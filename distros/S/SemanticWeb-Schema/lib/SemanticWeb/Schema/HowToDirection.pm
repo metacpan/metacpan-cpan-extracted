@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has after_media => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_after_media',
     json_ld   => 'afterMedia',
 );
 
@@ -28,7 +28,7 @@ has after_media => (
 
 has before_media => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_before_media',
     json_ld   => 'beforeMedia',
 );
 
@@ -36,7 +36,7 @@ has before_media => (
 
 has during_media => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_during_media',
     json_ld   => 'duringMedia',
 );
 
@@ -44,7 +44,7 @@ has during_media => (
 
 has perform_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_perform_time',
     json_ld   => 'performTime',
 );
 
@@ -52,7 +52,7 @@ has perform_time => (
 
 has prep_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_prep_time',
     json_ld   => 'prepTime',
 );
 
@@ -60,7 +60,7 @@ has prep_time => (
 
 has supply => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_supply',
     json_ld   => 'supply',
 );
 
@@ -68,7 +68,7 @@ has supply => (
 
 has tool => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_tool',
     json_ld   => 'tool',
 );
 
@@ -76,7 +76,7 @@ has tool => (
 
 has total_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_total_time',
     json_ld   => 'totalTime',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::HowToDirection - A direction indicating a single action to 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -124,6 +124,10 @@ A after_media should be one of the following types:
 
 =back
 
+=head2 C<_has_after_media>
+
+A predicate for the L</after_media> attribute.
+
 =head2 C<before_media>
 
 C<beforeMedia>
@@ -140,6 +144,10 @@ A before_media should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_before_media>
+
+A predicate for the L</before_media> attribute.
 
 =head2 C<during_media>
 
@@ -158,6 +166,10 @@ A during_media should be one of the following types:
 
 =back
 
+=head2 C<_has_during_media>
+
+A predicate for the L</during_media> attribute.
+
 =head2 C<perform_time>
 
 C<performTime>
@@ -174,6 +186,10 @@ A perform_time should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
+
+=head2 C<_has_perform_time>
+
+A predicate for the L</perform_time> attribute.
 
 =head2 C<prep_time>
 
@@ -192,6 +208,10 @@ A prep_time should be one of the following types:
 
 =back
 
+=head2 C<_has_prep_time>
+
+A predicate for the L</prep_time> attribute.
+
 =head2 C<supply>
 
 A sub-property of instrument. A supply consumed when performing
@@ -207,6 +227,10 @@ A supply should be one of the following types:
 
 =back
 
+=head2 C<_has_supply>
+
+A predicate for the L</supply> attribute.
+
 =head2 C<tool>
 
 A sub property of instrument. An object used (but not consumed) when
@@ -221,6 +245,10 @@ A tool should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_tool>
+
+A predicate for the L</tool> attribute.
 
 =head2 C<total_time>
 
@@ -238,6 +266,10 @@ A total_time should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
+
+=head2 C<_has_total_time>
+
+A predicate for the L</total_time> attribute.
 
 =head1 SEE ALSO
 

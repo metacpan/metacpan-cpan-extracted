@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has end_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_end_time',
     json_ld   => 'endTime',
 );
 
@@ -28,7 +28,7 @@ has end_time => (
 
 has party_size => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_party_size',
     json_ld   => 'partySize',
 );
 
@@ -36,7 +36,7 @@ has party_size => (
 
 has start_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_start_time',
     json_ld   => 'startTime',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::FoodEstablishmentReservation - A reservation to dine at a f
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -89,6 +89,10 @@ A end_time should be one of the following types:
 
 =back
 
+=head2 C<_has_end_time>
+
+A predicate for the L</end_time> attribute.
+
 =head2 C<party_size>
 
 C<partySize>
@@ -104,6 +108,10 @@ A party_size should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_party_size>
+
+A predicate for the L</party_size> attribute.
 
 =head2 C<start_time>
 
@@ -125,6 +133,10 @@ A start_time should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_start_time>
+
+A predicate for the L</start_time> attribute.
 
 =head1 SEE ALSO
 

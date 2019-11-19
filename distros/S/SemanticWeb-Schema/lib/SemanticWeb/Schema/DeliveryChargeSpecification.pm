@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has applies_to_delivery_method => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_applies_to_delivery_method',
     json_ld   => 'appliesToDeliveryMethod',
 );
 
@@ -28,7 +28,7 @@ has applies_to_delivery_method => (
 
 has area_served => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_area_served',
     json_ld   => 'areaServed',
 );
 
@@ -36,7 +36,7 @@ has area_served => (
 
 has eligible_region => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_eligible_region',
     json_ld   => 'eligibleRegion',
 );
 
@@ -44,7 +44,7 @@ has eligible_region => (
 
 has ineligible_region => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ineligible_region',
     json_ld   => 'ineligibleRegion',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::DeliveryChargeSpecification - The price for the delivery of
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -89,6 +89,10 @@ A applies_to_delivery_method should be one of the following types:
 
 =back
 
+=head2 C<_has_applies_to_delivery_method>
+
+A predicate for the L</applies_to_delivery_method> attribute.
+
 =head2 C<area_served>
 
 C<areaServed>
@@ -108,6 +112,10 @@ A area_served should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_area_served>
+
+A predicate for the L</area_served> attribute.
 
 =head2 C<eligible_region>
 
@@ -131,6 +139,10 @@ A eligible_region should be one of the following types:
 
 =back
 
+=head2 C<_has_eligible_region>
+
+A predicate for the L</eligible_region> attribute.
+
 =head2 C<ineligible_region>
 
 C<ineligibleRegion>
@@ -152,6 +164,10 @@ A ineligible_region should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_ineligible_region>
+
+A predicate for the L</ineligible_region> attribute.
 
 =head1 SEE ALSO
 

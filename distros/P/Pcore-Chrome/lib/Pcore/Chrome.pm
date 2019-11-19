@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.8.1;
+package Pcore::Chrome v0.8.2;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Chrome::Tab;
@@ -104,33 +104,25 @@ around new => sub ( $orig, $self, %args ) {
 };
 
 sub tabs ( $self ) {
-    return P->http->get(
-        "http://$self->{host}:$self->{port}/json",
-        sub ($res) {
-            say dump $res;
+    my $res = P->http->get("http://$self->{host}:$self->{port}/json");
 
-            my $tabs = from_json $res->{data};
+    my $tabs = from_json $res->{data};
 
-            for my $tab ( $tabs->@* ) {
-                $tab = bless { chrome => $self, id => $tab->{id} }, 'Pcore::Chrome::Tab';
-            }
+    for my $tab ( $tabs->@* ) {
+        $tab = bless { chrome => $self, id => $tab->{id} }, 'Pcore::Chrome::Tab';
+    }
 
-            return res 200, $tabs;
-        }
-    );
+    return res 200, $tabs;
 }
 
 sub new_tab ( $self, $url = undef ) {
-    return P->http->get(
-        "http://$self->{host}:$self->{port}/json/new?" . ( $url // 'about:blank' ),
-        sub ($res) {
-            my $data = from_json $res->{data};
+    my $res = P->http->get( "http://$self->{host}:$self->{port}/json/new?" . ( $url // 'about:blank' ) );
 
-            my $tab = bless { chrome => $self, id => $data->{id} }, 'Pcore::Chrome::Tab';
+    my $data = from_json $res->{data};
 
-            return $tab;
-        }
-    );
+    my $tab = bless { chrome => $self, id => $data->{id} }, 'Pcore::Chrome::Tab';
+
+    return $tab;
 }
 
 1;

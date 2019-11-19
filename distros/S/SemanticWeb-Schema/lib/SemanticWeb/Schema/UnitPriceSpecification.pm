@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has billing_increment => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_billing_increment',
     json_ld   => 'billingIncrement',
 );
 
@@ -28,7 +28,7 @@ has billing_increment => (
 
 has price_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price_type',
     json_ld   => 'priceType',
 );
 
@@ -36,7 +36,7 @@ has price_type => (
 
 has reference_quantity => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_reference_quantity',
     json_ld   => 'referenceQuantity',
 );
 
@@ -44,7 +44,7 @@ has reference_quantity => (
 
 has unit_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_unit_code',
     json_ld   => 'unitCode',
 );
 
@@ -52,7 +52,7 @@ has unit_code => (
 
 has unit_text => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_unit_text',
     json_ld   => 'unitText',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::UnitPriceSpecification - The price asked for a given offer 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -98,6 +98,10 @@ A billing_increment should be one of the following types:
 
 =back
 
+=head2 C<_has_billing_increment>
+
+A predicate for the L</billing_increment> attribute.
+
 =head2 C<price_type>
 
 C<priceType>
@@ -113,6 +117,10 @@ A price_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_price_type>
+
+A predicate for the L</price_type> attribute.
 
 =head2 C<reference_quantity>
 
@@ -130,6 +138,10 @@ A reference_quantity should be one of the following types:
 
 =back
 
+=head2 C<_has_reference_quantity>
+
+A predicate for the L</reference_quantity> attribute.
+
 =head2 C<unit_code>
 
 C<unitCode>
@@ -146,6 +158,10 @@ A unit_code should be one of the following types:
 
 =back
 
+=head2 C<_has_unit_code>
+
+A predicate for the L</unit_code> attribute.
+
 =head2 C<unit_text>
 
 C<unitText>
@@ -160,6 +176,10 @@ A unit_text should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_unit_text>
+
+A predicate for the L</unit_text> attribute.
 
 =head1 SEE ALSO
 

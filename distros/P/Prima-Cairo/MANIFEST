@@ -11,6 +11,7 @@ examples/raycaster.pl
 examples/star_and_ring.pl
 examples/test.pl
 examples/a1-test.pl
+examples/coordinates.pl
 examples/wall_texture.jpg
 t/01_load.t
 t/02_paint.t

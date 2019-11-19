@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has caption => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_caption',
     json_ld   => 'caption',
 );
 
@@ -28,7 +28,7 @@ has caption => (
 
 has exif_data => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_exif_data',
     json_ld   => 'exifData',
 );
 
@@ -36,7 +36,7 @@ has exif_data => (
 
 has representative_of_page => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_representative_of_page',
     json_ld   => 'representativeOfPage',
 );
 
@@ -44,7 +44,7 @@ has representative_of_page => (
 
 has thumbnail => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_thumbnail',
     json_ld   => 'thumbnail',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::ImageObject - An image file.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -91,6 +91,10 @@ A caption should be one of the following types:
 
 =back
 
+=head2 C<_has_caption>
+
+A predicate for the L</caption> attribute.
+
 =head2 C<exif_data>
 
 C<exifData>
@@ -107,6 +111,10 @@ A exif_data should be one of the following types:
 
 =back
 
+=head2 C<_has_exif_data>
+
+A predicate for the L</exif_data> attribute.
+
 =head2 C<representative_of_page>
 
 C<representativeOfPage>
@@ -121,6 +129,10 @@ A representative_of_page should be one of the following types:
 
 =back
 
+=head2 C<_has_representative_of_page>
+
+A predicate for the L</representative_of_page> attribute.
+
 =head2 C<thumbnail>
 
 Thumbnail image for an image or video.
@@ -132,6 +144,10 @@ A thumbnail should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
 
 =back
+
+=head2 C<_has_thumbnail>
+
+A predicate for the L</thumbnail> attribute.
 
 =head1 SEE ALSO
 

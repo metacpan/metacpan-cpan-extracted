@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has associated_anatomy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_associated_anatomy',
     json_ld   => 'associatedAnatomy',
 );
 
@@ -28,7 +28,7 @@ has associated_anatomy => (
 
 has category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_category',
     json_ld   => 'category',
 );
 
@@ -36,7 +36,7 @@ has category => (
 
 has epidemiology => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_epidemiology',
     json_ld   => 'epidemiology',
 );
 
@@ -44,7 +44,7 @@ has epidemiology => (
 
 has pathophysiology => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_pathophysiology',
     json_ld   => 'pathophysiology',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::PhysicalActivity - Any bodily activity that enhances or mai
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -96,6 +96,10 @@ A associated_anatomy should be one of the following types:
 
 =back
 
+=head2 C<_has_associated_anatomy>
+
+A predicate for the L</associated_anatomy> attribute.
+
 =head2 C<category>
 
 A category for the item. Greater signs or slashes can be used to informally
@@ -113,6 +117,10 @@ A category should be one of the following types:
 
 =back
 
+=head2 C<_has_category>
+
+A predicate for the L</category> attribute.
+
 =head2 C<epidemiology>
 
 The characteristics of associated patients, such as age, gender, race etc.
@@ -124,6 +132,10 @@ A epidemiology should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_epidemiology>
+
+A predicate for the L</epidemiology> attribute.
 
 =head2 C<pathophysiology>
 
@@ -137,6 +149,10 @@ A pathophysiology should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_pathophysiology>
+
+A predicate for the L</pathophysiology> attribute.
 
 =head1 SEE ALSO
 

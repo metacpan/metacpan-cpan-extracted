@@ -26,6 +26,15 @@ coerce 'XML::NewsML_G2::ArrayRefOfLinks', from 'ArrayRef[HashRef]', via {
     [ map { XML::NewsML_G2::Link->new($_) } @$_ ]
 };
 
+class_type 'XML::NewsML_G2::Creator';
+coerce 'XML::NewsML_G2::Creator', from 'Str',
+    via { use_module('XML::NewsML_G2::Creator')->new( name => $_ ) };
+subtype 'XML::NewsML_G2::ArrayRefOfCreators',
+    as 'ArrayRef[XML::NewsML_G2::Creator]';
+coerce 'XML::NewsML_G2::ArrayRefOfCreators', from 'ArrayRef[Str]', via {
+    [ map { XML::NewsML_G2::Creator->new( name => $_ ) } @$_ ]
+};
+
 1;
 __END__
 

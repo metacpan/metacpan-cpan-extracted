@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has holding_archive => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_holding_archive',
     json_ld   => 'holdingArchive',
 );
 
@@ -28,7 +28,7 @@ has holding_archive => (
 
 has item_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_item_location',
     json_ld   => 'itemLocation',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::ArchiveComponent - An intangible type to be applied to any 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -76,6 +76,10 @@ A holding_archive should be one of the following types:
 
 =back
 
+=head2 C<_has_holding_archive>
+
+A predicate for the L</holding_archive> attribute.
+
 =head2 C<item_location>
 
 C<itemLocation>
@@ -93,6 +97,10 @@ A item_location should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_item_location>
+
+A predicate for the L</item_location> attribute.
 
 =head1 SEE ALSO
 

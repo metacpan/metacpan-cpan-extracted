@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has area_served => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_area_served',
     json_ld   => 'areaServed',
 );
 
@@ -28,7 +28,7 @@ has area_served => (
 
 has available_language => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_available_language',
     json_ld   => 'availableLanguage',
 );
 
@@ -36,7 +36,7 @@ has available_language => (
 
 has contact_option => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_contact_option',
     json_ld   => 'contactOption',
 );
 
@@ -44,7 +44,7 @@ has contact_option => (
 
 has contact_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_contact_type',
     json_ld   => 'contactType',
 );
 
@@ -52,7 +52,7 @@ has contact_type => (
 
 has email => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_email',
     json_ld   => 'email',
 );
 
@@ -60,7 +60,7 @@ has email => (
 
 has fax_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_fax_number',
     json_ld   => 'faxNumber',
 );
 
@@ -68,7 +68,7 @@ has fax_number => (
 
 has hours_available => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_hours_available',
     json_ld   => 'hoursAvailable',
 );
 
@@ -76,7 +76,7 @@ has hours_available => (
 
 has product_supported => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_product_supported',
     json_ld   => 'productSupported',
 );
 
@@ -84,7 +84,7 @@ has product_supported => (
 
 has service_area => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_service_area',
     json_ld   => 'serviceArea',
 );
 
@@ -92,7 +92,7 @@ has service_area => (
 
 has telephone => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_telephone',
     json_ld   => 'telephone',
 );
 
@@ -114,7 +114,7 @@ SemanticWeb::Schema::ContactPoint - A contact point—for example
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -142,6 +142,10 @@ A area_served should be one of the following types:
 
 =back
 
+=head2 C<_has_area_served>
+
+A predicate for the L</area_served> attribute.
+
 =head2 C<available_language>
 
 C<availableLanguage>
@@ -161,6 +165,10 @@ A available_language should be one of the following types:
 
 =back
 
+=head2 C<_has_available_language>
+
+A predicate for the L</available_language> attribute.
+
 =head2 C<contact_option>
 
 C<contactOption>
@@ -175,6 +183,10 @@ A contact_option should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ContactPointOption']>
 
 =back
+
+=head2 C<_has_contact_option>
+
+A predicate for the L</contact_option> attribute.
 
 =head2 C<contact_type>
 
@@ -192,6 +204,10 @@ A contact_type should be one of the following types:
 
 =back
 
+=head2 C<_has_contact_type>
+
+A predicate for the L</contact_type> attribute.
+
 =head2 C<email>
 
 Email address.
@@ -203,6 +219,10 @@ A email should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_email>
+
+A predicate for the L</email> attribute.
 
 =head2 C<fax_number>
 
@@ -218,6 +238,10 @@ A fax_number should be one of the following types:
 
 =back
 
+=head2 C<_has_fax_number>
+
+A predicate for the L</fax_number> attribute.
+
 =head2 C<hours_available>
 
 C<hoursAvailable>
@@ -231,6 +255,10 @@ A hours_available should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::OpeningHoursSpecification']>
 
 =back
+
+=head2 C<_has_hours_available>
+
+A predicate for the L</hours_available> attribute.
 
 =head2 C<product_supported>
 
@@ -251,6 +279,10 @@ A product_supported should be one of the following types:
 
 =back
 
+=head2 C<_has_product_supported>
+
+A predicate for the L</product_supported> attribute.
+
 =head2 C<service_area>
 
 C<serviceArea>
@@ -269,6 +301,10 @@ A service_area should be one of the following types:
 
 =back
 
+=head2 C<_has_service_area>
+
+A predicate for the L</service_area> attribute.
+
 =head2 C<telephone>
 
 The telephone number.
@@ -280,6 +316,10 @@ A telephone should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_telephone>
+
+A predicate for the L</telephone> attribute.
 
 =head1 SEE ALSO
 

@@ -15,7 +15,7 @@ use Types::Standard qw/ Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 # RECOMMEND PREREQ: aliased
 # RECOMMEND PREREQ: Class::XSAccessor 1.18
@@ -48,7 +48,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 SYNOPSIS
 
@@ -123,11 +123,21 @@ feature.
 
 Robert Rothenberg <rrwo@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Mohammad S Anwar
+=for stopwords Arikawa Takaya Mohammad S Anwar
+
+=over 4
+
+=item *
+
+Arikawa Takaya <tky.c10.ver@gmail.com>
+
+=item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

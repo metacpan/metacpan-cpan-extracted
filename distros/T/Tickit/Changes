@@ -1,5 +1,10 @@
 Revision history for Changes
 
+0.68    2019-11-18 16:27:52
+        [CHANGES]
+         * Wrap toplevel Tickit objects from C library; use C library's event
+           loop
+
 0.67    2019-04-10 19:42:06
         [CHANGES]
          * Use libtickit 0.3

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has to_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_to_location',
     json_ld   => 'toLocation',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::InsertAction - The act of adding at a specific location in 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ A to_location should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
+
+=head2 C<_has_to_location>
+
+A predicate for the L</to_location> attribute.
 
 =head1 SEE ALSO
 

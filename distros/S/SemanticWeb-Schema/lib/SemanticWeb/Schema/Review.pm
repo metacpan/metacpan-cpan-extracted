@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has item_reviewed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_item_reviewed',
     json_ld   => 'itemReviewed',
 );
 
@@ -28,7 +28,7 @@ has item_reviewed => (
 
 has review_aspect => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_review_aspect',
     json_ld   => 'reviewAspect',
 );
 
@@ -36,7 +36,7 @@ has review_aspect => (
 
 has review_body => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_review_body',
     json_ld   => 'reviewBody',
 );
 
@@ -44,7 +44,7 @@ has review_body => (
 
 has review_rating => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_review_rating',
     json_ld   => 'reviewRating',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::Review - A review of an item - for example
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -88,6 +88,10 @@ A item_reviewed should be one of the following types:
 
 =back
 
+=head2 C<_has_item_reviewed>
+
+A predicate for the L</item_reviewed> attribute.
+
 =head2 C<review_aspect>
 
 C<reviewAspect>
@@ -103,6 +107,10 @@ A review_aspect should be one of the following types:
 
 =back
 
+=head2 C<_has_review_aspect>
+
+A predicate for the L</review_aspect> attribute.
+
 =head2 C<review_body>
 
 C<reviewBody>
@@ -116,6 +124,10 @@ A review_body should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_review_body>
+
+A predicate for the L</review_body> attribute.
 
 =head2 C<review_rating>
 
@@ -134,6 +146,10 @@ A review_rating should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Rating']>
 
 =back
+
+=head2 C<_has_review_rating>
+
+A predicate for the L</review_rating> attribute.
 
 =head1 SEE ALSO
 

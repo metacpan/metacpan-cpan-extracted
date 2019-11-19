@@ -8,7 +8,7 @@ use Cache::Memory::Simple;
 use List::Util qw//;
 use Time::HiRes qw//;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 sub request($$) {
    my ($self, $req, $cb) = @_;

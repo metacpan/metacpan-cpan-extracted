@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has in_support_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_in_support_of',
     json_ld   => 'inSupportOf',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::Thesis - A thesis or dissertation document submitted in sup
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ A in_support_of should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_in_support_of>
+
+A predicate for the L</in_support_of> attribute.
 
 =head1 SEE ALSO
 

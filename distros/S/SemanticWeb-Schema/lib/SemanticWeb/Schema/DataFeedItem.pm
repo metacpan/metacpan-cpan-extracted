@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has date_created => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_created',
     json_ld   => 'dateCreated',
 );
 
@@ -28,7 +28,7 @@ has date_created => (
 
 has date_deleted => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_deleted',
     json_ld   => 'dateDeleted',
 );
 
@@ -36,7 +36,7 @@ has date_deleted => (
 
 has date_modified => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_modified',
     json_ld   => 'dateModified',
 );
 
@@ -44,7 +44,7 @@ has date_modified => (
 
 has item => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_item',
     json_ld   => 'item',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::DataFeedItem - A single item within a larger data feed.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -89,6 +89,10 @@ A date_created should be one of the following types:
 
 =back
 
+=head2 C<_has_date_created>
+
+A predicate for the L</date_created> attribute.
+
 =head2 C<date_deleted>
 
 C<dateDeleted>
@@ -102,6 +106,10 @@ A date_deleted should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_date_deleted>
+
+A predicate for the L</date_deleted> attribute.
 
 =head2 C<date_modified>
 
@@ -118,6 +126,10 @@ A date_modified should be one of the following types:
 
 =back
 
+=head2 C<_has_date_modified>
+
+A predicate for the L</date_modified> attribute.
+
 =head2 C<item>
 
 An entity represented by an entry in a list or data feed (e.g. an 'artist'
@@ -130,6 +142,10 @@ A item should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_item>
+
+A predicate for the L</item> attribute.
 
 =head1 SEE ALSO
 

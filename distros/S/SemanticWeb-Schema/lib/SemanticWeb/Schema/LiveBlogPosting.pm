@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has coverage_end_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_coverage_end_time',
     json_ld   => 'coverageEndTime',
 );
 
@@ -28,7 +28,7 @@ has coverage_end_time => (
 
 has coverage_start_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_coverage_start_time',
     json_ld   => 'coverageStartTime',
 );
 
@@ -36,7 +36,7 @@ has coverage_start_time => (
 
 has live_blog_update => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_live_blog_update',
     json_ld   => 'liveBlogUpdate',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::LiveBlogPosting - A blog post intended to provide a rolling
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -82,6 +82,10 @@ A coverage_end_time should be one of the following types:
 
 =back
 
+=head2 C<_has_coverage_end_time>
+
+A predicate for the L</coverage_end_time> attribute.
+
 =head2 C<coverage_start_time>
 
 C<coverageStartTime>
@@ -98,6 +102,10 @@ A coverage_start_time should be one of the following types:
 
 =back
 
+=head2 C<_has_coverage_start_time>
+
+A predicate for the L</coverage_start_time> attribute.
+
 =head2 C<live_blog_update>
 
 C<liveBlogUpdate>
@@ -111,6 +119,10 @@ A live_blog_update should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::BlogPosting']>
 
 =back
+
+=head2 C<_has_live_blog_update>
+
+A predicate for the L</live_blog_update> attribute.
 
 =head1 SEE ALSO
 

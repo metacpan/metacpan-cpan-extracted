@@ -1,6 +1,6 @@
 package Bio::Palantir::Explorer;
 # ABSTRACT: front-end class for Bio::Palantir::Explorer module, wich handles the NRPS/PKS domain exploration without pre-existing consensus architecture
-$Bio::Palantir::Explorer::VERSION = '0.193080';
+$Bio::Palantir::Explorer::VERSION = '0.193230';
 use warnings;
 use strict;
 
@@ -19,7 +19,7 @@ Bio::Palantir::Explorer - front-end class for Bio::Palantir::Explorer module, wi
 
 =head1 VERSION
 
-version 0.193080
+version 0.193230
 
 =head1 DESCRIPTION
 

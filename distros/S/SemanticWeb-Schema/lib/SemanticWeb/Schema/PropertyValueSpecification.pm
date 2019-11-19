@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has default_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_default_value',
     json_ld   => 'defaultValue',
 );
 
@@ -28,7 +28,7 @@ has default_value => (
 
 has max_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_max_value',
     json_ld   => 'maxValue',
 );
 
@@ -36,7 +36,7 @@ has max_value => (
 
 has min_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_min_value',
     json_ld   => 'minValue',
 );
 
@@ -44,7 +44,7 @@ has min_value => (
 
 has multiple_values => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_multiple_values',
     json_ld   => 'multipleValues',
 );
 
@@ -52,7 +52,7 @@ has multiple_values => (
 
 has readonly_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_readonly_value',
     json_ld   => 'readonlyValue',
 );
 
@@ -60,7 +60,7 @@ has readonly_value => (
 
 has step_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_step_value',
     json_ld   => 'stepValue',
 );
 
@@ -68,7 +68,7 @@ has step_value => (
 
 has value_max_length => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_value_max_length',
     json_ld   => 'valueMaxLength',
 );
 
@@ -76,7 +76,7 @@ has value_max_length => (
 
 has value_min_length => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_value_min_length',
     json_ld   => 'valueMinLength',
 );
 
@@ -84,7 +84,7 @@ has value_min_length => (
 
 has value_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_value_name',
     json_ld   => 'valueName',
 );
 
@@ -92,7 +92,7 @@ has value_name => (
 
 has value_pattern => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_value_pattern',
     json_ld   => 'valuePattern',
 );
 
@@ -100,7 +100,7 @@ has value_pattern => (
 
 has value_required => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_value_required',
     json_ld   => 'valueRequired',
 );
 
@@ -122,7 +122,7 @@ SemanticWeb::Schema::PropertyValueSpecification - A Property value specification
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -148,6 +148,10 @@ A default_value should be one of the following types:
 
 =back
 
+=head2 C<_has_default_value>
+
+A predicate for the L</default_value> attribute.
+
 =head2 C<max_value>
 
 C<maxValue>
@@ -161,6 +165,10 @@ A max_value should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_max_value>
+
+A predicate for the L</max_value> attribute.
 
 =head2 C<min_value>
 
@@ -176,6 +184,10 @@ A min_value should be one of the following types:
 
 =back
 
+=head2 C<_has_min_value>
+
+A predicate for the L</min_value> attribute.
+
 =head2 C<multiple_values>
 
 C<multipleValues>
@@ -189,6 +201,10 @@ A multiple_values should be one of the following types:
 =item C<Bool>
 
 =back
+
+=head2 C<_has_multiple_values>
+
+A predicate for the L</multiple_values> attribute.
 
 =head2 C<readonly_value>
 
@@ -206,6 +222,10 @@ A readonly_value should be one of the following types:
 
 =back
 
+=head2 C<_has_readonly_value>
+
+A predicate for the L</readonly_value> attribute.
+
 =head2 C<step_value>
 
 C<stepValue>
@@ -221,6 +241,10 @@ A step_value should be one of the following types:
 
 =back
 
+=head2 C<_has_step_value>
+
+A predicate for the L</step_value> attribute.
+
 =head2 C<value_max_length>
 
 C<valueMaxLength>
@@ -234,6 +258,10 @@ A value_max_length should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_value_max_length>
+
+A predicate for the L</value_max_length> attribute.
 
 =head2 C<value_min_length>
 
@@ -250,6 +278,10 @@ A value_min_length should be one of the following types:
 
 =back
 
+=head2 C<_has_value_min_length>
+
+A predicate for the L</value_min_length> attribute.
+
 =head2 C<value_name>
 
 C<valueName>
@@ -264,6 +296,10 @@ A value_name should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_value_name>
+
+A predicate for the L</value_name> attribute.
 
 =head2 C<value_pattern>
 
@@ -280,6 +316,10 @@ A value_pattern should be one of the following types:
 
 =back
 
+=head2 C<_has_value_pattern>
+
+A predicate for the L</value_pattern> attribute.
+
 =head2 C<value_required>
 
 C<valueRequired>
@@ -294,6 +334,10 @@ A value_required should be one of the following types:
 =item C<Bool>
 
 =back
+
+=head2 C<_has_value_required>
+
+A predicate for the L</value_required> attribute.
 
 =head1 SEE ALSO
 

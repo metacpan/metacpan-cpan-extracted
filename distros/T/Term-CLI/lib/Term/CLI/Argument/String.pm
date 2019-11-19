@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Argument::String  0.051005 {
+package Term::CLI::Argument::String  0.051007 {
 
 use Modern::Perl 1.20140107;
 
@@ -72,7 +72,7 @@ Term::CLI::Argument::String - class for basic string arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.051005
+version 0.051007
 
 =head1 SYNOPSIS
 

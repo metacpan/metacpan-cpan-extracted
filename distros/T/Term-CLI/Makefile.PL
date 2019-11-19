@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014001",
   "NAME" => "Term::CLI",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Exporter" => "5.71",
     "File::Which" => "1.09",
     "FindBin" => "1.50",
@@ -51,7 +52,7 @@ my %WriteMakefileArgs = (
     "strict" => "1.00",
     "warnings" => "1.00"
   },
-  "VERSION" => "0.051005",
+  "VERSION" => "0.051007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,6 +60,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Exporter" => "5.71",
   "File::Temp" => "0.2304",
   "File::Which" => "1.09",

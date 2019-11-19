@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has date_issued => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_issued',
     json_ld   => 'dateIssued',
 );
 
@@ -28,7 +28,7 @@ has date_issued => (
 
 has issued_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_issued_by',
     json_ld   => 'issuedBy',
 );
 
@@ -36,7 +36,7 @@ has issued_by => (
 
 has price_currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price_currency',
     json_ld   => 'priceCurrency',
 );
 
@@ -44,7 +44,7 @@ has price_currency => (
 
 has ticket_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ticket_number',
     json_ld   => 'ticketNumber',
 );
 
@@ -52,7 +52,7 @@ has ticket_number => (
 
 has ticket_token => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ticket_token',
     json_ld   => 'ticketToken',
 );
 
@@ -60,7 +60,7 @@ has ticket_token => (
 
 has ticketed_seat => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ticketed_seat',
     json_ld   => 'ticketedSeat',
 );
 
@@ -68,7 +68,7 @@ has ticketed_seat => (
 
 has total_price => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_total_price',
     json_ld   => 'totalPrice',
 );
 
@@ -76,7 +76,7 @@ has total_price => (
 
 has under_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_under_name',
     json_ld   => 'underName',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::Ticket - Used to describe a ticket to an event
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -120,6 +120,10 @@ A date_issued should be one of the following types:
 
 =back
 
+=head2 C<_has_date_issued>
+
+A predicate for the L</date_issued> attribute.
+
 =head2 C<issued_by>
 
 C<issuedBy>
@@ -133,6 +137,10 @@ A issued_by should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_issued_by>
+
+A predicate for the L</issued_by> attribute.
 
 =head2 C<price_currency>
 
@@ -158,6 +166,10 @@ A price_currency should be one of the following types:
 
 =back
 
+=head2 C<_has_price_currency>
+
+A predicate for the L</price_currency> attribute.
+
 =head2 C<ticket_number>
 
 C<ticketNumber>
@@ -171,6 +183,10 @@ A ticket_number should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_ticket_number>
+
+A predicate for the L</ticket_number> attribute.
 
 =head2 C<ticket_token>
 
@@ -187,6 +203,10 @@ A ticket_token should be one of the following types:
 
 =back
 
+=head2 C<_has_ticket_token>
+
+A predicate for the L</ticket_token> attribute.
+
 =head2 C<ticketed_seat>
 
 C<ticketedSeat>
@@ -200,6 +220,10 @@ A ticketed_seat should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Seat']>
 
 =back
+
+=head2 C<_has_ticketed_seat>
+
+A predicate for the L</ticketed_seat> attribute.
 
 =head2 C<total_price>
 
@@ -224,6 +248,10 @@ A total_price should be one of the following types:
 
 =back
 
+=head2 C<_has_total_price>
+
+A predicate for the L</total_price> attribute.
+
 =head2 C<under_name>
 
 C<underName>
@@ -239,6 +267,10 @@ A under_name should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_under_name>
+
+A predicate for the L</under_name> attribute.
 
 =head1 SEE ALSO
 

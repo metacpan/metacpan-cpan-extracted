@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has originates_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_originates_from',
     json_ld   => 'originatesFrom',
 );
 
@@ -28,7 +28,7 @@ has originates_from => (
 
 has region_drained => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_region_drained',
     json_ld   => 'regionDrained',
 );
 
@@ -36,7 +36,7 @@ has region_drained => (
 
 has runs_to => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_runs_to',
     json_ld   => 'runsTo',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::LymphaticVessel - A type of blood vessel that specifically 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -81,6 +81,10 @@ A originates_from should be one of the following types:
 
 =back
 
+=head2 C<_has_originates_from>
+
+A predicate for the L</originates_from> attribute.
+
 =head2 C<region_drained>
 
 C<regionDrained>
@@ -98,6 +102,10 @@ A region_drained should be one of the following types:
 
 =back
 
+=head2 C<_has_region_drained>
+
+A predicate for the L</region_drained> attribute.
+
 =head2 C<runs_to>
 
 C<runsTo>
@@ -111,6 +119,10 @@ A runs_to should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Vessel']>
 
 =back
+
+=head2 C<_has_runs_to>
+
+A predicate for the L</runs_to> attribute.
 
 =head1 SEE ALSO
 

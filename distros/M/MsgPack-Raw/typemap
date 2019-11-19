@@ -1,0 +1,16 @@
+Packer                 T_MSGPACK_REF
+Unpacker               T_MSGPACK_REF
+
+OUTPUT
+T_MSGPACK_REF
+	sv_setref_pv($arg, \"MsgPack::Raw::${(my $ntt = $ntype) =~ s/_/::/g;\$ntt}\", (void *) $var);
+
+INPUT
+T_MSGPACK_REF
+	if (sv_isobject ($arg) &&
+	    sv_derived_from ($arg, \"MsgPack::Raw::${(my $ntt = $ntype) =~ s/_/::/g;\$ntt}\")) {
+		$var = INT2PTR ($type, SvIV ((SV *) SvRV ($arg)));
+	} else {
+		$var = NULL;
+		croak (\"$var is not of type MsgPack::Raw::${(my $ntt = $ntype) =~ s/_/::/g;\$ntt}\");
+	}

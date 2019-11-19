@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has actionable_feedback_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actionable_feedback_policy',
     json_ld   => 'actionableFeedbackPolicy',
 );
 
@@ -28,7 +28,7 @@ has actionable_feedback_policy => (
 
 has corrections_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_corrections_policy',
     json_ld   => 'correctionsPolicy',
 );
 
@@ -36,7 +36,7 @@ has corrections_policy => (
 
 has diversity_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_diversity_policy',
     json_ld   => 'diversityPolicy',
 );
 
@@ -44,7 +44,7 @@ has diversity_policy => (
 
 has diversity_staffing_report => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_diversity_staffing_report',
     json_ld   => 'diversityStaffingReport',
 );
 
@@ -52,7 +52,7 @@ has diversity_staffing_report => (
 
 has ethics_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ethics_policy',
     json_ld   => 'ethicsPolicy',
 );
 
@@ -60,7 +60,7 @@ has ethics_policy => (
 
 has masthead => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_masthead',
     json_ld   => 'masthead',
 );
 
@@ -68,7 +68,7 @@ has masthead => (
 
 has mission_coverage_priorities_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_mission_coverage_priorities_policy',
     json_ld   => 'missionCoveragePrioritiesPolicy',
 );
 
@@ -76,7 +76,7 @@ has mission_coverage_priorities_policy => (
 
 has no_bylines_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_no_bylines_policy',
     json_ld   => 'noBylinesPolicy',
 );
 
@@ -84,7 +84,7 @@ has no_bylines_policy => (
 
 has ownership_funding_info => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ownership_funding_info',
     json_ld   => 'ownershipFundingInfo',
 );
 
@@ -92,7 +92,7 @@ has ownership_funding_info => (
 
 has unnamed_sources_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_unnamed_sources_policy',
     json_ld   => 'unnamedSourcesPolicy',
 );
 
@@ -100,7 +100,7 @@ has unnamed_sources_policy => (
 
 has verification_fact_checking_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_verification_fact_checking_policy',
     json_ld   => 'verificationFactCheckingPolicy',
 );
 
@@ -122,7 +122,7 @@ SemanticWeb::Schema::NewsMediaOrganization - A News/Media organization such as a
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -152,6 +152,10 @@ A actionable_feedback_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_actionable_feedback_policy>
+
+A predicate for the L</actionable_feedback_policy> attribute.
+
 =head2 C<corrections_policy>
 
 C<correctionsPolicy>
@@ -172,6 +176,10 @@ A corrections_policy should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_corrections_policy>
+
+A predicate for the L</corrections_policy> attribute.
 
 =head2 C<diversity_policy>
 
@@ -196,6 +204,10 @@ A diversity_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_diversity_policy>
+
+A predicate for the L</diversity_policy> attribute.
+
 =head2 C<diversity_staffing_report>
 
 C<diversityStaffingReport>
@@ -216,6 +228,10 @@ A diversity_staffing_report should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_diversity_staffing_report>
+
+A predicate for the L</diversity_staffing_report> attribute.
 
 =head2 C<ethics_policy>
 
@@ -241,6 +257,10 @@ A ethics_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_ethics_policy>
+
+A predicate for the L</ethics_policy> attribute.
+
 =head2 C<masthead>
 
 =for html <p>For a <a class="localLink"
@@ -256,6 +276,10 @@ A masthead should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_masthead>
+
+A predicate for the L</masthead> attribute.
 
 =head2 C<mission_coverage_priorities_policy>
 
@@ -276,6 +300,10 @@ A mission_coverage_priorities_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_mission_coverage_priorities_policy>
+
+A predicate for the L</mission_coverage_priorities_policy> attribute.
+
 =head2 C<no_bylines_policy>
 
 C<noBylinesPolicy>
@@ -295,6 +323,10 @@ A no_bylines_policy should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_no_bylines_policy>
+
+A predicate for the L</no_bylines_policy> attribute.
 
 =head2 C<ownership_funding_info>
 
@@ -322,6 +354,10 @@ A ownership_funding_info should be one of the following types:
 
 =back
 
+=head2 C<_has_ownership_funding_info>
+
+A predicate for the L</ownership_funding_info> attribute.
+
 =head2 C<unnamed_sources_policy>
 
 C<unnamedSourcesPolicy>
@@ -343,6 +379,10 @@ A unnamed_sources_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_unnamed_sources_policy>
+
+A predicate for the L</unnamed_sources_policy> attribute.
+
 =head2 C<verification_fact_checking_policy>
 
 C<verificationFactCheckingPolicy>
@@ -362,6 +402,10 @@ A verification_fact_checking_policy should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_verification_fact_checking_policy>
+
+A predicate for the L</verification_fact_checking_policy> attribute.
 
 =head1 SEE ALSO
 

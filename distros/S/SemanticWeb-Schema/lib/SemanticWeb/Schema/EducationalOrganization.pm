@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has alumni => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_alumni',
     json_ld   => 'alumni',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::EducationalOrganization - An educational organization.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -61,6 +61,10 @@ A alumni should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_alumni>
+
+A predicate for the L</alumni> attribute.
 
 =head1 SEE ALSO
 

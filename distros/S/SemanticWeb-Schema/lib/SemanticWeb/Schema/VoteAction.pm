@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has candidate => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_candidate',
     json_ld   => 'candidate',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::VoteAction - The act of expressing a preference from a fixe
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -62,6 +62,10 @@ A candidate should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_candidate>
+
+A predicate for the L</candidate> attribute.
 
 =head1 SEE ALSO
 

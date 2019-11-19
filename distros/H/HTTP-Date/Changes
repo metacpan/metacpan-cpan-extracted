@@ -1,5 +1,8 @@
 Change history for HTTP-Date
 
+6.05      2019-11-19 03:02:32Z
+    - Bump minimum version of Time::Local to 1.28 (GH#17) (Olaf Alders)
+
 6.04      2019-11-14 22:22:50Z
     - Replace vars with our (GH#15) (James Raspass)
     - Tidy lib and t files (GH#16) (Olaf Alders)

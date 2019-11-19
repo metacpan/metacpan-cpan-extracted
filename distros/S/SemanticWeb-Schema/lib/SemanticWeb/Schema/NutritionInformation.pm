@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has calories => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_calories',
     json_ld   => 'calories',
 );
 
@@ -28,7 +28,7 @@ has calories => (
 
 has carbohydrate_content => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_carbohydrate_content',
     json_ld   => 'carbohydrateContent',
 );
 
@@ -36,7 +36,7 @@ has carbohydrate_content => (
 
 has cholesterol_content => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_cholesterol_content',
     json_ld   => 'cholesterolContent',
 );
 
@@ -44,7 +44,7 @@ has cholesterol_content => (
 
 has fat_content => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_fat_content',
     json_ld   => 'fatContent',
 );
 
@@ -52,7 +52,7 @@ has fat_content => (
 
 has fiber_content => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_fiber_content',
     json_ld   => 'fiberContent',
 );
 
@@ -60,7 +60,7 @@ has fiber_content => (
 
 has protein_content => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_protein_content',
     json_ld   => 'proteinContent',
 );
 
@@ -68,7 +68,7 @@ has protein_content => (
 
 has saturated_fat_content => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_saturated_fat_content',
     json_ld   => 'saturatedFatContent',
 );
 
@@ -76,7 +76,7 @@ has saturated_fat_content => (
 
 has serving_size => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_serving_size',
     json_ld   => 'servingSize',
 );
 
@@ -84,7 +84,7 @@ has serving_size => (
 
 has sodium_content => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sodium_content',
     json_ld   => 'sodiumContent',
 );
 
@@ -92,7 +92,7 @@ has sodium_content => (
 
 has sugar_content => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sugar_content',
     json_ld   => 'sugarContent',
 );
 
@@ -100,7 +100,7 @@ has sugar_content => (
 
 has trans_fat_content => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_trans_fat_content',
     json_ld   => 'transFatContent',
 );
 
@@ -108,7 +108,7 @@ has trans_fat_content => (
 
 has unsaturated_fat_content => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_unsaturated_fat_content',
     json_ld   => 'unsaturatedFatContent',
 );
 
@@ -130,7 +130,7 @@ SemanticWeb::Schema::NutritionInformation - Nutritional information about the re
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -150,6 +150,10 @@ A calories should be one of the following types:
 
 =back
 
+=head2 C<_has_calories>
+
+A predicate for the L</calories> attribute.
+
 =head2 C<carbohydrate_content>
 
 C<carbohydrateContent>
@@ -163,6 +167,10 @@ A carbohydrate_content should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Mass']>
 
 =back
+
+=head2 C<_has_carbohydrate_content>
+
+A predicate for the L</carbohydrate_content> attribute.
 
 =head2 C<cholesterol_content>
 
@@ -178,6 +186,10 @@ A cholesterol_content should be one of the following types:
 
 =back
 
+=head2 C<_has_cholesterol_content>
+
+A predicate for the L</cholesterol_content> attribute.
+
 =head2 C<fat_content>
 
 C<fatContent>
@@ -191,6 +203,10 @@ A fat_content should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Mass']>
 
 =back
+
+=head2 C<_has_fat_content>
+
+A predicate for the L</fat_content> attribute.
 
 =head2 C<fiber_content>
 
@@ -206,6 +222,10 @@ A fiber_content should be one of the following types:
 
 =back
 
+=head2 C<_has_fiber_content>
+
+A predicate for the L</fiber_content> attribute.
+
 =head2 C<protein_content>
 
 C<proteinContent>
@@ -219,6 +239,10 @@ A protein_content should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Mass']>
 
 =back
+
+=head2 C<_has_protein_content>
+
+A predicate for the L</protein_content> attribute.
 
 =head2 C<saturated_fat_content>
 
@@ -234,6 +258,10 @@ A saturated_fat_content should be one of the following types:
 
 =back
 
+=head2 C<_has_saturated_fat_content>
+
+A predicate for the L</saturated_fat_content> attribute.
+
 =head2 C<serving_size>
 
 C<servingSize>
@@ -247,6 +275,10 @@ A serving_size should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_serving_size>
+
+A predicate for the L</serving_size> attribute.
 
 =head2 C<sodium_content>
 
@@ -262,6 +294,10 @@ A sodium_content should be one of the following types:
 
 =back
 
+=head2 C<_has_sodium_content>
+
+A predicate for the L</sodium_content> attribute.
+
 =head2 C<sugar_content>
 
 C<sugarContent>
@@ -275,6 +311,10 @@ A sugar_content should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Mass']>
 
 =back
+
+=head2 C<_has_sugar_content>
+
+A predicate for the L</sugar_content> attribute.
 
 =head2 C<trans_fat_content>
 
@@ -290,6 +330,10 @@ A trans_fat_content should be one of the following types:
 
 =back
 
+=head2 C<_has_trans_fat_content>
+
+A predicate for the L</trans_fat_content> attribute.
+
 =head2 C<unsaturated_fat_content>
 
 C<unsaturatedFatContent>
@@ -303,6 +347,10 @@ A unsaturated_fat_content should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Mass']>
 
 =back
+
+=head2 C<_has_unsaturated_fat_content>
+
+A predicate for the L</unsaturated_fat_content> attribute.
 
 =head1 SEE ALSO
 

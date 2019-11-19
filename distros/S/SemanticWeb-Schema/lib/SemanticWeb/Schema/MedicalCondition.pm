@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has associated_anatomy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_associated_anatomy',
     json_ld   => 'associatedAnatomy',
 );
 
@@ -28,7 +28,7 @@ has associated_anatomy => (
 
 has cause => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_cause',
     json_ld   => 'cause',
 );
 
@@ -36,7 +36,7 @@ has cause => (
 
 has differential_diagnosis => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_differential_diagnosis',
     json_ld   => 'differentialDiagnosis',
 );
 
@@ -44,7 +44,7 @@ has differential_diagnosis => (
 
 has drug => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_drug',
     json_ld   => 'drug',
 );
 
@@ -52,7 +52,7 @@ has drug => (
 
 has epidemiology => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_epidemiology',
     json_ld   => 'epidemiology',
 );
 
@@ -60,7 +60,7 @@ has epidemiology => (
 
 has expected_prognosis => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_expected_prognosis',
     json_ld   => 'expectedPrognosis',
 );
 
@@ -68,7 +68,7 @@ has expected_prognosis => (
 
 has natural_progression => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_natural_progression',
     json_ld   => 'naturalProgression',
 );
 
@@ -76,7 +76,7 @@ has natural_progression => (
 
 has pathophysiology => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_pathophysiology',
     json_ld   => 'pathophysiology',
 );
 
@@ -84,7 +84,7 @@ has pathophysiology => (
 
 has possible_complication => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_possible_complication',
     json_ld   => 'possibleComplication',
 );
 
@@ -92,7 +92,7 @@ has possible_complication => (
 
 has possible_treatment => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_possible_treatment',
     json_ld   => 'possibleTreatment',
 );
 
@@ -100,7 +100,7 @@ has possible_treatment => (
 
 has primary_prevention => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_primary_prevention',
     json_ld   => 'primaryPrevention',
 );
 
@@ -108,7 +108,7 @@ has primary_prevention => (
 
 has risk_factor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_risk_factor',
     json_ld   => 'riskFactor',
 );
 
@@ -116,7 +116,7 @@ has risk_factor => (
 
 has secondary_prevention => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_secondary_prevention',
     json_ld   => 'secondaryPrevention',
 );
 
@@ -124,7 +124,7 @@ has secondary_prevention => (
 
 has sign_or_symptom => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sign_or_symptom',
     json_ld   => 'signOrSymptom',
 );
 
@@ -132,7 +132,7 @@ has sign_or_symptom => (
 
 has stage => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_stage',
     json_ld   => 'stage',
 );
 
@@ -140,7 +140,7 @@ has stage => (
 
 has status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_status',
     json_ld   => 'status',
 );
 
@@ -148,7 +148,7 @@ has status => (
 
 has subtype => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_subtype',
     json_ld   => 'subtype',
 );
 
@@ -156,7 +156,7 @@ has subtype => (
 
 has typical_test => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_typical_test',
     json_ld   => 'typicalTest',
 );
 
@@ -178,7 +178,7 @@ SemanticWeb::Schema::MedicalCondition - Any condition of the human body that aff
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -207,6 +207,10 @@ A associated_anatomy should be one of the following types:
 
 =back
 
+=head2 C<_has_associated_anatomy>
+
+A predicate for the L</associated_anatomy> attribute.
+
 =head2 C<cause>
 
 Specifying a cause of something in general. e.g in medicine , one of the
@@ -220,6 +224,10 @@ A cause should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalCause']>
 
 =back
+
+=head2 C<_has_cause>
+
+A predicate for the L</cause> attribute.
 
 =head2 C<differential_diagnosis>
 
@@ -240,6 +248,10 @@ A differential_diagnosis should be one of the following types:
 
 =back
 
+=head2 C<_has_differential_diagnosis>
+
+A predicate for the L</differential_diagnosis> attribute.
+
 =head2 C<drug>
 
 Specifying a drug or medicine used in a medication procedure
@@ -252,6 +264,10 @@ A drug should be one of the following types:
 
 =back
 
+=head2 C<_has_drug>
+
+A predicate for the L</drug> attribute.
+
 =head2 C<epidemiology>
 
 The characteristics of associated patients, such as age, gender, race etc.
@@ -263,6 +279,10 @@ A epidemiology should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_epidemiology>
+
+A predicate for the L</epidemiology> attribute.
 
 =head2 C<expected_prognosis>
 
@@ -279,6 +299,10 @@ A expected_prognosis should be one of the following types:
 
 =back
 
+=head2 C<_has_expected_prognosis>
+
+A predicate for the L</expected_prognosis> attribute.
+
 =head2 C<natural_progression>
 
 C<naturalProgression>
@@ -294,6 +318,10 @@ A natural_progression should be one of the following types:
 
 =back
 
+=head2 C<_has_natural_progression>
+
+A predicate for the L</natural_progression> attribute.
+
 =head2 C<pathophysiology>
 
 Changes in the normal mechanical, physical, and biochemical functions that
@@ -306,6 +334,10 @@ A pathophysiology should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_pathophysiology>
+
+A predicate for the L</pathophysiology> attribute.
 
 =head2 C<possible_complication>
 
@@ -323,6 +355,10 @@ A possible_complication should be one of the following types:
 
 =back
 
+=head2 C<_has_possible_complication>
+
+A predicate for the L</possible_complication> attribute.
+
 =head2 C<possible_treatment>
 
 C<possibleTreatment>
@@ -336,6 +372,10 @@ A possible_treatment should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalTherapy']>
 
 =back
+
+=head2 C<_has_possible_treatment>
+
+A predicate for the L</possible_treatment> attribute.
 
 =head2 C<primary_prevention>
 
@@ -352,6 +392,10 @@ A primary_prevention should be one of the following types:
 
 =back
 
+=head2 C<_has_primary_prevention>
+
+A predicate for the L</primary_prevention> attribute.
+
 =head2 C<risk_factor>
 
 C<riskFactor>
@@ -367,6 +411,10 @@ A risk_factor should be one of the following types:
 
 =back
 
+=head2 C<_has_risk_factor>
+
+A predicate for the L</risk_factor> attribute.
+
 =head2 C<secondary_prevention>
 
 C<secondaryPrevention>
@@ -381,6 +429,10 @@ A secondary_prevention should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalTherapy']>
 
 =back
+
+=head2 C<_has_secondary_prevention>
+
+A predicate for the L</secondary_prevention> attribute.
 
 =head2 C<sign_or_symptom>
 
@@ -398,6 +450,10 @@ A sign_or_symptom should be one of the following types:
 
 =back
 
+=head2 C<_has_sign_or_symptom>
+
+A predicate for the L</sign_or_symptom> attribute.
+
 =head2 C<stage>
 
 The stage of the condition, if applicable.
@@ -409,6 +465,10 @@ A stage should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalConditionStage']>
 
 =back
+
+=head2 C<_has_stage>
+
+A predicate for the L</stage> attribute.
 
 =head2 C<status>
 
@@ -426,6 +486,10 @@ A status should be one of the following types:
 
 =back
 
+=head2 C<_has_status>
+
+A predicate for the L</status> attribute.
+
 =head2 C<subtype>
 
 A more specific type of the condition, where applicable, for example 'Type
@@ -438,6 +502,10 @@ A subtype should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_subtype>
+
+A predicate for the L</subtype> attribute.
 
 =head2 C<typical_test>
 
@@ -452,6 +520,10 @@ A typical_test should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalTest']>
 
 =back
+
+=head2 C<_has_typical_test>
+
+A predicate for the L</typical_test> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has carrier_requirements => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_carrier_requirements',
     json_ld   => 'carrierRequirements',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::MobileApplication - A software application designed specifi
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -65,6 +65,10 @@ A carrier_requirements should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_carrier_requirements>
+
+A predicate for the L</carrier_requirements> attribute.
 
 =head1 SEE ALSO
 

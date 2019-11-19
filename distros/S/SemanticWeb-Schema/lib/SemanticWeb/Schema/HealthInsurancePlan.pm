@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has benefits_summary_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_benefits_summary_url',
     json_ld   => 'benefitsSummaryUrl',
 );
 
@@ -28,7 +28,7 @@ has benefits_summary_url => (
 
 has contact_point => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_contact_point',
     json_ld   => 'contactPoint',
 );
 
@@ -36,7 +36,7 @@ has contact_point => (
 
 has health_plan_drug_option => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_drug_option',
     json_ld   => 'healthPlanDrugOption',
 );
 
@@ -44,7 +44,7 @@ has health_plan_drug_option => (
 
 has health_plan_drug_tier => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_drug_tier',
     json_ld   => 'healthPlanDrugTier',
 );
 
@@ -52,7 +52,7 @@ has health_plan_drug_tier => (
 
 has health_plan_id => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_id',
     json_ld   => 'healthPlanId',
 );
 
@@ -60,7 +60,7 @@ has health_plan_id => (
 
 has health_plan_marketing_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_marketing_url',
     json_ld   => 'healthPlanMarketingUrl',
 );
 
@@ -68,7 +68,7 @@ has health_plan_marketing_url => (
 
 has includes_health_plan_formulary => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_includes_health_plan_formulary',
     json_ld   => 'includesHealthPlanFormulary',
 );
 
@@ -76,7 +76,7 @@ has includes_health_plan_formulary => (
 
 has includes_health_plan_network => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_includes_health_plan_network',
     json_ld   => 'includesHealthPlanNetwork',
 );
 
@@ -84,7 +84,7 @@ has includes_health_plan_network => (
 
 has uses_health_plan_id_standard => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_uses_health_plan_id_standard',
     json_ld   => 'usesHealthPlanIdStandard',
 );
 
@@ -106,7 +106,7 @@ SemanticWeb::Schema::HealthInsurancePlan - A US-style health insurance plan
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -129,6 +129,10 @@ A benefits_summary_url should be one of the following types:
 
 =back
 
+=head2 C<_has_benefits_summary_url>
+
+A predicate for the L</benefits_summary_url> attribute.
+
 =head2 C<contact_point>
 
 C<contactPoint>
@@ -142,6 +146,10 @@ A contact_point should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
 
 =back
+
+=head2 C<_has_contact_point>
+
+A predicate for the L</contact_point> attribute.
 
 =head2 C<health_plan_drug_option>
 
@@ -157,6 +165,10 @@ A health_plan_drug_option should be one of the following types:
 
 =back
 
+=head2 C<_has_health_plan_drug_option>
+
+A predicate for the L</health_plan_drug_option> attribute.
+
 =head2 C<health_plan_drug_tier>
 
 C<healthPlanDrugTier>
@@ -170,6 +182,10 @@ A health_plan_drug_tier should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_health_plan_drug_tier>
+
+A predicate for the L</health_plan_drug_tier> attribute.
 
 =head2 C<health_plan_id>
 
@@ -186,6 +202,10 @@ A health_plan_id should be one of the following types:
 
 =back
 
+=head2 C<_has_health_plan_id>
+
+A predicate for the L</health_plan_id> attribute.
+
 =head2 C<health_plan_marketing_url>
 
 C<healthPlanMarketingUrl>
@@ -201,6 +221,10 @@ A health_plan_marketing_url should be one of the following types:
 
 =back
 
+=head2 C<_has_health_plan_marketing_url>
+
+A predicate for the L</health_plan_marketing_url> attribute.
+
 =head2 C<includes_health_plan_formulary>
 
 C<includesHealthPlanFormulary>
@@ -214,6 +238,10 @@ A includes_health_plan_formulary should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::HealthPlanFormulary']>
 
 =back
+
+=head2 C<_has_includes_health_plan_formulary>
+
+A predicate for the L</includes_health_plan_formulary> attribute.
 
 =head2 C<includes_health_plan_network>
 
@@ -229,6 +257,10 @@ A includes_health_plan_network should be one of the following types:
 
 =back
 
+=head2 C<_has_includes_health_plan_network>
+
+A predicate for the L</includes_health_plan_network> attribute.
+
 =head2 C<uses_health_plan_id_standard>
 
 C<usesHealthPlanIdStandard>
@@ -243,6 +275,10 @@ A uses_health_plan_id_standard should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_uses_health_plan_id_standard>
+
+A predicate for the L</uses_health_plan_id_standard> attribute.
 
 =head1 SEE ALSO
 

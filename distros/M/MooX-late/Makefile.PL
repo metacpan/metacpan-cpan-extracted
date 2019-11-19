@@ -4,50 +4,51 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "easily translate Moose code to Moo",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>", "unknown"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "MooX-late",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => {
-                          recommends => { "MooX::HandlesVia" => 0.001004 },
-                          requires   => { "Moo" => "1.006000", "Type::Utils" => 1.000001 },
-                          suggests   => { MooX => 0 },
+  "abstract"         => "easily translate Moose code to Moo",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
                         },
-                        test => {
-                          requires => {
-                            "Test::Fatal"    => "0.010",
-                            "Test::More"     => 0.96,
-                            "Test::Requires" => 0.06,
+  "name"             => "MooX-late",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            recommends => { "MooX::HandlesVia" => 0.001004 },
+                            requires   => { "Moo" => "1.006000", "perl" => 5.008003, "Type::Utils" => 1.000001 },
+                            suggests   => { MooX => 0 },
+                          },
+                          test => {
+                            requires => {
+                              "Test::Fatal"    => "0.010",
+                              "Test::More"     => 0.96,
+                              "Test::Requires" => 0.06,
+                            },
                           },
                         },
-                      },
-  "provides"       => {
-                        "MooX::late" => { file => "lib/MooX/late.pm", version => 0.015 },
-                        "MooX::late::DefinitionContext" => { file => "lib/MooX/late.pm", version => 0.015 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=MooX-late" },
-                        homepage     => "https://metacpan.org/release/MooX-late",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-moox-late.git",
-                                          web  => "https://github.com/tobyink/p5-moox-late",
-                                        },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-late/project",
-                      },
-  "version"        => 0.015,
+  "provides"         => {
+                          "MooX::late" => { file => "lib/MooX/late.pm", version => 0.016 },
+                          "MooX::late::DefinitionContext" => { file => "lib/MooX/late.pm", version => 0.016 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=MooX-late" },
+                          homepage     => "https://metacpan.org/release/MooX-late",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-moox-late.git",
+                                            web  => "https://github.com/tobyink/p5-moox-late",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-late/project",
+                        },
+  "version"          => 0.016,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

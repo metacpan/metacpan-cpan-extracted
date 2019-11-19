@@ -46,62 +46,62 @@
    "provides" : {
       "Tickit" : {
          "file" : "lib/Tickit.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::Debug" : {
          "file" : "lib/Tickit/Debug.pm"
       },
       "Tickit::Event" : {
          "file" : "lib/Tickit/Event.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::Pen" : {
          "file" : "lib/Tickit/Pen.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::Pen::Immutable" : {
          "file" : "lib/Tickit/Pen.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::Pen::Mutable" : {
          "file" : "lib/Tickit/Pen.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::Rect" : {
          "file" : "lib/Tickit/Rect.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::RectSet" : {
          "file" : "lib/Tickit/RectSet.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::RenderBuffer" : {
          "file" : "lib/Tickit/RenderBuffer.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::StringPos" : {
          "file" : "lib/Tickit/StringPos.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::Term" : {
          "file" : "lib/Tickit/Term.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::Test" : {
          "file" : "lib/Tickit/Test.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::Test::MockTerm" : {
          "file" : "lib/Tickit/Test/MockTerm.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::Utils" : {
          "file" : "lib/Tickit/Utils.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       },
       "Tickit::Window" : {
          "file" : "lib/Tickit/Window.pm",
-         "version" : "0.67"
+         "version" : "0.68"
       }
    },
    "release_status" : "stable",
@@ -110,6 +110,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.67",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.68",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

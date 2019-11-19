@@ -1,6 +1,26 @@
 ==================================================
-Changes from 2014-11-15 00:00:00 +0000 to present.
+Changes from 2014-11-20 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.80 at 2019-11-19 16:27:40 +0000
+-----------------------------------------
+
+  Change: acdcf1d67ae426367f42ca763b9ba6b92dd90925
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-11-19 16:27:40 +0000
+
+    Release engineering for 1.80
+
+    - Fixes https://github.com/bingos/devel-patchperl/issues/38
+
+    "Failed to apply devel-patchperl to perl 5.8.8 in macOS" 
+
+  Change: 94520b369885689366535b80a05b16e8129789d7
+  Author: Shoichi Kaji <skaji@cpan.org>
+  Date : 2019-11-19 16:26:17 +0000
+
+    fix #38; _patch -> _patch_b64 
 
 -----------------------------------------
 version 1.78 at 2019-11-14 14:18:25 +0000
@@ -503,5 +523,5 @@ version 1.30 at 2014-12-23 22:41:27 +0000
     add Devel::PatchPerl version to list of local patches 
 
 =================================================
-Plus 64 releases after 2014-11-15 00:00:00 +0000.
+Plus 64 releases after 2014-11-20 00:00:00 +0000.
 =================================================

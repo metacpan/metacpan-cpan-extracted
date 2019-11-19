@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has steps => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_steps',
     json_ld   => 'steps',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::HowToSection - A sub-grouping of steps in the instructions 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -67,6 +67,10 @@ A steps should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_steps>
+
+A predicate for the L</steps> attribute.
 
 =head1 SEE ALSO
 

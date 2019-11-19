@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has in_language => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_in_language',
     json_ld   => 'inLanguage',
 );
 
@@ -28,7 +28,7 @@ has in_language => (
 
 has link_relationship => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_link_relationship',
     json_ld   => 'linkRelationship',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::LinkRole - A Role that represents a Web link e
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -82,6 +82,10 @@ A in_language should be one of the following types:
 
 =back
 
+=head2 C<_has_in_language>
+
+A predicate for the L</in_language> attribute.
+
 =head2 C<link_relationship>
 
 C<linkRelationship>
@@ -95,6 +99,10 @@ A link_relationship should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_link_relationship>
+
+A predicate for the L</link_relationship> attribute.
 
 =head1 SEE ALSO
 

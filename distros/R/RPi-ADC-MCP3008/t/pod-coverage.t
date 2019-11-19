@@ -1,7 +1,5 @@
-#!perl -T
-use 5.006;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use Test::More;
 
 unless ( $ENV{RELEASE_TESTING} ) {
@@ -21,4 +19,29 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-all_pod_coverage_ok();
+#all_pod_coverage_ok();
+
+my $pc = Pod::Coverage->new(
+    package => 'RPi::ADC::MCP3008',
+    pod_from => 'lib/RPi/ADC/MCP3008.pm',
+    private => [
+        qr/\p{Lowercase}+\p{Uppercase}\p{Lowercase}+/, # camelCase (XS)
+        qr/^bootstrap$/,
+        qr/^_/,
+        qr/^fetch$/,        # XS
+        qr/^spi_setup$/,    # XS
+        qr/^wpi_setup$/,    # XS
+        qr/^DESTROY$/,
+    ],
+    #"Test Perl subs, skip XS/C functions"
+);
+
+is $pc->coverage, 1, "pod coverage ok";
+
+if ($pc->uncovered){
+    warn "Uncovered:\n\t", join( ", ", $pc->uncovered ), "\n";
+}
+
+warn $pc->why_unrated if ! defined $pc->coverage;
+
+done_testing();

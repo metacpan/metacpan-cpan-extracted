@@ -292,6 +292,7 @@ use LWP::UserAgent ();
 use vars qw(@ISA @EXPORT);
 
 my $DEBUG = 0;
+my $bummer = ($^O =~ /MSWin/);
 my %uops = ();
 my @userAgentOps = ();
 
@@ -308,7 +309,10 @@ sub new
 	my $self = {};
 	return undef  unless ($url);
 
-	foreach my $p ("$ENV{HOME}/.config/StreamFinder/config", "$ENV{HOME}/.config/StreamFinder/Radionomy/config") {
+	my $homedir = $bummer ? $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'} : $ENV{'HOME'};
+	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
+	$homedir =~ s#[\/\\]$##;
+	foreach my $p ("${homedir}/.config/StreamFinder/config", "${homedir}/.config/StreamFinder/Radionomy/config") {
 		if (open IN, $p) {
 			my ($atr, $val);
 			while (<IN>) {

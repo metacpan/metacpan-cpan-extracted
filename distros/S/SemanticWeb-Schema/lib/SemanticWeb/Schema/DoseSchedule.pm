@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has dose_unit => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_dose_unit',
     json_ld   => 'doseUnit',
 );
 
@@ -28,7 +28,7 @@ has dose_unit => (
 
 has dose_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_dose_value',
     json_ld   => 'doseValue',
 );
 
@@ -36,7 +36,7 @@ has dose_value => (
 
 has frequency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_frequency',
     json_ld   => 'frequency',
 );
 
@@ -44,7 +44,7 @@ has frequency => (
 
 has target_population => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_target_population',
     json_ld   => 'targetPopulation',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::DoseSchedule - A specific dosing schedule for a drug or sup
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -88,6 +88,10 @@ A dose_unit should be one of the following types:
 
 =back
 
+=head2 C<_has_dose_unit>
+
+A predicate for the L</dose_unit> attribute.
+
 =head2 C<dose_value>
 
 C<doseValue>
@@ -104,6 +108,10 @@ A dose_value should be one of the following types:
 
 =back
 
+=head2 C<_has_dose_value>
+
+A predicate for the L</dose_value> attribute.
+
 =head2 C<frequency>
 
 How often the dose is taken, e.g. 'daily'.
@@ -115,6 +123,10 @@ A frequency should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_frequency>
+
+A predicate for the L</frequency> attribute.
 
 =head2 C<target_population>
 
@@ -130,6 +142,10 @@ A target_population should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_target_population>
+
+A predicate for the L</target_population> attribute.
 
 =head1 SEE ALSO
 

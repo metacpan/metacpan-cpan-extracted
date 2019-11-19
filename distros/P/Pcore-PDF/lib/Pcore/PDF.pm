@@ -1,9 +1,9 @@
-package Pcore::PDF v0.7.0;
+package Pcore::PDF v0.8.1;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
 use Pcore::Lib::Data qw[to_json from_json];
-use Pcore::Lib::Scalar qw[weaken is_plain_scalarref];
+use Pcore::Lib::Scalar qw[is_plain_scalarref];
 
 const our $PAGE_SIZE => {
     A0        => '841 x 1189 mm',
@@ -39,12 +39,11 @@ const our $PAGE_SIZE => {
 };
 
 has bin         => 'princexml';
-has max_threads => 4;
+has max_threads => P->sys->cpus_num;
 has page_size   => $PAGE_SIZE->{A4};
 
-has _threads => 0;
-has _queue   => ();
-has _signal  => sub { Coro::Signal->new };
+has _semaphore => sub ($self) { Coro::Semaphore->new( $self->{max_threads} ) }, is => 'lazy';
+has _princexml => ();
 
 # NOTE job config example
 # {   input => {
@@ -95,36 +94,24 @@ has _signal  => sub { Coro::Signal->new };
 #     'job-resource-count' => 1,
 # };
 
-sub DESTROY ($self) {
-    if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
+sub generate_pdf ( $self, $html ) {
 
-        # finish threads
-        $self->{_signal}->broadcast;
+    # block thread
+    my $guard = $self->{max_threads} && $self->_semaphore->guard;
 
-        # finish tasks
-        while ( my $task = shift $self->{_queue}->@* ) {
-            $task->[1]->( res 500 );
-        }
+    my $princexml;
+
+    while ( defined( $princexml = pop $self->{_princexml}->@* ) ) {
+        last if $princexml->is_active;
     }
 
-    return;
-}
+    $princexml //= $self->_create_princexml_proc;
 
-sub generate_pdf ( $self, $html, $cb = undef ) {
-    my $cv = P->cv;
+    my $res = $self->_run_task( $princexml, \$html );
 
-    my $on_finish = sub ($res) { $cv->( $cb ? $cb->($res) : $res ) };
+    push $self->{_princexml}->@*, $princexml;
 
-    push $self->{_queue}->@*, [ $html, $on_finish ];
-
-    if ( $self->{_signal}->awaited ) {
-        $self->{_signal}->send;
-    }
-    elsif ( $self->{_threads} < $self->{max_threads} ) {
-        $self->_run_thread;
-    }
-
-    return defined wantarray ? $cv->recv : ();
+    return $res;
 }
 
 sub remove_logo ( $self, $pdf_ref ) {
@@ -150,39 +137,7 @@ sub remove_logo ( $self, $pdf_ref ) {
     return;
 }
 
-sub _run_thread ($self) {
-    weaken $self;
-
-    $self->{_threads}++;
-
-    Coro::async_pool {
-        my $proc;
-
-        while () {
-            return if !defined $self;
-
-            if ( my $task = shift $self->{_queue}->@* ) {
-                undef $proc if defined $proc && !$proc->is_active;
-
-                $proc //= $self->_get_proc;
-
-                $task->[1]->( $self->_run_task( $task, $proc ) );
-
-                next;
-            }
-
-            $self->{_signal}->wait;
-        }
-
-        return;
-    };
-
-    Coro::cede;
-
-    return;
-}
-
-sub _get_proc ($self) {
+sub _create_princexml_proc ($self) {
     my $proc = P->sys->run_proc( [ $self->{bin}, '--control' ], stdin => 1, stdout => 1, stderr => 1 );
 
     undef $proc->{child_stdout};
@@ -201,16 +156,16 @@ sub _get_proc ($self) {
     return $proc;
 }
 
-sub _run_task ( $self, $task, $proc ) {
+sub _run_task ( $self, $princexml, $task_ref ) {
     my ( $job, $resources );
 
-    if ( is_plain_scalarref $task->[0] ) {
+    if ( is_plain_scalarref $task_ref->$* ) {
         $job->{input}->{src} = 'job-resource:0';
 
-        push $resources->@*, $task->[0];
+        push $resources->@*, $task_ref->$*;
     }
     else {
-        $job->{input}->{src} = $task->[0];
+        $job->{input}->{src} = $task_ref->$*;
     }
 
     $job->{'job-resource-count'} = $resources ? scalar $resources->@* : 0;
@@ -218,15 +173,15 @@ sub _run_task ( $self, $task, $proc ) {
     # write job
     my $json = to_json $job;
 
-    $proc->{stdin}->write( 'job ' . length($json) . "\n$json\n" );
+    $princexml->{stdin}->write( 'job ' . length($json) . "\n$json\n" );
 
     if ($resources) {
         for my $resource ( $resources->@* ) {
-            $proc->{stdin}->write( 'dat ' . length( $resource->$* ) . "\n$resource->$*\n" );
+            $princexml->{stdin}->write( 'dat ' . length( $resource->$* ) . "\n$resource->$*\n" );
         }
     }
 
-    my $line = $proc->{stdout}->read_line("\n");
+    my $line = $princexml->{stdout}->read_line("\n");
 
     # protocol error, connection closed
     return res 500 if !$line;
@@ -236,7 +191,7 @@ sub _run_task ( $self, $task, $proc ) {
     # protocol error
     return res 500 if !$len;
 
-    my $data = $proc->{stdout}->read_chunk( $len + 1 );
+    my $data = $princexml->{stdout}->read_chunk( $len + 1 );
 
     chop $data->$*;
 
@@ -244,14 +199,14 @@ sub _run_task ( $self, $task, $proc ) {
     return res [ 500, $data->$* ] if $tag eq 'err';
 
     # read log
-    $line = $proc->{stdout}->read_line("\n");
+    $line = $princexml->{stdout}->read_line("\n");
 
     my ( $tag1, $len1 ) = split /\s/sm, $line->$*, 2;
 
     # protocol error
     return res 500 if !$len1;
 
-    my $log = $proc->{stdout}->read_chunk( $len1 + 1 );
+    my $log = $princexml->{stdout}->read_chunk( $len1 + 1 );
 
     chop $log->$*;
 
@@ -277,21 +232,8 @@ Pcore::PDF - non-blocking HTML to PDF converter
         max_threads => 4,
     });
 
-    # blocking mode, blocks only current coroutine
+    # $res->{data} contains ScalarRef to generated PDF content
     my $res = $pdf->generate_pdf($html);
-
-    # non-blocking mode
-    $pdf->generate_pdf($html, sub ($res) {
-        if (!$res) {
-            say $res;
-        }
-        else {
-
-            # $res->{data} contains ScalarRef to generated PDF content
-        }
-
-        return;
-    });
 
 =head1 DESCRIPTION
 
@@ -315,7 +257,7 @@ Maximum number of princexml processes. Default value is C<< 4 >>.
 
 =over
 
-=item generate_pdf( $self, $html, $cb = undef )
+=item generate_pdf( $self, $html )
 
 Generates PDF from C<< $html >> template. C<< $result >> is a standard Pcore API result object, see L<Pcore::Lib::Result> documentation for details.
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_code',
     json_ld   => 'code',
 );
 
@@ -28,7 +28,7 @@ has code => (
 
 has guideline => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_guideline',
     json_ld   => 'guideline',
 );
 
@@ -36,7 +36,7 @@ has guideline => (
 
 has legal_status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legal_status',
     json_ld   => 'legalStatus',
 );
 
@@ -44,7 +44,7 @@ has legal_status => (
 
 has medicine_system => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_medicine_system',
     json_ld   => 'medicineSystem',
 );
 
@@ -52,7 +52,7 @@ has medicine_system => (
 
 has recognizing_authority => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_recognizing_authority',
     json_ld   => 'recognizingAuthority',
 );
 
@@ -60,7 +60,7 @@ has recognizing_authority => (
 
 has relevant_specialty => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_relevant_specialty',
     json_ld   => 'relevantSpecialty',
 );
 
@@ -68,7 +68,7 @@ has relevant_specialty => (
 
 has study => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_study',
     json_ld   => 'study',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::MedicalEntity - The most generic type of entity related to 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -112,6 +112,10 @@ A code should be one of the following types:
 
 =back
 
+=head2 C<_has_code>
+
+A predicate for the L</code> attribute.
+
 =head2 C<guideline>
 
 A medical guideline related to this entity.
@@ -123,6 +127,10 @@ A guideline should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalGuideline']>
 
 =back
+
+=head2 C<_has_guideline>
+
+A predicate for the L</guideline> attribute.
 
 =head2 C<legal_status>
 
@@ -143,6 +151,10 @@ A legal_status should be one of the following types:
 
 =back
 
+=head2 C<_has_legal_status>
+
+A predicate for the L</legal_status> attribute.
+
 =head2 C<medicine_system>
 
 C<medicineSystem>
@@ -157,6 +169,10 @@ A medicine_system should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicineSystem']>
 
 =back
+
+=head2 C<_has_medicine_system>
+
+A predicate for the L</medicine_system> attribute.
 
 =head2 C<recognizing_authority>
 
@@ -173,6 +189,10 @@ A recognizing_authority should be one of the following types:
 
 =back
 
+=head2 C<_has_recognizing_authority>
+
+A predicate for the L</recognizing_authority> attribute.
+
 =head2 C<relevant_specialty>
 
 C<relevantSpecialty>
@@ -187,6 +207,10 @@ A relevant_specialty should be one of the following types:
 
 =back
 
+=head2 C<_has_relevant_specialty>
+
+A predicate for the L</relevant_specialty> attribute.
+
 =head2 C<study>
 
 A medical study or trial related to this entity.
@@ -198,6 +222,10 @@ A study should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalStudy']>
 
 =back
+
+=head2 C<_has_study>
+
+A predicate for the L</study> attribute.
 
 =head1 SEE ALSO
 

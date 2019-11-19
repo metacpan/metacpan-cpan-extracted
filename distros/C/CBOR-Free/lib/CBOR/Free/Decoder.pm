@@ -12,6 +12,9 @@ CBOR::Free::Decoder
         2 => sub { DateTime->from_epoch( epoch => shift() ) },
     );
 
+    # Enable shared/circular references:
+    $decoder->preserve_references();
+
 =head1 DESCRIPTION
 
 This class provides an object-oriented interface to L<CBOR::Free>’s
@@ -46,6 +49,22 @@ As in L<CBOR::Free>, any unrecognized tags prompt a warning but are
 otherwise ignored.
 
 =cut
+
+#----------------------------------------------------------------------
+
+=head2 $enabled_yn = I<OBJ>->preserve_references( [$ENABLE] )
+
+Enables/disables recognition of CBOR’s shared references. (If no
+argument is given, shared references wil be enabled.)
+
+B<HANDLE WITH CARE.> This option can cause CBOR::Free to create circular
+references, which can cause memory leaks if not handled properly.
+
+=cut
+
+sub preserve_references {
+    return $_[0]{'_preserve_references'} = (@_ > 1 ? !!$_[1] : 1);
+}
 
 #----------------------------------------------------------------------
 

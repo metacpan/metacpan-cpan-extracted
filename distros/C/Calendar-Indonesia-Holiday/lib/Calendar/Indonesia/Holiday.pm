@@ -1,7 +1,7 @@
 package Calendar::Indonesia::Holiday;
 
-our $DATE = '2018-12-04'; # DATE
-our $VERSION = '0.323'; # VERSION
+our $DATE = '2019-11-19'; # DATE
+our $VERSION = '0.324'; # VERSION
 
 use 5.010001;
 use strict;
@@ -785,7 +785,7 @@ my %year_holidays;
         # - pancasila day
         ($eidulf2019 =
         _h_eidulf    ({_expand_dm("05-06")}, {hyear=>1440, day=>1})),
-        _h_eidulf    ({_expand_dm("06-06")}, {hyear=>1439, day=>2}),
+        _h_eidulf    ({_expand_dm("06-06")}, {hyear=>1440, day=>2}),
         _h_eidula    ({_expand_dm("11-08")}, {hyear=>1440}),
         # - independence day
         _h_hijra     ({_expand_dm("01-09")}, {hyear=>1441}),
@@ -795,6 +795,43 @@ my %year_holidays;
         _jointlv     ({_expand_dm("03-06")}, {holiday=>$eidulf2019}),
         _jointlv     ({_expand_dm("04-06")}, {holiday=>$eidulf2019}),
         _jointlv     ({_expand_dm("07-06")}, {holiday=>$eidulf2019}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
+    ];
+}
+
+# decreed aug 28, 2019
+#
+# ref:
+# - https://www.kominfo.go.id/content/detail/20922/inilah-jadwal-libur-nasional-dan-cuti-bersama-tahun-2020/0/berita
+#   "Jakarta, Kominfo - Rapat Tingkat Menteri (RTM) tentang Hari Libur Nasional
+#   dan Cuti Bersama Tahun 2020 yang dipimpin oleh Menko bidang Pembangunan
+#   Manusia dan Kebudayaan (PMK), Puan Maharani, di Gedung Kemenko PMK, Jakarta,
+#   Selasa (28/8/2019) pagi, telah menyepakati tahun 2020 akan memiliki 16 Hari
+#   Libur Nasional dan 4 hari Cuti Bersama."
+{
+    my $eidulf2020;
+    $year_holidays{2020} = [
+        # - new year
+        _h_chnewyear ({_expand_dm("25-01")}, {hyear=>2571}),
+        _h_isramiraj ({_expand_dm("22-03")}, {hyear=>1441}),
+        _h_nyepi     ({_expand_dm("25-03")}, {hyear=>1942}),
+        _h_goodfri   ({_expand_dm("10-04")}),
+        # - labor day
+        _h_vesakha   ({_expand_dm("07-05")}, {hyear=>2564}),
+        _h_ascension ({_expand_dm("21-05")}),
+        ($eidulf2020 =
+        _h_eidulf    ({_expand_dm("24-05")}, {hyear=>1441, day=>1})),
+        _h_eidulf    ({_expand_dm("25-05")}, {hyear=>1441, day=>2}),
+        # - pancasila day
+        _h_eidula    ({_expand_dm("31-07")}, {hyear=>1441}),
+        # - independence day
+        _h_hijra     ({_expand_dm("20-08")}, {hyear=>1442}),
+        _h_mawlid    ({_expand_dm("29-10")}, {hyear=>1442}),
+        # - christmas
+
+        _jointlv     ({_expand_dm("22-05")}, {holiday=>$eidulf2020}),
+        _jointlv     ({_expand_dm("26-05")}, {holiday=>$eidulf2020}),
+        _jointlv     ({_expand_dm("27-05")}, {holiday=>$eidulf2020}),
         _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
     ];
 }
@@ -1123,7 +1160,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.323 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2018-12-04.
+This document describes version 0.324 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2019-11-19.
 
 =head1 SYNOPSIS
 
@@ -1215,8 +1252,8 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 2002 to 2019 (joint leave days until
-2019).
+Contains data from years 2002 to 2020 (joint leave days until
+2020).
 
 This function is not exported by default, but exportable.
 
@@ -1258,6 +1295,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 enum_id_workdays
@@ -1273,8 +1311,8 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 2002 to 2019 (joint leave days until
-2019).
+Contains data from years 2002 to 2020 (joint leave days until
+2020).
 
 This function is not exported by default, but exportable.
 
@@ -1318,6 +1356,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 list_id_holidays
 
 Usage:
@@ -1328,8 +1367,8 @@ List Indonesian holidays in calendar.
 
 List holidays and joint leave days ("cuti bersama").
 
-Contains data from years 2002 to 2019 (joint leave days until
-2019).
+Contains data from years 2002 to 2020 (joint leave days until
+2020).
 
 This function is not exported by default, but exportable.
 
@@ -1748,6 +1787,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 list_id_workdays
 
 Usage:
@@ -1833,7 +1873,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

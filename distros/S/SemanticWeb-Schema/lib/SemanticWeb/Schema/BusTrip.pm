@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has arrival_bus_stop => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_arrival_bus_stop',
     json_ld   => 'arrivalBusStop',
 );
 
@@ -28,7 +28,7 @@ has arrival_bus_stop => (
 
 has bus_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_bus_name',
     json_ld   => 'busName',
 );
 
@@ -36,7 +36,7 @@ has bus_name => (
 
 has bus_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_bus_number',
     json_ld   => 'busNumber',
 );
 
@@ -44,7 +44,7 @@ has bus_number => (
 
 has departure_bus_stop => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_departure_bus_stop',
     json_ld   => 'departureBusStop',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::BusTrip - A trip on a commercial bus line.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -90,6 +90,10 @@ A arrival_bus_stop should be one of the following types:
 
 =back
 
+=head2 C<_has_arrival_bus_stop>
+
+A predicate for the L</arrival_bus_stop> attribute.
+
 =head2 C<bus_name>
 
 C<busName>
@@ -104,6 +108,10 @@ A bus_name should be one of the following types:
 
 =back
 
+=head2 C<_has_bus_name>
+
+A predicate for the L</bus_name> attribute.
+
 =head2 C<bus_number>
 
 C<busNumber>
@@ -117,6 +125,10 @@ A bus_number should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_bus_number>
+
+A predicate for the L</bus_number> attribute.
 
 =head2 C<departure_bus_stop>
 
@@ -133,6 +145,10 @@ A departure_bus_stop should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::BusStop']>
 
 =back
+
+=head2 C<_has_departure_bus_stop>
+
+A predicate for the L</departure_bus_stop> attribute.
 
 =head1 SEE ALSO
 

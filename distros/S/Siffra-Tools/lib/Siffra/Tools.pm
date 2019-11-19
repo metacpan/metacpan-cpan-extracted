@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.22';
+    $VERSION = '0.23';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -383,7 +383,9 @@ sub parseBlockText()
 
         if ( $tamanho_da_linha_no_arquivo != $tamanho_da_linha_no_layout )
         {
-            my $msg = "Tamanho da linha [ $. ] do tipo $tipo_de_registro no arquivo $file ($tamanho_da_linha_no_arquivo) esta diferente do layout ($tamanho_da_linha_no_layout)";
+            my $msg = "Tamanho da linha [ $. ] do tipo [ $tipo_de_registro ] no arquivo [ $file ] ($tamanho_da_linha_no_arquivo) esta diferente do layout ($tamanho_da_linha_no_layout)";
+
+            #my $msg = "Tamanho da linha [ %d ] do tipo [ %s ] no arquivo [ %s ] ( %d ) esta diferente do layout ( %d )";
             #$log->error( $msg );
             $retorno->{ rows }    = undef;
             $retorno->{ message } = $msg;

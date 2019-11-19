@@ -48,6 +48,16 @@ UnixGuts * pguts;
 #define CLEAR_ERROR  last_error = 0
 #define SET_ERROR(s) last_error = s
 
+static XVisualInfo *
+select_visual( Display * display, int screen, int * attr_list)
+{
+	int n_attrs;
+	GLXFBConfig * fb;
+	fb = glXChooseFBConfig(display,  screen,  attr_list, &n_attrs);
+	if ( !fb) return NULL;
+	return glXGetVisualFromFBConfig( display, *fb);
+}
+
 Handle
 gl_context_create( Handle widget, GLRequest * request)
 {
@@ -68,7 +78,6 @@ gl_context_create( Handle widget, GLRequest * request)
 		*(attr++) = request-> in; \
 	}
 
-	*(attr++) = GLX_USE_GL;
 	if ( request-> pixels         == GLREQ_PIXEL_RGBA) *(attr++) = GLX_RGBA;
 	if ( request-> double_buffer  == GLREQ_TRUE) *(attr++) = GLX_DOUBLEBUFFER;
 	if ( request-> stereo         == GLREQ_TRUE) *(attr++) = GLX_STEREO;
@@ -85,11 +94,22 @@ gl_context_create( Handle widget, GLRequest * request)
 	ATTR( accum_green_bits, GLX_ACCUM_GREEN_SIZE )
 	ATTR( accum_blue_bits , GLX_ACCUM_BLUE_SIZE  )
 	ATTR( accum_alpha_bits, GLX_ACCUM_ALPHA_SIZE )
+	
+	switch ( request-> target) {
+	case GLREQ_TARGET_BITMAP:
+	case GLREQ_TARGET_IMAGE: 
+		*(attr++) = GLX_X_RENDERABLE;
+		*(attr++) = 1;
+		*(attr++) = GLX_DRAWABLE_TYPE;
+		*(attr++) = GLX_PIXMAP_BIT;
+		break;
+	}
+
 	*(attr++) = 0;
 
 	if ( request-> target == GLREQ_TARGET_WINDOW && sys-> flags. layered) {
 		visual = sys-> visual;
-	} else if ( !( visual = glXChooseVisual( DISP, SCREEN, attr_list ))) {
+	} else if ( !( visual = select_visual( DISP, SCREEN, attr_list ))) {
 		if ( request-> pixels != GLREQ_PIXEL_RGBA) {
 			/* emulate win32 which does it softly, i.e. if RGBA fails, it proposes PALETTED */
 			request-> pixels = GLREQ_PIXEL_RGBA;
@@ -241,6 +261,7 @@ gl_error_string(char * buf, int len)
 	case ERROR_STACK_OVERFLOW:
 		return "No more space for GL contexts on stack";
 	}
+	return NULL;
 }
 
 Bool

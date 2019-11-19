@@ -175,7 +175,8 @@
 #define G1_RULE_LUASCRIPT_STATEMENT              "G1_rule_luascript_statement"
 #define G1_RULE_LUASCRIPT_SOURCE                 "G1_rule_luascript_source"
 #define G1_RULE_IF_ACTION                        "G1_rule_if_action"
-#define G1_RULE_IFACTION_NAME                    "G1_rule_ifaction_name"
+#define G1_RULE_IFACTION_NAME_1                  "G1_rule_ifaction_name_1"
+#define G1_RULE_IFACTION_NAME_2                  "G1_rule_ifaction_name_2"
 
 #define G1_ACTION_STATEMENTS                       "::undef"
 #define G1_ACTION_STATEMENT_01                     "::undef"
@@ -346,7 +347,8 @@
 #define G1_ACTION_DISCARD_OFF                      "::undef"
 #define G1_ACTION_LUASCRIPT_STATEMENT              "G1_action_luascript_statement"
 #define G1_ACTION_LUASCRIPT_SOURCE                 "::concat"
-#define G1_ACTION_IFACTION_NAME                    "::ascii" /* <if action name> ::= <ascii graph name> */
+#define G1_ACTION_IFACTION_NAME_1                  "::ascii" /* <if action name> ::= <ascii graph name> */
+#define G1_ACTION_IFACTION_NAME_2                  "::ascii" /* <if action name> ::= <lua action name> */
 #define G1_ACTION_IFACTION                         "G1_action_ifaction"                         /* done */
 
 typedef struct bootstrap_grammar_terminal {

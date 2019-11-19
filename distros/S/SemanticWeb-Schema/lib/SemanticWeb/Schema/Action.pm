@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has action_status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_action_status',
     json_ld   => 'actionStatus',
 );
 
@@ -28,7 +28,7 @@ has action_status => (
 
 has agent => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_agent',
     json_ld   => 'agent',
 );
 
@@ -36,7 +36,7 @@ has agent => (
 
 has end_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_end_time',
     json_ld   => 'endTime',
 );
 
@@ -44,7 +44,7 @@ has end_time => (
 
 has error => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_error',
     json_ld   => 'error',
 );
 
@@ -52,7 +52,7 @@ has error => (
 
 has instrument => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_instrument',
     json_ld   => 'instrument',
 );
 
@@ -60,7 +60,7 @@ has instrument => (
 
 has location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_location',
     json_ld   => 'location',
 );
 
@@ -68,7 +68,7 @@ has location => (
 
 has object => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_object',
     json_ld   => 'object',
 );
 
@@ -76,7 +76,7 @@ has object => (
 
 has participant => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_participant',
     json_ld   => 'participant',
 );
 
@@ -84,7 +84,7 @@ has participant => (
 
 has result => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_result',
     json_ld   => 'result',
 );
 
@@ -92,7 +92,7 @@ has result => (
 
 has start_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_start_time',
     json_ld   => 'startTime',
 );
 
@@ -100,7 +100,7 @@ has start_time => (
 
 has target => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_target',
     json_ld   => 'target',
 );
 
@@ -122,7 +122,7 @@ SemanticWeb::Schema::Action - An action performed by a direct agent and indirect
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -151,6 +151,10 @@ A action_status should be one of the following types:
 
 =back
 
+=head2 C<_has_action_status>
+
+A predicate for the L</action_status> attribute.
+
 =head2 C<agent>
 
 =for html <p>The direct performer or driver of the action (animate or inanimate).
@@ -165,6 +169,10 @@ A agent should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_agent>
+
+A predicate for the L</agent> attribute.
 
 =head2 C<end_time>
 
@@ -187,6 +195,10 @@ A end_time should be one of the following types:
 
 =back
 
+=head2 C<_has_end_time>
+
+A predicate for the L</end_time> attribute.
+
 =head2 C<error>
 
 For failed actions, more information on the cause of the failure.
@@ -198,6 +210,10 @@ A error should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_error>
+
+A predicate for the L</error> attribute.
 
 =head2 C<instrument>
 
@@ -211,6 +227,10 @@ A instrument should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_instrument>
+
+A predicate for the L</instrument> attribute.
 
 =head2 C<location>
 
@@ -229,6 +249,10 @@ A location should be one of the following types:
 
 =back
 
+=head2 C<_has_location>
+
+A predicate for the L</location> attribute.
+
 =head2 C<object>
 
 =for html <p>The object upon which the action is carried out, whose state is kept
@@ -243,6 +267,10 @@ A object should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_object>
+
+A predicate for the L</object> attribute.
 
 =head2 C<participant>
 
@@ -259,6 +287,10 @@ A participant should be one of the following types:
 
 =back
 
+=head2 C<_has_participant>
+
+A predicate for the L</participant> attribute.
+
 =head2 C<result>
 
 =for html <p>The result produced in the action. e.g. John wrote <em>a book</em>.<p>
@@ -270,6 +302,10 @@ A result should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_result>
+
+A predicate for the L</result> attribute.
 
 =head2 C<start_time>
 
@@ -292,6 +328,10 @@ A start_time should be one of the following types:
 
 =back
 
+=head2 C<_has_start_time>
+
+A predicate for the L</start_time> attribute.
+
 =head2 C<target>
 
 Indicates a target EntryPoint for an Action.
@@ -303,6 +343,10 @@ A target should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::EntryPoint']>
 
 =back
+
+=head2 C<_has_target>
+
+A predicate for the L</target> attribute.
 
 =head1 SEE ALSO
 

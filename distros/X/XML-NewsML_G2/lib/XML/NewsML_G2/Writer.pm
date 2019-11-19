@@ -107,8 +107,17 @@ sub BUILD {
 # DOM creating methods
 
 sub _create_creator {
-    my ( $self, $name ) = @_;
-    return $self->create_element( 'creator', _name_text => $name );
+    my ( $self, $creator ) = @_;
+    my $result =
+        $self->create_element( 'creator', _name_text => $creator->name );
+
+    if ( $creator->kind ) {
+        my $rel =
+            $result->appendChild(
+            $self->create_element( 'related', rel => 'crel:isA' ) );
+        $self->scheme_manager->add_qcode( $rel, 'gyibt', $creator->kind );
+    }
+    return $result;
 }
 
 sub _create_root_element {

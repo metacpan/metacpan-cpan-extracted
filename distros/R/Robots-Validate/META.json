@@ -48,9 +48,8 @@
          "requires" : {
             "List::Util" : "1.33",
             "Moo" : "1",
-            "MooX::Const" : "0",
+            "MooX::Const" : "v0.4.0",
             "Net::DNS::Resolver" : "0",
-            "Types::Const" : "v0.3.6",
             "Types::Standard" : "0",
             "namespace::autoclean" : "0",
             "perl" : "v5.10.0"
@@ -72,7 +71,7 @@
    "provides" : {
       "Robots::Validate" : {
          "file" : "lib/Robots/Validate.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       }
    },
    "release_status" : "stable",
@@ -86,9 +85,9 @@
          "web" : "https://github.com/robrwo/Robots-Validate"
       }
    },
-   "version" : "v0.1.5",
+   "version" : "v0.1.6",
    "x_authority" : "cpan:RRWO",
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

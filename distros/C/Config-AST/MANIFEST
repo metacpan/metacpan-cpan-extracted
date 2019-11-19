@@ -1,4 +1,6 @@
 Changes
+Config-AST-1.06/META.json
+Config-AST-1.06/META.yml
 lib/Config/AST.pm
 lib/Config/AST/Follow.pm
 lib/Config/AST/Node.pm

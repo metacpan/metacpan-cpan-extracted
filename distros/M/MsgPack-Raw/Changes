@@ -1,0 +1,12 @@
+Revision history for MsgPack-Raw
+
+0.03      2019-11-18 17:03:20+00:00 Europe/London
+
+ - Added support for perl 5.8
+
+0.02      2019-11-17 19:05:43+00:00 Europe/London
+
+ - Compilation fixes: Don't require a C++ linker
+ - Removed unneeded files from the distribution
+
+0.01      2019-11-17 13:39:33+00:00 Europe/London

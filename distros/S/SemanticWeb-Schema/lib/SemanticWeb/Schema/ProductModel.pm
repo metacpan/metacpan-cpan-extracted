@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has is_variant_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_variant_of',
     json_ld   => 'isVariantOf',
 );
 
@@ -28,7 +28,7 @@ has is_variant_of => (
 
 has predecessor_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_predecessor_of',
     json_ld   => 'predecessorOf',
 );
 
@@ -36,7 +36,7 @@ has predecessor_of => (
 
 has successor_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_successor_of',
     json_ld   => 'successorOf',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::ProductModel - A datasheet or vendor specification of a pro
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -83,6 +83,10 @@ A is_variant_of should be one of the following types:
 
 =back
 
+=head2 C<_has_is_variant_of>
+
+A predicate for the L</is_variant_of> attribute.
+
 =head2 C<predecessor_of>
 
 C<predecessorOf>
@@ -98,6 +102,10 @@ A predecessor_of should be one of the following types:
 
 =back
 
+=head2 C<_has_predecessor_of>
+
+A predicate for the L</predecessor_of> attribute.
+
 =head2 C<successor_of>
 
 C<successorOf>
@@ -112,6 +120,10 @@ A successor_of should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ProductModel']>
 
 =back
+
+=head2 C<_has_successor_of>
+
+A predicate for the L</successor_of> attribute.
 
 =head1 SEE ALSO
 

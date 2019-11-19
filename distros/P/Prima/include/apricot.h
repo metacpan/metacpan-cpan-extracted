@@ -311,6 +311,7 @@ typedef Uquad_t Handle;
 #endif
 typedef Handle ApiHandle;
 
+
 #define __xstr1(x) #x
 #define __xstr2(x) __xstr1(x)
 #define PR_HANDLE_FMT "0x%0" __xstr2(PTRSIZE) PR_HANDLE
@@ -2646,12 +2647,27 @@ typedef enum {
 	ropDstOut,
 	ropSrcAtop,
 	ropDstAtop,
+	/* and their extensions, photoshop blend modes */
+	ropAdd,
+	ropMultiply,
+	ropScreen,
+	ropNoOper2 = ropNoOper,
+	ropOverlay,
+	ropDarken,
+	ropLighten,
+	ropColorDodge,
+	ropColorBurn,
+	ropHardLight,
+	ropSoftLight,
+	ropDifference,
+	ropExclusion,
+	ropMaxPDFunc = ropExclusion,
 
 	/* 8-bit standalone alpha */
 	ropAlphaCopy          = 0x0000100,
 
 	/* extensions for Prima's own Image.put */
-	ropPorterDuffMask     = 0x000000F,
+	ropPorterDuffMask     = 0x000001F,
 	ropSrcAlpha           = 0x1000000,
 	ropSrcAlphaShift      = 8,
 	ropDstAlpha           = 0x2000000,
@@ -2674,6 +2690,10 @@ ROP(NotSrcXor) ROP(NotDestXor)
 ROP(SrcOver) ROP(SrcCopy) ROP(SrcIn) ROP(SrcOut) ROP(SrcAtop)
 ROP(DstOver) ROP(DstCopy) ROP(DstIn) ROP(DstOut) ROP(DstAtop)
 ROP(Xor) ROP(Clear)
+	
+ROP(Add) ROP(Multiply) ROP(Screen) ROP(Overlay)
+ROP(Darken) ROP(Lighten) ROP(ColorDodge) ROP(ColorBurn)
+ROP(HardLight) ROP(SoftLight) ROP(Difference) ROP(Exclusion)
 
 ROP(SrcAlpha) ROP(SrcAlphaShift)
 ROP(DstAlpha) ROP(DstAlphaShift)
@@ -2932,6 +2952,9 @@ IM(TrigComplex)
 IM(TrigDComplex)
 END_TABLE(im,UV)
 #undef IM
+
+#define MAX_SIZEOF_PIXEL (sizeof(double) * 2)
+typedef Byte ColorPixel[MAX_SIZEOF_PIXEL];
 
 /* Image statistics constants */
 #define IS(const_name) CONSTANT(is,const_name)

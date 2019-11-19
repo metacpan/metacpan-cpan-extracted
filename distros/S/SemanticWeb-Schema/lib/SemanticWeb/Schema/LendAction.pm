@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has borrower => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_borrower',
     json_ld   => 'borrower',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::LendAction - The act of providing an object under an agreem
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -66,6 +66,10 @@ A borrower should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_borrower>
+
+A predicate for the L</borrower> attribute.
 
 =head1 SEE ALSO
 

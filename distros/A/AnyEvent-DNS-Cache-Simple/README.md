@@ -12,7 +12,6 @@ AnyEvent::DNS::Cache::Simple - Simple cache for AnyEvent::DNS
         timeout => [1,1]
     );
     
-
     for my $i ( 1..3 ) {
         my $cv = AE::cv;
         AnyEvent::DNS::a "example.com", sub {
@@ -22,7 +21,6 @@ AnyEvent::DNS::Cache::Simple - Simple cache for AnyEvent::DNS
         $cv->recv;
     }
     
-
     undef $guard;
 
 # DESCRIPTION
@@ -57,7 +55,7 @@ register can accept all `AnyEvent::DNS-`new> arguments and has some additional a
 
 # SEE ALSO
 
-[AnyEvent::DNS](http://search.cpan.org/perldoc?AnyEvent::DNS), [AnyEvent::Socket](http://search.cpan.org/perldoc?AnyEvent::Socket), [AnyEvent::CacheDNS](http://search.cpan.org/perldoc?AnyEvent::CacheDNS), [Cache::Memory::Simple](http://search.cpan.org/perldoc?Cache::Memory::Simple)
+[AnyEvent::DNS](https://metacpan.org/pod/AnyEvent%3A%3ADNS), [AnyEvent::Socket](https://metacpan.org/pod/AnyEvent%3A%3ASocket), [AnyEvent::CacheDNS](https://metacpan.org/pod/AnyEvent%3A%3ACacheDNS), [Cache::Memory::Simple](https://metacpan.org/pod/Cache%3A%3AMemory%3A%3ASimple)
 
 # LICENSE
 

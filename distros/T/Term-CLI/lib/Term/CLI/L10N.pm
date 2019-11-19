@@ -18,7 +18,7 @@
 
 use 5.014_001;
 
-package Term::CLI::L10N  0.051005 {
+package Term::CLI::L10N  0.051007 {
 
 use Modern::Perl 1.20140107;
 
@@ -73,7 +73,7 @@ Term::CLI::L10N - localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.051005
+version 0.051007
 
 =head1 SYNOPSIS
 

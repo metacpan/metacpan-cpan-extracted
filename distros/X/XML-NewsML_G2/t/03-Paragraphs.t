@@ -19,7 +19,7 @@ ok( $ni->add_paragraph( $text[0] ), 'add_paragraph returns OK' );
 ok( $ni->add_paragraph( $text[1] ), 'add_paragraph returns OK again' );
 
 my %schemes;
-foreach (qw(crel desk geo svc role ind org topic hltype)) {
+foreach (qw(crel desk geo svc role ind org topic hltype gyibt)) {
     $schemes{$_} = XML::NewsML_G2::Scheme->new(
         alias => "apa$_",
         uri   => "http://cv.apa.at/$_/"

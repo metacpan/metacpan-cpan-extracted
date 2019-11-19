@@ -459,6 +459,9 @@ static short marpaESLIFLua_lua_gettable(int *rcp, lua_State *L, int idx);
                                case MARPAESLIF_ACTION_TYPE_STRING:      \
                                  if (! marpaESLIFLua_lua_pushlstring(NULL, L, (const char *) actionp->u.stringp->bytep, actionp->u.stringp->bytel)) goto err; \
                                  break;                                 \
+                               case MARPAESLIF_ACTION_TYPE_LUA:        \
+                                 if (! marpaESLIFLua_lua_pushstring(NULL, L, actionp->u.luas)) goto err; \
+                                 break;                                 \
                                default:                                 \
                                  marpaESLIFLua_luaL_errorf(L, "Unsupported action type %d", actionp->type); \
                                  goto err;                              \
@@ -3780,7 +3783,7 @@ static short marpaESLIFLua_importb(marpaESLIFValue_t *marpaESLIFValuep, void *us
         marpaESLIFLua_luaL_errorf(L, "malloc failure, %s", strerror(errno));
         goto err;
       }
-      *marpaESLIFValueResultDupp = *marpaESLIFValueResultp;;
+      *marpaESLIFValueResultDupp = *marpaESLIFValueResultp;
       if (! marpaESLIFLua_lua_pushlightuserdata(L, marpaESLIFValueResultDupp->u.p.p)) goto err;
       /* We want to remember that marpaESLIFValueResultDupp->u.p.p is associated to marpaESLIFValueResultDupp */
       /* If case there would be more than another marpaESLIFValueResult or type PTR with the same PTR */

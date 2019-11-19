@@ -30,7 +30,6 @@ sub new {
 
 sub __parse_with_Text_CSV {
     my ( $sf, $sql, $fh ) = @_;
-    delete $sf->{i}{gc}{sheet_name};
     my $waiting = 'Parsing file ... ';
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     say $waiting . "\r";
@@ -67,7 +66,6 @@ sub __parse_with_Text_CSV {
 
 sub __parse_with_split {
     my ( $sf, $sql, $fh ) = @_;
-    delete $sf->{i}{gc}{sheet_name};
     my $waiting = 'Parsing file ... ';
     say $waiting . "\r";
     my $rows_of_cols = [];
@@ -132,7 +130,6 @@ sub __print_template_info {
 
 sub __parse_with_template {
     my ( $sf, $sql, $fh ) = @_;
-    delete $sf->{i}{gc}{sheet_name};
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
@@ -256,7 +253,6 @@ sub __parse_with_template {
 sub __parse_with_Spreadsheet_Read {
     my ( $sf, $sql, $file_ec ) = @_;
     my $tc = Term::Choose->new( { %{$sf->{i}{tc_default}}, clear_screen => 1 } );
-    delete $sf->{i}{gc}{sheet_name};
     my $waiting = 'Parsing file ... ';
     say $waiting . "\r";
     require Spreadsheet::Read;

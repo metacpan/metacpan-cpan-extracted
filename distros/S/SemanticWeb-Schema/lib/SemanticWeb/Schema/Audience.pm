@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has audience_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_audience_type',
     json_ld   => 'audienceType',
 );
 
@@ -28,7 +28,7 @@ has audience_type => (
 
 has geographic_area => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geographic_area',
     json_ld   => 'geographicArea',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::Audience - Intended audience for an item, i
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -74,6 +74,10 @@ A audience_type should be one of the following types:
 
 =back
 
+=head2 C<_has_audience_type>
+
+A predicate for the L</audience_type> attribute.
+
 =head2 C<geographic_area>
 
 C<geographicArea>
@@ -87,6 +91,10 @@ A geographic_area should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
 
 =back
+
+=head2 C<_has_geographic_area>
+
+A predicate for the L</geographic_area> attribute.
 
 =head1 SEE ALSO
 

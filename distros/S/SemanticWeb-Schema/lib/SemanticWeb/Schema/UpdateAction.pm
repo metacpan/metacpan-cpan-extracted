@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has collection => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_collection',
     json_ld   => 'collection',
 );
 
@@ -28,7 +28,7 @@ has collection => (
 
 has target_collection => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_target_collection',
     json_ld   => 'targetCollection',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::UpdateAction - The act of managing by changing/editing the 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -70,6 +70,10 @@ A collection should be one of the following types:
 
 =back
 
+=head2 C<_has_collection>
+
+A predicate for the L</collection> attribute.
+
 =head2 C<target_collection>
 
 C<targetCollection>
@@ -83,6 +87,10 @@ A target_collection should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_target_collection>
+
+A predicate for the L</target_collection> attribute.
 
 =head1 SEE ALSO
 

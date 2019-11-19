@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has appearance => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_appearance',
     json_ld   => 'appearance',
 );
 
@@ -28,7 +28,7 @@ has appearance => (
 
 has first_appearance => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_first_appearance',
     json_ld   => 'firstAppearance',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::Claim - A Claim in Schema
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -94,6 +94,10 @@ A appearance should be one of the following types:
 
 =back
 
+=head2 C<_has_appearance>
+
+A predicate for the L</appearance> attribute.
+
 =head2 C<first_appearance>
 
 C<firstAppearance>
@@ -109,6 +113,10 @@ A first_appearance should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
+
+=head2 C<_has_first_appearance>
+
+A predicate for the L</first_appearance> attribute.
 
 =head1 SEE ALSO
 

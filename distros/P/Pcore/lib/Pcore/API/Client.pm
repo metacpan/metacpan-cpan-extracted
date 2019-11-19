@@ -32,8 +32,9 @@ has on_pong        => ();                # Maybe [CodeRef]
 
 has _is_http => ( required => 1 );
 
-has _get_ws_cb => ( init_arg => undef );
-has _ws        => ( init_arg => undef );
+has _ws           => ( init_arg => undef );
+has _get_ws_exec  => ( init_arg => undef );
+has _get_ws_queue => ( init_arg => undef );
 
 sub DESTROY ( $self ) {
     if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
@@ -81,44 +82,23 @@ sub api_call ( $self, $method, @args ) {
         }
     }
 
-    # parse callback
-    my $cb = is_callback $_[-1] ? pop : undef;
-
-    if ( defined wantarray ) {
-        my $cv = P->cv;
-
-        if ( $self->{_is_http} ) {
-            $self->_send_http( $method, \@args, $cv );
-        }
-        else {
-            $self->_send_ws( $method, \@args, $cv );
-        }
-
-        my $res = $cv->recv;
-
-        return $cb ? $cb->($res) : $res;
+    if ( $self->{_is_http} ) {
+        return $self->_send_http( $method, \@args );
     }
     else {
-        if ( $self->{_is_http} ) {
-            $self->_send_http( $method, \@args, undef );
-        }
-        else {
-            $self->_send_ws( $method, \@args, undef );
-        }
-
-        return;
+        return $self->_send_ws( $method, \@args );
     }
 }
 
-sub _send_http ( $self, $method, $args, $cb ) {
+sub _send_http ( $self, $method, $args ) {
     my $payload = {
         type   => 'rpc',
         method => $method,
         args   => $args,
-        ( $cb ? ( tid => uuid_v1mc_str ) : () ),
+        ( defined wantarray ? ( tid => uuid_v1mc_str ) : () ),
     };
 
-    P->http->post(
+    my $res = P->http->post(
         $self->{uri},
         connect_timeout => $self->{connect_timeout},
 
@@ -130,138 +110,135 @@ sub _send_http ( $self, $method, $args, $cb ) {
             Authorization  => "Token $self->{token}",
             'Content-Type' => 'application/cbor',
         ],
-        data => to_cbor($payload),
-        sub ($res) {
-            if ( !$res ) {
-                $cb->( res [ $res->{status}, $res->{reason} ] ) if $cb;
-            }
-            else {
-                my $msg = eval { from_cbor $res->{data} };
+        data => to_cbor($payload)
+    );
 
-                if ($@) {
-                    $cb->( res [ 500, 'Error decoding response' ] ) if $cb;
-                }
-                elsif ($cb) {
-                    my $tx = is_plain_arrayref $msg ? $msg->[0] : $msg;
+    if ( !$res ) {
+        return res [ $res->{status}, $res->{reason} ];
+    }
+    else {
+        my $msg = eval { from_cbor $res->{data} };
 
-                    if ( $tx->{type} eq 'exception' ) {
-                        $cb->( bless $tx->{message}, 'Pcore::Lib::Result::Class' );
-                    }
-                    elsif ( $tx->{type} eq 'rpc' ) {
-                        $cb->( bless $tx->{result}, 'Pcore::Lib::Result::Class' );
-                    }
-                }
+        if ($@) {
+            return res [ 500, 'Error decoding response' ];
+        }
+        else {
+            my $tx = is_plain_arrayref $msg ? $msg->[0] : $msg;
+
+            if ( $tx->{type} eq 'exception' ) {
+                return bless $tx->{message}, 'Pcore::Lib::Result::Class';
             }
+            elsif ( $tx->{type} eq 'rpc' ) {
+                return bless $tx->{result}, 'Pcore::Lib::Result::Class';
+            }
+        }
+    }
+}
+
+sub _send_ws ( $self, $method, $args ) {
+    my ( $ws, $error ) = $self->_get_ws;
+
+    return $error if defined $error;
+
+    return $ws->rpc_call( $method, $args );
+}
+
+sub _get_ws ( $self ) {
+    return $self->{_ws} if $self->{_ws};
+
+    if ( $self->{_get_ws_exec} ) {
+        my $cv = P->cv;
+
+        push $self->{_get_ws_queue}->@*, $cv;
+
+        $cv->recv;
+
+        return;
+    }
+
+    $self->{_get_ws_exec} = 1;
+
+    weaken $self;
+
+    my $cv = P->cv;
+
+    Pcore::WebSocket->connect_ws(
+        $self->{uri},
+        protocol         => 'pcore',
+        max_message_size => 0,
+        compression      => $self->{compression},
+        connect_timeout  => $self->{connect_timeout},
+        tls_ctx          => $self->{tls_ctx},
+        before_connect   => {
+            token          => $self->{token},
+            bind_events    => $self->{bind_events},
+            forward_events => $self->{forward_events},
+        },
+        on_listen_event => sub ( $ws, $mask ) {    # API server can listen client events
+            return 1;
+        },
+        on_fire_event => sub ( $ws, $key ) {       # API server can fire client events
+            return 1;
+        },
+        on_connect_error => sub ($res) {
+            $cv->( undef, $res );
 
             return;
         },
-    );
+        on_connect => sub ( $ws, $headers ) {
+            $self->{_ws} = $ws;
 
-    return;
-}
+            $self->{on_connect}->( $self, $headers ) if defined $self->{on_connect};
 
-sub _send_ws ( $self, $method, $args, $cb ) {
-    $self->_get_ws(
-        sub ( $ws, $error ) {
-            if ( defined $error ) {
-                $cb->($error) if $cb;
-            }
-            else {
-                $ws->rpc_call( $method, $args, $cb );
-            }
+            $cv->( $ws, undef );
 
             return;
-        }
+        },
+        on_disconnect => sub ( $ws, $status ) {
+            undef $self->{_ws};
+
+            $self->{on_disconnect}->( $self, $status ) if $self && $self->{on_disconnect};
+
+            return;
+        },
+        on_ping => do {
+            if ( $self->{on_ping} ) {
+                sub ( $ws, $payload_ref ) {
+                    $self->{on_ping}->( $self, $payload_ref ) if $self && $self->{on_ping};
+
+                    return;
+                };
+            }
+        },
+        on_pong => do {
+            if ( $self->{on_pong} ) {
+                sub ( $ws, $payload_ref ) {
+                    $self->{on_pong}->( $self, $payload_ref ) if $self && $self->{on_pong};
+
+                    return;
+                };
+            }
+        },
+        on_rpc => do {
+            if ( $self->{on_rpc} ) {
+                sub ( $ws, $req, $tx ) {
+                    $self->{on_rpc}->( $self, $req, $tx ) if $self && $self->{on_rpc};
+
+                    return;
+                };
+            }
+        },
     );
 
-    return;
-}
+    my ( $ws, $error ) = $cv->recv;
 
-sub _get_ws ( $self, $cb ) {
-    if ( $self->{_ws} ) {
-        $cb->( $self->{_ws}, undef );
-    }
-    else {
-        push $self->{_get_ws_cb}->@*, $cb;
+    $self->{_get_ws_exec} = 0;
 
-        return if $self->{_get_ws_cb}->@* > 1;
-
-        weaken $self;
-
-        Pcore::WebSocket->connect_ws(
-            $self->{uri},
-            protocol         => 'pcore',
-            max_message_size => 0,
-            compression      => $self->{compression},
-            connect_timeout  => $self->{connect_timeout},
-            tls_ctx          => $self->{tls_ctx},
-            before_connect   => {
-                token          => $self->{token},
-                bind_events    => $self->{bind_events},
-                forward_events => $self->{forward_events},
-            },
-            on_listen_event => sub ( $ws, $mask ) {    # API server can listen client events
-                return 1;
-            },
-            on_fire_event => sub ( $ws, $key ) {       # API server can fire client events
-                return 1;
-            },
-            on_connect_error => sub ($res) {
-                while ( my $cb = shift $self->{_get_ws_cb}->@* ) {
-                    $cb->( undef, $res );
-                }
-
-                return;
-            },
-            on_connect => sub ( $ws, $headers ) {
-                $self->{_ws} = $ws;
-
-                $self->{on_connect}->( $self, $headers ) if $self->{on_connect};
-
-                while ( my $cb = shift $self->{_get_ws_cb}->@* ) {
-                    $cb->( $ws, undef );
-                }
-
-                return;
-            },
-            on_disconnect => sub ( $ws, $status ) {
-                undef $self->{_ws};
-
-                $self->{on_disconnect}->( $self, $status ) if $self && $self->{on_disconnect};
-
-                return;
-            },
-            on_ping => do {
-                if ( $self->{on_ping} ) {
-                    sub ( $ws, $payload_ref ) {
-                        $self->{on_ping}->( $self, $payload_ref ) if $self && $self->{on_ping};
-
-                        return;
-                    };
-                }
-            },
-            on_pong => do {
-                if ( $self->{on_pong} ) {
-                    sub ( $ws, $payload_ref ) {
-                        $self->{on_pong}->( $self, $payload_ref ) if $self && $self->{on_pong};
-
-                        return;
-                    };
-                }
-            },
-            on_rpc => do {
-                if ( $self->{on_rpc} ) {
-                    sub ( $ws, $req, $tx ) {
-                        $self->{on_rpc}->( $self, $req, $tx ) if $self && $self->{on_rpc};
-
-                        return;
-                    };
-                }
-            },
-        );
+    while ( my $cb = shift $self->{_get_ws_queue}->@* ) {
+        $cb->( $ws, $error );
     }
 
-    return;
+    return $ws, $error;
 }
 
 1;

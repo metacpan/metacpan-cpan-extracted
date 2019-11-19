@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has additional_property => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_additional_property',
     json_ld   => 'additionalProperty',
 );
 
@@ -28,7 +28,7 @@ has additional_property => (
 
 has aggregate_rating => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_aggregate_rating',
     json_ld   => 'aggregateRating',
 );
 
@@ -36,7 +36,7 @@ has aggregate_rating => (
 
 has audience => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_audience',
     json_ld   => 'audience',
 );
 
@@ -44,7 +44,7 @@ has audience => (
 
 has award => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_award',
     json_ld   => 'award',
 );
 
@@ -52,7 +52,7 @@ has award => (
 
 has awards => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_awards',
     json_ld   => 'awards',
 );
 
@@ -60,7 +60,7 @@ has awards => (
 
 has brand => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_brand',
     json_ld   => 'brand',
 );
 
@@ -68,7 +68,7 @@ has brand => (
 
 has category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_category',
     json_ld   => 'category',
 );
 
@@ -76,7 +76,7 @@ has category => (
 
 has color => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_color',
     json_ld   => 'color',
 );
 
@@ -84,7 +84,7 @@ has color => (
 
 has depth => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_depth',
     json_ld   => 'depth',
 );
 
@@ -92,7 +92,7 @@ has depth => (
 
 has gtin => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_gtin',
     json_ld   => 'gtin',
 );
 
@@ -100,7 +100,7 @@ has gtin => (
 
 has gtin12 => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_gtin12',
     json_ld   => 'gtin12',
 );
 
@@ -108,7 +108,7 @@ has gtin12 => (
 
 has gtin13 => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_gtin13',
     json_ld   => 'gtin13',
 );
 
@@ -116,7 +116,7 @@ has gtin13 => (
 
 has gtin14 => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_gtin14',
     json_ld   => 'gtin14',
 );
 
@@ -124,7 +124,7 @@ has gtin14 => (
 
 has gtin8 => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_gtin8',
     json_ld   => 'gtin8',
 );
 
@@ -132,7 +132,7 @@ has gtin8 => (
 
 has has_product_return_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_product_return_policy',
     json_ld   => 'hasProductReturnPolicy',
 );
 
@@ -140,7 +140,7 @@ has has_product_return_policy => (
 
 has height => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_height',
     json_ld   => 'height',
 );
 
@@ -148,7 +148,7 @@ has height => (
 
 has is_accessory_or_spare_part_for => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_accessory_or_spare_part_for',
     json_ld   => 'isAccessoryOrSparePartFor',
 );
 
@@ -156,7 +156,7 @@ has is_accessory_or_spare_part_for => (
 
 has is_consumable_for => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_consumable_for',
     json_ld   => 'isConsumableFor',
 );
 
@@ -164,7 +164,7 @@ has is_consumable_for => (
 
 has is_related_to => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_related_to',
     json_ld   => 'isRelatedTo',
 );
 
@@ -172,7 +172,7 @@ has is_related_to => (
 
 has is_similar_to => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_similar_to',
     json_ld   => 'isSimilarTo',
 );
 
@@ -180,7 +180,7 @@ has is_similar_to => (
 
 has item_condition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_item_condition',
     json_ld   => 'itemCondition',
 );
 
@@ -188,7 +188,7 @@ has item_condition => (
 
 has logo => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_logo',
     json_ld   => 'logo',
 );
 
@@ -196,7 +196,7 @@ has logo => (
 
 has manufacturer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_manufacturer',
     json_ld   => 'manufacturer',
 );
 
@@ -204,7 +204,7 @@ has manufacturer => (
 
 has material => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_material',
     json_ld   => 'material',
 );
 
@@ -212,7 +212,7 @@ has material => (
 
 has model => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_model',
     json_ld   => 'model',
 );
 
@@ -220,7 +220,7 @@ has model => (
 
 has mpn => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_mpn',
     json_ld   => 'mpn',
 );
 
@@ -228,7 +228,7 @@ has mpn => (
 
 has nsn => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_nsn',
     json_ld   => 'nsn',
 );
 
@@ -236,7 +236,7 @@ has nsn => (
 
 has offers => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_offers',
     json_ld   => 'offers',
 );
 
@@ -244,7 +244,7 @@ has offers => (
 
 has product_id => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_product_id',
     json_ld   => 'productID',
 );
 
@@ -252,7 +252,7 @@ has product_id => (
 
 has production_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_production_date',
     json_ld   => 'productionDate',
 );
 
@@ -260,7 +260,7 @@ has production_date => (
 
 has purchase_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_purchase_date',
     json_ld   => 'purchaseDate',
 );
 
@@ -268,7 +268,7 @@ has purchase_date => (
 
 has release_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_release_date',
     json_ld   => 'releaseDate',
 );
 
@@ -276,7 +276,7 @@ has release_date => (
 
 has review => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_review',
     json_ld   => 'review',
 );
 
@@ -284,7 +284,7 @@ has review => (
 
 has reviews => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_reviews',
     json_ld   => 'reviews',
 );
 
@@ -292,7 +292,7 @@ has reviews => (
 
 has sku => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sku',
     json_ld   => 'sku',
 );
 
@@ -300,7 +300,7 @@ has sku => (
 
 has slogan => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_slogan',
     json_ld   => 'slogan',
 );
 
@@ -308,7 +308,7 @@ has slogan => (
 
 has weight => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_weight',
     json_ld   => 'weight',
 );
 
@@ -316,7 +316,7 @@ has weight => (
 
 has width => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_width',
     json_ld   => 'width',
 );
 
@@ -338,7 +338,7 @@ SemanticWeb::Schema::Product - Any offered product or service
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -369,6 +369,10 @@ A additional_property should be one of the following types:
 
 =back
 
+=head2 C<_has_additional_property>
+
+A predicate for the L</additional_property> attribute.
+
 =head2 C<aggregate_rating>
 
 C<aggregateRating>
@@ -384,6 +388,10 @@ A aggregate_rating should be one of the following types:
 
 =back
 
+=head2 C<_has_aggregate_rating>
+
+A predicate for the L</aggregate_rating> attribute.
+
 =head2 C<audience>
 
 An intended audience, i.e. a group for whom something was created.
@@ -395,6 +403,10 @@ A audience should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Audience']>
 
 =back
+
+=head2 C<_has_audience>
+
+A predicate for the L</audience> attribute.
 
 =head2 C<award>
 
@@ -408,6 +420,10 @@ A award should be one of the following types:
 
 =back
 
+=head2 C<_has_award>
+
+A predicate for the L</award> attribute.
+
 =head2 C<awards>
 
 Awards won by or for this item.
@@ -419,6 +435,10 @@ A awards should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_awards>
+
+A predicate for the L</awards> attribute.
 
 =head2 C<brand>
 
@@ -434,6 +454,10 @@ A brand should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_brand>
+
+A predicate for the L</brand> attribute.
 
 =head2 C<category>
 
@@ -452,6 +476,10 @@ A category should be one of the following types:
 
 =back
 
+=head2 C<_has_category>
+
+A predicate for the L</category> attribute.
+
 =head2 C<color>
 
 The color of the product.
@@ -463,6 +491,10 @@ A color should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_color>
+
+A predicate for the L</color> attribute.
 
 =head2 C<depth>
 
@@ -477,6 +509,10 @@ A depth should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_depth>
+
+A predicate for the L</depth> attribute.
 
 =head2 C<gtin>
 
@@ -511,6 +547,10 @@ A gtin should be one of the following types:
 
 =back
 
+=head2 C<_has_gtin>
+
+A predicate for the L</gtin> attribute.
+
 =head2 C<gtin12>
 
 =for html <p>The GTIN-12 code of the product, or the product to which the offer
@@ -527,6 +567,10 @@ A gtin12 should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_gtin12>
+
+A predicate for the L</gtin12> attribute.
 
 =head2 C<gtin13>
 
@@ -545,6 +589,10 @@ A gtin13 should be one of the following types:
 
 =back
 
+=head2 C<_has_gtin13>
+
+A predicate for the L</gtin13> attribute.
+
 =head2 C<gtin14>
 
 =for html <p>The GTIN-14 code of the product, or the product to which the offer
@@ -558,6 +606,10 @@ A gtin14 should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_gtin14>
+
+A predicate for the L</gtin14> attribute.
 
 =head2 C<gtin8>
 
@@ -576,6 +628,10 @@ A gtin8 should be one of the following types:
 
 =back
 
+=head2 C<_has_gtin8>
+
+A predicate for the L</gtin8> attribute.
+
 =head2 C<has_product_return_policy>
 
 C<hasProductReturnPolicy>
@@ -590,6 +646,10 @@ A has_product_return_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_has_product_return_policy>
+
+A predicate for the L</has_product_return_policy> attribute.
+
 =head2 C<height>
 
 The height of the item.
@@ -603,6 +663,10 @@ A height should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_height>
+
+A predicate for the L</height> attribute.
 
 =head2 C<is_accessory_or_spare_part_for>
 
@@ -619,6 +683,10 @@ A is_accessory_or_spare_part_for should be one of the following types:
 
 =back
 
+=head2 C<_has_is_accessory_or_spare_part_for>
+
+A predicate for the L</is_accessory_or_spare_part_for> attribute.
+
 =head2 C<is_consumable_for>
 
 C<isConsumableFor>
@@ -633,6 +701,10 @@ A is_consumable_for should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
 
 =back
+
+=head2 C<_has_is_consumable_for>
+
+A predicate for the L</is_consumable_for> attribute.
 
 =head2 C<is_related_to>
 
@@ -650,6 +722,10 @@ A is_related_to should be one of the following types:
 
 =back
 
+=head2 C<_has_is_related_to>
+
+A predicate for the L</is_related_to> attribute.
+
 =head2 C<is_similar_to>
 
 C<isSimilarTo>
@@ -665,6 +741,10 @@ A is_similar_to should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Service']>
 
 =back
+
+=head2 C<_has_is_similar_to>
+
+A predicate for the L</is_similar_to> attribute.
 
 =head2 C<item_condition>
 
@@ -682,6 +762,10 @@ A item_condition should be one of the following types:
 
 =back
 
+=head2 C<_has_item_condition>
+
+A predicate for the L</item_condition> attribute.
+
 =head2 C<logo>
 
 An associated logo.
@@ -696,6 +780,10 @@ A logo should be one of the following types:
 
 =back
 
+=head2 C<_has_logo>
+
+A predicate for the L</logo> attribute.
+
 =head2 C<manufacturer>
 
 The manufacturer of the product.
@@ -707,6 +795,10 @@ A manufacturer should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_manufacturer>
+
+A predicate for the L</manufacturer> attribute.
 
 =head2 C<material>
 
@@ -721,6 +813,10 @@ A material should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_material>
+
+A predicate for the L</material> attribute.
 
 =head2 C<model>
 
@@ -739,6 +835,10 @@ A model should be one of the following types:
 
 =back
 
+=head2 C<_has_model>
+
+A predicate for the L</model> attribute.
+
 =head2 C<mpn>
 
 The Manufacturer Part Number (MPN) of the product, or the product to which
@@ -751,6 +851,10 @@ A mpn should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_mpn>
+
+A predicate for the L</mpn> attribute.
 
 =head2 C<nsn>
 
@@ -767,6 +871,10 @@ A nsn should be one of the following types:
 
 =back
 
+=head2 C<_has_nsn>
+
+A predicate for the L</nsn> attribute.
+
 =head2 C<offers>
 
 An offer to provide this item&#x2014;for example, an offer to sell a
@@ -780,6 +888,10 @@ A offers should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Offer']>
 
 =back
+
+=head2 C<_has_offers>
+
+A predicate for the L</offers> attribute.
 
 =head2 C<product_id>
 
@@ -796,6 +908,10 @@ A product_id should be one of the following types:
 
 =back
 
+=head2 C<_has_product_id>
+
+A predicate for the L</product_id> attribute.
+
 =head2 C<production_date>
 
 C<productionDate>
@@ -810,6 +926,10 @@ A production_date should be one of the following types:
 
 =back
 
+=head2 C<_has_production_date>
+
+A predicate for the L</production_date> attribute.
+
 =head2 C<purchase_date>
 
 C<purchaseDate>
@@ -823,6 +943,10 @@ A purchase_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_purchase_date>
+
+A predicate for the L</purchase_date> attribute.
 
 =head2 C<release_date>
 
@@ -839,6 +963,10 @@ A release_date should be one of the following types:
 
 =back
 
+=head2 C<_has_release_date>
+
+A predicate for the L</release_date> attribute.
+
 =head2 C<review>
 
 A review of the item.
@@ -851,6 +979,10 @@ A review should be one of the following types:
 
 =back
 
+=head2 C<_has_review>
+
+A predicate for the L</review> attribute.
+
 =head2 C<reviews>
 
 Review of the item.
@@ -862,6 +994,10 @@ A reviews should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Review']>
 
 =back
+
+=head2 C<_has_reviews>
+
+A predicate for the L</reviews> attribute.
 
 =head2 C<sku>
 
@@ -876,6 +1012,10 @@ A sku should be one of the following types:
 
 =back
 
+=head2 C<_has_sku>
+
+A predicate for the L</sku> attribute.
+
 =head2 C<slogan>
 
 A slogan or motto associated with the item.
@@ -888,6 +1028,10 @@ A slogan should be one of the following types:
 
 =back
 
+=head2 C<_has_slogan>
+
+A predicate for the L</slogan> attribute.
+
 =head2 C<weight>
 
 The weight of the product or person.
@@ -899,6 +1043,10 @@ A weight should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_weight>
+
+A predicate for the L</weight> attribute.
 
 =head2 C<width>
 
@@ -913,6 +1061,10 @@ A width should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_width>
+
+A predicate for the L</width> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has iata_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_iata_code',
     json_ld   => 'iataCode',
 );
 
@@ -28,7 +28,7 @@ has iata_code => (
 
 has icao_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_icao_code',
     json_ld   => 'icaoCode',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::Airport - An airport.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -72,6 +72,10 @@ A iata_code should be one of the following types:
 
 =back
 
+=head2 C<_has_iata_code>
+
+A predicate for the L</iata_code> attribute.
+
 =head2 C<icao_code>
 
 C<icaoCode>
@@ -85,6 +89,10 @@ A icao_code should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_icao_code>
+
+A predicate for the L</icao_code> attribute.
 
 =head1 SEE ALSO
 

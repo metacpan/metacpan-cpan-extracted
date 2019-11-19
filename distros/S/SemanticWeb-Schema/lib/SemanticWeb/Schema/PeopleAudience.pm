@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has health_condition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_condition',
     json_ld   => 'healthCondition',
 );
 
@@ -28,7 +28,7 @@ has health_condition => (
 
 has required_gender => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_required_gender',
     json_ld   => 'requiredGender',
 );
 
@@ -36,7 +36,7 @@ has required_gender => (
 
 has required_max_age => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_required_max_age',
     json_ld   => 'requiredMaxAge',
 );
 
@@ -44,7 +44,7 @@ has required_max_age => (
 
 has required_min_age => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_required_min_age',
     json_ld   => 'requiredMinAge',
 );
 
@@ -52,7 +52,7 @@ has required_min_age => (
 
 has suggested_gender => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_suggested_gender',
     json_ld   => 'suggestedGender',
 );
 
@@ -60,7 +60,7 @@ has suggested_gender => (
 
 has suggested_max_age => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_suggested_max_age',
     json_ld   => 'suggestedMaxAge',
 );
 
@@ -68,7 +68,7 @@ has suggested_max_age => (
 
 has suggested_min_age => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_suggested_min_age',
     json_ld   => 'suggestedMinAge',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::PeopleAudience - A set of characteristics belonging to peop
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -114,6 +114,10 @@ A health_condition should be one of the following types:
 
 =back
 
+=head2 C<_has_health_condition>
+
+A predicate for the L</health_condition> attribute.
+
 =head2 C<required_gender>
 
 C<requiredGender>
@@ -127,6 +131,10 @@ A required_gender should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_required_gender>
+
+A predicate for the L</required_gender> attribute.
 
 =head2 C<required_max_age>
 
@@ -142,6 +150,10 @@ A required_max_age should be one of the following types:
 
 =back
 
+=head2 C<_has_required_max_age>
+
+A predicate for the L</required_max_age> attribute.
+
 =head2 C<required_min_age>
 
 C<requiredMinAge>
@@ -155,6 +167,10 @@ A required_min_age should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_required_min_age>
+
+A predicate for the L</required_min_age> attribute.
 
 =head2 C<suggested_gender>
 
@@ -170,6 +186,10 @@ A suggested_gender should be one of the following types:
 
 =back
 
+=head2 C<_has_suggested_gender>
+
+A predicate for the L</suggested_gender> attribute.
+
 =head2 C<suggested_max_age>
 
 C<suggestedMaxAge>
@@ -184,6 +204,10 @@ A suggested_max_age should be one of the following types:
 
 =back
 
+=head2 C<_has_suggested_max_age>
+
+A predicate for the L</suggested_max_age> attribute.
+
 =head2 C<suggested_min_age>
 
 C<suggestedMinAge>
@@ -197,6 +221,10 @@ A suggested_min_age should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_suggested_min_age>
+
+A predicate for the L</suggested_min_age> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has increases_risk_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_increases_risk_of',
     json_ld   => 'increasesRiskOf',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::MedicalRiskFactor - A risk factor is anything that increase
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ A increases_risk_of should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalEntity']>
 
 =back
+
+=head2 C<_has_increases_risk_of>
+
+A predicate for the L</increases_risk_of> attribute.
 
 =head1 SEE ALSO
 

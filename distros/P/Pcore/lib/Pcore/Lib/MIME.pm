@@ -39,48 +39,43 @@ sub _load_data {
     return;
 }
 
-sub update ($cb = undef) {
+sub update {
     print 'updating mime.yaml ... ';
 
-    return P->http->get(
-        'https://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=co',
-        sub ($res) {
-            if ($res) {
-                my $data = $ENV->{share}->read_cfg('/Pcore/data/mime.yaml');
+    my $res = P->http->get('https://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=co');
 
-                my $suffixes = $data->{suffix};
+    if ($res) {
+        my $data = $ENV->{share}->read_cfg('/Pcore/data/mime.yaml');
 
-                for my $line ( split /\n\r?/sm, $res->{data}->$* ) {
-                    next if $line =~ /\A\s*#/sm;
+        my $suffixes = $data->{suffix};
 
-                    my @tokens = split /\s+/sm, $line;
+        for my $line ( split /\n\r?/sm, $res->{data}->$* ) {
+            next if $line =~ /\A\s*#/sm;
 
-                    my $type = shift @tokens;
+            my @tokens = split /\s+/sm, $line;
 
-                    for my $suffix (@tokens) {
-                        if ( !exists $suffixes->{$suffix} ) {
-                            $suffixes->{$suffix} = [$type];
-                        }
-                        elsif ( $suffixes->{$suffix}->[0] ne $type ) {
-                            $suffixes->{$suffix}->[0] = $type;
+            my $type = shift @tokens;
 
-                            # TODO update type in custom_suffix, filename, shebang branches
-                        }
-                    }
+            for my $suffix (@tokens) {
+                if ( !exists $suffixes->{$suffix} ) {
+                    $suffixes->{$suffix} = [$type];
                 }
+                elsif ( $suffixes->{$suffix}->[0] ne $type ) {
+                    $suffixes->{$suffix}->[0] = $type;
 
-                $ENV->{share}->write( '/Pcore/data/mime.yaml', $data );
-
-                undef $DATA;
+                    # TODO update type in custom_suffix, filename, shebang branches
+                }
             }
-
-            say $res;
-
-            $cb->($res) if $cb;
-
-            return $res;
         }
-    );
+
+        $ENV->{share}->write( '/Pcore/data/mime.yaml', $data );
+
+        undef $DATA;
+    }
+
+    say $res;
+
+    return $res;
 }
 
 sub mime_shebang ( $shebang ) {

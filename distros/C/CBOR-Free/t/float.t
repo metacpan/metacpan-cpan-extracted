@@ -62,11 +62,15 @@ is(
     'Inf encodes to half-precision as expected',
 );
 
-is(
-    sprintf('%v.02x', CBOR::Free::encode($neginf)),
-    'f9.fc.00',
-    '-Inf encodes to half-precision as expected',
-);
+TODO: {
+    our $TODO = 'Apparently broken on MSWin32 prior to 5.24?' if $^O eq 'MSWin32';
+
+    is(
+        sprintf('%v.02x', CBOR::Free::encode($neginf)),
+        'f9.fc.00',
+        '-Inf encodes to half-precision as expected',
+    );
+}
 
 is(
     sprintf('%v.02x', CBOR::Free::encode($nan)),

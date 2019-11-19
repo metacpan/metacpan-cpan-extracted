@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has authenticator => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_authenticator',
     json_ld   => 'authenticator',
 );
 
@@ -28,7 +28,7 @@ has authenticator => (
 
 has expects_acceptance_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_expects_acceptance_of',
     json_ld   => 'expectsAcceptanceOf',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::MediaSubscription - A subscription which allows a user to a
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,10 @@ A authenticator should be one of the following types:
 
 =back
 
+=head2 C<_has_authenticator>
+
+A predicate for the L</authenticator> attribute.
+
 =head2 C<expects_acceptance_of>
 
 C<expectsAcceptanceOf>
@@ -87,6 +91,10 @@ A expects_acceptance_of should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Offer']>
 
 =back
+
+=head2 C<_has_expects_acceptance_of>
+
+A predicate for the L</expects_acceptance_of> attribute.
 
 =head1 SEE ALSO
 

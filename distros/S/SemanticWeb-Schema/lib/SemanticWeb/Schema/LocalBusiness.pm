@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has branch_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_branch_of',
     json_ld   => 'branchOf',
 );
 
@@ -28,7 +28,7 @@ has branch_of => (
 
 has currencies_accepted => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_currencies_accepted',
     json_ld   => 'currenciesAccepted',
 );
 
@@ -36,7 +36,7 @@ has currencies_accepted => (
 
 has opening_hours => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_opening_hours',
     json_ld   => 'openingHours',
 );
 
@@ -44,7 +44,7 @@ has opening_hours => (
 
 has payment_accepted => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payment_accepted',
     json_ld   => 'paymentAccepted',
 );
 
@@ -52,7 +52,7 @@ has payment_accepted => (
 
 has price_range => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price_range',
     json_ld   => 'priceRange',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::LocalBusiness - A particular physical business or branch of
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -101,6 +101,10 @@ A branch_of should be one of the following types:
 
 =back
 
+=head2 C<_has_branch_of>
+
+A predicate for the L</branch_of> attribute.
+
 =head2 C<currencies_accepted>
 
 C<currenciesAccepted>
@@ -121,6 +125,10 @@ A currencies_accepted should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_currencies_accepted>
+
+A predicate for the L</currencies_accepted> attribute.
 
 =head2 C<opening_hours>
 
@@ -149,6 +157,10 @@ A opening_hours should be one of the following types:
 
 =back
 
+=head2 C<_has_opening_hours>
+
+A predicate for the L</opening_hours> attribute.
+
 =head2 C<payment_accepted>
 
 C<paymentAccepted>
@@ -163,6 +175,10 @@ A payment_accepted should be one of the following types:
 
 =back
 
+=head2 C<_has_payment_accepted>
+
+A predicate for the L</payment_accepted> attribute.
+
 =head2 C<price_range>
 
 C<priceRange>
@@ -176,6 +192,10 @@ A price_range should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_price_range>
+
+A predicate for the L</price_range> attribute.
 
 =head1 SEE ALSO
 

@@ -1,4 +1,3 @@
-CONTRIBUTING
 COPYRIGHT
 CREDITS
 Changes
@@ -23,3 +22,8 @@ t/07extends.t
 t/08with.t
 t/09hygiene.t
 t/10modifiers.t
+t/11types-moose.t
+t/11types-mouse.t
+t/11types-nano.t
+t/11types-specio.t
+t/11types.t

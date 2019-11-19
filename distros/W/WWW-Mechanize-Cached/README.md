@@ -4,7 +4,7 @@ WWW::Mechanize::Cached - Cache response to be polite
 
 # VERSION
 
-version 1.51
+version 1.52
 
 # SYNOPSIS
 
@@ -27,9 +27,9 @@ version 1.51
 
 # DESCRIPTION
 
-Uses the [Cache::Cache](https://metacpan.org/pod/Cache::Cache) hierarchy by default to implement a caching Mech. This
+Uses the [Cache::Cache](https://metacpan.org/pod/Cache%3A%3ACache) hierarchy by default to implement a caching Mech. This
 lets one perform repeated requests without hammering a server impolitely.
-Please note that [Cache::Cache](https://metacpan.org/pod/Cache::Cache) has been superseded by [CHI](https://metacpan.org/pod/CHI), but the default
+Please note that [Cache::Cache](https://metacpan.org/pod/Cache%3A%3ACache) has been superseded by [CHI](https://metacpan.org/pod/CHI), but the default
 has not been changed here for reasons of backwards compatibility.  For this
 reason, you are encouraged to provide your own [CHI](https://metacpan.org/pod/CHI) caching object to
 override the default.
@@ -38,7 +38,7 @@ override the default.
 
 ## new
 
-Behaves like, and calls, [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize)'s `new` method. Any params, other
+Behaves like, and calls, [WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize)'s `new` method. Any params, other
 than those explicitly listed here are passed directly to WWW::Mechanize's
 constructor.
 
@@ -75,7 +75,7 @@ For example, you may want to try something like this:
 
 # METHODS
 
-Most methods are provided by [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize). See that module's
+Most methods are provided by [WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize). See that module's
 documentation for details.
 
 ## cache( $cache\_object )
@@ -159,6 +159,14 @@ addition of this feature.
 And thirdly, you can set the value to the string 'warn', to warn if this
 scenario occurs, and then not cache it. ( This is the default behaviour )
 
+## invalidate\_last\_request()
+
+Remove the last request from the cache.
+
+The return value reveals whether the request was successfully removed from the
+cache. 1 means it's still cached, 0 means it was removed, and undef means there
+was nothing to remove (there was no request or it wasn't cached).
+
 # UPGRADING FROM 1.40 OR EARLIER
 
 Caching behaviour has changed since 1.40, and this may result in pages that were
@@ -188,7 +196,7 @@ You can find documentation for this module with the perldoc command.
 
 # SEE ALSO
 
-[WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize), [WWW::Mechanize::Cached::GZip](https://metacpan.org/pod/WWW::Mechanize::Cached::GZip).
+[WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize), [WWW::Mechanize::Cached::GZip](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3ACached%3A%3AGZip).
 
 # AUTHORS
 
@@ -198,7 +206,7 @@ You can find documentation for this module with the perldoc command.
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Iain Truskett and Andy Lester.
+This software is copyright (c) 2004-2019 by Iain Truskett and Andy Lester.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

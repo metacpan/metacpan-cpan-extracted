@@ -31,7 +31,7 @@ name: XML-NewsML_G2
 provides:
   XML::NewsML_G2:
     file: lib/XML/NewsML_G2.pm
-    version: v0.3.2
+    version: v0.3.3
   XML::NewsML_G2::AnyItem:
     file: lib/XML/NewsML_G2/AnyItem.pm
   XML::NewsML_G2::Audio:
@@ -42,6 +42,8 @@ provides:
     file: lib/XML/NewsML_G2/Concept.pm
   XML::NewsML_G2::Copyright_Holder:
     file: lib/XML/NewsML_G2/Copyright_Holder.pm
+  XML::NewsML_G2::Creator:
+    file: lib/XML/NewsML_G2/Creator.pm
   XML::NewsML_G2::Desk:
     file: lib/XML/NewsML_G2/Desk.pm
   XML::NewsML_G2::Destination:
@@ -179,5 +181,5 @@ resources:
   bugtracker: https://github.com/apa-it/xml-newsml-g2/issues
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/apa-it/xml-newsml-g2
-version: v0.3.2
+version: v0.3.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

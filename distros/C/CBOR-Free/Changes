@@ -1,5 +1,13 @@
 Revision history for Perl module CBOR::Free
 
+0.16 19 Nov 2019
+- Make tests accommodate floating-point bug in pre-5.24 Windows perls.
+
+0.15 18 Nov 2019
+- BUG FIX: Several memory leaks on error conditions are fixed.
+- Add optional preserve/shared references support.
+- Speed up “canonical” ordering.
+
 0.14 9 Nov 2019
 - BREAKING CHANGE: The encoder now requires a flag to encode scalar references.
   (The decoder still handles them all the time.)

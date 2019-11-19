@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has engine_displacement => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_engine_displacement',
     json_ld   => 'engineDisplacement',
 );
 
@@ -28,7 +28,7 @@ has engine_displacement => (
 
 has engine_power => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_engine_power',
     json_ld   => 'enginePower',
 );
 
@@ -36,7 +36,7 @@ has engine_power => (
 
 has engine_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_engine_type',
     json_ld   => 'engineType',
 );
 
@@ -44,7 +44,7 @@ has engine_type => (
 
 has fuel_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_fuel_type',
     json_ld   => 'fuelType',
 );
 
@@ -52,7 +52,7 @@ has fuel_type => (
 
 has torque => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_torque',
     json_ld   => 'torque',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::EngineSpecification - Information about the engine of the v
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -105,6 +105,10 @@ A engine_displacement should be one of the following types:
 
 =back
 
+=head2 C<_has_engine_displacement>
+
+A predicate for the L</engine_displacement> attribute.
+
 =head2 C<engine_power>
 
 C<enginePower>
@@ -131,6 +135,10 @@ A engine_power should be one of the following types:
 
 =back
 
+=head2 C<_has_engine_power>
+
+A predicate for the L</engine_power> attribute.
+
 =head2 C<engine_type>
 
 C<engineType>
@@ -146,6 +154,10 @@ A engine_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_engine_type>
+
+A predicate for the L</engine_type> attribute.
 
 =head2 C<fuel_type>
 
@@ -164,6 +176,10 @@ A fuel_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_fuel_type>
+
+A predicate for the L</fuel_type> attribute.
 
 =head2 C<torque>
 
@@ -185,6 +201,10 @@ A torque should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_torque>
+
+A predicate for the L</torque> attribute.
 
 =head1 SEE ALSO
 

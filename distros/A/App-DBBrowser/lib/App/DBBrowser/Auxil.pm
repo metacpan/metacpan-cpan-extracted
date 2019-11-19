@@ -131,8 +131,8 @@ sub insert_into_args_info_format {
     else {
         $avail_h = get_term_height() - 14;
     }
-    if ( $avail_h < 1) {
-        $avail_h = 1;
+    if ( $avail_h < 3) {
+        $avail_h = 3;
     }
     my $first_part_end = int( $avail_h / 1.5 );
     my $second_part_begin = $avail_h - $first_part_end;

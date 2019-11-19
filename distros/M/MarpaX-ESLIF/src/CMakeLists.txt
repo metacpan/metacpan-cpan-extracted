@@ -7,11 +7,18 @@ ENDIF ()
 # when we do make marpaESLIFPerlRelease
 #
 # SET (MYPACKAGE_DEBUG TRUE)
-MYPACKAGESTART (marpaESLIF 3 0 19)
+MYPACKAGESTART (marpaESLIF 3 0 28)
 
 ###########
 # Library #
 ###########
+IF (MSVC)
+  #
+  # Some MSVC warnings are literally polluting the output, in particular in Visual Studio 2008
+  #
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4305 /wd4309")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} /wd4018 /wd4067 /wd4305 /wd4309")
+ENDIF (MSVC)
 #
 # We have some specifics -;
 #

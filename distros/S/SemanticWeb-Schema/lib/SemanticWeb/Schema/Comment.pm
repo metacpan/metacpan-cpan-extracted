@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has downvote_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_downvote_count',
     json_ld   => 'downvoteCount',
 );
 
@@ -28,7 +28,7 @@ has downvote_count => (
 
 has parent_item => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_parent_item',
     json_ld   => 'parentItem',
 );
 
@@ -36,7 +36,7 @@ has parent_item => (
 
 has upvote_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_upvote_count',
     json_ld   => 'upvoteCount',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::Comment - A comment on an item - for example
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -85,6 +85,10 @@ A downvote_count should be one of the following types:
 
 =back
 
+=head2 C<_has_downvote_count>
+
+A predicate for the L</downvote_count> attribute.
+
 =head2 C<parent_item>
 
 C<parentItem>
@@ -98,6 +102,10 @@ A parent_item should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Question']>
 
 =back
+
+=head2 C<_has_parent_item>
+
+A predicate for the L</parent_item> attribute.
 
 =head2 C<upvote_count>
 
@@ -113,6 +121,10 @@ A upvote_count should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_upvote_count>
+
+A predicate for the L</upvote_count> attribute.
 
 =head1 SEE ALSO
 

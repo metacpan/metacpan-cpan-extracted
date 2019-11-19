@@ -1,11 +1,12 @@
 package Util::Medley::DateTime;
-$Util::Medley::DateTime::VERSION = '0.008';
+$Util::Medley::DateTime::VERSION = '0.009';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
 use Data::Printer alias => 'pdump';
 use Time::localtime;
 use Kavorka '-all';
+use Time::ParseDate;
 
 =head1 NAME
 
@@ -13,7 +14,7 @@ Util::Medley::DateTime - Class with various datetime methods.
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =cut
 
@@ -24,12 +25,12 @@ version 0.008
   #
   # positional  
   #
-  say $dt->localdatetime(time);
+  say $dt->localDateTime(time);
 
   #
   # named pair
   #
-  say $dt->localdatetime(epoch => time);
+  say $dt->localDateTime(epoch => time);
    
 =cut
 
@@ -51,7 +52,7 @@ none
 
 =head1 METHODS
 
-=head2 localdatetime
+=head2 localDateTime
 
 Returns the local date/time in the format: YYYY-MM-DD HH:MM:SS.  
 
@@ -59,9 +60,9 @@ Returns the local date/time in the format: YYYY-MM-DD HH:MM:SS.
 
 =item usage:
 
- $dt->localdatetime([time]);
+ $dt->localDateTime([time]);
 
- $dt->localdatetime([epoch => time]);
+ $dt->localDateTime([epoch => time]);
  
 =item args:
 
@@ -77,7 +78,7 @@ Epoch time used to generate date/time string.  Default is now.
    
 =cut
 
-multi method localdatetime (Int $epoch = time) {
+multi method localDateTime (Int $epoch = time) {
 
     my $l = localtime($epoch);
 
@@ -91,9 +92,55 @@ multi method localdatetime (Int $epoch = time) {
     return $str;
 }
 
-multi method localdatetime (Int :$epoch = time) {
+multi method localDateTime (Int :$epoch = time) {
 	
-	return $self->localdatetime($epoch);	
+	return $self->localDateTime($epoch);	
+}
+
+
+=head2 localDateTimeIsValid
+
+Validates the date-time string against: YYYY-MM-DD HH:MM:SS.  Also,
+checks if it is actually a valid date-time.
+
+=over
+
+=item usage:
+
+ $dt->localDateTimeIsValid($dateTime);
+
+ $dt->localDateTime(dateTime => $dateTime);
+ 
+=item args:
+
+=over
+
+=item dateTime [Str]
+
+The date-time string to validate.
+
+=back
+
+=back
+   
+=cut
+
+multi method localDateTimeIsValid (Str :$dateTime!) {
+	
+	if ($dateTime =~ /^\d\d\d\d-\d\d\-\d\d \d\d\:\d\d\:\d\d$/) {
+  		
+  		my $epoch = parsedate($dateTime, VALIDATE=>1);
+  		if ($epoch) {
+  			return 1;	
+  		}
+	}
+	
+	return 0;
+}
+
+multi method localDateTimeIsValid (Str $dateTime) {
+
+	return $self->localDateTimeIsValid(dateTime	=> $dateTime);
 }
 
 1;

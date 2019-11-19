@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has accepts_reservations => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_accepts_reservations',
     json_ld   => 'acceptsReservations',
 );
 
@@ -28,7 +28,7 @@ has accepts_reservations => (
 
 has has_menu => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_menu',
     json_ld   => 'hasMenu',
 );
 
@@ -36,7 +36,7 @@ has has_menu => (
 
 has menu => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_menu',
     json_ld   => 'menu',
 );
 
@@ -44,7 +44,7 @@ has menu => (
 
 has serves_cuisine => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_serves_cuisine',
     json_ld   => 'servesCuisine',
 );
 
@@ -52,7 +52,7 @@ has serves_cuisine => (
 
 has star_rating => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_star_rating',
     json_ld   => 'starRating',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::FoodEstablishment - A food-related business.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -100,6 +100,10 @@ A accepts_reservations should be one of the following types:
 
 =back
 
+=head2 C<_has_accepts_reservations>
+
+A predicate for the L</accepts_reservations> attribute.
+
 =head2 C<has_menu>
 
 C<hasMenu>
@@ -117,6 +121,10 @@ A has_menu should be one of the following types:
 
 =back
 
+=head2 C<_has_has_menu>
+
+A predicate for the L</has_menu> attribute.
+
 =head2 C<menu>
 
 Either the actual menu as a structured representation, as text, or a URL of
@@ -132,6 +140,10 @@ A menu should be one of the following types:
 
 =back
 
+=head2 C<_has_menu>
+
+A predicate for the L</menu> attribute.
+
 =head2 C<serves_cuisine>
 
 C<servesCuisine>
@@ -145,6 +157,10 @@ A serves_cuisine should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_serves_cuisine>
+
+A predicate for the L</serves_cuisine> attribute.
 
 =head2 C<star_rating>
 
@@ -162,6 +178,10 @@ A star_rating should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Rating']>
 
 =back
+
+=head2 C<_has_star_rating>
+
+A predicate for the L</star_rating> attribute.
 
 =head1 SEE ALSO
 

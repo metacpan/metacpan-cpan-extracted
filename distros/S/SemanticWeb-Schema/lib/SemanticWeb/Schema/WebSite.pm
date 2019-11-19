@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has issn => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_issn',
     json_ld   => 'issn',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::WebSite - A WebSite is a set of related web pages and other
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ A issn should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_issn>
+
+A predicate for the L</issn> attribute.
 
 =head1 SEE ALSO
 

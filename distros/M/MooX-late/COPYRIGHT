@@ -1,21 +1,15 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: MooX-late
-Upstream-Contact:  and Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/MooX-late
 
-Files: CONTRIBUTING
- INSTALL
- LICENSE
- TODO
- examples/simple.pl
-Copyright: Unknown
-License: Unknown
-
-Files: t/01basic.t
+Files: README
+ lib/MooX/late.pm
+ t/01basic.t
  t/02inflation.t
  t/03invalid_tc.t
  t/04arrayofattrs.t
-Copyright: This software is copyright (c) 2012-2013 by Toby Inkster.
+Copyright: This software is copyright (c) 2012-2014, 2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/05haveimissedanytypes.t
@@ -29,8 +23,15 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
-Copyright: Copyright 2014 Toby Inkster.
+Copyright: Copyright 2019 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ TODO
+ examples/simple.pl
+Copyright: Unknown
+License: Unknown
 
 Files: COPYRIGHT
  CREDITS
@@ -43,20 +44,15 @@ Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: README
- lib/MooX/late.pm
-Copyright: This software is copyright (c) 2012-2014 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  

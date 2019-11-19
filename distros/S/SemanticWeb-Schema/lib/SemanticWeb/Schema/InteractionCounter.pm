@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has interaction_service => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_interaction_service',
     json_ld   => 'interactionService',
 );
 
@@ -28,7 +28,7 @@ has interaction_service => (
 
 has interaction_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_interaction_type',
     json_ld   => 'interactionType',
 );
 
@@ -36,7 +36,7 @@ has interaction_type => (
 
 has user_interaction_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_user_interaction_count',
     json_ld   => 'userInteractionCount',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::InteractionCounter - A summary of how users have interacted
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -84,6 +84,10 @@ A interaction_service should be one of the following types:
 
 =back
 
+=head2 C<_has_interaction_service>
+
+A predicate for the L</interaction_service> attribute.
+
 =head2 C<interaction_type>
 
 C<interactionType>
@@ -102,6 +106,10 @@ A interaction_type should be one of the following types:
 
 =back
 
+=head2 C<_has_interaction_type>
+
+A predicate for the L</interaction_type> attribute.
+
 =head2 C<user_interaction_count>
 
 C<userInteractionCount>
@@ -116,6 +124,10 @@ A user_interaction_count should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_user_interaction_count>
+
+A predicate for the L</user_interaction_count> attribute.
 
 =head1 SEE ALSO
 

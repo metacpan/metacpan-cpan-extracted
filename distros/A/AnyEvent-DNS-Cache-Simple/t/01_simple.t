@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 use AnyEvent::DNS::Cache::Simple;
-use t::TestCache;
+require "./t/TestCache.pm";
+t::TestCache->import();
 use Test::More;
 
 my ($name,$aliases,$addrtype,$length,@addrs)= gethostbyname("google.com");
@@ -41,4 +42,3 @@ for my $i ( 1..3 ) {
 ok(!$t::TestCache::HIT{'in a example.com'});
 
 done_testing();
-

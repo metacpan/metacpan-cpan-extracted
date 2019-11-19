@@ -1,33 +1,40 @@
-0.323   2018-12-04 (PERLANCAR)
+0.324   2019-11-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add official 2020 holidays (16 + 4 joint leave).
+
+	- Fix typo in Eidul Fitr 2019.
+
+
+0.323   2018-12-04  Released-By: PERLANCAR
 
 	- Add official 2019 holidays (16 days + 4 joint leave days).
 
 
-0.322   2018-10-16 (PERLANCAR)
+0.322   2018-10-16  Released-By: PERLANCAR
 
 	- Add tentative 2019 holidays.
 
 	- Fixed joint leave days for 2018.
 
 
-0.321   2018-06-26 (PERLANCAR)
+0.321   2018-06-26  Released-By: PERLANCAR
 
 	- Add 2018 holiday: Jun 27 declared as national holiday on Jun 25.
 
 
-0.320   2017-12-04 (PERLANCAR)
+0.320   2017-12-04  Released-By: PERLANCAR
 
 	- Updates for official 2018 holidays (Nyepi Mar 18 -> Mar 17, Isra
 	  Miraj Apr 13 -> Apr 14, Hijra Sep 12 -> Sep 11, joint leave +Jun
 	  13, -Jun 20).
 
 
-0.31    2017-07-31 (PERLANCAR)
+0.31    2017-07-31  Released-By: PERLANCAR
 
 	- Add holidays for 2018 (tentative, draft, guess).
 
 
-0.30    2017-06-20 (PERLANCAR)
+0.30    2017-06-20  Released-By: PERLANCAR
 
 	- Add joint leave on 2017-06-23 (ref: Keppres 18/2017 on
 	  2017-06-15).
@@ -35,22 +42,22 @@
 	- Remove use of Log::Any::IfLOG.
 
 
-0.29    2017-05-29 (PERLANCAR)
+0.29    2017-05-29  Released-By: PERLANCAR
 
 	- Add Pancasila Day (June 1) as a holiday from 2017.
 
 
-0.28    2016-04-23 (PERLANCAR)
+0.28    2016-04-23  Released-By: PERLANCAR
 
 	- Add official holidays of 2017.
 
 
-0.27    2015-12-09 (PERLANCAR)
+0.27    2015-12-09  Released-By: PERLANCAR
 
 	- Add 2015 holiday: Pilkada Serentak (2015-12-09).
 
 
-0.26    2015-09-03 (PERLANCAR)
+0.26    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -59,13 +66,13 @@
 	  requirement.
 
 
-0.25    2015-07-25 (PERLANCAR)
+0.25    2015-07-25  Released-By: PERLANCAR
 
 	- Update with official 2016 holidays (Isra Miraj is May 6th not
 	  4th, Idul Adha is Sep 12th not 13th, Hijra is Oct 2nd not 3rd).
 
 
-0.24    2015-04-28 (PERLANCAR)
+0.24    2015-04-28  Released-By: PERLANCAR
 
 	- Add tentative holidays for 2016.
 
@@ -82,13 +89,13 @@
            generated script is not as polished as it should be. Stay tuned.
 
 
-0.22     2014-08-06 (SHARYANTO)
+0.22     2014-08-06  Released-By: SHARYANTO
 
          - Update data: 2015 holidays (official, decreed May 7th, so I'm a bit
            late).
 
 
-0.21     2014-07-02 (SHARYANTO)
+0.21     2014-07-02  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -97,23 +104,23 @@
            installing [RT#96884]
 
 
-0.20     2014-06-26 (SHARYANTO)
+0.20     2014-06-26  Released-By: SHARYANTO
 
          - Add script: list-id-workdays.
 
 
-0.19     2014-04-24 (SHARYANTO)
+0.19     2014-04-24  Released-By: SHARYANTO
 
          - bin/list-id-holidays: Experiment with Text::ANSITable's style set.
 
 
-0.18     2014-04-16 (SHARYANTO)
+0.18     2014-04-16  Released-By: SHARYANTO
 
          - Change wording of Pemilu -> Pemilu Legislatif, Pilpres -> Pemilu
            Presiden.
 
 
-0.17     2014-04-08 (SHARYANTO)
+0.17     2014-04-08  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -137,7 +144,7 @@
            (year,month) instead of (year) or (month,year).
 
 
-0.16     2014-04-08 (SHARYANTO)
+0.16     2014-04-08  Released-By: SHARYANTO
 
          - Add holiday: Pemilu 2014.
 
@@ -145,7 +152,7 @@
            for a couple of holidays so far).
 
 
-0.15     2013-12-12 (SHARYANTO)
+0.15     2013-12-12  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -156,42 +163,42 @@
            (e.g. original name is really long).
 
 
-0.14     2013-08-27 (SHARYANTO)
+0.14     2013-08-27  Released-By: SHARYANTO
 
          - Update data: 2014 holidays (official, decreed Aug 21st).
 
 
-0.13     2013-07-25 (SHARYANTO)
+0.13     2013-07-25  Released-By: SHARYANTO
 
          - Update data: 2014 holidays (tentative, no decree yet).
 
 
-0.12     2012-08-04 (SHARYANTO)
+0.12     2012-08-04  Released-By: SHARYANTO
 
          - No functional changes. Update to Perinci::Sub::Gen::AccessTable 0.16.
 
 
-0.11     2012-08-04 (SHARYANTO)
+0.11     2012-08-04  Released-By: SHARYANTO
 
          - Update data: 2013 holidays (decreed Jul 19).
 
 
-0.10     2012-07-11 (SHARYANTO)
+0.10     2012-07-11  Released-By: SHARYANTO
 
          - No functional changes. Update to Perinci::Sub::Gen::AccessTable 0.14.
 
 
-0.09     2012-06-04 (SHARYANTO)
+0.09     2012-06-04  Released-By: SHARYANTO
 
          - No functional changes. Update to Perinci::Sub::Gen::AccessTable 0.11.
 
 
-0.08     2012-03-22 (SHARYANTO)
+0.08     2012-03-22  Released-By: SHARYANTO
 
          - No functional changes. Update to Perinci::Sub::Gen::AccessTable 0.08.
 
 
-0.07     2011-12-14 (SHARYANTO)
+0.07     2011-12-14  Released-By: SHARYANTO
 
          - No functionality changes.
 
@@ -202,17 +209,17 @@
            'identifier'.
 
 
-0.06     2011-12-14 (SHARYANTO)
+0.06     2011-12-14  Released-By: SHARYANTO
 
          - No library changes. Add command-line script.
 
 
-0.05     2011-10-05 (SHARYANTO)
+0.05     2011-10-05  Released-By: SHARYANTO
 
          - Fix some calendar mistakes, add holidays from 2002-2007.
 
 
-0.04     2011-07-19 (SHARYANTO)
+0.04     2011-07-19  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -227,14 +234,14 @@
            functions.
 
 
-0.03     2011-07-10 (SHARYANTO)
+0.03     2011-07-10  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
          - Add alias Calendar::ID::Holiday
 
 
-0.02     2011-06-30 (SHARYANTO)
+0.02     2011-06-30  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -243,6 +250,6 @@
          - (documentation) Add FAQ.
 
 
-0.01     2011-06-14 (SHARYANTO)
+0.01     2011-06-14  Released-By: SHARYANTO
 
          - First release.

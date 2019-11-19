@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has account_minimum_inflow => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_account_minimum_inflow',
     json_ld   => 'accountMinimumInflow',
 );
 
@@ -28,7 +28,7 @@ has account_minimum_inflow => (
 
 has account_overdraft_limit => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_account_overdraft_limit',
     json_ld   => 'accountOverdraftLimit',
 );
 
@@ -36,7 +36,7 @@ has account_overdraft_limit => (
 
 has bank_account_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_bank_account_type',
     json_ld   => 'bankAccountType',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::BankAccount - A product or service offered by a bank whereb
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -81,6 +81,10 @@ A account_minimum_inflow should be one of the following types:
 
 =back
 
+=head2 C<_has_account_minimum_inflow>
+
+A predicate for the L</account_minimum_inflow> attribute.
+
 =head2 C<account_overdraft_limit>
 
 C<accountOverdraftLimit>
@@ -98,6 +102,10 @@ A account_overdraft_limit should be one of the following types:
 
 =back
 
+=head2 C<_has_account_overdraft_limit>
+
+A predicate for the L</account_overdraft_limit> attribute.
+
 =head2 C<bank_account_type>
 
 C<bankAccountType>
@@ -111,6 +119,10 @@ A bank_account_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_bank_account_type>
+
+A predicate for the L</bank_account_type> attribute.
 
 =head1 SEE ALSO
 

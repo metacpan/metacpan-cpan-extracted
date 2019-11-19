@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has dependencies => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_dependencies',
     json_ld   => 'dependencies',
 );
 
@@ -28,7 +28,7 @@ has dependencies => (
 
 has proficiency_level => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_proficiency_level',
     json_ld   => 'proficiencyLevel',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::TechArticle - A technical article - Example: How-to (task) 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -71,6 +71,10 @@ A dependencies should be one of the following types:
 
 =back
 
+=head2 C<_has_dependencies>
+
+A predicate for the L</dependencies> attribute.
+
 =head2 C<proficiency_level>
 
 C<proficiencyLevel>
@@ -84,6 +88,10 @@ A proficiency_level should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_proficiency_level>
+
+A predicate for the L</proficiency_level> attribute.
 
 =head1 SEE ALSO
 

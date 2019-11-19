@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has in_defined_term_set => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_in_defined_term_set',
     json_ld   => 'inDefinedTermSet',
 );
 
@@ -28,7 +28,7 @@ has in_defined_term_set => (
 
 has term_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_term_code',
     json_ld   => 'termCode',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::DefinedTerm - A word, name, acronym, phrase, etc
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -80,6 +80,10 @@ A in_defined_term_set should be one of the following types:
 
 =back
 
+=head2 C<_has_in_defined_term_set>
+
+A predicate for the L</in_defined_term_set> attribute.
+
 =head2 C<term_code>
 
 C<termCode>
@@ -96,6 +100,10 @@ A term_code should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_term_code>
+
+A predicate for the L</term_code> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has arrival_platform => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_arrival_platform',
     json_ld   => 'arrivalPlatform',
 );
 
@@ -28,7 +28,7 @@ has arrival_platform => (
 
 has arrival_station => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_arrival_station',
     json_ld   => 'arrivalStation',
 );
 
@@ -36,7 +36,7 @@ has arrival_station => (
 
 has departure_platform => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_departure_platform',
     json_ld   => 'departurePlatform',
 );
 
@@ -44,7 +44,7 @@ has departure_platform => (
 
 has departure_station => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_departure_station',
     json_ld   => 'departureStation',
 );
 
@@ -52,7 +52,7 @@ has departure_station => (
 
 has train_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_train_name',
     json_ld   => 'trainName',
 );
 
@@ -60,7 +60,7 @@ has train_name => (
 
 has train_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_train_number',
     json_ld   => 'trainNumber',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::TrainTrip - A trip on a commercial train line.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -104,6 +104,10 @@ A arrival_platform should be one of the following types:
 
 =back
 
+=head2 C<_has_arrival_platform>
+
+A predicate for the L</arrival_platform> attribute.
+
 =head2 C<arrival_station>
 
 C<arrivalStation>
@@ -117,6 +121,10 @@ A arrival_station should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::TrainStation']>
 
 =back
+
+=head2 C<_has_arrival_station>
+
+A predicate for the L</arrival_station> attribute.
 
 =head2 C<departure_platform>
 
@@ -132,6 +140,10 @@ A departure_platform should be one of the following types:
 
 =back
 
+=head2 C<_has_departure_platform>
+
+A predicate for the L</departure_platform> attribute.
+
 =head2 C<departure_station>
 
 C<departureStation>
@@ -145,6 +157,10 @@ A departure_station should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::TrainStation']>
 
 =back
+
+=head2 C<_has_departure_station>
+
+A predicate for the L</departure_station> attribute.
 
 =head2 C<train_name>
 
@@ -160,6 +176,10 @@ A train_name should be one of the following types:
 
 =back
 
+=head2 C<_has_train_name>
+
+A predicate for the L</train_name> attribute.
+
 =head2 C<train_number>
 
 C<trainNumber>
@@ -173,6 +193,10 @@ A train_number should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_train_number>
+
+A predicate for the L</train_number> attribute.
 
 =head1 SEE ALSO
 

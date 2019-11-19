@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has actor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actor',
     json_ld   => 'actor',
 );
 
@@ -28,7 +28,7 @@ has actor => (
 
 has actors => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actors',
     json_ld   => 'actors',
 );
 
@@ -36,7 +36,7 @@ has actors => (
 
 has country_of_origin => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_country_of_origin',
     json_ld   => 'countryOfOrigin',
 );
 
@@ -44,7 +44,7 @@ has country_of_origin => (
 
 has director => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_director',
     json_ld   => 'director',
 );
 
@@ -52,7 +52,7 @@ has director => (
 
 has directors => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_directors',
     json_ld   => 'directors',
 );
 
@@ -60,7 +60,7 @@ has directors => (
 
 has duration => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_duration',
     json_ld   => 'duration',
 );
 
@@ -68,7 +68,7 @@ has duration => (
 
 has music_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_music_by',
     json_ld   => 'musicBy',
 );
 
@@ -76,7 +76,7 @@ has music_by => (
 
 has production_company => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_production_company',
     json_ld   => 'productionCompany',
 );
 
@@ -84,7 +84,7 @@ has production_company => (
 
 has subtitle_language => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_subtitle_language',
     json_ld   => 'subtitleLanguage',
 );
 
@@ -92,7 +92,7 @@ has subtitle_language => (
 
 has trailer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_trailer',
     json_ld   => 'trailer',
 );
 
@@ -114,7 +114,7 @@ SemanticWeb::Schema::Movie - A movie.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -136,6 +136,10 @@ A actor should be one of the following types:
 
 =back
 
+=head2 C<_has_actor>
+
+A predicate for the L</actor> attribute.
+
 =head2 C<actors>
 
 An actor, e.g. in tv, radio, movie, video games etc. Actors can be
@@ -148,6 +152,10 @@ A actors should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_actors>
+
+A predicate for the L</actors> attribute.
 
 =head2 C<country_of_origin>
 
@@ -164,6 +172,10 @@ A country_of_origin should be one of the following types:
 
 =back
 
+=head2 C<_has_country_of_origin>
+
+A predicate for the L</country_of_origin> attribute.
+
 =head2 C<director>
 
 A director of e.g. tv, radio, movie, video gaming etc. content, or of an
@@ -178,6 +190,10 @@ A director should be one of the following types:
 
 =back
 
+=head2 C<_has_director>
+
+A predicate for the L</director> attribute.
+
 =head2 C<directors>
 
 A director of e.g. tv, radio, movie, video games etc. content. Directors
@@ -191,6 +207,10 @@ A directors should be one of the following types:
 
 =back
 
+=head2 C<_has_directors>
+
+A predicate for the L</directors> attribute.
+
 =head2 C<duration>
 
 =for html <p>The duration of the item (movie, audio recording, event, etc.) in <a
@@ -203,6 +223,10 @@ A duration should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
+
+=head2 C<_has_duration>
+
+A predicate for the L</duration> attribute.
 
 =head2 C<music_by>
 
@@ -220,6 +244,10 @@ A music_by should be one of the following types:
 
 =back
 
+=head2 C<_has_music_by>
+
+A predicate for the L</music_by> attribute.
+
 =head2 C<production_company>
 
 C<productionCompany>
@@ -234,6 +262,10 @@ A production_company should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_production_company>
+
+A predicate for the L</production_company> attribute.
 
 =head2 C<subtitle_language>
 
@@ -252,6 +284,10 @@ A subtitle_language should be one of the following types:
 
 =back
 
+=head2 C<_has_subtitle_language>
+
+A predicate for the L</subtitle_language> attribute.
+
 =head2 C<trailer>
 
 The trailer of a movie or tv/radio series, season, episode, etc.
@@ -263,6 +299,10 @@ A trailer should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::VideoObject']>
 
 =back
+
+=head2 C<_has_trailer>
+
+A predicate for the L</trailer> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has stage_as_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_stage_as_number',
     json_ld   => 'stageAsNumber',
 );
 
@@ -28,7 +28,7 @@ has stage_as_number => (
 
 has sub_stage_suffix => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sub_stage_suffix',
     json_ld   => 'subStageSuffix',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::MedicalConditionStage - A stage of a medical condition
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -72,6 +72,10 @@ A stage_as_number should be one of the following types:
 
 =back
 
+=head2 C<_has_stage_as_number>
+
+A predicate for the L</stage_as_number> attribute.
+
 =head2 C<sub_stage_suffix>
 
 C<subStageSuffix>
@@ -85,6 +89,10 @@ A sub_stage_suffix should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_sub_stage_suffix>
+
+A predicate for the L</sub_stage_suffix> attribute.
 
 =head1 SEE ALSO
 

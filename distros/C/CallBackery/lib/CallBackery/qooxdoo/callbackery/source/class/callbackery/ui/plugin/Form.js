@@ -220,7 +220,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 }
                 busy.hide();
                 that._loading--;
-            },'getPluginData',this._cfg.name,'allFields',parentFormData);
+            },'getPluginData',this._cfg.name,'allFields',parentFormData,{ currentFormData: this._form.getData()});
         }
     }
 });

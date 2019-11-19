@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has character_attribute => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_character_attribute',
     json_ld   => 'characterAttribute',
 );
 
@@ -28,7 +28,7 @@ has character_attribute => (
 
 has game_item => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_game_item',
     json_ld   => 'gameItem',
 );
 
@@ -36,7 +36,7 @@ has game_item => (
 
 has game_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_game_location',
     json_ld   => 'gameLocation',
 );
 
@@ -44,7 +44,7 @@ has game_location => (
 
 has number_of_players => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_players',
     json_ld   => 'numberOfPlayers',
 );
 
@@ -52,7 +52,7 @@ has number_of_players => (
 
 has quest => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_quest',
     json_ld   => 'quest',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::Game - The Game type represents things which are games
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -99,6 +99,10 @@ A character_attribute should be one of the following types:
 
 =back
 
+=head2 C<_has_character_attribute>
+
+A predicate for the L</character_attribute> attribute.
+
 =head2 C<game_item>
 
 C<gameItem>
@@ -113,6 +117,10 @@ A game_item should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_game_item>
+
+A predicate for the L</game_item> attribute.
 
 =head2 C<game_location>
 
@@ -132,6 +140,10 @@ A game_location should be one of the following types:
 
 =back
 
+=head2 C<_has_game_location>
+
+A predicate for the L</game_location> attribute.
+
 =head2 C<number_of_players>
 
 C<numberOfPlayers>
@@ -146,6 +158,10 @@ A number_of_players should be one of the following types:
 
 =back
 
+=head2 C<_has_number_of_players>
+
+A predicate for the L</number_of_players> attribute.
+
 =head2 C<quest>
 
 The task that a player-controlled character, or group of characters may
@@ -158,6 +174,10 @@ A quest should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_quest>
+
+A predicate for the L</quest> attribute.
 
 =head1 SEE ALSO
 

@@ -20,61 +20,49 @@ sub _build__auth ($self) {
     return 'Basic ' . P->data->to_b64( "$self->{username}:$self->{password}", $EMPTY );
 }
 
-sub _req1 ( $self, $method, $endpoint, $data, $cb = undef ) {
-    return P->http->$method(
+sub _req1 ( $self, $method, $endpoint, $data = undef ) {
+    my $res = P->http->$method(
         'https://bitbucket.org/api/1.0' . $endpoint,
         headers => [
             Authorization  => $self->_auth,
             'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
         ],
-        data => $data ? P->data->to_uri($data) : undef,
-        sub ($res) {
-            my $api_res;
-
-            if ( !$res ) {
-                $api_res = res [ $res->{status}, $res->{reason} ], $res->{data};
-            }
-            else {
-                my $data = $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : undef;
-
-                $api_res = res $res->{status}, $data;
-            }
-
-            return $cb ? $cb->{$api_res} : $api_res;
-        }
+        data => $data ? P->data->to_uri($data) : undef
     );
+
+    if ( !$res ) {
+        return res [ $res->{status}, $res->{reason} ], $res->{data};
+    }
+    else {
+        my $data = $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : undef;
+
+        return res $res->{status}, $data;
+    }
 }
 
-sub _req2 ( $self, $method, $endpoint, $data, $cb = undef ) {
-    return P->http->$method(
+sub _req2 ( $self, $method, $endpoint, $data = undef ) {
+    my $res = P->http->$method(
         'https://api.bitbucket.org/2.0' . $endpoint,
         headers => [
             Authorization  => $self->_auth,
             'Content-Type' => 'application/json',
         ],
-        data => $data ? P->data->to_json($data) : undef,
-        sub ($res) {
-            my $data = $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : undef;
-
-            my $api_res;
-
-            if ( !$res ) {
-                $api_res = res [ $res->{status}, $data->{error}->{message} // $res->{reason} ];
-            }
-            else {
-                $api_res = res $res->{status}, $data;
-            }
-
-            return $cb ? $cb->($api_res) : $api_res;
-        }
+        data => $data ? P->data->to_json($data) : undef
     );
+
+    $data = $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : undef;
+
+    if ( !$res ) {
+        return res [ $res->{status}, $data->{error}->{message} // $res->{reason} ];
+    }
+    else {
+        return res $res->{status}, $data;
+    }
 }
 
 # https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Busername%7D/%7Brepo_slug%7D#post
-sub create_repo ( $self, $repo_id, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = (
+sub create_repo ( $self, $repo_id, %args ) {
+    %args = (
 
         # common atts
         description => undef,
@@ -85,151 +73,105 @@ sub create_repo ( $self, $repo_id, @args ) {
         # bitbucket attrs
         fork_police => 'allow_forks',    # allow_forks, no_public_forks, no_forks
         language    => 'perl',
-        @args,
+        %args,
     );
 
-    return $self->_req2( 'post', "/repositories/$repo_id", \%args, $cb );
+    return $self->_req2( 'post', "/repositories/$repo_id", \%args );
 }
 
 # https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Busername%7D/%7Brepo_slug%7D#delete
-sub delete_repo ( $self, $repo_id, $cb = undef ) {
-    return $self->_req2( 'delete', "/repositories/$repo_id", undef, $cb );
+sub delete_repo ( $self, $repo_id ) {
+    return $self->_req2( 'delete', "/repositories/$repo_id", undef );
 }
 
 # VERSIONS
 # https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Busername%7D/%7Brepo_slug%7D/versions
-sub get_versions ( $self, $repo_id, $cb = undef ) {
-    my $cv = P->cv;
-
+sub get_versions ( $self, $repo_id ) {
     my $versions;
 
-    my $get = sub ($page) {
-        my $sub = __SUB__;
+    my $page = 1;
 
-        $self->_req2(
-            'get',
-            "/repositories/$repo_id/versions?page=$page&pagelen=100",
-            undef,
-            sub ($res) {
-                if ($res) {
-                    for my $ver ( $res->{data}->{values}->@* ) {
-                        $versions->{ $ver->{name} } = $ver->{links}->{self}->{href};
-                    }
+  GET_PAGE:
+    my $res = $self->_req2( 'get', "/repositories/$repo_id/versions?page=$page&pagelen=100" );
 
-                    if ( $res->{data}->{next} ) {
-                        $sub->( ++$page );
-                    }
-                    else {
-                        my $api_res = res 200, $versions;
+    if ($res) {
+        for my $ver ( $res->{data}->{values}->@* ) {
+            $versions->{ $ver->{name} } = $ver->{links}->{self}->{href};
+        }
 
-                        $cv->( $cb ? $cb->($api_res) : $api_res );
-                    }
-                }
-                else {
-                    $cv->( $cb ? $cb->($res) : $res );
-                }
+        if ( $res->{data}->{next} ) {
+            $page++;
 
-                return;
-            }
-        );
-
-        return;
-    };
-
-    $get->(1);
-
-    return defined wantarray ? $cv->recv : ();
+            goto GET_PAGE;
+        }
+        else {
+            return res 200, $versions;
+        }
+    }
+    else {
+        return $res;
+    }
 }
 
 # https://confluence.atlassian.com/bitbucket/issues-resource-296095191.html#issuesResource-POSTanewversion
-sub create_version ( $self, $repo_id, $ver, $cb = undef ) {
-    return $self->_req1(
-        'post',
-        "/repositories/$repo_id/issues/versions",
-        { name => version->parse($ver)->normal },
-        sub ($res) {
-            if ( !$res && $res->{data}->$* =~ /already exists/sm ) {
-                $res->set_status(200);
-            }
+sub create_version ( $self, $repo_id, $ver ) {
+    my $res = $self->_req1( 'post', "/repositories/$repo_id/issues/versions", { name => version->parse($ver)->normal } );
 
-            return $cb ? $cb->($res) : $res;
-        }
-    );
+    if ( !$res && $res->{data}->$* =~ /already exists/sm ) {
+        $res->set_status(200);
+    }
+
+    return $res;
 }
 
 # MILESTONES
 # https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Busername%7D/%7Brepo_slug%7D/milestones
-sub get_milestones ( $self, $repo_id, $cb = undef ) {
-    my $cv = P->cv;
-
+sub get_milestones ( $self, $repo_id ) {
     my $versions;
 
-    my $get = sub ($page) {
-        my $sub = __SUB__;
+    my $page = 1;
 
-        $self->_req2(
-            'get',
-            "/repositories/$repo_id/milestones?page=$page&pagelen=100",
-            undef,
-            sub ($res) {
-                if ($res) {
-                    for my $ver ( $res->{data}->{values}->@* ) {
-                        $versions->{ $ver->{name} } = $ver->{links}->{self}->{href};
-                    }
+  GET_PAGE:
+    my $res = $self->_req2( 'get', "/repositories/$repo_id/milestones?page=$page&pagelen=100" );
 
-                    if ( $res->{data}->{next} ) {
-                        $sub->( ++$page );
-                    }
-                    else {
-                        my $api_res = res 200, $versions;
+    if ($res) {
+        for my $ver ( $res->{data}->{values}->@* ) {
+            $versions->{ $ver->{name} } = $ver->{links}->{self}->{href};
+        }
 
-                        $cv->( $cb ? $cb->($api_res) : $api_res );
-                    }
-                }
-                else {
-                    $cv->( $cb ? $cb->($res) : $res );
-                }
+        if ( $res->{data}->{next} ) {
+            $page++;
 
-                return;
-            }
-        );
-
-        return;
-    };
-
-    $get->(1);
-
-    return defined wantarray ? $cv->recv : ();
+            goto GET_PAGE;
+        }
+        else {
+            return res 200, $versions;
+        }
+    }
+    else {
+        return $res;
+    }
 }
 
 # https://confluence.atlassian.com/bitbucket/issues-resource-296095191.html#issuesResource-POSTanewmilestone
-sub create_milestone ( $self, $repo_id, $ver, $cb = undef ) {
-    return $self->_req1(
-        'post',
-        "/repositories/$repo_id/issues/milestones",
-        { name => version->parse($ver)->normal },
-        sub ($res) {
-            if ( !$res && $res->{data}->$* =~ /already exists/sm ) {
-                $res->set_status(200);
-            }
+sub create_milestone ( $self, $repo_id, $ver ) {
+    my $res = $self->_req1( 'post', "/repositories/$repo_id/issues/milestones", { name => version->parse($ver)->normal } );
 
-            return $cb ? $cb->($res) : $res;
-        }
-    );
+    if ( !$res && $res->{data}->$* =~ /already exists/sm ) {
+        $res->set_status(200);
+    }
+
+    return $res;
 }
 
 # https://confluence.atlassian.com/bitbucket/issues-resource-296095191.html#issuesResource-GETalistofissuesinarepository%27stracker
-sub get_issues ( $self, $repo_id, @args ) {
-    my $cv = P->cv;
-
-    my $cb = is_plain_coderef $args[-1] ? pop @args : ();
-
-    my %args = (
+sub get_issues ( $self, $repo_id, %args ) {
+    %args = (
         sort   => 'priority',    # priority, kind, version, component, milestone
         status => undef,
         start  => 0,
         limit  => 50,            # 50 - max.
-        @args,
+        %args,
     );
 
     # remove undefined args
@@ -237,47 +179,28 @@ sub get_issues ( $self, $repo_id, @args ) {
 
     my $issues;
 
-    my $get = sub ($page) {
-        my $sub = __SUB__;
+    my $res = $self->_req1( 'get', "/repositories/$repo_id/issues?" . P->data->to_uri( \%args ) );
 
-        $self->_req1(
-            'get',
-            "/repositories/$repo_id/issues?" . P->data->to_uri( \%args ),
-            undef,
-            sub ($res) {
-                if ($res) {
-                    for my $issue ( $res->{data}->{issues}->@* ) {
-                        $issues->{ $issue->{local_id} } = $issue;
-                    }
+    if ($res) {
+        for my $issue ( $res->{data}->{issues}->@* ) {
+            $issues->{ $issue->{local_id} } = $issue;
+        }
 
-                    my $api_res = res 200, data => $issues, total => $res->{data}->{count};
-
-                    $cv->( $cb ? $cb->($api_res) : $api_res );
-                }
-                else {
-                    $cv->( $cb ? $cb->($res) : $res );
-                }
-
-                return;
-            }
-        );
-
-        return;
-    };
-
-    $get->(1);
-
-    return defined wantarray ? $cv->recv : ();
+        return res 200, data => $issues, total => $res->{data}->{count};
+    }
+    else {
+        return $res;
+    }
 }
 
 # https://confluence.atlassian.com/bitbucket/issues-resource-296095191.html#issuesResource-GETanindividualissue
-sub get_issue ( $self, $repo_id, $issue_id, $cb = undef ) {
-    return $self->_req1( 'get', "/repositories/$repo_id/issues/$issue_id", undef, $cb );
+sub get_issue ( $self, $repo_id, $issue_id ) {
+    return $self->_req1( 'get', "/repositories/$repo_id/issues/$issue_id" );
 }
 
 # https://confluence.atlassian.com/bitbucket/issues-resource-296095191.html#issuesResource-Updateanexistingissue
-sub update_issue ( $self, $repo_id, $issue_id, $data, $cb = undef ) {
-    return $self->_req1( 'put', "/repositories/$repo_id/issues/$issue_id", $data, $cb );
+sub update_issue ( $self, $repo_id, $issue_id, $data ) {
+    return $self->_req1( 'put', "/repositories/$repo_id/issues/$issue_id", $data );
 }
 
 1;
@@ -287,7 +210,7 @@ sub update_issue ( $self, $repo_id, $issue_id, $data, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 274, 279             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 202                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

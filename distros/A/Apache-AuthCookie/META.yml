@@ -8,12 +8,40 @@ configure_requires:
   Apache::Test: '1.39'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Apache-AuthCookie
+provides:
+  Apache2::AuthCookie:
+    file: lib/Apache2/AuthCookie.pm
+    version: '3.28'
+  Apache2::AuthCookie::Base:
+    file: lib/Apache2/AuthCookie/Base.pm
+    version: '3.28'
+  Apache2::AuthCookie::Params:
+    file: lib/Apache2/AuthCookie/Params.pm
+    version: '3.28'
+  Apache2_4::AuthCookie:
+    file: lib/Apache2_4/AuthCookie.pm
+    version: '3.28'
+  Apache::AuthCookie:
+    file: lib/Apache/AuthCookie.pm
+    version: '3.28'
+  Apache::AuthCookie::Params:
+    file: lib/Apache/AuthCookie/Params.pm
+    version: '3.28'
+  Apache::AuthCookie::Params::Base:
+    file: lib/Apache/AuthCookie/Params/Base.pm
+    version: '3.28'
+  Apache::AuthCookie::Params::CGI:
+    file: lib/Apache/AuthCookie/Params/CGI.pm
+    version: '3.28'
+  Apache::AuthCookie::Util:
+    file: lib/Apache/AuthCookie/Util.pm
+    version: '3.28'
 recommends:
   WWW::Form::UrlEncoded::XS: '0'
 requires:
@@ -25,8 +53,9 @@ requires:
   Test::More: '0.94'
   WWW::Form::UrlEncoded: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Apache-AuthCookie
-  homepage: http://search.cpan.org/dist/Apache-AuthCookie/
-  repository: git://github.com/mschout/apache-authcookie.git
-version: '3.27'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  bugtracker: https://github.com/mschout/apache-authcookie/issues
+  homepage: https://github.com/mschout/apache-authcookie
+  repository: https://github.com/mschout/apache-authcookie.git
+version: '3.28'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

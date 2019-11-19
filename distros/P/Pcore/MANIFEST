@@ -10,8 +10,7 @@ lib/Pcore.pm
 lib/Pcore/AE/DNS/Cache.pm
 lib/Pcore/AE/Patch.pm
 lib/Pcore/API/AntiCaptcha.pm
-lib/Pcore/API/AntiCaptcha/Result.pm
-lib/Pcore/API/AntiCaptcha/Role.pm
+lib/Pcore/API/AntiCaptcha/Captcha.pm
 lib/Pcore/API/Bitbucket.pm
 lib/Pcore/API/Client.pm
 lib/Pcore/API/Cloudflare.pm

@@ -1641,8 +1641,19 @@ color2pixel( Handle self, Color color, Byte * pixel)
 }
 
 static void
-read_fill_pattern(Handle self, FillPattern * p)
+prepare_fill_context(Handle self, Point translate, PImgPaintContext ctx)
 {
+	FillPattern * p = &ctx->pattern;
+
+	color2pixel( self, my->get_color(self), ctx->color);
+	color2pixel( self, my->get_backColor(self), ctx->backColor);
+	ctx-> rop    = my->get_rop(self);
+	ctx-> region = var->regionData ? &var->regionData-> data. box : NULL;
+	ctx-> patternOffset = my->get_fillPatternOffset(self);
+	ctx-> patternOffset.x -= translate.x;
+	ctx-> patternOffset.y -= translate.y;
+	ctx-> transparent = my->get_rop2(self) == ropNoOper;
+
 	if ( my-> fillPattern == Drawable_fillPattern) {
 		FillPattern * fp = apc_gp_get_fill_pattern( self);
 		if ( fp )
@@ -1697,6 +1708,7 @@ Bool
 Image_bar( Handle self, int x1, int y1, int x2, int y2)
 {
 	Point t;
+	Bool ok;
 	ImgPaintContext ctx;
 	if (opt_InPaint)
 		return apc_gp_bar( self, x1, y1, x2, y2);
@@ -1704,18 +1716,11 @@ Image_bar( Handle self, int x1, int y1, int x2, int y2)
 	t = my->get_translate(self);
 	x1 += t.x;
 	y1 += t.y;
-	color2pixel( self, my->get_color(self), ctx.color);
-	color2pixel( self, my->get_backColor(self), ctx.backColor);
-	ctx.rop    = my->get_rop(self);
-	ctx.region = var->regionData ? &var->regionData-> data. box : NULL;
-	read_fill_pattern(self, &ctx.pattern);
-	ctx.patternOffset = my->get_fillPatternOffset(self);
-	ctx.patternOffset.x -= t.x;
-	ctx.patternOffset.y -= t.y;
-	ctx.transparent = my->get_rop2(self) == ropNoOper;
-	img_bar( self, x1, y1, x2 - x1 + 1, y2 - y1 + 1, &ctx);
+
+	prepare_fill_context(self, t, &ctx);
+	ok = img_bar( self, x1, y1, x2 - x1 + 1, y2 - y1 + 1, &ctx);
 	my-> update_change(self);
-	return true;
+	return ok;
 }
 
 Bool
@@ -1724,40 +1729,33 @@ Image_bars( Handle self, SV * rects)
 	Point t;
 	ImgPaintContext ctx;
 	int i, count;
+	Bool ok = true;
 	Rect * p, * r;
 	if (opt_InPaint)
 		return inherited bars( self, rects);
 
 	if (( p = prima_read_array( rects, "Image::bars", true, 4, 0, -1, &count)) == NULL)
 		return false;
-	color2pixel( self, my->get_color(self), ctx.color);
-	color2pixel( self, my->get_backColor(self), ctx.backColor);
-	ctx.rop    = my->get_rop(self);
-	ctx.region = var->regionData ? &var->regionData-> data. box : NULL;
-	read_fill_pattern(self, &ctx.pattern);
-	t = my->get_translate(self);
-	ctx.patternOffset = my->get_fillPatternOffset(self);
-	ctx.patternOffset.x -= t.x;
-	ctx.patternOffset.y -= t.y;
-	ctx.transparent = my->get_rop2(self) == ropNoOper;
+	prepare_fill_context(self, t, &ctx);
 	for ( i = 0, r = p; i < count; i++, r++) {
 		ImgPaintContext ctx2 = ctx;
-		img_bar( self, 
+		if ( !( ok &= img_bar( self, 
 			r->left + t.x, 
 			r->bottom + t.y, 
 			r->right - r->left + t.x + 1, 
 			r->top - r->bottom + t.y + 1,
-			&ctx2);
+			&ctx2))) break;
 	}
 	free( p);
 	my-> update_change(self);
-	return true;
+	return ok;
 }
 
 Bool
 Image_clear(Handle self, int x1, int y1, int x2, int y2)
 {
 	Point t;
+	Bool ok;
 	ImgPaintContext ctx;
 	if (opt_InPaint)
 		return inherited clear( self, x1, y1, x2, y2);
@@ -1778,9 +1776,9 @@ Image_clear(Handle self, int x1, int y1, int x2, int y2)
 	ctx.patternOffset.x -= t.x;
 	ctx.patternOffset.y -= t.y;
 	ctx.transparent = false;
-	img_bar( self, x1, y1, x2 - x1 + 1, y2 - y1 + 1, &ctx);
+	ok = img_bar( self, x1, y1, x2 - x1 + 1, y2 - y1 + 1, &ctx);
 	my-> update_change(self);
-	return true;
+	return ok;
 }
 
 void
@@ -1888,6 +1886,44 @@ Image_premultiply_alpha( Handle self, SV * alpha)
 		my-> set_type( self, oldType );
 	else
 		my-> update_change( self );
+} 
+
+Rect
+Image_clipRect( Handle self, Bool set, Rect r)
+{
+	if ( is_opt(optInDraw) || is_opt(optInDrawInfo))
+		return inherited clipRect(self,set,r);
+
+	if ( var-> stage > csFrozen) return r;
+
+	if ( set) {
+		PRegionRec reg;
+		if ( var-> regionData ) {
+			free(var->regionData);
+			var->regionData = NULL;
+		}
+		if ((reg = malloc(sizeof(RegionRec) + sizeof(Box))) != NULL) {
+			Box *box;
+			reg->type = rgnRectangle;
+			reg-> data. box. n_boxes = 1;
+			box = reg-> data. box. boxes = (Box*) (((Byte*)reg) + sizeof(RegionRec));
+			box-> x = r.left;
+			box-> y = r.bottom;
+			box-> width  = r.right - r.left + 1;
+			box-> height = r.top - r.bottom + 1;
+			var->regionData = reg;
+		}
+	} else if ( var-> regionData ) {
+		Box box   = img_region_box( &var->regionData->data.box);
+		r.left    = box.x;
+		r.bottom  = box.y;
+		r.right   = box.x + box.width  - 1;
+		r.top     = box.y + box.height - 1;
+	} else {
+		bzero(&r, sizeof(Rect));
+	}
+
+	return r;
 }
 
 Handle
@@ -1985,8 +2021,7 @@ Image_line(Handle self, int x1, int y1, int x2, int y2)
 		poly[0].y = y1;
 		poly[1].x = x2;
 		poly[1].y = y2;
-		img_polyline(self, 2, poly, &ctx);
-		return true;
+		return img_polyline(self, 2, poly, &ctx);
 	} else {
 		return primitive( self, 0, "siiii", "line", x1, y1, x2, y2);
 	}
@@ -2000,6 +2035,7 @@ Image_lines( Handle self, SV * points)
 	} else if ( my->get_lineWidth(self) == 0) {
 		Point * lines, *p;
 		int i, count;
+		Bool ok = true;
 		ImgPaintContext ctx, ctx2;
 		unsigned char lp[256];
 		if (( lines = prima_read_array( points, "Image::lines", true, 4, 0, -1, &count)) == NULL)
@@ -2007,10 +2043,10 @@ Image_lines( Handle self, SV * points)
 		prepare_line_context( self, lp, &ctx);
 		for (i = 0, p = lines; i < count; i++, p+=2) {
 			ctx2 = ctx;
-			img_polyline(self, 2, p, &ctx2);
+			if ( !( ok &= img_polyline(self, 2, p, &ctx2))) break;
 		}
 		free(lines);
-		return true;
+		return ok;
 	} else {
 		return primitive( self, 0, "sS", "lines", points );
 	}
@@ -2024,14 +2060,15 @@ Image_polyline( Handle self, SV * points)
 	} else if ( my->get_lineWidth(self) == 0) {
 		Point * lines;
 		int count;
+		Bool ok;
 		ImgPaintContext ctx;
 		unsigned char lp[256];
 		if (( lines = prima_read_array( points, "Image::polyline", true, 2, 2, -1, &count)) == NULL)
 			return false;
 		prepare_line_context( self, lp, &ctx);
-		img_polyline(self, count, lines, &ctx);
+		ok = img_polyline(self, count, lines, &ctx);
 		free(lines);
-		return true;
+		return ok;
 	} else {
 		return primitive( self, 0, "sS", "line", points );
 	}
@@ -2047,8 +2084,7 @@ Image_rectangle(Handle self, int x1, int y1, int x2, int y2)
 		unsigned char lp[256];
 		Point r[5] = { {x1,y1}, {x2,y1}, {x2,y2}, {x1,y2}, {x1,y1} };
 		prepare_line_context( self, lp, &ctx);
-		img_polyline(self, 5, r, &ctx);
-		return true;
+		return img_polyline(self, 5, r, &ctx);
 	} else {
 		return primitive( self, 0, "siiii", "rectangle", x1, y1, x2, y2);
 	}
@@ -2088,6 +2124,28 @@ Image_fill_sector( Handle self, int x, int y, int dX, int dY, double startAngle,
 	if ( opt_InPaint) return inherited fill_sector(self, x, y, dX, dY, startAngle, endAngle);
 	return primitive( self, 1, "siiiinn", "sector", x, y, dX-1, dY-1, startAngle, endAngle);
 }
+
+Bool
+Image_flood_fill( Handle self, int x, int y, Color color, Bool singleBorder)
+{
+	Point t;
+	Bool ok;
+	ImgPaintContext ctx;
+	ColorPixel px;
+	if (opt_InPaint)
+		return inherited flood_fill(self, x, y, color, singleBorder);
+
+	t = my->get_translate(self);
+	x += t.x;
+	y += t.y;
+
+	prepare_fill_context(self, t, &ctx);
+	color2pixel( self, color, (Byte*)&px);
+	ok = img_flood_fill( self, x, y, px, singleBorder, &ctx); 
+	my-> update_change(self);
+	return ok;
+}
+
 
 #ifdef __cplusplus
 }

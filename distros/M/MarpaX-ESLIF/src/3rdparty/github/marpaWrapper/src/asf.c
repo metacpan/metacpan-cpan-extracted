@@ -211,7 +211,7 @@ static void _marpaWrapperAsf_dumpintsetHashpv(marpaWrapperAsf_t *marpaWrapperAsf
 marpaWrapperAsf_t *marpaWrapperAsf_newp(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, marpaWrapperAsfOption_t *marpaWrapperAsfOptionp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_newp);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_newp)
   marpaWrapperAsf_t                          *marpaWrapperAsfp           = NULL;
   marpaWrapperAsfOrNode_t                    *orNodep                    = NULL;
   marpaWrapperAfsAndNodeIdAndPredecessorId_t *andNodeIdAndPredecessorIdp = NULL;
@@ -525,7 +525,7 @@ err:
 short marpaWrapperAsf_traverseb(marpaWrapperAsf_t *marpaWrapperAsfp, traverserCallback_t traverserCallbackp, void *userDatavp, int *valueip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverseb);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverseb)
   genericLogger_t            *genericLoggerp = NULL;
   int                         gladeIdi;
   marpaWrapperAsfGlade_t     *gladep;
@@ -587,7 +587,7 @@ short marpaWrapperAsf_traverseb(marpaWrapperAsf_t *marpaWrapperAsfp, traverserCa
 void marpaWrapperAsf_freev(marpaWrapperAsf_t *marpaWrapperAsfp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_freev);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_freev)
   genericLogger_t         *genericLoggerp;
 
   if (marpaWrapperAsfp != NULL) {
@@ -660,7 +660,7 @@ void marpaWrapperAsf_freev(marpaWrapperAsf_t *marpaWrapperAsfp)
 static inline void _marpaWrapperAsf_orNodeStackp_freev(marpaWrapperAsf_t *marpaWrapperAsfp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_orNodeStackp_freev);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_orNodeStackp_freev)
   int                      orNodeUsedi;
   int                      i;
   marpaWrapperAsfOrNode_t *orNodep;
@@ -684,7 +684,7 @@ static inline void _marpaWrapperAsf_orNodeStackp_freev(marpaWrapperAsf_t *marpaW
 static inline void _marpaWrapperAsf_gladeStackp_freev(marpaWrapperAsf_t *marpaWrapperAsfp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_gladeStackp_freev);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_gladeStackp_freev)
   int                      gladeUsedi;
   int                      i;
   marpaWrapperAsfGlade_t  *gladep;
@@ -705,7 +705,7 @@ static inline void _marpaWrapperAsf_gladeStackp_freev(marpaWrapperAsf_t *marpaWr
 static inline void _marpaWrapperAsf_glade_freev(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfGlade_t *gladep)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_freev);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_freev)
 
   if (gladep != NULL) {
     _marpaWrapperAsf_symchesStackp_freev(marpaWrapperAsfp, gladep->symchesStackp);
@@ -717,7 +717,7 @@ static inline void _marpaWrapperAsf_glade_freev(marpaWrapperAsf_t *marpaWrapperA
 static inline void _marpaWrapperAsf_symchesStackp_freev(marpaWrapperAsf_t *marpaWrapperAsfp, genericStack_t *symchesStackp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_symchesStackp_freev);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_symchesStackp_freev)
   int                      symchesUsedi;
   int                      i;
   genericStack_t          *factoringsStackp;
@@ -739,7 +739,7 @@ static inline void _marpaWrapperAsf_symchesStackp_freev(marpaWrapperAsf_t *marpa
 static inline void _marpaWrapperAsf_factoringStackp_freev(marpaWrapperAsf_t *marpaWrapperAsfp, genericStack_t **factoringStackpp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_factoringStackp_freev);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_factoringStackp_freev)
   int                      factoringUsedi;
   int                      i;
   marpaWrapperAsfNook_t   *nookp;
@@ -766,7 +766,7 @@ static inline void _marpaWrapperAsf_factoringStackp_freev(marpaWrapperAsf_t *mar
 static inline void _marpaWrapperAsf_factoringsStackp_freev(marpaWrapperAsf_t *marpaWrapperAsfp, genericStack_t *factoringsStackp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_factoringsStackp_freev);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_factoringsStackp_freev)
   int                      factoringsUsedi;
   int                      i;
   genericStack_t          *localStackp;
@@ -790,7 +790,7 @@ static inline void _marpaWrapperAsf_factoringsStackp_freev(marpaWrapperAsf_t *ma
 static inline genericStack_t *_marpaWrapperAsf_factoringStackp_resetb(marpaWrapperAsf_t *marpaWrapperAsfp, genericStack_t **factoringStackpp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_factoringStackp_resetb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_factoringStackp_resetb)
   genericLogger_t             *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericStack_t              *factoringStackp;
 
@@ -818,7 +818,7 @@ static inline genericStack_t *_marpaWrapperAsf_factoringStackp_resetb(marpaWrapp
 static inline short _marpaWrapperAsf_peakb(marpaWrapperAsf_t *marpaWrapperAsfp, int *gladeIdip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_peakb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_peakb)
   genericLogger_t         *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericStack_t          *orNodeStackp   = marpaWrapperAsfp->orNodeStackp;
   int                      augmentOrNodeIdi;
@@ -942,7 +942,7 @@ static inline int _marpaWrapperAsf_andNodeIdAndPredecessorIdCmpi(const void *p1,
 static inline short _marpaWrapperAsf_intsetIdb(marpaWrapperAsf_t *marpaWrapperAsfp, int *intsetIdip, int counti, int *idip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_intsetIdb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_intsetIdb)
   genericLogger_t         *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericHash_t           *intsetHashp    = marpaWrapperAsfp->intsetHashp;
   int                      intsetcounti   = counti + 1;
@@ -1067,7 +1067,7 @@ static inline int _marpaWrapperAsf_idCmpi(const void *p1, const void *p2)
 static inline marpaWrapperAsfIdset_t *_marpaWrapperAsf_idset_obtainp(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfIdsete_t idsete, int counti, int *idip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_obtainp);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_obtainp)
   genericLogger_t         *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericSparseArray_t    *sparseArrayp   = (idsete == MARPAWRAPPERASFIDSET_NIDSET) ? marpaWrapperAsfp->nidsetSparseArrayp : marpaWrapperAsfp->powersetSparseArrayp;
   char                    *idsets         = marpaWrapperAsfIdsets[idsete];
@@ -1126,7 +1126,7 @@ static inline marpaWrapperAsfIdset_t *_marpaWrapperAsf_idset_obtainp(marpaWrappe
 static inline int *_marpaWrapperAsf_idset_idip(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfIdsete_t idsete, marpaWrapperAsfIdset_t *idsetp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_idip);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_idip)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t         *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -1139,7 +1139,7 @@ static inline int *_marpaWrapperAsf_idset_idip(marpaWrapperAsf_t *marpaWrapperAs
 static inline short _marpaWrapperAsf_idset_idi_by_ixib(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfIdsete_t idsete, marpaWrapperAsfIdset_t *idsetp, int ixi, int *idip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_idi_by_ixib);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_idi_by_ixib)
   genericLogger_t         *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 
   if (ixi >= idsetp->counti) {
@@ -1162,7 +1162,7 @@ static inline short _marpaWrapperAsf_idset_idi_by_ixib(marpaWrapperAsf_t *marpaW
 static inline int _marpaWrapperAsf_idset_counti(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfIdsete_t idsete, marpaWrapperAsfIdset_t *idsetp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_counti);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_counti)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t         *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -1175,7 +1175,7 @@ static inline int _marpaWrapperAsf_idset_counti(marpaWrapperAsf_t *marpaWrapperA
 static inline int _marpaWrapperAsf_idset_idi(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfIdsete_t idsete, marpaWrapperAsfIdset_t *idsetp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_idi);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_idi)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t         *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -1188,7 +1188,7 @@ static inline int _marpaWrapperAsf_idset_idi(marpaWrapperAsf_t *marpaWrapperAsfp
 static inline void _marpaWrapperAsf_idset_freev(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfIdsete_t idsete)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_freev);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_idset_freev)
   genericSparseArray_t   **sparseArraypp  = (idsete == MARPAWRAPPERASFIDSET_NIDSET) ? &(marpaWrapperAsfp->nidsetSparseArrayp) : &(marpaWrapperAsfp->powersetSparseArrayp);
   genericSparseArray_t    *sparseArrayp;
 
@@ -1328,7 +1328,7 @@ int _marpaWrapperAsf_orNodeInUse_sparseArrayIndi(void *userDatavp, genericStackI
 static inline marpaWrapperAsfNook_t *_marpaWrapperAsf_nook_newp(marpaWrapperAsf_t *marpaWrapperAsfp, int orNodeIdi, int parentOrNodeIdi)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nook_newp);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nook_newp)
   genericLogger_t         *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   marpaWrapperAsfNook_t   *nookp;
   short                    haveLastChoiceb;
@@ -1369,7 +1369,7 @@ static inline marpaWrapperAsfNook_t *_marpaWrapperAsf_nook_newp(marpaWrapperAsf_
 static inline short _marpaWrapperAsf_nook_has_semantic_causeb(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfNook_t *nookp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nook_has_semantic_causeb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nook_has_semantic_causeb)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t          *genericLoggerp           = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -1403,7 +1403,7 @@ static inline short _marpaWrapperAsf_nook_has_semantic_causeb(marpaWrapperAsf_t 
 static inline short _marpaWrapperAsf_setLastChoiceb(marpaWrapperAsf_t *marpaWrapperAsfp, short *haveLastChoicebp, marpaWrapperAsfNook_t *nookp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_setLastChoiceb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_setLastChoiceb)
   genericLogger_t         *genericLoggerp     = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericStack_t          *orNodeStackp       = marpaWrapperAsfp->orNodeStackp;
   int                      orNodeIdi          = nookp->orNodeIdi;
@@ -1464,7 +1464,7 @@ static inline short _marpaWrapperAsf_setLastChoiceb(marpaWrapperAsf_t *marpaWrap
 static inline short _marpaWrapperAsf_nook_incrementb(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfNook_t *nookp, short *haveLastChoicebp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nook_incrementb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nook_incrementb)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t         *genericLoggerp     = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -1488,7 +1488,7 @@ static inline short _marpaWrapperAsf_nook_incrementb(marpaWrapperAsf_t *marpaWra
 static inline short _marpaWrapperAsf_symch_factoring_countb(marpaWrapperAsf_t *marpaWrapperAsfp, int gladeIdi, int symchIxi, int *factoringCountip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_symch_factoring_countb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_symch_factoring_countb)
   genericLogger_t         *genericLoggerp     = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   marpaWrapperAsfGlade_t  *gladep;
   genericStack_t          *symchesStackp;
@@ -1524,7 +1524,7 @@ static inline short _marpaWrapperAsf_symch_factoring_countb(marpaWrapperAsf_t *m
 static inline int _marpaWrapperAsf_nidset_sort_ixi(marpaWrapperAsf_t *marpaWrapperAsfp, int nidi)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nidset_sort_ixi);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nidset_sort_ixi)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t         *genericLoggerp     = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -1589,7 +1589,7 @@ static inline int _marpaWrapperAsf_sourceDataCmpi(const void *p1, const void *p2
 static inline int _marpaWrapperAsf_nid_token_idi(marpaWrapperAsf_t *marpaWrapperAsfp, int nidi)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nid_token_idi);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nid_token_idi)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -1618,7 +1618,7 @@ static inline int _marpaWrapperAsf_nid_token_idi(marpaWrapperAsf_t *marpaWrapper
 static inline int _marpaWrapperAsf_nid_symbol_idi(marpaWrapperAsf_t *marpaWrapperAsfp, int nidi)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nid_symbol_idi);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nid_symbol_idi)
   genericLogger_t          *genericLoggerp          = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   int                       idi                     = -1;
   int                       tokenIdi;
@@ -1657,7 +1657,7 @@ static inline int _marpaWrapperAsf_nid_symbol_idi(marpaWrapperAsf_t *marpaWrappe
 static inline int _marpaWrapperAsf_nid_rule_idi(marpaWrapperAsf_t *marpaWrapperAsfp, int nidi)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nid_rule_idi);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nid_rule_idi)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -1685,7 +1685,7 @@ static inline int _marpaWrapperAsf_nid_rule_idi(marpaWrapperAsf_t *marpaWrapperA
 static inline int _marpaWrapperAsf_nid_spani(marpaWrapperAsf_t *marpaWrapperAsfp, int nidi, int *lengthip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nid_spani);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_nid_spani)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t   *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -1712,7 +1712,7 @@ static inline int _marpaWrapperAsf_nid_spani(marpaWrapperAsf_t *marpaWrapperAsfp
 static inline int _marpaWrapperAsf_token_es_spani(marpaWrapperAsf_t *marpaWrapperAsfp, int andNodeIdi, int *lengthip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_token_es_spani);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_token_es_spani)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -1757,7 +1757,7 @@ static inline int _marpaWrapperAsf_token_es_spani(marpaWrapperAsf_t *marpaWrappe
 static inline marpaWrapperAsfNidset_t *_marpaWrapperAsf_powerset_nidsetp(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfPowerset_t *powersetp, int ixi)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_powerset_nidsetp);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_powerset_nidsetp)
   genericLogger_t         *genericLoggerp     = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericSparseArray_t    *nidsetSparseArrayp = marpaWrapperAsfp->nidsetSparseArrayp;
   marpaWrapperAsfNidset_t *nidsetp;
@@ -1794,7 +1794,7 @@ static inline marpaWrapperAsfNidset_t *_marpaWrapperAsf_powerset_nidsetp(marpaWr
 static inline marpaWrapperAsfGlade_t *_marpaWrapperAsf_glade_obtainp(marpaWrapperAsf_t *marpaWrapperAsfp, int gladei)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_obtainp);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_obtainp)
   genericLogger_t             *genericLoggerp         = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericStack_t              *gladeStackp            = marpaWrapperAsfp->gladeStackp;
   genericSparseArray_t        *nidsetSparseArrayp     = marpaWrapperAsfp->nidsetSparseArrayp;
@@ -2196,7 +2196,7 @@ static inline marpaWrapperAsfGlade_t *_marpaWrapperAsf_glade_obtainp(marpaWrappe
 static inline short _marpaWrapperAsf_first_factoringb(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfChoicePoint_t *choicepointp, int nidOfChoicePointi, short *firstFactoringbp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_first_factoringb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_first_factoringb)
   genericLogger_t             *genericLoggerp          = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericStack_t              *orNodeStackp            = marpaWrapperAsfp->orNodeStackp;
   marpaWrapperAsfNook_t       *nookp                   = NULL;
@@ -2283,7 +2283,7 @@ static inline short _marpaWrapperAsf_first_factoringb(marpaWrapperAsf_t *marpaWr
 static inline short _marpaWrapperAsf_factoring_finishb(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfChoicePoint_t *choicepointp, int nidOfChoicePointi, short *factoringFinishbp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_factoring_finishb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_factoring_finishb)
   genericLogger_t          *genericLoggerp          = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   Marpa_Bocage              marpaBocagep            = marpaWrapperAsfp->marpaBocagep;
   genericStack_t           *orNodeStackp            = marpaWrapperAsfp->orNodeStackp;
@@ -2420,7 +2420,7 @@ static inline short _marpaWrapperAsf_factoring_finishb(marpaWrapperAsf_t *marpaW
 static inline short _marpaWrapperAsf_factoring_iterateb(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfChoicePoint_t *choicepointp, short *factoringIteratebp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_factoring_iterateb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_factoring_iterateb)
   genericLogger_t          *genericLoggerp          = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericStack_t           *factoringStackp         = choicepointp->factoringStackp;
   genericSparseArray_t     *orNodeInUseSparseArrayp = choicepointp->orNodeInUseSparseArrayp;
@@ -2497,7 +2497,7 @@ static inline short _marpaWrapperAsf_factoring_iterateb(marpaWrapperAsf_t *marpa
 static inline short _marpaWrapperAsf_glade_id_factorsb(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfChoicePoint_t *choicepointp, genericStack_t **stackpp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_id_factorsb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_id_factorsb)
   genericLogger_t          *genericLoggerp          = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericStack_t           *stackp                  = *stackpp;
   genericStack_t           *orNodeStackp            = marpaWrapperAsfp->orNodeStackp;
@@ -2676,7 +2676,7 @@ int _marpaWrapperAsf_causesHash_indi(void *userDatavp, genericStackItemType_t it
 static inline short _marpaWrapperAsf_and_nodes_to_cause_nidsp(marpaWrapperAsf_t *marpaWrapperAsfp, genericStack_t *andNodeIdStackp, genericStack_t *causeNidsStackp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_and_nodes_to_cause_nidsp);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_and_nodes_to_cause_nidsp)
   genericLogger_t          *genericLoggerp          = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   Marpa_Bocage              marpaBocagep            = marpaWrapperAsfp->marpaBocagep;
   genericHash_t            *causesHashp             = marpaWrapperAsfp->causesHashp;
@@ -2751,7 +2751,7 @@ static inline short _marpaWrapperAsf_and_nodes_to_cause_nidsp(marpaWrapperAsf_t 
 static inline short _marpaWrapperAsf_next_factoringb(marpaWrapperAsf_t *marpaWrapperAsfp, marpaWrapperAsfChoicePoint_t *choicepointp, int nidOfChoicePointi, short *factoringbp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_next_factoringb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_next_factoringb)
   genericLogger_t          *genericLoggerp          = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   short                     factoringb              = 0;
 
@@ -2794,7 +2794,7 @@ static inline short _marpaWrapperAsf_next_factoringb(marpaWrapperAsf_t *marpaWra
 static inline short _marpaWrapperAsf_glade_is_visitedb(marpaWrapperAsf_t *marpaWrapperAsfp, int gladeIdi)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_is_visitedb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_is_visitedb)
   genericLogger_t         *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   short                    rcb            = 0;
   genericStack_t          *gladeStackp    = marpaWrapperAsfp->gladeStackp;
@@ -2816,7 +2816,7 @@ static inline short _marpaWrapperAsf_glade_is_visitedb(marpaWrapperAsf_t *marpaW
 static inline void _marpaWrapperAsf_glade_visited_clearb(marpaWrapperAsf_t *marpaWrapperAsfp, int *gladeIdip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_visited_clearb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_visited_clearb)
   genericLogger_t         *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericStack_t          *gladeStackp    = marpaWrapperAsfp->gladeStackp;
   marpaWrapperAsfGlade_t  *gladep;
@@ -2844,7 +2844,7 @@ static inline void _marpaWrapperAsf_glade_visited_clearb(marpaWrapperAsf_t *marp
 static inline short _marpaWrapperAsf_glade_symch_countb(marpaWrapperAsf_t *marpaWrapperAsfp, int gladeIdi, int *countip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_symch_countb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_symch_countb)
   genericLogger_t         *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   marpaWrapperAsfGlade_t  *gladep;
   int                      counti;
@@ -2872,7 +2872,7 @@ static inline short _marpaWrapperAsf_glade_symch_countb(marpaWrapperAsf_t *marpa
 static inline int _marpaWrapperAsf_glade_symbol_idi(marpaWrapperAsf_t *marpaWrapperAsfp, int gladeIdi)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_symbol_idi);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_symbol_idi)
   genericLogger_t         *genericLoggerp     = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericSparseArray_t    *nidsetSparseArrayp = marpaWrapperAsfp->nidsetSparseArrayp;
   int                      nid0;
@@ -2911,7 +2911,7 @@ static inline int _marpaWrapperAsf_glade_symbol_idi(marpaWrapperAsf_t *marpaWrap
 static inline int _marpaWrapperAsf_glade_spani(marpaWrapperAsf_t *marpaWrapperAsfp, int gladeIdi, int *lengthip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_spani);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_glade_spani)
   genericLogger_t         *genericLoggerp     = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericSparseArray_t    *nidsetSparseArrayp = marpaWrapperAsfp->nidsetSparseArrayp;
   int                      spanIdi            = -1;
@@ -2951,7 +2951,7 @@ static inline int _marpaWrapperAsf_glade_spani(marpaWrapperAsf_t *marpaWrapperAs
 int marpaWrapperAsf_traverse_rh_lengthi(marpaWrapperAsfTraverser_t *traverserp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_rh_lengthi);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_rh_lengthi)
   genericLogger_t          *genericLoggerp = NULL;
   marpaWrapperAsf_t        *marpaWrapperAsfp;
   marpaWrapperAsfGlade_t   *gladep;
@@ -3028,7 +3028,7 @@ int marpaWrapperAsf_traverse_rh_lengthi(marpaWrapperAsfTraverser_t *traverserp)
 short marpaWrapperAsf_traverse_rh_valueb(marpaWrapperAsfTraverser_t *traverserp, int rhIxi, int *valueip, int *lengthip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_rh_valueb);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_rh_valueb)
   genericLogger_t            *genericLoggerp = NULL;
   genericSparseArray_t       *valueSparseArrayp;
   marpaWrapperAsfTraverser_t  childTraverser;
@@ -3209,7 +3209,7 @@ ok:
 short marpaWrapperAsf_traverse_symbolIdb(marpaWrapperAsfTraverser_t *traverserp, int *symbolIdip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_symbolIdb);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_symbolIdb)
   genericLogger_t          *genericLoggerp = NULL;
   marpaWrapperAsf_t        *marpaWrapperAsfp;
   marpaWrapperAsfGlade_t   *gladep;
@@ -3252,7 +3252,7 @@ short marpaWrapperAsf_traverse_symbolIdb(marpaWrapperAsfTraverser_t *traverserp,
 short marpaWrapperAsf_traverse_ruleIdb(marpaWrapperAsfTraverser_t *traverserp, int *ruleIdip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_ruleIdb);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_ruleIdb)
   genericLogger_t          *genericLoggerp = NULL;
   marpaWrapperAsf_t        *marpaWrapperAsfp;
   genericStack_t           *symchesStackp;
@@ -3303,7 +3303,7 @@ short marpaWrapperAsf_traverse_ruleIdb(marpaWrapperAsfTraverser_t *traverserp, i
 static inline short _marpaWrapperAsf_traverse_nextFactoringb(marpaWrapperAsfTraverser_t *traverserp, int *factoringIxip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_traverse_nextFactoringb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_traverse_nextFactoringb)
   genericLogger_t          *genericLoggerp = NULL;
   marpaWrapperAsf_t        *marpaWrapperAsfp;
   marpaWrapperAsfGlade_t   *gladep;
@@ -3363,7 +3363,7 @@ static inline short _marpaWrapperAsf_traverse_nextFactoringb(marpaWrapperAsfTrav
 static inline short _marpaWrapperAsf_traverse_nextSymchb(marpaWrapperAsfTraverser_t *traverserp, int *symchIxip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_traverse_nextSymchb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_traverse_nextSymchb)
   genericLogger_t          *genericLoggerp = NULL;
   marpaWrapperAsf_t        *marpaWrapperAsfp;
   marpaWrapperAsfGlade_t   *gladep;
@@ -3419,7 +3419,7 @@ static inline short _marpaWrapperAsf_traverse_nextSymchb(marpaWrapperAsfTraverse
 short marpaWrapperAsf_traverse_nextb(marpaWrapperAsfTraverser_t *traverserp, short *nextbp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_nextb);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_nextb)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t          *genericLoggerp = NULL;
 #endif
@@ -3463,7 +3463,7 @@ short marpaWrapperAsf_traverse_nextb(marpaWrapperAsfTraverser_t *traverserp, sho
 marpaWrapperAsf_t *marpaWrapperAsf_traverse_asfp(marpaWrapperAsfTraverser_t *traverserp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_asfp);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_traverse_asfp)
   marpaWrapperAsf_t        *marpaWrapperAsfp;
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t          *genericLoggerp;
@@ -3487,7 +3487,7 @@ marpaWrapperAsf_t *marpaWrapperAsf_traverse_asfp(marpaWrapperAsfTraverser_t *tra
 marpaWrapperRecognizer_t *marpaWrapperAsf_recognizerp(marpaWrapperAsf_t *marpaWrapperAsfp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_recognizerp);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_recognizerp)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t          *genericLoggerp;
 #endif
@@ -3511,7 +3511,7 @@ marpaWrapperRecognizer_t *marpaWrapperAsf_recognizerp(marpaWrapperAsf_t *marpaWr
 short marpaWrapperAsf_genericLoggerp(marpaWrapperAsf_t *marpaWrapperAsfp, genericLogger_t **genericLoggerpp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_genericLoggerp);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_genericLoggerp)
   genericLogger_t *genericLoggerp;
 
   if (marpaWrapperAsfp == NULL) {
@@ -3578,7 +3578,7 @@ int _marpaWrapperAsf_intset_keyIndFunctioni(void *userDatavp, genericStackItemTy
 #ifndef MARPAWRAPPER_NTRACE
   /* For performance, this block, used only in TRACE mode, is compiled only if */
   /* compiled with support of tracing at this level.                           */
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_intset_keyIndFunctioni);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_intset_keyIndFunctioni)
   marpaWrapperAsf_t *marpaWrapperAsfp = (marpaWrapperAsf_t *) userDatavp;
   genericLogger_t   *genericLoggerp   = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -3615,7 +3615,7 @@ short _marpaWrapperAsf_intset_keyCmpFunctionb(void *userDatavp, void **pp1, void
 #ifndef MARPAWRAPPER_NTRACE
   /* For performance, this block, used only in TRACE mode, is compiled only if */
   /* compiled with support of tracing at this level.                           */
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_intset_keyCmpFunctionb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_intset_keyCmpFunctionb)
   marpaWrapperAsf_t *marpaWrapperAsfp = (marpaWrapperAsf_t *) userDatavp;
   genericLogger_t   *genericLoggerp   = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -3666,7 +3666,7 @@ void *_marpaWrapperAsf_intset_keyCopyFunctionp(void *userDatavp, void **pp)
 #ifndef MARPAWRAPPER_NTRACE
   /* For performance, this block, used only in TRACE mode, is compiled only if */
   /* compiled with support of tracing at this level.                           */
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_intset_keyCopyFunctionp);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_intset_keyCopyFunctionp)
   marpaWrapperAsf_t *marpaWrapperAsfp = (marpaWrapperAsf_t *) userDatavp;
   genericLogger_t   *genericLoggerp   = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -3710,7 +3710,7 @@ void _marpaWrapperAsf_intset_keyFreeFunctionv(void *userDatavp, void **pp)
 static inline int _marpaWrapperAsf_or_node_es_spani(marpaWrapperAsf_t *marpaWrapperAsfp, int choicepointi, int *lengthip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_or_node_es_spani);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_or_node_es_spani)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
 #endif
@@ -3742,7 +3742,7 @@ static inline int _marpaWrapperAsf_or_node_es_spani(marpaWrapperAsf_t *marpaWrap
 static inline void _marpaWrapperAsf_dump_stack(marpaWrapperAsf_t *marpaWrapperAsfp, char *what, genericStack_t *stackp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_dump_stack);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_dump_stack)
   genericLogger_t         *genericLoggerp           = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   int                      i;
 
@@ -3793,7 +3793,7 @@ static inline void _marpaWrapperAsf_dump_stack(marpaWrapperAsf_t *marpaWrapperAs
 static inline marpaWrapperAsfChoicePoint_t *_marpaWrapperAsf_choicepoint_newp(marpaWrapperAsf_t *marpaWrapperAsfp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_choicepoint_newp);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_choicepoint_newp)
   genericLogger_t              *genericLoggerp = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   marpaWrapperAsfChoicePoint_t *choicepointp;
 
@@ -3835,7 +3835,7 @@ static inline void _marpaWrapperAsf_choicepoint_freev(marpaWrapperAsf_t *marpaWr
 static void _marpaWrapperAsf_dumpintsetHashpv(marpaWrapperAsf_t *marpaWrapperAsfp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_dumpintsetHashpv);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_dumpintsetHashpv)
   genericLogger_t   *genericLoggerp  = marpaWrapperAsfp->marpaWrapperAsfOption.genericLoggerp;
   genericHash_t     *intsetHashp     = marpaWrapperAsfp->intsetHashp;
   int                i;
@@ -3888,7 +3888,7 @@ int _marpaWrapperAsf_valueSparseArray_indi(void *userDatavp, genericStackItemTyp
 marpaWrapperAsfValue_t *marpaWrapperAsfValue_newp(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, marpaWrapperAsfOption_t *marpaWrapperAsfOptionp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsfValue_newp);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsfValue_newp)
   marpaWrapperAsf_t      *marpaWrapperAsfp      = NULL;
   marpaWrapperAsfValue_t *marpaWrapperAsfValuep = NULL;
   genericLogger_t        *genericLoggerp;
@@ -3966,7 +3966,7 @@ short marpaWrapperAsfValue_valueb(marpaWrapperAsfValue_t *marpaWrapperAsfValuep,
                                   marpaWrapperValueNullingCallback_t valueNullingCallbackp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperAsf_valueb);
+  MARPAWRAPPER_FUNCS(marpaWrapperAsf_valueb)
   marpaWrapperAsf_t *marpaWrapperAsfp;
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t   *genericLoggerp;
@@ -4070,7 +4070,7 @@ static inline short _marpaWrapperAsf_valueTraverserb(marpaWrapperAsfTraverser_t 
 /* Each iteration is doing a replay to get positionned where needed.        */
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_valueTraverserb);
+  MARPAWRAPPER_FUNCS(_marpaWrapperAsf_valueTraverserb)
   marpaWrapperAsf_t                  *marpaWrapperAsfp      = marpaWrapperAsf_traverse_asfp(traverserp);
   genericLogger_t                    *genericLoggerp        = NULL;
   marpaWrapperAsfValue_t             *marpaWrapperAsfValuep = (marpaWrapperAsfValue_t *) userDatavp;

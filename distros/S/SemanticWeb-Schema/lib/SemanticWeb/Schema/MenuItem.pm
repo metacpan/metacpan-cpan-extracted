@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has menu_add_on => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_menu_add_on',
     json_ld   => 'menuAddOn',
 );
 
@@ -28,7 +28,7 @@ has menu_add_on => (
 
 has nutrition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_nutrition',
     json_ld   => 'nutrition',
 );
 
@@ -36,7 +36,7 @@ has nutrition => (
 
 has offers => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_offers',
     json_ld   => 'offers',
 );
 
@@ -44,7 +44,7 @@ has offers => (
 
 has suitable_for_diet => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_suitable_for_diet',
     json_ld   => 'suitableForDiet',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::MenuItem - A food or drink item listed in a menu or menu se
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -92,6 +92,10 @@ A menu_add_on should be one of the following types:
 
 =back
 
+=head2 C<_has_menu_add_on>
+
+A predicate for the L</menu_add_on> attribute.
+
 =head2 C<nutrition>
 
 Nutrition information about the recipe or menu item.
@@ -103,6 +107,10 @@ A nutrition should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::NutritionInformation']>
 
 =back
+
+=head2 C<_has_nutrition>
+
+A predicate for the L</nutrition> attribute.
 
 =head2 C<offers>
 
@@ -118,6 +126,10 @@ A offers should be one of the following types:
 
 =back
 
+=head2 C<_has_offers>
+
+A predicate for the L</offers> attribute.
+
 =head2 C<suitable_for_diet>
 
 C<suitableForDiet>
@@ -132,6 +144,10 @@ A suitable_for_diet should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::RestrictedDiet']>
 
 =back
+
+=head2 C<_has_suitable_for_diet>
+
+A predicate for the L</suitable_for_diet> attribute.
 
 =head1 SEE ALSO
 

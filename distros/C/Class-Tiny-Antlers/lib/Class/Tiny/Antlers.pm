@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.023';
+our $VERSION   = '0.024';
 
 use Class::Tiny 0.006 ();
 our @ISA = 'Class::Tiny';
@@ -22,7 +22,7 @@ my %CLASS_ATTRIBUTES;
 
 sub import
 {
-	my $class = shift;
+	my $me = shift;
 	my %want =
 		map +($_ => 1),
 		map +(@{ $EXPORT_TAGS{substr($_, 1)} or [$_] }),
@@ -32,15 +32,15 @@ sub import
 	warnings->import if delete $want{warnings};
 	
 	my $caller = caller;
-	_install_tracked($caller, has     => sub { unshift @_, $caller; goto \&has })     if delete $want{has};
-	_install_tracked($caller, extends => sub { unshift @_, $caller; goto \&extends }) if delete $want{extends};
-	_install_tracked($caller, with    => sub { unshift @_, $caller; goto \&with })    if delete $want{with};
-	_install_tracked($caller, confess => \&confess)                                   if delete $want{confess};
+	$me->_install_tracked($caller, has     => sub { unshift @_, $me, $caller; goto \&has })     if delete $want{has};
+	$me->_install_tracked($caller, extends => sub { unshift @_, $me, $caller; goto \&extends }) if delete $want{extends};
+	$me->_install_tracked($caller, with    => sub { unshift @_, $me, $caller; goto \&with })    if delete $want{with};
+	$me->_install_tracked($caller, confess => \&confess)                                        if delete $want{confess};
 	
 	for my $modifier (qw/ before after around /)
 	{
 		next unless delete $want{$modifier};
-		_install_tracked($caller, $modifier, sub
+		$me->_install_tracked($caller, $modifier, sub
 		{
 			require Class::Method::Modifiers;
 			Class::Method::Modifiers::install_modifier($caller, $modifier, @_);
@@ -49,7 +49,7 @@ sub import
 	
 	croak("Unknown import symbols (%s)", join ", ", sort keys %want) if keys %want;
 	
-	@_ = ($class);
+	@_ = ($me);
 	goto \&Class::Tiny::import;
 }
 
@@ -57,21 +57,21 @@ my %INSTALLED;
 sub _install_tracked
 {
 	no strict 'refs';
-	my ($pkg, $name, $code) = @_;
+	my ($me, $pkg, $name, $code) = @_;
 	*{"$pkg\::$name"} = $code;
 	$INSTALLED{$pkg}{$name} = "$code";
 }
 
 sub unimport
 {
-	shift;
+	my $me = shift;
 	my $caller = caller;
-	_clean($caller, $INSTALLED{$caller});
+	$me->_clean($caller, $INSTALLED{$caller});
 }
 
 sub _clean
 {
-	my ($target, $exports) = @_;
+	my ($me, $target, $exports) = @_;
 	my %rev = reverse %$exports or return;
 	my $stash = _getstash($target);
 	
@@ -109,14 +109,12 @@ sub confess
 	Carp::confess(sprintf($fmt, @values));
 }
 
+my %BUILD_WRAPPED;
+
 sub has
 {
-	my $caller = shift;
+	my ($me, $caller) = (shift, shift);
 	my ($attr, %spec) = @_;
-	
-	$CLASS_ATTRIBUTES{$caller}{$attr} = +{ %spec };
-	$CLASS_ATTRIBUTES{$caller}{$attr}{is}   ||= 'ro';
-	$CLASS_ATTRIBUTES{$caller}{$attr}{lazy} ||= 1 if exists($spec{default});
 	
 	if (defined($attr) and ref($attr) eq q(ARRAY))
 	{
@@ -124,6 +122,10 @@ sub has
 		return;
 	}
 
+	$CLASS_ATTRIBUTES{$caller}{$attr} = +{ %spec };
+	$CLASS_ATTRIBUTES{$caller}{$attr}{is}   ||= 'ro';
+	$CLASS_ATTRIBUTES{$caller}{$attr}{lazy} ||= 1 if exists($spec{default});
+	
 	if (!defined($attr) or ref($attr) or $attr !~ /^[^\W\d]\w*$/s)
 	{
 		croak("Invalid accessor name '%s'", $attr);
@@ -136,6 +138,18 @@ sub has
 	my $lazy      = delete($spec{lazy});
 	my $clearer   = delete($spec{clearer});
 	my $predicate = delete($spec{predicate});
+	my $setter_wrap;
+
+	if ($spec{isa} or $spec{coerce})
+	{
+		ref($spec{isa}) or croak("Type names are strings are not supported");
+		$spec{isa}->can('check')       or croak("Type doesn't have a `check` method");
+		$spec{isa}->can('get_message') or croak("Type doesn't have a `get_message` method");
+		$spec{isa}->can('coerce')      or !$spec{coerce} or croak("Type doesn't have a `coerce` method");
+		$setter_wrap = 1;
+		delete $spec{$_} for qw/ isa coerce /;
+		__PACKAGE__->_wrap_build($caller) unless $BUILD_WRAPPED{$caller}++;
+	}
 	
 	if ($is eq 'lazy')
 	{
@@ -146,10 +160,6 @@ sub has
 	if (defined $lazy and not $lazy)
 	{
 		croak("Class::Tiny does not support eager defaults");
-	}
-	elsif ($spec{isa} or $spec{coerce})
-	{
-		croak("Class::Tiny does not support type constraints");
 	}
 	elsif (keys %spec)
 	{
@@ -180,14 +190,17 @@ sub has
 		$getter = "\$_[0]{'$attr'} = \$default unless exists \$_[0]{'$attr'}; $getter";
 	}
 	
+	my $setter_name;
 	my @methods;
 	my $needs_clean = 0;
 	if ($is eq 'rw')
 	{
+		$setter_name = $attr;
 		push @methods, "sub $attr :method { \$_[0]{'$attr'} = \$_[1] if \@_ > 1; $getter };";
 	}
 	elsif ($is eq 'ro' or $is eq 'rwp')
 	{
+		$setter_name = "_set_$attr";
 		push @methods, "sub $attr :method { $getter };";
 		push @methods, "sub _set_$attr :method { \$_[0]{'$attr'} = \$_[1] };"
 			if $is eq 'rwp';
@@ -215,15 +228,114 @@ sub has
 	}
 	
 	eval "package $caller; @methods";
-	__PACKAGE__->create_attributes($caller, $attr);
+	$me->create_attributes($caller, $attr);
 	
-	_clean($caller, { $attr => do { no strict 'refs'; ''.\&{"$caller\::$attr"} } })
+	$me->_wrap_setter($caller, $attr, $setter_name) if $setter_wrap;
+	
+	$me->_clean($caller, { $attr => do { no strict 'refs'; ''.\&{"$caller\::$attr"} } })
 		if $needs_clean;
+}
+
+sub _wrap_build {
+	my ($me, $caller) = @_;
+	no strict 'refs';
+	if (exists &{"$caller\::BUILD"}) {
+		my $next = \&{"$caller\::BUILD"};
+		$me->_clean($caller, { BUILD => $next });
+		eval sprintf(q{
+			package %s;
+			sub BUILD {
+				my $self = shift;
+				%s->_check_args('%s', @_);
+				$self->$next(@_);
+			}
+		}, $caller, $me, $caller);
+	}
+	else {
+		eval sprintf(q{
+			package %s;
+			sub BUILD {
+				my $self = shift;
+				%s->_check_args('%s', $self, @_);
+			}
+		}, $caller, $me, $caller);
+	}
+}
+
+sub _check_args {
+	my ($me, $caller, $object, $args) = @_;
+	my $spec = $CLASS_ATTRIBUTES{$caller};
+	for my $attr (sort keys %$spec) {
+		my $type = $spec->{$attr}{isa} or next;
+		exists $args->{$attr} or next;
+		$type->check($args->{$attr}) and next;
+		if ($spec->{$attr}{coerce}) {
+			my $coerced = $type->coerce($args->{$attr});
+			if ($type->check($coerced)) {
+				$object->{$attr} = $args->{$attr} = $coerced;
+				next;
+			}
+		}
+		croak('Type constraint check failed for attribute "%s": %s', $attr, $type->get_message($args->{$attr}));
+	}
+}
+
+sub _wrap_setter {
+	my ($me, $caller, $attr, $setter_name) = @_;
+	no strict 'refs';
+	my $next = \&{"$caller\::$setter_name"};
+	my $spec = $CLASS_ATTRIBUTES{$caller};
+	my $type = $spec->{$attr}{isa};
+	my $coerce = $spec->{$attr}{coerce};
+	$me->_clean($caller, { $setter_name => $next });
+	if ($coerce) {
+		eval sprintf(q{
+			package %s;
+			sub %s {
+				my $self = shift;
+				if (@_) {
+					$type->check(@_)
+					or do {
+						my $coerced = $type->coerce(@_);
+						$type->check($coerced) and do { @_ = ($coerced); 1 };
+					}
+					or %s::croak('Type constraint check failed for attribute "%s": %%s', $type->get_message(@_));
+				}
+				$self->$next(@_);
+			}
+		}, $caller, $setter_name, $me, $attr);
+	}
+	elsif ($type->can('can_be_inlined') && $type->can_be_inlined) {
+		my $ic = $type->can('inline_check') || $type->can('_inline_check');
+		eval sprintf(q{
+			package %s;
+			sub %s {
+				my $self = shift;
+				if (@_) {
+					my $val = $_[0];
+					%s or %s::croak('Type constraint check failed for attribute "%s": %%s', $type->get_message(@_));
+				}
+				$self->$next(@_);
+			}
+		}, $caller, $setter_name, $type->$ic('$val'), $me, $attr);
+	}
+	else {
+		eval sprintf(q{
+			package %s;
+			sub %s {
+				my $self = shift;
+				if (@_) {
+					$type->check(@_) or %s::croak('Type constraint check failed for attribute "%s": %%s', $type->get_message(@_));
+				}
+				$self->$next(@_);
+			}
+		}, $caller, $setter_name, $me, $attr);
+	}
 }
 
 sub extends
 {
-	my $caller = shift;
+	my ($me, $caller) = (shift, shift);
 	my (@parents) = @_;
 	
 	for my $parent (@parents)
@@ -237,7 +349,7 @@ sub extends
 
 sub with
 {
-	my $caller = shift;
+	my ($me, $caller) = (shift, shift);
 	require Role::Tiny::With;
 	goto \&Role::Tiny::With::with;
 }
@@ -305,10 +417,15 @@ L<Class::Method::Modifiers>.)
 
 Class::Tiny doesn't support all Moose's attribute options; C<has> should
 throw you an error if you try to do something it doesn't support (like
-triggers or type constraints).
+triggers).
 
 Class::Tiny::Antlers does however hack in support for C<< is => 'ro' >>
 and Moo-style C<< is => 'rwp' >>, clearers and predicates.
+
+From version 0.24, Class::Tiny::Antlers also adds support for `isa` and
+`coerce` using L<Type::Tiny>. (I mean, this is a TOBYINK module, so what
+do you expect?!) Technically L<MooseX::Types>, L<MouseX::Types>,
+L<Specio>, and L<Type::Nano> should work, but these are less tested.
 
 =head2 Export
 
@@ -392,7 +509,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Class-Tiny-Antlers>.
 
 =head1 SEE ALSO
 
-L<Class::Tiny>, L<Role::Tiny>, L<Class::Method::Modifiers>.
+L<Class::Tiny>, L<Role::Tiny>, L<Class::Method::Modifiers>,
+L<Type::Tiny::Manual>.
 
 L<Moose>, L<Mouse>, L<Moo>.
 
@@ -402,7 +520,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Toby Inkster.
+This software is copyright (c) 2013, 2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

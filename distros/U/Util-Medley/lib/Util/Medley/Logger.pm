@@ -1,5 +1,5 @@
 package Util::Medley::Logger;
-$Util::Medley::Logger::VERSION = '0.008';
+$Util::Medley::Logger::VERSION = '0.009';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -23,7 +23,7 @@ Util::Medley::Logger - Yet another class for logging.
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =cut
 
@@ -804,7 +804,7 @@ method _assembleMsg (Str 	   :$type!,
 	}
 
 	if ( $detail > 2 ) {
-		push @msg, sprintf '[%s]', $self->DateTime->localdatetime();
+		push @msg, sprintf '[%s]', $self->DateTime->localDateTime();
 	}
 
 	if ( $detail > 3 ) {

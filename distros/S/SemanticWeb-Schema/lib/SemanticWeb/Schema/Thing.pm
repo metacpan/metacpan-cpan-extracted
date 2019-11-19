@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has additional_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_additional_type',
     json_ld   => 'additionalType',
 );
 
@@ -28,7 +28,7 @@ has additional_type => (
 
 has alternate_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_alternate_name',
     json_ld   => 'alternateName',
 );
 
@@ -36,7 +36,7 @@ has alternate_name => (
 
 has description => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_description',
     json_ld   => 'description',
 );
 
@@ -44,7 +44,7 @@ has description => (
 
 has disambiguating_description => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_disambiguating_description',
     json_ld   => 'disambiguatingDescription',
 );
 
@@ -52,7 +52,7 @@ has disambiguating_description => (
 
 has identifier => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_identifier',
     json_ld   => 'identifier',
 );
 
@@ -60,7 +60,7 @@ has identifier => (
 
 has image => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_image',
     json_ld   => 'image',
 );
 
@@ -68,7 +68,7 @@ has image => (
 
 has main_entity_of_page => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_main_entity_of_page',
     json_ld   => 'mainEntityOfPage',
 );
 
@@ -76,7 +76,7 @@ has main_entity_of_page => (
 
 has name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_name',
     json_ld   => 'name',
 );
 
@@ -84,7 +84,7 @@ has name => (
 
 has potential_action => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_potential_action',
     json_ld   => 'potentialAction',
 );
 
@@ -92,7 +92,7 @@ has potential_action => (
 
 has same_as => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_same_as',
     json_ld   => 'sameAs',
 );
 
@@ -100,7 +100,7 @@ has same_as => (
 
 has subject_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_subject_of',
     json_ld   => 'subjectOf',
 );
 
@@ -108,7 +108,7 @@ has subject_of => (
 
 has url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_url',
     json_ld   => 'url',
 );
 
@@ -130,7 +130,7 @@ SemanticWeb::Schema::Thing - The most generic type of item.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -157,6 +157,10 @@ A additional_type should be one of the following types:
 
 =back
 
+=head2 C<_has_additional_type>
+
+A predicate for the L</additional_type> attribute.
+
 =head2 C<alternate_name>
 
 C<alternateName>
@@ -171,6 +175,10 @@ A alternate_name should be one of the following types:
 
 =back
 
+=head2 C<_has_alternate_name>
+
+A predicate for the L</alternate_name> attribute.
+
 =head2 C<description>
 
 A description of the item.
@@ -182,6 +190,10 @@ A description should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_description>
+
+A predicate for the L</description> attribute.
 
 =head2 C<disambiguating_description>
 
@@ -199,6 +211,10 @@ A disambiguating_description should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_disambiguating_description>
+
+A predicate for the L</disambiguating_description> attribute.
 
 =head2 C<identifier>
 
@@ -219,6 +235,10 @@ A identifier should be one of the following types:
 
 =back
 
+=head2 C<_has_identifier>
+
+A predicate for the L</identifier> attribute.
+
 =head2 C<image>
 
 =for html <p>An image of the item. This can be a <a class="localLink"
@@ -234,6 +254,10 @@ A image should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_image>
+
+A predicate for the L</image> attribute.
 
 =head2 C<main_entity_of_page>
 
@@ -254,6 +278,10 @@ A main_entity_of_page should be one of the following types:
 
 =back
 
+=head2 C<_has_main_entity_of_page>
+
+A predicate for the L</main_entity_of_page> attribute.
+
 =head2 C<name>
 
 The name of the item.
@@ -265,6 +293,10 @@ A name should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_name>
+
+A predicate for the L</name> attribute.
 
 =head2 C<potential_action>
 
@@ -280,6 +312,10 @@ A potential_action should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Action']>
 
 =back
+
+=head2 C<_has_potential_action>
+
+A predicate for the L</potential_action> attribute.
 
 =head2 C<same_as>
 
@@ -297,6 +333,10 @@ A same_as should be one of the following types:
 
 =back
 
+=head2 C<_has_same_as>
+
+A predicate for the L</same_as> attribute.
+
 =head2 C<subject_of>
 
 C<subjectOf>
@@ -313,6 +353,10 @@ A subject_of should be one of the following types:
 
 =back
 
+=head2 C<_has_subject_of>
+
+A predicate for the L</subject_of> attribute.
+
 =head2 C<url>
 
 URL of the item.
@@ -324,6 +368,10 @@ A url should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_url>
+
+A predicate for the L</url> attribute.
 
 =head1 SEE ALSO
 

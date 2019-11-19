@@ -7,6 +7,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   FindBin: '0'
   Test::Deep: '0'
+  Test::Differences: '0'
   Test::Exception: '0'
   Test::FailWarnings: '0'
   Test::More: '1.302133'
@@ -34,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-CBOR-Free/issues
   repository: git://github.com/FGasper/p5-CBOR-Free.git
-version: '0.14'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

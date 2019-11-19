@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has education_requirements => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_education_requirements',
     json_ld   => 'educationRequirements',
 );
 
@@ -28,7 +28,7 @@ has education_requirements => (
 
 has estimated_salary => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_estimated_salary',
     json_ld   => 'estimatedSalary',
 );
 
@@ -36,7 +36,7 @@ has estimated_salary => (
 
 has experience_requirements => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_experience_requirements',
     json_ld   => 'experienceRequirements',
 );
 
@@ -44,7 +44,7 @@ has experience_requirements => (
 
 has occupation_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_occupation_location',
     json_ld   => 'occupationLocation',
 );
 
@@ -52,7 +52,7 @@ has occupation_location => (
 
 has occupational_category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_occupational_category',
     json_ld   => 'occupationalCategory',
 );
 
@@ -60,7 +60,7 @@ has occupational_category => (
 
 has qualifications => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_qualifications',
     json_ld   => 'qualifications',
 );
 
@@ -68,7 +68,7 @@ has qualifications => (
 
 has responsibilities => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_responsibilities',
     json_ld   => 'responsibilities',
 );
 
@@ -76,7 +76,7 @@ has responsibilities => (
 
 has skills => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_skills',
     json_ld   => 'skills',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::Occupation - A profession
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -122,6 +122,10 @@ A education_requirements should be one of the following types:
 
 =back
 
+=head2 C<_has_education_requirements>
+
+A predicate for the L</education_requirements> attribute.
+
 =head2 C<estimated_salary>
 
 C<estimatedSalary>
@@ -143,6 +147,10 @@ A estimated_salary should be one of the following types:
 
 =back
 
+=head2 C<_has_estimated_salary>
+
+A predicate for the L</estimated_salary> attribute.
+
 =head2 C<experience_requirements>
 
 C<experienceRequirements>
@@ -156,6 +164,10 @@ A experience_requirements should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_experience_requirements>
+
+A predicate for the L</experience_requirements> attribute.
 
 =head2 C<occupation_location>
 
@@ -172,6 +184,10 @@ A occupation_location should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
 
 =back
+
+=head2 C<_has_occupation_location>
+
+A predicate for the L</occupation_location> attribute.
 
 =head2 C<occupational_category>
 
@@ -197,6 +213,10 @@ A occupational_category should be one of the following types:
 
 =back
 
+=head2 C<_has_occupational_category>
+
+A predicate for the L</occupational_category> attribute.
+
 =head2 C<qualifications>
 
 Specific qualifications required for this role or Occupation.
@@ -211,6 +231,10 @@ A qualifications should be one of the following types:
 
 =back
 
+=head2 C<_has_qualifications>
+
+A predicate for the L</qualifications> attribute.
+
 =head2 C<responsibilities>
 
 Responsibilities associated with this role or Occupation.
@@ -222,6 +246,10 @@ A responsibilities should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_responsibilities>
+
+A predicate for the L</responsibilities> attribute.
 
 =head2 C<skills>
 
@@ -238,6 +266,10 @@ A skills should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_skills>
+
+A predicate for the L</skills> attribute.
 
 =head1 SEE ALSO
 

@@ -16,7 +16,7 @@
 	doap-deps:runtime-recommendation [
 		doap-deps:on "MooX::HandlesVia 0.001004"^^doap-deps:CpanId;
 	];
-	doap-deps:runtime-requirement [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008003"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [
 		doap-deps:on "Type::Utils 1.000001"^^doap-deps:CpanId;
 	];
 	doap-deps:runtime-suggestion [ doap-deps:on "MooX"^^doap-deps:CpanId ];
@@ -32,7 +32,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooX-late";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-015>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-015>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-016>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moox-late>;
@@ -269,7 +269,7 @@
 <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-015>
 	a                    doap:Version;
 	dc:identifier        "MooX-late-0.015"^^xsd:string;
-	dc:issued            "2013-08-18"^^xsd:date;
+	dc:issued            "2014-08-18"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Documentation;
@@ -291,6 +291,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.015.tar.gz>;
 	doap:revision        "0.015"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-016>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.016"^^xsd:string;
+	dc:issued            "2019-11-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Get test suite passing and stuff.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.016.tar.gz>;
+	doap:revision        "0.016"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/shlomif>
 	a                    foaf:Person;

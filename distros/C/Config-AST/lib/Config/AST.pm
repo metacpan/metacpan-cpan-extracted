@@ -32,7 +32,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'sort' => [ qw(NO_SORT SORT_NATURAL SORT_PATH) ] );
 our @EXPORT_OK = qw(NO_SORT SORT_NATURAL SORT_PATH);
     
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 =head1 NAME
 

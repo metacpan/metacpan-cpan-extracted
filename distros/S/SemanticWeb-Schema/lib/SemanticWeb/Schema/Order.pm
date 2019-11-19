@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has accepted_offer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_accepted_offer',
     json_ld   => 'acceptedOffer',
 );
 
@@ -28,7 +28,7 @@ has accepted_offer => (
 
 has billing_address => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_billing_address',
     json_ld   => 'billingAddress',
 );
 
@@ -36,7 +36,7 @@ has billing_address => (
 
 has broker => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broker',
     json_ld   => 'broker',
 );
 
@@ -44,7 +44,7 @@ has broker => (
 
 has confirmation_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_confirmation_number',
     json_ld   => 'confirmationNumber',
 );
 
@@ -52,7 +52,7 @@ has confirmation_number => (
 
 has customer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_customer',
     json_ld   => 'customer',
 );
 
@@ -60,7 +60,7 @@ has customer => (
 
 has discount => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_discount',
     json_ld   => 'discount',
 );
 
@@ -68,7 +68,7 @@ has discount => (
 
 has discount_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_discount_code',
     json_ld   => 'discountCode',
 );
 
@@ -76,7 +76,7 @@ has discount_code => (
 
 has discount_currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_discount_currency',
     json_ld   => 'discountCurrency',
 );
 
@@ -84,7 +84,7 @@ has discount_currency => (
 
 has is_gift => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_gift',
     json_ld   => 'isGift',
 );
 
@@ -92,7 +92,7 @@ has is_gift => (
 
 has merchant => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_merchant',
     json_ld   => 'merchant',
 );
 
@@ -100,7 +100,7 @@ has merchant => (
 
 has order_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_order_date',
     json_ld   => 'orderDate',
 );
 
@@ -108,7 +108,7 @@ has order_date => (
 
 has order_delivery => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_order_delivery',
     json_ld   => 'orderDelivery',
 );
 
@@ -116,7 +116,7 @@ has order_delivery => (
 
 has order_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_order_number',
     json_ld   => 'orderNumber',
 );
 
@@ -124,7 +124,7 @@ has order_number => (
 
 has order_status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_order_status',
     json_ld   => 'orderStatus',
 );
 
@@ -132,7 +132,7 @@ has order_status => (
 
 has ordered_item => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ordered_item',
     json_ld   => 'orderedItem',
 );
 
@@ -140,7 +140,7 @@ has ordered_item => (
 
 has part_of_invoice => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_part_of_invoice',
     json_ld   => 'partOfInvoice',
 );
 
@@ -148,7 +148,7 @@ has part_of_invoice => (
 
 has payment_due => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payment_due',
     json_ld   => 'paymentDue',
 );
 
@@ -156,7 +156,7 @@ has payment_due => (
 
 has payment_due_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payment_due_date',
     json_ld   => 'paymentDueDate',
 );
 
@@ -164,7 +164,7 @@ has payment_due_date => (
 
 has payment_method => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payment_method',
     json_ld   => 'paymentMethod',
 );
 
@@ -172,7 +172,7 @@ has payment_method => (
 
 has payment_method_id => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payment_method_id',
     json_ld   => 'paymentMethodId',
 );
 
@@ -180,7 +180,7 @@ has payment_method_id => (
 
 has payment_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payment_url',
     json_ld   => 'paymentUrl',
 );
 
@@ -188,7 +188,7 @@ has payment_url => (
 
 has seller => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_seller',
     json_ld   => 'seller',
 );
 
@@ -210,7 +210,7 @@ SemanticWeb::Schema::Order - An order is a confirmation of a transaction (a rece
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -235,6 +235,10 @@ A accepted_offer should be one of the following types:
 
 =back
 
+=head2 C<_has_accepted_offer>
+
+A predicate for the L</accepted_offer> attribute.
+
 =head2 C<billing_address>
 
 C<billingAddress>
@@ -248,6 +252,10 @@ A billing_address should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::PostalAddress']>
 
 =back
+
+=head2 C<_has_billing_address>
+
+A predicate for the L</billing_address> attribute.
 
 =head2 C<broker>
 
@@ -266,6 +274,10 @@ A broker should be one of the following types:
 
 =back
 
+=head2 C<_has_broker>
+
+A predicate for the L</broker> attribute.
+
 =head2 C<confirmation_number>
 
 C<confirmationNumber>
@@ -279,6 +291,10 @@ A confirmation_number should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_confirmation_number>
+
+A predicate for the L</confirmation_number> attribute.
 
 =head2 C<customer>
 
@@ -294,6 +310,10 @@ A customer should be one of the following types:
 
 =back
 
+=head2 C<_has_customer>
+
+A predicate for the L</customer> attribute.
+
 =head2 C<discount>
 
 Any discount applied (to an Order).
@@ -308,6 +328,10 @@ A discount should be one of the following types:
 
 =back
 
+=head2 C<_has_discount>
+
+A predicate for the L</discount> attribute.
+
 =head2 C<discount_code>
 
 C<discountCode>
@@ -321,6 +345,10 @@ A discount_code should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_discount_code>
+
+A predicate for the L</discount_code> attribute.
 
 =head2 C<discount_currency>
 
@@ -343,6 +371,10 @@ A discount_currency should be one of the following types:
 
 =back
 
+=head2 C<_has_discount_currency>
+
+A predicate for the L</discount_currency> attribute.
+
 =head2 C<is_gift>
 
 C<isGift>
@@ -356,6 +388,10 @@ A is_gift should be one of the following types:
 =item C<Bool>
 
 =back
+
+=head2 C<_has_is_gift>
+
+A predicate for the L</is_gift> attribute.
 
 =head2 C<merchant>
 
@@ -371,6 +407,10 @@ A merchant should be one of the following types:
 
 =back
 
+=head2 C<_has_merchant>
+
+A predicate for the L</merchant> attribute.
+
 =head2 C<order_date>
 
 C<orderDate>
@@ -384,6 +424,10 @@ A order_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_order_date>
+
+A predicate for the L</order_date> attribute.
 
 =head2 C<order_delivery>
 
@@ -399,6 +443,10 @@ A order_delivery should be one of the following types:
 
 =back
 
+=head2 C<_has_order_delivery>
+
+A predicate for the L</order_delivery> attribute.
+
 =head2 C<order_number>
 
 C<orderNumber>
@@ -413,6 +461,10 @@ A order_number should be one of the following types:
 
 =back
 
+=head2 C<_has_order_number>
+
+A predicate for the L</order_number> attribute.
+
 =head2 C<order_status>
 
 C<orderStatus>
@@ -426,6 +478,10 @@ A order_status should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::OrderStatus']>
 
 =back
+
+=head2 C<_has_order_status>
+
+A predicate for the L</order_status> attribute.
 
 =head2 C<ordered_item>
 
@@ -445,6 +501,10 @@ A ordered_item should be one of the following types:
 
 =back
 
+=head2 C<_has_ordered_item>
+
+A predicate for the L</ordered_item> attribute.
+
 =head2 C<part_of_invoice>
 
 C<partOfInvoice>
@@ -458,6 +518,10 @@ A part_of_invoice should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Invoice']>
 
 =back
+
+=head2 C<_has_part_of_invoice>
+
+A predicate for the L</part_of_invoice> attribute.
 
 =head2 C<payment_due>
 
@@ -473,6 +537,10 @@ A payment_due should be one of the following types:
 
 =back
 
+=head2 C<_has_payment_due>
+
+A predicate for the L</payment_due> attribute.
+
 =head2 C<payment_due_date>
 
 C<paymentDueDate>
@@ -487,6 +555,10 @@ A payment_due_date should be one of the following types:
 
 =back
 
+=head2 C<_has_payment_due_date>
+
+A predicate for the L</payment_due_date> attribute.
+
 =head2 C<payment_method>
 
 C<paymentMethod>
@@ -500,6 +572,10 @@ A payment_method should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::PaymentMethod']>
 
 =back
+
+=head2 C<_has_payment_method>
+
+A predicate for the L</payment_method> attribute.
 
 =head2 C<payment_method_id>
 
@@ -516,6 +592,10 @@ A payment_method_id should be one of the following types:
 
 =back
 
+=head2 C<_has_payment_method_id>
+
+A predicate for the L</payment_method_id> attribute.
+
 =head2 C<payment_url>
 
 C<paymentUrl>
@@ -529,6 +609,10 @@ A payment_url should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_payment_url>
+
+A predicate for the L</payment_url> attribute.
 
 =head2 C<seller>
 
@@ -544,6 +628,10 @@ A seller should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_seller>
+
+A predicate for the L</seller> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has assembly => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_assembly',
     json_ld   => 'assembly',
 );
 
@@ -28,7 +28,7 @@ has assembly => (
 
 has assembly_version => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_assembly_version',
     json_ld   => 'assemblyVersion',
 );
 
@@ -36,7 +36,7 @@ has assembly_version => (
 
 has executable_library_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_executable_library_name',
     json_ld   => 'executableLibraryName',
 );
 
@@ -44,7 +44,7 @@ has executable_library_name => (
 
 has programming_model => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_programming_model',
     json_ld   => 'programmingModel',
 );
 
@@ -52,7 +52,7 @@ has programming_model => (
 
 has target_platform => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_target_platform',
     json_ld   => 'targetPlatform',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::APIReference - Reference documentation for application prog
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -94,6 +94,10 @@ A assembly should be one of the following types:
 
 =back
 
+=head2 C<_has_assembly>
+
+A predicate for the L</assembly> attribute.
+
 =head2 C<assembly_version>
 
 C<assemblyVersion>
@@ -107,6 +111,10 @@ A assembly_version should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_assembly_version>
+
+A predicate for the L</assembly_version> attribute.
 
 =head2 C<executable_library_name>
 
@@ -122,6 +130,10 @@ A executable_library_name should be one of the following types:
 
 =back
 
+=head2 C<_has_executable_library_name>
+
+A predicate for the L</executable_library_name> attribute.
+
 =head2 C<programming_model>
 
 C<programmingModel>
@@ -136,6 +148,10 @@ A programming_model should be one of the following types:
 
 =back
 
+=head2 C<_has_programming_model>
+
+A predicate for the L</programming_model> attribute.
+
 =head2 C<target_platform>
 
 C<targetPlatform>
@@ -149,6 +165,10 @@ A target_platform should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_target_platform>
+
+A predicate for the L</target_platform> attribute.
 
 =head1 SEE ALSO
 

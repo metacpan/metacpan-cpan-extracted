@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has num_tracks => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_num_tracks',
     json_ld   => 'numTracks',
 );
 
@@ -28,7 +28,7 @@ has num_tracks => (
 
 has track => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_track',
     json_ld   => 'track',
 );
 
@@ -36,7 +36,7 @@ has track => (
 
 has tracks => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_tracks',
     json_ld   => 'tracks',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::MusicPlaylist - A collection of music tracks in playlist fo
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -80,6 +80,10 @@ A num_tracks should be one of the following types:
 
 =back
 
+=head2 C<_has_num_tracks>
+
+A predicate for the L</num_tracks> attribute.
+
 =head2 C<track>
 
 A music recording (track)&#x2014;usually a single song. If an ItemList is
@@ -95,6 +99,10 @@ A track should be one of the following types:
 
 =back
 
+=head2 C<_has_track>
+
+A predicate for the L</track> attribute.
+
 =head2 C<tracks>
 
 A music recording (track)&#x2014;usually a single song.
@@ -106,6 +114,10 @@ A tracks should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MusicRecording']>
 
 =back
+
+=head2 C<_has_tracks>
+
+A predicate for the L</tracks> attribute.
 
 =head1 SEE ALSO
 

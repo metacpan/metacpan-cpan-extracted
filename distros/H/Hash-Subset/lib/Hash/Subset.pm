@@ -1,59 +1,73 @@
 package Hash::Subset;
 
-our $DATE = '2019-09-20'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-11-19'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(hash_subset hashref_subset);
+our @EXPORT_OK = qw(
+                       hash_subset
+                       hashref_subset
+                       hash_subset_without
+                       hashref_subset_without
+               );
 
-sub hash_subset {
-    my ($hash, $keys_src) = @_;
+sub _routine {
+    my ($which, $hash, $keys_src) = @_;
+
+    my $reverse = $which =~ /_without\z/;
+    my $return_ref = $which =~ /\Ahashref_/;
 
     my %subset;
     my $ref = ref $keys_src;
     if ($ref eq 'ARRAY') {
-        for (@$keys_src) {
-            $subset{$_} = $hash->{$_} if exists $hash->{$_};
+        if ($reverse) {
+            for my $key (keys %$hash) {
+                $subset{$key} = $hash->{$key}
+                    unless grep { $key eq $_ } @$keys_src;
+            }
+        } else {
+            for (@$keys_src) {
+                $subset{$_} = $hash->{$_} if exists $hash->{$_};
+            }
         }
     } elsif ($ref eq 'HASH') {
-        for (keys %$keys_src) {
-            $subset{$_} = $hash->{$_} if exists $hash->{$_};
+        if ($reverse) {
+            for (keys %$hash) {
+                $subset{$_} = $hash->{$_} unless exists $keys_src->{$_};
+            }
+        } else {
+            for (keys %$keys_src) {
+                $subset{$_} = $hash->{$_} if exists $hash->{$_};
+            }
         }
     } elsif ($ref eq 'CODE') {
-        for (keys %$hash) {
-            $subset{$_} = $hash->{$_} if $keys_src->($_, $hash->{$_});
+        if ($reverse) {
+            for (keys %$hash) {
+                $subset{$_} = $hash->{$_} unless $keys_src->($_, $hash->{$_});
+            }
+        } else {
+            for (keys %$hash) {
+                $subset{$_} = $hash->{$_} if $keys_src->($_, $hash->{$_});
+            }
         }
     } else {
         die "Second argument (keys_src) must be a hashref/arrayref/coderef";
     }
-    %subset;
-}
 
-sub hashref_subset {
-    my ($hash, $keys_src) = @_;
-
-    my $subset = {};
-    my $ref = ref $keys_src;
-    if ($ref eq 'ARRAY') {
-        for (@$keys_src) {
-            $subset->{$_} = $hash->{$_} if exists $hash->{$_};
-        }
-    } elsif ($ref eq 'HASH') {
-        for (keys %$keys_src) {
-            $subset->{$_} = $hash->{$_} if exists $hash->{$_};
-        }
-    } elsif ($ref eq 'CODE') {
-        for (keys %$hash) {
-            $subset->{$_} = $hash->{$_} if $keys_src->($_, $hash->{$_});
-        }
+    if ($return_ref) {
+        return \%subset;
     } else {
-        die "Second argument (keys_src) must be a hashref/arrayref/coderef";
+        return %subset;
     }
-    $subset;
 }
+
+sub hash_subset    { _routine('hash_subset'   , @_) }
+sub hashref_subset { _routine('hashref_subset', @_) }
+sub hash_subset_without    { _routine('hash_subset_without'   , @_) }
+sub hashref_subset_without { _routine('hashref_subset_without', @_) }
 
 1;
 # ABSTRACT: Produce subset of a hash
@@ -70,11 +84,16 @@ Hash::Subset - Produce subset of a hash
 
 =head1 VERSION
 
-This document describes version 0.004 of Hash::Subset (from Perl distribution Hash-Subset), released on 2019-09-20.
+This document describes version 0.005 of Hash::Subset (from Perl distribution Hash-Subset), released on 2019-11-19.
 
 =head1 SYNOPSIS
 
- use Hash::Subset qw(hash_subset hashref_subset);
+ use Hash::Subset qw(
+     hash_subset
+     hashref_subset
+     hash_subset_without
+     hashref_subset_without
+ );
 
  # using keys specified in an array
  my %subset = hash_subset   ({a=>1, b=>2, c=>3}, ['b','c','d']); # => (b=>2, c=>3)
@@ -83,6 +102,14 @@ This document describes version 0.004 of Hash::Subset (from Perl distribution Ha
  # using keys specified in another hash
  my %subset = hash_subset   ({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => (b=>2, c=>3)
  my $subset = hashref_subset({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => {b=>2, c=>3}
+
+ # excluding keys specified in an array
+ my %subset = hash_subset_without   ({a=>1, b=>2, c=>3}, ['b','c','d']); # => (a=>1)
+ my $subset = hashref_subset_without({a=>1, b=>2, c=>3}, ['b','c','d']); # => {a=>1}
+
+ # excluding keys specified in another hash
+ my %subset = hash_subset_without   ({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => (a=>1)
+ my $subset = hashref_subset_without({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => {a=>1}
 
  # filtering keys using a coderef
  my %subset = hash_subset   ({a=>1, b=>2, c=>3}, sub {$_[0] =~ /[bc]/}); # => (b=>2, c=>3)
@@ -190,6 +217,27 @@ and available for perl earlier than 5.20.
 
 See L</hash_subset>.
 
+=head2 hash_subset_without
+
+Usage:
+
+ my %subset  = hash_subset_without   (\%hash, \@keys);
+ my $subset  = hashref_subset_without(\%hash, \@keys);
+
+ my %subset  = hash_subset_without   (\%hash, \%another_hash);
+ my $subset  = hashref_subset_without(\%hash, \%another_hash);
+
+ # filter_sub is called with args ($key, $value) and return true when key should be excluded
+ my %subset  = hash_subset_without   (\%hash, \&filter_sub);
+ my $subset  = hashref_subset_without(\%hash, \&filter_sub);
+
+Like L</hash_subset>, but reverses the logic. Will create subset that only
+includes keys not in the specified array/hash.
+
+=head2 hashref_subset_without
+
+See L</hash_subset_without>.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Hash-Subset>.
@@ -207,6 +255,15 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<Hash::MoreUtils> provides various ways to create hash subset ("slice") through
+its C<slice_*> functions. It does not provide way to specify subset keys via the
+keys of C<%another_hash>, but that can be done trivially using C<< keys
+%another_hash >>. Hash::Subset is currently more lightweight than
+Hash::MoreUtils.
+
+L<Tie::Subset::Hash> to create a tied version of a hash subset (a "view" of a
+subset of a hash).
 
 L<Hash::Util::Pick> also allows you to create a hash subset by specifying the
 wanted keys in a list or via filtering using a coderef. This XS module should

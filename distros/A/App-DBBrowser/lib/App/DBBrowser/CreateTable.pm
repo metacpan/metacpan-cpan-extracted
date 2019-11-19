@@ -131,16 +131,13 @@ sub create_table {
                     }
                     next SET_COLUMNS;
                 }
-                elsif ( ! $ok_create_table ) {
-                    delete $sf->{i}{gc};
+                delete $sf->{i}{gc};
+                if ( ! $ok_create_table ) {
                     return;
                 }
-                delete $sf->{i}{gc};
                 if ( @{$sql->{insert_into_args}} ) {
                     $sf->{i}{ct}{skip_confirm_insert} = 1;
                     my $ok_insert = $sf->__insert_data( $sql );
-                    delete $sf->{i}{ct};
-                    delete $sf->{i}{gc};
                     if ( ! $ok_insert ) {
                         require App::DBBrowser::DropTable;
                         my $dt = App::DBBrowser::DropTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -224,15 +221,13 @@ sub __set_table_name {
     my $c = 0;
 
     while ( 1 ) {
-        my ( $file_name, $info );
+        my $info;
         if ( $sf->{i}{gc}{source_type} =~ /file/i ) {
-            $file_name = basename decode( 'locale_fs', $sf->{i}{gc}{file_ec} );
+            my $file_name = basename decode( 'locale_fs', $sf->{i}{gc}{file_ec} );
             $info = sprintf "File: '%s'", $file_name;
-        }
-        if ( ! exists $sf->{i}{ct}{default_table_name} && defined $file_name ) {
             ( $sf->{i}{ct}{default_table_name} = $file_name ) =~ s/\.[^.]{1,4}\z//;
             if ( defined $sf->{i}{gc}{sheet_name} && length $sf->{i}{gc}{sheet_name} ) {
-                $sf->{i}{ct}{default_table_name} .= '_' . delete $sf->{i}{gc}{sheet_name};
+                $sf->{i}{ct}{default_table_name} .= '_' . $sf->{i}{gc}{sheet_name};
             }
             $sf->{i}{ct}{default_table_name} =~ s/ /_/g;
         }

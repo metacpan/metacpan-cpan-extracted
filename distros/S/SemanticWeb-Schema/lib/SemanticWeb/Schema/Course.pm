@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has course_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_course_code',
     json_ld   => 'courseCode',
 );
 
@@ -28,7 +28,7 @@ has course_code => (
 
 has course_prerequisites => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_course_prerequisites',
     json_ld   => 'coursePrerequisites',
 );
 
@@ -36,7 +36,7 @@ has course_prerequisites => (
 
 has educational_credential_awarded => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_educational_credential_awarded',
     json_ld   => 'educationalCredentialAwarded',
 );
 
@@ -44,7 +44,7 @@ has educational_credential_awarded => (
 
 has has_course_instance => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_course_instance',
     json_ld   => 'hasCourseInstance',
 );
 
@@ -52,7 +52,7 @@ has has_course_instance => (
 
 has occupational_credential_awarded => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_occupational_credential_awarded',
     json_ld   => 'occupationalCredentialAwarded',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::Course - A description of an educational course which may b
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -104,6 +104,10 @@ A course_code should be one of the following types:
 
 =back
 
+=head2 C<_has_course_code>
+
+A predicate for the L</course_code> attribute.
+
 =head2 C<course_prerequisites>
 
 C<coursePrerequisites>
@@ -126,6 +130,10 @@ A course_prerequisites should be one of the following types:
 
 =back
 
+=head2 C<_has_course_prerequisites>
+
+A predicate for the L</course_prerequisites> attribute.
+
 =head2 C<educational_credential_awarded>
 
 C<educationalCredentialAwarded>
@@ -144,6 +152,10 @@ A educational_credential_awarded should be one of the following types:
 
 =back
 
+=head2 C<_has_educational_credential_awarded>
+
+A predicate for the L</educational_credential_awarded> attribute.
+
 =head2 C<has_course_instance>
 
 C<hasCourseInstance>
@@ -158,6 +170,10 @@ A has_course_instance should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CourseInstance']>
 
 =back
+
+=head2 C<_has_has_course_instance>
+
+A predicate for the L</has_course_instance> attribute.
 
 =head2 C<occupational_credential_awarded>
 
@@ -176,6 +192,10 @@ A occupational_credential_awarded should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_occupational_credential_awarded>
+
+A predicate for the L</occupational_credential_awarded> attribute.
 
 =head1 SEE ALSO
 

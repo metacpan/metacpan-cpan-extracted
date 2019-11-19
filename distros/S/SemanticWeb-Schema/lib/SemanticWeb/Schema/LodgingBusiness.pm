@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has amenity_feature => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_amenity_feature',
     json_ld   => 'amenityFeature',
 );
 
@@ -28,7 +28,7 @@ has amenity_feature => (
 
 has audience => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_audience',
     json_ld   => 'audience',
 );
 
@@ -36,7 +36,7 @@ has audience => (
 
 has available_language => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_available_language',
     json_ld   => 'availableLanguage',
 );
 
@@ -44,7 +44,7 @@ has available_language => (
 
 has checkin_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_checkin_time',
     json_ld   => 'checkinTime',
 );
 
@@ -52,7 +52,7 @@ has checkin_time => (
 
 has checkout_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_checkout_time',
     json_ld   => 'checkoutTime',
 );
 
@@ -60,7 +60,7 @@ has checkout_time => (
 
 has number_of_rooms => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_rooms',
     json_ld   => 'numberOfRooms',
 );
 
@@ -68,7 +68,7 @@ has number_of_rooms => (
 
 has pets_allowed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_pets_allowed',
     json_ld   => 'petsAllowed',
 );
 
@@ -76,7 +76,7 @@ has pets_allowed => (
 
 has star_rating => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_star_rating',
     json_ld   => 'starRating',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::LodgingBusiness - A lodging business
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -123,6 +123,10 @@ A amenity_feature should be one of the following types:
 
 =back
 
+=head2 C<_has_amenity_feature>
+
+A predicate for the L</amenity_feature> attribute.
+
 =head2 C<audience>
 
 An intended audience, i.e. a group for whom something was created.
@@ -134,6 +138,10 @@ A audience should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Audience']>
 
 =back
+
+=head2 C<_has_audience>
+
+A predicate for the L</audience> attribute.
 
 =head2 C<available_language>
 
@@ -154,6 +162,10 @@ A available_language should be one of the following types:
 
 =back
 
+=head2 C<_has_available_language>
+
+A predicate for the L</available_language> attribute.
+
 =head2 C<checkin_time>
 
 C<checkinTime>
@@ -168,6 +180,10 @@ A checkin_time should be one of the following types:
 
 =back
 
+=head2 C<_has_checkin_time>
+
+A predicate for the L</checkin_time> attribute.
+
 =head2 C<checkout_time>
 
 C<checkoutTime>
@@ -181,6 +197,10 @@ A checkout_time should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_checkout_time>
+
+A predicate for the L</checkout_time> attribute.
 
 =head2 C<number_of_rooms>
 
@@ -201,6 +221,10 @@ A number_of_rooms should be one of the following types:
 
 =back
 
+=head2 C<_has_number_of_rooms>
+
+A predicate for the L</number_of_rooms> attribute.
+
 =head2 C<pets_allowed>
 
 C<petsAllowed>
@@ -218,6 +242,10 @@ A pets_allowed should be one of the following types:
 
 =back
 
+=head2 C<_has_pets_allowed>
+
+A predicate for the L</pets_allowed> attribute.
+
 =head2 C<star_rating>
 
 C<starRating>
@@ -234,6 +262,10 @@ A star_rating should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Rating']>
 
 =back
+
+=head2 C<_has_star_rating>
+
+A predicate for the L</star_rating> attribute.
 
 =head1 SEE ALSO
 

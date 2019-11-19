@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has checkin_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_checkin_time',
     json_ld   => 'checkinTime',
 );
 
@@ -28,7 +28,7 @@ has checkin_time => (
 
 has checkout_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_checkout_time',
     json_ld   => 'checkoutTime',
 );
 
@@ -36,7 +36,7 @@ has checkout_time => (
 
 has lodging_unit_description => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_lodging_unit_description',
     json_ld   => 'lodgingUnitDescription',
 );
 
@@ -44,7 +44,7 @@ has lodging_unit_description => (
 
 has lodging_unit_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_lodging_unit_type',
     json_ld   => 'lodgingUnitType',
 );
 
@@ -52,7 +52,7 @@ has lodging_unit_type => (
 
 has num_adults => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_num_adults',
     json_ld   => 'numAdults',
 );
 
@@ -60,7 +60,7 @@ has num_adults => (
 
 has num_children => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_num_children',
     json_ld   => 'numChildren',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::LodgingReservation - A reservation for lodging at a hotel
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -107,6 +107,10 @@ A checkin_time should be one of the following types:
 
 =back
 
+=head2 C<_has_checkin_time>
+
+A predicate for the L</checkin_time> attribute.
+
 =head2 C<checkout_time>
 
 C<checkoutTime>
@@ -121,6 +125,10 @@ A checkout_time should be one of the following types:
 
 =back
 
+=head2 C<_has_checkout_time>
+
+A predicate for the L</checkout_time> attribute.
+
 =head2 C<lodging_unit_description>
 
 C<lodgingUnitDescription>
@@ -134,6 +142,10 @@ A lodging_unit_description should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_lodging_unit_description>
+
+A predicate for the L</lodging_unit_description> attribute.
 
 =head2 C<lodging_unit_type>
 
@@ -152,6 +164,10 @@ A lodging_unit_type should be one of the following types:
 
 =back
 
+=head2 C<_has_lodging_unit_type>
+
+A predicate for the L</lodging_unit_type> attribute.
+
 =head2 C<num_adults>
 
 C<numAdults>
@@ -168,6 +184,10 @@ A num_adults should be one of the following types:
 
 =back
 
+=head2 C<_has_num_adults>
+
+A predicate for the L</num_adults> attribute.
+
 =head2 C<num_children>
 
 C<numChildren>
@@ -183,6 +203,10 @@ A num_children should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_num_children>
+
+A predicate for the L</num_children> attribute.
 
 =head1 SEE ALSO
 

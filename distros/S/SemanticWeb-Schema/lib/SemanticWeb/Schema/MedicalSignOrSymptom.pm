@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has cause => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_cause',
     json_ld   => 'cause',
 );
 
@@ -28,7 +28,7 @@ has cause => (
 
 has possible_treatment => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_possible_treatment',
     json_ld   => 'possibleTreatment',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::MedicalSignOrSymptom - Any feature associated or not with a
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,10 @@ A cause should be one of the following types:
 
 =back
 
+=head2 C<_has_cause>
+
+A predicate for the L</cause> attribute.
+
 =head2 C<possible_treatment>
 
 C<possibleTreatment>
@@ -86,6 +90,10 @@ A possible_treatment should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalTherapy']>
 
 =back
+
+=head2 C<_has_possible_treatment>
+
+A predicate for the L</possible_treatment> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has order_delivery => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_order_delivery',
     json_ld   => 'orderDelivery',
 );
 
@@ -28,7 +28,7 @@ has order_delivery => (
 
 has order_item_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_order_item_number',
     json_ld   => 'orderItemNumber',
 );
 
@@ -36,7 +36,7 @@ has order_item_number => (
 
 has order_item_status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_order_item_status',
     json_ld   => 'orderItemStatus',
 );
 
@@ -44,7 +44,7 @@ has order_item_status => (
 
 has order_quantity => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_order_quantity',
     json_ld   => 'orderQuantity',
 );
 
@@ -52,7 +52,7 @@ has order_quantity => (
 
 has ordered_item => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ordered_item',
     json_ld   => 'orderedItem',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::OrderItem - An order item is a line of an order
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -97,6 +97,10 @@ A order_delivery should be one of the following types:
 
 =back
 
+=head2 C<_has_order_delivery>
+
+A predicate for the L</order_delivery> attribute.
+
 =head2 C<order_item_number>
 
 C<orderItemNumber>
@@ -110,6 +114,10 @@ A order_item_number should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_order_item_number>
+
+A predicate for the L</order_item_number> attribute.
 
 =head2 C<order_item_status>
 
@@ -125,6 +133,10 @@ A order_item_status should be one of the following types:
 
 =back
 
+=head2 C<_has_order_item_status>
+
+A predicate for the L</order_item_status> attribute.
+
 =head2 C<order_quantity>
 
 C<orderQuantity>
@@ -139,6 +151,10 @@ A order_quantity should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_order_quantity>
+
+A predicate for the L</order_quantity> attribute.
 
 =head2 C<ordered_item>
 
@@ -157,6 +173,10 @@ A ordered_item should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Service']>
 
 =back
+
+=head2 C<_has_ordered_item>
+
+A predicate for the L</ordered_item> attribute.
 
 =head1 SEE ALSO
 

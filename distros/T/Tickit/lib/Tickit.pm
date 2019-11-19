@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2019 -- leonerd@leonerd.org.uk
 
 package Tickit;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 BEGIN {
-   our $VERSION = '0.67';
+   our $VERSION = '0.68';
 }
 
 use Carp;
@@ -28,10 +28,8 @@ BEGIN {
 use Exporter 'import';
 
 use Tickit::Event;
+use Tickit::Term;
 use Tickit::Window;
-
-use Struct::Dumb;
-struct TimeQueue => [qw( time code )];
 
 =head1 NAME
 
@@ -128,19 +126,17 @@ sub new
    my $class = shift;
    my %args = @_;
 
-   # Test code also accepts 'term' argument but we won't document that for now
-
-   my $in  = delete $args{term_in}  || \*STDIN;
-   my $out = delete $args{term_out} || \*STDOUT;
-
+   my $root = delete $args{root};
    my $term = delete $args{term};
 
    my $self = bless {
-      todo_queue => [],
-      timer_queue => [],
+      use_altscreen => $args{use_altscreen} // 1,
    }, $class;
 
-   unless( $term ) {
+   if( $args{term_in} or $args{term_out} ) {
+      my $in  = delete $args{term_in}  || \*STDIN;
+      my $out = delete $args{term_out} || \*STDOUT;
+
       my $writer = $self->_make_writer( $out );
 
       require Tickit::Term;
@@ -149,23 +145,13 @@ sub new
          writer        => $writer,
          input_handle  => $in,
          output_handle => $out,
-         UTF8          => $args{UTF8},
+         UTF8          => delete $args{UTF8},
       );
    }
 
    $self->{term} = $term;
-   $self->{term_in}  = $in;
-   $self->{term_out} = $out;
 
-   $self->{use_altscreen} = $args{use_altscreen} // 1;
-
-   my $rootwin = $self->{rootwin} = Tickit::Window->new( $self, $term->lines, $term->cols );
-
-   $self->bind_key( 'C-c' => $self->can( "stop" ) );
-
-   $term->set_output_buffer( 2**16 ); # 64KiB
-
-   $self->set_root_widget( $args{root} ) if defined $args{root};
+   $self->set_root_widget( $root ) if $root;
 
    return $self;
 }
@@ -184,6 +170,24 @@ sub _make_writer
    return $out;
 }
 
+sub _tickit
+{
+   my $self = shift;
+   return $self->{_tickit} //= do {
+      my $tickit = $self->_make_tickit( $self->{term} );
+
+      $tickit->setctl( 'use-altscreen' => $self->{use_altscreen} );
+
+      $tickit;
+   };
+}
+
+sub _make_tickit
+{
+   my $self = shift;
+   return Tickit::_Tickit->new( @_ );
+}
+
 =head2 later
 
    $tickit->later( $code )
@@ -194,21 +198,7 @@ events are processed.
 
 =cut
 
-sub _flush_later
-{
-   my $self = shift;
-
-   my $queue = $self->{todo_queue};
-   ( shift @$queue )->() while @$queue;
-}
-
-sub later
-{
-   my $self = shift;
-   my ( $code ) = @_;
-
-   push @{ $self->{todo_queue} }, $code;
-}
+sub later { shift->_tickit->watch_later( @_ ) }
 
 =head2 timer
 
@@ -232,21 +222,17 @@ sub timer
    my $self = shift;
    my ( $mode, $amount, $code ) = @_;
 
-   my $at;
+   my $tickit = $self->_tickit;
+
    if( $mode eq "at" ) {
-      $at = $amount;
+      return $tickit->watch_timer_at_msec( $amount * 1000, $code );
    }
    elsif( $mode eq "after" ) {
-      $at = time + $amount;
+      return $tickit->watch_timer_after_msec( $amount * 1000, $code );
    }
    else {
       croak "Mode should be 'at' or 'after'";
    }
-
-   # TODO: bin-search insert position then splice
-   @{ $self->{timer_queue} } = sort { $a->time <=> $b->time } @{ $self->{timer_queue} }, my $id = TimeQueue( $at => $code );
-
-   return 0 + $id;
 }
 
 =head2 cancel_timer
@@ -258,18 +244,7 @@ will no longer be invoked.
 
 =cut
 
-sub cancel_timer
-{
-   my $self = shift;
-   my ( $id ) = @_;
-
-   my $timer_queue = $self->{timer_queue};
-
-   my $idx;
-   $timer_queue->[$idx=$_] == $id and last for 0 .. $#$timer_queue;
-
-   splice @$timer_queue, $idx, 1, () if defined $idx;
-}
+sub cancel_timer { shift->_tickit->watch_cancel( @_ ) }
 
 =head2 term
 
@@ -279,11 +254,7 @@ Returns the underlying L<Tickit::Term> object.
 
 =cut
 
-sub term
-{
-   my $self = shift;
-   return $self->{term};
-}
+sub term { shift->_tickit->term }
 
 =head2 cols
 
@@ -300,13 +271,6 @@ of C<SIGWINCH> signals.
 
 sub lines { shift->term->lines }
 sub cols  { shift->term->cols  }
-
-sub _SIGWINCH
-{
-   my $self = shift;
-
-   $self->term->refresh_size;
-}
 
 =head2 bind_key
 
@@ -337,6 +301,10 @@ sub bind_key
    if( $code ) {
       if( !%$keybinds ) {
          weaken( my $weakself = $self );
+
+         # Need to ensure a root window exists before this so it gets its
+         # key bind event first
+         $self->rootwin;
 
          $self->{key_bind_id} = $self->term->bind_event( key => sub {
             my $self = $weakself or return;
@@ -371,11 +339,8 @@ Returns the root L<Tickit::Window>.
 
 =cut
 
-sub rootwin
-{
-   my $self = shift;
-   return $self->{rootwin};
-}
+# root window needs to know where the toplevel "tickit" instance is
+sub rootwin { $_[0]->_tickit->rootwin( $_[0] ) }
 
 =head2 set_root_widget
 
@@ -392,65 +357,6 @@ sub set_root_widget
    ( $self->{root_widget} ) = @_;
 }
 
-=head2 setup_term
-
-   $tickit->setup_term
-
-Set up the screen and generally prepare to start running
-
-=cut
-
-sub setup_term
-{
-   my $self = shift;
-
-   my $term = $self->term;
-
-   $term->await_started( 0.100 ); # 100 msec
-
-   $term->setctl( altscreen => 1 ) if $self->{use_altscreen};
-   $term->setctl( cursorvis => 0 );
-   $term->setctl( mouse     => Tickit::Term::TERM_MOUSEMODE_DRAG );
-   $term->clear;
-
-   if( my $widget = $self->{root_widget} ) {
-      $widget->set_window( $self->rootwin );
-   }
-
-   $term->flush;
-}
-
-=head2 teardown_term
-
-   $tickit->teardown_term
-
-Shut down the screen after running
-
-=cut
-
-sub teardown_term
-{
-   my $self = shift;
-
-   if( my $widget = $self->{root_widget} ) {
-      $widget->set_window( undef );
-   }
-
-   my $term = $self->term;
-
-   if( $self->{use_altscreen} ) {
-      $term->setctl( altscreen => 0 );
-   }
-   else {
-      $term->goto( $term->get_size );
-   }
-
-   $term->setctl( cursorvis => 1 );
-   $term->setctl( mouse     => 0 );
-
-   $term->flush;
-}
-
 =head2 tick
 
    $tickit->tick
@@ -460,50 +366,13 @@ C<teardown_term>.
 
 =cut
 
-sub _flush
-{
-   my $self = shift;
-
-   $self->_flush_later if @{ $self->{todo_queue} };
-   $self->rootwin->flush if $self->rootwin;
-}
-
-sub _tick
-{
-   my $self = shift;
-
-   my $timer_queue = $self->{timer_queue};
-
-   my $timeout;
-   if( @$timer_queue ) {
-      $timeout = $self->{timer_queue}[0]->time - time;
-   }
-
-   $self->{term}->input_wait( $timeout );
-
-   my $now = time;
-   while( @$timer_queue and $timer_queue->[0]->time <= $now ) {
-      shift( @$timer_queue )->code->();
-   }
-
-   $self->_flush;
-}
-
 sub tick
 {
    my $self = shift;
 
-   my $old_DIE = $SIG{__DIE__};
-   local $SIG{__DIE__} = sub {
-      local $SIG{__DIE__} = $old_DIE;
+   # TODO: Consider root widget
 
-      die @_ if $^S;
-
-      $self->teardown_term;
-      die @_;
-   };
-
-   $self->_tick;
+   $self->_tickit->tick( @_ );
 }
 
 =head2 run
@@ -520,40 +389,17 @@ sub run
 {
    my $self = shift;
 
-   $self->setup_term;
+   if( my $widget = $self->{root_widget} ) {
+      $widget->set_window( $self->rootwin );
+   }
 
-   $SIG{INT} = $SIG{TERM} = sub {
-      my $signal = shift;
+   # TODO: $SIG{__DIE__} wrapping
 
-      # Disable the handler so a second signal will be fatal
-      undef $SIG{$signal};
-      $SIG{$signal} = sub {
-         die "Aborting Tickit on double SIGINT\n";
-      };
+   $self->_tickit->run;
 
-      $self->stop;
-   };
-
-   $SIG{WINCH} = sub {
-      $self->later( sub { $self->_SIGWINCH } )
-   };
-
-   my $old_DIE = $SIG{__DIE__};
-   local $SIG{__DIE__} = sub {
-      local $SIG{__DIE__} = $old_DIE;
-
-      die @_ if $^S;
-
-      $self->teardown_term;
-      die @_;
-   };
-
-   $self->_flush;
-
-   local $self->{keep_running} = 1;
-   $self->_tick while( $self->{keep_running} );
-
-   $self->teardown_term;
+   if( my $widget = $self->{root_widget} ) {
+      $widget->set_window( undef );
+   }
 }
 
 =head2 stop
@@ -564,11 +410,7 @@ Causes a currently-running C<run> method to stop processing events and return.
 
 =cut
 
-sub stop
-{
-   my $self = shift;
-   $self->{keep_running} = 0;
-}
+sub stop { shift->_tickit->stop( @_ ) }
 
 =head1 AUTHOR
 

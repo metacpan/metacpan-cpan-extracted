@@ -1,3 +1,18 @@
+0.013   2019-10-06  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add FAQ items: how to turn file/screen/syslog logging off.
+
+
+0.012   2019-10-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add arguments: file_name, file_dir to allow customizing log
+	  file's location.
+
+	- Check for known arguments.
+
+
 0.011   2019-09-18  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

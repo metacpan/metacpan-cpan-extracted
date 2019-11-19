@@ -4,7 +4,7 @@
       "Michael Schout <mschout@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,14 @@
       },
       "develop" : {
          "requires" : {
-            "Test::Pod" : "1.41"
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::PluginBundle::ApacheTest" : "0",
+            "Dist::Zilla::PluginBundle::Filter" : "0",
+            "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Signature" : "0"
          }
       },
       "runtime" : {
@@ -45,20 +52,58 @@
          }
       }
    },
+   "provides" : {
+      "Apache2::AuthCookie" : {
+         "file" : "lib/Apache2/AuthCookie.pm",
+         "version" : "3.28"
+      },
+      "Apache2::AuthCookie::Base" : {
+         "file" : "lib/Apache2/AuthCookie/Base.pm",
+         "version" : "3.28"
+      },
+      "Apache2::AuthCookie::Params" : {
+         "file" : "lib/Apache2/AuthCookie/Params.pm",
+         "version" : "3.28"
+      },
+      "Apache2_4::AuthCookie" : {
+         "file" : "lib/Apache2_4/AuthCookie.pm",
+         "version" : "3.28"
+      },
+      "Apache::AuthCookie" : {
+         "file" : "lib/Apache/AuthCookie.pm",
+         "version" : "3.28"
+      },
+      "Apache::AuthCookie::Params" : {
+         "file" : "lib/Apache/AuthCookie/Params.pm",
+         "version" : "3.28"
+      },
+      "Apache::AuthCookie::Params::Base" : {
+         "file" : "lib/Apache/AuthCookie/Params/Base.pm",
+         "version" : "3.28"
+      },
+      "Apache::AuthCookie::Params::CGI" : {
+         "file" : "lib/Apache/AuthCookie/Params/CGI.pm",
+         "version" : "3.28"
+      },
+      "Apache::AuthCookie::Util" : {
+         "file" : "lib/Apache/AuthCookie/Util.pm",
+         "version" : "3.28"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-apache-authcookie at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Apache-AuthCookie"
+         "web" : "https://github.com/mschout/apache-authcookie/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Apache-AuthCookie/",
+      "homepage" : "https://github.com/mschout/apache-authcookie",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mschout/apache-authcookie.git",
+         "url" : "https://github.com/mschout/apache-authcookie.git",
          "web" : "https://github.com/mschout/apache-authcookie"
       }
    },
-   "version" : "3.27",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "3.28",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

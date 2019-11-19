@@ -165,7 +165,7 @@ gl_context_create( Handle object, GLRequest * request)
 		break;
 	case GLREQ_TARGET_WINDOW:
 		glbm = 0;
-		if ( apc_widget_surface_is_layered( object )) {
+		if ( apc_widget_get_layered_request( object )) {
         		const WCHAR wnull = 0;
 			wnd = CreateWindowExW(
 				WS_EX_TOOLWINDOW, L"Generic", &wnull,

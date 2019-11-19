@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has aircraft => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_aircraft',
     json_ld   => 'aircraft',
 );
 
@@ -28,7 +28,7 @@ has aircraft => (
 
 has arrival_airport => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_arrival_airport',
     json_ld   => 'arrivalAirport',
 );
 
@@ -36,7 +36,7 @@ has arrival_airport => (
 
 has arrival_gate => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_arrival_gate',
     json_ld   => 'arrivalGate',
 );
 
@@ -44,7 +44,7 @@ has arrival_gate => (
 
 has arrival_terminal => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_arrival_terminal',
     json_ld   => 'arrivalTerminal',
 );
 
@@ -52,7 +52,7 @@ has arrival_terminal => (
 
 has boarding_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_boarding_policy',
     json_ld   => 'boardingPolicy',
 );
 
@@ -60,7 +60,7 @@ has boarding_policy => (
 
 has carrier => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_carrier',
     json_ld   => 'carrier',
 );
 
@@ -68,7 +68,7 @@ has carrier => (
 
 has departure_airport => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_departure_airport',
     json_ld   => 'departureAirport',
 );
 
@@ -76,7 +76,7 @@ has departure_airport => (
 
 has departure_gate => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_departure_gate',
     json_ld   => 'departureGate',
 );
 
@@ -84,7 +84,7 @@ has departure_gate => (
 
 has departure_terminal => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_departure_terminal',
     json_ld   => 'departureTerminal',
 );
 
@@ -92,7 +92,7 @@ has departure_terminal => (
 
 has estimated_flight_duration => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_estimated_flight_duration',
     json_ld   => 'estimatedFlightDuration',
 );
 
@@ -100,7 +100,7 @@ has estimated_flight_duration => (
 
 has flight_distance => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_flight_distance',
     json_ld   => 'flightDistance',
 );
 
@@ -108,7 +108,7 @@ has flight_distance => (
 
 has flight_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_flight_number',
     json_ld   => 'flightNumber',
 );
 
@@ -116,7 +116,7 @@ has flight_number => (
 
 has meal_service => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_meal_service',
     json_ld   => 'mealService',
 );
 
@@ -124,7 +124,7 @@ has meal_service => (
 
 has seller => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_seller',
     json_ld   => 'seller',
 );
 
@@ -132,7 +132,7 @@ has seller => (
 
 has web_checkin_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_web_checkin_time',
     json_ld   => 'webCheckinTime',
 );
 
@@ -154,7 +154,7 @@ SemanticWeb::Schema::Flight - An airline flight.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -176,6 +176,10 @@ A aircraft should be one of the following types:
 
 =back
 
+=head2 C<_has_aircraft>
+
+A predicate for the L</aircraft> attribute.
+
 =head2 C<arrival_airport>
 
 C<arrivalAirport>
@@ -189,6 +193,10 @@ A arrival_airport should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Airport']>
 
 =back
+
+=head2 C<_has_arrival_airport>
+
+A predicate for the L</arrival_airport> attribute.
 
 =head2 C<arrival_gate>
 
@@ -204,6 +212,10 @@ A arrival_gate should be one of the following types:
 
 =back
 
+=head2 C<_has_arrival_gate>
+
+A predicate for the L</arrival_gate> attribute.
+
 =head2 C<arrival_terminal>
 
 C<arrivalTerminal>
@@ -217,6 +229,10 @@ A arrival_terminal should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_arrival_terminal>
+
+A predicate for the L</arrival_terminal> attribute.
 
 =head2 C<boarding_policy>
 
@@ -233,6 +249,10 @@ A boarding_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_boarding_policy>
+
+A predicate for the L</boarding_policy> attribute.
+
 =head2 C<carrier>
 
 'carrier' is an out-dated term indicating the 'provider' for parcel
@@ -245,6 +265,10 @@ A carrier should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_carrier>
+
+A predicate for the L</carrier> attribute.
 
 =head2 C<departure_airport>
 
@@ -260,6 +284,10 @@ A departure_airport should be one of the following types:
 
 =back
 
+=head2 C<_has_departure_airport>
+
+A predicate for the L</departure_airport> attribute.
+
 =head2 C<departure_gate>
 
 C<departureGate>
@@ -274,6 +302,10 @@ A departure_gate should be one of the following types:
 
 =back
 
+=head2 C<_has_departure_gate>
+
+A predicate for the L</departure_gate> attribute.
+
 =head2 C<departure_terminal>
 
 C<departureTerminal>
@@ -287,6 +319,10 @@ A departure_terminal should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_departure_terminal>
+
+A predicate for the L</departure_terminal> attribute.
 
 =head2 C<estimated_flight_duration>
 
@@ -304,6 +340,10 @@ A estimated_flight_duration should be one of the following types:
 
 =back
 
+=head2 C<_has_estimated_flight_duration>
+
+A predicate for the L</estimated_flight_duration> attribute.
+
 =head2 C<flight_distance>
 
 C<flightDistance>
@@ -319,6 +359,10 @@ A flight_distance should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_flight_distance>
+
+A predicate for the L</flight_distance> attribute.
 
 =head2 C<flight_number>
 
@@ -336,6 +380,10 @@ A flight_number should be one of the following types:
 
 =back
 
+=head2 C<_has_flight_number>
+
+A predicate for the L</flight_number> attribute.
+
 =head2 C<meal_service>
 
 C<mealService>
@@ -349,6 +397,10 @@ A meal_service should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_meal_service>
+
+A predicate for the L</meal_service> attribute.
 
 =head2 C<seller>
 
@@ -365,6 +417,10 @@ A seller should be one of the following types:
 
 =back
 
+=head2 C<_has_seller>
+
+A predicate for the L</seller> attribute.
+
 =head2 C<web_checkin_time>
 
 C<webCheckinTime>
@@ -378,6 +434,10 @@ A web_checkin_time should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_web_checkin_time>
+
+A predicate for the L</web_checkin_time> attribute.
 
 =head1 SEE ALSO
 

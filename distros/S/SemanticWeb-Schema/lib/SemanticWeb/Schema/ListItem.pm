@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has item => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_item',
     json_ld   => 'item',
 );
 
@@ -28,7 +28,7 @@ has item => (
 
 has next_item => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_next_item',
     json_ld   => 'nextItem',
 );
 
@@ -36,7 +36,7 @@ has next_item => (
 
 has position => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_position',
     json_ld   => 'position',
 );
 
@@ -44,7 +44,7 @@ has position => (
 
 has previous_item => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_previous_item',
     json_ld   => 'previousItem',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::ListItem - An list item, e
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -87,6 +87,10 @@ A item should be one of the following types:
 
 =back
 
+=head2 C<_has_item>
+
+A predicate for the L</item> attribute.
+
 =head2 C<next_item>
 
 C<nextItem>
@@ -100,6 +104,10 @@ A next_item should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ListItem']>
 
 =back
+
+=head2 C<_has_next_item>
+
+A predicate for the L</next_item> attribute.
 
 =head2 C<position>
 
@@ -115,6 +123,10 @@ A position should be one of the following types:
 
 =back
 
+=head2 C<_has_position>
+
+A predicate for the L</position> attribute.
+
 =head2 C<previous_item>
 
 C<previousItem>
@@ -128,6 +140,10 @@ A previous_item should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ListItem']>
 
 =back
+
+=head2 C<_has_previous_item>
+
+A predicate for the L</previous_item> attribute.
 
 =head1 SEE ALSO
 

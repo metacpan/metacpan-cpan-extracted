@@ -20,7 +20,11 @@ if (@ARGV_types) {
 }
 
 # report parsing
-my $report = Parser->new( file => $ARGV_report_file );
+my $report = Parser->new(
+    file => $ARGV_report_file,
+    module_delineation => $module_delineation,
+);
+
 my $root = $report->root;
 
 my $prefix = $ARGV_prefix ? $ARGV_prefix . '@' : '';
@@ -118,7 +122,7 @@ extract_bgc_sequences.pl - Extracts protein sequences for different BGC scales i
 
 =head1 VERSION
 
-version 0.193080
+version 0.193230
 
 =head1 NAME
 
@@ -154,6 +158,14 @@ or antismash [default: palantir]
 
 =for Euclid: str.type: /antismash|palantir/
     str.default: 'palantir'
+
+=item --module-delineation [=] <str>
+
+Method for delineating the modules. Modules can either be cut on condensation
+(C and KS) or selection domains (A and AT) [default: selection].
+
+=for Euclid: str.type: /condensation|selection/
+    str.default: 'selection'
 
 =item --types [=] <str>...
 

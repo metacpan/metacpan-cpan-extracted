@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has actor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actor',
     json_ld   => 'actor',
 );
 
@@ -28,7 +28,7 @@ has actor => (
 
 has actors => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actors',
     json_ld   => 'actors',
 );
 
@@ -36,7 +36,7 @@ has actors => (
 
 has director => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_director',
     json_ld   => 'director',
 );
 
@@ -44,7 +44,7 @@ has director => (
 
 has directors => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_directors',
     json_ld   => 'directors',
 );
 
@@ -52,7 +52,7 @@ has directors => (
 
 has episode_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_episode_number',
     json_ld   => 'episodeNumber',
 );
 
@@ -60,7 +60,7 @@ has episode_number => (
 
 has music_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_music_by',
     json_ld   => 'musicBy',
 );
 
@@ -68,7 +68,7 @@ has music_by => (
 
 has part_of_season => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_part_of_season',
     json_ld   => 'partOfSeason',
 );
 
@@ -76,7 +76,7 @@ has part_of_season => (
 
 has part_of_series => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_part_of_series',
     json_ld   => 'partOfSeries',
 );
 
@@ -84,7 +84,7 @@ has part_of_series => (
 
 has production_company => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_production_company',
     json_ld   => 'productionCompany',
 );
 
@@ -92,7 +92,7 @@ has production_company => (
 
 has trailer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_trailer',
     json_ld   => 'trailer',
 );
 
@@ -114,7 +114,7 @@ SemanticWeb::Schema::Episode - A media episode (e
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -137,6 +137,10 @@ A actor should be one of the following types:
 
 =back
 
+=head2 C<_has_actor>
+
+A predicate for the L</actor> attribute.
+
 =head2 C<actors>
 
 An actor, e.g. in tv, radio, movie, video games etc. Actors can be
@@ -149,6 +153,10 @@ A actors should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_actors>
+
+A predicate for the L</actors> attribute.
 
 =head2 C<director>
 
@@ -164,6 +172,10 @@ A director should be one of the following types:
 
 =back
 
+=head2 C<_has_director>
+
+A predicate for the L</director> attribute.
+
 =head2 C<directors>
 
 A director of e.g. tv, radio, movie, video games etc. content. Directors
@@ -176,6 +188,10 @@ A directors should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_directors>
+
+A predicate for the L</directors> attribute.
 
 =head2 C<episode_number>
 
@@ -193,6 +209,10 @@ A episode_number should be one of the following types:
 
 =back
 
+=head2 C<_has_episode_number>
+
+A predicate for the L</episode_number> attribute.
+
 =head2 C<music_by>
 
 C<musicBy>
@@ -209,6 +229,10 @@ A music_by should be one of the following types:
 
 =back
 
+=head2 C<_has_music_by>
+
+A predicate for the L</music_by> attribute.
+
 =head2 C<part_of_season>
 
 C<partOfSeason>
@@ -223,6 +247,10 @@ A part_of_season should be one of the following types:
 
 =back
 
+=head2 C<_has_part_of_season>
+
+A predicate for the L</part_of_season> attribute.
+
 =head2 C<part_of_series>
 
 C<partOfSeries>
@@ -236,6 +264,10 @@ A part_of_series should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWorkSeries']>
 
 =back
+
+=head2 C<_has_part_of_series>
+
+A predicate for the L</part_of_series> attribute.
 
 =head2 C<production_company>
 
@@ -252,6 +284,10 @@ A production_company should be one of the following types:
 
 =back
 
+=head2 C<_has_production_company>
+
+A predicate for the L</production_company> attribute.
+
 =head2 C<trailer>
 
 The trailer of a movie or tv/radio series, season, episode, etc.
@@ -263,6 +299,10 @@ A trailer should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::VideoObject']>
 
 =back
+
+=head2 C<_has_trailer>
+
+A predicate for the L</trailer> attribute.
 
 =head1 SEE ALSO
 

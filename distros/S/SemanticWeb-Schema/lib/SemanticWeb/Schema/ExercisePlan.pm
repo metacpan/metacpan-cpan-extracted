@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has activity_duration => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_activity_duration',
     json_ld   => 'activityDuration',
 );
 
@@ -28,7 +28,7 @@ has activity_duration => (
 
 has activity_frequency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_activity_frequency',
     json_ld   => 'activityFrequency',
 );
 
@@ -36,7 +36,7 @@ has activity_frequency => (
 
 has additional_variable => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_additional_variable',
     json_ld   => 'additionalVariable',
 );
 
@@ -44,7 +44,7 @@ has additional_variable => (
 
 has exercise_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_exercise_type',
     json_ld   => 'exerciseType',
 );
 
@@ -52,7 +52,7 @@ has exercise_type => (
 
 has intensity => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_intensity',
     json_ld   => 'intensity',
 );
 
@@ -60,7 +60,7 @@ has intensity => (
 
 has repetitions => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_repetitions',
     json_ld   => 'repetitions',
 );
 
@@ -68,7 +68,7 @@ has repetitions => (
 
 has rest_periods => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_rest_periods',
     json_ld   => 'restPeriods',
 );
 
@@ -76,7 +76,7 @@ has rest_periods => (
 
 has workload => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_workload',
     json_ld   => 'workload',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::ExercisePlan - Fitness-related activity designed for a spec
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -124,6 +124,10 @@ A activity_duration should be one of the following types:
 
 =back
 
+=head2 C<_has_activity_duration>
+
+A predicate for the L</activity_duration> attribute.
+
 =head2 C<activity_frequency>
 
 C<activityFrequency>
@@ -139,6 +143,10 @@ A activity_frequency should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_activity_frequency>
+
+A predicate for the L</activity_frequency> attribute.
 
 =head2 C<additional_variable>
 
@@ -157,6 +165,10 @@ A additional_variable should be one of the following types:
 
 =back
 
+=head2 C<_has_additional_variable>
+
+A predicate for the L</additional_variable> attribute.
+
 =head2 C<exercise_type>
 
 C<exerciseType>
@@ -171,6 +183,10 @@ A exercise_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_exercise_type>
+
+A predicate for the L</exercise_type> attribute.
 
 =head2 C<intensity>
 
@@ -188,6 +204,10 @@ A intensity should be one of the following types:
 
 =back
 
+=head2 C<_has_intensity>
+
+A predicate for the L</intensity> attribute.
+
 =head2 C<repetitions>
 
 Number of times one should repeat the activity.
@@ -201,6 +221,10 @@ A repetitions should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_repetitions>
+
+A predicate for the L</repetitions> attribute.
 
 =head2 C<rest_periods>
 
@@ -218,6 +242,10 @@ A rest_periods should be one of the following types:
 
 =back
 
+=head2 C<_has_rest_periods>
+
+A predicate for the L</rest_periods> attribute.
+
 =head2 C<workload>
 
 Quantitative measure of the physiologic output of the exercise; also
@@ -232,6 +260,10 @@ A workload should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
 
 =back
+
+=head2 C<_has_workload>
+
+A predicate for the L</workload> attribute.
 
 =head1 SEE ALSO
 

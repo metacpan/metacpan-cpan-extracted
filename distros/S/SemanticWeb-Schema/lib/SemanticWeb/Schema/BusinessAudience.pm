@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has number_of_employees => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_employees',
     json_ld   => 'numberOfEmployees',
 );
 
@@ -28,7 +28,7 @@ has number_of_employees => (
 
 has yearly_revenue => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_yearly_revenue',
     json_ld   => 'yearlyRevenue',
 );
 
@@ -36,7 +36,7 @@ has yearly_revenue => (
 
 has years_in_operation => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_years_in_operation',
     json_ld   => 'yearsInOperation',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::BusinessAudience - A set of characteristics belonging to bu
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -81,6 +81,10 @@ A number_of_employees should be one of the following types:
 
 =back
 
+=head2 C<_has_number_of_employees>
+
+A predicate for the L</number_of_employees> attribute.
+
 =head2 C<yearly_revenue>
 
 C<yearlyRevenue>
@@ -95,6 +99,10 @@ A yearly_revenue should be one of the following types:
 
 =back
 
+=head2 C<_has_yearly_revenue>
+
+A predicate for the L</yearly_revenue> attribute.
+
 =head2 C<years_in_operation>
 
 C<yearsInOperation>
@@ -108,6 +116,10 @@ A years_in_operation should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_years_in_operation>
+
+A predicate for the L</years_in_operation> attribute.
 
 =head1 SEE ALSO
 

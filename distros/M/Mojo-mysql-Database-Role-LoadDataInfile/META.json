@@ -1,0 +1,79 @@
+{
+   "abstract" : "Easy load data infile support for Mojo::mysql",
+   "author" : [
+      "Adam Hopkins <srchulo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojo-mysql-Database-Role-LoadDataInfile",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.20",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Text::CSV_XS" : "0"
+         },
+         "requires" : {
+            "Mojo::mysql" : "0",
+            "Mojolicious" : "0",
+            "Role::Tiny" : "2.000001",
+            "Text::CSV_PP" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::MockModule" : "0",
+            "Test::More" : "0.96",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/srchulo/Mojo-mysql-Database-Role-LoadDataInfile/issues"
+      },
+      "homepage" : "https://github.com/srchulo/Mojo-mysql-Database-Role-LoadDataInfile",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/srchulo/Mojo-mysql-Database-Role-LoadDataInfile.git",
+         "web" : "https://github.com/srchulo/Mojo-mysql-Database-Role-LoadDataInfile"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Adam Hopkins <violapiratejunky@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.13",
+   "x_static_install" : 1
+}
+

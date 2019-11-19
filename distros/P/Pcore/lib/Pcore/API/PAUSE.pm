@@ -13,7 +13,7 @@ sub _build__auth_header ($self) {
     return 'Basic ' . P->data->to_b64u( encode_utf8( $self->{username} ) . q[:] . encode_utf8( $self->{password} ) ) . q[==];
 }
 
-sub upload ( $self, $path, $cb = undef ) {
+sub upload ( $self, $path ) {
     my $body;
 
     $path = P->path($path);
@@ -43,7 +43,6 @@ sub upload ( $self, $path, $cb = undef ) {
             'Content-Type' => qq[multipart/form-data; boundary=$boundary],
         ],
         data => \$body,
-        $cb // ()
     );
 }
 
@@ -132,7 +131,7 @@ sub _pack_multipart ( $self, $body, $boundary, $name, $content, $filename = unde
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 112                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 111                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

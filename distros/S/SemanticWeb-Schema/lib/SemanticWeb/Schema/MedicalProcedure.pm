@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has body_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_body_location',
     json_ld   => 'bodyLocation',
 );
 
@@ -28,7 +28,7 @@ has body_location => (
 
 has followup => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_followup',
     json_ld   => 'followup',
 );
 
@@ -36,7 +36,7 @@ has followup => (
 
 has how_performed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_how_performed',
     json_ld   => 'howPerformed',
 );
 
@@ -44,7 +44,7 @@ has how_performed => (
 
 has indication => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_indication',
     json_ld   => 'indication',
 );
 
@@ -52,7 +52,7 @@ has indication => (
 
 has outcome => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_outcome',
     json_ld   => 'outcome',
 );
 
@@ -60,7 +60,7 @@ has outcome => (
 
 has preparation => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_preparation',
     json_ld   => 'preparation',
 );
 
@@ -68,7 +68,7 @@ has preparation => (
 
 has procedure_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_procedure_type',
     json_ld   => 'procedureType',
 );
 
@@ -76,7 +76,7 @@ has procedure_type => (
 
 has status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_status',
     json_ld   => 'status',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::MedicalProcedure - A process of care used in either a diagn
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -122,6 +122,10 @@ A body_location should be one of the following types:
 
 =back
 
+=head2 C<_has_body_location>
+
+A predicate for the L</body_location> attribute.
+
 =head2 C<followup>
 
 Typical or recommended followup care after the procedure is performed.
@@ -133,6 +137,10 @@ A followup should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_followup>
+
+A predicate for the L</followup> attribute.
 
 =head2 C<how_performed>
 
@@ -147,6 +155,10 @@ A how_performed should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_how_performed>
+
+A predicate for the L</how_performed> attribute.
 
 =head2 C<indication>
 
@@ -164,6 +176,10 @@ A indication should be one of the following types:
 
 =back
 
+=head2 C<_has_indication>
+
+A predicate for the L</indication> attribute.
+
 =head2 C<outcome>
 
 Expected or actual outcomes of the study.
@@ -177,6 +193,10 @@ A outcome should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_outcome>
+
+A predicate for the L</outcome> attribute.
 
 =head2 C<preparation>
 
@@ -193,6 +213,10 @@ A preparation should be one of the following types:
 
 =back
 
+=head2 C<_has_preparation>
+
+A predicate for the L</preparation> attribute.
+
 =head2 C<procedure_type>
 
 C<procedureType>
@@ -206,6 +230,10 @@ A procedure_type should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalProcedureType']>
 
 =back
+
+=head2 C<_has_procedure_type>
+
+A predicate for the L</procedure_type> attribute.
 
 =head2 C<status>
 
@@ -222,6 +250,10 @@ A status should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_status>
+
+A predicate for the L</status> attribute.
 
 =head1 SEE ALSO
 

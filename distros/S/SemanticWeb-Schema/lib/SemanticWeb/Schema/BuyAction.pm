@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has seller => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_seller',
     json_ld   => 'seller',
 );
 
@@ -28,7 +28,7 @@ has seller => (
 
 has vendor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_vendor',
     json_ld   => 'vendor',
 );
 
@@ -36,7 +36,7 @@ has vendor => (
 
 has warranty_promise => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_warranty_promise',
     json_ld   => 'warrantyPromise',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::BuyAction - The act of giving money to a seller in exchange
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -83,6 +83,10 @@ A seller should be one of the following types:
 
 =back
 
+=head2 C<_has_seller>
+
+A predicate for the L</seller> attribute.
+
 =head2 C<vendor>
 
 'vendor' is an earlier term for 'seller'.
@@ -97,6 +101,10 @@ A vendor should be one of the following types:
 
 =back
 
+=head2 C<_has_vendor>
+
+A predicate for the L</vendor> attribute.
+
 =head2 C<warranty_promise>
 
 C<warrantyPromise>
@@ -110,6 +118,10 @@ A warranty_promise should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::WarrantyPromise']>
 
 =back
+
+=head2 C<_has_warranty_promise>
+
+A predicate for the L</warranty_promise> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has bcc_recipient => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_bcc_recipient',
     json_ld   => 'bccRecipient',
 );
 
@@ -28,7 +28,7 @@ has bcc_recipient => (
 
 has cc_recipient => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_cc_recipient',
     json_ld   => 'ccRecipient',
 );
 
@@ -36,7 +36,7 @@ has cc_recipient => (
 
 has date_read => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_read',
     json_ld   => 'dateRead',
 );
 
@@ -44,7 +44,7 @@ has date_read => (
 
 has date_received => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_received',
     json_ld   => 'dateReceived',
 );
 
@@ -52,7 +52,7 @@ has date_received => (
 
 has date_sent => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_sent',
     json_ld   => 'dateSent',
 );
 
@@ -60,7 +60,7 @@ has date_sent => (
 
 has message_attachment => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_message_attachment',
     json_ld   => 'messageAttachment',
 );
 
@@ -68,7 +68,7 @@ has message_attachment => (
 
 has recipient => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_recipient',
     json_ld   => 'recipient',
 );
 
@@ -76,7 +76,7 @@ has recipient => (
 
 has sender => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sender',
     json_ld   => 'sender',
 );
 
@@ -84,7 +84,7 @@ has sender => (
 
 has to_recipient => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_to_recipient',
     json_ld   => 'toRecipient',
 );
 
@@ -106,7 +106,7 @@ SemanticWeb::Schema::Message - A single message from a sender to one or more org
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -132,6 +132,10 @@ A bcc_recipient should be one of the following types:
 
 =back
 
+=head2 C<_has_bcc_recipient>
+
+A predicate for the L</bcc_recipient> attribute.
+
 =head2 C<cc_recipient>
 
 C<ccRecipient>
@@ -150,6 +154,10 @@ A cc_recipient should be one of the following types:
 
 =back
 
+=head2 C<_has_cc_recipient>
+
+A predicate for the L</cc_recipient> attribute.
+
 =head2 C<date_read>
 
 C<dateRead>
@@ -165,6 +173,10 @@ A date_read should be one of the following types:
 
 =back
 
+=head2 C<_has_date_read>
+
+A predicate for the L</date_read> attribute.
+
 =head2 C<date_received>
 
 C<dateReceived>
@@ -178,6 +190,10 @@ A date_received should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_date_received>
+
+A predicate for the L</date_received> attribute.
 
 =head2 C<date_sent>
 
@@ -193,6 +209,10 @@ A date_sent should be one of the following types:
 
 =back
 
+=head2 C<_has_date_sent>
+
+A predicate for the L</date_sent> attribute.
+
 =head2 C<message_attachment>
 
 C<messageAttachment>
@@ -206,6 +226,10 @@ A message_attachment should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
+
+=head2 C<_has_message_attachment>
+
+A predicate for the L</message_attachment> attribute.
 
 =head2 C<recipient>
 
@@ -226,6 +250,10 @@ A recipient should be one of the following types:
 
 =back
 
+=head2 C<_has_recipient>
+
+A predicate for the L</recipient> attribute.
+
 =head2 C<sender>
 
 A sub property of participant. The participant who is at the sending end of
@@ -242,6 +270,10 @@ A sender should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_sender>
+
+A predicate for the L</sender> attribute.
 
 =head2 C<to_recipient>
 
@@ -263,6 +295,10 @@ A to_recipient should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_to_recipient>
+
+A predicate for the L</to_recipient> attribute.
 
 =head1 SEE ALSO
 

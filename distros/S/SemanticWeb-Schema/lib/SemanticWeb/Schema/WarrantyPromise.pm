@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has duration_of_warranty => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_duration_of_warranty',
     json_ld   => 'durationOfWarranty',
 );
 
@@ -28,7 +28,7 @@ has duration_of_warranty => (
 
 has warranty_scope => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_warranty_scope',
     json_ld   => 'warrantyScope',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::WarrantyPromise - A structured value representing the durat
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -75,6 +75,10 @@ A duration_of_warranty should be one of the following types:
 
 =back
 
+=head2 C<_has_duration_of_warranty>
+
+A predicate for the L</duration_of_warranty> attribute.
+
 =head2 C<warranty_scope>
 
 C<warrantyScope>
@@ -88,6 +92,10 @@ A warranty_scope should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::WarrantyScope']>
 
 =back
+
+=head2 C<_has_warranty_scope>
+
+A predicate for the L</warranty_scope> attribute.
 
 =head1 SEE ALSO
 

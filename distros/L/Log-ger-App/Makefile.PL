@@ -32,9 +32,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0
+    "Test::Exception" => 0,
+    "Test::More" => "0.98"
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +55,8 @@ my %FallbackPrereqs = (
   "Log::ger::Output::Syslog" => 0,
   "Log::ger::Util" => "0.008",
   "PERLANCAR::File::HomeDir" => 0,
-  "Test::More" => 0,
+  "Test::Exception" => 0,
+  "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0
 );

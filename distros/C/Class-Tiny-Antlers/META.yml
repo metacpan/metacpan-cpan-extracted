@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -27,7 +27,7 @@ optional_features: {}
 provides:
   Class::Tiny::Antlers:
     file: lib/Class/Tiny/Antlers.pm
-    version: '0.023'
+    version: '0.024'
 requires:
   Class::Tiny: '0.006'
   perl: '5.006'
@@ -38,4 +38,6 @@ resources:
   homepage: https://metacpan.org/release/Class-Tiny-Antlers
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-class-tiny-antlers.git
-version: '0.023'
+version: '0.024'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

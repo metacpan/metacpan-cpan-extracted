@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has access_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_access_code',
     json_ld   => 'accessCode',
 );
 
@@ -28,7 +28,7 @@ has access_code => (
 
 has available_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_available_from',
     json_ld   => 'availableFrom',
 );
 
@@ -36,7 +36,7 @@ has available_from => (
 
 has available_through => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_available_through',
     json_ld   => 'availableThrough',
 );
 
@@ -44,7 +44,7 @@ has available_through => (
 
 has has_delivery_method => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_delivery_method',
     json_ld   => 'hasDeliveryMethod',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::DeliveryEvent - An event involving the delivery of an item.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -88,6 +88,10 @@ A access_code should be one of the following types:
 
 =back
 
+=head2 C<_has_access_code>
+
+A predicate for the L</access_code> attribute.
+
 =head2 C<available_from>
 
 C<availableFrom>
@@ -101,6 +105,10 @@ A available_from should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_available_from>
+
+A predicate for the L</available_from> attribute.
 
 =head2 C<available_through>
 
@@ -116,6 +124,10 @@ A available_through should be one of the following types:
 
 =back
 
+=head2 C<_has_available_through>
+
+A predicate for the L</available_through> attribute.
+
 =head2 C<has_delivery_method>
 
 C<hasDeliveryMethod>
@@ -129,6 +141,10 @@ A has_delivery_method should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::DeliveryMethod']>
 
 =back
+
+=head2 C<_has_has_delivery_method>
+
+A predicate for the L</has_delivery_method> attribute.
 
 =head1 SEE ALSO
 

@@ -6,8 +6,7 @@ use v5.10;
 
 use Moo 1;
 
-use MooX::Const;
-use Types::Const v0.3.6;
+use MooX::Const v0.4.0;
 use List::Util 1.33 qw/ first none /;
 use Net::DNS::Resolver;
 use Types::Standard -types;
@@ -17,7 +16,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.5';
+our $VERSION = 'v0.1.6';
 
 
 has resolver => (
@@ -41,6 +40,7 @@ has robots => (
         ]
     ],
     lazy    => 1,
+    strict  => 0,
     builder => 1,
 );
 
@@ -95,6 +95,12 @@ sub _build_robots {
             name   => 'Pinterest',
             agent  => qr/\bPinterest\b/,
             domain => qr/\.pinterest\.com$/,
+        },
+
+        {
+            name   => 'SeznamBot',
+            agent  => qr/\bSeznam\b/,
+            domain => qr/\.seznam\.cz$/,
         },
 
         {
@@ -200,7 +206,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.1.5
+version v0.1.6
 
 =head1 SYNOPSIS
 
@@ -317,7 +323,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

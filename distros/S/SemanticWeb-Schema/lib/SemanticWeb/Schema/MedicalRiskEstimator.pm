@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has estimates_risk_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_estimates_risk_of',
     json_ld   => 'estimatesRiskOf',
 );
 
@@ -28,7 +28,7 @@ has estimates_risk_of => (
 
 has included_risk_factor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_included_risk_factor',
     json_ld   => 'includedRiskFactor',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::MedicalRiskEstimator - Any rule set or interactive tool for
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,10 @@ A estimates_risk_of should be one of the following types:
 
 =back
 
+=head2 C<_has_estimates_risk_of>
+
+A predicate for the L</estimates_risk_of> attribute.
+
 =head2 C<included_risk_factor>
 
 C<includedRiskFactor>
@@ -87,6 +91,10 @@ A included_risk_factor should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalRiskFactor']>
 
 =back
+
+=head2 C<_has_included_risk_factor>
+
+A predicate for the L</included_risk_factor> attribute.
 
 =head1 SEE ALSO
 

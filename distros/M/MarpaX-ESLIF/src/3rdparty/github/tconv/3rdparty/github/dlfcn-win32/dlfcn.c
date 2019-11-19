@@ -24,15 +24,12 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #endif
-#define PSAPI_VERSION 1
 #include <windows.h>
-#include <psapi.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifdef _MSC_VER
 /* https://docs.microsoft.com/en-us/cpp/intrinsics/returnaddress */
-#include <intrin.h>
 #pragma intrinsic(_ReturnAddress)
 #else
 /* https://gcc.gnu.org/onlinedocs/gcc/Return-Address.html */
@@ -45,19 +42,6 @@
 #define DLFCN_WIN32_EXPORTS
 #endif
 #include "dlfcn.h"
-
-#if ((defined(_WIN32) || defined(WIN32)) && (defined(_MSC_VER)) )
-#define snprintf sprintf_s
-#endif
-
-#ifdef UNICODE
-#include <wchar.h>
-#define CHAR	wchar_t
-#define UNICODE_L(s)	L##s
-#else
-#define CHAR	char
-#define UNICODE_L(s)	s
-#endif
 
 /* Note:
  * MSDN says these functions are not thread-safe. We make no efforts to have
@@ -87,34 +71,36 @@ static local_object *local_search( HMODULE hModule )
     return NULL;
 }
 
-static void local_add( HMODULE hModule )
+static BOOL local_add( HMODULE hModule )
 {
     local_object *pobject;
     local_object *nobject;
 
     if( hModule == NULL )
-        return;
+        return TRUE;
 
     pobject = local_search( hModule );
 
     /* Do not add object again if it's already on the list */
     if( pobject )
-        return;
+        return TRUE;
 
     for( pobject = &first_object; pobject->next; pobject = pobject->next );
 
     nobject = (local_object*) malloc( sizeof( local_object ) );
 
-    /* Should this be enough to fail local_add, and therefore also fail
-     * dlopen?
-     */
     if( !nobject )
-        return;
+    {
+        SetLastError( ERROR_NOT_ENOUGH_MEMORY );
+        return FALSE;
+    }
 
     pobject->next = nobject;
     nobject->next = NULL;
     nobject->previous = pobject;
     nobject->hModule = hModule;
+
+    return TRUE;
 }
 
 static void local_rem( HMODULE hModule )
@@ -142,49 +128,44 @@ static void local_rem( HMODULE hModule )
  * MSDN says the buffer cannot be larger than 64K bytes, so we set it to
  * the limit.
  */
-static CHAR error_buffer[65535];
-static CHAR *current_error;
-static char dlerror_buffer[65536];
+static char error_buffer[65535];
+static BOOL error_occurred;
 
-static int copy_string( CHAR *dest, int dest_size, const CHAR *src )
-{
-    int i = 0;
-
-    /* gcc should optimize this out */
-    if( !src || !dest )
-        return 0;
-
-    for( i = 0 ; i < dest_size-1 ; i++ )
-    {
-        if( !src[i] )
-            break;
-        else
-            dest[i] = src[i];
-    }
-    dest[i] = '\0';
-
-    return i;
-}
-
-static void save_err_str( const CHAR *str )
+static void save_err_str( const char *str )
 {
     DWORD dwMessageId;
-    DWORD pos;
+    DWORD ret;
+    size_t pos, len;
 
     dwMessageId = GetLastError( );
 
     if( dwMessageId == 0 )
         return;
 
+    len = strlen( str );
+    if( len > sizeof( error_buffer ) - 5 )
+        len = sizeof( error_buffer ) - 5;
+
     /* Format error message to:
      * "<argument to function that failed>": <Windows localized error message>
       */
-    pos  = copy_string( error_buffer,     sizeof(error_buffer),     UNICODE_L("\"") );
-    pos += copy_string( error_buffer+pos, sizeof(error_buffer)-pos, str );
-    pos += copy_string( error_buffer+pos, sizeof(error_buffer)-pos, UNICODE_L("\": ") );
-    pos += FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwMessageId,
+    pos = 0;
+    error_buffer[pos++] = '"';
+    memcpy( error_buffer+pos, str, len );
+    pos += len;
+    error_buffer[pos++] = '"';
+    error_buffer[pos++] = ':';
+    error_buffer[pos++] = ' ';
+
+    ret = FormatMessageA( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, dwMessageId,
         MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-        error_buffer+pos, sizeof(error_buffer)-pos, NULL );
+        error_buffer+pos, (DWORD) (sizeof(error_buffer)-pos), NULL );
+    pos += ret;
+
+    /* When FormatMessageA() fails it returns zero and does not touch buffer
+     * so add trailing null byte */
+    if( ret == 0 )
+        error_buffer[pos] = '\0';
 
     if( pos > 1 )
     {
@@ -193,26 +174,38 @@ static void save_err_str( const CHAR *str )
             error_buffer[pos-2] = '\0';
     }
 
-    current_error = error_buffer;
+    error_occurred = TRUE;
 }
 
 static void save_err_ptr_str( const void *ptr )
 {
-    CHAR ptr_buf[19]; /* 0x<pointer> up to 64 bits. */
+    char ptr_buf[19]; /* 0x<pointer> up to 64 bits. */
 
-#ifdef UNICODE
-
-#	if ((defined(_WIN32) || defined(WIN32)) && (defined(_MSC_VER)) )
-    swprintf_s( ptr_buf, 19, UNICODE_L("0x%p"), ptr );
-#	else
-    swprintf(ptr_buf, 19, UNICODE_L("0x%p"), ptr);
-#	endif
-
-#else
-    snprintf( ptr_buf, 19, "0x%p", ptr );
+#ifdef _MSC_VER
+/* Supress warning C4996: 'sprintf': This function or variable may be unsafe */
+#pragma warning( suppress: 4996 )
 #endif
+    sprintf( ptr_buf, "0x%p", ptr );
 
     save_err_str( ptr_buf );
+}
+
+/* Load Psapi.dll at runtime, this avoids linking caveat */
+static BOOL MyEnumProcessModules( HANDLE hProcess, HMODULE *lphModule, DWORD cb, LPDWORD lpcbNeeded )
+{
+    static BOOL (WINAPI *EnumProcessModulesPtr)(HANDLE, HMODULE *, DWORD, LPDWORD);
+    HMODULE psapi;
+
+    if( !EnumProcessModulesPtr )
+    {
+        psapi = LoadLibraryA( "Psapi.dll" );
+        if( psapi )
+            EnumProcessModulesPtr = (BOOL (WINAPI *)(HANDLE, HMODULE *, DWORD, LPDWORD)) GetProcAddress( psapi, "EnumProcessModules" );
+        if( !EnumProcessModulesPtr )
+            return 0;
+    }
+
+    return EnumProcessModulesPtr( hProcess, lphModule, cb, lpcbNeeded );
 }
 
 void *dlopen( const char *file, int mode )
@@ -220,7 +213,7 @@ void *dlopen( const char *file, int mode )
     HMODULE hModule;
     UINT uMode;
 
-    current_error = NULL;
+    error_occurred = FALSE;
 
     /* Do not let Windows display the critical-error-handler message box */
     uMode = SetErrorMode( SEM_FAILCRITICALERRORS );
@@ -232,10 +225,10 @@ void *dlopen( const char *file, int mode )
          * all symbols from the original program file, and any objects loaded
          * with the RTLD_GLOBAL flag.
          * The return value from GetModuleHandle( ) allows us to retrieve
-         * symbols only from the original program file. For objects loaded with
-         * the RTLD_GLOBAL flag, we create our own list later on. For objects
-         * outside of the program file but already loaded (e.g. linked DLLs)
-         * they are added below.
+         * symbols only from the original program file. EnumProcessModules() is
+         * used to access symbols from other libraries. For objects loaded
+         * with the RTLD_LOCAL flag, we create our own list later on. They are
+         * excluded from EnumProcessModules() iteration.
          */
         hModule = GetModuleHandle( NULL );
 
@@ -246,52 +239,74 @@ void *dlopen( const char *file, int mode )
     {
         HANDLE hCurrentProc;
         DWORD dwProcModsBefore, dwProcModsAfter;
-        CHAR lpFileName[MAX_PATH];
-        size_t i;
+        char lpFileName[MAX_PATH];
+        size_t i, len;
 
-        /* MSDN says backslashes *must* be used instead of forward slashes. */
-        for( i = 0 ; i < sizeof(lpFileName) - 1 ; i ++ )
+        len = strlen( file );
+
+        if( len >= sizeof( lpFileName ) )
         {
-            if( !file[i] )
-                break;
-            else if( file[i] == '/' )
-                lpFileName[i] = '\\';
-            else
-                lpFileName[i] = file[i];
+            SetLastError( ERROR_FILENAME_EXCED_RANGE );
+            save_err_str( file );
+            hModule = NULL;
         }
-        lpFileName[i] = '\0';
+        else
+        {
+            /* MSDN says backslashes *must* be used instead of forward slashes. */
+            for( i = 0; i < len; i++ )
+            {
+                if( file[i] == '/' )
+                    lpFileName[i] = '\\';
+                else
+                    lpFileName[i] = file[i];
+            }
+            lpFileName[len] = '\0';
 
-        hCurrentProc = GetCurrentProcess( );
+            hCurrentProc = GetCurrentProcess( );
 
-        if( EnumProcessModules( hCurrentProc, NULL, 0, &dwProcModsBefore ) == 0 )
-            dwProcModsBefore = 0;
+            if( MyEnumProcessModules( hCurrentProc, NULL, 0, &dwProcModsBefore ) == 0 )
+                dwProcModsBefore = 0;
 
-        /* POSIX says the search path is implementation-defined.
-         * LOAD_WITH_ALTERED_SEARCH_PATH is used to make it behave more closely
-         * to UNIX's search paths (start with system folders instead of current
-         * folder).
-         */
-        hModule = LoadLibraryEx(lpFileName, NULL, 
-                                LOAD_WITH_ALTERED_SEARCH_PATH );
+            /* POSIX says the search path is implementation-defined.
+             * LOAD_WITH_ALTERED_SEARCH_PATH is used to make it behave more closely
+             * to UNIX's search paths (start with system folders instead of current
+             * folder).
+             */
+            hModule = LoadLibraryExA( lpFileName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
 
-        if( EnumProcessModules( hCurrentProc, NULL, 0, &dwProcModsAfter ) == 0 )
-            dwProcModsAfter = 0;
+            if( !hModule )
+            {
+                save_err_str( lpFileName );
+            }
+            else
+            {
+                if( MyEnumProcessModules( hCurrentProc, NULL, 0, &dwProcModsAfter ) == 0 )
+                    dwProcModsAfter = 0;
 
-        /* If the object was loaded with RTLD_LOCAL, add it to list of local
-         * objects, so that its symbols cannot be retrieved even if the handle for
-         * the original program file is passed. POSIX says that if the same
-         * file is specified in multiple invocations, and any of them are
-         * RTLD_GLOBAL, even if any further invocations use RTLD_LOCAL, the
-         * symbols will remain global. If number of loaded modules was not
-         * changed after calling LoadLibraryEx(), it means that library was
-         * already loaded.
-         */
-        if( !hModule )
-            save_err_str( lpFileName );
-        else if( (mode & RTLD_LOCAL) && dwProcModsBefore != dwProcModsAfter )
-            local_add( hModule );
-        else if( !(mode & RTLD_LOCAL) && dwProcModsBefore == dwProcModsAfter )
-            local_rem( hModule );
+                /* If the object was loaded with RTLD_LOCAL, add it to list of local
+                 * objects, so that its symbols cannot be retrieved even if the handle for
+                 * the original program file is passed. POSIX says that if the same
+                 * file is specified in multiple invocations, and any of them are
+                 * RTLD_GLOBAL, even if any further invocations use RTLD_LOCAL, the
+                 * symbols will remain global. If number of loaded modules was not
+                 * changed after calling LoadLibraryEx(), it means that library was
+                 * already loaded.
+                 */
+                if( (mode & RTLD_LOCAL) && dwProcModsBefore != dwProcModsAfter )
+                {
+                    if( !local_add( hModule ) )
+                    {
+                        save_err_str( lpFileName );
+                        FreeLibrary( hModule );
+                        hModule = NULL;
+                    }
+                }
+                else if( !(mode & RTLD_LOCAL) && dwProcModsBefore == dwProcModsAfter )
+                {
+                    local_rem( hModule );
+                }
+            }
+        }
     }
 
     /* Return to previous state of the error-mode bit flags. */
@@ -305,7 +320,7 @@ int dlclose( void *handle )
     HMODULE hModule = (HMODULE) handle;
     BOOL ret;
 
-    current_error = NULL;
+    error_occurred = FALSE;
 
     ret = FreeLibrary( hModule );
 
@@ -331,12 +346,8 @@ void *dlsym( void *handle, const char *name )
     HMODULE hModule;
     HANDLE hCurrentProc;
 
-#ifdef UNICODE
-    wchar_t namew[MAX_PATH];
-    wmemset(namew, 0, MAX_PATH);
-#endif
+    error_occurred = FALSE;
 
-    current_error = NULL;
     symbol = NULL;
     hCaller = NULL;
     hModule = GetModuleHandle( NULL );
@@ -365,10 +376,17 @@ void *dlsym( void *handle, const char *name )
         size_t sLen;
         sLen = VirtualQueryEx( hCurrentProc, _ReturnAddress(), &info, sizeof( info ) );
         if( sLen != sizeof( info ) )
+        {
+            if( sLen != 0 )
+                SetLastError( ERROR_INVALID_PARAMETER );
             goto end;
+        }
         hCaller = (HMODULE) info.AllocationBase;
-        if(!hCaller)
+        if( !hCaller )
+        {
+            SetLastError( ERROR_INVALID_PARAMETER );
             goto end;
+        }
     }
 
     if( handle != RTLD_NEXT )
@@ -394,12 +412,12 @@ void *dlsym( void *handle, const char *name )
          * if we want to get ALL loaded module including those in linked DLLs,
          * we have to use EnumProcessModules( ).
          */
-        if( EnumProcessModules( hCurrentProc, NULL, 0, &dwSize ) != 0 )
+        if( MyEnumProcessModules( hCurrentProc, NULL, 0, &dwSize ) != 0 )
         {
             modules = malloc( dwSize );
             if( modules )
             {
-                if( EnumProcessModules( hCurrentProc, modules, dwSize, &cbNeeded ) != 0 && dwSize == cbNeeded )
+                if( MyEnumProcessModules( hCurrentProc, modules, dwSize, &cbNeeded ) != 0 && dwSize == cbNeeded )
                 {
                     for( i = 0; i < dwSize / sizeof( HMODULE ); i++ )
                     {
@@ -420,75 +438,37 @@ void *dlsym( void *handle, const char *name )
                 }
                 free( modules );
             }
+            else
+            {
+                SetLastError( ERROR_NOT_ENOUGH_MEMORY );
+                goto end;
+            }
         }
     }
 
 end:
     if( symbol == NULL )
     {
-#ifdef UNICODE
-        size_t converted_chars;
-
-        size_t str_len = strlen(name) + 1;
-
-#if ((defined(_WIN32) || defined(WIN32)) && (defined(_MSC_VER)) )
-        errno_t err = mbstowcs_s(&converted_chars, namew, str_len, name, str_len);
-        if (err != 0)
-            return NULL;
-#else
-        mbstowcs(namew, name, str_len);
-#endif
-
-        save_err_str( namew );
-#else
+        if( GetLastError() == 0 )
+            SetLastError( ERROR_PROC_NOT_FOUND );
         save_err_str( name );
-#endif
     }
 
-    //  warning C4054: 'type cast' : from function pointer 'FARPROC' to data pointer 'void *'
-#ifdef _MSC_VER
-#pragma warning( suppress: 4054 )
-#endif
-    return (void*) symbol;
+    return *(void **) (&symbol);
 }
 
 char *dlerror( void )
 {
-    char *error_pointer = dlerror_buffer;
-    
     /* If this is the second consecutive call to dlerror, return NULL */
-    if (current_error == NULL)
-    {
+    if( !error_occurred )
         return NULL;
-    }
-
-#ifdef UNICODE
-    errno_t err = 0;
-    size_t converted_chars = 0;
-    size_t str_len = wcslen(current_error) + 1;
-    memset(error_pointer, 0, 65535);
-
-#	if ((defined(_WIN32) || defined(WIN32)) && (defined(_MSC_VER)) )
-    err = wcstombs_s(&converted_chars, 
-        error_pointer, str_len * sizeof(char),
-        current_error, str_len * sizeof(wchar_t));
-
-    if (err != 0)
-        return NULL;
-#	else
-    wcstombs(error_pointer, current_error, str_len);
-#	endif
-
-#else
-    memcpy(error_pointer, current_error, strlen(current_error) + 1);
-#endif
 
     /* POSIX says that invoking dlerror( ) a second time, immediately following
      * a prior invocation, shall result in NULL being returned.
      */
-    current_error = NULL;
+    error_occurred = FALSE;
 
-    return error_pointer;
+    return error_buffer;
 }
 
 #ifdef SHARED

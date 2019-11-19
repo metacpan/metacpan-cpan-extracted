@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has blog_post => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_blog_post',
     json_ld   => 'blogPost',
 );
 
@@ -28,7 +28,7 @@ has blog_post => (
 
 has blog_posts => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_blog_posts',
     json_ld   => 'blogPosts',
 );
 
@@ -36,7 +36,7 @@ has blog_posts => (
 
 has issn => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_issn',
     json_ld   => 'issn',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::Blog - A blog.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -80,6 +80,10 @@ A blog_post should be one of the following types:
 
 =back
 
+=head2 C<_has_blog_post>
+
+A predicate for the L</blog_post> attribute.
+
 =head2 C<blog_posts>
 
 C<blogPosts>
@@ -94,6 +98,10 @@ A blog_posts should be one of the following types:
 
 =back
 
+=head2 C<_has_blog_posts>
+
+A predicate for the L</blog_posts> attribute.
+
 =head2 C<issn>
 
 The International Standard Serial Number (ISSN) that identifies this serial
@@ -107,6 +115,10 @@ A issn should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_issn>
+
+A predicate for the L</issn> attribute.
 
 =head1 SEE ALSO
 

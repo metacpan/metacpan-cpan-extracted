@@ -379,7 +379,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 our $DEBUG = 0;
 
 require Exporter;
@@ -409,7 +409,7 @@ sub new
 	push @args, ('-debug', $DEBUG)  if ($DEBUG);
 	if ($haveit{'BannedVideo'} && $url =~ m#\bbanned\.video\/#) {
 		return new StreamFinder::BannedVideo($url, @args);
-	} elsif ($haveit{'IHeartRadio'} && $url =~ m#\biheart\.com\/#) {
+	} elsif ($haveit{'IHeartRadio'} && $url =~ m#\biheart(?:radio)?\.#i) {
 #		return new StreamFinder::IHeartRadio($url, 'secure_shoutcast', 'secure', 'any', '!rtmp', @args); #DEPRECIATED, USE CONFIG FILE!
 		return new StreamFinder::IHeartRadio($url, @args);
 	} elsif ($haveit{'Tunein'} && $url =~ m#\btunein\.com\/#) {  #NOTE:ALSO USES youtube-dl!

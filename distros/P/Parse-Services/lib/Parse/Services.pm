@@ -1,7 +1,7 @@
 package Parse::Services;
 
-our $DATE = '2016-10-26'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-11-19'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,7 +14,7 @@ our %SPEC;
 
 $SPEC{parse_services} = {
     v => 1.1,
-    summary => 'Parse /etc/hosts',
+    summary => 'Parse /etc/services',
     args => {
         content => {
             summary => 'Content of /etc/services file',
@@ -58,7 +58,7 @@ sub parse_services {
 }
 
 1;
-# ABSTRACT: Parse /etc/hosts
+# ABSTRACT: Parse /etc/services
 
 __END__
 
@@ -68,11 +68,11 @@ __END__
 
 =head1 NAME
 
-Parse::Services - Parse /etc/hosts
+Parse::Services - Parse /etc/services
 
 =head1 VERSION
 
-This document describes version 0.001 of Parse::Services (from Perl distribution Parse-Services), released on 2016-10-26.
+This document describes version 0.002 of Parse::Services (from Perl distribution Parse-Services), released on 2019-11-19.
 
 =head1 SYNOPSIS
 
@@ -82,9 +82,13 @@ This document describes version 0.001 of Parse::Services (from Perl distribution
 =head1 FUNCTIONS
 
 
-=head2 parse_services(%args) -> [status, msg, result, meta]
+=head2 parse_services
 
-Parse /etc/hosts.
+Usage:
+
+ parse_services(%args) -> [status, msg, payload, meta]
+
+Parse /etc/services.
 
 This function is not exported by default, but exportable.
 
@@ -105,7 +109,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -137,7 +141,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

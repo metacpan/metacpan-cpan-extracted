@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has item_reviewed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_item_reviewed',
     json_ld   => 'itemReviewed',
 );
 
@@ -28,7 +28,7 @@ has item_reviewed => (
 
 has rating_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_rating_count',
     json_ld   => 'ratingCount',
 );
 
@@ -36,7 +36,7 @@ has rating_count => (
 
 has review_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_review_count',
     json_ld   => 'reviewCount',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::AggregateRating - The average rating based on multiple rati
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -80,6 +80,10 @@ A item_reviewed should be one of the following types:
 
 =back
 
+=head2 C<_has_item_reviewed>
+
+A predicate for the L</item_reviewed> attribute.
+
 =head2 C<rating_count>
 
 C<ratingCount>
@@ -94,6 +98,10 @@ A rating_count should be one of the following types:
 
 =back
 
+=head2 C<_has_rating_count>
+
+A predicate for the L</rating_count> attribute.
+
 =head2 C<review_count>
 
 C<reviewCount>
@@ -107,6 +115,10 @@ A review_count should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_review_count>
+
+A predicate for the L</review_count> attribute.
 
 =head1 SEE ALSO
 

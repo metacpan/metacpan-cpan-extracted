@@ -1,3 +1,4 @@
+requires "Carp" => "0";
 requires "Exporter" => "5.71";
 requires "File::Which" => "1.09";
 requires "FindBin" => "1.50";

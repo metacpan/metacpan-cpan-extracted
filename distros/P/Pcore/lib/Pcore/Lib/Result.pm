@@ -17,35 +17,30 @@ const our $STATUS_CATEGORY => [    #
     'Server Error',                # 5xx
 ];
 
-sub update ($cb = undef) {
+sub update {
     print 'updating status.yaml ... ';
 
-    return P->http->get(
-        'https://www.iana.org/assignments/http-status-codes/http-status-codes-1.csv',
-        sub ($res) {
-            if ($res) {
-                my $data;
+    my $res = P->http->get('https://www.iana.org/assignments/http-status-codes/http-status-codes-1.csv');
 
-                for my $line ( split /\n\r?/sm, $res->{data}->$* ) {
-                    my ( $status, $reason ) = split /,/sm, $line;
+    if ($res) {
+        my $data;
 
-                    $data->{$status} = $reason if $status =~ /\A\d\d\d\z/sm;
-                }
+        for my $line ( split /\n\r?/sm, $res->{data}->$* ) {
+            my ( $status, $reason ) = split /,/sm, $line;
 
-                local $YAML::XS::QuoteNumericStrings = 0;
-
-                $ENV->{share}->write( '/Pcore/data/status.yaml', $data );
-
-                $STATUS_REASON = $data;
-            }
-
-            say $res;
-
-            $cb->($res) if $cb;
-
-            return $res;
+            $data->{$status} = $reason if $status =~ /\A\d\d\d\z/sm;
         }
-    );
+
+        local $YAML::XS::QuoteNumericStrings = 0;
+
+        $ENV->{share}->write( '/Pcore/data/status.yaml', $data );
+
+        $STATUS_REASON = $data;
+    }
+
+    say $res;
+
+    return $res;
 }
 
 sub _load_data {
@@ -95,10 +90,10 @@ sub resolve_reason ( $status, $status_reason = undef ) {
     if    ( $status_reason && $status_reason->{$status} ) { return $status_reason->{$status} }
     elsif ( exists $STATUS_REASON->{$status} )            { return $STATUS_REASON->{$status} }
     elsif ( $status < 200 )                               { return $STATUS_CATEGORY->[1] }
-    elsif ( $status >= 200 && $status < 300 ) { return $STATUS_CATEGORY->[2] }
-    elsif ( $status >= 300 && $status < 400 ) { return $STATUS_CATEGORY->[3] }
-    elsif ( $status >= 400 && $status < 500 ) { return $STATUS_CATEGORY->[4] }
-    else                                      { return $STATUS_CATEGORY->[5] }
+    elsif ( $status >= 200 && $status < 300 )             { return $STATUS_CATEGORY->[2] }
+    elsif ( $status >= 300 && $status < 400 )             { return $STATUS_CATEGORY->[3] }
+    elsif ( $status >= 400 && $status < 500 )             { return $STATUS_CATEGORY->[4] }
+    else                                                  { return $STATUS_CATEGORY->[5] }
 }
 
 1;

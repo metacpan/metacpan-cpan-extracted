@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has result_review => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_result_review',
     json_ld   => 'resultReview',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::ReviewAction - The act of producing a balanced opinion abou
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -65,6 +65,10 @@ A result_review should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Review']>
 
 =back
+
+=head2 C<_has_result_review>
+
+A predicate for the L</result_review> attribute.
 
 =head1 SEE ALSO
 

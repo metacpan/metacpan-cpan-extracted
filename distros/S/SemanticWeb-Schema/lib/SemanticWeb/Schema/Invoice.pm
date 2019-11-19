@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has account_id => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_account_id',
     json_ld   => 'accountId',
 );
 
@@ -28,7 +28,7 @@ has account_id => (
 
 has billing_period => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_billing_period',
     json_ld   => 'billingPeriod',
 );
 
@@ -36,7 +36,7 @@ has billing_period => (
 
 has broker => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broker',
     json_ld   => 'broker',
 );
 
@@ -44,7 +44,7 @@ has broker => (
 
 has category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_category',
     json_ld   => 'category',
 );
 
@@ -52,7 +52,7 @@ has category => (
 
 has confirmation_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_confirmation_number',
     json_ld   => 'confirmationNumber',
 );
 
@@ -60,7 +60,7 @@ has confirmation_number => (
 
 has customer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_customer',
     json_ld   => 'customer',
 );
 
@@ -68,7 +68,7 @@ has customer => (
 
 has minimum_payment_due => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_minimum_payment_due',
     json_ld   => 'minimumPaymentDue',
 );
 
@@ -76,7 +76,7 @@ has minimum_payment_due => (
 
 has payment_due => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payment_due',
     json_ld   => 'paymentDue',
 );
 
@@ -84,7 +84,7 @@ has payment_due => (
 
 has payment_due_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payment_due_date',
     json_ld   => 'paymentDueDate',
 );
 
@@ -92,7 +92,7 @@ has payment_due_date => (
 
 has payment_method => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payment_method',
     json_ld   => 'paymentMethod',
 );
 
@@ -100,7 +100,7 @@ has payment_method => (
 
 has payment_method_id => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payment_method_id',
     json_ld   => 'paymentMethodId',
 );
 
@@ -108,7 +108,7 @@ has payment_method_id => (
 
 has payment_status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payment_status',
     json_ld   => 'paymentStatus',
 );
 
@@ -116,7 +116,7 @@ has payment_status => (
 
 has provider => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_provider',
     json_ld   => 'provider',
 );
 
@@ -124,7 +124,7 @@ has provider => (
 
 has references_order => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_references_order',
     json_ld   => 'referencesOrder',
 );
 
@@ -132,7 +132,7 @@ has references_order => (
 
 has scheduled_payment_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_scheduled_payment_date',
     json_ld   => 'scheduledPaymentDate',
 );
 
@@ -140,7 +140,7 @@ has scheduled_payment_date => (
 
 has total_payment_due => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_total_payment_due',
     json_ld   => 'totalPaymentDue',
 );
 
@@ -162,7 +162,7 @@ SemanticWeb::Schema::Invoice - A statement of the money due for goods or service
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -184,6 +184,10 @@ A account_id should be one of the following types:
 
 =back
 
+=head2 C<_has_account_id>
+
+A predicate for the L</account_id> attribute.
+
 =head2 C<billing_period>
 
 C<billingPeriod>
@@ -197,6 +201,10 @@ A billing_period should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
+
+=head2 C<_has_billing_period>
+
+A predicate for the L</billing_period> attribute.
 
 =head2 C<broker>
 
@@ -215,6 +223,10 @@ A broker should be one of the following types:
 
 =back
 
+=head2 C<_has_broker>
+
+A predicate for the L</broker> attribute.
+
 =head2 C<category>
 
 A category for the item. Greater signs or slashes can be used to informally
@@ -232,6 +244,10 @@ A category should be one of the following types:
 
 =back
 
+=head2 C<_has_category>
+
+A predicate for the L</category> attribute.
+
 =head2 C<confirmation_number>
 
 C<confirmationNumber>
@@ -246,6 +262,10 @@ A confirmation_number should be one of the following types:
 
 =back
 
+=head2 C<_has_confirmation_number>
+
+A predicate for the L</confirmation_number> attribute.
+
 =head2 C<customer>
 
 Party placing the order or paying the invoice.
@@ -259,6 +279,10 @@ A customer should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_customer>
+
+A predicate for the L</customer> attribute.
 
 =head2 C<minimum_payment_due>
 
@@ -276,6 +300,10 @@ A minimum_payment_due should be one of the following types:
 
 =back
 
+=head2 C<_has_minimum_payment_due>
+
+A predicate for the L</minimum_payment_due> attribute.
+
 =head2 C<payment_due>
 
 C<paymentDue>
@@ -289,6 +317,10 @@ A payment_due should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_payment_due>
+
+A predicate for the L</payment_due> attribute.
 
 =head2 C<payment_due_date>
 
@@ -304,6 +336,10 @@ A payment_due_date should be one of the following types:
 
 =back
 
+=head2 C<_has_payment_due_date>
+
+A predicate for the L</payment_due_date> attribute.
+
 =head2 C<payment_method>
 
 C<paymentMethod>
@@ -317,6 +353,10 @@ A payment_method should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::PaymentMethod']>
 
 =back
+
+=head2 C<_has_payment_method>
+
+A predicate for the L</payment_method> attribute.
 
 =head2 C<payment_method_id>
 
@@ -332,6 +372,10 @@ A payment_method_id should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_payment_method_id>
+
+A predicate for the L</payment_method_id> attribute.
 
 =head2 C<payment_status>
 
@@ -349,6 +393,10 @@ A payment_status should be one of the following types:
 
 =back
 
+=head2 C<_has_payment_status>
+
+A predicate for the L</payment_status> attribute.
+
 =head2 C<provider>
 
 The service provider, service operator, or service performer; the goods
@@ -365,6 +413,10 @@ A provider should be one of the following types:
 
 =back
 
+=head2 C<_has_provider>
+
+A predicate for the L</provider> attribute.
+
 =head2 C<references_order>
 
 C<referencesOrder>
@@ -380,6 +432,10 @@ A references_order should be one of the following types:
 
 =back
 
+=head2 C<_has_references_order>
+
+A predicate for the L</references_order> attribute.
+
 =head2 C<scheduled_payment_date>
 
 C<scheduledPaymentDate>
@@ -393,6 +449,10 @@ A scheduled_payment_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_scheduled_payment_date>
+
+A predicate for the L</scheduled_payment_date> attribute.
 
 =head2 C<total_payment_due>
 
@@ -409,6 +469,10 @@ A total_payment_due should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
 
 =back
+
+=head2 C<_has_total_payment_due>
+
+A predicate for the L</total_payment_due> attribute.
 
 =head1 SEE ALSO
 

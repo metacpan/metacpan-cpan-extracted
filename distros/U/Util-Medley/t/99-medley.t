@@ -12,6 +12,6 @@ my $medley = Util::Medley->new;
 ok($medley);
 
 my $dt = $medley->DateTime;
-ok( $dt->localdatetime);
+ok( $dt->localDateTime);
 
 done_testing;

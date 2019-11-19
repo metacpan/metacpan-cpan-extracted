@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has course_mode => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_course_mode',
     json_ld   => 'courseMode',
 );
 
@@ -28,7 +28,7 @@ has course_mode => (
 
 has course_workload => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_course_workload',
     json_ld   => 'courseWorkload',
 );
 
@@ -36,7 +36,7 @@ has course_workload => (
 
 has instructor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_instructor',
     json_ld   => 'instructor',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::CourseInstance - An instance of a Course which is distinct 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -87,6 +87,10 @@ A course_mode should be one of the following types:
 
 =back
 
+=head2 C<_has_course_mode>
+
+A predicate for the L</course_mode> attribute.
+
 =head2 C<course_workload>
 
 C<courseWorkload>
@@ -104,6 +108,10 @@ A course_workload should be one of the following types:
 
 =back
 
+=head2 C<_has_course_workload>
+
+A predicate for the L</course_workload> attribute.
+
 =head2 C<instructor>
 
 =for html <p>A person assigned to instruct or provide instructional assistance for
@@ -117,6 +125,10 @@ A instructor should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_instructor>
+
+A predicate for the L</instructor> attribute.
 
 =head1 SEE ALSO
 

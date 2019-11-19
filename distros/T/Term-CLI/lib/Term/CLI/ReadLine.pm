@@ -20,13 +20,13 @@
 
 use 5.014_001;
 
-package Term::CLI::ReadLine  0.051005 {
+package Term::CLI::ReadLine  0.051007 {
 
 use Modern::Perl 1.20140107;
 
-use parent 0.228 qw( Term::ReadLine );
+use Carp qw( confess );
 
-use Term::ReadLine::Gnu;
+use parent 0.228 qw( Term::ReadLine );
 
 use namespace::clean 0.25;
 
@@ -35,6 +35,20 @@ my $Term = undef;
 sub new {
     my $class = shift;
     $Term = Term::ReadLine->new(@_);
+    my $rlmodule = lc $Term->ReadLine =~ s/.*Term::ReadLine:://r;
+    if ($rlmodule ne 'gnu') {
+        my $err = "** No 'Term::ReadLine::Gnu' support loaded\n";
+        if ($::ENV{PERL_RL} && lc $::ENV{PERL_RL} ne 'gnu') {
+            $err .= "** Either unset the PERL_RL environment"
+                 .  " variable or set it to 'Gnu'\n";
+        }
+        else {
+            $err .= "** Make sure the Term::ReadLine::Gnu module is installed"
+                 .  " and either unset the\n"
+                 .  "** PERL_RL environment variable or set it to 'Gnu'\n";
+        }
+        confess $err;
+    }
     return bless $Term, $class;
 }
 
@@ -66,7 +80,7 @@ Term::CLI::ReadLine - maintain a single Term::ReadLine object
 
 =head1 VERSION
 
-version 0.051005
+version 0.051007
 
 =head1 SYNOPSIS
 
@@ -102,12 +116,18 @@ instance around with a class accessor to access that single instance.
 =item B<new> ( ... )
 X<new>
 
-Create a new Term::CLI::ReadLine object and return a reference to it.
-Arguments are identical to L<Term::ReadLine>(3p) and L<Term::ReadLine::Gnu>(3p).
+Create a new L<Term::CLI::ReadLine>(3p) object and return a reference to it.
 
-A reference to the newly created object is stored internally and can be retrieved
-later with the L<term|/term> class method. Note that repeated calls to C<new> will
-reset this internal reference.
+ Check that the newly created newly created L<Term::ReadLine> object is
+ of the L<Term::ReadLine::Gnu>(3p) variety. If not, it will call throw a fatal
+ exception (using L<Carp::confess|Carp/confess>).
+
+Arguments are identical to L<Term::ReadLine>(3p) and
+L<Term::ReadLine::Gnu>(3p).
+
+A reference to the newly created object is stored internally and can be
+retrieved later with the L<term|/term> class method. Note that repeated calls
+to C<new> will reset this internal reference.
 
 =back
 

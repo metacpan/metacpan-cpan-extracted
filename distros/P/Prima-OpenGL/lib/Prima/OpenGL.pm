@@ -9,7 +9,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 sub dl_load_flags { 0x01 };
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 @EXPORT = qw();
 @EXPORT_OK = qw();
 %EXPORT_TAGS = ();
@@ -464,6 +464,10 @@ re-creation of GL-capable widgets takes place.
 
 On Win32, re-creation of GL context on same window won't work
 ( See L<https://www.opengl.org/wiki/Platform_specifics:_Windows#How_many_times_can_I_call_SetPixelFormat.3F> ).
+
+Win32 DWM API does not recognize black pixels from OpenGL surfaces as
+transparent, while it does so for regular widgets. If this is needed, set
+layered(1) on your GLWidget.
 
 See F<examples/icosahedron.pl> for an example.
 

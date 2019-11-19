@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has shared_content => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_shared_content',
     json_ld   => 'sharedContent',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::SocialMediaPosting - A post to a social media platform
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -65,6 +65,10 @@ A shared_content should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
+
+=head2 C<_has_shared_content>
+
+A predicate for the L</shared_content> attribute.
 
 =head1 SEE ALSO
 

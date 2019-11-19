@@ -8,11 +8,11 @@ my $installed;
 
 BEGIN { $constant_import = \&constant::import };
 
-use 5.014;
+use 5.020;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our %declared;
 

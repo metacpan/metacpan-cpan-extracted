@@ -19,9 +19,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "List::Util" => "1.33",
     "Moo" => 1,
-    "MooX::Const" => 0,
+    "MooX::Const" => "0.4.0",
     "Net::DNS::Resolver" => 0,
-    "Types::Const" => "0.3.6",
     "Types::Standard" => 0,
     "namespace::autoclean" => 0
   },
@@ -32,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "v0.1.5",
+  "VERSION" => "v0.1.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,12 +43,11 @@ my %FallbackPrereqs = (
   "List::Util" => "1.33",
   "Module::Metadata" => 0,
   "Moo" => 1,
-  "MooX::Const" => 0,
+  "MooX::Const" => "0.4.0",
   "Net::DNS::Resolver" => 0,
   "Net::DNS::Resolver::Mock" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
-  "Types::Const" => "0.3.6",
   "Types::Standard" => 0,
   "namespace::autoclean" => 0
 );

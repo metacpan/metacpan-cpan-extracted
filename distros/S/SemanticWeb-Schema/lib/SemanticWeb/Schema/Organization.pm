@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has actionable_feedback_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actionable_feedback_policy',
     json_ld   => 'actionableFeedbackPolicy',
 );
 
@@ -28,7 +28,7 @@ has actionable_feedback_policy => (
 
 has address => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_address',
     json_ld   => 'address',
 );
 
@@ -36,7 +36,7 @@ has address => (
 
 has aggregate_rating => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_aggregate_rating',
     json_ld   => 'aggregateRating',
 );
 
@@ -44,7 +44,7 @@ has aggregate_rating => (
 
 has alumni => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_alumni',
     json_ld   => 'alumni',
 );
 
@@ -52,7 +52,7 @@ has alumni => (
 
 has area_served => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_area_served',
     json_ld   => 'areaServed',
 );
 
@@ -60,7 +60,7 @@ has area_served => (
 
 has award => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_award',
     json_ld   => 'award',
 );
 
@@ -68,7 +68,7 @@ has award => (
 
 has awards => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_awards',
     json_ld   => 'awards',
 );
 
@@ -76,7 +76,7 @@ has awards => (
 
 has brand => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_brand',
     json_ld   => 'brand',
 );
 
@@ -84,7 +84,7 @@ has brand => (
 
 has contact_point => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_contact_point',
     json_ld   => 'contactPoint',
 );
 
@@ -92,7 +92,7 @@ has contact_point => (
 
 has contact_points => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_contact_points',
     json_ld   => 'contactPoints',
 );
 
@@ -100,7 +100,7 @@ has contact_points => (
 
 has corrections_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_corrections_policy',
     json_ld   => 'correctionsPolicy',
 );
 
@@ -108,7 +108,7 @@ has corrections_policy => (
 
 has department => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_department',
     json_ld   => 'department',
 );
 
@@ -116,7 +116,7 @@ has department => (
 
 has dissolution_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_dissolution_date',
     json_ld   => 'dissolutionDate',
 );
 
@@ -124,7 +124,7 @@ has dissolution_date => (
 
 has diversity_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_diversity_policy',
     json_ld   => 'diversityPolicy',
 );
 
@@ -132,7 +132,7 @@ has diversity_policy => (
 
 has diversity_staffing_report => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_diversity_staffing_report',
     json_ld   => 'diversityStaffingReport',
 );
 
@@ -140,7 +140,7 @@ has diversity_staffing_report => (
 
 has duns => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_duns',
     json_ld   => 'duns',
 );
 
@@ -148,7 +148,7 @@ has duns => (
 
 has email => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_email',
     json_ld   => 'email',
 );
 
@@ -156,7 +156,7 @@ has email => (
 
 has employee => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_employee',
     json_ld   => 'employee',
 );
 
@@ -164,7 +164,7 @@ has employee => (
 
 has employees => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_employees',
     json_ld   => 'employees',
 );
 
@@ -172,7 +172,7 @@ has employees => (
 
 has ethics_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ethics_policy',
     json_ld   => 'ethicsPolicy',
 );
 
@@ -180,7 +180,7 @@ has ethics_policy => (
 
 has event => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_event',
     json_ld   => 'event',
 );
 
@@ -188,7 +188,7 @@ has event => (
 
 has events => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_events',
     json_ld   => 'events',
 );
 
@@ -196,7 +196,7 @@ has events => (
 
 has fax_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_fax_number',
     json_ld   => 'faxNumber',
 );
 
@@ -204,7 +204,7 @@ has fax_number => (
 
 has founder => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_founder',
     json_ld   => 'founder',
 );
 
@@ -212,7 +212,7 @@ has founder => (
 
 has founders => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_founders',
     json_ld   => 'founders',
 );
 
@@ -220,7 +220,7 @@ has founders => (
 
 has founding_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_founding_date',
     json_ld   => 'foundingDate',
 );
 
@@ -228,7 +228,7 @@ has founding_date => (
 
 has founding_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_founding_location',
     json_ld   => 'foundingLocation',
 );
 
@@ -236,7 +236,7 @@ has founding_location => (
 
 has funder => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_funder',
     json_ld   => 'funder',
 );
 
@@ -244,7 +244,7 @@ has funder => (
 
 has global_location_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_global_location_number',
     json_ld   => 'globalLocationNumber',
 );
 
@@ -252,7 +252,7 @@ has global_location_number => (
 
 has has_credential => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_credential',
     json_ld   => 'hasCredential',
 );
 
@@ -260,7 +260,7 @@ has has_credential => (
 
 has has_offer_catalog => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_offer_catalog',
     json_ld   => 'hasOfferCatalog',
 );
 
@@ -268,7 +268,7 @@ has has_offer_catalog => (
 
 has has_pos => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_pos',
     json_ld   => 'hasPOS',
 );
 
@@ -276,7 +276,7 @@ has has_pos => (
 
 has has_product_return_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_product_return_policy',
     json_ld   => 'hasProductReturnPolicy',
 );
 
@@ -284,7 +284,7 @@ has has_product_return_policy => (
 
 has isic_v4 => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_isic_v4',
     json_ld   => 'isicV4',
 );
 
@@ -292,7 +292,7 @@ has isic_v4 => (
 
 has knows_about => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_knows_about',
     json_ld   => 'knowsAbout',
 );
 
@@ -300,7 +300,7 @@ has knows_about => (
 
 has knows_language => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_knows_language',
     json_ld   => 'knowsLanguage',
 );
 
@@ -308,7 +308,7 @@ has knows_language => (
 
 has legal_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legal_name',
     json_ld   => 'legalName',
 );
 
@@ -316,7 +316,7 @@ has legal_name => (
 
 has lei_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_lei_code',
     json_ld   => 'leiCode',
 );
 
@@ -324,7 +324,7 @@ has lei_code => (
 
 has location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_location',
     json_ld   => 'location',
 );
 
@@ -332,7 +332,7 @@ has location => (
 
 has logo => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_logo',
     json_ld   => 'logo',
 );
 
@@ -340,7 +340,7 @@ has logo => (
 
 has makes_offer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_makes_offer',
     json_ld   => 'makesOffer',
 );
 
@@ -348,7 +348,7 @@ has makes_offer => (
 
 has member => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_member',
     json_ld   => 'member',
 );
 
@@ -356,7 +356,7 @@ has member => (
 
 has member_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_member_of',
     json_ld   => 'memberOf',
 );
 
@@ -364,7 +364,7 @@ has member_of => (
 
 has members => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_members',
     json_ld   => 'members',
 );
 
@@ -372,7 +372,7 @@ has members => (
 
 has naics => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_naics',
     json_ld   => 'naics',
 );
 
@@ -380,7 +380,7 @@ has naics => (
 
 has number_of_employees => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_employees',
     json_ld   => 'numberOfEmployees',
 );
 
@@ -388,7 +388,7 @@ has number_of_employees => (
 
 has ownership_funding_info => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ownership_funding_info',
     json_ld   => 'ownershipFundingInfo',
 );
 
@@ -396,7 +396,7 @@ has ownership_funding_info => (
 
 has owns => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_owns',
     json_ld   => 'owns',
 );
 
@@ -404,7 +404,7 @@ has owns => (
 
 has parent_organization => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_parent_organization',
     json_ld   => 'parentOrganization',
 );
 
@@ -412,7 +412,7 @@ has parent_organization => (
 
 has publishing_principles => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_publishing_principles',
     json_ld   => 'publishingPrinciples',
 );
 
@@ -420,7 +420,7 @@ has publishing_principles => (
 
 has review => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_review',
     json_ld   => 'review',
 );
 
@@ -428,7 +428,7 @@ has review => (
 
 has reviews => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_reviews',
     json_ld   => 'reviews',
 );
 
@@ -436,7 +436,7 @@ has reviews => (
 
 has seeks => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_seeks',
     json_ld   => 'seeks',
 );
 
@@ -444,7 +444,7 @@ has seeks => (
 
 has service_area => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_service_area',
     json_ld   => 'serviceArea',
 );
 
@@ -452,7 +452,7 @@ has service_area => (
 
 has slogan => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_slogan',
     json_ld   => 'slogan',
 );
 
@@ -460,7 +460,7 @@ has slogan => (
 
 has sponsor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sponsor',
     json_ld   => 'sponsor',
 );
 
@@ -468,7 +468,7 @@ has sponsor => (
 
 has sub_organization => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sub_organization',
     json_ld   => 'subOrganization',
 );
 
@@ -476,7 +476,7 @@ has sub_organization => (
 
 has tax_id => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_tax_id',
     json_ld   => 'taxID',
 );
 
@@ -484,7 +484,7 @@ has tax_id => (
 
 has telephone => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_telephone',
     json_ld   => 'telephone',
 );
 
@@ -492,7 +492,7 @@ has telephone => (
 
 has unnamed_sources_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_unnamed_sources_policy',
     json_ld   => 'unnamedSourcesPolicy',
 );
 
@@ -500,7 +500,7 @@ has unnamed_sources_policy => (
 
 has vat_id => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_vat_id',
     json_ld   => 'vatID',
 );
 
@@ -522,7 +522,7 @@ SemanticWeb::Schema::Organization - An organization such as a school
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -552,6 +552,10 @@ A actionable_feedback_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_actionable_feedback_policy>
+
+A predicate for the L</actionable_feedback_policy> attribute.
+
 =head2 C<address>
 
 Physical address of the item.
@@ -565,6 +569,10 @@ A address should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_address>
+
+A predicate for the L</address> attribute.
 
 =head2 C<aggregate_rating>
 
@@ -581,6 +589,10 @@ A aggregate_rating should be one of the following types:
 
 =back
 
+=head2 C<_has_aggregate_rating>
+
+A predicate for the L</aggregate_rating> attribute.
+
 =head2 C<alumni>
 
 Alumni of an organization.
@@ -592,6 +604,10 @@ A alumni should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_alumni>
+
+A predicate for the L</alumni> attribute.
 
 =head2 C<area_served>
 
@@ -613,6 +629,10 @@ A area_served should be one of the following types:
 
 =back
 
+=head2 C<_has_area_served>
+
+A predicate for the L</area_served> attribute.
+
 =head2 C<award>
 
 An award won by or for this item.
@@ -625,6 +645,10 @@ A award should be one of the following types:
 
 =back
 
+=head2 C<_has_award>
+
+A predicate for the L</award> attribute.
+
 =head2 C<awards>
 
 Awards won by or for this item.
@@ -636,6 +660,10 @@ A awards should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_awards>
+
+A predicate for the L</awards> attribute.
 
 =head2 C<brand>
 
@@ -652,6 +680,10 @@ A brand should be one of the following types:
 
 =back
 
+=head2 C<_has_brand>
+
+A predicate for the L</brand> attribute.
+
 =head2 C<contact_point>
 
 C<contactPoint>
@@ -666,6 +698,10 @@ A contact_point should be one of the following types:
 
 =back
 
+=head2 C<_has_contact_point>
+
+A predicate for the L</contact_point> attribute.
+
 =head2 C<contact_points>
 
 C<contactPoints>
@@ -679,6 +715,10 @@ A contact_points should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
 
 =back
+
+=head2 C<_has_contact_points>
+
+A predicate for the L</contact_points> attribute.
 
 =head2 C<corrections_policy>
 
@@ -701,6 +741,10 @@ A corrections_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_corrections_policy>
+
+A predicate for the L</corrections_policy> attribute.
+
 =head2 C<department>
 
 A relationship between an organization and a department of that
@@ -716,6 +760,10 @@ A department should be one of the following types:
 
 =back
 
+=head2 C<_has_department>
+
+A predicate for the L</department> attribute.
+
 =head2 C<dissolution_date>
 
 C<dissolutionDate>
@@ -729,6 +777,10 @@ A dissolution_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_dissolution_date>
+
+A predicate for the L</dissolution_date> attribute.
 
 =head2 C<diversity_policy>
 
@@ -753,6 +805,10 @@ A diversity_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_diversity_policy>
+
+A predicate for the L</diversity_policy> attribute.
+
 =head2 C<diversity_staffing_report>
 
 C<diversityStaffingReport>
@@ -774,6 +830,10 @@ A diversity_staffing_report should be one of the following types:
 
 =back
 
+=head2 C<_has_diversity_staffing_report>
+
+A predicate for the L</diversity_staffing_report> attribute.
+
 =head2 C<duns>
 
 The Dun &amp; Bradstreet DUNS number for identifying an organization or
@@ -787,6 +847,10 @@ A duns should be one of the following types:
 
 =back
 
+=head2 C<_has_duns>
+
+A predicate for the L</duns> attribute.
+
 =head2 C<email>
 
 Email address.
@@ -798,6 +862,10 @@ A email should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_email>
+
+A predicate for the L</email> attribute.
 
 =head2 C<employee>
 
@@ -811,6 +879,10 @@ A employee should be one of the following types:
 
 =back
 
+=head2 C<_has_employee>
+
+A predicate for the L</employee> attribute.
+
 =head2 C<employees>
 
 People working for this organization.
@@ -822,6 +894,10 @@ A employees should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_employees>
+
+A predicate for the L</employees> attribute.
 
 =head2 C<ethics_policy>
 
@@ -847,6 +923,10 @@ A ethics_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_ethics_policy>
+
+A predicate for the L</ethics_policy> attribute.
+
 =head2 C<event>
 
 Upcoming or past event associated with this place, organization, or action.
@@ -859,6 +939,10 @@ A event should be one of the following types:
 
 =back
 
+=head2 C<_has_event>
+
+A predicate for the L</event> attribute.
+
 =head2 C<events>
 
 Upcoming or past events associated with this place or organization.
@@ -870,6 +954,10 @@ A events should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Event']>
 
 =back
+
+=head2 C<_has_events>
+
+A predicate for the L</events> attribute.
 
 =head2 C<fax_number>
 
@@ -885,6 +973,10 @@ A fax_number should be one of the following types:
 
 =back
 
+=head2 C<_has_fax_number>
+
+A predicate for the L</fax_number> attribute.
+
 =head2 C<founder>
 
 A person who founded this organization.
@@ -897,6 +989,10 @@ A founder should be one of the following types:
 
 =back
 
+=head2 C<_has_founder>
+
+A predicate for the L</founder> attribute.
+
 =head2 C<founders>
 
 A person who founded this organization.
@@ -908,6 +1004,10 @@ A founders should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_founders>
+
+A predicate for the L</founders> attribute.
 
 =head2 C<founding_date>
 
@@ -923,6 +1023,10 @@ A founding_date should be one of the following types:
 
 =back
 
+=head2 C<_has_founding_date>
+
+A predicate for the L</founding_date> attribute.
+
 =head2 C<founding_location>
 
 C<foundingLocation>
@@ -936,6 +1040,10 @@ A founding_location should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
+
+=head2 C<_has_founding_location>
+
+A predicate for the L</founding_location> attribute.
 
 =head2 C<funder>
 
@@ -951,6 +1059,10 @@ A funder should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_funder>
+
+A predicate for the L</funder> attribute.
 
 =head2 C<global_location_number>
 
@@ -969,6 +1081,10 @@ A global_location_number should be one of the following types:
 
 =back
 
+=head2 C<_has_global_location_number>
+
+A predicate for the L</global_location_number> attribute.
+
 =head2 C<has_credential>
 
 C<hasCredential>
@@ -982,6 +1098,10 @@ A has_credential should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::EducationalOccupationalCredential']>
 
 =back
+
+=head2 C<_has_has_credential>
+
+A predicate for the L</has_credential> attribute.
 
 =head2 C<has_offer_catalog>
 
@@ -998,6 +1118,10 @@ A has_offer_catalog should be one of the following types:
 
 =back
 
+=head2 C<_has_has_offer_catalog>
+
+A predicate for the L</has_offer_catalog> attribute.
+
 =head2 C<has_pos>
 
 C<hasPOS>
@@ -1012,6 +1136,10 @@ A has_pos should be one of the following types:
 
 =back
 
+=head2 C<_has_has_pos>
+
+A predicate for the L</has_pos> attribute.
+
 =head2 C<has_product_return_policy>
 
 C<hasProductReturnPolicy>
@@ -1025,6 +1153,10 @@ A has_product_return_policy should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ProductReturnPolicy']>
 
 =back
+
+=head2 C<_has_has_product_return_policy>
+
+A predicate for the L</has_product_return_policy> attribute.
 
 =head2 C<isic_v4>
 
@@ -1041,6 +1173,10 @@ A isic_v4 should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_isic_v4>
+
+A predicate for the L</isic_v4> attribute.
 
 =head2 C<knows_about>
 
@@ -1064,6 +1200,10 @@ A knows_about should be one of the following types:
 
 =back
 
+=head2 C<_has_knows_about>
+
+A predicate for the L</knows_about> attribute.
+
 =head2 C<knows_language>
 
 C<knowsLanguage>
@@ -1085,6 +1225,10 @@ A knows_language should be one of the following types:
 
 =back
 
+=head2 C<_has_knows_language>
+
+A predicate for the L</knows_language> attribute.
+
 =head2 C<legal_name>
 
 C<legalName>
@@ -1098,6 +1242,10 @@ A legal_name should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_legal_name>
+
+A predicate for the L</legal_name> attribute.
 
 =head2 C<lei_code>
 
@@ -1113,6 +1261,10 @@ A lei_code should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_lei_code>
+
+A predicate for the L</lei_code> attribute.
 
 =head2 C<location>
 
@@ -1131,6 +1283,10 @@ A location should be one of the following types:
 
 =back
 
+=head2 C<_has_location>
+
+A predicate for the L</location> attribute.
+
 =head2 C<logo>
 
 An associated logo.
@@ -1144,6 +1300,10 @@ A logo should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_logo>
+
+A predicate for the L</logo> attribute.
 
 =head2 C<makes_offer>
 
@@ -1159,6 +1319,10 @@ A makes_offer should be one of the following types:
 
 =back
 
+=head2 C<_has_makes_offer>
+
+A predicate for the L</makes_offer> attribute.
+
 =head2 C<member>
 
 A member of an Organization or a ProgramMembership. Organizations can be
@@ -1173,6 +1337,10 @@ A member should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_member>
+
+A predicate for the L</member> attribute.
 
 =head2 C<member_of>
 
@@ -1191,6 +1359,10 @@ A member_of should be one of the following types:
 
 =back
 
+=head2 C<_has_member_of>
+
+A predicate for the L</member_of> attribute.
+
 =head2 C<members>
 
 A member of this organization.
@@ -1205,6 +1377,10 @@ A members should be one of the following types:
 
 =back
 
+=head2 C<_has_members>
+
+A predicate for the L</members> attribute.
+
 =head2 C<naics>
 
 The North American Industry Classification System (NAICS) code for a
@@ -1217,6 +1393,10 @@ A naics should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_naics>
+
+A predicate for the L</naics> attribute.
 
 =head2 C<number_of_employees>
 
@@ -1231,6 +1411,10 @@ A number_of_employees should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_number_of_employees>
+
+A predicate for the L</number_of_employees> attribute.
 
 =head2 C<ownership_funding_info>
 
@@ -1258,6 +1442,10 @@ A ownership_funding_info should be one of the following types:
 
 =back
 
+=head2 C<_has_ownership_funding_info>
+
+A predicate for the L</ownership_funding_info> attribute.
+
 =head2 C<owns>
 
 Products owned by the organization or person.
@@ -1271,6 +1459,10 @@ A owns should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
 
 =back
+
+=head2 C<_has_owns>
+
+A predicate for the L</owns> attribute.
 
 =head2 C<parent_organization>
 
@@ -1286,6 +1478,10 @@ A parent_organization should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_parent_organization>
+
+A predicate for the L</parent_organization> attribute.
 
 =head2 C<publishing_principles>
 
@@ -1318,6 +1514,10 @@ A publishing_principles should be one of the following types:
 
 =back
 
+=head2 C<_has_publishing_principles>
+
+A predicate for the L</publishing_principles> attribute.
+
 =head2 C<review>
 
 A review of the item.
@@ -1329,6 +1529,10 @@ A review should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Review']>
 
 =back
+
+=head2 C<_has_review>
+
+A predicate for the L</review> attribute.
 
 =head2 C<reviews>
 
@@ -1342,6 +1546,10 @@ A reviews should be one of the following types:
 
 =back
 
+=head2 C<_has_reviews>
+
+A predicate for the L</reviews> attribute.
+
 =head2 C<seeks>
 
 A pointer to products or services sought by the organization or person
@@ -1354,6 +1562,10 @@ A seeks should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Demand']>
 
 =back
+
+=head2 C<_has_seeks>
+
+A predicate for the L</seeks> attribute.
 
 =head2 C<service_area>
 
@@ -1373,6 +1585,10 @@ A service_area should be one of the following types:
 
 =back
 
+=head2 C<_has_service_area>
+
+A predicate for the L</service_area> attribute.
+
 =head2 C<slogan>
 
 A slogan or motto associated with the item.
@@ -1384,6 +1600,10 @@ A slogan should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_slogan>
+
+A predicate for the L</slogan> attribute.
 
 =head2 C<sponsor>
 
@@ -1401,6 +1621,10 @@ A sponsor should be one of the following types:
 
 =back
 
+=head2 C<_has_sponsor>
+
+A predicate for the L</sponsor> attribute.
+
 =head2 C<sub_organization>
 
 C<subOrganization>
@@ -1417,6 +1641,10 @@ A sub_organization should be one of the following types:
 
 =back
 
+=head2 C<_has_sub_organization>
+
+A predicate for the L</sub_organization> attribute.
+
 =head2 C<tax_id>
 
 C<taxID>
@@ -1432,6 +1660,10 @@ A tax_id should be one of the following types:
 
 =back
 
+=head2 C<_has_tax_id>
+
+A predicate for the L</tax_id> attribute.
+
 =head2 C<telephone>
 
 The telephone number.
@@ -1443,6 +1675,10 @@ A telephone should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_telephone>
+
+A predicate for the L</telephone> attribute.
 
 =head2 C<unnamed_sources_policy>
 
@@ -1465,6 +1701,10 @@ A unnamed_sources_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_unnamed_sources_policy>
+
+A predicate for the L</unnamed_sources_policy> attribute.
+
 =head2 C<vat_id>
 
 C<vatID>
@@ -1478,6 +1718,10 @@ A vat_id should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_vat_id>
+
+A predicate for the L</vat_id> attribute.
 
 =head1 SEE ALSO
 

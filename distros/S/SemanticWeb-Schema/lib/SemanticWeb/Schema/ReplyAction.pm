@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has result_comment => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_result_comment',
     json_ld   => 'resultComment',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::ReplyAction - The act of responding to a question/message a
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -69,6 +69,10 @@ A result_comment should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Comment']>
 
 =back
+
+=head2 C<_has_result_comment>
+
+A predicate for the L</result_comment> attribute.
 
 =head1 SEE ALSO
 

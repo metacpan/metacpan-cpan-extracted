@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has seat_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_seat_number',
     json_ld   => 'seatNumber',
 );
 
@@ -28,7 +28,7 @@ has seat_number => (
 
 has seat_row => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_seat_row',
     json_ld   => 'seatRow',
 );
 
@@ -36,7 +36,7 @@ has seat_row => (
 
 has seat_section => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_seat_section',
     json_ld   => 'seatSection',
 );
 
@@ -44,7 +44,7 @@ has seat_section => (
 
 has seating_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_seating_type',
     json_ld   => 'seatingType',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::Seat - Used to describe a seat
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -88,6 +88,10 @@ A seat_number should be one of the following types:
 
 =back
 
+=head2 C<_has_seat_number>
+
+A predicate for the L</seat_number> attribute.
+
 =head2 C<seat_row>
 
 C<seatRow>
@@ -102,6 +106,10 @@ A seat_row should be one of the following types:
 
 =back
 
+=head2 C<_has_seat_row>
+
+A predicate for the L</seat_row> attribute.
+
 =head2 C<seat_section>
 
 C<seatSection>
@@ -115,6 +123,10 @@ A seat_section should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_seat_section>
+
+A predicate for the L</seat_section> attribute.
 
 =head2 C<seating_type>
 
@@ -131,6 +143,10 @@ A seating_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_seating_type>
+
+A predicate for the L</seating_type> attribute.
 
 =head1 SEE ALSO
 

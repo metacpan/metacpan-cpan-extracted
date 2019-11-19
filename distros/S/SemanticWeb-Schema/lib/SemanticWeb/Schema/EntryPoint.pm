@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has action_application => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_action_application',
     json_ld   => 'actionApplication',
 );
 
@@ -28,7 +28,7 @@ has action_application => (
 
 has action_platform => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_action_platform',
     json_ld   => 'actionPlatform',
 );
 
@@ -36,7 +36,7 @@ has action_platform => (
 
 has application => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_application',
     json_ld   => 'application',
 );
 
@@ -44,7 +44,7 @@ has application => (
 
 has content_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_content_type',
     json_ld   => 'contentType',
 );
 
@@ -52,7 +52,7 @@ has content_type => (
 
 has encoding_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_encoding_type',
     json_ld   => 'encodingType',
 );
 
@@ -60,7 +60,7 @@ has encoding_type => (
 
 has http_method => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_http_method',
     json_ld   => 'httpMethod',
 );
 
@@ -68,7 +68,7 @@ has http_method => (
 
 has url_template => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_url_template',
     json_ld   => 'urlTemplate',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::EntryPoint - An entry point
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -112,6 +112,10 @@ A action_application should be one of the following types:
 
 =back
 
+=head2 C<_has_action_application>
+
+A predicate for the L</action_application> attribute.
+
 =head2 C<action_platform>
 
 C<actionPlatform>
@@ -128,6 +132,10 @@ A action_platform should be one of the following types:
 
 =back
 
+=head2 C<_has_action_platform>
+
+A predicate for the L</action_platform> attribute.
+
 =head2 C<application>
 
 An application that can complete the request.
@@ -139,6 +147,10 @@ A application should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::SoftwareApplication']>
 
 =back
+
+=head2 C<_has_application>
+
+A predicate for the L</application> attribute.
 
 =head2 C<content_type>
 
@@ -154,6 +166,10 @@ A content_type should be one of the following types:
 
 =back
 
+=head2 C<_has_content_type>
+
+A predicate for the L</content_type> attribute.
+
 =head2 C<encoding_type>
 
 C<encodingType>
@@ -167,6 +183,10 @@ A encoding_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_encoding_type>
+
+A predicate for the L</encoding_type> attribute.
 
 =head2 C<http_method>
 
@@ -183,6 +203,10 @@ A http_method should be one of the following types:
 
 =back
 
+=head2 C<_has_http_method>
+
+A predicate for the L</http_method> attribute.
+
 =head2 C<url_template>
 
 C<urlTemplate>
@@ -197,6 +221,10 @@ A url_template should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_url_template>
+
+A predicate for the L</url_template> attribute.
 
 =head1 SEE ALSO
 

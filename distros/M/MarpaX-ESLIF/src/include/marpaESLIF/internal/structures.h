@@ -426,6 +426,10 @@ struct marpaESLIFRecognizer {
   /* the only way to get last discard value is to have an explicit area for it. */
   size_t                       lastDiscardl;    /* Number of bytes */
   char                        *lastDiscards;    /* Bytes */
+
+  /* For lua if-action callback */
+  lua_State                   *L;
+  char                        *ifactions;
 };
 
 struct marpaESLIF_lexeme_data {

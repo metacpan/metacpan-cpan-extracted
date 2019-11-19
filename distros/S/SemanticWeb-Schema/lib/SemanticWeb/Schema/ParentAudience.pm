@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has child_max_age => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_child_max_age',
     json_ld   => 'childMaxAge',
 );
 
@@ -28,7 +28,7 @@ has child_max_age => (
 
 has child_min_age => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_child_min_age',
     json_ld   => 'childMinAge',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::ParentAudience - A set of characteristics describing parent
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,10 @@ A child_max_age should be one of the following types:
 
 =back
 
+=head2 C<_has_child_max_age>
+
+A predicate for the L</child_max_age> attribute.
+
 =head2 C<child_min_age>
 
 C<childMinAge>
@@ -86,6 +90,10 @@ A child_min_age should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_child_min_age>
+
+A predicate for the L</child_min_age> attribute.
 
 =head1 SEE ALSO
 

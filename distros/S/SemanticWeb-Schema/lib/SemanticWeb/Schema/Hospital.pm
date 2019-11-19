@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has available_service => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_available_service',
     json_ld   => 'availableService',
 );
 
@@ -28,7 +28,7 @@ has available_service => (
 
 has medical_specialty => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_medical_specialty',
     json_ld   => 'medicalSpecialty',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::Hospital - A hospital.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -76,6 +76,10 @@ A available_service should be one of the following types:
 
 =back
 
+=head2 C<_has_available_service>
+
+A predicate for the L</available_service> attribute.
+
 =head2 C<medical_specialty>
 
 C<medicalSpecialty>
@@ -89,6 +93,10 @@ A medical_specialty should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalSpecialty']>
 
 =back
+
+=head2 C<_has_medical_specialty>
+
+A predicate for the L</medical_specialty> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has article_body => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_article_body',
     json_ld   => 'articleBody',
 );
 
@@ -28,7 +28,7 @@ has article_body => (
 
 has article_section => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_article_section',
     json_ld   => 'articleSection',
 );
 
@@ -36,7 +36,7 @@ has article_section => (
 
 has backstory => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_backstory',
     json_ld   => 'backstory',
 );
 
@@ -44,7 +44,7 @@ has backstory => (
 
 has page_end => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_page_end',
     json_ld   => 'pageEnd',
 );
 
@@ -52,7 +52,7 @@ has page_end => (
 
 has page_start => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_page_start',
     json_ld   => 'pageStart',
 );
 
@@ -60,7 +60,7 @@ has page_start => (
 
 has pagination => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_pagination',
     json_ld   => 'pagination',
 );
 
@@ -68,7 +68,7 @@ has pagination => (
 
 has speakable => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_speakable',
     json_ld   => 'speakable',
 );
 
@@ -76,7 +76,7 @@ has speakable => (
 
 has word_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_word_count',
     json_ld   => 'wordCount',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::Article - An article
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -124,6 +124,10 @@ A article_body should be one of the following types:
 
 =back
 
+=head2 C<_has_article_body>
+
+A predicate for the L</article_body> attribute.
+
 =head2 C<article_section>
 
 C<articleSection>
@@ -138,6 +142,10 @@ A article_section should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_article_section>
+
+A predicate for the L</article_section> attribute.
 
 =head2 C<backstory>
 
@@ -159,6 +167,10 @@ A backstory should be one of the following types:
 
 =back
 
+=head2 C<_has_backstory>
+
+A predicate for the L</backstory> attribute.
+
 =head2 C<page_end>
 
 C<pageEnd>
@@ -174,6 +186,10 @@ A page_end should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_page_end>
+
+A predicate for the L</page_end> attribute.
 
 =head2 C<page_start>
 
@@ -191,6 +207,10 @@ A page_start should be one of the following types:
 
 =back
 
+=head2 C<_has_page_start>
+
+A predicate for the L</page_start> attribute.
+
 =head2 C<pagination>
 
 Any description of pages that is not separated into pageStart and pageEnd;
@@ -203,6 +223,10 @@ A pagination should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_pagination>
+
+A predicate for the L</pagination> attribute.
 
 =head2 C<speakable>
 
@@ -239,6 +263,10 @@ A speakable should be one of the following types:
 
 =back
 
+=head2 C<_has_speakable>
+
+A predicate for the L</speakable> attribute.
+
 =head2 C<word_count>
 
 C<wordCount>
@@ -252,6 +280,10 @@ A word_count should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_word_count>
+
+A predicate for the L</word_count> attribute.
 
 =head1 SEE ALSO
 

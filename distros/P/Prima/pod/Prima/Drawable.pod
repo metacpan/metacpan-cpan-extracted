@@ -591,24 +591,30 @@ C<put_image> and C<stretch_image> can only use C<rop::SrcCopy> and C<rop::SrcOve
 raster operations on OS-provided surfaces.
 
 Additionally, Prima implements extra features for compositing on images outside the
-begin_paint/end_paint brackets. It supports the following 12 Porter-Duff operators:
+begin_paint/end_paint brackets. It supports the following 12 Porter-Duff operators
+and some selected Photoshop blend operators:
 
-=for podview <img src="rop2.gif" cut=1 >
+=for podview 
+ <img src="rop2.gif" cut=1>
+ <img src="rop3.png" cut=1>
 
-=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/rop2.gif"><!--
+=for html <p>
+<img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/rop2.gif">
+<img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/rop3.png">
+<!--
 
-   rop::Clear
-   rop::Xor
-   rop::SrcOver
-   rop::DstOver
-   rop::SrcCopy
-   rop::DstCopy
-   rop::SrcIn
-   rop::DstIn
-   rop::SrcOut
-   rop::DstOut
-   rop::SrcAtop
-   rop::DstAtop
+   rop::Clear            rop::Add
+   rop::Xor              rop::Multiply
+   rop::SrcOver          rop::Screen
+   rop::DstOver          rop::Overlay
+   rop::SrcCopy          rop::Darken
+   rop::DstCopy          rop::Lighten
+   rop::SrcIn            rop::ColorDodge
+   rop::DstIn            rop::ColorBurn
+   rop::SrcOut           rop::HardLight
+   rop::DstOut           rop::SoftLight
+   rop::SrcAtop          rop::Difference
+   rop::DstAtop          rop::Exclusion
 
 =for html -->
 
@@ -632,6 +638,12 @@ Also, function C<rop::blend($alpha)> creates a rop constant for simple blending 
 by the following formula:
 
    $dst = ( $src * $alpha + $dst * ( 255 - $alpha ) ) / 255
+
+Its brother function C<rop::alpha($rop, $src_alpha[, $dst_alpha])> can be used for drawing on
+image outside begin_paint/end_paint:
+
+   $image->rop( rop::alpha( rop::SrcOver, 128 ));
+   $image->ellipse( 5, 5, 5, 5 );
 
 In addition to that, C<rop::AlphaCopy> operation is available for accessing
 alpha bits only.  When used, the source image is treated as alpha mask, and

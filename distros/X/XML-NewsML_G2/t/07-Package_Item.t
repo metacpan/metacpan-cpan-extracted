@@ -2,7 +2,7 @@
 use Test::MockTime 'set_fixed_time';
 
 BEGIN {
-    set_fixed_time('2012-01-01T13:00:00Z');
+    set_fixed_time('1325422800');
 }
 
 use utf8;

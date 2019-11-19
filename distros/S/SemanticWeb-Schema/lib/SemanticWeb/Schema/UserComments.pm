@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has comment_text => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_comment_text',
     json_ld   => 'commentText',
 );
 
@@ -28,7 +28,7 @@ has comment_text => (
 
 has comment_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_comment_time',
     json_ld   => 'commentTime',
 );
 
@@ -36,7 +36,7 @@ has comment_time => (
 
 has creator => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_creator',
     json_ld   => 'creator',
 );
 
@@ -44,7 +44,7 @@ has creator => (
 
 has discusses => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_discusses',
     json_ld   => 'discusses',
 );
 
@@ -52,7 +52,7 @@ has discusses => (
 
 has reply_to_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_reply_to_url',
     json_ld   => 'replyToUrl',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::UserComments - UserInteraction and its subtypes is an old w
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -100,6 +100,10 @@ A comment_text should be one of the following types:
 
 =back
 
+=head2 C<_has_comment_text>
+
+A predicate for the L</comment_text> attribute.
+
 =head2 C<comment_time>
 
 C<commentTime>
@@ -113,6 +117,10 @@ A comment_time should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_comment_time>
+
+A predicate for the L</comment_time> attribute.
 
 =head2 C<creator>
 
@@ -129,6 +137,10 @@ A creator should be one of the following types:
 
 =back
 
+=head2 C<_has_creator>
+
+A predicate for the L</creator> attribute.
+
 =head2 C<discusses>
 
 Specifies the CreativeWork associated with the UserComment.
@@ -140,6 +152,10 @@ A discusses should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
+
+=head2 C<_has_discusses>
+
+A predicate for the L</discusses> attribute.
 
 =head2 C<reply_to_url>
 
@@ -154,6 +170,10 @@ A reply_to_url should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_reply_to_url>
+
+A predicate for the L</reply_to_url> attribute.
 
 =head1 SEE ALSO
 

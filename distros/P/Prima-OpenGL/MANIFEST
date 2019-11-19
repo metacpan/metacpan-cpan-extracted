@@ -15,6 +15,7 @@ examples/basic.pl
 examples/bitmap.pl 
 examples/image.pl 
 examples/shadertoy.pl 
+examples/teapot.pl 
 examples/triangle.pl 
 t/01_load.t
 t/02_basic.t

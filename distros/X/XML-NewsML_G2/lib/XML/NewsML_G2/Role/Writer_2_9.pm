@@ -113,8 +113,8 @@ override '_create_company_data' => sub {
 };
 
 override '_create_creator' => sub {
-    my ( $self, $name ) = @_;
-    return $self->create_element( 'creator', literal => $name );
+    my ( $self, $creator ) = @_;
+    return $self->create_element( 'creator', literal => $creator->name );
 };
 
 override '_create_teaser'                      => sub { };

@@ -1,5 +1,9 @@
 Revision history for Perl extension MySQL-Dump-Parser-XS
 
+0.04 2019-11-19T02:06:35Z
+
+    - Support '_binary' character set introducer for string literals (lemzwerg)
+
 0.03 2019-10-02T14:37:14Z
 
     - Fixed Changes (this file) format.

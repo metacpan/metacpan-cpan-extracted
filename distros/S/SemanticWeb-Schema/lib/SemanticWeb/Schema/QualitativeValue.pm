@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has additional_property => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_additional_property',
     json_ld   => 'additionalProperty',
 );
 
@@ -28,7 +28,7 @@ has additional_property => (
 
 has equal => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_equal',
     json_ld   => 'equal',
 );
 
@@ -36,7 +36,7 @@ has equal => (
 
 has greater => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_greater',
     json_ld   => 'greater',
 );
 
@@ -44,7 +44,7 @@ has greater => (
 
 has greater_or_equal => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_greater_or_equal',
     json_ld   => 'greaterOrEqual',
 );
 
@@ -52,7 +52,7 @@ has greater_or_equal => (
 
 has lesser => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_lesser',
     json_ld   => 'lesser',
 );
 
@@ -60,7 +60,7 @@ has lesser => (
 
 has lesser_or_equal => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_lesser_or_equal',
     json_ld   => 'lesserOrEqual',
 );
 
@@ -68,7 +68,7 @@ has lesser_or_equal => (
 
 has non_equal => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_non_equal',
     json_ld   => 'nonEqual',
 );
 
@@ -76,7 +76,7 @@ has non_equal => (
 
 has value_reference => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_value_reference',
     json_ld   => 'valueReference',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::QualitativeValue - A predefined value for a product charact
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -128,6 +128,10 @@ A additional_property should be one of the following types:
 
 =back
 
+=head2 C<_has_additional_property>
+
+A predicate for the L</additional_property> attribute.
+
 =head2 C<equal>
 
 This ordering relation for qualitative values indicates that the subject is
@@ -141,6 +145,10 @@ A equal should be one of the following types:
 
 =back
 
+=head2 C<_has_equal>
+
+A predicate for the L</equal> attribute.
+
 =head2 C<greater>
 
 This ordering relation for qualitative values indicates that the subject is
@@ -153,6 +161,10 @@ A greater should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
 
 =back
+
+=head2 C<_has_greater>
+
+A predicate for the L</greater> attribute.
 
 =head2 C<greater_or_equal>
 
@@ -169,6 +181,10 @@ A greater_or_equal should be one of the following types:
 
 =back
 
+=head2 C<_has_greater_or_equal>
+
+A predicate for the L</greater_or_equal> attribute.
+
 =head2 C<lesser>
 
 This ordering relation for qualitative values indicates that the subject is
@@ -181,6 +197,10 @@ A lesser should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
 
 =back
+
+=head2 C<_has_lesser>
+
+A predicate for the L</lesser> attribute.
 
 =head2 C<lesser_or_equal>
 
@@ -197,6 +217,10 @@ A lesser_or_equal should be one of the following types:
 
 =back
 
+=head2 C<_has_lesser_or_equal>
+
+A predicate for the L</lesser_or_equal> attribute.
+
 =head2 C<non_equal>
 
 C<nonEqual>
@@ -211,6 +235,10 @@ A non_equal should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
 
 =back
+
+=head2 C<_has_non_equal>
+
+A predicate for the L</non_equal> attribute.
 
 =head2 C<value_reference>
 
@@ -234,6 +262,10 @@ A value_reference should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
 
 =back
+
+=head2 C<_has_value_reference>
+
+A predicate for the L</value_reference> attribute.
 
 =head1 SEE ALSO
 

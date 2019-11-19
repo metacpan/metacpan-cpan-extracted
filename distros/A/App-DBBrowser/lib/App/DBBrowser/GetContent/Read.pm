@@ -190,16 +190,16 @@ sub from_file {
         @files_ec = sort @files_ec;
         my @files = map { '  ' . decode( 'locale_fs', basename $_ ) } @files_ec;
         my $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
-        $sf->{i}{gc}{old_file_idx} //= 0;
+        $sf->{i}{gc}{old_file_idx} //= 1;
 
         FILE: while ( 1 ) {
-            my @pre = ( undef );
-            my $prompt = 'Choose File ' . $sf->__parse_settings( $parse_mode_idx );
+            my $hidden = 'Choose File:';
+            my @pre = ( $hidden, undef );
             my $choices = [ @pre, @files ];
             # Choose
             my $idx = $tc->choose(
                 $choices,
-                { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $sf->{i}{gc}{old_file_idx}, undef => '  <=' }
+                { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $sf->{i}{gc}{old_file_idx}, undef => '  <=' }
             );
             if ( ! defined $idx || ! defined $choices->[$idx] ) {
                 return if $sf->{o}{insert}{history_dirs} == 1;
@@ -207,10 +207,14 @@ sub from_file {
             }
             if ( $sf->{o}{G}{menu_memory} ) {
                 if ( $sf->{i}{gc}{old_file_idx} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                    $sf->{i}{gc}{old_file_idx} = 0;
+                    $sf->{i}{gc}{old_file_idx} = 1;
                     next FILE;
                 }
                 $sf->{i}{gc}{old_file_idx} = $idx;
+            }
+            if ( $choices->[$idx] eq $hidden ) {
+                say "Hallo, World!";
+                sleep 4;
             }
             my $file_ec = $files_ec[$idx-@pre];
             return 1, $file_ec;

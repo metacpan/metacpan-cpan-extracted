@@ -1,3 +1,9 @@
+v0.8.1 2019-11-19T00:43:29Z
+ - use semaphore for threads blocking
+
+v0.8.0 2019-11-18T23:37:43Z
+ - api refactored
+
 v0.7.0 2019-11-06T20:34:18Z
  - converted to git
 

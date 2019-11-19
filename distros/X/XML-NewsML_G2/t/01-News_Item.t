@@ -3,7 +3,7 @@
 use Test::MockTime 'set_fixed_time';
 
 BEGIN {
-    set_fixed_time('2012-01-01T13:00:00Z');
+    set_fixed_time('1325422800');
 }
 
 use utf8;
@@ -95,7 +95,7 @@ sub basic_checks {
 }
 
 my %schemes;
-foreach (qw(crel desk geo svc role ind org topic hltype)) {
+foreach (qw(crel desk geo svc role ind org topic hltype gyibt)) {
     $schemes{$_} = XML::NewsML_G2::Scheme->new(
         alias => "apa$_",
         uri   => "http://cv.apa.at/$_/"

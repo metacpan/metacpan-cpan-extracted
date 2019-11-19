@@ -47,7 +47,8 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0"
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
          }
       }
    },
@@ -63,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-App"
       }
    },
-   "version" : "0.011",
+   "version" : "0.013",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -449,6 +450,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
             "version" : "6.010"
          },
          {

@@ -14,13 +14,15 @@ use Log::Any::Adapter::Util ();
 
 use base qw/Log::Any::Adapter::Base/;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub init {
     my ($self) = @_;
 
     # Duplicate STDERR
     open( $self->{fh}, '>&', STDERR ) or croak "Can't dup STDERR: $!";    ## no critic [InputOutput::RequireBriefOpen]
+
+    $self->{fh}->autoflush(1);
 
     if ( exists $self->{log_level} ) {
         $self->{log_level} = Log::Any::Adapter::Util::numeric_level( $self->{log_level} )

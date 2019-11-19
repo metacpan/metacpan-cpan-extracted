@@ -18,59 +18,55 @@ sub clear {
     return;
 }
 
-sub update_all ($cb = undef) {
+sub update_all {
     my $success_all = 1;
 
-    my $cv = P->cv->begin( sub ($cv) { $cv->( $cb ? $cb->($success_all) : $success_all ) } );
+    my $cv = P->cv->begin;
 
-    for ( keys $RES->%* ) {
+    for my $type ( keys $RES->%* ) {
         $cv->begin;
 
-        update(
-            $_,
-            sub ($success) {
-                $success_all = 0 if !$success;
+        Coro::async {
+            $success_all = 0 if !update($type);
 
-                $cv->end;
+            $cv->end;
 
-                return;
-            }
-        );
+            return;
+        };
     }
 
-    $cv->end;
+    $cv->end->recv;
 
-    return defined wantarray ? $cv->recv : ();
+    return $success_all;
 }
 
-sub update ( $type, $cb = undef ) {
+sub update ( $type ) {
     require IO::Uncompress::Gunzip;
 
-    return P->http->get(
+    my $res = P->http->get(
         $RES->{$type}->[1],
         mem_buf_size => 0,
-        on_progress  => 1,
-        sub ($res) {
-            my $success = 0;
-
-            if ( $res->{status} == 200 ) {
-                eval {
-                    my $temp = P->file1->tempfile;
-
-                    IO::Uncompress::Gunzip::gunzip( $res->{data}->{path}, $temp->{path}, BinModeOut => 1 ) or die "gunzip failed: $IO::Uncompress::Gunzip::GunzipError\n";
-
-                    $ENV->{share}->write( "/Pcore-GeoIP/$RES->{$type}->[0]", $temp );
-
-                    # empty cache
-                    delete $H->{$type};
-
-                    $success = 1;
-                };
-            }
-
-            return $cb ? $cb->($success) : $success;
-        }
+        on_progress  => 1
     );
+
+    my $success = 0;
+
+    if ( $res->{status} == 200 ) {
+        eval {
+            my $temp = P->file1->tempfile;
+
+            IO::Uncompress::Gunzip::gunzip( $res->{data}->{path}, $temp->{path}, BinModeOut => 1 ) or die "gunzip failed: $IO::Uncompress::Gunzip::GunzipError\n";
+
+            $ENV->{share}->write( "/Pcore-GeoIP/$RES->{$type}->[0]", $temp );
+
+            # empty cache
+            delete $H->{$type};
+
+            $success = 1;
+        };
+    }
+
+    return $success;
 }
 
 sub country {
@@ -104,7 +100,7 @@ sub _get_h ($type) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 57                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 55                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has course => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_course',
     json_ld   => 'course',
 );
 
@@ -28,7 +28,7 @@ has course => (
 
 has diet => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_diet',
     json_ld   => 'diet',
 );
 
@@ -36,7 +36,7 @@ has diet => (
 
 has distance => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_distance',
     json_ld   => 'distance',
 );
 
@@ -44,7 +44,7 @@ has distance => (
 
 has exercise_course => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_exercise_course',
     json_ld   => 'exerciseCourse',
 );
 
@@ -52,7 +52,7 @@ has exercise_course => (
 
 has exercise_plan => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_exercise_plan',
     json_ld   => 'exercisePlan',
 );
 
@@ -60,7 +60,7 @@ has exercise_plan => (
 
 has exercise_related_diet => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_exercise_related_diet',
     json_ld   => 'exerciseRelatedDiet',
 );
 
@@ -68,7 +68,7 @@ has exercise_related_diet => (
 
 has exercise_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_exercise_type',
     json_ld   => 'exerciseType',
 );
 
@@ -76,7 +76,7 @@ has exercise_type => (
 
 has from_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_from_location',
     json_ld   => 'fromLocation',
 );
 
@@ -84,7 +84,7 @@ has from_location => (
 
 has opponent => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_opponent',
     json_ld   => 'opponent',
 );
 
@@ -92,7 +92,7 @@ has opponent => (
 
 has sports_activity_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sports_activity_location',
     json_ld   => 'sportsActivityLocation',
 );
 
@@ -100,7 +100,7 @@ has sports_activity_location => (
 
 has sports_event => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sports_event',
     json_ld   => 'sportsEvent',
 );
 
@@ -108,7 +108,7 @@ has sports_event => (
 
 has sports_team => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sports_team',
     json_ld   => 'sportsTeam',
 );
 
@@ -116,7 +116,7 @@ has sports_team => (
 
 has to_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_to_location',
     json_ld   => 'toLocation',
 );
 
@@ -138,7 +138,7 @@ SemanticWeb::Schema::ExerciseAction - The act of participating in exertive activ
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -159,6 +159,10 @@ A course should be one of the following types:
 
 =back
 
+=head2 C<_has_course>
+
+A predicate for the L</course> attribute.
+
 =head2 C<diet>
 
 A sub property of instrument. The diet used in this action.
@@ -171,6 +175,10 @@ A diet should be one of the following types:
 
 =back
 
+=head2 C<_has_diet>
+
+A predicate for the L</diet> attribute.
+
 =head2 C<distance>
 
 The distance travelled, e.g. exercising or travelling.
@@ -182,6 +190,10 @@ A distance should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Distance']>
 
 =back
+
+=head2 C<_has_distance>
+
+A predicate for the L</distance> attribute.
 
 =head2 C<exercise_course>
 
@@ -197,6 +209,10 @@ A exercise_course should be one of the following types:
 
 =back
 
+=head2 C<_has_exercise_course>
+
+A predicate for the L</exercise_course> attribute.
+
 =head2 C<exercise_plan>
 
 C<exercisePlan>
@@ -211,6 +227,10 @@ A exercise_plan should be one of the following types:
 
 =back
 
+=head2 C<_has_exercise_plan>
+
+A predicate for the L</exercise_plan> attribute.
+
 =head2 C<exercise_related_diet>
 
 C<exerciseRelatedDiet>
@@ -224,6 +244,10 @@ A exercise_related_diet should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Diet']>
 
 =back
+
+=head2 C<_has_exercise_related_diet>
+
+A predicate for the L</exercise_related_diet> attribute.
 
 =head2 C<exercise_type>
 
@@ -240,6 +264,10 @@ A exercise_type should be one of the following types:
 
 =back
 
+=head2 C<_has_exercise_type>
+
+A predicate for the L</exercise_type> attribute.
+
 =head2 C<from_location>
 
 C<fromLocation>
@@ -255,6 +283,10 @@ A from_location should be one of the following types:
 
 =back
 
+=head2 C<_has_from_location>
+
+A predicate for the L</from_location> attribute.
+
 =head2 C<opponent>
 
 A sub property of participant. The opponent on this action.
@@ -266,6 +298,10 @@ A opponent should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_opponent>
+
+A predicate for the L</opponent> attribute.
 
 =head2 C<sports_activity_location>
 
@@ -282,6 +318,10 @@ A sports_activity_location should be one of the following types:
 
 =back
 
+=head2 C<_has_sports_activity_location>
+
+A predicate for the L</sports_activity_location> attribute.
+
 =head2 C<sports_event>
 
 C<sportsEvent>
@@ -295,6 +335,10 @@ A sports_event should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::SportsEvent']>
 
 =back
+
+=head2 C<_has_sports_event>
+
+A predicate for the L</sports_event> attribute.
 
 =head2 C<sports_team>
 
@@ -311,6 +355,10 @@ A sports_team should be one of the following types:
 
 =back
 
+=head2 C<_has_sports_team>
+
+A predicate for the L</sports_team> attribute.
+
 =head2 C<to_location>
 
 C<toLocation>
@@ -325,6 +373,10 @@ A to_location should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
+
+=head2 C<_has_to_location>
+
+A predicate for the L</to_location> attribute.
 
 =head1 SEE ALSO
 

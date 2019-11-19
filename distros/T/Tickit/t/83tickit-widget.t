@@ -44,17 +44,21 @@ my $tickit = Tickit->new(
    root     => TestWidget->new,
 );
 
-$tickit->setup_term;
+#$tickit->setup_term;
+$tickit->later( sub { $tickit->stop } );
+$tickit->run;
 
 # There might be some terminal setup code here... Flush it
 $my_rd->blocking( 0 );
 sysread( $my_rd, my $buffer, 8192 );
 
-$tickit->rootwin->flush;
+#$tickit->rootwin->flush;
+$tickit->later( sub { $tickit->stop } );
+$tickit->run;
 
 # These strings are fragile but there's not much else we can do for an end-to-end
 # test. If this unit test breaks likely these strings need updating. Sorry.
-stream_is( "\e[13;38H\e[mHello", 'root widget rendered' );
+stream_is( "\e[13;38HHello", 'root widget rendered' );
 
 done_testing;
 
@@ -69,11 +73,13 @@ sub set_window
    my $self = shift;
    ( $self->{window} ) = @_;
 
-   $self->{window}->bind_event( expose => sub {
-      my ( $win, undef, $info ) = @_;
-      $self->render_to_rb( $info->rb, $info->rect );
-   } );
-   $self->{window}->expose;
+   if( my $window = $self->{window} ) {
+      $window->bind_event( expose => sub {
+         my ( $win, undef, $info ) = @_;
+         $self->render_to_rb( $info->rb, $info->rect );
+      } );
+      $window->expose;
+   }
 }
 
 sub render_to_rb

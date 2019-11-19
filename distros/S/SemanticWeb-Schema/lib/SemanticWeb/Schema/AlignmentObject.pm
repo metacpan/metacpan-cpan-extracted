@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has alignment_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_alignment_type',
     json_ld   => 'alignmentType',
 );
 
@@ -28,7 +28,7 @@ has alignment_type => (
 
 has educational_framework => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_educational_framework',
     json_ld   => 'educationalFramework',
 );
 
@@ -36,7 +36,7 @@ has educational_framework => (
 
 has target_description => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_target_description',
     json_ld   => 'targetDescription',
 );
 
@@ -44,7 +44,7 @@ has target_description => (
 
 has target_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_target_name',
     json_ld   => 'targetName',
 );
 
@@ -52,7 +52,7 @@ has target_name => (
 
 has target_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_target_url',
     json_ld   => 'targetUrl',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::AlignmentObject - An intangible item that describes an alig
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -100,6 +100,10 @@ A alignment_type should be one of the following types:
 
 =back
 
+=head2 C<_has_alignment_type>
+
+A predicate for the L</alignment_type> attribute.
+
 =head2 C<educational_framework>
 
 C<educationalFramework>
@@ -113,6 +117,10 @@ A educational_framework should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_educational_framework>
+
+A predicate for the L</educational_framework> attribute.
 
 =head2 C<target_description>
 
@@ -128,6 +136,10 @@ A target_description should be one of the following types:
 
 =back
 
+=head2 C<_has_target_description>
+
+A predicate for the L</target_description> attribute.
+
 =head2 C<target_name>
 
 C<targetName>
@@ -142,6 +154,10 @@ A target_name should be one of the following types:
 
 =back
 
+=head2 C<_has_target_name>
+
+A predicate for the L</target_name> attribute.
+
 =head2 C<target_url>
 
 C<targetUrl>
@@ -155,6 +171,10 @@ A target_url should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_target_url>
+
+A predicate for the L</target_url> attribute.
 
 =head1 SEE ALSO
 

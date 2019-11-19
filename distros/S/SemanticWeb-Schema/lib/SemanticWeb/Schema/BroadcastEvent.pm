@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has broadcast_of_event => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcast_of_event',
     json_ld   => 'broadcastOfEvent',
 );
 
@@ -28,7 +28,7 @@ has broadcast_of_event => (
 
 has is_live_broadcast => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_live_broadcast',
     json_ld   => 'isLiveBroadcast',
 );
 
@@ -36,7 +36,7 @@ has is_live_broadcast => (
 
 has subtitle_language => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_subtitle_language',
     json_ld   => 'subtitleLanguage',
 );
 
@@ -44,7 +44,7 @@ has subtitle_language => (
 
 has video_format => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_video_format',
     json_ld   => 'videoFormat',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::BroadcastEvent - An over the air or online broadcast event.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -88,6 +88,10 @@ A broadcast_of_event should be one of the following types:
 
 =back
 
+=head2 C<_has_broadcast_of_event>
+
+A predicate for the L</broadcast_of_event> attribute.
+
 =head2 C<is_live_broadcast>
 
 C<isLiveBroadcast>
@@ -101,6 +105,10 @@ A is_live_broadcast should be one of the following types:
 =item C<Bool>
 
 =back
+
+=head2 C<_has_is_live_broadcast>
+
+A predicate for the L</is_live_broadcast> attribute.
 
 =head2 C<subtitle_language>
 
@@ -119,6 +127,10 @@ A subtitle_language should be one of the following types:
 
 =back
 
+=head2 C<_has_subtitle_language>
+
+A predicate for the L</subtitle_language> attribute.
+
 =head2 C<video_format>
 
 C<videoFormat>
@@ -133,6 +145,10 @@ A video_format should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_video_format>
+
+A predicate for the L</video_format> attribute.
 
 =head1 SEE ALSO
 

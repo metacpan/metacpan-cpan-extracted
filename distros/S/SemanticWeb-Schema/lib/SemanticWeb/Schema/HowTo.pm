@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has estimated_cost => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_estimated_cost',
     json_ld   => 'estimatedCost',
 );
 
@@ -28,7 +28,7 @@ has estimated_cost => (
 
 has perform_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_perform_time',
     json_ld   => 'performTime',
 );
 
@@ -36,7 +36,7 @@ has perform_time => (
 
 has prep_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_prep_time',
     json_ld   => 'prepTime',
 );
 
@@ -44,7 +44,7 @@ has prep_time => (
 
 has step => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_step',
     json_ld   => 'step',
 );
 
@@ -52,7 +52,7 @@ has step => (
 
 has steps => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_steps',
     json_ld   => 'steps',
 );
 
@@ -60,7 +60,7 @@ has steps => (
 
 has supply => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_supply',
     json_ld   => 'supply',
 );
 
@@ -68,7 +68,7 @@ has supply => (
 
 has tool => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_tool',
     json_ld   => 'tool',
 );
 
@@ -76,7 +76,7 @@ has tool => (
 
 has total_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_total_time',
     json_ld   => 'totalTime',
 );
 
@@ -84,7 +84,7 @@ has total_time => (
 
 has yield => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_yield',
     json_ld   => 'yield',
 );
 
@@ -106,7 +106,7 @@ SemanticWeb::Schema::HowTo - Instructions that explain how to achieve a result b
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -132,6 +132,10 @@ A estimated_cost should be one of the following types:
 
 =back
 
+=head2 C<_has_estimated_cost>
+
+A predicate for the L</estimated_cost> attribute.
+
 =head2 C<perform_time>
 
 C<performTime>
@@ -149,6 +153,10 @@ A perform_time should be one of the following types:
 
 =back
 
+=head2 C<_has_perform_time>
+
+A predicate for the L</perform_time> attribute.
+
 =head2 C<prep_time>
 
 C<prepTime>
@@ -165,6 +173,10 @@ A prep_time should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
+
+=head2 C<_has_prep_time>
+
+A predicate for the L</prep_time> attribute.
 
 =head2 C<step>
 
@@ -185,6 +197,10 @@ A step should be one of the following types:
 
 =back
 
+=head2 C<_has_step>
+
+A predicate for the L</step> attribute.
+
 =head2 C<steps>
 
 A single step item (as HowToStep, text, document, video, etc.) or a
@@ -202,6 +218,10 @@ A steps should be one of the following types:
 
 =back
 
+=head2 C<_has_steps>
+
+A predicate for the L</steps> attribute.
+
 =head2 C<supply>
 
 A sub-property of instrument. A supply consumed when performing
@@ -217,6 +237,10 @@ A supply should be one of the following types:
 
 =back
 
+=head2 C<_has_supply>
+
+A predicate for the L</supply> attribute.
+
 =head2 C<tool>
 
 A sub property of instrument. An object used (but not consumed) when
@@ -231,6 +255,10 @@ A tool should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_tool>
+
+A predicate for the L</tool> attribute.
 
 =head2 C<total_time>
 
@@ -249,6 +277,10 @@ A total_time should be one of the following types:
 
 =back
 
+=head2 C<_has_total_time>
+
+A predicate for the L</total_time> attribute.
+
 =head2 C<yield>
 
 The quantity that results by performing instructions. For example, a paper
@@ -263,6 +295,10 @@ A yield should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_yield>
+
+A predicate for the L</yield> attribute.
 
 =head1 SEE ALSO
 

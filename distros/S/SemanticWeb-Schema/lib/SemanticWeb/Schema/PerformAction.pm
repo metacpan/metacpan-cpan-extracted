@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has entertainment_business => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_entertainment_business',
     json_ld   => 'entertainmentBusiness',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::PerformAction - The act of participating in performance art
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ A entertainment_business should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::EntertainmentBusiness']>
 
 =back
+
+=head2 C<_has_entertainment_business>
+
+A predicate for the L</entertainment_business> attribute.
 
 =head1 SEE ALSO
 

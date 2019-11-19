@@ -42,12 +42,13 @@ subtest 'git_ls_files' => sub {
 subtest 'git_toplevel' => sub {
     plan skip_all => 'Cannot run git' if !$can_git;
     my $repodir =_setup_git_repo();
+    my $repodir_fixed = _fix_win32_path($repodir);
 
     my $r = App::Codeowners::Util::git_toplevel($repodir);
-    is($r->canonpath, $repodir->canonpath, 'found toplevel directory from toplevel');
+    is($r->canonpath, $repodir_fixed->canonpath, 'found toplevel directory from toplevel');
 
     $r = App::Codeowners::Util::git_toplevel($repodir->child('a/b'));
-    is($r->canonpath, $repodir->canonpath, 'found toplevel directory');
+    is($r->canonpath, $repodir_fixed->canonpath, 'found toplevel directory');
 };
 
 subtest 'find_nearest_codeowners' => sub {
@@ -90,11 +91,22 @@ sub _setup_git_repo {
     my $repodir = tempdir;
 
     run_git('-C', $repodir, 'init')->wait;
+    run_git('-C', $repodir, qw{config --local user.email app-codeowners@example.com})->wait;
+    run_git('-C', $repodir, qw{config --local user.name App-Codeowners})->wait;
 
     $repodir->child('foo.txt')->touchpath;
     $repodir->child('a/b/c/bar.txt')->touchpath;
 
     return $repodir;
+}
+
+sub _fix_win32_path {
+    my $path = shift;
+    # Git for Windows shows full paths
+    if (eval { require Win32 }) {
+        $path = path(Win32::GetLongPathName($path));
+    }
+    return $path;
 }
 
 sub _spew_codeowners {

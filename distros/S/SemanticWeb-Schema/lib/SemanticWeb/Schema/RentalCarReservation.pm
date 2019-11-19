@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has dropoff_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_dropoff_location',
     json_ld   => 'dropoffLocation',
 );
 
@@ -28,7 +28,7 @@ has dropoff_location => (
 
 has dropoff_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_dropoff_time',
     json_ld   => 'dropoffTime',
 );
 
@@ -36,7 +36,7 @@ has dropoff_time => (
 
 has pickup_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_pickup_location',
     json_ld   => 'pickupLocation',
 );
 
@@ -44,7 +44,7 @@ has pickup_location => (
 
 has pickup_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_pickup_time',
     json_ld   => 'pickupTime',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::RentalCarReservation - A reservation for a rental car
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -90,6 +90,10 @@ A dropoff_location should be one of the following types:
 
 =back
 
+=head2 C<_has_dropoff_location>
+
+A predicate for the L</dropoff_location> attribute.
+
 =head2 C<dropoff_time>
 
 C<dropoffTime>
@@ -103,6 +107,10 @@ A dropoff_time should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_dropoff_time>
+
+A predicate for the L</dropoff_time> attribute.
 
 =head2 C<pickup_location>
 
@@ -118,6 +126,10 @@ A pickup_location should be one of the following types:
 
 =back
 
+=head2 C<_has_pickup_location>
+
+A predicate for the L</pickup_location> attribute.
+
 =head2 C<pickup_time>
 
 C<pickupTime>
@@ -131,6 +143,10 @@ A pickup_time should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_pickup_time>
+
+A predicate for the L</pickup_time> attribute.
 
 =head1 SEE ALSO
 

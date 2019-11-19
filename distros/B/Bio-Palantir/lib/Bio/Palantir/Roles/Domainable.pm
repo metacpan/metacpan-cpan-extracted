@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Domainable;
 # ABSTRACT: Domainable Moose role for Domain and DomainPlus objects
-$Bio::Palantir::Roles::Domainable::VERSION = '0.193080';
+$Bio::Palantir::Roles::Domainable::VERSION = '0.193230';
 use Moose::Role;
 
 use autodie;
@@ -41,7 +41,7 @@ has 'symbol' => (
             : $name =~ m/^H$ | Heterocyclization/xms
             ? 'H' 
             : $name =~ m/^TE$ | Thioesterase/xmsi
-            ? 'Te' 
+            ? 'TE' 
             : $name =~ m/^Red$ | ^TD$ /xmsi
             ? 'Red' 
             : $name =~ m/Aminotran/xms
@@ -99,7 +99,7 @@ Bio::Palantir::Roles::Domainable - Domainable Moose role for Domain and DomainPl
 
 =head1 VERSION
 
-version 0.193080
+version 0.193230
 
 =head1 SYNOPSIS
 

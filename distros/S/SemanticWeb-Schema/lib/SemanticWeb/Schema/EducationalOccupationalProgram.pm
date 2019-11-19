@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has educational_credential_awarded => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_educational_credential_awarded',
     json_ld   => 'educationalCredentialAwarded',
 );
 
@@ -28,7 +28,7 @@ has educational_credential_awarded => (
 
 has occupational_credential_awarded => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_occupational_credential_awarded',
     json_ld   => 'occupationalCredentialAwarded',
 );
 
@@ -36,7 +36,7 @@ has occupational_credential_awarded => (
 
 has offers => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_offers',
     json_ld   => 'offers',
 );
 
@@ -44,7 +44,7 @@ has offers => (
 
 has program_prerequisites => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_program_prerequisites',
     json_ld   => 'programPrerequisites',
 );
 
@@ -52,7 +52,7 @@ has program_prerequisites => (
 
 has provider => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_provider',
     json_ld   => 'provider',
 );
 
@@ -60,7 +60,7 @@ has provider => (
 
 has salary_upon_completion => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_salary_upon_completion',
     json_ld   => 'salaryUponCompletion',
 );
 
@@ -68,7 +68,7 @@ has salary_upon_completion => (
 
 has time_to_complete => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_time_to_complete',
     json_ld   => 'timeToComplete',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::EducationalOccupationalProgram - A program offered by an in
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -121,6 +121,10 @@ A educational_credential_awarded should be one of the following types:
 
 =back
 
+=head2 C<_has_educational_credential_awarded>
+
+A predicate for the L</educational_credential_awarded> attribute.
+
 =head2 C<occupational_credential_awarded>
 
 C<occupationalCredentialAwarded>
@@ -139,6 +143,10 @@ A occupational_credential_awarded should be one of the following types:
 
 =back
 
+=head2 C<_has_occupational_credential_awarded>
+
+A predicate for the L</occupational_credential_awarded> attribute.
+
 =head2 C<offers>
 
 An offer to provide this item&#x2014;for example, an offer to sell a
@@ -152,6 +160,10 @@ A offers should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Offer']>
 
 =back
+
+=head2 C<_has_offers>
+
+A predicate for the L</offers> attribute.
 
 =head2 C<program_prerequisites>
 
@@ -173,6 +185,10 @@ A program_prerequisites should be one of the following types:
 
 =back
 
+=head2 C<_has_program_prerequisites>
+
+A predicate for the L</program_prerequisites> attribute.
+
 =head2 C<provider>
 
 The service provider, service operator, or service performer; the goods
@@ -189,6 +205,10 @@ A provider should be one of the following types:
 
 =back
 
+=head2 C<_has_provider>
+
+A predicate for the L</provider> attribute.
+
 =head2 C<salary_upon_completion>
 
 C<salaryUponCompletion>
@@ -203,6 +223,10 @@ A salary_upon_completion should be one of the following types:
 
 =back
 
+=head2 C<_has_salary_upon_completion>
+
+A predicate for the L</salary_upon_completion> attribute.
+
 =head2 C<time_to_complete>
 
 C<timeToComplete>
@@ -216,6 +240,10 @@ A time_to_complete should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
+
+=head2 C<_has_time_to_complete>
+
+A predicate for the L</time_to_complete> attribute.
 
 =head1 SEE ALSO
 

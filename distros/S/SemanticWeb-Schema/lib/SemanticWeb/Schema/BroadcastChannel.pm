@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has broadcast_channel_id => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcast_channel_id',
     json_ld   => 'broadcastChannelId',
 );
 
@@ -28,7 +28,7 @@ has broadcast_channel_id => (
 
 has broadcast_frequency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcast_frequency',
     json_ld   => 'broadcastFrequency',
 );
 
@@ -36,7 +36,7 @@ has broadcast_frequency => (
 
 has broadcast_service_tier => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcast_service_tier',
     json_ld   => 'broadcastServiceTier',
 );
 
@@ -44,7 +44,7 @@ has broadcast_service_tier => (
 
 has genre => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_genre',
     json_ld   => 'genre',
 );
 
@@ -52,7 +52,7 @@ has genre => (
 
 has in_broadcast_lineup => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_in_broadcast_lineup',
     json_ld   => 'inBroadcastLineup',
 );
 
@@ -60,7 +60,7 @@ has in_broadcast_lineup => (
 
 has provides_broadcast_service => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_provides_broadcast_service',
     json_ld   => 'providesBroadcastService',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::BroadcastChannel - A unique instance of a BroadcastService 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -106,6 +106,10 @@ A broadcast_channel_id should be one of the following types:
 
 =back
 
+=head2 C<_has_broadcast_channel_id>
+
+A predicate for the L</broadcast_channel_id> attribute.
+
 =head2 C<broadcast_frequency>
 
 C<broadcastFrequency>
@@ -124,6 +128,10 @@ A broadcast_frequency should be one of the following types:
 
 =back
 
+=head2 C<_has_broadcast_frequency>
+
+A predicate for the L</broadcast_frequency> attribute.
+
 =head2 C<broadcast_service_tier>
 
 C<broadcastServiceTier>
@@ -139,6 +147,10 @@ A broadcast_service_tier should be one of the following types:
 
 =back
 
+=head2 C<_has_broadcast_service_tier>
+
+A predicate for the L</broadcast_service_tier> attribute.
+
 =head2 C<genre>
 
 Genre of the creative work, broadcast channel or group.
@@ -150,6 +162,10 @@ A genre should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_genre>
+
+A predicate for the L</genre> attribute.
 
 =head2 C<in_broadcast_lineup>
 
@@ -165,6 +181,10 @@ A in_broadcast_lineup should be one of the following types:
 
 =back
 
+=head2 C<_has_in_broadcast_lineup>
+
+A predicate for the L</in_broadcast_lineup> attribute.
+
 =head2 C<provides_broadcast_service>
 
 C<providesBroadcastService>
@@ -178,6 +198,10 @@ A provides_broadcast_service should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::BroadcastService']>
 
 =back
+
+=head2 C<_has_provides_broadcast_service>
+
+A predicate for the L</provides_broadcast_service> attribute.
 
 =head1 SEE ALSO
 

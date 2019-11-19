@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has drug => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_drug',
     json_ld   => 'drug',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::DrugClass - A class of medical drugs, e
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -63,6 +63,10 @@ A drug should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Drug']>
 
 =back
+
+=head2 C<_has_drug>
+
+A predicate for the L</drug> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has code_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_code_value',
     json_ld   => 'codeValue',
 );
 
@@ -28,7 +28,7 @@ has code_value => (
 
 has in_code_set => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_in_code_set',
     json_ld   => 'inCodeSet',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::CategoryCode - A Category Code.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -72,6 +72,10 @@ A code_value should be one of the following types:
 
 =back
 
+=head2 C<_has_code_value>
+
+A predicate for the L</code_value> attribute.
+
 =head2 C<in_code_set>
 
 C<inCodeSet>
@@ -89,6 +93,10 @@ A in_code_set should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_in_code_set>
+
+A predicate for the L</in_code_set> attribute.
 
 =head1 SEE ALSO
 

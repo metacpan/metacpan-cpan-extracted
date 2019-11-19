@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has legislation_applies => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_applies',
     json_ld   => 'legislationApplies',
 );
 
@@ -28,7 +28,7 @@ has legislation_applies => (
 
 has legislation_changes => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_changes',
     json_ld   => 'legislationChanges',
 );
 
@@ -36,7 +36,7 @@ has legislation_changes => (
 
 has legislation_consolidates => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_consolidates',
     json_ld   => 'legislationConsolidates',
 );
 
@@ -44,7 +44,7 @@ has legislation_consolidates => (
 
 has legislation_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_date',
     json_ld   => 'legislationDate',
 );
 
@@ -52,7 +52,7 @@ has legislation_date => (
 
 has legislation_date_version => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_date_version',
     json_ld   => 'legislationDateVersion',
 );
 
@@ -60,7 +60,7 @@ has legislation_date_version => (
 
 has legislation_identifier => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_identifier',
     json_ld   => 'legislationIdentifier',
 );
 
@@ -68,7 +68,7 @@ has legislation_identifier => (
 
 has legislation_jurisdiction => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_jurisdiction',
     json_ld   => 'legislationJurisdiction',
 );
 
@@ -76,7 +76,7 @@ has legislation_jurisdiction => (
 
 has legislation_legal_force => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_legal_force',
     json_ld   => 'legislationLegalForce',
 );
 
@@ -84,7 +84,7 @@ has legislation_legal_force => (
 
 has legislation_passed_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_passed_by',
     json_ld   => 'legislationPassedBy',
 );
 
@@ -92,7 +92,7 @@ has legislation_passed_by => (
 
 has legislation_responsible => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_responsible',
     json_ld   => 'legislationResponsible',
 );
 
@@ -100,7 +100,7 @@ has legislation_responsible => (
 
 has legislation_transposes => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_transposes',
     json_ld   => 'legislationTransposes',
 );
 
@@ -108,7 +108,7 @@ has legislation_transposes => (
 
 has legislation_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_type',
     json_ld   => 'legislationType',
 );
 
@@ -130,7 +130,7 @@ SemanticWeb::Schema::Legislation - A legal document such as an act
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -160,6 +160,10 @@ A legislation_applies should be one of the following types:
 
 =back
 
+=head2 C<_has_legislation_applies>
+
+A predicate for the L</legislation_applies> attribute.
+
 =head2 C<legislation_changes>
 
 C<legislationChanges>
@@ -181,6 +185,10 @@ A legislation_changes should be one of the following types:
 
 =back
 
+=head2 C<_has_legislation_changes>
+
+A predicate for the L</legislation_changes> attribute.
+
 =head2 C<legislation_consolidates>
 
 C<legislationConsolidates>
@@ -199,6 +207,10 @@ A legislation_consolidates should be one of the following types:
 
 =back
 
+=head2 C<_has_legislation_consolidates>
+
+A predicate for the L</legislation_consolidates> attribute.
+
 =head2 C<legislation_date>
 
 C<legislationDate>
@@ -214,6 +226,10 @@ A legislation_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_legislation_date>
+
+A predicate for the L</legislation_date> attribute.
 
 =head2 C<legislation_date_version>
 
@@ -232,6 +248,10 @@ A legislation_date_version should be one of the following types:
 
 =back
 
+=head2 C<_has_legislation_date_version>
+
+A predicate for the L</legislation_date_version> attribute.
+
 =head2 C<legislation_identifier>
 
 C<legislationIdentifier>
@@ -249,6 +269,10 @@ A legislation_identifier should be one of the following types:
 
 =back
 
+=head2 C<_has_legislation_identifier>
+
+A predicate for the L</legislation_identifier> attribute.
+
 =head2 C<legislation_jurisdiction>
 
 C<legislationJurisdiction>
@@ -265,6 +289,10 @@ A legislation_jurisdiction should be one of the following types:
 
 =back
 
+=head2 C<_has_legislation_jurisdiction>
+
+A predicate for the L</legislation_jurisdiction> attribute.
+
 =head2 C<legislation_legal_force>
 
 C<legislationLegalForce>
@@ -279,6 +307,10 @@ A legislation_legal_force should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::LegalForceStatus']>
 
 =back
+
+=head2 C<_has_legislation_legal_force>
+
+A predicate for the L</legislation_legal_force> attribute.
 
 =head2 C<legislation_passed_by>
 
@@ -299,6 +331,10 @@ A legislation_passed_by should be one of the following types:
 
 =back
 
+=head2 C<_has_legislation_passed_by>
+
+A predicate for the L</legislation_passed_by> attribute.
+
 =head2 C<legislation_responsible>
 
 C<legislationResponsible>
@@ -318,6 +354,10 @@ A legislation_responsible should be one of the following types:
 
 =back
 
+=head2 C<_has_legislation_responsible>
+
+A predicate for the L</legislation_responsible> attribute.
+
 =head2 C<legislation_transposes>
 
 C<legislationTransposes>
@@ -336,6 +376,10 @@ A legislation_transposes should be one of the following types:
 
 =back
 
+=head2 C<_has_legislation_transposes>
+
+A predicate for the L</legislation_transposes> attribute.
+
 =head2 C<legislation_type>
 
 C<legislationType>
@@ -353,6 +397,10 @@ A legislation_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_legislation_type>
+
+A predicate for the L</legislation_type> attribute.
 
 =head1 SEE ALSO
 

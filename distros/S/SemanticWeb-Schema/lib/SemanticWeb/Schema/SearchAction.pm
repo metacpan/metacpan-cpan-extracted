@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has query => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_query',
     json_ld   => 'query',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::SearchAction - The act of searching for an object
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ A query should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_query>
+
+A predicate for the L</query> attribute.
 
 =head1 SEE ALSO
 

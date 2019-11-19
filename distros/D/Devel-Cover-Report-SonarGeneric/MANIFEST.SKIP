@@ -7,3 +7,6 @@
 ^blib
 ^pm_to_blib
 ^README\.md
+^_Deparsed_XSubs.pm
+^cover_db
+^t/cover_db/sonar_generic.xml

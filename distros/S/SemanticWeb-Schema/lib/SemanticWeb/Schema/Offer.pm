@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has accepted_payment_method => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_accepted_payment_method',
     json_ld   => 'acceptedPaymentMethod',
 );
 
@@ -28,7 +28,7 @@ has accepted_payment_method => (
 
 has add_on => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_add_on',
     json_ld   => 'addOn',
 );
 
@@ -36,7 +36,7 @@ has add_on => (
 
 has advance_booking_requirement => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_advance_booking_requirement',
     json_ld   => 'advanceBookingRequirement',
 );
 
@@ -44,7 +44,7 @@ has advance_booking_requirement => (
 
 has aggregate_rating => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_aggregate_rating',
     json_ld   => 'aggregateRating',
 );
 
@@ -52,7 +52,7 @@ has aggregate_rating => (
 
 has area_served => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_area_served',
     json_ld   => 'areaServed',
 );
 
@@ -60,7 +60,7 @@ has area_served => (
 
 has availability => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_availability',
     json_ld   => 'availability',
 );
 
@@ -68,7 +68,7 @@ has availability => (
 
 has availability_ends => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_availability_ends',
     json_ld   => 'availabilityEnds',
 );
 
@@ -76,7 +76,7 @@ has availability_ends => (
 
 has availability_starts => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_availability_starts',
     json_ld   => 'availabilityStarts',
 );
 
@@ -84,7 +84,7 @@ has availability_starts => (
 
 has available_at_or_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_available_at_or_from',
     json_ld   => 'availableAtOrFrom',
 );
 
@@ -92,7 +92,7 @@ has available_at_or_from => (
 
 has available_delivery_method => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_available_delivery_method',
     json_ld   => 'availableDeliveryMethod',
 );
 
@@ -100,7 +100,7 @@ has available_delivery_method => (
 
 has business_function => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_business_function',
     json_ld   => 'businessFunction',
 );
 
@@ -108,7 +108,7 @@ has business_function => (
 
 has category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_category',
     json_ld   => 'category',
 );
 
@@ -116,7 +116,7 @@ has category => (
 
 has delivery_lead_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_delivery_lead_time',
     json_ld   => 'deliveryLeadTime',
 );
 
@@ -124,7 +124,7 @@ has delivery_lead_time => (
 
 has eligible_customer_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_eligible_customer_type',
     json_ld   => 'eligibleCustomerType',
 );
 
@@ -132,7 +132,7 @@ has eligible_customer_type => (
 
 has eligible_duration => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_eligible_duration',
     json_ld   => 'eligibleDuration',
 );
 
@@ -140,7 +140,7 @@ has eligible_duration => (
 
 has eligible_quantity => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_eligible_quantity',
     json_ld   => 'eligibleQuantity',
 );
 
@@ -148,7 +148,7 @@ has eligible_quantity => (
 
 has eligible_region => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_eligible_region',
     json_ld   => 'eligibleRegion',
 );
 
@@ -156,7 +156,7 @@ has eligible_region => (
 
 has eligible_transaction_volume => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_eligible_transaction_volume',
     json_ld   => 'eligibleTransactionVolume',
 );
 
@@ -164,7 +164,7 @@ has eligible_transaction_volume => (
 
 has gtin => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_gtin',
     json_ld   => 'gtin',
 );
 
@@ -172,7 +172,7 @@ has gtin => (
 
 has gtin12 => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_gtin12',
     json_ld   => 'gtin12',
 );
 
@@ -180,7 +180,7 @@ has gtin12 => (
 
 has gtin13 => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_gtin13',
     json_ld   => 'gtin13',
 );
 
@@ -188,7 +188,7 @@ has gtin13 => (
 
 has gtin14 => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_gtin14',
     json_ld   => 'gtin14',
 );
 
@@ -196,7 +196,7 @@ has gtin14 => (
 
 has gtin8 => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_gtin8',
     json_ld   => 'gtin8',
 );
 
@@ -204,7 +204,7 @@ has gtin8 => (
 
 has includes_object => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_includes_object',
     json_ld   => 'includesObject',
 );
 
@@ -212,7 +212,7 @@ has includes_object => (
 
 has ineligible_region => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ineligible_region',
     json_ld   => 'ineligibleRegion',
 );
 
@@ -220,7 +220,7 @@ has ineligible_region => (
 
 has inventory_level => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_inventory_level',
     json_ld   => 'inventoryLevel',
 );
 
@@ -228,7 +228,7 @@ has inventory_level => (
 
 has item_condition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_item_condition',
     json_ld   => 'itemCondition',
 );
 
@@ -236,7 +236,7 @@ has item_condition => (
 
 has item_offered => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_item_offered',
     json_ld   => 'itemOffered',
 );
 
@@ -244,7 +244,7 @@ has item_offered => (
 
 has mpn => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_mpn',
     json_ld   => 'mpn',
 );
 
@@ -252,7 +252,7 @@ has mpn => (
 
 has offered_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_offered_by',
     json_ld   => 'offeredBy',
 );
 
@@ -260,7 +260,7 @@ has offered_by => (
 
 has price => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price',
     json_ld   => 'price',
 );
 
@@ -268,7 +268,7 @@ has price => (
 
 has price_currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price_currency',
     json_ld   => 'priceCurrency',
 );
 
@@ -276,7 +276,7 @@ has price_currency => (
 
 has price_specification => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price_specification',
     json_ld   => 'priceSpecification',
 );
 
@@ -284,7 +284,7 @@ has price_specification => (
 
 has price_valid_until => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price_valid_until',
     json_ld   => 'priceValidUntil',
 );
 
@@ -292,7 +292,7 @@ has price_valid_until => (
 
 has review => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_review',
     json_ld   => 'review',
 );
 
@@ -300,7 +300,7 @@ has review => (
 
 has reviews => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_reviews',
     json_ld   => 'reviews',
 );
 
@@ -308,7 +308,7 @@ has reviews => (
 
 has seller => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_seller',
     json_ld   => 'seller',
 );
 
@@ -316,7 +316,7 @@ has seller => (
 
 has serial_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_serial_number',
     json_ld   => 'serialNumber',
 );
 
@@ -324,7 +324,7 @@ has serial_number => (
 
 has sku => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sku',
     json_ld   => 'sku',
 );
 
@@ -332,7 +332,7 @@ has sku => (
 
 has valid_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_from',
     json_ld   => 'validFrom',
 );
 
@@ -340,7 +340,7 @@ has valid_from => (
 
 has valid_through => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_through',
     json_ld   => 'validThrough',
 );
 
@@ -348,7 +348,7 @@ has valid_through => (
 
 has warranty => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_warranty',
     json_ld   => 'warranty',
 );
 
@@ -370,7 +370,7 @@ SemanticWeb::Schema::Offer - An offer to transfer some rights to an item or to p
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -403,6 +403,10 @@ A accepted_payment_method should be one of the following types:
 
 =back
 
+=head2 C<_has_accepted_payment_method>
+
+A predicate for the L</accepted_payment_method> attribute.
+
 =head2 C<add_on>
 
 C<addOn>
@@ -419,6 +423,10 @@ A add_on should be one of the following types:
 
 =back
 
+=head2 C<_has_add_on>
+
+A predicate for the L</add_on> attribute.
+
 =head2 C<advance_booking_requirement>
 
 C<advanceBookingRequirement>
@@ -434,6 +442,10 @@ A advance_booking_requirement should be one of the following types:
 
 =back
 
+=head2 C<_has_advance_booking_requirement>
+
+A predicate for the L</advance_booking_requirement> attribute.
+
 =head2 C<aggregate_rating>
 
 C<aggregateRating>
@@ -448,6 +460,10 @@ A aggregate_rating should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AggregateRating']>
 
 =back
+
+=head2 C<_has_aggregate_rating>
+
+A predicate for the L</aggregate_rating> attribute.
 
 =head2 C<area_served>
 
@@ -469,6 +485,10 @@ A area_served should be one of the following types:
 
 =back
 
+=head2 C<_has_area_served>
+
+A predicate for the L</area_served> attribute.
+
 =head2 C<availability>
 
 The availability of this item&#x2014;for example In stock, Out of stock,
@@ -481,6 +501,10 @@ A availability should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ItemAvailability']>
 
 =back
+
+=head2 C<_has_availability>
+
+A predicate for the L</availability> attribute.
 
 =head2 C<availability_ends>
 
@@ -497,6 +521,10 @@ A availability_ends should be one of the following types:
 
 =back
 
+=head2 C<_has_availability_ends>
+
+A predicate for the L</availability_ends> attribute.
+
 =head2 C<availability_starts>
 
 C<availabilityStarts>
@@ -512,6 +540,10 @@ A availability_starts should be one of the following types:
 
 =back
 
+=head2 C<_has_availability_starts>
+
+A predicate for the L</availability_starts> attribute.
+
 =head2 C<available_at_or_from>
 
 C<availableAtOrFrom>
@@ -526,6 +558,10 @@ A available_at_or_from should be one of the following types:
 
 =back
 
+=head2 C<_has_available_at_or_from>
+
+A predicate for the L</available_at_or_from> attribute.
+
 =head2 C<available_delivery_method>
 
 C<availableDeliveryMethod>
@@ -539,6 +575,10 @@ A available_delivery_method should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::DeliveryMethod']>
 
 =back
+
+=head2 C<_has_available_delivery_method>
+
+A predicate for the L</available_delivery_method> attribute.
 
 =head2 C<business_function>
 
@@ -555,6 +595,10 @@ A business_function should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::BusinessFunction']>
 
 =back
+
+=head2 C<_has_business_function>
+
+A predicate for the L</business_function> attribute.
 
 =head2 C<category>
 
@@ -573,6 +617,10 @@ A category should be one of the following types:
 
 =back
 
+=head2 C<_has_category>
+
+A predicate for the L</category> attribute.
+
 =head2 C<delivery_lead_time>
 
 C<deliveryLeadTime>
@@ -589,6 +637,10 @@ A delivery_lead_time should be one of the following types:
 
 =back
 
+=head2 C<_has_delivery_lead_time>
+
+A predicate for the L</delivery_lead_time> attribute.
+
 =head2 C<eligible_customer_type>
 
 C<eligibleCustomerType>
@@ -603,6 +655,10 @@ A eligible_customer_type should be one of the following types:
 
 =back
 
+=head2 C<_has_eligible_customer_type>
+
+A predicate for the L</eligible_customer_type> attribute.
+
 =head2 C<eligible_duration>
 
 C<eligibleDuration>
@@ -616,6 +672,10 @@ A eligible_duration should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_eligible_duration>
+
+A predicate for the L</eligible_duration> attribute.
 
 =head2 C<eligible_quantity>
 
@@ -632,6 +692,10 @@ A eligible_quantity should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_eligible_quantity>
+
+A predicate for the L</eligible_quantity> attribute.
 
 =head2 C<eligible_region>
 
@@ -655,6 +719,10 @@ A eligible_region should be one of the following types:
 
 =back
 
+=head2 C<_has_eligible_region>
+
+A predicate for the L</eligible_region> attribute.
+
 =head2 C<eligible_transaction_volume>
 
 C<eligibleTransactionVolume>
@@ -671,6 +739,10 @@ A eligible_transaction_volume should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
 
 =back
+
+=head2 C<_has_eligible_transaction_volume>
+
+A predicate for the L</eligible_transaction_volume> attribute.
 
 =head2 C<gtin>
 
@@ -705,6 +777,10 @@ A gtin should be one of the following types:
 
 =back
 
+=head2 C<_has_gtin>
+
+A predicate for the L</gtin> attribute.
+
 =head2 C<gtin12>
 
 =for html <p>The GTIN-12 code of the product, or the product to which the offer
@@ -721,6 +797,10 @@ A gtin12 should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_gtin12>
+
+A predicate for the L</gtin12> attribute.
 
 =head2 C<gtin13>
 
@@ -739,6 +819,10 @@ A gtin13 should be one of the following types:
 
 =back
 
+=head2 C<_has_gtin13>
+
+A predicate for the L</gtin13> attribute.
+
 =head2 C<gtin14>
 
 =for html <p>The GTIN-14 code of the product, or the product to which the offer
@@ -752,6 +836,10 @@ A gtin14 should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_gtin14>
+
+A predicate for the L</gtin14> attribute.
 
 =head2 C<gtin8>
 
@@ -770,6 +858,10 @@ A gtin8 should be one of the following types:
 
 =back
 
+=head2 C<_has_gtin8>
+
+A predicate for the L</gtin8> attribute.
+
 =head2 C<includes_object>
 
 C<includesObject>
@@ -784,6 +876,10 @@ A includes_object should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::TypeAndQuantityNode']>
 
 =back
+
+=head2 C<_has_includes_object>
+
+A predicate for the L</includes_object> attribute.
 
 =head2 C<ineligible_region>
 
@@ -807,6 +903,10 @@ A ineligible_region should be one of the following types:
 
 =back
 
+=head2 C<_has_ineligible_region>
+
+A predicate for the L</ineligible_region> attribute.
+
 =head2 C<inventory_level>
 
 C<inventoryLevel>
@@ -820,6 +920,10 @@ A inventory_level should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_inventory_level>
+
+A predicate for the L</inventory_level> attribute.
 
 =head2 C<item_condition>
 
@@ -837,6 +941,10 @@ A item_condition should be one of the following types:
 
 =back
 
+=head2 C<_has_item_condition>
+
+A predicate for the L</item_condition> attribute.
+
 =head2 C<item_offered>
 
 C<itemOffered>
@@ -853,6 +961,10 @@ A item_offered should be one of the following types:
 
 =back
 
+=head2 C<_has_item_offered>
+
+A predicate for the L</item_offered> attribute.
+
 =head2 C<mpn>
 
 The Manufacturer Part Number (MPN) of the product, or the product to which
@@ -865,6 +977,10 @@ A mpn should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_mpn>
+
+A predicate for the L</mpn> attribute.
 
 =head2 C<offered_by>
 
@@ -881,6 +997,10 @@ A offered_by should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_offered_by>
+
+A predicate for the L</offered_by> attribute.
 
 =head2 C<price>
 
@@ -917,6 +1037,10 @@ A price should be one of the following types:
 
 =back
 
+=head2 C<_has_price>
+
+A predicate for the L</price> attribute.
+
 =head2 C<price_currency>
 
 C<priceCurrency>
@@ -941,6 +1065,10 @@ A price_currency should be one of the following types:
 
 =back
 
+=head2 C<_has_price_currency>
+
+A predicate for the L</price_currency> attribute.
+
 =head2 C<price_specification>
 
 C<priceSpecification>
@@ -956,6 +1084,10 @@ A price_specification should be one of the following types:
 
 =back
 
+=head2 C<_has_price_specification>
+
+A predicate for the L</price_specification> attribute.
+
 =head2 C<price_valid_until>
 
 C<priceValidUntil>
@@ -970,6 +1102,10 @@ A price_valid_until should be one of the following types:
 
 =back
 
+=head2 C<_has_price_valid_until>
+
+A predicate for the L</price_valid_until> attribute.
+
 =head2 C<review>
 
 A review of the item.
@@ -982,6 +1118,10 @@ A review should be one of the following types:
 
 =back
 
+=head2 C<_has_review>
+
+A predicate for the L</review> attribute.
+
 =head2 C<reviews>
 
 Review of the item.
@@ -993,6 +1133,10 @@ A reviews should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Review']>
 
 =back
+
+=head2 C<_has_reviews>
+
+A predicate for the L</reviews> attribute.
 
 =head2 C<seller>
 
@@ -1008,6 +1152,10 @@ A seller should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_seller>
+
+A predicate for the L</seller> attribute.
 
 =head2 C<serial_number>
 
@@ -1025,6 +1173,10 @@ A serial_number should be one of the following types:
 
 =back
 
+=head2 C<_has_serial_number>
+
+A predicate for the L</serial_number> attribute.
+
 =head2 C<sku>
 
 The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a
@@ -1037,6 +1189,10 @@ A sku should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_sku>
+
+A predicate for the L</sku> attribute.
 
 =head2 C<valid_from>
 
@@ -1051,6 +1207,10 @@ A valid_from should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_valid_from>
+
+A predicate for the L</valid_from> attribute.
 
 =head2 C<valid_through>
 
@@ -1067,6 +1227,10 @@ A valid_through should be one of the following types:
 
 =back
 
+=head2 C<_has_valid_through>
+
+A predicate for the L</valid_through> attribute.
+
 =head2 C<warranty>
 
 The warranty promise(s) included in the offer.
@@ -1078,6 +1242,10 @@ A warranty should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::WarrantyPromise']>
 
 =back
+
+=head2 C<_has_warranty>
+
+A predicate for the L</warranty> attribute.
 
 =head1 SEE ALSO
 

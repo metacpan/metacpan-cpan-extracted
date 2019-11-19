@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has replacee => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_replacee',
     json_ld   => 'replacee',
 );
 
@@ -28,7 +28,7 @@ has replacee => (
 
 has replacer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_replacer',
     json_ld   => 'replacer',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::ReplaceAction - The act of editing a recipient by replacing
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -71,6 +71,10 @@ A replacee should be one of the following types:
 
 =back
 
+=head2 C<_has_replacee>
+
+A predicate for the L</replacee> attribute.
+
 =head2 C<replacer>
 
 A sub property of object. The object that replaces.
@@ -82,6 +86,10 @@ A replacer should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_replacer>
+
+A predicate for the L</replacer> attribute.
 
 =head1 SEE ALSO
 

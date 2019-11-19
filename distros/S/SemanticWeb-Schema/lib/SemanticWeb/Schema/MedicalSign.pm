@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has identifying_exam => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_identifying_exam',
     json_ld   => 'identifyingExam',
 );
 
@@ -28,7 +28,7 @@ has identifying_exam => (
 
 has identifying_test => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_identifying_test',
     json_ld   => 'identifyingTest',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::MedicalSign - Any physical manifestation of a person's medi
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,10 @@ A identifying_exam should be one of the following types:
 
 =back
 
+=head2 C<_has_identifying_exam>
+
+A predicate for the L</identifying_exam> attribute.
+
 =head2 C<identifying_test>
 
 C<identifyingTest>
@@ -86,6 +90,10 @@ A identifying_test should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalTest']>
 
 =back
+
+=head2 C<_has_identifying_test>
+
+A predicate for the L</identifying_test> attribute.
 
 =head1 SEE ALSO
 

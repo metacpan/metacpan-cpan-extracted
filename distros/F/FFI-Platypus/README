@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.00
+    version 1.01
 
 SYNOPSIS
 
@@ -683,7 +683,7 @@ EXAMPLES
      
      use FFI::Platypus::Record;
      
-     record_layout(qw(
+     record_layout_1(qw(
          int    tm_sec
          int    tm_min
          int    tm_hour
@@ -1326,9 +1326,9 @@ FAQ
 
     You can also use the new Platypus bundle interface to define Perl
     constants from C space. This is more reliable, but does require a
-    compiler. It is recommended mainly for writing bindings against
-    libraries that have constants that can vary widely from platform to
-    platform. See FFI::Platypus::Constant for details.
+    compiler at install time. It is recommended mainly for writing bindings
+    against libraries that have constants that can vary widely from
+    platform to platform. See FFI::Platypus::Constant for details.
 
  What about enums?
 

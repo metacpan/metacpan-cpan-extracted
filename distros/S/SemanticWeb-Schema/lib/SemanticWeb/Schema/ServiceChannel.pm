@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has available_language => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_available_language',
     json_ld   => 'availableLanguage',
 );
 
@@ -28,7 +28,7 @@ has available_language => (
 
 has processing_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_processing_time',
     json_ld   => 'processingTime',
 );
 
@@ -36,7 +36,7 @@ has processing_time => (
 
 has provides_service => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_provides_service',
     json_ld   => 'providesService',
 );
 
@@ -44,7 +44,7 @@ has provides_service => (
 
 has service_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_service_location',
     json_ld   => 'serviceLocation',
 );
 
@@ -52,7 +52,7 @@ has service_location => (
 
 has service_phone => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_service_phone',
     json_ld   => 'servicePhone',
 );
 
@@ -60,7 +60,7 @@ has service_phone => (
 
 has service_postal_address => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_service_postal_address',
     json_ld   => 'servicePostalAddress',
 );
 
@@ -68,7 +68,7 @@ has service_postal_address => (
 
 has service_sms_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_service_sms_number',
     json_ld   => 'serviceSmsNumber',
 );
 
@@ -76,7 +76,7 @@ has service_sms_number => (
 
 has service_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_service_url',
     json_ld   => 'serviceUrl',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::ServiceChannel - A means for accessing a service, e
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -126,6 +126,10 @@ A available_language should be one of the following types:
 
 =back
 
+=head2 C<_has_available_language>
+
+A predicate for the L</available_language> attribute.
+
 =head2 C<processing_time>
 
 C<processingTime>
@@ -140,6 +144,10 @@ A processing_time should be one of the following types:
 
 =back
 
+=head2 C<_has_processing_time>
+
+A predicate for the L</processing_time> attribute.
+
 =head2 C<provides_service>
 
 C<providesService>
@@ -153,6 +161,10 @@ A provides_service should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Service']>
 
 =back
+
+=head2 C<_has_provides_service>
+
+A predicate for the L</provides_service> attribute.
 
 =head2 C<service_location>
 
@@ -169,6 +181,10 @@ A service_location should be one of the following types:
 
 =back
 
+=head2 C<_has_service_location>
+
+A predicate for the L</service_location> attribute.
+
 =head2 C<service_phone>
 
 C<servicePhone>
@@ -182,6 +198,10 @@ A service_phone should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
 
 =back
+
+=head2 C<_has_service_phone>
+
+A predicate for the L</service_phone> attribute.
 
 =head2 C<service_postal_address>
 
@@ -197,6 +217,10 @@ A service_postal_address should be one of the following types:
 
 =back
 
+=head2 C<_has_service_postal_address>
+
+A predicate for the L</service_postal_address> attribute.
+
 =head2 C<service_sms_number>
 
 C<serviceSmsNumber>
@@ -211,6 +235,10 @@ A service_sms_number should be one of the following types:
 
 =back
 
+=head2 C<_has_service_sms_number>
+
+A predicate for the L</service_sms_number> attribute.
+
 =head2 C<service_url>
 
 C<serviceUrl>
@@ -224,6 +252,10 @@ A service_url should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_service_url>
+
+A predicate for the L</service_url> attribute.
 
 =head1 SEE ALSO
 

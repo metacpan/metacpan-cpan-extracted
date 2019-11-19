@@ -5,7 +5,7 @@ package App::Codeowners::Formatter::CSV;
 use warnings;
 use strict;
 
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.47'; # VERSION
 
 use parent 'App::Codeowners::Formatter';
 
@@ -63,7 +63,7 @@ App::Codeowners::Formatter::CSV - Format codeowners output as comma-separated va
 
 =head1 VERSION
 
-version 0.45
+version 0.47
 
 =head1 DESCRIPTION
 

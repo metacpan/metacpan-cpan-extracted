@@ -6,7 +6,8 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -32,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-App
   homepage: https://metacpan.org/release/Log-ger-App
   repository: git://github.com/perlancar/perl-Log-ger-App.git
-version: '0.011'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -335,6 +336,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode

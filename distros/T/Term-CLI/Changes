@@ -1,3 +1,28 @@
+0.051007 -- 2019-11-18
+
+    - Get rid of bogus file "xx".
+
+0.051006 -- 2019-11-18
+
+    - Add script to get current version.
+
+        Files added:
+            scratch/get_version.pl
+
+    - Autoincrement version if argument is +1.
+
+        Files modified:
+            scratch/fix_version_number.pl
+
+    - Do not try to load Term::ReadLine::Gnu directly.
+        Term::ReadLine::Gnu should not be loaded directly. Instead,
+        the Term::CLI::ReadLine->new method will check whether a
+        newly created Term::ReadLine object is of the "::Gnu" variety.
+        If not, it will call "Carp::confess()".
+
+        Files modified:
+            lib/Term/CLI/ReadLine.pm
+
 0.051005 -- 2019-11-06
 
     - Bad lexical scope for $has_terminator

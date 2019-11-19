@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has geo_contains => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_contains',
     json_ld   => 'geoContains',
 );
 
@@ -28,7 +28,7 @@ has geo_contains => (
 
 has geo_covered_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_covered_by',
     json_ld   => 'geoCoveredBy',
 );
 
@@ -36,7 +36,7 @@ has geo_covered_by => (
 
 has geo_covers => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_covers',
     json_ld   => 'geoCovers',
 );
 
@@ -44,7 +44,7 @@ has geo_covers => (
 
 has geo_crosses => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_crosses',
     json_ld   => 'geoCrosses',
 );
 
@@ -52,7 +52,7 @@ has geo_crosses => (
 
 has geo_disjoint => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_disjoint',
     json_ld   => 'geoDisjoint',
 );
 
@@ -60,7 +60,7 @@ has geo_disjoint => (
 
 has geo_equals => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_equals',
     json_ld   => 'geoEquals',
 );
 
@@ -68,7 +68,7 @@ has geo_equals => (
 
 has geo_intersects => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_intersects',
     json_ld   => 'geoIntersects',
 );
 
@@ -76,7 +76,7 @@ has geo_intersects => (
 
 has geo_overlaps => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_overlaps',
     json_ld   => 'geoOverlaps',
 );
 
@@ -84,7 +84,7 @@ has geo_overlaps => (
 
 has geo_touches => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_touches',
     json_ld   => 'geoTouches',
 );
 
@@ -92,7 +92,7 @@ has geo_touches => (
 
 has geo_within => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_within',
     json_ld   => 'geoWithin',
 );
 
@@ -114,7 +114,7 @@ SemanticWeb::Schema::GeospatialGeometry - (Eventually to be defined as) a supert
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -143,6 +143,10 @@ A geo_contains should be one of the following types:
 
 =back
 
+=head2 C<_has_geo_contains>
+
+A predicate for the L</geo_contains> attribute.
+
 =head2 C<geo_covered_by>
 
 C<geoCoveredBy>
@@ -160,6 +164,10 @@ A geo_covered_by should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
+
+=head2 C<_has_geo_covered_by>
+
+A predicate for the L</geo_covered_by> attribute.
 
 =head2 C<geo_covers>
 
@@ -179,6 +187,10 @@ A geo_covers should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
+
+=head2 C<_has_geo_covers>
+
+A predicate for the L</geo_covers> attribute.
 
 =head2 C<geo_crosses>
 
@@ -200,6 +212,10 @@ A geo_crosses should be one of the following types:
 
 =back
 
+=head2 C<_has_geo_crosses>
+
+A predicate for the L</geo_crosses> attribute.
+
 =head2 C<geo_disjoint>
 
 C<geoDisjoint>
@@ -218,6 +234,10 @@ A geo_disjoint should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
+
+=head2 C<_has_geo_disjoint>
+
+A predicate for the L</geo_disjoint> attribute.
 
 =head2 C<geo_equals>
 
@@ -240,6 +260,10 @@ A geo_equals should be one of the following types:
 
 =back
 
+=head2 C<_has_geo_equals>
+
+A predicate for the L</geo_equals> attribute.
+
 =head2 C<geo_intersects>
 
 C<geoIntersects>
@@ -257,6 +281,10 @@ A geo_intersects should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
+
+=head2 C<_has_geo_intersects>
+
+A predicate for the L</geo_intersects> attribute.
 
 =head2 C<geo_overlaps>
 
@@ -277,6 +305,10 @@ A geo_overlaps should be one of the following types:
 
 =back
 
+=head2 C<_has_geo_overlaps>
+
+A predicate for the L</geo_overlaps> attribute.
+
 =head2 C<geo_touches>
 
 C<geoTouches>
@@ -296,6 +328,10 @@ A geo_touches should be one of the following types:
 
 =back
 
+=head2 C<_has_geo_touches>
+
+A predicate for the L</geo_touches> attribute.
+
 =head2 C<geo_within>
 
 C<geoWithin>
@@ -314,6 +350,10 @@ A geo_within should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
+
+=head2 C<_has_geo_within>
+
+A predicate for the L</geo_within> attribute.
 
 =head1 SEE ALSO
 

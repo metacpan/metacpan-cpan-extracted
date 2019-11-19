@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has health_plan_network_id => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_network_id',
     json_ld   => 'healthPlanNetworkId',
 );
 
@@ -28,7 +28,7 @@ has health_plan_network_id => (
 
 has is_accepting_new_patients => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_accepting_new_patients',
     json_ld   => 'isAcceptingNewPatients',
 );
 
@@ -36,7 +36,7 @@ has is_accepting_new_patients => (
 
 has medical_specialty => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_medical_specialty',
     json_ld   => 'medicalSpecialty',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::MedicalOrganization - A medical organization (physical or n
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -82,6 +82,10 @@ A health_plan_network_id should be one of the following types:
 
 =back
 
+=head2 C<_has_health_plan_network_id>
+
+A predicate for the L</health_plan_network_id> attribute.
+
 =head2 C<is_accepting_new_patients>
 
 C<isAcceptingNewPatients>
@@ -96,6 +100,10 @@ A is_accepting_new_patients should be one of the following types:
 
 =back
 
+=head2 C<_has_is_accepting_new_patients>
+
+A predicate for the L</is_accepting_new_patients> attribute.
+
 =head2 C<medical_specialty>
 
 C<medicalSpecialty>
@@ -109,6 +117,10 @@ A medical_specialty should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalSpecialty']>
 
 =back
+
+=head2 C<_has_medical_specialty>
+
+A predicate for the L</medical_specialty> attribute.
 
 =head1 SEE ALSO
 

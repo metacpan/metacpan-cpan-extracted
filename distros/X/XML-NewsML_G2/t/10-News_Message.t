@@ -3,7 +3,7 @@
 use Test::MockTime 'set_fixed_time';
 
 BEGIN {
-    set_fixed_time('2012-01-01T13:00:00Z');
+    set_fixed_time('1325422800');
 }
 
 use utf8;
@@ -77,7 +77,7 @@ sub news_message_package_check {
 
 #News Item Test
 my %schemes;
-foreach (qw(crel desk geo svc role ind org topic hltype adc)) {
+foreach (qw(crel desk geo svc role ind org topic hltype adc gyibt)) {
     $schemes{$_} = XML::NewsML_G2::Scheme->new(
         alias => "apa$_",
         uri   => "http://cv.apa.at/$_/"
@@ -142,7 +142,7 @@ cmp_ok( @{ $pi->root_group->items }, '==', 2,
             'http://www.iptc.org/std/catalog/catalog.IPTC-G2-Standards_22.xml'
     )
 );
-foreach (qw(group svc ind)) {
+foreach (qw(group svc ind gyibt)) {
     $schemes{$_} = XML::NewsML_G2::Scheme->new(
         alias => "apa$_",
         uri   => "http://cv.apa.at/$_/"

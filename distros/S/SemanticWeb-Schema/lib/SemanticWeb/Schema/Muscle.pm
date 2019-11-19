@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has action => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_action',
     json_ld   => 'action',
 );
 
@@ -28,7 +28,7 @@ has action => (
 
 has antagonist => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_antagonist',
     json_ld   => 'antagonist',
 );
 
@@ -36,7 +36,7 @@ has antagonist => (
 
 has blood_supply => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_blood_supply',
     json_ld   => 'bloodSupply',
 );
 
@@ -44,7 +44,7 @@ has blood_supply => (
 
 has insertion => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_insertion',
     json_ld   => 'insertion',
 );
 
@@ -52,7 +52,7 @@ has insertion => (
 
 has muscle_action => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_muscle_action',
     json_ld   => 'muscleAction',
 );
 
@@ -60,7 +60,7 @@ has muscle_action => (
 
 has nerve => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_nerve',
     json_ld   => 'nerve',
 );
 
@@ -68,7 +68,7 @@ has nerve => (
 
 has origin => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_origin',
     json_ld   => 'origin',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::Muscle - A muscle is an anatomical structure consisting of 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -114,6 +114,10 @@ A action should be one of the following types:
 
 =back
 
+=head2 C<_has_action>
+
+A predicate for the L</action> attribute.
+
 =head2 C<antagonist>
 
 The muscle whose action counteracts the specified muscle.
@@ -125,6 +129,10 @@ A antagonist should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Muscle']>
 
 =back
+
+=head2 C<_has_antagonist>
+
+A predicate for the L</antagonist> attribute.
 
 =head2 C<blood_supply>
 
@@ -140,6 +148,10 @@ A blood_supply should be one of the following types:
 
 =back
 
+=head2 C<_has_blood_supply>
+
+A predicate for the L</blood_supply> attribute.
+
 =head2 C<insertion>
 
 The place of attachment of a muscle, or what the muscle moves.
@@ -151,6 +163,10 @@ A insertion should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AnatomicalStructure']>
 
 =back
+
+=head2 C<_has_insertion>
+
+A predicate for the L</insertion> attribute.
 
 =head2 C<muscle_action>
 
@@ -166,6 +182,10 @@ A muscle_action should be one of the following types:
 
 =back
 
+=head2 C<_has_muscle_action>
+
+A predicate for the L</muscle_action> attribute.
+
 =head2 C<nerve>
 
 The underlying innervation associated with the muscle.
@@ -178,6 +198,10 @@ A nerve should be one of the following types:
 
 =back
 
+=head2 C<_has_nerve>
+
+A predicate for the L</nerve> attribute.
+
 =head2 C<origin>
 
 The place or point where a muscle arises.
@@ -189,6 +213,10 @@ A origin should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AnatomicalStructure']>
 
 =back
+
+=head2 C<_has_origin>
+
+A predicate for the L</origin> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has lease_length => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_lease_length',
     json_ld   => 'leaseLength',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::RealEstateListing - A RealEstateListing is a listing that d
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -76,6 +76,10 @@ A lease_length should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_lease_length>
+
+A predicate for the L</lease_length> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has end_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_end_date',
     json_ld   => 'endDate',
 );
 
@@ -28,7 +28,7 @@ has end_date => (
 
 has issn => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_issn',
     json_ld   => 'issn',
 );
 
@@ -36,7 +36,7 @@ has issn => (
 
 has start_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_start_date',
     json_ld   => 'startDate',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::CreativeWorkSeries - A CreativeWorkSeries in schema
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -103,6 +103,10 @@ A end_date should be one of the following types:
 
 =back
 
+=head2 C<_has_end_date>
+
+A predicate for the L</end_date> attribute.
+
 =head2 C<issn>
 
 The International Standard Serial Number (ISSN) that identifies this serial
@@ -116,6 +120,10 @@ A issn should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_issn>
+
+A predicate for the L</issn> attribute.
 
 =head2 C<start_date>
 
@@ -131,6 +139,10 @@ A start_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_start_date>
+
+A predicate for the L</start_date> attribute.
 
 =head1 SEE ALSO
 

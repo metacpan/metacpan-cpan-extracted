@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has delivery_method => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_delivery_method',
     json_ld   => 'deliveryMethod',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::OrderAction - An agent orders an object/product/service to 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -63,6 +63,10 @@ A delivery_method should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::DeliveryMethod']>
 
 =back
+
+=head2 C<_has_delivery_method>
+
+A predicate for the L</delivery_method> attribute.
 
 =head1 SEE ALSO
 

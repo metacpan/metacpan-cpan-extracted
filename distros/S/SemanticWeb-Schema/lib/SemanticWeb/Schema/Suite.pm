@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has bed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_bed',
     json_ld   => 'bed',
 );
 
@@ -28,7 +28,7 @@ has bed => (
 
 has number_of_rooms => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_rooms',
     json_ld   => 'numberOfRooms',
 );
 
@@ -36,7 +36,7 @@ has number_of_rooms => (
 
 has occupancy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_occupancy',
     json_ld   => 'occupancy',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::Suite - A suite in a hotel or other public accommodation
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -91,6 +91,10 @@ A bed should be one of the following types:
 
 =back
 
+=head2 C<_has_bed>
+
+A predicate for the L</bed> attribute.
+
 =head2 C<number_of_rooms>
 
 C<numberOfRooms>
@@ -110,6 +114,10 @@ A number_of_rooms should be one of the following types:
 
 =back
 
+=head2 C<_has_number_of_rooms>
+
+A predicate for the L</number_of_rooms> attribute.
+
 =head2 C<occupancy>
 
 The allowed total occupancy for the accommodation in persons (including
@@ -125,6 +133,10 @@ A occupancy should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_occupancy>
+
+A predicate for the L</occupancy> attribute.
 
 =head1 SEE ALSO
 

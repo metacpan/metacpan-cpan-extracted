@@ -2,7 +2,7 @@ package Cache::Memcached::Managed;
 
 # Make sure we have version info for this module
 
-$VERSION= '0.25';
+$VERSION= '0.26';
 
 # Make sure we're as strict as possible
 # With as much feedback that we can get
@@ -2196,13 +2196,13 @@ as name and ID value pairs) and returns how many items were actually deleted.
 
  my $delimiter = $cache->delimiter;
 
-Returns the delimiter as (implicitely) specified with L<new>.
+Returns the delimiter as (implicitly) specified with L<new>.
 
 =head2 directory
 
  my $directory = $cache->directory;
 
-Returns the directory cache object as (implicitely) specified with L<new>.
+Returns the directory cache object as (implicitly) specified with L<new>.
 
 =head2 errors
 
@@ -2220,7 +2220,7 @@ error counts should be reset.
 
  $expiration = $cache->expiration;
 
-Returns the default expiration as (implicitely) specified with L<new>.
+Returns the default expiration as (implicitly) specified with L<new>.
 
 =head2 flush_all
 
@@ -2231,7 +2231,7 @@ Returns the default expiration as (implicitely) specified with L<new>.
 Initialize contents of all of the memcached backend servers of the
 L<"data server">.  The input parameter specifies interval between flushes
 of backend memcached servers, default is the L<flush_interval> value
-implicitely) specified with L<new>.  Returns whether all memcached L<servers>
+implicitly) specified with L<new>.  Returns whether all memcached L<servers>
 were successfully flushed.
 
 Please note that this method returns immediately after instructing each of
@@ -2246,7 +2246,7 @@ flush_all functionality.
  my $interval = $cache->flush_interval;
 
 Returns the default flush interval values used with L<flush_all>, as
-(implicitely) specified with L<new>.
+(implicitly) specified with L<new>.
 
 =head2 get
 
@@ -2383,7 +2383,7 @@ default key (as determined by the caller environment).
 =item namespace
 
 The L<namespace> for which to fetch values.  Defaults to the namespace that
-was (implicitely) specified with L<new>.
+was (implicitly) specified with L<new>.
 
 =back
 
@@ -2426,7 +2426,7 @@ See L<"group management"> for more information about groups.
  
  my $group_names = $cache->group_names; # hash ref
 
-Returns the valid group names as (implicitely) specified with L<new>.  Returns
+Returns the valid group names as (implicitly) specified with L<new>.  Returns
 them in alphabetical order if called in a list context, or as a hash ref if
 called in scalar context.
 
@@ -2471,7 +2471,7 @@ increments of the same counter).
 
  my $namespace = $cache->namespace;
 
-Obtain the default namespace, as (implicitely) specified with L<new>.
+Obtain the default namespace, as (implicitly) specified with L<new>.
 
 =head2 replace
 
@@ -2587,7 +2587,7 @@ if called from the package "Foo".
 =item namespace
 
 The L<namespace> to which to associate the value.  Defaults to the namespace
-that was (implicitely) specified with L<new>.
+that was (implicitly) specified with L<new>.
 
 =item value
 
@@ -2611,7 +2611,7 @@ be specified to indicate a link to that group.
 
 Attempts to start the memcached servers that have been configured with L<new>
 (and which can be find out with L<servers>) by default, or the servers with
-the specified configs.  Returns whether all servers (implicitely) specified
+the specified configs.  Returns whether all servers (implicitly) specified
 have been started successfully.
 
 This only works if the memcached server(s) will be running on the same

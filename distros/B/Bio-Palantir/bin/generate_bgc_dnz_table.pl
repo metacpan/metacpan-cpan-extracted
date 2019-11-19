@@ -104,7 +104,7 @@ generate_bgc_dnz_table.pl - Generates a denormalized table for BGC data
 
 =head1 VERSION
 
-version 0.193080
+version 0.193230
 
 =head1 NAME
 

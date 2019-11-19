@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has accommodation_category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_accommodation_category',
     json_ld   => 'accommodationCategory',
 );
 
@@ -28,7 +28,7 @@ has accommodation_category => (
 
 has amenity_feature => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_amenity_feature',
     json_ld   => 'amenityFeature',
 );
 
@@ -36,7 +36,7 @@ has amenity_feature => (
 
 has floor_level => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_floor_level',
     json_ld   => 'floorLevel',
 );
 
@@ -44,7 +44,7 @@ has floor_level => (
 
 has floor_size => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_floor_size',
     json_ld   => 'floorSize',
 );
 
@@ -52,7 +52,7 @@ has floor_size => (
 
 has lease_length => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_lease_length',
     json_ld   => 'leaseLength',
 );
 
@@ -60,7 +60,7 @@ has lease_length => (
 
 has number_of_bathrooms_total => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_bathrooms_total',
     json_ld   => 'numberOfBathroomsTotal',
 );
 
@@ -68,7 +68,7 @@ has number_of_bathrooms_total => (
 
 has number_of_full_bathrooms => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_full_bathrooms',
     json_ld   => 'numberOfFullBathrooms',
 );
 
@@ -76,7 +76,7 @@ has number_of_full_bathrooms => (
 
 has number_of_rooms => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_rooms',
     json_ld   => 'numberOfRooms',
 );
 
@@ -84,7 +84,7 @@ has number_of_rooms => (
 
 has permitted_usage => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_permitted_usage',
     json_ld   => 'permittedUsage',
 );
 
@@ -92,7 +92,7 @@ has permitted_usage => (
 
 has pets_allowed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_pets_allowed',
     json_ld   => 'petsAllowed',
 );
 
@@ -114,7 +114,7 @@ SemanticWeb::Schema::Accommodation - An accommodation is a place that can accomm
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -148,6 +148,10 @@ A accommodation_category should be one of the following types:
 
 =back
 
+=head2 C<_has_accommodation_category>
+
+A predicate for the L</accommodation_category> attribute.
+
 =head2 C<amenity_feature>
 
 C<amenityFeature>
@@ -164,6 +168,10 @@ A amenity_feature should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::LocationFeatureSpecification']>
 
 =back
+
+=head2 C<_has_amenity_feature>
+
+A predicate for the L</amenity_feature> attribute.
 
 =head2 C<floor_level>
 
@@ -184,6 +192,10 @@ A floor_level should be one of the following types:
 
 =back
 
+=head2 C<_has_floor_level>
+
+A predicate for the L</floor_level> attribute.
+
 =head2 C<floor_size>
 
 C<floorSize>
@@ -199,6 +211,10 @@ A floor_size should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_floor_size>
+
+A predicate for the L</floor_size> attribute.
 
 =head2 C<lease_length>
 
@@ -218,6 +234,10 @@ A lease_length should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_lease_length>
+
+A predicate for the L</lease_length> attribute.
 
 =head2 C<number_of_bathrooms_total>
 
@@ -240,6 +260,10 @@ A number_of_bathrooms_total should be one of the following types:
 
 =back
 
+=head2 C<_has_number_of_bathrooms_total>
+
+A predicate for the L</number_of_bathrooms_total> attribute.
+
 =head2 C<number_of_full_bathrooms>
 
 C<numberOfFullBathrooms>
@@ -258,6 +282,10 @@ A number_of_full_bathrooms should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_number_of_full_bathrooms>
+
+A predicate for the L</number_of_full_bathrooms> attribute.
 
 =head2 C<number_of_rooms>
 
@@ -278,6 +306,10 @@ A number_of_rooms should be one of the following types:
 
 =back
 
+=head2 C<_has_number_of_rooms>
+
+A predicate for the L</number_of_rooms> attribute.
+
 =head2 C<permitted_usage>
 
 C<permittedUsage>
@@ -291,6 +323,10 @@ A permitted_usage should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_permitted_usage>
+
+A predicate for the L</permitted_usage> attribute.
 
 =head2 C<pets_allowed>
 
@@ -308,6 +344,10 @@ A pets_allowed should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_pets_allowed>
+
+A predicate for the L</pets_allowed> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has algorithm => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_algorithm',
     json_ld   => 'algorithm',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::MedicalRiskScore - A simple system that adds up the number 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -62,6 +62,10 @@ A algorithm should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_algorithm>
+
+A predicate for the L</algorithm> attribute.
 
 =head1 SEE ALSO
 

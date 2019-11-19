@@ -1,5 +1,5 @@
 package Apache::AuthCookie;
-$Apache::AuthCookie::VERSION = '3.27';
+$Apache::AuthCookie::VERSION = '3.28';
 # ABSTRACT: Perl Authentication and Authorization via cookies
 
 use strict;
@@ -586,6 +586,15 @@ sub cookie_string {
         $string .= '; HttpOnly';
     }
 
+    # SameSite is an anti-CSRF cookie property.  See
+    # https://www.owasp.org/index.php/SameSite
+    if (my $samesite = $r->dir_config("${auth_name}SameSite")) {
+        if ($samesite =~ /\A(strict|lax)\z/i) {
+            $samesite = lc($1);
+            $string .= "; SameSite=$samesite";
+        }
+    }
+
     return $string;
 }
 
@@ -626,13 +635,15 @@ sub _encode {
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Apache::AuthCookie - Perl Authentication and Authorization via cookies
 
 =head1 VERSION
 
-version 3.27
+version 3.28
 
 =head1 SYNOPSIS
 
@@ -1109,8 +1120,6 @@ information like clearances or whatever into the session key.
 
 Returns the value of C<PerlSetVar ${auth_name}Path>.
 
-=encoding UTF-8
-
 =head1 EXAMPLE
 
 For an example of how to use Apache::AuthCookie, you may want to check
@@ -1239,7 +1248,7 @@ format using L<Encode/decode>.
 The value stored in C<< $r-E<gt>connection-E<gt>user >> will be encoded as
 B<bytes>, not characters using the configured encoding name.  This is because
 the value stored by mod_perl is a C API string, and not a perl string.  You can
-use L<decoded_user()> to get user string encoded using B<character> semantics.
+use L</decoded_user()> to get user string encoded using B<character> semantics.
 
 =back
 
@@ -1249,7 +1258,7 @@ This does has some caveats:
 
 =item *
 
-your L<authen_cred()> and L<authen_ses_key()> function is expected to return
+your L</authen_cred()> and L</authen_ses_key()> function is expected to return
 a decoded username, either by passing it through L<Encode/decode()>, or, by
 turning on the UTF8 flag if appropriate.
 
@@ -1258,12 +1267,12 @@ turning on the UTF8 flag if appropriate.
 Due to the way HTTP works, cookies cannot contain non-ASCII characters.
 Because of this, if you are including the username in your generated session
 key, you will need to escape any non-ascii characters in the session key
-returned by L<authen_cred()>.
+returned by L</authen_cred()>.
 
 =item *
 
-Similarly, you must reverse this escaping process in L<authen_ses_key()> and
-return a L<Encode/decode()> decoded username.  If your L<authen_cred()>
+Similarly, you must reverse this escaping process in L</authen_ses_key()> and
+return a L<Encode/decode()> decoded username.  If your L</authen_cred()>
 function already only generates ASCII-only session keys then you do not need to
 worry about any of this.
 
@@ -1271,7 +1280,7 @@ worry about any of this.
 
 The value stored in C<< $r-E<gt>connection-E<gt>user >> will be encoded using
 bytes semantics using the configured B<Encoding>.  If you want the decoded user
-value, use L<decoded_user()> instead.
+value, use L</decoded_user()> instead.
 
 =back
 
@@ -1331,13 +1340,17 @@ L<perl(1)>, L<mod_perl(1)>, L<Apache(1)>.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/apache-authcookie>
-and may be cloned from L<git://github.com/mschout/apache-authcookie.git>
+The development version is on github at L<https://https://github.com/mschout/apache-authcookie>
+and may be cloned from L<git://https://github.com/mschout/apache-authcookie.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-apache-authcookie@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Apache-AuthCookie
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/apache-authcookie/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

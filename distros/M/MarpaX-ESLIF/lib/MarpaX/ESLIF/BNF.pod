@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 3.0.19
+version 3.0.28
 
 =head1 DESCRIPTION
 
@@ -370,9 +370,10 @@ The grammar's C<symbol-action> can be overwritten by setting such entry in C<:le
   :lexeme   ::= symbolname2 symbol-action => Custom_action
   :terminal ::= 'ThisTerminal' symbol-action => ::lua->lua_custom_action
 
-A lexeme or a terminal can have a C<if-action> setting, that applies I<only> when the lexeme or a terminal is discovered via the automatic scan. The C<if-action> must refers to a callback in user-land's recognizer interface, and must return a boolean:
+A lexeme or a terminal can have a C<if-action> setting, that applies I<only> when the lexeme or a terminal is discovered via the automatic scan. The C<if-action> must refers to a callback in user-land's recognizer interface or in embedded lua interpreter, and must return a boolean:
 
-  :lexeme   ::= symbolname if-action => Custom_action
+  :lexeme   ::= symbolname1 if-action => Custom_action1
+  :lexeme   ::= symbolname2 if-action => lua::->Custom_action2
 
 Please note that the C<if-action> will always be called with an argument of type ARRAY (i.e. up to the implementation to convert that to a multibyte string, if any).
 
@@ -425,13 +426,13 @@ Constraints are:
 
 =over
 
-=item Both C<RHS1> and <RHS2> must be lexemes
+=item Both C<RHS1> and C<RHS2> must be lexemes
 
-=item Both C<RHS1> and <RHS2> must not contain sub-lexemes
+=item Both C<RHS1> and C<RHS2> must not contain sub-lexemes
 
 =back
 
-This mean that the C<LHS> of an exception statement can never be nullable. You must add explicitely declare so if this is wanted, i.e.:
+This mean that the C<LHS> of an exception statement can never be nullable. You must explicitely declare so if this is wanted, i.e.:
 
   LHS ::=
 
@@ -781,6 +782,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | '::true'
                                    | '::false'
   <if action name>               ::= <restricted ascii graph name>
+                                   | <lua action name>
   <quantifier>                   ::= '*'
                                    | '+'
   <signed integer>               ::= /[+-]?\d+/
@@ -832,7 +834,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
 
 =over
 
-The embedded lua language always have the following globals when executing its actions:
+The embedded lua language have the following globals when executing its actions:
 
 =over
 
@@ -850,7 +852,7 @@ Lua object representing current marpaESLIFRecognizer instance.
 
 =item marpaESLIFValue
 
-Lua object representing current marpaESLIFValue instance.
+Lua object representing current marpaESLIFValue instance, when doing valuation.
 
 =back
 

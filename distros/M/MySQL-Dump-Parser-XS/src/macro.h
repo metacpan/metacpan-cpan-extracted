@@ -82,6 +82,16 @@
   p[3] == 'L'            \
 )
 
+#define IS__binary(p) ( \
+  p[0] == '_' &&        \
+  p[1] == 'b' &&        \
+  p[2] == 'i' &&        \
+  p[3] == 'n' &&        \
+  p[4] == 'a' &&        \
+  p[5] == 'r' &&        \
+  p[6] == 'y'           \
+)
+
 #define IS_MAYBE_KEY(p) (IS_KEY(p) || IS_INDEX(p) || IS_UNIQUE(p) || IS_PRIMARY(p))
 
 #define IS_WSPACE(p) (*p == ' ' || *p == '\t')

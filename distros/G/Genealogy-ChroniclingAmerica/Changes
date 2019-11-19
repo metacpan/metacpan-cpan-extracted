@@ -1,5 +1,8 @@
 Revision history for Genealogy-ChroniclingAmerica
 
+0.03	Sun 17 Nov 09:58:53 EST 2019
+	Fixed "Use of uninitialized value $text in substitution"
+
 0.02	Fri 31 May 14:33:50 EDT 2019
 	Fixed missing matches where names spanned a new line
 	Don't set env_proxy in a useragent that was passed in

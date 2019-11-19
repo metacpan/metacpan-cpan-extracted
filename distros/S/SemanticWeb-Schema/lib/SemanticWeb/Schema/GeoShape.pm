@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has address => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_address',
     json_ld   => 'address',
 );
 
@@ -28,7 +28,7 @@ has address => (
 
 has address_country => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_address_country',
     json_ld   => 'addressCountry',
 );
 
@@ -36,7 +36,7 @@ has address_country => (
 
 has box => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_box',
     json_ld   => 'box',
 );
 
@@ -44,7 +44,7 @@ has box => (
 
 has circle => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_circle',
     json_ld   => 'circle',
 );
 
@@ -52,7 +52,7 @@ has circle => (
 
 has elevation => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_elevation',
     json_ld   => 'elevation',
 );
 
@@ -60,7 +60,7 @@ has elevation => (
 
 has line => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_line',
     json_ld   => 'line',
 );
 
@@ -68,7 +68,7 @@ has line => (
 
 has polygon => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_polygon',
     json_ld   => 'polygon',
 );
 
@@ -76,7 +76,7 @@ has polygon => (
 
 has postal_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_postal_code',
     json_ld   => 'postalCode',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::GeoShape - The geographic shape of a place
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -123,6 +123,10 @@ A address should be one of the following types:
 
 =back
 
+=head2 C<_has_address>
+
+A predicate for the L</address> attribute.
+
 =head2 C<address_country>
 
 C<addressCountry>
@@ -141,6 +145,10 @@ A address_country should be one of the following types:
 
 =back
 
+=head2 C<_has_address_country>
+
+A predicate for the L</address_country> attribute.
+
 =head2 C<box>
 
 A box is the area enclosed by the rectangle formed by two points. The first
@@ -155,6 +163,10 @@ A box should be one of the following types:
 
 =back
 
+=head2 C<_has_box>
+
+A predicate for the L</box> attribute.
+
 =head2 C<circle>
 
 A circle is the circular region of a specified radius centered at a
@@ -168,6 +180,10 @@ A circle should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_circle>
+
+A predicate for the L</circle> attribute.
 
 =head2 C<elevation>
 
@@ -187,6 +203,10 @@ A elevation should be one of the following types:
 
 =back
 
+=head2 C<_has_elevation>
+
+A predicate for the L</elevation> attribute.
+
 =head2 C<line>
 
 A line is a point-to-point path consisting of two or more points. A line is
@@ -199,6 +219,10 @@ A line should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_line>
+
+A predicate for the L</line> attribute.
 
 =head2 C<polygon>
 
@@ -215,6 +239,10 @@ A polygon should be one of the following types:
 
 =back
 
+=head2 C<_has_polygon>
+
+A predicate for the L</polygon> attribute.
+
 =head2 C<postal_code>
 
 C<postalCode>
@@ -228,6 +256,10 @@ A postal_code should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_postal_code>
+
+A predicate for the L</postal_code> attribute.
 
 =head1 SEE ALSO
 

@@ -9,7 +9,7 @@ use App::Codeowners::Util qw(run_git);
 use App::Codeowners;
 use Capture::Tiny qw(capture);
 use File::pushd;
-use Path::Tiny qw(path tempdir);
+use Path::Tiny 0.089 qw(path tempdir);
 use Test::More;
 
 my $can_git = _can_git();
@@ -114,6 +114,8 @@ a/  @snickers
 END
 
     run_git('-C', $repodir, qw{init})->wait;
+    run_git('-C', $repodir, qw{config --local user.email app-codeowners@example.com})->wait;
+    run_git('-C', $repodir, qw{config --local user.name App-Codeowners})->wait;
     run_git('-C', $repodir, qw{add .})->wait;
     run_git('-C', $repodir, qw{commit -m}, 'initial commit')->wait;
 

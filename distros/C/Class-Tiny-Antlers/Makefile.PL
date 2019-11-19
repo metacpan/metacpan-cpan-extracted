@@ -4,48 +4,53 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "Moose-like sugar for Class::Tiny",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Class-Tiny-Antlers",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => {
-                          requires => { "Class::Tiny" => 0.006, "perl" => 5.006 },
-                          suggests => { "Class::Method::Modifiers" => 1.05, "Role::Tiny" => "1.000000" },
+  "abstract"         => "Moose-like sugar for Class::Tiny",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
                         },
-                        test => {
-                          recommends => { "Class::Method::Modifiers" => 1.05, "Role::Tiny" => "1.000000" },
-                          requires   => { "Test::Fatal" => 0.003, "Test::More" => 0.96, "Test::Requires" => 0.06 },
+  "name"             => "Class-Tiny-Antlers",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            requires => { "Class::Tiny" => 0.006, "perl" => 5.006 },
+                            suggests => { "Class::Method::Modifiers" => 1.05, "Role::Tiny" => "1.000000" },
+                          },
+                          test => {
+                            recommends => {
+                                            "Class::Method::Modifiers" => 1.05,
+                                            "Role::Tiny" => "1.000000",
+                                            "Types::Standard" => 0,
+                                          },
+                            requires   => { "Test::Fatal" => 0.003, "Test::More" => 0.96, "Test::Requires" => 0.06 },
+                          },
                         },
-                      },
-  "provides"       => {
-                        "Class::Tiny::Antlers" => { file => "lib/Class/Tiny/Antlers.pm", version => 0.023 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Class-Tiny-Antlers",
-                                        },
-                        homepage     => "https://metacpan.org/release/Class-Tiny-Antlers",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-class-tiny-antlers.git",
-                                          web  => "https://github.com/tobyink/p5-class-tiny-antlers",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/project",
-                        x_IRC        => "irc://irc.perl.org/#moops",
-                      },
-  "version"        => 0.023,
+  "provides"         => {
+                          "Class::Tiny::Antlers" => { file => "lib/Class/Tiny/Antlers.pm", version => 0.024 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=Class-Tiny-Antlers",
+                                          },
+                          homepage     => "https://metacpan.org/release/Class-Tiny-Antlers",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-class-tiny-antlers.git",
+                                            web  => "https://github.com/tobyink/p5-class-tiny-antlers",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/project",
+                          x_IRC        => "irc://irc.perl.org/#moops",
+                        },
+  "version"          => 0.024,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

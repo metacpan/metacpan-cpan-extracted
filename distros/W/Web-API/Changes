@@ -1,10 +1,22 @@
 ==================================================
-Changes from 2018-01-15 00:00:00 +0000 to present.
+Changes from 2018-11-18 00:00:00 +0000 to present.
 ==================================================
 
-------------------------------------------
-version 2.4.1 at 2019-01-15 04:01:08 +0000
-------------------------------------------
+----------------------------------------
+version 2.5 at 2019-11-18 02:37:30 +0000
+----------------------------------------
+
+  Change: 73517c3caf077a4de1a9d2ac90e168c828aedc87
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2019-11-18 15:35:12 +0000
+
+    simple test system support 
+
+  Change: c8c0c4519966072b8c8e2b054655475937965b16
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2019-01-15 17:01:21 +0000
+
+    v2.4.1 
 
   Change: f7531fae482f31b3e64fe60e3c10a1dd2ddfcdeb
   Author: Tobias Kirschstein <lev@ideegeo.com>
@@ -223,5 +235,5 @@ version 2.3 at 2018-12-25 10:23:48 +0000
     use caller with parenthesis to silence warning. fixes #18 
 
 =================================================
-Plus 22 releases after 2018-01-15 00:00:00 +0000.
+Plus 22 releases after 2018-11-18 00:00:00 +0000.
 =================================================

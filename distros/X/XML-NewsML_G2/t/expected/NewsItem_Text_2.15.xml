@@ -4,6 +4,7 @@
     <scheme alias="apacrel" uri="http://cv.apa.at/crel/"/>
     <scheme alias="apadesk" uri="http://cv.apa.at/desk/"/>
     <scheme alias="apageo" uri="http://cv.apa.at/geo/"/>
+    <scheme alias="apagyibt" uri="http://cv.apa.at/gyibt/"/>
     <scheme alias="apahltype" uri="http://cv.apa.at/hltype/"/>
     <scheme alias="apaind" uri="http://cv.apa.at/ind/"/>
     <scheme alias="apaorg" uri="http://cv.apa.at/org/"/>
@@ -28,7 +29,7 @@
     <versionCreated>2012-01-01T14:00:00+01:00</versionCreated>
     <embargoed>2012-03-15T12:00:00+01:00</embargoed>
     <pubStatus qcode="stat:usable"/>
-    <generator versioninfo="0.3.2">XML::NewsML_G2</generator>
+    <generator versioninfo="0.3.3">XML::NewsML_G2</generator>
     <service qcode="apasvc:bd">
       <name>Basisdienst</name>
     </service>
@@ -59,6 +60,10 @@
     </creator>
     <creator>
       <name>wh</name>
+    </creator>
+    <creator>
+      <name>Max Musterman</name>
+      <related rel="crel:isA" qcode="apagyibt:staff"/>
     </creator>
     <altId>APA0379</altId>
     <language tag="de"/>

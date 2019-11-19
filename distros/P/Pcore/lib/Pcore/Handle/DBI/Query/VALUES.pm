@@ -7,10 +7,6 @@ has _buf => ( required => 1 );    # ArrayRef
 
 our $EXPORT = [qw[$SQL_VALUES_IDX_FIRST $SQL_VALUES_IDX_SCAN]];
 
-# VALUES [ { a => 1 }, { b => 1 } ] # get columns from the first not empty hash, columns will be ( "a" )
-# VALUES [ {}, { a => 1 }, { b => 1 } ] # perform full scan, columns will be ( "a", "b" ), first row will be ignored
-# VALUES [ [], {}, { a => 1 }, { b => 1 } ] # get columns from the first not empty hash, columns will be ( "a" ), first [] will be ignored, first {} will not be ignored
-
 # default behavior - get index from the first non-empty hash
 const our $SQL_VALUES_IDX_FIRST => 1;    # treat first row as columns index, index row will be ignored
 const our $SQL_VALUES_IDX_SCAN  => 2;    # full scan rows keys
@@ -160,7 +156,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 18                   | Subroutines::ProhibitExcessComplexity - Subroutine "get_query" with high complexity score (42)                 |
+## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "get_query" with high complexity score (42)                 |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

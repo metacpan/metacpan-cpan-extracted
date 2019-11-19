@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_currency',
     json_ld   => 'currency',
 );
 
@@ -28,7 +28,7 @@ has currency => (
 
 has current_exchange_rate => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_current_exchange_rate',
     json_ld   => 'currentExchangeRate',
 );
 
@@ -36,7 +36,7 @@ has current_exchange_rate => (
 
 has exchange_rate_spread => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_exchange_rate_spread',
     json_ld   => 'exchangeRateSpread',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::ExchangeRateSpecification - A structured value representing
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -85,6 +85,10 @@ A currency should be one of the following types:
 
 =back
 
+=head2 C<_has_currency>
+
+A predicate for the L</currency> attribute.
+
 =head2 C<current_exchange_rate>
 
 C<currentExchangeRate>
@@ -98,6 +102,10 @@ A current_exchange_rate should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::UnitPriceSpecification']>
 
 =back
+
+=head2 C<_has_current_exchange_rate>
+
+A predicate for the L</current_exchange_rate> attribute.
 
 =head2 C<exchange_rate_spread>
 
@@ -115,6 +123,10 @@ A exchange_rate_spread should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_exchange_rate_spread>
+
+A predicate for the L</exchange_rate_spread> attribute.
 
 =head1 SEE ALSO
 

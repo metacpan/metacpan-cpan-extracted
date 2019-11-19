@@ -1,3 +1,5 @@
+1.02  - Minor fixes
+
 1.01  - Make OpenGL::Modern usage transparent for GLWidget
 
 1.00  - Experimental OpenGL code is no longer experimental, mark as stable.

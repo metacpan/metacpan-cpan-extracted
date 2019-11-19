@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has has_menu_item => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_menu_item',
     json_ld   => 'hasMenuItem',
 );
 
@@ -28,7 +28,7 @@ has has_menu_item => (
 
 has has_menu_section => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_menu_section',
     json_ld   => 'hasMenuSection',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::Menu - A structured representation of food or drink items a
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,10 @@ A has_menu_item should be one of the following types:
 
 =back
 
+=head2 C<_has_has_menu_item>
+
+A predicate for the L</has_menu_item> attribute.
+
 =head2 C<has_menu_section>
 
 C<hasMenuSection>
@@ -86,6 +90,10 @@ A has_menu_section should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MenuSection']>
 
 =back
+
+=head2 C<_has_has_menu_section>
+
+A predicate for the L</has_menu_section> attribute.
 
 =head1 SEE ALSO
 

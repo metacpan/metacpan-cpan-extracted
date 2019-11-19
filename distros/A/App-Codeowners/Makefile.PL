@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => "2.39",
     "IPC::Open2" => 0,
     "Module::Load" => 0,
-    "Path::Tiny" => 0,
+    "Path::Tiny" => "0.089",
     "Scalar::Util" => 0,
     "Test::Builder" => 0,
     "Text::Gitignore" => 0,
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::Exit" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.45",
+  "VERSION" => "0.47",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,7 +69,7 @@ my %FallbackPrereqs = (
   "IPC::Open2" => 0,
   "IPC::Open3" => 0,
   "Module::Load" => 0,
-  "Path::Tiny" => 0,
+  "Path::Tiny" => "0.089",
   "Scalar::Util" => 0,
   "Test::Builder" => 0,
   "Test::Exit" => 0,

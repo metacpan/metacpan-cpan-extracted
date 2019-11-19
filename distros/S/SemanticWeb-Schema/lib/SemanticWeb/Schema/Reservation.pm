@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has booking_agent => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_booking_agent',
     json_ld   => 'bookingAgent',
 );
 
@@ -28,7 +28,7 @@ has booking_agent => (
 
 has booking_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_booking_time',
     json_ld   => 'bookingTime',
 );
 
@@ -36,7 +36,7 @@ has booking_time => (
 
 has broker => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broker',
     json_ld   => 'broker',
 );
 
@@ -44,7 +44,7 @@ has broker => (
 
 has modified_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_modified_time',
     json_ld   => 'modifiedTime',
 );
 
@@ -52,7 +52,7 @@ has modified_time => (
 
 has price_currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price_currency',
     json_ld   => 'priceCurrency',
 );
 
@@ -60,7 +60,7 @@ has price_currency => (
 
 has program_membership_used => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_program_membership_used',
     json_ld   => 'programMembershipUsed',
 );
 
@@ -68,7 +68,7 @@ has program_membership_used => (
 
 has provider => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_provider',
     json_ld   => 'provider',
 );
 
@@ -76,7 +76,7 @@ has provider => (
 
 has reservation_for => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_reservation_for',
     json_ld   => 'reservationFor',
 );
 
@@ -84,7 +84,7 @@ has reservation_for => (
 
 has reservation_id => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_reservation_id',
     json_ld   => 'reservationId',
 );
 
@@ -92,7 +92,7 @@ has reservation_id => (
 
 has reservation_status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_reservation_status',
     json_ld   => 'reservationStatus',
 );
 
@@ -100,7 +100,7 @@ has reservation_status => (
 
 has reserved_ticket => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_reserved_ticket',
     json_ld   => 'reservedTicket',
 );
 
@@ -108,7 +108,7 @@ has reserved_ticket => (
 
 has total_price => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_total_price',
     json_ld   => 'totalPrice',
 );
 
@@ -116,7 +116,7 @@ has total_price => (
 
 has under_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_under_name',
     json_ld   => 'underName',
 );
 
@@ -138,7 +138,7 @@ SemanticWeb::Schema::Reservation - Describes a reservation for travel
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -168,6 +168,10 @@ A booking_agent should be one of the following types:
 
 =back
 
+=head2 C<_has_booking_agent>
+
+A predicate for the L</booking_agent> attribute.
+
 =head2 C<booking_time>
 
 C<bookingTime>
@@ -181,6 +185,10 @@ A booking_time should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_booking_time>
+
+A predicate for the L</booking_time> attribute.
 
 =head2 C<broker>
 
@@ -199,6 +207,10 @@ A broker should be one of the following types:
 
 =back
 
+=head2 C<_has_broker>
+
+A predicate for the L</broker> attribute.
+
 =head2 C<modified_time>
 
 C<modifiedTime>
@@ -212,6 +224,10 @@ A modified_time should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_modified_time>
+
+A predicate for the L</modified_time> attribute.
 
 =head2 C<price_currency>
 
@@ -237,6 +253,10 @@ A price_currency should be one of the following types:
 
 =back
 
+=head2 C<_has_price_currency>
+
+A predicate for the L</price_currency> attribute.
+
 =head2 C<program_membership_used>
 
 C<programMembershipUsed>
@@ -251,6 +271,10 @@ A program_membership_used should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ProgramMembership']>
 
 =back
+
+=head2 C<_has_program_membership_used>
+
+A predicate for the L</program_membership_used> attribute.
 
 =head2 C<provider>
 
@@ -268,6 +292,10 @@ A provider should be one of the following types:
 
 =back
 
+=head2 C<_has_provider>
+
+A predicate for the L</provider> attribute.
+
 =head2 C<reservation_for>
 
 C<reservationFor>
@@ -281,6 +309,10 @@ A reservation_for should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_reservation_for>
+
+A predicate for the L</reservation_for> attribute.
 
 =head2 C<reservation_id>
 
@@ -296,6 +328,10 @@ A reservation_id should be one of the following types:
 
 =back
 
+=head2 C<_has_reservation_id>
+
+A predicate for the L</reservation_id> attribute.
+
 =head2 C<reservation_status>
 
 C<reservationStatus>
@@ -310,6 +346,10 @@ A reservation_status should be one of the following types:
 
 =back
 
+=head2 C<_has_reservation_status>
+
+A predicate for the L</reservation_status> attribute.
+
 =head2 C<reserved_ticket>
 
 C<reservedTicket>
@@ -323,6 +363,10 @@ A reserved_ticket should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Ticket']>
 
 =back
+
+=head2 C<_has_reserved_ticket>
+
+A predicate for the L</reserved_ticket> attribute.
 
 =head2 C<total_price>
 
@@ -347,6 +391,10 @@ A total_price should be one of the following types:
 
 =back
 
+=head2 C<_has_total_price>
+
+A predicate for the L</total_price> attribute.
+
 =head2 C<under_name>
 
 C<underName>
@@ -362,6 +410,10 @@ A under_name should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_under_name>
+
+A predicate for the L</under_name> attribute.
 
 =head1 SEE ALSO
 

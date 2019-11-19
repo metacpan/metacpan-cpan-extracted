@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has aggregate_rating => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_aggregate_rating',
     json_ld   => 'aggregateRating',
 );
 
@@ -28,7 +28,7 @@ has aggregate_rating => (
 
 has logo => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_logo',
     json_ld   => 'logo',
 );
 
@@ -36,7 +36,7 @@ has logo => (
 
 has review => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_review',
     json_ld   => 'review',
 );
 
@@ -44,7 +44,7 @@ has review => (
 
 has slogan => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_slogan',
     json_ld   => 'slogan',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::Brand - A brand is a name used by an organization or busine
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -90,6 +90,10 @@ A aggregate_rating should be one of the following types:
 
 =back
 
+=head2 C<_has_aggregate_rating>
+
+A predicate for the L</aggregate_rating> attribute.
+
 =head2 C<logo>
 
 An associated logo.
@@ -104,6 +108,10 @@ A logo should be one of the following types:
 
 =back
 
+=head2 C<_has_logo>
+
+A predicate for the L</logo> attribute.
+
 =head2 C<review>
 
 A review of the item.
@@ -116,6 +124,10 @@ A review should be one of the following types:
 
 =back
 
+=head2 C<_has_review>
+
+A predicate for the L</review> attribute.
+
 =head2 C<slogan>
 
 A slogan or motto associated with the item.
@@ -127,6 +139,10 @@ A slogan should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_slogan>
+
+A predicate for the L</slogan> attribute.
 
 =head1 SEE ALSO
 

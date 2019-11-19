@@ -26,65 +26,66 @@ name: Term-CLI
 provides:
   Term::CLI:
     file: lib/Term/CLI.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Argument:
     file: lib/Term/CLI/Argument.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Argument::Bool:
     file: lib/Term/CLI/Argument/Bool.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Argument::Enum:
     file: lib/Term/CLI/Argument/Enum.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Argument::Filename:
     file: lib/Term/CLI/Argument/Filename.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Argument::Number:
     file: lib/Term/CLI/Argument/Number.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Argument::Number::Float:
     file: lib/Term/CLI/Argument/Number/Float.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Argument::Number::Int:
     file: lib/Term/CLI/Argument/Number/Int.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Argument::String:
     file: lib/Term/CLI/Argument/String.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Base:
     file: lib/Term/CLI/Base.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Command:
     file: lib/Term/CLI/Command.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Command::Help:
     file: lib/Term/CLI/Command/Help.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Element:
     file: lib/Term/CLI/Element.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::L10N:
     file: lib/Term/CLI/L10N.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::L10N::en:
     file: lib/Term/CLI/L10N/en.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::L10N::nl:
     file: lib/Term/CLI/L10N/nl.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::ReadLine:
     file: lib/Term/CLI/ReadLine.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Role::ArgumentSet:
     file: lib/Term/CLI/Role/ArgumentSet.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Role::CommandSet:
     file: lib/Term/CLI/Role/CommandSet.pm
-    version: '0.051005'
+    version: '0.051007'
   Term::CLI::Role::HelpText:
     file: lib/Term/CLI/Role/HelpText.pm
-    version: '0.051005'
+    version: '0.051007'
 requires:
+  Carp: '0'
   Exporter: '5.71'
   File::Which: '1.09'
   FindBin: '1.50'
@@ -110,6 +111,6 @@ resources:
   bugtracker: https://github.com/sbakker/perl-Term-CLI/issues
   homepage: https://github.com/sbakker/perl-Term-CLI
   repository: https://github.com/sbakker/perl-Term-CLI.git
-version: '0.051005'
-x_generated_by_perl: v5.30.0
+version: '0.051007'
+x_generated_by_perl: v5.30.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

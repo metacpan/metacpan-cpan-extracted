@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has free => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_free',
     json_ld   => 'free',
 );
 
@@ -28,7 +28,7 @@ has free => (
 
 has is_accessible_for_free => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_accessible_for_free',
     json_ld   => 'isAccessibleForFree',
 );
 
@@ -36,7 +36,7 @@ has is_accessible_for_free => (
 
 has published_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_published_by',
     json_ld   => 'publishedBy',
 );
 
@@ -44,7 +44,7 @@ has published_by => (
 
 has published_on => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_published_on',
     json_ld   => 'publishedOn',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::PublicationEvent - A PublicationEvent corresponds indiffere
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -88,6 +88,10 @@ A free should be one of the following types:
 
 =back
 
+=head2 C<_has_free>
+
+A predicate for the L</free> attribute.
+
 =head2 C<is_accessible_for_free>
 
 C<isAccessibleForFree>
@@ -101,6 +105,10 @@ A is_accessible_for_free should be one of the following types:
 =item C<Bool>
 
 =back
+
+=head2 C<_has_is_accessible_for_free>
+
+A predicate for the L</is_accessible_for_free> attribute.
 
 =head2 C<published_by>
 
@@ -118,6 +126,10 @@ A published_by should be one of the following types:
 
 =back
 
+=head2 C<_has_published_by>
+
+A predicate for the L</published_by> attribute.
+
 =head2 C<published_on>
 
 C<publishedOn>
@@ -131,6 +143,10 @@ A published_on should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::BroadcastService']>
 
 =back
+
+=head2 C<_has_published_on>
+
+A predicate for the L</published_on> attribute.
 
 =head1 SEE ALSO
 

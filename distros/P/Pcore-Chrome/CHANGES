@@ -1,3 +1,6 @@
+v0.8.2 2019-11-17T07:54:46Z
+ - http callback removed
+
 v0.8.1 2019-11-15T23:12:18Z
  - win32_create_no_window arg removed from run proc
 

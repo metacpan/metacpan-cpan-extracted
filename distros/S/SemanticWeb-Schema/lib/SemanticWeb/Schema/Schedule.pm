@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has by_day => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_by_day',
     json_ld   => 'byDay',
 );
 
@@ -28,7 +28,7 @@ has by_day => (
 
 has by_month => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_by_month',
     json_ld   => 'byMonth',
 );
 
@@ -36,7 +36,7 @@ has by_month => (
 
 has by_month_day => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_by_month_day',
     json_ld   => 'byMonthDay',
 );
 
@@ -44,7 +44,7 @@ has by_month_day => (
 
 has event_schedule => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_event_schedule',
     json_ld   => 'eventSchedule',
 );
 
@@ -52,7 +52,7 @@ has event_schedule => (
 
 has except_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_except_date',
     json_ld   => 'exceptDate',
 );
 
@@ -60,7 +60,7 @@ has except_date => (
 
 has repeat_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_repeat_count',
     json_ld   => 'repeatCount',
 );
 
@@ -68,7 +68,7 @@ has repeat_count => (
 
 has repeat_frequency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_repeat_frequency',
     json_ld   => 'repeatFrequency',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::Schedule - A schedule defines a repeating time period used 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -122,6 +122,10 @@ A by_day should be one of the following types:
 
 =back
 
+=head2 C<_has_by_day>
+
+A predicate for the L</by_day> attribute.
+
 =head2 C<by_month>
 
 C<byMonth>
@@ -139,6 +143,10 @@ A by_month should be one of the following types:
 
 =back
 
+=head2 C<_has_by_month>
+
+A predicate for the L</by_month> attribute.
+
 =head2 C<by_month_day>
 
 C<byMonthDay>
@@ -155,6 +163,10 @@ A by_month_day should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_by_month_day>
+
+A predicate for the L</by_month_day> attribute.
 
 =head2 C<event_schedule>
 
@@ -187,6 +199,10 @@ A event_schedule should be one of the following types:
 
 =back
 
+=head2 C<_has_event_schedule>
+
+A predicate for the L</event_schedule> attribute.
+
 =head2 C<except_date>
 
 C<exceptDate>
@@ -214,6 +230,10 @@ A except_date should be one of the following types:
 
 =back
 
+=head2 C<_has_except_date>
+
+A predicate for the L</except_date> attribute.
+
 =head2 C<repeat_count>
 
 C<repeatCount>
@@ -228,6 +248,10 @@ A repeat_count should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_repeat_count>
+
+A predicate for the L</repeat_count> attribute.
 
 =head2 C<repeat_frequency>
 
@@ -249,6 +273,10 @@ A repeat_frequency should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_repeat_frequency>
+
+A predicate for the L</repeat_frequency> attribute.
 
 =head1 SEE ALSO
 

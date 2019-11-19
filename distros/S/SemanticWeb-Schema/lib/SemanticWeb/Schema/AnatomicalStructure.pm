@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has associated_pathophysiology => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_associated_pathophysiology',
     json_ld   => 'associatedPathophysiology',
 );
 
@@ -28,7 +28,7 @@ has associated_pathophysiology => (
 
 has body_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_body_location',
     json_ld   => 'bodyLocation',
 );
 
@@ -36,7 +36,7 @@ has body_location => (
 
 has connected_to => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_connected_to',
     json_ld   => 'connectedTo',
 );
 
@@ -44,7 +44,7 @@ has connected_to => (
 
 has diagram => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_diagram',
     json_ld   => 'diagram',
 );
 
@@ -52,7 +52,7 @@ has diagram => (
 
 has function => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_function',
     json_ld   => 'function',
 );
 
@@ -60,7 +60,7 @@ has function => (
 
 has part_of_system => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_part_of_system',
     json_ld   => 'partOfSystem',
 );
 
@@ -68,7 +68,7 @@ has part_of_system => (
 
 has related_condition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_related_condition',
     json_ld   => 'relatedCondition',
 );
 
@@ -76,7 +76,7 @@ has related_condition => (
 
 has related_therapy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_related_therapy',
     json_ld   => 'relatedTherapy',
 );
 
@@ -84,7 +84,7 @@ has related_therapy => (
 
 has sub_structure => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sub_structure',
     json_ld   => 'subStructure',
 );
 
@@ -106,7 +106,7 @@ SemanticWeb::Schema::AnatomicalStructure - Any part of the human body
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -131,6 +131,10 @@ A associated_pathophysiology should be one of the following types:
 
 =back
 
+=head2 C<_has_associated_pathophysiology>
+
+A predicate for the L</associated_pathophysiology> attribute.
+
 =head2 C<body_location>
 
 C<bodyLocation>
@@ -144,6 +148,10 @@ A body_location should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_body_location>
+
+A predicate for the L</body_location> attribute.
 
 =head2 C<connected_to>
 
@@ -159,6 +167,10 @@ A connected_to should be one of the following types:
 
 =back
 
+=head2 C<_has_connected_to>
+
+A predicate for the L</connected_to> attribute.
+
 =head2 C<diagram>
 
 An image containing a diagram that illustrates the structure and/or its
@@ -172,6 +184,10 @@ A diagram should be one of the following types:
 
 =back
 
+=head2 C<_has_diagram>
+
+A predicate for the L</diagram> attribute.
+
 =head2 C<function>
 
 Function of the anatomical structure.
@@ -183,6 +199,10 @@ A function should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_function>
+
+A predicate for the L</function> attribute.
 
 =head2 C<part_of_system>
 
@@ -198,6 +218,10 @@ A part_of_system should be one of the following types:
 
 =back
 
+=head2 C<_has_part_of_system>
+
+A predicate for the L</part_of_system> attribute.
+
 =head2 C<related_condition>
 
 C<relatedCondition>
@@ -211,6 +235,10 @@ A related_condition should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalCondition']>
 
 =back
+
+=head2 C<_has_related_condition>
+
+A predicate for the L</related_condition> attribute.
 
 =head2 C<related_therapy>
 
@@ -226,6 +254,10 @@ A related_therapy should be one of the following types:
 
 =back
 
+=head2 C<_has_related_therapy>
+
+A predicate for the L</related_therapy> attribute.
+
 =head2 C<sub_structure>
 
 C<subStructure>
@@ -239,6 +271,10 @@ A sub_structure should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AnatomicalStructure']>
 
 =back
+
+=head2 C<_has_sub_structure>
+
+A predicate for the L</sub_structure> attribute.
 
 =head1 SEE ALSO
 

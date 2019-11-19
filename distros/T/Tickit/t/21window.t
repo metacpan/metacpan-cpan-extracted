@@ -11,15 +11,12 @@ use Tickit::Test;
 
 my ( $term, $rootwin ) = mk_term_and_window;
 
-# Already 2 references; Tickit object keeps a permanent one, and we have one
-# here. This is fine.
-is_refcount( $rootwin, 2, '$rootwin has refcount 2 initially' );
+is_refcount( $rootwin, 1, '$rootwin has refcount 1 initially' );
 
 my $win = $rootwin->make_sub( 3, 10, 4, 20 );
 flush_tickit;
 
 is_oneref( $win, '$win has refcount 1 initially' );
-is_refcount( $rootwin, 2, '$rootwin has refcount 2 after ->make_sub' );
 
 is( "$win", 'Tickit::Window[20x4 abs@10,3]', '$win string overload' );
 ok( $win != $rootwin, '$win numeric comparison compares object identities' );
@@ -101,14 +98,13 @@ isa_ok( $win->term, "Tickit::Term", '$win->term' );
 
    isa_ok( $subwin->term, "Tickit::Term", '$subwin->term' );
 
-   is_refcount( $win, 1, '$win has refcount 2 at EOF' );
-   is_refcount( $rootwin, 2, '$rootwin has refcount 3 before $win drop' );
+   is_refcount( $win, 1, '$win has refcount 1 at EOF' );
 
    $subwin->close; undef $subwin;
    $win->close; undef $win;
    flush_tickit;
 }
 
-is_refcount( $rootwin, 2, '$rootwin has refcount 2 at EOF' );
+is_refcount( $rootwin, 1, '$rootwin has refcount 1 at EOF' );
 
 done_testing;

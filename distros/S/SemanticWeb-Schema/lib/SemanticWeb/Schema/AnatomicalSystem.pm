@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has associated_pathophysiology => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_associated_pathophysiology',
     json_ld   => 'associatedPathophysiology',
 );
 
@@ -28,7 +28,7 @@ has associated_pathophysiology => (
 
 has comprised_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_comprised_of',
     json_ld   => 'comprisedOf',
 );
 
@@ -36,7 +36,7 @@ has comprised_of => (
 
 has related_condition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_related_condition',
     json_ld   => 'relatedCondition',
 );
 
@@ -44,7 +44,7 @@ has related_condition => (
 
 has related_structure => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_related_structure',
     json_ld   => 'relatedStructure',
 );
 
@@ -52,7 +52,7 @@ has related_structure => (
 
 has related_therapy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_related_therapy',
     json_ld   => 'relatedTherapy',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::AnatomicalSystem - An anatomical system is a group of anato
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -103,6 +103,10 @@ A associated_pathophysiology should be one of the following types:
 
 =back
 
+=head2 C<_has_associated_pathophysiology>
+
+A predicate for the L</associated_pathophysiology> attribute.
+
 =head2 C<comprised_of>
 
 C<comprisedOf>
@@ -121,6 +125,10 @@ A comprised_of should be one of the following types:
 
 =back
 
+=head2 C<_has_comprised_of>
+
+A predicate for the L</comprised_of> attribute.
+
 =head2 C<related_condition>
 
 C<relatedCondition>
@@ -134,6 +142,10 @@ A related_condition should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalCondition']>
 
 =back
+
+=head2 C<_has_related_condition>
+
+A predicate for the L</related_condition> attribute.
 
 =head2 C<related_structure>
 
@@ -150,6 +162,10 @@ A related_structure should be one of the following types:
 
 =back
 
+=head2 C<_has_related_structure>
+
+A predicate for the L</related_structure> attribute.
+
 =head2 C<related_therapy>
 
 C<relatedTherapy>
@@ -163,6 +179,10 @@ A related_therapy should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalTherapy']>
 
 =back
+
+=head2 C<_has_related_therapy>
+
+A predicate for the L</related_therapy> attribute.
 
 =head1 SEE ALSO
 

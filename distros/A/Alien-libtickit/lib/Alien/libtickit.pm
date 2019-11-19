@@ -5,7 +5,7 @@
 
 package Alien::libtickit;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use POSIX qw( WEXITSTATUS );
 
@@ -35,7 +35,7 @@ provides a simple access to its configuration. If not, the process of
 installing it will install a locally-bundled copy of the library into perl's
 arch-specific library directory.
 
-This module bundles F<libtickit> version 0.3.2.
+This module bundles F<libtickit> version 0.3.3.
 
 =head1 METHODS
 

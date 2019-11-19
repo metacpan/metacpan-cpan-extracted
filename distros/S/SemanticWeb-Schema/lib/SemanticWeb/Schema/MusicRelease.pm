@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has catalog_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_catalog_number',
     json_ld   => 'catalogNumber',
 );
 
@@ -28,7 +28,7 @@ has catalog_number => (
 
 has credited_to => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_credited_to',
     json_ld   => 'creditedTo',
 );
 
@@ -36,7 +36,7 @@ has credited_to => (
 
 has duration => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_duration',
     json_ld   => 'duration',
 );
 
@@ -44,7 +44,7 @@ has duration => (
 
 has music_release_format => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_music_release_format',
     json_ld   => 'musicReleaseFormat',
 );
 
@@ -52,7 +52,7 @@ has music_release_format => (
 
 has record_label => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_record_label',
     json_ld   => 'recordLabel',
 );
 
@@ -60,7 +60,7 @@ has record_label => (
 
 has release_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_release_of',
     json_ld   => 'releaseOf',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::MusicRelease - A MusicRelease is a specific release of a mu
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -104,6 +104,10 @@ A catalog_number should be one of the following types:
 
 =back
 
+=head2 C<_has_catalog_number>
+
+A predicate for the L</catalog_number> attribute.
+
 =head2 C<credited_to>
 
 C<creditedTo>
@@ -122,6 +126,10 @@ A credited_to should be one of the following types:
 
 =back
 
+=head2 C<_has_credited_to>
+
+A predicate for the L</credited_to> attribute.
+
 =head2 C<duration>
 
 =for html <p>The duration of the item (movie, audio recording, event, etc.) in <a
@@ -134,6 +142,10 @@ A duration should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
+
+=head2 C<_has_duration>
+
+A predicate for the L</duration> attribute.
 
 =head2 C<music_release_format>
 
@@ -150,6 +162,10 @@ A music_release_format should be one of the following types:
 
 =back
 
+=head2 C<_has_music_release_format>
+
+A predicate for the L</music_release_format> attribute.
+
 =head2 C<record_label>
 
 C<recordLabel>
@@ -164,6 +180,10 @@ A record_label should be one of the following types:
 
 =back
 
+=head2 C<_has_record_label>
+
+A predicate for the L</record_label> attribute.
+
 =head2 C<release_of>
 
 C<releaseOf>
@@ -177,6 +197,10 @@ A release_of should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MusicAlbum']>
 
 =back
+
+=head2 C<_has_release_of>
+
+A predicate for the L</release_of> attribute.
 
 =head1 SEE ALSO
 

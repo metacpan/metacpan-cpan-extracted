@@ -17,7 +17,6 @@ WriteMakefile(
 		'Cairo'               => 1.104,
 	},
 	CONFIGURE_REQUIRES => {
-		'ExtUtils::Depends'   => 0.2,
 		'ExtUtils::PkgConfig' => 1.0,
 		'Prima'               => 1.50,
 	},

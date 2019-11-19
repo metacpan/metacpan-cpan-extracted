@@ -242,7 +242,7 @@ id                      TEXT     NOT NULL    PRIMARY KEY,
 marker_lineage          TEXT     NULL,
 genomes_n               INTEGER  NULL,
 markers_n               INTEGER  NULL,
-maker_sets_n            INTEGER  NULL,
+marker_sets_n           INTEGER  NULL,
 zero                    INTEGER  NULL,
 one                     INTEGER  NULL,
 two                     INTEGER  NULL,
@@ -324,13 +324,18 @@ for my $infile ($ARGV_file_table ? @infiles : @ARGV_infiles) {
 
 
     # load antiSMASH report
-    my $parser = Parser->new( file => $infile);
+    my $parser = Parser->new( 
+        file => $infile,
+        module_delineation => $ARGV_module_delineation,
+    );
+
     my $root = $parser->root;
 
     my @clusters = $root->all_clusters;
     my @clusters_plus = map { 
         ClusterPlus->new( 
             _cluster => $_,
+            module_delineation => $ARGV_module_delineation,
             gap_filling => $ARGV_gap_filling,
             undef_cleaning => $ARGV_undef_cleaning,
         )
@@ -741,7 +746,7 @@ export_bgc_sql_tables.pl - Exports SQL tables of BGC data (Palantir and antiSMAS
 
 =head1 VERSION
 
-version 0.193080
+version 0.193230
 
 =head1 NAME
 
@@ -826,6 +831,14 @@ Name of your database [default: bgc_db].
 
 =for Euclid: str.type: str
     str.default: 'bgc_db'
+
+=item --module-delineation [=] <str>
+
+Method for delineating the modules. Modules can either be cut on condensation
+(C and KS) or selection domains (A and AT) [default: selection].
+
+=for Euclid: str.type: /condensation|selection/
+    str.default: 'selection'
 
 =item --gap-filling [=] <bool>
 

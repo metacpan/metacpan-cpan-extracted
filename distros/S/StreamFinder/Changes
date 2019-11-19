@@ -121,3 +121,8 @@ Revision history for StreamFinder
         - StreamFinder::Brighteon: Fix another site-change that caused blank 
         titles to be returned, and broaden title and description searching 
         ability.
+1.26    2019/11/19
+        - Correctly handle "HOME" directory in M#-Windows.
+        - StreamFinder::IHeartRadio - Handle non-US site URLs.  Change default 
+        "keep" priority to "secure_shoutcast, shoutcast, secure, any" for 
+        easier use by Fauxdacious.

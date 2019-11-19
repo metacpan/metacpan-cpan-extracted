@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has claim_reviewed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_claim_reviewed',
     json_ld   => 'claimReviewed',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::ClaimReview - A fact-checking review of claims made (or rep
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ A claim_reviewed should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_claim_reviewed>
+
+A predicate for the L</claim_reviewed> attribute.
 
 =head1 SEE ALSO
 

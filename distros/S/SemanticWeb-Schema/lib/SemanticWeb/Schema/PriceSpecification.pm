@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has eligible_quantity => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_eligible_quantity',
     json_ld   => 'eligibleQuantity',
 );
 
@@ -28,7 +28,7 @@ has eligible_quantity => (
 
 has eligible_transaction_volume => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_eligible_transaction_volume',
     json_ld   => 'eligibleTransactionVolume',
 );
 
@@ -36,7 +36,7 @@ has eligible_transaction_volume => (
 
 has max_price => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_max_price',
     json_ld   => 'maxPrice',
 );
 
@@ -44,7 +44,7 @@ has max_price => (
 
 has min_price => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_min_price',
     json_ld   => 'minPrice',
 );
 
@@ -52,7 +52,7 @@ has min_price => (
 
 has price => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price',
     json_ld   => 'price',
 );
 
@@ -60,7 +60,7 @@ has price => (
 
 has price_currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price_currency',
     json_ld   => 'priceCurrency',
 );
 
@@ -68,7 +68,7 @@ has price_currency => (
 
 has valid_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_from',
     json_ld   => 'validFrom',
 );
 
@@ -76,7 +76,7 @@ has valid_from => (
 
 has valid_through => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_through',
     json_ld   => 'validThrough',
 );
 
@@ -84,7 +84,7 @@ has valid_through => (
 
 has value_added_tax_included => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_value_added_tax_included',
     json_ld   => 'valueAddedTaxIncluded',
 );
 
@@ -106,7 +106,7 @@ SemanticWeb::Schema::PriceSpecification - A structured value representing a pric
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -134,6 +134,10 @@ A eligible_quantity should be one of the following types:
 
 =back
 
+=head2 C<_has_eligible_quantity>
+
+A predicate for the L</eligible_quantity> attribute.
+
 =head2 C<eligible_transaction_volume>
 
 C<eligibleTransactionVolume>
@@ -151,6 +155,10 @@ A eligible_transaction_volume should be one of the following types:
 
 =back
 
+=head2 C<_has_eligible_transaction_volume>
+
+A predicate for the L</eligible_transaction_volume> attribute.
+
 =head2 C<max_price>
 
 C<maxPrice>
@@ -165,6 +173,10 @@ A max_price should be one of the following types:
 
 =back
 
+=head2 C<_has_max_price>
+
+A predicate for the L</max_price> attribute.
+
 =head2 C<min_price>
 
 C<minPrice>
@@ -178,6 +190,10 @@ A min_price should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_min_price>
+
+A predicate for the L</min_price> attribute.
 
 =head2 C<price>
 
@@ -214,6 +230,10 @@ A price should be one of the following types:
 
 =back
 
+=head2 C<_has_price>
+
+A predicate for the L</price> attribute.
+
 =head2 C<price_currency>
 
 C<priceCurrency>
@@ -238,6 +258,10 @@ A price_currency should be one of the following types:
 
 =back
 
+=head2 C<_has_price_currency>
+
+A predicate for the L</price_currency> attribute.
+
 =head2 C<valid_from>
 
 C<validFrom>
@@ -251,6 +275,10 @@ A valid_from should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_valid_from>
+
+A predicate for the L</valid_from> attribute.
 
 =head2 C<valid_through>
 
@@ -267,6 +295,10 @@ A valid_through should be one of the following types:
 
 =back
 
+=head2 C<_has_valid_through>
+
+A predicate for the L</valid_through> attribute.
+
 =head2 C<value_added_tax_included>
 
 C<valueAddedTaxIncluded>
@@ -281,6 +313,10 @@ A value_added_tax_included should be one of the following types:
 =item C<Bool>
 
 =back
+
+=head2 C<_has_value_added_tax_included>
+
+A predicate for the L</value_added_tax_included> attribute.
 
 =head1 SEE ALSO
 

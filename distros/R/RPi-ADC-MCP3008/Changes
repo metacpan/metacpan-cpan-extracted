@@ -1,5 +1,10 @@
 Revision history for RPi-ADC-MCP3008
 
+2.3605  2019-11-18
+        - modified what we send in to SPI setup. A recent change in WiringPi
+          broke sending in the GPIO pin as a channel
+        - updated POD coverage tests
+
 2.3604  2017-06-28
         - added git info to Makefile.PL
         - bumped prereq of WiringPi::API to 2.3612
@@ -16,4 +21,4 @@ Revision history for RPi-ADC-MCP3008
         - updated POD
 
 2.36.1  2017-03-11
-- initial release
+        - initial release

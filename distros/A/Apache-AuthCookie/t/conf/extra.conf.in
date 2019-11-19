@@ -261,6 +261,28 @@ PerlSetVar WhatEverRequiresEncoding UTF-8
   </IfDefine>
 </Files>
 
+# login action that sets SameSite
+<Files LOGIN-SAMESITE>
+  PerlSetVar WhatEverSameSite strict
+  AuthName WhatEver
+  SetHandler perl-script
+  <IfDefine APACHE1>
+    AuthType Sample::Apache::AuthCookieHandler
+    PerlHandler Sample::Apache::AuthCookieHandler->login
+  </IfDefine>
+  <IfDefine APACHE2>
+    <IfDefine !APACHE2_4>
+      AuthType Sample::Apache2::AuthCookieHandler
+      PerlResponseHandler Sample::Apache2::AuthCookieHandler->login
+    </IfDefine>
+    <IfDefine APACHE2_4>
+      AuthType Sample::Apache2_4::AuthCookieHandler
+      PerlResponseHandler Sample::Apache2_4::AuthCookieHandler->login
+      Require all granted
+    </IfDefine>
+  </IfDefine>
+</Files>
+
 <Files logout.pl>
   AuthName WhatEver
 

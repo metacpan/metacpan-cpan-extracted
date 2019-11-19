@@ -4,6 +4,7 @@ use XML::NewsML_G2::Audio;
 use XML::NewsML_G2::Binary;
 use XML::NewsML_G2::Concept;
 use XML::NewsML_G2::Copyright_Holder;
+use XML::NewsML_G2::Creator;
 use XML::NewsML_G2::Desk;
 use XML::NewsML_G2::ElectionDistrict;
 use XML::NewsML_G2::ElectionProvince;
@@ -46,7 +47,7 @@ use XML::NewsML_G2::Writer::Package_Item;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv('0.3.2');
+use version; our $VERSION = qv('0.3.3');
 
 1;
 
@@ -59,7 +60,7 @@ XML::NewsML_G2 - generate NewsML-G2 news items
 
 =head1 VERSION
 
-0.3.2
+0.3.3
 
 =begin readme
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has high_price => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_high_price',
     json_ld   => 'highPrice',
 );
 
@@ -28,7 +28,7 @@ has high_price => (
 
 has low_price => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_low_price',
     json_ld   => 'lowPrice',
 );
 
@@ -36,7 +36,7 @@ has low_price => (
 
 has offer_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_offer_count',
     json_ld   => 'offerCount',
 );
 
@@ -44,7 +44,7 @@ has offer_count => (
 
 has offers => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_offers',
     json_ld   => 'offers',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::AggregateOffer - When a single product is associated with m
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -97,6 +97,10 @@ A high_price should be one of the following types:
 
 =back
 
+=head2 C<_has_high_price>
+
+A predicate for the L</high_price> attribute.
+
 =head2 C<low_price>
 
 C<lowPrice>
@@ -118,6 +122,10 @@ A low_price should be one of the following types:
 
 =back
 
+=head2 C<_has_low_price>
+
+A predicate for the L</low_price> attribute.
+
 =head2 C<offer_count>
 
 C<offerCount>
@@ -132,6 +140,10 @@ A offer_count should be one of the following types:
 
 =back
 
+=head2 C<_has_offer_count>
+
+A predicate for the L</offer_count> attribute.
+
 =head2 C<offers>
 
 An offer to provide this item&#x2014;for example, an offer to sell a
@@ -145,6 +157,10 @@ A offers should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Offer']>
 
 =back
+
+=head2 C<_has_offers>
+
+A predicate for the L</offers> attribute.
 
 =head1 SEE ALSO
 

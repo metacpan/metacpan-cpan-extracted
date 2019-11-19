@@ -3,7 +3,7 @@ package RPi::ADC::MCP3008;
 use warnings;
 use strict;
 
-our $VERSION = '2.3604';
+our $VERSION = '2.3605';
 
 require XSLoader;
 XSLoader::load('RPi::ADC::MCP3008', $VERSION);
@@ -19,7 +19,10 @@ sub new {
     $self->_channel($channel);
 
     wpi_setup();
-    spi_setup($self->_channel);
+
+    my $spi_channel = $channel > 1 ? 0 : $channel;
+
+    spi_setup($spi_channel);
 
     # init the CS pin per the datasheet, if
     # we're in bit-bang mode
@@ -185,7 +188,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Steve Bertrand.
+Copyright 2017-2019 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

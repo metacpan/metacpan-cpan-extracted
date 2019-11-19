@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has acriss_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_acriss_code',
     json_ld   => 'acrissCode',
 );
 
@@ -28,7 +28,7 @@ has acriss_code => (
 
 has roof_load => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_roof_load',
     json_ld   => 'roofLoad',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::BusOrCoach - A bus (also omnibus or autobus) is a road vehi
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -75,6 +75,10 @@ A acriss_code should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_acriss_code>
+
+A predicate for the L</acriss_code> attribute.
 
 =head2 C<roof_load>
 
@@ -102,6 +106,10 @@ A roof_load should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_roof_load>
+
+A predicate for the L</roof_load> attribute.
 
 =head1 SEE ALSO
 

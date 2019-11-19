@@ -1,0 +1,6 @@
+Revision history for Perl extension TTS::Flite.
+
+0.01  Tue Nov  5 13:15:30 2019
+	- original version; created by h2xs 1.23 with options
+		-Xn TTS::Flite
+

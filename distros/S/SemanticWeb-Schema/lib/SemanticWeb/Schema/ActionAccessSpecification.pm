@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has availability_ends => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_availability_ends',
     json_ld   => 'availabilityEnds',
 );
 
@@ -28,7 +28,7 @@ has availability_ends => (
 
 has availability_starts => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_availability_starts',
     json_ld   => 'availabilityStarts',
 );
 
@@ -36,7 +36,7 @@ has availability_starts => (
 
 has category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_category',
     json_ld   => 'category',
 );
 
@@ -44,7 +44,7 @@ has category => (
 
 has eligible_region => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_eligible_region',
     json_ld   => 'eligibleRegion',
 );
 
@@ -52,7 +52,7 @@ has eligible_region => (
 
 has expects_acceptance_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_expects_acceptance_of',
     json_ld   => 'expectsAcceptanceOf',
 );
 
@@ -60,7 +60,7 @@ has expects_acceptance_of => (
 
 has ineligible_region => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_ineligible_region',
     json_ld   => 'ineligibleRegion',
 );
 
@@ -68,7 +68,7 @@ has ineligible_region => (
 
 has requires_subscription => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_requires_subscription',
     json_ld   => 'requiresSubscription',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::ActionAccessSpecification - A set of requirements that a mu
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -114,6 +114,10 @@ A availability_ends should be one of the following types:
 
 =back
 
+=head2 C<_has_availability_ends>
+
+A predicate for the L</availability_ends> attribute.
+
 =head2 C<availability_starts>
 
 C<availabilityStarts>
@@ -128,6 +132,10 @@ A availability_starts should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_availability_starts>
+
+A predicate for the L</availability_starts> attribute.
 
 =head2 C<category>
 
@@ -145,6 +153,10 @@ A category should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_category>
+
+A predicate for the L</category> attribute.
 
 =head2 C<eligible_region>
 
@@ -168,6 +180,10 @@ A eligible_region should be one of the following types:
 
 =back
 
+=head2 C<_has_eligible_region>
+
+A predicate for the L</eligible_region> attribute.
+
 =head2 C<expects_acceptance_of>
 
 C<expectsAcceptanceOf>
@@ -182,6 +198,10 @@ A expects_acceptance_of should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Offer']>
 
 =back
+
+=head2 C<_has_expects_acceptance_of>
+
+A predicate for the L</expects_acceptance_of> attribute.
 
 =head2 C<ineligible_region>
 
@@ -205,6 +225,10 @@ A ineligible_region should be one of the following types:
 
 =back
 
+=head2 C<_has_ineligible_region>
+
+A predicate for the L</ineligible_region> attribute.
+
 =head2 C<requires_subscription>
 
 C<requiresSubscription>
@@ -222,6 +246,10 @@ A requires_subscription should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MediaSubscription']>
 
 =back
+
+=head2 C<_has_requires_subscription>
+
+A predicate for the L</requires_subscription> attribute.
 
 =head1 SEE ALSO
 

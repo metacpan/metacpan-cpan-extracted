@@ -16,7 +16,7 @@ use Encode qw(encode);
 
 Apache::TestRequest::user_agent( reset => 1, requests_redirectable => 0 );
 
-plan tests => 33, need_lwp;
+plan tests => 34, need_lwp;
 
 ok 1, 'Test initialized';
 
@@ -335,6 +335,26 @@ subtest 'HttpOnly cookie attribute' => sub {
     is($r->header('Set-Cookie'),
        'Sample::AuthCookieHandler_WhatEver=programmer:Heroo; path=/; HttpOnly',
        'cookie contains HttpOnly attribute');
+
+    is($r->code, 302, 'check redirect response code');
+};
+
+# Should succeed and cookie should have SameSite attribute
+subtest 'SameSite cookie attribute' => sub {
+    plan tests => 3;
+
+    my $r = POST('/LOGIN-SAMESITE', [
+        destination  => '/docs/protected/get_me.html',
+        credential_0 => 'programmer',
+        credential_1 => 'Heroo'
+    ]);
+
+    is($r->header('Location'), '/docs/protected/get_me.html',
+       'SameSite location header');
+
+    is($r->header('Set-Cookie'),
+       'Sample::AuthCookieHandler_WhatEver=programmer:Heroo; path=/; SameSite=strict',
+       'cookie contains SameSite attribute');
 
     is($r->code, 302, 'check redirect response code');
 };

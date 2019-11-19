@@ -111,6 +111,8 @@ sub run ( $self, $req ) {
     return;
 }
 
+# TODO http api should return immediately if no transactions with the TID were received
+# TODO this is required to unblock http api client ASAP if it is not required API response
 sub _http_api_router ( $self, $auth, $data, $cb ) {
     my $response;
 

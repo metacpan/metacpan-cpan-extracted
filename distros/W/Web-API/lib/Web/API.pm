@@ -6,7 +6,7 @@ use experimental 'smartmatch';
 
 # ABSTRACT: A Simple base module to implement almost every RESTful API with just a few lines of configuration
 
-our $VERSION = '2.4.1'; # VERSION
+our $VERSION = '2.5'; # VERSION
 
 use LWP::UserAgent;
 use HTTP::Cookies 6.04;
@@ -35,9 +35,26 @@ our %CONTENT_TYPE = (
 requires 'commands';
 
 
-has 'base_url' => (
-    is  => 'rw',
-    isa => 'Str',
+has 'live_url' => (
+    is      => 'rw',
+    isa     => 'Str',
+    lazy    => 1,
+    builder => '_build_live_test_url',
+);
+
+
+has 'test_url' => (
+    is      => 'rw',
+    isa     => 'Str',
+    lazy    => 1,
+    builder => '_build_live_test_url',
+);
+
+
+has 'test' => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => sub { 0 },
 );
 
 
@@ -258,6 +275,11 @@ has 'error_keys' => (
     isa => 'ArrayRef[Str]',
 );
 
+has 'base_url' => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
 has 'json' => (
     is      => 'rw',
     isa     => 'JSON',
@@ -309,6 +331,13 @@ sub _build_agent {
     );
 }
 
+sub _build_live_test_url {
+    my ($self) = @_;
+
+    return $self->base_url if $self->base_url;
+    return;
+}
+
 
 sub nonce {
     return join('', rand_chars(size => 16, set => 'alphanumeric'));
@@ -317,7 +346,10 @@ sub nonce {
 
 sub log {    ## no critic (ProhibitBuiltinHomonyms)
     my ($self, $msg) = @_;
-    print STDERR caller() . ': ' . $msg . $/;
+    print STDERR caller() . ': '
+        . ($self->test ? '[test] ' : '[LIVE] ')
+        . $msg
+        . $/;
     return;
 }
 
@@ -828,6 +860,8 @@ sub AUTOLOAD {
     $self->clear_decoded_response;
     $self->clear_response;
 
+    $self->base_url($self->test ? $self->test_url : $self->live_url);
+
     # sanity checks
     die "Attribute (base_url) is required\n" unless $self->base_url;
     if ($self->auth_type =~ m/^oauth_/) {
@@ -907,7 +941,7 @@ Web::API - A Simple base module to implement almost every RESTful API with just 
 
 =head1 VERSION
 
-version 2.4.1
+version 2.5
 
 =head1 SYNOPSIS
 
@@ -919,7 +953,7 @@ Implement the RESTful API of your choice in 10 minutes, roughly.
     package Net::CloudProvider;
 
     use Mouse;
-    
+
     with 'Web::API';
 
     our $VERSION = "0.1";
@@ -986,7 +1020,7 @@ Implement the RESTful API of your choice in 10 minutes, roughly.
         my ($self) = @_;
 
         $self->user_agent(__PACKAGE__ . ' ' . $VERSION);
-        $self->base_url('https://ams01.cloudprovider.net/virtual_machines');
+        $self->live_url('https://ams01.cloudprovider.net/virtual_machines');
         $self->content_type('application/json');
         $self->extension('json');
         $self->wrapper('virtual_machine');
@@ -1005,7 +1039,7 @@ Implement the RESTful API of your choice in 10 minutes, roughly.
 later use as:
 
     use Net::CloudProvider;
-    
+
     my $nc = Net::CloudProvider->new(user => 'foobar', api_key => 'secret');
     my $response = $nc->create_node({
         id                             => 'funnybox',
@@ -1055,9 +1089,17 @@ an example for C<path>:
 this will add C<user_id> to the list of mandatory keys for this command
 automatically.
 
-=head2 base_url (required)
+=head2 live_url (required)
 
 get/set base URL to API, can include paths
+
+=head2 test_url (optional)
+
+get/set base URL for test system if applicable
+
+=head2 test (optional)
+
+get/set boolean to run against base URL from test system or live system
 
 =head2 api_key (required in most cases)
 
@@ -1121,7 +1163,7 @@ default: GET
 
 =head2 extension (optional)
 
-get/set file extension, e.g. '.json'
+get/set file extension, e.g. 'json'
 
 =head2 user_agent (optional)
 

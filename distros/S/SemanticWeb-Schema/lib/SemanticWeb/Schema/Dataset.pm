@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has catalog => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_catalog',
     json_ld   => 'catalog',
 );
 
@@ -28,7 +28,7 @@ has catalog => (
 
 has dataset_time_interval => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_dataset_time_interval',
     json_ld   => 'datasetTimeInterval',
 );
 
@@ -36,7 +36,7 @@ has dataset_time_interval => (
 
 has distribution => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_distribution',
     json_ld   => 'distribution',
 );
 
@@ -44,7 +44,7 @@ has distribution => (
 
 has included_data_catalog => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_included_data_catalog',
     json_ld   => 'includedDataCatalog',
 );
 
@@ -52,7 +52,7 @@ has included_data_catalog => (
 
 has included_in_data_catalog => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_included_in_data_catalog',
     json_ld   => 'includedInDataCatalog',
 );
 
@@ -60,7 +60,7 @@ has included_in_data_catalog => (
 
 has issn => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_issn',
     json_ld   => 'issn',
 );
 
@@ -68,7 +68,7 @@ has issn => (
 
 has measurement_technique => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_measurement_technique',
     json_ld   => 'measurementTechnique',
 );
 
@@ -76,7 +76,7 @@ has measurement_technique => (
 
 has variable_measured => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_variable_measured',
     json_ld   => 'variableMeasured',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::Dataset - A body of structured information describing some 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -118,6 +118,10 @@ A catalog should be one of the following types:
 
 =back
 
+=head2 C<_has_catalog>
+
+A predicate for the L</catalog> attribute.
+
 =head2 C<dataset_time_interval>
 
 C<datasetTimeInterval>
@@ -133,6 +137,10 @@ A dataset_time_interval should be one of the following types:
 
 =back
 
+=head2 C<_has_dataset_time_interval>
+
+A predicate for the L</dataset_time_interval> attribute.
+
 =head2 C<distribution>
 
 A downloadable form of this dataset, at a specific location, in a specific
@@ -145,6 +153,10 @@ A distribution should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::DataDownload']>
 
 =back
+
+=head2 C<_has_distribution>
+
+A predicate for the L</distribution> attribute.
 
 =head2 C<included_data_catalog>
 
@@ -161,6 +173,10 @@ A included_data_catalog should be one of the following types:
 
 =back
 
+=head2 C<_has_included_data_catalog>
+
+A predicate for the L</included_data_catalog> attribute.
+
 =head2 C<included_in_data_catalog>
 
 C<includedInDataCatalog>
@@ -175,6 +191,10 @@ A included_in_data_catalog should be one of the following types:
 
 =back
 
+=head2 C<_has_included_in_data_catalog>
+
+A predicate for the L</included_in_data_catalog> attribute.
+
 =head2 C<issn>
 
 The International Standard Serial Number (ISSN) that identifies this serial
@@ -188,6 +208,10 @@ A issn should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_issn>
+
+A predicate for the L</issn> attribute.
 
 =head2 C<measurement_technique>
 
@@ -230,6 +254,10 @@ A measurement_technique should be one of the following types:
 
 =back
 
+=head2 C<_has_measurement_technique>
+
+A predicate for the L</measurement_technique> attribute.
+
 =head2 C<variable_measured>
 
 C<variableMeasured>
@@ -247,6 +275,10 @@ A variable_measured should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_variable_measured>
+
+A predicate for the L</variable_measured> attribute.
 
 =head1 SEE ALSO
 

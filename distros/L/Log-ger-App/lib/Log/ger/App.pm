@@ -1,7 +1,7 @@
 package Log::ger::App;
 
-our $DATE = '2019-09-18'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2019-10-06'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -80,21 +80,24 @@ sub import {
     require Log::ger;
     require Log::ger::Util;
 
+    my $level_arg = delete $args{level};
+    my $default_level_arg = delete $args{default_level};
+
     my $level = _set_level(
         "general log level",
-        val => $args{level}, "import argument 'level'",
+        val => $level_arg, "import argument 'level'",
         envset => "", "",
-        val => $args{default_level}, "import argument 'default_level'",
+        val => $default_level_arg, "import argument 'default_level'",
         val => 'warn', "fallback value",
     );
     $Log::ger::Current_Level = Log::ger::Util::numeric_level($level);
 
-    my $is_daemon = $args{daemon};
+    my $is_daemon = delete $args{daemon};
     $is_daemon = _is_daemon() if !defined($is_daemon);
 
     my $is_oneliner = $0 eq '-e';
 
-    my $progname = $args{name};
+    my $progname = delete $args{name};
     unless (defined $progname) {
         ($progname = $0) =~ s!.+/!!;
         $progname =~ s/\.pl$//;
@@ -127,19 +130,29 @@ sub import {
 
     # add File
     {
+        my $file_name = delete $args{file_name};
+        unless (defined $file_name) {
+            $file_name = "$progname.log";
+        }
+
+        my $file_dir  = delete $args{file_dir};
+        unless (defined $file_dir) {
+            require PERLANCAR::File::HomeDir;
+            $file_dir = $> ? PERLANCAR::File::HomeDir::get_my_home_dir() :
+                (-d "/var/log" ? "/var/log" : "/");
+        }
+
         last if $0 eq '-';
-        require PERLANCAR::File::HomeDir;
-        my $path = $> ?
-            PERLANCAR::File::HomeDir::get_my_home_dir()."/$progname.log" :
-              "/var/log/$progname.log";
+
+        my $file_path = "$file_dir/$file_name";
         my $olevel = _set_level(
-            "file ($path) log level",
+            "file ($file_path) log level",
             envset => "FILE_", "",
             val => $level, "general log level",
         );
         last if $olevel eq 'off';
         $conf{outputs}{File} = {
-            conf   => { path => $path },
+            conf   => { path => $file_path },
             level  => $olevel,
             layout => [Pattern => {format => '[pid %P] [%d] %m'}],
         };
@@ -160,10 +173,13 @@ sub import {
         };
     }
 
-    if ($args{outputs}) {
-        $conf{outputs}{$_} = $args{outputs}{$_}
-            for keys %{$args{outputs}{$_}};
+    if (my $outputs = delete $args{outputs}) {
+        $conf{outputs}{$_} = $outputs->{$_}
+            for keys %{$outputs->{$_}};
     }
+
+    die "Unknown argument(s): ".join(", ", sort keys %args)
+        if keys %args;
 
     require Log::ger::Output;
     Log::ger::Output->set('Composite', %conf);
@@ -184,7 +200,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.011
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -305,6 +321,16 @@ Program name will be shown on the screen, e.g.:
  myprog: Doing task 2 ...
  myprog: Exiting ...
 
+=item * file_name
+
+str. Explicitly set log filename. By default, filename will be set to
+I<name>.log.
+
+=item * file_dir
+
+str. Explicitly set log file's directory. By default, it is user's home (if not
+running as root), or F</var/log> (if running as root).
+
 =item * daemon
 
 bool. Explicitly tell Log::ger::App that your application is a daemon or not.
@@ -388,6 +414,37 @@ Bool.
 =head2 SYSLOG_QUIET
 
 =head1 FAQS
+
+=head2 How do I turn off file logging?
+
+By default, file logging is on unless running as a Perl one-liner (under
+C<perl>'s C<-e>).
+
+To explicitly turn file logging off, you can set I<FILE_LEVEL> environment
+variable to C<off>, for example:
+
+ BEGIN { $ENV{FILE_LEVEL} //= "off" }
+ use Log::ger::App;
+
+=head2 How do I turn off screen logging?
+
+By default, screen logging is on unless script is a daemon.
+
+To explicitly turn screen logging off, you can set I<SCREEN_LEVEL> environment
+variable to C<off>, for example:
+
+ BEGIN { $ENV{SCREEN_LEVEL} //= "off" }
+ use Log::ger::App;
+
+=head2 How do I turn off syslog logging?
+
+By default, syslog logging is on if script is a daemon.
+
+To explicitly turn syslog logging off, you can set I<SYSLOG_LEVEL> environment
+variable to C<off>, for example:
+
+ BEGIN { $ENV{SYSLOG_LEVEL} //= "off" }
+ use Log::ger::App;
 
 =head2 Why doesn't re-setting log level using Log::ger::Util::set_level() work?
 

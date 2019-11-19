@@ -1,0 +1,24 @@
+TTS-Flite version 0.02
+======================
+
+use TTS::Flite;
+my $tts = TTS::Flite->new();
+
+$tts->init();  # call it only once, before calling tts().
+$tts->tts("Some String");
+
+INSTALLATION
+
+On debian(10+) and ubuntu(18.04+) systems
+
+    sudo apt install libflite1
+
+    git clone https://github.com/rkrt/TTS-Flite
+    cd TTS-Flite
+    sudo cpan install .
+
+Copyright (C) 2019 by Rajkumar Reddy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.26.1 or,
+at your option, any later version of Perl 5 you may have available.

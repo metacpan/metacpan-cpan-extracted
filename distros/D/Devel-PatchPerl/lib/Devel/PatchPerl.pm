@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '1.78';
+$Devel::PatchPerl::VERSION = '1.80';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -9372,7 +9372,7 @@ Cg==
 UH2PH580
   }
   if ( $num < 5.008009 ) {
-    return _patch(<<'UH2PH588');
+    return _patch_b64(<<'UH2PH588');
 LS0tIHV0aWxzL2gycGguUEwKKysrIHV0aWxzL2gycGguUEwKQEAgLTg0LDcgKzg0LDcgQEAgc3Vi
 IHJlaW5kZW50KCQpIHsKIH0KIAogbXkgKCR0LCAkdGFiLCAlY3VyYXJncywgJG5ldywgJGV2YWxf
 aW5kZXgsICRkaXIsICRuYW1lLCAkYXJncywgJG91dGZpbGUpOwotbXkgKCRpbmNsLCAkaW5jbF90
@@ -9791,7 +9791,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 1.78
+version 1.80
 
 =head1 SYNOPSIS
 

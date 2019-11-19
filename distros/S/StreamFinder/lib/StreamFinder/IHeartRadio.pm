@@ -121,7 +121,12 @@ include or skip respectively.  The list for each can be either a comma-separated
 string or an array reference ([...]) of stream types, in the order they should be 
 returned.  Each stream type in the list can be one of:  any, secure, secure_pls, 
 pls, secure_hls, hls, secure_shortcast, shortcast, secure_rtmp, rtmp, (I<ext>, 
-ie. mp4) etc.  
+ie. mp4) etc.
+
+DEFAULT keep list is 'secure_shoutcast, shoutcast, secure, any', meaning that all 
+secure_shoutcast streams followed by all other shoutcast streams, followed by 
+all other secure (https) streams, followed by all remaining streams.  
+More than one value can be specified to control order of search.
 
 NOTE:  This is now the preferred method over the DEPRECIATED one below.  If using 
 this method, do NOT include the inverter ("!") in front of the stream types, as 
@@ -333,6 +338,7 @@ use LWP::UserAgent ();
 use vars qw(@ISA @EXPORT);
 
 my $DEBUG = 0;
+my $bummer = ($^O =~ /MSWin/);
 my %uops = ();
 my @userAgentOps = ();
 
@@ -349,8 +355,11 @@ sub new
 	my $self = {};
 	return undef  unless ($url);
 
+	my $homedir = $bummer ? $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'} : $ENV{'HOME'};
+	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
+	$homedir =~ s#[\/\\]$##;
 	my (@okStreams, @skipStreams, @okStreamsClassic, @skipStreamsClassic);
-	foreach my $p ("$ENV{HOME}/.config/StreamFinder/config", "$ENV{HOME}/.config/StreamFinder/IHeartRadio/config") {
+	foreach my $p ("${homedir}/.config/StreamFinder/config", "${homedir}/.config/StreamFinder/IHeartRadio/config") {
 		if (open IN, $p) {
 			my ($atr, $val);
 			while (<IN>) {
@@ -403,7 +412,7 @@ sub new
 	if (!defined($skipStreams[0]) && defined($uops{'skip'})) {
 		@skipStreams = (ref($uops{'skip'}) =~ /ARRAY/) ? @{$uops{'skip'}} : split(/\,\s*/, $uops{'skip'});
 	}
-	@okStreams = ('any')  unless (defined $okStreams[0]);  # one of:  {secure_pls | pls | stw}
+	@okStreams = (qw(secure_shoutcast shoutcast secure any))  unless (defined $okStreams[0]);  # one of:  {secure_pls | pls | stw}
 
 	print STDERR "-0(IHeartRadio): URL=$url= KEEP=(",join('|',@okStreams).") SKIP=(",join('|',@skipStreams).")\n"  if ($DEBUG);
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has funded_item => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_funded_item',
     json_ld   => 'fundedItem',
 );
 
@@ -28,7 +28,7 @@ has funded_item => (
 
 has sponsor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sponsor',
     json_ld   => 'sponsor',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::Grant - A grant
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -97,6 +97,10 @@ A funded_item should be one of the following types:
 
 =back
 
+=head2 C<_has_funded_item>
+
+A predicate for the L</funded_item> attribute.
+
 =head2 C<sponsor>
 
 A person or organization that supports a thing through a pledge, promise,
@@ -112,6 +116,10 @@ A sponsor should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_sponsor>
+
+A predicate for the L</sponsor> attribute.
 
 =head1 SEE ALSO
 

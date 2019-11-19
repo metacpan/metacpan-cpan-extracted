@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has competency_required => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_competency_required',
     json_ld   => 'competencyRequired',
 );
 
@@ -28,7 +28,7 @@ has competency_required => (
 
 has credential_category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_credential_category',
     json_ld   => 'credentialCategory',
 );
 
@@ -36,7 +36,7 @@ has credential_category => (
 
 has educational_level => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_educational_level',
     json_ld   => 'educationalLevel',
 );
 
@@ -44,7 +44,7 @@ has educational_level => (
 
 has recognized_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_recognized_by',
     json_ld   => 'recognizedBy',
 );
 
@@ -52,7 +52,7 @@ has recognized_by => (
 
 has valid_for => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_for',
     json_ld   => 'validFor',
 );
 
@@ -60,7 +60,7 @@ has valid_for => (
 
 has valid_in => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_in',
     json_ld   => 'validIn',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::EducationalOccupationalCredential - An educational or occup
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -109,6 +109,10 @@ A competency_required should be one of the following types:
 
 =back
 
+=head2 C<_has_competency_required>
+
+A predicate for the L</competency_required> attribute.
+
 =head2 C<credential_category>
 
 C<credentialCategory>
@@ -125,6 +129,10 @@ A credential_category should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_credential_category>
+
+A predicate for the L</credential_category> attribute.
 
 =head2 C<educational_level>
 
@@ -144,6 +152,10 @@ A educational_level should be one of the following types:
 
 =back
 
+=head2 C<_has_educational_level>
+
+A predicate for the L</educational_level> attribute.
+
 =head2 C<recognized_by>
 
 C<recognizedBy>
@@ -160,6 +172,10 @@ A recognized_by should be one of the following types:
 
 =back
 
+=head2 C<_has_recognized_by>
+
+A predicate for the L</recognized_by> attribute.
+
 =head2 C<valid_for>
 
 C<validFor>
@@ -174,6 +190,10 @@ A valid_for should be one of the following types:
 
 =back
 
+=head2 C<_has_valid_for>
+
+A predicate for the L</valid_for> attribute.
+
 =head2 C<valid_in>
 
 C<validIn>
@@ -187,6 +207,10 @@ A valid_in should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
 
 =back
+
+=head2 C<_has_valid_in>
+
+A predicate for the L</valid_in> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has health_plan_coinsurance_option => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_coinsurance_option',
     json_ld   => 'healthPlanCoinsuranceOption',
 );
 
@@ -28,7 +28,7 @@ has health_plan_coinsurance_option => (
 
 has health_plan_coinsurance_rate => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_coinsurance_rate',
     json_ld   => 'healthPlanCoinsuranceRate',
 );
 
@@ -36,7 +36,7 @@ has health_plan_coinsurance_rate => (
 
 has health_plan_copay => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_copay',
     json_ld   => 'healthPlanCopay',
 );
 
@@ -44,7 +44,7 @@ has health_plan_copay => (
 
 has health_plan_copay_option => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_copay_option',
     json_ld   => 'healthPlanCopayOption',
 );
 
@@ -52,7 +52,7 @@ has health_plan_copay_option => (
 
 has health_plan_pharmacy_category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_pharmacy_category',
     json_ld   => 'healthPlanPharmacyCategory',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::HealthPlanCostSharingSpecification - A description of costs
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -97,6 +97,10 @@ A health_plan_coinsurance_option should be one of the following types:
 
 =back
 
+=head2 C<_has_health_plan_coinsurance_option>
+
+A predicate for the L</health_plan_coinsurance_option> attribute.
+
 =head2 C<health_plan_coinsurance_rate>
 
 C<healthPlanCoinsuranceRate>
@@ -111,6 +115,10 @@ A health_plan_coinsurance_rate should be one of the following types:
 
 =back
 
+=head2 C<_has_health_plan_coinsurance_rate>
+
+A predicate for the L</health_plan_coinsurance_rate> attribute.
+
 =head2 C<health_plan_copay>
 
 C<healthPlanCopay>
@@ -124,6 +132,10 @@ A health_plan_copay should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
 
 =back
+
+=head2 C<_has_health_plan_copay>
+
+A predicate for the L</health_plan_copay> attribute.
 
 =head2 C<health_plan_copay_option>
 
@@ -140,6 +152,10 @@ A health_plan_copay_option should be one of the following types:
 
 =back
 
+=head2 C<_has_health_plan_copay_option>
+
+A predicate for the L</health_plan_copay_option> attribute.
+
 =head2 C<health_plan_pharmacy_category>
 
 C<healthPlanPharmacyCategory>
@@ -153,6 +169,10 @@ A health_plan_pharmacy_category should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_health_plan_pharmacy_category>
+
+A predicate for the L</health_plan_pharmacy_category> attribute.
 
 =head1 SEE ALSO
 

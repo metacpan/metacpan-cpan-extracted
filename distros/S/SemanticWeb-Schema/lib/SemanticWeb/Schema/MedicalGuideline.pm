@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has evidence_level => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_evidence_level',
     json_ld   => 'evidenceLevel',
 );
 
@@ -28,7 +28,7 @@ has evidence_level => (
 
 has evidence_origin => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_evidence_origin',
     json_ld   => 'evidenceOrigin',
 );
 
@@ -36,7 +36,7 @@ has evidence_origin => (
 
 has guideline_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_guideline_date',
     json_ld   => 'guidelineDate',
 );
 
@@ -44,7 +44,7 @@ has guideline_date => (
 
 has guideline_subject => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_guideline_subject',
     json_ld   => 'guidelineSubject',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::MedicalGuideline - Any recommendation made by a standard so
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -95,6 +95,10 @@ A evidence_level should be one of the following types:
 
 =back
 
+=head2 C<_has_evidence_level>
+
+A predicate for the L</evidence_level> attribute.
+
 =head2 C<evidence_origin>
 
 C<evidenceOrigin>
@@ -110,6 +114,10 @@ A evidence_origin should be one of the following types:
 
 =back
 
+=head2 C<_has_evidence_origin>
+
+A predicate for the L</evidence_origin> attribute.
+
 =head2 C<guideline_date>
 
 C<guidelineDate>
@@ -123,6 +131,10 @@ A guideline_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_guideline_date>
+
+A predicate for the L</guideline_date> attribute.
 
 =head2 C<guideline_subject>
 
@@ -138,6 +150,10 @@ A guideline_subject should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalEntity']>
 
 =back
+
+=head2 C<_has_guideline_subject>
+
+A predicate for the L</guideline_subject> attribute.
 
 =head1 SEE ALSO
 

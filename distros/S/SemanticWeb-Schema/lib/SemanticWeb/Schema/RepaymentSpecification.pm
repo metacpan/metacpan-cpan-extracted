@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has down_payment => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_down_payment',
     json_ld   => 'downPayment',
 );
 
@@ -28,7 +28,7 @@ has down_payment => (
 
 has early_prepayment_penalty => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_early_prepayment_penalty',
     json_ld   => 'earlyPrepaymentPenalty',
 );
 
@@ -36,7 +36,7 @@ has early_prepayment_penalty => (
 
 has loan_payment_amount => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_loan_payment_amount',
     json_ld   => 'loanPaymentAmount',
 );
 
@@ -44,7 +44,7 @@ has loan_payment_amount => (
 
 has loan_payment_frequency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_loan_payment_frequency',
     json_ld   => 'loanPaymentFrequency',
 );
 
@@ -52,7 +52,7 @@ has loan_payment_frequency => (
 
 has number_of_loan_payments => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_loan_payments',
     json_ld   => 'numberOfLoanPayments',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::RepaymentSpecification - A structured value representing re
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -100,6 +100,10 @@ A down_payment should be one of the following types:
 
 =back
 
+=head2 C<_has_down_payment>
+
+A predicate for the L</down_payment> attribute.
+
 =head2 C<early_prepayment_penalty>
 
 C<earlyPrepaymentPenalty>
@@ -115,6 +119,10 @@ A early_prepayment_penalty should be one of the following types:
 
 =back
 
+=head2 C<_has_early_prepayment_penalty>
+
+A predicate for the L</early_prepayment_penalty> attribute.
+
 =head2 C<loan_payment_amount>
 
 C<loanPaymentAmount>
@@ -128,6 +136,10 @@ A loan_payment_amount should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
 
 =back
+
+=head2 C<_has_loan_payment_amount>
+
+A predicate for the L</loan_payment_amount> attribute.
 
 =head2 C<loan_payment_frequency>
 
@@ -144,6 +156,10 @@ A loan_payment_frequency should be one of the following types:
 
 =back
 
+=head2 C<_has_loan_payment_frequency>
+
+A predicate for the L</loan_payment_frequency> attribute.
+
 =head2 C<number_of_loan_payments>
 
 C<numberOfLoanPayments>
@@ -159,6 +175,10 @@ A number_of_loan_payments should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_number_of_loan_payments>
+
+A predicate for the L</number_of_loan_payments> attribute.
 
 =head1 SEE ALSO
 

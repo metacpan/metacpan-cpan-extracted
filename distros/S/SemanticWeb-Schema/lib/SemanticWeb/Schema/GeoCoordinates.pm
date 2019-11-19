@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has address => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_address',
     json_ld   => 'address',
 );
 
@@ -28,7 +28,7 @@ has address => (
 
 has address_country => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_address_country',
     json_ld   => 'addressCountry',
 );
 
@@ -36,7 +36,7 @@ has address_country => (
 
 has elevation => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_elevation',
     json_ld   => 'elevation',
 );
 
@@ -44,7 +44,7 @@ has elevation => (
 
 has latitude => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_latitude',
     json_ld   => 'latitude',
 );
 
@@ -52,7 +52,7 @@ has latitude => (
 
 has longitude => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_longitude',
     json_ld   => 'longitude',
 );
 
@@ -60,7 +60,7 @@ has longitude => (
 
 has postal_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_postal_code',
     json_ld   => 'postalCode',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::GeoCoordinates - The geographic coordinates of a place or e
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -104,6 +104,10 @@ A address should be one of the following types:
 
 =back
 
+=head2 C<_has_address>
+
+A predicate for the L</address> attribute.
+
 =head2 C<address_country>
 
 C<addressCountry>
@@ -121,6 +125,10 @@ A address_country should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_address_country>
+
+A predicate for the L</address_country> attribute.
 
 =head2 C<elevation>
 
@@ -140,6 +148,10 @@ A elevation should be one of the following types:
 
 =back
 
+=head2 C<_has_elevation>
+
+A predicate for the L</elevation> attribute.
+
 =head2 C<latitude>
 
 =for html <p>The latitude of a location. For example <code>37.42242</code> (<a
@@ -154,6 +166,10 @@ A latitude should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_latitude>
+
+A predicate for the L</latitude> attribute.
 
 =head2 C<longitude>
 
@@ -170,6 +186,10 @@ A longitude should be one of the following types:
 
 =back
 
+=head2 C<_has_longitude>
+
+A predicate for the L</longitude> attribute.
+
 =head2 C<postal_code>
 
 C<postalCode>
@@ -183,6 +203,10 @@ A postal_code should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_postal_code>
+
+A predicate for the L</postal_code> attribute.
 
 =head1 SEE ALSO
 

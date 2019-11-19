@@ -1,5 +1,10 @@
-Revision history for Parse-Services
+0.002   2019-11-19  Released-By: PERLANCAR; Urgency: low
 
-0.001   2016-10-26 (PERLANCAR) (unreleased)
+	- No functional changes.
+
+	- [bugfix] Fix wrong Abstract (thanks Slaven Rezic) [RT#131006].
+
+
+0.001   2016-10-26  Released-By: PERLANCAR
 
         - First release.

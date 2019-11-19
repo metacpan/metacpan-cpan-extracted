@@ -3,9 +3,7 @@ Upstream-Name: Class-Tiny-Antlers
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Class-Tiny-Antlers
 
-Files: README
- lib/Class/Tiny/Antlers.pm
- t/01basic.t
+Files: t/01basic.t
  t/02ro-rw-rwp-bare.t
  t/03defaults.t
  t/04predicates-clearers.t
@@ -22,7 +20,12 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
-Copyright: Copyright 2014 Toby Inkster.
+ t/11types-moose.t
+ t/11types-mouse.t
+ t/11types-nano.t
+ t/11types-specio.t
+ t/11types.t
+Copyright: Copyright 2019 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -31,26 +34,30 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: CONTRIBUTING
- INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
+Files: README
+ lib/Class/Tiny/Antlers.pm
+Copyright: This software is copyright (c) 2013, 2019 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: Makefile.PL
  dist.ini
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  

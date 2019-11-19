@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has carrier => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_carrier',
     json_ld   => 'carrier',
 );
 
@@ -28,7 +28,7 @@ has carrier => (
 
 has delivery_address => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_delivery_address',
     json_ld   => 'deliveryAddress',
 );
 
@@ -36,7 +36,7 @@ has delivery_address => (
 
 has delivery_status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_delivery_status',
     json_ld   => 'deliveryStatus',
 );
 
@@ -44,7 +44,7 @@ has delivery_status => (
 
 has expected_arrival_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_expected_arrival_from',
     json_ld   => 'expectedArrivalFrom',
 );
 
@@ -52,7 +52,7 @@ has expected_arrival_from => (
 
 has expected_arrival_until => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_expected_arrival_until',
     json_ld   => 'expectedArrivalUntil',
 );
 
@@ -60,7 +60,7 @@ has expected_arrival_until => (
 
 has has_delivery_method => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_delivery_method',
     json_ld   => 'hasDeliveryMethod',
 );
 
@@ -68,7 +68,7 @@ has has_delivery_method => (
 
 has item_shipped => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_item_shipped',
     json_ld   => 'itemShipped',
 );
 
@@ -76,7 +76,7 @@ has item_shipped => (
 
 has origin_address => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_origin_address',
     json_ld   => 'originAddress',
 );
 
@@ -84,7 +84,7 @@ has origin_address => (
 
 has part_of_order => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_part_of_order',
     json_ld   => 'partOfOrder',
 );
 
@@ -92,7 +92,7 @@ has part_of_order => (
 
 has provider => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_provider',
     json_ld   => 'provider',
 );
 
@@ -100,7 +100,7 @@ has provider => (
 
 has tracking_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_tracking_number',
     json_ld   => 'trackingNumber',
 );
 
@@ -108,7 +108,7 @@ has tracking_number => (
 
 has tracking_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_tracking_url',
     json_ld   => 'trackingUrl',
 );
 
@@ -130,7 +130,7 @@ SemanticWeb::Schema::ParcelDelivery - The delivery of a parcel either via the po
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -152,6 +152,10 @@ A carrier should be one of the following types:
 
 =back
 
+=head2 C<_has_carrier>
+
+A predicate for the L</carrier> attribute.
+
 =head2 C<delivery_address>
 
 C<deliveryAddress>
@@ -165,6 +169,10 @@ A delivery_address should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::PostalAddress']>
 
 =back
+
+=head2 C<_has_delivery_address>
+
+A predicate for the L</delivery_address> attribute.
 
 =head2 C<delivery_status>
 
@@ -181,6 +189,10 @@ A delivery_status should be one of the following types:
 
 =back
 
+=head2 C<_has_delivery_status>
+
+A predicate for the L</delivery_status> attribute.
+
 =head2 C<expected_arrival_from>
 
 C<expectedArrivalFrom>
@@ -194,6 +206,10 @@ A expected_arrival_from should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_expected_arrival_from>
+
+A predicate for the L</expected_arrival_from> attribute.
 
 =head2 C<expected_arrival_until>
 
@@ -209,6 +225,10 @@ A expected_arrival_until should be one of the following types:
 
 =back
 
+=head2 C<_has_expected_arrival_until>
+
+A predicate for the L</expected_arrival_until> attribute.
+
 =head2 C<has_delivery_method>
 
 C<hasDeliveryMethod>
@@ -222,6 +242,10 @@ A has_delivery_method should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::DeliveryMethod']>
 
 =back
+
+=head2 C<_has_has_delivery_method>
+
+A predicate for the L</has_delivery_method> attribute.
 
 =head2 C<item_shipped>
 
@@ -237,6 +261,10 @@ A item_shipped should be one of the following types:
 
 =back
 
+=head2 C<_has_item_shipped>
+
+A predicate for the L</item_shipped> attribute.
+
 =head2 C<origin_address>
 
 C<originAddress>
@@ -251,6 +279,10 @@ A origin_address should be one of the following types:
 
 =back
 
+=head2 C<_has_origin_address>
+
+A predicate for the L</origin_address> attribute.
+
 =head2 C<part_of_order>
 
 C<partOfOrder>
@@ -264,6 +296,10 @@ A part_of_order should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Order']>
 
 =back
+
+=head2 C<_has_part_of_order>
+
+A predicate for the L</part_of_order> attribute.
 
 =head2 C<provider>
 
@@ -281,6 +317,10 @@ A provider should be one of the following types:
 
 =back
 
+=head2 C<_has_provider>
+
+A predicate for the L</provider> attribute.
+
 =head2 C<tracking_number>
 
 C<trackingNumber>
@@ -295,6 +335,10 @@ A tracking_number should be one of the following types:
 
 =back
 
+=head2 C<_has_tracking_number>
+
+A predicate for the L</tracking_number> attribute.
+
 =head2 C<tracking_url>
 
 C<trackingUrl>
@@ -308,6 +352,10 @@ A tracking_url should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_tracking_url>
+
+A predicate for the L</tracking_url> attribute.
 
 =head1 SEE ALSO
 

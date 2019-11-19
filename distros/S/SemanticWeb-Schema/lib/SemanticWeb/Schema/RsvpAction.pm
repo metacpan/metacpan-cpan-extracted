@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has additional_number_of_guests => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_additional_number_of_guests',
     json_ld   => 'additionalNumberOfGuests',
 );
 
@@ -28,7 +28,7 @@ has additional_number_of_guests => (
 
 has comment => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_comment',
     json_ld   => 'comment',
 );
 
@@ -36,7 +36,7 @@ has comment => (
 
 has rsvp_response => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_rsvp_response',
     json_ld   => 'rsvpResponse',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::RsvpAction - The act of notifying an event organizer as to 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -82,6 +82,10 @@ A additional_number_of_guests should be one of the following types:
 
 =back
 
+=head2 C<_has_additional_number_of_guests>
+
+A predicate for the L</additional_number_of_guests> attribute.
+
 =head2 C<comment>
 
 Comments, typically from users.
@@ -93,6 +97,10 @@ A comment should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Comment']>
 
 =back
+
+=head2 C<_has_comment>
+
+A predicate for the L</comment> attribute.
 
 =head2 C<rsvp_response>
 
@@ -107,6 +115,10 @@ A rsvp_response should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::RsvpResponseType']>
 
 =back
+
+=head2 C<_has_rsvp_response>
+
+A predicate for the L</rsvp_response> attribute.
 
 =head1 SEE ALSO
 

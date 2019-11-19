@@ -1,5 +1,5 @@
 package Apache2::AuthCookie;
-$Apache2::AuthCookie::VERSION = '3.27';
+$Apache2::AuthCookie::VERSION = '3.28';
 # ABSTRACT: Perl Authentication and Authorization via cookies
 
 use strict;
@@ -110,13 +110,15 @@ sub satisfy_is_valid {
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Apache2::AuthCookie - Perl Authentication and Authorization via cookies
 
 =head1 VERSION
 
-version 3.27
+version 3.28
 
 =head1 SYNOPSIS
 
@@ -149,9 +151,13 @@ MethodHandlers, Authen, and Authz compiled in.
  PerlSetVar WhatEverSessionTimeout +30m
 
  # to enable the HttpOnly cookie property, use HttpOnly.
- # this is an MS extension.  See:
+ # This is an MS extension.  See:
  # http://msdn.microsoft.com/workshop/author/dhtml/httponly_cookies.asp
  PerlSetVar WhatEverHttpOnly 1
+
+ # to enable the SameSite cookie property, set SameSite to "lax" or "strict".
+ # See: https://www.owasp.org/index.php/SameSite
+ PerlSetVar WhatEverSameSite strict
 
  # Usually documents are uncached - turn off here
  PerlSetVar WhatEverCache 1
@@ -454,8 +460,6 @@ again').
 
   where CODE is a valid code from Apache2::Const
 
-=encoding UTF-8
-
 =head1 ENCODING AND CHARACTER SETS
 
 =head2 Encoding
@@ -684,13 +688,17 @@ L<Apache2::AuthCookie::Base>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/apache-authcookie>
-and may be cloned from L<git://github.com/mschout/apache-authcookie.git>
+The development version is on github at L<https://https://github.com/mschout/apache-authcookie>
+and may be cloned from L<git://https://github.com/mschout/apache-authcookie.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-apache-authcookie@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Apache-AuthCookie
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/apache-authcookie/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

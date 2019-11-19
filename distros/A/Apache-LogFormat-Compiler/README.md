@@ -90,7 +90,7 @@ Compile a log format string to perl-code. For faster generation of access\_log l
 
 # ABOUT POSIX::strftime::Compiler
 
-This module uses [POSIX::strftime::Compiler](https://metacpan.org/pod/POSIX::strftime::Compiler) for generate datetime string. POSIX::strftime::Compiler provides GNU C library compatible strftime(3). But this module will not affected by the system locale. This feature is useful when you want to write loggers, servers and portable applications.
+This module uses [POSIX::strftime::Compiler](https://metacpan.org/pod/POSIX%3A%3Astrftime%3A%3ACompiler) for generate datetime string. POSIX::strftime::Compiler provides GNU C library compatible strftime(3). But this module will not affected by the system locale. This feature is useful when you want to write loggers, servers and portable applications.
 
 # ADD CUSTOM FORMAT STRING
 
@@ -125,7 +125,7 @@ Masahiro Nagano <kazeburo@gmail.com>
 
 # SEE ALSO
 
-[Plack::Middleware::AccessLog](https://metacpan.org/pod/Plack::Middleware::AccessLog), [http://httpd.apache.org/docs/2.2/mod/mod\_log\_config.html](http://httpd.apache.org/docs/2.2/mod/mod_log_config.html)
+[Plack::Middleware::AccessLog](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AAccessLog), [http://httpd.apache.org/docs/2.2/mod/mod\_log\_config.html](http://httpd.apache.org/docs/2.2/mod/mod_log_config.html)
 
 # LICENSE
 

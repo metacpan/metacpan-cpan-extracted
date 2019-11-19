@@ -1,5 +1,9 @@
 Revision history for Perl extension Log-Any-Adapter-Dupstd
 
+0.05 2019-11-19T14:34:12Z
+
+    - pull#1 autoflush for DUPERR
+
 0.04 2018-10-07T20:28:37Z
 
     - Unit-test has been redone

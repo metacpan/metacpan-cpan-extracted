@@ -754,7 +754,11 @@
 */
 
 
-#cmakedefine C_VA_COPY         @C_VA_COPY@
+#cmakedefine C_VA_COPY                @C_VA_COPY@
+#cmakedefine C_LOG2                   @C_LOG2@
+#cmakedefine C_LOG2F                  @C_LOG2F@
+#cmakedefine C_LOG2L                  @C_LOG2L@
+#cmakedefine HAVE_SIZEOF_LONG_DOUBLE  @HAVE_SIZEOF_LONG_DOUBLE@
 
 #endif
 

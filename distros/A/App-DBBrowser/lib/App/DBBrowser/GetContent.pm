@@ -62,8 +62,8 @@ sub __setting_menu_entries {
 
 sub get_content {
     my ( $sf, $sql, $goto_FILTER ) = @_;
-    my $gd = App::DBBrowser::GetContent::Read->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $pf = App::DBBrowser::GetContent::Parse->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $cr = App::DBBrowser::GetContent::Read->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $cp = App::DBBrowser::GetContent::Parse->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @cu_keys = ( qw/from_plain from_file from_copy/ );
@@ -109,23 +109,24 @@ sub get_content {
         GET_DATA: while ( 1 ) {
             my ( $aoa, $open_mode );
             if ( ! $goto_FILTER ) {
+                delete $sf->{i}{ct}{default_table_name};
+                delete $sf->{i}{gc}{sheet_name};
                 my $ok;
                 if ( $sf->{i}{gc}{source_type} eq $cu{from_plain} ) {
-                    ( $ok, $aoa ) = $gd->from_col_by_col( $sql );
+                    ( $ok, $aoa ) = $cr->from_col_by_col( $sql );
                 }
                 elsif ( $sf->{i}{gc}{source_type} eq $cu{from_copy} ) {
-                    ( $ok, $sf->{i}{gc}{file_ec} ) = $gd->from_copy_and_paste( $sql );
+                    ( $ok, $sf->{i}{gc}{file_ec} ) = $cr->from_copy_and_paste( $sql );
                 }
                 elsif ( $sf->{i}{gc}{source_type} eq $cu{from_file} ) {
-                    ( $ok, $sf->{i}{gc}{file_ec} ) = $gd->from_file( $sql );
+                    ( $ok, $sf->{i}{gc}{file_ec} ) = $cr->from_file( $sql );
                 }
                 if ( ! $ok ) {
                     next MENU;
                 }
-
+                $sf->{i}{gc}{sheet_count} = 0;
+                $sf->{i}{gc}{book} = undef;
             }
-            my $sheet_count = 0;
-            $sf->{i}{gc}{book} = undef;
 
             PARSE: while ( 1 ) {
                 if ( ! $goto_FILTER ) {
@@ -146,13 +147,13 @@ sub get_content {
                         open my $fh, $open_mode, $sf->{i}{gc}{file_ec} or die $!;
                         my $parse_ok;
                         if ( $parse_mode_idx == 0 ) {
-                            $parse_ok = $pf->__parse_with_Text_CSV( $sql, $fh );
+                            $parse_ok = $cp->__parse_with_Text_CSV( $sql, $fh );
                         }
                         elsif ( $parse_mode_idx == 1 ) {
-                            $parse_ok = $pf->__parse_with_split( $sql, $fh );
+                            $parse_ok = $cp->__parse_with_split( $sql, $fh );
                         }
                         elsif ( $parse_mode_idx == 2 ) {
-                            $parse_ok = $pf->__parse_with_template( $sql, $fh, $sf->{i}{gc}{source_type} ); #
+                            $parse_ok = $cp->__parse_with_template( $sql, $fh );
                             if ( $parse_ok && $parse_ok == -1 ) {
                                 next PARSE;
                             }
@@ -171,12 +172,12 @@ sub get_content {
                     }
                     else {
                         SHEET: while ( 1 ) {
-                            $sheet_count = $pf->__parse_with_Spreadsheet_Read( $sql, $sf->{i}{gc}{file_ec} );
-                            if ( ! $sheet_count ) {
+                            $sf->{i}{gc}{sheet_count} = $cp->__parse_with_Spreadsheet_Read( $sql, $sf->{i}{gc}{file_ec} );
+                            if ( ! $sf->{i}{gc}{sheet_count} ) {
                                 next GET_DATA;
                             }
                             if ( ! @{$sql->{insert_into_args}} ) { #
-                                next SHEET if $sheet_count >= 2;
+                                next SHEET if $sf->{i}{gc}{sheet_count} >= 2;
                                 next GET_DATA;
                             }
                             last SHEET;
@@ -190,7 +191,7 @@ sub get_content {
                     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} ); ##
                     my $ok = $cf->input_filter( $sql, 0 );
                     if ( ! $ok ) {
-                        if ( $sheet_count >= 2 ) {
+                        if ( $sf->{i}{gc}{sheet_count} >= 2 ) {
                             next PARSE;
                         }
                         next GET_DATA;

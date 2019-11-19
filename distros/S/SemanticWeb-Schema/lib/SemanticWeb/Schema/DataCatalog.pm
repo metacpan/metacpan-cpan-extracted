@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has dataset => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_dataset',
     json_ld   => 'dataset',
 );
 
@@ -28,7 +28,7 @@ has dataset => (
 
 has measurement_technique => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_measurement_technique',
     json_ld   => 'measurementTechnique',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::DataCatalog - A collection of datasets.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -69,6 +69,10 @@ A dataset should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Dataset']>
 
 =back
+
+=head2 C<_has_dataset>
+
+A predicate for the L</dataset> attribute.
 
 =head2 C<measurement_technique>
 
@@ -110,6 +114,10 @@ A measurement_technique should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_measurement_technique>
+
+A predicate for the L</measurement_technique> attribute.
 
 =head1 SEE ALSO
 

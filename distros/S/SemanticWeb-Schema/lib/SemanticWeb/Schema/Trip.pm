@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has arrival_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_arrival_time',
     json_ld   => 'arrivalTime',
 );
 
@@ -28,7 +28,7 @@ has arrival_time => (
 
 has departure_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_departure_time',
     json_ld   => 'departureTime',
 );
 
@@ -36,7 +36,7 @@ has departure_time => (
 
 has itinerary => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_itinerary',
     json_ld   => 'itinerary',
 );
 
@@ -44,7 +44,7 @@ has itinerary => (
 
 has offers => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_offers',
     json_ld   => 'offers',
 );
 
@@ -52,7 +52,7 @@ has offers => (
 
 has part_of_trip => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_part_of_trip',
     json_ld   => 'partOfTrip',
 );
 
@@ -60,7 +60,7 @@ has part_of_trip => (
 
 has provider => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_provider',
     json_ld   => 'provider',
 );
 
@@ -68,7 +68,7 @@ has provider => (
 
 has sub_trip => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sub_trip',
     json_ld   => 'subTrip',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::Trip - A trip or journey
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -112,6 +112,10 @@ A arrival_time should be one of the following types:
 
 =back
 
+=head2 C<_has_arrival_time>
+
+A predicate for the L</arrival_time> attribute.
+
 =head2 C<departure_time>
 
 C<departureTime>
@@ -125,6 +129,10 @@ A departure_time should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_departure_time>
+
+A predicate for the L</departure_time> attribute.
 
 =head2 C<itinerary>
 
@@ -144,6 +152,10 @@ A itinerary should be one of the following types:
 
 =back
 
+=head2 C<_has_itinerary>
+
+A predicate for the L</itinerary> attribute.
+
 =head2 C<offers>
 
 An offer to provide this item&#x2014;for example, an offer to sell a
@@ -157,6 +169,10 @@ A offers should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Offer']>
 
 =back
+
+=head2 C<_has_offers>
+
+A predicate for the L</offers> attribute.
 
 =head2 C<part_of_trip>
 
@@ -174,6 +190,10 @@ A part_of_trip should be one of the following types:
 
 =back
 
+=head2 C<_has_part_of_trip>
+
+A predicate for the L</part_of_trip> attribute.
+
 =head2 C<provider>
 
 The service provider, service operator, or service performer; the goods
@@ -190,6 +210,10 @@ A provider should be one of the following types:
 
 =back
 
+=head2 C<_has_provider>
+
+A predicate for the L</provider> attribute.
+
 =head2 C<sub_trip>
 
 C<subTrip>
@@ -205,6 +229,10 @@ A sub_trip should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Trip']>
 
 =back
+
+=head2 C<_has_sub_trip>
+
+A predicate for the L</sub_trip> attribute.
 
 =head1 SEE ALSO
 

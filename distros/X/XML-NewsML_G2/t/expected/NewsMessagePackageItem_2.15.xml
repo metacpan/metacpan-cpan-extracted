@@ -9,6 +9,7 @@
     <packageItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://iptc.org/std/nar/2006-10-01/" standard="NewsML-G2" standardversion="2.15" conformance="power" xml:lang="de" guid="urn:newsml:apa.at:20120315:BUNDLE42" version="1">
       <catalog>
         <scheme alias="apagroup" uri="http://cv.apa.at/group/"/>
+        <scheme alias="apagyibt" uri="http://cv.apa.at/gyibt/"/>
         <scheme alias="apaind" uri="http://cv.apa.at/ind/"/>
         <scheme alias="apasvc" uri="http://cv.apa.at/svc/"/>
       </catalog>
@@ -20,7 +21,7 @@
         </provider>
         <versionCreated>2012-01-01T14:00:00+01:00</versionCreated>
         <pubStatus qcode="stat:usable"/>
-        <generator versioninfo="0.3.2">XML::NewsML_G2</generator>
+        <generator versioninfo="0.3.3">XML::NewsML_G2</generator>
       </itemMeta>
       <groupSet root="root_group">
         <group id="root_group" role="apagroup:main">
@@ -38,6 +39,7 @@
     <newsItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://iptc.org/std/nar/2006-10-01/" standard="NewsML-G2" standardversion="2.15" conformance="power" xml:lang="de" guid="urn:newsml:apa.at:20120315:APA0379" version="1">
       <catalog>
         <scheme alias="apagroup" uri="http://cv.apa.at/group/"/>
+        <scheme alias="apagyibt" uri="http://cv.apa.at/gyibt/"/>
         <scheme alias="apaind" uri="http://cv.apa.at/ind/"/>
         <scheme alias="apasvc" uri="http://cv.apa.at/svc/"/>
       </catalog>
@@ -57,7 +59,7 @@
         <versionCreated>2012-01-01T14:00:00+01:00</versionCreated>
         <embargoed>2012-03-15T12:00:00+01:00</embargoed>
         <pubStatus qcode="stat:usable"/>
-        <generator versioninfo="0.3.2">XML::NewsML_G2</generator>
+        <generator versioninfo="0.3.3">XML::NewsML_G2</generator>
         <service qcode="apasvc:bd">
           <name>Basisdienst</name>
         </service>
@@ -88,6 +90,10 @@
         </creator>
         <creator>
           <name>wh</name>
+        </creator>
+        <creator>
+          <name>Max Musterman</name>
+          <related rel="crel:isA" qcode="apagyibt:staff"/>
         </creator>
         <altId>APA0379</altId>
         <language tag="de"/>
@@ -183,6 +189,7 @@
     <newsItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://iptc.org/std/nar/2006-10-01/" standard="NewsML-G2" standardversion="2.15" conformance="power" xml:lang="de" guid="urn:newsml:apa.at:20120315:ABD0111" version="1">
       <catalog>
         <scheme alias="apagroup" uri="http://cv.apa.at/group/"/>
+        <scheme alias="apagyibt" uri="http://cv.apa.at/gyibt/"/>
         <scheme alias="apaind" uri="http://cv.apa.at/ind/"/>
         <scheme alias="apasvc" uri="http://cv.apa.at/svc/"/>
       </catalog>
@@ -202,7 +209,7 @@
         <versionCreated>2012-01-01T14:00:00+01:00</versionCreated>
         <embargoed>2012-03-15T12:00:00+01:00</embargoed>
         <pubStatus qcode="stat:usable"/>
-        <generator versioninfo="0.3.2">XML::NewsML_G2</generator>
+        <generator versioninfo="0.3.3">XML::NewsML_G2</generator>
         <service qcode="apasvc:bd">
           <name>Basisdienst</name>
         </service>
@@ -236,6 +243,10 @@
         </creator>
         <creator>
           <name>wh</name>
+        </creator>
+        <creator>
+          <name>Max Musterman</name>
+          <related rel="crel:isA" qcode="apagyibt:staff"/>
         </creator>
         <altId>APA0379</altId>
         <language tag="de"/>

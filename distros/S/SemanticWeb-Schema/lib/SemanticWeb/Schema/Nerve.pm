@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has branch => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_branch',
     json_ld   => 'branch',
 );
 
@@ -28,7 +28,7 @@ has branch => (
 
 has nerve_motor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_nerve_motor',
     json_ld   => 'nerveMotor',
 );
 
@@ -36,7 +36,7 @@ has nerve_motor => (
 
 has sensory_unit => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sensory_unit',
     json_ld   => 'sensoryUnit',
 );
 
@@ -44,7 +44,7 @@ has sensory_unit => (
 
 has sourced_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sourced_from',
     json_ld   => 'sourcedFrom',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::Nerve - A common pathway for the electrochemical nerve impu
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -89,6 +89,10 @@ A branch should be one of the following types:
 
 =back
 
+=head2 C<_has_branch>
+
+A predicate for the L</branch> attribute.
+
 =head2 C<nerve_motor>
 
 C<nerveMotor>
@@ -102,6 +106,10 @@ A nerve_motor should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Muscle']>
 
 =back
+
+=head2 C<_has_nerve_motor>
+
+A predicate for the L</nerve_motor> attribute.
 
 =head2 C<sensory_unit>
 
@@ -120,6 +128,10 @@ A sensory_unit should be one of the following types:
 
 =back
 
+=head2 C<_has_sensory_unit>
+
+A predicate for the L</sensory_unit> attribute.
+
 =head2 C<sourced_from>
 
 C<sourcedFrom>
@@ -133,6 +145,10 @@ A sourced_from should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::BrainStructure']>
 
 =back
+
+=head2 C<_has_sourced_from>
+
+A predicate for the L</sourced_from> attribute.
 
 =head1 SEE ALSO
 

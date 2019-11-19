@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has character_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_character_name',
     json_ld   => 'characterName',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::PerformanceRole - A PerformanceRole is a Role that some ent
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -65,6 +65,10 @@ A character_name should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_character_name>
+
+A predicate for the L</character_name> attribute.
 
 =head1 SEE ALSO
 

@@ -9,9 +9,11 @@ has username => ( required => 1 );
 has token    => ( required => 1 );
 
 has _login_token => ( init_arg => undef );
-has _reg_queue   => ( init_arg => undef );    # HashRef [ArrayRef]
+has _login_exec  => ( init_arg => undef );
+has _login_queue => ( init_arg => undef );
 
-const our $BASE_URL => 'https://hub.docker.com/v2';
+const our $API_VER  => 'v2';
+const our $BASE_URL => "https://hub.docker.com/$API_VER";
 
 const our $DOCKERHUB_SOURCE_TYPE_TAG    => 'tag';
 const our $DOCKERHUB_SOURCE_TYPE_BRANCH => 'branch';
@@ -43,132 +45,104 @@ sub BUILDARGS ( $self, $args = undef ) {
     return $args;
 }
 
-sub _login ( $self, $cb ) {
+sub _login ( $self ) {
     state $endpoint = '/users/login/';
 
-    if ( $self->{_login_token} ) {
-        $cb->( $self->{_login_token} );
+    return res 200 if $self->{_login_token};
 
-        return;
+    if ( $self->{_login_exec} ) {
+        my $cv = P->cv;
+
+        push $self->{_login_queue}->@*, $cv;
+
+        return $cv->recv;
     }
 
-    push $self->{_req_queue}->{$endpoint}->@*, $cb;
+    $self->{_login_exec} = 1;
 
-    return if $self->{_req_queue}->{$endpoint}->@* > 1;
-
-    return $self->_req(
+    my $res = $self->_req_no_auth(
         'POST',
         $endpoint,
-        undef,
         {   username => $self->{username},
             password => $self->{token},
-        },
-        sub ($res) {
-            if ( !$res ) {
-                $res->{reason} = $res->{data}->{detail} if $res->{data}->{detail};
-            }
-            elsif ( $res->{data}->{token} ) {
-                $self->{_login_token} = delete $res->{data}->{token};
-            }
-
-            while ( my $cb = shift $self->{_req_queue}->{$endpoint}->@* ) {
-                $cb->($res);
-            }
-
-            return;
         }
     );
+
+    $self->{_login_exec} = 0;
+
+    if ( !$res ) {
+        $res = res [ $res->{status}, $res->{data}->{detail} ];
+
+        delete $self->{_login_token};
+    }
+    elsif ( $res->{data}->{token} ) {
+        $res = res 200;
+    }
+
+    while ( my $cb = shift $self->{_login_queue}->@* ) {
+        $cb->( res $res );
+    }
+
+    return $res;
 }
 
-sub _req ( $self, $method, $endpoint, $require_auth, $data, $cb = undef ) {
-    my $cv = P->cv;
+sub _req ( $self, $method, $endpoint, $data = undef ) {
+    if ( !$self->{_login_token} ) {
+        my $res = $self->_login;
 
-    my $request = sub {
-        P->http->request(
-            method  => $method,
-            url     => $BASE_URL . $endpoint,
-            headers => [
-                'Content-Type' => 'application/json',
-                $require_auth ? ( Authorization => 'JWT ' . $self->{_login_token} ) : (),
-            ],
-            data => $data ? P->data->to_json($data) : undef,
-            sub ($res) {
-                my $api_res = res [ $res->{status}, $res->{reason} ], $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : ();
-
-                $cv->( $cb ? $cb->($api_res) : $api_res );
-
-                return;
-            }
-        );
-
-        return;
-    };
-
-    if ( !$require_auth ) {
-        $request->();
-    }
-    elsif ( $self->{_login_token} ) {
-        $request->();
-    }
-    else {
-        $self->_login( sub ($res) {
-
-            # login ok
-            if ($res) {
-                $request->();
-            }
-
-            # login failure
-            else {
-                $cv->( $cb ? $cb->($res) : $res );
-            }
-
-            return;
-        } );
+        # login ok
+        return $res if !$res;
     }
 
-    return defined wantarray ? $cv->recv : ();
+    return $self->_req_no_auth( $method, $endpoint, $data );
+}
+
+sub _req_no_auth ( $self, $method, $endpoint, $data = undef ) {
+    my $res = P->http->request(
+        method  => $method,
+        url     => $BASE_URL . $endpoint,
+        headers => [
+            'Content-Type' => 'application/json',
+            $self->{_login_token} ? ( Authorization => 'JWT ' . $self->{_login_token} ) : (),
+        ],
+        data => $data ? P->data->to_json($data) : undef
+    );
+
+    return res [ $res->{status}, $res->{reason} ], $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : ();
 }
 
 # USER / NAMESPACE
-sub get_user ( $self, $username, $cb = undef ) {
-    return $self->_req( 'GET', "/users/$username/", undef, undef, $cb );
+sub get_user ( $self, $username ) {
+    return $self->_req_no_auth( 'GET', "/users/$username/" );
 }
 
-sub get_user_registry_settings ( $self, $username, $cb = undef ) {
-    return $self->_req( 'GET', "/users/$username/registry-settings/", 1, undef, $cb );
+sub get_user_registry_settings ( $self, $username ) {
+    return $self->_req( 'GET', "/users/$username/registry-settings/" );
 }
 
-sub get_user_orgs ( $self, $cb = undef ) {
-    return $self->_req(
-        'GET',
-        "/user/orgs/?page_size=$DEF_PAGE_SIZE&page=1",
-        1, undef,
-        sub ($res) {
-            if ($res) {
-                my $data;
+sub get_user_orgs ( $self ) {
+    my $res = $self->_req( 'GET', "/user/orgs/?page_size=$DEF_PAGE_SIZE&page=1" );
 
-                for my $org ( $res->{data}->{results}->@* ) {
-                    $data->{ $org->{orgname} } = $org;
-                }
+    if ($res) {
+        my $data;
 
-                $res->{data} = $data;
-            }
-
-            return $cb ? $cb->($res) : $res;
+        for my $org ( $res->{data}->{results}->@* ) {
+            $data->{ $org->{orgname} } = $org;
         }
-    );
+
+        $res->{data} = $data;
+    }
+
+    return $res;
 }
 
 # CREATE REPO / AUTOMATED BUILD
-sub create_repo ( $self, $repo_id, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = (
+sub create_repo ( $self, $repo_id, %args ) {
+    %args = (
         private   => 0,
         desc      => $EMPTY,
         full_desc => $EMPTY,
-        @args
+        %args
     );
 
     my ( $namespace, $name ) = split m[/]sm, $repo_id;
@@ -176,27 +150,23 @@ sub create_repo ( $self, $repo_id, @args ) {
     return $self->_req(
         'POST',
         '/repositories/',
-        1,
         {   namespace        => $namespace,
             name             => $name,
             is_private       => $args{private},
             description      => $args{desc},
             full_description => $args{full_desc},
-        },
-        $cb
+        }
     );
 }
 
 # TODO not work
-sub create_autobuild ( $self, $repo_id, $git_repo_id, $desc, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = (
+sub create_autobuild ( $self, $repo_id, $git_repo_id, $desc, %args ) {
+    %args = (
         desc       => undef,
         private    => 0,
         active     => 1,
         build_tags => undef,
-        @args,
+        %args,
     );
 
     my ( $namespace, $name ) = split m[/]sm, $repo_id;
@@ -226,7 +196,6 @@ sub create_autobuild ( $self, $repo_id, $git_repo_id, $desc, @args ) {
     return $self->_req(
         'POST',
         "/repositories/$repo_id/autobuild/",
-        1,
         {   namespace           => $namespace,
             name                => $name,
             description         => $desc,
@@ -237,92 +206,75 @@ sub create_autobuild ( $self, $repo_id, $git_repo_id, $desc, @args ) {
             vcs_repo_name       => $git_repo_id,
             description         => $desc,
             build_tags          => $build_tags,
-        },
-        $cb
+        }
     );
 }
 
 # REPO
-sub get_all_repos ( $self, $namespace, $cb = undef ) {
-    return $self->_req(
-        'GET',
-        "/users/$namespace/repositories/",
-        1, undef,
-        sub ($res) {
-            if ($res) {
-                my $data;
+sub get_all_repos ( $self, $namespace ) {
+    my $res = $self->_req( 'GET', "/users/$namespace/repositories/" );
 
-                for my $repo ( $res->{data}->@* ) {
-                    $repo->{id} = "$repo->{namespace}/$repo->{name}";
+    if ($res) {
+        my $data;
 
-                    $data->{ $repo->{id} } = $repo;
-                }
+        for my $repo ( $res->{data}->@* ) {
+            $repo->{id} = "$repo->{namespace}/$repo->{name}";
 
-                $res->{data} = $data;
-            }
-
-            return $cb ? $cb->($res) : $res;
+            $data->{ $repo->{id} } = $repo;
         }
-    );
+
+        $res->{data} = $data;
+    }
+
+    return $res;
 }
 
-sub get_repo ( $self, $repo_id, $cb = undef ) {
-    return $self->_req(
-        'GET',
-        "/repositories/$repo_id/",
-        1, undef,
-        sub($res) {
-            if ($res) {
-                $res->{data}->{id} = $repo_id;
-            }
+sub get_repo ( $self, $repo_id ) {
+    my $res = $self->_req( 'GET', "/repositories/$repo_id/" );
 
-            return $cb ? $cb->($res) : $res;
-        }
-    );
+    if ($res) {
+        $res->{data}->{id} = $repo_id;
+    }
+
+    return $res;
 }
 
-sub remove_repo ( $self, $repo_id, $cb = undef ) {
-    return $self->_req( 'DELETE', "/repositories/$repo_id/", 1, undef, $cb );
+sub remove_repo ( $self, $repo_id ) {
+    return $self->_req( 'DELETE', "/repositories/$repo_id/" );
 }
 
 # REPO TAGS
 # TODO gel all pages
-sub get_tags ( $self, $repo_id, $cb = undef ) {
-    return $self->_req(
-        'GET',
-        "/repositories/$repo_id/tags/?page_size=$DEF_PAGE_SIZE&page=1",
-        1, undef,
-        sub ($res) {
-            if ($res) {
-                my $data;
+sub get_tags ( $self, $repo_id ) {
+    my $res = $self->_req( 'GET', "/repositories/$repo_id/tags/?page_size=$DEF_PAGE_SIZE&page=1" );
 
-                for my $tag ( $res->{data}->{results}->@* ) {
-                    $data->{ $tag->{id} } = $tag;
-                }
+    if ($res) {
+        my $data;
 
-                $res->{data} = $data;
-            }
-
-            return $cb ? $cb->($res) : $res;
+        for my $tag ( $res->{data}->{results}->@* ) {
+            $data->{ $tag->{id} } = $tag;
         }
-    );
+
+        $res->{data} = $data;
+    }
+
+    return $res;
 }
 
-sub delete_tag ( $self, $repo_id, $tag_name, $cb = undef ) {
-    return $self->_req( 'DELETE', "/repositories/$repo_id/tags/$tag_name/", 1, undef, $cb );
+sub delete_tag ( $self, $repo_id, $tag_name ) {
+    return $self->_req( 'DELETE', "/repositories/$repo_id/tags/$tag_name/" );
 }
 
 # REPO WEBHOOKS
 # TODO get all pages
-sub get_webhooks ( $self, $repo_id, $cb = undef ) {
-    return $self->_req( 'GET', "/repositories/$repo_id/webhooks/?page_size=$DEF_PAGE_SIZE&page=1", 1, undef, $cb );
+sub get_webhooks ( $self, $repo_id ) {
+    return $self->_req( 'GET', "/repositories/$repo_id/webhooks/?page_size=$DEF_PAGE_SIZE&page=1" );
 }
 
-sub create_webhook ( $self, $repo_id, $webhook_name, $webhook_url, $cb = undef ) {
+sub create_webhook ( $self, $repo_id, $webhook_name, $webhook_url ) {
     return $self->_req(
         'POST',
         "/repositories/$repo_id/webhook_pipeline/",
-        1,
         {   name                  => $webhook_name,
             expect_final_callback => \0,
             webhooks              => [ {
@@ -330,102 +282,85 @@ sub create_webhook ( $self, $repo_id, $webhook_name, $webhook_url, $cb = undef )
                 hook_url => $webhook_url,
             } ],
         },
-        $cb
     );
 }
 
-sub delete_webhook ( $self, $repo_id, $webhook_name, $cb = undef ) {
-    return $self->_req( 'DELETE', "/repositories/$repo_id/webhook_pipeline/$webhook_name/", 1, undef, $cb );
+sub delete_webhook ( $self, $repo_id, $webhook_name ) {
+    return $self->_req( 'DELETE', "/repositories/$repo_id/webhook_pipeline/$webhook_name/" );
 }
 
 # AUTOBUILD LINKS
-sub get_autobuild_links ( $self, $repo_id, $cb = undef ) {
-    return $self->_req(
-        'GET',
-        "/repositories/$repo_id/links/",
-        1, undef,
-        sub ($res) {
-            if ($res) {
-                my $data;
+sub get_autobuild_links ( $self, $repo_id ) {
+    my $res = $self->_req( 'GET', "/repositories/$repo_id/links/" );
 
-                for my $link ( $res->{data}->{results}->@* ) {
-                    $data->{ $link->{id} } = $link;
-                }
+    if ($res) {
+        my $data;
 
-                $res->{data} = $data;
-            }
-
-            return $cb ? $cb->($res) : $res;
+        for my $link ( $res->{data}->{results}->@* ) {
+            $data->{ $link->{id} } = $link;
         }
-    );
+
+        $res->{data} = $data;
+    }
+
+    return $res;
 }
 
-sub create_autobuild_link ( $self, $repo_id, $target_repo_id, $cb = undef ) {
-    return $self->_req( 'POST', "/repositories/$repo_id/links/", 1, { to_repo => $target_repo_id }, $cb );
+sub create_autobuild_link ( $self, $repo_id, $target_repo_id ) {
+    return $self->_req( 'POST', "/repositories/$repo_id/links/", { to_repo => $target_repo_id } );
 }
 
-sub delete_autobuild_link ( $self, $repo_id, $link_id, $cb = undef ) {
-    return $self->_req( 'DELETE', "/repositories/$repo_id/links/$link_id/", 1, undef, $cb );
+sub delete_autobuild_link ( $self, $repo_id, $link_id ) {
+    return $self->_req( 'DELETE', "/repositories/$repo_id/links/$link_id/" );
 }
 
 # BUILD
 # TODO get all pages
-sub get_build_history ( $self, $repo_id, $cb = undef ) {
-    return $self->_req(
-        'GET',
-        "/repositories/$repo_id/buildhistory/?page_size=$DEF_PAGE_SIZE&page=1",
-        1, undef,
-        sub ($res) {
-            if ($res) {
-                my $data;
+sub get_build_history ( $self, $repo_id ) {
+    my $res = $self->_req( 'GET', "/repositories/$repo_id/buildhistory/?page_size=$DEF_PAGE_SIZE&page=1" );
 
-                for my $build ( $res->{data}->{results}->@* ) {
-                    $data->{ $build->{id} } = $build;
+    if ($res) {
+        my $data;
 
-                    $build->{status_text} = exists $BUILD_STATUS_TEXT->{ $build->{status} } ? $BUILD_STATUS_TEXT->{ $build->{status} } : $build->{status};
-                }
+        for my $build ( $res->{data}->{results}->@* ) {
+            $data->{ $build->{id} } = $build;
 
-                $res->{data} = $data;
-            }
-
-            return $cb ? $cb->($res) : $res;
+            $build->{status_text} = exists $BUILD_STATUS_TEXT->{ $build->{status} } ? $BUILD_STATUS_TEXT->{ $build->{status} } : $build->{status};
         }
-    );
+
+        $res->{data} = $data;
+    }
+
+    return $res;
 }
 
-sub get_autobuild_settings ( $self, $repo_id, $cb = undef ) {
-    return $self->_req( 'GET', "/repositories/$repo_id/autobuild/", 1, undef, $cb );
+sub get_autobuild_settings ( $self, $repo_id ) {
+    return $self->_req( 'GET', "/repositories/$repo_id/autobuild/" );
 }
 
 # AUTOBUILD TAGS
-sub get_autobuild_tags ( $self, $repo_id, $cb = undef ) {
-    return $self->_req(
-        'GET',
-        "/repositories/$repo_id/autobuild/tags/",
-        1, undef,
-        sub ($res) {
-            if ($res) {
-                my $data;
+sub get_autobuild_tags ( $self, $repo_id ) {
+    my $res = $self->_req( 'GET', "/repositories/$repo_id/autobuild/tags/" );
 
-                for my $tag ( $res->{data}->{results}->@* ) {
-                    $data->{ $tag->{id} } = $tag;
-                }
+    if ($res) {
+        my $data;
 
-                $res->{data} = $data;
-            }
-
-            return $cb ? $cb->($res) : $res;
+        for my $tag ( $res->{data}->{results}->@* ) {
+            $data->{ $tag->{id} } = $tag;
         }
-    );
+
+        $res->{data} = $data;
+    }
+
+    return $res;
 }
 
-sub create_autobuild_tag ( $self, $repo_id, $tag_name, $source_name, $source_type, $dockerfile_location, $cb = undef ) {
+sub create_autobuild_tag ( $self, $repo_id, $tag_name, $source_name, $source_type, $dockerfile_location ) {
     my ( $namespace, $name ) = split m[/]sm, $repo_id;
 
     return $self->_req(
         'POST',
         "/repositories/$repo_id/autobuild/tags/",
-        1,
         {   name                => $tag_name,
             dockerfile_location => $dockerfile_location // '/',
             source_name         => $source_name,
@@ -433,102 +368,69 @@ sub create_autobuild_tag ( $self, $repo_id, $tag_name, $source_name, $source_typ
             isNew               => \1,
             repoName            => $name,
             namespace           => $namespace,
-        },
-        $cb
-    );
-}
-
-sub delete_autobuild_tag_by_id ( $self, $repo_id, $autobuild_tag_id, $cb = undef ) {
-    return $self->_req( 'DELETE', "/repositories/$repo_id/autobuild/tags/$autobuild_tag_id/", 1, undef, $cb );
-}
-
-sub delete_autobuild_tag_by_name ( $self, $repo_id, $autobuild_tag_name, $cb = undef ) {
-    my $cv = P->cv;
-
-    my $on_finish = sub ($res) { $cv->( $cb ? $cb->($res) : $res ) };
-
-    # get autobuild tags
-    $self->get_autobuild_tags(
-        $repo_id,
-        sub ($res) {
-            if ( !$res ) {
-                $on_finish->($res);
-            }
-            else {
-                my $found_autobuild_tag;
-
-                for my $autobuild_tag ( values $res->{data}->%* ) {
-                    if ( $autobuild_tag->{name} eq $autobuild_tag_name ) {
-                        $found_autobuild_tag = $autobuild_tag;
-
-                        last;
-                    }
-                }
-
-                if ( !$found_autobuild_tag ) {
-                    $on_finish->( res [ 404, 'Autobuild tag was not found' ] );
-                }
-                else {
-                    $self->delete_autobuild_tag_by_id( $repo_id, $found_autobuild_tag->{id}, $on_finish );
-                }
-            }
-
-            return;
         }
     );
-
-    return defined wantarray ? $cv->recv : ();
 }
 
-sub trigger_autobuild ( $self, $repo_id, $source_name, $source_type, $cb = undef ) {
+sub delete_autobuild_tag_by_id ( $self, $repo_id, $autobuild_tag_id ) {
+    return $self->_req( 'DELETE', "/repositories/$repo_id/autobuild/tags/$autobuild_tag_id/" );
+}
+
+sub delete_autobuild_tag_by_name ( $self, $repo_id, $autobuild_tag_name ) {
+    my $res = $self->get_autobuild_tags($repo_id);
+
+    return $res if !$res;
+
+    my $found_autobuild_tag;
+
+    for my $autobuild_tag ( values $res->{data}->%* ) {
+        if ( $autobuild_tag->{name} eq $autobuild_tag_name ) {
+            $found_autobuild_tag = $autobuild_tag;
+
+            last;
+        }
+    }
+
+    if ( !$found_autobuild_tag ) {
+        return res [ 404, 'Autobuild tag was not found' ];
+    }
+    else {
+        return $self->delete_autobuild_tag_by_id( $repo_id, $found_autobuild_tag->{id} );
+    }
+}
+
+sub trigger_autobuild ( $self, $repo_id, $source_name, $source_type ) {
     return $self->_req(
         'POST',
         "/repositories/$repo_id/autobuild/trigger-build/",
-        1,
         {   source_name         => $source_name,
             source_type         => $DOCKERHUB_SOURCE_TYPE_NAME->{ lc $source_type },
             dockerfile_location => '/',
-        },
-        $cb
+        }
     );
 }
 
-sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name, $cb = undef ) {
-    my $cv = P->cv;
+sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name ) {
+    my $res = $self->get_autobuild_tags($repo_id);
 
-    my $on_finish = sub ($res) { $cv->( $cb ? $cb->($res) : $res ) };
+    return $res if !$res;
 
-    # get autobuild tags
-    $self->get_autobuild_tags(
-        $repo_id,
-        sub ($res) {
-            if ( !$res ) {
-                $on_finish->($res);
-            }
-            else {
-                my $found_autobuild_tag;
+    my $found_autobuild_tag;
 
-                for my $autobuild_tag ( values $res->{data}->%* ) {
-                    if ( $autobuild_tag->{name} eq $autobuild_tag_name ) {
-                        $found_autobuild_tag = $autobuild_tag;
+    for my $autobuild_tag ( values $res->{data}->%* ) {
+        if ( $autobuild_tag->{name} eq $autobuild_tag_name ) {
+            $found_autobuild_tag = $autobuild_tag;
 
-                        last;
-                    }
-                }
-
-                if ( !$found_autobuild_tag ) {
-                    $on_finish->( res [ 404, 'Autobuild tag was not found' ] );
-                }
-                else {
-                    $self->trigger_autobuild( $repo_id, $found_autobuild_tag->{source_name}, $found_autobuild_tag->{source_type}, $on_finish );
-                }
-            }
-
-            return;
+            last;
         }
-    );
+    }
 
-    return defined wantarray ? $cv->recv : ();
+    if ( !$found_autobuild_tag ) {
+        return res [ 404, 'Autobuild tag was not found' ];
+    }
+    else {
+        return $self->trigger_autobuild( $repo_id, $found_autobuild_tag->{source_name}, $found_autobuild_tag->{source_type} );
+    }
 }
 
 1;
@@ -538,11 +440,10 @@ sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name, $cb = 
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 83, 191, 311, 321,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 337, 363, 367, 422,  |                                                                                                                |
-## |      | 441, 445, 483, 496   |                                                                                                                |
+## |    3 | 163, 274, 309, 358,  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 375, 379, 402, 413   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 167                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 141                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

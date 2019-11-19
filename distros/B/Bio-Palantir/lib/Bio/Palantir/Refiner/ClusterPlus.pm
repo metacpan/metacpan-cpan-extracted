@@ -1,6 +1,6 @@
 package Bio::Palantir::Refiner::ClusterPlus;
 # ABSTRACT: Refiner internal class for handling ClusterPlus objects
-$Bio::Palantir::Refiner::ClusterPlus::VERSION = '0.193080';
+$Bio::Palantir::Refiner::ClusterPlus::VERSION = '0.193230';
 use Moose;
 use namespace::autoclean;
 
@@ -43,6 +43,7 @@ has 'from_seq' => (
 has 'module_delineation' => (
     is      => 'ro',
     isa     => 'Str',
+    default => 'selection',
 );
 
 has 'uui' => (
@@ -146,7 +147,7 @@ Bio::Palantir::Refiner::ClusterPlus - Refiner internal class for handling Cluste
 
 =head1 VERSION
 
-version 0.193080
+version 0.193230
 
 =head1 SYNOPSIS
 

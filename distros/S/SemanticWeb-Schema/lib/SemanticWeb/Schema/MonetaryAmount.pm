@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_currency',
     json_ld   => 'currency',
 );
 
@@ -28,7 +28,7 @@ has currency => (
 
 has max_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_max_value',
     json_ld   => 'maxValue',
 );
 
@@ -36,7 +36,7 @@ has max_value => (
 
 has min_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_min_value',
     json_ld   => 'minValue',
 );
 
@@ -44,7 +44,7 @@ has min_value => (
 
 has valid_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_from',
     json_ld   => 'validFrom',
 );
 
@@ -52,7 +52,7 @@ has valid_from => (
 
 has valid_through => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_through',
     json_ld   => 'validThrough',
 );
 
@@ -60,7 +60,7 @@ has valid_through => (
 
 has value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_value',
     json_ld   => 'value',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::MonetaryAmount - A monetary value or range
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -114,6 +114,10 @@ A currency should be one of the following types:
 
 =back
 
+=head2 C<_has_currency>
+
+A predicate for the L</currency> attribute.
+
 =head2 C<max_value>
 
 C<maxValue>
@@ -127,6 +131,10 @@ A max_value should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_max_value>
+
+A predicate for the L</max_value> attribute.
 
 =head2 C<min_value>
 
@@ -142,6 +150,10 @@ A min_value should be one of the following types:
 
 =back
 
+=head2 C<_has_min_value>
+
+A predicate for the L</min_value> attribute.
+
 =head2 C<valid_from>
 
 C<validFrom>
@@ -155,6 +167,10 @@ A valid_from should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_valid_from>
+
+A predicate for the L</valid_from> attribute.
 
 =head2 C<valid_through>
 
@@ -170,6 +186,10 @@ A valid_through should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_valid_through>
+
+A predicate for the L</valid_through> attribute.
 
 =head2 C<value>
 
@@ -199,6 +219,10 @@ A value should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_value>
+
+A predicate for the L</value> attribute.
 
 =head1 SEE ALSO
 

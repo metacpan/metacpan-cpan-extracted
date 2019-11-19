@@ -2,25 +2,22 @@ package Pcore::Lib::CA;
 
 use Pcore -class;
 
-sub update ($cb = undef) {
+sub update {
     print 'updating cacert.pem ... ';
 
-    return P->http->get(
-        'https://curl.haxx.se/ca/cacert.pem',
-        sub ($res) {
-            my $status;
+    my $res = P->http->get('https://curl.haxx.se/ca/cacert.pem');
 
-            say $res;
+    my $status;
 
-            if ($res) {
-                $ENV->{share}->write( '/Pcore/data/cacert.pem', $res->{data} );
+    say $res;
 
-                $status = 1;
-            }
+    if ($res) {
+        $ENV->{share}->write( '/Pcore/data/cacert.pem', $res->{data} );
 
-            return $cb ? $cb->($status) : $status;
-        }
-    );
+        $status = 1;
+    }
+
+    return $status;
 }
 
 sub ca_file {

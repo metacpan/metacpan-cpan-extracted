@@ -80,21 +80,21 @@ sub input_filter {
         my $filter = $choices->[$idx];
         my $filter_str = sprintf( "Filter: %s", $filter );
         if ( $filter eq $reset ) {
+            $sf->__print_filter_info( $sql, 3, undef );
             $sql->{insert_into_args} = [ map { [ @$_ ] } @{$sf->{i}{gc}{bu_insert_into_args}} ];
             $sf->{empty_to_null} = $default_e2n;
             next FILTER
         }
         elsif ( $filter eq $confirm ) {
             if ( $sf->{empty_to_null} ) {
+                $sf->__print_filter_info( $sql, 3, undef );
                 no warnings 'uninitialized';
                 $sql->{insert_into_args} = [ map { [ map { length ? $_ : undef } @$_ ] } @{$sql->{insert_into_args}} ];
             }
-            delete $sf->{i}{gc}{working};
             return 1;
         }
         elsif ( $filter eq $reparse ) {
             $sf->__print_filter_info( $sql, 7, undef );
-            delete $sf->{i}{gc}{working};
             return -1;
         }
         elsif ( $filter eq $choose_cols  ) {
@@ -150,6 +150,7 @@ sub input_filter {
 sub __print_filter_info {
     my ( $sf, $sql, $row_count, $horizontal_choices ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    print $sf->{i}{gc}{working} . "\r";
     $sf->{i}{occupied_term_height} = 1; #
     #$sf->{i}{occupied_term_height} += 1; # keep bottom line empty
     $sf->{i}{occupied_term_height} += $row_count;
@@ -170,7 +171,6 @@ sub __print_filter_info {
                 $sf->{i}{occupied_term_height} += 1;
             }
             else {
-                my $cols_in_a_row = 0;
                 my $joined_cols = $longest;
                 my $cols_in_a_row = 1;
                 while ( $joined_cols < $term_w ) {
@@ -202,13 +202,23 @@ sub __choose_columns {
     my $aoa = $sql->{insert_into_args};
     my $empty_cells_of_col_count =  $sf->__count_empty_cells_of_cols( $aoa );
     my $header = $sf->__prepare_header( $aoa, $empty_cells_of_col_count );
-    my $mark = $sf->__prepare_mark( $aoa, $empty_cells_of_col_count );
     $sf->__print_filter_info( $sql, 0, [ '<<', $sf->{i}{ok}, @$header ] );
+    my $row_count = @$aoa;
+    my $col_count = @{$aoa->[0]};
+    my $mark = [];
+    for my $col_idx ( 0 .. $col_count - 1 ) {
+        if ( $empty_cells_of_col_count->[$col_idx] < $row_count ) {
+            push @$mark, $col_idx;
+        }
+    }
+    if ( @$mark == $col_count ) {
+        $mark = undef; # no preselect if all cols have entries
+    }
     # Choose
     my $col_idx = $tu->choose_a_subset(
         $header,
         { current_selection_label => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1,
-          index => 1, confirm => $sf->{i}{ok}, back => '<<', info => $filter_str } # order
+          index => 1, confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{gc}{working} }
     );
     if ( ! defined $col_idx ) {
         return;
@@ -217,27 +227,35 @@ sub __choose_columns {
     return 1;
 }
 
+
 sub __choose_rows {
     my ( $sf, $sql, $filter_str ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aoa = $sql->{insert_into_args};
+    $sf->__print_filter_info( $sql, 2 + @$aoa, undef );
     my @pre = ( undef, $sf->{i}{ok} );
     my @stringified_rows;
+    my $mark;
     {
         no warnings 'uninitialized';
-        @stringified_rows = map { join ',', @$_ } @$aoa;
+        for my $i ( 0 .. $#$aoa ) {
+            push @$mark, $i + @pre if length join '', @{$aoa->[$i]};
+            push @stringified_rows, join ',', @{$aoa->[$i]};
+        }
+    }
+    if ( @$mark == @stringified_rows ) {
+        $mark = undef;
     }
     my $prompt = 'Choose rows:';
-    $sf->__print_filter_info( $sql, 2 + @$aoa, undef ); # before resetting $sql->{insert_into_args}
     $sql->{insert_into_args} = []; # $sql->{insert_into_args} refers to a new new empty array - this doesn't delete $aoa
 
     while ( 1 ) {
         # Choose
         my @idx = $tc->choose(
             [ @pre, @stringified_rows ],
-            { %{$sf->{i}{lyt_v}}, prompt => $prompt, info => $filter_str, meta_items => [ 0 .. $#pre ], include_highlighted => 2,
-                index => 1, undef => '<<', busy_string => $sf->{i}{gc}{working} }
+            { %{$sf->{i}{lyt_v}}, prompt => $prompt, info => $filter_str, meta_items => [ 0 .. $#pre ],
+              include_highlighted => 2, index => 1, undef => '<<', busy_string => $sf->{i}{gc}{working}, mark => $mark }
         );
         $sf->__print_filter_info( $sql, 2 + @$aoa, undef );
         if ( ! $idx[0] ) {
@@ -292,7 +310,7 @@ sub __range_of_rows {
 
 sub __row_groups {
     my ( $sf, $sql, $filter_str ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $aoa = $sql->{insert_into_args};
     my %group; # group rows by the number of cols
     for my $row_idx ( 0 .. $#$aoa ) {
@@ -311,21 +329,24 @@ sub __row_groups {
             $len, insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_str,
             $col_count, $col_str;
     }
-    $sf->__print_filter_info( $sql, 1 + @choices_groups, undef );
+    $sf->__print_filter_info( $sql, 4 + @choices_groups, undef );
     my $prompt = 'Choose group:';
-    my @pre = ( undef );
-    # Choose
-    my $idx = $tc->choose(
-        [ @pre, @choices_groups ],
-        { %{$sf->{i}{lyt_v}}, info => $filter_str, prompt => $prompt, index => 1, undef => '  <=', busy_string => $sf->{i}{gc}{working} }
+    my $idxs = $tu->choose_a_subset(
+        \@choices_groups,
+        { info => $filter_str, prompt => $prompt, layout => 3, index => 1, confirm => $sf->{i}{ok}, back => '<<',
+          all_by_default => 1, current_selection_label => "Chosen groups:\n", current_selection_separator => "\n",
+          current_selection_end => "\n", busy_string => $sf->{i}{gc}{working} }
     );
-    $sf->__print_filter_info( $sql, 1 + @choices_groups, undef );
-    if ( ! $idx ) {
+    $sf->__print_filter_info( $sql, 4 + @choices_groups, undef );
+    if ( ! defined $idxs ) {
         return;
     }
     else {
-        my $row_idxs = $group{ $keys_sorted[$idx-@pre] };
-        $sql->{insert_into_args} = [ @{$aoa}[@$row_idxs] ];
+        my $row_idxs = [];
+        for my $idx ( @$idxs ) {
+            push @$row_idxs, @{$group{ $keys_sorted[$idx] }};
+        }
+        $sql->{insert_into_args} = [ @{$aoa}[sort { $a <=> $b } @$row_idxs] ];
         return;
     }
 }
@@ -478,7 +499,7 @@ sub __split_column {
         return;
     }
     my $info = $filter_str;
-    my $prompt = "Split column \"$header->[$idx]\"";
+    $prompt = "Split column \"$header->[$idx]\"";
     my $fields = [
         [ 'Pattern', ],
         [ 'Limit', ],
@@ -558,7 +579,7 @@ sub __search_and_replace {
         my $col_idx = $tu->choose_a_subset(
             $header,
             { current_selection_label => 'Columns: ', info => $info, layout => 0, all_by_default => 1,
-              index => 1, confirm => $sf->{i}{ok}, back => '<<' }
+              index => 1, confirm => $sf->{i}{ok}, back => '<<', busy_string => $sf->{i}{gc}{working} }
         );
         if ( ! defined $col_idx ) {
             next SEARCH_AND_REPLACE;
@@ -653,6 +674,7 @@ sub __merge_rows {
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $aoa = $sql->{insert_into_args};
+    $sf->__print_filter_info( $sql, 2 + @$aoa, undef );
     my $term_w = get_term_width();
     my @stringified_rows;
     {
@@ -667,17 +689,17 @@ sub __merge_rows {
             }
         } @$aoa;
     }
-    $sf->__print_filter_info( $sql, 2 + @$aoa, undef );
     my $prompt = 'Choose rows:';
     my $chosen_idxs = $tu->choose_a_subset(
         \@stringified_rows,
         { current_selection_separator => "\n", current_selection_end => "\n",
           layout => 3, order => 0, all_by_default => 0, prompt => $prompt, index => 1,
-          confirm => $sf->{i}{ok}, back => '<<', info => $filter_str } # order
+          confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{gc}{working} }
     );
     if ( ! defined $chosen_idxs || ! @$chosen_idxs ) {
         return;
     }
+    $sf->__print_filter_info( $sql, 2 + @{$aoa->[$chosen_idxs->[0]]}, undef );
     my $merged = [];
     for my $col ( 0 .. $#{$aoa->[$chosen_idxs->[0]]} ) {
         my @tmp;
@@ -691,7 +713,6 @@ sub __merge_rows {
     }
     my $col_number = 0;
     my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$merged ];
-    $sf->__print_filter_info( $sql, 2 + @$fields, undef );
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
@@ -725,7 +746,7 @@ sub __join_columns {
     my $chosen_idxs = $tu->choose_a_subset(
         $header,
         { current_selection_label => 'Cols: ', layout => 0, order => 0, index => 1, confirm => $sf->{i}{ok},
-          back => '<<', info => $filter_str } # order
+          back => '<<', info => $filter_str, busy_string => $sf->{i}{gc}{working} }
     );
     if ( ! defined $chosen_idxs || ! @$chosen_idxs ) {
         return;
@@ -743,6 +764,7 @@ sub __join_columns {
     if ( ! defined $join_char ) {
         return;
     }
+    $sf->__print_filter_info( $sql, 2 + @$aoa, undef );
     my $merged = [];
     for my $row ( 0 .. $#{$aoa} ) {
         my @tmp;
@@ -756,7 +778,6 @@ sub __join_columns {
     }
     my $col_number = 0;
     my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$merged ];
-    $sf->__print_filter_info( $sql, 2 + @$fields, undef );
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
@@ -772,7 +793,7 @@ sub __join_columns {
     for my $row ( 0 .. $#{$aoa} ) { # modifies $aoa
         $aoa->[$row][$first_idx] = $merged->[$row];
         for my $idx ( sort { $b <=> $a } @$chosen_idxs ) {
-            splice @{$aoa->[$row]}, $idx, 1;
+            splice @{$aoa->[$row]}, $idx, 1 if $idx < @{$aoa->[$row]};
         }
     }
     $sql->{insert_into_args} = $aoa;
@@ -852,22 +873,6 @@ sub __prepare_header {
         }
     }
     return $header;
-}
-
-sub __prepare_mark {
-    my ( $sf, $aoa, $empty_cells_of_col_count ) = @_;
-    my $row_count = @$aoa;
-    my $col_count = @{$aoa->[0]};
-    my $mark = [];
-    for my $col_idx ( 0 .. $col_count - 1 ) {
-        if ( $empty_cells_of_col_count->[$col_idx] < $row_count ) {
-            push @$mark, $col_idx;
-        }
-    }
-    if ( @$mark == $col_count ) {
-        $mark = undef; # no preselect if all cols have entries
-    }
-    return $mark;
 }
 
 sub __choose_a_column_idx {

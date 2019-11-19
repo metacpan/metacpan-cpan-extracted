@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has domain_includes => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_domain_includes',
     json_ld   => 'domainIncludes',
 );
 
@@ -28,7 +28,7 @@ has domain_includes => (
 
 has inverse_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_inverse_of',
     json_ld   => 'inverseOf',
 );
 
@@ -36,7 +36,7 @@ has inverse_of => (
 
 has range_includes => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_range_includes',
     json_ld   => 'rangeIncludes',
 );
 
@@ -44,7 +44,7 @@ has range_includes => (
 
 has superseded_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_superseded_by',
     json_ld   => 'supersededBy',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::Property - A property
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -90,6 +90,10 @@ A domain_includes should be one of the following types:
 
 =back
 
+=head2 C<_has_domain_includes>
+
+A predicate for the L</domain_includes> attribute.
+
 =head2 C<inverse_of>
 
 C<inverseOf>
@@ -108,6 +112,10 @@ A inverse_of should be one of the following types:
 
 =back
 
+=head2 C<_has_inverse_of>
+
+A predicate for the L</inverse_of> attribute.
+
 =head2 C<range_includes>
 
 C<rangeIncludes>
@@ -122,6 +130,10 @@ A range_includes should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Class']>
 
 =back
+
+=head2 C<_has_range_includes>
+
+A predicate for the L</range_includes> attribute.
 
 =head2 C<superseded_by>
 
@@ -141,6 +153,10 @@ A superseded_by should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Property']>
 
 =back
+
+=head2 C<_has_superseded_by>
+
+A predicate for the L</superseded_by> attribute.
 
 =head1 SEE ALSO
 

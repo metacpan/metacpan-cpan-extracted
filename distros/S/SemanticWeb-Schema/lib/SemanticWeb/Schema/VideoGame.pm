@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has actor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actor',
     json_ld   => 'actor',
 );
 
@@ -28,7 +28,7 @@ has actor => (
 
 has actors => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actors',
     json_ld   => 'actors',
 );
 
@@ -36,7 +36,7 @@ has actors => (
 
 has cheat_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_cheat_code',
     json_ld   => 'cheatCode',
 );
 
@@ -44,7 +44,7 @@ has cheat_code => (
 
 has director => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_director',
     json_ld   => 'director',
 );
 
@@ -52,7 +52,7 @@ has director => (
 
 has directors => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_directors',
     json_ld   => 'directors',
 );
 
@@ -60,7 +60,7 @@ has directors => (
 
 has game_platform => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_game_platform',
     json_ld   => 'gamePlatform',
 );
 
@@ -68,7 +68,7 @@ has game_platform => (
 
 has game_server => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_game_server',
     json_ld   => 'gameServer',
 );
 
@@ -76,7 +76,7 @@ has game_server => (
 
 has game_tip => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_game_tip',
     json_ld   => 'gameTip',
 );
 
@@ -84,7 +84,7 @@ has game_tip => (
 
 has music_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_music_by',
     json_ld   => 'musicBy',
 );
 
@@ -92,7 +92,7 @@ has music_by => (
 
 has play_mode => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_play_mode',
     json_ld   => 'playMode',
 );
 
@@ -100,7 +100,7 @@ has play_mode => (
 
 has trailer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_trailer',
     json_ld   => 'trailer',
 );
 
@@ -122,7 +122,7 @@ SemanticWeb::Schema::VideoGame - A video game is an electronic game that involve
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -145,6 +145,10 @@ A actor should be one of the following types:
 
 =back
 
+=head2 C<_has_actor>
+
+A predicate for the L</actor> attribute.
+
 =head2 C<actors>
 
 An actor, e.g. in tv, radio, movie, video games etc. Actors can be
@@ -157,6 +161,10 @@ A actors should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_actors>
+
+A predicate for the L</actors> attribute.
 
 =head2 C<cheat_code>
 
@@ -172,6 +180,10 @@ A cheat_code should be one of the following types:
 
 =back
 
+=head2 C<_has_cheat_code>
+
+A predicate for the L</cheat_code> attribute.
+
 =head2 C<director>
 
 A director of e.g. tv, radio, movie, video gaming etc. content, or of an
@@ -186,6 +198,10 @@ A director should be one of the following types:
 
 =back
 
+=head2 C<_has_director>
+
+A predicate for the L</director> attribute.
+
 =head2 C<directors>
 
 A director of e.g. tv, radio, movie, video games etc. content. Directors
@@ -198,6 +214,10 @@ A directors should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_directors>
+
+A predicate for the L</directors> attribute.
 
 =head2 C<game_platform>
 
@@ -217,6 +237,10 @@ A game_platform should be one of the following types:
 
 =back
 
+=head2 C<_has_game_platform>
+
+A predicate for the L</game_platform> attribute.
+
 =head2 C<game_server>
 
 C<gameServer>
@@ -231,6 +255,10 @@ A game_server should be one of the following types:
 
 =back
 
+=head2 C<_has_game_server>
+
+A predicate for the L</game_server> attribute.
+
 =head2 C<game_tip>
 
 C<gameTip>
@@ -244,6 +272,10 @@ A game_tip should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
+
+=head2 C<_has_game_tip>
+
+A predicate for the L</game_tip> attribute.
 
 =head2 C<music_by>
 
@@ -261,6 +293,10 @@ A music_by should be one of the following types:
 
 =back
 
+=head2 C<_has_music_by>
+
+A predicate for the L</music_by> attribute.
+
 =head2 C<play_mode>
 
 C<playMode>
@@ -277,6 +313,10 @@ A play_mode should be one of the following types:
 
 =back
 
+=head2 C<_has_play_mode>
+
+A predicate for the L</play_mode> attribute.
+
 =head2 C<trailer>
 
 The trailer of a movie or tv/radio series, season, episode, etc.
@@ -288,6 +328,10 @@ A trailer should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::VideoObject']>
 
 =back
+
+=head2 C<_has_trailer>
+
+A predicate for the L</trailer> attribute.
 
 =head1 SEE ALSO
 

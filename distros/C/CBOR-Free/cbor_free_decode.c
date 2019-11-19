@@ -14,7 +14,7 @@
 
 #define _DECODE_CHECK_FOR_OVERAGE( decstate, len) \
     if ((len + decstate->curbyte) > decstate->end) { \
-        _croak_incomplete( aTHX_ (len + decstate->curbyte) - decstate->end ); \
+        _croak_incomplete( aTHX_ decstate, (len + decstate->curbyte) - decstate->end ); \
     }
 
 //----------------------------------------------------------------------
@@ -65,6 +65,10 @@ const char *MAJOR_TYPE_DESCRIPTION[] = {
 };
 
 //----------------------------------------------------------------------
+
+void _free_decode_state(decode_ctx* decode_state);
+
+//----------------------------------------------------------------------
 // Croakers
 
 static const char* UV_TO_STR_TMPL = (sizeof(UV) == 8 ? "%llu" : "%lu");
@@ -78,7 +82,9 @@ UV _iv_to_str(IV num, char *numstr, const char strlen) {
     return my_snprintf( numstr, strlen, IV_TO_STR_TMPL, num );
 }
 
-void _croak_incomplete( pTHX_ STRLEN lack ) {
+void _croak_incomplete( pTHX_ decode_ctx* decstate, STRLEN lack ) {
+    _free_decode_state(decstate);
+
     char lackstr[24];
     _uv_to_str( lack, lackstr, sizeof(lackstr) );
 
@@ -99,16 +105,22 @@ void _croak_invalid_control( pTHX_ decode_ctx* decstate ) {
 
     char * words[] = { "InvalidControl", ordstr, offsetstr, NULL };
 
+    _free_decode_state(decstate);
+
     _die( G_DISCARD, words );
 }
 
-void _croak_invalid_utf8( pTHX_ char *string ) {
+void _croak_invalid_utf8( pTHX_ decode_ctx* decstate, char *string ) {
+    _free_decode_state(decstate);
+
     char * words[3] = { "InvalidUTF8", string, NULL };
 
     _die( G_DISCARD, words);
 }
 
-void _croak_invalid_map_key( pTHX_ const uint8_t byte, STRLEN offset ) {
+void _croak_invalid_map_key( pTHX_ decode_ctx* decstate, const uint8_t byte, STRLEN offset ) {
+    _free_decode_state(decstate);
+
     char bytebuf[5];
 
     char *bytestr;
@@ -148,7 +160,9 @@ void _croak_invalid_map_key( pTHX_ const uint8_t byte, STRLEN offset ) {
     _die( G_DISCARD, words);
 }
 
-void _croak_cannot_decode_64bit( pTHX_ const uint8_t *u64bytes, STRLEN offset ) {
+void _croak_cannot_decode_64bit( pTHX_ decode_ctx* decstate, const uint8_t *u64bytes, STRLEN offset ) {
+    _free_decode_state(decstate);
+
     char numhex[20];
     numhex[19] = 0;
 
@@ -162,7 +176,9 @@ void _croak_cannot_decode_64bit( pTHX_ const uint8_t *u64bytes, STRLEN offset ) 
     _die( G_DISCARD, words );
 }
 
-void _croak_cannot_decode_negative( pTHX_ UV abs, STRLEN offset ) {
+void _croak_cannot_decode_negative( pTHX_ decode_ctx* decstate, UV abs, STRLEN offset ) {
+    _free_decode_state(decstate);
+
     char absstr[40];
     _uv_to_str( abs, absstr, sizeof(absstr) );
 
@@ -236,7 +252,7 @@ static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
 #if !IS_64_BIT
 
             if (decstate->curbyte[0] || decstate->curbyte[1] || decstate->curbyte[2] || decstate->curbyte[3]) {
-                _croak_cannot_decode_64bit( aTHX_ (const uint8_t *) decstate->curbyte, decstate->curbyte - decstate->start );
+                _croak_cannot_decode_64bit( aTHX_ decstate, (const uint8_t *) decstate->curbyte, decstate->curbyte - decstate->start );
             }
 #endif
             ret = _buffer_u64_to_uv( (uint8_t *) decstate->curbyte );
@@ -324,7 +340,7 @@ IV _decode_negint( pTHX_ decode_ctx* decstate ) {
 
 #if IS_64_BIT
     if (positive >= 0x8000000000000000U) {
-        _croak_cannot_decode_negative( aTHX_ positive, decstate->curbyte - decstate->start - 8 );
+        _croak_cannot_decode_negative( aTHX_ decstate, positive, decstate->curbyte - decstate->start - 8 );
     }
 #else
     if (positive >= 0x80000000U) {
@@ -337,7 +353,7 @@ IV _decode_negint( pTHX_ decode_ctx* decstate ) {
             offset -= 8;
         }
 
-        _croak_cannot_decode_negative( aTHX_ positive, offset );
+        _croak_cannot_decode_negative( aTHX_ decstate, positive, offset );
     }
 #endif
 
@@ -434,7 +450,7 @@ void _decode_to_hash( pTHX_ decode_ctx* decstate, HV *hash ) {
             break;
 
         default:
-            _croak_invalid_map_key( aTHX_ decstate->curbyte[0], decstate->curbyte - decstate->start );
+            _croak_invalid_map_key( aTHX_ decstate, decstate->curbyte[0], decstate->curbyte - decstate->start );
     }
 
     SV *curval = _decode( aTHX_ decstate );
@@ -556,14 +572,15 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
         case CBOR_TYPE_UTF8:
             ret = _decode_str_to_sv( aTHX_ decstate );
 
-            // XXX: “perldoc perlapi” says this function is experimental.
-            // Its use here is a calculated risk; the alternatives are
-            // to invoke utf8::decode() via call_pv(), which is ugly,
-            // or just to assume the UTF-8 is valid, which is wrong.
-            //
             if (CBOR_TYPE_UTF8 == control->pieces.major_type) {
+
+                // XXX: “perldoc perlapi” says this function is experimental.
+                // Its use here is a calculated risk; the alternatives are
+                // to invoke utf8::decode() via call_pv(), which is ugly,
+                // or just to assume the UTF-8 is valid, which is wrong.
+                //
                 if ( !sv_utf8_decode(ret) ) {
-                    _croak_invalid_utf8( aTHX_ SvPV_nolen(ret) );
+                    _croak_invalid_utf8( aTHX_ decstate, SvPV_nolen(ret) );
                 }
             }
 
@@ -586,25 +603,50 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
 
             U8 value_major_type = ((union control_byte *) decstate->curbyte)->pieces.major_type;
 
-            ret = _decode( aTHX_ decstate );
+            if (tagnum == CBOR_TAG_SHAREDREF && decstate->reflist) {
+                if (value_major_type != CBOR_TYPE_UINT) {
+                    char tmpl[255];
+                    my_snprintf( tmpl, sizeof(tmpl), "Shared ref type must be uint, not %%u (%%s)!" );
+                    croak(tmpl, value_major_type, MAJOR_TYPE_DESCRIPTION[value_major_type]);
+                }
 
-            if (tagnum == CBOR_TAG_INDIRECTION) {
-                ret = newRV_inc(ret);
+                UV refnum = _parse_for_uint_len2( aTHX_ decstate );
+
+                if (refnum >= decstate->reflistlen) {
+                    _croak("Missing shareable!");
+                }
+
+                ret = decstate->reflist[refnum];
+                SvREFCNT_inc(ret);
             }
-            else if (decstate->tag_handler) {
-                HV *my_tag_handler = decstate->tag_handler;
+            else {
+                ret = _decode( aTHX_ decstate );
 
-                SV **handler_cr = hv_fetch( my_tag_handler, (char *) &tagnum, sizeof(UV), 0 );
+                if (tagnum == CBOR_TAG_INDIRECTION) {
+                    ret = newRV_inc(ret);
+                }
+                else if (tagnum == CBOR_TAG_SHAREABLE && decstate->reflist) {
+                    ++decstate->reflistlen;
+                    Renew( decstate->reflist, decstate->reflistlen, void * );
 
-                if (handler_cr && *handler_cr && SvOK(*handler_cr)) {
-                    ret = _call_with_argument( aTHX_ *handler_cr, ret );
+                    decstate->reflist[ decstate->reflistlen - 1 ] = (SV *) ret;
+                }
+
+                else if (decstate->tag_handler) {
+                    HV *my_tag_handler = decstate->tag_handler;
+
+                    SV **handler_cr = hv_fetch( my_tag_handler, (char *) &tagnum, sizeof(UV), 0 );
+
+                    if (handler_cr && *handler_cr && SvOK(*handler_cr)) {
+                        ret = _call_with_argument( aTHX_ *handler_cr, ret );
+                    }
+                    else {
+                        _warn_unhandled_tag( aTHX_ tagnum, value_major_type );
+                    }
                 }
                 else {
                     _warn_unhandled_tag( aTHX_ tagnum, value_major_type );
                 }
-            }
-            else {
-                _warn_unhandled_tag( aTHX_ tagnum, value_major_type );
             }
 
             break;
@@ -679,7 +721,7 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
     return ret;
 }
 
-SV *cbf_decode( pTHX_ SV *cbor, HV *tag_handler ) {
+decode_ctx _create_decode_state( pTHX_ SV *cbor, HV *tag_handler, bool preserve_refs ) {
     STRLEN cborlen;
 
     char *cborstr = SvPV(cbor, cborlen);
@@ -690,9 +732,30 @@ SV *cbf_decode( pTHX_ SV *cbor, HV *tag_handler ) {
         cborstr,
         cborstr + cborlen,
         tag_handler,
+        NULL,
+        0,
     };
 
+    if (preserve_refs) {
+        Newx( decode_state.reflist, 0, void * );
+    }
+
+    return decode_state;
+}
+
+void _free_decode_state(decode_ctx* decode_state) {
+    if (decode_state->reflist) {
+        Safefree(decode_state->reflist);
+    }
+}
+
+SV *cbf_decode( pTHX_ SV *cbor, HV *tag_handler, bool preserve_refs ) {
+
+    decode_ctx decode_state = _create_decode_state( aTHX_ cbor, tag_handler, preserve_refs);
+
     SV *RETVAL = _decode( aTHX_ &decode_state );
+
+    _free_decode_state(&decode_state);
 
     if (decode_state.curbyte != decode_state.end) {
         STRLEN bytes_count = decode_state.end - decode_state.curbyte;

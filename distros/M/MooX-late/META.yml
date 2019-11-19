@@ -2,7 +2,6 @@
 abstract: 'easily translate Moose code to Moo'
 author:
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
-  - unknown
 build_requires:
   Test::Fatal: '0.010'
   Test::More: '0.96'
@@ -10,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -28,19 +27,22 @@ optional_features: {}
 provides:
   MooX::late:
     file: lib/MooX/late.pm
-    version: '0.015'
+    version: '0.016'
   MooX::late::DefinitionContext:
     file: lib/MooX/late.pm
-    version: '0.015'
+    version: '0.016'
 recommends:
   MooX::HandlesVia: '0.001004'
 requires:
   Moo: '1.006000'
   Type::Utils: '1.000001'
+  perl: '5.008003'
 resources:
-  X_identifier: http://purl.org/NET/cpan-uri/dist/MooX-late/project
+  Identifier: http://purl.org/NET/cpan-uri/dist/MooX-late/project
   bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooX-late
   homepage: https://metacpan.org/release/MooX-late
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moox-late.git
-version: '0.015'
+version: '0.016'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

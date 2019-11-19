@@ -4,6 +4,7 @@
 #include <DeviceBitmap.h>
 #include <Widget.h>
 #include <Image.h>
+#include <img_conv.h>
 #include <Icon.h>
 #include <Application.h>
 #include <Printer.h>
@@ -64,7 +65,7 @@ apc_cairo_surface_create( Handle widget, int request)
 			result = cairo_xlib_surface_create_with_xrender_format(DISP, sys->gdrawable, ScreenOfDisplay(DISP,SCREEN), pguts->xrender_argb_pic_format, p.x, p.y);
 		else
 #endif
-			result = cairo_xlib_surface_create(DISP, sys->gdrawable, VISUAL, p.x, p.y);
+	 		result = cairo_xlib_surface_create(DISP, sys->gdrawable, VISUAL, p.x, p.y);
 		break;
 	case REQ_TARGET_PRINTER:
 		break;
@@ -76,12 +77,15 @@ apc_cairo_surface_create( Handle widget, int request)
 #endif
 			result = cairo_xlib_surface_create(DISP, sys->gdrawable, VISUAL, var->w, var->h);
 	}
-	
+
 	XCHECKPOINT;
 #else
 	result = ( request == REQ_TARGET_PRINTER ) ?
-        	cairo_win32_printing_surface_create(sys-> ps) :
-        	cairo_win32_surface_create(sys-> ps);
+        	cairo_win32_printing_surface_create(sys-> ps) : (
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 14, 0)
+		sys-> options. aptLayered ? cairo_win32_surface_create_with_format(sys-> ps, CAIRO_FORMAT_ARGB32) :
+#endif
+        	cairo_win32_surface_create(sys-> ps));
 #endif
 	return (void*) result;
 }

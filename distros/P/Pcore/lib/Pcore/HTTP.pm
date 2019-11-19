@@ -138,8 +138,6 @@ sub mirror ( $target, $url, @args ) {
 
 # TODO HTTP2 accept_compressed
 sub request {
-    my $cb = @_ % 2 ? pop : ();
-
     my %args = (
         method => undef,
         url    => undef,
@@ -229,25 +227,7 @@ sub request {
     $args{headers}      = \@headers;
     $args{norm_headers} = $norm_headers;
 
-    if ( defined wantarray ) {
-        my $res = _request( \%args );
-
-        return $cb ? $cb->($res) : $res;
-    }
-    else {
-        Coro::async_pool(
-            sub {
-                my $res = _request(@_);
-
-                $cb->($res) if $cb;
-
-                return;
-            },
-            \%args
-        );
-
-        return;
-    }
+    return _request( \%args );
 }
 
 # TODO process persistent
@@ -867,16 +847,15 @@ sub _http2_request ( $h, $args, $res ) {
 ## |    3 | 97                   | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 140                  | * Subroutine "request" with high complexity score (23)                                                         |
-## |      | 254                  | * Subroutine "_request" with high complexity score (28)                                                        |
-## |      | 510                  | * Subroutine "_read_data" with high complexity score (46)                                                      |
-## |      | 730                  | * Subroutine "_http2_request" with high complexity score (22)                                                  |
+## |      | 234                  | * Subroutine "_request" with high complexity score (28)                                                        |
+## |      | 490                  | * Subroutine "_read_data" with high complexity score (46)                                                      |
+## |      | 710                  | * Subroutine "_http2_request" with high complexity score (22)                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 90                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 125                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 217                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 215                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

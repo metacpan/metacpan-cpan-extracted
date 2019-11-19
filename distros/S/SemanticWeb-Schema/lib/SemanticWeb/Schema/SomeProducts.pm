@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has inventory_level => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_inventory_level',
     json_ld   => 'inventoryLevel',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::SomeProducts - A placeholder for multiple similar products 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -63,6 +63,10 @@ A inventory_level should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_inventory_level>
+
+A predicate for the L</inventory_level> attribute.
 
 =head1 SEE ALSO
 

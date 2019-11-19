@@ -14,7 +14,7 @@ use Log::Any::Adapter::Util ();
 
 use base qw/Log::Any::Adapter::Base/;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub init {
     my ($self) = @_;

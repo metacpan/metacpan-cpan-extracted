@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has occupational_category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_occupational_category',
     json_ld   => 'occupationalCategory',
 );
 
@@ -28,7 +28,7 @@ has occupational_category => (
 
 has training_salary => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_training_salary',
     json_ld   => 'trainingSalary',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::WorkBasedProgram - A program with both an educational and e
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -86,6 +86,10 @@ A occupational_category should be one of the following types:
 
 =back
 
+=head2 C<_has_occupational_category>
+
+A predicate for the L</occupational_category> attribute.
+
 =head2 C<training_salary>
 
 C<trainingSalary>
@@ -99,6 +103,10 @@ A training_salary should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MonetaryAmountDistribution']>
 
 =back
+
+=head2 C<_has_training_salary>
+
+A predicate for the L</training_salary> attribute.
 
 =head1 SEE ALSO
 

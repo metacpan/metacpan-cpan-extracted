@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has fees_and_commissions_specification => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_fees_and_commissions_specification',
     json_ld   => 'feesAndCommissionsSpecification',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::FinancialService - Financial services business.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ A fees_and_commissions_specification should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_fees_and_commissions_specification>
+
+A predicate for the L</fees_and_commissions_specification> attribute.
 
 =head1 SEE ALSO
 

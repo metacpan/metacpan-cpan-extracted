@@ -22,7 +22,7 @@ Term::CLI::Tutorial - tips, tricks, and examples for Term::CLI
 
 =head1 VERSION
 
-version 0.051005
+version 0.051007
 
 =head1 SYNOPSIS
 

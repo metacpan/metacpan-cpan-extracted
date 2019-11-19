@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has amount => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_amount',
     json_ld   => 'amount',
 );
 
@@ -28,7 +28,7 @@ has amount => (
 
 has funder => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_funder',
     json_ld   => 'funder',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::MonetaryGrant - A monetary grant.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -72,6 +72,10 @@ A amount should be one of the following types:
 
 =back
 
+=head2 C<_has_amount>
+
+A predicate for the L</amount> attribute.
+
 =head2 C<funder>
 
 A person or organization that supports (sponsors) something through some
@@ -86,6 +90,10 @@ A funder should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_funder>
+
+A predicate for the L</funder> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has constraining_property => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_constraining_property',
     json_ld   => 'constrainingProperty',
 );
 
@@ -28,7 +28,7 @@ has constraining_property => (
 
 has num_constraints => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_num_constraints',
     json_ld   => 'numConstraints',
 );
 
@@ -36,7 +36,7 @@ has num_constraints => (
 
 has population_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_population_type',
     json_ld   => 'populationType',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::StatisticalPopulation - A StatisticalPopulation is a set of
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -116,6 +116,10 @@ A constraining_property should be one of the following types:
 
 =back
 
+=head2 C<_has_constraining_property>
+
+A predicate for the L</constraining_property> attribute.
+
 =head2 C<num_constraints>
 
 C<numConstraints>
@@ -137,6 +141,10 @@ A num_constraints should be one of the following types:
 
 =back
 
+=head2 C<_has_num_constraints>
+
+A predicate for the L</num_constraints> attribute.
+
 =head2 C<population_type>
 
 C<populationType>
@@ -153,6 +161,10 @@ A population_type should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Class']>
 
 =back
+
+=head2 C<_has_population_type>
+
+A predicate for the L</population_type> attribute.
 
 =head1 SEE ALSO
 

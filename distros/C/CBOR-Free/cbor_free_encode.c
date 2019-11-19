@@ -4,6 +4,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include <stdlib.h>
+
 #include "cbor_free_encode.h"
 
 #define TAGGED_CLASS    "CBOR::Free::Tagged"
@@ -53,19 +55,31 @@ static inline void _u64_to_buffer( UV num, unsigned char *buffer ) {
 //----------------------------------------------------------------------
 // Croakers
 
-void _croak_unrecognized(pTHX_ SV *value) {
+void _croak_unrecognized(pTHX_ encode_ctx *encode_state, SV *value) {
     char * words[3] = { "Unrecognized", SvPV_nolen(value), NULL };
+
+    cbf_encode_ctx_free_all(encode_state);
 
     _die( G_DISCARD, words );
 }
 
+// This has to be a macro because _croak() needs a string literal.
+#define _croak_encode(encode_state, str) \
+    cbf_encode_ctx_free_all(encode_state); \
+    _croak(str);
+
 //----------------------------------------------------------------------
 
-// NOTE: Contrary to what we’d ordinarily expect, for canonical CBOR
+// NOTE: Contrary to JSON’s “canonical” order, for canonical CBOR
 // keys are only byte-sorted if their lengths are identical. Thus,
 // “z” sorts EARLIER than “aa”. (cf. section 3.9 of the RFC)
-static I32 _sortstring( pTHX_ SV *a, SV *b ) {
-    return (SvCUR(a) < SvCUR(b)) ? -1 : (SvCUR(a) > SvCUR(b)) ? 1 : memcmp( SvPV_nolen(a), SvPV_nolen(b), SvCUR(a) );
+
+int _sort_string_and_length( const void* a, const void* b ) {
+    return (
+        ((struct string_and_length *)a)->length < ((struct string_and_length *)b)->length ? -1
+        : ((struct string_and_length *)a)->length > ((struct string_and_length *)b)->length ? 1
+        : memcmp( ((struct string_and_length *)a)->buffer, ((struct string_and_length *)b)->buffer, ((struct string_and_length *)a)->length )
+    );
 }
 
 //----------------------------------------------------------------------
@@ -91,17 +105,21 @@ static inline void _COPY_INTO_ENCODE( encode_ctx *encode_state, const unsigned c
 
 // TODO? This could be a macro … it’d just be kind of unwieldy as such.
 static inline void _init_length_buffer( pTHX_ UV num, enum CBOR_TYPE major_type, encode_ctx *encode_state ) {
+//fprintf(stderr, "_init_length_buffer(%llu)\n", num);
     union control_byte *scratch0 = (void *) encode_state->scratch;
     scratch0->pieces.major_type = major_type;
 
     if ( num < CBOR_LENGTH_SMALL ) {
+//fprintf(stderr, "size tiny\n");
         scratch0->pieces.length_type = (uint8_t) num;
 
         _COPY_INTO_ENCODE(encode_state, encode_state->scratch, 1);
     }
     else if ( num <= 0xff ) {
+//fprintf(stderr, "size small\n");
         scratch0->pieces.length_type = CBOR_LENGTH_SMALL;
         encode_state->scratch[1] = (uint8_t) num;
+//fprintf(stderr, "uint8: %02x,%02x\n", encode_state->scratch[0], encode_state->scratch[1]);
 
         _COPY_INTO_ENCODE(encode_state, encode_state->scratch, 2);
     }
@@ -130,6 +148,31 @@ static inline void _init_length_buffer( pTHX_ UV num, enum CBOR_TYPE major_type,
 
 static inline void _encode_tag( pTHX_ IV tagnum, SV *value, encode_ctx *encode_state );
 
+// Return indicates to encode the actual value.
+bool _check_reference( pTHX_ SV *varref, encode_ctx *encode_state ) {
+    if ( SvREFCNT(varref) > 1 ) {
+        void *this_ref;
+
+        IV r = 0;
+
+        while ( (this_ref = encode_state->reftracker[r++]) ) {
+            if (this_ref == varref) {
+                _init_length_buffer( aTHX_ CBOR_TAG_SHAREDREF, CBOR_TYPE_TAG, encode_state );
+                _init_length_buffer( aTHX_ r - 1, CBOR_TYPE_UINT, encode_state );
+                return false;
+            }
+        }
+
+        Renew( encode_state->reftracker, 1 + r, void * );
+        encode_state->reftracker[r - 1] = varref;
+        encode_state->reftracker[r] = NULL;
+
+        _init_length_buffer( aTHX_ CBOR_TAG_SHAREABLE, CBOR_TYPE_TAG, encode_state );
+    }
+
+    return true;
+}
+
 void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
     ++encode_state->recurse_count;
 
@@ -139,7 +182,7 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
         static char * words[] = { NULL };
         call_argv("CBOR::Free::_die_recursion", G_EVAL|G_DISCARD, words);
 
-        _croak(NULL);
+        _croak_encode( encode_state, NULL );
     }
 
     if (!SvROK(value)) {
@@ -247,79 +290,99 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
 
         // TODO: Support TO_JSON() or TO_CBOR() method?
 
-        else _croak_unrecognized(aTHX_ value);
+        else _croak_unrecognized(aTHX_ encode_state, value);
     }
     else if (SVt_PVAV == SvTYPE(SvRV(value))) {
         AV *array = (AV *)SvRV(value);
-        SSize_t len;
-        len = 1 + av_len(array);
 
-        _init_length_buffer( aTHX_ len, CBOR_TYPE_ARRAY, encode_state );
+        if (!encode_state->reftracker || _check_reference( aTHX_ (SV *)array, encode_state )) {
+            SSize_t len;
+            len = 1 + av_len(array);
 
-        SSize_t i;
+            _init_length_buffer( aTHX_ len, CBOR_TYPE_ARRAY, encode_state );
 
-        SV **cur;
-        for (i=0; i<len; i++) {
-            cur = av_fetch(array, i, 0);
-            _encode( aTHX_ *cur, encode_state );
+            SSize_t i;
+
+            SV **cur;
+            for (i=0; i<len; i++) {
+                cur = av_fetch(array, i, 0);
+                _encode( aTHX_ *cur, encode_state );
+            }
         }
     }
     else if (SVt_PVHV == SvTYPE(SvRV(value))) {
         HV *hash = (HV *)SvRV(value);
 
-        char *key;
-        I32 key_length;
-        SV *cur;
+        if (!encode_state->reftracker || _check_reference( aTHX_ (SV *)hash, encode_state)) {
+            SV *cur_sv;
+            char *key;
+            I32 key_length;
 
-        I32 keyscount = hv_iterinit(hash);
+            I32 keyscount = hv_iterinit(hash);
 
-        _init_length_buffer( aTHX_ keyscount, CBOR_TYPE_MAP, encode_state );
+            _init_length_buffer( aTHX_ keyscount, CBOR_TYPE_MAP, encode_state );
 
-        if (encode_state->is_canonical) {
-            SV *keys[keyscount];
+            if (encode_state->is_canonical) {
 
-            I32 curkey = 0;
+                // The CBOR RFC defines canonical sorting such that the
+                // *encoded* keys are what gets sorted; however, since Perl hash
+                // keys are always (binary) strings, and since a lexicographical
+                // sort of encoded CBOR uints yields the same order as encoding
+                // that same list of uints pre-sorted, we can sort the keys
+                // prior to insertion into the output buffer.
+                //
+                // It may be faster to sort encoded keys (as the RFC envisions),
+                // but this works for now.
 
-            while (hv_iternextsv(hash, &key, &key_length)) {
-                keys[curkey] = newSVpvn(key, key_length);
-                ++curkey;
+                struct string_and_length cur;
+                struct string_and_length strings[keyscount];
+
+                I32 curkey = 0;
+
+                while (hv_iternextsv(hash, &key, &key_length)) {
+                    strings[curkey].buffer = key;
+                    strings[curkey].length = key_length;
+                    ++curkey;
+                }
+
+                qsort(strings, keyscount, sizeof(struct string_and_length), _sort_string_and_length);
+
+                for (curkey=0; curkey < keyscount; ++curkey) {
+                    cur = strings[curkey];
+                    key = cur.buffer;
+                    key_length = cur.length;
+
+                    // Store the key.
+                    _init_length_buffer( aTHX_ key_length, CBOR_TYPE_BINARY, encode_state );
+                    _COPY_INTO_ENCODE( encode_state, (unsigned char *) key, key_length );
+
+                    cur_sv = *( hv_fetch(hash, key, key_length, 0) );
+
+                    _encode( aTHX_ cur_sv, encode_state );
+                }
             }
+            else {
+                while ((cur_sv = hv_iternextsv(hash, &key, &key_length))) {
 
-            sortsv(keys, keyscount, _sortstring);
+                    // Store the key.
+                    _init_length_buffer( aTHX_ key_length, CBOR_TYPE_BINARY, encode_state );
 
-            for (curkey=0; curkey < keyscount; ++curkey) {
-                cur = keys[curkey];
-                key = SvPV_nolen(cur);
-                key_length = SvCUR(cur);
+                    _COPY_INTO_ENCODE( encode_state, (unsigned char *) key, key_length );
 
-                // Store the key.
-                _init_length_buffer( aTHX_ key_length, CBOR_TYPE_BINARY, encode_state );
-                _COPY_INTO_ENCODE( encode_state, (unsigned char *) key, key_length );
-
-                cur = *( hv_fetch(hash, key, key_length, 0) );
-
-                _encode( aTHX_ cur, encode_state );
-            }
-        }
-        else {
-            while ((cur = hv_iternextsv(hash, &key, &key_length))) {
-
-                // Store the key.
-                _init_length_buffer( aTHX_ key_length, CBOR_TYPE_BINARY, encode_state );
-
-                _COPY_INTO_ENCODE( encode_state, (unsigned char *) key, key_length );
-
-                _encode( aTHX_ cur, encode_state );
+                    _encode( aTHX_ cur_sv, encode_state );
+                }
             }
         }
     }
     else if (encode_state->encode_scalar_refs && IS_SCALAR_REFERENCE(value)) {
         SV *referent = SvRV(value);
 
-        _encode_tag( aTHX_ CBOR_TAG_INDIRECTION, referent, encode_state );
+        if (!encode_state->reftracker || _check_reference( aTHX_ referent, encode_state)) {
+            _encode_tag( aTHX_ CBOR_TAG_INDIRECTION, referent, encode_state );
+        }
     }
     else {
-        _croak_unrecognized(aTHX_ value);
+        _croak_unrecognized(aTHX_ encode_state, value);
     }
 
     --encode_state->recurse_count;
@@ -328,6 +391,41 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
 static inline void _encode_tag( pTHX_ IV tagnum, SV *value, encode_ctx *encode_state ) {
     _init_length_buffer( aTHX_ tagnum, CBOR_TYPE_TAG, encode_state );
     _encode( aTHX_ value, encode_state );
+}
+
+//----------------------------------------------------------------------
+
+encode_ctx cbf_encode_ctx_create(uint8_t flags) {
+    encode_ctx encode_state;
+
+    encode_state.buffer = NULL;
+    Newx( encode_state.buffer, ENCODE_ALLOC_CHUNK_SIZE, char );
+
+    encode_state.buflen = ENCODE_ALLOC_CHUNK_SIZE;
+    encode_state.len = 0;
+    encode_state.recurse_count = 0;
+
+    encode_state.is_canonical = !!(flags & ENCODE_FLAG_CANONICAL);
+
+    encode_state.encode_scalar_refs = !!(flags & ENCODE_FLAG_SCALAR_REFS);
+
+    if (flags & ENCODE_FLAG_PRESERVE_REFS) {
+        Newxz( encode_state.reftracker, 1, void * );
+    }
+    else {
+        encode_state.reftracker = NULL;
+    }
+
+    return encode_state;
+}
+
+void cbf_encode_ctx_free_reftracker(encode_ctx* encode_state) {
+    Safefree( encode_state->reftracker );
+}
+
+void cbf_encode_ctx_free_all(encode_ctx* encode_state) {
+    cbf_encode_ctx_free_reftracker(encode_state);
+    Safefree( encode_state->buffer );
 }
 
 SV *cbf_encode( pTHX_ SV *value, encode_ctx *encode_state, SV *RETVAL ) {

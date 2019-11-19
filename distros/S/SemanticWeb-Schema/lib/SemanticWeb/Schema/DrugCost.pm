@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has applicable_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_applicable_location',
     json_ld   => 'applicableLocation',
 );
 
@@ -28,7 +28,7 @@ has applicable_location => (
 
 has cost_category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_cost_category',
     json_ld   => 'costCategory',
 );
 
@@ -36,7 +36,7 @@ has cost_category => (
 
 has cost_currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_cost_currency',
     json_ld   => 'costCurrency',
 );
 
@@ -44,7 +44,7 @@ has cost_currency => (
 
 has cost_origin => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_cost_origin',
     json_ld   => 'costOrigin',
 );
 
@@ -52,7 +52,7 @@ has cost_origin => (
 
 has cost_per_unit => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_cost_per_unit',
     json_ld   => 'costPerUnit',
 );
 
@@ -60,7 +60,7 @@ has cost_per_unit => (
 
 has drug_unit => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_drug_unit',
     json_ld   => 'drugUnit',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::DrugCost - The cost per unit of a medical drug
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -110,6 +110,10 @@ A applicable_location should be one of the following types:
 
 =back
 
+=head2 C<_has_applicable_location>
+
+A predicate for the L</applicable_location> attribute.
+
 =head2 C<cost_category>
 
 C<costCategory>
@@ -123,6 +127,10 @@ A cost_category should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::DrugCostCategory']>
 
 =back
+
+=head2 C<_has_cost_category>
+
+A predicate for the L</cost_category> attribute.
 
 =head2 C<cost_currency>
 
@@ -139,6 +147,10 @@ A cost_currency should be one of the following types:
 
 =back
 
+=head2 C<_has_cost_currency>
+
+A predicate for the L</cost_currency> attribute.
+
 =head2 C<cost_origin>
 
 C<costOrigin>
@@ -153,6 +165,10 @@ A cost_origin should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_cost_origin>
+
+A predicate for the L</cost_origin> attribute.
 
 =head2 C<cost_per_unit>
 
@@ -172,6 +188,10 @@ A cost_per_unit should be one of the following types:
 
 =back
 
+=head2 C<_has_cost_per_unit>
+
+A predicate for the L</cost_per_unit> attribute.
+
 =head2 C<drug_unit>
 
 C<drugUnit>
@@ -185,6 +205,10 @@ A drug_unit should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_drug_unit>
+
+A predicate for the L</drug_unit> attribute.
 
 =head1 SEE ALSO
 

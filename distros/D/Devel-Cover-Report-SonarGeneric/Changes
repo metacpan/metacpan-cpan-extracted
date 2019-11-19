@@ -1,3 +1,7 @@
+0.4 2019-11-17
+  - add build dependency for ExtUtils::MakeMaker 6.64
+  - cleanup test
+
 0.3 2019-04-03
   - add test dependency for JSON::MaybeXS
 

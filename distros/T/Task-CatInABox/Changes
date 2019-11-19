@@ -1,10 +1,13 @@
 Changes for Perl extension Task-CatInABox
 
-0.03 Wed 22 Apr 2009
-	- Incremental release to tie up some Kwalitee loose ends
+0.04      2019-11-16 22:50:58Z
+        - Correct name for DBIx::Class::Timestamp
 
-0.02 Sat 22 Nov 2008
-	- Fixed typo Catalyst::Model::DBIC::File should be Catalyst::Model::DBIC
+0.03      2009-04-22
+        - Incremental release to tie up some Kwalitee loose ends
 
-0.01 Fri 24 Oct 2008
-	- Created the initial release
+0.02      2008-11-22
+        - Fixed typo Catalyst::Model::DBIC::File should be Catalyst::Model::DBIC
+
+0.01      2008-10-24
+        - Created the initial release

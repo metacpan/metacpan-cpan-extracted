@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has acquired_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_acquired_from',
     json_ld   => 'acquiredFrom',
 );
 
@@ -28,7 +28,7 @@ has acquired_from => (
 
 has owned_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_owned_from',
     json_ld   => 'ownedFrom',
 );
 
@@ -36,7 +36,7 @@ has owned_from => (
 
 has owned_through => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_owned_through',
     json_ld   => 'ownedThrough',
 );
 
@@ -44,7 +44,7 @@ has owned_through => (
 
 has type_of_good => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_type_of_good',
     json_ld   => 'typeOfGood',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::OwnershipInfo - A structured value providing information ab
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -91,6 +91,10 @@ A acquired_from should be one of the following types:
 
 =back
 
+=head2 C<_has_acquired_from>
+
+A predicate for the L</acquired_from> attribute.
+
 =head2 C<owned_from>
 
 C<ownedFrom>
@@ -105,6 +109,10 @@ A owned_from should be one of the following types:
 
 =back
 
+=head2 C<_has_owned_from>
+
+A predicate for the L</owned_from> attribute.
+
 =head2 C<owned_through>
 
 C<ownedThrough>
@@ -118,6 +126,10 @@ A owned_through should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_owned_through>
+
+A predicate for the L</owned_through> attribute.
 
 =head2 C<type_of_good>
 
@@ -134,6 +146,10 @@ A type_of_good should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Service']>
 
 =back
+
+=head2 C<_has_type_of_good>
+
+A predicate for the L</type_of_good> attribute.
 
 =head1 SEE ALSO
 

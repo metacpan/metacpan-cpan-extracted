@@ -70,7 +70,7 @@ sub AUTOLOAD {
     my ($p, $m) = ($1, $2);
 
     if ($self->{_node}->can($m)) {
-	return $self->{_node}->${\$m};
+	return $self->{_node}->${\$m}(@_);
     }
 
     croak "Can't locate object method \"$m\" via package \"$p\""

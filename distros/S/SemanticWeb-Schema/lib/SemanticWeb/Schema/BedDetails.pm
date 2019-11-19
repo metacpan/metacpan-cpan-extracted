@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has number_of_beds => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_beds',
     json_ld   => 'numberOfBeds',
 );
 
@@ -28,7 +28,7 @@ has number_of_beds => (
 
 has type_of_bed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_type_of_bed',
     json_ld   => 'typeOfBed',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::BedDetails - An entity holding detailed information about t
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -77,6 +77,10 @@ A number_of_beds should be one of the following types:
 
 =back
 
+=head2 C<_has_number_of_beds>
+
+A predicate for the L</number_of_beds> attribute.
+
 =head2 C<type_of_bed>
 
 C<typeOfBed>
@@ -93,6 +97,10 @@ A type_of_bed should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_type_of_bed>
+
+A predicate for the L</type_of_bed> attribute.
 
 =head1 SEE ALSO
 

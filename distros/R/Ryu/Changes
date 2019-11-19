@@ -1,5 +1,14 @@
 Revision history for Ryu
 
+1.009     2019-11-17 23:53:21+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Dependencies:
+
+    - minimum Future.pm version is now 0.42, due to a memory leak relating
+    to cancellation in previous versions:
+    https://rt.cpan.org/Ticket/Display.html?id=130957
+
 1.008     2019-11-06 00:05:39+08:00 Asia/Kuala_Lumpur
     New features:
 

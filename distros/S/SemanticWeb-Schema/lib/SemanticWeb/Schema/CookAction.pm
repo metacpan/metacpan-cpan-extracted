@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has food_establishment => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_food_establishment',
     json_ld   => 'foodEstablishment',
 );
 
@@ -28,7 +28,7 @@ has food_establishment => (
 
 has food_event => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_food_event',
     json_ld   => 'foodEvent',
 );
 
@@ -36,7 +36,7 @@ has food_event => (
 
 has recipe => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_recipe',
     json_ld   => 'recipe',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::CookAction - The act of producing/preparing food.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -83,6 +83,10 @@ A food_establishment should be one of the following types:
 
 =back
 
+=head2 C<_has_food_establishment>
+
+A predicate for the L</food_establishment> attribute.
+
 =head2 C<food_event>
 
 C<foodEvent>
@@ -98,6 +102,10 @@ A food_event should be one of the following types:
 
 =back
 
+=head2 C<_has_food_event>
+
+A predicate for the L</food_event> attribute.
+
 =head2 C<recipe>
 
 A sub property of instrument. The recipe/instructions used to perform the
@@ -110,6 +118,10 @@ A recipe should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Recipe']>
 
 =back
+
+=head2 C<_has_recipe>
+
+A predicate for the L</recipe> attribute.
 
 =head1 SEE ALSO
 

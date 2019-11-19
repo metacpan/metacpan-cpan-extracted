@@ -20,7 +20,7 @@ static marpaWrapperRecognizerOption_t marpaWrapperRecognizerOptionDefault = {
 marpaWrapperRecognizer_t *marpaWrapperRecognizer_newp(marpaWrapperGrammar_t *marpaWrapperGrammarp, marpaWrapperRecognizerOption_t *marpaWrapperRecognizerOptionp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_newp);
+  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_newp)
   marpaWrapperRecognizer_t *marpaWrapperRecognizerp = NULL;
   genericLogger_t          *genericLoggerp;
   int                       highestSymbolIdi;
@@ -134,7 +134,7 @@ err:
 short marpaWrapperRecognizer_alternativeb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, int symboli, int valuei, int lengthi)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_alternativeb);
+  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_alternativeb)
   genericLogger_t *genericLoggerp = NULL;
   
   if (marpaWrapperRecognizerp == NULL) {
@@ -176,7 +176,7 @@ short marpaWrapperRecognizer_alternativeb(marpaWrapperRecognizer_t *marpaWrapper
 short marpaWrapperRecognizer_completeb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_completeb);
+  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_completeb)
   genericLogger_t *genericLoggerp = NULL;
   
   if (marpaWrapperRecognizerp == NULL) {
@@ -211,7 +211,7 @@ short marpaWrapperRecognizer_completeb(marpaWrapperRecognizer_t *marpaWrapperRec
 short marpaWrapperRecognizer_latestb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, int *earleySetIdip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_latestb);
+  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_latestb)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t     *genericLoggerp = NULL;
 #endif
@@ -257,7 +257,7 @@ short marpaWrapperRecognizer_readb(marpaWrapperRecognizer_t *marpaWrapperRecogni
 short marpaWrapperRecognizer_event_onoffb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, int symboli, marpaWrapperGrammarEventType_t eventSeti, int onoffb)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_event_onoffb);
+  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_event_onoffb)
   genericLogger_t *genericLoggerp = NULL;
 
   if (marpaWrapperRecognizerp == NULL) {
@@ -305,7 +305,7 @@ short marpaWrapperRecognizer_event_onoffb(marpaWrapperRecognizer_t *marpaWrapper
 short marpaWrapperRecognizer_expectedb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, size_t *nSymbollp, int **symbolArraypp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_expectedb);
+  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_expectedb)
   genericLogger_t *genericLoggerp = NULL;
   int              nSymbolIdi;
 
@@ -344,7 +344,7 @@ short marpaWrapperRecognizer_expectedb(marpaWrapperRecognizer_t *marpaWrapperRec
 short marpaWrapperRecognizer_exhaustedb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, short *exhaustedbp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_exhaustedb);
+  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_exhaustedb)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t *genericLoggerp = NULL;
 #endif
@@ -378,7 +378,7 @@ short marpaWrapperRecognizer_exhaustedb(marpaWrapperRecognizer_t *marpaWrapperRe
 short marpaWrapperRecognizer_progressb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, int starti, int endi, size_t *nProgresslp, marpaWrapperRecognizerProgress_t **progresspp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_progressb);
+  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_progressb)
   genericLogger_t    *genericLoggerp = NULL;
   Marpa_Earley_Set_ID marpaLatestEarleySetIdi;
   Marpa_Earley_Set_ID marpaEarleySetIdStarti;
@@ -498,7 +498,7 @@ short marpaWrapperRecognizer_progressb(marpaWrapperRecognizer_t *marpaWrapperRec
 short marpaWrapperRecognizer_progressLogb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, int starti, int endi, genericLoggerLevel_t logleveli, void *userDatavp, symbolDescriptionCallback_t symbolDescriptionCallbackp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_progressLogb);
+  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_progressLogb)
   size_t            i;
   int               ix;
   genericLogger_t  *genericLoggerp = NULL;
@@ -638,7 +638,7 @@ short marpaWrapperRecognizer_progressLogb(marpaWrapperRecognizer_t *marpaWrapper
 void marpaWrapperRecognizer_freev(marpaWrapperRecognizer_t *marpaWrapperRecognizerp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_freev);
+  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_freev)
   genericLogger_t  *genericLoggerp;
 
   if (marpaWrapperRecognizerp != NULL) {
@@ -670,7 +670,7 @@ void marpaWrapperRecognizer_freev(marpaWrapperRecognizer_t *marpaWrapperRecogniz
 marpaWrapperGrammar_t *marpaWrapperRecognizer_grammarp(marpaWrapperRecognizer_t *marpaWrapperRecognizerp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_grammarp);
+  MARPAWRAPPER_FUNCS(marpaWrapperRecognizer_grammarp)
 #ifndef MARPAWRAPPER_NTRACE
   genericLogger_t       *genericLoggerp;
 #endif

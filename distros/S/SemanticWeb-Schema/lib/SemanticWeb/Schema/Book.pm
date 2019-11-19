@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has abridged => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_abridged',
     json_ld   => 'abridged',
 );
 
@@ -28,7 +28,7 @@ has abridged => (
 
 has book_edition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_book_edition',
     json_ld   => 'bookEdition',
 );
 
@@ -36,7 +36,7 @@ has book_edition => (
 
 has book_format => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_book_format',
     json_ld   => 'bookFormat',
 );
 
@@ -44,7 +44,7 @@ has book_format => (
 
 has illustrator => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_illustrator',
     json_ld   => 'illustrator',
 );
 
@@ -52,7 +52,7 @@ has illustrator => (
 
 has isbn => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_isbn',
     json_ld   => 'isbn',
 );
 
@@ -60,7 +60,7 @@ has isbn => (
 
 has number_of_pages => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_pages',
     json_ld   => 'numberOfPages',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::Book - A book.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -102,6 +102,10 @@ A abridged should be one of the following types:
 
 =back
 
+=head2 C<_has_abridged>
+
+A predicate for the L</abridged> attribute.
+
 =head2 C<book_edition>
 
 C<bookEdition>
@@ -115,6 +119,10 @@ A book_edition should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_book_edition>
+
+A predicate for the L</book_edition> attribute.
 
 =head2 C<book_format>
 
@@ -130,6 +138,10 @@ A book_format should be one of the following types:
 
 =back
 
+=head2 C<_has_book_format>
+
+A predicate for the L</book_format> attribute.
+
 =head2 C<illustrator>
 
 The illustrator of the book.
@@ -142,6 +154,10 @@ A illustrator should be one of the following types:
 
 =back
 
+=head2 C<_has_illustrator>
+
+A predicate for the L</illustrator> attribute.
+
 =head2 C<isbn>
 
 The ISBN of the book.
@@ -153,6 +169,10 @@ A isbn should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_isbn>
+
+A predicate for the L</isbn> attribute.
 
 =head2 C<number_of_pages>
 
@@ -167,6 +187,10 @@ A number_of_pages should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_number_of_pages>
+
+A predicate for the L</number_of_pages> attribute.
 
 =head1 SEE ALSO
 

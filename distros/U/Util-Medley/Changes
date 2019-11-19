@@ -1,10 +1,39 @@
 ==================================================
-Changes from 2018-11-14 00:00:00 +0000 to present.
+Changes from 2018-11-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.008 at 2019-11-14 19:24:59 +0000
+version 0.009 at 2019-11-19 15:48:26 +0000
 ------------------------------------------
+
+  Change: 225fa2f4549cb82211c7b5a229ba5834a0ffab38
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-19 09:47:42 +0000
+
+    fixed test case in t/99-medley.t 
+
+  Change: 6af8abef8831adaa8357b0049fec34a1887a4214
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-19 09:46:11 +0000
+
+    modified DateTime.pm to follow camel-case convention. added
+    localDateTimeIsValid method 
+
+  Change: 4f6e5e6df5e836dfc333814ad2ef5c93905abaf5
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-14 13:26:12 +0000
+
+    updated README.build 
+
+------------------------------------------
+version 0.008 at 2019-11-14 19:25:14 +0000
+------------------------------------------
+
+  Change: 994b111a993fd242d04b1cfe4e079d41ac1a9628
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-14 13:25:14 +0000
+
+    v0.008 
 
   Change: b8b48975b40c761618b795f438e5b6a5fc0c3c4b
   Author: John Gravatt <john@gravatt.org>

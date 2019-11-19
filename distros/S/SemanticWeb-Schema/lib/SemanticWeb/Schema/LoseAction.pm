@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has winner => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_winner',
     json_ld   => 'winner',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::LoseAction - The act of being defeated in a competitive act
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -61,6 +61,10 @@ A winner should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_winner>
+
+A predicate for the L</winner> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has audience => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_audience',
     json_ld   => 'audience',
 );
 
@@ -28,7 +28,7 @@ has audience => (
 
 has event => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_event',
     json_ld   => 'event',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::PlayAction - The act of playing/exercising/training/perform
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -79,6 +79,10 @@ A audience should be one of the following types:
 
 =back
 
+=head2 C<_has_audience>
+
+A predicate for the L</audience> attribute.
+
 =head2 C<event>
 
 Upcoming or past event associated with this place, organization, or action.
@@ -90,6 +94,10 @@ A event should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Event']>
 
 =back
+
+=head2 C<_has_event>
+
+A predicate for the L</event> attribute.
 
 =head1 SEE ALSO
 

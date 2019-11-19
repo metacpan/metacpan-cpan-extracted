@@ -4,7 +4,7 @@ CBOR::Free - Fast CBOR for everyone
 
 # SYNOPSIS
 
-    $cbor = CBOR::Free::encode( $scalar_or_ar_or_hr );
+    $cbor = CBOR::Free::encode( $some_data_structure );
 
     $thing = CBOR::Free::decode( $cbor )
 
@@ -38,27 +38,39 @@ The encoder currently does not handle any other blessed references.
 
 %OPTS may be:
 
-- `canonical` - A boolean that makes the function output
+- `canonical` - A boolean that makes the encoder output
 CBOR in [canonical form](https://tools.ietf.org/html/rfc7049#section-3.9).
-- `scalar_references` - Tells the encoder to accept scalar references
+- `preserve_references` - A boolean that makes the encoder encode
+multi-referenced values via [CBOR’s “shared references” tags](https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml). This allows encoding of shared
+and circular references. It also incurs a performance penalty.
+
+    (Take care that any circular references in your application don’t cause
+    memory leaks!)
+
+- `scalar_references` - A boolean that makes the encoder accept
+scalar references
 (rather than reject them) and encode them via
 [CBOR’s “indirection” tag](https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml).
 Most languages don’t use references as Perl does, so this option seems of
 little use outside all-Perl IPC contexts; it is arguably more useful, then,
-to have the encoder reject data structures that most other languages cannot
-represent.
+for general use to have the encoder reject data structures that most other
+languages cannot represent.
 
 Notes on mapping Perl to CBOR:
 
 - The internal state of a defined Perl scalar (e.g., whether it’s an
 integer, float, byte string, or character string) determines its CBOR
 encoding.
+- Perl hash keys become CBOR binary strings.
 - [Types::Serialiser](https://metacpan.org/pod/Types::Serialiser) booleans are encoded as CBOR booleans.
 Perl undef is encoded as CBOR null. (NB: No Perl value encodes as CBOR
 undefined.)
 - Scalar references (including references to other references) are
 unhandled by default, which makes them trigger an exception. You can
 optionally tell CBOR::Free to encode them via the `scalar_references` flag.
+- Via the optional `preserve_references` flag, circular and shared
+references may be preserved. Without this flag, circular references cause an
+exception, and other shared references are not preserved.
 - Instances of [CBOR::Free::Tagged](https://metacpan.org/pod/CBOR::Free::Tagged) are encoded as tagged values.
 
 An error is thrown on excess recursion or an unrecognized object.
@@ -83,6 +95,8 @@ An exception is thrown if the decoder finds anything else as a map key.
 Both CBOR null and undefined become Perl undef.
 - [CBOR’s “indirection” tag](https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml) is interpreted as a scalar reference. This behavior is always
 active; unlike with the encoder, there is no need to enable it manually.
+- `preserve_references()` mode complements the same flag
+given to the encoder.
 - This function does not interpret any other tags. If you need to
 decode other tags, look at [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR::Free::Decoder). Any unhandled tags that
 this function sees prompt a warning but are otherwise ignored.

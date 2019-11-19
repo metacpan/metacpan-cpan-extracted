@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has about => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_about',
     json_ld   => 'about',
 );
 
@@ -28,7 +28,7 @@ has about => (
 
 has abstract => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_abstract',
     json_ld   => 'abstract',
 );
 
@@ -36,7 +36,7 @@ has abstract => (
 
 has access_mode => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_access_mode',
     json_ld   => 'accessMode',
 );
 
@@ -44,7 +44,7 @@ has access_mode => (
 
 has access_mode_sufficient => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_access_mode_sufficient',
     json_ld   => 'accessModeSufficient',
 );
 
@@ -52,7 +52,7 @@ has access_mode_sufficient => (
 
 has accessibility_api => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_accessibility_api',
     json_ld   => 'accessibilityAPI',
 );
 
@@ -60,7 +60,7 @@ has accessibility_api => (
 
 has accessibility_control => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_accessibility_control',
     json_ld   => 'accessibilityControl',
 );
 
@@ -68,7 +68,7 @@ has accessibility_control => (
 
 has accessibility_feature => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_accessibility_feature',
     json_ld   => 'accessibilityFeature',
 );
 
@@ -76,7 +76,7 @@ has accessibility_feature => (
 
 has accessibility_hazard => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_accessibility_hazard',
     json_ld   => 'accessibilityHazard',
 );
 
@@ -84,7 +84,7 @@ has accessibility_hazard => (
 
 has accessibility_summary => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_accessibility_summary',
     json_ld   => 'accessibilitySummary',
 );
 
@@ -92,7 +92,7 @@ has accessibility_summary => (
 
 has accountable_person => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_accountable_person',
     json_ld   => 'accountablePerson',
 );
 
@@ -100,7 +100,7 @@ has accountable_person => (
 
 has aggregate_rating => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_aggregate_rating',
     json_ld   => 'aggregateRating',
 );
 
@@ -108,7 +108,7 @@ has aggregate_rating => (
 
 has alternative_headline => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_alternative_headline',
     json_ld   => 'alternativeHeadline',
 );
 
@@ -116,7 +116,7 @@ has alternative_headline => (
 
 has associated_media => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_associated_media',
     json_ld   => 'associatedMedia',
 );
 
@@ -124,7 +124,7 @@ has associated_media => (
 
 has audience => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_audience',
     json_ld   => 'audience',
 );
 
@@ -132,7 +132,7 @@ has audience => (
 
 has audio => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_audio',
     json_ld   => 'audio',
 );
 
@@ -140,7 +140,7 @@ has audio => (
 
 has author => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_author',
     json_ld   => 'author',
 );
 
@@ -148,7 +148,7 @@ has author => (
 
 has award => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_award',
     json_ld   => 'award',
 );
 
@@ -156,7 +156,7 @@ has award => (
 
 has awards => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_awards',
     json_ld   => 'awards',
 );
 
@@ -164,7 +164,7 @@ has awards => (
 
 has character => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_character',
     json_ld   => 'character',
 );
 
@@ -172,7 +172,7 @@ has character => (
 
 has citation => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_citation',
     json_ld   => 'citation',
 );
 
@@ -180,7 +180,7 @@ has citation => (
 
 has comment => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_comment',
     json_ld   => 'comment',
 );
 
@@ -188,7 +188,7 @@ has comment => (
 
 has comment_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_comment_count',
     json_ld   => 'commentCount',
 );
 
@@ -196,7 +196,7 @@ has comment_count => (
 
 has conditions_of_access => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_conditions_of_access',
     json_ld   => 'conditionsOfAccess',
 );
 
@@ -204,7 +204,7 @@ has conditions_of_access => (
 
 has content_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_content_location',
     json_ld   => 'contentLocation',
 );
 
@@ -212,7 +212,7 @@ has content_location => (
 
 has content_rating => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_content_rating',
     json_ld   => 'contentRating',
 );
 
@@ -220,7 +220,7 @@ has content_rating => (
 
 has content_reference_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_content_reference_time',
     json_ld   => 'contentReferenceTime',
 );
 
@@ -228,7 +228,7 @@ has content_reference_time => (
 
 has contributor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_contributor',
     json_ld   => 'contributor',
 );
 
@@ -236,7 +236,7 @@ has contributor => (
 
 has copyright_holder => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_copyright_holder',
     json_ld   => 'copyrightHolder',
 );
 
@@ -244,7 +244,7 @@ has copyright_holder => (
 
 has copyright_year => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_copyright_year',
     json_ld   => 'copyrightYear',
 );
 
@@ -252,7 +252,7 @@ has copyright_year => (
 
 has correction => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_correction',
     json_ld   => 'correction',
 );
 
@@ -260,7 +260,7 @@ has correction => (
 
 has creative_work_status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_creative_work_status',
     json_ld   => 'creativeWorkStatus',
 );
 
@@ -268,7 +268,7 @@ has creative_work_status => (
 
 has creator => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_creator',
     json_ld   => 'creator',
 );
 
@@ -276,7 +276,7 @@ has creator => (
 
 has date_created => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_created',
     json_ld   => 'dateCreated',
 );
 
@@ -284,7 +284,7 @@ has date_created => (
 
 has date_modified => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_modified',
     json_ld   => 'dateModified',
 );
 
@@ -292,7 +292,7 @@ has date_modified => (
 
 has date_published => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_published',
     json_ld   => 'datePublished',
 );
 
@@ -300,7 +300,7 @@ has date_published => (
 
 has discussion_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_discussion_url',
     json_ld   => 'discussionUrl',
 );
 
@@ -308,7 +308,7 @@ has discussion_url => (
 
 has editor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_editor',
     json_ld   => 'editor',
 );
 
@@ -316,7 +316,7 @@ has editor => (
 
 has educational_alignment => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_educational_alignment',
     json_ld   => 'educationalAlignment',
 );
 
@@ -324,7 +324,7 @@ has educational_alignment => (
 
 has educational_use => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_educational_use',
     json_ld   => 'educationalUse',
 );
 
@@ -332,7 +332,7 @@ has educational_use => (
 
 has encoding => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_encoding',
     json_ld   => 'encoding',
 );
 
@@ -340,7 +340,7 @@ has encoding => (
 
 has encoding_format => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_encoding_format',
     json_ld   => 'encodingFormat',
 );
 
@@ -348,7 +348,7 @@ has encoding_format => (
 
 has encodings => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_encodings',
     json_ld   => 'encodings',
 );
 
@@ -356,7 +356,7 @@ has encodings => (
 
 has example_of_work => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_example_of_work',
     json_ld   => 'exampleOfWork',
 );
 
@@ -364,7 +364,7 @@ has example_of_work => (
 
 has expires => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_expires',
     json_ld   => 'expires',
 );
 
@@ -372,7 +372,7 @@ has expires => (
 
 has file_format => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_file_format',
     json_ld   => 'fileFormat',
 );
 
@@ -380,7 +380,7 @@ has file_format => (
 
 has funder => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_funder',
     json_ld   => 'funder',
 );
 
@@ -388,7 +388,7 @@ has funder => (
 
 has genre => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_genre',
     json_ld   => 'genre',
 );
 
@@ -396,7 +396,7 @@ has genre => (
 
 has has_part => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_part',
     json_ld   => 'hasPart',
 );
 
@@ -404,7 +404,7 @@ has has_part => (
 
 has headline => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_headline',
     json_ld   => 'headline',
 );
 
@@ -412,7 +412,7 @@ has headline => (
 
 has in_language => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_in_language',
     json_ld   => 'inLanguage',
 );
 
@@ -420,7 +420,7 @@ has in_language => (
 
 has interaction_statistic => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_interaction_statistic',
     json_ld   => 'interactionStatistic',
 );
 
@@ -428,7 +428,7 @@ has interaction_statistic => (
 
 has interactivity_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_interactivity_type',
     json_ld   => 'interactivityType',
 );
 
@@ -436,7 +436,7 @@ has interactivity_type => (
 
 has is_accessible_for_free => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_accessible_for_free',
     json_ld   => 'isAccessibleForFree',
 );
 
@@ -444,7 +444,7 @@ has is_accessible_for_free => (
 
 has is_based_on => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_based_on',
     json_ld   => 'isBasedOn',
 );
 
@@ -452,7 +452,7 @@ has is_based_on => (
 
 has is_based_on_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_based_on_url',
     json_ld   => 'isBasedOnUrl',
 );
 
@@ -460,7 +460,7 @@ has is_based_on_url => (
 
 has is_family_friendly => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_family_friendly',
     json_ld   => 'isFamilyFriendly',
 );
 
@@ -468,7 +468,7 @@ has is_family_friendly => (
 
 has is_part_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_part_of',
     json_ld   => 'isPartOf',
 );
 
@@ -476,7 +476,7 @@ has is_part_of => (
 
 has keywords => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_keywords',
     json_ld   => 'keywords',
 );
 
@@ -484,7 +484,7 @@ has keywords => (
 
 has learning_resource_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_learning_resource_type',
     json_ld   => 'learningResourceType',
 );
 
@@ -492,7 +492,7 @@ has learning_resource_type => (
 
 has license => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_license',
     json_ld   => 'license',
 );
 
@@ -500,7 +500,7 @@ has license => (
 
 has location_created => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_location_created',
     json_ld   => 'locationCreated',
 );
 
@@ -508,7 +508,7 @@ has location_created => (
 
 has main_entity => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_main_entity',
     json_ld   => 'mainEntity',
 );
 
@@ -516,7 +516,7 @@ has main_entity => (
 
 has material => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_material',
     json_ld   => 'material',
 );
 
@@ -524,7 +524,7 @@ has material => (
 
 has material_extent => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_material_extent',
     json_ld   => 'materialExtent',
 );
 
@@ -532,7 +532,7 @@ has material_extent => (
 
 has mentions => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_mentions',
     json_ld   => 'mentions',
 );
 
@@ -540,7 +540,7 @@ has mentions => (
 
 has offers => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_offers',
     json_ld   => 'offers',
 );
 
@@ -548,7 +548,7 @@ has offers => (
 
 has position => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_position',
     json_ld   => 'position',
 );
 
@@ -556,7 +556,7 @@ has position => (
 
 has producer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_producer',
     json_ld   => 'producer',
 );
 
@@ -564,7 +564,7 @@ has producer => (
 
 has provider => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_provider',
     json_ld   => 'provider',
 );
 
@@ -572,7 +572,7 @@ has provider => (
 
 has publication => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_publication',
     json_ld   => 'publication',
 );
 
@@ -580,7 +580,7 @@ has publication => (
 
 has publisher => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_publisher',
     json_ld   => 'publisher',
 );
 
@@ -588,7 +588,7 @@ has publisher => (
 
 has publisher_imprint => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_publisher_imprint',
     json_ld   => 'publisherImprint',
 );
 
@@ -596,7 +596,7 @@ has publisher_imprint => (
 
 has publishing_principles => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_publishing_principles',
     json_ld   => 'publishingPrinciples',
 );
 
@@ -604,7 +604,7 @@ has publishing_principles => (
 
 has recorded_at => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_recorded_at',
     json_ld   => 'recordedAt',
 );
 
@@ -612,7 +612,7 @@ has recorded_at => (
 
 has released_event => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_released_event',
     json_ld   => 'releasedEvent',
 );
 
@@ -620,7 +620,7 @@ has released_event => (
 
 has review => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_review',
     json_ld   => 'review',
 );
 
@@ -628,7 +628,7 @@ has review => (
 
 has reviews => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_reviews',
     json_ld   => 'reviews',
 );
 
@@ -636,7 +636,7 @@ has reviews => (
 
 has schema_version => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_schema_version',
     json_ld   => 'schemaVersion',
 );
 
@@ -644,7 +644,7 @@ has schema_version => (
 
 has sd_date_published => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sd_date_published',
     json_ld   => 'sdDatePublished',
 );
 
@@ -652,7 +652,7 @@ has sd_date_published => (
 
 has sd_license => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sd_license',
     json_ld   => 'sdLicense',
 );
 
@@ -660,7 +660,7 @@ has sd_license => (
 
 has sd_publisher => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sd_publisher',
     json_ld   => 'sdPublisher',
 );
 
@@ -668,7 +668,7 @@ has sd_publisher => (
 
 has source_organization => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_source_organization',
     json_ld   => 'sourceOrganization',
 );
 
@@ -676,7 +676,7 @@ has source_organization => (
 
 has spatial => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_spatial',
     json_ld   => 'spatial',
 );
 
@@ -684,7 +684,7 @@ has spatial => (
 
 has spatial_coverage => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_spatial_coverage',
     json_ld   => 'spatialCoverage',
 );
 
@@ -692,7 +692,7 @@ has spatial_coverage => (
 
 has sponsor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sponsor',
     json_ld   => 'sponsor',
 );
 
@@ -700,7 +700,7 @@ has sponsor => (
 
 has temporal => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_temporal',
     json_ld   => 'temporal',
 );
 
@@ -708,7 +708,7 @@ has temporal => (
 
 has temporal_coverage => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_temporal_coverage',
     json_ld   => 'temporalCoverage',
 );
 
@@ -716,7 +716,7 @@ has temporal_coverage => (
 
 has text => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_text',
     json_ld   => 'text',
 );
 
@@ -724,7 +724,7 @@ has text => (
 
 has thumbnail_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_thumbnail_url',
     json_ld   => 'thumbnailUrl',
 );
 
@@ -732,7 +732,7 @@ has thumbnail_url => (
 
 has time_required => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_time_required',
     json_ld   => 'timeRequired',
 );
 
@@ -740,7 +740,7 @@ has time_required => (
 
 has translation_of_work => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_translation_of_work',
     json_ld   => 'translationOfWork',
 );
 
@@ -748,7 +748,7 @@ has translation_of_work => (
 
 has translator => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_translator',
     json_ld   => 'translator',
 );
 
@@ -756,7 +756,7 @@ has translator => (
 
 has typical_age_range => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_typical_age_range',
     json_ld   => 'typicalAgeRange',
 );
 
@@ -764,7 +764,7 @@ has typical_age_range => (
 
 has version => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_version',
     json_ld   => 'version',
 );
 
@@ -772,7 +772,7 @@ has version => (
 
 has video => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_video',
     json_ld   => 'video',
 );
 
@@ -780,7 +780,7 @@ has video => (
 
 has work_example => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_work_example',
     json_ld   => 'workExample',
 );
 
@@ -788,7 +788,7 @@ has work_example => (
 
 has work_translation => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_work_translation',
     json_ld   => 'workTranslation',
 );
 
@@ -810,7 +810,7 @@ SemanticWeb::Schema::CreativeWork - The most generic kind of creative work
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -831,6 +831,10 @@ A about should be one of the following types:
 
 =back
 
+=head2 C<_has_about>
+
+A predicate for the L</about> attribute.
+
 =head2 C<abstract>
 
 =for html <p>An abstract is a short description that summarizes a <a
@@ -844,6 +848,10 @@ A abstract should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_abstract>
+
+A predicate for the L</abstract> attribute.
 
 =head2 C<access_mode>
 
@@ -862,6 +870,10 @@ A access_mode should be one of the following types:
 
 =back
 
+=head2 C<_has_access_mode>
+
+A predicate for the L</access_mode> attribute.
+
 =head2 C<access_mode_sufficient>
 
 C<accessModeSufficient>
@@ -877,6 +889,10 @@ A access_mode_sufficient should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ItemList']>
 
 =back
+
+=head2 C<_has_access_mode_sufficient>
+
+A predicate for the L</access_mode_sufficient> attribute.
 
 =head2 C<accessibility_api>
 
@@ -895,6 +911,10 @@ A accessibility_api should be one of the following types:
 
 =back
 
+=head2 C<_has_accessibility_api>
+
+A predicate for the L</accessibility_api> attribute.
+
 =head2 C<accessibility_control>
 
 C<accessibilityControl>
@@ -911,6 +931,10 @@ A accessibility_control should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_accessibility_control>
+
+A predicate for the L</accessibility_control> attribute.
 
 =head2 C<accessibility_feature>
 
@@ -929,6 +953,10 @@ A accessibility_feature should be one of the following types:
 
 =back
 
+=head2 C<_has_accessibility_feature>
+
+A predicate for the L</accessibility_feature> attribute.
+
 =head2 C<accessibility_hazard>
 
 C<accessibilityHazard>
@@ -945,6 +973,10 @@ A accessibility_hazard should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_accessibility_hazard>
+
+A predicate for the L</accessibility_hazard> attribute.
 
 =head2 C<accessibility_summary>
 
@@ -964,6 +996,10 @@ A accessibility_summary should be one of the following types:
 
 =back
 
+=head2 C<_has_accessibility_summary>
+
+A predicate for the L</accessibility_summary> attribute.
+
 =head2 C<accountable_person>
 
 C<accountablePerson>
@@ -977,6 +1013,10 @@ A accountable_person should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_accountable_person>
+
+A predicate for the L</accountable_person> attribute.
 
 =head2 C<aggregate_rating>
 
@@ -993,6 +1033,10 @@ A aggregate_rating should be one of the following types:
 
 =back
 
+=head2 C<_has_aggregate_rating>
+
+A predicate for the L</aggregate_rating> attribute.
+
 =head2 C<alternative_headline>
 
 C<alternativeHeadline>
@@ -1006,6 +1050,10 @@ A alternative_headline should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_alternative_headline>
+
+A predicate for the L</alternative_headline> attribute.
 
 =head2 C<associated_media>
 
@@ -1022,6 +1070,10 @@ A associated_media should be one of the following types:
 
 =back
 
+=head2 C<_has_associated_media>
+
+A predicate for the L</associated_media> attribute.
+
 =head2 C<audience>
 
 An intended audience, i.e. a group for whom something was created.
@@ -1033,6 +1085,10 @@ A audience should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Audience']>
 
 =back
+
+=head2 C<_has_audience>
+
+A predicate for the L</audience> attribute.
 
 =head2 C<audio>
 
@@ -1047,6 +1103,10 @@ A audio should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Clip']>
 
 =back
+
+=head2 C<_has_audio>
+
+A predicate for the L</audio> attribute.
 
 =head2 C<author>
 
@@ -1064,6 +1124,10 @@ A author should be one of the following types:
 
 =back
 
+=head2 C<_has_author>
+
+A predicate for the L</author> attribute.
+
 =head2 C<award>
 
 An award won by or for this item.
@@ -1075,6 +1139,10 @@ A award should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_award>
+
+A predicate for the L</award> attribute.
 
 =head2 C<awards>
 
@@ -1088,6 +1156,10 @@ A awards should be one of the following types:
 
 =back
 
+=head2 C<_has_awards>
+
+A predicate for the L</awards> attribute.
+
 =head2 C<character>
 
 Fictional person connected with a creative work.
@@ -1099,6 +1171,10 @@ A character should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_character>
+
+A predicate for the L</character> attribute.
 
 =head2 C<citation>
 
@@ -1115,6 +1191,10 @@ A citation should be one of the following types:
 
 =back
 
+=head2 C<_has_citation>
+
+A predicate for the L</citation> attribute.
+
 =head2 C<comment>
 
 Comments, typically from users.
@@ -1126,6 +1206,10 @@ A comment should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Comment']>
 
 =back
+
+=head2 C<_has_comment>
+
+A predicate for the L</comment> attribute.
 
 =head2 C<comment_count>
 
@@ -1142,6 +1226,10 @@ A comment_count should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_comment_count>
+
+A predicate for the L</comment_count> attribute.
 
 =head2 C<conditions_of_access>
 
@@ -1166,6 +1254,10 @@ A conditions_of_access should be one of the following types:
 
 =back
 
+=head2 C<_has_conditions_of_access>
+
+A predicate for the L</conditions_of_access> attribute.
+
 =head2 C<content_location>
 
 C<contentLocation>
@@ -1180,6 +1272,10 @@ A content_location should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
+
+=head2 C<_has_content_location>
+
+A predicate for the L</content_location> attribute.
 
 =head2 C<content_rating>
 
@@ -1197,6 +1293,10 @@ A content_rating should be one of the following types:
 
 =back
 
+=head2 C<_has_content_rating>
+
+A predicate for the L</content_rating> attribute.
+
 =head2 C<content_reference_time>
 
 C<contentReferenceTime>
@@ -1212,6 +1312,10 @@ A content_reference_time should be one of the following types:
 
 =back
 
+=head2 C<_has_content_reference_time>
+
+A predicate for the L</content_reference_time> attribute.
+
 =head2 C<contributor>
 
 A secondary contributor to the CreativeWork or Event.
@@ -1225,6 +1329,10 @@ A contributor should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_contributor>
+
+A predicate for the L</contributor> attribute.
 
 =head2 C<copyright_holder>
 
@@ -1242,6 +1350,10 @@ A copyright_holder should be one of the following types:
 
 =back
 
+=head2 C<_has_copyright_holder>
+
+A predicate for the L</copyright_holder> attribute.
+
 =head2 C<copyright_year>
 
 C<copyrightYear>
@@ -1256,6 +1368,10 @@ A copyright_year should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_copyright_year>
+
+A predicate for the L</copyright_year> attribute.
 
 =head2 C<correction>
 
@@ -1275,6 +1391,10 @@ A correction should be one of the following types:
 
 =back
 
+=head2 C<_has_correction>
+
+A predicate for the L</correction> attribute.
+
 =head2 C<creative_work_status>
 
 C<creativeWorkStatus>
@@ -1293,6 +1413,10 @@ A creative_work_status should be one of the following types:
 
 =back
 
+=head2 C<_has_creative_work_status>
+
+A predicate for the L</creative_work_status> attribute.
+
 =head2 C<creator>
 
 The creator/author of this CreativeWork. This is the same as the Author
@@ -1307,6 +1431,10 @@ A creator should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_creator>
+
+A predicate for the L</creator> attribute.
 
 =head2 C<date_created>
 
@@ -1323,6 +1451,10 @@ A date_created should be one of the following types:
 
 =back
 
+=head2 C<_has_date_created>
+
+A predicate for the L</date_created> attribute.
+
 =head2 C<date_modified>
 
 C<dateModified>
@@ -1338,6 +1470,10 @@ A date_modified should be one of the following types:
 
 =back
 
+=head2 C<_has_date_modified>
+
+A predicate for the L</date_modified> attribute.
+
 =head2 C<date_published>
 
 C<datePublished>
@@ -1351,6 +1487,10 @@ A date_published should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_date_published>
+
+A predicate for the L</date_published> attribute.
 
 =head2 C<discussion_url>
 
@@ -1366,6 +1506,10 @@ A discussion_url should be one of the following types:
 
 =back
 
+=head2 C<_has_discussion_url>
+
+A predicate for the L</discussion_url> attribute.
+
 =head2 C<editor>
 
 Specifies the Person who edited the CreativeWork.
@@ -1377,6 +1521,10 @@ A editor should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_editor>
+
+A predicate for the L</editor> attribute.
 
 =head2 C<educational_alignment>
 
@@ -1391,6 +1539,10 @@ A educational_alignment should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AlignmentObject']>
 
 =back
+
+=head2 C<_has_educational_alignment>
+
+A predicate for the L</educational_alignment> attribute.
 
 =head2 C<educational_use>
 
@@ -1407,6 +1559,10 @@ A educational_use should be one of the following types:
 
 =back
 
+=head2 C<_has_educational_use>
+
+A predicate for the L</educational_use> attribute.
+
 =head2 C<encoding>
 
 A media object that encodes this CreativeWork. This property is a synonym
@@ -1419,6 +1575,10 @@ A encoding should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MediaObject']>
 
 =back
+
+=head2 C<_has_encoding>
+
+A predicate for the L</encoding> attribute.
 
 =head2 C<encoding_format>
 
@@ -1448,6 +1608,10 @@ A encoding_format should be one of the following types:
 
 =back
 
+=head2 C<_has_encoding_format>
+
+A predicate for the L</encoding_format> attribute.
+
 =head2 C<encodings>
 
 A media object that encodes this CreativeWork.
@@ -1459,6 +1623,10 @@ A encodings should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MediaObject']>
 
 =back
+
+=head2 C<_has_encodings>
+
+A predicate for the L</encodings> attribute.
 
 =head2 C<example_of_work>
 
@@ -1474,6 +1642,10 @@ A example_of_work should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
+
+=head2 C<_has_example_of_work>
+
+A predicate for the L</example_of_work> attribute.
 
 =head2 C<expires>
 
@@ -1493,6 +1665,10 @@ A expires should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_expires>
+
+A predicate for the L</expires> attribute.
 
 =head2 C<file_format>
 
@@ -1515,6 +1691,10 @@ A file_format should be one of the following types:
 
 =back
 
+=head2 C<_has_file_format>
+
+A predicate for the L</file_format> attribute.
+
 =head2 C<funder>
 
 A person or organization that supports (sponsors) something through some
@@ -1530,6 +1710,10 @@ A funder should be one of the following types:
 
 =back
 
+=head2 C<_has_funder>
+
+A predicate for the L</funder> attribute.
+
 =head2 C<genre>
 
 Genre of the creative work, broadcast channel or group.
@@ -1541,6 +1725,10 @@ A genre should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_genre>
+
+A predicate for the L</genre> attribute.
 
 =head2 C<has_part>
 
@@ -1557,6 +1745,10 @@ A has_part should be one of the following types:
 
 =back
 
+=head2 C<_has_has_part>
+
+A predicate for the L</has_part> attribute.
+
 =head2 C<headline>
 
 Headline of the article.
@@ -1568,6 +1760,10 @@ A headline should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_headline>
+
+A predicate for the L</headline> attribute.
 
 =head2 C<in_language>
 
@@ -1589,6 +1785,10 @@ A in_language should be one of the following types:
 
 =back
 
+=head2 C<_has_in_language>
+
+A predicate for the L</in_language> attribute.
+
 =head2 C<interaction_statistic>
 
 C<interactionStatistic>
@@ -1605,6 +1805,10 @@ A interaction_statistic should be one of the following types:
 
 =back
 
+=head2 C<_has_interaction_statistic>
+
+A predicate for the L</interaction_statistic> attribute.
+
 =head2 C<interactivity_type>
 
 C<interactivityType>
@@ -1620,6 +1824,10 @@ A interactivity_type should be one of the following types:
 
 =back
 
+=head2 C<_has_interactivity_type>
+
+A predicate for the L</interactivity_type> attribute.
+
 =head2 C<is_accessible_for_free>
 
 C<isAccessibleForFree>
@@ -1633,6 +1841,10 @@ A is_accessible_for_free should be one of the following types:
 =item C<Bool>
 
 =back
+
+=head2 C<_has_is_accessible_for_free>
+
+A predicate for the L</is_accessible_for_free> attribute.
 
 =head2 C<is_based_on>
 
@@ -1652,6 +1864,10 @@ A is_based_on should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_is_based_on>
+
+A predicate for the L</is_based_on> attribute.
 
 =head2 C<is_based_on_url>
 
@@ -1673,6 +1889,10 @@ A is_based_on_url should be one of the following types:
 
 =back
 
+=head2 C<_has_is_based_on_url>
+
+A predicate for the L</is_based_on_url> attribute.
+
 =head2 C<is_family_friendly>
 
 C<isFamilyFriendly>
@@ -1686,6 +1906,10 @@ A is_family_friendly should be one of the following types:
 =item C<Bool>
 
 =back
+
+=head2 C<_has_is_family_friendly>
+
+A predicate for the L</is_family_friendly> attribute.
 
 =head2 C<is_part_of>
 
@@ -1702,6 +1926,10 @@ A is_part_of should be one of the following types:
 
 =back
 
+=head2 C<_has_is_part_of>
+
+A predicate for the L</is_part_of> attribute.
+
 =head2 C<keywords>
 
 Keywords or tags used to describe this content. Multiple entries in a
@@ -1714,6 +1942,10 @@ A keywords should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_keywords>
+
+A predicate for the L</keywords> attribute.
 
 =head2 C<learning_resource_type>
 
@@ -1730,6 +1962,10 @@ A learning_resource_type should be one of the following types:
 
 =back
 
+=head2 C<_has_learning_resource_type>
+
+A predicate for the L</learning_resource_type> attribute.
+
 =head2 C<license>
 
 A license document that applies to this content, typically indicated by
@@ -1744,6 +1980,10 @@ A license should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_license>
+
+A predicate for the L</license> attribute.
 
 =head2 C<location_created>
 
@@ -1760,6 +2000,10 @@ A location_created should be one of the following types:
 
 =back
 
+=head2 C<_has_location_created>
+
+A predicate for the L</location_created> attribute.
+
 =head2 C<main_entity>
 
 C<mainEntity>
@@ -1774,6 +2018,10 @@ A main_entity should be one of the following types:
 
 =back
 
+=head2 C<_has_main_entity>
+
+A predicate for the L</main_entity> attribute.
+
 =head2 C<material>
 
 A material that something is made from, e.g. leather, wool, cotton, paper.
@@ -1787,6 +2035,10 @@ A material should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_material>
+
+A predicate for the L</material> attribute.
 
 =head2 C<material_extent>
 
@@ -1805,6 +2057,10 @@ A material_extent should be one of the following types:
 
 =back
 
+=head2 C<_has_material_extent>
+
+A predicate for the L</material_extent> attribute.
+
 =head2 C<mentions>
 
 Indicates that the CreativeWork contains a reference to, but is not
@@ -1817,6 +2073,10 @@ A mentions should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_mentions>
+
+A predicate for the L</mentions> attribute.
 
 =head2 C<offers>
 
@@ -1832,6 +2092,10 @@ A offers should be one of the following types:
 
 =back
 
+=head2 C<_has_offers>
+
+A predicate for the L</offers> attribute.
+
 =head2 C<position>
 
 The position of an item in a series or sequence of items.
@@ -1845,6 +2109,10 @@ A position should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_position>
+
+A predicate for the L</position> attribute.
 
 =head2 C<producer>
 
@@ -1860,6 +2128,10 @@ A producer should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_producer>
+
+A predicate for the L</producer> attribute.
 
 =head2 C<provider>
 
@@ -1877,6 +2149,10 @@ A provider should be one of the following types:
 
 =back
 
+=head2 C<_has_provider>
+
+A predicate for the L</provider> attribute.
+
 =head2 C<publication>
 
 A publication event associated with the item.
@@ -1888,6 +2164,10 @@ A publication should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::PublicationEvent']>
 
 =back
+
+=head2 C<_has_publication>
+
+A predicate for the L</publication> attribute.
 
 =head2 C<publisher>
 
@@ -1903,6 +2183,10 @@ A publisher should be one of the following types:
 
 =back
 
+=head2 C<_has_publisher>
+
+A predicate for the L</publisher> attribute.
+
 =head2 C<publisher_imprint>
 
 C<publisherImprint>
@@ -1916,6 +2200,10 @@ A publisher_imprint should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_publisher_imprint>
+
+A predicate for the L</publisher_imprint> attribute.
 
 =head2 C<publishing_principles>
 
@@ -1948,6 +2236,10 @@ A publishing_principles should be one of the following types:
 
 =back
 
+=head2 C<_has_publishing_principles>
+
+A predicate for the L</publishing_principles> attribute.
+
 =head2 C<recorded_at>
 
 C<recordedAt>
@@ -1963,6 +2255,10 @@ A recorded_at should be one of the following types:
 
 =back
 
+=head2 C<_has_recorded_at>
+
+A predicate for the L</recorded_at> attribute.
+
 =head2 C<released_event>
 
 C<releasedEvent>
@@ -1977,6 +2273,10 @@ A released_event should be one of the following types:
 
 =back
 
+=head2 C<_has_released_event>
+
+A predicate for the L</released_event> attribute.
+
 =head2 C<review>
 
 A review of the item.
@@ -1989,6 +2289,10 @@ A review should be one of the following types:
 
 =back
 
+=head2 C<_has_review>
+
+A predicate for the L</review> attribute.
+
 =head2 C<reviews>
 
 Review of the item.
@@ -2000,6 +2304,10 @@ A reviews should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Review']>
 
 =back
+
+=head2 C<_has_reviews>
+
+A predicate for the L</reviews> attribute.
 
 =head2 C<schema_version>
 
@@ -2018,6 +2326,10 @@ A schema_version should be one of the following types:
 
 =back
 
+=head2 C<_has_schema_version>
+
+A predicate for the L</schema_version> attribute.
+
 =head2 C<sd_date_published>
 
 C<sdDatePublished>
@@ -2033,6 +2345,10 @@ A sd_date_published should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_sd_date_published>
+
+A predicate for the L</sd_date_published> attribute.
 
 =head2 C<sd_license>
 
@@ -2050,6 +2366,10 @@ A sd_license should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_sd_license>
+
+A predicate for the L</sd_license> attribute.
 
 =head2 C<sd_publisher>
 
@@ -2074,6 +2394,10 @@ A sd_publisher should be one of the following types:
 
 =back
 
+=head2 C<_has_sd_publisher>
+
+A predicate for the L</sd_publisher> attribute.
+
 =head2 C<source_organization>
 
 C<sourceOrganization>
@@ -2087,6 +2411,10 @@ A source_organization should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_source_organization>
+
+A predicate for the L</source_organization> attribute.
 
 =head2 C<spatial>
 
@@ -2107,6 +2435,10 @@ A spatial should be one of the following types:
 
 =back
 
+=head2 C<_has_spatial>
+
+A predicate for the L</spatial> attribute.
+
 =head2 C<spatial_coverage>
 
 C<spatialCoverage>
@@ -2126,6 +2458,10 @@ A spatial_coverage should be one of the following types:
 
 =back
 
+=head2 C<_has_spatial_coverage>
+
+A predicate for the L</spatial_coverage> attribute.
+
 =head2 C<sponsor>
 
 A person or organization that supports a thing through a pledge, promise,
@@ -2141,6 +2477,10 @@ A sponsor should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_sponsor>
+
+A predicate for the L</sponsor> attribute.
 
 =head2 C<temporal>
 
@@ -2160,6 +2500,10 @@ A temporal should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_temporal>
+
+A predicate for the L</temporal> attribute.
 
 =head2 C<temporal_coverage>
 
@@ -2190,6 +2534,10 @@ A temporal_coverage should be one of the following types:
 
 =back
 
+=head2 C<_has_temporal_coverage>
+
+A predicate for the L</temporal_coverage> attribute.
+
 =head2 C<text>
 
 The textual content of this CreativeWork.
@@ -2201,6 +2549,10 @@ A text should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_text>
+
+A predicate for the L</text> attribute.
 
 =head2 C<thumbnail_url>
 
@@ -2215,6 +2567,10 @@ A thumbnail_url should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_thumbnail_url>
+
+A predicate for the L</thumbnail_url> attribute.
 
 =head2 C<time_required>
 
@@ -2231,6 +2587,10 @@ A time_required should be one of the following types:
 
 =back
 
+=head2 C<_has_time_required>
+
+A predicate for the L</time_required> attribute.
+
 =head2 C<translation_of_work>
 
 C<translationOfWork>
@@ -2245,6 +2605,10 @@ A translation_of_work should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
+
+=head2 C<_has_translation_of_work>
+
+A predicate for the L</translation_of_work> attribute.
 
 =head2 C<translator>
 
@@ -2262,6 +2626,10 @@ A translator should be one of the following types:
 
 =back
 
+=head2 C<_has_translator>
+
+A predicate for the L</translator> attribute.
+
 =head2 C<typical_age_range>
 
 C<typicalAgeRange>
@@ -2275,6 +2643,10 @@ A typical_age_range should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_typical_age_range>
+
+A predicate for the L</typical_age_range> attribute.
 
 =head2 C<version>
 
@@ -2290,6 +2662,10 @@ A version should be one of the following types:
 
 =back
 
+=head2 C<_has_version>
+
+A predicate for the L</version> attribute.
+
 =head2 C<video>
 
 An embedded video object.
@@ -2303,6 +2679,10 @@ A video should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::VideoObject']>
 
 =back
+
+=head2 C<_has_video>
+
+A predicate for the L</video> attribute.
 
 =head2 C<work_example>
 
@@ -2318,6 +2698,10 @@ A work_example should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
+
+=head2 C<_has_work_example>
+
+A predicate for the L</work_example> attribute.
 
 =head2 C<work_translation>
 
@@ -2335,6 +2719,10 @@ A work_translation should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
+
+=head2 C<_has_work_translation>
+
+A predicate for the L</work_translation> attribute.
 
 =head1 SEE ALSO
 

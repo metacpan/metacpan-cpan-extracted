@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has caption => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_caption',
     json_ld   => 'caption',
 );
 
@@ -28,7 +28,7 @@ has caption => (
 
 has transcript => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_transcript',
     json_ld   => 'transcript',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::AudioObject - An audio file.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -75,6 +75,10 @@ A caption should be one of the following types:
 
 =back
 
+=head2 C<_has_caption>
+
+A predicate for the L</caption> attribute.
+
 =head2 C<transcript>
 
 If this MediaObject is an AudioObject or VideoObject, the transcript of
@@ -87,6 +91,10 @@ A transcript should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_transcript>
+
+A predicate for the L</transcript> attribute.
 
 =head1 SEE ALSO
 

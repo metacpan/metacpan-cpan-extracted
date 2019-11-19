@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf
@@ -126,6 +126,7 @@ sub _valid_options {
         layout         => '[ 0 1 2 3 ]',
         lf             => 'ARRAY',
         mark           => 'ARRAY',
+        busy_string    => 'Str',
         info           => 'Str',
         init_dir       => 'Str',
         add_dir        => 'Str',
@@ -167,6 +168,7 @@ sub _defaults {
     return {
         alignment      => 0,
         all_by_default => 1,
+        #busy_string   => undef,
         clear_screen   => 0,
         color          => 0,
         decoded        => 1,
@@ -219,7 +221,7 @@ sub _routine_options {
         $options = [ @every, qw( small_first reset thousands_separator) ];
     }
     elsif ( $caller eq 'choose_a_subset' ) {
-        $options = [ @every, qw( layout order alignment enchanted keep_chosen index prefix all_by_default current_selection_begin current_selection_end current_selection_separator mark ) ];
+        $options = [ @every, qw( layout order alignment enchanted keep_chosen index prefix all_by_default current_selection_begin current_selection_end current_selection_separator mark busy_string ) ];
     }
     elsif ( $caller eq 'settings_menu' ) {
         $options = [ @every ];
@@ -587,8 +589,16 @@ sub choose_a_number {
         $back_w    = print_columns( $self->{back}    );
         $confirm_w = print_columns( $self->{confirm} );
     }
-    my $back_tmp    = $self->{back}    . ' ' x ( $longest * 2 + $tab_w + 1 - $back_w );
-    my $confirm_tmp = $self->{confirm} . ' ' x ( $longest * 2 + $tab_w + 1 - $confirm_w );
+    my $back_tmp = $self->{back};
+    my $space_count_back = $longest * 2 + $tab_w + 1 - $back_w;
+    if ( $space_count_back > 0 ) {
+        $back_tmp .= ' ' x $space_count_back;
+    }
+    my $confirm_tmp = $self->{confirm};
+    my $space_count_confirm = $longest * 2 + $tab_w + 1 - $confirm_w;
+    if ( $space_count_confirm > 0 ) {
+        $confirm_tmp .= ' ' x $space_count_confirm;
+    }
     if ( print_columns( "$choices_range[0]" ) > get_term_width() ) {
         @choices_range = ();
         for my $di ( 0 .. $digits - 1 ) {
@@ -720,7 +730,8 @@ sub choose_a_subset {
               alignment => $self->{alignment}, order => $self->{order}, mouse => $self->{mouse},
               meta_items => [ 0 .. $#pre ], mark => $self->{mark}, include_highlighted => 2,
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
-              color => $self->{color}, lf => $self->{lf}, undef => $self->{back} }
+              color => $self->{color}, lf => $self->{lf}, undef => $self->{back},
+              busy_string => $self->{busy_string} }
         );
         $self->{mark} = undef;
         if ( ! defined $idx[0] || $idx[0] == 0 ) {
@@ -932,7 +943,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.105
+Version 0.106
 
 =cut
 

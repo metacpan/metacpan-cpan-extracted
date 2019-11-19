@@ -1,6 +1,6 @@
 package Bio::Palantir::Explorer::GeneFasta;
 # ABSTRACT: Explorer internal class for handling GeneFasta objects
-$Bio::Palantir::Explorer::GeneFasta::VERSION = '0.193080';
+$Bio::Palantir::Explorer::GeneFasta::VERSION = '0.193230';
 use Moose;
 use namespace::autoclean;
 
@@ -111,7 +111,7 @@ Bio::Palantir::Explorer::GeneFasta - Explorer internal class for handling GeneFa
 
 =head1 VERSION
 
-version 0.193080
+version 0.193230
 
 =head1 SYNOPSIS
 

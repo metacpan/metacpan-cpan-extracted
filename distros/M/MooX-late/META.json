@@ -1,11 +1,10 @@
 {
    "abstract" : "easily translate Moose code to Moo",
    "author" : [
-      "Toby Inkster (TOBYINK) <tobyink@cpan.org>",
-      ""
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -37,7 +36,8 @@
          },
          "requires" : {
             "Moo" : "1.006000",
-            "Type::Utils" : "1.000001"
+            "Type::Utils" : "1.000001",
+            "perl" : "5.008003"
          },
          "suggests" : {
             "MooX" : "0"
@@ -54,16 +54,15 @@
    "provides" : {
       "MooX::late" : {
          "file" : "lib/MooX/late.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "MooX::late::DefinitionContext" : {
          "file" : "lib/MooX/late.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-late/project",
       "bugtracker" : {
          "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooX-late"
       },
@@ -75,7 +74,10 @@
          "type" : "git",
          "url" : "git://github.com/tobyink/p5-moox-late.git",
          "web" : "https://github.com/tobyink/p5-moox-late"
-      }
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-late/project"
    },
-   "version" : "0.015"
+   "version" : "0.016",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

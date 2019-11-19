@@ -11,21 +11,18 @@ has _offset => ( init_arg => undef );
 
 # https://core.telegram.org/bots/api
 
-sub _req ( $self, $path, $data, $cb = undef ) {
+sub _req ( $self, $path, $data ) {
     $data = P->data->to_json($data) if $data;
 
-    return P->http->get(
+    my $res = P->http->get(
         "https://api.telegram.org/bot$self->{key}/$path",
         headers => [ 'Content-Type' => 'application/json', ],
-        data    => $data,
-        sub ($res) {
-            my $data = P->data->from_json( $res->{data} );
-
-            my $api_res = res 200, $data;
-
-            return $cb ? $cb->($api_res) : $api_res;
-        }
+        data    => $data
     );
+
+    my $data = P->data->from_json( $res->{data} );
+
+    return res 200, $data;
 }
 
 # TODO
@@ -36,7 +33,7 @@ sub set_webhook ( $self, $url, %args ) {
 sub poll_updates ( $self, $timeout = $self->{poll_timeout} ) {
     weaken $self;
 
-    my $coro = Coro::async_pool {
+    Coro::async_pool {
         while () {
             last if !defined $self;
 
@@ -60,27 +57,24 @@ sub poll_updates ( $self, $timeout = $self->{poll_timeout} ) {
         return;
     };
 
-    $coro->cede_to;
-
     return;
 }
 
 sub get_updates ($self) {
-    return $self->_req(
+    my $res = $self->_req(
         'getUpdates',
         {   offset => $self->{_offset},
             limit  => 100,
-        },
-        sub ($res) {
-            if ( $res->{data}->{result}->@* ) {
-                my $update_id = $res->{data}->{result}->[-1]->{update_id};
-
-                $self->{_offset} = ++$update_id if defined $update_id;
-            }
-
-            return $res;
         }
     );
+
+    if ( $res->{data}->{result}->@* ) {
+        my $update_id = $res->{data}->{result}->[-1]->{update_id};
+
+        $self->{_offset} = ++$update_id if defined $update_id;
+    }
+
+    return $res;
 }
 
 sub send_message ( $self, $chat_id, $text ) {

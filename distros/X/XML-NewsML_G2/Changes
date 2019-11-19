@@ -1,5 +1,9 @@
 Revision history for XML::NewsML_G2
 
+v0.3.3  Wed Nov 06 14:30:00 2019
+        XML::NewsML_G2::Creator added
+        Timezone issues in unittests fixed
+
 v0.3.2  Wed Nov 06 14:30:00 2019
         Support for NewsML-G2 2.28 added
         Support for Facetted Concepts added

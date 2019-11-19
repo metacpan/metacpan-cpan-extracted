@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has code_repository => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_code_repository',
     json_ld   => 'codeRepository',
 );
 
@@ -28,7 +28,7 @@ has code_repository => (
 
 has code_sample_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_code_sample_type',
     json_ld   => 'codeSampleType',
 );
 
@@ -36,7 +36,7 @@ has code_sample_type => (
 
 has programming_language => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_programming_language',
     json_ld   => 'programmingLanguage',
 );
 
@@ -44,7 +44,7 @@ has programming_language => (
 
 has runtime => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_runtime',
     json_ld   => 'runtime',
 );
 
@@ -52,7 +52,7 @@ has runtime => (
 
 has runtime_platform => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_runtime_platform',
     json_ld   => 'runtimePlatform',
 );
 
@@ -60,7 +60,7 @@ has runtime_platform => (
 
 has sample_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sample_type',
     json_ld   => 'sampleType',
 );
 
@@ -68,7 +68,7 @@ has sample_type => (
 
 has target_product => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_target_product',
     json_ld   => 'targetProduct',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::SoftwareSourceCode - Computer programming source code
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -114,6 +114,10 @@ A code_repository should be one of the following types:
 
 =back
 
+=head2 C<_has_code_repository>
+
+A predicate for the L</code_repository> attribute.
+
 =head2 C<code_sample_type>
 
 C<codeSampleType>
@@ -128,6 +132,10 @@ A code_sample_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_code_sample_type>
+
+A predicate for the L</code_sample_type> attribute.
 
 =head2 C<programming_language>
 
@@ -145,6 +153,10 @@ A programming_language should be one of the following types:
 
 =back
 
+=head2 C<_has_programming_language>
+
+A predicate for the L</programming_language> attribute.
+
 =head2 C<runtime>
 
 Runtime platform or script interpreter dependencies (Example - Java v1,
@@ -157,6 +169,10 @@ A runtime should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_runtime>
+
+A predicate for the L</runtime> attribute.
 
 =head2 C<runtime_platform>
 
@@ -173,6 +189,10 @@ A runtime_platform should be one of the following types:
 
 =back
 
+=head2 C<_has_runtime_platform>
+
+A predicate for the L</runtime_platform> attribute.
+
 =head2 C<sample_type>
 
 C<sampleType>
@@ -188,6 +208,10 @@ A sample_type should be one of the following types:
 
 =back
 
+=head2 C<_has_sample_type>
+
+A predicate for the L</sample_type> attribute.
+
 =head2 C<target_product>
 
 C<targetProduct>
@@ -202,6 +226,10 @@ A target_product should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::SoftwareApplication']>
 
 =back
+
+=head2 C<_has_target_product>
+
+A predicate for the L</target_product> attribute.
 
 =head1 SEE ALSO
 

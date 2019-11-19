@@ -21,7 +21,7 @@ my $class = 'Bio::Palantir::Explorer::ClusterFasta';
 
     my @expected_symbols = [
         'A', 'C', 'PCP',
-        'Te', 'Te', 'Amt'
+        'TE', 'TE', 'Amt'
     ];
 
     my @expected_evalues = [

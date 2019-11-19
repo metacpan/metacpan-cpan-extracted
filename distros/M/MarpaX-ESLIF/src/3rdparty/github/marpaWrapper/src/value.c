@@ -23,7 +23,7 @@ static marpaWrapperValueOption_t marpaWrapperValueOptionDefault = {
 marpaWrapperValue_t *marpaWrapperValue_newp(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, marpaWrapperValueOption_t *marpaWrapperValueOptionp)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperValue_newp);
+  MARPAWRAPPER_FUNCS(marpaWrapperValue_newp)
   marpaWrapperValue_t  *marpaWrapperValuep = NULL;
   genericLogger_t      *genericLoggerp;
   Marpa_Earley_Set_ID   marpaLatestEarleySetIdi;
@@ -175,7 +175,7 @@ short marpaWrapperValue_valueb(marpaWrapperValue_t               *marpaWrapperVa
 /****************************************************************************/
 {
   /* We take much care to set marpaWrapperValuep->marpaValuep only around the callbacks */
-  MARPAWRAPPER_FUNCS(marpaWrapperValue_valueb);
+  MARPAWRAPPER_FUNCS(marpaWrapperValue_valueb)
   genericLogger_t  *genericLoggerp = NULL;
   int               tnexti;
   Marpa_Value       marpaValuep = NULL;
@@ -352,7 +352,7 @@ short marpaWrapperValue_valueb(marpaWrapperValue_t               *marpaWrapperVa
 short marpaWrapperValue_value_startb(marpaWrapperValue_t *marpaWrapperValuep, int *startip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperValue_value_startb);
+  MARPAWRAPPER_FUNCS(marpaWrapperValue_value_startb)
   genericLogger_t    *genericLoggerp = NULL;
   Marpa_Step_Type     step_type;
   Marpa_Earley_Set_ID start_earley_set;
@@ -401,7 +401,7 @@ short marpaWrapperValue_value_startb(marpaWrapperValue_t *marpaWrapperValuep, in
 short marpaWrapperValue_value_lengthb(marpaWrapperValue_t *marpaWrapperValuep, int *lengthip)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperValue_value_lengthb);
+  MARPAWRAPPER_FUNCS(marpaWrapperValue_value_lengthb)
   genericLogger_t    *genericLoggerp = NULL;
   Marpa_Step_Type     step_type;
   Marpa_Earley_Set_ID start_earley_set;
@@ -460,7 +460,7 @@ short marpaWrapperValue_value_lengthb(marpaWrapperValue_t *marpaWrapperValuep, i
 void marpaWrapperValue_freev(marpaWrapperValue_t *marpaWrapperValuep)
 /****************************************************************************/
 {
-  MARPAWRAPPER_FUNCS(marpaWrapperValue_freev);
+  MARPAWRAPPER_FUNCS(marpaWrapperValue_freev)
   genericLogger_t  *genericLoggerp;
 
   if (marpaWrapperValuep != NULL) {

@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Modulable::Module;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Roles::Modulable::Module::VERSION = '0.193080';
+$Bio::Palantir::Roles::Modulable::Module::VERSION = '0.193230';
 use Moose;
 use namespace::autoclean;
 
@@ -121,7 +121,7 @@ Bio::Palantir::Roles::Modulable::Module - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.193080
+version 0.193230
 
 =head1 SYNOPSIS
 

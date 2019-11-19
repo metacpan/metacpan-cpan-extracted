@@ -21,8 +21,8 @@ no_index:
 requires:
   Sub::Util: '0'
   constant: '0'
-  perl: '5.006'
+  perl: '5.020'
 resources:
   repository: https://github.com/EvanCarroll/unconstant.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

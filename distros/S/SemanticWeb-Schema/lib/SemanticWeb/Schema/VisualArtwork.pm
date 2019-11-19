@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has art_edition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_art_edition',
     json_ld   => 'artEdition',
 );
 
@@ -28,7 +28,7 @@ has art_edition => (
 
 has art_medium => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_art_medium',
     json_ld   => 'artMedium',
 );
 
@@ -36,7 +36,7 @@ has art_medium => (
 
 has artform => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_artform',
     json_ld   => 'artform',
 );
 
@@ -44,7 +44,7 @@ has artform => (
 
 has artist => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_artist',
     json_ld   => 'artist',
 );
 
@@ -52,7 +52,7 @@ has artist => (
 
 has artwork_surface => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_artwork_surface',
     json_ld   => 'artworkSurface',
 );
 
@@ -60,7 +60,7 @@ has artwork_surface => (
 
 has colorist => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_colorist',
     json_ld   => 'colorist',
 );
 
@@ -68,7 +68,7 @@ has colorist => (
 
 has depth => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_depth',
     json_ld   => 'depth',
 );
 
@@ -76,7 +76,7 @@ has depth => (
 
 has height => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_height',
     json_ld   => 'height',
 );
 
@@ -84,7 +84,7 @@ has height => (
 
 has inker => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_inker',
     json_ld   => 'inker',
 );
 
@@ -92,7 +92,7 @@ has inker => (
 
 has letterer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_letterer',
     json_ld   => 'letterer',
 );
 
@@ -100,7 +100,7 @@ has letterer => (
 
 has penciler => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_penciler',
     json_ld   => 'penciler',
 );
 
@@ -108,7 +108,7 @@ has penciler => (
 
 has surface => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_surface',
     json_ld   => 'surface',
 );
 
@@ -116,7 +116,7 @@ has surface => (
 
 has width => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_width',
     json_ld   => 'width',
 );
 
@@ -138,7 +138,7 @@ SemanticWeb::Schema::VisualArtwork - A work of art that is primarily visual in c
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -164,6 +164,10 @@ A art_edition should be one of the following types:
 
 =back
 
+=head2 C<_has_art_edition>
+
+A predicate for the L</art_edition> attribute.
+
 =head2 C<art_medium>
 
 C<artMedium>
@@ -180,6 +184,10 @@ A art_medium should be one of the following types:
 
 =back
 
+=head2 C<_has_art_medium>
+
+A predicate for the L</art_medium> attribute.
+
 =head2 C<artform>
 
 e.g. Painting, Drawing, Sculpture, Print, Photograph, Assemblage, Collage,
@@ -192,6 +200,10 @@ A artform should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_artform>
+
+A predicate for the L</artform> attribute.
 
 =head2 C<artist>
 
@@ -206,6 +218,10 @@ A artist should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_artist>
+
+A predicate for the L</artist> attribute.
 
 =head2 C<artwork_surface>
 
@@ -222,6 +238,10 @@ A artwork_surface should be one of the following types:
 
 =back
 
+=head2 C<_has_artwork_surface>
+
+A predicate for the L</artwork_surface> attribute.
+
 =head2 C<colorist>
 
 The individual who adds color to inked drawings.
@@ -233,6 +253,10 @@ A colorist should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_colorist>
+
+A predicate for the L</colorist> attribute.
 
 =head2 C<depth>
 
@@ -248,6 +272,10 @@ A depth should be one of the following types:
 
 =back
 
+=head2 C<_has_depth>
+
+A predicate for the L</depth> attribute.
+
 =head2 C<height>
 
 The height of the item.
@@ -262,6 +290,10 @@ A height should be one of the following types:
 
 =back
 
+=head2 C<_has_height>
+
+A predicate for the L</height> attribute.
+
 =head2 C<inker>
 
 The individual who traces over the pencil drawings in ink after pencils are
@@ -274,6 +306,10 @@ A inker should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_inker>
+
+A predicate for the L</inker> attribute.
 
 =head2 C<letterer>
 
@@ -288,6 +324,10 @@ A letterer should be one of the following types:
 
 =back
 
+=head2 C<_has_letterer>
+
+A predicate for the L</letterer> attribute.
+
 =head2 C<penciler>
 
 The individual who draws the primary narrative artwork.
@@ -299,6 +339,10 @@ A penciler should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_penciler>
+
+A predicate for the L</penciler> attribute.
 
 =head2 C<surface>
 
@@ -313,6 +357,10 @@ A surface should be one of the following types:
 
 =back
 
+=head2 C<_has_surface>
+
+A predicate for the L</surface> attribute.
+
 =head2 C<width>
 
 The width of the item.
@@ -326,6 +374,10 @@ A width should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_width>
+
+A predicate for the L</width> attribute.
 
 =head1 SEE ALSO
 

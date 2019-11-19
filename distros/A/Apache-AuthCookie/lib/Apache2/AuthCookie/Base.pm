@@ -1,5 +1,5 @@
 package Apache2::AuthCookie::Base;
-$Apache2::AuthCookie::Base::VERSION = '3.27';
+$Apache2::AuthCookie::Base::VERSION = '3.28';
 # ABSTRACT: Common Methods Shared by Apache2 and Apache2_4 AuthCookie Subclasses.
 
 use strict;
@@ -155,6 +155,15 @@ sub cookie_string {
     # http://msdn.microsoft.com/workshop/author/dhtml/httponly_cookies.asp
     if ($r->dir_config("${auth_name}HttpOnly")) {
         $string .= '; HttpOnly';
+    }
+
+    # SameSite is an anti-CSRF cookie property.  See
+    # https://www.owasp.org/index.php/SameSite
+    if (my $samesite = $r->dir_config("${auth_name}SameSite")) {
+        if ($samesite =~ /\A(strict|lax)\z/i) {
+            $samesite = lc($1);
+            $string .= "; SameSite=$samesite";
+        }
     }
 
     return $string;
@@ -524,13 +533,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Apache2::AuthCookie::Base - Common Methods Shared by Apache2 and Apache2_4 AuthCookie Subclasses.
 
 =head1 VERSION
 
-version 3.27
+version 3.28
 
 =head1 DESCRIPTION
 
@@ -702,13 +713,17 @@ uris, only special hosts or only limited set of characters.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/apache-authcookie>
-and may be cloned from L<git://github.com/mschout/apache-authcookie.git>
+The development version is on github at L<https://https://github.com/mschout/apache-authcookie>
+and may be cloned from L<git://https://github.com/mschout/apache-authcookie.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-apache-authcookie@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Apache-AuthCookie
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/apache-authcookie/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

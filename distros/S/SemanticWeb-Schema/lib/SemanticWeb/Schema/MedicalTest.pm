@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has affected_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_affected_by',
     json_ld   => 'affectedBy',
 );
 
@@ -28,7 +28,7 @@ has affected_by => (
 
 has normal_range => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_normal_range',
     json_ld   => 'normalRange',
 );
 
@@ -36,7 +36,7 @@ has normal_range => (
 
 has sign_detected => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sign_detected',
     json_ld   => 'signDetected',
 );
 
@@ -44,7 +44,7 @@ has sign_detected => (
 
 has used_to_diagnose => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_used_to_diagnose',
     json_ld   => 'usedToDiagnose',
 );
 
@@ -52,7 +52,7 @@ has used_to_diagnose => (
 
 has uses_device => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_uses_device',
     json_ld   => 'usesDevice',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::MedicalTest - Any medical test
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -96,6 +96,10 @@ A affected_by should be one of the following types:
 
 =back
 
+=head2 C<_has_affected_by>
+
+A predicate for the L</affected_by> attribute.
+
 =head2 C<normal_range>
 
 C<normalRange>
@@ -112,6 +116,10 @@ A normal_range should be one of the following types:
 
 =back
 
+=head2 C<_has_normal_range>
+
+A predicate for the L</normal_range> attribute.
+
 =head2 C<sign_detected>
 
 C<signDetected>
@@ -125,6 +133,10 @@ A sign_detected should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalSign']>
 
 =back
+
+=head2 C<_has_sign_detected>
+
+A predicate for the L</sign_detected> attribute.
 
 =head2 C<used_to_diagnose>
 
@@ -140,6 +152,10 @@ A used_to_diagnose should be one of the following types:
 
 =back
 
+=head2 C<_has_used_to_diagnose>
+
+A predicate for the L</used_to_diagnose> attribute.
+
 =head2 C<uses_device>
 
 C<usesDevice>
@@ -153,6 +169,10 @@ A uses_device should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalDevice']>
 
 =back
+
+=head2 C<_has_uses_device>
+
+A predicate for the L</uses_device> attribute.
 
 =head1 SEE ALSO
 

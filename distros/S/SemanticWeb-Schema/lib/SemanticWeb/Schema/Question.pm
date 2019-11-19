@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has accepted_answer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_accepted_answer',
     json_ld   => 'acceptedAnswer',
 );
 
@@ -28,7 +28,7 @@ has accepted_answer => (
 
 has answer_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_answer_count',
     json_ld   => 'answerCount',
 );
 
@@ -36,7 +36,7 @@ has answer_count => (
 
 has downvote_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_downvote_count',
     json_ld   => 'downvoteCount',
 );
 
@@ -44,7 +44,7 @@ has downvote_count => (
 
 has suggested_answer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_suggested_answer',
     json_ld   => 'suggestedAnswer',
 );
 
@@ -52,7 +52,7 @@ has suggested_answer => (
 
 has upvote_count => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_upvote_count',
     json_ld   => 'upvoteCount',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::Question - A specific question - e
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -101,6 +101,10 @@ A accepted_answer should be one of the following types:
 
 =back
 
+=head2 C<_has_accepted_answer>
+
+A predicate for the L</accepted_answer> attribute.
+
 =head2 C<answer_count>
 
 C<answerCount>
@@ -114,6 +118,10 @@ A answer_count should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_answer_count>
+
+A predicate for the L</answer_count> attribute.
 
 =head2 C<downvote_count>
 
@@ -129,6 +137,10 @@ A downvote_count should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_downvote_count>
+
+A predicate for the L</downvote_count> attribute.
 
 =head2 C<suggested_answer>
 
@@ -147,6 +159,10 @@ A suggested_answer should be one of the following types:
 
 =back
 
+=head2 C<_has_suggested_answer>
+
+A predicate for the L</suggested_answer> attribute.
+
 =head2 C<upvote_count>
 
 C<upvoteCount>
@@ -161,6 +177,10 @@ A upvote_count should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_upvote_count>
+
+A predicate for the L</upvote_count> attribute.
 
 =head1 SEE ALSO
 

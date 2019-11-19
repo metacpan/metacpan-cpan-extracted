@@ -56,10 +56,10 @@ example_data/results/bgc_db_tables/Lineages
 example_data/results/bgc_db_tables/Modules
 example_data/results/bgc_db_tables/Modules_plus
 example_data/results/bgc_db_tables/Sequences
-example_data/results/bgc_db_tables/load_db.sql
 example_data/results/bgc_maps/Cluster1_NRPS.png
 example_data/results/cluster10_denormalized_table.tsv
 example_data/results/cluster10_gene_sequences.fasta
+example_data/results/load_db.sql
 lib/Bio/Palantir.pm
 lib/Bio/Palantir/Explorer.pm
 lib/Bio/Palantir/Explorer/ClusterFasta.pm

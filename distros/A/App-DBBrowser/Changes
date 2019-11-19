@@ -1,6 +1,24 @@
 Revision history for App-DBBrowser
 
 
+2.226    2019-11-17
+        - Bugfix in filter split_column.
+
+2.225    2019-11-17
+        - Code refactoring.
+        - Update required Term::Choose-Util-versions.
+
+2.224    2019-11-17
+        - Filter "Choose Rows": preselect non-empty rows if the data contains empty rows.
+
+2.223    2019-11-16
+        - Update documentation.
+        - Coming back from a not completed "create table": keep track of sheet index.
+
+2.222    2019-11-16
+        - Bugfix in 'print_filter_info'.
+        - Filter "Row Groups": allow to choose more then one group.
+
 2.221    2019-11-15
         - Create table: no extra confirm for the insert.
         - Menu-updates for: create table, fetch data, parse data, filter data.

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has health_plan_cost_sharing => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_cost_sharing',
     json_ld   => 'healthPlanCostSharing',
 );
 
@@ -28,7 +28,7 @@ has health_plan_cost_sharing => (
 
 has health_plan_network_id => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_network_id',
     json_ld   => 'healthPlanNetworkId',
 );
 
@@ -36,7 +36,7 @@ has health_plan_network_id => (
 
 has health_plan_network_tier => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_plan_network_tier',
     json_ld   => 'healthPlanNetworkTier',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::HealthPlanNetwork - A US-style health insurance plan networ
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -81,6 +81,10 @@ A health_plan_cost_sharing should be one of the following types:
 
 =back
 
+=head2 C<_has_health_plan_cost_sharing>
+
+A predicate for the L</health_plan_cost_sharing> attribute.
+
 =head2 C<health_plan_network_id>
 
 C<healthPlanNetworkId>
@@ -96,6 +100,10 @@ A health_plan_network_id should be one of the following types:
 
 =back
 
+=head2 C<_has_health_plan_network_id>
+
+A predicate for the L</health_plan_network_id> attribute.
+
 =head2 C<health_plan_network_tier>
 
 C<healthPlanNetworkTier>
@@ -109,6 +117,10 @@ A health_plan_network_tier should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_health_plan_network_tier>
+
+A predicate for the L</health_plan_network_tier> attribute.
 
 =head1 SEE ALSO
 

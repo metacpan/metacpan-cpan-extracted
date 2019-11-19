@@ -33,5 +33,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Choose-Util
-version: '0.105'
+version: '0.106'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

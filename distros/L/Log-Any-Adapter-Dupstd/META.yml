@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,13 +28,13 @@ no_index:
 provides:
   Log::Any::Adapter::Duperr:
     file: lib/Log/Any/Adapter/Duperr.pm
-    version: '0.04'
+    version: '0.05'
   Log::Any::Adapter::Dupout:
     file: lib/Log/Any/Adapter/Dupout.pm
-    version: '0.04'
+    version: '0.05'
   Log::Any::Adapter::Dupstd:
     file: lib/Log/Any/Adapter/Dupstd.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Log::Any: '1.032'
   perl: '5.008001'
@@ -43,10 +43,12 @@ resources:
   bugtracker: https://github.com/ivanych/Log-Any-Adapter-Dupstd/issues
   homepage: https://github.com/ivanych/Log-Any-Adapter-Dupstd
   repository: git://github.com/ivanych/Log-Any-Adapter-Dupstd.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:IVANYCH
 x_contributors:
   - 'Mikhail Ivanov <m.ivanov@i-free.com>'
   - 'Mikhail Ivanov <m.ivanych@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Yaroslav O. Kosmina <kosmina.yaroslav@220-volt.ru>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

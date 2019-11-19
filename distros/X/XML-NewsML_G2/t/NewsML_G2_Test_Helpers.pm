@@ -271,6 +271,12 @@ sub _create_ni {
     ok( $ni->add_desk($desk),  'add_desk works' );
 
     $ni->add_author($_) foreach (qw(dw dk wh));
+    $ni->add_author(
+        XML::NewsML_G2::Creator->new(
+            name => 'Max Musterman',
+            kind => 'staff'
+        )
+    ) unless ( $opts{no_required_scheme} );
     ok( $ni->authors, 'add_author works' );
 
     $ni->add_keyword($_) foreach (@keywords);
@@ -409,7 +415,7 @@ sub test_ni_picture {
     my ( $ni, $testname ) = @_;
 
     my %schemes;
-    foreach (qw(crel desk geo svc role ind org topic hltype)) {
+    foreach (qw(crel desk geo svc role ind org topic hltype gyibt)) {
         $schemes{$_} = XML::NewsML_G2::Scheme->new(
             alias => "apa$_",
             uri   => "http://cv.apa.at/$_/"

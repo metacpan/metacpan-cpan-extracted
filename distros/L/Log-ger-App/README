@@ -2,7 +2,7 @@ NAME
     Log::ger::App - An easy way to use Log::ger in applications
 
 VERSION
-    version 0.011
+    version 0.013
 
 SYNOPSIS
     In your script:
@@ -114,6 +114,16 @@ FUNCTIONS
          myprog: Doing task 2 ...
          myprog: Exiting ...
 
+    *   file_name
+
+        str. Explicitly set log filename. By default, filename will be set
+        to *name*.log.
+
+    *   file_dir
+
+        str. Explicitly set log file's directory. By default, it is user's
+        home (if not running as root), or /var/log (if running as root).
+
     *   daemon
 
         bool. Explicitly tell Log::ger::App that your application is a
@@ -171,6 +181,34 @@ ENVIRONMENT
   SYSLOG_VERBOSE
   SYSLOG_QUIET
 FAQS
+  How do I turn off file logging?
+    By default, file logging is on unless running as a Perl one-liner (under
+    "perl"'s "-e").
+
+    To explicitly turn file logging off, you can set *FILE_LEVEL*
+    environment variable to "off", for example:
+
+     BEGIN { $ENV{FILE_LEVEL} //= "off" }
+     use Log::ger::App;
+
+  How do I turn off screen logging?
+    By default, screen logging is on unless script is a daemon.
+
+    To explicitly turn screen logging off, you can set *SCREEN_LEVEL*
+    environment variable to "off", for example:
+
+     BEGIN { $ENV{SCREEN_LEVEL} //= "off" }
+     use Log::ger::App;
+
+  How do I turn off syslog logging?
+    By default, syslog logging is on if script is a daemon.
+
+    To explicitly turn syslog logging off, you can set *SYSLOG_LEVEL*
+    environment variable to "off", for example:
+
+     BEGIN { $ENV{SYSLOG_LEVEL} //= "off" }
+     use Log::ger::App;
+
   Why doesn't re-setting log level using Log::ger::Util::set_level() work?
     (This FAQ item is from Log::ger::Output::Composite's, slightly
     modified).

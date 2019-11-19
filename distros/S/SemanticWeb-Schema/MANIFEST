@@ -821,6 +821,7 @@ lib/SemanticWeb/Schema/Zoo.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-simple.t
+t/02-conflicting-attriubte.t
 t/author-clean-namespaces.t
 t/author-eof.t
 t/author-minimum-version.t

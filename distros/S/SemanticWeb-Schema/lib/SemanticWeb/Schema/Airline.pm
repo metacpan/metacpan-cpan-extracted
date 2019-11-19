@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has boarding_policy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_boarding_policy',
     json_ld   => 'boardingPolicy',
 );
 
@@ -28,7 +28,7 @@ has boarding_policy => (
 
 has iata_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_iata_code',
     json_ld   => 'iataCode',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::Airline - An organization that provides flights for passeng
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,10 @@ A boarding_policy should be one of the following types:
 
 =back
 
+=head2 C<_has_boarding_policy>
+
+A predicate for the L</boarding_policy> attribute.
+
 =head2 C<iata_code>
 
 C<iataCode>
@@ -86,6 +90,10 @@ A iata_code should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_iata_code>
+
+A predicate for the L</iata_code> attribute.
 
 =head1 SEE ALSO
 

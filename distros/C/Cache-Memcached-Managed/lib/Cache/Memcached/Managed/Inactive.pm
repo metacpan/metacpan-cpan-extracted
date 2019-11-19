@@ -2,7 +2,7 @@ package Cache::Memcached::Managed::Inactive;
 
 # Make sure we have version info for this module
 
-$VERSION= '0.25';
+$VERSION= '0.26';
 
 #--------------------------------------------------------------------------
 BEGIN { # We're fooling the Kwalitee checker into thinking we're strict

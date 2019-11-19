@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has author => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_author',
     json_ld   => 'author',
 );
 
@@ -28,7 +28,7 @@ has author => (
 
 has best_rating => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_best_rating',
     json_ld   => 'bestRating',
 );
 
@@ -36,7 +36,7 @@ has best_rating => (
 
 has rating_explanation => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_rating_explanation',
     json_ld   => 'ratingExplanation',
 );
 
@@ -44,7 +44,7 @@ has rating_explanation => (
 
 has rating_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_rating_value',
     json_ld   => 'ratingValue',
 );
 
@@ -52,7 +52,7 @@ has rating_value => (
 
 has review_aspect => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_review_aspect',
     json_ld   => 'reviewAspect',
 );
 
@@ -60,7 +60,7 @@ has review_aspect => (
 
 has worst_rating => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_worst_rating',
     json_ld   => 'worstRating',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::Rating - A rating is an evaluation on a numeric scale
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -106,6 +106,10 @@ A author should be one of the following types:
 
 =back
 
+=head2 C<_has_author>
+
+A predicate for the L</author> attribute.
+
 =head2 C<best_rating>
 
 C<bestRating>
@@ -122,6 +126,10 @@ A best_rating should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_best_rating>
+
+A predicate for the L</best_rating> attribute.
 
 =head2 C<rating_explanation>
 
@@ -140,6 +148,10 @@ A rating_explanation should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_rating_explanation>
+
+A predicate for the L</rating_explanation> attribute.
 
 =head2 C<rating_value>
 
@@ -162,6 +174,10 @@ A rating_value should be one of the following types:
 
 =back
 
+=head2 C<_has_rating_value>
+
+A predicate for the L</rating_value> attribute.
+
 =head2 C<review_aspect>
 
 C<reviewAspect>
@@ -176,6 +192,10 @@ A review_aspect should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_review_aspect>
+
+A predicate for the L</review_aspect> attribute.
 
 =head2 C<worst_rating>
 
@@ -193,6 +213,10 @@ A worst_rating should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_worst_rating>
+
+A predicate for the L</worst_rating> attribute.
 
 =head1 SEE ALSO
 

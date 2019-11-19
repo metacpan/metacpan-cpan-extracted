@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has athlete => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_athlete',
     json_ld   => 'athlete',
 );
 
@@ -28,7 +28,7 @@ has athlete => (
 
 has coach => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_coach',
     json_ld   => 'coach',
 );
 
@@ -36,7 +36,7 @@ has coach => (
 
 has gender => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_gender',
     json_ld   => 'gender',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::SportsTeam - Organization: Sports team.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -79,6 +79,10 @@ A athlete should be one of the following types:
 
 =back
 
+=head2 C<_has_athlete>
+
+A predicate for the L</athlete> attribute.
+
 =head2 C<coach>
 
 A person that acts in a coaching role for a sports team.
@@ -90,6 +94,10 @@ A coach should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_coach>
+
+A predicate for the L</coach> attribute.
 
 =head2 C<gender>
 
@@ -114,6 +122,10 @@ A gender should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_gender>
+
+A predicate for the L</gender> attribute.
 
 =head1 SEE ALSO
 

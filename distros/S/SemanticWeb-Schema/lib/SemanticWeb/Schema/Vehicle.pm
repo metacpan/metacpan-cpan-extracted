@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has acceleration_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_acceleration_time',
     json_ld   => 'accelerationTime',
 );
 
@@ -28,7 +28,7 @@ has acceleration_time => (
 
 has body_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_body_type',
     json_ld   => 'bodyType',
 );
 
@@ -36,7 +36,7 @@ has body_type => (
 
 has call_sign => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_call_sign',
     json_ld   => 'callSign',
 );
 
@@ -44,7 +44,7 @@ has call_sign => (
 
 has cargo_volume => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_cargo_volume',
     json_ld   => 'cargoVolume',
 );
 
@@ -52,7 +52,7 @@ has cargo_volume => (
 
 has date_vehicle_first_registered => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_vehicle_first_registered',
     json_ld   => 'dateVehicleFirstRegistered',
 );
 
@@ -60,7 +60,7 @@ has date_vehicle_first_registered => (
 
 has drive_wheel_configuration => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_drive_wheel_configuration',
     json_ld   => 'driveWheelConfiguration',
 );
 
@@ -68,7 +68,7 @@ has drive_wheel_configuration => (
 
 has emissions_co2 => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_emissions_co2',
     json_ld   => 'emissionsCO2',
 );
 
@@ -76,7 +76,7 @@ has emissions_co2 => (
 
 has fuel_capacity => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_fuel_capacity',
     json_ld   => 'fuelCapacity',
 );
 
@@ -84,7 +84,7 @@ has fuel_capacity => (
 
 has fuel_consumption => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_fuel_consumption',
     json_ld   => 'fuelConsumption',
 );
 
@@ -92,7 +92,7 @@ has fuel_consumption => (
 
 has fuel_efficiency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_fuel_efficiency',
     json_ld   => 'fuelEfficiency',
 );
 
@@ -100,7 +100,7 @@ has fuel_efficiency => (
 
 has fuel_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_fuel_type',
     json_ld   => 'fuelType',
 );
 
@@ -108,7 +108,7 @@ has fuel_type => (
 
 has known_vehicle_damages => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_known_vehicle_damages',
     json_ld   => 'knownVehicleDamages',
 );
 
@@ -116,7 +116,7 @@ has known_vehicle_damages => (
 
 has meets_emission_standard => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_meets_emission_standard',
     json_ld   => 'meetsEmissionStandard',
 );
 
@@ -124,7 +124,7 @@ has meets_emission_standard => (
 
 has mileage_from_odometer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_mileage_from_odometer',
     json_ld   => 'mileageFromOdometer',
 );
 
@@ -132,7 +132,7 @@ has mileage_from_odometer => (
 
 has model_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_model_date',
     json_ld   => 'modelDate',
 );
 
@@ -140,7 +140,7 @@ has model_date => (
 
 has number_of_airbags => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_airbags',
     json_ld   => 'numberOfAirbags',
 );
 
@@ -148,7 +148,7 @@ has number_of_airbags => (
 
 has number_of_axles => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_axles',
     json_ld   => 'numberOfAxles',
 );
 
@@ -156,7 +156,7 @@ has number_of_axles => (
 
 has number_of_doors => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_doors',
     json_ld   => 'numberOfDoors',
 );
 
@@ -164,7 +164,7 @@ has number_of_doors => (
 
 has number_of_forward_gears => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_forward_gears',
     json_ld   => 'numberOfForwardGears',
 );
 
@@ -172,7 +172,7 @@ has number_of_forward_gears => (
 
 has number_of_previous_owners => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_previous_owners',
     json_ld   => 'numberOfPreviousOwners',
 );
 
@@ -180,7 +180,7 @@ has number_of_previous_owners => (
 
 has payload => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_payload',
     json_ld   => 'payload',
 );
 
@@ -188,7 +188,7 @@ has payload => (
 
 has production_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_production_date',
     json_ld   => 'productionDate',
 );
 
@@ -196,7 +196,7 @@ has production_date => (
 
 has purchase_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_purchase_date',
     json_ld   => 'purchaseDate',
 );
 
@@ -204,7 +204,7 @@ has purchase_date => (
 
 has seating_capacity => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_seating_capacity',
     json_ld   => 'seatingCapacity',
 );
 
@@ -212,7 +212,7 @@ has seating_capacity => (
 
 has speed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_speed',
     json_ld   => 'speed',
 );
 
@@ -220,7 +220,7 @@ has speed => (
 
 has steering_position => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_steering_position',
     json_ld   => 'steeringPosition',
 );
 
@@ -228,7 +228,7 @@ has steering_position => (
 
 has tongue_weight => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_tongue_weight',
     json_ld   => 'tongueWeight',
 );
 
@@ -236,7 +236,7 @@ has tongue_weight => (
 
 has trailer_weight => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_trailer_weight',
     json_ld   => 'trailerWeight',
 );
 
@@ -244,7 +244,7 @@ has trailer_weight => (
 
 has vehicle_configuration => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_vehicle_configuration',
     json_ld   => 'vehicleConfiguration',
 );
 
@@ -252,7 +252,7 @@ has vehicle_configuration => (
 
 has vehicle_engine => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_vehicle_engine',
     json_ld   => 'vehicleEngine',
 );
 
@@ -260,7 +260,7 @@ has vehicle_engine => (
 
 has vehicle_identification_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_vehicle_identification_number',
     json_ld   => 'vehicleIdentificationNumber',
 );
 
@@ -268,7 +268,7 @@ has vehicle_identification_number => (
 
 has vehicle_interior_color => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_vehicle_interior_color',
     json_ld   => 'vehicleInteriorColor',
 );
 
@@ -276,7 +276,7 @@ has vehicle_interior_color => (
 
 has vehicle_interior_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_vehicle_interior_type',
     json_ld   => 'vehicleInteriorType',
 );
 
@@ -284,7 +284,7 @@ has vehicle_interior_type => (
 
 has vehicle_model_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_vehicle_model_date',
     json_ld   => 'vehicleModelDate',
 );
 
@@ -292,7 +292,7 @@ has vehicle_model_date => (
 
 has vehicle_seating_capacity => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_vehicle_seating_capacity',
     json_ld   => 'vehicleSeatingCapacity',
 );
 
@@ -300,7 +300,7 @@ has vehicle_seating_capacity => (
 
 has vehicle_special_usage => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_vehicle_special_usage',
     json_ld   => 'vehicleSpecialUsage',
 );
 
@@ -308,7 +308,7 @@ has vehicle_special_usage => (
 
 has vehicle_transmission => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_vehicle_transmission',
     json_ld   => 'vehicleTransmission',
 );
 
@@ -316,7 +316,7 @@ has vehicle_transmission => (
 
 has weight_total => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_weight_total',
     json_ld   => 'weightTotal',
 );
 
@@ -324,7 +324,7 @@ has weight_total => (
 
 has wheelbase => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_wheelbase',
     json_ld   => 'wheelbase',
 );
 
@@ -346,7 +346,7 @@ SemanticWeb::Schema::Vehicle - A vehicle is a device that is designed or used to
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -380,6 +380,10 @@ A acceleration_time should be one of the following types:
 
 =back
 
+=head2 C<_has_acceleration_time>
+
+A predicate for the L</acceleration_time> attribute.
+
 =head2 C<body_type>
 
 C<bodyType>
@@ -397,6 +401,10 @@ A body_type should be one of the following types:
 
 =back
 
+=head2 C<_has_body_type>
+
+A predicate for the L</body_type> attribute.
+
 =head2 C<call_sign>
 
 C<callSign>
@@ -412,6 +420,10 @@ A call_sign should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_call_sign>
+
+A predicate for the L</call_sign> attribute.
 
 =head2 C<cargo_volume>
 
@@ -431,6 +443,10 @@ A cargo_volume should be one of the following types:
 
 =back
 
+=head2 C<_has_cargo_volume>
+
+A predicate for the L</cargo_volume> attribute.
+
 =head2 C<date_vehicle_first_registered>
 
 C<dateVehicleFirstRegistered>
@@ -445,6 +461,10 @@ A date_vehicle_first_registered should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_date_vehicle_first_registered>
+
+A predicate for the L</date_vehicle_first_registered> attribute.
 
 =head2 C<drive_wheel_configuration>
 
@@ -463,6 +483,10 @@ A drive_wheel_configuration should be one of the following types:
 
 =back
 
+=head2 C<_has_drive_wheel_configuration>
+
+A predicate for the L</drive_wheel_configuration> attribute.
+
 =head2 C<emissions_co2>
 
 C<emissionsCO2>
@@ -478,6 +502,10 @@ A emissions_co2 should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_emissions_co2>
+
+A predicate for the L</emissions_co2> attribute.
 
 =head2 C<fuel_capacity>
 
@@ -496,6 +524,10 @@ A fuel_capacity should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_fuel_capacity>
+
+A predicate for the L</fuel_capacity> attribute.
 
 =head2 C<fuel_consumption>
 
@@ -525,6 +557,10 @@ A fuel_consumption should be one of the following types:
 
 =back
 
+=head2 C<_has_fuel_consumption>
+
+A predicate for the L</fuel_consumption> attribute.
+
 =head2 C<fuel_efficiency>
 
 C<fuelEfficiency>
@@ -553,6 +589,10 @@ A fuel_efficiency should be one of the following types:
 
 =back
 
+=head2 C<_has_fuel_efficiency>
+
+A predicate for the L</fuel_efficiency> attribute.
+
 =head2 C<fuel_type>
 
 C<fuelType>
@@ -571,6 +611,10 @@ A fuel_type should be one of the following types:
 
 =back
 
+=head2 C<_has_fuel_type>
+
+A predicate for the L</fuel_type> attribute.
+
 =head2 C<known_vehicle_damages>
 
 C<knownVehicleDamages>
@@ -584,6 +628,10 @@ A known_vehicle_damages should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_known_vehicle_damages>
+
+A predicate for the L</known_vehicle_damages> attribute.
 
 =head2 C<meets_emission_standard>
 
@@ -601,6 +649,10 @@ A meets_emission_standard should be one of the following types:
 
 =back
 
+=head2 C<_has_meets_emission_standard>
+
+A predicate for the L</meets_emission_standard> attribute.
+
 =head2 C<mileage_from_odometer>
 
 C<mileageFromOdometer>
@@ -617,6 +669,10 @@ A mileage_from_odometer should be one of the following types:
 
 =back
 
+=head2 C<_has_mileage_from_odometer>
+
+A predicate for the L</mileage_from_odometer> attribute.
+
 =head2 C<model_date>
 
 C<modelDate>
@@ -631,6 +687,10 @@ A model_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_model_date>
+
+A predicate for the L</model_date> attribute.
 
 =head2 C<number_of_airbags>
 
@@ -648,6 +708,10 @@ A number_of_airbags should be one of the following types:
 
 =back
 
+=head2 C<_has_number_of_airbags>
+
+A predicate for the L</number_of_airbags> attribute.
+
 =head2 C<number_of_axles>
 
 C<numberOfAxles>
@@ -664,6 +728,10 @@ A number_of_axles should be one of the following types:
 
 =back
 
+=head2 C<_has_number_of_axles>
+
+A predicate for the L</number_of_axles> attribute.
+
 =head2 C<number_of_doors>
 
 C<numberOfDoors>
@@ -679,6 +747,10 @@ A number_of_doors should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_number_of_doors>
+
+A predicate for the L</number_of_doors> attribute.
 
 =head2 C<number_of_forward_gears>
 
@@ -697,6 +769,10 @@ A number_of_forward_gears should be one of the following types:
 
 =back
 
+=head2 C<_has_number_of_forward_gears>
+
+A predicate for the L</number_of_forward_gears> attribute.
+
 =head2 C<number_of_previous_owners>
 
 C<numberOfPreviousOwners>
@@ -713,6 +789,10 @@ A number_of_previous_owners should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_number_of_previous_owners>
+
+A predicate for the L</number_of_previous_owners> attribute.
 
 =head2 C<payload>
 
@@ -742,6 +822,10 @@ A payload should be one of the following types:
 
 =back
 
+=head2 C<_has_payload>
+
+A predicate for the L</payload> attribute.
+
 =head2 C<production_date>
 
 C<productionDate>
@@ -756,6 +840,10 @@ A production_date should be one of the following types:
 
 =back
 
+=head2 C<_has_production_date>
+
+A predicate for the L</production_date> attribute.
+
 =head2 C<purchase_date>
 
 C<purchaseDate>
@@ -769,6 +857,10 @@ A purchase_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_purchase_date>
+
+A predicate for the L</purchase_date> attribute.
 
 =head2 C<seating_capacity>
 
@@ -787,6 +879,10 @@ A seating_capacity should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_seating_capacity>
+
+A predicate for the L</seating_capacity> attribute.
 
 =head2 C<speed>
 
@@ -811,6 +907,10 @@ A speed should be one of the following types:
 
 =back
 
+=head2 C<_has_speed>
+
+A predicate for the L</speed> attribute.
+
 =head2 C<steering_position>
 
 C<steeringPosition>
@@ -824,6 +924,10 @@ A steering_position should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::SteeringPositionValue']>
 
 =back
+
+=head2 C<_has_steering_position>
+
+A predicate for the L</steering_position> attribute.
 
 =head2 C<tongue_weight>
 
@@ -853,6 +957,10 @@ A tongue_weight should be one of the following types:
 
 =back
 
+=head2 C<_has_tongue_weight>
+
+A predicate for the L</tongue_weight> attribute.
+
 =head2 C<trailer_weight>
 
 C<trailerWeight>
@@ -878,6 +986,10 @@ A trailer_weight should be one of the following types:
 
 =back
 
+=head2 C<_has_trailer_weight>
+
+A predicate for the L</trailer_weight> attribute.
+
 =head2 C<vehicle_configuration>
 
 C<vehicleConfiguration>
@@ -893,6 +1005,10 @@ A vehicle_configuration should be one of the following types:
 
 =back
 
+=head2 C<_has_vehicle_configuration>
+
+A predicate for the L</vehicle_configuration> attribute.
+
 =head2 C<vehicle_engine>
 
 C<vehicleEngine>
@@ -906,6 +1022,10 @@ A vehicle_engine should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::EngineSpecification']>
 
 =back
+
+=head2 C<_has_vehicle_engine>
+
+A predicate for the L</vehicle_engine> attribute.
 
 =head2 C<vehicle_identification_number>
 
@@ -922,6 +1042,10 @@ A vehicle_identification_number should be one of the following types:
 
 =back
 
+=head2 C<_has_vehicle_identification_number>
+
+A predicate for the L</vehicle_identification_number> attribute.
+
 =head2 C<vehicle_interior_color>
 
 C<vehicleInteriorColor>
@@ -935,6 +1059,10 @@ A vehicle_interior_color should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_vehicle_interior_color>
+
+A predicate for the L</vehicle_interior_color> attribute.
 
 =head2 C<vehicle_interior_type>
 
@@ -953,6 +1081,10 @@ A vehicle_interior_type should be one of the following types:
 
 =back
 
+=head2 C<_has_vehicle_interior_type>
+
+A predicate for the L</vehicle_interior_type> attribute.
+
 =head2 C<vehicle_model_date>
 
 C<vehicleModelDate>
@@ -967,6 +1099,10 @@ A vehicle_model_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_vehicle_model_date>
+
+A predicate for the L</vehicle_model_date> attribute.
 
 =head2 C<vehicle_seating_capacity>
 
@@ -985,6 +1121,10 @@ A vehicle_seating_capacity should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_vehicle_seating_capacity>
+
+A predicate for the L</vehicle_seating_capacity> attribute.
 
 =head2 C<vehicle_special_usage>
 
@@ -1005,6 +1145,10 @@ A vehicle_special_usage should be one of the following types:
 
 =back
 
+=head2 C<_has_vehicle_special_usage>
+
+A predicate for the L</vehicle_special_usage> attribute.
+
 =head2 C<vehicle_transmission>
 
 C<vehicleTransmission>
@@ -1021,6 +1165,10 @@ A vehicle_transmission should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_vehicle_transmission>
+
+A predicate for the L</vehicle_transmission> attribute.
 
 =head2 C<weight_total>
 
@@ -1049,6 +1197,10 @@ A weight_total should be one of the following types:
 
 =back
 
+=head2 C<_has_weight_total>
+
+A predicate for the L</weight_total> attribute.
+
 =head2 C<wheelbase>
 
 =for html <p>The distance between the centers of the front and rear wheels.<br/><br/>
@@ -1062,6 +1214,10 @@ A wheelbase should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_wheelbase>
+
+A predicate for the L</wheelbase> attribute.
 
 =head1 SEE ALSO
 

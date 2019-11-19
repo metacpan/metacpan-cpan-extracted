@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has drains_to => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_drains_to',
     json_ld   => 'drainsTo',
 );
 
@@ -28,7 +28,7 @@ has drains_to => (
 
 has region_drained => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_region_drained',
     json_ld   => 'regionDrained',
 );
 
@@ -36,7 +36,7 @@ has region_drained => (
 
 has tributary => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_tributary',
     json_ld   => 'tributary',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::Vein - A type of blood vessel that specifically carries blo
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -80,6 +80,10 @@ A drains_to should be one of the following types:
 
 =back
 
+=head2 C<_has_drains_to>
+
+A predicate for the L</drains_to> attribute.
+
 =head2 C<region_drained>
 
 C<regionDrained>
@@ -97,6 +101,10 @@ A region_drained should be one of the following types:
 
 =back
 
+=head2 C<_has_region_drained>
+
+A predicate for the L</region_drained> attribute.
+
 =head2 C<tributary>
 
 The anatomical or organ system that the vein flows into; a larger structure
@@ -109,6 +117,10 @@ A tributary should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AnatomicalStructure']>
 
 =back
+
+=head2 C<_has_tributary>
+
+A predicate for the L</tributary> attribute.
 
 =head1 SEE ALSO
 

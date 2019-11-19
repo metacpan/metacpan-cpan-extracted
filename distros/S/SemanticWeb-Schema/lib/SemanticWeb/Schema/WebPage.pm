@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has breadcrumb => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_breadcrumb',
     json_ld   => 'breadcrumb',
 );
 
@@ -28,7 +28,7 @@ has breadcrumb => (
 
 has last_reviewed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_last_reviewed',
     json_ld   => 'lastReviewed',
 );
 
@@ -36,7 +36,7 @@ has last_reviewed => (
 
 has main_content_of_page => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_main_content_of_page',
     json_ld   => 'mainContentOfPage',
 );
 
@@ -44,7 +44,7 @@ has main_content_of_page => (
 
 has primary_image_of_page => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_primary_image_of_page',
     json_ld   => 'primaryImageOfPage',
 );
 
@@ -52,7 +52,7 @@ has primary_image_of_page => (
 
 has related_link => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_related_link',
     json_ld   => 'relatedLink',
 );
 
@@ -60,7 +60,7 @@ has related_link => (
 
 has reviewed_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_reviewed_by',
     json_ld   => 'reviewedBy',
 );
 
@@ -68,7 +68,7 @@ has reviewed_by => (
 
 has significant_link => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_significant_link',
     json_ld   => 'significantLink',
 );
 
@@ -76,7 +76,7 @@ has significant_link => (
 
 has significant_links => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_significant_links',
     json_ld   => 'significantLinks',
 );
 
@@ -84,7 +84,7 @@ has significant_links => (
 
 has speakable => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_speakable',
     json_ld   => 'speakable',
 );
 
@@ -92,7 +92,7 @@ has speakable => (
 
 has specialty => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_specialty',
     json_ld   => 'specialty',
 );
 
@@ -114,7 +114,7 @@ SemanticWeb::Schema::WebPage - A web page
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -141,6 +141,10 @@ A breadcrumb should be one of the following types:
 
 =back
 
+=head2 C<_has_breadcrumb>
+
+A predicate for the L</breadcrumb> attribute.
+
 =head2 C<last_reviewed>
 
 C<lastReviewed>
@@ -156,6 +160,10 @@ A last_reviewed should be one of the following types:
 
 =back
 
+=head2 C<_has_last_reviewed>
+
+A predicate for the L</last_reviewed> attribute.
+
 =head2 C<main_content_of_page>
 
 C<mainContentOfPage>
@@ -169,6 +177,10 @@ A main_content_of_page should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::WebPageElement']>
 
 =back
+
+=head2 C<_has_main_content_of_page>
+
+A predicate for the L</main_content_of_page> attribute.
 
 =head2 C<primary_image_of_page>
 
@@ -184,6 +196,10 @@ A primary_image_of_page should be one of the following types:
 
 =back
 
+=head2 C<_has_primary_image_of_page>
+
+A predicate for the L</primary_image_of_page> attribute.
+
 =head2 C<related_link>
 
 C<relatedLink>
@@ -197,6 +213,10 @@ A related_link should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_related_link>
+
+A predicate for the L</related_link> attribute.
 
 =head2 C<reviewed_by>
 
@@ -215,6 +235,10 @@ A reviewed_by should be one of the following types:
 
 =back
 
+=head2 C<_has_reviewed_by>
+
+A predicate for the L</reviewed_by> attribute.
+
 =head2 C<significant_link>
 
 C<significantLink>
@@ -230,6 +254,10 @@ A significant_link should be one of the following types:
 
 =back
 
+=head2 C<_has_significant_link>
+
+A predicate for the L</significant_link> attribute.
+
 =head2 C<significant_links>
 
 C<significantLinks>
@@ -244,6 +272,10 @@ A significant_links should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_significant_links>
+
+A predicate for the L</significant_links> attribute.
 
 =head2 C<speakable>
 
@@ -280,6 +312,10 @@ A speakable should be one of the following types:
 
 =back
 
+=head2 C<_has_speakable>
+
+A predicate for the L</speakable> attribute.
+
 =head2 C<specialty>
 
 One of the domain specialities to which this web page's content applies.
@@ -291,6 +327,10 @@ A specialty should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Specialty']>
 
 =back
+
+=head2 C<_has_specialty>
+
+A predicate for the L</specialty> attribute.
 
 =head1 SEE ALSO
 

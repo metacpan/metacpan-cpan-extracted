@@ -8,7 +8,7 @@ extends 'XML::NewsML_G2::News_Item';
 has '+nature',  default => 'picture';
 has '+remotes', isa     => 'HashRef[XML::NewsML_G2::Picture]';
 
-has 'photographer', isa => 'Str', is => 'rw';
+has 'photographer', isa => 'XML::NewsML_G2::Creator', is => 'rw', coerce => 1;
 
 __PACKAGE__->meta->make_immutable;
 

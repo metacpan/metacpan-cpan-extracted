@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has country_of_origin => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_country_of_origin',
     json_ld   => 'countryOfOrigin',
 );
 
@@ -28,7 +28,7 @@ has country_of_origin => (
 
 has part_of_tv_series => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_part_of_tv_series',
     json_ld   => 'partOfTVSeries',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::TVSeason - Season dedicated to TV broadcast and associated 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,10 @@ A country_of_origin should be one of the following types:
 
 =back
 
+=head2 C<_has_country_of_origin>
+
+A predicate for the L</country_of_origin> attribute.
+
 =head2 C<part_of_tv_series>
 
 C<partOfTVSeries>
@@ -86,6 +90,10 @@ A part_of_tv_series should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::TVSeries']>
 
 =back
+
+=head2 C<_has_part_of_tv_series>
+
+A predicate for the L</part_of_tv_series> attribute.
 
 =head1 SEE ALSO
 

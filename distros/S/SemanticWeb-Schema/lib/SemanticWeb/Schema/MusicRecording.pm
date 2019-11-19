@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has by_artist => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_by_artist',
     json_ld   => 'byArtist',
 );
 
@@ -28,7 +28,7 @@ has by_artist => (
 
 has duration => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_duration',
     json_ld   => 'duration',
 );
 
@@ -36,7 +36,7 @@ has duration => (
 
 has in_album => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_in_album',
     json_ld   => 'inAlbum',
 );
 
@@ -44,7 +44,7 @@ has in_album => (
 
 has in_playlist => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_in_playlist',
     json_ld   => 'inPlaylist',
 );
 
@@ -52,7 +52,7 @@ has in_playlist => (
 
 has isrc_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_isrc_code',
     json_ld   => 'isrcCode',
 );
 
@@ -60,7 +60,7 @@ has isrc_code => (
 
 has recording_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_recording_of',
     json_ld   => 'recordingOf',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::MusicRecording - A music recording (track)
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -106,6 +106,10 @@ A by_artist should be one of the following types:
 
 =back
 
+=head2 C<_has_by_artist>
+
+A predicate for the L</by_artist> attribute.
+
 =head2 C<duration>
 
 =for html <p>The duration of the item (movie, audio recording, event, etc.) in <a
@@ -118,6 +122,10 @@ A duration should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
+
+=head2 C<_has_duration>
+
+A predicate for the L</duration> attribute.
 
 =head2 C<in_album>
 
@@ -133,6 +141,10 @@ A in_album should be one of the following types:
 
 =back
 
+=head2 C<_has_in_album>
+
+A predicate for the L</in_album> attribute.
+
 =head2 C<in_playlist>
 
 C<inPlaylist>
@@ -146,6 +158,10 @@ A in_playlist should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MusicPlaylist']>
 
 =back
+
+=head2 C<_has_in_playlist>
+
+A predicate for the L</in_playlist> attribute.
 
 =head2 C<isrc_code>
 
@@ -161,6 +177,10 @@ A isrc_code should be one of the following types:
 
 =back
 
+=head2 C<_has_isrc_code>
+
+A predicate for the L</isrc_code> attribute.
+
 =head2 C<recording_of>
 
 C<recordingOf>
@@ -174,6 +194,10 @@ A recording_of should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MusicComposition']>
 
 =back
+
+=head2 C<_has_recording_of>
+
+A predicate for the L</recording_of> attribute.
 
 =head1 SEE ALSO
 

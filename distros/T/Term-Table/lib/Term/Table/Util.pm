@@ -4,7 +4,7 @@ use warnings;
 
 use Config qw/%Config/;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use Importer Importer => 'import';
 our @EXPORT_OK = qw/term_size USE_GCS USE_TERM_READKEY USE_TERM_SIZE_ANY uni_length/;

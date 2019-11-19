@@ -1,3 +1,15 @@
+0.23.1 2019-11-19 09:20:20 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - change vertical spacing in form renderer so that no extra space is produced
+   for hidden items
+
+0.23.0 2019-11-18 18:36:01 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - provide current form content on reload so that getters can preserve
+   current values if they so like.
+
+ - properly json decode utf8 arguments in download links
+
 0.22.2 2019-11-13 18:45:20 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - perl 5.0.22 is ok

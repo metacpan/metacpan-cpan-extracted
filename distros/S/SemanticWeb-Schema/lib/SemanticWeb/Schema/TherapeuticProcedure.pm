@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has adverse_outcome => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_adverse_outcome',
     json_ld   => 'adverseOutcome',
 );
 
@@ -28,7 +28,7 @@ has adverse_outcome => (
 
 has dose_schedule => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_dose_schedule',
     json_ld   => 'doseSchedule',
 );
 
@@ -36,7 +36,7 @@ has dose_schedule => (
 
 has drug => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_drug',
     json_ld   => 'drug',
 );
 
@@ -44,7 +44,7 @@ has drug => (
 
 has indication => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_indication',
     json_ld   => 'indication',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::TherapeuticProcedure - A medical procedure intended primari
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -93,6 +93,10 @@ A adverse_outcome should be one of the following types:
 
 =back
 
+=head2 C<_has_adverse_outcome>
+
+A predicate for the L</adverse_outcome> attribute.
+
 =head2 C<dose_schedule>
 
 C<doseSchedule>
@@ -108,6 +112,10 @@ A dose_schedule should be one of the following types:
 
 =back
 
+=head2 C<_has_dose_schedule>
+
+A predicate for the L</dose_schedule> attribute.
+
 =head2 C<drug>
 
 Specifying a drug or medicine used in a medication procedure
@@ -119,6 +127,10 @@ A drug should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Drug']>
 
 =back
+
+=head2 C<_has_drug>
+
+A predicate for the L</drug> attribute.
 
 =head2 C<indication>
 
@@ -135,6 +147,10 @@ A indication should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalIndication']>
 
 =back
+
+=head2 C<_has_indication>
+
+A predicate for the L</indication> attribute.
 
 =head1 SEE ALSO
 

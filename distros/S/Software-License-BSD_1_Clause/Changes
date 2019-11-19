@@ -1,0 +1,9 @@
+0.003     2019-11-19 05:28:29+01:00 Europe/Warsaw
+  - A certain individual on #perl@freenode has told me that excluding dist.ini
+    is a bad idea
+
+0.002     2019-11-19 04:18:25+01:00 Europe/Warsaw
+  - Exclude dist.ini from the release tarball
+
+0.001     2019-11-19 04:05:50+01:00 Europe/Warsaw
+  - This is the first release of Software::License::BSD_1_Clause

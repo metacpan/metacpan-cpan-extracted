@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has additional_property => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_additional_property',
     json_ld   => 'additionalProperty',
 );
 
@@ -28,7 +28,7 @@ has additional_property => (
 
 has max_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_max_value',
     json_ld   => 'maxValue',
 );
 
@@ -36,7 +36,7 @@ has max_value => (
 
 has min_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_min_value',
     json_ld   => 'minValue',
 );
 
@@ -44,7 +44,7 @@ has min_value => (
 
 has unit_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_unit_code',
     json_ld   => 'unitCode',
 );
 
@@ -52,7 +52,7 @@ has unit_code => (
 
 has unit_text => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_unit_text',
     json_ld   => 'unitText',
 );
 
@@ -60,7 +60,7 @@ has unit_text => (
 
 has value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_value',
     json_ld   => 'value',
 );
 
@@ -68,7 +68,7 @@ has value => (
 
 has value_reference => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_value_reference',
     json_ld   => 'valueReference',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::QuantitativeValue - A point value or interval for product c
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -119,6 +119,10 @@ A additional_property should be one of the following types:
 
 =back
 
+=head2 C<_has_additional_property>
+
+A predicate for the L</additional_property> attribute.
+
 =head2 C<max_value>
 
 C<maxValue>
@@ -133,6 +137,10 @@ A max_value should be one of the following types:
 
 =back
 
+=head2 C<_has_max_value>
+
+A predicate for the L</max_value> attribute.
+
 =head2 C<min_value>
 
 C<minValue>
@@ -146,6 +154,10 @@ A min_value should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_min_value>
+
+A predicate for the L</min_value> attribute.
 
 =head2 C<unit_code>
 
@@ -163,6 +175,10 @@ A unit_code should be one of the following types:
 
 =back
 
+=head2 C<_has_unit_code>
+
+A predicate for the L</unit_code> attribute.
+
 =head2 C<unit_text>
 
 C<unitText>
@@ -177,6 +193,10 @@ A unit_text should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_unit_text>
+
+A predicate for the L</unit_text> attribute.
 
 =head2 C<value>
 
@@ -207,6 +227,10 @@ A value should be one of the following types:
 
 =back
 
+=head2 C<_has_value>
+
+A predicate for the L</value> attribute.
+
 =head2 C<value_reference>
 
 C<valueReference>
@@ -229,6 +253,10 @@ A value_reference should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
 
 =back
+
+=head2 C<_has_value_reference>
+
+A predicate for the L</value_reference> attribute.
 
 =head1 SEE ALSO
 

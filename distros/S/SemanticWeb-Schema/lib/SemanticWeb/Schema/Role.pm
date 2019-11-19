@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has end_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_end_date',
     json_ld   => 'endDate',
 );
 
@@ -28,7 +28,7 @@ has end_date => (
 
 has named_position => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_named_position',
     json_ld   => 'namedPosition',
 );
 
@@ -36,7 +36,7 @@ has named_position => (
 
 has role_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_role_name',
     json_ld   => 'roleName',
 );
 
@@ -44,7 +44,7 @@ has role_name => (
 
 has start_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_start_date',
     json_ld   => 'startDate',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::Role - Represents additional information about a relationsh
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -97,6 +97,10 @@ A end_date should be one of the following types:
 
 =back
 
+=head2 C<_has_end_date>
+
+A predicate for the L</end_date> attribute.
+
 =head2 C<named_position>
 
 C<namedPosition>
@@ -112,6 +116,10 @@ A named_position should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_named_position>
+
+A predicate for the L</named_position> attribute.
 
 =head2 C<role_name>
 
@@ -130,6 +138,10 @@ A role_name should be one of the following types:
 
 =back
 
+=head2 C<_has_role_name>
+
+A predicate for the L</role_name> attribute.
+
 =head2 C<start_date>
 
 C<startDate>
@@ -144,6 +156,10 @@ A start_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_start_date>
+
+A predicate for the L</start_date> attribute.
 
 =head1 SEE ALSO
 

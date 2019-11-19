@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has party_size => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_party_size',
     json_ld   => 'partySize',
 );
 
@@ -28,7 +28,7 @@ has party_size => (
 
 has pickup_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_pickup_location',
     json_ld   => 'pickupLocation',
 );
 
@@ -36,7 +36,7 @@ has pickup_location => (
 
 has pickup_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_pickup_time',
     json_ld   => 'pickupTime',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::TaxiReservation - A reservation for a taxi
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -85,6 +85,10 @@ A party_size should be one of the following types:
 
 =back
 
+=head2 C<_has_party_size>
+
+A predicate for the L</party_size> attribute.
+
 =head2 C<pickup_location>
 
 C<pickupLocation>
@@ -99,6 +103,10 @@ A pickup_location should be one of the following types:
 
 =back
 
+=head2 C<_has_pickup_location>
+
+A predicate for the L</pickup_location> attribute.
+
 =head2 C<pickup_time>
 
 C<pickupTime>
@@ -112,6 +120,10 @@ A pickup_time should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_pickup_time>
+
+A predicate for the L</pickup_time> attribute.
 
 =head1 SEE ALSO
 

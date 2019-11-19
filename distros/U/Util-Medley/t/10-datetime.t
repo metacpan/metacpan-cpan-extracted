@@ -17,7 +17,10 @@ ok($dt);
 
 $dt = Util::Medley::DateTime->new;
 
-ok(my $dtstr = $dt->localdatetime);
-ok($dtstr =~ /\d\d\d\d\-\d\d-\d\d \d\d:\d\d:\d\d/);
+ok(my $dtstr = $dt->localDateTime);
+ok( $dt->localDateTimeIsValid($dtstr));
+
+ok(!$dt->localDateTimeIsValid('foobar'));
+ok(!$dt->localDateTimeIsValid('0000-88-00 88:00:00'));
 
 done_testing;

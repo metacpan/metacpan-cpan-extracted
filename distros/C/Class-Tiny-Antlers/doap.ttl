@@ -24,7 +24,7 @@
 		doap-deps:on "Role::Tiny 1.000000"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Class::Method::Modifiers 1.05"^^doap-deps:CpanId;
-	];
+	], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal 0.003"^^doap-deps:CpanId ], [
 		doap-deps:on "Test::Requires 0.06"^^doap-deps:CpanId;
 	];
@@ -37,7 +37,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Class-Tiny-Antlers";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-023>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-023>, <http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-024>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-class-tiny-antlers>;
@@ -132,6 +132,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Class-Tiny-Antlers-0.023.tar.gz>;
 	doap:revision        "0.023"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Class-Tiny-Antlers/v_0-024>
+	a                    doap:Version;
+	dc:identifier        "Class-Tiny-Antlers-0.024"^^xsd:string;
+	dc:issued            "2019-11-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support for isa/coerce.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Class-Tiny-Antlers-0.024.tar.gz>;
+	doap:revision        "0.024"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

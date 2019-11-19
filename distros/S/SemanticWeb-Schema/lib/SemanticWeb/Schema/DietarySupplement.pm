@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has active_ingredient => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_active_ingredient',
     json_ld   => 'activeIngredient',
 );
 
@@ -28,7 +28,7 @@ has active_ingredient => (
 
 has background => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_background',
     json_ld   => 'background',
 );
 
@@ -36,7 +36,7 @@ has background => (
 
 has is_proprietary => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_is_proprietary',
     json_ld   => 'isProprietary',
 );
 
@@ -44,7 +44,7 @@ has is_proprietary => (
 
 has legal_status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legal_status',
     json_ld   => 'legalStatus',
 );
 
@@ -52,7 +52,7 @@ has legal_status => (
 
 has manufacturer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_manufacturer',
     json_ld   => 'manufacturer',
 );
 
@@ -60,7 +60,7 @@ has manufacturer => (
 
 has maximum_intake => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_maximum_intake',
     json_ld   => 'maximumIntake',
 );
 
@@ -68,7 +68,7 @@ has maximum_intake => (
 
 has mechanism_of_action => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_mechanism_of_action',
     json_ld   => 'mechanismOfAction',
 );
 
@@ -76,7 +76,7 @@ has mechanism_of_action => (
 
 has non_proprietary_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_non_proprietary_name',
     json_ld   => 'nonProprietaryName',
 );
 
@@ -84,7 +84,7 @@ has non_proprietary_name => (
 
 has proprietary_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_proprietary_name',
     json_ld   => 'proprietaryName',
 );
 
@@ -92,7 +92,7 @@ has proprietary_name => (
 
 has recommended_intake => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_recommended_intake',
     json_ld   => 'recommendedIntake',
 );
 
@@ -100,7 +100,7 @@ has recommended_intake => (
 
 has safety_consideration => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_safety_consideration',
     json_ld   => 'safetyConsideration',
 );
 
@@ -108,7 +108,7 @@ has safety_consideration => (
 
 has target_population => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_target_population',
     json_ld   => 'targetPopulation',
 );
 
@@ -130,7 +130,7 @@ SemanticWeb::Schema::DietarySupplement - A product taken by mouth that contains 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -156,6 +156,10 @@ A active_ingredient should be one of the following types:
 
 =back
 
+=head2 C<_has_active_ingredient>
+
+A predicate for the L</active_ingredient> attribute.
+
 =head2 C<background>
 
 Descriptive information establishing a historical perspective on the
@@ -170,6 +174,10 @@ A background should be one of the following types:
 
 =back
 
+=head2 C<_has_background>
+
+A predicate for the L</background> attribute.
+
 =head2 C<is_proprietary>
 
 C<isProprietary>
@@ -183,6 +191,10 @@ A is_proprietary should be one of the following types:
 =item C<Bool>
 
 =back
+
+=head2 C<_has_is_proprietary>
+
+A predicate for the L</is_proprietary> attribute.
 
 =head2 C<legal_status>
 
@@ -203,6 +215,10 @@ A legal_status should be one of the following types:
 
 =back
 
+=head2 C<_has_legal_status>
+
+A predicate for the L</legal_status> attribute.
+
 =head2 C<manufacturer>
 
 The manufacturer of the product.
@@ -214,6 +230,10 @@ A manufacturer should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_manufacturer>
+
+A predicate for the L</manufacturer> attribute.
 
 =head2 C<maximum_intake>
 
@@ -230,6 +250,10 @@ A maximum_intake should be one of the following types:
 
 =back
 
+=head2 C<_has_maximum_intake>
+
+A predicate for the L</maximum_intake> attribute.
+
 =head2 C<mechanism_of_action>
 
 C<mechanismOfAction>
@@ -245,6 +269,10 @@ A mechanism_of_action should be one of the following types:
 
 =back
 
+=head2 C<_has_mechanism_of_action>
+
+A predicate for the L</mechanism_of_action> attribute.
+
 =head2 C<non_proprietary_name>
 
 C<nonProprietaryName>
@@ -258,6 +286,10 @@ A non_proprietary_name should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_non_proprietary_name>
+
+A predicate for the L</non_proprietary_name> attribute.
 
 =head2 C<proprietary_name>
 
@@ -274,6 +306,10 @@ A proprietary_name should be one of the following types:
 
 =back
 
+=head2 C<_has_proprietary_name>
+
+A predicate for the L</proprietary_name> attribute.
+
 =head2 C<recommended_intake>
 
 C<recommendedIntake>
@@ -288,6 +324,10 @@ A recommended_intake should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::RecommendedDoseSchedule']>
 
 =back
+
+=head2 C<_has_recommended_intake>
+
+A predicate for the L</recommended_intake> attribute.
 
 =head2 C<safety_consideration>
 
@@ -305,6 +345,10 @@ A safety_consideration should be one of the following types:
 
 =back
 
+=head2 C<_has_safety_consideration>
+
+A predicate for the L</safety_consideration> attribute.
+
 =head2 C<target_population>
 
 C<targetPopulation>
@@ -319,6 +363,10 @@ A target_population should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_target_population>
+
+A predicate for the L</target_population> attribute.
 
 =head1 SEE ALSO
 

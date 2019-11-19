@@ -7,7 +7,9 @@ Tickit::RectSet      T_PTROBJ
 Tickit::RenderBuffer T_PTROBJ
 Tickit::StringPos    T_PTROBJ_OR_NULL
 Tickit::Term         T_PTROBJ
+Tickit::Term_MAYBE   T_PTROBJ_MAYBE
 Tickit::Window       T_PTROBJ
+Tickit::_Tickit      T_PTROBJ
 
 INPUT
 T_PTROBJ_MAYBE
@@ -36,6 +38,17 @@ T_PTROBJ_OR_NULL
             Perl_croak(aTHX_ \"%s: %s is not of type %s\",
                         ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
                         \"$var\", \"$ntype\")
+
+INPUT
+T_PTRSTRUCT
+        if (SvROK($arg) && sv_derived_from($arg, \"${\do { local $_ = $ntype; s/^struct\s+//; s/Ptr$//; $_ }}\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                        \"$var\", \"${\do { local $_ = $ntype; s/^struct\s+//; s/Ptr$//; $_ }}\");
 
 OUTPUT
 T_PTROBJ_OR_NULL

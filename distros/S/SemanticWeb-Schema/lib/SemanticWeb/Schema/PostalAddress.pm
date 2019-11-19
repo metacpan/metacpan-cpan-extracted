@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has address_country => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_address_country',
     json_ld   => 'addressCountry',
 );
 
@@ -28,7 +28,7 @@ has address_country => (
 
 has address_locality => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_address_locality',
     json_ld   => 'addressLocality',
 );
 
@@ -36,7 +36,7 @@ has address_locality => (
 
 has address_region => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_address_region',
     json_ld   => 'addressRegion',
 );
 
@@ -44,7 +44,7 @@ has address_region => (
 
 has post_office_box_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_post_office_box_number',
     json_ld   => 'postOfficeBoxNumber',
 );
 
@@ -52,7 +52,7 @@ has post_office_box_number => (
 
 has postal_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_postal_code',
     json_ld   => 'postalCode',
 );
 
@@ -60,7 +60,7 @@ has postal_code => (
 
 has street_address => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_street_address',
     json_ld   => 'streetAddress',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::PostalAddress - The mailing address.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -108,6 +108,10 @@ A address_country should be one of the following types:
 
 =back
 
+=head2 C<_has_address_country>
+
+A predicate for the L</address_country> attribute.
+
 =head2 C<address_locality>
 
 C<addressLocality>
@@ -122,6 +126,10 @@ A address_locality should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_address_locality>
+
+A predicate for the L</address_locality> attribute.
 
 =head2 C<address_region>
 
@@ -140,6 +148,10 @@ A address_region should be one of the following types:
 
 =back
 
+=head2 C<_has_address_region>
+
+A predicate for the L</address_region> attribute.
+
 =head2 C<post_office_box_number>
 
 C<postOfficeBoxNumber>
@@ -153,6 +165,10 @@ A post_office_box_number should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_post_office_box_number>
+
+A predicate for the L</post_office_box_number> attribute.
 
 =head2 C<postal_code>
 
@@ -168,6 +184,10 @@ A postal_code should be one of the following types:
 
 =back
 
+=head2 C<_has_postal_code>
+
+A predicate for the L</postal_code> attribute.
+
 =head2 C<street_address>
 
 C<streetAddress>
@@ -181,6 +201,10 @@ A street_address should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_street_address>
+
+A predicate for the L</street_address> attribute.
 
 =head1 SEE ALSO
 

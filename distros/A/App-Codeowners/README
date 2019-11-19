@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.45
+    version 0.47
 
 SYNOPSIS
 
@@ -92,7 +92,7 @@ OPTIONS
 
  --shell-completion
 
-        eval "$(lintany --shell-completion)"
+        eval "$(git-codeowners --shell-completion)"
 
     Print shell code to enable completion to STDOUT, and exit.
 

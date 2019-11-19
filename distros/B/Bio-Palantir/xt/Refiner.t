@@ -156,7 +156,11 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     # get main container
     my $root = $report->root;
 
-    my $ClusterPlus = $class->new( _cluster => $root->all_clusters);
+    my $ClusterPlus = $class->new( 
+        _cluster => $root->all_clusters,
+        module_delineation => 'condensation',
+    );
+
     isa_ok $ClusterPlus, $class;
     
     my @expected_domain_sizes = [
@@ -235,7 +239,7 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
 
     my @expected_exploratory_domain_symbols = [
         'CAL_domain', 'ACP', 'KS', 'PCP', 'AT', 'DHt',
-        'Te', 'DHt', 'Te', 'KR', 'ACP', 'AT', 'Te', 'PCP',
+        'TE', 'DHt', 'TE', 'KR', 'ACP', 'AT', 'TE', 'PCP',
     ];
 
     my @expected_exploratory_domain_coordinates = [

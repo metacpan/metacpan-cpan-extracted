@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has landlord => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_landlord',
     json_ld   => 'landlord',
 );
 
@@ -28,7 +28,7 @@ has landlord => (
 
 has real_estate_agent => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_real_estate_agent',
     json_ld   => 'realEstateAgent',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::RentAction - The act of giving money in return for temporar
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -74,6 +74,10 @@ A landlord should be one of the following types:
 
 =back
 
+=head2 C<_has_landlord>
+
+A predicate for the L</landlord> attribute.
+
 =head2 C<real_estate_agent>
 
 C<realEstateAgent>
@@ -88,6 +92,10 @@ A real_estate_agent should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::RealEstateAgent']>
 
 =back
+
+=head2 C<_has_real_estate_agent>
+
+A predicate for the L</real_estate_agent> attribute.
 
 =head1 SEE ALSO
 

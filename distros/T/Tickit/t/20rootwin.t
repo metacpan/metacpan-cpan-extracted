@@ -13,9 +13,7 @@ my ( $term, $win ) = mk_term_and_window;
 
 isa_ok( $win, "Tickit::Window", '$win isa Tickit::Window' );
 
-# Already 2 references; Tickit object keeps a permanent one, and we have one
-# here. This is fine.
-is_refcount( $win, 2, '$win has refcount 2 initially' );
+is_refcount( $win, 1, '$win has refcount 1 initially' );
 
 is( $win->top,  0, '$win->top is 0' );
 is( $win->left, 0, '$win->left is 0' );
@@ -170,6 +168,6 @@ isa_ok( $win->tickit, "Tickit", '$win->tickit' );
    is( $geom_changed, 1, '$reshaped is 1 after term resize' );
 }
 
-is_refcount( $win, 2, '$win has refcount 2 before dropping Tickit' );
+is_refcount( $win, 1, '$win has refcount 1 before EOF' );
 
 done_testing;

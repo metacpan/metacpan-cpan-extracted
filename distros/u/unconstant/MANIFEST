@@ -12,8 +12,6 @@ t/05_prototype.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-unconstant-0.08/META.json
-unconstant-0.08/META.yml
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

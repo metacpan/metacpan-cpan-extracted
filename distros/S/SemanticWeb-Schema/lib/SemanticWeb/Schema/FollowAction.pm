@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has followee => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_followee',
     json_ld   => 'followee',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::FollowAction - The act of forming a personal connection wit
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -82,6 +82,10 @@ A followee should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_followee>
+
+A predicate for the L</followee> attribute.
 
 =head1 SEE ALSO
 

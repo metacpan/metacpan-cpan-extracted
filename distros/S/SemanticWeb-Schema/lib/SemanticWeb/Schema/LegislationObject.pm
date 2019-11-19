@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has legislation_legal_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_legislation_legal_value',
     json_ld   => 'legislationLegalValue',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::LegislationObject - A specific object or file containing a 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -68,6 +68,10 @@ A legislation_legal_value should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::LegalValueLevel']>
 
 =back
+
+=head2 C<_has_legislation_legal_value>
+
+A predicate for the L</legislation_legal_value> attribute.
 
 =head1 SEE ALSO
 

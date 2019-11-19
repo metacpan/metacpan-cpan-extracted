@@ -187,6 +187,10 @@ sub write_config {
     $source =~ s/^[ \t]*#[ \t]*cmakedefine[ \t]+(\w+)+[ \t]+\@([^ \t@]*)\@//smg;
 
     open($fh, '>', $output) || die "Cannot open $output, $!";
+    my $c_va_copy = get_C_WRAPPER('va_copy');
+    my $c_log2 = get_C_WRAPPER('log2', 0);
+    my $c_log2f = get_C_WRAPPER('log2f', 0);
+    my $c_log2l = get_C_WRAPPER('log2l', 0);
     print $fh <<CONFIG;
 #ifndef LUAUNPANIC_CONFIG_WRAPPER_H
 #define LUAUNPANIC_CONFIG_WRAPPER_H
@@ -195,6 +199,11 @@ sub write_config {
 
 #define LUAUNPANIC_VERSION "$version"
    
+$c_va_copy
+$c_log2
+$c_log2f
+$c_log2l
+
 $source
 
 #endif /* LUA_CONFIG_WRAPPER_H */
@@ -224,4 +233,31 @@ sub try_compile {
     unlink $fh->filename;
 
     return $rc;
+}
+
+sub get_C_WRAPPER {
+    my ($what, $required) = @_;
+
+    $required //= 1;
+
+    my $WHAT = uc($what);
+    my $error = $required ? "#error \"C_$WHAT is undefined\"" : '';
+
+    my $c_wrapper = <<C_WRAPPER;
+#ifdef HAVE_$WHAT
+#  define C_$WHAT $what
+#else
+#  ifdef HAVE__$WHAT
+#    define C_$WHAT _$what
+#  else
+#    ifdef HAVE___$WHAT
+#      define C_$WHAT __$what
+#    else
+$error
+#    endif
+#  endif
+#endif
+C_WRAPPER
+
+    return $c_wrapper
 }

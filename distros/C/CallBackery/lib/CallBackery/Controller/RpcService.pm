@@ -5,7 +5,7 @@ use CallBackery::Exception qw(mkerror);
 use CallBackery::User;
 # use Data::Dumper;
 use Scalar::Util qw(blessed weaken);
-use Mojo::JSON qw(encode_json decode_json);
+use Mojo::JSON qw(encode_json decode_json from_json);
 
 =head1 NAME
 
@@ -529,7 +529,7 @@ sub handleDownload {
 
     my $form;
     if (my $formData = $self->req->param('formData')){
-        $form = eval { decode_json($formData) };
+        $form = eval { from_json($formData) };
         if ($@){
             return $self->render(text=>encode_json({exception=>{message=>'Data Decoding Problem '.$@,code=>3923}}));
         }

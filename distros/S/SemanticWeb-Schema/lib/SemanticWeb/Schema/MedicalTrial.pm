@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has phase => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_phase',
     json_ld   => 'phase',
 );
 
@@ -28,7 +28,7 @@ has phase => (
 
 has trial_design => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_trial_design',
     json_ld   => 'trialDesign',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::MedicalTrial - A medical trial is a type of medical study t
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,10 @@ A phase should be one of the following types:
 
 =back
 
+=head2 C<_has_phase>
+
+A predicate for the L</phase> attribute.
+
 =head2 C<trial_design>
 
 C<trialDesign>
@@ -86,6 +90,10 @@ A trial_design should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalTrialDesign']>
 
 =back
+
+=head2 C<_has_trial_design>
+
+A predicate for the L</trial_design> attribute.
 
 =head1 SEE ALSO
 

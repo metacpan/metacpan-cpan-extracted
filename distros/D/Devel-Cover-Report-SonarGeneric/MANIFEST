@@ -1,6 +1,4 @@
 Changes
-cover_db/digests
-cover_db/runs/1554112839.3776.34719/cover.14
 lib/Devel/Cover/Report/SonarGeneric.pm
 LICENSE
 Makefile.PL
@@ -9,7 +7,6 @@ MANIFEST.SKIP
 t/01_basic.t
 t/cover_db/cover.14
 t/cover_db/digests
-t/cover_db/sonar_generic.xml
 t/cover_db/structure/47fffd7cf202bad8f69425a094875724
 t/lib/lib/archive.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

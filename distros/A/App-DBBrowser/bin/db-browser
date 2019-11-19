@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.221';
+our $VERSION = '2.226';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.221
+Version 2.226
 
 =head1 SYNOPSIS
 
@@ -405,13 +405,18 @@ If a column is not empty, but has no header name the header is named temporarily
 
 Use only selected rows of the imported data.
 
+If the data has empty rows, the non-empty rows are preselected. Rows are regarded as empty if the values of all fields
+in the row have no length.
+
 =item Range Rows
 
 Use only a range of rows.
 
 =item Row Groups
 
-If the input has rows with different numbers of columns, one can choose a group of rows with the same number of columns.
+If the input has rows with different numbers of columns, I<Row Groups> sorts rows with the same number of columns in a
+group. The user can then choose one or more groups of rows. There is only one group, if all rows have the same column
+count.
 
 =item Remove Cell
 
@@ -1001,6 +1006,9 @@ If C<Spreadsheet::Read> is chosen, the default settings from L<Spreadsheet::Read
 C<Spreadsheet::Read> will use the first line of the file to auto-detect the separation character if the file is a
 csv-file.
 
+C<Spreadsheet::Read::rows> fills up uneven rows automatically so the filter L<Fill up Rows> and L<Row Groups> have no
+meaning if C<Spreadsheet::Read> is used.
+
 Advantages:
 
 =over
@@ -1117,8 +1125,6 @@ Perl minimum version is now C<5.10.1> instead of C<5.8.3>.
 New L<Plugin API|App::DBBrowser::DB>.
 
 =head1 REQUIREMENTS
-
-See L<Term::TablePrint/REQUIREMENTS>.
 
 =head2 Perl version
 

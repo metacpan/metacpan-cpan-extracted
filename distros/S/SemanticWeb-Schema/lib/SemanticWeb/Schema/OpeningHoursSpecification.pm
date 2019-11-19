@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has closes => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_closes',
     json_ld   => 'closes',
 );
 
@@ -28,7 +28,7 @@ has closes => (
 
 has day_of_week => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_day_of_week',
     json_ld   => 'dayOfWeek',
 );
 
@@ -36,7 +36,7 @@ has day_of_week => (
 
 has opens => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_opens',
     json_ld   => 'opens',
 );
 
@@ -44,7 +44,7 @@ has opens => (
 
 has valid_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_from',
     json_ld   => 'validFrom',
 );
 
@@ -52,7 +52,7 @@ has valid_from => (
 
 has valid_through => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_through',
     json_ld   => 'validThrough',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::OpeningHoursSpecification - A structured value providing in
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -102,6 +102,10 @@ A closes should be one of the following types:
 
 =back
 
+=head2 C<_has_closes>
+
+A predicate for the L</closes> attribute.
+
 =head2 C<day_of_week>
 
 C<dayOfWeek>
@@ -116,6 +120,10 @@ A day_of_week should be one of the following types:
 
 =back
 
+=head2 C<_has_day_of_week>
+
+A predicate for the L</day_of_week> attribute.
+
 =head2 C<opens>
 
 The opening hour of the place or service on the given day(s) of the week.
@@ -127,6 +135,10 @@ A opens should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_opens>
+
+A predicate for the L</opens> attribute.
 
 =head2 C<valid_from>
 
@@ -142,6 +154,10 @@ A valid_from should be one of the following types:
 
 =back
 
+=head2 C<_has_valid_from>
+
+A predicate for the L</valid_from> attribute.
+
 =head2 C<valid_through>
 
 C<validThrough>
@@ -156,6 +172,10 @@ A valid_through should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_valid_through>
+
+A predicate for the L</valid_through> attribute.
 
 =head1 SEE ALSO
 

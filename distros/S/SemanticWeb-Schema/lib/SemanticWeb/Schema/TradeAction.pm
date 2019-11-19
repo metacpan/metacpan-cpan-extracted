@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has price => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price',
     json_ld   => 'price',
 );
 
@@ -28,7 +28,7 @@ has price => (
 
 has price_currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price_currency',
     json_ld   => 'priceCurrency',
 );
 
@@ -36,7 +36,7 @@ has price_currency => (
 
 has price_specification => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_price_specification',
     json_ld   => 'priceSpecification',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::TradeAction - The act of participating in an exchange of go
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -103,6 +103,10 @@ A price should be one of the following types:
 
 =back
 
+=head2 C<_has_price>
+
+A predicate for the L</price> attribute.
+
 =head2 C<price_currency>
 
 C<priceCurrency>
@@ -127,6 +131,10 @@ A price_currency should be one of the following types:
 
 =back
 
+=head2 C<_has_price_currency>
+
+A predicate for the L</price_currency> attribute.
+
 =head2 C<price_specification>
 
 C<priceSpecification>
@@ -141,6 +149,10 @@ A price_specification should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
 
 =back
+
+=head2 C<_has_price_specification>
+
+A predicate for the L</price_specification> attribute.
 
 =head1 SEE ALSO
 

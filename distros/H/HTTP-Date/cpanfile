@@ -1,5 +1,5 @@
 requires "Exporter" => "0";
-requires "Time::Local" => "0";
+requires "Time::Local" => "1.28";
 requires "Time::Zone" => "0";
 requires "perl" => "5.006002";
 requires "strict" => "0";

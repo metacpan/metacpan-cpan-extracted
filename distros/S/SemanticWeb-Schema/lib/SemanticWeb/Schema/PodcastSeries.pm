@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has web_feed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_web_feed',
     json_ld   => 'webFeed',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::PodcastSeries - A podcast is an episodic series of digital 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -65,6 +65,10 @@ A web_feed should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_web_feed>
+
+A predicate for the L</web_feed> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has grantee => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_grantee',
     json_ld   => 'grantee',
 );
 
@@ -28,7 +28,7 @@ has grantee => (
 
 has permission_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_permission_type',
     json_ld   => 'permissionType',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::DigitalDocumentPermission - A permission for a particular p
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -77,6 +77,10 @@ A grantee should be one of the following types:
 
 =back
 
+=head2 C<_has_grantee>
+
+A predicate for the L</grantee> attribute.
+
 =head2 C<permission_type>
 
 C<permissionType>
@@ -90,6 +94,10 @@ A permission_type should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::DigitalDocumentPermissionType']>
 
 =back
+
+=head2 C<_has_permission_type>
+
+A predicate for the L</permission_type> attribute.
 
 =head1 SEE ALSO
 

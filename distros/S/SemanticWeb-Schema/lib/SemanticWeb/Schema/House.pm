@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has number_of_rooms => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_rooms',
     json_ld   => 'numberOfRooms',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::House - A house is a building or structure that has the abi
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -72,6 +72,10 @@ A number_of_rooms should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_number_of_rooms>
+
+A predicate for the L</number_of_rooms> attribute.
 
 =head1 SEE ALSO
 

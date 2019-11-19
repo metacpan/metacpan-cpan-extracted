@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has actor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actor',
     json_ld   => 'actor',
 );
 
@@ -28,7 +28,7 @@ has actor => (
 
 has actors => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actors',
     json_ld   => 'actors',
 );
 
@@ -36,7 +36,7 @@ has actors => (
 
 has contains_season => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_contains_season',
     json_ld   => 'containsSeason',
 );
 
@@ -44,7 +44,7 @@ has contains_season => (
 
 has country_of_origin => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_country_of_origin',
     json_ld   => 'countryOfOrigin',
 );
 
@@ -52,7 +52,7 @@ has country_of_origin => (
 
 has director => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_director',
     json_ld   => 'director',
 );
 
@@ -60,7 +60,7 @@ has director => (
 
 has directors => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_directors',
     json_ld   => 'directors',
 );
 
@@ -68,7 +68,7 @@ has directors => (
 
 has episode => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_episode',
     json_ld   => 'episode',
 );
 
@@ -76,7 +76,7 @@ has episode => (
 
 has episodes => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_episodes',
     json_ld   => 'episodes',
 );
 
@@ -84,7 +84,7 @@ has episodes => (
 
 has music_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_music_by',
     json_ld   => 'musicBy',
 );
 
@@ -92,7 +92,7 @@ has music_by => (
 
 has number_of_episodes => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_episodes',
     json_ld   => 'numberOfEpisodes',
 );
 
@@ -100,7 +100,7 @@ has number_of_episodes => (
 
 has number_of_seasons => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_seasons',
     json_ld   => 'numberOfSeasons',
 );
 
@@ -108,7 +108,7 @@ has number_of_seasons => (
 
 has production_company => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_production_company',
     json_ld   => 'productionCompany',
 );
 
@@ -116,7 +116,7 @@ has production_company => (
 
 has season => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_season',
     json_ld   => 'season',
 );
 
@@ -124,7 +124,7 @@ has season => (
 
 has seasons => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_seasons',
     json_ld   => 'seasons',
 );
 
@@ -132,7 +132,7 @@ has seasons => (
 
 has trailer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_trailer',
     json_ld   => 'trailer',
 );
 
@@ -154,7 +154,7 @@ SemanticWeb::Schema::TVSeries - CreativeWorkSeries dedicated to TV broadcast and
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -177,6 +177,10 @@ A actor should be one of the following types:
 
 =back
 
+=head2 C<_has_actor>
+
+A predicate for the L</actor> attribute.
+
 =head2 C<actors>
 
 An actor, e.g. in tv, radio, movie, video games etc. Actors can be
@@ -189,6 +193,10 @@ A actors should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_actors>
+
+A predicate for the L</actors> attribute.
 
 =head2 C<contains_season>
 
@@ -203,6 +211,10 @@ A contains_season should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWorkSeason']>
 
 =back
+
+=head2 C<_has_contains_season>
+
+A predicate for the L</contains_season> attribute.
 
 =head2 C<country_of_origin>
 
@@ -219,6 +231,10 @@ A country_of_origin should be one of the following types:
 
 =back
 
+=head2 C<_has_country_of_origin>
+
+A predicate for the L</country_of_origin> attribute.
+
 =head2 C<director>
 
 A director of e.g. tv, radio, movie, video gaming etc. content, or of an
@@ -233,6 +249,10 @@ A director should be one of the following types:
 
 =back
 
+=head2 C<_has_director>
+
+A predicate for the L</director> attribute.
+
 =head2 C<directors>
 
 A director of e.g. tv, radio, movie, video games etc. content. Directors
@@ -246,6 +266,10 @@ A directors should be one of the following types:
 
 =back
 
+=head2 C<_has_directors>
+
+A predicate for the L</directors> attribute.
+
 =head2 C<episode>
 
 An episode of a tv, radio or game media within a series or season.
@@ -258,6 +282,10 @@ A episode should be one of the following types:
 
 =back
 
+=head2 C<_has_episode>
+
+A predicate for the L</episode> attribute.
+
 =head2 C<episodes>
 
 An episode of a TV/radio series or season.
@@ -269,6 +297,10 @@ A episodes should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Episode']>
 
 =back
+
+=head2 C<_has_episodes>
+
+A predicate for the L</episodes> attribute.
 
 =head2 C<music_by>
 
@@ -286,6 +318,10 @@ A music_by should be one of the following types:
 
 =back
 
+=head2 C<_has_music_by>
+
+A predicate for the L</music_by> attribute.
+
 =head2 C<number_of_episodes>
 
 C<numberOfEpisodes>
@@ -300,6 +336,10 @@ A number_of_episodes should be one of the following types:
 
 =back
 
+=head2 C<_has_number_of_episodes>
+
+A predicate for the L</number_of_episodes> attribute.
+
 =head2 C<number_of_seasons>
 
 C<numberOfSeasons>
@@ -313,6 +353,10 @@ A number_of_seasons should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_number_of_seasons>
+
+A predicate for the L</number_of_seasons> attribute.
 
 =head2 C<production_company>
 
@@ -329,6 +373,10 @@ A production_company should be one of the following types:
 
 =back
 
+=head2 C<_has_production_company>
+
+A predicate for the L</production_company> attribute.
+
 =head2 C<season>
 
 A season in a media series.
@@ -340,6 +388,10 @@ A season should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWorkSeason']>
 
 =back
+
+=head2 C<_has_season>
+
+A predicate for the L</season> attribute.
 
 =head2 C<seasons>
 
@@ -353,6 +405,10 @@ A seasons should be one of the following types:
 
 =back
 
+=head2 C<_has_seasons>
+
+A predicate for the L</seasons> attribute.
+
 =head2 C<trailer>
 
 The trailer of a movie or tv/radio series, season, episode, etc.
@@ -364,6 +420,10 @@ A trailer should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::VideoObject']>
 
 =back
+
+=head2 C<_has_trailer>
+
+A predicate for the L</trailer> attribute.
 
 =head1 SEE ALSO
 

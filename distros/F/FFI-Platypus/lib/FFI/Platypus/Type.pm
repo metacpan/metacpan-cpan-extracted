@@ -6,7 +6,7 @@ use Carp qw( croak );
 require FFI::Platypus;
 
 # ABSTRACT: Defining types for FFI::Platypus
-our $VERSION = '1.00'; # VERSION
+our $VERSION = '1.01'; # VERSION
 
 # The TypeParser and Type classes are used internally ONLY and
 # are not to be exposed to the user.  External users should
@@ -57,7 +57,7 @@ FFI::Platypus::Type - Defining types for FFI::Platypus
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -345,8 +345,17 @@ Perl:
  f(BAR);
  f(BAZ);
 
-See the main FAQ (L<FFI::Platypus/FAQ>) for details on the best way to
-specify value constants when there are lots of possible values.
+Dealing with enumerated values with FFI can be tricky because these are
+usually defined in C header files and cannot be found in dynamic libraries.
+For trivial usage you can do as illustrated above, simply define your own
+Perl constants.  For more complicated usage, or where the values might vary
+from platform to platform you may want to consider the new Platypus bundle
+interface to define Perl constants (essentially the same as an enumerated
+value) from C space.  This is more reliable, but does require a compiler
+at install time.  See L<FFI::Platypus::Constant> for details.
+
+The main FAQ (L<FFI::Platypus/FAQ>) also has a discussion on dealing
+with constants and enumerated types.
 
 =head3 Boolean types
 
@@ -455,7 +464,7 @@ what the object represents:
 
  $lib->find_lib( lib => 'archive' );
  $ffi->type('opaque' => 'archive');
- $ffi->attach('archive_read_new => [] => 'archive');
+ $ffi->attach(archive_read_new   => [] => 'archive');
  $ffi->attach(archive_read_free  => ['archive'] => 'int');
  ...
 
@@ -580,7 +589,7 @@ to the string).  Consider the API:
  {
    const char *str;
    str = get_message();
-   printf("message = %s\n");
+   printf("message = %s\n", str);
  }
 
 It feels like this should be able to work:
@@ -612,7 +621,7 @@ and return an opaque pointer to the string using a cast.
 =head2 Pointer / References
 
 In C you can pass a pointer to a variable to a function in order
-accomplish the task of pass by reference.  In Perl the same is task is
+accomplish the task of pass by reference.  In Perl the same task is
 accomplished by passing a reference (although you can also modify the
 argument stack thus Perl supports proper pass by reference as well).
 
@@ -666,7 +675,7 @@ Here is a brief example:
  
  use FFI::Platypus::Record;
  
- record_layout(qw(
+ record_layout_1(qw(
      int    tm_sec
      int    tm_min
      int    tm_hour
@@ -913,7 +922,7 @@ Perl code:
  {
    package Foo;
    use FFI::Platypus::Record;
-   record_layout( int => 'a' );
+   record_layout_1( int => 'a' );
  }
  $ffi->type( 'Record(Foo)' => 'foo_t' );
  $ffi->attach( pass_by_value_example => [ 'foo_t' ] => 'void' );
@@ -1263,7 +1272,7 @@ class name that we pass in as the first argument.  If you have a C
 "constructor" like this that takes arguments you'd have to write a
 wrapper for new.
 
-I good example of a C library that uses this pattern, including
+A good example of a C library that uses this pattern, including
 inheritance is C<libarchive>. Platypus comes with a more extensive
 example in C<examples/archive.pl> that demonstrates this.
 

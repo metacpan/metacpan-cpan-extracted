@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has active_ingredient => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_active_ingredient',
     json_ld   => 'activeIngredient',
 );
 
@@ -28,7 +28,7 @@ has active_ingredient => (
 
 has available_in => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_available_in',
     json_ld   => 'availableIn',
 );
 
@@ -36,7 +36,7 @@ has available_in => (
 
 has maximum_intake => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_maximum_intake',
     json_ld   => 'maximumIntake',
 );
 
@@ -44,7 +44,7 @@ has maximum_intake => (
 
 has strength_unit => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_strength_unit',
     json_ld   => 'strengthUnit',
 );
 
@@ -52,7 +52,7 @@ has strength_unit => (
 
 has strength_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_strength_value',
     json_ld   => 'strengthValue',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::DrugStrength - A specific strength in which a medical drug 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -98,6 +98,10 @@ A active_ingredient should be one of the following types:
 
 =back
 
+=head2 C<_has_active_ingredient>
+
+A predicate for the L</active_ingredient> attribute.
+
 =head2 C<available_in>
 
 C<availableIn>
@@ -111,6 +115,10 @@ A available_in should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
 
 =back
+
+=head2 C<_has_available_in>
+
+A predicate for the L</available_in> attribute.
 
 =head2 C<maximum_intake>
 
@@ -127,6 +135,10 @@ A maximum_intake should be one of the following types:
 
 =back
 
+=head2 C<_has_maximum_intake>
+
+A predicate for the L</maximum_intake> attribute.
+
 =head2 C<strength_unit>
 
 C<strengthUnit>
@@ -141,6 +153,10 @@ A strength_unit should be one of the following types:
 
 =back
 
+=head2 C<_has_strength_unit>
+
+A predicate for the L</strength_unit> attribute.
+
 =head2 C<strength_value>
 
 C<strengthValue>
@@ -154,6 +170,10 @@ A strength_value should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_strength_value>
+
+A predicate for the L</strength_value> attribute.
 
 =head1 SEE ALSO
 

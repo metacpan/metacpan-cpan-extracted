@@ -18,10 +18,45 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-
 #undef PI
 #define PI	(l_mathop(3.141592653589793238462643383279502884))
 
+#ifndef C_LOG2
+#  define C_LOG2 math_log2
+static double C_LOG2(double x)
+{
+  const double log_of_2 = log(2.0);
+  return log(x) * log_of_2;
+}
+#endif /* C_LOG2 */
+
+#ifndef C_LOG2F
+#  define C_LOG2F math_log2f
+#  undef  C_LOG2f
+#  define C_LOG2f C_LOG2F
+static float C_LOG2F(float x)
+{
+  return (float) C_LOG2((double) x);
+}
+#else /* C_LOG2F */
+#  undef  C_LOG2f
+#  define C_LOG2f C_LOG2F
+#endif /* C_LOG2F */
+
+#ifndef C_LOG2L
+#  ifdef HAVE_SIZEOF_LONG_DOUBLE
+#    define C_LOG2L math_log2l
+#    undef  C_LOG2l
+#    define C_LOG2l C_LOG2L
+static long double C_LOG2L(long double x)
+{
+  return (long double) C_LOG2((long double) x);
+}
+#  endif  /* HAVE_SIZEOF_LONG_DOUBLE */
+#else /* C_LOG2L */
+#  undef  C_LOG2l
+#  define C_LOG2l C_LOG2L
+#endif /* C_LOG2L */
 
 #if !defined(l_rand)		/* { */
 #if defined(LUA_USE_POSIX)
@@ -185,7 +220,7 @@ static int math_log (lua_State *L) {
     lua_Number base = luaL_checknumber(L, 2);
 #if !defined(LUA_USE_C89)
     if (base == l_mathop(2.0))
-      res = l_mathop(log2)(x); else
+      res = l_mathop(C_LOG2)(x); else
 #endif
     if (base == l_mathop(10.0))
       res = l_mathop(log10)(x);

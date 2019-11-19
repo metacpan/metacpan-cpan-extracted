@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has health_condition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_condition',
     json_ld   => 'healthCondition',
 );
 
@@ -28,7 +28,7 @@ has health_condition => (
 
 has outcome => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_outcome',
     json_ld   => 'outcome',
 );
 
@@ -36,7 +36,7 @@ has outcome => (
 
 has population => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_population',
     json_ld   => 'population',
 );
 
@@ -44,7 +44,7 @@ has population => (
 
 has sponsor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_sponsor',
     json_ld   => 'sponsor',
 );
 
@@ -52,7 +52,7 @@ has sponsor => (
 
 has status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_status',
     json_ld   => 'status',
 );
 
@@ -60,7 +60,7 @@ has status => (
 
 has study_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_study_location',
     json_ld   => 'studyLocation',
 );
 
@@ -68,7 +68,7 @@ has study_location => (
 
 has study_subject => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_study_subject',
     json_ld   => 'studySubject',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::MedicalStudy - A medical study is an umbrella type covering
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -121,6 +121,10 @@ A health_condition should be one of the following types:
 
 =back
 
+=head2 C<_has_health_condition>
+
+A predicate for the L</health_condition> attribute.
+
 =head2 C<outcome>
 
 Expected or actual outcomes of the study.
@@ -135,6 +139,10 @@ A outcome should be one of the following types:
 
 =back
 
+=head2 C<_has_outcome>
+
+A predicate for the L</outcome> attribute.
+
 =head2 C<population>
 
 Any characteristics of the population used in the study, e.g. 'males under
@@ -147,6 +155,10 @@ A population should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_population>
+
+A predicate for the L</population> attribute.
 
 =head2 C<sponsor>
 
@@ -164,6 +176,10 @@ A sponsor should be one of the following types:
 
 =back
 
+=head2 C<_has_sponsor>
+
+A predicate for the L</sponsor> attribute.
+
 =head2 C<status>
 
 The status of the study (enumerated).
@@ -180,6 +196,10 @@ A status should be one of the following types:
 
 =back
 
+=head2 C<_has_status>
+
+A predicate for the L</status> attribute.
+
 =head2 C<study_location>
 
 C<studyLocation>
@@ -193,6 +213,10 @@ A study_location should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
 
 =back
+
+=head2 C<_has_study_location>
+
+A predicate for the L</study_location> attribute.
 
 =head2 C<study_subject>
 
@@ -208,6 +232,10 @@ A study_subject should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalEntity']>
 
 =back
+
+=head2 C<_has_study_subject>
+
+A predicate for the L</study_subject> attribute.
 
 =head1 SEE ALSO
 

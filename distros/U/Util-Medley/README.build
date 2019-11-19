@@ -1,8 +1,7 @@
 To perform a release, do the following:
 
 1. update version in dist.ini
-2. update Changes file
-3. dzil release  (versions will be stamped to all the pm files for you)
+2. dzil release  (versions will be stamped to all the pm files for you)
 
 To generate coverage:
 

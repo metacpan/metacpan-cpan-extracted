@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has margin_of_error => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_margin_of_error',
     json_ld   => 'marginOfError',
 );
 
@@ -28,7 +28,7 @@ has margin_of_error => (
 
 has measured_property => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_measured_property',
     json_ld   => 'measuredProperty',
 );
 
@@ -36,7 +36,7 @@ has measured_property => (
 
 has measured_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_measured_value',
     json_ld   => 'measuredValue',
 );
 
@@ -44,7 +44,7 @@ has measured_value => (
 
 has observation_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_observation_date',
     json_ld   => 'observationDate',
 );
 
@@ -52,7 +52,7 @@ has observation_date => (
 
 has observed_node => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_observed_node',
     json_ld   => 'observedNode',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::Observation - Instances of the class Observation are used t
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -119,6 +119,10 @@ A margin_of_error should be one of the following types:
 
 =back
 
+=head2 C<_has_margin_of_error>
+
+A predicate for the L</margin_of_error> attribute.
+
 =head2 C<measured_property>
 
 C<measuredProperty>
@@ -137,6 +141,10 @@ A measured_property should be one of the following types:
 
 =back
 
+=head2 C<_has_measured_property>
+
+A predicate for the L</measured_property> attribute.
+
 =head2 C<measured_value>
 
 C<measuredValue>
@@ -152,6 +160,10 @@ A measured_value should be one of the following types:
 
 =back
 
+=head2 C<_has_measured_value>
+
+A predicate for the L</measured_value> attribute.
+
 =head2 C<observation_date>
 
 C<observationDate>
@@ -166,6 +178,10 @@ A observation_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_observation_date>
+
+A predicate for the L</observation_date> attribute.
 
 =head2 C<observed_node>
 
@@ -184,6 +200,10 @@ A observed_node should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::StatisticalPopulation']>
 
 =back
+
+=head2 C<_has_observed_node>
+
+A predicate for the L</observed_node> attribute.
 
 =head1 SEE ALSO
 

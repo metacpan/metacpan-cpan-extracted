@@ -11,7 +11,7 @@ our ($VERSION);
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.14';
+    $VERSION = '0.16';
     XSLoader::load();
 }
 
@@ -25,7 +25,7 @@ CBOR::Free - Fast CBOR for everyone
 
 =head1 SYNOPSIS
 
-    $cbor = CBOR::Free::encode( $scalar_or_ar_or_hr );
+    $cbor = CBOR::Free::encode( $some_data_structure );
 
     $thing = CBOR::Free::decode( $cbor )
 
@@ -61,16 +61,24 @@ The encoder currently does not handle any other blessed references.
 
 =over
 
-=item * C<canonical> - A boolean that makes the function output
+=item * C<canonical> - A boolean that makes the encoder output
 CBOR in L<canonical form|https://tools.ietf.org/html/rfc7049#section-3.9>.
 
-=item * C<scalar_references> - Tells the encoder to accept scalar references
+=item * C<preserve_references> - A boolean that makes the encoder encode
+multi-referenced values via L<CBOR’s “shared references” tags|https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml>. This allows encoding of shared
+and circular references. It also incurs a performance penalty.
+
+(Take care that any circular references in your application don’t cause
+memory leaks!)
+
+=item * C<scalar_references> - A boolean that makes the encoder accept
+scalar references
 (rather than reject them) and encode them via
 L<CBOR’s “indirection” tag|https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml>.
 Most languages don’t use references as Perl does, so this option seems of
 little use outside all-Perl IPC contexts; it is arguably more useful, then,
-to have the encoder reject data structures that most other languages cannot
-represent.
+for general use to have the encoder reject data structures that most other
+languages cannot represent.
 
 =back
 
@@ -82,6 +90,8 @@ Notes on mapping Perl to CBOR:
 integer, float, byte string, or character string) determines its CBOR
 encoding.
 
+=item * Perl hash keys become CBOR binary strings.
+
 =item * L<Types::Serialiser> booleans are encoded as CBOR booleans.
 Perl undef is encoded as CBOR null. (NB: No Perl value encodes as CBOR
 undefined.)
@@ -89,6 +99,10 @@ undefined.)
 =item * Scalar references (including references to other references) are
 unhandled by default, which makes them trigger an exception. You can
 optionally tell CBOR::Free to encode them via the C<scalar_references> flag.
+
+=item * Via the optional C<preserve_references> flag, circular and shared
+references may be preserved. Without this flag, circular references cause an
+exception, and other shared references are not preserved.
 
 =item * Instances of L<CBOR::Free::Tagged> are encoded as tagged values.
 
@@ -120,6 +134,9 @@ Both CBOR null and undefined become Perl undef.
 
 =item * L<CBOR’s “indirection” tag|https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml> is interpreted as a scalar reference. This behavior is always
 active; unlike with the encoder, there is no need to enable it manually.
+
+=item * C<preserve_references()> mode complements the same flag
+given to the encoder.
 
 =item * This function does not interpret any other tags. If you need to
 decode other tags, look at L<CBOR::Free::Decoder>. Any unhandled tags that

@@ -35,6 +35,7 @@ my %WriteMakefileArgs = (
     "Moose::Role" => 0,
     "Path::Iterator::Rule" => 0,
     "String::Util" => 0,
+    "Time::ParseDate" => 0,
     "Time::localtime" => 0,
     "Try::Tiny" => 0,
     "constant" => 0,
@@ -43,10 +44,9 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::Plugin::DieOnFail" => 0,
     "Test2::V0" => 0,
-    "Time::ParseDate" => 0,
     "vars" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -43,10 +43,9 @@ That requires libcairo binaries, includes, and pkg-config.
 
 In case you don't have cairo binaries and include files, grab them here:
 
-http://karasik.eu.org/misc/cairo/cairo-win32.zip .
+http://prima.eu.org/Cairo/cairo-win.zip
 
-Hack lib/pkgconfig/cairo.pc and point PKG_CONFIG_PATH to the directory
-where it is located.
+unzip and run <code>make install</code>.
 
 Strawberry 5.20 is shipped with a broken pkg-config (
 https://rt.cpan.org/Ticket/Display.html?id=96315,
@@ -56,6 +55,11 @@ working one grab it here:
 http://karasik.eu.org/misc/cairo/pkgconfig.zip
 
 This setup is needed both for Cairo and Prima-Cairo.
+
+Debian/Ubuntu
+-------------
+
+apt-get install libextutils-pkgconfig-perl libcairo-dev libcairo-perl
 
 AUTHOR
 =====

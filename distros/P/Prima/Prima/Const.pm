@@ -49,6 +49,21 @@ sub blend($)
    return rop::DstAtop | rop::ConstantAlpha | ( $alpha << rop::SrcAlphaShift ) | ($alpha << rop::DstAlphaShift);
 }
 
+sub alpha($;$$)
+{
+   my ($rop, $src_alpha, $dst_alpha) = @_;
+   $src_alpha //= 255;
+   $src_alpha = 0 if $src_alpha < 0;
+   $src_alpha = 255 if $src_alpha > 255;
+   my $ret = $rop | rop::SrcAlpha | ( $src_alpha << rop::SrcAlphaShift );
+   if (defined $dst_alpha) {
+      $dst_alpha = 0 if $dst_alpha < 0;
+      $dst_alpha = 255 if $dst_alpha > 255;
+      $ret |= rop::DstAlpha | ( $dst_alpha << rop::DstAlphaShift );
+   }
+   return $ret;
+}
+
 package
     gm; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# grow modes
 package
@@ -860,20 +875,35 @@ See L<Prima::Drawable/Raster operations>
 
 12 Porter-Duff operators
 
-        rop::Clear
-        rop::Xor
-        rop::SrcOver
-        rop::DstOver
-        rop::SrcCopy
-        rop::DstCopy
-        rop::SrcIn
-        rop::DstIn
-        rop::SrcOut
-        rop::DstOut
-        rop::SrcAtop
-        rop::DstAtop
+        rop::Clear       # = 0
+        rop::Xor         # = src ( 1 - dstA ) + dst ( 1 - srcA )
+        rop::SrcOver     # = src + dst (1 - srcA) 
+        rop::DstOver     # = dst + src (1 - dstA)
+        rop::SrcCopy     # = src
+        rop::DstCopy     # = dst
+        rop::SrcIn       # = src dstA
+        rop::DstIn       # = dst srcA
+        rop::SrcOut      # = src ( 1 - dstA )
+        rop::DstOut      # = dst ( 1 - srcA )
+        rop::SrcAtop     # = src dstA + dst ( 1 - srcA )
+        rop::DstAtop     # = dst srcA + src ( 1 - dstA )
 
         rop::PorterDuffMask - masks out all bits but the constants above
+
+Photoshop operators
+
+	rop::Add
+	rop::Multiply
+	rop::Screen
+	rop::Overlay
+	rop::Darken
+	rop::Lighten
+	rop::ColorDodge
+	rop::ColorBurn
+	rop::HardLight
+	rop::SoftLight
+	rop::Difference
+	rop::Exclusion
 
 Constant alpha flags
 

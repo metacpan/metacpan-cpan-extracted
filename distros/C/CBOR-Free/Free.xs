@@ -8,6 +8,7 @@
 
 //#include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "cbor_free_common.h"
@@ -19,10 +20,13 @@
 #define _PACKAGE "CBOR::Free"
 
 #define CANONICAL_OPT "canonical"
-#define CANONICAL_OPT_LEN sizeof(CANONICAL_OPT) - 1
+#define CANONICAL_OPT_LEN (sizeof(CANONICAL_OPT) - 1)
+
+#define PRESERVE_REFS_OPT "preserve_references"
+#define PRESERVE_REFS_OPT_LEN (sizeof(PRESERVE_REFS_OPT) - 1)
 
 #define SCALAR_REFS_OPT "scalar_references"
-#define SCALAR_REFS_OPT_LEN sizeof(SCALAR_REFS_OPT) - 1
+#define SCALAR_REFS_OPT_LEN (sizeof(SCALAR_REFS_OPT) - 1)
 
 HV *cbf_stash = NULL;
 
@@ -40,17 +44,7 @@ BOOT:
 SV *
 encode( SV * value, ... )
     CODE:
-        encode_ctx encode_state[1];
-
-        encode_state->buffer = NULL;
-        Newx( encode_state->buffer, ENCODE_ALLOC_CHUNK_SIZE, char );
-
-        encode_state->buflen = ENCODE_ALLOC_CHUNK_SIZE;
-        encode_state->len = 0;
-        encode_state->recurse_count = 0;
-
-        encode_state->is_canonical = false;
-        encode_state->encode_scalar_refs = false;
+        uint8_t encode_state_flags = 0;
 
         U8 i;
         for (i=1; i<items; i++) {
@@ -58,29 +52,43 @@ encode( SV * value, ... )
 
             if ((SvCUR(ST(i)) == CANONICAL_OPT_LEN) && memEQ( SvPV_nolen(ST(i)), CANONICAL_OPT, CANONICAL_OPT_LEN)) {
                 ++i;
-                if (i<items) encode_state->is_canonical = SvTRUE(ST(i));
-                break;
+                if (i<items && SvTRUE(ST(i))) {
+                    encode_state_flags |= ENCODE_FLAG_CANONICAL;
+                }
             }
-            if ((SvCUR(ST(i)) == SCALAR_REFS_OPT_LEN) && memEQ( SvPV_nolen(ST(i)), SCALAR_REFS_OPT, SCALAR_REFS_OPT_LEN)) {
+
+            else if ((SvCUR(ST(i)) == PRESERVE_REFS_OPT_LEN) && memEQ( SvPV_nolen(ST(i)), PRESERVE_REFS_OPT, PRESERVE_REFS_OPT_LEN)) {
                 ++i;
-                if (i<items) encode_state->encode_scalar_refs = SvTRUE(ST(i));
-                break;
+                if (i<items && SvTRUE(ST(i))) {
+                    encode_state_flags |= ENCODE_FLAG_PRESERVE_REFS;
+                }
+            }
+
+            else if ((SvCUR(ST(i)) == SCALAR_REFS_OPT_LEN) && memEQ( SvPV_nolen(ST(i)), SCALAR_REFS_OPT, SCALAR_REFS_OPT_LEN)) {
+                ++i;
+                if (i<items && SvTRUE(ST(i))) {
+                    encode_state_flags |= ENCODE_FLAG_SCALAR_REFS;
+                }
             }
         }
 
+        encode_ctx encode_state = cbf_encode_ctx_create(encode_state_flags);
+
         RETVAL = newSV(0);
 
-        cbf_encode(aTHX_ value, encode_state, RETVAL);
+        cbf_encode(aTHX_ value, &encode_state, RETVAL);
+
+        cbf_encode_ctx_free_reftracker( &encode_state );
 
         // Don’t use newSVpvn here because that will copy the string.
         // Instead, create a new SV and manually assign its pieces.
         // This follows the example from ext/POSIX/POSIX.xs:
 
         SvUPGRADE(RETVAL, SVt_PV);
-        SvPV_set(RETVAL, encode_state->buffer);
+        SvPV_set(RETVAL, encode_state.buffer);
         SvPOK_on(RETVAL);
-        SvCUR_set(RETVAL, encode_state->len - 1);
-        SvLEN_set(RETVAL, encode_state->buflen);
+        SvCUR_set(RETVAL, encode_state.len - 1);
+        SvLEN_set(RETVAL, encode_state.buflen);
 
     OUTPUT:
         RETVAL
@@ -89,7 +97,7 @@ encode( SV * value, ... )
 SV *
 decode( SV *cbor )
     CODE:
-        RETVAL = cbf_decode( aTHX_ cbor, NULL );
+        RETVAL = cbf_decode( aTHX_ cbor, NULL, false );
 
     OUTPUT:
         RETVAL
@@ -113,7 +121,13 @@ decode( SV *selfref, SV *cbor )
             tag_handler = (HV *)SvRV(*tag_handler_hr);
         }
 
-        RETVAL = cbf_decode( aTHX_ cbor, tag_handler );
+        SV **preserve_refs = hv_fetchs(self, "_preserve_references", 0);
+
+        RETVAL = cbf_decode( aTHX_
+            cbor,
+            tag_handler,
+            preserve_refs && *preserve_refs && SvTRUE(*preserve_refs)
+        );
 
     OUTPUT:
         RETVAL

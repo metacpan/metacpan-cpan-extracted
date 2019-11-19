@@ -21,7 +21,11 @@ use aliased 'Bio::FastParsers::Hmmer::DomTable';
 
 
 # load biosynML.xml/regions.js file report
-my $report = Parser->new( file => $ARGV_report_file);
+my $report = Parser->new(
+    file => $ARGV_report_file,
+    module_delineation => $ARGV_module_delineation
+);
+
 my $root = $report->root;
 
 # generate Cluster object depending on selected mode
@@ -392,7 +396,7 @@ draw_bgc_maps.pl - This script draws NRPS/PKS BGC clusters maps in PNG
 
 =head1 VERSION
 
-version 0.193080
+version 0.193230
 
 =head1 NAME
 
@@ -439,6 +443,14 @@ Label to use for the mapping of domains: symbol, function, subtype
 =for Euclid: str.type:   /symbol|function|subtype/
     str.type.error: <str> must be of symbol, function, subtype (not str)
     str.default: 'symbol'
+
+=item --module-delineation [=] <str>
+
+Method for delineating the modules. Modules can either be cut on condensation
+(C and KS) or selection domains (A and AT) [default: selection].
+
+=for Euclid: str.type: /condensation|selection/
+    str.default: 'selection'
 
 =item --verbose
 

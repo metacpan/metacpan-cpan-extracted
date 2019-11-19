@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has album => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_album',
     json_ld   => 'album',
 );
 
@@ -28,7 +28,7 @@ has album => (
 
 has albums => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_albums',
     json_ld   => 'albums',
 );
 
@@ -36,7 +36,7 @@ has albums => (
 
 has genre => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_genre',
     json_ld   => 'genre',
 );
 
@@ -44,7 +44,7 @@ has genre => (
 
 has music_group_member => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_music_group_member',
     json_ld   => 'musicGroupMember',
 );
 
@@ -52,7 +52,7 @@ has music_group_member => (
 
 has track => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_track',
     json_ld   => 'track',
 );
 
@@ -60,7 +60,7 @@ has track => (
 
 has tracks => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_tracks',
     json_ld   => 'tracks',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::MusicGroup - A musical group
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -103,6 +103,10 @@ A album should be one of the following types:
 
 =back
 
+=head2 C<_has_album>
+
+A predicate for the L</album> attribute.
+
 =head2 C<albums>
 
 A collection of music albums.
@@ -115,6 +119,10 @@ A albums should be one of the following types:
 
 =back
 
+=head2 C<_has_albums>
+
+A predicate for the L</albums> attribute.
+
 =head2 C<genre>
 
 Genre of the creative work, broadcast channel or group.
@@ -126,6 +134,10 @@ A genre should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_genre>
+
+A predicate for the L</genre> attribute.
 
 =head2 C<music_group_member>
 
@@ -140,6 +152,10 @@ A music_group_member should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_music_group_member>
+
+A predicate for the L</music_group_member> attribute.
 
 =head2 C<track>
 
@@ -156,6 +172,10 @@ A track should be one of the following types:
 
 =back
 
+=head2 C<_has_track>
+
+A predicate for the L</track> attribute.
+
 =head2 C<tracks>
 
 A music recording (track)&#x2014;usually a single song.
@@ -167,6 +187,10 @@ A tracks should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MusicRecording']>
 
 =back
+
+=head2 C<_has_tracks>
+
+A predicate for the L</tracks> attribute.
 
 =head1 SEE ALSO
 

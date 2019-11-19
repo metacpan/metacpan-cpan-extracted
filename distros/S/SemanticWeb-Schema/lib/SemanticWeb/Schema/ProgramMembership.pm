@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has hosting_organization => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_hosting_organization',
     json_ld   => 'hostingOrganization',
 );
 
@@ -28,7 +28,7 @@ has hosting_organization => (
 
 has member => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_member',
     json_ld   => 'member',
 );
 
@@ -36,7 +36,7 @@ has member => (
 
 has members => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_members',
     json_ld   => 'members',
 );
 
@@ -44,7 +44,7 @@ has members => (
 
 has membership_number => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_membership_number',
     json_ld   => 'membershipNumber',
 );
 
@@ -52,7 +52,7 @@ has membership_number => (
 
 has membership_points_earned => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_membership_points_earned',
     json_ld   => 'membershipPointsEarned',
 );
 
@@ -60,7 +60,7 @@ has membership_points_earned => (
 
 has program_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_program_name',
     json_ld   => 'programName',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::ProgramMembership - Used to describe membership in a loyalt
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -106,6 +106,10 @@ A hosting_organization should be one of the following types:
 
 =back
 
+=head2 C<_has_hosting_organization>
+
+A predicate for the L</hosting_organization> attribute.
+
 =head2 C<member>
 
 A member of an Organization or a ProgramMembership. Organizations can be
@@ -121,6 +125,10 @@ A member should be one of the following types:
 
 =back
 
+=head2 C<_has_member>
+
+A predicate for the L</member> attribute.
+
 =head2 C<members>
 
 A member of this organization.
@@ -135,6 +143,10 @@ A members should be one of the following types:
 
 =back
 
+=head2 C<_has_members>
+
+A predicate for the L</members> attribute.
+
 =head2 C<membership_number>
 
 C<membershipNumber>
@@ -148,6 +160,10 @@ A membership_number should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_membership_number>
+
+A predicate for the L</membership_number> attribute.
 
 =head2 C<membership_points_earned>
 
@@ -167,6 +183,10 @@ A membership_points_earned should be one of the following types:
 
 =back
 
+=head2 C<_has_membership_points_earned>
+
+A predicate for the L</membership_points_earned> attribute.
+
 =head2 C<program_name>
 
 C<programName>
@@ -180,6 +200,10 @@ A program_name should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_program_name>
+
+A predicate for the L</program_name> attribute.
 
 =head1 SEE ALSO
 

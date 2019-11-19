@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has composer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_composer',
     json_ld   => 'composer',
 );
 
@@ -28,7 +28,7 @@ has composer => (
 
 has first_performance => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_first_performance',
     json_ld   => 'firstPerformance',
 );
 
@@ -36,7 +36,7 @@ has first_performance => (
 
 has included_composition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_included_composition',
     json_ld   => 'includedComposition',
 );
 
@@ -44,7 +44,7 @@ has included_composition => (
 
 has iswc_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_iswc_code',
     json_ld   => 'iswcCode',
 );
 
@@ -52,7 +52,7 @@ has iswc_code => (
 
 has lyricist => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_lyricist',
     json_ld   => 'lyricist',
 );
 
@@ -60,7 +60,7 @@ has lyricist => (
 
 has lyrics => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_lyrics',
     json_ld   => 'lyrics',
 );
 
@@ -68,7 +68,7 @@ has lyrics => (
 
 has music_arrangement => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_music_arrangement',
     json_ld   => 'musicArrangement',
 );
 
@@ -76,7 +76,7 @@ has music_arrangement => (
 
 has music_composition_form => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_music_composition_form',
     json_ld   => 'musicCompositionForm',
 );
 
@@ -84,7 +84,7 @@ has music_composition_form => (
 
 has musical_key => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_musical_key',
     json_ld   => 'musicalKey',
 );
 
@@ -92,7 +92,7 @@ has musical_key => (
 
 has recorded_as => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_recorded_as',
     json_ld   => 'recordedAs',
 );
 
@@ -114,7 +114,7 @@ SemanticWeb::Schema::MusicComposition - A musical composition.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -137,6 +137,10 @@ A composer should be one of the following types:
 
 =back
 
+=head2 C<_has_composer>
+
+A predicate for the L</composer> attribute.
+
 =head2 C<first_performance>
 
 C<firstPerformance>
@@ -150,6 +154,10 @@ A first_performance should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Event']>
 
 =back
+
+=head2 C<_has_first_performance>
+
+A predicate for the L</first_performance> attribute.
 
 =head2 C<included_composition>
 
@@ -165,6 +173,10 @@ A included_composition should be one of the following types:
 
 =back
 
+=head2 C<_has_included_composition>
+
+A predicate for the L</included_composition> attribute.
+
 =head2 C<iswc_code>
 
 C<iswcCode>
@@ -179,6 +191,10 @@ A iswc_code should be one of the following types:
 
 =back
 
+=head2 C<_has_iswc_code>
+
+A predicate for the L</iswc_code> attribute.
+
 =head2 C<lyricist>
 
 The person who wrote the words.
@@ -191,6 +207,10 @@ A lyricist should be one of the following types:
 
 =back
 
+=head2 C<_has_lyricist>
+
+A predicate for the L</lyricist> attribute.
+
 =head2 C<lyrics>
 
 The words in the song.
@@ -202,6 +222,10 @@ A lyrics should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
+
+=head2 C<_has_lyrics>
+
+A predicate for the L</lyrics> attribute.
 
 =head2 C<music_arrangement>
 
@@ -217,6 +241,10 @@ A music_arrangement should be one of the following types:
 
 =back
 
+=head2 C<_has_music_arrangement>
+
+A predicate for the L</music_arrangement> attribute.
+
 =head2 C<music_composition_form>
 
 C<musicCompositionForm>
@@ -230,6 +258,10 @@ A music_composition_form should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_music_composition_form>
+
+A predicate for the L</music_composition_form> attribute.
 
 =head2 C<musical_key>
 
@@ -245,6 +277,10 @@ A musical_key should be one of the following types:
 
 =back
 
+=head2 C<_has_musical_key>
+
+A predicate for the L</musical_key> attribute.
+
 =head2 C<recorded_as>
 
 C<recordedAs>
@@ -258,6 +294,10 @@ A recorded_as should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MusicRecording']>
 
 =back
+
+=head2 C<_has_recorded_as>
+
+A predicate for the L</recorded_as> attribute.
 
 =head1 SEE ALSO
 

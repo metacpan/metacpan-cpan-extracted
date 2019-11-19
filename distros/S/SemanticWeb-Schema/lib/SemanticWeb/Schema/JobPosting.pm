@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has applicant_location_requirements => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_applicant_location_requirements',
     json_ld   => 'applicantLocationRequirements',
 );
 
@@ -28,7 +28,7 @@ has applicant_location_requirements => (
 
 has base_salary => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_base_salary',
     json_ld   => 'baseSalary',
 );
 
@@ -36,7 +36,7 @@ has base_salary => (
 
 has benefits => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_benefits',
     json_ld   => 'benefits',
 );
 
@@ -44,7 +44,7 @@ has benefits => (
 
 has date_posted => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_date_posted',
     json_ld   => 'datePosted',
 );
 
@@ -52,7 +52,7 @@ has date_posted => (
 
 has education_requirements => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_education_requirements',
     json_ld   => 'educationRequirements',
 );
 
@@ -60,7 +60,7 @@ has education_requirements => (
 
 has employment_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_employment_type',
     json_ld   => 'employmentType',
 );
 
@@ -68,7 +68,7 @@ has employment_type => (
 
 has employment_unit => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_employment_unit',
     json_ld   => 'employmentUnit',
 );
 
@@ -76,7 +76,7 @@ has employment_unit => (
 
 has estimated_salary => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_estimated_salary',
     json_ld   => 'estimatedSalary',
 );
 
@@ -84,7 +84,7 @@ has estimated_salary => (
 
 has experience_requirements => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_experience_requirements',
     json_ld   => 'experienceRequirements',
 );
 
@@ -92,7 +92,7 @@ has experience_requirements => (
 
 has hiring_organization => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_hiring_organization',
     json_ld   => 'hiringOrganization',
 );
 
@@ -100,7 +100,7 @@ has hiring_organization => (
 
 has incentive_compensation => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_incentive_compensation',
     json_ld   => 'incentiveCompensation',
 );
 
@@ -108,7 +108,7 @@ has incentive_compensation => (
 
 has incentives => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_incentives',
     json_ld   => 'incentives',
 );
 
@@ -116,7 +116,7 @@ has incentives => (
 
 has industry => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_industry',
     json_ld   => 'industry',
 );
 
@@ -124,7 +124,7 @@ has industry => (
 
 has job_benefits => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_job_benefits',
     json_ld   => 'jobBenefits',
 );
 
@@ -132,7 +132,7 @@ has job_benefits => (
 
 has job_immediate_start => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_job_immediate_start',
     json_ld   => 'jobImmediateStart',
 );
 
@@ -140,7 +140,7 @@ has job_immediate_start => (
 
 has job_location => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_job_location',
     json_ld   => 'jobLocation',
 );
 
@@ -148,7 +148,7 @@ has job_location => (
 
 has job_location_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_job_location_type',
     json_ld   => 'jobLocationType',
 );
 
@@ -156,7 +156,7 @@ has job_location_type => (
 
 has job_start_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_job_start_date',
     json_ld   => 'jobStartDate',
 );
 
@@ -164,7 +164,7 @@ has job_start_date => (
 
 has occupational_category => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_occupational_category',
     json_ld   => 'occupationalCategory',
 );
 
@@ -172,7 +172,7 @@ has occupational_category => (
 
 has qualifications => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_qualifications',
     json_ld   => 'qualifications',
 );
 
@@ -180,7 +180,7 @@ has qualifications => (
 
 has relevant_occupation => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_relevant_occupation',
     json_ld   => 'relevantOccupation',
 );
 
@@ -188,7 +188,7 @@ has relevant_occupation => (
 
 has responsibilities => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_responsibilities',
     json_ld   => 'responsibilities',
 );
 
@@ -196,7 +196,7 @@ has responsibilities => (
 
 has salary_currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_salary_currency',
     json_ld   => 'salaryCurrency',
 );
 
@@ -204,7 +204,7 @@ has salary_currency => (
 
 has skills => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_skills',
     json_ld   => 'skills',
 );
 
@@ -212,7 +212,7 @@ has skills => (
 
 has special_commitments => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_special_commitments',
     json_ld   => 'specialCommitments',
 );
 
@@ -220,7 +220,7 @@ has special_commitments => (
 
 has title => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_title',
     json_ld   => 'title',
 );
 
@@ -228,7 +228,7 @@ has title => (
 
 has total_job_openings => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_total_job_openings',
     json_ld   => 'totalJobOpenings',
 );
 
@@ -236,7 +236,7 @@ has total_job_openings => (
 
 has valid_through => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_through',
     json_ld   => 'validThrough',
 );
 
@@ -244,7 +244,7 @@ has valid_through => (
 
 has work_hours => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_work_hours',
     json_ld   => 'workHours',
 );
 
@@ -266,7 +266,7 @@ SemanticWeb::Schema::JobPosting - A listing that describes a job opening in a ce
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -291,6 +291,10 @@ A applicant_location_requirements should be one of the following types:
 
 =back
 
+=head2 C<_has_applicant_location_requirements>
+
+A predicate for the L</applicant_location_requirements> attribute.
+
 =head2 C<base_salary>
 
 C<baseSalary>
@@ -309,6 +313,10 @@ A base_salary should be one of the following types:
 
 =back
 
+=head2 C<_has_base_salary>
+
+A predicate for the L</base_salary> attribute.
+
 =head2 C<benefits>
 
 Description of benefits associated with the job.
@@ -320,6 +328,10 @@ A benefits should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_benefits>
+
+A predicate for the L</benefits> attribute.
 
 =head2 C<date_posted>
 
@@ -334,6 +346,10 @@ A date_posted should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_date_posted>
+
+A predicate for the L</date_posted> attribute.
 
 =head2 C<education_requirements>
 
@@ -351,6 +367,10 @@ A education_requirements should be one of the following types:
 
 =back
 
+=head2 C<_has_education_requirements>
+
+A predicate for the L</education_requirements> attribute.
+
 =head2 C<employment_type>
 
 C<employmentType>
@@ -366,6 +386,10 @@ A employment_type should be one of the following types:
 
 =back
 
+=head2 C<_has_employment_type>
+
+A predicate for the L</employment_type> attribute.
+
 =head2 C<employment_unit>
 
 C<employmentUnit>
@@ -380,6 +404,10 @@ A employment_unit should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_employment_unit>
+
+A predicate for the L</employment_unit> attribute.
 
 =head2 C<estimated_salary>
 
@@ -402,6 +430,10 @@ A estimated_salary should be one of the following types:
 
 =back
 
+=head2 C<_has_estimated_salary>
+
+A predicate for the L</estimated_salary> attribute.
+
 =head2 C<experience_requirements>
 
 C<experienceRequirements>
@@ -415,6 +447,10 @@ A experience_requirements should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_experience_requirements>
+
+A predicate for the L</experience_requirements> attribute.
 
 =head2 C<hiring_organization>
 
@@ -430,6 +466,10 @@ A hiring_organization should be one of the following types:
 
 =back
 
+=head2 C<_has_hiring_organization>
+
+A predicate for the L</hiring_organization> attribute.
+
 =head2 C<incentive_compensation>
 
 C<incentiveCompensation>
@@ -444,6 +484,10 @@ A incentive_compensation should be one of the following types:
 
 =back
 
+=head2 C<_has_incentive_compensation>
+
+A predicate for the L</incentive_compensation> attribute.
+
 =head2 C<incentives>
 
 Description of bonus and commission compensation aspects of the job.
@@ -456,6 +500,10 @@ A incentives should be one of the following types:
 
 =back
 
+=head2 C<_has_incentives>
+
+A predicate for the L</incentives> attribute.
+
 =head2 C<industry>
 
 The industry associated with the job position.
@@ -467,6 +515,10 @@ A industry should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_industry>
+
+A predicate for the L</industry> attribute.
 
 =head2 C<job_benefits>
 
@@ -482,6 +534,10 @@ A job_benefits should be one of the following types:
 
 =back
 
+=head2 C<_has_job_benefits>
+
+A predicate for the L</job_benefits> attribute.
+
 =head2 C<job_immediate_start>
 
 C<jobImmediateStart>
@@ -495,6 +551,10 @@ A job_immediate_start should be one of the following types:
 =item C<Bool>
 
 =back
+
+=head2 C<_has_job_immediate_start>
+
+A predicate for the L</job_immediate_start> attribute.
 
 =head2 C<job_location>
 
@@ -510,6 +570,10 @@ A job_location should be one of the following types:
 
 =back
 
+=head2 C<_has_job_location>
+
+A predicate for the L</job_location> attribute.
+
 =head2 C<job_location_type>
 
 C<jobLocationType>
@@ -523,6 +587,10 @@ A job_location_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_job_location_type>
+
+A predicate for the L</job_location_type> attribute.
 
 =head2 C<job_start_date>
 
@@ -540,6 +608,10 @@ A job_start_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_job_start_date>
+
+A predicate for the L</job_start_date> attribute.
 
 =head2 C<occupational_category>
 
@@ -565,6 +637,10 @@ A occupational_category should be one of the following types:
 
 =back
 
+=head2 C<_has_occupational_category>
+
+A predicate for the L</occupational_category> attribute.
+
 =head2 C<qualifications>
 
 Specific qualifications required for this role or Occupation.
@@ -578,6 +654,10 @@ A qualifications should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_qualifications>
+
+A predicate for the L</qualifications> attribute.
 
 =head2 C<relevant_occupation>
 
@@ -593,6 +673,10 @@ A relevant_occupation should be one of the following types:
 
 =back
 
+=head2 C<_has_relevant_occupation>
+
+A predicate for the L</relevant_occupation> attribute.
+
 =head2 C<responsibilities>
 
 Responsibilities associated with this role or Occupation.
@@ -604,6 +688,10 @@ A responsibilities should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_responsibilities>
+
+A predicate for the L</responsibilities> attribute.
 
 =head2 C<salary_currency>
 
@@ -621,6 +709,10 @@ A salary_currency should be one of the following types:
 
 =back
 
+=head2 C<_has_salary_currency>
+
+A predicate for the L</salary_currency> attribute.
+
 =head2 C<skills>
 
 A statement of knowledge, skill, ability, task or any other assertion
@@ -637,6 +729,10 @@ A skills should be one of the following types:
 
 =back
 
+=head2 C<_has_skills>
+
+A predicate for the L</skills> attribute.
+
 =head2 C<special_commitments>
 
 C<specialCommitments>
@@ -652,6 +748,10 @@ A special_commitments should be one of the following types:
 
 =back
 
+=head2 C<_has_special_commitments>
+
+A predicate for the L</special_commitments> attribute.
+
 =head2 C<title>
 
 The title of the job.
@@ -663,6 +763,10 @@ A title should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_title>
+
+A predicate for the L</title> attribute.
 
 =head2 C<total_job_openings>
 
@@ -679,6 +783,10 @@ A total_job_openings should be one of the following types:
 
 =back
 
+=head2 C<_has_total_job_openings>
+
+A predicate for the L</total_job_openings> attribute.
+
 =head2 C<valid_through>
 
 C<validThrough>
@@ -694,6 +802,10 @@ A valid_through should be one of the following types:
 
 =back
 
+=head2 C<_has_valid_through>
+
+A predicate for the L</valid_through> attribute.
+
 =head2 C<work_hours>
 
 C<workHours>
@@ -708,6 +820,10 @@ A work_hours should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_work_hours>
+
+A predicate for the L</work_hours> attribute.
 
 =head1 SEE ALSO
 

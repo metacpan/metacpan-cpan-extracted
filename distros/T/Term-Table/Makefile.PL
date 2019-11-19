@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Tiny" => "1.302097",
     "utf8" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t t/Table/*.t"
   }

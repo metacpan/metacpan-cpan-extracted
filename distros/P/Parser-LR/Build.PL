@@ -8,14 +8,15 @@ my $b = Module::Build->new(
   module_name           => 'Parser::LR',
   perl                  => '5.26',
   requires              => {
-     Carp               => 0,
-    'Data::Dump'        => 0,
+     Carp                      => 0,
+    'Data::Dump'               => 0,
     'Data::Table::Text'              => 20191110,
-    'Data::DFA'                      => 20180429,
-    'Data::NFA'                      => 20181027,
-    'Exporter'          => 0,
-    'Test::More'        => 0,
-    'Test2::API'        => 0,
+    'Data::DFA'                      => 20191119,
+    'Data::NFA'                      => 20191110,
+    'Exporter'                 => 0,
+    'Math::Cartesian::Product' => '1.009',
+    'Test::More'               => 0,
+    'Test2::API'               => 0,
    },
  );
 

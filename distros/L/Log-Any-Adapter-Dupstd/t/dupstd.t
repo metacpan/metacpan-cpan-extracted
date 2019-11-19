@@ -16,7 +16,7 @@ subtest 'Dupout' => \&test_fh, 'STDOUT', 'Dupout';
 sub test_fh {
     my ( $std, $adapter ) = @_;
 
-    plan tests => 8;
+    plan tests => 9;
 
     no strict 'refs';
 
@@ -44,6 +44,8 @@ sub test_fh {
     ok( my @adapter_stat_2 = $adapter_fh->stat, "Get stat for $adapter" );
 
     is( $adapter_stat_2[1], $std_stat[1], "Inode $std == $adapter after close $std" );
+
+    is $adapter_fh->autoflush, $adapter eq "Duperr"? 1:0, "\$adpater_fh is autoflushed";
 
     # Restore STD*
     ok(open $std_fh, '>&', $adapter_fh);

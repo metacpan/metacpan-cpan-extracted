@@ -1,5 +1,12 @@
 Revision history for App-Codeowners.
 
+0.47      2019-11-17 17:36:49-07:00 MST7MDT
+  * Configure git in unit tests to avoid unnecessary test failures.
+  * Compare long paths on win32 (thanks CPAN testers).
+
+0.46      2019-11-16 22:58:17-07:00 MST7MDT
+  * Declare dependency on Path::Tiny 0.089 (thanks CPAN testers).
+
 0.45      2019-11-14 22:30:14-07:00 MST7MDT
   * Pod::Usage is now optional for the benefit of Git for Windows.
 

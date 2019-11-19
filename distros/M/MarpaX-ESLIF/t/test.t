@@ -885,7 +885,7 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  lookupResolvedLeveli => 1,
                  nullableAction => undef,
                  symbolAction => 'perl_number',
-                 ifAction => undef,
+                 ifAction => 'test_if_action',
                  priority => 0,
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
@@ -1788,10 +1788,15 @@ Expression ::=
    ||     Expression  '+' Expression                                             name => 'Expression is +'
     |     Expression  '-' Expression                                             name => 'Expression is -'
 
-:lexeme ::= NUMBER pause => before event => ^NUMBER symbol-action => perl_number priority => 1
+:lexeme ::= NUMBER pause => before event => ^NUMBER symbol-action => perl_number priority => 1 if-action => ::lua->test_if_action
 :lexeme ::= NUMBER pause => after  event => NUMBER$ priority => 0
 NUMBER     ~ /[\d]+/
 whitespaces ::= WHITESPACES
 WHITESPACES ~ [\s]+
 comment ::= /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/)))/u
 
+<luascript>
+function test_if_action(lexeme)
+  return true
+end
+</luascript>

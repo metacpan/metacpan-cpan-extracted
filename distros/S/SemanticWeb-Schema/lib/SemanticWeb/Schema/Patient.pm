@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has diagnosis => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_diagnosis',
     json_ld   => 'diagnosis',
 );
 
@@ -28,7 +28,7 @@ has diagnosis => (
 
 has drug => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_drug',
     json_ld   => 'drug',
 );
 
@@ -36,7 +36,7 @@ has drug => (
 
 has health_condition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_health_condition',
     json_ld   => 'healthCondition',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::Patient - A patient is any person recipient of health care 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -79,6 +79,10 @@ A diagnosis should be one of the following types:
 
 =back
 
+=head2 C<_has_diagnosis>
+
+A predicate for the L</diagnosis> attribute.
+
 =head2 C<drug>
 
 Specifying a drug or medicine used in a medication procedure
@@ -90,6 +94,10 @@ A drug should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Drug']>
 
 =back
+
+=head2 C<_has_drug>
+
+A predicate for the L</drug> attribute.
 
 =head2 C<health_condition>
 
@@ -105,6 +113,10 @@ A health_condition should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalCondition']>
 
 =back
+
+=head2 C<_has_health_condition>
+
+A predicate for the L</health_condition> attribute.
 
 =head1 SEE ALSO
 

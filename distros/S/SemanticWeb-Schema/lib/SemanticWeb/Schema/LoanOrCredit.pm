@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has amount => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_amount',
     json_ld   => 'amount',
 );
 
@@ -28,7 +28,7 @@ has amount => (
 
 has currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_currency',
     json_ld   => 'currency',
 );
 
@@ -36,7 +36,7 @@ has currency => (
 
 has grace_period => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_grace_period',
     json_ld   => 'gracePeriod',
 );
 
@@ -44,7 +44,7 @@ has grace_period => (
 
 has loan_repayment_form => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_loan_repayment_form',
     json_ld   => 'loanRepaymentForm',
 );
 
@@ -52,7 +52,7 @@ has loan_repayment_form => (
 
 has loan_term => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_loan_term',
     json_ld   => 'loanTerm',
 );
 
@@ -60,7 +60,7 @@ has loan_term => (
 
 has loan_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_loan_type',
     json_ld   => 'loanType',
 );
 
@@ -68,7 +68,7 @@ has loan_type => (
 
 has recourse_loan => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_recourse_loan',
     json_ld   => 'recourseLoan',
 );
 
@@ -76,7 +76,7 @@ has recourse_loan => (
 
 has renegotiable_loan => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_renegotiable_loan',
     json_ld   => 'renegotiableLoan',
 );
 
@@ -84,7 +84,7 @@ has renegotiable_loan => (
 
 has required_collateral => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_required_collateral',
     json_ld   => 'requiredCollateral',
 );
 
@@ -106,7 +106,7 @@ SemanticWeb::Schema::LoanOrCredit - A financial product for the loaning of an am
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -129,6 +129,10 @@ A amount should be one of the following types:
 
 =back
 
+=head2 C<_has_amount>
+
+A predicate for the L</amount> attribute.
+
 =head2 C<currency>
 
 =for html <p>The currency in which the monetary amount is expressed.<br/><br/> Use
@@ -148,6 +152,10 @@ A currency should be one of the following types:
 
 =back
 
+=head2 C<_has_currency>
+
+A predicate for the L</currency> attribute.
+
 =head2 C<grace_period>
 
 C<gracePeriod>
@@ -162,6 +170,10 @@ A grace_period should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
+
+=head2 C<_has_grace_period>
+
+A predicate for the L</grace_period> attribute.
 
 =head2 C<loan_repayment_form>
 
@@ -179,6 +191,10 @@ A loan_repayment_form should be one of the following types:
 
 =back
 
+=head2 C<_has_loan_repayment_form>
+
+A predicate for the L</loan_repayment_form> attribute.
+
 =head2 C<loan_term>
 
 C<loanTerm>
@@ -193,6 +209,10 @@ A loan_term should be one of the following types:
 
 =back
 
+=head2 C<_has_loan_term>
+
+A predicate for the L</loan_term> attribute.
+
 =head2 C<loan_type>
 
 C<loanType>
@@ -206,6 +226,10 @@ A loan_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_loan_type>
+
+A predicate for the L</loan_type> attribute.
 
 =head2 C<recourse_loan>
 
@@ -223,6 +247,10 @@ A recourse_loan should be one of the following types:
 
 =back
 
+=head2 C<_has_recourse_loan>
+
+A predicate for the L</recourse_loan> attribute.
+
 =head2 C<renegotiable_loan>
 
 C<renegotiableLoan>
@@ -237,6 +265,10 @@ A renegotiable_loan should be one of the following types:
 =item C<Bool>
 
 =back
+
+=head2 C<_has_renegotiable_loan>
+
+A predicate for the L</renegotiable_loan> attribute.
 
 =head2 C<required_collateral>
 
@@ -254,6 +286,10 @@ A required_collateral should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_required_collateral>
+
+A predicate for the L</required_collateral> attribute.
 
 =head1 SEE ALSO
 

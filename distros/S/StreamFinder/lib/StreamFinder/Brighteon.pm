@@ -322,6 +322,7 @@ use LWP::UserAgent ();
 use vars qw(@ISA @EXPORT);
 
 my $DEBUG = 0;
+my $bummer = ($^O =~ /MSWin/);
 my $YOUTUBE = 'yes';
 my %uops = ();
 my @userAgentOps = ();
@@ -341,7 +342,10 @@ sub new
 
 	my @okStreams;
 
-	foreach my $p ("$ENV{HOME}/.config/StreamFinder/config", "$ENV{HOME}/.config/StreamFinder/Brighteon/config") {
+	my $homedir = $bummer ? $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'} : $ENV{'HOME'};
+	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
+	$homedir =~ s#[\/\\]$##;
+	foreach my $p ("${homedir}/.config/StreamFinder/config", "${homedir}/.config/StreamFinder/Brighteon/config") {
 		if (open IN, $p) {
 			my ($atr, $val);
 			while (<IN>) {

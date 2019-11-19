@@ -27,8 +27,10 @@ sub finalize {
                 for (@$v) {
                     push @params, encode_utf8($k), encode_utf8($_);
                 }
+            } elsif (ref $v) {
+                push @params, encode_utf8($k), $v;
             } else {
-                push @params, encode_utf8($k), encode_utf8($v); 
+                push @params, encode_utf8($k), encode_utf8($v);
             }
         }
     }
@@ -48,7 +50,7 @@ HTTP::Entity::Parser::JSON - parser for application/json
 =head1 SYNOPSIS
 
     use HTTP::Entity::Parser;
-    
+
     my $parser = HTTP::Entity::Parser->new;
     $parser->register('application/json','HTTP::Entity::Parser::JSON');
 

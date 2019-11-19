@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has item_list_element => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_item_list_element',
     json_ld   => 'itemListElement',
 );
 
@@ -28,7 +28,7 @@ has item_list_element => (
 
 has item_list_order => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_item_list_order',
     json_ld   => 'itemListOrder',
 );
 
@@ -36,7 +36,7 @@ has item_list_order => (
 
 has number_of_items => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_number_of_items',
     json_ld   => 'numberOfItems',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::ItemList - A list of items of any sort—for example
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -94,6 +94,10 @@ A item_list_element should be one of the following types:
 
 =back
 
+=head2 C<_has_item_list_element>
+
+A predicate for the L</item_list_element> attribute.
+
 =head2 C<item_list_order>
 
 C<itemListOrder>
@@ -110,6 +114,10 @@ A item_list_order should be one of the following types:
 
 =back
 
+=head2 C<_has_item_list_order>
+
+A predicate for the L</item_list_order> attribute.
+
 =head2 C<number_of_items>
 
 C<numberOfItems>
@@ -125,6 +133,10 @@ A number_of_items should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
+
+=head2 C<_has_number_of_items>
+
+A predicate for the L</number_of_items> attribute.
 
 =head1 SEE ALSO
 

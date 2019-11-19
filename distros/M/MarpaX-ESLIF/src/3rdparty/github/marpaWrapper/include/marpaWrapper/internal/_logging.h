@@ -10,7 +10,7 @@ extern const struct marpa_event_description_s marpa_event_description[];
 extern const struct marpa_step_type_description_s marpa_step_type_description[];
 
 #ifndef MARPAWRAPPER_NTRACE
-#define MARPAWRAPPER_FUNCS(name)                            const static char *funcs = #name
+#define MARPAWRAPPER_FUNCS(name)                            const static char *funcs = #name ;
 #define MARPAWRAPPER_TRACEF(genericLoggerp, funcs, fmts, ...) do { if ((genericLoggerp) != NULL) { GENERICLOGGER_TRACEF(genericLoggerp, "[%s:%04d] %s - " fmts, funcs, __LINE__, funcs, __VA_ARGS__); } } while (0)
 #define MARPAWRAPPER_TRACE(genericLoggerp, funcs, msgs)       do { if ((genericLoggerp) != NULL) { GENERICLOGGER_TRACEF(genericLoggerp, "[%s:%04d] %s - %s", funcs, __LINE__, funcs, msgs); } } while (0)
 #else

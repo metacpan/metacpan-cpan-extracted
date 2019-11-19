@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has subtitle_language => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_subtitle_language',
     json_ld   => 'subtitleLanguage',
 );
 
@@ -28,7 +28,7 @@ has subtitle_language => (
 
 has video_format => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_video_format',
     json_ld   => 'videoFormat',
 );
 
@@ -36,7 +36,7 @@ has video_format => (
 
 has work_presented => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_work_presented',
     json_ld   => 'workPresented',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::ScreeningEvent - A screening of a movie or other video.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -83,6 +83,10 @@ A subtitle_language should be one of the following types:
 
 =back
 
+=head2 C<_has_subtitle_language>
+
+A predicate for the L</subtitle_language> attribute.
+
 =head2 C<video_format>
 
 C<videoFormat>
@@ -98,6 +102,10 @@ A video_format should be one of the following types:
 
 =back
 
+=head2 C<_has_video_format>
+
+A predicate for the L</video_format> attribute.
+
 =head2 C<work_presented>
 
 C<workPresented>
@@ -111,6 +119,10 @@ A work_presented should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Movie']>
 
 =back
+
+=head2 C<_has_work_presented>
+
+A predicate for the L</work_presented> attribute.
 
 =head1 SEE ALSO
 

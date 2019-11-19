@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has album_production_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_album_production_type',
     json_ld   => 'albumProductionType',
 );
 
@@ -28,7 +28,7 @@ has album_production_type => (
 
 has album_release => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_album_release',
     json_ld   => 'albumRelease',
 );
 
@@ -36,7 +36,7 @@ has album_release => (
 
 has album_release_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_album_release_type',
     json_ld   => 'albumReleaseType',
 );
 
@@ -44,7 +44,7 @@ has album_release_type => (
 
 has by_artist => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_by_artist',
     json_ld   => 'byArtist',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::MusicAlbum - A collection of music tracks.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -89,6 +89,10 @@ A album_production_type should be one of the following types:
 
 =back
 
+=head2 C<_has_album_production_type>
+
+A predicate for the L</album_production_type> attribute.
+
 =head2 C<album_release>
 
 C<albumRelease>
@@ -103,6 +107,10 @@ A album_release should be one of the following types:
 
 =back
 
+=head2 C<_has_album_release>
+
+A predicate for the L</album_release> attribute.
+
 =head2 C<album_release_type>
 
 C<albumReleaseType>
@@ -116,6 +124,10 @@ A album_release_type should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MusicAlbumReleaseType']>
 
 =back
+
+=head2 C<_has_album_release_type>
+
+A predicate for the L</album_release_type> attribute.
 
 =head2 C<by_artist>
 
@@ -132,6 +144,10 @@ A by_artist should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_by_artist>
+
+A predicate for the L</by_artist> attribute.
 
 =head1 SEE ALSO
 

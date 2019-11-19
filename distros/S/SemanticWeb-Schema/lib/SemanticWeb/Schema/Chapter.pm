@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has page_end => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_page_end',
     json_ld   => 'pageEnd',
 );
 
@@ -28,7 +28,7 @@ has page_end => (
 
 has page_start => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_page_start',
     json_ld   => 'pageStart',
 );
 
@@ -36,7 +36,7 @@ has page_start => (
 
 has pagination => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_pagination',
     json_ld   => 'pagination',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::Chapter - One of the sections into which a book is divided
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -83,6 +83,10 @@ A page_end should be one of the following types:
 
 =back
 
+=head2 C<_has_page_end>
+
+A predicate for the L</page_end> attribute.
+
 =head2 C<page_start>
 
 C<pageStart>
@@ -99,6 +103,10 @@ A page_start should be one of the following types:
 
 =back
 
+=head2 C<_has_page_start>
+
+A predicate for the L</page_start> attribute.
+
 =head2 C<pagination>
 
 Any description of pages that is not separated into pageStart and pageEnd;
@@ -111,6 +119,10 @@ A pagination should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_pagination>
+
+A predicate for the L</pagination> attribute.
 
 =head1 SEE ALSO
 

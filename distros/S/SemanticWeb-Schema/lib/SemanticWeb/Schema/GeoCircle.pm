@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has geo_midpoint => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_midpoint',
     json_ld   => 'geoMidpoint',
 );
 
@@ -28,7 +28,7 @@ has geo_midpoint => (
 
 has geo_radius => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_geo_radius',
     json_ld   => 'geoRadius',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::GeoCircle - A GeoCircle is a GeoShape representing a circul
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -76,6 +76,10 @@ A geo_midpoint should be one of the following types:
 
 =back
 
+=head2 C<_has_geo_midpoint>
+
+A predicate for the L</geo_midpoint> attribute.
+
 =head2 C<geo_radius>
 
 C<geoRadius>
@@ -94,6 +98,10 @@ A geo_radius should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_geo_radius>
+
+A predicate for the L</geo_radius> attribute.
 
 =head1 SEE ALSO
 

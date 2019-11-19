@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has available_test => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_available_test',
     json_ld   => 'availableTest',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::DiagnosticLab - A medical laboratory that offers on-site or
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -63,6 +63,10 @@ A available_test should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalTest']>
 
 =back
+
+=head2 C<_has_available_test>
+
+A predicate for the L</available_test> attribute.
 
 =head1 SEE ALSO
 

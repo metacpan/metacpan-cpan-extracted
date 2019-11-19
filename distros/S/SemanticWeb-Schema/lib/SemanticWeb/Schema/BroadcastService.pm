@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has area => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_area',
     json_ld   => 'area',
 );
 
@@ -28,7 +28,7 @@ has area => (
 
 has broadcast_affiliate_of => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcast_affiliate_of',
     json_ld   => 'broadcastAffiliateOf',
 );
 
@@ -36,7 +36,7 @@ has broadcast_affiliate_of => (
 
 has broadcast_display_name => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcast_display_name',
     json_ld   => 'broadcastDisplayName',
 );
 
@@ -44,7 +44,7 @@ has broadcast_display_name => (
 
 has broadcast_frequency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcast_frequency',
     json_ld   => 'broadcastFrequency',
 );
 
@@ -52,7 +52,7 @@ has broadcast_frequency => (
 
 has broadcast_timezone => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcast_timezone',
     json_ld   => 'broadcastTimezone',
 );
 
@@ -60,7 +60,7 @@ has broadcast_timezone => (
 
 has broadcaster => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcaster',
     json_ld   => 'broadcaster',
 );
 
@@ -68,7 +68,7 @@ has broadcaster => (
 
 has call_sign => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_call_sign',
     json_ld   => 'callSign',
 );
 
@@ -76,7 +76,7 @@ has call_sign => (
 
 has has_broadcast_channel => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_has_broadcast_channel',
     json_ld   => 'hasBroadcastChannel',
 );
 
@@ -84,7 +84,7 @@ has has_broadcast_channel => (
 
 has parent_service => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_parent_service',
     json_ld   => 'parentService',
 );
 
@@ -92,7 +92,7 @@ has parent_service => (
 
 has video_format => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_video_format',
     json_ld   => 'videoFormat',
 );
 
@@ -114,7 +114,7 @@ SemanticWeb::Schema::BroadcastService - A delivery service through which content
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -135,6 +135,10 @@ A area should be one of the following types:
 
 =back
 
+=head2 C<_has_area>
+
+A predicate for the L</area> attribute.
+
 =head2 C<broadcast_affiliate_of>
 
 C<broadcastAffiliateOf>
@@ -148,6 +152,10 @@ A broadcast_affiliate_of should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_broadcast_affiliate_of>
+
+A predicate for the L</broadcast_affiliate_of> attribute.
 
 =head2 C<broadcast_display_name>
 
@@ -163,6 +171,10 @@ A broadcast_display_name should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_broadcast_display_name>
+
+A predicate for the L</broadcast_display_name> attribute.
 
 =head2 C<broadcast_frequency>
 
@@ -182,6 +194,10 @@ A broadcast_frequency should be one of the following types:
 
 =back
 
+=head2 C<_has_broadcast_frequency>
+
+A predicate for the L</broadcast_frequency> attribute.
+
 =head2 C<broadcast_timezone>
 
 C<broadcastTimezone>
@@ -197,6 +213,10 @@ A broadcast_timezone should be one of the following types:
 
 =back
 
+=head2 C<_has_broadcast_timezone>
+
+A predicate for the L</broadcast_timezone> attribute.
+
 =head2 C<broadcaster>
 
 The organization owning or operating the broadcast service.
@@ -208,6 +228,10 @@ A broadcaster should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_broadcaster>
+
+A predicate for the L</broadcaster> attribute.
 
 =head2 C<call_sign>
 
@@ -225,6 +249,10 @@ A call_sign should be one of the following types:
 
 =back
 
+=head2 C<_has_call_sign>
+
+A predicate for the L</call_sign> attribute.
+
 =head2 C<has_broadcast_channel>
 
 C<hasBroadcastChannel>
@@ -238,6 +266,10 @@ A has_broadcast_channel should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::BroadcastChannel']>
 
 =back
+
+=head2 C<_has_has_broadcast_channel>
+
+A predicate for the L</has_broadcast_channel> attribute.
 
 =head2 C<parent_service>
 
@@ -254,6 +286,10 @@ A parent_service should be one of the following types:
 
 =back
 
+=head2 C<_has_parent_service>
+
+A predicate for the L</parent_service> attribute.
+
 =head2 C<video_format>
 
 C<videoFormat>
@@ -268,6 +304,10 @@ A video_format should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_video_format>
+
+A predicate for the L</video_format> attribute.
 
 =head1 SEE ALSO
 

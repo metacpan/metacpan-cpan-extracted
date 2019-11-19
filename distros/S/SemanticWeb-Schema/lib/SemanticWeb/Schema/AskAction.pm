@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has question => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_question',
     json_ld   => 'question',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::AskAction - The act of posing a question / favor to someone
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ A question should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Question']>
 
 =back
+
+=head2 C<_has_question>
+
+A predicate for the L</question> attribute.
 
 =head1 SEE ALSO
 

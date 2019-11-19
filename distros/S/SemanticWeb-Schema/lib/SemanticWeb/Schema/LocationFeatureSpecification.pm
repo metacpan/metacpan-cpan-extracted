@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has hours_available => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_hours_available',
     json_ld   => 'hoursAvailable',
 );
 
@@ -28,7 +28,7 @@ has hours_available => (
 
 has valid_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_from',
     json_ld   => 'validFrom',
 );
 
@@ -36,7 +36,7 @@ has valid_from => (
 
 has valid_through => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_through',
     json_ld   => 'validThrough',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::LocationFeatureSpecification - Specifies a location feature
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -82,6 +82,10 @@ A hours_available should be one of the following types:
 
 =back
 
+=head2 C<_has_hours_available>
+
+A predicate for the L</hours_available> attribute.
+
 =head2 C<valid_from>
 
 C<validFrom>
@@ -95,6 +99,10 @@ A valid_from should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_valid_from>
+
+A predicate for the L</valid_from> attribute.
 
 =head2 C<valid_through>
 
@@ -110,6 +118,10 @@ A valid_through should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_valid_through>
+
+A predicate for the L</valid_through> attribute.
 
 =head1 SEE ALSO
 

@@ -9,11 +9,10 @@ use_ok "Devel::Cover::Report::SonarGeneric";
 
 chdir('t');
 
-my $rfn = "cover_db/sonar_generic.xml";
+my $rfn = path('cover_db/sonar_generic.xml');
+$rfn->remove;
 
-unlink $rfn if -e $rfn;
-
-ok(! -e $rfn, 'start fresh');
+ok(! $rfn->exists, 'start fresh');
 
 $ENV{DEVEL_COVER_DB_FORMAT} = 'JSON';
 
@@ -22,7 +21,7 @@ my @files = sort $db->cover->items;
 
 Devel::Cover::Report::SonarGeneric->report($db, {file => \@files});
 
-ok(-e $rfn, 'report generated');
+ok($rfn->exists, 'report generated');
 
 my $expect = <<'END';
 <coverage version="1">
@@ -85,8 +84,6 @@ my $expect = <<'END';
 </coverage>
 END
 
-my $rtxt = path($rfn)->slurp;
-
-is($rtxt, $expect, 'content matches');
+is($rfn->slurp, $expect, 'content matches');
 
 done_testing();

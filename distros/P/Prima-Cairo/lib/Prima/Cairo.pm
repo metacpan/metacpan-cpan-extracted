@@ -11,7 +11,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 sub dl_load_flags { 0x01 };
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 @EXPORT = qw();
 @EXPORT_OK = qw();
 %EXPORT_TAGS = ();
@@ -120,6 +120,10 @@ sub cairo_context
 				0, $canvas->height
 			);
 			$context->transform($matrix);
+
+			$matrix = $context->get_font_matrix;
+			$matrix->scale(1,-1);
+			$context-> set_font_matrix($matrix);
 		}
 		return $context;
 	} else {
@@ -249,6 +253,17 @@ system call it like this:
 
    $canvas->cairo_context( transform => 0 );
 
+This also affect font rendering, so when Prima transform is used, Cairo font must 
+not be changed via
+
+   $cairo->set_font_size(18)
+
+but rather via
+
+   my $matrix = $cairo->get_font_matrix;
+   $matrix->scale(1.8, 1.8); # default cairo matrix is 10
+   $cairo->set_font_matrix($matrix);
+
 =item Cairo::ImageSurface::to_prima_image [ $class = Prima::Image ].
 
 Returns a im::bpp24 (for color surfaces) or im::Byte/im::BW (for a8/a1 mask
@@ -274,10 +289,9 @@ That requires libcairo binaries, includes, and pkg-config.
 
 In case you don't have cairo binaries and include files, grab them here:
 
-L<http://karasik.eu.org/misc/cairo/cairo-win32.zip> .
+http://prima.eu.org/Cairo/cairo-win.zip
 
-Hack lib/pkgconfig/cairo.pc and point PKG_CONFIG_PATH to the directory where it
-is located or copy it to where your system pkgconfig files are.
+unzip and run <code>make install</code>.
 
 Strawberry 5.20 is shipped with a broken pkg-config (
 L<https://rt.cpan.org/Ticket/Display.html?id=96315>,

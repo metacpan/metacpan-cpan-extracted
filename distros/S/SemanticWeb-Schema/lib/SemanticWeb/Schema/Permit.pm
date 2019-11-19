@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has issued_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_issued_by',
     json_ld   => 'issuedBy',
 );
 
@@ -28,7 +28,7 @@ has issued_by => (
 
 has issued_through => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_issued_through',
     json_ld   => 'issuedThrough',
 );
 
@@ -36,7 +36,7 @@ has issued_through => (
 
 has permit_audience => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_permit_audience',
     json_ld   => 'permitAudience',
 );
 
@@ -44,7 +44,7 @@ has permit_audience => (
 
 has valid_for => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_for',
     json_ld   => 'validFor',
 );
 
@@ -52,7 +52,7 @@ has valid_for => (
 
 has valid_from => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_from',
     json_ld   => 'validFrom',
 );
 
@@ -60,7 +60,7 @@ has valid_from => (
 
 has valid_in => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_in',
     json_ld   => 'validIn',
 );
 
@@ -68,7 +68,7 @@ has valid_in => (
 
 has valid_until => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_valid_until',
     json_ld   => 'validUntil',
 );
 
@@ -90,7 +90,7 @@ SemanticWeb::Schema::Permit - A permit issued by an organization, e
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -112,6 +112,10 @@ A issued_by should be one of the following types:
 
 =back
 
+=head2 C<_has_issued_by>
+
+A predicate for the L</issued_by> attribute.
+
 =head2 C<issued_through>
 
 C<issuedThrough>
@@ -125,6 +129,10 @@ A issued_through should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Service']>
 
 =back
+
+=head2 C<_has_issued_through>
+
+A predicate for the L</issued_through> attribute.
 
 =head2 C<permit_audience>
 
@@ -140,6 +148,10 @@ A permit_audience should be one of the following types:
 
 =back
 
+=head2 C<_has_permit_audience>
+
+A predicate for the L</permit_audience> attribute.
+
 =head2 C<valid_for>
 
 C<validFor>
@@ -153,6 +165,10 @@ A valid_for should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
+
+=head2 C<_has_valid_for>
+
+A predicate for the L</valid_for> attribute.
 
 =head2 C<valid_from>
 
@@ -168,6 +184,10 @@ A valid_from should be one of the following types:
 
 =back
 
+=head2 C<_has_valid_from>
+
+A predicate for the L</valid_from> attribute.
+
 =head2 C<valid_in>
 
 C<validIn>
@@ -182,6 +202,10 @@ A valid_in should be one of the following types:
 
 =back
 
+=head2 C<_has_valid_in>
+
+A predicate for the L</valid_in> attribute.
+
 =head2 C<valid_until>
 
 C<validUntil>
@@ -195,6 +219,10 @@ A valid_until should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_valid_until>
+
+A predicate for the L</valid_until> attribute.
 
 =head1 SEE ALSO
 

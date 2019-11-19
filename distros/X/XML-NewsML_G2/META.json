@@ -62,7 +62,7 @@
    "provides" : {
       "XML::NewsML_G2" : {
          "file" : "lib/XML/NewsML_G2.pm",
-         "version" : "v0.3.2"
+         "version" : "v0.3.3"
       },
       "XML::NewsML_G2::AnyItem" : {
          "file" : "lib/XML/NewsML_G2/AnyItem.pm"
@@ -78,6 +78,9 @@
       },
       "XML::NewsML_G2::Copyright_Holder" : {
          "file" : "lib/XML/NewsML_G2/Copyright_Holder.pm"
+      },
+      "XML::NewsML_G2::Creator" : {
+         "file" : "lib/XML/NewsML_G2/Creator.pm"
       },
       "XML::NewsML_G2::Desk" : {
          "file" : "lib/XML/NewsML_G2/Desk.pm"
@@ -267,6 +270,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#xml-newsml-g2"
    },
-   "version" : "v0.3.2",
+   "version" : "v0.3.3",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

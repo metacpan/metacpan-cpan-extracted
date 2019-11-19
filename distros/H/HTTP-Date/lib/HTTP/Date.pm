@@ -2,7 +2,7 @@ package HTTP::Date;
 
 use strict;
 
-our $VERSION = '6.04';
+our $VERSION = '6.05';
 
 require Exporter;
 our @ISA       = qw(Exporter);
@@ -289,7 +289,7 @@ HTTP::Date - HTTP::Date - date conversion routines
 
 =head1 VERSION
 
-version 6.04
+version 6.05
 
 =head1 SYNOPSIS
 

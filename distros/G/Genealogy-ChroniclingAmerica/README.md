@@ -4,7 +4,7 @@ Genealogy::ChroniclingAmerica - Find URLs for a given person on the Library of C
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -37,7 +37,7 @@ State must be the full name, not an abbreviation.
 There are four optional arguments: middlename, date\_of\_birth, date\_of\_death, ua and host:
 host is the domain of the site to search, the default is chroniclingamerica.loc.gov.
 ua is a pointer to an object that understands get and env\_proxy messages, such
-as [LWP::UserAgent::Throttled](https://metacpan.org/pod/LWP::UserAgent::Throttled).
+as [LWP::UserAgent::Throttled](https://metacpan.org/pod/LWP%3A%3AUserAgent%3A%3AThrottled).
 
 ## get\_next\_entry
 

@@ -451,6 +451,9 @@ SV *boot_MarpaX__ESLIF__false_svp;
         _svp = MARPAESLIFPERL_NEWSVPVN_UTF8(actionp->u.stringp->bytep, actionp->u.stringp->bytel); \
         MARPAESLIFPERL_XV_STORE(hvp, key, _svp);                        \
         break;                                                          \
+      case MARPAESLIF_ACTION_TYPE_LUA:                                  \
+        MARPAESLIFPERL_XV_STORE(hvp, key, newSVpv(actionp->u.luas, 0)); \
+        break;                                                          \
       default:                                                          \
         warn("Unsupported action type %d", actionp->type);              \
         MARPAESLIFPERL_XV_STORE_UNDEF(hvp, key);                        \
@@ -3173,6 +3176,7 @@ CODE:
   MARPAESLIFPERL_XV_STORE_IV         (avp, "propertyBitSet",             symbolProperty.propertyBitSet);
   MARPAESLIFPERL_XV_STORE_IV         (avp, "eventBitSet",                symbolProperty.eventBitSet);
   MARPAESLIFPERL_XV_STORE_ACTION     (avp, "symbolAction",               symbolProperty.symbolActionp);
+  MARPAESLIFPERL_XV_STORE_ACTION     (avp, "ifAction",                   symbolProperty.ifActionp);
 
   RETVAL = marpaESLIFPerl_call_actionp(aTHX_ boot_MarpaX__ESLIF__Grammar__Symbol__Properties_svp, "new", avp, NULL /* Perl_MarpaX_ESLIF_Valuep */, 0 /* evalb */, 0 /* evalSilentb */);
   av_undef(avp);
@@ -3227,6 +3231,7 @@ CODE:
   MARPAESLIFPERL_XV_STORE_IV         (avp, "propertyBitSet",             symbolProperty.propertyBitSet);
   MARPAESLIFPERL_XV_STORE_IV         (avp, "eventBitSet",                symbolProperty.eventBitSet);
   MARPAESLIFPERL_XV_STORE_ACTION     (avp, "symbolAction",               symbolProperty.symbolActionp);
+  MARPAESLIFPERL_XV_STORE_ACTION     (avp, "ifAction",                   symbolProperty.ifActionp);
 
   RETVAL = marpaESLIFPerl_call_actionp(aTHX_ boot_MarpaX__ESLIF__Grammar__Symbol__Properties_svp, "new", avp, NULL /* Perl_MarpaX_ESLIF_Valuep */, 0 /* evalb */, 0 /* evalSilentb */);
   av_undef(avp);

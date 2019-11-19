@@ -14,7 +14,7 @@ MarpaX::ESLIF::Introduction - MarpaX::ESLIF's Introduction
 
 =head1 VERSION
 
-version 3.0.19
+version 3.0.28
 
 =head1 DESCRIPTION
 
@@ -574,6 +574,16 @@ MarpaX::ESLIF follows the L<Semantic Versioning 2.0.0|https://semver.org/spec/v2
 =item PATCH for backwards-compatible bug fixes
 
 =back
+
+=head1 BUILD
+
+You must use a L<CMake|http://cmake.org> version 3 at least. Recommended pattern is:
+
+  cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DALL_IN_ONE=TRUE -DTCONV_USE_ICU=NO .
+  make
+  make check
+
+MarpaX::ESLIF follows the L<Semantic Versioning 2.0.0|https://semver.org/spec/v2.0.0.html>, i:e:
 
 =head1 SEE ALSO
 

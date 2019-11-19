@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has associated_article => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_associated_article',
     json_ld   => 'associatedArticle',
 );
 
@@ -28,7 +28,7 @@ has associated_article => (
 
 has bitrate => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_bitrate',
     json_ld   => 'bitrate',
 );
 
@@ -36,7 +36,7 @@ has bitrate => (
 
 has content_size => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_content_size',
     json_ld   => 'contentSize',
 );
 
@@ -44,7 +44,7 @@ has content_size => (
 
 has content_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_content_url',
     json_ld   => 'contentUrl',
 );
 
@@ -52,7 +52,7 @@ has content_url => (
 
 has duration => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_duration',
     json_ld   => 'duration',
 );
 
@@ -60,7 +60,7 @@ has duration => (
 
 has embed_url => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_embed_url',
     json_ld   => 'embedUrl',
 );
 
@@ -68,7 +68,7 @@ has embed_url => (
 
 has encodes_creative_work => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_encodes_creative_work',
     json_ld   => 'encodesCreativeWork',
 );
 
@@ -76,7 +76,7 @@ has encodes_creative_work => (
 
 has encoding_format => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_encoding_format',
     json_ld   => 'encodingFormat',
 );
 
@@ -84,7 +84,7 @@ has encoding_format => (
 
 has end_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_end_time',
     json_ld   => 'endTime',
 );
 
@@ -92,7 +92,7 @@ has end_time => (
 
 has height => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_height',
     json_ld   => 'height',
 );
 
@@ -100,7 +100,7 @@ has height => (
 
 has player_type => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_player_type',
     json_ld   => 'playerType',
 );
 
@@ -108,7 +108,7 @@ has player_type => (
 
 has production_company => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_production_company',
     json_ld   => 'productionCompany',
 );
 
@@ -116,7 +116,7 @@ has production_company => (
 
 has regions_allowed => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_regions_allowed',
     json_ld   => 'regionsAllowed',
 );
 
@@ -124,7 +124,7 @@ has regions_allowed => (
 
 has requires_subscription => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_requires_subscription',
     json_ld   => 'requiresSubscription',
 );
 
@@ -132,7 +132,7 @@ has requires_subscription => (
 
 has start_time => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_start_time',
     json_ld   => 'startTime',
 );
 
@@ -140,7 +140,7 @@ has start_time => (
 
 has upload_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_upload_date',
     json_ld   => 'uploadDate',
 );
 
@@ -148,7 +148,7 @@ has upload_date => (
 
 has width => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_width',
     json_ld   => 'width',
 );
 
@@ -170,7 +170,7 @@ SemanticWeb::Schema::MediaObject - A media object
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -196,6 +196,10 @@ A associated_article should be one of the following types:
 
 =back
 
+=head2 C<_has_associated_article>
+
+A predicate for the L</associated_article> attribute.
+
 =head2 C<bitrate>
 
 The bitrate of the media object.
@@ -207,6 +211,10 @@ A bitrate should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_bitrate>
+
+A predicate for the L</bitrate> attribute.
 
 =head2 C<content_size>
 
@@ -222,6 +230,10 @@ A content_size should be one of the following types:
 
 =back
 
+=head2 C<_has_content_size>
+
+A predicate for the L</content_size> attribute.
+
 =head2 C<content_url>
 
 C<contentUrl>
@@ -236,6 +248,10 @@ A content_url should be one of the following types:
 
 =back
 
+=head2 C<_has_content_url>
+
+A predicate for the L</content_url> attribute.
+
 =head2 C<duration>
 
 =for html <p>The duration of the item (movie, audio recording, event, etc.) in <a
@@ -248,6 +264,10 @@ A duration should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
+
+=head2 C<_has_duration>
+
+A predicate for the L</duration> attribute.
 
 =head2 C<embed_url>
 
@@ -265,6 +285,10 @@ A embed_url should be one of the following types:
 
 =back
 
+=head2 C<_has_embed_url>
+
+A predicate for the L</embed_url> attribute.
+
 =head2 C<encodes_creative_work>
 
 C<encodesCreativeWork>
@@ -278,6 +302,10 @@ A encodes_creative_work should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
+
+=head2 C<_has_encodes_creative_work>
+
+A predicate for the L</encodes_creative_work> attribute.
 
 =head2 C<encoding_format>
 
@@ -307,6 +335,10 @@ A encoding_format should be one of the following types:
 
 =back
 
+=head2 C<_has_encoding_format>
+
+A predicate for the L</encoding_format> attribute.
+
 =head2 C<end_time>
 
 C<endTime>
@@ -328,6 +360,10 @@ A end_time should be one of the following types:
 
 =back
 
+=head2 C<_has_end_time>
+
+A predicate for the L</end_time> attribute.
+
 =head2 C<height>
 
 The height of the item.
@@ -342,6 +378,10 @@ A height should be one of the following types:
 
 =back
 
+=head2 C<_has_height>
+
+A predicate for the L</height> attribute.
+
 =head2 C<player_type>
 
 C<playerType>
@@ -355,6 +395,10 @@ A player_type should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_player_type>
+
+A predicate for the L</player_type> attribute.
 
 =head2 C<production_company>
 
@@ -371,6 +415,10 @@ A production_company should be one of the following types:
 
 =back
 
+=head2 C<_has_production_company>
+
+A predicate for the L</production_company> attribute.
+
 =head2 C<regions_allowed>
 
 C<regionsAllowed>
@@ -386,6 +434,10 @@ A regions_allowed should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
+
+=head2 C<_has_regions_allowed>
+
+A predicate for the L</regions_allowed> attribute.
 
 =head2 C<requires_subscription>
 
@@ -404,6 +456,10 @@ A requires_subscription should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MediaSubscription']>
 
 =back
+
+=head2 C<_has_requires_subscription>
+
+A predicate for the L</requires_subscription> attribute.
 
 =head2 C<start_time>
 
@@ -426,6 +482,10 @@ A start_time should be one of the following types:
 
 =back
 
+=head2 C<_has_start_time>
+
+A predicate for the L</start_time> attribute.
+
 =head2 C<upload_date>
 
 C<uploadDate>
@@ -440,6 +500,10 @@ A upload_date should be one of the following types:
 
 =back
 
+=head2 C<_has_upload_date>
+
+A predicate for the L</upload_date> attribute.
+
 =head2 C<width>
 
 The width of the item.
@@ -453,6 +517,10 @@ A width should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
+
+=head2 C<_has_width>
+
+A predicate for the L</width> attribute.
 
 =head1 SEE ALSO
 

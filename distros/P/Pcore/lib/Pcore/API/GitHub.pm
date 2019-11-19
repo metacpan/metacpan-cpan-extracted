@@ -14,35 +14,32 @@ sub BUILDARGS ( $self, $args = undef ) {
     return $args;
 }
 
-sub _req ( $self, $method, $endpoint, $data, $cb = undef ) {
-    return P->http->$method(
+sub _req ( $self, $method, $endpoint, $data ) {
+    my $res = P->http->$method(
         'https://api.github.com' . $endpoint,
         headers => [
             Authorization  => "token $self->{token}",
             'Content-Type' => 'application/json',
         ],
-        data => $data ? P->data->to_json($data) : undef,
-        sub ($res) {
-            my $data = $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : undef;
-
-            my $api_res;
-
-            if ( !$res ) {
-                $api_res = res [ $res->{status}, $data->{message} // $res->{reason} ];
-            }
-            else {
-                $api_res = res $res->{status}, $data;
-            }
-
-            return $cb ? $cb->($api_res) : $api_res;
-        }
+        data => $data ? P->data->to_json($data) : undef
     );
+
+    my $data = $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : undef;
+
+    my $api_res;
+
+    if ( !$res ) {
+        $api_res = res [ $res->{status}, $data->{message} // $res->{reason} ];
+    }
+    else {
+        $api_res = res $res->{status}, $data;
+    }
+
+    return $api_res;
 }
 
 # https://developer.github.com/v3/repos/#create
 sub create_repo ( $self, $repo_id, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
     my %args = (
 
         # common attrs
@@ -73,12 +70,12 @@ sub create_repo ( $self, $repo_id, @args ) {
         $endpoint = "/orgs/$repo_namespace/repos";
     }
 
-    return $self->_req( 'post', $endpoint, \%args, $cb );
+    return $self->_req( 'post', $endpoint, \%args );
 }
 
 # https://developer.github.com/v3/repos/#delete-a-repository
-sub delete_repo ( $self, $repo_id, $cb = undef ) {
-    return $self->_req( 'delete', "/repos/$repo_id", undef, $cb );
+sub delete_repo ( $self, $repo_id ) {
+    return $self->_req( 'delete', "/repos/$repo_id", undef );
 }
 
 1;
@@ -88,7 +85,7 @@ sub delete_repo ( $self, $repo_id, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    1 | 46                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 43                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

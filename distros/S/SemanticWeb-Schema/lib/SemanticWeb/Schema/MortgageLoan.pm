@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has domiciled_mortgage => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_domiciled_mortgage',
     json_ld   => 'domiciledMortgage',
 );
 
@@ -28,7 +28,7 @@ has domiciled_mortgage => (
 
 has loan_mortgage_mandate_amount => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_loan_mortgage_mandate_amount',
     json_ld   => 'loanMortgageMandateAmount',
 );
 
@@ -50,7 +50,7 @@ SemanticWeb::Schema::MortgageLoan - A loan in which property or real estate is u
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -74,6 +74,10 @@ A domiciled_mortgage should be one of the following types:
 
 =back
 
+=head2 C<_has_domiciled_mortgage>
+
+A predicate for the L</domiciled_mortgage> attribute.
+
 =head2 C<loan_mortgage_mandate_amount>
 
 C<loanMortgageMandateAmount>
@@ -88,6 +92,10 @@ A loan_mortgage_mandate_amount should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
 
 =back
+
+=head2 C<_has_loan_mortgage_mandate_amount>
+
+A predicate for the L</loan_mortgage_mandate_amount> attribute.
 
 =head1 SEE ALSO
 

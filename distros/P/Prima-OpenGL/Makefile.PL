@@ -16,6 +16,7 @@ if (
 	push @libs, '-lopengl32 -lgdi32 -lmsimg32';
 	push @obj,  'win32.o';
 } else {
+	push @libs, map { "-L$_" } @{$Prima::Config::Config{ldpaths} } if $^O eq 'darwin';
 	push @libs, '-lGL';
 	push @obj,  'x11.o';
 }

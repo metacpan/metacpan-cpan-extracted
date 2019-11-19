@@ -6,6 +6,7 @@ lib/XML/NewsML_G2/Audio.pm
 lib/XML/NewsML_G2/Binary.pm
 lib/XML/NewsML_G2/Concept.pm
 lib/XML/NewsML_G2/Copyright_Holder.pm
+lib/XML/NewsML_G2/Creator.pm
 lib/XML/NewsML_G2/Desk.pm
 lib/XML/NewsML_G2/Destination.pm
 lib/XML/NewsML_G2/ElectionDistrict.pm

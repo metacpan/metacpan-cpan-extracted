@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has monthly_minimum_repayment_amount => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_monthly_minimum_repayment_amount',
     json_ld   => 'monthlyMinimumRepaymentAmount',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::CreditCard - A card payment method of a particular brand or
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -74,6 +74,10 @@ A monthly_minimum_repayment_amount should be one of the following types:
 =item C<Num>
 
 =back
+
+=head2 C<_has_monthly_minimum_repayment_amount>
+
+A predicate for the L</monthly_minimum_repayment_amount> attribute.
 
 =head1 SEE ALSO
 

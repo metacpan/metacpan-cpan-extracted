@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has away_team => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_away_team',
     json_ld   => 'awayTeam',
 );
 
@@ -28,7 +28,7 @@ has away_team => (
 
 has competitor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_competitor',
     json_ld   => 'competitor',
 );
 
@@ -36,7 +36,7 @@ has competitor => (
 
 has home_team => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_home_team',
     json_ld   => 'homeTeam',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::SportsEvent - Event type: Sports event.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -82,6 +82,10 @@ A away_team should be one of the following types:
 
 =back
 
+=head2 C<_has_away_team>
+
+A predicate for the L</away_team> attribute.
+
 =head2 C<competitor>
 
 A competitor in a sports event.
@@ -95,6 +99,10 @@ A competitor should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::SportsTeam']>
 
 =back
+
+=head2 C<_has_competitor>
+
+A predicate for the L</competitor> attribute.
 
 =head2 C<home_team>
 
@@ -111,6 +119,10 @@ A home_team should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::SportsTeam']>
 
 =back
+
+=head2 C<_has_home_team>
+
+A predicate for the L</home_team> attribute.
 
 =head1 SEE ALSO
 

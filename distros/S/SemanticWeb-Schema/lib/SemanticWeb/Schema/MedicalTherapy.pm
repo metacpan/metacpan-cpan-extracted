@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has contraindication => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_contraindication',
     json_ld   => 'contraindication',
 );
 
@@ -28,7 +28,7 @@ has contraindication => (
 
 has duplicate_therapy => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_duplicate_therapy',
     json_ld   => 'duplicateTherapy',
 );
 
@@ -36,7 +36,7 @@ has duplicate_therapy => (
 
 has serious_adverse_outcome => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_serious_adverse_outcome',
     json_ld   => 'seriousAdverseOutcome',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::MedicalTherapy - Any medical intervention designed to preve
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -85,6 +85,10 @@ A contraindication should be one of the following types:
 
 =back
 
+=head2 C<_has_contraindication>
+
+A predicate for the L</contraindication> attribute.
+
 =head2 C<duplicate_therapy>
 
 C<duplicateTherapy>
@@ -98,6 +102,10 @@ A duplicate_therapy should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalTherapy']>
 
 =back
+
+=head2 C<_has_duplicate_therapy>
+
+A predicate for the L</duplicate_therapy> attribute.
 
 =head2 C<serious_adverse_outcome>
 
@@ -117,6 +125,10 @@ A serious_adverse_outcome should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalEntity']>
 
 =back
+
+=head2 C<_has_serious_adverse_outcome>
+
+A predicate for the L</serious_adverse_outcome> attribute.
 
 =head1 SEE ALSO
 

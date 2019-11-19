@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has dateline => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_dateline',
     json_ld   => 'dateline',
 );
 
@@ -28,7 +28,7 @@ has dateline => (
 
 has print_column => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_print_column',
     json_ld   => 'printColumn',
 );
 
@@ -36,7 +36,7 @@ has print_column => (
 
 has print_edition => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_print_edition',
     json_ld   => 'printEdition',
 );
 
@@ -44,7 +44,7 @@ has print_edition => (
 
 has print_page => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_print_page',
     json_ld   => 'printPage',
 );
 
@@ -52,7 +52,7 @@ has print_page => (
 
 has print_section => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_print_section',
     json_ld   => 'printSection',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::NewsArticle - A NewsArticle is an article whose content rep
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -110,6 +110,10 @@ A dateline should be one of the following types:
 
 =back
 
+=head2 C<_has_dateline>
+
+A predicate for the L</dateline> attribute.
+
 =head2 C<print_column>
 
 C<printColumn>
@@ -125,6 +129,10 @@ A print_column should be one of the following types:
 
 =back
 
+=head2 C<_has_print_column>
+
+A predicate for the L</print_column> attribute.
+
 =head2 C<print_edition>
 
 C<printEdition>
@@ -138,6 +146,10 @@ A print_edition should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_print_edition>
+
+A predicate for the L</print_edition> attribute.
 
 =head2 C<print_page>
 
@@ -155,6 +167,10 @@ A print_page should be one of the following types:
 
 =back
 
+=head2 C<_has_print_page>
+
+A predicate for the L</print_page> attribute.
+
 =head2 C<print_section>
 
 C<printSection>
@@ -169,6 +185,10 @@ A print_section should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_print_section>
+
+A predicate for the L</print_section> attribute.
 
 =head1 SEE ALSO
 

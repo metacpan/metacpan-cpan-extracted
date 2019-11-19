@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has artist => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_artist',
     json_ld   => 'artist',
 );
 
@@ -28,7 +28,7 @@ has artist => (
 
 has colorist => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_colorist',
     json_ld   => 'colorist',
 );
 
@@ -36,7 +36,7 @@ has colorist => (
 
 has inker => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_inker',
     json_ld   => 'inker',
 );
 
@@ -44,7 +44,7 @@ has inker => (
 
 has letterer => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_letterer',
     json_ld   => 'letterer',
 );
 
@@ -52,7 +52,7 @@ has letterer => (
 
 has penciler => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_penciler',
     json_ld   => 'penciler',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::ComicStory - The term "story" is any indivisible
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -98,6 +98,10 @@ A artist should be one of the following types:
 
 =back
 
+=head2 C<_has_artist>
+
+A predicate for the L</artist> attribute.
+
 =head2 C<colorist>
 
 The individual who adds color to inked drawings.
@@ -109,6 +113,10 @@ A colorist should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_colorist>
+
+A predicate for the L</colorist> attribute.
 
 =head2 C<inker>
 
@@ -123,6 +131,10 @@ A inker should be one of the following types:
 
 =back
 
+=head2 C<_has_inker>
+
+A predicate for the L</inker> attribute.
+
 =head2 C<letterer>
 
 The individual who adds lettering, including speech balloons and sound
@@ -136,6 +148,10 @@ A letterer should be one of the following types:
 
 =back
 
+=head2 C<_has_letterer>
+
+A predicate for the L</letterer> attribute.
+
 =head2 C<penciler>
 
 The individual who draws the primary narrative artwork.
@@ -147,6 +163,10 @@ A penciler should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_penciler>
+
+A predicate for the L</penciler> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has adverse_outcome => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_adverse_outcome',
     json_ld   => 'adverseOutcome',
 );
 
@@ -28,7 +28,7 @@ has adverse_outcome => (
 
 has contraindication => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_contraindication',
     json_ld   => 'contraindication',
 );
 
@@ -36,7 +36,7 @@ has contraindication => (
 
 has indication => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_indication',
     json_ld   => 'indication',
 );
 
@@ -44,7 +44,7 @@ has indication => (
 
 has post_op => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_post_op',
     json_ld   => 'postOp',
 );
 
@@ -52,7 +52,7 @@ has post_op => (
 
 has pre_op => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_pre_op',
     json_ld   => 'preOp',
 );
 
@@ -60,7 +60,7 @@ has pre_op => (
 
 has procedure => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_procedure',
     json_ld   => 'procedure',
 );
 
@@ -68,7 +68,7 @@ has procedure => (
 
 has purpose => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_purpose',
     json_ld   => 'purpose',
 );
 
@@ -76,7 +76,7 @@ has purpose => (
 
 has serious_adverse_outcome => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_serious_adverse_outcome',
     json_ld   => 'seriousAdverseOutcome',
 );
 
@@ -98,7 +98,7 @@ SemanticWeb::Schema::MedicalDevice - Any object used in a medical capacity
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -125,6 +125,10 @@ A adverse_outcome should be one of the following types:
 
 =back
 
+=head2 C<_has_adverse_outcome>
+
+A predicate for the L</adverse_outcome> attribute.
+
 =head2 C<contraindication>
 
 A contraindication for this therapy.
@@ -138,6 +142,10 @@ A contraindication should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_contraindication>
+
+A predicate for the L</contraindication> attribute.
 
 =head2 C<indication>
 
@@ -155,6 +163,10 @@ A indication should be one of the following types:
 
 =back
 
+=head2 C<_has_indication>
+
+A predicate for the L</indication> attribute.
+
 =head2 C<post_op>
 
 C<postOp>
@@ -169,6 +181,10 @@ A post_op should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_post_op>
+
+A predicate for the L</post_op> attribute.
 
 =head2 C<pre_op>
 
@@ -185,6 +201,10 @@ A pre_op should be one of the following types:
 
 =back
 
+=head2 C<_has_pre_op>
+
+A predicate for the L</pre_op> attribute.
+
 =head2 C<procedure>
 
 A description of the procedure involved in setting up, using, and/or
@@ -197,6 +217,10 @@ A procedure should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_procedure>
+
+A predicate for the L</procedure> attribute.
 
 =head2 C<purpose>
 
@@ -211,6 +235,10 @@ A purpose should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
+
+=head2 C<_has_purpose>
+
+A predicate for the L</purpose> attribute.
 
 =head2 C<serious_adverse_outcome>
 
@@ -230,6 +258,10 @@ A serious_adverse_outcome should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::MedicalEntity']>
 
 =back
+
+=head2 C<_has_serious_adverse_outcome>
+
+A predicate for the L</serious_adverse_outcome> attribute.
 
 =head1 SEE ALSO
 

@@ -158,18 +158,6 @@ METHODS
     Sets the root widget for the application's display. This must be a
     subclass of Tickit::Widget.
 
- setup_term
-
-       $tickit->setup_term
-
-    Set up the screen and generally prepare to start running
-
- teardown_term
-
-       $tickit->teardown_term
-
-    Shut down the screen after running
-
  tick
 
        $tickit->tick

@@ -132,8 +132,9 @@ options:
     WITH_COCOA        - compile with/without Cocoa (default 1), MacOSX only
     CYGWIN_WINAPI     - Winapi build in cygwin environment
     DEBUG             - build with debug information
-    EXTRA_LDFLAGS      - add extra ld line (i.e. -lgcc )
-    EXTRA_CCFLAGS      - add extra cc line (i.e. -I/usr/local/include )
+    VERBOSE           - don't redirect commands to makefile.log
+    EXTRA_LDFLAGS     - add extra ld line (i.e. -lgcc )
+    EXTRA_CCFLAGS     - add extra cc line (i.e. -I/usr/local/include )
 
 HELP
 	exit;
@@ -187,6 +188,7 @@ sub setup_argv
 		DEBUG         => 0,
 		EXTRA_CCFLAGS => '',
 		EXTRA_LDFLAGS => '',
+		VERBOSE       => 0,
 
 		# service vars
 		AUTOMATED_RUN => 0,
@@ -603,6 +605,7 @@ sub restore_output
 			seek MAKEFILELOG, $offset_makefile_log, 0;
 			local $/;
 			$captured_makefile_log = <MAKEFILELOG>;
+			print "\n", $captured_makefile_log if $cmd_options{VERBOSE};
 			close MAKEFILELOG;
 		}
 	}
@@ -664,14 +667,18 @@ sub compile_and_run
 
 	null_output;
 	my $cc = cc_command_line( $tmpsrc, $tmpo, $tmpexe, 0);
-	$cc =~ s/\s\-(s(hared)?|mdll)\b//g if gcc;
+	$cc =~ s/\s\-+(s(hared)?|mdll)\b//g if gcc;
 	print STDERR "$cc\n";
 	my $rc = system($cc);
+	print "$tmpexe\n";
 	restore_output;
 	unlink $tmpsrc;
 	unlink $tmpo if -w $tmpo;
-	my $ret = `$tmpexe`;
-	chomp $ret;
+	my $ret = '';
+	if ( -x $tmpexe ) {
+		`$tmpexe`;
+		chomp $ret;
+	}
 	unlink $tmpexe if -w $tmpexe;
 	unlink $_ for @tmpextras;
 	return $ret;

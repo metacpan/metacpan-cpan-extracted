@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has amount_of_this_good => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_amount_of_this_good',
     json_ld   => 'amountOfThisGood',
 );
 
@@ -28,7 +28,7 @@ has amount_of_this_good => (
 
 has business_function => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_business_function',
     json_ld   => 'businessFunction',
 );
 
@@ -36,7 +36,7 @@ has business_function => (
 
 has type_of_good => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_type_of_good',
     json_ld   => 'typeOfGood',
 );
 
@@ -44,7 +44,7 @@ has type_of_good => (
 
 has unit_code => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_unit_code',
     json_ld   => 'unitCode',
 );
 
@@ -52,7 +52,7 @@ has unit_code => (
 
 has unit_text => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_unit_text',
     json_ld   => 'unitText',
 );
 
@@ -74,7 +74,7 @@ SemanticWeb::Schema::TypeAndQuantityNode - A structured value indicating the qua
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -97,6 +97,10 @@ A amount_of_this_good should be one of the following types:
 
 =back
 
+=head2 C<_has_amount_of_this_good>
+
+A predicate for the L</amount_of_this_good> attribute.
+
 =head2 C<business_function>
 
 C<businessFunction>
@@ -112,6 +116,10 @@ A business_function should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::BusinessFunction']>
 
 =back
+
+=head2 C<_has_business_function>
+
+A predicate for the L</business_function> attribute.
 
 =head2 C<type_of_good>
 
@@ -129,6 +137,10 @@ A type_of_good should be one of the following types:
 
 =back
 
+=head2 C<_has_type_of_good>
+
+A predicate for the L</type_of_good> attribute.
+
 =head2 C<unit_code>
 
 C<unitCode>
@@ -145,6 +157,10 @@ A unit_code should be one of the following types:
 
 =back
 
+=head2 C<_has_unit_code>
+
+A predicate for the L</unit_code> attribute.
+
 =head2 C<unit_text>
 
 C<unitText>
@@ -159,6 +175,10 @@ A unit_text should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_unit_text>
+
+A predicate for the L</unit_text> attribute.
 
 =head1 SEE ALSO
 

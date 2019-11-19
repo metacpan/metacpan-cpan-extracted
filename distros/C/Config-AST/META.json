@@ -4,7 +4,7 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -19,34 +19,52 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Data::Dumper" : "2.135_06",
+            "File::Temp" : "0.22",
+            "File::stat" : "0",
+            "Scalar::Util" : "1.48",
+            "Text::Locus" : "1.01",
+            "perl" : "5.016001"
+         }
+      }
+   },
    "provides" : {
       "Config::AST" : {
          "file" : "lib/Config/AST.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Config::AST::Follow" : {
-         "file" : "lib/Config/AST/Follow.pm",
-         "version" : 0
+         "file" : "lib/Config/AST/Follow.pm"
       },
       "Config::AST::Node" : {
-         "file" : "lib/Config/AST/Node.pm",
-         "version" : 0
+         "file" : "lib/Config/AST/Node.pm"
       },
       "Config::AST::Node::Null" : {
-         "file" : "lib/Config/AST/Node/Null.pm",
-         "version" : 0
+         "file" : "lib/Config/AST/Node/Null.pm"
       },
       "Config::AST::Node::Section" : {
-         "file" : "lib/Config/AST/Node/Section.pm",
-         "version" : 0
+         "file" : "lib/Config/AST/Node/Section.pm"
       },
       "Config::AST::Node::Value" : {
-         "file" : "lib/Config/AST/Node/Value.pm",
-         "version" : 0
+         "file" : "lib/Config/AST/Node/Value.pm"
       },
       "Config::AST::Root" : {
-         "file" : "lib/Config/AST/Root.pm",
-         "version" : 0
+         "file" : "lib/Config/AST/Root.pm"
       }
    },
    "release_status" : "stable",
@@ -57,5 +75,6 @@
          "web" : "http://git.gnu.org.ua/cgit/config-ast.git/"
       }
    },
-   "version" : "1.05"
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

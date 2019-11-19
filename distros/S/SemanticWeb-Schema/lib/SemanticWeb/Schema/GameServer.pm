@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has game => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_game',
     json_ld   => 'game',
 );
 
@@ -28,7 +28,7 @@ has game => (
 
 has players_online => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_players_online',
     json_ld   => 'playersOnline',
 );
 
@@ -36,7 +36,7 @@ has players_online => (
 
 has server_status => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_server_status',
     json_ld   => 'serverStatus',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::GameServer - Server that provides game interaction in a mul
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -78,6 +78,10 @@ A game should be one of the following types:
 
 =back
 
+=head2 C<_has_game>
+
+A predicate for the L</game> attribute.
+
 =head2 C<players_online>
 
 C<playersOnline>
@@ -92,6 +96,10 @@ A players_online should be one of the following types:
 
 =back
 
+=head2 C<_has_players_online>
+
+A predicate for the L</players_online> attribute.
+
 =head2 C<server_status>
 
 C<serverStatus>
@@ -105,6 +113,10 @@ A server_status should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::GameServerStatus']>
 
 =back
+
+=head2 C<_has_server_status>
+
+A predicate for the L</server_status> attribute.
 
 =head1 SEE ALSO
 

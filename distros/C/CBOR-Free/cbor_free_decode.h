@@ -15,6 +15,9 @@ typedef struct {
 
     HV * tag_handler;
 
+    void **reflist;
+    UV reflistlen;
+
     union {
         uint8_t bytes[30];  // used for num -> key conversions
         float as_float;
@@ -34,6 +37,6 @@ struct numbuf {
 
 //----------------------------------------------------------------------
 
-SV *cbf_decode( pTHX_ SV *cbor, HV *tag_handler );
+SV *cbf_decode( pTHX_ SV *cbor, HV *tag_handler, bool preserve_refs );
 
 #endif

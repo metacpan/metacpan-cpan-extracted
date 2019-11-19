@@ -31,11 +31,11 @@ AV* parse (pTHX_ HV* state, register char* p) {
         p = parse_block_comment(aTHX_ state, p);
         break;
       case CONTEXT_INSERT_INTO:
-        DEBUG_OUT("context: INSER INTO\n");
+        DEBUG_OUT("context: INSERT INTO\n");
         p = parse_insert_into(aTHX_ state, p);
         break;
       case CONTEXT_INSERT_VALUES:
-        DEBUG_OUT("context: INSER INTO (values)\n");
+        DEBUG_OUT("context: INSERT INTO (values)\n");
         if (! ret) {
           ret = newAV_mortal();
         }
@@ -364,6 +364,7 @@ char* parse_insert_values (pTHX_ HV* state, register char* p, AV* ret) {
       p++;
 
       I32 column_id = 0;
+      int have_binary_literal = 0;
       while (*p != '\0' && *p != ')') {
         // get column name
         SV** column_ref = XSUTIL_AV_FETCH(columns, column_id);
@@ -371,12 +372,26 @@ char* parse_insert_values (pTHX_ HV* state, register char* p, AV* ret) {
         SV* column = *column_ref;
         DEBUG_OUT("key: %s\n", SvPV_nolen(column));
 
+      Again:
         // extract and store value
         if (IS_NULL_STR(p)) {
+          if (have_binary_literal)
+            croak("Invalid use of '_binary' keyword.");
+
           // null value
           p += 4;
           DEBUG_OUT("value: (NULL)\n");
           XSUTIL_HV_STORE_ENT_NOINC(row, column, &PL_sv_undef);
+        }
+        else if (IS__binary(p)) {
+          if (have_binary_literal)
+            croak("Found duplicated '_binary' keyword.");
+
+          // skip '_binary' character set introducer for string literals
+          p += 7;
+          SKIP_WSPACE(p);
+          have_binary_literal = 1;
+          goto Again;
         }
         else if (*p == '\'' || *p == '"') {
           // string
@@ -430,10 +445,16 @@ char* parse_insert_values (pTHX_ HV* state, register char* p, AV* ret) {
           else {
             sv_catpvn(value, mark, p - mark);
           }
-          DEBUG_OUT("value: %s (string)\n", SvPV_nolen(value));
+          DEBUG_OUT("value: %s (%sstring)\n",
+                    SvPV_nolen(value),
+                    have_binary_literal ? "binary " : "");
           XSUTIL_HV_STORE_ENT_NOINC(row, column, value);
+          have_binary_literal = 0;
         }
         else {
+          if (have_binary_literal)
+            croak("Invalid use of '_binary' keyword.");
+
           // normal value
           char* mark = p;
           while (*p != '\0' && *p != ',' && *p != ')') p++;

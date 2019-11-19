@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2011-2018 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2011-2019 -- leonerd@leonerd.org.uk
  */
 
 
@@ -348,7 +348,7 @@ static SV *newSVrb(TickitRenderBuffer *rb)
  * Tickit::Term *
  ****************/
 
-typedef TickitTerm *Tickit__Term;
+typedef TickitTerm *Tickit__Term, *Tickit__Term_MAYBE;
 
 static int term_userevent_fn(TickitTerm *tt, TickitEventFlags flags, void *_info, void *user)
 {
@@ -643,6 +643,35 @@ static int window_userevent_fn(TickitWindow *win, TickitEventFlags flags, void *
   }
 
   return ret;
+}
+
+/*******************
+ * toplevel Tickit *
+ *******************/
+
+typedef Tickit *Tickit___Tickit;
+
+static int invoke_callback(Tickit *t, TickitEventFlags flags, void *info, void *user)
+{
+  dSP;
+  CV *code = user;
+
+  if(flags & TICKIT_EV_FIRE) {
+    ENTER;
+    SAVETMPS;
+
+    /* No args */
+    PUSHMARK(SP);
+    PUTBACK;
+
+    call_sv((SV*)code, G_VOID);
+
+    FREETMPS;
+    LEAVE;
+  }
+
+  if(flags & TICKIT_EV_UNBIND)
+    SvREFCNT_dec((SV*)code);
 }
 
 static void setup_constants(void)
@@ -3131,6 +3160,149 @@ setctl(self,ctl,value)
     }
   OUTPUT:
     RETVAL
+
+MODULE = Tickit  PACKAGE = Tickit::_Tickit
+
+SV *
+new(package,term)
+  char               *package
+  Tickit::Term_MAYBE  term
+  INIT:
+    Tickit *t;
+  CODE:
+    if(term)
+      t = tickit_new_for_term(tickit_term_ref(term));
+    else
+      t = tickit_new_stdio();
+    if(!t)
+      XSRETURN_UNDEF;
+    RETVAL = newSV(0);
+    sv_setref_pv(RETVAL, package, t);
+  OUTPUT:
+    RETVAL
+
+void
+DESTROY(self)
+  Tickit::_Tickit self
+  CODE:
+    tickit_unref(self);
+
+SV *
+rootwin(self,tickit)
+  Tickit::_Tickit  self
+  SV              *tickit
+  INIT:
+    Tickit__Window win;
+  CODE:
+    RETVAL = newSVwin(tickit_get_rootwin(self));
+    win = INT2PTR(struct Tickit__Window *, SvIV(SvRV(RETVAL)));
+    if(!win->tickit) {
+      win->tickit = newSVsv(tickit);
+      sv_rvweaken(win->tickit);
+    }
+  OUTPUT:
+    RETVAL
+
+SV *
+term(self)
+  Tickit::_Tickit self
+  CODE:
+    RETVAL = newSVterm(tickit_get_term(self), "Tickit::Term");
+  OUTPUT:
+    RETVAL
+
+bool
+setctl(self, ctl, value)
+  Tickit::_Tickit  self
+  SV              *ctl
+  SV              *value
+  INIT:
+    TickitCtl ctl_e;
+  CODE:
+    if(SvPOK(ctl)) {
+      ctl_e = tickit_lookup_ctl(SvPV_nolen(ctl));
+      if(ctl_e == -1)
+        croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
+    }
+    else if(SvIOK(ctl))
+      ctl_e = SvIV(ctl);
+    else
+      croak("Expected 'ctl' to be an integer or string");
+
+    RETVAL = 0;
+    switch(tickit_ctltype(ctl_e)) {
+      case TICKIT_TYPE_BOOL:
+      case TICKIT_TYPE_INT:
+        RETVAL = tickit_setctl_int(self, ctl_e, SvIV(value));
+        break;
+      case TICKIT_TYPE_STR:
+      case TICKIT_TYPE_NONE:
+        break;
+    }
+  OUTPUT:
+    RETVAL
+
+UV
+watch_timer_after_msec(self, msec, code)
+  Tickit::_Tickit  self
+  int              msec
+  CV              *code
+  CODE:
+    RETVAL = PTR2UV(tickit_watch_timer_after_msec(self, msec, TICKIT_BIND_UNBIND, invoke_callback, SvREFCNT_inc(code)));
+  OUTPUT:
+    RETVAL
+
+UV
+watch_timer_at_msec(self, msec, code)
+  Tickit::_Tickit self
+  long             msec
+  CV              *code
+  INIT:
+    struct timeval at;
+  CODE:
+    /* For convenience of the calling Perl code we'll invent a _timer_at_msec
+     * function, even though the underlying tickit library doesn't.
+     */
+
+    at.tv_sec = (int)(msec / 1000);
+    at.tv_usec = (msec % 1000) * 1000;
+
+    RETVAL = PTR2UV(tickit_watch_timer_at_tv(self, &at, TICKIT_BIND_UNBIND, invoke_callback, SvREFCNT_inc(code)));
+  OUTPUT:
+    RETVAL
+
+void
+watch_cancel(self, id)
+  Tickit::_Tickit  self
+  UV               id
+  CODE:
+    tickit_watch_cancel(self, INT2PTR(void *,id));
+
+void
+watch_later(self, code)
+  Tickit::_Tickit  self
+  CV              *code
+  CODE:
+    tickit_watch_later(self, TICKIT_BIND_UNBIND, invoke_callback, SvREFCNT_inc(code));
+
+void
+run(self)
+  Tickit::_Tickit  self
+  CODE:
+    tickit_run(self);
+
+void
+stop(self)
+  Tickit::_Tickit  self
+  CODE:
+    tickit_stop(self);
+
+void
+tick(self, flags=0)
+  Tickit::_Tickit  self
+  int              flags
+  CODE:
+    tickit_tick(self, flags);
 
 MODULE = Tickit  PACKAGE = Tickit
 

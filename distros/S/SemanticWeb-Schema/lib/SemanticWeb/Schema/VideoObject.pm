@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has actor => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actor',
     json_ld   => 'actor',
 );
 
@@ -28,7 +28,7 @@ has actor => (
 
 has actors => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_actors',
     json_ld   => 'actors',
 );
 
@@ -36,7 +36,7 @@ has actors => (
 
 has caption => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_caption',
     json_ld   => 'caption',
 );
 
@@ -44,7 +44,7 @@ has caption => (
 
 has director => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_director',
     json_ld   => 'director',
 );
 
@@ -52,7 +52,7 @@ has director => (
 
 has directors => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_directors',
     json_ld   => 'directors',
 );
 
@@ -60,7 +60,7 @@ has directors => (
 
 has music_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_music_by',
     json_ld   => 'musicBy',
 );
 
@@ -68,7 +68,7 @@ has music_by => (
 
 has thumbnail => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_thumbnail',
     json_ld   => 'thumbnail',
 );
 
@@ -76,7 +76,7 @@ has thumbnail => (
 
 has transcript => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_transcript',
     json_ld   => 'transcript',
 );
 
@@ -84,7 +84,7 @@ has transcript => (
 
 has video_frame_size => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_video_frame_size',
     json_ld   => 'videoFrameSize',
 );
 
@@ -92,7 +92,7 @@ has video_frame_size => (
 
 has video_quality => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_video_quality',
     json_ld   => 'videoQuality',
 );
 
@@ -114,7 +114,7 @@ SemanticWeb::Schema::VideoObject - A video file.
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -136,6 +136,10 @@ A actor should be one of the following types:
 
 =back
 
+=head2 C<_has_actor>
+
+A predicate for the L</actor> attribute.
+
 =head2 C<actors>
 
 An actor, e.g. in tv, radio, movie, video games etc. Actors can be
@@ -148,6 +152,10 @@ A actors should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_actors>
+
+A predicate for the L</actors> attribute.
 
 =head2 C<caption>
 
@@ -166,6 +174,10 @@ A caption should be one of the following types:
 
 =back
 
+=head2 C<_has_caption>
+
+A predicate for the L</caption> attribute.
+
 =head2 C<director>
 
 A director of e.g. tv, radio, movie, video gaming etc. content, or of an
@@ -180,6 +192,10 @@ A director should be one of the following types:
 
 =back
 
+=head2 C<_has_director>
+
+A predicate for the L</director> attribute.
+
 =head2 C<directors>
 
 A director of e.g. tv, radio, movie, video games etc. content. Directors
@@ -192,6 +208,10 @@ A directors should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_directors>
+
+A predicate for the L</directors> attribute.
 
 =head2 C<music_by>
 
@@ -209,6 +229,10 @@ A music_by should be one of the following types:
 
 =back
 
+=head2 C<_has_music_by>
+
+A predicate for the L</music_by> attribute.
+
 =head2 C<thumbnail>
 
 Thumbnail image for an image or video.
@@ -220,6 +244,10 @@ A thumbnail should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
 
 =back
+
+=head2 C<_has_thumbnail>
+
+A predicate for the L</thumbnail> attribute.
 
 =head2 C<transcript>
 
@@ -233,6 +261,10 @@ A transcript should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_transcript>
+
+A predicate for the L</transcript> attribute.
 
 =head2 C<video_frame_size>
 
@@ -248,6 +280,10 @@ A video_frame_size should be one of the following types:
 
 =back
 
+=head2 C<_has_video_frame_size>
+
+A predicate for the L</video_frame_size> attribute.
+
 =head2 C<video_quality>
 
 C<videoQuality>
@@ -261,6 +297,10 @@ A video_quality should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_video_quality>
+
+A predicate for the L</video_quality> attribute.
 
 =head1 SEE ALSO
 

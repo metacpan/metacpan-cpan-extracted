@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has biomechnical_class => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_biomechnical_class',
     json_ld   => 'biomechnicalClass',
 );
 
@@ -28,7 +28,7 @@ has biomechnical_class => (
 
 has functional_class => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_functional_class',
     json_ld   => 'functionalClass',
 );
 
@@ -36,7 +36,7 @@ has functional_class => (
 
 has structural_class => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_structural_class',
     json_ld   => 'structuralClass',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::Joint - The anatomical location at which two or more bones 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -80,6 +80,10 @@ A biomechnical_class should be one of the following types:
 
 =back
 
+=head2 C<_has_biomechnical_class>
+
+A predicate for the L</biomechnical_class> attribute.
+
 =head2 C<functional_class>
 
 C<functionalClass>
@@ -96,6 +100,10 @@ A functional_class should be one of the following types:
 
 =back
 
+=head2 C<_has_functional_class>
+
+A predicate for the L</functional_class> attribute.
+
 =head2 C<structural_class>
 
 C<structuralClass>
@@ -109,6 +117,10 @@ A structural_class should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_structural_class>
+
+A predicate for the L</structural_class> attribute.
 
 =head1 SEE ALSO
 

@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has broadcast_frequency_value => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcast_frequency_value',
     json_ld   => 'broadcastFrequencyValue',
 );
 
@@ -28,7 +28,7 @@ has broadcast_frequency_value => (
 
 has broadcast_signal_modulation => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcast_signal_modulation',
     json_ld   => 'broadcastSignalModulation',
 );
 
@@ -36,7 +36,7 @@ has broadcast_signal_modulation => (
 
 has broadcast_sub_channel => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_broadcast_sub_channel',
     json_ld   => 'broadcastSubChannel',
 );
 
@@ -58,7 +58,7 @@ SemanticWeb::Schema::BroadcastFrequencySpecification - The frequency in MHz and 
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -83,6 +83,10 @@ A broadcast_frequency_value should be one of the following types:
 
 =back
 
+=head2 C<_has_broadcast_frequency_value>
+
+A predicate for the L</broadcast_frequency_value> attribute.
+
 =head2 C<broadcast_signal_modulation>
 
 C<broadcastSignalModulation>
@@ -99,6 +103,10 @@ A broadcast_signal_modulation should be one of the following types:
 
 =back
 
+=head2 C<_has_broadcast_signal_modulation>
+
+A predicate for the L</broadcast_signal_modulation> attribute.
+
 =head2 C<broadcast_sub_channel>
 
 C<broadcastSubChannel>
@@ -112,6 +120,10 @@ A broadcast_sub_channel should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_broadcast_sub_channel>
+
+A predicate for the L</broadcast_sub_channel> attribute.
 
 =head1 SEE ALSO
 

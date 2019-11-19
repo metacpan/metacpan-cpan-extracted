@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has superseded_by => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_superseded_by',
     json_ld   => 'supersededBy',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::Enumeration - Lists or enumerationsâfor example
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -69,6 +69,10 @@ A superseded_by should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Property']>
 
 =back
+
+=head2 C<_has_superseded_by>
+
+A predicate for the L</superseded_by> attribute.
 
 =head1 SEE ALSO
 

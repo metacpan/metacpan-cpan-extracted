@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has service_operator => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_service_operator',
     json_ld   => 'serviceOperator',
 );
 
@@ -42,7 +42,7 @@ SemanticWeb::Schema::GovernmentService - A service provided by a government orga
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -66,6 +66,10 @@ A service_operator should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
+
+=head2 C<_has_service_operator>
+
+A predicate for the L</service_operator> attribute.
 
 =head1 SEE ALSO
 

@@ -23,7 +23,7 @@ our @EXPORT_OK = qw(
     zip
 );
 
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.47'; # VERSION
 
 
 sub find_nearest_codeowners {
@@ -280,7 +280,7 @@ App::Codeowners::Util - Grab bag of utility subs for Codeowners modules
 
 =head1 VERSION
 
-version 0.45
+version 0.47
 
 =head1 DESCRIPTION
 

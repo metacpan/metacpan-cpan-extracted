@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has diet_features => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_diet_features',
     json_ld   => 'dietFeatures',
 );
 
@@ -28,7 +28,7 @@ has diet_features => (
 
 has endorsers => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_endorsers',
     json_ld   => 'endorsers',
 );
 
@@ -36,7 +36,7 @@ has endorsers => (
 
 has expert_considerations => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_expert_considerations',
     json_ld   => 'expertConsiderations',
 );
 
@@ -44,7 +44,7 @@ has expert_considerations => (
 
 has overview => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_overview',
     json_ld   => 'overview',
 );
 
@@ -52,7 +52,7 @@ has overview => (
 
 has physiological_benefits => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_physiological_benefits',
     json_ld   => 'physiologicalBenefits',
 );
 
@@ -60,7 +60,7 @@ has physiological_benefits => (
 
 has risks => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_risks',
     json_ld   => 'risks',
 );
 
@@ -82,7 +82,7 @@ SemanticWeb::Schema::Diet - A strategy of regulating the intake of food to achie
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -108,6 +108,10 @@ A diet_features should be one of the following types:
 
 =back
 
+=head2 C<_has_diet_features>
+
+A predicate for the L</diet_features> attribute.
+
 =head2 C<endorsers>
 
 People or organizations that endorse the plan.
@@ -121,6 +125,10 @@ A endorsers should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
+
+=head2 C<_has_endorsers>
+
+A predicate for the L</endorsers> attribute.
 
 =head2 C<expert_considerations>
 
@@ -136,6 +144,10 @@ A expert_considerations should be one of the following types:
 
 =back
 
+=head2 C<_has_expert_considerations>
+
+A predicate for the L</expert_considerations> attribute.
+
 =head2 C<overview>
 
 Descriptive information establishing the overarching theory/philosophy of
@@ -149,6 +161,10 @@ A overview should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_overview>
+
+A predicate for the L</overview> attribute.
 
 =head2 C<physiological_benefits>
 
@@ -164,6 +180,10 @@ A physiological_benefits should be one of the following types:
 
 =back
 
+=head2 C<_has_physiological_benefits>
+
+A predicate for the L</physiological_benefits> attribute.
+
 =head2 C<risks>
 
 Specific physiologic risks associated to the diet plan.
@@ -175,6 +195,10 @@ A risks should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_risks>
+
+A predicate for the L</risks> attribute.
 
 =head1 SEE ALSO
 

@@ -34,7 +34,7 @@
          "requires" : {
             "Sub::Util" : "0",
             "constant" : "0",
-            "perl" : "5.006"
+            "perl" : "5.020"
          }
       },
       "test" : {
@@ -51,6 +51,6 @@
          "web" : "https://github.com/EvanCarroll/unconstant"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

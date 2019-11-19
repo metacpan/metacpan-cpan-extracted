@@ -50,11 +50,15 @@ A [% name %] should be one of the following types:
 =back
 [% END -%]
 
+=head2 C<_has_[% name %]>
+
+A predicate for the L</[% name %]> attribute.
+
 =cut
 
 has [% name %] => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_[% name %]',
     json_ld   => '[% attributes.$name.label %]',
 );
 

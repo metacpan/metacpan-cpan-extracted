@@ -34,6 +34,7 @@ t/add_one.t
 t/against_cbor_xs.t
 t/array.t
 t/boolean.t
+t/cbor_numbers_sort_lex.t
 t/dec_strings.t
 t/decode.t
 t/decode_map_keys.t
@@ -44,7 +45,9 @@ t/fuzzed.t
 t/fuzzed/a
 t/hash.t
 t/negint.t
+t/pod.t
 t/scalar_ref.t
+t/shared.t
 t/string.t
 t/tag.t
 t/tag_decode.t

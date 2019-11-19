@@ -15,12 +15,12 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 
 has amount => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_amount',
     json_ld   => 'amount',
 );
 
@@ -28,7 +28,7 @@ has amount => (
 
 has currency => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_currency',
     json_ld   => 'currency',
 );
 
@@ -36,7 +36,7 @@ has currency => (
 
 has end_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_end_date',
     json_ld   => 'endDate',
 );
 
@@ -44,7 +44,7 @@ has end_date => (
 
 has start_date => (
     is        => 'rw',
-    predicate => 1,
+    predicate => '_has_start_date',
     json_ld   => 'startDate',
 );
 
@@ -66,7 +66,7 @@ SemanticWeb::Schema::DatedMoneySpecification - A DatedMoneySpecification represe
 
 =head1 VERSION
 
-version v5.0.0
+version v5.0.1
 
 =head1 DESCRIPTION
 
@@ -93,6 +93,10 @@ A amount should be one of the following types:
 
 =back
 
+=head2 C<_has_amount>
+
+A predicate for the L</amount> attribute.
+
 =head2 C<currency>
 
 =for html <p>The currency in which the monetary amount is expressed.<br/><br/> Use
@@ -112,6 +116,10 @@ A currency should be one of the following types:
 
 =back
 
+=head2 C<_has_currency>
+
+A predicate for the L</currency> attribute.
+
 =head2 C<end_date>
 
 C<endDate>
@@ -127,6 +135,10 @@ A end_date should be one of the following types:
 
 =back
 
+=head2 C<_has_end_date>
+
+A predicate for the L</end_date> attribute.
+
 =head2 C<start_date>
 
 C<startDate>
@@ -141,6 +153,10 @@ A start_date should be one of the following types:
 =item C<Str>
 
 =back
+
+=head2 C<_has_start_date>
+
+A predicate for the L</start_date> attribute.
 
 =head1 SEE ALSO
 

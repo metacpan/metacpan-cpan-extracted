@@ -15,12 +15,13 @@ use Carp qw( carp croak );
 use Data::Dump qw( dump );
 use Storable qw( nfreeze thaw );
 
-our $VERSION = '1.51';
+our $VERSION = '1.52';
 
 has is_cached => ( is => 'rw', isa => Maybe [Bool], default => undef );
 has positive_cache   => ( is => 'rw', isa => Bool, default => 1 );
 has ref_in_cache_key => ( is => 'rw', isa => Bool, default => 0 );
 has _verbose_dwarn   => ( is => 'rw', isa => Bool, default => 0 );
+has _last_request    => ( is => 'rw' );
 
 has [qw/ cache_undef_content_length cache_zero_content_length /] =>
     ( is => 'rw', isa => AnyOf [ Bool, Enum ['warn'] ], default => 0 );
@@ -87,6 +88,7 @@ around _make_request => sub {
     }
     if ( $self->_cache_ok($response) ) {
         $self->is_cached(1);
+        $self->_last_request($req);
         return $response;
     }
 
@@ -101,10 +103,24 @@ around _make_request => sub {
     $response->decode();
     delete $response->{handlers};    ## no critic
 
-    $self->cache->set( $req, nfreeze($response) ) if $should_cache;
+    if ($should_cache) {
+        $self->_last_request($req);
+        $self->cache->set( $req, nfreeze($response) );
+    }
 
     return $response;
 };
+
+sub invalidate_last_request {
+    my $self = shift;
+    return unless $self->is_cached;
+
+    my $request = $self->_last_request;
+    return unless $request;
+
+    $self->cache->remove($request);
+    return $self->is_cached( $self->cache->get($request) ? 1 : 0 );
+}
 
 sub _dwarn_filter {
     return {
@@ -242,7 +258,7 @@ WWW::Mechanize::Cached - Cache response to be polite
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -397,6 +413,14 @@ addition of this feature.
 And thirdly, you can set the value to the string 'warn', to warn if this
 scenario occurs, and then not cache it. ( This is the default behaviour )
 
+=head2 invalidate_last_request()
+
+Remove the last request from the cache.
+
+The return value reveals whether the request was successfully removed from the
+cache. 1 means it's still cached, 0 means it was removed, and undef means there
+was nothing to remove (there was no request or it wasn't cached).
+
 =head1 UPGRADING FROM 1.40 OR EARLIER
 
 Caching behaviour has changed since 1.40, and this may result in pages that were
@@ -452,7 +476,7 @@ Olaf Alders <olaf@wundercounter.com> (current maintainer)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Iain Truskett and Andy Lester.
+This software is copyright (c) 2004-2019 by Iain Truskett and Andy Lester.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

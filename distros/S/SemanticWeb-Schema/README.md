@@ -4,7 +4,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 # VERSION
 
-version v5.0.0
+version v5.0.1
 
 # SYNOPSIS
 
@@ -66,9 +66,10 @@ feature.
 
 Robert Rothenberg <rrwo@cpan.org>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-Mohammad S Anwar <mohammad.anwar@yahoo.com>
+- Arikawa Takaya <tky.c10.ver@gmail.com>
+- Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 

@@ -26,6 +26,7 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
         fl.setColumnMinWidth(1, 130);
         fl.setColumnFlex(2,1);
         fl.setColumnMaxWidth(2,250);
+        fl.setSpacingY(0);
     },
 
     members: {
@@ -48,8 +49,16 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
             // add the items
             for (var i = 0; i < items.length; i++) {
                 var label = this._createLabel(names[i], items[i]);
+                label.set({
+                    marginTop: 2,
+                    marginBottom: 2
+                });
                 this._add(label, {row: this._row, column: 0});
                 var item = items[i];
+                item.set({
+                    marginTop: 2,
+                    marginBottom: 2
+                });
                 label.setBuddy(item);
                 this._add(item, {row: this._row, column: 1});
                 if (itemOptions != null && itemOptions[i] != null && itemOptions[i].note ){
