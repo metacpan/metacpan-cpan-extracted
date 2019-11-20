@@ -62,7 +62,7 @@ is( $obj->{_language}->name, 'Arabic', 'Reset language attribute with code_alpha
 $obj->language_name('Swedish');
 
 #10
-is( $obj->{_language}->code_alpha3, 'sve', 'Reset language attribute with name' );
+is( $obj->{_language}->code_alpha3, 'swe', 'Reset language attribute with name' );
 
 # Sanity checks
 ###############

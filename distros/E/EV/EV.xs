@@ -31,7 +31,7 @@ sv_fileno (SV *fh)
 #define EV_USE_NANOSLEEP EV_USE_MONOTONIC
 #define EV_USE_FLOOR 1
 #define EV_API_STATIC
-#define EV_H <ev.h>
+#define EV_H "../libev/ev.h"
 #define EV_CONFIG_H error
 #include "EV/EVAPI.h"
 
@@ -44,7 +44,7 @@ sv_fileno (SV *fh)
 /* due to bugs in OS X we have to use libev/ explicitly here */
 #include "libev/ev.c"
 
-#if !defined _WIN32 && !defined _MINIX && !EV_NO_ATFORK
+#if !defined _WIN32 && !defined __minix && !EV_NO_ATFORK
 # include <pthread.h>
 #endif
 
@@ -204,11 +204,11 @@ e_cb (EV_P_ ev_watcher *w, int revents)
   SV *sv_self, *sv_events;
 
   /* libev might have stopped the watcher */
-  if (expect_false (w->e_flags & WFLAG_UNREFED)
+  if (ecb_expect_false (w->e_flags & WFLAG_UNREFED)
       && !ev_is_active (w))
     REF (w);
 
-  if (expect_true (sv_self_cache))
+  if (ecb_expect_true (sv_self_cache))
     {
       sv_self = sv_self_cache; sv_self_cache = 0;
       SvRV_set (sv_self, SvREFCNT_inc_NN (w->self));
@@ -219,7 +219,7 @@ e_cb (EV_P_ ev_watcher *w, int revents)
       SvREADONLY_on (sv_self);
     }
 
-  if (expect_true (sv_events_cache))
+  if (ecb_expect_true (sv_events_cache))
     {
       sv_events = sv_events_cache; sv_events_cache = 0;
       SvIV_set (sv_events, revents);
@@ -239,7 +239,7 @@ e_cb (EV_P_ ev_watcher *w, int revents)
   PUTBACK;
   call_sv (w->cb_sv, G_DISCARD | G_VOID | G_EVAL);
 
-  if (expect_false (SvREFCNT (sv_self) != 1 || sv_self_cache))
+  if (ecb_expect_false (SvREFCNT (sv_self) != 1 || sv_self_cache))
     SvREFCNT_dec (sv_self);
   else
     {
@@ -248,12 +248,12 @@ e_cb (EV_P_ ev_watcher *w, int revents)
       sv_self_cache = sv_self;
     }
 
-  if (expect_false (SvREFCNT (sv_events) != 1 || sv_events_cache))
+  if (ecb_expect_false (SvREFCNT (sv_events) != 1 || sv_events_cache))
     SvREFCNT_dec (sv_events);
   else
     sv_events_cache = sv_events;
 
-  if (expect_false (SvTRUE (ERRSV)))
+  if (ecb_expect_false (SvTRUE (ERRSV)))
     {
       SPAGAIN;
       PUSHMARK (SP);

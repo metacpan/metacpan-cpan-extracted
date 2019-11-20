@@ -187,7 +187,7 @@ Retrieves the value of the continent object's name.
 
     my @countries = $asia->countries;
 
-Returns an array of L<Locale::Object::Country> objects with their ISO 3166 alpha2 codes as keys (see L<Locale::Object::DB::Schemata> for more details on those) in array context, or a reference in scalar context. The objects have their own attribute methods, so you can do things like this:
+Returns an array of L<Locale::Object::Country> objects with their ISO 3166 alpha2 codes as keys in array context, or a reference in scalar context. The objects have their own attribute methods, so you can do things like this:
 
     foreach my $place (@countries)
     {

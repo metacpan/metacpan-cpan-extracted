@@ -1,3 +1,7 @@
+2019-11
+  - Install on systems with a non-english locale
+  - BREAKING CHANGE (content): Updated all languages + country_language mappings, some languages changed code, as some were misspelt, and some werent ISO 639-3/T as stated in the docs.
+
 2012-11-22: 0.79
   - POD updates (COPYRIGHT AND LICENSE)
 

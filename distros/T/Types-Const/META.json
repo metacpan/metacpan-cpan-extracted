@@ -69,7 +69,7 @@
             "Types::Standard" : "0",
             "Types::TypeTiny" : "0",
             "namespace::autoclean" : "0.28",
-            "perl" : "v5.8.0",
+            "perl" : "v5.10.0",
             "version" : "0.77"
          }
       },
@@ -91,7 +91,7 @@
    "provides" : {
       "Types::Const" : {
          "file" : "lib/Types/Const.pm",
-         "version" : "v0.3.8"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -106,7 +106,7 @@
          "web" : "https://github.com/robrwo/Types-Const"
       }
    },
-   "version" : "v0.3.8",
+   "version" : "v0.4.0",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

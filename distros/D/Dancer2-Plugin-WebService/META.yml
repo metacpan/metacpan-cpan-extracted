@@ -15,7 +15,7 @@ name: Dancer2-Plugin-WebService
 provides:
   Dancer2::Plugin::WebService:
     file: lib/Dancer2/Plugin/WebService.pm
-    version: v4.2.6
+    version: v4.2.9
 requires:
   Dancer2: '0'
   Dancer2::Plugin: '0'
@@ -27,7 +27,7 @@ requires:
   Starman: '0'
   Storable: '0'
   XML::Hash::XS: '0'
-  YAML::XS: '0'
-version: 4.2.6
+  YAML::Syck: '0'
+version: 4.2.9
 x_generated_by_perl: v5.30.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

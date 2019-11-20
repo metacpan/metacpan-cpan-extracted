@@ -6,6 +6,7 @@ MANIFEST
 Makefile.PL
 README.md
 examples/anyevent.pl
+examples/anyevent_monitor.pl
 examples/credentials.pl
 examples/introspect.pl
 examples/introspect_nb.pl
@@ -23,6 +24,11 @@ lib/Protocol/DBus/Authn/Mechanism/DBUS_COOKIE_SHA1.pm
 lib/Protocol/DBus/Authn/Mechanism/DBUS_COOKIE_SHA1/Pieces.pm
 lib/Protocol/DBus/Authn/Mechanism/EXTERNAL.pm
 lib/Protocol/DBus/Client.pm
+lib/Protocol/DBus/Client/AnyEvent.pm
+lib/Protocol/DBus/Client/EventBase.pm
+lib/Protocol/DBus/Client/EventMessenger.pm
+lib/Protocol/DBus/Client/IOAsync.pm
+lib/Protocol/DBus/Client/Mojo.pm
 lib/Protocol/DBus/Connect.pm
 lib/Protocol/DBus/Marshal.pm
 lib/Protocol/DBus/Message.pm

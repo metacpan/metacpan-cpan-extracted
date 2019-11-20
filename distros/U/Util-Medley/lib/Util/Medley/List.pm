@@ -1,5 +1,5 @@
 package Util::Medley::List;
-$Util::Medley::List::VERSION = '0.009';
+$Util::Medley::List::VERSION = '0.010';
 #########################################################################################
 
 use Modern::Perl;
@@ -15,7 +15,7 @@ Util::Medley::List - utility methods for working with lists
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =cut
 
@@ -191,6 +191,8 @@ Just a proxy to List::Util::uniq().
  @uniq = $util->uniq(@list);
 
  @uniq = $util->uniq(list => \@list);
+
+=back
    
 =cut
 

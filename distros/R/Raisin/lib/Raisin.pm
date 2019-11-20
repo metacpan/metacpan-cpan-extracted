@@ -25,7 +25,7 @@ use Plack::Util::Accessor qw(
     encoder
 );
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 sub new {
     my ($class, %args) = @_;
@@ -454,6 +454,18 @@ Defines a route parameter as a resource C<id> which can be anything if type
 isn't specified for it.
 
     route_param id => sub { ... };
+
+Raisin allows you to nest C<route_param>:
+
+    params requires => { name => 'id', type => Int };
+    route_param id => sub {
+        get sub { ... };
+
+        params requires => { name => 'sub_id', type => Int };
+        route_param sub_id => sub {
+            ...
+        };
+    };
 
 =head3 del, get, patch, post, put
 

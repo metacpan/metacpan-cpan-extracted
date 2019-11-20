@@ -5,15 +5,16 @@
 # Joan Ntzougani, gravitalsun@hotmail.com
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.2.6';
+our	$VERSION = '4.2.9';
 use	strict;
 use	warnings;
+use Encode;
 use	Dancer2::Plugin;
 use	Storable;
-use	Data::Dumper;	$Data::Dumper::Sortkeys=0; $Data::Dumper::Indent=2; $Data::Dumper::Purity=1; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Trailingcomma=0;
-use	YAML::XS;		$YAML::XS::QuoteNumericStrings=1;
-use	XML::Hash::XS;	$XML::Hash::XS::root='Data'; $XML::Hash::XS::canonical=0; $XML::Hash::XS::indent=2; $XML::Hash::XS::utf8=1; $XML::Hash::XS::encoding='utf8'; $XML::Hash::XS::xml_decl=0; $XML::Hash::XS::doc=0;
-use JSON::XS;		my $JSON=JSON::XS->new; $JSON->canonical(0); $JSON->pretty(1); $JSON->indent(1); $JSON->space_before(0); $JSON->space_after(0); $JSON->max_size(0); $JSON->relaxed(0); $JSON->shrink(0); $JSON->allow_tags(1); $JSON->allow_nonref(0); $JSON->allow_unknown(0); $JSON->allow_blessed(1); $JSON->convert_blessed(1); $JSON->utf8(1); $JSON->max_depth(1024);
+use	Data::Dumper;	$Data::Dumper::Sortkeys=0;     $Data::Dumper::Indent=2;     $Data::Dumper::Purity=1; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Trailingcomma=0;
+use YAML::Syck;     $YAML::Syck::ImplicitTyping=1; $YAML::Syck::Headless=0;     $YAML::Syck::ImplicitUnicode=0;
+use	XML::Hash::XS;	$XML::Hash::XS::root='Data';   $XML::Hash::XS::canonical=0; $XML::Hash::XS::indent=2; $XML::Hash::XS::utf8=1; $XML::Hash::XS::encoding='utf8'; $XML::Hash::XS::xml_decl=0; $XML::Hash::XS::doc=0;
+use JSON::XS;		my $JSON=JSON::XS->new; $JSON->canonical(0); $JSON->pretty(1); $JSON->indent(1); $JSON->space_before(0); $JSON->space_after(0); $JSON->max_size(0); $JSON->relaxed(0); $JSON->shrink(0); $JSON->allow_tags(1); $JSON->allow_nonref(0); $JSON->allow_unknown(0); $JSON->allow_blessed(1); $JSON->convert_blessed(1); $JSON->max_depth(1024); $JSON->utf8(0);
 
 if ($^O=~/(?i)MSWin/) {warn "Operating system is not supported\n"; exit 1}
 
@@ -29,7 +30,7 @@ has reply_text		=> (is=>'rw', lazy=>1, default=> '');
 has auth_method		=> (is=>'rw', lazy=>1, default=> '');
 has auth_command	=> (is=>'rw', lazy=>1, default=> '');
 has auth_config		=> (is=>'rw', lazy=>1, default=> sub{ {} });
-has data			=> (is=>'rw', lazy=>1, default=> sub{ {} });	# user posted data
+has data			=> (is=>'rw', lazy=>1, default=> sub{ {} });	# user posted data as hash
 has Session_timeout	=> (is=>'ro', lazy=>0, from_config=>'Session idle timeout',default=> sub{ 3600 }, isa => sub {unless ( $_[0]=~/^\d+$/ ) {warn "Session idle timeout \"$_[0]\" It is not a number\n"; exit 1}} );
 has rules			=> (is=>'ro', lazy=>0, from_config=>'Allowed hosts',       default=> sub{ ['127.0.*', '192.168.*', '10.*', '172.16.*'] });
 has rules_compiled	=> (is=>'ro', lazy=>0, default=> sub {my $array = [@{$_[0]->rules}]; for (@{$array}) { s/([^?*]+)/\Q$1\E/g; s|\?|.|g; s|\*+|.*?|g; $_ = qr/^$_$/i } $array});
@@ -126,19 +127,20 @@ delete $plg->config->{'Authentication methods'};
 		}
 	}
 
-print "\nApplication              : $app->{name}\n";
-print "Application version      : ",(exists $app->{config}->{version} ? $app->{config}->{version} : '1.0.0')."\n";
-print "WebService  version      : $Dancer2::Plugin::WebService::VERSION\n";
-print "Dancer2     version      : $Dancer2::VERSION\n";
-print "Perl        version      : $^V\n";
-print 'Run as user              : ', (getpwuid($>))[0]    ,"\n";
-print 'Start time               : ', scalar localtime $^T ,"\n";
-print "Module auth dir scripts  : $module_dir\n";
-print "Default format           : ", $plg->config->{'Default format'},"\n";
-print "Authorization method     : ", $plg->auth_method ,"\n";
-print "Session directory        : ", $plg->dir_session ,"\n";
-print "Session max idle timeout : ", $plg->Session_timeout ," sec\n";
-print "Main PID                 : $$\n\n";
+print "\nApplication             : $app->{name}\n";
+print "Version                 :\n";
+print "  - Application         : ",(exists $app->{config}->{version} ? $app->{config}->{version} : '1.0.0')."\n";
+print "  - WebService          : $Dancer2::Plugin::WebService::VERSION\n";
+print "  - Dancer2             : $Dancer2::VERSION\n";
+print "  - Perl                : $^V\n";
+print 'Run as user             : ', (getpwuid($>))[0]    ,"\n";
+print 'Start time              : ', scalar localtime $^T ,"\n";
+print "Module auth dir scripts : $module_dir\n";
+print "Default format          : ", $plg->config->{'Default format'},"\n";
+print "Authorization method    : ", $plg->auth_method ,"\n";
+print "Session directory       : ", $plg->dir_session ,"\n";
+print "Session idle timeout    : ", $plg->Session_timeout ," sec\n";
+print "Main PID                : $$\n";
 
 
 # Restore the valid sessions, and delete the expired
@@ -236,13 +238,13 @@ closedir __SESSIONDIR;
 
 	# Convert the posted data string, to hash $plg->data
 
-		if ( $app->request->body ) { 
+		if ($app->request->body) { 
 
 			eval  {
-			if    ($plg->Format->{from} eq 'json')	{ $plg->data( JSON::XS::decode_json   $app->request->body ) }
-			elsif ($plg->Format->{from} eq 'xml')	{ $plg->data( XML::Hash::XS::xml2hash $app->request->body ) }
-			elsif ($plg->Format->{from} eq 'yaml')	{ $plg->data( YAML::XS::Load          $app->request->body ) }
-			elsif ($plg->Format->{from} eq 'perl')	{ $plg->data( eval                    $app->request->body ) }
+			if    ($plg->Format->{from} eq 'json')	{ $plg->data(JSON::XS::decode_json   Encode::encode('UTF-8',$app->request->body)) }
+			elsif ($plg->Format->{from} eq 'xml')	{ $plg->data(XML::Hash::XS::xml2hash $app->request->body) }
+			elsif ($plg->Format->{from} eq 'yaml')	{ $plg->data(YAML::Syck::Load        $app->request->body) }
+			elsif ($plg->Format->{from} eq 'perl')	{ $plg->data(eval                    $app->request->body) }
 			elsif ($plg->Format->{from} eq 'human')	{
 
 				my $arrayref;
@@ -357,7 +359,7 @@ closedir __SESSIONDIR;
 				Epoch				=> time,
 				Server				=> { address => $app->request->env->{SERVER_NAME}, ip => $app->request->env->{SERVER_PORT} },
 				'Login idle timeout'=> $plg->Session_timeout,
-				'Auth method'       => $plg->auth_method
+				'Auth method'       => "ώπαρτις ". $plg->auth_method
 				)
 			}
 			elsif ( $app->request->param('what') =~/(?i)c/ ) {
@@ -516,23 +518,28 @@ my $plg=shift;
 $plg->reply_text('');
 
 	eval {
-	if    ($plg->Format->{to} eq 'json') {
-	$JSON->pretty($plg->pretty);
-	$JSON->canonical($plg->sort);
-	$plg->{reply_text} = $JSON->encode($_[0])
-	}
-	elsif ($plg->Format->{to} eq 'xml') {
-	$XML::Hash::XS::canonical=$plg->sort;
-	$XML::Hash::XS::indent=$plg->pretty;
-	$plg->{reply_text} = XML::Hash::XS::hash2xml $_[0]
-	}
-	elsif ($plg->Format->{to} eq 'perl') {
-	$Data::Dumper::Indent=$plg->pretty;
-	$Data::Dumper::Sortkeys=$plg->sort;
-	$plg->{reply_text} = Data::Dumper::Dumper $_[0]
-	}
-	elsif ($plg->Format->{to} eq 'yaml')  { $plg->{reply_text} = YAML::XS::Dump $_[0] }
-	elsif ($plg->Format->{to} eq 'human') { $Handler{WALKER}->($_[0], sub {my $val=shift; $val =~s/^\s*(.*?)\s*$/$1/; $plg->{reply_text} .= join('.', @_) ." = $val\n"}); $plg->{reply_text} = Encode::encode('utf8', $plg->{reply_text}) }
+		if    ($plg->Format->{to} eq 'json') {
+		$JSON->pretty($plg->pretty);
+		$JSON->canonical($plg->sort);
+		$plg->{reply_text} = $JSON->encode($_[0])
+		}
+		elsif ($plg->Format->{to} eq 'xml') {
+		$XML::Hash::XS::canonical=$plg->sort;
+		$XML::Hash::XS::indent=$plg->pretty;
+		$plg->{reply_text} = XML::Hash::XS::hash2xml $_[0]
+		}
+		elsif ($plg->Format->{to} eq 'perl') {
+		$Data::Dumper::Indent=$plg->pretty;
+		$Data::Dumper::Sortkeys=$plg->sort;
+		$plg->{reply_text} = Data::Dumper::Dumper $_[0]
+		}
+		elsif ($plg->Format->{to} eq 'yaml') {
+		$YAML::Syck::SortKeys=$plg->sort;
+		$plg->{reply_text} = YAML::Syck::Dump $_[0]
+		}
+		elsif ($plg->Format->{to} eq 'human') {
+		$Handler{WALKER}->($_[0], sub {my $val=shift; $val =~s/^\s*(.*?)\s*$/$1/; $plg->{reply_text} .= join('.', @_) ." = $val\n"}); $plg->{reply_text} = Encode::encode('utf8', $plg->{reply_text})
+		}
 	};
 
 	if ($@) {
@@ -760,7 +767,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.2.6
+version 4.2.9
 
 =head1 SYNOPSIS
 
@@ -1136,8 +1143,8 @@ I</opt/TestService/environments/development.yml>
 
 Start the service as user I<dancer>
 
-  plackup --host 0.0.0.0 --port 3000 --env production  --server Starman --workers=5 -a /opt/TestService/bin/app.psgi
-  plackup --host 0.0.0.0 --port 3000 --env development --server HTTP::Server::PSGI --Reload /opt/TestService/lib/TestService.pm,/opt/TestService/config.yml -a /opt/TestService/bin/app.psgi
+  plackup --host 0.0.0.0 --port 3000 -a /opt/TestService/bin/app.psgi --env production  --server Starman --workers=5 
+  plackup --host 0.0.0.0 --port 3000 -a /opt/TestService/bin/app.psgi --env development --server HTTP::Server::PSGI --Reload /opt/TestService/lib/TestService.pm,/opt/TestService/config.yml
   plackup --host 0.0.0.0 --port 3000 -a /opt/TestService/bin/app.psgi
 
   # without Plack

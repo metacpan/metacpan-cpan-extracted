@@ -34,7 +34,7 @@ use Protocol::DBus::Client;
     my $client = eval {
         local $SIG{'__WARN__'} = sub { diag shift() };
 
-        my $db = Protocol::DBus::Client->system();
+        my $db = Protocol::DBus::Client::system();
         $db->initialize();
         $db;
     };
@@ -58,7 +58,7 @@ SKIP: {
         skip 'dbus-run-session exited nonzero', 1;
     }
 
-    my $loaded_smh = readpipe( qq[$bin -- $^X -MProtocol::DBus::Client -e 'Protocol::DBus::Client->login_session()->initialize(); print \$INC{"Socket/MsgHdr.pm"} ? "y" : "n"'] );
+    my $loaded_smh = readpipe( qq[$bin -- $^X -MProtocol::DBus::Client -e 'Protocol::DBus::Client::login_session()->initialize(); print \$INC{"Socket/MsgHdr.pm"} ? "y" : "n"'] );
 
     my $no_msghdr_needed = grep { $^O eq $_ } @Protocol::DBus::Authn::Mechanism::EXTERNAL::_OS_NO_MSGHDR_LIST;
 

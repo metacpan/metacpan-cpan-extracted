@@ -1,7 +1,7 @@
 package App::NetworkUtils;
 
-our $DATE = '2019-06-15'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-10-07'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -180,7 +180,7 @@ App::NetworkUtils - Command-line utilities related to networking
 
 =head1 VERSION
 
-This document describes version 0.004 of App::NetworkUtils (from Perl distribution App-NetworkUtils), released on 2019-06-15.
+This document describes version 0.005 of App::NetworkUtils (from Perl distribution App-NetworkUtils), released on 2019-10-07.
 
 =head1 DESCRIPTION
 
@@ -188,6 +188,10 @@ This distribution includes the following command-line utilities related to
 networking:
 
 =over
+
+=item * L<netoff>
+
+=item * L<neton>
 
 =item * L<networking-is-on>
 
@@ -206,6 +210,10 @@ networking:
 =item * L<turn-wireless-off>
 
 =item * L<turn-wireless-on>
+
+=item * L<wloff>
+
+=item * L<wlon>
 
 =back
 

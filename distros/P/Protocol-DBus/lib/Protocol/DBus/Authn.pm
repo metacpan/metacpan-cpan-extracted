@@ -90,11 +90,17 @@ sub go {
                 $self->flush_write_queue() or last LINES;
             }
 
+            my $last_lines;
+
             my $dollar_at = $@;
             my $ok = eval {
                 while ( my $cur = $self->{'_xaction'}[0] ) {
                     if ($cur->[0]) {
-                        my $line = $self->_read_line() or last LINES;
+                        my $line = $self->_read_line() or do {
+                            $last_lines = 1;
+                            last;
+                        };
+
                         $cur->[1]->($self, $line);
                     }
                     else {
@@ -117,6 +123,8 @@ sub go {
 
                 1;
             };
+
+            last LINES if $last_lines;
 
             if (!$ok) {
                 my $err = $@;
@@ -264,5 +272,9 @@ sub _is_unix_socket {
 
     return Socket::sockaddr_family($sname) == Socket::AF_UNIX();
 }
+
+#sub DESTROY {
+#    print "DESTROYED: [$_[0]]\n";
+#}
 
 1;

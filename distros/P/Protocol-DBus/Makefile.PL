@@ -34,6 +34,10 @@ WriteMakefile1(
         'IO::Framed' => 0.15,
         'IO::SigGuard' => 0.13,
         'Promise::ES6' => 0,
+
+        # Perl 5.10.1 ships 1.82, which mishandles
+        # abstract-namespace Linux sockets.
+        'Socket' => 1.87,
     },
 
     TEST_REQUIRES => {

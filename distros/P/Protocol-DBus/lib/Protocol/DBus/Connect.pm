@@ -3,7 +3,7 @@ package Protocol::DBus::Connect;
 use strict;
 use warnings;
 
-use Socket;
+use Socket ();
 
 sub create_socket {
     my ($addr_obj) = @_;
@@ -24,11 +24,7 @@ sub create_socket {
             die "socket(AF_UNIX, SOCK_STREAM): $!";
         };
 
-        connect $s, Socket::pack_sockaddr_un($path) or do {
-            die "connect($path): $!";
-        };
-
-        return $s;
+        return ($s, Socket::pack_sockaddr_un($path), $path);
     }
 
     # TODO: Handle TCP addresses.

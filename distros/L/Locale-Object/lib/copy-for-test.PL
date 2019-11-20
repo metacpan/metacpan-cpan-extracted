@@ -14,7 +14,7 @@ foreach my $dir (@dirs)
   $where = $where . $dir;
 
   mkdir $where;
-  die "Couldn't make $where directory: $!" unless $! =~ /File exists/;
+  die "Couldn't make $where directory: $!" unless -d $where;
 }
 
 copy('lib/Locale/Object/locale.db', 'blib/lib/Locale/Object/locale.db')

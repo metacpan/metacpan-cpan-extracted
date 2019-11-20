@@ -1537,7 +1537,7 @@ Many event loops support I<watcher priorities>, which are usually small
 integers that influence the ordering of event callback invocation
 between watchers in some way, all else being equal.
 
-In libev, Watcher priorities can be set using C<ev_set_priority>. See its
+In libev, watcher priorities can be set using C<ev_set_priority>. See its
 description for the more technical details such as the actual priority
 range.
 
@@ -1751,7 +1751,7 @@ reuse the same code path.
 
 =head3 The special problem of fork
 
-Some backends (epoll, kqueue, probably linuxaio) do not support C<fork ()>
+Some backends (epoll, kqueue, linuxaio, iouring) do not support C<fork ()>
 at all or exhibit useless behaviour. Libev fully supports fork, but needs
 to be told about it in the child if you want to continue to use it in the
 child.
@@ -4486,6 +4486,7 @@ in your include path (e.g. in libev/ when using -Ilibev):
    ev_poll.c       only when poll backend is enabled
    ev_epoll.c      only when the epoll backend is enabled
    ev_linuxaio.c   only when the linux aio backend is enabled
+   ev_iouring.c    only when the linux io_uring backend is enabled
    ev_kqueue.c     only when the kqueue backend is enabled
    ev_port.c       only when the solaris port backend is enabled
 
@@ -4688,10 +4689,16 @@ headers indicate GNU/Linux + Glibc 2.4 or newer, otherwise disabled.
 
 =item EV_USE_LINUXAIO
 
+If defined to be C<1>, libev will compile in support for the Linux aio
+backend (C<EV_USE_EPOLL> must also be enabled). If undefined, it will be
+enabled on linux, otherwise disabled.
+
+=item EV_USE_IOURING
+
 If defined to be C<1>, libev will compile in support for the Linux
-aio backend. Due to it's currenbt limitations it has to be requested
-explicitly.  If undefined, it will be enabled on linux, otherwise
-disabled.
+io_uring backend (C<EV_USE_EPOLL> must also be enabled). Due to it's
+current limitations it has to be requested explicitly. If undefined, it
+will be enabled on linux, otherwise disabled.
 
 =item EV_USE_KQUEUE
 

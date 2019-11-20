@@ -138,4 +138,8 @@ sub preserve_variant_signatures {
     return !!$self->{'_preserve_variant_signatures'};
 }
 
+#sub DESTROY {
+#    print "DESTROYED: [$_[0]]\n";
+#}
+
 1;

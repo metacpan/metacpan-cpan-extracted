@@ -303,7 +303,7 @@ BASIC INTERFACE
     EV::feed_signal $signal
         Feed a signal event into EV - unlike "EV::feed_signal_event", this
         works regardless of which loop has registered the signal, and is
-        mainly useful fro custom signal implementations.
+        mainly useful for custom signal implementations.
 
     EV::set_io_collect_interval $time
     $loop->set_io_collect_interval ($time)

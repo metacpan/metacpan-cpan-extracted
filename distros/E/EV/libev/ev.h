@@ -151,7 +151,10 @@ EV_CPP(extern "C" {)
 
 /*****************************************************************************/
 
-typedef double ev_tstamp;
+#ifndef EV_TSTAMP_T
+# define EV_TSTAMP_T double
+#endif
+typedef EV_TSTAMP_T ev_tstamp;
 
 #include <string.h> /* for memmove */
 
@@ -522,8 +525,9 @@ enum {
   EVBACKEND_KQUEUE   = 0x00000008U, /* bsd, broken on osx */
   EVBACKEND_DEVPOLL  = 0x00000010U, /* solaris 8 */ /* NYI */
   EVBACKEND_PORT     = 0x00000020U, /* solaris 10 */
-  EVBACKEND_LINUXAIO = 0x00000040U, /* Linuix AIO */
-  EVBACKEND_ALL      = 0x0000007FU, /* all known backends */
+  EVBACKEND_LINUXAIO = 0x00000040U, /* linuix AIO, 4.19+ */
+  EVBACKEND_IOURING  = 0x00000080U, /* linux io_uring, 5.1+ */
+  EVBACKEND_ALL      = 0x000000FFU, /* all known backends */
   EVBACKEND_MASK     = 0x0000FFFFU  /* all future backends */
 };
 

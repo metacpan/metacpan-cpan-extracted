@@ -96,7 +96,7 @@ sub flush_write_queue {
 
 #----------------------------------------------------------------------
 
-=head2 I<OBJ>->send_call( %OPTS )
+=head2 $promise = I<OBJ>->send_call( %OPTS )
 
 Send a METHOD_CALL message.
 
@@ -147,9 +147,12 @@ sub send_call {
     };
 }
 
-=head2 I<OBJ>->send_return( $ORIG_MSG, %OPTS )
+=head2 $flushed_yn = I<OBJ>->send_return( $ORIG_MSG, %OPTS )
 
 Send a METHOD_RETURN message.
+
+The return is a boolean that indicates whether the message is sent (truthy)
+or remains queued (falsy).
 
 Arguments are similar to C<send_call()> except for the header differences
 that the D-Bus specification describes. Also, C<destination> is not given
@@ -167,7 +170,7 @@ sub send_return {
     );
 }
 
-=head2 I<OBJ>->send_error( $ORIG_MSG, %OPTS )
+=head2 $flushed_yn = I<OBJ>->send_error( $ORIG_MSG, %OPTS )
 
 Like C<send_return()>, but sends an error instead. The
 C<error_name> parameter is required.
@@ -198,10 +201,10 @@ sub _response_fields_from_orig_msg {
     );
 }
 
-=head2 I<OBJ>->send_signal( %OPTS )
+=head2 $flushed_yn = I<OBJ>->send_signal( %OPTS )
 
-Like C<send_call()> but sends a signal rather than a method call,
-and a promise is not returned.
+Like C<send_call()> but sends a signal rather than a method call.
+This also returns a boolean like C<send_return()>.
 
 =cut
 

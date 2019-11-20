@@ -1,0 +1,45 @@
+---
+abstract: 'A REST API microframework for Perl.'
+author:
+  - 'Artur Khabibullin - rtkh@cpan.org'
+build_requires:
+  List::Util: '1.29'
+  Module::Build: '0.28'
+  Test::Exception: '0'
+  Test::Pod: '0'
+  Test::Simple: '1.001014'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Raisin
+no_index:
+  directory:
+    - examples
+    - t
+requires:
+  HTTP::Request::Common: '0'
+  HTTP::Status: '0'
+  Hash::Merge: '0.300'
+  JSON::MaybeXS: '1.004000'
+  Plack: '1.0030'
+  Plack::Middleware::CrossOrigin: '0.009'
+  Scalar::Util: '1.38'
+  Type::Tiny: '0.044'
+  YAML: '0.90'
+  parent: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/khrt/Raisin/issues
+  homepage: https://github.com/khrt/Raisin
+  repository: https://github.com/khrt/Raisin.git
+version: '0.88'
+x_contributors:
+  - 'Vladimir Lettiev <thecrux@gmail.com>'
+  - 'Dan Burke <dburke@addictmud.org>'
+  - kimcognito
+x_serialization_backend: 'YAML::Tiny version 1.73'

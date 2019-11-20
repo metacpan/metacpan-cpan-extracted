@@ -1,5 +1,11 @@
 Revision history for Perl module Protocol::DBus
 
+0.11
+- BUG FIX: initialize() now returns 1 after initial truthy return.
+- Implement non-blocking connect().
+- Add AnyEvent and IO::Async wrapper modules.
+- Improve Peer.pm documentation.
+
 0.10 Thu 16 May 2019
 - Switch from Module::Load to Module::Runtime.
 

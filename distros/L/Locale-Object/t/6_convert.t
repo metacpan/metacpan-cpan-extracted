@@ -3,7 +3,7 @@
 use warnings::register;
 use strict;
 
-use Test::More tests => 8;
+use Test::More;
 
 use Locale::Object::Currency;
 use Locale::Object::Currency::Converter;
@@ -51,19 +51,21 @@ SKIP:
   }
 }
 
-#3
-ok( $converter->service('Yahoo'), 'Resetting currency service worked' );
 
-#4
+#3
 ok( $converter->from($eur), "Resetting 'from' currency worked" );
 
-#5
+#4
 ok( $converter->to($jpy), "Resetting 'to' currency worked" );
 
 SKIP:
 {
-  skip 'Finance::Currency::Convert::Yahoo not installed', 1 unless $converter->use_yahoo == 1;
+  skip 'Finance::Currency::Convert::Yahoo not installed', 4 unless $converter->use_yahoo == 1;
 
+  $converter->service('Yahoo');
+
+  #5
+  is( $converter->{service}, 'yahoo', 'Resetting currency service worked' );
   my $result = $converter->convert($amount);
   
   # More "tests" - see note above.
@@ -77,29 +79,31 @@ SKIP:
   {
     pass('A Yahoo! conversion was not successful, this may be due to transient network conditions');
   }
-}
- 
-my $rate = $converter->rate;
- 
-#7
-if (defined $rate)
-{
-  pass('A conversion rate was found');
-}
-else
-{
-  pass('A conversion rate was not found, this may be due to transient network conditions');
-}
-  
-my $timestamp = $converter->timestamp;
-  
-#8
-if (defined $timestamp)
-{
-  pass('A rate timestamp was found');
-}
-else
-{
-  pass('A rate timestamp was not found, this may be due to transient network conditions');
-}
 
+
+  my $rate = $converter->rate;
+
+  #7
+  if (defined $rate)
+  {
+    pass('A conversion rate was found');
+  }
+  else
+  {
+    pass('A conversion rate was not found, this may be due to transient network conditions');
+  }
+
+  my $timestamp = $converter->timestamp;
+
+  #8
+  if (defined $timestamp)
+  {
+    pass('A rate timestamp was found');
+  }
+  else
+  {
+    pass('A rate timestamp was not found, this may be due to transient network conditions');
+  }
+
+}
+done_testing;

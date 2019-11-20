@@ -109,6 +109,7 @@ sub service
     # Check that we can use Finance::Currency::Convert::XE.
     if ($use_xe == 1)
     {
+      $self->{service} = $service;
       return $self;
     }
     else
@@ -121,6 +122,7 @@ sub service
     # Check that we can use Finance::Currency::Convert::Yahoo.
     if ($use_yahoo == 1)
     {
+      $self->{service} = $service;
       return $self;
     }
     else
@@ -133,7 +135,6 @@ sub service
     carp "ERROR: Values for service can be 'XE' or 'Yahoo' (case-insensitive); you said '$service'.";
   }
   
-  $self->{service} = $service;
 }
 
 # Set currency to be converted from.

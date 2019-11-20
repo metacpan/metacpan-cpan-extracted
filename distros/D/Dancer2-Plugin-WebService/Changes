@@ -1,3 +1,16 @@
+4.2.9  2019-11-20
+
+  - Uniocode corrections while encoding json structures
+  - YAML output can be sorted or not
+
+4.2.8  2019-11-19
+
+  - YAML::Syck replaced the YAML::XS
+
+4.2.7  2019-11-18
+
+  - Change start up debug information
+
 4.2.6  2019-11-16
 
   - Print Perl version at start

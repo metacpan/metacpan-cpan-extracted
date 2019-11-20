@@ -26,9 +26,9 @@ my %WriteMakefileArgs = (
     "Starman" => 0,
     "Storable" => 0,
     "XML::Hash::XS" => 0,
-    "YAML::XS" => 0
+    "YAML::Syck" => 0
   },
-  "VERSION" => "4.2.6",
+  "VERSION" => "4.2.9",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %FallbackPrereqs = (
   "Starman" => 0,
   "Storable" => 0,
   "XML::Hash::XS" => 0,
-  "YAML::XS" => 0
+  "YAML::Syck" => 0
 );
 
 

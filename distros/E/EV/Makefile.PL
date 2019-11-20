@@ -9,7 +9,7 @@ sub have_inc($) {
 
 my $DEFINE;
 
-unless (-e "libev/ev_linuxaio.c") {
+unless (-e "libev/ev_iouring.c") {
    print <<EOF;
 
 ***
@@ -187,13 +187,54 @@ print <<EOF;
 *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
 
 
-Similarly to the epoll backend above, EV can take advantage of kqueue on
-many BSD systems. Support for kqueue will be detected at runtime, with a
-safe fallback to other methods when it cannot be used.
+Linux 4.19 introduced another event polling interface, "io_uring". While
+this API is far superior to epoll and almost rivals linuxaio, it also
+suffers from the same issues as kqueue typically does: only a subset of
+file types are supported (as of 5.2). It is also very buggy still, and
+most importantly, very very slow for most workloads.  Therefore, this
+backend is not used by default, even when it is compiled in, and you have
+to request it explicitly, e.g. with LIBEV_FLAGS=128. If unsure, accept the
+default.
 
-Note that kqueue is broken on most operating systems, so by default it
-won't be used on many platforms, but you can still create your own event
-loop with kqueue backend if you ask specifically for it.
+EOF
+
+my $can_iouring = have_inc "linux/fs.h";
+$can_iouring = $ENV{EV_IOURING} if exists $ENV{EV_IOURING};
+$can_iouring = 0 + (prompt ("Enable linux io_uring backend (y/n)?", $can_iouring ? "y" : "n") =~ /[yY]/);
+$DEFINE .= " -DEV_USE_IOURING=$can_iouring";
+
+if ($can_iouring) {
+print <<EOF;
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+
+
+The previously mentioned Linux io_uring is experimental and will not be
+used unless requested explicitly. You can, howeer, choose to make ti a
+recommended basckend, which means it will be chosen if available even when
+not explicitly asked for, in preference to epoll on GNU/Linux. This option
+is likely temporary. When unsure, accept the default.
+
+EOF
+
+my $recommend_iouring = 0;
+$recommend_iouring = $ENV{EV_RECOMMEND_IOURING} if exists $ENV{EV_RECOMMEND_IOURING};
+$recommend_iouring = 0 + (prompt ("Treat io_uring as a recommended backend (y/n)?", $recommend_iouring ? "y" : "n") =~ /[yY]/);
+$DEFINE .= " -DEV_RECOMMEND_IOURING=$recommend_iouring";
+}
+
+print <<EOF;
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+
+
+EV can take advantage of kqueue on many BSD systems. Support for kqueue
+will be detected at runtime, with a safe fallback to other methods when it
+cannot be used.
+
+Note that kqueue is subtly broken on most operating systems, so by default
+it won't be used on many platforms, but you can still create your own
+event loop with kqueue backend if you ask specifically for it.
 
 Here is what we know:
 
@@ -206,7 +247,8 @@ OS X:    completely, utterly broken on at least <= 10.6.
 
 EOF
 
-my $can_kqueue = have_inc "sys/event.h";
+# minix has all the header files, but no implementation. won-der-ful.
+my $can_kqueue = have_inc "sys/event.h" && $^O ne "minix";
 $can_kqueue = $ENV{EV_KQUEUE} if exists $ENV{EV_KQUEUE};
 $DEFINE .= " -DEV_USE_KQUEUE=" . (0 + (prompt ("Enable kqueue backend (y/n)?", $can_kqueue ? "y" : "n") =~ /[yY]/));
 
@@ -352,7 +394,7 @@ WriteMakefile(
 	           },
     depend => {
        "EV.c" => "EV/EVAPI.h "
-               . "libev/ev.c libev/ev.h libev/ev_epoll.c libev/ev_select.c libev/ev_kqueue.c libev/ev_poll.c "
+               . "libev/ev.c libev/ev.h libev/ev_epoll.c libev/ev_select.c libev/ev_kqueue.c libev/ev_poll.c libev/ev_linuxaio.c "
                . "libev/ev_vars.h libev/ev_wrap.h",
     },
     INC       => "-Ilibev",
@@ -378,5 +420,4 @@ WriteMakefile(
                     'libev/ev.pod'    => '$(INST_MAN3DIR)/EV::libev.$(MAN3EXT)',
                 },
 );
-
 

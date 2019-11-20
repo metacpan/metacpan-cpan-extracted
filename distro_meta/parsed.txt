@@ -60077,3 +60077,12 @@ G/GR/GRAVATTJ/Util-Medley-0.009.tar.gz
 L/LE/LEV/Web-API-2.5.tar.gz
 O/OA/OALDERS/WWW-Mechanize-Cached-1.52.tar.gz
 C/CE/CED/XML-NewsML_G2-v0.3.3.tar.gz
+P/PE/PERLANCAR/App-NetworkUtils-0.005.tar.gz
+M/MP/MPOURASG/Dancer2-Plugin-WebService-4.2.9.tar.gz
+M/ML/MLEHMANN/EV-4.28.tar.gz
+P/PL/PLICEASE/FFI-Platypus-Lang-Rust-0.08.tar.gz
+J/JR/JROBINSON/Locale-Object-0.80.tar.gz
+F/FE/FELIPE/Protocol-DBus-0.11.tar.gz
+R/RT/RTKH/Raisin-0.88.tar.gz
+R/RR/RRWO/Types-Const-v0.4.0.tar.gz
+G/GR/GRAVATTJ/Util-Medley-0.010.tar.gz

@@ -4,6 +4,7 @@ Changes
 LICENSE
 MANIFEST
 META.json
+META.yml
 cpanfile
 dist.ini
 examples/music-app/db/music.db
@@ -63,6 +64,7 @@ t/unit/param/moose.t
 t/unit/plugin.t
 t/unit/plugin/logger.t
 t/unit/plugin/swagger.t
+t/unit/plugin/swagger/moose.t
 t/unit/request.t
 t/unit/routes.t
 t/unit/routes/endpoint.t

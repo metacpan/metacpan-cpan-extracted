@@ -288,7 +288,7 @@ C<Locale::Object::Language> allows you to create objects containing information 
 
     my $eng = Locale::Object::Language->new( code_alpha3 => 'eng' );
 
-The C<new> method creates an object. It takes a single-item hash as an argument - valid options to pass are ISO 3166 values - 'code_alpha2', 'code_alpha3' and 'name' (see L<Locale::Object::DB::Schemata> for details on these).
+The C<new> method creates an object. It takes a single-item hash as an argument - valid options to pass are ISO 3166 values - 'code_alpha2', 'code_alpha3' and 'name'.
 
 The objects created are singletons; if you try and create a currency object when one matching your specification already exists, C<new()> will return the original one.
 
@@ -302,7 +302,7 @@ These methods retrieve the values of the attributes in the object whose name the
 
     my @countries = $eng->countries;
 
-Returns an array (in array context, otherwise a reference) of L<Locale::Object::Country> objects with their ISO 3166 alpha2 codes as keys (see L<Locale::Object::DB::Schemata> for more details on those) for all countries using this currency in array context, or a reference in scalar context. The objects have their own attribute methods, so you can do things like this for example:
+Returns an array (in array context, otherwise a reference) of L<Locale::Object::Country> objects with their ISO 3166 alpha2 codes as keys for all countries using this currency in array context, or a reference in scalar context. The objects have their own attribute methods, so you can do things like this for example:
 
     foreach my $place (@countries)
     {
@@ -322,7 +322,7 @@ Which will list you all the countries that use in that currency. See the documen
 
     print $eng->official($gb);  # prints 'true'
 
-Give this method a L<Locale::Object::Country> object, and it will return a 'true' or 'false' value for whether the country the object represents has the language represented by your C<Locale::Object::Language> object as an official language. See L<database.pod> for a note about languages in the database.
+Give this method a L<Locale::Object::Country> object, and it will return a 'true' or 'false' value for whether the country the object represents has the language represented by your C<Locale::Object::Language> object as an official language. See L<Locale::Object::Database> for a note about languages in the database.
 
 =head1 OBSOLETE LANGUAGE CODES
 
@@ -330,7 +330,7 @@ ISO 639 is not immune from change, and there are three codes that changed in 199
 
 =head1 KNOWN BUGS
 
-The database of language information is not perfect by a long stretch. In particular, numerous comparatively obscure secondary or regional languages that don't have ISO codes, such as in several African countries and India, are missing. (See note in L<database.pod> about data sources.) Please send any corrections to the author.
+The database of language information is not perfect by a long stretch. In particular, numerous comparatively obscure secondary or regional languages that don't have ISO codes, such as in several African countries and India, are missing. (See note in L<Locale::Object::Database> about data sources.) Please send any corrections to the author.
 
 =head1 AUTHOR
 

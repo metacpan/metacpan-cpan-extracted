@@ -1,5 +1,5 @@
 package Util::Medley::XML;
-$Util::Medley::XML::VERSION = '0.009';
+$Util::Medley::XML::VERSION = '0.010';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -16,7 +16,7 @@ Util::Medley::XML - utility XML methods
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =cut
 
@@ -61,6 +61,8 @@ Location of the xml file.
 
 =back
 
+=back
+
 =cut
 
 multi method xmlBeautifyFile (Str :$path!) {
@@ -94,6 +96,8 @@ Formats an XML string.  Requires the xmllint command.
 =item xml [Str]
 
 An XML string.
+
+=back
 
 =back
 

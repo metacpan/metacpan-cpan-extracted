@@ -1,5 +1,5 @@
 package Util::Medley::Crypt;
-$Util::Medley::Crypt::VERSION = '0.009';
+$Util::Medley::Crypt::VERSION = '0.010';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -14,7 +14,7 @@ Util::Medley::Crypt - Class for simple encrypt/descrypt of strings.
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =cut
 

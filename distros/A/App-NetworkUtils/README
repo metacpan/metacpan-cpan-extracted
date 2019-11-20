@@ -2,12 +2,16 @@ NAME
     App::NetworkUtils - Command-line utilities related to networking
 
 VERSION
-    This document describes version 0.004 of App::NetworkUtils (from Perl
-    distribution App-NetworkUtils), released on 2019-06-15.
+    This document describes version 0.005 of App::NetworkUtils (from Perl
+    distribution App-NetworkUtils), released on 2019-10-07.
 
 DESCRIPTION
     This distribution includes the following command-line utilities related
     to networking:
+
+    *   netoff
+
+    *   neton
 
     *   networking-is-on
 
@@ -26,6 +30,10 @@ DESCRIPTION
     *   turn-wireless-off
 
     *   turn-wireless-on
+
+    *   wloff
+
+    *   wlon
 
 FUNCTIONS
   networking_is_on

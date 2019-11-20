@@ -1,11 +1,12 @@
 package Util::Medley::String;
-$Util::Medley::String::VERSION = '0.009';
+$Util::Medley::String::VERSION = '0.010';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
 use Kavorka '-all';
 use Data::Printer alias => 'pdump';
 use String::Util 'nocontent';
+use Scalar::Util::Numeric; # qw(isint);
 
 =head1 NAME
 
@@ -13,7 +14,7 @@ Util::Medley::String - utility methods for working with strings
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -110,17 +111,18 @@ multi method isBlank (Str :$str!) {
 	return $self->isBlank($str);
 }
 
-=head2 ltrim
 
-Just a pass-through to String::Util::ltrim.
+=head2 isInt
+
+Just a pass-through to String::Util::Numeric::isint.
 
 =over
 
 =item usage:
 
-  $lTrimmed = $util->ltrim($str);
+  $bool = $util->isInt($str);
 
-  $lTrimmed = $util->ltrim(str => $str);
+  $bool = $util->isInt(str => $str);
 
 =item args:
 
@@ -128,7 +130,7 @@ Just a pass-through to String::Util::ltrim.
 
 =item str [Str]
 
-The string to ltrim.
+The string you wish to check for an integer.
 
 =back
 
@@ -136,14 +138,54 @@ The string to ltrim.
  
 =cut
 
-multi method ltrim (Str $str) {
+multi method isInt (Str :$str!) {
+
+	if (Scalar::Util::Numeric::isint($str)) {
+		return 1;	
+	}
+	
+	return 0;
+}
+
+multi method isInt (Str $str) {
+
+	return $self->isInt(str => $str);	
+}
+
+=head2 lTrim
+
+Just a pass-through to String::Util::lTrim.
+
+=over
+
+=item usage:
+
+  $lTrimmed = $util->lTrim($str);
+
+  $lTrimmed = $util->lTrim(str => $str);
+
+=item args:
+
+=over
+
+=item str [Str]
+
+The string to lTrim.
+
+=back
+
+=back
+ 
+=cut
+
+multi method lTrim (Str $str) {
 
 	return String::Util::ltrim($str);
 }
 
-multi method ltrim (Str :$str!) {
+multi method lTrim (Str :$str!) {
 	
-	return $self->ltrim($str);
+	return $self->lTrim($str);
 }
 
 =head2 pascalize
@@ -187,17 +229,17 @@ multi method pascalize (Str :$str!) {
 }
 
 
-=head2 rtrim
+=head2 rTrim
 
-Just a pass-through to String::Util::rtrim.
+Just a pass-through to String::Util::rTrim.
 
 =over
 
 =item usage:
 
-  $rTrimmed = $util->rtrim($str);
+  $rTrimmed = $util->rTrim($str);
 
-  $rTrimmed = $util->rtrim(str => $str);
+  $rTrimmed = $util->rTrim(str => $str);
 
 =item args:
 
@@ -205,7 +247,7 @@ Just a pass-through to String::Util::rtrim.
 
 =item str [Str]
 
-The string to rtrim.
+The string to rTrim.
 
 =back
 
@@ -213,14 +255,14 @@ The string to rtrim.
  
 =cut
 
-multi method rtrim (Str $str) {
-
-	return String::Util::rtrim($str);
+multi method rTrim (Str :$str!) {
+	
+	return $self->rTrim($str);
 }
 
-multi method rtrim (Str :$str!) {
-	
-	return $self->rtrim($str);
+multi method rTrim (Str $str) {
+
+	return String::Util::rtrim($str);
 }
 
 =head2 snakelize

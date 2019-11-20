@@ -9,7 +9,7 @@ use Locale::Object::Country;
 use Locale::Object::Currency;
 use Locale::Object::Language;
 
-our $VERSION = '0.79';
+our $VERSION = '0.80';
 
 sub new
 {
@@ -416,7 +416,7 @@ At present, the modules are:
 
 =back
 
-For more information, see the documentation for those modules. The database is documented in docs/database.pod. Locale::Object itself can be used to create compound objects containing country, currency and language objects.
+For more information, see the documentation for those modules. The database is documented in L<Locale::Object::Database>. Locale::Object itself can be used to create compound objects containing country, currency and language objects.
 
 =head1 SYNOPSIS
 

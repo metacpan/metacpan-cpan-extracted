@@ -187,7 +187,7 @@ This module provides common functionality for the Locale::Object modules by doin
     
 C<lookup> will return a reference to an anonymous array of hashes. The hashes will contain the results for a query of the database for cells in $result_column in $table that are in a row that has $value in $search_column. Use '*' as a value for result_column if you want to retrieve whole rows.
 
-For information on what db tables are available and where the data came from, see C<docs/database.pod>.
+For information on what db tables are available and where the data came from, see L<Locale::Object::Database>.
 
 IMPORTANT: The way of using this method has changed as of version 0.2, and in addition it supersedes the place formerly taken by C<lookup_all()>. Apologies for any inconvenience.
 

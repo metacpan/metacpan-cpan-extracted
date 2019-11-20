@@ -4,7 +4,7 @@ Types::Const - Types that coerce references to read-only
 
 # VERSION
 
-version v0.3.8
+version v0.4.0
 
 # SYNOPSIS
 
@@ -24,8 +24,8 @@ has bar => (
 
 # DESCRIPTION
 
-This is an _experimental_ type library that provides types that force
-read-only hash and array reference attributes to be deeply read-only.
+This is a type library that provides types to coerce read-only hash
+and array reference attributes to be deeply read-only.
 
 See the [known issues](#known-issues) below for a discussion of
 side-effects.
@@ -44,11 +44,6 @@ It supports coercions to read-only.
 
 This was added in v0.3.0.
 
-# ROADMAP
-
-Support for Perl versions earlier than 5.10 will be removed sometime
-in 2019.
-
 # SEE ALSO
 
 [Const::Fast](https://metacpan.org/pod/Const::Fast)
@@ -58,6 +53,8 @@ in 2019.
 [Types::Standard](https://metacpan.org/pod/Types::Standard)
 
 [Types::ReadOnly](https://metacpan.org/pod/Types::ReadOnly)
+
+[MooX::Const](https://metacpan.org/pod/MooX::Const)
 
 # KNOWN ISSUES
 

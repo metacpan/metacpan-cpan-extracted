@@ -1,6 +1,6 @@
 package Types::Const;
 
-use v5.8;
+use v5.10;
 
 use strict;
 use warnings;
@@ -25,14 +25,7 @@ use Types::TypeTiny ();
 
 use namespace::autoclean 0.28;
 
-our $VERSION = 'v0.3.8';
-
-
-sub VERSION { # for older Perls
-    my ( $class, $wanted ) = @_;
-    require version;
-    return version->parse($VERSION);
-}
+our $VERSION = 'v0.4.0';
 
 
 declare Const,
@@ -126,7 +119,7 @@ Types::Const - Types that coerce references to read-only
 
 =head1 VERSION
 
-version v0.3.8
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -144,8 +137,8 @@ version v0.3.8
 
 =head1 DESCRIPTION
 
-This is an I<experimental> type library that provides types that force
-read-only hash and array reference attributes to be deeply read-only.
+This is a type library that provides types to coerce read-only hash
+and array reference attributes to be deeply read-only.
 
 See the L<known issues|/"KNOWN ISSUES"> below for a discussion of
 side-effects.
@@ -164,13 +157,6 @@ It supports coercions to read-only.
 
 This was added in v0.3.0.
 
-=for Pod::Coverage VERSION
-
-=head1 ROADMAP
-
-Support for Perl versions earlier than 5.10 will be removed sometime
-in 2019.
-
 =head1 SEE ALSO
 
 L<Const::Fast>
@@ -180,6 +166,8 @@ L<Type::Tiny>
 L<Types::Standard>
 
 L<Types::ReadOnly>
+
+L<MooX::Const>
 
 =head1 KNOWN ISSUES
 

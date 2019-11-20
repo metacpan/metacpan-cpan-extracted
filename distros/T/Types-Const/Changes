@@ -1,5 +1,17 @@
 Revision history for Types-Const:
 
+v0.4.0    2019-11-19 19:01:43+00:00 Europe/London
+  [Incompatible Changes]
+  - Perl v5.10 or newer is now required.
+
+  [Documentation]
+  - Minor rewording.
+
+  - Add MooX::Const to SEE ALSO.
+
+  [Other]
+  - This module is no longer experimental.
+
 v0.3.8    2019-11-14 17:46:36+00:00 Europe/London
   [Documentation]
   - Add Types::ReadOnly to SEE ALSO.

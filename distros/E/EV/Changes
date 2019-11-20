@@ -3,6 +3,17 @@ Revision history for Perl extension EV
 Changes marked with (libev) are changes in libev, and have more
 documentation in the libev Changes file.
 
+4.28 Tue Nov 19 13:55:39 CET 2019
+	- (libev) fix ev_port backend, thanks to David H. Gutteridge for
+        - (libev) many bugfixes in linuxaio backend.
+        - (libev) experimental io uring interface.
+          reminding me to actually release the fix.
+	- try to name ev.h more explicitly, to hopefully improve portability.
+        - opportunistically round up wait times for poll and epoll backend,
+          to avoid unnecessary loop iterations.
+        - add build dependency on ev_linuxaio.c.
+        - quickly (re)-ported to minix 3.3 before minix crashed again.
+
 4.27 Thu Jun 27 09:39:58 CEST 2019
 	- (libev) completely rewritten linuxaio backend, maybe
           usable as a general-use backend.

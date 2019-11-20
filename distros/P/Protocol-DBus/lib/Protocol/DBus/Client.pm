@@ -71,10 +71,12 @@ sub login_session {
 
 sub _create_local {
     my ($addr) = @_;
-    my $socket = Protocol::DBus::Connect::create_socket($addr);
+    my ($socket, $bin_addr) = Protocol::DBus::Connect::create_socket($addr);
 
     return __PACKAGE__->new(
         socket => $socket,
+        address => $bin_addr,
+        human_address => $addr->to_string(),
         authn_mechanism => 'EXTERNAL',
     );
 }
@@ -100,14 +102,16 @@ as an alias for backward compatibility.
 sub initialize {
     my ($self) = @_;
 
-    if ($self->{'_authn'}->go()) {
+    if ($self->_connect() && $self->{'_authn'}->go()) {
         $self->{'_sent_hello'} ||= do {
+            my $connection_name_sr = \do { $self->{'_connection_name'} = undef };
+
             $self->send_call(
                 path => '/org/freedesktop/DBus',
                 interface => 'org.freedesktop.DBus',
                 destination => 'org.freedesktop.DBus',
                 member => 'Hello',
-            )->then( sub { $self->{'_connection_name'} = $_[0]->get_body()->[0]; } );
+            )->then( sub { $$connection_name_sr = $_[0]->get_body()->[0]; } );
         };
 
         if (!$self->{'_connection_name'}) {
@@ -123,7 +127,55 @@ sub initialize {
         }
     }
 
-    return 0;
+    return $self->{'_connection_name'} ? 1 : 0;
+}
+
+sub _connect {
+    my ($self) = @_;
+
+    local $!;
+
+    if (!$self->{'_connected'}) {
+        $self->{'_sent_connect'} ||= do {
+            if ( connect $self->{'_socket'}, $self->{'_address'} ) {
+                $self->{'_connected'} = 1;
+            }
+            elsif (!$!{'EINPROGRESS'}) {
+                die "connect($self->{'_human_address'}): $!";
+            }
+        };
+    }
+
+    if (!$self->{'_connected'}) {
+
+        # This non-blocking connect logic will ordinarily be unneeded
+        # since even in non-blocking mode a UNIX socket connect() doesn’t
+        # normally block. Where such a connect() *will* have to wait is
+        # when the server has no more space for a new connection.
+
+        my $mask = q<>;
+        vec( $mask, fileno $self->{'_socket'}, 1 ) = 1;
+
+        my $got = select undef, $mask, undef, 0;
+
+        if ($got > 0) {
+            my $errno = getsockopt( $self->{'_socket'}, Socket::SOL_SOCKET(), Socket::SO_ERROR() );
+            if (!defined $errno) {
+                die "getsockopt(SOL_SOCKET, SO_ERROR): $!";
+            }
+
+            local $! = unpack 'I', $errno;
+
+            if (0 + $!) {
+                die "connect($self->{'_human_address'}): $!";
+            }
+            else {
+                $self->{'_connected'} = 1;
+            }
+        }
+    }
+
+    return $self->{'_connected'};
 }
 
 *do_authn = *initialize;
@@ -146,6 +198,8 @@ sub init_pending_send {
     if ($self->{'_connection_name'}) {
         die "Don’t call this after initialize() is done!";
     }
+
+    return 1 if $self->{'_sent_connect'} && !$self->{'_connected'};
 
     if ($self->{'_sent_hello'}) {
         return $self->pending_send();
@@ -223,7 +277,19 @@ sub new {
 
     $self->{'_authn'} = $authn;
 
+    if (my $address = $opts{'address'}) {
+        $self->{'_address'} = $address;
+        $self->{'_human_address'} = $opts{'human_address'};
+    }
+    else {
+        $self->{'_connected'} = 1;
+    }
+
     return $self;
 }
+
+#sub DESTROY {
+#    print "DESTROYED: [$_[0]]\n";
+#}
 
 1;

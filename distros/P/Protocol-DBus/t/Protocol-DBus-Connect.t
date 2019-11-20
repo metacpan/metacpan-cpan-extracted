@@ -38,9 +38,14 @@ close $s;
 
 my ($addr_obj) = Protocol::DBus::Address::parse("unix:path=$path");
 
-my $cln = Protocol::DBus::Connect::create_socket($addr_obj);
+my ($cln, $bin_addr, $human_addr) = Protocol::DBus::Connect::create_socket($addr_obj);
 
 isa_ok( $cln, 'GLOB', 'create_socket() creates a filehandle' );
+
+ok(
+    connect($cln, $bin_addr),
+    'address can be connect()ed to',
+);
 
 SKIP: {
     my $peername = getpeername($cln);

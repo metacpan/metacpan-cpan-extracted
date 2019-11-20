@@ -20,11 +20,24 @@ my $mb = Module::Build->new(
   },
   'build_requires' => {
     'DBI'           => 0,
-    'DBD::SQLite'   => 0,
     'Module::Build' => '0.21',
     'Test::More'    => 0,
     'Test::Pod'     => 0,
   },
+  'configure_requires' => {
+    'DBD::SQLite'   => 0,
+    'Module::Build' => '0.40',
+  },
+  recommends => {
+    'Finance::Currency::Convert::Yahoo' => '0.2',
+    'Finance::Currency::Convert::XE' => '0.25',
+  },
+  meta_merge => {
+    resources => {
+      repository  => 'https://github.com/castaway/Locale-Object',
+    }
+    
+  }
 );
 
 eval {

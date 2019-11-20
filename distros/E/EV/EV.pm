@@ -121,7 +121,7 @@ package EV;
 use common::sense;
 
 BEGIN {
-   our $VERSION = 4.27;
+   our $VERSION = 4.28;
    use XSLoader;
    local $^W = 0; # avoid spurious warning
    XSLoader::load "EV", $VERSION;
@@ -372,7 +372,7 @@ if the signal specified by C<$signal> had occured.
 
 Feed a signal event into EV - unlike C<EV::feed_signal_event>, this works
 regardless of which loop has registered the signal, and is mainly useful
-fro custom signal implementations.
+for custom signal implementations.
 
 =item EV::set_io_collect_interval $time
 

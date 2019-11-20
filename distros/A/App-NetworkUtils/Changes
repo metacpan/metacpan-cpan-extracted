@@ -1,21 +1,27 @@
-0.004   2019-06-15 (PERLANCAR)
+0.005   2019-10-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Add shorter CLI's: turn-wireless-{off,on} -> wl{off,on},
+	  turn-networking-{off,on} -> net{off,on}.
+
+
+0.004   2019-06-15  Released-By: PERLANCAR
 
 	- [ux] Add CLI aliases: turn-{wireless,networking}-{off,on} ->
 	  turn-{off,on}-{networking,wireless}.
 
 
-0.003   2019-01-08 (PERLANCAR)
+0.003   2019-01-08  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Tweak module summary.
 
 
-0.002   2018-12-15 (PERLANCAR)
+0.002   2018-12-15  Released-By: PERLANCAR
 
 	- Add utilities: turn-{on,off}-wireless.
 
 
-0.001   2018-12-15 (PERLANCAR)
+0.001   2018-12-15  Released-By: PERLANCAR
 
         - First release.

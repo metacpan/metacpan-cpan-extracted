@@ -15,6 +15,11 @@ perl:
   - "5.10"
 #  - "5.8"
 #  - "5.6"
+
+before_install:
+    - eval $(curl https://travis-perl.github.io/init) --auto
+    - cpanm ExtUtils::MakeMaker
+
 matrix:
   include:
     - os: osx
