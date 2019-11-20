@@ -29,7 +29,7 @@ BEGIN
     require Siffra::Tools;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.06';
+    $VERSION = '0.07';
     @ISA     = qw(Siffra::Tools Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -186,6 +186,24 @@ sub loadApplication()
         }
     } ## end else [ if ( $@ ) ]
 
+    my $emailDispatcher = $log->{ adapter }->{ dispatcher }->{ outputs }->{ Email };
+
+    if ( $emailDispatcher )
+    {
+        my $mailConf = $self->{ configurations }->{ mail };
+
+        if ( $mailConf )
+        {
+            eval { require DateTime; };
+            $emailDispatcher->{ to }      = [ $mailConf->{ to } ];
+            $emailDispatcher->{ from }    = $mailConf->{ from };
+            $emailDispatcher->{ host }    = $mailConf->{ host };
+            $emailDispatcher->{ port }    = $mailConf->{ port };
+            $emailDispatcher->{ subject } = "[ " . DateTime->now()->datetime( ' ' ) . " ] " . $self->{ configurations }->{ application }->{ name };
+        } ## end if ( $mailConf )
+
+    } ## end if ( $emailDispatcher ...)
+
     return TRUE;
 } ## end sub loadApplication
 
@@ -199,8 +217,8 @@ sub run
 
     if ( ref $self->{ application }->{ instance } eq $self->{ configurations }->{ application }->{ package } )
     {
-        $self->{ beachmarck }->{ started } = time();
-        $retorno = eval { $self->{ application }->{ instance }->start(); };
+        $self->{ beachmarck }->{ started }  = time();
+        $retorno                            = eval { $self->{ application }->{ instance }->start(); };
         $self->{ beachmarck }->{ finished } = time();
         $log->error( "Problemas durante execucao de start: $@" ) if ( $@ );
     } ## end if ( ref $self->{ application...})

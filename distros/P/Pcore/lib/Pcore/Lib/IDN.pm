@@ -68,7 +68,13 @@ SV* domain_to_ascii ( char* domain, ... ) {
     }
 }
 C
-    libs      => $MSWIN ? '-lidn2' : '-l:libidn2.a',
+
+    # NOTE static linking not working with libidn2 v2.3.0
+    # libs      => $MSWIN ? '-lidn2' : '-l:libidn2.a',
+
+    # dynamic linking
+    libs => '-lidn2',
+
     ccflagsex => '-Wall -Wextra -Ofast -std=c11',
 
     # build_noisy => 1,

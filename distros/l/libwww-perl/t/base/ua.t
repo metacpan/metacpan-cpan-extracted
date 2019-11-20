@@ -4,7 +4,7 @@ use HTTP::Request ();
 use LWP::UserAgent ();
 use Test::More;
 
-plan tests => 41;
+plan tests => 46;
 
 # Prevent environment from interfering with test:
 delete $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME};
@@ -104,6 +104,17 @@ Multi: 2
 x=y&f=ff
 EOT
 
+ok($ua->patch("http://www.example.com", [x => "y", f => "ff"])->content, <<EOT);
+PATCH http://www.example.com
+User-Agent: foo/0.1
+Content-Length: 8
+Content-Type: application/x-www-form-urlencoded
+Foo: bar
+Multi: 1
+Multi: 2
+x=y&f=ff
+EOT
+
 is(ref($clone->{proxy}), 'HASH', 'ref($clone->{proxy})');
 
 is($ua->proxy(http => undef), "loopback:", '$ua->proxy(http => undef)');
@@ -164,3 +175,12 @@ $ua = LWP::UserAgent->new();
 is($ua->proxy('http'), "http://example.com", "\$ua->proxy('http')");
 $ua = LWP::UserAgent->new(env_proxy => 0);
 is($ua->proxy('http'),                undef, "\$ua->proxy('http')");
+
+$ua = LWP::UserAgent->new();
+is($ua->conn_cache, undef, "\$ua->conn_cache");
+$ua = LWP::UserAgent->new(keep_alive => undef);
+is($ua->conn_cache, undef, "\$ua->conn_cache");
+$ua = LWP::UserAgent->new(keep_alive => 0);
+is($ua->conn_cache, undef, "\$ua->conn_cache");
+$ua = LWP::UserAgent->new(keep_alive => 1);
+is($ua->conn_cache->total_capacity, 1, "\$ua->conn_cache->total_capacity");

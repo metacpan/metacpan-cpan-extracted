@@ -1,0 +1,164 @@
+#!/usr/bin/env perl
+
+#
+# Copyright (c) 2002,2014-2015 Christian Jaeger, copying@christianjaeger.ch
+#
+# This is free software, offered under either the same terms as perl 5
+# or the terms of the Artistic License version 2 or the terms of the
+# MIT License (Expat version). See the file COPYING.md that came
+# bundled with this file.
+#
+
+use strict; use warnings; use warnings FATAL => 'uninitialized';
+
+use Cwd 'abs_path';
+our ($mydir, $myname); BEGIN {
+    my $location= (-l $0) ? abs_path ($0) : $0;
+    $location=~ /(.*?)([^\/]+?)_?\z/s or die "?";
+    ($mydir, $myname)=($1,$2);
+}
+use lib "$mydir/../lib";
+
+
+sub usage {
+    print "$myname [ calculation(s) ]
+
+  Repl-Enhanced PerL
+
+  Evaluates the given string(s), or goes into interactive mode if
+  none given.
+
+  Interactive mode tricks:
+  - uses readline (read up on its features)
+  - entering nothing re-evaluates the last entry
+  - 'strict vars' is not active, so there's no need to declare new
+    globals with 'our'
+  - global variables and subroutines stay around, lexical ('my')
+    varibles don't
+  - you can refer to '\$VAR1' etc. to get the correspondin result from the
+    previous evaluation (as long as you're using the default ':d'
+    display mode)
+  - enter ':?' to get a list of special commands and mode switches
+
+  Options:
+  -t               trap exceptions in a repl, too
+  -H|--no-history  do not save history to file (it is still read on
+                   startup.)
+  --name name      use name instead of the name of this script as part
+                   of the history file name: ~/.\${name}_history
+  -M module        use the given module (namespace or path)
+  -m module        same as -M but don't complain about failures
+";
+exit @_;
+}
+
+use Chj::xhome qw(xsafehome);
+
+my @files;
+my $opt_H;
+my @opt_M;
+my @opt_m;
+my $opt_t;
+for (my $i=0; $i<=$#ARGV; $i++) {
+    local $_=$ARGV[$i];
+    if (/^--?h(elp)?$/) {
+        usage
+    } elsif ($_ eq '--') {
+        push @files, @ARGV[$i+1..$#ARGV];
+        last;
+    } elsif ($_ eq '-H' or $_ eq '--no-history') {
+        $opt_H=1;
+    } elsif ($_ eq '-t') {
+        $opt_t=1;
+    } elsif (/^-M(.*)/) {
+        if ($1) {
+            push @opt_M,$1;
+        } else {
+            my $arg= $ARGV[++$i];
+            defined $arg or usage "missing argument to -M";
+            push @opt_M,$arg;
+        }
+    } elsif (/^-m(.*)/) {
+        if ($1) {
+            push @opt_m,$1;
+        } else {
+            my $arg= $ARGV[++$i];
+            defined $arg or usage "missing argument to -m";
+            push @opt_m,$arg;
+        }
+    } elsif (/^--name$/) {
+        my $arg= $ARGV[++$i];
+        defined $arg or usage "missing argument to --name";
+        $myname= $arg;
+    } elsif (/^-/) {
+        warn "Unknown option '$_'\n";
+        usage(1)
+    } else {
+        push @files, $_
+    }
+}
+
+my $HISTFILE= xsafehome."/.${myname}_history";
+my $MAXHISTLEN= 100;
+
+
+eval {
+    require Chj::BinHexOctDec;
+};
+warn $@ if $@;
+
+use Chj::Package::OfPath qw(package_of_path_or_package);
+use FP::Repl::WithRepl qw(push_withrepl WithRepl_eval WithRepl_eval_e);
+
+push_withrepl (0)
+  if $opt_t;
+
+
+sub moduleoption_to_code ($) {
+    my ($a)=@_;
+    $a=~ s/([^=]+)//s
+      or die "invalid -M option '$_'";
+    my $path_or_package= $1;
+    my $p= package_of_path_or_package($path_or_package);
+    "use ".do {
+        if ($a=~ s/^=//s) {
+            $p." ".join(", ",map{"'$_'"} split /,/,$a)
+        } else {
+            $p
+        }
+    }
+}
+
+
+if (@opt_M) {
+    my $code=
+      join(";",
+           map { moduleoption_to_code $_ }
+           @opt_M);
+
+    &WithRepl_eval ("package $myname; "
+                    .$code
+                    ."; 1")
+      or die $@;
+}
+
+for my $path_or_package (@opt_m) {
+    eval moduleoption_to_code $path_or_package;
+}
+
+
+if (@files) {
+    for (@files) {
+        my ($res,$e,$is_error)= &WithRepl_eval_e($_, $myname);
+        die $e if $is_error;
+        print "$res\n";
+    }
+}
+
+else {
+    require FP::Repl;
+    FP::Repl::repl(maybe_historypath=> ($opt_H ? undef : $HISTFILE),
+              maxhistlen=> $MAXHISTLEN,
+              maybe_package=> $myname);
+}
+

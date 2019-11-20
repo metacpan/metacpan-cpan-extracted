@@ -6,10 +6,22 @@ Home page:    <https://metacpan.org/release/Web-Solid-Test-Basic>
 Bug tracker:  <https://github.com/kjetilk/p5-web-solid-test-basic/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.008	2019-11-20	Ensure that IO::Socket::SSL can be used
+
+ [ Documentation ]
+ - Document problems with Net::SSL
+
+ [ Other ]
+ - Added: Add SOLID_SSL_FINGERPRINT environment variable to communicate
+   fingerprint to verify
+
 0.006	2019-11-03	Make integration tests fully automated
 
+ [ Bug Fixes ]
  - Fix prerequires.
    Mohammad S Anwar++
+
+ [ Other ]
  - Move HTTP integration tests from author tests to normal tests, and make
    them fully automated.
 

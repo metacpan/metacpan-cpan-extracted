@@ -1,5 +1,19 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.09    2019-11-20
+        [CHANGES]
+         * Accept optional version number for `class` declaration and
+           `extends` base class
+         * Provide a default `BUILDALL` method which invokes all the available
+           `BUILD` methods of component packages
+         * Unit-test that Syntax::Keyword::Dynamically works correctly with
+           object slots and document the fact that `local` does not
+
+        [BUGFIXES]
+         * Generate the constructor as an XSUB so we can find the superclass
+           for derived subclasses better and avoid an infinite recusion loop
+           on double-subclassing.
+
 0.08    2019-11-10
         [CHANGES]
          * Accept `class Name;` to introduce a toplevel class scope

@@ -6,7 +6,12 @@ use Type::Library -base, -declare => qw( Uri Iri Namespace NamespaceMap );
 use Types::Standard qw( HashRef InstanceOf );
 use Types::URI qw();
 
-our $VERSION = '1.08';
+my $AtteanIRI  = InstanceOf['Attean::IRI'];
+my $TrineNS    = InstanceOf['RDF::Trine::Namespace'];
+my $TrineNSMap = InstanceOf['RDF::Trine::NamespaceMap'];
+my $TrineNode  = InstanceOf['RDF::Trine::Node::Resource'];
+
+our $VERSION = '1.10';
 
 =head1 NAME
 
@@ -41,13 +46,15 @@ forth. It builds on L<Types::URI>.
 
 A class type for L<URI::Namespace>.
 
-Can coerce from L<URI>, L<IRI>, L<Path::Tiny>, and strings.
+Can coerce from L<URI>, L<IRI>, L<Path::Tiny>, L<Attean::IRI>,
+L<RDF::Trine::Namespace>, L<RDF::Trine::Node::Resource> and strings.
 
 =item C<< NamespaceMap >>
 
 A class type for L<URI::NamespaceMap>.
 
-Can coerce from a hashref of C<< prefix => URI >> pairs.
+Can coerce from a hashref of C<< prefix => URI >> pairs and from
+L<RDF::Trine::NamespaceMap>.
 
 =item C<< Uri >>, C<< Iri >>
 
@@ -85,6 +92,9 @@ __PACKAGE__->add_type(
 	parent     => InstanceOf['URI::Namespace'],
 	coercion   => [
 		Iri->coercibles ,=> q{ "URI::Namespace"->new($_) },
+		$AtteanIRI      ,=> q{ "URI::Namespace"->new($_->as_string) },
+      $TrineNode      ,=> q{ "URI::Namespace"->new($_->as_string) },
+      $TrineNS        ,=> q{ "URI::Namespace"->new($_->as_string) },
 	],
 );
 
@@ -92,7 +102,8 @@ __PACKAGE__->add_type(
 	name       => NamespaceMap,
 	parent     => InstanceOf['URI::NamespaceMap'],
 	coercion   => [
-		HashRef ,=> q{ "URI::NamespaceMap"->new(namespace_map => $_) }
+		HashRef     ,=> q{ "URI::NamespaceMap"->new(namespace_map => $_) },
+      $TrineNSMap ,=> q{ do { my $map = $_; my %hash = map { $_ => $map->namespace_uri($_)->uri_value } $map->list_prefixes ; "URI::NamespaceMap"->new(namespace_map => \%hash) } }
 	],
 );
 

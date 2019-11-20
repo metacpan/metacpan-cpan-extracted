@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Carp;
 
@@ -21,6 +21,8 @@ if( $] >= 5.020 ) {
    require experimental;
    require indirect;
 }
+
+require mro;
 
 =head1 NAME
 
@@ -52,6 +54,25 @@ actually use this in production :)
 This module provides a simple syntax for creating object classes, which uses
 private variables that look like lexicals as object member fields.
 
+=head2 Automatic Construction
+
+Classes are automatically provided with a constructor method, called C<new>,
+which helps create the object instances.
+
+By default, this constructor will invoke the C<BUILD> method of every
+component class, passing the list of arguments the constructor was invoked
+with. Each class should perform its required setup behaviour in a method
+called C<BUILD>, but does not need to chain to the C<SUPER> class first;
+this is handled automatically.
+
+   $class->BUILD( @_ )
+
+If the class provides a C<BUILDALL> method, that is used to implement the
+setup behaviour instead. It is passed the entire parameters list from the
+C<new> method. It should perform any C<SUPER> chaining as may be required.
+
+   $class->BUILDALL( @_ )
+
 =head1 KEYWORDS
 
 =head2 class
@@ -64,16 +85,27 @@ private variables that look like lexicals as object member fields.
 
 Behaves similarly to the C<package> keyword, but provides a package that
 defines a new class. Such a class provides an automatic constructor method
-called C<new>, which will invoke the class's C<BUILDALL> method if it exists.
+called C<new>.
 
 As with C<package>, an optional block may be provided. If so, the contents of
 that block define the new class and the preceding package continues
 afterwards. If not, it sets the class as the package context of following
 keywords and definitions.
 
+As with C<package>, an optional version declaration may be given. If so, this
+sets the value of the package's C<$VERSION> variable.
+
+   class Name VERSION { ... }
+
+   class Name VERSION;
+
 A single superclass is supported by the keyword C<extends>
 
-   class Cat extends Animal {
+   class Name extends BASECLASS {
+      ...
+   }
+
+   class Name extends BASECLASS VERSION {
       ...
    }
 
@@ -95,6 +127,10 @@ format of the value stored here is not specified and may change between module
 versions, though it can be relied on to be well-behaved as some kind of perl
 data structure for purposes of modules like L<Data::Dumper> or serialisation
 into things like C<YAML> or C<JSON>.
+
+An optional version check can also be supplied; it performs the equivalent of
+
+   BaseClass->VERSION( $ver )
 
 =head2 has
 
@@ -207,34 +243,17 @@ sub import_into
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
 
-# One of these methods gets injected into every Object::Pad class
-sub Object::Pad::__new
+# The universal base-class methods
+
+# TODO: Inject this at class generation time by folding the mro list
+sub Object::Pad::UNIVERSAL::BUILDALL
 {
-   my $class = shift;
+   my $self = shift;
 
-   my $self = bless [], $class;
-   $self->INITSLOTS;
-
-   $self->BUILDALL( @_ ) if $self->can( "BUILDALL" );
-
-   return $self;
-}
-
-sub Object::Pad::__new_foreign_HASH
-{
-   my $class = shift;
-   # Ugh... :(
-   my $superclass = do {
-      no strict 'refs';
-      ${"${class}::ISA"}[0];
-   };
-   my $self = $superclass->can( "new" )->( $class, @_ );
-
-   $self->INITSLOTS;
-
-   $self->BUILDALL( @_ ) if $self->can( "BUILDALL" );
-
-   return $self;
+   foreach my $pkg ( reverse @{ mro::get_linear_isa( ref $self ) } ) {
+      my $meth = $pkg->can( "BUILD" ) or next;
+      $self->$meth( @_ );
+   }
 }
 
 =head1 DESIGN TODOs
@@ -254,6 +273,10 @@ including giving roles the ability to use private slots?
 Consider the visibility of superclass slots to subclasses. Do subclasses even
 need to be able to see their superclass's slots, or are accessor methods
 always appropriate?
+
+Concrete example: The C<< $self->{split_at} >> access that
+L<Tickit::Widget::HSplit> makes of its parent class
+L<Tickit::Widget::LinearSplit>.
 
 =back
 
@@ -292,6 +315,21 @@ A way to request generated accessors - ro or rw.
 =item *
 
 Work out why C<no indirect> doesn't appear to work properly before perl 5.20.
+
+=item *
+
+The C<local> modifier does not work on slot variables, because they appear to
+be regular lexicals to the parser at that point. A workaround is to use
+L<Syntax::Keyword::Dynamically> instead:
+
+   use Syntax::Keyword::Dynamically;
+
+   has $loglevel;
+
+   method quietly {
+      dynamically $loglevel = LOG_ERROR;
+      ...
+   }
 
 =back
 

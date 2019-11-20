@@ -139,35 +139,28 @@ sub _build__smtp ($self) {
     } );
 }
 
-sub sendmail ( $self, $to, $bcc, $subject, $body, $cb = undef ) {
+sub sendmail ( $self, $to, $bcc, $subject, $body ) {
     my $smtp = $self->_smtp;
 
+    my $res;
+
     if ( !$smtp ) {
-        my $res = res [ 500, 'SMTP is not configured' ];
-
-        P->sendlog( '<: $dist_name :>.FATAL', 'SMTP error', "$res" );
-
-        $cb->($res) if $cb;
+        $res = res [ 500, 'SMTP is not configured' ];
     }
     else {
-        $smtp->sendmail(
+        $res = $smtp->sendmail(
             from     => $smtp->{username},
             reply_to => $smtp->{username},
             to       => $to,
             bcc      => $bcc,
             subject  => $subject,
-            body     => $body,
-            sub ($res) {
-                P->sendlog( '<: $dist_name :>.FATAL', 'SMTP error', "$res" ) if !$res;
-
-                $cb->($res) if $cb;
-
-                return;
-            }
+            body     => $body
         );
     }
 
-    return;
+    P->sendlog( '<: $dist_name :>.FATAL', 'SMTP error', "$res" ) if !$res;
+
+    return $res;
 }
 
 # RECAPTCHA
@@ -193,11 +186,9 @@ sub _build_recaptcha ($self) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 6                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 142                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    1 | 161                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 148, 161             | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 205                  | Documentation::RequirePackageMatchesPodName - Pod NAME on line 209 does not match the package declaration      |
+## |    1 | 196                  | Documentation::RequirePackageMatchesPodName - Pod NAME on line 200 does not match the package declaration      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

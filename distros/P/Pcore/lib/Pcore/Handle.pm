@@ -1,7 +1,7 @@
 package Pcore::Handle;
 
 use Pcore -const, -class, -export;
-use Pcore::AE::DNS::Cache;
+use Pcore::Core::Patch::AnyEvent::DNSCache;
 use Pcore::Lib::CA;
 use HTTP::Parser::XS qw[];
 use Pcore::Lib::Scalar qw[is_ref is_uri is_plain_scalarref is_plain_arrayref is_plain_coderef is_glob is_plain_hashref];
@@ -416,7 +416,7 @@ sub write ( $self, $buf, %args ) {    ## no critic qw[Subroutines::ProhibitBuilt
 
         if ( defined $bytes ) {
             $total_bytes += $bytes;
-            $size -= $bytes;
+            $size        -= $bytes;
 
             # all data written
             last if $size == 0;

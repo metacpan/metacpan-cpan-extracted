@@ -1,6 +1,19 @@
 
 === version history of distribution XML-Compile-SOAP
 
+version 3.26: Wed 20 Nov 08:43:52 CET 2019
+
+	Fixes:
+	- procedure detection cannot handle empty response messages
+	  anymore.  Got broken in 3.23.
+	  github XML-Compile-SOAP-Daemon#2 [Daniel Juarez]
+	- soap implementations do not have a mimeType method anymore
+	  github XML-Compile-SOAP-Daemon#2 [Daniel Juarez]
+
+	Improvements:
+	- warning on producing templates for operations without message
+	  [Patrick Powell]
+
 version 3.25: Wed 25 Sep 13:16:53 CEST 2019
 
 	Improvements:

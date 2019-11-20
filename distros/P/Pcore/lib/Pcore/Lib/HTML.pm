@@ -2,7 +2,6 @@ package Pcore::Lib::HTML;
 
 use Pcore;
 use Pcore::Lib::Scalar qw[is_callback];
-use Coro::Signal qw[];
 use HTML5::DOM qw[];
 
 our $MAX_THREADS = P->sys->cpus_num;

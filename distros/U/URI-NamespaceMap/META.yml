@@ -5,8 +5,10 @@ author:
   - 'Gregory Todd Williams <gwilliams@cpan.org>'
   - 'Chris Prather (PERIGRIN) <chris@prather.org>'
 build_requires:
+  Test::Deep: '0'
   Test::Exception: '0'
   Test::More: '0.88'
+  Test::Requires: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
@@ -28,16 +30,16 @@ optional_features: {}
 provides:
   Types::Namespace:
     file: lib/Types/Namespace.pm
-    version: '1.08'
+    version: '1.10'
   URI::Namespace:
     file: lib/URI/Namespace.pm
-    version: '1.08'
+    version: '1.10'
   URI::NamespaceMap:
     file: lib/URI/NamespaceMap.pm
-    version: '1.08'
+    version: '1.10'
   URI::NamespaceMap::ReservedLocalParts:
     file: lib/URI/NamespaceMap/ReservedLocalParts.pm
-    version: '1.08'
+    version: '1.10'
 recommends:
   RDF::NS: '20130802'
   RDF::NS::Curated: '0'
@@ -61,7 +63,7 @@ resources:
   homepage: https://metacpan.org/module/URI::NamespaceMap
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kjetilk/URI-NamespaceMap/
-version: '1.08'
+version: '1.10'
 x_contributors:
   - 'Dorian Taylor <dorian@cpan.org>'
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'

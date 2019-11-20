@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README
+README.md
 SIGNATURE
 dist.ini
 doap.ttl
@@ -17,7 +18,11 @@ lib/URI/NamespaceMap.pm
 lib/URI/NamespaceMap/ReservedLocalParts.pm
 t/iri.t
 t/justuri.t
+t/lib/CommonTest.pm
 t/namespacemap.t
 t/prefixguess-none.t
 t/prefixguess.t
 t/reserved.t
+t/types-attean.t
+t/types-trine.t
+t/types.t

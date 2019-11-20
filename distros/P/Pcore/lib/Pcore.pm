@@ -1,4 +1,4 @@
-package Pcore v0.101.0;
+package Pcore v0.102.0;
 
 use v5.30;
 no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
@@ -58,6 +58,7 @@ sub import {
         require EV;
         require AnyEvent;
         require Coro;
+        require Pcore::Core::Patch::Coro;
         require Pcore::Core::OOP::Class;
         require Pcore::Core::OOP::Role;
 
@@ -208,7 +209,7 @@ sub _CORE_INIT ($import) {
 }
 
 sub _CORE_INIT_AFTER_FORK {
-    require Pcore::AE::Patch;
+    require Pcore::Core::Patch::AnyEvent;
 
     return;
 }
@@ -410,15 +411,15 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 65                   | Variables::ProtectPrivateVars - Private variable used                                                          |
+## |    3 | 66                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 154, 183, 186, 190,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 222, 225, 230, 233,  |                                                                                                                |
-## |      | 258, 387             |                                                                                                                |
+## |    3 | 155, 184, 187, 191,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 223, 226, 231, 234,  |                                                                                                                |
+## |      | 259, 388             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 240                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
+## |    3 | 241                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 158                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 159                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

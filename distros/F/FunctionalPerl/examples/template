@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+
+# Copyright (c) 2016 Christian Jaeger, copying@christianjaeger.ch
+# This is free software. See the file COPYING.md that came bundled
+# with this file.
+
+use strict; use warnings; use warnings FATAL => 'uninitialized';
+#use Function::Parameters qw(:strict);
+#use Sub::Call::Tail;
+
+# find modules from functional-perl working directory (not installed)
+use Cwd 'abs_path';
+our ($mydir, $myname); BEGIN {
+    my $location= (-l $0) ? abs_path ($0) : $0;
+    $location=~ /(.*?)([^\/]+?)_?\z/s or die "?";
+    ($mydir, $myname)=($1,$2);
+}
+use lib "$mydir/../lib";
+
+
+sub usage {
+    print "usage: $myname ...
+";
+    exit 1;
+}
+
+use Getopt::Long;
+our $verbose=0;
+GetOptions("verbose"=> \$verbose,
+           "help"=> sub{usage},
+           ) or exit 1;
+usage if @ARGV;
+
+
+# example module use:
+use FP::List ":all";
+use FP::Array ":all";
+use FP::Array_sort ":all";
+use Chj::TEST;
+
+# for development/debugging
+use Chj::ruse;
+use FP::Repl::Trap; # or Chj::Backtrace
+use FP::Repl;
+
+# add your own code.... (possibly adding `repl` calls within, too;
+# also, it's better to put most code in modules, and use `ruse` to
+# reload them (main is [currently?] not reloaded by `ruse`))
+
+# during development:
+repl;

@@ -163,8 +163,8 @@ Returns a CODE reference which can be used to produce faults.
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile-SOAP distribution version 3.25,
-built on September 25, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of XML-Compile-SOAP distribution version 3.26,
+built on November 20, 2019. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

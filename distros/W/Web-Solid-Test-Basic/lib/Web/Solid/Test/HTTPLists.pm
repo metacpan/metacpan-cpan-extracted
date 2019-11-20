@@ -11,7 +11,7 @@ use Test::RDF;
 use Data::Dumper;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.008';
 
 my $bearer_predicate = 'http://example.org/httplist/param#bearer'; # TODO: Define proper URI
 
@@ -21,7 +21,7 @@ sub http_req_res_list_regex_reuser : Test : Plan(1)  {
   my @matches;
   subtest $args->{'-special'}->{description} => sub {
 	 plan tests => scalar @pairs;
-	 my $ua = LWP::UserAgent->new;
+	 my $ua = LWP::UserAgent->new(ssl_opts => { SSL_fingerprint => $ENV{SOLID_SSL_FINGERPRINT} } ); # TODO: Fix if it breaks when using CA certs
 	 subtest "First request" => sub {
 		my $request_no = 0;
 		my $request = $pairs[$request_no]->{request};
@@ -70,7 +70,7 @@ sub http_req_res_list_regex_reuser : Test : Plan(1)  {
 sub http_req_res_list : Test : Plan(1)  {
   my ($self, $args) = @_;
   my @pairs = @{$args->{'-special'}->{'http-pairs'}}; # Unpack for readability
-  my $ua = LWP::UserAgent->new;
+  my $ua = LWP::UserAgent->new(ssl_opts => { SSL_fingerprint => $ENV{SOLID_SSL_FINGERPRINT} } ); # TODO: Fix if it breaks when using CA certs
   subtest $args->{'-special'}->{description} => sub {
 	 plan tests => scalar @pairs;
 	 my $counter = 1;
@@ -136,7 +136,7 @@ sub _subtest_compare_req_res {
 sub _create_authorization_field {
   my ($object, $request_url) = @_;
   if ($object->isa('URI')) {
-	 my $ua = LWP::UserAgent->new;
+	 my $ua = LWP::UserAgent->new; # This UA is used towards the test IDP and should fail if the certs are invalid
 	 # Construct the URI to retrieve bearer token from
 	 my $bearer_url = $object;
 	 if (defined($request_url)) {
@@ -147,7 +147,7 @@ sub _create_authorization_field {
 		$bearer_url->query("aud=$aud_url");
 	 }
 	 my $response = $ua->get($bearer_url);
-	 BAIL_OUT 'Could not retrieve bearer token from ' . $bearer_url->as_string unless $response->is_success;
+	 BAIL_OUT 'Could not retrieve bearer token, got error ' . $response->as_string unless $response->is_success;
 	 $object = $response->content;
   }
   return "Bearer $object";
@@ -328,10 +328,21 @@ The parameters above are in the RDF formulated as actual full URIs,
 but where the local part is used here and resolved by the
 L<Test::FITesque::RDF> framework, see its documentation for details.
 
-To run tests against a server that uses HTTPS but does not have a
-valid certificate, such as a self-signed one, install
-L<LWP::Protocol::https> and ignore errors by setting the environment
-variable <PERL_LWP_SSL_VERIFY_HOSTNAME=0>
+To run tests against a server that uses HTTPS but uses a self-signed
+certificate, the certificate's fingerprint needs to be supplied to the
+test script to use in the validation. To set this, use the environment
+variable C<SOLID_SSL_FINGERPRINT>. The fingerprint can be obtained for
+example by visiting the system under test in a browser and examine the
+certificate details from there.
+
+There are two SSL implementations in wide use, L<Net::SSL> and
+L<IO::Socket::SSL>. The latter has largely supplantet the former, and
+the the former has been known to cause the test suite to "hang" for
+two minutes. Nevertheless, certain setups may still have it as the
+default. To ensure that L<IO::Socket::SSL> is used, the environment
+variable C<PERL_NET_HTTPS_SSL_SOCKET_CLASS> can be set to
+C<IO::Socket::SSL>
+
 
 
 =head1 TODO

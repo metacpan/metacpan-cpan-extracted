@@ -32,10 +32,10 @@ optional_features: {}
 provides:
   Web::Solid::Test::Basic:
     file: lib/Web/Solid/Test/Basic.pm
-    version: '0.006'
+    version: '0.008'
   Web::Solid::Test::HTTPLists:
     file: lib/Web/Solid/Test/HTTPLists.pm
-    version: '0.006'
+    version: '0.008'
 requires:
   FindBin: '0'
   IO::Socket::SSL: '0'
@@ -54,6 +54,6 @@ resources:
   homepage: https://metacpan.org/release/Web-Solid-Test-Basic
   license: http://www.opensource.org/licenses/mit-license.php
   repository: git://github.com/kjetilk/p5-web-solid-test-basic.git
-version: '0.006'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -8,7 +8,7 @@
 
 package XML::Compile::SOAP11::Operation;
 use vars '$VERSION';
-$VERSION = '3.25';
+$VERSION = '3.26';
 
 use base 'XML::Compile::SOAP::Operation';
 
@@ -97,8 +97,8 @@ sub _msg_parts($$$$$)
            : @parts==1 && $parts[0]{type} ? $msgname
            : $local; 
 
-        $parts{body}  = {procedure => $procedure, %$port_op, use => 'literal'
-           , %$body, parts => \@parts};
+        $parts{body}  = { procedure => $procedure, %$port_op, use => 'literal'
+           , %$body, parts => \@parts };
     }
     elsif($port_op->{message})
     {   # missing <soap:body use="literal"> in <wsdl:input> or :output
@@ -444,7 +444,7 @@ sub explain($$$@)
     if(my $how = $def->{body})
     {   my $use  = $how->{use} || 'literal';
         push @header
-          , "# Operation $how->{procedure}"
+          , "# Operation ". ($how->{procedure} || '(unnamed)')
           , "#           $dir, $style $use";
     }
     else

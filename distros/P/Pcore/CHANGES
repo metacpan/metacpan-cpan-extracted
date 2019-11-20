@@ -1,3 +1,18 @@
+v0.102.0 2019-11-20T17:44:21Z
+ - pgsql callbacks removed
+ - sqlite callbacks removed
+ - Coro patch
+ - perltidy output fixed
+ - anticaptcha api redesigned
+ - use semaphore for threads blocking
+ - lid use dynamic linking to be compatible with libidn v2.3.0
+ - use signals for threads blocking
+ - s3 api refactored
+ - facebook api refactored
+ - cloudflare api refactored
+ - smtp api no callbacks
+ - API callbacks refactored
+
 v0.101.0 2019-11-18T02:16:27Z
  - http callback removed
  - dockerfile

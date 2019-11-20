@@ -1,7 +1,6 @@
 package Pcore::API::Facebook::Marketing;
 
 use Pcore -role, -const, -export;
-use Pcore::Lib::Scalar qw[is_plain_coderef];
 
 our $EXPORT = {
     ALL                     => [qw[$FB_ADACC_STATUS_TEXT $FB_ADACC_DISABLE_REASON_TEXT]],
@@ -66,79 +65,51 @@ const our $FB_ADACC_DISABLE_REASON_TEXT => {
 # https://developers.facebook.com/docs/marketing-api/reference/ad-account/
 # metadata, fields, limit
 # fields => 'account_id,id,name,age,amount_spent,balance,currency,account_status,disable_reason,is_prepay_account,spend_cap,min_campaign_group_spend_cap,min_daily_budget,current_unbilled_spend,next_bill_date,min_billing_threshold,max_billing_threshold,can_repay_now,can_pay_now,adtrust_dsl'
-sub get_adaccounts ( $self, $user_id, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = @args;
-
-    return $self->_req( 'GET', "v$API_VER/$user_id/adaccounts", \%args, undef, $cb );
+sub get_adaccounts ( $self, $user_id, %args ) {
+    return $self->_req( 'GET', "v$API_VER/$user_id/adaccounts", \%args );
 }
 
 # CAMPAIGNS
 # https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group
 # fields => 'id,budget_remaining,configured_status,daily_budget,lifetime_budget,effective_status,name',
-sub get_campaigns ( $self, $adaccount_id, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = @args;
-
+sub get_campaigns ( $self, $adaccount_id, %args ) {
     $adaccount_id = "act_$adaccount_id" if substr( $adaccount_id, 0, 4 ) ne 'act_';
 
-    return $self->_req( 'GET', "v$API_VER/$adaccount_id/campaigns", \%args, undef, $cb );
+    return $self->_req( 'GET', "v$API_VER/$adaccount_id/campaigns", \%args );
 }
 
 # ADSETS
 # https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/
 # fields => 'id,name,daily_budget,effective_status,lifetime_budget,budget_remaining,campaign'
-sub get_adsets ( $self, $adaccount_id, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = @args;
-
+sub get_adsets ( $self, $adaccount_id, %args ) {
     $adaccount_id = "act_$adaccount_id" if substr( $adaccount_id, 0, 4 ) ne 'act_';
 
-    return $self->_req( 'GET', "v$API_VER/$adaccount_id/adsets", \%args, undef, $cb );
+    return $self->_req( 'GET', "v$API_VER/$adaccount_id/adsets", \%args );
 }
 
 # fields => 'id,name,daily_budget,effective_status,lifetime_budget,budget_remaining
-sub get_adset ( $self, $adset_id, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = @args;
-
-    return $self->_req( 'GET', "v$API_VER/$adset_id", \%args, undef, $cb );
+sub get_adset ( $self, $adset_id, %args ) {
+    return $self->_req( 'GET', "v$API_VER/$adset_id", \%args );
 }
 
 # INSIGHTS
 # https://developers.facebook.com/docs/marketing-api/insights
 # https://developers.facebook.com/docs/marketing-api/reference/ads-insights/
 # fields => 'impressions,ad_id,clicks,spend,cpc,ctr,reach,adset_name,adset_id'
-sub get_insights ( $self, $id, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = @args;
-
-    return $self->_req( 'GET', "v$API_VER/$id/insights", \%args, undef, $cb );
+sub get_insights ( $self, $id, %args ) {
+    return $self->_req( 'GET', "v$API_VER/$id/insights", \%args );
 }
 
 # get ads
 # limit, fields
-sub get_ads ( $self, $id, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = @args;
-
-    return $self->_req( 'GET', "v$API_VER/$id/ads", \%args, undef, $cb );
+sub get_ads ( $self, $id, %args ) {
+    return $self->_req( 'GET', "v$API_VER/$id/ads", \%args );
 }
 
 # get ad by id
 # metadata, limit, fields
-sub get_ad ( $self, $ad_id, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = @args;
-
-    return $self->_req( 'GET', "v$API_VER/$ad_id", \%args, undef, $cb );
+sub get_ad ( $self, $ad_id, %args ) {
+    return $self->_req( 'GET', "v$API_VER/$ad_id", \%args );
 }
 
 1;

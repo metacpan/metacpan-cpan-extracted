@@ -43,15 +43,24 @@ my $meta = {
                                             "URI" => 1.52,
                                           },
                           },
-                          test => { requires => { "Test::Exception" => 0, "Test::More" => 0.88 } },
+                          test => {
+                            recommends => { Attean => 0.025 },
+                            requires   => {
+                                            "Test::Deep"      => 0,
+                                            "Test::Exception" => 0,
+                                            "Test::More"      => 0.88,
+                                            "Test::Requires"  => 0,
+                                          },
+                            suggests   => { "RDF::Trine" => 0 },
+                          },
                         },
   "provides"         => {
-                          "Types::Namespace" => { file => "lib/Types/Namespace.pm", version => 1.08 },
-                          "URI::Namespace" => { file => "lib/URI/Namespace.pm", version => 1.08 },
-                          "URI::NamespaceMap" => { file => "lib/URI/NamespaceMap.pm", version => 1.08 },
+                          "Types::Namespace" => { file => "lib/Types/Namespace.pm", version => "1.10" },
+                          "URI::Namespace" => { file => "lib/URI/Namespace.pm", version => "1.10" },
+                          "URI::NamespaceMap" => { file => "lib/URI/NamespaceMap.pm", version => "1.10" },
                           "URI::NamespaceMap::ReservedLocalParts" => {
                             file => "lib/URI/NamespaceMap/ReservedLocalParts.pm",
-                            version => 1.08,
+                            version => "1.10",
                           },
                         },
   "release_status"   => "stable",
@@ -65,7 +74,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project",
                         },
-  "version"          => 1.08,
+  "version"          => "1.10",
   "x_contributors"   => [
                           "Dorian Taylor <dorian\@cpan.org>",
                           "Toby Inkster (TOBYINK) <tobyink\@cpan.org>",

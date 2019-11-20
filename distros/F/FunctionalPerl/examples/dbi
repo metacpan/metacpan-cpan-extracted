@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+
+# Copyright (c) 2015 Christian Jaeger, copying@christianjaeger.ch
+# This is free software. See the file COPYING.md that came bundled
+# with this file.
+
+use strict; use warnings; use warnings FATAL => 'uninitialized';
+
+# find modules from functional-perl working directory (not installed)
+use Cwd 'abs_path';
+our ($mydir, $myname); BEGIN {
+    my $location= (-l $0) ? abs_path ($0) : $0;
+    $location=~ /(.*?)([^\/]+?)_?\z/s or die "?";
+    ($mydir, $myname)=($1,$2);
+}
+use lib "$mydir/../lib";
+
+use Chj::TEST
+  use=> 'FP::Repl::Dependencies',
+  use=> "DBD::CSV",
+  use=> "FP::DBI"; # 'DBI' really, indirectly
+use PXML::XHTML ":all";
+use FP::Weak;
+
+use Chj::Backtrace;
+use FP::Repl;
+
+
+our $db= FP::DBI->connect ("dbi:CSV:");
+
+$db->{csv_sep_char}= ";";
+
+our $get= $db->prepare("select * from examples/csv_to_xml-example.csv");
+
+TEST {
+    $get->execute ();
+    my $s= $get->row_stream;
+    TABLE
+      (TH($s->first->map (*TD)),
+       $s->rest->take (10)->map (sub {TR($_[0]->map (*TD))}))
+        ->string;
+}
+  '<table><th><td>1</td><td>2</td><td>3</td><td>4</td></th>'.
+  '<tr><td>4</td><td>3.3</td><td>foo</td><td>bar</td></tr></table>';
+
+TEST {
+    $get->execute ();
+    my $s= $get->hash_stream;
+    [Keep($s)->length, $s->second]
+}
+  [2, {a=>4, b=>3.3, c=>"foo", d=>"bar"}];
+
+
+# interlock tests:
+
+TEST {
+    $get->execute;
+    my $s= $get->array_stream;
+    $s->first
+} [1,2,3,4];
+
+TEST_EXCEPTION {
+    $get->execute;
+    my $s= $get->array_stream;
+    $get->execute;
+    $s->first
+} "stream was interrupted by another execute or stream request";
+
+TEST_EXCEPTION {
+    $get->execute;
+    my $s= $get->array_stream;
+    my $s2= $get->hash_stream;
+    $s->first
+} "stream was interrupted by another execute or stream request";
+
+
+# XX leak tests?
+
+
+perhaps_run_tests __PACKAGE__ or repl;

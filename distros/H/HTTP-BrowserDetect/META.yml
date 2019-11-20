@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/oalders/http-browserdetect/issues
   homepage: https://github.com/oalders/http-browserdetect
   repository: https://github.com/oalders/http-browserdetect.git
-version: '3.24'
+version: '3.25'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -270,6 +270,10 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/Test::PodSpelling'
       version: '2.007005'
     -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@Author::OALDERS/MojibakeTests'
+      version: '0.8'
+    -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::OALDERS/PodSyntaxTests'
       version: '6.012'
@@ -280,6 +284,25 @@ x_Dist_Zilla:
           changelog: Changes
       name: '@Author::OALDERS/Test::CPAN::Changes'
       version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/author/eol.t
+          finder:
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
+          trailing_whitespace: 1
+      name: '@Author::OALDERS/Test::EOL'
+      version: '0.19'
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      config:
+        Dist::Zilla::Plugin::Test::Portability:
+          options: ''
+      name: '@Author::OALDERS/Test::Portability'
+      version: '2.001000'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::OALDERS/TestRelease'
@@ -296,6 +319,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::TidyAll
       name: '@Author::OALDERS/Test::TidyAll'
       version: '0.04'
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@Author::OALDERS/Test::Version'
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -553,7 +580,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.24
+          tag: v3.25
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -676,6 +703,7 @@ x_contributors:
   - 'Douglas Christopher Wilson <doug@somethingdoug.com>'
   - 'Graham Barr <gbarr@pobox.com>'
   - 'gregor herrmann <gregor+github@comodo.priv.at>'
+  - 'Gregory Oschwald <goschwald@maxmind.com>'
   - 'Hao Wu <hwu@intellisurvey.com>'
   - 'James Waters <james@jcwaters.co.uk>'
   - 'joatis <joatis3@gmail.com>'

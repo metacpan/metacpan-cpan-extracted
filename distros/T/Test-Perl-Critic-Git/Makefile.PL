@@ -14,10 +14,11 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Test::More' => '0',
+        'Test::More'       => '0',
         'Test::MockModule' => '0',
     },
     PREREQ_PM => {
+        'Cwd'                     => 0,
         'Git::Diff'               => 0,
         'Perl::Critic'            => 0,
         'Test::Builder'           => 0,

@@ -8,7 +8,7 @@ use Test::More;
 use Object::Pad;
 
 class Point {
-   method BUILDALL { @$self = @_; }
+   method BUILD { @$self = @_; }
 
    method where { sprintf "(%d,%d)", @$self }
 }

@@ -8,6 +8,11 @@ Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
 Maintainer:   Gregory Todd Williams <gwilliams@cpan.org>
 Maintainer:   Chris Prather (PERIGRIN) <chris@prather.org>
 
+1.10	2019-11-20	Add more coercions.
+
+ - Added: Add coercions for RDF::Trine and Attean classes.
+ - Added: Bring Namespace.pm test coverage to 100%.
+
 1.08	2019-04-15	Add local_part method.
 
  - Added: Add local_part method to URI::Namespace.

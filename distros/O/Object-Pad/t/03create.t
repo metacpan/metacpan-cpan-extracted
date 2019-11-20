@@ -11,7 +11,7 @@ class Point {
    has $x = 0;
    has $y = 0;
 
-   method BUILDALL {
+   method BUILD {
       ( $x, $y ) = @_;
    }
 

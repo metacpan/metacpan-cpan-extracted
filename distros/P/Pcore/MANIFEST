@@ -7,8 +7,6 @@ README.md
 cpanfile
 lib/Build.PL
 lib/Pcore.pm
-lib/Pcore/AE/DNS/Cache.pm
-lib/Pcore/AE/Patch.pm
 lib/Pcore/API/AntiCaptcha.pm
 lib/Pcore/API/AntiCaptcha/Captcha.pm
 lib/Pcore/API/Bitbucket.pm
@@ -85,6 +83,9 @@ lib/Pcore/Core/Exporter.pm
 lib/Pcore/Core/L10N.pm
 lib/Pcore/Core/OOP/Class.pm
 lib/Pcore/Core/OOP/Role.pm
+lib/Pcore/Core/Patch/AnyEvent.pm
+lib/Pcore/Core/Patch/AnyEvent/DNSCache.pm
+lib/Pcore/Core/Patch/Coro.pm
 lib/Pcore/Core/PerlIOviaWinUniCon.pm
 lib/Pcore/Dist.pm
 lib/Pcore/Dist/Build.pm

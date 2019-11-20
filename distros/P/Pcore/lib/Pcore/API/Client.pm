@@ -32,9 +32,9 @@ has on_pong        => ();                # Maybe [CodeRef]
 
 has _is_http => ( required => 1 );
 
-has _ws           => ( init_arg => undef );
-has _get_ws_exec  => ( init_arg => undef );
-has _get_ws_queue => ( init_arg => undef );
+has _ws             => ( init_arg => undef );
+has _get_ws_threads => ( init_arg => undef );
+has _get_ws_queue   => ( init_arg => undef );
 
 sub DESTROY ( $self ) {
     if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
@@ -146,17 +146,15 @@ sub _send_ws ( $self, $method, $args ) {
 sub _get_ws ( $self ) {
     return $self->{_ws} if $self->{_ws};
 
-    if ( $self->{_get_ws_exec} ) {
+    if ( $self->{_get_ws_threads} ) {
         my $cv = P->cv;
 
         push $self->{_get_ws_queue}->@*, $cv;
 
-        $cv->recv;
-
-        return;
+        return $cv->recv;
     }
 
-    $self->{_get_ws_exec} = 1;
+    $self->{_get_ws_threads} = 1;
 
     weaken $self;
 
@@ -232,7 +230,7 @@ sub _get_ws ( $self ) {
 
     my ( $ws, $error ) = $cv->recv;
 
-    $self->{_get_ws_exec} = 0;
+    $self->{_get_ws_threads} = 0;
 
     while ( my $cb = shift $self->{_get_ws_queue}->@* ) {
         $cb->( $ws, $error );

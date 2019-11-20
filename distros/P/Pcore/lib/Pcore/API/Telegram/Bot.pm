@@ -51,7 +51,7 @@ sub poll_updates ( $self, $timeout = $self->{poll_timeout} ) {
 
             last if !defined $self;
 
-            Coro::AnyEvent::sleep $timeout;
+            Coro::sleep $timeout;
         }
 
         return;

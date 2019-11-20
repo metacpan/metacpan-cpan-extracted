@@ -7,7 +7,7 @@ use File::Which qw( which );
 use File::Spec;
 use Env qw( @PATH );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ Rust:
  
  #[no_mangle]
  pub extern "C" fn add(a:i32, b:i32) -> i32 {
-   a+b
+     a+b
  }
 
 Perl:
@@ -73,7 +73,7 @@ directly call from Perl.  For example:
  
  #[no_mangle]
  pub extern "C" fn foo() {
-   bar();
+     bar();
  }
 
 =head2 panics
@@ -137,18 +137,18 @@ Which can be called easily from Perl:
 
  package Foo {
  
-   use FFI::Platypus 1.00;
-   my $ffi = FFI::Platypus->new( api => 1, lang => 'Rust' );
-   $ffi->bundle; # see FFI::Build::File::Cargo for how to bundle
-                 # your rust code...
-   $ffi->type( 'object(Foo)' => 'CFoo' );
-   $ffi->mangler(sub {
-     my $symbol = shift;
-     "foo_$symbol";
-   });
-   $ffi->attach( new     => [] => 'CFoo' );
-   $ffi->attach( method1 => ['CFoo'] );
-   $ffi->attach( DESTROY => ['CFoo'] );
+     use FFI::Platypus 1.00;
+     my $ffi = FFI::Platypus->new( api => 1, lang => 'Rust' );
+     $ffi->bundle; # see FFI::Build::File::Cargo for how to bundle
+                   # your rust code...
+     $ffi->type( 'object(Foo)' => 'CFoo' );
+     $ffi->mangler(sub {
+         my $symbol = shift;
+         "foo_$symbol";
+     });
+     $ffi->attach( new     => [] => 'CFoo' );
+     $ffi->attach( method1 => ['CFoo'] );
+     $ffi->attach( DESTROY => ['CFoo'] );
  };
  
  my $foo = Foo->new;
@@ -161,7 +161,7 @@ Passing in strings is not too hard, you can convert a Rust C<CString> into a Rus
 Return a string is a little tricky because of the ownership model.  Depending on how your
 API works there are probably lot of approaches you might want to take.  One approach would
 be to use thread local storage to store a C<CString> which you return.  It wastes a little
-memory because once the string is copied into Perl scpace it isn't used again, but at least
+memory because once the string is copied into Perl space it isn't used again, but at least
 it doesn't leak memory since it will be freed on the next call to your function.  Best of all
 it doesn't require an C<unsafe> block.
 
@@ -186,6 +186,54 @@ From Perl:
  my $ffi = FFI::Platypus->new( api => 1, lang => 'Rust' );
  $ffi->bundle;
  $ffi->attach( return_string => [] => 'string' );
+
+=head2 callbacks
+
+Calling back into Perl from Rust is easy so long as you have the correct
+types defined.  Consider a Rust function that takes a C function pointer:
+
+ use std::ffi::CString;
+ 
+ type PerlLog = extern fn(line: *const i8);
+ 
+ #[no_mangle]
+ pub extern "C" fn rust_log(logf: PerlLog) {
+ 
+     let lines: [&str; 3] = [
+         "Hello from rust!",
+         "Something else.",
+         "The last log line",
+     ];
+ 
+     for line in lines.iter() {
+         // convert string slice to a C style NULL terminated string
+         let line = CString::new(*line).unwrap();
+         logf(line.as_ptr());
+     }
+ }
+
+This can be called with a closure from Perl:
+
+ use FFI::Platypus 1.00;
+ 
+ my $ffi = FFI::Platypus->new( api => 1, lang => 'Rust' );
+ $ffi->bundle;
+ $ffi->type( '(string)->void' => 'PerlLog' );
+ $ffi->attach( rust_log => ['PerlLog'] );
+ 
+ my $perl_log = $ffi->closure(sub {
+     my $message = shift;
+     print "log> $message\n";
+ });
+ 
+ rust_log($perl_log);
+
+Which outputs:
+
+ $ perl callback.pl
+ log> Hello from rust!
+ log> Something else.
+ log> The last log line
 
 =head1 METHODS
 
@@ -277,7 +325,7 @@ improve things.
 
 The Core Platypus documentation.
 
-=item L<Module::Build::FFI::Rust>
+=item L<FFI::Build::File::Cargo>
 
 Bundle Rust code with your FFI / Perl extension.
 

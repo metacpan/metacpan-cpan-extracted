@@ -48,8 +48,8 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Web::Solid::Test::Basic"     => { file => "lib/Web/Solid/Test/Basic.pm", version => 0.006 },
-                          "Web::Solid::Test::HTTPLists" => { file => "lib/Web/Solid/Test/HTTPLists.pm", version => 0.006 },
+                          "Web::Solid::Test::Basic"     => { file => "lib/Web/Solid/Test/Basic.pm", version => 0.008 },
+                          "Web::Solid::Test::HTTPLists" => { file => "lib/Web/Solid/Test/HTTPLists.pm", version => 0.008 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -65,7 +65,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/project",
                         },
-  "version"          => 0.006,
+  "version"          => 0.008,
   "x_static_install" => 1,
 };
 

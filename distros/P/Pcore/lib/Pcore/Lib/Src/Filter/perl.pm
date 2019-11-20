@@ -84,6 +84,8 @@ sub decompress ( $self ) {
     if ($err) {
         $res = res $SEVERITY->{perltidy};
 
+        $err =~ s/^<source_stream>://smg;
+
         $error_log = "PerlTidy:\n$err";
 
         $error_log .= "\n$log" if $self->{perl_verbose};
@@ -438,7 +440,7 @@ sub _cut_log ($self) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 40                   | Subroutines::ProhibitExcessComplexity - Subroutine "decompress" with high complexity score (29)                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 174                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 176                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

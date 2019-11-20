@@ -24,7 +24,7 @@ use Pcore;
 
     # amCharts4 geodata
     amcharts4_geodata => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.1.8 );
+        my $ver = version->parse( $args->{ver} // v4.1.9 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4/geodata';
 

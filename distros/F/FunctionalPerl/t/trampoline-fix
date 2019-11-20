@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+
+# Copyright (c) 2015 Christian Jaeger, copying@christianjaeger.ch
+# This is free software. See the file COPYING.md that came bundled
+# with this file.
+
+use strict; use warnings; use warnings FATAL => 'uninitialized';
+
+require "./testmem.pl";
+# bleadperl on 64bit system needs enormeously more memory than v5.14.2
+# on 32bit. FIXME for the right combinations (or/and increase
+# iteration count to trigger it even with too high limits)
+my $m= ($^V->{version}[1] < 15 ? 30 : 100);
+warn "m=$m" if $ENV{RUN_TESTS_VERBOSE};
+setlimit_mem_MB ($m);
+
+use Test::Requires qw(Method::Signatures);
+
+# Also need Sub::Call::Tail:
+
+if (eval {require Sub::Call::Tail; 1}) {
+
+    $ENV{RUN_TESTS}=1; exec "intro/more_tailcalls" or exit 1;
+
+} else {
+    # hack to run it without Sub::Call::Tail, e.g. on bleadperl where
+    # this can't be installed currently.
+    system ("bin/expand-tail intro/more_tailcalls intro/.expansion-more_tailcalls")
+      == 0 or exit 1;
+
+    $ENV{RUN_TESTS}=1; exec "intro/.expansion-more_tailcalls" or exit 1;
+}

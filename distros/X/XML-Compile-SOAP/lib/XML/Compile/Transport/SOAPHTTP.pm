@@ -8,7 +8,7 @@
 
 package XML::Compile::Transport::SOAPHTTP;
 use vars '$VERSION';
-$VERSION = '3.25';
+$VERSION = '3.26';
 
 use base 'XML::Compile::Transport';
 
@@ -100,11 +100,11 @@ sub _prepare_call($)
 
     my $content_type;
     if($version eq 'SOAP11')
-    {   $mime  ||= ref $soap ? $soap->mimeType : 'text/xml';
+    {   $mime  ||= 'text/xml';
         $content_type = qq{$mime; charset=$charset};
     }
     elsif($version eq 'SOAP12')
-    {   $mime  ||= ref $soap ? $soap->mimeType : 'application/soap+xml';
+    {   $mime  ||= 'application/soap+xml';
         my $sa   = defined $action ? qq{; action="$action"} : '';
         $content_type = qq{$mime; charset=$charset$sa};
         $header->header(Accept => $mime);  # not the HTML answer

@@ -51,10 +51,8 @@ const our $STATUS_REASON => {
     555 => q[Syntax error],
 };
 
-sub sendmail ( $self, @ ) {
-    my $cb = is_plain_coderef $_[-1] ? pop : undef;
-
-    my %args = (
+sub sendmail ( $self, %args ) {
+    %args = (
         from     => undef,
         reply_to => undef,    # Str
         to       => undef,    # Str, ArrayRef
@@ -63,7 +61,7 @@ sub sendmail ( $self, @ ) {
         subject  => undef,
         headers  => undef,    # ArrayRef
         body     => undef,    # Str, ScalarRef
-        splice @_, 1,
+        %args
     );
 
     $args{to}  = undef if defined $args{to}  && !$args{to};
@@ -74,28 +72,36 @@ sub sendmail ( $self, @ ) {
     $args{cc}  = [ $args{cc} ]  if defined $args{cc}  && !is_plain_arrayref $args{cc};
     $args{bcc} = [ $args{bcc} ] if defined $args{bcc} && !is_plain_arrayref $args{bcc};
 
-    if ( defined wantarray ) {
-        my $res = _sendmail( $self, \%args );
+    my $h = P->handle(
+        [ $self->{host}, $self->{port} ],
+        timeout => $self->{timeout},
+        tls_ctx => $self->{tls_ctx},
+    );
 
-        return $cb ? $cb->($res) : $res;
-    }
-    else {
-        Coro::async_pool(
-            sub {
-                my $res = _sendmail(@_);
+    $h->starttls if $self->{tls};
 
-                $cb->($res) if $cb;
+    my $res;
 
-                return;
-            },
-            $self,
-            \%args
-        );
+    # handshake
+    ( $res = $self->_read_response($h) ) or return $res;
 
-        return;
-    }
+    # EHLO
+    ( $res = $self->_EHLO($h) ) or return $res;
 
-    return;
+    # AUTH
+    ( $res = $self->_AUTH( $h, $res->{ext}->{AUTH} ) ) or return $res;
+
+    # MAIL_FROM
+    ( $res = $self->_MAIL_FROM( $h, $args{from} // $self->{username} ) ) or return $res;
+
+    # RCPT_TO
+    ( $res = $self->_RCPT_TO( $h, [ defined $args{to} ? $args{to}->@* : (), defined $args{cc} ? $args{cc}->@* : (), defined $args{bcc} ? $args{bcc}->@* : () ] ) ) or return $res;
+
+    # DATA
+    ( $res = $self->_DATA( $h, \%args ) ) or return $res;
+
+    # QUIT
+    return $self->_QUIT($h);
 }
 
 sub test ($self) {
@@ -119,39 +125,6 @@ sub test ($self) {
     $res = $self->_AUTH( $h, $res->{ext}->{AUTH} );
 
     return $res;
-}
-
-sub _sendmail ( $self, $args ) {
-    my $h = P->handle(
-        [ $self->{host}, $self->{port} ],
-        timeout => $self->{timeout},
-        tls_ctx => $self->{tls_ctx},
-    );
-
-    $h->starttls if $self->{tls};
-
-    my $res;
-
-    # handshake
-    ( $res = $self->_read_response($h) ) or return $res;
-
-    # EHLO
-    ( $res = $self->_EHLO($h) ) or return $res;
-
-    # AUTH
-    ( $res = $self->_AUTH( $h, $res->{ext}->{AUTH} ) ) or return $res;
-
-    # MAIL_FROM
-    ( $res = $self->_MAIL_FROM( $h, $args->{from} // $self->{username} ) ) or return $res;
-
-    # RCPT_TO
-    ( $res = $self->_RCPT_TO( $h, [ defined $args->{to} ? $args->{to}->@* : (), defined $args->{cc} ? $args->{cc}->@* : (), defined $args->{bcc} ? $args->{bcc}->@* : () ] ) ) or return $res;
-
-    # DATA
-    ( $res = $self->_DATA( $h, $args ) ) or return $res;
-
-    # QUIT
-    return $self->_QUIT($h);
 }
 
 sub _read_response ( $self, $h ) {
@@ -431,16 +404,20 @@ sub _NOOP ( $self, $h, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 168, 170             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
+## |      | 54                   | * Subroutine "sendmail" with high complexity score (23)                                                        |
+## |      | 268                  | * Subroutine "_DATA" with high complexity score (29)                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 295                  | Subroutines::ProhibitExcessComplexity - Subroutine "_DATA" with high complexity score (29)                     |
+## |    3 | 141, 143             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 409                  | * Private subroutine/method '_RSET' declared but not used                                                      |
-## |      | 415                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
-## |      | 421                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
+## |      | 382                  | * Private subroutine/method '_RSET' declared but not used                                                      |
+## |      | 388                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
+## |      | 394                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 416                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 389                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 55                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -466,21 +443,14 @@ Pcore::API::SMTP - non-blocking SMTP protocol implementation
     # send email with two attachments
     $message_body = [ [ 'filename1.ext', \$content1 ], [ 'filename2.ext', \$content2 ] ];
 
-    $smtp->sendmail(
+    my $res = $smtp->sendmail(
         from     => 'from@host',
         reply_to => 'from@host',
         to       => 'to@host',
         cc       => 'cc@host',
         bcc      => 'bcc@host',
         subject  => 'email subject',
-        body     => $message_body,
-        sub ($res) {
-            say $res;
-
-            $cb->();
-
-            return;
-        }
+        body     => $message_body
     );
 
 =head1 DESCRIPTION

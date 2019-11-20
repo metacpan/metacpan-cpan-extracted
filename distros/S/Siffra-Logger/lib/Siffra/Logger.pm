@@ -18,17 +18,25 @@ use constant {
     DEBUG => $ENV{ DEBUG } // 0,
 };
 
+use Log::Any::Adapter;
+use Log::Dispatch;
+use File::Basename;
+use POSIX qw/strftime/;
+
 BEGIN
 {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.06';
+    $VERSION = '0.07';
     @ISA     = qw(Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
     %EXPORT_TAGS = ();
+
+    binmode( STDOUT, ":encoding(UTF-8)" );
+    binmode( STDERR, ":encoding(UTF-8)" );
 } ## end BEGIN
 
 =head1 Log-Levels
@@ -43,15 +51,7 @@ BEGIN
     emergency
 =cut
 
-BEGIN
 {
-    binmode( STDOUT, ":encoding(UTF-8)" );
-    binmode( STDERR, ":encoding(UTF-8)" );
-
-    use Log::Any::Adapter;
-    use Log::Dispatch;
-    use File::Basename;
-    use POSIX qw/strftime/;
 
     $ENV{ LC_ALL } = $ENV{ LANG } = 'pt_BR.UTF-8';
 
@@ -94,14 +94,14 @@ BEGIN
                 'Email::Siffra',
                 name      => 'Email',
                 subject   => 'Subject',
-                to        => 'luiz@siffra.com.br',
-                from      => 'avell@siffra.local',
+                to        => 'admin@siffra.com.br',
+                from      => 'bot@siffra.com.br',
                 min_level => 'error',
                 buffered  => 1,
                 smtp      => 'mail',
                 port      => 2525,
                 utf8      => 1,
-            ]
+            ],
         ],
         callbacks => [
             sub {
@@ -133,7 +133,13 @@ BEGIN
     );
 
     Log::Any::Adapter->set( 'Dispatch', dispatcher => $dispatcher );
-} ## end BEGIN
+}
+
+sub import
+{
+    my ( $self, $parameters ) = @_;
+    my $caller = caller();
+}
 
 #################### main pod documentation begin ###################
 ## Below is the stub of documentation for your module.

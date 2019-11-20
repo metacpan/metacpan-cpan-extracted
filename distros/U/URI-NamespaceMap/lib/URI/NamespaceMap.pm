@@ -6,7 +6,7 @@ URI::NamespaceMap - Class holding a collection of namespaces
 
 =head1 VERSION
 
-Version 1.08
+Version 1.10
 
 =cut
 
@@ -25,7 +25,7 @@ use URI::NamespaceMap::ReservedLocalParts;
 use namespace::autoclean;
 
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 
 =head1 SYNOPSIS
@@ -408,7 +408,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2012,2013,2014,2015,2016,2017,2018 Gregory Todd Williams, Chris Prather and Kjetil Kjernsmo
+Copyright 2012,2013,2014,2015,2016,2017,2018,2019 Gregory Todd Williams, Chris Prather and Kjetil Kjernsmo
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

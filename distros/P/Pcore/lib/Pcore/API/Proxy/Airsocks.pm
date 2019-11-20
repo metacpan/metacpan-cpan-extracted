@@ -48,7 +48,7 @@ sub change_ip ( $self, $nowait = undef ) {
         if ( $res->{data}->$* =~ /wait\s+(\d+)s/sm ) {
             return res 400 if $nowait;
 
-            Coro::AnyEvent::sleep( $1 + 1 );
+            Coro::sleep( $1 + 1 );
 
             goto REDO;
         }

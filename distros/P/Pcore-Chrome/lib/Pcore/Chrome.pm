@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.8.2;
+package Pcore::Chrome v0.9.1;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Chrome::Tab;
@@ -93,7 +93,7 @@ around new => sub ( $orig, $self, %args ) {
     my $time = time + ( $args{timeout} // $CONNECT_TIMEOUT );
 
     while () {
-        Coro::AnyEvent::sleep($CHECK_PORT_TIMEOUT);
+        Coro::sleep($CHECK_PORT_TIMEOUT);
 
         last if P->net->check_port( $self->{host}, $self->{port}, $CHECK_PORT_TIMEOUT );
 

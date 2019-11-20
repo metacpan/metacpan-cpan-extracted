@@ -130,12 +130,15 @@ typedef struct {
 
 /* Metadata about a class */
 typedef struct {
+  HV *stash;
   SLOTOFFSET offset;   /* first slot index of this partial within its instance */
   AV *slots;           /* each AV item is a raw pointer directly to a SlotMeta */
   enum {
     REPR_NATIVE,       /* instances are in native format - blessed AV as slots */
     REPR_FOREIGN_HASH, /* instances are blessed HASHes; our slots live in $self->{"Object::Pad/slots"} */
   } repr;
+
+  COP *tmpcop; /* a COP to use during generated constructor */
 } ClassMeta;
 
 /* The metadata on the currently-compiling class */
@@ -306,6 +309,23 @@ static void MY_import_pragma(pTHX_ const char *pragma, const char *arg)
   FREETMPS;
 }
 
+#define ensure_module_version(module, version)  MY_ensure_module_version(aTHX_ module, version)
+static void MY_ensure_module_version(pTHX_ SV *module, SV *version)
+{
+  dSP;
+
+  ENTER;
+
+  PUSHMARK(SP);
+  PUSHs(module);
+  PUSHs(version);
+  PUTBACK;
+
+  call_method("VERSION", G_VOID);
+
+  LEAVE;
+}
+
 
 #define get_class_isa(stash)  MY_get_class_isa(aTHX_ stash)
 static AV *MY_get_class_isa(pTHX_ HV *stash)
@@ -440,6 +460,100 @@ static void late_generate_initslots(pTHX_ void *p)
   generate_initslots_method(meta, PL_curstash);
 }
 
+static XS(injected_constructor);
+static XS(injected_constructor)
+{
+  dXSARGS;
+  const ClassMeta *meta = XSANY.any_ptr;
+  SV *class = ST(0);
+  SV **args = mark + 1; /* all the args minus the leading $class */
+  SV *self;
+
+  PL_curcop = meta->tmpcop;
+  CopLINE_set(PL_curcop, __LINE__);
+
+  switch(meta->repr) {
+    case REPR_NATIVE:
+      CopLINE_set(PL_curcop, __LINE__);
+      self = newRV_noinc((SV *)newAV());
+      sv_bless(self, meta->stash);
+      break;
+
+    case REPR_FOREIGN_HASH: {
+      CopLINE_set(PL_curcop, __LINE__);
+
+      GV *gv = gv_fetchmeth_pvn(meta->stash, "new", 3, -1, GV_SUPER);
+      if(!gv || !GvCV(gv))
+        croak("Unable to find SUPER::new for " SVf, SVfARG(class));
+
+      {
+        ENTER;
+        PUSHMARK(SP);
+        EXTEND(SP, SP-args + 1);
+
+        SV **argtop = SP;
+
+        mPUSHs(newSVsv(class));
+
+        /* Push a copy of the args in case the (foreign) constructor mutates
+         * them. We still need them for BUILDALL */
+        for(SV **svp = args + 1; svp <= argtop; svp++)
+          PUSHs(*svp);
+        PUTBACK;
+
+        call_sv((SV *)GvCV(gv), G_SCALAR);
+        SPAGAIN;
+
+        self = POPs;
+        LEAVE;
+      }
+      break;
+    }
+  }
+
+  {
+    /* $self->INITSLOTS */
+    CopLINE_set(PL_curcop, __LINE__);
+
+    ENTER;
+    EXTEND(SP, 1);
+    PUSHMARK(SP);
+    PUSHs(self);
+    PUTBACK;
+
+    call_method("INITSLOTS", G_VOID);
+
+    LEAVE;
+  }
+
+  {
+    /* $self->BUILDALL(@_) */
+    CopLINE_set(PL_curcop, __LINE__);
+
+    ENTER;
+    SAVETMPS;
+
+    EXTEND(SP, 1);
+
+    /* Rather than PUSH all the args again, we'll just move them all up one
+     * position and set the self as the bottom one */
+    PUSHMARK(args);
+    SV **svp, **bottom = args + 1;
+    for(svp = SP; svp >= bottom; svp--)
+      *(svp+1) = *svp;
+    *bottom = self;
+    PUTBACK;
+
+    call_method("BUILDALL", G_VOID);
+
+    FREETMPS;
+    LEAVE;
+  }
+
+  ST(0) = self;
+  XSRETURN(1);
+}
+
 
 static int keyword_class(pTHX_ OP **op_ptr)
 {
@@ -449,14 +563,15 @@ static int keyword_class(pTHX_ OP **op_ptr)
   if(!packagename)
     croak("Expected 'class' to be followed by package name");
 
+  lex_read_space(0);
+  SV *packagever = lex_scan_version(PARSE_OPTIONAL);
+
   SV *superclassname = NULL;
   ClassMeta *supermeta = NULL;
 
   // TODO: This grammar is quite flexible; maybe too much?
   while(1) {
     lex_read_space(0);
-
-    // TODO: Maybe accept `v1.23`
 
     if(lex_consume("extends")) {
       if(superclassname)
@@ -465,7 +580,8 @@ static int keyword_class(pTHX_ OP **op_ptr)
       lex_read_space(0);
       superclassname = lex_scan_packagename();
 
-      /* TODO: look for a version of that package too */
+      lex_read_space(0);
+      SV *superclassver = lex_scan_version(PARSE_OPTIONAL);
 
       HV *superstash = gv_stashsv(superclassname, 0);
       if(!superstash || !hv_fetchs(superstash, "new", 0)) {
@@ -477,6 +593,9 @@ static int keyword_class(pTHX_ OP **op_ptr)
 
       if(!superstash)
         croak("Superclass %" SVf " does not exist", superclassname);
+
+      if(superclassver)
+        ensure_module_version(superclassname, superclassver);
 
       GV **metagvp = (GV **)hv_fetchs(superstash, "META", 0);
       if(metagvp)
@@ -516,6 +635,9 @@ static int keyword_class(pTHX_ OP **op_ptr)
   meta->slots  = newAV();
   meta->repr   = REPR_NATIVE;
 
+  meta->tmpcop = (COP *)newSTATEOP(0, NULL, NULL);
+  CopFILE_set(meta->tmpcop, __FILE__);
+
   /* CARGOCULT from perl/op.c:Perl_package() */
   {
     SAVEGENERICSV(PL_curstash);
@@ -526,6 +648,12 @@ static int keyword_class(pTHX_ OP **op_ptr)
 
     PL_hints |= HINT_BLOCK_SCOPE;
     PL_parser->copline = NOLINE;
+
+    meta->stash = PL_curstash;
+  }
+
+  if(packagever) {
+    Perl_package_version(aTHX_ newSVOP(OP_CONST, 0, packagever));
   }
 
   AV *isa;
@@ -536,10 +664,9 @@ static int keyword_class(pTHX_ OP **op_ptr)
     isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvUTF8(PL_curstash) ? SVf_UTF8 : 0));
   }
 
-  if(superclassname)
+  if(superclassname) {
     av_push(isa, superclassname);
 
-  if(av_count(isa) > 0) {
     if(supermeta) {
       /* A subclass of an Object::Pad class */
       meta->offset = supermeta->offset + av_count(supermeta->slots);
@@ -548,25 +675,22 @@ static int keyword_class(pTHX_ OP **op_ptr)
     else {
       /* A subclass of a foreign class - presume HASH for now */
       meta->repr = REPR_FOREIGN_HASH;
+      av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
     }
+  }
+  else {
+    /* A base class */
+    av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
   }
 
   {
     /* Inject the constructor */
-    CV *newcv;
-    switch(meta->repr) {
-      case REPR_NATIVE:
-        newcv = get_cv("Object::Pad::__new", 0);
-        break;
-      case REPR_FOREIGN_HASH:
-        newcv = get_cv("Object::Pad::__new_foreign_HASH", 0);
-        break;
-    }
+    CV *newcv = newXS("new", injected_constructor, __FILE__);
+    CvXSUBANY(newcv).any_ptr = meta;
 
     GV *gv = gv_fetchpvs("new", GV_ADD, SVt_PVCV);
     GvMULTI_on(gv);
 
-    SvREFCNT_inc((SV *)newcv);
     GvCV_set(gv, newcv);
   }
 

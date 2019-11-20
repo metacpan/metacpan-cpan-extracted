@@ -3,7 +3,7 @@ package Pcore::Handle::pgsql::DBH;
 use Pcore -class, -res, -const;
 use Pcore::Handle::DBI::Const qw[:CONST];
 use Pcore::Handle::pgsql qw[:ALL];
-use Pcore::Lib::Scalar qw[weaken looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
+use Pcore::Lib::Scalar qw[weaken looks_like_number is_plain_arrayref is_blessed_arrayref];
 use Pcore::Lib::Digest qw[md5_hex];
 use Pcore::Lib::Data qw[from_json];
 
@@ -702,10 +702,9 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
 
 sub _parse_args ( $args ) {
     my $bind = is_plain_arrayref $args->[0] ? shift $args->@* : undef;
-    my $cb   = is_plain_coderef $args->[-1] ? pop $args->@*   : undef;
     my %args = $args->@*;
 
-    return $bind, \%args, $cb;
+    return $bind, \%args;
 }
 
 # STH
@@ -713,300 +712,234 @@ sub prepare ( $self, $query ) {
     return $self->{pool}->prepare($query);
 }
 
-sub get_dbh ( $self, $cb = undef ) {
+sub get_dbh ( $self ) {
 
     # self is ready
     if ( $self->{state} == $STATE_READY && $self->{tx_status} eq $TX_STATUS_IDLE ) {
-        return $cb ? $cb->( res(200), $self ) : ( res(200), $self );
+        return res(200), $self;
     }
 
     # self is not ready
     else {
-        return $self->{pool}->get_dbh($cb);
+        return $self->{pool}->get_dbh;
     }
 }
 
 # PUBLIC DBI METHODS
 sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
-    my ( $bind, $args, $cb ) = _parse_args( \@args );
+    my ( $bind, $args ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $sth, $res ) {
-        my $guard = $self;           # keep reference to $self until query is finished
+    $self->_execute( $query, $bind, my $cv = P->cv );
 
-        if ( $res && defined $sth->{rows} ) {
-            my @cols_names = map { $_->[0] } $sth->{cols}->@*;
+    my ( $sth, $res ) = $cv->recv;
 
-            my $data;
+    if ( $res && defined $sth->{rows} ) {
+        my @cols_names = map { $_->[0] } $sth->{cols}->@*;
 
-            for my $row ( $sth->{rows}->@* ) {
-                my $data_row->@{@cols_names} = $row->@*;
+        my $data;
 
-                push $data->@*, $data_row;
-            }
+        for my $row ( $sth->{rows}->@* ) {
+            my $data_row->@{@cols_names} = $row->@*;
 
-            $res->{data} = $data;
+            push $data->@*, $data_row;
         }
 
-        return $cb ? $cb->($res) : $res;
-    };
-
-    if ( defined wantarray ) {
-        $self->_execute( $query, $bind, my $cv = P->cv );
-
-        return $on_finish->( $cv->recv );
+        $res->{data} = $data;
     }
-    else {
-        $self->_execute( $query, $bind, $on_finish );
 
-        return;
-    }
+    return $res;
 }
 
 # key_col => [0, 1, 'id'], key_col => 'id'
 sub selectall ( $self, $query, @args ) {
-    my ( $bind, $args, $cb ) = _parse_args( \@args );
+    my ( $bind, $args ) = _parse_args( \@args );
 
-    my $on_finish = sub ( $sth, $res ) {
-        my $guard = $self;    # keep reference to $self until query is finished
+    $self->_execute( $query, $bind, my $cv = P->cv );
 
-        if ( $res && defined $sth->{rows} ) {
-            my @cols_names = map { $_->[0] } $sth->{cols}->@*;
+    my ( $sth, $res ) = $cv->recv;
 
-            if ( defined $args->{key_col} ) {
-                my $name2idx;
+    if ( $res && defined $sth->{rows} ) {
+        my @cols_names = map { $_->[0] } $sth->{cols}->@*;
 
-                # create columns index
-                for ( my $i = 0; $i <= $sth->{cols}->$#*; $i++ ) {
-                    $name2idx->{ $sth->{cols}->[$i]->[0] } = $i;
-                }
+        if ( defined $args->{key_col} ) {
+            my $name2idx;
 
-                my $num_of_fields = $sth->{cols}->@*;
-                my @key_col_idx;
+            # create columns index
+            for ( my $i = 0; $i <= $sth->{cols}->$#*; $i++ ) {
+                $name2idx->{ $sth->{cols}->[$i]->[0] } = $i;
+            }
 
-                for my $key_col ( is_plain_arrayref $args->{key_col} ? $args->{key_col}->@* : $args->{key_col} ) {
-                    if ( looks_like_number $key_col) {
-                        if ( $key_col + 1 > $num_of_fields ) {
-                            my $res = res [ 400, qq[Invalid field index "$key_col"] ];
+            my $num_of_fields = $sth->{cols}->@*;
+            my @key_col_idx;
 
-                            warn $res;
+            for my $key_col ( is_plain_arrayref $args->{key_col} ? $args->{key_col}->@* : $args->{key_col} ) {
+                if ( looks_like_number $key_col) {
+                    if ( $key_col + 1 > $num_of_fields ) {
+                        $res = res [ 400, qq[Invalid field index "$key_col"] ];
 
-                            return $cb ? $cb->($res) : $res;
-                        }
+                        warn $res;
 
-                        push @key_col_idx, $key_col;
+                        return $res;
                     }
-                    else {
-                        my $idx = $name2idx->{$key_col};
 
-                        if ( !defined $idx ) {
-                            my $res = res [ 400, qq[DBI: Invalid field name "$key_col"] ];
+                    push @key_col_idx, $key_col;
+                }
+                else {
+                    my $idx = $name2idx->{$key_col};
 
-                            warn $res;
+                    if ( !defined $idx ) {
+                        $res = res [ 400, qq[DBI: Invalid field name "$key_col"] ];
 
-                            return $cb ? $cb->($res) : $res;
-                        }
+                        warn $res;
 
-                        push @key_col_idx, $idx;
+                        return $res;
                     }
-                }
 
-                my $data = {};
-
-                for my $row ( $sth->{rows}->@* ) {
-                    my $ref = $data;
-
-                    $ref = $ref->{ $row->[$_] // $EMPTY } //= {} for @key_col_idx;
-
-                    $ref->@{@cols_names} = $row->@*;
-                }
-
-                $res->{data} = $data;
-            }
-            else {
-                my $data;
-
-                for my $row ( $sth->{rows}->@* ) {
-                    my $row_hashref->@{@cols_names} = $row->@*;
-
-                    push $data->@*, $row_hashref;
-                }
-
-                $res->{data} = $data;
-            }
-        }
-
-        return $cb ? $cb->($res) : $res;
-    };
-
-    if ( defined wantarray ) {
-        $self->_execute( $query, $bind, my $cv = P->cv );
-
-        return $on_finish->( $cv->recv );
-    }
-    else {
-        $self->_execute( $query, $bind, $on_finish );
-
-        return;
-    }
-}
-
-sub selectall_arrayref ( $self, $query, @args ) {
-    my ( $bind, $args, $cb ) = _parse_args( \@args );
-
-    my $on_finish = sub ( $sth, $res ) {
-        my $guard = $self;    # keep reference to $self until query is finished
-
-        my $data;
-
-        if ( $res && defined $sth->{rows} ) {
-            $res->{data} = $sth->{rows};
-        }
-
-        return $cb ? $cb->($res) : $res;
-    };
-
-    if ( defined wantarray ) {
-        $self->_execute( $query, $bind, my $cv = P->cv );
-
-        return $on_finish->( $cv->recv );
-    }
-    else {
-        $self->_execute( $query, $bind, $on_finish );
-
-        return;
-    }
-}
-
-sub selectrow ( $self, $query, @args ) {
-    my ( $bind, $args, $cb ) = _parse_args( \@args );
-
-    my $on_finish = sub ( $sth, $res ) {
-        my $guard = $self;    # keep reference to $self until query is finished
-
-        if ( $res && defined $sth->{rows} ) {
-            if ( $sth->{rows} ) {
-                my @cols_names = map { $_->[0] } $sth->{cols}->@*;
-
-                $res->{data}->@{@cols_names} = $sth->{rows}->[0]->@*;
-            }
-        }
-
-        return $cb ? $cb->($res) : $res;
-    };
-
-    if ( defined wantarray ) {
-        $self->_execute( $query, $bind, my $cv = P->cv, max_rows => 1 );
-
-        return $on_finish->( $cv->recv );
-    }
-    else {
-        $self->_execute( $query, $bind, $on_finish, max_rows => 1 );
-
-        return;
-    }
-}
-
-sub selectrow_arrayref ( $self, $query, @args ) {
-    my ( $bind, $args, $cb ) = _parse_args( \@args );
-
-    my $on_finish = sub ( $sth, $res ) {
-        my $guard = $self;    # keep reference to $self until query is finished
-
-        if ( $res && defined $sth->{rows} ) {
-            $res->{data} = $sth->{rows}->[0];
-        }
-
-        return $cb ? $cb->($res) : $res;
-    };
-
-    if ( defined wantarray ) {
-        $self->_execute( $query, $bind, my $cv = P->cv, max_rows => 1 );
-
-        return $on_finish->( $cv->recv );
-    }
-    else {
-        $self->_execute( $query, $bind, $on_finish, max_rows => 1 );
-
-        return;
-    }
-}
-
-# col => [0, 'id'], col => 'id', default col => 0
-sub selectcol ( $self, $query, @args ) {
-    my ( $bind, $args, $cb ) = _parse_args( \@args );
-
-    my $on_finish = sub ( $sth, $res ) {
-        my $guard = $self;    # keep reference to $self until query is finished
-
-        if ( $res && defined $sth->{rows} ) {
-            my @slice;
-
-            my $num_of_fields = $sth->{cols}->@* - 1;
-
-            if ( !defined $args->{col} ) {
-                push @slice, 0;
-            }
-            else {
-                for my $col ( is_plain_arrayref $args->{col} ? $args->{col}->@* : $args->{col} ) {
-                    if ( looks_like_number $col) {
-                        if ( $col > $num_of_fields ) {
-                            my $res = res [ 400, qq[DBI: Invalid column index: "$col"] ];
-
-                            warn $res;
-
-                            return $cb ? $cb->($res) : $res;
-                        }
-
-                        push @slice, $col;
-                    }
-                    else {
-
-                        # create columns index
-                        my $name2idx;
-
-                        if ( !defined $name2idx ) {
-                            $name2idx = {};
-
-                            for ( my $i = 0; $i <= $sth->{cols}->$#*; $i++ ) {
-                                $name2idx->{ $sth->{cols}->[$i]->[0] } = $i;
-                            }
-                        }
-
-                        if ( !exists $name2idx->{$col} ) {
-                            my $res = res [ 400, qq[DBI: Invalid column name: "$col"] ];
-
-                            warn $res;
-
-                            return $cb ? $cb->($res) : $res;
-                        }
-
-                        push @slice, $name2idx->{$col};
-                    }
+                    push @key_col_idx, $idx;
                 }
             }
 
-            my $data;
+            my $data = {};
 
             for my $row ( $sth->{rows}->@* ) {
-                push $data->@*, $row->@[@slice];
+                my $ref = $data;
+
+                $ref = $ref->{ $row->[$_] // $EMPTY } //= {} for @key_col_idx;
+
+                $ref->@{@cols_names} = $row->@*;
             }
 
             $res->{data} = $data;
         }
+        else {
+            my $data;
 
-        return $cb ? $cb->($res) : $res;
-    };
+            for my $row ( $sth->{rows}->@* ) {
+                my $row_hashref->@{@cols_names} = $row->@*;
 
-    if ( defined wantarray ) {
-        $self->_execute( $query, $bind, my $cv = P->cv );
+                push $data->@*, $row_hashref;
+            }
 
-        return $on_finish->( $cv->recv );
+            $res->{data} = $data;
+        }
     }
-    else {
-        $self->_execute( $query, $bind, $on_finish );
 
-        return;
+    return $res;
+}
+
+sub selectall_arrayref ( $self, $query, @args ) {
+    my ( $bind, $args ) = _parse_args( \@args );
+
+    $self->_execute( $query, $bind, my $cv = P->cv );
+
+    my ( $sth, $res ) = $cv->recv;
+
+    my $data;
+
+    if ( $res && defined $sth->{rows} ) {
+        $res->{data} = $sth->{rows};
     }
+
+    return $res;
+}
+
+sub selectrow ( $self, $query, @args ) {
+    my ( $bind, $args ) = _parse_args( \@args );
+
+    $self->_execute( $query, $bind, my $cv = P->cv, max_rows => 1 );
+
+    my ( $sth, $res ) = $cv->recv;
+
+    if ( $res && defined $sth->{rows} ) {
+        if ( $sth->{rows} ) {
+            my @cols_names = map { $_->[0] } $sth->{cols}->@*;
+
+            $res->{data}->@{@cols_names} = $sth->{rows}->[0]->@*;
+        }
+    }
+
+    return $res;
+}
+
+sub selectrow_arrayref ( $self, $query, @args ) {
+    my ( $bind, $args ) = _parse_args( \@args );
+
+    $self->_execute( $query, $bind, my $cv = P->cv, max_rows => 1 );
+
+    my ( $sth, $res ) = $cv->recv;
+
+    if ( $res && defined $sth->{rows} ) {
+        $res->{data} = $sth->{rows}->[0];
+    }
+
+    return $res;
+}
+
+# col => [0, 'id'], col => 'id', default col => 0
+sub selectcol ( $self, $query, @args ) {
+    my ( $bind, $args ) = _parse_args( \@args );
+
+    $self->_execute( $query, $bind, my $cv = P->cv );
+
+    my ( $sth, $res ) = $cv->recv;
+
+    if ( $res && defined $sth->{rows} ) {
+        my @slice;
+
+        my $num_of_fields = $sth->{cols}->@* - 1;
+
+        if ( !defined $args->{col} ) {
+            push @slice, 0;
+        }
+        else {
+            for my $col ( is_plain_arrayref $args->{col} ? $args->{col}->@* : $args->{col} ) {
+                if ( looks_like_number $col) {
+                    if ( $col > $num_of_fields ) {
+                        $res = res [ 400, qq[DBI: Invalid column index: "$col"] ];
+
+                        warn $res;
+
+                        return $res;
+                    }
+
+                    push @slice, $col;
+                }
+                else {
+
+                    # create columns index
+                    my $name2idx;
+
+                    if ( !defined $name2idx ) {
+                        $name2idx = {};
+
+                        for ( my $i = 0; $i <= $sth->{cols}->$#*; $i++ ) {
+                            $name2idx->{ $sth->{cols}->[$i]->[0] } = $i;
+                        }
+                    }
+
+                    if ( !exists $name2idx->{$col} ) {
+                        $res = res [ 400, qq[DBI: Invalid column name: "$col"] ];
+
+                        warn $res;
+
+                        return $res;
+                    }
+
+                    push @slice, $name2idx->{$col};
+                }
+            }
+        }
+
+        my $data;
+
+        for my $row ( $sth->{rows}->@* ) {
+            push $data->@*, $row->@[@slice];
+        }
+
+        $res->{data} = $data;
+    }
+
+    return $res;
 }
 
 # TRANSACTIONS
@@ -1014,59 +947,28 @@ sub in_transaction ($self) {
     return $self->{tx_status} ne $TX_STATUS_IDLE;
 }
 
-sub begin_work ( $self, $cb = undef ) {
-    my $on_finish = sub ( $sth, $res ) {
-        return $cb ? $cb->($res) : $res;
-    };
+sub begin_work ( $self ) {
+    $self->_execute( 'BEGIN', undef, my $cv = P->cv );
 
-    if ( defined wantarray ) {
-        $self->_execute( 'BEGIN', undef, my $cv = P->cv );
+    my ( $sth, $res ) = $cv->recv;
 
-        return $on_finish->( $cv->recv );
-    }
-    else {
-        $self->_execute( 'BEGIN', undef, $on_finish );
-
-        return;
-    }
+    return $res;
 }
 
-sub commit ( $self, $cb = undef ) {
-    my $on_finish = sub ( $sth, $res ) {
-        my $guard = $self;    # keep reference to $self until query is finished
+sub commit ( $self ) {
+    $self->_execute( 'COMMIT', undef, my $cv = P->cv );
 
-        return $cb ? $cb->($res) : $res;
-    };
+    my ( $sth, $res ) = $cv->recv;
 
-    if ( defined wantarray ) {
-        $self->_execute( 'COMMIT', undef, my $cv = P->cv );
-
-        return $on_finish->( $cv->recv );
-    }
-    else {
-        $self->_execute( 'COMMIT', undef, $on_finish );
-
-        return;
-    }
+    return $res;
 }
 
-sub rollback ( $self, $cb = undef ) {
-    my $on_finish = sub ( $sth, $res ) {
-        my $guard = $self;    # keep reference to $self until query is finished
+sub rollback ( $self ) {
+    $self->_execute( 'ROLLBACK', undef, my $cv = P->cv );
 
-        return $cb ? $cb->($res) : $res;
-    };
+    my ( $sth, $res ) = $cv->recv;
 
-    if ( defined wantarray ) {
-        $self->_execute( 'ROLLBACK', undef, my $cv = P->cv );
-
-        return $on_finish->( $cv->recv );
-    }
-    else {
-        $self->_execute( 'ROLLBACK', undef, $on_finish );
-
-        return;
-    }
+    return $res;
 }
 
 # QUOTE
@@ -1095,11 +997,11 @@ sub encode_json ( $self, $var ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 536                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (31)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 637, 970             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 637, 915             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 779, 970             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 768, 915             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 818                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 807                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

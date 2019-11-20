@@ -2,16 +2,14 @@
 
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 11;
 
 BEGIN {
     use_ok('Test::Perl::Critic::Git') || print "Bail out!\n";
     use_ok('Test::MockModule')        || print "Bail out!\n";
 }
 
-diag(
-    "Testing Test::Perl::Critic::Git $Test::Perl::Critic::Git::VERSION, Perl $], $^X"
-);
+diag("Testing Test::Perl::Critic::Git $Test::Perl::Critic::Git::VERSION, Perl $], $^X");
 
 my $o_gitdiff_mock = Test::MockModule->new('Git::Diff');
 $o_gitdiff_mock->mock(
@@ -49,6 +47,20 @@ $o_criticutils_mock->mock(
 );
 
 my $o_critic_mock = Test::MockModule->new('Perl::Critic');
-$o_critic_mock->mock( critique => sub { return; }, );
+$o_critic_mock->mock(
+    critique => sub {
+        my $desc = 'Offending code';    # Describe the violation
+        my $expl = [ 1, 45, 67 ];       # Page numbers from PBP
+        my $sev  = 5;                   # Severity level of this violation
+        require PPI::Element;
+        require Perl::Critic::Violation;
+        return Perl::Critic::Violation->new( $desc, $expl, PPI::Document->new( \'print "Hello World!\n"' )->child(0), $sev );
+    }
+);
 
-ok critic_on_changed_ok, 'critic_on_changed_ok test';
+my $o_violation_mock = Test::MockModule->new('Perl::Critic::Violation');
+$o_violation_mock->mock( line_number => sub { 80; } );
+ok critic_on_changed_ok( ['.'], 'critic_on_changed_ok test' );
+
+$o_violation_mock->mock( line_number => sub { 23; } );
+ok critic_on_changed_not_ok( ['.'], 'critic_on_changed_not_ok test' );

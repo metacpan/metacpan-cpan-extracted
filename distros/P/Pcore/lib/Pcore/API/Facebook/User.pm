@@ -1,24 +1,15 @@
 package Pcore::API::Facebook::User;
 
 use Pcore -role, -const;
-use Pcore::Lib::Scalar qw[is_plain_coderef];
 
 const our $API_VER => 3.3;
 
-sub me ( $self, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = @args;
-
-    return $self->_req( 'GET', 'me', \%args, undef, $cb );
+sub me ( $self, %args ) {
+    return $self->_req( 'GET', 'me', \%args );
 }
 
-sub debug_token ( $self, @args ) {
-    my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
-
-    my %args = @args;
-
-    return $self->_req( 'GET', "v$API_VER/debug_token", { input_token => $self->{token} }, undef, $cb );
+sub debug_token ( $self ) {
+    return $self->_req( 'GET', "v$API_VER/debug_token", { input_token => $self->{token} } );
 }
 
 1;

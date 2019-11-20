@@ -44,7 +44,7 @@ sub _authenticate ($self) {
 }
 
 # https://docs.docker.com/registry/spec/api/#tags
-sub get_tags ( $self, $cb = undef ) {
+sub get_tags ( $self ) {
     my $res = P->http->get(
         "https://registry-1.docker.io/v2/$self->{repo_id}/tags/list",
         headers => [    #
@@ -63,7 +63,7 @@ sub get_tags ( $self, $cb = undef ) {
 }
 
 # https://docs.docker.com/registry/spec/api/#manifest
-sub get_manifest ( $self, $tag, $cb = undef ) {
+sub get_manifest ( $self, $tag ) {
     my $res = P->http->get(
         "https://registry-1.docker.io/v2/$self->{repo_id}/manifests/$tag",
         headers => [    #
@@ -86,7 +86,7 @@ sub get_manifest ( $self, $tag, $cb = undef ) {
 
 # NOTE disabled for dockerhub registry
 # https://docs.docker.com/registry/spec/api/#deleting-an-image
-sub delete_image ( $self, $digest, $cb = undef ) {
+sub delete_image ( $self, $digest ) {
     my $res = P->http->delete(
         "https://registry-1.docker.io/v2/$self->{repo_id}/manifests/$digest",
         headers => [    #
@@ -107,7 +107,7 @@ sub delete_image ( $self, $digest, $cb = undef ) {
 # https://docs.docker.com/registry/spec/api/#catalog
 # NOTE disabled for dockerhub registry
 # TODO need to authenticate for scope "registry:catalog:*"
-sub catalog ( $self, $cb = undef ) {
+sub catalog ( $self ) {
     my $res = P->http->get(
         "https://registry-1.docker.io/v2/_catalog",
         headers => [    #

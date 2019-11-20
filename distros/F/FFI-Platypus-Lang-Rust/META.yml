@@ -34,5 +34,5 @@ resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/Perl5-FFI/FFI-Platypus-Lang-Rust/issues
   repository: https://github.com/Perl5-FFI/FFI-Platypus-Lang-Rust.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

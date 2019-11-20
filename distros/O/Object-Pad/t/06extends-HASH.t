@@ -9,7 +9,12 @@ use Object::Pad;
 
 package Base::Class {
    sub new {
-      return bless { base_field => 123 }, shift;
+      my $class = shift;
+      my ( $ok ) = @_;
+      Test::More::is( $ok, "ok", '@_ to Base::Class::new' );
+      Test::More::is( scalar @_, 1, 'scalar @_ to Base::Class::new' );
+
+      return bless { base_field => 123 }, $class;
    }
 
    sub fields {
@@ -21,13 +26,17 @@ package Base::Class {
 class Derived::Class extends Base::Class {
    has $derived_field = 456;
 
+   method BUILD($ok) {
+      Test::More::is( $ok, "ok", '@_ to Derived::Class::BUILD' );
+   }
+
    method fields {
       return $self->SUPER::fields . ",derived_field=$derived_field";
    }
 }
 
 {
-   my $obj = Derived::Class->new;
+   my $obj = Derived::Class->new( "ok" );
    is( $obj->fields, "base_field=123,derived_field=456",
       '$obj->fields' );
 

@@ -34,7 +34,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:name            "Web-Solid-Test-Basic";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-006>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-008>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-web-solid-test-basic>;
@@ -60,6 +60,15 @@
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Addition;
+			rdfs:label "Add bearer token-based authentication.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "A script to run mockup server.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Author tests again mockup server.";
+		], [
+			a doap-changeset:Addition;
 			rdfs:label "Regexp-based stateful requests.";
 		], [
 			a doap-changeset:Addition;
@@ -70,15 +79,6 @@
 		], [
 			a doap-changeset:Change;
 			rdfs:label "Small fixes.";
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add bearer token-based authentication.";
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "A script to run mockup server.";
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Author tests again mockup server.";
 		];
 		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-001>;
 	];
@@ -112,7 +112,7 @@
 	dc:issued            "2019-11-03"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
-			a doap-changeset:bugfix;
+			a doap-changeset:Bugfix;
 			rdfs:label "Fix prerequires.";
 			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/manwar>;
 		], [
@@ -124,6 +124,25 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Web-Solid-Test-Basic-0.006.tar.gz>;
 	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-008>
+	a                    doap:Version;
+	rdfs:label           "Ensure that IO::Socket::SSL can be used";
+	dc:identifier        "Web-Solid-Test-Basic-0.008"^^xsd:string;
+	dc:issued            "2019-11-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Document problems with Net::SSL";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add SOLID_SSL_FINGERPRINT environment variable to communicate fingerprint to verify";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-006>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Web-Solid-Test-Basic-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;

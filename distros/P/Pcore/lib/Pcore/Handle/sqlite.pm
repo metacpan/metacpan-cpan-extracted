@@ -5,7 +5,7 @@ use DBI qw[];
 use Pcore::Handle::DBI::Const qw[:CONST];
 use DBD::SQLite qw[];
 use DBD::SQLite::Constants qw[:file_open];
-use Pcore::Lib::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
+use Pcore::Lib::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_blessed_arrayref];
 use Pcore::Lib::UUID qw[uuid_v1mc_str uuid_v4_str];
 use Pcore::Lib::Digest qw[md5_hex];
 use Pcore::Lib::Data qw[to_json];
@@ -249,7 +249,6 @@ sub _exec_sth ( $self, $query, @args ) {
 
     # parse args
     my $bind = is_plain_arrayref $args[0] ? shift @args : undef;
-    my $cb   = is_plain_coderef $args[-1] ? pop @args   : undef;
     my %args = @args;
 
     my ( $dbh, $sth, $rows ) = $self->{h};
@@ -268,7 +267,7 @@ sub _exec_sth ( $self, $query, @args ) {
 
             $sth = $dbh->prepare( $query->{query} );
 
-            return $rows, $sth, \%args, $cb if defined $DBI::err;
+            return $rows, $sth, \%args if defined $DBI::err;
 
             $self->{prepared_sth}->{ $query->{id} } = $sth;
 
@@ -289,7 +288,7 @@ sub _exec_sth ( $self, $query, @args ) {
 
         $sth = $dbh->prepare($query);
 
-        return $rows, $sth, \%args, $cb if defined $DBI::err;
+        return $rows, $sth, \%args if defined $DBI::err;
     }
 
     if ( defined $bind ) {
@@ -302,12 +301,12 @@ sub _exec_sth ( $self, $query, @args ) {
     }
 
     if ( defined $DBI::err ) {
-        return $rows, $sth, \%args, $cb;
+        return $rows, $sth, \%args;
     }
     else {
         $rows = 0 if $rows == 0;    # convert "0E0" to "0"
 
-        return $rows, $sth, \%args, $cb;
+        return $rows, $sth, \%args;
     }
 }
 
@@ -358,8 +357,8 @@ sub _execute ( $self, $sth, $bind, $bind_pos ) {
     return $sth->execute(@bind);
 }
 
-sub get_dbh ( $self, $cb = undef ) {
-    return $cb ? $cb->( res(200), $self ) : ( res(200), $self );
+sub get_dbh ( $self ) {
+    return res(200), $self;
 }
 
 # PUBLIC DBI METHODS
@@ -367,7 +366,6 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
     # parse args
     my $bind = is_plain_arrayref $args[0] ? shift @args : undef;
-    my $cb   = is_plain_coderef $args[-1] ? pop @args   : undef;
     my %args = @args;
 
     my ( $dbh, $rows, $res ) = $self->{h};
@@ -432,7 +430,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
             $res = res 200, rows => $rows;
         }
 
-        return $cb ? $cb->($res) : $res;
+        return $res;
     }
 
     # query is ArrayRef
@@ -460,7 +458,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
             $res = res 200, rows => $rows;
         }
 
-        return $cb ? $cb->($res) : $res;
+        return $res;
     }
 
     # extended query mode
@@ -502,13 +500,13 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
         $res = res 200, rows => $rows if !defined $res;
 
-        return $cb ? $cb->($res) : $res;
+        return $res;
     }
 }
 
 # key_col => [0, 1, 'id'], key_col => 'id'
 sub selectall ( $self, @ ) {
-    my ( $rows, $sth, $args, $cb ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+    my ( $rows, $sth, $args ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
     my $res;
 
@@ -545,11 +543,11 @@ sub selectall ( $self, @ ) {
         }
     }
 
-    return $cb ? $cb->($res) : $res;
+    return $res;
 }
 
 sub selectall_arrayref ( $self, @ ) {
-    my ( $rows, $sth, $args, $cb ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+    my ( $rows, $sth, $args ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
     my $res;
 
@@ -565,11 +563,11 @@ sub selectall_arrayref ( $self, @ ) {
         $res = res 200, $data->@* ? $data : undef, rows => $rows;
     }
 
-    return $cb ? $cb->($res) : $res;
+    return $res;
 }
 
 sub selectrow ( $self, @ ) {
-    my ( $rows, $sth, $args, $cb ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+    my ( $rows, $sth, $args ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
     my $res;
 
@@ -585,11 +583,11 @@ sub selectrow ( $self, @ ) {
         $sth->finish;
     }
 
-    return $cb ? $cb->($res) : $res;
+    return $res;
 }
 
 sub selectrow_arrayref ( $self, @ ) {
-    my ( $rows, $sth, $args, $cb ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+    my ( $rows, $sth, $args ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
     my $res;
 
@@ -605,12 +603,12 @@ sub selectrow_arrayref ( $self, @ ) {
         $sth->finish;
     }
 
-    return $cb ? $cb->($res) : $res;
+    return $res;
 }
 
 # col => [0, 'id'], col => 'id', default col => 0
 sub selectcol ( $self, @ ) {
-    my ( $rows, $sth, $args, $cb ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+    my ( $rows, $sth, $args ) = &_exec_sth;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 
     my $res;
 
@@ -663,7 +661,7 @@ sub selectcol ( $self, @ ) {
         }
     }
 
-    return $cb ? $cb->($res) : $res;
+    return $res;
 }
 
 # TRANSACTIONS
@@ -671,7 +669,7 @@ sub in_transaction ($self) {
     return !$self->{h}->{AutoCommit} || !$self->{h}->sqlite_get_autocommit;
 }
 
-sub begin_work ( $self, $cb = undef ) {
+sub begin_work ( $self ) {
     $self->{h}->begin_work;
 
     my $res;
@@ -686,10 +684,10 @@ sub begin_work ( $self, $cb = undef ) {
         $res = res 200;
     }
 
-    return $cb ? $cb->($res) : $res;
+    return $res;
 }
 
-sub commit ( $self, $cb = undef ) {
+sub commit ( $self ) {
     $self->{h}->commit;
 
     my $res;
@@ -704,10 +702,10 @@ sub commit ( $self, $cb = undef ) {
         $res = res 200;
     }
 
-    return $cb ? $cb->($res) : $res;
+    return $res;
 }
 
-sub rollback ( $self, $cb = undef ) {
+sub rollback ( $self ) {
     $self->{h}->rollback;
 
     my $res;
@@ -722,7 +720,7 @@ sub rollback ( $self, $cb = undef ) {
         $res = res 200;
     }
 
-    return $cb ? $cb->($res) : $res;
+    return $res;
 }
 
 # LAST INSERT ID
@@ -753,13 +751,13 @@ sub attach ( $self, $name, $path = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 366                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
+## |    3 | 365                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (24)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 449                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 447                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 328                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 327                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 660                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 658                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

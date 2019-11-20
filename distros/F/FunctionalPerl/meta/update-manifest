@@ -1,0 +1,125 @@
+#!/usr/bin/env perl
+
+# Tue Jul 16 19:07:50 BST 2013
+(my $email='copying%christianjaeger,ch')=~ tr/%,/@./;
+
+use strict; use warnings; use warnings FATAL => 'uninitialized';
+
+use lib "./lib";
+
+use Chj::IO::Command;
+use Chj::xopen qw(xopen_read xopen_write);
+use FP::List ':all';
+use FP::Repl::AutoTrap;
+
+
+our $excludepath= ".update-manifest.exclude";
+
+$0=~ /(.*?)([^\/]+)\z/s or die "?";
+my ($mydir, $myname)=($1,$2);
+sub usage {
+    print STDERR map{"$_\n"} @_ if @_;
+    print "$myname
+
+  Update MANIFEST file (as used in Perl modules) according to the
+  files in the Git repository.
+
+  ('Better' than
+    perl -MExtUtils::Manifest=mkmanifest -e 'mkmanifest()'
+   because it only adds files that are in the Git repo,
+   and because it ignores subtrees that have their own
+   MANIFEST file. Also ignores entries in bugs/, and if
+   present, those listed in '$excludepath'.)
+
+  (Christian Jaeger <$email>)
+";
+exit (@_ ? 1 : 0);
+}
+
+use Getopt::Long;
+our $verbose=0;
+#our $opt_dry;
+GetOptions("verbose"=> \$verbose,
+           "help"=> sub{usage},
+           #"dry-run"=> \$opt_dry,
+           ) or exit 1;
+usage if @ARGV;
+
+our $excludes=
+  -f $excludepath ? do {
+      +{
+        map {
+            chomp;
+            ($_=> 1)
+        } grep {
+            not /^\s*#/
+        } xopen_read ($excludepath)->xreadline
+       }
+  } : +{map { $_=>1 } qw(.gitignore)};
+
+
+sub treebuild {
+    my ($t,$l)=@_;
+    #use Data::Dumper; warn "t=".Dumper($t).", l=".Dumper($l);
+    my ($a,$r)= $l->first_and_rest;
+    if ($r->is_null) {
+        $$t{$a}= undef
+    } else {
+        treebuild($$t{$a} ||= {}, $r)
+    }
+}
+
+
+our $tree= do {
+    my $ls= Chj::IO::Command->new_sender("git", "ls-files", "-z");
+
+    my $tree= {};
+    local $/= "\0";
+    while (<$ls>) {
+        chomp;
+        treebuild($tree, list split "/");
+    }
+    $ls->xxfinish;
+    $tree
+};
+
+sub tree_for_each {
+    my ($t, $rbefore, $proc)=@_;
+    if (not($rbefore->is_null) and exists $$t{MANIFEST}) {
+        # stop processing, we're in a merged subtree with its own
+        # MANIFEST
+    } else {
+        for my $k (keys %$t) {
+            if (defined (my $subtree= $$t{$k})) {
+                tree_for_each($subtree, cons($k, $rbefore), $proc);
+            } else {
+                &$proc($k, $rbefore);
+            }
+        }
+    }
+}
+
+sub tree2array {
+    my ($t)=@_;
+    my @a;
+    tree_for_each
+      ($t,
+       null,
+       sub {
+           my ($name, $rbefore)=@_;
+           push @a, cons($name, $rbefore)->reverse->strings_join("/")
+       });
+    \@a
+}
+
+
+#use FP::Repl; repl;
+{
+    my $m= xopen_write "MANIFEST";
+    for (sort @{tree2array $tree}) {
+        next if $$excludes{$_};
+        $m->xprintln($_);
+    }
+    $m->xclose;
+}
+

@@ -8,7 +8,7 @@
 
 package XML::Compile::SOAP::Server;
 use vars '$VERSION';
-$VERSION = '3.25';
+$VERSION = '3.26';
 
 
 use warnings;
@@ -114,21 +114,20 @@ sub compileFilter(@)
         # can only base the selection on the type of the elements.  Therefore,
         # procedure selection is often based on HTTP header (which was created
         # for other purposes.
-		my $first = $args{body}{parts}[0] or panic;
-        $need_node = $first->{element} or panic;
+        my $first = $args{body}{parts}[0];
+        $need_node = $first ? $first->{element} : undef;
     }
 
-    my ($need_ns, $need_local) = $need_node ? unpack_type($need_node) : ();
+    $need_node
+        or return sub { !defined $_[1]->{body}[0] };  # empty body
+
+    my ($need_ns, $need_local) = unpack_type($need_node);
 
     # The returned code-ref is called with (XML, INFO)
     sub {
         my ($xml, $info) = @_;
-#use Data::Dumper;
-#warn Dumper \@_;
-#warn $_[0]->toString;
         (my $body) = $xml->getChildrenByLocalName('Body');
         (my $has)  = $body->getElementsByTagNameNS($need_ns, $need_local);
-#warn $has->toString;
         defined $has;
     };
 }

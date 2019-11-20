@@ -5,7 +5,6 @@ use Pcore::Lib::Path::Poll::Tree;
 use Pcore::Lib::Path::Poll::File;
 use Pcore::Lib::Scalar qw[weaken];
 use Time::HiRes qw[];
-use Coro::Signal qw[];
 
 const our $DEFAULT_POLL_INTERVAL => 3;
 
@@ -62,7 +61,7 @@ sub _add_poll ( $self, $poll ) {
     else {
         $THREAD = Coro::async {
             while () {
-                Coro::AnyEvent::sleep $POLL_INTERVAL;
+                Coro::sleep $POLL_INTERVAL;
 
                 for my $poll ( values $POLL->%* ) {
                     next if $poll->{last_checked} + $poll->{interval} > time;

@@ -1,0 +1,55 @@
+{
+   "abstract" : "FunctionalPerl - functional programming on Perl",
+   "author" : [
+      "Christian Jaeger <copying@christianjaeger.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "FunctionalPerl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "meta"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Capture::Tiny" : "0",
+            "Eval::WithLexicals" : "0",
+            "PadWalker" : "0",
+            "Term::ReadLine::Gnu" : "0"
+         },
+         "requires" : {
+            "Scalar::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.72.2",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

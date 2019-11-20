@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.24';
+our $VERSION = '3.25';
 
 use vars qw(@ALL_TESTS);
 
@@ -2280,13 +2280,9 @@ sub _init_device {
         );
     }
 
-    if (
-        $browser_tests->{ucbrowser}
-        && ( $self->{user_agent}
-            =~ m{ucweb/2.0\s*\(([^\;\)]*\;){4}\s*([^\;\)]*?)\s*\)}i
-            || $self->{user_agent}
-            =~ m{ucweb/2.0\s*\(([^\;\)]*\;){3}\s*([^\;\)]*?)\s*\)}i )
-    ) {
+    if (   $browser_tests->{ucbrowser}
+        && $self->{user_agent}
+        =~ m{ucweb/2.0\s*\(([^\;\)]*\;){3,4}\s*([^\;\)]*?)\s*\)}i ) {
         $device_string = $2;
     }
     elsif ( $ua =~ /^(\bmot-[^ \/]+)/ ) {
@@ -2980,7 +2976,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.24
+version 3.25
 
 =head1 SYNOPSIS
 

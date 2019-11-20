@@ -24,10 +24,12 @@ subtest 'Missing hash on XSD' => sub {
 	isa_ok( $xsd, 'URI::Namespace' );
 	my $uri	= $xsd->as_string;
 	is( $uri, 'http://www.w3.org/2001/XMLSchema', 'expected resource object for namespace from XSD namespace map' );
+	is( $xsd->iri->as_string, 'http://www.w3.org/2001/XMLSchema', 'expected resource object for namespace from XSD namespace map through IRI' );
 	
 	is($xsd->integer->as_string, 'http://www.w3.org/2001/XMLSchema#integer', 'expected resource object for XSD namespace with integer' );
 	
 	is($xsd->uri('decimal')->as_string, 'http://www.w3.org/2001/XMLSchema#decimal', 'expected resource object for XSD namespace with decimal when set with uri method' );
+	is($xsd->iri('boolean')->as_string, 'http://www.w3.org/2001/XMLSchema#boolean', 'expected resource object for XSD namespace with boolean when set with iri method' );
 };
 
 subtest 'With hash on XSD' => sub {
@@ -35,6 +37,7 @@ subtest 'With hash on XSD' => sub {
 	isa_ok( $xsd, 'URI::Namespace' );
 	my $uri	= $xsd->as_string;
 	is( $uri, 'http://www.w3.org/2001/XMLSchema#', 'expected resource object for namespace from XSD namespace map with hash' );
+	is( $xsd->iri->as_string, 'http://www.w3.org/2001/XMLSchema#', 'expected resource object for namespace from XSD namespace map with hash through IRI' );
 	
 	is($xsd->byte->as_string, 'http://www.w3.org/2001/XMLSchema#byte', 'expected resource object for XSD namespace with byte' );
 	

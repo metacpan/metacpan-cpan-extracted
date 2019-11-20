@@ -201,6 +201,23 @@ static SV *MY_lex_scan_parenthesized(pTHX)
   return NULL;
 }
 
+#define lex_scan_version(flags)  MY_lex_scan_version(aTHX_ flags)
+static SV *MY_lex_scan_version(pTHX_ int flags)
+{
+  const char *err = NULL;
+  const char *endp = prescan_version(PL_parser->bufptr, FALSE, &err, NULL, NULL, NULL, NULL);
+
+  if(endp == PL_parser->bufptr && (flags & PARSE_OPTIONAL))
+    return NULL;
+
+  SV *ret = newSV(0);
+  endp = scan_version(PL_parser->bufptr, ret, FALSE);
+
+  lex_read_to((char *)endp);
+
+  return ret;
+}
+
 #define parse_lexvar()  MY_parse_lexvar(aTHX)
 static PADOFFSET MY_parse_lexvar(pTHX)
 {

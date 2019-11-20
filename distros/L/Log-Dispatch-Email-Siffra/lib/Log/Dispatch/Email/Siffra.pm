@@ -20,7 +20,7 @@ BEGIN
     require Log::Dispatch::Email;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.03';
+    $VERSION = '0.04';
     @ISA     = qw(Log::Dispatch::Email Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -41,8 +41,10 @@ sub send_email
 
     my $to      = ( join ',', @{ $self->{ to } } );
     my $from    = $self->{ from };
-    my $subject = encode( 'utf8', 'Test Email encode : não / ü / ção...' );
+    my $subject = $self->{ subject };
     my $message = "<h4>$parameters{ message }</h4>";
+    my $host    = ( $self->{ host } // 'mail' );
+    my $port    = ( $self->{ port } // 2525 );
     $message = encode( 'utf8', $message );
 
     my $msg = MIME::Lite->new(
@@ -55,8 +57,8 @@ sub send_email
 
     $msg->attr( 'content-type'         => 'text/html' );
     $msg->attr( 'content-type.charset' => 'UTF-8' );
-    $msg->send( 'smtp', 'mail', 'port', 2525 );
-    $log->info( "Email Sent Successfully\n" );
+    $msg->send( 'smtp', $host, 'port', $port );
+    $log->info( "Email enviado com sucesso : host [ $host ] port [ $port ] subject [ $subject ]\n" );
 } ## end sub send_email
 
 =head3 C<flush()>

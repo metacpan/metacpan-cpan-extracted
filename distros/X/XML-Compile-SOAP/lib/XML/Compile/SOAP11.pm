@@ -8,7 +8,7 @@
 
 package XML::Compile::SOAP11;
 use vars '$VERSION';
-$VERSION = '3.25';
+$VERSION = '3.26';
 
 use base 'XML::Compile::SOAP';
 

@@ -11,6 +11,10 @@ Files: Changes
  lib/URI/Namespace.pm
  lib/URI/NamespaceMap/ReservedLocalParts.pm
  t/justuri.t
+ t/lib/CommonTest.pm
+ t/types-attean.t
+ t/types-trine.t
+ t/types.t
 Copyright: Copyright 2019 Chris Prather, Gregory Todd Williams, and Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -26,9 +30,15 @@ Files: t/namespacemap.t
 Copyright: Copyright 2017 Chris Prather, Gregory Todd Williams, and Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: INSTALL
+ LICENSE
+ README.md
+Copyright: Unknown
+License: Unknown
+
 Files: README
  lib/URI/NamespaceMap.pm
-Copyright: Copyright 2012,2013,2014,2015,2016,2017,2018 Gregory Todd Williams, Chris Prather and Kjetil Kjernsmo.
+Copyright: Copyright 2012,2013,2014,2015,2016,2017,2018,2019 Gregory Todd Williams, Chris Prather and Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
@@ -36,17 +46,12 @@ Files: dist.ini
 Copyright: Copyright 2018 Chris Prather, Gregory Todd Williams, and Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: t/iri.t
 Copyright: Copyright 2014 Chris Prather, Gregory Todd Williams, and Kjetil Kjernsmo.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

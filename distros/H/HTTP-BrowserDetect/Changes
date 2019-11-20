@@ -1,5 +1,8 @@
 Revision history for Perl extension HTTP::BrowserDetect.
 
+3.25      2019-11-20 14:11:51Z
+    - Remove a near duplicate regex (GH#171) (Gregory Oschwald)
+
 3.24      2019-10-31 17:48:35Z
     - Bump JSON::PP to 4.04. Fixes #169 (GH#170) (Olaf Alders)
     - Remove links to AnnoCPAN (GH#168) (Petr)

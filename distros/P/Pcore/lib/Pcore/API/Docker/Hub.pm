@@ -8,9 +8,9 @@ our $EXPORT = { DOCKERHUB_SOURCE_TYPE => [qw[$DOCKERHUB_SOURCE_TYPE_TAG $DOCKERH
 has username => ( required => 1 );
 has token    => ( required => 1 );
 
-has _login_token => ( init_arg => undef );
-has _login_exec  => ( init_arg => undef );
-has _login_queue => ( init_arg => undef );
+has _login_token   => ( init_arg => undef );
+has _login_threads => ( init_arg => undef );
+has _login_queue   => ( init_arg => undef );
 
 const our $API_VER  => 'v2';
 const our $BASE_URL => "https://hub.docker.com/$API_VER";
@@ -48,9 +48,7 @@ sub BUILDARGS ( $self, $args = undef ) {
 sub _login ( $self ) {
     state $endpoint = '/users/login/';
 
-    return res 200 if $self->{_login_token};
-
-    if ( $self->{_login_exec} ) {
+    if ( $self->{_login_threads} ) {
         my $cv = P->cv;
 
         push $self->{_login_queue}->@*, $cv;
@@ -58,7 +56,9 @@ sub _login ( $self ) {
         return $cv->recv;
     }
 
-    $self->{_login_exec} = 1;
+    $self->{_login_threads} = 1;
+
+    undef $self->{_login_token};
 
     my $res = $self->_req_no_auth(
         'POST',
@@ -68,14 +68,12 @@ sub _login ( $self ) {
         }
     );
 
-    $self->{_login_exec} = 0;
+    $self->{_login_threads} = 0;
 
     if ( !$res ) {
         $res = res [ $res->{status}, $res->{data}->{detail} ];
-
-        delete $self->{_login_token};
     }
-    elsif ( $res->{data}->{token} ) {
+    elsif ( $self->{_login_token} = $res->{data}->{token} ) {
         $res = res 200;
     }
 
@@ -440,10 +438,10 @@ sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 163, 274, 309, 358,  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 375, 379, 402, 413   |                                                                                                                |
+## |    3 | 161, 272, 307, 356,  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 373, 377, 400, 411   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 141                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 139                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

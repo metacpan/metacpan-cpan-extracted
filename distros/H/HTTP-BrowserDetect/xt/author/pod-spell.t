@@ -37,6 +37,7 @@ Firebird
 Florian
 Fontani
 Graham
+Gregory
 HTTP
 Hao
 Heiko
@@ -62,6 +63,7 @@ Nicolas
 Oatis
 Olaf
 Olivier
+Oschwald
 Paul
 Pelzer
 Perlover
@@ -133,6 +135,7 @@ googlebotnews
 googlebotvideo
 googlefavicon
 googlemobile
+goschwald
 gregor
 hengst
 herrmann
