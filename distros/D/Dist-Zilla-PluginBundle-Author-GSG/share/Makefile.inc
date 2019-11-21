@@ -27,7 +27,7 @@ CPANFILE_SNAPSHOT    := cpanfile.snapshot
 endif
 CARTON_INSTALL_FLAGS ?= --without develop
 PERL_CARTON_PERL5LIB ?= $(PERL5LIB)
-CONTRIB              ?= CONTRIBUTING.md MANIFEST.SKIP
+CONTRIB              ?= CONTRIBUTING.md
 EXTRA_UPDATES        += $(CONTRIB)
 
 # If someone includes this Makefile, don't write the Makefile

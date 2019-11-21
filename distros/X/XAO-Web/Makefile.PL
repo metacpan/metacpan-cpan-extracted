@@ -45,8 +45,7 @@ EOT
 
         $dsn=$1;
 
-
-                chomp(my $default_user=`whoami`);
+        chomp(my $default_user=`whoami`);
         my $user=prompt('User name',$default_user);
         my $pass=prompt('Password','');
 

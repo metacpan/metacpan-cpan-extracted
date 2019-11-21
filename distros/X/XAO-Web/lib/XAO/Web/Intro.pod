@@ -28,10 +28,9 @@ files if no processing is required.
 
 A specific site can replace or modify standard XAO::Web objects if
 required by overriding or extending their methods. You do not need to
-re-implement entire object to make a site specific change.
-
-In case of system object upgrade or bug fix there is no need to alter
-site-specific changes normally.
+re-implement entire object to make a site specific change.  In case of a
+system object upgrade or bug fix there is no need to alter site-specific
+changes normally.
 
 =item *
 
@@ -52,13 +51,12 @@ content -- content of mail messages or reports for instance.
 
 =item *
 
-Works with CGI or mod_perl (mod_perl is recommended for production
-grade sites).
+Works with CGI, mod_perl, or PSGI.
 
 =item *
 
-If used in mod_perl mode improves performance by using caching of
-configuration, parsed templates, database handlers and so on.
+If used in mod_perl or PSGI mode improves performance by using caching
+of configuration, parsed templates, database handlers and so on.
 
 =item *
 
@@ -77,43 +75,28 @@ only templates.
 
 =head1 INSTALLATION
 
-Download tarball from a CPAN server near you, from the master site
-(L<http://xao.com/>) or using links on L<http://freshmeat.net/> and then
-install it in the usual way, just say:
+In most cases it should be enough to declare a dependency on XAO::Web in
+your project's 'cpanfile'.
+
+For a manual installation download an archive from a CPAN server near
+you or use download links on L<https://ejelta.com/xao/> and then install
+it in the usual way:
 
   perl Makefile.PL
   make
   make test
   sudo make install
 
-Saying "install XAO::Web" from the CPAN shell is a good way too:
-
-  perl -MCPAN -eshell
-  install XAO::Web
-
-Using CPAN shell is usually the best way because all dependencies will
-be resolved automatically. If you do manual installation then XAO::Web
-depends on at least the following modules (look into Makefile.PL or
-just watch closely the output of `perl Makefile.PL' for additional
-dependencies):
-
-  XAO::Base
-  XAO::FS
-  Digest::MD5
-  Error
-  MIME::Lite
-  Test::Unit
-
 When you run "perl Makefile.PL" you will be asked for XAO::Web test
-database. That database is only used when you do `make test' and it have
+database. That database is only used when you do `make test' and it has
 to exist. It does not matter what is inside the database, it will be
 completely wiped out for each test case. Normally the database should be
-the same that you have used for XAO::FS tests and in case of MySQL is
+the same that you have used for XAO::FS tests and in case of MySQL it is
 usually 'test' or 'test_fs'.
 
 The directory where templates get installed is the same that you
 gave to XAO::Base when you installed it. Normally that directory is
-/usr/local/xao -- we will assume that for the rest of the document.
+/opt/xao -- we will assume that for the rest of the document.
 
 =head1 FIRST-TIME RUNNING AND TESTING
 
@@ -125,14 +108,14 @@ misc/samplesite/ directory of the distribution archive.
 B<The sample site also provides a very useful template to start any project with!>
 
 Configure your Apache server so that it would execute
-/usr/local/xao/handlers/xao-apache.pl when someone types URL like
+/opt/xao/handlers/xao-apache.pl when someone types URL like
 http://test.company.com/cgi-bin/xao-apache.pl. Here is an example of a virtual
 host configuration for that (or you can simply sym-link xao-apache.pl to
 your existing cgi-bin directory if you have one):
 
  <VirtualHost 10.0.0.1:80>
   ServerName   test.company.com
-  ScriptAlias  /cgi-bin/ /usr/local/xao/handlers/
+  ScriptAlias  /cgi-bin/ /opt/xao/handlers/
  </VirtualHost>
 
 After you configure and re-start your web-server point your browser at
@@ -160,17 +143,17 @@ Here is how to configure Apache with mod_rewrite in the meantime:
   ServerName   test.company.com
   ServerAlias  test.company.com
  
-  <Directory /usr/local/xao/handlers>
+  <Directory /opt/xao/handlers>
    Options ExecCGI
    SetHandler cgi-script
   </Directory>
 
   RewriteEngine on
   RewriteRule   ^/images/(.*)$  \
-                /usr/local/xao/projects/mysite/images/$1  \
+                /opt/xao/projects/mysite/images/$1  \
                 [L]
   RewriteRule   ^/(.*)$  \
-                /usr/local/xao/handlers/xao-apache.pl/mysite/$1  \
+                /opt/xao/handlers/xao-apache.pl/mysite/$1  \
                 [L]
  </VirtualHost>
 
@@ -187,7 +170,7 @@ block.
   ServerName   test.company.com
   ServerAlias  test.company.com
  
-  <Directory /usr/local/xao/handlers>
+  <Directory /opt/xao/handlers>
    Options ExecCGI
    SetHandler perl-script
    PerlHandler Apache::Registry
@@ -196,10 +179,10 @@ block.
 
   RewriteEngine on
   RewriteRule   ^/images/(.*)$  \
-                /usr/local/xao/projects/mysite/images/$1  \
+                /opt/xao/projects/mysite/images/$1  \
                 [L]
   RewriteRule   ^/(.*)$  \
-                /usr/local/xao/handlers/xao-apache.pl/mysite/$1  \
+                /opt/xao/handlers/xao-apache.pl/mysite/$1  \
                 [L]
  </VirtualHost>
 
@@ -227,8 +210,8 @@ chosen "mysite" as a name.
 
 =item 2
 
-Create a sub-directory in /usr/local/xao/projects with the name of
-your site (/usr/local/xao/projects/mysite in our case). This
+Create a sub-directory in /opt/xao/projects with the name of
+your site (/opt/xao/projects/mysite in our case). This
 directory is the home directory of your site. Everything else below is
 relative to that directory. For simplicity you might want to sym-link
 that directory into your home directory.
@@ -273,7 +256,7 @@ Here is an example of configuration module Config.pm for "mysite" site:
  #
  my %data=(
      base_url        => "http://test.company.com",
-     base_url_secure => "http://test.company.com",
+     base_url_secure => "https://test.company.com",
  );
 
  ##
@@ -333,16 +316,14 @@ directory and go to browser to check how it appears.
 
 =head1 AUTHORS
 
-Copyright (c) 2005 Andrew Maltsev
-
-Copyright (c) 2001-2004 Andrew Maltsev, XAO Inc.
-
-<am@ejelta.com> -- http://ejelta.com/xao/
+Andrew Maltsev -- L<am@ejelta.com> -- L<https://ejelta.com/xao/>
 
 XAO::Web was created and is maintained by Andrew Maltsev. Creating of
 XAO::Web would not be possible without valuable comments and ideas from
 everybody on our team and especially from Marcos Alves, Bil Drury, Brian
 Despain and Jason Shupe.
+
+Copyright (c) 2001-2004 XAO Inc.
 
 =head1 SEE ALSO
 

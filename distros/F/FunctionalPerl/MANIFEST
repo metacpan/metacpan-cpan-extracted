@@ -158,11 +158,11 @@ lib/FP/Repl/Trap.pm
 lib/FP/Repl/WithRepl.pm
 lib/FP/Repl/corefuncs.pm
 lib/FP/Show.pm
-lib/FP/Show/Base/FP_Struct.pm
 lib/FP/Show/t.pm
 lib/FP/Stream.pm
 lib/FP/StrictList.pm
 lib/FP/Struct.pm
+lib/FP/Struct/Show.pm
 lib/FP/Text/CSV.pm
 lib/FP/Trampoline.pm
 lib/FP/TransparentLazy.pm
@@ -188,6 +188,7 @@ lib/PXML/Tags.pm
 lib/PXML/Util.pm
 lib/PXML/XHTML.pm
 licenses/artistic_license_2.0.md
+meta/FunctionalPerl/Dependencies.pm
 meta/FunctionalPerl/ModuleList.pm
 meta/_critic.out
 meta/critic

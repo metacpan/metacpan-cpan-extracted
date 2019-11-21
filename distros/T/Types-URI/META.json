@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -31,6 +31,9 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "Attean" : "0"
+         },
          "requires" : {
             "Test::Warnings" : "0"
          }
@@ -56,6 +59,7 @@
             "Test::Requires" : "0"
          },
          "suggests" : {
+            "Attean::IRI" : "0",
             "RDF::Trine::Node::Resource" : "0"
          }
       }
@@ -63,7 +67,7 @@
    "provides" : {
       "Types::URI" : {
          "file" : "lib/Types/URI.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -82,5 +86,10 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Types-URI/project"
    },
-   "version" : "0.006"
+   "version" : "0.007",
+   "x_contributors" : [
+      "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

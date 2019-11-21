@@ -1,16 +1,23 @@
-0.030   2018-04-08 (PERLANCAR)
+0.031   2019-11-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: parse-pom-reg-code.
+
+        - [ux] simplify CLIs by disabling reading config/env, enable logging.
+
+
+0.030   2018-04-08  Released-By: PERLANCAR
 
 	- Add utility: parse-nkk.
 
 
-0.02    2016-01-18 (PERLANCAR)
+0.02    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD rendering.
 
 
-0.01    2015-07-10 (PERLANCAR)
+0.01    2015-07-10  Released-By: PERLANCAR
 
         - First release. Created to put split Perinci::CmdLine scripts from
           Business::ID::{NIK,NOPPBB,NPWP,SIM}.

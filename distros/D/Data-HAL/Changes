@@ -4,6 +4,10 @@
 
 Changes - Revision history for Data-HAL
 
+=head2 1.001 2019-11-21
+
+restrict dependency
+
 =head2 1.000 2013-10-15
 
 Initial release.

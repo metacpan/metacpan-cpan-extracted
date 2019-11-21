@@ -1,0 +1,38 @@
+---
+abstract: 'Minecraft RCON remote console'
+author:
+  - 'Ryan Thompson <rjt@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  List::Util: '0'
+  Test::Exception: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+  Test::Output: '0'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-RCON-Minecraft
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Select: '0'
+  IO::Socket::IP: '0'
+  Mouse: '0'
+  Mouse::Util::TypeConstraints: '0'
+  Term::ANSIColor: '0'
+  perl: '5.008'
+resources:
+  X_metaspec:
+    version: 2
+  repository: https://github.com/rjt-pl/Net-RCON-Minecraft.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

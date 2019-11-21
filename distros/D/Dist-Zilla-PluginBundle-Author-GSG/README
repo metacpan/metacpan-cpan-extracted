@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.0.16
+    version v0.0.18
 
 SYNOPSIS
 
@@ -28,12 +28,12 @@ SYNOPSIS
         -remove = UploadToCPAN
         -remove = GatherDir
     
-        # The MakeMaker Plugin gets an additional setting
-        # in order to support "version ranges".
+        ; The MakeMaker Plugin gets an additional setting
+        ; in order to support "version ranges".
         eumm_version = 7.1101
     
-        # The defaults for author and license come from
-        #[Author::GSG]
+        ; The defaults for author and license come from
+        [Author::GSG]
     
         [MetaJSON]
         [OurPkgVersion]
@@ -42,8 +42,8 @@ SYNOPSIS
         [$meta_provides] # defaults to MetaProvides::Package
     
         [StaticInstall]
-        # mode    from static_install_mode
-        # dry_run from static_install_dry_run
+        ; mode    from static_install_mode
+        ; dry_run from static_install_dry_run
     
         [Pod::Weaver]
         replacer = replace_with_comment
@@ -64,6 +64,11 @@ SYNOPSIS
     
         [Git::Contributors]
         [Git::GatherDir]
+        ; include_dotfiles
+        ; exclude_filename
+        ; exclude_match
+        exclude_filename = README.md
+        exclude_filename = LICENSE.txt
     
         [GitHub::Meta]
         [GitHub::UploadRelease] # plus magic to work without releasing elsewhere
@@ -115,6 +120,20 @@ ATTRIBUTES / PARAMETERS
     static_install_dry_run
 
       Passed to Dist::Zilla::Plugin::StaticInstall as dry_run.
+
+    include_dotfiles
+
+      Passed to "include_dotfiles" in Dist::Zilla::Plugin::Git::GatherDir.
+
+    exclude_filename
+
+      Passed to "exclude_filename" in Dist::Zilla::Plugin::Git::GatherDir.
+
+      Automatically appends README.md and LICENSE.txt to the list.
+
+    exclude_match
+
+      Passed to "exclude_match" in Dist::Zilla::Plugin::Git::GatherDir.
 
 Setting up a new dist
 

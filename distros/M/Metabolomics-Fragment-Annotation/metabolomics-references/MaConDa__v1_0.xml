@@ -1,0 +1,8267 @@
+<?xml version="1.0" ?>
+<MaConDa>
+  <contaminant>
+    <id>
+      CON00001
+    </id>
+    <name>
+      Acetic Acid
+    </name>
+    <formula>
+      C2H4O2
+    </formula>
+    <exact_mass>
+      60.02113
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)
+    </std_inchi>
+    <std_inchi_key>
+      QTBSBXVTEAMEQO-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      176
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00002
+    </id>
+    <name>
+      Acetonitrile (fragment)
+    </name>
+    <formula>
+      CN
+    </formula>
+    <exact_mass>
+      26.003074
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00003
+    </id>
+    <name>
+      Acetonitrile
+    </name>
+    <formula>
+      CH3CN
+    </formula>
+    <exact_mass>
+      41.026549
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2H3N/c1-2-3/H1h3
+    </std_inchi>
+    <std_inchi_key>
+      WEVYAHXRMPXWCK-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      6342
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00004
+    </id>
+    <name>
+      Acetonitrile.1.Acetic acid.1
+    </name>
+    <formula>
+      C4H7NO2
+    </formula>
+    <exact_mass>
+      101.047679
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00005
+    </id>
+    <name>
+      Acetonitrile.1.Methanol.1
+    </name>
+    <formula>
+      C3H7NO
+    </formula>
+    <exact_mass>
+      73.052764
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00006
+    </id>
+    <name>
+      Acetonitrile.2.Methanol.2
+    </name>
+    <formula>
+      C6H14N2O2
+    </formula>
+    <exact_mass>
+      146.105528
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00007
+    </id>
+    <name>
+      Behentrimonium chloride
+    </name>
+    <formula>
+      C25H54NCl
+    </formula>
+    <exact_mass>
+      403.394477
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C25H54N.ClH/c1-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26(2,3)4;/h5-25H2,1-4H3;1H/q+1;/p-1
+    </std_inchi>
+    <std_inchi_key>
+      YSJGOMATDFSEED-UHFFFAOYSA-M
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Personal care products
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00008
+    </id>
+    <name>
+      Bis(2-ethylhexyl) Adipate
+    </name>
+    <formula>
+      C22H42O4
+    </formula>
+    <exact_mass>
+      370.30831
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C22H42O4/c1-5-9-13-19(7-3)17-25-21(23)15-11-12-16-22(24)26-18-20(8-4)14-10-6-2/h19-20H,5-18H2,1-4H3
+    </std_inchi>
+    <std_inchi_key>
+      SAOKZLXYCUGLFA-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      7641
+    </pubchem_cid>
+    <type_of_contaminant>
+      Plasticiser
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00009
+    </id>
+    <name>
+      Bis(2-ethylhexyl) Phthalate
+    </name>
+    <formula>
+      C24H38O4
+    </formula>
+    <exact_mass>
+      390.27701
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C24H38O4/c1-5-9-13-19(7-3)17-27-23(25)21-15-11-12-16-22(21)24(26)28-18-20(8-4)14-10-6-2/h11-12,15-16,19-20H,5-10,13-14,17-18H2,1-4H3
+    </std_inchi>
+    <std_inchi_key>
+      BJQHLKABXJIVAM-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      8343
+    </pubchem_cid>
+    <type_of_contaminant>
+      Plasticiser
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00010
+    </id>
+    <name>
+      Butyl Carbitol
+    </name>
+    <formula>
+      C8H18O3
+    </formula>
+    <exact_mass>
+      162.125595
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C8H18O3/c1-2-3-5-10-7-8-11-6-4-9/h9H,2-8H2,1H3
+    </std_inchi>
+    <std_inchi_key>
+      OAYXUHPQHDHDDZ-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      8177
+    </pubchem_cid>
+    <type_of_contaminant>
+      Scintillation cocktail
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00011
+    </id>
+    <name>
+      Butylated Hydroxyanisole
+    </name>
+    <formula>
+      C11H16O2
+    </formula>
+    <exact_mass>
+      180.11503
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C11H16O2/c1-11(2,3)9-7-8(13-4)5-6-10(9)12/h5-7,12H,1-4H3
+    </std_inchi>
+    <std_inchi_key>
+      MRBKEAMVRSLQPH-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      11954184
+    </pubchem_cid>
+    <type_of_contaminant>
+      Antioxidant
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00012
+    </id>
+    <name>
+      Butylated Hydroxytoluene
+    </name>
+    <formula>
+      C15H24O
+    </formula>
+    <exact_mass>
+      220.182715
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C15H24O/c1-10-8-11(14(2,3)4)13(16)12(9-10)15(5,6)7/h8-9,16H,1-7H3
+    </std_inchi>
+    <std_inchi_key>
+      NLZUEZXRPGMBCV-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      31404
+    </pubchem_cid>
+    <type_of_contaminant>
+      Antioxidant
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00013
+    </id>
+    <name>
+      Copper catalyst iodide adduct (63Cu(I))
+    </name>
+    <formula>
+      63Cu(I)
+    </formula>
+    <exact_mass>
+      189.834076
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00014
+    </id>
+    <name>
+      Copper catalyst iodide adduct (65Cu(I))
+    </name>
+    <formula>
+      65Cu(I)
+    </formula>
+    <exact_mass>
+      191.832269
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00015
+    </id>
+    <name>
+      Cs-133
+    </name>
+    <formula>
+      Cs
+    </formula>
+    <exact_mass>
+      132.905452
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00016
+    </id>
+    <name>
+      d6-Dimethylsulfoxide
+    </name>
+    <formula>
+      C2D6OS
+    </formula>
+    <exact_mass>
+      84.051593
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2H6OS/c1-4(2)3/h1-2H3/i1D3,2D3
+    </std_inchi>
+    <std_inchi_key>
+      IAZDPXIOMUYVGZ-WFGJKAKNSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      75151
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00017
+    </id>
+    <name>
+      DDTDP
+    </name>
+    <formula>
+      C30H58O4S
+    </formula>
+    <exact_mass>
+      514.405582
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00018
+    </id>
+    <name>
+      Decamethylcyclopentasiloxane
+    </name>
+    <formula>
+      C10H30Si5O5
+    </formula>
+    <exact_mass>
+      370.09396
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C10H30O5Si5/c1-16(2)11-17(3,4)13-19(7,8)15-20(9,10)14-18(5,6)12-16/h1-10H3
+    </std_inchi>
+    <std_inchi_key>
+      XMSXQFUHVRWGNA-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      10193
+    </pubchem_cid>
+    <type_of_contaminant>
+      Airborne Contaminant
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00019
+    </id>
+    <name>
+      Dibutyl phthalate
+    </name>
+    <formula>
+      C16H22O4
+    </formula>
+    <exact_mass>
+      278.15181
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C16H22O4/c1-3-5-7-11-9-10-13(15(17)18)14(16(19)20)12(11)8-6-4-2/h9-10H,3-8H2,1-2H3,(H,17,18)(H,19,20)/p-2
+    </std_inchi>
+    <std_inchi_key>
+      NUONTTMMRCYJMI-UHFFFAOYSA-L
+    </std_inchi_key>
+    <pubchem_cid>
+      3026
+    </pubchem_cid>
+    <type_of_contaminant>
+      Plasticiser
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00020
+    </id>
+    <name>
+      Dibutyl Sebacate
+    </name>
+    <formula>
+      C18H34O4
+    </formula>
+    <exact_mass>
+      314.24571
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C18H34O4/c1-3-5-15-21-17(19)13-11-9-7-8-10-12-14-18(20)22-16-6-4-2/h3-16H2,1-2H3
+    </std_inchi>
+    <std_inchi_key>
+      PYGXAGIECVVIOZ-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      7986
+    </pubchem_cid>
+    <type_of_contaminant>
+      Plasticiser
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00021
+    </id>
+    <name>
+      Didodecyl 3,3'-thiodipropanoate sulfone product
+    </name>
+    <formula>
+      C30H58O6S
+    </formula>
+    <exact_mass>
+      546.395412
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Antioxidant
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00022
+    </id>
+    <name>
+      Didodecyl 3,3'-thiodipropanoate sulfoxide product
+    </name>
+    <formula>
+      C30H58O5S
+    </formula>
+    <exact_mass>
+      530.400497
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Antioxidant
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00023
+    </id>
+    <name>
+      Diethyl carbitol
+    </name>
+    <formula>
+      C8H18O3
+    </formula>
+    <exact_mass>
+      162.125595
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C8H18O3/c1-3-9-5-7-11-8-6-10-4-2/h3-8H2,1-2H3
+    </std_inchi>
+    <std_inchi_key>
+      RRQYJINTUHWNHW-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      8179
+    </pubchem_cid>
+    <type_of_contaminant>
+      Scintillation cocktail
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00024
+    </id>
+    <name>
+      Diisooctyl phthalate
+    </name>
+    <formula>
+      C24H38O4
+    </formula>
+    <exact_mass>
+      390.27701
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C24H38O4/c1-19(2)13-7-5-11-17-27-23(25)21-15-9-10-16-22(21)24(26)28-18-12-6-8-14-20(3)4/h9-10,15-16,19-20H,5-8,11-14,17-18H2,1-4H3
+    </std_inchi>
+    <std_inchi_key>
+      IJFPVINAQGWBRJ-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      33934
+    </pubchem_cid>
+    <type_of_contaminant>
+      Plasticiser
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00025
+    </id>
+    <name>
+      Diisopropylethylamine
+    </name>
+    <formula>
+      C8H19N
+    </formula>
+    <exact_mass>
+      129.151749
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C8H19N/c1-6-9(7(2)3)8(4)5/h7-8H,6H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      81531
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00026
+    </id>
+    <name>
+      Dimethyl Formamide
+    </name>
+    <formula>
+      C3H7NO
+    </formula>
+    <exact_mass>
+      73.052764
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C3H7NO/c1-4(2)3-5/h3H,1-2H3
+    </std_inchi>
+    <std_inchi_key>
+      ZMXDDKWLCZADIW-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      6228
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00027
+    </id>
+    <name>
+      Dimethyl Phthalate
+    </name>
+    <formula>
+      C10H10O4
+    </formula>
+    <exact_mass>
+      194.05791
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C10H10O4/c1-13-9(11)7-5-3-4-6-8(7)10(12)14-2/h3-6H,1-2H3
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      8554
+    </pubchem_cid>
+    <type_of_contaminant>
+      Plasticiser
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00028
+    </id>
+    <name>
+      Dimethylaminopyridine
+    </name>
+    <formula>
+      C7H10N2
+    </formula>
+    <exact_mass>
+      122.084398
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C7H10N2/c1-9(2)7-5-3-4-6-8-7/h3-6H,1-2H3
+    </std_inchi>
+    <std_inchi_key>
+      PSHKMPUSSFXUIA-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      21885
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00029
+    </id>
+    <name>
+      Dimethylsulfoxide (DMSO)
+    </name>
+    <formula>
+      C2H6OS
+    </formula>
+    <exact_mass>
+      78.013937
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2H6OS/c1-4(2)3/h1-2H3
+    </std_inchi>
+    <std_inchi_key>
+      IAZDPXIOMUYVGZ-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      679
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00030
+    </id>
+    <name>
+      Dipalmityldimethylammonium chloride
+    </name>
+    <formula>
+      C34H72NCl
+    </formula>
+    <exact_mass>
+      529.535327
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Personal care products
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00031
+    </id>
+    <name>
+      Diphenyl ketone
+    </name>
+    <formula>
+      C13H10O
+    </formula>
+    <exact_mass>
+      182.073165
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C13H10O/c14-13(11-7-3-1-4-8-11)12-9-5-2-6-10-12/h1-10H
+    </std_inchi>
+    <std_inchi_key>
+      RWCCWEUUXYIKHB-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      3102
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00032
+    </id>
+    <name>
+      Distearyldimethylammonium chloride
+    </name>
+    <formula>
+      C38H80NCl
+    </formula>
+    <exact_mass>
+      585.597927
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C38H80N.ClH/c1-5-7-9-11-13-15-17-19-21-23-25-27-29-31-33-35-37-39(3,4)38-36-34-32-30-28-26-24-22-20-18-16-14-12-10-8-6-2;/h5-38H2,1-4H3;1H/q+1;/p-1
+    </std_inchi>
+    <std_inchi_key>
+      REZZEXDLIUJMMS-UHFFFAOYSA-M
+    </std_inchi_key>
+    <pubchem_cid>
+      7879
+    </pubchem_cid>
+    <type_of_contaminant>
+      Personal care products
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00033
+    </id>
+    <name>
+      Dodecamethylcyclohexasiloxane
+    </name>
+    <formula>
+      C12H36Si6O6
+    </formula>
+    <exact_mass>
+      444.112752
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C12H36O6Si6/c1-19(2)13-20(3,4)15-22(7,8)17-24(11,12)18-23(9,10)16-21(5,6)14-19/h1-12H3
+    </std_inchi>
+    <std_inchi_key>
+      IUMSDRXLFWAGNT-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      109111
+    </pubchem_cid>
+    <type_of_contaminant>
+      Airborne Contaminant
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00034
+    </id>
+    <name>
+      Eicosamethylcyclodecasiloxane
+    </name>
+    <formula>
+      C20H60Si10O10
+    </formula>
+    <exact_mass>
+      740.18792
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C20H60O10Si10/c1-31(2)21-32(3,4)23-34(7,8)25-36(11,12)27-38(15,16)29-40(19,20)30-39(17,18)28-37(13,14)26-35(9,10)24-33(5,6)22-31/h1-20H3
+    </std_inchi>
+    <std_inchi_key>
+      CDNNKGWZSNSADW-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      519601
+    </pubchem_cid>
+    <type_of_contaminant>
+      Airborne Contaminant
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00035
+    </id>
+    <name>
+      Erucamide
+    </name>
+    <formula>
+      C22H43NO
+    </formula>
+    <exact_mass>
+      337.334464
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C22H43NO/c1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22(23)24/h9-10H,2-8,11-21H2,1H3,(H2,23,24)/b10-9-
+    </std_inchi>
+    <std_inchi_key>
+      UAUDZVJPLUQNMU-KTKRTIGZSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      5365371
+    </pubchem_cid>
+    <type_of_contaminant>
+      Anti-static agent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00036
+    </id>
+    <name>
+      Formic acid
+    </name>
+    <formula>
+      H2CO2
+    </formula>
+    <exact_mass>
+      46.00548
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/CH2O2/c2-1-3/h1H,(H,2,3)
+    </std_inchi>
+    <std_inchi_key>
+      BDAGIHXWWSANSR-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      284
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00036
+    </id>
+    <name>
+      Formic acid
+    </name>
+    <formula>
+      H2CO2
+    </formula>
+    <exact_mass>
+      46.00548
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/CH2O2/c2-1-3/h1H,(H,2,3)
+    </std_inchi>
+    <std_inchi_key>
+      BDAGIHXWWSANSR-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00037
+    </id>
+    <name>
+      Hexadecamethylcyclooctasiloxane
+    </name>
+    <formula>
+      C16H48Si8O8
+    </formula>
+    <exact_mass>
+      592.150336
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C16H48O8Si8/c1-25(2)17-26(3,4)19-28(7,8)21-30(11,12)23-32(15,16)24-31(13,14)22-29(9,10)20-27(5,6)18-25/h1-16H3
+    </std_inchi>
+    <std_inchi_key>
+      XKJMJYZFAWYREL-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      11170
+    </pubchem_cid>
+    <type_of_contaminant>
+      Airborne Contaminant
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00038
+    </id>
+    <name>
+      Iodine anion (Iodide)
+    </name>
+    <formula>
+      I
+    </formula>
+    <exact_mass>
+      126.904477
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00039
+    </id>
+    <name>
+      Irganox
+    </name>
+    <formula>
+      C35H62O3
+    </formula>
+    <exact_mass>
+      530.469895
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C35H62O3/c1-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-26-38-32(36)25-24-29-27-30(34(2,3)4)33(37)31(28-29)35(5,6)7/h27-28,37H,8-26H2,1-7H3
+    </std_inchi>
+    <std_inchi_key>
+      SSDSCDGVMJFTEQ-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      16386
+    </pubchem_cid>
+    <type_of_contaminant>
+      Antioxidant
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00040
+    </id>
+    <name>
+      Methanesulfonate
+    </name>
+    <formula>
+      CH4O3S
+    </formula>
+    <exact_mass>
+      95.988117
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/CH4O3S/c1-5(2,3)4/h1H3,(H,2,3,4)/p-1
+    </std_inchi>
+    <std_inchi_key>
+      AFVFQIVMOAPDHO-UHFFFAOYSA-M
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00041
+    </id>
+    <name>
+      Methanol
+    </name>
+    <formula>
+      CH3OH
+    </formula>
+    <exact_mass>
+      32.026215
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/CH4O/c1-2/h2H,1H3
+    </std_inchi>
+    <std_inchi_key>
+      OKKJLVBELUTLKV-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      887
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00042
+    </id>
+    <name>
+      Methanol.2.Water.2
+    </name>
+    <formula>
+      C2H12O4
+    </formula>
+    <exact_mass>
+      100.07356
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00043
+    </id>
+    <name>
+      Methanol.3.Water.2
+    </name>
+    <formula>
+      C3H16O5
+    </formula>
+    <exact_mass>
+      132.099775
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00044
+    </id>
+    <name>
+      Methanol.4.Water.3
+    </name>
+    <formula>
+      C4H22O7
+    </formula>
+    <exact_mass>
+      182.136555
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00045
+    </id>
+    <name>
+      Monomethoxytrityl
+    </name>
+    <formula>
+      C20H17O
+    </formula>
+    <exact_mass>
+      273.12794
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C20H17O/c1-21-19-14-12-18(13-15-19)20(16-8-4-2-5-9-16)17-10-6-3-7-11-17/h2-15H,1H3
+    </std_inchi>
+    <std_inchi_key>
+      NTSFISBKIKSZLT-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00046
+    </id>
+    <name>
+      N,N-Bis(2-hydroxyethyl)dodecanamide
+    </name>
+    <formula>
+      C16H33NO3
+    </formula>
+    <exact_mass>
+      287.246044
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C16H33NO3/c1-2-3-4-5-6-7-8-9-10-11-16(20)17(12-14-18)13-15-19/h18-19H,2-15H2,1H3
+    </std_inchi>
+    <std_inchi_key>
+      AOMUHOFOVNGZAN-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Anti-static agent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00047
+    </id>
+    <name>
+      N-Butylbenzenesulfonamide
+    </name>
+    <formula>
+      C10H15NO2S
+    </formula>
+    <exact_mass>
+      213.082351
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C10H15NO2S/c1-2-3-9-11-14(12,13)10-7-5-4-6-8-10/h4-8,11H,2-3,9H2,1H3
+    </std_inchi>
+    <std_inchi_key>
+      IPRJXAGUEGOFGG-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      19241
+    </pubchem_cid>
+    <type_of_contaminant>
+      Plasticiser
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00048
+    </id>
+    <name>
+      N-Methyl 2-pyrrolidone
+    </name>
+    <formula>
+      C5H9NO
+    </formula>
+    <exact_mass>
+      99.068414
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C5H9NO/c1-6-4-2-3-5(6)7/h2-4H2,1H3
+    </std_inchi>
+    <std_inchi_key>
+      SECXISVLQFMRJM-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      13387
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00051
+    </id>
+    <name>
+      Nylon 66 polymer
+    </name>
+    <formula>
+      C24H44N4O4
+    </formula>
+    <exact_mass>
+      452.336256
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Filter
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00051
+    </id>
+    <name>
+      Nylon 66 polymer
+    </name>
+    <formula>
+      C36H66N6O6
+    </formula>
+    <exact_mass>
+      678.504384
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Filter
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00051
+    </id>
+    <name>
+      Nylon 66 polymer
+    </name>
+    <formula>
+      C48H88N8O8
+    </formula>
+    <exact_mass>
+      904.672512
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Filter
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00052
+    </id>
+    <name>
+      Octadecamethylcyclononasiloxane
+    </name>
+    <formula>
+      C18H54Si9O9
+    </formula>
+    <exact_mass>
+      666.169128
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C18H54O9Si9/c1-28(2)19-29(3,4)21-31(7,8)23-33(11,12)25-35(15,16)27-36(17,18)26-34(13,14)24-32(9,10)22-30(5,6)20-28/h1-18H3
+    </std_inchi>
+    <std_inchi_key>
+      ISXOGOLHEGHGQF-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      11172
+    </pubchem_cid>
+    <type_of_contaminant>
+      Airborne Contaminant
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00053
+    </id>
+    <name>
+      Oleamide
+    </name>
+    <formula>
+      C18H35NO
+    </formula>
+    <exact_mass>
+      281.271864
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C18H35NO/c1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18(19)20/h9-10H,2-8,11-17H2,1H3,(H2,19,20)/b10-9-
+    </std_inchi>
+    <std_inchi_key>
+      FATBGEAMYMYZAF-KTKRTIGZSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      5283387
+    </pubchem_cid>
+    <type_of_contaminant>
+      Slip agent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00054
+    </id>
+    <name>
+      Oleic acid
+    </name>
+    <formula>
+      C18H34O2
+    </formula>
+    <exact_mass>
+      282.25588
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C18H34O2/c1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18(19)20/h9-10H,2-8,11-17H2,1H3,(H,19,20)/b10-9-
+    </std_inchi>
+    <std_inchi_key>
+      ZQPPMHVWECSIRJ-KTKRTIGZSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      445639
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00055
+    </id>
+    <name>
+      Palmitic acid
+    </name>
+    <formula>
+      C16H32O2
+    </formula>
+    <exact_mass>
+      256.24023
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C16H32O2/c1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16(17)18/h2-15H2,1H3,(H,17,18)
+    </std_inchi>
+    <std_inchi_key>
+      IPCSVZSSVZVIGE-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      985
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00056
+    </id>
+    <name>
+      Palmitamidopropyl-trimonium chloride
+    </name>
+    <formula>
+      C22H47N2OCl
+    </formula>
+    <exact_mass>
+      390.337691
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Personal care products
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00057
+    </id>
+    <name>
+      PEG.1
+    </name>
+    <formula>
+      C2H6O2
+    </formula>
+    <exact_mass>
+      62.03678
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2H6O2/c3-1-2-4/h3-4H,1-2H2
+    </std_inchi>
+    <std_inchi_key>
+      LYCAIKOWRPUZTN-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      174
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00058
+    </id>
+    <name>
+      PEG.10
+    </name>
+    <formula>
+      C20H42O11
+    </formula>
+    <exact_mass>
+      458.272715
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C20H42O11/c21-1-3-23-5-7-25-9-11-27-13-15-29-17-19-31-20-18-30-16-14-28-12-10-26-8-6-24-4-2-22/h21-22H,1-20H2
+    </std_inchi>
+    <std_inchi_key>
+      DTPCFIHYWYONMD-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      79689
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00059
+    </id>
+    <name>
+      PEG.11
+    </name>
+    <formula>
+      C22H46O12
+    </formula>
+    <exact_mass>
+      502.29893
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C22H46O12/c23-1-3-25-5-7-27-9-11-29-13-15-31-17-19-33-21-22-34-20-18-32-16-14-30-12-10-28-8-6-26-4-2-24/h23-24H,1-22H2
+    </std_inchi>
+    <std_inchi_key>
+      PSVXZQVXSXSQRO-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      81260
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00060
+    </id>
+    <name>
+      PEG.12
+    </name>
+    <formula>
+      C24H50O13
+    </formula>
+    <exact_mass>
+      546.325145
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C24H50O13/c25-1-3-27-5-7-29-9-11-31-13-15-33-17-19-35-21-23-37-24-22-36-20-18-34-16-14-32-12-10-30-8-6-28-4-2-26/h25-26H,1-24H2
+    </std_inchi>
+    <std_inchi_key>
+      WRZXKWFJEFFURH-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      81248
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00061
+    </id>
+    <name>
+      PEG.13
+    </name>
+    <formula>
+      C26H54O14
+    </formula>
+    <exact_mass>
+      590.35136
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C26H54O14/c27-1-3-29-5-7-31-9-11-33-13-15-35-17-19-37-21-23-39-25-26-40-24-22-38-20-18-36-16-14-34-12-10-32-8-6-30-4-2-28/h27-28H,1-26H2
+    </std_inchi>
+    <std_inchi_key>
+      AKWFJQNBHYVIPY-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      87168
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00062
+    </id>
+    <name>
+      PEG.14
+    </name>
+    <formula>
+      C28H58O15
+    </formula>
+    <exact_mass>
+      634.377575
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C28H58O15/c29-1-3-31-5-7-33-9-11-35-13-15-37-17-19-39-21-23-41-25-27-43-28-26-42-24-22-40-20-18-38-16-14-36-12-10-34-8-6-32-4-2-30/h29-30H,1-28H2
+    </std_inchi>
+    <std_inchi_key>
+      ILLKMACMBHTSHP-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00063
+    </id>
+    <name>
+      PEG.15
+    </name>
+    <formula>
+      C30H62O16
+    </formula>
+    <exact_mass>
+      678.40379
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C30H62O16/c31-1-3-33-5-7-35-9-11-37-13-15-39-17-19-41-21-23-43-25-27-45-29-30-46-28-26-44-24-22-42-20-18-40-16-14-38-12-10-36-8-6-34-4-2-32/h31-32H,1-30H2
+    </std_inchi>
+    <std_inchi_key>
+      OWTQQPNDSWCHOV-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      120062
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00064
+    </id>
+    <name>
+      PEG.16
+    </name>
+    <formula>
+      C32H66O17
+    </formula>
+    <exact_mass>
+      722.430005
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C32H66O17/c33-1-3-35-5-7-37-9-11-39-13-15-41-17-19-43-21-23-45-25-27-47-29-31-49-32-30-48-28-26-46-24-22-44-20-18-42-16-14-40-12-10-38-8-6-36-4-2-34/h33-34H,1-32H2
+    </std_inchi>
+    <std_inchi_key>
+      DHORSBRLGKJPFC-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      81262
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00065
+    </id>
+    <name>
+      PEG.17
+    </name>
+    <formula>
+      C34H70O18
+    </formula>
+    <exact_mass>
+      766.45622
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00066
+    </id>
+    <name>
+      PEG.18
+    </name>
+    <formula>
+      C36H74O19
+    </formula>
+    <exact_mass>
+      810.482435
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00067
+    </id>
+    <name>
+      PEG.19
+    </name>
+    <formula>
+      C38H78O20
+    </formula>
+    <exact_mass>
+      854.50865
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00068
+    </id>
+    <name>
+      PEG.2
+    </name>
+    <formula>
+      C4H10O3
+    </formula>
+    <exact_mass>
+      106.062995
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C4H10O3/c5-1-3-7-4-2-6/h5-6H,1-4H2
+    </std_inchi>
+    <std_inchi_key>
+      MTHSVFCYNBDYFN-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      8117
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00069
+    </id>
+    <name>
+      PEG.20
+    </name>
+    <formula>
+      C40H82O21
+    </formula>
+    <exact_mass>
+      898.534865
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C40H82O21/c41-1-3-43-5-7-45-9-11-47-13-15-49-17-19-51-21-23-53-25-27-55-29-31-57-33-35-59-37-39-61-40-38-60-36-34-58-32-30-56-28-26-54-24-22-52-20-18-50-16-14-48-12-10-46-8-6-44-4-2-42/h41-42H,1-40H2
+    </std_inchi>
+    <std_inchi_key>
+      ZHMUMDLGQBRJIW-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00070
+    </id>
+    <name>
+      PEG.3
+    </name>
+    <formula>
+      C6H14O4
+    </formula>
+    <exact_mass>
+      150.08921
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C6H14O4/c7-1-3-9-5-6-10-4-2-8/h7-8H,1-6H2
+    </std_inchi>
+    <std_inchi_key>
+      ZIBGPFATKBEMQZ-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      8172
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00071
+    </id>
+    <name>
+      PEG.4
+    </name>
+    <formula>
+      C8H18O5
+    </formula>
+    <exact_mass>
+      194.115425
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C8H18O5/c9-1-3-11-5-7-13-8-6-12-4-2-10/h9-10H,1-8H2
+    </std_inchi>
+    <std_inchi_key>
+      UWHCKJMYHZGTIT-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      8200
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00072
+    </id>
+    <name>
+      PEG.5
+    </name>
+    <formula>
+      C10H22O6
+    </formula>
+    <exact_mass>
+      238.14164
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C10H22O6/c11-1-3-13-5-7-15-9-10-16-8-6-14-4-2-12/h11-12H,1-10H2
+    </std_inchi>
+    <std_inchi_key>
+      JLFNLZLINWHATN-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      62551
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00073
+    </id>
+    <name>
+      PEG.6
+    </name>
+    <formula>
+      C12H26O7
+    </formula>
+    <exact_mass>
+      282.167855
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C12H26O7/c13-1-3-15-5-7-17-9-11-19-12-10-18-8-6-16-4-2-14/h13-14H,1-12H2
+    </std_inchi>
+    <std_inchi_key>
+      IIRDTKBZINWQAW-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00074
+    </id>
+    <name>
+      PEG.7
+    </name>
+    <formula>
+      C14H30O8
+    </formula>
+    <exact_mass>
+      326.19407
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C14H30O8/c15-1-3-17-5-7-19-9-11-21-13-14-22-12-10-20-8-6-18-4-2-16/h15-16H,1-14H2
+    </std_inchi>
+    <std_inchi_key>
+      XPJRQAIZZQMSCM-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      79718
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00075
+    </id>
+    <name>
+      PEG.8
+    </name>
+    <formula>
+      C16H34O9
+    </formula>
+    <exact_mass>
+      370.220285
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C16H34O9/c17-1-3-19-5-7-21-9-11-23-13-15-25-16-14-24-12-10-22-8-6-20-4-2-18/h17-18H,1-16H2
+    </std_inchi>
+    <std_inchi_key>
+      GLZWNFNQMJAZGY-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      78798
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00076
+    </id>
+    <name>
+      PEG.9
+    </name>
+    <formula>
+      C18H38O10
+    </formula>
+    <exact_mass>
+      414.2465
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C18H38O10/c19-1-3-21-5-7-23-9-11-25-13-15-27-17-18-28-16-14-26-12-10-24-8-6-22-4-2-20/h19-20H,1-18H2
+    </std_inchi>
+    <std_inchi_key>
+      YZUUTMGDONTGTN-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      4867
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00077
+    </id>
+    <name>
+      Pentafluoropropionic acid
+    </name>
+    <formula>
+      C3HF5O2
+    </formula>
+    <exact_mass>
+      163.98967
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C3HF5O2/c4-2(5,1(9)10)3(6,7)8/h(H,9,10)
+    </std_inchi>
+    <std_inchi_key>
+      LRMSQVBRUNSOJL-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      62356
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00078
+    </id>
+    <name>
+      Phenyldiethylamine
+    </name>
+    <formula>
+      C10H15N
+    </formula>
+    <exact_mass>
+      149.120449
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C10H15N/c1-3-11(4-2)10-8-6-5-7-9-10/h5-9H,3-4H2,1-2H3
+    </std_inchi>
+    <std_inchi_key>
+      GGSUCNLOZRCGPQ-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      7061
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00079
+    </id>
+    <name>
+      Phosphoric acid
+    </name>
+    <formula>
+      H3PO4
+    </formula>
+    <exact_mass>
+      97.976898
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/H3O4P/c1-5(2,3)4/h(H3,1,2,3,4)
+    </std_inchi>
+    <std_inchi_key>
+      NBIIXXVUZAFLBC-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      1004
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00079
+    </id>
+    <name>
+      Phosphoric acid
+    </name>
+    <formula>
+      H3PO4
+    </formula>
+    <exact_mass>
+      97.976898
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/H3O4P/c1-5(2,3)4/h(H3,1,2,3,4)
+    </std_inchi>
+    <std_inchi_key>
+      NBIIXXVUZAFLBC-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00080
+    </id>
+    <name>
+      Phthalic acid
+    </name>
+    <formula>
+      C8H6O4
+    </formula>
+    <exact_mass>
+      166.02661
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C8H6O4/c9-7(10)5-3-1-2-4-6(5)8(11)12/h1-4H,(H,9,10)(H,11,12)
+    </std_inchi>
+    <std_inchi_key>
+      XNGIFLGASWRNHJ-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      1017
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00081
+    </id>
+    <name>
+      Phthalic anhydride
+    </name>
+    <formula>
+      C8H4O3
+    </formula>
+    <exact_mass>
+      148.016045
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C8H4O3/c9-7-5-3-1-2-4-6(5)8(10)11-7/h1-4H
+    </std_inchi>
+    <std_inchi_key>
+      LGRFSURHDFAFJT-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      6811
+    </pubchem_cid>
+    <type_of_contaminant>
+      Plasticiser
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00082
+    </id>
+    <name>
+      PPG.1
+    </name>
+    <formula>
+      C3H8O2
+    </formula>
+    <exact_mass>
+      76.05243
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C3H8O2/c1-3(5)2-4/h3-5H,2H2,1H3
+    </std_inchi>
+    <std_inchi_key>
+      DNIAPMSPPWPWGF-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      439846
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00083
+    </id>
+    <name>
+      PPG.10
+    </name>
+    <formula>
+      C30H62O11
+    </formula>
+    <exact_mass>
+      598.429215
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00084
+    </id>
+    <name>
+      PPG.11
+    </name>
+    <formula>
+      C33H68O12
+    </formula>
+    <exact_mass>
+      656.47108
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00085
+    </id>
+    <name>
+      PPG.12
+    </name>
+    <formula>
+      C36H74O13
+    </formula>
+    <exact_mass>
+      714.512945
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00086
+    </id>
+    <name>
+      PPG.13
+    </name>
+    <formula>
+      C39H80O14
+    </formula>
+    <exact_mass>
+      772.55481
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00087
+    </id>
+    <name>
+      PPG.14
+    </name>
+    <formula>
+      C42H86O15
+    </formula>
+    <exact_mass>
+      830.596675
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00088
+    </id>
+    <name>
+      PPG.15
+    </name>
+    <formula>
+      C45H92O16
+    </formula>
+    <exact_mass>
+      888.63854
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00089
+    </id>
+    <name>
+      PPG.16
+    </name>
+    <formula>
+      C48H98O17
+    </formula>
+    <exact_mass>
+      946.680405
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00090
+    </id>
+    <name>
+      PPG.17
+    </name>
+    <formula>
+      C51H104O18
+    </formula>
+    <exact_mass>
+      1004.72227
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00091
+    </id>
+    <name>
+      PPG.18
+    </name>
+    <formula>
+      C54H110O19
+    </formula>
+    <exact_mass>
+      1062.764135
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00092
+    </id>
+    <name>
+      PPG.19
+    </name>
+    <formula>
+      C57H116O20
+    </formula>
+    <exact_mass>
+      1120.806
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00093
+    </id>
+    <name>
+      PPG.20
+    </name>
+    <formula>
+      C60H122O21
+    </formula>
+    <exact_mass>
+      1178.847865
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00094
+    </id>
+    <name>
+      PPG.2
+    </name>
+    <formula>
+      C6H14O3
+    </formula>
+    <exact_mass>
+      134.094295
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C6H14O3/c1-5(8)4-9-6(2)3-7/h5-8H,3-4H2,1-2H3
+    </std_inchi>
+    <std_inchi_key>
+      DUFKCOQISQKSAV-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      32881
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00095
+    </id>
+    <name>
+      PPG.3
+    </name>
+    <formula>
+      C9H20O4
+    </formula>
+    <exact_mass>
+      192.13616
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C9H20O4/c1-7(11)5-12-9(3)6-13-8(2)4-10/h7-11H,4-6H2,1-3H3
+    </std_inchi>
+    <std_inchi_key>
+      LCZVSXRMYJUNFX-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00096
+    </id>
+    <name>
+      PPG.4
+    </name>
+    <formula>
+      C12H26O5
+    </formula>
+    <exact_mass>
+      250.178025
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C12H26O5/c1-9(14)6-15-11(3)8-17-12(4)7-16-10(2)5-13/h9-14H,5-8H2,1-4H3
+    </std_inchi>
+    <std_inchi_key>
+      QVHMSMOUDQXMRS-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      91234
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00097
+    </id>
+    <name>
+      PPG.5
+    </name>
+    <formula>
+      C15H32O6
+    </formula>
+    <exact_mass>
+      308.21989
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C15H32O6/c1-11(17)7-18-13(3)9-20-15(5)10-21-14(4)8-19-12(2)6-16/h11-17H,6-10H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      AQRQHYITOOVBTO-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00098
+    </id>
+    <name>
+      PPG.6
+    </name>
+    <formula>
+      C18H38O7
+    </formula>
+    <exact_mass>
+      366.261755
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00099
+    </id>
+    <name>
+      PPG.7
+    </name>
+    <formula>
+      C21H44O8
+    </formula>
+    <exact_mass>
+      424.30362
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C21H44O8/c1-15(22)8-24-10-17(3)26-12-19(5)28-14-21(7)29-13-20(6)27-11-18(4)25-9-16(2)23/h15-23H,8-14H2,1-7H3/t15-,16+,17+,18-,19+,20-,21+/m1/s1
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00100
+    </id>
+    <name>
+      PPG.8
+    </name>
+    <formula>
+      C24H50O9
+    </formula>
+    <exact_mass>
+      482.345485
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00101
+    </id>
+    <name>
+      PPG.9
+    </name>
+    <formula>
+      C27H56O10
+    </formula>
+    <exact_mass>
+      540.38735
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Polyether
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00102
+    </id>
+    <name>
+      Propionic acid
+    </name>
+    <formula>
+      C3H6O2
+    </formula>
+    <exact_mass>
+      74.03678
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C3H6O2/c1-2-3(4)5/h2H2,1H3,(H,4,5)
+    </std_inchi>
+    <std_inchi_key>
+      XBDQKXXYIPTUBI-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      1032
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00103
+    </id>
+    <name>
+      Sodium acetate
+    </name>
+    <formula>
+      C2H3O2Na
+    </formula>
+    <exact_mass>
+      82.003074
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2H4O2.Na/c1-2(3)4;/h1H3,(H,3,4);/q;+1/p-1
+    </std_inchi>
+    <std_inchi_key>
+      VMHLLURERBWHNL-UHFFFAOYSA-M
+    </std_inchi_key>
+    <pubchem_cid>
+      517045
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00104
+    </id>
+    <name>
+      Sodium trifluoroacetate
+    </name>
+    <formula>
+      C2F3O2Na
+    </formula>
+    <exact_mass>
+      135.974808
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2HF3O2.Na/c3-2(4,5)1(6)7;/h(H,6,7);/q;+1/p-1
+    </std_inchi>
+    <std_inchi_key>
+      UYCAUPASBSROMS-UHFFFAOYSA-M
+    </std_inchi_key>
+    <pubchem_cid>
+      51709
+    </pubchem_cid>
+    <type_of_contaminant>
+      Salt
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00105
+    </id>
+    <name>
+      Stearamide
+    </name>
+    <formula>
+      C18H37NO
+    </formula>
+    <exact_mass>
+      283.287514
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C18H37NO/c1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18(19)20/h2-17H2,1H3,(H2,19,20)
+    </std_inchi>
+    <std_inchi_key>
+      LYRFLYHAGKPMFH-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      31292
+    </pubchem_cid>
+    <type_of_contaminant>
+      Slip agent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00106
+    </id>
+    <name>
+      Stearic acid
+    </name>
+    <formula>
+      C18H36O2
+    </formula>
+    <exact_mass>
+      284.27153
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C18H36O2/c1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18(19)20/
+    </std_inchi>
+    <std_inchi_key>
+      QIQXTHQIDYTFRH-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      5281
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00107
+    </id>
+    <name>
+      Stearyl-palmityldimethylammonium chloride
+    </name>
+    <formula>
+      C36H76NCl
+    </formula>
+    <exact_mass>
+      557.566627
+    </exact_mass>
+    <std_inchi>
+      h2-17H2,1H3,(H,19,20)
+    </std_inchi>
+    <std_inchi_key>
+      UKAFOQJMXIZSMD-UHFFFAOYSA-M
+    </std_inchi_key>
+    <pubchem_cid>
+      161744
+    </pubchem_cid>
+    <type_of_contaminant>
+      Personal care products
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00108
+    </id>
+    <name>
+      Sulphuric acid
+    </name>
+    <formula>
+      H2SO4
+    </formula>
+    <exact_mass>
+      97.967382
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/H2O4S/c1-5(2,3)4/h(H2,1,2,3,4)
+    </std_inchi>
+    <std_inchi_key>
+      QAOWNCQODCNURD-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      1118
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00109
+    </id>
+    <name>
+      Tetrabutylammonium (TBA)
+    </name>
+    <formula>
+      C16H36N
+    </formula>
+    <exact_mass>
+      242.284774
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C16H36N/c1-5-9-13-17(14-10-6-2,15-11-7-3)16-12-8-4/h5-16H2,1-4H3/q+1
+    </std_inchi>
+    <std_inchi_key>
+      DZLFLBLQUQXARW-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      70681
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00110
+    </id>
+    <name>
+      Tetradecamethylcycloheptasiloxane
+    </name>
+    <formula>
+      C14H42Si7O7
+    </formula>
+    <exact_mass>
+      518.131544
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C14H42O7Si7/c1-22(2)15-23(3,4)17-25(7,8)19-27(11,12)21-28(13,14)20-26(9,10)18-24(5,6)16-22/h1-14H3
+    </std_inchi>
+    <std_inchi_key>
+      GSANOGQCVHBHIF-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      7874
+    </pubchem_cid>
+    <type_of_contaminant>
+      Airborne Contaminant
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00111
+    </id>
+    <name>
+      Tributyl Tin Formate
+    </name>
+    <formula>
+      C13H28O2Sn
+    </formula>
+    <exact_mass>
+      336.111129
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/3C4H9.CH2O2.Sn/c3*1-3-4-2;2-1-3;/h3*1,3-4H2,2H3;1H,(H,2,3);/q;;;;+1/p-1
+    </std_inchi>
+    <std_inchi_key>
+      POUGAXCXKDLEMK-UHFFFAOYSA-M
+    </std_inchi_key>
+    <pubchem_cid>
+      22167734
+    </pubchem_cid>
+    <type_of_contaminant>
+      Catalyst
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00112
+    </id>
+    <name>
+      Tributylamine
+    </name>
+    <formula>
+      C12H27N
+    </formula>
+    <exact_mass>
+      185.214349
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C12H27N/c1-4-7-10-13(11-8-5-2)12-9-6-3/h4-12H2,1-3H3
+    </std_inchi>
+    <std_inchi_key>
+      IMFACGCPASFAPR-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      7622
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00113
+    </id>
+    <name>
+      Tributylphosphate
+    </name>
+    <formula>
+      C12H27O4P
+    </formula>
+    <exact_mass>
+      266.164698
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C12H27O4P/c1-4-7-10-14-17(13,15-11-8-5-2)16-12-9-6-3/h4-12H2,1-3H3
+    </std_inchi>
+    <std_inchi_key>
+      STCOOQWBFONSKY-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      31357
+    </pubchem_cid>
+    <type_of_contaminant>
+      Plasticiser
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00114
+    </id>
+    <name>
+      Triethylamine
+    </name>
+    <formula>
+      C6H15N
+    </formula>
+    <exact_mass>
+      101.120449
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C6H15N/c1-4-7(5-2)6-3/h4-6H2,1-3H3
+    </std_inchi>
+    <std_inchi_key>
+      ZMANZCXQSJIPKH-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      8471
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00115
+    </id>
+    <name>
+      Triethylamine Hydrochloride (35)
+    </name>
+    <formula>
+      C6H15N
+    </formula>
+    <exact_mass>
+      101.120449
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C6H15N/c1-4-7(5-2)6-3/h4-6H2,1-3H3
+    </std_inchi>
+    <std_inchi_key>
+      ZMANZCXQSJIPKH-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      8471
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00116
+    </id>
+    <name>
+      Triethylamine Hydrochloride (37)
+    </name>
+    <formula>
+      C6H15N
+    </formula>
+    <exact_mass>
+      101.120449
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C6H15N/c1-4-7(5-2)6-3/h4-6H2,1-3H3
+    </std_inchi>
+    <std_inchi_key>
+      ZMANZCXQSJIPKH-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      8471
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00117
+    </id>
+    <name>
+      Trifluoroacetic acid
+    </name>
+    <formula>
+      C2HO2F3
+    </formula>
+    <exact_mass>
+      113.992864
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2HF3O2/c3-2(4,5)1(6)7/h(H,6,7)
+    </std_inchi>
+    <std_inchi_key>
+      DTQVDTLACAAQTR-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      6422
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00118
+    </id>
+    <name>
+      Triphenyl phosphate
+    </name>
+    <formula>
+      C18H15O4P
+    </formula>
+    <exact_mass>
+      326.070798
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C18H15O4P/c19-23(20-16-10-4-1-5-11-16,21-17-12-6-2-7-13-17)22-18-14-8-3-9-15-18/h1-15H
+    </std_inchi>
+    <std_inchi_key>
+      XZZNDPSIHUTMOC-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      8289
+    </pubchem_cid>
+    <type_of_contaminant>
+      Flame retardant in plastics
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00119
+    </id>
+    <name>
+      Triphenylphosphine oxide
+    </name>
+    <formula>
+      C18H15OP
+    </formula>
+    <exact_mass>
+      278.086053
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C18H15OP/c19-20(16-10-4-1-5-11-16,17-12-6-2-7-13-17)18-14-8-3-9-15-18/h1-15H
+    </std_inchi>
+    <std_inchi_key>
+      FIQMHBFVRAXMOP-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      13097
+    </pubchem_cid>
+    <type_of_contaminant>
+      Crystallizing agent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00120
+    </id>
+    <name>
+      Tripropylamine
+    </name>
+    <formula>
+      C9H21N
+    </formula>
+    <exact_mass>
+      143.167399
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C9H21N/c1-4-7-10(8-5-2)9-6-3/h4-9H2,1-3H3
+    </std_inchi>
+    <std_inchi_key>
+      YFTHZRPMJXBUME-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      7616
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00121
+    </id>
+    <name>
+      TRIS
+    </name>
+    <formula>
+      C4H11NO3
+    </formula>
+    <exact_mass>
+      121.073894
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C4H11NO3/c5-4(1-6,2-7)3-8/h6-8H,1-3,5H2
+    </std_inchi>
+    <std_inchi_key>
+      LENZDBCJOHFCAS-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      6503
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00122
+    </id>
+    <name>
+      Triton X-100.1
+    </name>
+    <formula>
+      C16H26O2
+    </formula>
+    <exact_mass>
+      250.19328
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C16H26O2/c1-15(2,3)12-16(4,5)13-6-8-14(9-7-13)18-11-10-17/h6-9,17H,10-12H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      JYCQQPHGFMYQCF-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      5590
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00122
+    </id>
+    <name>
+      Triton X-100.1
+    </name>
+    <formula>
+      C16H26O2
+    </formula>
+    <exact_mass>
+      250.19328
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C16H26O2/c1-15(2,3)12-16(4,5)13-6-8-14(9-7-13)18-11-10-17/h6-9,17H,10-12H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      JYCQQPHGFMYQCF-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00123
+    </id>
+    <name>
+      Triton X-100.10
+    </name>
+    <formula>
+      C34H62O11
+    </formula>
+    <exact_mass>
+      646.429215
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C34H62O11/c1-33(2,3)30-34(4,5)31-6-8-32(9-7-31)45-29-28-44-27-26-43-25-24-42-23-22-41-21-20-40-19-18-39-17-16-38-15-14-37-13-12-36-11-10-35/h6-9,35H,10-30H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      IVKNZCBNXPYYKL-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00124
+    </id>
+    <name>
+      Triton X-100.11
+    </name>
+    <formula>
+      C36H66O12
+    </formula>
+    <exact_mass>
+      690.45543
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00125
+    </id>
+    <name>
+      Triton X-100.12
+    </name>
+    <formula>
+      C38H70O13
+    </formula>
+    <exact_mass>
+      734.481645
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00126
+    </id>
+    <name>
+      Triton X-100.13
+    </name>
+    <formula>
+      C40H74O14
+    </formula>
+    <exact_mass>
+      778.50786
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00127
+    </id>
+    <name>
+      Triton X-100.14
+    </name>
+    <formula>
+      C42H78O15
+    </formula>
+    <exact_mass>
+      822.534075
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00128
+    </id>
+    <name>
+      Triton X-100.15
+    </name>
+    <formula>
+      C44H82O16
+    </formula>
+    <exact_mass>
+      866.56029
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00129
+    </id>
+    <name>
+      Triton X-100.16
+    </name>
+    <formula>
+      C46H86O17
+    </formula>
+    <exact_mass>
+      910.586505
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00130
+    </id>
+    <name>
+      Triton X-100.17
+    </name>
+    <formula>
+      C48H90O18
+    </formula>
+    <exact_mass>
+      954.61272
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00131
+    </id>
+    <name>
+      Triton X-100.18
+    </name>
+    <formula>
+      C50H94O19
+    </formula>
+    <exact_mass>
+      998.638935
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00132
+    </id>
+    <name>
+      Triton X-100.19
+    </name>
+    <formula>
+      C52H98O20
+    </formula>
+    <exact_mass>
+      1042.66515
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00133
+    </id>
+    <name>
+      Triton X-100.20
+    </name>
+    <formula>
+      C54H102O21
+    </formula>
+    <exact_mass>
+      1086.691365
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00134
+    </id>
+    <name>
+      Triton X-100.2
+    </name>
+    <formula>
+      C18H30O3
+    </formula>
+    <exact_mass>
+      294.219495
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C18H30O3/c1-17(2,3)14-18(4,5)15-6-8-16(9-7-15)21-13-12-20-11-10-19/h6-9,19H,10-14H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      LBCZOTMMGHGTPH-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      24775
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00134
+    </id>
+    <name>
+      Triton X-100.2
+    </name>
+    <formula>
+      C18H30O3
+    </formula>
+    <exact_mass>
+      294.219495
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00135
+    </id>
+    <name>
+      Triton X-100.3
+    </name>
+    <formula>
+      C20H34O4
+    </formula>
+    <exact_mass>
+      338.24571
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C20H34O4/c1-19(2,3)16-20(4,5)17-6-8-18(9-7-17)24-15-14-23-13-12-22-11-10-21/h6-9,21H,10-16H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      OLOHNJXENGJYTB-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      448876
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00135
+    </id>
+    <name>
+      Triton X-100.3
+    </name>
+    <formula>
+      C20H34O4
+    </formula>
+    <exact_mass>
+      338.24571
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00136
+    </id>
+    <name>
+      Triton X-100.4
+    </name>
+    <formula>
+      C22H38O5
+    </formula>
+    <exact_mass>
+      382.271925
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C22H38O5/c1-21(2,3)18-22(4,5)19-6-8-20(9-7-19)27-17-16-26-15-14-25-13-12-24-11-10-23/h6-9,23H,10-18H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      UYDLBVPAAFVANX-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      628327
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00136
+    </id>
+    <name>
+      Triton X-100.4
+    </name>
+    <formula>
+      C22H38O5
+    </formula>
+    <exact_mass>
+      382.271925
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00137
+    </id>
+    <name>
+      Triton X-100.5
+    </name>
+    <formula>
+      C24H42O6
+    </formula>
+    <exact_mass>
+      426.29814
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C24H42O6/c1-23(2,3)20-24(4,5)21-6-8-22(9-7-21)30-19-18-29-17-16-28-15-14-27-13-12-26-11-10-25/h6-9,25H,10-20H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      WQBPSJIAFZCNBR-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      560774
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00137
+    </id>
+    <name>
+      Triton X-100.5
+    </name>
+    <formula>
+      C24H42O6
+    </formula>
+    <exact_mass>
+      426.29814
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00138
+    </id>
+    <name>
+      Triton X-100.6
+    </name>
+    <formula>
+      C26H46O7
+    </formula>
+    <exact_mass>
+      470.324355
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C26H46O7/c1-25(2,3)22-26(4,5)23-6-8-24(9-7-23)33-21-20-32-19-18-31-17-16-30-15-14-29-13-12-28-11-10-27/h6-9,27H,10-22H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      SQAUJCLQNBQZMT-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      17245
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00138
+    </id>
+    <name>
+      Triton X-100.6
+    </name>
+    <formula>
+      C26H46O7
+    </formula>
+    <exact_mass>
+      470.324355
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00139
+    </id>
+    <name>
+      Triton X-100.7
+    </name>
+    <formula>
+      C28H50O8
+    </formula>
+    <exact_mass>
+      514.35057
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C28H50O8/c1-27(2,3)24-28(4,5)25-6-8-26(9-7-25)36-23-22-35-21-20-34-19-18-33-17-16-32-15-14-31-13-12-30-11-10-29/h6-9,29H,10-24H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      HNLXNOZHXNSSPN-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      75622
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00139
+    </id>
+    <name>
+      Triton X-100.7
+    </name>
+    <formula>
+      C28H50O8
+    </formula>
+    <exact_mass>
+      514.35057
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00140
+    </id>
+    <name>
+      Triton X-100.8
+    </name>
+    <formula>
+      C30H54O9
+    </formula>
+    <exact_mass>
+      558.376785
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00141
+    </id>
+    <name>
+      Triton X-100.9
+    </name>
+    <formula>
+      C32H58O10
+    </formula>
+    <exact_mass>
+      602.403
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C32H58O10/c1-31(2,3)28-32(4,5)29-6-8-30(9-7-29)42-27-26-41-25-24-40-23-22-39-21-20-38-19-18-37-17-16-36-15-14-35-13-12-34-11-10-33/h6-9,33H,10-28H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      VJYAJQFKKLYARJ-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00141
+    </id>
+    <name>
+      Triton X-100.9
+    </name>
+    <formula>
+      C32H58O10
+    </formula>
+    <exact_mass>
+      602.403
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00142
+    </id>
+    <name>
+      Triton X-100R.1
+    </name>
+    <formula>
+      C16H32O2
+    </formula>
+    <exact_mass>
+      256.24023
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00143
+    </id>
+    <name>
+      Triton X-100R.10
+    </name>
+    <formula>
+      C34H68O11
+    </formula>
+    <exact_mass>
+      652.476165
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C34H68O11/c1-33(2,3)30-34(4,5)31-6-8-32(9-7-31)45-29-28-44-27-26-43-25-24-42-23-22-41-21-20-40-19-18-39-17-16-38-15-14-37-13-12-36-11-10-35/h31-32,35H,6-30H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      AXMJGXMRGDCRND-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00144
+    </id>
+    <name>
+      Triton X-100R.11
+    </name>
+    <formula>
+      C36H72O12
+    </formula>
+    <exact_mass>
+      696.50238
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00145
+    </id>
+    <name>
+      Triton X-100R.12
+    </name>
+    <formula>
+      C38H76O13
+    </formula>
+    <exact_mass>
+      740.528595
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00146
+    </id>
+    <name>
+      Triton X-100R.13
+    </name>
+    <formula>
+      C40H80O14
+    </formula>
+    <exact_mass>
+      784.55481
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00147
+    </id>
+    <name>
+      Triton X-100R.14
+    </name>
+    <formula>
+      C42H84O15
+    </formula>
+    <exact_mass>
+      828.581025
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00148
+    </id>
+    <name>
+      Triton X-100R.15
+    </name>
+    <formula>
+      C44H88O16
+    </formula>
+    <exact_mass>
+      872.60724
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00149
+    </id>
+    <name>
+      Triton X-100R.16
+    </name>
+    <formula>
+      C46H92O17
+    </formula>
+    <exact_mass>
+      916.633455
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00150
+    </id>
+    <name>
+      Triton X-100R.17
+    </name>
+    <formula>
+      C48H96O18
+    </formula>
+    <exact_mass>
+      960.65967
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00151
+    </id>
+    <name>
+      Triton X-100R.18
+    </name>
+    <formula>
+      C50H100O19
+    </formula>
+    <exact_mass>
+      1004.685885
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00152
+    </id>
+    <name>
+      Triton X-100R.19
+    </name>
+    <formula>
+      C52H104O20
+    </formula>
+    <exact_mass>
+      1048.7121
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00153
+    </id>
+    <name>
+      Triton X-100R.20
+    </name>
+    <formula>
+      C54H108O21
+    </formula>
+    <exact_mass>
+      1092.738315
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00154
+    </id>
+    <name>
+      Triton X-100R.2
+    </name>
+    <formula>
+      C18H36O3
+    </formula>
+    <exact_mass>
+      300.266445
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C18H36O3/c1-17(2,3)14-18(4,5)15-6-8-16(9-7-15)21-13-12-20-11-10-19/h15-16,19H,6-14H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      PNAKTNFERWFEIX-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00155
+    </id>
+    <name>
+      Triton X-100R.3
+    </name>
+    <formula>
+      C20H40O4
+    </formula>
+    <exact_mass>
+      344.29266
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00156
+    </id>
+    <name>
+      Triton X-100R.4
+    </name>
+    <formula>
+      C22H44O5
+    </formula>
+    <exact_mass>
+      388.318875
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00157
+    </id>
+    <name>
+      Triton X-100R.5
+    </name>
+    <formula>
+      C24H48O6
+    </formula>
+    <exact_mass>
+      432.34509
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00158
+    </id>
+    <name>
+      Triton X-100R.6
+    </name>
+    <formula>
+      C26H52O7
+    </formula>
+    <exact_mass>
+      476.371305
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00159
+    </id>
+    <name>
+      Triton X-100R.7
+    </name>
+    <formula>
+      C28H56O8
+    </formula>
+    <exact_mass>
+      520.39752
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00160
+    </id>
+    <name>
+      Triton X-100R.8
+    </name>
+    <formula>
+      C30H60O9
+    </formula>
+    <exact_mass>
+      564.423735
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C30H60O9/c1-29(2,3)26-30(4,5)27-6-8-28(9-7-27)39-25-24-38-23-22-37-21-20-36-19-18-35-17-16-34-15-14-33-13-12-32-11-10-31/h27-28,31H,6-26H2,1-5H3
+    </std_inchi>
+    <std_inchi_key>
+      LVHZSSVOODJLAY-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00161
+    </id>
+    <name>
+      Triton X-100R.9
+    </name>
+    <formula>
+      C32H64O10
+    </formula>
+    <exact_mass>
+      608.44995
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00162
+    </id>
+    <name>
+      Triton X-101.1
+    </name>
+    <formula>
+      C17H28O2
+    </formula>
+    <exact_mass>
+      264.20893
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00163
+    </id>
+    <name>
+      Triton X-101.10
+    </name>
+    <formula>
+      C35H64O11
+    </formula>
+    <exact_mass>
+      660.444865
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00164
+    </id>
+    <name>
+      Triton X-101.11
+    </name>
+    <formula>
+      C37H68O12
+    </formula>
+    <exact_mass>
+      704.47108
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00165
+    </id>
+    <name>
+      Triton X-101.12
+    </name>
+    <formula>
+      C39H72O13
+    </formula>
+    <exact_mass>
+      748.497295
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00166
+    </id>
+    <name>
+      Triton X-101.13
+    </name>
+    <formula>
+      C41H76O14
+    </formula>
+    <exact_mass>
+      792.52351
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00167
+    </id>
+    <name>
+      Triton X-101.14
+    </name>
+    <formula>
+      C43H80O15
+    </formula>
+    <exact_mass>
+      836.549725
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00168
+    </id>
+    <name>
+      Triton X-101.15
+    </name>
+    <formula>
+      C45H84O16
+    </formula>
+    <exact_mass>
+      880.57594
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00169
+    </id>
+    <name>
+      Triton X-101.16
+    </name>
+    <formula>
+      C47H88O17
+    </formula>
+    <exact_mass>
+      924.602155
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00170
+    </id>
+    <name>
+      Triton X-101.17
+    </name>
+    <formula>
+      C49H92O18
+    </formula>
+    <exact_mass>
+      968.62837
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00171
+    </id>
+    <name>
+      Triton X-101.18
+    </name>
+    <formula>
+      C51H96O19
+    </formula>
+    <exact_mass>
+      1012.654585
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00172
+    </id>
+    <name>
+      Triton X-101.19
+    </name>
+    <formula>
+      C53H100O20
+    </formula>
+    <exact_mass>
+      1056.6808
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00173
+    </id>
+    <name>
+      Triton X-101.20
+    </name>
+    <formula>
+      C55H104O21
+    </formula>
+    <exact_mass>
+      1100.707015
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00174
+    </id>
+    <name>
+      Triton X-101.2
+    </name>
+    <formula>
+      C19H32O3
+    </formula>
+    <exact_mass>
+      308.235145
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00175
+    </id>
+    <name>
+      Triton X-101.3
+    </name>
+    <formula>
+      C21H36O4
+    </formula>
+    <exact_mass>
+      352.26136
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00176
+    </id>
+    <name>
+      Triton X-101.4
+    </name>
+    <formula>
+      C23H40O5
+    </formula>
+    <exact_mass>
+      396.287575
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00177
+    </id>
+    <name>
+      Triton X-101.5
+    </name>
+    <formula>
+      C25H44O6
+    </formula>
+    <exact_mass>
+      440.31379
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00178
+    </id>
+    <name>
+      Triton X-101.6
+    </name>
+    <formula>
+      C27H48O7
+    </formula>
+    <exact_mass>
+      484.340005
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00179
+    </id>
+    <name>
+      Triton X-101.7
+    </name>
+    <formula>
+      C29H52O8
+    </formula>
+    <exact_mass>
+      528.36622
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00180
+    </id>
+    <name>
+      Triton X-101.8
+    </name>
+    <formula>
+      C31H56O9
+    </formula>
+    <exact_mass>
+      572.392435
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00181
+    </id>
+    <name>
+      Triton X-101.9
+    </name>
+    <formula>
+      C33H60O10
+    </formula>
+    <exact_mass>
+      616.41865
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00182
+    </id>
+    <name>
+      Triton X-101R.1
+    </name>
+    <formula>
+      C17H34O2
+    </formula>
+    <exact_mass>
+      270.25588
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00183
+    </id>
+    <name>
+      Triton X-101R.10
+    </name>
+    <formula>
+      C35H70O11
+    </formula>
+    <exact_mass>
+      666.491815
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00184
+    </id>
+    <name>
+      Triton X-101R.11
+    </name>
+    <formula>
+      C37H74O12
+    </formula>
+    <exact_mass>
+      710.51803
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00185
+    </id>
+    <name>
+      Triton X-101R.12
+    </name>
+    <formula>
+      C39H78O13
+    </formula>
+    <exact_mass>
+      754.544245
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00186
+    </id>
+    <name>
+      Triton X-101R.13
+    </name>
+    <formula>
+      C41H82O14
+    </formula>
+    <exact_mass>
+      798.57046
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00187
+    </id>
+    <name>
+      Triton X-101R.14
+    </name>
+    <formula>
+      C43H86O15
+    </formula>
+    <exact_mass>
+      842.596675
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00188
+    </id>
+    <name>
+      Triton X-101R.15
+    </name>
+    <formula>
+      C45H90O16
+    </formula>
+    <exact_mass>
+      886.62289
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00189
+    </id>
+    <name>
+      Triton X-101R.16
+    </name>
+    <formula>
+      C47H94O17
+    </formula>
+    <exact_mass>
+      930.649105
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00190
+    </id>
+    <name>
+      Triton X-101R.17
+    </name>
+    <formula>
+      C49H98O18
+    </formula>
+    <exact_mass>
+      974.67532
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00191
+    </id>
+    <name>
+      Triton X-101R.18
+    </name>
+    <formula>
+      C51H102O19
+    </formula>
+    <exact_mass>
+      1018.701535
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00192
+    </id>
+    <name>
+      Triton X-101R.19
+    </name>
+    <formula>
+      C53H106O20
+    </formula>
+    <exact_mass>
+      1062.72775
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00193
+    </id>
+    <name>
+      Triton X-101R.20
+    </name>
+    <formula>
+      C55H110O21
+    </formula>
+    <exact_mass>
+      1106.753965
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00194
+    </id>
+    <name>
+      Triton X-101R.2
+    </name>
+    <formula>
+      C19H38O3
+    </formula>
+    <exact_mass>
+      314.282095
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00195
+    </id>
+    <name>
+      Triton X-101R.3
+    </name>
+    <formula>
+      C21H42O4
+    </formula>
+    <exact_mass>
+      358.30831
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00196
+    </id>
+    <name>
+      Triton X-101R.4
+    </name>
+    <formula>
+      C23H46O5
+    </formula>
+    <exact_mass>
+      402.334525
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00197
+    </id>
+    <name>
+      Triton X-101R.5
+    </name>
+    <formula>
+      C25H50O6
+    </formula>
+    <exact_mass>
+      446.36074
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00198
+    </id>
+    <name>
+      Triton X-101R.6
+    </name>
+    <formula>
+      C27H54O7
+    </formula>
+    <exact_mass>
+      490.386955
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00199
+    </id>
+    <name>
+      Triton X-101R.7
+    </name>
+    <formula>
+      C29H58O8
+    </formula>
+    <exact_mass>
+      534.41317
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00200
+    </id>
+    <name>
+      Triton X-101R.8
+    </name>
+    <formula>
+      C31H62O9
+    </formula>
+    <exact_mass>
+      578.439385
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00201
+    </id>
+    <name>
+      Triton X-101R.9
+    </name>
+    <formula>
+      C33H66O10
+    </formula>
+    <exact_mass>
+      622.4656
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Detergent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00202
+    </id>
+    <name>
+      Trityl cation
+    </name>
+    <formula>
+      C19H15
+    </formula>
+    <exact_mass>
+      243.117375
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C19H15/c1-4-10-16(11-5-1)19(17-12-6-2-7-13-17)18-14-8-3-9-15-18/h1-15H/q+1
+    </std_inchi>
+    <std_inchi_key>
+      OLFPYUPGPBITMH-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      84899
+    </pubchem_cid>
+    <type_of_contaminant>
+      Catalyst
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00203
+    </id>
+    <name>
+      Tween 20.10
+    </name>
+    <formula>
+      C38H74O16
+    </formula>
+    <exact_mass>
+      786.49769
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00204
+    </id>
+    <name>
+      Tween 20.11
+    </name>
+    <formula>
+      C40H78O17
+    </formula>
+    <exact_mass>
+      830.523905
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00205
+    </id>
+    <name>
+      Tween 20.12
+    </name>
+    <formula>
+      C42H82O18
+    </formula>
+    <exact_mass>
+      874.55012
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00206
+    </id>
+    <name>
+      Tween 20.13
+    </name>
+    <formula>
+      C44H86O19
+    </formula>
+    <exact_mass>
+      918.576335
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00207
+    </id>
+    <name>
+      Tween 20.14
+    </name>
+    <formula>
+      C46H90O20
+    </formula>
+    <exact_mass>
+      962.60255
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00208
+    </id>
+    <name>
+      Tween 20.15
+    </name>
+    <formula>
+      C48H94O21
+    </formula>
+    <exact_mass>
+      1006.628765
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00209
+    </id>
+    <name>
+      Tween 20.16
+    </name>
+    <formula>
+      C50H98O22
+    </formula>
+    <exact_mass>
+      1050.65498
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00210
+    </id>
+    <name>
+      Tween 20.17
+    </name>
+    <formula>
+      C52H102O23
+    </formula>
+    <exact_mass>
+      1094.681195
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00211
+    </id>
+    <name>
+      Tween 20.18
+    </name>
+    <formula>
+      C54H106O24
+    </formula>
+    <exact_mass>
+      1138.70741
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00212
+    </id>
+    <name>
+      Tween 20.19
+    </name>
+    <formula>
+      C56H110O25
+    </formula>
+    <exact_mass>
+      1182.733625
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00213
+    </id>
+    <name>
+      Tween 20.20
+    </name>
+    <formula>
+      C58H114O26
+    </formula>
+    <exact_mass>
+      1226.75984
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00214
+    </id>
+    <name>
+      Tween 20.21
+    </name>
+    <formula>
+      C60H118O27
+    </formula>
+    <exact_mass>
+      1270.786055
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00215
+    </id>
+    <name>
+      Tween 20.22
+    </name>
+    <formula>
+      C62H122O28
+    </formula>
+    <exact_mass>
+      1314.81227
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00216
+    </id>
+    <name>
+      Tween 20.23
+    </name>
+    <formula>
+      C64H126O29
+    </formula>
+    <exact_mass>
+      1358.838485
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00217
+    </id>
+    <name>
+      Tween 20.24
+    </name>
+    <formula>
+      C66H130O30
+    </formula>
+    <exact_mass>
+      1402.8647
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00218
+    </id>
+    <name>
+      Tween 20.25
+    </name>
+    <formula>
+      C68H134O31
+    </formula>
+    <exact_mass>
+      1446.890915
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00219
+    </id>
+    <name>
+      Tween 20.26
+    </name>
+    <formula>
+      C70H138O32
+    </formula>
+    <exact_mass>
+      1490.91713
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00220
+    </id>
+    <name>
+      Tween 20.27
+    </name>
+    <formula>
+      C72H142O33
+    </formula>
+    <exact_mass>
+      1534.943345
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00221
+    </id>
+    <name>
+      Tween 20.28
+    </name>
+    <formula>
+      C74H146O34
+    </formula>
+    <exact_mass>
+      1578.96956
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00222
+    </id>
+    <name>
+      Tween 20.29
+    </name>
+    <formula>
+      C76H150O35
+    </formula>
+    <exact_mass>
+      1622.995775
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00223
+    </id>
+    <name>
+      Tween 20.30
+    </name>
+    <formula>
+      C78H154O36
+    </formula>
+    <exact_mass>
+      1667.02199
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00224
+    </id>
+    <name>
+      Tween 20.31
+    </name>
+    <formula>
+      C80H158O37
+    </formula>
+    <exact_mass>
+      1711.048205
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00225
+    </id>
+    <name>
+      Tween 20.32
+    </name>
+    <formula>
+      C82H162O38
+    </formula>
+    <exact_mass>
+      1755.07442
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00226
+    </id>
+    <name>
+      Tween 40.10
+    </name>
+    <formula>
+      C42H82O16
+    </formula>
+    <exact_mass>
+      842.56029
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00227
+    </id>
+    <name>
+      Tween 40.11
+    </name>
+    <formula>
+      C44H86O17
+    </formula>
+    <exact_mass>
+      886.586505
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00228
+    </id>
+    <name>
+      Tween 40.12
+    </name>
+    <formula>
+      C46H90O18
+    </formula>
+    <exact_mass>
+      930.61272
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00229
+    </id>
+    <name>
+      Tween 40.13
+    </name>
+    <formula>
+      C48H94O19
+    </formula>
+    <exact_mass>
+      974.638935
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00230
+    </id>
+    <name>
+      Tween 40.14
+    </name>
+    <formula>
+      C50H98O20
+    </formula>
+    <exact_mass>
+      1018.66515
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00231
+    </id>
+    <name>
+      Tween 40.15
+    </name>
+    <formula>
+      C52H102O21
+    </formula>
+    <exact_mass>
+      1062.691365
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00232
+    </id>
+    <name>
+      Tween 40.16
+    </name>
+    <formula>
+      C54H106O22
+    </formula>
+    <exact_mass>
+      1106.71758
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00233
+    </id>
+    <name>
+      Tween 40.17
+    </name>
+    <formula>
+      C56H110O23
+    </formula>
+    <exact_mass>
+      1150.743795
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00234
+    </id>
+    <name>
+      Tween 40.18
+    </name>
+    <formula>
+      C58H114O24
+    </formula>
+    <exact_mass>
+      1194.77001
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00235
+    </id>
+    <name>
+      Tween 40.19
+    </name>
+    <formula>
+      C60H118O25
+    </formula>
+    <exact_mass>
+      1238.796225
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00236
+    </id>
+    <name>
+      Tween 40.20
+    </name>
+    <formula>
+      C62H122O26
+    </formula>
+    <exact_mass>
+      1282.82244
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00237
+    </id>
+    <name>
+      Tween 40.21
+    </name>
+    <formula>
+      C64H126O27
+    </formula>
+    <exact_mass>
+      1326.848655
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00238
+    </id>
+    <name>
+      Tween 40.22
+    </name>
+    <formula>
+      C66H130O28
+    </formula>
+    <exact_mass>
+      1370.87487
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00239
+    </id>
+    <name>
+      Tween 40.23
+    </name>
+    <formula>
+      C68H134O29
+    </formula>
+    <exact_mass>
+      1414.901085
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00240
+    </id>
+    <name>
+      Tween 40.24
+    </name>
+    <formula>
+      C70H138O30
+    </formula>
+    <exact_mass>
+      1458.9273
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00241
+    </id>
+    <name>
+      Tween 40.25
+    </name>
+    <formula>
+      C72H142O31
+    </formula>
+    <exact_mass>
+      1502.953515
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00242
+    </id>
+    <name>
+      Tween 40.26
+    </name>
+    <formula>
+      C74H146O32
+    </formula>
+    <exact_mass>
+      1546.97973
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00243
+    </id>
+    <name>
+      Tween 40.27
+    </name>
+    <formula>
+      C76H150O33
+    </formula>
+    <exact_mass>
+      1591.005945
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00244
+    </id>
+    <name>
+      Tween 40.28
+    </name>
+    <formula>
+      C78H154O34
+    </formula>
+    <exact_mass>
+      1635.03216
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00245
+    </id>
+    <name>
+      Tween 40.29
+    </name>
+    <formula>
+      C80H158O35
+    </formula>
+    <exact_mass>
+      1679.058375
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00246
+    </id>
+    <name>
+      Tween 40.30
+    </name>
+    <formula>
+      C82H162O36
+    </formula>
+    <exact_mass>
+      1723.08459
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00247
+    </id>
+    <name>
+      Tween 40.31
+    </name>
+    <formula>
+      C84H166O37
+    </formula>
+    <exact_mass>
+      1767.110805
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00248
+    </id>
+    <name>
+      Tween 40.32
+    </name>
+    <formula>
+      C86H170O38
+    </formula>
+    <exact_mass>
+      1811.13702
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00249
+    </id>
+    <name>
+      Tween 60.10
+    </name>
+    <formula>
+      C44H86O16
+    </formula>
+    <exact_mass>
+      870.59159
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00250
+    </id>
+    <name>
+      Tween 60.11
+    </name>
+    <formula>
+      C46H90O17
+    </formula>
+    <exact_mass>
+      914.617805
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00251
+    </id>
+    <name>
+      Tween 60.12
+    </name>
+    <formula>
+      C48H94O18
+    </formula>
+    <exact_mass>
+      958.64402
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00252
+    </id>
+    <name>
+      Tween 60.13
+    </name>
+    <formula>
+      C50H98O19
+    </formula>
+    <exact_mass>
+      1002.670235
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00253
+    </id>
+    <name>
+      Tween 60.14
+    </name>
+    <formula>
+      C52H102O20
+    </formula>
+    <exact_mass>
+      1046.69645
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00254
+    </id>
+    <name>
+      Tween 60.15
+    </name>
+    <formula>
+      C54H106O21
+    </formula>
+    <exact_mass>
+      1090.722665
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00255
+    </id>
+    <name>
+      Tween 60.16
+    </name>
+    <formula>
+      C56H110O22
+    </formula>
+    <exact_mass>
+      1134.74888
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00256
+    </id>
+    <name>
+      Tween 60.17
+    </name>
+    <formula>
+      C58H114O23
+    </formula>
+    <exact_mass>
+      1178.775095
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00257
+    </id>
+    <name>
+      Tween 60.18
+    </name>
+    <formula>
+      C60H118O24
+    </formula>
+    <exact_mass>
+      1222.80131
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00258
+    </id>
+    <name>
+      Tween 60.19
+    </name>
+    <formula>
+      C62H122O25
+    </formula>
+    <exact_mass>
+      1266.827525
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00259
+    </id>
+    <name>
+      Tween 60.20
+    </name>
+    <formula>
+      C64H126O26
+    </formula>
+    <exact_mass>
+      1310.85374
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00260
+    </id>
+    <name>
+      Tween 60.21
+    </name>
+    <formula>
+      C66H130O27
+    </formula>
+    <exact_mass>
+      1354.879955
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00261
+    </id>
+    <name>
+      Tween 60.22
+    </name>
+    <formula>
+      C68H134O28
+    </formula>
+    <exact_mass>
+      1398.90617
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00262
+    </id>
+    <name>
+      Tween 60.23
+    </name>
+    <formula>
+      C70H138O29
+    </formula>
+    <exact_mass>
+      1442.932385
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00263
+    </id>
+    <name>
+      Tween 60.24
+    </name>
+    <formula>
+      C72H142O30
+    </formula>
+    <exact_mass>
+      1486.9586
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00264
+    </id>
+    <name>
+      Tween 60.25
+    </name>
+    <formula>
+      C74H146O31
+    </formula>
+    <exact_mass>
+      1530.984815
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00265
+    </id>
+    <name>
+      Tween 60.26
+    </name>
+    <formula>
+      C76H150O32
+    </formula>
+    <exact_mass>
+      1575.01103
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00266
+    </id>
+    <name>
+      Tween 60.27
+    </name>
+    <formula>
+      C78H154O33
+    </formula>
+    <exact_mass>
+      1619.037245
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00267
+    </id>
+    <name>
+      Tween 60.28
+    </name>
+    <formula>
+      C80H158O34
+    </formula>
+    <exact_mass>
+      1663.06346
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00268
+    </id>
+    <name>
+      Tween 60.29
+    </name>
+    <formula>
+      C82H162O35
+    </formula>
+    <exact_mass>
+      1707.089675
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00269
+    </id>
+    <name>
+      Tween 60.30
+    </name>
+    <formula>
+      C84H166O36
+    </formula>
+    <exact_mass>
+      1751.11589
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00270
+    </id>
+    <name>
+      Tween 60.31
+    </name>
+    <formula>
+      C86H170O37
+    </formula>
+    <exact_mass>
+      1795.142105
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00271
+    </id>
+    <name>
+      Tween 60.32
+    </name>
+    <formula>
+      C88H174O38
+    </formula>
+    <exact_mass>
+      1839.16832
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00272
+    </id>
+    <name>
+      Tween 80.10
+    </name>
+    <formula>
+      C44H84O16
+    </formula>
+    <exact_mass>
+      868.57594
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00273
+    </id>
+    <name>
+      Tween 80.11
+    </name>
+    <formula>
+      C46H88O17
+    </formula>
+    <exact_mass>
+      912.602155
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00274
+    </id>
+    <name>
+      Tween 80.12
+    </name>
+    <formula>
+      C48H92O18
+    </formula>
+    <exact_mass>
+      956.62837
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00275
+    </id>
+    <name>
+      Tween 80.13
+    </name>
+    <formula>
+      C50H96O19
+    </formula>
+    <exact_mass>
+      1000.654585
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00276
+    </id>
+    <name>
+      Tween 80.14
+    </name>
+    <formula>
+      C52H100O20
+    </formula>
+    <exact_mass>
+      1044.6808
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00277
+    </id>
+    <name>
+      Tween 80.15
+    </name>
+    <formula>
+      C54H104O21
+    </formula>
+    <exact_mass>
+      1088.707015
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00278
+    </id>
+    <name>
+      Tween 80.16
+    </name>
+    <formula>
+      C56H108O22
+    </formula>
+    <exact_mass>
+      1132.73323
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00279
+    </id>
+    <name>
+      Tween 80.17
+    </name>
+    <formula>
+      C58H112O23
+    </formula>
+    <exact_mass>
+      1176.759445
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00280
+    </id>
+    <name>
+      Tween 80.18
+    </name>
+    <formula>
+      C60H116O24
+    </formula>
+    <exact_mass>
+      1220.78566
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00281
+    </id>
+    <name>
+      Tween 80.19
+    </name>
+    <formula>
+      C62H120O25
+    </formula>
+    <exact_mass>
+      1264.811875
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00282
+    </id>
+    <name>
+      Tween 80.20
+    </name>
+    <formula>
+      C64H124O26
+    </formula>
+    <exact_mass>
+      1308.83809
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00283
+    </id>
+    <name>
+      Tween 80.21
+    </name>
+    <formula>
+      C66H128O27
+    </formula>
+    <exact_mass>
+      1352.864305
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00284
+    </id>
+    <name>
+      Tween 80.22
+    </name>
+    <formula>
+      C68H132O28
+    </formula>
+    <exact_mass>
+      1396.89052
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00285
+    </id>
+    <name>
+      Tween 80.23
+    </name>
+    <formula>
+      C70H136O29
+    </formula>
+    <exact_mass>
+      1440.916735
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00286
+    </id>
+    <name>
+      Tween 80.24
+    </name>
+    <formula>
+      C72H140O30
+    </formula>
+    <exact_mass>
+      1484.94295
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00287
+    </id>
+    <name>
+      Tween 80.25
+    </name>
+    <formula>
+      C74H144O31
+    </formula>
+    <exact_mass>
+      1528.969165
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00288
+    </id>
+    <name>
+      Tween 80.26
+    </name>
+    <formula>
+      C76H148O32
+    </formula>
+    <exact_mass>
+      1572.99538
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00289
+    </id>
+    <name>
+      Tween 80.27
+    </name>
+    <formula>
+      C78H152O33
+    </formula>
+    <exact_mass>
+      1617.021595
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00290
+    </id>
+    <name>
+      Tween 80.28
+    </name>
+    <formula>
+      C80H156O34
+    </formula>
+    <exact_mass>
+      1661.04781
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00291
+    </id>
+    <name>
+      Tween 80.29
+    </name>
+    <formula>
+      C82H160O35
+    </formula>
+    <exact_mass>
+      1705.074025
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00292
+    </id>
+    <name>
+      Tween 80.30
+    </name>
+    <formula>
+      C84H164O36
+    </formula>
+    <exact_mass>
+      1749.10024
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00293
+    </id>
+    <name>
+      Tween 80.31
+    </name>
+    <formula>
+      C86H168O37
+    </formula>
+    <exact_mass>
+      1793.126455
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00294
+    </id>
+    <name>
+      Tween 80.32
+    </name>
+    <formula>
+      C88H172O38
+    </formula>
+    <exact_mass>
+      1837.15267
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      Buffer
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00295
+    </id>
+    <name>
+      1,3-Dicyclohexylurea
+    </name>
+    <formula>
+      C13H24N2O
+    </formula>
+    <exact_mass>
+      224.188863
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C13H24N2O/c16-13(14-11-7-3-1-4-8-11)15-12-9-5-2-6-10-12/h11-12H,1-10H2,(H2,14,15,16)
+    </std_inchi>
+    <std_inchi_key>
+      ADFXKUOMJKEIND-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      4277
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00296
+    </id>
+    <name>
+      1,8-Diazabicycloundec-7-ene
+    </name>
+    <formula>
+      C9H16N2
+    </formula>
+    <exact_mass>
+      152.131348
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C9H16N2/c1-2-5-9-10-6-4-8-11(9)7-3-1/h1-8H2
+    </std_inchi>
+    <std_inchi_key>
+      GQHTUMJGOHRCHB-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      81184
+    </pubchem_cid>
+    <type_of_contaminant>
+      Catalyst
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00297
+    </id>
+    <name>
+      3-((3-cholamidopropyl)dimethylammonium)-1-propanesulfonate (CHAPS)
+    </name>
+    <formula>
+      C32H58N2O7S
+    </formula>
+    <exact_mass>
+      614.396475
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C32H58N2O7S/c1-21(8-11-29(38)33-14-6-15-34(4,5)16-7-17-42(39,40)41)24-9-10-25-30-26(20-28(37)32(24,25)3)31(2)13-12-23(35)18-22(31)19-27(30)36/h21-28,30,35-37H,6-20H2,1-5H3,(H-,33,38,39,40,41)/t21-,22+,23-,24-,25+,26+,27-,28+,30+,31+,32-/m1/s1
+    </std_inchi>
+    <std_inchi_key>
+      UMCMPZBLKLEWAF-BCTGSCMUSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      107670
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant>
+    <id>
+      CON00298
+    </id>
+    <name>
+      4-HCCA
+    </name>
+    <formula>
+      C10H7NO3
+    </formula>
+    <exact_mass>
+      189.042594
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C10H7NO3/c11-6-8(10(13)14)5-7-1-3-9(12)4-2-7/h1-5,12H,(H,13,14)/b8-5+
+    </std_inchi>
+    <std_inchi_key>
+      AFVLVVWMAFSXCK-VMPITWQZSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      5328791
+    </pubchem_cid>
+    <type_of_contaminant>
+      Matrix compound
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+  <contaminant/>
+</MaConDa>

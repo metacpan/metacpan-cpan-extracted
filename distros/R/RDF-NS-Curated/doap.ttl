@@ -32,7 +32,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:name            "RDF-NS-Curated";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-000>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-002>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-003>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-004>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-005>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-000>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-001>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-002>, <http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-004>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-rdf-ns-curated>;
@@ -94,6 +94,12 @@
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Addition;
+			rdfs:label "Added csvw prefix."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Added sosa prefix."@en;
+		], [
+			a doap-changeset:Addition;
 			rdfs:label "Add an all method."@en;
 		], [
 			a doap-changeset:Addition;
@@ -101,12 +107,6 @@
 		], [
 			a doap-changeset:Bugfix;
 			rdfs:label "Fix a typo bug in dc11 URI."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Added csvw prefix."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Added sosa prefix."@en;
 		];
 	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
@@ -155,13 +155,27 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-1.002.tar.gz>;
 	doap:revision        "1.002"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/v_1-004>
+	a                    doap:Version;
+	dc:identifier        "RDF-NS-Curated-1.004"^^xsd:string;
+	dc:issued            "2019-11-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Bring test coverage to 100%."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-NS-Curated-1.004.tar.gz>;
+	doap:revision        "1.004"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
 	foaf:name            "Kjetil Kjernsmo";
 	foaf:nick            "KJETILK", "KjetilK";
 	foaf:page            <https://metacpan.org/author/KJETILK>;
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>;
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-ns-curated&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>, <https://solid.kjernsmo.net/profile/card#me>;
 	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
 	wot:hasKey           _:B1.
 
@@ -171,8 +185,8 @@
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
 	foaf:name            "Kjetil Kjernsmo";
 	foaf:nick            "KjetilK";
-	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>;
-	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>, <https://solid.kjernsmo.net/profile/card#me>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>, <https://solid.kjernsmo.net/profile/card>;
 	wot:hasKey           _:B1.
 
 <irc://irc.perl.org/#perlrdf>

@@ -4,13 +4,13 @@
       "Lars DÉªá´á´á´á´á´¡ C<< <daxim@cpan.org> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-HAL",
    "no_index" : {
@@ -50,7 +50,7 @@
             "Types::Standard" : "0",
             "URI" : "0",
             "URI::IRI" : "0",
-            "URI::NamespaceMap" : "0",
+            "URI::NamespaceMap" : "<= 0.12",
             "URI::Template" : "0",
             "XML::RegExp" : "0",
             "boolean" : "0",
@@ -60,29 +60,12 @@
          }
       }
    },
-   "provides" : {
-      "Data::HAL" : {
-         "file" : "lib/Data/HAL.pm",
-         "version" : "1.000"
-      },
-      "Data::HAL::Link" : {
-         "file" : "lib/Data/HAL/Link.pm",
-         "version" : "1.000"
-      },
-      "Data::HAL::URI" : {
-         "file" : "lib/Data/HAL/URI.pm",
-         "version" : "1.000"
-      },
-      "Data::HAL::URI::NamespaceMap" : {
-         "file" : "lib/Data/HAL/URI/NamespaceMap.pm",
-         "version" : "1.000"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.000"
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

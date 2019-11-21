@@ -4,54 +4,59 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "type constraints and coercions for URIs",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Types-URI",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        develop   => { requires => { "Test::Warnings" => 0 } },
-                        runtime   => {
-                                       requires => {
-                                         "perl" => 5.008,
-                                         "Type::Library" => "1.000000",
-                                         "Types::Path::Tiny" => 0,
-                                         "Types::Standard" => 0,
-                                         "Types::UUID" => 0,
-                                         "URI" => 0,
-                                         "URI::FromHash" => 0,
+  "abstract"         => "type constraints and coercions for URIs",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "Types-URI",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          develop   => {
+                                         recommends => { Attean => 0 },
+                                         requires   => { "Test::Warnings" => 0 },
                                        },
-                                     },
-                        test      => {
-                                       recommends => { IRI => 0.004, Moose => "2.0000" },
-                                       requires   => { "Test::More" => 0.96, "Test::Requires" => 0 },
-                                       suggests   => { "RDF::Trine::Node::Resource" => 0 },
-                                     },
-                      },
-  "provides"       => {
-                        "Types::URI" => { file => "lib/Types/URI.pm", version => 0.006 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Types-URI" },
-                        homepage     => "https://metacpan.org/release/Types-URI",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-types-uri.git",
-                                          web  => "https://github.com/tobyink/p5-types-uri",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Types-URI/project",
-                      },
-  "version"        => 0.006,
+                          runtime   => {
+                                         requires => {
+                                           "perl" => 5.008,
+                                           "Type::Library" => "1.000000",
+                                           "Types::Path::Tiny" => 0,
+                                           "Types::Standard" => 0,
+                                           "Types::UUID" => 0,
+                                           "URI" => 0,
+                                           "URI::FromHash" => 0,
+                                         },
+                                       },
+                          test      => {
+                                         recommends => { IRI => 0.004, Moose => "2.0000" },
+                                         requires   => { "Test::More" => 0.96, "Test::Requires" => 0 },
+                                         suggests   => { "Attean::IRI" => 0, "RDF::Trine::Node::Resource" => 0 },
+                                       },
+                        },
+  "provides"         => {
+                          "Types::URI" => { file => "lib/Types/URI.pm", version => 0.007 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Types-URI" },
+                          homepage     => "https://metacpan.org/release/Types-URI",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-types-uri.git",
+                                            web  => "https://github.com/tobyink/p5-types-uri",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Types-URI/project",
+                        },
+  "version"          => 0.007,
+  "x_contributors"   => ["Kjetil Kjernsmo (KJETILK) <kjetilk\@cpan.org>"],
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

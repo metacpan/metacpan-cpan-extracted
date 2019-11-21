@@ -72,8 +72,10 @@ sub checkLocalDateTime {
 sub checkLocalDateTimeIsValid {
 
 	my $str = $DateTime->localDateTime;
-
 	ok( $DateTime->localDateTimeIsValid($str) );
+	
+	ok($DateTime->localDateTimeIsValid('2019-11-20 10:26:31'));
+		
 	ok( !$DateTime->localDateTimeIsValid('foobar') );
 	ok( !$DateTime->localDateTimeIsValid('0000-88-00 88:00:00') );
 }

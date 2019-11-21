@@ -6,18 +6,29 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A collection of commonly used utilities.",
   "AUTHOR" => "John Gravatt <gravattj\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Util-Medley",
+  "EXE_FILES" => [
+    "bin/medley"
+  ],
   "LICENSE" => "perl",
   "NAME" => "Util::Medley",
   "PREREQ_PM" => {
     "Archive::Zip" => 0,
     "CHI" => 0,
+    "CLI::Driver" => 0,
     "Carp" => 0,
     "Crypt::Blowfish" => 0,
     "Crypt::CBC" => 0,
@@ -26,7 +37,9 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "File::LibMagic" => 0,
     "File::Path" => 0,
+    "File::ShareDir" => 0,
     "FileHandle" => 0,
+    "Getopt::Long" => 0,
     "IPC::Run3" => 0,
     "Kavorka" => 0,
     "List::Util" => 0,
@@ -35,20 +48,22 @@ my %WriteMakefileArgs = (
     "Moose::Role" => 0,
     "Path::Iterator::Rule" => 0,
     "Scalar::Util::Numeric" => 0,
+    "Sort::Naturally" => 0,
     "String::Util" => 0,
     "Time::Local" => 0,
     "Time::ParseDate" => 0,
     "Time::localtime" => 0,
     "Try::Tiny" => 0,
     "constant" => 0,
-    "namespace::autoclean" => 0
+    "namespace::autoclean" => 0,
+    "vars" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test2::Plugin::DieOnFail" => 0,
-    "Test2::V0" => 0,
-    "vars" => 0
+    "Test2::V0" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,6 +73,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Archive::Zip" => 0,
   "CHI" => 0,
+  "CLI::Driver" => 0,
   "Carp" => 0,
   "Crypt::Blowfish" => 0,
   "Crypt::CBC" => 0,
@@ -66,7 +82,9 @@ my %FallbackPrereqs = (
   "File::Basename" => 0,
   "File::LibMagic" => 0,
   "File::Path" => 0,
+  "File::ShareDir" => 0,
   "FileHandle" => 0,
+  "Getopt::Long" => 0,
   "IPC::Run3" => 0,
   "Kavorka" => 0,
   "List::Util" => 0,
@@ -75,6 +93,7 @@ my %FallbackPrereqs = (
   "Moose::Role" => 0,
   "Path::Iterator::Rule" => 0,
   "Scalar::Util::Numeric" => 0,
+  "Sort::Naturally" => 0,
   "String::Util" => 0,
   "Test2::Plugin::DieOnFail" => 0,
   "Test2::V0" => 0,
@@ -84,7 +103,8 @@ my %FallbackPrereqs = (
   "Try::Tiny" => 0,
   "constant" => 0,
   "namespace::autoclean" => 0,
-  "vars" => 0
+  "vars" => 0,
+  "warnings" => 0
 );
 
 
@@ -98,3 +118,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

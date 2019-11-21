@@ -1,5 +1,5 @@
 package MsgPack::Raw::Ext;
-$MsgPack::Raw::Ext::VERSION = '0.03';
+$MsgPack::Raw::Ext::VERSION = '0.04';
 use strict;
 use warnings;
 use overload
@@ -29,7 +29,7 @@ MsgPack::Raw::Ext - msgpack Ext class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ MessagePack Ext class
 
 =head2 new( $type, $data)
 
-TODO
+Create a new ext type.
 
 =head1 AUTHOR
 

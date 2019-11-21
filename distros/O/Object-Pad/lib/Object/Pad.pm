@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp;
 
@@ -48,8 +48,8 @@ C<Object::Pad> - a simple syntax for lexical slot-based objects
 
 =head1 DESCRIPTION
 
-B<WARNING> This is a highly experimental proof-of-concept. Please don't
-actually use this in production :)
+B<WARNING> This is an experimental proof-of-concept. Please don't actually
+use this in production unless you are crazy :)
 
 This module provides a simple syntax for creating object classes, which uses
 private variables that look like lexicals as object member fields.

@@ -1,11 +1,13 @@
 package App::DumpFirefoxHistory;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-11-21'; # DATE
+our $DIST = 'App-DumpFirefoxHistory'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 our %SPEC;
 
@@ -29,12 +31,20 @@ provide a directory name.
 
 _
         },
+        attempt_orig_first => {
+            schema => 'bool*',
+            default => 0,
+            'summary' => 'Attempt to open the original history database '.
+                'first instead of directly copying the database',
+            'summary.alt.bool.not' => 'Do not attempt to open the original history database '.
+                '(and possibly get a "locked" error), proceed directly to copy it',
+        },
         copy_size_limit => {
             schema => 'posint*',
             default => 100*1024*1024,
             description => <<'_',
 
-Chrome often locks the History database for a long time. If the size of the
+Firefox often locks the History database for a long time. If the size of the
 database is not too large (determine by checking against this limit), then the
 script will copy the file to a temporary file and extract the data from the
 copied database.
@@ -78,7 +88,11 @@ sub dump_firefox_history {
 
     my @rows;
     my $resmeta = {};
+    my $num_attempts;
   SELECT: {
+        $num_attempts++;
+        goto COPY if $num_attempts == 1 && !$args{attempt_orig_first};
+
         eval {
             my $dbh = DBI->connect("dbi:SQLite:dbname=$path", "", "", {RaiseError=>1});
             my $sth = $dbh->prepare("SELECT url,title,last_visit_date,visit_count,frecency FROM moz_places ORDER BY last_visit_date");
@@ -92,10 +106,19 @@ sub dump_firefox_history {
             }
         };
         my $err = $@;
-        if ($err && $err =~ /database is locked/ && (-s $path) <= $args{copy_size_limit}) {
+        log_info "Got DBI error: $@" if $err;
+      COPY: {
+            unless (!$args{attempt_orig_first} && $num_attempts == 1 || $err && $err =~ /database is locked/) {
+                last;
+            }
+            my $size = -s $path;
+            unless ($size <= $args{copy_size_limit}) {
+                log_trace "Not copying history database to tempfile, size too large (%.1fMB)", $size/1024/1024;
+            }
             require File::Copy;
             require File::Temp;
             my ($temp_fh, $temp_path) = File::Temp::tempfile();
+            log_trace "Copying $path to $temp_path ...";
             File::Copy::copy($path, $temp_path) or die $err;
             $path = $temp_path;
             redo SELECT;
@@ -122,7 +145,7 @@ App::DumpFirefoxHistory - Dump Firefox history
 
 =head1 VERSION
 
-This document describes version 0.003 of App::DumpFirefoxHistory (from Perl distribution App-DumpFirefoxHistory), released on 2019-08-14.
+This document describes version 0.004 of App::DumpFirefoxHistory (from Perl distribution App-DumpFirefoxHistory), released on 2019-11-21.
 
 =head1 SYNOPSIS
 
@@ -145,9 +168,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<attempt_orig_first> => I<bool> (default: 0)
+
+Attempt to open the original history database first instead of directly copying the database.
+
 =item * B<copy_size_limit> => I<posint> (default: 104857600)
 
-Chrome often locks the History database for a long time. If the size of the
+Firefox often locks the History database for a long time. If the size of the
 database is not too large (determine by checking against this limit), then the
 script will copy the file to a temporary file and extract the data from the
 copied database.

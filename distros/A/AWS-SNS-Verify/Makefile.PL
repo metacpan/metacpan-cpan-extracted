@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "AWS::SNS::Verify",
   "PREREQ_PM" => {
     "CryptX" => 0,
+    "Data::Structure::Util" => 0,
     "HTTP::Tiny" => 0,
     "JSON" => 0,
     "MIME::Base64" => 0,
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "URI::URL" => 0
   },
-  "VERSION" => "0.0104",
+  "VERSION" => "0.0105",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,6 +36,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "CryptX" => 0,
+  "Data::Structure::Util" => 0,
   "HTTP::Tiny" => 0,
   "JSON" => 0,
   "MIME::Base64" => 0,

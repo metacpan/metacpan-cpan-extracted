@@ -1,0 +1,427 @@
+<?xml version="1.0" ?>
+<MaConDa>
+  <contaminant>
+    <name>
+      Acetic Acid
+    </name>
+    <formula>
+      C2H4O2
+    </formula>
+    <exact_mass>
+      60.02113
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)
+    </std_inchi>
+    <std_inchi_key>
+      QTBSBXVTEAMEQO-UHFFFAOYSA-N
+    </std_inchi_key>
+    <id>
+      CON00001
+    </id>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+    <pubchem_cid>
+      176
+    </pubchem_cid>
+    <reference>
+      Tong, H., Bell, D., Tabei, K., &amp; Siegel, M. M. (1999). Automated data massaging, interpretation, and E-mailing modules for high throughput open access mass spectrometry. Journal of the American Society for Mass Spectrometry, 10(11), 1174-1187, doi:10.1016/s1044-0305(99)00090-2.
+    </reference>
+    <ion_mode>
+      NEG
+    </ion_mode>
+    <mz>
+      59
+    </mz>
+    <exact_adduct_mass>
+      59.0138536
+    </exact_adduct_mass>
+    <ion_form>
+      [M-H]-
+    </ion_form>
+    <instrument_type>
+      Ion trap
+    </instrument_type>
+    <instrument>
+      Micromass Platform II
+    </instrument>
+    <chromatography>
+      LC
+    </chromatography>
+    <ion_source_type>
+      ESI
+    </ion_source_type>
+  </contaminant>
+  <contaminant>
+    <name>
+      Acetic Acid
+    </name>
+    <formula>
+      C2H4O2
+    </formula>
+    <exact_mass>
+      60.02113
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)
+    </std_inchi>
+    <std_inchi_key>
+      QTBSBXVTEAMEQO-UHFFFAOYSA-N
+    </std_inchi_key>
+    <id>
+      CON00001
+    </id>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+    <pubchem_cid>
+      176
+    </pubchem_cid>
+    <reference>
+      Ijames, C. F., Dutky, R. C., &amp; Fales, H. M. (1995). Iron carboxylate oxygen-centered-triangle complexes detected during electrospray use of organic acid modifiers with a comment on the Finnigan TSQ-700 electrospray inlet system. Journal of the American Society for Mass Spectrometry, 6(12), 1226-1231, doi:10.1016/1044-0305(95)00579-x.
+    </reference>
+    <ion_mode>
+      POS
+    </ion_mode>
+    <mz>
+      537.88
+    </mz>
+    <exact_adduct_mass>
+      537.8790134
+    </exact_adduct_mass>
+    <ion_form>
+      [M6-H6+Fe3+O]+
+    </ion_form>
+    <instrument_type>
+      Triple quadrupole
+    </instrument_type>
+    <instrument>
+      Finnigan TSQ-700
+    </instrument>
+    <chromatography>
+      
+    </chromatography>
+    <ion_source_type>
+      ESI
+    </ion_source_type>
+  </contaminant>
+  <contaminant>
+    <name>
+      Acetic Acid
+    </name>
+    <formula>
+      C2H4O2
+    </formula>
+    <exact_mass>
+      60.02113
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)
+    </std_inchi>
+    <std_inchi_key>
+      QTBSBXVTEAMEQO-UHFFFAOYSA-N
+    </std_inchi_key>
+    <id>
+      CON00001
+    </id>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+    <pubchem_cid>
+      176
+    </pubchem_cid>
+    <reference>
+      Ijames, C. F., Dutky, R. C., &amp; Fales, H. M. (1995). Iron carboxylate oxygen-centered-triangle complexes detected during electrospray use of organic acid modifiers with a comment on the Finnigan TSQ-700 electrospray inlet system. Journal of the American Society for Mass Spectrometry, 6(12), 1226-1231, doi:10.1016/1044-0305(95)00579-x.
+    </reference>
+    <ion_mode>
+      POS
+    </ion_mode>
+    <mz>
+      555
+    </mz>
+    <exact_adduct_mass>
+      555.8895784
+    </exact_adduct_mass>
+    <ion_form>
+      [M6-H6+H2O+Fe3+O]+
+    </ion_form>
+    <instrument_type>
+      Triple quadrupole
+    </instrument_type>
+    <instrument>
+      Finnigan TSQ-700
+    </instrument>
+    <chromatography>
+      
+    </chromatography>
+    <ion_source_type>
+      ESI
+    </ion_source_type>
+  </contaminant>
+  <contaminant>
+    <name>
+      Butyl Carbitol
+    </name>
+    <formula>
+      C8H18O3
+    </formula>
+    <exact_mass>
+      162.125595
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C8H18O3/c1-2-3-5-10-7-8-11-6-4-9/h9H,2-8H2,1H3
+    </std_inchi>
+    <std_inchi_key>
+      OAYXUHPQHDHDDZ-UHFFFAOYSA-N
+    </std_inchi_key>
+    <id>
+      CON00010
+    </id>
+    <type_of_contaminant>
+      Scintillation cocktail
+    </type_of_contaminant>
+    <pubchem_cid>
+      8177
+    </pubchem_cid>
+    <reference>
+      Gibson, C. R., &amp; Brown, C. M. (2003). Identification of diethylene glycol monobutyl ether as a source of contamination in an ion trap mass spectrometer. Journal of the American Society for Mass Spectrometry, 14(11), 1247-1249, doi:10.1016/s1044-0305(03)00534-8.
+    </reference>
+    <ion_mode>
+      POS
+    </ion_mode>
+    <mz>
+      324.9
+    </mz>
+    <exact_adduct_mass>
+      325.2584664
+    </exact_adduct_mass>
+    <ion_form>
+      [M2+H]+
+    </ion_form>
+    <instrument_type>
+      Ion trap
+    </instrument_type>
+    <instrument>
+      ThermoFinnigan LCQ Deca XP
+    </instrument>
+    <chromatography>
+      LC
+    </chromatography>
+    <ion_source_type>
+      ESI
+    </ion_source_type>
+  </contaminant>
+  <contaminant>
+    <name>
+      Butylated Hydroxyanisole
+    </name>
+    <formula>
+      C11H16O2
+    </formula>
+    <exact_mass>
+      180.11503
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C11H16O2/c1-11(2,3)9-7-8(13-4)5-6-10(9)12/h5-7,12H,1-4H3
+    </std_inchi>
+    <std_inchi_key>
+      MRBKEAMVRSLQPH-UHFFFAOYSA-N
+    </std_inchi_key>
+    <id>
+      CON00011
+    </id>
+    <type_of_contaminant>
+      Antioxidant
+    </type_of_contaminant>
+    <pubchem_cid>
+      11954184
+    </pubchem_cid>
+    <reference>
+      Keller, B. O., Suj, J., Young, A. B., &amp; Whittal, R. M. (2008). Interferences and contaminants encountered in modern mass spectrometry. Analytica Chimica Acta, 627(1), 71-81, doi:10.1016/j.aca.2008.04.043.
+    </reference>
+    <ion_mode>
+      POS
+    </ion_mode>
+    <mz>
+      181.122306
+    </mz>
+    <exact_adduct_mass>
+      181.1223064
+    </exact_adduct_mass>
+    <ion_form>
+      [M+H]+
+    </ion_form>
+    <instrument_type>
+      
+    </instrument_type>
+    <instrument>
+      
+    </instrument>
+    <chromatography>
+      
+    </chromatography>
+    <ion_source_type>
+      
+    </ion_source_type>
+  </contaminant>
+  <contaminant>
+    <name>
+      Butylated Hydroxyanisole
+    </name>
+    <formula>
+      C11H16O2
+    </formula>
+    <exact_mass>
+      180.11503
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C11H16O2/c1-11(2,3)9-7-8(13-4)5-6-10(9)12/h5-7,12H,1-4H3
+    </std_inchi>
+    <std_inchi_key>
+      MRBKEAMVRSLQPH-UHFFFAOYSA-N
+    </std_inchi_key>
+    <id>
+      CON00011
+    </id>
+    <type_of_contaminant>
+      Antioxidant
+    </type_of_contaminant>
+    <pubchem_cid>
+      11954184
+    </pubchem_cid>
+    <reference>
+      Keller, B. O., Suj, J., Young, A. B., &amp; Whittal, R. M. (2008). Interferences and contaminants encountered in modern mass spectrometry. Analytica Chimica Acta, 627(1), 71-81, doi:10.1016/j.aca.2008.04.043.
+    </reference>
+    <ion_mode>
+      POS
+    </ion_mode>
+    <mz>
+      203.104249
+    </mz>
+    <exact_adduct_mass>
+      203.1042514
+    </exact_adduct_mass>
+    <ion_form>
+      [M+Na]+
+    </ion_form>
+    <instrument_type>
+      
+    </instrument_type>
+    <instrument>
+      
+    </instrument>
+    <chromatography>
+      
+    </chromatography>
+    <ion_source_type>
+      
+    </ion_source_type>
+  </contaminant>
+  <contaminant>
+    <name>
+      4-HCCA
+    </name>
+    <formula>
+      C10H7NO3
+    </formula>
+    <exact_mass>
+      189.042594
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C10H7NO3/c11-6-8(10(13)14)5-7-1-3-9(12)4-2-7/h1-5,12H,(H,13,14)/b8-5+
+    </std_inchi>
+    <std_inchi_key>
+      AFVLVVWMAFSXCK-VMPITWQZSA-N
+    </std_inchi_key>
+    <id>
+      CON00298
+    </id>
+    <type_of_contaminant>
+      Matrix compound
+    </type_of_contaminant>
+    <pubchem_cid>
+      5328791
+    </pubchem_cid>
+    <reference>
+      Keller, B. O., Suj, J., Young, A. B., &amp; Whittal, R. M. (2008). Interferences and contaminants encountered in modern mass spectrometry. Analytica Chimica Acta, 627(1), 71-81, doi:10.1016/j.aca.2008.04.043.
+    </reference>
+    <ion_mode>
+      POS
+    </ion_mode>
+    <mz>
+      441.01479
+    </mz>
+    <exact_adduct_mass>
+      441.0142384
+    </exact_adduct_mass>
+    <ion_form>
+      [M2+63Cu(I)]+
+    </ion_form>
+    <instrument_type>
+      
+    </instrument_type>
+    <instrument>
+      
+    </instrument>
+    <chromatography>
+      
+    </chromatography>
+    <ion_source_type>
+      
+    </ion_source_type>
+  </contaminant>
+  <contaminant>
+    <name>
+      unknown
+    </name>
+    <formula>
+      unknown
+    </formula>
+    <exact_mass>
+      0.0
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <id>
+      CON00315
+    </id>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <reference>
+      NewObjective Common Background Ions for Electrospray (Positive Ion). http://www.newobjective.com/downloads/technotes/PV-3.pdf.
+    </reference>
+    <ion_mode>
+      POS
+    </ion_mode>
+    <mz>
+      933
+    </mz>
+    <exact_adduct_mass>
+      0.0
+    </exact_adduct_mass>
+    <ion_form>
+      
+    </ion_form>
+    <instrument_type>
+      
+    </instrument_type>
+    <instrument>
+      
+    </instrument>
+    <chromatography>
+      
+    </chromatography>
+    <ion_source_type>
+      
+    </ion_source_type>
+  </contaminant>
+</MaConDa>

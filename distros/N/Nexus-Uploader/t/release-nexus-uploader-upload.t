@@ -27,13 +27,12 @@ require_ok('Nexus::Uploader');
     skip "Author tests",
         1
         unless my $uploader = Nexus::Uploader->new(
-        nexus_URL =>
-            'http://localhost:8081/nexus/content/repositories/releases',
-        username => 'admin',
-        password => 'admin123',
-        group    => 'BRAD',
-        artefact => 'Nexus::Uploader::Test',
-        version  => '1.0.' . time(),
+        nexus_URL => 'http://localhost:8081/nexus/content/repositories/releases',
+        username  => 'admin',
+        password  => 'admin123',
+        group     => 'BRAD.SVW',
+        artefact  => 'Nexus::Uploader::Test',
+        version   => '1.0.' . time(),
         );
     my $tar = Archive::Tar->new;
 

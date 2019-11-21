@@ -20,6 +20,13 @@
 #######################################################################
 
 
+2019-11-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000480 released
+
+        * Export clean_filehandle().
+
+
 2019-11-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000479 released

@@ -2,12 +2,17 @@ package Rarbg::torrentapi::Res;
 
 use strict;
 use 5.008_005;
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.2.0';
 use Moose;
 
-has [qw( category download info_page pubdate title)] => (
+has [qw( category download info_page pubdate )] => (
     is  => 'ro',
     isa => 'Str'
+);
+
+has title => (
+    is  => 'ro',
+    isa => 'Maybe[Str]'
 );
 
 has [qw( seeders leechers ranked size)] => (
@@ -17,9 +22,7 @@ has [qw( seeders leechers ranked size)] => (
 
 has episode_info => (
     is      => 'ro',
-    # sometimes we get undef, that breaks validation ...
-    # isa     => 'HashRef',
-    # default => sub { {} }
+    isa => 'Maybe[HashRef]'
 );
 
 no Moose;

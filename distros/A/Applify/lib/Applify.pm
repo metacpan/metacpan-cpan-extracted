@@ -13,7 +13,7 @@ use constant SUB_NAME_IS_AVAILABLE => $INC{'App/FatPacker/Trace.pm'}
 our $INSTANTIATING = 0;
 our $PERLDOC       = 'perldoc';
 our $SUBCMD_PREFIX = 'command';
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 my $ANON = 0;
 
 sub app {
@@ -169,7 +169,7 @@ sub print_help {
 
 OPTION:
   for my $option (@options) {
-    my $length = length $option->{name};
+    my $length = length($option->{name} || '');
     $width = $length if $width < $length;
   }
 
@@ -464,7 +464,7 @@ Applify - Write object oriented scripts with ease
 
 =head1 VERSION
 
-0.19
+0.20
 
 =head1 DESCRIPTION
 

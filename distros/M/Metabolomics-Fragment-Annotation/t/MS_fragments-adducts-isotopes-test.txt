@@ -1,0 +1,7 @@
+type	losses_or_gains	delta_mass	annotation_in_pos_mode	annotation_in_neg_mode
+adduct	-2H+Na+K	59.9378259		
+adduct	-H+K	37.95588165			
+isotope	13C db 	0.501677419		
+isotope	15N	0.997034893					
+fragment	-(C11H18O9)	-294.0950822		
+fragment	-(C12H16O12)	-352.064176			

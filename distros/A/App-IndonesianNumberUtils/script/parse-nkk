@@ -1,21 +1,25 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Business/ID/NKK/parse_nkk
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2018-04-08'; # DATE
+our $DATE = '2019-11-21'; # DATE
 our $DIST = 'App-IndonesianNumberUtils'; # DIST
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Business/ID/NKK/parse_nkk",
     program_name => "parse-nkk",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
 );
 
 $cmdline->run;
@@ -35,7 +39,7 @@ parse-nkk - Parse Indonesian family card number (nomor kartu keluarga, NKK)
 
 =head1 VERSION
 
-This document describes version 0.030 of parse-nkk (from Perl distribution App-IndonesianNumberUtils), released on 2018-04-08.
+This document describes version 0.031 of parse-nkk (from Perl distribution App-IndonesianNumberUtils), released on 2019-11-21.
 
 =head1 SYNOPSIS
 
@@ -61,33 +65,29 @@ Input NKK to be validated.
 
 =back
 
-=head2 Configuration options
+=head2 Logging options
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--debug>
 
-Set path to configuration file.
+Shortcut for --log-level=debug.
 
-Can be specified multiple times.
+=item B<--log-level>=I<s>
 
-=item B<--config-profile>=I<s>
+Set log level.
 
-Set configuration profile to use.
+=item B<--quiet>
 
-=item B<--no-config>
+Shortcut for --log-level=error.
 
-Do not use any configuration file.
+=item B<--trace>
 
-=back
+Shortcut for --log-level=trace.
 
-=head2 Environment options
+=item B<--verbose>
 
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
+Shortcut for --log-level=info.
 
 =back
 
@@ -178,44 +178,6 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/parse-nkk.conf>, F<~/parse-nkk.conf>, or F</etc/parse-nkk.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-List of available configuration parameters:
-
- check_locality (see --no-check-locality)
- check_province (see --no-check-province)
- format (see --format)
- naked_res (see --naked-res)
- nkk (see --nkk)
-
-=head1 ENVIRONMENT
-
-=head2 PARSE_NKK_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/parse-nkk.conf>
-
-F<~/parse-nkk.conf>
-
-F</etc/parse-nkk.conf>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-IndonesianNumberUtils>.
@@ -238,7 +200,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,12 @@
+0.004   2019-11-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add --attempt-orig-first (default false). So now by default we
+          copy the database first.
+
+	- [ux] Simplify CLI by disabling reading config/env, enable
+	  logging.
+
+
 0.003   2019-08-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Like dump-chrome-history, now also copy places.sqlite to a

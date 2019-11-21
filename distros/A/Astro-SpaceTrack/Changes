@@ -1,3 +1,8 @@
+0.133		2019-11-21	T. R. Wyant
+    Add celestrak_supplemental() 'starlink' dataset
+
+    Eliminate redirects in POD URL links.
+
 0.132		2019-08-05	T. R. Wyant
     Update canned status table for decay of
 

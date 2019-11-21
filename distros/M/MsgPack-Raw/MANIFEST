@@ -193,6 +193,7 @@ t/02-packer_ext.t
 t/02-packer_fixed.t
 t/02-packer_float.t
 t/02-packer_hash.t
+t/02-packer_invalid.t
 t/02-packer_signed.t
 t/02-packer_unsigned.t
 t/02-packer_utf8.t

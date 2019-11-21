@@ -1,9 +1,44 @@
 ==================================================
-Changes from 2017-10-20 00:00:00 +0000 to present.
+Changes from 2017-11-21 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 7.4 at 2019-10-20 13:28:14 +0000
+version 7.5 at 2019-11-21 21:39:39 +0000
+----------------------------------------
+
+  Change: eef552859755c3b446755232ef5cdab4fe39713f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-11-21 13:39:18 +0000
+
+    Version 7.5 Release 
+
+  Change: fdccadaf74838e2876b5d370978ba780a8bbb819
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-11-21 13:33:31 +0000
+
+    Include count in the --by ordering
+
+    The default sort order for --by does not take into account the count of the
+    sub buckets. This adds a secondary sort descending on the count of objects
+    in each bucket. 
+
+  Change: a27a8b23f9bfd25259539dbae83a54ffc5a40cc7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-11-21 13:10:17 +0000
+
+    Make ::Query objects able to execute
+
+    This was an oversight on my part. The `::Query` object now supports
+    `->execute( $list_of_indexes )` directly. This makes working with the
+    library easier as folks don't need to read docs on the `es_request()`
+    function to figure out how to construct a search.
+
+    Additionally, `scroll_id`'s are automatically extracted from the result
+    set. Calls to `->scroll_results()` will allow scrolling without having to
+    understand the mechanics of the scroll. 
+
+----------------------------------------
+version 7.4 at 2019-10-20 13:24:50 +0000
 ----------------------------------------
 
   Change: be1145db74f2394ae9c4f2747332cc03d3f7ca07
@@ -949,5 +984,5 @@ version 5.5 at 2018-03-17 06:01:25 +0000
     document * Change to an array so you can add multiple --show's 
 
 =================================================
-Plus 61 releases after 2017-10-20 00:00:00 +0000.
+Plus 61 releases after 2017-11-21 00:00:00 +0000.
 =================================================

@@ -55,6 +55,8 @@ subtest 'Build a basic dist' => sub {
                     { name => 'OurExternal-Package' },
                     '@Author::GSG',
                 ),
+                'source/README.md'     => 'Excluded',
+                'source/LICENSE.txt'   => 'Excluded',
                 'source/lib/External/Package.pm' =>
                     "package External::Package;\n# ABSTRACT: ABSTRACT\n# VERSION\n1;",
             }
@@ -69,6 +71,22 @@ subtest 'Build a basic dist' => sub {
     $source_git->commit( -a => { m => "Add new files for Git::GatherDir" });
 
     $tzil->build;
+
+    Test::Deep::cmp_bag [ map { $_->name } @{ $tzil->files } ], [
+       'META.yml',
+       'LICENSE',
+       'README',
+       'Makefile.PL',
+       'MANIFEST',
+       'META.json',
+       'CHANGES',
+       'cpanfile',
+       'dist.ini',
+       'lib/External/Package.pm',
+       't/00-compile.t',
+       't/00-report-prereqs.t',
+       't/00-report-prereqs.dd'
+     ], "Gathered the files we expect";
 
     my $built = $tzil->slurp_file('build/lib/External/Package.pm');
     like $built, qr/\nour \$VERSION = 'v0.0.1';/,
@@ -260,6 +278,41 @@ subtest "Override MetaProvides subclass" => sub {
         \@meta_provides_plugins,
         ['@Author::GSG/MetaProvides::Fake'],
         "Correctly only have the fake MetaProvides Plugin"
+    );
+};
+
+subtest "Pass through Git::GatherDir params" => sub {
+    my $tzil = Builder->from_config(
+        { dist_root => 'corpus/dist/git-gather_dir' },
+        {   add_files => {
+                'source/dist.ini' => dist_ini(
+                    { name           => 'External-Fake' },
+                    [ '@Author::GSG' => {
+                        include_dotfiles => 1,
+                        exclude_filename => [ qw< foo bar > ],
+                        exclude_match => [ q{baz}, q{qu+x} ],
+                    } ],
+                ),
+            }
+        }
+    );
+
+    my ($plugin)
+        = grep { $_->plugin_name =~ /\bGit::GatherDir\b/ }
+        @{ $tzil->plugins };
+
+    ok $plugin->include_dotfiles, "Enabled include_dotfiles";
+
+    Test::Deep::cmp_bag(
+        $plugin->exclude_filename,
+        [qw< foo bar README.md LICENSE.txt >],
+        "Added to the exclude_filename list"
+    );
+
+    Test::Deep::cmp_bag(
+        $plugin->exclude_match,
+        [q{baz}, q{qu+x}],
+        "Added to the exclude_match list"
     );
 };
 

@@ -4,13 +4,13 @@
       "Nikolay Shulyakovskiy <n.shulyakovskiy@corp.mail.ru>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "MouseX-AttributeTraitHelper-Merge",
    "no_index" : {
@@ -21,11 +21,6 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
@@ -46,9 +41,8 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "web" : "https://gitlab.corp.mail.ru/mydev/mousex-attributetraithelper"
+         "web" : "https://github.com/my-mail-ru/MouseX-AttributeTraitHelper-Merge"
       }
    },
-   "version" : "0.9",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.99"
 }

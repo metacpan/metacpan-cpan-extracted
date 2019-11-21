@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.705';
+our $VERSION = '1.706';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -70,7 +70,6 @@ sub _defaults {
         info                => '',
         keep                => 5,
         layout              => 1,
-        #lf                 => undef,
         #ll                 => undef,
         #mark               => undef,
         #max_height         => undef,
@@ -82,6 +81,8 @@ sub _defaults {
         pad                 => 2,
         page                => 1,
         #prompt             => undef,
+        #tabs_info          => undef,
+        #tabs_prompt        => undef,
         undef               => '<undef>',
         #busy_string        => undef,
     };
@@ -93,12 +94,12 @@ sub _valid_options {
         beep                => '[ 0 1 ]',
         clear_screen        => '[ 0 1 ]',
         codepage_mapping    => '[ 0 1 ]',
-        color               => '[ 0 1 ]',
         hide_cursor         => '[ 0 1 ]',
         index               => '[ 0 1 ]',
         order               => '[ 0 1 ]',
         page                => '[ 0 1 ]',
         alignment           => '[ 0 1 2 ]',
+        color               => '[ 0 1 2 ]',
         justify             => '[ 0 1 2 ]',         # 05.09.2019    # after transition -> remove
         include_highlighted => '[ 0 1 2 ]',
         layout              => '[ 0 1 2 3 ]',
@@ -109,10 +110,12 @@ sub _valid_options {
         max_width           => '[ 1-9 ][ 0-9 ]*',
         default             => '[ 0-9 ]+',
         pad                 => '[ 0-9 ]+',
-        lf                  => 'ARRAY',
+        lf                  => 'ARRAY',     # 21.11.2019    # after transition -> remove
         mark                => 'ARRAY',
         meta_items          => 'ARRAY',
         no_spacebar         => 'ARRAY',
+        tabs_info           => 'ARRAY',
+        tabs_prompt         => 'ARRAY',
         empty               => 'Str',
         info                => 'Str',
         prompt              => 'Str',
@@ -237,6 +240,13 @@ sub __choose {
         ##### 05.09.2019
         if ( ! defined $opt->{alignment} && defined $opt->{justify} ) {
             $opt->{alignment} = $opt->{justify};
+        }
+        #####
+
+        ##### 21.11.2019
+        if ( ! defined $opt->{tabs_prompt} && ! defined $opt->{tabs_info} && defined $opt->{lf} ) {
+            $opt->{tabs_prompt} = $opt->{lf};
+            $opt->{tabs_info} = $opt->{lf};
         }
         #####
 
@@ -639,26 +649,34 @@ sub __beep {
 }
 
 
-
 sub __prepare_promptline {
     my ( $self ) = @_;
     my $prompt = '';
     if ( length $self->{info} ) {
-        $prompt .= $self->{info};
-        $prompt .= "\n" if length $self->{prompt};
+        my $init   = $self->{tabs_info}[0] ? $self->{tabs_info}[0] : 0;
+        my $subseq = $self->{tabs_info}[1] ? $self->{tabs_info}[1] : 0;
+        $prompt .= line_fold(
+            $self->{info}, $self->{avail_width},
+            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color} }
+        );
     }
-    $prompt .= $self->{prompt};
+    if ( length $self->{prompt} ) {
+        if ( length $prompt ) {
+            $prompt .= "\n";
+        }
+        my $init   = $self->{tabs_prompt}[0] ? $self->{tabs_prompt}[0] : 0;
+        my $subseq = $self->{tabs_prompt}[1] ? $self->{tabs_prompt}[1] : 0;
+        $prompt .= line_fold(
+            $self->{prompt}, $self->{avail_width},
+            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color} }
+        );
+    }
     if ( $prompt eq '' ) {
         $self->{prompt_copy} = '';
         $self->{count_prompt_lines} = 0;
         return;
     }
-    my $init   = $self->{lf}[0] ? $self->{lf}[0] : 0;
-    my $subseq = $self->{lf}[1] ? $self->{lf}[1] : 0;
-    $self->{prompt_copy} = line_fold(
-        $prompt, $self->{avail_width},
-        { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color} }
-    );
+    $self->{prompt_copy} = $prompt;
     $self->{prompt_copy} .= "\n\r";
     # s/\n/\n\r/g; -> stty 'raw' mode and Term::Readkey 'ultra-raw' mode
     #                 don't translate newline to carriage return-newline
@@ -797,7 +815,7 @@ sub __wr_cell {
         if ( $self->{color} ) {
             my $str = $self->{list}[$idx];
             if ( $emphasised ) {
-                if ( $is_current_pos ) {
+                if ( $is_current_pos && $self->{color} == 1 ) {
                     # no color for selected cell
                     $str =~ s/(\e\[[\d;]*m)//g;
                 }
@@ -856,7 +874,7 @@ sub __wr_cell {
                     $_ .= $emphasised;
                 }
                 $str = $emphasised . $str . normal();
-                if ( $is_current_pos ) {
+                if ( $is_current_pos && $self->{color} == 1 ) {
                     # no color for selected cell
                     @color = ();
                     $str =~ s/\x{feff}//g;
@@ -1171,7 +1189,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.705
+Version 1.706
 
 =cut
 
@@ -1423,11 +1441,14 @@ Setting this option to C<1> enables the codepage mapping offered by L<Win32::Con
 
 =head3 color
 
-Setting this option to C<1> enables the support for color and text formatting escape sequences.
+Enable the support for color and text formatting escape sequences.
 
 0 - off (default)
 
-1 - on
+1 - Enables the support for color and text formatting escape sequences except for the current selected element.
+
+2 - Enables the support for color and text formatting escape sequences including for the current selected element (shown
+in inverted colors).
 
 =head3 default
 
@@ -1544,20 +1565,9 @@ From broad to narrow: 0 > 1 > 2 > 3
 
 =back
 
-=head3 lf
+=head3 lf DEPRECATED
 
-If I<prompt> and I<info> lines are folded, the option I<lf> allows one to insert spaces at beginning of the folded lines.
-
-The option I<lf> expects a reference to an array with one or two elements:
-
-- the first element (initial tab) sets the number of spaces inserted at beginning of paragraphs
-
-- a second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart
-from the beginning of paragraphs
-
-Allowed values for the two elements are: 0 or greater.
-
-(default: undefined)
+The option I<lf> is deprecated and will be removed. Use I<tabs_prompt> and I<tabs_info> instead.
 
 =head3 ll
 
@@ -1648,6 +1658,36 @@ If the I<prompt> value is an empty string ("") no prompt-line will be shown.
 default in list and scalar context: C<Your choice:>
 
 default in void context: C<Close with ENTER>
+
+=head3 tabs_info
+
+If I<info> lines are folded, the option I<tabs_info> allows one to insert spaces at beginning of the folded lines.
+
+The option I<tabs_info> expects a reference to an array with one or two elements:
+
+- the first element (initial tab) sets the number of spaces inserted at beginning of paragraphs
+
+- a second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart
+from the beginning of paragraphs
+
+Allowed values for the two elements are: 0 or greater.
+
+(default: undefined)
+
+=head3 tabs_prompt
+
+If I<prompt> lines are folded, the option I<tabs_prompt> allows one to insert spaces at beginning of the folded lines.
+
+The option I<tabs_prompt> expects a reference to an array with one or two elements:
+
+- the first element (initial tab) sets the number of spaces inserted at beginning of paragraphs
+
+- a second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart
+from the beginning of paragraphs
+
+Allowed values for the two elements are: 0 or greater.
+
+(default: undefined)
 
 =head3 undef
 

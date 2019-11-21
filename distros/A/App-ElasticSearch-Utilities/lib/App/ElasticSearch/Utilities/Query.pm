@@ -4,8 +4,9 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '7.4'; # VERSION
+our $VERSION = '7.5'; # VERSION
 
+use App::ElasticSearch::Utilities qw(es_request);
 use CLI::Helpers qw(:output);
 use Clone qw(clone);
 use Moo;
@@ -33,6 +34,16 @@ has query_stash => (
     init_arg => undef,
     default  => sub {{}},
 );
+
+
+has scroll_id => (
+    is       => 'rw',
+    isa      => Str,
+    init_arg => undef,
+    writer   => 'set_scroll_id',
+    clearer  => 1,
+);
+
 
 
 my %QUERY = (
@@ -90,6 +101,54 @@ foreach my $attr (keys %PARAMS) {
         writer   => "set_$attr",
         %{ $PARAMS{$attr} },
     );
+}
+
+
+sub as_search {
+    my ($self,$indexes) = @_;
+    return (
+        _search => {
+            index     => $indexes,
+            uri_param => $self->uri_params,
+            method    => 'POST',
+        },
+        $self->request_body,
+    );
+}
+
+
+sub execute {
+    my($self,$indexes) = @_;
+
+    my $result = es_request( $self->as_search($indexes) );
+
+    if( $result->{_scroll_id} ) {
+        $self->set_scroll_id($result->{_scroll_id})
+    }
+
+    return $result;
+}
+
+
+sub scroll_results {
+    my($self) = @_;
+    my $result;
+    if( $self->scroll_id ) {
+        $result = es_request( '_search/scroll',
+                { method => 'POST' },
+                {
+                    scroll => $self->scroll,
+                    scroll_id => $self->scroll_id,
+                }
+        );
+        if( $result && $result->{_scroll_id} ) {
+            $self->set_scroll_id($result->{_scroll_id})
+        }
+        else {
+            $self->clear_scroll_id();
+        }
+    }
+    return $result ? $result : ();
 }
 
 
@@ -265,6 +324,8 @@ sub stash {
         if( defined $condition ) {
             debug({color=>exists $stash->{$section} ? 'green' : 'red' }, "setting $section in stash");
             $stash->{$section} = $condition;
+            # Reset Scroll ID
+            $self->clear_scroll_id();
         }
     }
     return exists $stash->{$section} ? $stash->{$section} : undef;
@@ -283,7 +344,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 7.4
+version 7.5
 
 =head1 ATTRIBUTES
 
@@ -294,6 +355,11 @@ A hash reference with the field data from L<App::ElasticSearch::Utilities::es_in
 =head2 query_stash
 
 Hash reference containing replaceable query elements.  See L<stash>.
+
+=head2 scroll_id
+
+The scroll id for the last executed query.  You shouldn't mess with this
+directly. It's best to use the L<execute()> and L<scroll_results()> methods.
 
 =head2 must
 
@@ -401,6 +467,19 @@ set it to a valid `search_type` setting, see:
 L<https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html#request-body-search-search-type>
 
 =head1 METHODS
+
+=head2 as_search( [ 'index1', 'index2' ] )
+
+Returns a list of parameters to pass directly to C<es_request()>.
+
+=head2 execute( [ $index1, $index2 ] )
+
+Uses `es_request()` to return the result, stores any relevant scroll data.
+
+=head2 scroll_results()
+
+If a scroll has been set, this will construct and run the requisite scroll
+search, otherwise it returns undef.
 
 =head2 uri_params()
 

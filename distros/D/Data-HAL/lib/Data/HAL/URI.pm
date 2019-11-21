@@ -4,7 +4,7 @@ use Moo; # has
 use Types::Standard qw(InstanceOf Str);
 use URI qw();
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 has('_original', is => 'rw', isa => Str);
 # just records what was passed to the constructor, this is a work-around for
@@ -53,7 +53,7 @@ Data::HAL::URI - URI wrapper
 
 =head1 VERSION
 
-This document describes Data::HAL::URI version 1.000
+This document describes Data::HAL::URI version 1.001
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,10 @@
 Revision history for Nexus-Uploader
 
+1.0.1     2019-11-21 12:39:14+01:00 Europe/Hamburg
+
+  - Fix rt.cpan.org ticket #130781 (wrong group processing).
+  - Fix rt.cpan.org ticket #130790 (uploads archive name instead of archive content).
+
 1.0.0     2016-09-26 23:40:49+01:00 Europe/Dublin
 
   - Remove the 'content/repositories' string from the plugin and instead require users enter that part of the path in nexus_URL for 2.x instances.

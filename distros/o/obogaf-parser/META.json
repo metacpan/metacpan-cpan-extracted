@@ -56,7 +56,7 @@
    "provides" : {
       "obogaf::parser" : {
          "file" : "lib/obogaf/parser.pm",
-         "version" : "1.271"
+         "version" : "1.272"
       }
    },
    "release_status" : "stable",
@@ -67,6 +67,6 @@
          "web" : "https://github.com/marconotaro/obogaf-parser"
       }
    },
-   "version" : "1.271",
+   "version" : "1.272",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

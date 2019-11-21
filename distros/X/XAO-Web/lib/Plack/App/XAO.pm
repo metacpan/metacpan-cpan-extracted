@@ -185,8 +185,6 @@ From a command line:
 
 =head1 DESCRIPTION
 
-B<Work in progress!> Do not use in production code yet.
-
 This is a simple adapter allowing to run a XAO::Web web site with Plack
 and the multitude of servers that support PSGI interface.
 
@@ -203,6 +201,7 @@ L<Apache::XAO> module uses:
     path_mapping_table => {
         '/images' => {
             type        => 'maptodir',
+            max_age     => 7*24*3600,
         },
     },
 

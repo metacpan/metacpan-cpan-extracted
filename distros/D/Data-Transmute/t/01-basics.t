@@ -228,6 +228,46 @@ subtest transmute_data => sub {
         );
     };
 
+    subtest "rule: modify_hash_value" => sub {
+        test_transmute_data(
+            name   => "data not hash -> noop",
+            data   => ["foo"],
+            rules  => [ [modify_hash_value=>{name=>"a", from=>1, to=>2}] ],
+            result => ["foo"],
+        );
+        test_transmute_data(
+            name   => "required argument: name",
+            data   => {a=>1},
+            rules  => [ [modify_hash_value=>{from=>1, to=>2}] ],
+            dies   => 1,
+        );
+        test_transmute_data(
+            name   => "key (name) does not exist -> dies",
+            data   => {b=>1},
+            rules  => [ [modify_hash_value=>{name=>"a", from=>1, to=>2}] ],
+            dies   => 1,
+        );
+        test_transmute_data(
+            name   => "original value does not equal 'from' -> dies",
+            data   => {a=>3},
+            rules  => [ [modify_hash_value=>{name=>"a", from=>1, to=>2}] ],
+            dies   => 1,
+        );
+        test_transmute_data(
+            name   => "modify a",
+            data   => {a=>1},
+            rules  => [ [modify_hash_value=>{name=>"a", from=>1, to=>2}] ],
+            result => {a=>2},
+        );
+        test_transmute_data(
+            name   => "from is optional",
+            data   => {a=>3},
+            rules  => [ [modify_hash_value=>{name=>"a", to=>2}] ],
+            result => {a=>2},
+            reverse_dies => 1,
+        );
+    };
+
     subtest "rule: delete_hash_key" => sub {
         test_transmute_data(
             name   => "data not hash -> noop",

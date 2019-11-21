@@ -6,7 +6,7 @@
 # podDocumentation
 package Parser::LR;
 require v5.26;
-our $VERSION = 20191121;
+our $VERSION = 20191122;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -570,6 +570,47 @@ sub printParseTree($$;$)                                                        
   $r
  } # printParseTree
 
+sub printParseTreeAsBrackets($$;$)                                              # Print a parse tree as XML.
+ {my ($grammar, $tree, $indent) = @_;                                           # Grammar, parse tree, optional indent level
+  my @r;
+  my @rules = $grammar->rules->@*;
+
+  my $print; $print = sub                                                       # Print sub tree
+   {my ($stack, $depth) = @_;
+    my $s = q(  ) x $depth;
+
+    if (ref($stack))
+     {if (defined(my ($r) = @$stack))
+       {my ($rule) = $rules[$r];
+        my (undef, @exp) = @$stack;
+        my $n = $rule->rule;
+        my $e = $rule->expandable;
+        my $E = printSymbolAsXml($e);
+        push @r, qq(\n$s$E);
+        for my $s(@exp)
+         {$print->($s, $depth+1);
+         }
+        push @r, qq(\n$s$E);
+       }
+     }
+    else
+     {my $t = printSymbolAsXml($stack);
+      push @r, $t;
+     }
+   };
+
+  return q() unless $tree;                                                      # Empty tree
+
+  $print->($tree, $indent//0);
+
+  my $r = join ' ', @r, "\n";
+     $r =~ s( +\n)  (\n)gs;
+     $r =~ s(\s+\Z) (\n)gs;
+     $r =~ s(\A\s+) ()gs;
+  owf($logFile, $r) if -e $logFile;                                             # Log the result if requested
+  $r
+ } # printParseTreeAsBrackets
+
 sub printParseTreeAsXml($$;$)                                                   # Print a parse tree as XML.
  {my ($grammar, $tree, $indent) = @_;                                           # Grammar, parse tree, optional indent level
   my @r;
@@ -656,145 +697,71 @@ Create an LR grammar from rules expressed one rule per line of a string.  Each
 rule starts with an expandable symbol followed by one possible expansion as a
 mixture of expandable and terminal symbols:
 
-    my $grammar = compileGrammar(<<END);
+  my $grammar = compileGrammar(<<END);
   A  A + B
   A  B
   B  B * C
   B  C
   C  n
+  C  D C
+  D  ++
+  D  --
+  C  C E
+  E  **
+  E  //
+
   C  ( A )
   C  [ A ]
   C  { A }
   C  ( )
   C  [ ]
   C  { }
-  END
 
-Print the grammar with L<printGrammar> (substituting non recursive
-expandables):
-
-    ok printGrammar($grammar) eq <<END;
-      Rule  Symbol  Expansion
-   1     0  A       A          +  B
-   2     1  A       B
-   3     2  B       B          *  n
-   4     3  B       B          *  (  A  )
-   5     4  B       B          *  [  A  ]
-   6     5  B       B          *  {  A  }
-   7     6  B       B          *  (  )
-   8     7  B       B          *  [  ]
-   9     8  B       B          *  {  }
-  10     9  B       n
-  11    10  B       (          A  )
-  12    11  B       [          A  ]
-  13    12  B       {          A  }
-  14    13  B       (          )
-  15    14  B       [          ]
-  16    15  B       {          }
+  C  D n
   END
 
 Use the grammar so created to parse a string an array of terminal symbols
 into a parse tree with L<parseWithGrammar>:
 
-    my $tree = parseWithGrammar($grammar, qw/( [ { }  ]  +  [ { n }  ] ) * [ n + n ]  /);
+  my $tree = parseWithGrammar($grammar, qw{n * (  ++ -- n ** //   + -- ++  n // ** )});
 
-Print the parse tree tree with L<printParseTree>:
+Print the parse tree tree, perhaps with L<printParseTreeAsBrackets> or L<printParseTreeAsXml>:
 
-    ok printParseTree($grammar, $tree) eq <<END;
-      Rule  Expandable         Terminal
-   1     1  A
-   2     4    B
-   3    10      B
-   4                           (
-   5     0        A
-   6     1          A
-   7    11            B
-   8                           [
-   9     1              A
-  10    15                B
-  11                           {
-  12                           }
-  13                           ]
-  14                           +
-  15    11          B
-  16                           [
-  17     1            A
-  18    12              B
-  19                           {
-  20     1                A
-  21     9                  B
-  22                           n
-  23                           }
-  24                           ]
-  25                           )
-  26                           *
-  27                           [
-  28     0      A
-  29     1        A
-  30     9          B
-  31                           n
-  32                           +
-  33     9        B
-  34                           n
-  35                           ]
-  END
-
-Or print the parse tree as XML with: L<printParseTreeAsXml> and apply L<Data::Edit::Xml> to process it
-further:
-
-    ok printParseTreeAsXml($grammar, $tree) eq <<END;
-  <A rule="1">
-    <B rule="4">
-      <B rule="10">
-        <"(" pos="0"/>
-        <A rule="0">
-          <A rule="1">
-            <B rule="11">
-              <"[" pos="1"/>
-              <A rule="1">
-                <B rule="15">
-                  <"{" pos="2"/>
-                  <"}" pos="3"/>
-                </B>
-              </A>
-              <"]" pos="4"/>
-            </B>
-          </A>
-          <"+" pos="5"/>
-          <B rule="11">
-            <"[" pos="6"/>
-            <A rule="1">
-              <B rule="12">
-                <"{" pos="7"/>
-                <A rule="1">
-                  <B rule="9">
-                    <n pos="8"/>
-                  </B>
-                </A>
-                <"}" pos="9"/>
-              </B>
-            </A>
-            <"]" pos="10"/>
-          </B>
-        </A>
-        <")" pos="11"/>
-      </B>
-      <"*" pos="12"/>
-      <"[" pos="13"/>
-      <A rule="0">
-        <A rule="1">
-          <B rule="9">
-            <n pos="14"/>
-          </B>
-        </A>
-        <"+" pos="15"/>
-        <B rule="9">
-          <n pos="16"/>
-        </B>
-      </A>
-      <"]" pos="17"/>
-    </B>
-  </A>
+  ok printParseTreeAsBrackets($grammar, $tree) eq <<END;
+  A
+    B
+      B
+        C n
+        C
+      B "*"
+      C "("
+        A
+          A
+            B
+              C "++"
+                C
+                  C
+                    C "--" n
+                    C "**"
+                  C "//"
+                C
+              C
+            B
+          A "+"
+          B
+            C "--"
+              C
+                C
+                  C "++" n
+                  C "//"
+                C "**"
+              C
+            C
+          B
+        A ")"
+      C
+    B
+  A
   END
 
 =head1 Description
@@ -825,7 +792,7 @@ Compile a grammar from a set of rules expressed as a string with one rule per li
 B<Example:>
 
 
-  if (1) {                                                                              
+  if (1) {
     my $grammar = 𝗰𝗼𝗺𝗽𝗶𝗹𝗲𝗚𝗿𝗮𝗺𝗺𝗮𝗿(<<END);
   A  A + B
   A  B
@@ -839,7 +806,7 @@ B<Example:>
   C  [ ]
   C  { }
   END
-  
+
     ok printGrammar($grammar) eq <<END;
       Rule  Expandable  Expansion
    1     0  A           A          +  B
@@ -859,9 +826,9 @@ B<Example:>
   15    14  B           [          ]
   16    15  B           {          }
   END
-  
+
     my $tree = parseWithGrammar($grammar, qw/( [ { }  ]  +  [ { n }  ] ) * [ n + n ]  /);
-  
+
     ok printParseTree($grammar, $tree) eq <<END;
       Rule  Expandable         Terminal
    1     1  A
@@ -900,7 +867,7 @@ B<Example:>
   34                           n
   35                           ]
   END
-  
+
     ok printParseTreeAsXml($grammar, $tree) eq <<END;
   <A rule="1">
     <B rule="4">
@@ -955,7 +922,7 @@ B<Example:>
     </B>
   </A>
   END
-  
+
     ok printGrammarAsXml($grammar) eq <<END
   <grammar>
     <A><A/><"+"/><B/></A>
@@ -977,7 +944,7 @@ B<Example:>
   </grammar>
   END
    }
-  
+
 
 =head2 parseWithGrammar($@)
 
@@ -990,7 +957,7 @@ Parse, using a compiled B<$grammar>, an array of terminals and return a parse tr
 B<Example:>
 
 
-  if (1) {                                                                              
+  if (1) {
     my $grammar = compileGrammar(<<END);
   A  A + B
   A  B
@@ -1004,7 +971,7 @@ B<Example:>
   C  [ ]
   C  { }
   END
-  
+
     ok printGrammar($grammar) eq <<END;
       Rule  Expandable  Expansion
    1     0  A           A          +  B
@@ -1024,9 +991,9 @@ B<Example:>
   15    14  B           [          ]
   16    15  B           {          }
   END
-  
+
     my $tree = 𝗽𝗮𝗿𝘀𝗲𝗪𝗶𝘁𝗵𝗚𝗿𝗮𝗺𝗺𝗮𝗿($grammar, qw/( [ { }  ]  +  [ { n }  ] ) * [ n + n ]  /);
-  
+
     ok printParseTree($grammar, $tree) eq <<END;
       Rule  Expandable         Terminal
    1     1  A
@@ -1065,7 +1032,7 @@ B<Example:>
   34                           n
   35                           ]
   END
-  
+
     ok printParseTreeAsXml($grammar, $tree) eq <<END;
   <A rule="1">
     <B rule="4">
@@ -1120,7 +1087,7 @@ B<Example:>
     </B>
   </A>
   END
-  
+
     ok printGrammarAsXml($grammar) eq <<END
   <grammar>
     <A><A/><"+"/><B/></A>
@@ -1142,7 +1109,7 @@ B<Example:>
   </grammar>
   END
    }
-  
+
 
 =head2 printGrammar($)
 
@@ -1154,7 +1121,7 @@ Print a B<$grammar>.
 B<Example:>
 
 
-  if (1) {                                                                              
+  if (1) {
     my $grammar = compileGrammar(<<END);
   A  A + B
   A  B
@@ -1168,7 +1135,7 @@ B<Example:>
   C  [ ]
   C  { }
   END
-  
+
     ok 𝗽𝗿𝗶𝗻𝘁𝗚𝗿𝗮𝗺𝗺𝗮𝗿($grammar) eq <<END;
       Rule  Expandable  Expansion
    1     0  A           A          +  B
@@ -1188,9 +1155,9 @@ B<Example:>
   15    14  B           [          ]
   16    15  B           {          }
   END
-  
+
     my $tree = parseWithGrammar($grammar, qw/( [ { }  ]  +  [ { n }  ] ) * [ n + n ]  /);
-  
+
     ok printParseTree($grammar, $tree) eq <<END;
       Rule  Expandable         Terminal
    1     1  A
@@ -1229,7 +1196,7 @@ B<Example:>
   34                           n
   35                           ]
   END
-  
+
     ok printParseTreeAsXml($grammar, $tree) eq <<END;
   <A rule="1">
     <B rule="4">
@@ -1284,7 +1251,7 @@ B<Example:>
     </B>
   </A>
   END
-  
+
     ok printGrammarAsXml($grammar) eq <<END
   <grammar>
     <A><A/><"+"/><B/></A>
@@ -1306,7 +1273,7 @@ B<Example:>
   </grammar>
   END
    }
-  
+
 
 =head2 printParseTree($$$)
 
@@ -1320,7 +1287,7 @@ Print a parse tree.
 B<Example:>
 
 
-  if (1) {                                                                              
+  if (1) {
     my $grammar = compileGrammar(<<END);
   A  A + B
   A  B
@@ -1334,7 +1301,7 @@ B<Example:>
   C  [ ]
   C  { }
   END
-  
+
     ok printGrammar($grammar) eq <<END;
       Rule  Expandable  Expansion
    1     0  A           A          +  B
@@ -1354,9 +1321,9 @@ B<Example:>
   15    14  B           [          ]
   16    15  B           {          }
   END
-  
+
     my $tree = parseWithGrammar($grammar, qw/( [ { }  ]  +  [ { n }  ] ) * [ n + n ]  /);
-  
+
     ok 𝗽𝗿𝗶𝗻𝘁𝗣𝗮𝗿𝘀𝗲𝗧𝗿𝗲𝗲($grammar, $tree) eq <<END;
       Rule  Expandable         Terminal
    1     1  A
@@ -1395,7 +1362,7 @@ B<Example:>
   34                           n
   35                           ]
   END
-  
+
     ok printParseTreeAsXml($grammar, $tree) eq <<END;
   <A rule="1">
     <B rule="4">
@@ -1450,7 +1417,7 @@ B<Example:>
     </B>
   </A>
   END
-  
+
     ok printGrammarAsXml($grammar) eq <<END
   <grammar>
     <A><A/><"+"/><B/></A>
@@ -1472,7 +1439,84 @@ B<Example:>
   </grammar>
   END
    }
-  
+
+
+=head2 printParseTreeAsBrackets($$$)
+
+Print a parse tree as XML.
+
+     Parameter  Description
+  1  $grammar   Grammar
+  2  $tree      Parse tree
+  3  $indent    Optional indent level
+
+B<Example:>
+
+
+  if (1) {
+    my $grammar = compileGrammar(<<END);
+  A  A + B
+  A  B
+  B  B * C
+  B  C
+  C  n
+  C  D C
+  D  ++
+  D  --
+  C  C E
+  E  **
+  E  //
+
+  C  ( A )
+  C  [ A ]
+  C  { A }
+  C  ( )
+  C  [ ]
+  C  { }
+
+  C  D n
+  END
+
+    my $tree = parseWithGrammar($grammar, qw{n * (  ++ -- n ** //   + -- ++  n // ** )});
+
+    ok 𝗽𝗿𝗶𝗻𝘁𝗣𝗮𝗿𝘀𝗲𝗧𝗿𝗲𝗲𝗔𝘀𝗕𝗿𝗮𝗰𝗸𝗲𝘁𝘀($grammar, $tree) eq <<END;
+  A
+    B
+      B
+        C n
+        C
+      B "*"
+      C "("
+        A
+          A
+            B
+              C "++"
+                C
+                  C
+                    C "--" n
+                    C "**"
+                  C "//"
+                C
+              C
+            B
+          A "+"
+          B
+            C "--"
+              C
+                C
+                  C "++" n
+                  C "//"
+                C "**"
+              C
+            C
+          B
+        A ")"
+      C
+    B
+  A
+  END
+   }
+
 
 =head2 printParseTreeAsXml($$$)
 
@@ -1486,7 +1530,7 @@ Print a parse tree as XML.
 B<Example:>
 
 
-  if (1) {                                                                              
+  if (1) {
     my $grammar = compileGrammar(<<END);
   A  A + B
   A  B
@@ -1500,7 +1544,7 @@ B<Example:>
   C  [ ]
   C  { }
   END
-  
+
     ok printGrammar($grammar) eq <<END;
       Rule  Expandable  Expansion
    1     0  A           A          +  B
@@ -1520,9 +1564,9 @@ B<Example:>
   15    14  B           [          ]
   16    15  B           {          }
   END
-  
+
     my $tree = parseWithGrammar($grammar, qw/( [ { }  ]  +  [ { n }  ] ) * [ n + n ]  /);
-  
+
     ok printParseTree($grammar, $tree) eq <<END;
       Rule  Expandable         Terminal
    1     1  A
@@ -1561,7 +1605,7 @@ B<Example:>
   34                           n
   35                           ]
   END
-  
+
     ok 𝗽𝗿𝗶𝗻𝘁𝗣𝗮𝗿𝘀𝗲𝗧𝗿𝗲𝗲𝗔𝘀𝗫𝗺𝗹($grammar, $tree) eq <<END;
   <A rule="1">
     <B rule="4">
@@ -1616,7 +1660,7 @@ B<Example:>
     </B>
   </A>
   END
-  
+
     ok printGrammarAsXml($grammar) eq <<END
   <grammar>
     <A><A/><"+"/><B/></A>
@@ -1638,7 +1682,7 @@ B<Example:>
   </grammar>
   END
    }
-  
+
 
 
 =head2 Parser::LR::Grammar Definition
@@ -1788,13 +1832,15 @@ Print a parse tree produced from a grammar by L<parseWithGrammarAndLog> as XML.
 
 9 L<printParseTreeAndGrammarAsXml|/printParseTreeAndGrammarAsXml> - Print a parse tree produced from a grammar by L<parseWithGrammarAndLog> as XML.
 
-10 L<printParseTreeAsXml|/printParseTreeAsXml> - Print a parse tree as XML.
+10 L<printParseTreeAsBrackets|/printParseTreeAsBrackets> - Print a parse tree as XML.
 
-11 L<printRule|/printRule> - Print a rule
+11 L<printParseTreeAsXml|/printParseTreeAsXml> - Print a parse tree as XML.
 
-12 L<printSymbolAsXml|/printSymbolAsXml> - Print a symbol in a form acceptable as Xml
+12 L<printRule|/printRule> - Print a rule
 
-13 L<reduceStackWithRule|/reduceStackWithRule> - Reduce by the specified rule and update the stack and parse tree to match.
+13 L<printSymbolAsXml|/printSymbolAsXml> - Print a symbol in a form acceptable as Xml
+
+14 L<reduceStackWithRule|/reduceStackWithRule> - Reduce by the specified rule and update the stack and parse tree to match.
 
 =head1 Installation
 
@@ -1838,7 +1884,7 @@ test unless caller;
 1;
 #podDocumentation
 __DATA__
-use Test::More tests => 25;
+use Test::More tests => 30;
 
 if (1) {
   my $g = compileGrammar(<<END, nosub=>1);
@@ -2342,6 +2388,124 @@ END
   <B><"["/><"]"/></B>
   <B><"{"/><"}"/></B>
 </grammar>
+END
+ }
+
+if (1) {
+  my $grammar = compileGrammar(<<END);
+A  A b
+A  a
+END
+
+  my $t0 = parseWithGrammar($grammar, qw(a));
+
+  ok printParseTreeAsBrackets($grammar, $t0) eq <<END;
+A a
+A
+END
+
+  my $t3 = parseWithGrammar($grammar, qw(a b b b));
+
+  ok printParseTreeAsBrackets($grammar, $t3) eq <<END;
+A
+  A
+    A
+      A a
+      A b
+    A b
+  A b
+A
+END
+ }
+
+if (1) {
+  my $grammar = compileGrammar(<<END);
+A  b A
+A  a
+END
+
+  my $t0 = parseWithGrammar($grammar, qw(a));
+
+  ok printParseTreeAsBrackets($grammar, $t0) eq <<END;
+A a
+A
+END
+
+  my $t3 = parseWithGrammar($grammar, qw(b b b a));
+
+  ok printParseTreeAsBrackets($grammar, $t3) eq <<END;
+A b
+  A b
+    A b
+      A a
+      A
+    A
+  A
+A
+END
+ }
+
+if (1) {                                                                        #TprintParseTreeAsBrackets
+  my $grammar = compileGrammar(<<END);
+A  A + B
+A  B
+B  B * C
+B  C
+C  n
+C  D C
+D  ++
+D  --
+C  C E
+E  **
+E  //
+
+C  ( A )
+C  [ A ]
+C  { A }
+C  ( )
+C  [ ]
+C  { }
+
+C  D n
+END
+
+  my $tree = parseWithGrammar($grammar, qw{n * (  ++ -- n ** //   + -- ++  n // ** )});
+
+  ok printParseTreeAsBrackets($grammar, $tree) eq <<END;
+A
+  B
+    B
+      C n
+      C
+    B "*"
+    C "("
+      A
+        A
+          B
+            C "++"
+              C
+                C
+                  C "--" n
+                  C "**"
+                C "//"
+              C
+            C
+          B
+        A "+"
+        B
+          C "--"
+            C
+              C
+                C "++" n
+                C "//"
+              C "**"
+            C
+          C
+        B
+      A ")"
+    C
+  B
+A
 END
  }
 

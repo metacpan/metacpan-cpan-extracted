@@ -6,7 +6,7 @@ use DBI;
 use Apache::Session;
 use Apache::Session::Browseable::_common;
 
-our $VERSION = '1.2.7';
+our $VERSION = '1.3.4';
 our @ISA     = qw(Apache::Session Apache::Session::Browseable::_common);
 
 sub searchOn {
@@ -29,7 +29,7 @@ sub searchOnExpr {
     my ( $args, $selectField, $value, @fields ) = @_;
 
     # Escape quotes
-    $value =~ s/'/''/g;
+    $value       =~ s/'/''/g;
     $selectField =~ s/'/''/g;
     if ( $class->_fieldIsIndexed( $args, $selectField ) ) {
         $value =~ s/\*/%/g;
@@ -74,12 +74,18 @@ sub _query {
             no strict 'refs';
             my $self = eval "&${class}::populate();";
             my $sub  = $self->{unserialize};
-            my $tmp  = &$sub( { serialized => $row[1] } );
-            if (@fields) {
-                $res{ $row[0] }->{$_} = $tmp->{$_} foreach (@fields);
-            }
-            else {
-                $res{ $row[0] } = $tmp;
+            eval {
+                my $tmp = &$sub( { serialized => $row[1] } );
+                if (@fields) {
+                    $res{ $row[0] }->{$_} = $tmp->{$_} foreach (@fields);
+                }
+                else {
+                    $res{ $row[0] } = $tmp;
+                }
+            };
+            if ($@) {
+                print STDERR "Error in session $row[0]: $@\n";
+                delete $res{ $row[0] };
             }
         }
     }
@@ -156,29 +162,35 @@ sub get_key_from_all_sessions {
         ? sub {
             require Storable;
             return Storable::thaw( pack( 'H*', $_[0] ) );
-          }
+        }
         : $args->{DataSource} =~ /^mysql/i ? sub {
             require MIME::Base64;
             require Storable;
             return Storable::thaw( MIME::Base64::decode_base64( $_[0] ) );
-          }
+        }
         : undef
     );
     while ( my @row = $sth->fetchrow_array ) {
         no strict 'refs';
         my $self = eval "&${class}::populate();";
-        my $sub  = $self->{unserialize};
-        my $tmp  = &$sub( { serialized => $row[1] }, $next );
-        if ( ref($data) eq 'CODE' ) {
-            $tmp = &$data( $tmp, $row[0] );
-            $res{ $row[0] } = $tmp if ( defined($tmp) );
-        }
-        elsif ($data) {
-            $data = [$data] unless ( ref($data) );
-            $res{ $row[0] }->{$_} = $tmp->{$_} foreach (@$data);
-        }
-        else {
-            $res{ $row[0] } = $tmp;
+        eval {
+            my $sub = $self->{unserialize};
+            my $tmp = &$sub( { serialized => $row[1] }, $next );
+            if ( ref($data) eq 'CODE' ) {
+                $tmp = &$data( $tmp, $row[0] );
+                $res{ $row[0] } = $tmp if ( defined($tmp) );
+            }
+            elsif ($data) {
+                $data = [$data] unless ( ref($data) );
+                $res{ $row[0] }->{$_} = $tmp->{$_} foreach (@$data);
+            }
+            else {
+                $res{ $row[0] } = $tmp;
+            }
+        };
+        if ($@) {
+            print STDERR "Error in session $row[0]: $@\n";
+            delete $res{ $row[0] };
         }
     }
     return \%res;

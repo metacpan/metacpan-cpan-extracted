@@ -6,6 +6,7 @@ META.yml
 Makefile.PL
 README
 author.t/01_verify.t
+author.t/unicode.t
 dist.ini
 lib/AWS/SNS/Verify.pm
 t/01_verify.t

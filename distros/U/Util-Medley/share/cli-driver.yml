@@ -1,0 +1,55 @@
+# vim: tabstop=2 softtabstop=2 expandtab
+
+---
+
+############################################################################
+# template
+############################################################################
+
+# my-action-name:
+#  is_deprecated: false
+#  class:
+#    name: "My::Class::Name"
+#    attr:
+#      required:
+#        hard:
+#         a: abc
+#        soft:
+#         b: xyz
+#      optional:
+#        f: foo
+#      flags:
+#        dry-run: dry_run_flag
+#  method:
+#    name: my_method_name
+#    args:
+#      required:
+#        hard:
+#        soft:
+#      optional:                   
+#      flags:
+
+encrypt-str:
+  class:
+    name: Util::Medley::Exec
+    attr:
+  method:
+    name: encryptStr
+    args:
+      required:
+        hard: 
+          k: key
+          s: str
+
+decrypt-str:
+  class:
+    name: Util::Medley::Exec
+    attr:
+  method:
+    name: decryptStr
+    args:
+      required:
+        hard: 
+          k: key
+          s: str 
+  

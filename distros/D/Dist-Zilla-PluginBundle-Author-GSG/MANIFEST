@@ -3,7 +3,6 @@ CHANGES
 CONTRIBUTING.md
 LICENSE
 MANIFEST
-MANIFEST.SKIP
 META.json
 META.yml
 Makefile.PL
@@ -13,7 +12,6 @@ dist.ini
 lib/Dist/Zilla/Plugin/Author/GSG.pm
 lib/Dist/Zilla/PluginBundle/Author/GSG.pm
 share/CONTRIBUTING.md
-share/MANIFEST.SKIP
 share/Makefile.inc
 t/00-compile.t
 t/00-report-prereqs.dd

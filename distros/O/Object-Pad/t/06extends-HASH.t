@@ -26,8 +26,9 @@ package Base::Class {
 class Derived::Class extends Base::Class {
    has $derived_field = 456;
 
-   method BUILD($ok) {
-      Test::More::is( $ok, "ok", '@_ to Derived::Class::BUILD' );
+   method BUILD {
+      my @args = @_;
+      Test::More::is_deeply( \@args, [ "ok" ], '@_ to Derived::Class::BUILD' );
    }
 
    method fields {

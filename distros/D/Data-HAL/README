@@ -1,6 +1,6 @@
 =encoding UTF-8
 
-Data-HAL version 1.000 is Copyright © 2013, Lars Dɪᴇᴄᴋᴏᴡ
+Data-HAL version 1.001 is Copyright © 2013-2019, Lars Dɪᴇᴄᴋᴏᴡ
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ L<perlfaq8/"How do I keep my own module/library directory?">.
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright © 2013 Lars Dɪᴇᴄᴋᴏᴡ C<< <daxim@cpan.org> >>
+Copyright © 2013-2019 Lars Dɪᴇᴄᴋᴏᴡ C<< <daxim@cpan.org> >>
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.18.0.

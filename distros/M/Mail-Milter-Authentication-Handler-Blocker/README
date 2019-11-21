@@ -1,0 +1,30 @@
+NAME
+
+    Mail::Milter::Authentication::Handler::Blocker - Block mail based on
+    simple rules
+
+VERSION
+
+    version 2.20191120
+
+DESCRIPTION
+
+    Defer/Reject mail based on simple rules.
+
+CONFIGURATION
+
+            "Blocker" : {                                                       |
+                'blocker_configs' => [ '/tmpfs/authmilter-blocker.toml' ],      | A list of blocker configs to test against.
+            }                                                                   |
+
+AUTHOR
+
+    Marc Bradshaw <marc@marcbradshaw.net>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2019 by Marc Bradshaw.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

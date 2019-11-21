@@ -1,5 +1,5 @@
 This archive contains the distribution AWS-SNS-Verify,
-version 0.0104:
+version 0.0105:
 
   Verifies authenticity of SNS messages.
 

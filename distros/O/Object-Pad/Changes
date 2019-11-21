@@ -1,5 +1,9 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.10    2019-11-20
+        [BUGFIXES]
+         * Back-compat fixes for perl 5.16, 5.20
+
 0.09    2019-11-20
         [CHANGES]
          * Accept optional version number for `class` declaration and

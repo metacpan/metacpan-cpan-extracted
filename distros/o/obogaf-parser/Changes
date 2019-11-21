@@ -1,3 +1,8 @@
+#### obogaf::parser 1.272
+
+###### CHANGES
+- fixed CPAN Testers issues
+
 #### obogaf::parser 1.271
 
 ###### CHANGES
@@ -8,7 +13,7 @@
 #### NEW FEATURES
 - added the new subroutine get_parents_or_children_list
 - added source/destination name of obo terms ID in build_edges and build_subonto subroutines
-- fix bug in die condition in build_subonto subroutine
+- fixed bug in die condition in build_subonto subroutine
 
 ###### CHANGES
 - adjusted test according to the new features of build_edges and build_subonto subroutines

@@ -1,0 +1,256 @@
+=head1 NAME
+
+Net::RCON::Minecraft - Minecraft RCON remote console
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+    use Net::RCON::Minecraft;
+
+    my $rcon = Net::RCON::Minecraft->new(password => 'secret',
+                                             host => 'mc.example.com');
+
+    eval { $rcon->connect } or die "Connection failed: $@"; # Optional
+
+    my $response = eval { $rcon->command('kill @a') };
+    if ($@) {
+        warn "Command failed: $@";
+    } else {
+        say "Command response: " . $response;
+    }
+
+=head1 DESCRIPTION
+
+This module is a Minecraft-specific implementation of the RCON protocol, used
+to automate sending commands and receiving responses from a Minecraft server.
+
+With a properly configured server, you can use this module to automate many
+tasks, and extend the functionality of your server without the need to mod
+the server itself.
+
+=head2 MINECRAFT RCON BUG MC-72390
+
+Bug L<MC-72390|https://bugs.mojang.com/browse/MC-72390>
+
+Vanilla servers running versions older than Minecraft 1.14.3 have a bug in
+the RCON implementation that can cause server crashes. See the link above for
+details. RCON is not recommended on these older servers. If you are running
+modded Minecraft, your base (e.g., spigot, bukkit, etc.) may or may not have
+patched this issue. Check with them first.
+
+If you are running vanilla 1.14.3 or greater, however, RCON should work just
+fine.
+
+=head2 ENABLING RCON
+
+Your Minecraft server must be configured to use RCON via the following options
+in the C<server.properties> file in your Minecraft server's top level
+directory:
+
+    rcon.port=25575
+    rcon.password=secret
+    enable-rcon=true
+
+Your Minecraft server will need to be restarted for these options to take
+effect.
+
+=head3 A Note About Security
+
+While the full security implications of enabling RCON are beyond the scope of
+this documentation, the most important consideration is that anyone who can
+connect to C<rcon.port> and provide the C<rcon.password> will have full,
+operator-level access to run arbitrary commands on your server.
+
+If you do nothing else, please at least choose a secure, random password.
+Configuring access to C<rcon.port> (TCP) in your firewall will ensure only
+permitted hosts can use RCON. Contact your network administrator.
+
+=head1 CONSTRUCTOR
+
+=head2 new( %options )
+
+Creates a new RCON object with the given properties, but does not contact the
+server. The properties and their defaults are shown below:
+
+    my $rcon = Net::RCON::Minecraft->new(
+        host            => 'localhost',
+        port            => 25575,
+        password        => '',
+        timeout         => 30,
+    );
+
+=over 4
+
+=item host
+
+The hostname or IPv4/IPv6 address to connect to.
+
+=item port
+
+The TCP port number to connect to.
+
+=item password
+
+The plaintext password used to authenticate. This password must match the
+C<rcon.password=> line in the F<server.properties> file for your server.
+
+=item timeout
+
+Specifies the timeout for all socket reads, in seconds. C<connect()> and
+C<command()> will wait this long before giving up.
+
+=back
+
+=head1 SENDING COMMANDS
+
+=head2 command( $command )
+
+    my $response = eval { $rcon->command("data get block $x $y $z") };
+
+Sends the C<$command> to the Minecraft server, and synchronously waits for the
+response. This method is capable of handling fragmented responses (spread over
+several response packets), and will concatenate them all before returning the
+result.
+
+For all intents and purposes C<$response> can be treated like a plaintext
+string. However, what you are really getting is L<overload> stringification of
+a L<Net::RCON::Minecraft::Response> object, as some modded servers will return
+Minecraft C<U+00a7> color codes, and you will want to handle those:
+
+    $response->raw;   # Original. Minecraft color codes are left as-is
+    $response->plain; # Color codes stripped. The result is plain text
+    $response->ansi;  # Color codes converted to ANSI escape sequences
+
+See L<Net::RCON::Minecraft::Response> for I<slightly> more detail, but there
+really isn't much to it. C<$response-E<gt>plain> will always return a scalar,
+so may be slightly safer when dealing with other code that doesn't handle
+overloaded objects well.
+
+C<command()> will C<croak()> in the event of connection failure, no command
+given, or any unexpected protocol response from the server. C<command()> does
+B<not> know anything about Minecraft commands (or their responses) themselves,
+and this is by design.
+
+=head1 OTHER METHODS
+
+=head2 timeout( $seconds )
+
+    $s->timeout(3.5); # Timeout is now 3.5 seconds
+    printf "Our timeout is %.2f seconds\n", $s->timeout;
+
+Set a new socket read timeout value. Takes effect immediately.
+
+The new timeout will affect all network reads. If the server takes more than
+this many seconds to send all the bytes we are expecting, we will C<croak()>
+with a timeout error message.
+
+The default of 30 seconds is normally enough, but may need to be set higher if
+you are running a command that takes a long time, or the Minecraft server is
+very busy.
+
+=head2 connect
+
+B<This method is optional.> By default, this module will connect to the
+Minecraft server automatically as soon as the first C<command()> is run. It
+will stay connected unless there is an error, and will attempt to reconnect
+the next time C<command()> is run.
+
+However, you may explicitly call C<connect()> if you need more granular
+control, and earlier error handling in the event of a failed connection:
+
+    eval { $rcon->connect }; # $@ will be set on error
+
+The above attempts to connect to the configured host and port, and issues
+the configured password for authentication.
+
+If already connected, does nothing but returns a true value.
+
+This method will C<croak()> if the connection fails for any reason, and C<$@>
+will be set. Otherwise, C<connect()> will return a true value.
+
+=head2 connected
+
+In normal operation, you probably won't need to call this method.
+
+    say "We are connected!" if $rcon->connected;
+
+Returns true if we have a connected socket, false otherwise. Note that we have
+no way to tell if there is a misbehaving Minecraft server on the other side of
+that socket, so it is entirely possible for this command (or C<connect()>) to
+succeed, but C<command()> calls to fail.
+
+=head2 disconnect
+
+    $rcon->disconnect;
+
+Disconnects from the server by closing the socket. Always succeeds.
+
+=head1 DIAGNOSTICS
+
+=head2 Errors
+
+This module C<croak()>s on error. You are advised to wrap all method calls,
+especially C<connect()> and C<command()> in block C<eval>, like so:
+
+    my $r = eval { $rcon->command($cmd_str) };
+    if ($@) {
+        # Error occurred. Description of error is in $@
+    } else {
+        # No errors. $r contains your command response.
+    }
+
+Other methods will only C<croak()> on invalid inputs.
+
+=head2 Warnings
+
+There are currently no warnings generated by this module. That may change in
+the future, and those warnings will be signaled via C<carp()>.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item
+
+L<Valve RCON Protocol|https://developer.valvesoftware.com/wiki/Source_RCON_Protocol>
+
+=item
+
+L<Minecraft RCON Protocol|https://wiki.vg/RCON>
+
+=item
+
+L<MC-72390 Minecraft RCON bug|https://bugs.mojang.com/browse/MC-72390>
+
+=back
+
+=head1 SUPPORT
+
+=over 2
+
+=item
+
+L<RT, CPAN's request tracker|https://rt.cpan.org/NoAuth/Bugs.html?Queue=Net-RCON-Minecraft>: Report bugs here.
+
+=item
+
+L<GitHub Repository|https://github.com/rjt-pl/Net-RCON-Minecraft>: Patches
+welcome!
+
+=back
+
+=head1 AUTHOR
+
+B<Ryan Thompson> E<lt>rjt@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2019 Ryan Thompson
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+L<http://dev.perl.org/licenses/artistic.html>

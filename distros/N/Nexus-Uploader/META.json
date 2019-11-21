@@ -1,0 +1,61 @@
+{
+   "abstract" : "Upload files to a Sonatype Nexus instance. Modelled on L<CPAN::Uploader>.",
+   "author" : [
+      "Sven Willenbuecher <sven.willenbuecher@gmx.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Nexus-Uploader",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "File::Slurp" : "0",
+            "JSON" : "0",
+            "Log::Any" : "0",
+            "Moose" : "0",
+            "REST::Client" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008000",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "1.00",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -2,13 +2,18 @@ package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
 use version;
-our $VERSION = 'v0.0.16'; # VERSION
+our $VERSION = 'v0.0.18'; # VERSION
 
 use Moose;
 with qw(
     Dist::Zilla::Role::PluginBundle::Easy
 );
 use namespace::autoclean;
+
+sub mvp_multivalue_args { qw(
+    exclude_filename
+    exclude_match
+) }
 
 sub configure {
     my ($self) = @_;
@@ -73,7 +78,11 @@ sub configure {
         'Git::Push',
 
         'Git::Contributors',
-        'Git::GatherDir',
+        [ 'Git::GatherDir' => $self->config_slice( qw<
+            exclude_filename
+            exclude_match
+            include_dotfiles
+        > ) ],
 
         'GitHub::Meta',
         'Author::GSG::GitHub::UploadRelease',
@@ -81,6 +90,13 @@ sub configure {
         'Test::Compile',
         'Test::ReportPrereqs',
     );
+
+    my ($gather_dir)
+        = grep { $_->[1] eq 'Dist::Zilla::Plugin::Git::GatherDir' }
+        @{ $self->plugins };
+
+    push @{ $gather_dir->[2]->{exclude_filename} },
+        qw< README.md LICENSE.txt >;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -139,7 +155,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version v0.0.16
+version v0.0.18
 
 =head1 SYNOPSIS
 
@@ -163,12 +179,12 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     -remove = UploadToCPAN
     -remove = GatherDir
 
-    # The MakeMaker Plugin gets an additional setting
-    # in order to support "version ranges".
+    ; The MakeMaker Plugin gets an additional setting
+    ; in order to support "version ranges".
     eumm_version = 7.1101
 
-    # The defaults for author and license come from
-    #[Author::GSG]
+    ; The defaults for author and license come from
+    [Author::GSG]
 
     [MetaJSON]
     [OurPkgVersion]
@@ -177,8 +193,8 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     [$meta_provides] # defaults to MetaProvides::Package
 
     [StaticInstall]
-    # mode    from static_install_mode
-    # dry_run from static_install_dry_run
+    ; mode    from static_install_mode
+    ; dry_run from static_install_dry_run
 
     [Pod::Weaver]
     replacer = replace_with_comment
@@ -199,6 +215,11 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
 
     [Git::Contributors]
     [Git::GatherDir]
+    ; include_dotfiles
+    ; exclude_filename
+    ; exclude_match
+    exclude_filename = README.md
+    exclude_filename = LICENSE.txt
 
     [GitHub::Meta]
     [GitHub::UploadRelease] # plus magic to work without releasing elsewhere
@@ -254,6 +275,20 @@ Passed to L<Dist::Zilla::Plugin::StaticInstall> as C<mode>.
 =item static_install_dry_run
 
 Passed to L<Dist::Zilla::Plugin::StaticInstall> as C<dry_run>.
+
+=item include_dotfiles
+
+Passed to L<Dist::Zilla::Plugin::Git::GatherDir/include_dotfiles>.
+
+=item exclude_filename
+
+Passed to L<Dist::Zilla::Plugin::Git::GatherDir/exclude_filename>.
+
+Automatically appends C<README.md> and C<LICENSE.txt> to the list.
+
+=item exclude_match
+
+Passed to L<Dist::Zilla::Plugin::Git::GatherDir/exclude_match>.
 
 =back
 

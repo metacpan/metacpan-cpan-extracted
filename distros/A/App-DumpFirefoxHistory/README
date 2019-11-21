@@ -2,8 +2,8 @@ NAME
     App::DumpFirefoxHistory - Dump Firefox history
 
 VERSION
-    This document describes version 0.003 of App::DumpFirefoxHistory (from
-    Perl distribution App-DumpFirefoxHistory), released on 2019-08-14.
+    This document describes version 0.004 of App::DumpFirefoxHistory (from
+    Perl distribution App-DumpFirefoxHistory), released on 2019-11-21.
 
 SYNOPSIS
     See the included script dump-firefox-history.
@@ -20,12 +20,17 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   attempt_orig_first => *bool* (default: 0)
+
+        Attempt to open the original history database first instead of
+        directly copying the database.
+
     *   copy_size_limit => *posint* (default: 104857600)
 
-        Chrome often locks the History database for a long time. If the size
-        of the database is not too large (determine by checking against this
-        limit), then the script will copy the file to a temporary file and
-        extract the data from the copied database.
+        Firefox often locks the History database for a long time. If the
+        size of the database is not too large (determine by checking against
+        this limit), then the script will copy the file to a temporary file
+        and extract the data from the copied database.
 
     *   detail => *bool*
 

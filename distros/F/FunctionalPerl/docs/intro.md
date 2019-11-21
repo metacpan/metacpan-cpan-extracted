@@ -127,7 +127,7 @@ command:
 
 To see a list of all repl commands enter `:?`. You can also use the
 comma `,` instead of the colon if you prefer. The repl remembers these
-settings across repl runs (they are stored in ~/.perl-repl_settings).
+settings across repl runs (they are stored in ~/.fp-repl_settings).
 
 So, yes, `cons 3, null` is equivalent to `cons 3, list()` which is
 equivalent to `list(3)`, and the :s representation shows perl code
@@ -1415,10 +1415,10 @@ To get the constructor functions whose existence these implicate:
     $VAR1 = Rectangle(Point(2, 3), Point(5, 4));
 
 Instead of adding the `FP_Show_show` methods, you could also have just
-added `FP::Show::Base::FP_Struct` as a base class:
+added `FP::Struct::Show` as a base class:
 
     package Shape {
-        use FP::Struct [], 'FP::Show::Base::FP_Struct';
+        use FP::Struct [], 'FP::Struct::Show';
         _END_
     }
 

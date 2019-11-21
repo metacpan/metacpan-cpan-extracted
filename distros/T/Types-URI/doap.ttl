@@ -2,6 +2,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
 @prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix dt:    <http://ontologi.es/pretdsl#dt/> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
@@ -12,6 +13,7 @@
 <http://purl.org/NET/cpan-uri/dist/Types-URI/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Attean"^^doap-deps:CpanId ];
 	doap-deps:develop-requirement [ doap-deps:on "Test::Warnings"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [ doap-deps:on "URI"^^doap-deps:CpanId ], [ doap-deps:on "URI::FromHash"^^doap-deps:CpanId ], [
 		doap-deps:on "Type::Library 1.000000"^^doap-deps:CpanId;
@@ -20,7 +22,7 @@
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
 	doap-deps:test-suggestion [
 		doap-deps:on "RDF::Trine::Node::Resource"^^doap-deps:CpanId;
-	];
+	], [ doap-deps:on "Attean::IRI"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Types-URI>;
 	doap:created         "2014-03-24"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -30,7 +32,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Types-URI";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-006>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-007>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-types-uri>;
@@ -130,6 +132,27 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-URI-0.006.tar.gz>;
 	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-URI/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Types-URI-0.007"^^xsd:string;
+	dc:issued            "2019-11-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a dt:Addition;
+			rdfs:label "Coercions from Attean::IRI.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/kjetilk>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-URI-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kjetilk>
+	a                    foaf:Person;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KJETILK";
+	foaf:page            <https://metacpan.org/author/KJETILK>.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

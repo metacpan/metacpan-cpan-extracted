@@ -14,7 +14,7 @@ use Safe::Isa qw($_isa);
 use Scalar::Util qw(reftype);
 use Types::Standard qw(ArrayRef Bool HashRef InstanceOf Str);
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 my $uri_from_str = sub {
     my ($val) = @_;
@@ -205,7 +205,7 @@ Data::HAL - Hypertext Application Language resource
 
 =head1 VERSION
 
-This document describes Data::HAL version 1.000
+This document describes Data::HAL version 1.001
 
 =head1 SYNOPSIS
 
@@ -420,7 +420,7 @@ Lars Dɪᴇᴄᴋᴏᴡ C<< <daxim@cpan.org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright © 2013 Lars Dɪᴇᴄᴋᴏᴡ C<< <daxim@cpan.org> >>
+Copyright © 2013-2019 Lars Dɪᴇᴄᴋᴏᴡ C<< <daxim@cpan.org> >>
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.18.0.

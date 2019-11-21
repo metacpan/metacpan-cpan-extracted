@@ -1,0 +1,224 @@
+type	losses_or_gains	delta_mass	annotation_in_pos_mode	annotation_in_neg_mode
+adduct	-2H+Na+K	59.9378259		[(M-H+Na+K)-H]-
+adduct	-H+K	37.95588165	[M+K]+	
+adduct	-H+Na	21.98194425	[M+Na]+	
+adduct	-3H+3Na	65.94583274		[(M-2H+3Na)-H]-
+adduct	-4H+4K	151.8235266		[(M-3H+4K)-H]-
+adduct	-4H+4Na	87.92777699		[(M-3H+4Na)-H]-
+adduct	-3H+3K	113.8676449		[(M-2H+3K)-H]-
+adduct	-2H+2K	75.9117633		[(M-H+2K)-H]-
+adduct	-2H+2Na	43.9638885		[(M-H+2Na)-H]-
+adduct	Cl 	35.9767		[M+Cl]-
+adduct	-2H+Ca 	37.94694092		[(M-H+Ca)-H]-
+isotope	13C db 	0.501677419		
+isotope	13C	1.003354838	[M+H]+_13C	[M+H]-_13C
+isotope	15N	0.997034893	[M+H]+_15N	[M+H]-_15N
+isotope	18O	2.00424638	[M+H]+_18O	[M+H]-_18O
+isotope	34S	1.9957959	[M+H]+_34S	[M+H]-_34S
+isotope	41K	1.99811908	[M+H]+_41K	[M+H]-_41K
+isotope	37Cl	1.99704991	[M+H]+_37Cl	[M+H]-_37Cl
+isotope	13C2	2.006709676	[M+H]+_13C2	[M+H]-_13C2
+isotope	13C3	3.010064513	[M+H]+_13C3	[M+H]-_13C3
+isotope	13C+37Cl	3.000404748	[M+H]+_13C_37Cl	[M+H]-_13C_37Cl
+isotope	13C+18O	3.007601218	[M+H]+_13C_18O	[M+H]-_13C_18O
+isotope	13C+34S	2.999150738	[M+H]+_13C_34S	[M+H]-_13C_34S
+isotope	44Ca	3.99289082	[M+H]+_44Ca	[M+H]-_44Ca
+adduct	+(CH3OH)	32.02621475	[(M+H)+CH3OH]+	
+adduct	+(CH3CN)	41.0265491	[M+CH3CNH]+	[M+CH2CN]-
+adduct	+(H2O)	18.01056468	[M+H3O]+	[M+OH]-
+adduct	+2(H2O)	36.02112937	[(M+2H20)+H]+	[(M+2H20)-H]-
+adduct	+(NaCl)	57.95862196		[(M-H+Na)+Cl]-
+adduct	+(HCOOH)	46.0054793		[M+HCO2]-
+adduct	+(HCOOH)+(HCOOK)	129.9668403		
+adduct	+(HCOOH)+(HCOONa)	113.9929029		
+adduct	+(HCOOH)+2(HCOONa)	181.9803264		
+adduct	+(HCOOK)	83.96136095	[(M+HCO2)+K]+	
+adduct	+(HCOOK)+(HCOONa)	151.9487845		
+adduct	+(HCOONa)	67.98742355	[(M+HCO2)+Na]+	
+adduct	+2(HCOOH)	92.01095861		[M+2HCO2+H]-
+adduct	+2(HCOOH)+(HCOOK)	175.9723196		
+adduct	+2(HCOOH)+(HCOONa)	159.9983822		
+adduct	+2(HCOOK)	167.9227219		
+adduct	+2(HCOONa)	135.9748471		
+fragment	-(C11H18O9)	-294.0950822	[(M+H)-C11H18O9]+	[(M-H)-C11H18O9]-
+fragment	-(C12H16O12)	-352.064176	[(M+H)-C12H16O12]+	[(M-H)-C12H16O12]-
+fragment	-(C12H20O9)	-308.1107322	[(M+H)-C12H20O9]+	[(M-H)-C12H20O9]-
+fragment	-(C2H2O)	-42.01056468	[(M+H)-C2H2O]+	[(M-H)-C2H2O]-
+fragment	-(C2H3.)	-27.0229265		
+fragment	-(C2H3N)	-41.0265491	[(M+H)-C2H3N]+	[(M-H)-C2H3N]-
+fragment	-(C2H3NO3)	-89.01129296	[(M+H)-C3H3NO3]+	[(M-H)-C3H3NO3]-
+fragment	-(C2H3O.)	-43.01784112		
+fragment	-(C2H4)	-28.03130013	[(M+H)-C2H4]+	[(M-H)-C2H4]-
+fragment	-(C2H4N.)	-42.03382553		
+fragment	-(C2H4O)	-44.02621475	[(M+H)-C2H4O]+	[(M-H)-C2H4O]-
+fragment	-(C2H5.)	-29.03857656		
+fragment	-(C2H5N)	-43.04219916	[(M+H)-C2H5N]+	[(M-H)-C2H5N]-
+fragment	-(C2H5NO2)	-75.0320284	[(M+H)-C2H6]+	[(M-H)-C2H5NO2]-
+fragment	-(C2H5O.)	-45.03349118		
+fragment	-(C2H5O6P)	-155.9823745	[(M+H)-C2H5O6P]+	[(M-H)-C2H5O6P]-
+fragment	-(C2H6)	-30.04695019	[(M+H)-C2H6]+	[(M-H)-C2H6]-
+fragment	-(C2H7N)	-45.05784922	[(M+H)-C2H7N]+	[(M-H)-C2H7N]-
+fragment	-(C2HNO2)	-71.00072827	[(M+H)-C2HNO2]+	[(M-H)-C2HNO2]-
+fragment	-(C3H4O3)	-88.01604399	[(M+H)-C3H4NO3]+	[(M-H)-C3H4NO3]-
+fragment	-(C3H5.)	-41.03857656		
+fragment	-(C3H5NO2)	-87.0320284	[(M+H)-C3H5NO2]+	[(M-H)-C3H5NO2]-
+fragment	-(C3H5O2NS)-(NH3)	-136.0306485		
+fragment	-(C3H5O2NS)	-119.0040994	[(M+H)-C3H5O2NS]+	[(M-H)-C3H5O2NS]-
+fragment	-(C3H6)	-42.04695019	[(M+H)-C3H6]+	[(M-H)-C3H6]-
+fragment	-(C3H6O3)	-90.03169405	[(M+H)-C3H6O3]+	[(M-H)-C3H6O3]-
+fragment	-(C3H7.)	-43.05422662		
+fragment	-(C3H7O2N)	-89.04767846	[(M+H)-C3H7O2N]+	[(M-H)-C3H7O2N]-
+fragment	-(C3H7O2NS)	-121.0197495	[(M+H)-C3H7O2NS]+	[(M-H)-C3H7O2NS]-
+fragment	-(C3H7O6P)	-169.9980246	[(M+H)-C3H7O6P]+	[(M-H)-C3H7O6P]-
+fragment	-(C4H6)	-54.04695019	[(M+H)-C4H6P]+	[(M-H)-C4H6]-
+fragment	-(C4H6O2)	-86.03677943	[(M+H)-C4H6O2]+	[(M-H)-C4H6O2]-
+fragment	-(C4H6O4)	-118.0266087	[(M+H)-C4H6O4]+	[(M-H)-C4H6O4]-
+fragment	-(C4H7.)	-55.05422662		
+fragment	-(C4H8O3)	-104.0473441	[(M+H)-C4H8O3]+	[(M-H)-C4H8O3]-
+fragment	-(C4H9)	-57.07042529	[(M+H)-C4H9]+	[(M-H)-C4H9]-
+fragment	-(C5H7O3N)	-129.0425931	[(M+H)-C5H7O3N]+	[(M-H)-C5H7O3N]-
+fragment	-(C5H8O3NS)	-162.0224891	[(M+H)-C5H8O3NS]+	[(M-H)-C5H8O3NS]-
+fragment	-(C5H8O4)	-132.0422587	[(M+H)-C5H8O4]+	[(M-H)-C5H8O4]-
+fragment	-(C6H10O4)	-146.0579088	[(M+H)-C6H10O4]+	[(M-H)-C6H10O4]-
+fragment	-(C6H10O5)-(H2O)	-180.0633881	[(M+H)-C6H10O5-H2O]+	[(M-H)-C6H10O5-H2O]-
+fragment	-(C6H10O5)	-162.0528234	[(M+H)-C6H10O5]+	[(M-H)-C6H10O5]-
+fragment	-(C6H10O7)	-194.0426527	[(M+H)-C6H10O7]+	[(M-H)-C6H10O7]-
+fragment	-(C6H8O6)	-176.032088	[(M+H)-C6H8O7]+	[(M-H)-C6H8O7]-
+fragment	-(CH2O)	-30.01056468	[(M+H)-CH2O]+	[(M-H)-CH2O]-
+fragment	-(CH2S)-(HCOOH)	-91.99320037	[(M+H)-(CH2S)-(HCOOH)]+	[(M-H)-(CH2S)-(HCOOH)]-
+fragment	-(CH2S)-(NH3)	-63.01427016	[(M+H)-(CH2S)-(NH3)]+	[(M-H)-(CH2S)-(NH3)]-
+fragment	-(CH2S)	-45.98772106	[(M+H)-CH2S]+	[(M-H)-CH2S]-
+fragment	-(CH3.)	-15.0229265		
+fragment	-(CH3COO.)	-59.01275574		
+fragment	-(CH3COOH)	-60.02112937	[(M+H)-CH3COOH]+	[(M-H)-CH3COOH]-
+fragment	-(CH3N)	-29.0265491	[(M+H)-CH3N]+	[(M-H)-CH3N]-
+fragment	-(CH3O.)	-31.01784112		
+fragment	-(CH3OH)	-32.02621475	[(M+H)-CH3OH]+	[(M-H)-CH3OH]-
+fragment	-(CH4)	-16.03130013	[(M+H)-CH4]+	[(M-H)-CH4]-
+fragment	-(CH4N.)	-30.03382553		
+fragment	-(CH4S)-(HCOOH)	-94.00885043	[(M+H)-(CH4S)-(HCOOH)]+	[(M-H)-(CH4S)-(HCOOH)]-
+fragment	-(CH4S)-(NH3)	-65.02992022	[(M+H)-(CH4S)-(NH3)]+	[(M-H)-(CH4S)-(NH3)]-
+fragment	-(CH4S)	-48.00337113	[(M+H)-CH4S]+	[(M-H)-CH4S]-
+fragment	-(CH5N)	-31.04219916	[(M+H)-CH5N]+	[(M-H)-CH5N]-
+fragment	-(Cl.)	-34.96830408		
+fragment	-(CO)	-27.99491462	[(M+H)-CO]+	[(M-H)-CO]-
+fragment	-(CO2)-(CO)	-71.98474386	[(M+H)-(CO2)-(CO)]+	[(M-H)-(CO2)-(CO)]-
+fragment	-(CO2)	-43.98982924	[(M+H)-CO2]+	[(M-H)-CO2]-
+fragment	-(H2)-(NH3)	-19.04219916	[(M+H)-(H2)-(NH3)]+	[(M-H)-(H2)-(NH3)]-
+fragment	-(H2)	-2.015650064	[(M+H)-H2]+	[(M-H)-H2]-
+fragment	-(H2O)-(CO2)	-62.00039392	[(M+H)-(H2O)-(CO2)]+	[(M-H)-(H2O)-(CO2)]-
+fragment	 -(H2O)-(HCOOH)	-64.01604399	[(M+H)-(H2O)-(CO2)]+	[(M-H)-(H2O)-(HCOOH)]-
+fragment	-(H2O)-(NH3)	-35.03711378	[(M+H)-(H2O)-(NH3)]+	[(M-H)-(H2O)-(NH3)]-
+fragment	-(H2O)	-18.01056468	[(M+H)-(H2O)]+	[(M-H)-(H2O)]-
+fragment	-(H2O)-2(CO2)	-105.9902232	[(M+H)-(H2O)-2(H2O)]+	[(M-H)-(H2O)-2(H2O)]-
+fragment	-(H2S)-(H2O)	-51.99828575	[(M+H)-(H2S)-(H2O)]+	[(M-H)-(H2S)-(H2O)]-
+fragment	-(H2S)	-33.98772106	[(M+H)-H2S]+	[(M-H)-H2S]-
+fragment	-(H2SO4)	-97.96737954	[(M+H)-H2SO4]+	[(M-H)-H2SO4]-
+fragment	-(H3PO4)	-97.97689521	[(M+H)-H3PO4]+	[(M-H)-H3PO4]-
+fragment	-(HCl)	-35.97667771	[(M+H)-HCl]+	[(M-H)-HCl]-
+fragment	-(HCN)	-27.01089903	[(M+H)-HCN]+	[(M-H)-HCN]-
+fragment	-(HCOOH)-(HCN)	-73.01637834	[(M+H)-(HCOOH)-(HCN)]+	[(M-H)-(HCOOH)-(HCN)]-
+fragment	-(HCOOH)	-46.0054793	[(M+H)-HCOOH]+	[(M-H)-HCOOH]-
+fragment	-(HS.)	-32.97934743		
+fragment	-(NC3H9)-(CH3COOH)	-119.0946287	[(M+H)-(NC3H9)-(CH3COOH)]+	[(M-H)-(NC3H9)-(CH3COOH)]-
+fragment	-(NC3H9)-(H2O)	-77.08406397	[(M+H)-(NC3H9)-(H2O)]+	[(M-H)-(NC3H9)-(H2O)]-
+fragment	-(NC3H9)-(HCOOH)	-105.0789786	[(M+H)-(NC3H9)-(HCOOH)]+	[(M-H)-(NC3H9)-(HCOOH)]-
+fragment	-(NC3H9)	-59.07349929	[(M+H)-NC3H9]+	[(M-H)-NC3H9]-
+fragment	-(NaCl)	-57.95862196	[(M+H-NaCl]+	[(M-H-NaCl]-
+fragment	-(NH2CO.)	-44.01309008		
+fragment	-(NH3)-(CO2)-(H2O)	-79.02694302	[(M+H)-(NH3)-(CO2)-(H2O)]+	[(M-H)-(NH3)-(CO2)-(H2O)]-
+fragment	-(NH3)-(CO2)	-61.01637834	[(M+H)-CO2]+	[(M-H)-CO2]-
+fragment	-(NH3)-(CONH)	-60.03236275	[(M+H)-CONH]+	[(M-H)-CONH]-
+fragment	-(NH3)-(HCOOH)	-63.0320284	[(M+H)-(NH3)-(HCOOH)]+	[(M-H)-(NH3)-(HCOOH)]-
+fragment	-(NH3)	-17.0265491	[(M+H)-NH3]+	[(M-H)-NH3]-
+fragment	-(NH3CO)	-45.02146372	[(M+H)-NH3CO]+	[(M-H)-NH3CO]-
+fragment	-(NHCO)	-43.00581365	[(M+H)-NHCO]+	[(M-H)-NHCO]-
+fragment	-(OH.)	-17.00219105		
+fragment	-(PO3)	-78.95850549	[(M+H)-PO3]+	[(M-H)-PO3]-
+fragment	-(SO2)	-63.96190024	[(M+H)-SO2]+	[(M-H)-SO2]-
+fragment	-(SO3)	-79.95681486	[(M+H)-SO3]+	[(M-H)-SO3]-
+fragment	-2(H2O)-(CO2)	-80.01095861	[(M+H)-2(H2O)-(CO2)]+	[(M-H)-2(H2O)-(CO2)]-
+fragment	-2(H2O)-(HCOOH)-(NH3)	-99.05315777	[(M+H)-2(H2O)-(HCOOH)-(NH3)]+	[(M-H)-2(H2O)-(HCOOH)-(NH3)]-
+fragment	-2(H2O)-(HCOOH)	-82.02660867	[(M+H)-2(H2O)-(HCOOH)]+	[(M-H)-2(H2O)-(HCOOH)]-
+fragment	-2(H2O)	-36.02112937	[(M+H)-2(H2O)]+	[(M-H)-2(H2O)]-
+fragment	-2(HCOOH)	-92.01095861	[(M+H)-2(HCOOH)]+	[(M-H)-2(HCOOH)]-
+fragment	-2(NH3)-(CO)-(CO2)	-106.0378421	[(M+H)-2(NH3)-(CO)-(CO2)]+	[(M-H)-2(NH3)-(CO)-(CO2)]-
+fragment	-2(NH3)-(CO)	-62.04801281	[(M+H)-2(NH3)-(CO)]+	[(M-H)-2(NH3)-(CO)]-
+fragment	-2(NH3)	-34.05309819	[(M+H)-2(NH3)]+	[(M-H)-2(NH3)]-
+fragment	-3(H2O)	-54.03169405	[(M+H)-3(H2O)]+	[(M-H)-3(H2O)]-
+fragment	-3(NH3)	-51.07964729	[(M+H)-3(NH3)]+	[(M-H)-3(NH3)]-
+fragment	-4(H2O)	-72.04225874	[(M+H)-4(H2O)]+	[(M-H)-4(H2O)]-
+fragment	-(C10H11O3N5)	-249.0861892	[(M+H)-C10H11O3N5]+	[(M-H)-C10H11O3N5]-
+fragment	-(C10H13O4N5)	-267.0967539	[(M+H)-C10H13O4N5]+	[(M-H)-C10H13O4N5]-
+fragment	-(C10H14O7N5P)	-347.0630844	[(M+H)-C10H14O7N5P]+	[(M-H)-C10H14O7N5P]-
+fragment	-(C10H15O5N5)	-285.1073186	[(M+H)-C10H15O5N5]+	[(M-H)-C10H15O5N5]-
+fragment	-(C2H3NO2)	-73.01637834	[(M+H)-C10H15O5N5]+	[(M-H)-C10H15O5N5]-
+fragment	-(C2H4O2)	-60.02112937	[(M+H)-C2H4O2]+	[(M-H)-C2H4O2]-
+fragment	-(C2H5NO3)	-91.02694302	[(M+H)-C2H5NO3]+	[(M-H)-C2H5NO3]-
+fragment	-(C2H6O2)	-62.03677943	[(M+H)-C2H6O2]+	[(M-H)-C2H6O2]-
+fragment	-(C2H6O3)	-78.03169405	[(M+H)-C2H6O3]+	[(M-H)-C2H6O3]-
+fragment	-(C2H6O3)-(H2O)	-96.04225874	[(M+H)-(C2H6O3)-(H2O)]+	[(M-H)--(C2H6O3)-(H2O)]-
+fragment	-(C2H6O4)	-94.02660867	[(M+H)-C2H6O4]+	[(M-H)-C2H6O4]-
+fragment	-(C2H7NO2)	-77.04767846	[(M+H)-C2H7NO2]+	[(M-H)-C2H7NO2]-
+fragment	-(C3H10O5)	-126.0528234	[(M+H)-C3H10O5]+	[(M-H)-C3H10O5]-
+fragment	-(C3H6O3)-(CHNO)	-133.0375077	[(M+H)-(C3H6O3)-(CHNO)]+	[(M-H)-(C3H6O3)-(CHNO)]-
+fragment	-(C3H6O4)	-106.0266087	[(M+H)-C3H6O4]+	[(M-H)-C3H6O4]-
+fragment	-(C3H8O3)	-92.04734412	[(M+H)-C3H8O3]+	[(M-H)-C3H8O3]-
+fragment	-(C3H8O4)	-108.0422587	[(M+H)-C3H8O4]+	[(M-H)-C3H8O4]-
+fragment	-(C4H10O5)	-138.0528234	[(M+H)-C4H10O5]+	[(M-H)-C4H10O5]-
+fragment	-(C4H5NO3)	-115.026943	[(M+H)-C4H5NO3]+	[(M-H)-C4H5NO3]-
+fragment	-(C4H8O4)	-120.0422587	[(M+H)-C4H8O4]+	[(M-H)-C4H8O4]-
+fragment	-(C5H10O4)	-134.0579088	[(M+H)-C5H10O4]+	[(M-H)-C5H10O4]-
+fragment	-(C5H13O4N)	-151.0844579	[(M+H)-C5H13O4N]+	[(M-H)-C5H13O4N]-
+fragment	-(C6H11O4N)	-161.0688078	[(M+H)-C6H11O4N]+	[(M-H)-C6H11O4N]-
+fragment	-(C6H11O5N)	-177.0637225	[(M+H)-C6H11O5N]+	[(M-H)-C6H11O5N]-
+fragment	-(C6H13O5N)	-179.0793725	[(M+H)-C6H13O5N]+	[(M-H)-C6H13O5N]-
+fragment	-(C5H10O5)	-150.0528234	[(M+H)-C5H10O5]+	[(M-H)-C5H10O5]-
+fragment	-(C5H10O6)	-166.047738	[(M+H)-C5H10O6]+	[(M-H)-C5H10O6]-
+fragment	-(C5H12O2)	-104.0837296	[(M+H)-C5H12O6]+	[(M-H)-C5H12O6]-
+fragment	-(C5H12O2)-(H2O)	-122.0942943	[(M+H)-(C5H12O2)-(H2O)]+	[(M-H)-(C5H12O2)-(H2O)]-
+fragment	-(C5H5N5)	-135.0544952	[(M+H)-C5H5N5]+	[(M-H)-C5H5N5]-
+fragment	-(C5H5ON5)	-151.0494098	[(M+H)-C5H5ON5]+	[(M-H)-C5H5ON5]-
+fragment	-(C5H6O2)	-98.03677943	[(M+H)-C5H6O2]+	[(M-H)-C5H6O2]-
+fragment	-(C5H7O2N5)	-169.0599745	[(M+H)-C5H7O2N5]+	[(M-H)-C5H7O2N5]-
+fragment	-(C5H7O3N)-(CO2)	-173.0324223	[(M+H)-(C5H7O3N)-(CO2)]+	[(M-H)-(C5H7O3N)-(CO2)]-
+fragment	-(C5H7O3N)-(H2O)	-147.0531578	[(M+H)-(C5H7O3N)-(H2O)]+	[(M-H)-(C5H7O3N)-(H2O)]-
+fragment	-(C5H8N3)	-110.0718223	[(M+H)-C5H8N3]+	[(M-H)-C5H8N3]-
+fragment	-(C5H8O3)	-116.0473441	[(M+H)-C5H8O3]+	[(M-H)-C5H8O3]-
+fragment	-(C5H8O5N5P)	-249.026305	[(M+H)-C5H8O5N5P]+	[(M-H)-C5H8O5N5P]-
+fragment	-(C5H9O3)	-117.0551691	[(M+H)-C5H9O3]+	[(M-H)-C5H9O3]-
+fragment	-(C5H9O6P)	-196.0136746	[(M+H)-C5H9O6P]+	[(M-H)-C5H9O6P]-
+fragment	-(C5H9O7P)	-212.0085893	[(M+H)-C5H9O7P]+	[(M-H)-C5H9O7P]-
+fragment	-(C6H10O3)	-130.0629942	[(M+H)-C6H10O3]+	[(M-H)-C6H10O3]-
+fragment	-(C6H10O3)-(H2O)	-148.0735589	[(M+H)-(C6H10O3)-(H2O)]+	[(M-H)-(C6H10O3)-(H2O)]-
+fragment	-(C6H11O4N3PS)	-252.0207885	[(M+H)-C6H11O4N3PS]+	[(M-H)-C6H11O4N3PS]-
+fragment	-(C6H11O4NPS)	-224.0146405	[(M+H)-C6H11O4NPS]+	[(M-H)-C6H11O4NPS]-
+fragment	-(C6H12O5)	-164.0684735	[(M+H)-C6H12O5]+	[(M-H)-C6H12O5]-
+fragment	-(C6H14O6)	-182.0790382	[(M+H)-C6H14O6]+	[(M-H)-C6H14O6]-
+fragment	-(C6H14O7)	-198.0739528	[(M+H)-C6H14O7]+	[(M-H)-C6H14O7]-
+fragment	-(C6H16O7)	-200.0896029	[(M+H)-C6H16O7]+	[(M-H)-C6H16O7]-
+fragment	-(C6H16O8)	-216.0845175	[(M+H)-C6H16O8]+	[(M-H)-C6H16O8]-
+fragment	-(C6H8N3)	-122.0718223	[(M+H)-C6H8N3]+	[(M-H)-C6H8N3]-
+fragment	-(C6H8NS)	-126.0377453	[(M+H)-C6H8NS]+	[(M-H)-C6H8NS]-
+fragment	-(C7H5ON5)	-175.0494098	[(M+H)-C7H5ON5]+	[(M-H)-C7H5ON5]-
+fragment	-(C7H6ON6)	-190.0603088	[(M+H)-C7H6ON6]+	[(M-H)-C7H6ON6]-
+fragment	-(C7H7O2N5)	-193.0599745	[(M+H)-C7H7O2N5]+	[(M-H)-C7H7O2N5]-
+fragment	-(C7H11O6N)	-205.0586371	[(M+H)-C7H11O6N]+	[(M-H)-C7H11O6N]-
+fragment	-(C8H14O7)	-222.0739528	[(M+H)-C8H14O7]+	[(M-H)-C8H14O7]-
+fragment	-(C8H5O3N5)	-219.039239	[(M+H)-C8H5O3N5]+	[(M-H)-C8H5O3N5]-
+fragment	-(C8H7O4N5)	-237.0498037	[(M+H)-C8H7O4N5]+	[(M-H)-C8H7O4N5]-
+fragment	-(C9H10O4N2)	-210.0640568	[(M+H)-C9H10O4N2]+	[(M-H)-C9H10O4N2]-
+fragment	-(C9H11O3N3)	-209.0800412	[(M+H)-C9H11O3N3]+	[(M-H)-C9H11O3N3]-
+fragment	-(C9H11O4N3)	-225.0749558	[(M+H)-C9H11O4N3]+	[(M-H)-C9H11O4N3]-
+fragment	-(C9H12O5N2)	-228.0746215	[(M+H)-C9H12O5N2]+	[(M-H)-C9H12O5N2]-
+fragment	-(C9H12O6N3P)	-289.0463717	[(M+H)-C9H12O6N3P]+	[(M-H)-C9H12O6N3P]-
+fragment	-(C9H13O4N3)	-227.0906059	[(M+H)-C9H13O4N3]+	[(M-H)-C9H13O4N3]-
+fragment	-(C9H14O7N3P)	-307.0569364	[(M+H)-C9H14O7N3P]+	[(M-H)-C9H14O7N3P]-
+fragment	-(C9H16O8)	-252.0845175	[(M+H)-C9H16O8]+	[(M-H)-C9H16O8]-
+fragment	-(CH2N2)	-42.02179806	[(M+H)-CH2N2]+	[(M-H)-CH2N2]-
+fragment	-(CH2O)-(H2O)	-48.02112937	[(M+H)-(CH2O)-(H2O)]+	[(M-H)-(CH2O)-(H2O)]-
+fragment	-(CH5NO)	-47.03711378	[(M+H)-CH5NO]+	[(M-H)-CH5NO]-
+fragment	-(H3PO4)-(CHNO)	-140.9827089	[(M+H)-(H3PO4)-(CHNO)]+	[(M-H)-(H3PO4)-(CHNO)]-
+fragment	-(H3PO4)-(H2O)	-115.9874599	[(M+H)-(H3PO4)-(H2O)]+	[(M-H)-(H3PO4)-(H2O)]-
+fragment	-(H3PO4)-(NH3)	-115.0034443	[(M+H)-(H3PO4)-(NH3)]+	[(M-H)-(H3PO4)-(NH3)]-
+fragment	-(HPO3)	-79.96633052	[(M+H)-HPO3]+	[(M-H)-HPO3]-

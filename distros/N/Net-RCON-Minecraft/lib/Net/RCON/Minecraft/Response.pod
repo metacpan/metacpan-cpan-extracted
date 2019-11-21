@@ -1,0 +1,95 @@
+=head1 NAME
+
+Net::RCON::Minecraft::Response - Minecraft RCON command response
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+    use Net::RCON::Minecraft;
+
+    my $response = eval { $rcon->command($command) };
+
+    if ($response) {
+        print  "Response: " . $response->ansi . "\n";
+        logger "Response: " . $response->plain;
+        logger "Response: " . $response; # Stringifies to $response->plain;
+    }
+
+=head1 DESCRIPTION
+
+This module encapsulates a command response from a Minecraft server. You would
+not normally create one of these objects yourself; they are generated from
+L<Net::RCON::Minecraft>'s C<command()> method.
+
+Minecraft servers return commands in a format that I<may> include Minecraft
+color codes, so this module provides methods to strip or convert those codes
+as needed. At the time of release, vanilla Minecraft servers do not ever
+transmit color codes to RCON results, but modded servers such as Bukkit do.
+
+=head1 STRINGIFICATION
+
+If all you need is the plaintext response with color codes stripped, in most
+cases you can just use C<$response> as a string. The object is L<overload>ed
+to return C<$response-E<gt>plain> in such cases.
+
+=head1 CONSTRUCTOR
+
+=head2 new( raw => $raw, id => $id )
+
+This is called automatically by C<command()> in C<Net::RCON::Minecraft>.
+
+Creates a new RCON command response with the given raw command response text,
+and request ID.
+
+=head1 METHODS
+
+=head2 raw
+
+Returns the unaltered raw command response.
+
+    $raw = $response->raw;
+
+=head2 plain
+
+Returns the command response with all color codes removed.
+
+    $plain = $response->plain;
+
+=head2 ansi
+
+Returns the command response with color codes converted to ANSI escape
+sequences, suitable for displaying in a terminal.
+
+    $ansi = $response->ansi;
+
+=head2 id
+
+Returns the numerical request ID that this response was for. These IDs are
+generated automatically by C<Net::RCON::Minecraft>, and there is normally no
+need to know them, but this may be useful for debugging.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Net::RCON::Minecraft>
+
+=item L<Term::ANSIColor>
+
+=back
+
+=head1 AUTHOR
+
+B<Ryan Thompson> E<lt>rjt@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2019 Ryan Thompson
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+L<http://dev.perl.org/licenses/artistic.html>

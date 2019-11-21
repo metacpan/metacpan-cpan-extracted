@@ -1,9 +1,45 @@
 ==================================================
-Changes from 2018-11-19 00:00:00 +0000 to present.
+Changes from 2018-11-21 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.010 at 2019-11-19 19:48:01 +0000
+version 0.013 at 2019-11-21 20:46:35 +0000
+------------------------------------------
+
+  Change: 385915d304e5f2312669497c7d35c7d081d5dc02
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-21 14:46:22 +0000
+
+    added medley cli 
+
+------------------------------------------
+version 0.012 at 2019-11-21 15:02:03 +0000
+------------------------------------------
+
+  Change: 5c1d61cb61f170491f09db3ddef534a64da5a22a
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-21 09:01:42 +0000
+
+    added more test cases for DateTime.pm 
+
+------------------------------------------
+version 0.011 at 2019-11-21 14:59:58 +0000
+------------------------------------------
+
+  Change: 5225709e77821f254edcaee0f4bf8fa2d15d1e11
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-21 08:59:58 +0000
+
+    added nsort to List.pm 
+
+  Change: 2bd01c4aeb344099f740bb90e22469a7929cffc5
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-19 13:48:57 +0000
+
+    pod cleanup on XML.pm 
+
+------------------------------------------
+version 0.010 at 2019-11-19 19:47:53 +0000
 ------------------------------------------
 
   Change: 97f704f93ddae7f2f8f57d9787594ac4d660be9d

@@ -326,6 +326,26 @@ static void MY_ensure_module_version(pTHX_ SV *module, SV *version)
   LEAVE;
 }
 
+#define fetch_superclass_method_pv(stash, pv, len, level)  MY_fetch_superclass_method_pv(aTHX_ stash, pv, len, level)
+static CV *MY_fetch_superclass_method_pv(pTHX_ HV *stash, const char *pv, STRLEN len, U32 level)
+{
+#if HAVE_PERL_VERSION(5, 18, 0)
+  GV *gv = gv_fetchmeth_pvn(stash, pv, len, level, GV_SUPER);
+#else
+  SV *superclassname = newSVpvf("%*s::SUPER", HvNAMELEN_get(stash), HvNAME_get(stash));
+  if(HvNAMEUTF8(stash))
+    SvUTF8_on(superclassname);
+  SAVEFREESV(superclassname);
+
+  HV *superstash = gv_stashsv(superclassname, GV_ADD);
+  GV *gv = gv_fetchmeth_pvn(superstash, pv, len, level, 0);
+#endif
+
+  if(!gv)
+    return NULL;
+  return GvCV(gv);
+}
+
 
 #define get_class_isa(stash)  MY_get_class_isa(aTHX_ stash)
 static AV *MY_get_class_isa(pTHX_ HV *stash)
@@ -482,9 +502,9 @@ static XS(injected_constructor)
     case REPR_FOREIGN_HASH: {
       CopLINE_set(PL_curcop, __LINE__);
 
-      GV *gv = gv_fetchmeth_pvn(meta->stash, "new", 3, -1, GV_SUPER);
-      if(!gv || !GvCV(gv))
-        croak("Unable to find SUPER::new for " SVf, SVfARG(class));
+      CV *supernew = fetch_superclass_method_pv(meta->stash, "new", 3, -1);
+      if(!supernew)
+        croak("Unable to find SUPER::new for " SVf, class);
 
       {
         ENTER;
@@ -501,7 +521,7 @@ static XS(injected_constructor)
           PUSHs(*svp);
         PUTBACK;
 
-        call_sv((SV *)GvCV(gv), G_SCALAR);
+        call_sv((SV *)supernew, G_SCALAR);
         SPAGAIN;
 
         self = POPs;

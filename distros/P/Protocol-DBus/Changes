@@ -1,6 +1,9 @@
 Revision history for Perl module Protocol::DBus
 
-0.11
+0.12 Tue 20 Nov 2019
+- Fix POD typo that misidentifies Mojo connector.
+
+0.11 Mon 19 Nov 2019
 - BUG FIX: initialize() now returns 1 after initial truthy return.
 - Implement non-blocking connect().
 - Add AnyEvent and IO::Async wrapper modules.

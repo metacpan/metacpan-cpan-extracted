@@ -76,11 +76,11 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::GSG" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/GSG.pm",
-         "version" : "v0.0.16"
+         "version" : "v0.0.18"
       },
       "Dist::Zilla::PluginBundle::Author::GSG" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GSG.pm",
-         "version" : "v0.0.16"
+         "version" : "v0.0.18"
       }
    },
    "release_status" : "stable",
@@ -88,13 +88,14 @@
       "bugtracker" : {
          "web" : "https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG/issues"
       },
+      "homepage" : "https://metacpan.org/pod/Dist::Zilla::PluginBundle::Author::GSG",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG.git",
          "web" : "https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG"
       }
    },
-   "version" : "v0.0.16",
+   "version" : "v0.0.18",
    "x_contributors" : [
       "Andrew Fresh <andrew.fresh@grantstreet.com>",
       "Mark Flickinger <mark.flickinger@grantstreet.com>"

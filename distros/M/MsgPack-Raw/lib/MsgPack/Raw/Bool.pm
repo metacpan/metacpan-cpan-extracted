@@ -1,5 +1,5 @@
 package MsgPack::Raw::Bool;
-$MsgPack::Raw::Bool::VERSION = '0.03';
+$MsgPack::Raw::Bool::VERSION = '0.04';
 use strict;
 use warnings;
 use MsgPack::Raw;
@@ -15,7 +15,7 @@ MsgPack::Raw::Bool - msgpack boolean class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 

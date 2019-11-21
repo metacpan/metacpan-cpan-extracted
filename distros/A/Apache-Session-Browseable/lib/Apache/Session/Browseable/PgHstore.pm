@@ -8,7 +8,7 @@ use Apache::Session::Browseable::Store::Postgres;
 use Apache::Session::Generate::SHA256;
 use Apache::Session::Serialize::Hstore;
 
-our $VERSION = '1.3.0';
+our $VERSION = '1.3.4';
 our @ISA     = qw(Apache::Session);
 
 sub populate {
@@ -36,7 +36,7 @@ sub searchOn {
 sub searchOnExpr {
     my ( $class, $args, $selectField, $value, @fields ) = @_;
     $selectField =~ s/'/''/g;
-    $value =~ s/\*/%/g;
+    $value       =~ s/\*/%/g;
     my $query =
       { query => "a_session -> '$selectField' like ?", values => [$value] };
     return $class->_query( $args, $query, @fields );
@@ -74,8 +74,14 @@ sub _query {
         my $self = eval "&${class}::populate();";
         my $sub  = $self->{unserialize};
         foreach my $s ( keys %$res ) {
-            my $tmp = &$sub( { serialized => $res->{$s}->{a_session} } );
-            $res->{$s} = $tmp;
+            eval {
+                my $tmp = &$sub( { serialized => $res->{$s}->{a_session} } );
+                $res->{$s} = $tmp;
+            };
+            if ($@) {
+                print STDERR "Error in session $s: $@\n";
+                delete $res->{$s};
+            }
         }
     }
     return $res;

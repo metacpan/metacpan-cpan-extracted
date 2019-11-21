@@ -105,7 +105,7 @@ static const int   MARPAESLIF_VERSION_PATCH_STATIC = MARPAESLIF_VERSION_PATCH;
 #endif
 
 #ifndef MARPAESLIF_HASH_SIZE
-#define MARPAESLIF_HASH_SIZE 16 /* Suggestive number - raising too high leads to unnecessary CPU when doing relax */
+#define MARPAESLIF_HASH_SIZE 16 /* Subjective number - raising too high leads to unnecessary CPU when doing relax */
 #endif
 
 /* Internal marpaESLIFValueResult used to do lazy row transformation: we use an INVALID type */
@@ -511,7 +511,7 @@ static inline void                   _marpaESLIF_rule_createshowv(marpaESLIF_t *
 static inline void                   _marpaESLIF_grammar_createshowv(marpaESLIFGrammar_t *marpaESLIFGrammarp, marpaESLIF_grammar_t *grammarp, char *asciishows, size_t *asciishowlp);
 static inline int                    _marpaESLIF_utf82ordi(PCRE2_SPTR8 utf8bytes, marpaESLIF_uint32_t *uint32p);
 static inline short                  _marpaESLIFRecognizer_matchPostProcessingb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, size_t matchl);
-static inline short                  _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *datas, size_t datal);
+static inline short                  _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *datas, size_t datal, short eofb);
 static inline short                  _marpaESLIFRecognizer_createDiscardStateb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp);
 static inline short                  _marpaESLIFRecognizer_createBeforeStateb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp);
 static inline short                  _marpaESLIFRecognizer_createAfterStateb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp);
@@ -10168,6 +10168,8 @@ static inline short _marpaESLIFRecognizer_readb(marpaESLIFRecognizer_t *marpaESL
   short                         characterStreamb           = 0;
   char                         *utf8s                      = NULL;
   size_t                        utf8l;
+  short                         appendDatab;
+  short                         charconvb;
   short                         rcb;
 
   MARPAESLIFRECOGNIZER_CALLSTACKCOUNTER_INC;
@@ -10178,16 +10180,10 @@ static inline short _marpaESLIFRecognizer_readb(marpaESLIFRecognizer_t *marpaESL
     MARPAESLIF_ERROR(marpaESLIFp, "Null reader callback");
   }
 
+ again:
   if (! marpaESLIFRecognizerOption.readerCallbackp(marpaESLIFRecognizerOption.userDatavp, &inputs, &inputl, &eofb, &characterStreamb, &encodings, &encodingl)) {
     MARPAESLIF_ERROR(marpaESLIFp, "reader failure");
     goto err;
-  }
-
-  /* We maintain here a very special thing: if there is EOF at the very first read, this mean that the user gave the whole stream */
-  /* in ONE step: then removing PCRE2_ANCHORED is allowed. */
-  if (marpaESLIF_streamp->nextReadIsFirstReadb) {
-    marpaESLIF_streamp->noAnchorIsOkb = eofb;
-    marpaESLIF_streamp->nextReadIsFirstReadb = 0; /* Next read will not be the first read */
   }
 
   if ((inputs != NULL) && (inputl > 0)) {
@@ -10246,8 +10242,12 @@ static inline short _marpaESLIFRecognizer_readb(marpaESLIFRecognizer_t *marpaESL
               goto err;
             }
             /* Start a new one */
-            if (! _marpaESLIFRecognizer_start_charconvb(marpaESLIFRecognizerp, encodings, encodingl, inputs, inputl, eofb)) {
+            charconvb = _marpaESLIFRecognizer_start_charconvb(marpaESLIFRecognizerp, encodings, encodingl, inputs, inputl, eofb);
+            if (! charconvb) {
               goto err;
+            } else if (charconvb < 0) {
+              /* EAGAIN case: charconv internally appends data, the later tried to remove BOM, this is not eof, and there are not enough bytes */
+              goto again;
             }
           } else {
             /* ************************************************************************************************************************************************* */
@@ -10258,8 +10258,12 @@ static inline short _marpaESLIFRecognizer_readb(marpaESLIFRecognizer_t *marpaESL
             if (utf8s == NULL) {
               goto err;
             }
-            if (! _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, utf8s, utf8l)) {
+            appendDatab = _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, utf8s, utf8l, eofb);
+            if (! appendDatab) {
               goto err;
+            } else if (appendDatab < 0) {
+              /* EAGAIN case: appending data tried to remove BOM, this is not eof, and there are not enough bytes */
+              goto again;
             }
           }
         } else {
@@ -10271,8 +10275,12 @@ static inline short _marpaESLIFRecognizer_readb(marpaESLIFRecognizer_t *marpaESL
           if (utf8s == NULL) {
             goto err;
           }
-          if (! _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, utf8s, utf8l)) {
+          appendDatab = _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, utf8s, utf8l, eofb);
+          if (! appendDatab) {
             goto err;
+          } else if (appendDatab < 0) {
+            /* EAGAIN case: appending data tried to remove BOM, this is not eof, and there are not enough bytes */
+            goto again;
           }
         }
       } else {
@@ -10280,8 +10288,12 @@ static inline short _marpaESLIFRecognizer_readb(marpaESLIFRecognizer_t *marpaESL
         /* - Previous read was NOT a stream of characters (marpaESLIF_streamp->charconvb is false).                                                          */
         /* ************************************************************************************************************************************************* */
         /* Start a new conversion engine */
-        if (! _marpaESLIFRecognizer_start_charconvb(marpaESLIFRecognizerp, encodings, encodingl, inputs, inputl, eofb)) {
+        charconvb = _marpaESLIFRecognizer_start_charconvb(marpaESLIFRecognizerp, encodings, encodingl, inputs, inputl, eofb);
+        if (! charconvb) {
           goto err;
+        } else if (charconvb < 0) {
+          /* EAGAIN case: charconv internally appends data, the later tried to remove BOM, this is not eof, and there are not enough bytes */
+          goto again;
         }
       }
     } else {
@@ -10305,7 +10317,12 @@ static inline short _marpaESLIFRecognizer_readb(marpaESLIFRecognizer_t *marpaESL
           goto err;
         }
         /* Data is appended as-is */
-        if (! _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, inputs, inputl)) {
+        appendDatab = _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, inputs, inputl, eofb);
+        if (! appendDatab) {
+          goto err;
+        } else if (appendDatab < 0) {
+          /* EAGAIN case: should never happen because we said this is not anymore a character stream */
+          MARPAESLIF_ERROR(marpaESLIFRecognizerp->marpaESLIFp, "Internal failure, appending data wants more data when it should not");
           goto err;
         }
       } else {
@@ -10313,7 +10330,12 @@ static inline short _marpaESLIFRecognizer_readb(marpaESLIFRecognizer_t *marpaESL
         /* - Previous read was NOT a stream of characters (marpaESLIF_streamp->charconvb is false).                                                          */
         /* ************************************************************************************************************************************************* */
         /* Data is appended as-is */
-        if (! _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, inputs, inputl)) {
+        appendDatab = _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, inputs, inputl, eofb);
+        if (! appendDatab) {
+          goto err;
+        } else if (appendDatab < 0) {
+          /* EAGAIN case: should never happen because we said this is not anymore a character stream */
+          MARPAESLIF_ERROR(marpaESLIFRecognizerp->marpaESLIFp, "Internal failure, appending data wants more data when it should not");
           goto err;
         }
       }
@@ -10324,6 +10346,14 @@ static inline short _marpaESLIFRecognizer_readb(marpaESLIFRecognizer_t *marpaESL
 
   rcb = 1;
   marpaESLIF_streamp->eofb = eofb;
+
+  /* We maintain here a very special thing: if there is EOF at the very first read, this mean that the user gave the whole stream */
+  /* in ONE step: then removing PCRE2_ANCHORED is allowed. */
+  if (marpaESLIF_streamp->nextReadIsFirstReadb) {
+    marpaESLIF_streamp->noAnchorIsOkb = eofb;
+    marpaESLIF_streamp->nextReadIsFirstReadb = 0; /* Next read will not be the first read */
+  }
+
   goto done;
 
  err:
@@ -11426,7 +11456,7 @@ marpaESLIFRecognizerOption_t *marpaESLIFRecognizer_optionp(marpaESLIFRecognizer_
 }
 
 /*****************************************************************************/
-static inline short _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *datas, size_t datal)
+static inline short _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *datas, size_t datal, short eofb)
 /*****************************************************************************/
 {
   static const char   *funcs              = "_marpaESLIFRecognizer_appendDatab";
@@ -11484,7 +11514,7 @@ static inline short _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizer_t *ma
         buffers       = marpaESLIF_streamp->buffers      = tmps;        /* Buffer pointer */
         bufferallocl  = marpaESLIF_streamp->bufferallocl = wantedl;     /* Allocated size */
         bufferl       = marpaESLIF_streamp->bufferl      = inputl;      /* Number of valid bytes */
-        globalOffsetp += inputl;                                               /* We "forget" inputl bytes: increase global offset (size_t turnaround not checked) */
+        globalOffsetp += inputl;                                        /* We "forget" inputl bytes: increase global offset (size_t turnaround not checked) */
         marpaESLIF_streamp->globalOffsetp = globalOffsetp;
         /* Pointer inside internal buffer is back to the beginning */
         marpaESLIF_streamp->inputs = buffers;
@@ -11505,7 +11535,7 @@ static inline short _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizer_t *ma
     }
     buffers      = marpaESLIF_streamp->buffers      = tmps;        /* Buffer pointer */
     bufferallocl = marpaESLIF_streamp->bufferallocl = wantedl;     /* Allocated size */
-    bufferl      = marpaESLIF_streamp->bufferl      = 0;           /* Number of valid bytes */
+    bufferl      = marpaESLIF_streamp->bufferl      = 0;           /* Number of valid bytes (increased below) */
     buffers[bufferl] = '\0';
     /* Pointer inside internal buffer is at the beginning */
     marpaESLIF_streamp->inputs = buffers;
@@ -11542,16 +11572,22 @@ static inline short _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizer_t *ma
   /* the later is set to true only after append data is done */
   if ((marpaESLIF_streamp->tconvp != NULL) && (! marpaESLIF_streamp->bomdoneb)) {
     removebomb = _marpaESLIF_string_removebomb(marpaESLIFRecognizerp->marpaESLIFp, marpaESLIF_streamp->inputs, &(marpaESLIF_streamp->inputl), (char *) MARPAESLIF_UTF8_STRING, &bomsizel);
-    /* Whatever happened, keep bufferl and inputl in sync: it is guaranteed that buffer was never crunched because of this pending BOM check */
-    marpaESLIF_streamp->bufferl = marpaESLIF_streamp->inputl;
     if (! removebomb) {
       goto err;
     } else if (removebomb > 0) {
       MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, "BOM is %ld bytes", (unsigned long) bomsizel);
       /* BOM processed */
       marpaESLIF_streamp->bomdoneb = 1;
+      /* It is guaranteed that buffer was never crunched because of this pending BOM check - _marpaESLIF_string_removebomb() did an internal memmove, decreasing inputl */
+      marpaESLIF_streamp->bufferl = marpaESLIF_streamp->inputl;
     } else {
-      MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, "BOM must be checked at next read", (unsigned long) bomsizel);
+      if (! eofb) {
+        MARPAESLIFRECOGNIZER_TRACE(marpaESLIFRecognizerp, funcs, "BOM must be checked at next read");
+        rcb = -1;
+        goto done;
+      } else {
+        MARPAESLIFRECOGNIZER_TRACE(marpaESLIFRecognizerp, funcs, "BOM cannot be checked and eof is reached");
+      }
     }
   }
 
@@ -11911,7 +11947,7 @@ static inline short _marpaESLIFRecognizer_flush_charconvb(marpaESLIFRecognizer_t
   if (utf8s == NULL) {
     goto err;
   }
-  if (! _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, utf8s, utf8l)) {
+  if (! _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, utf8s, utf8l, 1 /* eofb */)) {
     goto err;
   }
 
@@ -11950,6 +11986,8 @@ static inline short _marpaESLIFRecognizer_flush_charconvb(marpaESLIFRecognizer_t
 /*****************************************************************************/
 static inline short _marpaESLIFRecognizer_start_charconvb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *encodings, size_t encodingl, char *srcs, size_t srcl, short eofb)
 /*****************************************************************************/
+/* Take care: this CAN RETURN -1, meaning that it needs more data, the reason is BOM removal */
+/*****************************************************************************/
 {
   static const char          *funcs              = "_marpaESLIFRecognizer_start_charconvb";
   marpaESLIF_t               *marpaESLIFp        = marpaESLIFRecognizerp->marpaESLIFp;
@@ -11958,6 +11996,7 @@ static inline short _marpaESLIFRecognizer_start_charconvb(marpaESLIFRecognizer_t
   char                       *encodingutf8s      = NULL;
   char                       *utf8s              = NULL;
   size_t                      utf8l;
+  short                       appendDatab;
   short                       rcb;
   size_t                      encodingutf8l;
 
@@ -12038,7 +12077,9 @@ static inline short _marpaESLIFRecognizer_start_charconvb(marpaESLIFRecognizer_t
     goto err;
   }
 
-  if (! _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, utf8s, utf8l)) {
+  appendDatab = _marpaESLIFRecognizer_appendDatab(marpaESLIFRecognizerp, utf8s, utf8l, eofb);
+  /* Take care: appendDatab can be < 0 */
+  if (! appendDatab) {
     goto err;
   }
 
@@ -12058,7 +12099,7 @@ static inline short _marpaESLIFRecognizer_start_charconvb(marpaESLIFRecognizer_t
   /* Put global flag to on */
   marpaESLIF_streamp->charconvb = 1;
 
-  rcb = 1;
+  rcb = appendDatab;
   goto done;
 
  err:
@@ -14043,6 +14084,7 @@ static inline short _marpaESLIF_generic_action___concatb(void *userDatavp, marpa
 	if (converteds == NULL) {
 	  goto err;
 	}
+        /* We send the whole data in one go: we ignore the fact that _marpaESLIF_string_removebomb() may return -1 */
 	if (! _marpaESLIF_string_removebomb(marpaESLIFp, converteds, &(convertedl), toEncodings, NULL /* bomsizelp */)) {
 	  goto err;
 	}
@@ -16572,6 +16614,7 @@ static inline marpaESLIF_string_t *_marpaESLIF_string2utf8p(marpaESLIF_t *marpaE
         goto err;
       }
 
+        /* We send the whole data in one go: we ignore the fact that _marpaESLIF_string_removebomb() may return -1 */
       if (! _marpaESLIF_string_removebomb(marpaESLIFp, rcp->bytep, &(rcp->bytel), (char *) MARPAESLIF_UTF8_STRING, NULL /* bomsizelp */)) {
         goto err;
       }

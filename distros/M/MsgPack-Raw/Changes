@@ -1,5 +1,10 @@
 Revision history for MsgPack-Raw
 
+0.04      2019-11-21 17:21:50+00:00 Europe/London
+
+ - Documentation fixes
+ - Improved test coverage
+
 0.03      2019-11-18 17:03:20+00:00 Europe/London
 
  - Added support for perl 5.8

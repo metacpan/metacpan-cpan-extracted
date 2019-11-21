@@ -280,7 +280,7 @@ if( exists $OPT{top} ) {
 
     if( exists $sub_agg{by} ) {
         $agg_header = "$OPT{by}\t" . $agg_header;
-        $agg{$top_agg}->{order} = { by => $ORDER };
+        $agg{$top_agg}->{order} = [ { by => $ORDER }, { "_count" => "desc" } ];
     }
     $agg{aggregations} = \%sub_agg if keys %sub_agg;
 
@@ -351,16 +351,9 @@ AGES: while( !$DONE && @AGES ) {
     debug_var($q->request_body);
     debug_var($q->uri_params);
 
-    my $result = es_request('_search',
-        # Search Parameters
-        {
-            index     => $by_age{$age},
-            uri_param => $q->uri_params,
-            method    => 'POST',
-        },
-        # Search Body
-        $q->request_body,
-    );
+    # Execute the query
+    my $result = $q->execute( $by_age{$age} );
+
     debug({clear=>1},"== Results");
     debug_var($result);
     $duration += time() - $start;
@@ -568,16 +561,10 @@ AGES: while( !$DONE && @AGES ) {
 
         # Scroll forward
         $start = time;
-        $result = es_request('_search/scroll',
-            {
-                method => 'POST',
-            },
-            {
-                scroll => $q->scroll,
-                scroll_id => $result->{_scroll_id},
-            }
-        );
+        $result = $q->scroll_results();
         $duration += time - $start;
+        # Check if we need to keep going
+        last unless defined $result;
         last unless $result->{hits} && $result->{hits}{hits} && @{ $result->{hits}{hits} } > 0
     }
     last if all_records_displayed();
@@ -718,7 +705,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 7.4
+version 7.5
 
 =head1 SYNOPSIS
 

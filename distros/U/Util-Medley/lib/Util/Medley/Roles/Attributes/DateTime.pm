@@ -1,5 +1,5 @@
 package Util::Medley::Roles::Attributes::DateTime;
-$Util::Medley::Roles::Attributes::DateTime::VERSION = '0.010';
+$Util::Medley::Roles::Attributes::DateTime::VERSION = '0.013';
 use Modern::Perl;
 use Moose::Role;
 use Util::Medley::DateTime;
@@ -10,7 +10,7 @@ Util::Medley::Roles::Attributes::DateTime
 
 =head1 VERSION
 
-version 0.010
+version 0.013
 
 =cut
 

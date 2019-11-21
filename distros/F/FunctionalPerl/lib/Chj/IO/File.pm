@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2003-2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2003-2019 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -151,16 +151,15 @@ use Fcntl qw(:DEFAULT :flock :seek :mode);
 
 my $has_posix;
 BEGIN {
-    eval {
-        require POSIX;
-    };
-    if ($@) {
+    if (eval {
+        require POSIX; 1
+        }) {
+        $has_posix=1;
+        POSIX->import( qw(EINVAL ENOENT));
+    } else {
         $has_posix=0;
         require Errno;
         Errno->import( qw(EINVAL ENOENT));
-    } else {
-        $has_posix=1;
-        POSIX->import( qw(EINVAL ENOENT));
     }
 }
 
@@ -1165,19 +1164,21 @@ sub eof {
 
 
 if ($has_posix) {
-    my $base= do {
-        if (-d "/dev/fd") {
-            "/dev/fd"
-        } elsif (-d "/proc/self/fd") {
-            "/proc/self/fd"
-        } else {
-            warn "missing /dev/fd or /proc/self/fd, fd_dev_path method will not work";
-            undef
+    my $_base;
+    my $base= sub {
+        $_base //= do {
+            if (-d "/dev/fd") {
+                "/dev/fd"
+            } elsif (-d "/proc/self/fd") {
+                "/proc/self/fd"
+            } else {
+                die "missing /dev/fd or /proc/self/fd"
+            }
         }
     };
     *Fd_dev_path= sub {
         my ($fileno)=@_;
-        $base . "/" . $fileno
+        &$base() . "/" . $fileno
     };
     *fd_dev_path= sub {
         my $s=shift;

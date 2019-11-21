@@ -1,0 +1,284 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /Business/ID/POM/parse_pom_reg_code
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
+
+our $DATE = '2019-11-21'; # DATE
+our $DIST = 'App-IndonesianNumberUtils'; # DIST
+our $VERSION = '0.031'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/Business/ID/POM/parse_pom_reg_code",
+    program_name => "parse-pom-reg-code",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Parse food/drug registration code published by the Indonesian National Agency of Drug and Food Control (POM)
+# PODNAME: parse-pom-reg-code
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+parse-pom-reg-code - Parse food/drug registration code published by the Indonesian National Agency of Drug and Food Control (POM)
+
+=head1 VERSION
+
+This document describes version 0.031 of parse-pom-reg-code (from Perl distribution App-IndonesianNumberUtils), released on 2019-11-21.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % parse-pom-reg-code [options] <code>
+
+Examples:
+
+ % parse-pom-reg-code 'MD 224510107115'
+ +---------------------------+-------------------------------+
+ | key                       | value                         |
+ +---------------------------+-------------------------------+
+ | category_code             | MD                            |
+ | category_id               | Makanan (M), dalam negeri (D) |
+ | food_company_code         | 107                           |
+ | food_company_product_code | 115                           |
+ | food_packaging_code       | 2                             |
+ | food_province_code        | 10                            |
+ | food_type_code            | 245                           |
+ | number                    | 224510107115                  |
+ +---------------------------+-------------------------------+
+
+ % parse-pom-reg-code DBL9624502804A1
+ +---------------------------+---------------------------------------------+
+ | key                       | value                                       |
+ +---------------------------+---------------------------------------------+
+ | category_code             | DBL                                         |
+ | category_id               | Obat merek dagang (D), bebas (B), lokal (L) |
+ | drug_category_code        | B                                           |
+ | drug_company_code         | 245                                         |
+ | drug_company_product_code | 028                                         |
+ | drug_dosage_form_code     | 04                                          |
+ | drug_dosage_form_id       | kaplet (04)                                 |
+ | drug_origin_code          | L                                           |
+ | drug_packaging_serial     | 1                                           |
+ | drug_strength_serial      | A                                           |
+ | drug_year                 | 1996                                        |
+ | number                    | 9624502804A1                                |
+ +---------------------------+---------------------------------------------+
+
+ % parse-pom-reg-code NC14191300159
+ +----------------------------+-------------------------+
+ | key                        | value                   |
+ +----------------------------+-------------------------+
+ | category_code              | NC                      |
+ | category_id                | Kosmetik (N), Eropa (C) |
+ | cosmetic_category_code     | C                       |
+ | cosmetic_country_code      | 14                      |
+ | cosmetic_group_code        | 13                      |
+ | cosmetic_notification_code | 00159                   |
+ | cosmetic_year              | 2019                    |
+ | number                     | 14191300159             |
+ +----------------------------+-------------------------+
+
+ % parse-pom-reg-code TR092699241
+ +-----------------------------+----------------------------------------+
+ | key                         | value                                  |
+ +-----------------------------+----------------------------------------+
+ | category_code               | TR                                     |
+ | category_id                 | Obat traditional (T), dalam negeri (R) |
+ | number                      | 092699241                              |
+ | trad_company_product_serial | 9924                                   |
+ | trad_company_type_code      | 2                                      |
+ | trad_company_type_id        | pabrik jamu                            |
+ | trad_origin                 | R                                      |
+ | trad_packaging_code         | 6                                      |
+ | trad_packaging_id           | cairan                                 |
+ | trad_packaging_volume       | 15ml                                   |
+ | trad_packaging_volume_code  | 1                                      |
+ | trad_year                   | 2009                                   |
+ +-----------------------------+----------------------------------------+
+
+ % parse-pom-reg-code FF182600791
+ +---------------+----------------+
+ | key           | value          |
+ +---------------+----------------+
+ | category_code | FF             |
+ | category_id   | Fitofarma (FF) |
+ | number        | 182600791      |
+ +---------------+----------------+
+
+=head1 DESCRIPTION
+
+This routine does not check whether the code actually exists. Use
+https://cekbpom.pom.go.id/ for that.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--code>=I<s>*
+
+Input POM code to be parsed.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C parse-pom-reg-code parse-pom-reg-code
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete parse-pom-reg-code 'p/*/`parse-pom-reg-code`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-IndonesianNumberUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-IndonesianNumberUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianNumberUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2018, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,5 +1,9 @@
 Revision history for Rarbg-torrentapi
 
+v0.2.0  2019-11-21 20:38:29 CET
+        - `title` can be null.  Than breaks type validation.  API docs are not
+          so good ...
+
 v0.1.10  2019-11-15 18:17:21 CET
         - fix: an error is returned if search finds only 1 result.  Thanks to
           Hoffy Can.

@@ -10,12 +10,14 @@ require_ok('Nexus::Uploader');
 {
     my $uploader = eval {
         Nexus::Uploader->new(
-            group    => 'BRAD',
+            group    => 'BRAD.SVW',
             artefact => 'Nexus::Uploader::Test',
             version  => '1.0.0',
         );
     };
     ok( !$@, 'Testing Nexus::Uploader->new(GAV)' . $@ );
+    cmp_ok $uploader->artefact, 'eq', 'Nexus-Uploader-Test', 'Testing artefact processing';
+    cmp_ok $uploader->group,    'eq', 'BRAD/SVW',            'Testing group processing';
 }
 
 # Finish the testing run

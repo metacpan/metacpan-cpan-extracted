@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '3.0.28'; # VERSION
+our $VERSION = '3.0.29'; # VERSION
 
 
 #
@@ -38,7 +38,7 @@ MarpaX::ESLIF::Grammar - MarpaX::ESLIF's grammar
 
 =head1 VERSION
 
-version 3.0.28
+version 3.0.29
 
 =head1 SYNOPSIS
 

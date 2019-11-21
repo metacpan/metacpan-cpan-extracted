@@ -1,6 +1,11 @@
 Revision history for Term::Choose
 
 
+1.706   2019-11-21
+    - Deprecated the option 'lf'.
+    - New options 'tabs_info' and 'tabs_prompt'.
+    - Option 'color': added a valid value (2).
+
 1.705   2019-10-18
     - Bugfix in 'busy_string'.
 

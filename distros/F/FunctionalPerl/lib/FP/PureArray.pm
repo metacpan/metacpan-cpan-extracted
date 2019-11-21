@@ -31,6 +31,7 @@ FP::PureArray
     is ref($a), 'FP::_::MutableArray';
     # see FP::MutableArray
 
+    is( FP::_::PureArray->null == FP::_::PureArray->null, 1);
 
 =head1 DESCRIPTION
 
@@ -132,13 +133,12 @@ package FP::_::PureArray {
 
     # emptyness constructor that works for subclassing (using singletons
     # for performance (perhaps))
-    my %empties;
-    sub empty {
+    my %null;
+    sub null {
         my $proto=shift;
         my $class= ref($proto) || $proto;
-        $empties{$class} ||= $class->new_from_array([]) 
+        $null{$class} ||= $class->new_from_array([]) 
     }
-
 
     sub constructor_name {
         "purearray"
@@ -166,8 +166,9 @@ package FP::_::PureArray {
     _END_; # Chj::NamespaceCleanAbove
 
     FP::Interfaces::implemented qw(
-        FP::Abstract::Sequence
         FP::Abstract::Pure
+        FP::Abstract::Sequence
+        FP::Abstract::Equal
         FP::Abstract::Show);
 }
 

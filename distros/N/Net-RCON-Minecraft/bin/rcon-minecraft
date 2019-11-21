@@ -1,0 +1,215 @@
+#!/usr/bin/env perl
+
+use 5.008;
+use strict;
+use warnings;
+
+use Net::RCON::Minecraft;
+use Getopt::Long qw< GetOptionsFromArray >;
+use Pod::Usage;
+no warnings 'uninitialized';
+
+exit main(@ARGV) unless caller;
+
+sub main {
+    my $ARGV = \@_;
+
+    my %o = ( command => [ ] );
+    GetOptionsFromArray($ARGV, \%o, qw< host=s port=i password=s timeout=f
+        command|cmd=s@ color quiet echo help version > )           or return 2;
+    if ($o{help})    { pod2usage -verbose => 1, -exitval => 'noexit'; return }
+    if ($o{version}) { print "rcon-minecraft version 0.01\n";         return }
+
+    push @{$o{command}}, join(' ', @$ARGV) if @$ARGV;
+
+    $o{rcon} = Net::RCON::Minecraft->new(%o);
+    $o{rcon}->connect; # Not necessary, but better here to fail early
+
+    if (@{$o{command}}) {   for (@{$o{command}}) { run_command(\%o, $_) } }
+    else                { while (<STDIN>) { chomp; run_command(\%o, $_) } }
+
+    return;
+}
+
+# Run the command and display the output, echoing if so configured
+sub run_command {
+    my $o = shift;
+    print "> $_[0]\n" if $o->{echo};
+
+    my $resp = $o->{rcon}->command($_[0]);
+    my $disp = $o->{color} ? $resp->ansi : $resp->plain;
+
+    print length $resp ? "$disp\n" : "[Command sent]\n" unless $o->{quiet};
+}
+
+__END__
+
+=head1 NAME
+
+rcon-minecraft - RCON interface for Minecraft servers
+
+=head1 SYNOPSIS
+
+B<rcon-minecraft> --pass=I<password> [I<options>] I<command args> ...
+
+B<rcon-minecraft> --pass=I<password> [I<options>] --command='I<cmd1>' ...
+
+=head1 OPTIONS
+
+ --host=host        Hostname to connect to          [127.0.0.1]
+ --port=port        Port number                         [25575]
+ --password=pass    Password
+ --timeout=sec      Timeout in seconds (float)             [30]
+ --command='cmd'    Command to run. May be repeated.
+   | --cmd='cmd'
+ -c|--color         Use a colored output (modded servers)   [0]
+ -q|--quiet         Suppress command output
+ --echo             Echo the commands themselves to stdout
+ -v|--version       Display version number and exit
+
+Any remaining arguments on the commandline will be concatenated
+together and interpreted as a single command, as you might expect.
+
+=head1 DESCRIPTION
+
+I<rcon-minecraft> provides a commandline interface to interact with a
+Minecraft server using the RCON protocol. You may specify commands via
+commandline options, or via standard input if no options are specified
+on the commandline.
+
+=head1 OPTION DETAILS
+
+=over 4
+
+=item --host=I<host>
+
+The hostname or IP address of the Minecraft server.
+
+=item --port=I<port>
+
+The TCP port number to connect to. Default is the usual RCON port number, 25575.
+This must match the port number defined in your Minecraft server's
+F<server.properties> file:
+
+    rcon.port=25575
+
+=item --password=I<password>
+
+The password required to connect to the Minecraft RCON. This is defined in
+your Minecraft server's F<server.properties> file:
+
+    rcon.password=
+
+Note that the password must not be blank. A blank password defined in
+F<server.properties> means that RCON is disabled on your server.
+
+=item --timeout=I<sec>
+
+Normally C<rcon-minecraft> will wait 30 seconds for the server to respond
+before it reports a timeout and exits. Setting a different timeout will affect
+I<all> network operations, including connecting, and running commands. Some
+commands may legitimately take a long time to return, such as C<fill>,
+C<reload>, etc., so beware of setting this value too low.
+
+=item --command='I<command args>' | --cmd='I<command args>'
+
+Sends I<command args> to the server and waits for the response. A forward
+slash is not needed (and will usually result in an error). When supplying
+arguments, enclose the command in quotation marks. Be sure to properly escape
+any special characters used by your shell.
+
+To specify more than one command, simply repeat the C<--command> option.
+
+Examples:
+
+    rcon-minecraft --pass=secret --cmd=list
+    rcon-minecraft --pass=secret --cmd='team list' --cmd='say Hello, world'
+
+If no commands are given, commands will be read from the standard input
+instead, and executed in order:
+
+    rcon-minecraft --pass=secret < commands.txt
+
+If you only want to run one command, as a convenience, you may skip the
+C<--command> argument, and in this case only, arguments will be joined
+even if not enclosed in quotes:
+
+    rcon-minecraft --pass=secret gamerule keepInventory true
+
+Of course, proper shell escaping of special characters is still required. If
+this is a burden, consider using the above standard input method, or bypassing
+the shell by using the L<Net::RCON::Minecraft> Perl module itself.
+
+=item -c | --color
+
+Some modded servers send back colored output. By default these color codes are
+stripped to give plaintext output. Setting C<-c> instead causes command output
+to be displayed using ANSI escape codes. Whether those escape codes will
+actually produce colored output depends entirely on your terminal.
+
+=item -q | --quiet
+
+Suppresses output from commands (if any). Errors are still displayed, and if
+C<--echo> is set, commands themselves are still echoed.
+
+=item --echo
+
+Echo commands themselves to standard output before they are run, prefixed by
+C<E<gt>>:
+
+    > list
+    There are 2 of a max 20 players online: me, you
+
+=item -v | --version
+
+Display version number and exit.
+
+=item --help
+
+Display usage summary and exit.
+
+=back
+
+=head1 ERRORS
+
+Invalid arguments, connection errors, and unexpected/incorrect responses from
+the server will cause C<rcon-minecraft> to display an error message and exit
+with a non-zero status code.
+
+When running several commands in sequence, it is therefore possible for some
+of the commands to run, and the remainder not to run. If this results in an
+inconsistent state for your logic, and you need to perform a rollback, you are
+advised to run commands individually, or at least use C<--echo> so you know
+which commands have been run. Of course, the full Perl module
+L<Net::RCON::Minecraft> is installed on this machine, so you always have the
+option of coding complex logic directly in Perl.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item
+
+L<Net::RCON::Minecraft> - The Perl module that provides all of the Minecraft
+RCON logic used by this script.
+
+=item
+
+L<https://minecraft.gamepedia.com/Commands> - Commands supported by vanilla
+Minecraft servers. If your server is modded, consult that documentation
+instead.
+
+=back
+
+=head1 AUTHOR
+
+B<Ryan Thompson> E<lt>rjt@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2019 Ryan Thompson
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+L<http://dev.perl.org/licenses/artistic.html>

@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -20,12 +20,39 @@ no_index:
     - inc
     - examples
     - meta
+    - htmlgen
 recommends:
+  B::Deparse: '0'
+  BSD::Resource: '0'
   Capture::Tiny: '0'
+  Clone: '0'
+  DBD::CSV: '0'
+  DBI: '0'
+  Encode: '0'
   Eval::WithLexicals: '0'
+  Function::Parameters: '0'
+  LWP::UserAgent: '0'
+  Method::Signatures: '0'
   PadWalker: '0'
+  Sub::Util: '0'
   Term::ReadLine::Gnu: '0'
+  Test::Pod::Snippets: '0'
+  Text::CSV: '0'
+  Text::Markdown: '0'
+  URI: '0'
 requires:
+  Digest: '0'
+  Getopt::Long: '0'
+  NEXT: '0'
   Scalar::Util: '0'
-version: v0.72.2
+  Symbol: '0'
+  Test::More: '0'
+  base: '0'
+  overload: '0'
+  perl: '5.014002'
+  utf8: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/pflanze/functional-perl.git
+version: v0.72.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

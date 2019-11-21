@@ -11,7 +11,7 @@ use Apache::Session::Browseable::_common;
 
 use constant SL => ( $^O and $^O =~ /(?:MSWin|Windows)/i ? '\\' : '/' );
 
-our $VERSION = '1.2.3';
+our $VERSION = '1.3.4';
 our @ISA     = qw(Apache::Session Apache::Session::Browseable::_common);
 
 sub populate {
@@ -48,20 +48,27 @@ sub get_key_from_all_sessions {
     closedir DIR;
     my %res;
     for my $f (@t) {
-        open F, $args->{Directory} . SL . $f;
-        my $row = join '', <F>;
-        if ( ref($data) eq 'CODE' ) {
-            $res{$f} =
-              &$data( &Apache::Session::Serialize::JSON::_unserialize($row),
-                $f );
-        }
-        elsif ($data) {
-            $data = [$data] unless ( ref($data) );
-            my $tmp = &Apache::Session::Serialize::JSON::_unserialize($row);
-            $res{$f}->{$_} = $tmp->{$_} foreach (@$data);
-        }
-        else {
-            $res{$f} = &Apache::Session::Serialize::JSON::_unserialize($row);
+        eval {
+            open F, $args->{Directory} . SL . $f or die $!;
+            my $row = join '', <F>;
+            if ( ref($data) eq 'CODE' ) {
+                $res{$f} =
+                  &$data( &Apache::Session::Serialize::JSON::_unserialize($row),
+                    $f );
+            }
+            elsif ($data) {
+                $data = [$data] unless ( ref($data) );
+                my $tmp = &Apache::Session::Serialize::JSON::_unserialize($row);
+                $res{$f}->{$_} = $tmp->{$_} foreach (@$data);
+            }
+            else {
+                $res{$f} =
+                  &Apache::Session::Serialize::JSON::_unserialize($row);
+            }
+        };
+        if ($@) {
+            print STDERR "Error in session $f: $@\n";
+            delete $res{$f};
         }
     }
     return \%res;

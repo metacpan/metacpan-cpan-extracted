@@ -23,7 +23,7 @@ is($res, "#oboterm <tab> degree <tab> indegree <tab> outdegree\nGO:0007260\t2\t2
 
 ## test read or die
 my $fakedges = "t/data/test_GOBASIC_edges.txt";
-lives_ok( sub { my $file = obogaf::parser::make_stat($goedges, $parentIndex, $childIndex) }, 'file opened' );
+lives_ok( sub { my $file = obogaf::parser::make_stat($goedges,  $parentIndex, $childIndex) }, 'file opened' );
 dies_ok ( sub { my $file = obogaf::parser::make_stat($fakedges, $parentIndex, $childIndex) }, 'die: wrong file name');
 
 ## build $gobp

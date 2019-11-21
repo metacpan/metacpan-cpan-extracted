@@ -37,13 +37,13 @@ typedef struct
 
 typedef struct
 {
-    msgpack_packer packer;
+	msgpack_packer packer;
 	SV *data;
 } msgpack_raw_packer;
 
 typedef struct
 {
-    msgpack_unpacker unpacker;
+	msgpack_unpacker unpacker;
 } msgpack_raw_unpacker;
 
 typedef msgpack_raw_packer *Packer;
@@ -174,8 +174,8 @@ STATIC void encode_msgpack (msgpack_raw_packer *packer, SV *sv)
 		}
 		else
 		{
-            croak ("encountered object '%s', Data::MessagePack doesn't allow the object",
-                           SvPV_nolen(sv_2mortal(newRV_inc(sv))));
+			croak ("encountered object '%s', Data::MessagePack doesn't allow the object",
+				SvPV_nolen (sv_2mortal (newRV_inc (sv))));
 		}
 	}
 	else if (!SvOK (sv))
@@ -242,9 +242,9 @@ STATIC SV *decode_msgpack (msgpack_object *obj)
 		case MSGPACK_OBJECT_EXT:
 		{
 			HV *hash = MUTABLE_HV (sv_2mortal (MUTABLE_SV (newHV())));
-            hv_stores (hash, "type", newSViv (obj->via.ext.type));
-            hv_stores (hash, "data", newSVpvn (obj->via.ext.ptr, obj->via.ext.size));
-            return sv_bless (newRV_inc (MUTABLE_SV (hash)),
+			hv_stores (hash, "type", newSViv (obj->via.ext.type));
+			hv_stores (hash, "data", newSVpvn (obj->via.ext.ptr, obj->via.ext.size));
+			return sv_bless (newRV_inc (MUTABLE_SV (hash)),
 				gv_stashpv ("MsgPack::Raw::Ext", 0));
 		}
 

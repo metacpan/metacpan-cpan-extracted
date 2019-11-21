@@ -46,4 +46,25 @@ is(
 isa_ok( $res->episode_info, 'HASH' );
 is( $res->episode_info->{imdb}, 'tt2930604', 'Episode info hash test' );
 
+# sometimes episode_info and title can be null
+$res_msg = <<RES;
+     {
+       "title": null,
+       "category": "TV HD Episodes",
+       "download": "magnet-link-here",
+       "seeders": 10,
+       "leechers": 0,
+       "size": 1061306416,
+       "pubdate": "2015-07-31 14:01:18 +0000",
+       "episode_info": null,
+       "ranked": 0,
+       "info_page": "https://torrentapi.org/redirect_to_info.php?token=tok&p=foo"
+     }
+RES
+$res_res = decode_json($res_msg);
+$res     = Rarbg::torrentapi::Res->new($res_res);
+
+is( $res->title, undef, 'Title info undef' );
+is( $res->episode_info, undef, 'Episode info undef' );
+
 done_testing;

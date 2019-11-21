@@ -15,7 +15,7 @@ name: Parser-LR
 provides:
   Parser::LR:
     file: lib/Parser/LR.pm
-    version: '20191121'
+    version: '20191122'
 requires:
   Carp: '0'
   Data::DFA: '20191119'
@@ -28,5 +28,5 @@ requires:
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20191121'
+version: '20191122'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

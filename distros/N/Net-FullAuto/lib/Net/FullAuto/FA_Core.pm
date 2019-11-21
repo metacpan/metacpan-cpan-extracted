@@ -312,7 +312,8 @@ our @EXPORT  = qw(%Hosts $localhost getpasswd
                   check_for_amazon_localhost $OUTPUT
                   get_amazon_external_ip $random
                   fa_welcome get_isets cmd_raw
-                  connect_berkeleydb $dashboard);
+                  connect_berkeleydb $dashboard
+                  clean_filehandle);
 
 {
    no warnings;

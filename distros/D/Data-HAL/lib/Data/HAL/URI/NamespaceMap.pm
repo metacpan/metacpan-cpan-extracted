@@ -7,7 +7,7 @@ use URI::Template qw();
 use XML::RegExp qw();
 extends 'URI::NamespaceMap';
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 sub uri {
     my ($self, $abbr) = @_;

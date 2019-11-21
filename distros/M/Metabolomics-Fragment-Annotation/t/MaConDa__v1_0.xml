@@ -1,0 +1,133 @@
+<?xml version="1.0" ?>
+<MaConDa>
+  <contaminant>
+    <id>
+      CON00001
+    </id>
+    <name>
+      Acetic Acid
+    </name>
+    <formula>
+      C2H4O2
+    </formula>
+    <exact_mass>
+      60.02113
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)
+    </std_inchi>
+    <std_inchi_key>
+      QTBSBXVTEAMEQO-UHFFFAOYSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      176
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00002
+    </id>
+    <name>
+      Acetonitrile (fragment)
+    </name>
+    <formula>
+      CN
+    </formula>
+    <exact_mass>
+      26.003074
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00015
+    </id>
+    <name>
+      Cs-133
+    </name>
+    <formula>
+      Cs
+    </formula>
+    <exact_mass>
+      132.905452
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00016
+    </id>
+    <name>
+      d6-Dimethylsulfoxide
+    </name>
+    <formula>
+      C2D6OS
+    </formula>
+    <exact_mass>
+      84.051593
+    </exact_mass>
+    <std_inchi>
+      InChI=1S/C2H6OS/c1-4(2)3/h1-2H3/i1D3,2D3
+    </std_inchi>
+    <std_inchi_key>
+      IAZDPXIOMUYVGZ-WFGJKAKNSA-N
+    </std_inchi_key>
+    <pubchem_cid>
+      75151
+    </pubchem_cid>
+    <type_of_contaminant>
+      Solvent
+    </type_of_contaminant>
+  </contaminant>
+  <contaminant>
+    <id>
+      CON00017
+    </id>
+    <name>
+      DDTDP
+    </name>
+    <formula>
+      C30H58O4S
+    </formula>
+    <exact_mass>
+      514.405582
+    </exact_mass>
+    <std_inchi>
+      
+    </std_inchi>
+    <std_inchi_key>
+      
+    </std_inchi_key>
+    <pubchem_cid>
+      
+    </pubchem_cid>
+    <type_of_contaminant>
+      
+    </type_of_contaminant>
+  </contaminant>
+</MaConDa>

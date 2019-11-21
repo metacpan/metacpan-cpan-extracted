@@ -6,7 +6,6 @@ use Test::Files;
 use obogaf::parser;
 
 ## input files and variable
-my $obofile = "t/data/test_gobasic.obo";
 my $goedges = "t/data/test_gobasic_edges.txt"; 
 my $fakedge = "t/data/test_GOBASIC_edges.txt";
 my $domain  =  "biological_process";
@@ -15,6 +14,7 @@ my $domain  =  "biological_process";
 my ($gores, $fh);
 
 ## build $goedges
+my $obofile = "t/data/test_gobasic.obo";
 $gores= obogaf::parser::build_edges($obofile);
 open $fh, ">", $goedges; 
 print $fh "${$gores}";

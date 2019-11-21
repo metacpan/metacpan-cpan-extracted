@@ -2,8 +2,8 @@ NAME
     Data::Transmute - Transmute (transform) data structure using rules data
 
 VERSION
-    This document describes version 0.035 of Data::Transmute (from Perl
-    distribution Data-Transmute), released on 2019-08-23.
+    This document describes version 0.036 of Data::Transmute (from Perl
+    distribution Data-Transmute), released on 2019-10-10.
 
 SYNOPSIS
      use Data::Transmute qw(
@@ -151,6 +151,25 @@ RULES
 
         Bool. If set to true, will overwrite (instead of error) when target
         key already exists.
+
+  modify_hash_value
+    This rule only applies when data is a hash, when data is not a hash this
+    will do nothing. Modify a single hash value from original value *from*
+    to new value *to*. Key must exist, and value must originally be *from*.
+
+    Known arguments ("*" means required):
+
+    *   name*
+
+        String. Key name.
+
+    *   from*
+
+        String or undef. Original value.
+
+    *   to*
+
+        String or undef. New value.
 
   delete_hash_key
     This rule only applies when data is a hash, when data is not a hash this
@@ -333,6 +352,8 @@ SEE ALSO
     Config::Model, which you can also use to convert/upgrade configuration
     files. But I find this module slightly too heavyweight for the simpler
     needs that I have, hence I created Data::Transmute.
+
+    Bencher::Scenarios::DataTransmute
 
 AUTHOR
     perlancar <perlancar@cpan.org>

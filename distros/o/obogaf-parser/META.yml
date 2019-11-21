@@ -30,12 +30,12 @@ no_index:
 provides:
   obogaf::parser:
     file: lib/obogaf/parser.pm
-    version: '1.271'
+    version: '1.272'
 requires:
   Graph: '0'
   PerlIO::gzip: '0'
   perl: '5.006'
 resources:
   repository: git://github.com/marconotaro/obogaf-parser.git
-version: '1.271'
+version: '1.272'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

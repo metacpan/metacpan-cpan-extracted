@@ -30,6 +30,8 @@ sub perl_proxy         { $_[1] }
 package main;
 use strict;
 use warnings FATAL => 'all';
+use Test::More tests => 31; # require_ok + scalar(@input)
+use Test::More::UTF8;
 use Test::Deep qw/cmp_details deep_diag/;
 use Log::Log4perl qw/:easy/;
 use Log::Any::Adapter;
@@ -39,46 +41,8 @@ use Math::BigFloat;
 use Encode qw/ encode :fallbacks /;
 use utf8;
 use Safe::Isa;
-use Test::More tests => 1 + 20 + 10; # 20=scalar(@input) + 8 pushes after the require_ok
-use Test::More::UTF8;
 use open qw( :utf8 :std );
 
-my @input =
-    (
-     undef,
-     "XXX",
-     "\xa0\xa1",
-     ["\xa0\xa1", 0],
-     ["\xf0\x28\x8c\x28", 0],
-     "Ḽơᶉëᶆ ȋṕšᶙṁ ḍỡḽǭᵳ ʂǐť ӓṁệẗ, ĉṓɲṩḙċťᶒțûɾ ấɖḯƥĭṩčįɳġ ḝłįʈ, șếᶑ ᶁⱺ ẽḭŭŝḿꝋď ṫĕᶆᶈṓɍ ỉñḉīḑȋᵭṵńť ṷŧ ḹẩḇőꝛế éȶ đꝍꞎôꝛȇ ᵯáꞡᶇā ąⱡîɋṹẵ.",
-     ["Ḽơᶉëᶆ ȋṕšᶙṁ ḍỡḽǭᵳ ʂǐť ӓṁệẗ, ĉṓɲṩḙċťᶒțûɾ ấɖḯƥĭṩčįɳġ ḝłįʈ, șếᶑ ᶁⱺ ẽḭŭŝḿꝋď ṫĕᶆᶈṓɍ ỉñḉīḑȋᵭṵńť ṷŧ ḹẩḇőꝛế éȶ đꝍꞎôꝛȇ ᵯáꞡᶇā ąⱡîɋṹẵ.", 0],
-     ["Ḽơᶉëᶆ ȋṕšᶙṁ ḍỡḽǭᵳ ʂǐť ӓṁệẗ, ĉṓɲṩḙċťᶒțûɾ ấɖḯƥĭṩčįɳġ ḝłįʈ, șếᶑ ᶁⱺ ẽḭŭŝḿꝋď ṫĕᶆᶈṓɍ ỉñḉīḑȋᵭṵńť ṷŧ ḹẩḇőꝛế éȶ đꝍꞎôꝛȇ ᵯáꞡᶇā ąⱡîɋṹẵ.", 1],
-     0,
-     1,
-     -32768,
-     32767,
-     -32769,
-     32768,
-     2.34,
-     1.6e+308,
-     Math::BigFloat->new("6.78E+9"),
-     Math::BigInt->new("6.78E+9"),
-     [[1, undef, 2], 0],
-     ""
-    );
-
-BEGIN { require_ok('MarpaX::ESLIF') }
-push(@input, $MarpaX::ESLIF::true);
-push(@input, $MarpaX::ESLIF::false);
-push(@input, { one => "one", two => "two", perltrue => 1, true => $MarpaX::ESLIF::true, false => $MarpaX::ESLIF::false, 'else' => 'again', 'undef' => undef });
-push(@input, { element1 => { one => "one", two => "two", perltrue => 1, true => $MarpaX::ESLIF::true, false => $MarpaX::ESLIF::false, 'else' => 'again', 'undef' => undef },
-               element2 => { one => "one", two => "two", perltrue => 1, true => $MarpaX::ESLIF::true, false => $MarpaX::ESLIF::false, 'else' => 'again', 'undef' => undef }});
-push(@input, MarpaX::ESLIF::String->new("XXXḼơᶉëᶆYYY", 'UTF-8'));
-push(@input, MarpaX::ESLIF::String->new("", 'UTF-8'));
-push(@input, MarpaX::ESLIF::String->new(encode('UTF-16LE', my $s = "XXXḼơᶉëᶆYYY", FB_CROAK), 'UTF-16LE'));
-push(@input, MarpaX::ESLIF::String->new("", 'UTF-16'));
-push(@input, 'one');
-push(@input, 'two');
 #
 # Init log
 #
@@ -91,6 +55,50 @@ log4perl.appender.Screen.layout.ConversionPattern = %d %-5p %6P %m{chomp}%n
 ';
 Log::Log4perl::init(\$defaultLog4perlConf);
 Log::Any::Adapter->set('Log4perl');
+
+
+BEGIN { require_ok('MarpaX::ESLIF') }
+#
+# Our input depends on MarpaX::ESLIF, and Test::More says it has to be
+# in another BEGIN block, after the one that is loading/requiring our module
+#
+my @input;
+BEGIN {
+    @input =
+        (
+         undef,
+         "XXX",
+         "\xa0\xa1",
+         ["\xa0\xa1", 0],
+         ["\xf0\x28\x8c\x28", 0],
+         "Ḽơᶉëᶆ ȋṕšᶙṁ ḍỡḽǭᵳ ʂǐť ӓṁệẗ, ĉṓɲṩḙċťᶒțûɾ ấɖḯƥĭṩčįɳġ ḝłįʈ, șếᶑ ᶁⱺ ẽḭŭŝḿꝋď ṫĕᶆᶈṓɍ ỉñḉīḑȋᵭṵńť ṷŧ ḹẩḇőꝛế éȶ đꝍꞎôꝛȇ ᵯáꞡᶇā ąⱡîɋṹẵ.",
+         ["Ḽơᶉëᶆ ȋṕšᶙṁ ḍỡḽǭᵳ ʂǐť ӓṁệẗ, ĉṓɲṩḙċťᶒțûɾ ấɖḯƥĭṩčįɳġ ḝłįʈ, șếᶑ ᶁⱺ ẽḭŭŝḿꝋď ṫĕᶆᶈṓɍ ỉñḉīḑȋᵭṵńť ṷŧ ḹẩḇőꝛế éȶ đꝍꞎôꝛȇ ᵯáꞡᶇā ąⱡîɋṹẵ.", 0],
+         ["Ḽơᶉëᶆ ȋṕšᶙṁ ḍỡḽǭᵳ ʂǐť ӓṁệẗ, ĉṓɲṩḙċťᶒțûɾ ấɖḯƥĭṩčįɳġ ḝłįʈ, șếᶑ ᶁⱺ ẽḭŭŝḿꝋď ṫĕᶆᶈṓɍ ỉñḉīḑȋᵭṵńť ṷŧ ḹẩḇőꝛế éȶ đꝍꞎôꝛȇ ᵯáꞡᶇā ąⱡîɋṹẵ.", 1],
+         0,
+         1,
+         -32768,
+         32767,
+         -32769,
+         32768,
+         2.34,
+         1.6e+308,
+         Math::BigFloat->new("6.78E+9"),
+         Math::BigInt->new("6.78E+9"),
+         [[1, undef, 2], 0],
+         "",
+         $MarpaX::ESLIF::true,
+         $MarpaX::ESLIF::false,
+         { one => "one", two => "two", perltrue => 1, true => $MarpaX::ESLIF::true, false => $MarpaX::ESLIF::false, 'else' => 'again', 'undef' => undef },
+         { element1 => { one => "one", two => "two", perltrue => 1, true => $MarpaX::ESLIF::true, false => $MarpaX::ESLIF::false, 'else' => 'again', 'undef' => undef },
+           element2 => { one => "one", two => "two", perltrue => 1, true => $MarpaX::ESLIF::true, false => $MarpaX::ESLIF::false, 'else' => 'again', 'undef' => undef }},
+         MarpaX::ESLIF::String->new("XXXḼơᶉëᶆYYY", 'UTF-8'),
+         MarpaX::ESLIF::String->new("", 'UTF-8'),
+         MarpaX::ESLIF::String->new(encode('UTF-16LE', my $s = "XXXḼơᶉëᶆYYY", FB_CROAK), 'UTF-16LE'),
+         MarpaX::ESLIF::String->new("", 'UTF-16'),
+         'one',
+         'two'
+        );
+}
 
 my $grammar = q{
 event ^perl_input = predicted perl_input

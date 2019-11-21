@@ -22,9 +22,6 @@ See also [[ideas]], [[htmlgen/TODO]], [[functional_XML/TODO]] and the
 * Consistently use "{ package Foo; ... }" or "package Foo { ... }"
   (latter if compatible with the minimal required Perl version)
 
-* There is a bug (warning) with unicode in one of the build files,
-  track down and fix.
-
 * Rename `is_null` to `is_empty`? I'm torn. `null` to `empty`?
 
 * Should I or should I not move modules that implement functions to
@@ -69,6 +66,9 @@ See also [[ideas]], [[htmlgen/TODO]], [[functional_XML/TODO]] and the
 * Think through UNIVERSAL::isa and UNIVERSAL::can, use `Safe::Isa` if
   decide that have to, or otherwise appropriately (handling of
   promises, should it let methods shine through via can?)
+
+* Consistently `use Scalar::Util qw(reftype)`? What was the point
+  again of using this over `ref`?
 
 * die vs. croak: die is nice since `FP::Repl::Trap` will go to the real
   location, how is the situation with croak? (Also, `Chj::Backtrace`?)
@@ -186,6 +186,10 @@ See also [[ideas]], [[htmlgen/TODO]], [[functional_XML/TODO]] and the
 * Get rid of `test.pl` script, as this is old style and not necessary
   anymore? But I'm setting an env var and define the ordering there,
   how?
+
+* Perhaps do not use all-lowercase namings like `FP::uncurry` (rename
+  to `FP::Uncurry` while still exporting `uncurry` and other
+  functions.)
 
 ## Get rid of unnecessary home-grown code
 

@@ -68,6 +68,28 @@ sub test_header_args ($) {
         $self->assert($got eq $v,
             "Expected value on '$key' be '$v', got '$got'");
     }
+
+    # Deleting by providing an undef value
+    #
+    $config->header_args(-X_Frame_Options => 'deny');
+    my $v=$config->header_args->{'x_frame_options'};
+    $self->assert(defined $v && $v eq 'deny',
+        "Expected 'deny', got '".($v // 'undef')."' on first assignment");
+
+    $config->header_args('X-Frame-Options' => undef);
+    $self->assert(! exists $config->header_args->{'x_frame_options'},
+        "Expected nothing, got a value after assigning undef");
+
+    # Explicit removal
+    #
+    $config->header_args(-X_Frame_Options => 'deny');
+    $v=$config->header_args->{'x_frame_options'};
+    $self->assert(defined $v && $v eq 'deny',
+        "Expected 'deny', got '".($v // 'undef')."' on second assignment");
+
+    $config->header_remove('x-frame-options');
+    $self->assert(! exists $config->header_args->{'x_frame_options'},
+        "Expected nothing, got a value after removing");
 }
 
 ###############################################################################

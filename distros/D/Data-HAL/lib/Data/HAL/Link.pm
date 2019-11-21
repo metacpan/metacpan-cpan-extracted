@@ -10,7 +10,7 @@ use Moo; # has
 use Safe::Isa qw($_can $_isa);
 use Types::Standard qw(InstanceOf Str);
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 my $uri_from_str = sub {
     my ($val) = @_;
@@ -80,7 +80,7 @@ Data::HAL::Link - Hypertext Application Language link
 
 =head1 VERSION
 
-This document describes Data::HAL::Link version 1.000
+This document describes Data::HAL::Link version 1.001
 
 =head1 SYNOPSIS
 

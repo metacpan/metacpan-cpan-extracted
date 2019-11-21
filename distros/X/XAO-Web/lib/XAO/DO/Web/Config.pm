@@ -44,7 +44,9 @@ sub force_byte_output ($;$);
 sub header ($@);
 sub header_args ($@);
 sub header_array ($);
+sub header_normalize ($$);
 sub header_printed ($);
+sub header_remove ($@);
 sub get_cookie ($$;$);
 sub new ($@);
 
@@ -304,7 +306,7 @@ force_byte_output(), header(), header_args().
 sub embeddable_methods ($) {
     qw(
         add_cookie cgi clipboard cookies force_byte_output
-        header header_args header_array get_cookie
+        header header_args header_array header_remove get_cookie
     );
 }
 
@@ -441,18 +443,49 @@ Header names can be any of 'Header-Name', 'header-name', 'header_name',
 or '-Header_name'. All variants are normalized to all-lowercase
 underscored to make values assigned later in the code trump the earlier.
 
+Supplying 'undef' as a header value is the same as removing that header
+with header_remove().
+
 =cut
 
 sub header_args ($@) {
     my $self=shift;
     my $args=get_args(\@_);
 
-    @{$self->{'header_args'}}{map {
-        $_=lc($_);
-        $_=~s/-/_/g;
-        $_=~s/^_+//;
-        $_;
-    } keys %{$args}}=values %{$args};
+    @{$self->{'header_args'}}{map { $self->header_normalize($_) } keys %{$args}}=values %{$args};
+
+    my @todrop=grep { ! defined $self->{'header_args'}->{$_} } keys %{$self->{'header_args'}};
+    delete @{$self->{'header_args'}}{@todrop} if @todrop;
+
+    return $self->{'header_args'};
+}
+
+###############################################################################
+
+sub header_normalize ($$) {
+    my ($self,$header)=@_;
+
+    $header=lc($header);
+    $header=~s/-/_/g;
+    $header=~s/^_+//;
+
+    return $header;
+}
+
+###############################################################################
+
+=item header_remove (@)
+
+Remove one or more headers that were previously set in the same session.
+
+ $config->header_remove('X-Frame-Options');
+
+=cut
+
+sub header_remove ($@) {
+    my $self=shift;
+
+    delete @{$self->{'header_args'}}{map { $self->header_normalize($_) } @_};
 
     return $self->{'header_args'};
 }

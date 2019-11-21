@@ -1,9 +1,69 @@
 ==================================================
-Changes from 2018-11-04 00:00:00 +0000 to present.
+Changes from 2018-11-20 00:00:00 +0000 to present.
 ==================================================
 
 --------------------------------------------
-version v0.0.16 at 2019-11-04 20:16:08 +0000
+version v0.0.18 at 2019-11-20 16:17:49 +0000
+--------------------------------------------
+
+  Change: 2d9a317a4dab0beb15abf29b23e4acaeb2e5c59e
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-11-20 11:17:30 +0000
+
+    Update README.md 
+
+  Change: ad77bac8e04e8ee52a4304f60269639e33753cfe
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-11-19 18:35:31 +0000
+
+    Use Git::GatherDir exclude_filename not PruneFiles
+
+    We already have that Plugin loaded with the feature we need. 
+
+  Change: c25f8cf2109d22e801035449fa6a2d91af1e70ca
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-11-19 18:33:51 +0000
+
+    Pass parameters to Git::GatherDir Plugin
+
+    We need some of these for our apps. 
+
+  Change: 566085694d73df801ec390357839da29e6f85469
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-11-19 18:32:17 +0000
+
+    Switch to correct comments in ini file examples 
+
+--------------------------------------------
+version v0.0.17 at 2019-11-05 22:33:04 +0000
+--------------------------------------------
+
+  Change: d47a860e79ce01dcd09a519da95bac044bfefc3b
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-11-05 17:33:04 +0000
+
+    Update README 
+
+  Change: f4d5bf25c81208ea7ef1a6d32efeb40a47ca23e6
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-11-05 15:18:59 +0000
+
+    Prune README.md and LICENSE.txt from the dist
+
+    Since we are going to properly generate those with correct names. 
+
+  Change: 36958e21b3992da14384ea73effe3ba8cf287de3
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-11-05 14:44:27 +0000
+
+    Remove existing MANIFEST.SKIP
+
+    Because we don't actually need one as we are only getting committed
+    files anyway from Git::GatherDir, we can instead add a PruneFiles
+    Plugin that removes the things we don't want and expect. 
+
+--------------------------------------------
+version v0.0.16 at 2019-11-04 20:15:58 +0000
 --------------------------------------------
 
   Change: 248acab8647ced2996db6f46550b54c7d1dc0ebc

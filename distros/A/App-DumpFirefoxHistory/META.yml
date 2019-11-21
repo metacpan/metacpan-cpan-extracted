@@ -24,6 +24,7 @@ requires:
   Data::Sah::Compiler::perl::TH::str: '0'
   File::Copy: '0'
   File::Temp: '0'
+  Log::ger: '0.027'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
   Sah::Schema::posint: '0'
@@ -34,10 +35,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DumpFirefoxHistory
   homepage: https://metacpan.org/release/App-DumpFirefoxHistory
   repository: git://github.com/perlancar/perl-App-DumpFirefoxHistory.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
-    version: '5.028002'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -108,13 +109,17 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::FileFinder::ByName
+      name: '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+      version: '6.012'
+    -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.597'
+      version: '0.599'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -146,7 +151,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
@@ -181,7 +186,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: '@Author::PERLANCAR/OurPkgVersion'
-      version: '0.15'
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -339,9 +344,13 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/Test::Compile'
       version: '2.058'
     -
-      class: Dist::Zilla::Plugin::Test::Perl::Critic
-      name: '@Author::PERLANCAR/Test::Perl::Critic'
-      version: '3.001'
+      class: Dist::Zilla::Plugin::Test::Perl::Critic::Subset
+      config:
+        Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
+          finder:
+            - '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+      name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
+      version: 3.001.003
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
@@ -436,6 +445,6 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.012'
 x_authority: cpan:PERLANCAR
-x_generated_by_perl: v5.28.2
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

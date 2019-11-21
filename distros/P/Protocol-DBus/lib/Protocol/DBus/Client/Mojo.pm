@@ -7,7 +7,7 @@ use warnings;
 
 =head1 NAME
 
-Protocol::DBus::Client::IOAsync - D-Bus with L<IO::Async>
+Protocol::DBus::Client::Mojo - D-Bus with L<Mojolicious>
 
 =head1 SYNOPSIS
 

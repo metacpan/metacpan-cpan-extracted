@@ -8,7 +8,7 @@ use Apache::Session::Browseable::Store::Postgres;
 use Apache::Session::Generate::SHA256;
 use Apache::Session::Serialize::JSON;
 
-our $VERSION = '1.2.9';
+our $VERSION = '1.3.4';
 our @ISA     = qw(Apache::Session);
 
 sub populate {
@@ -36,7 +36,7 @@ sub searchOn {
 sub searchOnExpr {
     my ( $class, $args, $selectField, $value, @fields ) = @_;
     $selectField =~ s/'/''/g;
-    $value =~ s/\*/%/g;
+    $value       =~ s/\*/%/g;
     my $query =
       { query => "a_session ->> '$selectField' like ?", values => [$value] };
     return $class->_query( $args, $query, @fields );
@@ -74,8 +74,14 @@ sub _query {
         my $self = eval "&${class}::populate();";
         my $sub  = $self->{unserialize};
         foreach my $s ( keys %$res ) {
-            my $tmp = &$sub( { serialized => $res->{$s}->{a_session} } );
-            $res->{$s} = $tmp;
+            eval {
+                my $tmp = &$sub( { serialized => $res->{$s}->{a_session} } );
+                $res->{$s} = $tmp;
+            };
+            if ($@) {
+                print STDERR "Error in session $s: $@\n";
+                delete $res->{$s};
+            }
         }
     }
     return $res;
@@ -86,16 +92,19 @@ sub deleteIfLowerThan {
     my $query;
     if ( $rule->{or} ) {
         $query = join ' OR ',
-          map { "cast(a_session ->> '$_' as bigint) < $rule->{or}->{$_}" } keys %{ $rule->{or} };
+          map { "cast(a_session ->> '$_' as bigint) < $rule->{or}->{$_}" }
+          keys %{ $rule->{or} };
     }
     elsif ( $rule->{and} ) {
         $query = join ' AND ',
-          map { "cast(a_session ->> '$_' as bigint) < $rule->{or}->{$_}" } keys %{ $rule->{or} };
+          map { "cast(a_session ->> '$_' as bigint) < $rule->{or}->{$_}" }
+          keys %{ $rule->{or} };
     }
     if ( $rule->{not} ) {
         $query = "($query) AND "
           . join( ' AND ',
-            map { "a_session ->> '$_' <> '$rule->{not}->{$_}'" } keys %{ $rule->{not} } );
+            map { "a_session ->> '$_' <> '$rule->{not}->{$_}'" }
+              keys %{ $rule->{not} } );
     }
     return 0 unless ($query);
     my $dbh        = $class->_classDbh($args);
@@ -116,7 +125,8 @@ sub get_key_from_all_sessions {
     # Special case if all wanted fields are indexed
     if ( $data and ref($data) ne 'CODE' ) {
         $data = [$data] unless ( ref($data) );
-        my $fields = join ',', map { s/'//g; "a_session ->> '$_' AS $_" } @$data;
+        my $fields = join ',',
+          map { s/'//g; "a_session ->> '$_' AS $_" } @$data;
         $sth = $dbh->prepare("SELECT $fields from $table_name");
         $sth->execute;
         return $sth->fetchall_hashref('id');
@@ -127,18 +137,24 @@ sub get_key_from_all_sessions {
     while ( my @row = $sth->fetchrow_array ) {
         no strict 'refs';
         my $self = eval "&${class}::populate();";
-        my $sub  = $self->{unserialize};
-        my $tmp  = &$sub( { serialized => $row[1] } );
-        if ( ref($data) eq 'CODE' ) {
-            $tmp = &$data( $tmp, $row[0] );
-            $res{ $row[0] } = $tmp if ( defined($tmp) );
-        }
-        elsif ($data) {
-            $data = [$data] unless ( ref($data) );
-            $res{ $row[0] }->{$_} = $tmp->{$_} foreach (@$data);
-        }
-        else {
-            $res{ $row[0] } = $tmp;
+        eval {
+            my $sub = $self->{unserialize};
+            my $tmp = &$sub( { serialized => $row[1] } );
+            if ( ref($data) eq 'CODE' ) {
+                $tmp = &$data( $tmp, $row[0] );
+                $res{ $row[0] } = $tmp if ( defined($tmp) );
+            }
+            elsif ($data) {
+                $data = [$data] unless ( ref($data) );
+                $res{ $row[0] }->{$_} = $tmp->{$_} foreach (@$data);
+            }
+            else {
+                $res{ $row[0] } = $tmp;
+            }
+        };
+        if ($@) {
+            print STDERR "Error in session $row[0]: $@\n";
+            delete $res{ $row[0] };
         }
     }
     return \%res;

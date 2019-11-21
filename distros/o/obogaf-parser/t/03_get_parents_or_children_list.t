@@ -6,13 +6,19 @@ use Test::Files;
 use obogaf::parser;
 
 # input files/variables
+my $goedges=     "t/data/test_gobasic_edges.txt"; 
 my $fakegoedges= "t/data/test_GObasic_edges.txt";
-my $goedges= "t/data/test_gobasic_edges.txt"; 
-my $gobp= "t/data/test_gobasic_edgesBP.txt";  
 my ($parentIndex, $childIndex)= (1,2);
 
 ## define arguments
-my ($res,$chdlist,$parlist,$fh,$chdORpar);
+my ($res,$gores,$chdlist,$parlist,$fh,$chdORpar);
+
+## build $goedges
+my $obofile=  "t/data/test_gobasic.obo";
+$gores= obogaf::parser::build_edges($obofile);
+open $fh, ">", $goedges; 
+print $fh "${$gores}";
+close $fh;
 
 ## test read or die
 lives_ok( sub { my $file = obogaf::parser::get_parents_or_children_list($goedges, $parentIndex, $childIndex, "parents" ) }, 'file opened' );
@@ -44,8 +50,14 @@ close $fh;
 
 file_ok($chdlist, "GO:0007259 GO:0007260\nGO:0018108 GO:0007260\n", "test that get_parents_or_children_list works");
 
-
 ## test parents list (BP subontology)
+my $domain= "biological_process";
+my $gobp= "t/data/test_gobasic_edgesBP.txt";
+$gores= obogaf::parser::build_subonto($goedges, $domain);
+open $fh, ">", $gobp; 
+print $fh "${$gores}";
+close $fh;
+
 $chdORpar= "parents";
 $res= obogaf::parser::get_parents_or_children_list($gobp, 0,1, $chdORpar);
 $parlist= "t/data/test_gobasicBP_parents_list.txt";

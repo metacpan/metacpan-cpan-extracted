@@ -9,7 +9,7 @@ use Apache::Session::Generate::SHA256;
 use Apache::Session::Serialize::JSON;
 use Apache::Session::Browseable::DBI;
 
-our $VERSION = '1.2.7';
+our $VERSION = '1.3.4';
 our @ISA     = qw(Apache::Session::Browseable::DBI Apache::Session);
 
 sub populate {
@@ -36,7 +36,7 @@ sub searchOn {
 sub searchOnExpr {
     my ( $class, $args, $selectField, $value, @fields ) = @_;
     $selectField =~ s/'/''/g;
-    $value =~ s/\*/%/g;
+    $value       =~ s/\*/%/g;
     my $query =
       { query => qq'a_session->>"\$.$selectField" like ?', values => [$value] };
     return $class->_query( $args, $query, @fields );
@@ -123,18 +123,24 @@ sub get_key_from_all_sessions {
     while ( my @row = $sth->fetchrow_array ) {
         no strict 'refs';
         my $self = eval "&${class}::populate();";
-        my $sub  = $self->{unserialize};
-        my $tmp  = &$sub( { serialized => $row[1] } );
-        if ( ref($data) eq 'CODE' ) {
-            $tmp = &$data( $tmp, $row[0] );
-            $res{ $row[0] } = $tmp if ( defined($tmp) );
-        }
-        elsif ($data) {
-            $data = [$data] unless ( ref($data) );
-            $res{ $row[0] }->{$_} = $tmp->{$_} foreach (@$data);
-        }
-        else {
-            $res{ $row[0] } = $tmp;
+        eval {
+            my $sub = $self->{unserialize};
+            my $tmp = &$sub( { serialized => $row[1] } );
+            if ( ref($data) eq 'CODE' ) {
+                $tmp = &$data( $tmp, $row[0] );
+                $res{ $row[0] } = $tmp if ( defined($tmp) );
+            }
+            elsif ($data) {
+                $data = [$data] unless ( ref($data) );
+                $res{ $row[0] }->{$_} = $tmp->{$_} foreach (@$data);
+            }
+            else {
+                $res{ $row[0] } = $tmp;
+            }
+        };
+        if ($@) {
+            print STDERR "Error in session $row[0]: $@\n";
+            delete $res{ $row[0] };
         }
     }
     return \%res;

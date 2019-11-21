@@ -33,6 +33,8 @@ FP::MutableArray
 
  is $a->sum, 14;
 
+ is( FP::_::MutableArray->null == FP::_::MutableArray->null, '' );
+
 =head1 DESCRIPTION
 
 Native Perl arrays but blessed so that they can follow the sequences
@@ -85,6 +87,13 @@ package FP::_::MutableArray {
         bless $a, $class
     }
 
+    sub null {
+        my $proto=shift;
+        my $class= ref($proto) || $proto;
+        # can't cache this since mutation is allowed!:
+        $class->new_from_array([]) 
+    }
+
     sub constructor_name {
         "mutablearray"
     }
@@ -108,6 +117,7 @@ package FP::_::MutableArray {
 
     FP::Interfaces::implemented qw(
         FP::Abstract::Sequence
+        FP::Abstract::Equal
         FP::Abstract::Show);
 }
 

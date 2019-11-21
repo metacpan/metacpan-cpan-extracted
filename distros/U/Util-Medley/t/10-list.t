@@ -30,6 +30,17 @@ my $min = $list->min(7, 4, 99);
 ok($min == 4);
 
 #####################################
+# nsort
+#####################################
+
+my @sorted = $list->nsort(qw(foobar bizbaz Foobar Bizbaz));
+
+ok($sorted[0] eq 'bizbaz');
+ok($sorted[1] eq 'Bizbaz');
+ok($sorted[2] eq 'foobar');
+ok($sorted[3] eq 'Foobar');
+
+#####################################
 # undefsToStrings
 #####################################
 

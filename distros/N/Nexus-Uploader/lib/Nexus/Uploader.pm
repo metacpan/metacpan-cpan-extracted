@@ -3,7 +3,7 @@ use warnings;
 use v5.8.0;
 
 package Nexus::Uploader;
-$Nexus::Uploader::VERSION = '1.0.0';
+$Nexus::Uploader::VERSION = '1.0.1';
 
 # ABSTRACT: Upload files to a Sonatype Nexus instance. Modelled on L<CPAN::Uploader>.
 
@@ -11,13 +11,12 @@ use utf8;
 use Moose;
 
 use Carp;
+use File::Slurp;
 use JSON;
-use MIME::Base64;
 use REST::Client;
 use Log::Any qw($log);
 
 use namespace::autoclean;
-
 
 has username => (
     is       => 'ro',
@@ -26,14 +25,12 @@ has username => (
     default  => 'anonymous',
 );
 
-
 has password => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
     default  => '',
 );
-
 
 has nexus_URL => (
     is       => 'ro',
@@ -42,13 +39,10 @@ has nexus_URL => (
     default  => 'http://localhost:8081/repository/maven-releases',
 );
 
-
 has group =>
     ( is => 'ro', isa => 'Str', required => 1, default => 'AUTHORID', );
 
-
 has artefact => ( is => 'ro', isa => 'Str', required => 1, );
-
 
 has version => (
     is       => 'ro',
@@ -56,16 +50,14 @@ has version => (
     required => 1,
 );
 
-
 around [qw(group artefact)] => sub {
     my $orig  = shift;
     my $self  = shift;
     my $value = $self->$orig;
     $value =~ s/::/-/g;
-    $value =~ s#/#.#g;
+    $value =~ s#\.#/#g;
     return $value;
 };
-
 
 sub upload_file {
     my $self    = shift;
@@ -82,13 +74,11 @@ sub upload_file {
     use Data::Dumper;
     $log->debug( Dumper($self) );
 
-    my $headers = {
-        Accept        => 'application/json',
-        Authorization => 'Basic '
-            . encode_base64( $self->username . ':' . $self->password )
-    };
+    my $headers = HTTP::Headers->new( Accept => 'application/json' );
+    $headers->authorization_basic( $self->username, $self->password );
 
     my $Nexus = REST::Client->new();
+    $Nexus->getUseragent()->default_headers($headers);
     $Nexus->setFollow(1);
     my $artefact_URL =
 
@@ -96,7 +86,8 @@ sub upload_file {
         $self->nexus_URL, $self->group, $self->artefact, $self->version,
         $self->artefact . '-' . $self->version . '.tar.gz' );
     $log->debug($artefact_URL);
-    $Nexus->PUT( $artefact_URL, $archive, $headers );
+    my $content = read_file($archive);
+    $Nexus->PUT( $artefact_URL, $content );
     $log->debug( $Nexus->responseCode() );
     my $rc = $Nexus->responseCode();
 
@@ -105,12 +96,10 @@ sub upload_file {
     }
 }
 
-
 sub log {
     my $self = shift;
     $log->info(@_);
 }
-
 
 sub log_debug {
     my $self = shift;
@@ -133,7 +122,7 @@ Nexus::Uploader - Upload files to a Sonatype Nexus instance. Modelled on L<CPAN:
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 ATTRIBUTES
 
@@ -167,7 +156,7 @@ The version of the artefact being uploaded. There is no default.
 
 =head2 group and artefact processing
 
-C<group> and C<artefact> atrributes have colons and full stops modified as follows:
+C<group> and C<artefact> attributes have colons and full stops modified as follows:
 
   :: goes to -
   . goes to /
@@ -198,9 +187,19 @@ Included for compatibility with L<CPAN::Uploader> - passes straight through to t
 
 - L<CPAN::Uploader>
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Brad Macpherson <brad@teched-creations.com>
+
+=item *
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

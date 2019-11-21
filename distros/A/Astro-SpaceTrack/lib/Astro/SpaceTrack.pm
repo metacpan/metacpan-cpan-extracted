@@ -126,7 +126,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.132';
+our $VERSION = '0.133';
 our @EXPORT_OK = qw{
     shell
 
@@ -285,6 +285,7 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	orbcomm		=> { name => 'Orbcomm (no rms data)' },
 	iss		=> { name => 'ISS (from NASA, no rms data)' },
 	cpf		=> { name => 'CPF TLEs',	rms => 1 },
+	starlink	=> { name => 'Starlink TLEs',	rms => 1 },
     },
     iridium_status => {
 	kelso => {name => 'Celestrak (Kelso)'},
@@ -696,7 +697,7 @@ sub new {
 =item $resp = $st->amsat ()
 
 This method downloads current orbital elements from the Radio Amateur
-Satellite Corporation's web page, L<http://www.amsat.org/>. This lists
+Satellite Corporation's web page, L<https://www.amsat.org/>. This lists
 satellites of interest to radio amateurs, and appears to be updated
 weekly.
 
@@ -1114,21 +1115,25 @@ These TLE data are B<not> redistributed from Space Track, but are
 derived from publicly available ephemeris data for the satellites in
 question. Valid data set names are:
 
+ cpf: CPF TLEs
  glonass: Glonass satellites
  gps: GPS satellites
  intelsat: Intelsat satellites
+ iss: ISS (from NASA, no rms data
  meteosat: Meteosat satellites
  orbcomm: Orbcomm satellites (no RMS data)
  ses: SES satellites
+ starlink Starlink TLEs
 
 You can specify options as either command-type options (e.g.
-C<< amsat( '-file', 'foo.dat' ) >>) or as a leading hash reference (e.g.
-C<< amsat( { file => 'foo.dat' } ) >>). If you specify the hash
-reference, option names must be specified in full, without the leading
-'-', and the argument list will not be parsed for command-type options.
-If you specify command-type options, they may be abbreviated, as long as
-the abbreviation is unique. Errors in either sort result in an exception
-being thrown.
+C<< celestrak_supplemental( '-file', 'foo.dat' ) >>) or as a leading
+hash reference (e.g.
+C<< celestrak_supplemental( { file => 'foo.dat' }) >>). If you specify
+the hash reference, option names must be specified in full, without the
+leading '-', and the argument list will not be parsed for command-type
+options.  If you specify command-type options, they may be abbreviated,
+as long as the abbreviation is unique. Errors in either sort result in
+an exception being thrown.
 
 The legal options are:
 
@@ -1366,7 +1371,7 @@ If the response object B<is> provided, you can call this as a static
 method (i.e. as Astro::SpaceTrack->content_type($response)).
 
 For the format of the magnitude data, see
-L<http://www.prismnet.com/~mmccants/tles/index.html>.
+L<https://www.prismnet.com/~mmccants/tles/index.html>.
 
 =cut
 
@@ -1847,7 +1852,7 @@ to the value of the C<iridium_status_format> attribute.
 If the format is 'kelso', only Dr. Kelso's Celestrak web site
 (L<http://celestrak.com/SpaceTrack/query/iridium.txt>) is queried for
 the data. The possible status values are documented at
-L<http://celestrak.com/satcat/status.asp>, and repeated here for
+L<http://celestrak.com/satcat/status.php>, and repeated here for
 convenience:
 
     '[+]' - Operational
@@ -3957,7 +3962,7 @@ sub source {
 =item $resp = $st->spaceflight ()
 
 This method downloads current orbital elements from NASA's human
-spaceflight site, L<http://spaceflight.nasa.gov/>. As of July 21 2011
+spaceflight site, L<https://spaceflight.nasa.gov/>. As of July 21 2011
 you only get the International Space Station.
 
 You can specify the argument 'ISS' (case-insensitive) to explicitly
@@ -6773,7 +6778,7 @@ itself returns them.
 =head1 ACKNOWLEDGMENTS
 
 The author wishes to thank Dr. T. S. Kelso of
-L<http://celestrak.com/> and the staff of L<http://www.space-track.org/>
+L<http://celestrak.com/> and the staff of L<https://www.space-track.org/>
 (whose names are unfortunately unknown to me) for their co-operation,
 assistance and encouragement.
 

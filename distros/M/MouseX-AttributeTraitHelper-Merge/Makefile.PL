@@ -20,14 +20,14 @@ my %WriteMakefileArgs = (
         "Test::More" => "0.88",
         "Mouse" => "2.5.9",
     },
-    "VERSION" => "0.9",
+    "VERSION" => "0.99",
     META_MERGE => {
         "meta-spec" => { version => 2 },
         resources => {
             repository => {
                 type => 'git',
-                url => 'git@gitlab.corp.mail.ru:mydev/mousex-attributetraithelper.git',
-                web => 'https://gitlab.corp.mail.ru/mydev/mousex-attributetraithelper',
+                url => 'git@github.com:my-mail-ru/MouseX-AttributeTraitHelper-Merge.git',
+                web => 'https://github.com/my-mail-ru/MouseX-AttributeTraitHelper-Merge',
             }
         },
     },

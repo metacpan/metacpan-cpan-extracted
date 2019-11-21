@@ -22,8 +22,8 @@ SYNOPSIS
 
 DESCRIPTION
 
-    WARNING This is a highly experimental proof-of-concept. Please don't
-    actually use this in production :)
+    WARNING This is an experimental proof-of-concept. Please don't actually
+    use this in production unless you are crazy :)
 
     This module provides a simple syntax for creating object classes, which
     uses private variables that look like lexicals as object member fields.

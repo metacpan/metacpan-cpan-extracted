@@ -45,5 +45,7 @@ is_deeply(\@got, \@expected, 'OK qname for dc and name in list context');
 is($ns->qname('http://clearly.invalid/vocab#term'), undef, 'OK when non-existing URI');
 is(($ns->qname('http://clearly.invalid/vocab#term')), undef, 'OK in list context for non-existing URI');
 
+is(scalar keys(%{$ns->all}), 63, 'Should be 63 pairs in total');
+
 done_testing;
 

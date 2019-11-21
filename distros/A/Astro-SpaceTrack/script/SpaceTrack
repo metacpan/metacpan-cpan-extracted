@@ -15,7 +15,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.132';
+our $VERSION = '0.133';
 
 use Astro::SpaceTrack qw{shell};
 use Getopt::Long 2.39;
@@ -81,7 +81,7 @@ Please see L<Astro::SpaceTrack|Astro::SpaceTrack> for the details.
 =head1 ACKNOWLEDGMENTS
 
 The author wishes to thank Dr. T. S. Kelso of
-L<http://celestrak.com/> and the staff of L<http://www.space-track.org/>
+L<http://celestrak.com/> and the staff of L<https://www.space-track.org/>
 (whose names are unfortunately unknown to me) for their co-operation,
 assistance and encouragement in the development of the Astro::SpaceTrack
 module.

@@ -24,19 +24,19 @@ name: MsgPack-Raw
 provides:
   MsgPack::Raw:
     file: lib/MsgPack/Raw.pm
-    version: '0.03'
+    version: '0.04'
   MsgPack::Raw::Bool:
     file: lib/MsgPack/Raw/Bool.pm
-    version: '0.03'
+    version: '0.04'
   MsgPack::Raw::Ext:
     file: lib/MsgPack/Raw/Ext.pm
-    version: '0.03'
+    version: '0.04'
   MsgPack::Raw::Packer:
     file: lib/MsgPack/Raw/Packer.pm
-    version: '0.03'
+    version: '0.04'
   MsgPack::Raw::Unpacker:
     file: lib/MsgPack/Raw/Unpacker.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   XSLoader: '0'
   overload: '0'
@@ -46,7 +46,7 @@ requires:
 resources:
   bugtracker: https://github.com/jacquesg/p5-MsgPack-Raw/issues
   repository: git://github.com/jacquesg/p5-MsgPack-Raw.git
-version: '0.03'
+version: '0.04'
 x_Dist_Zilla:
   perl:
     version: '5.026003'
@@ -211,7 +211,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.03
+          tag: v0.04
           tag_format: v%V
           tag_message: '%N %v'
         Dist::Zilla::Role::Git::Repo:

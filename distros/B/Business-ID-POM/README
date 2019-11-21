@@ -1,0 +1,179 @@
+NAME
+    Business::ID::POM - Parse food/drug registration code published by the
+    Indonesian National Agency of Drug and Food Control (POM)
+
+VERSION
+    This document describes version 0.001 of Business::ID::POM (from Perl
+    distribution Business-ID-POM), released on 2019-11-21.
+
+DESCRIPTION
+    This module can be used to validate food/drug registration codes
+    published by the Indonesian National Agency of Drug and Food Control
+    (BPOM, Badan Pengawas Obat dan Makanan). These codes include:
+
+     MD, ML - food
+     SI, SD - health supplements
+     NA, NB, NC, ND, NE - cosmetics
+     TR, TI - traditional medicine
+     D, G - pharmaceutical products
+     FF - phytopharmaceutical products
+
+    Not yet included BPOM codes:
+
+     CA, CD, CL - cosmetics?
+     HT - standardized herbal (herbal terstandar)
+
+    Related codes:
+
+    SNI
+
+    P-IRT
+
+FUNCTIONS
+  parse_pom_reg_code
+    Usage:
+
+     parse_pom_reg_code(%args) -> [status, msg, payload, meta]
+
+    Parse food/drug registration code published by the Indonesian National
+    Agency of Drug and Food Control (POM).
+
+    Examples:
+
+    *   Example #1:
+
+         parse_pom_reg_code(code => "MD 224510107115");
+
+        Result:
+
+         {
+           category_code             => "MD",
+           category_id               => "Makanan (M), dalam negeri (D)",
+           food_company_code         => 107,
+           food_company_product_code => 115,
+           food_packaging_code       => 2,
+           food_province_code        => 10,
+           food_type_code            => 245,
+           number                    => 224510107115,
+         }
+
+    *   Example #2:
+
+         parse_pom_reg_code(code => "DBL9624502804A1");
+
+        Result:
+
+         {
+           category_code             => "DBL",
+           category_id               => "Obat merek dagang (D), bebas (B), lokal (L)",
+           drug_category_code        => "B",
+           drug_company_code         => 245,
+           drug_company_product_code => "028",
+           drug_dosage_form_code     => "04",
+           drug_dosage_form_id       => "kaplet (04)",
+           drug_origin_code          => "L",
+           drug_packaging_serial     => 1,
+           drug_strength_serial      => "A",
+           drug_year                 => 1996,
+           number                    => "9624502804A1",
+         }
+
+    *   Example #3:
+
+         parse_pom_reg_code(code => "NC14191300159");
+
+        Result:
+
+         {
+           category_code => "NC",
+           category_id => "Kosmetik (N), Eropa (C)",
+           cosmetic_category_code => "C",
+           cosmetic_country_code => 14,
+           cosmetic_group_code => 13,
+           cosmetic_notification_code => "00159",
+           cosmetic_year => 2019,
+           number => 14191300159,
+         }
+
+    *   Example #4:
+
+         parse_pom_reg_code(code => "TR092699241");
+
+        Result:
+
+         {
+           category_code => "TR",
+           category_id => "Obat traditional (T), dalam negeri (R)",
+           number => "092699241",
+           trad_company_product_serial => 9924,
+           trad_company_type_code => 2,
+           trad_company_type_id => "pabrik jamu",
+           trad_origin => "R",
+           trad_packaging_code => 6,
+           trad_packaging_id => "cairan",
+           trad_packaging_volume => "15ml",
+           trad_packaging_volume_code => 1,
+           trad_year => 2009,
+         }
+
+    *   Example #5:
+
+         parse_pom_reg_code(code => "FF182600791");
+
+        Result:
+
+         {
+           category_code => "FF",
+           category_id => "Fitofarma (FF)",
+           number => 182600791,
+         }
+
+    This routine does not check whether the code actually exists. Use
+    https://cekbpom.pom.go.id/ for that.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code* => *str*
+
+        Input POM code to be parsed.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Business-ID-POM>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Business-ID-POM>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-POM>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Business::ID::PIRT
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

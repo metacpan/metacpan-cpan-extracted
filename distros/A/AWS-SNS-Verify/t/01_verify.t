@@ -98,8 +98,8 @@ END
 my $tampered_body_sns = AWS::SNS::Verify->new(body => $tampered_body, certificate_string => $cert_string);
 throws_ok(
     sub { $tampered_body_sns->verify },
-    qr/Could not verify the SES message/,
-    "Tampered with body doesn't valiate",
+    qr/Could not verify the SNS message/,
+    "Tampered with body doesn't validate",
 );
 
 

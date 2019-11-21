@@ -44,7 +44,7 @@ Module::Build->new(
         'Types::Standard' => 0,
         'URI' => 0,
         'URI::IRI' => 0,
-        'URI::NamespaceMap' => 0,
+        'URI::NamespaceMap' => '<= 0.12',
         'URI::Template' => 0,
         'XML::RegExp' => 0,
     },

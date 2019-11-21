@@ -5,7 +5,7 @@ use warnings;
 package Types::URI;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 use URI;
 use URI::file;
@@ -19,6 +19,7 @@ use Types::Path::Tiny  qw( Path );
 use Types::Standard    qw( InstanceOf ScalarRef HashRef Str );
 use Types::UUID        qw( Uuid );
 
+my $AtteanIRI = InstanceOf['Attean::IRI'];
 my $TrineNode = InstanceOf['RDF::Trine::Node::Resource'];
 my $TrineNS   = InstanceOf['RDF::Trine::Namespace'];
 my $XmlNS     = InstanceOf['XML::Namespace'];
@@ -43,6 +44,7 @@ __PACKAGE__->meta->add_type({
 		$TrineNS    ,=> q{ "URI"->new($_->uri->uri_value) },
 		$XmlNS      ,=> q{ "URI"->new($_->uri) },
 		Iri         ,=> q{ "URI"->new($_->as_string) },
+		$AtteanIRI  ,=> q{ "URI"->new($_->as_string) },
 	],
 });
 
@@ -70,6 +72,7 @@ __PACKAGE__->meta->add_type({
 		$TrineNode  ,=> q{ "URI"->new($_->uri_value) },
 		$TrineNS    ,=> q{ "URI"->new($_->uri->uri_value) },
 		$XmlNS      ,=> q{ "URI"->new($_->uri) },
+		$AtteanIRI  ,=> q{ "URI"->new($_->as_string) },
 		Iri         ,=> q{ "URI"->new($_->as_string) },
 	],
 });
@@ -86,6 +89,7 @@ __PACKAGE__->meta->add_type({
 		$TrineNode  ,=> q{ "URI"->new($_->uri_value) },
 		$TrineNS    ,=> q{ "URI"->new($_->uri->uri_value) },
 		$XmlNS      ,=> q{ "URI"->new($_->uri) },
+		$AtteanIRI  ,=> q{ "URI"->new($_->as_string) },
 		Iri         ,=> q{ "URI"->new($_->as_string) },
 	],
 });
