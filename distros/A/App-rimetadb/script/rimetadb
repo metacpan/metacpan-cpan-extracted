@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.222'; # VERSION
+our $DATE = '2019-10-15'; # DATE
+our $VERSION = '0.223'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,7 +45,7 @@ rimetadb - Manage a Rinci metadata database
 
 =head1 VERSION
 
-This document describes version 0.222 of rimetadb (from Perl distribution App-rimetadb), released on 2019-08-14.
+This document describes version 0.223 of rimetadb (from Perl distribution App-rimetadb), released on 2019-10-15.
 
 =head1 SYNOPSIS
 

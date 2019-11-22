@@ -1,7 +1,7 @@
 package App::rimetadb;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.222'; # VERSION
+our $DATE = '2019-10-15'; # DATE
+our $VERSION = '0.223'; # VERSION
 
 use 5.010001;
 use strict;
@@ -59,8 +59,8 @@ our $db_schema_spec = {
 };
 
 sub _cleanser {
-    require Data::Clean::JSON;
-    state $cleanser = Data::Clean::JSON->get_cleanser;
+    require Data::Clean::ForJSON;
+    state $cleanser = Data::Clean::ForJSON->get_cleanser;
     $cleanser;
 }
 
@@ -1033,7 +1033,7 @@ App::rimetadb - Manage a Rinci metadata database
 
 =head1 VERSION
 
-This document describes version 0.222 of App::rimetadb (from Perl distribution App-rimetadb), released on 2019-08-14.
+This document describes version 0.223 of App::rimetadb (from Perl distribution App-rimetadb), released on 2019-10-15.
 
 =head1 SYNOPSIS
 
@@ -1404,13 +1404,34 @@ Return value:  (any)
 
 Usage:
 
- stats() -> [status, msg, payload, meta]
+ stats(%args) -> [status, msg, payload, meta]
 
 Show some statistics from the database.
 
 This function is not exported.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dsn> => I<str>
+
+DBI connection DSN.
+
+If not specified, will default to C<dbd:SQLite:$HOME/rimeta.db> where C<$HOME> is
+user's home directory.
+
+Note: has been tested with MySQL and SQLite only.
+
+=item * B<password> => I<str>
+
+DBI connection password.
+
+=item * B<user> => I<str>
+
+DBI connection user.
+
+=back
 
 Returns an enveloped result (an array).
 

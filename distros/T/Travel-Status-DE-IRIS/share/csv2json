@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use File::Slurp qw(read_file write_file);
+use JSON;
+use Text::CSV;
+
+my @csv_lines = read_file( 'stations.csv', { binmode => ':utf8' } );
+my @stations;
+my $csv = Text::CSV->new;
+
+# skip header
+shift @csv_lines;
+
+for my $line (@csv_lines) {
+	if ( $csv->parse($line) ) {
+		my ( $name, $ds100, $eva, $lat, $lon ) = $csv->fields;
+
+		if ( not $name ) {
+			say "Station name is mandatory -- skipping this line: $line";
+			next;
+		}
+		if ( not $ds100 ) {
+			say "DS100 is mandatory at the moment -- skipping this line: $line";
+			next;
+		}
+		if ( not $eva or $eva !~ m{ ^ \d+ $ }x ) {
+			say
+"EVA is mandatory and must be numeric -- skipping this line: $line";
+			next;
+		}
+
+		my $station = {
+			name    => $name,
+			ds100   => $ds100,
+			eva     => 0 + $eva,
+			latlong => undef
+		};
+		if ( $lat and $lon ) {
+			$station->{latlong} = [ 0 + $lat, 0 + $lon ];
+		}
+		push( @stations, $station );
+	}
+}
+
+@stations = sort { $a->{name} cmp $b->{name} } @stations;
+
+my $have_duplicates = 0;
+my @names           = map { $_->{name} } @stations;
+my @ds100           = map { $_->{ds100} } sort { $a->{ds100} cmp $b->{ds100} } @stations;
+my @eva_ids         = map { $_->{eva} } sort { $a->{eva} <=> $b->{eva} } @stations;
+
+for my $i ( 1 .. $#names ) {
+	if ( $names[ $i - 1 ] eq $names[$i] ) {
+		say "Duplicate station name: $names[$i]";
+		$have_duplicates = 1;
+	}
+}
+for my $i ( 1 .. $#ds100 ) {
+	if ( $ds100[ $i - 1 ] eq $ds100[$i] ) {
+		say "Duplicate DS100 code: $ds100[$i]";
+		$have_duplicates = 1;
+	}
+}
+for my $i ( 1 .. $#eva_ids ) {
+	if ( $eva_ids[ $i - 1 ] == $eva_ids[$i] ) {
+		say "Duplicate EVA ID: $eva_ids[$i]";
+		$have_duplicates = 1;
+	}
+}
+
+if ($have_duplicates) {
+	say "Data has NOT been converted to stations.json";
+	say "Please remove duplicates and run $0 again";
+}
+
+my $json_out = JSON->new->utf8->canonical->pretty->encode( [@stations] );
+write_file( 'stations.json', $json_out );

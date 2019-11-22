@@ -1,0 +1,26 @@
+#separator \x09
+#set_separator	,
+#empty_field	(empty)
+#unset_field	-
+#path	ssl
+#open	2014-08-08-17-13-55
+#fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	version	cipher	curve	server_name	resumed	last_alert	next_protocol	established	cert_chain_fuids	client_cert_chain_fuids	subject	issuer	client_subject	client_issuer
+#types	time	string	addr	port	addr	port	string	string	string	string	bool	string	string	bool	vector[string]	vector[string]	string	string	string	string
+1394747126.855035	CXWv6p3arKYeMETxOg	192.168.4.149	60623	74.125.239.129	443	TLSv12	TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256	secp256r1	-	F	-	-	T	FlaIzV19yTmBYwWwc6,F0BeiV3cMsGkNML0P2,F6PfYi2WUoPdIJrhpg	(empty)	CN=*.google.com,O=Google Inc,L=Mountain View,ST=California,C=US	CN=Google Internet Authority G2,O=Google Inc,C=US	-	-
+1394747129.505622	CjhGID4nQcgTWjvg4c	192.168.4.149	60624	74.125.239.129	443	TLSv12	TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256	secp256r1	-	F	-	-	T	FOye6a4kt8a7QChqw3,FytlLr3jOQenFAVtYi,FEmnxy4DGbxkmtQJS1	(empty)	CN=*.google.com,O=Google Inc,L=Mountain View,ST=California,C=US	CN=Google Internet Authority G2,O=Google Inc,C=US	-	-
+#close	2014-08-08-17-13-55
+#separator \x09
+#set_separator	,
+#empty_field	(empty)
+#unset_field	-
+#path	x509
+#open	2014-03-20-04-42-54
+#fields	ts	id	certificate.version	certificate.serial	certificate.subject	certificate.issuer	certificate.not_valid_before	certificate.not_valid_after	certificate.key_alg	certificate.sig_alg	certificate.key_type	certificate.key_length	certificate.exponent	certificate.curve	san.dns	san.uri	san.email	san.ip	basic_constraints.ca	basic_constraints.path_len
+#types	time	string	count	string	string	string	time	time	string	string	string	count	string	string	vector[string]	vector[string]	vector[string]	vector[addr]	bool	count
+1394747126.862409	FlaIzV19yTmBYwWwc6	3	4A2C8628C1010633	CN=*.google.com,O=Google Inc,L=Mountain View,ST=California,C=US	CN=Google Internet Authority G2,O=Google Inc,C=US	1393341558.000000	1401062400.000000	rsaEncryption	sha1WithRSAEncryption	rsa	2048	65537	-	*.google.com,*.android.com,*.appengine.google.com,*.cloud.google.com,*.google-analytics.com,*.google.ca,*.google.cl,*.google.co.in,*.google.co.jp,*.google.co.uk,*.google.com.ar,*.google.com.au,*.google.com.br,*.google.com.co,*.google.com.mx,*.google.com.tr,*.google.com.vn,*.google.de,*.google.es,*.google.fr,*.google.hu,*.google.it,*.google.nl,*.google.pl,*.google.pt,*.googleapis.cn,*.googlecommerce.com,*.googlevideo.com,*.gstatic.com,*.gvt1.com,*.urchin.com,*.url.google.com,*.youtube-nocookie.com,*.youtube.com,*.youtubeeducation.com,*.ytimg.com,android.com,g.co,goo.gl,google-analytics.com,google.com,googlecommerce.com,urchin.com,youtu.be,youtube.com,youtubeeducation.com	-	-	-	F	-
+1394747126.862409	F0BeiV3cMsGkNML0P2	3	023A69	CN=Google Internet Authority G2,O=Google Inc,C=US	CN=GeoTrust Global CA,O=GeoTrust Inc.,C=US	1365174955.000000	1428160555.000000	rsaEncryption	sha1WithRSAEncryption	rsa	2048	65537	-	-	-	-	-	T	0
+1394747126.862409	F6PfYi2WUoPdIJrhpg	3	12BBE6	CN=GeoTrust Global CA,O=GeoTrust Inc.,C=US	OU=Equifax Secure Certificate Authority,O=Equifax,C=US	1021953600.000000	1534824000.000000	rsaEncryption	sha1WithRSAEncryption	rsa	2048	65537	-	-	-	-	-	T	-
+1394747129.512954	FOye6a4kt8a7QChqw3	3	4A2C8628C1010633	CN=*.google.com,O=Google Inc,L=Mountain View,ST=California,C=US	CN=Google Internet Authority G2,O=Google Inc,C=US	1393341558.000000	1401062400.000000	rsaEncryption	sha1WithRSAEncryption	rsa	2048	65537	-	*.google.com,*.android.com,*.appengine.google.com,*.cloud.google.com,*.google-analytics.com,*.google.ca,*.google.cl,*.google.co.in,*.google.co.jp,*.google.co.uk,*.google.com.ar,*.google.com.au,*.google.com.br,*.google.com.co,*.google.com.mx,*.google.com.tr,*.google.com.vn,*.google.de,*.google.es,*.google.fr,*.google.hu,*.google.it,*.google.nl,*.google.pl,*.google.pt,*.googleapis.cn,*.googlecommerce.com,*.googlevideo.com,*.gstatic.com,*.gvt1.com,*.urchin.com,*.url.google.com,*.youtube-nocookie.com,*.youtube.com,*.youtubeeducation.com,*.ytimg.com,android.com,g.co,goo.gl,google-analytics.com,google.com,googlecommerce.com,urchin.com,youtu.be,youtube.com,youtubeeducation.com	-	-	-	F	-
+1394747129.512954	FytlLr3jOQenFAVtYi	3	023A69	CN=Google Internet Authority G2,O=Google Inc,C=US	CN=GeoTrust Global CA,O=GeoTrust Inc.,C=US	1365174955.000000	1428160555.000000	rsaEncryption	sha1WithRSAEncryption	rsa	2048	65537	-	-	-	-	-	T	0
+1394747129.512954	FEmnxy4DGbxkmtQJS1	3	12BBE6	CN=GeoTrust Global CA,O=GeoTrust Inc.,C=US	OU=Equifax Secure Certificate Authority,O=Equifax,C=US	1021953600.000000	1534824000.000000	rsaEncryption	sha1WithRSAEncryption	rsa	2048	65537	-	-	-	-	-	T	-
+#close	2014-03-20-04-42-54

@@ -96,13 +96,13 @@ for my $opt ( sort keys %$string ) {
 }
 
 
-my $lf = {
-    lf => 'ARRAY',
+my $tabs_prompt = {
+    tabs_prompt => 'ARRAY',
 };
-my @val_lf = ( [ 2, 4 ], [ 8 ], [], undef );
+my @val_tabs_prompt = ( [ 2, 4 ], [ 8 ], [], undef );
 
-for my $opt ( sort keys %$lf ) {
-    for my $val ( @val_lf ) {
+for my $opt ( sort keys %$tabs_prompt ) {
+    for my $val ( @val_tabs_prompt ) {
         ok( ! defined( exception { $d = choose( $choices, { $opt => $val } ) } ) );
     }
 }
@@ -123,10 +123,10 @@ for my $opt ( sort keys %$no_spacebar ) {
 ok( ! defined( exception {  $d = choose( $choices, {
     beep  => 0, clear_screen => undef, hide_cursor => 1, index => 0, alignment => 0, layout => 0, mouse => 0,
     order => 1, page => 0, keep => 1, ll => 1, max_height => 19, max_width => 19, default => 9,
-    pad => 3, empty => '', prompt => '', undef => '', lf => [ 1 ], no_spacebar => [ 0 ], info => 'hello' } ) } ) );
+    pad => 3, empty => '', prompt => '', undef => '', tabs_prompt => [ 1 ], no_spacebar => [ 0 ], info => 'hello' } ) } ) );
 
 ok( ! defined( exception {  $d = choose( [ 'aaa' .. 'zzz' ], {
-    no_spacebar => [ 11, 0, 8 ], lf => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '', pad => 3,
+    no_spacebar => [ 11, 0, 8 ], tabs_prompt => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '', pad => 3,
     default => 9, max_width => 19, max_height => 119, ll => 15, keep => 1, page => 1, order => 1,
     mouse => 0, layout => 3, alignment => 0, index => 0, hide_cursor => 1,  clear_screen => undef, beep  => 0 } ) } ) );
 

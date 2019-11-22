@@ -126,6 +126,15 @@
 #  define EV_USE_LINUXAIO 0
 # endif
    
+# if HAVE_LINUX_FS_H && HAVE_SYS_TIMERFD_H && HAVE_KERNEL_RWF_T
+#  ifndef EV_USE_IOURING
+#   define EV_USE_IOURING EV_FEATURE_BACKENDS
+#  endif
+# else
+#  undef EV_USE_IOURING
+#  define EV_USE_IOURING 0
+# endif
+ 
 # if HAVE_KQUEUE && HAVE_SYS_EVENT_H
 #  ifndef EV_USE_KQUEUE
 #   define EV_USE_KQUEUE EV_FEATURE_BACKENDS
@@ -170,7 +179,7 @@
 #  undef EV_USE_EVENTFD
 #  define EV_USE_EVENTFD 0
 # endif
- 
+
 #endif
 
 /* OS X, in its infinite idiocy, actually HARDCODES
@@ -335,8 +344,8 @@
 #endif
 
 #ifndef EV_USE_IOURING
-# if __linux
-#  define EV_USE_IOURING 0
+# if __linux /* later checks might disable again */
+#  define EV_USE_IOURING 1
 # else
 #  define EV_USE_IOURING 0
 # endif
@@ -438,6 +447,14 @@
 #if !EV_STAT_ENABLE
 # undef EV_USE_INOTIFY
 # define EV_USE_INOTIFY 0
+#endif
+
+#if __linux && EV_USE_IOURING
+# include <linux/fs.h>
+# ifndef RWF_SYNC
+#  undef EV_USE_IOURING
+#  define EV_USE_IOURING 0
+# endif
 #endif
 
 #if !EV_USE_NANOSLEEP

@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.35';
+our $VERSION = '1.36';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -624,7 +624,7 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 DESCRIPTION
 
@@ -724,7 +724,7 @@ Returns a list of hashes describing related stations whose
 arrivals/departures are included in B<results>. Only useful when setting
 B<with_related> to a true value, see its documentation above for details.
 
-Each hash contains the keys B<uic> (UIC/EVA number; known as IBNR in Germany),
+Each hash contains the keys B<uic> (EVA number; often same as UIC station ID),
 B<name> (station name), and B<ds100> (station code). Note that stations
 returned by B<related_stations> are not necessarily known to
 Travel::Status::DE::IRIS::Stations(3pm).

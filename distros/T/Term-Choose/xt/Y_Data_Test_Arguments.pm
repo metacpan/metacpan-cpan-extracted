@@ -33,10 +33,8 @@ sub valid_values {
         prompt => [ 0, 'Hello' x 50, '', ' ', 'abc', 'world', undef ],
         undef  => [ 0, 'Hello' x 50, '', ' ', 'abc', 'world', undef ],
 
-        # ARRAY max 2 int
-        lf => [ [ 2, 4 ], [ 8 ], [], undef ],
-
         # ARRAY int
+        tabs_prompt => [ [ 2, 4 ], [ 8 ], [], undef ],
         mark        => [ [ 0, 1, 2, 100, 999999 ], [ 1 ], undef ],
         no_spacebar => [ [ 0, 1, 2, 100, 999999 ], [ 1 ], undef ],
     };
@@ -46,14 +44,14 @@ sub mixed_options_1 {
     return {
         beep  => 0, clear_screen => undef, hide_cursor => 1, index => 0, alignment => 0, layout => 0, mouse => 0,
         order => 1, page => 0, keep => 1, ll => 1, max_height => 19, max_width => 19, default => 9, pad => 3,
-        empty => '', prompt => '', undef => '', lf => [ 1 ], no_spacebar => [ 0 ], mark => [ 3, 4 ]
+        empty => '', prompt => '', undef => '', tabs_prompt => [ 1 ], no_spacebar => [ 0 ], mark => [ 3, 4 ]
     };
 }
 
 
 sub mixed_options_2 {
     return {
-        mark => [ 0 ], no_spacebar => [ 11, 0, 8 ], lf => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '',
+        mark => [ 0 ], no_spacebar => [ 11, 0, 8 ], tabs_prompt => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '',
         pad => 3, default => 9, max_width => 19, max_height => 119, ll => 15, keep => 1, page => 1, order => 1,
         mouse => 0, layout => 3, alignment => 0, index => 0, hide_cursor => 1, clear_screen => undef, beep => 0
     };
@@ -86,7 +84,7 @@ sub invalid_values {
         undef  => [ { 1, 1 }, [ 1 ], {}, [], [ 2 ] ],
 
         # ARRAY max 2 int
-        lf => [ -2, -1, 0, 1, '', 'a', { 1, 1 }, {}, [ 1, 2, 3, ], [ 'a', 'b' ], [ -3, -4 ] ],
+        tabs_prompt => [ -2, -1, 0, 1, '', 'a', { 1, 1 }, {}, [ 1, 2, 'k', ], [ 'a', 'b' ], [ -3, -4 ] ],
 
         # ARRAY int
         mark        => [ -2, -1, 0, 1, '', 'a', { 1, 1 }, {}, [ 'a', 'b' ], [ -3, -4 ] ],
@@ -98,14 +96,14 @@ sub mixed_invalid_1 {
     return {
         beep  => -1, clear_screen => 2, hide_cursor => 3, index => 4, alignment => '@', layout => 5, mouse => {},
         order => 1, page => 0, keep => -1, ll => -1, max_height => 0, max_width => 0, default => [], pad => 'a',
-        empty => [], prompt => {}, undef => [], lf => 4, no_spacebar => 4, mark => 'o'
+        empty => [], prompt => {}, undef => [], tabs_prompt => 4, no_spacebar => 4, mark => 'o'
     };
 }
 
 
 sub mixed_invalid_2 {
     return {
-        mark => '', no_spacebar => 'a', lf => 'b', undef => [], prompt => {}, empty => {}, pad => 'd', default => 'e',
+        mark => '', no_spacebar => 'a', tabs_prompt => 'b', undef => [], prompt => {}, empty => {}, pad => 'd', default => 'e',
         max_width => -1, max_height => -2, ll => -4, keep => -5, page => -6, order => -7, mouse => 'k', layout => 'e',
         alignment => [], index => {}, hide_cursor => -1,  clear_screen => [], beep  => 10
     };

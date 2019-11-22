@@ -3,7 +3,7 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use constant _has_current_sub => $^V ge v5.16.0;
 
@@ -262,48 +262,52 @@ sub new {
 sub _propagate_if_needed {
     my ($value_sr, $children_ar) = @_;
 
-    my $cb;
-    $cb = sub {
-        my ($repromise_value_sr) = @_;
+    # Avoid creating the closure if we can:
+    if (@$children_ar || _is_promise($$value_sr)) {
 
-        if ( _is_promise($$repromise_value_sr) ) {
+        my $cb;
+        $cb = sub {
+            my ($repromise_value_sr) = @_;
 
-            # Accommodate Perl versions whose $@ handling is buggy
-            # by forgoing local():
-            my $old_err = $@;
+            if ( _is_promise($$repromise_value_sr) ) {
 
-            my $current_sub = do {
-                no strict 'subs';
+                # Accommodate Perl versions whose $@ handling is buggy
+                # by forgoing local():
+                my $old_err = $@;
 
-                # The eval here mimics the “current_sub” feature:
-                # a reference to the current subroutine
-                # without actually closing on that reference.
-                # This helps to prevent memory leaks.
-                _has_current_sub() ? __SUB__ : eval '$cb';
-            };
+                my $current_sub = do {
+                    no strict 'subs';
 
-            $@ = $old_err;
+                    # The eval here mimics the “current_sub” feature:
+                    # a reference to the current subroutine
+                    # without actually closing on that reference.
+                    # This helps to prevent memory leaks.
+                    _has_current_sub() ? __SUB__ : eval '$cb';
+                };
 
-            my $in_reprom = $$repromise_value_sr->then(
-                sub { $current_sub->( bless \do {my $v = $_[0]}, _RESOLUTION_CLASS ) },
-                sub { $current_sub->( bless \do {my $v = $_[0]}, _REJECTION_CLASS ) },
-            );
-        }
-        else {
-            $$value_sr = $$repromise_value_sr;
-            bless $value_sr, ref($repromise_value_sr);
+                $@ = $old_err;
 
-            # It may not be necessary to empty out @$children_ar, but
-            # let’s do so anyway so Perl will delete references ASAP.
-            # It’s safe to do so because from here on $value_sr is
-            # no longer a pending value.
-            for my $subpromise (splice @$children_ar) {
-                $subpromise->_finish($value_sr);
+                my $in_reprom = $$repromise_value_sr->then(
+                    sub { $current_sub->( bless \do {my $v = $_[0]}, _RESOLUTION_CLASS ) },
+                    sub { $current_sub->( bless \do {my $v = $_[0]}, _REJECTION_CLASS ) },
+                );
             }
-        }
-    };
+            else {
+                $$value_sr = $$repromise_value_sr;
+                bless $value_sr, ref($repromise_value_sr);
 
-    $cb->($value_sr);
+                # It may not be necessary to empty out @$children_ar, but
+                # let’s do so anyway so Perl will delete references ASAP.
+                # It’s safe to do so because from here on $value_sr is
+                # no longer a pending value.
+                for my $subpromise (splice @$children_ar) {
+                    $subpromise->_finish($value_sr);
+                }
+            }
+        };
+
+        $cb->($value_sr);
+    }
 
     return;
 }
@@ -496,9 +500,6 @@ sub DESTROY {
     return if $$ != $_[0]{'_pid'};
 
     if ($_[0]{'_detect_leak'} && ${^GLOBAL_PHASE} && ${^GLOBAL_PHASE} eq 'DESTRUCT') {
-use Data::Dumper;
-$Data::Dumper::Deparse = 1;
-print STDERR Dumper $_[0];
         warn(
             ('=' x 70) . "\n"
             . 'XXXXXX - ' . ref($_[0]) . " survived until global destruction; memory leak likely!\n"

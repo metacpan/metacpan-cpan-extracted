@@ -204,6 +204,7 @@ require Exporter;
            xfork
            xfork_
            xexec
+           xexec_safe
            xsystem
            xxsystem
            xsystem_safe
@@ -259,6 +260,7 @@ require Exporter;
               XLmtime
               min max
               fstype_for_device
+              xgetfile_utf8 xslurp
             );
               # would we really want to export these?:
               #caching_getpwuid
@@ -304,11 +306,17 @@ sub xfork_(&) {
 }
 
 sub xexec {
-    #local $^W;
     no warnings;
     exec @_;
     croak "xexec ".singlequote_many(@_).": $!";
 }
+
+sub xexec_safe {
+    no warnings;
+    exec { $_[0] } @_;
+    croak "xexec_safe ".singlequote_many(@_).": $!";
+}
+
 
 sub xspawn {
     croak "xspawn: too few arguments" unless @_;
@@ -1422,6 +1430,22 @@ sub xprintln {
     print $fh @_,"\n"
       or die "printing to $fh: $!"
 }
+
+sub xgetfile_utf8 ($) {
+    my ($path)=@_;
+    open my $in, "<", $path
+        or die "xgetfile_utf8($path): open: $!";
+    binmode $in, ":encoding(UTF-8)" or die "binmode";
+    local $/;
+    my $cnt= <$in>
+        // die "xgetfile_utf8($path): read: $!";
+    close $in
+        or die "xgetfile_utf8($path): close: $!";
+    $cnt
+}
+
+sub xslurp ($);
+*xslurp= \&xgetfile_utf8;
 
 
 1;

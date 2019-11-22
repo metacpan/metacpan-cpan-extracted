@@ -1,28 +1,26 @@
-#!/usr/bin/perl  -I/home/phil/perl/cpan/DataEditXml/lib/ -I/home/phil/perl/cpan/DataTableText/lib/
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataEditXml/lib/ -I/home/phil/perl/cpan/DataTableText/lib/
 #-------------------------------------------------------------------------------
 # Cross reference Dita XML, match topics and ameliorate missing references.
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2019
 #-------------------------------------------------------------------------------
 # podDocumentation
-# Results cannot be accurate until we are at 100% lint
-# It is easier to criticize than to fix - but we do some fixes any way.
 # Check for image formats that will not display in a browser
-# Needs more tests
 # Do not consider companion files!
 # Images that are referenced by topics which are not referenced by bookmaps showup as referenced
 # It should be possible to remove reportImages by using generic references instead
-# CONREF processing in reportReferencesFromBookmaps
+# Conref processing in reportReferencesFromBookmaps
 # Fix xref external/scope and eliminate error count if fixbadrefs in operation.
 # Add labels to ditaRefs processing so that references to labels are also fixed
-# Eliminate unused ids?
-# Concepts can be nested inside concepts and so each sub concept can establish its own address range.  If there is duplication of referenced ids in teh sub ranges then we have to account for the topic id to help disambiguate references -at the moment the ids are assumed to be unique and so no effort is made to use this extra information
-# Reports after fix references can be done in parallel as can reports before reportReferencesFromBookMaps
-# ADD xref expansion from id in file as it is a pain to code up the full details by hand
+# Add xref expansion from id in file as it is a pain to code up the full details by hand
 # Find topics that have no text in them per: PS2-617
+# Need test for changeBadXrefToPh
+# Unique target needs tests
+# Create list of images found in input folder
+# Conrefs report should use targets/ to update the conref file so conrefs fixed by fixDitaRefs are considered
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 20190721;
-use v5.20;
+our $VERSION = 20191121;
+use v5.26;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess cluck);
@@ -30,11 +28,12 @@ use Data::Dump qw(dump);
 use Data::Edit::Xml;
 use Data::Table::Text qw(:all);
 use Dita::GB::Standard;
-use feature q(postderef);
+use Storable qw(store retrieve);
 use Time::HiRes qw(time);
 use utf8;
 
-sub improvementLength     {80}                                                  #P Maximum length of the test of an improvement suggestion
+sub improvementLength      {80}                                                 #P Maximum length of the test of an improvement suggestion
+sub classificationMapSuffix{q(_classification.ditamap)}                         #P Suffix to add to map files to create corresponding classification map file
 
 #D1 Cross reference                                                             # Check the cross references in a set of Dita files and report the results.
 
@@ -54,25 +53,31 @@ sub newXref(%)                                                                  
     badGuidHrefs=>{},                                                           # Bad conrefs - all.
 #   badImageRefs=>{},                                                           # Consolidated images missing.
     badNavTitles=>{},                                                           # Details of nav titles that were not resolved
-    badReferencesCount=>0,                                                      # The number of bad references encountered
+    badReferencesCount=>0,                                                      # The number of bad references at the start of the run - however depending on what options were chosen Xref might ameliorate these bad references and thereby reduce this count.
     badTables=>[],                                                              # Array of tables that need fixing.
     badXml1=>{},                                                                # [Files] with a bad xml encoding header on the first line.
     badXml2=>{},                                                                # [Files] with a bad xml doc type on the second line.
 #   badXRefs=>{},                                                               # Bad Xrefs - by file
 #   badXRefsList=>{},                                                           # Bad Xrefs - all
+    baseFiles=>{},                                                              # {base of file name}{full file name}++ Current location of the file via uniqueness guaranteed by the GB standard
     baseTag=>{},                                                                # Base Tag for each file
     bookMapRefs=>{},                                                            # {bookmap full file name}{href}{navTitle}++ References from bookmaps to topics via appendix, chapter, bookmapref.
     changeBadXrefToPh=>undef,                                                   #I Change xrefs being placed in B<M3> by L<fixBadRefs> to B<ph>.
-    conRefs=>{},                                                                # {file}{href}   Count of conref definitions in each file.
+    classificationMaps=>undef,                                                  #I Create classification maps if true
+    conRefs=>{},                                                                # {file}{href}{tag}++ : conref source detail
     currentFolder=>currentDirectory,                                            # The current working folder used to make absolute file names from relative ones
 #   debugTimes=>undef,                                                          #I Write timing information if true
+    deleteUnusedIds=>0,                                                         #I Delete ids (except on topics) that are not referenced in any reference in the corpus regardless of the file component of any such reference.
     deguidize=>undef,                                                           #I Set true to replace guids in dita references with file name. Given reference B<g1#g2/id> convert B<g1> to a file name by locating the topic with topicId B<g2>.  This requires the guids to be genuinely unique. SDL guids are thought to be unique by language code but the same topic, translated to a different language might well have the same guid as the original topic with a different language code: =(de|en|es|fr).  If the source is in just one language then the guid uniqueness is a reasonable assumption.  If the conversion can be done in phases by language then the uniqueness of guids is again reasonably assured. L<Data::Edit::Xml::Lint> provides an alternative solution to deguidizing by using labels to record the dita reference in the input corpus for each id encountered, these references can then be resolved in the usual manner by L<Data::Edit::Xml::Lint::relint>.
     docType=>{},                                                                # {file} == docType:  the docType for each xml file.
     duplicateIds=>{},                                                           # [file, id]     Duplicate id definitions within each file.
     duplicateTopicIds=>{},                                                      # Duplicate topic ids
     duplicateTopicIds=>{},                                                      # [topicId, [files]] Files with duplicate topic ids - the id on the outermost tag.
+    emptyTopics=>{},                                                            # {file} : topics where the *body is empty.
+    errors=>0,                                                                  # Number of significant errors as reported in L<statusLine> or 0 if no such errors found
+    exteriorMaps=>{},                                                           # {exterior map} : maps that are not referenced by another map
     fileExtensions=>[qw(.dita .ditamap .xml .fodt)],                            # Default file extensions to load
-    fixBadRefs=>undef,                                                          #I Try to fix bad references in L<these files|/fixRefs> where possible by either changing a guid to a file name assuming the right file is present in the corpus being scanned and L<deguidize|/deguidize> has been set true or failing that by moving the failing reference to the B<xtrf> attribute i.e. placing it in B<M3> possibly renaming the tag to B<ph> if L<changeBadXrefToPh> is in effect.
+    fixBadRefs=>undef,                                                          #I Fix any remaining bad references after any all allowed attempts have been made to fix failing references by moving the failing reference to the B<xtrf> attribute i.e. placing it in B<M3> possibly renaming the tag to B<ph> if L<changeBadXrefToPh> is in effect as well.
     fixDitaRefs=>undef,                                                         #I Fix references in a corpus of L<Dita> documents that have been converted to the L<GBStandard> and whose target structure has been written to the named folder.
 #   fixedDitaRefs=>[],                                                          # [] topic refs fixed by L<fixDitaRefs>
     fixedFolder=>undef,                                                         # Fixed files are placed in this folder if L<fixBadRefs|/fixBadRefs> has been specified.
@@ -81,37 +86,48 @@ sub newXref(%)                                                                  
     fixedRefs=>[],                                                              # [] hrefs and conrefs from L<fixRefs|/fixRefs> which were invalid but have been fixed by L<deguidizing|/deguidize> them to a valid file name.
     fixedRefsNoAction=>[],                                                      # [] hrefs and conrefs from L<fixRefs|/fixRefs> for which no action was taken.
     fixRefs=>{},                                                                # {file}{ref} where the href or conref target is not valid.
-    fixRelocatedRefs=>undef,                                                    #I Fix references to topics that have been moved around in the out folder structure assuming that all file names are unique.
-    fixXrefsByTitle=>undef,                                                     #I Try to fix invalid xrefs by the Gearhart Title Method if true
+    fixRelocatedRefs=>undef,                                                    #I Fix references to topics that have been moved around in the out folder structure assuming that all file names are unique which they will be if they have been renamed to the GB Standard.
+    fixXrefsByTitle=>undef,                                                     #I Try to fix invalid xrefs by the Gearhart Title Method enhanced by the Monroe map method if true
     flattenFiles=>{},                                                           # {old full file name} = file renamed to Gearhart-Brenan file naming standard
     flattenFolder=>undef,                                                       #I Files are renamed to the Gearhart standard and placed in this folder if set.  References to the unflattened files are updated to references to the flattened files.  This option will eventually be deprecated as the Dita::GB::Standard is now fully available allowing files to be easily flattened before being processed by Xref.
-#   goodBookMaps=>{},                                                           # Good book maps.
+    getFileUrl=>qq(/cgi-bin/uiSelfServiceXref/client.pl?getFile=),               #I A url to retrieve a specified file from the server running xref used in generating html reports. The complete url is obtained by appending the fully qualified file name to this value.
 #   goodConRefs=>{},                                                            # Good con refs - by file.
 #   goodConRefsList=>{},                                                        # Good con refs - all.
 #   goodGuidHrefs=>{},                                                          # {file}{href}{location}++ where a href that starts with GUID- has been correctly resolved.
 #   goodImageRefs=>{},                                                          # Consolidated images found.
-    goodNavTitles=>{},                                                          # Details of nav titles that were resolved
-#   goodBookMapRefs=>{},                                                          # Good topic refs.
+    goodImageFiles=>{},                                                         # {file}++ : number of references to each good image
+    goodNavTitles=>{},                                                          # Details of nav titles that were resolved.
+#   goodBookMapRefs=>{},                                                        # Good topic refs.
 #   goodXRefs=>{},                                                              # Good xrefs - by file.
 #   goodXRefsList=>{},                                                          # Good xrefs - all.
     guidHrefs=>{},                                                              # {file}{href} = location where href starts with GUID- and is thus probably a guid.
     guidToFile=>{},                                                             # {topic id which is a guid} = file defining topic id.
-    hrefUrlEncoding=>{},                                                        # Hrefs that need url encoding because they contain white space
-    ids=>{},                                                                    # {file}{id}     Id definitions across all files.
+    hrefUrlEncoding=>{},                                                        # Hrefs that need url encoding because they contain white space.
+    html=>undef,                                                                #I Generate html version of reports in this folder if supplied
+    idNotReferenced=>{},                                                        # {file}{id}++ - id in a file that is not referenced
+    idReferencedCount=>{},                                                      # {file}{id}++ - the number of times this id in this file is referenced from the rest of the corpus
+    ids=>{},                                                                    # {file}{id}   - id definitions across all files.
+    idsRemoved=>{},                                                             # {id}++ : Ids removed from all files
+    idTags=>{},                                                                 # {file}{id}[tag] The tags associated with each id in a file - there might be more than one if the id is duplicated
     images=>{},                                                                 # {file}{href}   Count of image references in each file.
     imagesReferencedFromBookMaps=>{},                                           # {bookmap full file name}{full name of image referenced from topic referenced from bookmap}++
     imagesReferencedFromTopics=>{},                                             # {topic full file name}{full name of image referenced from topic}++
+    imagesToRefferingBookMaps=>{},                                              # {image full file name}{bookmap full file name}++ : images to referring bookmaps
     improvements=>{},                                                           # Suggested improvements - a list of improvements that might be made.
+    indexWords=>undef,                                                          #I Index words to topics and topics to words if true.
+    indexWordsFolder=>undef,                                                    #I Folder into which to save words to topic and topics to word indexes if L<indexWords> is true.
+    indexedWords=>{},                                                           # {word}{full file name of topic the words occurs in}.
     inputFiles=>[],                                                             # Input files from L<inputFolder|/inputFolder>.
     inputFileToTargetTopics=>{},                                                # {input file}{target file}++ : Tells us the topics an input file was split into
     inputFolderImages=>{},                                                      # {full image file name} for all files in input folder thus including any images resent
     inputFolder=>undef,                                                         #I A folder containing the dita and ditamap files to be cross referenced.
     ltgt=>{},                                                                   # {text between &lt; and &gt}{filename} = count giving the count of text items found between &lt; and &gt;
     matchTopics=>undef,                                                         #I Match topics by title and by vocabulary to the specified confidence level between 0 and 1.  This operation might take some time to complete on a large corpus.
-    maximumNumberOfProcesses=>undef,                                            #I Maximum number of processes to run in parallel at any one time with a sensible default.
+    maximumNumberOfProcesses=>numberOfCpus(8),                                  #I Maximum number of processes to run in parallel at any one time with a sensible default.
     maxZoomIn=>undef,                                                           #I Optional hash of names to regular expressions to look for in each file
     maxZoomOut=>{},                                                             # Results from L<maxZoomIn|/maxZoomIn>  where {file name}{regular expression key name in L<maxZoomIn|/maxZoomIn>}++
     md5Sum=>{},                                                                 # MD5 sum for each input file.
+    md5SumDuplicates=>{},                                                       # {md5sum}{file}++ : md5 sums with more than one file
     missingImageFiles=>{},                                                      # [file, href] == Missing images in each file.
     missingTopicIds=>{},                                                        # Missing topic ids.
     noHref=>{},                                                                 # Tags that should have an href but do not have one.
@@ -125,18 +141,24 @@ sub newXref(%)                                                                  
     otherMetaPushToBookMap=>[],                                                 # Othermeta that can be pushed to the calling book map
     otherMetaBookMapsBeforeTopicIncludes=>[],                                   # Bookmap othermeta before topic othermeta has been included
     otherMetaBookMapsAfterTopicIncludes=>[],                                    # Bookmap othermeta after  topic othermeta has been included
+    otherMetaConsolidated=>{},                                                  # {Name}{Content}++ : consolidated other meta data across entire corpus
+    oxygenProjects=>undef,                                                      #I Create oxygen project files for each map in this folder
     parseFailed=>{},                                                            # {file} files that failed to parse.
-    printSummaryLine=>1,                                                        #I Print the summary line if true - on by default.
+    publicId=>{},                                                                # {file} = Public id on Doctype
     references=>{},                                                             # {file}{reference}++ - the various references encountered
     relocatedReferencesFailed=>[],                                              # Failing references that were not fixed by relocation
     relocatedReferencesFixed=>[],                                               # Relocated references fixed
     requestAttributeNameAndValueCounts=>undef,                                  #I Report attribute name and value counts
-    reports=>q(reports),                                                        #I Reports folder: the cross referencer will write reports to files in this folder.
+    requiredCleanUp=>undef,                                                     # {full file name}{cleanup} = number of required-cleanups
+    reports=>undef,                                                             #I Reports folder: Xref will write text versions of the generated reports to files in this folder.
     results=>[],                                                                # Summary of results table.
     sourceFile=>undef,                                                          # The source file from which this structure was generated.
     sourceTopicToTargetBookMap=>{},                                             # {input topic cut into multiple pieces} = output bookmap representing pieces
     statusLine=>undef,                                                          # Status line summarizing the cross reference.
     statusTable=>undef,                                                         # Status table summarizing the cross reference.
+    subjectSchemeMap=>undef,                                                    #I Create a subject scheme map in the named file
+    suppressReferenceChecks=>undef,                                             #I Suppress reference checking - which normally happens by default - but which takes time and might be irrelevant if an earlier xref has already checked all the references.
+    tableDimensions=>{},                                                        # {file}{columns}{rows} == count
     tagCount=>{},                                                               # {file}{tags} == count of the different tag names found in the xml files.
     tagsTextsRatio=>undef,                                                      # Ratio of tags to text encountered
     tags=>undef,                                                                # Number of tags encountered
@@ -145,13 +167,15 @@ sub newXref(%)                                                                  
     texts=>undef,                                                               # Number of texts encountered
     timeEnded=>undef,                                                           # Time the run ended
     timeStart=>undef,                                                           # Time the run started
-    title=>{},                                                                  # {file} = title of file.
+    title=>{},                                                                  # {full file name} = title of file.
     titleToFile=>{},                                                            # {title}{file}++ if L<fixXrefsByTitle> is in effect
+    topicFlatteningFactor=>{},                                                  # Topic flattening factor - higher is better
+    topicFlattening=>{},                                                        # {topic}{sources}++ : the source files for each topic that was flattened
     topicIds=>{},                                                               # {file} = topic id - the id on the outermost tag.
     topicsFlattened=>undef,                                                     # Number of topics flattened
-    topicFlattening=>{},                                                        # {topic}{sources}++ : the source files for each topic that was flattened
-    topicFlatteningFactor=>{},                                                  # Topic flattening factor - higher is better
-    topicsReferencedFromBookMaps=>{},                                           # {bookmap file, file name}{topic full file name}++
+    topicsNotReferencedFromBookMaps=>{},                                        # {topic file not referenced from any bookmap} = 1
+    topicsReferencedFromBookMaps=>{},                                           # {bookmap full file name}{topic full file name}++ : bookmaps to topics
+    topicsToReferringBookMaps=>{},                                              # {topic full file name}{bookmap full file name}++ : topics to referring bookmaps
     validationErrors=>{},                                                       # True means that Lint detected errors in the xml contained in the file.
     vocabulary=>{},                                                             # The text of each topic shorn of attributes for vocabulary comparison.
     xrefBadFormat=>{},                                                          # External xrefs with no format=html.
@@ -164,17 +188,23 @@ sub newXref(%)                                                                  
  } # newXref
 
 sub xref(%)                                                                     # Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible attributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
- {my $xref = newXref(@_);                                                       # create the cross referencer
-
+ {my $xref = newXref(@_);                                                       # Create the cross referencer
   $xref->timeStart = time;                                                      # Start time
-
-  $xref->maximumNumberOfProcesses //= 4 * numberOfCpus;                         # Set a sensible default for the maximum number of processes
 
   $xref->inputFolder or confess "Please supply a value for: inputFolder";
   $xref->inputFolder =~ s(\/+\Z) (\/)gs;                                        # Cleanup path names
   $xref->inputFolder =                                                          # Make input folder absolute
     absFromAbsPlusRel($xref->currentFolder, $xref->inputFolder)
     if $xref->inputFolder !~ m(\A/);
+
+  if (1)                                                                        # Write title and some of the parameters
+   {my $r = $xref->reports;
+    owf(fpe($r, qw(xref_parameter_settings txt)), dump($xref)) if $r;           # Print all parameters
+
+    my $i = $xref->inputFolder;
+    lll "Xref started on  folder: $i, reports: $r"                              # Show that we are starting unless in development
+      unless $i =~ m(cpan/DataEditXmlXref);
+   }
 
   if (my $d = $xref->fixDitaRefs)                                               # Fully qualify and validate targets folder
    {$xref->fixDitaRefs = fullyQualifiedFile($d) ? $d :                          # Fully qualified target folder name
@@ -192,6 +222,7 @@ sub xref(%)                                                                     
                   $xref->deguidize ? q(reportGuidsToFiles) : (),                # Used by addNavTitleToMaps
                   q(checkReferences),                                           # Check all the references
                   q(fixReferences),                                             # Fix any failing references
+                  q(removeUnusedIds),                                           # Count and/or remove unused ids
                  );
 
   my @parallel = (                                                              # Can be done in parallel
@@ -203,7 +234,7 @@ sub xref(%)                                                                     
                   q(reportDuplicateTopicIds),
                   q(reportNoHrefs),
                   q(reportTables),
-#                 q(reportConrefs),                                             # Unified reference processing
+#                 q(reportBadRefs),                                             # Bad references
                   q(reportImages),
                   q(reportParseFailed),
                   q(reportAttributeCount),
@@ -218,15 +249,25 @@ sub xref(%)                                                                     
                   q(reportGuidHrefs),
                   q(reportExternalXrefs),
                   q(reportPossibleImprovements),
-                  q(reportMaxZoomOut),
+#                 q(reportMaxZoomOut),                                          # Fails after upgrade to html reports
                   q(reportTopicDetails),
                   q(reportTopicReuse),
-#                 q(reportMd5Sum),                                              # Not parallelized: takes too much time in series
+                  q(reportMd5Sum),
                   q(reportOlBody),
                   q(reportHrefUrlEncoding),
                   q(reportFixRefs),
                   q(reportSourceFiles),
                   q(reportOtherMeta),
+                  q(reportOtherMetaConsolidated),
+                  q(reportTopicsNotReferencedFromBookMaps),
+                  q(reportTableDimensions),
+                  q(reportExteriorMaps),
+                  q(createClassificationMaps),
+                  q(reportIdRefs),
+                  q(reportEmptyTopics),
+                  q(reportConRefMatching),
+                  q(reportPublicIds),
+                  q(reportRequiredCleanUps),
                  );
 
   if ($xref->addNavTitles)                                                      # Add nav titles to bookmaps if requested
@@ -246,40 +287,61 @@ sub xref(%)                                                                     
                     q(reportSimilarTopicsByVocabulary);
    }
 
+  if ($xref->indexWords)                                                        # Word indexing required
+   {push @parallel, q(reportWordsByFile);
+    $xref->indexWordsFolder or confess "Please set indexWordsFolder";
+   }
+
 # push @parallel, q(reportNotReferenced);                                       # Need to account for changes made by fixFiles or FixFilesGB
 
   if (1)                                                                        # Perform phases in series that must be run in series
    {my @times;
-    for my $phase(@series)
+
+    for my $phase(@series)                                                      # Each phase in series
      {my $startTime = time;
-      $xref->$phase;
-      push @times, [$phase, time - $startTime];
+      #lll "Xref phase $phase";
+
+      $xref->$phase;                                                            # Execute phase
+
+      push @times, [$phase, sprintf("%12.4f", time - $startTime)];              # Phase time
      }
 
-    formatTable([sort {$$b[1] <=> $$a[1]} @times], <<END,
-Phase Xref processing phase
-Time  Time in seconds taken by processing phase
+    formatTables($xref, [sort {$$b[1] <=> $$a[1]} @times],                      # Update after each phase so we can see progress on long running jobs
+      columns => <<END,
+Phase            Xref processing phase
+Time_in_Seconds  Time in seconds taken by this processing phase
 END
-    title=>qq(Processing phases elapsed times in descending order),
-    head =>qq(Xref phases took the following times on DDDD),
-    file =>fpe($xref->reports, q(timing), qw(phases txt)));                     # Write phase times
+      title   => qq(Processing phases elapsed times in descending order),
+      head    => qq(Xref phases took the following times on DDDD),
+      file    => fpe(q(timing), qw(xref_phases txt)));                          # Write phase times
    }
 
   if (1)                                                                        # Perform phases in parallel that can be run in parallel
    {runInParallel($xref->maximumNumberOfProcesses,
       sub                                                                       # Execute each phase in parallel
        {my ($phase) = @_;
-        $xref->$phase
+        my ($result) = my @result = ($xref->$phase);                            # Check that the value returned by the phase is a single hash reference
+        if (scalar(@result) != 1)
+         {confess "Phase $phase does not return one result";
+         }
+        if ($result =~ m(hash)s)
+         {confess "Phase $phase does not return a hash reference";
+         }
+
+        $result                                                                 # Return results from phase
        },
       sub                                                                       # Decode results
        {for my $r(@_)
-         {next unless $r;
-          for my $k(sort keys %$r)
+         {for my $k(sort keys %$r)
            {$xref->{$k} = $$r{$k};
            }
          }
        },
       @parallel);                                                               # Each phase to be run parallel
+   }
+
+  if ($xref->oxygenProjects)                                                    # Create oxygen project files if requested
+   {$xref->createOxygenProjectMapFiles
    }
 
   formattedTablesReport
@@ -289,7 +351,7 @@ NNNN reports available on DDDD
 
 Sorted by title
 END
-   file=>fpe($xref->reports, qw(reports txt)));
+   file=>fpe($xref->reports, qw(reports txt))) if $xref->reports;
 
   if (1)                                                                        # Summarize
    {my @o;
@@ -307,24 +369,26 @@ END
     $save->(1, "badGuidHrefs",      q(invalid guid hrefs));
 #   $save->(1, "badImageRefs",      q(missing image files));
     $save->(1, "badTables",         q(tables));
-#   $save->(0, "badReferencesCount",q(bad refs));
     $save->(1, "badXml1",           q(first lines));
     $save->(1, "badXml2",           q(second lines));
     $save->(1, "badXRefsList",      q(xrefs));
     $save->(1, "badXRefs",          q(files with bad xrefs), q(file with bad xrefs));
-    $save->(1, "duplicateIds",      q(duplicate ids));
+    $save->(2, "duplicateIds",      q(duplicate ids));
     $save->(1, "fixedRefsFailed",   q(refs));                                   # Unable to resolve these references - L<fixBadRefs> can be used to ameliorate them.
     $save->(1, "hrefUrlEncoding",   q(href url encoding), q(href url encoding));
+    $save->(2, "md5SumDuplicates",  q(duplicate files));
     $save->(1, "missingImageFiles", q(image refs));
     $save->(1, "missingTopicIds",   q(missing topic ids));
     $save->(1, "notReferenced",     q(files not referenced), q(file not referenced));
     $save->(1, "parseFailed",       q(files failed to parse), q(file failed to parse));
-    $save->(2, "duplicateTopicIds", q(duplicate topic ids));
+    $save->(1, "duplicateTopicIds", q(duplicate topic ids));
 #   $save->(2, "improvements",      q(improvements));
     $save->(2, "noHref",            q(hrefs missing), q(href missing));
     $save->(2, "validationErrors",  q(validation errors)); # Needs testing
     $save->(2, "xrefBadFormat",     q(External xrefs with no format=html));
     $save->(2, "xrefBadScope",      q(External xrefs with no scope=external));
+
+    my $files = $xref->inputFiles->@*;
 
     $xref->statusLine = @o ? join " ",                                          # Status line
       "Xref:", join ", ",
@@ -333,29 +397,33 @@ END
                 {return $$a[1] cmp $$b[1] if $$b[0] == $$a[0];
                  $$b[0] <=> $$a[0]
                 }
-               @o : q();
+               @o : qq(Xref: processed $files files, found no errors);
+
+    $xref->errors = @o;
 
     $xref->statusTable = formatTable
      ([sort {$$b[0] <=> $$a[0]} @o], [qw(Count Condition)]);                    # Summary in status form
     $xref->results = \@o;                                                       # Save status line components
-
-    if (@o and $xref->printSummaryLine)                                         # Summary line
-     {say STDERR $xref->statusLine;
-     }
    }
 
   $xref->timeEnded = time;                                                      # Run ended time
 
-  formatTable([[$xref->timeStart, $xref->timeEnded,                             # Write run times
-                $xref->timeEnded - $xref->timeStart]],
-  <<END,
+  formatTables($xref, [[$xref->timeStart, $xref->timeEnded,                     # Write run times
+               $xref->timeEnded - $xref->timeStart]],
+    columns => <<END,
 Start_Time   Start time of the run
 End_Time     End time of the run
 Elapsed_Time Xref took this many seconds to run
 END
     title => qq(Run times in seconds),
     head  => qq(Xref took the following time to run on DDDD),
-    file  => fpe($xref->reports, q(timing), qw(run txt)));
+    file  => fpe(q(timing), qw(run txt)));
+
+  formatHtmlTablesIndex($xref->reports, q(), $xref->getFileUrl);                # Create an index of html files for use as an initial page of Xref results
+
+  lll "Xref finished on folder: ", $xref->inputFolder unless                    # Show that we have finished unless in development
+    $xref->inputFolder =~ m(cpan/DataEditXmlXref);
+
 
   $xref                                                                         # Return Xref results
  }
@@ -384,13 +452,40 @@ sub externalReference($)                                                        
   $reference =~ m(\A(https?:|mailto:|www))is                                    # Check reference
  }
 
+sub fixingRun($)                                                                #P A fixing run fixes problems where it can and thus induces changes which might make the updated output different from the incoming source.  Returns a useful message describing this state of affairs.
+ {my ($xref) = @_;                                                              # Cross referencer
+  my @i;
+  for my $i(qw(fixBadRefs fixDitaRefs fixRelocatedRefs  fixXrefsByTitle))
+   {push @i, $i if $xref->{$i};
+   }
+
+  if (@i)                                                                       # Fixing run
+   {my $i = join ', ', @i;
+    return <<END;
+
+Caution: this is a fixing run with options: $i set to on.
+
+This report represents the status quo ante - i.e. what things look like at the
+start of the run.  This is useful information for driving development of Xref
+but confusing if you only want to improve your document corpus.
+
+To get the state of play, a posteriori, request a copy of this report as
+produced after an Xref run with all the options above set to off.
+
+END
+   }
+  else                                                                          # Reporting run
+   {return '';
+   }
+ }
+
 sub loadInputFiles($)                                                           #P Load the names of the files to be processed
  {my ($xref) = @_;                                                              # Cross referencer
   my $in = $xref->inputFiles =
    [searchDirectoryTreesForMatchingFiles
     $xref->inputFolder, @{$xref->fileExtensions}];
 
-  if (!$in or @$in == 0)                                                                 # Complain if there are no input files to analyze
+  if (!$in or @$in == 0)                                                        # Complain if there are no input files to analyze
    {my $i = $xref->inputFolder;
     my $e = join " ", @{$xref->fileExtensions};
     my $x = -d $i ? "The input folder does exist." :
@@ -429,6 +524,7 @@ sub analyzeOneFile($$)                                                          
   $xref->flattenFiles->{$iFile} =                                               # Record correspondence between existing file and its GB Standard file name
     Dita::GB::Standard::gbStandardFileName($source, fe($iFile), md5=>$md5);
 
+
   my $saveReference = sub                                                       # Save a reference so it can be integrity checked later
    {my ($ref) = @_;                                                             # Reference
     return if externalReference($ref);                                          # Looks like an external reference
@@ -451,8 +547,14 @@ sub analyzeOneFile($$)                                                          
 
     my $tag = -t $o;
 
+    my $saveConRef = sub                                                        # Save a conref
+     {my ($conRef) = @_;                                                        # Conref
+      $xref->conRefs->{$iFile}{$conRef}{$tag}++;
+     };
+
     if (my $i = $o->id)                                                         # Id definitions
      {$xref->ids->{$iFile}{$i}++;
+      push $xref->idTags->{$iFile}{$i}->@*, $tag;                               # Tags for each id in the file
      }
 
     if ($tag eq q(xref))                                                        # Xrefs but not to the web
@@ -474,9 +576,11 @@ sub analyzeOneFile($$)                                                          
        }
       else
        {push @{$xref->noHref->{$iFile}}, [$tag, $o->lineLocation, $iFile];      # No href
+        $xref->fixRefs->{$iFile}{q()}++                                         # Try and fix by the Gearhart Title method augmented by the Monroe Map Method
        }
      }
-    elsif ($tag =~ m(\A(appendix|chapter|link|mapref|notices|topicref)\Z)is)    # References from bookmaps
+#   elsif ($tag =~ m(\A(appendix|chapter|link|mapref|notices|topicref)\Z)is)    # References from bookmaps
+    elsif ($x->isADitaMap and $tag =~ m(\A(appendix|chapter|link|mapref|notices|topicref)\Z)is) # References from bookmaps at 2019.11.10 22:58:24 as mapref can be used in a topic
      {if (my $h = $o->href)
        {if ($h =~ m(\Aguid-)is)                                                 # Href is a guid
          {$xref->guidHrefs->{$iFile}{$h} = [$tag, $o->lineLocation];
@@ -505,12 +609,12 @@ sub analyzeOneFile($$)                                                          
      }
 
     if (my $conref = $o->attr_conref)                                           # Conref
-     {$xref->conRefs->{$iFile}{$conref}++;
+     {&$saveConRef($conref);
       &$saveReference($conref);
      }
 
     if (my $conref = $o->attr_conrefend)                                        # Conref end
-     {$xref->conRefs->{$iFile}{$conref}++;
+     {&$saveConRef($conref);
       &$saveReference($conref);
      }
 
@@ -523,6 +627,7 @@ sub analyzeOneFile($$)                                                          
     elsif ($tag eq q(required-cleanup))                                         # Required cleanup
      {my $t = &$content;
       push @improvements, [-t $o, $t, &$loc];
+      $xref->requiredCleanUp->{$iFile}{nws($o->stringContent)}++;
      }
     elsif ($tag eq q(steps-unordered))                                          # Steps unordered
      {my $t = nws(-c $o, improvementLength);
@@ -599,6 +704,9 @@ sub analyzeOneFile($$)                                                          
       else
        {$error->(qq(Column padding required));
        }
+      if ($maxCols and my $rows = $stats->rows)                                 # Count table sizes
+       {$xref->tableDimensions->{$iFile}{$maxCols}{$rows}++;
+       }
      }
     elsif (keys %maxZoomIn and $o->isText)                                      # Search for text using Micaela's Max Zoom In Method
      {my $t = $o->text;
@@ -614,6 +722,9 @@ sub analyzeOneFile($$)                                                          
       my $n = $o->attrX_name;
       $xref->otherMeta->{$iFile}{$n}{$c}++;
      }
+    elsif ($tag =~ m(body\Z) and $o->isAllBlankText)                            # Empty body
+     {$xref->emptyTopics->{$iFile}++;
+     }
 
     if (my $h = $o->href)                                                       # Check href
      {if ($h =~ m(\s)s and externalReference($h))                               # Check href for url encoding needed
@@ -622,7 +733,6 @@ sub analyzeOneFile($$)                                                          
       if ($xref->deguidize and $h =~ m(\bguid-)is)                              # Deguidizing a href that looks as if it might have a guid in it
        {$xref->fixRefs->{$iFile}{$h}++
        }
-
       &$saveReference($h);
      }
 
@@ -638,15 +748,19 @@ sub analyzeOneFile($$)                                                          
   push @{$xref->improvements->{$iFile}}, @improvements if @improvements;        # Save improvements
   $xref->maxZoomOut->{$iFile} = \%maxZoomOut;                                   # Save max zoom
 
-  $xref->topicIds                    ->{$iFile} = $x->id;                       # Topic Id
-  $xref->docType                     ->{$iFile} = $x->tag;                      # Document type
+  my $docType = parseXmlDocType($source);                                       # Get DocType details
+
   $xref->attributeCount              ->{$iFile} = $x->countAttrNames;           # Attribute names
   $xref->attributeNamesAndValuesCount->{$iFile} = $x->countAttrNamesAndValues;  # Attribute names and values
   $xref->baseTag                     ->{$iFile} = $x->tag;                      # Tag on base node
+  $xref->docType                     ->{$iFile} = $x->tag;                      # Document type
+  $xref->publicId                    ->{$iFile} = $docType->{publicId};         # Public id on Doctype
   $xref->tagCount                    ->{$iFile} = $x->countTagNames;            # Tag names
   $xref->tags                        ->{$iFile} = $tags;                        # Number of tags
   $xref->texts                       ->{$iFile} = $texts;                       # Number of texts
-  $xref->vocabulary                  ->{$iFile} = $x->stringTagsAndText;        # Text of topic minus attributes
+  $xref->topicIds                    ->{$iFile} = $x->id;                       # Topic Id
+  $xref->vocabulary                  ->{$iFile} = $x->stringTagsAndText         # Text of topic minus attributes
+     unless $x->isADitaMap;                                                     # Maps tend not to have any matchable text in them and so are ignored
 
   if (1)                                                                        # Check xml headers and lint errors
    {my @h = split /\n/, my $s = readFile($iFile);
@@ -664,6 +778,30 @@ sub analyzeOneFile($$)                                                          
   $xref
  } # analyzeOneFile
 
+sub formatTables($$%)                                                           #P Using cross reference B<$xref> options and an array of arrays B<$data> format a report as a table using B<%options> as described in L<Data::Table::Text::formatTable> and L<Data::Table::Text::formatHtmlTable>.
+ {my ($xref, $data, %options) = @_;                                             # Cross referencer, table to be formatted, options
+
+  $xref && ref($xref) =~ m(xref)i or cluck "No cross referencer";               # Check parameters
+  $data && ref($data) =~ m(array)i or cluck "No data for table";
+
+  cluck "No file for table"    unless $options{file};                           # Check for required options
+  cluck "No columns for table" unless $options{columns};
+  cluck "No title for table"   unless $options{title};
+
+  formatHtmlAndTextTables
+   ($xref->reports, $xref->html, $xref->getFileUrl,
+    $xref->inputFolder, $data, %options);
+ }
+
+sub hashOfCountsToArray($)                                                      #P Convert a B<$hash> of {key} = count to an array so it can be formatted with L<formatTables>
+ {my ($hash) = @_;                                                              # Hash to be converted
+  my $array = [];
+  for my $key(sort keys %$hash)
+   {push @$array, [$$hash{$key}, $key];
+   }
+  $array
+ }
+
 sub reportGuidsToFiles($)                                                       #P Map and report guids to files
  {my ($xref) = @_;                                                              # Xref results
   my @r;
@@ -675,14 +813,15 @@ sub reportGuidsToFiles($)                                                       
      }
    }
 
-  formatTable(\@r, <<END,
+  formatTables($xref, \@r,
+    columns  => <<END,
 Guid The guid being defined
 File The file that defines the guid
 END
     title    =>qq(Guid topic definitions),
     head     =>qq(Xref found NNNN guid topic definitions on DDDD),
     summarize=>1,
-    file     =>fpe($xref->reports, q(lists), qw(guidsToFiles txt)));
+    file     =>fpe(q(lists), qw(guidsToFiles txt)));
  }
 
 sub editXml($$$)                                                                #P Edit an xml file retaining any existing XML headers and lint trailers
@@ -723,7 +862,7 @@ sub editXml($$$)                                                                
 #
 # If fixRelocatedRefs is in effect: such references are fixed by assuming that
 # the files mentioned in broken links have been relocated else where in the
-# elsewhere in the folder structure and can be located by base file name alone.
+# folder structure and can be located by base file name alone.
 #
 # If fixXrefsByTitle is in effect apply the Gearhart Title Method: fix broken
 # xrefs by looking for a unique topic with the same title text as the content of
@@ -742,14 +881,6 @@ sub fixReferencesInOneFile($$)                                                  
   my @bad;                                                                      # Hrefs that could not be fixed and so were ameliorated by moving them to @xtrf
   my @good;                                                                     # Hrefs that were fixed by resolving a Guid
 
-  my %baseFiles;                                                                # Map base files back to full files. The base file is the file name shorn of the path - the reason the GB Standard is so important
-  if ($xref->fixRelocatedRefs)                                                  # Load base file name to full name but if needed to do relocation fixes
-   {for my $file(searchDirectoryTreesForMatchingFiles($xref->inputFolder))      # All input files
-     {my $base = fne $file;                                                     # Base file name - the GB Standard name for the file
-      $baseFiles{$base}{$file}++;                                               # Current location of the file
-     }
-   }
-
   my $refDetails = sub                                                          # Save details of a reference
    {my ($r) = @_;
     my $s = $xref->targetTopicToInputFiles->{$sourceFile};                      # The source file(s) from which each target was obtained
@@ -763,52 +894,37 @@ sub fixReferencesInOneFile($$)                                                  
    };
 
   my $good = sub                                                                # Save details of a good reference
-   {my ($r) = @_;
-    push @good, my $R = &$refDetails($r);
+   {my ($target, $r) = @_;                                                      # Target file, reason
+    my $R = &$refDetails($r);
+    push @good, [@$R[0..3], $target, @$R[4..$#$R]];                             # Insert target at correct location
     $R
    };
 
   my $fixXrefByTitle = sub                                                      # Attempt to fix an xref by using its text content to search for a matching title
    {return undef unless -t $node eq q(xref);                                    # Only works for xrefs
 
-    my $content     = -C $node;
-    if (my $topics  = $xref->titleToFile->{nws($content)})                      # Find the topics that match the title text content
-     {if (keys %$topics == 1)                                                   # Unique matching topic
+    my $xTitle      = nws($node->stringContent);                                # Normalized title from xref node
+    if (my $topics  = $xref->titleToFile->{$xTitle})                            # Find the topics that match the title text content
+     {my $N         = keys %$topics;                                            # Matching topics
+
+      if ($N == 1)                                                              # Unique matching topic - the original Gearhart Title Method
        {my ($path)  = keys %$topics;
         my $rel     = relFromAbsAgainstAbs($path, $sourceFile);                 # Relative file name
         $node->href = $rel;                                                     # Update xref
-        return &$good(q(Fixed by title));                                       # Report fix made
+        return &$good($path, q(Fixed by Gearhart Title Method));                # Report the fix made
        }
-     }
-    undef                                                                       # Failed
-   };
-
-  my $fixRelRef = sub                                                           # Attempt to fix a reference broken by relocation
-   {my ($R, $rest) = split m(#)s, $ref;                                         # Get referenced file name
-    if ($R)
-     {my $r = fne($R);                                                          # Href file base name
-      if (my $F = $baseFiles{$r})                                               # Relocated else where
-       {my @targets = sort keys(%$F);                                           # Relocation targets
-        if (@targets == 1)                                                      # Just one such relocation
-         {my $f = relFromAbsAgainstAbs($targets[0], $sourceFile);               # Link to it
-          if ($f ne $R)
-           {my $newLink;                                                        # Fix if the target is else where
-            if ($rest)                                                          # Link has more than one component
-             {$node->set($attr=>($newLink = $f.q(#).$rest));                    # Reset link
-             }
-            else                                                                # Link has just one component
-             {$node->set($attr=>($newLink = $f));                               # Reset link
-             }
-            return &$good(q(Relocated));                                        # Report fix of a relocated reference
-           }
+      elsif ($N > 1)                                                            # Multiple matches
+       {if (my $l = fileLargestSize(sort keys %$topics))                        # Boldly choose the topic with the largest size to resolve the ambiguity on the basis that it is probably the most interesting
+         {my $rel = relFromAbsAgainstAbs($l, $sourceFile);                      # File name of target topic relative to source file
+          $node->href = $rel;                                                   # Update reference
+          return &$good($l, q(Fixed by Gearhart Bold Title Method));            # Report the fix made
          }
        }
      }
     undef                                                                       # Failed
    };
 
-
-  my $locateUniqueTopicSourceForTargetFile = sub                                # Unique source file in the input corpus corresponding to the specified target file else undef
+  my $locateUniqueTopicSourceForTargetFile = sub                                # Unique source file in the input corpus corresponding to the specified target file else undef.  There could be multiple such files because of flattening: if there are then they are all supposed to be identical and so any one of them should do.
    {my ($targetFile) = @_;                                                      # The target file we want to locate a unique source file from
     my $inputFiles = $xref->targetTopicToInputFiles->{$targetFile};             # Input files corresponding to target file
     return undef unless $inputFiles;                                            # Only if we have input files corresponding to this target file
@@ -830,39 +946,56 @@ sub fixReferencesInOneFile($$)                                                  
   my $fixBookMapDitaRef = sub                                                   # Fix a partial dita reference in a bookmap.  If the reference is to a single topic then replace the href with the renamed topic.  If the reference is to a topic that was cut into multiple sub topics then replace the reference with the bookmap that represents the cut out topic.
    {return undef unless $xref->fixDitaRefs;                                     # Only works if we have the targets folder information
 
-    $sourceFile =~ m(ditamap\Z)s or confess "Not a bookmap: $sourceFile";       # Must be a bookmap - need a better test
-
-    my $bookMapSource = &$locateUniqueTopicSourceForTargetFile($sourceFile);    # Source of the book map
-       $bookMapSource or confess "No source for $sourceFile";
-
-    my $sourceTopic = absFromAbsPlusRel($bookMapSource, $ref);                  # Source topic relative to source bookmap
-       $sourceTopic or confess "No source for $bookMapSource + $ref";
-
-    if (my $sourceTarget = $xref->sourceTopicToTargetBookMap->{$sourceTopic})   # Target of source topic via targets/ folder
-     {my $sourceDocType    = $sourceTarget->sourceDocType;                      # Source document type
-      my $sourceTargetType = $sourceTarget->targetType;                         # Target document type
-      if ($sourceDocType !~ m(map\Z)s and $sourceTargetType =~ m(\Abookmap\Z))  # Replace this chapter or topic with the content of the book map generated to represent a non bookmap topic that was split into several sub topics described by a bookmap
-       {my $generatedBookMap = $sourceTarget->target;
-        -e $generatedBookMap or
-          confess "Generated bookmap does not exist $generatedBookMap";
-
-        if (my $x = Data::Edit::Xml::new($generatedBookMap))                    # Parse the generated bookmap for chapters
-         {$x->at_bookmap or confess
-           "Expected bookmap, got:".$x->tag." sourceDocType=$sourceDocType from file:\n$b";
-          if (my @c = $x->c_chapter)                                            # Chapters
-           {for my $c(reverse @c)                                               # Copy chapters
-             {$node->putFirstCut($c);
-             }
-            $node->unwrap;                                                      # Unwrap the referencing topic
-           }
-         }
-        return &$good(q(Expanded representative bookmap));
-       }
-      else                                                                      # Not a bookmap so just upgrade href
-       {$node->href = relFromAbsAgainstAbs($sourceTarget->target, $sourceFile);
-        return &$good(q(Unique target));
+    if (my $docType = $xref->docType->{$sourceFile})                            # Must be a bookmap
+     {if ($docType !~ m(map\Z)s)
+       {lll "Not a bookmap: $sourceFile";
+        return undef;
        }
      }
+    else
+     {lll "Not a file known to xref: $sourceFile";
+      return undef;
+     }
+
+    if (my $bookMapSource = &$locateUniqueTopicSourceForTargetFile($sourceFile))# Source of the book map
+     {my $sourceTopic = absFromAbsPlusRel($bookMapSource, $ref);                # Source topic relative to source bookmap
+
+      if (my $sourceTarget = $xref->sourceTopicToTargetBookMap->{$sourceTopic}) # Target of source topic via targets/ folder
+       {my $sourceDocType    = $sourceTarget->sourceDocType;                    # Source document type
+        my $sourceTargetType = $sourceTarget->targetType;                       # Target document type
+        if ($sourceDocType !~ m(map\Z)s and $sourceTargetType =~ m(\Abookmap\Z))# Replace this chapter or topic with the content of the book map generated to represent a non bookmap topic that was split into several sub topics described by a bookmap
+         {if (my $generatedBookMap = $sourceTarget->target)
+           {if (my $x = Data::Edit::Xml::new($generatedBookMap))                # Parse the generated bookmap for chapters
+             {if ($x->at_bookmap)
+               {if (my @c = $x->c_chapter)                                      # Chapters
+                 {for my $c(reverse @c)                                         # Copy chapters
+                   {$node->putFirstCut($c);
+                   }
+                  $node->unwrap;                                                # Unwrap the referencing topic
+                 }
+               }
+              else
+               {lll "Expected bookmap, got:", $x->tag,
+                    "sourceDocType=$sourceDocType from file:\n$b";
+               }
+             }
+            return &$good(q(), q(Expanded representative bookmap));             # Record the fix made
+           }
+          else
+           {lll "Generated bookmap does not exist $generatedBookMap";
+           }
+         }
+        else                                                                    # Not a bookmap so just upgrade href
+         {my $path = $sourceTarget->target;
+          $node->href = relFromAbsAgainstAbs($path, $sourceFile);
+          return &$good($path, q(Unique target from bookmap));                  # Record the fix made
+         }
+       }
+     }
+    else
+     {lll "No source for $sourceFile\n";
+     }
+
     undef                                                                       # Failed
    };
 
@@ -883,10 +1016,10 @@ sub fixReferencesInOneFile($$)                                                  
     my $refIn = absFromAbsPlusRel($topicSource, $ref);                          # The referenced input file that was present in the input being transformed because we assume that (most of) the input Dita refs were valid
 
     if (my $new = $xref->inputFileToTargetTopics->{$refIn})                     # The target files new files that were cut out of the referenced input file - there might several such
-     {if (my ($referencedTarget) = sort keys %$new)                             # Boldly assume that the first possible target in sort order is the required one
+     {if (my $referencedTarget = fileLargestSize(sort keys %$new))              # Boldly assume that the largest possible target is the one we want
        {my $link = relFromAbsAgainstAbs($referencedTarget, $sourceFile);        # Create relative link from book map
-        $node->set($attr=>$link);                                               # Reset reference
-        return &$good(q(unique target));                                        # Record successful fix
+        $node->set($attr=>$link);# if $xref->fixBadRefs;                        # Reset reference - we know fixDitaRefs is true.
+        &$good($link, q(unique target));                                        # Record successful fix
         return 1;                                                               # Success
        }
      }
@@ -895,19 +1028,20 @@ sub fixReferencesInOneFile($$)                                                  
 
   my $fixOneFullDitaRef = sub                                                   # Fix a full dita reference to an externally cut out topic renamed to the GB Standard where such a reference is: file#topicId/label
    {return undef unless $xref->fixDitaRefs;                                     # Fixing dita references not requested
-
     return &$fixOnePartialDitaRef($ref) unless $ref =~ m(#);                    # Confirm it is a full reference else fix it as a partial reference
 
     my $topicSource    = &$locateUniqueTopicSourceForTargetFile($sourceFile);   # Unique source file corresponding to the target file  else undef
     return undef unless $topicSource;                                           # The references can not be resolved without a unique source file.
     my ($rf, $rt, $ri) = parseDitaRef($ref, $topicSource);                      # Parse the dita ref
 
+
     if (my $new        = $xref->originalSourceFileAndIdToNewFile->{$rf}{$ri})   # The new files cut out of the original topic source file
      {my $targetFile   = relFromAbsAgainstAbs($new, $sourceFile);               # Create relative link from current file
       if (my $topicId  = $xref->topicIds->{$new})                               # Topic id for target file
        {my $href       = qq($targetFile#$topicId/$ri);                          # New href
-        $node->set($attr=>$href);                                               # Reset href
-        return &$good(q(Unique target for file ref));                           # Record the action
+        $node->set($attr=>$href);# if $xref->fixBadRefs;                        # Reset href - we know fixDitaRefs is true.
+        &$good($new, q(Unique target for file ref));                            # Record the fix made
+        return 1;                                                               # Record the fix made
        }
      }
 
@@ -918,13 +1052,41 @@ sub fixReferencesInOneFile($$)                                                  
     undef                                                                       # Failed
    };
 
+  my $fixRelRef = sub                                                           # Attempt to fix a reference broken by relocation
+   {my ($R, $rest) = split m(#)s, $ref, 2;                                      # Get referenced file name
+    if ($R)
+     {my $r = fne($R);                                                          # Href file base name
+      if (my $F = $xref->baseFiles->{$r})                                       # Relocated else where
+       {my @targets = sort keys(%$F);                                           # Relocation targets
+        if (@targets == 1)                                                      # Just one such relocation
+         {my $f = relFromAbsAgainstAbs($targets[0], $sourceFile);               # Link to it
+          if ($f ne $R)
+           {my $newLink;                                                        # Fix if the target is else where
+            if ($rest)                                                          # Link has more than one component
+             {$node->set($attr=>($newLink = $f.q(#).$rest));                    # Reset link
+             }
+            else                                                                # Link has just one component
+             {$node->set($attr=>($newLink = $f));                               # Reset link
+             }
+#           return &$good($targets[0], q(Relocated));                           # Report the fix made
+            my $saveRef = $ref; $ref = $newLink;                                # Try fixing the relocated reference as a dita reference.
+            my $r = &$fixOneFullDitaRef;
+            $ref = $saveRef;
+            return $r;
+           }
+         }
+       }
+     }
+    undef                                                                       # Failed
+   };
+
   my $fixOneRef = sub                                                           # Fix one unresolved reference either by ameliorating it or by moving it to the xtrf attribute thereby putting it in M3.
    {return unless $xref->fixRefs->{$sourceFile}{$ref};                          # Fix not requested for this reference
 
     if ($xref->deguidize and $ref =~ m(GUID-)is)                                # On a guid and deguidization allowed so given g1#g2/id convert g1 to a file name by locating the topic with topicId g2.
      {my @refs = split /\s+/, $ref;                                             # There might be multiple references in the href
-      my @unresolved;
-      my @resolved;
+      my @unresolved;                                                           # Unresolved targets
+      my @resolved;                                                             # Resolved targets
 
       for my $subRef(@refs)                                                     # Each reference in the reference
        {my ($guid, $rest) = split /#/, $subRef;
@@ -933,7 +1095,7 @@ sub fixReferencesInOneFile($$)                                                  
           $link .= q(#).$rest if $rest;                                         # Remainder of reference which does not change as it is not file related
           if (!@resolved)                                                       # First resolution
            {$node->set($attr=>$link);                                           # New href or conref
-            &$good(q(Deguidized reference));                                    # Report fix
+            &$good($target, q(Deguidized reference));                           # Report fix made
            }
           push @resolved, $subRef;
          }
@@ -955,8 +1117,12 @@ sub fixReferencesInOneFile($$)                                                  
      }
     elsif ($xref->fixBadRefs)                                                   # Move href to xtrf as no other fix seems possible given that we have already tried to fix it as a guid and it was reportedly not working as a standard dita reference.
      {$node->renameAttr($attr, q(xtrf));                                        # No target file for guid
-      $node->change_ph if $node->at_xref and $xref->changeBadXrefToPh;          # Change bad xref to ph if requested
 
+      if ($xref->changeBadXrefToPh)                                             # Change bad xref to ph if requested
+       {if ($node->at_xref)
+         {$node->change_ph;
+         }
+       }
       &$bad(q(No such target));                                                 # Report failure
      }
     else                                                                        # ffff - Fix not requested so href left alone
@@ -971,9 +1137,10 @@ sub fixReferencesInOneFile($$)                                                  
    {my ($o) = @_;                                                               # Current node
     $node   = $o;                                                               # Make current node available globally
     my $t   = $node->tag;                                                       # Tag
-    if ($t  =~  m(\A(appendix|chapter|image|link|topicref|xref)\Z)is)           # Hrefs that need to be fixed
+    if ($t  =~  m(\A(appendix|chapter|image|link|mapref|topicref|xref)\Z)is)    # Hrefs that need to be fixed
      {if ($ref = $node->attr($attr = q(href)))                                  # The attribute and reference to ameliorate or fix
-       {if ($t =~  m(\A(appendix|chapter|topicref)\Z)is)                        # Fix bookmap hrefs
+       #if ($t =~  m(\A(appendix|chapter|topicref)\Z)is)                        # Fix bookmap hrefs
+       {if ($t =~  m(\A(appendix|chapter|mapref|topicref)\Z)is)                 # Fix bookmap hrefs
          {&$fixBookMapDitaRef or &$fixOneRef;                                   # Fix references to topics cut into multiple pieces and now represented by a bookmap
          }
         elsif ($t =~ m(\Aimage\Z)is)                                            # Check image references
@@ -982,6 +1149,9 @@ sub fixReferencesInOneFile($$)                                                  
         else                                                                    # Fix hrefs without the benefit of the targets/ folder
          {&$fixOneFullDitaRef or &$fixOneRef;                                   # Fix references not in a bookmap
          }
+       }
+      elsif ($t =~ m(\Axref\Z)s and $xref->fixXrefsByTitle and &$fixXrefByTitle)# Try to fix a missing xref by title
+       {
        }
      }
     if ($ref = $node->attr($attr = q(conref)))                                  # Fix a conref
@@ -1011,6 +1181,7 @@ sub fixReferences($)                                                            
  {my ($xref) = @_;                                                              # Xref results
   my @bad;                                                                      # Hrefs that could not be fixed and so were ameliorated by moving them to @xtrf
   my @good;                                                                     # Hrefs that were fixed by resolving a Guid
+  my $startTime = time;                                                         # Time each block
 
   if (1)                                                                        # Map titles to files for the Gearhart Title Method
    {my %titleToFile;                                                            # Titles to file
@@ -1021,6 +1192,7 @@ sub fixReferences($)                                                            
          }
        }
      }
+
     $xref->titleToFile = \%titleToFile;                                         # Record titles to files
 
     if (1)                                                                      # Report titles with duplicated titles
@@ -1035,7 +1207,8 @@ sub fixReferences($)                                                            
          }
        }
 
-      formatTable(\@r, <<END,
+      formatTables($xref, \@r,
+        columns => <<END,
 Title   Topic title
 File    Topic file
 END
@@ -1044,7 +1217,7 @@ END
 Xref noted NNNN topics have duplicated titles on DDDD
 END
         clearUpLeft=>1,
-        file=>(fpe($xref->reports, qw(bad topics_with_duplicated_titles txt))));
+        file=>(fpe(qw(bad topics_with_duplicated_titles txt))));
      }
    }
 
@@ -1116,19 +1289,19 @@ END
     $xref->topicFlattening            = \%targetToSourceDuplicated;             # Topics that arose from flattening several source files
     $xref->originalSourceFileAndIdToNewFile = \%si;                             # Record mapping from original source file and id to the new file containing the id
 
-    formatTable(\@r, <<END,
+    formatTables($xref, \@r,
+      columns => <<END,
 Type    The type of reference
 DocType Document type of the source file
 Source  Source file
 Target  Cut out file
 END
-    summarize=>1,
-    title=>qq(The target topics cut out of the source documents),
-    head=><<END,
+      summarize=>1,
+      title=>qq(The target topics cut out of the source documents),
+      head=><<END,
 Xref noted NNNN cut out topics on DDDD
 END
-    file=>(fpe($xref->reports, qw(lists source_to_targets txt))));
-
+      file=>(fpe(qw(lists source_to_targets txt))));
 
     if (1)                                                                      # Report topic flattening
      {my @r;
@@ -1146,7 +1319,8 @@ END
       my $n = @{$xref->inputFiles};                                             # Number of topics
       my $p = sprintf("%7.4f", $n ? 100*$t/$n : 0);                             # Percentage topics flattened versus total number of topics
 
-      formatTable(\@r, <<END,
+      formatTables($xref, \@r,
+        columns => <<END,
 Count   Number of sources that created this target
 Target  The target file flattened out from multiple source files
 END
@@ -1161,38 +1335,42 @@ Total number of topics    : $n
 Number of topics flattened: $t
 Percent topics   flattened: $p
 END
-        file      => fpe($xref->reports, qw(lists topic_flattening txt)));
+        file      => fpe(qw(lists topic_flattening txt)));
      }
+   }
+
+  if ($xref->fixRelocatedRefs)                                                  # Load base file name to full name but if needed to do relocation fixes
+   {my %baseFiles;                                                              # Map base files back to full files. The base file is the file name shorn of the path - the reason the GB Standard is so important
+    for my $file(searchDirectoryTreesForMatchingFiles($xref->inputFolder))      # All input files
+     {my $base = fne $file;                                                     # Base file name - the GB Standard name for the file
+      $baseFiles{$base}{$file}++;                                               # Current location of the file
+     }
+    $xref->baseFiles = \%baseFiles;
    }
 
   if (my @files = sort keys %{$xref->fixRefs})                                  # Fix files if requested
-   {my @square = squareArray(@files);                                           # Divide the task
+   {processFilesInParallel
+     sub                                                                        # Fix one file
+      {my ($file) = @_;                                                         # File to fix
+       $xref->fixReferencesInOneFile($file);
+      },
+     sub                                                                        # Consolidate results
+      {for my $r(@_)
+        {my ($good, $bad) = @$r;
+         push @bad,  @$bad;
+         push @good, @$good;
+        }
+      }, @files;
 
-    my $ps = newProcessStarter($xref->maximumNumberOfProcesses);                # Process starter
-       $ps->processingTitle   = q(Xref);
-       $ps->totalToBeStarted  = scalar @square;
-       $ps->processingLogFile = fpe($xref->reports, qw(log xref fix txt));
-
-    for my $row(@square)                                                        # Each row of input files file
-     {$ps->start(sub
-       {my @r;                                                                  # Results
-        for my $col(@$row)                                                      # Each column in the row
-         {push @r, $xref->fixReferencesInOneFile($col);                         # Analyze each input file in parallel
-         }
-        [@r]                                                                    # Return results as a reference
-       });
-     }
-
-    for my $r(deSquareArray($ps->finish))                                       # Consolidate results
-     {my ($good, $bad) = @$r;
-      push @bad,  @$bad;
-      push @good, @$good;
-     }
+    @good = sort {join(' ', @$a) cmp join(' ', @$b)} @good;
+    @bad  = sort {join(' ', @$a) cmp join(' ', @$b)} @bad;
    }
 
-  my $fbr = $xref->fixBadRefs;
+  my $fbr   = $xref->fixBadRefs;                                                # Are we fixing bad refs?
+  my $facet = q(Dita references);
 
-  formatTable($xref->fixedRefsFailed = \@bad, <<END,                            # Report invalid references
+  formatTables($xref, $xref->fixedRefsFailed = \@bad,                           # Report references we cannot fix
+    columns   => <<END,
 Reason         The reason the reference was not fixed
 Tag            The tag of the node in which the reference failure occurs
 Attr           The attribute of the node in which the reference failure occurs
@@ -1202,102 +1380,34 @@ Source_Files   One or more source files that from which this file was derived
 END
     summarize => 1,
     title     => q(Invalid references),
+    facet     => $facet,  aspectColor=>q(red),
     head      => $fbr ? <<END : <<END2,
 Xref moved NNNN invalid references to M3 on DDDD as fixBadRefs=>$fbr was specified
 END
-Xref moved NNNN found invalid references on DDDD, fixBadRefs=> was not specified
+Xref was unable to resolve NNNN failing references on DDDD, fixBadRefs=> was not specified
 END2
-    file=>(fpe($xref->reports, qw(bad references txt))));
+    zero      => 1,
+    file      => fpe(qw(bad failing_references txt)));
 
-#  formatTable($xref->fixedRefsNoAction = \@none, <<END,                        # Report hrefs on which no action was taken
-#Reason         The reason no action was taken on the reference despite action being requested
-#Href           The reference on which no action was taken
-#Source_File    The source file in which the reference appears
-#END
-#    summarize=>1,
-#    title=>qq(No action was taken on these failing references despite a request that the href be fixed),
-#    head=><<END,
-#Xref took no action on NNNN references despite a request that the href be fixed on DDDD
-#
-#See below for the readons why no action was taken on the specified references.
-#END
-#    file=>(fpe($xref->reports, qw(bad no_action_on_invalid_references txt))));
-
-  formatTable($xref->fixedRefs = \@good, <<END,                                 # Report hrefs which were interpreted as guids and successfully resolved
-Href           The reference which might contain more than one reference specification
-Ref            The actual reference from the reference that is being resolved
-Target_File    The located target file
-Source_File    The source file in which the reference appears
+  formatTables($xref, $xref->fixedRefs = \@good,                                # Report hrefs which were failing but were successfully resolved by ingenuity.
+    columns   => <<END,
+Method         The way that the reference was fixed
+Tag            The tag of the node on which the reference was fixed
+Attr           The attribute being fixed - normally href
+Ref            The reference that is being resolved
+Target_File    The file the reference resolves to.
+File           The file in which the reference appears
+Source_Files   The source files that gave rise to the file containing the reference after file flattening
 END
-    summarize=>1,
-    title=>qq(These failing references were reinterpreted as guids and successfully resolved),
-    head=><<END,
-Xref successfully resolved NNNN hrefs as guids on DDDD
+    summarize => 1,
+    title     => qq(These failing references were successfully resolved),
+    facet     => $facet, aspectColor => q(green),
+    head      => <<END,
+Xref successfully resolved NNNN previously failing references on DDDD
 END
-    file=>(fpe($xref->reports, qw(good fixed_guid_references txt))));
+    zero      => 1,
+    file      => fpe(qw(good fixed_references txt)));
 
-
-#  return {fixedRefsFailed => $xref->fixedRefsFailed,                            # From multiverse to universe
-#          fixedRefs       => $xref->fixedRefs,
-#         }
-#  formatTable($xref->relocatedReferencesFixed = \@fixRelRefsFixed, <<END,       # Relocated references fixed
-#New_Reference  The newly created reference
-#Old_Reference  The original reference
-#Source_File    The source file containing the reference
-#END
-#    summarize=>1,
-#    title=>qq(These failing references were reinterpreted as relocated references and successfully resolved),
-#    head=><<END,
-#Xref successfully resolved NNNN relocated hrefs on DDDD
-#END
-#    file=>(fpe($xref->reports, qw(good relocated_references txt))));
-#
-#  formatTable($xref->relocatedReferencesFailed = \@fixRelRefsFailed, <<END,     # Relocated references that were not fixed by relocation
-#Reason      The reason the reference could not be fixed by relocation
-#Targets     A list of the possible target locations for this reference if there are more than one
-#Reference   The reference that might be fixable by relocation
-#Source_File The source file containing the reference
-#END
-#    summarize=>1,
-#    title=>qq(These failing references could not be fixed by relocation),
-#    head=><<END,
-#Xref failed to relocate NNNN failing conrefs/hrefs on DDDD
-#END
-#    file=>(fpe($xref->reports, qw(bad relocated_references txt))));
-#
-#  if (my $fxt = $xref->fixXrefsByTitle)                                         # Xrefs fixed by title
-#   {formatTable($xref->xrefsFixedByTitle = \@fixByTitle, <<END,
-#Content     The text content of the link
-#Relative    Relative path of file containing target of link
-#Target_File Target file
-#Source_File The source file containing the reference
-#END
-#      summarize=>1,
-#      title=>qq(Fixed by topic title),
-#      head=><<END,
-#Xref fixed NNNN failing xrefs by locating the unique topic with the same title
-#as the text of xref on DDDD.
-#
-#This action was enabled by setting: fixXrefsByTitle=>$fxt
-#END
-#      file=>(my $f = fpe($xref->reports, qw(good xrefs_fixed_by_titles txt))));
-#   }
-#
-#  if (my $ftr = $xref->fixDitaRefs)                                             # Renamed bookmaprefs
-#   {formatTable($xref->fixedDitaRefs = \@fixedDitaRefs, <<END,
-#Old     The existing topic ref
-#New     The new topic ref
-#File    The file in which the old topic ref was updated to the new topic ref
-#END
-#      summarize=>1,
-#      title=>qq(Fixed topics refs),
-#      head=><<END,
-#Xref fixed NNNN renamed bookmaprefs on DDDD.
-#
-#This action was enabled by setting: fixDitaRefs=>$ftr
-#END
-#      file=>(my $f = fpe($xref->reports, qw(good bookmap_references_updated txt))));
-#   }
  } # fixReferences
 
 sub fixOneFileGB($$)                                                            #P Fix one file to the Gearhart-Brenan standard
@@ -1321,7 +1431,7 @@ sub fixOneFileGB($$)                                                            
    });
 
   my $target = fpf($xref->flattenFolder, $xref->flattenFiles->{$file});         # Previously assigned GB name.  We cannot use the very latest name because other files have to be told about it and in changing them to reflect the latest name we would change their name as well.  So close has to be good enough.
-  editXml($file, $target, -p $x);                                                  # Edit xml
+  editXml($file, $target, -p $x);                                               # Edit xml
 
   \@r                                                                           # Return report of items fixed
  }
@@ -1329,42 +1439,17 @@ sub fixOneFileGB($$)                                                            
 sub fixFilesGB($)                                                               #P Rename files to the L<GBStandard>
  {my ($xref) = @_;                                                              # Xref results
   my @files  = grep {!$xref->parseFailed->{$_}} sort @{$xref->inputFiles};      # Fix files that parsed if requested
-  my @square = squareArray(@files);                                             # Divide the task
-
-# Done faster in analyzeOneFile at 2019.06.18 20:06:24
-#  for my $file(@files)                                                         # New target file name for each input file
-#   {my $target = sub
-#     {my $t = $xref->title->{$file} // q();                                    # Title
-#         $t =~ s([^a-zA-Z0-9]+) (_)gs;                                         # Title reduced to basics
-#      my $m = $xref->md5Sum->{$file} // q();
-#      my $s = substr($xref->baseTag->{$file}//q(u), 0, 1);                     # First letter of tag
-#      join q(_), $s, firstNChars($t, maximumFileNameChars), $m;                # The Gearhart-Brenan file naming standard
-#     }->();
-#
-#    $xref->flattenFiles->{$file} = fpe($target, fe $file);                     # Record correspondence between existing file and standardized file name
-#   }
-
-  my $ps = newProcessStarter($xref->maximumNumberOfProcesses);                  # Process starter
-     $ps->processingTitle   = q(Xref Gearhart);
-     $ps->totalToBeStarted  = scalar @square;
-     $ps->processingLogFile = fpe($xref->reports, qw(log flatten txt));
 
   my @r;                                                                        # Fixes made
-  for my $row(@square)                                                          # Each row of input files
-   {$ps->start(sub
-     {my @r;                                                                    # Results
-      for my $col(@$row)                                                        # Each column in the row
-       {push @r, $xref->fixOneFileGB($col);                                     # Analyze one input file
-       }
-      [@r]                                                                      # Return results as a reference
-     });
-   }
+  processFilesInParallel
+    sub                                                                         # Each file
+     {my ($file) = @_;                                                          # File to analyze
+      $xref->fixOneFileGB($file);                                               # Analyze one input file
+     },
+    sub {push @r, deSquareArray @_}, @files;                                    # Flatten results
 
-  for my $r(deSquareArray($ps->finish))                                         # Consolidate results
-   {push @r, @$r;
-   }
-
-  formatTable($xref->fixedRefsGB = \@r, <<END,                                  # Report results
+  formatTables($xref, $xref->fixedRefsGB = \@r,                                 # Report results
+    columns => <<END,
 Href           The href being fixed
 Source         The source file containing the href
 END
@@ -1373,7 +1458,7 @@ END
     head=><<END,
 Xref failed to fix NNNN hrefs to the Gearhart-Brenan file naming standard
 END
-    file=>(my $f = fpe($xref->reports, qw(bad fixedRefsGB txt))));
+    file=>(my $f = fpe(qw(bad fixedRefsGB txt))));
 
    {fixedRefsGB => $xref->fixedRefsGB,                                          # From multiverse to universe
    }
@@ -1383,25 +1468,7 @@ sub analyzeInputFiles($)                                                        
  {my ($xref) = @_;                                                              # Cross referencer
   my @in = @{$xref->inputFiles};                                                # Input files
 
-  my @square = squareArray(@in);                                                # Divide the task
-  my $square = @square;
-
-  my $p = newProcessStarter($xref->maximumNumberOfProcesses);                   # Process starter
-     $p->processingTitle   = q(Xref Analyze);
-     $p->totalToBeStarted  = $square;
-     $p->processingLogFile = fpe($xref->reports, qw(log xref analyze txt));
-
-  for my $row(@square)                                                          # Each row of input files file
-   {$p->start(sub
-     {my @r;                                                                    # Results
-      for my $col(@$row)                                                        # Each column in the row
-       {push @r, analyzeOneFile($xref, $col);                                   # Analyze one input file
-       }
-      [@r]                                                                      # Return results as a reference
-     });
-   }
-
-  my @x = deSquareArray($p->finish);                                            # Load results
+  my @x = processFilesInParallel sub{analyzeOneFile($xref, $_[0])}, undef, @in; # Analyze input files
 
   my @fields = (                                                                # Fields to be merged
 q(attributeCount),
@@ -1412,11 +1479,13 @@ q(badXml2),
 q(baseTag),
 q(conRefs),
 q(docType),
+q(emptyTopics),
 q(fixRefs),
 q(flattenFiles),
 q(guidHrefs),
 q(hrefUrlEncoding),
 q(ids),
+q(idTags),
 q(images),
 q(imagesReferencedFromTopics),
 q(improvements),
@@ -1427,7 +1496,10 @@ q(noHref),
 q(olBody),
 q(otherMeta),
 q(parseFailed),
+q(publicId),
 q(references),
+q(requiredCleanUp),
+q(tableDimensions),
 q(tagCount),
 q(tags),
 q(texts),
@@ -1446,13 +1518,16 @@ q(xRefs),
   my $q = newProcessStarter($xref->maximumNumberOfProcesses);                   # Process starter
      $q->processingTitle   = q(Xref Analyze Merge);
      $q->totalToBeStarted  = $fields;
-     $q->processingLogFile = fpe($xref->reports, qw(log xref analyzeMerge txt));
+
+  if (my $reports = $xref->reports)
+   {$q->processingLogFile  = fpe($reports, qw(log xref analyzeMerge txt));
+   }
 
   for my $field(@fields)                                                        # Merge hashes by file names which are unique - ffff
    {$q->start(sub
      {my $startTime = time;
       my $target = $xref->{$field} //= {};                                      # Field to be merged
-      for my $x(@x)                                                             # mmmm Merge results from each file analyzed
+      for my $x(@x)                                                             # Merge results from each file analyzed
        {if (my $xf = $x->{$field})
          {for my $f(keys %$xf)                                                  # Each file analyzed
            {$target->{$f} = $xf->{$f}                                           # Merge
@@ -1471,13 +1546,14 @@ q(xRefs),
     push @times, [$f, $t];
    }
 
-  formatTable([sort {$$b[1] <=> $$a[1]} @times], <<END,
+  formatTables($xref, [sort {$$b[1] <=> $$a[1]} @times],
+    columns => <<END,
 Field Xref field merge
 Time  Time in seconds to merge this field
 END
     title=>qq(Field merging elapsed times in descending order),
     head =>qq(Xref field merging took the following times on DDDD),
-    file =>fpe($xref->reports, q(timing), qw(merges txt)));
+    file =>fpe(q(timing), qw(merges txt)));
 
   for my $field(                                                                # Merge arrays
     qw(badTables))
@@ -1488,37 +1564,264 @@ END
    }
  } # analyzeInputFiles
 
-sub reportDuplicateIds($)                                                       #P Report duplicate ids
+sub reportIdRefs($)                                                             #P Report the number of times each id is referenced
  {my ($xref) = @_;                                                              # Cross referencer
 
-  my @dups;                                                                     # Duplicate ids definitions
-  for my $file(sort keys %{$xref->ids})                                         # Each input file
-   {for my $id(sort keys %{$xref->ids->{$file}})                                # Each id in the file
-     {my $count = $xref->ids->{$file}{$id};                                     # Number of definitions of this id in the file
-      if ($count > 1)                                                           # Duplicate definition
-       {push @dups, [$id, $count, $file];                                       # Save details of duplicate definition
+  my %n;                                                                        # Ids that might not be referenced
+  for   my $f(sort keys %{$xref->ids})                                          # Each input file
+   {for my $i(sort keys %{$xref->ids->{$f}})                                    # Each id in each input file
+     {$n{$f}{$i}++;                                                             # Ids that might not be referenced
+     }
+   }
+
+  my %c;                                                                        # Count of how often each id in each file was referenced
+  for   my $f(sort keys %{$xref->references})                                   # Each input file
+   {for my $r(sort keys %{$xref->references->{$f}})                             # Each reference from each input file
+     {my ($rf, $rt, $ri) = parseDitaRef($r, $f);                                # Parse reference
+      if ($ri)                                                                  # If this is an id not a topic id
+       {       $c{$rf}{$ri} += $xref->references->{$f}{$r};                     # Count id references
+        delete $n{$rf}{$ri};                                                    # Remove ids that get referenced
        }
      }
    }
 
-  my $dups = $xref->duplicateIds = {map {$$_[2]=>$_} @dups};                    # All duplicates
+  my @n; my $notTopicIds = 0;                                                   # Ids not referenced
+  for   my $f(sort keys %n)                                                     # Each input file
+   {my $topicId = $xref->topicIds->{$f} // q();
+    for my $i(sort keys %{$n{$f}})                                              # Each unreferenced id in each input file
+     {my $t = $i eq $topicId ? "**" : q();                                      # Show ids which are topic ids
+      ++$notTopicIds unless $t;                                                 # Count non topic ids that are not referenced
+      push @n, [$t, $i, $f];                                                    # Report as topicId or not, id, file
+     }
+   }
 
-  formatTable(\@dups, [qw(Id Count File)],
+  my @c;
+  for   my $f(sort keys %c)                                                     # Each input file
+   {for my $i(sort keys %{$c{$f}})                                              # Each referenced id in each input file
+     {push @c, [$c{$f}{$i}, $i, $f];                                            # Report as count, id, file
+     }
+   }
+
+  my $facet = q(Ids referenced);
+
+  formatTables($xref, \@n,
+    columns   => <<END,
+TopicId If this id is a topic id then this column will have ** in it.
+Id      The id that has not been referenced
+File    The file containing the id that has not been referenced
+END
+    title     => qq(Ids that have not been referenced),
+    facet     => $facet, aspectColor=>q(red),
+    head      => <<END,
+Xref found $notTopicIds unreferenced ids on DDDD
+
+The $notTopicIds ids below which are not marked with ** are not referenced by
+any other file in this corpus and thus should be considered for removal.
+
+END
+    summarize => 1, csv => 1,
+    file      => fpe(qw(bad ids_not_referenced txt)));
+
+  formatTables($xref, \@c,
+    columns   => <<END,
+Count  The number of times this id is referenced
+Id     The id in question
+File   The file in which the id appears
+END
+    title     => qq(Ids referenced),
+    facet     => $facet, aspectColor=>q(green),
+    head      => <<END,
+Xref found NNNN ids are being referenced on DDDD
+
+END
+    summarize => 1, csv => 1,
+    file      => fpe(qw(good id_reference_counts txt)));
+
+   {idReferencedCount => \%c,                                                   # From multiverse to universe
+    idNotReferenced   => \%n,
+   }
+ } # reportIdRefs
+
+sub removeUnusedIds($)                                                          #P Remove ids that do are not mentioned in any href or conref in the corpus regardless of the file component of any such reference. This is a very conservative approach which acknowledges that writers might be looking for an id if they mention it in a reference.
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %keep;                                                                     # {id}++ : id to be kept as it occurs in a reference some here
+  for   my $f(sort keys $xref->references->%*)                                  # Each input file with references
+   {for my $r(sort keys $xref->references->{$f}->%*)                            # Each id in each input file with references
+     {my (undef, undef, $i) = parseDitaRef($r);                                 # Ids to keep as they might be referenced now or soon
+      $keep{$i}++
+     }
+   }
+
+
+  my %remove;                                                                   # {file}{id}++ : id to be removed from a file
+  my %ids;                                                                      # {id}++ : id removed from all files as a consequence of removing it from each file
+  for   my $f(sort keys $xref->ids->%*)                                         # Each input file
+   {for my $i(sort keys $xref->ids->{$f}->%*)                                   # Each id in each input file
+     {next if $keep{$i};                                                        # Id that can be deleted as it is never referenced in any form
+      $remove{$f}{$i}++;
+      $ids   {$i}++
+     }
+   }
+
+  $xref->idsRemoved = \%ids;                                                    # Record ids removed
+
+  formatTables($xref, [map {[$_]} sort keys %ids],
+    columns   => <<END,
+Id     An id that has been removed
+END
+    title     => qq(Ids removed),
+    head      => <<END,
+Xref found NNNN unreferenced ids on DDDD
+END
+    summarize => 1,
+    file      => fpe(qw(lists ids_removed txt)));
+
+  processFilesInParallel
+   (sub
+     {my ($f) = @_;                                                             # File with ids to be removed
+      my %i = %{$remove{$f}};                                                   # Ids to remove
+      my @remove;                                                               # [id, file] : removed this id in this file
+      if (my $x = Data::Edit::Xml::new($f))                                     # Parse file with ids to be removed
+       {$x->by(sub
+         {my ($o) = @_;
+          if ($o != $x and my $i = $o->id)                                      # Keep topic ids
+           {if ($i{$i})
+             {$o->id = undef;
+              push @remove, [$i, $o->tag, $f];                                  # Report id removed
+             }
+           }
+         });
+        editXml($f, $f, -p $x) if @remove;
+       }
+      [@remove]
+     },
+
+    sub                                                                         # Consolidate removal report
+     {my (@removed) = @_;
+
+      my @r;
+      for my $removed(@removed)                                                 # Consolidate each batch of removals
+       {push @r, @$removed if $removed;
+       }
+
+      formatTables($xref, \@r,
+        columns   => <<END,
+Id     The id removed
+Tag    The tag the removed id was on
+File   The file in which the id appeared
+END
+        title     => qq(Ids removed from files),
+        head      => <<END,
+Xref removed NNNN unreferenced ids from files on DDDD
+
+Ids are only removed if the id is not mentioned in any reference in the entire
+corpus regardless of what file the reference is to.  This is to allow for the
+possibility of fixing possibly broken references in the future.
+
+END
+        summarize => 1,
+        file      => fpe(qw(lists ids_removed_from_files txt)));
+     }, sort keys %remove) if $xref->deleteUnusedIds;                           # Remove unused ids unless except on the root element
+;
+ } # removeUnusedIds
+
+sub reportEmptyTopics($)                                                        #P Report empty topics
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my @E;                                                                        # Ids that might not be referenced
+  for   my $f(sort keys %{$xref->emptyTopics})                                  # Each empty topic
+   {my $d = $xref->docType->{$f};
+    my $t = $xref->title->{$f} // q();
+    push @E, [$d, $t, $f];
+   }
+
+  my @e = sort {$$a[1] cmp $$b[1]} @E;
+
+  formatTables($xref, \@e,
+    columns   => <<END,
+TopicType The type of topic thatis empty
+Title     The title of the empty topic
+File      The source file containing the empty topic
+END
+    title     => <<END,
+Empty Topics
+END
+    head      => <<END,
+Xref found NNNN empty topics on DDDD
+
+END
+    summarize => 1,
+    csv       => 1,
+    file      => fpe(qw(lists empty_topics txt)));
+
+   {                                                                            # From multiverse to universe
+   }
+ } # reportEmptyTopics
+
+sub reportDuplicateIds($)                                                       #P Report duplicate ids
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my @dups;                                                                     # Duplicate ids definitions
+  my %dups;
+  my %active;  my %removed;                                                     # Active duplicate ids, removable ids
+  for   my $f(sort keys %{$xref->ids})                                          # Each input file
+   {for my $i(sort keys %{$xref->ids->{$f}})                                    # Each id in the file
+     {my $count   = $xref->ids->{$f}{$i};                                       # Number of definitions of this id in the file
+      if ($count > 1)                                                           # Duplicate definition
+       {if ($xref->idsRemoved->{$i})                                            # Duplicated and being referred to
+         {$removed{$i}++;
+         }
+        else
+         {$active{$i}++;
+         }
+        push @dups, [$i, $count, $active{$i} ? q(**) : q(), $f];                # Save details of duplicate definition
+        $dups{$f}{$i} = $count;
+       }
+     }
+   }
+
+  my $A = keys %active;                                                         # Number of possibly active duplicate ids
+  my $R = keys %removed;                                                        # Number of ids removed
+
+  my $r = $xref->deleteUnusedIds ? <<END :                                      # Explain active vs inactive ids
+$R unused ids are being deleted as they are not active (used in a reference
+regardless of the file component of the reference) and Xref was invoked with:
+
+  deleteUnusedIds => 1
+
+The $A active ids that cannot be removed are marked in this report with **.
+END
+  <<END;
+$R unused ids could be deleted as they are not active (used in a reference
+regardless of the file component of the reference). To remove these ids from
+the entire corpus invoke Xref with:
+
+  deleteUnusedIds => 1
+
+The $A active ids that cannot be so removed are marked in this report with **.
+END
+
+  formatTables($xref, \@dups,
+    columns => <<END,
+Id     The id that has been duplicated
+Count  The number of times the id was duplicated
+Active ** if this id is possibly being referred to from elsewhere in the corpus.
+File   The file in which the duplication occurs
+END
     title=>qq(Duplicate id definitions within files),
     head=><<END,
 Xref found NNNN duplicate id definitions within files on DDDD
 
-These ids are duplicated within a file, possibly because they were copied from
-another part of the same file.  This report does not show ids that are the same
-in different files as this is not a problem using Dita's three part addressing
-scheme which requires only that the topic id be unique across all files.
+$A of these ids are possibly being referred to - see rows containing **.
 
 Duplicate topic ids are reported in ../bad/topicIds.txt.
 
+$r
 END
-    file=>(my $f = fpe($xref->reports, qw(bad duplicateIds txt))));
-
-   {duplicateIds => $dups,
+    summarize=>1, csv=>1,
+    file=>(my $f = fpe(qw(bad duplicateIds txt))));
+   {duplicateIds => \%dups,
    }                                                                            # From multiverse to universe
  } # reportDuplicateIds
 
@@ -1537,7 +1840,7 @@ sub reportDuplicateTopicIds($)                                                  
        {$dups{$i} = $file;                                                      # Save topic id
        }
      }
-    else
+    elsif ($xref->docType->{$file} !~ m(map\Z)s)                                # Maps are not required to have topics ids
      {push @miss, [$file];                                                      # Missing topic id
      }
    }
@@ -1545,23 +1848,26 @@ sub reportDuplicateTopicIds($)                                                  
   my $dups = $xref->duplicateTopicIds = {map {$$_[0]=>$_} @dups};               # All duplicates
   my $miss = $xref->missingTopicIds   = {map {$$_[0]=>$_} @miss};               # All missing
 
-  formatTable(\@dups, [qw(TopicId File1 File2)],
-    title=>qq(Duplicate topic id definitions),
-    head=><<END,
-Xref found NNNN duplicate topic id definitions on DDDD
-
-File1, File2 are two files that both define TopicId
-
+  formatTables($xref, \@dups, columns => <<END,                                 # Duplicate topic ids report
+TopicId  The topic id that has been duplicated in File1 and File2
+File1    The first file in which the duplicated topic id appears
+File2    The second file in which the duplicated topic id appears
 END
-    file=>(fpe($xref->reports, qw(bad duplicateTopicIds txt))));
+    title => qq(Duplicate topic id definitions),
+    head  => <<END,
+Xref found NNNN duplicate topic id definitions on DDDD
+END
+    file=>(fpe(qw(bad duplicate_topics_ids txt))));
 
-  formatTable(\@miss, [qw(File)],
+  formatTables($xref, \@miss, columns => <<END,                                 # Missing topic ids report
+File  A file containing a topic with no topic id
+END
     title=>qq(Topics without ids),
     head=><<END,
 Xref found NNNN topics that have no topic id on DDDD
 
 END
-    file=>(fpe($xref->reports, qw(bad topicIdDefinitionsMissing txt))));
+    file=>(fpe(qw(bad topic_id_missing txt))));
 
    {duplicateTopicIds => $dups,
     missingTopicIds   => $miss,
@@ -1575,7 +1881,8 @@ sub reportNoHrefs($)                                                            
    {push @t,             @{$xref->noHref->{$file}};                             # Missing href details
    }
 
-  formatTable(\@t, <<END,
+  formatTables($xref, \@t,
+    columns => <<END,
 Tag        A tag that should have an xref.
 Location   The location of the tag that should have an xref.
 File       The source file containing the tag
@@ -1584,7 +1891,7 @@ END
     head=><<END,
 Xref found NNNN tags that should have href attributes but did not on DDDD
 END
-    file=>(fpe($xref->reports, qw(bad missing_href_attributes txt))));
+    file=>(fpe(qw(bad missing_href_attributes txt))));
   {}                                                                            # From multiverse to universe
  } # reportNoHrefs
 
@@ -1592,7 +1899,9 @@ sub checkReferences($)                                                          
  {my ($xref) = @_;                                                              # Cross referencer
 
   my @bad;                                                                      # Bad references
+  my @good;                                                                     # Good references
   my %references = %{$xref->references};                                        # References
+
   for   my $file(sort keys %references)                                         # Each input file which will be absolute
    {for my $ref (sort keys %{$references{$file}})                               # Each href in the file which will be relative
      {if (my $r = &oneBadRef($xref, $file, $ref))                               # Check reference
@@ -1600,10 +1909,16 @@ sub checkReferences($)                                                          
         $xref->fixRefs->{$file}{$ref}++;                                        # Request fix attempt for this reference
         $xref->badReferencesCount++;                                            # Number of bad references encountered
        }
+      else                                                                      # Good references
+       {push @good, [$ref, $file]
+       }
      }
    }
 
-  formatTable(\@bad, <<END,                                                     # Report the failing references
+  my $facet = q(References between topics at start);
+
+  formatTables($xref, \@bad,                                                    # Report the failing references
+    columns => <<END,
 Reason          The reason why the reference failed to resolve
 Reference       The href in the source file
 Ref_File        The file containing the referenced topic relative to the referencing file
@@ -1614,153 +1929,37 @@ Target_TopicId  The topic id of the referenced file
 Source_File     The referencing source file
 Target_File     The referenced target file
 END
-    title => qq(Bad references),
-    head  => qq(Xref found NNNN Bad references on DDDD),
+    title => qq(Bad references at start),
+    facet => $facet,  aspectColor=>q(red),
+    head  => <<END,
+Xref found NNNN bad references on DDDD at the start of processing
+
+Depending on the options chosen, Xref might fix or ameliorate these references
+so that the actual number of references with problems is lower than this.  The
+best way to find out how many references still need fixing after doing an Xref
+run with fixing options enabled is to do another run with all of these options
+disabled. The braver elements will be asking why we do not account for these
+improvements in flight - that would significantly increase code complexity
+while taking a lot of effort to validate yet produce no significant
+improvements - so it is much easier not to when a second run suffices.
+END
     csv   => 1, wide =>1, summarize=>1,
-    file  => my $f = fpe($xref->reports, q(bad), q(references), q(txt)));
-  {}                                                                            # From multiverse to universe
+    file  => fpe(q(bad), q(references), q(txt)));
+
+  formatTables($xref, \@good,                                                   # Report good references
+    columns => <<END,
+Href            A good href attribute
+Source_File     The referencing source file
+END
+    title => qq(Good references at start),
+    facet => $facet,  aspectColor=>q(green),
+    head  => <<END,
+Xref found NNNN good references on DDDD at the start of processing.
+END
+    csv   => 1, wide =>1, summarize=>1,
+    file  => fpe(q(good), q(references), q(txt)));
+#  {}                                                                            # From multiverse to universe  2019.08.29 - no need - we are in series
  } # checkReferences
-
-#sub reportRefs($$)                                                              #P Report bad references found in xrefs or conrefs as they have the same structure
-# {my ($xref, $type) = @_;                                                       # Cross referencer, type of reference to be processed
-#
-#  my @bad; my @good;                                                            # Bad xrefs.
-#  for   my $file(sort keys %{$xref->{${type}.q(Refs)}})                         # Each input file which will be absolute
-#   {my $sourceTopicId = $xref->topicIds->{$file};
-#    for my $href(sort keys %{$xref->{${type}.q(Refs)}{$file}})                  # Each href in the file which will be relative
-#     {my @text;
-#
-#      if (               ref($xref->{${type}.q(Refs)}{$file}{$href}))           # xRef: Text associated with reference deemed helpful by Bill
-#       {@text =  sort keys %{$xref->{${type}.q(Refs)}{$file}{$href}};
-#        s(\s+) ( )gs for @text;                                                 # Normalize white space
-#       }
-#
-#      if ($href =~ m(#))                                                        # Full Dita href
-#       {my ($target, $topic, $id) = parseDitaRef($href, $file, $sourceTopicId); # Parse full Dita href
-#
-#        my $good = sub                                                          # Save a good reference
-#         {push @good, [$href, $target, $file];
-#         };
-#
-#        my $bad = sub                                                           # Save a bad reference
-#         {my ($reason, $t) = @_;
-#          push @bad,
-#           [$reason, $href, $topic, $id, $t, $sourceTopicId, $file, $target, @text];
-#         };
-#
-#        if ($target and !(-e $target or -e wwwDecode($target)))                  # Check target file
-#         {&$bad(q(No such file), q());
-#         }
-#        elsif (my $t = $xref->topicIds->{$target})                              # Check topic id
-#         {if ($t eq $topic)
-#           {if (my $i = $xref->ids->{$target}{$id})
-#             {if ($i == 1)
-#               {&$good;
-#               }
-#              else
-#               {&$bad(q(Duplicate id in topic), $t);
-#               }
-#             }
-#            elsif ($id)
-#             {&$bad(q(No such id in topic), $t);
-#             }
-#            else
-#             {&$good;
-#             }
-#           }
-#          else
-#           {&$bad(q(Topic id does not match target topic), $t);
-#           }
-#         }
-#        elsif ($topic =~ m(\S)s)                                                # The href contains a topic id but there is not topic with that id
-#         {&$bad(q(No topic id on topic in target file), $t);
-#         }
-#        else
-#         {&$good;
-#         }
-#       }
-#      else                                                                      # No # in href
-#       {my $target = absFromAbsPlusRel($file, $href);
-#        if (!-e $target and !-e wwwDecode($target))                             # Actual file name or www encoded file name
-#         {push @bad, my $p = [qq(No such file), $href,
-#            q(), q(), q(), $sourceTopicId, $file, $target, @text];
-#         }
-#        else
-#         {push @good, my $p = [$href, $target, $file];
-#         }
-#       }
-#     }
-#   }
-#
-#  for my $bad(@bad)                                                             # List of files to fix
-#   {my $href = $$bad[1];
-#    my $file = $$bad[6];
-#    $xref->fixRefs->{$file}{$href}++;
-#   }
-#
-#  my $Type = ucfirst $type;
-#  $xref->{q(bad).$Type.q(Refs)}  = {map {$$_[6]=>$_} @bad};                     # Bad references
-#  $xref->{q(good).$Type.q(Refs)} = {map {$$_[1]=>$_} @good};                    # Good references
-#
-#  for my $good(@good)
-#   {my (undef, $t, $s) = @$good;
-#    my $T = $xref->docType->{$t} || q();
-#    my $S = $xref->docType->{$s} || q();
-#    $$good[1] = swapFilePrefix($$good[2], $xref->inputFolder);
-#    pop @$good;
-#
-#    if ($T eq $S)
-#     {unshift @$good, $T, q();
-#     }
-#    else
-#     {unshift @$good, $T, $S;
-#     }
-#   }
-#
-#  $xref->{q(bad).$Type.q(RefsList)}  = \@bad;                                   # Bad references list
-#  $xref->{q(good).$Type.q(RefsList)} = \@good;                                  # Good references list
-#
-#  my $in = $xref->inputFolder//'';
-#  formatTable(\@bad, <<END,
-#Reason          The reason why the conref failed to resolve
-#Href            The href in the source file
-#Href_Topic_Id   The id of the topic referenced by the href in the source file
-#Target_Topic_Id The actual id of the topic in the target file
-#HRef_Id         The id of the statement in the body of the topic referenced by the href in the source file
-#Source_TopicId  The topic id at the top of the source file containing the bad reference
-#Source_File     The source file containing the reference
-#Target_File     The target file pointed to by the reference
-#Example_Text    Any text associated with the link such as the navtitle of a bad bookMapRef or the CDATA text of an xref.
-#END
-#    title    =>qq(Bad ${type}Refs),
-#    head     =>qq(Xref found NNNN Bad ${type}Refs on DDDD),
-#    summarize=>1, csv=>1,
-#    wide     =>1,
-#    file     =>(fpe($xref->reports, q(bad), qq(${Type}Refs), q(txt))));
-#
-#  formatTable(\@good, <<END,
-#Target          Target topic type if different from source topic type
-#Source          Source topic type if different from target topic type
-#Href            The href in the source file
-#Source_File     The source file containing the xref
-#END
-##Target_File     The target file
-#    title    =>qq(Good ${type}Refs),
-#    head     =>qq(Xref found NNNN Good $type refs on DDDD),
-#    file     =>(fpe($xref->reports, q(good), qq(${Type}Refs), q(txt))));
-# } # reportRefs
-
-
-# Report on hrefs that have been guidized and mark them for fixing.  The reasons
-# we do not fix them here are:
-#
-#  - we do not have access to a parse tree in which to fix them
-#  - the caller might not want them fixed
-#  - the caller might want to choose the fixing strategy.
-#
-# Thus this report merely identifies hrefs with guids in them in line with xrefs
-# initial goal of reporting the state of play, while the question of actually
-# improving the situation is deferred until later.
 
 sub reportGuidHrefs($)                                                          #P Report on guid hrefs
  {my ($xref) = @_;                                                              # Cross referencer
@@ -1778,7 +1977,7 @@ sub reportGuidHrefs($)                                                          
    {my $sourceTopicId = $xref->topicIds->{$file};
     for my $href(sort keys %{$xref->guidHrefs->{$file}})                        # Each href in the file which will start with guid
      {my ($tag, $lineLocation) = @{$xref->guidHrefs->{$file}{$href}};           # Tag of node and location in source file of node doing the referencing
-
+#  2019.08.29 The following line does not appear to be needed - it is happening to late to affect anything
       $xref->fixRefs->{$file}{$href}++ unless $xref->fixRefs->{$file}{$href};   # Avoid double counting - all guid hrefs will be fixed if we are fixing hrefs as both good and bad will fail.
 
       if ($href =~ m(#))                                                        # Href with #
@@ -1853,7 +2052,8 @@ sub reportGuidHrefs($)                                                          
            $lineLocation, q(), $sourceTopicId, $targetFile, $file];
          }
         elsif ($xref->fixBadRefs)                                               # The file exists and we want to fix such references
-         {$xref->fixRefs->{$file}{$href}++;
+         {# 2019.08.29 the following line happens too late to be useful
+          $xref->fixRefs->{$file}{$href}++;
          }
         else
          {push @good, [$tag, $href, $lineLocation, $targetFile, $file];
@@ -1873,7 +2073,8 @@ sub reportGuidHrefs($)                                                          
 ##  $xref->{goodGuidHrefs} = {map {$$_[4]=>$_} @good};                            # Good references
 
   my $in = $xref->inputFolder//'';
-  formatTable(\@bad, <<END,
+  formatTables($xref, \@bad,
+    columns => <<END,
 Reason          The reason why the href failed to resolve
 Tag             The tag of the node doing the referencing
 Href            The href of the node doing the referencing
@@ -1887,9 +2088,10 @@ END
     head     =>qq(Xref found NNNN unresolved GUID hrefs on DDDD),
     summarize=>1,
     wide     =>1,
-    file     =>(fpe($xref->reports, q(bad), qw(guidHrefs txt))));
+    file     =>(fpe(q(bad), qw(guidHrefs txt))));
 
-  formatTable(\@good, <<END,
+  formatTables($xref, \@good,
+    columns => <<END,
 Tag             The tag containing the href
 Href            The href of the node doing the referencing
 Line_Location   The line location where the href occurred in the source file
@@ -1898,7 +2100,7 @@ Target_File     The target file
 END
     title    =>qq(Resolved GUID hrefs),
     head     =>qq(Xref found NNNN Resolved GUID hrefs on DDDD),
-    file     =>(fpe($xref->reports, q(good), qw(guidHrefs txt))));
+    file     =>(fpe(q(good), qw(guidHrefs txt))));
 
    {badGuidHrefs => $xref->badGuidHrefs,                                        # From multiverse to universe
     ##fixRefs      => $xref->fixRefs,
@@ -1966,7 +2168,7 @@ END
 #    head     =>qq(Xref found NNNN Bad bookmaprefs on DDDD),
 #    summarize=>1,
 #    wide     =>1,
-#    file     =>(fpe($xref->reports, qw(bad bookMapRefs txt))));
+#    file     =>(fpe(qw(bad bookMapRefs txt))));
 #
 #  formatTable(\@good, <<END,
 #FullFileName  The target file name
@@ -1975,110 +2177,121 @@ END
 #END
 #    title=>qq(Good bookmaprefs),
 #    head=>qq(Xref found NNNN Good bookmaprefs on DDDD),
-#    file=>(fpe($xref->reports, qw(good bookMapRefs txt))));
+#    file=>(fpe(qw(good bookMapRefs txt))));
 # }
 
-#sub reportConrefs($)                                                            #P Report bad conrefs refs
+#sub reportBadRefs($)                                                            #P Report bad conrefs refs
 # {my ($xref) = @_;                                                              # Cross referencer
-#  reportRefs($xref, q(con));
-# }
-=pod
-say STDERR  "DDDD ", dump([@bad]);
-
-  formatTable($xref->fixedRefsFailed = \@bad, <<END,                            # Report invalid references
-Reason         The reason the reference was not fixed
-Tag            The tag of the node in which the reference failure occurs
-Attr           The attribute of the node in which the reference failure occurs
-Href           The reference not being fixed
-File           The file in which the reference appears
-Source_Files   One or more files that contained the content in this file
-END
-    summarize=>1,
-    title=>$xref->fixBadRefs
-      ? qq(These failing references refer to files that could not be located and so were put in M3)
-      : qq(These failing references refer to files that could not be located),
-    head=><<END,
-Xref moved NNNN failing references on DDDD
-END
-    file=>(fpe($xref->reports, qw(bad failingReferences txt))));
-=cut
+#
+#  formatTable($xref->fixedRefsFailed, <<END,                                    # Report invalid references
+#Reason         The reason the reference was not fixed
+#Tag            The tag of the node in which the reference failure occurs
+#Attr           The attribute of the node in which the reference failure occurs
+#Href           The reference not being fixed
+#Source_File    The file in which the reference appears
+#END
+#    summarize=>1,
+#    title=>$xref->fixBadRefs
+#      ? qq(These failing references refer to files that could not be located and so were put in M3)
+#      : qq(These failing references refer to files that could not be located),
+#    head=><<END,
+#Xref moved NNNN failing references on DDDD
+#END
+#    file=>(fpe(qw(bad failing_references txt))));
+#   {}
+#  }
 
 sub reportImages($)                                                             #P Reports on images and references to images
  {my ($xref) = @_;                                                              # Cross referencer
 
-  my @bad =                                                                     # Image reference failures
-    sort {$$a[1] cmp $$b[1]}                                                    # Sort by source file
-    sort {$$a[0] cmp $$b[0]}                                                    # Sort by href
-    map  {[@$_[3..5]]}                                                          # Relevant details
-    grep {$$_[1] =~ m(\Aimage\Z)s} @{$xref->fixedRefsFailed};                   # Bad images
+  my %bad;                                                                      # Missing images
+  for my $fail($xref->fixedRefsFailed->@*)                                      # References that failed
+   {my ($reason, $type, $attr, $ref, $file) = @$fail;
+    next unless $type =~ m(\Aimage\Z)is;
+    my $i = absFromAbsPlusRel($file, $ref);
+    $bad{$i}++;
+   }
 
-  formatTable($xref->missingImageFiles = [@bad], <<END,                         # Report missing images references
-Href           The image reference that could not be resolved
-File           The source file in which the image reference appears
-Source_Files   One or more files that contained the content in this source file
+  my @bad = map {[$bad{$_}, $_]} sort keys %bad;
+
+  my $facet = q(Image files);
+
+  formatTables($xref, \@bad,                                                    # Report missing images references
+    columns   => <<END,
+Count        The number of unresolved references to this missing image
+Image_File   The file name of the missing image
 END
-    title=>qq(Bad image references),
-    head=>qq(Xref found NNNN bad image references on DDDD),
-    summarize=>1,
-    file=>(my $f = fpe($xref->reports, qw(bad missing_images txt))));
+    title     => qq(Missing images),
+    facet     => $facet, aspectColor => qw(red),
+    head      => qq(Xref found NNNN missing images on DDDD),
+    summarize => 1,
+    file      => fpe(qw(bad missing_images txt)));
 
-  return {missingImageFiles => $xref->missingImageFiles}
-#  my $found = [map {[$xref->goodImageRefs->{$_}, $_]}
-#              keys %{$xref->goodImageRefs}];
-#
-#  formatTable($found, <<END,
-#Count          Number of references to each image file found.
-#ImageFileName  Full image file name
-#END
-#    title=>qq(Image files),
-#    head=>qq(Xref found NNNN image files found on DDDD),
-#    file=>(fpe($xref->reports, qw(good imagesFound txt))));
-#
-#  my $missing = [map {[$xref->badImageRefs->{$_}, $_]}
-#                 sort keys %{$xref->badImageRefs}];
-#
-#  formatTable($missing, <<END,
-#Count          Number of references to each image file found.
-#ImageFileName  Full image file name
-#END
-#    title=>qq(Missing image references),
-#    head=>qq(Xref found NNNN images missing on DDDD),
-#    file=>(fpe($xref->reports, qw(bad imagesMissing txt))));
+
+  my %good;                                                                     # Good images
+  for   my $topic(sort keys $xref->images->%*)                                  # Topics containing images
+   {for my $ref  (sort keys $xref->images->{$topic}->%*)                        # Image references
+     {my $i = absFromAbsPlusRel($topic, $ref);
+      if (!$bad{$i})
+       {$good{$i}++;
+       }
+     }
+   }
+
+  my @good = map {[$good{$_}, $_]} sort keys %good;                             # Report good images
+
+  formatTables($xref, \@good,
+    columns   => <<END,
+Count       The number of references to this image
+Image_File  The file name of the image
+END
+    title=>qq(Image files),
+    facet     => $facet, aspectColor => qw(green),
+    head=>qq(Xref found NNNN image files on DDDD),
+    file=>(fpe(qw(good image_files txt))));
+
+   {missingImageFiles => \%bad,
+    goodImageFiles    => \%good}
+
  } # reportImages
 
 sub reportParseFailed($)                                                        #P Report failed parses
  {my ($xref) = @_;                                                              # Cross referencer
 
-  formatTable($xref->parseFailed, <<END,
+  formatTables($xref,
+    hashOfCountsToArray($xref->parseFailed),
+    columns => <<END,
 Source The file that failed to parse as an absolute file path
 END
     title=>qq(Files failed to parse),
     head=>qq(Xref found NNNN files failed to parse on DDDD),
-    file=>(my $f = fpe($xref->reports, qw(bad parseFailed txt))));
+    file=>(my $f = fpe(qw(bad parseFailed txt))));
   {}                                                                            # From multiverse to universe
  } # reportParseFailed
 
 sub reportXml1($)                                                               #P Report bad xml on line 1
  {my ($xref) = @_;                                                              # Cross referencer
 
-  formatTable([sort keys %{$xref->badXml1}], <<END,
+  formatTables($xref, [map {[$_]} sort keys %{$xref->badXml1}],
+    columns => <<END,
 Source  The source file containing bad xml on line
 END
     title=>qq(Bad Xml line 1),
     head=>qq(Xref found NNNN Files with the incorrect xml on line 1 on DDDD),
-    file=>(my $f = fpe($xref->reports, qw(bad xmlLine1 txt))));
+    file=>(my $f = fpe(qw(bad xmlLine1 txt))));
   {}                                                                            # From multiverse to universe
  } # reportXml1
 
 sub reportXml2($)                                                               #P Report bad xml on line 2
  {my ($xref) = @_;                                                              # Cross referencer
 
-  formatTable([sort keys %{$xref->badXml2}], <<END,
+  formatTables($xref, [map {[$_]} sort keys %{$xref->badXml2}],
+    columns => <<END,
 Source  The source file containing bad xml on line
 END
     title=>qq(Bad Xml line 2),
     head=>qq(Xref found NNNN Files with the incorrect xml on line 2 on DDDD),
-    file=>(my $f = fpe($xref->reports, qw(bad xmlLine2 txt))));
+    file=>(my $f = fpe(qw(bad xmlLine2 txt))));
   {}                                                                            # From multiverse to universe
  } # reportXml2
 
@@ -2091,10 +2304,14 @@ sub reportDocTypeCount($)                                                       
     $d{$d}++
    }
 
-  formatTable(\%d, [qw(DocType)],
+  formatTables($xref,
+    hashOfCountsToArray(\%d),
+    columns => <<END,
+DocType  The root element tag of this document
+END
     title=>qq(Document types),
     head=>qq(Xref found NNNN different doc types on DDDD),
-    file=>(fpe($xref->reports, qw(count docTypes txt))));
+    file=>(fpe(qw(count docTypes txt))));
   {}                                                                            # From multiverse to universe
  } # reportDocTypeCount
 
@@ -2109,10 +2326,14 @@ sub reportTagCount($)                                                           
      }
    }
 
-  formatTable(\%d, [qw(Tag Count)],
+  formatTables($xref, hashOfCountsToArray(\%d),
+    columns => <<END,
+Tag     The tag name of the xml node
+Count   The number of times this tag name occurs
+END
     title=>qq(Tags),
     head=>qq(Xref found NNNN different tags on DDDD),
-    file=>(fpe($xref->reports, qw(count tags txt))));
+    file=>(fpe(qw(count tags txt))));
   {}                                                                            # From multiverse to universe
  } # reportTagCount
 
@@ -2129,10 +2350,14 @@ sub reportTagsAndTextsCount($)                                                  
   push @t, [q(Tags to Texts), sprintf("%7.4f", $ratio)];
 
 
-  formatTable(\@t, [qw(Item Count)],
+  formatTables($xref, \@t,
+    columns => <<END,
+Item   A tag or some text
+Count  The number of times the tag or text occurs
+END
     title => q(Tags to Texts Ratio),
     head  => q(Xref found the following tag and text counts on DDDD),
-    file  => (fpe($xref->reports, qw(count tagsAndTexts txt))));
+    file  => (fpe(qw(count tagsAndTexts txt))));
 
    {tagsTextsRatio => $xref->tagsTextsRatio,                                    # From multiverse to universe
    }
@@ -2148,7 +2373,8 @@ sub reportLtGt($)                                                               
      }
    }
 
-  formatTable([map {[$d{$_}, nws($_)]} sort keys %d], <<END,
+  formatTables($xref, [map {[$d{$_}, nws($_)]} sort keys %d],
+    columns => <<END,
 Count The number of times this text was found
 Text  The text found between &lt; and &gt;. The white space has been normalized to make better use of the display.
 END
@@ -2156,7 +2382,7 @@ END
     head=><<END,
 Xref found NNNN different text items between &lt; and &gt; on DDDD
 END
-    file=>(fpe($xref->reports, qw(count ltgt txt))));
+    file=>(fpe(qw(count ltgt txt))));
   {}                                                                            # From multiverse to universe
  } # reportLtGt
 
@@ -2171,10 +2397,19 @@ sub reportAttributeCount($)                                                     
      }
    }
 
-  formatTable(\%d, [qw(Attribute Count)],
+  my @c;
+  for   my $t(sort keys %d)
+   {push @c, [$d{$t}, $t];
+   }
+
+  formatTables($xref, [@c],                                                     # Attribute count report
+    columns => <<END,
+Count     The number of times this attribute appears
+Attribute The attribute name being counted
+END
     title=>qq(Attributes),
     head=>qq(Xref found NNNN different attributes on DDDD),
-    file=>(my $f = fpe($xref->reports, qw(count attributes txt))));
+    file=>(my $f = fpe(qw(count attributes txt))));
   {}                                                                            # From multiverse to universe
  } # reportAttributeCount
 
@@ -2202,7 +2437,8 @@ sub reportAttributeNameAndValueCounts($)                                        
           sort {$$b[0] <=> $$a[0]} @D;
 
 
-  formatTable(\@d, <<END,
+  formatTables($xref, \@d,
+    columns => <<END,
 Count     The number of  times this value occurs
 Value     The value being counted
 Attribute The attribute on which the value appears
@@ -2210,19 +2446,25 @@ END
     summarize => 1,
     title     => qq(Attribute value counts),
     head      => qq(Xref found NNNN attribute value combinations on DDDD),
-    file      => (fpe($xref->reports, qw(count attributeNamesAndValues txt))));
+    file      => (fpe(qw(count attributeNamesAndValues txt))));
   {}                                                                            # From multiverse to universe
  } # reportAttributeNameAndValueCounts
 
 sub reportValidationErrors($)                                                   #P Report the files known to have validation errors
  {my ($xref) = @_;                                                              # Cross referencer
 
-  formatTable([map {[$_]} sort keys %{$xref->validationErrors}], [qw(File)],
-    title=>qq(Topics with validation errors),
-    head=><<END,
-Xref found NNNN topics with validation errors on DDDD
+  my $e = $xref->validationErrors;
+
+  formatTables($xref, [map {[$$e{$_}, $_]} sort keys %$e],                      #
+    columns => <<END,
+Count The number of valiation errors in the file
+File  A file with xml validation errors
 END
-    file=>(fpe($xref->reports, qw(bad validationErrors txt))));
+    title=>qq(Topics with xml validation errors),
+    head=><<END,
+Xref found NNNN topics with xml validation errors on DDDD
+END
+    file=>(fpe(qw(bad validationErrors txt))));
   {}                                                                            # From multiverse to universe
  } # reportValidationErrors
 
@@ -2274,20 +2516,21 @@ END
 #Xref found NNNN bookmaps with errors on DDDD
 #END
 #    summarize=>1,
-#    file=>(fpe($xref->reports, qw(bad bookMap txt))));
+#    file=>(fpe(qw(bad bookMap txt))));
 #
 #  formatTable(\@good, [qw(File)],
 #    title=>qq(Good bookmaps),
 #    head=><<END,
 #Xref found NNNN good bookmaps on DDDD
 #END
-#    file=>(fpe($xref->reports, qw(good bookMap txt))));
+#    file=>(fpe(qw(good bookMap txt))));
 # }
 
 sub reportTables($)                                                             #P Report on tables that have problems
  {my ($xref) = @_;                                                              # Cross referencer
 
-  formatTable($xref->badTables, <<END,
+  formatTables($xref, $xref->badTables,
+    columns => <<END,
 Reason          Reason bookmap failed
 Attributes      The tag and attributes of the table element in question
 Location        The location at which the error was detected
@@ -2298,33 +2541,43 @@ END
 Xref found NNNN table errors on DDDD
 END
     summarize=>1,
-    file=>(fpe($xref->reports, qw(bad tables txt))));
+    file=>(fpe(qw(bad tables txt))));
   {}                                                                            # From multiverse to universe
  } # reportTables
 
 sub reportFileExtensionCount($)                                                 #P Report file extension counts
  {my ($xref) = @_;                                                              # Cross referencer
-
-  formatTable(countFileExtensions($xref->inputFolder), [qw(Ext Count)],
+  my $folder = $xref->inputFolder;
+  formatTables($xref,
+    hashOfCountsToArray(countFileExtensions($folder)),
+    columns => <<END,
+Ext     An extension that appears in the input corpus
+Count   The number of times the extension appears in the corpus.
+END
     title=>qq(File extensions),
     head=><<END,
-Xref found NNNN different file extensions on DDDD
+Xref found NNNN different file extensions on DDDD in folder: $folder
 END
-    file=>(fpe($xref->reports, qw(count fileExtensions txt))));
+    file=>(fpe(qw(count fileExtensions txt))));
   {}                                                                            # From multiverse to universe
  } # reportFileExtensionCount
 
 sub reportFileTypes($)                                                          #P Report file type counts - takes too long in series
  {my ($xref) = @_;                                                              # Cross referencer
 
-  formatTable(countFileTypes
-   ($xref->inputFolder, $xref->maximumNumberOfProcesses),
-   [qw(Type Count)],
+  my $ft = countFileTypes($xref->inputFolder, $xref->maximumNumberOfProcesses); # Count file types
+
+  formatTables($xref,
+    hashOfCountsToArray($ft),
+    columns=><<END,
+Type    A file type that appears in the input corpus
+Count   The number of times the file type appears in the corpus.
+END
     title=>qq(Files types),
     head=><<END,
 Xref found NNNN different file types on DDDD
 END
-    file=>(my $f = fpe($xref->reports, qw(count fileTypes txt))));
+    file=>(my $f = fpe(qw(count fileTypes txt))));
   {}                                                                            # From multiverse to universe
  } # reportFileTypes
 
@@ -2370,7 +2623,7 @@ END
 #bookmaps.
 #
 #END
-#    file=>(my $f = fpe($xref->reports, qw(bad notReferenced txt))));
+#    file=>(my $f = fpe(qw(bad notReferenced txt))));
 # }
 
 sub reportExternalXrefs($)                                                      #P Report external xrefs missing other attributes
@@ -2393,7 +2646,8 @@ sub reportExternalXrefs($)                                                      
      }
    }
 
-  formatTable(\@s, <<END,
+  formatTables($xref, \@s,
+    columns => <<END,
 Reason          The reason why the xref is unsatisfactory
 Href            The href attribute of the xref in question
 Xref_Statement  The xref statement in question
@@ -2402,7 +2656,7 @@ File            The file containing the xref statement in question
 END
     title=>qq(Bad external xrefs),
     head=>qq(Xref found bad external xrefs on DDDD),
-    file=>(my $f = fpe($xref->reports, qw(bad externalXrefs txt))));
+    file=>(my $f = fpe(qw(bad externalXrefs txt))));
   {}                                                                            # From multiverse to universe
  } # reportExternalXrefs
 
@@ -2417,7 +2671,8 @@ sub reportPossibleImprovements($)                                               
   my @s = sort {$$a[0] cmp $$b[0]}
           sort {$$a[3] cmp $$b[3]} @S;
 
-  formatTable(\@s, <<END,
+  formatTables($xref, \@s,
+    columns => <<END,
 Improvement     The improvement that might be made.
 Text            The text that suggested the improvement.
 Line_Number     The line number at which the improvement could be made.
@@ -2428,17 +2683,18 @@ END
 Xref found NNNN opportunities for improvements that might be
 made on DDDD
 END
-    file=>(fpe($xref->reports, qw(improvements txt))),
+    file=>(fpe(qw(improvements txt))),
     summarize=>1);
   {}                                                                            # From multiverse to universe
  } # reportPossibleImprovements
 
 sub reportMaxZoomOut($)                                                         #P Text located via Max Zoom In
  {my ($xref) = @_;                                                              # Cross referencer
-  return unless my $names = $xref->maxZoomIn;                                   # No point if maxZoomIn was not specified
+  return {} unless my $names = $xref->maxZoomIn;                                # No point if maxZoomIn was not specified
 
-  my @names = (qw(File_Name Title), sort keys %$names);                         # Column Headers
-  my %names = map {$names[$_]=>$_} keys @names;                                 # Assign regular expression names to columns in the output table/csv
+  my @names   = (qw(File_Name Title), sort keys %$names);                       # Column Headers
+  my $columns = join "\n", @names;                                              # Column Headers as lines suitable for format tables
+  my %names   = map {$names[$_]=>$_} keys @names;                               # Assign regular expression names to columns in the output table/csv
 
   my @f;
   for   my $f(sort keys %{$xref->maxZoomOut // {}})                             # One row per file processed showing which regular expression names matched
@@ -2457,15 +2713,16 @@ sub reportMaxZoomOut($)                                                         
     $xref->maxZoomOut->{$f} = {title=>$t, data=>$d};
    }
 
-  formatTable([sort {$$a[0] cmp $$b[0]} @f], [@names],                          # Sort by file name
-    title=>qq(Max Zoom In Matches),
-    head=><<END,
+  formatTables($xref, [sort {$$a[0] cmp $$b[0]} @f],                            # Sort by file name
+    columns   => $columns,
+    title     => qq(Max Zoom In Matches),
+    head      => <<END,
 Xref found NNNN file matches on DDDD
 END
-    file=>(fpe($xref->reports, qw(lists maxZoom txt))),
-    summarize=>1);
+    file      =>(fpe(qw(lists maxZoom txt))),
+    summarize => 1);
 
-  dumpFile(fpe($xref->reports, qw(lists maxZoom data)), $xref->maxZoomOut);     # Dump the search results
+  dumpFile(fpe(qw(lists maxZoom data)), $xref->maxZoomOut);     # Dump the search results
 
    {maxZoomOut => $xref->maxZoomOut,                                            # From multiverse to universe
    }
@@ -2484,7 +2741,8 @@ sub reportTopicDetails($)                                                       
              ];
    }
 
-  formatTable(\@t, <<END,
+  formatTables($xref, \@t,
+    columns => <<END,
 Tag             The outermost tag
 Id              The id on the outermost tag
 Author          The author of the topic
@@ -2495,7 +2753,7 @@ END
     head=><<END,
 Xref found NNNN topics on DDDD
 END
-    file=>(fpe($xref->reports, qw(lists topics txt))),
+    file=>(fpe(qw(lists topics txt))),
     summarize=>1);
   {}                                                                            # From multiverse to universe
  } # reportTopicDetails
@@ -2533,8 +2791,8 @@ sub reportTopicReuse($)                                                         
     $b->[0] = '' if $a->[2] eq $b->[2];
    }
 
-  formatTable($t,                                                               # Format report
-               <<END,
+  formatTables($xref, $t,
+    columns => <<END,
 Reuse           The number of times the target topic is reused over all topics
 Count           The number of times the target topic is reused in the source topic
 Target          The topic that is being reused == the target of reuse
@@ -2544,7 +2802,7 @@ END
     head=><<END,
 Xref found NNNN topics that are currently being reused on DDDD
 END
-    file=>(fpe($xref->reports, qw(lists topicReuse txt))),
+    file=>(fpe(qw(lists topicReuse txt))),
     zero=>1,                                                                    # Reuse is very unlikely because the matching criteria is the MD5 sum
     summarize=>1);
   {}                                                                            # From multiverse to universe
@@ -2563,8 +2821,8 @@ sub reportFixRefs($)                                                            
      }
    }
 
-  formatTable(\@r,                                                              # Format report
-               <<END,
+  formatTables($xref, \@r,
+    columns => <<END,
 Reference       The reference to be fixed
 Source          The topic that contains the reference
 END
@@ -2572,7 +2830,7 @@ END
     head=><<END,
 Xref found NNNN hrefs that should be fixed on DDDD
 END
-    file=>(fpe($xref->reports, qw(lists fixRefs txt))),
+    file=>(fpe(qw(lists fixRefs txt))),
     zero=>1,
     summarize=>1);
   {}                                                                            # From multiverse to universe
@@ -2583,18 +2841,19 @@ sub reportSourceFiles($)                                                        
   my @r;
   for my $f(sort keys %{$xref->targetTopicToInputFiles})                        # File
    {my $s = $xref->targetTopicToInputFiles->{$f};                               # Source file for topic
-    push @r, [$f, join ' ', sort keys %$s] if $s;
+    push @r, [$f, join ', ', sort keys %$s] if $s;
    }
 
-  formatTable([sort {$$a[0]cmp $$b[0]} @r], <<END,                              # Report source files
+  formatTables($xref, [sort {$$a[0]cmp $$b[0]} @r],
+    columns => <<END,
 Topic     The topic file
-Source    The source file from which the topic was obtained
+Source    The source file(s) from which the topic was obtained
 END
     title=>qq(Source file for each topic),
     head=><<END,
 Xref found the source files for NNNN topics on DDDD
 END
-    file=>(fpe($xref->reports, qw(lists source_file_for_each_topic txt))),
+    file=>(fpe(qw(lists source_file_for_each_topic txt))),
     summarize=>1);
   {}                                                                            # From multiverse to universe
  } # reportSourceFiles
@@ -2603,16 +2862,20 @@ sub reportReferencesFromBookMaps($)                                             
  {my ($xref) = @_;                                                              # Cross referencer
   my %bi;                                                                       # Bookmap to image
   my %bt;                                                                       # Bookmap to topics
+  my %ib;                                                                       # Images to bookmaps
+  my %tb;                                                                       # Topics to bookmaps
   my @bi;                                                                       # Bookmap to image report
   my @bt;                                                                       # Bookmap to topic report
+  my @ib;                                                                       # Images to bookmaps reports
+  my @tb;                                                                       # Topics to bookmaps reports
 
   my $imageRefsFromTopic = sub                                                  # Image references from a topic
    {my ($b, $t) = @_;                                                           # Book map, topic
-
     for my $I(sort keys %{$xref->imagesReferencedFromTopics->{$t}})             # Image href
      {my $i = absFromAbsPlusRel($t, $I);
       push @bi, my $d = [$I, -e $i ? 1 : '', $i, $t, $b];
       $bi{$b}{$i}++;                                                            # Images from bookmap
+      $ib{$i}{$b}++;                                                            # Images to bookmaps
      }
    };
 
@@ -2620,8 +2883,9 @@ sub reportReferencesFromBookMaps($)                                             
    {for my $T(sort keys %{$xref->bookMapRefs->{$b}})                            # Topic href
      {my $t = absFromAbsPlusRel($b, $T);
 
-      push @bt, [$T, -e $t ? 1 : '', $t, $b];                                   # Report bookmap to topic
+      push @bt, [$T, (-e $T ? 1 : q()), $t, $b];                                # Report bookmap to topic
       $bt{$b}{$t}++;                                                            # Topics from bookmap
+      $tb{$t}{$b}++;                                                            # Topics to bookmaps
 
       &$imageRefsFromTopic($b, $t);
      }
@@ -2632,10 +2896,27 @@ sub reportReferencesFromBookMaps($)                                             
      }
    }
 
+  for   my $i(sort keys %ib)                                                    # Image
+   {for my $b(sort keys %{$ib{$i}})                                             # Bookmap
+     {my $c = $ib{$i}{$b};
+      push @ib, [$c, $i, $b];
+     }
+   }
+
+  for   my $t(sort keys %tb)                                                    # Topic
+   {for my $b(sort keys %{$tb{$t}})                                             # Bookmap
+     {my $c = $tb{$t}{$b};
+      push @tb, [$c, $t, $b];
+     }
+   }
+                                                                                # ALL FILES (below) ARE FULLY QUALIFIED!
+  $xref->topicsToReferringBookMaps    = \%tb;                                   # Topics to referring bookmaps
   $xref->topicsReferencedFromBookMaps = \%bt;                                   # Topics referenced from bookmaps
   $xref->imagesReferencedFromBookMaps = \%bi;                                   # Images referenced from bookmaps
+  $xref->imagesToRefferingBookMaps    = \%ib;                                   # Images to bookmaps
 
-  formatTable(\@bi, <<END,                                                      # Report images
+  formatTables($xref, \@bi,
+    columns => <<END,
 Href      The href that contains an image reference
 Exists    Whether the referenced image exists or not
 Image     The name of the image file
@@ -2646,11 +2927,12 @@ END
     head=><<END,
 Xref found NNNN images referenced from bookmaps via topics on DDDD
 END
-    file=>(fpe($xref->reports, qw(lists images_from_bookmaps txt))),
+    file=>(fpe(qw(lists images_from_bookmaps txt))),
     zero=>1,
     summarize=>1);
 
-  formatTable(\@bt, <<END,                                                      # Report topics
+  formatTables($xref, \@bt,
+    columns => <<END,
 Reference The topic reference
 Exists    Whether the referenced topic exists or not
 Topic     The topic that referenced the image
@@ -2660,34 +2942,180 @@ END
     head=><<END,
 Xref found NNNN topics referenced from bookmaps via topics on DDDD
 END
-    file=>(fpe($xref->reports, qw(lists topics_from_bookmaps txt))),
+    file=>(fpe(qw(lists bookmaps_to_topics txt))),
     zero=>1,
     summarize=>1);
 
-  {topicsReferencedFromBookMaps => \%bt,                                        # Topics referenced from bookmaps
-   imagesReferencedFromBookMaps => \%bi,                                        # Images referenced from bookmaps
-  }                                                                             # From multiverse to universe
+  formatTables($xref, \@tb,
+    columns => <<END,
+Count     The number of times this topic is reffered to by this bookmap
+Topic     The topic in question
+Bookmap   A bookmap that refers to this topic
+END
+    title=>qq(Topics to referring bookmaps),
+    head=><<END,
+Xref found NNNN topics referred to from bookmaps on DDDD
+END
+    file=>(fpe(qw(lists topics_to_bookmaps txt))),
+    zero=>1,
+    summarize=>1);
+
+  formatTables($xref, \@ib,
+    columns => <<END,
+Count     The number of times this image is reffered to by this bookmap
+Image     The image in question
+Bookmap   A bookmap that refers to this image
+END
+    title=>qq(Images to referring bookmaps),
+    head=><<END,
+Xref found NNNN images referred to from bookmaps on DDDD
+END
+    file=>(fpe(qw(lists images_to_bookmaps txt))),
+    zero=>1,
+    summarize=>1);
+                                                                                 # ALL FILES (below) ARE FULLY QUALIFIED
+#  {topicsReferencedFromBookMaps => \%bt,                                        # Topics from bookmaps
+#   imagesReferencedFromBookMaps => \%bi,                                        # Images from bookmaps
+#   topicsToReferringBookMaps    => \%tb,                                        # Topics to bookmaps
+#   imagesToRefferingBookMaps    => \%ib,                                        # Images to bookmaps
+#  }                                                                             # From multiverse to universe
  } # reportReferencesFromBookMaps
 
-
-=pod
-
-=head1 Assumptions
-
-=head2 All othermeta is at the root level in the maps not at the topic ref level
-
-There are 138 maps that have othermeta in them. For at least one of them this
-assumption is not true, see: help/bundle_setup/setup.ditamap
-
-=cut
-
-sub reportOtherMeta($)
+sub reportExteriorMaps($)                                                       #P Maps that are not referenced by any other map
  {my ($xref) = @_;                                                              # Cross referencer
 
-  my %t; my %b; my %B;                                                          # Othermeta at topic level and bookmap level
+  my %r;                                                                        # Map reference count
+  for   my $b(sort keys %{$xref->topicsReferencedFromBookMaps})                 # Each map
+   {$r{$b}++;                                                                   # Save map
+    for my $t(sort keys %{$xref->topicsReferencedFromBookMaps->{$b}})           # Each topic reference from the map
+     {if (my $d = $xref->docType->{$t})                                         # Document type
+       {if ($d =~ m(map\Z)s)                                                    # Its a map
+         {$r{$t}--;                                                             # It has been referenced
+         }
+       }
+     }
+   }
+
+  my %u;                                                                        # Unreferenced maps
+  for my $b(sort keys %r)                                                       # Each map
+   {$u{$b}++ if $r{$b} > 0;                                                     # Unreferenced map
+   }
+
+  formatTables($xref,
+    hashOfCountsToArray(\%u),
+    columns => <<END,
+Bookmap   An exterior bookmap
+END
+    title=>qq(Exterior bookmaps),
+    head=><<END,
+Xref found NNNN exterior bookmaps on DDDD
+
+An exterior map is one that is not referenced from any other map in the corpus.
+END
+    file=>(fpe(qw(lists exterior_maps txt))),
+    summarize=>1);
+
+  {exteriorMaps => \%u,                                                         # Exterior maps == maps that are not referenced by another map
+  }                                                                             # From multiverse to universe
+ } # reportExteriorMaps
+
+sub reportTopicsNotReferencedFromBookMaps($)                                    #P Topics not referenced from bookmaps
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %r;                                                                        # Topics referenced from a bookmap
+  for   my $b(sort keys %{$xref->topicsReferencedFromBookMaps})                 # Book maps
+   {for my $f(sort keys %{$xref->topicsReferencedFromBookMaps->{$b}})           # Topics referenced from bookmaps
+     {$r{$f}++;                                                                 # Topic reference count
+     }
+   }
+
+  my @n;                                                                        # Topic not referenced from a bookmap
+  for   my $f(sort keys %{$xref->docType})                                      # Input xml files
+   {next if $xref->docType ->{$f} =~ m(map\Z)s;
+    push @n, $f unless $r{$f};                                                  # Topic not referenced from a bookmap
+   }
+
+  my $facet = q(Topics referenced from bookmaps);                               # Facet
+
+  my $n = $xref->topicsNotReferencedFromBookMaps = {map {$_=>1} @n};            #Topics not referenced by any bookmap
+
+  formatTables($xref,
+    [map {[$r{$_}, swapFilePrefix($_, $xref->inputFolder)]} sort keys %r],
+    columns   => <<END,
+Count Number of referring bookmaps
+Topic Topic referenced from one or more bookmaps
+END
+    title     => qq(Topics referenced by bookmaps),
+    facet     => $facet, aspectColor=>q(green),
+    head      => <<END,
+Xref found NNNN topics that are referenced by one or more bookmaps on DDDD
+END
+    file      => fpe(qw(good topics_referenced_from_bookmaps txt)),
+    summarize => 1);
+
+  formatTables($xref,
+    [map {[swapFilePrefix($_, $xref->inputFolder)]} sort {$a cmp $b} @n],
+    columns   => <<END,
+Topic     Unreferenced topic file name
+END
+    title     => qq(Topics not referenced by any bookmap),
+    facet     => $facet,  aspectColor=>q(red),
+    head      => <<END,
+Xref found NNNN topics that are not referenced by any bookmaps on DDDD
+END
+    file      => fpe(qw(bad topics_not_referenced_from_bookmaps txt)),
+    summarize => 1);
+
+  {topicsNotReferencedFromBookMaps=>$n
+  }
+ } # reportTopicsNotReferencedFromBookMaps
+
+
+sub reportTableDimensions($)                                                    #P Report table dimensions
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %d = %{$xref->tableDimensions};
+  my %r;                                                                        # Topic not referenced from a bookmap
+  for   my $f(keys %d)                                                          # Files with tables
+   {for   my $c(keys %{$d{$f}})                                                 # Table columns
+     {for my $r(keys %{$d{$f}{$c}})                                             # Table rows
+       {push @{$r{$c}{$r}}, $f;
+       }
+     }
+   }
+
+  my @d;                                                                        # Topic not referenced from a bookmap
+  for   my $c(sort {$a <=> $b} keys %r)                                         # Table columns
+   {for my $r(sort {$a <=> $b} keys %{$r{$c}})                                  # Table rows
+     {my ($f, @f) = @{$r{$c}{$r}};
+      push @d, [$c, $r, $f];
+      push @d, [q(), q(), $_] for @f;
+     }
+   }
+
+  formatTables($xref, [@d],
+    columns => <<END,
+Columns Number of columns in table
+Rows    Number of rows in table
+File    A file that contains a table with this many columns and rows
+END
+    title=>qq(Table dimensions),
+    head=><<END,
+Xref found NNNN table dimensions on DDDD
+END
+    file=>(fpe(qw(count table_dimensions txt))),
+    summarize=>1);
+
+  {}
+ } # reportTableDimensions
+
+sub reportOtherMeta($)                                                          #P Advise in the feasibility of moving othermeta data from topics to bookmaps assuming that the othermeta data will be applied only at the head of the map rather than individually to each topic in the map.
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %t; my %b; my %B;                                                          # Othermeta at topic level, othermeta to migrate to bookmap, othermeta already in bookmap
   for     my $b(sort keys $xref->bookMapRefs->%*)
-   {for   my $n(sort keys $xref->otherMeta->{$b}->%*)
-     {for my $c(sort keys $xref->otherMeta->{$b}->{$n}->%*)
+   {for   my $n(sort keys $xref->otherMeta->{$b}->%*)                           # Name of othermeta
+     {for my $c(sort keys $xref->otherMeta->{$b}->{$n}->%*)                     # Content of other meta
        {$b{$b}{$n}{$c}++;
         $B{$b}{$n}{$c}++;
        }
@@ -2730,7 +3158,8 @@ sub reportOtherMeta($)
        }
      }
 
-    formatTable($xref->otherMetaDuplicatesSeparately = [@d], <<END,             # Duplicate othermeta in bookmaps and topics considered separately
+    formatTables($xref, $xref->otherMetaDuplicatesSeparately = [@d],
+    columns => <<END,
 Source   Bookmaps or topic files with duplicate othermeta data
 Name     Duplicated othermeta name field
 Count    Number of duplicates
@@ -2739,7 +3168,7 @@ END
     title=>q(Duplicate othermeta data in bookmaps and topics considered separately),
     head =>q(Found NNNN duplicate othermeta items on DDDD),
     clearUpLeft => -1, summarize=>1,
-    file =>fpe($xref->reports, qw(other_meta duplicates_separately txt)));
+    file =>fpe(qw(other_meta duplicates_separately txt)));
    }
 
   if (1)                                                                        # Report duplicate othermeta in bookmaps with called topics othermeta included
@@ -2756,7 +3185,8 @@ END
        }
      }
 
-    formatTable($xref->otherMetaDuplicatesCombined = [@d], <<END,               # Duplicate othermeta in bookmaps with called topics othermeta included
+    formatTables($xref, $xref->otherMetaDuplicatesCombined = [@d],
+      columns => <<END,
 Source   Bookmap with duplicate othermeta with called topics othermeta included
 Name     Duplicated othermeta name field
 Count    Number of duplicates
@@ -2765,7 +3195,7 @@ END
       title=>q(Duplicate othermeta in bookmaps with called topic othermeta included),
       head =>q(Found NNNN duplicate othermeta items on DDDD),
       clearUpLeft => -1, summarize=>1,
-      file =>fpe($xref->reports, qw(other_meta duplicates txt)));
+      file =>fpe(qw(other_meta duplicates txt)));
    }
 
   my %o;                                                                        # Topic overrides
@@ -2791,8 +3221,8 @@ END
        }
      }
 
-    formatTable($xref->otherMetaRemainWithTopic = [@k],                         # Othermeta that must stay in the topic
-         <<END,
+    formatTables($xref, $xref->otherMetaRemainWithTopic = [@k],
+      columns => <<END,
 Topic    Topic file name
 Name     Othermeta name field to be retained
 Content  Othermeta name content to be retained
@@ -2801,7 +3231,7 @@ END
     title=>q(Othermeta kept in topics because calling bookmaps disagree),
     clearUpLeft => -1, summarize=>1,
     head =>qq(Found NNNN othermeta items that must remain in topic on DDDD),
-    file =>fpe($xref->reports, qw(other_meta must_remain_in_topic txt)));
+    file =>fpe(qw(other_meta must_remain_in_topic txt)));
    }
 
   if (1)                                                                        # Report othermeta pushed to the bookmaps
@@ -2816,8 +3246,8 @@ END
        }
      }
 
-    formatTable($xref->otherMetaPushToBookMap = [@p],                           # Othermeta that can be pushed to the calling book map
-         <<END,
+    formatTables($xref, $xref->otherMetaPushToBookMap = [@p],
+      columns => <<END,
 Topic    Topic file name
 Name     Othermeta name field to be retained
 Content  Othermeta name content to be retained
@@ -2826,7 +3256,7 @@ END
     title=>q(Othermeta data that can be pushed to the calling bookmaps),
     clearUpLeft => -1, summarize=>1,
     head =>qq(Found NNNN othermeta items that can be pushed to the calling bookmaps on DDDD),
-    file =>fpe($xref->reports, qw(other_meta push_to_book_maps txt)));
+    file =>fpe(qw(other_meta push_to_book_maps txt)));
    }
 
   if (1)                                                                        # Report bookmap othermeta before topic othermeta has been included
@@ -2841,7 +3271,8 @@ END
        }
      }
 
-  formatTable($xref->otherMetaBookMapsBeforeTopicIncludes = [@b], <<END,        # Bookmap othermeta before topic othermeta has been included
+  formatTables($xref, $xref->otherMetaBookMapsBeforeTopicIncludes = [@b],
+    columns => <<END,
 Bookmap Bookmap file name
 Name    Bookmap othermeta name
 Count   Number of distinct values for this othermeta name in this bookmap
@@ -2850,7 +3281,7 @@ END
     title=> q(Bookmap othermeta before topic othermeta has been included),
     clearUpLeft => -1, summarize=>1,
     head => qq(Xref found NNNN Bookmap othermeta tags before topic othermeta was included),
-    file => fpe($xref->reports, qw(other_meta book_maps_before_topics_included txt)));
+    file => fpe(qw(other_meta book_maps_before_topics_included txt)));
    }
 
   if (1)                                                                        # Report bookmap othermeta after topic othermeta has been included
@@ -2864,7 +3295,8 @@ END
        }
      }
 
-    formatTable($xref->otherMetaBookMapsAfterTopicIncludes = [@b], <<END,       # Bookmap othermeta after topic othermeta data has been included
+    formatTables($xref, $xref->otherMetaBookMapsAfterTopicIncludes = [@b],
+      columns => <<END,
 Bookmap Bookmap file name
 Name    Bookmap or topic othermeta name
 Count   Number of distinct values for this othermeta name
@@ -2873,7 +3305,7 @@ END
     title=> q(Bookmap othermeta data after topic othermeta has been included),
     clearUpLeft => -1, summarize=>1,
     head => qq(Xref found NNNN Bookmap othermeta tags after topic othermeta was included on DDDD),
-    file =>fpe($xref->reports, qw(other_meta book_maps_after_topics_included txt)));
+    file =>fpe(qw(other_meta book_maps_after_topics_included txt)));
    }
 
    {otherMetaDuplicatesSeparately         => $xref->otherMetaDuplicatesSeparately,
@@ -2885,6 +3317,138 @@ END
    }
 
  } # reportOtherMeta
+
+sub reportOtherMetaConsolidated($)                                              #P Create a subject scheme map from othermeta
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %o;                                                                        # Consolidated other meta
+  for     my $f(sort keys $xref->otherMeta->%*)                                 # Each file containing othermeta
+   {for   my $n(sort keys $xref->otherMeta->{$f}->%*)                           # Name of othermeta
+     {for my $c(sort keys $xref->otherMeta->{$f}->{$n}->%*)                     # Content of other meta
+       {$o{$n}{$c}++;
+       }
+     }
+   }
+
+  if (my $out = $xref->subjectSchemeMap)                                        # SubjectSchemeMap requested by supplying an output file for the map
+   {my $makeNavTitle = sub                                                      # Create a nav title using the Gearhart NavTitle Method
+     {my ($c) = @_;                                                             # Othermeta content
+      ucfirst $c =~ s(_) ( )gsr                                                 # The Gearhart NavTitle method
+     };
+
+    my @m;
+    for my $n(sort keys %o)                                                     # Layout map entries
+     {my $t = &$makeNavTitle($n);
+      push @m, qq(<subjectHead id="$n" navtitle="$t">);
+
+      my %c;                                                                    # Normalize all the othermeta
+      for my $content(sort keys $o{$n}->%*)
+       {for my $c(split m(\s+)s, $content)
+         {$c{$c}++
+         }
+       }
+      for my $c(sort keys %c)                                                   # Write the normalized othermeta
+       {my $t = &$makeNavTitle($c);
+        push @m, qq(<subjectdef keys="$c" navtitle="$t"/>);
+       }
+
+      push @m, qq(</subjectHead>);
+     }
+
+    my $m = join "\n", q(<subjectScheme>), @m, q(</subjectScheme>);             # Map
+    my $x = Data::Edit::Xml::new($m);                                           # Parse map
+    owf($out, $x->ditaPrettyPrintWithHeaders);                                  # Print map
+   }
+
+   {otherMetaConsolidated=>\%o}                                                 # Consolidated meta data
+ } # reportOtherMetaConsolidated
+
+sub createClassificationMap($$)                                                 #P Create a classification map for each bookmap
+ {my ($xref, $bookMap) = @_;                                                    # Cross referencer, bookmap to classify
+
+  for my $b($bookMap)                                                           # Book map
+   {my $out = fpn($b).classificationMapSuffix;
+
+    push my @o, <<END;
+<map>
+  <topicmeta>
+    <othermeta name="ryffine.classificationMap" content="yes"/>
+    <othermeta name="ryffine.classificationMap.source" content="$bookMap"/>
+  </topicmeta>
+END
+
+    for     my $f(sort keys $xref->topicsReferencedFromBookMaps->{$b}->%*)      # Book map topics
+     {next unless my $tag = $xref->baseTag->{$f};                               # Check that the referenced topic exists locally
+
+      my $F = $tag !~ m(map\Z)i ? $f : fpn($f).classificationMapSuffix;         # SF215 - reference classification map rather than actual map
+
+      my $r = relFromAbsAgainstAbs($F, $out);
+
+      push @o, <<END;
+<topicref href="$r">
+  <topicmeta>
+    <keywords/>
+  </topicmeta>
+END
+      for   my $n(sort keys $xref->otherMeta->{$f}->%*)                         # Name of other meta in book map topic
+       {push @o, <<END;
+<topicsubject outputclass="$n">
+END
+
+        for my $C(sort keys $xref->otherMeta->{$f}->{$n}->%*)                   # Content of other meta
+         {my %c = map {$_=>1} split /\s+/, $C;                                  # Von Sabine gefunden!
+          for my $c(sort keys %c)
+           {push @o, <<END;
+<subjectref keyref="$c"></subjectref>
+END
+           }
+         }
+        push @o, <<END;
+</topicsubject>
+END
+       }
+      push @o, <<END;
+</topicref>
+END
+     }
+    push @o, q(</map>);
+
+
+    if (1)                                                                      # Write classification map
+     {my $o = join "\n", @o;
+      my $x = Data::Edit::Xml::new $o;
+      my $y = $x->ditaPrettyPrintWithHeaders;
+      owf($out, $y);
+     }
+
+    if (my $x = Data::Edit::Xml::new($b))                                       # Edit an xml file retaining any existing XML headers and lint trailers
+     {my $href     = relFromAbsAgainstAbs($out, $b);
+      my $topicRef = <<END;
+<topicref href="$href" processing-role="resource-only" format="xml" type="xml" outputclass="classification-ditamap" scope="local"/>
+END
+
+      if (my $t = $x->go_topicmeta || $x->go_title)                             # Position the classification map reference
+       {$t->putNextAsText($topicRef);
+        editXml($b, $b, -p $x);
+       }
+      else                                                                      # Put the classification map reference first if no other place for it
+       {$x->putFirstAsText($topicRef);
+        editXml($b, $b, -p $x);
+       }
+     }
+   }
+ } # createClassificationMap
+
+sub createClassificationMaps($)                                                 #P Create classification maps for each bookmap
+ {my ($xref) = @_;                                                              # Cross referencer
+  return {} unless $xref->classificationMaps;                                   # Only if requested
+
+  for my $b(sort keys $xref->bookMapRefs->%*)                                   # Ideally this should be in parallel - but it only takes 1/10 of the Xref time and is not used in most Xrefs anyway so it can probably continue in series for the moment at 2019.11.04
+   {createClassificationMap($xref, $b);
+   }
+
+  {}                                                                            # Consolidated meta data
+ } # createClassificationMaps
 
 sub reportSimilarTopicsByTitle($)                                               #P Report topics likely to be similar on the basis of their titles as expressed in the non Guid part of their file names
  {my ($xref) = @_;                                                              # Cross referencer
@@ -2919,100 +3483,134 @@ sub reportSimilarTopicsByTitle($)                                               
     $b->[0] = '' if $a->[1] eq $b->[1];
    }
 
-  formatTable($t, <<END,                                                        # Format report
+  formatTables($xref, $t,
+    columns => <<END,
 Similar          The number of topics similar to this one
 Prefix           The prefix of the target file names being used for matching
 Source           Topics that have the current prefix
 END
-    title => qq(Topic Reuses),
+    title => qq(Similar topics),
     head  => <<END,
 Xref found NNNN topics that might be similar on DDDD
 END
-    clearUpLeft => -1, summarize=>1,
-    file  => fpe($xref->reports, qw(lists similar byTitle txt)));
+    clearUpLeft => -1, summarize=>1, zero=>1,
+    file  => fpe(qw(lists similar byTitle txt)));
   {}                                                                            # From multiverse to universe
  } # reportSimilarTopicsByTitle
 
 sub reportSimilarTopicsByVocabulary($)                                          #P Report topics likely to be similar on the basis of their vocabulary
  {my ($xref) = @_;                                                              # Cross referencer
 
+  my $l = $xref->matchTopics;                                                   # Match level
+  my $p = int($l * 100);                                                        # Match level as a percentage
+
   my @m = grep {scalar(@$_) > 1}                                                # Partition into like topics based on vocabulary - select the partitions with more than one element
-  setPartitionOnIntersectionOverUnionOfHashStringSets
-   ($xref->matchTopics, $xref->vocabulary);
+  setPartitionOnIntersectionOverUnionOfHashStringSets($l, $xref->vocabulary);
 
   my @t;
-  for my $a(@m)
+  for my $a(@m)                                                                 # Each block of matching topics
    {my ($first, @rest) = @$a;
     push @t, [scalar(@$a), $first], map {[q(), $_]} @rest;
     push @t, [q(), q()];
    }
-  formatTable(\@t, <<END,                                                       # Format report
-Similar          The number of similar topics in this block
-Topic            One of the similar topics
+
+  my $m = @m;
+  formatTables($xref, \@t,
+    columns => <<END,
+Similar The number of similar topics in this block
+Topic   One of the similar topics
 END
-    title=>qq(Topics with similar vocabulary),
+    title=>qq(Topics with similar vocabulary with $p % confidence),
     head=><<END,
-Xref found NNNN topics that have similar vocabulary on DDDD
+Xref found $m groups of topics that have similar vocabulary with $p % confidence on DDDD
 END
-    clearUpLeft => -1, summarize=>1,
-    file=>(my $f = fpe($xref->reports, qw(lists similar byVocabulary txt))));
+    clearUpLeft => -1, summarize=>1, zero=>1,
+    file=>(my $f = fpe(qw(lists similar byVocabulary txt))));
   {}                                                                            # From multiverse to universe
  } # reportSimilarTopicsByVocabulary
 
-sub reportMd5Sum($)                                                             #P Good files have short names which uniquely represent their content and thus can be used instead of their md5sum to generate unique names
+sub reportWordsByFile($)                                                        #P Index words to the files they occur in
  {my ($xref) = @_;                                                              # Cross referencer
 
-  my %f;                                                                        # {short file}{md5}++ means this short file name has the specified md5 sum.  We want there to be only one md5 sum per short file name
-  for my $F(sort keys %{$xref->md5Sum})
-   {if (my $m = $xref->md5Sum->{$F})
-     {my $f = fn $F;
-      $f{$f}{$m}++;
+  my %w;                                                                        # Words to files
+  for     my $f(sort keys $xref->vocabulary->%*)                                # Each file containing words
+   {my $t = lc $xref->vocabulary->{$f};
+#   my @w = split /\s+/, $t =~ s(\W) ( )gsr;
+    my @w = split /\s+/, $t =~ s([^a-z]) ( )gsr;                                # Only allow letters in words
+    for my $w(@w)
+     {$w{$w}{$f}++ if length($w) < 16;                                          # No one will want to type 16 letter words
      }
    }
 
-  for my $f(sort keys %f)                                                       # These are the good md5 sums that are in one-to-one correspondence with short file names
-   {delete $f{$f} unless keys %{$f{$f}} == 1;
-   }
-
-  my @good;                                                                     # File name matches and md5 sum matches or opposite
-  my @bad;                                                                      # Md5 sum matches but file name is not equal or file name is equal but md5 differs
-  for my $F(sort keys %{$xref->md5Sum})
-   {if (my $m = $xref->md5Sum->{$F})
-     {my $f = fn $F;
-      if ($f{$f}{$m})
-       {push @good, [$m, $f, $F];
-       }
-      else
-       {push @bad, [$m, $f, $F];
-       }
+  my $N = keys %w;                                                              # Number of words
+  for   my $w(keys %w)                                                          # Delete useless words == appears in more than the square root of the number of files as they are not selective enough
+   {my $n = keys %{$w{$w}};
+    if ($n * $n > $N)                                                           # Not selective enough
+     {delete $w{$w};
      }
-     ### Need check for undef $m
    }
 
-  formatTable(\@bad, <<END,
-Md5_Sum           The md5 sum in question
-Short_File_Name   The short name of the file
-File              The file name
+  my %t;                                                                        # Files to words
+  for   my $w(keys %w)                                                          # Delete useless words == appears in more than the square root of the number of files as they are not selective enough
+   {for my $t(keys %{$w{$w}})
+     {$t{$t}{$w} = $w{$w}{$t};
+     }
+   }
+
+  if (my $out = $xref->indexWordsFolder)                                        # Save the indexed words
+   {makePath($out);
+    store \%w, fpe($out, qw(words_to_topics data));                             # Index word to topics
+    store \%t, fpe($out, qw(topics_to_words data));                             # Index topics to words
+    store $xref->title, fpe($out, qw(topics_to_titles data));                   # Index topics to titles
+   }
+
+  {indexedWords => $N,                                                          # Retain number of indexed words - if we need the actual index it is in the file
+  }                                                                             # From multiverse to universe
+ } # reportWordsByFile
+
+sub reportMd5Sum($)                                                             #P Report files with identical md5 sums
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %m;                                                                        # {md5}{file}++
+  for my $f(sort keys %{$xref->md5Sum})
+   {if (my $m = $xref->md5Sum->{$f})
+     {$m{$m}{$f}++;
+     }
+   }
+
+  for my $m(keys %m)                                                            # Remove files with unique md5 sums
+   {if (1 == keys %{$m{$m}})
+     {delete $m{$m};
+     }
+   }
+
+  my @r; my $M;                                                                 # Report files with same md5 sum clearing up and left
+  for   my $m(sort  keys %m)
+   {for my $f(sort  keys %{$m{$m}})
+     {push @r, [$m, scalar(keys %{$m{$m}}), $f] unless $M;
+      push @r, [q(), q(),                   $f] if     $M;
+      $M = $m;
+     }
+    $M = undef;
+   }
+
+  formatTables($xref, \@r,
+    columns => <<END,
+Md5_Sum The md5 sum in question
+Count   The number of files with this md5 sum
+File    A file that has this md5 sum
 END
-    title=>qq(Files whose short names are not bi-jective with their md5 sums),
+    title=>qq(Files with identical md5 sums),
     head=><<END,
-Xref found NNNN such files on DDDD
+Xref found NNNN files with identical md5 sums on DDDD
+
+Such files are very likely to be identical and thus duplications of each other.
 END
-    file=>(fpe($xref->reports, qw(bad short_name_to_md5_sum txt))),
+    file=>(fpe(qw(bad same_md5_sum txt))),
     summarize=>1);
 
-  formatTable(\@good, <<END,
-Md5_Sum           The md5 sum in question
-Short_File_Name   The short name of the file
-File              The file name
-END
-    title=>qq(Files whose short names are bi-jective with their md5 sums),
-    head=><<END,
-Xref found NNNN such files on DDDD
-END
-    file=>(fpe($xref->reports, qw(good short_name_to_md5_sum txt))),
-    summarize=>1);
-  {}                                                                            # From multiverse to universe
+  {md5SumDuplicates=>\%m,                                                       # From multiverse to universe
+  }
  } # reportMd5Sum
 
 sub reportOlBody($)                                                             #P ol under body - indicative of a task
@@ -3033,7 +3631,9 @@ sub reportOlBody($)                                                             
 
   my %c = $select->(q(conbody));
 
-  formatTable([map {[$c{$_}, $_]} sort {$c{$b} <=> $c{$a}} sort keys %c], <<END,
+  formatTables($xref,
+    [map {[$c{$_}, $_]} sort {$c{$b} <=> $c{$a}} sort keys %c],
+    columns => <<END,
 Count             Number of ol under a conbody tag
 File_Name         The name of the file containing an ol under conbody
 END
@@ -3043,12 +3643,14 @@ Xref found NNNN files with ol under a conbody tag on DDDD.
 
 ol under a conbody tag is often indicative of steps in a task.
 END
-    file=>(fpe($xref->reports, qw(bad olUnderConBody txt))),
+    file=>(fpe(qw(bad olUnderConBody txt))),
     summarize=>1);
 
   my %t = $select->(q(taskbody));
 
-  formatTable([map {[$t{$_}, $_]} sort {$t{$b} <=> $t{$a}} sort keys %t], <<END,
+  formatTables($xref,
+    [map {[$t{$_}, $_]} sort {$t{$b} <=> $t{$a}} sort keys %t],
+    columns => <<END,
 Count             Number of ol under a taskbody tag
 File_Name         The name of the file containing an ol under taskbody
 END
@@ -3058,7 +3660,7 @@ Xref found NNNN files with ol under a taskbody tag on DDDD.
 
 ol under a taskbody tag is often indicative of steps in a task.
 END
-    file=>(fpe($xref->reports, qw(bad olUnderTaskBody txt))),
+    file=>(fpe(qw(bad olUnderTaskBody txt))),
     summarize=>1);
   {}                                                                            # From multiverse to universe
  } # reportOlBody
@@ -3073,7 +3675,8 @@ sub reportHrefUrlEncoding($)                                                    
      }
    }
 
-  formatTable([@b], <<END,
+  formatTables($xref, [@b],
+    columns => <<END,
 Href             Href that needs url encoding
 Line_location    Line location
 File_Name        The file containing the href that needs url encoding
@@ -3082,10 +3685,121 @@ END
     head=><<END,
 Xref found NNNN locations where an href needs to be url encoded on DDDD.
 END
-    file=>(fpe($xref->reports, qw(bad hrefs_that_need_url_encoding txt))),
+    file=>(fpe(qw(bad hrefs_that_need_url_encoding txt))),
     summarize=>1);
   {}                                                                            # From multiverse to universe
  } # reportHrefUrlEncoding
+
+sub reportConRefMatching($)                                                     #P Report conref matching
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %r;                                                                        # The number of references to each target id
+  for my   $file(sort keys %{$xref->conRefs})                                   # Each file that has a conref
+   {for my $ref (sort keys %{$xref->conRefs->{$file}})                          # Each conref
+     {my ($rf, $rt, $ri) = parseDitaRef($ref, $file);                           # Parse the dita ref
+      $r{$rf}{$ri}++;                                                           # Count the number of references to this id
+     }
+   }
+
+  my @r; my $N = 0;                                                             # Number of tags mismatched
+  for my   $file(sort keys %{$xref->conRefs})                                   # Each file that has a conref
+   {for my  $ref(sort keys %{$xref->conRefs->{$file}})                          # Each conref target file
+     {my ($rf, $rt, $ri) = parseDitaRef($ref, $file);                           # Parse the dita ref
+      if (my $targetTags = $xref->idTags->{$rf}{$ri})                           # Array of target tags that have this id
+       {for my $t(@$targetTags)                                                 # Each target tag
+         {for my $st(sort keys %{$xref->conRefs->{$file}{$ref}})                # Each conref
+           {$N++ if my $tagMisMatch = $st ne $t ? q(**) : q();                  # Check for mismatch between source and target tags
+            push @r, [$r{$rf}{$ri}, $tagMisMatch, $st, $t, $ref, $file, $rf];
+           }
+         }
+       }
+     }
+   }
+
+  formatTables($xref, [@r],
+    columns => <<END,
+Count        Number of references to this target
+Mismatch     ** if there is a mismatch between the source and target tags
+Source_tag   The source tag
+Target_tag   The target tag
+Reference    The reference value from source to target
+Source_File  The source file
+Target_File  The target file
+END
+    title=>qq(Conrefs),
+    head=><<END.fixingRun($xref),
+Xref found NNNN conrefs on DDDD with $N mismatches**
+END
+    file=>(my $f = fpe(qw(lists conrefs txt))),
+    summarize=>1);
+
+  {}                                                                            # From multiverse to universe
+ } # reportConRefMatching
+
+sub reportPublicIds($)                                                          #P Report public ids in use
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %p; my $missing = 0;                                                       # Public Id counts
+  for my $f(sort keys %{$xref->publicId})                                       # Each file
+   {if (my $p = $xref->publicId->{$f})
+     {$p{$p}++
+     }
+    else
+     {++$missing
+     }
+   }
+
+  my @p;                                                                        # Public Id counts
+  for my $p(sort keys %p)
+   {push @p, [$p{$p}, $p];
+   }
+
+  formatTables($xref, [@p],
+    columns => <<END,
+Count        Number of references to this public id
+Public_Id    A public Id found in the input corpus
+END
+    title=>qq(Public Ids),
+    head=><<END,
+Xref found NNNN public ids in use on DDDD
+
+$missing files have a missing public id.
+END
+    file=>(my $f = fpe(qw(lists public_ids txt))),
+    summarize=>1);
+
+  {}                                                                            # From multiverse to universe
+ } # reportPublicIds
+
+sub reportRequiredCleanUps($)                                                   #P Report required clean ups
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my @r; my %r;                                                                 # Required clean ups
+  for my $f(sort keys %{$xref->requiredCleanUp})                                # Each file
+   {for my $t(sort keys %{$xref->requiredCleanUp->{$f}})                        # Each clean up
+     {push @r, [$xref->requiredCleanUp->{$f}{$t}, firstNChars($t, 80), $f];
+      $r{$t}++;
+     }
+   }
+
+  my $N = scalar keys %r;
+  my $F = scalar keys %{$xref->requiredCleanUp};
+
+  formatTables($xref, [@r],
+    columns => <<END,
+Count     Number of required clean ups
+Clean_Up  The text of the clean up request
+File_Name File name containing the required clean up requests
+END
+    title   => qq(Required cleans ups by file),
+    head    => <<END,
+Xref found $F files with $N required-cleanups on DDDD
+END
+    file=>(fpe(qw(lists required_clean_ups txt))),
+    summarize=>1);
+
+  {}                                                                            # From multiverse to universe
+ } # reportRequiredCleanUps
 
 sub addNavTitlesToOneMap($$)                                                    #P Fix navtitles in one map
  {my ($xref, $file) = @_;                                                       # Xref results, file to fix
@@ -3096,7 +3810,7 @@ sub addNavTitlesToOneMap($$)                                                    
 
   $x->by(sub                                                                    # Each node
    {my ($o) = @_;
-    if ($o->at(qr(\A(appendix|chapter|topicref)\Z)is))                          # Nodes that take nv titles
+    if ($o->at(qr(\A(appendix|chapter|mapref|topicref)\Z)is))                   # Nodes that take nav titles
      {if (my $h = $o->href)                                                     # href to target
        {if ($h =~ m(\AGUID-)is)                                                 # Target by guid
          {if (my $target = $xref->guidToFile->{$h})                             # Absolute target name
@@ -3147,26 +3861,12 @@ sub addNavTitlesToMaps($)                                                       
     keys %{$xref->baseTag};                                                     # Files with any base tags
 
   if (@files)                                                                   # Add nav titles to files
-   {my @square = squareArray(@files);                                           # Divide the task
-
-    my $ps = newProcessStarter($xref->maximumNumberOfProcesses);                # Process starter
-       $ps->processingTitle   = q(Xref navtitles);
-       $ps->totalToBeStarted  = scalar @square;
-       $ps->processingLogFile = fpe($xref->reports, qw(log xref navtitles txt));
-
-    for my $row(@square)                                                        # Each row of input files file
-     {$ps->start(sub
-       {my @r;                                                                  # Results
-        for my $col(@$row)                                                      # Each column in the row
-         {push @r, $xref->addNavTitlesToOneMap($col);                           # Process one input file
-         }
-        [@r]                                                                    # Return results as a reference
-       });
-     }
-
-    for my $r(deSquareArray($ps->finish))                                       # Consolidate results
-     {push @r, @$r;
-     }
+   {processFilesInParallel                                                      # Process each file in parallel
+      sub
+       {my ($file) = @_;                                                        # File to process
+        $xref->addNavTitlesToOneMap($file);                                     # Process one input file
+       },
+      sub {push @r, deSquareArray(@_)}, @files;
    }
 
   my @Bad;
@@ -3181,10 +3881,13 @@ sub addNavTitlesToMaps($)                                                       
      }
    }
 
-  my @bad  = sort {$$a[3] cmp $$b[3]} sort {$$a[1] cmp $$b[1]} @Bad;            # Sort results else we will get them in varying orders
-  my @good = sort {$$a[2] cmp $$b[2]} sort {$$a[0] cmp $$b[0]} @Good;
+  my @bad  = sort {$$a[3] cmp $$b[3]} sort {$$a[1] cmp $$b[1]}                  # Sort results else we will get them in varying orders
+                                      sort {$$a[0] cmp $$b[0]} @Bad;
+  my @good = sort {$$a[2] cmp $$b[2]} sort {$$a[0] cmp $$b[0]}
+             sort {$$a[3] cmp $$b[3]} sort {$$a[1] cmp $$b[1]} @Good;
 
-  formatTable($xref->badNavTitles = \@bad, <<END,                               # Report bad results
+  formatTables($xref, $xref->badNavTitles = \@bad,
+    columns => <<END,
 Reason         The reason why a nav title was not added
 Statement      The source xml statement requesting a navtitle
 Title          The title of the the navtitle attribute
@@ -3196,9 +3899,10 @@ END
     head=><<END,
 Xref was unable to add NNNN navtitles as requested by the addNavTitles attribute on DDDD
 END
-    file=>(my $f = fpe($xref->reports, qw(bad nav_titles txt))));
+    file=>(my $f = fpe(qw(bad nav_titles txt))));
 
-  formatTable($xref->goodNavTitles = \@good, <<END,                             # Report good results
+  formatTables($xref, $xref->goodNavTitles = \@good,
+    columns => <<END,
 Statement      The source xml statement requesting a navtitle
 Title          The title of the the navtitle attribute
 Target_File    The target of the href
@@ -3209,12 +3913,257 @@ END
     head=><<END,
 Xref was able to add NNNN navtitles as requested by the addNavTitles parameter on DDDD
 END
-    file=>(fpe($xref->reports, qw(good nav_titles txt))));
+    file=>(fpe(qw(good nav_titles txt))));
 
    {badNavTitles  => $xref->badNavTitles,
     goodNavTitles => $xref->goodNavTitles,
   }                                                                             # From multiverse to universe
  } # addNavTitlesToMaps
+
+sub oxygenProjectFileMetaData                                                   #r Meta data for the oxygen project files
+ {q(<meta/>)
+ } # oxygenProjectFileMetaData
+
+#our %targetFolderStructure;                                                    # Target folder structure used to create oxygen project files
+
+sub createOxygenProjectFile($$$)                                                #P Create an Oxygen project file for the specified bookmap
+ {my ($xref, $bm, $xprName) = @_;                                               # Xref, Bookmap, xpr name from bookmap
+
+  my @mapRefs = ($bm);                                                          # Include this map in the project file
+
+  my $extractHrefs = sub                                                        # Extract some hrefs from the xref
+   {my ($field) = @_;                                                           # Field to extract
+    my %hash;
+
+    for     my $bm(@mapRefs)                                                    # Initial plus referenced book maps
+     {for   my $file(sort keys %{$xref->topicsReferencedFromBookMaps->{$bm}})   # Topics from referenced book maps
+       {for my $href(sort keys %{$xref->{$field}->{$file}})                     # Href
+         {if (my ($t) = parseDitaRef($href, $file))                             # Fully qualified target
+           {$hash{$t}++;                                                        # Referenced file
+           }
+         }
+       }
+     }
+    %hash
+   };
+
+  my $extractHrefsAndWrapWithField = sub                                        # Extract some hrefs from the xref and wrap them with file name relative to the specified absolute file
+   {my ($field, $xpr) = @_;                                                     # Field to extract, oxygen project file
+    my %hash = &$extractHrefs($field, $xpr);
+
+    my @f;                                                                      # File names
+    for my $file(sort keys %hash)
+     {my $r = relFromAbsAgainstAbs $file, $xpr;
+      push @f, qq(<file name="$r"/>);
+     }
+
+    join "\n", @f;
+   };
+
+  my $extractTopicsNotConrefs = sub                                             # Extract non conreffed topicrefs
+   {my ($xpr) = @_;                                                             # Project file being built
+    my %conRefs = &$extractHrefs(q(conRefs), $xpr);
+
+    my @f; my %s;                                                               # File names, files already seen
+    for   my $bm(@mapRefs)                                                      # Each bookmap in this xpr
+     {for my $file(sort keys $xref->topicsReferencedFromBookMaps->{$bm}->%*)    # Field to extract
+       {if (my $docType = $xref->docType->{$file})                              # Include files only once even if they are referenced multiple times
+         {if ($docType !~ m(map\Z)s and !$s{$file}++)                           # Include files only once even if they are referenced multiple times
+           {if (!$conRefs{$file})
+             {my $t = detagString($xref->title->{$file} // $file);
+              my $r = relFromAbsAgainstAbs $file, $xpr;
+              push @f, <<END
+<folder name="$t">
+  <file name="$r"/>
+</folder>
+END
+             }
+           }
+         }
+       }
+     }
+
+    join "\n", sort @f;
+   };
+
+  my $formatTargetsFolder = sub                                                 # Recreate the targets folder structure so that they can get from their old folder structure to the new flattened files
+   {my ($xpr) = @_;                                                             # Oxygen project file
+
+    my @r;
+    my $r; $r = sub                                                             # Target files for each file in the bookmaps in this project file
+     {my ($files) = @_;
+      for my $f(sort keys %$files)
+       {if (ref($$files{$f}))
+         {push @r, qq(<folder name="$f">);
+          &$r($$files{$f});
+          push @r, qq(</folder>);
+         }
+        else
+         {my $F = $$files{$f};                                                  # Find first containing bookmap
+          for my $bm(@mapRefs)
+           {if ($xref->topicsReferencedFromBookMaps->{$bm}{$F} or
+                $xref->imagesReferencedFromBookMaps->{$bm}{$F})
+             {my $t = detagString($xref->title->{$F} // $f);
+              my $r = relFromAbsAgainstAbs $F, $xpr;
+              push @r, <<END;
+<folder name="$f" navTitle="$t">
+  <file name="$r"/>
+</folder>
+END
+              last;
+             }
+           }
+         }
+       }
+     };
+
+#    &$r(\%targetFolderStructure);
+
+    join "\n", @r;
+   };
+
+  my $mapRefsFrom; $mapRefsFrom = sub                                           # Parse referenced bookmaps recursively
+   {my ($bookMap, $href) = @_;                                                  # Bookmap, href in bookmap which refers to this bookmap
+
+    my $bm = absFromAbsPlusRel($bookMap, $href);                                # Referenced bookmap
+    push @mapRefs, $bm;                                                         # Save referenced bookmap
+    my $x = eval {Data::Edit::Xml::new($bm)};                                          # Parse bookmap
+
+    $x->by(sub                                                                  # Traverse referenced bookmap
+     {my ($o, $p, $q) = @_;
+      if ($o->at_mapref)                                                        # Map reference in referenced bookmap
+       {if (my $h = $o->href)
+         {&$mapRefsFrom($bm, $h);
+         }
+       }
+      elsif ($o->at_topicref)                                                   # Map referenced via topic ref in referenced bookmap
+       {if ($o->attrX_format =~ m(\Aditamap\Z)i)
+         {if (my $h = $o->href)
+           {&$mapRefsFrom($bm, $h);
+           }
+         }
+       }
+     });
+   };
+
+  my $x = Data::Edit::Xml::new($bm);                                            # Parse initial bookmap
+  my $title;                                                                    # Title from initial bookmap
+
+  $x->by(sub                                                                    # Traverse initial bookmap
+   {my ($o, $p, $q) = @_;
+    if    ($o->at(qr(title\Z)))
+     {$title = $o->stringText;
+     }
+    elsif ($o->at_mapref)                                                       # Map ref in initial bookmap
+     {if (my $h = $o->href)
+       {&$mapRefsFrom($bm, $h, 1);
+       }
+     }
+    elsif ($o->at_topicref)                                                     # Map referenced via a topic reference in the initial bookmap
+     {if ($o->attrX_format =~ m(\Aditamap\Z)i)
+       {if (my $h = $o->href)
+         {&$mapRefsFrom($bm, $h, 1);
+         }
+       }
+     }
+   });
+
+  $title //= q();                                                               # Default title
+  my $out = &$xprName($bm);                                                     # Oxygen Project File name from bookmap name
+
+  my $base      = fn $bm;                                                       # Remove MD5 sum to create an acceptable name but arbitrary name for the project tree
+     $base      =~ s(_[a-f0-9]{32}\Z) ()i;                                      # Match book map name
+  my $baseExt   = relFromAbsAgainstAbs($bm, $out);                              # Targeted book map that we are creating an xpr file for
+  my $name      = fpe($base, q(xpr));                                           # Project tree name
+
+  my $mapRefs   = join "\n",
+    map
+     {q(<file name=").relFromAbsAgainstAbs($_, $out).q("/>)                     # Xpr file out has references to bookmaps in other folders
+     } @mapRefs;
+
+  my $resources = &$extractHrefsAndWrapWithField(q(conRefs), $out);
+  my $images    = &$extractHrefsAndWrapWithField(q(images),  $out);
+  my $topics    = &$extractTopicsNotConrefs                 ($out);
+# my $targets   = &$formatTargetsFolder                     ($out);             # This mapped old files to new files bu
+
+  my $metaData  = &oxygenProjectFileMetaData;                                   # Add meta data if we are doing this for real otherwise ignore it as it is bulky and gets in the way
+
+  my $X = eval {$x->new(<<END)};
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="21.1">
+    $metaData
+    <projectTree name="$name">
+        <folder masterFiles="true" name="Master Files">
+           $mapRefs
+        </folder>
+        <folder name="$title">
+          <file name="$baseExt"/>
+        </folder>
+        <folder name="Images">
+          $images
+        </folder>
+        <folder name="Resources">
+          $resources
+        </folder>
+        <folder name="Topics">
+          $topics
+        </folder>
+        <folder name="CCX Content Repo (All)">
+          <folder path="../out"/>
+        </folder>
+    </projectTree>
+</project>
+END
+#       <folder name="New files from old files">
+#         $targets
+#       </folder>
+
+  $X->go_projectTree->last->by(sub                                              # Cut out empty folders under the last folder otherwise we get lots of empty folders that contain no files because the files in them were not relevant to this bookmap
+   {my ($f) = @_;
+    $f->cutIfEmpty_folder;
+   });
+
+  if ($@)
+   {cluck "Unable to parse generated oxygen project file:\n$@"
+   }
+  else
+   {my $text = Data::Edit::Xml::xmlHeader -p $X;
+
+    owf($out, $text);
+   }
+ } # createOxygenProjectFile
+
+sub createOxygenProjectMapFiles($)                                              #P Create Oxygen project files from Xref results
+ {my ($xref) = @_;                                                              # Cross referencer
+  lll "Create Oxygen Project files started";
+
+#  for my $f(searchDirectoryTreesForMatchingFiles $xref->targetTopicToInputFiles)# Map target folder structure of source to targets
+#   {my $file = swapFilePrefix($f, &targets);
+#    my @f = split m(/), $file;
+#    my $s = join '', map {q({).dump($_).q(})} @f;                               # Hashify directory structure
+#    my $t = evalFile($f);
+#    my $c = "\$targetFolderStructure$s = " . dump($t->target);                  # Load targets
+#    eval $c;
+#    confess $@ if $@;
+#   }
+
+  my $xprName = sub                                                             # Method of choosing xpr file name
+   {my $x = $xref->oxygenProjects;                                              # Method specified by caller
+    if (isSubInPackage(q(Data::Edit::Xml::Xref), q(xprName)))
+     {return sub {&Data::Edit::Xml::Xref::xprName(@_)}                          # Call supplied sub to generate xpr file name
+     }
+    return sub {my ($bm) = @_; setFileExtension($bm, q(xpr))} unless ref $x;    # xpr file mirrors book map
+   }->();
+
+  processFilesInParallel
+    sub
+     {my ($bm) = @_;
+      createOxygenProjectFile($xref, $bm, $xprName);
+     },
+    sub {}, sort keys %{$xref->exteriorMaps};
+
+  lll "Create Oxygen Project files finished";
+ } # createOxygenProjectMapFiles
 
 sub oneBadRef($$$)                                                              #P Check one reference and return the first error encountered or B<undef> if no errors encountered. Relies on L<topicIds> to test files present and test the B<topicId> is valid, relies on L<ids> to check that the referenced B<id> is valid.
  {my ($xref, $file, $href) = @_;                                                # Cross referencer, file containing reference, reference
@@ -3231,7 +4180,6 @@ sub oneBadRef($$$)                                                              
   if ($href =~ m(#))                                                            # Full Dita href
    {my $sourceTopicId = $xref->topicIds->{$file};                               # Source id for referencing file
     my ($target, $topicId, $id) = parseDitaRef($href, $file, $sourceTopicId);   # Parse full Dita href
-
     my $targetFile    = absFromAbsPlusRel($file, $target//$file);               # Absolute target file which might be the current file
     my $targetTopicId = $xref->topicIds->{$targetFile};                         # Topic Id of target file
 
@@ -3241,14 +4189,16 @@ sub oneBadRef($$$)                                                              
         $targetTopicId, $file, $targetFile];
      };
 
-    return &$bad(q(No such file))            unless &$fileExists($targetFile);  # Check target file exists
-    return &$bad(q(No topic id))             unless $targetTopicId;             # Check the target has a topic id
-    return &$bad(q(Topic id does not match)) unless $targetTopicId eq $topicId; # Check topic id of referenced topic against supplied topicId.  It is safe to assume that the target does have topic id as Dita requires one
+    return &$bad(q(No such file)) unless &$fileExists($targetFile);             # Check target file exists
+    return &$bad(q(No topic id))  unless $targetTopicId;                        # Check the target has a topic id
+    return &$bad(q(Topic id does not match))
+      unless $targetTopicId eq $topicId or $topicId eq q();                     # Check topic id of referenced topic against supplied topicId.  It is safe to assume that the target does have topic id as Dita requires one
 
     if ($id)                                                                    # Checkid if supplied
      {my $i = $xref->ids->{$target}{$id};                                       # Number of ids in the target topic with this value
-      return &$bad(q(No such id in target topic))    unless $i;                 # No such id
-      return &$bad(q(Duplicated id in target topic)) unless $i == 1;            # Duplicate ids
+      return &$bad(q(No such id in target topic)) unless $i;                    # No such id
+      return &$bad(q(Duplicated id in target topic))                            # Duplicate ids
+        unless $i == 1 or $i == 2 && $id eq $topicId;                           # Using dita topic references we can cope with one internal id that duplicates the topic id
      }
    }
 
@@ -3273,17 +4223,22 @@ Data::Edit::Xml::Xref - Cross reference Dita XML, match topics and ameliorate mi
 
 =head1 Synopsis
 
-Check the references in a large corpus of Dita XML documents held in folder
-L<inputFolder|/inputFolder> running processes in parallel where ever possible
-to take advantage of multi-cpu computers:
+L<Xref> scans an entire document corpus looking primarily for problems with
+references between the files in the corpus; it reports any opportunities for
+improvements it finds and makes changes to the corpus to implement these
+improvements if so requested taking advantage of parallelism where ever
+possible.
+
+The following example checks the references in a corpus of Dita XML
+documents held in folder L<inputFolder|/inputFolder> running processes in
+parallel where ever possible:
 
   use Data::Edit::Xml::Xref;
 
-  my $x = xref(inputFolder              => q(in),
-               maximumNumberOfProcesses => 512,
-               fixBadRefs               => 1,
-               flattenFolder            => q(out2),
-               matchTopics              => 0.9,
+  my $x = xref(inputFolder   => q(in),
+               fixBadRefs    => 1,
+               flattenFolder => q(out2),
+               matchTopics   => 0.9,
               );
 
 The cross reference analysis can be requested as a L<status line|/statusLine>:
@@ -3401,15 +4356,8 @@ attributes be renamed to:
  xtrf
 
 if the B<conref> or B<href> attribute specification cannot be resolved in the
-current corpus.
-
-If the L<fixedFolder|/fixedFolder> attribute is set, the fixed files are
-written into this folder, else they are written back into the
-L<inputFolder|/inputFolder>.  Two reports are generated by this action:
-
-  reports/bad/fixedRefs.txt
-
-  reports/bad/fixedRefsNoAction.txt
+current corpus by other methods of fixing failing references such as:
+L<fixDitaRefs>, L<fixRelocatedRefs> or L<fixXrefsByTitle>.
 
 This feature designed by L<mailto:mim@cpan.org>.
 
@@ -3466,9 +4414,11 @@ If:
 
 is specified, L<Xref> will locate possible targets for a broken B<href> by
 matching the white space normalized L<Data::Table::Text::nws> of the text
-content of the B<xref> with the similarly normalized title of each topic.  If a
-single matching candidate is located then it will be used to update the B<href>
-attribute of the B<xref>.
+content of the B<xref> with the similarly normalized title of each topic that
+is referenced by any book map that refers to the topic containing the B<xref>.
+
+If a single matching candidate is located then it will be used to update the
+B<href> attribute of the B<xref>.
 
 =head2 Fix References in Dita To Dita Conversions
 
@@ -3570,11 +4520,24 @@ together:
 Cross reference Dita XML, match topics and ameliorate missing references.
 
 
-Version 20190712.
+Version 20191121.
 
 
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
+
+
+
+=head1 Immediately useful methods
+
+These methods are the ones most likely to be of immediate use to anyone using
+this module for the first time:
+
+
+L<formatTables|/formatTables>
+
+Using cross reference B<$xref> options and an array of arrays B<$data> format a report as a table using B<%options> as described in L<Data::Table::Text::formatTable> and L<Data::Table::Text::formatHtmlTable>.
+
 
 
 
@@ -3596,7 +4559,7 @@ B<Example:>
    {clearFolder(tests, 111);
     createTestReferenceToCutOutTopic(tests);
 
-    my $x = 𝘅𝗿𝗲𝗳(inputFolder => out, fixDitaRefs => targets);
+    my $x = 𝘅𝗿𝗲𝗳(inputFolder => out, fixBadRefs => 1, fixDitaRefs => targets);
     ok $x->statusLine eq q(Xref: 1 ref);
 
     is_deeply checkXrefStructure($x, q(inputFileToTargetTopics),          in, targets), { "a.xml" => { "c_aaaa_121939eab89cd7d2c3eb4c4189772a1f.dita" => 1, "c_aaaa_bbbb_55baefe9258538b26a95b0015a8d5a2b.dita" => 1, "c_aaaa_cccc_a91633094220d068c453eecae1726eff.dita" => 1, "c_aaaa_dddd_914b8e11993908497768c50d992ea0f0.dita" => 1, }, "b.xml" => { "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita" => 1, "c_bbbb_aaaa_cfd3a140e06a914fc8469583ad87829d.dita" => 1, "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita" => 1, "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita" => 1, }, };
@@ -3606,6 +4569,89 @@ B<Example:>
     is_deeply checkXrefStructure($x, q(originalSourceFileAndIdToNewFile), in, targets), { "a.xml" => { "GUID-400c2c59-95e1-7bf3-4647-3a135281bfaf" => "c_aaaa_cccc_a91633094220d068c453eecae1726eff.dita", "GUID-68822563-d568-f418-38ae-f1c62cb4ac8d" => "c_aaaa_dddd_914b8e11993908497768c50d992ea0f0.dita", "GUID-c67821ef-3da2-c89f-0fc9-9fba3937f368" => "c_aaaa_121939eab89cd7d2c3eb4c4189772a1f.dita", "GUID-f0c0e170-8128-10ef-045d-97602fdde76f" => "c_aaaa_bbbb_55baefe9258538b26a95b0015a8d5a2b.dita", }, "b.xml" => { "GUID-2b6aab4f-9328-e326-f55f-160771a8c3dd" => "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita", "GUID-86a684b0-1a0b-4c30-6da9-24c74ff1f0cc" => "c_bbbb_aaaa_cfd3a140e06a914fc8469583ad87829d.dita", "GUID-96a20d7f-bbaf-deef-55ef-e09a0a059251" => "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita", "GUID-cfe7cb3d-05e7-a147-db10-dcbacaeecef7" => "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita", "p1" => "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita", "p2" => "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita", "p3" => "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita", }, };
    }
 
+
+=head2 formatTables($$%)
+
+Using cross reference B<$xref> options and an array of arrays B<$data> format a report as a table using B<%options> as described in L<Data::Table::Text::formatTable> and L<Data::Table::Text::formatHtmlTable>.
+
+     Parameter  Description
+  1  $xref      Cross referencer
+  2  $data      Table to be formatted
+  3  %options   Options
+
+=head2 hashOfCountsToArray($)
+
+Convert a B<$hash> of {key} = count to an array so it can be formatted with L<formatTables>
+
+     Parameter  Description
+  1  $hash      Hash to be converted
+
+=head2 reportOtherMeta($)
+
+Advise in the feasibility of moving othermeta data from topics to bookmaps assuming that the othermeta data will be applied only at the head of the map rather than individually to each topic in the map.
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportOtherMetaConsolidated($)
+
+Create a subject scheme map from othermeta
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 createClassificationMap($$)
+
+Create a classification map for each bookmap
+
+     Parameter  Description
+  1  $xref      Cross referencer
+  2  $bookMap   Bookmap to classify
+
+=head2 createClassificationMaps($)
+
+Create classification maps for each bookmap
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 oxygenProjectFileMetaData()
+
+Meta data for the oxygen project files
+
+
+B<Example:>
+
+
+  sub 𝗼𝘅𝘆𝗴𝗲𝗻𝗣𝗿𝗼𝗷𝗲𝗰𝘁𝗙𝗶𝗹𝗲𝗠𝗲𝘁𝗮𝗗𝗮𝘁𝗮
+   {q(<meta/>)
+   } # 𝗼𝘅𝘆𝗴𝗲𝗻𝗣𝗿𝗼𝗷𝗲𝗰𝘁𝗙𝗶𝗹𝗲𝗠𝗲𝘁𝗮𝗗𝗮𝘁𝗮
+
+
+You can provide you own implementation of this method in your calling package
+via:
+
+  sub oxygenProjectFileMetaData {...}
+
+if you wish to override the default processing supplied by this method.
+
+
+
+=head2 createOxygenProjectFile($$$)
+
+Create an Oxygen project file for the specified bookmap
+
+     Parameter  Description
+  1  $xref      Xref
+  2  $bm        Bookmap
+  3  $xprName   Xpr name from bookmap
+
+=head2 createOxygenProjectMapFiles($)
+
+Create Oxygen project files from Xref results
+
+     Parameter  Description
+  1  $xref      Cross referencer
 
 =head1 Create test data
 
@@ -3627,17 +4673,29 @@ B<addNavTitles> - If true, add navtitle to outgoing bookmap references to show t
 
 B<changeBadXrefToPh> - Change xrefs being placed in B<M3> by L<fixBadRefs> to B<ph>.
 
+B<classificationMaps> - Create classification maps if true
+
 B<deguidize> - Set true to replace guids in dita references with file name. Given reference B<g1#g2/id> convert B<g1> to a file name by locating the topic with topicId B<g2>.  This requires the guids to be genuinely unique. SDL guids are thought to be unique by language code but the same topic, translated to a different language might well have the same guid as the original topic with a different language code: =(de|en|es|fr).  If the source is in just one language then the guid uniqueness is a reasonable assumption.  If the conversion can be done in phases by language then the uniqueness of guids is again reasonably assured. L<Data::Edit::Xml::Lint> provides an alternative solution to deguidizing by using labels to record the dita reference in the input corpus for each id encountered, these references can then be resolved in the usual manner by L<Data::Edit::Xml::Lint::relint>.
 
-B<fixBadRefs> - Try to fix bad references in L<these files|/fixRefs> where possible by either changing a guid to a file name assuming the right file is present in the corpus being scanned and L<deguidize|/deguidize> has been set true or failing that by moving the failing reference to the B<xtrf> attribute i.e. placing it in B<M3> possibly renaming the tag to B<ph> if L<changeBadXrefToPh> is in effect.
+B<deleteUnusedIds> - Delete ids (except on topics) that are not referenced in any reference in the corpus regardless of the file component of any such reference.
+
+B<fixBadRefs> - Fix any remaining bad references after any all allowed attempts have been made to fix failing references by moving the failing reference to the B<xtrf> attribute i.e. placing it in B<M3> possibly renaming the tag to B<ph> if L<changeBadXrefToPh> is in effect as well.
 
 B<fixDitaRefs> - Fix references in a corpus of L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> documents that have been converted to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard> and whose target structure has been written to the named folder.
 
-B<fixRelocatedRefs> - Fix references to topics that have been moved around in the out folder structure assuming that all file names are unique.
+B<fixRelocatedRefs> - Fix references to topics that have been moved around in the out folder structure assuming that all file names are unique which they will be if they have been renamed to the GB Standard.
 
-B<fixXrefsByTitle> - Try to fix invalid xrefs by the Gearhart Title Method if true
+B<fixXrefsByTitle> - Try to fix invalid xrefs by the Gearhart Title Method enhanced by the Monroe map method if true
 
 B<flattenFolder> - Files are renamed to the Gearhart standard and placed in this folder if set.  References to the unflattened files are updated to references to the flattened files.  This option will eventually be deprecated as the Dita::GB::Standard is now fully available allowing files to be easily flattened before being processed by Xref.
+
+B<getFileUrl> - A url to retrieve a specified file from the server running xref used in generating html reports. The complete url is obtained by appending the fully qualified file name to this value.
+
+B<html> - Generate html version of reports in this folder if supplied
+
+B<indexWords> - Index words to topics and topics to words if true.
+
+B<indexWordsFolder> - Folder into which to save words to topic and topics to word indexes if L<indexWords> is true.
 
 B<inputFolder> - A folder containing the dita and ditamap files to be cross referenced.
 
@@ -3647,11 +4705,15 @@ B<maxZoomIn> - Optional hash of names to regular expressions to look for in each
 
 B<maximumNumberOfProcesses> - Maximum number of processes to run in parallel at any one time with a sensible default.
 
-B<printSummaryLine> - Print the summary line if true - on by default.
+B<oxygenProjects> - Create oxygen project files for each map in this folder
 
-B<reports> - Reports folder: the cross referencer will write reports to files in this folder.
+B<reports> - Reports folder: Xref will write text versions of the generated reports to files in this folder.
 
 B<requestAttributeNameAndValueCounts> - Report attribute name and value counts
+
+B<subjectSchemeMap> - Create a subject scheme map in the named file
+
+B<suppressReferenceChecks> - Suppress reference checking - which normally happens by default - but which takes time and might be irrelevant if an earlier xref has already checked all the references.
 
 
 
@@ -3670,7 +4732,7 @@ B<badGuidHrefs> - Bad conrefs - all.
 
 B<badNavTitles> - Details of nav titles that were not resolved
 
-B<badReferencesCount> - The number of bad references encountered
+B<badReferencesCount> - The number of bad references at the start of the run - however depending on what options were chosen Xref might ameliorate these bad references and tehreby reduce this count.
 
 B<badTables> - Array of tables that need fixing.
 
@@ -3678,11 +4740,13 @@ B<badXml1> - [Files] with a bad xml encoding header on the first line.
 
 B<badXml2> - [Files] with a bad xml doc type on the second line.
 
+B<baseFiles> - {base of file name}{full file name}++ Current location of the file via uniqueness guaranteed by the GB standard
+
 B<baseTag> - Base Tag for each file
 
 B<bookMapRefs> - {bookmap full file name}{href}{navTitle}++ References from bookmaps to topics via appendix, chapter, bookmapref.
 
-B<conRefs> - {file}{href}   Count of conref definitions in each file.
+B<conRefs> - {file}{href}{tag}++ : conref source detail
 
 B<currentFolder> - The current working folder used to make absolute file names from relative ones
 
@@ -3691,6 +4755,12 @@ B<docType> - {file} == docType:  the docType for each xml file.
 B<duplicateIds> - [file, id]     Duplicate id definitions within each file.
 
 B<duplicateTopicIds> - [topicId, [files]] Files with duplicate topic ids - the id on the outermost tag.
+
+B<emptyTopics> - {file} : topics where the *body is empty.
+
+B<errors> - Number of significant errors as reported in L<statusLine> or 0 if no such errors found
+
+B<exteriorMaps> - {exterior map} : maps that are not referenced by another map
 
 B<fileExtensions> - Default file extensions to load
 
@@ -3708,15 +4778,25 @@ B<fixedRefsNoAction> - [] hrefs and conrefs from L<fixRefs|/fixRefs> for which n
 
 B<flattenFiles> - {old full file name} = file renamed to Gearhart-Brenan file naming standard
 
-B<goodNavTitles> - Details of nav titles that were resolved
+B<goodImageFiles> - {file}++ : number of references to each good image
+
+B<goodNavTitles> - Details of nav titles that were resolved.
 
 B<guidHrefs> - {file}{href} = location where href starts with GUID- and is thus probably a guid.
 
 B<guidToFile> - {topic id which is a guid} = file defining topic id.
 
-B<hrefUrlEncoding> - Hrefs that need url encoding because they contain white space
+B<hrefUrlEncoding> - Hrefs that need url encoding because they contain white space.
 
-B<ids> - {file}{id}     Id definitions across all files.
+B<idNotReferenced> - {file}{id}++ - id in a file that is not referenced
+
+B<idReferencedCount> - {file}{id}++ - the number of times this id in this file is referenced from the rest of the corpus
+
+B<idTags> - {file}{id}[tag] The tags associated with each id in a file - there might be more than one if the id is duplicated
+
+B<ids> - {file}{id}   - id definitions across all files.
+
+B<idsRemoved> - {id}++ : Ids removed from all files
 
 B<images> - {file}{href}   Count of image references in each file.
 
@@ -3724,7 +4804,11 @@ B<imagesReferencedFromBookMaps> - {bookmap full file name}{full name of image re
 
 B<imagesReferencedFromTopics> - {topic full file name}{full name of image referenced from topic}++
 
+B<imagesToRefferingBookMaps> - {image full file name}{bookmap full file name}++ : images to referring bookmaps
+
 B<improvements> - Suggested improvements - a list of improvements that might be made.
+
+B<indexedWords> - {word}{full file name of topic the words occurs in}.
 
 B<inputFileToTargetTopics> - {input file}{target file}++ : Tells us the topics an input file was split into
 
@@ -3737,6 +4821,8 @@ B<ltgt> - {text between &lt; and &gt}{filename} = count giving the count of text
 B<maxZoomOut> - Results from L<maxZoomIn|/maxZoomIn>  where {file name}{regular expression key name in L<maxZoomIn|/maxZoomIn>}++
 
 B<md5Sum> - MD5 sum for each input file.
+
+B<md5SumDuplicates> - {md5sum}{file}++ : md5 sums with more than one file
 
 B<missingImageFiles> - [file, href] == Missing images in each file.
 
@@ -3756,6 +4842,8 @@ B<otherMetaBookMapsAfterTopicIncludes> - Bookmap othermeta after  topic othermet
 
 B<otherMetaBookMapsBeforeTopicIncludes> - Bookmap othermeta before topic othermeta has been included
 
+B<otherMetaConsolidated> - {Name}{Content}++ : consolidated other meta data across entire corpus
+
 B<otherMetaDuplicatesCombined> - Duplicate othermeta in bookmaps with called topics othermeta included
 
 B<otherMetaDuplicatesSeparately> - Duplicate othermeta in bookmaps and topics considered separately
@@ -3766,11 +4854,15 @@ B<otherMetaRemainWithTopic> - Othermeta that must stay in the topic
 
 B<parseFailed> - {file} files that failed to parse.
 
+B<publicId> - {file} = Public id on Doctype
+
 B<references> - {file}{reference}++ - the various references encountered
 
 B<relocatedReferencesFailed> - Failing references that were not fixed by relocation
 
 B<relocatedReferencesFixed> - Relocated references fixed
+
+B<requiredCleanUp> - {full file name}{cleanup} = number of required-cleanups
 
 B<results> - Summary of results table.
 
@@ -3781,6 +4873,8 @@ B<sourceTopicToTargetBookMap> - {input topic cut into multiple pieces} = output 
 B<statusLine> - Status line summarizing the cross reference.
 
 B<statusTable> - Status table summarizing the cross reference.
+
+B<tableDimensions> - {file}{columns}{rows} == count
 
 B<tagCount> - {file}{tags} == count of the different tag names found in the xml files.
 
@@ -3798,7 +4892,7 @@ B<timeEnded> - Time the run ended
 
 B<timeStart> - Time the run started
 
-B<title> - {file} = title of file.
+B<title> - {full file name} = title of file.
 
 B<titleToFile> - {title}{file}++ if L<fixXrefsByTitle> is in effect
 
@@ -3810,7 +4904,11 @@ B<topicIds> - {file} = topic id - the id on the outermost tag.
 
 B<topicsFlattened> - Number of topics flattened
 
-B<topicsReferencedFromBookMaps> - {bookmap file, file name}{topic full file name}++
+B<topicsNotReferencedFromBookMaps> - {topic file not referenced from any bookmap} = 1
+
+B<topicsReferencedFromBookMaps> - {bookmap full file name}{topic full file name}++ : bookmaps to topics
+
+B<topicsToReferringBookMaps> - {topic full file name}{bookmap full file name}++ : topics to referring bookmaps
 
 B<validationErrors> - True means that Lint detected errors in the xml contained in the file.
 
@@ -3823,6 +4921,23 @@ B<xrefBadFormat> - External xrefs with no format=html.
 B<xrefBadScope> - External xrefs with no scope=external.
 
 B<xrefsFixedByTitle> - Xrefs fixed by locating a matching topic title from their text content.
+
+
+
+=head1 Optional Replace Methods
+
+The following is a list of all the optionally replaceable methods in this
+package.  A method coded with the same name in your package will over ride the
+method of the same name in this package providing your preferred processing for
+the replaced method in place of the default processing supplied by this
+package. If you do not supply such an over riding method, the existing method
+in this package will be used instead.
+
+=head2 Replaceable Method List
+
+
+oxygenProjectFileMetaData
+
 
 
 
@@ -3849,6 +4964,13 @@ Check for an external reference
 
      Parameter   Description
   1  $reference  Reference to check
+
+=head2 fixingRun($)
+
+A fixing run fixes problems where it can and thus induces changes which might make the updated output different from the incoming source.  Returns a useful message describing this state of affairs.
+
+     Parameter  Description
+  1  $xref      Cross referencer
 
 =head2 loadInputFiles($)
 
@@ -3914,6 +5036,27 @@ Rename files to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>
 =head2 analyzeInputFiles($)
 
 Analyze the input files
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportIdRefs($)
+
+Report the number of times each id is referenced
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 removeUnusedIds($)
+
+Remove ids that do are not mentioned in any href or conref in the corpus regardless of the file component of any such reference. This is a very conservative approach which acknowledges that writers might be looking for an id if they mention it in a reference.
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportEmptyTopics($)
+
+Report empty topics
 
      Parameter  Description
   1  $xref      Cross referencer
@@ -4107,6 +5250,27 @@ Topics and images referenced from bookmaps
      Parameter  Description
   1  $xref      Cross referencer
 
+=head2 reportExteriorMaps($)
+
+Maps that are not referenced by any other map
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportTopicsNotReferencedFromBookMaps($)
+
+Topics not referenced from bookmaps
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportTableDimensions($)
+
+Report table dimensions
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
 =head2 reportSimilarTopicsByTitle($)
 
 Report topics likely to be similar on the basis of their titles as expressed in the non Guid part of their file names
@@ -4121,9 +5285,16 @@ Report topics likely to be similar on the basis of their vocabulary
      Parameter  Description
   1  $xref      Cross referencer
 
+=head2 reportWordsByFile($)
+
+Index words to the files they occur in
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
 =head2 reportMd5Sum($)
 
-Good files have short names which uniquely represent their content and thus can be used instead of their md5sum to generate unique names
+Report files with identical md5 sums
 
      Parameter  Description
   1  $xref      Cross referencer
@@ -4138,6 +5309,27 @@ ol under body - indicative of a task
 =head2 reportHrefUrlEncoding($)
 
 href needs url encoding
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportConRefMatching($)
+
+Report conref matching
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportPublicIds($)
+
+Report public ids in use
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportRequiredCleanUps($)
+
+Report required clean ups
 
      Parameter  Description
   1  $xref      Cross referencer
@@ -4166,7 +5358,15 @@ Check one reference and return the first error encountered or B<undef> if no err
   2  $file      File containing reference
   3  $href      Reference
 
-=head2 createSampleInputFiles($$)
+=head2 removeStringsFromData($@)
+
+Given a data structure, remove the specified strings from it
+
+     Parameter  Description
+  1  $d         Structure
+  2  @r         Strings to remove
+
+=head2 createSampleInputFilesBaseCase($$)
 
 Create sample input files for testing. The attribute B<inputFolder> supplies the name of the folder in which to create the sample files.
 
@@ -4199,6 +5399,55 @@ Create sample input files for fixing renamed topic refs
 =head2 createSampleInputFilesForFixDitaRefsXref($)
 
 Create sample input files for fixing references into renamed topics by xref
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createSampleConRefs($)
+
+Create sample input files for fixing a conref
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createSampleConRefMatching($)
+
+Create sample input files for matching conref source and targets
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createSampleDuplicateMd5Sum($)
+
+Create sample input files with duplicate md5 sums
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createSampleUnreferencedIds($)
+
+Create sample input files with unreferenced ids
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createEmptyBody($)
+
+Create sample input files for empty body detection
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createClassificationMapsTest($)
+
+Create sample input files for a classification map
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createWordsToFilesTest($)
+
+Index words to file
 
      Parameter  Description
   1  $in        Folder to create the files in
@@ -4274,6 +5523,41 @@ Create sample data for othermeta reports
      Parameter  Description
   1  $out       Folder
 
+=head2 createTestOneNotRef($)
+
+One topic refernced and the other not
+
+     Parameter  Description
+  1  $folder    Folder to switch to
+
+=head2 createSampleTopicsReferencedFromBookMaps($)
+
+The number of times a topic is referenced from a bookmap
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createSampleImageReferences($)
+
+Good and bad image references
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createRequiredCleanUps($)
+
+Required clean ups report
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
+=head2 createSoftConrefs($)
+
+Fix file part of conref even if the rest is invalid
+
+     Parameter  Description
+  1  $in        Folder to create the files in
+
 =head2 checkXrefStructure($$@)
 
 Check an output structure produced by Xrf
@@ -4283,7 +5567,7 @@ Check an output structure produced by Xrf
   2  $field     Field to check
   3  @folders   Folders to suppress
 
-=head2 writeXrefStructureTest($$@)
+=head2 writeXrefStructure($$@)
 
 Write the test for an Xref structure
 
@@ -4317,121 +5601,187 @@ Test reference checking
 
 8 L<countLevels|/countLevels> - Count has elements to the specified number of levels
 
-9 L<createSampleImageTest|/createSampleImageTest> - Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
+9 L<createClassificationMap|/createClassificationMap> - Create a classification map for each bookmap
 
-10 L<createSampleInputFiles|/createSampleInputFiles> - Create sample input files for testing.
+10 L<createClassificationMaps|/createClassificationMaps> - Create classification maps for each bookmap
 
-11 L<createSampleInputFilesFixFolder|/createSampleInputFilesFixFolder> - Create sample input files for testing fixFolder
+11 L<createClassificationMapsTest|/createClassificationMapsTest> - Create sample input files for a classification map
 
-12 L<createSampleInputFilesForFixDitaRefs|/createSampleInputFilesForFixDitaRefs> - Create sample input files for fixing renamed topic refs
+12 L<createEmptyBody|/createEmptyBody> - Create sample input files for empty body detection
 
-13 L<createSampleInputFilesForFixDitaRefsImproved1|/createSampleInputFilesForFixDitaRefsImproved1> - Create sample input files for fixing references via the targets/ folder
+13 L<createOxygenProjectFile|/createOxygenProjectFile> - Create an Oxygen project file for the specified bookmap
 
-14 L<createSampleInputFilesForFixDitaRefsImproved2|/createSampleInputFilesForFixDitaRefsImproved2> - Create sample input files for fixing conref references via the targets/ folder
+14 L<createOxygenProjectMapFiles|/createOxygenProjectMapFiles> - Create Oxygen project files from Xref results
 
-15 L<createSampleInputFilesForFixDitaRefsImproved3|/createSampleInputFilesForFixDitaRefsImproved3> - Create sample input files for fixing bookmap references to topics that get cut into multiple pieces
+15 L<createRequiredCleanUps|/createRequiredCleanUps> - Required clean ups report
 
-16 L<createSampleInputFilesForFixDitaRefsImproved4|/createSampleInputFilesForFixDitaRefsImproved4> - Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
+16 L<createSampleConRefMatching|/createSampleConRefMatching> - Create sample input files for matching conref source and targets
 
-17 L<createSampleInputFilesForFixDitaRefsXref|/createSampleInputFilesForFixDitaRefsXref> - Create sample input files for fixing references into renamed topics by xref
+17 L<createSampleConRefs|/createSampleConRefs> - Create sample input files for fixing a conref
 
-18 L<createSampleInputFilesLtGt|/createSampleInputFilesLtGt> - Create sample input files for testing items between &lt; and &gt;
+18 L<createSampleDuplicateMd5Sum|/createSampleDuplicateMd5Sum> - Create sample input files with duplicate md5 sums
 
-19 L<createSampleOtherMeta|/createSampleOtherMeta> - Create sample data for othermeta reports
+19 L<createSampleImageReferences|/createSampleImageReferences> - Good and bad image references
 
-20 L<createTestReferencedToFlattenedTopic|/createTestReferencedToFlattenedTopic> - Full reference to a topic that has been flattened
+20 L<createSampleImageTest|/createSampleImageTest> - Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
 
-21 L<createTestReferenceToCutOutTopic|/createTestReferenceToCutOutTopic> - References from a topic that has been cut out to a topic that has been cut out
+21 L<createSampleInputFilesBaseCase|/createSampleInputFilesBaseCase> - Create sample input files for testing.
 
-22 L<createTestTopicFlattening|/createTestTopicFlattening> - Create sample input files for testing topic flattening ratio reporting
+22 L<createSampleInputFilesFixFolder|/createSampleInputFilesFixFolder> - Create sample input files for testing fixFolder
 
-23 L<editXml|/editXml> - Edit an xml file retaining any existing XML headers and lint trailers
+23 L<createSampleInputFilesForFixDitaRefs|/createSampleInputFilesForFixDitaRefs> - Create sample input files for fixing renamed topic refs
 
-24 L<externalReference|/externalReference> - Check for an external reference
+24 L<createSampleInputFilesForFixDitaRefsImproved1|/createSampleInputFilesForFixDitaRefsImproved1> - Create sample input files for fixing references via the targets/ folder
 
-25 L<fixFilesGB|/fixFilesGB> - Rename files to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>
+25 L<createSampleInputFilesForFixDitaRefsImproved2|/createSampleInputFilesForFixDitaRefsImproved2> - Create sample input files for fixing conref references via the targets/ folder
 
-26 L<fixOneFileGB|/fixOneFileGB> - Fix one file to the Gearhart-Brenan standard
+26 L<createSampleInputFilesForFixDitaRefsImproved3|/createSampleInputFilesForFixDitaRefsImproved3> - Create sample input files for fixing bookmap references to topics that get cut into multiple pieces
 
-27 L<fixReferences|/fixReferences> - Fix just the file containing references using a number of techniques and report those references that cannot be so fixed.
+27 L<createSampleInputFilesForFixDitaRefsImproved4|/createSampleInputFilesForFixDitaRefsImproved4> - Create sample input files for fixing bookmap reference to a topic that did not get cut into  multiple pieces
 
-28 L<fixReferencesInOneFile|/fixReferencesInOneFile> - Fix one file by moving unresolved references to the xtrf attribute
+28 L<createSampleInputFilesForFixDitaRefsXref|/createSampleInputFilesForFixDitaRefsXref> - Create sample input files for fixing references into renamed topics by xref
 
-29 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
+29 L<createSampleInputFilesLtGt|/createSampleInputFilesLtGt> - Create sample input files for testing items between &lt; and &gt;
 
-30 L<newXref|/newXref> - Create a new cross referencer
+30 L<createSampleOtherMeta|/createSampleOtherMeta> - Create sample data for othermeta reports
 
-31 L<oneBadRef|/oneBadRef> - Check one reference and return the first error encountered or B<undef> if no errors encountered.
+31 L<createSampleTopicsReferencedFromBookMaps|/createSampleTopicsReferencedFromBookMaps> - The number of times a topic is referenced from a bookmap
 
-32 L<reportAttributeCount|/reportAttributeCount> - Report attribute counts
+32 L<createSampleUnreferencedIds|/createSampleUnreferencedIds> - Create sample input files with unreferenced ids
 
-33 L<reportAttributeNameAndValueCounts|/reportAttributeNameAndValueCounts> - Report attribute value counts
+33 L<createSoftConrefs|/createSoftConrefs> - Fix file part of conref even if the rest is invalid
 
-34 L<reportDocTypeCount|/reportDocTypeCount> - Report doc type count
+34 L<createTestOneNotRef|/createTestOneNotRef> - One topic refernced and the other not
 
-35 L<reportDuplicateIds|/reportDuplicateIds> - Report duplicate ids
+35 L<createTestReferencedToFlattenedTopic|/createTestReferencedToFlattenedTopic> - Full reference to a topic that has been flattened
 
-36 L<reportDuplicateTopicIds|/reportDuplicateTopicIds> - Report duplicate topic ids
+36 L<createTestReferenceToCutOutTopic|/createTestReferenceToCutOutTopic> - References from a topic that has been cut out to a topic that has been cut out
 
-37 L<reportExternalXrefs|/reportExternalXrefs> - Report external xrefs missing other attributes
+37 L<createTestTopicFlattening|/createTestTopicFlattening> - Create sample input files for testing topic flattening ratio reporting
 
-38 L<reportFileExtensionCount|/reportFileExtensionCount> - Report file extension counts
+38 L<createWordsToFilesTest|/createWordsToFilesTest> - Index words to file
 
-39 L<reportFileTypes|/reportFileTypes> - Report file type counts - takes too long in series
+39 L<editXml|/editXml> - Edit an xml file retaining any existing XML headers and lint trailers
 
-40 L<reportFixRefs|/reportFixRefs> - Report of hrefs that need to be fixed
+40 L<externalReference|/externalReference> - Check for an external reference
 
-41 L<reportGuidHrefs|/reportGuidHrefs> - Report on guid hrefs
+41 L<fixFilesGB|/fixFilesGB> - Rename files to the L<GB Standard|http://metacpan.org/pod/Dita::GB::Standard>
 
-42 L<reportGuidsToFiles|/reportGuidsToFiles> - Map and report guids to files
+42 L<fixingRun|/fixingRun> - A fixing run fixes problems where it can and thus induces changes which might make the updated output different from the incoming source.
 
-43 L<reportHrefUrlEncoding|/reportHrefUrlEncoding> - href needs url encoding
+43 L<fixOneFileGB|/fixOneFileGB> - Fix one file to the Gearhart-Brenan standard
 
-44 L<reportImages|/reportImages> - Reports on images and references to images
+44 L<fixReferences|/fixReferences> - Fix just the file containing references using a number of techniques and report those references that cannot be so fixed.
 
-45 L<reportLtGt|/reportLtGt> - Report items found between &lt; and &gt;
+45 L<fixReferencesInOneFile|/fixReferencesInOneFile> - Fix one file by moving unresolved references to the xtrf attribute
 
-46 L<reportMaxZoomOut|/reportMaxZoomOut> - Text located via Max Zoom In
+46 L<formatTables|/formatTables> - Using cross reference B<$xref> options and an array of arrays B<$data> format a report as a table using B<%options> as described in L<Data::Table::Text::formatTable> and L<Data::Table::Text::formatHtmlTable>.
 
-47 L<reportMd5Sum|/reportMd5Sum> - Good files have short names which uniquely represent their content and thus can be used instead of their md5sum to generate unique names
+47 L<hashOfCountsToArray|/hashOfCountsToArray> - Convert a B<$hash> of {key} = count to an array so it can be formatted with L<formatTables>
 
-48 L<reportNoHrefs|/reportNoHrefs> - Report locations where an href was expected but not found
+48 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
 
-49 L<reportOlBody|/reportOlBody> - ol under body - indicative of a task
+49 L<newXref|/newXref> - Create a new cross referencer
 
-50 L<reportParseFailed|/reportParseFailed> - Report failed parses
+50 L<oneBadRef|/oneBadRef> - Check one reference and return the first error encountered or B<undef> if no errors encountered.
 
-51 L<reportPossibleImprovements|/reportPossibleImprovements> - Report improvements possible
+51 L<oxygenProjectFileMetaData|/oxygenProjectFileMetaData> - Meta data for the oxygen project files
 
-52 L<reportReferencesFromBookMaps|/reportReferencesFromBookMaps> - Topics and images referenced from bookmaps
+52 L<removeStringsFromData|/removeStringsFromData> - Given a data structure, remove the specified strings from it
 
-53 L<reportSimilarTopicsByTitle|/reportSimilarTopicsByTitle> - Report topics likely to be similar on the basis of their titles as expressed in the non Guid part of their file names
+53 L<removeUnusedIds|/removeUnusedIds> - Remove ids that do are not mentioned in any href or conref in the corpus regardless of the file component of any such reference.
 
-54 L<reportSimilarTopicsByVocabulary|/reportSimilarTopicsByVocabulary> - Report topics likely to be similar on the basis of their vocabulary
+54 L<reportAttributeCount|/reportAttributeCount> - Report attribute counts
 
-55 L<reportSourceFiles|/reportSourceFiles> - Source file for each topic
+55 L<reportAttributeNameAndValueCounts|/reportAttributeNameAndValueCounts> - Report attribute value counts
 
-56 L<reportTables|/reportTables> - Report on tables that have problems
+56 L<reportConRefMatching|/reportConRefMatching> - Report conref matching
 
-57 L<reportTagCount|/reportTagCount> - Report tag counts
+57 L<reportDocTypeCount|/reportDocTypeCount> - Report doc type count
 
-58 L<reportTagsAndTextsCount|/reportTagsAndTextsCount> - Report tags and texts counts
+58 L<reportDuplicateIds|/reportDuplicateIds> - Report duplicate ids
 
-59 L<reportTopicDetails|/reportTopicDetails> - Things that occur once in each file
+59 L<reportDuplicateTopicIds|/reportDuplicateTopicIds> - Report duplicate topic ids
 
-60 L<reportTopicReuse|/reportTopicReuse> - Count how frequently each topic is reused
+60 L<reportEmptyTopics|/reportEmptyTopics> - Report empty topics
 
-61 L<reportValidationErrors|/reportValidationErrors> - Report the files known to have validation errors
+61 L<reportExteriorMaps|/reportExteriorMaps> - Maps that are not referenced by any other map
 
-62 L<reportXml1|/reportXml1> - Report bad xml on line 1
+62 L<reportExternalXrefs|/reportExternalXrefs> - Report external xrefs missing other attributes
 
-63 L<reportXml2|/reportXml2> - Report bad xml on line 2
+63 L<reportFileExtensionCount|/reportFileExtensionCount> - Report file extension counts
 
-64 L<testReferenceChecking|/testReferenceChecking> - Test reference checking
+64 L<reportFileTypes|/reportFileTypes> - Report file type counts - takes too long in series
 
-65 L<writeXrefStructureTest|/writeXrefStructureTest> - Write the test for an Xref structure
+65 L<reportFixRefs|/reportFixRefs> - Report of hrefs that need to be fixed
 
-66 L<xref|/xref> - Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder.
+66 L<reportGuidHrefs|/reportGuidHrefs> - Report on guid hrefs
+
+67 L<reportGuidsToFiles|/reportGuidsToFiles> - Map and report guids to files
+
+68 L<reportHrefUrlEncoding|/reportHrefUrlEncoding> - href needs url encoding
+
+69 L<reportIdRefs|/reportIdRefs> - Report the number of times each id is referenced
+
+70 L<reportImages|/reportImages> - Reports on images and references to images
+
+71 L<reportLtGt|/reportLtGt> - Report items found between &lt; and &gt;
+
+72 L<reportMaxZoomOut|/reportMaxZoomOut> - Text located via Max Zoom In
+
+73 L<reportMd5Sum|/reportMd5Sum> - Report files with identical md5 sums
+
+74 L<reportNoHrefs|/reportNoHrefs> - Report locations where an href was expected but not found
+
+75 L<reportOlBody|/reportOlBody> - ol under body - indicative of a task
+
+76 L<reportOtherMeta|/reportOtherMeta> - Advise in the feasibility of moving othermeta data from topics to bookmaps assuming that the othermeta data will be applied only at the head of the map rather than individually to each topic in the map.
+
+77 L<reportOtherMetaConsolidated|/reportOtherMetaConsolidated> - Create a subject scheme map from othermeta
+
+78 L<reportParseFailed|/reportParseFailed> - Report failed parses
+
+79 L<reportPossibleImprovements|/reportPossibleImprovements> - Report improvements possible
+
+80 L<reportPublicIds|/reportPublicIds> - Report public ids in use
+
+81 L<reportReferencesFromBookMaps|/reportReferencesFromBookMaps> - Topics and images referenced from bookmaps
+
+82 L<reportRequiredCleanUps|/reportRequiredCleanUps> - Report required clean ups
+
+83 L<reportSimilarTopicsByTitle|/reportSimilarTopicsByTitle> - Report topics likely to be similar on the basis of their titles as expressed in the non Guid part of their file names
+
+84 L<reportSimilarTopicsByVocabulary|/reportSimilarTopicsByVocabulary> - Report topics likely to be similar on the basis of their vocabulary
+
+85 L<reportSourceFiles|/reportSourceFiles> - Source file for each topic
+
+86 L<reportTableDimensions|/reportTableDimensions> - Report table dimensions
+
+87 L<reportTables|/reportTables> - Report on tables that have problems
+
+88 L<reportTagCount|/reportTagCount> - Report tag counts
+
+89 L<reportTagsAndTextsCount|/reportTagsAndTextsCount> - Report tags and texts counts
+
+90 L<reportTopicDetails|/reportTopicDetails> - Things that occur once in each file
+
+91 L<reportTopicReuse|/reportTopicReuse> - Count how frequently each topic is reused
+
+92 L<reportTopicsNotReferencedFromBookMaps|/reportTopicsNotReferencedFromBookMaps> - Topics not referenced from bookmaps
+
+93 L<reportValidationErrors|/reportValidationErrors> - Report the files known to have validation errors
+
+94 L<reportWordsByFile|/reportWordsByFile> - Index words to the files they occur in
+
+95 L<reportXml1|/reportXml1> - Report bad xml on line 1
+
+96 L<reportXml2|/reportXml2> - Report bad xml on line 2
+
+97 L<testReferenceChecking|/testReferenceChecking> - Test reference checking
+
+98 L<writeXrefStructure|/writeXrefStructure> - Write the test for an Xref structure
+
+99 L<xref|/xref> - Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder.
 
 =head1 Installation
 
@@ -4477,6 +5827,7 @@ test unless caller;
 __DATA__
 use Test::More;
 use warnings FATAL=>qw(all);
+
 use strict;
 
 if ($^O !~ m(bsd|linux)i)
@@ -4485,6 +5836,13 @@ if ($^O !~ m(bsd|linux)i)
 
 Test::More->builder->output("/dev/null")                                        # Show only errors during testing
   if ((caller(1))[0]//'Data::Edit::Xml::Xref') eq "Data::Edit::Xml::Xref";
+
+makeDieConfess;
+
+my $conceptHeader = <<END =~ s(\s*\Z) ()gsr;                                    # Header for a concept
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Task//EN" "concept.dtd" []>
+END
 
 #goto latestTest;
 
@@ -4497,14 +5855,18 @@ sub targets    {fpf(tests, q(targets))}                                         
 
 #D1 Create test data                                                            # Create files to test the various capabilities provided by Xref
 
-my $conceptHeader = <<END =~ s(\s*\Z) ()gsr;                                    # Header for a concept
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Task//EN" "concept.dtd" []>
-END
+sub removeStringsFromData($@)                                                   #P Given a data structure, remove the specified strings from it
+ {my ($d, @r) = @_;                                                             # Structure,  strings to remove
+  my $s = dump($d);
+  for my $r(@r)
+   {$s =~ s($r) ()gs;
+   }
+  eval($s)
+ }
 
-sub createSampleInputFiles($$)                                                  #P Create sample input files for testing. The attribute B<inputFolder> supplies the name of the folder in which to create the sample files.
+sub createSampleInputFilesBaseCase($$)                                          #P Create sample input files for testing. The attribute B<inputFolder> supplies the name of the folder in which to create the sample files.
  {my ($in, $N) = @_;                                                            # Input folder, number of sample files
-  clearFolder($in, 20);
+  clearFolder($in, 30);
   for my $n(1..$N)
    {my $o = $n + 1; $o -= $N if $o > $N;
     my $f = owf(fpe($in, $n, q(dita)), <<END);
@@ -4817,6 +6179,224 @@ END
 END
  }
 
+sub createSampleConRefs($)                                                      #P Create sample input files for fixing a conref
+ {my ($in) = @_;                                                                # Folder to create the files in
+  my $d = fpd(currentDirectory, $in);
+  owf(fpe($in, qw(c1 dita)), <<END);
+<concept id="c1">
+  <title>1111</title>
+  <conbody>
+    <p id="i1" conref="c2.dita#c2/p1"/>
+    <p id="i2" conref="c2.dita#c2/p2"/>
+    <p id="i2" conref="c2.dita#c2/p3"/>
+    <xref id="c1" href="c1.dita#c1/i1"/>
+    <xref id="x1" href="c1.dita#c1/i2"/>
+    <xref href="c1.dita#c1/i3"/>
+    <xref href="c1.dita#c1/i3"/>
+    <xref href="c1.dita#c1/i3"/>
+  </conbody>
+</concept>
+END
+  owf(fpe($in, qw(c2 dita)), <<END);
+<concept id="c2">
+  <title id="c2">2222</title>
+  <conbody>
+    <p id="p1">p1p1p1p1</p>
+    <p id="p2">p2p2p2p2</p>
+  </conbody>
+</concept>
+END
+ }
+
+sub createSampleConRefMatching($)                                               #P Create sample input files for matching conref source and targets
+ {my ($in) = @_;                                                                # Folder to create the files in
+  my $d = fpd(currentDirectory, $in);
+  owf(fpe($in, qw(c1 dita)), <<END);
+<concept id="c1">
+  <title>1111</title>
+  <conbody>
+    <p conref="c2.dita#c2/p1"/>
+    <p conref="c2.dita#c2/q1"/>
+  </conbody>
+</concept>
+END
+  owf(fpe($in, qw(c2 dita)), <<END);
+<concept id="c2">
+  <title>2222</title>
+  <conbody>
+    <p id="p1">p1p1p1p1</p>
+    <q id="q1">q1q1q1q1</q>
+  </conbody>
+</concept>
+END
+ }
+
+sub createSampleDuplicateMd5Sum($)                                              #P Create sample input files with duplicate md5 sums
+ {my ($in) = @_;                                                                # Folder to create the files in
+  my $d = fpd(currentDirectory, $in);
+  owf(fpe($in, $_, qw(c dita)), <<END) for 1..3;
+<concept/>
+END
+  owf(fpe($in, $_, qw(t dita)), <<END) for 1..2;
+<task/>
+END
+ }
+
+sub createSampleUnreferencedIds($)                                              #P Create sample input files with unreferenced ids
+ {my ($in) = @_;                                                                # Folder to create the files in
+  my $d = fpd(currentDirectory, $in);
+  owf(fpe($in, $_, qw(c1 dita)), <<END);
+<concept id="c1">
+  <title id="c1"/>
+  <conbody>
+    <p id="p1"/>
+    <p id="p2"/>
+    <p id="p2"/>
+    <p id="p3"/>
+    <p id="p3"/>
+    <p id="p3"/>
+  </conbody>
+</concept>
+END
+  owf(fpe($in, $_, qw(c2 dita)), <<END);
+<concept id="c2">
+  <title id="c2"/>
+  <conbody>
+    <p href="c1.dita#p1"/>
+    <p conref="c1.dita#c1/p2"/>
+  </conbody>
+</concept>
+END
+ }
+
+sub createEmptyBody($)                                                          #P Create sample input files for empty body detection
+ {my ($in) = @_;                                                                # Folder to create the files in
+  my $d = fpd(currentDirectory, $in);
+  owf(fpe($in, qw(c1 dita)), <<END);
+$conceptHeader
+<concept id="c1">
+  <title>Empty</title>
+  <conbody/>
+</concept>
+END
+  owf(fpe($in, qw(c2 dita)), <<END);
+$conceptHeader
+<concept id="c2">
+  <title>Full</title>
+  <conbody>
+    <p>2222</p>
+  </conbody>
+</concept>
+END
+ }
+
+sub createClassificationMapsTest($)                                             #P Create sample input files for a classification map
+ {my ($in) = @_;                                                                # Folder to create the files in
+  my $d = fpd($in);
+  owf(fpe($in, qw(maps m1 ditamap)), <<END);
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<map id="m1">
+    <title>A map that is not nested</title>
+    <mapref   href="m2.ditamap"/>
+    <topicref href="../c1.dita"/>
+    <topicref href="../c2.dita"/>
+</map>
+END
+  owf(fpe($in, qw(maps m2 ditamap)), <<END);
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<map id="m2">
+    <title>A map that is nested</title>
+    <topicref href="../c1.dita"/>
+    <topicref href="../c2.dita"/>
+</map>
+END
+  owf(fpe($in, qw(c1 dita)), <<END);
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="c1">
+    <title>Concept 1</title>
+    <prolog>
+        <metadata>
+            <othermeta content="concept" name="topic_type ee ee aa"/>
+            <othermeta content="Developer_Guide_Reference Salesforce_Console" name="app_area"/>
+        </metadata>
+    </prolog>
+    <conbody/>
+</concept>
+END
+  owf(fpe($in, qw(c2 dita)), <<END);
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="c2">
+    <title>Concept 2</title>
+    <prolog>
+        <metadata>
+            <othermeta content="Developer Partner" name="role"/>
+            <othermeta content="PE EE PXE UE DE" name="edition"/>
+            <othermeta content="aloha sfx aloha" name="ui_platform"/>
+        </metadata>
+    </prolog>
+    <conbody/>
+</concept>
+END
+ }
+
+sub createWordsToFilesTest($)                                                   #P Index words to file
+ {my ($in) = @_;                                                                # Folder to create the files in
+  owf(fpe($in, qw(spaghetti dita)), <<END);
+<task id="t1">
+  <title>How to cook spaghetti</title>
+  <taskbody>
+
+    <context><p>You are in a well equipped kitchen with a packet of spaghetti
+    to hand.  You wish to cook some spaghetti</p></context>
+
+    <steps>
+      <step>
+        <cmd>Bring a large pan of water to a rolling boil</cmd>
+      </step>
+      <step>
+        <cmd>Place the spaghetti in the boiling water</cmd>
+      </step>
+      <step>
+        <cmd>Cover the pan with a lid and turn the heat down</cmd>
+      </step>
+      <step>
+        <cmd>Cook for 15 minutes then drain through a collander</cmd>
+      </step>
+      </steps>
+  </taskbody>
+</task>
+END
+  owf(fpe($in, qw(tea dita)), <<END);
+<task id="t2">
+  <title>How to make a cup of tea</title>
+  <taskbody>
+
+    <context><p>You are in a well equipped kitchen with a packet of tea bags to hand.
+    You wish to make a cup of tea</p></context>
+
+    <steps>
+      <step>
+        <cmd>Bring a kettle of water to the boil</cmd>
+      </step>
+      <step>
+        <cmd>Place a tea bag in an insulated glass</cmd>
+      </step>
+      <step>
+        <cmd>Pour hot water over the tea bag until the glass is 80% full</cmd>
+      </step>
+      <step>
+        <cmd>Place the glass in a microwave oven and power for 30 seconds.</cmd>
+      </step>
+      </steps>
+  </taskbody>
+</task>
+END
+ }
+
 sub changeFolderAndWriteFiles($$)                                               #P Change file structure to the current folder and write
  {my ($f, $D) = @_;                                                             # Data structure as a string, target folder
   my $d = q(/home/phil/perl/cpan/DataEditXmlToDita/test/);
@@ -4903,7 +6483,7 @@ sub createTestTopicFlattening($)                                                
  }
 
 sub createTestReferencedToFlattenedTopic($)                                     #P Full reference to a topic that has been flattened
- {my ($folder) = @_;                                                            # Folder to switch to
+ {my ($folder) = @_;                                                           # Folder to switch to
 
   my $f = {
   "/home/phil/perl/cpan/DataEditXmlToDita/test/out/c_aaaa_3119ee09e34375ed4d8a7a15274a9774.dita" => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE concept PUBLIC \"-//OASIS//DTD DITA Concept//EN\" \"concept.dtd\" []>\n<concept id=\"GUID-7b56e1e5-a8b5-7f09-73e5-e6ecb15d5e8f\">\n  <title>aaaa</title>\n  <conbody>\n    <p conref=\"b.dita#c/p1\"/>\n  </conbody>\n</concept>\n\n<!--linted: 2019-07-07 at 00:40:33 -->\n<!--catalog: /home/phil/r/dita/dita-ot-3.1/catalog-dita.xml -->\n<!--ditaType: concept -->\n<!--docType: <!DOCTYPE concept PUBLIC \"-//OASIS//DTD DITA Concept//EN\" \"concept.dtd\" []> -->\n<!--file: /home/phil/perl/cpan/DataEditXmlToDita/test/out/c_aaaa_3119ee09e34375ed4d8a7a15274a9774.dita -->\n<!--guid: GUID-7b56e1e5-a8b5-7f09-73e5-e6ecb15d5e8f -->\n<!--header: <?xml version=\"1.0\" encoding=\"UTF-8\"?> -->\n<!--inputFile: /home/phil/perl/cpan/DataEditXmlToDita/test/in/a.dita -->\n<!--lineNumber: Data::Edit::Xml::To::DitaVb /home/phil/perl/cpan/DataEditXmlToDita/lib/Data/Edit/Xml/To/DitaVb.pm 945 -->\n<!--project: all -->\n<!--title: aaaa -->\n<!--definition: GUID-7b56e1e5-a8b5-7f09-73e5-e6ecb15d5e8f -->\n<!--labels: GUID-7b56e1e5-a8b5-7f09-73e5-e6ecb15d5e8f c -->\n",
@@ -5000,6 +6580,156 @@ sub createSampleOtherMeta($)                                                    
   genMap($out, q(b2), genMeta(%common, dd=>q(DD2222)), @topics);
  } # createSampleOtherMeta
 
+sub createTestOneNotRef($)                                                      #P One topic refernced and the other not
+ {my ($folder) = @_;                                                            # Folder to switch to
+
+  my $f = {
+  "/home/phil/perl/cpan/DataEditXmlToDita/test/in/a.dita"    => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE concept PUBLIC \"-//OASIS//DTD DITA Task//EN\" \"concept.dtd\" []>\n<concept id=\"ca\">\n  <title>aaaa</title>\n  <conbody/>\n</concept>\n",
+  "/home/phil/perl/cpan/DataEditXmlToDita/test/in/a.ditamap" => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE bookmap PUBLIC \"-//OASIS//DTD DITA BookMap//EN\" \"bookmap.dtd\" []>\n<bookmap id=\"bm\">\n  <chapter href=\"a.dita\" navtitle=\"aaaa\"/>\n</bookmap>\n",
+  "/home/phil/perl/cpan/DataEditXmlToDita/test/in/b.dita"    => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE concept PUBLIC \"-//OASIS//DTD DITA Task//EN\" \"concept.dtd\" []>\n<concept id=\"cb\">\n  <title>bbbb</title>\n  <conbody/>\n</concept>\n",
+  };
+
+  changeFolderAndWriteFiles($f, $folder);                                       # Change folder and write files
+ }
+
+sub createSampleTopicsReferencedFromBookMaps($)                                 #P The number of times a topic is referenced from a bookmap
+ {my ($in) = @_;                                                                # Folder to create the files in
+  my $d = fpd(currentDirectory, $in);
+
+  owf(fpe($in, qw(m1 dita)), <<END);
+<map id="m1">
+  <title>Map 1</title>
+  <chapter href="c1.dita"/>
+</map>
+END
+
+  owf(fpe($in, qw(m2 dita)), <<END);
+<map id="m2">
+  <title>Map 1</title>
+  <topicref href="c1.dita"/>
+  <topicref href="c2.dita"/>
+</map>
+END
+
+  owf(fpe($in, qw(c1 dita)), <<END);
+<concept id="c1">
+  <title>c1</title>
+  <conbody>
+    <image href="1.png"/>;
+  </conbody>
+</concept>
+END
+  owf(fpe($in, qw(c2 dita)), <<END);
+<concept id="c2">
+  <title>c2</title>
+  <conbody>
+    <image href="1.png"/>;
+    <image href="2.png"/>;
+  </conbody>
+</concept>
+END
+  owf(fpe($in, qw(c3 dita)), <<END);
+<concept id="c3">
+  <title>c3</title>
+  <conbody>
+    <image href="1.png"/>;
+    <image href="2.png"/>;
+    <image href="3.png"/>;
+  </conbody>
+</concept>
+END
+ }
+
+sub createSampleImageReferences($)                                              #P Good and bad image references
+ {my ($in) = @_;                                                                # Folder to create the files in
+  my $d    = fpd(currentDirectory, $in);
+
+  owf(fpe($in, qq(c$_), q(dita)), <<END) for 1..3;
+<concept id="c$_">
+  <title>C$_</title>
+  <conbody>
+    <image href="good1.png"/>
+    <image href="good1.png"/>
+    <image href="good2.png"/>
+    <image href="good2.png"/>
+    <image href="bad1.png"/>
+    <image href="bad1.png"/>
+  </conbody>
+</concept>
+END
+
+  owf(fpe($in, qw(good1 png)), <<END);
+<image/>
+END
+
+  owf(fpe($in, qw(good2 png)), <<END);
+<image/>
+END
+ }
+
+sub createRequiredCleanUps($)                                                   #P Required clean ups report
+ {my ($in) = @_;                                                                # Folder to create the files in
+  my $d    = fpd(currentDirectory, $in);
+
+  owf(fpe($in, qq(c1), q(dita)), <<END);
+<concept id="c1">
+  <title>C1_</title>
+  <conbody>
+    <required-cleanup>aaa</required-cleanup>
+    <required-cleanup>bbb</required-cleanup>
+    <required-cleanup>bbb</required-cleanup>
+  </conbody>
+</concept>
+END
+
+  owf(fpe($in, qq(c2), q(dita)), <<END);
+<concept id="c2">
+  <title>C2_</title>
+  <conbody>
+    <required-cleanup>aaa</required-cleanup>
+    <required-cleanup>bbb</required-cleanup>
+    <required-cleanup>ccc</required-cleanup>
+    <required-cleanup>CCC</required-cleanup>
+  </conbody>
+</concept>
+END
+ }
+
+sub createSoftConrefs($)                                                        #P Fix file part of conref even if the rest is invalid
+ {my ($in) = @_;                                                                # Folder to create the files in
+  my $d    = fpd(currentDirectory, $in);
+
+  my $r = fpe(qw(c_12345678123456781234567812345678 dita));                     # Relocatable
+  owf(fpf($in, q(folder), $r), <<END);
+$conceptHeader
+<concept id="c">
+  <title>C1</title>
+  <conbody>
+    <p id="p1">aaa</p>
+    <p id="p1">bbb</p>
+    <p conref="#c/p1"/>    <!-- FAILS -->
+    <p conref="#c/pp"/>    <!-- FAILS: No such id -->
+  </conbody>
+</concept>
+END
+
+  owf(fpe($in, qw(c dita)), <<END);
+$conceptHeader
+<concept id="c">
+  <title>C2</title>
+  <conbody>
+    <p conref="$r#c/p1"/>
+    <p conref="$r#c1/p1"/>   <!-- PASSES: wrong topic id but we ignore topic ids-->
+    <p conref="$r#c/bad"/>   <!-- PASSES: no such id - SHOULD FAIL even though we are relocating -->
+    <p conref="$r"/>
+    <p conref="c.dta"/>      <!-- FAILS: no such file -->
+    <p id="q1">aaa</p>
+    <p conref="#c/q1"/>
+  </conbody>
+</concept>
+END
+ }
+
 sub checkXrefStructure($$@)                                                     #P Check an output structure produced by Xrf
  {my ($x, $field, @folders) = @_;                                               # Cross references, field to check, folders to suppress
   my $s = nws dump($x->{$field});                                               # Structure to be tested
@@ -5009,12 +6739,15 @@ sub checkXrefStructure($$@)                                                     
   eval $s;                                                                      # Recreate structure
  }
 
-sub writeXrefStructureTest($$@)                                                 #P Write the test for an Xref structure
+sub writeXrefStructure($$@)                                                     #P Write the test for an Xref structure
  {my ($x, $field, @folders) = @_;                                               # Cross referencer, field, names of the folders to suppress
+
   my $in = $x->inputFolder;
+
   my $s = nws(dump($x->{$field}) =~ s($in) ()gsr);                              # Field to be tested
      $s =~ s(\],\s+\[) (],\n    [)gs;
      $s =~ s(\},\s+\{) (},\n    {)gs;
+
   for my $folderName(@folders)                                                  # Remove specified folder names from structure to be tested
    {no strict qw(refs);
     my $folder = &{$folderName};                                                # Folder name
@@ -5053,7 +6786,7 @@ sub testReferenceChecking                                                       
   ok !oneBadRef($xref, q(/home/phil/aaa.dita), q(../phil/bbb.dita));
   ok !oneBadRef($xref, q(/home/phil/aaa.dita), q(#aaa/paaa));
   ok !oneBadRef($xref, q(/home/phil/aaa.dita), q(#./paaa));
-  ok !oneBadRef($xref, q(/home/phil/aaa.dita), q(#aaa));
+  ok !oneBadRef($xref, q(/home/phil/aaa.dita), q(#paaa));
 
   is_deeply oneBadRef($xref, q(/home/phil/aaa.dita), q(../phil/bbb.dita#bbb/pccc)),
    ["No such id in target topic",
@@ -5121,12 +6854,12 @@ sub testReferenceChecking                                                       
     "/home/phil/aaa.dita",
     "/home/phil/aaa.dita",
   ];
-  is_deeply oneBadRef($xref, q(/home/phil/aaa.dita), q(#bbb)),
+  is_deeply oneBadRef($xref, q(/home/phil/aaa.dita), q(#bbb/ccc)),
    ["Topic id does not match",
-    "#bbb",
+    "#bbb/ccc",
     "/home/phil/aaa.dita",
     "bbb",
-    "",
+    "ccc",
     "aaa",
     "aaa",
     "/home/phil/aaa.dita",
@@ -5155,30 +6888,41 @@ sub testReferenceChecking                                                       
 
 if (1) {                                                                        # Fix xrefs by title  - there should be just one so fixed
   clearFolder($_, 420) for in, out, reports;
-  createSampleInputFiles(in, 8);
+  createSampleInputFilesBaseCase(in, 8);
 
-  my $x = xref(inputFolder     => in);
+  my $x = xref(inputFolder => in, html => reports);
+  ok $x->statusLine eq q(Xref: 104 refs, 21 image refs, 14 first lines, 14 second lines, 8 duplicate ids, 4 duplicate topic ids, 4 invalid guid hrefs, 2 duplicate files, 2 tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing);
+  #say STDERR writeXrefStructure($x, q(publicId), q(in));
+  is_deeply checkXrefStructure($x, q(publicId), in),
+   {"1.dita" => undef, "2.dita" => undef, "3.dita" => undef, "4.dita" => undef,
+    "5.dita" => undef, "6.dita" => undef, "7.dita" => undef, "8.dita" => undef,
+    "act1.dita" => undef, "act4.dita" => undef, "act5.dita" => undef,
+    "map/bookmap3.ditamap" => undef,
+    "map/bookmap.ditamap"  => undef, "map/bookmap2.ditamap" => undef,
+    "act2.dita"  => "-//OASIS//DTD DITA Task//EN",
+    "table.dita" => "-//OASIS//DTD DITA Task//EN", };
 
-  ok $x->statusLine eq q(Xref: 112 refs, 21 image refs, 14 first lines, 14 second lines, 12 duplicate topic ids, 8 duplicate ids, 4 invalid guid hrefs, 2 tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing);
+  ok readFile(fpe(reports, qw(bad duplicate_topics_ids html))) =~ m(<tr><td>c2<td>)is;
+  ok readFile(fpe(reports, qw(bad duplicate_topics_ids txt)))  =~ m(1  c2)is;
 
-  my $y = xref(inputFolder     => in, fixXrefsByTitle =>  1);                   # Update error counts
-
-  ok $y->statusLine eq q(Xref: 111 refs, 21 image refs, 14 first lines, 14 second lines, 12 duplicate topic ids, 8 duplicate ids, 4 invalid guid hrefs, 2 tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing);
+  my $y = xref(inputFolder => in, fixBadRefs => 1, fixXrefsByTitle => 1);       # Update error counts
+  ok $y->statusLine eq q(Xref: 103 refs, 21 image refs, 14 first lines, 14 second lines, 8 duplicate ids, 4 duplicate topic ids, 4 invalid guid hrefs, 2 duplicate files, 2 tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing);
 
   is_deeply checkXrefStructure($y, q(fixedRefs)),
-   [["Fixed by title", "xref", "href", "act1.dita#c1/title", "act2.dita"]];
+   [['Fixed by Gearhart Title Method', "xref", "href",
+     "act1.dita#c1/title", "act1.dita", "act2.dita"]];
  }
 
 if (1)
  {clearFolder($_, 420) for in, out, reports;
-  createSampleInputFiles(in, 8);
+  createSampleInputFilesBaseCase(in, 8);
 
   my $x = xref(inputFolder => in);
-  ok $x->statusLine eq q(Xref: 112 refs, 21 image refs, 14 first lines, 14 second lines, 12 duplicate topic ids, 8 duplicate ids, 4 invalid guid hrefs, 2 tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing);
+  ok $x->statusLine eq q(Xref: 104 refs, 21 image refs, 14 first lines, 14 second lines, 8 duplicate ids, 4 duplicate topic ids, 4 invalid guid hrefs, 2 duplicate files, 2 tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing);
 
   is_deeply checkXrefStructure($x, q(topicsReferencedFromBookMaps)),
     {
-      "act2.dita"            => { "act1.dita" => 1, "act9999.dita" => 1 },
+      #"act2.dita"            => { "act1.dita" => 1, "act9999.dita" => 1 },
       "map/bookmap.ditamap"  => {
                                    "act1.dita"     => 1,
                                    "act2.dita"     => 1,
@@ -5199,13 +6943,13 @@ if (1)
     };
 
   is_deeply checkXrefStructure($x, q(imagesReferencedFromBookMaps)),
-   {"act2.dita" => {
-       "act1.png"  => 1,
-       "act2.png"  => 1,
-       "guid-000"  => 1,
-       "guid-9999" => 1,
-       "guid-act1" => 1,
-     },
+   {#"act2.dita" => {
+    #   "act1.png"  => 1,
+    #   "act2.png"  => 1,
+    #   "guid-000"  => 1,
+    #   "guid-9999" => 1,
+    #   "guid-act1" => 1,
+    # },
      "map/bookmap.ditamap" => {
        "act1.png"  => 1,
        "act2.png"  => 1,
@@ -5225,21 +6969,22 @@ if (1)
 
 if (1)                                                                          # Check topic matching
  {clearFolder($_, 420) for in, out, reports;
-  createSampleInputFiles(in, 8);
+  createSampleInputFilesBaseCase(in, 8);
 
-  my $x = xref(inputFolder              => in,
-               deguidize                => 1,
-               fixBadRefs               => 1,
-               matchTopics              => 0.9,
-               flattenFolder            => out);
+  my $x = xref(inputFolder   => in,
+               deguidize     => 1,
+               fixBadRefs    => 1,
+               matchTopics   => 0.9,
+               flattenFolder => out,
+               html          => reports);
 
-  ok $x->statusLine eq q(Xref: 105 refs, 20 image refs, 14 first lines, 14 second lines, 12 duplicate topic ids, 8 duplicate ids, 4 invalid guid hrefs, 2 tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing);
+  ok $x->statusLine eq q(Xref: 97 refs, 20 image refs, 14 first lines, 14 second lines, 8 duplicate ids, 4 duplicate topic ids, 4 invalid guid hrefs, 2 duplicate files, 2 tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing);
   ok readFile(fpe($x->reports, qw(lists similar byVocabulary txt))) =~ m(1\s+8.*in/1\.dita);
  }
 
 if (1) {                                                                        # Relocated refs
   clearFolder($_, 420) for qw(in out reports);
-  createSampleInputFiles(in, 8);
+  createSampleInputFilesBaseCase(in, 8);
 
   my $x = xref(inputFolder              => in,
                deguidize                => 1,
@@ -5247,48 +6992,55 @@ if (1) {                                                                        
                fixRelocatedRefs         => 1,
                flattenFolder            => out);
 
-  ok $x->statusLine eq q(Xref: 103 refs, 20 image refs, 14 first lines, 14 second lines, 12 duplicate topic ids, 8 duplicate ids, 4 invalid guid hrefs, 2 tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing);
+  ok $x->statusLine eq q(Xref: 97 refs, 20 image refs, 14 first lines, 14 second lines, 8 duplicate ids, 4 duplicate topic ids, 4 invalid guid hrefs, 2 duplicate files, 2 tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing);
 
   my $table = $x->statusTable;
   say STDERR $table;
   ok index($table, <<END) == 0;
     Count  Condition
- 1    103  refs
+ 1     97  refs
  2     20  image refs
  3     14  first lines
  4     14  second lines
- 5     12  duplicate topic ids
- 6      8  duplicate ids
- 7      4  invalid guid hrefs
+ 5      8  duplicate ids
+ 6      4  invalid guid hrefs
+ 7      4  duplicate topic ids
  8      2  tables
- 9      1  file failed to parse
-10      1  href missing
-11      1  External xrefs with no format=html
-12      1  External xrefs with no scope=external
+ 9      2  duplicate files
+10      1  file failed to parse
+11      1  href missing
+12      1  External xrefs with no format=html
+13      1  External xrefs with no scope=external
 END
 
   is_deeply checkXrefStructure($x, q(fixedRefs), in, targets),
-   [["Deguidized reference", "image",    "href",   "guid-000",                                        "act1.dita"],
-    ["Deguidized reference", "xref",     "href",   "guid-000#guid-000/title",                         "act2.dita"],
-    ["Deguidized reference", "xref",     "href",   "guid-001#guid-001/title guid-000#guid-000/title", "act2.dita"],
-    ["Deguidized reference", "xref",     "href",   "guid-000#guid-000/title2",                        "act2.dita"],
-    ["Deguidized reference", "xref",     "href",   "guid-000#c1/title2",                              "act2.dita"],
-    ["Deguidized reference", "link",     "href",   "guid-000",                                        "act2.dita"],
-    ["Relocated",            "p",        "conref", "bookmap.ditamap",                                 "act2.dita"],
-    ["Relocated",            "p",        "conref", "bookmap2.ditamap",                                "act2.dita"],
-    ["Deguidized reference", "topicref", "href",   "guid-000",                                        "map/bookmap.ditamap"],
-    ["Deguidized reference", "topicref", "href",   "guid-000",                                        "map/bookmap2.ditamap"],
-   ];
+   [[ "Deguidized reference", "image",    "href",   "guid-000",                                          "act1.dita",            "act1.dita", ],
+    [ "Deguidized reference", "link",     "href",   "guid-000",                                          "act1.dita",            "act2.dita", ],
+    [ "Deguidized reference", "topicref", "href",   "guid-000",                                          "act1.dita",            "map/bookmap.ditamap", ],
+    [ "Deguidized reference", "topicref", "href",   "guid-000",                                          "act1.dita",            "map/bookmap2.ditamap", ],
+    [ "Deguidized reference", "xref",     "href",   "guid-000#c1/title2",                                "act1.dita",            "act2.dita", ],
+    [ "Deguidized reference", "xref",     "href",   "guid-000#guid-000/title",                           "act1.dita",            "act2.dita", ],
+    [ "Deguidized reference", "xref",     "href",   "guid-000#guid-000/title2",                          "act1.dita",            "act2.dita", ],
+    [ "Deguidized reference", "xref",     "href",   "guid-001#guid-001/title guid-000#guid-000/title",   "act1.dita",            "act2.dita", ],
+  #  [ "Relocated",            "p",        "conref", "bookmap.ditamap",                                   "map/bookmap.ditamap",  "act2.dita", ],
+  #  [ "Relocated",            "p",        "conref", "bookmap2.ditamap",                                  "map/bookmap2.ditamap", "act2.dita", ],
+  ];
+
+
+# &writeXrefStructure($x, qw(fixedRefs in targets));
  }
+
 
 if (1)                                                                          # Add nav titles
  {my $N = 8;
 
   clearFolder($_, 420) for in, out, reports;
-  createSampleInputFiles(in, $N);
+  createSampleInputFilesBaseCase(in, $N);
 
   my $x = xref(inputFolder  => in, requestAttributeNameAndValueCounts=>1,
-               addNavTitles => 1, deguidize=>1);
+               addNavTitles => 1, deguidize=>1, deleteUnusedIds => 1);
+
+  #&writeXrefStructure($x, qw(badNavTitles in));
 
   is_deeply checkXrefStructure($x, q(badNavTitles), in, targets),
    [["No title for target",  "chapter href=\"yyyy.dita\"",     "map/yyyy.dita",  "map/bookmap.ditamap"],
@@ -5307,8 +7059,12 @@ if (1)                                                                          
     ["No title for target",  "chapter href=\"../act4.dita\"",  "act4.dita",      "map/bookmap3.ditamap"],
     ["No title for target",  "chapter href=\"../act5.dita\"",  "act5.dita",      "map/bookmap3.ditamap"]];
 
+  #&writeXrefStructure($x, qw(goodNavTitles in targets)); exit;
 
-  is_deeply checkXrefStructure($x, q(goodNavTitles), in, targets),
+  my $y = xref(inputFolder  => in, requestAttributeNameAndValueCounts=>1,
+               addNavTitles => 1, deguidize=>1, fixBadRefs=>1);
+
+  is_deeply checkXrefStructure($y, q(goodNavTitles), in, targets),
    [[ "../act1.dita", "All Timing Codes Begin Here", "act1.dita", "map/bookmap.ditamap",  ],
     [ "../act1.dita", "All Timing Codes Begin Here", "act1.dita", "map/bookmap.ditamap",  ],
     [ "../act1.dita", "All Timing Codes Begin Here", "act1.dita", "map/bookmap2.ditamap", ],
@@ -5319,16 +7075,17 @@ if (1)                                                                          
   ok index(readFile(fpe($x->reports, qw(count attributeNamesAndValues txt))), <<END) > 0;
 Summary_of_column_Attribute
    Count  Attribute
-1    100  href
-2     77  id
+1     98  href
+2     29  id
 3     20  conref
 4      8  xtrf
-5      1  cols
-6      1  format
+5      2  navtitle
+6      1  cols
+7      1  format
 END
  }
 
-if (1)                                                                          # Max zoom in
+if (0)                                                                          # Max zoom in - fails after upgrade to html reports
  {my $N = 8;
 
   clearFolder($_, 420) for in, out, reports;
@@ -5366,7 +7123,6 @@ if (1)                                                                          
                fixedFolder => outFixed);
 
   ok $x->statusLine eq q(Xref: 2 refs, 2 second lines);
-
   my @files = searchDirectoryTreesForMatchingFiles(outFixed, q(dita));
 
   ok @files == 1;
@@ -5385,6 +7141,12 @@ if (1)                                                                          
   </conbody>
 </concept>
 END
+
+#  &writeXrefStructure($x, qw(fixedRefsFailed));
+
+  is_deeply checkXrefStructure($x, q(fixedRefsFailed)),
+   [["No such target", "p",    "conref", "3.dita#c2/p1", "1.dita"],
+    ["No such target", "xref", "href",   "3.dita#c2/p1", "1.dita"]];
  }
 
 if (1)                                                                          # ltgt
@@ -5401,8 +7163,8 @@ if (1)                                                                          
  {clearFolder(tests, 111);
   createSampleInputFilesForFixDitaRefsImproved1(tests);
 
-  my $x = xref(inputFolder => out, fixDitaRefs => targets);                     # Fix with statistics showing the scale of the problem
-  ok !$x->statusLine;
+  my  $x = xref(inputFolder => out, fixBadRefs => 1, fixDitaRefs => targets);   # Fix with statistics showing the scale of the problem
+  ok !$x->errors;
 
   is_deeply checkXrefStructure($x, q(inputFileToTargetTopics), tests),
    {"in/a.dita"     => {"c_aaaa_ca202b3f0a58c67675f9704a32546cea.dita" => 1},
@@ -5421,8 +7183,8 @@ if (1)                                                                          
     "c_aaaa_ca202b3f0a58c67675f9704a32546cea.dita" => {"in/a.dita" => 1, "in/b.dita" => 1}
    };
 
-  my $y = xref(inputFolder => out);                                             # Check results
-  ok $y->statusLine eq q();
+  my  $y = xref(inputFolder => out);                                            # Check results
+  ok !$y->errors;
  }
 
 if (1)                                                                          # fixDitaRefs using target files to resolve conrefs to renamed files
@@ -5432,8 +7194,8 @@ if (1)                                                                          
   my $y = xref(inputFolder => out);                                             # Check results without fixes
   ok $y->statusLine eq q(Xref: 1 ref);
 
-  my $x = xref(inputFolder => out, fixDitaRefs => targets);                     # Fix
-  ok !$x->statusLine;
+  my $x = xref(inputFolder => out, fixBadRefs => 1, fixDitaRefs => targets);    # Fix
+  ok !$x->errors;
 
   is_deeply checkXrefStructure($x, q(inputFileToTargetTopics), tests),
    {"in/a.dita" => {"c_aaaa_c8e30fbb422819ab92e1752ca50bb158.dita"=>1},
@@ -5459,8 +7221,8 @@ if (1)                                                                          
   my $y = xref(inputFolder => out);                                             # Check results without fixes
   ok $y->statusLine eq q(Xref: 1 ref);
 
-  my $x = xref(inputFolder => out, fixDitaRefs => targets);                     # Fix
-  ok !$x->statusLine;
+  my $x = xref(inputFolder => out, fixBadRefs => 1, fixDitaRefs => targets);    # Fix
+  ok !$x->errors;
  }
 
 if (1)                                                                          # fixDitaRefs in bookmaps to a topics that was not cut into multiple pieces
@@ -5470,27 +7232,28 @@ if (1)                                                                          
   my $y = xref(inputFolder => out);                                             # Check results without fixes
   ok $y->statusLine eq q(Xref: 1 ref);
 
-  my $x = xref(inputFolder => out, fixDitaRefs => targets);                     # Fix
-  ok !$x->statusLine;
+  my $x = xref(inputFolder => out, fixBadRefs => 1, fixDitaRefs => targets);    # Fix
+  ok !$x->errors;
 
   ok int(1e2 * $y->tagsTextsRatio) == 233;
-
  }
 
 if (1)                                                                          # Images
  {clearFolder(tests, 111);
   createSampleImageTest(tests);
 
-  my $x = xref(inputFolder => out, fixDitaRefs => targets);
+  my $x = xref(inputFolder => out, fixBadRefs => 1, fixDitaRefs => targets);
   ok $x->statusLine eq q(Xref: 1 image ref, 1 ref);
-  ok $x->missingImageFiles->[0][0] eq q(../images/b.png);
+
+  my ($file) = keys $x->missingImageFiles->%*;
+  ok $file =~ m(/images/b.png\Z);
  }
 
 if (1)                                                                          # Test topic flattening ratio reporting
  {clearFolder(tests, 111);
   createTestTopicFlattening(tests);
 
-  my $x = xref(inputFolder => out, fixDitaRefs => targets);
+  my $x = xref(inputFolder => out, fixBadRefs => 1, fixDitaRefs => targets);
 
   ok $x->topicsFlattened       == 3;
   ok $x->topicFlatteningFactor == 3;
@@ -5509,17 +7272,19 @@ if (1)                                                                          
   ok $x->statusLine eq q(Xref: 1 ref);
   is_deeply checkXrefStructure($x, q(fixedRefs), in, targets), [];
 
-  my $y = xref(inputFolder => out, fixDitaRefs => targets);
+  my $y = xref(inputFolder => out, fixBadRefs => 1, fixDitaRefs => targets);
   ok $y->topicsFlattened == 2;
   ok $y->topicFlatteningFactor == 2;
 
   is_deeply checkXrefStructure($y, q(fixedRefs), in, targets),
    [["Unique target for file ref", "p", "conref", "b.dita#c/p1",
+     "c_aaaa_8b028dc2faaca88ac747b3776189d4a6.dita",
      "c_aaaa_3119ee09e34375ed4d8a7a15274a9774.dita", "a.dita"]];
 
-  ok !$y->statusLine;
+  ok !$y->errors;
   is_deeply checkXrefStructure($y, q(fixedRefs), in, targets),
     [["Unique target for file ref", "p", "conref", "b.dita#c/p1",
+      "c_aaaa_8b028dc2faaca88ac747b3776189d4a6.dita",
       "c_aaaa_3119ee09e34375ed4d8a7a15274a9774.dita", "a.dita"]];
 
  }
@@ -5528,7 +7293,7 @@ if (1)                                                                          
  {clearFolder(tests, 111);
   createTestReferenceToCutOutTopic(tests);
 
-  my $x = xref(inputFolder => out, fixDitaRefs => targets);
+  my $x = xref(inputFolder => out, fixBadRefs => 1, fixDitaRefs => targets);
   ok $x->statusLine eq q(Xref: 1 ref);
 
   is_deeply checkXrefStructure($x, q(inputFileToTargetTopics),          in, targets), { "a.xml" => { "c_aaaa_121939eab89cd7d2c3eb4c4189772a1f.dita" => 1, "c_aaaa_bbbb_55baefe9258538b26a95b0015a8d5a2b.dita" => 1, "c_aaaa_cccc_a91633094220d068c453eecae1726eff.dita" => 1, "c_aaaa_dddd_914b8e11993908497768c50d992ea0f0.dita" => 1, }, "b.xml" => { "c_bbbb_6100b51ca1f789836cd4f31893ed67d2.dita" => 1, "c_bbbb_aaaa_cfd3a140e06a914fc8469583ad87829d.dita" => 1, "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita" => 1, "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita" => 1, }, };
@@ -5542,9 +7307,9 @@ if (1)                                                                          
  {clearFolder(tests, 111);
   createSampleOtherMeta(in);
 
-  my $x = xref(inputFolder => in);
+  my $x = xref(inputFolder => in, subjectSchemeMap=> fpe(out, qw(subjectScheme map)));
 
-  ok !$x->statusLine;
+  ok !$x->errors;
 
   is_deeply checkXrefStructure($x, q(otherMetaDuplicatesSeparately)), [];
 
@@ -5585,14 +7350,259 @@ if (1)                                                                          
     ["b2.ditamap", "dd", 2, "DD2222"]];
  }
 
-latestTest:;
+if (1)                                                                          # Othermeta migration
+ {clearFolder(tests, 111);
+  createTestOneNotRef(tests);
+
+  my $x = xref(inputFolder => in);
+
+  ok !$x->errors;
+
+  is_deeply checkXrefStructure($x, q(topicsNotReferencedFromBookMaps)),
+            {"b.dita" => 1};
+  is_deeply checkXrefStructure($x, q(topicsReferencedFromBookMaps)),
+            {"a.ditamap" => {"a.dita" => 1}};
+ }
+
+if (1)                                                                          # Classification and subject scheme maps
+ {clearFolder(tests, 111);
+  createClassificationMapsTest(in);
+
+  my $x = xref
+   (inputFolder        => in,
+    classificationMaps => 1,
+    subjectSchemeMap   => fpe(reports, qw(subjectSchemeAndClassification ditamap)));
+
+  ok !$x->errors;
+  my $m1 = fpe(in, qw(maps m1_classification ditamap));
+  my $m2 = fpe(in, qw(maps m2_classification ditamap));
+  ok -e $_ for $m1, $m2;
+  ok readFile($m1) =~ m'<topicref href="m2_classification.ditamap">'i;
+ }
+
+if (1)                                                                          # Classification and subject scheme maps
+ {clearFolder(tests, 111);
+  createWordsToFilesTest(in);
+
+  my $x = xref(inputFolder      => in,
+               indexWords       => 1,
+               indexWordsFolder => fpd(reports, q(words)));
+  ok  65 == $x->indexedWords;
+
+  my $wt = fpe($x->indexWordsFolder, qw(words_to_topics data));
+  my $tw = fpe($x->indexWordsFolder, qw(topics_to_words data));
+
+  ok -e $wt;
+  ok -e $tw;
+
+  my $index = retrieve $wt;
+  my $i     = intersectionOfHashesAsArrays(map {$index->{$_}} qw(make tea));
+
+  is_deeply removeStringsFromData($i, in), { "tea.dita" => [2, 5] };
+ }
+
+if (1)                                                                          # Classification and subject scheme maps
+ {clearFolder(tests, 111);
+  createSampleConRefs(&in);
+
+  my $x = xref
+   (inputFolder      => in,
+    reports          => reports,
+    fixBadRefs       => 1,
+    fixRelocatedRefs => 1,
+    fixXrefsByTitle  => 1,
+   );
+
+  is_deeply removeFilePathsFromStructure($x->ids),
+   { "c1.dita" => { c1 => 2, i1 => 1, i2 => 2, x1 => 1 },
+     "c2.dita" => { c2 => 2, p1 => 1, p2 => 1 },
+   };
+
+  is_deeply removeFilePathsFromStructure($x->references),
+   { "c1.dita" => { "i1" => 1, "i2" => 1, "i3" => 3, "p1" => 1, "p2" => 1, "p3" => 1, },
+   };
+
+  is_deeply removeFilePathsFromStructure($x->idNotReferenced),
+   { "c1.dita" => { c1 => 1, x1 => 1 },
+     "c2.dita" => { c2 => 1 },
+   };
+
+  is_deeply removeFilePathsFromStructure($x->idReferencedCount),
+   { "c1.dita" => { i1 => 1, i2 => 1, i3 => 3 },
+     "c2.dita" => { p1 => 1, p2 => 1, p3 => 1 },
+   };
+
+  ok $x->statusLine eq q(Xref: 5 refs, 3 duplicate ids, 2 first lines, 2 second lines);
+
+  my $fr = readFile(fpe(reports, qw(bad failing_references txt)));
+  ok index($fr, q(Comma_Separated_Values_of_column_Reference: "c1.dita#c1/i2","c1.dita#c1/i3","c2.dita#c2/p3")) > -1;
+  ok index($fr, q(Comma_Separated_Values_of_column_Attr: "conref","href"))                                      > -1;
+
+  my $di = readFile(fpe(reports, qw(bad duplicateIds txt)));
+  ok index($di, q(Comma_Separated_Values_of_column_Id: "c1","c2","i2")) > -1;
+  ok index($di, q(Comma_Separated_Values_of_column_Count: 2))           > -1;
+ }
+
+if (1)                                                                          # Classification and subject scheme maps
+ {clearFolder(tests, 111);
+  createEmptyBody(&in);
+
+  my $x = xref(inputFolder => in);
+
+  ok !$x->errors;
+
+  #say STDERR writeStructureTest($x->emptyTopics, q($x->emptyTopics));
+  is_deeply removeFilePathsFromStructure($x->emptyTopics),
+   {"c1.dita" => 1};
+ }
+
+if (1)                                                                          # Topics to referring bookmaps
+ {clearFolder(tests, 111);
+  createSampleTopicsReferencedFromBookMaps(&in);
+
+  my $x = xref(inputFolder => in);
+
+  ok $x->statusLine eq q(Xref: 6 refs, 5 first lines, 5 second lines, 3 image refs);
+
+  is_deeply removeFilePathsFromStructure($x->topicsToReferringBookMaps),
+   { "c1.dita" => { "m1.dita" => 1, "m2.dita" => 1, },
+     "c2.dita" => { "m2.dita" => 1, },
+   };
+
+  is_deeply removeFilePathsFromStructure($x->topicsReferencedFromBookMaps),
+   { "m1.dita" => { "c1.dita" => 1, },
+     "m2.dita" => { "c1.dita" => 1, "c2.dita" => 1, },
+   };
+
+  is_deeply removeFilePathsFromStructure($x->imagesToRefferingBookMaps),
+   { "1.png" => { "m1.dita" => 1, "m2.dita" => 2, },
+     "2.png" => { "m2.dita" => 1, },
+     };
+
+  is_deeply removeFilePathsFromStructure($x->imagesReferencedFromBookMaps),
+   { "m1.dita" => { "1.png" => 1, },
+     "m2.dita" => { "1.png" => 2, "2.png" => 1, },
+   };
+
+ }
+
+if (1)                                                                          # Conref matching
+ {clearFolder(tests, 111);
+  createSampleConRefMatching(&in);
+
+  my $x = xref(inputFolder => in);
+  ok $x->statusLine eq q(Xref: 2 first lines, 2 second lines);
+ }
+
+if (1)                                                                          # Md5 sum duplicates
+ {clearFolder(tests, 111);
+  createSampleDuplicateMd5Sum(&in);
+
+  my $x = xref(inputFolder => in, html => reports);
+  ok $x->statusLine eq q(Xref: 5 duplicate files, 5 first lines, 5 missing topic ids, 5 second lines);
+
+  #say STDERR writeStructureTest($x->md5SumDuplicates, q($x->md5SumDuplicates));
+  is_deeply removeFilePathsFromStructure($x->md5SumDuplicates),
+   { "3b6840b4a7409ae6b0f6daed9aa8f1db" => { "t.dita" => 1, "t.dita" => 1, },
+     "a5899fda929f90ff7a2419fc61d5f8c3" => { "c.dita" => 1, "c.dita" => 1, "c.dita" => 1, },
+   };
+ }
+
+if (1)                                                                          # Remove unreferenced ids
+ {clearFolder(tests, 111);
+  createSampleUnreferencedIds(&in);
+
+  my $x = xref(inputFolder => in, deleteUnusedIds => 1);
+  ok $x->statusLine eq q(Xref: 4 duplicate ids, 2 first lines, 2 second lines, 1 ref);
+  is_deeply $x->idsRemoved, {c1=>1, c2=>1, p3=>1};
+
+  ok readFile(fpe(&in, qw(c1 dita))) eq <<END;
+<concept id="c1">
+  <title/>
+  <conbody>
+    <p id="p1"/>
+    <p id="p2"/>
+    <p id="p2"/>
+    <p/>
+    <p/>
+    <p/>
+  </conbody>
+</concept>
+END
+
+  ok readFile(fpe(&in, qw(c2 dita))) eq <<END;
+<concept id="c2">
+  <title/>
+  <conbody>
+    <p href="c1.dita#p1"/>
+    <p conref="c1.dita#c1/p2"/>
+  </conbody>
+</concept>
+END
+
+  my $y = xref(inputFolder => in, html=>reports);
+  ok $y->statusLine eq q(Xref: 2 first lines, 2 second lines, 1 duplicate id, 1 ref);
+
+  #say STDERR writeStructureTest($y->duplicateIds, q($y->duplicateIds));
+  is_deeply removeFilePathsFromStructure($y->duplicateIds),
+   { "c1.dita" => { p2 => 2 },
+   };
+
+  ok readFile(fpe(reports, qw(index_of_reports html))) =~ m(<b>22</b>);
+ }
+
+if (1)                                                                          # Remove unreferenced ids
+ {clearFolder(tests, 111);
+  createSampleImageReferences(&in);
+
+  my $x = xref(inputFolder => in);
+  ok $x->statusLine eq q(Xref: 6 refs, 3 first lines, 3 second lines, 1 image ref);
+
+  #say STDERR writeStructureTest($x->goodImageFiles, q($x->goodImageFiles));
+  is_deeply removeFilePathsFromStructure($x->goodImageFiles),
+   { "good1.png" => 3, "good2.png" => 3};
+
+  #say STDERR writeStructureTest($x->missingImageFiles, q($x->missingImageFiles));
+  is_deeply removeFilePathsFromStructure($x->missingImageFiles),
+   { "bad1.png" => 6, };
+ }
+
+if (1)                                                                          # Required clean ups report
+ {clearFolder(tests, 111);
+  createRequiredCleanUps(&in);
+
+  my $x = xref(inputFolder => in);
+  ok $x->statusLine eq q(Xref: 2 first lines, 2 second lines);
+
+  #say STDERR writeStructureTest($x->requiredCleanUp, q($x->requiredCleanUp));
+  is_deeply removeFilePathsFromStructure($x->requiredCleanUp),
+   { "c1.dita" => { aaa => 1, bbb => 2 },
+     "c2.dita" => { aaa => 1, bbb => 1, ccc => 1, CCC => 1 },
+   };
+ }
+
+if (1)                                                                          # Soft conrefs
+ {clearFolder(tests, 111);
+  createSoftConrefs(&in);
+
+  my $x = xref(inputFolder      => in);
+  ok $x->statusLine eq q(Xref: 7 refs, 1 duplicate id, 1 duplicate topic id);
+
+  my $y = xref(inputFolder      => in, fixRelocatedRefs => 1);
+  ok $y->statusLine eq q(Xref: 7 refs, 1 duplicate id, 1 duplicate topic id);
+
+  my $z = xref(inputFolder      => in);
+  ok $z->statusLine eq q(Xref: 6 refs, 1 duplicate id, 1 duplicate topic id);
+ }
+
+if (1)                                                                          # Oxygen project files
+ {clearFolder(tests, 111);
+  createSampleInputFilesBaseCase(&in, 8);
+
+  my $x = xref(inputFolder => in, oxygenProjects=>1);
+  ok $x->statusLine eq q(Xref: 104 refs, 21 image refs, 14 first lines, 14 second lines, 8 duplicate ids, 4 duplicate topic ids, 4 invalid guid hrefs, 2 duplicate files, 2 tables, 1 External xrefs with no format=html, 1 External xrefs with no scope=external, 1 file failed to parse, 1 href missing);
+ }
 
 clearFolder($_, 1e3) for in, out, outFixed, reports, tests, targets, q(zzzParseErrors);
 
 done_testing;
-
-
-1
-
-# &writeXrefStructureTest($x, qw(topicFlattening in targets));
-

@@ -34,12 +34,20 @@
          "requires" : {
             "File::Slurp" : "0",
             "Test2::V0" : "0",
-            "perl" : "5.006"
+            "perl" : "5.008"
+         },
+         "suggests" : {
+            "Sub::Override" : "0",
+            "Test2::Plugin::BailOnFail" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "Sub::Override" : "0",
+            "Test2::Plugin::BailOnFail" : "0"
+         },
          "requires" : {
-            "Test2::Tools::Basic" : "0",
+            "Test2::V0" : "0",
             "Test::Output" : "0"
          }
       }
@@ -52,6 +60,6 @@
          "web" : "https://github.com/SpareRoom/Test2-Aggregate"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

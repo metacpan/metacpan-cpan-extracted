@@ -5,7 +5,7 @@ package VMware::vCloudDirector2::Object;
 use strict;
 use warnings;
 
-our $VERSION = '0.106'; # VERSION
+our $VERSION = '0.107'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -216,6 +216,7 @@ method find_link (@criteria) {
     }
     return $matched_links[0];
 }
+method fetch_link (@search_items) { return $self->find_link(@search_items)->GET(); }
 
 # ------------------------------------------------------------------------
 
@@ -336,7 +337,7 @@ VMware::vCloudDirector2::Object - Module to contain an object!
 
 =head1 VERSION
 
-version 0.106
+version 0.107
 
 =head2 Attributes
 
@@ -417,6 +418,11 @@ multiple links match then the first one returned (normally the first one back
 from the API) would be returned.
 
 The return value is a single link object.
+
+=head3 fetch_link
+
+As per L</find_link> except that the link found is fetched and expanded up as
+an object.
 
 =head3 fetch_links
 

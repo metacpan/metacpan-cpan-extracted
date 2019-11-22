@@ -17,6 +17,12 @@ qx.Class.define("callbackery.ui.plugin.Form", {
      */
     construct : function(cfg,getParentFormData) {
         this.base(arguments);
+        var that = this;
+        cfg.form.forEach(function(s){
+            if (s.triggerFormReset) {
+                that._hasTrigger = true;
+            }
+        });
         this._cfg = cfg;
         this._loading = 0;
         this._getParentFormData = getParentFormData;
@@ -62,6 +68,8 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         _cfg: null,
         _loading: null,
         _getParentFormData: null,
+        _hasTrigger: null,
+        _reConfFormInProgress: null,
 
         _populate: function(){
             var cfg = this._cfg;
@@ -96,7 +104,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             var rpc = callbackery.data.Server.getInstance();
             var cfg = this._cfg;
             var form = this._form;
-            var reConfFormInProgress;
+
             cfg.form.forEach(function(s){
                 if (!s.key){
                     return;
@@ -136,18 +144,8 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                             }
                         }, 'validatePluginData',cfg.name,s.key,form.getData());
                     }
-                    if (s.triggerFormReset && ! reConfFormInProgress){
-                        var that = this;
-                        reConfFormInProgress=true;
-                        rpc.callAsyncSmart(function(pluginConfig) {
-                            if (pluginConfig){
-                                that._reConfForm(pluginConfig.form);
-                            }
-                            reConfFormInProgress = false;
-                        }, 'getPluginConfig',cfg.name,{ 
-                            triggerField: s.key,
-                            currentFormData: form.getData()
-                        });
+                    if (s.triggerFormReset && ! this._loading){
+                        this._reconfForm(s.key);
                     }
                 };
                 if (control.getSelection){
@@ -158,11 +156,27 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 }
             },this);
         },
-        _reConfForm: function(formCfg){
+        _reconfForm: function(triggerField){
+            if (this._reConfFormInProgress) return;
+
+            var that = this;
+            var rpc = callbackery.data.Server.getInstance();
+            that._reConfFormInProgress=true;
+            rpc.callAsyncSmart(function(pluginConfig) {
+                if (pluginConfig){
+                    that._reConfFormHandler(pluginConfig.form);
+                }
+                that._reConfFormInProgress = false;
+            }, 'getPluginConfig', that._cfg.name,{
+                triggerField: triggerField,
+                currentFormData: that._form.getData()
+            });
+        },
+        _reConfFormHandler: function(formCfg){
             formCfg.forEach(function(s){
                 if (!s.key){
                     return;
-                }               
+                }
                 if (s.widget == 'selectBox' || s.widget == 'comboBox'){
                     this._form.setSelectBoxData(s.key,s.cfg.structure);
                 }
@@ -212,6 +226,9 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             rpc.callAsync(function(data,exc){
                 if (!exc){
                     that._form.setData(data,true);
+                    if (that._hasTrigger) {
+                        that._reconfForm();
+                    }
                 }
                 else {
                     if (exc.code != 2){ /* 2 is for aborted calls, this happens when the popup is closed */

@@ -13,25 +13,43 @@ sub new {
 
         local $@;
 
+        my $rej_pp = $class->_create_postpone_cb($rej);
+
         my $ok = eval {
             $cr->(
-                sub {
-                    my ($arg) = @_;
-                    $class->_postpone( sub { $res->($arg) } );
-                },
-                sub {
-                    my ($arg) = @_;
-                    $class->_postpone( sub { $rej->($arg) } );
-                },
+                $class->_create_postpone_cb($res),
+                $rej_pp,
             );
 
             1;
         };
 
         if (!$ok) {
-            my $err = $@;
-            $class->_postpone( sub { $rej->($err) } );
+            $rej_pp->( my $err = $@ );
         }
+    } );
+}
+
+sub _create_postpone_cb {
+    my ($class, $cr) = @_;
+
+    return sub {
+        my ($arg) = @_;
+        $class->_postpone( sub { $cr->($arg) } );
+    },
+}
+
+sub then {
+    my ($self, $on_res, $on_rej) = @_;
+
+    my $class = ref $self;
+
+    return $class->new( sub {
+        my ($y, $n) = @_;
+
+        $class->_postpone( sub {
+            $self->SUPER::then($on_res, $on_rej)->SUPER::then($y, $n);
+        } );
     } );
 }
 

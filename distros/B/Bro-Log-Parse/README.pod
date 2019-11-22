@@ -2,6 +2,11 @@
 
 Bro::Log::Parse - Object-oriented Perl interface for parsing Bro log files
 
+=head1 DEPRECATION
+
+This module is deprecated. Please use L<Zeek::Log::Parse> instead. New features
+will only be added there.
+
 =head1 SYNOPSIS
 
   use Bro::Log::Parse;

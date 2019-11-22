@@ -1,4 +1,4 @@
-#!/usr/bin/perl  -Ilib
+#!/usr/bin/perl -Ilib
 #-------------------------------------------------------------------------------
 # Test Data::Edit::Xml::Xref
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016

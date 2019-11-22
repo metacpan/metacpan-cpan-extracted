@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.706';
+our $VERSION = '1.707';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -1189,7 +1189,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.706
+Version 1.707
 
 =cut
 
@@ -1670,7 +1670,7 @@ The option I<tabs_info> expects a reference to an array with one or two elements
 - a second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart
 from the beginning of paragraphs
 
-Allowed values for the two elements are: 0 or greater.
+Allowed values: 0 or greater. Elements beyond the second are ignored.
 
 (default: undefined)
 
@@ -1685,7 +1685,7 @@ The option I<tabs_prompt> expects a reference to an array with one or two elemen
 - a second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart
 from the beginning of paragraphs
 
-Allowed values for the two elements are: 0 or greater.
+Allowed values: 0 or greater. Elements beyond the second are ignored.
 
 (default: undefined)
 

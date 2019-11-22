@@ -9,7 +9,7 @@ lib/Promise/ES6.pm
 lib/Promise/ES6/AnyEvent.pm
 lib/Promise/ES6/EventLoopBase.pm
 lib/Promise/ES6/IOAsync.pm
-t/00_compile.t
+lib/Promise/ES6/Mojo.pm
 t/all.t
 t/all_async.t
 t/anyevent.t
@@ -19,10 +19,12 @@ t/await_with_async.t
 t/catch.t
 t/catch_asyncreject.t
 t/ioasync.t
+t/lib/EventTest.pm
 t/lib/Eventer.pm
 t/lib/MemoryCheck.pm
 t/lib/PromiseTest.pm
 t/memory_leaks.t
+t/mojo.t
 t/multi_then.t
 t/race.t
 t/race_async.t

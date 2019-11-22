@@ -37,7 +37,6 @@
          "recommends" : {
             "B::Deparse" : "0",
             "BSD::Resource" : "0",
-            "Capture::Tiny" : "0",
             "Clone" : "0",
             "DBD::CSV" : "0",
             "DBI" : "0",
@@ -47,7 +46,6 @@
             "LWP::UserAgent" : "0",
             "Method::Signatures" : "0",
             "PadWalker" : "0",
-            "Sub::Util" : "0",
             "Term::ReadLine::Gnu" : "0",
             "Test::Pod::Snippets" : "0",
             "Text::CSV" : "0",
@@ -55,12 +53,15 @@
             "URI" : "0"
          },
          "requires" : {
+            "Capture::Tiny" : "0",
             "Digest" : "0",
             "Getopt::Long" : "0",
             "NEXT" : "0",
             "Scalar::Util" : "0",
+            "Sub::Util" : "0",
             "Symbol" : "0",
             "Test::More" : "0",
+            "Test::Requires" : "0",
             "base" : "0",
             "overload" : "0",
             "perl" : "5.014002",
@@ -69,9 +70,7 @@
          }
       },
       "test" : {
-         "requires" : {
-            "Test::Requires" : "0"
-         }
+         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -82,6 +81,6 @@
          "web" : "https://github.com/pflanze/functional-perl"
       }
    },
-   "version" : "v0.72.4",
+   "version" : "v0.72.6",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,5 +1,10 @@
 Revision history for Perl module Promise::ES6
 
+0.12 Thu 21 November 2019
+- Fix event-loop logic to run ->then() asynchronously.
+- Remove left-in Data::Dumper.
+- Add Mojolicious backend.
+
 0.11 Fri 15 November 2019
 - Fix memory leak in callback propagation.
 

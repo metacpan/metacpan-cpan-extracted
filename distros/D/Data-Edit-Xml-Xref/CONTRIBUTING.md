@@ -1,5 +1,5 @@
 # Contributing
 
-Please send your proposed improvements to philiprbrenan@gmail.com titled **DEXX**. Thanks!
+Please send your improvements to philiprbrenan@gmail.com titled **Xref**. Thanks!
 
 

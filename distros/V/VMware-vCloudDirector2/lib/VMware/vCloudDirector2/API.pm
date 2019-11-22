@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use v5.10;    # needed for state variable
 
-our $VERSION = '0.106'; # VERSION
+our $VERSION = '0.107'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -396,7 +396,11 @@ method _build_returned_objects ($response) {
         # was not a list of things, so just objectify the one thing here
         else {
             $self->_debug("API: building a single [$thing_type] object") if ( $self->debug );
-            return VMware::vCloudDirector2::Object->new( hash => $hash, api => $self );
+            return VMware::vCloudDirector2::Object->new(
+                hash => $hash,
+                api  => $self,
+                href => $response->request->uri,
+            );
         }
     }
 
@@ -497,7 +501,7 @@ VMware::vCloudDirector2::API - Module to do stuff!
 
 =head1 VERSION
 
-version 0.106
+version 0.107
 
 =head2 Attributes
 

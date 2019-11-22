@@ -1,0 +1,125 @@
+=head1 NAME
+
+Zeek::Log::Parse - Object-oriented Perl interface for parsing Zeek log files
+
+=head1 SYNOPSIS
+
+  use Zeek::Log::Parse;
+  
+  my $parse = Zeek::Log::Parse->new('/path/to/logfile');
+  while ( $fields = $parse->getLine() ) {
+    print $fields->{ts}."\n";
+  }
+
+=head1 ABSTRACT
+
+Perl interface for parsing Zeek logfiles
+
+=head1 DESCRIPTION
+
+This library provides an easy and convenient way to parse the log files generated
+by the L<Zeek Network Security Monitor|http://www.zeek.org>.
+
+If the L<JSON> module is installed, this module can also be used to parse Zeek log
+files that were written in JSON format.
+
+=head1 Constructor
+
+The base constructor for Zeek::Log::Parse classes is called new. There are
+several different ways of calling the constructor, depending on the options you
+want to set. In a nutshell, one can either pass no argument (data is read from
+C<< <> >>); a string argument, which is interpreted as a file name; a file handle which
+is used to read data from; or an array reference that can use all of these
+options and set a few more parameter.
+
+=over 4
+
+=item B<new()>
+
+The first invocation of the base constructor for Zeek::Log::Parse. No argument is
+passed. The resulting class reads Zeek log data from C<< <> >>.
+
+=item B<new('/path/to/file')>
+
+Passing a string to the constructor for Zeek::Log::Parse will read Zeek log data
+from the file pointed to. If the file pointed to does not exist or cannot be
+opened, a fatal error is raised.
+
+=item B<new($fh)>
+
+Passing a file handle to the constructor for Zeek::Log::Parse will read Zeek log
+data from the filehandle.
+
+=item B<new({ option =E<gt> value })>
+
+Pass a hashref of options to the constructor for Zeek::log::Parse. Options that
+can be given (in descending order of importance):
+
+=over 4
+
+=item B<fh>
+
+Filehandle to be used as data source.
+
+=item B<file>
+
+Name of file to be used as data source.
+
+=item B<diamond>
+
+Boolean; if set to true, data is read from C<< <> >>, if no other data source is given.
+
+=item B<empty_as_undef>
+
+Boolean; if set to true, C<< getLine() >> will return empty columns as undef instead of as empty arrayrefs.
+
+=back
+
+=back
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<getLine()>
+
+Read the the line of the input and return the parsed data as a hash. Returns
+undef when on EOF.
+
+=item B<fh()>
+
+Return the filehandle data is read from. Returns undef if data is read from C<< <> >>.
+
+=item B<file()>
+
+Return the filename data is read from. Returns undef if no filename was given in
+constructor.
+
+=item B<line()>
+
+Value of the last line that was read; undef if no line was read yet.
+
+=item B<headers()>
+
+Hash reference of all headers that were read. Contains, for example, open, fields, types, etc.
+
+=item B<headerlines()>
+
+Arrayref of all header lines that were read in order.
+
+=item B<fields()>
+
+Arrayref of all fields present in the input file.
+
+=back
+
+=head1 AUTHOR
+
+Johanna Amann, E<lt>johanna@icir.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2019 by Johanna Amann
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

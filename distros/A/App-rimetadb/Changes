@@ -1,3 +1,8 @@
+0.223   2019-10-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Update renamed prereq Data::Clean::JSON -> Data::Clean::ForJSON.
+
+
 0.222   2019-08-14  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] stats: did not include common options like --dsn.

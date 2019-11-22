@@ -7,8 +7,8 @@ BEGIN { use_ok('Telugu::AsciiMap') };
 
 
 my $map = Telugu::AsciiMap->new();
-my $asciistring = $map->convert('కరీమింఘీణ');
-my $telugustring = $map->deconvert($asciistring);
+my $asciistring = $map->asciimap('కరీమింఘీణ');
+my $telugustring = $map->asciimap($asciistring);
 
 ok($telugustring eq 'కరీమింఘీణ');
 

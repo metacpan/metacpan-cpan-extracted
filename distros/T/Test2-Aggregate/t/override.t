@@ -1,4 +1,4 @@
-use Test2::Tools::Basic;
+use Test2::V0;
 use Test2::Aggregate;
 
 eval "use Sub::Override";
@@ -13,4 +13,3 @@ Test2::Aggregate::run_tests(
     root     => $root,
     override => { 'Test2::Aggregate::_run_tests' => sub { ok 1, "$0 replacement test"} }
 );
-

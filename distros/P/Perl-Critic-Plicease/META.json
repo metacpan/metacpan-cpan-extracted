@@ -1,0 +1,75 @@
+{
+   "abstract" : "Some Perl::Critic policies used by Plicease",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Plicease",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic::Policy" : "0",
+            "Perl::Critic::Utils" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Perl::Critic::TestUtils" : "0",
+            "Test2::V0" : "0.000060",
+            "Test::Perl::Critic::Policy" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Perl-Critic-Plicease/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Perl::Critic::Plicease",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Perl-Critic-Plicease.git",
+         "web" : "https://github.com/plicease/Perl-Critic-Plicease"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.31.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "x_use_unsafe_inc" : 0
+}
+

@@ -1,4 +1,3 @@
-use Test2::Tools::Basic;
 use Test2::V0;
 use Test2::Aggregate;
 

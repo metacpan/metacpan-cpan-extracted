@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-GitHubREADME-Badge
 
+0.30  2019-11-22 12:33:09 CST
+        - Update CPANTS URL (oalders)
+
 0.29  2019-10-03 22:11:47 CST
         - add github actions badge (skaji)
 

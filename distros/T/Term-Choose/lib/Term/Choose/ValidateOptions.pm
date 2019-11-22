@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.706';
+our $VERSION = '1.707';
 
 use Exporter qw( import );
 
@@ -29,9 +29,6 @@ sub validate_options {
                 for ( @{$opt->{$key}} ) {
                     /^[0-9]+\z/ or croak "$sub: option '$key' => $_ is an invalid array element";
                 }
-            }
-            if ( $key eq 'lf' ) {
-                croak "$sub: option '$key' => too many array elements." if @{$opt->{$key}} > 2;
             }
         }
         elsif ( ref $opt->{$key} ) {

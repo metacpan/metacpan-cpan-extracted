@@ -25,24 +25,25 @@ Test2::Aggregate - Aggregate tests
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 
 =head1 DESCRIPTION
 
 Aggregates all tests specified in C<dirs> (which can even be individual tests), 
-to avoid forking, reloading etc that can help with performance or profiling.
+to avoid forking, reloading etc that can help with performance (dramatically if
+you have numerous small tests) and also facilitate group profiling.
 Test files are expected to end in B<.t> and are run as subtests of a single
 aggregate test.
 
-A bit similar but simpler in concept and execution than C<Test::Aggregate>,
-which makes it more likely to work with your test suite and also with more
-modern Test2 bundles. It does not try to package each test which may be good or
-bad (e.g. redefines), depending on your requirements.
+A bit similar, but simpler in concept and execution to C<Test::Aggregate>, which
+makes it more likely to work with your test suite (especially if you use modern
+tools like Test2). It does not even try to package each test by default, which may
+be good or bad (e.g. redefines), depending on your requirements.
 
 Generally, the way to use this module is to try to aggregate sets of quick tests
 (e.g. unit tests). Try to iterativelly add tests to the aggregator dropping those
@@ -57,12 +58,13 @@ that do not work.
         lists         => \@lists,             # optional if dirs defined
         root          => '/testroot/',        # optional
         load_modules  => \@modules,           # optional
+        package       => 0,                   # optional
         shuffle       => 0,                   # optional
         reverse       => 0,                   # optional
         repeat        => 1,                   # optional, requires Test2::Plugin::BailOnFail for < 0
         slow          => 0,                   # optional
         override      => \%override,          # optional, requires Sub::Override
-        stats_output  => $stats_output_path,  # optional, requires Time::HiRes
+        stats_output  => $stats_output_path,  # optional
         extend_stats  => 0,                   # optional
         test_warnings => 0                    # optional
     );
@@ -74,7 +76,8 @@ Runs the aggregate tests. Returns a hashref with stats like this:
       'test_no'   => 1,                 # numbering starts at 1
       'pass_perc' => 100,               # for single runs pass/fail is 100/0
       'timestamp' => '20190705T145043', # start of test
-      'time'      => '0.1732'           # only with stats_output
+      'time'      => '0.1732',          # only with stats_output
+      'warnings'  => $STDERR            # only with test_warnings on non empty STDERR
     }
   };
 
@@ -104,6 +107,10 @@ to the current directory and the dot is not in your C<@INC>.
 Arrayref with modules to be loaded (with C<eval "use ...">) at the start of the
 test. Useful for testing modules with special namespace requirements.
 
+=item * C<package> (optional)
+
+Will package each test in its own namespace (no redefine warnings etc).
+
 =item * C<override> (optional)
 
 Pass C<Sub::Override> key/values as a hashref.
@@ -128,9 +135,11 @@ When true, tests will be skipped if the environment variable C<SKIP_SLOW> is set
 
 =item * C<test_warnings> (optional)
 
-Tests for warnings over all the tests if set to true. It will print an array of
-warnings, however if you want to see the warnings the moment they are generated
-(for debugging etc), then leave it disabled.
+Tests for warnings over all the tests if set to true - this is added as a final
+test which expects zero as the number of tests which had STDERR output.
+The STDERR output of each test will be printed at the end of the test run (and
+included in the test run result hash), so if you want to see warnings the moment
+they are generated (for debugging etc), then leave this option disabled.
 
 =item * C<stats_output_path> (optional)
 
@@ -145,9 +154,10 @@ time per subtest.
 
 =item * C<extend_stats> (optional)
 
-This is to allow default output of C<stats_output_path> to be fixed/reliable and
-anything additional in future versions requires C<extend_stats> to be shown.
-Currently starting date/time in ISO_8601 is added.
+This option is to allow for the default output of C<stats_output_path> to be
+fixed/reliable and anything added in future versions will only be written when
+C<extend_stats> is enabled.
+Currently starting date/time in ISO_8601 is added when the extend option is set.
 
 =back
 
@@ -193,22 +203,29 @@ sub run_tests {
     my @stack = caller();
     $args{caller} = $stack[1] || 'aggregate';
     $args{caller} =~ s#^.*?([^/]+)$#$1#;
+    $args{repeat} ||= 1;
 
-    my $warnings=[];
-    if ($args{repeat} && $args{repeat} < 0) {
+    my $warnings = [];
+    if ($args{repeat} < 0) {
         eval 'use Test2::Plugin::BailOnFail';
         my $iter = 0;
         while (!@$warnings) {
             $iter++;
             print "Test suite iteration $iter\n";
             if ($args{test_warnings}) {
-                $warnings = Test2::V0::warnings{_run_tests(\@tests, \%args)};
+                $warnings = _process_warnings(
+                    Test2::V0::warnings{_run_tests(\@tests, \%args)},
+                     \%args
+                );
             } else {
                 _run_tests(\@tests, \%args);
             }
         }
     } elsif ($args{test_warnings}) {
-        $warnings = Test2::V0::warnings { _run_tests(\@tests, \%args) };
+        $warnings = _process_warnings(
+            Test2::V0::warnings { _run_tests(\@tests, \%args) },
+            \%args
+        );
         Test2::V0::is(
             @$warnings,
             0,
@@ -218,31 +235,57 @@ sub run_tests {
         _run_tests(\@tests, \%args);
     }
 
-    warn "Test warning output:\n".join("\n", @$warnings)."\n" if @$warnings;
+    warn "Test warning output:\n".join("\n", @$warnings)."\n"
+        if @$warnings;
 
     return $args{stats};
+}
+
+sub _process_warnings {
+    my $warnings = shift;
+    my $args     = shift;
+    my @warnings = split(/<-Test2::Aggregate\n/, join('',@$warnings));
+    my @clean    = ();
+
+    foreach my $warn (@warnings) {
+        if ($warn =~ m/(.*)->Test2::Aggregate\n(.*\S.*)/) {
+            push @clean, "<$1>\n$2";
+            $args->{stats}->{$1}->{warnings} = $2;
+            $args->{stats}->{$1}->{pass_perc} = 0;
+        }
+    }
+    return \@clean;
 }
 
 sub _run_tests {
     my $tests  = shift;
     my $args   = shift;
-    my $repeat = $args->{repeat} || 1;
+
+    my $repeat = $args->{repeat};
     $repeat = 1 if $repeat < 0;
     my %stats;
 
-    eval 'require Time::HiRes' if $args->{stats_output};
+    require Time::HiRes if $args->{stats_output};
 
-    for (1 .. $repeat) {
-        my $iter = $repeat > 1 ? "Iter: $_/$repeat - " : '';
+    for my $i (1 .. $repeat) {
+        my $iter = $repeat > 1 ? "Iter: $i/$repeat - " : '';
         my $count = 0;
         foreach my $test (@$tests) {
             my $start;
+
+            warn "$test->Test2::Aggregate\n" if $args->{test_warnings};
+
             $stats{$test}{test_no}=++$count;
             $start = Time::HiRes::time() if $args->{stats_output};
             $stats{$test}{timestamp} = _timestamp();
+
             my $result = subtest $iter. "Running test $test" => sub {
+                eval "package Test.$i.$count;" if $args->{package};
                 do $test;
             };
+
+            warn "<-Test2::Aggregate\n" if $args->{test_warnings};
+
             $stats{$test}{time} += (Time::HiRes::time() - $start)/$repeat
                 if $args->{stats_output};
             $stats{$test}{pass_perc} += $result ? 100/$repeat : 0;
@@ -283,15 +326,17 @@ sub _print_stats {
         open($fh, '>', $file) or die "Can't open > $file: $!";
     }
 
+    my $total = 0;
     my $extra = $args->{extend_stats} ? ' TIMESTAMP' : '';
     print $fh "TIME PASS%$extra TEST\n";
-    my $total = 0;
+
     foreach my $test (sort {$stats->{$b}->{time}<=>$stats->{$a}->{time}} keys %$stats) {
         $extra = ' '.$stats->{$test}->{timestamp} if $args->{extend_stats};
         $total += $stats->{$test}->{time};
         printf $fh "%.2f %d$extra $test\n",
             $stats->{$test}->{time}, $stats->{$test}->{pass_perc};
     }
+
     printf $fh "TOTAL TIME: %.1f sec\n", $total;
     close $fh unless $args->{stats_output} =~ /^-$/;
 }
@@ -304,21 +349,26 @@ sub _timestamp {
 =head1 USAGE NOTES
 
 Not all tests can be modified to run under the aggregator, it is not intended
-for tests that require an isolated environment. So, for those that do not and
-can potentially run under the aggregator, sometimes very simple changes might be
-needed like giving unique names to subs (or not warning for redefines), replacing
-things that complain, restoring the environment at the end of the test etc.
+for tests that require an isolated environment, do overrides etc. For other tests
+which can potentially run under the aggregator, sometimes very simple changes may be
+needed like giving unique names to subs (or not warning for redefines, or trying the
+package option), replacing things that complain, restoring the environment at
+the end of the test etc.
 
-The environment variable C<AGGREGATE_TESTS> will be set while the tests are
-running. Example usage is a module that can only be loaded once, so you load it
-on the aggregated test file and then use something like this in the individual
-test files:
+Unit tests are usually great for aggregating. You could use the hash that C<run_tests>
+returns in a script that tries to add more tests automatically to an aggregate list
+to see which added tests passed and keep them, dropping failures.
+
+The environment variable C<AGGREGATE_TESTS> will be set while the tests are running
+for your convenience. Example usage is a module that can only be loaded once, so
+you load it on the aggregated test file and then use something like this in the
+individual test files:
 
  eval 'use My::Module' unless $ENV{AGGREGATE_TESTS};
 
 Trying to aggregate too many tests into a single one can be counter-intuitive as
-you would ideally want to parallelize your test suite (so a super-long test
-continuing after the rest are done will slow down the suite). And in general
+you would ideally want to parallelize your test suite (so a super-long aggregated
+test continuing after the rest are done will slow down the suite). And in general
 more tests will run aggregated if they are grouped so that tests that can't be
 aggregated together are in different groups.
 

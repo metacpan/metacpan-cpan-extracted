@@ -1,0 +1,31 @@
+---
+abstract: 'Some Perl::Critic policies used by Plicease'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Perl::Critic::TestUtils: '0'
+  Test2::V0: '0.000060'
+  Test::Perl::Critic::Policy: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Plicease
+requires:
+  Perl::Critic::Policy: '0'
+  Perl::Critic::Utils: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/Perl-Critic-Plicease/issues
+  homepage: https://metacpan.org/pod/Perl::Critic::Plicease
+  repository: git://github.com/plicease/Perl-Critic-Plicease.git
+version: '0.01'
+x_generated_by_perl: v5.31.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

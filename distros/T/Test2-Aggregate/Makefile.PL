@@ -3,33 +3,50 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+# Optional except for cpancover etc.
+my $extra_test = $ENV{EXTENDED_TESTING} ? 'requires' : 'recommends';
+
 my %WriteMakefileArgs = (
-    NAME             => 'Test2::Aggregate',
-    AUTHOR           => q{Dimitrios Kechagias <dkechag@cpan.org>},
-    VERSION_FROM     => 'lib/Test2/Aggregate.pm',
-    ABSTRACT_FROM    => 'lib/Test2/Aggregate.pm',
-    LICENSE          => 'perl_5',
-    MIN_PERL_VERSION => '5.006',
+    NAME               => 'Test2::Aggregate',
+    AUTHOR             => q{Dimitrios Kechagias <dkechag@cpan.org>},
+    VERSION_FROM       => 'lib/Test2/Aggregate.pm',
+    ABSTRACT_FROM      => 'lib/Test2/Aggregate.pm',
+    LICENSE            => 'perl_5',
+    MIN_PERL_VERSION   => '5.008',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Test2::Tools::Basic' => '0',
-        'Test::Output'        => '0'
+        'Test::Output' => '0',
+        'Test2::V0'    => '0'
     },
     PREREQ_PM => {
         'File::Slurp' => '0',
         'Test2::V0'   => '0'
     },
-    META_MERGE        => {
-      "meta-spec" => { version => 2 },
-      resources => {
-        repository => {
-            type => 'git',
-            url => 'git://github.com/SpareRoom/Test2-Aggregate.git',
-            web => 'https://github.com/SpareRoom/Test2-Aggregate',
+    META_MERGE => {
+        "meta-spec" => { version => 2 },
+        prereqs => {
+            test => {
+                $extra_test => {
+                    'Test2::Plugin::BailOnFail' => '0',
+                    'Sub::Override'             => '0'
+                }
+            },
+            runtime => {
+                suggests => {
+                    'Test2::Plugin::BailOnFail' => '0',
+                    'Sub::Override'             => '0'
+                }
+            }
         },
-      },
+        resources => {
+            repository => {
+                type => 'git',
+                url => 'git://github.com/SpareRoom/Test2-Aggregate.git',
+                web => 'https://github.com/SpareRoom/Test2-Aggregate',
+            }
+        }
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Test2-Aggregate-*' },

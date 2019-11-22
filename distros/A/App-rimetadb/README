@@ -2,8 +2,8 @@ NAME
     App::rimetadb - Manage a Rinci metadata database
 
 VERSION
-    This document describes version 0.222 of App::rimetadb (from Perl
-    distribution App-rimetadb), released on 2019-08-14.
+    This document describes version 0.223 of App::rimetadb (from Perl
+    distribution App-rimetadb), released on 2019-10-15.
 
 SYNOPSIS
     See the included CLI script rimetadb.
@@ -321,13 +321,30 @@ FUNCTIONS
   stats
     Usage:
 
-     stats() -> [status, msg, payload, meta]
+     stats(%args) -> [status, msg, payload, meta]
 
     Show some statistics from the database.
 
     This function is not exported.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   dsn => *str*
+
+        DBI connection DSN.
+
+        If not specified, will default to "dbd:SQLite:$HOME/rimeta.db" where
+        $HOME is user's home directory.
+
+        Note: has been tested with MySQL and SQLite only.
+
+    *   password => *str*
+
+        DBI connection password.
+
+    *   user => *str*
+
+        DBI connection user.
 
     Returns an enveloped result (an array).
 

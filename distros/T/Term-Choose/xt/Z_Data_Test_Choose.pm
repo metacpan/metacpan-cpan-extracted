@@ -241,7 +241,7 @@ my $options = [
     { max_height => 20, max_width => 60, layout => 1, prompt => 'Your choice: ' x 100, page => 0, pad => 3, order => 1,
       alignment => 2, keep => 8, clear_screen => 1, include_highlighted => 1 },
     { prompt => 'abc 12345678 def' x 50, default => 10, empty =>' ', undef => '--', beep => 1,
-      no_spacebar => [ 11 .. 2000 ], lf => [ 0, 4 ], keep => 16, include_highlighted => 1 },
+      no_spacebar => [ 11 .. 2000 ], tabs_prompt => [ 0, 4 ], keep => 16, include_highlighted => 1 },
     { max_height => 20, max_width => 60, layout => 0, mark => [ 0, 10, 100 ], include_highlighted => 1 },
     { max_height => 20, max_width => 60, layout => 1, mark => [ 0, 10, 100 ], index => 1, include_highlighted => 1 },
     { max_height => 20, max_width => 60, layout => 2, mark => [ 0, 10, 35, 100, 1979 ], no_spacebar => [ 35, 1066, 1979 ], include_highlighted => 1 },

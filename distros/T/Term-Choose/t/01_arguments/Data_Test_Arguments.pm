@@ -34,7 +34,8 @@ sub valid_values {
         undef  => [ 0, 'Hello' x 50, '', ' ', 'abc', 'world', undef ],
 
         # ARRAY max 2 int
-        lf => [ [ 2, 4 ], [ 8 ], [], undef ],
+        tabs_info   => [ [ 2, 4 ], [ 8 ], [], undef ],
+        tabs_prompt => [ [ 2, 4 ], [ 8 ], [], undef ],
 
         # ARRAY int
         mark        => [ [ 0, 1, 2, 100, 999999 ], [ 1 ], undef ],
@@ -46,7 +47,7 @@ sub mixed_options_1 {
     return {
         beep  => 0, clear_screen => undef, hide_cursor => 1, index => 0, alignment => 0, layout => 0, mouse => 0,
         order => 1, page => 0, keep => 1, ll => 1, max_height => 19, max_width => 19, default => 9, pad => 3,
-        empty => '', prompt => '', undef => '', lf => [ 1 ], no_spacebar => [ 0 ], mark => [ 3, 4 ]
+        empty => '', prompt => '', undef => '', tabs_info => [ 1 ], no_spacebar => [ 0 ], mark => [ 3, 4 ]
     };
 }
 
@@ -55,7 +56,8 @@ sub mixed_options_2 {
     return {
         mark => [ 0 ], no_spacebar => [ 11, 0, 8 ], lf => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '',
         pad => 3, default => 9, max_width => 19, max_height => 119, ll => 15, keep => 1, page => 1, order => 1,
-        mouse => 0, layout => 3, alignment => 0, index => 0, hide_cursor => 1, clear_screen => undef, beep => 0
+        mouse => 0, layout => 3, alignment => 0, index => 0, hide_cursor => 1, clear_screen => undef, beep => 0,
+        tabs_prompt => [ 4, 4 ]
     };
 }
 
@@ -86,7 +88,8 @@ sub invalid_values {
         undef  => [ { 1, 1 }, [ 1 ], {}, [], [ 2 ] ],
 
         # ARRAY max 2 int
-        lf => [ -2, -1, 0, 1, '', 'a', { 1, 1 }, {}, [ 1, 2, 3, ], [ 'a', 'b' ], [ -3, -4 ] ],
+        tabs_info   => [ -2, -1, 0, 1, '', 'a', { 1, 1 }, {}, [ 1, 2, 's', ], [ 'a', 'b' ], [ -3, -4 ] ],
+        tabs_prompt => [ -2, -1, 0, 1, '', 'a', { 1, 1 }, {}, [ 1, 2, 'g', ], [ 'a', 'b' ], [ -3, -4 ] ],
 
         # ARRAY int
         mark        => [ -2, -1, 0, 1, '', 'a', { 1, 1 }, {}, [ 'a', 'b' ], [ -3, -4 ] ],

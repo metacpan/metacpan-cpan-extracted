@@ -115,7 +115,7 @@ print <<EOF;
 The second very portable backend is poll(2). It does not exist on windows
 and various versions of Mac OS X (and on the other versions it simply
 doesn't work), but works basically everywhere else. It is recommended to use
-the default here unless you run into compile problems in ev_poll.c.
+the default here unless you run into compilation problems in ev_poll.c.
 
 EOF
 
@@ -367,11 +367,11 @@ Very rarely, people want to tweak EV even more, e.g. to exclude
 or include certain watcher types or backends. This can be done by adding
 extra -D options here, or via the EV_EXTRA_DEFS environment variable.
 
-For example, if you run into compile problems because of missing memory
+For example, if you run into compilation problems because of missing memory
 fences (or you just want extra performance), you can tell EV to not support
 smp and threads via -DEV_NO_THREADS.
 
-Normal persons just press enter.
+Most people would just press enter.
 
 EOF
 

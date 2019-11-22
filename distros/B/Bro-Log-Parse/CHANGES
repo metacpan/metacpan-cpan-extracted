@@ -1,195 +1,33 @@
 ==================================================
-Changes from 2014-09-23 00:00:00 +0000 to present.
+Changes from 2018-11-22 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.07 at 2015-09-23 23:07:20 +0000
+version 0.08 at 2019-11-22 00:26:22 +0000
 -----------------------------------------
 
-  Change: 3f21ab7f030a30898ba8949ae2b8aff6c3df403a
+  Change: 7ed5f89182421391e24482094fcc306bee77c176
   Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-09-23 16:05:27 +0000
+  Date : 2019-11-21 16:25:56 +0000
 
-    add test for json log reading 
-
-  Change: 82ec12606fb0a2a6650b17e932ecb74cd990221b
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-09-23 16:04:31 +0000
-
-    support reading of json formatted logs. 
-
-  Change: 8dec5ca40dcdb495f09fd638eda8d65915bb5b74
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-09-22 19:03:14 +0000
-
-    make headers return a hashref, which makes more sense.
-
-    Also make the array available as headerlines.
-
-    This breaks the API, but I don't think we have anyone using this. 
+    Mark as deprecated 
 
 -----------------------------------------
-version 0.06 at 2015-07-28 03:39:08 +0000
+version 0.08 at 2019-11-22 00:13:58 +0000
 -----------------------------------------
 
-  Change: d6e9909d8af3a30625ee94840d41531cc59875f9
+  Change: fc7280833d1af9e4be406433a5161de0f956779d
   Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-07-27 20:39:08 +0000
+  Date : 2019-11-21 16:13:58 +0000
 
-    bump version to 0.06. 
+    Do the Bro->Zeek renaming 
 
------------------------------------------
-version 0.05 at 2015-07-15 18:47:31 +0000
------------------------------------------
-
-  Change: 91182c1112c183c8b9e0dc4b52f4fbb5a8bf8403
+  Change: f6a6b7614206cbb8c66fe76322072ccbabfd2a9a
   Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-07-15 11:47:31 +0000
+  Date : 2015-12-09 15:34:14 +0000
 
-    a few more accessors, fix documentation, more tests. 
+    add test for incomplete logfiles 
 
-  Change: e9302271dc1f3754d8620d4ae25346012949deb3
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-07-15 11:25:22 +0000
-
-    remove all the stuff that really should not be part of this package. 
-
-  Change: 79d74bf42ea2beed6b415d9301f3a38668b3b5a8
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-07-09 19:01:56 +0000
-
-    add executable allowing us to hash specified columns. 
-
-  Change: 6786954bae1d0b69a8b1828e46153f9ce15b7f3f
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-04-27 11:56:48 +0000
-
-    also add -i command line option that just skips nonexisting lines.
-    Furthermore, add -n that nulls nonexistant fields. 
-
-  Change: e61beae40e49ebba50f6953e1d261957bc0a0073
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-04-21 12:27:05 +0000
-
-    let app deal with nonexisting fields 
-
-  Change: b4ca05e0ac4d1ea2f24797b8410d354be19eb444
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-04-21 12:23:21 +0000
-
-    set not existing fields to undef, instead of just completely ignoring
-    them.
-
-    That makes it possible to see that undefined fields were specified in
-    the file later. 
-
-  Change: 0b6294c6ab0dfb218b700e75042dde72c5eb356a
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-04-21 08:15:43 +0000
-
-    add the beginnings of a cli.
-
-    This is messy and undocumented for the moment, sorry.
-
-    Short overview: run bro-filter with arguments to get output
-
-    -p => select columns to print. Separated by p or define several -p
-    switches -u => only print unique columns (uniqueness determined by
-    selected output) -c => count unique columns (implies -c). -t =>
-    trunate selected columns to value. -t can be used several times.
-
-    Examples: $ bro-filter -p ts,uid logs/ssl.log 1394747126.855035
-    CXWv6p3arKYeMETxOg 1394747129.505622 CjhGID4nQcgTWjvg4c
-
-    $ bro-filter -cp ts logs/ssl.log 1394747126.855035 1
-    1394747129.505622 1
-
-    $ bro-filter -cp ts -t ts=3600 logs/ssl.log 1394744400 2 
-
------------------------------------------
-version 0.04 at 2015-04-20 05:30:38 +0000
------------------------------------------
-
-  Change: f14e020b97d43b0603cecbf7240c0a41fab4e5fe
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-04-19 22:30:38 +0000
-
-    add the ability to parse concatenated log files by accepting later
-    #fields lines 
-
------------------------------------------
-version 0.03 at 2015-04-18 15:37:45 +0000
------------------------------------------
-
-  Change: a7dcdecd5638b3e08b83e55859c52ec8247ab6f9
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-04-18 08:37:45 +0000
-
-    add two more accessor for current lines and all the header lines so
-    far 
-
-  Change: 547903c54694639f555a377fd36c83f6fb1e5ac4
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-03-04 14:04:46 +0000
-
-    and even more small pod file fixes... 
-
-  Change: aa43e48ea8b0fcf7e42357c6f7821b33d1e962ca
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-03-02 15:35:22 +0000
-
-    fix a few more pod issues 
-
------------------------------------------
-version 0.02 at 2015-03-02 23:32:36 +0000
------------------------------------------
-
-  Change: 60c083b6951c493545eddddce5b23ffb7ee17d77
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-03-02 15:32:36 +0000
-
-    expand a bit on the interface...
-
-    allow reading from filehandles, allow passing arguments as a hashref,
-    give accessors for fh and file name, have actual tests for just about
-    everything that it supported.
-
-    Now, handling arrays would be nice... 
-
-  Change: 8574da464a62701ae4e7d26f16d66ad1eacea2fb
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-02-27 12:14:32 +0000
-
-    even more pod fixes 
-
-  Change: cec1b1ab1fa4219a253a8b6ea05f005a25db37c5
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-02-27 12:11:12 +0000
-
-    fix a few errors in the pod syntax 
-
-  Change: 029279c7263086494baef17226e4eb8971395050
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-02-27 12:10:35 +0000
-
-    move pod documentation to separate file for github 
-
------------------------------------------
-version 0.01 at 2015-02-27 19:53:33 +0000
------------------------------------------
-
-  Change: d8770fd2b0e3667e5225f42fa294972c7d481475
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-02-27 11:53:33 +0000
-
-    add a few more git plugins here 
-
-  Change: 6fd3367441fdf55979a468bf35fdf2524bf31349
-  Author: Johanna Amann <johanna@icir.org>
-  Date : 2015-02-27 11:50:05 +0000
-
-    Initial version that does very basic reading of Bro log files 
-
-================
-End of releases.
-================
+================================================
+Plus 7 releases after 2018-11-22 00:00:00 +0000.
+================================================

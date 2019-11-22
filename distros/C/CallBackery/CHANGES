@@ -1,3 +1,7 @@
+0.23.2 2019-11-22 16:06:25 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix handling of trigger fields when loading data into a form
+
 0.23.1 2019-11-19 09:20:20 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - change vertical spacing in form renderer so that no extra space is produced

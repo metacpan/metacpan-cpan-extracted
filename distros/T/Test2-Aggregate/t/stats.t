@@ -1,11 +1,11 @@
-use Test2::Tools::Basic;
+use Test2::V0;
 use Test2::Aggregate;
 use Test::Output;
 
 eval "use Time::HiRes";
 plan skip_all => "Time::HiRes required for stats_output option" if $@;
 
-plan(8);
+plan(10);
 
 my $root = (grep {/^\.$/i} @INC) ? undef : './';
 foreach my $extend (0 .. 1) {
@@ -25,6 +25,12 @@ foreach my $extend (0 .. 1) {
 Test2::Aggregate::run_tests(
     dirs         => ['xt/aggregate'],
     root         => $root,
-    stats_output => '/tmp/tmp'
+    stats_output => '/tmp'
+);
+
+Test2::Aggregate::run_tests(
+    dirs         => ['xt/aggregate'],
+    root         => $root,
+    stats_output => '/tmp/tmp'.time()
 );
 

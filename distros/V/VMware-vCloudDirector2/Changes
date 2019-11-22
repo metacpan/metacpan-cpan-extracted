@@ -1,5 +1,9 @@
 Revision history for VMware-vCloudDirector2
 
+0.107     2019-11-22 17:10:59+00:00 Europe/London
+	- Add a fetch_link just like find_link
+	- Inject href into objects that have this missing
+
 0.106     2019-10-31 16:42:24+00:00 Europe/London
 	- Added additional methods for building objects from
 	  lists of things within an object - see build_sub_sub_objects

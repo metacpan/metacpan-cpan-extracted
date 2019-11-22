@@ -1,0 +1,37 @@
+## name RexExpWithSlashD
+## failures 1
+## cut
+
+/\d/;
+
+## name RexExpSubWithSlashD
+## failures 1
+## cut
+
+/\d//;
+
+## name GlobalDoesntSaveYou
+## failures 1
+## cut
+
+use re '/a';
+
+/\d/;
+
+## name RegExpWithSlashDInsideOtherStuff
+## failures 1
+## cut
+
+/foo\dbar/
+
+## name RegExpWithSlashDSlashA
+## failures 0
+## cut
+
+/\d/a;
+
+## name RegExpWithoutSlashD
+## failures 0
+## cut
+
+/foo/;

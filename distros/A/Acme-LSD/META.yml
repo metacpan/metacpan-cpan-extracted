@@ -1,0 +1,41 @@
+---
+abstract: 'A dumb module that colorize your prints'
+author:
+  - 'Thibault DUPONCHELLE <thibault.duponchelle@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-LSD
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::LSD:
+    file: lib/Acme/LSD.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/thibaultduponchelle/Acme-LSD/issues
+  homepage: https://github.com/thibaultduponchelle/Acme-LSD
+  repository: git://github.com/thibaultduponchelle/Acme-LSD.git
+version: '0.01'
+x_contributors:
+  - 'Thibault DUPONCHELLE <thibault.duponchelle@amadeus.com>'
+  - 'thibaultduponchelle <580360+thibaultduponchelle@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

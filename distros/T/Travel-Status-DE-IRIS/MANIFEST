@@ -5,12 +5,17 @@ examples/traintrack
 lib/Travel/Status/DE/IRIS.pm
 lib/Travel/Status/DE/IRIS/Result.pm
 lib/Travel/Status/DE/IRIS/Stations.pm
+lib/Travel/Status/DE/IRIS/Stations.pm.PL
 MANIFEST			This list of files
 META.json
-README
+README.md
 scripts/acronyms.pl
 scripts/acronyms.sh
 scripts/debug
+share/csv2json
+share/json2csv
+share/json2json
+share/stations.json
 t/20-iris-class.t
 t/21-iris-stations.t
 t/30-iris-const.t

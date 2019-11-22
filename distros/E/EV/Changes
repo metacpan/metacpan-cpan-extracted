@@ -3,6 +3,11 @@ Revision history for Perl extension EV
 Changes marked with (libev) are changes in libev, and have more
 documentation in the libev Changes file.
 
+4.29 Fri Nov 22 15:34:29 CET 2019
+	- (libev) add io uring autoconf and non-autoconf detection,
+          the latter of which should disable io_uring compilation
+          on old systems.
+
 4.28 Tue Nov 19 13:55:39 CET 2019
 	- (libev) fix ev_port backend, thanks to David H. Gutteridge for
         - (libev) many bugfixes in linuxaio backend.

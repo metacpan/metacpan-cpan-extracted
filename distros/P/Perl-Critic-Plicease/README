@@ -1,0 +1,26 @@
+NAME
+
+    Perl::Critic::Plicease - Some Perl::Critic policies used by Plicease
+
+VERSION
+
+    version 0.01
+
+DESCRIPTION
+
+    The Perl::Critic::Policy::Plicease policies are a collection of
+    Perl::Critic policies. They aren't grouped into a theme because some
+    are application specific and you should review and include them only on
+    a case by case basis.
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2019 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
