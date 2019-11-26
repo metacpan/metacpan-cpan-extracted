@@ -1,9 +1,7 @@
 use Test2::V0;
 use Test2::Aggregate;
 use Test::Output;
-
-eval "use Time::HiRes";
-plan skip_all => "Time::HiRes required for stats_output option" if $@;
+use Time::HiRes;
 
 plan(10);
 

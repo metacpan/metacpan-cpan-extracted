@@ -4,7 +4,7 @@ package main v0.1.0;
 
 use Pcore;
 use Test::More;
-use Pcore::Lib::List qw[pairs];
+use Pcore::Util::List qw[pairs];
 
 our $tests = [
 

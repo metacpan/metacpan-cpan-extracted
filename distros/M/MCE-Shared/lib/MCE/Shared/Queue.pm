@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.862';
+our $VERSION = '1.863';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 
@@ -46,13 +46,8 @@ use overload (
 our ($HIGHEST, $LOWEST, $FIFO, $LIFO, $LILO, $FILO) = (1, 0, 1, 0, 1, 0);
 my  ($PORDER, $TYPE, $FAST, $AWAIT) = ($HIGHEST, $FIFO, 0, 0);
 
-my $_sig;
-my $_sigint  = sub { $_sig = 'INT'  };
-my $_sigterm = sub { $_sig = 'TERM' };
-
 my $LF = "\012"; Internals::SvREADONLY($LF, 1);
-my $_has_threads = $INC{'threads.pm'} ? 1 : 0;
-my $_tid = $_has_threads ? threads->tid() : 0;
+my $_tid = $INC{'threads.pm'} ? threads->tid() : 0;
 my $_reset_flg = 1;
 
 my %_valid_fields_new = map { $_ => 1 } qw(
@@ -63,12 +58,12 @@ sub _croak {
    goto &MCE::Shared::Base::_croak;
 }
 sub CLONE {
-   $_tid = threads->tid() if $_has_threads;
+   $_tid = threads->tid() if $INC{'threads.pm'};
 }
 
 sub DESTROY {
    my ($_Q) = @_;
-   my $_pid = $_has_threads ? $$ .'.'. $_tid : $$;
+   my $_pid = $_tid ? $$ .'.'. $_tid : $$;
 
    undef $_Q->{_datp}, undef $_Q->{_datq}, undef $_Q->{_heap};
 
@@ -125,7 +120,7 @@ sub new {
 
    # --------------------------------------------------------------------------
 
-   $_Q->{_init_pid} = $_has_threads ? $$ .'.'. $_tid : $$;
+   $_Q->{_init_pid} = $_tid ? $$ .'.'. $_tid : $$;
    $_Q->{_dsem} = 0 if $_Q->{_fast};
 
    my $_barrier = defined $_argv{barrier} ? $_argv{barrier} : 1;
@@ -912,11 +907,12 @@ sub _init_queue {
 sub _req_queue {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
+   local $MCE::Signal::SIG;
 
    my ($_len, $_buf, $_frozen);
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -933,7 +929,8 @@ sub _req_queue {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
+
    return if ($_len < 0);
 
    ($_[2] == 1)
@@ -1031,7 +1028,7 @@ MCE::Shared::Queue - Hybrid-queue helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Queue version 1.862
+This document describes MCE::Shared::Queue version 1.863
 
 =head1 DESCRIPTION
 

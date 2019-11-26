@@ -13,6 +13,7 @@ use Test::Most tests => 4;
 
 use Utils;
 use aliased "Google::RestApi";
+use Google::RestApi::Auth::OAuth2Client;
 
 Utils::init_logger();
 

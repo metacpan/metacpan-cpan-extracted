@@ -1,7 +1,7 @@
 package Acme::CPANModules::PickingRandomLinesFromFile;
 
-our $DATE = '2019-01-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-10-16'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
     summary => 'Picking random lines from a file',
@@ -79,7 +79,7 @@ Acme::CPANModules::PickingRandomLinesFromFile - Picking random lines from a file
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::PickingRandomLinesFromFile (from Perl distribution Acme-CPANModules-PickingRandomLinesFromFile), released on 2019-01-09.
+This document describes version 0.002 of Acme::CPANModules::PickingRandomLinesFromFile (from Perl distribution Acme-CPANModules-PickingRandomLinesFromFile), released on 2019-10-16.
 
 =head1 DESCRIPTION
 
@@ -149,6 +149,8 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<Acme::CPANModules::PickingRandomItemsFromList>
 
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 

@@ -1,12 +1,13 @@
 use strict;
 use warnings;
 
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
+
 use Test::Fatal;
 use Test::More 0.96;
 
 use Specio::Library::Builtins;
-
-use lib 't/lib';
 use Specio::Library::XY;
 
 {

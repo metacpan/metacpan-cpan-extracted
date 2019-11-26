@@ -450,8 +450,8 @@
 #endif
 
 #if __linux && EV_USE_IOURING
-# include <linux/fs.h>
-# ifndef RWF_SYNC
+# include <linux/version.h>
+# if LINUX_VERSION_CODE < KERNEL_VERSION(4,14,0)
 #  undef EV_USE_IOURING
 #  define EV_USE_IOURING 0
 # endif

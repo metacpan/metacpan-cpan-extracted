@@ -5,12 +5,13 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use 5.010;
 use Quiq::Formatter;
 use POSIX ();
 use Math::Trig ();
+use Quiq::Math;
 use Scalar::Util ();
 
 # -----------------------------------------------------------------------------
@@ -567,7 +568,7 @@ ist $xMax. Die gelieferten Werte liegen im Bereich 0 .. $width-1.
 
 sub valueToPixelX {
     my ($this,$width,$xMin,$xMax,$xVal) = @_;
-    return sprintf '%.0f',($xVal-$xMin)*($width-1)/($xMax-$xMin);
+    return Quiq::Math->roundToInt(($xVal-$xMin)*($width-1)/($xMax-$xMin));
 }
 
 {
@@ -597,7 +598,8 @@ also von einem Ursprung I<unten links> aus.
 
 sub valueToPixelY {
     my ($this,$height,$yMin,$yMax,$yVal) = @_;
-    return sprintf '%.0f',$height-1-($yVal-$yMin)*($height-1)/($yMax-$yMin);
+    return Quiq::Math->roundToInt($height-1-($yVal-$yMin)*
+        ($height-1)/($yMax-$yMin));
 }
 
 # -----------------------------------------------------------------------------
@@ -620,7 +622,7 @@ ist $yMax. Die gelieferten Werte liegen im Bereich $height-1 .. 0.
 
 sub valueToPixelYTop {
     my ($this,$height,$yMin,$yMax,$yVal) = @_;
-    return sprintf '%.0f',($yVal-$yMin)*($height-1)/($yMax-$yMin);
+    return Quiq::Math->roundToInt(($yVal-$yMin)*($height-1)/($yMax-$yMin));
 }
 
 # -----------------------------------------------------------------------------
@@ -703,7 +705,7 @@ sub spikeValue {
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

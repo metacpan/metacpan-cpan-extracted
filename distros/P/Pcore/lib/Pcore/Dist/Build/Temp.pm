@@ -54,7 +54,7 @@ sub run ( $self, $keep = 0 ) {
 }
 
 sub _gather_files ($self) {
-    my $tree = Pcore::Lib::File::Tree->new;
+    my $tree = Pcore::Util::File::Tree->new;
 
     for my $dir (qw[bin lib share t xt]) {
         $tree->add_dir( "$self->{dist}->{root}/$dir", $dir );

@@ -4,7 +4,7 @@ use warnings;
 
 package MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::is;
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 use Moose::Role;
 with 'Moose::Meta::Method::Accessor::Native::Reader';

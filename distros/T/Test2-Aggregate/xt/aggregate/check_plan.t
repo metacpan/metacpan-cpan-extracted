@@ -1,4 +1,4 @@
-use Test2::Tools::Basic;
+use Test2::V0;
  
 plan(4);
 

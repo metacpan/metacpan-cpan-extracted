@@ -81,7 +81,7 @@ $tax->batch_values(values => "=SUM(C2:C4)");
 $salary->batch_values(values => "=SUM(D2:D4)");
 my $rg = $ss->range_group($tax, $salary);
 $rg->submit_values();
-$rg->bold()->italic()->submit_requests();
+$rg->bold()->italic()->bd_solid()->bd_thick('bottom')->submit_requests();
 end("Totals should now be set with formulas.");
 
 message('blue', "We are done, here are some api stats:\n", Dump($ss->stats()));

@@ -1,0 +1,18 @@
+resources:
+  repositories:
+    - repository: ci-perl-helpers
+      type: github
+      name: houseabsolute/ci-perl-helpers
+      endpoint: houseabsolute/ci-perl-helpers
+
+stages:
+  - template: templates/build.yml@ci-perl-helpers
+    parameters:
+      debug: 1
+  - template: templates/test.yml@ci-perl-helpers
+    parameters:
+      # Coverage tests cause a random segfault occasionally. See
+      # https://github.com/pjcj/Devel--Cover/issues/251 for my bug report.
+      # coverage: codecov
+      debug: 1
+      include_threaded_perls: 'true'

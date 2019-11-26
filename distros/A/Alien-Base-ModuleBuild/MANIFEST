@@ -47,9 +47,11 @@ lib/Alien/Base/ModuleBuild/Repository/HTTP.pm
 lib/Alien/Base/ModuleBuild/Repository/Local.pm
 lib/Alien/Base/ModuleBuild/Utils.pm
 LICENSE
-maint/min-perl.pl
+maint/cip-before-install
 maint/releaseprep
 MANIFEST			This list of files
+META.json
+META.yml
 README
 t/00_diag.t
 t/alien_base_modulebuild.t
@@ -63,5 +65,3 @@ t/alien_base_modulebuild_utils.t
 t/inline.t
 t/inline_cpp.t
 t/lib/Test2/Plugin/AlienEnv.pm
-META.yml
-META.json

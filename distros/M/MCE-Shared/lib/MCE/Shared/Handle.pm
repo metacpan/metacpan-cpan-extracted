@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.862';
+our $VERSION = '1.863';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (InputOutput::ProhibitTwoArgOpen)
@@ -25,16 +25,16 @@ use MCE::Shared::Base ();
 use Errno ();
 use bytes;
 
-my $_sig;
-my $_sigint  = sub { $_sig = 'INT'  };
-my $_sigterm = sub { $_sig = 'TERM' };
-
 my $LF = "\012"; Internals::SvREADONLY($LF, 1);
+my $_tid = $INC{'threads.pm'} ? threads->tid() : 0;
 my $_max_fd = eval 'fileno(\*main::DATA)' // 2;
 my $_reset_flg = 1;
 
 sub _croak {
    goto &MCE::Shared::Base::_croak;
+}
+sub CLONE {
+   $_tid = threads->tid() if $INC{'threads.pm'};
 }
 
 sub import {
@@ -516,7 +516,7 @@ sub _init_handle {
 }
 
 sub CLOSE {
-   _req0('O~CLO', $_[0]->[0].$LF);
+   _req1('O~CLO', $_[0]->[0].$LF);
 }
 
 sub OPEN {
@@ -549,11 +549,12 @@ sub OPEN {
 
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
+   local $MCE::Signal::SIG;
 
    my $_err;
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -568,7 +569,7 @@ sub OPEN {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    if ($_err) {
       $! = $_err;
@@ -581,11 +582,12 @@ sub OPEN {
 
 sub READ {
    local $\ = undef if (defined $\);
+   local $MCE::Signal::SIG;
 
    my ($_len, $_ret);
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -606,7 +608,7 @@ sub READ {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    if ($_len) {
       if ($_len < 0) {
@@ -629,11 +631,12 @@ sub READ {
 
 sub READLINE {
    local $\ = undef if (defined $\);
+   local $MCE::Signal::SIG;
 
    my ($_buf, $_len, $_ret);
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -652,7 +655,7 @@ sub READLINE {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    if ($_len && $_len < 0) {
       $. = 0, $! = $_len * -1;
@@ -685,24 +688,25 @@ sub PRINTF {
 
 sub WRITE {
    my $_id  = shift()->[0];
+
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
+   local $MCE::Signal::SIG;
 
    my $_ret;
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
+      $_dat_ex->() if !$_is_MSWin32;
 
       if (@_ == 1 || (@_ == 2 && $_[1] == length($_[0]))) {
-         $_dat_ex->() if !$_is_MSWin32;
          print({$_DAT_W_SOCK} 'O~WRI'.$LF . $_chn.$LF),
          print({$_DAU_W_SOCK} $_id.$LF . length($_[0]).$LF, $_[0]);
       }
       else {
          my $_buf = substr($_[0], ($_[2] || 0), $_[1]);
-         $_dat_ex->() if !$_is_MSWin32;
          print({$_DAT_W_SOCK} 'O~WRI'.$LF . $_chn.$LF),
          print({$_DAU_W_SOCK} $_id.$LF . length($_buf).$LF, $_buf);
       }
@@ -712,7 +716,7 @@ sub WRITE {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    (length $_ret) ? $_ret : undef;
 }
@@ -733,7 +737,7 @@ MCE::Shared::Handle - Handle helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Handle version 1.862
+This document describes MCE::Shared::Handle version 1.863
 
 =head1 DESCRIPTION
 

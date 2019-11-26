@@ -5,7 +5,7 @@ use warnings;
 package MooseX::Enumeration;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 {
 	my $impl;
@@ -167,6 +167,9 @@ We can still go one better...
    );
 
 This will create a delegated method for each value in the enumeration.
+
+C<< handles => 1 >> will create methods like C<< $object->is_pass >> while 
+C<< handles => 2 >> will create methods like C<< $object->status_is_pass >>.
 
 As a slightly more advanced option, which will only work for the
 long-hand version, you may match the value against a regular expression

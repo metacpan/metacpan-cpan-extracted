@@ -18,7 +18,7 @@ my $loop = IO::Async::Loop->new_builtin;
 
 testing_loop( $loop );
 
-note( "Default IO::Async::Channel codec is " . IO::Async::Channel->DEFAULT_CODEC );
+note( "Default IO::Async::Channel codec is " . IO::Async::Channel::_default_codec );
 
 # sync->sync - mostly doesn't involve IO::Async
 {
@@ -234,7 +234,8 @@ note( "Default IO::Async::Channel codec is " . IO::Async::Channel->DEFAULT_CODEC
 
 # Sereal encoder
 SKIP: {
-   skip "Sereal is not available", 1 unless IO::Async::OS->HAVE_SEREAL;
+   skip "Sereal is not available", 1 unless
+      defined eval { require Sereal::Encoder; require Sereal::Decoder };
 
    my ( $pipe_rd, $pipe_wr ) = IO::Async::OS->pipepair;
 

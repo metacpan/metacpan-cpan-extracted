@@ -1,7 +1,7 @@
 package Bencher::Scenario::Example::MultipleArgValues::Array;
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '1.044'; # VERSION
+our $DATE = '2019-10-15'; # DATE
+our $VERSION = '1.045'; # VERSION
 
 our $scenario = {
     participants => [
@@ -28,7 +28,7 @@ Bencher::Scenario::Example::MultipleArgValues::Array - An example scenario: demo
 
 =head1 VERSION
 
-This document describes version 1.044 of Bencher::Scenario::Example::MultipleArgValues::Array (from Perl distribution Bencher-Backend), released on 2019-02-24.
+This document describes version 1.045 of Bencher::Scenario::Example::MultipleArgValues::Array (from Perl distribution Bencher-Backend), released on 2019-10-15.
 
 =head1 HOMEPAGE
 

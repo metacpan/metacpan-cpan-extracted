@@ -9,6 +9,7 @@ t/bail.t
 t/dirs.t
 t/lists.t
 t/override.t
+t/package.t
 t/repeat.t
 t/shuffle.t
 t/slow.t

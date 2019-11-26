@@ -4,7 +4,7 @@ Specio - Type constraints and coercions for Perl
 
 # VERSION
 
-version 0.44
+version 0.45
 
 # SYNOPSIS
 
@@ -66,14 +66,14 @@ type to a variable at all.
 Instead, you can explicitly check a value against a type, and optionally
 coerce values to that type.
 
-My long-term goal is to replace Moose's built-in types and [MooseX::Types](https://metacpan.org/pod/MooseX::Types)
+My long-term goal is to replace Moose's built-in types and [MooseX::Types](https://metacpan.org/pod/MooseX%3A%3ATypes)
 with this module.
 
 # WHAT IS A TYPE?
 
 At it's core, a type is simply a constraint. A constraint is code that checks
 a value and returns true or false. Most constraints are represented by
-[Specio::Constraint::Simple](https://metacpan.org/pod/Specio::Constraint::Simple) objects. However, there are other type
+[Specio::Constraint::Simple](https://metacpan.org/pod/Specio%3A%3AConstraint%3A%3ASimple) objects. However, there are other type
 constraint classes for specialized kinds of constraints.
 
 Types can be named or anonymous, and each type can have a parent type. A
@@ -135,7 +135,7 @@ The `ClassName` type constraint checks that the name is valid _and_ that the
 class is loaded.
 
 The `FileHandle` type accepts either a glob, a scalar filehandle, or anything
-that isa [IO::Handle](https://metacpan.org/pod/IO::Handle).
+that isa [IO::Handle](https://metacpan.org/pod/IO%3A%3AHandle).
 
 All types accept overloaded objects that support the required operation. See
 below for details.
@@ -224,7 +224,7 @@ definition. You _cannot_ define the same type twice internally.
 
 By default, all types created inside a package are invisible to other
 packages. If you want to create a type library, you need to inherit from
-[Specio::Exporter](https://metacpan.org/pod/Specio::Exporter) package:
+[Specio::Exporter](https://metacpan.org/pod/Specio%3A%3AExporter) package:
 
     package MyApp::Type::Library;
 
@@ -241,7 +241,7 @@ packages. If you want to create a type library, you need to inherit from
 
 Now the MyApp::Type::Library package will export a single type named
 `Foo`. It _does not_ re-export the types provided by
-[Specio::Library::Builtins](https://metacpan.org/pod/Specio::Library::Builtins).
+[Specio::Library::Builtins](https://metacpan.org/pod/Specio%3A%3ALibrary%3A%3ABuiltins).
 
 If you want to make your library re-export some other libraries types, you can
 ask for this explicitly:
@@ -256,11 +256,11 @@ ask for this explicitly:
     declare( 'Foo, ... );
 
 Now MyApp::Types::Library exports any types it defines, as well as all the
-types defined in [Specio::Library::Builtins](https://metacpan.org/pod/Specio::Library::Builtins).
+types defined in [Specio::Library::Builtins](https://metacpan.org/pod/Specio%3A%3ALibrary%3A%3ABuiltins).
 
 # DECLARING TYPES
 
-Use the [Specio::Declare](https://metacpan.org/pod/Specio::Declare) module to declare types. It exports a set of helpers
+Use the [Specio::Declare](https://metacpan.org/pod/Specio%3A%3ADeclare) module to declare types. It exports a set of helpers
 for declaring types. See that module's documentation for more details on these
 helpers.
 
@@ -303,18 +303,18 @@ Using Specio with Moo is easy. You can pass Specio constraint objects as
         coerce => $ucstr->coercion_sub,
     );
 
-The subs returned by Specio use [Sub::Quote](https://metacpan.org/pod/Sub::Quote) internally and are suitable for
+The subs returned by Specio use [Sub::Quote](https://metacpan.org/pod/Sub%3A%3AQuote) internally and are suitable for
 inlining.
 
 # USING SPECIO WITH OTHER THINGS
 
-See [Specio::Constraint::Simple](https://metacpan.org/pod/Specio::Constraint::Simple) for the API that all constraint objects
+See [Specio::Constraint::Simple](https://metacpan.org/pod/Specio%3A%3AConstraint%3A%3ASimple) for the API that all constraint objects
 share.
 
-# [Moose](https://metacpan.org/pod/Moose), [MooseX::Types](https://metacpan.org/pod/MooseX::Types), and Specio
+# [Moose](https://metacpan.org/pod/Moose), [MooseX::Types](https://metacpan.org/pod/MooseX%3A%3ATypes), and Specio
 
 This module aims to supplant both [Moose](https://metacpan.org/pod/Moose)'s built-in type system (see
-[Moose::Util::TypeConstraints](https://metacpan.org/pod/Moose::Util::TypeConstraints) aka MUTC) and [MooseX::Types](https://metacpan.org/pod/MooseX::Types), which attempts
+[Moose::Util::TypeConstraints](https://metacpan.org/pod/Moose%3A%3AUtil%3A%3ATypeConstraints) aka MUTC) and [MooseX::Types](https://metacpan.org/pod/MooseX%3A%3ATypes), which attempts
 to patch some of the holes in the Moose built-in type design.
 
 Here are some of the salient differences:
@@ -336,7 +336,7 @@ Here are some of the salient differences:
 
 - Anon types are explicit
 
-    With [Moose](https://metacpan.org/pod/Moose) and [MooseX::Types](https://metacpan.org/pod/MooseX::Types), you use the same subroutine, `subtype()`,
+    With [Moose](https://metacpan.org/pod/Moose) and [MooseX::Types](https://metacpan.org/pod/MooseX%3A%3ATypes), you use the same subroutine, `subtype()`,
     to declare both named and anonymous types. With Specio, you use `declare()` for
     named types and `anon()` for anonymous types.
 
@@ -379,7 +379,7 @@ Here are some of the salient differences:
 There are several optional prereqs that if installed will make this
 distribution better in some way.
 
-- [Ref::Util](https://metacpan.org/pod/Ref::Util)
+- [Ref::Util](https://metacpan.org/pod/Ref%3A%3AUtil)
 
     Installing this will speed up a number of type checks for built-in types.
 
@@ -389,7 +389,7 @@ distribution better in some way.
     Perl 5.10 or greater. This module is much more memory efficient than loading
     all of [B](https://metacpan.org/pod/B).
 
-- [Sub::Util](https://metacpan.org/pod/Sub::Util) or [Sub::Name](https://metacpan.org/pod/Sub::Name)
+- [Sub::Util](https://metacpan.org/pod/Sub%3A%3AUtil) or [Sub::Name](https://metacpan.org/pod/Sub%3A%3AName)
 
     If one of these is installed then stack traces that end up in Specio code will
     have much better subroutine names for any frames.

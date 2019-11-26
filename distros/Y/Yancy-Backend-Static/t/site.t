@@ -18,7 +18,7 @@ my $SHARE_DIR = path( $Bin, 'share' );
 $ENV{ MOJO_HOME } = $SHARE_DIR->child( 'site' );
 my $t = Test::Mojo->new( 'Mojolicious' );
 $t->app->plugin( Yancy => {
-    backend => 'static:' . $SHARE_DIR->child( 'site' ),
+    backend => 'static:' . $SHARE_DIR->child( 'site' ) . '?encoding=UTF-8',
     read_schema => 1,
 } );
 

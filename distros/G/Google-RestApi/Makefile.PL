@@ -34,6 +34,7 @@ WriteMakefile(
 	'Types::Standard'                 => 0,
 	'URI'                             => 0,
 	'URI::QueryParam'                 => 0,
+	'WWW::Google::Cloud::Auth::ServiceAccount' => 0,
 	'YAML::Any'                       => 0,
     },
     TEST_REQUIRES     => {
@@ -41,8 +42,9 @@ WriteMakefile(
 	'Test::MockObject::Extends' => 0,
 	'Test::Most'                => 0,
     },
+    EXE_FILES         => [qw(bin/google_restapi_session_creator)],
     META_MERGE        => {
-      "meta-spec" => { version => 2 }, 
+      "meta-spec" => { version => 2 },
       resources   => {
         repository => {
           type => 'git',

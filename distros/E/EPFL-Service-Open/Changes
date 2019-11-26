@@ -1,5 +1,10 @@
 Revision history for EPFL-Service-Open
 
+1.05    2019-11-22
+        Improve documentation
+        Fix links of repositories
+        Test against Perl 5.30
+
 1.04    2019-04-26
         Clean repositories url
 

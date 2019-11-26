@@ -1,5 +1,5 @@
 package Class::MOP::Mixin;
-our $VERSION = '2.2011';
+our $VERSION = '2.2012';
 
 use strict;
 use warnings;
@@ -33,7 +33,7 @@ Class::MOP::Mixin - Base class for mixin classes
 
 =head1 VERSION
 
-version 2.2011
+version 2.2012
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@ package Pcore::Handle::DBI;
 
 use Pcore -role, -const;
 use Pcore::Handle::DBI::STH;
-use Pcore::Lib::Scalar qw[is_ref is_plain_scalarref is_blessed_arrayref is_blessed_hashref is_plain_arrayref is_plain_hashref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_blessed_arrayref is_blessed_hashref is_plain_arrayref is_plain_hashref];
 
 with qw[Pcore::Handle::Base];
 
@@ -81,38 +81,35 @@ sub upgrade_schema ( $self ) {
     # unable to start transaction
     die $res if !$res;
 
-    my $on_finish = sub {
-        delete $self->{_schema_patch};
-
-        if ($res) {
-            $dbh->commit;
-        }
-        else {
-            $dbh->rollback;
-        }
-
-        return $res;
-    };
-
     # create patch table
-    ( $res = $dbh->do( $self->_get_schema_patch_table_query($SCHEMA_PATCH_TABLE_NAME) ) ) || return $on_finish->();
+    ( $res = $dbh->do( $self->_get_schema_patch_table_query($SCHEMA_PATCH_TABLE_NAME) ) ) or goto FINISH;
 
     for my $module ( sort keys $self->{_schema_patch}->%* ) {
         for my $id ( sort { $a <=> $b } keys $self->{_schema_patch}->{$module}->%* ) {
-            ( $res = $dbh->selectrow( qq[SELECT "id" FROM "$SCHEMA_PATCH_TABLE_NAME" WHERE "module" = \$1 AND "id" = \$2], [ $module, $id ] ) ) or return $on_finish->();
+            ( $res = $dbh->selectrow( qq[SELECT "id" FROM "$SCHEMA_PATCH_TABLE_NAME" WHERE "module" = \$1 AND "id" = \$2], [ $module, $id ] ) ) or goto FINISH;
 
             # patch is already applied
             next if $res->{data};
 
             # apply patch
-            ( $res = $dbh->do( $self->{_schema_patch}->{$module}->{$id}->{sql} ) ) or return $on_finish->();
+            ( $res = $dbh->do( $self->{_schema_patch}->{$module}->{$id}->{sql} ) ) or goto FINISH;
 
             # register patch
-            ( $res = $dbh->do( qq[INSERT INTO "$SCHEMA_PATCH_TABLE_NAME" ("module", "id") VALUES (\$1, \$2)], [ $module, $id ] ) ) or return $on_finish->();
+            ( $res = $dbh->do( qq[INSERT INTO "$SCHEMA_PATCH_TABLE_NAME" ("module", "id") VALUES (\$1, \$2)], [ $module, $id ] ) ) or goto FINISH;
         }
     }
 
-    return $on_finish->();
+  FINISH:
+    delete $self->{_schema_patch};
+
+    if ($res) {
+        $dbh->commit;
+    }
+    else {
+        $dbh->rollback;
+    }
+
+    return $res;
 }
 
 # QUOTE

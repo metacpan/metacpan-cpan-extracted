@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 =encoding utf8
 
@@ -48,7 +48,7 @@ L<Quiq::Axis> - Definition einer Plot-Achse (abstrakte Basisklasse)
 
 =item *
 
-L<Quiq::Axis::Numeric> - Definition einer numerischen Plot-Achse
+L<Quiq::Axis::Numeric> - Definition einer numerischen Achse
 
 =item *
 
@@ -57,6 +57,10 @@ L<Quiq::Axis::Time> - Definition einer Zeit-Achse
 =item *
 
 L<Quiq::AxisTick> - Tick einer Plot-Achse
+
+=item *
+
+L<Quiq::Cache> - Cache Daten in Datei
 
 =item *
 
@@ -80,7 +84,7 @@ L<Quiq::Color> - Eine Farbe des RGB-Farbraums
 
 =item *
 
-L<Quiq::CommandLine> - Konstruiere eine Unix-Kommandozeile
+L<Quiq::CommandLine> - Erstelle eine Unix-Kommandozeile
 
 =item *
 
@@ -260,35 +264,39 @@ L<Quiq::Formatter> - Formatierung von Werten
 
 =item *
 
+L<Quiq::Gd::Component> - Basisklasse aller Component-Klassen (abstrakt)
+
+=item *
+
+L<Quiq::Gd::Component::Axis> - Achse eines XY-Plot
+
+=item *
+
+L<Quiq::Gd::Component::BlockDiagram> - Farbige Blöcke in einer Fläche
+
+=item *
+
+L<Quiq::Gd::Component::ColorBar> - Rechteck mit einem Farbverlauf
+
+=item *
+
+L<Quiq::Gd::Component::ColorLegend> - Legende zu einem Farb-Plot
+
+=item *
+
+L<Quiq::Gd::Component::Graph> - Polyline-Graph
+
+=item *
+
+L<Quiq::Gd::Component::Grid> - Gitter eines XY-Plot
+
+=item *
+
+L<Quiq::Gd::Component::ScatterGraph> - Farbpunkte in einer Fläche
+
+=item *
+
 L<Quiq::Gd::Font> - GD- oder TrueType-Font
-
-=item *
-
-L<Quiq::Gd::Graphic> - Basisklasse aller Graphic-Klassen (abstrakt)
-
-=item *
-
-L<Quiq::Gd::Graphic::Axis> - Grafik einer Achse eines XY-Plot
-
-=item *
-
-L<Quiq::Gd::Graphic::BlockDiagram> - Farbige Blöcke in einer Fläche
-
-=item *
-
-L<Quiq::Gd::Graphic::ColorBar> - Rechteck mit einem Farbverlauf
-
-=item *
-
-L<Quiq::Gd::Graphic::ColorLegend> - Legende zu einem Farb-Plot
-
-=item *
-
-L<Quiq::Gd::Graphic::Graph> - Polyline-Grafik für XY-Plot
-
-=item *
-
-L<Quiq::Gd::Graphic::PointGraph> - Polyline-Grafik für XY-Plot mit farbigen Punkten
 
 =item *
 
@@ -700,6 +708,10 @@ L<Quiq::String> - Operationen auf Zeichenketten
 
 =item *
 
+L<Quiq::Svg::Tag> - Erzeuge SVG Markup-Code
+
+=item *
+
 L<Quiq::System> - Information über das System und seine Umgebung
 
 =item *
@@ -709,6 +721,10 @@ L<Quiq::Table> - Tabelle
 =item *
 
 L<Quiq::TableRow> - Tabellenzeile
+
+=item *
+
+L<Quiq::Tag> - Erzeuge Markup-Code gemäß XML-Regeln
 
 =item *
 
@@ -802,7 +818,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

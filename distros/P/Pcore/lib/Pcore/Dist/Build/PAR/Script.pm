@@ -1,26 +1,26 @@
 package Pcore::Dist::Build::PAR::Script;
 
 use Pcore -class, -ansi;
-use Pcore::Lib::Text qw[add_num_sep];
-use Pcore::Lib::File::Tree;
+use Pcore::Util::Text qw[add_num_sep];
+use Pcore::Util::File::Tree;
 use Archive::Zip qw[];
 use PAR::Filter;
 use Config;
 use Fcntl qw[:DEFAULT SEEK_END];
 
 has dist   => ( required => 1 );    # InstanceOf ['Pcore::Dist']
-has script => ( required => 1 );    # InstanceOf ['Pcore::Lib::Path']
+has script => ( required => 1 );    # InstanceOf ['Pcore::Util::Path']
 has crypt  => ( required => 1 );
 has clean  => ( required => 1 );
 has gui    => ( required => 1 );
 has mod    => ( required => 1 );    # HashRef
 
-has tree => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::Lib::File::Tree']
+has tree => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::Util::File::Tree']
 has main_mod       => ( sub { {} }, is => 'lazy', init_arg => undef );    # HashRef, main modules, found during deps processing
 has shared_objects => ( init_arg       => undef );                        # HashRef
 
 sub _build_tree ($self) {
-    return Pcore::Lib::File::Tree->new;
+    return Pcore::Util::File::Tree->new;
 }
 
 sub run ($self) {
@@ -99,18 +99,21 @@ sub run ($self) {
 }
 
 sub _store_exe ( $self, $source_path ) {
-    my $dist_id = $self->{dist}->id;
+    my $dist_id  = $self->{dist}->id;
+    my $is_dirty = $dist_id->{is_dirty} ? '.dirty' : $EMPTY;
 
     my @tags;
+
     @tags = grep {defined} $dist_id->{branch}, $dist_id->{tags}->@*;
-    push @tags, $dist_id->{hash_short} if !@tags;
+
+    @tags = ("$dist_id->{hash_short}${is_dirty}") if $is_dirty || !@tags;
 
     my $filename = $self->{script}->{filename_base};
     my $arch     = $Config{archname} =~ /x64|x86_64/sm ? 'x64' : $EMPTY;
     my $suffix   = $MSWIN ? '.exe' : $EMPTY;
 
     for my $tag (@tags) {
-        my $target_filename = "$filename-$tag@{[ $dist_id->{is_dirty} ? '.dirty' : $EMPTY ]}-${arch}${suffix}";
+        my $target_filename = "$filename-${tag}-${arch}${suffix}";
 
         my $target_path = "$self->{dist}->{root}/data/$target_filename";
 
@@ -434,11 +437,11 @@ sub _error ( $self, $msg ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 299                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 302                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 391                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "record"                                |
+## |    3 | 394                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "record"                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 410                  | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
+## |    2 | 413                  | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

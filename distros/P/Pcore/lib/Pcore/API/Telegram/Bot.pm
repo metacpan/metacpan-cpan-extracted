@@ -1,7 +1,7 @@
 package Pcore::API::Telegram::Bot;
 
 use Pcore -class, -res;
-use Pcore::Lib::Scalar qw[weaken];
+use Pcore::Util::Scalar qw[weaken];
 
 has key          => ( required => 1 );
 has poll_timeout => 1;
@@ -20,7 +20,7 @@ sub _req ( $self, $path, $data ) {
         data    => $data
     );
 
-    my $data = P->data->from_json( $res->{data} );
+    $data = P->data->from_json( $res->{data} );
 
     return res 200, $data;
 }

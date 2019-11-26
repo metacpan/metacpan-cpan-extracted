@@ -13,6 +13,7 @@ dist.ini
 doap.ttl
 lib/MooX/Enumeration.pm
 t/01basic.t
+t/01handles2.t
 t/03typetiny.t
 t/04matchsimple.t
 t/05assign.t

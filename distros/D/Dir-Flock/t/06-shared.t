@@ -39,14 +39,17 @@ ok(@t > 0, "lock directory is not empty because child has lock");
 my $t1 = time;
 my $p = Dir::Flock::lock_sh($dir, 0);
 my $t2 = time;
-ok(!$p, "failed to get shared lock in parent");
+ok(!$p, "failed to get shared lock in parent")
+    or Dir::Flock::unlock($dir);
 ok($t2-$t1 < 2, "flock finished fast with 0 timeout");
 my $pp = Dir::Flock::unlock($dir);
 ok(!$pp, "unlock fails when we don't have the lock");
 $t1 = time;
 $p = Dir::Flock::lock_ex($dir,0);
 $t2 = time;
-ok(!$p && $t2-$t1 < 2, "failed to get exclusive lock, timeout quickly");
+ok(!$p, "failed to get exclusive lock")
+    or Dir::Flock::unlock($dir);
+ok($t2-$t1 < 2, "timed out quickly");
 my $q = Dir::Flock::lock_sh($dir);
 my $t3 = time;
 ok($q, "flock succeeded in parent");

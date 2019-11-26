@@ -1,5 +1,9 @@
 Revision history for File-ContentStore
 
+1.004 2019-11-26 BOOK
+    - Update the minimum version required for Path::Tiny
+    - Minor documentation fixes
+
 1.003 2019-04-27 BOOK
     - Produce a NA test report if perl doesn't have link()
 

@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Indicator::Gauge::Bar::Line;
 
-our $VERSION = '0.030';    # VERSION
+our $VERSION = '0.031';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace indicator.
 
@@ -66,7 +66,7 @@ Chart::Plotly::Trace::Indicator::Gauge::Bar - This attribute is one of the possi
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 

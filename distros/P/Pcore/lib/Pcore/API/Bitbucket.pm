@@ -1,7 +1,6 @@
 package Pcore::API::Bitbucket;
 
 use Pcore -class, -res;
-use Pcore::Lib::Scalar qw[is_plain_coderef];
 
 has username => ( required => 1 );
 has password => ( required => 1 );
@@ -210,7 +209,7 @@ sub update_issue ( $self, $repo_id, $issue_id, $data ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 202                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 201                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

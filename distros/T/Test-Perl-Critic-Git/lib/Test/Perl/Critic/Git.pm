@@ -6,23 +6,26 @@ use 5.018;
 use strict;
 use warnings;
 use Git::Diff;
+use File::Spec;
 use Perl::Critic;
 use Test::Builder;
 use Perl::Critic::Utils;
 use Perl::Critic::Violation;
 
-$Test::Perl::Critic::Git::VERSION     = '0.000104';
+$Test::Perl::Critic::Git::VERSION     = '0.000200';
 $Test::Perl::Critic::Git::TEST        = Test::Builder->new;
 %Test::Perl::Critic::Git::CRITIC_ARGS = ();
-%Test::Perl::Critic::Git::GIT_ARGS    = ();
+%Test::Perl::Critic::Git::CHECK_ARGS  = ();
 
 sub _matching_files {
     my ( $ar_dirs, $hr_changed_files ) = @_;
     my @a_perlfiles = Perl::Critic::Utils::all_perl_files( @{$ar_dirs} );
+    if ( exists $Test::Perl::Critic::Git::CHECK_ARGS{explicit} ) {
+        my $rx_exclude = '\.(' . join( q/|/, @{ $Test::Perl::Critic::Git::CHECK_ARGS{explicit} } ) . ')$';
+        @a_perlfiles = grep { /$rx_exclude/sxm } @a_perlfiles;
+    }
 
-    require File::Spec;
     my $s_current_dir = Cwd::cwd;
-
     my @a_files = ();
     for my $s_file (@a_perlfiles) {
         for ( keys %{$hr_changed_files} ) {
@@ -34,26 +37,31 @@ sub _matching_files {
 
 sub _run_builder {
     my ( $b_switch, $hr_files, $s_message ) = @_;
-    my $i_files_to_test = 0;
-    for my $s_file ( sort keys %{$hr_files} ) {
-        my $hr_file = $hr_files->{$s_file};
-        next if scalar @{ $hr_file->{violations} } == 0;
-        $i_files_to_test++;
-        my @a_violations = grep { exists $hr_file->{addition}->{ $_->line_number } } @{ $hr_file->{violations} };
-        if ( scalar @a_violations > 0 ) {
-            $Test::Perl::Critic::Git::TEST->diag(qq{Perl::Critic had errors in "$s_file":});
-            $Test::Perl::Critic::Git::TEST->diag($_) for @a_violations;
-            $Test::Perl::Critic::Git::TEST->ok( $b_switch, $s_message // '' );
-            next;
+    return $Test::Perl::Critic::Git::TEST->ok( !$b_switch, $s_message // '' ) if scalar keys %{$hr_files} == 0;
+    return $Test::Perl::Critic::Git::TEST->subtest(
+        $s_message,
+        sub {
+            my $i_files_to_test = 0;
+            for my $s_file ( sort keys %{$hr_files} ) {
+                my $hr_file = $hr_files->{$s_file};
+                $i_files_to_test++;
+                my @a_violations = grep { exists $hr_file->{addition}->{ $_->line_number } } @{ $hr_file->{violations} };
+                if ( scalar @a_violations > 0 ) {
+                    $Test::Perl::Critic::Git::TEST->ok( $b_switch, qq~File "$s_file" test failed~ );
+                    $Test::Perl::Critic::Git::TEST->diag(qq{Perl::Critic had errors in "$s_file":});
+                    $Test::Perl::Critic::Git::TEST->diag($_) for @a_violations;
+                    next;
+                }
+                $Test::Perl::Critic::Git::TEST->ok( !$b_switch, $s_file );
+                $i_files_to_test--;
+            }
+            return $Test::Perl::Critic::Git::TEST->ok( ( ( !$b_switch && !$i_files_to_test ) || ( $b_switch && $i_files_to_test ) ) ? 1 : 0, $s_message // '' );
         }
-        $Test::Perl::Critic::Git::TEST->ok( !$b_switch, ( $s_message . ' ' ) . $s_file );
-        $i_files_to_test--;
-    }
-    return $Test::Perl::Critic::Git::TEST->ok( ( ( !$b_switch && !$i_files_to_test ) || ( $b_switch && $i_files_to_test ) ) ? 1 : 0, $s_message // '' );
+    );
 }
 
 sub import {
-    my ( $self, $hr_critic_args, $hr_git_args ) = @_;
+    my ( $self, $hr_critic_args, $hr_git_args, $hr_check_args ) = @_;
     my $s_caller = caller;
     {
         no strict 'refs';    ## no critic qw(ProhibitNoStrict)
@@ -64,7 +72,8 @@ sub import {
     # -format is supported for backward compatibility.
     $hr_critic_args->{-verbose} = $hr_critic_args->{-format} if exists $hr_critic_args->{-format};
     %Test::Perl::Critic::Git::CRITIC_ARGS = %{$hr_critic_args};
-    %Test::Perl::Critic::Git::GIT_ARGS = $hr_git_args ? %{$hr_git_args} : ();
+    %Test::Perl::Critic::Git::GIT_ARGS    = $hr_git_args ? %{$hr_git_args} : ();
+    %Test::Perl::Critic::Git::CHECK_ARGS  = $hr_check_args ? %{$hr_check_args} : ();
     return $Test::Perl::Critic::Git::TEST->exported_to($s_caller);
 }
 
@@ -77,7 +86,6 @@ sub critic_on_changed_ok {
     my $o_critic = Perl::Critic->new(%Test::Perl::Critic::Git::CRITIC_ARGS);
     Perl::Critic::Violation::set_format( $o_critic->config->verbose );
     $hr_files->{$_}->{violations} = [ $o_critic->critique($_) ] for keys %{$hr_files};
-
     return _run_builder( 0, $hr_files, $s_message );
 }
 
@@ -106,25 +114,29 @@ Test::Perl::Critic::Git - Test module to run perl critic on changed git files
 
 =head1 VERSION
 
-Version 0.000104
+Version 0.000200
 
 =head1 SUBROUTINES/METHODS
 
 =head2 critic_on_changed_ok
 
+Run perl critic on changed files and and raises errors, or even not :-D
+
 Params:
 
-$hr_critic_args - direct import params for L<Perl::Critic|Perl::Critic>
-
-$hr_git_args - direct import params for L<Git|Git>
-
-=head2 critic_on_changed_ok
-
-Run perl critic on changed files and and raises errors, or even not :-D
+Arrayref of String from directories which should be tested in the git-project.
 
 =head2 critic_on_changed_not_ok
 
 Same as critic_on_changed_ok but vice versa
+
+=head2 import
+
+Params:
+
+Hash-Ref: direct import params for L<Perl::Critic|Perl::Critic>
+Hash-Ref: direct import params for L<Git|Git>
+Hash-Ref: params in which conditions should be checked.
 
 =head1 SYNOPSIS
 
@@ -137,10 +149,41 @@ Same as critic_on_changed_ok but vice versa
           ...
     });
 
+or
+
+    Test::Perl::Critic::Git->import(
+        {
+            -severity => 'brutal',
+            -profile => File::Spec->catfile($Bin, 'critic', 'profilerc'),
+            ...
+        },
+        {
+            Directory => '/srv/git/cogito.git'
+        }
+    );
+
+or
+
+    Test::Perl::Critic::Git->import(
+        {
+            -severity => 'brutal',
+            -profile => File::Spec->catfile($Bin, 'critic', 'profilerc'),
+            ...
+        }, {},
+        # do not test pl files and unit tests
+        {
+            exclude => ['pl','t']
+        }
+    );
+
     critic_on_changed_ok([
         '.',
         ...
     ]);
+
+    critic_on_changed_ok( ['.'], 'critic_on_changed_ok test' );
+
+    critic_on_changed_not_ok( ['.'], 'critic_on_changed_not_ok test' );
 
 =head1 DIAGNOSTICS
 

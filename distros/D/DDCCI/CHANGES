@@ -1,0 +1,8 @@
+0.03
+	bugfix: improved testing scripts
+0.02
+	bugfix: fixed/improved testing scripts
+	bugfix: added a loop delay in the 'ddcci_caps' internal function for better monitors compatibility
+	refactoring: renamed most of the internal functions to avoid future name collisions
+0.01
+	first release

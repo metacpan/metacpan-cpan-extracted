@@ -1,3 +1,8 @@
+0.82    Fri Nov 22 19:09:35 GMT 2019
+* Correctly compare version string for Archive::Tar (#7)
+* Remove duplicate entry from the MANIFEST file. (#6)
+* Treat minix the same as NetBSD
+
 0.80    Wed Jan 18 23:14:32 GMT 2017
 * Change Linux unzip heuristic to match FreeBSD's [rt#119905]
 

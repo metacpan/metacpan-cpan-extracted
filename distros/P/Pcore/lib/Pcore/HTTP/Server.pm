@@ -1,7 +1,8 @@
 package Pcore::HTTP::Server;
 
 use Pcore -class, -const, -res;
-use Pcore::Lib::Scalar qw[is_ref];
+use Pcore::Util::Scalar qw[is_uri weaken];
+use Pcore::Util::HTTP;
 use AnyEvent::Socket qw[];
 use Pcore::HTTP::Server::Request;
 
@@ -31,9 +32,19 @@ has _listen_socket => ( init_arg => undef );
 sub BUILD ( $self, $args ) {
 
     # parse listen
-    $self->{listen} = P->uri( $self->{listen}, base => 'tcp:', listen => 1 ) if !is_ref $self->{listen};
+    $self->{listen} = P->uri( $self->{listen}, base => 'tcp:', listen => 1 ) if !is_uri $self->{listen};
 
-    $self->{_listen_socket} = &AnyEvent::Socket::tcp_server( $self->{listen}->connect, Coro::unblock_sub { return $self->_on_accept(@_) }, sub { return $self->_on_prepare(@_) } );    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+    $self->{_listen_socket} = &AnyEvent::Socket::tcp_server(          ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+        $self->{listen}->connect,
+        sub {
+            Coro::async_pool sub { return $self->_on_accept(@_) }, @_;
+
+            return;
+        },
+        sub {
+            return $self->_on_prepare(@_);
+        }
+    );
 
     chmod( oct 777, $self->{listen}->{path} ) || die $! if !defined $self->{listen}->{host} && substr( $self->{listen}->{path}, 0, 2 ) ne "/\x00";
 
@@ -52,15 +63,16 @@ sub _on_accept ( $self, $fh, $host, $port ) {
     );
 
     # read HTTP headers
-  READ_HEADERS: my $env = $h->read_http_req_headers( timeout => $self->{client_header_timeout} );
+  READ_HEADERS:
+    my $env = $h->read_http_req_headers( timeout => $self->{client_header_timeout} );
 
     # HTTP headers read error
     if ( !$env ) {
         if ( $h->is_timeout ) {
-            $self->return_xxx( $h, 408 );
+            $self->return_xxx( $h, 408, 1 );
         }
         else {
-            $self->return_xxx( $h, 400 );
+            $self->return_xxx( $h, 400, 1 );
         }
 
         return;
@@ -101,28 +113,28 @@ sub _on_accept ( $self, $fh, $host, $port ) {
 
             # payload too large
             if ($payload_too_large) {
-                return $self->return_xxx( $h, 413 );
+                return $self->return_xxx( $h, 413, 1 );
             }
 
             # timeout
             elsif ( $h->is_timeout ) {
-                return $self->return_xxx( $h, 408 );
+                return $self->return_xxx( $h, 408, 1 );
             }
 
             # read error
             else {
-                return $self->return_xxx( $h, 400 );
+                return $self->return_xxx( $h, 400, 1 );
             }
         }
 
         $env->{CONTENT_LENGTH} = length $data->$*;
     }
 
-    # fixed body size
+    # fixed body length
     elsif ( $env->{CONTENT_LENGTH} ) {
 
         # payload too large
-        return $self->return_xxx( $h, 413 ) if $self->{client_max_body_size} && $self->{client_max_body_size} > $env->{CONTENT_LENGTH};
+        return $self->return_xxx( $h, 413, 1 ) if $self->{client_max_body_size} && $self->{client_max_body_size} > $env->{CONTENT_LENGTH};
 
         $data = $h->read_chunk( $env->{CONTENT_LENGTH}, timeout => $self->{client_body_timeout} );
 
@@ -131,12 +143,12 @@ sub _on_accept ( $self, $fh, $host, $port ) {
 
             # timeout
             if ( $h->is_timeout ) {
-                return $self->return_xxx( $h, 408 );
+                return $self->return_xxx( $h, 408, 1 );
             }
 
             # read error
             else {
-                return $self->return_xxx( $h, 400 );
+                return $self->return_xxx( $h, 400, 1 );
             }
         }
     }
@@ -158,48 +170,67 @@ sub _on_accept ( $self, $fh, $host, $port ) {
         }
     };
 
-    my $cv = P->cv;
+    # create request object
+    my $req = bless {
+        _server          => $self,
+        _h               => $h,
+        env              => $env,
+        data             => $data,
+        keepalive        => $keepalive,
+        _response_status => 0,
+      },
+      'Pcore::HTTP::Server::Request';
 
-    Coro::async_pool {
+    # evaluate "on_request" callback
+    my @res = eval { $self->{on_request}->($req) };
 
-        # create request object
-        my $req = bless {
-            _server          => $self,
-            _h               => $h,
-            _cb              => $cv,
-            env              => $env,
-            data             => $data,
-            keepalive        => $keepalive,
-            _response_status => 0,
-          },
-          'Pcore::HTTP::Server::Request';
+    weaken $req;
 
-        # evaluate "on_request" callback
-        eval { $self->{on_request}->($req); 1; } or $@->sendlog;
-    };
+    if ($@) {
+        $@->sendlog;
 
-    # keep-alive
-    goto READ_HEADERS if !$cv->recv && $keepalive;
+        return;
+    }
+
+    # request is not finished
+    elsif ( defined $req ) {
+        my $cv = $req->{_cb} = P->cv;
+
+        my $close_connection = $cv->recv;
+
+        # keep-alive
+        goto READ_HEADERS if !$close_connection && $keepalive;
+    }
+    elsif ( !@res ) {
+        $self->return_xxx( $h, 204, 0 );
+    }
+    else {
+        my $headers = $self->build_response_headers( shift @res, shift @res, [ Connection => 'keep-alive' ] );
+
+        my $body = Pcore::Util::HTTP::build_body( \@res );
+
+        $headers->$* .= "Content-Length:@{[ length $body->$* ]}\r\n";
+
+        $h->write( $headers->$* . "\r\n" . $body->$* );
+    }
 
     return;
 }
 
-sub return_xxx ( $self, $h, $status, $close_connection = 1 ) {
+sub build_response_headers ( $self, $status, @headers ) {
+    return Pcore::Util::HTTP::build_response_headers( $status, $self->{server_tokens} ? [ Server => $self->{server_tokens} ] : (), @headers );
+}
+
+sub return_xxx ( $self, $h, $status, $close_connection ) {
 
     # handle closed, do nothing
     return if !$h;
 
-    $status = 0+ $status;
+    my $headers = $self->build_response_headers( $status, [ Connection => $close_connection ? 'close' : 'keep-alive' ] );
 
-    my $reason = P->result->resolve_reason($status);
+    $headers->$* .= "Content-Length:0\r\n";
 
-    my $buf = "HTTP/1.1 $status $reason\r\nContent-Length:0\r\n";
-
-    $buf .= 'Connection:' . ( $close_connection ? 'close' : 'keep-alive' ) . "\r\n";
-
-    $buf .= "Server:$self->{server_tokens}\r\n" if $self->{server_tokens};
-
-    $h->write("$buf\r\n");
+    $h->write("$headers->$*\r\n");
 
     return;
 }
@@ -211,7 +242,7 @@ sub return_xxx ( $self, $h, $status, $close_connection = 1 ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 47                   | Subroutines::ProhibitExcessComplexity - Subroutine "_on_accept" with high complexity score (32)                |
+## |    3 | 58                   | Subroutines::ProhibitExcessComplexity - Subroutine "_on_accept" with high complexity score (35)                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -225,6 +256,30 @@ __END__
 Pcore::HTTP::Server
 
 =head1 SYNOPSIS
+
+    my $svr = Pcore::HTTP::Server->new(
+        listen     => '//127.0.0.1:80',
+        on_request => sub ($req) {
+            return 200, [ 'Content-Type' => 'text/html' ], 'body';
+        }
+    );
+
+    # asynchronous response
+    on_request => sub ($req) {
+        async {
+            $req->( 200, [ 'Content-Type' => 'text/html' ] );
+
+            $req->('data1');
+
+            $req->('data2');
+
+            $req->finish;
+
+            return;
+        };
+
+        return;
+    }
 
 =head1 DESCRIPTION
 

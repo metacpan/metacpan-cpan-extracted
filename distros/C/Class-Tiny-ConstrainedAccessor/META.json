@@ -43,7 +43,7 @@
          "requires" : {
             "Class::Tiny" : "0",
             "Scalar::Util" : "1.50",
-            "perl" : "5.006",
+            "perl" : "5.006001",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -52,7 +52,8 @@
          "recommends" : {
             "MooX::Types::MooseLike" : "0",
             "MouseX::Types" : "0",
-            "Specio" : "0"
+            "Specio" : "0",
+            "Type::Nano" : "0.004"
          },
          "requires" : {
             "Exporter" : "0",
@@ -63,7 +64,7 @@
             "Test::Exception" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0",
-            "Type::Tiny" : "0",
+            "Type::Tiny" : "1.004004",
             "lib::relative" : "0.002",
             "parent" : "0",
             "vars::i" : "2.000000"
@@ -73,7 +74,7 @@
    "provides" : {
       "Class::Tiny::ConstrainedAccessor" : {
          "file" : "lib/Class/Tiny/ConstrainedAccessor.pm",
-         "version" : "0.000013"
+         "version" : "0.000015"
       }
    },
    "release_status" : "stable",
@@ -86,7 +87,7 @@
          "web" : "https://github.com/cxw42/Class-Tiny-ConstrainedAccessor"
       }
    },
-   "version" : "0.000013",
+   "version" : "0.000015",
    "x_contributors" : [
       "Christopher White <cxw@cpan.org>",
       "Ivan Butorin <fishbone@cpan.org>",

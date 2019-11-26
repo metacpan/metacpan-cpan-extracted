@@ -7,9 +7,25 @@ Bug tracker:  <https://github.com/kjetilk/p5-rdf-doap/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.103	2019-11-23
+
+ - If versions 10 and 12 both offer changelogs since version 8, then omit
+   details for all releases between 8 and 12 (not inclusive) instead of
+   just 8 and 10 (not inclusive).
+
+0.102	2019-11-23
+
+ [ Bug Fixes ]
+ - Cope with versions that have no changeset.
+
+0.101	2019-11-23
+
+ - If a changeset for version 10 indicates that it's versus version 8, then
+   the details for version 9 will be left out of changelog.
+
 0.100	2017-12-21
 
- - Added: RDF::DOAP::Project now has methods for foras.
+ - Added: RDF::DOAP::Project now has methods for fora.
  - Replace List::MoreUtils with List::Util.
  - Some minor changes.
 

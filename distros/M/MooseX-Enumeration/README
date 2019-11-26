@@ -127,6 +127,9 @@ DESCRIPTION
 
         This will create a delegated method for each value in the enumeration.
 
+        `handles => 1` will create methods like `$object->is_pass` while
+        `handles => 2` will create methods like `$object->status_is_pass`.
+
         As a slightly more advanced option, which will only work for the
         long-hand version, you may match the value against a regular
         expression or any other value that may serve as a right-hand side for

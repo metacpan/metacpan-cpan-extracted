@@ -7,14 +7,25 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.005'
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
+                                      'Code::TidyAll' => '0.71',
+                                      'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
+                                      'Code::TidyAll::Plugin::Test::Vars' => '0.04',
+                                      'Code::TidyAll::Plugin::UniqueLines' => '0.000003',
+                                      'Parallel::ForkManager' => '1.19',
+                                      'Perl::Critic' => '1.132',
+                                      'Perl::Tidy' => '20180220',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::CPAN::Changes' => '0.19',
+                                      'Test::EOL' => '0',
+                                      'Test::Mojibake' => '0',
                                       'Test::More' => '0.96',
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Synopsis' => '0',
+                                      'Test::Vars' => '0.014',
+                                      'Test::Version' => '1',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

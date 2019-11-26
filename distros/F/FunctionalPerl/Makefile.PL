@@ -18,8 +18,12 @@ WriteMakefile (
         "overload"=> 0,
         "Digest"=> 0,
         "warnings"=> 0,
-        "Test::More"=> 0,
+        "Test::More"=> "0.96", # for ~proper subtest support
         "Scalar::Util"=> 0,
+        "Import::Into"=> 0,
+
+        # could be optional (tests should skip if not available):
+        "autobox"=> 0,
 
 
         # XXX is TEST_REQUIRES not working? Just move all dependencies
@@ -81,6 +85,8 @@ WriteMakefile (
                 "examples", # ?
                 "meta",
                 "htmlgen",
+                "t-slow",
+                "t-extra",
             ],
         },
 

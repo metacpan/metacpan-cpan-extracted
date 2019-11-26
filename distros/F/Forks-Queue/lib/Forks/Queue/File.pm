@@ -1,4 +1,3 @@
-
 package Forks::Queue::File;
 use strict;
 use warnings;
@@ -8,7 +7,7 @@ use Time::HiRes;
 use base 'Forks::Queue';
 use 5.010;    #  sorry, v5.08. I love the // //=  operators too much
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
 
@@ -125,7 +124,7 @@ sub new {
     $opts{lock} = $opts{file} . ".lock";
     my $list = delete $opts{list};
 
-    my $fh;
+#   my $fh;
 
     $opts{_header_size} //= 2048;
     $opts{_end} = 0;            # whether "end" has been called for this obj
@@ -144,8 +143,8 @@ sub new {
 
     
 
-    open $fh, '>>', $opts{lock} or die;
-    close $fh or die;
+    open my $fh1, '>>', $opts{lock} or die;
+    close $fh1 or die;
 
     my $self = bless { %opts }, $class;
 
@@ -173,28 +172,29 @@ sub new {
 
     if ($opts{join} && -f $opts{file}) {
         $DB::single = 1;
-        open $fh, '+<', $opts{file} or die;
-        $self->{_fh} = *$fh;
-        my $fhx = select $fh; $| = 1; select $fhx;
+        open my $fh2, '+<', $opts{file} or die;
+        $self->{_fh} = *$fh2;
+        my $fhx = select $fh2; $| = 1; select $fhx;
         _SYNC { $self->_read_header } $self;
     } else {
         if (-f $opts{file}) {
             carp "Forks::Queue: Queue file $opts{file} already exists. ",
                  "Expect trouble if another process created this file.";
+            unlink $opts{file};
         }
-        open $fh, '>', $opts{file} or die;
-        close $fh or die;
+        open my $fh3, '>', $opts{file} or die;
+        close $fh3 or die;
 
-        open $fh, '+<', $opts{file} or die;
-        my $fhx = select $fh; $| = 1; select $fhx;
-        $self->{_fh} = *$fh;
-        seek $fh, 0, 0;
+        open my $fh4, '+<', $opts{file} or die;
+        my $fhx = select $fh4; $| = 1; select $fhx;
+        $self->{_fh} = *$fh4;
+        seek $fh4, 0, 0;
 
         $self->{_locked}++;
         $self->_write_header;
         $self->{_locked}--;
-        if (tell($fh) < $self->{_header_size}) {
-            print $fh "\0" x ($self->{_header_size} - tell($fh));
+        if (tell($fh4) < $self->{_header_size}) {
+            print $fh4 "\0" x ($self->{_header_size} - tell($fh4));
         }
     }
     if (defined($list)) {
@@ -543,32 +543,42 @@ sub push {
             return 0;
         }
 
-        # TODO: check if queue  limit  is reached, consult  on_limit
+        # put: add whatever items there is room for
+        # enqueue: add all items if there is room for one item
         if ($self->{limit} > 0) {
-            $failed_items = $self->{_avail} + @items - $self->{limit};
-            if ($failed_items > 0) {
-                @deferred_items = splice @items, -$failed_items;
-                if (@items == 0) {
-                    return;
+            if ($Forks::Queue::File::_ENQUEUE) {
+                if ($self->{_avail} >= $self->{limit}) {
+                    $failed_items = @deferred_items = @items;
+                    @items = ();
                 }
             } else {
-                $failed_items = 0;
+                $failed_items = $self->{_avail} + @items - $self->{limit};
+                if ($failed_items > 0) {
+                    @deferred_items = splice @items, -$failed_items;
+                    if (@items == 0) {
+                        return;
+                    }
+                } else {
+                    $failed_items = 0;
+                }
             }
         }
 
-        seek $self->{_fh}, 0, 2;
-        if (tell($self->{_fh}) < $self->{_tell}) {
-            Carp::cluck "funny seek";
-            seek $self->{_fh}, $self->{_tell}, 0;
-        }
-        foreach my $item (@items) {
-            my $json = jsonize($item);
-            print {$self->{_fh}} $json,EOL;
-            $self->{_count}++;
-            $self->{_avail}++;
-            $pushed++;
-            $self->_debug && print STDERR
-                "$$ put item [$json] $pushed/",0+@items,"\n";
+        if (@items > 0) {
+            seek $self->{_fh}, 0, 2;
+            if (tell($self->{_fh}) < $self->{_tell}) {
+                Carp::cluck "funny seek";
+                seek $self->{_fh}, $self->{_tell}, 0;
+            }
+            foreach my $item (@items) {
+                my $json = jsonize($item);
+                print {$self->{_fh}} $json,EOL;
+                $self->{_count}++;
+                $self->{_avail}++;
+                $pushed++;
+                $self->_debug && print STDERR
+                    "$$ put item [$json] $pushed/",0+@items,"\n";
+            }
         }
         $self->_write_header;
     } $self;
@@ -586,9 +596,16 @@ sub push {
                 "$$ $failed_items on put. Waiting for capacity\n";
             $self->_wait_for_capacity;
             $self->_debug && print STDERR "$$ got some capacity\n";
-            $pushed += $self->push(@deferred_items);        }
+            return $pushed + $self->push(@deferred_items);
+        }
     }
     return $pushed;
+}
+
+sub enqueue {
+    undef $Forks::Queue::File::_ENQUEUE;
+    local $Forks::Queue::File::_ENQUEUE = 1;
+    return Forks::Queue::File::push(@_);
 }
 
 sub unshift {
@@ -651,6 +668,11 @@ sub _dequeue_back {
         carp "Forks::Queue::pop operation failed: $@";
         return;
     }
+    if ($self->limit > 0 && $count > $self->limit) {
+        # error message compatible with Thread::Queue
+        croak "dequeue: 'count' argument ($count) exceeds queue size limit (",
+            $self->limit, ")";
+    }
     my @return;
     local $/ = EOL;
     while (@return == 0) {
@@ -684,6 +706,11 @@ sub _dequeue_front {
     if (! eval { $self->_check_pid; 1 } ) {
         carp "Forks::Queue::shift operation failed: $@";
         return;
+    }
+    if ($self->limit > 0 && $count > $self->limit) {
+        # error message compatible with Thread::Queue
+        croak "dequeue: 'count' argument ($count) exceeds queue size limit (",
+            $self->limit, ")";
     }
     my @return;
     local $/ = EOL;
@@ -965,7 +992,7 @@ sub insert {
                  "after end call from process ", $self->{_end}, "!";
             return 0;
         }
-        if ($self->{limit} > 0) {
+        if ($self->{on_limit} ne "tq-compat" && $self->{limit} > 0) {
             my $failed_items = $self->{_avail} + @items - $self->{limit};
             if ($failed_items > 0) {
                 @deferred_items = splice @items, -$failed_items;
@@ -1029,7 +1056,7 @@ sub insert {
                 "$$ $failed_items on insert. Waiting for capacity\n";
             $self->_wait_for_capacity;
             $self->_debug && print STDERR "$$ got some capacity\n";
-            $inserted += $self->insert($pos+$inserted, @deferred_items);
+            return $inserted + $self->insert($pos+$inserted, @deferred_items);
         }
     }
     $self->_notify if $inserted;
@@ -1229,7 +1256,7 @@ Forks::Queue::File - file-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.13
+0.14
 
 =head1 SYNOPSIS
 
@@ -1294,8 +1321,10 @@ overriding the value in C<$Forks::Queue::DEBUG>.
 
 Boolean value to enable directory-based alternative to flock
 for synchronization of the queue across processeses. The module
-will generally be able to guess whether this flag should be
-set by default.
+will often be able to guess whether this flag should be
+set by default, but it should be used explicitly in some cases
+such as sharing a queue over processes on different hosts
+accessing a shared, networked filesystem.
 
 =back
 

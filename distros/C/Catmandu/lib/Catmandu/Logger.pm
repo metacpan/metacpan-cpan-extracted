@@ -2,7 +2,7 @@ package Catmandu::Logger;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2009';
+our $VERSION = '1.2010';
 
 use Moo::Role;
 use Log::Any ();
@@ -17,7 +17,7 @@ has log_category => (is => 'lazy');
     sub _build_log {
         my ($self) = @_;
         my $category = $self->log_category;
-        $loggers->{$category} ||= Log::Any->get_logger(category => $category);
+        $loggers->{$category} //= Log::Any->get_logger(category => $category);
     }
 }
 

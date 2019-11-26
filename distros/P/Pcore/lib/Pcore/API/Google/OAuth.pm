@@ -2,8 +2,8 @@ package Pcore::API::Google::OAuth;
 
 use Pcore -class, -const, -res;
 use Crypt::OpenSSL::RSA qw[];
-use Pcore::Lib::Scalar qw[is_ref];
-use Pcore::Lib::Data qw[to_b64u to_json from_json to_uri];
+use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Util::Data qw[to_b64u to_json from_json to_uri];
 
 has key   => ( required => 1 );
 has scope => ( required => 1 );

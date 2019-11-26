@@ -1,45 +1,31 @@
-#!/bin/sh
+#!/usr/bin/env perl
 
-# Copyright (c) 2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
 # This is free software. See the file COPYING.md that came bundled
 # with this file.
 
 # load repl with most of the more interesting functional-perl packages
 # loaded
 
-repl=$(dirname "$0")/repl
+use strict; use warnings; use warnings FATAL => 'uninitialized';
 
-$repl \
- -t \
- -M Chj::ruse \
- -M FP::Repl \
- -M FP::TransparentLazy \
- -M FP::List=:all \
- -M FP::Stream=:all \
- -M FP::StrictList=:all \
- -M FP::PureArray \
- -M FP::Array=:all \
- -M FP::Div=:all \
- -M Chj::pp \
- -M FP::Predicates=:all \
- -M Chj::TerseDumper \
- -m Method::Signatures \
- -m Function::Parameters=:strict \
- -m Sub::Call::Tail \
- -M FP::IOStream=:all \
- -M FP::Array_sort \
- -M FP::Ops=:all \
- -M FP::Div=:all \
- -M FP::Struct \
- -M Chj::xopen=:all \
- -M FP::Path \
- -M Chj::xperlfunc=:all \
- -M PXML::Util=:all \
- -M PXML::XHTML=:all \
- -M PXML::Serialize \
- -M FP::OrderedCollection \
- -M FP::Combinators=:all \
- -M FP::Equal=:all \
- -M Chj::TEST=:all \
- -M Chj::time_this=:all \
- "$@"
+use Cwd 'abs_path';
+our ($mydir, $myname); BEGIN {
+    my $location= (-l $0) ? abs_path ($0) : $0;
+    $location=~ /(.*?)([^\/]+?)_?\z/s or die "?";
+    ($mydir, $myname)=($1,$2);
+}
+
+my $repl= "$mydir/repl";
+
+exec $^X,
+  $repl,
+  qw(
+        -t
+        -m Method::Signatures
+        -m Function::Parameters=:strict
+        -m Sub::Call::Tail
+        -M FunctionalPerl=:all
+   ), @ARGV
+  or exit 127;
+

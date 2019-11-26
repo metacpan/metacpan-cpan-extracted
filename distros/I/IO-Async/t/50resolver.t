@@ -94,7 +94,8 @@ SKIP: {
 
 my @proto = getprotobyname( "tcp" );
 
-{
+SKIP: {
+   skip "getprotobyname - No protocol", 1 unless @proto;
    my $result;
 
    $resolver->resolve(

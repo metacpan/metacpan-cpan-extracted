@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 use Carp;
 
@@ -545,9 +545,15 @@ sub _add_to_loop
 
    my $is_code = defined $self->{code};
 
-   $self->{finish_future} = Future->needs_all( @$finish_futures )
+   my $f = $self->finish_future;
+
+   $self->{_finish_future} = Future->needs_all( @$finish_futures )
       ->on_done( $self->_capture_weakself( sub {
          my $self = shift or return;
+
+         $self->debug_printf( "FINISH status=0x%04x%s", $exitcode,
+            join " ", '', ( $dollarbang ? '$!' : '' ), ( $dollarat ? '$@' : '' )
+         );
 
          $self->{exitcode} = $exitcode;
          $self->{dollarbang} = $dollarbang;
@@ -564,6 +570,8 @@ sub _add_to_loop
                $self->invoke_event( on_finish => $exitcode );
          }
 
+         $f->done( $exitcode );
+
          $self->remove_from_parent;
       } ),
    );
@@ -572,7 +580,7 @@ sub _add_to_loop
 sub DESTROY
 {
    my $self = shift;
-   $self->{finish_future}->cancel if $self->{finish_future};
+   $self->{_finish_future}->cancel if $self->{_finish_future};
 }
 
 sub notifier_name
@@ -590,6 +598,23 @@ sub notifier_name
 =head1 METHODS
 
 =cut
+
+=head2 finish_future
+
+   $f = $process->finish_future
+
+I<Since version 0.75.>
+
+Returns a L<Future> that completes when the process finishes. It will yield
+the exit code from the process.
+
+=cut
+
+sub finish_future
+{
+   my $self = shift;
+   return $self->{finish_future} //= $self->loop->new_future;
+}
 
 =head2 pid
 

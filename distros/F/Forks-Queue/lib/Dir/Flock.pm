@@ -119,9 +119,11 @@ sub _oldest_file {
     my ($dir) = @_;
     my $dh;
     Time::HiRes::sleep 0.001;
-    opendir $dh, $dir;
-    my @f1 = grep /^$LOCKFILE_STUB/, readdir $dh;
-    closedir $dh;
+    my @f1;
+    if (opendir $dh, $dir) {
+        @f1 = grep /^$LOCKFILE_STUB/, readdir $dh;
+        closedir $dh;
+    }
     my @f = map {
         my @s = Time::HiRes::stat("$dir/$_");
         [ $_, $s[9] ]
@@ -175,8 +177,10 @@ sub _write_lock_data {
 sub unlock {
     my ($dir) = @_;
     if (!defined $LOCK{$dir}) {
-        !__inGD() && carp "Dir::Flock::unlock: lock not held by ",
-                               _pid()," or any proc";
+        if (!__inGD() && !$Dir::Flock::SUPPRESS_RELOCK_WARNINGS) {
+            carp "Dir::Flock::unlock: lock not held by ",
+                _pid()," or any proc";
+        }
         return;
     }
     if ($LOCK{$dir}[0] ne _pid()) {

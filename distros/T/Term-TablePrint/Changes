@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.119   2019-11-24
+        - Update option 'color'.
+
 0.118   2019-10-05
         - Refactored functional interface.
 

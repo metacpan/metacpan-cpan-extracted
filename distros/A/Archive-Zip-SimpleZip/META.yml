@@ -20,15 +20,15 @@ no_index:
     - t
     - private
 recommends:
-  IO::Compress::Lzma: '2.09'
-  IO::Uncompress::UnLzma: '2.09'
+  IO::Compress::Lzma: '2.091'
+  IO::Uncompress::UnLzma: '2.091'
 requires:
-  IO::Compress::Base: '2.09'
-  IO::Uncompress::Base: '2.09'
+  IO::Compress::Base: '2.091'
+  IO::Uncompress::Base: '2.091'
   Perl::OSType: '0'
 resources:
   bugtracker: https://github.com/pmqs/Archive-Zip-SimpleZip/issues
   homepage: https://github.com/pmqs/Archive-Zip-SimpleZip
   repository: git://github.com/pmqs/Archive-Zip-SimpleZip.git
-version: '0.031'
+version: '0.032'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use POSIX ();
 use Time::Local ();
@@ -63,7 +63,55 @@ sub newlineToName {
 
 # -----------------------------------------------------------------------------
 
-=head3 snakeCaseToCamelCase() - Wandele Snake Case nach Camel Case
+=head3 camelCaseToSnakeCase() - Wandele CamelCase nach SnakeCase
+
+=head4 Synopsis
+
+  $snake = $this->camelCaseToSnakeCase($camel);
+
+=head4 Arguments
+
+=over 4
+
+=item $camel
+
+Bezeichner in CamelCase
+
+=back
+
+=head4 Returns
+
+Bezeichner in SnakeCase
+
+=head4 Description
+
+Wandele einen in CamelCase geschriebenen Bezeichner in einen
+SnakeCase Bezeichner und liefere diesen zurück.
+
+CamelCase:
+
+  imsApplyDeltaRowByRow
+
+SnakeCase:
+
+  ims-apply-delta-row-by-row
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub camelCaseToSnakeCase {
+    my ($this,$str) = @_;
+
+    # Eingebettete Bindestriche und Unterstriche in Camel Case wandeln
+    $str =~ s/(.)([A-Z])/$1-\L$2/g;
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 snakeCaseToCamelCase() - Wandele SnakeCase nach CamelCase
 
 =head4 Synopsis
 
@@ -71,15 +119,15 @@ sub newlineToName {
 
 =head4 Description
 
-Wandele einen in Snake Case geschriebenen Bezeichner in einen Camel Case
-Bezeichner und liefere diesen zurück.
+Wandele einen in SnakeCase geschriebenen Bezeichner in einen
+CamelCase Bezeichner und liefere diesen zurück.
 
-Snake Case:
+SnakeCase:
 
   ims-apply-delta-row-by-row
   ims_apply_delta_row_by_row
 
-Camel Case:
+CamelCase:
 
   imsApplyDeltaRowByRow
 
@@ -91,7 +139,6 @@ sub snakeCaseToCamelCase {
     my ($this,$str) = @_;
 
     # Eingebettete Bindestriche und Unterstriche in Camel Case wandeln
-
     $str =~ s/(.)[_-](.)/$1\U$2/g;
 
     return $str;
@@ -624,7 +671,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

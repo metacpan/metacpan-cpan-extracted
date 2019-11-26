@@ -1,9 +1,9 @@
 Build.PL
 Changes
 examples/demo-timer.pl
-examples/SpinnerWidget.pm
 examples/testonewidget.pl
 lib/Tickit/Async.pm
+lib/Tickit/Async.xs
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

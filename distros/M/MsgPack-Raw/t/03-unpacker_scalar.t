@@ -17,7 +17,7 @@ $unpacker->feed ("\xa3\xe2\x82\xac");
 is $unpacker->next, 'abc';
 is $unpacker->next, 1;
 is $unpacker->next, -1;
-is $unpacker->next, 3.14;
+ok (abs ($unpacker->next -3.14) < 0.000001);
 is_deeply $unpacker->next, [undef];
 is $unpacker->next, Encode::decode ('UTF-8', "€");
 

@@ -9,8 +9,9 @@ use strict;
 use warnings;
 use 5.010; # //
 use base qw( IO::Async::Process );
+IO::Async::Process->VERSION( '0.75' ); # ->finish_future
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -41,49 +42,19 @@ not yet exited, it is sent a C<SIGKILL> instead.
 
 =cut
 
-sub configure
+sub _init
 {
-   my $self   = shift;
-   my %params = @_;
+   my $self = shift;
+   my ( $params ) = @_;
 
-   if (my $on_finish = delete $params{on_finish}) {
-      $self->{ia__process__gracefulshutdown_wrapped_on_finish} = $on_finish;
-   }
+   $params->{on_finish} //= sub {}; # back-compat did not require this
 
-   return $self->SUPER::configure(%params);
+   $self->SUPER::_init( $params );
 }
 
 =head1 METHODS
 
 =cut
-
-=head2 finish_future
-
-   $f = $process->finish_future
-
-Returns a L<Future> that completes when the process finishes. It will yield
-the exit code from the process.
-
-=cut
-
-# TODO: Migrate this to regular IO::Async::Process
-sub finish_future
-{
-   my $self = shift;
-   return $self->{ia__process__gracefulshutdown_future} //= $self->loop->new_future;
-}
-
-sub on_finish
-{
-   my $self = shift;
-   my ( $exitcode ) = @_;
-
-   if( my $on_finish = $self->{ia__process__gracefulshutdown_wrapped_on_finish}) {
-      $self->$on_finish( $exitcode );
-   }
-
-   $self->finish_future->done($exitcode);
-}
 
 =head2 shutdown
 

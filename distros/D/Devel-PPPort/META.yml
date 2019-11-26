@@ -3,7 +3,7 @@ abstract: Perl/Pollution/Portability
 author:
   - 'Marcus Holland-Moritz <mhx@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  FindBin: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -20,9 +20,9 @@ no_index:
 provides:
   Devel::PPPort:
     file: PPPort.pm
-    version: '3.55'
+    version: '3.56'
 resources:
   bugtracker: https://github.com/Dual-Life/Devel-PPPort/issues
   repository: git://github.com/Dual-Life/Devel-PPPort.git
-version: '3.55'
+version: '3.56'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,7 +2,7 @@ package Pcore::App::API::Backend::Local::sqlite;
 
 use Pcore -class, -sql, -res;
 use Pcore::App::API qw[:ROOT_USER];
-use Pcore::Lib::UUID qw[uuid_v4_str];
+use Pcore::Util::UUID qw[uuid_v4_str];
 
 with qw[Pcore::App::API::Backend::Local];
 

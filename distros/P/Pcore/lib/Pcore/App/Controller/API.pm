@@ -1,8 +1,8 @@
 package Pcore::App::Controller::API;
 
 use Pcore -role, -const;
-use Pcore::Lib::Data qw[from_json to_json from_cbor to_cbor];
-use Pcore::Lib::Scalar qw[is_plain_arrayref];
+use Pcore::Util::Data qw[from_json to_json from_cbor to_cbor];
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 use Pcore::WebSocket::pcore;
 
 with qw[Pcore::App::Controller];
@@ -13,17 +13,13 @@ const our $WS_COMPRESSION      => 0;
 const our $TX_TYPE_RPC => 'rpc';
 
 sub run ( $self, $req ) {
-    if ( defined $req->{path} ) {
-        $req->(404)->finish;
-
-        return;
-    }
+    return 404 if defined $req->{path};
 
     # WebSocket API request
     if ( $req->is_websocket_connect_request ) {
 
         # create connection and accept websocket connect request
-        my $h = Pcore::WebSocket::pcore->accept(
+        return Pcore::WebSocket::pcore->accept(
             $req,
             max_message_size => $WS_MAX_MESSAGE_SIZE,
             compression      => $WS_COMPRESSION,
@@ -36,10 +32,8 @@ sub run ( $self, $req ) {
             on_event => sub ( $h, $ev ) {
                 return $self->on_event( $h, $ev );
             },
-            on_rpc => sub ( $h, $req, $tx ) {
-                $h->{auth}->api_call_arrayref( $tx->{method}, $tx->{args}, $req );
-
-                return;
+            on_rpc => sub ( $h, $tx ) {
+                return $h->{auth}->api_call( $tx->{method}, $tx->{args}->@* );
             }
         );
     }
@@ -57,70 +51,45 @@ sub run ( $self, $req ) {
             $msg = eval { from_json $req->{data} };
 
             # content decode error
-            if ($@) {
-                $req->( [ 400, q[Error decoding JSON request body] ] )->finish;
-
-                return;
-            }
+            return 400, q[Error decoding JSON request body] if $@;
         }
 
         elsif ( $env->{CONTENT_TYPE} =~ m[\bapplication/cbor\b]smi ) {
             $msg = eval { from_cbor $req->{data} };
 
             # content decode error
-            if ($@) {
-                $req->( [ 400, q[Error decoding JSON request body] ] )->finish;
-
-                return;
-            }
+            return 400, q[Error decoding JSON request body] if $@;
 
             $CBOR = 1;
         }
 
         # invalid content type
         else {
-            $req->(415)->finish;
-
-            return;
+            return 415;
         }
 
         # authenticate request
         my $auth = $req->authenticate;
 
-        $self->_http_api_router(
-            $auth, $msg,
-            sub ($res) {
-                if ($CBOR) {
+        my $response = $self->_http_api_router( $auth, $msg );
 
-                    # write HTTP response
-                    $req->( 200, [ 'Content-Type' => 'application/cbor' ], to_cbor $res )->finish;
-                }
-                else {
+        if ($CBOR) {
 
-                    # write HTTP response
-                    $req->( 200, [ 'Content-Type' => 'application/json' ], to_json $res)->finish;
-                }
+            # write HTTP response
+            return 200, [ 'Content-Type' => 'application/cbor' ], to_cbor $response;
+        }
+        else {
 
-                return;
-            }
-        );
-
-        return;
+            # write HTTP response
+            return 200, [ 'Content-Type' => 'application/json' ], to_json $response;
+        }
     }
-
-    return;
 }
 
-# TODO http api should return immediately if no transactions with the TID were received
-# TODO this is required to unblock http api client ASAP if it is not required API response
-sub _http_api_router ( $self, $auth, $data, $cb ) {
+sub _http_api_router ( $self, $auth, $data ) {
     my $response;
 
-    my $cv = P->cv->begin( sub {
-        $cb->($response);
-
-        return;
-    } );
+    my $cv = P->cv->begin;
 
     for my $tx ( is_plain_arrayref $data ? $data->@* : $data ) {
         next if !$tx->{type};
@@ -142,12 +111,14 @@ sub _http_api_router ( $self, $auth, $data, $cb ) {
                 next;
             }
 
-            $cv->begin;
+            my $tid = $tx->{tid};
 
-            $auth->api_call_arrayref(
-                $tx->{method},
-                $tx->{args},
-                sub ($res) {
+            $cv->begin if $tid;
+
+            Coro::async_pool {
+                my $res = $auth->api_call( $tx->{method}, $tx->{args}->@* );
+
+                if ($tid) {
                     push $response->@*,
                       { type   => $TX_TYPE_RPC,
                         tid    => $tx->{tid},
@@ -155,16 +126,16 @@ sub _http_api_router ( $self, $auth, $data, $cb ) {
                       };
 
                     $cv->end;
-
-                    return;
                 }
-            );
+
+                return;
+            };
         }
     }
 
-    $cv->end;
+    $cv->end->recv;
 
-    return;
+    return $response;
 }
 
 sub on_connect ( $self, $ws ) {

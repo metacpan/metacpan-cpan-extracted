@@ -21,5 +21,7 @@ requires:
   Alt::Devel::CallParser::ButWorking: '0.002'
   Kavorka: '0.039'
   Mouse: v2.5.6
-version: '0.08'
+resources:
+  repository: https://github.com/RKRT/Telugu-AsciiMap.git
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

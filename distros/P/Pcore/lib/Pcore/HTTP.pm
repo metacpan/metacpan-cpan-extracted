@@ -1,10 +1,11 @@
 package Pcore::HTTP;
 
 use Pcore -const, -export;
-use Pcore::Lib::Scalar qw[is_ref is_plain_coderef is_blessed_ref is_coderef is_plain_hashref is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_ref is_plain_coderef is_blessed_ref is_coderef is_plain_hashref is_plain_arrayref];
 use Pcore::Handle qw[:ALL];
 use Pcore::HTTP::Response;
 use Pcore::HTTP::Cookies;
+use Pcore::Util::HTTP;
 use Pcore::API::Proxy qw[:PROXY_TYPE];
 
 our $EXPORT = {
@@ -342,48 +343,42 @@ sub _request ($args) {
 }
 
 sub _write_headers ( $h, $args, $res ) {
-    my $request_path;
-
-    my $headers = join $EMPTY, map {"$_->[0]:$_->[1]\r\n"} grep { defined $_->[1] } P->list->pairs( $args->{headers}->@* );
+    my ( $request_path, @headers );
 
     if ( $h->{proxy_type} && $h->{proxy_type} == $PROXY_TYPE_HTTP ) {
         $request_path = $res->{url}->{uri};
 
-        $headers .= 'Proxy-Authorization:Basic ' . $h->{proxy}->{uri}->userinfo_b64 . "\r\n" if $h->{proxy}->{uri}->{userinfo};
+        push @headers, 'Proxy-Authorization', 'Basic ' . $h->{proxy}->{uri}->userinfo_b64 if $h->{proxy}->{uri}->{userinfo};
     }
     else {
         $request_path = $res->{url}->path_query;
     }
 
     # add "Host" header
-    $headers .= 'Host:' . ( defined $res->{url}->{host} ? $res->{url}->{host}->{name} : $EMPTY ) . "\r\n" if !$args->{norm_headers}->{host};
+    push @headers, 'Host', $res->{url}->{host}->{name} // $EMPTY if !$args->{norm_headers}->{host};
 
     # prepare content related headers
     if ( defined $args->{data} ) {
         if ( is_plain_coderef $args->{data} ) {
-            $headers .= "Transfer-Encoding:chunked\r\n";
+            push @headers, 'Transfer-Encoding', 'chunked';
         }
         else {
-            $headers .= 'Content-Length:' . bytes::length( is_ref $args->{data} ? $args->{data}->$* : $args->{data} ) . "\r\n";
+            push @headers, 'Content-Length', bytes::length( is_ref $args->{data} ? $args->{data}->$* : $args->{data} );
         }
     }
 
     # add basic authorization
-    if ( $res->{url}->{userinfo} ) {
-        $headers .= 'Authorization:Basic ' . $res->{url}->userinfo_b64 . "\r\n";
-    }
+    push @headers, 'Authorization', 'Basic ' . $res->{url}->userinfo_b64 if $res->{url}->{userinfo};
 
     # close connection, if not persistent
-    if ( !$args->{persistent} ) {
-        $headers .= "Connection:close\r\n";
-    }
+    push @headers, 'Connection', 'close' if !$args->{persistent};
 
     if ( $args->{cookies} && ( my $cookies = $args->{cookies}->get_cookies( $res->{url} ) ) ) {
-        $headers .= 'Cookie:' . join( ';', $cookies->@* ) . "\r\n";
+        push @headers, 'Cookie', join ';', $cookies->@*;
     }
 
     # write headers
-    $h->write("$args->{method} $request_path HTTP/1.1\r\n$headers\r\n");
+    $h->write("$args->{method} $request_path HTTP/1.1\r\n@{[ Pcore::Util::HTTP::build_headers($args->{headers}, \@headers)->$* ]}\r\n");
 
     # write error
     if ( !$h ) {
@@ -685,7 +680,7 @@ sub _read_data ( $h, $args, $res ) {
 }
 
 sub _get_on_progress_cb (%args) {
-    require Pcore::Lib::Term::Progress;
+    require Pcore::Util::Term::Progress;
 
     return sub ( $content_length, $bytes_received ) {
         state $indicator;
@@ -695,7 +690,7 @@ sub _get_on_progress_cb (%args) {
 
             $args{total} = $content_length;
 
-            $indicator = Pcore::Lib::Term::Progress::get_indicator(%args);
+            $indicator = Pcore::Util::Term::Progress::get_indicator(%args);
         }
         else {
             $indicator->update( value => $bytes_received );
@@ -842,20 +837,20 @@ sub _http2_request ( $h, $args, $res ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 76                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 77                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 97                   | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 98                   | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 234                  | * Subroutine "_request" with high complexity score (28)                                                        |
-## |      | 490                  | * Subroutine "_read_data" with high complexity score (46)                                                      |
-## |      | 710                  | * Subroutine "_http2_request" with high complexity score (22)                                                  |
+## |      | 235                  | * Subroutine "_request" with high complexity score (28)                                                        |
+## |      | 485                  | * Subroutine "_read_data" with high complexity score (46)                                                      |
+## |      | 705                  | * Subroutine "_http2_request" with high complexity score (22)                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 90                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
+## |    2 | 91                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 125                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |    2 | 126                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 215                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 216                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

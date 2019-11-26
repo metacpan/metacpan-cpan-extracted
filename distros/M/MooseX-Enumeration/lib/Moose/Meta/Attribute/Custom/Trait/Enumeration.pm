@@ -4,7 +4,7 @@ use warnings;
 
 package Moose::Meta::Attribute::Custom::Trait::Enumeration;
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 sub register_implementation {
 	'MooseX::Enumeration::Meta::Attribute::Native::Trait::Enumeration';

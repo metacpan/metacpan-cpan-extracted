@@ -139,9 +139,21 @@ WriteMakefile(
 	'Test::Pod::Coverage' => 0,
 	'Test::Pod' => 0,
     },
+    CONFIG_REQUIRES => {
+	'IPC::Cmd' => 0,
+    },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Fsdb-*' },
 );
+
+use IPC::Cmd qw[can_run];
+
+if (!can_run('groff')) {
+    print "This distribution requires 'groff', please provide groff in the build envrionment separately\n";
+    print STDERR "NA: Unable to build distribution on this platform.\n";
+    exit 0;
+}
+
 
 open(MF, ">>Makefile") or die "$0: cannot append to Makefile.\n";
 

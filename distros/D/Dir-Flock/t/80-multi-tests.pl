@@ -56,7 +56,11 @@ sub ok_multi {
 
     ok($fb{end_sleep1}-$fb{start_sleep1} >= 4,
        'secondary held shared lock for a while');
-    ok($fb{status_unlock2} != 0, 'secondary released shared lock');
+
+    # unlock might fail if primary process removes the lock directory ...
+    ok($fb{status_unlock2} eq '1 1' || $fb{status_unlock2} eq '0 0',
+       'secondary released shared lock');
+    
     ok($fb{end_unlock2}-$fb{start_unlock2} <= 2, '... released quickly');
 
     ok($fa{end_sleep3}-$fa{start_sleep3} >= 4,

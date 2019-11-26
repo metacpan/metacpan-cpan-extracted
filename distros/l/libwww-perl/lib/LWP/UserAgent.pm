@@ -15,7 +15,7 @@ use LWP::Protocol ();
 use Scalar::Util qw(blessed);
 use Try::Tiny qw(try catch);
 
-our $VERSION = '6.42';
+our $VERSION = '6.43';
 
 sub new
 {
@@ -420,8 +420,11 @@ sub request {
                         "Unsupported authentication scheme '$scheme'");
                 next CHALLENGE;
             }
-            return $class->authenticate($self, $proxy, $challenge, $response,
+            my $re = $class->authenticate($self, $proxy, $challenge, $response,
                 $request, $arg, $size);
+
+            next CHALLENGE if $re->code == HTTP::Status::RC_UNAUTHORIZED;
+            return $re;
         }
         return $response;
     }

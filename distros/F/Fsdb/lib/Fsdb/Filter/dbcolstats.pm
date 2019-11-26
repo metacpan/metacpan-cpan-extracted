@@ -616,8 +616,13 @@ sub run_one_key($) {
     if ($n == 0) {
 	$stddev = "-";
     } else {
-        $stddev = ($n <= 1 || $max == $min) ? 0 : 
-	    sqrt(($sxx - $n * $mean * $mean) / ($n - ($self->{_sample} ? 1 : 0)));
+        my $sxx_less_mean_sq = $sxx - $n * $mean * $mean;
+        if ($sxx_less_mean_sq < 0) {
+            $stddev = 0;
+        } else {
+                $stddev = ($n <= 1 || $max == $min) ? 0 : 
+                    sqrt($sxx_less_mean_sq / ($n - ($self->{_sample} ? 1 : 0)));
+        };
     };
     my $pct_rsd;
     if ($stddev eq '-' || $mean eq '-' || $mean == 0) {

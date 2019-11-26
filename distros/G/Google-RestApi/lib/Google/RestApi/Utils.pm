@@ -3,19 +3,21 @@ package Google::RestApi::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use 5.010_000;
 
 use autodie;
-use Type::Params qw(compile);
-use Types::Standard qw(StrMatch);
-use YAML::Any qw(Dump);
+use File::Basename;
+use Hash::Merge;
+use Type::Params qw(compile_named compile);
+use Types::Standard qw(Str StrMatch Any slurpy);
+use YAML::Any qw(Dump LoadFile);
 
 no autovivification;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(named_extra strip bool dim dims dims_all);
+our @EXPORT_OK = qw(named_extra config_file resolve_config_file strip bool dim dims dims_all);
 
 # similar to allow_extra in params::validate, simply returns the
 # extra key/value pairs we aren't interested in in the checked
@@ -28,8 +30,48 @@ sub named_extra {
   return $p;
 }
 
+sub config_file {
+  state $check = compile_named(
+    config_file => Str, { optional => 1 },
+    _extra_     => slurpy Any,
+  );
+  my $merged_config = named_extra($check->(@_));
+
+  my $config_file = $merged_config->{config_file};
+  if ($config_file) {
+    my $config = eval { LoadFile($config_file); };
+    die "Unable to load config file '$config_file': $@" if $@;
+    $merged_config = Hash::Merge::merge($merged_config, $config);
+  }
+
+  return $merged_config;
+}
+
+# a standard way to store file names in a config and resolve them
+# to a full path. can be used in Auth configs, possibly others.
+# see sub RestApi::auth for more.
+sub resolve_config_file {
+  my ($file_key, $config) = @_;
+
+  my $file_path = $config->{$file_key}
+    or die "No config file name found for '$file_key':\n", Dump($config);
+
+  # if file name is a simple file name (no path) then assume it's in the
+  # same directory as the config file.
+  if (!-e $file_path) {
+    my $config_file = $config->{config_file} || $config->{parent_config_file};
+    $file_path = dirname($config_file) . "/$file_path"
+      if $config_file;
+  }
+
+  die "Config file '$file_key' not found or is not readable:\n", Dump($config)
+    if !-f -r $file_path;
+
+  return $file_path;
+}
+
 sub strip {
-  my $p = shift || '';
+  my $p = shift // '';
   $p =~ s/^\s+|\s+$//g;
   return $p;
 }

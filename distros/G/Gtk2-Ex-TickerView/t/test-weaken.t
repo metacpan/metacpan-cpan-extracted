@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012 Kevin Ryde
 
 # This file is part of Gtk2-Ex-TickerView.
 #
@@ -25,14 +25,15 @@ use Test::More;
 use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
-use Test::Weaken::ExtraBits;
 
-# Test::Weaken 2.002 for "ignore"
-eval "use Test::Weaken 2.002;
+# Test::Weaken 3.018 for "ignore_preds"
+eval "use Test::Weaken 3.018;
       use Test::Weaken::Gtk2 24; # version 24 for contents_cell_renderers()
       1"
-  or plan skip_all => "due to Test::Weaken 2.002 and/or Test::Weaken::Gtk2 not available -- $@";
-diag ("Test::Weaken version ", Test::Weaken->VERSION);
+  or plan skip_all => "due to Test::Weaken 3.018 and/or Test::Weaken::Gtk2 not available -- $@";
+eval "use Test::Weaken::ExtraBits; 1"
+  or plan skip_all => "due to Test::Weaken::ExtraBits not available -- $@";
+diag ("using Test::Weaken version ", Test::Weaken->VERSION);
 
 plan tests => 5;
 
@@ -88,7 +89,7 @@ diag "have_display: ",($have_display ? "yes" : "no");
 
 sub my_ignore {
   my ($ref) = @_;
-  return (Test::Weaken::ExtraBits::ignore_global_function($ref)
+  return (Test::Weaken::ExtraBits::ignore_global_functions($ref)
           || Test::Weaken::Gtk2::ignore_default_display($ref));
 }
 
@@ -118,7 +119,9 @@ SKIP: {
        },
        destructor => \&Test::Weaken::Gtk2::destructor_destroy,
        contents => \&Test::Weaken::Gtk2::contents_cell_renderers,
-       ignore => \&my_ignore,
+       ignore_preds => [ \&Test::Weaken::ExtraBits::ignore_global_functions,
+                         \&Test::Weaken::Gtk2::ignore_default_display ],
+
      });
   ok ($timer_running, 'toplevel shown - timer runs');
 

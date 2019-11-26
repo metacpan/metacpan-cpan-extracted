@@ -1,6 +1,14 @@
 CHANGES
 -------
 
+  0.032 24 November 2019
+          
+        * Add StreamedUnzip
+          6d2c59aa70f5992903fdeb5d8a3b7fc97dc84137
+
+        * fix typo in Changes
+          2c4bd7743905ba04f121bf323d09caf8f6e88181
+
   0.031 10 November 2019
 
         * 000prereq.t: Add more prereqs for LZMA 

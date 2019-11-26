@@ -1,41 +1,43 @@
---- #YAML:1.0
-name:               PerlIO-via-EscStatus
-version:            11
-abstract:           Printing a status line through an I/O layer.
+---
+abstract: 'Printing a status line through an I/O layer.'
 author:
-    - Kevin Ryde <user42@zip.com.au>
-license:            gpl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Encode:               0
-    perl:                 5.008005
-    PerlIO::via:          0
-    Regexp::Common:       0
-    Regexp::Common::ANSIescape:  11
-    Term::Size:           0
-resources:
-    homepage:  http://user42.tuxfamily.org/perlio-via-escstatus/index.html
-    license:   http://www.gnu.org/licenses/gpl.html
-no_index:
-    directory:
-        - t
-        - inc
-        - devel
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PerlIO-via-EscStatus
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
 optional_features:
-    maximum_examples:
-        description:  Be able to run all the example programs.
-        requires:
-            ProgressMonitor:  0
-            Term::Sk:         0
-    maximum_interoperation:
-        description:  Have maximum inter-operation with other modules (optional supported other stuff).
-        requires:
-            ProgressMonitor:  0
+  maximum_examples:
+    description: 'Be able to run all the example programs.'
+    requires:
+      ProgressMonitor: '0'
+      Term::Sk: '0'
+  maximum_interoperation:
+    description: 'Have maximum inter-operation with other modules (optional supported other stuff).'
+    requires:
+      ProgressMonitor: '0'
+requires:
+  Encode: '0'
+  PerlIO::via: '0'
+  Regexp::Common: '0'
+  Regexp::Common::ANSIescape: '11'
+  Term::Size: '0'
+  perl: '5.008005'
+resources:
+  homepage: http://user42.tuxfamily.org/perlio-via-escstatus/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

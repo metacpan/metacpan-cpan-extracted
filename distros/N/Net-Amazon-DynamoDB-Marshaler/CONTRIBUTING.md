@@ -14,3 +14,9 @@ Build the image:
 Run the suite:
 
     docker-compose run development prove -l
+
+## Releasing
+
+    $EDITOR Changes
+    docker-compose run development milla test
+    docker-compose run development milla release

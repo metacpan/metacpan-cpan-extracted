@@ -1,7 +1,7 @@
 package Bencher::Formatter::CodeStartup;
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '1.044'; # VERSION
+our $DATE = '2019-10-15'; # DATE
+our $VERSION = '1.045'; # VERSION
 
 use 5.010001;
 use strict;
@@ -62,7 +62,7 @@ Bencher::Formatter::CodeStartup - Munge code_startup results
 
 =head1 VERSION
 
-This document describes version 1.044 of Bencher::Formatter::CodeStartup (from Perl distribution Bencher-Backend), released on 2019-02-24.
+This document describes version 1.045 of Bencher::Formatter::CodeStartup (from Perl distribution Bencher-Backend), released on 2019-10-15.
 
 =head1 DESCRIPTION
 

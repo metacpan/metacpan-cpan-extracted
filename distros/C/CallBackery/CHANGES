@@ -1,6 +1,10 @@
-0.23.2 2019-11-22 16:06:25 +0100 Tobias Oetiker <tobi@oetiker.ch>
+0.24.1 2019-11-25 10:53:02 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
- - fix handling of trigger fields when loading data into a form
+ - actually include the new functionality
+
+0.24.0 2019-11-25 10:44:35 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - added support for boolean cells (fritz)
 
 0.23.1 2019-11-19 09:20:20 +0100 Tobias Oetiker <tobi@oetiker.ch>
 

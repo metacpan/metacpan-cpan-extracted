@@ -4,7 +4,7 @@ package main v0.1.0;
 
 use Pcore -res;
 use Test::More;
-use Pcore::Lib::Result::Class;
+use Pcore::Util::Result::Class;
 
 my $STATUS_REASON1 = {
     200 => 11,
@@ -21,7 +21,7 @@ my $STATUS_REASON2 = {
 package TestRes {
     use Pcore -class;
 
-    extends qw[Pcore::Lib::Result::Class];
+    extends qw[Pcore::Util::Result::Class];
 
     sub get_status_reason ($self) { return $STATUS_REASON2 }
 }

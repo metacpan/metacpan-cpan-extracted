@@ -6,7 +6,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'IO::Async::Process::GracefulShutdown',
    requires => {
-      'IO::Async::Process' => 0,
+      'IO::Async::Process' => '0.75',
 
       'perl' => '5.010', # //
    },

@@ -6,7 +6,7 @@ use 5.018;
 use strict;
 use warnings;
 
-$Git::Diff::VERSION = '0.000101';
+$Git::Diff::VERSION = '0.000102';
 
 sub new {
     my $s_class = shift;
@@ -74,7 +74,7 @@ Git::Diff - Git submodule to convert git diff into a perl hash-ref
 
 =head1 VERSION
 
-Version 0.000101
+Version 0.000102
 
 =head1 SUBROUTINES/METHODS
 

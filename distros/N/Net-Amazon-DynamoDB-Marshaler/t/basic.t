@@ -743,6 +743,27 @@ sub test_force_type_complex() {
     );
 }
 
+# Workaround for https://github.com/pplu/aws-sdk-perl/issues/79
+# Apparently Paws sometimes returns an empty list alongside a scalar value.
+# Bug reported in https://github.com/stevecaldwell77/Net-Amazon-DynamoDB-Marshaler/issues/1
+sub test_empty_list_bug() {
+    my $item = {
+        email_address => 'foo@bar.com',
+        age => 42,
+        active => true,
+    };
+    my $item_dynamodb = {
+        email_address => { S => 'foo@bar.com', L => [] },
+        age => { N => '42', L => [] },
+        active => { BOOL => '1', L => [] },
+    };
+    cmp_deeply(
+        dynamodb_unmarshal($item_dynamodb),
+        $item,
+        'Extra empty lists are ignored',
+    );
+}
+
 test_undef();
 test_empty_string();
 test_number();
@@ -762,5 +783,6 @@ test_force_type_errors();
 test_force_type_list();
 test_force_type_map();
 test_force_type_complex();
+test_empty_list_bug();
 
 done_testing;

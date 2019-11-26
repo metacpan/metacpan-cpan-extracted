@@ -18,6 +18,7 @@ my $run;
 intercept {
     $run = Test2::Aggregate::run_tests(
         dirs   => ['xt/aggregate'],
+        sort   => 1,
         repeat => 2,
         root   => $root
         )
@@ -26,15 +27,15 @@ intercept {
 like(
     $run,
     {
-        'xt/aggregate/check_plan.t' => {
-            'test_no'   => 1,
-            'timestamp' => E(),
-            'pass_perc' => 100
-        },
         'xt/aggregate/check_env.t' => {
             'timestamp' => E(),
             'pass_perc' => 0,
-            'test_no'   => 2
+            'test_no'   => 1
+        },
+        'xt/aggregate/check_plan.t' => {
+            'test_no'   => 2,
+            'timestamp' => E(),
+            'pass_perc' => 100
         }
     },
     "Correct output including failure."

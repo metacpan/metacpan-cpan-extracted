@@ -1,5 +1,5 @@
 package Moose::Exception::InvalidNameForType;
-our $VERSION = '2.2011';
+our $VERSION = '2.2012';
 
 use Moose;
 extends 'Moose::Exception';
@@ -12,6 +12,6 @@ has 'name' => (
 
 sub _build_message {
     my $self = shift;
-    $self->name." contains invalid characters for a type name. Names can contain alphanumeric character, ':', and '.'";
+    $self->name." contains invalid characters for a type name. Names can contain alphanumeric characters, ':', and '.'";
 }
 1;

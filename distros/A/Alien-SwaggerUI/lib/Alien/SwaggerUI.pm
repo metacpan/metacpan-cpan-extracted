@@ -1,5 +1,5 @@
 package Alien::SwaggerUI;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 # ABSTRACT: Render OpenAPI spec documentation with Swagger-UI
 
 #pod =head1 SYNOPSIS
@@ -28,7 +28,7 @@ our $VERSION = '0.001';
 #pod application's L<OpenAPI specification|https://www.openapis.org>.
 #pod
 #pod The application is contained in a C<share/> directory. You can get the path
-#pod to this directory with the L</root_dir> method.
+#pod to this directory with the C<root_dir> method.
 #pod
 #pod To render your specific API documentation, pass it in with the
 #pod C<?url=/path/to/spec> query parameter.
@@ -65,7 +65,7 @@ Alien::SwaggerUI - Render OpenAPI spec documentation with Swagger-UI
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -93,7 +93,7 @@ pure-JavaScript application renders beautiful documentation for your
 application's L<OpenAPI specification|https://www.openapis.org>.
 
 The application is contained in a C<share/> directory. You can get the path
-to this directory with the L</root_dir> method.
+to this directory with the C<root_dir> method.
 
 To render your specific API documentation, pass it in with the
 C<?url=/path/to/spec> query parameter.
@@ -111,6 +111,22 @@ C<?url=/path/to/spec> query parameter.
 =head1 AUTHOR
 
 Doug Bell <preaction@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Gaurav Rai Mohammad S Anwar
+
+=over 4
+
+=item *
+
+Gaurav Rai <gauravrai7860@gmail.com>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

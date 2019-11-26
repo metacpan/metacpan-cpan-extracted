@@ -6,13 +6,13 @@ META.json
 Makefile.PL
 README.md
 cpanfile
+eg/s3
 lib/Amazon/S3/Thin.pm
 lib/Amazon/S3/Thin/Credentials.pm
 lib/Amazon/S3/Thin/Resource.pm
 lib/Amazon/S3/Thin/Signer/V2.pm
 lib/Amazon/S3/Thin/Signer/V4.pm
 minil.toml
-samplecode/s3
 t/00_compile.t
 t/01_accessors.t
 t/01_new.t
@@ -20,6 +20,10 @@ t/02_signer_v2.t
 t/02_signer_v4.t
 t/03_request.t
 t/04_request_v2.t
-t/90_functional.t
-t/91_functional.t
+t/05_presigned_post.t
+xt/90_functional.t
+xt/91_functional.t
+xt/92_presigned_post.t
+xt/93_session_token.t
+xt/upload.txt
 META.yml

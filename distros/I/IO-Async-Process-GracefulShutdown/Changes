@@ -1,4 +1,8 @@
 Revision history for IO-Async-Process-GracefulShutdown
 
+0.02    2019-11-26 00:35:43
+        [CHANGES]
+         * Update for IO::Async 0.75
+
 0.01    2019-04-11 17:15:24
         First version, released on an unsuspecting world.

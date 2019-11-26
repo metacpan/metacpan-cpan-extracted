@@ -69,9 +69,6 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
 0.006	2013-01-11
 
- [ Bug Fixes ]
- - Avoid triggering an 'in cleanup' error on some older versions of Perl.
-
 0.005	2013-01-05
 
  - Avoid triggering Sub::Exporter::Progressive's dependency on
@@ -222,6 +219,7 @@ __DATA__
 	dc:identifier        "MooX-ClassAttribute-0.007"^^xsd:string;
 	dc:issued            "2013-07-10"^^xsd:date;
 	doap-changeset:changeset [
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/MooX-ClassAttribute/v_0-005>;
 		doap-changeset:item [
 			a doap-changeset:Bugfix;
 			rdfs:label "Fixed error: Can't call method \"isa\" on an undefined value at MooX/CaptainHook.pm line 27.";

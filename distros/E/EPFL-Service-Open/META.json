@@ -4,7 +4,7 @@
       "William Belle <william.belle@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "apache_2_0"
    ],
@@ -34,7 +34,7 @@
    "provides" : {
       "EPFL::Service::Open" : {
          "file" : "lib/EPFL/Service/Open.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "url" : "https://github.com/innovativeinnovation/epfl-service-open"
       }
    },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

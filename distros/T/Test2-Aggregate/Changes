@@ -1,5 +1,9 @@
 Revision history for Test2-Aggregate
 
+0.10    2019-11-23
+        sort option for fixed order.
+        package option fixes & tests.
+
 0.09    2019-11-22
         Warnings added to stats of test run.
         package option.

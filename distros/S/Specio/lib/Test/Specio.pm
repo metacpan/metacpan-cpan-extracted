@@ -3,7 +3,7 @@ package Test::Specio;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use IO::File;
 use Scalar::Util qw( blessed looks_like_number openhandle );
@@ -223,7 +223,7 @@ BEGIN {
     }
 }
 
-our @EXPORT_OK   = ( @vars, qw( builtins_tests describe test_constraint ) );
+our @EXPORT_OK = ( @vars, qw( builtins_tests describe test_constraint ) );
 our %EXPORT_TAGS = ( vars => \@vars );
 
 sub builtins_tests {
@@ -1298,7 +1298,7 @@ Test::Specio - Test helpers for Specio
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -1529,7 +1529,7 @@ If you want to create a glob overloading object that returns a filehandle, do
 this:
 
   local *BAR;
-  open BAR, '<', $0 or die "Could not open $0 for the test";
+  open BAR, '<', $^X or die "Could not open $^X for the test";
   my $GLOB_OVERLOAD_FH = _T::GlobOverload->new( \*BAR );
 
 =head1 SUPPORT

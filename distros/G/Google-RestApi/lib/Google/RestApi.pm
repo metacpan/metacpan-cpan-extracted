@@ -3,26 +3,24 @@ package Google::RestApi;
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use 5.010_000;
 
 use autodie;
-use File::Basename;
 use Furl;
 use JSON;
-use Hash::Merge;
+use Scalar::Util qw(blessed);
 use Sub::Retry;
-use Storable qw(dclone retrieve);
+use Storable qw(dclone);
 use Time::Out qw(timeout);
 use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str StrMatch Int ArrayRef HashRef CodeRef slurpy Any);
+use Types::Standard qw(Str StrMatch Int ArrayRef HashRef CodeRef);
 use URI;
 use URI::QueryParam;
-use YAML::Any qw(Dump LoadFile);
+use YAML::Any qw(Dump);
 
-use Google::RestApi::OAuth2;
-use Google::RestApi::Utils qw(named_extra);
+use Google::RestApi::Utils qw(config_file);
 
 no autovivification;
 
@@ -31,33 +29,15 @@ do 'Google/RestApi/logger_init.pl';
 sub new {
   my $class = shift;
 
+  my $self = config_file(@_);
   state $check = compile_named(
-    config_file => Str, { optional => 1 },
-    _extra_     => slurpy Any,
+    config_file  => Str, { optional => 1 },
+    auth         => 1,
+    post_process => CodeRef, { optional => 1 },
+    throttle     => Int->where('$_ > -1'), { default => 0 },
+    timeout      => Int, { default => 120 },
   );
-  my $self = named_extra($check->(@_));
-
-  if ($self->{config_file}) {
-    my $config = eval { LoadFile($self->{config_file}) };
-    die "Unable to load config file '$self->{config_file}': $@" if $@;
-    $self = Hash::Merge::merge($self, $config);
-  }
-
-  state $check2 = compile_named(
-    config_file   => Str, { optional => 1 },
-    client_id     => Str,
-    client_secret => Str,
-    token_file    => Str,
-    timeout       => Int, { default => 120 },
-    throttle      => Int->where('$_ > -1'), { default => 0 },
-    post_process  => CodeRef, { optional => 1 },
-  );
-  $self = $check2->(%$self);
-
-  $self->{token_file} = dirname($self->{config_file}) . "/$self->{token_file}"
-    if !-f $self->{token_file} && $self->{config_file};
-  die "Token file not found: '$self->{token_file}'"
-    if !-f $self->{token_file};
+  $self = $check->(%$self);
 
   return bless $self, $class;
 }
@@ -94,8 +74,10 @@ sub api {
   push(@headers, 'Content-Type' => 'application/json') if $content;
   push(@headers, @{ $p->{headers} });
 
+  # some (outdated) auth mechanisms may allow auth info in the params.
+  my %params = (%{ $p->{params} }, %{ $self->auth()->params() });
   $uri = URI->new($uri);
-  $uri->query_form_hash($p->{params});
+  $uri->query_form_hash(\%params);
   DEBUG("Rest API URI: $p->{method} ", $uri->as_string());
   my $req = HTTP::Request->new(
     $p->{method}, $uri->as_string(), \@headers,
@@ -163,7 +145,8 @@ sub _api {
 
   my $res = retry 3, 1.0,
     sub {
-      # timeout is in the ua too, but i've seen requests to spreadsheets completely hang.
+      # timeout is in the ua too, but i've seen requests to spreadsheets
+      # completely hang if the request isn't constructed correctly.
       timeout $self->{timeout} => sub {
         $self->ua()->request($req);
       };
@@ -186,42 +169,28 @@ sub _api {
 sub ua {
   my $self = shift;
   if (!$self->{ua}) {
-    my $access_token = $self->access_token();
     $self->{ua} = Furl->new(
-      headers => [ Authorization => "Bearer $access_token" ],
+      headers => $self->auth()->headers(),
       timeout => $self->{timeout},
     );
   }
   return $self->{ua};
 }
 
-sub access_token {
+sub auth {
   my $self = shift;
-  return $self->{access_token} if $self->{access_token};
 
-  state $check = compile_named(
-    scope => ArrayRef, { optional => 1 },
-  );
-  my $p = $check->(@_);
+  if (!blessed($self->{auth})) {
+    # turn OAuth2Client into Google::RestApi::Auth::OAuth2Client etc.
+    my $class = __PACKAGE__ . "::Auth::" . delete $self->{auth}->{class};
+    eval "require $class";
+    die "Unable to require '$class': $@" if $@;
+    $self->{auth}->{parent_config_file} = $self->{config_file}
+      if $self->{config_file};
+    $self->{auth} = $class->new(%{ $self->{auth} });
+  }
 
-  my $oauth2 = Google::RestApi::OAuth2->new(
-    client_id     => $self->{client_id},
-    client_secret => $self->{client_secret},
-    $p->{scope} ? (scope => $p->{scope}) : (),
-    #scope         => [qw(
-    #  https://www.googleapis.com/auth/drive
-    #  https://www.googleapis.com/auth/spreadsheets
-    #)],
-  );
-  $oauth2->access_token(
-    auto_refresh  => 1,
-    refresh_token => retrieve($self->{token_file})->{refresh_token},
-  );
-  $oauth2->refresh_token();
-  $self->{access_token} = $oauth2->access_token()->access_token();
-  INFO("Successfully attained access token");
-
-  return $self->{access_token};
+  return $self->{auth};
 }
 
 sub stats {
@@ -246,9 +215,7 @@ Google::RestApi - Connection to Google REST APIs (currently Drive and Sheets).
   use Google::RestApi;
   $rest_api = Google::RestApi->new(
     config_file   => <path_to_config_file>,
-    client_id     => <oauth2_client_id>,
-    client_secret => <oath2_secret>,
-    token_file    => <path_to_token_file>,
+    auth          => <object|hashref>,
     timeout       => <int>,
     throttle      => <int>,
     post_process  => <coderef>,
@@ -278,35 +245,41 @@ Google::RestApi - Connection to Google REST APIs (currently Drive and Sheets).
 =head1 DESCRIPTION
 
 Google Rest API is the foundation class used by the included Drive
-and Sheets APIs. It is used to establish an OAuth2 handshake, and
-send API requests to the Google API endpoint on behalf of the
-underlying API classes (Sheets and Drive).
-
-Once you have established the OAuth2 handshake, you would not
-use this class much, it would be used indirectly by the Drive/Sheets
-API classes.
+and Sheets APIs. It is used to send API requests to the Google API
+endpoint on behalf of the underlying API classes (Sheets and Drive).
 
 =head1 SUBROUTINES
 
 =over
 
-=item new(config_file => <path_to_config_file>, client_id => <str>, client_secret => <str>, token_file => <path_to_token_file>, post_process => <coderef>, throttle => <int>);
+=item new(config_file => <path_to_config_file>, auth => <object|hash>, post_process => <coderef>, throttle => <int>);
 
  config_file: Optional YAML configuration file that can specify any
    or all of the following args:
- client_id: The OAuth2 client id you got from Google.
- client_secret: The OAuth2 client secret you got from Google.
- token_file: The file path to the previously saved token (see OAUTH2
-   SETUP below). If a config_file is passed, the dirname of the config
-   file is tried to find the token_file (same directory) if only the
-   token file name is passed.
+ auth: A hashref to create the specified auth class, or (outside the config file) an instance of the blessed class itself.
  post_process: A coderef to call after each API call.
  throttle: Used in development to sleep the number of seconds
    specified between API calls to avoid threshhold errors from Google.
 
 You can specify any of the arguments in the optional YAML config file.
 Any passed in arguments will override what is in the config file.
-   
+
+The 'auth' arg can specify a pre-blessed class of one of the Google::RestApi::Auth::*
+classes, or, for convenience sake, you can specify a hash of the required
+arguments to create an instance of that class:
+  auth:
+    class: OAuth2Client
+    client_id: xxxxxx
+    client_secret: xxxxxx
+    token_file: <path_to_token_file>
+
+Note that the auth hash itself can also contain a config_file:
+  auth:
+    class: OAuth2Client
+    config_file: <path_to_oauth_config_file>
+
+This allows you the option to keep the auth file in a separate, more secure place.
+
 =item api(uri => <uri_string>, method => <http_method_string>,
   headers => <headers_string_array>, params => <query_parameters_hash>,
   content => <body_hash>);
@@ -331,13 +304,6 @@ Shows some statistics on how many get/put/post etc calls were made.
 Useful for performance tuning during development.
 
 =back
-
-=head1 OAUTH2 SETUP
-
-This class depends on first creating an OAuth2 token session file
-that you point to via the 'token_file' config param passed via 'new'.
-See bin/session_creator and follow the instructions to save your
-token file.
 
 =head1 SEE ALSO
 

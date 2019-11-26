@@ -1,5 +1,14 @@
 Revision history for Devel-PPPort
 
+ 3.56 - 2019-11-25
+
+ * mktests.PL: use FindBin for INC setup
+ * devel/regenerate: Adjust POD line length
+ * Fix compilation with Visual C++ bugs introduced in 3.55 (Tomasz Konojacki)
+ * Fix mess.t failures when on VC++ when $0 contains backslashes (Tomasz Konojacki)
+ * Fix failing builds on 5.20.[1-3] introduced in 3.55 (Karl Williamson)
+ * Change tests to accept and use Test::More-like functions (Karl Williamson)
+
  3.55 - 2019-11-07
 
   * Fix p5-Text-Xslate on Perl 5.8.5 (Nicolas R)

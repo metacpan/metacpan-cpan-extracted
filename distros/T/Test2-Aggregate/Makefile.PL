@@ -3,8 +3,11 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-# Optional except for cpancover etc.
-my $extra_test = $ENV{EXTENDED_TESTING} ? 'requires' : 'recommends';
+# Optional except for cpancover, cpantesters etc.
+my $extra_test =
+  ( $ENV{EXTENDED_TESTING} || $ENV{AUTOMATED_TESTING} )
+  ? 'requires'
+  : 'recommends';
 
 my %WriteMakefileArgs = (
     NAME               => 'Test2::Aggregate',

@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.041';
+our $VERSION = '1.042';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -448,12 +448,20 @@ sub _openapi_spec_from_schema {
                     { '$ref' => '#/parameters/%24limit' },
                     { '$ref' => '#/parameters/%24offset' },
                     { '$ref' => '#/parameters/%24order_by' },
-                    map {; {
-                        name => $_,
+                    map {
+                        my $name = $_;
+                        my $type = ref $props{ $_ }{type} eq 'ARRAY' ? $props{ $_ }{type}[0] : $props{ $_ }{type};
+                        my $description =
+                           $type eq 'number' || $type eq 'integer' ? "Looks for records where the $type is equal to the value."
+                           : $type eq 'boolean' ? "Looks for records where the boolean is true/false."
+                           : $type eq 'array' ? "Looks for records where the array contains the value."
+                           : "By default, looks for records containing the value anywhere in the column. Use '*' anywhere in the value to anchor the match.";
+
+                        {
+                        name => $name,
                         in => 'query',
-                        type => ref $props{ $_ }{type} eq 'ARRAY'
-                                ? $props{ $_ }{type}[0] : $props{ $_ }{type},
-                        description => "Filter the list by the $_ field. By default, looks for rows containing the value anywhere in the column. Use '*' anywhere in the value to anchor the match.",
+                        type => $type,
+                        description => "Filter the list by the $name field. " . $description,
                     } } grep !exists( $props{ $_ }{'$ref'} ), sort keys %props,
                 ],
                 responses => {
@@ -620,7 +628,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.041
+version 1.042
 
 =head1 SYNOPSIS
 

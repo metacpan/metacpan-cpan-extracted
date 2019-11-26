@@ -1,5 +1,20 @@
 Revision history for IO-Async
 
+0.75    2019-11-26 00:06:59
+        [CHANGES]
+         * Remember to keep O_NONBLOCK off on IO::Async::Channel sync mode
+           filehandles
+         * Added IO::Async::Process->finish_future
+         * Added IO::Async::Routine->result_future
+         * Future-returning version of IO::Async::Function->stop
+         * Don't load IO::Socket or Sereal modules unless required
+
+        [BUGFIXES]
+         * Refresh the sigpipe in ->post_fork if required (RT128588)
+         * Fix some spelling mistakes (RT130087)
+         * Skip the async getprotobyname() test if it doesn't work
+           synchronously (RT131029)
+
 0.74    2019-06-27 18:44:38
         [CHANGES]
          * Warn about IO::Async::Stream using autoflush on a blocking handle

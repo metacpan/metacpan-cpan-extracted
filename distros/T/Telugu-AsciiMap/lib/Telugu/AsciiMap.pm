@@ -4,7 +4,7 @@ use Mouse;
 use utf8;
 use Kavorka -all;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 
 has 'TeMap' => (
@@ -46,14 +46,14 @@ Telugu::AsciiMap - Map Telugu chars to ascii chars to save space
 
   my $map = Telugu::AsciiMap->new();
   my $asciistring = $map->asciimap('రాజ్కుమార్రెడ్డి');	    # use asciimap method to convert telugu text to ascii
-  my $telugustring = $map->asciimap($asciistring);  # use the same method to convet back ascii text to telugu
+  my $telugustring = $map->asciimap($asciistring);          # use the same method to convet back ascii text to telugu
   print $asciistring, "\n", $telugustring, "\n";
 
 
 =head1 DESCRIPTION
 
 Each Telugu char uses four times the space required for an ascii char.
-This module provides a functions to convert Telugu text to ascii text and to convert back that ascii text to Telugu.
+This module provides a function to convert Telugu text to ascii text and to convert back that ascii text to Telugu.
 
 
 =head1 AUTHOR

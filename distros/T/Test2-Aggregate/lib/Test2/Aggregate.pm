@@ -25,11 +25,11 @@ Test2::Aggregate - Aggregate tests
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 
 =head1 DESCRIPTION
@@ -60,6 +60,7 @@ that do not work.
         load_modules  => \@modules,           # optional
         package       => 0,                   # optional
         shuffle       => 0,                   # optional
+        sort          => 0,                   # optional
         reverse       => 0,                   # optional
         repeat        => 1,                   # optional, requires Test2::Plugin::BailOnFail for < 0
         slow          => 0,                   # optional
@@ -76,7 +77,7 @@ Runs the aggregate tests. Returns a hashref with stats like this:
       'test_no'   => 1,                 # numbering starts at 1
       'pass_perc' => 100,               # for single runs pass/fail is 100/0
       'timestamp' => '20190705T145043', # start of test
-      'time'      => '0.1732',          # only with stats_output
+      'time'      => '0.1732',          # seconds - only with stats_output
       'warnings'  => $STDERR            # only with test_warnings on non empty STDERR
     }
   };
@@ -123,7 +124,12 @@ warning if C<test_warnings> is also set).
 
 =item * C<shuffle> (optional)
 
-Random order of tests if set to true.
+Random order of tests if set to true. Will override C<sort>.
+
+=item * C<sort> (optional)
+
+Sort tests alphabetically if set to true. Provides a way to fix the test order
+across systems.
 
 =item * C<reverse> (optional)
 
@@ -198,6 +204,8 @@ sub run_tests {
     if ($args{shuffle}) {
         require List::Util;
         @tests = List::Util::shuffle @tests;
+    } elsif ($args{sort}) {
+        @tests = sort @tests;
     }
 
     my @stack = caller();
@@ -280,8 +288,9 @@ sub _run_tests {
             $stats{$test}{timestamp} = _timestamp();
 
             my $result = subtest $iter. "Running test $test" => sub {
-                eval "package Test.$i.$count;" if $args->{package};
-                do $test;
+                $args->{package}
+                  ? eval "package Test::$i" . '::'. "$count; do '$test';"
+                  : do $test;
             };
 
             warn "<-Test2::Aggregate\n" if $args->{test_warnings};
@@ -371,6 +380,12 @@ you would ideally want to parallelize your test suite (so a super-long aggregate
 test continuing after the rest are done will slow down the suite). And in general
 more tests will run aggregated if they are grouped so that tests that can't be
 aggregated together are in different groups.
+
+In general you can call C<Test2::Aggregate::run_tests> multiple times in a test and
+even load C<run_tests> with tests that already contain another C<run_tests>, the
+only real issue with multiple calls is that if you use C<repeat < 0> on a call,
+C<Test2::Plugin::BailOnFail> is loaded so any subsequent failure, on any following
+C<run_tests> call will trigger a Bail.
 
 =head1 AUTHOR
 

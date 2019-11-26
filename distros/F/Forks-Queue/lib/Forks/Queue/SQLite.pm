@@ -9,7 +9,7 @@ use Time::HiRes 'time';
 use base 'Forks::Queue';
 use 5.010;    #  implementation contains  // //=  operators
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our ($DEBUG,$XDEBUG);
 *DEBUG = \$Forks::Queue::DEBUG;
 *XDEBUG = \$Forks::Queue::XDEBUG;
@@ -341,6 +341,57 @@ sub push {
     $self->_push(+1,@items);
 }
 
+sub enqueue {
+    my ($self,@items) = @_;
+    my $tfactor = +1;
+    my (@deferred_items,$failed_items);
+    my $pushed = 0;
+    my $_DEBUG = $self->{debug} // $DEBUG;
+
+    if ($self->_end) {
+        carp "Forks::Queue: put call from process $$ ",
+             "after end call from process " . $self->{_end};
+        return 0;
+    }
+
+    my $limit = $self->{limit};
+    $limit = 9E9 if $self->{limit} <= 0;
+    my $dbh = $self->_dbh;    
+
+    $dbh->begin_work;
+    my $stamp = Time::HiRes::time;
+    my $id = $self->_batch_id($stamp,$dbh);
+    # For Thread::queue compatibility,  enqueue  puts all items on
+    # the queue without blocking if there is even one free space,
+    if (@items && $self->_avail < $limit) {
+        foreach my $item (@items) {
+            $self->_add($item, $stamp, $id++);
+            $pushed++;
+        }
+        @items = ();
+    }
+    $dbh->commit;
+    if (@items > 0) {
+        @deferred_items = @items;
+        $failed_items = @deferred_items;
+    }
+    $self->_notify if $pushed;
+
+    if ($failed_items) {
+        if ($self->{on_limit} eq 'fail') {
+            carp "Forks::Queue: queue buffer is full ",
+                "and $failed_items items were not added";
+        } else {
+            $_DEBUG && print STDERR "$$ $failed_items on enqueue. ",
+                                   "Waiting for capacity\n";
+            $self->_wait_for_capacity;
+            $_DEBUG && print STDERR "$$ got some capacity\n";
+            $pushed += $self->enqueue(@deferred_items);
+        }
+    }
+    return $pushed;
+}
+
 sub unshift {
     my ($self,@items) = @_;
     $self->_push(-1,@items);
@@ -353,9 +404,7 @@ sub _add {
     my $jitem = $jsonizer->encode($item);
     my $dbh = $self->_dbh;
     my $sth = $dbh->prepare("INSERT INTO the_queue VALUES(?,?,?)");
-
     my $z = _try(3, sub { $sth->execute($timestamp, $id, $jitem) } );
-    
     return $z;
 }
 
@@ -424,12 +473,13 @@ sub _wait_for_capacity {
         return 9E9;
     }
     my $ready = 0;
+    my $count = @_ ? shift : 1;
     while (!$ready) {
-        last if $self->_avail < $self->{limit};
+        last if $self->_avail + $count <= $self->{limit};
         last if $self->_end;
         sleep($Forks::Queue::SLEEP_INTERVAL || 1);
     }
-    return $self->{avail} < $self->{limit};
+    return $self->{avail} + $count <= $self->{limit};
 }
 
 sub _batch_id {
@@ -448,6 +498,10 @@ sub _batch_id {
 sub dequeue {
     my $self = shift;
     Forks::Queue::_validate_input($_[0], 'count', 1) if @_;
+    my $count = $_[0] || 1;
+    if ($self->limit > 0 && $count > $self->limit) {
+        croak "dequeue: exceeds queue size limit";
+    }
     if ($self->{style} ne 'lifo') {
         return @_ ? $self->_retrieve(-1,1,2,0,$_[0]) 
                   : $self->_retrieve(-1,1,2,0);
@@ -537,7 +591,15 @@ sub insert {
     $limit = 9E9 if $self->{limit} <= 0;
 
     if ($pos >= $self->_avail) {
-        return $self->put(@items);
+        if ($self->{on_limit} eq 'tq-compat') {
+            my $limit = $self->{limit};
+            $self->{limit} = 0;
+            my $enq = $self->enqueue(@items);
+            $self->{limit} = $limit;
+            return $enq;
+        } else {
+            return $self->put(@items);
+        }
     }
     if ($pos <= -$self->_avail) {
         #return $self->unshift(@items);
@@ -597,11 +659,20 @@ sub insert {
             $b3 = $b1+1;
         }
     }
-    while (@items && $self->_avail < $limit) {
-        my $item = shift @items;
-        _try(3, sub { $self->_add($item,$t3,$b3) });
-        $inserted++;
-        $b3++;
+    if ($self->{on_limit} eq "tq-compat") {
+        for my $item (@items) {
+            $self->_add($item,$t3,$b3);
+            $inserted++;
+            $b3++;
+        }
+        @items = ();
+    } else {
+        while (@items && $self->_avail < $limit) {
+            my $item = shift @items;
+            _try(3, sub { $self->_add($item,$t3,$b3) });
+            $inserted++;
+            $b3++;
+        }
     }
     $dbh->commit;
     if (@items > 0) {
@@ -880,7 +951,7 @@ Forks::Queue::SQLite - SQLite-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.13
+0.14
 
 =head1 SYNOPSIS
 

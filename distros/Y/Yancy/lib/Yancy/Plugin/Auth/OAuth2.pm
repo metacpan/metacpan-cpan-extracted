@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::OAuth2;
-our $VERSION = '1.041';
+our $VERSION = '1.042';
 # ABSTRACT: Authenticate using an OAuth2 provider
 
 #pod =head1 SYNOPSIS
@@ -25,6 +25,11 @@ our $VERSION = '1.041';
 #pod useful. Without some kind of information about the user, it is
 #pod impossible to know if this is a new user or a returning user or to
 #pod maintain any kind of account information for the user.
+#pod
+#pod This module composes the L<Yancy::Auth::Plugin::Role::RequireUser> role
+#pod to provide the
+#pod L<require_user|Yancy::Auth::Plugin::Role::RequireUser/require_user>
+#pod authorization method.
 #pod
 #pod =head1 CONFIGURATION
 #pod
@@ -60,6 +65,23 @@ our $VERSION = '1.041';
 #pod     # Expire a session after 1 day of inactivity
 #pod     app->sessions->default_expiration( 24 * 60 * 60 );
 #pod
+#pod =head1 HELPERS
+#pod
+#pod This plugin has the following helpers.
+#pod
+#pod =head2 yancy.auth.current_user
+#pod
+#pod Get the current user from the session, if any. Returns C<undef> if no
+#pod user was found in the session.
+#pod
+#pod     my $user = $c->yancy->auth->current_user
+#pod         || return $c->render( status => 401, text => 'Unauthorized' );
+#pod
+#pod =head2 yancy.auth.require_user
+#pod
+#pod Validate there is a logged-in user and optionally that the user data has
+#pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
+#pod
 #pod =head1 TEMPLATES
 #pod
 #pod =head2 layouts/yancy/auth.html.ep
@@ -74,6 +96,8 @@ our $VERSION = '1.041';
 #pod =cut
 
 use Mojo::Base 'Mojolicious::Plugin';
+use Role::Tiny::With;
+with 'Yancy::Plugin::Auth::Role::RequireUser';
 use Yancy::Util qw( currym match );
 use Mojo::UserAgent;
 use Mojo::URL;
@@ -88,13 +112,10 @@ has token_url =>;
 
 sub register {
     my ( $self, $app, $config ) = @_;
+    $self->init( $app, $config );
     $app->helper(
         'yancy.auth.current_user' => currym( $self, 'current_user' ),
     );
-    $app->helper(
-        'yancy.auth.require_user' => currym( $self, 'require_user' ),
-    );
-    $self->init( $app, $config );
 }
 
 sub init {
@@ -123,38 +144,6 @@ sub init {
 sub current_user {
     my ( $self, $c ) = @_;
     return $c->session->{yancy}{ $self->moniker }{access_token} || undef;
-}
-
-#pod =method require_user
-#pod
-#pod     my $subref = $c->yancy->auth->require_user;
-#pod
-#pod Build a callback to validate there is a logged-in user. Since this auth
-#pod module has no information about the user, there can be no additional
-#pod authorization of the user.
-#pod
-#pod =cut
-
-sub require_user {
-    my ( $self, $c ) = @_;
-    return sub {
-        my ( $c ) = @_;
-        #; say "Are you authorized? " . $c->yancy->auth->current_user;
-        my $user = $c->yancy->auth->current_user;
-        if ( $user ) {
-            return 1;
-        }
-        $c->stash(
-            template => 'yancy/auth/unauthorized',
-            status => 401,
-            login_route => $self->route->render,
-        );
-        $c->respond_to(
-            json => {},
-            html => {},
-        );
-        return undef;
-    };
 }
 
 sub _handle_auth {
@@ -242,7 +231,7 @@ Yancy::Plugin::Auth::OAuth2 - Authenticate using an OAuth2 provider
 
 =head1 VERSION
 
-version 1.041
+version 1.042
 
 =head1 SYNOPSIS
 
@@ -268,19 +257,16 @@ useful. Without some kind of information about the user, it is
 impossible to know if this is a new user or a returning user or to
 maintain any kind of account information for the user.
 
+This module composes the L<Yancy::Auth::Plugin::Role::RequireUser> role
+to provide the
+L<require_user|Yancy::Auth::Plugin::Role::RequireUser/require_user>
+authorization method.
+
 =head1 METHODS
 
 =head2 current_user
 
 Returns the access token of the currently-logged-in user.
-
-=head2 require_user
-
-    my $subref = $c->yancy->auth->require_user;
-
-Build a callback to validate there is a logged-in user. Since this auth
-module has no information about the user, there can be no additional
-authorization of the user.
 
 =head2 get_authorize_url
 
@@ -330,6 +316,23 @@ default_expiration|https://mojolicious.org/perldoc/Mojolicious/Sessions#default_
     use Mojolicious::Lite;
     # Expire a session after 1 day of inactivity
     app->sessions->default_expiration( 24 * 60 * 60 );
+
+=head1 HELPERS
+
+This plugin has the following helpers.
+
+=head2 yancy.auth.current_user
+
+Get the current user from the session, if any. Returns C<undef> if no
+user was found in the session.
+
+    my $user = $c->yancy->auth->current_user
+        || return $c->render( status => 401, text => 'Unauthorized' );
+
+=head2 yancy.auth.require_user
+
+Validate there is a logged-in user and optionally that the user data has
+certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 
 =head1 TEMPLATES
 

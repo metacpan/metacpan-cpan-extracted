@@ -2,8 +2,8 @@ NAME
     App::dt - CLI data transformer
 
 VERSION
-    This document describes version 0.005 of App::dt (from Perl distribution
-    App-dt), released on 2019-09-19.
+    This document describes version 0.006 of App::dt (from Perl distribution
+    App-dt), released on 2019-11-26.
 
 SYNOPSIS
     See the command-line script dt.

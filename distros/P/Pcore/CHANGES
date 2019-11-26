@@ -1,3 +1,31 @@
+v0.104.1 2019-11-25T15:55:39Z
+ - code cleanup
+
+v0.104.0 2019-11-25T15:41:41Z
+ - code cleanup
+ - Pcore::Util restored
+ - sqlite to_string attr
+ - date methods names
+ - docker, par tags updated
+ - pcore lib HTTP added
+
+v0.103.0 2019-11-23T21:46:20Z
+ - HTTP server response refactored
+ - coro async pool size set to 256
+ - code cleanup
+ - api refactored
+ - node refactored
+ - unblock_sub removed
+ - pcore webcocket refactoring
+ - websocket encode data on send
+ - websocker raw run callbacks async
+ - http server refactoring
+ - coro no callbacks refactoring
+ - html tree parser refactored
+ - websocket callbacks removed
+ - syntax fixed
+ - dbi upgrade schema refactored
+
 v0.102.0 2019-11-20T17:44:21Z
  - pgsql callbacks removed
  - sqlite callbacks removed

@@ -1,5 +1,9 @@
 Revision history for Tickit-Async
 
+0.22    2019-11-23 17:08:27
+        [CHANGES]
+         * Rewrite to use libtickit 0.3's event hook integrations
+
 0.21    2017/06/08 17:36:59
         [CHANGES]
          * Implement the ->cancel_timer API

@@ -5,7 +5,7 @@ use Path::Tiny qw( path );
 
 @INC = map { path($_)->absolute->stringify } @INC;
 
-my $default = { 
+my $default = {
   protocol => 'test',
   host     => 'ftp.gnu.org',
   location => '/gnu/gsl',

@@ -1,6 +1,6 @@
 package Pithub::Markdown;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01034';
+our $VERSION = '0.01035';
 # ABSTRACT: Github v3 Markdown API
 
 use Moo;
@@ -39,7 +39,7 @@ Pithub::Markdown - Github v3 Markdown API
 
 =head1 VERSION
 
-version 0.01034
+version 0.01035
 
 =head1 ATTRIBUTES
 
@@ -77,7 +77,9 @@ Render an arbitrary Markdown document
 
 Example:
 
-    my $response = Pithub::Markdown->render(
+    use Pithub::Markdown;
+
+    my $response = Pithub::Markdown->new->render(
         data => {
             text => "Hello world github/linguist#1 **cool**, and #1!",
             context => "github/gollum",
@@ -94,7 +96,7 @@ Johannes Plunien <plu@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Johannes Plunien.
+This software is copyright (c) 2011-2019 by Johannes Plunien.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

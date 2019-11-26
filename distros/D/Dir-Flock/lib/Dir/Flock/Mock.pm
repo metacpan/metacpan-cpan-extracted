@@ -146,7 +146,7 @@ Dir::Flock::Mock - builtin flock advisory file locking wrapped in Dir::Flock API
 
 =head1 VERSION
 
-0.03
+0.04
 
 
 

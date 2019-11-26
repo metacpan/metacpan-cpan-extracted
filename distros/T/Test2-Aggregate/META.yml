@@ -25,5 +25,5 @@ requires:
   perl: '5.008'
 resources:
   repository: git://github.com/SpareRoom/Test2-Aggregate.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

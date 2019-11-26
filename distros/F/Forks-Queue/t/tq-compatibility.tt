@@ -32,9 +32,9 @@ sub Thread::Queue::new {
     # monkey patch Thread::Queue constructor to return an equivalent
     # Forks::Queue object.
     my ($pkg,@list) = @_;
-    print $DBG "Fake Thread::Queue::new\n";
-    Forks::Queue->new( impl => $ARGV[0] || $Forks::Queue::OPTS{impl} || 'File',
-                       on_limit => 'block', list => \@list );
+    my $impl = $ARGV[0] || $Forks::Queue::OPTS{impl} || "File";
+    print $DBG "Fake Thread::Queue::new impl => $impl\n";
+    Forks::Queue->new( impl => $impl, on_limit => 'tq-compat', list => \@list );
 }
 
 sub done_testing {

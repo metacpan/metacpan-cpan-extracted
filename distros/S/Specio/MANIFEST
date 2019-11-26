@@ -10,7 +10,7 @@ META.yml
 Makefile.PL
 README.md
 TODO.md
-appveyor.yml
+azure-pipelines.yml
 cpanfile
 dist.ini
 lib/Specio.pm

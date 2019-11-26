@@ -48,6 +48,7 @@ t/25-threads-extract.t
 t/26-threads-insert.t
 t/29-threads-ended.t
 t/30-threads-timed.t
+t/31-threads-limit.t
 t/exercises.tt
 t/tq-compatibility.tt
 tqt/00_load.t          # tests from Thread::Queue

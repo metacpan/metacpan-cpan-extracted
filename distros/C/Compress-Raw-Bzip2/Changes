@@ -1,9 +1,11 @@
 CHANGES
 -------
 
-  2.090 9 November 2019
+  2.091 23 November 2019
 
-      * No Changes
+      * Silence compiler warnings
+        https://github.com/pmqs/Compress-Raw-Bzip2/issues/1
+        74756934f3502a0f7ca6b28099fd36057bd958da
 
   2.089 3 November 2019
 

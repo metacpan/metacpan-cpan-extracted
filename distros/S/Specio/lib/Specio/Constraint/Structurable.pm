@@ -3,7 +3,7 @@ package Specio::Constraint::Structurable;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use Carp qw( confess );
 use Role::Tiny::With;
@@ -143,7 +143,7 @@ Specio::Constraint::Structurable - A class which represents structurable constra
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

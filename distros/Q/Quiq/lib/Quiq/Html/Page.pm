@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -184,7 +184,7 @@ sub html {
     my $self = ref $this? $this: $this->new(@_);
 
     my ($body,$comment,$encoding,$head,$loadA,$noNewline,$placeholders,
-        $title,$javaScript,$javaScriptToHead,$styleSheet,$topIndentation) =
+        $title,$javaScript,$javaScriptToHead,$styleSheet, $topIndentation) =
         $self->get(qw/body comment encoding head load noNewline placeholders
         title javaScript javaScriptToHead styleSheet topIndentation/);
 
@@ -258,7 +258,7 @@ sub html {
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

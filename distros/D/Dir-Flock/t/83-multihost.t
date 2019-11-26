@@ -39,7 +39,7 @@ my $fb = "$base/t/83b-$$.out";
 
 unlink $fa,$fb;
 
-$ENV{MULTI_DIR_FILE} = "t/83.dir";
+my $mdfile = $ENV{MULTI_DIR_FILE} = "t/83-$$.dir";
 
 if (fork() == 0) {
     close STDOUT; open STDOUT, ">", $fa;
@@ -49,11 +49,12 @@ if (fork() == 0) {
     close STDOUT; open STDOUT, ">", $fb;
     exit system(
         "ssh $REMOTE_HOST 'cd $base ;
-         MULTI_DIR_FILE=t/83.dir $^X -Iblib/lib -Ilib t/80b-multi.tt'") >> 8;
+         MULTI_DIR_FILE=$mdfile $^X -Iblib/lib -Ilib t/80b-multi.tt'") >> 8;
 }
-diag wait;
-diag wait;
+wait;
+wait;
 ok_multi( $fa, $fb );
 
 done_testing;
 unlink $fa,$fb;
+

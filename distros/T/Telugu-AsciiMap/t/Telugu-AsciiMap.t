@@ -7,9 +7,9 @@ BEGIN { use_ok('Telugu::AsciiMap') };
 
 
 my $map = Telugu::AsciiMap->new();
-my $asciistring = $map->asciimap('కరీమింఘీణ');
+my $asciistring = $map->asciimap('రాజ్కుమార్రెడ్డి');
 my $telugustring = $map->asciimap($asciistring);
 
-ok($telugustring eq 'కరీమింఘీణ');
+ok($telugustring eq 'రాజ్కుమార్రెడ్డి');
 
 done_testing();

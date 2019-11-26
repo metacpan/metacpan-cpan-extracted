@@ -1,0 +1,83 @@
+#!/usr/bin/env perl
+# vim:ts=4:shiftwidth=4:expandtab
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use DateTime;
+use DateTime::Format::ISO8601;
+use App::RetroPAN;
+
+my $opt_man = 0;
+my $opt_help = 0;
+my $opt_dir = "minicpan/";
+my $opt_version;
+my $opt_before = DateTime->now->iso8601;
+
+GetOptions(
+    'help|?' => \$opt_help,
+    man => \$opt_man,
+    "dir=s" => \$opt_dir,
+    "before=s" => \$opt_before,
+    version => \$opt_version,
+) or pod2usage(2);
+pod2usage(1) if $opt_help;
+pod2usage(-exitval => 0, -verbose => 2) if $opt_man;
+
+if ($opt_version) {
+    print STDERR "Version $App::RetroPAN::VERSION\n";
+    exit 0;
+}
+
+die "No time specified" if !$opt_before;
+
+my $dt = DateTime::Format::ISO8601->parse_datetime($opt_before);
+
+print STDERR "No modules to find\n" if !@ARGV;
+
+my ($dists_required, $dist_to_url) = App::RetroPAN::find_deps_on_date($dt->iso8601, @ARGV);
+
+App::RetroPAN::make_minicpan($opt_dir, $dists_required, $dist_to_url);
+
+exit 0;
+
+=head1 NAME
+
+retropan - Makes a historic minicpan E<9203>
+
+=head1 SYNOPSIS
+
+  $ retropan --dir minicpan/ --before 2011-02-01T00:00:00 Moose Catalyst
+
+=head1 OPTIONS
+
+The trailing arguments are the module names to be looked up.
+
+=over
+
+=item B<--before>
+
+Search for distributions released before this data. Defaults to now.
+
+
+=item B<--minicpan>
+
+Path of where to place our minicpan. Defaults to C<minicpan/>.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::RetroPAN>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Dave Lambley <dlambley@cpan.org>
+
+=cut

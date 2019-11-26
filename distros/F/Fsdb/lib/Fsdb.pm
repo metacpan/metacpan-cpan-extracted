@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '2.68';
+our $VERSION = '2.69';
 
 =head1 SYNOPSIS
 
@@ -235,38 +235,30 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 2.68, 2019-09-19
-All programs now support automatic decompression based on file extension.
+=head2 2.69, 2019-11-22
+a small bugfix in dbcolstats
 
 =over 4
 
-=item IMPROVEMENT
+=item BUG FIX
 
-The omitted-possible-error test case for L<dbfilepivot>
-now has an altnerative output that I saw on some BSD-running systems
-(thanks to CPAN).
+Filled in the the test case for autodecompress,
+which was missing for the 2.68 release.
 
-=item IMPROVEMENT
+=item ENHANCEMENT
 
-L<dbmerge> and L<dbmerge2> now support C<--header>.
-L<dbmerge2> now gives better error messages when presented
-the wrong number of inputs.
+The groff program is required for build,
+and the C<Makefile.PL> fails if groff is missing at build time.
+Thanks to Chris Williams for suggesting this check,
+and the CPAN auto-building system for trying many platforms.
 
 =item BUG FIX
 
-L<dbsort> now works with C<--header> even when the file is big
-(due to fixes to L<dbmerge>).
-
-=item IMPROVEMENT
-
-L<cvs_to_db> now processes data with the "binary" option, allowing
-it to handle newlines embedded in quoted fields.
-
-=item IMPROVEMENT
-
-All programs now will transparently decompress input files,
-if they are listed as a filename as an input argument
-that extends with a standard extension (.gz, .bz2, and .xz).
+The L<dbcolstats> program had numerical instability 
+that sometimes results in failing with a square-root of a negative
+number when many values varied right at the edge of floating-point 
+precision.  We now detect and report that case as 0 stddev.
+Thanks to Hang Guo for providing a test case.
 
 =back
 
@@ -3570,6 +3562,41 @@ Fixed L<dbjoin> error message for an unsorted right stream was incorrect
 
 All Fsdb programs can now read from and write to HDFS,
 when files that start with "hdfs:" are given to -i and -o options.
+
+=back
+
+=head2 2.68, 2019-09-19
+All programs now support automatic decompression based on file extension.
+
+=over 4
+
+=item IMPROVEMENT
+
+The omitted-possible-error test case for L<dbfilepivot>
+now has an altnerative output that I saw on some BSD-running systems
+(thanks to CPAN).
+
+=item IMPROVEMENT
+
+L<dbmerge> and L<dbmerge2> now support C<--header>.
+L<dbmerge2> now gives better error messages when presented
+the wrong number of inputs.
+
+=item BUG FIX
+
+L<dbsort> now works with C<--header> even when the file is big
+(due to fixes to L<dbmerge>).
+
+=item IMPROVEMENT
+
+L<cvs_to_db> now processes data with the "binary" option, allowing
+it to handle newlines embedded in quoted fields.
+
+=item IMPROVEMENT
+
+All programs now will transparently decompress input files,
+if they are listed as a filename as an input argument
+that extends with a standard extension (.gz, .bz2, and .xz).
 
 =back
 

@@ -78,6 +78,7 @@ Finch
 Fowler
 Frank
 Froehlich
+Galeev
 Gavin
 Gerhard
 Gertjan
@@ -214,6 +215,7 @@ Rezic
 Robert
 RobotUA
 Rolf
+Roman
 Romanov
 Roszatycki
 Sarathy
@@ -371,6 +373,7 @@ phrstbrn
 piotr
 rg
 ribasushi
+roman
 ruff
 sasao
 sburke

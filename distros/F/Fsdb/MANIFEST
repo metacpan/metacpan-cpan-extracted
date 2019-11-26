@@ -382,6 +382,9 @@ TEST/dbcolstats_quartile_singleton.out
 TEST/dbcolstats_quartile_truncation.cmd
 TEST/dbcolstats_quartile_truncation.in
 TEST/dbcolstats_quartile_truncation.out
+TEST/dbcolstats_stddev_instability.cmd
+TEST/dbcolstats_stddev_instability.in
+TEST/dbcolstats_stddev_instability.out
 TEST/dbcolstats_trailing_spaces.cmd
 TEST/dbcolstats_trailing_spaces.in
 TEST/dbcolstats_trailing_spaces.out
@@ -766,7 +769,10 @@ TEST/dbrecolize_ex_S.in
 TEST/dbrecolize_ex_S.out
 TEST/dbrow_ex.cmd
 TEST/dbrow_ex.in
+TEST/dbrow_ex.in.gz
 TEST/dbrow_ex.out
+TEST/dbrow_ex_autodecompress.cmd
+TEST/dbrow_ex_autodecompress.out
 TEST/dbrow_ex_R.cmd
 TEST/dbrow_ex_R.in
 TEST/dbrow_ex_R.out

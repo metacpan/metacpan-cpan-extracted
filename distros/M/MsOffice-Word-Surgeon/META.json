@@ -1,0 +1,72 @@
+{
+   "abstract" : "tamper wit the guts of Microsoft docx documents",
+   "author" : [
+      "DAMI <dami@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MsOffice-Word-Surgeon",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Carp" : "0",
+            "Encode" : "0",
+            "Moose" : "0",
+            "XML::LibXML" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MsOffice::Word::Surgeon" : {
+         "file" : "lib/MsOffice/Word/Surgeon.pm",
+         "version" : "1.0"
+      },
+      "MsOffice::Word::Surgeon::Change" : {
+         "file" : "lib/MsOffice/Word/Surgeon/Change.pm",
+         "version" : "1.0"
+      },
+      "MsOffice::Word::Surgeon::Run" : {
+         "file" : "lib/MsOffice/Word/Surgeon/Run.pm",
+         "version" : "1.0"
+      },
+      "MsOffice::Word::Surgeon::Text" : {
+         "file" : "lib/MsOffice/Word/Surgeon/Text.pm",
+         "version" : "1.0"
+      },
+      "MsOffice::Word::Surgeon::Utils" : {
+         "file" : "lib/MsOffice/Word/Surgeon/Utils.pm",
+         "version" : "1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/MsOffice-Word-Surgeon"
+      }
+   },
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

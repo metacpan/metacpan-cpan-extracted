@@ -1,7 +1,6 @@
 package Pcore::API::Docker::Hub;
 
 use Pcore -const, -class, -res, -export;
-use Pcore::Lib::Scalar qw[is_plain_coderef];
 
 our $EXPORT = { DOCKERHUB_SOURCE_TYPE => [qw[$DOCKERHUB_SOURCE_TYPE_TAG $DOCKERHUB_SOURCE_TYPE_BRANCH]] };
 
@@ -438,10 +437,10 @@ sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 161, 272, 307, 356,  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 373, 377, 400, 411   |                                                                                                                |
+## |    3 | 160, 271, 306, 355,  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 372, 376, 399, 410   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 139                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 138                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

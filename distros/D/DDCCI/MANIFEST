@@ -1,0 +1,14 @@
+DDCCI.xs
+lib/DDCCI.pm
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+t/00-init.t
+t/01-procedural-methods.t
+t/02-monitor-availability.t
+t/03-new.t
+t/04-edid.t
+t/05-caps.t
+t/06-vcp.t
+CHANGES
+META.yml                                 Module meta-data (added by MakeMaker)

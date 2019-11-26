@@ -1,5 +1,5 @@
 package File::ContentStore;
-$File::ContentStore::VERSION = '1.003';
+$File::ContentStore::VERSION = '1.004';
 use 5.014;
 
 use Carp qw( croak );
@@ -214,7 +214,7 @@ File::ContentStore - A store for file content built with hard links
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 
@@ -250,7 +250,7 @@ After linking F<file1> into the content store, we have the following:
     Directory                Content store
     ---------                -------------
     [123456] file1           [123456] d4/1d/8cd98f00b279d1c00998ecf8427e
-    [456789] file2           [456789] 8a/80/52e7a4f99c54b966a74144fe5761
+    [456789] file2
     [789012] file3
 
 After linking F<file2>:
@@ -290,7 +290,7 @@ does not exist, and otherwise inherit the permissions of the content file.
 
 =head2 path
 
-The location of the directory where the content files are store.
+The location of the directory where the content files are stored.
 (Required.)
 
 =head2 digest
@@ -436,7 +436,7 @@ Philippe Bruhat (BooK) <book@cpan.org>.
 
 =head1 COPYRIGHT
 
-Copyright 2018 Philippe Bruhat (BooK), all rights reserved.
+Copyright 2018-2019 Philippe Bruhat (BooK), all rights reserved.
 
 =head1 LICENSE
 

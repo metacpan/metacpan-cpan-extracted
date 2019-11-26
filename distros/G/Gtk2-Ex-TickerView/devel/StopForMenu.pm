@@ -16,7 +16,7 @@
 
 
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-TickerView.
 #
@@ -41,7 +41,7 @@ use Scalar::Util 'weaken';
 use Glib::Ex::SignalIds;
 use Gtk2::Ex::TickerView::Stopper;
 
-our $VERSION = 15;
+our $VERSION = 16;
 
 use Glib::Object::Subclass
   'Gtk2::Ex::TickerView',

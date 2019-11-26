@@ -1,6 +1,6 @@
 package Pithub::Result::SharedCache;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01034';
+our $VERSION = '0.01035';
 # ABSTRACT: A role to share the LRU cache with all Pithub objects
 
 use Moo::Role;
@@ -38,7 +38,7 @@ Pithub::Result::SharedCache - A role to share the LRU cache with all Pithub obje
 
 =head1 VERSION
 
-version 0.01034
+version 0.01035
 
 =head1 DESCRIPTION
 
@@ -63,7 +63,7 @@ Johannes Plunien <plu@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Johannes Plunien.
+This software is copyright (c) 2011-2019 by Johannes Plunien.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

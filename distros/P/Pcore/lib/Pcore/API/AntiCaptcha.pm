@@ -1,8 +1,8 @@
 package Pcore::API::AntiCaptcha;
 
 use Pcore -class, -const, -res;
-use Pcore::Lib::Data qw[to_b64 to_json from_json];
-use Pcore::Lib::Scalar qw[is_plain_scalarref];
+use Pcore::Util::Data qw[to_b64 to_json from_json];
+use Pcore::Util::Scalar qw[is_plain_scalarref];
 use Pcore::API::AntiCaptcha::Captcha;
 
 has api_key     => ( required => 1 );

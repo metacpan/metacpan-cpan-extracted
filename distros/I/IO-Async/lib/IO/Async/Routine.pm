@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2019 -- leonerd@leonerd.org.uk
 
 package IO::Async::Routine;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 use base qw( IO::Async::Notifier );
 
@@ -262,13 +262,17 @@ sub _setup_fork
          my ( $exitcode ) = @_;
          $self->maybe_invoke_event( on_finish => $exitcode );
 
-         $self->maybe_invoke_event( on_return => ($exitcode >> 8) ) unless $exitcode & 0x7f;
+         unless( $exitcode & 0x7f ) {
+            $self->maybe_invoke_event( on_return => ($exitcode >> 8) );
+            $self->result_future->done( $exitcode >> 8 );
+         }
       }),
       on_exception => $self->_replace_weakself( sub {
          my $self = shift or return;
          my ( $exception, $errno, $exitcode ) = @_;
 
          $self->maybe_invoke_event( on_die => $exception );
+         $self->result_future->fail( $exception, routine => );
       }),
    );
 
@@ -349,8 +353,14 @@ sub _setup_thread
          my ( $ev, @result ) = @_;
          $self->maybe_invoke_event( on_finish => @_ );
 
-         $self->maybe_invoke_event( on_return => @result ) if $ev eq "return";
-         $self->maybe_invoke_event( on_die => $result[0] ) if $ev eq "died";
+         if( $ev eq "return" ) {
+            $self->maybe_invoke_event( on_return => @result );
+            $self->result_future->done( @result );
+         }
+         if( $ev eq "died" ) {
+            $self->maybe_invoke_event( on_die => $result[0] );
+            $self->result_future->fail( $result[0], routine => );
+         }
 
          delete $self->{tid};
       }),
@@ -431,6 +441,34 @@ sub kill
 
    $self->{process}->kill( $signal ) if $self->{model} eq "fork";
    threads->object( $self->{tid} )->kill( $signal ) if $self->{model} eq "thread";
+}
+
+=head2 result_future
+
+   $f = $routine->result_future
+
+I<Since version 0.75.>
+
+Returns a new C<IO::Async::Future> which will complete with the eventual
+return value or exception when the routine finishes.
+
+If the routine finishes with a successful result then this will be the C<done>
+result of the future. If the routine fails with an exception then this will be
+the C<fail> result.
+
+=cut
+
+sub result_future
+{
+   my $self = shift;
+
+   return $self->{result_future} //= do {
+      my $f = $self->loop->new_future;
+      # This future needs to strongly retain $self to ensure it definitely gets
+      # notified
+      $f->on_ready( sub { undef $self } );
+      $f;
+   };
 }
 
 =head1 AUTHOR

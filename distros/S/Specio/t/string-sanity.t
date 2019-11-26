@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 
-use lib 't/lib';
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
 
 use Test::More 0.96;
 use Test::Specio qw( test_constraint :vars );
@@ -23,7 +24,7 @@ my $GLOB_OVERLOAD = _T::GlobOverload->new( \*FOO );
 local *BAR;
 {
     ## no critic (InputOutput::ProhibitBarewordFileHandles, InputOutput::RequireBriefOpen)
-    open BAR, '<', $0 or die "Could not open $0 for the test";
+    open BAR, '<', $^X or die "Could not open $^X for the test";
 }
 my $GLOB_OVERLOAD_FH = _T::GlobOverload->new( \*BAR );
 

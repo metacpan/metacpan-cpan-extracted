@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Streamtube::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Streamtube::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Streamtube::Colorbar::Title;
 
-our $VERSION = '0.030';    # VERSION
+our $VERSION = '0.031';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace streamtube.
 
@@ -281,7 +281,7 @@ Chart::Plotly::Trace::Streamtube::Colorbar - This attribute is one of the possib
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 

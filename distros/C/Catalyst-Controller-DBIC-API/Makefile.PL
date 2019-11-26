@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "Catalyst::Model::DBIC::Schema" => "0.20",
     "Catalyst::Runtime" => "5.90020",
     "DBIx::Class" => "0.08103",
+    "DBIx::Class::ResultSet::RecursiveUpdate" => "0.40",
     "Data::DPath::Validator" => "0.093411",
     "JSON::MaybeXS" => "1.004000",
     "MooseX::Types::Structured" => "0.20"
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "Test::WWW::Mechanize::Catalyst" => "0.37"
   },
-  "VERSION" => "2.007002",
+  "VERSION" => "2.008001",
   "test" => {
     "TESTS" => "t/*.t t/rest/*.t t/rpc/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "Catalyst::Model::DBIC::Schema" => "0.20",
   "Catalyst::Runtime" => "5.90020",
   "DBIx::Class" => "0.08103",
+  "DBIx::Class::ResultSet::RecursiveUpdate" => "0.40",
   "Data::DPath::Validator" => "0.093411",
   "Data::Printer" => "0.35",
   "JSON::MaybeXS" => "1.004000",

@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth;
-our $VERSION = '1.041';
+our $VERSION = '1.042';
 # ABSTRACT: Add one or more authentication plugins to your site
 
 #pod =head1 SYNOPSIS
@@ -49,6 +49,11 @@ our $VERSION = '1.041';
 #pod Multiple authentication plugins can be added with this plugin. If you
 #pod only ever want to have one type of auth, you can use that auth plugin
 #pod directly if you want.
+#pod
+#pod This module composes the L<Yancy::Auth::Plugin::Role::RequireUser> role
+#pod to provide the
+#pod L<require_user|Yancy::Auth::Plugin::Role::RequireUser/require_user>
+#pod authorization method.
 #pod
 #pod =head1 CONFIGURATION
 #pod
@@ -127,6 +132,23 @@ our $VERSION = '1.041';
 #pod     # Expire a session after 1 day of inactivity
 #pod     app->sessions->default_expiration( 24 * 60 * 60 );
 #pod
+#pod =head1 HELPERS
+#pod
+#pod This plugin has the following helpers.
+#pod
+#pod =head2 yancy.auth.current_user
+#pod
+#pod Get the current user from one of the configured plugins, if any. Returns
+#pod C<undef> if no user was found in the session.
+#pod
+#pod     my $user = $c->yancy->auth->current_user
+#pod         || return $c->render( status => 401, text => 'Unauthorized' );
+#pod
+#pod =head2 yancy.auth.require_user
+#pod
+#pod Validate there is a logged-in user and optionally that the user data has
+#pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
+#pod
 #pod =head1 TEMPLATES
 #pod
 #pod =head2 yancy/auth/login.html.ep
@@ -161,6 +183,8 @@ our $VERSION = '1.041';
 #pod =cut
 
 use Mojo::Base 'Mojolicious::Plugin';
+use Role::Tiny::With;
+with 'Yancy::Plugin::Auth::Role::RequireUser';
 use Mojo::Loader qw( load_class );
 use Yancy::Util qw( currym match );
 
@@ -207,10 +231,6 @@ sub register {
     $app->helper(
         'yancy.auth.plugins' => currym( $self, 'plugins' ),
     );
-    $app->helper(
-        'yancy.auth.require_user' => currym( $self, 'require_user' ),
-    );
-
     $self->route( $app->routes->get( '/yancy/auth' ) );
     $self->route->to( cb => currym( $self, 'login_form' ) );
 }
@@ -256,50 +276,6 @@ sub login_form {
     );
 }
 
-#pod =method require_user
-#pod
-#pod     my $subref = $c->yancy->auth->require_user( \%match );
-#pod
-#pod Build a callback to validate there is a logged-in user, and optionally
-#pod that the current user has certain fields set. C<\%match> is optional and
-#pod is a L<SQL::Abstract where clause|SQL::Abstract/WHERE CLAUSES> matched
-#pod with L<Yancy::Util/match>.
-#pod
-#pod     # Ensure the user is logged-in
-#pod     my $user_cb = $app->yancy->auth->require_user;
-#pod     my $user_only = $app->routes->under( $user_cb );
-#pod
-#pod     # Ensure the user's "is_admin" field is set to 1
-#pod     my $admin_cb = $app->yancy->auth->require_user( { is_admin => 1 } );
-#pod     my $admin_only = $app->routes->under( $admin_cb );
-#pod
-#pod =cut
-
-sub require_user {
-    my ( $self, $c, $where ) = @_;
-    return sub {
-        my ( $c ) = @_;
-        #; say "Are you authorized? " . $c->yancy->auth->current_user;
-        my $user = $c->yancy->auth->current_user;
-        if ( !$where && $user ) {
-            return 1;
-        }
-        if ( $where && match( $where, $user ) ) {
-            return 1;
-        }
-        $c->stash(
-            template => 'yancy/auth/unauthorized',
-            status => 401,
-            login_route => $self->route->render,
-        );
-        $c->respond_to(
-            json => {},
-            html => {},
-        );
-        return undef;
-    };
-}
-
 1;
 
 __END__
@@ -312,7 +288,7 @@ Yancy::Plugin::Auth - Add one or more authentication plugins to your site
 
 =head1 VERSION
 
-version 1.041
+version 1.042
 
 =head1 SYNOPSIS
 
@@ -362,6 +338,11 @@ Multiple authentication plugins can be added with this plugin. If you
 only ever want to have one type of auth, you can use that auth plugin
 directly if you want.
 
+This module composes the L<Yancy::Auth::Plugin::Role::RequireUser> role
+to provide the
+L<require_user|Yancy::Auth::Plugin::Role::RequireUser/require_user>
+authorization method.
+
 =head1 METHODS
 
 =head2 current_user
@@ -375,23 +356,6 @@ Returns the list of configured auth plugins.
 =head2 login_form
 
 Render the login form template for inclusion in L<Yancy::Plugin::Auth>.
-
-=head2 require_user
-
-    my $subref = $c->yancy->auth->require_user( \%match );
-
-Build a callback to validate there is a logged-in user, and optionally
-that the current user has certain fields set. C<\%match> is optional and
-is a L<SQL::Abstract where clause|SQL::Abstract/WHERE CLAUSES> matched
-with L<Yancy::Util/match>.
-
-    # Ensure the user is logged-in
-    my $user_cb = $app->yancy->auth->require_user;
-    my $user_only = $app->routes->under( $user_cb );
-
-    # Ensure the user's "is_admin" field is set to 1
-    my $admin_cb = $app->yancy->auth->require_user( { is_admin => 1 } );
-    my $admin_only = $app->routes->under( $admin_cb );
 
 =head1 CONFIGURATION
 
@@ -469,6 +433,23 @@ default_expiration|https://mojolicious.org/perldoc/Mojolicious/Sessions#default_
     use Mojolicious::Lite;
     # Expire a session after 1 day of inactivity
     app->sessions->default_expiration( 24 * 60 * 60 );
+
+=head1 HELPERS
+
+This plugin has the following helpers.
+
+=head2 yancy.auth.current_user
+
+Get the current user from one of the configured plugins, if any. Returns
+C<undef> if no user was found in the session.
+
+    my $user = $c->yancy->auth->current_user
+        || return $c->render( status => 401, text => 'Unauthorized' );
+
+=head2 yancy.auth.require_user
+
+Validate there is a logged-in user and optionally that the user data has
+certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 
 =head1 TEMPLATES
 

@@ -36,7 +36,7 @@ use Pcore;
         }
     },
 
-    # ExtJS
+    # extJS
     extjs6 => sub ( $cdn, $native, $args ) {
         my $ver = version->parse( $args->{ver} // v6.7.0 );
 
@@ -87,7 +87,7 @@ use Pcore;
         }
     },
 
-    # FontAwesome
+    # fontAwesome
     fa5 => sub ( $cdn, $native, $args ) {
         my $ver = version->parse( $args->{ver} // v5.11.2 );
 

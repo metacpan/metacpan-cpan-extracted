@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 6;
 
 BEGIN {
     use_ok('Test::Perl::Critic::Git') || print "Bail out!\n";
@@ -10,6 +10,45 @@ BEGIN {
 }
 
 diag("Testing Test::Perl::Critic::Git $Test::Perl::Critic::Git::VERSION, Perl $], $^X");
+
+my $import = Test::Perl::Critic::Git->import(
+    {
+        -severity => 'brutal',
+        -exclude => [
+            #'ProhibitStringyEval',
+            'ProhibitHashBarewords',
+            # 'ProhibitPostfixControls',
+            # 'RequireTidyCode',
+            # 'ProhibitBuiltinHomonyms',
+            # 'RequireArgUnpacking',
+            # 'ProhibitPunctuationVars',
+
+            # # file yml
+            # 'RequireCheckedSyscalls',
+            # 'RequireCheckedClose',
+
+            # # sqlite converter
+            # 'ProhibitMultiplePackages',
+
+            # #weired regex stuff
+            # 'ProhibitEscapedMetacharacters',
+            # 'RequireExtendedFormatting',
+            # 'RequireDotMatchAnything',
+            # 'RequireLineBoundaryMatching',
+
+            # # I'm using unless, deal with it
+            # 'ProhibitUnlessBlocks',
+
+            # # Some sub are called from string
+            # 'ProhibitUnusedPrivateSubroutines',
+
+            # 'ProhibitLongChainsOfMethodCalls'
+        ]
+    },
+    {},
+    { explicit => ['pm'] }
+);
+is $import, 'main', 'import test';
 
 my $o_gitdiff_mock = Test::MockModule->new('Git::Diff');
 $o_gitdiff_mock->mock(
@@ -28,15 +67,45 @@ $o_gitdiff_mock->mock(
         ~
                 },
                 raw         => undef,
-                subtraction => { 23 => '   my ($string) = @_;' },
-            }
+                subtraction => { 44 => '   my ($string) = @_;' },
+            },
+            'some/files/in/git.pm' => {
+                addition => { 44 => '   my ( $string ) = @_;' },
+                changed  => {
+                    '-44 +44 ' => q~sub is_identifier {
+        -   my ($string) = @_;
+        +   my ( $string ) = @_;
+        ~
+                },
+                raw         => undef,
+                subtraction => { 44 => '   my ($string) = @_;' },
+            },
+            'some/filer/in/git.pm' => {
+                addition => { 55 => '   my ( $string ) = @_;' },
+                changed  => {
+                    '-55 +55 ' => q~sub is_identifier {
+        -   my ($string) = @_;
+        +   my ( $string ) = @_;
+        ~
+                },
+                raw         => undef,
+                subtraction => { 55 => '   my ($string) = @_;' },
+            },
+            't/unit.t' => {
+                addition => { 88 => '   my ( $string ) = @_;' },
+                changed  => {
+                    '-88 +88 ' => q~sub is_identifier {
+        -   my ($string) = @_;
+        +   my ( $string ) = @_;
+        ~
+                },
+                raw         => undef,
+                subtraction => { 88 => '   my ($string) = @_;' },
+            },
         };
     },
 );
-my $import = Test::Perl::Critic::Git->import;
-is $import, 'main', 'import test';
-
-ok critic_on_changed_ok, 'critic_on_changed_ok test';
+critic_on_changed_ok( ['.'], 'critic_on_changed_ok test' );
 
 my $o_criticutils_mock = Test::MockModule->new('Test::Perl::Critic::Git');
 $o_criticutils_mock->mock(
@@ -60,7 +129,7 @@ $o_critic_mock->mock(
 
 my $o_violation_mock = Test::MockModule->new('Perl::Critic::Violation');
 $o_violation_mock->mock( line_number => sub { 80; } );
-ok critic_on_changed_ok( ['.'], 'critic_on_changed_ok test' );
+critic_on_changed_ok( ['.'], 'critic_on_changed_ok test' );
 
 $o_violation_mock->mock( line_number => sub { 23; } );
-ok critic_on_changed_not_ok( ['.'], 'critic_on_changed_not_ok test' );
+critic_on_changed_not_ok( ['.'], 'critic_on_changed_not_ok test' );

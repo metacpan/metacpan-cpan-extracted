@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of Gtk2-Ex-TickerView.
 #
@@ -182,9 +182,8 @@ if (0) {
 }
 { my $button = Gtk2::CheckButton->new_with_label ('Forced Height');
   $button->signal_connect (toggled => sub {
-                             $ticker->set (height_request
-                                           => $button->get_active
-                                           ? 50 : -1);
+                             $ticker->set (height_request =>
+                                           $button->get_active ? 50 : -1);
                            });
   $left_vbox->pack_start ($button, 0, 0, 0);
 }

@@ -34,9 +34,16 @@ sub exercise_fifo {
     ok($h->{avail} == 4, 'fifo: 4 items put on queue') or diagdump $h;
     ok($h->{end} == 0, 'fifo: end has not been called');
 
+    my $p1 = $q->peek_front;
+    my $p2 = $q->peek_back;
+    my $p3 = $q->peek;
+    ok($p1 eq 'hello', 'fifo: peek_front gets first item');
+    ok(ref($p2) eq 'HASH', 'fifo: peek_back gets last item');
+    is_deeply($p1, $p3, 'fifo: peek and peek_front are the same');
 
     my $g = $q->get;
     ok(defined($g), 'fifo: got item from queue');
+    is_deeply($g, $p3, 'fifo: got item that was returned by peek');
     ok($g eq 'hello', 'fifo: first item out was first item in');
 
     $g = $q->get(1);
@@ -103,8 +110,13 @@ sub exercise_forks {
     my $t = Time::HiRes::time;
     until ($s->{end}) {
         sleep 1;
-        $s = $q->status;
         if (time - $t > 15) {
+            diag "exercise_forks: ",
+                "Taking too long for queue to become availabile";
+            $q->end;
+        }
+        $s = $q->status;
+        if (time - $t > 20) {
             die "Took too long for queue to become available";
         }
     }
@@ -154,8 +166,16 @@ sub exercise_lifo {
     ok($q->pending == 4, 'lifo: 4 items put on queue');
     ok($h->{end} == 0, 'lifo: end has not been called');
 
+    my $p1 = $q->peek_front;
+    my $p2 = $q->peek_back;
+    my $p3 = $q->peek;
+    ok($p1 eq 'hello', 'lifo: peek_front gets first item');
+    ok(ref($p2) eq 'HASH', 'lifo: peek_back gets last item');
+    is_deeply($p2, $p3, 'lifo: peek and peek_back are the same');
+
     my $g = $q->get;
     ok(defined($g), 'lifo: got item from queue');
+    is_deeply($g, $p3, 'lifo: got item that was returned by peek');
     ok(ref($g) eq 'HASH' && $g->{foo} eq 'bar',
        'lifo: first item out was last item in');
 

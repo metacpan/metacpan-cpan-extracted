@@ -1,9 +1,8 @@
-package Pcore::Chrome v0.9.1;
+package Pcore::Chrome v0.11.0;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Chrome::Tab;
-use Pcore::Lib::Scalar qw[is_plain_coderef];
-use Pcore::Lib::Data qw[from_json];
+use Pcore::Util::Data qw[from_json];
 
 has bin           => ();
 has host          => '127.0.0.1';
@@ -132,9 +131,9 @@ sub new_tab ( $self, $url = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 79                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
+## |    2 | 78                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 91                   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 90                   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

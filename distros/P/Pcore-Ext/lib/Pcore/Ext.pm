@@ -1,9 +1,9 @@
-package Pcore::Ext v0.38.0;
+package Pcore::Ext v0.40.0;
 
 use Pcore -dist, -class;
 use Pcore::Ext::App;
-use Pcore::Lib::Scalar qw[is_ref];
-use Pcore::Lib::Path::Poll qw[:POLL];
+use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Util::Path::Poll qw[:POLL];
 
 has app => ( required => 1 );    # InstanceOf['Pcore::App']
 

@@ -8,7 +8,7 @@ package IO::Async::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 use base qw( IO::Async::Handle );
 
@@ -821,6 +821,7 @@ sub _flush_one_write
       $self->debug_printf( "WRITE err=%d/%s", $errno, $errno ) if $IO::Async::Debug::DEBUG > 1;
 
       if( $errno == EPIPE ) {
+         $self->debug_printf( "WRITE-EOF" );
          $self->{write_eof} = 1;
          $self->maybe_invoke_event( on_write_eof => );
       }
@@ -1039,6 +1040,7 @@ sub _do_read
       1 while $self->_flush_one_read( $eof );
 
       if( $eof ) {
+         $self->debug_printf( "READ-EOF" );
          $self->maybe_invoke_event( on_read_eof => );
          $self->close_now if $self->{close_on_read_eof};
          foreach ( @{ $self->{readqueue} } ) {

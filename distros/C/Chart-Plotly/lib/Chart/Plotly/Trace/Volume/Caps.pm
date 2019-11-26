@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Volume::Caps::X;
 use Chart::Plotly::Trace::Volume::Caps::Y;
 use Chart::Plotly::Trace::Volume::Caps::Z;
 
-our $VERSION = '0.030';    # VERSION
+our $VERSION = '0.031';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace volume.
 
@@ -61,7 +61,7 @@ Chart::Plotly::Trace::Volume::Caps - This attribute is one of the possible optio
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 

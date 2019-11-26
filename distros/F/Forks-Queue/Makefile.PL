@@ -14,7 +14,7 @@ if (@NO_INDEX) {
 }
 
 our $FILES_TO_CLEAN
-    = join " ", qw(Forks-Queue-* t/cfg* t/q* t/rq* t/*cfg);
+    = join " ", qw(Forks-Queue-* t/cfg* t/q* t/rq* t/*cfg t/*queue);
 
 our @TEST_FILES = ('t/[0-9]*.t');
 

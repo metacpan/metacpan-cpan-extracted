@@ -4,9 +4,9 @@ use Pcore -class;
 use Fcntl;
 use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32API::File';
-use Pcore::Lib::Data qw[to_cbor from_cbor];
-use Pcore::Lib::Scalar qw[weaken];
-use Pcore::Lib::Sys::Proc;
+use Pcore::Util::Data qw[to_cbor from_cbor];
+use Pcore::Util::Scalar qw[weaken];
+use Pcore::Util::Sys::Proc;
 
 has fh        => ();    # fh
 has on_finish => ();    # CodeRef->($self)
@@ -56,12 +56,12 @@ around new => sub ( $orig, $self, $type, % ) {
     my $proc;
 
     # run via fork tmpl
-    if ($Pcore::Lib::Sys::ForkTmpl::CHILD_PID) {
-        Pcore::Lib::Sys::ForkTmpl::run_node( $type, $boot_args );
+    if ($Pcore::Util::Sys::ForkTmpl::CHILD_PID) {
+        Pcore::Util::Sys::ForkTmpl::run_node( $type, $boot_args );
 
         my $res = $self->_handshake($fh_r);
 
-        $proc = bless { pid => $res->{pid}, kill_on_destroy => 0 }, 'Pcore::Lib::Sys::Proc';
+        $proc = bless { pid => $res->{pid}, kill_on_destroy => 0 }, 'Pcore::Util::Sys::Proc';
     }
 
     # run via run_proc
@@ -91,7 +91,7 @@ around new => sub ( $orig, $self, $type, % ) {
     }, $self;
 
     if ( $self->{on_finish} ) {
-        Coro::async_pool {
+        Coro::async {
             weaken $self;
 
             # blocks until $fh is closed

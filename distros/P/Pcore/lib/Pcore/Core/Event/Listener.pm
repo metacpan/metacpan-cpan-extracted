@@ -1,7 +1,7 @@
 package Pcore::Core::Event::Listener;
 
 use Pcore -role;
-use Pcore::Lib::Scalar qw[weaken is_plain_arrayref];
+use Pcore::Util::Scalar qw[weaken is_plain_arrayref];
 
 requires qw[_build_id forward_event];
 

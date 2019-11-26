@@ -1,4 +1,8 @@
 Revision history for Perl-Critic-Plicease
 
+0.02      2019-11-22 10:42:34 -0700
+  - Do not treat transliterate tr/// as a regexp
+  - Use PPIx::RegExp to parse regular expressions
+
 0.01      2019-11-22 09:26:22 -0700
   - initial version

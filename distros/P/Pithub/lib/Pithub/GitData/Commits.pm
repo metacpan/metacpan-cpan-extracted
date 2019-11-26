@@ -1,6 +1,6 @@
 package Pithub::GitData::Commits;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01034';
+our $VERSION = '0.01035';
 # ABSTRACT: Github v3 Git Data Commits API
 
 use Moo;
@@ -45,7 +45,7 @@ Pithub::GitData::Commits - Github v3 Git Data Commits API
 
 =head1 VERSION
 
-version 0.01034
+version 0.01035
 
 =head1 METHODS
 
@@ -269,7 +269,7 @@ Johannes Plunien <plu@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Johannes Plunien.
+This software is copyright (c) 2011-2019 by Johannes Plunien.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -76,4 +76,3 @@ multiprocess tests
         fails and fails fast
     non-blocking lock_sh in primary 
         succeeds and succeeds fast
-

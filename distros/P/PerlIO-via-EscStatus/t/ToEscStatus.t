@@ -33,7 +33,7 @@ plan tests => 8;
 
 require ProgressMonitor::Stringify::ToEscStatus;
 
-my $want_version = 11;
+my $want_version = 12;
 is ($ProgressMonitor::Stringify::ToEscStatus::VERSION, $want_version,
     'VERSION variable');
 is (ProgressMonitor::Stringify::ToEscStatus->VERSION,  $want_version,

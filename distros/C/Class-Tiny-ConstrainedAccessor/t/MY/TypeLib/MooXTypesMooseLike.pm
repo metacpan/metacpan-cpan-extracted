@@ -25,11 +25,17 @@ my $type_definitions = [
 
 MooX::Types::MooseLike::register_types($type_definitions, __PACKAGE__);
 
-# Sanity check
+# Sanity checks
 my $av = eval { is_MediumInteger(15) };
-die "Unexpected sanity-check failure: $@" if $@ or not $av;
+die "Unexpected is_ sanity-check failure: $@" if $@ or not $av;
 $av = is_MediumInteger(0);
-die "Unexpected sanity-check success" if $av;
+die "Unexpected is_ sanity-check success" if $av;
+
+my $coderef = MediumInteger();
+$av = eval { $coderef->(15); 1 };
+die "Unexpected sanity-check failure: $@" if $@ or not $av;
+$av = eval { $coderef->(0); 1 };
+die "Unexpected sanity-check success" if $av or not $@;
 
 $EXPORT_TAGS{all} = [@EXPORT, @EXPORT_OK];
 1;

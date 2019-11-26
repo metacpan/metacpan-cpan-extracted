@@ -1,5 +1,15 @@
 Revision history for Class-Tiny-ConstrainedAccessor
 
+0.000015    2019-11-23
+        - Updated manifest.  No functional changes.
+
+0.000014    2019-11-17 (TRIAL VERSION)
+        - Also test with Type::Nano
+        - Bump minimum Perl from 5.6 to 5.6.1 (for Types::TypeTiny)
+        - Replace most custom constraint-building logic with
+          a call to Types::TypeTiny::to_TypeTiny().  This permits us to accept
+          any type of constraint that function can accept. ++TOBYINK (#9)
+
 0.000013    2019-10-02
         - Arguments can now be provided in a hashref (#7).
           Thanks to FISHBONE for code.

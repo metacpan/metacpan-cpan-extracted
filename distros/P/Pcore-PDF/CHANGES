@@ -1,3 +1,6 @@
+v0.8.2 2019-11-25T15:44:52Z
+ - code cleanup
+
 v0.8.1 2019-11-19T00:43:29Z
  - use semaphore for threads blocking
 

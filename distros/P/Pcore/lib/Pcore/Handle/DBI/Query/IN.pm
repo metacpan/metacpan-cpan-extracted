@@ -1,7 +1,7 @@
 package Pcore::Handle::DBI::Query::IN;
 
 use Pcore -class;
-use Pcore::Lib::Scalar qw[is_ref is_plain_scalarref is_blessed_arrayref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_blessed_arrayref];
 
 has _buf => ( required => 1 );    # ArrayRef
 

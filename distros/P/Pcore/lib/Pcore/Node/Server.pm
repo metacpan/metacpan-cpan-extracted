@@ -1,8 +1,8 @@
 package Pcore::Node::Server;
 
 use Pcore -class, -res;
-use Pcore::Lib::Scalar qw[weaken];
-use Pcore::Lib::UUID qw[uuid_v4_str];
+use Pcore::Util::Scalar qw[weaken];
+use Pcore::Util::UUID qw[uuid_v4_str];
 use Pcore::HTTP::Server;
 use Pcore::WebSocket::pcore;
 use Clone qw[clone];
@@ -23,7 +23,7 @@ sub BUILD ( $self, $args ) {
         listen     => $self->{listen},
         on_request => sub ($req) {
             if ( $req->is_websocket_connect_request ) {
-                my $h = Pcore::WebSocket::pcore->accept(
+                return Pcore::WebSocket::pcore->accept(
                     $req,
                     compression   => $self->{compression},
                     on_disconnect => sub ($h) {
@@ -36,7 +36,7 @@ sub BUILD ( $self, $args ) {
                     on_auth => sub ( $h, $token ) {
                         return if !defined $self;
 
-                        ( $token, $h->{node_id}, $h->{node_data} ) = $token->@*;
+                        ( $token, $h->{node_id}, my $node_data ) = $token->@*;
 
                         if ( $self->{token} && $token ne $self->{token} ) {
                             $h->disconnect;
@@ -44,18 +44,18 @@ sub BUILD ( $self, $args ) {
                             return;
                         }
                         else {
+                            $self->register_node( $h, $h->{node_id}, $node_data, 1 );
+
                             return res 200;
                         }
                     },
-                    on_ready => sub ($h) {
-                        $self->register_node( $h, $h->{node_id}, delete $h->{node_data}, 1 );
-
-                        return;
-                    },
-                    on_rpc => sub ( $h, $req, $tx ) {
+                    on_rpc => sub ( $h, $tx ) {
                         return if !defined $self;
 
-                        if ( $tx->{method} eq 'update_status' ) {
+                        if ( $self->{token} && !$h->{auth} ) {
+                            $h->disconnect(401);
+                        }
+                        elsif ( $tx->{method} eq 'update_status' ) {
                             $self->update_node_status( $h->{node_id}, $tx->{args}->[0] );
                         }
 

@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "FindBin" : "0"
          }
       },
       "configure" : {
@@ -34,7 +34,7 @@
    "provides" : {
       "Devel::PPPort" : {
          "file" : "PPPort.pm",
-         "version" : "3.55"
+         "version" : "3.56"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "web" : "https://github.com/Dual-Life/Devel-PPPort"
       }
    },
-   "version" : "3.55",
+   "version" : "3.56",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

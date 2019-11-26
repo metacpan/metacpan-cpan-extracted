@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.862';
+our $VERSION = '1.863';
 
 use MCE::Shared::Base ();
 use MCE::Util ();
@@ -27,17 +27,16 @@ use overload (
 );
 
 my $LF = "\012"; Internals::SvREADONLY($LF, 1);
-my $_has_threads = $INC{'threads.pm'} ? 1 : 0;
-my $_tid = $_has_threads ? threads->tid() : 0;
+my $_tid = $INC{'threads.pm'} ? threads->tid() : 0;
 my $_reset_flg = 1;
 
 sub CLONE {
-   $_tid = threads->tid() if $_has_threads;
+   $_tid = threads->tid() if $INC{'threads.pm'};
 }
 
 sub DESTROY {
    my ($_cv) = @_;
-   my $_pid  = $_has_threads ? $$ .'.'. $_tid : $$;
+   my $_pid  = $_tid ? $$ .'.'. $_tid : $$;
 
    if ($_cv->{_init_pid} eq $_pid) {
       MCE::Util::_destroy_socks($_cv, qw(_cw_sock _cr_sock));
@@ -55,7 +54,7 @@ sub DESTROY {
 sub new {
    my ($_class, $_cv) = (shift, {});
 
-   $_cv->{_init_pid} = $_has_threads ? $$ .'.'. $_tid : $$;
+   $_cv->{_init_pid} = $_tid ? $$ .'.'. $_tid : $$;
    $_cv->{_value}    = shift || 0;
    $_cv->{_count}    = 0;
 
@@ -352,7 +351,7 @@ MCE::Shared::Condvar - Condvar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Condvar version 1.862
+This document describes MCE::Shared::Condvar version 1.863
 
 =head1 DESCRIPTION
 

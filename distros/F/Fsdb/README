@@ -144,23 +144,16 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        <http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 [1mWHAT'S NEW[0m
-   [1m2.68, date-tbd summary tbd[0m
-       IMPROVEMENT
-           The omitted-possible-error test case for dbfilepivot now has an
-           altnerative output that I saw on some BSD-running systems (thanks
-           to CPAN).
-
-       IMPROVEMENT
-           dbmerge and dbmerge2 now support "--header".  dbmerge2 now gives
-           better error messages when presented the wrong number of inputs.
-
+   [1m2.69, tbd xxx[0m
        BUG FIX
-           dbsort now works with "--header" even when the file is big (due to
-           fixes to dbmerge).
+           Filled in the the test case for autodecomrpress, which was missing
+           for the 2.68 release.
 
-       IMPROVEMENT
-           cvs_to_db now processes data with the "binary" option, allowing it
-           to handle newlines embedded in quoted fields.
+       ENHANCEMENT
+           The groff program is required for build, and the "Makefile.PL"
+           fails if groff is missing at build time.  Thanks to Chris Williams
+           for suggesting this check, and the CPAN auto-building system for
+           trying many platforms.
 
 [1mREADME CONTENTS[0m
        executive summary
@@ -2362,6 +2355,30 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
            All Fsdb programs can now read from and write to HDFS, when files
            that start with "hdfs:" are given to -i and -o options.
 
+   [1m2.68, 2019-09-19 All programs now support automatic decompression based on[0m
+       [1mfile extension.[0m
+       IMPROVEMENT
+           The omitted-possible-error test case for dbfilepivot now has an
+           altnerative output that I saw on some BSD-running systems (thanks
+           to CPAN).
+
+       IMPROVEMENT
+           dbmerge and dbmerge2 now support "--header".  dbmerge2 now gives
+           better error messages when presented the wrong number of inputs.
+
+       BUG FIX
+           dbsort now works with "--header" even when the file is big (due to
+           fixes to dbmerge).
+
+       IMPROVEMENT
+           cvs_to_db now processes data with the "binary" option, allowing it
+           to handle newlines embedded in quoted fields.
+
+       IMPROVEMENT
+           All programs now will transparently decompress input files, if they
+           are listed as a filename as an input argument that extends with a
+           standard extension (.gz, .bz2, and .xz).
+
 [1mAUTHOR[0m
        John Heidemann, "johnh@isi.edu"
 
@@ -2393,4 +2410,4 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
 
 
 
-perl v5.28.2                      2019-07-20                           Fsdb(3)
+perl v5.30.1                      2019-09-22                           Fsdb(3)

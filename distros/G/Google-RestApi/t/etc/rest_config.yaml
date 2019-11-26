@@ -1,4 +1,6 @@
 ---
-client_id: x
-client_secret: x
-token_file: rest_config.token
+auth:
+  class: OAuth2Client
+  client_id: x
+  client_secret: x
+  token_file: rest_config.token

@@ -1,5 +1,5 @@
 package Catalyst::Controller::DBIC::API::RPC;
-$Catalyst::Controller::DBIC::API::RPC::VERSION = '2.007002';
+$Catalyst::Controller::DBIC::API::RPC::VERSION = '2.008001';
 #ABSTRACT: Provides an RPC interface to DBIx::Class
 
 use Moose;
@@ -70,7 +70,7 @@ Catalyst::Controller::DBIC::API::RPC - Provides an RPC interface to DBIx::Class
 
 =head1 VERSION
 
-version 2.007002
+version 2.008001
 
 =head1 DESCRIPTION
 
@@ -203,7 +203,7 @@ Samuel Kaufman <sam@socialflow.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
+This software is copyright (c) 2019 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

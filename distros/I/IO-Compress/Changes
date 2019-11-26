@@ -1,6 +1,18 @@
 CHANGES
 -------
 
+  2.091 23 November 2019
+
+      * 000prereq.t: Drop LZMA Module as optional
+        00d3c110ce6fd6e77dbede3e3aa6125394141891
+        3697a7ced67d0989f2678514e9b04cbec3198f12
+        7494437856fb815ba2d6b8762ef6fc623a6384e2
+
+      * 011streamzip.t: Fixes for 5.6
+        2078eb58c5f483341ac7e5c6fc5d48a0a752c585
+        2f370b8ffb09b5cc5ad0830f9ef798b24a62f424
+        30101188220dddbfaf1c42a2a91b9bac147909ab
+
   2.090 9 November 2019
 
       * MANIFEST error for streamzip

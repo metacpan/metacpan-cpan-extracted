@@ -43,7 +43,12 @@ ok(@t > 0, "lock directory is not empty because child has lock");
 my $t1 = time;
 my $p = Dir::Flock::lock($dir, 0);
 my $t2 = time;
-ok(!$p, "flock failed in parent");
+
+# this (and t/04#7) is an intermittent test failure point.
+# Does the flock succeed here?
+ok(!$p, "flock failed in parent")
+    or Dir::Flock::unlock($dir);
+
 ok($t2-$t1 < 2, "flock failed fast with 0 timeout");
 my $q = Dir::Flock::lock($dir);
 my $t3 = time;

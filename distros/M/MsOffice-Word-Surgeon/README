@@ -1,0 +1,34 @@
+App-Zip-X
+
+Simple zip/unzip utility with extra indentation features for XML members
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Zip::X
+
+You can also look for information at:
+
+    Search METACPAN
+        https://metacpan.org/pod/distribution/App-Zip-X/bin/zip-x
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by DAMI.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

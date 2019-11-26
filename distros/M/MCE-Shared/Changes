@@ -1,6 +1,27 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.863 Sun Nov 26 20:00:00 EST 2019
+
+  * Use MCE::Channel for MCE::Hobo->yield to not incur unnecessary delays
+    due to busy shared-manager process.
+
+  * Re-factored recent changes regarding IPC safety in MCE::Shared::Server.
+    This update defers signal handling for HUP, INT, PIPE, QUIT, TERM, and
+    custom handlers during IPC without incurring a performance penalty.
+    See POD section labled "DEFER SIGNAL" in MCE::Signal 1.863.
+
+  * Reverted $hobo->exit back to sending the SIGQUIT signal in MCE::Hobo
+    now that MCE::Shared::Server defers signal during IPC.
+
+  * Improved reliability for spawning MCE::Hobo inside threads including
+    nested parallelization, made possible using a global lock $MCE::_GMUTEX
+    in MCE 1.863.
+
+  * Updated signal handling in mce-examples/framebuffer on GitHub.
+
+  * Bumped MCE dependency to 1.863.
+
 1.862 Wed Sep 18 22:00:00 EST 2019
 
   * Hotfix for 1.861.

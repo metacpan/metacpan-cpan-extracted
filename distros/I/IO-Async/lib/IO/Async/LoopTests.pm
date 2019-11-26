@@ -27,7 +27,7 @@ use POSIX qw( SIGTERM );
 use Socket qw( sockaddr_family AF_UNIX );
 use Time::HiRes qw( time );
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 # Abstract Units of Time
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;
@@ -580,7 +580,7 @@ Tests the Loop's ability to watch POSIX signals
 
 =cut
 
-use constant count_tests_signal => 14;
+use constant count_tests_signal => 15;
 sub run_tests_signal
 {
    unless( IO::Async::OS->HAVE_SIGNALS ) {
@@ -650,6 +650,17 @@ sub run_tests_signal
 
    ok( exception { $loop->attach_signal( 'this signal name does not exist', sub {} ) },
        'Bad signal name fails' );
+
+   undef $caught;
+   $loop->attach_signal( TERM => sub { $caught++ } );
+
+   $loop->post_fork;
+
+   kill SIGTERM, $$;
+
+   $loop->loop_once( 0.1 );
+
+   is( $caught, 1, '$caught SIGTERM after ->post_fork' );
 }
 
 =head2 idle

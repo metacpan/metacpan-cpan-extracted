@@ -16,10 +16,6 @@ sub CLI ($self) {
                 desc    => 'clean temp dir on exit',
                 negated => 1,
             },
-            force => {
-                desc    => 'do not check for uncommited changes',
-                default => 0,
-            },
         },
         arg => [
             script => {
@@ -35,10 +31,10 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 
     if ( !$dist->par_cfg ) {
         if ( P->term->prompt( q[Create PAR profile?], [qw[yes no]], enter => 1 ) eq 'yes' ) {
-            require Pcore::Lib::File::Tree;
+            require Pcore::Util::File::Tree;
 
             # copy files
-            my $files = Pcore::Lib::File::Tree->new;
+            my $files = Pcore::Util::File::Tree->new;
 
             $files->add_dir( $ENV->{share}->get_location('/Pcore/dist-tmpl') . '/par/' );
 

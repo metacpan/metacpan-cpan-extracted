@@ -1,7 +1,7 @@
 package Pcore::Core::OOP::Class;
 
 use Pcore;
-use Pcore::Lib::Scalar qw[is_ref is_plain_arrayref is_plain_hashref is_coderef];
+use Pcore::Util::Scalar qw[is_ref is_plain_arrayref is_plain_hashref is_coderef];
 use Class::XSAccessor qw[];
 use Package::Stash::XS qw[];
 use Sub::Util qw[];       ## no critic qw[Modules::ProhibitEvilModules]
@@ -310,7 +310,7 @@ sub _build_constructor ( $self ) {
 package $self;
 
 sub {
-    my \$self = !Pcore::Lib::Scalar::is_ref \$_[0] ? CORE::shift : Pcore::Lib::Scalar::is_blessed_ref \$_[0] ? CORE::ref CORE::shift : die qq[Invalid invoker for "$self\::new" constructor];
+    my \$self = !Pcore::Util::Scalar::is_ref \$_[0] ? CORE::shift : Pcore::Util::Scalar::is_blessed_ref \$_[0] ? CORE::ref CORE::shift : die qq[Invalid invoker for "$self\::new" constructor];
 
 PERL
 
@@ -322,7 +322,7 @@ PERL
     if (!defined $args) {
         $args = {};
     }
-    elsif (!Pcore::Lib::Scalar::is_plain_hashref $args) {
+    elsif (!Pcore::Util::Scalar::is_plain_hashref $args) {
         die qq["$self\::BUILDARGS" method didn't returned HashRef];
     }
 
@@ -330,7 +330,7 @@ PERL
     }
     else {
         $new .= <<'PERL';
-    my $args = Pcore::Lib::Scalar::is_plain_hashref $_[0] ? {$_[0]->%*} : @_ ? {@_} : {};
+    my $args = Pcore::Util::Scalar::is_plain_hashref $_[0] ? {$_[0]->%*} : @_ ? {@_} : {};
 PERL
     }
 

@@ -122,24 +122,24 @@ use File::Copy qw( copy );
 my $cmd = shift;
 @ARGV = map { s/DESTDIR/$ENV{DESTDIR}/g; $_ } @ARGV;
 print "% $cmd @ARGV\n";
-if($cmd eq 'mkdir')    { mkdir shift } 
+if($cmd eq 'mkdir')    { mkdir shift }
 elsif($cmd eq 'touch') { open my $fh, '>', shift; close $fh; }
 elsif($cmd eq 'copy')  { copy shift, shift }
 EOF
   close $fh;
 
   my $destdir = File::Temp->newdir;
-  
+
   mkdir 'src';
   open $fh, '>', 'src/foo.tar.gz';
   binmode $fh;
-  print $fh unpack("u", 
+  print $fh unpack("u",
               q{M'XL(`%)-#E0``TO+S]=GH#$P,#`P-S55`-*&YJ8&R#0<*!@:F1@8FYB8F1J:} .
               q{M*A@`.>:&#`JFM'88")06ER06`9V2GY.369R.6QTA>:@_X/00`6G`^-=+K<@L} .
               q{L+BFFF1W`\#`S,2$E_HW-S<T9%`QHYB(D,,+C?Q2,@E$P<@$`7EO"E``(````}
             );
   close $fh;
-  
+
   my $builder = builder(
     alien_name => 'foobarbazfakething',
     alien_build_commands => [
@@ -159,12 +159,12 @@ EOF
   );
 
   my $share = $builder->alien_library_destination;
-  
+
   output_to_note { $builder->depends_on('build') };
 
-  $builder->destdir($destdir);  
+  $builder->destdir($destdir);
   is $builder->destdir, $destdir, "destdir accessor";
-  
+
   output_to_note { $builder->depends_on('install') };
 
   my $foo_script = "$destdir/$share/bin/foo";
@@ -174,24 +174,24 @@ EOF
 subtest 'alien_bin_requires' => sub {
 
   my $bin = $abmb_root->child('corpus/alien_base_modulebuild/bin')->stringify;
-  
+
   local $CWD = _new_temp();
-  
+
   note "bin = $bin";
 
   eval q{
     package Alien::Libfoo;
 
     our $VERSION = '1.00';
-    
+
     $INC{'Alien/Libfoo.pm'} = __FILE__;
 
     package Alien::ToolFoo;
 
     our $VERSION = '0.37';
-    
+
     $INC{'Alien/ToolFoo.pm'} = __FILE__;
-    
+
     sub bin_dir {
       ($bin)
     }
@@ -215,7 +215,7 @@ subtest 'alien_bin_requires' => sub {
   is $builder->build_requires->{"Alien::ToolFoo"}, '0.37', 'alien_bin_requires implies a build requires';
 
   my %status;
-  output_to_note { 
+  output_to_note {
     local $CWD;
     my $dir = "_alien/buildroot";
     path($dir)->mkpath({verbose => 0});
@@ -246,7 +246,7 @@ EOF
   mkdir 'src';
   open $fh, '>', 'src/foo.tar.gz';
   binmode $fh;
-  print $fh unpack("u", 
+  print $fh unpack("u",
     q{M'XL(`)"=)%0``^W1P0K",`P&X)Y]BCQ!36K2GGP8#YL,AH6UBH]OA#%DH)ZJ} .
     q{MB/DNH;30O_W[G+>N,41,(J"3DN#C7``%)A4C$:`N)#F0UL'NSJ4>)HV2QW$H} .
     q{MQ^?GWNW/[UCFC^BU_TLWE2&??+W6)G?H?T3F%_V'=?\<DSC`)FE6_KS_N7O8} .
@@ -256,9 +256,9 @@ EOF
 
   eval q{
     package My::ModuleBuild1;
-    
+
     use base qw( Alien::Base::ModuleBuild );
-    
+
     sub alien_check_built_version {
       open my $fh, '<', 'version.txt';
       my $txt = <$fh>;
@@ -269,7 +269,7 @@ EOF
   die $@ if $@;
 
   local $mb_class = 'My::ModuleBuild1';
-  
+
   my $builder = builder(
     alien_name => 'foobarbazfakething',
     alien_build_commands => [
@@ -284,7 +284,7 @@ EOF
       c_compiler_required => 0,
     },
   );
-  
+
   output_to_note { $builder->depends_on('build') };
 
   is $builder->config_data( 'version' ), '2.3.4', 'version is set correctly';
@@ -303,7 +303,7 @@ EOF
   mkdir 'src';
   open $fh, '>', 'src/foo.tar.gz';
   binmode $fh;
-  print $fh unpack("u", 
+  print $fh unpack("u",
     q{M'XL(`)"=)%0``^W1P0K",`P&X)Y]BCQ!36K2GGP8#YL,AH6UBH]OA#%DH)ZJ} .
     q{MB/DNH;30O_W[G+>N,41,(J"3DN#C7``%)A4C$:`N)#F0UL'NSJ4>)HV2QW$H} .
     q{MQ^?GWNW/[UCFC^BU_TLWE2&??+W6)G?H?T3F%_V'=?\<DSC`)FE6_KS_N7O8} .
@@ -313,9 +313,9 @@ EOF
 
   eval q{
     package My::ModuleBuild2;
-    
+
     use base qw( Alien::Base::ModuleBuild );
-    
+
     sub alien_check_built_version {
       open my $fh, '<', 'version.txt';
       my $txt = <$fh>;
@@ -326,7 +326,7 @@ EOF
   die $@ if $@;
 
   local $mb_class = 'My::ModuleBuild2';
-  
+
   my $builder = builder(
     alien_name => 'foobarbazfakething',
     alien_build_commands => [
@@ -341,7 +341,7 @@ EOF
       c_compiler_required => 0,
     },
   );
-  
+
   output_to_note { $builder->depends_on('build') };
 
   is $builder->config_data( 'version' ), '2.3.4', 'version is set correctly';
@@ -443,7 +443,7 @@ subtest 'alien_env' => sub {
     },
     alien_build_commands => [],
   );
-  
+
   isa_ok $builder, 'Alien::Base::ModuleBuild';
   my($out, $err, %status) = capture { $builder->alien_do_system([$^X, -e => 'print $ENV{FOO}']) };
   is $status{stdout}, 'foo1', 'env FOO passed to process';
@@ -480,7 +480,7 @@ subtest 'cmake' => sub {
     isa_ok $builder, 'Alien::Base::ModuleBuild';
     is $builder->build_requires->{"Alien::CMake"}, '0.10', 'keep 0.10';
   };
-  
+
 };
 
 subtest 'install location' => sub {
@@ -552,7 +552,7 @@ subtest 'interpolation of version' => sub {
     };
     is $warn_count, 1, 'version warning';
   };
-  
+
   subtest 'after loading the version information' => sub {
 
     my $warn_count = warns {
@@ -562,7 +562,7 @@ subtest 'interpolation of version' => sub {
       $builder->config_data( 'alien_version', $test_version );
       is( $builder->alien_interpolate('version=%v'), "version=$test_version", 'version after setting it' );
     };
-  
+
     is $warn_count, 0, 'no warnings';
 
   };
@@ -597,7 +597,7 @@ subtest 'interpolation of helpers' => sub {
     alien_bin_requires => {
       'Alien::foopatcher' => 0,
     },
-  ); 
+  );
 
   is( $builder->alien_interpolate("|%{foo}|"), "|barbaz|", "helper" );
   is( $builder->alien_interpolate("|%{foo}|%{foo}|"), "|barbaz|barbaz|", "helper x 2" );
@@ -621,8 +621,8 @@ subtest 'interpolation of helpers' => sub {
 
 subtest 'find lib' => sub {
 
-  my $expected = { 
-    lib       => [ 'lib' ], 
+  my $expected = {
+    lib       => [ 'lib' ],
     inc       => [ 'include' ],
     lib_files => [ 'mylib' ],
   };
@@ -639,7 +639,7 @@ subtest 'find lib' => sub {
     subtest 'Find from file structure' => sub {
       local $expected->{lib_files} = [sort qw/mylib onlypostdot onlypredot otherlib prepostdot/];
       my $paths = $builder->alien_find_lib_paths($dir);
-      is( $paths, $expected, "found paths from extensions only" ); 
+      is( $paths, $expected, "found paths from extensions only" );
 
       my $pc = $builder->alien_generate_manual_pkgconfig($dir);
       isa_ok($pc, 'Alien::Base::PkgConfig');
@@ -659,7 +659,7 @@ subtest 'find lib' => sub {
     subtest 'Find using alien_provides_libs' => sub {
       $builder->alien_provides_libs('-lmylib');
       my $paths = $builder->alien_find_lib_paths($dir);
-      is( $paths, $expected, "found paths from provides" ); 
+      is( $paths, $expected, "found paths from provides" );
 
       my $pc = $builder->alien_generate_manual_pkgconfig($dir);
       isa_ok($pc, 'Alien::Base::PkgConfig');
@@ -710,7 +710,7 @@ subtest 'find lib' => sub {
 
     my $paths = $builder->alien_find_lib_paths($dir);
     is( $paths, $expected, "found paths from extensions only" );
-  
+
     my $pc = $builder->alien_generate_manual_pkgconfig($dir);
     isa_ok($pc, 'Alien::Base::PkgConfig');
 
@@ -730,18 +730,63 @@ subtest 'find lib' => sub {
 
 subtest 'ALIEN_FORCE and ALIEN_INSTALL_TYPE vars' => sub {
 
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => F();
+      call [ config_data => 'ForceSystem' ] => F();
+    },
+  ;
+
+  is
+    builder( alien_install_type => 'share' ),
+    object {
+      call [ config_data => 'Force' ] => T();
+      call [ config_data => 'ForceSystem' ] => F();
+    },
+  ;
+
+  is
+    builder( alien_install_type => 'system' ),
+    object {
+      call [ config_data => 'Force' ] => F();
+      call [ config_data => 'ForceSystem' ] => T();
+    },
+  ;
+
   local $ENV{ALIEN_FORCE} = 1;
-  
+
   Alien::Base::ModuleBuild::_compute_force();
   is $Alien::Base::ModuleBuild::Force, T();
   is $Alien::Base::ModuleBuild::ForceSystem, F();
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => T();
+      call [ config_data => 'ForceSystem' ] => F();
+    },
+  ;
+  is
+    builder( alien_install_type => 'system' ),
+    object {
+      call [ config_data => 'Force' ] => T();
+      call [ config_data => 'ForceSystem' ] => F();
+    },
+  ;
 
-  
   $ENV{ALIEN_FORCE} = 0;
 
   Alien::Base::ModuleBuild::_compute_force();
   is $Alien::Base::ModuleBuild::Force, F();
   is $Alien::Base::ModuleBuild::ForceSystem, F();
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => F();
+      call [ config_data => 'ForceSystem' ] => F();
+    },
+  ;
+
 
   delete $ENV{ALIEN_FORCE};
   local $ENV{ALIEN_INSTALL_TYPE} = 'share';
@@ -749,20 +794,46 @@ subtest 'ALIEN_FORCE and ALIEN_INSTALL_TYPE vars' => sub {
   Alien::Base::ModuleBuild::_compute_force();
   is $Alien::Base::ModuleBuild::Force, T();
   is $Alien::Base::ModuleBuild::ForceSystem, F();
-
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => T();
+      call [ config_data => 'ForceSystem' ] => F();
+    },
+  ;
 
   $ENV{ALIEN_INSTALL_TYPE} = 'system';
 
   Alien::Base::ModuleBuild::_compute_force();
   is $Alien::Base::ModuleBuild::Force, F();
   is $Alien::Base::ModuleBuild::ForceSystem, T();
-
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => F();
+      call [ config_data => 'ForceSystem' ] => T();
+    },
+  ;
+  is
+    builder( alien_install_type => 'share' ),
+    object {
+      call [ config_data => 'Force' ] => F();
+      call [ config_data => 'ForceSystem' ] => T();
+    },
+  ;
 
   $ENV{ALIEN_INSTALL_TYPE} = 'default';
 
   Alien::Base::ModuleBuild::_compute_force();
   is $Alien::Base::ModuleBuild::Force, F();
   is $Alien::Base::ModuleBuild::ForceSystem, F();
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => F();
+      call [ config_data => 'ForceSystem' ] => F();
+    },
+  ;
 
 
   $ENV{ALIEN_FORCE} = 0;
@@ -771,6 +842,13 @@ subtest 'ALIEN_FORCE and ALIEN_INSTALL_TYPE vars' => sub {
   Alien::Base::ModuleBuild::_compute_force();
   is $Alien::Base::ModuleBuild::Force, T();
   is $Alien::Base::ModuleBuild::ForceSystem, F();
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => T();
+      call [ config_data => 'ForceSystem' ] => F();
+    },
+  ;
 
 
   $ENV{ALIEN_INSTALL_TYPE} = 'system';
@@ -778,6 +856,13 @@ subtest 'ALIEN_FORCE and ALIEN_INSTALL_TYPE vars' => sub {
   Alien::Base::ModuleBuild::_compute_force();
   is $Alien::Base::ModuleBuild::Force, F();
   is $Alien::Base::ModuleBuild::ForceSystem, T();
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => F();
+      call [ config_data => 'ForceSystem' ] => T();
+    },
+  ;
 
 
   $ENV{ALIEN_INSTALL_TYPE} = 'default';
@@ -785,6 +870,13 @@ subtest 'ALIEN_FORCE and ALIEN_INSTALL_TYPE vars' => sub {
   Alien::Base::ModuleBuild::_compute_force();
   is $Alien::Base::ModuleBuild::Force, F();
   is $Alien::Base::ModuleBuild::ForceSystem, F();
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => F();
+      call [ config_data => 'ForceSystem' ] => F();
+    },
+  ;
 
 
   $ENV{ALIEN_FORCE} = 1;
@@ -793,6 +885,13 @@ subtest 'ALIEN_FORCE and ALIEN_INSTALL_TYPE vars' => sub {
   Alien::Base::ModuleBuild::_compute_force();
   is $Alien::Base::ModuleBuild::Force, T();
   is $Alien::Base::ModuleBuild::ForceSystem, F();
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => T();
+      call [ config_data => 'ForceSystem' ] => F();
+    },
+  ;
 
 
   $ENV{ALIEN_INSTALL_TYPE} = 'system';
@@ -800,6 +899,13 @@ subtest 'ALIEN_FORCE and ALIEN_INSTALL_TYPE vars' => sub {
   Alien::Base::ModuleBuild::_compute_force();
   is $Alien::Base::ModuleBuild::Force, F();
   is $Alien::Base::ModuleBuild::ForceSystem, T();
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => F();
+      call [ config_data => 'ForceSystem' ] => T();
+    },
+  ;
 
 
   $ENV{ALIEN_INSTALL_TYPE} = 'default';
@@ -807,6 +913,14 @@ subtest 'ALIEN_FORCE and ALIEN_INSTALL_TYPE vars' => sub {
   Alien::Base::ModuleBuild::_compute_force();
   is $Alien::Base::ModuleBuild::Force, F();
   is $Alien::Base::ModuleBuild::ForceSystem, F();
+  is
+    builder(),
+    object {
+      call [ config_data => 'Force' ] => F();
+      call [ config_data => 'ForceSystem' ] => F();
+    },
+  ;
+
 };
 
 $CWD = "$abmb_root";

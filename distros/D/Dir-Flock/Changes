@@ -1,5 +1,8 @@
 Revision history for Dir-Flock
 
+0.04	2019-11-25
+	Test fixes, robustness improvements
+
 0.03	2019-10-29
 	Enable testing of multi-process contention of directory.
         Use $Dir::Flock::errstr to store/report module errors.

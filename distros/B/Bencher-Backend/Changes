@@ -1,15 +1,20 @@
-1.044   2019-02-24 (PERLANCAR)
+1.045   2019-10-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Update renamed prereq Data::Clean::JSON -> Data::Clean::ForJSON.
+
+
+1.044   2019-02-24  Released-By: PERLANCAR
 
 	- Support loading scenario from an Acme::CPANModules module (add
 	  --cpanmodules-module option).
 
 
-1.043   2019-02-24 (PERLANCAR)
+1.043   2019-02-24  Released-By: PERLANCAR
 
 	- Use Exporter to check imported args.
 
 
-1.042   2019-02-15 (PERLANCAR)
+1.042   2019-02-15  Released-By: PERLANCAR
 
 	- [ux] Allow specifying scenario module with Bencher::Scenario::
 	  prefix.
@@ -17,7 +22,7 @@
 	- Stringify arg_XXX result column.
 
 
-1.041   2018-04-03 (PERLANCAR)
+1.041   2018-04-03  Released-By: PERLANCAR
 
 	- Implement import_args & import_args_array.
 
@@ -29,23 +34,23 @@
 	  of type=command.
 
 
-1.040   2017-07-13 (PERLANCAR)
+1.040   2017-07-13  Released-By: PERLANCAR
 
 	- Add code_startup mode.
 
 
-1.039   2017-07-02 (PERLANCAR)
+1.039   2017-07-02  Released-By: PERLANCAR
 
 	- [Bugfix] Incomplete conversion to Log::ger.
 
 
-1.038   2017-07-02 (PERLANCAR)
+1.038   2017-07-02  Released-By: PERLANCAR
 
         - [ux] If there is only one item and we are in interactive mode, open
           the profile result in browser.
 
 
-1.037   2017-07-02 (PERLANCAR)
+1.037   2017-07-02  Released-By: PERLANCAR
 
         - Add actions: dump-parsed-scenario, dump-items, profile (to profile
           items with Devel::NYTProf).
@@ -53,18 +58,18 @@
         - Replace Log::Any with Log::ger.
 
 
-1.036   2017-02-20 (PERLANCAR)
+1.036   2017-02-20  Released-By: PERLANCAR
 
 	- [Bugfix] Fix completion of participant & dataset tags.
 
 
-1.035   2017-02-19 (PERLANCAR)
+1.035   2017-02-19  Released-By: PERLANCAR
 
 	- Show participant tags (p_tags) & dataset tags (ds_tags) columns
 	  in result.
 
 
-1.034   2017-01-25 (PERLANCAR)
+1.034   2017-01-25  Released-By: PERLANCAR
 
 	- Introduce participant property: helper_modules (allow specifying
 	  modules that are require for running code but are not subject of
@@ -75,47 +80,47 @@
 	- [ux] Show elapsed time when output format is text.
 
 
-1.033   2017-01-04 (PERLANCAR)
+1.033   2017-01-04  Released-By: PERLANCAR
 
 	- [ux] Format numbers etc when output format is /html/, show
 	  platform information when output format is text.
 
 
-1.032   2016-12-10 (PERLANCAR)
+1.032   2016-12-10  Released-By: PERLANCAR
 
 	- Turn on with_process_size by default when in module_startup mode
 	  on linux.
 
 
-1.031   2016-11-23 (PERLANCAR)
+1.031   2016-11-23  Released-By: PERLANCAR
 
         - Record scenario file's mtime and checksums (MD5, SHA1, SHA256) in
           result metadata.
 
 
-1.030   2016-10-28 (PERLANCAR)
+1.030   2016-10-28  Released-By: PERLANCAR
 
 	- [ux] Provide completion for --sort/--sorts.
 
 
-1.029   2016-10-27 (PERLANCAR)
+1.029   2016-10-27  Released-By: PERLANCAR
 
 	- Add argument: scenario (to pass scenario data structure).
 
 
-1.028   2016-10-20 (PERLANCAR)
+1.028   2016-10-20  Released-By: PERLANCAR
 
         - Do not require Sys::Load on Windows because it doesn't install there.
           Bencher now works on Windows.
 
 
-1.027   2016-10-14 (PERLANCAR)
+1.027   2016-10-14  Released-By: PERLANCAR
 
         - Add options: --exclude-xs-modules (--noxs) --exclude-pp-modules
           (--nopp).
 
 
-1.026   2016-10-13 (PERLANCAR)
+1.026   2016-10-13  Released-By: PERLANCAR
 
 	- Add hooks before_parse_{datasets,participants} and deprecated
 	  before_list_{datasets,participants}. To generate
@@ -125,7 +130,7 @@
 	- Add hooks 'before_test_item' & 'after_test_item'.
 
 
-1.025   2016-10-09 (PERLANCAR)
+1.025   2016-10-09  Released-By: PERLANCAR
 
         - [Bugfix] Several bug fixes.
 
@@ -134,7 +139,7 @@
           don't want to wait for too long.
 
 
-1.024   2016-10-09 (PERLANCAR)
+1.024   2016-10-09  Released-By: PERLANCAR
 
 	- [Incompatible change] Remove action 'bench-with-benchmark-pm' (see
           below to run benchmark with Benchmark.pm).
@@ -147,13 +152,13 @@
           from Benchmark::Dumb.
 
 
-1.023   2016-09-09 (PERLANCAR)
+1.023   2016-09-09  Released-By: PERLANCAR
 
 	- Aside from observing per-dataset 'result' property, also observe
 	  scenario's 'result' property for when we don't have any datasets.
 
 
-1.022   2016-09-09 (PERLANCAR)
+1.022   2016-09-09  Released-By: PERLANCAR
 
 	- [workaround] Some completions were broken because we use
 	  'str_comma_sep' coercion rules for --include-path, this is
@@ -162,12 +167,12 @@
 	  Data::Sah, so now we disable this coercion rule for now.
 
 
-1.021   2016-08-26 (PERLANCAR)
+1.021   2016-08-26  Released-By: PERLANCAR
 
 	- Introduce --with-args-sizes.
 
 
-1.020   2016-08-24 (PERLANCAR)
+1.020   2016-08-24  Released-By: PERLANCAR
 
 	- [Incompatible change] Rename options for consistency
 	  --include-process-size to --with-process-size,
@@ -178,7 +183,7 @@
 	  --include-participants, --exclude-dataset-seqs, etc.
 
 
-1.019   2016-08-24 (PERLANCAR)
+1.019   2016-08-24  Released-By: PERLANCAR
 
 	- [ux] Allow specifying options like --include-datasets with
 	  comma-separated value, so --include-datasets 1,2,3 instead of
@@ -189,7 +194,7 @@
 	  dataset, breaking v1.018.
 
 
-1.018   2016-08-20 (PERLANCAR)
+1.018   2016-08-20  Released-By: PERLANCAR
 
         - UPDATE: this release is broken, don't use.
 
@@ -207,17 +212,17 @@
           sets.
 
 
-1.017   2016-07-13 (PERLANCAR)
+1.017   2016-07-13  Released-By: PERLANCAR
 
 	- Add chart_result().
 
 
-1.016   2016-07-13 (PERLANCAR)
+1.016   2016-07-13  Released-By: PERLANCAR
 
 	- Include permutation in result metadata (func.permute).
 
 
-1.015   2016-07-12 (PERLANCAR)
+1.015   2016-07-12  Released-By: PERLANCAR
 
 	- Handle negative time in results.
 
@@ -225,18 +230,18 @@
 	  though value is a number.
 
 
-1.014   2016-06-30 (PERLANCAR)
+1.014   2016-06-30  Released-By: PERLANCAR
 
         - Add function: split_result().
 
 
-1.013   2016-06-29 (PERLANCAR)
+1.013   2016-06-29  Released-By: PERLANCAR
 
         - [Bugfix] Determine number of significant digits from 'time', not from
           'rate' because 'rate' is removed in module startup result.
 
 
-1.012   2016-06-28 (PERLANCAR)
+1.012   2016-06-28  Released-By: PERLANCAR
 
 	- format_result(): Add a convenient way to skip using the
 	  RenderAsTextTable formatter by passing option render_as_text_table=>0.
@@ -245,18 +250,18 @@
 	  'perl' field is not defined.
 
 
-1.011   2016-06-23 (PERLANCAR)
+1.011   2016-06-23  Released-By: PERLANCAR
 
 	- More tweaks/fixes for alignments.
 
 
-1.010   2016-06-17 (PERLANCAR)
+1.010   2016-06-17  Released-By: PERLANCAR
 
 	- [Bugfix] DeleteConstantFields formatter didn't use
 	  delete_fields() yet.
 
 
-1.009   2016-06-17 (PERLANCAR)
+1.009   2016-06-17  Released-By: PERLANCAR
 
 	- [ux] Add column alignment to result.
 
@@ -264,7 +269,7 @@
 	  or when option --scientific-notation is given.
 
 
-1.008   2016-05-20 (PERLANCAR)
+1.008   2016-05-20  Released-By: PERLANCAR
 
 	- Follow Sah::Schemas specification, rename
 	  Sah::Schema::Bencher::Scenario to Sah::Schema::bencher::scenario.
@@ -272,14 +277,14 @@
 	- Avoid perl undef warning.
 
 
-1.007   2016-04-19 (PERLANCAR)
+1.007   2016-04-19  Released-By: PERLANCAR
 
 	- [Bugfix] save_result was turned *on* all the time, it should be
 	  only when --save-result or (--result-dir or BENCHER_RESULT_DIR
 	  was set).
 
 
-1.006   2016-04-13 (PERLANCAR)
+1.006   2016-04-13  Released-By: PERLANCAR
 
         - Add --{in,ex}clude-{participant,dataset,item}-{name,seq} to
           unambiguously include/exclude by name or sequence.
@@ -292,7 +297,7 @@
           due to mismatching prototypes.
 
 
-1.005   2016-04-08 (PERLANCAR)
+1.005   2016-04-08  Released-By: PERLANCAR
 
 	[ENHANCEMENTS]
 
@@ -312,14 +317,14 @@
 	  addition to just cmdline.
 
 
-1.004   2016-04-08 (PERLANCAR)
+1.004   2016-04-08  Released-By: PERLANCAR
 
 	- Eval code template in 'main' package.
 
         - Allow <VARNAME:raw> in template to avoid escaping.
 
 
-1.003   2016-04-03 (PERLANCAR)
+1.003   2016-04-03  Released-By: PERLANCAR
 
 	- [Bugfix] completer for participant/dataset name didn't include
 	  generated names.
@@ -328,13 +333,13 @@
 	  sets result_dir.
 
 
-1.002   2016-04-01 (PERLANCAR)
+1.002   2016-04-01  Released-By: PERLANCAR
 
 	- [Bug] Logic bug: --return-meta accidentally defaulted to off when
 	  --save-result is not enabled.
 
 
-1.001   2016-04-01 (PERLANCAR)
+1.001   2016-04-01  Released-By: PERLANCAR
 
 	- Turn off include_result_size when in module startup mode.
 
@@ -346,21 +351,21 @@
 	  metadata.
 
 
-1.000   2016-03-31 (PERLANCAR)
+1.000   2016-03-31  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Bump version number to 1.000.
 
 
-0.46    2016-03-31 (PERLANCAR)
+0.46    2016-03-31  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [doc] Add description, fixes.
 
 
-0.45    2016-03-30 (PERLANCAR)
+0.45    2016-03-30  Released-By: PERLANCAR
 
 	- [ux] Check that what's specified in
 	  --{in,ex}clude-{dataset,participant,item} are actually known, to
@@ -373,7 +378,7 @@
 	  except when it's not a round number.
 
 
-0.44    2016-03-26 (PERLANCAR)
+0.44    2016-03-26  Released-By: PERLANCAR
 
         - Show result size (as measured by Devel::Size), add
           --include-result-size (& include_result_size scenario property), add
@@ -383,7 +388,7 @@
 	- [Bugfix] Fix completion of -m when there is -I specified.
 
 
-0.43    2016-03-24 (PERLANCAR)
+0.43    2016-03-24  Released-By: PERLANCAR
 
 	- [ux] Directory specified in -I (--include-path) is now also used
 	  for searching and loading scenario module, this is so we can say
@@ -394,13 +399,13 @@
 	  argument value.
 
 
-0.42    2016-03-22 (PERLANCAR)
+0.42    2016-03-22  Released-By: PERLANCAR
 
 	- Allow specifying 'modules' in participant to benchmark startup
 	  overhead of several modules at once.
 
 
-0.41    2016-03-18 (PERLANCAR)
+0.41    2016-03-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -412,7 +417,7 @@
 	  undef max).
 
 
-0.40    2016-03-16 (PERLANCAR)
+0.40    2016-03-16  Released-By: PERLANCAR
 
         - Add action: list-perls; by default only use perls that have
           Bencher::Backend installed.
@@ -423,7 +428,7 @@
         - [Bugfix] fix calculating mod_overhead_time when in multiperl mode.
 
 
-0.39    2016-03-15 (PERLANCAR)
+0.39    2016-03-15  Released-By: PERLANCAR
 
         [ENHANCEMENTS]
 
@@ -432,7 +437,7 @@
           Currently this is implemented by dumping (using Data::Dmp, which means
           using B::Deparse) the items' codes into a temporary scenario file,
           then executing the scenario file using each perl executable. This
-          means codes that contains closures (references to outside variable)
+          means codes that contains closures  Released-By: references to outside variable
           won't work correctly.
 
         - Support benchmarking multiple versions of a module (`--multimodver`).
@@ -446,7 +451,7 @@
           to hardcode/include the perl executable location.
 
 
-0.38    2016-03-15 (PERLANCAR)
+0.38    2016-03-15  Released-By: PERLANCAR
 
         - First release, split from Bencher distribution to reduce dependencies
 	  when installing Bencher to a perl installation (this is part of

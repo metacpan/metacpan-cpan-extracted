@@ -13,11 +13,11 @@ FunctionalPerl::Dependencies
 
 =head1 SYNOPSIS
 
- use FunctionalPerl::Dependencies 'module_needs';
- 
- #  if (my @needs= module_needs $module) {
- #      skip "- don't have @needs", 1;
- #  }
+    use FunctionalPerl::Dependencies 'module_needs';
+
+    #  if (my @needs= module_needs $module) {
+    #      skip "- don't have @needs", 1;
+    #  }
 
 =head1 DESCRIPTION
 
@@ -40,6 +40,8 @@ use strict; use warnings; use warnings FATAL => 'uninitialized';
 our %dependencies=
   (
    # Don't specify Sub::Call::Tail (if meta/tail-expand can expand it)!
+
+   'FP::autobox'=> ['autobox'],
    'FP::Text::CSV'=> ['Text::CSV'],
    'FP::url_'=> ['URI'],
    'Chj::CPAN::ModulePODUrl'=> ['LWP::UserAgent'],

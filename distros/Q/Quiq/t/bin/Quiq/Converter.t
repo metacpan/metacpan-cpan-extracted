@@ -16,6 +16,15 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_camelCaseToSnakeCase : Test(1) {
+    my $self = shift;
+
+    my $camel = Quiq::Converter->camelCaseToSnakeCase('imsApplyDeltaRowByRow');
+    $self->is($camel,'ims-apply-delta-row-by-row');
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_snakeCaseToCamelCase : Test(2) {
     my $self = shift;
 

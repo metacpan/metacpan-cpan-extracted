@@ -6,7 +6,7 @@ use Carp;
 use Time::HiRes;
 use Config;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our $DEBUG = $ENV{FORKS_QUEUE_DEBUG} || 0;
 
 our $NOTIFY_OK = $ENV{FORKS_QUEUE_NOTIFY} // do {
@@ -30,12 +30,16 @@ sub new {
         if ($pkg =~ /[^\w:]/) {
             croak "Forks::Queue cannot be instantiated. Invalid 'impl' $pkg";
         }
-        if (eval "require Forks::Queue::$pkg; 1") {
+        my $e1 = eval "require Forks::Queue::$pkg; 1";
+        if ($e1) {
             $pkg = "Forks::Queue::" . $pkg;
             return $pkg->new(%opts);
-        } elsif (eval "require $pkg; 1") {
+        }
+        my $err1 = $@;
+        if (eval "require $pkg; 1") {
             return $pkg->new(%opts);
         } else {
+            warn $err1 if $err1;
             croak "Forks::Queue cannot be instantiated. ",
                 "Did not recognize 'impl' option '$opts{impl}'";
         }
@@ -62,7 +66,10 @@ sub put {
     return $self->push(@_);
 }
 
-sub enqueue { goto &put; }
+sub enqueue {
+    my $self = shift;
+    return $self->push(@_);
+}
 
 sub get {
     my $self = shift;
@@ -185,7 +192,8 @@ sub shift_nb   { _unimpl("shift/get") }
 sub pop_nb     { _unimpl("pop/get") }
 sub status     { _unimpl("pending/status") }
 sub clear      { _unimpl("clear") }
-
+sub end        { _unimpl("end") }
+sub lock :method { _unimpl("lock") }
 
 
 
@@ -242,11 +250,11 @@ sub __END {
 
 =head1 NAME
 
-Forks::Queue - queue that can be shared across processes
+Forks::Queue - queue that can be shared safely across processes
 
 =head1 VERSION
 
-0.13
+0.14
 
 =head1 SYNOPSIS
 
@@ -291,6 +299,10 @@ but will generally preclude data with blessed references and code references
   { name => "bad job", callback => \&my_callback_routine }
   [ 46, $url13, File::Temp->new ]
 
+Many of the methods of C<Forks::Queue> have analogues in the
+L<Thread::Queue> class, and many scripts using L<Thread::Queue>
+can be easily transformed to use C<Forks::Queue>.
+
 =head2 new
 
     $queue = Forks::Queue->new( %opts )
@@ -321,7 +333,7 @@ specify an unlimited size queue.
 
 =item * on_limit
 
-=item * C<< on_limit => 'block' | 'fail' >>
+=item * C<< on_limit => 'block' | 'fail' | 'tq-compat' >>
 
 Dictates what the queue should do when an attempt is made to
 add items beyond the queue's limit. If C<block>, the queue
@@ -329,8 +341,14 @@ will block and wait until items are removed from the queue.
 If C<fail>, the queue will warn and return immediately without
 changing the queue.
 
-See the L<"enqueue">, L<"put">, L<"push">, L<"unshift">,
-and L<"insert"> methods, which are used to increase the length
+The setting C<tq-compat> is similar to C<block>, but has the
+additional effect where the L<"insert"> method operates without
+regard to the queue limit. This behavior is compatible with
+the way queue limits and the insert method work in the 
+L<Thread::Queue> package.
+
+See the L<"enqueue">, L<"put">, L<"enqueue">, L<"push">, L<"unshift">,
+and L<"insert"> methods, which increase the length
 of the queue and may be affected by this setting.
 
 =item * join
@@ -418,11 +436,12 @@ items successfully added to the queue.
 Adding items to the queue will fail if the L<"end"> method of
 the queue had previously been called from any process.
 
+See the L<"limit"> method to see how the C<put> method behaves
+when adding items would cause the queue to exceed its maximum size.
+
 The C<enqueue> method name is provided for compatibility with
 L<Thread::Queue|Thread::Queue>.
 
-See the L<"limit"> method to see how the C<put> method behaves
-when adding items would cause the queue to exceed its maximum size.
 
 
 =head2 push
@@ -650,15 +669,14 @@ Provides random access to the queue, inserting the items specified
 in C<@list> into the queue after index position C<$index>.
 Negative C<$index> values are supported, which indicate that the
 items should be inserted after that position relative to the
-back of the queue.
+back of the queue. Returns the number of items that were 
+inserted into the queue.
 
-Returns the number of items that were inserted into the queue.
 If the queue has a L<"limit"> set, and inserting all the items on
-the list would cause the queue size to exceed the limit, this
-method will either block until capacity to insert the whole list
-becomes available, or it will insert items up to the queue size
-limit and issue a warning about the uninserted items, depending
-on the queue's L<"on_limit"|Forks::Queue/"new"> setting.
+the list would cause the queue size to exceed the limit, the setting
+of the queue's C<"on_limit">
+parameter will govern how this method will behave. 
+See the L<"on_limit"|Forks::Queue/"new"> setting for details.
 
 This method is inefficient for some queue implementations.
 
@@ -693,7 +711,7 @@ in this return value.
     $max = $queue->limit
     $queue->limit($new_limit)
     $queue->limit($new_limit,$on_limit)
-    $queue->limit = $new_limit    # may not work on some configurations
+    $queue->limit = $new_limit    # limit as lvalue requires Perl >=v5.14
 
 Returns or updates the maximum size of the queue. With no args, returns
 the existing maximum queue size, with a non-positive value indicating
@@ -703,17 +721,18 @@ The return value also acts as an lvalue through which the maximum
 queue size can be set, and allows the C<limit> method to be used 
 in the same way as 
 L<< the C<limit> method in Thread::Queue|Thread::Queue/"limit" >>. 
-I<< Note: lvalue feature may not work with Perl v<5.14. >>
+I<< Note: lvalue feature rqeuires Perl v5.14 or better. >>
 
 If arguments are provided, the first argument is used to set the
 maximum queue size. A non-positive queue size can be specified to
-indicate that the queue does not have a maximum size. 
+indicate that the queue does not have a maximum size.
+ 
 The second argument, if provided, updates the behavior of the queue
 when an attempt is made to add items beyond the maximum size.
-The acceptable values for the second argument are C<block>, which causes
-an insertion operation to block until there is capacity on the queue,
-or C<fail>, which returns immediately from an insertion operation with
-a warning about items that were not added to the queue.
+See L<"on_limit"|Forks::Queue/"new"> for the recognized values
+of this argument and how they affect the behavior of the
+L<"put">/L<"push">/L<"enqueue">, L<"unshift">, 
+L<"insert">, and L<"dequeue"> methods.
 
 
 =head1 VARIABLES
@@ -827,4 +846,5 @@ See http://dev.perl.org/licenses/ for more information.
 #
 #     priorities
 #     Directory implementation (see Queue::Dir)
-#
+#     Distinguish  enqueue  and  put . enqueue should behave like
+#         Thread::Queue and only check the limit once

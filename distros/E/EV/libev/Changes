@@ -4,6 +4,12 @@ TODO: revisit 59.x timer in the light of modern powersaving
 TODO: maybe use timerfd to detect time jumps on linux
 TODO: document EV_TSTAMP_T
 
+4.30 (EV only)
+	- change non-autoconf test for __kernel_rwf_t by testing
+          LINUX_VERSION_CODE, the most direct test I could find.
+        - fix a bug in the io_uring backend that polled the wrong
+          backend fd, causing it to not work in many cases.
+
 4.29 (EV only)
 	- add io uring autoconf and non-autoconf detection.
         - disable io_uring when some header files are too old.

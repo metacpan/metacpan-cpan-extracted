@@ -1,5 +1,5 @@
 ---
-abstract: 'queue that can be shared across processes'
+abstract: 'queue that can be shared safely across processes'
 author:
   - "Marty O'Brien <mob@cpan.org>"
 build_requires:
@@ -26,5 +26,5 @@ requires:
   File::Temp: '0'
   JSON: '2.0'
   Time::HiRes: '0'
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

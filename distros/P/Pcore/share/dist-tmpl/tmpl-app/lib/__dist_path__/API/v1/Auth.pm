@@ -8,37 +8,37 @@ extends qw[Pcore::App::API::Base];
 
 const our $API_NAMESPACE_PERMISSIONS => undef;
 
-sub API_app_init : Permissions('*') ( $self, $req, $data = undef ) {
-    return $req->( 200, { user_name => $req->{auth} ? ( $req->{auth}->{user_name} ) : undef, } );
+sub API_app_init : Permissions('*') ( $self, $auth, $data = undef ) {
+    return 200, { user_name => $auth ? ( $auth->{user_name} ) : undef };
 }
 
-sub API_signin : Permissions('*') ( $self, $req, $data ) {
-    my $auth = $self->{app}->{auth}->authenticate( [ $data->{user_name}, $data->{password} ] );
+sub API_signin : Permissions('*') ( $self, $auth, $data ) {
+    my $user_auth = $self->{app}->{auth}->authenticate( [ $data->{user_name}, $data->{password} ] );
 
     # authentication error
-    return $req->(401) if !$auth;
+    return 401 if !$user_auth;
 
     # create user session
-    my $session = $self->{app}->{auth}->user_session_create( $auth->{user_id} );
+    my $session = $self->{app}->{auth}->user_session_create( $user_auth->{user_id} );
 
     # user session creation error
-    return $req->(500) if !$session;
+    return 500 if !$session;
 
     # user session created
-    return $req->( 200, { user_name => $data->{user_name}, token => $session->{data}->{token} } );
+    return 200, { user_name => $data->{user_name}, token => $session->{data}->{token} };
 }
 
-sub API_signout : Permissions('*') ( $self, $req, @ ) {
+sub API_signout : Permissions('*') ( $self, $auth, @ ) {
 
     # request is authenticated from the session token
-    if ( $req->{auth}->{private_token}->[$PRIVATE_TOKEN_TYPE] && $req->{auth}->{private_token}->[$PRIVATE_TOKEN_TYPE] == $TOKEN_TYPE_SESSION ) {
+    if ( $auth->{private_token}->[$PRIVATE_TOKEN_TYPE] && $auth->{private_token}->[$PRIVATE_TOKEN_TYPE] == $TOKEN_TYPE_SESSION ) {
 
         # remove user session
-        return $req->( $self->{app}->{auth}->remove_user_session( $req->{auth}->{private_token}->[$PRIVATE_TOKEN_ID] ) );
+        return $self->{app}->{auth}->remove_user_session( $auth->{private_token}->[$PRIVATE_TOKEN_ID] );
     }
 
     # not a session token
-    return $req->(400);
+    return 400;
 }
 
 1;

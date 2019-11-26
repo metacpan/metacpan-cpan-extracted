@@ -1,7 +1,7 @@
 package Pcore::Core::Event;
 
 use Pcore -class;
-use Pcore::Lib::Scalar qw[weaken is_ref is_plain_arrayref];
+use Pcore::Util::Scalar qw[weaken is_ref is_plain_arrayref];
 use Pcore::Core::Event::Listener::Common;
 
 has _bindings_cache => ( init_arg => undef );                # HashRef

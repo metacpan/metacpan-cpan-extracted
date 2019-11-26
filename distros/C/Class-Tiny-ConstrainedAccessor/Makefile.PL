@@ -161,7 +161,7 @@ my %opts = (
     ABSTRACT_FROM    => $VERSION_FROM,
     LICENSE          => 'apache_2_0',
     PL_FILES         => {},
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.006001',
 
     # In the following, if a specific version is listed, but no explanation
     # is given, that means we want that version for bugfixes it includes.
@@ -187,7 +187,7 @@ my %opts = (
         # Type systems we always check.  Others are below (test recommends).
         'MooseX::Types' => '0',
         'MooseX::Types::Moose' => '0',
-        'Type::Tiny' => '0',
+        'Type::Tiny' => '1.004004',
         'vars::i' => '2.000000',    # See #6
     },
     PREREQ_PM => {
@@ -233,6 +233,7 @@ my %opts = (
                     'MooX::Types::MooseLike' => '0',
                     'MouseX::Types' => '0',
                     'Specio' => '0',
+                    'Type::Nano' => '0.004',
                 },
             },
         },

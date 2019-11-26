@@ -71,7 +71,7 @@
    "provides" : {
       "Perl::Dist::Strawberry" : {
          "file" : "lib/Perl/Dist/Strawberry.pm",
-         "version" : "4.018"
+         "version" : "4.019"
       },
       "Perl::Dist::Strawberry::Step" : {
          "file" : "lib/Perl/Dist/Strawberry/Step.pm"
@@ -128,7 +128,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Dist-Strawberry"
+         "web" : "https://github.com/StrawberryPerl/Perl-Dist-Strawberry/issues"
       },
       "homepage" : "http://strawberryperl.com/",
       "license" : [
@@ -140,5 +140,5 @@
       "x_IRC" : "irc://irc.perl.org/#win32",
       "x_MailingList" : "http://groups.google.com/group/perl.win32.vanilla"
    },
-   "version" : "4.018"
+   "version" : "4.019"
 }

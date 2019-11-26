@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use Quiq::Math;
 use Quiq::Hash;
@@ -18,7 +18,7 @@ use POSIX ();
 
 =head1 NAME
 
-Quiq::Axis::Numeric - Definition einer numerischen Plot-Achse
+Quiq::Axis::Numeric - Definition einer numerischen Achse
 
 =head1 BASE CLASS
 
@@ -204,8 +204,8 @@ sub new {
                 push @values,$val;
                 my $pos = Quiq::Math->valueToPixel($length,$min,$max,$val);
                 my $size = $self->labelSize($val); # Größe Tick
-                my $pos0 = int $pos-$size/2; # Anfangsposition Tick
-                my $pos1 = int $pos+$size/2; # Endposition Tick
+                my $pos0 = int($pos-$size/2); # Anfangsposition Tick
+                my $pos1 = int($pos+$size/2); # Endposition Tick
                 
                 if ($debug) {
                     print STDERR " $val($pos0/$pos/$pos1)";
@@ -455,7 +455,7 @@ sub label {
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

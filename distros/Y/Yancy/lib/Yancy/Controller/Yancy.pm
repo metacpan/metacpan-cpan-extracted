@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.041';
+our $VERSION = '1.042';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -305,12 +305,15 @@ sub list {
             $param_filter{ $key } = $value ;
         }
         elsif ( _is_type( $type, 'boolean' ) ) {
-            $param_filter{ $value ? '-bool' : '-not_bool' } = $key;
+            $param_filter{ ($value && $value ne 'false')? '-bool' : '-not_bool' } = $key;
+        }
+        elsif ( _is_type($type, 'array') ) {
+            $param_filter{ $key } = { '-has' =>  $value };
         }
         else {
             die "Sorry type '" .
                 to_json( $type ) .
-                "' is not handled yet, only string|number|integer|boolean is supported."
+                "' is not handled yet, only string|number|integer|boolean|array is supported."
         }
     }
     my $filter = {
@@ -644,6 +647,7 @@ sub set {
         if ( ref $errors eq 'ARRAY' ) {
             # Validation error
             $c->res->code( 400 );
+            $errors = [map {{message => $_->message, path => $_->path }} @$errors];
         }
         else {
             # Unknown error
@@ -832,7 +836,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.041
+version 1.042
 
 =head1 SYNOPSIS
 

@@ -3,9 +3,9 @@ NAME
     from a file
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::PickingRandomLinesFromFile (from Perl distribution
-    Acme-CPANModules-PickingRandomLinesFromFile), released on 2019-01-09.
+    Acme-CPANModules-PickingRandomLinesFromFile), released on 2019-10-16.
 
 DESCRIPTION
     Picking random lines from a file.
@@ -68,6 +68,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Acme::CPANModules::PickingRandomItemsFromList
+
     Acme::CPANModules - about the Acme::CPANModules namespace
 
     cpanmodules - CLI tool to let you browse/view the lists

@@ -2,7 +2,7 @@ package Net::Amazon::DynamoDB::Marshaler;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use parent qw(Exporter);
 our @EXPORT = qw(dynamodb_marshal dynamodb_unmarshal);
@@ -148,7 +148,7 @@ sub _marshal_val {
 
 sub _unmarshal_attr_val {
     my ($attr_val) = @_;
-    my ($type, $val) = %$attr_val;
+    my ($type, $val) = _get_canonical_attr_val($attr_val);
 
     return undef if $type eq 'NULL';
     return $val if $type =~ /^(S|N)$/;
@@ -159,6 +159,21 @@ sub _unmarshal_attr_val {
     return _unmarshal_hashref($val) if $type eq 'M';
 
     die "don't know how to unmarshal $type";
+}
+
+# Sometimes Paws includes an empty L value in its AttributeValue object, see
+# https://github.com/pplu/aws-sdk-perl/issues/79
+sub _get_canonical_attr_val {
+    my ($attr_val) = @_;
+    my @types = keys %$attr_val;
+    my $canonical_type;
+    if (@types == 1) {
+        $canonical_type = $types[0];
+    } else {
+        ($canonical_type) = grep { $_ ne 'L' } @types;
+    }
+
+    return ($canonical_type, $attr_val->{$canonical_type});
 }
 
 sub _val_type {

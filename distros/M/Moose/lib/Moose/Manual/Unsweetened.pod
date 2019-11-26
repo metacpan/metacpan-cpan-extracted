@@ -13,7 +13,7 @@ Moose::Manual::Unsweetened - Moose idioms in plain old Perl 5 without the sugar
 
 =head1 VERSION
 
-version 2.2011
+version 2.2012
 
 =head1 DESCRIPTION
 
@@ -119,7 +119,7 @@ helpers like C<Class::Accessor>.
       $class->_validate_birth_date( $p{birth_date} );
 
       $p{shirt_size} = 'l'
-          unless exists $p{shirt_size}:
+          unless exists $p{shirt_size};
 
       $class->_validate_shirt_size( $p{shirt_size} );
 

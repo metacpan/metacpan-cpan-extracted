@@ -1,3 +1,8 @@
+0.45     2019-11-24
+
+- Made XString a prereq if installing with Perl 5.10+.
+
+
 0.44     2019-08-14
 
 - Replaced the use of B with XString if it is installed. The latter is much

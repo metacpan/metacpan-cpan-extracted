@@ -20,12 +20,12 @@ no_index:
     - t
     - private
 requires:
-  Compress::Raw::Lzma: '2.090'
-  IO::Compress::Base: '2.090'
-  IO::Uncompress::Base: '2.090'
+  Compress::Raw::Lzma: '2.091'
+  IO::Compress::Base: '2.091'
+  IO::Uncompress::Base: '2.091'
 resources:
   bugtracker: https://github.com/pmqs/IO-Compress-Lzma/issues
   homepage: https://github.com/pmqs/IO-Compress-Lzma
   repository: git://github.com/pmqs/IO-Compress-Lzma.git
-version: '2.090'
+version: '2.091'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

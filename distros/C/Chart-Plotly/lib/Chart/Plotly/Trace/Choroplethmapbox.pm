@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Choroplethmapbox::Stream;
 use Chart::Plotly::Trace::Choroplethmapbox::Transform;
 use Chart::Plotly::Trace::Choroplethmapbox::Unselected;
 
-our $VERSION = '0.030';    # VERSION
+our $VERSION = '0.031';    # VERSION
 
 # ABSTRACT: GeoJSON features to be filled are set in `geojson` The data that describes the choropleth value-to-color mapping is set in `locations` and `z`.
 
@@ -297,7 +297,7 @@ Chart::Plotly::Trace::Choroplethmapbox - GeoJSON features to be filled are set i
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@
       "Joel A. Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -62,35 +62,35 @@
    "provides" : {
       "Alien::Base::ModuleBuild" : {
          "file" : "lib/Alien/Base/ModuleBuild.pm",
-         "version" : "1.06"
+         "version" : "1.08"
       },
       "Alien::Base::ModuleBuild::Cabinet" : {
          "file" : "lib/Alien/Base/ModuleBuild/Cabinet.pm",
-         "version" : "1.06"
+         "version" : "1.08"
       },
       "Alien::Base::ModuleBuild::File" : {
          "file" : "lib/Alien/Base/ModuleBuild/File.pm",
-         "version" : "1.06"
+         "version" : "1.08"
       },
       "Alien::Base::ModuleBuild::Repository" : {
          "file" : "lib/Alien/Base/ModuleBuild/Repository.pm",
-         "version" : "1.06"
+         "version" : "1.08"
       },
       "Alien::Base::ModuleBuild::Repository::FTP" : {
          "file" : "lib/Alien/Base/ModuleBuild/Repository/FTP.pm",
-         "version" : "1.06"
+         "version" : "1.08"
       },
       "Alien::Base::ModuleBuild::Repository::HTTP" : {
          "file" : "lib/Alien/Base/ModuleBuild/Repository/HTTP.pm",
-         "version" : "1.06"
+         "version" : "1.08"
       },
       "Alien::Base::ModuleBuild::Repository::Local" : {
          "file" : "lib/Alien/Base/ModuleBuild/Repository/Local.pm",
-         "version" : "1.06"
+         "version" : "1.08"
       },
       "Alien::Base::ModuleBuild::Utils" : {
          "file" : "lib/Alien/Base/ModuleBuild/Utils.pm",
-         "version" : "1.06"
+         "version" : "1.08"
       }
    },
    "release_status" : "stable",
@@ -107,6 +107,6 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,0 +1,78 @@
+{
+   "abstract" : "Printing a status line through an I/O layer.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PerlIO-via-EscStatus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ]
+   },
+   "optional_features" : {
+      "maximum_examples" : {
+         "description" : "Be able to run all the example programs.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "ProgressMonitor" : "0",
+                  "Term::Sk" : "0"
+               }
+            }
+         }
+      },
+      "maximum_interoperation" : {
+         "description" : "Have maximum inter-operation with other modules (optional supported other stuff).",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "ProgressMonitor" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "PerlIO::via" : "0",
+            "Regexp::Common" : "0",
+            "Regexp::Common::ANSIescape" : "11",
+            "Term::Size" : "0",
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/perlio-via-escstatus/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : 12,
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

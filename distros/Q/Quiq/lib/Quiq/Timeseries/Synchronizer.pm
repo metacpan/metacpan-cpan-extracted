@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use Quiq::Option;
 use Quiq::Array;
@@ -101,7 +101,7 @@ legt das Zeitraster auf 5, 15, 25, 35, 45, 55 Minuten.
 
 =item -geoCoordinates => $bool (Default: 0)
 
-Die Messerwerte haben zustzlich zur Zeit eine Ortskoordinate.
+Die Messerwerte haben zusätzlich zur Zeit eine Ortskoordinate.
 Wenn gesetzt, erwartet die Methode L<add|"add() - Füge Parameterwerte hinzu">() zusätzlich die
 Ortsangaben $latitude und $longitude.
 
@@ -611,7 +611,7 @@ sub rows {
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

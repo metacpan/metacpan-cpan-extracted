@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.862';
+our $VERSION = '1.863';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -68,7 +68,7 @@ sub share {
       );
 
       $_obj->[6] = MCE::Mutex->new( impl => 'Channel' ) unless (
-         caller->isa('MCE::Hobo') || exists( $_params->{_DEEPLY_} )
+         caller->isa('MCE::Hobo::_hash') || exists( $_params->{_DEEPLY_} )
       );
 
       return $_obj;
@@ -449,7 +449,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.862
+This document describes MCE::Shared version 1.863
 
 =head1 SYNOPSIS
 
@@ -1933,6 +1933,31 @@ Application-level advisory locking is possible with L<MCE::Mutex>.
        $cntr++;
 
        $mutex->unlock;
+    }
+ }
+
+ MCE::Hobo->create('work') for ( 1 .. 8 );
+ MCE::Hobo->waitall;
+
+ print $cntr, "\n"; # 8000
+
+Locking is available for shared objects via C<lock> and C<unlock> methods
+since 1.841. Previously, for C<condvar> only.
+
+ use MCE::Hobo;
+ use MCE::Shared;
+
+ tie my $cntr, 'MCE::Shared', 0;
+
+ sub work {
+    for ( 1 .. 1000 ) {
+       tied($cntr)->lock;
+
+       # Incrementing involves 2 IPC ops ( FETCH and STORE ).
+       # Thus, locking is required.
+       $cntr++;
+
+       tied($cntr)->unlock;
     }
  }
 

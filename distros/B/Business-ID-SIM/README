@@ -1,11 +1,17 @@
-SYNOPSIS
+NAME
+    Business::ID::SIM - Validate Indonesian driving license number (nomor
+    SIM)
 
+VERSION
+    This document describes version 0.08 of Business::ID::SIM (from Perl
+    distribution Business-ID-SIM), released on 2019-10-15.
+
+SYNOPSIS
      use Business::ID::SIM qw(parse_sim);
-    
+
      my $res = parse_sim(sim => "0113 40 00 0001");
 
 DESCRIPTION
-
     This module can be used to validate Indonesian driving license number,
     Nomor Surat Izin Mengemudi (SIM).
 
@@ -19,4 +25,56 @@ DESCRIPTION
 
     Note that there are several kinds of SIM (A, B1, B2, C) but this is not
     encoded in the SIM number and all SIM's have the same number.
+
+FUNCTIONS
+  parse_sim
+    Usage:
+
+     parse_sim(%args) -> [status, msg, payload, meta]
+
+    Validate Indonesian driving license number (nomor SIM).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   sim* => *str*
+
+        Input to be parsed.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Business-ID-SIM>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Business-ID-SIM>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-SIM>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -21,7 +21,7 @@ use MIME::Base64;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -705,6 +705,8 @@ sub hash_lock_recursive
     next unless ref( $vr ) eq 'HASH';
     hash_lock_recursive( $vr );
     }
+  
+  return $hr;  
 }
 
 sub hash_unlock_recursive
@@ -717,6 +719,8 @@ sub hash_unlock_recursive
     next unless ref( $vr ) eq 'HASH';
     hash_unlock_recursive( $vr );
     }
+
+  return $hr;  
 }
 
 sub hash_keys_lock_recursive
@@ -729,6 +733,8 @@ sub hash_keys_lock_recursive
     next unless ref( $vr ) eq 'HASH';
     hash_keys_lock_recursive( $vr );
     }
+
+  return $hr;  
 }
 
 ##############################################################################

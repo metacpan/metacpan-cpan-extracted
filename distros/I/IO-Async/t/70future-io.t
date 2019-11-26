@@ -13,6 +13,8 @@ use t::TimeAbout;
 use IO::Async::Loop;
 use IO::Async::OS;
 
+use Errno;
+
 eval { require Future::IO; require Future::IO::ImplBase } or
    plan skip_all => "Future::IO is not available";
 require Future::IO::Impl::IOAsync;

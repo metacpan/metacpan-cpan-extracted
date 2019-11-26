@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,11 +17,11 @@ name: IO-Async-Process-GracefulShutdown
 provides:
   IO::Async::Process::GracefulShutdown:
     file: lib/IO/Async/Process/GracefulShutdown.pm
-    version: '0.01'
+    version: '0.02'
 requires:
-  IO::Async::Process: '0'
+  IO::Async::Process: '0.75'
   perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

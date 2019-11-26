@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use Quiq::Css;
 use Quiq::Template;
@@ -84,7 +84,7 @@ ergibt
 
 =head2 Methode cat()
 
-Die Elemente eines HTML-Dokuments können syntaktisch ntürlich
+Die Elemente eines HTML-Dokuments können syntaktisch natürlich
 nicht nur geschachtelt auftreten, sie können auch
 aufeinanderfolgen. Die Methode cat() fügt aufeinanderfolgende
 HTML-Elemente zusammen.
@@ -754,7 +754,8 @@ my %Domain = (
     languageCode => 1,
     length => 1,
     linkTypes => [qw/stylesheet next prev copyright index glossary/], # unv.
-    mediaDesc => [qw/all aural braille handheld print projection screen tty tv/],
+    mediaDesc => [qw/all aural braille handheld print projection screen
+        tty tv/],
     method => [qw/get post/],
     multiLength => 1,
     multiLengths => 1,
@@ -909,7 +910,7 @@ nur der Rest mit schließenden Tags generiert werden soll.
   );
   $http->append($html);
 
-=item -fmt => 'e'|'m'|'p'|'v'|'i' (Default: richtet sich nach $tag)
+=item -fmt => 'c'|'e'|'E'|'m'|'M'|'p'|'P'|'v'|'i' (Default: gemäß $elem)
 
 Art der Content-Formatierung.
 
@@ -1104,7 +1105,7 @@ und dem Inhalt $content und liefere das Resultat zurück [2].
 Der Inhalt kann auch fehlen [1] oder sich über mehrere Argumente
 erstrecken [3].
 
-B<Attribut C{style}>
+B<Attribut style>
 
 Als Wert des Attributs C<style> kann eine Array-Referenz mit
 CSS-Regeln angegeben werden. Diese werden von der
@@ -1467,7 +1468,7 @@ sub tag {
     # Content bestimmen
     my $content = $self->cat(@_);
 
-    # Klauseln auswerten, die auf den Content bezug nehmen
+    # Klauseln auswerten, die auf den Content Bezug nehmen
 
     if ($ignoreIfNull && (!defined $content || $content eq '')) {
         return '';
@@ -2175,7 +2176,7 @@ sub import {
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

@@ -1,5 +1,41 @@
 Revision history for FunctionalPerl
 
+0.72.11 2019-11-26
+    - reimplement repl+ in Perl for Windows
+    - clean up tail expansion dependencies during testing, hopefully
+      fixes test failures when run out of alphabetic order
+    - fix for #131081 (t/skip-leak.t fails on BSD systems)
+    - change Chj::TEST to use TAP so that subtest failure details can
+      be seen in CPAN tester reports
+
+0.72.10 2019-11-24
+    - fix #131073 (Can't exec /bin/bash at website/gen line 1.)
+    - fixes for Windows (find-perl.pl; more system calls)
+    - more curing of unnecessary loading of FP::Repl
+    - FunctionalPerl: do not die on module load errors
+    - Chj::TEST::run_tests returns an object now with success number
+      as well; can't manage to merge numbers with Test::More's though.
+    - fix test.pl deletion: re-introduce $ENV{TEST}=1
+    - move csvstreams.t to t-slow/ (will look into how to do this
+      properly later)
+
+0.72.9 2019-11-24
+    - fix handling of autobox dependency (both making it optional in
+      tests as well as making it a hard dependency for now)
+    - hopefully fix "Bug #131047 for FunctionalPerl: Some tests run
+      with the wrong perl"
+    - do not use tail-expanded files from meta/ in t/pod-snippets.t
+      (there might be more such breakage, todo check)
+
+0.72.8 2019-11-24
+    - FunctionalPerl.pm: use proper pod formatting with links
+
+0.72.7 2019-11-24
+    - add FP::autobox
+    - clean up Windows skipping, eliminate top-level test.pl script
+    - add group import feature to FunctionalPerl module
+    - fix in Array: report out of range errors (todo: there are more of these)
+
 0.72.6 2019-11-22
     - attempt to fix CPAN testers issues missing even "Test::Requires"
       itself

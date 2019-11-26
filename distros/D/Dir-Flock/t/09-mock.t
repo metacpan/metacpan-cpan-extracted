@@ -19,16 +19,17 @@ sleep 2;
 my $test_dir;
 for my $candidate ("/tmp","/dev/shm","C:/Temp",$ENV{TMPDIR},$ENV{TEMP}) {
     next if !defined $candidate;
-    if (-d $candidate) {
+    if (-d $candidate && -r $candidate && -w $candidate && -x $candidate) {
         $test_dir = $candidate;
+        diag "test dir for t/09 is $test_dir";
         last;
     }
 }
-$test_dir //= "t";
+$test_dir ||= "t";
 
 my $dir = Dir::Flock::getDir($test_dir);
 ok(!!$dir, 'getDir returned value');
-ok(-d $dir, 'getDir returned dir');
+ok(-d $dir, "getDir returned dir: $dir");
 ok(-r $dir, 'getDir return value is readable');
 ok(-w $dir, 'getDir return value is writeable');
 
@@ -56,7 +57,8 @@ close P1;
 my $t1 = time;
 my $p = Dir::Flock::Mock::lock($dir, 0);
 my $t2 = time;
-ok(!$p, "flock failed in parent");
+ok(!$p, "flock failed in parent")
+    or Dir::Flock::Mock::unlock($dir);
 ok($t2-$t1 < 2, "flock failed fast with 0 timeout");
 my $q = Dir::Flock::Mock::lock($dir);
 my $t3 = time;
@@ -65,7 +67,8 @@ ok($t3-$t2 > 5, "flock in parent had to wait for child to release");
 my $r = Dir::Flock::Mock::unlock($dir);
 ok($r, "funlock successful");
 
-if (eval "use threads;1") {
+SKIP:
+{
     # scope semantics
     my $dir = Dir::Flock::getDir($test_dir);
     ok(!!$dir, 'getDir returned value');
@@ -75,27 +78,34 @@ if (eval "use threads;1") {
     my $f = "t/09a-$$.out";
     unlink $f;
     my @data = map [ ($_) x $_ ], 10 .. 20;
-    write_f($f,"");
-    my @thr = map threads->create(
-        sub {
-            my @list = @{$_[0]};
-            my $obj = Dir::Flock::lockobj($dir);
-            write_f($f,@list);
-        }, $_ ), @data;
-    $_->join for @thr;
-    ok(-f "$dir/_lock_", "lockobj used advisory directory flmocking");
-    open my $fh, "<", $f;
-    my @contents = <$fh>;
-    close $fh;
-    ok(@contents == 1, "thread output is on a single line");
-    my $data = $contents[0];
-    my $found_fail = 0;
-    for my $n (10..20) {
-        my $patt = qr/( $n){$n}/;
-        ok( $data =~ $patt, "found instances of $n" ) or $found_fail++;
-    }
-    if ($found_fail) {
-        diag "data was '$data'";
+    
+    if ($^O eq 'solaris') {
+        skip "flock/solaris threads don't work well together", 13;
+    } elsif (!eval "use threads;1") {
+        skip "next mock tests require threads", 13;
+    } else {
+        write_f($f,"");
+        my @thr = map threads->create(
+            sub {
+                my @list = @{$_[0]};
+                my $obj = Dir::Flock::lockobj($dir);
+                write_f($f,@list);
+            }, $_ ), @data;
+        $_->join for @thr;
+        ok(-f "$dir/_lock_", "lockobj used advisory directory flmocking");
+        open my $fh, "<", $f;
+        my @contents = <$fh>;
+        close $fh;
+        ok(@contents == 1, "thread output is on a single line");
+        my $data = $contents[0];
+        my $found_fail = 0;
+        for my $n (10..20) {
+            my $patt = qr/( $n){$n}/;
+            ok( $data =~ $patt, "found instances of $n" ) or $found_fail++;
+        }
+        if ($found_fail) {
+            diag "data was '$data'";
+        }
     }
     unlink $f;
     unlink "$dir/_lock_";
@@ -107,21 +117,27 @@ if (eval "use threads;1") {
     $f = "t/09b-$$.out";
     unlink $f;
     @data = map [ ($_) x $_ ], 12 .. 18;
-    write_f($f,"");
-    @thr = map threads->create( 
-        sub {
-            my @list = @{$_[0]};
-            Dir::Flock::sync  { write_f($f,@list) } $dir;
-        }, $_ ), @data;
-    $_->join for @thr;
-    open $fh, "<", $f;
-    @contents = <$fh>;
-    close $fh;
-    ok(@contents == 1, "thread output is on a single line");
-    $data = $contents[0];
-    for my $n (12..18) {
-        my $patt = qr/( $n){$n}/;
-        ok( $data =~ $patt, "found instances of token $n" );
+    if ($^O eq 'solaris') {
+        skip "flock/solaris threads don't work well together", 8;
+    } elsif (!eval "use threads;1") {
+        skip "next mock tests require threads", 8;
+    } else {
+        write_f($f,"");
+        my @thr = map threads->create( 
+            sub {
+                my @list = @{$_[0]};
+                Dir::Flock::sync  { write_f($f,@list) } $dir;
+            }, $_ ), @data;
+        $_->join for @thr;
+        open my $fh, "<", $f;
+        my @contents = <$fh>;
+        close $fh;
+        ok(@contents == 1, "thread output is on a single line");
+        my $data = $contents[0];
+        for my $n (12..18) {
+            my $patt = qr/( $n){$n}/;
+            ok( $data =~ $patt, "found instances of token $n" );
+        }
     }
     unlink $f;
 }

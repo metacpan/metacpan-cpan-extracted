@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4::Range;
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use 5.010_000;
 
@@ -240,23 +240,27 @@ sub named {
 # https://support.google.com/docs/answer/63175?co=GENIE.Platform%3DDesktop&hl=en
 sub is_named {
   my $self = shift;
+
   my $range = $self->{range};
-  return if ref($range);
+
   return if !$range;
+  return if ref($range);
   return if length($range) > 250;
+
   for (
     qr/^\d/,
     qr/^(true|false)/,
     qr/^R\d+C\d+$/,
     qr/^[A-Z]+\d+$/,
     RangeA1, ColA1, RowA1, CellA1,
-  ) {
-    return if $range =~ /$_/;
-  }
+  ) { return if $range =~ /$_/; }
+
   return 1;
 }
 
-# different ways to specify ranges:
+# there are different ways to specify ranges. this came
+# about by merging different ideas from different
+# spreadsheet implementations.
 
 # single cell:
 # A1                      ====> A1
@@ -274,7 +278,7 @@ sub is_named {
 # [[1, 1], [1, 1]]        ====> A1
 # [{row => 1, col => A}, {row => 1, col => A}]  ====> A1
 # [{row => 1, col => 1}, {row => 1, col => 1}]  ====> A1
- 
+
 # column:
 # A:A           ====> A:A
 # [A]           ====> A:A
@@ -285,6 +289,8 @@ sub is_named {
 # [{col => A}]  ====> A:A
 # {col => 1}    ====> A:A
 # [{col => 1}]  ====> A:A
+# a partial column is still considered a column
+# A5:A10        ====> A:A
 
 # row:
 # 1:1           ====> 1:1
@@ -295,6 +301,8 @@ sub is_named {
 # [[0, 1]]      ====> 1:1
 # {row => 1}    ====> 1:1
 # [{row => 1}]  ====> 1:1
+# a partial row is still considered a row
+# D1:1          ====> A:A
 
 # partial rows/columns:
 # [[A, 5], [A]]                       ====> A5:A
@@ -309,6 +317,16 @@ sub is_named {
 # [[A,1],[B,2]]                                 ====> A1:B2
 # [{row => 1, col => 1}, {row => 2, col => 2}]  ====> A1:B2
 # [{row => 1, col => A}, {row => 2, col => B}]  ====> A1:B2
+
+# mixing is usually ok:
+# [A1, [2, 2]]                    ====> A1:B2
+# [{row => 1, col => 1}, [2, 2]]  ====> A1:B2
+# [{row => 1, col => 1}, B2]      ====> A1:B2
+
+# bad ranges:
+# should be able to support this but makes range routine
+# too complex, and the simple workaround is to just A1:B2.
+# [A1, B2]
 sub range {
   my $self = shift;
 

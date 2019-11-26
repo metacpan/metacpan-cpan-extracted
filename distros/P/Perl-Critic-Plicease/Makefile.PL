@@ -53,6 +53,7 @@ my %WriteMakefileArgs = (
     "lib/Perl/Critic/Policy/Plicease/ProhibitUnicodeDigitInRegexp.pm" => "\$(INST_LIB)/Perl/Critic/Policy/Plicease/ProhibitUnicodeDigitInRegexp.pm"
   },
   "PREREQ_PM" => {
+    "PPIx::Regexp"         => 0,
     "Perl::Critic::Policy" => 0,
     "Perl::Critic::Utils"  => 0
   },
@@ -61,13 +62,14 @@ my %WriteMakefileArgs = (
     "Test2::V0"                  => "0.000060",
     "Test::Perl::Critic::Policy" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
+  "PPIx::Regexp"               => 0,
   "Perl::Critic::Policy"       => 0,
   "Perl::Critic::TestUtils"    => 0,
   "Perl::Critic::Utils"        => 0,

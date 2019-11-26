@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2019 -- leonerd@leonerd.org.uk
 
 package IO::Async::OS;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 our @ISA = qw( IO::Async::OS::_Base );
 
@@ -27,8 +27,6 @@ use Socket 1.95 qw(
    pack_sockaddr_in6 inet_pton
    pack_sockaddr_un
 );
-
-use IO::Socket (); # empty import
 
 use POSIX qw( sysconf _SC_OPEN_MAX );
 
@@ -55,9 +53,6 @@ use constant HAVE_CONNECT_EWOULDBLOCK => 0;
 # Can we rename() files that are open?
 use constant HAVE_RENAME_OPEN_FILES => 1;
 
-# Do we have IO::Socket::IP available?
-use constant HAVE_IO_SOCKET_IP => defined eval { require IO::Socket::IP };
-
 # Can we reliably watch for POSIX signals, including SIGCHLD to reliably
 # inform us that a fork()ed child has exit()ed?
 use constant HAVE_SIGNALS => 1;
@@ -73,9 +68,6 @@ use constant LOOP_BUILTIN_CLASSES => qw( Poll Select );
 
 # Should there be any other Loop classes we try before the builtin ones?
 use constant LOOP_PREFER_CLASSES => ();
-
-# Do we have Sereal available?
-use constant HAVE_SEREAL => defined eval { require Sereal::Encoder; require Sereal::Decoder; };
 
 =head1 NAME
 
@@ -170,10 +162,16 @@ sub getsocktypebyname
 
 # This one isn't documented because it's not really overridable. It's largely
 # here just for completeness
+my $HAVE_IO_SOCKET_IP;
+
 sub socket
 {
    my $self = shift;
    my ( $family, $socktype, $proto ) = @_;
+
+   require IO::Socket;
+   defined $HAVE_IO_SOCKET_IP or
+      $HAVE_IO_SOCKET_IP = defined eval { require IO::Socket::IP };
 
    croak "Cannot create a new socket without a family" unless $family;
    # PF_UNSPEC and undef are both false
@@ -184,7 +182,7 @@ sub socket
 
    defined $proto or $proto = 0;
 
-   if( HAVE_IO_SOCKET_IP and ( $family == AF_INET || $family == AF_INET6() ) ) {
+   if( $HAVE_IO_SOCKET_IP and ( $family == AF_INET || $family == AF_INET6() ) ) {
       return IO::Socket::IP->new->socket( $family, $socktype, $proto );
    }
 
@@ -229,6 +227,8 @@ sub socketpair
 {
    my $self = shift;
    my ( $family, $socktype, $proto ) = @_;
+
+   require IO::Socket;
 
    # PF_UNSPEC and undef are both false
    $family = $self->getfamilybyname( $family ) || AF_UNIX;
@@ -548,6 +548,34 @@ Used to implement the C<watch_signal> / C<unwatch_signal> Loop pair.
 
 =cut
 
+sub _setup_sigpipe
+{
+   my $self = shift;
+   my ( $loop ) = @_;
+
+   require IO::Async::Handle;
+
+   my ( $reader, $sigpipe ) = $self->pipepair or croak "Cannot pipe() - $!";
+   $_->blocking( 0 ) for $reader, $sigpipe;
+
+   $loop->{os}{sigpipe} = $sigpipe;
+
+   my $sigwatch = $loop->{os}{sigwatch};
+
+   $loop->add( $loop->{os}{sigpipe_reader} = IO::Async::Handle->new(
+      notifier_name => "sigpipe",
+      read_handle => $reader,
+      on_read_ready => sub {
+         sysread $reader, my $buffer, 8192 or return;
+         foreach my $signum ( unpack "I*", $buffer ) {
+            $sigwatch->{$signum}->() if $sigwatch->{$signum};
+         }
+      },
+   ) );
+
+   return $sigpipe;
+}
+
 sub loop_watch_signal
 {
    my $self = shift;
@@ -559,26 +587,7 @@ sub loop_watch_signal
    my $signum = $self->signame2num( $signal );
    my $sigwatch = $loop->{os}{sigwatch} ||= {}; # {$num} = $code
 
-   my $sigpipe;
-   unless( $sigpipe = $loop->{os}{sigpipe} ) {
-      require IO::Async::Handle;
-
-      ( my $reader, $sigpipe ) = $self->pipepair or croak "Cannot pipe() - $!";
-      $_->blocking( 0 ) for $reader, $sigpipe;
-
-      $loop->{os}{sigpipe} = $sigpipe;
-
-      $loop->add( $loop->{os}{sigpipe_reader} = IO::Async::Handle->new(
-         notifier_name => "sigpipe",
-         read_handle => $reader,
-         on_read_ready => sub {
-            sysread $reader, my $buffer, 8192 or return;
-            foreach my $signum ( unpack "I*", $buffer ) {
-               $sigwatch->{$signum}->() if $sigwatch->{$signum};
-            }
-         },
-      ) );
-   }
+   my $sigpipe = $loop->{os}{sigpipe} // $self->_setup_sigpipe( $loop );
 
    my $signum_str = pack "I", $signum;
    $SIG{$signal} = sub { syswrite $sigpipe, $signum_str };
@@ -611,6 +620,26 @@ guess.
 sub potentially_open_fds
 {
    return 0 .. OPEN_MAX_FD;
+}
+
+sub post_fork
+{
+   my $self = shift;
+   my ( $loop ) = @_;
+
+   if( $loop->{os}{sigpipe} ) {
+      $loop->remove( $loop->{os}{sigpipe_reader} );
+      undef $loop->{os}{sigpipe};
+
+      my $sigwatch = $loop->{os}{sigwatch};
+
+      foreach my $signal ( keys %SIG ) {
+         my $signum = $self->signame2num( $signal ) or next;
+         my $code = $sigwatch->{$signum} or next;
+
+         $self->loop_watch_signal( $loop, $signal, $code );
+      }
+   }
 }
 
 =head1 AUTHOR

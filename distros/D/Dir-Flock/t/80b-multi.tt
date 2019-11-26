@@ -47,9 +47,10 @@ if ($z) {
     sleep 10;
     print "end_sleep1: ",time,"\n";
     print "start_unlock2: ",time,"\n";
-    $z = Dir::Flock::unlock($dir);
+    my $z1 = Dir::Flock::unlock($dir);
+    my $z2 = -d $dir;
     print "end_unlock2: ",time,"\n";
-    print "status_unlock2: $z\n";
+    print "status_unlock2: ",$z1||0," ",$z2||0,"\n";
 }
 print "finish: ",time,"\n";
 

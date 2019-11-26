@@ -8,7 +8,7 @@ package IO::Async::Function;
 use strict;
 use warnings;
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 use base qw( IO::Async::Notifier );
 use IO::Async::Timer::Countdown;
@@ -286,6 +286,15 @@ sub start
 
 Stop the worker processes
 
+   $f = $function->stop
+
+I<Since version 0.75.>
+
+If called in non-void context, returns a L<IO::Async::Future> instance that
+will complete once every worker process has stopped and exited. This may be
+useful for waiting until all of the processes are waited on, or other
+edge-cases, but is not otherwise particularly useful.
+
 =cut
 
 sub stop
@@ -293,9 +302,14 @@ sub stop
    my $self = shift;
 
    $self->{stopping} = 1;
+
+   my @f;
+
    foreach my $worker ( $self->_worker_objects ) {
-      $worker->stop;
+      defined wantarray ? push @f, $worker->stop : $worker->stop;
    }
+
+   return Future->needs_all( @f ) if defined wantarray;
 }
 
 =head2 restart
@@ -683,6 +697,9 @@ sub stop
    my $worker = shift;
    $worker->{arg_channel}->close;
 
+   my $ret;
+   $ret = $worker->result_future if defined wantarray;
+
    if( my $function = $worker->parent ) {
       delete $function->{workers}{$worker->id};
 
@@ -693,6 +710,8 @@ sub stop
          $function->remove_child( $worker );
       }
    }
+
+   return $ret;
 }
 
 sub call

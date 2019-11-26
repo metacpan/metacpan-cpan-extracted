@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2017, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-TickerView.
 #
@@ -34,7 +34,7 @@ use Gtk2::Ex::CellLayout::Base 4;  # version 4 for _cellinfo_starts()
 our @ISA;
 push @ISA, 'Gtk2::Ex::CellLayout::Base';
 
-our $VERSION = 15;
+our $VERSION = 16;
 
 # set this to 1 for some diagnostic prints, or 2 for even more prints
 use constant DEBUG => 0;
@@ -109,7 +109,11 @@ use Glib::Object::Subclass
 
                   Glib::ParamSpec->enum
                   ('orientation',
-                   'Orientation', # dgettext('gtk20-properties')
+                   (do { # translation from GtkOrientable
+                     my $str = 'Orientation';
+                     eval { require Locale::Messages;
+                            Locale::Messages::dgettext('gtk20-properties',$str)
+                            } || $str }),
                    'Horizontal or vertical display and scrolling.',
                    'Gtk2::Orientation',
                    'horizontal',
@@ -508,7 +512,7 @@ sub _pixmap_find_want {
 
   # the usual case here is _normalize() finding want_index still within its
   # row width and the previously determined drawn_want_at in drawn_array is
-  # still wholely in a drawn portion of the pixmap
+  # still entirely in a drawn portion of the pixmap
 
   my ($want_x, $want_index)
     = _normalize ($self, $self->{'want_x'}, $self->{'want_index'});
@@ -1744,8 +1748,7 @@ renderer.  For example in C<Gtk2::CellRendererText> Pango recognises
 right-to-left scripts such as Arabic based on the characters and shouldn't
 need any special setups.  (But if you want to rotate 90 degrees for
 something vertical it might be much trickier.  Just setting text "gravity"
-doesn't work.  See F<examples/vertical-rottext.pl> in the TickerView sources
-for one way to do it.)
+doesn't work.  See F<examples/vertical-rottext.pl> for one way to do it.)
 
 Currently only a list style model is expected, meaning only a single level,
 and only that topmost level of the model is drawn.  For example a
@@ -1757,8 +1760,7 @@ ridiculously complicated.  Its power comes when showing a big updating list
 or wanting customized drawing, but the amount of code to get something on
 the screen is not nice.  Have a look at "Tree and List Widget Overview" in
 the Gtk reference manual if you haven't already.  Then F<examples/simple.pl>
-in the TickerView sources is more or less the minimum to actually display
-something.
+is more or less the minimum to actually display something.
 
 =head1 FUNCTIONS
 
@@ -1871,8 +1873,8 @@ desired rows from a very big model.
 TickerView implements the C<Gtk2::Buildable> interface of Gtk 2.12 and up,
 allowing C<Gtk2::Builder> to construct a ticker.  The class name is
 C<Gtk2__Ex__TickerView> and renderers and attributes are added as children
-per C<Gtk2::CellLayout>.  Here's a sample, or see F<examples/builder.pl> in
-the TickerView sources for a complete program,
+per C<Gtk2::CellLayout>.  Here's a sample, or see F<examples/builder.pl> for
+a complete program,
 
     <object class="Gtk2__Ex__TickerView" id="myticker">
       <property name="model">myliststore</property>
@@ -1899,7 +1901,7 @@ noted as "start" or "end", with "starts" drawn from the left and "ends" from
 the right (vice versa in RtoL mode).  In a TickerView the ends immediately
 follow the starts, there's no gap in between, unlike say in a C<Gtk2::HBox>.
 (Which means the "expand" parameter is ignored currently.)  See
-F<examples/order.pl> in the sources for a demonstration.
+F<examples/order.pl> for a demonstration.
 
 When the model has no rows the TickerView's desired height from
 C<size_request> is zero.  This is bad if you want a visible but blank area
@@ -1944,7 +1946,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-tickerview/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+Copyright 2007, 2008, 2009, 2010, 2011, 2017, 2019 Kevin Ryde
 
 Gtk2-Ex-TickerView is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

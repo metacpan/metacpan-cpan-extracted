@@ -1,0 +1,8 @@
+#fsdb mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+0.9995 0 0 0 0.9995 0.9995 0.95 99.95 99.899 0.999496774037648 0.999496975509876 100
+#   | csv_to_db
+#   | dbrow '_Sport > 9300 && _Sport < 9400'
+#   | dbsort Sport
+#   | dbrow _Sport==9384
+#   | dbsort -n RCLoss_norm
+#   | dbcolstats RCLoss_norm

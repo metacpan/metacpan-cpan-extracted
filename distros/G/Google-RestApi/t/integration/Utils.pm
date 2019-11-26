@@ -45,8 +45,8 @@ sub sheets_api {
 }
 
 sub rest_api_config {
-  my $config_file = $ENV{GOOGLE_RESTAPI_LOGIN}
-    or die "No testing config file found: set env var GOOGLE_RESTAPI_LOGIN first";
+  my $config_file = $ENV{GOOGLE_RESTAPI_CONFIG}
+    or die "No testing config file found: set env var GOOGLE_RESTAPI_CONFIG first";
   return $config_file;
 }
 

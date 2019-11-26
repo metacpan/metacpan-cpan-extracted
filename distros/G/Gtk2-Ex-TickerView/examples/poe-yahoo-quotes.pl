@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of Gtk2-Ex-TickerView.
 #
@@ -36,16 +36,16 @@ list of symbols can be given on the command line.
 
 POE means the GUI continues to run and display while downloading.  If you've
 got C<POE::Component::Client::DNS> then the hostname lookup is asynchronous
-too.  But get Client::DNS 1.04 since earlier versions only looked at the
-first name server in F</etc/resolv.conf> instead of going through all like
-the C library etc does.  (Or if your first there is a local name server then
-make sure it forwards somewhere for hostnames it doesn't itself handle.)
+too.  But get Client::DNS 1.04 or higher since previous versions only looked
+at the first name server in F</etc/resolv.conf> instead of going through all
+like the C library etc does.  (Or if the first there is a local name server
+then make sure it forwards somewhere for hostnames it doesn't handle.)
 
 The only tricky bit for POE and Gtk together is to note that some POE things
 can only be done from within a POE "current session".  So the HTTP request
 in refresh_start() can't be initiated directly from the $refresh_button Gtk
 signal handler, instead that signal handler must POE::Kernel->post() a POE
-event which is queued and then back in the main loop is dispatched to
+event which is queued and then from the main loop is dispatched to
 'refresh_start' in $session.  $session->postback creates an anonymous subr
 which does the post() -- it's a convenient way to create that glue when you
 don't need anything else in the Gtk handler.
@@ -55,14 +55,16 @@ click the Refresh button a few times fast then that's what you get.  In a
 real program you might want only one refresh in progress, or some limit on
 them.  If you set $refresh_button to insensitive with
 $refresh_button->set_sensitive(0) then it stops the user clicking again,
-however as of Gtk 2.12 there's a very long standing Gtk bug where if the
-mouse is in the button when you turn it back sensitive again then clicking
-does nothing until the user moves out and back in.  (Botched maintenance of
-the "armed" ready-to-click notion.)
+though as of Gtk 2.12 there's a long standing Gtk bug where if the mouse is
+in the button when you turn it back sensitive again then clicking does
+nothing until the user moves out and back in.  (Botched maintenance of the
+"armed" ready-to-click.)
 
 =head1 SEE ALSO
 
-L<Gtk2::Ex::TickerView>, L<POE>, L<POE::Component::Client::HTTP>,
+L<Gtk2::Ex::TickerView>,
+L<POE>,
+L<POE::Component::Client::HTTP>,
 L<POE::Component::Client::DNS>
 
 =cut
@@ -76,7 +78,7 @@ use Gtk2::Ex::TickerView;
 use POE 'Loop::Glib';
 use URI::Escape;
 
-my @symbols = ('^FTSE', 'GM', 'BHP.AX', 'TSCO.L', 'XAUUSD=X', 'CLZ09.NYM');
+my @symbols = ('^FTSE', 'GM', 'BHP.AX', 'TSCO.L', 'XAUUSD=X', 'CLZ11.NYM');
 if (@ARGV) {
   @symbols = @ARGV;
 }

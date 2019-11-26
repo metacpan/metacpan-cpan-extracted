@@ -1,7 +1,7 @@
 package Pcore::Dist::Build::Docker;
 
 use Pcore -class, -ansi, -res;
-use Pcore::Lib::Scalar qw[is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 
 has dist => ();                                     # InstanceOf ['Pcore::Dist']
 has api  => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::API::Docker::Hub']
@@ -61,10 +61,10 @@ sub init ( $self, $args ) {
     #     exit 3 if !$res->is_success;
     # }
 
-    require Pcore::Lib::File::Tree;
+    require Pcore::Util::File::Tree;
 
     # copy files
-    my $files = Pcore::Lib::File::Tree->new;
+    my $files = Pcore::Util::File::Tree->new;
 
     $files->add_dir( $ENV->{share}->get_location('/Pcore/dist-tmpl') . '/docker/' );
 
@@ -333,17 +333,17 @@ sub build_local ( $self, $tag, $args ) {
     }
 
     # create build tags
-    my $id      = $repo->id;
-    my $repo_id = $dist->docker->{repo_id};
+    my $id       = $repo->id;
+    my $repo_id  = $dist->docker->{repo_id};
+    my $is_dirty = $id->{is_dirty} ? '.dirty' : $EMPTY;
 
     my @tags;
-    my $is_dirty = $id->{is_dirty} ? '.dirty' : $EMPTY;
-    @tags = map {"$repo_id:${_}${is_dirty}"} grep {defined} $id->{branch}, $id->{tags}->@* if defined $tag;
-    push @tags, "$repo_id:$id->{hash_short}${is_dirty}" if !@tags;
 
-    for my $tag (@tags) {
-        say "Tag: $tag";
-    }
+    @tags = map {"$repo_id:${_}${is_dirty}"} grep {defined} $id->{branch}, $id->{tags}->@*;
+
+    @tags = ("$repo_id:$id->{hash_short}${is_dirty}") if $is_dirty || !@tags;
+
+    for my $tag (@tags) { say "Tag: $tag" }
 
     my $dockerignore = $self->_build_dockerignore("$repo->{root}/.dockerignore");
 

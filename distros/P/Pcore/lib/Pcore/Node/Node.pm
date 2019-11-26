@@ -2,7 +2,7 @@ package Pcore::Node::Node;
 
 use Pcore -res;
 use Pcore::Node;
-use Pcore::Lib::Data qw[to_cbor];
+use Pcore::Util::Data qw[to_cbor];
 use if $MSWIN, 'Win32API::File';
 use Symbol;
 
@@ -42,26 +42,22 @@ sub run ( $type, $args ) {
                 };
             }
         },
-        on_rpc => sub ( $self, $req, $tx ) {
+        on_rpc => sub ( $self, $tx ) {
             my $method_name = "API_$tx->{method}";
 
             if ( my $sub = $node->can($method_name) ) {
 
                 # call method
-                eval { $node->$sub( $req, $tx->{args} ? $tx->{args}->@* : () ) };
-
-                $@->sendlog if $@;
+                return $node->$sub( $tx->{args} ? $tx->{args}->@* : () );
             }
             else {
-                $req->( [ 400, q[Method not implemented] ] );
+                return [ 400, q[Method not implemented] ];
             }
-
-            return;
         },
     );
 
     # handshake
-    Coro::async_pool sub {
+    Coro::async sub {
 
         # open control handle
         my $fh = gensym;
@@ -97,16 +93,6 @@ sub run ( $type, $args ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 51                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

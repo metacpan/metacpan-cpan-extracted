@@ -19,7 +19,9 @@
          "inc",
          "examples",
          "meta",
-         "htmlgen"
+         "htmlgen",
+         "t-slow",
+         "t-extra"
       ]
    },
    "prereqs" : {
@@ -56,12 +58,14 @@
             "Capture::Tiny" : "0",
             "Digest" : "0",
             "Getopt::Long" : "0",
+            "Import::Into" : "0",
             "NEXT" : "0",
             "Scalar::Util" : "0",
             "Sub::Util" : "0",
             "Symbol" : "0",
-            "Test::More" : "0",
+            "Test::More" : "0.96",
             "Test::Requires" : "0",
+            "autobox" : "0",
             "base" : "0",
             "overload" : "0",
             "perl" : "5.014002",
@@ -81,6 +85,6 @@
          "web" : "https://github.com/pflanze/functional-perl"
       }
    },
-   "version" : "v0.72.6",
+   "version" : "v0.72.11",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

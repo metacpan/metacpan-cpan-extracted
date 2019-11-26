@@ -3,6 +3,13 @@ Revision history for Perl extension EV
 Changes marked with (libev) are changes in libev, and have more
 documentation in the libev Changes file.
 
+4.30 Fri Nov 22 21:00:00 CET 2019
+	- (libev) use a different and hopefully even more portable
+          test to disable io_uring when header files are too old,
+          by directly testing LINUX_VERSION_CODE.
+        - (libev) fix a bug in the io_uring backend that polled the wrong
+          backend fd, causing it to not work in many cases.
+
 4.29 Fri Nov 22 15:34:29 CET 2019
 	- (libev) add io uring autoconf and non-autoconf detection,
           the latter of which should disable io_uring compilation

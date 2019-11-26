@@ -1,6 +1,15 @@
 Revision history for Perl extension App-Greple-subst
 
+2.02 2019-11-26T14:50:40Z
+
+    - Use App::Greple::Pattern object.
+    - Add --linefold option.
+
 2.01 2019-11-22T01:20:09Z
 
     - Spin-off from App::Greple.
+
+1.01 2019-11-26T02:34:42Z
+
+    - original version
 

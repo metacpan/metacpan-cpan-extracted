@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2010 Kevin Ryde
+# Copyright 2008, 2010, 2013 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -67,8 +67,6 @@ sub WRITE {
 }
 
 package main;
-use strict;
-use warnings;
 use Data::Dumper;
 
 $Data::Dumper::Useqq = 1;

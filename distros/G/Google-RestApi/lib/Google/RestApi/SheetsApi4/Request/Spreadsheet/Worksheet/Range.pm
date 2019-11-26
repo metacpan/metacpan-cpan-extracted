@@ -3,11 +3,12 @@ package Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range;
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use 5.010_000;
 
 use autodie;
+use Scalar::Util qw(looks_like_number);
 use Type::Params qw(compile_named);
 use Types::Standard qw(Str StrMatch Bool ArrayRef HashRef HasMethods);
 use YAML::Any qw(Dump);
@@ -22,48 +23,105 @@ use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet";
 
 do 'Google/RestApi/logger_init.pl';
 
+my %white = ( red => 1, blue => 1, green => 1, alpha => 1 );
+my %black = ( red => 0, blue => 0, green => 0, alpha => 1 );
+
 sub range { die "Pure virtual function 'range' must be overridden"; }
 
-sub _user_entered_format { { cell => { userEnteredFormat => shift }, fields => 'userEnteredFormat.' . shift }; }
+sub left { shift->horizontal_alignment('LEFT'); }
+sub center { shift->horizontal_alignment('CENTER'); }
+sub right { shift->horizontal_alignment('RIGHT'); }
+sub horizontal_alignment { shift->user_entered_format({ horizontalAlignment => shift }); }
 
-sub horizontal_alignment { _user_entered_format({ horizontalAlignment => shift }, 'horizontalAlignment'); }
-sub left { shift->_repeat_cell(horizontal_alignment('LEFT')); }
-sub center { shift->_repeat_cell(horizontal_alignment('CENTER')); }
-sub right { shift->_repeat_cell(horizontal_alignment('RIGHT')); }
+sub top { shift->vertical_alignment('TOP'); }
+sub middle { shift->vertical_alignment('MIDDLE'); }
+sub bottom { shift->vertical_alignment('BOTTOM'); }
+sub vertical_alignment { shift->user_entered_format({ verticalAlignment => shift }); }
 
-sub vertical_alignment { _user_entered_format({ verticalAlignment => shift }, 'verticalAlignment'); }
-sub top { shift->_repeat_cell(vertical_alignment('TOP')); }
-sub middle { shift->_repeat_cell(vertical_alignment('MIDDLE')); }
-sub bottom { shift->_repeat_cell(vertical_alignment('BOTTOM')); }
+sub font_family { shift->text_format({ fontFamily => shift }); }
+sub font_size { shift->text_format({ fontSize => shift }); }
+sub bold { shift->text_format({ bold => bool(shift) }); }
+sub italic { shift->text_format({ italic => bool(shift) }); }
+sub strikethrough { shift->text_format({ strikethrough => bool(shift) }); }
+sub underline { shift->text_format({ underline => bool(shift) }); }
 
-sub _text_format { _user_entered_format({ textFormat => shift }, 'textFormat.' . shift); }
-sub font_family { shift->_repeat_cell(_text_format({ fontFamily => shift }, 'fontFamily')); }
-sub font_size { shift->_repeat_cell(_text_format({ fontSize => shift }, 'fontSize')); }
-sub bold { shift->_repeat_cell(_text_format({ bold => bool(shift) }, 'bold')); }
-sub italic { shift->_repeat_cell(_text_format({ italic => bool(shift) }, 'italic')); }
-sub strikethrough { shift->_repeat_cell(_text_format({ strikethrough => bool(shift) }, 'strikethrough')); }
-sub underline { shift->_repeat_cell(_text_format({ underline => bool(shift) }, 'underline')); }
+sub _rgba { shift->color({ (shift) => (shift // 1) }); }
+sub red { shift->_rgba('red' => shift); }
+sub blue { shift->_rgba('blue' => shift); }
+sub green { shift->_rgba('green' => shift); }
+sub alpha { shift->_rgba('alpha' => shift); }
+sub black { shift->color(\%black); }
+sub white { shift->color(\%white); }
+sub color { shift->text_format({ foregroundColor => shift }); }
 
-sub red { shift->_red_blue_green_alpha('red' => shift); }
-sub blue { shift->_red_blue_green_alpha('blue' => shift); }
-sub green { shift->_red_blue_green_alpha('green' => shift); }
-sub alpha { shift->_red_blue_green_alpha('alpha' => shift); }
-sub _red_blue_green_alpha { shift->color({ (shift) => (shift || 1) }); }
-sub black { shift->color({ red => 0, blue => 0, green => 0 }); }
-sub white { shift->color({ red => 1, blue => 1, green => 1 }); }
-sub color { shift->_repeat_cell(_text_format({ foregroundColor => shift }, 'foregroundColor')); }
+sub _bk_rgba { shift->bk_color({ (shift) => (shift // 1) }); }
+sub bk_red { shift->_bk_rgba('red' => shift); }
+sub bk_blue { shift->_bk_rgba('blue' => shift); }
+sub bk_green { shift->_bk_rgba('green' => shift); }
+sub bk_alpha { shift->_bk_rgba('alpha' => shift); }
+sub bk_black { shift->bk_color(\%black); }
+sub bk_white { shift->bk_color(\%white); }
+sub bk_color { shift->user_entered_format({ backgroundColor => shift }); }
 
-sub _background_color { _user_entered_format({ backgroundColor => shift }, 'backgroundColor'); }
-sub _background_red_blue_green { shift->background_color({ (shift) => (shift || 1) }); }
-sub background_red { shift->_background_red_blue_green('red' => shift); }
-sub background_blue { shift->_background_red_blue_green('blue' => shift); }
-sub background_green { shift->_background_red_blue_green('green' => shift); }
-sub background_black { shift->background_color({ red => 0, blue => 0, green => 0 }); }
-sub background_white { shift->background_color({ red => 1, blue => 1, green => 1 }); }
-sub background_color { shift->_repeat_cell(_background_color(shift)); }
+sub text { shift->number_format('TEXT', @_); }
+sub number { shift->number_format('NUMBER', @_); }
+sub percent { shift->number_format('PERCENT', @_); }
+sub currency { shift->number_format('CURRENCY', @_); }
+sub date { shift->number_format('DATE', @_); }
+sub time { shift->number_format('TIME', @_); }
+sub date_time { shift->number_format('DATE_TIME', @_); }
+sub scientific { shift->number_format('SCIENTIFIC', @_); }
+sub number_format {
+  shift->user_entered_format(
+    {
+      numberFormat => {
+        type => shift,
+        defined $_[0] ? (pattern => shift) : ()
+      }
+    },
+  );
+}
 
-# just dereferences the hash so it doesn't have to be done over and over above.
-sub _repeat_cell { my $self = shift; my $h = shift; $self->repeat_cell(%$h); }
+sub padding { my $s = shift; my %p = @_; $s->user_entered_format({ padding => \%p }); }
+
+sub overflow { shift->wrap_strategy('OVERFLOW_CELL'); }
+sub clip { shift->wrap_strategy('CLIP'); }
+sub wrap { shift->wrap_strategy('WRAP'); }
+sub wrap_strategy { shift->user_entered_format({ wrapStrategy => shift }); }
+
+sub left_to_right { shift->text_direction('LEFT_TO_RIGHT'); }
+sub right_to_left { shift->text_direction('RIGHT_TO_LEFT'); }
+sub text_direction { shift->user_entered_format({ textDirection => shift }); }
+
+sub rotate { shift->text_rotation({ angle => shift }); }
+sub vertical { shift->text_rotation({ vertical => bool(shift) }); }
+sub text_rotation { shift->user_entered_format({ textRotation => shift }); }
+
+sub hyper_linked { shift->user_entered_format({ hyperlinkDisplayType => 'LINKED' }); }
+sub hyper_plain { shift->user_entered_format({ hyperlinkDisplayType => 'PLAIN_TEXT' }); }
+
+sub text_format {
+  my $self = shift;
+  my ($format, $fields) = @_;
+  ($fields) = each %$format if !defined $fields;
+  $self->user_entered_format(
+     { textFormat => $format },
+    'textFormat.' . $fields,
+  );
+}
+
+sub user_entered_format {
+  my $self = shift;
+  my ($format, $fields) = @_;
+  ($fields) = each %$format if !defined $fields;
+  $self->repeat_cell(
+    cell => {
+      userEnteredFormat => $format,
+    },
+    fields => 'userEnteredFormat.' . $fields,
+  );
+  return $self;
+}
 
 sub repeat_cell {
   my $self = shift;
@@ -90,7 +148,112 @@ sub repeat_cell {
 
 sub heading {
   my $self = shift;
-  $self->center()->bold()->white()->background_black()->font_size(12);
+  $self->center()->bold()->white()->bk_black()->font_size(12);
+  return $self;
+}
+
+sub _bd { shift->borders(properties => shift, border => (shift||'')); };
+sub bd_red { shift->_bd_rbga('red' => shift, @_); }
+sub bd_blue { shift->_bd_rbga('blue' => shift, @_); }
+sub bd_green { shift->_bd_rbga('green' => shift, @_); }
+sub bd_alpha { shift->_bd_rbga('alpha' => shift, @_); }
+sub bd_black { shift->bd_color(\%black, @_); }
+sub bd_white { shift->bd_color(\%white, @_); }
+sub bd_color { shift->_bd({ color => shift }, @_); }
+
+sub bd_dotted { shift->bd_style('DOTTED', @_); }
+sub bd_dashed { shift->bd_style('DASHED', @_); }
+sub bd_solid { shift->bd_style('SOLID', @_); }
+sub bd_medium { shift->bd_style('SOLID_MEDIUM', @_); }
+sub bd_thick { shift->bd_style('SOLID_THICK', @_); }
+sub bd_double { shift->bd_style('DOUBLE', @_); }
+sub bd_none { shift->bd_style('NONE', @_); }
+sub bd_style { shift->_bd({ style => shift }, @_); }
+
+# allows:
+#   bd_red()  turns it all on
+#   bd_red(0)  turns it all off
+#   bd_red(0.3, 'top')
+#   bd_red(0.3)
+#   bd_red('top')
+sub _bd_rbga {
+  my $self = shift;
+  my $color = shift;
+  my $value;
+  $value = shift if looks_like_number($_[0]);
+  $value //= 1;
+  return $self->bd_color({ $color => $value }, @_);
+}
+
+# borders can be set for a range or each individual cell
+# in a range. bd_repeat_cell is turned on to redirect
+# border calls to repeat_cell above.
+sub bd_repeat_cell {
+  my $self = shift;
+  $self->{bd_repeat_cell} = shift;
+  $self->{bd_repeat_cell} //= 1; # bd_repeat_cell() turns it on, bd_repeat_cell(0) turns it off.
+  delete $self->{bd_repeat_cell} if !$self->{bd_repeat_cell};
+  return $self;
+}
+
+sub borders {
+  my $self = shift;
+
+  # allow an array of borders to be passed, recurse with each one.
+  my %p = @_;
+  if ($p{border} && ref($p{border}) eq 'ARRAY') {
+    $self->borders(border => $_, properties => $p{properties})
+      foreach (@{ $p{border} });
+    return $self;
+  }
+
+  state $check = compile_named(
+    border     =>
+      StrMatch[qr/^(top|bottom|left|right|around|vertical|horizontal|inner|all|)$/],
+      { default => 'around' },
+    properties => HashRef,
+  );
+  my $p = $check->(@_);
+  $p->{border} ||= 'around';
+
+  # recurse with border groups.
+  my %groups = (
+    around => [qw(top bottom left right)],
+    inner  => [qw(vertical horizontal)],
+    all    => [qw(around inner)],
+  );
+  my $group = $groups{ $p->{border} };
+  if ($group) {
+    $self->borders(border => $_, properties => $p->{properties})
+      foreach (@$group);
+    return $self;
+  }
+
+  # now we finally get to the guts of the borders.
+  # if these borders are to be part of repeatCell request, redirect
+  # the borders to it.
+  if ($self->{bd_repeat_cell}) {
+    die "Cannot use vertical|horizontal|inner when bd_repeat_cell is turned on"
+      if $p->{border} =~ /^(vertical|horizontal|inner)$/;
+    return $self->user_entered_format(
+      {
+        borders => {
+          $p->{border} => $p->{properties},
+        }
+      },
+    );
+  }
+
+  # change vertical to innerVertical. horizontal same same.
+  $p->{border} =~ s/^(vertical|horizontal)$/"'inner' . '" . ucfirst($1) . "'"/ee;
+
+  $self->batch_requests(
+    updateBorders => {
+      range        => $self->range_to_index(),
+      $p->{border} => $p->{properties},
+    }
+  );
+
   return $self;
 }
 

@@ -2,7 +2,7 @@ package Pcore::API::AntiCaptcha::Captcha;
 
 use Pcore -class, -res;
 
-with qw[Pcore::Lib::Result::Role];
+with qw[Pcore::Util::Result::Role];
 
 has api    => ( required => 1 );
 has params => ( required => 1 );    # initial captcha params

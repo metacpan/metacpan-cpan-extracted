@@ -1,4 +1,4 @@
-use 5.006;
+use 5.018;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM       => 'lib/Git/Diff.pm',
     ABSTRACT_FROM      => 'lib/Git/Diff.pm',
     LICENSE            => 'artistic_2',
-    MIN_PERL_VERSION   => '5.006',
+    MIN_PERL_VERSION   => '5.018',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

@@ -27,11 +27,11 @@ requires:
   File::HomeDir: '0'
   File::Spec::Functions: '0'
   List::Util: '0'
-  Term::Choose: '1.700'
+  Term::Choose: '1.706'
   perl: '5.008003'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Choose-Util
-version: '0.106'
+version: '0.107'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

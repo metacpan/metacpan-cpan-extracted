@@ -42,8 +42,8 @@ WriteMakefile(
         'Exporter'                => 0,
         'List::Util'              => 0,
         'Scalar::Util'            => 0,
-        'Term::Choose'            => '1.703',
-        'Term::Choose::Util'      => '0.102',
+        'Term::Choose'            => '1.707',
+        'Term::Choose::Util'      => '0.107',
         %prereqs_os_specific,
     },
     dist  => {

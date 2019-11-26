@@ -3,13 +3,13 @@
 package main v0.1.0;
 
 use Pcore;
-use Pcore::Lib::CA;
-use Pcore::Lib::Host;
+use Pcore::Util::CA;
+use Pcore::Util::Host;
 
-Pcore::Lib::CA::update()     or exit 3;
-Pcore::Lib::Host->update_all or exit 3;
-P->mime->update              or exit 3;
-P->result->update            or exit 3;
+Pcore::Util::CA::update()     or exit 3;
+Pcore::Util::Host->update_all or exit 3;
+P->mime->update               or exit 3;
+P->result->update             or exit 3;
 
 1;
 __END__

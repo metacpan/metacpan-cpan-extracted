@@ -45,6 +45,6 @@
          "web" : "https://github.com/pmqs/Compress-Raw-Lzma"
       }
    },
-   "version" : "2.090",
+   "version" : "2.091",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

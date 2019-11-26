@@ -1,7 +1,6 @@
 package Pcore::API::GitHub;
 
 use Pcore -class, -res;
-use Pcore::Lib::Scalar qw[is_plain_coderef];
 
 has username => ( required => 1 );
 has token    => ( required => 1 );
@@ -85,7 +84,7 @@ sub delete_repo ( $self, $repo_id ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    1 | 43                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 42                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

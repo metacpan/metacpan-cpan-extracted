@@ -1,10 +1,13 @@
 package Pcore::App::Router;
 
 use Pcore -class;
+use Pcore::App::Router::Request;
 
 use overload    #
-  q[&{}] => sub ( $self, @ ) {
-    return sub { return $self->run(@_) };
+  '&{}' => sub ( $self, @ ) {
+    return sub {
+        return $self->run(@_);
+    };
   },
   fallback => undef;
 
@@ -120,6 +123,10 @@ sub _get_host_map ( $self, $host, $ns ) {
 }
 
 sub run ( $self, $req ) {
+
+    # rebless request
+    $req = bless $req, 'Pcore::App::Router::Request';
+
     my $env = $req->{env};
 
     my $map = $self->{map};
@@ -135,9 +142,7 @@ sub run ( $self, $req ) {
 
         # unknown HTTP host
         else {
-            $req->return_xxx(421);    # 421 - misdirected request
-
-            return;
+            return 421;    # 421 - misdirected request
         }
     }
 
@@ -187,9 +192,7 @@ sub run ( $self, $req ) {
 
     my $ctrl = $self->{class_ctrl}->{$class};
 
-    Coro::async_pool { $ctrl->run($req) };
-
-    return;
+    return $ctrl->run($req);
 }
 
 sub get_host_api_path ( $self, $host ) {

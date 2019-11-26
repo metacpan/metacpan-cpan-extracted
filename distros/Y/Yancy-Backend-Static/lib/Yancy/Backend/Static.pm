@@ -1,5 +1,5 @@
 package Yancy::Backend::Static;
-our $VERSION = '0.010';
+our $VERSION = '0.012';
 # ABSTRACT: Build a Yancy site from static Markdown files
 
 #pod =head1 SYNOPSIS
@@ -153,6 +153,19 @@ our $VERSION = '0.010';
 #pod C<$item> hash reference (C<< $item->{author} >>).  See
 #pod L<Yancy::Help::Config> for more information about configuring a schema.
 #pod
+#pod =head2 Character Encoding
+#pod
+#pod By default, this backend detects the locale of your current environment
+#pod and assumes the files you read and write should be in that encoding. If
+#pod this is incorrect (if, for example, you always want to read/write UTF-8
+#pod files), add a C<?encoding=...> to the backend string:
+#pod
+#pod     use Mojolicious::Lite;
+#pod     plugin Yancy => {
+#pod         backend => 'static:.?encoding=UTF-8',
+#pod         read_schema => 1,
+#pod     };
+#pod
 #pod =head1 SEE ALSO
 #pod
 #pod L<Yancy>, L<Statocles>
@@ -165,16 +178,25 @@ use Text::Markdown;
 use YAML ();
 use JSON::PP ();
 use Yancy::Util qw( match order_by );
-use Encode;
+
+# Can't use open ':locale' because it caches the current locale (so it
+# won't work in tests unless we create a new process with the changed
+# locale...)
+use I18N::Langinfo qw( langinfo CODESET );
+use Encode qw( encode decode );
 
 has schema =>;
 has path =>;
 has markdown_parser => sub { Text::Markdown->new };
+has encoding => sub { langinfo( CODESET ) };
 
 sub new {
     my ( $class, $backend, $schema ) = @_;
     my ( undef, $path ) = split /:/, $backend, 2;
+    $path =~ s/^([^?]+)\?(.+)$/$1/;
+    my %attrs = map { split /=/ } split /\&/, $2 // '';
     return $class->SUPER::new( {
+        %attrs,
         path => Mojo::File->new( $path ),
         schema => $schema,
     } );
@@ -184,12 +206,7 @@ sub create {
     my ( $self, $schema, $params ) = @_;
 
     my $path = $self->path->child( $self->_id_to_path( $params->{path} ) );
-    my $content = $self->_deparse_content( $params );
-    if ( !-d $path->dirname ) {
-        $path->dirname->make_path;
-    }
-    $path->spurt( $content );
-
+    $self->_write_file( $path, $params );
     return $params->{path};
 }
 
@@ -211,7 +228,7 @@ sub get {
     #; say "Getting path $id: $path";
     return undef unless -f $path;
 
-    my $item = eval { $self->_parse_content( $path->slurp ) };
+    my $item = eval { $self->_read_file( $path ) };
     if ( $@ ) {
         warn sprintf 'Could not load file %s: %s', $path, $@;
         return undef;
@@ -229,7 +246,7 @@ sub list {
     my $total = 0;
     PATH: for my $path ( sort $self->path->list_tree->each ) {
         next unless $path =~ /[.](?:markdown|md)$/;
-        my $item = eval { $self->_parse_content( $path->slurp ) };
+        my $item = eval { $self->_read_file( $path ) };
         if ( $@ ) {
             warn sprintf 'Could not load file %s: %s', $path, $@;
             next;
@@ -261,7 +278,7 @@ sub set {
     # Load the current file to turn a partial set into a complete
     # set
     my %item = (
-        -f $path ? %{ $self->_parse_content( $path->slurp ) } : (),
+        -f $path ? %{ $self->_read_file( $path ) } : (),
         %$params,
     );
 
@@ -272,12 +289,7 @@ sub set {
       }
       $path = $new_path;
     }
-    if ( !-d $path->dirname ) {
-        $path->dirname->make_path;
-    }
-    my $content = $self->_deparse_content( \%item );
-    #; say "Set to $path:\n$content";
-    $path->spurt( $content );
+    $self->_write_file( $path, \%item );
     return 1;
 }
 
@@ -342,6 +354,25 @@ sub _path_to_id {
     return join '/', grep !!$_, $dir, $path->basename( '.markdown' );
 }
 
+sub _read_file {
+    my ( $self, $path ) = @_;
+    open my $fh, '<', $path or die "Could not open $path for reading: $!";
+    local $/;
+    return $self->_parse_content( decode( $self->encoding, scalar <$fh>, Encode::FB_CROAK ) );
+}
+
+sub _write_file {
+    my ( $self, $path, $item ) = @_;
+    if ( !-d $path->dirname ) {
+        $path->dirname->make_path;
+    }
+    #; say "Writing to $path:\n$content";
+    open my $fh, '>', $path
+        or die "Could not open $path for overwriting: $!";
+    print $fh encode( $self->encoding, $self->_deparse_content( $item ), Encode::FB_CROAK );
+    return;
+}
+
 #=sub _parse_content
 #
 #   my $item = $backend->_parse_content( $path->slurp );
@@ -355,7 +386,7 @@ sub _parse_content {
     my ( $self, $content ) = @_;
     my %item;
 
-    my @lines = split /\n/, decode_utf8 $content;
+    my @lines = split /\n/, $content;
     # YAML frontmatter
     if ( @lines && $lines[0] =~ /^---/ ) {
 
@@ -441,7 +472,7 @@ Yancy::Backend::Static - Build a Yancy site from static Markdown files
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -593,6 +624,19 @@ your schema, like so:
 These additional fields can be used in your template through the
 C<$item> hash reference (C<< $item->{author} >>).  See
 L<Yancy::Help::Config> for more information about configuring a schema.
+
+=head2 Character Encoding
+
+By default, this backend detects the locale of your current environment
+and assumes the files you read and write should be in that encoding. If
+this is incorrect (if, for example, you always want to read/write UTF-8
+files), add a C<?encoding=...> to the backend string:
+
+    use Mojolicious::Lite;
+    plugin Yancy => {
+        backend => 'static:.?encoding=UTF-8',
+        read_schema => 1,
+    };
 
 =head1 SEE ALSO
 

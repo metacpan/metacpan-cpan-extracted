@@ -7,9 +7,7 @@ has host => ( required => 1 );    # HTTP controller host
 has path => ( required => 1 );    # HTTP controller url path, always finished with "/"
 
 sub run ( $self, $req ) {
-    $req->(404)->finish;
-
-    return;
+    return 404;
 }
 
 sub get_abs_path ( $self, $path ) {

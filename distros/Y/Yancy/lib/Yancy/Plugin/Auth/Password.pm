@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Password;
-our $VERSION = '1.041';
+our $VERSION = '1.042';
 # ABSTRACT: A simple password-based auth
 
 #pod =encoding utf8
@@ -11,8 +11,8 @@ our $VERSION = '1.041';
 #pod         backend => 'sqlite://myapp.db',
 #pod         schema => {
 #pod             users => {
+#pod                 'x-id-field' => 'username',
 #pod                 properties => {
-#pod                     id => { type => 'integer', readOnly => 1 },
 #pod                     username => { type => 'string' },
 #pod                     password => { type => 'string', format => 'password' },
 #pod                 },
@@ -35,6 +35,27 @@ our $VERSION = '1.041';
 #pod
 #pod This plugin provides a basic password-based authentication scheme for
 #pod a site.
+#pod
+#pod This module composes the L<Yancy::Auth::Plugin::Role::RequireUser> role
+#pod to provide the
+#pod L<require_user|Yancy::Auth::Plugin::Role::RequireUser/require_user>
+#pod authorization method.
+#pod
+#pod =head2 Adding Users
+#pod
+#pod To add the initial user (or any user), use the L<C<mojo eval>
+#pod command|Mojolicious::Command::eval>:
+#pod
+#pod     ./myapp.pl eval 'yancy->create( users => { username => "dbell", password => "123qwe" } )'
+#pod
+#pod This plugin adds the L</auth.digest> filter to the C<password> field, so
+#pod the password passed to C<< yancy->create >> will be properly hashed in
+#pod the database.
+#pod
+#pod You can use this same technique to edit users from the command-line if
+#pod someone gets locked out:
+#pod
+#pod     ./myapp.pl eval 'yancy->update( users => "dbell", { password => "123qwe" } )'
 #pod
 #pod =head2 Migrate from Auth::Basic
 #pod
@@ -180,11 +201,16 @@ our $VERSION = '1.041';
 #pod
 #pod =head2 yancy.auth.current_user
 #pod
-#pod Get the current user from the session, if any. Returns C<undef> if no user
-#pod was found in the session.
+#pod Get the current user from the session, if any. Returns C<undef> if no
+#pod user was found in the session.
 #pod
 #pod     my $user = $c->yancy->auth->current_user
 #pod         || return $c->render( status => 401, text => 'Unauthorized' );
+#pod
+#pod =head2 yancy.auth.require_user
+#pod
+#pod Validate there is a logged-in user and optionally that the user data has
+#pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 #pod
 #pod =head1 ROUTES
 #pod
@@ -240,6 +266,8 @@ our $VERSION = '1.041';
 #pod =cut
 
 use Mojo::Base 'Mojolicious::Plugin';
+use Role::Tiny::With;
+with 'Yancy::Plugin::Auth::Role::RequireUser';
 use Yancy::Util qw( currym derp );
 use Digest;
 
@@ -264,9 +292,6 @@ sub register {
     $self->init( $app, $config );
     $app->helper(
         'yancy.auth.current_user' => currym( $self, 'current_user' ),
-    );
-    $app->helper(
-        'yancy.auth.require_user' => currym( $self, 'require_user' ),
     );
 }
 
@@ -570,25 +595,6 @@ sub _get_logout {
     return $c->redirect_to( 'yancy.auth.password.login_form' );
 }
 
-sub require_user {
-    my ( $self, $c ) = @_;
-    return sub {
-        my ( $c ) = @_;
-        #; say "Are you authorized? " . $c->yancy->auth->current_user;
-        $c->yancy->auth->current_user && return 1;
-        $c->stash(
-            template => 'yancy/auth/unauthorized',
-            status => 401,
-            login_route => $self->route->render,
-        );
-        $c->respond_to(
-            json => {},
-            html => {},
-        );
-        return undef;
-    };
-}
-
 1;
 
 __END__
@@ -601,7 +607,7 @@ Yancy::Plugin::Auth::Password - A simple password-based auth
 
 =head1 VERSION
 
-version 1.041
+version 1.042
 
 =head1 SYNOPSIS
 
@@ -610,8 +616,8 @@ version 1.041
         backend => 'sqlite://myapp.db',
         schema => {
             users => {
+                'x-id-field' => 'username',
                 properties => {
-                    id => { type => 'integer', readOnly => 1 },
                     username => { type => 'string' },
                     password => { type => 'string', format => 'password' },
                 },
@@ -634,6 +640,27 @@ Yancy v2.000 is released.
 
 This plugin provides a basic password-based authentication scheme for
 a site.
+
+This module composes the L<Yancy::Auth::Plugin::Role::RequireUser> role
+to provide the
+L<require_user|Yancy::Auth::Plugin::Role::RequireUser/require_user>
+authorization method.
+
+=head2 Adding Users
+
+To add the initial user (or any user), use the L<C<mojo eval>
+command|Mojolicious::Command::eval>:
+
+    ./myapp.pl eval 'yancy->create( users => { username => "dbell", password => "123qwe" } )'
+
+This plugin adds the L</auth.digest> filter to the C<password> field, so
+the password passed to C<< yancy->create >> will be properly hashed in
+the database.
+
+You can use this same technique to edit users from the command-line if
+someone gets locked out:
+
+    ./myapp.pl eval 'yancy->update( users => "dbell", { password => "123qwe" } )'
 
 =head2 Migrate from Auth::Basic
 
@@ -781,11 +808,16 @@ This plugin has the following helpers.
 
 =head2 yancy.auth.current_user
 
-Get the current user from the session, if any. Returns C<undef> if no user
-was found in the session.
+Get the current user from the session, if any. Returns C<undef> if no
+user was found in the session.
 
     my $user = $c->yancy->auth->current_user
         || return $c->render( status => 401, text => 'Unauthorized' );
+
+=head2 yancy.auth.require_user
+
+Validate there is a logged-in user and optionally that the user data has
+certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 
 =head1 ROUTES
 

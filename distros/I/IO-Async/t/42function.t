@@ -66,6 +66,10 @@ testing_loop( $loop );
    is( $function->workers_busy, 0, '$function has 0 workers busy after call returns' );
    is( $function->workers_idle, 1, '$function has 1 workers idle after call returns' );
 
+   # ->stop future
+   wait_for_future my $stop_f = $function->stop;
+   ok( !$stop_f->failure, '$stop_f succeeds' );
+
    $loop->remove( $function );
 }
 

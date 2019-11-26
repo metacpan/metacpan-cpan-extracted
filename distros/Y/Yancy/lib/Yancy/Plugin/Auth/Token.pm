@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Token;
-our $VERSION = '1.041';
+our $VERSION = '1.042';
 # ABSTRACT: A simple token-based auth
 
 #pod =head1 SYNOPSIS
@@ -87,11 +87,16 @@ our $VERSION = '1.041';
 #pod
 #pod =head2 yancy.auth.current_user
 #pod
-#pod Get the current user from the token, if any. Returns C<undef> if no token
-#pod was passed or the token was not found in the database.
+#pod Get the current user from the session, if any. Returns C<undef> if no
+#pod user was found in the session.
 #pod
 #pod     my $user = $c->yancy->auth->current_user
 #pod         || return $c->render( status => 401, text => 'Unauthorized' );
+#pod
+#pod =head2 yancy.auth.require_user
+#pod
+#pod Validate there is a logged-in user and optionally that the user data has
+#pod certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 #pod
 #pod =head2 yancy.auth.add_token
 #pod
@@ -233,11 +238,37 @@ sub add_token {
     return $token;
 }
 
+#pod =method require_user
+#pod
+#pod     my $subref = $c->yancy->auth->require_user( \%match );
+#pod
+#pod Build a callback to validate there is a logged-in user, and optionally
+#pod that the current user has certain fields set. C<\%match> is optional and
+#pod is a L<SQL::Abstract where clause|SQL::Abstract/WHERE CLAUSES> matched
+#pod with L<Yancy::Util/match>.
+#pod
+#pod     # Ensure the user is logged-in
+#pod     my $user_cb = $app->yancy->auth->require_user;
+#pod     my $user_only = $app->routes->under( $user_cb );
+#pod
+#pod     # Ensure the user's "is_admin" field is set to 1
+#pod     my $admin_cb = $app->yancy->auth->require_user( { is_admin => 1 } );
+#pod     my $admin_only = $app->routes->under( $admin_cb );
+#pod
+#pod =cut
+
 sub require_user {
-    my ( $self, $c ) = @_;
+    my ( $self, $c, $where ) = @_;
     return sub {
         my ( $c ) = @_;
-        $c->yancy->auth->current_user && return 1;
+        #; say "Are you authorized? " . $c->yancy->auth->current_user;
+        my $user = $c->yancy->auth->current_user;
+        if ( !$where && $user ) {
+            return 1;
+        }
+        if ( $where && match( $where, $user ) ) {
+            return 1;
+        }
         $c->stash(
             template => 'yancy/auth/unauthorized',
             status => 401,
@@ -262,7 +293,7 @@ Yancy::Plugin::Auth::Token - A simple token-based auth
 
 =head1 VERSION
 
-version 1.041
+version 1.042
 
 =head1 SYNOPSIS
 
@@ -297,6 +328,25 @@ This plugin provides a basic token-based authentication scheme for
 a site. Tokens are provided in the HTTP C<Authorization> header:
 
     Authorization: Token 
+
+=head1 METHODS
+
+=head2 require_user
+
+    my $subref = $c->yancy->auth->require_user( \%match );
+
+Build a callback to validate there is a logged-in user, and optionally
+that the current user has certain fields set. C<\%match> is optional and
+is a L<SQL::Abstract where clause|SQL::Abstract/WHERE CLAUSES> matched
+with L<Yancy::Util/match>.
+
+    # Ensure the user is logged-in
+    my $user_cb = $app->yancy->auth->require_user;
+    my $user_only = $app->routes->under( $user_cb );
+
+    # Ensure the user's "is_admin" field is set to 1
+    my $admin_cb = $app->yancy->auth->require_user( { is_admin => 1 } );
+    my $admin_only = $app->routes->under( $admin_cb );
 
 =head1 CONFIGURATION
 
@@ -349,11 +399,16 @@ This plugin has the following helpers.
 
 =head2 yancy.auth.current_user
 
-Get the current user from the token, if any. Returns C<undef> if no token
-was passed or the token was not found in the database.
+Get the current user from the session, if any. Returns C<undef> if no
+user was found in the session.
 
     my $user = $c->yancy->auth->current_user
         || return $c->render( status => 401, text => 'Unauthorized' );
+
+=head2 yancy.auth.require_user
+
+Validate there is a logged-in user and optionally that the user data has
+certain values. See L<Yancy::Plugin::Auth::Role::RequireUser/require_user>.
 
 =head2 yancy.auth.add_token
 

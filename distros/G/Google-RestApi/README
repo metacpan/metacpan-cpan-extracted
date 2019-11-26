@@ -17,6 +17,10 @@ to POD, debug messages, comments etc.
 0.3 Added an attrs cache, removed testing dependency for
 Spreadsheets::Perl, fixed and added more tests.
 
+0.4 Breaking change to allow for multiple authorization
+mechanisms, added support for Google Service Accounts
+as a mechanism. Cleaned up request range class and added
+more formatting options. Minor bug fixes.
 
 INSTALLATION
 
@@ -54,6 +58,7 @@ This module requires these other modules and libraries:
   Types::Standard
   URI 
   URI::QueryParam 
+  WWW::Google::Cloud::Auth::ServiceAccount
   YAML::Any
   Test::Class::Load
   Test::MockObject::Extends

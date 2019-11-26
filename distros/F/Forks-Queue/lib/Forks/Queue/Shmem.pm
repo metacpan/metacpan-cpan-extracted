@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our $DEV_SHM = "/dev/shm";
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
@@ -32,8 +32,6 @@ sub new {
     $opts{style} //= 'fifo';
     my $list = delete $opts{list};
 
-    my $fh;
-
     $opts{_header_size} //= 2048;
     $opts{_end} = 0;            # whether "end" has been called for this obj
     $opts{_pos} = 0;		# "cursor", index of next item to shift out
@@ -48,44 +46,44 @@ sub new {
     # sizes small and large values to improve performance
     $opts{_maintenance_freq} //= 32;
 
-    open $fh, '>>', $opts{lock}
+    open my $fh5, '>>', $opts{lock}
         or die "Forks::Queue::Shmem: ",
                "failed to create lock file '$opts{lock}': $!";
-    close $fh or die;
+    close $fh5 or die;
 
     my $self = bless { %opts }, $class;
 
     if ($opts{join} && -f $opts{file}) {
         $DB::single = 1;
-        open $fh, '+<', $opts{file} or die;
-        $self->{_fh} = *$fh;
-        my $fhx = select $fh; $| = 1; select $fhx;
+        open my $fh6, '+<', $opts{file} or die;
+        $self->{_fh} = *$fh6;
+        my $fhx = select $fh6; $| = 1; select $fhx;
         Forks::Queue::File::_SYNC { $self->_read_header } $self;
     } else {
         if (-f $opts{file}) {
             carp "Forks::Queue: Queue file $opts{file} already exists. ",
                  "Expect trouble if another process created this file.";
         }
-        open $fh, '>>', $opts{file} or croak(
+        open my $fh8, '>>', $opts{file} or croak(
             "Forks::Queue: could not create queue file $opts{file}: $!");
-        close $fh or croak(
+        close $fh8 or croak(
             "Forks::Queue: bizarre error closing queue file $opts{file} $!");
 
-        open $fh, '+<', $opts{file} or croak(
+        open my $fh7, '+<', $opts{file} or croak(
             "Forks::Queue: error re-opening queue file $opts{file} $!");
 
-        my $fx = select $fh;
+        my $fx = select $fh7;
         $| = 1;
         select $fx;
 
-        $self->{_fh} = *$fh;
-        seek $fh, 0, 0;
+        $self->{_fh} = *$fh7;
+        seek $fh7, 0, 0;
 
         $self->{_locked}++;
         $self->_write_header;
         $self->{_locked}--;
-        if (tell($fh) < $self->{_header_size}) {
-            print $fh "\0" x ($self->{_header_size} - tell($fh));
+        if (tell($fh7) < $self->{_header_size}) {
+            print $fh7 "\0" x ($self->{_header_size} - tell($fh7));
         }
     }
     if (defined($list)) {
@@ -124,7 +122,7 @@ Forks::Queue::Shmem - Forks::Queue implementation using shared memory
 
 =head1 VERSION
 
-0.13
+0.14
 
 =head1 DESCRIPTION
 

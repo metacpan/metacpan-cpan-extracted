@@ -44,6 +44,12 @@ Usage:
   epfl-service-open
 ```
 
+You can choose your favorite browser with:
+
+```bash
+export BROWSER=brave
+```
+
 ### Module
 
 ```perl

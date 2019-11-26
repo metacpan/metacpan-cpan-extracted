@@ -10,6 +10,7 @@ do { my $x = {
                       },
        'runtime' => {
                       'requires' => {
+                                      'Class::Method::Modifiers' => '0',
                                       'Digest' => '0',
                                       'Exporter' => '0',
                                       'File::Spec::Functions' => '0',

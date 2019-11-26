@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.107   2019-11-24
+        - choose_a_file: new option 'filter'.
+
 0.106   2019-11-17
         - Bugfix in 'choose_a_number'.
         - Added internal option 'busy_string'.

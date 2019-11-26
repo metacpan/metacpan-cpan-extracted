@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2017 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -22,7 +22,7 @@ use warnings;
 use PerlIO::via::EscStatus;
 use PerlIO::via::EscStatus::Parser;
 
-our $VERSION = 11;
+our $VERSION = 12;
 
 use constant DEBUG => 0;
 
@@ -70,8 +70,7 @@ the first place.  You can decide whether it's easier to check a mode flag at
 the print, or push a layer to strip what's printed.  A layer may be easier
 for suppressing prints from a library or independent parts of a program.
 
-See F<examples/shownone.pl> in the PerlIO-via-EscStatus sources for a
-complete program using ShowNone.
+See F<examples/shownone.pl> for a complete program using ShowNone.
 
 =head1 SEE ALSO
 
@@ -83,7 +82,7 @@ L<http://user42.tuxfamily.org/perlio-via-escstatus/index.html>
 
 =head1 LICENSE
 
-Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012, 2017 Kevin Ryde
 
 PerlIO-via-EscStatus is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

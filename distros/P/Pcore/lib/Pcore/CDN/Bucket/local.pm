@@ -1,15 +1,15 @@
 package Pcore::CDN::Bucket::local;
 
 use Pcore -class, -res;
-use Pcore::Lib::Scalar qw[is_plain_scalarref is_plain_arrayref is_plain_coderef];
+use Pcore::Util::Scalar qw[is_plain_scalarref is_plain_arrayref];
 
 with qw[Pcore::CDN::Bucket];
 
 has prefix => ('/cdn');
 
-has locations       => ( init_arg => undef );    # ArrayRef
-has upload_location => ( init_arg => undef );
-has is_local => ( 1, init_arg => undef );
+has locations       => ( init_arg    => undef );    # ArrayRef
+has upload_location => ( init_arg    => undef );
+has is_local        => ( 1, init_arg => undef );
 
 sub BUILD ( $self, $args ) {
 
@@ -78,26 +78,15 @@ TMPL
 }
 
 # TODO check path
-sub upload ( $self, $path, $data, @args ) {
-    my $cb = is_plain_coderef $_[-1] ? pop @args : ();
-
+sub upload ( $self, $path, $data, @ ) {
     die q[Can't upload to bucket] if !$self->{can_upload};
-
-    state $on_finish = sub ( $cb, $res ) {
-        if ($cb) {
-            return $cb->($res);
-        }
-        else {
-            return $res;
-        }
-    };
 
     $path = P->path("$self->{upload_location}/$path");
 
     # TODO check, that path is child
-    # return $on_finish->( $cb, res 404 );
+    # return res 404;
 
-    P->file->mkpath( $path->{dirname}, mode => 'rwxr-xr-x' ) || return $on_finish->( $cb, res [ 500, qq[Can't create CDN path "$path", $!] ] ) if !-d $path->{dirname};
+    P->file->mkpath( $path->{dirname}, mode => 'rwxr-xr-x' ) || return res [ 500, qq[Can't create CDN path "$path", $!] ] if !-d $path->{dirname};
 
     if ( is_plain_scalarref $data) {
         P->file->write_bin( $path, { mode => 'rw-r--r--' }, $data );    # TODO or return res [ 500, qq[Can't write "$path", $!] ];
@@ -106,7 +95,7 @@ sub upload ( $self, $path, $data, @args ) {
         P->file->copy( $data, $path, mode => 'rw-r--r--' );             # TODO or return res [ 500, qq[Can't write "$path", $!] ];
     }
 
-    return $on_finish->( $cb, res 200 );
+    return res 200;
 }
 
 1;

@@ -1,3 +1,70 @@
+1.165 2019-11-22
+================
+
+[Quiq::Axis::Numeric]
+* Rundung korrigiert
+
+[Quiq::Axis::Time]
+* Ermittelung Zeitintervall reimplementiert
+
+[Quiq::AxisTick]
+* width() - Wert auf Label umgestellt, Verbreiterung um 1 Pixel
+* height() - Wert auf Label umgestellt
+
+[Quiq::Cache]
+* Klasse hinzugefügt
+
+[Quiq::CommandLine]
+* Doku bearbeitet
+
+[Quiq::Converter]
+* camelCaseToSnakeCase() - hinzugefügt
+
+[Quiq::Epoch]
+* dayOfWeek() - hinzugefügt
+* dayAbbr() - hinzugefügt
+* dayName() - hinzugefügt
+* plus() - hinzugefügt
+* minus() - hinzugefügt
+* asIso() - hinzugefügt
+
+[Quiq::Gd::Component::*]
+* Umbenannt von Quiq::Gd::Graphic::*
+
+[Quiq::Gd::Component::Grid]
+* Klasse hinzugefügt
+
+[Quiq::Gd::Font]
+* alignLeftOffset() - hinzugefügt
+
+[Quiq::Html::Tag]
+* Doku bearbeitet
+
+[Quiq::Math]
+* Pixel-Rundung von sprintf '%.0f' auf roundToInt() umgestellt
+
+[Quiq::Progress]
+* percent() - Rundung per int() korrigiert
+
+[Quiq::Schedule]
+* Doku bearbeitet
+* Testcode verbessert
+
+[Quiq::Sql]
+* Doku bearbeitet
+
+[Quiq::Svg::Tag]
+* Klasse hinzugefügt
+
+[Quiq::Tag]
+* Klasse hinzugefügt
+
+[Quiq::Timeseries::Synchronizer]
+* Doku bearbeitet
+
+[Quiq::XTerm]
+* Doku bearbeitet
+
 1.164 2019-11-07
 ================
 

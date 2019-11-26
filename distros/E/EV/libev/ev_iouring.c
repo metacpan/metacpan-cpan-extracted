@@ -578,7 +578,7 @@ iouring_poll (EV_P_ ev_tstamp timeout)
     /* no events, so maybe wait for some */
     iouring_tfd_update (EV_A_ timeout);
 
-  /* only enter the kernel if we have somethign to submit, or we need to wait */
+  /* only enter the kernel if we have something to submit, or we need to wait */
   if (timeout || iouring_to_submit)
     {
       int res;
@@ -608,12 +608,6 @@ iouring_init (EV_P_ int flags)
   if (!epoll_init (EV_A_ 0))
     return 0;
 
-  ev_io_init  (&iouring_epoll_w, iouring_epoll_cb, backend_fd, EV_READ);
-  ev_set_priority (&iouring_epoll_w, EV_MAXPRI);
-
-  ev_io_init  (&iouring_tfd_w, iouring_tfd_cb, iouring_tfd, EV_READ);
-  ev_set_priority (&iouring_tfd_w, EV_MAXPRI);
-
   iouring_entries     = IOURING_INIT_ENTRIES;
   iouring_max_entries = 0;
 
@@ -622,6 +616,12 @@ iouring_init (EV_P_ int flags)
       iouring_internal_destroy (EV_A);
       return 0;
     }
+
+  ev_io_init  (&iouring_epoll_w, iouring_epoll_cb, backend_fd, EV_READ);
+  ev_set_priority (&iouring_epoll_w, EV_MAXPRI);
+
+  ev_io_init  (&iouring_tfd_w, iouring_tfd_cb, iouring_tfd, EV_READ);
+  ev_set_priority (&iouring_tfd_w, EV_MAXPRI);
 
   ev_io_start (EV_A_ &iouring_epoll_w);
   ev_unref (EV_A); /* watcher should not keep loop alive */

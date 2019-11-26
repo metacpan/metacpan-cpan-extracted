@@ -27,5 +27,5 @@ requires:
   Perl::Critic::Violation: '0'
   Test::Builder: '0'
   perl: '5.018'
-version: '0.000104'
+version: '0.000200'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

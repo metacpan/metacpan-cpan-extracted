@@ -4,7 +4,7 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.01
+Version 2.02
 
 # SYNOPSIS
 
@@ -12,6 +12,7 @@ greple -Msubst --dict _dictionary_ \[ options \]
 
     --check=[ng,ok,any,outstand,all]
     --select=N
+    --linefold
     --stat
     --diff
     --diffcmd command
@@ -66,6 +67,13 @@ You can use same file by **greple**'s **-f** option and string after
     Select _N_th entry from the dictionary.  Argument is interpreted by
     [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers) module.  Range can be defined like
     **--select**=_1:3,7:9_.
+
+- **--linefold**
+
+    If the target data is folded in the middle of text, use **--linefold**
+    option.  It creates regex patterns which matches string spread across
+    lines.  Substituted text does not include newline, though.  Because it
+    confuses regex behavior somewhat, avoid to use if possible.
 
 - **--stat**
 

@@ -1,5 +1,9 @@
 Revision history for JIRA-REST-OAuth
 
+1.04    2019-11-23 - Adam R. Schobelock <schobes@gmail.com>
+        Fixed issues with Travis-CI failures added new perls
+        Fixed packaging issues, with Manifest.
+
 1.03    2019-06-25 - Adam R. Schobelock <schobes@gmail.com>
         BUGFIX: Headers not being a HASHREF <Kat Wenger>
         BUGFIX: next_issue() not working due to _build_path handling

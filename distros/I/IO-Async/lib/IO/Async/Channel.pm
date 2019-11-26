@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2019 -- leonerd@leonerd.org.uk
 
 package IO::Async::Channel;
 
@@ -9,14 +9,11 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 use Carp;
 
 use IO::Async::Stream;
-
-use IO::Async::OS;
-use constant DEFAULT_CODEC => IO::Async::OS->HAVE_SEREAL ? "Sereal" : "Storable";
 
 =head1 NAME
 
@@ -119,12 +116,22 @@ channel gets closed by the peer.
 
 =cut
 
+my $DEFAULT_CODEC;
+sub _default_codec
+{
+   $DEFAULT_CODEC ||= do {
+      my $HAVE_SEREAL = defined eval {
+         require Sereal::Encoder; require Sereal::Decoder };
+      $HAVE_SEREAL ? "Sereal" : "Storable";
+   };
+}
+
 sub _init
 {
    my $self = shift;
    my ( $params ) = @_;
 
-   defined $params->{codec} or $params->{codec} = DEFAULT_CODEC;
+   defined $params->{codec} or $params->{codec} = _default_codec;
 
    $self->SUPER::_init( $params );
 }
@@ -249,7 +256,7 @@ sub encode
 
    return ( ref $self ?
       $self->{encode} :
-      $default_encode ||= do { ( $self->can( "_make_codec_".DEFAULT_CODEC )->() )[0] }
+      $default_encode ||= do { ( $self->can( "_make_codec_" . _default_codec )->() )[0] }
    )->( $data );
 }
 
@@ -347,6 +354,7 @@ sub setup_sync_mode
    # enable binmode
    binmode $self->{fh};
 
+   defined and $_->blocking( 1 ) for $self->{read_handle}, $self->{write_handle};
    $self->{fh}->autoflush(1);
 }
 

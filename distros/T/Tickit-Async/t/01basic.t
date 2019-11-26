@@ -36,21 +36,6 @@ is_refcount( $tickit, 2, '$tickit has refcount 2 after $loop->add' );
    is( $later, 1, '$later 1 after ->later' );
 }
 
-{
-   my $sigwinch;
-
-   no warnings 'redefine';
-   local *Tickit::_SIGWINCH = sub {
-      $sigwinch++;
-   };
-
-   kill SIGWINCH => $$;
-
-   $loop->loop_once( 1 );
-
-   is( $sigwinch, 1, '$sigwinch 1 after raise SIGWINCH' );
-}
-
 is_refcount( $tickit, 2, '$tickit has refcount 2 before $loop->remove' );
 
 $loop->remove( $tickit );

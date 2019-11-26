@@ -1,16 +1,16 @@
 package Pcore::Core::Event::Listener::stderr;
 
 use Pcore -class, -ansi, -const;
-use Pcore::Lib::Text qw[remove_ansi];
-use Pcore::Lib::Data qw[to_json];
-use Pcore::Lib::Scalar qw[is_ref];
+use Pcore::Util::Text qw[remove_ansi];
+use Pcore::Util::Data qw[to_json];
+use Pcore::Util::Scalar qw[is_ref];
 use Time::HiRes qw[];
 
 with qw[Pcore::Core::Event::Listener];
 
 has tmpl => $BOLD . $GREEN . '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>]' . $BOLD . $YELLOW . '[<: $channel :>]' . $BOLD . $RED . '[<: $level :>]' . $RESET . ' <: $title | raw :>' . "\n" . '<: $text | raw :>';
 
-has _tmpl    => ( init_arg => undef );    # InstanceOf ['Pcore::Lib::Tmpl']
+has _tmpl    => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Tmpl']
 has _is_ansi => ( init_arg => undef );
 
 const our $INDENT => $SPACE x 4;

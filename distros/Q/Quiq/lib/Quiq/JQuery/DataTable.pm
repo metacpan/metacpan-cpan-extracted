@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use Quiq::Html::Table::List;
 use Quiq::Unindent;
@@ -28,7 +28,7 @@ L<Quiq::Hash>
 =begin html
 
 <p class="sdoc-fig-p">
-  <img class="sdoc-fig-img" src="https://raw.github.com/s31tz/Quiq/master/img/quiq_jquery_datatable_example01.png" width="757" height="170" alt="" />
+  <img class="sdoc-fig-img" src="https://raw.github.com/s31tz/Quiq/master/img/quiq-jquery-datatable-example01.png" width="757" height="170" alt="" />
 </p>
 
 =end html
@@ -141,7 +141,7 @@ Default-Aussehen einer DataTable:
 =begin html
 
 <p class="sdoc-fig-p">
-  <img class="sdoc-fig-img" src="https://raw.github.com/s31tz/Quiq/master/img/quiq_jquery_datatable_example01.png" width="757" height="170" alt="" />
+  <img class="sdoc-fig-img" src="https://raw.github.com/s31tz/Quiq/master/img/quiq-jquery-datatable-example01.png" width="757" height="170" alt="" />
 </p>
 
 =end html
@@ -263,7 +263,7 @@ keine Bedienelemente erzeugt:
 =begin html
 
 <p class="sdoc-fig-p">
-  <img class="sdoc-fig-img" src="https://raw.github.com/s31tz/Quiq/master/img/quiq_jquery_datatable_example02.png" width="757" height="117" alt="" />
+  <img class="sdoc-fig-img" src="https://raw.github.com/s31tz/Quiq/master/img/quiq-jquery-datatable-example02.png" width="757" height="117" alt="" />
 </p>
 
 =end html
@@ -715,7 +715,7 @@ sub getColumns {
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

@@ -76,6 +76,9 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                 var tcm = table.getTableColumnModel();
                 var cr;
                 switch (col.type) {
+                    case 'boolean':
+                        cr =  new qx.ui.table.cellrenderer.Boolean;
+                        break;
                     case 'date':
                         cr =  new qx.ui.table.cellrenderer.Date;
                         if (col.format != null) {
@@ -99,7 +102,7 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                                 .set(col.format)
                             );
                         }
-                        break;    
+                        break;
                 }
                 if (cr){
                     tcm.setDataCellRenderer(i, cr);

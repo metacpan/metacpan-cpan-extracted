@@ -1,7 +1,7 @@
 package Pcore::HTTP::Cookies;
 
 use Pcore -class;
-use Pcore::Lib::Scalar qw[is_ref is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_ref is_plain_arrayref];
 
 has cookies => sub { {} };
 

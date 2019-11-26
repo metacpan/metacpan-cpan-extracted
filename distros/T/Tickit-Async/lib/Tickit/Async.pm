@@ -1,23 +1,23 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2019 -- leonerd@leonerd.org.uk
 
 package Tickit::Async;
 
 use strict;
 use warnings;
 use base qw( Tickit IO::Async::Notifier );
-Tickit->VERSION( '0.17' );
+Tickit->VERSION( '0.67' );
 IO::Async::Notifier->VERSION( '0.43' ); # Need support for being a nonprinciple mixin
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use IO::Async::Loop 0.47; # ->run and ->stop methods
-use IO::Async::Signal;
 use IO::Async::Stream;
-use IO::Async::Handle;
-use IO::Async::Timer::Countdown;
+
+require XSLoader;
+XSLoader::load( __PACKAGE__, $VERSION );
 
 =head1 NAME
 
@@ -61,20 +61,6 @@ sub new
    my $class = shift;
    my $self = $class->Tickit::new( @_ );
 
-   $self->add_child( IO::Async::Signal->new( 
-      name => "WINCH",
-      on_receipt => $self->_capture_weakself( "_SIGWINCH" ),
-   ) );
-
-   $self->add_child( IO::Async::Handle->new(
-      read_handle => $self->term->get_input_handle,
-      on_read_ready => $self->_capture_weakself( "_input_readready" ),
-   ) );
-
-   $self->add_child( $self->{timer} = IO::Async::Timer::Countdown->new(
-      on_expire => $self->_capture_weakself( "_timeout" ),
-   ) );
-
    return $self;
 }
 
@@ -103,101 +89,12 @@ sub _make_writer
    return $writer;
 }
 
-sub _input_readready
+sub _make_tickit
 {
    my $self = shift;
-   my $term = $self->term;
+   my ( $term ) = @_;
 
-   $self->{timer}->stop;
-
-   $term->input_readable;
-
-   $self->_timeout;
-}
-
-sub _timeout
-{
-   my $self = shift;
-   my $term = $self->term;
-
-   if( defined( my $timeout = $term->check_timeout ) ) {
-      $self->{timer}->configure( delay => $timeout / 1000 ); # msec
-      $self->{timer}->start;
-   }
-}
-
-sub later
-{
-   my $self = shift;
-   my ( $code ) = @_;
-
-   $self->get_loop->later( $code );
-}
-
-sub timer
-{
-   my $self = shift;
-   my ( $mode, $amount, $code ) = @_;
-
-   return $self->get_loop->watch_time( $mode => $amount, code => $code );
-}
-
-sub cancel_timer
-{
-   my $self = shift;
-   my ( $id ) = @_;
-
-   $self->get_loop->unwatch_time( $id );
-}
-
-sub tick
-{
-   my $self = shift;
-   $self->get_loop->loop_once;
-}
-
-sub stop
-{
-   my $self = shift;
-   $self->get_loop->stop;
-}
-
-sub run
-{
-   my $self = shift;
-
-   my $loop = $self->get_loop;
-
-   $self->setup_term;
-
-   my $running = 1;
-
-   $loop->add( my $sigint_notifier = IO::Async::Signal->new(
-      name => "INT",
-      on_receipt => $self->_capture_weakself( sub { undef $running }),
-   ) );
-
-   my $ret = eval {
-      $self->_flush;
-      while($running) {
-         $loop->loop_once;
-         $self->_flush;
-      }
-   };
-   my $e = $@;
-
-   {
-      local $@;
-
-      $self->teardown_term;
-      $loop->remove( $sigint_notifier );
-
-      # Restore STDIN's blocking mode
-      $self->term->get_input_handle->blocking( 1 );
-   }
-
-   die $@ if $@;
-   return $ret;
+   return Tickit::Async::_new_tickit( $term, $self->get_loop );
 }
 
 =head1 AUTHOR

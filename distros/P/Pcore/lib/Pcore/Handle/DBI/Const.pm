@@ -1,7 +1,7 @@
 package Pcore::Handle::DBI::Const;
 
 use Pcore -const, -export;
-use Pcore::Lib::Scalar qw[is_plain_arrayref is_blessed_hashref is_blessed_arrayref];
+use Pcore::Util::Scalar qw[is_plain_arrayref is_blessed_hashref is_blessed_arrayref];
 
 use Pcore::Handle::DBI::Query::Type;
 use Pcore::Handle::DBI::Query::SQL;

@@ -1,8 +1,8 @@
 package Pcore::Ext::App;
 
 use Pcore -class, -const;
-use Pcore::Lib::Scalar qw[is_ref];
-use Pcore::Lib::Data qw[to_json];
+use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Util::Data qw[to_json];
 use Package::Stash::XS qw[];
 use Pcore::Ext::App::Class;
 

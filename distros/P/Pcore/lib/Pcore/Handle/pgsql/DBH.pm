@@ -3,9 +3,9 @@ package Pcore::Handle::pgsql::DBH;
 use Pcore -class, -res, -const;
 use Pcore::Handle::DBI::Const qw[:CONST];
 use Pcore::Handle::pgsql qw[:ALL];
-use Pcore::Lib::Scalar qw[weaken looks_like_number is_plain_arrayref is_blessed_arrayref];
-use Pcore::Lib::Digest qw[md5_hex];
-use Pcore::Lib::Data qw[from_json];
+use Pcore::Util::Scalar qw[weaken looks_like_number is_plain_arrayref is_blessed_arrayref];
+use Pcore::Util::Digest qw[md5_hex];
+use Pcore::Util::Data qw[from_json];
 
 has pool => ( required => 1 );    # InstanceOf ['Pcore::Handle::pgsql']
 

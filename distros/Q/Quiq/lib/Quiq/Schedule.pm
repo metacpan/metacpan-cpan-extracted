@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use Quiq::Hash;
 
@@ -50,7 +50,16 @@ besitzen.
 =item $sub
 
 Subroutine, die den Anfangs- und den Ende-Zeitpunkt des
-Objektes in Unix-Epoch liefert.
+Objektes in Unix-Epoch liefert. Signatur:
+
+  sub {
+      my $obj = shift;
+  
+      my $epoch1 = ...;
+      my $epoch2 = ...;
+  
+      return ($epoch1,$epoch2);
+  }
 
 =back
 
@@ -331,7 +340,7 @@ sub width {
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

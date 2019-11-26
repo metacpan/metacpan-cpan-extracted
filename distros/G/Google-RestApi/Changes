@@ -13,3 +13,11 @@ Revision history for Perl extension Google::RestApi.
         - Removes testing dependency on Spreadsheets::Perl
         - Bug fixes in Range object
         - Fixed bugs in test suite, added more unit tests
+
+0.4 Tue Nov 26 2019
+        - Support for multiple authorization mechanisms
+        - Support for Google Service Account authorization
+        - Support for borders and other cell formatting
+        - Cleaned up and simplified Range request class
+        - Cleaned up range unit tests
+        - Minor bug fixes

@@ -4,20 +4,23 @@ use strict;
 use warnings;
 use 5.008001;
 use Perl::Critic::Utils qw( $SEVERITY_LOW );
+use PPIx::Regexp;
 use base qw( Perl::Critic::Policy );
 
 # ABSTRACT: Prohibit non-ASCII \d in regular expressions
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 use constant DESC => 'Using non-ASCII \d';
 use constant EXPL => 'The character class \d matches non-ASCI unicode digits.  ' .
                      'Use [0-9] or the /a modifier (Perl 5.14+) instead.';
 
-sub supported_parameters { ()                          }
-sub default_severity     { $SEVERITY_LOW               }
-sub default_themes       { ()                          }
-sub applies_to           { return 'PPI::Token::Regexp' }
+sub supported_parameters { ()                                        }
+sub default_severity     { $SEVERITY_LOW                             }
+sub default_themes       { ()                                        }
+sub applies_to           { return ('PPI::Token::Regexp::Match',
+                                   'PPI::Token::Regexp::Substitute',
+                                   'PPI::Token::QuoteLike::Regexp')  }
 
 sub violates
 {
@@ -28,9 +31,12 @@ sub violates
   # if the whole expression uses /a then we are in the clear.
   return if $mods{'a'};
 
-  my $match = $elem->get_match_string;
-  if($match =~ /\\d/)
+  my $re = PPIx::Regexp->new($elem->content);
+  my $ccs = $re->find('PPIx::Regexp::Token::CharClass');
+  return unless $ccs;
+  foreach my $cc (@$ccs)
   {
+    next if $cc->content ne '\\d';
     return $self->violation( DESC, EXPL, $elem );
   }
 
@@ -51,7 +57,7 @@ Perl::Critic::Policy::Plicease::ProhibitUnicodeDigitInRegexp - Prohibit non-ASCI
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 

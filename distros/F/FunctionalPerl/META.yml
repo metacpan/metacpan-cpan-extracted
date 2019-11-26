@@ -20,6 +20,8 @@ no_index:
     - examples
     - meta
     - htmlgen
+    - t-slow
+    - t-extra
 recommends:
   B::Deparse: '0'
   BSD::Resource: '0'
@@ -41,12 +43,14 @@ requires:
   Capture::Tiny: '0'
   Digest: '0'
   Getopt::Long: '0'
+  Import::Into: '0'
   NEXT: '0'
   Scalar::Util: '0'
   Sub::Util: '0'
   Symbol: '0'
-  Test::More: '0'
+  Test::More: '0.96'
   Test::Requires: '0'
+  autobox: '0'
   base: '0'
   overload: '0'
   perl: '5.014002'
@@ -54,5 +58,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/pflanze/functional-perl.git
-version: v0.72.6
+version: v0.72.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

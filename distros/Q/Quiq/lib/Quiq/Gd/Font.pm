@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use GD ();
 use Quiq::Math;
@@ -662,6 +662,51 @@ sub alignRightOffset {
 
 # -----------------------------------------------------------------------------
 
+=head3 alignLeftOffset() - Korrektur-Offset für Ausrichtung an linkem Rand
+
+=head4 Synopsis
+
+  $n = $g->alignLeftOffset;
+
+=head4 Description
+
+Der Korrektur-Offset ist so bemessen, dass der Text möglichst
+dicht an einen linken Rand angrenzt, z.B. das Label an den Tick
+einer Y-Achse auf der rechten Seite.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub alignLeftOffset {
+    my $self = shift;
+
+    if (!$self->isTrueType) {
+        # Offset für alle GD-Fonts
+        return 1;
+    }
+    else {
+        my $xOffset = 2;
+
+        my $pt = $self->pt;
+        if ($pt < 10) {
+            $xOffset = 2;
+        }
+        elsif ($pt <= 20) {
+            $xOffset = 3;
+        }
+        elsif ($pt <= 30) {
+            $xOffset = 4;
+        }
+
+        return $xOffset;
+    }
+
+    # not reached
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 alignTopOffset() - Korrektur-Offset für Ausrichtung an oberen Rand
 
 =head4 Synopsis
@@ -724,7 +769,7 @@ sub hCenterOffset {
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

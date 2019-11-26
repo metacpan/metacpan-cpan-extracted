@@ -8,7 +8,7 @@ my $fb = "t/81b-$$.out";
 
 unlink $fa,$fb;
 
-$ENV{MULTI_DIR_FILE} = "t/81.dir";
+$ENV{MULTI_DIR_FILE} = "t/81-$$.dir";
 
 if (fork() == 0) {
     close STDOUT; open STDOUT, ">", $fa;
@@ -19,9 +19,10 @@ if (fork() == 0) {
     close STDOUT; open STDOUT, ">", $fb;
     exit system($^X, "-Iblib/lib", "-Ilib", "t/80b-multi.tt") >> 8;
 }
-diag wait;
-diag wait;
+wait;
+wait;
 ok_multi( $fa, $fb );
 
 done_testing;
-#unlink $fa,$fb;
+unlink $fa,$fb;
+

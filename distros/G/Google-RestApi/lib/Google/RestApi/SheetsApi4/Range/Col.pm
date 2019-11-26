@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4::Range::Col;
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use 5.010_000;
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015 Kevin Ryde
 
 # This file is part of PerlIO-via-EscStatus.
 #
@@ -26,7 +26,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile
-  (NAME         => 'PerlIO-via-EscStatus',
+  (NAME         => 'PerlIO::via::EscStatus',
    ABSTRACT     => 'Printing a status line through an I/O layer.',
    VERSION_FROM => 'lib/PerlIO/via/EscStatus.pm',
    PREREQ_PM    => {
@@ -39,8 +39,8 @@ WriteMakefile
                     'Term::Size' => 0,
                     'Encode' => 0,
                    },
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
+   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE      => 'gpl_3',
    SIGN         => 1,
    MIN_PERL_VERSION => '5.008005',
 
@@ -49,7 +49,7 @@ WriteMakefile
      { homepage => 'http://user42.tuxfamily.org/perlio-via-escstatus/index.html',
        license  => 'http://www.gnu.org/licenses/gpl.html',
      },
-     no_index => { directory=>['devel'] },
+     no_index => { directory=>['devel','xt'] },
 
      optional_features =>
      { maximum_interoperation =>
@@ -69,12 +69,3 @@ WriteMakefile
      },
    },
   );
-
-# maximum_devel =>
-# { description => 'Stuff used variously for development.',
-#   requires => { 'Devel::TraceLoad' => 0,
-#                 'charnames' => 0,
-#                 'Devel::FindRef' => 0,
-#                 'Term::Sk' => 0,
-#               },
-# },

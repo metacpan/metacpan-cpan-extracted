@@ -1,7 +1,7 @@
 package RDF::DOAP::ChangeSet;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.100';
+our $VERSION   = '0.103';
 
 use Moose;
 extends qw(RDF::DOAP::Resource);
@@ -23,6 +23,15 @@ has items => (
 	coerce     => 1,
 	uri        => $dcs->item,
 	multi      => 1,
+);
+
+has versus => (
+	traits     => [ WithURI ],
+	is         => 'ro',
+	isa        => Version,
+	coerce     => 1,
+	uri        => $dcs->versus,
+	predicate  => 'has_versus',
 );
 
 1;

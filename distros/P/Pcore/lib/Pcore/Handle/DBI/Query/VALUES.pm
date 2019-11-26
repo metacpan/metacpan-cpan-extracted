@@ -1,7 +1,7 @@
 package Pcore::Handle::DBI::Query::VALUES;
 
 use Pcore -class, -const, -export;
-use Pcore::Lib::Scalar qw[is_ref is_plain_scalarref is_arrayref is_plain_arrayref is_plain_hashref is_blessed_hashref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_arrayref is_plain_arrayref is_plain_hashref is_blessed_hashref];
 
 has _buf => ( required => 1 );    # ArrayRef
 

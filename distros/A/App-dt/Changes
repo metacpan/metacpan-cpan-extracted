@@ -1,3 +1,11 @@
+0.006   2019-11-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option --pretty and output prettily (color, nice indentation)
+	  by default when not at the left side of the pipe.
+
+	- [bugfix] Didn't get input perl data.
+
+
 0.005   2019-09-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Add output format 'raw' (passed to print() directly).

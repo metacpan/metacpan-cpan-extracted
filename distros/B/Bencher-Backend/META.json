@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.87",
+            "Rinci" : "v1.1.90",
             "Sah::Schemas" : "v0.1.0"
          }
       },
@@ -43,8 +43,8 @@
             "Capture::Tiny" : "0",
             "Chart::Gnuplot" : "0",
             "Complete::Module" : "0",
-            "Complete::Util" : "0.57",
-            "Data::Clean::JSON" : "0.390",
+            "Complete::Util" : "0.603",
+            "Data::Clean::ForJSON" : "0",
             "Data::Clone" : "0",
             "Data::Dmp" : "0.21",
             "Data::Dump" : "0",
@@ -52,18 +52,18 @@
             "Devel::Size" : "0",
             "Exporter" : "5.57",
             "ExtUtils::MakeMaker" : "0",
-            "File::Digest" : "0.004",
+            "File::Digest" : "0.009",
             "File::Slurper" : "0",
             "File::Temp" : "0",
             "JSON::MaybeXS" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "1.45",
-            "Log::ger" : "0.023",
+            "Log::ger" : "0.027",
             "Math::ScientificNotation::Util" : "0",
             "Module::Load" : "0",
             "Module::Path::More" : "0.32",
             "Module::XSOrPP" : "0",
-            "PERLANCAR::Module::List" : "0",
+            "PERLANCAR::Module::List" : "0.004004",
             "POSIX" : "0",
             "Package::Abbreviate" : "0",
             "Perinci::Result::Format::Lite" : "0.273",
@@ -74,7 +74,7 @@
             "Scalar::Util" : "0",
             "String::ShellQuote" : "0",
             "Sys::Info" : "0",
-            "TableData::Object::aohos" : "0.110",
+            "TableData::Object::aohos" : "0.111",
             "Time::HiRes" : "0",
             "experimental" : "0",
             "parent" : "0",
@@ -104,7 +104,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Backend"
       }
    },
-   "version" : "1.044",
+   "version" : "1.045",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -199,7 +199,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Filter/PERLANCAR::BeforeBuild",
-            "version" : "0.594"
+            "version" : "0.597"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -283,9 +283,9 @@
             "version" : "0.02"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion",
-            "name" : "@Filter/PERLANCAR::OurPkgVersion",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::OurPkgVersion",
+            "name" : "@Filter/OurPkgVersion",
+            "version" : "0.15"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -404,7 +404,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.77"
+                        "version" : "0.780"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
@@ -455,12 +455,12 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
             "name" : "@Filter/Rinci::AddToDb",
-            "version" : "0.01"
+            "version" : "0.020"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Rinci::Validate",
-            "name" : "@Filter/Rinci::Validate",
-            "version" : "0.24"
+            "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
+            "name" : "@Filter/Rinci::EmbedValidator",
+            "version" : "0.250"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",

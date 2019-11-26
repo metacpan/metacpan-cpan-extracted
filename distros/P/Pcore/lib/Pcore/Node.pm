@@ -1,12 +1,12 @@
 package Pcore::Node;
 
 use Pcore -class, -res, -const;
-use Pcore::Lib::Scalar qw[is_callback weaken refaddr is_ref is_blessed_hashref is_plain_coderef is_plain_hashref];
+use Pcore::Util::Scalar qw[weaken refaddr is_ref is_blessed_hashref is_plain_hashref];
 use Pcore::HTTP::Server;
 use Pcore::Node::Server;
 use Pcore::Node::Proc;
 use Pcore::WebSocket::pcore;
-use Pcore::Lib::UUID qw[uuid_v4_str];
+use Pcore::Util::UUID qw[uuid_v4_str];
 
 has type     => ( required => 1 );
 has server   => ();                  # InstanceOf['Pcore::Node::Server'], $uri, HashRef, if not specified - local server will be created
@@ -93,7 +93,7 @@ sub BUILD ( $self, $args ) {
     $self->_run_http_server;
 
     # remote server
-    if ( defined $self->{server} && ( !is_ref $self->{server} || ( is_blessed_hashref $self->{server} && $self->{server}->isa('Pcore::Lib::URI') ) ) ) {
+    if ( defined $self->{server} && ( !is_ref $self->{server} || ( is_blessed_hashref $self->{server} && $self->{server}->isa('Pcore::Util::URI') ) ) ) {
         $self->{_server_is_remote} = 1;
         $self->{server_is_online}  = 0;
 
@@ -124,15 +124,18 @@ sub _build__on_rpc ($self) {
 
     weaken $self;
 
-    return sub ( $h, $req, $tx ) {
+    return sub ( $h, $tx ) {
         if ( !defined $self ) {
-            $req->( [ 1013, 'Node Destroyed' ] );
+            return [ 1013, 'Node Destroyed' ];
         }
         elsif ( $self->{status} < $NODE_STATUS_READY ) {
-            $req->( [ 1013, 'Node is Offline' ] );
+            return [ 1013, 'Node is Offline' ];
+        }
+        elsif ( defined $self->{listen}->{username} && !$h->{auth} ) {
+            $h->disconnect;
         }
         else {
-            $self->{on_rpc}->( $self, $req, $tx );
+            return $self->{on_rpc}->( $self, $tx );
         }
 
         return;
@@ -221,7 +224,7 @@ sub _connect_to_remote_server ($self) {
 
                 return;
             },
-            on_rpc => sub ( $h, $req, $tx ) {
+            on_rpc => sub ( $h, $tx ) {
 
                 # node was destroyed
                 return if !defined $self;
@@ -229,7 +232,7 @@ sub _connect_to_remote_server ($self) {
                 if ( exists $RPC_METHOD->{ $tx->{method} } ) {
                     my $method = $tx->{method};
 
-                    $self->$method( $tx->{args}->@* );
+                    return $self->$method( $tx->{args}->@* );
                 }
 
                 return;
@@ -256,7 +259,7 @@ sub _run_http_server ($self) {
         listen     => $self->{listen},
         on_request => sub ($req) {
             if ( $req->is_websocket_connect_request ) {
-                my $h = Pcore::WebSocket::pcore->accept(
+                return Pcore::WebSocket::pcore->accept(
                     $req,
                     compression   => $self->{compression},
                     on_disconnect => sub ($h) {
@@ -282,17 +285,10 @@ sub _run_http_server ($self) {
                             return;
                         }
                         else {
+                            $self->_on_node_connect($h);
+
                             return res(200), $self->_get_bindings( $h->{node_type} );
                         }
-                    },
-                    on_ready => sub ($h) {
-
-                        # node was destroyed
-                        return if !defined $self;
-
-                        $self->_on_node_connect($h);
-
-                        return;
                     },
 
                     # TODO
@@ -844,13 +840,7 @@ sub rpc_call ( $self, $type, $method, @args ) {
         push $self->{_ready_conn}->{$type}->@*, $h if defined $h;
     }
 
-    if ( !defined $h ) {
-        my $res = res [ 404, qq[Node type "$type" is not available] ];
-
-        my $cb = is_callback $args[-1] ? pop @args : undef;
-
-        return $cb ? $cb->($res) : $res;
-    }
+    return res [ 404, qq[Node type "$type" is not available] ] if !defined $h;
 
     return $h->rpc_call( $method, @args );
 }
@@ -863,14 +853,14 @@ sub rpc_call ( $self, $type, $method, @args ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 434                  | * Private subroutine/method '_on_node_register' declared but not used                                          |
-## |      | 442                  | * Private subroutine/method '_on_node_add' declared but not used                                               |
-## |      | 452                  | * Private subroutine/method '_on_node_update' declared but not used                                            |
-## |      | 460                  | * Private subroutine/method '_on_node_remove' declared but not used                                            |
+## |      | 430                  | * Private subroutine/method '_on_node_register' declared but not used                                          |
+## |      | 438                  | * Private subroutine/method '_on_node_add' declared but not used                                               |
+## |      | 448                  | * Private subroutine/method '_on_node_update' declared but not used                                            |
+## |      | 456                  | * Private subroutine/method '_on_node_remove' declared but not used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 468                  | Subroutines::ProhibitExcessComplexity - Subroutine "_update" with high complexity score (24)                   |
+## |    3 | 464                  | Subroutines::ProhibitExcessComplexity - Subroutine "_update" with high complexity score (24)                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 483                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 479                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

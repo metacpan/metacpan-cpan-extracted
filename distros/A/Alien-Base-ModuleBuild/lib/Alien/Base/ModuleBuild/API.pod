@@ -212,6 +212,12 @@ An arrayref of commands used to install it to the share directory specified by i
 
 Each command may be either a string or an array reference.  If the array reference form is used then the multiple argument form of C<system> is used.  Prior to version 0.009, only the string form was supported.
 
+=item alien_install_type
+
+[version 1.08]
+
+Set the install type.  Legal values are C<system> and C<share>.  The environment variable C<ALIEN_INSTALL_TYPE> and C<ALIEN_FORCE> will be used in preference over this property.
+
 =item alien_isolate_dynamic
 
 [version 0.005]
@@ -318,6 +324,11 @@ This is intended to choose the mechanism for selecting one file from many. The d
 The name of the folder which will both serve a stub share directory via L<Module::Build>'s C<share_dir>/C<dist_dir> parameter. This directory is added in a smart manner which attempts not to interfere with other author-defined C<share_dir>s. The default name is C<_share>. This folder will hold a README file which is then installed to the target installed share location. It is THAT location that the library will be installed to.
 
 =item alien_stage_install
+
+It might be tempting to use this option if you have a library or tool that hard codes paths from the install location inside the
+executable or library code.  However, using this option relies on blib detection which is not very reliable, and can leave your
+install in an broken state if the package install step fails.  If you really need this option, please consider instead migrating
+to L<Alien::Build>, which has a much more reliable way of staging installs correctly.
 
 [version 0.016]
 
@@ -469,9 +480,15 @@ For sh, be sure to set the C<alien_msys> property so that it will work on Window
 
 =item %s
 
-The full path to the final installed location of the share directory (builder method C<alien_library_destination>). This is where the library should install itself; for autoconf style installs this will look like 
+The full path to the installed location of the the share directory (builder method C<alien_library_destination>).
+This is where the library should install itself; for autoconf style installs this will look like
 
  --prefix=%s
+
+This will be the local blib directory location if C<alien_stage_install> is true (which is the default as of 0.17.
+This will be the final install location if C<alien_stage_install> is false (which was the default prior to 0.17).
+Please see the documentation above on C<alien_stage_install> which includes some caveats before you consider changing
+this option.
 
 =item %v
 

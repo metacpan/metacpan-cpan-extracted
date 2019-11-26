@@ -1,8 +1,12 @@
 Revision history for Forks-Queue
 
+0.14    2019-11-25
+	Test fixes.
+	Improved compatibility with Thread::Queue
+
 0.13	2019-10-07
 	Debug flag for individual queues.
-        Improved post-process clean up. Test fixes.
+	Improved post-process clean up. Test fixes.
 	Included Dir::Flock 0.01 as synchronization solution for Solaris, NFS.
 
 0.12	2019-09-03

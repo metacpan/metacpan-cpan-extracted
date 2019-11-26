@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Scattergl::Marker::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Scattergl::Marker::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Scattergl::Marker::Colorbar::Title;
 
-our $VERSION = '0.030';    # VERSION
+our $VERSION = '0.031';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattergl.
 
@@ -282,7 +282,7 @@ Chart::Plotly::Trace::Scattergl::Marker::Colorbar - This attribute is one of the
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 

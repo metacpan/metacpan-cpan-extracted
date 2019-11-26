@@ -5,13 +5,15 @@ use warnings;
 use utf8;
 
 use Module::Find;
+use Chart::Plotly;
 use namespace::autoclean;
 
-our $VERSION = '0.005';    # VERSION
+our $VERSION = '0.006';    # VERSION
 
 # ABSTRACT: Inline display of plotly charts in Jupyter notebooks using L<Devel::IPerl> kernel
 
-my $require_plotly = <<'EOJS';
+my $parameter_list = "(" . join( ", ", Chart::Plotly::plotlyjs_plot_function_parameters() ) . ")";
+my $require_plotly = <<'EOJSFP';
 <script>
 //# sourceURL=iperl-devel-plugin-chart-plotly.js
             $('#Plotly').each(function(i, e) { $(e).attr('id', 'plotly') });
@@ -22,16 +24,21 @@ my $require_plotly = <<'EOJS';
                     plotly: ['https://cdn.plot.ly/plotly-latest.min']},
                 });
                 window.Plotly = {
-                  plot : function(div, data, layout) {
+EOJSFP
+
+$require_plotly .= Chart::Plotly::plotlyjs_plot_function() . " : function " . $parameter_list . "{\n";
+$require_plotly .= <<'EOJSSP';
                     require(['plotly'], function(plotly) {
                       window.Plotly=plotly;
-                      Plotly.plot(div, data, layout);
+EOJSSP
+$require_plotly .= "Plotly." . Chart::Plotly::plotlyjs_plot_function() . $parameter_list . ";";
+$require_plotly .= <<'EOJSTP';
                     });
                   }
                 }
             }
 </script>
-EOJS
+EOJSTP
 
 sub register {
 
@@ -92,7 +99,7 @@ Devel::IPerl::Plugin::Chart::Plotly - Inline display of plotly charts in Jupyter
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -132,7 +139,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

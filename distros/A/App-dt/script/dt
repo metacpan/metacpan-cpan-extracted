@@ -1,12 +1,14 @@
 #!perl
 
-our $DATE = '2019-09-19'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-11-26'; # DATE
+our $DIST = 'App-dt'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
+use Data::Dmp 'dmp';
 use Getopt::Long qw(:config gnu_getopt no_ignore_case);
 
 my %Opts = (
@@ -15,6 +17,7 @@ my %Opts = (
     overwrite => 0,
     default_input_format => 'json',
     default_output_format => 'json',
+    pretty => undef,
 );
 our @DATA;
 our $DATA;
@@ -67,8 +70,10 @@ sub _read_file {
 
     my $fh;
     if ($filename eq '-') {
+        _debug("input source=stdin");
         $fh = \*STDIN;
     } else {
+        _debug("input file=$filename");
         open $fh, "<", $filename
             or die "Can't open '$filename': $!\n";
     }
@@ -90,6 +95,7 @@ sub _read_file {
             warn "Can't read '$filename' as Perl: $@\n";
             exit 99;
         }
+        return $res;
     } else {
         warn "dt: Unknown input format '$fmt'\n";
         exit 99;
@@ -100,10 +106,12 @@ sub _write_file {
     my ($filename, $data) = @_;
 
     my $fmt;
+    my $pretty = $Opts{pretty};
   DETERMINE_OUTPUT_FORMAT:
     {
         if ($filename eq '-') {
             $fmt = $Opts{default_output_format};
+            $pretty //= 1 if -t STDOUT;
             last;
         } elsif ($filename =~ s/:(json|yaml|perl)\z//) {
             $fmt = $1;
@@ -118,15 +126,30 @@ sub _write_file {
 
     my $res;
     if ($fmt eq 'json') {
-        require JSON::MaybeXS;
-        my $json = JSON::MaybeXS->new->allow_nonref;
-        $res = $json->encode($data);
+        if ($pretty) {
+            require JSON::Color;
+            $res = JSON::Color::encode_json($data, {pretty=>1});
+        } else {
+            require JSON::MaybeXS;
+            my $json = JSON::MaybeXS->new->allow_nonref;
+            $res = $json->encode($data);
+        }
     } elsif ($fmt eq 'yaml') {
-        require YAML::XS;
-        $res = YAML::XS::Dump($data);
+        if ($pretty) {
+            require YAML::Tiny::Color;
+            $res = YAML::Tiny::Color::Dump($data);
+        } else {
+            require YAML::XS;
+            $res = YAML::XS::Dump($data);
+        }
     } elsif ($fmt eq 'perl') {
-        require Data::Dump;
-        $res = Data::Dump::dump($data);
+        if ($pretty) {
+            require Data::Dump::Color;
+            $res = Data::Dump::Color::dump($data);
+        } else {
+            require Data::Dump;
+            $res = Data::Dump::dump($data);
+        }
     } elsif ($fmt eq 'raw') {
         $res = $data;
     } else {
@@ -156,6 +179,7 @@ sub parse_cmdline {
         'output|o=s@' => \$Opts{outputs},
         'default-input-format|f=s' => \$Opts{default_input_format},
         'default-output-format|F=s' => \$Opts{default_output_format},
+        'pretty!' => \$Opts{pretty},
         'help|h'         => sub {
             print <<'USAGE';
 Usage:
@@ -169,6 +193,7 @@ Options:
   --output-format=s, -F
   --default-input-format=s, -f
   --default-output-format=s, -F
+  --(no-)pretty
   --output=s@, -o
 For more details, see the manpage/documentation.
 USAGE
@@ -251,7 +276,7 @@ dt - CLI data transformer
 
 =head1 VERSION
 
-This document describes version 0.005 of dt (from Perl distribution App-dt), released on 2019-09-19.
+This document describes version 0.006 of dt (from Perl distribution App-dt), released on 2019-11-26.
 
 =head1 SYNOPSIS
 

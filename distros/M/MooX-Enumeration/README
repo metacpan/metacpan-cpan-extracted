@@ -64,6 +64,9 @@ DESCRIPTION
     Objects of the class will have `$object->is_foo`, `$object->is_bar`, and
     `$object->is_baz` methods.
 
+    If you use `handles => 2`, then you get `$object->xyz_is_foo`, etc
+    methods.
+
     For more details of method delegation, see MooseX::Enumeration.
 
   Use in roles

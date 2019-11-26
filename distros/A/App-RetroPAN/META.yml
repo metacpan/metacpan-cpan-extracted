@@ -1,0 +1,32 @@
+---
+abstract: 'Makes a historic minicpan ⏳'
+author:
+  - 'Dave Lambley <dlambley@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-RetroPAN
+requires:
+  Cpanel::JSON::XS: '0'
+  DateTime: '0'
+  DateTime::Format::ISO8601: '0'
+  Getopt::Long: '0'
+  HTTP::Request: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  Module::CoreList: '0'
+  OrePAN2: '0'
+  Pod::Usage: '0'
+  perl: v5.10.1
+resources:
+  repository: https://repo.or.cz/perl-App-RetroPAN.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -8,7 +8,7 @@ package IO::Async::Loop;
 use strict;
 use warnings;
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 # When editing this value don't forget to update the docs below
 use constant NEED_API_VERSION => '0.33';
@@ -30,7 +30,6 @@ use constant WATCHDOG_SIGABRT  => $ENV{IO_ASYNC_WATCHDOG_SIGABRT};
 
 use Carp;
 
-use IO::Socket (); # empty import
 use Time::HiRes qw(); # empty import
 use POSIX qw( WNOHANG );
 use Scalar::Util qw( refaddr weaken );
@@ -209,7 +208,7 @@ no class was successful, then an exception is thrown.
 The constructed object is cached, and will be returned again by a subsequent
 call. The cache will also be set by a constructor on a specific subclass. This
 behaviour makes it possible to simply use the normal constructor in a module
-that wishes to interract with the main program's Loop, such as an integration
+that wishes to interact with the main program's Loop, such as an integration
 module for another event system.
 
 For example, the following two C<$loop> variables will refer to the same
@@ -594,7 +593,9 @@ need recreating in the new child process before the program can continue.
 
 sub post_fork
 {
-   # empty
+   my $self = shift;
+
+   IO::Async::OS->post_fork( $self );
 }
 
 ###########
@@ -1267,9 +1268,9 @@ sub _run_process
       $subparams{stdin} = { from => $child_stdin };
    }
 
-   $subparams{code}    = delete $params{code};
-   $subparams{command} = delete $params{command};
-   $subparams{setup}   = delete $params{setup};
+   foreach (qw( code command setup notifier_name )) {
+      $subparams{$_} = delete $params{$_};
+   }
 
    foreach my $name ( @$capture ) {
       grep { $_ eq $name } qw( exitcode stdout stderr ) or croak "Unexpected capture $name";
@@ -1345,7 +1346,7 @@ The second argument is passed the plain perl C<$?> value.
 
 =back
 
-This method should not be used in new code; intead use L</run_process>
+This method should not be used in new code; instead use L</run_process>
 directly.
 
 =cut

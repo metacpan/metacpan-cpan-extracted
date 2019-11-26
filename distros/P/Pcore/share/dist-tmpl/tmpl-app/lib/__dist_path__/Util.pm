@@ -5,7 +5,7 @@ use Pcore::API::SMTP;
 use Pcore::API::ReCaptcha;
 use <: $module_name ~ "::Const qw[:CONST]" :>;
 
-has tmpl     => ( init_arg => undef );    # InstanceOf ['Pcore::Lib::Tmpl']
+has tmpl     => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Tmpl']
 has dbh      => ( init_arg => undef );    # ConsumerOf ['Pcore::Handle::DBI']
 has settings => ( init_arg => undef );    # HashRef
 

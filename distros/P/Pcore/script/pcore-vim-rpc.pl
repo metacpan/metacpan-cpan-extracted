@@ -3,32 +3,36 @@
 package main v0.1.0;
 
 use Pcore;
-use Pcore::Lib::Data qw[from_json to_json];
-use Pcore::Lib::Text qw[decode_utf8 encode_utf8];
+use Pcore::Util::Data qw[from_json to_json];
+use Pcore::Util::Text qw[decode_utf8 encode_utf8];
 
 my $cv = P->cv;
 
-AnyEvent::Socket::tcp_server( '127.0.0.1', 55_555, Coro::unblock_sub { on_accept(@_) } );
+AnyEvent::Socket::tcp_server( '127.0.0.1', 55_555, \&on_accept );
 
 $cv->recv;
 
 sub on_accept ( $fh, $host, $port ) {
     my $h = P->handle($fh);
 
-    while () {
-        my $msg = $h->read_line("\n");
+    Coro::async {
+        while () {
+            my $msg = $h->read_line("\n");
 
-        last if !$msg;
+            last if !$msg;
 
-        # decode message, ignore invalid json
-        eval { $msg = from_json $msg->$*; 1; } or last;
+            # decode message, ignore invalid json
+            eval { $msg = from_json $msg->$*; 1; } or last;
 
-        my $cmd = 'CMD_' . ( delete( $msg->[1]->{cmd} ) // $EMPTY );
+            my $cmd = 'CMD_' . ( delete( $msg->[1]->{cmd} ) // $EMPTY );
 
-        last if !$cmd || !main->can($cmd);
+            last if !$cmd || !main->can($cmd);
 
-        main->$cmd( $h, $msg->[0], $msg->[1] );
-    }
+            main->$cmd( $h, $msg->[0], $msg->[1] );
+        }
+
+        return;
+    };
 
     return;
 }

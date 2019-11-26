@@ -1,8 +1,8 @@
 package Pcore::Core::Dump::Dumper;
 
 use Pcore -class, -ansi;
-use Pcore::Lib::Scalar qw[refaddr isweak reftype blessed looks_like_number tainted];
-use Pcore::Lib::Text qw[escape_perl remove_ansi add_num_sep];
+use Pcore::Util::Scalar qw[refaddr isweak reftype blessed looks_like_number tainted];
+use Pcore::Util::Text qw[escape_perl remove_ansi add_num_sep];
 use re qw[];
 use Sort::Naturally qw[nsort];
 use PerlIO::Layers qw[];

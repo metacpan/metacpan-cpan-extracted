@@ -1,5 +1,5 @@
 package MsgPack::Raw;
-$MsgPack::Raw::VERSION = '0.04';
+$MsgPack::Raw::VERSION = '0.05';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ MsgPack::Raw - Perl bindings to the msgpack C library
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

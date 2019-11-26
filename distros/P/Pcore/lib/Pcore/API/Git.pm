@@ -1,7 +1,7 @@
 package Pcore::API::Git;
 
 use Pcore -class, -res, -const, -export;
-use Pcore::Lib::Scalar qw[is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 
 has root        => ( required => 1 );
 has max_threads => 50;

@@ -2,10 +2,10 @@ package Pcore::App::API::Backend::Local;
 
 use Pcore -role, -sql, -res;
 use Pcore::App::API qw[:ALL];
-use Pcore::Lib::Text qw[encode_utf8];
-use Pcore::Lib::Digest qw[sha3_512_bin];
-use Pcore::Lib::UUID qw[uuid_v4];
-use Pcore::Lib::Data qw[to_b64u];
+use Pcore::Util::Text qw[encode_utf8];
+use Pcore::Util::Digest qw[sha3_512_bin];
+use Pcore::Util::UUID qw[uuid_v4];
+use Pcore::Util::Data qw[to_b64u];
 
 with qw[
   Pcore::App::API
@@ -19,7 +19,7 @@ with qw[
 
 has dbh => ( init_arg => undef );
 
-has _hash_cache      => ( init_arg => undef );    # InstanceOf ['Pcore::Lib::Hash::LRU']
+has _hash_cache      => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Hash::LRU']
 has _hash_cache_size => 10_000;                   # PositiveInt;
 
 sub init ( $self ) {

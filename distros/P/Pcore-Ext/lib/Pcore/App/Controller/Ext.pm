@@ -2,8 +2,8 @@ package Pcore::App::Controller::Ext;
 
 use Pcore -role, -const, -l10n;
 use Pcore::Ext;
-use Pcore::Lib::Data qw[to_json];
-use Pcore::Lib::Scalar qw[is_plain_arrayref];
+use Pcore::Util::Data qw[to_json];
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 
 has ext_package => ( required => 1 );     # name of the linked application, required
 has ext_title   => 'ExtJS Application';
@@ -44,11 +44,9 @@ sub BUILD ( $self, $args ) {
 sub _get_app ($self) { return $self->{app}->{ext}->{ext_app}->{ $self->{ext_package} } }
 
 around run => sub ( $orig, $self, $req ) {
-    return $req->return_xxx(404) if !$self->_get_app;
+    return 404 if !$self->_get_app;
 
-    $self->_return_index($req);
-
-    return;
+    return $self->_return_index;
 };
 
 sub get_resources ($self) {
@@ -59,7 +57,7 @@ sub get_resources ($self) {
     ];
 }
 
-sub _return_index ( $self, $req ) {
+sub _return_index ( $self ) {
     my $app = $self->_get_app;
 
     if ( !$self->{_index} ) {
@@ -90,9 +88,7 @@ sub _return_index ( $self, $req ) {
         );
     }
 
-    $req->( 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{_index} )->finish;
-
-    return;
+    return 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{_index};
 }
 
 1;
@@ -102,7 +98,7 @@ sub _return_index ( $self, $req ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 74                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 72                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,7 +1,7 @@
 package Pcore::App::API::Backend::Local::Methods;
 
 use Pcore -role, -res;
-use Pcore::Lib::Scalar qw[is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 use Package::Stash::XS qw[];
 use Pcore::App::API qw[:PERMISSIONS];
 

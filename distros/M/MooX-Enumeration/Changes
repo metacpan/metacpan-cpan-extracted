@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/MooX-Enumeration>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Enumeration>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.010	2019-11-24
+
+ - Support handles => 2.
+
 0.009	2019-11-10
 
  - Role support.

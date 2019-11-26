@@ -7,6 +7,16 @@ WriteMakefile(
     PREREQ_PM         => {'Alt::Devel::CallParser::ButWorking' => '0.002', 'Kavorka' => '0.039', 'Mouse' => '2.5.6'}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Telugu/AsciiMap.pm', # retrieve abstract from module
     AUTHOR            => '',
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/RKRT/Telugu-AsciiMap.git',
+                web  => 'https://github.com/RKRT/Telugu-AsciiMap',
+            },
+        },
+    },
     #LICENSE           => 'perl',
     #Value must be from legacy list of licenses here
     #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI

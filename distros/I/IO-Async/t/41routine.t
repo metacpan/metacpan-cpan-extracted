@@ -79,6 +79,8 @@ sub test_with_model
 
       is( $returned, 23, "on_return for $model model" );
 
+      is( $return_routine->result_future->get, 23, 'Result from ->result_future of return' );
+
       my $died;
       my $die_routine = IO::Async::Routine->new(
          model => $model,
@@ -91,6 +93,8 @@ sub test_with_model
       wait_for { defined $died };
 
       is( $died, "ARGH!\n", "on_die for $model model" );
+
+      is( $die_routine->result_future->failure, "ARGH!\n", 'Failure from ->result_future of die' );
    }
 
    {

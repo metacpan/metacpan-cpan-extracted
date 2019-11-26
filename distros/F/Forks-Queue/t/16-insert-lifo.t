@@ -19,26 +19,26 @@ for my $impl (IMPL()) {
        $q->peek_front(3) eq '2',   'items after insert preserved');
 
     ok(3 == $q->insert(-1, qw(one two three)), 'insert neg index count ok');
-    ok($q->peek_front(-4) eq 'one' && $q->peek_front(-3) eq 'two' &&
-       $q->peek_front(-2) eq 'three' && $q->peek_front(-1) eq '4',
+    ok($q->peek(3) eq 'one' && $q->peek(2) eq 'two' &&
+       $q->peek(1) eq 'three' && $q->peek(0) eq '4',
        'insert neg index successful');
 
     ok(4 == $q->insert(1000, qw(five seven nine eleven)),
        'insert past end');
-    ok($q->peek_front(-5) eq '4' && $q->peek_front(-4) eq 'five' && 
-       $q->peek_front(-1) eq 'eleven',
+    ok($q->peek(4) eq '4' && $q->peek(3) eq 'five' && 
+       $q->peek(0) eq 'eleven',
        'insert past end successfully added at end');
 
     ok(4 == $q->insert(-1000, qw/thirteen 15 seventeen 19/),
        'insert past start count ok');
-    ok($q->peek_front(3) eq '19' && $q->peek_front(4) eq '1',
+    ok($q->peek(-4) eq '19' && $q->peek(-5) eq '1',
        'insert past start successfully added at front');
 
     ok($q->pending == 17, 'count correct so far');
     ok(3 == $q->insert(10, qw[23 29 31 37 41]),
        'queue limit respected on insert');
-    ok($q->peek_front(10) eq '23' && $q->peek_front(12) eq '31'
-       && $q->peek_front(13) ne '37',
+    ok($q->peek(-11) eq '23' && $q->peek(-13) eq '31'
+       && $q->peek(-14) ne '37',
        'only some items were inserted successfully');
 }
 

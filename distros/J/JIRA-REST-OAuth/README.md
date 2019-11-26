@@ -6,7 +6,7 @@ JIRA::REST::OAuth - Sub Class JIRA::REST providing OAuth 1.0 support.
 
 # VERSION
 
-Version 1.02
+Version 1.04
 
 # SYNOPSIS
 

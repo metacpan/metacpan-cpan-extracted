@@ -3,7 +3,7 @@ package Pcore::Core::CLI::Opt;
 # NOTE http://docopt.org/
 
 use Pcore -class;
-use Pcore::Lib::Scalar qw[is_ref is_plain_arrayref is_plain_hashref];
+use Pcore::Util::Scalar qw[is_ref is_plain_arrayref is_plain_hashref];
 
 with qw[Pcore::Core::CLI::Type];
 

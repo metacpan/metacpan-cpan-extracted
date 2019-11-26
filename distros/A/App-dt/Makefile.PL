@@ -20,9 +20,13 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::dt",
   "PREREQ_PM" => {
+    "Data::Dmp" => "0.21",
     "Data::Dump" => 0,
+    "Data::Dump::Color" => 0,
     "Getopt::Long" => "2.50",
+    "JSON::Color" => 0,
     "JSON::MaybeXS" => 0,
+    "YAML::Tiny::Color" => 0,
     "YAML::XS" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -33,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,13 +45,17 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Dmp" => "0.21",
   "Data::Dump" => 0,
+  "Data::Dump::Color" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "JSON::Color" => 0,
   "JSON::MaybeXS" => 0,
   "Test::More" => 0,
+  "YAML::Tiny::Color" => 0,
   "YAML::XS" => 0,
   "strict" => 0,
   "warnings" => 0

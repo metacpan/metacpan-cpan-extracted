@@ -15,7 +15,7 @@ if($^O eq 'MSWin32'){
 our @ISA=qw(Exporter);
 our @EXPORT=qw(scrape_proxies);
 
-our $VERSION='2.1.2';
+our $VERSION='2.1.3';
 our $LIBRARY=__PACKAGE__;
 
 sub scrape_free_proxy_list{
@@ -105,7 +105,7 @@ Proxy::Scraper - Simple Perl script for scraping proxies from multiple websites.
 
 =head1 VERSION
 
-Version 2.1.2
+Version 2.1.3
 
 =head1 DESCRIPTION
 

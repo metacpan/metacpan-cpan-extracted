@@ -8,7 +8,7 @@ use Fcntl ':flock';
 use Data::Dumper;    # when debugging is on
 use base 'Exporter';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 my @TMPFILE;
 my %LOCK;
 our @EXPORT_OK = qw(getDir lock lock_ex lock_sh unlock lockobj lockobj_ex
@@ -38,7 +38,9 @@ sub getDir {
         require File::Basename;
         $rootdir = File::Basename::dirname(Cwd::abs_path($rootdir));
     }
-    my $tmpdir = File::Temp::tempdir( DIR => $rootdir, CLEANUP => 1 );
+    my $tmpdir = File::Temp::tempdir(
+        TEMPLATE => "dflock-XXXXXX",
+        DIR => $rootdir, CLEANUP => 1 );
     $tmpdir;
 }
 
@@ -114,6 +116,17 @@ sub lock_sh {
     1;
 }
 
+sub _refresh_dir {
+    # https://stackoverflow.com/a/30630912
+    # "Within a given process, calling opendir and closedir on the
+    #  parent directory of a file invalidates the NFS cache."
+    my $dir = shift;
+    my $dh;
+    opendir $dh, $dir;
+    closedir $dh;
+    return;
+}
+
 sub _validate_dir {
     my $dir = shift;
     if (! -d $dir) {
@@ -126,6 +139,7 @@ sub _validate_dir {
         carp "Dir::Flock::lock: $errstr";
         return;
     }
+    _refresh_dir($dir);
     1;
 }
 
@@ -167,12 +181,12 @@ sub unlock {
         carp "Dir::Flock::unlock: $errstr";
         return;
     }
-    $_DEBUG && print STDERR _pid()," unlocking $dir/$LOCK{$dir}[1]\n";
+    $_DEBUG && print STDERR _pid()," unlocking $dir/$filename\n";
     if (! -f "$dir/$filename") {
         return if __inGD();
-        $errstr = "lock file '$dir/$LOCK{$dir}[1]' is missing";
+        $errstr = "lock file '$dir/$filename' is missing";
         carp "Dir::Flock::unlock: lock file is missing ",
-            @{$LOCK{$dir}};
+            %{$LOCK{$dir}};
         return;
     }
     my $z = unlink("$dir/$filename");
@@ -285,13 +299,13 @@ sub _create_tempfile {
 sub _oldest_file {
     my ($dir, $excl) = @_;
     my $dh;
-    Time::HiRes::sleep 0.001;
+    _refresh_dir($dir);  # is this necessary? is this sufficient?
     opendir $dh, $dir;
     my @f1 = grep /^${LOCKFILE_STUB}_/, readdir $dh;
+    closedir $dh;
     if ($excl) {
         @f1 = grep /_excl_/, @f1;
     }
-    closedir $dh;
     my @f = map {
         my @s = Time::HiRes::stat("$dir/$_");
         [ $_, $s[9] ]
@@ -371,7 +385,7 @@ Dir::Flock - advisory locking of a dedicated directory
 
 =head1 VERSION
 
-0.03
+0.04
 
 
 

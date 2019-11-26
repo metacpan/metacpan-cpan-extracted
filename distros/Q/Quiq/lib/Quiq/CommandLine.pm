@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 # -----------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ our $VERSION = '1.164';
 
 =head1 NAME
 
-Quiq::CommandLine - Konstruiere eine Unix-Kommandozeile
+Quiq::CommandLine - Erstelle eine Unix-Kommandozeile
 
 =head1 BASE CLASS
 
@@ -45,10 +45,10 @@ L<Quiq::Hash>
 
 =head1 DESCRIPTION
 
-Die Klasse stellt Methoden zur Verfügung, um eine
-Unix-Kommandozeile zu konstruieren. Die Klasse ist hilfreich, wenn
-einzelne Bestandteile der Kommandozeile nicht statisch sind,
-sondern variieren können.
+Die Klasse stellt Methoden zur Verfügung, um eine Unix-Kommandozeile
+zu konstruieren. Die Klasse ist hilfreich, wenn einzelne Bestandteile
+der Kommandozeile nicht statisch sind, sondern von Variablenwerten
+und Bedingungen abhängen.
 
 =head1 METHODS
 
@@ -536,7 +536,7 @@ sub value {
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

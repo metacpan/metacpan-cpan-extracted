@@ -1,7 +1,7 @@
 package App::dt;
 
-our $DATE = '2019-09-19'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-11-26'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: CLI data transformer
@@ -18,7 +18,7 @@ App::dt - CLI data transformer
 
 =head1 VERSION
 
-This document describes version 0.005 of App::dt (from Perl distribution App-dt), released on 2019-09-19.
+This document describes version 0.006 of App::dt (from Perl distribution App-dt), released on 2019-11-26.
 
 =head1 SYNOPSIS
 

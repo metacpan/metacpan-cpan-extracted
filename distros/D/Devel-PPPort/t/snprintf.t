@@ -10,10 +10,12 @@
 #
 ################################################################################
 
+use FindBin ();
+
 BEGIN {
   if ($ENV{'PERL_CORE'}) {
     chdir 't' if -d 't';
-    @INC = ('../lib', '../ext/Devel-PPPort/t', '../ext/Devel-PPPort/parts/inc') if -d '../lib' && -d '../ext';
+    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
     require Config; import Config;
     use vars '%Config';
     if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
@@ -21,13 +23,14 @@ BEGIN {
       exit 0;
     }
   }
-  else {
-    unshift @INC, 't', 'parts/inc';
-  }
+
+  use lib "$FindBin::Bin";
+  use lib "$FindBin::Bin/../parts/inc";
+
+  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
 
   sub load {
-    eval "use Test";
-    require 'testutil.pl' if $@;
+    require 'testutil.pl';
     require 'inctools';
   }
 
@@ -50,6 +53,6 @@ bootstrap Devel::PPPort;
 package main;
 
 my($l, $s) = Devel::PPPort::my_snprintf();
-ok($l, 8);
-ok($s, "foobar42");
+is($l, 8);
+is($s, "foobar42");
 

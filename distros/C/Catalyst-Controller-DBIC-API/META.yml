@@ -30,16 +30,17 @@ requires:
   Catalyst::Model::DBIC::Schema: '0.20'
   Catalyst::Runtime: '5.90020'
   DBIx::Class: '0.08103'
+  DBIx::Class::ResultSet::RecursiveUpdate: '0.40'
   Data::DPath::Validator: '0.093411'
   JSON::MaybeXS: '1.004000'
   MooseX::Types::Structured: '0.20'
   perl: '5.008006'
 resources:
   repository: git://git.shadowcat.co.uk/catagits/Catalyst-Controller-DBIC-API
-version: '2.007002'
+version: '2.008001'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -215,10 +216,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.20.1
           repo_root: .
       name: '@Git/Check'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -232,12 +233,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -245,16 +246,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '2.007002'
+          tag: '2.008001'
           tag_format: '%v'
           tag_message: 'Version %v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -263,10 +264,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.20.1
           repo_root: .
       name: '@Git/Push'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: MetaNoIndex
@@ -374,5 +375,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

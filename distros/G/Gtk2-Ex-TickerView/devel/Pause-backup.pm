@@ -14,7 +14,7 @@
 
 
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-TickerView.
 #
@@ -36,7 +36,7 @@ use strict;
 use warnings;
 use 5.008;
 
-our $VERSION = 15;
+our $VERSION = 16;
 
 sub new {
   my ($class, $tickerview) = @_;
@@ -141,7 +141,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-tickerview/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2008, 2009, 2010 Kevin Ryde
+Copyright 2008, 2009, 2010, 2019 Kevin Ryde
 
 Gtk2-Ex-TickerView is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

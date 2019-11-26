@@ -23,5 +23,6 @@ WriteMakefile(
     MIN_PERL_VERSION    => '5.008001',
     test		=> { TESTS => 't/*.t' },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Dir-Flock-* MYMETA.* t/*.out' },
+    clean               => { FILES => 'Dir-Flock-* MYMETA.* t/*.out
+                                       t/dflock-*' },
 );

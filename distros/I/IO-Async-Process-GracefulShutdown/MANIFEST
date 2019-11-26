@@ -3,10 +3,10 @@ Changes
 lib/IO/Async/Process/GracefulShutdown.pm
 LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
 README
 t/00use.t
 t/01process.t
 t/02shutdown.t
 t/99pod.t
-META.yml
-META.json

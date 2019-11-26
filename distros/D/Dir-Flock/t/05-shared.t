@@ -46,7 +46,9 @@ ok($pp, "released shared lock in parent");
 $t1 = time;
 $p = Dir::Flock::lock_ex($dir,0);
 $t2 = time;
-ok(!$p && $t2-$t1 < 2, "failed to get exclusive lock, timeout quickly");
+ok(!$p && $t2-$t1 < 2, "failed to get exclusive lock")
+    or Dir::Flock::unlock($dir);
+ok($t2-$t1 < 2, "timeout quickly");
 my $q = Dir::Flock::lock_ex($dir);
 my $t3 = time;
 ok($q, "flock succeeded in parent");

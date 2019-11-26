@@ -4,7 +4,6 @@ debian/changelog
 debian/compat
 debian/control
 debian/copyright
-debian/patches/pod-examples-dir.diff
 debian/rules
 debian/source/format
 debian/watch
@@ -12,6 +11,7 @@ devel/buildable.pl
 devel/clock-gettime.pl
 devel/display.t
 devel/Pause-backup.pm
+devel/pod-examples-dir.diff
 devel/refilter.pl
 devel/run.pl
 devel/StopForMenu.pm
@@ -27,7 +27,6 @@ examples/vertical-rottext.pl
 examples/vertical.pl
 examples/wrap-width.pl
 inc/my_pod2html
-inc/MyMakeMakerExtras.pm
 lib/Gtk2/Ex/TickerView.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -37,11 +36,15 @@ SIGNATURE
 t/buildable.t
 t/MyTestHelpers.pm
 t/test-weaken.t
-t/Test/Weaken/ExtraBits.pm
+t/TickerView-load.t
 t/TickerView.t
+xt/0-file-is-part-of.t
 xt/0-META-read.t
+xt/0-no-debug-left-on.t
+xt/0-Test-ConsistentVersion.t
 xt/0-Test-DistManifest.t
 xt/0-Test-Pod.t
 xt/0-Test-Synopsis.t
 xt/0-Test-YAML-Meta.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

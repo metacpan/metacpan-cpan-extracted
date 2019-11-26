@@ -6,7 +6,6 @@ use Pcore::Dist::Build::PAR::Script;
 
 has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
 
-has force  => ();
 has crypt  => ();
 has clean  => ();
 has gui    => ();
@@ -28,12 +27,6 @@ sub run ($self) {
 
     if ( !$dist_id->{hash} ) {
         say q[Unable to identify current changeset.];
-
-        exit 1;
-    }
-
-    if ( $dist_id->{is_dirty} && !$self->{force} ) {
-        say q[Working copy has uncommited changes. Use --force to build PAR from the dirty source.];
 
         exit 1;
     }

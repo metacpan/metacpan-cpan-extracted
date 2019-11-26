@@ -1,9 +1,9 @@
-package Pcore::PDF v0.8.1;
+package Pcore::PDF v0.8.2;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
-use Pcore::Lib::Data qw[to_json from_json];
-use Pcore::Lib::Scalar qw[is_plain_scalarref];
+use Pcore::Util::Data qw[to_json from_json];
+use Pcore::Util::Scalar qw[is_plain_scalarref];
 
 const our $PAGE_SIZE => {
     A0        => '841 x 1189 mm',
@@ -259,7 +259,7 @@ Maximum number of princexml processes. Default value is C<< 4 >>.
 
 =item generate_pdf( $self, $html )
 
-Generates PDF from C<< $html >> template. C<< $result >> is a standard Pcore API result object, see L<Pcore::Lib::Result> documentation for details.
+Generates PDF from C<< $html >> template. C<< $result >> is a standard Pcore API result object, see L<Pcore::Util::Result> documentation for details.
 
 =back
 
@@ -269,7 +269,7 @@ Generates PDF from C<< $html >> template. C<< $result >> is a standard Pcore API
 
 =item L<Pcore>
 
-=item L<Pcore::Lib::Result>
+=item L<Pcore::Util::Result>
 
 =item L<https://www.princexml.com/|https://www.princexml.com/>
 

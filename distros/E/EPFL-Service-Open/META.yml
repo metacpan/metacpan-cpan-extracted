@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4224'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,11 +16,11 @@ name: EPFL-Service-Open
 provides:
   EPFL::Service::Open:
     file: lib/EPFL/Service/Open.pm
-    version: '1.04'
+    version: '1.05'
 requires:
   Browser::Open: '0.04'
   IPC::Run: '0.99'
 resources:
   repository: https://github.com/innovativeinnovation/epfl-service-open
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

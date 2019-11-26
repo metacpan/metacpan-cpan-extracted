@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4;
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use 5.010_000;
 
@@ -219,8 +219,8 @@ Google::RestApi::SheetsApi4 - API to Google Sheets API V4.
  # now collect the ranges into a group and send the values via batch:
  $rg = $sheet->range_group($tax, $salary);
  $rg->submit_values();
- # bold and italicize both cells:
- $rg->bold()->italic()->submit_requests();
+ # bold and italicize both cells, and put a solid border around each one:
+ $rg->bold()->italic()->bd_solid()->submit_requests();
 
  # tie ranges to a hash:
  $row = $ws0->tie_cells({id => 'A2'}, {name => 'B2'});

@@ -85,6 +85,7 @@ lib/Yancy/Plugin/Auth/Basic.pm
 lib/Yancy/Plugin/Auth/Github.pm
 lib/Yancy/Plugin/Auth/OAuth2.pm
 lib/Yancy/Plugin/Auth/Password.pm
+lib/Yancy/Plugin/Auth/Role/RequireUser.pm
 lib/Yancy/Plugin/Auth/Token.pm
 lib/Yancy/Plugin/Editor.pm
 lib/Yancy/Plugin/File.pm

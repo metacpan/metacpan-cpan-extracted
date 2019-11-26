@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use Quiq::Math;
 use POSIX ();
@@ -192,10 +192,12 @@ des Tick von seinem Label bestimmt.
 sub width {
     my $self = shift;
 
-    my $fnt = $self->{'axis'}->font;
+    my $ax = $self->{'axis'};
+    my $fnt = $ax->font;
     my $val = $self->{'value'};
+    my $label = $ax->label($val);
 
-    return $fnt->stringWidth($val);
+    return $fnt->stringWidth($label)+1; # +1 für zusätzlichen Leerraum
 }
 
 # -----------------------------------------------------------------------------
@@ -218,17 +220,19 @@ des Tick von seinem Label bestimmt.
 sub height {
     my $self = shift;
 
-    my $fnt = $self->{'axis'}->font;
+    my $ax = $self->{'axis'};
+    my $fnt = $ax->font;
     my $val = $self->{'value'};
+    my $label = $ax->label($val);
 
-    return $fnt->stringHeight($val);
+    return $fnt->stringHeight($label);
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

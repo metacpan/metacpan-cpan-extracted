@@ -18,7 +18,7 @@ use UUID::Tiny ':std';
 use File::ShareDir;
 use Path::Tiny;
 
-our $VERSION = '0.030';    # VERSION
+our $VERSION = '0.031';    # VERSION
 
 # ABSTRACT: Generate html/javascript charts from perl data using javascript library plotly.js
 
@@ -71,13 +71,14 @@ sub _render_cell {
 <div id="{$chart_id}"></div>
 {$load_plotly}
 <script>
-Plotly.react(document.getElementById('{$chart_id}'),{$data} {$layout} {$config});
+Plotly.{$plotlyjs_plot_function}(document.getElementById('{$chart_id}'),{$data} {$layout} {$config});
 </script>
 TEMPLATE
 
-    my $template_variables = { data        => $data_string,
-                               chart_id    => $chart_id,
-                               load_plotly => $load_plotly,
+    my $template_variables = { data                   => $data_string,
+                               chart_id               => $chart_id,
+                               load_plotly            => $load_plotly,
+                               plotlyjs_plot_function => plotlyjs_plot_function(),
                                defined $layout ? ( layout => $layout ) : (),
                                defined $config ? ( config => $config ) : (),
     };
@@ -143,6 +144,14 @@ sub plotlyjs_version {
     return '1.51.1';
 }
 
+sub plotlyjs_plot_function {
+    return 'react';
+}
+
+sub plotlyjs_plot_function_parameters {
+    return qw(div data layout config);
+}
+
 1;
 
 __END__
@@ -157,7 +166,7 @@ Chart::Plotly - Generate html/javascript charts from perl data using javascript 
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 
@@ -274,6 +283,14 @@ Data to be represented. The format is the same as the parameter data in render_f
 =head2 plotlyjs_version
 
 Returns the version of plotly.js using in this version of the perl module as a string
+
+=head2 plotlyjs_plot_function
+
+Returns the name of function of plotly.js used in this version of the perl module to draw plots
+
+=head2 plotlyjs_plot_function_parameters
+
+Returns the function parameters of the function of plotly.js used in this version of the perl module to draw plots as a list of strings
 
 =head1 BUGS
 

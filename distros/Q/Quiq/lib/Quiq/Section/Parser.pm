@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 no bytes;
 use Quiq::Section::Object;
@@ -728,7 +728,7 @@ Als Beispiel siehe quiq-confluence:
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

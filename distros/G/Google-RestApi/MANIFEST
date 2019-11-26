@@ -1,10 +1,12 @@
-bin/session_creator
+bin/google_restapi_session_creator
 Changes
 lib/Google/RestApi.pm
+lib/Google/RestApi/Auth.pm
+lib/Google/RestApi/Auth/OAuth2Client.pm
+lib/Google/RestApi/Auth/ServiceAccount.pm
 lib/Google/RestApi/DriveApi3.pm
 lib/Google/RestApi/DriveApi3/File.pm
 lib/Google/RestApi/logger_init.pl
-lib/Google/RestApi/OAuth2.pm
 lib/Google/RestApi/SheetsApi4.pm
 lib/Google/RestApi/SheetsApi4/Range.pm
 lib/Google/RestApi/SheetsApi4/Range/All.pm
@@ -58,6 +60,7 @@ t/unit/Test/Google/RestApi/SheetsApi4/Range/Row.pm
 t/unit/Test/Google/RestApi/SheetsApi4/RangeGroup.pm
 t/unit/Test/Google/RestApi/SheetsApi4/RangeGroup/Tie.pm
 t/unit/Test/Google/RestApi/SheetsApi4/RangeGroup/Tie/Iterator.pm
+t/unit/Test/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet/Range.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Worksheet.pm
 t/unit/Test/Mock/Drive.pm
 t/unit/Test/Mock/RestApi.pm

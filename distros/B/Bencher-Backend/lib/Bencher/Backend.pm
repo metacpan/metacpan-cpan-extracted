@@ -1,7 +1,7 @@
 package Bencher::Backend;
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '1.044'; # VERSION
+our $DATE = '2019-10-15'; # DATE
+our $VERSION = '1.045'; # VERSION
 
 use 5.010001;
 use strict;
@@ -4134,7 +4134,7 @@ sub bencher {
 
         # XXX separate to sub?
         if ($save_result) {
-            require Data::Clean::JSON;
+            require Data::Clean::ForJSON;
             require File::Slurper;
             require JSON::MaybeXS;
             require POSIX;
@@ -4152,7 +4152,7 @@ sub bencher {
                 );
             };
             my $path = "$result_dir/$result_filename";
-            my $cleanser = Data::Clean::JSON->get_cleanser;
+            my $cleanser = Data::Clean::ForJSON->get_cleanser;
             log_trace("Saving result to %s ...", $path);
             File::Slurper::write_text(
                 $path,
@@ -4248,7 +4248,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.044 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2019-02-24.
+This document describes version 1.045 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2019-10-15.
 
 =head1 FUNCTIONS
 
@@ -4718,6 +4718,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 chart_result
 
 Usage:
@@ -4764,6 +4765,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 format_result
 
 Usage:
@@ -4802,6 +4804,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 parse_scenario
 
 Usage:
@@ -4832,6 +4835,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 split_result

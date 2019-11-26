@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 use Carp;
 
@@ -326,17 +326,30 @@ sub _remove_from_loop
 sub notifier_name
 {
    my $self = shift;
+
+   my @parts;
+
    if( length( my $name = $self->SUPER::notifier_name ) ) {
-      return $name;
+      push @parts, $name;
    }
 
    my $r = $self->read_fileno;
    my $w = $self->write_fileno;
-   return "rw=$r"     if defined $r and defined $w and $r == $w;
-   return "r=$r,w=$w" if defined $r and defined $w;
-   return "r=$r"      if defined $r;
-   return "w=$w"      if defined $w;
-   return "no";
+
+   if( defined $r and defined $w and $r == $w ) {
+      push @parts, "rw=$r";
+   }
+   elsif( defined $r and defined $w ) {
+      push @parts, "r=$r,w=$w";
+   }
+   elsif( defined $r ) {
+      push @parts, "r=$r";
+   }
+   elsif( defined $w ) {
+      push @parts, "w=$w";
+   }
+
+   return join ",", @parts;
 }
 
 =head1 METHODS

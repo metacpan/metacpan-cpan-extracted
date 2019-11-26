@@ -3,7 +3,7 @@ package Alien::Base::ModuleBuild::Repository::HTTP;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.08';
 
 use Carp;
 
@@ -79,12 +79,12 @@ sub list_files {
     carp $content;
     return ();
   }
-  
+
   $self->{base_url} = $base_url;
 
   my @links = $self->find_links($content);
 
-  return @links;  
+  return @links;
 }
 
 sub find_links {
@@ -93,7 +93,7 @@ sub find_links {
 
   my @links;
   if ($Has_HTML_Parser) {
-    push @links, $self->find_links_preferred($html) 
+    push @links, $self->find_links_preferred($html)
   } else {
     push @links, $self->find_links_textbalanced($html)
   }
@@ -108,7 +108,7 @@ sub find_links_preferred {
   my @links;
 
   my $extor = HTML::LinkExtor->new(
-    sub { 
+    sub {
       my ($tag, %attrs) = @_;
       return unless $tag eq 'a';
       return unless defined $attrs{href};

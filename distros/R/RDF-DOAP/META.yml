@@ -27,70 +27,70 @@ optional_features: {}
 provides:
   RDF::DOAP:
     file: lib/RDF/DOAP.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change:
     file: lib/RDF/DOAP/Change.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change::Addition:
     file: lib/RDF/DOAP/Change/Addition.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change::BackCompat:
     file: lib/RDF/DOAP/Change/BackCompat.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change::Bugfix:
     file: lib/RDF/DOAP/Change/Bugfix.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change::Documentation:
     file: lib/RDF/DOAP/Change/Documentation.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change::Packaging:
     file: lib/RDF/DOAP/Change/Packaging.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change::Regression:
     file: lib/RDF/DOAP/Change/Regression.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change::Removal:
     file: lib/RDF/DOAP/Change/Removal.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change::SecurityFix:
     file: lib/RDF/DOAP/Change/SecurityFix.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change::SecurityRegression:
     file: lib/RDF/DOAP/Change/SecurityRegression.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change::Tests:
     file: lib/RDF/DOAP/Change/Tests.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Change::Update:
     file: lib/RDF/DOAP/Change/Update.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::ChangeSet:
     file: lib/RDF/DOAP/ChangeSet.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Issue:
     file: lib/RDF/DOAP/Issue.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Person:
     file: lib/RDF/DOAP/Person.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Project:
     file: lib/RDF/DOAP/Project.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Repository:
     file: lib/RDF/DOAP/Repository.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Resource:
     file: lib/RDF/DOAP/Resource.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Types:
     file: lib/RDF/DOAP/Types.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Utils:
     file: lib/RDF/DOAP/Utils.pm
-    version: '0.100'
+    version: '0.103'
   RDF::DOAP::Version:
     file: lib/RDF/DOAP/Version.pm
-    version: '0.100'
+    version: '0.103'
 requires:
   Exporter::Tiny: '0.026'
   JSON: '2.00'
@@ -108,6 +108,6 @@ resources:
   homepage: https://metacpan.org/release/RDF-DOAP
   license: http://dev.perl.org/licenses/
   repository: git://github.com/kjetilk/p5-rdf-doap.git
-version: '0.100'
+version: '0.103'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

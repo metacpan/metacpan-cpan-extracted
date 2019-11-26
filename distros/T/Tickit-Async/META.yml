@@ -3,13 +3,15 @@ abstract: 'use C<Tickit> with C<IO::Async>'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
+  ExtUtils::CBuilder: '0'
   Test::HexString: '0'
   Test::More: '0.88'
   Test::Refcount: '0'
 configure_requires:
-  Module::Build: '0.42'
+  Module::Build: '0.4004'
+  Module::Build::Using::PkgConfig: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,14 +20,14 @@ name: Tickit-Async
 provides:
   Tickit::Async:
     file: lib/Tickit/Async.pm
-    version: '0.21'
+    version: '0.22'
 requires:
   IO::Async: '0.47'
   IO::Async::Notifier: '0.43'
   IO::Async::Stream: '0.34'
   IO::Async::Test: '0'
-  Tickit: '0.58'
+  Tickit: 0.67_001
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

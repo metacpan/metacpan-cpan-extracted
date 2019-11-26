@@ -4,7 +4,6 @@ debian/changelog
 debian/compat
 debian/control
 debian/copyright
-debian/patches/pod-examples-dir.diff
 debian/rules
 debian/source/format
 debian/watch
@@ -18,9 +17,11 @@ devel/junk/TtyStatus-startline.pm
 devel/misc.pl
 devel/non-match.pl
 devel/partial-end.pl
+devel/pod-examples-dir.diff
 devel/property.pl
 devel/sk-whisper.pl
 devel/tell-stdout.pl
+devel/termcap.pl
 devel/tostream.pl
 devel/unicode.pl
 examples/colour.pl
@@ -67,4 +68,5 @@ xtools/my-manifest.sh
 xtools/my-pc.sh
 xtools/my-tags.sh
 xtools/my-wunused.sh
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

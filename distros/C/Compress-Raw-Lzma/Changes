@@ -1,6 +1,18 @@
 CHANGES
 -------
 
+  2.091 23 November 2019
+
+      * More updates for memory leak in raw_decoder
+        Issue https://github.com/pmqs/Compress-Raw-Lzma/issues/1
+        08e80080b0d94e17eb1e9ceed589b145cdaf8495
+        ac9b6e5c9c6966a40d1a6caf2f2c6dc021ed50d9
+
+      * Silence compiler warning
+        https://github.com/pmqs/Compress-Raw-Lzma/issues/1
+        c496f8716b3651cab2753cf90a3aa47a7ce0a339
+
+
   2.090 9 November 2019
 
       * Memory leak in raw_decoder

@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2018-11-18 00:00:00 +0000 to present.
+Changes from 2018-11-26 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 2.5 at 2019-11-18 02:37:30 +0000
+version 2.6 at 2019-11-26 04:59:31 +0000
+----------------------------------------
+
+  Change: 7da3392c4a45d33734f9e88ecf36ccb6432ed271
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2019-11-26 17:59:19 +0000
+
+    auth header format as an attribute 
+
+  Change: 5c8c9874b4ce8fb98a04d4b678c7397c61dd34bd
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2019-11-18 15:46:57 +0000
+
+    cleanup after dzil 
+
+----------------------------------------
+version 2.5 at 2019-11-18 02:35:12 +0000
 ----------------------------------------
 
   Change: 73517c3caf077a4de1a9d2ac90e168c828aedc87
@@ -235,5 +251,5 @@ version 2.3 at 2018-12-25 10:23:48 +0000
     use caller with parenthesis to silence warning. fixes #18 
 
 =================================================
-Plus 22 releases after 2018-11-18 00:00:00 +0000.
+Plus 22 releases after 2018-11-26 00:00:00 +0000.
 =================================================

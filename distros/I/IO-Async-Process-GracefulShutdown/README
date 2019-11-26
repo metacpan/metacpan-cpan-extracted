@@ -27,13 +27,6 @@ DESCRIPTION
 
 METHODS
 
- finish_future
-
-       $f = $process->finish_future
-
-    Returns a Future that completes when the process finishes. It will
-    yield the exit code from the process.
-
  shutdown
 
        $process->shutdown( $signal, %args )->get

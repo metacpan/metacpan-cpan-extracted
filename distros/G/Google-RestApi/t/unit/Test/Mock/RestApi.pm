@@ -8,9 +8,12 @@ use Test::MockObject::Extends;
  
 sub new {
   my $self = RestApi->new(
-    client_id     => 'mocked_client_id',
-    client_secret => 'mocked_client_secret',
-    token_file    => $0,
+    auth => {
+      class         => 'OAuth2Client',
+      client_id     => 'mocked_client_id',
+      client_secret => 'mocked_client_secret',
+      token_file    => $0,
+    },
   );
   $self = Test::MockObject::Extends->new($self);
   $self->mock('token', sub { 'mocked_token'; });

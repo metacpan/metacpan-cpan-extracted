@@ -66,7 +66,26 @@ testing_loop( $loop );
 
    ok( !defined $process->loop, '$process no longer in Loop' );
 
+   my $f = $process->finish_future;
+   ok( $f->is_ready, '$process->finish_future is ready' );
+   is( $f->get, 0, '$process->finish_future->get' );
+
    is_oneref( $process, '$process has refcount 1 before EOS' );
+}
+
+# Exit only via ->finish_future
+{
+   my $process = IO::Async::Process->new(
+      code => sub { return 2 },
+      on_finish => sub {},
+   );
+
+   $loop->add( $process );
+
+   my $exitcode = wait_for_future( $process->finish_future )->get;
+
+   ok( ($exitcode & 0x7f) == 0, 'WIFEXITED($exitcode) after sub { 2 }' );
+   is( ($exitcode >> 8), 2,     'WEXITSTATUS($exitcode) after sub { 2 }' );
 }
 
 {

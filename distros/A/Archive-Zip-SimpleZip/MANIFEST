@@ -1,6 +1,7 @@
 Changes
 lib/Archive/Zip/SimpleZip.pm
 lib/Archive/Zip/SimpleUnzip.pm
+lib/Archive/Zip/StreamedUnzip.pm
 Makefile.PL
 MANIFEST
 private/MakeUtil.pm
@@ -8,6 +9,7 @@ README
 t/000prereq.t
 t/001main.t
 t/010main-unzip.t
+t/020main-unzip-stream.t
 t/111const-deflate.t
 t/999pod.t
 t/meta-json.t 

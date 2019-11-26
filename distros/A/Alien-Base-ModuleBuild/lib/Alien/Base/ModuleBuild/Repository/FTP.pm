@@ -3,7 +3,7 @@ package Alien::Base::ModuleBuild::Repository::FTP;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.08';
 
 use parent 'Alien::Base::ModuleBuild::Repository';
 
@@ -19,17 +19,17 @@ sub connection {
   # allow easy use of Net::FTP subclass
   $self->{protocol_class} ||= 'Net::FTP';
 
-  my $server = $self->{host} 
+  my $server = $self->{host}
     or croak "Must specify a host for FTP service";
 
   my $ftp = $self->{protocol_class}->new($server, Debug => 0)
     or croak "Cannot connect to $server: $@";
 
-  $ftp->login() 
+  $ftp->login()
     or croak "Cannot login ", $ftp->message;
 
   if (defined $self->location) {
-    $ftp->cwd($self->location) 
+    $ftp->cwd($self->location)
       or croak "Cannot change working directory ", $ftp->message;
   }
 

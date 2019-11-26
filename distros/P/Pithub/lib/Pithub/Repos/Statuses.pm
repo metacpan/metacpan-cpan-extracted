@@ -1,6 +1,6 @@
 package Pithub::Repos::Statuses;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01034';
+our $VERSION = '0.01035';
 # ABSTRACT:  Github v3 repos / statuses API
 
 use Moo;
@@ -63,7 +63,7 @@ Pithub::Repos::Statuses - Github v3 repos / statuses API
 
 =head1 VERSION
 
-version 0.01034
+version 0.01035
 
 =head1 METHODS
 
@@ -117,7 +117,7 @@ Examples:
 
     my $statuses = Pithub::Repos::Statuses->new;
     my $result   = $statuses->create( user => 'plu', repo => 'Pithub',
-        sha => '0123456', 
+        sha => '0123456',
         data => {
             state => 'error',
             description => 'Build failed',
@@ -131,7 +131,7 @@ Johannes Plunien <plu@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Johannes Plunien.
+This software is copyright (c) 2011-2019 by Johannes Plunien.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -84,10 +84,10 @@ feature linux => sub {
     suggests 'Authen::SASL::XS', v1.0.0;
 };
 
-# Pcore::Lib::Class
+# Pcore::Util::Class
 requires 'Sub::Util', v1.50.0;
 
-# Pcore::Lib::Data
+# Pcore::Util::Data
 requires 'YAML::XS',              v0.76.0;
 requires 'Cpanel::JSON::XS',      v4.7.0;
 requires 'CBOR::XS',              v1.7.0;
@@ -99,14 +99,14 @@ requires 'MIME::Base64',          v3.15.0;
 requires 'MIME::Base64::URLSafe', v0.1.0;
 requires 'Text::CSV_XS',          v1.37.0;
 
-# Pcore::Lib::Date
+# Pcore::Util::Date
 requires 'Time::Moment', v0.44.0;
 requires 'HTTP::Date',   v6.2.0;
 requires 'Time::Zone',   v2.30.0;
 
 # requires 'DateTime::TimeZone';
 
-# Pcore::Lib::Digest
+# Pcore::Util::Digest
 requires 'Digest',        v1.17.0;
 requires 'String::CRC32', v1.7.0;
 requires 'Digest::MD5',   v2.55.0;
@@ -114,25 +114,25 @@ requires 'Digest::SHA1',  v2.13.0;
 requires 'Digest::SHA',   v6.2.0;
 requires 'Digest::SHA3',  v1.4.0;
 
-# Pcore::Lib::File
+# Pcore::Util::File
 requires 'File::Copy::Recursive';
 
-# Pcore::Lib::List
+# Pcore::Util::List
 requires 'List::Util::XS';
 requires 'List::AllUtils';
 
-# Pcore::Lib::Random
+# Pcore::Util::Random
 requires 'Net::SSLeay';
 
-# Pcore::Lib::Regexp
+# Pcore::Util::Regexp
 requires 'Regexp::Util';
 
-# Pcore::Lib::Scalar
+# Pcore::Util::Scalar
 requires 'Devel::Refcount';
 requires 'Ref::Util';
 requires 'Ref::Util::XS';
 
-# Pcore::Lib::Src
+# Pcore::Util::Src
 requires 'Perl::Tidy';
 on develop => sub {
     requires 'Perl::Stripper';
@@ -147,28 +147,28 @@ on develop => sub {
     # suggests 'Perl::Lint';    # Perl::Critic replacement
 };
 
-# Pcore::Lib::Sys
+# Pcore::Util::Sys
 requires 'Sys::CpuAffinity';
 feature windows => sub {
     requires 'Win32::RunAsAdmin';
     requires 'Win32::Process';
 };
 
-# Pcore::Lib::Term
+# Pcore::Util::Term
 requires 'Term::ReadKey';
 requires 'Term::Size::Any';
 feature windows => sub {
     requires 'Term::Size::Win32';
 };
 
-# Pcore::Lib::Text
+# Pcore::Util::Text
 requires 'HTML::Entities';
 
-# Pcore::Lib::Tmpl
+# Pcore::Util::Tmpl
 requires 'Text::Xslate';
 requires 'Text::Xslate::Bridge::TT2Like';
 
-# Pcore::Lib::UUID
+# Pcore::Util::UUID
 requires 'Data::UUID',     v1.221.0;
 requires 'Data::UUID::MT', v1.1.0;
 

@@ -1,5 +1,5 @@
 package Catalyst::Controller::DBIC::API;
-$Catalyst::Controller::DBIC::API::VERSION = '2.007002';
+$Catalyst::Controller::DBIC::API::VERSION = '2.008001';
 #ABSTRACT: Provides a DBIx::Class web service automagically
 use Moose;
 BEGIN { extends 'Catalyst::Controller'; }
@@ -13,6 +13,7 @@ use Moose::Util;
 use Scalar::Util( 'blessed', 'reftype' );
 use Try::Tiny;
 use Catalyst::Controller::DBIC::API::Request;
+use DBIx::Class::ResultSet::RecursiveUpdate;
 use namespace::autoclean;
 
 has '_json' => (
@@ -402,14 +403,32 @@ sub validate_object {
                 ? [ $related_source->columns ]
                 : $allowed_fields;
 
-            foreach my $related_col ( @{$allowed_related_cols} ) {
-                if (defined(
-                        my $related_col_value =
-                            $related_params->{$related_col}
-                    )
-                    )
-                {
-                    $values{$key}{$related_col} = $related_col_value;
+            if (ref($related_params) && reftype($related_params) eq 'ARRAY') {
+                my @related_data;
+                for my $related_param (@$related_params) {
+                    my %data;
+                    foreach my $related_col ( @{$allowed_related_cols} ) {
+                        if (defined(
+                                my $related_col_value =
+                                    $related_param->{$related_col}
+                            )
+                        ) {
+                            $data{$related_col} = $related_col_value;
+                        }
+                    }
+                    push @related_data, \%data;
+                }
+                $values{$key} = \@related_data;
+            }
+            else {
+                foreach my $related_col ( @{$allowed_related_cols} ) {
+                    if (defined(
+                            my $related_col_value =
+                                $related_params->{$related_col}
+                        )
+                    ) {
+                        $values{$key}{$related_col} = $related_col_value;
+                    }
                 }
             }
         }
@@ -495,60 +514,19 @@ sub save_object {
 sub update_object_from_params {
     my ( $self, $c, $object, $params ) = @_;
 
-    foreach my $key ( keys %$params ) {
-        my $value = $params->{$key};
-        if ( ref($value) && !( reftype($value) eq reftype(JSON::MaybeXS::true) ) ) {
-            $self->update_object_relation( $c, $object,
-                delete $params->{$key}, $key );
-        }
+    $params = {%$params, %{$object->ident_condition}};
 
-        # accessor = colname
-        elsif ( $object->can($key) ) {
-            $object->$key($value);
-        }
+    my $updated_object =
+        DBIx::Class::ResultSet::RecursiveUpdate::Functions::recursive_update(
+        resultset => $c->req->current_result_set,
+        # unknown_params_ok => 1,
+        updates => $params,
+    );
 
-        # accessor != colname
-        else {
-            my $accessor =
-                $object->result_source->column_info($key)->{accessor};
-            $object->$accessor($value);
-        }
-    }
-
-    $object->update();
-}
-
-
-sub update_object_relation {
-    my ( $self, $c, $object, $related_params, $relation ) = @_;
-    my $row = $object->find_related( $relation, {}, {} );
-
-    if ($row) {
-        foreach my $key ( keys %$related_params ) {
-            my $value = $related_params->{$key};
-            if ( ref($value) && !( reftype($value) eq reftype(JSON::MaybeXS::true) ) )
-            {
-                $self->update_object_relation( $c, $row,
-                    delete $related_params->{$key}, $key );
-            }
-
-            # accessor = colname
-            elsif ( $row->can($key) ) {
-                $row->$key($value);
-            }
-
-            # accessor != colname
-            else {
-                my $accessor =
-                    $row->result_source->column_info($key)->{accessor};
-                $row->$accessor($value);
-            }
-        }
-        $row->update();
-    }
-    else {
-        $object->create_related( $relation, $related_params );
-    }
+    # replace request object with updated one for response
+    my $vals = $c->req->get_object(0)->[1];
+    $c->req->clear_objects;
+    $c->req->add_object( [ $updated_object, $vals ] );
 }
 
 
@@ -579,7 +557,14 @@ sub insert_object_from_params {
     $object->insert;
 
     while ( my ( $k, $v ) = each %rels ) {
-        $object->create_related( $k, $v );
+        if (reftype($v) eq 'ARRAY') {
+            foreach my $next_v ( @$v ) {
+                $object->create_related($k, $next_v);
+            }
+        }
+        else {
+            $object->create_related($k => $v);
+        }
     }
 }
 
@@ -699,7 +684,7 @@ Catalyst::Controller::DBIC::API - Provides a DBIx::Class web service automagical
 
 =head1 VERSION
 
-version 2.007002
+version 2.008001
 
 =head1 SYNOPSIS
 
@@ -1195,11 +1180,6 @@ update_object_from_params iterates through the params to see if any of them are
 pertinent to relations. If so it calls L</update_object_relation> with the
 object, and the relation parameters. Then it calls ->update on the object.
 
-=head2 update_object_relation
-
-update_object_relation finds the relation to the object, then calls ->update
-with the specified parameters.
-
 =head2 insert_object_from_params
 
 Sets the columns of the object, then calls ->insert.
@@ -1363,7 +1343,7 @@ Samuel Kaufman <sam@socialflow.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
+This software is copyright (c) 2019 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

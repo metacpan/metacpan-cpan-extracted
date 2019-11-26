@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   Alien::SwaggerUI:
     file: lib/Alien/SwaggerUI.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   File::Share: '0'
   File::Spec: '0'
@@ -39,6 +39,10 @@ resources:
   bugtracker: https://github.com/preaction/Alien-SwaggerUI/issues
   homepage: https://github.com/preaction/Alien-SwaggerUI
   repository: https://github.com/preaction/Alien-SwaggerUI.git
-version: '0.001'
+version: '0.002'
 x_authority: cpan:PREACTION
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_contributors:
+  - 'Gaurav Rai <gauravrai7860@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

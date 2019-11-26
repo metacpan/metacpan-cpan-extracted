@@ -23,10 +23,8 @@ sub BUILD ( $self, $args ) {
     return;
 }
 
-sub API_test ( $self, $req, @args ) {
-    $req->( 200, time );
-
-    return;
+sub API_test ( $self, @args ) {
+    return 200, time;
 }
 
 1;
@@ -40,7 +38,7 @@ sub API_test ( $self, $req, @args ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 11                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 48                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 52 does not match the package declaration       |
+## |    1 | 46                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 50 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

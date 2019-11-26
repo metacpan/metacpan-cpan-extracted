@@ -1,6 +1,13 @@
 CHANGES
 -------
 
+  2.091 23 November 2019
+
+      * Silence "macro expands to multiple statements" warning
+        Change sourced upstream from https://github.com/Perl/perl5/issues/17013
+        https://github.com/pmqs/Compress-Raw-Zlib/issues/2
+        da2bd1fc765b80d01ed10a79b6c4a035e5095ed8
+
   2.090 9 November 2019
 
       * No Changes

@@ -51,6 +51,7 @@
             "Types::Standard" : "0",
             "URI" : "0",
             "URI::QueryParam" : "0",
+            "WWW::Google::Cloud::Auth::ServiceAccount" : "0",
             "YAML::Any" : "0",
             "aliased" : "0",
             "autodie" : "0",
@@ -74,6 +75,6 @@
          "web" : "https://github.com/mvsjes2/p5-google-restapi"
       }
    },
-   "version" : "0.3",
+   "version" : "0.4",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

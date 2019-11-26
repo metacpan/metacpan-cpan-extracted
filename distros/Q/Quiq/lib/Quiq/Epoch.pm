@@ -5,10 +5,11 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use Time::HiRes ();
 use Time::Local ();
+use Quiq::Duration;
 use POSIX ();
 
 # -----------------------------------------------------------------------------
@@ -77,6 +78,10 @@ sub new {
         $epoch =~ s/(\.\d+)//;
         my $x = $1;
 
+        if (length($epoch) == 10) {
+            $epoch .= ' 00:00:00';
+        }
+
         my @arr = reverse split /\D+/,$epoch;
         $arr[4]--;
         $epoch = Time::Local::timelocal(@arr);
@@ -87,6 +92,164 @@ sub new {
 
     return bless \$epoch,$class;
 } 
+
+# -----------------------------------------------------------------------------
+
+=head2 Zeitkomponenten
+
+=head3 dayOfWeek() - Wochentagsnummer
+
+=head4 Synopsis
+
+  $i = $t->dayOfWeek;
+
+=head4 Returns
+
+Integer
+
+=head4 Description
+
+Liefere Wochentagsnummer im Bereich 0-6, 0 = Sonntag.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub dayOfWeek {
+    my $self = shift;
+    return (localtime $$self)[6];
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 dayAbbr() - Abgekürzter Wochentagsname
+
+=head4 Synopsis
+
+  $abbr = $ti->dayAbbr;
+
+=head4 Returns
+
+String
+
+=head4 Description
+
+Liefere abgekürzten Wochentagsnamen (So, Mo, Di, Mi, Do, Fr, Sa).
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+our @DayAbbr = qw(So Mo Di Mi Do Fr Sa);
+
+sub dayAbbr {
+    my $self = shift;
+    return $DayAbbr[$self->dayOfWeek];
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 dayName() - Wochentagsname
+
+=head4 Synopsis
+
+  $name = $ti->dayName;
+
+=head4 Returns
+
+String
+
+=head4 Description
+
+Liefere Wochentagsname (Sonntag, Montag, Dienstag, Mittwoch, Donnerstag,
+Freitag, Samstag).
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+our @DayName = qw(Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag);
+
+sub dayName {
+    my $self = shift;
+    return $DayName[$self->dayOfWeek];
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Zeit-Arithmetik
+
+=head3 minus() - Verschiebe Zeitpunkt in Vergangenheit
+
+=head4 Synopsis
+
+  $t = $t->minus($duration);
+
+=head4 Arguments
+
+=over 4
+
+=item $duration
+
+Dauer, um die der Zeitpunkt in die Vergangenheit verschoben wird.
+Die Dauer wird wie beim Konstruktor von Quiq::Duration angegeben.
+
+=back
+
+=head4 Returns
+
+Geändertes Epoch-Objekt (für Method-Chaining)
+
+=head4 Description
+
+Verschiebe den Zeitpunkt um Dauer $duration in die Vergangenheit.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub minus {
+    my ($self,$duration) = @_;
+    $$self -= Quiq::Duration->new($duration)->asSeconds;
+    return $self;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 plus() - Verschiebe Zeitpunkt in Zukunft
+
+=head4 Synopsis
+
+  $t = $t->plus($duration);
+
+=head4 Arguments
+
+=over 4
+
+=item $duration
+
+Dauer, um die der Zeitpunkt in die Zukunft verschoben wird. Die Dauer
+wird wie beim Konstruktor von Quiq::Duration angegeben.
+
+=back
+
+=head4 Returns
+
+Geändertes Epoch-Objekt (für Method-Chaining)
+
+=head4 Description
+
+Verschiebe den Zeitpunkt um Dauer $duration in die Zukunft.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub plus {
+    my ($self,$duration) = @_;
+    $$self += Quiq::Duration->new($duration)->asSeconds;
+    return $self;
+}
 
 # -----------------------------------------------------------------------------
 
@@ -221,9 +384,29 @@ sub as {
 
 # -----------------------------------------------------------------------------
 
+=head3 asIso() - Erzeuge ISO-Darstellung
+
+=head4 Synopsis
+
+  $str = $t->asIso;
+
+=head4 Returns
+
+Zeit-Darstellung (String)
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub asIso {
+    return shift->as('YYYY-MM-DD HH:MI:SS');
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

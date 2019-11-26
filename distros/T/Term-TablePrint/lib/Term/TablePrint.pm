@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.118';
+our $VERSION = '0.119';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -55,10 +55,10 @@ sub _valid_options {
         choose_columns    => '[ 0 1 ]',
         binary_filter     => '[ 0 1 ]',
         codepage_mapping  => '[ 0 1 ]',
-        color             => '[ 0 1 ]',
         hide_cursor       => '[ 0 1 ]', # documentation
         keep_header       => '[ 0 1 ]',
         squash_spaces     => '[ 0 1 ]',
+        color             => '[ 0 1 2 ]',
         grid              => '[ 0 1 2 ]',
         table_expand      => '[ 0 1 2 ]',
         mouse             => '[ 0 1 2 3 4 ]',
@@ -725,7 +725,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.118
+Version 0.119
 
 =cut
 
@@ -919,7 +919,8 @@ Default: 0
 
 =head3 color
 
-Setting this option to C<1> enables the support for color and text formatting escape sequences.
+Setting I<color> to C<1> enables the support for color and text formatting escape sequences except for the current
+selected element. If set to C<2>, also for the current selected element the color support is enabled (inverted colors).
 
 Default: 0
 

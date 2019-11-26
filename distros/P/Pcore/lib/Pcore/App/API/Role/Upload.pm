@@ -1,24 +1,24 @@
 package Pcore::App::API::Role::Upload;
 
 use Pcore -role, -res;
-use Pcore::Lib::UUID qw[uuid_v4_str];
+use Pcore::Util::UUID qw[uuid_v4_str];
 
 has upload_idle_timeout => 60;
 
 has _uploads      => ( init_arg => undef );
 has _upload_timer => ( init_arg => undef );
 
-sub _upload ( $self, $req, $args, $on_start, $on_finish, $on_hash = undef ) {
+sub _upload ( $self, $auth, $args, $on_start, $on_finish, $on_hash = undef ) {
 
     # upload start
     if ( !$args->{id} ) {
 
-        return $req->( [ 400, q[File size is required] ] ) if !$args->{size};
+        return [ 400, q[File size is required] ] if !$args->{size};
 
         # generate upload id
         my $id = $args->{id} = uuid_v4_str;
 
-        $args->{auth} = $req->{auth};
+        $args->{auth} = $auth;
 
         my $res = $on_start->( $self, $args );
 
@@ -34,17 +34,15 @@ sub _upload ( $self, $req, $args, $on_start, $on_finish, $on_hash = undef ) {
 
             $args->{hash_is_required} = !!$on_hash;
 
-            $req->(
-                200,
-                {   id               => $id,
-                    hash_is_required => $args->{hash_is_required}
-                }
-            );
+            return 200,
+              { id               => $id,
+                hash_is_required => $args->{hash_is_required}
+              };
         }
 
         # upload rejected
         else {
-            $req->($res);
+            return $res;
         }
     }
 
@@ -53,18 +51,18 @@ sub _upload ( $self, $req, $args, $on_start, $on_finish, $on_hash = undef ) {
         my $upload = $self->{_upload}->{ $args->{id} };
 
         # upload was not found
-        return $req->( [ 400, q[Upload id is invalid or expired] ] ) if !$upload;
+        return [ 400, q[Upload id is invalid or expired] ] if !$upload;
 
         if ( $upload->{hash_is_required} && !$upload->{client_hash} ) {
             if ( !$args->{hash} ) {
                 $self->_remove_upload( $args->{id} );
 
-                return $req->( [ 400, 'File hash is required' ] );
+                return [ 400, 'File hash is required' ];
             }
             else {
                 $upload->{client_hash} = $args->{hash};
 
-                return $req->( $on_hash->( $self, $upload ) );
+                return $on_hash->( $self, $upload );
             }
         }
 
@@ -87,7 +85,7 @@ sub _upload ( $self, $req, $args, $on_start, $on_finish, $on_hash = undef ) {
         if ( $upload->{uploaded_size} < $upload->{size} ) {
             $args->{last_activity} = time;
 
-            $req->(200);
+            return 200;
         }
 
         # upload is finished
@@ -99,19 +97,19 @@ sub _upload ( $self, $req, $args, $on_start, $on_finish, $on_hash = undef ) {
                 $upload->{server_hash} = $upload->{server_hash}->hexdigest;
 
                 # hash is invalid
-                return $req->( [ 400, 'File hash is invalid' ] ) if $upload->{client_hash} ne $upload->{server_hash};
+                return [ 400, 'File hash is invalid' ] if $upload->{client_hash} ne $upload->{server_hash};
             }
 
             my $res = $on_finish->( $self, $upload );
 
-            $req->($res);
+            return $res;
         }
 
         # uploaded size is greater
         else {
             $self->_remove_upload( $args->{id} );
 
-            $req->( [ 400, q[File size is invalid] ] );
+            return [ 400, q[File size is invalid] ];
         }
     }
 

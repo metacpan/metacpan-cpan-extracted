@@ -1,3 +1,9 @@
+v0.40.0 2019-11-25T15:57:30Z
+ - code cleanup
+
+v0.39.0 2019-11-23T21:44:22Z
+ - HTTP server response refactored
+
 v0.38.0 2019-11-06T20:36:20Z
  - ported to git
  - ext 7.0.0

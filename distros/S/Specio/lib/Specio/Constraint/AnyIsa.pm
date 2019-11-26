@@ -3,7 +3,7 @@ package Specio::Constraint::AnyIsa;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use Role::Tiny::With;
 use Scalar::Util ();
@@ -75,7 +75,7 @@ Specio::Constraint::AnyIsa - A class for constraints which require a class name 
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

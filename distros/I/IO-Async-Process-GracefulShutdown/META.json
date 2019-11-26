@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,7 @@
       },
       "runtime" : {
          "requires" : {
-            "IO::Async::Process" : "0",
+            "IO::Async::Process" : "0.75",
             "perl" : "5.010"
          }
       },
@@ -35,7 +35,7 @@
    "provides" : {
       "IO::Async::Process::GracefulShutdown" : {
          "file" : "lib/IO/Async/Process/GracefulShutdown.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -44,6 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

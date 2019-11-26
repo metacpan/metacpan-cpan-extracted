@@ -1,7 +1,7 @@
 package Pcore::Core::Event::Listener::Common;
 
 use Pcore -class;
-use Pcore::Lib::UUID qw[uuid_v1mc_str];
+use Pcore::Util::UUID qw[uuid_v1mc_str];
 
 with qw[Pcore::Core::Event::Listener];
 

@@ -5,9 +5,7 @@ use Pcore -class;
 with qw[Pcore::App::Controller::Index];
 
 sub run ( $self, $req ) {
-    $req->( 200, [ 'Content-Type' => 'text/html' ], $self->{app}->{util}->{tmpl}->render('index.html') )->finish;
-
-    return;
+    return 200, [ 'Content-Type' => 'text/html' ], $self->{app}->{util}->{tmpl}->render('index.html');
 }
 
 1;
@@ -19,7 +17,7 @@ sub run ( $self, $req ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 27                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 31 does not match the package declaration       |
+## |    1 | 25                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 29 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

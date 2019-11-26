@@ -1,8 +1,8 @@
 package Pcore::API::Facebook;
 
 use Pcore -const, -class, -res;
-use Pcore::Lib::Data qw[to_uri from_json];
-use Pcore::Lib::Scalar qw[is_plain_arrayref];
+use Pcore::Util::Data qw[to_uri from_json];
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 
 with qw[
   Pcore::API::Facebook::User

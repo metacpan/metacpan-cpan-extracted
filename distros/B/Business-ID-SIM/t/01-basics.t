@@ -3,10 +3,10 @@
 use 5.010;
 use strict;
 use warnings;
+use Test::More 0.98;
 
 use Business::ID::SIM qw(parse_sim);
-use Data::Clean::JSON;
-use Test::More 0.98;
+use Data::Clean::ForJSON;
 
 test_parse(
     sim    => "0101 06 00 0001",
@@ -35,7 +35,7 @@ sub test_parse {
     my %args = @_;
 
     # just to convert DateTime object to Unix time
-    state $cleanser = Data::Clean::JSON->get_cleanser;
+    state $cleanser = Data::Clean::ForJSON->get_cleanser;
 
     subtest +($args{name} //= "sim $args{sim}"), sub {
         my $res = $cleanser->clean_in_place(parse_sim(sim => $args{sim}));

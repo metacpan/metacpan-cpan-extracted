@@ -10,10 +10,12 @@
 #
 ################################################################################
 
+use FindBin ();
+
 BEGIN {
   if ($ENV{'PERL_CORE'}) {
     chdir 't' if -d 't';
-    @INC = ('../lib', '../ext/Devel-PPPort/t', '../ext/Devel-PPPort/parts/inc') if -d '../lib' && -d '../ext';
+    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
     require Config; import Config;
     use vars '%Config';
     if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
@@ -21,13 +23,14 @@ BEGIN {
       exit 0;
     }
   }
-  else {
-    unshift @INC, 't', 'parts/inc';
-  }
+
+  use lib "$FindBin::Bin";
+  use lib "$FindBin::Bin/../parts/inc";
+
+  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
 
   sub load {
-    eval "use Test";
-    require 'testutil.pl' if $@;
+    require 'testutil.pl';
     require 'inctools';
   }
 
@@ -52,9 +55,7 @@ package main;
 use Config;
 
 if ("$]" < '5.004') {
-    for (1..5) {
-        skip 'skip: No newSVpvf support', 0;
-    }
+    skip 'skip: No newSVpvf support', 5;
     exit;
 }
 
@@ -63,18 +64,16 @@ my $num = 1.12345678901234567890;
 eval { Devel::PPPort::croak_NVgf($num) };
 ok($@ =~ /^1.1234567890/);
 
-ok(Devel::PPPort::sprintf_iv(-8), 'XX_-8_XX');
-ok(Devel::PPPort::sprintf_uv(15), 'XX_15_XX');
+is(Devel::PPPort::sprintf_iv(-8), 'XX_-8_XX');
+is(Devel::PPPort::sprintf_uv(15), 'XX_15_XX');
 
 my $ivsize = $Config::Config{ivsize};
 my $ivmax = ($ivsize == 4) ? '2147483647' : ($ivsize == 8) ? '9223372036854775807' : 0;
 my $uvmax = ($ivsize == 4) ? '4294967295' : ($ivsize == 8) ? '18446744073709551615' : 0;
 if ($ivmax == 0) {
-    for (1..2) {
-        skip 'skip: unknown ivsize', 0;
-    }
+    skip 'skip: unknown ivsize', 2;
 } else {
-    ok(Devel::PPPort::sprintf_ivmax(), $ivmax);
-    ok(Devel::PPPort::sprintf_uvmax(), $uvmax);
+    is(Devel::PPPort::sprintf_ivmax(), $ivmax);
+    is(Devel::PPPort::sprintf_uvmax(), $uvmax);
 }
 

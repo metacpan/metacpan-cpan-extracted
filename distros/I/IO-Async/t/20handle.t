@@ -340,7 +340,7 @@ my $sub_writeready = 0;
 
    is_oneref( $handle, '$handle latebound has refcount 1 initially' );
 
-   is( $handle->notifier_name, "no", '$handle->notifier_name for late bind before handles' );
+   is( $handle->notifier_name, "", '$handle->notifier_name for late bind before handles' );
 
    $loop->add( $handle );
 

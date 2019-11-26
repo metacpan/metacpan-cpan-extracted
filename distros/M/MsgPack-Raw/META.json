@@ -52,23 +52,23 @@
    "provides" : {
       "MsgPack::Raw" : {
          "file" : "lib/MsgPack/Raw.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "MsgPack::Raw::Bool" : {
          "file" : "lib/MsgPack/Raw/Bool.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "MsgPack::Raw::Ext" : {
          "file" : "lib/MsgPack/Raw/Ext.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "MsgPack::Raw::Packer" : {
          "file" : "lib/MsgPack/Raw/Packer.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "MsgPack::Raw::Unpacker" : {
          "file" : "lib/MsgPack/Raw/Unpacker.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://github.com/jacquesg/p5-MsgPack-Raw"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026003"
@@ -291,7 +291,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.04",
+                  "tag" : "v0.05",
                   "tag_format" : "v%V",
                   "tag_message" : "%N %v"
                },

@@ -5,11 +5,11 @@ use DBI qw[];
 use Pcore::Handle::DBI::Const qw[:CONST];
 use DBD::SQLite qw[];
 use DBD::SQLite::Constants qw[:file_open];
-use Pcore::Lib::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_blessed_arrayref];
-use Pcore::Lib::UUID qw[uuid_v1mc_str uuid_v4_str];
-use Pcore::Lib::Digest qw[md5_hex];
-use Pcore::Lib::Data qw[to_json];
-use Pcore::Lib::Text qw[encode_utf8];
+use Pcore::Util::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_blessed_arrayref];
+use Pcore::Util::UUID qw[uuid_v1mc_str uuid_v4_str];
+use Pcore::Util::Digest qw[md5_hex];
+use Pcore::Util::Data qw[to_json];
+use Pcore::Util::Text qw[encode_utf8];
 use Time::HiRes qw[];
 
 # NOTE http://habrahabr.ru/post/149635/
@@ -36,6 +36,9 @@ has journal_mode => 'WAL';         # Enum [qw[DELETE TRUNCATE PERSIST MEMORY WAL
 has synchronous  => 'OFF';         # Enum [qw[FULL NORMAL OFF]], OFF - data integrity on app failure, NORMAL - data integrity on app and OS failures, FULL - full data integrity on app or OS failures, slower
 has cache_size   => -1_048_576;    # Int, 0+ - pages,  -kilobytes, default 1G
 has foreign_keys => 1;             # Bool
+
+# TODO
+# has to_string    => 999;           # automaticaly stringify query if number of bind params greater than this threshold
 
 has is_sqlite    => ( 1, init_arg => undef );    # Bool
 has h            => ( init_arg    => undef );    # Object
@@ -253,12 +256,12 @@ sub _exec_sth ( $self, $query, @args ) {
 
     my ( $dbh, $sth, $rows ) = $self->{h};
 
-    # query is prepared sth
+    # query is prepared DBI sth
     if ( ref $query eq 'DBI::st' ) {
         $sth = $query;
     }
 
-    # query is sth
+    # query is pcore sth
     elsif ( ref $query eq 'Pcore::Handle::DBI::STH' ) {
         $sth = $self->{prepared_sth}->{ $query->{id} };
 
@@ -374,6 +377,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
     if ( is_blessed_ref $query) {
         my $sth;
 
+        # query is Pcore sth
         if ( ref $query eq 'Pcore::Handle::DBI::STH' ) {
             $sth = $self->{prepared_sth}->{ $query->{id} };
 
@@ -397,6 +401,8 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
                 weaken $query->{dbh}->[-1];
             }
         }
+
+        # query is prepared DBI sth
         elsif ( ref $query eq 'DBI::st' ) {
             $sth = $query;
         }
@@ -751,13 +757,13 @@ sub attach ( $self, $name, $path = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 365                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (24)                        |
+## |    3 | 368                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (24)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 447                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 453                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 327                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 330                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 658                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 664                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

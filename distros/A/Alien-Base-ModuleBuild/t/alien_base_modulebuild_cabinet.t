@@ -18,19 +18,19 @@ subtest 'basic' => sub {
 subtest 'sort' => sub {
 
   my $cb = Alien::Base::ModuleBuild::Cabinet->new;
-  
+
   $cb->add_files(
     map {
       Alien::Base::ModuleBuild::File->new(@$_)
-    } ( [ filename => 'foo-2' ], 
-        [ filename => 'foo-1' ], 
-        [ filename => 'foo-3' ], 
-        [ filename => 'foo', version => 1 ], 
+    } ( [ filename => 'foo-2' ],
+        [ filename => 'foo-1' ],
+        [ filename => 'foo-3' ],
+        [ filename => 'foo', version => 1 ],
         [ filename => 'bar', version => 2 ],
         [ filename => 'baz', version => 3 ],
       )
   );
-  
+
   $cb->sort_files;
 
   is(

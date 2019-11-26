@@ -4,7 +4,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.01
+Version 2.02
 
 =head1 SYNOPSIS
 
@@ -12,6 +12,7 @@ greple -Msubst --dict I<dictionary> [ options ]
 
   --check=[ng,ok,any,outstand,all]
   --select=N
+  --linefold
   --stat
   --diff
   --diffcmd command
@@ -106,6 +107,13 @@ Select I<N>th entry from the dictionary.  Argument is interpreted by
 L<Getopt::EX::Numbers> module.  Range can be defined like
 B<--select>=I<1:3,7:9>.
 
+=item B<--linefold>
+
+If the target data is folded in the middle of text, use B<--linefold>
+option.  It creates regex patterns which matches string spread across
+lines.  Substituted text does not include newline, though.  Because it
+confuses regex behavior somewhat, avoid to use if possible.
+
 =item B<--stat>
 
 Print statistical information.  By default, it only prints information
@@ -158,7 +166,7 @@ Kazumasa Utashiro
 
 package App::Greple::subst;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use v5.14;
 use strict;
@@ -181,7 +189,27 @@ our @EXPORT_OK   = qw();
 use Carp;
 use Data::Dumper;
 use Text::ParseWords qw(shellwords);
+use Getopt::EX::Numbers;
+use Getopt::EX::Module; # to avoid error. why?
 use App::Greple::Common;
+use App::Greple::Pattern;
+
+# oo interface
+our @ISA = 'App::Greple::Pattern';
+{
+    sub new {
+	my $class = shift;
+	die if @_ < 2;
+	my($pattern, $correct) = splice @_, 0, 2;
+	my $obj = $class->SUPER::new($pattern, @_);
+	$obj->correct($correct);
+	$obj;
+    }
+    sub correct {
+	my $obj = shift;
+	@_ ? $obj->{CORRECT} = shift : $obj->{CORRECT};
+    }
+}
 
 package SmartString {
     use List::Util qw(any);
@@ -208,33 +236,16 @@ my  $ss_check;
 our @opt_format;
 our @default_opt_format = ( '%s' );
 our $opt_subst_select;
+our $opt_linefold;
 
 my $initialized;
 my $current_file;
 my $contents;
-my %fromto;
 my @fromto;
-my @fromto_re;
 my @subst_diffcmd;
 
 sub debug {
     $debug = 1;
-}
-
-sub set_fromto ($$) {
-    my($from, $to) = @_;
-
-    if (exists $fromto{$from}) {
-	if ($fromto{$from} eq $to) {
-	    warn "[$from -> $to] duplicated\n";
-	    return;
-	} else {
-	    warn "[$from -> $to] ignored\n";
-	}
-    } else {
-	$fromto{$from} = $to;
-    }
-    push @fromto, [ qr/$from/, $to ];
 }
 
 sub subst_initialize {
@@ -253,19 +264,9 @@ sub subst_initialize {
 	read_dict($dict);
     }
 
-    my($from, $to);
-    while (defined ($from = shift @opt_subst_from)) {
-	if (not defined ($to = shift @opt_subst_to)) {
-	    warn __PACKAGE__ . ": ($from) Unmatched parameter.\n";
-	    next;
-	}
-	set_fromto $from, $to;
-    }
-    map { warn __PACKAGE__ . ": ($_) Unmatched parameter.\n" } @opt_subst_to;
-
     if (my $select = $opt_subst_select) {
 	my $max = @fromto;
-	my $numbers = new Getopt::EX::Numbers max => $max;
+	my $numbers = Getopt::EX::Numbers->new(max => $max);
 	my @select = do {
 	    map  { $_ - 1 }
 	    sort { $a <=> $b }
@@ -273,13 +274,11 @@ sub subst_initialize {
 	    map  { $numbers->parse($_)->sequence }
 	    split /,/, $select;
 	};
-	for my $l (\@fromto, \@fromto_re) {
-	    @$l = sub {
-		my @result = (undef) x @$l;
-		@result[@select] = @$l[@select];
-		@result;
-	    }->(@$l);
-	}
+	@fromto = sub {
+	    my @result = (undef) x $max;
+	    @result[@select] = @fromto[@select];
+	    @result;
+	}->(@fromto);
     }
 
     $initialized = 1;
@@ -311,9 +310,9 @@ sub subst_stat {
     my %arg = @_;
     $current_file = delete $arg{&FILELABEL} or die;
 
-    for my $i (0 .. $#fromto_re) {
-	my $list = $fromto_re[$i] // next;
-	my($from_re, $to_re, $from, $to) = @$list;
+    for my $i (0 .. $#fromto) {
+	my $p = $fromto[$i] // next;
+	my($from_re, $to) = ($p->regex, $p->correct);
 
 	my @match;
 	while (/$from_re/gp) {
@@ -321,6 +320,7 @@ sub subst_stat {
 	}
 	my $hash = $match_list[$i] //= {};
 	for my $match (@match) {
+	    $match =~ s/\R//g;
 	    $hash->{$match}++;
 	}
     }
@@ -331,12 +331,12 @@ sub subst_stat {
 sub subst_stat_show {
     my %arg = @_;
 
-    my $from_max = max map { vwidth $_->[0] } @fromto_re;
-    my $to_max   = max map { vwidth $_->[3] } @fromto_re;
+    my $from_max = max map { vwidth $_->string  } grep { defined } @fromto;
+    my $to_max   = max map { vwidth $_->correct } grep { defined } @fromto;
 
-    for my $i (0 .. $#fromto_re) {
-	my $list = $fromto_re[$i] // next;
-	my($from_re, $to_re, $from, $to) = @$list or next;
+    for my $i (0 .. $#fromto) {
+	my $p = $fromto[$i] // next;
+	my($from_re, $to) = ($p->string, $p->correct);
 
 	my $hash = $match_list[$i];
 	my @keys = keys %{$hash};
@@ -373,20 +373,17 @@ sub read_dict {
     open DICT, $dict or die "$dict: $!\n";
 
     local $_;
+    my $flag = FLAG_REGEX;
+    $flag |= FLAG_COOK if $opt_linefold;
     while (<DICT>) {
 	chomp;
 	s/^\s*#.*//;
 	/\S/ or next;
 
 	my @param = grep { not m{^//+$} } split ' ';
-	if (@param < 2) {
-	    push @fromto_re, [ @param ] if @param;
-	    next;
-	}
-	my($from, $to) = splice @param, -2, 2;
-	my($from_re, $to_re) = ($from, $to);
-	push @fromto_re, [ $from_re, $to_re, $from, $to ];
-	set_fromto $from, $to;
+	splice @param, 0, -2; # leave last one or two
+	my($pattern, $correct) = @param;
+	push @fromto, __PACKAGE__->new($pattern, $correct, flag => $flag);
     }
     close DICT;
 }
@@ -399,19 +396,21 @@ sub subst_search {
     $current_file = delete $arg{&FILELABEL} or die;
 
     my @matched;
-    for my $index (0 .. $#fromto_re) {
-	my $list = $fromto_re[$index] // next;
-	my($from_re, $to_re, $from, $to) = @$list;
-	my @r = match_regions(pattern => $from_re);
+    for my $index (0 .. $#fromto) {
+	my $p = $fromto[$index] // next;
+	my($from_re, $to) = ($p->string, $p->correct);
+	my @r = match_regions(pattern => $p->regex);
 	next if @r == 0 and $opt_check ne 'all';
 	my $callback = sub {
 	    my($ms, $me, $i, $s) = @_;
 	    my $format = @opt_format[ $i % @opt_format ];
-	    sprintf $format, $opt_subst ? $to : $s;
+	    sprintf($format,
+		    ($opt_subst && $s =~ s/\R//gr ne $to) ? $to : $s);
 	};
 	my(@ok, @ng);
 	for (@r) {
-	    if (substr($text, $_->[0], $_->[1] - $_->[0]) ne $to) {
+	    my $matched = substr($text, $_->[0], $_->[1] - $_->[0]);
+	    if ($matched =~ s/\R//gr ne $to) {
 		$_->[2] = $index * 2;
 		push @ng, $_;
 	    } else {
@@ -497,14 +496,13 @@ sub subst_create {
 __DATA__
 
 builtin dict|subst-file=s  @opt_dictfile
-builtin subst-from=s       @opt_subst_from
-builtin subst-to=s         @opt_subst_to
 builtin subst-format=s     @opt_format
 builtin subst!             $opt_subst
 builtin diffcmd=s          $opt_subst_diffcmd
 builtin U=i                $opt_U
 builtin check=s            $opt_check
 builtin select=s           $opt_subst_select
+builtin linefold!          $opt_linefold
 
 option default   --begin subst_begin --le &subst_search --subst-color
 option --stat    --begin subst_stat --epilogue subst_stat_show
@@ -527,6 +525,12 @@ option  --subst-color \
         --cm 555D/012,K/345 \
         --cm 555D/102,K/435 \
         --cm 555D/120,K/453 \
+        --cm 555D/200,K/533 \
+        --cm 555D/020,K/353 \
+        --cm 555D/002,K/335 \
+        --cm 555D/022,K/355 \
+        --cm 555D/202,K/535 \
+        --cm 555D/220,K/553 \
         --cm 555D/211,K/544 \
         --cm 555D/121,K/454 \
         --cm 555D/112,K/445 \

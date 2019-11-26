@@ -30,7 +30,7 @@ sub tick
 {
    $fg++;
    $fg = 1 if $fg > 7;
-   $static->pen->chattr( fg => $fg );
+   $static->set_style( fg => $fg );
 
    $tickit->timer( after => 0.5, \&tick );
 }

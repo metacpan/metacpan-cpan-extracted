@@ -1,7 +1,7 @@
 package RDF::DOAP::Project;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.100';
+our $VERSION   = '0.103';
 
 use Moose;
 extends qw(RDF::DOAP::Resource);
@@ -131,9 +131,36 @@ sub changelog
 {
 	my $self = shift;
 	
+	my @releases = @{ $self->sorted_releases };
+	my @filtered_releases;
+	while (@releases) {
+		my $next = shift @releases;
+		if (@releases) {
+			my $found_catchup = undef;
+			for my $i (reverse(0 .. $#releases)) {
+				for my $cs (@{ $releases[$i]->changesets || [] }) {
+					if ($cs->has_versus and $cs->versus->revision eq $next->revision) {
+						$found_catchup = $i;
+					}
+				}
+			}
+			if ($found_catchup) {
+				my @intermediates = splice(@releases, 0, $found_catchup);
+				push @filtered_releases, $next->changelog_section;
+				push @filtered_releases, map $_->_changelog_section_header, @intermediates;
+			}
+			else {
+				push @filtered_releases, $next->changelog_section;
+			}
+		}
+		else {
+			push @filtered_releases, $next->changelog_section;
+		}
+	}
+	
 	return join "\n",
 		$self->_changelog_header,
-		map($_->changelog_section, reverse @{ $self->sorted_releases });
+		reverse @filtered_releases;
 }
 
 sub _changelog_header

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use Quiq::Shell;
 
@@ -36,16 +36,15 @@ L<Quiq::Hash>
 
 =over 4
 
-=item $program
+=item $program (Default: 'xterm')
 
-Art des X-Terminals. Mögliche Werte: 'xterm' (Default),
-'gnome-terminal'.
+X-Terminal-Programm. Mögliche Werte: 'xterm', 'gnome-terminal'.
 
 =back
 
 =head4 Description
 
-Instantiiere ein XTerminal-Fenster-Objekt und liefere eine
+Instantiiere ein X-Terminal-Fenster-Objekt und liefere eine
 Referenz auf dieses Objekt zurück.
 
 =cut
@@ -69,6 +68,22 @@ sub new {
 }
 
 # -----------------------------------------------------------------------------
+
+=head2 Attributmethoden
+
+=head3 program() - Name des X-Terminals
+
+=head4 Synopsis
+
+  $program = $xtl->program;
+
+=head4 Returns
+
+String
+
+=head4 Description
+
+Liefere den Namen des X-Terminal-Programms (siehe Konstruktor) zurück.
 
 =head2 Objektmethoden
 
@@ -104,10 +119,6 @@ Kommandozeile des Programms, das gestartet werden soll.
 
 =back
 
-=head4 Returns
-
-nichts
-
 =cut
 
 # -----------------------------------------------------------------------------
@@ -135,15 +146,9 @@ sub launch {
 
 # -----------------------------------------------------------------------------
 
-=head3 program() - Name des Programms
-
-=head4 Synopsis
-
-  $program = $xtl->program;
-
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

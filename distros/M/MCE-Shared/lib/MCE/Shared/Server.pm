@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.862';
+our $VERSION = '1.863';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -28,7 +28,7 @@ no overloading;
 use Carp ();
 use Storable ();
 
-my ($_has_threads, $_spawn_child, $_freeze, $_thaw);
+my ($_spawn_child, $_freeze, $_thaw);
 
 BEGIN {
    local $@;
@@ -36,8 +36,7 @@ BEGIN {
    eval 'use IO::FDPass ();'
       if ( ! $INC{'IO/FDPass.pm'} && $^O ne 'cygwin' );
 
-   $_has_threads = $INC{'threads.pm'} ? 1 : 0;
-   $_spawn_child = $_has_threads  ? 0 : 1;
+   $_spawn_child = $INC{'threads.pm'} ? 0 : 1;
 
    if ( ! $INC{'PDL.pm'} ) {
       eval 'use Sereal::Encoder 3.015; use Sereal::Decoder 3.015;';
@@ -65,8 +64,8 @@ use Scalar::Util qw( blessed looks_like_number reftype weaken );
 use Socket qw( SOL_SOCKET SO_RCVBUF );
 use Time::HiRes qw( alarm sleep time );
 
-use MCE::Util 1.838 ();
-use MCE::Signal ();
+use MCE::Signal 1.863 (); # requires 1.863 minimally
+use MCE::Util ();
 use MCE::Mutex ();
 use bytes;
 
@@ -124,19 +123,15 @@ my @_db_modules = qw(
    Tie::Array::DBD Tie::Hash::DBD
 );
 
-my $_sig;
-my $_sigint  = sub { $_sig = 'INT'  };
-my $_sigterm = sub { $_sig = 'TERM' };
-
 my $_is_MSWin32 = ( $^O eq 'MSWin32') ? 1 : 0;
-my $_tid = $_has_threads ? threads->tid() : 0;
+my $_tid = $INC{'threads.pm'} ? threads->tid() : 0;
 my $_oid = "$$.$_tid";
 
 sub _croak {
    Carp::carp($_[0]); MCE::Signal::stop_and_exit('INT');
 }
 sub CLONE {
-   $_tid = threads->tid() if $_has_threads;
+   $_tid = threads->tid() if $INC{'threads.pm'};
 }
 
 END {
@@ -195,9 +190,10 @@ sub _new {
 
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
+   local $MCE::Signal::SIG;
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_DAT_LOCK->lock() if !$_is_MSWin32;
@@ -225,7 +221,8 @@ sub _new {
       $_DAT_LOCK->unlock() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
+
    $! = $_id, return '' unless $_len;
 
    if (keys %_hndls) {
@@ -235,7 +232,7 @@ sub _new {
 
    if (!$_deeply) {
       # for auto-destroy
-      $_new{ $_id } = $_has_threads ? $$ .'.'. $_tid : $$;
+      $_new{ $_id } = $_tid ? $$ .'.'. $_tid : $$;
    }
 
    return $_thaw->($_buf);
@@ -251,9 +248,10 @@ sub _incr_count {
 
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
+   local $MCE::Signal::SIG;
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_DAT_LOCK->lock() if !$_is_MSWin32;
@@ -265,7 +263,7 @@ sub _incr_count {
       $_DAT_LOCK->unlock() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    return;
 }
@@ -370,13 +368,11 @@ sub _start {
 
    local $_;  $_init_pid = "$$.$_tid";
 
-   my $_data_channels = ($_init_pid eq $_oid)
-      ? ( $INC{'MCE/Channel.pm'} ? 6 : DATA_CHANNELS )
-      : 2;
+   my $_data_channels = ($_init_pid eq $_oid) ? DATA_CHANNELS : 2;
 
    $_SVR = { _data_channels => $_data_channels };
 
-   # Defaults to misc channel used by _new, _get_hobo_data, and export.
+   # Defaults to the misc channel used by _new, _get_hobo_data, and export.
    MCE::Util::_sock_pair($_SVR, qw(_dat_r_sock _dat_w_sock), $_)
       for (0 .. $_data_channels + 1);
 
@@ -396,9 +392,8 @@ sub _start {
 
    MCE::Shared::Object::_start();
 
-   local $SIG{TTIN}  unless $_is_MSWin32;
-   local $SIG{TTOU}  unless $_is_MSWin32;
-   local $SIG{WINCH} unless $_is_MSWin32;
+   local $SIG{TTIN}, local $SIG{TTOU}, local $SIG{WINCH}
+      unless $_is_MSWin32;
 
    if ($_spawn_child) {
       $_svr_pid = fork();
@@ -412,7 +407,7 @@ sub _start {
    _croak("cannot start the shared-manager process: $!")
       unless (defined $_svr_pid);
 
-   sleep(0.005) if (!$_spawn_child || $_is_MSWin32);
+   sleep 0.015 if (!$_spawn_child || $_is_MSWin32);
 
    return;
 }
@@ -432,6 +427,9 @@ sub _stop {
          eval { $_svr_pid->kill('KILL') };
       }
       else {
+         local $SIG{HUP} = local $SIG{QUIT} = local $SIG{PIPE} =
+         local $SIG{INT} = local $SIG{TERM} = sub {};
+
          my $_start = time;
 
          eval {
@@ -441,7 +439,7 @@ sub _stop {
 
          while () {
             last if waitpid($_svr_pid, _WNOHANG);
-            if ( time - $_start > 0.5 ) {
+            if ( time - $_start > 0.7 ) {
                CORE::kill('USR2', $_svr_pid);
                waitpid($_svr_pid, 0);
                last;
@@ -523,8 +521,8 @@ sub _destroy {
 ###############################################################################
 
 sub _exit {
-   $SIG{__DIE__}  = sub { } unless $_tid;
-   $SIG{__WARN__} = sub { };
+   $SIG{__DIE__}  = sub {} unless $_tid;
+   $SIG{__WARN__} = sub {};
 
    # Flush file handles.
    for my $_id ( keys %_obj ) {
@@ -553,9 +551,7 @@ sub _exit {
       sleep 1.0;
    }
 
-   if ( !$_spawn_child || ($_has_threads && $_is_MSWin32) ) {
-      threads->exit(0);
-   }
+   threads->exit(0) if ( !$_spawn_child || $_is_MSWin32 );
 
    CORE::kill('KILL', $$) unless $_is_MSWin32;
    CORE::exit(0);
@@ -564,22 +560,21 @@ sub _exit {
 sub _loop {
    $_is_client = 0;
 
+   $MCE::MCE = undef if ($MCE::MCE && $MCE::MCE->{_wid} == 0);
+
    local $\ = undef; local $/ = $LF; $| = 1;
    my $_running_inside_eval = $^S;
 
-   if ($_init_pid eq $_oid) {
-      $SIG{TERM} = $SIG{QUIT} = $SIG{INT} = $SIG{HUP} = sub {};
-      $SIG{KILL} = \&_exit if !$_spawn_child;
-      $SIG{USR2} = \&_exit if !$_is_MSWin32;
-   }
+   local $SIG{TERM} = local $SIG{QUIT} = local $SIG{INT} = local $SIG{HUP} = sub {}
+      if ($_init_pid eq $_oid);
 
-   if ($_spawn_child && !$_is_MSWin32) {
-      $SIG{PIPE} = sub {
-         $SIG{PIPE} = sub {}; CORE::kill('PIPE', getppid());
-      };
-   }
+   local $SIG{PIPE} = sub { $SIG{PIPE} = sub {}; CORE::kill('PIPE', getppid()); }
+      if ($_spawn_child && !$_is_MSWin32);
 
-   $SIG{__DIE__} = sub {
+   local $SIG{USR2} = \&_exit if ($_init_pid eq $_oid && !$_is_MSWin32);
+   local $SIG{KILL} = \&_exit if ($_init_pid eq $_oid && !$_spawn_child);
+
+   local $SIG{__DIE__} = sub {
       if (!defined $^S || $^S) {
          if ( ($INC{'threads.pm'} && threads->tid() != 0) ||
                $ENV{'PERL_IPERL_RUNNING'} ||
@@ -597,17 +592,16 @@ sub _loop {
          }
       }
 
-      $SIG{INT} = $SIG{__DIE__} = $SIG{__WARN__} = sub { };
+      $SIG{INT} = $SIG{__DIE__} = $SIG{__WARN__} = sub {};
       print {*STDERR} defined $_[0] ? $_[0] : '';
-      CORE::kill('INT', $_is_MSWin32 ? -$$ : -getpgrp);
 
       ( $_spawn_child && !$_is_MSWin32 )
-         ? CORE::kill('KILL', $$)
+         ? CORE::kill('KILL', -getpgrp)
          : CORE::exit($?);
    };
 
    my ($_id, $_fcn, $_wa, $_len, $_le2, $_func, $_var);
-   my ($_client_id, $_done) = (0, 0);
+   my ($_channel_id, $_done) = (0, 0);
 
    my $_channels   = $_SVR->{_dat_r_sock};
    my $_DAT_R_SOCK = $_SVR->{_dat_r_sock}[0];
@@ -802,8 +796,8 @@ sub _loop {
       },
 
       SHR_M_CID.$LF => sub {                      # ClientID request
-         print {$_DAU_R_SOCK} (++$_client_id).$LF;
-         $_client_id = 0 if ($_client_id > 2e9);
+         print {$_DAU_R_SOCK} (++$_channel_id).$LF;
+         $_channel_id = 0 if ($_channel_id >= $_SVR->{_data_channels});
 
          return;
       },
@@ -1067,25 +1061,18 @@ sub _loop {
          chomp($_id  = <$_DAU_R_SOCK>),
          chomp($_key = <$_DAU_R_SOCK>);
 
-         my $attempt = chop $_key;
-
-         if ( ! $attempt ) {
-            delete $_obj{ $_id }{ 'R'.$_key };
+         if (! chop $_key) {
             delete $_obj{ $_id }{ 'S'.$_key };
+            delete $_obj{ $_id }{ 'R'.$_key };
 
             return;
          }
 
-         if ($attempt > 1 || exists $_obj{ $_id }{ 'R'.$_key }) {
-            my $result = delete $_obj{ $_id }{ 'R'.$_key } // '';
-            my $error  = delete $_obj{ $_id }{ 'S'.$_key } // '';
+         my $error  = delete $_obj{ $_id }{ 'S'.$_key } // '';
+         my $result = delete $_obj{ $_id }{ 'R'.$_key } // '';
 
-            print {$_DAU_R_SOCK} length($result).$LF . length($error).$LF,
-                  $result, $error;
-         }
-         else {
-            print {$_DAU_R_SOCK} '0'.$LF . '2'.$LF . '' . '-1';
-         }
+         print {$_DAU_R_SOCK}
+            length($error).$LF . length($result).$LF . $error, $result;
 
          return;
       },
@@ -1301,8 +1288,8 @@ BEGIN {
 # Hook for threads.
 
 sub CLONE {
-   $_tid = threads->tid() if $_has_threads;
-   &_init($_tid)          if $_tid;
+   $_tid = threads->tid() if $INC{'threads.pm'};
+   &_init($_tid) if $_tid;
 }
 
 # Private functions.
@@ -1318,7 +1305,7 @@ sub DESTROY {
    my $_id = $_[0]->[_ID];
 
    if ( exists $_new{ $_id } ) {
-      my $_pid = $_has_threads ? $$ .'.'. $_tid : $$;
+      my $_pid = $_tid ? $$ .'.'. $_tid : $$;
 
       if ($_new{ $_id } eq $_pid) {
          return if $MCE::Signal::KILLED;
@@ -1327,7 +1314,7 @@ sub DESTROY {
          delete($_new{ $_id }), delete($_ob2{ $_id }),
          delete($_ob3{"$_id:count"});
 
-         _req0('M~DES', $_id.$LF);
+         _req1('M~DES', $_id.$LF);
       }
    }
 
@@ -1368,13 +1355,13 @@ sub _start {
 
    # inlined for performance
    $_dat_ex = sub {
-      my $_pid = $_has_threads ? $$ .'.'. $_tid : $$;
+      my $_pid = $_tid ? $$ .'.'. $_tid : $$;
       MCE::Util::_sysread($_DAT_LOCK->{_r_sock}, my($b), 1), $_DAT_LOCK->{ $_pid } = 1
          unless $_DAT_LOCK->{ $_pid };
    };
    $_dat_un = sub {
-      my $_pid = $_has_threads ? $$ .'.'. $_tid : $$;
-      syswrite($_DAT_LOCK->{_w_sock}, '0'), $_DAT_LOCK->{ $_pid } = 0
+      my $_pid = $_tid ? $$ .'.'. $_tid : $$;
+      CORE::syswrite($_DAT_LOCK->{_w_sock}, '0'), $_DAT_LOCK->{ $_pid } = 0
          if $_DAT_LOCK->{ $_pid };
    };
 
@@ -1392,14 +1379,15 @@ sub _stop {
    return;
 }
 
-sub _get_client_id {
+sub _get_channel_id {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
+   local $MCE::Signal::SIG;
 
    my $_ret;
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -1410,7 +1398,7 @@ sub _get_client_id {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    return $_ret;
 }
@@ -1418,7 +1406,7 @@ sub _get_client_id {
 sub _init {
    return unless defined $_SVR;
 
-   my $_id = $_[0] // &_get_client_id();
+   my $_id = $_[0] // &_get_channel_id();
       $_id = $$ if ( $_id !~ /\d+/ );
 
    $_chn        = abs($_id) % $_SVR->{_data_channels} + 1;
@@ -1427,7 +1415,7 @@ sub _init {
 
    %_new = (), _reset();
 
-   return $_id;
+   return;
 }
 
 ###############################################################################
@@ -1442,30 +1430,30 @@ my %_nofreeze = map { $_ => undef } qw( enqueue decrby incrby );
 
 sub _auto {
    my $_wa = !defined wantarray ? _UNDEF : wantarray ? _ARRAY : _SCALAR;
+
    local $\ = undef if (defined $\);
+   local $MCE::Signal::SIG;
 
    my ( $_buf, $_frozen );
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
+      $_dat_ex->() if !$_is_MSWin32;
 
       if ( @_ == 2 ) {
-         $_dat_ex->() if !$_is_MSWin32;
          print({$_DAT_W_SOCK} 'M~OB0'.$LF . $_chn.$LF),
          print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF);
       }
       elsif ( @_ == 3 && ( !looks_like_number $_[2] || exists $_nofreeze{ $_[0] } )
                       && !ref $_[2] && defined $_[2] ) {
-         $_dat_ex->() if !$_is_MSWin32;
          print({$_DAT_W_SOCK} 'M~OB1'.$LF . $_chn.$LF),
          print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF .
             length($_[2]).$LF, $_[2]);
       }
       elsif ( @_ == 4 && !looks_like_number $_[3] && !ref $_[3] && defined $_[3]
                       && !looks_like_number $_[2] && !ref $_[2] && defined $_[2] ) {
-         $_dat_ex->() if !$_is_MSWin32;
          print({$_DAT_W_SOCK} 'M~OB2'.$LF . $_chn.$LF),
          print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF .
             length($_[2]).$LF . length($_[3]).$LF, $_[2], $_[3]);
@@ -1474,7 +1462,6 @@ sub _auto {
          my ( $_fcn, $_id, $_tmp ) = ( shift, shift()->[_ID], $_freeze->([ @_ ]) );
          my $_buf = $_id.$LF . $_fcn.$LF . $_wa.$LF . length($_tmp).$LF;
 
-         $_dat_ex->() if !$_is_MSWin32;
          print({$_DAT_W_SOCK} 'M~OBJ'.$LF . $_chn.$LF),
          print({$_DAU_W_SOCK} $_buf, $_tmp);
       }
@@ -1482,14 +1469,14 @@ sub _auto {
       if ( $_wa ) {
          local $/ = $LF if ($/ ne $LF);
          chomp(my $_len = <$_DAU_W_SOCK>);
-         $_frozen = chop $_len;
-         read $_DAU_W_SOCK, $_buf, $_len;
+         $_frozen = chop($_len), read($_DAU_W_SOCK, $_buf, $_len);
       }
 
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
+
    return unless $_wa;
 
    return ( $_wa != _ARRAY )
@@ -1507,11 +1494,12 @@ sub _get_hobo_data {
 
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
+   local $MCE::Signal::SIG;
 
    my ($_result, $_error);
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -1523,63 +1511,32 @@ sub _get_hobo_data {
          chomp(my $_le1 = <$_DAU_W_SOCK>),
          chomp(my $_le2 = <$_DAU_W_SOCK>);
 
-         read($_DAU_W_SOCK, $_result, $_le1) if $_le1;
-         read($_DAU_W_SOCK, $_error,  $_le2) if $_le2;
+         read($_DAU_W_SOCK, $_error,  $_le1) if $_le1;
+         read($_DAU_W_SOCK, $_result, $_le2) if $_le2;
       }
 
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    return ($_result, $_error);
 }
 
-# Called by CLOSE, DESTROY, and destroy using the misc data channel.
-
-sub _req0 {
-   return unless defined $_DAU_W_SOCK;  # (in cleanup)
-
-   my $_chn        = $_SVR->{_data_channels} + 1;
-   my $_DAT_LOCK   = $_SVR->{'_mutex_'.$_chn};
-   my $_DAT_W_SOCK = $_SVR->{_dat_w_sock}[0];
-   my $_DAU_W_SOCK = $_SVR->{_dat_w_sock}[$_chn];
-
-   local $\ = undef if (defined $\);
-   local $/ = $LF   if ($/ ne $LF );
-
-   my $_ret;
-
-   {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
-
-      CORE::lock $_DAT_LOCK if $_is_MSWin32;
-      $_DAT_LOCK->lock() if !$_is_MSWin32;
-
-      print({$_DAT_W_SOCK} $_[0].$LF . $_chn.$LF),
-      print({$_DAU_W_SOCK} $_[1]);
-      chomp($_ret = <$_DAU_W_SOCK>);
-
-      $_DAT_LOCK->unlock if !$_is_MSWin32;
-   }
-
-   CORE::kill($_sig, $$) if $_sig;
-
-   $_ret;
-}
-
 # Called by await, rewind, broadcast, signal, timedwait, and wait.
+# Including CLOSE, DESTROY, and destroy.
 
 sub _req1 {
    return unless defined $_DAU_W_SOCK;  # (in cleanup)
 
    local $\ = undef if (defined $\);
    local $/ = $LF   if ($/ ne $LF );
+   local $MCE::Signal::SIG;
 
    my $_ret;
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -1591,7 +1548,7 @@ sub _req1 {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    $_ret;
 }
@@ -1600,9 +1557,10 @@ sub _req1 {
 
 sub _req2 {
    local $\ = undef if (defined $\);
+   local $MCE::Signal::SIG;
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -1613,7 +1571,7 @@ sub _req2 {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    1;
 }
@@ -1625,11 +1583,12 @@ sub _req3 {
 
    local $\ = undef if (defined $\);
    local $/ = $LF   if ($/ ne $LF );
+   local $MCE::Signal::SIG;
 
    delete $self->[_ITER] if defined $self->[_ITER];
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -1640,7 +1599,7 @@ sub _req3 {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    return;
 }
@@ -1650,6 +1609,7 @@ sub _req3 {
 sub _req4 {
    local $\ = undef if (defined $\);
    local $/ = $LF   if ($/ ne $LF );
+   local $MCE::Signal::SIG;
 
    my ( $_key, $_len, $_buf, $_frozen );
 
@@ -1659,7 +1619,7 @@ sub _req4 {
    }
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -1674,7 +1634,8 @@ sub _req4 {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
+
    return undef if ($_len < 0);
 
    if ( $_[1]->[_DECODE] && $_[0] eq 'FETCH' ) {
@@ -1690,11 +1651,12 @@ sub _req4 {
 sub _size {
    local $\ = undef if (defined $\);
    local $/ = $LF   if ($/ ne $LF );
+   local $MCE::Signal::SIG;
 
    my $_size;
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -1706,7 +1668,7 @@ sub _size {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    length($_size) ? int($_size) : undef;
 }
@@ -1758,12 +1720,12 @@ sub destroy {
    my $_id   = $_[0]->[_ID];
    my $_un   = (ref $_[1] eq 'HASH' && $_[1]->{'unbless'}) ? 1 : 0;
    my $_item = (defined wantarray) ? $_[0]->export({ unbless => $_un }) : undef;
-   my $_pid  = $_has_threads ? $$ .'.'. $_tid : $$;
+   my $_pid  = $_tid ? $$ .'.'. $_tid : $$;
 
    delete($_all{ $_id }), delete($_obj{ $_id });
 
    if (defined $_svr_pid && exists $_new{ $_id } && $_new{ $_id } eq $_pid) {
-      delete($_new{ $_id }), _req0('M~DES', $_id.$LF);
+      delete($_new{ $_id }), _req1('M~DES', $_id.$LF);
    }
 
    $_[0] = undef;
@@ -1792,11 +1754,12 @@ sub export {
    {
       local $\ = undef if (defined $\);
       local $/ = $LF if ($/ ne $LF);
+      local $MCE::Signal::SIG;
 
       my $_len;
 
       {
-         $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+         local $MCE::Signal::IPC = 1;
 
          CORE::lock $_DAT_LOCK if $_is_MSWin32;
          $_dat_ex->() if !$_is_MSWin32;
@@ -1810,7 +1773,8 @@ sub export {
          $_dat_un->() if !$_is_MSWin32;
       }
 
-      CORE::kill($_sig, $$) if $_sig;
+      CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
+
       return undef if ($_len < 0);
 
       $_item = $_lkup->{ $_id } = Storable::thaw($_buf);
@@ -1871,7 +1835,7 @@ sub iterator {
    my $get = $pkg->can('FETCH') ? 'FETCH' : $pkg->can('get') ? 'get' : '';
 
    unless ( ($flg || $pkg->can('FETCHSIZE')) && $get ) {
-      return sub { };
+      return sub {};
    }
 
    # MCE::Shared::{ Array, Cache, Hash, Ordhash }, Hash::Ordered,
@@ -1883,7 +1847,7 @@ sub iterator {
       @keys = $self->keys;
    }
    elsif ( @keys == 1 && $keys[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
-      return sub { } unless $pkg->isa('MCE::Shared::Base::Common');
+      return sub {} unless $pkg->isa('MCE::Shared::Base::Common');
       @keys = $self->keys($keys[0]);
    }
    elsif ( $pkg->isa('MCE::Shared::Cache') ) {
@@ -1916,11 +1880,12 @@ sub rewind {
 sub next {
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
+   local $MCE::Signal::SIG;
 
    my ( $_len, $_buf );
 
    {
-      $_sig = undef, local $SIG{INT} = $_sigint, local $SIG{TERM} = $_sigterm;
+      local $MCE::Signal::IPC = 1;
 
       CORE::lock $_DAT_LOCK if $_is_MSWin32;
       $_dat_ex->() if !$_is_MSWin32;
@@ -1934,7 +1899,8 @@ sub next {
       $_dat_un->() if !$_is_MSWin32;
    }
 
-   CORE::kill($_sig, $$) if $_sig;
+   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
+
    return if ($_len < 0);
 
    my $_b; return wantarray ? () : undef unless @{ $_b = $_thaw->($_buf) };
@@ -2061,7 +2027,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.862
+This document describes MCE::Shared::Server version 1.863
 
 =head1 DESCRIPTION
 

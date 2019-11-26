@@ -44,11 +44,11 @@ Asm::X86 - List of instructions and registers of x86-compatible processors, vali
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =head1 DESCRIPTION
 
@@ -391,7 +391,7 @@ our @instr_intel = (
 	'lodsq', 'lodsw', 'loop', 'loopd', 'loope', 'looped', 'loopeq', 'loopew', 'loopne', 'loopned',
 	'loopneq', 'loopnew', 'loopnz', 'loopnzd', 'loopnzq', 'loopnzw', 'loopq', 'loopw', 'loopz',
 	'loopzd', 'loopzq', 'loopzw', 'lsl', 'lss', 'ltr', 'lwpins', 'lwpval', 'lzcnt', 'maskmovdqu',
-	'maskmovq', 'maxpd', 'maxps', 'maxsd', 'maxss', 'mfence', 'minpd', 'minps', 'minsd',
+	'maskmovq', 'maxpd', 'maxps', 'maxsd', 'maxss', 'mcommit', 'mfence', 'minpd', 'minps', 'minsd',
 	'minss', 'monitor', 'monitorx', 'montmul', 'mov', 'movapd',
 	'movaps', 'movbe', 'movd', 'movddup', 'movdir64b', 'movdiri', 'movdq2q',
 	'movdqa', 'movdqu', 'movhlps', 'movhpd', 'movhps', 'movlhps', 'movlpd', 'movlps', 'movmskpd',

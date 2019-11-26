@@ -13,6 +13,9 @@ use Test::More;
 use Mojo::File qw( path tempdir );
 use Yancy::Backend::Static;
 use JSON::PP ( );
+use Encode qw( encode decode );
+use POSIX qw( setlocale LC_ALL );
+use utf8;
 
 my $temp = tempdir();
 my $be = Yancy::Backend::Static->new(
@@ -203,5 +206,84 @@ is_deeply $item,
         html => qq{<h1>Index</h1>\n},
     },
     'get item with trailing slash works correctly';
+
+subtest 'encoding' => sub {
+    # These inputs to encode() are stringified because Encode will
+    # modify the scalar in-place, causing our tests to fail because
+    # the variables we're using have been emptied (causing the content
+    # written to the file to be truncated).
+    my $id_decoded = "æøå";
+    my $id_encoded = encode( "ISO8859-1" => "$id_decoded", Encode::FB_CROAK );
+    my $content_decoded = "þ";
+    my $content_encoded = encode( "ISO8859-1" => "$content_decoded", Encode::FB_CROAK );
+
+    my $force_locale = 'en_US.ISO8859-1';
+    my $locale = setlocale( LC_ALL );
+    diag "Before locale change: $locale";
+    setlocale( LC_ALL, $force_locale );
+    local $ENV{LANG} = $force_locale;
+    local $ENV{LC_ALL} = $force_locale;
+    local $ENV{LC_CTYPE} = $force_locale;
+    $locale = setlocale( LC_ALL );
+    diag "After locale change: $locale";
+    if ( $locale ne $force_locale ) {
+        pass "Could not change locale to $force_locale. Skipping";
+        return;
+    }
+
+    my $be = Yancy::Backend::Static->new(
+        'static:' . $temp,
+    );
+
+    my %decoded_page = (
+        title => 'Test ' . $id_decoded,
+        path => $id_decoded,
+        markdown => $content_decoded,
+    );
+
+    # create
+    my $id;
+    eval {
+        $id = $be->create( pages => \%decoded_page );
+    };
+    ok !$@, 'create succeeds' or diag $@;
+    is $id, $id_decoded, 'id returned is decoded';
+
+    if ( ok -e $temp->child( "$id_decoded.markdown" ), 'create() - correct file name exists' ) {
+        is $temp->child( "$id_decoded.markdown" )->slurp,
+            join( "\n",
+                "---",
+                "title: Test $id_encoded",
+                "---",
+                "$content_encoded",
+            ),
+            'create() - content in file is correct',
+            ;
+    }
+
+    # set
+    $content_decoded = "Þ";
+    $content_encoded = encode( $force_locale => "$content_decoded", Encode::FB_CROAK );
+    $decoded_page{ markdown } = $content_decoded;
+    my $ok;
+    eval {
+        $ok = $be->set( pages => $id_decoded, \%decoded_page );
+    };
+    ok !$@, 'set succeeds' or diag $@;
+    ok $ok, 'set returns success';
+
+    if ( ok -e $temp->child( "$id_decoded.markdown" ), 'set() - correct file name exists' ) {
+        is $temp->child( "$id_decoded.markdown" )->slurp,
+            join( "\n",
+                "---",
+                "title: Test $id_encoded",
+                "---",
+                "$content_encoded",
+            ),
+            'set() - content in file is correct',
+            ;
+    }
+
+};
 
 done_testing;

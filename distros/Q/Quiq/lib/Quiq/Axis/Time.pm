@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.164';
+our $VERSION = '1.165';
 
 use Quiq::Math;
 use Quiq::Hash;
@@ -144,123 +144,85 @@ sub new {
 
     my ($length,$min,$max,$debug) = $self->get(qw/length min max debug/);
 
-    my @stepList = (
-        1,          # 1 Sekunde
-        5,          # 5 Sekunden
-        10,         # 10 Sekunden
-        30,         # 30 Sekunden
-        60,         # 1 Minute
-        300,        # 5 Minuten
-        600,        # 10 Minuten
-        1_800,      # eine halbe Stunde
-        3_600,      # eine Stunde
-        86_400,     # ein Tag
-        2_592_000,  # ungefähr ein Monat (30 Tage)
-        31_536_000, # ungefähr ein Jahr (365 Tage)
-    );
-
-    my $minTickSize = $self->labelSize(int $min); # min. Breite bzw. Höhe
-    my $maxTicks = $length/$minTickSize;
-    my $minStep = ($max-$min)/$maxTicks;
-    my $maxStep = $max-$min;
-
     # Mögliche Schrittweiten ermitteln
 
     my @candidates;
 
-    LOOP_EXP:
-    for my $exp (-10 .. 10) { # Exponent
-        LOOP_BASE:
-        for my $base (1,2,5) { # Basiswert
-            my $step = $base*10**$exp; # Schrittweite
+    # Einteilung bis Tag
 
-            if ($step < $minStep) {
-                # Weiter: die Schrittweite ist so klein, es würden
-                # mehr Ticks als theoretisch auf die Achse passen
-                next;
-            }
+    STEP_LOOP:
+    for my $step (1,60,3600,86400) {
+        my $val = $self->firstTick($step);
+        if ($val > $max) {
+            # Ende: erster Tick liegt jenseits der Achse
+            last STEP_LOOP;
+        }
 
-            my $val = $self->firstTick($step);
-            if ($val > $max) {
-                # Ende: erster Tick liegt jenseits der Achse
-                last LOOP_EXP;
-            }
+        if ($debug) {
+            print STDERR "$step: ";
+        }
 
-            if ($debug) {
-                print STDERR "$step: ";
-            }
+        # Alle Ticks für die Schrittweite durchlaufen und prüfen, ob
+        # genug Raum für jedes Label ist. Gibt es eine Überlappung,
+        # wird mit der nächsten Schrittweite weiter gemacht.
 
-            # Alle Ticks für die Schrittweite durchlaufen und prüfen, ob
-            # genug Raum für jedes Label ist. Gibt es eine Überlappung,
-            # wird mit der nächsten Schrittweite weiter gemacht.
-
-            my (@values,$minPos,$maxPos,$minGap);
-            # for (; $val <= $max; $val += $step) {
-            while ($val <= $max) {
-                push @values,$val;
-                my $pos = Quiq::Math->valueToPixel($length,$min,$max,$val);
-                my $size = $self->labelSize($val); # Größe Tick
-                my $pos0 = int $pos-$size/2; # Anfangsposition Tick
-                my $pos1 = int $pos+$size/2; # Endposition Tick
-                
-                if ($debug) {
-                    print STDERR " $val($pos0/$pos/$pos1)";
-                }
-                if (defined $maxPos) { # beim ersten Step keine Überlappung
-                    if ($pos0 > $maxPos+$minTickGap) {
-                        my $gap = $pos0-$maxPos;
-                        if (!defined($minGap) || $gap < $minGap) {
-                            $minGap = $gap;
-                        }
-                    }
-                    else {
-                        # Weiter: Label überlappen sich
-                        if ($debug) {
-                            print STDERR " Ueberlappung\n";
-                        }
-                        next LOOP_BASE;
-                    }
-                }
-                if (!defined $minPos) {
-                    $minPos = $pos0; # erste Pixelkoordinate
-                }
-                $maxPos = $pos1; # letzte Pixelkoordinate
-
-                # Nächster Tick-Wert. Bei Schrittweiten < 0 müssen wir
-                # runden, da sonst manchmal der letzte Tick nicht
-                # hinzugenommen wird (offenbar ist der Wert > $max)
-
-                $val = sprintf '%.*f',($exp < 0? abs $exp: 0),$val+$step;
-                if (index($val,'.') >= 0) {
-                    $val =~ s/\.?0+$//;
-                }
-            }
+        my (@values,$minPos,$maxPos,$minGap);
+        while ($val <= $max) {
+            push @values,$val;
+            my $pos = Quiq::Math->valueToPixel($length,$min,$max,$val);
+            my $size = $self->labelSize($val); # Größe Tick-Label
+            my $pos0 = int($pos-$size/2); # Anfangsposition Tick
+            my $pos1 = int($pos+$size/2); # Endposition Tick
 
             if ($debug) {
-                printf STDERR " minGap=%s\n",$minGap || '';
+                print STDERR " $val($pos0/$pos/$pos1)";
             }
-
-            push @candidates,Quiq::Hash->new(
-                 # Weltkoordinaten
-                 step => $step, # Schrittweite
-                 base => $base, # 1, 2, oder 5
-                 exp => $exp, # -10 .. 10
-                 valueA => \@values, # Liste der Ticks
-                 # Pixelkoordinaten
-                 tickDistance => Quiq::Math->valueToPixel($length,$min,
-                     $max,$step),
-                 minGap => $minGap, # kleinster Pixelabstand zw. Ticks
-                 minPos => $minPos, # erste Pixelposition (kann < 0 sein)
-                 maxPos => $maxPos, # letzte Pixelposition
-                                    # (kann >= $length sein)
-            );
-
-            if ($step > $maxStep) {
-                # Ende: die folgenden Schrittweiten sind so groß,
-                # dass sie auch höchstens einen Tick produzieren, wie
-                # die aktuelle Schrittweite auch schon
-                last LOOP_EXP;
+            if (defined $maxPos) { # beim ersten Step keine Überlappung
+                if ($pos0 > $maxPos+$minTickGap) {
+                    my $gap = $pos0-$maxPos;
+                    if (!defined($minGap) || $gap < $minGap) {
+                        $minGap = $gap;
+                    }
+                }
+                else {
+                    # Weiter: Label überlappen sich
+                    if ($debug) {
+                        print STDERR " Ueberlappung\n";
+                    }
+                    next STEP_LOOP;
+                }
             }
+            if (!defined $minPos) {
+                $minPos = $pos0; # erste Pixelkoordinate
+            }
+            $maxPos = $pos1; # letzte Pixelkoordinate
+
+            # Nächster Tick-Wert
+            $val += $step;
+        }
+
+        if ($debug) {
+            printf STDERR " minGap=%s\n",$minGap || '';
+        }
+
+        push @candidates,Quiq::Hash->new(
+             # Weltkoordinaten
+             step => $step, # Schrittweite
+             valueA => \@values, # Liste der Ticks
+             # Pixelkoordinaten
+             tickDistance => Quiq::Math->valueToPixel($length,$min,
+                 $max,$min+$step),
+             minGap => $minGap, # kleinster Pixelabstand zw. Ticks
+             minPos => $minPos, # erste Pixelposition (kann < 0 sein)
+             maxPos => $maxPos, # letzte Pixelposition
+                                # (kann >= $length sein)
+        );
+
+        if ($step > $max-$min) {
+            # Ende: die folgenden Schrittweiten sind so groß,
+            # dass sie auch höchstens einen Tick produzieren, wie
+            # die aktuelle Schrittweite auch schon.
+            last;
         }
     }
 
@@ -273,9 +235,8 @@ sub new {
 
     my $stp;
     for my $e (@candidates) {
-        if ($e->get('base') == 1 && @{$e->get('valueA')} >= 6) {
-            # Wir bevorzugen die 10er-Einteilung mit genügend Ticks
-            $stp = $e;
+        # Wir haben hier aktuell keine Kriterien -> s. %<Quiq::Axis::Numeric
+        if (0) {
             last;
         }
     }
@@ -284,7 +245,7 @@ sub new {
     # Step-Definition sichern
     $self->set(step=>$stp);
 
-    # * Tick-Listen erstellen *
+    # Tick-Listen erstellen
 
     # tick
 
@@ -297,30 +258,40 @@ sub new {
 
     # subTick
 
-    my ($step,$base,$tickDistance) = $stp->get(qw/step base tickDistance/);
+    my ($step,$tickDistance) = $stp->get(qw/step tickDistance/);
 
-    my $subTickA = $self->subTicks;
-    my $numSubSteps;
-    if ($base == 1 || $base == 2) {
-        $numSubSteps = 1;
-    }
-    elsif ($base == 5 && $tickDistance >= 40) {
-        $numSubSteps = 4;
-    }
-
-    if (defined $numSubSteps) {
-        my $subStep = $step/($numSubSteps+1);
-
-        for my $tickVal ($values[0]-$step,@values) {
-            for my $i (1..$numSubSteps) {
-                my $val = $tickVal+$i*$subStep;
-                if ($val >= $min && $val <= $max) {
-                    push @$subTickA,Quiq::AxisTick->new($self,$val);
+    if ($step > 1 && $step <= 86400) {
+        my @numSubSteps;
+        if ($step == 60) {
+            @numSubSteps = (4,2);
+        }
+        elsif ($step == 3600) {
+            @numSubSteps = (4,2);
+        }
+        elsif ($step == 86400) {
+            @numSubSteps = (4,2);
+        }
+        my ($subStep,$numSubSteps);
+        for my $n (@numSubSteps) {
+            if ($tickDistance/$n > 4) {
+                $subStep = $step/$n;
+                $numSubSteps = $n;
+                last;
+            }
+        }
+        if ($subStep) {
+            my $subTickA = $self->subTicks;
+            for my $tickVal ($values[0]-$step,@values) {
+                for my $i (1..$numSubSteps) {
+                    my $val = $tickVal+$i*$subStep;
+                    if ($val >= $min && $val <= $max) {
+                        push @$subTickA,Quiq::AxisTick->new($self,$val);
+                    }
                 }
             }
         }
     }
-
+    
     return $self;
 }
 
@@ -419,6 +390,9 @@ Liefere das Achsenlabel für Wert $val.
 sub label {
     my ($self,$val) = @_;
 
+    # FIXME: Wir liefern hier z.Zt. nur Stundenformat
+    $val = POSIX::strftime('%H:%M',localtime $val);
+
     return $val;
 }
 
@@ -426,7 +400,7 @@ sub label {
 
 =head1 VERSION
 
-1.164
+1.165
 
 =head1 AUTHOR
 

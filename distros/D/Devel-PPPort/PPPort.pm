@@ -1507,7 +1507,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   av_arylen_p  (undocumented)
   ckwarn  (undocumented)
   ckwarn_d  (undocumented)
-  csighandler  (undocumented)
   dMULTICALL
   doref  (undocumented)
   gv_const_sv
@@ -1846,7 +1845,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   isUPPER_utf8_safe
   isUPPER_uvchr
   is_utf8_char  (DEPRECATED)
-  is_utf8_mark  (DEPRECATED)  (marked experimental)  (undocumented)
   isWORDCHAR_LC_utf8_safe
   isWORDCHAR_utf8_safe
   isWORDCHAR_uvchr
@@ -2166,6 +2164,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   G_NOARGS
   gp_free  (undocumented)
   gp_ref  (undocumented)
+  G_RETHROW
   grok_bin
   grok_hex
   grok_number
@@ -2706,6 +2705,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   SvEND
   sv_eq
   SVf  (undocumented)
+  SVfARG
   sv_free
   SVf_UTF8
   SvGETMAGIC
@@ -2973,7 +2973,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
  dTHXa  (undocumented)
  dTHXoa  (undocumented)
  get_cvs  (undocumented)
- G_RETHROW  (undocumented)
  gv_fetchpvs  (undocumented)
  GvSVn  (undocumented)
  HvNAME_get  (undocumented)
@@ -2991,7 +2990,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
  PL_signals  (undocumented)
  PTR2nat  (undocumented)
  PTR2ul  (undocumented)
- SVfARG  (undocumented)
  SvPV_const  (undocumented)
  SvPV_flags  (undocumented)
  SvPV_flags_const  (undocumented)
@@ -3068,7 +3066,7 @@ package Devel::PPPort;
 use strict;
 use vars qw($VERSION $data);
 
-$VERSION = '3.55';
+$VERSION = '3.56';
 
 sub _init_data
 {
@@ -3784,7 +3782,7 @@ boolSV|5.004000|5.003007|p
 boot_core_mro|5.009005||Viu
 boot_core_PerlIO|5.007002||Viu
 boot_core_UNIVERSAL|5.003007||Viu
-_byte_dump_string|5.025006||Viu
+_byte_dump_string|5.025006||cViu
 BYTEORDER|5.003007|5.003007|
 bytes_cmp_utf8|5.013007|5.013007|
 bytes_from_utf8|5.007001|5.007001|x
@@ -3902,7 +3900,9 @@ croak_popstack|5.017008||ncViu
 croak_sv|5.013001|5.003007|p
 croak_xs_usage|5.010001|5.003007|pn
 cr_textfilter|5.006000||Viu
-csighandler|5.009003|5.009003|nu
+csighandler1|||nu
+csighandler3|||nu
+csighandler|||nu
 current_re_engine|5.017001||cViu
 curse|5.013009||Viu
 custom_op_desc|5.007003|5.007003|d
@@ -4051,11 +4051,10 @@ do_sysseek|5.004000||Viu
 do_tell|5.003007||Viu
 do_trans|5.003007||Viu
 do_trans_complex|5.006001||Viu
-do_trans_complex_utf8|5.006001||Viu
 do_trans_count|5.006001||Viu
-do_trans_count_utf8|5.006001||Viu
+do_trans_count_invmap|5.031006||Viu
+do_trans_invmap|5.031006||Viu
 do_trans_simple|5.006001||Viu
-do_trans_simple_utf8|5.006001||Viu
 DOUBLEINFBYTES|5.023000|5.023000|
 DOUBLEKIND|5.021006|5.021006|
 DOUBLEMANTBITS|5.023000|5.023000|
@@ -4124,7 +4123,6 @@ EXTERN_C|5.005000|5.003007|poVu
 F0convert|5.009003||nViu
 fbm_compile|5.005000|5.005000|
 fbm_instr|5.005000|5.005000|
-feature_is_enabled|||ciu
 filter_add|5.003007|5.003007|
 filter_del|5.003007|5.003007|u
 filter_gets|5.005000||Viu
@@ -4136,6 +4134,7 @@ find_array_subscript|5.009004||Viu
 find_beginning|5.005000||Viu
 find_byclass|5.006000||Viu
 find_default_stash|5.019004||Viu
+find_first_differing_byte_pos|||nViu
 find_hash_subscript|5.009004||Viu
 find_in_my_stash|5.006001||Viu
 find_lexical_cv|5.019001||Viu
@@ -4226,7 +4225,7 @@ G_NOARGS|5.003007|5.003007|
 gp_dup|5.007003|5.007003|u
 gp_free|5.003007|5.003007|u
 gp_ref|5.003007|5.003007|u
-G_RETHROW|||piu
+G_RETHROW||5.003007|p
 grok_atoUV|5.021010||ncVi
 grok_bin|5.007003|5.003007|p
 grok_bslash_c|5.013001||cViu
@@ -4453,6 +4452,7 @@ invlist_iterfinish|5.017008||nViu
 invlist_iterinit|5.015001||nViu
 invlist_iternext|5.015001||nViu
 _invlist_len|5.017004||nViu
+invlist_lowest|||nxViu
 invlist_max|5.013010||nViu
 invlist_previous_index|5.017004||nViu
 invlist_replace_list_destroys_src|5.023009||Viu
@@ -4463,6 +4463,7 @@ _invlist_subtract|5.015001||Viu
 invlist_trim|5.013010||nViu
 _invlist_union|5.015001||cVu
 _invlist_union_maybe_complement_2nd|5.015008||cViu
+invmap_dump|5.031006||Viu
 invoke_exception_hook|5.013001||Viu
 io_close|5.003007||Viu
 isALNUM|5.003007|5.003007|p
@@ -4640,39 +4641,9 @@ isSTRICT_UTF8_CHAR|5.025005|5.025005|n
 is_strict_utf8_string|5.025006|5.025006|n
 is_strict_utf8_string_loc|5.025006|5.025006|n
 is_strict_utf8_string_loclen|5.025006|5.025006|n
-is_uni_alnum|5.006000||dcVu
-is_uni_alnumc|5.017007||dcVu
-is_uni_alnumc_lc|5.017007||dcVu
-is_uni_alnum_lc|5.006000||dcVu
-is_uni_alpha|5.006000||dcVu
-is_uni_alpha_lc|5.006000||dcVu
-is_uni_ascii|5.006000||dcVu
-is_uni_ascii_lc|5.006000||dcVu
-is_uni_blank|5.017002||dcVu
-is_uni_blank_lc|5.017007||dcVu
-is_uni_cntrl|5.006000||dcVu
-is_uni_cntrl_lc|5.006000||dcVu
-is_uni_digit|5.006000||dcVu
-is_uni_digit_lc|5.006000||dcVu
 _is_uni_FOO|5.017008||cVu
-is_uni_graph|5.006000||dcVu
-is_uni_graph_lc|5.006000||dcVu
-is_uni_idfirst|5.006000||dcVu
-is_uni_idfirst_lc|5.006000||dcVu
-is_uni_lower|5.006000||dcVu
-is_uni_lower_lc|5.006000||dcVu
 _is_uni_perl_idcont|5.017008||cVu
 _is_uni_perl_idstart|5.017007||cVu
-is_uni_print|5.006000||dcVu
-is_uni_print_lc|5.006000||dcVu
-is_uni_punct|5.006000||dcVu
-is_uni_punct_lc|5.006000||dcVu
-is_uni_space|5.006000||dcVu
-is_uni_space_lc|5.006000||dcVu
-is_uni_upper|5.006000||dcVu
-is_uni_upper_lc|5.006000||dcVu
-is_uni_xdigit|5.006000||dcVu
-is_uni_xdigit_lc|5.006000||dcVu
 isUPPER|5.003007|5.003007|p
 isUPPER_A|5.013006|5.003007|p
 isUPPER_L1|5.013006|5.003007|p
@@ -4688,22 +4659,17 @@ is_utf8_char_buf|5.015008|5.015008|n
 isUTF8_CHAR_flags|5.025005|5.025005|
 is_utf8_char_helper|5.031004||ncVu
 is_utf8_common|5.009003||Viu
-is_utf8_common_with_len|5.025009||Viu
 is_utf8_cp_above_31_bits|5.025005||nViu
 is_utf8_fixed_width_buf_flags|5.025006|5.025006|n
 is_utf8_fixed_width_buf_loc_flags|5.025006|5.025006|n
 is_utf8_fixed_width_buf_loclen_flags|5.025006|5.025006|n
-_is_utf8_FOO_with_len|5.025009||cVu
-_is_utf8_idcont|5.021001||cVu
-_is_utf8_idstart|5.021001||cVu
+_is_utf8_FOO|5.031006||cVu
 is_utf8_invariant_string|5.025005|5.011000|pn
 is_utf8_invariant_string_loc|5.027001|5.027001|n
-is_utf8_mark|5.006000|5.006000|dxu
-_is_utf8_mark|5.017008||cVu
 is_utf8_non_invariant_string|5.027007||ncVi
 is_utf8_overlong_given_start_byte_ok|5.025006||nViu
-_is_utf8_perl_idcont_with_len|5.025009||cVu
-_is_utf8_perl_idstart_with_len|5.025009||cVu
+_is_utf8_perl_idcont|5.031006||cVu
+_is_utf8_perl_idstart|5.031006||cVu
 is_utf8_string|5.006001|5.006001|n
 is_utf8_string_flags|5.025006|5.025006|n
 is_utf8_string_loc|5.008001|5.008001|n
@@ -4712,8 +4678,6 @@ is_utf8_string_loclen|5.009003|5.009003|n
 is_utf8_string_loclen_flags|5.025006|5.025006|n
 is_utf8_valid_partial_char|5.025005|5.025005|n
 is_utf8_valid_partial_char_flags|5.025005|5.025005|n
-_is_utf8_xidcont|5.021001||cVu
-_is_utf8_xidstart|5.021001||cVu
 isWB|5.021009||Viu
 isWORDCHAR|5.013006|5.003007|p
 isWORDCHAR_A|5.013006|5.003007|p
@@ -4837,7 +4801,7 @@ magic_setuvar|5.003007||Viu
 magic_setvec|5.003007||Viu
 magic_sizepack|5.005000||Viu
 magic_wipepack|5.003007||Viu
-_make_exactf_invlist|5.021007||Viu
+make_exactf_invlist|5.031006||Viu
 make_matcher|5.027008||Viu
 make_trie|5.009002||Viu
 malloc|5.007002|5.007002|n
@@ -5426,6 +5390,7 @@ PERL_USE_GCC_BRACE_GROUPS|5.009004|5.004000|poVu
 PERL_USHORT_MAX|5.003007|5.003007|p
 PERL_USHORT_MIN|5.003007|5.003007|p
 PERL_VERSION|5.006000|5.003007|p
+perly_sighandler|||nu
 pidgone|5.003007||Viu
 PL_bufend||5.003007|pou
 PL_bufptr||5.003007|pou
@@ -5563,8 +5528,8 @@ pv_escape|5.009004|5.003007|p
 pv_pretty|5.009004|5.003007|p
 pv_uni_display|5.007003|5.007003|
 qerror|5.006000||cViu
-quadmath_format_needed|5.021004||nV
-quadmath_format_single|5.021004||nV
+quadmath_format_needed|5.021004||nVi
+quadmath_format_valid|||nVi
 RANDBITS|5.003007|5.003007|
 READ_XDIGIT|5.017006|5.017006|
 realloc|5.007002|5.007002|n
@@ -5803,6 +5768,8 @@ share_hek_flags|5.008000||Viu
 SHORTSIZE|5.004000|5.004000|
 should_warn_nl|5.021001||nViu
 si_dup|5.007003|5.007003|u
+sighandler1|||nViu
+sighandler3|||nViu
 sighandler|5.003007||nViu
 simplify_sort|5.006000||Viu
 SITELIB|5.003007|5.003007|
@@ -5944,6 +5911,7 @@ sv_derived_from|5.004000|5.004000|
 sv_derived_from_pv|5.015004|5.015004|
 sv_derived_from_pvn|5.015004|5.015004|
 sv_derived_from_sv|5.015004|5.015004|
+sv_derived_from_svpvn|5.031006||Viu
 sv_destroyable|5.010000|5.010000|
 sv_display|5.021002||Viu
 sv_does|5.009004|5.009004|
@@ -5960,7 +5928,7 @@ sv_eq|5.003007|5.003007|
 sv_eq_flags|5.013006|5.013006|
 sv_exp_grow|5.009003||Viu
 SVf|5.006000|5.003007|poVu
-SVfARG|5.009005||pVu
+SVfARG|5.009005|5.003007|pV
 sv_force_normal|5.006000|5.006000|
 sv_force_normal_flags|5.007001|5.007001|
 sv_free2|||xciu
@@ -6257,10 +6225,6 @@ sv_vsetpvf_mg|5.006000|5.004000|p
 sv_vsetpvfn|5.004000|5.004000|
 SvVSTRING_mg|5.009004||pVu
 swallow_bom|5.006001||Viu
-swash_fetch|5.006000||cViu
-swash_init|5.006000||cViu
-swash_scan_list_line|5.021001||Viu
-swatch_get|5.015007||Viu
 switch_category_locale_to_template|5.027009||Viu
 switch_to_global_locale|5.027009|5.003007|pn
 sync_locale|5.027009|5.003007|pn
@@ -6303,11 +6267,8 @@ toTITLE_uvchr|5.023009|5.006000|p
 to_uni_fold|5.031004||cVu
 _to_uni_fold_flags|5.014000||cVu
 to_uni_lower|5.006000||cVu
-to_uni_lower_lc|5.006000||dcVu
 to_uni_title|5.006000||cVu
-to_uni_title_lc|5.006000||dcVu
 to_uni_upper|5.006000||cVu
-to_uni_upper_lc|5.006000||dcVu
 toUPPER|5.003007|5.003007|
 _to_upper_title_latin1|5.015005||Viu
 toUPPER_utf8|5.031005|5.031005|
@@ -12978,8 +12939,9 @@ DPPP_(my_my_strlcpy)(char *dst, const char *src, Size_t size)
 
 #if defined UTF8SKIP
 
-/* Don't use official version because it uses MIN, which may not be available */
+/* Don't use official versions because they use MIN, which may not be available */
 #undef UTF8_SAFE_SKIP
+#undef UTF8_CHK_SKIP
 #ifndef UTF8_SAFE_SKIP
 #  define UTF8_SAFE_SKIP(s, e)           (                                          \
                                       ((((e) - (s)) <= 0)                       \
@@ -13655,10 +13617,15 @@ DPPP_(my_pv_display)(pTHX_ SV *dsv, const char *pv, STRLEN cur, STRLEN len, STRL
 #    if (PERL_BCDVERSION >= 0x5021003)
 #      undef sync_locale
 #      define sync_locale() (Perl_sync_locale(aTHX), 1)
+#    elif defined(sync_locale)  /* These should be the 5.20 maints*/
+#      undef sync_locale        /* Just copy their defn and return 1 */
+#      define sync_locale() (new_ctype(setlocale(LC_CTYPE, NULL)),        \
+                             new_collate(setlocale(LC_COLLATE, NULL)),    \
+                             set_numeric_local(),                         \
+                             new_numeric(setlocale(LC_NUMERIC, NULL)),    \
+                             1)
 #    elif defined(new_ctype) && defined(LC_CTYPE)
 #      define sync_locale() (new_ctype(setlocale(LC_CTYPE, NULL)), 1)
-#    else
-#      undef sync_locale
 #    endif
 #  endif
 #endif

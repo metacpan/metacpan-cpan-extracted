@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4::Request;
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use 5.010_000;
 
@@ -96,7 +96,7 @@ sub requests_response {
 sub _can_merge {
   my $self = shift;
   my ($key, $request) = @_;
-  return 1 if $key =~ /^(repeatCell|mergeCells)$/;
+  return 1 if $key =~ /^(repeatCell|mergeCells|updateBorders)$/;
   return;
 }
 

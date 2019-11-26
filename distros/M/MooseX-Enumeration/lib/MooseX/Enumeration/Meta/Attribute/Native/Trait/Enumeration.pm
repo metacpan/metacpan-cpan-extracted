@@ -4,7 +4,7 @@ use warnings;
 
 package MooseX::Enumeration::Meta::Attribute::Native::Trait::Enumeration;
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 use Moose::Role;
 with 'Moose::Meta::Attribute::Native::Trait';
@@ -63,6 +63,11 @@ around _canonicalize_handles => sub
 	if (!ref $handles and $handles eq 1)
 	{
 		return map +("is_$_" => ["is", $_]), @{ $self->enum };
+	}
+	elsif (!ref $handles and $handles eq 2)
+	{
+		my $attr = $self->name;
+		return map +("$attr\_is_$_" => ["is", $_]), @{ $self->enum };
 	}
 	
 	if (ref $handles eq 'ARRAY')
