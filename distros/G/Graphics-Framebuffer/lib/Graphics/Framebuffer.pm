@@ -89,7 +89,7 @@ If you are using CPAN, then installation is simple, but if you are installing ma
 
 Please note, that the install step may require root permissions (run it with sudo, "sudo make install").  "Build.PL" is not used due to lack of support by Inline::C.
 
-If testing fails, it will usually be ok to install it anyway, as it will likely work.  The testing is flakey (thank Perl's test mode for that).
+If testing fails, it will usually be ok to install it anyway, as it will likely work.  The testing is flakey (thank Perl's test/taint mode for that).
 
 I recommend running the scripts inside of the "examples" directory for real testing instead.
 
@@ -406,7 +406,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.40';
+    our $VERSION   = '6.43';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -7615,12 +7615,14 @@ sub _gather_fonts {
         next if ($file =~ /^\./);
         if (-d "$path/$file") {
             $self->_gather_fonts("$path/$file");
-        } elsif ($file =~ /\.ttf$/i && ($self->{'Imager-Has-TrueType'} || $self->{'Imager-Has-Freetype2'})) {
-            my $face = $self->get_face_name({ 'font_path' => $path, 'face' => $file });
-            $self->{'FONTS'}->{$face} = { 'path' => $path, 'font' => $file };
-        } elsif ($file =~ /\.afb$/i && $self->{'Imager-Has-Type1'}) {
-            my $face = $self->get_face_name({ 'font_path' => $path, 'face' => $file });
-            $self->{'FONTS'}->{$face} = { 'path' => $path, 'font' => $file };
+        } elsif (-f "$path/$file" && -s "$path/$file") { # Makes sure font is non-zero length
+            if ($file =~ /\.ttf$/i && ($self->{'Imager-Has-TrueType'} || $self->{'Imager-Has-Freetype2'})) {
+                my $face = $self->get_face_name({ 'font_path' => $path, 'face' => $file });
+                $self->{'FONTS'}->{$face} = { 'path' => $path, 'font' => $file };
+            } elsif ($file =~ /\.afb$/i && $self->{'Imager-Has-Type1'}) {
+                my $face = $self->get_face_name({ 'font_path' => $path, 'face' => $file });
+                $self->{'FONTS'}->{$face} = { 'path' => $path, 'font' => $file };
+            }
         }
     }
 }
@@ -9060,7 +9062,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.40 (Nov 4, 2019)
+Version 6.43 (Dec 2, 2019)
 
 =head1 THANKS
 

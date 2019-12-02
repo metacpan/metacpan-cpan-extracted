@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use Markdent::Event::CodeBlock;
 use Markdent::Regexes qw( $BlockStart $HorizontalWS );
@@ -76,7 +76,7 @@ Markdent::Dialect::GitHub::BlockParser - Block parser for GitHub Markdown
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

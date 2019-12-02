@@ -89,6 +89,7 @@
    'HDT'         => 'America/Adak',
    'HKST'        => 'Asia/Hong_Kong',
    'HKT'         => 'Asia/Hong_Kong',
+   'HKWT'        => 'Asia/Hong_Kong',
    'HMT'         => 'Asia/Dhaka',
    'HPT'         => 'Pacific/Honolulu',
    'HST'         => 'Pacific/Honolulu',

@@ -11,18 +11,20 @@ no warnings 'experimental';
 use List::Util qw( min max );
 use Vote::Count::RankCount;
 use TextTableTiny 'generate_markdown_table';
-# use boolean;
-# use Data::Printer;
+
+use Math::BigRat try => 'GMP';
+use Storable 'dclone';
+use Data::Printer;
 
 # ABSTRACT: TopCount and related methods for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='0.02401';
+our $VERSION='1.00';
 
 =head1 NAME
 
 Vote::Count::TopCount
 
-=head1 VERSION 0.02401
+=head1 VERSION 1.00
 
 =head1 Synopsis
 
@@ -38,25 +40,66 @@ Takes a hashref of active choices as an optional parameter, if one is not provid
 
 Returns a RankCount object containing the TopCount.
 
+TopCount supports both Ranked and Range Ballot Types.
+
+=head3 Top Counting Range Ballots
+
+Since Range Ballots often allow ranking choices equally, those equal votes need to be split. To prevent Rounding errors in the addition on large sets the fractions are added as Rational Numbers. The totals are converted to floating point numbers with a precision of 3 places. Three was arbitrarily chosen because it is reasonable for display, but precise enough as a truncation point to be unlikely to cause an error.
+
+It is recommended to install Math::BigInt::GMP to improve performance on the Rational Number math used for Top Count on Range Ballots.
+
 =cut
 
-sub TopCount ( $self, $active=undef ) {
+sub _RangeTopCount ( $self, $active = undef ) {
+  $active = $self->Active() unless defined $active;
+  my %topcount = ( map { $_ => Math::BigRat->new(0) } keys( $active->%* ) );
+TOPCOUNTRANGEBALLOTS:
+  for my $b ( $self->BallotSet()->{'ballots'}->@* ) {
+    my $vv    = dclone $b->{'votes'};
+    my %votes = $vv->%*;
+    for my $v ( keys %votes ) {
+      delete $votes{$v} unless defined $active->{$v};
+    }
+    next TOPCOUNTRANGEBALLOTS unless keys %votes;
+    my $max = max( values %votes );
+    my @top = ();
+    for my $c ( keys %votes ) {
+      if ( $votes{$c} == $max ) { push @top, $c }
+    }
+    my $topvalue = Math::BigRat->new( $b->{'count'} / scalar(@top) );
+    for (@top) { $topcount{$_} += $topvalue }
+  }
+  for my $k ( keys %topcount ) {
+    $topcount{$k} = $topcount{$k}->as_float(3)->numify();
+  }
+  return Vote::Count::RankCount->Rank( \%topcount );
+}
+
+sub _RCVTopCount ( $self, $active = undef ) {
   my %ballotset = $self->BallotSet()->%*;
-  my %ballots = ( $ballotset{'ballots'}->%* );
-  # $active = $ballotset{'choices'} unless defined $active ;
-  $active = $self->Active() unless defined $active ;
-  my %topcount = ( map { $_ => 0 } keys( $active->%* ));
+  my %ballots   = ( $ballotset{'ballots'}->%* );
+  $active = $self->Active() unless defined $active;
+  my %topcount = ( map { $_ => 0 } keys( $active->%* ) );
 TOPCOUNTBALLOTS:
-    for my $b ( keys %ballots ) {
-      my @votes = $ballots{$b}->{'votes'}->@* ;
-      for my $v ( @votes ) {
-        if ( defined $topcount{$v} ) {
-          $topcount{$v} += $ballots{$b}{'count'};
-          next TOPCOUNTBALLOTS;
-        }
+  for my $b ( keys %ballots ) {
+    my @votes = $ballots{$b}->{'votes'}->@*;
+    for my $v (@votes) {
+      if ( defined $topcount{$v} ) {
+        $topcount{$v} += $ballots{$b}{'count'};
+        next TOPCOUNTBALLOTS;
       }
     }
+  }
   return Vote::Count::RankCount->Rank( \%topcount );
+}
+
+sub TopCount ( $self, $active = undef ) {
+  if ( $self->BallotSet()->{'options'}{'rcv'} == 1 ) {
+    return $self->_RCVTopCount($active);
+  }
+  elsif ( $self->BallotSet()->{'options'}{'range'} == 1 ) {
+    return $self->_RangeTopCount($active);
+  }
 }
 
 =head2 Method TopCountMajority
@@ -74,18 +117,18 @@ Returns a hashref of results. It will always include the votes in the round and 
 sub TopCountMajority ( $self, $topcount = undef, $active = undef ) {
   $active = $self->Active() unless defined $active;
   unless ( defined $topcount ) { $topcount = $self->TopCount($active) }
-  my $topc = $topcount->RawCount();
-  my $numvotes = $topcount->CountVotes();
-  my @choices  = keys $topc->%*;
+  my $topc      = $topcount->RawCount();
+  my $numvotes  = $topcount->CountVotes();
+  my @choices   = keys $topc->%*;
   my $threshold = 1 + int( $numvotes / 2 );
   for my $t (@choices) {
     if ( $topc->{$t} >= $threshold ) {
       return (
         {
-          votes      => $numvotes,
+          votes     => $numvotes,
           threshold => $threshold,
-          winner     => $t,
-          winvotes   => $topc->{$t}
+          winner    => $t,
+          winvotes  => $topc->{$t}
         }
       );
     }
@@ -93,8 +136,8 @@ sub TopCountMajority ( $self, $topcount = undef, $active = undef ) {
   # No winner
   return (
     {
-      votes      => $numvotes,
-      threshold => $threshold
+      votes     => $numvotes,
+      threshold => $threshold,
     }
   );
 }
@@ -105,11 +148,11 @@ This method wraps TopCountMajority adding logging, the logging of which would be
 
 =cut
 
-sub EvaluateTopCountMajority ( $self, $topcount = undef, $active = undef) {
+sub EvaluateTopCountMajority ( $self, $topcount = undef, $active = undef ) {
   my $majority = $self->TopCountMajority( $topcount, $active );
   if ( $majority->{'winner'} ) {
     my $winner = $majority->{'winner'};
-    my $rows = [
+    my $rows   = [
       [ 'Winner',                    $winner ],
       [ 'Votes in Final Round',      $majority->{'votes'} ],
       [ 'Votes Needed for Majority', $majority->{'threshold'} ],

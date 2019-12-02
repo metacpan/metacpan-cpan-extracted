@@ -1,9 +1,7 @@
 #!/usr/bin/perl
-# Copyright (c) 2009-2010 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: matrix.pl 7 2010-09-27 16:02:14Z demetri $
+# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # This example demonstrates solving linear systems of congruences
 # with a unique solution, and how Math::ModInt::ChineseRemainder

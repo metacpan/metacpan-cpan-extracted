@@ -1,5 +1,13 @@
 Revision history for Net-Async-HTTP-Server
 
+0.10    2019-11-28 00:54:47
+        [CHANGES]
+         * Experimental Net::Prometheus integration by automatic metrics
+           export
+
+        [BUGFIXES]
+         * Regenerate in-dist testing SSL certs (RT131030)
+
 0.09    2015/09/09 15:53:42
         [CHANGES]
          * Added ->query_form, ->query_param_names, ->query_param

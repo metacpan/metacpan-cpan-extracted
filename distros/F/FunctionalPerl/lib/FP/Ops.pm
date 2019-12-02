@@ -52,7 +52,8 @@ safety check!
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -75,6 +76,7 @@ package FP::Ops;
                  string_le
                  string_gt
                  string_ge
+                 string
                  string_lc
                  string_uc
                  string_lcfirst
@@ -193,6 +195,10 @@ sub string_gt ($ $) {
 sub string_ge ($ $) {
     @_==2 or die "need 2 arguments";
     $_[0] ge $_[1]
+}
+
+sub string ($) {
+    "$_[0]"
 }
 
 sub string_lc ($) {

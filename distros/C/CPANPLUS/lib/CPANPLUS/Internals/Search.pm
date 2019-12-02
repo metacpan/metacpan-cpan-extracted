@@ -14,7 +14,7 @@ use Params::Check               qw[check allow];
 use Locale::Maketext::Simple    Class => 'CPANPLUS', Style => 'gettext';
 
 use vars qw[$VERSION];
-$VERSION = "0.9178";
+$VERSION = "0.9902";
 
 $Params::Check::VERBOSE = 1;
 

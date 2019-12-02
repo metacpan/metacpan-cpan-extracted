@@ -1,69 +1,88 @@
 NAME
-    `Net::Async::HTTP::Server' - serve HTTP with `IO::Async'
+
+    Net::Async::HTTP::Server - serve HTTP with IO::Async
 
 SYNOPSIS
+
      use Net::Async::HTTP::Server;
      use IO::Async::Loop;
-
+    
      use HTTP::Response;
-
+    
      my $loop = IO::Async::Loop->new();
-
+    
      my $httpserver = Net::Async::HTTP::Server->new(
         on_request => sub {
            my $self = shift;
            my ( $req ) = @_;
-
+    
            my $response = HTTP::Response->new( 200 );
            $response->add_content( "Hello, world!\n" );
            $response->content_type( "text/plain" );
            $response->content_length( length $response->content );
-
+    
            $req->respond( $response );
         },
      );
-
+    
      $loop->add( $httpserver );
-
+    
      $httpserver->listen(
         addr => { family => "inet6", socktype => "stream", port => 8080 },
      )->get
-
+    
      $loop->run;
 
 DESCRIPTION
-    This module allows a program to respond asynchronously to HTTP requests,
-    as part of a program based on IO::Async. An object in this class listens
-    on a single port and invokes the `on_request' callback or subclass
-    method whenever an HTTP request is received, allowing the program to
-    respond to it.
+
+    This module allows a program to respond asynchronously to HTTP
+    requests, as part of a program based on IO::Async. An object in this
+    class listens on a single port and invokes the on_request callback or
+    subclass method whenever an HTTP request is received, allowing the
+    program to respond to it.
 
     For accepting HTTP connections via PSGI and Plack, see also
     Plack::Handler::Net::Async::HTTP::Server.
 
+ Prometheus Metrics
+
+    If Net::Prometheus at least version 0.07_001 is also loaded into the
+    running perl instance (i.e. not just installed and available, but
+    actually loaded) then some integration code will be run which exports
+    basic metrics on received requests and send responses. This is largely
+    experimental and undocumented for now. It is implemented in
+    Net::Async::HTTP::Server::PrometheusCollector.
+
 EVENTS
-  on_request $req
+
+ on_request $req
+
     Invoked when a new HTTP request is received. It will be passed a
     Net::Async::HTTP::Server::Request object.
 
 PARAMETERS
-    The following named parameters may be passed to `new' or `configure':
 
-  request_class => STRING
-    Gives the name of the class that `make_request' will construct. This is
-    provided as an alternative to overriding the `make_request' method, for
+    The following named parameters may be passed to new or configure:
+
+ request_class => STRING
+
+    Gives the name of the class that make_request will construct. This is
+    provided as an alternative to overriding the make_request method, for
     the case where no other methods need overriding or other behaviour
     changed.
 
 METHODS
+
     As a small subclass of IO::Async::Listener, this class does not provide
     many new methods of its own. The superclass provides useful methods to
     control the basic operation of this server.
 
-    Specifically, see the IO::Async::Listener method on how to actually bind
-    the server to a listening socket to make it accept requests.
+    Specifically, see the "listen" in IO::Async::Listener method on how to
+    actually bind the server to a listening socket to make it accept
+    requests.
 
-  make_request
+ make_request
+
        $request = $server->make_request( @args )
 
     Invoked by the protocol stream handler to create a new request object
@@ -72,12 +91,14 @@ METHODS
     subclasses of the basic request representation.
 
 TODO
-    * Don't use HTTP::Message objects as underlying implementation
 
-    * Consider how to do streaming request inbound
+      * Don't use HTTP::Message objects as underlying implementation
 
-    * Lots more testing
+      * Consider how to do streaming request inbound
+
+      * Lots more testing
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

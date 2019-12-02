@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.108   2019-12-01
+        - choose_a_number: bugfix width colored separator.
+        - Code refactoring.
+
 0.107   2019-11-24
         - choose_a_file: new option 'filter'.
 

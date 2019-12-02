@@ -6,16 +6,17 @@ use feature qw /postderef signatures/;
 package Vote::Count::Matrix;
 use Moose;
 
-with  'Vote::Count::TieBreaker',
-      'Vote::Count::Approval',
-      'Vote::Count::Borda',      
-      'Vote::Count::Log';
+with 'Vote::Count::TieBreaker',
+  'Vote::Count::Approval',
+  'Vote::Count::Borda',
+  'Vote::Count::Log',
+  'Vote::Count::Range';
 
 use Vote::Count::RankCount;
 
 no warnings 'experimental';
 use List::Util qw( min max sum );
-use TextTableTiny  qw/generate_markdown_table/;
+use TextTableTiny qw/generate_markdown_table/;
 use Sort::Hash;
 
 # use Try::Tiny;
@@ -24,13 +25,13 @@ use Sort::Hash;
 
 use YAML::XS;
 
-our $VERSION='0.02401';
+our $VERSION='1.00';
 
 =head1 NAME
 
 Vote::Count::Matrix
 
-=head1 VERSION 0.02401
+=head1 VERSION 1.00
 
 =cut
 
@@ -42,12 +43,6 @@ has BallotSet => (
   isa      => 'HashRef',
 );
 
-has BallotSetType => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'rcv',
-);
-
 has Active => (
   is      => 'rw',
   isa     => 'HashRef',
@@ -56,10 +51,10 @@ has Active => (
 );
 
 has TieBreakMethod => (
-  is  => 'rw',
-  isa => 'Str',
+  is       => 'rw',
+  isa      => 'Str',
   required => 0,
-  default => 'none',
+  default  => 'none',
 );
 
 sub _buildActive ( $self ) {
@@ -67,19 +62,14 @@ sub _buildActive ( $self ) {
 }
 
 sub _untie ( $I, $A, $B ) {
-  my @untie = $I->TieBreaker(
-    $I->TieBreakMethod(),
-    $I->Active(),
-    $A, $B );
+  my @untie = $I->TieBreaker( $I->TieBreakMethod(), $I->Active(), $A, $B );
   return $untie[0] if ( scalar(@untie) == 1 );
   return 0;
 }
 
-sub _conduct_pair ( $I, $A, $B ) {
-  my $ballots = $I->BallotSet()->{'ballots'};
-  my $countA  = 0;
-  my $countB  = 0;
-  $I->logv( "Pairing: $A vs $B");
+sub _pairwinner_rcv ( $ballots, $A, $B ) {
+  my $countA = 0;
+  my $countB = 0;
 FORVOTES:
   for my $b ( keys $ballots->%* ) {
     for my $v ( values $ballots->{$b}{'votes'}->@* ) {
@@ -93,6 +83,20 @@ FORVOTES:
       }
     }
   }    # FORVOTES
+  return ( $countA, $countB );
+}
+
+sub _conduct_pair ( $I, $A, $B ) {
+  my $ballots = $I->BallotSet()->{'ballots'};
+  my $countA  = 0;
+  my $countB  = 0;
+  $I->logv("Pairing: $A vs $B");
+  if ( $I->BallotSet()->{'options'}{'range'} ) {
+    ( $countA, $countB ) = $I->RangeBallotPair( $A, $B );
+  }
+  else {
+    ( $countA, $countB ) = _pairwinner_rcv( $ballots, $A, $B );
+  }
   my %retval = (
     $A       => $countA,
     $B       => $countB,
@@ -102,15 +106,15 @@ FORVOTES:
     'margin' => abs( $countA - $countB )
   );
   my $diff = $countA - $countB;
-  # 0 : $countA == $countB 
+  # 0 : $countA == $countB
   if ( $diff == 0 ) {
     my $untied = $I->_untie( $A, $B );
-    if ( $untied ) { 
-      $diff =  1 if $untied eq $A;
+    if ($untied) {
+      $diff = 1  if $untied eq $A;
       $diff = -1 if $untied eq $B;
     }
   }
-  if ( $diff == 0 ) {    
+  if ( $diff == 0 ) {
     $retval{'winner'} = '';
     $retval{'tie'}    = 1;
   }
@@ -119,15 +123,15 @@ FORVOTES:
     $retval{'winner'} = $A;
     $retval{'loser'}  = $B;
   }
-  # $diff < 0 B won or won tiebreaker.  
+  # $diff < 0 B won or won tiebreaker.
   elsif ( $diff < 0 ) {
     $retval{'winner'} = $B;
     $retval{'loser'}  = $A;
   }
-  if ( $retval{'winner'}) {
-      $I->logv( "Winner: $retval{'winner'} ($A: $countA $B: $countB)");
-    }
-  else { $I->logv( "Tie $A: $countA $B: $countB") } 
+  if ( $retval{'winner'} ) {
+    $I->logv("Winner: $retval{'winner'} ($A: $countA $B: $countB)");
+  }
+  else { $I->logv("Tie $A: $countA $B: $countB") }
   return \%retval;
 }
 
@@ -139,7 +143,7 @@ sub BUILD {
   while ( scalar(@choices) ) {
     my $A = shift @choices;
     for my $B (@choices) {
-      my $result = $self->_conduct_pair( $A, $B );    
+      my $result = $self->_conduct_pair( $A, $B );
       # Each result has two hash keys so it can be found without
       # having to try twice or sort the names for a single key.
       $results->{$A}{$B} = $result;
@@ -159,8 +163,8 @@ sub ScoreMatrix ( $self ) {
     $scores->{$A} = 0;
     for my $B ( keys %active ) {
       next if $B eq $A;
-        if( $A eq $self->{'Matrix'}{$A}{$B}{'winner'} ) { $scores->{$A}++ }
-        if( $self->{'Matrix'}{$A}{$B}{'tie'} ) { $hasties = .001 }
+      if ( $A eq $self->{'Matrix'}{$A}{$B}{'winner'} ) { $scores->{$A}++ }
+      if ( $self->{'Matrix'}{$A}{$B}{'tie'} ) { $hasties = .001 }
     }
     if ( $scores->{$A} == 0 ) { $scores->{$A} += $hasties }
   }
@@ -169,24 +173,24 @@ sub ScoreMatrix ( $self ) {
 
 # return the choice with fewest wins in matrix.
 sub LeastWins ( $matrix ) {
-  my @lowest = ();
-  my %scored = $matrix->ScoreMatrix()->%*;
-      my $lowscore = min( values %scored );
-      for my $A ( keys %scored ) {
-        if ( $scored{ $A } == $lowscore ) {
-          push @lowest, $A;
-        }
-      }
+  my @lowest   = ();
+  my %scored   = $matrix->ScoreMatrix()->%*;
+  my $lowscore = min( values %scored );
+  for my $A ( keys %scored ) {
+    if ( $scored{$A} == $lowscore ) {
+      push @lowest, $A;
+    }
+  }
   return @lowest;
 }
 
-sub CondorcetLoser( $self, $nowins=0 ) {
+sub CondorcetLoser ( $self, $nowins = 0 ) {
   my $unfinished = 1;
   my $wordy      = "Removing Condorcet Losers\n";
   my @eliminated = ();
-  my $loser = sub ( $score ) {
-    if ( $nowins  ) { return 1 if $score < 1 }
-    else { return 1 if $score == 0 }
+  my $loser      = sub ( $score ) {
+    if   ($nowins) { return 1 if $score < 1 }
+    else           { return 1 if $score == 0 }
     return 0;
   };
 CONDORCETLOSERLOOP:
@@ -205,7 +209,7 @@ CONDORCETLOSERLOOP:
     }
     $wordy .= YAML::XS::Dump($scores);
     for my $A (@alist) {
-      if ( $loser->($scores->{$A} ) ) {
+      if ( $loser->( $scores->{$A} ) ) {
         push @eliminated, ($A);
         $wordy .= "Eliminationg Condorcet Loser: *$A*\n";
         delete $self->{'Active'}{$A};
@@ -219,22 +223,22 @@ CONDORCETLOSERLOOP:
     ? "Eliminated Condorcet Losers: " . join( ', ', @eliminated ) . "\n"
     : "No Condorcet Losers Eliminated\n";
   return {
-    verbose => $wordy,
-    terse   => $elimstr,
-    eliminated => \@eliminated,
+    verbose      => $wordy,
+    terse        => $elimstr,
+    eliminated   => \@eliminated,
     eliminations => scalar(@eliminated),
   };
 }
 
 sub CondorcetWinner( $self ) {
-  my $scores = $self->ScoreMatrix;
+  my $scores  = $self->ScoreMatrix;
   my @choices = keys $scores->%*;
   # # if there is only one choice left they win.
   # if ( scalar(@choices) == 1 ) { return $choices[0]}
-  my $mustwin = scalar(@choices) -1;
-  my $winner = '';
+  my $mustwin = scalar(@choices) - 1;
+  my $winner  = '';
   for my $c (@choices) {
-    if ( $scores->{$c} == $mustwin) {
+    if ( $scores->{$c} == $mustwin ) {
       $winner .= $c;
     }
   }
@@ -244,21 +248,22 @@ sub CondorcetWinner( $self ) {
 sub GreatestLoss ( $self, $A ) {
   my $bigloss = 0;
 GREATESTLOSSLOOP:
-    for my $B ( keys $self->Active()->%* ) {
-      next GREATESTLOSSLOOP if $B eq $A;
-      my %result = $self->{'Matrix'}{$A}{$B}->%*;
+  for my $B ( keys $self->Active()->%* ) {
+    next GREATESTLOSSLOOP if $B eq $A;
+    my %result = $self->{'Matrix'}{$A}{$B}->%*;
 # warn "$A : $B loser $result{'loser'} : margin $result{'margin'} $A: $result{$A} $B: $result{$B}";
-      if ( $result{'loser'} eq $A ) {
-        $bigloss = $result{'margin'} if $result{'margin'} > $bigloss;
-      }
+    if ( $result{'loser'} eq $A ) {
+      $bigloss = $result{'margin'} if $result{'margin'} > $bigloss;
     }
+  }
   return $bigloss;
 }
 
-sub RankGreatestLoss ( $self ){
+sub RankGreatestLoss ( $self, $active = undef ) {
   my %loss = ();
-  for my $A ( keys $self->Active()->%* ) {
-    $loss{$A} = $self->GreatestLoss( $A);
+  $active = $self->Active() unless defined $active;
+  for my $A ( keys $active->%* ) {
+    $loss{$A} = $self->GreatestLoss($A);
   }
   return Vote::Count::RankCount->Rank( \%loss );
 }
@@ -281,11 +286,11 @@ sub _getsmithguessforchoice ( $h, $matrix ) {
   return ( map { $_ => 1 } @winners );
 }
 
-sub GetPairResult( $self, $A, $B ) {
+sub GetPairResult ( $self, $A, $B ) {
   return $self->{'Matrix'}{$A}{$B};
 }
 
-sub GetPairWinner( $self, $A, $B ) {
+sub GetPairWinner ( $self, $A, $B ) {
   my $winner = $self->{'Matrix'}{$A}{$B}{'winner'};
   return $winner if $winner;
   return '';
@@ -327,26 +332,28 @@ SMITHLOOP: while (1) {
 sub ScoreTable ( $self ) {
   my $scores = $self->ScoreMatrix();
   my @header = ( 'Choice', 'Score' );
-  my @rows = ( \@header );
-  for my $c ( sort_hash( $scores, 'numeric', 'desc') ) {
-  # for my $c ( sort ( keys $scores->%* ) ) {
-      push @rows, [ $c, $scores->{$c} ] }
+  my @rows   = ( \@header );
+  for my $c ( sort_hash( $scores, 'numeric', 'desc' ) ) {
+    # for my $c ( sort ( keys $scores->%* ) ) {
+    push @rows, [ $c, $scores->{$c} ];
+  }
   return generate_markdown_table( rows => \@rows );
 }
 
 sub MatrixTable ( $self, $options = {} ) {
   my @header = ( 'Choice', 'Wins', 'Losses', 'Ties' );
-  # this option was never fully implemented, it shows what the
+  # the options option was never fully implemented, it shows what the
   # structure would be if one were or if I finished the feature.
-  my $o_topcount = defined $options->{'topcount'}
-    ? $options->{'topcount'} : 0;
+  # leaving the code in place even though its useless.
+  my $o_topcount =
+    defined $options->{'topcount'} ? $options->{'topcount'} : 0;
   push @header, 'Top Count' if $o_topcount;
   my @active = sort ( keys $self->Active()->%* );
   my @rows = ( \@header );    # [ 'Rank', 'Choice', 'TopCount']);
   for my $A (@active) {
-    my $wins   = 0;
-    my $ties   = 0;
-    my $losses = 0;
+    my $wins     = 0;
+    my $ties     = 0;
+    my $losses   = 0;
     my $topcount = $o_topcount ? $options->{'topcount'} : 0;
   MTNEWROW:
     for my $B (@active) {
@@ -361,27 +368,28 @@ sub MatrixTable ( $self, $options = {} ) {
         $ties++;
       }
     }
-    my @newrow = ( $A, $wins, $losses, $ties);
-    push @newrow, $topcount if $o_topcount ;
+    my @newrow = ( $A, $wins, $losses, $ties );
+    push @newrow, $topcount if $o_topcount;
     push @rows, \@newrow;
   }
   return generate_markdown_table( rows => \@rows );
 }
 
 sub PairingVotesTable ( $self ) {
-  my @rows = ( [ qw/Choice Choice Votes Opponent Votes/]);
+  my @rows = ( [qw/Choice Choice Votes Opponent Votes/] );
   my @choices = sort ( keys $self->Active()->%* );
-  for my $Choice ( @choices) {
-    push @rows, [ $Choice ];
-    for my $Opponent ( @choices) {
-      my $Cstr = $Choice; my $Ostr = $Opponent;
+  for my $Choice (@choices) {
+    push @rows, [$Choice];
+    for my $Opponent (@choices) {
+      my $Cstr = $Choice;
+      my $Ostr = $Opponent;
       next if $Opponent eq $Choice;
       my $CVote = $self->{'Matrix'}{$Choice}{$Opponent}{$Choice};
       my $OVote = $self->{'Matrix'}{$Choice}{$Opponent}{$Opponent};
-      if ($self->{'Matrix'}{$Choice}{$Opponent}{'winner'} eq $Choice ) {
+      if ( $self->{'Matrix'}{$Choice}{$Opponent}{'winner'} eq $Choice ) {
         $Cstr = "**$Cstr**";
       }
-      if ($self->{'Matrix'}{$Choice}{$Opponent}{'winner'} eq $Opponent ) {
+      if ( $self->{'Matrix'}{$Choice}{$Opponent}{'winner'} eq $Opponent ) {
         $Ostr = "**$Ostr**";
       }
       push @rows, [ ' ', $Cstr, $CVote, $Ostr, $OVote ];
@@ -413,6 +421,11 @@ Condorcet Pairwise Methods require a Win-Loss Matrix. This object takes an RCV B
 
 
 
+=head1 Tie Breakers
+
+A tie breaker may be specified by setting the Tie::Breaker attribute, see the Tie::Breaker module for more information. If using Range Ballots 'none' and 'approval' are the only currently supported options.
+
+
 =head2 new
 
 Parameters:
@@ -422,10 +435,7 @@ Parameters:
 
 A Ballot Set reference as generated by ReadBallots, which can be retrieved from a Vote::Count object via the ->BallotSet() method.
 
-
-=head3 BallotSetType (future use)
-
-Defaults to rcv. Currently rcv is the only type supported. In the future the Matrix may be able to deal directly with Range Ballots.
+Both Ranked Choice and Range BallotSets are supported.
 
 
 =head3 Active (optional)
@@ -435,7 +445,7 @@ A hash reference with active choices as the keys. The default value is all of th
 
 =head3 Logging (optional)
 
-Has the logging methods of Vote::Count::Log.
+Has the logging methods of L.
 
 
 =head1 Methods
@@ -530,7 +540,6 @@ Returns a RankCount object of the Greatest Loss for each choice.
 =cut
 
 #buildpod
-
 
 #FOOTER
 

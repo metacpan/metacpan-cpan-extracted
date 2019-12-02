@@ -1,5 +1,5 @@
 package HTML::Spelling::Site;
-$HTML::Spelling::Site::VERSION = '0.4.0';
+$HTML::Spelling::Site::VERSION = '0.4.1';
 use strict;
 use warnings;
 
@@ -13,13 +13,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-HTML::Spelling::Site
-
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 
@@ -38,10 +34,6 @@ automated tests, but I'm anxious to get something out the door.
 
 HTML::Spelling::Site - a system/framework for spell-checking an entire static
 HTML site.
-
-=head1 VERSION
-
-version 0.4.0
 
 =head1 SEE ALSO
 

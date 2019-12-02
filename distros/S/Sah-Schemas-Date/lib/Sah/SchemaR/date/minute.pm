@@ -1,7 +1,7 @@
 package Sah::SchemaR::date::minute;
 
-our $DATE = '2019-07-21'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 our $rschema = ["int",[{max=>59,min=>0,summary=>"Minute of hour"}],["int"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::date::minute - Minute of hour
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::date::minute (from Perl distribution Sah-Schemas-Date), released on 2019-07-21.
+This document describes version 0.007 of Sah::SchemaR::date::minute (from Perl distribution Sah-Schemas-Date), released on 2019-11-28.
 
 =head1 DESCRIPTION
 

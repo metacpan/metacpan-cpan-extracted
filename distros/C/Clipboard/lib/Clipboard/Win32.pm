@@ -1,5 +1,5 @@
 package Clipboard::Win32;
-$Clipboard::Win32::VERSION = '0.20';
+$Clipboard::Win32::VERSION = '0.21';
 use strict;
 use warnings;
 
@@ -23,13 +23,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-Clipboard::Win32
-
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

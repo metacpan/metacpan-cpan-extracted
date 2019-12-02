@@ -42,7 +42,7 @@
             "File::Spec" : "0",
             "FileHandle" : "0",
             "POSIX" : "0",
-            "perl" : "5.01",
+            "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -62,6 +62,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.28",
+   "version" : "0.30",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

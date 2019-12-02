@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value::LayeredInclude 2.136;
+package Config::Model::Value::LayeredInclude 2.137;
 
 use 5.010;
 use strict;
@@ -52,7 +52,6 @@ sub _store {
 
     # load included file in layered mode
     $self->root->read_config_data(
-
         # check => 'no',
         config_file => $value,
         auto_create => 0,        # included file must exist
@@ -68,29 +67,6 @@ sub _store {
     return $value;
 }
 
-sub _check_value {
-    my $self      = shift;
-    my %args      = @_ > 1 ? @_ : ( value => $_[0] );
-    my $value     = $args{value};
-    my $quiet     = $args{quiet} || 0;
-    my $check     = $args{check} || 'yes';
-    my $apply_fix = $args{fix} || 0;
-    my $mode      = $args{mode} || '';
-
-    $self->SUPER::check_value(@_);
-
-    # need to test that prest config file is present as the model
-    # may not enforce it (when read_config auto_create is 1)
-    my $layered_file = $self->instance->root_dir->child($value);
-
-    my $err = $self->{error_list};
-
-    if ( not $layered_file->is_file ) {
-        push @$err, "cannot read include file $layered_file";
-    }
-
-    return wantarray ? @$err : scalar @$err ? 0 : 1;
-}
 1;
 
 # ABSTRACT: Include a sub layer configuration
@@ -107,7 +83,7 @@ Config::Model::Value::LayeredInclude - Include a sub layer configuration
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 
@@ -152,10 +128,6 @@ included files.
 =back
 
 This class works only with the first type
-
-=head1 AUTHOR
-
-Copyright 2011,2013 Dominique Dumont <ddumont at cpan.org>
 
 =head1 AUTHOR
 

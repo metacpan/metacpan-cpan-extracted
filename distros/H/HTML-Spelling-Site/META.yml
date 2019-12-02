@@ -22,16 +22,16 @@ name: HTML-Spelling-Site
 provides:
   HTML::Spelling::Site:
     file: lib/HTML/Spelling/Site.pm
-    version: v0.4.0
+    version: v0.4.1
   HTML::Spelling::Site::Checker:
     file: lib/HTML/Spelling/Site/Checker.pm
-    version: v0.4.0
+    version: v0.4.1
   HTML::Spelling::Site::Finder:
     file: lib/HTML/Spelling/Site/Finder.pm
-    version: v0.4.0
+    version: v0.4.1
   HTML::Spelling::Site::Whitelist:
     file: lib/HTML/Spelling/Site/Whitelist.pm
-    version: v0.4.0
+    version: v0.4.1
 requires:
   File::Find::Object: '0'
   HTML::Parser: '3.00'
@@ -53,10 +53,10 @@ resources:
   bugtracker: https://github.com/shlomif/html-spelling-site/issues
   homepage: http://metacpan.org/release/HTML-Spelling-Site
   repository: https://github.com/shlomif/HTML-Spelling-Site.git
-version: 0.4.0
+version: 0.4.1
 x_Dist_Zilla:
   perl:
-    version: '5.028002'
+    version: '5.030001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -154,7 +154,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Filter/MetaProvides::Package'
       version: '2.004003'
@@ -180,10 +180,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/PodSyntaxTests'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::PodVersion
-      name: '@Filter/PodVersion'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::Compile
@@ -264,10 +260,6 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Name
-              name: '@SHLOMIF/Name'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Version
@@ -431,5 +423,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.2
+x_generated_by_perl: v5.30.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

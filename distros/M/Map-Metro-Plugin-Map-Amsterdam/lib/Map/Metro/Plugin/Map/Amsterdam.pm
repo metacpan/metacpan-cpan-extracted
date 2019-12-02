@@ -2,7 +2,9 @@ use 5.14.0;
 
 package Map::Metro::Plugin::Map::Amsterdam;
 
-our $VERSION = '0.1102'; # VERSION
+# ABSTRACT: Map::Metro map for Amsterdam
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
+our $VERSION = '0.1103';
 
 use Moose;
 with 'Map::Metro::Plugin::Map';
@@ -27,30 +29,25 @@ __END__
 
 =head1 NAME
 
-Map::Metro::Plugin::Map::Amsterdam
+Map::Metro::Plugin::Map::Amsterdam - Map::Metro map for Amsterdam
 
 
 
-=begin HTML
+=begin html
 
-<p><img src="https://img.shields.io/badge/perl-5.16+-brightgreen.svg" alt="Requires Perl 5.16+" /> <a href="https://travis-ci.org/Csson/p5-Map-Metro-Amsterdam"><img src="https://api.travis-ci.org/Csson/p5-Map-Metro-Amsterdam.svg?branch=master" alt="Travis status" /></a> <img src="https://img.shields.io/badge/coverage-69.2%-red.svg" alt="coverage 69.2%" /></p>
+<p>
+<img src="https://img.shields.io/badge/perl-5.16+-blue.svg" alt="Requires Perl 5.16+" />
+<a href="https://travis-ci.org/Csson/p5-Map-Metro-Amsterdam"><img src="https://api.travis-ci.org/Csson/p5-Map-Metro-Amsterdam.svg?branch=master" alt="Travis status" /></a>
+<a href="http://cpants.cpanauthors.org/release/CSSON/Map-Metro-Plugin-Map-Amsterdam-0.1103"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/Map-Metro-Plugin-Map-Amsterdam/0.1103" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=Map-Metro-Plugin-Map-Amsterdam%200.1103"><img src="http://badgedepot.code301.com/badge/cpantesters/Map-Metro-Plugin-Map-Amsterdam/0.1103" alt="CPAN Testers result" /></a>
+<img src="https://img.shields.io/badge/coverage-69.2%-red.svg" alt="coverage 69.2%" />
+</p>
 
-=end HTML
-
-
-=begin markdown
-
-![Requires Perl 5.16+](https://img.shields.io/badge/perl-5.16+-brightgreen.svg) [![Travis status](https://api.travis-ci.org/Csson/p5-Map-Metro-Amsterdam.svg?branch=master)](https://travis-ci.org/Csson/p5-Map-Metro-Amsterdam) ![coverage 69.2%](https://img.shields.io/badge/coverage-69.2%-red.svg)
-
-=end markdown
+=end html
 
 =head1 VERSION
 
-Version 0.1102, released 2016-01-22.
-
-=head1 NAME
-
-Map::Metro::Plugin::Map::Amsterdam - Map::Metro map for Amsterdam
+Version 0.1103, released 2019-11-30.
 
 =head1 SYNOPSIS
 

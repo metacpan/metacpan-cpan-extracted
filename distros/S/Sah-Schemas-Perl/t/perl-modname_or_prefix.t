@@ -11,7 +11,7 @@ subtest "coercion" => sub {
     test_needs 'Data::Sah::Coerce';
 
     my $c = Data::Sah::Coerce::gen_coercer(
-        type=>"str", coerce_rules => ['str_normalize_perl_modname_or_prefix']);
+        type=>"str", coerce_rules => ['From_str::normalize_perl_modname_or_prefix']);
 
     is_deeply($c->([]), [], "uncoerced");
     is($c->("*"), "*", "uncoerced 2");

@@ -1,3 +1,15 @@
+1.046   2019-11-29  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 1.045 & 1.045.1.
+
+
+1.045.1 2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names (Data::Sah::Coerce 0.034+). UPDATE
+          2019-12-02: rename release from 1.045 to 1.045.1, cancel release
+          (duplicate version).
+
+
 1.045   2019-10-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Update renamed prereq Data::Clean::JSON -> Data::Clean::ForJSON.

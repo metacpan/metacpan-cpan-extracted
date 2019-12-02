@@ -11,7 +11,7 @@ subtest "coercion" => sub {
 
     my $c = Data::Sah::Coerce::gen_coercer(
         type=>"obj",
-        coerce_rules => ['str_perl_version'],
+        coerce_rules => ['From_str::perl_version'],
         return_type => "status+err+val",
     );
 

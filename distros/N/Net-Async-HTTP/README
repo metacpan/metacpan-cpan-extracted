@@ -4,22 +4,22 @@ NAME
 
 SYNOPSIS
 
-     use IO::Async::Loop;
-     use Net::Async::HTTP;
-     use URI;
+       use IO::Async::Loop;
+       use Net::Async::HTTP;
+       use URI;
     
-     my $loop = IO::Async::Loop->new();
+       my $loop = IO::Async::Loop->new();
     
-     my $http = Net::Async::HTTP->new();
+       my $http = Net::Async::HTTP->new();
     
-     $loop->add( $http );
+       $loop->add( $http );
     
-     my ( $response ) = $http->do_request(
-        uri => URI->new( "http://www.cpan.org/" ),
-     )->get;
+       my ( $response ) = $http->do_request(
+          uri => URI->new( "http://www.cpan.org/" ),
+       )->get;
     
-     print "Front page of http://www.cpan.org/ is:\n";
-     print $response->as_string;
+       print "Front page of http://www.cpan.org/ is:\n";
+       print $response->as_string;
 
 DESCRIPTION
 
@@ -87,6 +87,20 @@ PARAMETERS
     will be constructed that declares Net::Async::HTTP and the version
     number.
 
+ headers => ARRAY or HASH
+
+    Since version 0.45.
+
+    A set of extra headers to apply to every outgoing request. May be
+    specified either as an even-sized array containing key/value pairs, or
+    a hash.
+
+    Individual header values may be added or changed without replacing the
+    entire set by using the configure method and passing a key called
+    +headers:
+
+       $http->configure( +headers => { One_More => "Key" } );
+
  max_redirects => INT
 
     Optional. How many levels of redirection to follow. If not supplied,
@@ -115,7 +129,7 @@ PARAMETERS
     To test if your application will handle this correctly, you can set a
     different default by setting an environment variable:
 
-     $ NET_ASYNC_HTTP_MAXCONNS=3 perl ...
+       $ NET_ASYNC_HTTP_MAXCONNS=3 perl ...
 
  timeout => NUM
 
@@ -145,6 +159,14 @@ PARAMETERS
 
     Optional. If false, disables HTTP/1.1-style request pipelining.
 
+ close_after_request => BOOL
+
+    Since version 0.45.
+
+    Optional. If true, will set the Connection: close header on outgoing
+    requests and disable pipelining, thus making every request use a new
+    connection.
+
  family => INT
 
  local_host => STRING
@@ -172,9 +194,9 @@ PARAMETERS
     The HTTP response and request objects will be passed as well as the
     code and message, and the failure name will be http.
 
-     ( $code_message, "http", $response, $request ) = $f->failure
+       ( $code_message, "http", $response, $request ) = $f->failure
     
-     $on_error->( "$code $message", $response, $request )
+       $on_error->( "$code $message", $response, $request )
 
  read_len => INT
 
@@ -235,7 +257,7 @@ METHODS
     specific response it will be included. The original request is also
     included.
 
-     $f->fail( $message, "http", $response, $request )
+       $f->fail( $message, "http", $response, $request )
 
  $response = $http->do_request( %args )->get
 
@@ -351,7 +373,7 @@ METHODS
       cycle continue. If it fails, that failure is propagated to the
       caller.
 
-       $f = $on_ready->( $connection )
+         $f = $on_ready->( $connection )
 
     on_redirect => CODE
 
@@ -359,7 +381,7 @@ METHODS
       received, before the new location is fetched. It will be passed the
       response and the new URL.
 
-       $on_redirect->( $response, $location )
+         $on_redirect->( $response, $location )
 
     on_body_write => CODE
 
@@ -369,7 +391,7 @@ METHODS
       body content written so far (i.e. excluding bytes consumed in the
       header).
 
-       $on_body_write->( $written )
+         $on_body_write->( $written )
 
     max_redirects => INT
 
@@ -386,7 +408,7 @@ METHODS
       On a timeout, the returned future will fail with either timeout or
       stall_timeout as the operation name.
 
-       ( $message, "timeout" ) = $f->failure
+         ( $message, "timeout" ) = $f->failure
 
  $http->do_request( %args )
 
@@ -399,7 +421,7 @@ METHODS
       received. It will be passed an HTTP::Response object containing the
       response the server sent.
 
-       $on_response->( $response )
+         $on_response->( $response )
 
     on_header => CODE
 
@@ -410,10 +432,10 @@ METHODS
       request has been reached, and whatever it returns will be used as the
       result of the returned Future, if there is one.
 
-       $on_body_chunk = $on_header->( $header )
+         $on_body_chunk = $on_header->( $header )
       
-          $on_body_chunk->( $data )
-          $response = $on_body_chunk->()
+            $on_body_chunk->( $data )
+            $response = $on_body_chunk->()
 
     on_error => CODE
 
@@ -421,13 +443,13 @@ METHODS
       the request or obtain the response. It will be passed an error
       message.
 
-       $on_error->( $message )
+         $on_error->( $message )
 
       If this is invoked because of a received 4xx or 5xx error code in an
       HTTP response, it will be invoked with the response and request
       objects as well.
 
-       $on_error->( $message, $response, $request )
+         $on_error->( $message, $response, $request )
 
  $response = $http->GET( $uri, %args )->get
 
@@ -490,13 +512,13 @@ CONTENT DECODING
     no paramters, and expected to return a CODE reference to perform one
     instance of decoding.
 
-     $decoder = $make_decoder->()
+       $decoder = $make_decoder->()
 
     This decoder will be invoked on string buffers to decode them until the
     end of stream is reached, when it will be invoked with no arguments.
 
-     $content = $decoder->( $encoded_content )
-     $content = $decoder->() # EOS
+       $content = $decoder->( $encoded_content )
+       $content = $decoder->() # EOS
 
 EXAMPLES
 
@@ -505,26 +527,29 @@ EXAMPLES
     The Future-returning GET method makes it easy to await multiple URLs at
     once, by using the Future::Utils fmap_void utility
 
-     my @URLs = ( ... );
+       use Future::Utils qw( fmap_void );
     
-     my $http = Net::Async::HTTP->new( ... );
-     $loop->add( $http );
+       my @URLs = ( ... );
     
-     my $future = fmap_void {
-        my ( $url ) = @_;
-        $http->GET( $url )
-             ->on_done( sub {
-                my $response = shift;
-                say "$url succeeded: ", $response->code;
-                say "  Content-Type":", $response->content_type;
-             } )
-             ->on_fail( sub {
-                my $failure = shift;
-                say "$url failed: $failure";
-             } );
-     } foreach => \@URLs;
+       my $http = Net::Async::HTTP->new( ... );
+       $loop->add( $http );
     
-     $loop->await( $future );
+       my $future = fmap_void {
+          my ( $url ) = @_;
+          $http->GET( $url )
+               ->on_done( sub {
+                  my $response = shift;
+                  say "$url succeeded: ", $response->code;
+                  say "  Content-Type:", $response->content_type;
+               } )
+               ->on_fail( sub {
+                  my $failure = shift;
+                  say "$url failed: $failure";
+               } );
+       } foreach => \@URLs,
+         concurrent => 5;
+    
+       $loop->await( $future );
 
 SEE ALSO
 

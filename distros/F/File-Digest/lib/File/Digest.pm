@@ -1,7 +1,9 @@
 package File::Digest;
 
-our $DATE = '2019-09-12'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'File-Digest'; # DIST
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,7 +47,7 @@ my %args_algorithm = (
         cmdline_aliases => {a=>{}},
     },
     digest_args => {
-        schema => ['array*', of=>'str*', 'x.perl.coerce_rules'=>['str_comma_sep']],
+        schema => ['array*', of=>'str*', 'x.perl.coerce_rules'=>['From_str::comma_sep']],
         cmdline_aliases => {A=>{}},
     },
 );
@@ -158,7 +160,7 @@ File::Digest - Calculate digests of files
 
 =head1 VERSION
 
-This document describes version 0.010 of File::Digest (from Perl distribution File-Digest), released on 2019-09-12.
+This document describes version 0.011 of File::Digest (from Perl distribution File-Digest), released on 2019-11-29.
 
 =head1 SYNOPSIS
 

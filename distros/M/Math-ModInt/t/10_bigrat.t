@@ -1,8 +1,6 @@
-# Copyright (c) 2015 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: 10_bigrat.t 56 2015-05-17 22:16:10Z demetri $
+# Copyright (c) 2015-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Tests of Math::ModInt handling Math::BigRat objects.
 

@@ -30,7 +30,7 @@ $loop->add( $http );
       ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
       $self->set_handle( $selfsock );
 
-      return Future->new->done( $self );
+      return Future->done( $self );
    };
 
    my $request = HTTP::Request->new(
@@ -59,9 +59,8 @@ $loop->add( $http );
       "Hello world!"
    );
 
-   wait_for { $future->is_ready };
+   my $response = wait_for_future( $future )->get;
 
-   my $response = $future->get;
    isa_ok( $response, "HTTP::Response", '$future->get for request' );
 
    is( $response->code, 200, '$response->code for request' );
@@ -77,7 +76,7 @@ $loop->add( $http );
       ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
       $self->set_handle( $selfsock );
 
-      return Future->new->done( $self );
+      return Future->done( $self );
    };
 
    my $future = $http->do_request(
@@ -101,9 +100,8 @@ $loop->add( $http );
       "Hello world!"
    );
 
-   wait_for { $future->is_ready };
+   my $response = wait_for_future( $future )->get;
 
-   my $response = $future->get;
    isa_ok( $response, "HTTP::Response", '$future->get for uri' );
 
    is( $response->code, 200, '$response->code for uri' );

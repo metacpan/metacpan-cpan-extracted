@@ -7,14 +7,6 @@ This is something you need to keep in mind before loading giant pictures.
 
 ##############################################################################
 
-blit_transform - flip_horizontal - has known issues.  It only happens with
-some images.  I am not yet sure what the issue is.  Try instead rotating
-180 degrees and then flip_vertical, if you have issues.
-
-There may be other flipping issues, but this one is the most obvious.
-
-##############################################################################
-
 UNMASK drawing for 16 bit displays may have issues.  Use MASK mode in
 reverse as an alternate workaround.
 

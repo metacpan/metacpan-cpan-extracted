@@ -7,14 +7,21 @@ use Test::RequiresInternet;
 
 use_ok('Bio::DB::Taxonomy');
 
+my %params;
+
+if (defined $ENV{BIOPERLEMAIL}) {
+    $params{'-email'} = $ENV{BIOPERLEMAIL};
+    $params{'-delay'} = 1;
+}
+
 {
-    ok my $db = Bio::DB::Taxonomy->new(-source => 'entrez');
+    ok my $db = Bio::DB::Taxonomy->new(-source => 'entrez', %params);
     isa_ok $db, 'Bio::DB::Taxonomy::entrez';
     isa_ok $db, 'Bio::DB::Taxonomy';
 }
 
 {
-    my $db = Bio::DB::Taxonomy->new(-source => 'entrez');
+    my $db = Bio::DB::Taxonomy->new(-source => 'entrez', %params);
     my $id;
     my $n;
 
@@ -106,7 +113,6 @@ use_ok('Bio::DB::Taxonomy');
 
     @ids = $db->get_taxonids('Rhodotorula');
     cmp_ok @ids, '>=' , 1;
-    diag(join(",", @ids));
     # From NCBI: Taxid 592558 was merged into taxid 5533 on June 16, 2017
     is( (grep { $_ == 592558 } @ids), 0, 'Value no longer found');
     ok grep { $_ == 5533 } @ids;
@@ -115,7 +121,7 @@ use_ok('Bio::DB::Taxonomy');
 
 # we can recursively fetch all descendents of a taxon
 {
-    my $db = Bio::DB::Taxonomy->new(-source=>"entrez");
+    my $db = Bio::DB::Taxonomy->new(-source=>"entrez", %params);
     $db->get_taxon(10090);
 
     my $lca = $db->get_taxon(314146);
@@ -126,7 +132,7 @@ use_ok('Bio::DB::Taxonomy');
 
 # tests for #182
 {
-    my $db = Bio::DB::Taxonomy->new(-source=>"entrez");
+    my $db = Bio::DB::Taxonomy->new(-source=>"entrez", %params);
 
     my @taxa = qw(viruses Deltavirus unclassified plasmid);
 
@@ -151,7 +157,7 @@ use_ok('Bio::DB::Taxonomy');
 
 # tests for #212
 {
-    my $db = Bio::DB::Taxonomy->new( -source => "entrez" );
+    my $db = Bio::DB::Taxonomy->new( -source => "entrez", %params);
 
     # String                 | What I expect | What I get
     # ---------------------- | ------------- | ----------

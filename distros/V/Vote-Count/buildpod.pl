@@ -5,6 +5,7 @@ use feature qw/signatures postderef/;
 no warnings qw/experimental uninitialized/;
 use utf8::all;
 use Try::Tiny;
+# use Data::Printer;
 
 =pod
 
@@ -55,11 +56,11 @@ use Data::Printer;
 
 =head1 SYNOPSIS
 
-=head1 VERSION 2019.0712
+=head1 VERSION 2019.0902
 
 =cut
 
-our $VERSION='2019.0712';
+our $VERSION='2019.0902';
 
 my $m2p = Markdown::Pod->new;
 
@@ -126,22 +127,22 @@ This module is released under the GNU Public License Version 3. See license file
 
 FOOTER
 
-
 my $dist = path( './dist.ini')->slurp;
 $dist =~ /version\s? =\s?(\d+\.\d+)/;
 my $version = $1;
 
 my @mdfiles = path("./md")->children( qr/md$/ );
-my @pmfiles1 = path("./lib/Vote/Count")->children( qr/pm$/);
+my @pmfiles1 = path("./lib/Vote/Count")->children( qr/pm$|pod$/);
 my @pmfiles2 = path("./lib/Vote/Count/Method")->children( qr/pm$/);
 my $countpm = path( "./lib/Vote/Count.pm");
 my @pmfiles = ( @pmfiles1, @pmfiles2, $countpm);
 my %pmkeys = ();
 for my $pm (@pmfiles ) {
-  $pm =~ /(.*)\.pm/; # extract the part of the string before .pm
+  $pm =~ /(.*)\.(pm$|pod$)/; # extract the part of the string before .pm
   my @bits = split /\//, $1; # split extracted on /, llast bit is basename
   $pmkeys{ $bits[-1] } = $pm ; # put the path object in the hash keyed on the basename.
 }
+FORMD:
 for my $md ( @mdfiles ) {
   my $name = $md->basename;
   $name =~ s/\.md$//;
@@ -155,10 +156,16 @@ for my $md ( @mdfiles ) {
     $pm->spew( $pmtext );
     say "updated $pm added pod from $md";
   } else {
+      next FORMD if $md =~ /README/ ;
       my $mdtext = path($md)->slurp();
+      $mdtext =~ s/(\# ABSTRACT.*)\n//;
+      my $abstract = $1;
       my $pod =  $m2p->markdown_to_pod( markdown => $mdtext );
-      $pod = "=pod\n$pod\n=cut\n";
-      path( "./$name.pod")->spew($pod);
+      my $versionline = "=head1 VERSION $version";
+warn $versionline;
+      # $pod = "$abstract\n$versionline\n$pod\n$footer";
+      $pod = "$abstract\n\n=pod\n\n$versionline\n$pod\n$footer\n=cut\n";
+      path( "./lib/Vote/$name.pod")->spew($pod);
   }
   for my $pm ( values %pmkeys ) {
     my $pmtext = path($pm)->slurp;

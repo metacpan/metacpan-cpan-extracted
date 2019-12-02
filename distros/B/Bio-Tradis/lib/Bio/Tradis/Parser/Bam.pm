@@ -1,5 +1,5 @@
 package Bio::Tradis::Parser::Bam;
-$Bio::Tradis::Parser::Bam::VERSION = '1.4.1';
+$Bio::Tradis::Parser::Bam::VERSION = '1.4.3';
 # ABSTRACT: Very basic BAM parser. Limited functionality.
 
 
@@ -157,7 +157,7 @@ Bio::Tradis::Parser::Bam - Very basic BAM parser. Limited functionality.
 
 =head1 VERSION
 
-version 1.4.1
+version 1.4.3
 
 =head1 SYNOPSIS
 

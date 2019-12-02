@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Path::Tiny qw(path);
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 sub report {
     my ($pkg, $db, $options) = @_;
@@ -16,27 +16,27 @@ sub report {
         my $f  = $cover->file($file);
         my $st = $f->statement;
         my $br = $f->branch;
+        my $cn = $f->condition;
 
         $otxt .= qq(  <file path="$file">\n);
 
         for my $lnr ( sort { $a <=> $b } $st->items ) {
-            my $sinfo = $st->location($lnr);
-            if ( $sinfo ) {
-                my $covered = 0;
-                for my $o ( @$sinfo ) {
-                    my $ocov = $o->covered // 0;
-                    my $ounc = $o->uncoverable // 0;
-                    $covered |= $ocov || $ounc;
-                }
-                my $covtxt = $covered > 0 ? 'true' : 'false';
-                if ( $br and my $binfo = $br->location($lnr) ) {
-                    my $btot = $binfo->[0]->total;
-                    my $bcov = $binfo->[0]->covered;
-                    $otxt .= qq(    <lineToCover lineNumber="$lnr" covered="$covtxt" branchesToCover="$btot" coveredBranches="$bcov"/>\n);
-                } else {
-                    $otxt .= qq(    <lineToCover lineNumber="$lnr" covered="$covtxt"/>\n);
-                }
+            my $sinfo = $st->location($lnr) // [];
+            my $covered = 0;
+            for my $s ( @$sinfo ) {
+                my $scov = $s->covered // 0;
+                my $sunc = $s->uncoverable // 0;
+                $covered |= $scov || $sunc;
             }
+            my $covtxt = $covered > 0 ? 'true' : 'false';
+            my $binfo = $br->location($lnr) // [];
+            my $cinfo = $cn->location($lnr) // [];
+            my $btot = my $bcov = 0;
+            for my $b ( @$binfo, @$cinfo ) {
+                $btot += $b->total;
+                $bcov += $b->covered;
+            }
+            $otxt .= qq(    <lineToCover lineNumber="$lnr" covered="$covtxt" branchesToCover="$btot" coveredBranches="$bcov"/>\n);
         }
 
         $otxt .= qq(  </file>\n);

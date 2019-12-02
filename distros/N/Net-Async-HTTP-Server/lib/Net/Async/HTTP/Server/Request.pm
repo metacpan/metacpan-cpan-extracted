@@ -8,7 +8,7 @@ package Net::Async::HTTP::Server::Request;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp;
 
@@ -262,6 +262,10 @@ sub write
    my $self = shift;
    my ( $data ) = @_;
 
+   unless( defined $self->{response_status_line} ) {
+      ( $self->{response_status_line} ) = split m/$CRLF/, $data;
+   }
+
    return if $self->{is_closed};
 
    $self->{is_done} and croak "This request has already been completed";
@@ -308,6 +312,8 @@ sub done
 
    $self->{is_done} = 1;
    $self->{conn}->_flush_requests;
+
+   $self->{conn}->parent->_done_request( $self );
 }
 
 =head2 write_chunk_eof
@@ -415,6 +421,37 @@ sub stream
 {
    my $self = shift;
    return $self->{conn};
+}
+
+=head2 response_status_line
+
+   $status = $request->response_status_line
+
+If a response header has been written by calling the C<write> method, returns
+the first line of it.
+
+=cut
+
+sub response_status_line
+{
+   my $self = shift;
+   return $self->{response_status_line};
+}
+
+=head2 response_status_code
+
+   $code = $request->response_status_code
+
+If a response header has been written by calling the C<write> method, returns
+the status code from it.
+
+=cut
+
+sub response_status_code
+{
+   my $self = shift;
+   my $line = $self->{response_status_line} or return undef;
+   return +( split m/ /, $line )[1];
 }
 
 =head1 AUTHOR

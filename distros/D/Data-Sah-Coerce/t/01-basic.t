@@ -28,14 +28,14 @@ subtest "opt:coerce_rules" => sub {
         dies_ok {
             Data::Sah::CoerceCommon::get_coerce_rules(
                 compiler=>"perl", type=>"date", coerce_to=>'float(epoch)', data_term=>'$data',
-                coerce_rules => ['FoO'],
+                coerce_rules => ['From_str::FoO'],
             );
         };
     };
     subtest "unknown name in !name -> ignored" => sub {
         my $rules = Data::Sah::CoerceCommon::get_coerce_rules(
             compiler=>"perl", type=>"date", coerce_to=>'float(epoch)', data_term=>'$data',
-            coerce_rules => ['!FoO'],
+            coerce_rules => ['!From_str::FoO'],
         );
         test_no_dupes($rules);
         ok(@$rules);
@@ -61,17 +61,17 @@ subtest "opt:coerce_rules" => sub {
     subtest "default + R" => sub {
         my $rules = Data::Sah::CoerceCommon::get_coerce_rules(
             compiler=>"perl", type=>"bool", data_term=>'$data',
-            coerce_rules => ['str'],
+            coerce_rules => ['From_str::common_words'],
         );
         test_no_dupes($rules);
         ok(@$rules);
-        ok(grep { $_->{name} eq 'str' } @$rules);
+        ok(grep { $_->{name} eq 'From_str::common_words' } @$rules);
     };
 
     subtest "default - R" => sub {
         my $rules = Data::Sah::CoerceCommon::get_coerce_rules(
             compiler=>"perl", type=>"date", coerce_to=>"float(epoch)", data_term=>'$data',
-            coerce_rules=>['!float_epoch'],
+            coerce_rules=>['!From_float::epoch'],
         );
         test_no_dupes($rules);
         ok(@$rules);
@@ -81,13 +81,13 @@ subtest "opt:coerce_rules" => sub {
     subtest "default - R1 - R2" => sub {
         my $rules = Data::Sah::CoerceCommon::get_coerce_rules(
             compiler=>"perl", type=>"date", coerce_to=>"float(epoch)", data_term=>'$data',
-            coerce_rules=>['!str_iso8601', '!obj_DateTime'],
+            coerce_rules=>['!From_str::iso8601', '!From_obj::datetime'],
         );
         test_no_dupes($rules);
         ok(@$rules);
         #diag explain $rules;
-        ok(!grep { $_->{name} eq 'str_iso8601' } @$rules);
-        ok(!grep { $_->{name} eq 'obj_DateTime' } @$rules);
+        ok(!grep { $_->{name} eq 'From_str::iso8601' } @$rules);
+        ok(!grep { $_->{name} eq 'From_obj::datetime' } @$rules);
     };
 };
 

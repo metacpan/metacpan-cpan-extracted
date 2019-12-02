@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2019 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -28,7 +28,8 @@ This is a L<FunctionalPerl::Htmlgen::PXMLMapper>
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -55,8 +56,7 @@ fun rindices_numberstring ($rindices) {
 TEST { rindices_numberstring (list ()) }     "";
 TEST { rindices_numberstring (list (2,1)) }  "1.2. ";
 
-{
-    package PFLANZE::TocNodeBase;
+package FunctionalPerl::Htmlgen::Toc::TocNodeBase {
     use FP::StrictList;
     use FP::Predicates;
     use FP::List;
@@ -69,7 +69,7 @@ TEST { rindices_numberstring (list (2,1)) }  "1.2. ";
     }
 
     method subnodes_add ($node) {
-        is_instance_of $node, "PFLANZE::TocNode"
+        is_instance_of $node, "FunctionalPerl::Htmlgen::Toc::TocNode"
           or die "wrong type";
         # (^ XX so poor, neither do I have a TypedList yet, nor the
         # syntax to add it to the method declaration)
@@ -135,8 +135,7 @@ TEST { rindices_numberstring (list (2,1)) }  "1.2. ";
     _END_
 }
 
-{
-    package PFLANZE::TocNode;
+package FunctionalPerl::Htmlgen::Toc::TocNode {
     use FP::Predicates "is_string";
     use PXML "is_pxml_element";
     use FP::List;
@@ -145,7 +144,7 @@ TEST { rindices_numberstring (list (2,1)) }  "1.2. ";
                                           # already in the document
                     [*is_pxml_element, "header"]
                    ],
-                     "PFLANZE::TocNodeBase";
+                     "FunctionalPerl::Htmlgen::Toc::TocNodeBase";
 
     method header_pxml_for_toc () {
         # XX keep some formatting?
@@ -155,12 +154,11 @@ TEST { rindices_numberstring (list (2,1)) }  "1.2. ";
     _END_
 }
 
-{
-    package PFLANZE::TocRootNode;
+package FunctionalPerl::Htmlgen::Toc::TocRootNode {
     use FP::List;
     use PXML::XHTML ":all";
 
-    use FP::Struct ["header_pxml_for_toc"], "PFLANZE::TocNodeBase";
+    use FP::Struct ["header_pxml_for_toc"], "FunctionalPerl::Htmlgen::Toc::TocNodeBase";
 
     method name () { undef }
 
@@ -173,13 +171,13 @@ TEST { rindices_numberstring (list (2,1)) }  "1.2. ";
 }
 
 
-our $empty_toc= PFLANZE::TocRootNode->new
+our $empty_toc= FunctionalPerl::Htmlgen::Toc::TocRootNode->new
   (strictnull,
    H3 ({class=> "toc_title"}, "Contents"));
 
 sub tocnode ($$) {
     my ($name,$header)=@_;
-    PFLANZE::TocNode->new(strictnull, $name, $header);
+    FunctionalPerl::Htmlgen::Toc::TocNode->new(strictnull, $name, $header);
 }
 
 our $ttoc;

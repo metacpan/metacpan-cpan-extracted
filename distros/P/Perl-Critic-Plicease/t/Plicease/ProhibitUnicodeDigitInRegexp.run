@@ -56,6 +56,12 @@ tr/\d//;
 
 /\d/a;
 
+## name RegExpWithSlashDSlashU
+## failures 0
+## cut
+
+/\d/u;
+
 ## name RegExpWithoutSlashD
 ## failures 0
 ## cut

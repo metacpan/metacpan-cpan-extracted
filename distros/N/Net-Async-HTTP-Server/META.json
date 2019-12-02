@@ -4,13 +4,13 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Async-HTTP-Server",
    "prereqs" : {
@@ -39,23 +39,27 @@
    "provides" : {
       "Net::Async::HTTP::Server" : {
          "file" : "lib/Net/Async/HTTP/Server.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Net::Async::HTTP::Server::PSGI" : {
          "file" : "lib/Net/Async/HTTP/Server/PSGI.pm",
-         "version" : "0.09"
+         "version" : "0.10"
+      },
+      "Net::Async::HTTP::Server::PrometheusCollector" : {
+         "file" : "lib/Net/Async/HTTP/Server/PrometheusCollector.pm",
+         "version" : "0.10"
       },
       "Net::Async::HTTP::Server::Protocol" : {
          "file" : "lib/Net/Async/HTTP/Server/Protocol.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Net::Async::HTTP::Server::Request" : {
          "file" : "lib/Net/Async/HTTP/Server/Request.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Plack::Handler::Net::Async::HTTP::Server" : {
          "file" : "lib/Plack/Handler/Net/Async/HTTP/Server.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -64,5 +68,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.09"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

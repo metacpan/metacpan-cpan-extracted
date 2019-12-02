@@ -10,7 +10,7 @@ use Data::Sah::Coerce qw(gen_coercer);
 subtest "basics" => sub {
     my $c = gen_coercer(
         type=>"float",
-        coerce_rules=>["str_share"],
+        coerce_rules=>["From_str::share"],
         return_type=>"status+err+val",
     );
 

@@ -1,3 +1,31 @@
+1.166 2019-11-29
+================
+
+[Quiq::AsciiTable]
+* Doku bearbeitet
+
+[Quiq::ChartJs::TimeSeries]
+* implementiert
+
+[Quiq::Gd::Component::ColorBar]
+* Doku bearbeitet
+
+[Quiq::Gd::Component::ScatterGraph]
+* Doku bearbeitet
+
+[Quiq::Html::Page]
+* Attribut ready hinzugefügt
+
+[Quiq::Path]
+* numberPaths() - Option -move hinzugefügt
+* rename() - optimiert
+
+[Quiq::Storable]
+* Doku bearbeitet
+
+[Quiq::Svg::Tag]
+* Doku bearbeitet
+
 1.165 2019-11-22
 ================
 

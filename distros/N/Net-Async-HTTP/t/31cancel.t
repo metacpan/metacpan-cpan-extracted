@@ -32,7 +32,7 @@ local *IO::Async::Handle::connect = sub {
    $self->set_handle( $selfsock );
    $peersock->blocking(0);
 
-   return Future->new->done( $self );
+   return Future->done( $self );
 };
 
 # Cancellation
@@ -72,8 +72,7 @@ local *IO::Async::Handle::connect = sub {
       "Hello world!"
    );
 
-   wait_for { $f2->is_ready };
-   $f2->get;
+   wait_for_future( $f2 )->get;
 }
 
 # Cancelling a pending unpipelined request
@@ -95,7 +94,7 @@ local *IO::Async::Handle::connect = sub {
       "" ) . $CRLF
    );
 
-   wait_for { $f0->is_ready };
+   wait_for_future( $f0 );
 
    my ( $f1, $f2, $f3 ) = map {
       $http->do_request(
@@ -122,7 +121,7 @@ local *IO::Async::Handle::connect = sub {
       "" ) . $CRLF
    );
 
-   wait_for { $f1->is_ready };
+   wait_for_future( $f1 );
    ok( $f1->is_done, '$f1 is done' );
 
    wait_for_stream { $request_stream =~ m/$CRLF$CRLF/ } $peersock => $request_stream;
@@ -136,7 +135,7 @@ local *IO::Async::Handle::connect = sub {
       "" ) . $CRLF
    );
 
-   wait_for { $f3->is_ready };
+   wait_for_future( $f3 );
    ok( $f3->is_done, '$f3 is done' );
 }
 

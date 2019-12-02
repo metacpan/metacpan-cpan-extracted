@@ -5,9 +5,9 @@
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Aug 29 14:13:15 EDT 2019
-#    Data version: tzdata2019b
-#    Code version: tzcode2019b
+#    Generated on: Mon Dec  2 09:47:31 EST 2019
+#    Data version: tzdata2019c
+#    Code version: tzcode2019c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -746,9 +746,9 @@ default alias can be overridden as described above.
                                           Europe/Lisbon
                                           Africa/Tripoli
                                           Africa/Algiers
+                                          Europe/Kaliningrad
                                           Europe/Sofia
                                           Europe/Uzhgorod
-                                          Europe/Kaliningrad
                                           Europe/Athens
                                           Europe/Chisinau
                                           Europe/Minsk
@@ -1720,8 +1720,8 @@ L<Date::Manip::TZ> module.
                         Europe/Lisbon
                         Europe/Uzhgorod
                         Europe/London
-                        Europe/Sofia
                         Europe/Kaliningrad
+                        Europe/Sofia
                         Europe/Tallinn
                         Europe/Athens
                         Europe/Chisinau
@@ -2082,7 +2082,6 @@ L<Date::Manip::TZ> module.
      0      +08:27:52   Asia/Seoul
      0      +08:30:00   Asia/Pyongyang
                         Asia/Seoul
-                        Asia/Hong_Kong
      0      +08:35:28   Australia/Eucla
      0      +08:38:58   Asia/Yakutsk
      0      +08:43:20   Australia/Darwin
@@ -2650,6 +2649,7 @@ L<Date::Manip::TZ> module.
                         Asia/Novosibirsk
                         Asia/Irkutsk
      1      +08:20:00   Asia/Kuching
+     1      +08:30:00   Asia/Hong_Kong
      1      +09:00:00   Asia/Ulaanbaatar
                         Asia/Choibalsan
                         Asia/Irkutsk
@@ -2691,7 +2691,8 @@ L<Date::Manip::TZ> module.
                         Pacific/Guam
                         Antarctica/Macquarie
      1      +11:30:00   Australia/Lord_Howe
-     1      +12:00:00   Asia/Magadan
+     1      +12:00:00   Pacific/Norfolk
+                        Asia/Magadan
                         Asia/Srednekolymsk
                         Asia/Ust-Nera
                         Asia/Anadyr
@@ -3143,8 +3144,8 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Asia/Amman
                       Europe/Bucharest
                       Europe/Chisinau
-                      Africa/Tripoli
                       Europe/Kaliningrad
+                      Africa/Tripoli
                       Europe/Uzhgorod
                       Europe/Istanbul
                       Europe/Simferopol
@@ -3246,6 +3247,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Pacific/Honolulu
      HKST             Asia/Hong_Kong
      HKT              Asia/Hong_Kong
+     HKWT             Asia/Hong_Kong
      HMT              Asia/Dhaka
                       America/Havana
                       Europe/Helsinki

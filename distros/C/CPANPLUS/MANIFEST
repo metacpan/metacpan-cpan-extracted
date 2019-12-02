@@ -161,3 +161,4 @@ t/dummy-perl/lib/.hidden
 t/dummy-perl/man/man1/.hidden
 t/dummy-perl/man/man3/.hidden
 t/inc/conf.pl
+t/testrules.yml

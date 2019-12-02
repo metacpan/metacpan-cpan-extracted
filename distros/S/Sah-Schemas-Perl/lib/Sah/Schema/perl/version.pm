@@ -1,13 +1,13 @@
 package Sah::Schema::perl::version;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 our $schema = [obj => {
     summary => 'Perl version object',
     isa => 'version',
     'x.perl.coerce_rules' => [
-        'str_perl_version',
+        'From_str::perl_version',
     ],
 }, {}];
 
@@ -26,7 +26,7 @@ Sah::Schema::perl::version - Perl version object
 
 =head1 VERSION
 
-This document describes version 0.023 of Sah::Schema::perl::version (from Perl distribution Sah-Schemas-Perl), released on 2019-07-26.
+This document describes version 0.025 of Sah::Schema::perl::version (from Perl distribution Sah-Schemas-Perl), released on 2019-11-29.
 
 =head1 HOMEPAGE
 

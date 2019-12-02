@@ -15,7 +15,7 @@ Sah::Schemas::Date::ID - Sah schemas related to date (Indonesian)
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::Date::ID (from Perl distribution Sah-Schemas-Date-ID), released on 2019-07-21.
+This document describes version 0.003 of Sah::Schemas::Date::ID (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
 
 =head1 SYNOPSIS
 

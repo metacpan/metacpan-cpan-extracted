@@ -3,8 +3,8 @@ NAME
     algorithms)
 
 VERSION
-    This document describes version 0.007 of App::xsum (from Perl
-    distribution App-xsum), released on 2019-09-12.
+    This document describes version 0.009 of App::xsum (from Perl
+    distribution App-xsum), released on 2019-11-29.
 
 SYNOPSIS
     See xsum.

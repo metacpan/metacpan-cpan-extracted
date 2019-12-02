@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Greple" : "8.38",
+            "App::Greple" : "8.3801",
             "Getopt::EX" : "v1.15.0",
             "Text::VisualPrintf" : "2.03",
             "Text::VisualWidth::PP" : "0.05",
@@ -58,7 +58,7 @@
    "provides" : {
       "App::Greple::subst" : {
          "file" : "lib/App/Greple/subst.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "SmartString" : {
          "file" : "lib/App/Greple/subst.pm"
@@ -75,7 +75,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-subst"
       }
    },
-   "version" : "2.02",
+   "version" : "2.03",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <kaz@utashiro.com>"

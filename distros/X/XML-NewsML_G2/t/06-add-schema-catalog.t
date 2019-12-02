@@ -41,7 +41,8 @@ sub create_ni_text {
                 'Saisonstart im Schweizerhaus: Run aufs Krügerl im Prater',
             language => 'de',
             provider => $prov_apa,
-            guid     => $guid_text
+            guid     => $guid_text,
+            timezone => 'UTC'
         ),
         'create News Item instance'
     );
@@ -60,7 +61,7 @@ sub create_ni_text {
 
     my $writer = XML::NewsML_G2::Writer::News_Item->new(
         news_item      => $ni,
-        scheme_manager => $sm
+        scheme_manager => $sm,
     );
 
     ok( my $dom = $writer->create_dom(), 'create DOM' );

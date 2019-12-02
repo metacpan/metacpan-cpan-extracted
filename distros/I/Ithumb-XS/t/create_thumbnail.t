@@ -11,26 +11,26 @@ use constant IMG_SRC => 't/src.png';
 use constant IMG_OUT => 't/src_thumb.png';
 
 ok(
-    Ithumb::XS::create_thumbnail({width => 2, height => 2, src_image => IMG_SRC, dst_image => IMG_OUT}),
+    Ithumb::XS::convert_image({width => 2, height => 2, src_image => IMG_SRC, dst_image => IMG_OUT}),
     "create_thumbnail()"
 );
 
 unlink IMG_OUT if -f IMG_OUT;
 
 eval {
-    Ithumb::XS::create_thumbnail({width => -2, height => 2, src_image => IMG_SRC, dst_image => IMG_OUT});
+    Ithumb::XS::convert_image({width => -2, height => 2, src_image => IMG_SRC, dst_image => IMG_OUT});
 } or do {
     like($@, qr/invalid value of width/i, 'check with invalid width');
 };
 
 eval {
-    Ithumb::XS::create_thumbnail({width => 2, height => -2, src_image => IMG_SRC, dst_image => IMG_OUT});
+    Ithumb::XS::convert_image({width => 2, height => -2, src_image => IMG_SRC, dst_image => IMG_OUT});
 } or do {
     like($@, qr/invalid value of height/i, 'check with invalid height');
 };
 
 eval {
-    Ithumb::XS::create_thumbnail({width => 2, height => 2, src_image => 'invalid_file.png', dst_image => IMG_OUT});
+    Ithumb::XS::convert_image({width => 2, height => 2, src_image => 'invalid_file.png', dst_image => IMG_OUT});
 } or do {
     like($@, qr/file does not exist/i, 'check not exists file');
 };

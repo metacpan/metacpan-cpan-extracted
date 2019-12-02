@@ -1,16 +1,16 @@
 {
    "abstract" : "modular integer arithmetic",
    "author" : [
-      "Martin Becker <becker-cpan-mp@cozap.com>"
+      "Martin Becker <becker-cpan-mp (at) cozap.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-ModInt",
    "no_index" : {
@@ -22,15 +22,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Scalar::Util" : "0",
-            "Test" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec" : "0"
          }
       },
       "runtime" : {
@@ -44,8 +42,62 @@
             "overload" : "0",
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::ModInt" : {
+         "file" : "lib/Math/ModInt.pm",
+         "version" : "0.012"
+      },
+      "Math::ModInt::BigInt" : {
+         "file" : "lib/Math/ModInt/BigInt.pm",
+         "version" : "0.012"
+      },
+      "Math::ModInt::ChineseRemainder" : {
+         "file" : "lib/Math/ModInt/ChineseRemainder.pm",
+         "version" : "0.012"
+      },
+      "Math::ModInt::Event" : {
+         "file" : "lib/Math/ModInt/Event.pm",
+         "version" : "0.012"
+      },
+      "Math::ModInt::Event::Trap" : {
+         "file" : "lib/Math/ModInt/Event/Trap.pm",
+         "version" : "0.012"
+      },
+      "Math::ModInt::GF2" : {
+         "file" : "lib/Math/ModInt/GF2.pm",
+         "version" : "0.012"
+      },
+      "Math::ModInt::GF3" : {
+         "file" : "lib/Math/ModInt/GF3.pm",
+         "version" : "0.012"
+      },
+      "Math::ModInt::Perl" : {
+         "file" : "lib/Math/ModInt/Perl.pm",
+         "version" : "0.012"
+      },
+      "Math::ModInt::Trivial" : {
+         "file" : "lib/Math/ModInt/Trivial.pm",
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
-   "version" : "0.011"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Math-ModInt"
+      },
+      "license" : [
+         "https://www.perlfoundation.org/artistic-license-20.html"
+      ]
+   },
+   "version" : "0.012",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

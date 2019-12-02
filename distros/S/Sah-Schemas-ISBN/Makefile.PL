@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Sah-Schemas-ISBN",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::Schemas::ISBN",
   "PREREQ_PM" => {
     "strict" => 0,
@@ -23,13 +24,13 @@ my %WriteMakefileArgs = (
     "Algorithm::CheckDigits" => 0,
     "Algorithm::CheckDigits::M10_004" => 0,
     "Algorithm::CheckDigits::M11_001" => 0,
-    "Data::Sah::Coerce" => "0.031",
+    "Data::Sah::Coerce" => "0.038",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +41,7 @@ my %FallbackPrereqs = (
   "Algorithm::CheckDigits" => 0,
   "Algorithm::CheckDigits::M10_004" => 0,
   "Algorithm::CheckDigits::M11_001" => 0,
-  "Data::Sah::Coerce" => "0.031",
+  "Data::Sah::Coerce" => "0.038",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

@@ -1,9 +1,9 @@
 package Sah::SchemaR::cryptoexchange::account;
 
-our $DATE = '2018-06-09'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.004'; # VERSION
 
-our $rschema = ["str",[{description=>"\nThe format of this data is \"<cryptoexchange>/<account>\" where \"<cryptoexchange>\"\nis the name of cryptoexchange (can be code, name or safename, but will be\nnormalized to its safename) and <account> is account nickname in the\ncryptoexchange and must match /\\A[A-Za-z0-9_-]+\\z/. The \"/<account>\" part is\noptional and will be assumed to be \"/default\" if not specified.\n\n",summary=>"Account at a cryptocurrency exchange","x.completion"=>"cryptoexchange_account","x.perl.coerce_rules"=>["str_normalize_cryptoexchange_account"]}],["str"]];
+our $rschema = ["str",[{description=>"\nThe format of this data is \"<cryptoexchange>/<account>\" where \"<cryptoexchange>\"\nis the name of cryptoexchange (can be code, name or safename, but will be\nnormalized to its safename) and <account> is account nickname in the\ncryptoexchange and must match /\\A[A-Za-z0-9_-]+\\z/. The \"/<account>\" part is\noptional and will be assumed to be \"/default\" if not specified.\n\n",summary=>"Account at a cryptocurrency exchange","x.completion"=>"cryptoexchange_account","x.perl.coerce_rules"=>["From_str::normalize_cryptoexchange_account"]}],["str"]];
 
 1;
 # ABSTRACT: Account at a cryptocurrency exchange
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptoexchange::account - Account at a cryptocurrency exchange
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::cryptoexchange::account (from Perl distribution Sah-Schemas-App-cryp), released on 2018-06-09.
+This document describes version 0.004 of Sah::SchemaR::cryptoexchange::account (from Perl distribution Sah-Schemas-App-cryp), released on 2019-11-29.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

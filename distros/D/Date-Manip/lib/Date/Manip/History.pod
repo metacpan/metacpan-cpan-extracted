@@ -61,8 +61,8 @@ but none had the scope of Date::Manip.
 During this period, I recognized that the single biggest weakness was
 the inability to correctly handle timezones and daylight saving time.
 Towards the end of this period (2000 I believe), I began a project to
-rewrite Date::Manip, but I didn't not have the time needed to really
-carry it out at that time.
+rewrite Date::Manip, but I didn't have the time needed to really carry it
+out at that time.
 
 Another weakness was that Date::Manip grew in a random way.  As ideas
 and suggestions came, I added them.  There was little planning or
@@ -166,8 +166,8 @@ packages is actually a lower limit.
 
 I found that:
 
-   13 authors are active today
-   21 of the packages are active today
+   13 of the 32 authors are active today
+   21 of the 70 packages are active today
    7 of those packages are still maintained by the original author
 
 An active author is one who has released something in the past 3 years.
@@ -191,7 +191,7 @@ Congratulations to those authors who have been with perl since the
 beginning.  I'm proud to be in their company!  And congratulations to
 ILYAZ for having the oldest module in CPAN!
 
-Again, if I have missed anyone, please let me know.
+If I have missed anyone, please let me know.
 
 =head1 SEE ALSO
 

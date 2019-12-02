@@ -1,16 +1,16 @@
 {
-   "abstract" : "Run a quick and dirty static files web server",
+   "abstract" : "Quickly serve static files",
    "author" : [
       "Stefan Adams <sadams@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Command-static",
    "no_index" : {
@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "List::MoreUtils" : "0.428",
             "Mojolicious" : "8.00",
             "perl" : "5.010001"
          }
@@ -41,7 +42,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/stefanadams/Mojolicious-Command-static/issues"
+         "web" : "https://github.com/stefanadams/mojolicious-command-static/issues"
       },
       "homepage" : "https://stefan.adams.fm",
       "license" : [
@@ -49,11 +50,11 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/stefanadams/Mojolicious-Command-static.git",
-         "web" : "https://github.com/stefanadams/Mojolicious-Command-static"
+         "url" : "https://github.com/stefanadams/mojolicious-command-static.git",
+         "web" : "https://github.com/stefanadams/mojolicious-command-static"
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

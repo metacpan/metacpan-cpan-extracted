@@ -1,0 +1,72 @@
+NAME
+    App::CrossPericmd - Output the cross product of two or more sets
+
+VERSION
+    This document describes version 0.003 of App::CrossPericmd (from Perl
+    distribution App-CrossPericmd), released on 2019-11-29.
+
+FUNCTIONS
+  cross
+    Usage:
+
+     cross(%args) -> [status, msg, payload, meta]
+
+    Output the cross product of two or more sets.
+
+    Examples:
+
+    *   Example #1:
+
+         cross( aoaos => ["1,2,3", "4,5"]); # -> [[1, 4], [1, 5], [2, 4], [2, 5], [3, 4], [3, 5]]
+
+    This is more or less the same as the cross CLI on CPAN (from
+    Set::CrossProduct) except that this CLI is written using the
+    Perinci::CmdLine framework. It returns table data which might be more
+    easily consumed by other tools.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   aoaos* => *array[array[str]]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CrossPericmd>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-CrossPericmd>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CrossPericmd>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    cross. The original script.
+
+    setop. Can also do cross product aside from other set operations.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

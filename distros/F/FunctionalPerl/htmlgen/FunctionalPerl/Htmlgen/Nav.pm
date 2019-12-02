@@ -18,7 +18,8 @@ FunctionalPerl::Htmlgen::Nav -- configurable navigation bar data structure
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -48,8 +49,7 @@ fun entry ($path0,@subentries) {
 
 # Classes
 
-{
-    package FunctionalPerl::Htmlgen::Nav::Entry;
+package FunctionalPerl::Htmlgen::Nav::Entry {
     use FP::Predicates ":all";
     use FP::List qw(list_of); # should that be re-exported by
                               # FP::Predicates?
@@ -114,8 +114,7 @@ fun entry ($path0,@subentries) {
     _END_
 }
 
-{
-    package FunctionalPerl::Htmlgen::Nav::TopEntry;
+package FunctionalPerl::Htmlgen::Nav::TopEntry {
     use FP::Predicates ":all";
     use FP::Ops qw(the_method string_cmp);
     use FP::Combinators qw(compose);
@@ -187,8 +186,7 @@ fun entry ($path0,@subentries) {
     _END_
 }
 
-{
-    package FunctionalPerl::Htmlgen::Nav::RealEntry;
+package FunctionalPerl::Htmlgen::Nav::RealEntry {
     use FP::Predicates ":all";
     use FP::Ops qw(the_method);
     use FP::Equal qw(equal);
@@ -222,8 +220,7 @@ use FP::fix;
 # FP::List of items out of its location. Also to resolve path0 to its
 # nav object.
 
-{
-    package FunctionalPerl::Htmlgen::Nav::Index;
+package FunctionalPerl::Htmlgen::Nav::Index {
     use FP::List qw(null);
 
     use FP::Struct ["p0_to_upitems", "p0_to_item"];

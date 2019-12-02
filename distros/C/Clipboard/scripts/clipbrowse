@@ -16,13 +16,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-clipbrowse
-
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 USAGE
 
@@ -37,10 +33,6 @@ This means you can have any text in your clipboard and `clipbrowse`.
 =head1 NAME
 
 clipbrowse - Load a URL from the clipboard into your browser.
-
-=head1 VERSION
-
-version 0.20
 
 =head1 MOTIVATION
 

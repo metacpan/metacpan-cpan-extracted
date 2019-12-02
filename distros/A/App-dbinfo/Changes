@@ -1,18 +1,24 @@
-0.004   2018-04-03 (PERLANCAR)
+0.005   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
+	  0.034+).
+
+
+0.004   2018-04-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace nonnegint with uint.
 
 
-0.003   2017-10-30 (PERLANCAR)
+0.003   2017-10-30  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Tweaks to be usable from App::mysqlinfo.
 
 
-0.002   2017-08-25 (PERLANCAR)
+0.002   2017-08-25  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -20,6 +26,6 @@
           names in examples.
 
 
-0.001   2017-08-21 (PERLANCAR)
+0.001   2017-08-21  Released-By: PERLANCAR
 
         - First release.

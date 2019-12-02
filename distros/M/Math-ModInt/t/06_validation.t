@@ -1,8 +1,6 @@
-# Copyright (c) 2009-2015 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: 06_validation.t 51 2015-04-29 22:09:44Z demetri $
+# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Tests of parameter validation and edge case detection of Math::ModInt.
 

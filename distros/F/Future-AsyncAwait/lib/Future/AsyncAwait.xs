@@ -77,27 +77,10 @@ typedef SV PADNAME;
 #endif
 
 #ifndef wrap_keyword_plugin
-#  define wrap_keyword_plugin(func, var)  S_wrap_keyword_plugin(aTHX_ func, var)
-static void S_wrap_keyword_plugin(pTHX_ Perl_keyword_plugin_t func, Perl_keyword_plugin_t *var)
-{
-  /* BOOT can potentially race with other threads (RT123547) */
-
-  /* Perl doesn't really provide us a nice mutex for doing this so this is the
-   * best we can find. See also
-   *   https://rt.perl.org/Public/Bug/Display.html?id=132413
-   */
-  if(*var)
-    return;
-
-  OP_CHECK_MUTEX_LOCK;
-  if(!*var) {
-    *var = PL_keyword_plugin;
-    PL_keyword_plugin = func;
-  }
-
-  OP_CHECK_MUTEX_UNLOCK;
-}
+#  include "wrap_keyword_plugin.c.inc"
 #endif
+
+#include "lexer-additions.c.inc"
 
 /* Currently no version of perl makes this visible, so we always want it. Maybe
  * one day in the future we can make it version-dependent
@@ -1729,7 +1712,6 @@ static OP *pp_leaveasync(pTHX)
   dSP;
   dMARK;
 
-  PERL_CONTEXT *cx = CX_CUR();
   SV *f = NULL;
   SV *ret;
 
@@ -1746,6 +1728,8 @@ static OP *pp_leaveasync(pTHX)
     ret = future_done_from_stack(f, mark);
   }
 
+  PERL_CONTEXT *cx = CX_CUR();
+
   SPAGAIN;
   SV **oldsp = PL_stack_base + cx->blk_oldsp;
 
@@ -1753,6 +1737,7 @@ static OP *pp_leaveasync(pTHX)
   while(SP > oldsp)
     POPs;
 
+  EXTEND(SP, 1);
   mPUSHs(ret);
   PUTBACK;
 
@@ -1953,110 +1938,6 @@ static OP *newAWAITOP(I32 flags, OP *expr)
   return op;
 }
 
-/*
- * Lexer extensions
- */
-
-#define lex_consume(s)  MY_lex_consume(aTHX_ s)
-static int MY_lex_consume(pTHX_ char *s)
-{
-  /* I want strprefix() */
-  size_t i;
-  for(i = 0; s[i]; i++) {
-    if(s[i] != PL_parser->bufptr[i])
-      return 0;
-  }
-
-  lex_read_to(PL_parser->bufptr + i);
-  return i;
-}
-
-#define sv_cat_c(sv, c)  MY_sv_cat_c(aTHX_ sv, c)
-static void MY_sv_cat_c(pTHX_ SV *sv, U32 c)
-{
-  char ds[UTF8_MAXBYTES + 1], *d;
-  d = (char *)uvchr_to_utf8((U8 *)ds, c);
-  if (d - ds > 1) {
-    sv_utf8_upgrade(sv);
-  }
-  sv_catpvn(sv, ds, d - ds);
-}
-
-#define lex_scan_ident()  MY_lex_scan_ident(aTHX)
-static SV *MY_lex_scan_ident(pTHX)
-{
-  /* Inspired by
-   *   https://metacpan.org/source/MAUKE/Function-Parameters-1.0705/Parameters.xs#L265
-   */
-  I32 c;
-  bool at_start;
-  SV *ret = newSVpvs("");
-  if(lex_bufutf8())
-    SvUTF8_on(ret);
-
-  at_start = TRUE;
-
-  c = lex_peek_unichar(0);
-
-  while(c != -1) {
-    if(at_start ? isIDFIRST_uni(c) : isALNUM_uni(c)) {
-      at_start = FALSE;
-      sv_cat_c(ret, lex_read_unichar(0));
-
-      c = lex_peek_unichar(0);
-    }
-    else
-      break;
-  }
-
-  if(SvCUR(ret))
-    return ret;
-
-  SvREFCNT_dec(ret);
-  return NULL;
-}
-
-#define lex_scan_attr()  MY_lex_scan_attr(aTHX)
-static SV *MY_lex_scan_attr(pTHX)
-{
-  SV *ret = lex_scan_ident();
-  if(!ret)
-    return ret;
-
-  lex_read_space(0);
-
-  if(lex_peek_unichar(0) != '(')
-    return ret;
-  sv_cat_c(ret, lex_read_unichar(0));
-
-  int count = 1;
-  I32 c = lex_peek_unichar(0);
-  while(count && c != -1) {
-    if(c == '(')
-      count++;
-    if(c == ')')
-      count--;
-    if(c == '\\') {
-      /* The next char does not bump count even if it is ( or );
-       * the \\ is still captured
-       */
-      sv_cat_c(ret, lex_read_unichar(0));
-      c = lex_peek_unichar(0);
-      if(c == -1)
-        goto unterminated;
-    }
-
-    sv_cat_c(ret, lex_read_unichar(0));
-    c = lex_peek_unichar(0);
-  }
-
-  if(c != -1)
-    return ret;
-
-unterminated:
-  croak("Unterminated attribute parameter in attribute list");
-}
-
 enum {
   NO_FORBID,
   FORBID_FOREACH_NONLEXICAL,
@@ -2160,26 +2041,11 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   I32 floor_ix = start_subparse(FALSE, name ? 0 : CVf_ANON);
   SAVEFREESV(PL_compcv);
 
-  /* Parse subroutine attrs
-   * These are supplied to newATTRSUB() as an OP_LIST containing OP_CONSTs,
-   *   one attribute in each as a plain SV. Note that we don't have to parse
-   *   inside the contents of the parens; that is handled by the attribute
-   *   handlers themselves
-   */
   OP *attrs = NULL;
   if(lex_peek_unichar(0) == ':') {
-    SV *attr;
     lex_read_unichar(0);
-    lex_read_space(0);
 
-    while((attr = lex_scan_attr())) {
-      lex_read_space(0);
-
-      if(!attrs)
-        attrs = newLISTOP(OP_LIST, 0, NULL, NULL);
-
-      attrs = op_append_elem(OP_LIST, attrs, newSVOP(OP_CONST, 0, attr));
-    }
+    attrs = lex_scan_attrs(PL_compcv);
   }
 
 #ifdef HAVE_PARSE_SUBSIGNATURE
@@ -2214,15 +2080,20 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   I32 save_ix = block_start(TRUE);
 
   OP *body = parse_block(0);
-
-  COP *last_cop = PL_curcop;
-  check_optree(aTHX_ body, NO_FORBID, &last_cop);
+  /* body might be NULL if an error happened; we check that below so for now
+   * just be defensive
+   */
+  if(body) {
+    COP *last_cop = PL_curcop;
+    check_optree(aTHX_ body, NO_FORBID, &last_cop);
+  }
 
   SvREFCNT_inc(PL_compcv);
   body = block_end(save_ix, body);
 
   if(PL_parser->error_count) {
-    /* parse_block() still returns a valid body even if a parse error happens.
+    /* parse_block() still sometimes returns a valid body even if a parse
+     * error happens.
      * We need to destroy this partial body before returning a valid(ish)
      * state to the keyword hook mechanism, so it will find the error count
      * correctly

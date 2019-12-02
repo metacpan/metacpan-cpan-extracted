@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,21 +14,22 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Sah-Schemas-Net",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::Schemas::Net",
   "PREREQ_PM" => {
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Sah" => "0.896",
-    "Data::Sah::Coerce" => "0.031",
+    "Data::Sah" => "0.902",
+    "Data::Sah::Coerce" => "0.038",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "NetAddr::IP" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,8 +37,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah" => "0.896",
-  "Data::Sah::Coerce" => "0.031",
+  "Data::Sah" => "0.902",
+  "Data::Sah::Coerce" => "0.038",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

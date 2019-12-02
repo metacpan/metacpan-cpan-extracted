@@ -4,15 +4,17 @@
 use ExtUtils::testlib;
 use Test::More;
 use Test::Exception;
-use Test::Warn;
 use Test::Differences;
 use Test::Memory::Cycle;
 use Config::Model;
 use Config::Model::Tester::Setup qw/init_test/;
 use Config::Model::Value;
+use Test::Log::Log4perl;
 
 use strict;
 use warnings;
+$::_use_log4perl_to_warn = 1;
+
 use 5.010;
 
 binmode STDOUT, ':encoding(UTF-8)';
@@ -721,9 +723,22 @@ subtest "validation done with a Parse::RecDescent grammar" => sub {
 
 subtest "warn_if_match with a string" => sub {
     my $wim = $root->fetch_element('warn_if_match');
-    warning_like { $wim->store('foobar'); } qr/should not match/, "test warn_if condition";
+
+    {
+        my $xp = Test::Log::Log4perl->expect(
+            ignore_priority => "info",
+            ['User', warn =>  qr/should not match/]
+        );
+        $wim->store('foobar');
+    }
 
     is( $wim->has_fixes, 1, "test has_fixes" );
+
+    {
+        # check code is not run when check is 'no'.
+        my $xp = Test::Log::Log4perl->expect(ignore_priority => "debug", []);
+        $wim->fetch(  check => 'no');
+    }
 
     is( $wim->fetch( check => 'no', silent => 1 ), 'foobar', "check warn_if stored value" );
     is( $wim->has_fixes, 1, "test has_fixes after fetch with check=no" );
@@ -738,7 +753,14 @@ subtest "warn_if_match with a string" => sub {
 
 subtest "warn_if_number with a regexp" => sub {
     my $win = $root->fetch_element('warn_if_number');
-    warning_like { $win->store('bar51'); } qr/should not have numbers/, "test warn_if condition";
+
+    {
+        my $xp = Test::Log::Log4perl->expect(
+            ignore_priority => 'info',
+            ['User', warn => qr/should not have numbers/]
+        );
+        $win->store('bar51');
+    }
 
     is( $win->has_fixes, 1, "test has_fixes" );
     $win->apply_fixes;
@@ -747,7 +769,13 @@ subtest "warn_if_number with a regexp" => sub {
 
 subtest "integer_with_warn_if" => sub {
     my $iwwi = $root->fetch_element('integer_with_warn_if');
-    warning_like { $iwwi->store('5'); } qr/should be greater than 9/, "test warn_if condition";
+    {
+        my $xp = Test::Log::Log4perl->expect(
+            ignore_priority => 'info',
+            ['User', warn => qr/should be greater than 9/]
+        );
+        $iwwi->store('5');
+    }
 
     is( $iwwi->has_fixes, 1, "test has_fixes" );
     $iwwi->apply_fixes;
@@ -757,9 +785,13 @@ subtest "integer_with_warn_if" => sub {
 my $warn_unless_test = sub {
     my $wup = $root->fetch_element('warn_unless_match');
     my $v = shift;
-    warning_like {
+    {
+        my $xp = Test::Log::Log4perl->expect(
+            ignore_priority => 'info',
+            ['User', warn => qr/should match/]
+        );
         $wup->store($v);
-    } qr/should match/,  "test warn_unless_match condition";
+    }
 
     is( $wup->has_fixes, 1, "test has_fixes" );
     $wup->apply_fixes;
@@ -771,14 +803,22 @@ subtest "warn_unless_match feature with multiline value" => $warn_unless_test, "
 
 subtest "unconditional feature" => sub {
     my $aw = $root->fetch_element('always_warn');
-    warning_like { $aw->store('whatever'); } qr/always/i, "got unconditional warning";
+    my $xp = Test::Log::Log4perl->expect(
+        ignore_priority => 'info',
+        ['User', warn => qr/always/]
+    );
+    $aw->store('whatever');
 };
 
 subtest "warning and repeated storage in same element" => sub {
     my $aw = $root->fetch_element('always_warn');
-    warning_like { $aw->store('what ?'); } qr/always/i, "got unconditional warning";
-    warning_is { $aw->store('what ?'); } undef, "no warning when repeating a store with same value";
-    warning_like { $aw->store('what never'); } qr/always/i, "got unconditional warning when storing a changed value";
+    my $xp = Test::Log::Log4perl->expect(
+        ignore_priority => 'info',
+        [ 'User', ( warn => qr/always/ ) x 2 ]
+    );
+    $aw->store('what ?'); # warns
+    $aw->store('what ?');  # does not warn
+    $aw->store('what never'); # warns
 };
 
 subtest "unicode" => sub {
@@ -825,7 +865,14 @@ subtest "replace_follow" => sub {
 
 subtest "Standards-Version" => sub {
     my $sv = $root->fetch_element('Standards-Version');
-    warning_like { $sv->store('3.9.1'); } qr/Current/, "store old standard version";
+    {
+        my $xp = Test::Log::Log4perl->expect(
+            ignore_priority => 'info',
+            ['User', warn => qr/Current/]
+        );
+        # store old standard version
+        $sv->store('3.9.1');
+    }
     is( $inst->needs_save, 1, "check needs_save after load" );
     $sv->apply_fixes;
     is( $inst->needs_save, 2, "check needs_save after load" );
@@ -848,7 +895,11 @@ subtest "assert"  => sub {
 subtest "warn_unless" => sub {
     my $warn_unless = $root->fetch_element('warn_unless');
 
-    warning_like { $warn_unless->fetch(); } qr/should not be empty/, "check warn_unless";
+    my $xp = Test::Log::Log4perl->expect(
+        ignore_priority => 'info',
+        ['User', warn => qr/should not be empty/]
+    );
+    $warn_unless->fetch();
 
     $warn_unless->apply_fixes;
     ok( 1, "warn_unless apply_fixes called" );
@@ -858,7 +909,11 @@ subtest "warn_unless" => sub {
 subtest "warn_unless_file" => sub {
     my $warn_unless_file = $root->fetch_element('warn_unless_file');
 
-    warning_like { $warn_unless_file->store('not-value.t'); } qr/file not-value.t should exist/, "check warn_unless_file";
+    my $xp = Test::Log::Log4perl->expect(
+        ignore_priority => 'info',
+        ['User', warn =>  qr/file not-value.t should exist/]
+    );
+    $warn_unless_file->store('not-value.t');
 
     $warn_unless_file->apply_fixes;
     ok( 1, "warn_unless_file apply_fixes called" );
@@ -868,9 +923,21 @@ subtest "warn_unless_file" => sub {
 subtest "file and dir value types"  => sub {
     my $t_file = $root->fetch_element('t_file');
     my $t_dir  = $root->fetch_element('t_dir');
-    warning_like {$t_file->store('toto')} qr/not exist/, "test non existent file" ;
-    warning_like {$t_file->store('t')} qr/not a file/, "test not a file" ;
-    warning_like {$t_dir->store('t/value.t')} qr/not a dir/, "test not a dir" ;
+
+    {
+        my $xp = Test::Log::Log4perl->expect(
+            ignore_priority => 'info',
+            [
+                'User',
+                warn => qr/not exist/,
+                warn => qr/not a file/,
+                warn => qr/not a dir/,
+            ]
+        );
+        $t_file->store('toto');
+        $t_file->store('t');
+        $t_dir->store('t/value.t');
+    }
 
     $t_file->store('t/value.t') ;
     is($t_file->has_warning, 0, "test a file");

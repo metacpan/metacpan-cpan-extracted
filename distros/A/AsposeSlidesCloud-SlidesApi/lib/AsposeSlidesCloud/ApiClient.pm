@@ -1,3 +1,29 @@
+=begin comment
+
+Copyright (c) 2019 Aspose Pty Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=end comment
+
+=cut
+
 package AsposeSlidesCloud::ApiClient;
 
 use strict;
@@ -14,54 +40,33 @@ use URI::Query;
 use JSON;
 use URI::Escape;
 use Scalar::Util;
-use Log::Any qw($log);
 use Carp;
 use Module::Runtime qw(use_module);
-use Digest::HMAC_SHA1;
-use MIME::Base64;
+use Log::Any qw($log);
+use Log::Any::Adapter ('Stderr');
 
+use AsposeSlidesCloud::ApiInfo;
 use AsposeSlidesCloud::Configuration;
 
-sub new
-{
-	
-	if(not defined $AsposeSlidesCloud::Configuration::app_sid or $AsposeSlidesCloud::Configuration::app_sid eq ''){
-		croak("Aspose Cloud App SID key is missing.");
-    }
-	
-	if(not defined $AsposeSlidesCloud::Configuration::api_key or $AsposeSlidesCloud::Configuration::api_key eq ''){
-		croak("Aspose Cloud API key is missing.");
-    }
-    
+sub new {
     my $class = shift;
+
+    my $config;
+
+    my %params = @_;
+
+    if (defined $params{config}) {
+        $config = $params{config};
+    } else {
+        $config = AsposeSlidesCloud::Configuration->new(@_);
+    }
+
     my (%args) = (
         'ua' => LWP::UserAgent->new,
-        'base_url' => $AsposeSlidesCloud::Configuration::api_server,
-        @_
+        'config' => $config,
     );
   
     return bless \%args, $class;
-}
-
-# Set the user agent of the API client
-#
-# @param string $user_agent The user agent of the API client
-#
-sub set_user_agent {
-    my ($self, $user_agent) = @_;
-    $self->{http_user_agent}= $user_agent;
-}
-
-# Set timeout
-#
-# @param integer $seconds Number of seconds before timing out [set to 0 for no timeout]
-# 
-sub set_timeout {
-    my ($self, $seconds) = @_;
-    if (!looks_like_number($seconds)) {
-        croak('Timeout variable must be numeric.');
-    }
-    $self->{http_timeout} = $seconds;
 }
 
 # make the HTTP request
@@ -75,24 +80,26 @@ sub call_api {
     my $self = shift;
     my ($resource_path, $method, $query_params, $post_params, $header_params, $body_data, $auth_settings) = @_;
   
-	$resource_path =~ s/\Q{appSid}\E/$AsposeSlidesCloud::Configuration::app_sid/g;
+    $self->update_headers($header_params);
   
-    my $_url = $self->{base_url} . $resource_path;
-  
-    # update signature
-    my $signature = $self->sign($_url, $AsposeSlidesCloud::Configuration::app_sid, $AsposeSlidesCloud::Configuration::api_key);
-	
-	$_url = $_url . '&signature=' . $signature;
-	
-	if($AsposeSlidesCloud::Configuration::debug){
-		print "\nFinal URL: ".$method."::".$_url."\n";
-	}
-	# body data
-    $body_data = to_json($body_data->to_hash) if defined $body_data && $body_data->can('to_hash'); # model to json string
-    my $_body_data = keys %$post_params > 1 ? $post_params : $body_data;
-   
-    #my $_body_data = $body_data;
-  
+    my $_url = $self->{config}{base_url}."/".$self->{config}{version}.$resource_path;
+
+    # build query 
+    if (%$query_params) {
+        $_url = ($_url . '?' . eval { URI::Query->new($query_params)->stringify });
+    }
+
+    # body data
+    if (defined $body_data) {
+        if (!(ref $body_data eq "HASH") && $body_data->can('to_hash')) {
+            $body_data = $body_data->to_hash;
+        }
+        if (ref $body_data eq "HASH") {
+            $body_data = to_json($body_data); # model to json string
+        }
+    }
+    my $_body_data = %$post_params ? $post_params : $body_data;
+
     # Make the HTTP request
     my $_request;
     if ($method eq 'POST') {
@@ -109,7 +116,7 @@ sub call_api {
             'form-data' : $header_params->{'Content-Type'};
   
         $_request = PUT($_url, %$header_params, Content => $_body_data);
-  
+
     }
     elsif ($method eq 'GET') {
         my $headers = HTTP::Headers->new(%$header_params);
@@ -121,23 +128,24 @@ sub call_api {
     }
     elsif ($method eq 'DELETE') { #TODO support form data
         my $headers = HTTP::Headers->new(%$header_params);
-        $_request = DELETE($_url, %$headers, Content => $_body_data);
+        $_request = DELETE($_url, %$headers);
     }
-    elsif ($method eq 'PATCH') { #TODO
+
+    if ($self->{config}{debug}) {
+        $log->info("REQUEST: %s", $_request->as_string);
     }
-    else {
-    }
-   
-    $self->{ua}->timeout($self->{http_timeout} || $AsposeSlidesCloud::Configuration::http_timeout); 
-    $self->{ua}->agent($self->{http_user_agent} || $AsposeSlidesCloud::Configuration::http_user_agent);
-    
+
     my $_response = $self->{ua}->request($_request);
-  
+
+    if ($self->{config}{debug}) {
+        $log->debugf("RESPONSE: %s", $_response->as_string);
+    }
+
     unless ($_response->is_success) {
-        croak("API Exception(".$_response->code."): ".$_response->message);
+        croak(sprintf "API Exception(%s): %s\n%s", $_response->code, $_response->message, $_response->content);
     }
        
-    return $_response;
+    return $_response->content;
   
 }
 
@@ -147,25 +155,34 @@ sub call_api {
 #  @return string the serialized object
 sub to_path_value {
     my ($self, $value) = @_;
-    return uri_escape($self->to_string($value));
+    return $self->to_string($value);
 }
-
 
 # Take value and turn it into a string suitable for inclusion in
 # the query, by imploding comma-separated if it's an object.
-# If it's a string, pass through unchanged. It will be url-encoded
-# later.
 # @param object $object an object to be serialized to a string
 # @return string the serialized object
 sub to_query_value {
       my ($self, $object) = @_;
-      if (is_array($object)) {
-          return implode(',', $object);
+      if (ref($object) eq 'ARRAY') {
+          return join(',', @$object);
       } else {
           return $self->to_string($object);
       }
 }
 
+# Take boolean value and turn it into a string suitable for inclusion in
+# the query, by imploding comma-separated if it's an object.
+# @param object $object an object to be serialized to a string
+# @return string the serialized object
+sub to_boolean_query_value {
+      my ($self, $value) = @_;
+      if ($value) {
+          return "true";
+      } else {
+          return "false";
+      }
+}
 
 # Take value and turn it into a string suitable for inclusion in
 # the header. If it's a string, pass through unchanged
@@ -198,7 +215,7 @@ sub to_string {
         return $value->datetime();
     }
     else {
-        return $value;
+        return sprintf("%s", $value);
     }
 }
 
@@ -210,7 +227,6 @@ sub to_string {
 sub deserialize
 {
     my ($self, $class, $data) = @_;
-    $log->debugf("deserializing %s for %s", $data, $class);
   
     if (not defined $data) {
         return undef;
@@ -247,7 +263,7 @@ sub deserialize
         return \@_values;
     } elsif ($class eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
-    } elsif (grep /^$class$/, ('string', 'int', 'float', 'bool', 'object')) {
+    } elsif (grep /^$class$/, ('string', 'int', 'float', 'bool', 'object', 'File')) {
         return $data;
     } else { # model
         my $_instance = use_module("AsposeSlidesCloud::Object::$class")->new;
@@ -257,7 +273,6 @@ sub deserialize
             return $_instance->from_hash(decode_json $data);
         }
     }
-  
 }
 
 # return 'Accept' based on an array of accept provided
@@ -288,47 +303,47 @@ sub select_header_content_type
         return 'application/json'; # default to application/json
     } elsif (grep(/^application\/json$/i, @header)) {
         return 'application/json';
+    } elsif ($header[0] eq 'multipart/form-data') {
+        return 'application/json';
     } else {
         return join(',', @header);
     }
   
 }
 
-sub pre_deserialize
-{
-    my ($self, $data, $class, $content_type) = @_;
-    $log->debugf("pre_deserialize %s for %s and content_type %s", $data, $class, $content_type);    
-        if ($class eq "ResponseMessage") {        	
-        	if (defined $content_type and lc $content_type ne 'application/json' ) {        		
-        		my $_instance = use_module("AsposeSlidesCloud::Object::$class")->new;
-        		$_instance->{'Status'} = 'OK';
-        		$_instance->{'Code'} = 200;
-        		$_instance->{'Content'} = $data;
-        		return  $_instance;
-       	 	}
-       }
-       
-       if ( (defined $content_type) && ($content_type !~ m/json/) )  {
-       		croak("API Exception(406.): Invalid contentType".$content_type);
-       }
-        
-        return $self->deserialize($class, $data);
+# add auth, user agent and other headers
+#  
+# @param array $headerParams header parameters (by ref)
+sub update_params_for_auth {
+    my ($self, $header_params) = @_;
+    $header_params->{'X_Aspose_Client'} = 'perl sdk';
+    $header_params->{'X_Aspose_Version'} = AsposeSlidesCloud::ApiInfo::VERSION;
+    if ((defined $self->{config}{timeout}) && $self->{config}{timeout} > 0) {
+        $header_params->{'X_Aspose_Timeout'} = $self->{config}{timeout};
+    }
+    my $custom_headers = $self->{config}{custom_headers};
+    foreach my $key (keys %$custom_headers) {
+        $header_params->{$key} = $self->{config}{custom_headers}{$key};
+    }
+    $self->update_params_for_auth($header_params);
 }
 
-# return signature for aspose cloud api
-sub sign {
-    my ($self, $url_to_sign, $appSid, $appKey) = @_;
-  
-    #return if (!defined($url_to_sign) || scalar(@$auth_settings) == 0);
-        	
-    my $hmac = Digest::HMAC_SHA1->new($appKey);
-	$hmac->add($url_to_sign);
-	my $signature = $hmac->digest;
-	$signature = encode_base64($signature, '');
-	$signature =~ s/=//;
-	#$signature =~ s/[^A-Za-z0-9]//g;
-	$log->debugf ("signature :: ".$signature);
-	return $signature;
+# update header and query param based on authentication setting
+#  
+# @param array $headerParams header parameters (by ref)
+# @param array $queryParams query parameters (by ref)
+# @param array $authSettings array of authentication scheme (e.g ['api_key'])
+sub update_headers {
+    my ($self, $header_params) = @_;
+    if (!defined $self->{config}{access_token} || $self->{config}{access_token} eq "") {
+        my $_url = $self->{config}{auth_base_url} . "/connect/token";
+        my $_request = POST($_url, {}, Content => 'grant_type=client_credentials&client_id='.$self->{config}{app_sid}.'&client_secret='.$self->{config}{app_key});
+        my $_response = $self->{ua}->request($_request);
+        my $decoded_data = decode_json $_response->content;
+        $self->{config}{access_token} = $decoded_data->{access_token};
+    }
+    $header_params->{'Authorization'} = 'Bearer ' . $self->{config}{access_token};
 }
+
 
 1;

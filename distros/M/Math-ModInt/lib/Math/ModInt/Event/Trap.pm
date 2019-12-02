@@ -1,8 +1,6 @@
-# Copyright (c) 2010-2015 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: Trap.pm 60 2015-05-18 08:47:12Z demetri $
+# Copyright (c) 2010-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 package Math::ModInt::Event::Trap;
 
@@ -15,7 +13,7 @@ use Carp qw(carp croak);
 
 BEGIN {
     our @CARP_NOT = qw(Math::ModInt::Event);
-    our $VERSION  = '0.011';
+    our $VERSION  = '0.012';
 }
 
 # Math::ModInt::Event::Trap=ARRAY(...)
@@ -53,7 +51,13 @@ my %generic_handlers = (
 
 sub _discard_handler {
     my ($trap_id) = @_;
-    @handlers = grep { $trap_id != $_->[H_TRAP_ID] } @handlers;
+    my $hx = @handlers;
+    while ($hx) {
+        if ($trap_id == $handlers[--$hx]->[H_TRAP_ID]) {
+            splice @handlers, $hx, 1;
+            return;
+        }
+    }
 }
 
 sub _add_handler {
@@ -70,7 +74,7 @@ sub _final_trap {
 
 sub new {
     my ($class, $event, $handler) = @_;
-    my $is_static = defined wantarray? 0: 1;
+    my $is_static = !defined wantarray;
     my $trap_id   = $is_static? 0: ++$unique;
     if (!ref $handler) {
         if (!$handler || !exists $generic_handlers{$handler}) {
@@ -115,7 +119,7 @@ Math::ModInt::Event::Trap - catching events triggered by Math::ModInt
 
 =head1 VERSION
 
-This documentation refers to version 0.011 of Math::ModInt::Event::Trap.
+This documentation refers to version 0.012 of Math::ModInt::Event::Trap.
 
 =head1 SYNOPSIS
 
@@ -202,10 +206,10 @@ Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2015 by Martin Becker.  All rights reserved.
+Copyright (c) 2010-2019 Martin Becker, Blaubeuren.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.6.0 or,
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see LICENSE file).
 at your option, any later version of Perl 5 you may have available.
 
 =head1 DISCLAIMER OF WARRANTY

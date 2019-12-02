@@ -1,7 +1,7 @@
 package Sah::Schema::perl::modprefixes;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 our $schema = [array => {
     summary => 'Perl module prefixes',
@@ -26,7 +26,7 @@ _
     of => ["perl::modprefix", {req=>1}, {}],
 
     'x.perl.coerce_rules' => [
-        'str_or_array_expand_perl_modprefix_wildcard',
+        'From_str_or_array::expand_perl_modprefix_wildcard',
     ],
 
     # provide a default completion which is from list of installed perl modules
@@ -49,7 +49,7 @@ Sah::Schema::perl::modprefixes - Perl module prefixes
 
 =head1 VERSION
 
-This document describes version 0.023 of Sah::Schema::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2019-07-26.
+This document describes version 0.025 of Sah::Schema::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

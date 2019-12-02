@@ -34,22 +34,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Chart::Plotly" : "0.031",
-            "Chart::Plotly::Plot" : "0",
-            "Devel::IPerl::Display::HTML" : "0",
-            "Module::Find" : "0",
-            "Moo::Role" : "0",
-            "Role::Tiny" : "0",
-            "namespace::autoclean" : "0",
+            "Chart::Plotly" : "0.033",
             "perl" : "5.008",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
-         }
-      },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0"
          }
       }
    },
@@ -65,7 +54,7 @@
          "web" : "https://github.com/pablrod/p5-Devel-IPerl-Plugin-Chart-Plotly"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_contributors" : [
       "Roy Storey <kiwiroy@users.noreply.github.com>"
    ],

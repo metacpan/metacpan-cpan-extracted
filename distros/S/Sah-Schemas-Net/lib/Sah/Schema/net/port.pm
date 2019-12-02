@@ -1,7 +1,7 @@
 package Sah::Schema::net::port;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 our $schema = [int => {
     summary => 'Network port number',
@@ -23,7 +23,7 @@ Sah::Schema::net::port - Network port number
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::net::port (from Perl distribution Sah-Schemas-Net), released on 2019-07-25.
+This document describes version 0.008 of Sah::Schema::net::port (from Perl distribution Sah-Schemas-Net), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::month_num;
 
-our $DATE = '2019-07-21'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = ["int",[{max=>12,min=>1,summary=>"Month number","x.completion"=>["date_month_num"],"x.perl.coerce_rules"=>["str_convert_en_month_name_to_num"]}],["int"]];
+our $rschema = ["int",[{max=>12,min=>1,summary=>"Month number","x.completion"=>["date_month_num"],"x.perl.coerce_rules"=>["From_str::convert_en_month_name_to_num"]}],["int"]];
 
 1;
 # ABSTRACT: Month number
@@ -20,7 +20,7 @@ Sah::SchemaR::date::month_num - Month number
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::date::month_num (from Perl distribution Sah-Schemas-Date), released on 2019-07-21.
+This document describes version 0.007 of Sah::SchemaR::date::month_num (from Perl distribution Sah-Schemas-Date), released on 2019-11-28.
 
 =head1 DESCRIPTION
 

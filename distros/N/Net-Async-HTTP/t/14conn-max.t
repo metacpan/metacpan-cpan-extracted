@@ -32,7 +32,7 @@ local *IO::Async::Handle::connect = sub {
    $self->set_handle( $selfsock );
    push @peersocks, $peersock;
 
-   return Future->new->done( $self );
+   return Future->done( $self );
 };
 
 foreach my $max ( 1, 2, 0 ) {

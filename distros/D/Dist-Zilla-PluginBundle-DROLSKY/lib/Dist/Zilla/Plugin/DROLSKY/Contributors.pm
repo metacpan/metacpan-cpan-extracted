@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.02';
+our $VERSION = '1.05';
 
 use Moose;
 
@@ -56,7 +56,7 @@ Dist::Zilla::Plugin::DROLSKY::Contributors - Creates a .mailmap to populate Cont
 
 =head1 VERSION
 
-version 1.02
+version 1.05
 
 =for Pod::Coverage .*
 

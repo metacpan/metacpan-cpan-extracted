@@ -9,7 +9,7 @@ use Test::More;
 plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/str/str_rgb24_from_colorname_X_or_code.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/rgb24_from_colorname_X_or_code.pm',
     'Sah/Schema/color/ansi16.pm',
     'Sah/Schema/color/ansi256.pm',
     'Sah/Schema/color/rgb24.pm',

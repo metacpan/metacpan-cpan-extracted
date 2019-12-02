@@ -1,7 +1,7 @@
 package Sah::SchemaR::dirname;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $rschema = ["str",[{summary=>"Filesystem directory name","x.completion"=>["dirname"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::dirname - Filesystem directory name
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::SchemaR::dirname (from Perl distribution Sah-Schemas-Path), released on 2019-07-25.
+This document describes version 0.010 of Sah::SchemaR::dirname (from Perl distribution Sah-Schemas-Path), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

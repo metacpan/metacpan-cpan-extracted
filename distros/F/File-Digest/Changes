@@ -1,3 +1,14 @@
+0.011   2019-11-29  Released-By: PERLANCAR; Urgency: high
+
+        - Merge two releases 0.010 & 0.010.1.
+
+
+0.010.1 2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names (Data::Sah::Coerce 0.034+). UPDATE: rename
+          release 0.010 -> 0.10.1, cancel release (duplicate version).
+
+
 0.010   2019-09-12  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Didn't pass digest_args argument from digest_files() to

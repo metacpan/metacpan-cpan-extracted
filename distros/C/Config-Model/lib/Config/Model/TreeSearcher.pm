@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TreeSearcher 2.136;
+package Config::Model::TreeSearcher 2.137;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -105,9 +105,14 @@ sub search {
         foreach my $e (@element) {
             my $store = 0;
 
-            map { $store = 1 if $need_search->{$_} and $node->get_help_as_text( $_ => $e ) =~ $reg }
-                qw/description summary/;
-            $store = 1 if $need_search->{element} and $e =~ $reg;
+            for ( qw/description summary/ ) {
+                if ($need_search->{$_} and $node->get_help_as_text( $_ => $e ) =~ $reg) {
+                    $store = 1;
+                }
+            }
+            if ($need_search->{element} and $e =~ $reg) {
+                $store = 1;
+            }
 
             $data_ref->( $loc ? $loc . ' ' . $e : $e ) if $store;
 
@@ -148,7 +153,7 @@ Config::Model::TreeSearcher - Search tree for match in value, description...
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 

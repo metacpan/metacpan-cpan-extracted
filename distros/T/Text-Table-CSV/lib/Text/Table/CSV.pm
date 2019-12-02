@@ -1,7 +1,7 @@
 package Text::Table::CSV;
 
-our $DATE = '2019-01-17'; # DATE
-our $VERSION = '0.021'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -19,6 +19,7 @@ sub table {
     my %params = @_;
     my $rows = $params{rows} or die "Must provide rows!";
 
+    my $header_row = defined $params{header_row} ? $params{header_row} : 1;
     my $max_index = _max_array_index($rows);
 
     # here we go...
@@ -26,8 +27,9 @@ sub table {
 
     # then the data
     my $i = 0;
-    foreach my $row ( @{ $rows }[0..$#$rows] ) {
+    foreach my $row (@$rows) {
         $i++;
+        next if $i==1 && !$header_row;
         push @table, join(
 	    ",",
 	    map { _encode(defined($row->[$_]) ? $row->[$_] : '') } (0..$max_index)
@@ -69,7 +71,7 @@ Text::Table::CSV - Generate CSV
 
 =head1 VERSION
 
-This document describes version 0.021 of Text::Table::CSV (from Perl distribution Text-Table-CSV), released on 2019-01-17.
+This document describes version 0.023 of Text::Table::CSV (from Perl distribution Text-Table-CSV), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -111,10 +113,15 @@ The C<table> function understands these arguments, which are passed as a hash.
 
 =over
 
-=item * rows (aoaos)
+=item * rows* (aoaos)
 
-Takes an array reference which should contain one or more rows of data, where
-each row is an array reference.
+Required. Takes an array reference which should contain one or more rows of
+data, where each row is an array reference.
+
+=item * header_row (bool)
+
+Optional, default true. Whether to print the first row (which is assumed to be
+the header row).
 
 =back
 

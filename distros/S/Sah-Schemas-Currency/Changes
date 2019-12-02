@@ -1,8 +1,14 @@
-0.002   2018-06-27 (PERLANCAR)
+0.003   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
+	  0.034+).
+
+
+0.002   2018-06-27  Released-By: PERLANCAR
 
 	- Add schema: currency::pair.
 
 
-0.001   2018-03-08 (PERLANCAR)
+0.001   2018-03-08  Released-By: PERLANCAR
 
         - First release.

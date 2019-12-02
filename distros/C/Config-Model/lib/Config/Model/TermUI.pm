@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TermUI 2.136;
+package Config::Model::TermUI 2.137;
 
 use Carp;
 use utf8;      # so literals and identifiers can be in UTF-8
@@ -25,7 +25,7 @@ my $completion_sub = sub {
     my ( $self, $text, $line, $start ) = @_;
 
     my @choice = $self->{current_node}->get_element_name;
-    my @ret = grep( /^$text/, @choice );
+    my @ret = grep { /^$text/ } @choice ;
     return @ret;
 };
 
@@ -33,7 +33,7 @@ my $leaf_completion_sub = sub {
     my ( $self, $text, $line, $start ) = @_;
 
     my @choice = $self->{current_node}->get_element_name( cargo_type => 'leaf' );
-    my @ret = grep( /^$text/, @choice );
+    my @ret = grep { /^$text/ } @choice ;
     return @ret;
 };
 
@@ -42,7 +42,7 @@ my $fix_completion_sub = sub {
 
     my @choice = $self->{current_node}->get_element_name;
     push @choice, '!';
-    my @ret = grep( /^$text/, @choice );
+    my @ret = grep { /^$text/ } @choice ;
     return @ret;
 };
 
@@ -51,7 +51,7 @@ my $ll_completion_sub = sub {
 
     my @choice = $self->{current_node}->get_element_name;
     push @choice, '-nz';
-    my @ret = grep( /^$text/, @choice );
+    my @ret = grep { /^$text/ } @choice ;
     return @ret;
 };
 
@@ -105,7 +105,7 @@ my $cd_completion_sub = sub {
     }
 
     # filter possible choices according to input
-    my @ret = grep( /^$text/, @choice );
+    my @ret = grep { /^$text/ } @choice ;
 
     #print "->choice +",join('+',@ret),"+ text:'$text'<-\n";
 
@@ -138,7 +138,7 @@ sub completion {
         return $completion_dispatch{$main}->( $self, $text, $line, $start );
     }
     elsif ( not $cmd ) {
-        return grep ( /^$text/, $self->simple_ui_commands() );
+        return grep { /^$text/ } $self->simple_ui_commands() ;
     }
 
     return ();
@@ -238,7 +238,7 @@ Config::Model::TermUI - Interactive command line interface for cme
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 

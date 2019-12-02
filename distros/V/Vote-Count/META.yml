@@ -4,7 +4,6 @@ author:
   - 'John Karr <brainbuz@cpan.org>'
 build_requires:
   File::Temp: '0'
-  JSON::MaybeXS: '0'
   Test2::Bundle::More: '0'
   Test2::Harness: '0'
   Test2::Tools::Exception: '0'
@@ -23,10 +22,15 @@ meta-spec:
 name: Vote-Count
 requires:
   Carp: '0'
+  Cpanel::JSON::XS: '4.12'
+  Data::Dumper: '0'
   Data::Printer: '0'
   Exporter: '0'
   Exporter::Easy: '0'
+  JSON::MaybeXS: '1.004000'
   List::Util: '0'
+  Math::BigInt::GMP: '1.6006'
+  Math::BigRat: '0'
   Moose: '0'
   Moose::Role: '0'
   Path::Tiny: '0.108'
@@ -45,6 +49,6 @@ resources:
   bugtracker: https://github.com/brainbuz/Vote-Count/issues
   homepage: https://github.com/brainbuz/Vote-Count
   repository: https://github.com/brainbuz/Vote-Count.git
-version: '0.02401'
+version: '1.00'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

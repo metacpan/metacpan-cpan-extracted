@@ -61,19 +61,19 @@
    "provides" : {
       "Clipboard" : {
          "file" : "lib/Clipboard.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "Clipboard::MacPasteboard" : {
          "file" : "lib/Clipboard/MacPasteboard.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "Clipboard::Win32" : {
          "file" : "lib/Clipboard/Win32.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "Clipboard::Xclip" : {
          "file" : "lib/Clipboard/Xclip.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -88,10 +88,10 @@
          "web" : "https://github.com/shlomif/clipboard"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028001"
+         "version" : "5.030001"
       },
       "plugins" : [
          {
@@ -211,7 +211,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -241,11 +241,6 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Filter/PodSyntaxTests",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::PodVersion",
-            "name" : "@Filter/PodVersion",
             "version" : "6.012"
          },
          {
@@ -326,11 +321,6 @@
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Name",
-                        "name" : "@SHLOMIF/Name",
                         "version" : "4.015"
                      },
                      {
@@ -532,7 +522,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.30.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }
 

@@ -1,7 +1,7 @@
 package Data::Size::Suffix::Filesize;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our %suffixes = (
     b => 1,
@@ -52,7 +52,7 @@ Data::Size::Suffix::Filesize - Filesize suffixes
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Size::Suffix::Filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-07-25.
+This document describes version 0.004 of Data::Size::Suffix::Filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-11-29.
 
 =head1 HOMEPAGE
 

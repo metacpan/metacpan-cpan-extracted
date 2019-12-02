@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.136;
+package Config::Model 2.137;
 
 use strict ;
 use warnings;
@@ -1101,7 +1101,7 @@ sub translate_follow_arg {
     }
     elsif ( defined $raw_follow ) {
 
-        # follow is a simple string
+        # follow is a plain string
         return { f1 => $raw_follow };
     }
     else {
@@ -1124,7 +1124,7 @@ sub translate_rules_arg {
     my @rules;
     if ( ref($raw_rules) eq 'HASH' ) {
 
-        # transform the simple hash { foo => { ...} }
+        # transform the hash { foo => { ...} }
         # into array ref [ '$f1 eq foo' => { ... } ]
         my $h = $raw_rules;
         @rules = $follow ? map { ( "\$f1 eq '$_'", $h->{$_} ) } keys %$h : keys %$h;
@@ -1848,7 +1848,7 @@ __PACKAGE__->meta->make_immutable;
 
 1;
 
-# ABSTRACT:  Create tools to validate, migrate and edit configuration files
+# ABSTRACT: a framework to validate, migrate and edit configuration files
 
 __END__
 
@@ -1858,11 +1858,11 @@ __END__
 
 =head1 NAME
 
-Config::Model - Create tools to validate, migrate and edit configuration files
+Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 
@@ -2272,7 +2272,7 @@ Simpler exploration and query
 =item *
 
 Simple hierarchy. Deletion of configuration items is simpler to grasp:
-when you cut a branch, all the leaves attaches to that branch go down.
+when you cut a branch, all the leaves attached to that branch go down.
 
 =back
 
@@ -2282,7 +2282,7 @@ But using a tree has also some drawbacks:
 
 =item *
 
-A complex configuration cannot be mapped on a simple tree.  Some more
+A complex configuration cannot be mapped on a tree.  Some more
 relation between nodes and leaves must be added.
 
 =item *

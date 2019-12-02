@@ -19,7 +19,8 @@ Run by test suite
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -33,6 +34,7 @@ use Chj::TEST;
 use FP::Show; # exports 'show'
 use FP::List ":all";
 use FP::Stream ":all";
+use FP::Ops qw(regex_substitute);
 
 TEST_EXCEPTION {
     my $l= list 100-1, "bottles";
@@ -46,8 +48,9 @@ TEST { show cons 1, cons 2, 3 }
 TEST { show improper_list (list (1,3), 2) }
   'improper_list(list(1, 3), 2)';
 
-TEST { show improper_list ([1,3], {foo=> list("bar",sub{"f"})}) }
-  'improper_list([1, 3], +{foo => list(\'bar\', sub { \'DUMMY: FP::Show::t::__ANON__ at "lib/FP/Show/t.pm" line 49\' })})';
+TEST { regex_substitute sub{s/line \d+/line .../g},
+           show improper_list ([1,3], {foo=> list("bar",sub{"f"})}) }
+  'improper_list([1, 3], +{foo => list(\'bar\', sub { "DUMMY" })})';
 
 my $s;
 TEST {

@@ -31,7 +31,7 @@ local *IO::Async::Handle::connect = sub {
    ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
    $self->set_handle( $selfsock );
 
-   return Future->new->done( $self );
+   return Future->done( $self );
 };
 
 {
@@ -142,7 +142,7 @@ local *IO::Async::Handle::connect = sub {
       writer => sub { $! = EAGAIN; return undef },
    );
 
-   wait_for { $future->is_ready };
+   wait_for_future( $future );
    is( scalar $future->failure, "Stalled while writing request", '$future->failure for stall during write' );
    is( ( $future->failure )[1], "stall_timeout", '$future->failure [1] is stall_timeout' );
 }
@@ -157,7 +157,7 @@ local *IO::Async::Handle::connect = sub {
 
    # Don't write anything
 
-   wait_for { $future->is_ready };
+   wait_for_future( $future );
    is( scalar $future->failure, "Stalled while waiting for response", '$future->failure for stall during response header' );
    is( ( $future->failure )[1], "stall_timeout", '$future->failure [1] is stall_timeout' );
 }
@@ -176,7 +176,7 @@ local *IO::Async::Handle::connect = sub {
    $peersock->syswrite( "HTTP/1.1 200 OK$CRLF" .
                         "Content-Length: 100$CRLF" ); # unfinished
 
-   wait_for { $future->is_ready };
+   wait_for_future( $future );
    is( scalar $future->failure, "Stalled while receiving response header", '$future->failure for stall during response header' );
    is( ( $future->failure )[1], "stall_timeout", '$future->failure [1] is stall_timeout' );
 }
@@ -197,7 +197,7 @@ local *IO::Async::Handle::connect = sub {
                         $CRLF );
    $peersock->syswrite( "some of the content" ); # unfinished
 
-   wait_for { $future->is_ready };
+   wait_for_future( $future );
    is( scalar $future->failure, "Stalled while receiving body", '$future->failure for stall during response body' );
    is( ( $future->failure )[1], "stall_timeout", '$future->failure [1] is stall_timeout' );
 }

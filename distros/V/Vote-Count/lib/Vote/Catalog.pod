@@ -1,0 +1,178 @@
+# ABSTRACT: Catalog of Voting Methods and their Vote::Count Implementations
+
+=pod
+
+=head1 VERSION 1.00
+
+=head1 NAME
+
+Catalog
+
+
+=head1 Description
+
+A catalog of common Vote Counting Systems and their implementation in Vote::Count.
+
+
+=head1 Methods by Family
+
+
+=head2 Borda Count
+
+The Borda Count implementation does not yet cover all common weighting rule variations.
+
+=over
+
+=item *
+
+Borda Count: core L<Vote::Count::Borda|https://metacpan.org/pod/Vote::Count::Borda>
+
+
+=item *
+
+Nansen: I<needs example>
+
+
+=item *
+
+Baldwin: I<needs example>
+
+
+=item *
+
+Minet: I<needs example>
+
+
+=item *
+
+STAR: L<Vote::Count::Method::STAR|https://metacpan.org/pod/Vote::Count::Method::STAR>
+
+
+=back
+
+
+=head2 Instant Runoff Voting
+
+=over
+
+=item *
+
+Instant Runoff Voting: core L<Vote::Count::IRV|https://metacpan.org/pod/Vote::Count::IRV>
+
+
+=item *
+
+Benham Condorcet IRV: L<Hand Count|https://metacpan.org/pod/release/BRAINBUZ/Vote-Count/Hand_Count.pod> methods documentation, implemented by L<Vote::Count::Method::CondorcetDropping|https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping>
+
+
+=item *
+
+SmithSet IRV: L<Vote::Count::Method::CondorcetIRV|https://metacpan.org/pod/Vote::Count::Method::CondorcetIRV>
+
+
+=back
+
+
+=head2 Condorcet
+
+
+=head3 Simple Condorcet
+
+=over
+
+=item *
+
+Benham Condorcet IRV: L<HandCount|https://metacpan.org/pod/release/BRAINBUZ/Vote-Count/Hand_Count.pod> methods documentation, implemented by L<Vote::Count::Method::CondorcetDropping|https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping>
+
+
+=item *
+
+Simple Dropping: L<Vote::Count::Method::CondorcetDropping|https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping>
+
+
+=item *
+
+SmithSet IRV: L<Vote::Count::Method::CondorcetIRV|https://metacpan.org/pod/Vote::Count::Method::CondorcetIRV>
+
+
+=back
+
+
+=head3 Complex Condorcet
+
+=over
+
+=item *
+
+Condorcet vs IRV: L<Vote::Count::Method::CondorcetVsIRV|https://metacpan.org/pod/Vote::Count::Method::CondorcetVsIRV>
+
+
+=item *
+
+Tiedeman: I<unimplemented>
+
+
+=item *
+
+SSD: I<unimplemented>
+
+
+=item *
+
+Kemmeny-Young: I<unimplemented>
+
+
+=back
+
+
+=head3 Redacting Condorcet
+
+=over
+
+=item *
+
+Condorcet vs IRV: L<Vote::Count::Method::CondorcetVsIRV|https://metacpan.org/pod/Vote::Count::Method::CondorcetVsIRV>
+
+
+=back
+
+
+=head2 AUTHOR
+
+John Karr (BRAINBUZ) brainbuz@cpan.org
+
+
+=head2 CONTRIBUTORS
+
+Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+
+
+=head1 LICENSE
+
+This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit http://fsf.org.
+
+
+#FOOTER
+
+=pod
+
+BUG TRACKER
+
+L<https://github.com/brainbuz/Vote-Count/issues>
+
+AUTHOR
+
+John Karr (BRAINBUZ) brainbuz@cpan.org
+
+CONTRIBUTORS
+
+Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+
+LICENSE
+
+This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
+
+=cut
+
+
+=cut

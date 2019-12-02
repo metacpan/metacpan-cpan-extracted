@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ProgUtils/list_all_programs_in_path
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-05-18'; # DATE
+our $DATE = '2019-10-17'; # DATE
 our $DIST = 'App-ProgUtils'; # DIST
-our $VERSION = '0.200'; # VERSION
+our $VERSION = '0.201'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ allprogs - List all programs in PATH
 
 =head1 VERSION
 
-This document describes version 0.200 of allprogs (from Perl distribution App-ProgUtils), released on 2019-05-18.
+This document describes version 0.201 of allprogs (from Perl distribution App-ProgUtils), released on 2019-10-17.
 
 =head1 SYNOPSIS
 

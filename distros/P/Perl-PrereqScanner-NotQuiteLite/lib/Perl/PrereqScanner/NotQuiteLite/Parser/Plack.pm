@@ -35,6 +35,7 @@ sub parse_enable_args {
   if ($module =~ s/^\+//) {
     $c->add($module => 0);
   } else {
+    $module =~ s/^Plack::Middleware:://;
     $c->add("Plack::Middleware::".$module => 0);
   }
 }
@@ -53,6 +54,7 @@ sub parse_enable_if_args {
   if ($module =~ s/^\+//) {
     $c->add($module => 0);
   } else {
+    $module =~ s/^Plack::Middleware:://;
     $c->add("Plack::Middleware::".$module => 0);
   }
 }

@@ -1,0 +1,51 @@
+NAME
+    Data::Sah::CoerceBundle::To_num::From_str::num_id - Use
+    Parse::Number::ID to parse number
+
+VERSION
+    This document describes version 0.005 of
+    Data::Sah::CoerceBundle::To_num::From_str::num_id (from Perl
+    distribution Data-Sah-CoerceBundle-To_num-From_str-num_id), released on
+    2019-11-28.
+
+DESCRIPTION
+    This distribution contains the following Sah coerce rule modules:
+
+    *   Data::Sah::Coerce::perl::To_float::From_str::num_id
+
+    *   Data::Sah::Coerce::perl::To_num::From_str::num_id
+
+    *   Data::Sah::Coerce::perl::To_int::From_str::num_id
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-CoerceBundle-To_num-From_str-num_
+    id>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-CoerceBundle-To_num-From_str
+    -num_id>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-CoerceBundle
+    -To_num-From_str-num_id>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Parse::Number::ID
+
+    Parse::Number::EN and Data::Sah::CoerceBundle::To_num::From_str::num_en
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

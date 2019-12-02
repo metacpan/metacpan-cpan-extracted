@@ -1,0 +1,62 @@
+{
+   "abstract" : "BitBucket Server backend for Devel::Cover",
+   "author" : [
+      "Thomas Kratz <tomk@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-Cover-Report-BitBucketServer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Cover" : "1.25",
+            "JSON::MaybeXS" : "0",
+            "Path::Tiny" : "0.013",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON::MaybeXS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tomk3003/devel-cover-report-bitbucket-server/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/tomk3003/devel-cover-report-bitbucket-server"
+      }
+   },
+   "version" : "0.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

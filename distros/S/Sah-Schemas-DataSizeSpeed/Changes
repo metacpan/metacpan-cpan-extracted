@@ -1,3 +1,13 @@
+0.004   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add test and explicit dependency to Data::Sah::Coerce 0.034+.
+
+
+0.003   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules (Data::Sah::Coerce 0.037+).
+
+
 0.002   2019-07-25  Released-By: PERLANCAR; Urgency: medium
 
 	- Update metadata version 3->4.

@@ -25,11 +25,12 @@ has sudo_perl_command => (is => 'lazy');
 
 sub _build_sudo_perl_command {
   my ($self) = @_;
-  return
+  return [
     'sudo', '-S', '-u', $self->target_user, '-p', "[sudo] password please\n",
     'perl', '-MPOSIX=dup2',
             '-e', 'print STDERR "GO\n"; exec(@ARGV);',
-    $self->perl_command;
+    @{$self->perl_command},
+  ];
 }
 
 sub _start_perl {

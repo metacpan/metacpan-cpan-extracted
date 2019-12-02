@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.003
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/Data/Sah/Coerce/perl/To_any/From_any/validate_dirhandle.pm','lib/Data/Sah/Coerce/perl/To_any/From_any/validate_filehandle.pm','lib/Sah/Schema/dirhandle.pm','lib/Sah/Schema/filehandle.pm','lib/Sah/SchemaR/dirhandle.pm','lib/Sah/SchemaR/filehandle.pm','lib/Sah/Schemas/FileHandle.pm'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

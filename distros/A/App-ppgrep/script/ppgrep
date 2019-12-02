@@ -4,18 +4,18 @@
 # Note: This script is a CLI for Riap function /App/ppgrep/ppgrep
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"ppgrep.conf","env_name":"PPGREP_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":"0","read_env":"0","script_name":"ppgrep","script_summary":null,"script_version":"0.032","shebang":"perl","skip_format":1,"subcommands":null,"url":"/App/ppgrep/ppgrep","use_cleanser":1,"validate_args":1}
+# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"ppgrep.conf","env_name":"PPGREP_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":"0","read_env":"0","script_name":"ppgrep","script_summary":null,"script_version":"0.033","shebang":"perl","skip_format":1,"subcommands":null,"url":"/App/ppgrep/ppgrep","use_cleanser":1,"validate_args":1}
 
-my $_pci_metas = {""=>{args=>{count=>{cmdline_aliases=>{c=>{}},schema=>["true",{req=>1},{}],summary=>"Suppress normal output; instead print a count of matching processes",tags=>["category:display"]},euid=>{cmdline_aliases=>{u=>{}},schema=>["array",{of=>["str",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["str_comma_sep"]},{}],summary=>"Only match processes whose effective user ID is listed. Either the numerical or symbolical value may be used.",tags=>["category:filtering"]},exact=>{cmdline_aliases=>{x=>{}},schema=>["true",{req=>1},{}],summary=>"Only match processes whose names (or command line if -f is specified) exactly match the pattern",tags=>["category:filtering"]},full=>{cmdline_aliases=>{f=>{}},schema=>["true",{req=>1},{}],summary=>"The pattern is normally only matched against the process name. When -f is set, the full command line is used.",tags=>["category:filtering"]},group=>{cmdline_aliases=>{G=>{}},schema=>["array",{of=>["str",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["str_comma_sep"]},{}],summary=>"Only match processes whose real group ID is listed. Either the numerical or symbolical value may be used.",tags=>["category:filtering"]},inverse=>{cmdline_aliases=>{v=>{}},schema=>["true",{req=>1},{}],summary=>"Negates the matching",tags=>["category:filtering"]},list_full=>{cmdline_aliases=>{a=>{}},schema=>["true",{req=>1},{}],summary=>"List the full command line as well as the process ID",tags=>["category:display"]},list_name=>{cmdline_aliases=>{l=>{}},schema=>["true",{req=>1},{}],summary=>"List the process name as well as the process ID",tags=>["category:display"]},pattern=>{pos=>0,schema=>["str",{req=>1},{}],summary=>"Only match processes whose name/cmdline match the pattern",tags=>["category:filtering"]},pgroup=>{cmdline_aliases=>{g=>{}},schema=>["array",{of=>["uint",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["str_comma_sep"]},{}],summary=>"Only match processes in the process group IDs listed",tags=>["category:filtering"]},session=>{cmdline_aliases=>{s=>{}},schema=>["array",{of=>["uint",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["str_comma_sep"]},{}],summary=>"Only match processes whose process session ID is listed",tags=>["category:filtering"]},terminal=>{cmdline_aliases=>{t=>{}},schema=>["array",{of=>["str",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["str_comma_sep"]},{}],summary=>"Only match processes whose controlling terminal is listed. The terminal name should be specified without the \"/dev/\" prefix.",tags=>["category:filtering"]},uid=>{cmdline_aliases=>{U=>{}},schema=>["array",{of=>["str",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["str_comma_sep"]},{}],summary=>"Only match processes whose user ID is listed. Either the numerical or symbolical value may be used.",tags=>["category:filtering"]}},description=>"\nThis utility is similar to <prog:pgrep> except that we only look at our\ndescendants (parent, parent's parent, and so on up to PID 1).\n\n",links=>["prog:pgrep"],result=>{},summary=>"Look up parents' processes based on name and other attributes",v=>1.1}};
+my $_pci_metas = {""=>{args=>{count=>{cmdline_aliases=>{c=>{}},schema=>["true",{req=>1},{}],summary=>"Suppress normal output; instead print a count of matching processes",tags=>["category:display"]},euid=>{cmdline_aliases=>{u=>{}},schema=>["array",{of=>["str",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["From_str::comma_sep"]},{}],summary=>"Only match processes whose effective user ID is listed. Either the numerical or symbolical value may be used.",tags=>["category:filtering"]},exact=>{cmdline_aliases=>{x=>{}},schema=>["true",{req=>1},{}],summary=>"Only match processes whose names (or command line if -f is specified) exactly match the pattern",tags=>["category:filtering"]},full=>{cmdline_aliases=>{f=>{}},schema=>["true",{req=>1},{}],summary=>"The pattern is normally only matched against the process name. When -f is set, the full command line is used.",tags=>["category:filtering"]},group=>{cmdline_aliases=>{G=>{}},schema=>["array",{of=>["str",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["From_str::comma_sep"]},{}],summary=>"Only match processes whose real group ID is listed. Either the numerical or symbolical value may be used.",tags=>["category:filtering"]},inverse=>{cmdline_aliases=>{v=>{}},schema=>["true",{req=>1},{}],summary=>"Negates the matching",tags=>["category:filtering"]},list_full=>{cmdline_aliases=>{a=>{}},schema=>["true",{req=>1},{}],summary=>"List the full command line as well as the process ID",tags=>["category:display"]},list_name=>{cmdline_aliases=>{l=>{}},schema=>["true",{req=>1},{}],summary=>"List the process name as well as the process ID",tags=>["category:display"]},pattern=>{pos=>0,schema=>["str",{req=>1},{}],summary=>"Only match processes whose name/cmdline match the pattern",tags=>["category:filtering"]},pgroup=>{cmdline_aliases=>{g=>{}},schema=>["array",{of=>["uint",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["From_str::comma_sep"]},{}],summary=>"Only match processes in the process group IDs listed",tags=>["category:filtering"]},session=>{cmdline_aliases=>{s=>{}},schema=>["array",{of=>["uint",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["From_str::comma_sep"]},{}],summary=>"Only match processes whose process session ID is listed",tags=>["category:filtering"]},terminal=>{cmdline_aliases=>{t=>{}},schema=>["array",{of=>["str",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["From_str::comma_sep"]},{}],summary=>"Only match processes whose controlling terminal is listed. The terminal name should be specified without the \"/dev/\" prefix.",tags=>["category:filtering"]},uid=>{cmdline_aliases=>{U=>{}},schema=>["array",{of=>["str",{req=>1},{}],req=>1,"x.perl.coerce_rules"=>["From_str::comma_sep"]},{}],summary=>"Only match processes whose user ID is listed. Either the numerical or symbolical value may be used.",tags=>["category:filtering"]}},description=>"\nThis utility is similar to <prog:pgrep> except that we only look at our\ndescendants (parent, parent's parent, and so on up to PID 1).\n\n",links=>["prog:pgrep"],result=>{},summary=>"Look up parents' processes based on name and other attributes",v=>1.1}};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.545 on Thu Jul  4 15:30:50 2019.
+# This script is generated by Perinci::CmdLine::Inline version 0.545 on Fri Nov 29 13:50:02 2019.
 
 # Rinci metadata taken from these modules: App::ppgrep (no version)
 
 # You probably should not manually edit this file.
 
-our $DATE = '2019-07-04'; # DATE
-our $VERSION = '0.032'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.033'; # VERSION
 # PODNAME: ppgrep
 # ABSTRACT: Look up parents' processes based on name and other attributes
 
@@ -128,13 +128,13 @@ sub _pci_json {
 my %mentioned_args;
 require Getopt::Long::EvenLess;
 my $go_spec1 = {
-    'help|h|?' => sub { print "ppgrep - Look up parents' processes based on name and other attributes\n\nUsage:\n  ppgrep --help (or -h, -?)\n  ppgrep --version (or -v)\n  ppgrep [options] [pattern]\n\nThis utility is similar to <prog:pgrep> except that we only look at our\ndescendants (parent, parent's parent, and so on up to PID 1).\n\nDisplay options:\n  --count, -c      Suppress normal output; instead print a count of matching processes\n  --list-full, -a  List the full command line as well as the process ID\n  --list-name, -l  List the process name as well as the process ID\n\nFiltering options:\n  --euid=s, -u      Only match processes whose effective user ID is listed. Either the numerical or\n\t\t      symbolical value may be used.\n  --exact, -x       Only match processes whose names (or command line if -f is specified) exactly\n\t\t      match the pattern\n  --full, -f        The pattern is normally only matched against the process name. When -f is set,\n\t\t      the full command line is used.\n  --group=s, -G     Only match processes whose real group ID is listed. Either the numerical or\n\t\t      symbolical value may be used.\n  --inverse         Negates the matching\n  --pattern=s       Only match processes whose name/cmdline match the pattern (=arg[0])\n  --pgroup=s, -g    Only match processes in the process group IDs listed\n  --session=s, -s   Only match processes whose process session ID is listed\n  --terminal=s, -t  Only match processes whose controlling terminal is listed. The terminal name\n\t\t      should be specified without the \"/dev/\" prefix.\n  --uid=s, -U       Only match processes whose user ID is listed. Either the numerical or\n\t\t      symbolical value may be used.\n\nOther options:\n  --help, -h, -?  Display help message and exit\n  --version, -v   Display program's version and exit\n"; exit 0; },
-    'version|v' => sub { no warnings 'once'; require App::ppgrep; print "ppgrep version ", "0.032", ($App::ppgrep::DATE ? " ($App::ppgrep::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.545 (2019-04-15)\n"; exit 0 },
+    'help|h|?' => sub { print "ppgrep - Look up parents' processes based on name and other attributes\n\nUsage:\n  ppgrep --help (or -h, -?)\n  ppgrep --version (or -v)\n  ppgrep [options] [pattern]\n\nThis utility is similar to <prog:pgrep> except that we only look at our\ndescendants (parent, parent's parent, and so on up to PID 1).\n\nDisplay options:\n  --count, -c      Suppress normal output; instead print a count of matching processes\n  --list-full, -a  List the full command line as well as the process ID\n  --list-name, -l  List the process name as well as the process ID\n\nFiltering options:\n  --euid=s\@, -u      Only match processes whose effective user ID is listed. Either the numerical or\n\t\t       symbolical value may be used.\n  --exact, -x        Only match processes whose names (or command line if -f is specified) exactly\n\t\t       match the pattern\n  --full, -f         The pattern is normally only matched against the process name. When -f is set,\n\t\t       the full command line is used.\n  --group=s\@, -G     Only match processes whose real group ID is listed. Either the numerical or\n\t\t       symbolical value may be used.\n  --inverse          Negates the matching\n  --pattern=s        Only match processes whose name/cmdline match the pattern (=arg[0])\n  --pgroup=s\@, -g    Only match processes in the process group IDs listed\n  --session=s\@, -s   Only match processes whose process session ID is listed\n  --terminal=s\@, -t  Only match processes whose controlling terminal is listed. The terminal name\n\t\t       should be specified without the \"/dev/\" prefix.\n  --uid=s\@, -U       Only match processes whose user ID is listed. Either the numerical or\n\t\t       symbolical value may be used.\n\nOther options:\n  --help, -h, -?  Display help message and exit\n  --version, -v   Display program's version and exit\n"; exit 0; },
+    'version|v' => sub { no warnings 'once'; require App::ppgrep; print "ppgrep version ", "0.033", ($App::ppgrep::DATE ? " ($App::ppgrep::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.545 (2019-04-15)\n"; exit 0 },
 };
 my $go_spec2 = {
-    'G=s' => sub {         $_pci_args{'group'} = $_[1];
+    'G=s@' => sub {         if ($mentioned_args{'group'}++) { push @{ $_pci_args{'group'} }, $_[1] } else { $_pci_args{'group'} = [$_[1]] }
  },
-    'U=s' => sub {         $_pci_args{'uid'} = $_[1];
+    'U=s@' => sub {         if ($mentioned_args{'uid'}++) { push @{ $_pci_args{'uid'} }, $_[1] } else { $_pci_args{'uid'} = [$_[1]] }
  },
     'a' => sub {         $_pci_args{'list_full'} = $_[1];
  },
@@ -142,7 +142,9 @@ my $go_spec2 = {
  },
     'count' => sub {         $_pci_args{'count'} = $_[1];
  },
-    'euid=s' => sub {         $_pci_args{'euid'} = $_[1];
+    'euid-json=s' => sub {         $_pci_args{'euid'} = _pci_json()->decode($_[1]);
+ },
+    'euid=s@' => sub {         if ($mentioned_args{'euid'}++) { push @{ $_pci_args{'euid'} }, $_[1] } else { $_pci_args{'euid'} = [$_[1]] }
  },
     'exact' => sub {         $_pci_args{'exact'} = $_[1];
  },
@@ -150,9 +152,11 @@ my $go_spec2 = {
  },
     'full' => sub {         $_pci_args{'full'} = $_[1];
  },
-    'g=s' => sub {         $_pci_args{'pgroup'} = $_[1];
+    'g=s@' => sub {         if ($mentioned_args{'pgroup'}++) { push @{ $_pci_args{'pgroup'} }, $_[1] } else { $_pci_args{'pgroup'} = [$_[1]] }
  },
-    'group=s' => sub {         $_pci_args{'group'} = $_[1];
+    'group-json=s' => sub {         $_pci_args{'group'} = _pci_json()->decode($_[1]);
+ },
+    'group=s@' => sub {         if ($mentioned_args{'group'}++) { push @{ $_pci_args{'group'} }, $_[1] } else { $_pci_args{'group'} = [$_[1]] }
  },
     'help|h|?' => sub {  },
     'inverse' => sub {         $_pci_args{'inverse'} = $_[1];
@@ -163,45 +167,29 @@ my $go_spec2 = {
  },
     'list-name' => sub {         $_pci_args{'list_name'} = $_[1];
  },
-    'no-count' => sub {         $_pci_args{'count'} = 0;
- },
-    'no-exact' => sub {         $_pci_args{'exact'} = 0;
- },
-    'no-full' => sub {         $_pci_args{'full'} = 0;
- },
-    'no-inverse' => sub {         $_pci_args{'inverse'} = 0;
- },
-    'no-list-full' => sub {         $_pci_args{'list_full'} = 0;
- },
-    'no-list-name' => sub {         $_pci_args{'list_name'} = 0;
- },
-    'nocount' => sub {         $_pci_args{'count'} = 0;
- },
-    'noexact' => sub {         $_pci_args{'exact'} = 0;
- },
-    'nofull' => sub {         $_pci_args{'full'} = 0;
- },
-    'noinverse' => sub {         $_pci_args{'inverse'} = 0;
- },
-    'nolist-full' => sub {         $_pci_args{'list_full'} = 0;
- },
-    'nolist-name' => sub {         $_pci_args{'list_name'} = 0;
- },
     'pattern=s' => sub {         $_pci_args{'pattern'} = $_[1];
  },
-    'pgroup=s' => sub {         $_pci_args{'pgroup'} = $_[1];
+    'pgroup-json=s' => sub {         $_pci_args{'pgroup'} = _pci_json()->decode($_[1]);
  },
-    's=s' => sub {         $_pci_args{'session'} = $_[1];
+    'pgroup=s@' => sub {         if ($mentioned_args{'pgroup'}++) { push @{ $_pci_args{'pgroup'} }, $_[1] } else { $_pci_args{'pgroup'} = [$_[1]] }
  },
-    'session=s' => sub {         $_pci_args{'session'} = $_[1];
+    's=s@' => sub {         if ($mentioned_args{'session'}++) { push @{ $_pci_args{'session'} }, $_[1] } else { $_pci_args{'session'} = [$_[1]] }
  },
-    't=s' => sub {         $_pci_args{'terminal'} = $_[1];
+    'session-json=s' => sub {         $_pci_args{'session'} = _pci_json()->decode($_[1]);
  },
-    'terminal=s' => sub {         $_pci_args{'terminal'} = $_[1];
+    'session=s@' => sub {         if ($mentioned_args{'session'}++) { push @{ $_pci_args{'session'} }, $_[1] } else { $_pci_args{'session'} = [$_[1]] }
  },
-    'u=s' => sub {         $_pci_args{'euid'} = $_[1];
+    't=s@' => sub {         if ($mentioned_args{'terminal'}++) { push @{ $_pci_args{'terminal'} }, $_[1] } else { $_pci_args{'terminal'} = [$_[1]] }
  },
-    'uid=s' => sub {         $_pci_args{'uid'} = $_[1];
+    'terminal-json=s' => sub {         $_pci_args{'terminal'} = _pci_json()->decode($_[1]);
+ },
+    'terminal=s@' => sub {         if ($mentioned_args{'terminal'}++) { push @{ $_pci_args{'terminal'} }, $_[1] } else { $_pci_args{'terminal'} = [$_[1]] }
+ },
+    'u=s@' => sub {         if ($mentioned_args{'euid'}++) { push @{ $_pci_args{'euid'} }, $_[1] } else { $_pci_args{'euid'} = [$_[1]] }
+ },
+    'uid-json=s' => sub {         $_pci_args{'uid'} = _pci_json()->decode($_[1]);
+ },
+    'uid=s@' => sub {         if ($mentioned_args{'uid'}++) { push @{ $_pci_args{'uid'} }, $_[1] } else { $_pci_args{'uid'} = [$_[1]] }
  },
     'version|v' => sub {  },
     'x' => sub {         $_pci_args{'exact'} = $_[1];
@@ -273,7 +261,7 @@ ppgrep - Look up parents' processes based on name and other attributes
 
 =head1 VERSION
 
-This document describes version 0.032 of main (from Perl distribution App-ppgrep), released on 2019-07-04.
+This document describes version 0.033 of main (from Perl distribution App-ppgrep), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -312,9 +300,17 @@ List the process name as well as the process ID.
 
 =over
 
-=item B<--euid>=I<s>, B<-u>
+=item B<--euid-json>=I<s>, B<-u>
+
+Only match processes whose effective user ID is listed. Either the numerical or symbolical value may be used. (JSON-encoded).
+
+See C<--euid>.
+
+=item B<--euid>=I<s@>
 
 Only match processes whose effective user ID is listed. Either the numerical or symbolical value may be used..
+
+Can be specified multiple times.
 
 =item B<--exact>, B<-x>
 
@@ -324,9 +320,17 @@ Only match processes whose names (or command line if -f is specified) exactly ma
 
 The pattern is normally only matched against the process name. When -f is set, the full command line is used..
 
-=item B<--group>=I<s>, B<-G>
+=item B<--group-json>=I<s>, B<-G>
+
+Only match processes whose real group ID is listed. Either the numerical or symbolical value may be used. (JSON-encoded).
+
+See C<--group>.
+
+=item B<--group>=I<s@>
 
 Only match processes whose real group ID is listed. Either the numerical or symbolical value may be used..
+
+Can be specified multiple times.
 
 =item B<--inverse>
 
@@ -336,21 +340,53 @@ Negates the matching.
 
 Only match processes whose name/cmdline match the pattern.
 
-=item B<--pgroup>=I<s>, B<-g>
+=item B<--pgroup-json>=I<s>, B<-g>
+
+Only match processes in the process group IDs listed (JSON-encoded).
+
+See C<--pgroup>.
+
+=item B<--pgroup>=I<s@>
 
 Only match processes in the process group IDs listed.
 
-=item B<--session>=I<s>, B<-s>
+Can be specified multiple times.
+
+=item B<--session-json>=I<s>, B<-s>
+
+Only match processes whose process session ID is listed (JSON-encoded).
+
+See C<--session>.
+
+=item B<--session>=I<s@>
 
 Only match processes whose process session ID is listed.
 
-=item B<--terminal>=I<s>, B<-t>
+Can be specified multiple times.
+
+=item B<--terminal-json>=I<s>, B<-t>
+
+Only match processes whose controlling terminal is listed. The terminal name should be specified without the "/dev/" prefix. (JSON-encoded).
+
+See C<--terminal>.
+
+=item B<--terminal>=I<s@>
 
 Only match processes whose controlling terminal is listed. The terminal name should be specified without the "/dev/" prefix..
 
-=item B<--uid>=I<s>, B<-U>
+Can be specified multiple times.
+
+=item B<--uid-json>=I<s>, B<-U>
+
+Only match processes whose user ID is listed. Either the numerical or symbolical value may be used. (JSON-encoded).
+
+See C<--uid>.
+
+=item B<--uid>=I<s@>
 
 Only match processes whose user ID is listed. Either the numerical or symbolical value may be used..
+
+Can be specified multiple times.
 
 =back
 
@@ -439,9 +475,9 @@ __DATA__
 Data::Section::Seekable v1
 Clone/PP.pm,20,6331,0;0
 Getopt/Long/EvenLess.pm,6383,11364,1;193
-Local/_pci_check_args.pm,17780,18688,2;575
-Local/_pci_clean_json.pm,36501,4414,3;909
-Scalar/Util/Numeric/PP.pm,40949,3106,4;971
+Local/_pci_check_args.pm,17780,18748,2;575
+Local/_pci_clean_json.pm,36561,4414,3;909
+Scalar/Util/Numeric/PP.pm,41009,3106,4;971
 
 ### Clone/PP.pm ###
 #package Clone::PP;
@@ -1061,7 +1097,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            # coerce rule(s): str_comma_sep
+#            # coerce rule(s): From_str::comma_sep
 #            (($args->{"euid"} = (!ref($args->{"euid"})) ? ([split /\s*,\s*/, $args->{"euid"}]) : $args->{"euid"}), 1)
 #            
 #            &&
@@ -1071,7 +1107,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+#            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
 #            ((!defined(List::Util::first(sub {!(
 #                        ($_sahv_dpath->[-1] = $_),
 #                        # req #0
@@ -1123,7 +1159,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            # coerce rule(s): str_comma_sep
+#            # coerce rule(s): From_str::comma_sep
 #            (($args->{"group"} = (!ref($args->{"group"})) ? ([split /\s*,\s*/, $args->{"group"}]) : $args->{"group"}), 1)
 #            
 #            &&
@@ -1133,7 +1169,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+#            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
 #            ((!defined(List::Util::first(sub {!(
 #                        ($_sahv_dpath->[-1] = $_),
 #                        # req #0
@@ -1212,7 +1248,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            # coerce rule(s): str_comma_sep
+#            # coerce rule(s): From_str::comma_sep
 #            (($args->{"pgroup"} = (!ref($args->{"pgroup"})) ? ([split /\s*,\s*/, $args->{"pgroup"}]) : $args->{"pgroup"}), 1)
 #            
 #            &&
@@ -1222,7 +1258,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+#            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
 #            ((!defined(List::Util::first(sub {!(
 #                        ($_sahv_dpath->[-1] = $_),
 #                        # req #1
@@ -1247,7 +1283,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            # coerce rule(s): str_comma_sep
+#            # coerce rule(s): From_str::comma_sep
 #            (($args->{"session"} = (!ref($args->{"session"})) ? ([split /\s*,\s*/, $args->{"session"}]) : $args->{"session"}), 1)
 #            
 #            &&
@@ -1257,7 +1293,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+#            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
 #            ((!defined(List::Util::first(sub {!(
 #                        ($_sahv_dpath->[-1] = $_),
 #                        # req #1
@@ -1282,7 +1318,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            # coerce rule(s): str_comma_sep
+#            # coerce rule(s): From_str::comma_sep
 #            (($args->{"terminal"} = (!ref($args->{"terminal"})) ? ([split /\s*,\s*/, $args->{"terminal"}]) : $args->{"terminal"}), 1)
 #            
 #            &&
@@ -1292,7 +1328,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+#            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
 #            ((!defined(List::Util::first(sub {!(
 #                        ($_sahv_dpath->[-1] = $_),
 #                        # req #0
@@ -1312,7 +1348,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            # coerce rule(s): str_comma_sep
+#            # coerce rule(s): From_str::comma_sep
 #            (($args->{"uid"} = (!ref($args->{"uid"})) ? ([split /\s*,\s*/, $args->{"uid"}]) : $args->{"uid"}), 1)
 #            
 #            &&
@@ -1322,7 +1358,7 @@ Scalar/Util/Numeric/PP.pm,40949,3106,4;971
 #            
 #            &&
 #            
-#            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+#            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
 #            ((!defined(List::Util::first(sub {!(
 #                        ($_sahv_dpath->[-1] = $_),
 #                        # req #0

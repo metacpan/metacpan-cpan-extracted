@@ -1,3 +1,15 @@
+0.903   2019-11-29  Released-By: PERLANCAR; Urgency: high
+
+        - Merge two releases 0.902 and 0.902.1.
+
+
+0.902.1 2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Data::Sah::Coerce 0.034+ (new naming of Data::Sah::Coerce::*
+	  rule modules). UPDATE 2019-11-29: rename to 0.902.1, cancel release
+	  (duplicate version).
+
+
 0.902   2019-10-24  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Didn't set value of data in the case of coercion

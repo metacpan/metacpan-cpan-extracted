@@ -1,6 +1,12 @@
 Revision history for Term::Form
 
 
+0.524   2019-12-01
+        - Updated Term::Choose::Util: adapt 'unicode_sprintf'.
+
+0.523   2019-11-30
+        - Option color: 2 is a valid value.
+
 0.522   2019-10-19
         - Bugfix in "fill_form" - 'page_up' and 'page_down': check argument of 'up()'.
 

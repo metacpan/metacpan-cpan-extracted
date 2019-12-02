@@ -1,0 +1,72 @@
+0.012   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules again, revert to using lower_case
+	  notation for the description part, because CamelCase is really,
+	  REALLY ugly when we have many words.
+
+	- [dist] Use Pod::Weaver plugin [-Data::Sah::Coerce].
+
+
+0.011   2019-11-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist from Data-Sah-Coerce-perl-date-alami to
+          Data-Sah-Coerce-perl-To_date-alami.
+
+
+0.010   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Data::Sah::Coerce to 0.032 [CT].
+
+
+0.009   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version 3->4.
+
+
+0.008   2018-06-03  Released-By: PERLANCAR
+
+	- Update to Data::Sah::Coerce 0.025.
+
+
+0.007   2017-01-09  Released-By: PERLANCAR
+
+	- Split str_alami_{en,id} to their own dists.
+
+	- Die on parse failure.
+
+	- [dist] Make DateTime::Format::Alami::{ID,EN} a RuntimeRequires prereq
+	  for convenience of user.
+
+	- Fix/simplify examples.
+
+
+0.006   2016-06-14  Released-By: PERLANCAR
+
+	- Don't require coerce_to=DateTime when using this rule.
+
+
+0.005   2016-05-27  Released-By: PERLANCAR
+
+	- Supply default coerce_to knowledge to each rule, for convenience.
+
+
+0.004   2016-05-23  Released-By: PERLANCAR
+
+	- Adjust to Data::Sah::Coerce 0.011 (coerce_from & dont_coerce_from
+	  have been replaced with coerce_rules).
+
+
+0.003   2016-05-22  Released-By: PERLANCAR
+
+        - Update rule metadata version 1 -> 2 (Data::Sah::Coerce 0.011+): add
+          'precludes'.
+
+
+0.002   2016-05-20  Released-By: PERLANCAR
+
+	- Add rules: str_alami_en, str_alami_id.
+
+
+0.001   2016-05-19  Released-By: PERLANCAR
+
+        - First release.

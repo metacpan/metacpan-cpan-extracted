@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-09-07'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +32,7 @@ finquotehist - Fetch historical stock quotes
 
 =head1 VERSION
 
-This document describes version 0.001 of finquotehist (from Perl distribution App-finquotehist), released on 2018-09-07.
+This document describes version 0.002 of finquotehist (from Perl distribution App-finquotehist), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -121,7 +121,7 @@ See C<--action>.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -337,7 +337,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

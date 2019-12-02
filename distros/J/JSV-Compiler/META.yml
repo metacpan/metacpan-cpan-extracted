@@ -3,7 +3,7 @@ abstract: unknown
 author:
   - 'Anton Petrusevich'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
   JSON: '2.91'
   Test::Most: '0'
 configure_requires:
@@ -35,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/jef-sure/jsv-compilator/issues
   repository: https://github.com/jef-sure/jsv-compilator.git
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

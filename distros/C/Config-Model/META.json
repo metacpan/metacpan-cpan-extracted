@@ -1,5 +1,5 @@
 {
-   "abstract" : "Create tools to validate, migrate and edit configuration files",
+   "abstract" : "a framework to validate, migrate and edit configuration files",
    "author" : [
       "Dominique Dumont"
    ],
@@ -111,8 +111,8 @@
          "web" : "http://github.com/dod38fr/config-model"
       }
    },
-   "version" : "2.136",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "version" : "2.137",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }
 

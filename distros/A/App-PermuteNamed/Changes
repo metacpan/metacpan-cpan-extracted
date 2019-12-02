@@ -1,9 +1,15 @@
-0.003   2017-01-29 (PERLANCAR)
+0.004   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
+	  0.034+).
+
+
+0.003   2017-01-29  Released-By: PERLANCAR
 
 	- Add option: separator to produce aos instead of aohos.
 
 
-0.002   2016-09-26 (PERLANCAR)
+0.002   2016-09-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -13,6 +19,6 @@
 	  that makes more sense.
 
 
-0.001   2016-09-26 (PERLANCAR)
+0.001   2016-09-26  Released-By: PERLANCAR
 
         - First release.

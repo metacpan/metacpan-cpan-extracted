@@ -1,0 +1,64 @@
+0.010   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules again, revert to using lower_case
+	  notation for the description part, because CamelCase is really,
+	  REALLY ugly when we have many words.
+
+	- [dist] Use Pod::Weaver plugin [-Data::Sah::Coerce].
+
+
+0.009   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module/dist:
+	  Data::Sah::Coerce::perl::{date::str_natural,To_date::From_str::Na
+	  tural}.
+
+
+0.008   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Data::Sah::Coerce to 0.032 [CT].
+
+
+0.007   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version 3->4.
+
+
+0.006   2018-06-04  Released-By: PERLANCAR
+
+	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
+	  version 3).
+
+
+0.005   2016-07-01  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- [test] Fix copy-paste mistake [CT].
+
+
+0.004   2016-06-30  Released-By: PERLANCAR
+
+	- Die on parse failure.
+
+	- Make DateTime::Format::Natural a RuntimeRequires prereq for
+	  convenience of user.
+
+	- [doc] Fix/simplify example.
+
+
+0.003   2016-06-14  Released-By: PERLANCAR
+
+	- Don't require coerce_to=DateTime when using this rule, default to
+	  UTC for time zone instead of floating for ease of converting to
+	  Time::Moment/epoch.
+
+
+0.002   2016-05-27  Released-By: PERLANCAR
+
+	- Impart default coerce_to knowledge to each rule, for convenience.
+
+
+0.001   2016-05-24  Released-By: PERLANCAR
+
+        - First release.

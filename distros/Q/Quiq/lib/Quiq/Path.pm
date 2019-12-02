@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.165';
+our $VERSION = '1.166';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -2652,6 +2652,12 @@ sub rename {
     my $newPath = shift;
     # @_: @opt
 
+    # Nichts tun, wenn die Pfade identisch sind
+
+    if ($oldPath eq $newPath) {
+        return;
+    }
+
     # Optionen
 
     my $overwrite = 1;
@@ -2708,7 +2714,7 @@ sub rename {
 
 =head4 Synopsis
 
-  $this->numberPaths(\@paths,$width,$step);
+  $this->numberPaths(\@paths,$width,$step,@opts);
 
 =head4 Arguments
 
@@ -2725,6 +2731,19 @@ Die Breite (Anzahl der Stellen) der Nummer.
 =item $step
 
 Die Schrittweite der Nummerierung.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -move => [$after,$from,$to]
+
+Ordne alle Pfade von $from bis $to (lexikalisch sortiert) nach der
+Datei $after ein. Ist $after leer (Leerstring oder undef), werden
+die Pfade an den Anfang gestellt. Alle Angaben I<vor> der
+(Re-)Nummerierung.
 
 =back
 
@@ -2758,7 +2777,65 @@ bleibt als einziges vom ursprünglichen Dateinamen erhalten.
 # -----------------------------------------------------------------------------
 
 sub numberPaths {
-    my ($this,$pathA,$width,$step) = splice @_,0,4;
+    my $this = shift;
+    # @_: $pathA,$width,$step,@opts
+
+    # Optionen
+
+    my $moveA = undef;
+
+    my $argA = $this->parameters(3,3,\@_,
+        -move => \$moveA,
+    );
+    my ($pathA,$width,$step) = @$argA;
+
+    if ($moveA) {
+        my ($after,$from,$to) = @$moveA;
+
+        # Prüfe Angaben
+
+        scalar $this->glob("$after.*");
+        my $fromPath = $this->glob("$from.*");
+        my $toPath =  $this->glob("$to.*");
+
+        if ($fromPath gt $toPath) {
+            $this->throw(
+                'PATH-00099: fromPath must be less than toPath',
+                FromPath => $fromPath,
+                ToPath => $toPath,
+            );
+        }
+
+        # Pfadliste neu aufbauen
+        my @paths = @$pathA;
+
+        # Pfade $from bis $to von @paths nach @movePaths bewegen
+
+        my ($pos,@movePaths);
+        if (!defined $after || $after eq '') {
+            $pos = 0;
+        }
+        for (my $i = 0; $i < @paths; $i++) {
+            my $path = $this->removeExtension($paths[$i]);
+            if (!defined $pos && $after eq $path) {
+                $pos = $i+1;
+                next;
+            }
+            if ($path ge $from && $path le $to) {
+                push @movePaths,splice @paths,$i--,1;
+            }
+        }
+        if (!defined $pos) {
+            $this->throw(
+                'PATH-00099: Path (after) not found',
+                Path => $after,
+            );
+        }
+        splice @paths,$pos,0,@movePaths;
+
+        # Umgeschriebene Pfadliste einsetzen
+        $pathA = \@paths;
+    }
 
     # Nummeriere Dateien mit Endung .tmp
 
@@ -3121,7 +3198,7 @@ sub uid {
 
 =head1 VERSION
 
-1.165
+1.166
 
 =head1 AUTHOR
 

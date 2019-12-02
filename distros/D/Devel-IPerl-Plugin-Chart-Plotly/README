@@ -1,5 +1,5 @@
 This archive contains the distribution Devel-IPerl-Plugin-Chart-Plotly,
-version 0.006:
+version 0.007:
 
   Inline display of plotly charts in Jupyter notebooks using L<Devel::IPerl> kernel
 

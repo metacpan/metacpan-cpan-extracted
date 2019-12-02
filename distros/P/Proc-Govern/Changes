@@ -1,3 +1,8 @@
+0.209   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names (Data::Sah::Coerce 0.034+).
+
+
 0.208   2019-09-03  Released-By: PERLANCAR; Urgency: medium
 
 	- When no_screensaver=1, give lead time of 10 seconds instead of 5

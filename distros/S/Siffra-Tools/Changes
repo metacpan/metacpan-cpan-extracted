@@ -3,4 +3,7 @@ Revision history for Perl module Siffra::Tools
 0.01 Mon Feb 25 02:12:52 2019
     - original version; created by ExtUtils::ModuleMaker 0.63
 
+0.25 2019-12-01
+    - Added ZIP capability to parseCSV and parseBlockText
+
 

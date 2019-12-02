@@ -1,3 +1,13 @@
+0.005   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to update coerce rule name in schemas.
+
+
+0.004   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules (Data::Sah::Coerce 0.037+).
+
+
 0.003   2019-07-25  Released-By: PERLANCAR; Urgency: medium
 
 	- Update metadata version of coerce rule module(s) 3->4.

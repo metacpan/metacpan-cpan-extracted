@@ -1,3 +1,11 @@
+0.36   2019-11-26
+
+- Fix somewhat broken HTML parsing. The change in 0.35 caused the parser to
+  die if it encountered an empty attribute like in `<button
+  ... disabled>`. This broke Markdown::Pod. Fixes
+  https://github.com/keedi/Markdown-Pod/issues/13. Reported by Slaven Rezić.
+
+
 0.35   2019-11-09
 
 - Fix entirely broken HTML attribute parsing. Any attribute with a space in

@@ -6,7 +6,7 @@ use Digest::MD5;
 use HTTP::Response;
 use base 'LWP::UserAgent';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new {
 	my ($class, %opts) = @_;
@@ -59,7 +59,7 @@ sub simple_request {
 	}
 	
 	my $request = $_[0];
-	eval{ $self->prepare_request($request) };
+	$request = $self->prepare_request($request);
 	my $fpath = $self->_get_cache_name($request);
 	my $response;
 	my $no_collision_suffix;
@@ -99,7 +99,7 @@ sub simple_request {
 			$self->{on_uncached}->($request);
 		}
 		
-		$response = $self->SUPER::simple_request(@_);
+		$response = $self->send_request(@_);
 		
 		if (!defined($self->{nocache_if}) || !$self->{nocache_if}->($response)) {
 			if (defined $no_collision_suffix) {

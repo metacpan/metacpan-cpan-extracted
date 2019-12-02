@@ -11,7 +11,7 @@ use Perl::Critic::Exception::Fatal::Internal qw{ throw_internal };
 use Perl::Critic::Utils qw{ :characters :severities :data_conversion };
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.134';
+our $VERSION = '1.136';
 
 #-----------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ sub _parse_allow {
 
     if( defined $config_string ) {
         my $allowed = lc $config_string; #String of words
-        my %allowed = hashify( $allowed =~ m/ (\w+) /gxms );
+        my %allowed = hashify( $allowed =~ m/ (experimental::\w+|\w+) /gxms );
 
         $self->{_allow} = \%allowed;
     }

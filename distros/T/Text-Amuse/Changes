@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.30 2019-12-01
+
+ - Fix crash with a verse followed by a "[" in LaTeX compilation
+
 1.29 2019-10-31
 
  - Fix multiple issues on the tag mismatch warnings. Many thanks to

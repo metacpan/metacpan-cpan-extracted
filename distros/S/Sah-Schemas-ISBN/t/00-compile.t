@@ -9,9 +9,9 @@ use Test::More;
 plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/str/str_to_isbn.pm',
-    'Data/Sah/Coerce/perl/str/str_to_isbn10.pm',
-    'Data/Sah/Coerce/perl/str/str_to_isbn13.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/to_isbn.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/to_isbn10.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/to_isbn13.pm',
     'Sah/Schema/isbn.pm',
     'Sah/Schema/isbn10.pm',
     'Sah/Schema/isbn13.pm',

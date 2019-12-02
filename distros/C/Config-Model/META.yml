@@ -1,5 +1,5 @@
 ---
-abstract: 'Create tools to validate, migrate and edit configuration files'
+abstract: 'a framework to validate, migrate and edit configuration files'
 author:
   - 'Dominique Dumont'
 build_requires:
@@ -77,6 +77,6 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.136'
-x_generated_by_perl: v5.28.1
+version: '2.137'
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -16,12 +16,21 @@ my %expected_lengths = (
     '2AAA_YEAST' => 635
 );
 
+my %params;
+
+if (defined $ENV{BIOPERLEMAIL}) {
+    $params{'-email'} = $ENV{BIOPERLEMAIL};
+    $params{'-delay'} = 2;
+}
+
+$params{'-verbose'} = $ENV{BIOPERLDEBUG};
+
 my ($gb, $seq, $seqio);
 
 #
 # Bio::DB::GenPept
 #
-ok $gb = Bio::DB::GenPept->new();
+ok $gb = Bio::DB::GenPept->new(%params);
 SKIP: {
     eval {$seqio = $gb->get_seq_stream(-uids => [2981015, 1621261, 195055], -mode => 'batch');};
     skip "Couldn't connect to complete GenPept tests. Skipping those tests", 8 if $@;
@@ -41,7 +50,7 @@ SKIP: {
 
 $seq = $seqio = undef;
 
-ok $gb = Bio::DB::GenPept->new('-delay' => 0);
+ok $gb = Bio::DB::GenPept->new(%params);
 SKIP: {
     eval {$seq = $gb->get_Seq_by_id('195055');};
     skip "Couldn't connect to Genbank with Bio::DB::GenPept.pm. Skipping those tests: $@", 10 if $@;

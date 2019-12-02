@@ -104,40 +104,7 @@ EOF
         },
     ];
 
-    parse_ok( $text, $expect, 'html in a block' );
-}
-
-{
-    my $html = <<'EOF';
-<div class="foo">
-  <p>
-    An arbitrary chunk of html.
-  </p>
-</div>
-EOF
-
-    my $text = <<"EOF";
-Some text
-
-$html
-EOF
-
-    my $expect = [
-        {
-            type => 'paragraph',
-        },
-        [
-            {
-                type => 'text',
-                text => "Some text\n",
-            },
-        ], {
-            type => 'html_block',
-            html => $html,
-        },
-    ];
-
-    parse_ok( $text, $expect, 'html in a block' );
+    parse_ok( $text, $expect, 'html_block as separate html' );
 }
 
 {
@@ -513,7 +480,40 @@ EOF
         ],
     ];
 
-    parse_ok( $text, $expect, 'html in a block' );
+    parse_ok( $text, $expect, 'attribute value that has spaces' );
+}
+
+{
+    my $text = <<"EOF";
+Some tag: <iframe name="value" justName other="foo" anotherName>
+EOF
+
+    my $expect = [
+        {
+            type => 'paragraph',
+        },
+        [
+            {
+                type => 'text',
+                text => 'Some tag: ',
+            }, {
+                type       => 'html_tag',
+                tag        => 'iframe',
+                attributes => {
+                    name        => 'value',
+                    justName    => undef,
+                    other       => 'foo',
+                    anotherName => undef,
+                },
+            },
+            {
+                type => 'text',
+                text => "\n",
+            },
+        ],
+    ];
+
+    parse_ok( $text, $expect, 'empty attributes with no value' );
 }
 
 done_testing();

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-09-03'; # DATE
-our $VERSION = '0.208'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.209'; # VERSION
 
 use 5.010;
 use strict;
@@ -159,7 +159,7 @@ govproc - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.208 of govproc (from Perl distribution Proc-Govern), released on 2019-09-03.
+This document describes version 0.209 of govproc (from Perl distribution Proc-Govern), released on 2019-11-29.
 
 =head1 SYNOPSIS
 

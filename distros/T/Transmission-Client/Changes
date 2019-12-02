@@ -1,5 +1,12 @@
 Revision history for Transmission-Client
 
+0.0806   Thu Nov 28 21:33:56 CET 2019
+       - Simplify Transmission::Stats and add tests for it. (Thanks to
+         contributions by Yanick Champoux)
+       - Improve POD documentation. (Thanks to contributions by Yanick
+         Champoux)
+       - Document read_all method on Transmission::Stats
+
 0.0805   Sun Jul 31 17:35:16 CEST 2016
        - Update metadata: bugtracker and VCS repository, pointing to
          github.

@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 1.02
+version 1.05
 
 # SYNOPSIS
 
@@ -44,12 +44,12 @@ version 1.02
 
 # DESCRIPTION
 
-This is the [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) plugin bundle I use for my distributions. Don't use
+This is the [Dist::Zilla](https://metacpan.org/pod/Dist%3A%3AZilla) plugin bundle I use for my distributions. Don't use
 this directly for your own distributions, but you may find it useful as a
 source of ideas for building your own bundle.
 
-This bundle uses [Dist::Zilla::Role::PluginBundle::PluginRemover](https://metacpan.org/pod/Dist::Zilla::Role::PluginBundle::PluginRemover) and
-[Dist::Zilla::Role::PluginBundle::Config::Slicer](https://metacpan.org/pod/Dist::Zilla::Role::PluginBundle::Config::Slicer) so I can remove or
+This bundle uses [Dist::Zilla::Role::PluginBundle::PluginRemover](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3APluginBundle%3A%3APluginRemover) and
+[Dist::Zilla::Role::PluginBundle::Config::Slicer](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3APluginBundle%3A%3AConfig%3A%3ASlicer) so I can remove or
 configure any plugin as needed.
 
 This is more or less equivalent to the following `dist.ini`:

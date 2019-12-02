@@ -1,9 +1,9 @@
 package Sah::SchemaR::percent;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.006'; # VERSION
 
-our $rschema = ["float",[{description=>"\nThis type is basically `float`, with `str_as_percent` coerce rule. So the\npercent sign is optional, but the number is always interpreted as percent, e.g.\n\"1\" is interpreted as 1% (0.01).\n\n",summary=>"A float","x.perl.coerce_rules"=>["str_as_percent"]}],["float"]];
+our $rschema = ["float",[{description=>"\nThis type is basically `float`, with `str_as_percent` coerce rule. So the\npercent sign is optional, but the number is always interpreted as percent, e.g.\n\"1\" is interpreted as 1% (0.01).\n\n",summary=>"A float","x.perl.coerce_rules"=>["From_str::as_percent"]}],["float"]];
 
 1;
 # ABSTRACT: A float
@@ -20,7 +20,7 @@ Sah::SchemaR::percent - A float
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::SchemaR::percent (from Perl distribution Sah-Schemas-Float), released on 2019-07-26.
+This document describes version 0.006 of Sah::SchemaR::percent (from Perl distribution Sah-Schemas-Float), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

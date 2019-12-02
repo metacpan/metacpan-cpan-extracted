@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Path - Schemas related to filesystem path
 
 VERSION
-    This document describes version 0.008 of Sah::Schemas::Path (from Perl
-    distribution Sah-Schemas-Path), released on 2019-07-25.
+    This document describes version 0.010 of Sah::Schemas::Path (from Perl
+    distribution Sah-Schemas-Path), released on 2019-11-29.
 
 SAH SCHEMAS
     *   dirname

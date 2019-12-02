@@ -1,9 +1,9 @@
 package Sah::SchemaR::country::code::alpha3;
 
-our $DATE = '2018-04-08'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.003'; # VERSION
 
-our $rschema = ["str",[{description=>"\nAccept only current (not retired) codes. Only alpha-3 codes are accepted.\n\nCode will be converted to lowercase.\n\n",in=>["abw","afg","ago","aia","ala","alb","and","are","arg","arm","asm","ata","atf","atg","aus","aut","aze","bdi","bel","ben","bes","bfa","bgd","bgr","bhr","bhs","bih","blm","blr","blz","bmu","bol","bra","brb","brn","btn","bvt","bwa","caf","can","cck","che","chl","chn","civ","cmr","cod","cog","cok","col","com","cpv","cri","cub","cuw","cxr","cym","cyp","cze","deu","dji","dma","dnk","dom","dza","ecu","egy","eri","esh","esp","est","eth","fin","fji","flk","fra","fro","fsm","gab","gbr","geo","ggy","gha","gib","gin","glp","gmb","gnb","gnq","grc","grd","grl","gtm","guf","gum","guy","hkg","hmd","hnd","hrv","hti","hun","idn","imn","ind","iot","irl","irn","irq","isl","isr","ita","jam","jey","jor","jpn","kaz","ken","kgz","khm","kir","kna","kor","kwt","lao","lbn","lbr","lby","lca","lie","lka","lso","ltu","lux","lva","mac","maf","mar","mco","mda","mdg","mdv","mex","mhl","mkd","mli","mlt","mmr","mne","mng","mnp","moz","mrt","msr","mtq","mus","mwi","mys","myt","nam","ncl","ner","nfk","nga","nic","niu","nld","nor","npl","nru","nzl","omn","pak","pan","pcn","per","phl","plw","png","pol","pri","prk","prt","pry","pse","pyf","qat","reu","rou","rus","rwa","sau","sdn","sen","sgp","sgs","shn","sjm","slb","sle","slv","smr","som","spm","srb","ssd","stp","sur","svk","svn","swe","swz","sxm","syc","syr","tca","tcd","tgo","tha","tjk","tkl","tkm","tls","ton","tto","tun","tur","tuv","twn","tza","uga","ukr","umi","ury","usa","uzb","vat","vct","ven","vgb","vir","vnm","vut","wlf","wsm","yem","zaf","zmb","zwe"],match=>"\\A[a-z]{3}\\z",summary=>"Country code (alpha-3)","x.perl.coerce_rules"=>["str_tolower"]}],["str"]];
+our $rschema = ["str",[{description=>"\nAccept only current (not retired) codes. Only alpha-3 codes are accepted.\n\nCode will be converted to lowercase.\n\n",in=>["abw","afg","ago","aia","ala","alb","and","are","arg","arm","asm","ata","atf","atg","aus","aut","aze","bdi","bel","ben","bes","bfa","bgd","bgr","bhr","bhs","bih","blm","blr","blz","bmu","bol","bra","brb","brn","btn","bvt","bwa","caf","can","cck","che","chl","chn","civ","cmr","cod","cog","cok","col","com","cpv","cri","cub","cuw","cxr","cym","cyp","cze","deu","dji","dma","dnk","dom","dza","ecu","egy","eri","esh","esp","est","eth","fin","fji","flk","fra","fro","fsm","gab","gbr","geo","ggy","gha","gib","gin","glp","gmb","gnb","gnq","grc","grd","grl","gtm","guf","gum","guy","hkg","hmd","hnd","hrv","hti","hun","idn","imn","ind","iot","irl","irn","irq","isl","isr","ita","jam","jey","jor","jpn","kaz","ken","kgz","khm","kir","kna","kor","kwt","lao","lbn","lbr","lby","lca","lie","lka","lso","ltu","lux","lva","mac","maf","mar","mco","mda","mdg","mdv","mex","mhl","mkd","mli","mlt","mmr","mne","mng","mnp","moz","mrt","msr","mtq","mus","mwi","mys","myt","nam","ncl","ner","nfk","nga","nic","niu","nld","nor","npl","nru","nzl","omn","pak","pan","pcn","per","phl","plw","png","pol","pri","prk","prt","pry","pse","pyf","qat","reu","rou","rus","rwa","sau","sdn","sen","sgp","sgs","shn","sjm","slb","sle","slv","smr","som","spm","srb","ssd","stp","sur","svk","svn","swe","swz","sxm","syc","syr","tca","tcd","tgo","tha","tjk","tkl","tkm","tls","ton","tto","tun","tur","tuv","twn","tza","uga","ukr","umi","ury","usa","uzb","vat","vct","ven","vgb","vir","vnm","vut","wlf","wsm","yem","zaf","zmb","zwe"],match=>"\\A[a-z]{3}\\z",summary=>"Country code (alpha-3)","x.perl.coerce_rules"=>["From_str::to_lower"]}],["str"]];
 
 1;
 # ABSTRACT: Country code (alpha-3)
@@ -20,7 +20,7 @@ Sah::SchemaR::country::code::alpha3 - Country code (alpha-3)
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::country::code::alpha3 (from Perl distribution Sah-Schemas-Country), released on 2018-04-08.
+This document describes version 0.003 of Sah::SchemaR::country::code::alpha3 (from Perl distribution Sah-Schemas-Country), released on 2019-11-29.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

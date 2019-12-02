@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME             => "JSV::Compiler",
     AUTHOR           => "Anton Petrusevich",
-    VERSION          => "0.06",
+    VERSION          => "0.07",
     INSTALLDIRS      => 'site',
     LICENSE          => "artistic_2",
     MIN_PERL_VERSION => "5.008000",
@@ -30,7 +30,8 @@ WriteMakefile(
         'Regexp::Common::Email::Address' => 0,
         'Regexp::Common::URI'            => 0,
     },
-    TEST_REQUIRES => {
+    BUILD_REQUIRES => {'ExtUtils::MakeMaker' => "6.64",},
+    TEST_REQUIRES  => {
         'Test::Most' => 0,
         'JSON'       => "2.91",
     },

@@ -63,7 +63,7 @@ greple - extensible grep with lexical expression and region handling
 =head1 VERSION
 
 
-Version 8.3401
+Version 8.3801
 
 
 =head1 SYNOPSIS
@@ -79,7 +79,8 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --le pattern         lexical expression (same as bare pattern)
     --re pattern         regular expression
     --fe pattern         fixed expression
-    --file file          file contains search pattern
+    -f, --file file      file contains search pattern
+    --select index       select indexed pattern from -f file
   MATCH
     -i                   ignore case
     --need=[+-]n         required positive match count
@@ -138,6 +139,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
   RUNTIME FUNCTION
     --print=func         print function
     --continue           continue after print function
+    --callback=func      callback function for matched string
     --begin=func         call function before search
     --end=func           call function after search
     --prologue=func      call function before command execution
@@ -181,6 +183,7 @@ my @opt_begin;
 my @opt_end;
 my @opt_prologue;
 my @opt_epilogue;
+my @opt_callback;
 my $opt_noif;
 my $opt_all;
 my $opt_blockend;
@@ -219,6 +222,7 @@ my $opt_usage;
 my $opt_c;
 my @opt_d = ();
 my @opt_f;
+my $opt_select;
 my $opt_h;
 my $opt_i;
 my $opt_n;
@@ -262,10 +266,11 @@ my @optargs = (
     'C|context:2'        => \$opt_C,
     'all'                => \$opt_all,
     'f|file=s'           => \@opt_f,
+    'select=s'           => \$opt_select,
     'readlist!'          => \$opt_readlist,
     'd=s'                => \@opt_d,
-    'man'                => \$opt_man,
-    'show'               => \$opt_show,
+    'man|doc'            => \$opt_man,
+    'show|less'          => \$opt_show,
     'path'               => \$opt_path,
     'icode=s'            => \@opt_icode,
     'ocode=s'            => \$opt_ocode,
@@ -290,6 +295,7 @@ my @optargs = (
     'end=s'              => \@opt_end,
     'prologue=s'         => \@opt_prologue,
     'epilogue=s'         => \@opt_epilogue,
+    'callback=s'         => \@opt_callback,
     'clean!'             => \$opt_clean,
     'color=s'            => \$opt_color,
     'colormap|cm=s'      => \@opt_colormap,
@@ -437,13 +443,22 @@ if ($opt_man or $opt_show or $opt_path) {
     my @bucket = $rcloader->buckets;
     if (@bucket and not default_module($bucket[-1])) {
 	my $mod = $bucket[-1]->title;
-	my @perldocopt = $opt_show ? '-m' : $opt_path ? '-ml' : () ;
 	my $jp = first { -x "$_/perldocjp" } split /:/, $ENV{PATH};
 	my $perldoc = $jp ? "perldocjp" : "perldoc";
 	$ENV{PERL5LIB} = join ':', @INC;
-	my $command = "$perldoc @perldocopt App::Greple::$mod";
-	warn $command, "\n" if $opt_d{m};
-	exec $command or die $!;
+	my $module = "App::Greple::$mod";
+	if ($opt_man) {
+	    exec "$perldoc $module" or die $!;
+	} else {
+	    my $file = `$perldoc -ml $module`;
+	    if ($opt_path) {
+		say $file;
+	    } else {
+		my $pager = $ENV{PAGER} || 'less';
+		exec "$pager $file" or die $!;
+	    }
+	}
+	exit;
     }
     pod2usage({-verbose => 2});
     die;
@@ -488,9 +503,13 @@ my $pat_holder = new App::Greple::Pattern::Holder;
 my $FLAG_BASE = FLAG_NONE;
 $FLAG_BASE |= FLAG_IGNORECASE if $opt_i;
 
+use Getopt::EX::Numbers;
+
 if (@opt_f) {
     for my $opt_f (@opt_f) {
-	$pat_holder->append({ flag => $FLAG_BASE, type => 'file' },
+	$pat_holder->append({ flag => $FLAG_BASE, type => 'file',
+			      $opt_select ? (select => $opt_select) : (),
+			    },
 			    $opt_f);
     }
 } else {
@@ -775,6 +794,7 @@ for my $set (
     [ "end"     , \@opt_end     , 0 ],
     [ "prologue", \@opt_prologue, 0 ],
     [ "epilogue", \@opt_epilogue, 0 ],
+    [ "callback", \@opt_callback, 0 ],
     [ "block"   , \@opt_block   , 1 ], # need &
     [ "inside"  , \@opt_inside  , 1 ], # need &
     [ "outside" , \@opt_outside , 1 ], # need &
@@ -1045,7 +1065,7 @@ sub open_nextfile {
 	}
 
 	if ($file_code eq 'binary') {
-	    # binmode STDIN, ":raw";
+	    binmode STDIN, ":raw";
 	} else {
 	    binmode STDIN, ":encoding($file_code)";
 	}
@@ -1087,6 +1107,7 @@ sub grep_data {
 	strict       => $opt_strict,
 	region_index => $opt_regioncolor,
 	stat         => \%stat,
+	callback     => @opt_callback ? $opt_callback[-1] : undef,
 	)->run;
     my $matched = $grep->matched;
 
@@ -1156,9 +1177,9 @@ sub display_result {
 	if ($ci{A} or $ci{D}) {
 	    my $i = 0;
 	    new Indexer
-		index => sub { $i++ },
-		reset => sub { $i = 0 },
-		block => $ci{B},
+		index   => sub { $i++   },
+		reset   => sub { $i = 0 },
+		block   => $ci{B},
 		reverse => $ci{D};
 	}
 	elsif ($ci{R}) {
@@ -1177,7 +1198,7 @@ sub display_result {
 	if (@opt_print) {
 	    local *_ = \$block;
 	    for my $func (@opt_print) {
-		$_ = $func->call(&FILELABEL => $file, matched => $result);
+		$_ = $func->call(&FILELABEL => $file);
 	    }
 	    if (not $opt_continue) {
 		print $block if defined $block;
@@ -1212,11 +1233,25 @@ sub display_result {
 
 	my $mark = "\001";
 	for my $matched (reverse @$result) {
-	    my($ms, $me, $pi) = @$matched;
-
-	    $ms = max($ms - $block_start, 0);
-	    $me -= $block_start;
+	    my($start, $end, $pi, $callback) = @$matched;
+	    my $ms = max($start - $block_start, 0);
+	    my $me = $end - $block_start;
 	    my $s = substr($block, $ms, $me - $ms);
+
+	    ## run callback function
+	    if ($callback) {
+		if (ref $callback eq 'CODE') {
+		    $s = $callback->($start, $end, $pi, $s);
+		}
+		elsif (callable $callback) {
+		    $s = $callback->call(
+			&FILELABEL => $file,
+			start => $start,
+			end   => $end,
+			index => $pi,
+			match => $s);
+		}
+	    }
 
 	    if ($opt_join) {
 		if ($opt_n and $opt_linestyle eq 'line') {
@@ -1464,6 +1499,15 @@ Multiple `?' preceded tokens are treated all mixed together.  That
 means `?A|B ?C|D' is equivalent to `?A|B|C|D'.  If you want to mean
 `(A or B) and (C or D)', use AND syntax instead: `A|B C|D'.
 
+This is the summary of start character for B<--le> option:
+
+    +  Required pattern
+    -  Negative match pattern
+    ?  Alternative pattern
+    &  Function call (see next section)
+
+=item B<--le>=B<&>I<function>
+
 If the pattern start with ampersand (`&'), it is treated as a
 function, and the function is called instead of searching pattern.
 Function call interface is same as the one for block/region options.
@@ -1474,12 +1518,13 @@ lines like this:
 
     greple -n '&odd_line' file
 
-This is the summary of start character for B<--le> option:
-
-    +  Required pattern
-    -  Negative match pattern
-    ?  Alternative pattern
-    &  Function call
+This version experimentally support callback function for each
+pattern.  Region list returned by function can have two extra element
+besides start/end position.  Third element is index.  Fourth element
+is callback function pointer which is called to produce string to be
+shown in command output.  Callback function takes four argument (start
+position, end position, index, matched string) and returns replacement
+string.
 
 =item B<-e> I<pattern>, B<--and>=I<pattern>
 
@@ -1579,7 +1624,26 @@ removed with preceding spaces.
 
 When multiple files specified, each file produces individual pattern.
 
-See B<-Msubst> module.
+If the file name is followed by `[index]` string, it is treated as
+specified by B<--select> option.  Next two commands are equivalent.
+
+    greple -f pattern_file'[1,5:7]'
+
+    greple -f pattern_file --select 1,5:7
+
+See L<App::Greple::subst> module.
+
+=item B<--select>=I<index>
+
+When you want to choose specific pattern in the pattern file provided
+by B<-f> option, use B<--select> option.  I<index> is number list
+separated by comma (,) character and each numbers are interpreted by
+L<Getopt::EX::Numbers> module.  Take a look at the module document for
+detail.
+
+Next command use 1st and 5,6,7th pattern in the file.
+
+    greple -f pattern_file --select 1,5:7
 
 =back
 
@@ -1611,7 +1675,9 @@ Display filename always.
 
 =item B<-o>, B<--only-matching>
 
-Print matched string only.
+Print matched string only.  Newline character is printed after matched
+string if it does not end with newline.  Use B<--no-newline> option if
+you don't need extra newline.
 
 =item B<-m> I<n>[,I<m>], B<--max-count>=I<n>[,I<m>]
 
@@ -1684,9 +1750,10 @@ documents within Perl script.
 =item B<--[no]newline>
 
 Since B<greple> can handle arbitrary blocks other than normal text
-lines, they sometimes do not end by newline character.  In that case,
-extra newline is appended at the end of block to be shown.  Option
-B<--nonewline> disables this behavior.
+lines, they sometimes do not end with newline character.  Option B<-o>
+makes similar situation.  In that case, extra newline is appended at
+the end of block to be shown.  Option B<--no-newline> disables this
+behavior.
 
 =item B<--filestyle>=I<line>|I<once>|I<separate>, B<--fs>
 
@@ -1784,7 +1851,7 @@ up-to-date specification.
 
 Color specification is combination of single uppercase character
 representing basic colors, and (usually brighter) alternative colors in
-lowercase :
+lowercase:
 
     R  r   Red
     G  g   Green
@@ -1795,7 +1862,7 @@ lowercase :
     K  k   Black
     W  w   White
 
-or RGB value and 24 grey levels if using ANSI 256 color terminal :
+or RGB value and 24 grey levels if using ANSI 256 color terminal:
 
     (255,255,255)      : 24bit decimal RGB colors
     #000000 .. #FFFFFF : 24bit hex RGB colors
@@ -1812,13 +1879,13 @@ grey level, otherwise 6x6x6 216 color.
 
 =back
 
-or color names enclosed by angle bracket :
+or color names enclosed by angle bracket:
 
     <red> <blue> <green> <cyan> <magenta> <yellow>
     <aliceblue> <honeydue> <hotpink> <mooccasin>
     <medium_aqua_marine>
 
-with other special effects :
+with other special effects:
 
     Z  0 Zero (reset)
     D  1 Double-struck (boldface)
@@ -1835,10 +1902,10 @@ with other special effects :
     ;  No effect
     X  No effect
 
-If the spec includes C</>, left side is considered to be as foreground
-color and right side as background.  If multiple colors are given in
-same spec, all indicators are produced in the order of their presence.
-As a result, the last one takes effect.
+If the spec includes C</>, left side is considered as foreground color
+and right side as background.  If multiple colors are given in same
+spec, all indicators are produced in the order of their presence.  As
+a result, the last one takes effect.
 
 Effect characters are case insensitive, and can be found anywhere and
 in any order in color spec string.  Because C<X> and C<;> takes no
@@ -1951,6 +2018,11 @@ Reset sequential index on every block.
 
 Apply random color.
 
+=item N (Normal)
+
+Reset to normal behavior.  Because the last option takes effect,
+B<--ci=N> can be used to reset the behavior set by previous options.
+
 =back
 
 =item B<--random>
@@ -1972,8 +2044,8 @@ Shortcut for B<--ansicolor>=I<256> or I<16>.
 Use different colors for each B<--inside>/B<outside> regions.
 
 Disabled by default, but automatically enabled when only single search
-pattern is specified.  Because there is no way to explicitly disable
-this action, use B<--nocolorful> option to use single color.
+pattern is specified.  Use B<--no-regioncolor> to cancel automatic
+action.
 
 =item B<--[no]uniqcolor>, B<--[no]uc>
 
@@ -2291,29 +2363,9 @@ entire output from B<greple> command.
 
 Specify user defined function executed before data print.  Text to be
 printed is replaced by the result of the function.  Arbitrary function
-can be defined in F<.greplerc> file.  Matched data is placed in
-variable C<$_>.  Other information is passed by key-value pair in the
-arguments.  Filename is passed by C<&FILELABEL> key, as described
-later.  Matched information is passed by C<matched> key, in the form
-of perl array reference: C<[[start,end],[start,end]...]>.
-
-Simplest function is B<--print>='I<sub{$_}>'.  Coloring capability can
-be used like this:
-
-    # ~/.greplerc
-    __PERL__
-    sub print_simple {
-        my %attr = @_;
-        for my $r (reverse @{$attr{matched}}) {
-            my($s, $e) = @$r;
-            substr($_, $s, $e - $s, main::color('B', substr($_, $s, $e - $s)));
-        }
-        $_;
-    }
-
-Then, you can use this function in the command line.
-
-    greple --print=print_simple ...
+can be defined in F<.greplerc> file or module.  Matched data is placed
+in variable C<$_>.  Filename is passed by C<&FILELABEL> key, as
+described later.
 
 It is possible to use multiple B<--print> options.  In that case,
 second function will get the result of the first function.  The
@@ -2325,6 +2377,14 @@ When B<--print> option is given, B<greple> will immediately print the
 result returned from print function and finish the cycle.  Option
 B<--continue> forces to continue normal printing process after print
 function called.  So please be sure that all data being consistent.
+
+=item B<--callback>=I<function>(I<...>)
+
+Callback function is called before printing every matched pattern with
+four labeled parameters: B<start>, B<end>, B<index> and B<match>,
+which corresponds to start and end position in the text, pattern
+index, and the matched string.  Matched string in the text is replaced
+by returned string from the funciton.
 
 =item B<--begin>=I<function>(I<...>)
 
@@ -2419,12 +2479,12 @@ expanded, supply something not empty to B<--usage> option, like:
 
     greple -Mmodule --usage=expand
 
-=item B<--man>
+=item B<--man>, B<--doc>
 
 Show manual page.
 Display module's manual page when used with B<-M> option.
 
-=item B<--show>
+=item B<--show>, B<--less>
 
 Show module file contents.  Use with B<-M> option.
 
@@ -2493,10 +2553,10 @@ Next command will show strings in binary file.
 
     greple -o --re '(?a)\w{4,}' --persist --uc /bin/*
 
-When processing all files as binary data, use B<--icode=binary>
+If you want read all files as binary data, use B<--icode=binary>
 instead.
 
-=item B<-Mdebug>, -B<-d>I<x>
+=item B<-Mdebug>, B<-d>I<x>
 
 Debug option is decribed in L<App::Greple::debug> module.
 

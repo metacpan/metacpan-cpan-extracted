@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::Bencher::Scenario;
 
-our $DATE = '2019-03-24'; # DATE
-our $VERSION = '0.243'; # VERSION
+our $DATE = '2019-10-20'; # DATE
+our $VERSION = '0.244'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -508,8 +508,12 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
         $file->_set_added_by(
             sprintf("%s (%s line %s)", __PACKAGE__, __PACKAGE__, __LINE__),
         );
-        push @{ $zilla->files }, $file;
-        $self->log(["Creating file '%s'", $rname]);
+        if (grep { $_->name eq $rname } @{ $zilla->files }) {
+            $self->log("File $rname already exists (probably by another instance of ".__PACKAGE__.", not adding another one");
+        } else {
+            $self->log(["Creating file '%s'", $rname]);
+            push @{ $zilla->files }, $file;
+        }
     }
 
     $self->log(["Generated POD for '%s'", $filename]);
@@ -613,7 +617,7 @@ Pod::Weaver::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.243 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-03-24.
+This document describes version 0.244 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-10-20.
 
 =head1 SYNOPSIS
 

@@ -9,8 +9,9 @@ use Giblog::API;
 use Carp 'confess';
 use Pod::Usage 'pod2usage';
 use List::Util 'min';
+use File::Spec;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub new {
   my $class = shift;
@@ -87,6 +88,66 @@ sub run_command {
 
 sub home_dir { shift->{'home_dir'} }
 sub config { shift->{config} }
+
+sub build {
+  my ($class) = @_;
+  
+  # Build
+  my $cmd = 'giblog build';
+  system($cmd) == 0
+    or die "Can't execute $cmd: $!";
+}
+
+sub serve {
+  my ($class, $app) = @_;
+  
+  # Read config file
+  my $config_file = "$FindBin::Bin/giblog.conf";
+  my $config;
+  $config = do $config_file
+    or die "Can't read config file $config_file";
+
+  # Remove base path before dispatch
+  my $base_path = $config->{base_path};
+  if (defined $base_path) {
+    
+    # Subdir depth
+    my @parts = File::Spec->splitdir($base_path);
+    my $subdir_depth = @parts - 1;
+    
+    $app->hook(before_dispatch => sub {
+      my $c = shift;
+      
+      # Root is redirect
+      unless (@{$c->req->url->path->parts}) {
+        $c->stash(is_redirect => 1);
+      }
+      
+      # Remove base path
+      for (my $i = 0; $i < $subdir_depth; $i++) {
+        shift @{$c->req->url->path->parts};
+      }
+    });
+  }
+
+  my $r = $app->routes;
+
+  $r->get('/' => sub {
+    my $c = shift;
+    
+    my $is_redirect = $c->stash('is_redirect');
+    if ($is_redirect) {
+      $c->redirect_to($base_path);
+    }
+    else {
+      $c->reply->static('index.html');
+    }
+  });
+
+  $app->start;
+}
+
+=encoding utf8
 
 =head1 NAME
 
@@ -184,6 +245,8 @@ Giblog have the following features.
 =item * You can serve your web site in local environment. Contents changes is detected and build automatically(need L<Mojolicious>).
 
 =item * Fast. Build 645 pages by 0.78 seconds in starndard linux environment.
+
+=item * Support Github Pages, both user and project page.
 
 =back
 
@@ -438,6 +501,52 @@ You see the following message.
    Server start
 
 If files in "templates" directory is changed, Web site is automatically rebuild.
+
+=head1 CONFIG FILE
+
+Giblog config file is "giblog.conf".
+
+This is Perl script and return config as hash reference.
+
+  use strict;
+  use warnings;
+  use utf8;
+
+  # giblog.conf
+  {
+    site_title => 'mysite😄',
+    site_url => 'http://somesite.example',
+  }
+
+=head2 site_title
+
+  site_title => 'mysite😄'
+
+Site title
+
+=head2 site_url
+
+  site_url => 'http://somesite.example'
+
+Site URL.
+
+=head2 base_path
+
+  base_path => '/subdir'
+
+Base path. Base path is used to deploy your site to sub directory.
+
+For example, Project page URL of Github Pages is
+
+  https://yuki-kimoto.github.io/giblog-theme1-public/
+
+You specify the following
+
+  base_path => '/giblog-theme1-public'
+
+Top character of base_path must be slash "/".
+
+HTML files is output into "public/giblog-theme1-public" directory.
 
 =head1 METHODS
 

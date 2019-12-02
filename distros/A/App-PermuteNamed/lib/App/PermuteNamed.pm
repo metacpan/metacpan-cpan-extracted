@@ -1,7 +1,9 @@
 package App::PermuteNamed;
 
-our $DATE = '2017-01-29'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-PermuteNamed'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +34,7 @@ _
                 of => ['array*', {
                     min_len => 1,
                     of => 'str*',
-                    'x.perl.coerce_rules' => ['str_comma_sep']
+                    'x.perl.coerce_rules' => ['From_str::comma_sep']
                 }],
             }],
             req => 1,
@@ -103,12 +105,16 @@ App::PermuteNamed - Permute multiple-valued key-value pairs
 
 =head1 VERSION
 
-This document describes version 0.003 of App::PermuteNamed (from Perl distribution App-PermuteNamed), released on 2017-01-29.
+This document describes version 0.004 of App::PermuteNamed (from Perl distribution App-PermuteNamed), released on 2019-11-29.
 
 =head1 FUNCTIONS
 
 
-=head2 permute_named(%args) -> [status, msg, result, meta]
+=head2 permute_named
+
+Usage:
+
+ permute_named(%args) -> [status, msg, payload, meta]
 
 Permute multiple-valued key-value pairs.
 
@@ -123,17 +129,12 @@ Examples:
 Result:
 
  [
-   200,
-   "OK",
-   [
-     { bool => 0, x => "foo" },
-     { bool => 0, x => "bar" },
-     { bool => 0, x => "baz" },
-     { bool => 1, x => "foo" },
-     { bool => 1, x => "bar" },
-     { bool => 1, x => "baz" },
-   ],
-   { "table.fields" => ["bool", "x"] },
+   { bool => 0, x => "foo" },
+   { bool => 0, x => "bar" },
+   { bool => 0, x => "baz" },
+   { bool => 1, x => "foo" },
+   { bool => 1, x => "bar" },
+   { bool => 1, x => "baz" },
  ]
 
 =back
@@ -165,7 +166,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -200,7 +201,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

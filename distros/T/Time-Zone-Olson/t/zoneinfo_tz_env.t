@@ -28,6 +28,8 @@ if ($ENV{RELEASE_TESTING}) {
 	$max_number_of_years = 20;
 }
 foreach my $tz (
+				($] >= 5.010 ? '<+0330>-3:30<+0430>,79/24,263/24' : ()),
+				'<+0330>-3:30<+0430>,J79/24,J263/24',
 				'WET0WEST,M3.5.0,M10.5.0/3',
 				'EST5EDT,M3.2.0,M11.1.0',
 				'<-04>4<-03>,M11.1.0/0,M2.3.0/0',
@@ -78,6 +80,7 @@ sub _LOCALTIME_HOUR_INDEX { return 2 }
 sub _LOCALTIME_DAY_INDEX { return 3 }
 sub _LOCALTIME_MONTH_INDEX { return 4 }
 sub _LOCALTIME_DAY_OF_WEEK_INDEX { return 6 }
+sub _LOCALTIME_DAY_OF_YEAR_INDEX { return 7 }
 
 sub check_time {
 	my ($tz, $time) = @_;
@@ -140,6 +143,19 @@ sub check_time {
 			} else {
 				die "Unknown TZ format for week";
 			}
+		}
+	}
+	while ($tz =~ /[J,](\d+)(?:\/(\d+))?/smxg) {
+		my ($day, $hour) = ($1, $2);
+		$hour = defined $hour ? $hour : 2;
+		$ok = 1;
+		if ($hour == 0) {
+			return if (($time_local[_LOCALTIME_HOUR_INDEX()] > $hour + 1) && ($time_local[_LOCALTIME_HOUR_INDEX()] < 23));
+		} else {
+			return if (($time_local[_LOCALTIME_HOUR_INDEX()] > $hour + 1) || ($time_local[_LOCALTIME_HOUR_INDEX()] < $hour - 1));
+		}
+		if (($time_local[_LOCALTIME_DAY_OF_YEAR_INDEX()] >= $day - 2) && ($time_local[_LOCALTIME_DAY_OF_YEAR_INDEX()] <= $day + 2)) {
+			$match = 1;
 		}
 	}
 	if (!$ok) {

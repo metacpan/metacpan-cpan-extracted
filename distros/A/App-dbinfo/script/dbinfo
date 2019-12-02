@@ -32,7 +32,7 @@ dbinfo - Get/extract information from database
 
 =head1 VERSION
 
-This document describes version 0.004 of dbinfo (from Perl distribution App-dbinfo), released on 2018-04-03.
+This document describes version 0.005 of dbinfo (from Perl distribution App-dbinfo), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -73,13 +73,11 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
@@ -132,7 +130,7 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -180,7 +178,7 @@ Shortcut for --row-format=array.
 
 See C<--row-format>.
 
-=item B<--exclude-column>=I<s@>, B<-C>
+=item B<--exclude-column>=I<s@>
 
 Can be specified multiple times.
 
@@ -188,7 +186,7 @@ Can be specified multiple times.
 
 See C<--exclude-column>.
 
-=item B<--include-column>=I<s@>, B<-c>
+=item B<--include-column>=I<s@>
 
 Can be specified multiple times.
 
@@ -368,7 +366,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

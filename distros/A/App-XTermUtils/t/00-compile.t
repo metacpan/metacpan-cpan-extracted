@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/XTermUtils.pm'
@@ -14,9 +14,13 @@ my @module_files = (
 
 my @scripts = (
     'script/get-term-bgcolor',
+    'script/get-term-fgcolor',
     'script/set-term-bgcolor',
+    'script/set-term-fgcolor',
     'script/term-bgcolor-is-dark',
-    'script/term-bgcolor-is-light'
+    'script/term-bgcolor-is-light',
+    'script/term-fgcolor-is-dark',
+    'script/term-fgcolor-is-light'
 );
 
 # no fake home requested

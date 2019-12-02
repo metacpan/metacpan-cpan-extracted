@@ -1,7 +1,7 @@
 package Sah::Schema::percent;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $schema = ['float', {
     summary => 'A float',
@@ -13,7 +13,7 @@ percent sign is optional, but the number is always interpreted as percent, e.g.
 
 _
     'x.perl.coerce_rules' => [
-        'str_as_percent',
+        'From_str::as_percent',
     ],
 }, {}];
 
@@ -32,7 +32,7 @@ Sah::Schema::percent - A float
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::percent (from Perl distribution Sah-Schemas-Float), released on 2019-07-26.
+This document describes version 0.006 of Sah::Schema::percent (from Perl distribution Sah-Schemas-Float), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

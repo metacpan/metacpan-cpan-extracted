@@ -35,24 +35,24 @@ my $meta = {
   "provides"         => {
                           "Moose::Meta::Attribute::Custom::Trait::Enum" => {
                             file => "lib/Moose/Meta/Attribute/Custom/Trait/Enum.pm",
-                            version => 0.009,
+                            version => "0.010",
                           },
                           "Moose::Meta::Attribute::Custom::Trait::Enumeration" => {
                             file => "lib/Moose/Meta/Attribute/Custom/Trait/Enumeration.pm",
-                            version => 0.009,
+                            version => "0.010",
                           },
-                          "MooseX::Enumeration" => { file => "lib/MooseX/Enumeration.pm", version => 0.009 },
+                          "MooseX::Enumeration" => { file => "lib/MooseX/Enumeration.pm", version => "0.010" },
                           "MooseX::Enumeration::Meta::Attribute::Native::Trait::Enumeration" => {
                             file => "lib/MooseX/Enumeration/Meta/Attribute/Native/Trait/Enumeration.pm",
-                            version => 0.009,
+                            version => "0.010",
                           },
                           "MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::assign" => {
                             file => "lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/assign.pm",
-                            version => 0.009,
+                            version => "0.010",
                           },
                           "MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::is" => {
                             file => "lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/is.pm",
-                            version => 0.009,
+                            version => "0.010",
                           },
                         },
   "release_status"   => "stable",
@@ -69,7 +69,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooseX-Enumeration/project",
                         },
-  "version"          => 0.009,
+  "version"          => "0.010",
   "x_static_install" => 1,
 };
 

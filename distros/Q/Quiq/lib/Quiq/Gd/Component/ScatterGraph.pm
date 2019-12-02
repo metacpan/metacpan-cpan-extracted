@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.165';
+our $VERSION = '1.166';
 
 use Quiq::Option;
 use Quiq::Array;
@@ -66,7 +66,7 @@ Farbe für Z-Werte, die zMax überschreiten.
 Code:
 
   use Quiq::Gd::Image;
-  use Quiq::Gd::Component::ScatterPlot;
+  use Quiq::Gd::Component::ScatterGraph;
   
   # Konfiguration
   
@@ -86,7 +86,7 @@ Code:
   
   # Grafik-Objekt instantiieren
   
-  my $g = Quiq::Gd::Component::ScatterPlot->new(
+  my $g = Quiq::Gd::Component::ScatterGraph->new(
       width=>$width,
       height=>$height,
       pointSize=>$pointSize,
@@ -295,7 +295,7 @@ sub zMax {
 
 =head1 VERSION
 
-1.165
+1.166
 
 =head1 AUTHOR
 

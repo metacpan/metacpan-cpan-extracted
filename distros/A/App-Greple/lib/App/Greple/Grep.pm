@@ -100,7 +100,10 @@ sub prepare {
 	    else {
 		$self->{stat}->{match_negative} += @p;
 	    }
-	    map { push @$_, $i } @p;
+	    map { $_->[2] //= $i } @p;
+	    if (my $callback = $self->{callback}) {
+		map { $_->[3] //= $callback } @p;
+	    }
 	}
 	push @result, \@p;
     }
@@ -124,7 +127,7 @@ sub prepare {
 		my $r = $result[$resi];
 		my @l = select_regions({ strict => $self->{strict} },
 				       $r, \@select, $reg->flag);
-		if ($self->{region_index} or @result == 1) {
+		if ($self->{region_index} // @result == 1) {
 		    map { $_->[2] = $regi } @l;
 		}
 		push @{$tmp[$resi]}, @l;

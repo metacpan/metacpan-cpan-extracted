@@ -1,0 +1,64 @@
+0.011   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules again, revert to using lower_case
+	  notation for the description part, because CamelCase is really,
+	  REALLY ugly when we have many words.
+
+
+0.010   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule module from
+	  Data-Sah-CoerceRule-array-str_comma_sep to
+	  Data-Sah-CoerceBundle-To_array-From_str-CommaSep.
+
+
+0.009   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Data::Sah::Coerce to 0.032 [CT].
+
+
+0.008   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version 3->4.
+
+
+0.007   2018-06-04  Released-By: PERLANCAR
+
+	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
+	  version 3).
+
+
+0.006   2018-04-17  Released-By: PERLANCAR
+
+        - No functional changes.
+
+	- [doc] Mention related coerce rules: array::str_int_range &
+	  array_str_int_range_and_comma_sep.
+
+
+0.005   2016-05-23  Released-By: PERLANCAR
+
+	- Adjust to Data::Sah::Coerce 0.011 (coerce_from & dont_coerce_from
+	  have been replaced with coerce_rules).
+
+
+0.004   2016-05-22  Released-By: PERLANCAR
+
+        - Bump rule metadata version to 2 (Data::Sah::Coerce 0.10+).
+
+
+0.003   2016-05-21  Released-By: PERLANCAR
+
+	- [test] Skip js tests when node.js is not available [CT].
+
+
+0.002   2016-05-19  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Fix examples.
+
+
+0.001   2016-05-19  Released-By: PERLANCAR
+
+        - First release.

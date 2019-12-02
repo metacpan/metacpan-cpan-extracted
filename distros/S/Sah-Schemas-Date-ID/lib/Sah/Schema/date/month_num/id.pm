@@ -1,13 +1,13 @@
 package Sah::Schema::date::month_num::id;
 
-our $DATE = '2019-07-21'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [int => {
     summary => 'Month number',
     min => 1,
     max => 12,
-    'x.perl.coerce_rules' => ['str_convert_id_month_name_to_num'],
+    'x.perl.coerce_rules' => ['From_str::convert_id_month_name_to_num'],
 }, {}];
 
 1;
@@ -26,7 +26,7 @@ Sah::Schema::date::month_num::id - Month number
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::date::month_num::id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-07-21.
+This document describes version 0.003 of Sah::Schema::date::month_num::id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
 
 =head1 DESCRIPTION
 

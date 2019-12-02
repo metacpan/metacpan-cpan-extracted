@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 
-package Config::Model::Describe 2.136;
+package Config::Model::Describe 2.137;
 
 use Carp;
 use strict;
@@ -46,7 +46,7 @@ sub describe {
         my ( $scanner, $data_ref, $node, @element ) = @_;
         # filter elements according to pattern
         my @scan = $pattern ? grep { $_ =~ $pattern } @element : @element;
-        map { $scanner->scan_element( $data_ref, $node, $_ ) } @scan;
+        for (@scan) { $scanner->scan_element( $data_ref, $node, $_ ) }
     };
 
     my $std_cb = sub {
@@ -117,7 +117,7 @@ sub describe {
             push @$data_r, [ $element, 'node hash', "<$class_name>", $show_str ];
         }
         elsif (@keys) {
-            map { $scanner->scan_hash( $data_r, $obj, $element, $_ ) } @keys;
+            for ( @keys ) { $scanner->scan_hash( $data_r, $obj, $element, $_ ) }
         }
         else {
             push @$data_r, [ $element, 'value hash', "[empty hash]",  "" ] if $show_empty;
@@ -214,7 +214,7 @@ Config::Model::Describe - Provide a description of a node element
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 

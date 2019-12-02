@@ -1,17 +1,24 @@
 Revision history for Perl module Promise::ES6
 
-0.12 Thu 21 November 2019
+0.14 Wed 27 Nov 2019
+- Fix test by requiring a reasonably recent Test::More.
+
+0.13 Tue 26 Nov 2019
+- Provide Future conversion logic.
+- Flesh out Mojo.pm documentation.
+
+0.12 Thu 21 Nov 2019
 - Fix event-loop logic to run ->then() asynchronously.
 - Remove left-in Data::Dumper.
 - Add Mojolicious backend.
 
-0.11 Fri 15 November 2019
+0.11 Fri 15 Nov 2019
 - Fix memory leak in callback propagation.
 
-0.10 Thu 14 November 2019
+0.10 Thu 14 Nov 2019
 - Fix ::AnyEvent and ::IOAsync to pass values to callbacks.
 
-0.09 Thu 14 November 2019
+0.09 Thu 14 Nov 2019
 - Update documentation with discussions of synchronous operation and
   cancellation.
 - Add Promise::ES6::AnyEvent and Promise::ES6::IOAsync to implement

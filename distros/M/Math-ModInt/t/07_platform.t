@@ -1,8 +1,6 @@
-# Copyright (c) 2012 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: 07_platform.t 38 2012-08-26 22:44:59Z demetri $
+# Copyright (c) 2012-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Gather platform information to help analyzing test reports.
 
@@ -30,6 +28,7 @@ foreach my $module (qw(
     Math::ModInt::Event
     Math::ModInt::Event::Trap
     Math::ModInt::GF2
+    Math::ModInt::GF3
     Math::ModInt::Perl
     Math::ModInt::Trivial
     overload

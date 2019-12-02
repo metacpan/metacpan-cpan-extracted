@@ -11,87 +11,75 @@ use Moose::Role;
 
 no warnings 'experimental';
 
-our $VERSION='0.02401';
+our $VERSION='1.00';
 
 =head1 NAME
 
 Vote::Count::Floor
 
-=head1 VERSION 0.02401
+=head1 VERSION 1.00
 
 =cut
 
 # ABSTRACT: Floor Rules for RCV elections.
 
 # load the roles providing the underlying ops.
-with  'Vote::Count::Approval',
-      'Vote::Count::TopCount',
-      ;
+with 'Vote::Count::Approval', 'Vote::Count::TopCount',;
 
-sub _FloorMin( $self, $floorpct ) {
+sub _FloorMin ( $self, $floorpct ) {
   my $pct = $floorpct >= 1 ? $floorpct / 100 : $floorpct;
   return int( $self->VotesCast() * $pct );
 }
 
-
-sub _DoFloor( $self, $ranked, $cutoff ) {
+sub _DoFloor ( $self, $ranked, $cutoff ) {
   my @active = ();
   my @remove = ();
   for my $s ( keys $ranked->%* ) {
-    if ( $ranked->{$s} >= $cutoff) { push @active, $s }
+    if ( $ranked->{$s} >= $cutoff ) { push @active, $s }
     else {
       push @remove, $s;
-      $self->logv(
-        "Removing: $s: $ranked->{$s}, minimum is $cutoff."
-      );
+      $self->logv("Removing: $s: $ranked->{$s}, minimum is $cutoff.");
     }
   }
   $self->logt(
     "Floor Rule Eliminated: ",
     join( ', ', @remove ),
-    "Remaining: ",
-    join( ', ', @active ),
-    );
+    "Remaining: ", join( ', ', @active ),
+  );
   return { map { $_ => 1 } @active };
 }
 
 # Approval Floor is Approval votes vs total
 # votes cast -- not total of approval votes.
 # so floor is the same as for topcount floor.
-sub ApprovalFloor( $self, $floorpct=5 ) {
+sub ApprovalFloor ( $self, $floorpct = 5, $rangecutoff = 0 ) {
   my $votescast = $self->VotesCast();
-  $self->logt(
-    "Applying Floor Rule of $floorpct\% " .
-    "Approval Count. vs Ballots Cast of $votescast.");
-  return $self->_DoFloor(
-    $self->Approval()->RawCount(),
-    $self->_FloorMin($floorpct )
-  );
+  $self->logt( "Applying Floor Rule of $floorpct\% "
+      . "Approval Count. vs Ballots Cast of $votescast." );
+  return $self->_DoFloor( $self->Approval( undef, $rangecutoff )->RawCount(),
+    $self->_FloorMin($floorpct) );
 }
 
-sub TopCountFloor( $self, $floorpct=2 ) {
-  $self->logt( "Applying Floor Rule of $floorpct\% First Choice Votes.");
-  return $self->_DoFloor(
-    $self->TopCount()->RawCount(),
-    $self->_FloorMin($floorpct )
-  );
+sub TopCountFloor ( $self, $floorpct = 2 ) {
+  $self->logt("Applying Floor Rule of $floorpct\% First Choice Votes.");
+  return $self->_DoFloor( $self->TopCount()->RawCount(),
+    $self->_FloorMin($floorpct) );
 }
 
 sub TCA( $self ) {
-  $self->logt( 'Applying Floor Rule: Approval Must be at least ',
-    '50% of the Most First Choice votes for any Choice.');
+  $self->logt(
+    'Applying Floor Rule: Approval Must be at least ',
+    '50% of the Most First Choice votes for any Choice.'
+  );
   my $tc = $self->TopCount();
   # arraytop returns a list in case of tie.
   my $winner = shift( $tc->ArrayTop->@* );
-  my $tcraw = $tc->RawCount()->{$winner};
-  my $cutoff = int( $tcraw /2 );
-  $self->logv(
-    "The most first choice votes for any choice is $tcraw.",
-    "Cutoff will be $cutoff");
+  my $tcraw  = $tc->RawCount()->{$winner};
+  my $cutoff = int( $tcraw / 2 );
+  $self->logv( "The most first choice votes for any choice is $tcraw.",
+    "Cutoff will be $cutoff" );
   my $ac = $self->Approval()->RawCount();
-  return $self->_DoFloor(
-    $self->Approval()->RawCount(),
-    $cutoff );
+  return $self->_DoFloor( $self->Approval()->RawCount(), $cutoff );
 }
 
 =head1 Floor Rules
@@ -117,6 +105,11 @@ Requires a percent of votes cast in Approval or TopCount. The default is 5% for 
 
 Both of these methods take an optional parameter which is the percentage for the floor. If the parameter is 1 or greater the parameter will be interpreted as a percentage, if it is less than 1 it will be interpreted as a decimal fraction, .1 and 10 will both result in a 10% floor.
 
+For Range Ballots using ApprovalFloor there is an additional optional value for cutoff that sets the score below which choices are not considered approved of.
+
+  # Applies 5% floor with cutoff 5 (appropriate for Range 0-10)
+  my $active = $Range->ApprovalFloor( 5, 5 );
+
 =head2 TCA (TopCount-Approval)
 
 Aggressive but (effectively) safe for Condorcet Methods. It requires the Approval for a choice be at least half of the leading Top Count Vote.
@@ -132,7 +125,6 @@ There is a small possibility for a situation with a deeply nested Knotted result
 For IRV any choice with an Approval that is not greater than the current TopCount of any other choice will always be eliminated prior to that choice. Unfortunately, with IRV any change to dropping order can alter the result. If it is used in IRV the Election Rules must specify it. Also because it is a high Approval based Floor, it can be construed as adding a small risk of Later Harm violation. If the reason for choosing IRV was Later Harm, then the only safe floor is a TopCount floor.
 
 =cut
-
 
 1;
 

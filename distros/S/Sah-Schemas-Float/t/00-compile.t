@@ -9,8 +9,8 @@ use Test::More;
 plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/float/str_as_percent.pm',
-    'Data/Sah/Coerce/perl/float/str_share.pm',
+    'Data/Sah/Coerce/perl/To_float/From_str/as_percent.pm',
+    'Data/Sah/Coerce/perl/To_float/From_str/share.pm',
     'Sah/Schema/negfloat.pm',
     'Sah/Schema/percent.pm',
     'Sah/Schema/posfloat.pm',

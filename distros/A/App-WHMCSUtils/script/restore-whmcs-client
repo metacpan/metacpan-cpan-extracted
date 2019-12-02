@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/WHMCSUtils/restore_whmcs_client
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-09-19'; # DATE
+our $DATE = '2019-11-29'; # DATE
 our $DIST = 'App-WHMCSUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ restore-whmcs-client - Restore a missing client from SQL database backup
 
 =head1 VERSION
 
-This document describes version 0.009 of restore-whmcs-client (from Perl distribution App-WHMCSUtils), released on 2019-09-19.
+This document describes version 0.011 of restore-whmcs-client (from Perl distribution App-WHMCSUtils), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -177,6 +177,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--dry-run>
 
 Run in simulation mode (also via DRY_RUN=1).
+
+Default value:
+
+ ""
 
 =item B<--help>, B<-h>, B<-?>
 

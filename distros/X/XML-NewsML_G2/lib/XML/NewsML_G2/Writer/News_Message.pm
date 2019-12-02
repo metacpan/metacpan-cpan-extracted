@@ -2,6 +2,7 @@ package XML::NewsML_G2::Writer::News_Message;
 
 use XML::NewsML_G2::Writer::News_Item;
 use XML::NewsML_G2::Writer::Package_Item;
+use XML::NewsML_G2::Writer::Event_Item;
 
 use Moose;
 use List::MoreUtils qw(uniq);
@@ -59,6 +60,13 @@ sub _create_itemSet {
         elsif ( $item->isa('XML::NewsML_G2::Package_Item') ) {
             $writer = XML::NewsML_G2::Writer::Package_Item->new(
                 package_item   => $item,
+                scheme_manager => $self->scheme_manager,
+                g2_version     => $self->g2_version
+            );
+        }
+        elsif ( $item->isa('XML::NewsML_G2::Event_Item') ) {
+            $writer = XML::NewsML_G2::Writer::Event_Item->new(
+                event_item     => $item,
                 scheme_manager => $self->scheme_manager,
                 g2_version     => $self->g2_version
             );

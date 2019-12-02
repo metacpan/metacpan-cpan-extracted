@@ -15,3 +15,10 @@
 > di vendicar la morte di Troiano
 > sopra re Carlo imperator romano.
 
+<verse>
+Test
+[Virgilio]
+</verse>
+
+> Test
+> [Virgilio]

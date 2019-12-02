@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::WarpedNode 2.136;
+package Config::Model::WarpedNode 2.137;
 
 use Mouse;
 
@@ -144,7 +144,7 @@ sub set_properties {
     my %args = ( %{ $self->backup }, @_ );
 
     # mega cleanup
-    map( delete $self->{$_}, @allowed_warp_params );
+    for (@allowed_warp_params) { delete $self->{$_} }
 
     $logger->trace( $self->name . " set_properties called with ",
         Data::Dumper->Dump( [ \%args ], ['set_properties_args'] ) );
@@ -316,7 +316,7 @@ Config::Model::WarpedNode - Node that change config class properties
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 

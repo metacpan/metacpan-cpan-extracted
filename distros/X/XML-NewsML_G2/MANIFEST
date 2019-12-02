@@ -5,12 +5,15 @@ lib/XML/NewsML_G2/AnyItem.pm
 lib/XML/NewsML_G2/Audio.pm
 lib/XML/NewsML_G2/Binary.pm
 lib/XML/NewsML_G2/Concept.pm
+lib/XML/NewsML_G2/Concept_Item.pm
 lib/XML/NewsML_G2/Copyright_Holder.pm
 lib/XML/NewsML_G2/Creator.pm
 lib/XML/NewsML_G2/Desk.pm
 lib/XML/NewsML_G2/Destination.pm
 lib/XML/NewsML_G2/ElectionDistrict.pm
 lib/XML/NewsML_G2/ElectionProvince.pm
+lib/XML/NewsML_G2/Event_Item.pm
+lib/XML/NewsML_G2/Event_Ref.pm
 lib/XML/NewsML_G2/Facet.pm
 lib/XML/NewsML_G2/Genre.pm
 lib/XML/NewsML_G2/Graphics.pm
@@ -40,6 +43,7 @@ lib/XML/NewsML_G2/Role/Remote.pm
 lib/XML/NewsML_G2/Role/RemoteAudible.pm
 lib/XML/NewsML_G2/Role/RemoteVisual.pm
 lib/XML/NewsML_G2/Role/Writer.pm
+lib/XML/NewsML_G2/Role/Writer/Event_Item.pm
 lib/XML/NewsML_G2/Role/Writer/News_Item_Audio.pm
 lib/XML/NewsML_G2/Role/Writer/News_Item_Graphics.pm
 lib/XML/NewsML_G2/Role/Writer/News_Item_Picture.pm
@@ -58,13 +62,18 @@ lib/XML/NewsML_G2/Service.pm
 lib/XML/NewsML_G2/SportFacet.pm
 lib/XML/NewsML_G2/SportFacetValue.pm
 lib/XML/NewsML_G2/StoryType.pm
+lib/XML/NewsML_G2/Substancial_Item.pm
 lib/XML/NewsML_G2/Topic.pm
+lib/XML/NewsML_G2/Translatable_Text.pm
 lib/XML/NewsML_G2/Types.pm
 lib/XML/NewsML_G2/Video.pm
 lib/XML/NewsML_G2/Writer.pm
+lib/XML/NewsML_G2/Writer/Concept_Item.pm
+lib/XML/NewsML_G2/Writer/Event_Item.pm
 lib/XML/NewsML_G2/Writer/News_Item.pm
 lib/XML/NewsML_G2/Writer/News_Message.pm
 lib/XML/NewsML_G2/Writer/Package_Item.pm
+lib/XML/NewsML_G2/Writer/Substancial_Item.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -89,6 +98,7 @@ t/10-News_Message.t
 t/11-press-release.t
 t/author-test-eol.t
 t/deprecations.t
+t/Events.t
 t/expected/all_schemes_in_catalogs.xml
 t/expected/minimal.xml
 t/expected/NewsItem_2.12.xml
@@ -138,6 +148,7 @@ t/expected/NewsMessagePackageItem_2.12.xml
 t/expected/NewsMessagePackageItem_2.15.xml
 t/expected/NewsMessagePackageItem_2.18.xml
 t/expected/NewsMessagePackageItem_2.28.xml
+t/expected/NewsMsg_withEvents_2.28.xml
 t/expected/no_catalog.xml
 t/expected/PackageItem.xml
 t/expected/PackageItemSlideshow.xml

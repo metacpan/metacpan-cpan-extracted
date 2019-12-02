@@ -1,5 +1,5 @@
 package Bio::Tradis::TradisPlot;
-$Bio::Tradis::TradisPlot::VERSION = '1.4.1';
+$Bio::Tradis::TradisPlot::VERSION = '1.4.3';
 # ABSTRACT: Generate plots as part of a tradis analysis
 
 
@@ -40,7 +40,7 @@ Bio::Tradis::TradisPlot - Generate plots as part of a tradis analysis
 
 =head1 VERSION
 
-version 1.4.1
+version 1.4.3
 
 =head1 SYNOPSIS
 

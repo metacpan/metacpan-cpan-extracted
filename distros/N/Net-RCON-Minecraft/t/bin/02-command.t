@@ -9,7 +9,8 @@ use Test::Output;
 require 'rcon-minecraft';
 
 # Mock standard input for the <STDIN> version of the input
-package MockSTDIN {
+{
+    package MockSTDIN;
     use parent qw< Tie::Handle >;
 
     sub TIEHANDLE { bless $_[1], $_[0] }

@@ -1,7 +1,9 @@
 package App::CrossPericmd;
 
-our $DATE = '2016-09-26'; # DATE
-our $VERSION = '0.002'; # VERSION
+# AUTHOR
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-CrossPericmd'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,10 +16,10 @@ $SPEC{cross} = {
     summary => 'Output the cross product of two or more sets',
     description => <<'_',
 
-This is more or less the same as the `cross` CLI on CPAN (from
-`Set::CrossProduct`) except that this CLI is written using the
-`Perinci::CmdLine` framework. It returns table data which might be more easily
-consumed by other tools.
+This is more or less the same as the <prog:cross> CLI on CPAN (from
+<pm:Set::CrossProduct>) except that this CLI is written using the
+<pm:Perinci::CmdLine> framework. It returns table data which might be more
+easily consumed by other tools.
 
 _
     args => {
@@ -28,7 +30,7 @@ _
                 min_len => 2,
                 of => ['array*', {
                     of => 'str*',
-                    'x.perl.coerce_rules' => ['str_comma_sep']
+                    'x.perl.coerce_rules' => ['From_str::comma_sep']
                 }],
             }],
             req => 1,
@@ -84,12 +86,16 @@ App::CrossPericmd - Output the cross product of two or more sets
 
 =head1 VERSION
 
-This document describes version 0.002 of App::CrossPericmd (from Perl distribution App-CrossPericmd), released on 2016-09-26.
+This document describes version 0.003 of App::CrossPericmd (from Perl distribution App-CrossPericmd), released on 2019-11-29.
 
 =head1 FUNCTIONS
 
 
-=head2 cross(%args) -> [status, msg, result, meta]
+=head2 cross
+
+Usage:
+
+ cross(%args) -> [status, msg, payload, meta]
 
 Output the cross product of two or more sets.
 
@@ -99,18 +105,14 @@ Examples:
 
 =item * Example #1:
 
- cross( aoaos => ["1,2,3", "4,5"]);
-
-Result:
-
- [200, "OK", [[1, 4], [1, 5], [2, 4], [2, 5], [3, 4], [3, 5]], {}]
+ cross( aoaos => ["1,2,3", "4,5"]); # -> [[1, 4], [1, 5], [2, 4], [2, 5], [3, 4], [3, 5]]
 
 =back
 
-This is more or less the same as the C<cross> CLI on CPAN (from
-C<Set::CrossProduct>) except that this CLI is written using the
-C<Perinci::CmdLine> framework. It returns table data which might be more easily
-consumed by other tools.
+This is more or less the same as the L<cross> CLI on CPAN (from
+L<Set::CrossProduct>) except that this CLI is written using the
+L<Perinci::CmdLine> framework. It returns table data which might be more
+easily consumed by other tools.
 
 This function is not exported.
 
@@ -127,7 +129,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -162,7 +164,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

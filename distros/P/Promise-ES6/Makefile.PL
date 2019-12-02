@@ -27,7 +27,7 @@ WriteMakefile1(
         'autodie' => 0,
         'FindBin'         => 0,
         'Test::Fatal' => 0,
-        'Test::More'      => 0,
+        'Test::More'      => 1.302103,  # skip() without test count
         'Test::Class' => 0,
         'Test::Deep' => 0,
         'Test::FailWarnings' => 0,

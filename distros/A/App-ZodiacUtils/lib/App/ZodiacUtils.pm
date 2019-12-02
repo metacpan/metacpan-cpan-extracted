@@ -1,7 +1,9 @@
 package App::ZodiacUtils;
 
-our $DATE = '2016-06-02'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-ZodiacUtils'; # DIST
+our $VERSION = '0.110'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,7 +14,7 @@ our %SPEC;
 my $sch_array_of_dates = ['array*', {
     of=>['date*', {
         'x.perl.coerce_to' => 'DateTime',
-        'x.perl.coerce_rules'=>['str_alami_en'],
+        'x.perl.coerce_rules'=>['From_str::alami_en'],
     }],
     min_len=>1,
 }];
@@ -139,7 +141,7 @@ App::ZodiacUtils - CLI utilities related to zodiac
 
 =head1 VERSION
 
-This document describes version 0.10 of App::ZodiacUtils (from Perl distribution App-ZodiacUtils), released on 2016-06-02.
+This document describes version 0.110 of App::ZodiacUtils (from Perl distribution App-ZodiacUtils), released on 2019-11-29.
 
 =head1 DESCRIPTION
 
@@ -156,7 +158,11 @@ This distribution includes the following CLI utilities:
 =head1 FUNCTIONS
 
 
-=head2 chinese_zodiac_of(%args) -> any
+=head2 chinese_zodiac_of
+
+Usage:
+
+ chinese_zodiac_of(%args) -> any
 
 Show Chinese zodiac for a date.
 
@@ -196,7 +202,12 @@ Dates.
 Return value:  (any)
 
 
-=head2 zodiac_of(%args) -> any
+
+=head2 zodiac_of
+
+Usage:
+
+ zodiac_of(%args) -> any
 
 Show zodiac for a date.
 
@@ -259,7 +270,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

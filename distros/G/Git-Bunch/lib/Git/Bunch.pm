@@ -1,7 +1,7 @@
 package Git::Bunch;
 
-our $DATE = '2018-10-30'; # DATE
-our $VERSION = '0.624'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.625'; # VERSION
 
 use 5.010001;
 use strict;
@@ -163,7 +163,7 @@ interested in recent repos (which is most of the time unless you are doing a
 full check/sync).
 
 _
-        schema => ['date*', 'x.perl.coerce_rules' => ['!float_epoch', 'float_epoch_always', 'str_alami_en']],
+        schema => ['date*', 'x.perl.coerce_rules' => ['!From_float::epoch', 'From_float::epoch_always', 'From_str::alami_en']],
         tags => ['filter'],
     },
 );
@@ -1164,7 +1164,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.624 of Git::Bunch (from Perl distribution Git-Bunch), released on 2018-10-30.
+This document describes version 0.625 of Git::Bunch (from Perl distribution Git-Bunch), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -1297,6 +1297,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 exec_bunch
 
 Usage:
@@ -1391,6 +1392,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 list_bunch_contents
 
 Usage:
@@ -1473,6 +1475,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 sync_bunch
@@ -1679,7 +1682,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,35 +4,37 @@
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.2, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Object-Remote",
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "xt"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {}
+      },
       "runtime" : {
          "requires" : {
             "Class::C3" : "0",
+            "Devel::GlobalDestruction" : "0",
             "Future" : "0.29",
             "JSON::PP" : "0",
             "Log::Contextual" : "0.005",
@@ -40,12 +42,31 @@
             "Module::Runtime" : "0",
             "Moo" : "1.006",
             "String::ShellQuote" : "0",
-            "perl" : "5.006",
             "strictures" : "2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.004000",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Object-Remote@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Remote"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/scpubgit/Object-Remote.git",
+         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=scpubgit/Object-Remote.git"
+      }
+   },
+   "version" : "0.004001",
+   "x_authority" : "cpan:MSTROUT",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

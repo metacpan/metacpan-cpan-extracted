@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.165';
+our $VERSION = '1.166';
 
 use Storable ();
 use Quiq::Path;
@@ -16,7 +16,7 @@ use Quiq::Path;
 
 =head1 NAME
 
-Quiq::Storable - Persistenz für Perl-Datenstrukturen
+Quiq::Storable - Perl-Datenstrukturen persistent speichern
 
 =head1 BASE CLASS
 
@@ -171,7 +171,7 @@ sub memoize {
 
 =head1 VERSION
 
-1.165
+1.166
 
 =head1 AUTHOR
 

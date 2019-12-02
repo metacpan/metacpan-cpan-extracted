@@ -9,7 +9,7 @@ use Term::ANSIColor;
 use Carp;
 no warnings 'uninitialized';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use overload q("") => sub { shift->plain },
               '++' => sub { $_[0] = $_[0]->plain + 1 },

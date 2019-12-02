@@ -6,3 +6,5 @@
 ^Makefile$
 ^\.git/
 ^.gitignore$
+\.old$
+/\..*\.swp$

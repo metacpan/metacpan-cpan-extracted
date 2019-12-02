@@ -2,10 +2,9 @@ package Pod::Weaver::PluginBundle::DROLSKY;
 
 use strict;
 use warnings;
-
-our $VERSION = '1.02';
-
 use namespace::autoclean -also => ['_exp'];
+
+our $VERSION = '1.05';
 
 use Dist::Zilla::Plugin::PodWeaver;
 use List::Util qw( first );
@@ -27,10 +26,6 @@ use Pod::Weaver::Section::Legal;
 use Pod::Weaver::Section::Name;
 use Pod::Weaver::Section::Region;
 use Pod::Weaver::Section::Version;
-
-sub _exp {
-    return Pod::Weaver::Config::Assembler->expand_package( $_[0] );
-}
 
 sub configure {
     my $self = shift;
@@ -81,10 +76,10 @@ sub configure {
             },
         ],
 
-        # We don't enable GitHub::Meta under Travis so we don't have
+        # We don't enable GitHub::Meta under CI so we don't have
         # repository metadata. That means we end up generating an empty L<>
         # tag and our pod syntax test fails.
-        ( $ENV{TRAVIS} ? () : [ $self->_source_section ] ),
+        ( $self->_running_in_ci ? () : [ $self->_source_section ] ),
     );
 
     my $config = $self->_plugin_matching( $zilla, 'DROLSKY::WeaverConfig' );
@@ -237,6 +232,7 @@ sub mvp_bundle_config {
 
     sub _prefix {
         my $self = shift;
+
         return $prefix if defined $prefix;
         ( $prefix = ( ref($self) || $self ) )
             =~ s/^Pod::Weaver::PluginBundle:://;
@@ -245,23 +241,24 @@ sub mvp_bundle_config {
 }
 
 sub _expand_config {
-    my ( $self, $this_spec ) = @_;
+    my $self      = shift;
+    my $this_spec = shift;
 
-    die 'undefined config' if not $this_spec;
+    die 'undefined config' unless $this_spec;
     die 'unrecognized config format: ' . ref($this_spec)
         if ref($this_spec)
-        and ref($this_spec) ne 'ARRAY';
+        && ref($this_spec) ne 'ARRAY';
 
     my ( $name, $class, $payload );
 
-    if ( not ref $this_spec ) {
+    if ( !ref $this_spec ) {
         ( $name, $class, $payload ) = ( $this_spec, _exp($this_spec), {} );
     }
-    elsif ( @$this_spec == 1 ) {
+    elsif ( @{$this_spec} == 1 ) {
         ( $name, $class, $payload )
             = ( $this_spec->[0], _exp( $this_spec->[0] ), {} );
     }
-    elsif ( @$this_spec == 2 ) {
+    elsif ( @{$this_spec} == 2 ) {
         $name = ref $this_spec->[1] ? $this_spec->[0] : $this_spec->[1];
         $class
             = _exp( ref $this_spec->[1] ? $this_spec->[0] : $this_spec->[0] );
@@ -283,13 +280,23 @@ sub _expand_config {
 
     use_module( $class, $payload->{':version'} ) if $payload->{':version'};
 
-    # prepend '@DROLSKY/' to each class name,
-    # except for Generic and Collect which are left alone.
+    # Prepend '@DROLSKY/' to each class name, except for Generic and Collect
+    # which are left alone.
     $name = '@' . $self->_prefix . '/' . $name
         if $class ne _exp('Generic')
         and $class ne _exp('Collect');
 
     return [ $name => $class => $payload ];
+}
+
+sub _exp {
+    return Pod::Weaver::Config::Assembler->expand_package( $_[0] );
+}
+
+sub _running_in_ci {
+
+    # AGENT_ID is Azure Pipelines.
+    return $ENV{TRAVIS} || $ENV{AGENT_ID} ? 1 : 0;
 }
 
 1;
@@ -308,7 +315,7 @@ Pod::Weaver::PluginBundle::DROLSKY - A plugin bundle for pod woven by DROLSKY
 
 =head1 VERSION
 
-version 1.02
+version 1.05
 
 =head1 SYNOPSIS
 

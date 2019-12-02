@@ -2,19 +2,27 @@ NAME
     App::XTermUtils - Utilities related to XTerm
 
 VERSION
-    This document describes version 0.005 of App::XTermUtils (from Perl
-    distribution App-XTermUtils), released on 2019-08-20.
+    This document describes version 0.006 of App::XTermUtils (from Perl
+    distribution App-XTermUtils), released on 2019-11-27.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:
 
     *   get-term-bgcolor
 
+    *   get-term-fgcolor
+
     *   set-term-bgcolor
+
+    *   set-term-fgcolor
 
     *   term-bgcolor-is-dark
 
     *   term-bgcolor-is-light
+
+    *   term-fgcolor-is-dark
+
+    *   term-fgcolor-is-light
 
 HOMEPAGE
     Please visit the project's homepage at

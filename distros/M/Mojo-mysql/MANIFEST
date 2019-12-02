@@ -21,8 +21,6 @@ lib/Mojo/mysql/PubSub.pm
 lib/Mojo/mysql/Results.pm
 lib/Mojo/mysql/Transaction.pm
 lib/SQL/Abstract/mysql.pm
-local/async_query_in_flight.pl
-local/TODO
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

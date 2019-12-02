@@ -688,13 +688,13 @@ CREDITS
     <http://www.perlfoundation.org/april_1_2007_new_grant_awards>
 
     Thanks also to this incomplete laundry list of folks who have
-    contributed to Perl::Critic in some way: Gregory Oschwald, Mike O'Regan,
-    Tom Hukins, Omer Gazit, Evan Zacks, Paul Howarth, Sawyer X, Christian
-    Walde, Dave Rolsky, Jakub Wilk, Roy Ivy III, Oliver Trosien, Glenn
-    Fowler, Matt Creenan, Alex Balhatchet, Sebastian Paaske Tørholm, Stuart
-    A Johnston, Dan Book, Steven Humphrey, James Raspass, Nick Tonkin,
-    Harrison Katz, Douglas Sims, Mark Fowler, Alan Berndt, Neil Bowers,
-    Sergey Romanov, Gabor Szabo, Graham Knop, Mike Eldridge, David
+    contributed to Perl::Critic in some way: Daniel Mita, Gregory Oschwald,
+    Mike O'Regan, Tom Hukins, Omer Gazit, Evan Zacks, Paul Howarth, Sawyer
+    X, Christian Walde, Dave Rolsky, Jakub Wilk, Roy Ivy III, Oliver
+    Trosien, Glenn Fowler, Matt Creenan, Alex Balhatchet, Sebastian Paaske
+    Tørholm, Stuart A Johnston, Dan Book, Steven Humphrey, James Raspass,
+    Nick Tonkin, Harrison Katz, Douglas Sims, Mark Fowler, Alan Berndt, Neil
+    Bowers, Sergey Romanov, Gabor Szabo, Graham Knop, Mike Eldridge, David
     Steinbrunner, Kirk Kimmel, Guillaume Aubert, Dave Cross, Anirvan
     Chatterjee, Todd Rinaldo, Graham Ollis, Karen Etheridge, Jonas Brømsø,
     Olaf Alders, Jim Keenan, Slaven Rezić, Szymon Nieznański.
@@ -703,7 +703,7 @@ AUTHOR
     Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
 
 COPYRIGHT
-    Copyright (c) 2005-2018 Imaginative Software Systems. All rights
+    Copyright (c) 2005-2019 Imaginative Software Systems. All rights
     reserved.
 
     This program is free software; you can redistribute it and/or modify it

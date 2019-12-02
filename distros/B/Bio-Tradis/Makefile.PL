@@ -38,6 +38,7 @@ my %WriteMakefileArgs = (
     "File::Path" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
+    "FindBin" => 0,
     "Getopt::Long" => 0,
     "Moose" => 0,
     "Text::CSV" => 0,
@@ -54,7 +55,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "1.4.1",
+  "VERSION" => "1.4.3",
   "test" => {
     "TESTS" => "t/*.t t/Bio/Tradis/*.t t/Bio/Tradis/Analysis/*.t t/Bio/Tradis/CommandLine/*.t t/Bio/Tradis/Parser/*.t"
   }
@@ -73,6 +74,7 @@ my %FallbackPrereqs = (
   "File::Path" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
+  "FindBin" => 0,
   "Getopt::Long" => 0,
   "Moose" => 0,
   "Test::Exception" => 0,

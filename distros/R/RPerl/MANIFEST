@@ -1094,6 +1094,7 @@ lib/RPerl/Test/Operator01NamedExp/program_00_bad_02.pl
 lib/RPerl/Test/Operator01NamedExp/program_00_bad_03.pl
 lib/RPerl/Test/Operator01NamedExp/program_00_good.cpp.CPPOPS_CPPTYPES
 lib/RPerl/Test/Operator01NamedExp/program_00_good.pl
+lib/RPerl/Test/Operator01NamedKeys/program_20_good.cpp.CPPOPS_CPPTYPES
 lib/RPerl/Test/Operator01NamedKeys/program_20_good.pl
 lib/RPerl/Test/Operator01NamedPushPop/program_00_good.pl
 lib/RPerl/Test/Operator01NamedPushPop/program_01_good.pl
@@ -1277,6 +1278,10 @@ lib/RPerl/Test/Operator09BitwiseShift/program_00_good.pl
 lib/RPerl/Test/Operator10NamedUnaryChdir/program_00_bad_00.pl
 lib/RPerl/Test/Operator10NamedUnaryChdir/program_00_good.pl
 lib/RPerl/Test/Operator10NamedUnaryChdir/program_01_good.pl
+lib/RPerl/Test/Operator10NamedUnaryExists/program_10_good.cpp.CPPOPS_CPPTYPES
+lib/RPerl/Test/Operator10NamedUnaryExists/program_10_good.pl
+lib/RPerl/Test/Operator10NamedUnaryExists/program_20_good.cpp.CPPOPS_CPPTYPES
+lib/RPerl/Test/Operator10NamedUnaryExists/program_20_good.pl
 lib/RPerl/Test/Operator10NamedUnaryLength/program_00_good.cpp.CPPOPS_CPPTYPES
 lib/RPerl/Test/Operator10NamedUnaryLength/program_00_good.pl
 lib/RPerl/Test/Operator10NamedUnaryLength/program_01_good.cpp.CPPOPS_CPPTYPES

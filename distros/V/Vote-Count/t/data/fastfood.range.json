@@ -1,0 +1,71 @@
+{
+   "choices" : [
+      "FIVEGUYS",
+      "MCDONALDS",
+      "WIMPY",
+      "WENDYS",
+      "QUICK",
+      "BURGERKING",
+      "INNOUT",
+      "CARLS",
+      "KFC",
+      "TACOBELL",
+      "CHICKFILA",
+      "POPEYES"
+   ],
+   "ballots" : [
+      {
+         "votes" : {
+            "POPEYES" : 1,
+            "TACOBELL" : 1,
+            "MCDONALDS" : 3,
+            "QUICK" : 2,
+            "WENDYS" : 3,
+            "KFC" : 1,
+            "CHICKFILA" : 1,
+            "BURGERKING" : 2
+         },
+         "count" : 3
+      },
+      {
+         "count" : 1,
+         "votes" : {
+            "POPEYES" : 1,
+            "KFC" : 2,
+            "TACOBELL" : 3,
+            "CHICKFILA" : 1
+         }
+      },
+      {
+         "count" : 2,
+         "votes" : {
+            "CHICKFILA" : 3,
+            "INNOUT" : 2
+         }
+      },
+      {
+         "votes" : {
+            "BURGERKING" : 1,
+            "MCDONALDS" : 1,
+            "INNOUT" : 3
+         },
+         "count" : 2
+      },
+      {
+         "count" : 1,
+         "votes" : {
+            "CARLS" : 2
+         }
+      },
+      {
+         "votes" : {
+            "INNOUT" : 3,
+            "CARLS" : 1,
+            "FIVEGUYS" : 2,
+            "BURGERKING" : 1
+         },
+         "count" : 6
+      }
+   ],
+   "depth" : 3
+}

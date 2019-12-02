@@ -1,5 +1,31 @@
 Revision history for Perl application 'greple'.
 
+8.3801 2019-11-28T10:25:51Z
+
+    - Make --no-regioncolor to cancel default automatic action.
+
+8.38 2019-11-21T07:11:46Z
+
+    - Remove -Msubst module.
+
+8.37 2019-11-21T06:59:34Z
+
+    - Make --print function not to receive region information.
+    - Implement --callback option.
+    - Describe --ci=N can reset the behavior.
+
+8.36 2019-11-15T03:33:37Z
+
+    - Implement call-back function returned by --le &funciton.
+
+8.35 2019-11-04T11:12:56Z
+
+    - Implement --select option works with -f option.
+
+8.3402 2019-11-02T00:05:53Z
+
+    - Make --icode=binary option to work.
+
 8.3401 2019-09-18T11:51:09Z
 
     - Put t/09_filter.t test in TODO block.

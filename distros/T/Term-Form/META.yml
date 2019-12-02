@@ -24,13 +24,13 @@ requires:
   Carp: '0'
   Exporter: '0'
   List::Util: '1.33'
-  Term::Choose: '1.700'
-  Term::Choose::Util: '0.076'
+  Term::Choose: '1.707'
+  Term::Choose::Util: '0.108'
   parent: '0'
   perl: '5.008003'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Form.git
-version: '0.522'
+version: '0.524'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

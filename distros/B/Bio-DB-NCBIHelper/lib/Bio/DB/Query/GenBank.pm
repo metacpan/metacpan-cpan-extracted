@@ -1,7 +1,7 @@
 #
 # BioPerl module for Bio::DB::Query::GenBank.pm
 #
-# Please direct questions and support issues to <bioperl-l@bioperl.org> 
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
 #
 # Cared for by Lincoln Stein <lstein@cshl.org>
 #
@@ -62,15 +62,15 @@ is much appreciated.
   bioperl-l@bioperl.org                  - General discussion
   http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
 
-=head2 Support 
+=head2 Support
 
 Please direct usage questions or support issues to the mailing list:
 
 I<bioperl-l@bioperl.org>
 
-rather than to the module maintainer directly. Many experienced and 
-reponsive experts will be able look at the problem and quickly 
-address it. Please include a thorough description of the problem 
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
 with code and data examples if at all possible.
 
 =head2 Reporting Bugs
@@ -96,7 +96,7 @@ preceded with a _
 # Let the code begin...
 
 package Bio::DB::Query::GenBank;
-$Bio::DB::Query::GenBank::VERSION = '1.7.4';
+$Bio::DB::Query::GenBank::VERSION = '1.7.5';
 use strict;
 use URI::Escape 'uri_unescape';
 use Bio::DB::NCBIHelper;
@@ -104,7 +104,7 @@ use Bio::DB::NCBIHelper;
 
 #use constant EPOST       => $Bio::DB::NCBIHelper::HOSTBASE . '/entrez/eutils/epost.fcgi';
 #use constant ESEARCH     => $Bio::DB::NCBIHelper::HOSTBASE . '/entrez/eutils/esearch.fcgi';
-# the reference to the our variable of the $Bio::DB::NCBIHelper::HOSTBASE doesn't seem to work in 
+# the reference to the our variable of the $Bio::DB::NCBIHelper::HOSTBASE doesn't seem to work in
 # the constant definition in perl 5.10.1 or 5.16.3
 use constant EPOST       => '/entrez/eutils/epost.fcgi';
 use constant ESEARCH     => '/entrez/eutils/esearch.fcgi';
@@ -112,11 +112,12 @@ use constant DEFAULT_DB  => 'protein';
 use constant MAXENTRY    => 100;
 
 use vars qw(@ATTRIBUTES);
+our $REQUEST_DELAY = 4;
 
 use base qw(Bio::DB::Query::WebQuery);
 
 BEGIN {
-  @ATTRIBUTES = qw(db reldate mindate maxdate datetype maxids);
+  @ATTRIBUTES = qw(db reldate mindate maxdate datetype maxids email);
   for my $method (@ATTRIBUTES) {
     eval <<END;
 sub $method {
@@ -144,6 +145,10 @@ END
            -ids      array ref of gids (overrides query)
            -maxids   the maximum number of IDs you wish to collect
                      (defaults to 100)
+           -email    Email address; required if you want to decrease
+                     delay time between queries
+           -delay    Delay time (in seconds).  Note NCBI policy requires 4
+                     seconds between requests unless an email is provided
 
 This method creates a new query object.  Typically you will specify a
 -db and a -query argument, possibly modified by -mindate, -maxdate, or
@@ -189,13 +194,15 @@ receive when you generate a SeqIO stream from the query.
 sub new {
   my $class = shift;
   my $self  = $class->SUPER::new(@_);
-  my ($query,$db,$reldate,$mindate,$maxdate,$datetype,$ids,$maxids)
-    = $self->_rearrange([qw(QUERY DB RELDATE MINDATE MAXDATE DATETYPE IDS MAXIDS)],@_);
+  my ($query,$db,$reldate,$mindate,$maxdate,$datetype,$ids,$maxids,$email,$delay)
+    = $self->_rearrange([qw(QUERY DB RELDATE MINDATE MAXDATE DATETYPE IDS
+        MAXIDS EMAIL DELAY)],@_);
   $self->db($db || DEFAULT_DB);
   $reldate  && $self->reldate($reldate);
   $mindate  && $self->mindate($mindate);
   $maxdate  && $self->maxdate($maxdate);
   $maxids   && $self->maxids($maxids);
+  $email    && $self->email($email);
   $datetype ||= 'mdat';
   $datetype && $self->datetype($datetype);
   $self;
@@ -222,6 +229,7 @@ sub cookie {
   }
 
   else {
+    $self->_sleep();
     $self->_run_query;
     @{$self}{qw(_cookie _querynum)};
   }
@@ -243,11 +251,14 @@ sub _request_parameters {
   my @params = map {eval("\$self->$_") ? ($_ => eval("\$self->$_")) : () } @ATTRIBUTES;
   push @params,('usehistory'=>'y','tool'=>'bioperl');
   $method = 'get';
-  
+
   $base   = $Bio::DB::NCBIHelper::HOSTBASE.ESEARCH; # this seems to need to be dynamic
   push @params,('term'   => $self->query);
   # Providing 'retmax' limits queries to 500 sequences  ?? I don't think so LS
   push @params,('retmax' => $self->maxids || MAXENTRY);
+  if ($self->email) {
+      push @params,('email' => $self->email);
+  }
 
   # And actually, it seems that we need 'retstart' equal to 0 ?? I don't think so LS
   # push @params, ('retstart' => 0);
@@ -276,6 +287,7 @@ sub count   {
     return $d;
   }
   else {
+    $self->_sleep();
     $self->_run_query;
     return $self->{'_count'};
   }
@@ -356,5 +368,48 @@ sub _generate_id_string {
       ($_ =~ m{^\d+$}) ? $_.'[UID]' : $_.'[PACC]'
     } @$ids));
 }
+
+=head2 delay_policy
+
+  Title   : delay_policy
+  Usage   : $secs = $self->delay_policy
+  Function: NCBI requests a delay of 4 seconds between requests unless email is
+            provided. This method implements a 4 second delay; use 'delay()' to
+            override, though understand if no email is provided we are not
+            responsible for users being IP-blocked by NCBI
+  Returns : number of seconds to delay
+  Args    : none
+
+=cut
+
+sub delay_policy {
+    my $self = shift;
+    return $REQUEST_DELAY;
+}
+
+# =head2 _sleep
+#
+#  Title   : _sleep
+#  Usage   : $self->_sleep
+#  Function: sleep for a number of seconds indicated by the delay policy
+#  Returns : none
+#  Args    : none
+#
+# NOTE: This method keeps track of the last time it was called and only
+# imposes a sleep if it was called more recently than the delay_policy()
+# allows.
+#
+# =cut
+#
+# sub _sleep {
+#    my $self = shift;
+#    my $last_invocation = $LAST_INVOCATION_TIME;
+#    if (time - $LAST_INVOCATION_TIME < $self->delay) {
+#       my $delay = $self->delay - (time - $LAST_INVOCATION_TIME);
+#       warn "sleeping for $delay seconds\n" if $self->verbose > 0;
+#       sleep $delay;
+#    }
+#    $LAST_INVOCATION_TIME = time;
+# }
 
 1;

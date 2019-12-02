@@ -1,7 +1,7 @@
 package Data::Sah::Util::TypeX;
 
-our $DATE = '2019-10-24'; # DATE
-our $VERSION = '0.902'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.903'; # VERSION
 
 use 5.010;
 use strict;
@@ -40,7 +40,7 @@ Data::Sah::Util::TypeX - Sah utility routines for type extensions
 
 =head1 VERSION
 
-This document describes version 0.902 of Data::Sah::Util::TypeX (from Perl distribution Data-Sah), released on 2019-10-24.
+This document describes version 0.903 of Data::Sah::Util::TypeX (from Perl distribution Data-Sah), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

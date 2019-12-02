@@ -73,15 +73,15 @@ int get_imlib_error(int imlib_error_code) {
     }
 
     error_t.code = imlib_error_code;
-    
+
     return imlib_error_code;
 }
 
 
 static int _create_thumbnail(Image *image_t) {
-    float aspect;
     int result = 0;
-    
+    float aspect_ration_orig, aspect_ratio_new;
+
     int width = 0, height = 0, crop_x = 0, crop_y = 0, new_width = 0, new_height = 0;
 
     Imlib_Load_Error err = IMLIB_LOAD_ERROR_NONE;
@@ -120,31 +120,31 @@ static int _create_thumbnail(Image *image_t) {
 
     width  = imlib_image_get_width();
     height = imlib_image_get_height();
-    aspect = (float)width / (float)height;
+    aspect_ration_orig = (float)width / (float)height;
+    aspect_ratio_new = (float)image_t->width / (float)image_t->height;
 
-    if ( aspect > 1 ) {
-        if ( image_t->width >= image_t->height ) {
-            new_height = image_t->height;
-            new_width = image_t->width * aspect;
-            crop_x = (new_width - image_t->width) / 2;
-        } else {
-            new_width = image_t->width;
-            new_height = image_t->height * aspect;
-            crop_y = (new_height - image_t->height) / 2;
-        }
+    if ( aspect_ratio_new > 1 ) {
+        scaled_img = imlib_create_cropped_scaled_image(
+            0, 0, width, height, (int)(image_t->height * aspect_ration_orig), image_t->height);
+    } else {
+        scaled_img = imlib_create_cropped_scaled_image(
+            0, 0, width, height, (int)(image_t->height * aspect_ration_orig), image_t->height);
     }
 
-    scaled_img = imlib_create_cropped_scaled_image(0, 0, width, height, new_width,	new_height);
+    scaled_img = imlib_create_cropped_scaled_image(
+        0, 0, width, height, 640, 360);
 
     if (!scaled_img) {
         error_t.msg = "[Ithumb::XS] error: image can't be a scaled";
         error_t.code = 105;
         return error_t.code;
     }
-    
+
     imlib_context_set_image(scaled_img);
 
-    croped_img = imlib_create_cropped_image(crop_x, crop_y, image_t->width, image_t->height);
+    croped_img = imlib_create_cropped_image(
+        0,
+        0, image_t->width, 200);
 
     if (!croped_img) {
         error_t.msg = "[Ithumb::XS] error: image can't be croped";
@@ -172,7 +172,7 @@ new(const char *class)
         SV *const self = newRV_noinc( (SV *)hash );
         /* bless into the proper package */
         RETVAL = sv_bless( self, gv_stashpv( class, 0 ) );
-    OUTPUT: RETVAL 
+    OUTPUT: RETVAL
 
 int
 convert(SV *self, SV *thumb_params)
@@ -206,7 +206,7 @@ convert(SV *self, SV *thumb_params)
         dst_path = SvPV(*svp, keylen);
 
         Image image_t = { (unsigned short)width, (unsigned short)height, src_path, dst_path };
-        
+
         if (_create_thumbnail(&image_t))
             Perl_croak(aTHX_ "%s", error_t.msg);
 
@@ -214,9 +214,8 @@ convert(SV *self, SV *thumb_params)
     OUTPUT:
         RETVAL
 
-
 int
-create_thumbnail(SV *thumb_params)
+convert_image(SV *thumb_params)
 	CODE:
         SV **svp;
         unsigned long keylen;
@@ -247,7 +246,7 @@ create_thumbnail(SV *thumb_params)
         dst_path = SvPV(*svp, keylen);
 
         Image image_t = { width, height, src_path, dst_path };
-        
+
         if (_create_thumbnail(&image_t))
             Perl_croak(aTHX_ "%s", error_t.msg);
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2019 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -27,11 +27,12 @@ Adding/changing links, currently:
 
 =head1 SEE ALSO
 
-This is a L<FunctionalPerl::Htmlgen::PXMLMapper>
+These are L<FunctionalPerl::Htmlgen::PXMLMapper>s
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -43,8 +44,7 @@ use Function::Parameters qw(:strict);
 use Sub::Call::Tail;
 
 
-{
-    package FunctionalPerl::Htmlgen::Linking::Anchors;
+package FunctionalPerl::Htmlgen::Linking::Anchors {
     # add anchors
 
     use PXML::XHTML ":all";
@@ -62,17 +62,15 @@ use Sub::Call::Tail;
 }
 
 
-{
-    package FunctionalPerl::Htmlgen::Linking::code;
-
+package FunctionalPerl::Htmlgen::Linking::code {
     use FP::List;
     use FP::Predicates;
     use FunctionalPerl::Htmlgen::PathUtil qw(path_diff);
     use PXML::XHTML ":all";
-
     use Chj::CPAN::ModulePODUrl 'perhaps_module_pod_url';
-    our $podurl_cache= ".ModulePODUrl-cache"; mkdir $podurl_cache;
     use FP::Memoizing 'memoizing_to_dir';
+    
+    our $podurl_cache= ".ModulePODUrl-cache"; mkdir $podurl_cache;
     *xmaybe_module_pod_url=
         memoizing_to_dir $podurl_cache, sub {
             print STDERR "perhaps_module_pod_url(@_)..";
@@ -163,12 +161,14 @@ use Sub::Call::Tail;
                     my ($url)=@_;
                     A {href=> $url}, $e
                 };
-                if (defined $maybe_path) {
+
+                my $maybe_cpan_url= ignore_module_name ($t) ? undef
+                    : maybe_module_pod_url ($t);
+
+                if (defined $maybe_cpan_url) {
+                    &$wrap_with_link ($maybe_cpan_url)
+                } elsif (defined $maybe_path) {
                     &$wrap_with_link (path_diff $self->path0, $maybe_path)
-                } elsif (ignore_module_name $t) {
-                    &$mapped_e()
-                } elsif (my $url= maybe_module_pod_url ($t)) {
-                    &$wrap_with_link ($url)
                 } else {
                     &$mapped_e()
                 }
@@ -180,9 +180,8 @@ use Sub::Call::Tail;
     _END_
 }
 
-{
-    package FunctionalPerl::Htmlgen::Linking::a_href;
 
+package FunctionalPerl::Htmlgen::Linking::a_href {
     use FunctionalPerl::Htmlgen::UriUtil qw(URI_is_internal);
     use Chj::xperlfunc qw(dirname);
     use FunctionalPerl::Htmlgen::PathUtil qw(path_add path_diff);
@@ -209,7 +208,9 @@ use Sub::Call::Tail;
 
                 my $selfpath0= $self->path0;
 
-                my ($path,$uri,$is_md)= do { # XX $uri can be unmodified there, right?
+                my ($path,$uri,$is_md)= do { # XX $uri can be
+                                             # unmodified there,
+                                             # right?
                     my $path= $uri->path;
 
                     # '//' feature (see 'Formatting' section in htmlgen/README.md)
@@ -265,7 +266,9 @@ use Sub::Call::Tail;
                     $e->attribute_set("href", "$uri")
                 };
                 my $cont_path= fun ($path) {
-                    $uri->path($self->pathtranslate->possibly_suffix_md_to_html ($path));
+                    $uri->path(
+                        $self->pathtranslate->possibly_suffix_md_to_html(
+                            $path));
                     &$cont_uri($uri);
                 };
 

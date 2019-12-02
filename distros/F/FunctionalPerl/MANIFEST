@@ -27,6 +27,7 @@ examples/diff_to_html
 examples/existing_files
 examples/fibs
 examples/find-maildirs
+examples/functional-classes
 examples/gen-csv
 examples/goto
 examples/hiring-without-whiteboards
@@ -59,6 +60,8 @@ htmlgen/FunctionalPerl/Htmlgen/Nav.pm
 htmlgen/FunctionalPerl/Htmlgen/PXMLMapper.pm
 htmlgen/FunctionalPerl/Htmlgen/PathTranslate.pm
 htmlgen/FunctionalPerl/Htmlgen/PathUtil.pm
+htmlgen/FunctionalPerl/Htmlgen/PerlTidy.pm
+htmlgen/FunctionalPerl/Htmlgen/Sourcelang.pm
 htmlgen/FunctionalPerl/Htmlgen/Toc.pm
 htmlgen/FunctionalPerl/Htmlgen/UriUtil.pm
 htmlgen/FunctionalPerl/Htmlgen/default_config.pm
@@ -116,6 +119,7 @@ lib/Chj/xpipe.pm
 lib/Chj/xtmpfile.pm
 lib/FP/Abstract/Equal.pm
 lib/FP/Abstract/Interface.pm
+lib/FP/Abstract/Map.pm
 lib/FP/Abstract/Pure.pm
 lib/FP/Abstract/Sequence.pm
 lib/FP/Abstract/Sequence/t.pm
@@ -123,10 +127,12 @@ lib/FP/Abstract/Show.pm
 lib/FP/Array.pm
 lib/FP/Array/Mixin.pm
 lib/FP/Array_sort.pm
+lib/FP/BigInt.pm
 lib/FP/Char.pm
 lib/FP/Combinators.pm
 lib/FP/DBI.pm
 lib/FP/Div.pm
+lib/FP/Docstring.pm
 lib/FP/DumperEqual.pm
 lib/FP/Equal.pm
 lib/FP/Equal/t.pm
@@ -135,10 +141,13 @@ lib/FP/Git/Repository.pm
 lib/FP/Hash.pm
 lib/FP/HashSet.pm
 lib/FP/IOStream.pm
+lib/FP/Interface.pm
 lib/FP/Interfaces.pm
 lib/FP/Lazy.pm
+lib/FP/Lazy/t.pm
 lib/FP/List.pm
 lib/FP/Memoizing.pm
+lib/FP/Mixin/Utils.pm
 lib/FP/MutableArray.pm
 lib/FP/Ops.pm
 lib/FP/Optional.pm
@@ -148,6 +157,7 @@ lib/FP/Path/t.pm
 lib/FP/Predicates.pm
 lib/FP/PureArray.pm
 lib/FP/PureArray/t.pm
+lib/FP/PureHash.pm
 lib/FP/Repl.pm
 lib/FP/Repl/AutoTrap.pm
 lib/FP/Repl/Dependencies.pm
@@ -200,6 +210,7 @@ meta/readin.pl
 meta/tail-expand
 meta/test.pl
 meta/update-manifest
+meta/update-pod
 t-extra/evil-env.t
 t-extra/out-of-order.t
 t-slow/csvstreams.t
@@ -207,6 +218,7 @@ t/csv_to_xml.expected
 t/csv_to_xml.t
 t/dbi.t
 t/examples-fibs.t
+t/examples-functional-classes.t
 t/examples-logic.t
 t/examples-primes.t
 t/examples-sendprepare
@@ -215,6 +227,7 @@ t/functional_XML-test.expected
 t/functional_XML-test.t
 t/htmlgen.t
 t/intro-basics.t
+t/maintainer/perhaps
 t/perl-goto-leak.t
 t/perl-weaken-coderef-correctness.t
 t/perl-weaken-coderef.t

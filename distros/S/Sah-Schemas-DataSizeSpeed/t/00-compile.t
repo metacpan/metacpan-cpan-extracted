@@ -9,7 +9,7 @@ use Test::More;
 plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/float/str_suffix_filesize.pm',
+    'Data/Sah/Coerce/perl/To_float/From_str/suffix_filesize.pm',
     'Data/Size/Suffix/Filesize.pm',
     'Sah/Schema/filesize.pm',
     'Sah/SchemaR/filesize.pm',

@@ -1,7 +1,7 @@
 #!perl -w
 
 use Test;
-plan tests => 77;
+plan tests => 79;
 
 use HTTP::Cookies;
 use HTTP::Request;
@@ -697,6 +697,38 @@ my @a = $c->get_cookies("example.com", "bar", "foo");
 ok(@a, 2);
 ok($a[0], undef);
 ok($a[1], 42);
+
+# Test ignore_discard argument of save()
+$c = HTTP::Cookies->new( ignore_discard => 0 );
+interact($c, 'http://example.com/', 'foo=bar; Discard;');
+$old = $c->as_string;
+$c->save( file => $file, ignore_discard => 1 );
+undef $c;
+
+$c = HTTP::Cookies->new( ignore_discard => 0 );
+$c->load($file);
+unlink($file) || warn "Can't unlink $file: $!";
+
+ok($c->as_string, $old);
+
+$c = HTTP::Cookies::Netscape->new( ignore_discard => 0 );
+$req = HTTP::Request->new(GET => "http://1.1.1.1/");
+$req->header("Host", "www.acme.com:80");
+$res = HTTP::Response->new(200, "OK");
+$res->request($req);
+$res->header("Set-Cookie" => "foo=bar; path=/; discard; expires=Wednesday, 09-Nov-$year_plus_one 23:12:40 GMT");
+$c->extract_cookies($res);
+$old = $c->as_string;
+$c->save( file => $file, ignore_discard => 1 );
+undef $c;
+
+$c = HTTP::Cookies::Netscape->new( ignore_discard => 0 );
+$c->load($file);
+$req = HTTP::Request->new(GET => "http://www.acme.com/foo/bar");
+$c->add_cookie_header($req);
+$h = $req->header("Cookie");
+ok($h =~ /foo=bar/);
+unlink($file) || warn "Can't unlink $file: $!";
 
 
 #-------------------------------------------------------------------

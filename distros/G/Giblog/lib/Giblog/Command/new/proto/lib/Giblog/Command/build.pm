@@ -4,6 +4,7 @@ use base 'Giblog::Command';
 
 use strict;
 use warnings;
+use utf8;
 
 sub run {
   my ($self, @args) = @_;
@@ -19,6 +20,9 @@ sub run {
   
   # Get files in templates directory
   my $files = $api->get_templates_files;
+  
+  # Add base path to public css files
+  $api->add_base_path_to_public_css_files;
   
   for my $file (@$files) {
     
@@ -47,6 +51,9 @@ sub run {
     
     # Build whole html
     $api->build_html($data);
+
+    # Add base path to content
+    $api->add_base_path_to_content($data);
     
     # Write to public file
     $api->write_to_public_file($data);

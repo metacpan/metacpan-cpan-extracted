@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.136;
+package Config::Model::AnyId 2.137;
 
 use 5.010;
 
@@ -72,7 +72,7 @@ has _check_content_actions => (
     default => sub { []; }
 );
 
-# needs_check defaults to 1 to trap bad data right after loading
+# needs_content_check defaults to 1 to trap bad data right after loading
 has needs_content_check => ( is => 'rw', isa => 'Bool', default => 1 );
 
 has has_fixes => (
@@ -190,27 +190,31 @@ sub set_properties {
     my $self = shift;
 
     # mega cleanup
-    map( delete $self->{$_}, @allowed_warp_params );
+    for ( @allowed_warp_params ) { delete $self->{$_}; }
 
     my %args = ( %{ $self->{backup} }, @_ );
 
     # these are handled by Node or Warper
-    map { delete $args{$_} } qw/level/;
+    for ( qw/level/ ) { delete $args{$_}; }
 
     $logger->trace( $self->name, " set_properties called with @_" );
 
-    map { $self->{$_} = delete $args{$_} if defined $args{$_} } @common_params;
+    for ( @common_params ) {
+        $self->{$_} = delete $args{$_} if defined $args{$_};
+    }
 
     $self->set_convert( \%args ) if defined $args{convert};
 
     $self-> clear_warpable_check_content;
-    map { $self-> add_warpable_check_content($_) } $self-> get_all_content_checks;
-    map {
+    for ( $self-> get_all_content_checks ) {
+        $self-> add_warpable_check_content($_);
+    }
+    for ( qw/duplicates/ ) {
         my $method = "check_$_";
         my $weak_self = $self;
         weaken($weak_self); # weaken reference loop ($self - check_content - closure - self)
         $self-> add_check_content( sub { $weak_self->$method(@_);} ) if  $self->{$_};
-    } qw/duplicates/;
+    }
 
     Config::Model::Exception::Model->throw(
         object => $self,
@@ -397,8 +401,10 @@ sub handle_args {
 
     my $warp_info = delete $args{warp};
 
-    map { $self->{$_} = delete $args{$_} if defined $args{$_} }
-        qw/index_class index_type morph ordered/;
+    for ( qw/index_class index_type morph ordered/) {
+        $self->{$_} = delete $args{$_} if defined $args{$_};
+    }
+
 
     $self->{backup} = dclone( \%args );
 
@@ -484,7 +490,9 @@ sub deep_check {
 
     $deep_check_logger->trace("called on ".$self->name);
 
-    map { $self->check_idx(@args, index => $_); } $self->fetch_all_indexes();
+    for ( $self->fetch_all_indexes() ) {
+        $self->check_idx(@args, index => $_);
+    }
 
     $self->check_content(@args, logger => $deep_check_logger);
 }
@@ -512,18 +520,20 @@ sub check_content {
         }
 
         my $nb = $self->fetch_size;
-        push @error, "Too many instances ($nb) limit $self->{max_nb}, "
+        push @error, "Too many items ($nb) limit $self->{max_nb}, "
             if defined $self->{max_nb} and $nb > $self->{max_nb};
 
-        map {
-            if ($::_use_log4perl_to_warn) {
-                $user_logger->warn( "Warning in '" . $self->location_short . "': $_" )
+        if (not $silent) {
+            for ( @warn ) {
+                if ($::_use_log4perl_to_warn) {
+                    $user_logger->warn( "Warning in '" . $self->location_short . "': $_" )
+                }
+                else {
+                    warn( "Warning in '" . $self->location_short . "': $_\n" )
+                }
             }
-            else {
-                warn( "Warning in '" . $self->location_short . "': $_\n" )
-            }
-        } @warn
-            unless $silent;
+        }
+
 
         $self->{content_warning_list} = \@warn;
         $self->{content_error_list}   = \@error;
@@ -533,8 +543,8 @@ sub check_content {
     }
     else {
         $local_logger->debug( $self->location, " has not changed, actual check skipped" )
-            if $logger->is_debug;
-        my $err = $self->{content_error_list};
+            if $local_logger->is_debug;
+        my $err = $self->{content_error_list} // [];
         return scalar @$err ? 0 : 1;
     }
 }
@@ -581,26 +591,26 @@ sub check_idx {
         push @error, "Index $idx < min_index limit $self->{min_index}";
     }
 
-    push @error, "Too many instances ($new_nb) limit $self->{max_nb}, " . "rejected id '$idx'"
+    push @error, "Too many items ($new_nb) limit $self->{max_nb}, " . "rejected id '$idx'"
         if defined $self->{max_nb} and $new_nb > $self->{max_nb};
 
     if ( scalar @error ) {
         my @a = $self->_fetch_all_indexes;
-        push @error, "Instance ids are '" . join( ',', @a ) . "'", $self->warp_error;
+        push @error, "Item ids are '" . join( ',', @a ) . "'", $self->warp_error;
     }
 
     $self->{idx_error_list} = \@error;
     $self->{warning_hash}{$idx} = \@warn;
 
     if (@warn and not $silent and $check ne 'no') {
-        map {
+        for (@warn) {
             if ($::_use_log4perl_to_warn) {
                 $user_logger->warn( "Warning in '" . $self->location_short . "': $_" );
             }
             else {
                 warn( "Warning in '" . $self->location_short . "': $_\n" )
             }
-        } @warn;
+        }
     }
 
     return scalar @error ? 0 : 1;
@@ -697,7 +707,7 @@ sub check_duplicates {
 
     if ($apply_fix) {
         $logger->debug("Fixing duplicates @issues, removing @to_delete");
-        map { $self->remove($_) } reverse @to_delete;
+        for (reverse @to_delete) { $self->remove($_) }
     }
     elsif ( $dup eq 'forbid' ) {
         $logger->debug("Found forbidden duplicates @issues");
@@ -710,7 +720,7 @@ sub check_duplicates {
     }
     elsif ( $dup eq 'suppress' ) {
         $logger->debug("suppressing duplicates @issues");
-        map { $self->remove($_) } reverse @to_delete;
+        for (reverse @to_delete) { $self->remove($_) }
     }
     else {
         die "Internal error: duplicates is $dup";
@@ -1003,7 +1013,9 @@ sub clear_values {
     ) if $ct ne 'leaf';
 
     # this will trigger a notify_change
-    map { $self->fetch_with_id($_)->store(undef) } $self->fetch_all_indexes;
+    for ( $self->fetch_all_indexes ) {
+        $self->fetch_with_id($_)->store(undef);
+    }
     $self->notify_change( note => "cleared all values" );
 }
 
@@ -1028,7 +1040,9 @@ sub has_warning {
 sub error_msg {
     my $self = shift;
     my @list;
-    map { push @list, @{ $self->{$_} } if $self->{$_}; } qw/idx_error_list content_error_list/;
+    for (qw/idx_error_list content_error_list/) {
+        push @list, @{ $self->{$_} } if $self->{$_};
+    }
 
     return unless @list;
     return wantarray ? @list : join( "\n\t", @list );
@@ -1052,7 +1066,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 
@@ -1359,10 +1373,10 @@ For instance, with this model:
   );
 
 Setting C<macro> to C<A> means that C<warped_hash> can only accept
-one instance of C<Dummy>.
+one C<Dummy> class item .
 
 Setting C<macro> to C<B> means that C<warped_hash> accepts two
-instances of C<Dummy>.
+C<Dummy> class items.
 
 Like other warped class, a HashId or ListId can have multiple warp
 masters (See L<Config::Model::Warper/"Warp follow argument">:

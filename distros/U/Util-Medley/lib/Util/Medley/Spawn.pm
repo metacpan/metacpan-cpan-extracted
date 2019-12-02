@@ -1,5 +1,5 @@
 package Util::Medley::Spawn;
-$Util::Medley::Spawn::VERSION = '0.013';
+$Util::Medley::Spawn::VERSION = '0.016';
 ###############################################################################
 
 use Modern::Perl;
@@ -18,7 +18,7 @@ Util::Medley::Spawn - utility methods for system commands
 
 =head1 VERSION
 
-version 0.013
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -55,10 +55,11 @@ write to log if enabled.
 
 =item usage:
 
- ($stdout, $stderr, $exit) = $util->capture($cmd, [$stdin])
+ ($stdout, $stderr, $exit) = $util->capture($cmd, [$stdin], [$wantArrayRef])
  
  ($stdout, $stderr, $exit) = $util->capture(cmd   => $cmd, 
-                                           [stdin => $stdin])
+                                           [stdin => $stdin],
+                                           [wantArrayRefs => $wantArrayRef])
  
 =item args:
 
@@ -72,6 +73,11 @@ System command to invoke.  Can be an arrayref or a string.
 
 Stdin to pass to the command.
 
+=item wantArrayRef [Bool]
+
+If true, returns stdout and stderr as array refs instead of strings.  Default
+is 0.
+
 =back
 
 =back
@@ -79,7 +85,8 @@ Stdin to pass to the command.
 =cut
 
 multi method capture (ArrayRef|Str :$cmd!,
-					  ArrayRef|Str :$stdin) {
+					  ArrayRef|Str :$stdin,
+					  Bool         :$wantArrayRef) {
 
 	my $msg;
 	if (ref($cmd) eq 'ARRAY') {
@@ -110,7 +117,11 @@ multi method capture (ArrayRef|Str :$cmd!,
 
 	chomp $stdout;
 	chomp $stderr;
-		
+	
+	if ($wantArrayRef) {
+		return ([ split(/\n/, $stdout) ], [ split(/\n/, $stderr) ], $exit);		
+	}
+	
 	return ( $stdout, $stderr, $exit );
 }
 

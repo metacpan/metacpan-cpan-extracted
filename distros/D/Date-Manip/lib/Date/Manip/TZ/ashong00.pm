@@ -6,9 +6,9 @@ Date::Manip::TZ::ashong00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Aug 29 14:11:50 EDT 2019
-#    Data version: tzdata2019b
-#    Code version: tzcode2019b
+#    Generated on: Mon Dec  2 09:45:07 EST 2019
+#    Data version: tzdata2019c
+#    Code version: tzcode2019c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.78';
+$VERSION='6.79';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -47,7 +47,7 @@ END { undef $VERSION; }
           'HKST',1,[1941,9,30,18,59,59],[1941,10,1,3,59,59],
           '1941061419:00:00','1941061504:00:00','1941093018:59:59','1941100103:59:59' ],
         [ [1941,9,30,19,0,0],[1941,10,1,3,30,0],'+08:30:00',[8,30,0],
-          'HKT',0,[1941,12,24,15,29,59],[1941,12,24,23,59,59],
+          'HKWT',1,[1941,12,24,15,29,59],[1941,12,24,23,59,59],
           '1941093019:00:00','1941100103:30:00','1941122415:29:59','1941122423:59:59' ],
         [ [1941,12,24,15,30,0],[1941,12,25,0,30,0],'+09:00:00',[9,0,0],
           'JST',0,[1945,11,17,16,59,59],[1945,11,18,1,59,59],

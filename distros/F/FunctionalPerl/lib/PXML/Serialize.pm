@@ -44,7 +44,8 @@ if available and the result escaped, otherwise an exception is thrown.
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -65,7 +66,7 @@ package PXML::Serialize;
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
-use Data::Dumper;
+use FP::Show;
 use PXML::Element;
 use PXML qw(is_pxml_element is_pxmlflush);
 use FP::Lazy;
@@ -84,15 +85,6 @@ sub is_somearray ($) {
 
 sub is_empty_string ($) {
     defined $_[0] and !length ref $_[0] and $_[0] eq ""
-}
-
-sub perhaps_dump {
-    my ($v)=@_;
-    if (ref ($v) eq "ARRAY" or ref($v) eq "HASH") {
-        Dumper($v)
-    } else {
-        $v
-    }
 }
 
 my %attribute_escape=
@@ -152,7 +144,7 @@ sub object_force_escape ($$$$) {
         &$escape(&$m ($v))
     } else {
         die "unexpected type of reference that doesn't have a 'string' method: "
-          .(perhaps_dump $v);
+          .(show $v);
     }
 }
 
@@ -193,7 +185,7 @@ sub _pxml_print_fragment_fast {
         ## working on the code, please undo them first by using git
         ## revert.
         if (my $ref= ref $v) {
-            if ($ref eq "PXML::Element" or $ref eq "PXML::PXHTML_") {
+            if ($ref eq "PXML::Element" or $ref eq "PXML::_::XHTML") {
               PXML:
                 my $n= $v->name;
                 print $fh "<$n" or die $!;
@@ -373,10 +365,10 @@ sub pxml_xhtml_print_fast ($ $ ;$ ) {
     my ($v, $fh, $maybe_lang)= @_;
     weaken $_[0] if ref $_[0]; # ref check perhaps unnecessary here
     if (not ref $v or not UNIVERSAL::isa($v, "PXML::Element")) {
-        die "not an element: ".(perhaps_dump $v);
+        die "not an element: ".(show $v);
     }
     if (not "html" eq $v->name) {
-        die "not an 'html' element: ".(perhaps_dump $v);
+        die "not an 'html' element: ".(show $v);
     }
     xprint ($fh, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
     xprint ($fh, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");

@@ -1,69 +1,74 @@
-0.095   2019-02-17 (PERLANCAR)
+0.096   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Text::Table::CSV (0.022) now (re-)observes header_row=0.
+
+
+0.095   2019-02-17  Released-By: PERLANCAR
 
 	- Add backend: Term::TablePrint.
 
 	- Text::Table::CSV & Text::Table::TSV does not observe header_row.
 
 
-0.094   2019-01-11 (PERLANCAR)
+0.094   2019-01-11  Released-By: PERLANCAR
 
 	- Add @BACKENDS and backends() to let users get the list of
 	  supported backends.
 
 
-0.093   2018-09-23 (PERLANCAR)
+0.093   2018-09-23  Released-By: PERLANCAR
 
 	- Add backend: Text::Table::XLSX.
 
 
-0.092   2018-07-23 (PERLANCAR)
+0.092   2018-07-23  Released-By: PERLANCAR
 
 	- Add backend: Text::Table::ASV.
 
 
-0.091   2018-07-02 (PERLANCAR)
+0.091   2018-07-02  Released-By: PERLANCAR
 
 	- [Incompatible change] Change header_row default from 0 to 1.
 
 
-0.090   2018-06-30 (PERLANCAR)
+0.090   2018-06-30  Released-By: PERLANCAR
 
 	- Add new backends: Text::Table::{TSV,LTSV}.
 
 	- CSV backend: pass header_row option (Text::Table::CSV 0.020+).
 
 
-0.08    2017-01-01 (PERLANCAR)
+0.08    2017-01-01  Released-By: PERLANCAR
 
         - Add backend: Text::Table::Paragraph.
 
 
-0.07    2016-12-31 (PERLANCAR)
+0.07    2016-12-31  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Forgot to mention about the new backends in the POD.
 
 
-0.06    2016-12-29 (PERLANCAR)
+0.06    2016-12-29  Released-By: PERLANCAR
 
 	- Recognize new backends: Text::Table::HTML,
 	  Text::Table::HTML::DataTables.
 
 
-0.05    2016-10-19 (PERLANCAR)
+0.05    2016-10-19  Released-By: PERLANCAR
 
 	- Support new backends: Text::Table::Tiny{Color,ColorWide,Wide}.
 
 
-0.04    2016-09-06 (PERLANCAR)
+0.04    2016-09-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [doc] Show sample result for all backends.
 
 
-0.03    2016-09-03 (PERLANCAR)
+0.03    2016-09-03  Released-By: PERLANCAR
 
 	- [Bugfix] Text::MarkdownTable backend: forgot to set columns().
 
@@ -71,12 +76,12 @@
 	  setting.
 
 
-0.02    2016-09-03 (PERLANCAR)
+0.02    2016-09-03  Released-By: PERLANCAR
 
 	- [Bugfix] Text::ASCIITable backend: default to no header_row and
 	  observe the header_row setting.
 
 
-0.01    2015-12-19 (PERLANCAR)
+0.01    2015-12-19  Released-By: PERLANCAR
 
         - First release.

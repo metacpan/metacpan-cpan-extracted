@@ -405,6 +405,7 @@ t/data/csv/spike-test.csv
 t/data/db/person.tab
 t/data/db/process.dat
 t/data/db/test-databases.conf
+t/data/db/timeseries.dat
 t/data/etc/test1.conf
 t/data/etc/test2.conf
 t/data/font/pala.ttf

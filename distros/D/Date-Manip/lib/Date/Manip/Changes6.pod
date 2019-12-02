@@ -29,6 +29,14 @@ incompatible. These are marked with an exclamation mark (!).
 
 =head1 VERSION 6.79 (planned 2019-12-01)
 
+=over 5
+
+=item Time zone fixes
+
+Newest zoneinfo data (tzdata 2019c).
+
+=back
+
 =head1 VERSION 6.78 (2019-08-29)
 
 =over 5

@@ -40,7 +40,7 @@ $loop->add( $http );
       ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
       $self->set_handle( $selfsock );
 
-      return Future->new->done( $self );
+      return Future->done( $self );
    };
 
    my $f = $http->do_request(
@@ -58,7 +58,7 @@ $loop->add( $http );
                      "Hello world" .
                      "more stuff here" );
 
-   wait_for { $f->is_ready };
+   wait_for_future( $f );
    ok( !$f->failure, '$f is ready and does not fail' );
 }
 

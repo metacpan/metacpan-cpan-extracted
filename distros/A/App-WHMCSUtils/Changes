@@ -1,3 +1,26 @@
+0.011   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
+	  0.034+).
+
+	- [doc] Tweak description.
+
+
+0.010   2019-11-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Replace patching LWP::UserAgent from with
+	  LWP::UserAgent::Patch::HTTPSHardTimeout to with
+	  LWP::UserAgent::Patch::Retry.
+
+	[whmcs-calc-deferred-revenue]
+
+        - [doc] Add description and simplified example.
+
+        [whmcs-send-verification-emails]
+
+	- Add option --include-client-ids-from.
+
+
 0.009   2019-09-19  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

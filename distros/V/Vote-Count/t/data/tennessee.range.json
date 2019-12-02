@@ -1,0 +1,47 @@
+{
+   "choices" : [
+      "CHATTANOOGA",
+      "KNOXVILLE",
+      "MEMPHIS",
+      "NASHVILLE"
+   ],
+   "ballots" : [
+      {
+         "count" : 15,
+         "votes" : {
+            "MEMPHIS" : 1,
+            "NASHVILLE" : 3,
+            "KNOXVILLE" : 4,
+            "CHATTANOOGA" : 5
+         }
+      },
+      {
+         "count" : 17,
+         "votes" : {
+            "KNOXVILLE" : 5,
+            "MEMPHIS" : 1,
+            "NASHVILLE" : 3,
+            "CHATTANOOGA" : 4
+         }
+      },
+      {
+         "count" : 26,
+         "votes" : {
+            "CHATTANOOGA" : 4,
+            "KNOXVILLE" : 3,
+            "MEMPHIS" : 1,
+            "NASHVILLE" : 5
+         }
+      },
+      {
+         "votes" : {
+            "MEMPHIS" : 5,
+            "NASHVILLE" : 3,
+            "KNOXVILLE" : 2,
+            "CHATTANOOGA" : 1
+         },
+         "count" : 42
+      }
+   ],
+   "depth" : 5
+}

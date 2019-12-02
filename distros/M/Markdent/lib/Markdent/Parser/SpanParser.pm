@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use re 'eval';
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use List::AllUtils qw( uniq );
 use Markdent::Event::AutoLink;
@@ -637,7 +637,7 @@ sub _match_html_comment {
 }
 
 my %InlineTags = map { $_ => 1 }
-    qw( area base basefont br col frame hr img input link meta param );
+    qw( area base basefont br col frame hr iframe img input link meta param );
 
 sub _match_html_tag {
     my $self = shift;
@@ -681,31 +681,33 @@ sub _match_html_tag {
     return 1;
 }
 
-# This parsing code is all copied from HTML::Parser::Simple::Attributes by Ron
-# Savage.
+# This parsing code is copied from HTML::Parser::Simple::Attributes by Ron
+# Savage with some modifications & additions.
 my @quote = (
-    qr{^([a-zA-Z0-9_-]+)\s*=\s*["]([^"]+)["]\s*(.*)$}s,    # Double quotes.
-    qr{^([a-zA-Z0-9_-]+)\s*=\s*[']([^']+)[']\s*(.*)$}s,    # Single quotes.
-    qr{^([a-zA-Z0-9_-]+)\s*=\s*([^\s'"]+)\s*(.*)$}s,       # Unquoted.
+    qr{\G([a-zA-Z0-9_-]+)\s*=\s*["]([^"]+)["](?:\s+|\z)}s,    # Double quotes.
+    qr{\G([a-zA-Z0-9_-]+)\s*=\s*[']([^']+)['](?:\s+|\z)}s,    # Single quotes.
+    qr{\G([a-zA-Z0-9_-]+)\s*=\s*([^\s'"]+)(?:\s+|\z)}s,       # Unquoted.
+    qr{\G([a-zA-Z0-9_-]+)(?:\s+|\z)},    # Empty attribute (name w/ no value).
 );
 
 sub _parse_attributes {
     my $self = shift;
     my $text = shift;
 
-    my %attrs;
-    while ( length $text ) {
-        my $original = $text;
+    # If the tag had no attributes there's nothing to parse.
+    return {} unless defined $text && length $text;
 
+    my %attrs;
+OUTER:
+    while ( ( ( pos $text ) || 0 ) < length $text ) {
         for my $q (@quote) {
-            if ( $text =~ $q ) {
+            if ( $text =~ /$q/cg ) {
                 $attrs{$1} = $2;
-                $text = $3;
+                next OUTER;
             }
         }
 
-        die "Can't parse $text - not a properly formed attribute string\n"
-            if $text eq $original;
+        die "Can't parse $text - not a properly formed attribute string\n";
     }
 
     return \%attrs;
@@ -995,7 +997,7 @@ Markdent::Parser::SpanParser - Span parser for standard Markdown
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

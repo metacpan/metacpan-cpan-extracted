@@ -1,7 +1,7 @@
 package Sah::Schema::perl::podname;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 our $schema = ['str' => {
     summary => 'Perl POD name',
@@ -15,7 +15,7 @@ _
     match => '\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\z',
 
     'x.perl.coerce_rules' => [
-        'str_normalize_perl_modname',
+        'From_str::normalize_perl_modname',
     ],
 
     # provide a default completion which is from list of installed perl PODs
@@ -38,7 +38,7 @@ Sah::Schema::perl::podname - Perl POD name
 
 =head1 VERSION
 
-This document describes version 0.023 of Sah::Schema::perl::podname (from Perl distribution Sah-Schemas-Perl), released on 2019-07-26.
+This document describes version 0.025 of Sah::Schema::perl::podname (from Perl distribution Sah-Schemas-Perl), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

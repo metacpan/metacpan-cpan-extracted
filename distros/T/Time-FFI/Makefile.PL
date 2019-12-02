@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Exporter" => "5.57",
-    "FFI::Platypus" => 0,
+    "FFI::Platypus" => "1.00",
     "Module::Runtime" => 0,
     "Time::Local" => 0
   },
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Needs" => 0
   },
-  "VERSION" => "2.000",
+  "VERSION" => "2.001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Exporter" => "5.57",
   "ExtUtils::MakeMaker" => 0,
-  "FFI::Platypus" => 0,
+  "FFI::Platypus" => "1.00",
   "File::Spec" => 0,
   "Module::Runtime" => 0,
   "Test2::V0" => 0,

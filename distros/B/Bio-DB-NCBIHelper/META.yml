@@ -30,12 +30,14 @@ requires:
   Bio::Root::IO: '0'
   Bio::Root::Root: '0'
   Bio::SeqIO: '0'
+  Bio::SeqIO::entrezgene: '0'
   Bio::Taxon: '0'
   Bio::WebAgent: '0'
   CGI: '0'
   Cache::FileCache: '0'
   Getopt::Long: '0'
   HTTP::Request::Common: '0'
+  LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   URI: '0'
   URI::Escape: '0'
@@ -49,7 +51,7 @@ resources:
   bugtracker: https://github.com/bioperl/bio-db-ncbihelper/issues
   homepage: https://metacpan.org/release/Bio-DB-NCBIHelper
   repository: git://github.com/bioperl/bio-db-ncbihelper.git
-version: 1.7.4
+version: 1.7.5
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -218,7 +220,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: Bio-DB-NCBIHelper-v1.7.4
+          tag: Bio-DB-NCBIHelper-v1.7.5
           tag_format: '%N-v%v'
           tag_message: '%N-v%v'
         Dist::Zilla::Role::Git::Repo:
@@ -228,6 +230,14 @@ x_Dist_Zilla:
           time_zone: local
       name: '@BioPerl/Git::Tag'
       version: '2.045'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

@@ -23,7 +23,7 @@ WriteMakefile(
     "ExtUtils::MakeMaker" => "6.64",
   },
   PREREQ_PM => {
-    "Devel::Cover" => 0,
+    "Devel::Cover" => "1.25",
     "Path::Tiny"   => "0.013",
   },
   TEST_REQUIRES => {

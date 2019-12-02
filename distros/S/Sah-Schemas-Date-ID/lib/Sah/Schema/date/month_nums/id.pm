@@ -1,12 +1,12 @@
 package Sah::Schema::date::month_nums::id;
 
-our $DATE = '2019-07-21'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $schema = ['array' => {
     summary => 'Array of month numbers',
     of => ['date::month_num::id', {}, {}],
-    'x.perl.coerce_rules' => ['str_comma_sep'],
+    'x.perl.coerce_rules' => ['From_str::comma_sep'],
 }, {}];
 
 1;
@@ -25,7 +25,7 @@ Sah::Schema::date::month_nums::id - Array of month numbers
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::date::month_nums::id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-07-21.
+This document describes version 0.003 of Sah::Schema::date::month_nums::id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
 
 =head1 DESCRIPTION
 

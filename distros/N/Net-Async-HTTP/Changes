@@ -1,5 +1,14 @@
 Revision history for Net-Async-HTTP
 
+0.45    2019-11-26 17:32:42
+        [CHANGES]
+         * Allow configuring additional default headers to set in every
+           outbound request (RT125642)
+         * Added config option to enforce close after every request (RT128952)
+
+        [BUGFIXES]
+         * Correct request encoding for non-canonical headers (RT131040)
+
 0.44    2019-02-17 14:11:57
         [BUGFIXES]
          * Regnerate embedded SSL testing certs

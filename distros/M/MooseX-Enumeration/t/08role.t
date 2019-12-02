@@ -45,7 +45,7 @@ use Test::More tests => 2;
 ok( Local::Test->new( status => 'foo' )->is_foo, "handled is foo" );
 like(
 	eval { Local::Test->new( status => 'goo' )->is_bar } || $@,
-	qr/did not pass type constraint/,
+	qr/(did|does) not pass (the )?type constraint/,
 	"rejected bad input"
 );
 

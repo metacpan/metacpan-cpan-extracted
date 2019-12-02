@@ -15,7 +15,7 @@ Sah::Schemas::CPAN - Sah schemas related to CPAN
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schemas::CPAN (from Perl distribution Sah-Schemas-CPAN), released on 2019-01-13.
+This document describes version 0.005 of Sah::Schemas::CPAN (from Perl distribution Sah-Schemas-CPAN), released on 2019-11-29.
 
 =head1 SYNOPSIS
 

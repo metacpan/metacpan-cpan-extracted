@@ -9,17 +9,17 @@ use FFI::Platypus::Buffer;
 use FFI::Platypus::Memory;
 use Time::FFI::tm;
 
-our $VERSION = '2.000';
+our $VERSION = '2.001';
 
 our @EXPORT_OK = qw(asctime ctime gmtime localtime mktime strftime strptime timegm timelocal);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-my $ffi = FFI::Platypus->new(lib => [undef], ignore_not_found => 1);
+my $ffi = FFI::Platypus->new(api => 1, lib => [undef], ignore_not_found => 1);
 $ffi->type('record(Time::FFI::tm)' => 'tm');
 my $char_size = $ffi->sizeof('char');
 
 if (defined $ffi->find_symbol('asctime_r')) {
-  $ffi->attach([asctime_r => 'asctime'] => ['tm', 'opaque'] => 'string' => sub {
+  $ffi->attach([asctime_r => 'asctime'] => ['tm*', 'opaque'] => 'string' => sub {
     my ($xsub, $tm) = @_;
     my $rc = $xsub->($tm, my $buf = calloc(26, $char_size));
     free $buf;
@@ -27,7 +27,7 @@ if (defined $ffi->find_symbol('asctime_r')) {
     return $rc;
   });
 } else {
-  $ffi->attach(asctime => ['tm'] => 'string' => sub {
+  $ffi->attach(asctime => ['tm*'] => 'string' => sub {
     my ($xsub, $tm) = @_;
     my $rc = $xsub->($tm);
     croak "asctime: $!" unless defined $rc;
@@ -55,7 +55,7 @@ if (defined $ffi->find_symbol('ctime_r')) {
 }
 
 if (defined $ffi->find_symbol('gmtime_r')) {
-  $ffi->attach([gmtime_r => 'gmtime'] => ['time_t*', 'tm'] => 'opaque' => sub {
+  $ffi->attach([gmtime_r => 'gmtime'] => ['time_t*', 'tm*'] => 'opaque' => sub {
     my ($xsub, $time) = @_;
     $time = time unless defined $time;
     my $rc = $xsub->(\$time, my $tm = Time::FFI::tm->new);
@@ -63,7 +63,7 @@ if (defined $ffi->find_symbol('gmtime_r')) {
     return $tm;
   });
 } else {
-  $ffi->attach(gmtime => ['time_t*'] => 'tm' => sub {
+  $ffi->attach(gmtime => ['time_t*'] => 'tm*' => sub {
     my ($xsub, $time) = @_;
     $time = time unless defined $time;
     my $rc = $xsub->(\$time);
@@ -73,7 +73,7 @@ if (defined $ffi->find_symbol('gmtime_r')) {
 }
 
 if (defined $ffi->find_symbol('localtime_r')) {
-  $ffi->attach([localtime_r => 'localtime'] => ['time_t*', 'tm'] => 'opaque' => sub {
+  $ffi->attach([localtime_r => 'localtime'] => ['time_t*', 'tm*'] => 'opaque' => sub {
     my ($xsub, $time) = @_;
     $time = time unless defined $time;
     my $rc = $xsub->(\$time, my $tm = Time::FFI::tm->new);
@@ -81,7 +81,7 @@ if (defined $ffi->find_symbol('localtime_r')) {
     return $tm;
   });
 } else {
-  $ffi->attach(localtime => ['time_t*'] => 'tm' => sub {
+  $ffi->attach(localtime => ['time_t*'] => 'tm*' => sub {
     my ($xsub, $time) = @_;
     $time = time unless defined $time;
     my $rc = $xsub->(\$time);
@@ -90,14 +90,14 @@ if (defined $ffi->find_symbol('localtime_r')) {
   });
 }
 
-$ffi->attach(mktime => ['tm'] => 'time_t' => sub {
+$ffi->attach(mktime => ['tm*'] => 'time_t' => sub {
   my ($xsub, $tm) = @_;
   my $rc = $xsub->($tm);
   croak "mktime: $!" if $rc == -1;
   return $rc;
 });
 
-$ffi->attach(strftime => ['opaque', 'size_t', 'string', 'tm'] => 'size_t' => sub {
+$ffi->attach(strftime => ['opaque', 'size_t', 'string', 'tm*'] => 'size_t' => sub {
   my ($xsub, $format, $tm) = @_;
   my $max_size = length($format) * 20;
   my $buf_size = 200;
@@ -114,7 +114,7 @@ $ffi->attach(strftime => ['opaque', 'size_t', 'string', 'tm'] => 'size_t' => sub
   return $str;
 });
 
-$ffi->attach(strptime => ['string', 'string', 'tm'] => 'string' => sub {
+$ffi->attach(strptime => ['string', 'string', 'tm*'] => 'string' => sub {
   my ($xsub, $str, $format, $tm, $remaining) = @_;
   $tm = Time::FFI::tm->new unless defined $tm;
   my $rc = $xsub->($str, $format, $tm);
@@ -124,14 +124,14 @@ $ffi->attach(strptime => ['string', 'string', 'tm'] => 'string' => sub {
   return $tm;
 });
 
-$ffi->attach(timegm => ['tm'] => 'time_t' => sub {
+$ffi->attach(timegm => ['tm*'] => 'time_t' => sub {
   my ($xsub, $tm) = @_;
   my $rc = $xsub->($tm);
   croak "timegm: $!" if $rc == -1;
   return $rc;
 });
 
-$ffi->attach(timelocal => ['tm'] => 'time_t' => sub {
+$ffi->attach(timelocal => ['tm*'] => 'time_t' => sub {
   my ($xsub, $tm) = @_;
   my $rc = $xsub->($tm);
   croak "timelocal: $!" if $rc == -1;

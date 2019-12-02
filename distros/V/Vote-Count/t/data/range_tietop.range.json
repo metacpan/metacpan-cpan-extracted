@@ -1,0 +1,41 @@
+{
+   "choices" : [
+      "DEE",
+      "DUM",
+      "DUMPTY",
+      "THREE"
+   ],
+   "ballots" : [
+      {
+         "count" : 10,
+         "votes" : {
+            "DUMPTY" : 1,
+            "DEE" : 5
+         }
+      },
+      {
+         "count" : 10,
+         "votes" : {
+            "DUMPTY" : 1,
+            "DUM" : 5
+         }
+      },
+      {
+         "count" : 10,
+         "votes" : {
+            "DUMPTY" : 1,
+            "THREE" : 5
+         }
+      },
+      {
+         "votes" : {
+            "DEE" : 1,
+            "DUMPTY" : 5,
+            "DUM" : 1,
+            "THREE" : 1
+         },
+         "count" : 1
+      }
+   ],
+   "depth" : 5
+}

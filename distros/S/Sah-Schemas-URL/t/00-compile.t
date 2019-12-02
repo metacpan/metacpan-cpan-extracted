@@ -9,7 +9,7 @@ use Test::More;
 plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/obj/str_url.pm',
+    'Data/Sah/Coerce/perl/To_obj/From_str/url.pm',
     'Sah/Schema/url.pm',
     'Sah/Schema/urls.pm',
     'Sah/SchemaR/url.pm',

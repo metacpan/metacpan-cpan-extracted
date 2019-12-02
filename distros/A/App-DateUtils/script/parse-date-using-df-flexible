@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/DateUtils/parse_date_using_df_flexible
-# and generated automatically using Perinci::CmdLine::Gen version 0.490
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-06-19'; # DATE
+our $DATE = '2019-11-29'; # DATE
 our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.121'; # VERSION
+our $VERSION = '0.122'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ parse-date-using-df-flexible - Parse date string(s) using DateTime::Format::Flex
 
 =head1 VERSION
 
-This document describes version 0.121 of parse-date-using-df-flexible (from Perl distribution App-DateUtils), released on 2019-06-19.
+This document describes version 0.122 of parse-date-using-df-flexible (from Perl distribution App-DateUtils), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ Examples:
  +----------------------------+----------+--------------+------------------------------------------------------------------------------------------------------------------------------+
  | module                     | original | is_parseable | error_msg                                                                                                                    |
  +----------------------------+----------+--------------+------------------------------------------------------------------------------------------------------------------------------+
- | DateTime::Format::Flexible | foo      | 0            | Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.28.2/lib/site_perl/5.28.2/Perinci/CmdLine/POD.pm line 480.  |
+ | DateTime::Format::Flexible | foo      | 0            | Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.30.0/lib/site_perl/5.30.0/Perinci/CmdLine/POD.pm line 480.  |
  +----------------------------+----------+--------------+------------------------------------------------------------------------------------------------------------------------------+
 
 =head1 OPTIONS

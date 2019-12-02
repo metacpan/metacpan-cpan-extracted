@@ -20,8 +20,10 @@ FP::PureArray
     is $a->sum, 13;
 
     # can't mutate it:
-    like( (eval { $a->[0]++; 1 } || $@), qr/XXX Hello?/);
-    like( (eval { push @$a, 123; 1 } || $@), qr/XXX Hello?/);
+    like( (eval { $a->[0]++; 1 } || $@),
+          qr/^Modification of a read-only value attempted/);
+    like( (eval { push @$a, 123; 1 } || $@),
+          qr/^Modification of a read-only value attempted/);
 
     is $a->sum, 13;
 
@@ -76,7 +78,8 @@ L<FP::MutableArray>
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 

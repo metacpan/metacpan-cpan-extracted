@@ -1,9 +1,9 @@
 package Clipboard::MacPasteboard;
-$Clipboard::MacPasteboard::VERSION = '0.20';
+$Clipboard::MacPasteboard::VERSION = '0.21';
 use strict;
 use warnings;
 
-use Mac::Pasteboard;
+use Mac::Pasteboard 0.011;
 
 our $board = Mac::Pasteboard->new();
 $board->set( missing_ok => 1 );
@@ -25,13 +25,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-Clipboard::MacPasteboard
-
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

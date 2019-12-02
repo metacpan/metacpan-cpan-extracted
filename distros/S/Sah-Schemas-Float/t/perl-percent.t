@@ -8,7 +8,7 @@ use Test::More 0.98;
 use Data::Sah::Coerce qw(gen_coercer);
 
 subtest "basics" => sub {
-    my $c = gen_coercer(type=>"float", coerce_rules=>["str_as_percent"]);
+    my $c = gen_coercer(type=>"float", coerce_rules=>["From_str::as_percent"]);
 
     is($c->("a"), "a", "uncoerced: non-number");
     is_deeply($c->([]), [], "uncoerced: array");

@@ -1,9 +1,9 @@
 This archive contains the distribution Mojo-UserAgent-Mockable,
-version 1.56:
+version 1.57:
 
   A Mojo User-Agent that can record and play back requests without Internet connectivity, similar to LWP::UserAgent::Mockable
 
-This software is copyright (c) 2018 by Kit Peters.
+This software is copyright (c) 2019 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

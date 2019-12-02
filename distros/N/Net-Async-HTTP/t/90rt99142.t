@@ -75,7 +75,7 @@ $peersock->syswrite( "HTTP/1.1 200 OK$CRLF" .
                      "Content-Length: 0$CRLF" .
                      $CRLF );
 
-wait_for { $req_f1->is_ready };
+wait_for_future( $req_f1 );
 ok( $req_f1->is_done, '$req_f1 is done after first response' );
 
 # At this point, req 2 should already be made down the socket

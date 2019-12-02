@@ -1,7 +1,7 @@
 package Sah::SchemaR::posfloat;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $rschema = ["float",[{description=>"\n",summary=>"Positive float",xmin=>0}],["float"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::posfloat - Positive float
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::SchemaR::posfloat (from Perl distribution Sah-Schemas-Float), released on 2019-07-26.
+This document describes version 0.006 of Sah::SchemaR::posfloat (from Perl distribution Sah-Schemas-Float), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

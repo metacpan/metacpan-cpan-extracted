@@ -87,25 +87,25 @@ is_deeply( $data, $expect, "check data dump" );
 
 subtest "check default mapping of boolean value type" => sub {
     my $data = $root->dump_as_data( full_dump => 0 );
-    map {
+    for (0,1) {
         is($data->{bool_list}[$_], $_, "Perl data value of bool_list:$_ ");
         is(ref $data->{bool_list}[$_], '', "Perl data of bool_list:$_ is not a ref");
-    } qw/0 1/;
+    }
 };
 
 subtest "check mapping of boolean value type to Perl boolean" => sub {
     my $data = $root->dump_as_data( full_dump => 0, to_boolean => sub { boolean(shift) } );
-    map {
+    for (0,1) {
         isa_ok($data->{bool_list}[$_], "boolean", "Perl data of bool_list:$_ ");
-    } qw/0 1/;
+    };
 };
 
 subtest "check mapping of boolean value type to Perl boolean" => sub {
     plan skip_all => "JSON PP boolean behavior not yet checked";
     my $data = $root->dump_as_data( full_dump => 0, to_boolean => 'JSON::PP::Boolean' );
-    map {
+    for (0,1) {
         isa_ok($data->{bool_list}[$_], "JSON::PP::Boolean", "Perl data of bool_list:$_ ");
-    } qw/0 1/;
+    }
 };
 
 # add default information provided by model to check full dump
@@ -116,7 +116,7 @@ $expect->{olist}[1]{DX}    = 'Dv';
 $expect->{std_id}{ab}{DX}  = 'Dv';
 $expect->{std_id}{bc}{DX}  = 'Dv';
 $expect->{a_uniline}       = 'yada yada';
-my $full_data = $root->dump_as_data();
+my $full_data = $root->dump_as_data(mode => 'user');
 
 is_deeply( $full_data, $expect, "check full data dump" );
 
@@ -154,7 +154,7 @@ my @tries = (
 foreach my $test (@tries) {
     my ( $path, $expect ) = @$test;
     my $obj  = $root->grab($path);
-    my $dump = $obj->dump_as_data();
+    my $dump = $obj->dump_as_data(mode => 'user');
     is_deeply( $dump, $expect, "check data dump for '$path'" );
 }
 
@@ -203,7 +203,7 @@ $root3->load_data($data);
 foreach my $test (@tries) {
     my ( $path, $expect ) = @$test;
     my $obj  = $root3->grab($path);
-    my $dump = $obj->dump_as_data();
+    my $dump = $obj->dump_as_data(mode => 'user');
     is_deeply( $dump, $expect, "check data dump for '$path'" );
 }
 

@@ -2,7 +2,7 @@ package Catmandu::Importer::SRU::Parser::raw;
 
 use Moo;
 
-our $VERSION = '0.427';
+our $VERSION = '0.428';
 
 sub parse {
     my ($self, $record) = @_;

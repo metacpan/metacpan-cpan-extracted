@@ -1,7 +1,9 @@
 package App::AlgorithmBackoffUtils;
 
-our $DATE = '2019-06-08'; # DATE
-our $VERSION = '0.003'; # VERSION
+# AUTHOR
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-AlgorithmBackoffUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -307,7 +309,7 @@ $SPEC{show_backoff_delays} = {
         %args_algo_attrs,
         logs => {
             summary => 'List of failures or successes',
-            schema => ['array*', of=>'str*', 'x.perl.coerce_rules'=>['str_comma_sep']],
+            schema => ['array*', of=>'str*', 'x.perl.coerce_rules'=>['From_str::comma_sep']],
             'x.name.is_plural' => 1,
             'x.name.singular' => 'log',
             req => 1,
@@ -398,7 +400,7 @@ App::AlgorithmBackoffUtils - Utilities related to Algorithm::Backoff
 
 =head1 VERSION
 
-This document describes version 0.003 of App::AlgorithmBackoffUtils (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-06-08.
+This document describes version 0.004 of App::AlgorithmBackoffUtils (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-11-29.
 
 =head1 DESCRIPTION
 
@@ -1656,19 +1658,19 @@ feature.
 =head1 SEE ALSO
 
 
-L<Algorithm::Backoff::Exponential>.
-
-L<Algorithm::Backoff::LIMD>.
+L<Algorithm::Backoff::MIMD>.
 
 L<Algorithm::Backoff::Constant>.
 
-L<Algorithm::Backoff::LILD>.
+L<Algorithm::Backoff::Exponential>.
 
 L<Algorithm::Backoff::Fibonacci>.
 
 L<Algorithm::Backoff::MILD>.
 
-L<Algorithm::Backoff::MIMD>.
+L<Algorithm::Backoff::LILD>.
+
+L<Algorithm::Backoff::LIMD>.
 
 L<Algorithm::Backoff>
 

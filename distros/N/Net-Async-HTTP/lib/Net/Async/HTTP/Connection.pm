@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2019 -- leonerd@leonerd.org.uk
 
 package Net::Async::HTTP::Connection;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use Carp;
 
@@ -298,7 +298,11 @@ sub request
 
    my $protocol = $req->protocol || "HTTP/1.1";
    my @headers = ( "$method $path $protocol" );
-   $headers->scan( sub { push @headers, "$_[0]: $_[1]" } );
+   $headers->scan( sub {
+      my ( $name, $value ) = @_;
+      $name =~ s/^://; # non-canonical header
+      push @headers, "$name: $value";
+   } );
 
    $stall_timer->start if $stall_timer;
    $stall_timer->reason = "writing request" if $stall_timer;

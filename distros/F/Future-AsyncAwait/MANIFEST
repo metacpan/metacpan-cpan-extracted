@@ -6,12 +6,14 @@ hax/COP_SEQ_RANGE_HIGH_set.c.inc
 hax/cx_pushblock.c.inc
 hax/cx_pusheval.c.inc
 hax/docatch.c.inc
+hax/lexer-additions.c.inc
 hax/pad_block_start.c.inc
 hax/pad_leavemy.c.inc
 hax/parse_subsignature.c.inc
 hax/README
 hax/save_clearpadrange.c.inc
 hax/scalarseq.c.inc
+hax/wrap_keyword_plugin.c.inc
 lib/Future/AsyncAwait.h
 lib/Future/AsyncAwait.pm
 lib/Future/AsyncAwait.xs
@@ -53,5 +55,6 @@ t/81memory-growth.t
 t/82devel-mat-dumper-helper.t
 t/90rt128176.t
 t/90rt129836.t
+t/90rt129987.t
 t/90rt130417.t
 t/99pod.t

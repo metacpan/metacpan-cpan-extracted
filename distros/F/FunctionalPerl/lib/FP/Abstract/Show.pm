@@ -52,11 +52,14 @@ Configuration for whether to force promises
 
 =head1 SEE ALSO
 
-L<FP::Show>
+L<FP::Show> -- functions to access this protocol usefully
+
+L<FP::Mixin::Utils> -- implemented by this protocol
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -65,7 +68,9 @@ package FP::Abstract::Show;
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
-sub fp_interface_method_names {
+use base qw(FP::Mixin::Utils);
+
+sub FP_Interface__method_names {
     ("FP_Show_show")
 }
 

@@ -31,7 +31,7 @@ ok( my $sm = XML::NewsML_G2::Scheme_Manager->new(%schemes),
 
 my $writer = XML::NewsML_G2::Writer::News_Item->new(
     news_item      => $ni,
-    scheme_manager => $sm
+    scheme_manager => $sm,
 );
 
 ok( my $dom = $writer->create_dom(), 'create DOM' );

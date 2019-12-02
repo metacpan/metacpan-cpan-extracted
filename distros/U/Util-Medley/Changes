@@ -1,9 +1,39 @@
 ==================================================
-Changes from 2018-11-21 00:00:00 +0000 to present.
+Changes from 2018-11-26 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.013 at 2019-11-21 20:46:35 +0000
+version 0.016 at 2019-11-26 20:02:11 +0000
+------------------------------------------
+
+  Change: b5ffab2061337f9129ef0880f3e9c21ff01eddfc
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-26 13:58:19 +0000
+
+    added wantArrayRefs option to Spawn::capture() 
+
+------------------------------------------
+version 0.015 at 2019-11-26 19:51:39 +0000
+------------------------------------------
+
+  Change: 06e39675f1022ae72b138f51e18fc477e8f77fcf
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-26 13:50:41 +0000
+
+    - added more POD - other small tweaks 
+
+------------------------------------------
+version 0.014 at 2019-11-26 19:46:39 +0000
+------------------------------------------
+
+  Change: d1464dd53898b1186fb786648daf246d4a9cd419
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-26 13:46:39 +0000
+
+    modified File::find() to exclude the search dir from the results 
+
+------------------------------------------
+version 0.013 at 2019-11-21 20:46:22 +0000
 ------------------------------------------
 
   Change: 385915d304e5f2312669497c7d35c7d081d5dc02

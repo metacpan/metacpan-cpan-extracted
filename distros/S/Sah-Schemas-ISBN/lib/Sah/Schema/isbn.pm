@@ -1,7 +1,9 @@
 package Sah::Schema::isbn;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.006'; # VERSION
+# AUTHOR
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'Sah-Schemas-ISBN'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 our $schema = [str => {
     summary => 'ISBN 10 or ISBN 13 number',
@@ -13,7 +15,7 @@ Checksum digit must be valid.
 
 _
     match => '\A(?:[0-9]{13}|[0-9]{9}[0-9Xx])\z',
-    'x.perl.coerce_rules' => ['str_to_isbn'],
+    'x.perl.coerce_rules' => ['From_str::to_isbn'],
 }, {}];
 
 1;
@@ -31,7 +33,7 @@ Sah::Schema::isbn - ISBN 10 or ISBN 13 number
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::isbn (from Perl distribution Sah-Schemas-ISBN), released on 2019-07-25.
+This document describes version 0.007 of Sah::Schema::isbn (from Perl distribution Sah-Schemas-ISBN), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

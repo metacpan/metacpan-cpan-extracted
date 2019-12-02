@@ -1,9 +1,14 @@
-0.002   2018-12-19 (PERLANCAR)
+0.003   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names (Data::Sah::Coerce 0.034+).
+
+
+0.002   2018-12-19  Released-By: PERLANCAR
 
 	- [dist] Forgot to add DZP/PWP plugin, which causes RT#128037
 	  (unspecified dependency to coerce modules).
 
 
-0.001   2018-12-17 (PERLANCAR)
+0.001   2018-12-17  Released-By: PERLANCAR
 
         - First release.

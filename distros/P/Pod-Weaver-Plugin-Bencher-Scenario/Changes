@@ -1,36 +1,43 @@
-0.243   2019-03-24 (PERLANCAR)
+0.244   2019-10-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Avoid creating lib/Bencher/ScenarioR/ file multiple
+	  times if multiple benchmarks are produced (e.g. with multiple
+	  instances in weaver.ini).
+
+
+0.243   2019-03-24  Released-By: PERLANCAR
 
 	- [bugfix] Failed to retrieve package name for
 	  Bencher::Scenario::*.
 
 
-0.242   2019-02-24 (PERLANCAR)
+0.242   2019-02-24  Released-By: PERLANCAR
 
 	- Add '## no critic' to generated Scenario_R module file.
 
 
-0.241   2019-02-24 (PERLANCAR)
+0.241   2019-02-24  Released-By: PERLANCAR
 
 	- Support getting scenario from Acme::CPANModules::* module.
 
 
-0.240   2019-02-15 (PERLANCAR)
+0.240   2019-02-15  Released-By: PERLANCAR
 
 	- Mention datasets not included by default.
 
 
-0.23    2017-01-04 (PERLANCAR)
+0.23    2017-01-04  Released-By: PERLANCAR
 
 	- Add hint to use --format html+datatables.
 
 
-0.22    2016-10-21 (PERLANCAR)
+0.22    2016-10-21  Released-By: PERLANCAR
 
 	- Allow sample bench to get result from JSON file instead of
 	  performing bencher().
 
 
-0.21    2016-10-19 (PERLANCAR)
+0.21    2016-10-19  Released-By: PERLANCAR
 
         - [Experimental] Create lib/Bencher/ScenarioR/* module files that
           contain raw benchmark sample results. (Doing this in this Pod::Weaver
@@ -40,25 +47,25 @@
           plugin).
 
 
-0.20    2016-09-25 (PERLANCAR)
+0.20    2016-09-25  Released-By: PERLANCAR
 
 	- [ux] Add list of scenario modules at the beginning of Description
 	  section.
 
 
-0.19    2016-07-17 (PERLANCAR)
+0.19    2016-07-17  Released-By: PERLANCAR
 
 	- Provide alternate location in #IMAGE so DZP:InsertDistImage can
 	  work when hosting=data (otherwise, the file in share/images/
 	  won't be found because they are not added to the build yet).
 
 
-0.18    2016-07-13 (PERLANCAR)
+0.18    2016-07-13  Released-By: PERLANCAR
 
         - Add option to generate chart image files (by default off).
 
 
-0.17    2016-06-30 (PERLANCAR)
+0.17    2016-06-30  Released-By: PERLANCAR
 
         - Add configuration: result_split_fields.
 
@@ -67,34 +74,34 @@
           not to mention <script>).
 
 
-0.16    2016-04-01 (PERLANCAR)
+0.16    2016-04-01  Released-By: PERLANCAR
 
 	- Add --note to bencher.
 
 
-0.15    2016-03-16 (PERLANCAR)
+0.15    2016-03-16  Released-By: PERLANCAR
 
 	- Add configuration: bench_startup.
 
 
-0.14    2016-03-15 (PERLANCAR)
+0.14    2016-03-15  Released-By: PERLANCAR
 
 	- Add configuration: include_module, exclude_module.
 
 	- [Bugfix] metadata must be normalized.
 
 
-0.13    2016-03-15 (PERLANCAR)
+0.13    2016-03-15  Released-By: PERLANCAR
 
 	- Adjust to Bencher 0.38 (backend split to Bencher::Backend).
 
 
-0.12    2016-03-13 (PERLANCAR)
+0.12    2016-03-13  Released-By: PERLANCAR
 
 	- Show cmdline_template.
 
 
-0.11    2016-01-22 (PERLANCAR)
+0.11    2016-01-22  Released-By: PERLANCAR
 
 	- Add option: bench to allow disabling the producing of sample
 	  results.
@@ -103,30 +110,30 @@
 	  getting sample benchmark results.
 
 
-0.10    2016-01-20 (PERLANCAR)
+0.10    2016-01-20  Released-By: PERLANCAR
 
 	- [Bugfix] Used wrong variable, derp.
 
 
-0.09    2016-01-20 (PERLANCAR)
+0.09    2016-01-20  Released-By: PERLANCAR
 
 	- Show participants' & datasets' tags in POD.
 
 	- Fix getting module versions from benchmark results, derp.
 
 
-0.08    2016-01-20 (PERLANCAR)
+0.08    2016-01-20  Released-By: PERLANCAR
 
 	- Show bencher commands used when benchmarking with default options
 	  and benchmarking module startup overhead.
 
 
-0.07    2016-01-19 (PERLANCAR)
+0.07    2016-01-19  Released-By: PERLANCAR
 
 	- Fix command shown in benchmark sample results.
 
 
-0.06    2016-01-19 (PERLANCAR)
+0.06    2016-01-19  Released-By: PERLANCAR
 
         - Add option 'sample_bench' to allow rendering multiple results.
 
@@ -135,7 +142,7 @@
         - Adjust to Bencher 0.30+.
 
 
-0.05    2016-01-13 (PERLANCAR)
+0.05    2016-01-13  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -144,7 +151,7 @@
         - [doc] Mention DZP:Bencher::Scenario.
 
 
-0.04    2016-01-06 (PERLANCAR)
+0.04    2016-01-06  Released-By: PERLANCAR
 
 	- Add modules that are listed only in scenario's 'modules' property
 	  to BENCHMARKED MODULES.
@@ -153,21 +160,21 @@
 	  no scenario's description.
 
 
-0.03    2016-01-05 (PERLANCAR)
+0.03    2016-01-05  Released-By: PERLANCAR
 
 	- Add Benchmark Participants section.
 
 	- Show perl & modules' versions.
 
 
-0.02    2016-01-05 (PERLANCAR)
+0.02    2016-01-05  Released-By: PERLANCAR
 
         - Add SAMPLE BENCHMARK RESULTS section.
 
         - Tweaks.
 
 
-0.01    2015-11-17 (PERLANCAR)
+0.01    2015-11-17  Released-By: PERLANCAR
 
         - First, early release. Currently only inserts "BENCHMARKED MODULES"
           section.

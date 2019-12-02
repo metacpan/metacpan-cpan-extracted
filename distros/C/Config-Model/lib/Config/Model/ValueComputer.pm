@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ValueComputer 2.136;
+package Config::Model::ValueComputer 2.137;
 
 use Mouse;
 use MouseX::StrictConstructor;
@@ -550,7 +550,7 @@ Config::Model::ValueComputer - Provides configuration value computation
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 
@@ -922,7 +922,7 @@ Extract the host name from an URL:
      },
  },
 
-=head2 simple copy hash example
+=head2 copy hash example
 
 Copying a hash may not be useful, but the using C<&index()> in a variable can be. Here's an example
 where the hashes contain leaves.
@@ -973,7 +973,7 @@ the data to be copied is stored within a node. The main class has 2 hash element
             },
         },
 
-The Class to copy from is quite simple:
+The Class to copy from is quite short:
 
     'name' => 'From',
     'element' => [

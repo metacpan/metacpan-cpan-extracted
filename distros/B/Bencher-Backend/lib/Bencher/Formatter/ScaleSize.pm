@@ -1,7 +1,7 @@
 package Bencher::Formatter::ScaleSize;
 
-our $DATE = '2019-10-15'; # DATE
-our $VERSION = '1.045'; # VERSION
+our $DATE = '2019-12-02'; # DATE
+our $VERSION = '1.046'; # VERSION
 
 use 5.010001;
 use strict;
@@ -85,7 +85,7 @@ Bencher::Formatter::ScaleSize - Scale size fields to make it convenient
 
 =head1 VERSION
 
-This document describes version 1.045 of Bencher::Formatter::ScaleSize (from Perl distribution Bencher-Backend), released on 2019-10-15.
+This document describes version 1.046 of Bencher::Formatter::ScaleSize (from Perl distribution Bencher-Backend), released on 2019-12-02.
 
 =for Pod::Coverage .*
 

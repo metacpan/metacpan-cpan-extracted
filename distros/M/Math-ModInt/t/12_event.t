@@ -1,8 +1,6 @@
-# Copyright (c) 2009-2010 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: 12_event.t 4 2010-09-26 00:06:41Z demetri $
+# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Tests of the Math::ModInt::Event utility module.
 

@@ -45,7 +45,8 @@ L<FP::Lazy>
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -57,6 +58,9 @@ package FP::TransparentLazy;
 %EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
+
+use FP::Lazy qw(force FORCE is_promise); # for re-export
+
 
 sub lazy (&) {
     bless [$_[0],undef], "FP::TransparentLazy::Promise"
@@ -71,31 +75,24 @@ sub delay (&);  *delay = \&lazy;
 sub delayLight (&); *delayLight= \&lazyLight;
 
 
-use FP::Lazy qw(force FORCE is_promise);
-
-my @overload;
-BEGIN {
-    @overload=
-      ((map {
+package FP::TransparentLazy::Overloads {
+    use overload
+        ((map {
             $_=> "FORCE"
-        } split / +/,
-        '"" 0+ bool qr &{} ${} %{} *{}'),
-       # XX hm, can't overload '@{}', why?
-       fallback=> 1);
+          } split / +/,
+          '"" 0+ bool qr &{} ${} %{} *{}'),
+         # XX hm, can't overload '@{}', why?
+         fallback=> 1);
 }
 
-{
-    package FP::TransparentLazy::Promise;
-    our @ISA= qw(FP::Lazy::Promise);
-
-    use overload @overload;
+package FP::TransparentLazy::Promise {
+    our @ISA= qw(FP::TransparentLazy::Overloads
+                 FP::Lazy::Promise);
 }
 
-{
-    package FP::TransparentLazy::PromiseLight;
-    our @ISA= qw(FP::Lazy::PromiseLight);
-
-    use overload @overload;
+package FP::TransparentLazy::PromiseLight {
+    our @ISA= qw(FP::TransparentLazy::Overloads
+                 FP::Lazy::PromiseLight);
 }
 
 use Chj::TEST;

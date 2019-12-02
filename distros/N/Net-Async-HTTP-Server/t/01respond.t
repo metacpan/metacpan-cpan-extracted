@@ -85,6 +85,9 @@ sub connect_client
               [ [ "User-Agent" => "unit-test" ] ],
               '$req->headers' );
 
+   is( $req->response_status_line, "HTTP/1.1 200 OK", '$req->response_status_line' );
+   is( $req->response_status_code, 200, '$req->response_status_code' );
+
    $client->close;
 
    $loop->loop_once( 0.01 ) for 1 .. 3;

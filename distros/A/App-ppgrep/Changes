@@ -1,3 +1,9 @@
+0.033   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
+	  0.034+).
+
+
 0.032   2019-07-04  Released-By: PERLANCAR
 
         - First release. Spin ppgrep out of App-ProcUtils and build it using

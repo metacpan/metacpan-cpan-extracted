@@ -1,3 +1,11 @@
+v0.105.0 2019-11-27T08:20:24Z
+ - wrappers updated
+ - wrapper updated
+ - app routef auth updated
+ - git api chdir removed
+ - level pragma removed, use -caller \d instead
+ - resources updated
+
 v0.104.1 2019-11-25T15:55:39Z
  - code cleanup
 

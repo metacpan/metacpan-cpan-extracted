@@ -1,14 +1,20 @@
-0.121   2019-06-19 (PERLANCAR)
+0.122   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
+	  0.034+).
+
+
+0.121   2019-06-19  Released-By: PERLANCAR
 
 	- Add utility: datediff.
 
 
-0.120   2019-01-29 (PERLANCAR)
+0.120   2019-01-29  Released-By: PERLANCAR
 
 	- Add backend module: Date::Parse.
 
 
-0.11    2017-01-09 (PERLANCAR)
+0.11    2017-01-09  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to set result when parsing with DTF:Alami.
 
@@ -17,13 +23,13 @@
 	  fatpacked/datapacked scripts).
 
 
-0.10    2016-07-10 (PERLANCAR)
+0.10    2016-07-10  Released-By: PERLANCAR
 
         - parse-date, parse-duration: Add option --all-modules (-a) to parse
           dates/durations with all installed modules.
 
 
-0.09    2016-06-29 (PERLANCAR)
+0.09    2016-06-29  Released-By: PERLANCAR
 
 	- Add utility: parse-date-using-df-flexible.
 
@@ -35,14 +41,14 @@
 	- Add more examples.
 
 
-0.08    2016-06-29 (PERLANCAR)
+0.08    2016-06-29  Released-By: PERLANCAR
 
 	- Add examples.
 
 	- Add utility: parse-duration-using-df-natural.
 
 
-0.07    2016-06-29 (PERLANCAR)
+0.07    2016-06-29  Released-By: PERLANCAR
 
 	- [Removed] Remove parse-duration-using-df-duration because parsing
           duration with DateTime::Format::Duration requires predefining format
@@ -54,12 +60,12 @@
           always considered failed.
 
 
-0.06    2016-06-28 (PERLANCAR)
+0.06    2016-06-28  Released-By: PERLANCAR
 
 	- parse-date-using-df-alami-*: Show matched pattern.
 
 
-0.05    2016-06-19 (PERLANCAR)
+0.05    2016-06-19  Released-By: PERLANCAR
 
 	- Add CLIs: parse-date-using-df-alami-{en,id}.
 
@@ -67,19 +73,19 @@
 	  Data::Sah::Coerce 0.011).
 
 
-0.04    2016-05-20 (PERLANCAR)
+0.04    2016-05-20  Released-By: PERLANCAR
 
 	- Add scripts: dateconv, durconv.
 
 
-0.03    2016-01-18 (PERLANCAR)
+0.03    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.02    2015-09-23 (PERLANCAR)
+0.02    2015-09-23  Released-By: PERLANCAR
 
 	- [dist] Autogenerate scripts.
 
@@ -87,6 +93,6 @@
           parse-duration-using-df-duration.
 
 
-0.01    2015-09-23 (PERLANCAR)
+0.01    2015-09-23  Released-By: PERLANCAR
 
         - First release.

@@ -17,7 +17,7 @@ $ make install
 To automatical install this module type the following:
 
 ```
-$ cpan install Ithumb::XS
+$ cpan -i Ithumb::XS
 ```
 
 ## Dependences
@@ -25,17 +25,17 @@ $ cpan install Ithumb::XS
 This module requires these other modules and libraries:
 
   Imlib2 (binary and headers)
-  
+
 ## Usage
 
 ```perl
 use Ithumb::XS ();
 
-Ithumb::XS::create_thumbnail({
+Ithumb::XS::convert_image({
     width     => 800,
     height    => 600,
-    src_image => 'source_image.jpg',
-    dst_image => 'destination_result_image.jpg'
+    src_image => 'src_image.jpg',
+    dst_image => 'dst_image.jpg'
 });
 ```
 
@@ -48,8 +48,8 @@ my $ithumb = Ithumb::XS->new;
 $ithumb->convert({
     width     => 800,
     height    => 600,
-    src_image => 'source_image.jpg',
-    dst_image => 'destination_result_image.jpg'
+    src_image => 'src_image.jpg',
+    dst_image => 'dst_result_image.jpg'
 });
 ```
 

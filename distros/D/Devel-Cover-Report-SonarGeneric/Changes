@@ -1,3 +1,10 @@
+0.6 2019-12-01
+  - add conditions to branches
+  - minimum Devel::Cover 1.25
+
+0.5 2019-11-17
+  - change to configure dependency
+
 0.4 2019-11-17
   - add build dependency for ExtUtils::MakeMaker 6.64
   - cleanup test

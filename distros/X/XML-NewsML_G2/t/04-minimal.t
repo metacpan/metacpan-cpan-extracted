@@ -28,7 +28,8 @@ ok( my $ni = XML::NewsML_G2::News_Item_Text->new(
         title => 'Saisonstart im Schweizerhaus: Run aufs Krügerl im Prater',
         language => 'de',
         provider => $prov_apa,
-        guid     => $guid_text
+        guid     => $guid_text,
+        timezone => 'UTC'
     ),
     'create News Item instance'
 );
@@ -39,7 +40,7 @@ ok( $ni->add_paragraph(
     'add_paragraph works'
 );
 
-my $writer = XML::NewsML_G2::Writer::News_Item->new( news_item => $ni );
+my $writer = XML::NewsML_G2::Writer::News_Item->new( news_item => $ni, );
 ok( my $dom = $writer->create_dom(), 'create DOM' );
 
 #diag($dom->serialize(1));

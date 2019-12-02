@@ -77,7 +77,7 @@
          "web" : "https://github.com/libwww-perl/HTTP-Cookies"
       }
    },
-   "version" : "6.07",
+   "version" : "6.08",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -473,7 +473,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.24.0",
                   "repo_root" : "."
                }
             },
@@ -484,7 +484,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.24.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -597,7 +597,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.24.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -614,12 +614,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v6.07",
+                  "tag" : "v6.08",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.24.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -669,7 +669,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.24.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -689,7 +689,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.24.0",
                   "repo_root" : "."
                }
             },

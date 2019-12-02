@@ -2,6 +2,16 @@
 
 # vim: tabstop=4 expandtab
 
+=head1 NAME
+
+medley - a cli utility for Util::Medley
+
+=head1 VERSION
+
+version 0.016
+
+=cut
+
 ###### PACKAGES ######
 
 use Modern::Perl;
@@ -45,23 +55,31 @@ else {
 
 ###### END MAIN ######
 
+sub get_repo_dir {
+	
+	my $bindir = dirname $0;
+	my $devdir = dirname $bindir;		
+	
+	return $devdir;
+}
+
 sub get_cli_driver_path {
 
-	if ( -f "share/cli-driver.yml" ) {
-
+	#
+	# first attempt to find the driver file in the git repo location
+	#
+	my $sharedir = sprintf "%s/share", get_repo_dir();
+	if ( -f "$sharedir/cli-driver.yml" ) {
 		# local development location
-		return "share";
+		return $sharedir;
 	}
 
+	#
+	# try the installed location
+	#
 	my $file = dist_file( 'Util-Medley', 'cli-driver.yml' );
 
 	return dirname $file;
-
-	#	my $medley = Util::Medley->new;
-	#	my $path   = $INC{"Util/Medley.pm"};
-	#	$path =~ s/\.pm$//;
-
-	#	return $path;
 }
 
 sub check_required {

@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/WHMCSUtils/calc_deferred_revenue
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-09-19'; # DATE
+our $DATE = '2019-11-29'; # DATE
 our $DIST = 'App-WHMCSUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ whmcs-calc-deferred-revenue - whmcs-calc-deferred-revenue
 
 =head1 VERSION
 
-This document describes version 0.009 of whmcs-calc-deferred-revenue (from Perl distribution App-WHMCSUtils), released on 2019-09-19.
+This document describes version 0.011 of whmcs-calc-deferred-revenue (from Perl distribution App-WHMCSUtils), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -48,9 +48,40 @@ Usage:
 
 =head1 DESCRIPTION
 
+Deferring revenue is the process of recognizing revenue as you earn it, in
+contrast to as you receive the cash. This is the principle of accrual
+accounting, as opposed to cash-based accounting.
+
+For example, suppose on Nov 1, 2019 you receive an amount of $12 for 12 months
+of hosting (up until Oct 31, 2020). In cash-based accounting, you immediately
+recognize the $12 as revenue on Nov 1, 2019. In accrual accounting, you
+recognize $1 revenue for each month you are performing the hosting obligation,
+for 12 times, from Nov 2019 to Oct 2020.
+
+As another example, suppose you have three invoices:
+
+ invoice num    type                  amount    note
+ -----------    ------                ------    ----
+ 1001           domain registration     10.5    example.com, from 2019-11-11 to 2020-11-10
+ 1002           hosting                  9.0    example.com, from 2019-11-11 to 2020-02-10 (3 months)
+ 1003           hosting                 12.0    example.com, from 2019-11-01 to 2020-04-30 (6 months)
+
+The first invoice is not deferred, since we have earned (or performed the
+obligation of domain registration) immediately. The second and third invoices
+are deferred. This is how the deferment will go:
+
+ invoice \ period   2019-11   2019-12   2020-01   2020-02   2020-03   2020-04
+ ----------------   -------   -------   -------   -------   -------   -------
+ 1001                  10.5
+ 1002                   3.0       3.0       3.0
+ 1003                   2.0       2.0       2.0       2.0       2.0       2.0
+ 
+ TOTAL                 15.5       5.0       5.0       2.0       2.0       2.0
+
 This utility collects invoice items from paid invoices, filters eligible ones,
-then defers the revenue to separate months for items that should be deferred,
-and finally sums the amounts to calculate total monthly deferred revenues.
+then defers the revenue to separate months for items that should be deferred
+(determined using some heuristic and additionally configurable options), and
+finally sums the amounts to calculate total monthly deferred revenues.
 
 This utility can also be instructed (via setting the C<full> option to true) to
 output the full CSV report (each items with their categorizations and deferred

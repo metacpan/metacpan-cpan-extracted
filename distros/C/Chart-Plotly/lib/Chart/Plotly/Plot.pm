@@ -6,7 +6,7 @@ use utf8;
 
 use UUID::Tiny ':std';
 
-our $VERSION = '0.031';    # VERSION
+our $VERSION = '0.033';    # VERSION
 
 use Chart::Plotly;
 
@@ -89,7 +89,7 @@ Chart::Plotly::Plot
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 

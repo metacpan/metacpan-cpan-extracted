@@ -1,3 +1,4 @@
+#!perl
 use strict;
 BEGIN {
 my $old = select STDERR; $|++;  # turn on autoflush

@@ -1,7 +1,9 @@
 package App::ppgrep;
 
-our $DATE = '2019-07-04'; # DATE
-our $VERSION = '0.032'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-ppgrep'; # DIST
+our $VERSION = '0.033'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,13 +41,13 @@ _
         },
         pgroup => {
             summary => 'Only match processes in the process group IDs listed',
-            schema => ['array*', of=>'uint*', 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>'uint*', 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             cmdline_aliases => {g=>{}},
             tags => ['category:filtering'],
         },
         group => {
             summary => 'Only match processes whose real group ID is listed. Either the numerical or symbolical value may be used.',
-            schema => ['array*', of=>'str*', 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>'str*', 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             cmdline_aliases => {G=>{}},
             tags => ['category:filtering'],
         },
@@ -63,25 +65,25 @@ _
         },
         session => {
             summary => 'Only match processes whose process session ID is listed',
-            schema => ['array*', of=>'uint*', 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>'uint*', 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             cmdline_aliases => {s=>{}},
             tags => ['category:filtering'],
         },
         terminal => {
             summary => 'Only match processes whose controlling terminal is listed. The terminal name should be specified without the "/dev/" prefix.',
-            schema => ['array*', of=>'str*', 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>'str*', 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             cmdline_aliases => {t=>{}},
             tags => ['category:filtering'],
         },
         euid => {
             summary => 'Only match processes whose effective user ID is listed. Either the numerical or symbolical value may be used.',
-            schema => ['array*', of=>'str*', 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>'str*', 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             cmdline_aliases => {u=>{}},
             tags => ['category:filtering'],
         },
         uid => {
             summary => 'Only match processes whose user ID is listed. Either the numerical or symbolical value may be used.',
-            schema => ['array*', of=>'str*', 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>'str*', 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             cmdline_aliases => {U=>{}},
             tags => ['category:filtering'],
         },
@@ -267,7 +269,7 @@ App::ppgrep - Look up parents' processes based on name and other attributes
 
 =head1 VERSION
 
-This document describes version 0.032 of App::ppgrep (from Perl distribution App-ppgrep), released on 2019-07-04.
+This document describes version 0.033 of App::ppgrep (from Perl distribution App-ppgrep), released on 2019-11-29.
 
 =head1 SYNOPSIS
 

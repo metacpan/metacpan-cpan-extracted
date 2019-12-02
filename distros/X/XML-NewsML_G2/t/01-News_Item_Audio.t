@@ -57,7 +57,7 @@ $ni->add_remote( 'file://tmp/files/123.mp3', $mp3 );
 my $writer = XML::NewsML_G2::Writer::News_Item->new(
     news_item      => $ni,
     scheme_manager => $sm,
-    g2_version     => 2.9
+    g2_version     => 2.9,
 );
 
 # 2.9 checks
@@ -74,7 +74,7 @@ for my $version (qw(2.12 2.15 2.18 2.28)) {
     ok( $writer = XML::NewsML_G2::Writer::News_Item->new(
             news_item      => $ni,
             scheme_manager => $sm,
-            g2_version     => $version
+            g2_version     => $version,
         ),
         "creating $version writer"
     );

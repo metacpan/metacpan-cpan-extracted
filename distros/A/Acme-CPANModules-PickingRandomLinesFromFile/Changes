@@ -1,3 +1,10 @@
+0.003   2019-11-27  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Acme::CPANModules::ReadingFilesBackward.
+
+
 0.002   2019-10-16  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

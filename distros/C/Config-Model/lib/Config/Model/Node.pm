@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.136;
+package Config::Model::Node 2.137;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
@@ -126,7 +126,19 @@ has needs_save => ( is => 'rw', isa => 'Bool', default => 0 );
 
 has backend_mgr => ( is => 'ro', isa => 'Maybe[Config::Model::BackendMgr]' );
 
-# attribute is defined in Config::Model::Anythin
+# used to avoid warning twice about a deprecated element. Internal methods
+has warned_deprecated_element => (
+    is => 'ro',
+    isa => 'HashRef[Str]',
+    traits     => ['Hash'],
+    default => sub { {}; },
+    handles => {
+        warn_element_done => 'set',
+        was_element_warned => 'defined',
+    }
+) ;
+
+# attribute is defined in Config::Model::Anything
 sub _backend_support_annotation {
     my $self = shift;
     return $self->backend_mgr ? $self->backend_mgr->support_annotation
@@ -686,16 +698,12 @@ sub fetch_element {
     # do not warn when when is skip or "no"
     if ($self->{status}{$element_name} eq 'deprecated' and $check eq 'yes' ) {
         # FIXME elaborate more ? or include parameter description ??
-        if ($::_use_log4perl_to_warn) {
-            $user_logger->warn(
-                "Element '$element_name' of node '", $self->name, "' is deprecated"
-            )
-                if $check eq 'yes';
+        my $msg = "Element '$element_name' of node '". $self->name. "' is deprecated";
+        if (not $self->was_element_warned($element_name)) {
+            if ($::_use_log4perl_to_warn) { $user_logger->warn($msg); }
+            else                          { warn("$msg\n"); }
+            $self->warn_element_done($element_name,1);
         }
-        else {
-            warn("Element '$element_name' of node '", $self->name, "' is deprecated\n") if $check eq 'yes';
-        }
-
         # this will also force a rewrite of the file even if no other
         # semantic change was done
         $self->notify_change(
@@ -1036,14 +1044,17 @@ sub load_data {
     }
 }
 
-# TBD explain full_dump
-
 sub dump_tree {
     my $self = shift;
     my %args = @_;
     $self->init();
+    my $full = delete $args{full_dump} || 0;
+    if ($full) {
+        carp "dump_tree: full_dump parameter is deprecated. Please use 'mode => user' instead";
+        $args{mode} //= 'user';
+    }
     my $dumper = Config::Model::Dumper->new;
-    $dumper->dump_tree( node => $self, @_ );
+    $dumper->dump_tree( node => $self, %args );
 }
 
 sub migrate {
@@ -1223,7 +1234,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 
@@ -1465,7 +1476,7 @@ B<type> parameter. The I<type> type can be:
 
 =item C<node>
 
-The element is a simple node of a tree instantiated from a
+The element is a node of a tree instantiated from a
 configuration class (declared with
 L<Config::Model/"create_config_class( ... )">).
 See L</"Node element">.

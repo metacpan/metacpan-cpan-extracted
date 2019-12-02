@@ -1,7 +1,7 @@
 package Sah::Schema::fiat_or_cryptocurrency;
 
-our $DATE = '2019-10-24'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [str => {
     summary => 'Fiat currency code or cryptocurrency code, name, or safename',
@@ -16,7 +16,7 @@ Will be normalized to code in uppercase.
 
 _
     'x.completion' => 'fiat_or_cryptocurrency',
-    'x.perl.coerce_rules' => ['str_to_fiat_or_cryptocurrency_code'],
+    'x.perl.coerce_rules' => ['From_str::to_fiat_or_cryptocurrency_code'],
 }, {}];
 
 1;
@@ -34,7 +34,7 @@ Sah::Schema::fiat_or_cryptocurrency - Fiat currency code or cryptocurrency code,
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::fiat_or_cryptocurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-10-24.
+This document describes version 0.013 of Sah::Schema::fiat_or_cryptocurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

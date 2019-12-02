@@ -1,5 +1,15 @@
 Revision history for Future-AsyncAwait
 
+0.34    2019-12-01 01:45:23
+        [CHANGES]
+         * Various internal changes to neaten up the hax/ directory of C
+           source files, letting them be more shareable with other XS dists
+
+        [BUGFIXES]
+         * Fix (some of the cases of) RT129987
+         * Only fetch CX_CUR() after the future_done_from_stack() call
+           (RT131118)
+
 0.33    2019-09-08 05:16:05
         [BUGFIXES]
          * Remember to SPAGAIN after future_done_from_stack() in case the

@@ -36,7 +36,6 @@
             "IPC::Open3" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.41",
-            "blib" : "1.01",
             "perl" : "5.006"
          }
       },
@@ -51,6 +50,7 @@
             "File::Path" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
+            "FindBin" : "0",
             "Getopt::Long" : "0",
             "Moose" : "0",
             "Text::CSV" : "0",
@@ -77,103 +77,103 @@
    "provides" : {
       "Bio::Tradis" : {
          "file" : "lib/Bio/Tradis.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::AddTagsToSeq" : {
          "file" : "lib/Bio/Tradis/AddTagsToSeq.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::Analysis::Exceptions" : {
          "file" : "lib/Bio/Tradis/Analysis/Exceptions.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::Analysis::InsertSite" : {
          "file" : "lib/Bio/Tradis/Analysis/InsertSite.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::CombinePlots" : {
          "file" : "lib/Bio/Tradis/CombinePlots.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::CommandLine::AddTags" : {
          "file" : "lib/Bio/Tradis/CommandLine/AddTags.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::CommandLine::CheckTags" : {
          "file" : "lib/Bio/Tradis/CommandLine/CheckTags.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::CommandLine::FilterFastqTags" : {
          "file" : "lib/Bio/Tradis/CommandLine/FilterFastqTags.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::CommandLine::PlotCombine" : {
          "file" : "lib/Bio/Tradis/CommandLine/PlotCombine.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::CommandLine::PlotTradis" : {
          "file" : "lib/Bio/Tradis/CommandLine/PlotTradis.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::CommandLine::RemoveFastqTags" : {
          "file" : "lib/Bio/Tradis/CommandLine/RemoveFastqTags.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::CommandLine::RunMapping" : {
          "file" : "lib/Bio/Tradis/CommandLine/RunMapping.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::CommandLine::TradisAnalysis" : {
          "file" : "lib/Bio/Tradis/CommandLine/TradisAnalysis.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::CommandLine::TradisBam" : {
          "file" : "lib/Bio/Tradis/CommandLine/TradisBam.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::DetectTags" : {
          "file" : "lib/Bio/Tradis/DetectTags.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::Exception" : {
          "file" : "lib/Bio/Tradis/Exception.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::FilterTags" : {
          "file" : "lib/Bio/Tradis/FilterTags.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::Map" : {
          "file" : "lib/Bio/Tradis/Map.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::Parser::Bam" : {
          "file" : "lib/Bio/Tradis/Parser/Bam.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::Parser::Cigar" : {
          "file" : "lib/Bio/Tradis/Parser/Cigar.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::Parser::Fastq" : {
          "file" : "lib/Bio/Tradis/Parser/Fastq.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::RemoveTags" : {
          "file" : "lib/Bio/Tradis/RemoveTags.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::RunTradis" : {
          "file" : "lib/Bio/Tradis/RunTradis.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::Samtools" : {
          "file" : "lib/Bio/Tradis/Samtools.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       },
       "Bio::Tradis::TradisPlot" : {
          "file" : "lib/Bio/Tradis/TradisPlot.pm",
-         "version" : "v1.4.1"
+         "version" : "v1.4.3"
       }
    },
    "release_status" : "stable",
@@ -185,10 +185,10 @@
          "web" : "https://github.com/sanger-pathogens/Bio-Tradis"
       }
    },
-   "version" : "1.4.1",
+   "version" : "1.4.3",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.018004"
+         "version" : "5.030000"
       },
       "plugins" : [
          {
@@ -216,19 +216,19 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4 (Apple Git-66)",
+                  "git_version" : "2.24.0",
                   "repo_root" : "."
                }
             },
             "name" : "@Git/Check",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "v%v%n%n%c"
+                  "commit_msg" : "v%V%n%n%c"
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -239,7 +239,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4 (Apple Git-66)",
+                  "git_version" : "2.24.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -247,7 +247,7 @@
                }
             },
             "name" : "@Git/Commit",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -256,12 +256,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.4.1",
-                  "tag_format" : "v%v",
-                  "tag_message" : "v%v"
+                  "tag" : "v1.4.3",
+                  "tag_format" : "v%V",
+                  "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4 (Apple Git-66)",
+                  "git_version" : "2.24.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -269,7 +269,7 @@
                }
             },
             "name" : "@Git/Tag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -281,12 +281,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4 (Apple Git-66)",
+                  "git_version" : "2.24.0",
                   "repo_root" : "."
                }
             },
             "name" : "@Git/Push",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -302,53 +302,6 @@
                }
             },
             "name" : "@Starter/GatherDir",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::PruneCruft",
-            "name" : "@Starter/PruneCruft",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ManifestSkip",
-            "name" : "@Starter/ManifestSkip",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::MetaConfig",
-            "name" : "@Starter/MetaConfig",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
-            "config" : {
-               "Dist::Zilla::Plugin::MetaProvides::Package" : {
-                  "finder_objects" : [
-                     {
-                        "class" : "Dist::Zilla::Plugin::FinderCode",
-                        "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.012"
-                     }
-                  ],
-                  "include_underscores" : 0
-               },
-               "Dist::Zilla::Role::MetaProvider::Provider" : {
-                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
-                  "inherit_missing" : 1,
-                  "inherit_version" : 1,
-                  "meta_noindex" : 1
-               },
-               "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
-                  "version" : "0.004"
-               }
-            },
-            "name" : "@Starter/MetaProvides::Package",
-            "version" : "2.004003"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
-            "name" : "@Starter/MetaNoIndex",
             "version" : "6.012"
          },
          {
@@ -377,16 +330,6 @@
             "version" : "0.163250"
          },
          {
-            "class" : "Dist::Zilla::Plugin::ExecDir",
-            "name" : "@Starter/ExecDir",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ShareDir",
-            "name" : "@Starter/ShareDir",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Starter/PodSyntaxTests",
             "version" : "6.012"
@@ -394,7 +337,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
             "name" : "@Starter/Test::ReportPrereqs",
-            "version" : "0.025"
+            "version" : "0.027"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -417,7 +360,7 @@
                }
             },
             "name" : "@Starter/Test::Compile",
-            "version" : "2.056"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -435,8 +378,13 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::TestRelease",
-            "name" : "@Starter/TestRelease",
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Starter/PruneCruft",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Starter/ManifestSkip",
             "version" : "6.012"
          },
          {
@@ -450,6 +398,11 @@
             "version" : "0.029"
          },
          {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Starter/TestRelease",
+            "version" : "6.012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Starter/ConfirmRelease",
             "version" : "6.012"
@@ -457,6 +410,53 @@
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Starter/UploadToCPAN",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@Starter/MetaConfig",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "@Starter/MetaNoIndex",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.012"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000036",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Starter/MetaProvides::Package",
+            "version" : "2.004003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Starter/ShareDir",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Starter/ExecDir",
             "version" : "6.012"
          },
          {
@@ -648,7 +648,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.18.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }
 

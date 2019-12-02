@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :characters :severities :classification :ppi };
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.134';
+our $VERSION = '1.136';
 
 #-----------------------------------------------------------------------------
 
@@ -83,9 +83,9 @@ This Policy is not configurable except for the standard options.
 
 =head1 SEE ALSO
 
-L<Perl::Critic::Policy::BuiltInFunctions::RequireBlockGrep|Perl::Critic::Policy::BuiltInFunctions::RequireBlockGrep>
+L<Perl::Critic::Policy::BuiltinFunctions::RequireBlockGrep|Perl::Critic::Policy::BuiltinFunctions::RequireBlockGrep>
 
-L<Perl::Critic::Policy::BuiltInFunctions::RequireBlockMap|Perl::Critic::Policy::BuiltInFunctions::RequireBlockMap>
+L<Perl::Critic::Policy::BuiltinFunctions::RequireBlockMap|Perl::Critic::Policy::BuiltinFunctions::RequireBlockMap>
 
 
 =head1 AUTHOR

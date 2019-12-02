@@ -1,5 +1,5 @@
 package Email::Sender::Transport::Mailgun;
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use Moo;
 with 'Email::Sender::Transport';
@@ -54,6 +54,12 @@ has tracking_clicks => (
     is => 'ro',
     predicate => 1,
     isa => Enum[qw( yes no htmlonly )],
+);
+
+has region => (
+    is => 'ro',
+    predicate => 1,
+    isa => Enum[qw( us eu )],
 );
 
 has base_uri => (
@@ -139,6 +145,10 @@ sub _build_uri {
     my $api_key = $self->api_key;
     my $domain = $self->domain;
 
+    # adapt endpoint based on region setting.
+    $rest =~ s/(\.mailgun)/sprintf('.%s%s', $self->region, $1)/e
+        if defined $self->region && $self->region ne 'us';
+
     return "$proto://api:$api_key\@$rest/$domain";
 }
 
@@ -202,8 +212,8 @@ Mailgun domain. See L<https://documentation.mailgun.com/api-intro.html#base-url>
 
 =head1 OPTIONAL ATTRIBUTES
 
-These correspond to the C<o:> options in the C<messages.mime> section of
-L<https://documentation.mailgun.com/api-sending.html#sending>
+These (except region) correspond to the C<o:> options in the C<messages.mime>
+section of L<https://documentation.mailgun.com/api-sending.html#sending>
 
 =head2 campaign
 
@@ -216,6 +226,12 @@ Desired time of delivery. String or DateTime object.
 =head2 dkim
 
 Enables/disables DKIM signatures. C<'yes'> or C<'no'>.
+
+=head2 region
+
+Defines used Mailgun region. C<'us'> (default) or C<'eu'>.
+
+See L<https://documentation.mailgun.com/en/latest/api-intro.html#mailgun-regions>.
 
 =head2 tag
 
@@ -270,6 +286,8 @@ C<EMAIL_SENDER_TRANSPORT_>.
 =item EMAIL_SENDER_TRANSPORT_deliverytime
 
 =item EMAIL_SENDER_TRANSPORT_dkim
+
+=item EMAIL_SENDER_TRANSPORT_region
 
 =item EMAIL_SENDER_TRANSPORT_tag
 

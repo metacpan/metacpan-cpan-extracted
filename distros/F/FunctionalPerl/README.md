@@ -3,16 +3,38 @@ properly formatted versions of these documents.
 
 ---
 
-# Functional programming on Perl
+# Functional programming in Perl
 
-This project aims to provide modules as well as tutorials and
-introductionary materials to work in a functional style on Perl 5.
+This project aims to make it easier to reduce the number of places in
+Perl programs where side effects are being used, by providing
+facilities like data structures to enable it and tutorials and
+introductions to show good ways to go about it.
+
+Side effects (mutation and input/output), unless they are contained
+locally (transparent to the user of a subroutine/method/API) are not
+part of the method/subroutine calling interface but are implicit
+(hopefully at least documented), and such a call has lingering
+effects, possibly at a distance. This makes tracking down bugs more
+difficult, and can hinder the reuse of program parts in newly combined
+ways. Also, code using side effects means re-running it may not be
+idempotent (hence produce failures) or be calculating different
+values, which prevents its use in an interactive way, like from a
+read-eval print loop or debugger, and makes writing tests more
+difficult.
 
 <with_toc>
 
-## Teaser
+## Examples
 
-This is an example of the kind of code this project aims to make possible:
+Work more comfortably with sequences:
+
+    use Test::More;
+    use FunctionalPerl ":all"; # includes autoboxing (methods on arrays work)
+    
+    is [2, 3, 4]->reduce(\&add), 9; # the `sum` method does the same
+    is [2, 3, 4]->map(\&square)->sum, 29;
+
+Make some XML document:
 
     # Generate functions which construct PXML objects (objects that
     # can be serialized to XML) with the names given her as the XML
@@ -21,13 +43,14 @@ This is an example of the kind of code this project aims to make possible:
     # The functions are generated in all-uppercase so as to minimize
     # the chances for naming conflicts and to let them stand apart.
 
-    print RECORD(A("hi"),B("there"))->string; 
-    # prints: <record><a>hi</a><b>there</b></record>
+    is RECORD(A("hi"), B("<there>"))->string,
+       '<record><a>hi</a><b>&lt;there&gt;</b></record>';
 
-    # Now create a bigger document, with its inner parts built from
-    # external inputs:
+Now create a bigger document, with its inner parts built from external
+inputs:
+
     MYEXAMPLE
-      (PROTOCOL_VERSION ("0.123"),
+      (PROTOCOL_VERSION("0.123"),
        RECORDS
        (csv_file_to_rows($inpath, {eol=> "\n", sep_char=> ";"})
         # skip the header row
@@ -35,61 +58,95 @@ This is an example of the kind of code this project aims to make possible:
         # map rows to XML elements
         ->map(sub {
                   my ($a,$b,$c,$d)= @{$_[0]};
-                  RECORD A($a), B($b), C($c), D($d)
+                  RECORD(A($a), B($b), C($c), D($d))
               })))
       # print XML document to disk
       ->xmlfile($outpath);
 
-    # Note that the MYEXAMPLE document above is built lazily:
-    # `csv_file_to_rows` returns a *lazy* list of rows, ->rest causes
-    # the first CSV row to be read and dropped and returns the
-    # remainder of the lazy list, ->map returns a new lazy list which
-    # is passed as argument to RECORDS, which returns a PXML object
-    # representing a 'records' XML element, that is then passed to
-    # MYEXAMPLE which returns a PXML object representing a 'myexample'
-    # XML element. PXML objects come with a xmlfile method which
-    # serializes the document to a file, and only while it runs, when
-    # it encounters the embedded lazy lists, it walks those evaluating
-    # the list items one at a time and dropping each item immediately
-    # after printing. This means that only one row of the CSV file
-    # needs to be held in memory at any given point.
+The `MYEXAMPLE` document above is built lazily: `csv_file_to_rows`
+returns a *lazy* list of rows, `->rest` causes the first CSV row to be
+read and dropped and returns the remainder of the lazy list, `->map`
+returns a new lazy list which is passed as argument to `RECORDS`,
+which returns a `PXML` object representing a 'records' XML element,
+that is then passed to `MYEXAMPLE` which returns a `PXML` object
+representing a 'myexample' XML element. `PXML` objects come with an
+`xmlfile` method which serializes the document to a file, and only
+while it runs, when it encounters the embedded lazy lists, it walks
+those evaluating the list items one at a time and dropping each item
+immediately after printing. This means that only one row of the CSV
+file needs to be held in memory at any given point.
 
-See [examples/csv_to_xml_short](examples/csv_to_xml_short) for the
-complete script, and the [examples](examples/README.md) page for more.
-
-The above example shows the use of functions as a "template system".
-
-Note that the example assumes that steps have been taken so that the
-CSV file doesn't change until the serialization step has completed,
-otherwise functional purity is broken; the responsibility to ensure
-this assumption is left to the programmer (see
+<small>(Note that the example still assumes that steps have been taken
+so that the CSV file doesn't change until the serialization step has
+completed, otherwise functional purity is broken; the responsibility
+to ensure this assumption is left to the programmer (see
 [[howto#Pure_functions_versus_I/O_and_other_side-effects]] for more
-details about this).
+details about this).)</small>
+
+The core idea of functional programming is the avoidance of
+mutation. In the absense of mutation, a value, once calculated, stays
+the same, it is immutable. For example numbers: once a number is
+calculated you can't modify it in place; if you have multiple
+variables holding the same number, you can't (on purpose or
+accidentally) change them both at the same time:
+
+    my $x= 100; 
+    my $y= $x;
+    $x++;
+    is $y, 100; # still true, the number itself didn't change, only the variable
+
+There is no number operation that modifies numbers in place, they all
+return a new number instance. The same isn't true for most other
+values in Perl; they let you modify their internal contents without
+giving you a new reference, and it's usually the default way how
+things are done. Strings and sometimes arrays are often copied
+instead, which for large instances becomes inefficient. Setters on
+objects usually just modify an object in place (they mutate it). This
+project helps both with efficiency (minimizing copying) and ergonomy
+(automatically creates functional setters for class fields).
+[Here's an example](examples/functional-classes) with a simple class
+to show the difference.
+
+Code that doesn't mutate (pure functions or methods) can be combined
+easily into new functions, which are still pure and thus can be
+further combined. `compose` takes any number of function references
+(coderefs) and returns a new function (coderef) that applies those
+functions to its argument in turn (it is a combinator function, there
+are more in`FP::Combinators`):
+
+    # The function that adds all of its arguments together then
+    # squares the result:
+    *square_of_the_sum = compose \&square, \&add;
+    is square_of_the_sum(10,20,2), 1024;
+
+    # The same but takes the input items from a list instead of
+    # multiple function arguments:
+    *square_of_the_sequence_sum= compose(\&square, the_method "sum");
+    is square_of_the_sequence_sum(list(2, 3)), 25;
+
+Functional programming matters more in the large--with small programs
+it's easy to keep all places where mutation happens in the head,
+wheras with large ones the interactions can become unwieldy.
+
+See the [examples](examples/README.md) page for more examples.
 
 If you'd like to see a practical step-by-step introduction, read the
 [[intro]].
 
-Even if you're not interested in lazy evaluation like in the above,
-this project may help you write parts of programs in a purely
-functional way, and benefit from the decreased coupling and improved
-testability and debuggability that this brings.
+For an index into all modules, see the "see also" section in
+`FunctionalPerl`.
 
 
 ## Status: alpha
 
-This project is in an alpha status because:
+This project is in alpha status because:
 
-* There are some remaining issues which appear to be in the perl
-  interpreter that, in some cases, lead to memory being retained for
-  longer than necessary when using lazy lists. This has to be examined
-  and tested extensively, or a workaround (delete value out of promise
-  instead of deleting promise from its holder?) to be implemented.
-
-* Also in the area of lazy lists, the current need in some situations
-  to use `Keep` and `weaken` to guide deallocation of list elements is
-  unfortunate; ideally the perl interpreter is extended with a pragma
-  that, when enabled, makes it automatically let go of unused list
-  elements (lexical lifetimes).
+* Handling of streams (lazy lists) is currently unergonomic since the
+  user has to specify explicitly whether a stream is to be retained
+  (using of `Keep` function) or to be let go (default). Ideally the
+  perl interpreter is extended with a pragma that, when enabled, makes
+  it automatically keep or let go of a value, depending on whether a
+  variable is still used further down (lexical analysis).
 
 * The project is currently using some modules which the author
   developed a long time ago and could be replaced with other existing
@@ -211,8 +268,8 @@ howto/design documents.
 
 * __Our howto and design documents__
 
-    * *[How to write functional programs on Perl 5](docs/howto.md)* is
-      describing the necessary techniques to use the functional style on
+    * *[How to write functional programs in Perl 5](docs/howto.md)* is
+      describing the necessary techniques to use the functional style in
       Perl. (Todo: this may be too difficult for someone who doesn't know
       anything about functional programming; what to do about it?)
 
@@ -228,9 +285,8 @@ howto/design documents.
     was written long before the functional-perl project was started, and
     does various details differently.
 
-Please ask [me](http://leafpair.com/contact) or on the
-[[mailing_list]] if you'd like to meet up in London, Berlin or
-Switzerland to get an introduction in person.
+Please ask [me](http://leafpair.com/contact) if you'd like to meet up
+in London, Berlin or Switzerland to get an introduction in person.
 
 
 ## Dependencies
@@ -256,6 +312,12 @@ Switzerland to get an introduction in person.
 
 ## Installation
 
+### From CPAN
+
+Use your preferred CPAN installer, for example: `cpan FunctionalPerl`
+
+### From the Git repository
+
     git clone https://github.com/pflanze/functional-perl.git
     cd functional-perl
 
@@ -266,7 +328,7 @@ Switzerland to get an introduction in person.
     gpg --recv-key 04EDB072
     git tag -v $FP_VERSION
     # You'll find various pages in search engines with my fingerprint,
-    # or you may find a trust chain through one of the signatures on my
+    # or you may find a trust path through one of the signatures on my
     # older key 1FE692DA, that this one is signed with.
 
 The bundled scripts modify the library load path to find the files
@@ -274,11 +336,26 @@ locally, thus no installation is necessary. All modules are in the
 `lib/` directory, `export PERL5LIB=path/to/functional-perl/lib` is all
 that's needed.
 
-The normal `perl Makefile.PL; make test && make install` process
-should work as well. The repository is probably going to be split into
-or will produce several separate CPAN packages in the future, thus
-don't rely on the installation process working the way it is right
-now.
+To install, run the usual `perl Makefile.PL; make test && make install`.
+
+(The repository might be split into producing several separate CPAN
+packages (or even repositories?) in the future, thus don't rely too
+much on the installation process continuing to work the way it is
+right now.)
+
+
+## Reporting bugs, finding help, contributing
+
+* Report bugs via either:
+
+    * the [Github project](https://github.com/pflanze/functional-perl)
+
+    * the "Issues" link on the the distribution's
+      [CPAN page](https://metacpan.org/pod/FunctionalPerl).
+
+* Find IRC and contact details on the [[mailing_list]] and [[contact]]
+  pages. Check the [[design]] page to get an idea about the design
+  principles if you'd like to write code to contribute.
 
 
 </with_toc>

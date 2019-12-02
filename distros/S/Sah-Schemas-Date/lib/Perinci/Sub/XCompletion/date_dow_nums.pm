@@ -1,7 +1,7 @@
 package Perinci::Sub::XCompletion::date_dow_nums;
 
-our $DATE = '2019-07-21'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,7 +45,7 @@ Perinci::Sub::XCompletion::date_dow_nums - Generate completion for date::dow_num
 
 =head1 VERSION
 
-This document describes version 0.006 of Perinci::Sub::XCompletion::date_dow_nums (from Perl distribution Sah-Schemas-Date), released on 2019-07-21.
+This document describes version 0.007 of Perinci::Sub::XCompletion::date_dow_nums (from Perl distribution Sah-Schemas-Date), released on 2019-11-28.
 
 =head1 CONFIGURATION
 

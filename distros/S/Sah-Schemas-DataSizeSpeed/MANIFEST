@@ -7,7 +7,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
-lib/Data/Sah/Coerce/perl/float/str_suffix_filesize.pm
+lib/Data/Sah/Coerce/perl/To_float/From_str/suffix_filesize.pm
 lib/Data/Size/Suffix/Filesize.pm
 lib/Sah/Schema/filesize.pm
 lib/Sah/SchemaR/filesize.pm
@@ -16,4 +16,6 @@ t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/coerce-suffix_filesize.t
+t/schema-filesize.t
 weaver.ini

@@ -1,6 +1,184 @@
-DESCRIPTION
+NAME
+    App::FinanceUtils - Financial CLI utilities
 
+VERSION
+    This document describes version 0.003 of App::FinanceUtils (from Perl
+    distribution App-FinanceUtils), released on 2019-11-29.
+
+DESCRIPTION
     This distribution contains some CLI's to do financial calculations:
 
     # INSERT_EXECS_LIST
+
+FUNCTIONS
+  calc_fv_future_value
+    Usage:
+
+     calc_fv_future_value(%args) -> any
+
+    Calculate future value (fv) from present value (pv), return rate (r),
+    and periods (n).
+
+    Examples:
+
+    *   Invest $100 at 6% annual return rate for 5 years:
+
+         calc_fv_future_value(pv => 100, r => 0.06, n => 5); # -> [200, "OK", 133.82255776]
+
+    Formula is:
+
+     fv = pv*(1+r)**n
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   n* => *float*
+
+        Number of periods.
+
+    *   pv* => *float*
+
+        present value.
+
+    *   r* => *float*
+
+        Return rate (e.g. 0.06 for 6%).
+
+    Return value: (any)
+
+  calc_fv_periods
+    Usage:
+
+     calc_fv_periods(%args) -> any
+
+    Calculate periods (n) from future value (fv), present value (pv), and
+    return rate (r).
+
+    Examples:
+
+    *   Want to get $120 using $100 investment with annual 6% return rate,
+        how many years must we wait?:
+
+         calc_fv_periods(fv => 120, pv => 100, r => 0.06); # -> [200, "OK", 3.12896813521953]
+
+    Formula is:
+
+     n = log(fv/pv) / log(1+r)
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   fv* => *float*
+
+        future value.
+
+    *   pv* => *float*
+
+        present value.
+
+    *   r* => *float*
+
+        Return rate (e.g. 0.06 for 6%).
+
+    Return value: (any)
+
+  calc_fv_present_value
+    Usage:
+
+     calc_fv_present_value(%args) -> any
+
+    Calculate present value (pv) from future value (fv), return rate (r),
+    and periods (n).
+
+    Examples:
+
+    *   Want to get $100 after 5 years at 6% annual return rate, how much to
+        invest?:
+
+         calc_fv_present_value(fv => 100, r => 0.06, n => 5); # -> [200, "OK", 74.7258172866057]
+
+    Formula is:
+
+     pv = fv/(1+r)**n
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   fv* => *float*
+
+        future value.
+
+    *   n* => *float*
+
+        Number of periods.
+
+    *   r* => *float*
+
+        Return rate (e.g. 0.06 for 6%).
+
+    Return value: (any)
+
+  calc_fv_return_rate
+    Usage:
+
+     calc_fv_return_rate(%args) -> any
+
+    Calculate return rate (r) from future value (fv), present value (pv),
+    and periods (n).
+
+    Examples:
+
+    *   Want to get $120 in 5 years using $100 investment, what is the
+        required return rate?:
+
+         calc_fv_return_rate(fv => 120, pv => 100, n => 5); # -> [200, "OK", 0.0371372893366482]
+
+    Formula is:
+
+     r = (fv/pv)**(1/n) - 1
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   fv* => *float*
+
+        future value.
+
+    *   n* => *float*
+
+        Number of periods.
+
+    *   pv* => *float*
+
+        present value.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-FinanceUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-FinanceUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-FinanceUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

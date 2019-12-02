@@ -1,7 +1,7 @@
 package App::XTermUtils;
 
-our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-11-27'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Utilities related to XTerm
@@ -18,7 +18,7 @@ App::XTermUtils - Utilities related to XTerm
 
 =head1 VERSION
 
-This document describes version 0.005 of App::XTermUtils (from Perl distribution App-XTermUtils), released on 2019-08-20.
+This document describes version 0.006 of App::XTermUtils (from Perl distribution App-XTermUtils), released on 2019-11-27.
 
 =head1 DESCRIPTION
 
@@ -28,11 +28,19 @@ This distribution provides the following command-line utilities:
 
 =item * L<get-term-bgcolor>
 
+=item * L<get-term-fgcolor>
+
 =item * L<set-term-bgcolor>
+
+=item * L<set-term-fgcolor>
 
 =item * L<term-bgcolor-is-dark>
 
 =item * L<term-bgcolor-is-light>
+
+=item * L<term-fgcolor-is-dark>
+
+=item * L<term-fgcolor-is-light>
 
 =back
 

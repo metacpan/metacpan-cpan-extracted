@@ -1,12 +1,12 @@
 package Sah::Schema::cryptoexchange::code;
 
-our $DATE = '2019-10-24'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [str => {
     summary => 'Cryptocurrency exchange code',
     'x.completion' => 'cryptoexchange_code',
-    'x.perl.coerce_rules' => ['str_toupper'],
+    'x.perl.coerce_rules' => ['From_str::to_upper'],
 }, {}];
 
 1;
@@ -24,7 +24,7 @@ Sah::Schema::cryptoexchange::code - Cryptocurrency exchange code
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::cryptoexchange::code (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-10-24.
+This document describes version 0.013 of Sah::Schema::cryptoexchange::code (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-11-29.
 
 =head1 HOMEPAGE
 

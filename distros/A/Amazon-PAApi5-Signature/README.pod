@@ -1,0 +1,50 @@
+=encoding utf8
+
+
+This is Perl module B<Amazon::PAApi5::Signature>.
+
+=begin html
+
+<a href="https://github.com/bayashi/Amazon-PAApi5-Signature/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/Amazon-PAApi5-Signature"><img src="https://secure.travis-ci.org/bayashi/Amazon-PAApi5-Signature.png"/></a> <a href="https://coveralls.io/r/bayashi/Amazon-PAApi5-Signature"><img src="https://coveralls.io/repos/bayashi/Amazon-PAApi5-Signature/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Amazon::PAApi5::Signature installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Amazon::PAApi5::Signature
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Amazon::PAApi5::Signature documentation is available as in POD. So you can do:
+
+    % perldoc Amazon::PAApi5::Signature
+
+
+=head1 REPOSITORY
+
+Amazon::PAApi5::Signature is hosted on github
+L<http://github.com/bayashi/Amazon-PAApi5-Signature>
+
+
+=head1 LICENSE
+
+C<Amazon::PAApi5::Signature> is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0. (Note that, unlike the Artistic License 1.0, version 2.0 is GPL compatible by itself, hence there is no benefit to having an Artistic 2.0 / GPL disjunction.) See the file LICENSE for details.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

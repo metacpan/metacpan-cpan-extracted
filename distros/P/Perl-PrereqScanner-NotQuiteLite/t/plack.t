@@ -19,6 +19,13 @@ builder {
 };
 END
 
+test('enable full', <<'END', {'Plack::Builder' => 0, 'Plack::Middleware::Foo' => 0});
+use Plack::Builder;
+builder {
+  enable 'Plack::Middleware::Foo';
+}
+END
+
 test('enable_if', <<'END', {'Plack::Builder' => 0, 'Plack::Middleware::Foo' => 0});
 use Plack::Builder;
 builder {
@@ -33,6 +40,13 @@ builder {
 };
 END
 
+test('enable_if full', <<'END', {'Plack::Builder' => 0, 'Plack::Middleware::Foo' => 0});
+use Plack::Builder;
+builder {
+  enable_if { $_[0]->{REMOTE_ADDR} eq '127.0.0.1' } 'Plack::Middleware::Foo';
+};
+END
+
 test('enable_if, sub', <<'END', {'Plack::Builder' => 0, 'Plack::Middleware::Foo' => 0});
 use Plack::Builder;
 builder {
@@ -44,6 +58,13 @@ test('enable_if plus, sub', <<'END', {'Plack::Builder' => 0, 'Foo' => 0});
 use Plack::Builder;
 builder {
   enable_if sub { $_[0]->{REMOTE_ADDR} eq '127.0.0.1' }, '+Foo';
+};
+END
+
+test('enable_if full, sub', <<'END', {'Plack::Builder' => 0, 'Plack::Middleware::Foo' => 0});
+use Plack::Builder;
+builder {
+  enable_if sub { $_[0]->{REMOTE_ADDR} eq '127.0.0.1' }, 'Plack::Middleware::Foo';
 };
 END
 

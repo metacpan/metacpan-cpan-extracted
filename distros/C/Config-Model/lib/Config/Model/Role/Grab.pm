@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::Grab 2.136;
+package Config::Model::Role::Grab 2.137;
 
 # ABSTRACT: Role to grab data from elsewhere in the tree
 
@@ -57,7 +57,7 @@ sub grab {
 
     Config::Model::Exception::Internal->throw(
         error => "grab: steps parameter must be a string " . "or an array ref" )
-        unless ref $steps eq 'ARRAY' || not ref $steps;
+        unless ref $steps eq 'ARRAY' || ! ref $steps;
 
     # accept commands, grep remove empty items left by spurious spaces
     my $huge_string = ref $steps ? join( ' ', @$steps ) : $steps;
@@ -369,7 +369,7 @@ Config::Model::Role::Grab - Role to grab data from elsewhere in the tree
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 

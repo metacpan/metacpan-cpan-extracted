@@ -1,9 +1,9 @@
 package Sah::SchemaR::cryptoexchange;
 
-our $DATE = '2019-10-24'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = ["str",[{description=>"\nCryptoexchange code or name or safename that is listed in\n<pm:CryptoExchange::Catalog>, e.g. GDAX, \"BX Thailand\", bx-thailand.\n\nCode/name/safename must be listed.\n\nWill be normalized to safename in lowercase.\n\n",summary=>"Cryptoexchange code, name, or safename","x.completion"=>"cryptoexchange","x.perl.coerce_rules"=>["str_to_cryptoexchange_safename"]}],["str"]];
+our $rschema = ["str",[{description=>"\nCryptoexchange code or name or safename that is listed in\n<pm:CryptoExchange::Catalog>, e.g. GDAX, \"BX Thailand\", bx-thailand.\n\nCode/name/safename must be listed.\n\nWill be normalized to safename in lowercase.\n\n",summary=>"Cryptoexchange code, name, or safename","x.completion"=>"cryptoexchange","x.perl.coerce_rules"=>["From_str::to_cryptoexchange_safename"]}],["str"]];
 
 1;
 # ABSTRACT: Cryptoexchange code, name, or safename
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptoexchange - Cryptoexchange code, name, or safename
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::cryptoexchange (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-10-24.
+This document describes version 0.013 of Sah::SchemaR::cryptoexchange (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

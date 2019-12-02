@@ -1,7 +1,7 @@
 requires 'perl' => '5.008001';
 requires 'Carp';
 requires 'Exporter' => '5.57';
-requires 'FFI::Platypus';
+requires 'FFI::Platypus' => '1.00';
 requires 'Module::Runtime';
 requires 'Time::Local';
 test_requires 'Test2::V0';

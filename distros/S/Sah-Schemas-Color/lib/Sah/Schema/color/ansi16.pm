@@ -1,7 +1,7 @@
 package Sah::Schema::color::ansi16;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $schema = [str => {
     summary => 'ANSI-16 color, either a number from 0-15 or color names like "black", "bold red", etc',
@@ -24,7 +24,7 @@ Sah::Schema::color::ansi16 - ANSI-16 color, either a number from 0-15 or color n
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2019-07-25.
+This document describes version 0.005 of Sah::Schema::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2019-11-29.
 
 =head1 HOMEPAGE
 

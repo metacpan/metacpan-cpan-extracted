@@ -25,13 +25,16 @@ my %WriteMakefileArgs = (
         'Log::Any'     => 0,
         'Scalar::Util' => 0,
         'version'      => 0,
+
         # Default req
 
-        'Test::More'   => 0,
-        'Siffra::Base' => 0,
-        'Digest::MD5'  => 0,
-        'Text::CSV_XS' => 0,
-        'JSON::XS'     => 0,
+        'Test::More'            => 0,
+        'Siffra::Base'          => 0,
+        'Digest::MD5'           => 0,
+        'Text::CSV_XS'          => 0,
+        'JSON::XS'              => 0,
+        'MIME::Types'           => 0,
+        'IO::Uncompress::Unzip' => 0,
     },
     BUILD_REQUIRES => {
         'Test::More'          => 0,

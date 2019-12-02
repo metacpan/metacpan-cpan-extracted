@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.165';
+our $VERSION = '1.166';
 
 use Quiq::Unindent;
 
@@ -15,7 +15,7 @@ use Quiq::Unindent;
 
 =head1 NAME
 
-Quiq::AsciiTable - Parse ASCII-Tabelle
+Quiq::AsciiTable - Analysiere ASCII-Tabelle
 
 =head1 BASE CLASS
 
@@ -25,9 +25,8 @@ L<Quiq::Hash>
 
 Ein Objekt der Klasse repräsentiert eine Tabelle, die in Form
 eines ASCII-Texts gegeben ist. Diese Darstellung wird an den
-Konstruktor übergeben, von diesem geparst und inhaltlich
-analysiert. Die Klasse stellt Methoden zur Verfügung, um die
-Eigenschaften der Tabelle abzufragen.
+Konstruktor übergeben und von diesem analysiert. Die Klasse stellt
+Methoden zur Verfügung, um die Eigenschaften der Tabelle abzufragen.
 
 =head2 Aufbau einer ASCII-Tabelle
 
@@ -612,7 +611,7 @@ sub asText {
 
 =head1 VERSION
 
-1.165
+1.166
 
 =head1 AUTHOR
 

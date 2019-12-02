@@ -24,6 +24,14 @@ my $cmd = "echo foobar";
 }
 
 {
+	my ( $stdout, $stderr, $exit ) = $spawn->capture(cmd => $cmd, wantArrayRef => 1);
+	ok( !$exit );
+	ok(ref($stdout) eq 'ARRAY');
+	ok(ref($stderr) eq 'ARRAY');
+	ok($stdout->[0] eq 'foobar');
+}
+
+{
 	my ( $stdout, $stderr, $exit ) = $spawn->capture( cmd => $cmd );
 	ok( !$exit );
 	ok( $stdout eq 'foobar' );

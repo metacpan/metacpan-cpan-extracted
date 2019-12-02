@@ -8,18 +8,18 @@ package Vote::Count::IRV;
 use namespace::autoclean;
 use Moose::Role;
 
-with 'Vote::Count::TopCount' ;
-with 'Vote::Count::TieBreaker' ;
+with 'Vote::Count::TopCount';
+with 'Vote::Count::TieBreaker';
 
 use Storable 3.15 'dclone';
 
-our $VERSION='0.02401';
+our $VERSION='1.00';
 
 =head1 NAME
 
 Vote::Count::IRV
 
-=head1 VERSION 0.02401
+=head1 VERSION 1.00
 
 =cut
 
@@ -34,67 +34,66 @@ use TextTableTiny 'generate_markdown_table';
 # use Data::Printer;
 #use Data::Dumper;
 
-sub _ResolveTie (
-  $self, $active, $tiebreaker, @choices) {
+sub _ResolveTie ( $self, $active, $tiebreaker, @choices ) {
   return @choices if @choices == 1;
-  my %high = map
-    { $_ => 1 }
-   $self->TieBreaker(
-    $tiebreaker,
-    $active,
-    @choices );
-  if ( defined $self->{'last_tiebreaker'} ){
-    $self->logt( $self->{'last_tiebreaker'}{'terse'});
-    $self->logv( $self->{'last_tiebreaker'}{'verbose'});
+  my %high =
+    map { $_ => 1 } $self->TieBreaker( $tiebreaker, $active, @choices );
+  if ( defined $self->{'last_tiebreaker'} ) {
+    $self->logt( $self->{'last_tiebreaker'}{'terse'} );
+    $self->logv( $self->{'last_tiebreaker'}{'verbose'} );
     $self->{'last_tiebreaker'} = undef;
   }
-  if ( @choices == scalar( keys %high ) ) { return @choices}
-# tiebreaker returns winner, we want losers!
-# use map to remove winner(s) from @choices.
-  my @low = sort (map { if ( $high{$_}) { } else { $_ } } @choices) ;
+  if ( @choices == scalar( keys %high ) ) { return @choices }
+  # tiebreaker returns winner, we want losers!
+  # use map to remove winner(s) from @choices.
+  # warning about sort interpreted as function fixed
+  my @low = sort map {
+    if   ( $high{$_} ) { }
+    else               { $_ }
+  } @choices;
   return @low;
 }
 
-sub RunIRV ( $self, $active = undef, $tiebreaker=undef ) {
-# external $active should not be changed.
+sub RunIRV ( $self, $active = undef, $tiebreaker = undef ) {
+  # external $active should not be changed.
   if ( defined $active ) { $active = dclone $active }
-# Object's active is altered by IRV.
+  # Object's active is altered by IRV.
   else { $active = $self->Active() }
   unless ( defined $tiebreaker ) {
     if ( defined $self->TieBreakMethod() ) {
       $tiebreaker = $self->TieBreakMethod();
-    } else {
+    }
+    else {
       $tiebreaker = 'all';
     }
   }
-  # deref self->Active from any other references IRV alters it.
-  # else { $self->{'Active'} = { $active->%* } }
-  my $roundctr   = 0;
-  my $maxround   = scalar( keys %{$active} );
+  my $roundctr = 0;
+  my $maxround = scalar( keys %{$active} );
   $self->logt( "Instant Runoff Voting",
     'Choices: ', join( ', ', ( sort keys %{$active} ) ) );
-# forever loop normally ends with return from $majority
-# a tie should be detected and also generate a
-# return from the else loop.
-# if something goes wrong roundcountr/maxround
-# will generate exception.
+  # forever loop normally ends with return from $majority
+  # a tie should be detected and also generate a
+  # return from the else loop.
+  # if something goes wrong roundcountr/maxround
+  # will generate exception.
 IRVLOOP:
-  until ( 0 ) {
+  until (0) {
     $roundctr++;
     die "IRVLOOP infinite stopped at $roundctr" if $roundctr > $maxround;
     my $round = $self->TopCount($active);
     $self->logv( '---', "IRV Round $roundctr", $round->RankTable() );
-    my $majority = $self->EvaluateTopCountMajority( $round );
+    my $majority = $self->EvaluateTopCountMajority($round);
     if ( defined $majority->{'winner'} ) {
       return $majority;
-    } else {
-      my @bottom = $self->_ResolveTie (
-        $active, $tiebreaker, $round->ArrayBottom()->@*);
+    }
+    else {
+      my @bottom =
+        $self->_ResolveTie( $active, $tiebreaker, $round->ArrayBottom()->@* );
       if ( scalar(@bottom) == scalar( keys %{$active} ) ) {
         # if there is a tie at the end, the finalists should
         # be both top and bottom and the active set.
         $self->logt( "Tied: " . join( ', ', @bottom ) );
-        return { tie => 1, tied => \@bottom, winner => 0  };
+        return { tie => 1, tied => \@bottom, winner => 0 };
       }
       $self->logv( "Eliminating: " . join( ', ', @bottom ) );
       for my $b (@bottom) {
@@ -131,7 +130,7 @@ Instant Runoff Voting Looks for a Majority Winner. If one isn't present the choi
 
 Instant Runoff Voting is easy to count by hand and meets the Later Harm and Condorcet Loser Criteria. It, unfortunately, fails a large number of consistency criteria; the order of candidate dropping matters and small changes to the votes of non-winning choices that result in changes to the dropping order can change the outcome.
 
-Instant Runoff Voting is also known as Alternative Vote and as the Hare Method. 
+Instant Runoff Voting is also known as Alternative Vote and as the Hare Method.
 
 =head2 Tie Handling
 

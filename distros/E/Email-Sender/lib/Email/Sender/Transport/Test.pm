@@ -1,6 +1,6 @@
 package Email::Sender::Transport::Test;
 # ABSTRACT: deliver mail in memory for testing
-$Email::Sender::Transport::Test::VERSION = '1.300031';
+$Email::Sender::Transport::Test::VERSION = '1.300033';
 use Moo;
 
 use Email::Sender::Failure::Multi;
@@ -141,7 +141,7 @@ Email::Sender::Transport::Test - deliver mail in memory for testing
 
 =head1 VERSION
 
-version 1.300031
+version 1.300033
 
 =head1 DESCRIPTION
 
@@ -209,7 +209,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2019 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

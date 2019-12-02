@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Scattergeo::Marker::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Scattergeo::Marker::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Scattergeo::Marker::Colorbar::Title;
 
-our $VERSION = '0.031';    # VERSION
+our $VERSION = '0.033';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattergeo.
 
@@ -282,7 +282,7 @@ Chart::Plotly::Trace::Scattergeo::Marker::Colorbar - This attribute is one of th
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 

@@ -1,8 +1,6 @@
-# Copyright (c) 2009-2015 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: 05_bigint.t 53 2015-05-17 21:36:50Z demetri $
+# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Tests of the Math::ModInt::BigInt subclass of Math::ModInt.
 
@@ -18,7 +16,7 @@ use Math::BigInt;
 use Math::ModInt qw(mod divmod);
 use Math::ModInt::BigInt;
 
-plan tests => 36;
+plan tests => 37;
 
 #########################
 
@@ -259,7 +257,11 @@ ok(-1 == $qr[0]);
 ok($qr[1]->isa('Math::ModInt'));
 ok(-728 == $qr[1]);
 
-my $mm = eval { $m->new( MyNumber->new(-1) ) };
+my $mn = MyNumber->new(-1);
+my $mm = eval { $m->new($mn) };
 ok(defined($mm) && $mm->isa('Math::ModInt') && -1 == $mm);
+
+@qr = eval { $m->new2($mn) };
+ok(@qr && $qr[0] == -1 && $qr[1]->isa('Math::ModInt') && -1 == $qr[1]);
 
 __END__

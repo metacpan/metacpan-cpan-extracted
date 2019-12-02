@@ -8,7 +8,12 @@ has 'translations',
     is      => 'rw',
     default => sub { {} },
     traits  => ['Hash'],
-    handles => { add_translation => 'set' };
+    handles => {
+    add_translation  => 'set',
+    has_translations => 'count',
+    get_translation  => 'get',
+    languages        => 'keys'
+    };
 
 1;
 __END__

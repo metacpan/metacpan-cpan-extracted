@@ -1,27 +1,30 @@
 package Data::Sah::CoerceCommon;
 
-our $DATE = '2019-01-26'; # DATE
-our $VERSION = '0.033'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $DIST = 'Data-Sah-Coerce'; # DIST
+our $VERSION = '0.039'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 
+our $SUPPORT_OLD_PREFIX = $ENV{PERL_DATA_SAH_COERCE_SUPPORT_OLD_PREFIX} // 1;
+
 our %Default_Rules = (
     perl => {
         bool       => [qw//],
-        date       => [qw/float_epoch obj_DateTime obj_TimeMoment str_iso8601/],
-        datenotime => [qw/float_epoch obj_DateTime obj_TimeMoment str_iso8601/],
-        datetime   => [qw/float_epoch obj_DateTime obj_TimeMoment str_iso8601/],
-        duration   => [qw/float_secs obj_DateTimeDuration str_human str_iso8601/],
-        timeofday  => [qw/obj_DateTimeOfDay str_hms/],
+        date       => [qw/From_float::epoch From_obj::datetime From_obj::time_moment From_str::iso8601/],
+        datenotime => [qw/From_float::epoch From_obj::datetime From_obj::time_moment From_str::iso8601/],
+        datetime   => [qw/From_float::epoch From_obj::datetime From_obj::time_moment From_str::iso8601/],
+        duration   => [qw/From_float::seconds From_obj::datetime_duration From_str::human From_str::iso8601/],
+        timeofday  => [qw/From_obj::date_timeofday From_str::hms/],
     },
     js => {
-        bool       => [qw/float str/],
-        date       => [qw/float_epoch obj_Date str/],
-        datetime   => [qw/float_epoch obj_Date str/],
-        datenotime => [qw/float_epoch obj_Date str/],
-        duration   => [qw/float_secs str_iso8601/],
-        timeofday  => [qw/str_hms/],
+        bool       => [qw/From_float::zero_one From_str::common_words/],
+        date       => [qw/From_float::epoch From_obj::date From_str::date_parse/],
+        datetime   => [qw/From_float::epoch From_obj::date From_str::date_parse/],
+        datenotime => [qw/From_float::epoch From_obj::date From_str::date_parse/],
+        duration   => [qw/From_float::seconds From_str::iso8601/],
+        timeofday  => [qw/From_str::hms/],
     },
 );
 
@@ -135,14 +138,20 @@ sub get_coerce_rules {
     my $dt       = $args{data_term};
 
     my $typen = $type; $typen =~ s/::/__/g;
-    my $prefix = "Data::Sah::Coerce::$compiler\::$typen\::";
+    my $old_prefix = "Data::Sah::Coerce::$compiler\::$typen\::"; # deprecated, <0.034, will be removed in the future
+    my $prefix = "Data::Sah::Coerce::$compiler\::To_$typen\::";
 
     my @rule_names = @{ $Default_Rules{$compiler}{$typen} || [] };
     for my $item (@{ $args{coerce_rules} // [] }) {
         my $is_exclude = $item =~ s/\A!//;
-        $item =~ /\A[A-Za-z0-9_]+\z/
-            or die "Invalid coercion rule item '$item', please only use ".
-            "alphanumeric characters";
+        if ($SUPPORT_OLD_PREFIX && $item =~ /\A\w+\z/) {
+            # old name
+        } elsif ($item =~ /\AFrom_[A-Za-z0-9_]+::[A-Za-z0-9_]+\z/) {
+            # new name
+        } else {
+            die "Invalid syntax for coercion rule item '$item', please ".
+                "only use From_<type>::<description>";
+        }
         if ($is_exclude) {
             @rule_names = grep { $_ ne $item } @rule_names;
         } else {
@@ -152,7 +161,8 @@ sub get_coerce_rules {
 
     my @rules;
     for my $rule_name (@rule_names) {
-        my $mod = "$prefix$rule_name";
+        my $is_old_name = $SUPPORT_OLD_PREFIX && $rule_name =~ /\A\w+\z/;
+        my $mod = ($is_old_name ? $old_prefix : $prefix) . $rule_name;
         (my $mod_pm = "$mod.pm") =~ s!::!/!g;
         require $mod_pm;
         my $rule_meta = &{"$mod\::meta"};
@@ -221,7 +231,7 @@ Data::Sah::CoerceCommon - Common stuffs for Data::Sah::Coerce and Data::Sah::Coe
 
 =head1 VERSION
 
-This document describes version 0.033 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2019-01-26.
+This document describes version 0.039 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2019-11-28.
 
 =head1 FUNCTIONS
 
@@ -295,6 +305,13 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
+=head1 ENVIRONMENT
+
+=head2 PERL_DATA_SAH_COERCE_SUPPORT_OLD_PREFIX
+
+If set to false, will not support old prefix
+(Data::Sah::Coerce::<$TARGET_TYPE>::<$SOURCE_TYPE_AND_DESC>. Mainly for testing.
 
 =head1 HOMEPAGE
 

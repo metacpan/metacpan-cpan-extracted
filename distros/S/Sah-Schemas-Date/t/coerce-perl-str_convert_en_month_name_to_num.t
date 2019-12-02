@@ -9,7 +9,7 @@ use Test::Needs;
 use Data::Sah::Coerce qw(gen_coercer);
 
 subtest "basics" => sub {
-    my $c = gen_coercer(type=>"int", coerce_rules=>["str_convert_en_month_name_to_num"]);
+    my $c = gen_coercer(type=>"int", coerce_rules=>["From_str::convert_en_month_name_to_num"]);
 
     subtest "uncoerced" => sub {
         is_deeply($c->([]), [], "uncoerced");

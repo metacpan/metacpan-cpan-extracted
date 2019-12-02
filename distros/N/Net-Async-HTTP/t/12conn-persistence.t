@@ -43,7 +43,7 @@ foreach my $close ( 0, 1, 2 ) {
       ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
       $self->set_handle( $selfsock );
 
-      return Future->new->done( $self );
+      return Future->done( $self );
    };
 
    my $response;
@@ -189,6 +189,46 @@ foreach my $close ( 0, 1, 2 ) {
    # Drain connections for next test
    undef $peersock;
    wait_for { scalar $http->children == 0 };
+}
+
+# Check that close_after_request sets close header
+{
+   my $peersock;
+
+   no warnings 'redefine';
+   local *IO::Async::Handle::connect = sub {
+      my $self = shift;
+      my %args = @_;
+
+      ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
+      $self->set_handle( $selfsock );
+
+      return Future->done( $self );
+   };
+
+   $http->configure( close_after_request => 1 );
+
+   my $future = $http->do_request(
+      uri => URI->new( "http://host/closed" ),
+   );
+
+   wait_for { $peersock };
+
+   my $request_stream = "";
+   wait_for_stream { $request_stream =~ m/$CRLF$CRLF/ } $peersock => $request_stream;
+
+   like( $request_stream, qr/^Connection: close$CRLF/m, 'Request has Connection: close header' );
+
+   $peersock->syswrite( "HTTP/1.1 200 OK$CRLF" .
+                        "Content-Type: text/plain$CRLF" .
+                        "Connection: close$CRLF" .
+                        "$CRLF" .
+                        "Bye" );
+   $peersock->close;
+
+   my $response = wait_for_future( $future )->get;
+
+   is( $response->content, "Bye", 'Content of response' );
 }
 
 done_testing;

@@ -4,6 +4,7 @@ use base 'Giblog::Command';
 
 use strict;
 use warnings;
+use utf8;
 
 use File::Basename 'basename';
 
@@ -22,6 +23,9 @@ sub run {
   # Get files in templates directory
   my $files = $api->get_templates_files;
   
+  # Add base path to public css files
+  $api->add_base_path_to_public_css_files;
+  
   for my $file (@$files) {
     # Data
     my $data = {file => $file};
@@ -37,7 +41,7 @@ sub run {
 
     # Edit title
     my $site_title = $config->{site_title};
-    if ($data->{file} eq 'index.html') {
+    if ($data->{file} eq 'index.html' || !defined $data->{title}) {
       $data->{title} = $site_title;
     }
     else {
@@ -64,6 +68,9 @@ sub run {
     
     # Build whole html
     $api->build_html($data);
+    
+    # Add base path to content
+    $api->add_base_path_to_content($data);
     
     # Write to public file
     $api->write_to_public_file($data);
@@ -157,6 +164,9 @@ EOS
 
   # Build whole html
   $api->build_html($data);
+
+  # Add base path to content
+  $api->add_base_path_to_content($data);
   
   # Write content to public file
   my $public_file = $api->rel_file('public/index.html');
@@ -259,6 +269,9 @@ EOS
   
   # Build whole html
   $api->build_html($data);
+
+  # Add base path to content
+  $api->add_base_path_to_content($data);
   
   # Write content to public file
   my $public_file = $api->rel_file('public/list.html');

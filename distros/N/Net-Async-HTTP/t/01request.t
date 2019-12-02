@@ -50,7 +50,7 @@ sub do_test_req
       ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
       $self->set_handle( $selfsock );
 
-      return Future->new->done( $self );
+      return Future->done( $self );
    };
 
    my $future = $http->do_request(
@@ -566,6 +566,22 @@ do_test_req( "Non-HTTP response",
    response => "Some other protocol, sorry\n",
 
    expect_error => 1,
+);
+
+do_test_req( "Non-canonical header",
+   req => HTTP::Request->new( GET => "/", [ ":other_hdr" => "value" ] ),
+   host => "myhost",
+
+   expect_req_firstline => "GET / HTTP/1.1",
+   expect_req_headers => {
+      other_hdr => "value",
+   },
+
+   response => "HTTP/1.1 200 OK$CRLF" .
+               "Content-Length: 0$CRLF" .
+               $CRLF,
+
+   expect_res_code => 200,
 );
 
 done_testing;

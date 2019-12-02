@@ -1,12 +1,12 @@
 package Sah::Schema::dirhandle;
 
-our $DATE = '2019-04-09'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $schema = ['any', {
     summary => 'Dirhandle',
     'x.perl.coerce_rules' => [
-        'validate_dirhandle',
+        'From_any::validate_dirhandle',
     ],
 }, {}];
 
@@ -25,7 +25,7 @@ Sah::Schema::dirhandle - Dirhandle
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::dirhandle (from Perl distribution Sah-Schemas-FileHandle), released on 2019-04-09.
+This document describes version 0.003 of Sah::Schema::dirhandle (from Perl distribution Sah-Schemas-FileHandle), released on 2019-11-28.
 
 =head1 HOMEPAGE
 

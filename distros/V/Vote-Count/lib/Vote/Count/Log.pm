@@ -11,14 +11,13 @@ no warnings 'experimental';
 use Path::Tiny 0.108;
 # use Data::Printer;
 
-
-our $VERSION='0.02401';
+our $VERSION='1.00';
 
 =head1 NAME
 
 Vote::Count::Log
 
-=head1 VERSION 0.02401
+=head1 VERSION 1.00
 
 =cut
 
@@ -55,54 +54,54 @@ When logging from your methods, use logt for events that produce a summary, use 
 =cut
 
 has 'LogTo' => (
-  is => 'lazy',
-  is => 'rw',
-  isa => 'Str',
+  is      => 'lazy',
+  is      => 'rw',
+  isa     => 'Str',
   builder => '_logsetup',
 );
 
 has 'LogPath' => (
-  is => 'rw',
-  isa => 'Str',
-  default => '/tmp',  
+  is      => 'rw',
+  isa     => 'Str',
+  default => '/tmp',
 );
 
 has 'LogBaseName' => (
-  is => 'rw',
-  isa => 'Str',
+  is      => 'rw',
+  isa     => 'Str',
   default => 'votecount'
 );
 
 sub _logsetup ( $self ) {
   my $pathBase = $self->{'LogPath'} || '/tmp';
-  $pathBase =~ s/\/$|\\$//; # trim \ or / from end.
+  $pathBase =~ s/\/$|\\$//;    # trim \ or / from end.
   unless ( stat $pathBase ) {
-    path( $pathBase)->mkpath();
+    path($pathBase)->mkpath();
   }
-  my $baseName = $self->{'LogBaseName'} || 'votecount' ;
+  my $baseName = $self->{'LogBaseName'} || 'votecount';
   return "$pathBase/$baseName";
 }
 
 sub logt {
   my $self = shift @_;
-  return $self->{'LogT'} unless ( @_) ;
+  return $self->{'LogT'} unless (@_);
   my $msg = join( "\n", @_ ) . "\n";
   $self->{'LogT'} .= $msg;
   $self->{'LogV'} .= $msg;
-  $self->logd( @_);
+  $self->logd(@_);
 }
 
 sub logv {
   my $self = shift @_;
-  return $self->{'LogV'} unless ( @_) ;
+  return $self->{'LogV'} unless (@_);
   my $msg = join( "\n", @_ ) . "\n";
   $self->{'LogV'} .= $msg;
-  $self->logd( @_);
+  $self->logd(@_);
 }
 
 sub logd {
   my $self = shift @_;
-  return $self->{'LogD'} unless ( @_) ;
+  return $self->{'LogD'} unless (@_);
   my @args = (@_);
   # since ops are seqential and fast logging event times
   # clutters the debug log.
@@ -112,13 +111,12 @@ sub logd {
 }
 
 sub WriteLog {
-  my $self = shift @_;
+  my $self    = shift @_;
   my $logroot = $self->LogTo();
-  path( "$logroot.brief")->spew( $self->logt() );
-  path( "$logroot.full")->spew( $self->logv() );
-  path( "$logroot.debug")->spew( $self->logd() );
+  path("$logroot.brief")->spew( $self->logt() );
+  path("$logroot.full")->spew( $self->logv() );
+  path("$logroot.debug")->spew( $self->logd() );
 }
-
 
 1;
 

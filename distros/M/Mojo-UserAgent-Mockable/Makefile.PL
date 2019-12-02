@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "File::stat" => 0,
     "FindBin" => 0,
-    "IO::Socket::SSL" => 0,
+    "IO::Socket::SSL" => "2.009",
     "Module::Util" => 0,
     "Mojo::IOLoop" => 0,
     "Mojo::Message::Request" => 0,
@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "base" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.56",
+  "VERSION" => "1.57",
   "test" => {
     "TESTS" => "t/*.t t/request_compare/*.t t/serializer/*.t"
   }
@@ -82,7 +82,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "File::stat" => 0,
   "FindBin" => 0,
-  "IO::Socket::SSL" => 0,
+  "IO::Socket::SSL" => "2.009",
   "JSON::MaybeXS" => 0,
   "Module::Util" => 0,
   "Mojo::Base" => 0,

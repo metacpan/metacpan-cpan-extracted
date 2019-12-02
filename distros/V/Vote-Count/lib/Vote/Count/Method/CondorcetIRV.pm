@@ -14,13 +14,13 @@ extends 'Vote::Count';
 # use Moose;
 # extends 'Vote::Count';
 
-our $VERSION='0.02401';
+our $VERSION='1.00';
 
 =head1 NAME
 
 Vote::Count::Method::CondorcetIRV
 
-=head1 VERSION 0.02401
+=head1 VERSION 1.00
 
 =cut
 
@@ -77,29 +77,29 @@ Smith Set IRV is therefore substantially more consistent than basic IRV, but les
 
 =cut
 
-
 no warnings 'experimental';
 # use YAML::XS;
 
 use Carp;
 
-sub SmithSetIRV ( $E, $tiebreaker='all' ) {
+sub SmithSetIRV ( $E, $tiebreaker = 'all' ) {
   my $matrix = $E->PairMatrix();
-  $E->logt( 'SmithSetIRV');
-  my $winner = $matrix->CondorcetWinner();;
-  if ( $winner) {
-    $E->logv( "Condorcet Winner: $winner");
-    return { 
+  $E->logt('SmithSetIRV');
+  my $winner = $matrix->CondorcetWinner();
+  if ($winner) {
+    $E->logv("Condorcet Winner: $winner");
+    return {
       'winner' => $winner,
-      'tied' => 0
+      'tied'   => 0
     };
-  } else {
+  }
+  else {
     my $Smith = $matrix->SmithSet();
-    $E->logv( "Smith Set: " . join( ',', sort( keys $Smith->%* )));
+    $E->logv( "Smith Set: " . join( ',', sort( keys $Smith->%* ) ) );
     my $IRV = $E->RunIRV( $Smith, $tiebreaker );
     unless ( $IRV->{'winner'} ) {
       $winner = '';
-      $E->SetActive( {map { $_ => 1 } ( $IRV->{'tied'}->@* )});
+      $E->SetActive( { map { $_ => 1 } ( $IRV->{'tied'}->@* ) } );
     }
     return $IRV;
   }

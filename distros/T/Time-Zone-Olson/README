@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.28
+    Version 0.30
 
 SYNOPSIS
 
@@ -70,8 +70,8 @@ SUBROUTINES/METHODS
     file. For example, if "Australia/Melbourne" was passed as a parameter,
     the "comment" function would return "Victoria". For Windows platforms,
     it will return the contents of the Display registry setting. For
-    example, for "Australia/Melbourne", it would return "(UTC+10) Canberra,
-    Melbourne, Sydney".
+    example, for "Australia/Melbourne" using English as a language, it
+    would return "(UTC+10) Canberra, Melbourne, Sydney".
 
  directory
 
@@ -277,11 +277,8 @@ CONFIGURATION AND ENVIRONMENT
 
 DEPENDENCIES
 
-    Time::Zone::Olson requires Perl 5.10 or better. For environments where
-    the unpack 'q' parameter is not supported, the following module is also
-    required
-
-      * Math::Int64
+    For environments where the unpack 'q' parameter is not supported, the
+    Math::Int64 module is required
 
 INCOMPATIBILITIES
 
@@ -296,6 +293,10 @@ BUGS AND LIMITATIONS
     Time::Zone::Olson should be cross-platform compatible, but the actual
     results may be different, depending on the compatibility of the Windows
     Registry time zones and the Olson TZ database.
+
+    For perl versions less than 5.10, support for TZ environment variable
+    parsing is not complete. It should cover all existing cases in the
+    Olson time zone database though.
 
     Please report any bugs or feature requests to bug-time-zone-olson at
     rt.cpan.org, or through the web interface at

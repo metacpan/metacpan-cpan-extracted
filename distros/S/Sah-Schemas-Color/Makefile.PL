@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Sah-Schemas-Color",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::Schemas::Color",
   "PREREQ_PM" => {
     "Perinci::Sub::XCompletion::colorname" => 0,
@@ -21,12 +22,15 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Sah" => "0.903",
+    "Data::Sah::Coerce" => "0.038",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0
+    "Test::More" => "0.98",
+    "Test::Needs" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,11 +38,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah" => "0.903",
+  "Data::Sah::Coerce" => "0.038",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::Sub::XCompletion::colorname" => 0,
-  "Test::More" => 0,
+  "Test::More" => "0.98",
+  "Test::Needs" => 0,
   "strict" => 0,
   "warnings" => 0
 );

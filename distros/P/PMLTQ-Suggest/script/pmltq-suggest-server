@@ -16,12 +16,14 @@ my $port = 8071;
 my $host = 'localhost';
 my $prefork = 0;
 my @resources_path = ();
+my $resources_paths_follow = 0;
 GetOptions(
-	'--port=i' => \$port,
-	'--host=s' => \$host,
-	'--prefork=i' => \$prefork,
-	'--resources-path=s{,}' => \@resources_path,
-	);
+  '--port=i' => \$port,
+  '--host=s' => \$host,
+  '--prefork=i' => \$prefork,
+  '--resources-path=s{,}' => \@resources_path,
+  '--resources-path-follow' => \$resources_paths_follow
+  );
 
 my $inputenc = "UTF-8";
 
@@ -33,7 +35,7 @@ sub start_server {
   $server->prefork($prefork);
   for my $res_path (@resources_path) {
     if($res_path && (-d $res_path)){
-      my @resources = File::Find::Rule->directory->name('resources')->in( $res_path );
+      my @resources = File::Find::Rule->directory->name('resources')->extras({follow => $resources_paths_follow})->in( $res_path );
       print STDERR '['.localtime()."] resources: ". join('|',@resources)."\n";
       Treex::PML::SetResourcePaths(@resources);
     }

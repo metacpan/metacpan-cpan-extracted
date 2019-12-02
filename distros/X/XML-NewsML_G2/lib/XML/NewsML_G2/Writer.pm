@@ -34,8 +34,9 @@ has 'xhtml_ns',
     is      => 'ro',
     default => 'http://www.w3.org/1999/xhtml';
 
-has 'g2_version',      isa => 'Str', is => 'ro', default => '2.18';
-has '_root_node_name', isa => 'Str', is => 'ro', default => 'newsItem';
+has 'g2_version',           isa => 'Str', is => 'ro', default => '2.18';
+has '_root_node_name',      isa => 'Str', is => 'ro', default => 'newsItem';
+has '_nature_qcode_prefix', isa => 'Str', is => 'ro', default => 'ninat';
 has 'generator_version',
     is      => 'Str',
     is      => 'ro',
@@ -61,6 +62,7 @@ sub _build_g2_catalog_schemes {
     return {
         isrol       => undef,
         nprov       => undef,
+        cinat       => undef,
         ninat       => undef,
         stat        => undef,
         sig         => undef,
@@ -203,8 +205,11 @@ sub _create_item_meta {
 
     my $im = $self->create_element('itemMeta');
     $im->appendChild( my $ic = $self->create_element('itemClass') );
-    $self->scheme_manager->add_qcode( $ic, 'ninat',
-        $self->_root_item->nature );
+    $self->scheme_manager->add_qcode(
+        $ic,
+        $self->_nature_qcode_prefix,
+        $self->_root_item->nature
+    );
 
     $im->appendChild(
         my $p = $self->create_element(
@@ -217,7 +222,7 @@ sub _create_item_meta {
         $self->create_element(
             'versionCreated',
             _text => $self->_formatter->format_datetime(
-                DateTime->now( time_zone => 'local' )
+                DateTime->now( time_zone => $self->_root_item->timezone )
             )
         )
     );

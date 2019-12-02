@@ -4,7 +4,7 @@ HTTP::Cookies - HTTP cookie jars
 
 # VERSION
 
-version 6.07
+version 6.08
 
 # SYNOPSIS
 
@@ -117,12 +117,14 @@ The following methods are provided:
 
 - $cookie\_jar->save
 - $cookie\_jar->save( $file )
+- $cookie\_jar->save( file => $file, ignore\_discard => $ignore\_discard )
 
     This method file saves the state of the $cookie\_jar to a file.
     The state can then be restored later using the load() method.  If a
     filename is not specified we will use the name specified during
-    construction.  If the attribute _ignore\_discard_ is set, then we
-    will even save cookies that are marked to be discarded.
+    construction.  If the $ignore\_discard value is true (or not specified,
+    but attribute _ignore\_discard_ was set at cookie jar construction),
+    then we will even save cookies that are marked to be discarded.
 
     The default is to save a sequence of "Set-Cookie3" lines.
     "Set-Cookie3" is a proprietary LWP format, not known to be compatible

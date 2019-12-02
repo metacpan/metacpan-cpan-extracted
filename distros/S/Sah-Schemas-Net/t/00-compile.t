@@ -9,7 +9,7 @@ use Test::More;
 plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/obj/str_net_ipv4.pm',
+    'Data/Sah/Coerce/perl/To_obj/From_str/net_ipv4.pm',
     'Sah/Schema/net/hostname.pm',
     'Sah/Schema/net/ipv4.pm',
     'Sah/Schema/net/port.pm',

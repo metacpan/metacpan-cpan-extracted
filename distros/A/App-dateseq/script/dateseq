@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/dateseq/dateseq
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-22'; # DATE
+our $DATE = '2019-11-29'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.097'; # VERSION
+our $VERSION = '0.098'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.097 of dateseq (from Perl distribution App-dateseq), released on 2019-07-22.
+This document describes version 0.098 of dateseq (from Perl distribution App-dateseq), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -63,11 +63,11 @@ Generate dates from 2015-01-01 to 2015-01-31:
 Generate dates from yesterday to 2 weeks from now:
 
  % dateseq yesterday "2 weeks from now"
- 2019-07-21T00:00:00
- 2019-07-22T00:00:00
+ 2019-11-28T00:00:00
+ 2019-11-29T00:00:00
  ... 12 more lines ...
- 2019-08-04T00:00:00
- 2019-08-05T00:00:00
+ 2019-12-12T00:00:00
+ 2019-12-13T00:00:00
 
 Generate dates from 2015-01-31 to 2015-01-01 (reverse):
 
@@ -126,20 +126,10 @@ Generate first 5 non-business days (Sat-Sun) after 2015-01-01:
 Show Mondays, Wednesdays, and Fridays between 2015-01-01 and 2015-02-28:
 
  % dateseq 2015-01-01 2015-02-28 --include-dow Mo,We,Fr -f "%Y-%m-%d(%a)"
- 2015-01-02(Fri)
- 2015-01-05(Mon)
- ... 21 more lines ...
- 2015-02-25(Wed)
- 2015-02-27(Fri)
 
 Show dates (except Mondays) after 2015-01-01 and 2015-02-28:
 
  % dateseq 2015-01-01 2015-02-28 --exclude-dow Mo -f "%Y-%m-%d(%a)"
- 2015-01-01(Thu)
- 2015-01-02(Fri)
- ... 47 more lines ...
- 2015-02-27(Fri)
- 2015-02-28(Sat)
 
 Generate a CSV data:
 
@@ -240,21 +230,53 @@ Only list business days (Mon-Fri), or non-business days.
 
 Only list business days (Mon-Sat), or non-business days.
 
-=item B<--exclude-dow>=I<s>
+=item B<--exclude-dow-json>=I<s>
+
+Do not show dates with these day-of-weeks (JSON-encoded).
+
+See C<--exclude-dow>.
+
+=item B<--exclude-dow>=I<s@>
 
 Do not show dates with these day-of-weeks.
 
-=item B<--exclude-month>=I<s>
+Can be specified multiple times.
+
+=item B<--exclude-month-json>=I<s>
+
+Do not show dates with these month numbers (JSON-encoded).
+
+See C<--exclude-month>.
+
+=item B<--exclude-month>=I<s@>
 
 Do not show dates with these month numbers.
 
-=item B<--include-dow>=I<s>
+Can be specified multiple times.
+
+=item B<--include-dow-json>=I<s>
+
+Only show dates with these day-of-weeks (JSON-encoded).
+
+See C<--include-dow>.
+
+=item B<--include-dow>=I<s@>
 
 Only show dates with these day-of-weeks.
 
-=item B<--include-month>=I<s>
+Can be specified multiple times.
+
+=item B<--include-month-json>=I<s>
+
+Only show dates with these month numbers (JSON-encoded).
+
+See C<--include-month>.
+
+=item B<--include-month>=I<s@>
 
 Only show dates with these month numbers.
+
+Can be specified multiple times.
 
 =back
 

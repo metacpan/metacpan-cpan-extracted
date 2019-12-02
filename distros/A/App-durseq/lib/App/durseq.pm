@@ -1,7 +1,9 @@
 package App::durseq;
 
-our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-durseq'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,7 +27,7 @@ _
             summary => 'Starting duration',
             schema => ['duration*', {
                 'x.perl.coerce_to' => 'DateTime::Duration',
-                'x.perl.coerce_rules' => ['str_iso8601'],
+                'x.perl.coerce_rules' => ['From_str::iso8601'],
             }],
             pos => 0,
         },
@@ -33,7 +35,7 @@ _
             summary => 'Ending duration, if not specified will generate an infinite* stream of durations',
             schema => ['duration*', {
                 'x.perl.coerce_to' => 'DateTime::Duration',
-                'x.perl.coerce_rules' => ['str_iso8601'],
+                'x.perl.coerce_rules' => ['From_str::iso8601'],
             }],
             pos => 1,
         },
@@ -41,7 +43,7 @@ _
             summary => 'Increment, default is one day (P1D)',
             schema => ['duration*', {
                 'x.perl.coerce_to' => 'DateTime::Duration',
-                'x.perl.coerce_rules' => ['str_iso8601'],
+                'x.perl.coerce_rules' => ['From_str::iso8601'],
             }],
             cmdline_aliases => {i=>{}},
             pos => 2,
@@ -208,7 +210,7 @@ App::durseq - Generate a sequence of durations
 
 =head1 VERSION
 
-This document describes version 0.003 of App::durseq (from Perl distribution App-durseq), released on 2019-09-15.
+This document describes version 0.004 of App::durseq (from Perl distribution App-durseq), released on 2019-11-29.
 
 =head1 FUNCTIONS
 

@@ -23,17 +23,27 @@ my %expected_lengths = (
 
 my ($gb, $seq, $seqio, $seqin, $query);
 
+my %params;
+
+if (defined $ENV{BIOPERLEMAIL}) {
+    $params{'-email'} = $ENV{BIOPERLEMAIL};
+    $params{'-delay'} = 2;
+}
+
+$params{'-verbose'} = $ENV{BIOPERLDEBUG};
+
 # test query facility
 ok $query = Bio::DB::Query::GenBank->new('-db'      => 'nucleotide',
                                          '-query'   => 'Onchocerca volvulus[Organism]',
                                          '-mindate' => '2002/1/1',
-                                         '-maxdate' => '2002/12/31'), 'Bio::DB::Query::GenBank';
+                                         '-maxdate' => '2002/12/31', %params), 'Bio::DB::Query::GenBank';
+
 SKIP: {
     cmp_ok $query->count, '>', 0;
     my @ids = $query->ids;
     cmp_ok @ids, '>', 0;
     is @ids, $query->count;
-    ok $gb = Bio::DB::GenBank->new('-delay' => 0);
+    ok $gb = Bio::DB::GenBank->new(%params);
     eval {$seqio = $gb->get_Stream_by_query($query);};
     skip "Couldn't connect to complete GenBank query tests. Skipping those tests", 5 if $@;
     my $done = 0;
@@ -51,13 +61,14 @@ $seq = $seqio = undef;
 
 # test query facility (again)
 ok $query = Bio::DB::Query::GenBank->new('-db'  => 'nucleotide',
-                                         '-ids' => [qw(J00522 AF303112 2981014)]);
+                                         '-ids' => [qw(J00522 AF303112 2981014)],
+                                         %params);
 SKIP: {
     cmp_ok $query->count, '>', 0;
     my @ids = $query->ids;
     cmp_ok @ids, '>', 0;
     is @ids, $query->count;
-    $gb = Bio::DB::GenBank->new('-delay' => 0);
+    $gb = Bio::DB::GenBank->new(%params);
     eval {$seqio = $gb->get_Stream_by_query($query);};
     skip "Couldn't connect to complete GenBank query tests. Skipping those tests: $@", 4 if $@;
     my $done = 0;
@@ -74,5 +85,6 @@ $seq = $seqio = undef;
 
 # and yet again, for bug 2133
 $query = Bio::DB::Query::GenBank->new('-query'  => 'AF303112',
-                                      '-ids' => [qw(J00522 AF303112 2981014)]);
+                                      '-ids' => [qw(J00522 AF303112 2981014)],
+                                      %params);
 is $query->query, 'J00522[PACC]|AF303112[PACC]|2981014[UID]';

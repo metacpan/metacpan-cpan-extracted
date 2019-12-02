@@ -39,7 +39,7 @@ sub read_config {
   my $config_content = $self->slurp_file($config_file);
   
   $config = eval $config_content
-    or confess "Can't parse config file \"$config_file\"";
+    or confess "Can't parse config file \"$config_file\":$@$!";
     
   unless (ref $config eq 'HASH') {
     confess "\"$config_file\" must end with hash reference";
@@ -316,6 +316,7 @@ sub parse_giblog_syntax {
     
     # Escape >, < in pre tag
     if ($pre_start) {
+      $line =~ s/&/&amp;/g;
       $line =~ s/>/&gt;/g;
       $line =~ s/</&lt;/g;
       $content .= "$line\n";
@@ -359,6 +360,125 @@ sub parse_title {
   }
   else {
     $data->{title} = undef;
+  }
+}
+
+sub add_base_path_to_content {
+  my ($self, $data) = @_;
+  
+  # Giblog
+  my $giblog = $self->giblog;
+  
+  # Config
+  my $config = $giblog->config;
+  
+  # Base path
+  my $base_path = $config->{base_path};
+  if (defined $base_path) {
+    $self->_check_base_path($base_path);
+    
+    # Content
+    my $content = $data->{content};
+
+    # Add base path
+    my @lines = split /\n/, $content;
+    my $pre_start;
+    $content = '';
+    my $bread_end;
+    for my $line (@lines) {
+      my $original_line = $line;
+      
+      # Pre end
+      if ($line =~ m|^</pre\b|) {
+        $pre_start = 0;
+      }
+      
+      # Don't add base path in pre tag
+      if ($pre_start) {
+        $content .= "$line\n";
+      }
+      # Add base path to absolute path
+      else {
+        # Add base path to href absolute path
+        $line =~ s/\bhref\s*=\s*"(\/[^"]*?)"/href="$base_path$1"/g;
+        
+        # Add base path to src absolute path
+        $line =~ s/\bsrc\s*=\s*"(\/[^"]*?)"/src="$base_path$1"/g;
+        
+        $content .= "$line\n";
+      }
+      
+      # Pre start
+      if ($original_line =~ m|^<pre\b|) {
+        $pre_start = 1
+      }
+    }
+    
+    $data->{content} = $content;
+  }
+}
+
+sub add_base_path_to_public_css_files {
+  my ($self) = @_;
+  
+  # Giblog
+  my $giblog = $self->giblog;
+  
+  # Config
+  my $config = $giblog->config;
+  
+  # Base path
+  my $base_path = $config->{base_path};
+  if (defined $base_path) {
+    
+    $self->_check_base_path($base_path);
+    
+    my $public_dir = $self->rel_file('public');
+    
+    # Add base path to css file
+    find(
+      {
+        wanted => sub {
+          my $public_file = $File::Find::name;
+          
+          # Skip directory
+          return if -d $public_file;
+          
+          # Skip not css file
+          return unless $public_file =~ /\.css$/;
+          
+          # Open read-write mode
+          open my $fh, "+<", $public_file
+            or confess "Can't open \"$public_file\": $!";
+          
+          # Get content
+          my $content = $self->slurp_file($public_file);
+          
+          # Add base path to href absolute path
+          $content =~ s/\burl\s*\(\s*(\/[^\)]*?)\)/url($base_path$1)/g;
+          
+          print $fh encode('UTF-8', $content)
+            or confess "Can't write content to $public_file: $!";
+          
+          close $fh
+            or confess "Can't close file hanlde $public_file: $!";
+        },
+        no_chdir => 1,
+      },
+      $public_dir
+    );
+  }
+}
+
+sub _check_base_path {
+  my ($self, $base_path) = @_;
+  
+  # Check base path
+  unless ($base_path =~ /^\//) {
+    confess "base_path must start /";
+  }
+  if ($base_path =~ /\/$/) {
+    confess "base_path must end not /";
   }
 }
 
@@ -895,7 +1015,7 @@ Add p tag to inline element starting from the beginning of line.
 
 Empty line is deleted.
 
-=item 2. Escape E<gt>, E<lt> in pre tag
+=item 2. Escape E<gt>, E<lt>, & in pre tag
 
 If pre tag starts at the beginning of the line and its end tag starts at the beginning of the line, execute HTML escapes ">" and "<" between them.
   
@@ -906,7 +1026,7 @@ If pre tag starts at the beginning of the line and its end tag starts at the beg
 
   # Output
   <pre>
-  my $foo = 1 &gt; 3 && 2 &lt; 5;
+  my $foo = 1 &gt; 3 &amp;&amp; 2 &lt; 5;
   </pre>
 
 =back

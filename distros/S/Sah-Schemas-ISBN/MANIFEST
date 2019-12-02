@@ -7,9 +7,9 @@ META.yml
 Makefile.PL
 README
 dist.ini
-lib/Data/Sah/Coerce/perl/str/str_to_isbn.pm
-lib/Data/Sah/Coerce/perl/str/str_to_isbn10.pm
-lib/Data/Sah/Coerce/perl/str/str_to_isbn13.pm
+lib/Data/Sah/Coerce/perl/To_str/From_str/to_isbn.pm
+lib/Data/Sah/Coerce/perl/To_str/From_str/to_isbn10.pm
+lib/Data/Sah/Coerce/perl/To_str/From_str/to_isbn13.pm
 lib/Sah/Schema/isbn.pm
 lib/Sah/Schema/isbn10.pm
 lib/Sah/Schema/isbn13.pm

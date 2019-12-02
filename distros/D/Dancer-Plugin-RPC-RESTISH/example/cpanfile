@@ -1,0 +1,7 @@
+requires 'Moo';
+requires 'JSON';
+requires 'Dancer';
+requires 'Bread::Board';
+requires 'Dancer::Plugin::RPC';
+requires 'Starman';
+requires 'Daemon::Control';

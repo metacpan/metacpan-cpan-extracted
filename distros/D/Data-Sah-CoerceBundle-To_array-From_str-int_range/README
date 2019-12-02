@@ -1,0 +1,54 @@
+NAME
+    Data::Sah::CoerceBundle::To_array::From_str::int_range - Coerce array of
+    ints from string in the form of "INT1-INT2"
+
+VERSION
+    This document describes version 0.006 of
+    Data::Sah::CoerceBundle::To_array::From_str::int_range (from Perl
+    distribution Data-Sah-CoerceBundle-To_array-From_str-int_range),
+    released on 2019-11-28.
+
+DESCRIPTION
+    This distribution contains the following Sah coerce rule modules:
+
+    *   Data::Sah::Coerce::perl::To_array::From_str::int_range
+
+    This distribution contains Data::Sah coercion rule to coerce array of
+    ints from string in the form of "INT1-INT2" string.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-CoerceBundle-To_array-From_str-in
+    t_range>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-CoerceBundle-To_array-From_s
+    tr-int_range>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-CoerceBundle
+    -To_array-From_str-int_range>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Sah::CoerceBundle::To_array::From_str::comma_sep
+
+    Data::Sah::CoerceBundle::To_array::From_str::int_range_and_comma_sep
+
+    Data::Sah::Coerce
+
+    Data::Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

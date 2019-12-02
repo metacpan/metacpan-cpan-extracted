@@ -1,7 +1,9 @@
 package App::DateUtils;
 
-our $DATE = '2019-06-19'; # DATE
-our $VERSION = '0.121'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-DateUtils'; # DIST
+our $VERSION = '0.122'; # VERSION
 
 use 5.010001;
 use strict;
@@ -459,7 +461,7 @@ $SPEC{dateconv} = {
         date => {
             schema => ['date*', {
                 'x.perl.coerce_to' => 'DateTime',
-                'x.perl.coerce_rules' => ['str_alami'],
+                'x.perl.coerce_rules' => ['From_str::alami'],
             }],
             req => 1,
             pos => 0,
@@ -565,7 +567,7 @@ $SPEC{datediff} = {
     args => {
         date1 => {
             schema => ['date*', {
-                'x.perl.coerce_rules' => ['str_natural','str_iso8601','float_epoch'],
+                'x.perl.coerce_rules' => ['From_str::natural','From_str::iso8601','From_float::epoch'],
                 'x.perl.coerce_to' => 'DateTime',
             }],
             req => 1,
@@ -573,7 +575,7 @@ $SPEC{datediff} = {
         },
         date2 => {
             schema => ['date*', {
-                'x.perl.coerce_rules' => ['str_natural','str_iso8601','float_epoch'],
+                'x.perl.coerce_rules' => ['From_str::natural','From_str::iso8601','From_float::epoch'],
                 'x.perl.coerce_to' => 'DateTime',
             }],
             req => 1,
@@ -643,7 +645,7 @@ App::DateUtils - An assortment of date-/time-related CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.121 of App::DateUtils (from Perl distribution App-DateUtils), released on 2019-06-19.
+This document describes version 0.122 of App::DateUtils (from Perl distribution App-DateUtils), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -697,7 +699,7 @@ Examples:
 
 =item * Convert "today" to epoch:
 
- dateconv(date => "today"); # -> [200, "OK", 1560902400]
+ dateconv(date => "today"); # -> [200, "OK", 1574985600]
 
 =item * Convert epoch to ymd:
 
@@ -857,14 +859,14 @@ Result:
      module          => "DateTime::Format::Flexible",
      original        => "tomorrow",
      is_parseable    => 1,
-     as_epoch        => 1560988800,
-     as_datetime_obj => "2019-06-20T00:00:00",
+     as_epoch        => 1575072000,
+     as_datetime_obj => "2019-11-30T00:00:00",
    },
    {
      module       => "DateTime::Format::Flexible",
      original     => "foo",
      is_parseable => 0,
-     error_msg    => "Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.28.2/lib/site_perl/5.28.2/Perinci/Access.pm line 81. ",
+     error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.30.0/lib/site_perl/5.30.0/Perinci/Access.pm line 81. ",
    },
  ]
 
@@ -1096,7 +1098,7 @@ Result:
      module       => "DateTime::Format::Flexible",
      original     => "foo",
      is_parseable => 0,
-     error_msg    => "Invalid date format: foo at /home/s1/perl5/perlbrew/perls/perl-5.28.2/lib/site_perl/5.28.2/Perinci/Access.pm line 81. ",
+     error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.30.0/lib/site_perl/5.30.0/Perinci/Access.pm line 81. ",
    },
  ]
 
@@ -1395,8 +1397,8 @@ Result:
      is_parseable => 1,
      as_secs => 1209600,
      as_dtdur_obj => "P14D",
-     date2 => "2019-07-03T13:29:56",
-     date1 => "2019-06-19T13:29:56",
+     date1 => "2019-11-29T02:17:55",
+     date2 => "2019-12-13T02:17:55",
    },
  ]
 
@@ -1411,10 +1413,10 @@ Result:
      module => "DateTime::Format::Natural",
      original => "from 23 Jun to 29 Jun",
      is_parseable => 1,
-     as_secs => 815404,
-     as_dtdur_obj => "P9DT10H30M4S",
+     as_secs => 13157275,
+     as_dtdur_obj => "P5MT2H17M55S",
+     date1 => "2019-11-29T02:17:55",
      date2 => "2019-06-29T00:00:00",
-     date1 => "2019-06-19T13:29:56",
    },
  ]
 
@@ -1496,7 +1498,7 @@ Result:
      module       => "Time::Duration::Parse",
      original     => "foo",
      is_parseable => 0,
-     error_msg    => "Unknown timespec: foo at lib/App/DateUtils.pm line 372. ",
+     error_msg    => "Unknown timespec: foo at lib/App/DateUtils.pm line 374. ",
    },
  ]
 

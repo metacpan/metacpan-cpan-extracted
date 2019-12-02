@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::DumpAsData 2.136;
+package Config::Model::DumpAsData 2.137;
 
 use Carp;
 use strict;
@@ -27,7 +27,7 @@ sub dump_as_data {
     my %args      = @_;
     my $dump_node = delete $args{node}
         || croak "dump_as_data: missing 'node' parameter";
-    my $fetch_mode = delete $args{mode} ;
+    my $mode = delete $args{mode} // '';
     my $skip_aw = delete $args{skip_auto_write} || '';
     my $auto_v  = delete $args{auto_vivify}     || 0;
     my $ordered_hash_as_list = delete $args{ordered_hash_as_list};
@@ -35,9 +35,15 @@ sub dump_as_data {
     $ordered_hash_as_list = 1 unless defined $ordered_hash_as_list;
 
     # mode and full_dump params are both accepted
-    my $full = delete $args{full_dump} // 1;
-    $fetch_mode //= 'non_upstream_default' if $full;
-    $fetch_mode //= 'custom';
+    my $full = delete $args{full_dump} || 0;
+    carp "dump_as_data: full_dump parameter is deprecated. Please use 'mode => user' instead"
+        if $full;
+
+    my $fetch_mode =
+          $full           ? 'user'
+        : $mode eq 'full' ? 'user'
+        : $mode           ? $mode
+        :                   'custom';
 
     my $std_cb = sub {
         my ( $scanner, $data_r, $obj, $element, $index, $value_obj ) = @_;
@@ -258,7 +264,7 @@ Config::Model::DumpAsData - Dump configuration content as a perl data structure
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 
@@ -350,10 +356,13 @@ Reference to a L<Config::Model::Node> object. Mandatory
 =item full_dump
 
 Also dump default values in the data structure. Useful if the dumped
-configuration data is used by the application. (default is yes)
+configuration data is used by the application. This parameter is
+deprecated in favor of mode parameter.
+
+=item mode
 
 Note that C<mode> parameter is also accepted and overrides
-C<full_dump> parameter. See L<Config::Model::Value/fetch(...)> for
+C<full_dump> parameter. See L<Config::Model::Value/fetch> for
 details on C<mode>.
 
 =item skip_auto_write

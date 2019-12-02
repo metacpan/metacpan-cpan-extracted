@@ -5,7 +5,7 @@ use CPANPLUS::Error             qw[error msg];
 use Locale::Maketext::Simple    Class => 'CPANPLUS', Style => 'gettext';
 
 use vars qw[$VERSION];
-$VERSION = "0.9178";
+$VERSION = "0.9902";
 
 =head1 NAME
 

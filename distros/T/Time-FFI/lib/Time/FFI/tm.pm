@@ -7,11 +7,11 @@ use FFI::Platypus::Record ();
 use Module::Runtime ();
 use Time::Local ();
 
-our $VERSION = '2.000';
+our $VERSION = '2.001';
 
 my @tm_members = qw(sec min hour mday mon year wday yday isdst);
 
-FFI::Platypus::Record::record_layout(
+FFI::Platypus::Record::record_layout_1(
   (map { (int => $_) } @tm_members),
   long   => 'gmtoff',
   string => 'zone',

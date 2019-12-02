@@ -1,0 +1,6 @@
+requires 'Mojolicious';
+requires 'IO::Socket::SSL';
+
+on 'develop' => sub {
+    recommends 'Devel::Cover';
+};

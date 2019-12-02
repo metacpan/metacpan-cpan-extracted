@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/AlgorithmBackoffUtils/retry_mimd
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-06-08'; # DATE
+our $DATE = '2019-11-29'; # DATE
 our $DIST = 'App-AlgorithmBackoffUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +40,13 @@ retry-mimd - Retry a command with MIMD (multiplicative increase, multiplicative 
 
 =head1 VERSION
 
-This document describes version 0.003 of retry-mimd (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-06-08.
+This document describes version 0.004 of retry-mimd (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % retry-mimd [options] <command>
+ % retry-mimd [options] <command> ...
 
 =head1 OPTIONS
 
@@ -248,6 +248,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--dry-run>
 
 Run in simulation mode (also via DRY_RUN=1).
+
+Default value:
+
+ ""
 
 =item B<--help>, B<-h>, B<-?>
 

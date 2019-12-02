@@ -11,7 +11,7 @@ use Data::Dumper;
 use Regexp::Common('RE_ALL', 'Email::Address', 'URI', 'time');
 use Scalar::Util qw(looks_like_number blessed weaken reftype);
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 sub new {
     my ($class, %args) = @_;
@@ -134,6 +134,7 @@ sub compile {
     local $self->{coercion} = $opts{coercion} // $opts{coersion} // 0;
     local $self->{to_json}  = $opts{to_json}  // 0;
     $self->{required_modules} = {};
+    $self->{strict} = $opts{is_strict} // 0;
     my $input_sym   = $opts{input_symbole} // '$_[0]';
     my $schema      = _norm_schema($self->{full_schema});
     my $type        = $schema->{type} // _guess_schema_type($schema);
@@ -227,7 +228,7 @@ sub _validate_boolean {
     my ($self, $sympt, $schmpt, $path, $is_required) = @_;
     $schmpt = _norm_schema($schmpt);
     my $r = '';
-    if (exists $schmpt->{default}) {
+    if (!($is_required && $self->{strict}) && exists $schmpt->{default}) {
         my $val = _quote_var($schmpt->{default});
         $r = "$sympt = $val if not defined $sympt;\n";
     }
@@ -257,7 +258,7 @@ sub _validate_string {
     my ($self, $sympt, $schmpt, $path, $is_required) = @_;
     $schmpt = _norm_schema($schmpt);
     my $r = '';
-    if (defined $schmpt->{default}) {
+    if (!($is_required && $self->{strict}) && defined $schmpt->{default}) {
         my $val = _quote_var($schmpt->{default});
         $r = "$sympt = $val if not defined $sympt;\n";
     }
@@ -309,7 +310,7 @@ sub _validate_any_number {    ## no critic (Subroutines::ProhibitManyArgs Subrou
     $schmpt = _norm_schema($schmpt);
     my $r = '';
     $ntype ||= '';
-    if (defined $schmpt->{default}) {
+    if (!($is_required && $self->{strict}) && defined $schmpt->{default}) {
         my $val = _quote_var($schmpt->{default});
         $r = "$sympt = $val if not defined $sympt;\n";
     }
@@ -461,7 +462,7 @@ sub _validate_object {    ## no critic (Subroutines::ProhibitExcessComplexity)
     my $rpath = !$path ? "(object)" : $path;
     my $ppref = $path  ? "$path/"   : "";
     my $r     = '';
-    if ($schmpt->{default}) {
+    if (!($is_required && $self->{strict}) && $schmpt->{default}) {
         my $val = _quote_var($schmpt->{default});
         $r = "  $sympt = $val if not defined $sympt;\n";
     }
@@ -555,7 +556,7 @@ sub _validate_array {
     $schmpt = _norm_schema($schmpt);
     my $rpath = !$path ? "(object)" : $path;
     my $r = '';
-    if ($schmpt->{default}) {
+    if (!($is_required && $self->{strict}) && $schmpt->{default}) {
         my $val = _quote_var($schmpt->{default});
         $r = "  $sympt = $val if not defined $sympt;\n";
     }
@@ -675,6 +676,8 @@ with array of their required import symbols.
 =item to_json => true|false
 
 =item input_symbole => string to use for rood data structure access
+
+=item is_strict => true|false (default: false) "reqired" over "default" priority
 
 =back
 

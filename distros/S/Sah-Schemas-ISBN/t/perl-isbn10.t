@@ -10,7 +10,7 @@ use Data::Sah::Coerce qw(gen_coercer);
 subtest "basics" => sub {
     my $c = gen_coercer(
         type => "str",
-        coerce_rules => ['str_to_isbn10'],
+        coerce_rules => ['From_str::to_isbn10'],
         return_type=>"status+err+val",
     );
 

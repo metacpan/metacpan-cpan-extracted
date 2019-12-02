@@ -1,4 +1,3 @@
-use IO::Prompter; # dies, utterly, if loaded after strictures, no idea why
 use strictures 1;
 use Test::More;
 use lib 'xt/lib';

@@ -1,7 +1,8 @@
 package Data::Sah::CoerceJS;
 
-our $DATE = '2019-01-26'; # DATE
-our $VERSION = '0.033'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $DIST = 'Data-Sah-Coerce'; # DIST
+our $VERSION = '0.039'; # VERSION
 
 use 5.010001;
 use strict;
@@ -153,7 +154,7 @@ Data::Sah::CoerceJS - Generate coercer code
 
 =head1 VERSION
 
-This document describes version 0.033 of Data::Sah::CoerceJS (from Perl distribution Data-Sah-Coerce), released on 2019-01-26.
+This document describes version 0.039 of Data::Sah::CoerceJS (from Perl distribution Data-Sah-Coerce), released on 2019-11-28.
 
 =head1 SYNOPSIS
 

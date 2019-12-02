@@ -1,7 +1,7 @@
 package Sah::Schema::date::dow_name::id;
 
-our $DATE = '2019-07-21'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [cistr => {
     summary => 'Day-of-week name (abbreviated or full, in Indonesian)',
@@ -28,7 +28,7 @@ Sah::Schema::date::dow_name::id - Day-of-week name (abbreviated or full, in Indo
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::date::dow_name::id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-07-21.
+This document describes version 0.003 of Sah::Schema::date::dow_name::id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
 
 =head1 HOMEPAGE
 

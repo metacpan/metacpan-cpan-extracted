@@ -9,7 +9,7 @@ use Test::More;
 plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/str/str_strip_slashes.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/strip_slashes.pm',
     'Sah/Schema/dirname.pm',
     'Sah/Schema/dirname/unix.pm',
     'Sah/Schema/filename.pm',

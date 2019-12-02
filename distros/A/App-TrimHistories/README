@@ -1,4 +1,95 @@
-SYNOPSIS
+NAME
+    App::TrimHistories - Keep only a certain number of sets of file
+    histories, delete the rest
 
+VERSION
+    This document describes version 0.006 of App::TrimHistories (from Perl
+    distribution App-TrimHistories), released on 2019-11-29.
+
+SYNOPSIS
     See the included script trim-histories.
+
+FUNCTIONS
+  trim_histories
+    Usage:
+
+     trim_histories(%args) -> [status, msg, payload, meta]
+
+    Keep only a certain number of sets of file histories, delete the rest.
+
+    This script can be used to delete old backup or log files. The files
+    must be named with timestamps, e.g. "mydb-2017-06-14.sql.gz". By
+    default, it keeps only 7 daily, 4 weekly, and 6 monthly histories. The
+    rest will be deleted.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   discard_old_histories => *bool*
+
+    *   discard_young_histories => *bool*
+
+    *   files* => *array[filename]*
+
+        Each file name must be unique and contain date, e.g.
+        `backup-2017-06-14.tar.gz`.
+
+    *   sets => *array[str]* (default: ["daily",7,"weekly",4,"monthly",6])
+
+        History sets to keep.
+
+        Expressed as a list of (period, num-to-keep) pairs. Period can be
+        number of seconds or either "hourly", "daily", "weekly", "monthly",
+        "yearly". The default is:
+
+         ['daily', 7, 'weekly', 4, 'monthly', 6]
+
+        which means to keep 7 daily, 4 weekly, and 6 monthly histories. It
+        is equivalent to:
+
+         [86400, 7, 7*86400, 4, 30*86400, 6]
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-TrimHistories>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-TrimHistories>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-TrimHistories>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

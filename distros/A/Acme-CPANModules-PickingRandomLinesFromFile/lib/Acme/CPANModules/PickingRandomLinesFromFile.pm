@@ -1,7 +1,7 @@
 package Acme::CPANModules::PickingRandomLinesFromFile;
 
-our $DATE = '2019-10-16'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-27'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => 'Picking random lines from a file',
@@ -12,9 +12,9 @@ our $LIST = {
             description => <<'_',
 
 The `random_line()` function from this module picks one or more random lines
-from a specified file. The whole content of the file need not be slurped into
-memory, but the routine requires a single-pass of reading all lines from the
-file. The algorithm is as described in perlfaq (See: `perldoc -q "random
+from a specified file. The whole content of the file does not need to be slurped
+into memory, but the routine requires a single-pass of reading all lines from
+the file. The algorithm is as described in perlfaq (See: `perldoc -q "random
 line"`).
 
 If you pick more than one lines, then there might be duplicates.
@@ -79,7 +79,7 @@ Acme::CPANModules::PickingRandomLinesFromFile - Picking random lines from a file
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::PickingRandomLinesFromFile (from Perl distribution Acme-CPANModules-PickingRandomLinesFromFile), released on 2019-10-16.
+This document describes version 0.003 of Acme::CPANModules::PickingRandomLinesFromFile (from Perl distribution Acme-CPANModules-PickingRandomLinesFromFile), released on 2019-11-27.
 
 =head1 DESCRIPTION
 
@@ -92,9 +92,9 @@ Picking random lines from a file.
 =item * L<File::Random>
 
 The C<random_line()> function from this module picks one or more random lines
-from a specified file. The whole content of the file need not be slurped into
-memory, but the routine requires a single-pass of reading all lines from the
-file. The algorithm is as described in perlfaq (See: C<perldoc -q "random
+from a specified file. The whole content of the file does not need to be slurped
+into memory, but the routine requires a single-pass of reading all lines from
+the file. The algorithm is as described in perlfaq (See: C<perldoc -q "random
 line">).
 
 If you pick more than one lines, then there might be duplicates.
@@ -151,6 +151,8 @@ feature.
 =head1 SEE ALSO
 
 L<Acme::CPANModules::PickingRandomItemsFromList>
+
+L<Acme::CPANModules::ReadingFilesBackward>
 
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 

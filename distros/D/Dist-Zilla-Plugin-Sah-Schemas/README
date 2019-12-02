@@ -3,9 +3,9 @@ NAME
     Sah-Schemas-* distribution
 
 VERSION
-    This document describes version 0.015 of
+    This document describes version 0.016 of
     Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution
-    Dist-Zilla-Plugin-Sah-Schemas), released on 2019-05-07.
+    Dist-Zilla-Plugin-Sah-Schemas), released on 2019-11-28.
 
 SYNOPSIS
     In dist.ini:

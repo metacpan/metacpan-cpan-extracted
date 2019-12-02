@@ -1,7 +1,91 @@
-SEE ALSO
+NAME
+    App::PermuteNamed - Permute multiple-valued key-value pairs
 
+VERSION
+    This document describes version 0.004 of App::PermuteNamed (from Perl
+    distribution App-PermuteNamed), released on 2019-11-29.
+
+FUNCTIONS
+  permute_named
+    Usage:
+
+     permute_named(%args) -> [status, msg, payload, meta]
+
+    Permute multiple-valued key-value pairs.
+
+    Examples:
+
+    *   Example #1:
+
+         permute_named( aoaos => ["bool,0,1", "x,foo,bar,baz"]);
+
+        Result:
+
+         [
+           { bool => 0, x => "foo" },
+           { bool => 0, x => "bar" },
+           { bool => 0, x => "baz" },
+           { bool => 1, x => "foo" },
+           { bool => 1, x => "bar" },
+           { bool => 1, x => "baz" },
+         ]
+
+    This is a CLI for "Permute::Named::*" module (currently using
+    "Permute::Named::Iter").
+
+    To enter a pair with multiple values, you enter a comma-separated list
+    with the first element is the key name and the rest are values.
+
+    The return will be array of hashes.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   aoaos* => *array[array[str]]*
+
+    *   separator => *str*
+
+        Separator character to use.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PermuteNamed>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PermuteNamed>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PermuteNamed>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Permute::Named, Permute::Named::Iter, PERLANCAR::Permute::Named.
 
     Set::Product, Set::CrossProduct (see more similar modules in the POD of
     Set::Product) and CLI scripts <cross>, cross-pericmd.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

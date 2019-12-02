@@ -37,7 +37,7 @@ sub do_uris
       ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
       $self->set_handle( $selfsock );
 
-      return Future->new->done( $self );
+      return Future->done( $self );
    };
 
    while( my ( $uri, $on_resp ) = splice @_, 0, 2 ) {

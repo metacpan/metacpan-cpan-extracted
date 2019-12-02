@@ -9,7 +9,7 @@ use Test::More 0.98;
 use Test::Needs;
 
 subtest "basics" => sub {
-    my $c = gen_coercer(type=>"str", coerce_rules=>["str_strip_slashes"]);
+    my $c = gen_coercer(type=>"str", coerce_rules=>["From_str::strip_slashes"]);
 
     subtest "non-strings are uncoerced" => sub {
         is_deeply($c->([]), [], "uncoerced");

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::Fstab 2.136;
+package Config::Model::Backend::Fstab 2.137;
 
 use Mouse;
 use Carp;
@@ -73,12 +73,13 @@ sub read {
 
         # now load fs options
         $logger->trace("fs_type $type options is $options");
-        my @options = map {
+        my @options;
+        foreach ( split /,/, $options ) {
             my $o = $opt_r_translate{$_} // $_;
             $o =~ s/no(.*)/$1=0/;
             $o .= '=1' unless $o =~ /=/;
-            $o;
-        }  split /,/, $options;
+            push @options, $o;
+        }
 
         $logger->debug("Loading:@options");
         $fs_obj->fetch_element('fs_mntopts')->load( step => "@options", check => $check );
@@ -108,9 +109,9 @@ sub write {
     foreach my $line_obj ( $node->fetch_element('fs')->fetch_all ) {
         my $d = sprintf(
             "%-30s %-25s %-6s %-10s %d %d\n",
-            map ( $line_obj->fetch_element_value($_), qw/fs_spec fs_file fs_vfstype/ ),
+            (map { $line_obj->fetch_element_value($_); } qw/fs_spec fs_file fs_vfstype/),
             $self->option_string( $line_obj->fetch_element('fs_mntopts') ),
-            map ( $line_obj->fetch_element_value($_), qw/fs_freq fs_passno/ ),
+            (map { $line_obj->fetch_element_value($_); } qw/fs_freq fs_passno/),
         );
         $res .= $self->write_data_and_comments( '#', $d, $line_obj->annotation );
 
@@ -160,7 +161,7 @@ Config::Model::Backend::Fstab - Read and write config from fstab file
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 

@@ -27,7 +27,8 @@ Chj::CPAN::ModulePODUrl - get module POD url on metacpan
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -41,6 +42,7 @@ package Chj::CPAN::ModulePODUrl;
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
 use LWP::UserAgent;
+use FP::Show;
 
 our $ua = LWP::UserAgent->new; # reuse to speed up HTTPS handling?
 #$ua->timeout($maybe_timeout);
@@ -70,7 +72,7 @@ sub if_get ($&&&) {
 # better for caching (also perhaps in general): return error object? 
 # Or even just plain old die.
 
-sub perhaps_module_pod_url ($) {
+sub perhaps_module_pod_url {
     my ($module_name)= @_;
 
     my $url= "https://metacpan.org/pod/$module_name";

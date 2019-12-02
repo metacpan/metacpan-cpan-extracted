@@ -1,9 +1,9 @@
 package Sah::SchemaR::fiat_currency;
 
-our $DATE = '2019-10-24'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = ["str",[{description=>"\nAccept only current (not retired) codes.\n\n",in=>["AED","AFN","ALL","AMD","ANG","AOA","ARS","AUD","AWG","AZN","BAM","BBD","BDT","BGN","BHD","BIF","BMD","BND","BOB","BOV","BRL","BSD","BTN","BWP","BYR","BZD","CAD","CDF","CHE","CHF","CHW","CLF","CLP","CNY","COP","COU","CRC","CUC","CUP","CVE","CZK","DJF","DKK","DOP","DZD","EGP","ERN","ETB","EUR","FJD","FKP","GBP","GEL","GHS","GIP","GMD","GNF","GTQ","GYD","HKD","HNL","HRK","HTG","HUF","IDR","ILS","INR","IQD","IRR","ISK","JMD","JOD","JPY","KES","KGS","KHR","KMF","KPW","KRW","KWD","KYD","KZT","LAK","LBP","LKR","LRD","LSL","LYD","MAD","MDL","MGA","MKD","MMK","MNT","MOP","MRO","MUR","MVR","MWK","MXN","MXV","MYR","MZN","NAD","NGN","NIO","NOK","NPR","NZD","OMR","PAB","PEN","PGK","PHP","PKR","PLN","PYG","QAR","RON","RSD","RUB","RWF","SAR","SBD","SCR","SDG","SEK","SGD","SHP","SLL","SOS","SRD","SSP","STD","SVC","SYP","SZL","THB","TJS","TMT","TND","TOP","TRY","TTD","TWD","TZS","UAH","UGX","USD","USN","UYI","UYU","UZS","VEF","VND","VUV","WST","XAF","XAG","XAU","XBA","XBB","XBC","XBD","XCD","XDR","XOF","XPD","XPF","XPT","XSU","XUA","YER","ZAR","ZMW","ZWL"],match=>"\\A[A-Z]{3}\\z",summary=>"Currency code","x.perl.coerce_rules"=>["str_toupper"]},{summary=>"Alias for currency::code"}],["currency::code","str"]];
+our $rschema = ["str",[{description=>"\nAccept only current (not retired) codes.\n\n",in=>["AED","AFN","ALL","AMD","ANG","AOA","ARS","AUD","AWG","AZN","BAM","BBD","BDT","BGN","BHD","BIF","BMD","BND","BOB","BOV","BRL","BSD","BTN","BWP","BYN","BZD","CAD","CDF","CHE","CHF","CHW","CLF","CLP","CNY","COP","COU","CRC","CUC","CUP","CVE","CZK","DJF","DKK","DOP","DZD","EGP","ERN","ETB","EUR","FJD","FKP","GBP","GEL","GHS","GIP","GMD","GNF","GTQ","GYD","HKD","HNL","HRK","HTG","HUF","IDR","ILS","INR","IQD","IRR","ISK","JMD","JOD","JPY","KES","KGS","KHR","KMF","KPW","KRW","KWD","KYD","KZT","LAK","LBP","LKR","LRD","LSL","LYD","MAD","MDL","MGA","MKD","MMK","MNT","MOP","MRU","MUR","MVR","MWK","MXN","MXV","MYR","MZN","NAD","NGN","NIO","NOK","NPR","NZD","OMR","PAB","PEN","PGK","PHP","PKR","PLN","PYG","QAR","RON","RSD","RUB","RWF","SAR","SBD","SCR","SDG","SEK","SGD","SHP","SLL","SOS","SRD","SSP","STN","SVC","SYP","SZL","THB","TJS","TMT","TND","TOP","TRY","TTD","TWD","TZS","UAH","UGX","USD","USN","UYI","UYU","UYW","UZS","VES","VND","VUV","WST","XAF","XAG","XAU","XBA","XBB","XBC","XBD","XCD","XDR","XOF","XPD","XPF","XPT","XSU","XUA","YER","ZAR","ZMW","ZWL"],match=>"\\A[A-Z]{3}\\z",summary=>"Currency code","x.perl.coerce_rules"=>["From_str::to_upper"]},{summary=>"Alias for currency::code"}],["currency::code","str"]];
 
 1;
 # ABSTRACT: Alias for currency::code
@@ -20,7 +20,7 @@ Sah::SchemaR::fiat_currency - Alias for currency::code
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::fiat_currency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-10-24.
+This document describes version 0.013 of Sah::SchemaR::fiat_currency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

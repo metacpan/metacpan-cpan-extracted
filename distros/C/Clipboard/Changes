@@ -1,3 +1,8 @@
+0.21    2019-12-02
+
+    - Min version of Mac::Pasteboard for macOS Catalina compat
+        - Thanks to William H. Gilmore
+
 0.20    2019-04-18
 
     - use xclip on cygwin/win32 if SSH_CONNECTION is set (rkitover)

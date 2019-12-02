@@ -112,7 +112,7 @@ foreach my $ni ( create_ni_text(), create_ni_picture() ) {
     my $writer = XML::NewsML_G2::Writer::News_Item->new(
         news_item      => $ni,
         scheme_manager => $sm,
-        g2_version     => 2.9
+        g2_version     => 2.9,
     );
 
     my $paragraphs = $writer->create_element('paragraphs');
@@ -150,7 +150,7 @@ foreach my $ni ( create_ni_text(), create_ni_picture() ) {
         ok( $writer = XML::NewsML_G2::Writer::News_Item->new(
                 news_item      => $ni,
                 scheme_manager => $sm,
-                g2_version     => $version
+                g2_version     => $version,
             ),
             "creating $version writer"
         );

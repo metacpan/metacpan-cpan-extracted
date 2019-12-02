@@ -1,3 +1,9 @@
+0.098   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
+	  0.034+).
+
+
 0.097   2019-07-22  Released-By: PERLANCAR; Urgency: medium
 
 	- Allow using other DateTime::Format::* classes: rename

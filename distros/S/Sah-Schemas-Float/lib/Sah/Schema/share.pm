@@ -1,7 +1,7 @@
 package Sah::Schema::share;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $schema = ['float', {
     summary => 'A float between 0 and 1',
@@ -19,7 +19,7 @@ to mean "0.01" or "1%") use of this type is discouraged. Use
 
 _
     'x.perl.coerce_rules' => [
-        'str_share',
+        'From_str::share',
     ],
 }, {}];
 
@@ -38,7 +38,7 @@ Sah::Schema::share - A float between 0 and 1
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::share (from Perl distribution Sah-Schemas-Float), released on 2019-07-26.
+This document describes version 0.006 of Sah::Schema::share (from Perl distribution Sah-Schemas-Float), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

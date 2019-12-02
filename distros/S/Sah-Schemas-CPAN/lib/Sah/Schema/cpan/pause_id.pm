@@ -1,9 +1,11 @@
 package Sah::Schema::cpan::pause_id;
 
-our $DATE = '2019-01-13'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'Sah-Schemas-CPAN'; # DIST
+our $VERSION = '0.005'; # VERSION
 
- our $schema = ["str",{match=>qr([A-Z][A-Z0-9]{1,8}),summary=>"PAUSE author ID","x.completion"=>["lcpan_authorid"],"x.perl.coerce_rules"=>["str_toupper"]},{}];
+ our $schema = ["str",{match=>qr([A-Z][A-Z0-9]{1,8}),summary=>"PAUSE author ID","x.completion"=>["lcpan_authorid"],"x.perl.coerce_rules"=>["From_str::to_upper"]},{}];
 
 
 1;
@@ -22,7 +24,7 @@ Sah::Schema::cpan::pause_id - PAUSE author ID
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2019-01-13.
+This document describes version 0.005 of Sah::Schema::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2019-11-29.
 
 =head1 HOMEPAGE
 

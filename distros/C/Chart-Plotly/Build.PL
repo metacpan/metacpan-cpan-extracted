@@ -22,9 +22,12 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Chart-Plotly",
-  "dist_version" => "0.031",
+  "dist_version" => "0.033",
   "license" => "mit",
   "module_name" => "Chart::Plotly",
+  "recommends" => {
+    "Devel::IPerl" => "0.009"
+  },
   "recursive_test_files" => 1,
   "requires" => {
     "Exporter" => 0,
@@ -32,15 +35,19 @@ my %module_build_args = (
     "File::Which" => 0,
     "HTML::Show" => 0,
     "JSON" => 0,
+    "Module::Find" => 0,
     "Module::Load" => 0,
+    "Moo::Role" => 0,
     "Moose" => 0,
     "Moose::Util::TypeConstraints" => 0,
     "MooseX::ExtraArgs" => 0,
     "Params::Validate" => 0,
     "Path::Tiny" => 0,
     "Ref::Util" => 0,
+    "Role::Tiny" => 0,
     "Text::Template" => 0,
     "UUID::Tiny" => 0,
+    "namespace::autoclean" => 0,
     "overload" => 0,
     "perl" => "5.010",
     "strict" => 0,

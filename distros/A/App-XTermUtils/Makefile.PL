@@ -15,9 +15,13 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-XTermUtils",
   "EXE_FILES" => [
     "script/get-term-bgcolor",
+    "script/get-term-fgcolor",
     "script/set-term-bgcolor",
+    "script/set-term-fgcolor",
     "script/term-bgcolor-is-dark",
-    "script/term-bgcolor-is-light"
+    "script/term-bgcolor-is-light",
+    "script/term-fgcolor-is-dark",
+    "script/term-fgcolor-is-light"
   ],
   "LICENSE" => "perl",
   "NAME" => "App::XTermUtils",
@@ -29,7 +33,7 @@ my %WriteMakefileArgs = (
     "Perinci::CmdLine::Lite" => "1.820",
     "Sah::Schema::color::rgb24" => 0,
     "Sah::Schema::true" => 0,
-    "XTerm::Util" => "0.004"
+    "XTerm::Util" => "0.006"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -37,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +60,7 @@ my %FallbackPrereqs = (
   "Sah::Schema::color::rgb24" => 0,
   "Sah::Schema::true" => 0,
   "Test::More" => 0,
-  "XTerm::Util" => "0.004"
+  "XTerm::Util" => "0.006"
 );
 
 

@@ -244,7 +244,7 @@ my @order = (
     'Blitting',
     'Blit Move',
     'Rotate',
-#    'Flipping',
+    'Flipping',
     'Monochrome',
     'XOR Mode Drawing',
     'OR Mode Drawing',
@@ -1167,26 +1167,23 @@ sub rotate_truetype_fonts {
     while (time < $g) {
         my $b = $F->ttf_print(
             {
-                'x'      => $x - $h,
-                'y'      => $y - $h,
+                'x'      => $x,
+                'y'      => $y,
                 'height' => $h,
                 'wscale' => $ws,
                 'color'  => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
-                'text'   => "$angle degrees",
+                'text'   => "   $angle degrees   ",
                 'rotate' => $angle,
-
-                #                'font_path'    => $F->{'FONTS'}->{$font}->{'path'},
-                #                'face'         => $F->{'FONTS'}->{$font}->{'font'},
                 'bounding_box' => 1,
                 'center'       => CENTER_XY,
             }
         );
         if (defined($b)) {
-            $F->cls();
+#            $F->cls();
             $F->ttf_print($b);
         }
         $angle++;
-        $angle = 0 if ($angle >= 360);
+        $angle = 270 if ($angle >= 360);
 
         $benchmark->{'TrueType Fonts Rotated'}++;
     } ## end while (time < $g)
@@ -1392,6 +1389,7 @@ sub rotate {
             $angle += 3;
             $angle = 0 if ($angle >= 360);
             $count++;
+            last if ($p == 0); # We no longer bother with "high" as "quick" is pretty much the same, quality-wise.
         } ## end while (time < $s || $count...)
 
         $angle = 0;
@@ -1446,7 +1444,7 @@ sub flipping {
     my $image = $IMAGES[$r];
     $image->{'image'}          = "$IMAGES[$r]->{'image'}";
     $benchmark->{'Image Flip'} = 0;
-    my $s    = time + $delay * 2;
+    my $s    = time + $delay * 20;
     my $zoom = time + $delay;
     while (time < $s) {
         foreach my $dir (qw(normal horizontal vertical both)) {
@@ -1458,9 +1456,6 @@ sub flipping {
                         'blit_data' => $image
                     }
                 );
-                $rot->{'image'} = "$rot->{'image'}";
-                $rot->{'x'}     = abs(($XX - $rot->{'width'}) / 2);
-                $rot->{'y'}     = abs((($YY - $F->{'Y_CLIP'}) - $rot->{'height'}) / 2);
                 $F->blit_write($rot);
             } else {
                 $r                = rand(scalar(@IMAGES));

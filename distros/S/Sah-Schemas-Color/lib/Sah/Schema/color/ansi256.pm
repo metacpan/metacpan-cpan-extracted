@@ -1,7 +1,7 @@
 package Sah::Schema::color::ansi256;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $schema = [int => {
     summary => 'ANSI-256 color, an integer number from 0-255',
@@ -24,7 +24,7 @@ Sah::Schema::color::ansi256 - ANSI-256 color, an integer number from 0-255
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::color::ansi256 (from Perl distribution Sah-Schemas-Color), released on 2019-07-25.
+This document describes version 0.005 of Sah::Schema::color::ansi256 (from Perl distribution Sah-Schemas-Color), released on 2019-11-29.
 
 =head1 HOMEPAGE
 

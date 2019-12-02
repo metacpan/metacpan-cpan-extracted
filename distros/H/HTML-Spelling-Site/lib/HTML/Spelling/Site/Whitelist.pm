@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Whitelist;
-$HTML::Spelling::Site::Whitelist::VERSION = '0.4.0';
+$HTML::Spelling::Site::Whitelist::VERSION = '0.4.1';
 use strict;
 use warnings;
 use autodie;
@@ -231,13 +231,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-HTML::Spelling::Site::Whitelist
-
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 
@@ -266,10 +262,6 @@ spell check.
 =head1 NAME
 
 HTML::Spelling::Site::Whitelist - handles the whitelist file.
-
-=head1 VERSION
-
-version 0.4.0
 
 =head1 METHODS
 

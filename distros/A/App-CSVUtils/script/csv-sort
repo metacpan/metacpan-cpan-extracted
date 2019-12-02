@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_sort_rows
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-06-06'; # DATE
+our $DATE = '2019-11-29'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ csv-sort - Sort CSV rows
 
 =head1 VERSION
 
-This document describes version 0.023 of csv-sort (from Perl distribution App-CSVUtils), released on 2019-06-06.
+This document describes version 0.025 of csv-sort (from Perl distribution App-CSVUtils), released on 2019-11-29.
 
 =head1 SYNOPSIS
 

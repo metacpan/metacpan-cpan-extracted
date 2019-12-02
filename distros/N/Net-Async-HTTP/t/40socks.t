@@ -99,9 +99,7 @@ my $peersock;
                         $CRLF );
 }
 
-wait_for { $f->is_ready };
-
-my $response = $f->get;
+my $response = wait_for_future( $f )->get;
 
 is( $response->code, 200, '$response' );
 

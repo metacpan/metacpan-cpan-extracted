@@ -1,26 +1,29 @@
-Revision history for App-ZodiacUtils
+0.110   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
-0.10    2016-06-02 (PERLANCAR)
+	- Update coerce rule names (Data::Sah::Coerce 0.034+).
+
+
+0.10    2016-06-02  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix startup overhead degradation.
 
 
-0.09    2016-06-02 (PERLANCAR)
+0.09    2016-06-02  Released-By: PERLANCAR
 
         - [ux] Add coercion rule 'str_alami_en' to allow things like: 'zodiac-of
           today'.
 
 
-0.08    2016-01-18 (PERLANCAR)
+0.08    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.07    2015-12-18 (PERLANCAR)
+0.07    2015-12-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -28,7 +31,7 @@ Revision history for App-ZodiacUtils
           rendering of examples in modules' POD.
 
 
-0.06    2015-12-17 (PERLANCAR)
+0.06    2015-12-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -37,7 +40,7 @@ Revision history for App-ZodiacUtils
           'hash'.
 
 
-0.05    2015-12-17 (PERLANCAR)
+0.05    2015-12-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -47,24 +50,24 @@ Revision history for App-ZodiacUtils
           command-line in examples.
 
 
-0.04    2015-11-28 (PERLANCAR)
+0.04    2015-11-28  Released-By: PERLANCAR
 
 	- Switch to Perinci::CmdLine::Inline for faster startup, allow
 	  multiple arguments.
 
 
-0.03    2015-11-28 (PERLANCAR)
+0.03    2015-11-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace DateTime::Event::Zodiac with Zodiac::Tiny.
 
 
-0.02    2015-11-21 (PERLANCAR)
+0.02    2015-11-21  Released-By: PERLANCAR
 
 	- Add utility: chinese-zodiac-of.
 
 
-0.01    2015-11-09 (PERLANCAR)
+0.01    2015-11-09  Released-By: PERLANCAR
 
         - First release.

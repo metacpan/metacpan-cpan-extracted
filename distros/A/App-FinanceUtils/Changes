@@ -1,8 +1,14 @@
-0.002   2017-03-13 (PERLANCAR)
+0.003   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
+	  0.034+).
+
+
+0.002   2017-03-13  Released-By: PERLANCAR
 
         - Use Perinci::Sub::Gen::FromFormulas.
 
 
-0.001   2017-03-13 (PERLANCAR)
+0.001   2017-03-13  Released-By: PERLANCAR
 
         - First release.

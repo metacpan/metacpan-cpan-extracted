@@ -1,3 +1,20 @@
+0.009   2019-11-29  Released-By: PERLANCAR; Urgency: high
+
+        - Merge two releases 0.008 and 0.008.1.
+
+
+0.008.1 2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce 0.034+).
+	  UPDATE: rename release from 0.007 to 0.008.1, cancel release
+	  (duplicate version).
+
+
+0.008   2019-09-12  Released-By: PERLANCAR; Urgency: low
+
+        - [ux] Add completion for --digest-args (-A) (for Bcrypt, SHA, CRC).
+
+
 0.007   2019-09-12  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Perform checksum checking case-insensitively [GH#3].

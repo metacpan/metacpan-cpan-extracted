@@ -12,7 +12,7 @@ subtest "coercion" => sub {
     test_needs 'Data::Sah::Coerce';
 
     my $c = Data::Sah::Coerce::gen_coercer(
-        type=>"str", coerce_rules => ['str_convert_perl_pod_to_path']);
+        type=>"str", coerce_rules => ['From_str::convert_perl_pod_to_path']);
 
     is_deeply($c->([]), [], "uncoerced");
     is($c->("*"), "*", "uncoerced 2");

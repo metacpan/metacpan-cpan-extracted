@@ -1,7 +1,7 @@
 package Sah::Schema::ean13;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $schema = [str => {
     summary => 'EAN-13 number',
@@ -13,7 +13,7 @@ Checksum digit must be valid.
 
 _
     match => '\A[0-9]{13}\z',
-    'x.perl.coerce_rules' => ['str_to_ean13'],
+    'x.perl.coerce_rules' => ['From_str::to_ean13'],
 }, {}];
 
 1;
@@ -31,7 +31,7 @@ Sah::Schema::ean13 - EAN-13 number
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::ean13 (from Perl distribution Sah-Schemas-EAN), released on 2019-07-25.
+This document describes version 0.005 of Sah::Schema::ean13 (from Perl distribution Sah-Schemas-EAN), released on 2019-11-28.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

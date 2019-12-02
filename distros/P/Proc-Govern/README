@@ -2,8 +2,8 @@ NAME
     Proc::Govern - Run child process and govern its various aspects
 
 VERSION
-    This document describes version 0.208 of Proc::Govern (from Perl
-    distribution Proc-Govern), released on 2019-09-03.
+    This document describes version 0.209 of Proc::Govern (from Perl
+    distribution Proc-Govern), released on 2019-11-29.
 
 SYNOPSIS
     To use as Perl module:

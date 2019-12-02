@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-09-09'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-10-18'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -64,7 +64,7 @@ rename "../$curname", "../$ARGV[0]" or die "renwd: Can't rename: $!\n";
 print "$ARGV[0]\n" if $print;
 
 1;
-# ABSTRACT: REName current (Working Directory)
+# ABSTRACT: REName current (Working) Directory
 # PODNAME: renwd
 
 __END__
@@ -75,11 +75,11 @@ __END__
 
 =head1 NAME
 
-renwd - REName current (Working Directory)
+renwd - REName current (Working) Directory
 
 =head1 VERSION
 
-This document describes version 0.004 of renwd (from Perl distribution App-renwd), released on 2019-09-09.
+This document describes version 0.005 of renwd (from Perl distribution App-renwd), released on 2019-10-18.
 
 =head1 SYNOPSIS
 

@@ -50,7 +50,8 @@ ok( my $ni = XML::NewsML_G2::News_Item_Text->new(
         provider         => $prov_apa,
         service          => $svc,
         copyright_holder => $kolarik,
-        guid             => $guid_ots
+        guid             => $guid_ots,
+        timezone         => 'UTC'
     ),
     'create News Item instance'
 );
@@ -78,7 +79,7 @@ ok( my $sm = XML::NewsML_G2::Scheme_Manager->new(%schemes),
 
 my $writer = XML::NewsML_G2::Writer::News_Item->new(
     news_item      => $ni,
-    scheme_manager => $sm
+    scheme_manager => $sm,
 );
 ok( my $dom = $writer->create_dom(), 'create DOM' );
 

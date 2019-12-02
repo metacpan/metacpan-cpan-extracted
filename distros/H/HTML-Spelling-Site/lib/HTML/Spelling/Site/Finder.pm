@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Finder;
-$HTML::Spelling::Site::Finder::VERSION = '0.4.0';
+$HTML::Spelling::Site::Finder::VERSION = '0.4.1';
 use strict;
 use warnings;
 
@@ -46,13 +46,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-HTML::Spelling::Site::Finder
-
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 
@@ -82,10 +78,6 @@ array reference.
 
 HTML::Spelling::Site::Finder - find the relevant .html/.xhtml files in
 a directory tree.
-
-=head1 VERSION
-
-version 0.4.0
 
 =head1 METHODS
 

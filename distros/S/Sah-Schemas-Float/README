@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Float - Sah schemas for various floating types
 
 VERSION
-    This document describes version 0.005 of Sah::Schemas::Float (from Perl
-    distribution Sah-Schemas-Float), released on 2019-07-26.
+    This document describes version 0.006 of Sah::Schemas::Float (from Perl
+    distribution Sah-Schemas-Float), released on 2019-11-29.
 
 SAH SCHEMAS
     *   negfloat

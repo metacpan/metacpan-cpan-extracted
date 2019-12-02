@@ -10,9 +10,11 @@ use XML::NewsML_G2::News_Item_Text;
 use lib 't';
 use NewsML_G2_Test_Helpers;
 
-my $ni =
-    XML::NewsML_G2::News_Item_Text->new( %NewsML_G2_Test_Helpers::ni_std_opts,
-    title => 'blah' );
+my $ni = XML::NewsML_G2::News_Item_Text->new(
+    %NewsML_G2_Test_Helpers::ni_std_opts,
+    title    => 'blah',
+    timezone => 'UTC'
+);
 
 sub _test_deprecated_attribute_now_arrayref {
     my ($name) = @_;

@@ -47,7 +47,8 @@ storage. Could Storable be used for the key as well?
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -239,16 +240,20 @@ tests_for \&memoizing;
 
 {
     my $tdir= ".FP-Memoizing-tests";
+
     TEST {
         mkdir $tdir;
     } 1;
+
     tests_for sub {
         my ($f)=@_;
         &memoizing_to_dir ($tdir, $f);
     };
         
-    TEST { system qw(rm -rf --), $tdir }
-      0;
+    TEST {
+        require File::Path;
+        File::Path::remove_tree $tdir;
+    } 6;
 }
 
 1

@@ -1,9 +1,9 @@
 package Sah::SchemaR::perl::distname;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.025'; # VERSION
 
-our $rschema = ["str",[{match=>"\\A[A-Za-z_][A-Za-z_0-9]*(-[A-Za-z_0-9]+)*\\z",summary=>"Perl distribution name","x.completion"=>"perl_distname","x.perl.coerce_rules"=>["str_normalize_perl_distname"]}],["str"]];
+our $rschema = ["str",[{match=>"\\A[A-Za-z_][A-Za-z_0-9]*(-[A-Za-z_0-9]+)*\\z",summary=>"Perl distribution name","x.completion"=>"perl_distname","x.perl.coerce_rules"=>["From_str::normalize_perl_distname"]}],["str"]];
 
 1;
 # ABSTRACT: Perl distribution name
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::distname - Perl distribution name
 
 =head1 VERSION
 
-This document describes version 0.023 of Sah::SchemaR::perl::distname (from Perl distribution Sah-Schemas-Perl), released on 2019-07-26.
+This document describes version 0.025 of Sah::SchemaR::perl::distname (from Perl distribution Sah-Schemas-Perl), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

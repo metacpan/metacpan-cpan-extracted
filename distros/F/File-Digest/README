@@ -2,8 +2,8 @@ NAME
     File::Digest - Calculate digests of files
 
 VERSION
-    This document describes version 0.010 of File::Digest (from Perl
-    distribution File-Digest), released on 2019-09-12.
+    This document describes version 0.011 of File::Digest (from Perl
+    distribution File-Digest), released on 2019-11-29.
 
 SYNOPSIS
      use File::Digest qw(digest_files);

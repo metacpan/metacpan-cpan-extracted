@@ -9,6 +9,7 @@ minil.toml
 t/00_compile.t
 t/failure.t
 t/live.t
+t/region.t
 t/success.t
 META.yml
 MANIFEST

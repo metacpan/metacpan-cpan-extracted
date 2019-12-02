@@ -8,6 +8,7 @@ README.md
 lib/Promise/ES6.pm
 lib/Promise/ES6/AnyEvent.pm
 lib/Promise/ES6/EventLoopBase.pm
+lib/Promise/ES6/Future.pm
 lib/Promise/ES6/IOAsync.pm
 lib/Promise/ES6/Mojo.pm
 t/all.t
@@ -18,6 +19,7 @@ t/await_then_with_async.t
 t/await_with_async.t
 t/catch.t
 t/catch_asyncreject.t
+t/future.t
 t/ioasync.t
 t/lib/EventTest.pm
 t/lib/Eventer.pm

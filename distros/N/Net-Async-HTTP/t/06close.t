@@ -33,7 +33,7 @@ local *IO::Async::Handle::connect = sub {
    ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
    $self->set_handle( $selfsock );
 
-   return Future->new->done( $self );
+   return Future->done( $self );
 };
 
 # HTTP/1.1 pipelining - if server closes after first request, others should fail
@@ -52,19 +52,19 @@ local *IO::Async::Handle::connect = sub {
                      "Content-Length: 0$CRLF" .
                      $CRLF );
 
-   wait_for { $f[0]->is_ready };
+   wait_for_future( $f[0] );
    ok( !$f[0]->failure, 'First request succeeds before EOF' );
 
    $peersock->close;
 
-   wait_for { $f[1]->is_ready };
+   wait_for_future( $f[1] );
    ok( $f[1]->failure, 'Second request fails after EOF' );
 
    # Not sure which error will happen
    like( scalar $f[1]->failure, qr/^Connection closed($| while awaiting header)/,
       'Queued request gets connection closed error' );
 
-   wait_for { $f[2]->is_ready };
+   wait_for_future( $f[2] );
    ok( $f[2]->failure );
 }
 
@@ -87,7 +87,7 @@ local *IO::Async::Handle::connect = sub {
    $peersock->close;
    undef $peersock;
 
-   wait_for { $f[0]->is_ready };
+   wait_for_future( $f[0] );
    ok( !$f[0]->failure, 'First request succeeds after HTTP/1.0 EOF' );
 
    wait_for { defined $peersock };
@@ -102,7 +102,7 @@ local *IO::Async::Handle::connect = sub {
    $peersock->close;
    undef $peersock;
 
-   wait_for { $f[1]->is_ready };
+   wait_for_future( $f[1] );
    ok( !$f[1]->failure, 'Second request succeeds after second HTTP/1.0 EOF' );
 }
 

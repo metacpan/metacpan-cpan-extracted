@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2019 -- leonerd@leonerd.org.uk
 
 package Net::Async::HTTP;
 
@@ -10,7 +10,7 @@ use warnings;
 use 5.010;  # //
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 our $DEFAULT_UA = "Perl + " . __PACKAGE__ . "/$VERSION";
 our $DEFAULT_MAXREDIR = 3;
@@ -32,7 +32,7 @@ use Future 0.28; # ->set_label
 use Future::Utils 0.16 qw( repeat );
 
 use Scalar::Util qw( blessed reftype );
-use List::Util 1.29 qw( first pairs );
+use List::Util 1.29 qw( first pairs pairgrep );
 use Socket 2.010 qw(
    SOCK_STREAM IPPROTO_IP IP_TOS
    IPTOS_LOWDELAY IPTOS_THROUGHPUT IPTOS_RELIABILITY IPTOS_MINCOST
@@ -53,22 +53,22 @@ C<Net::Async::HTTP> - use HTTP with C<IO::Async>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop;
- use Net::Async::HTTP;
- use URI;
+   use IO::Async::Loop;
+   use Net::Async::HTTP;
+   use URI;
 
- my $loop = IO::Async::Loop->new();
+   my $loop = IO::Async::Loop->new();
 
- my $http = Net::Async::HTTP->new();
+   my $http = Net::Async::HTTP->new();
 
- $loop->add( $http );
+   $loop->add( $http );
 
- my ( $response ) = $http->do_request(
-    uri => URI->new( "http://www.cpan.org/" ),
- )->get;
+   my ( $response ) = $http->do_request(
+      uri => URI->new( "http://www.cpan.org/" ),
+   )->get;
 
- print "Front page of http://www.cpan.org/ is:\n";
- print $response->as_string;
+   print "Front page of http://www.cpan.org/ is:\n";
+   print $response->as_string;
 
 =head1 DESCRIPTION
 
@@ -162,6 +162,18 @@ The following named parameters may be passed to C<new> or C<configure>:
 A string to set in the C<User-Agent> HTTP header. If not supplied, one will
 be constructed that declares C<Net::Async::HTTP> and the version number.
 
+=head2 headers => ARRAY or HASH
+
+I<Since version 0.45.>
+
+A set of extra headers to apply to every outgoing request. May be specified
+either as an even-sized array containing key/value pairs, or a hash.
+
+Individual header values may be added or changed without replacing the entire
+set by using the L<configure> method and passing a key called C<+headers>:
+
+   $http->configure( +headers => { One_More => "Key" } );
+
 =head2 max_redirects => INT
 
 Optional. How many levels of redirection to follow. If not supplied, will
@@ -189,7 +201,7 @@ practice that most programs will raise this limit to something higher, perhaps
 To test if your application will handle this correctly, you can set a
 different default by setting an environment variable:
 
- $ NET_ASYNC_HTTP_MAXCONNS=3 perl ...
+   $ NET_ASYNC_HTTP_MAXCONNS=3 perl ...
 
 =head2 timeout => NUM
 
@@ -218,6 +230,14 @@ cookies in requests and store them from responses.
 
 Optional. If false, disables HTTP/1.1-style request pipelining.
 
+=head2 close_after_request => BOOL
+
+I<Since version 0.45.>
+
+Optional. If true, will set the C<Connection: close> header on outgoing
+requests and disable pipelining, thus making every request use a new
+connection.
+
 =head2 family => INT
 
 =head2 local_host => STRING
@@ -244,9 +264,9 @@ to fail, or the C<on_error> callback to be invoked.
 The HTTP response and request objects will be passed as well as the code and
 message, and the failure name will be C<http>.
 
- ( $code_message, "http", $response, $request ) = $f->failure
+   ( $code_message, "http", $response, $request ) = $f->failure
 
- $on_error->( "$code $message", $response, $request )
+   $on_error->( "$code $message", $response, $request )
 
 =head2 read_len => INT
 
@@ -305,10 +325,29 @@ sub configure
 
    foreach (qw( user_agent max_redirects max_in_flight max_connections_per_host
       timeout stall_timeout proxy_host proxy_port cookie_jar pipeline
-      family local_host local_port local_addrs local_addr fail_on_error
-      read_len write_len decode_content require_SSL ))
+      close_after_request family local_host local_port local_addrs local_addr
+      fail_on_error read_len write_len decode_content require_SSL ))
    {
       $self->{$_} = delete $params{$_} if exists $params{$_};
+   }
+
+   # Always store internally as ARRAyref
+   if( my $headers = delete $params{headers} ) {
+      @{ $self->{headers} } =
+         ( ref $headers eq "ARRAY" ) ? @$headers :
+         ( ref $headers eq "HASH"  ) ? %$headers :
+         croak "Expected 'headers' to be either ARRAY or HASH reference";
+   }
+
+   if( my $more = delete $params{"+headers"} ) {
+      my @more =
+         ( ref $more eq "ARRAY" ) ? @$more :
+         ( ref $more eq "HASH"  ) ? %$more :
+         croak "Expected '+headers' to be either ARRAY or HASH reference";
+      my %to_remove = @more;
+
+      my $headers = $self->{headers};
+      @$headers = ( ( pairgrep { !exists $to_remove{$a} } @$headers ), @more );
    }
 
    foreach ( grep { m/^SSL_/ } keys %params ) {
@@ -346,7 +385,7 @@ When returning a Future, the following methods all indicate HTTP-level errors
 using the Future failure name of C<http>. If the error relates to a specific
 response it will be included. The original request is also included.
 
- $f->fail( $message, "http", $response, $request )
+   $f->fail( $message, "http", $response, $request )
 
 =cut
 
@@ -436,7 +475,8 @@ sub get_connection
       notifier_name => "$host:$port,connecting",
       ready_queue   => $ready_queue,
       ( map { $_ => $self->{$_} }
-         qw( max_in_flight pipeline read_len write_len decode_content ) ),
+         qw( max_in_flight read_len write_len decode_content ) ),
+      pipeline => ( $self->{pipeline} && !$self->{close_after_request} ),
       is_proxy => $args{is_proxy},
 
       on_closed => sub {
@@ -601,7 +641,7 @@ operations on it. This code is expected to return a C<Future>; only once that
 has completed will the request cycle continue. If it fails, that failure is
 propagated to the caller.
 
- $f = $on_ready->( $connection )
+   $f = $on_ready->( $connection )
 
 =item on_redirect => CODE
 
@@ -609,7 +649,7 @@ Optional. A callback that is invoked if a redirect response is received,
 before the new location is fetched. It will be passed the response and the new
 URL.
 
- $on_redirect->( $response, $location )
+   $on_redirect->( $response, $location )
 
 =item on_body_write => CODE
 
@@ -618,7 +658,7 @@ body content. This may be used to implement an upload progress indicator or
 similar. It will be passed the total number of bytes of body content written
 so far (i.e. excluding bytes consumed in the header).
 
- $on_body_write->( $written )
+   $on_body_write->( $written )
 
 =item max_redirects => INT
 
@@ -635,7 +675,7 @@ request. If not specified, will use the configured defaults.
 On a timeout, the returned future will fail with either C<timeout> or
 C<stall_timeout> as the operation name.
 
- ( $message, "timeout" ) = $f->failure
+   ( $message, "timeout" ) = $f->failure
 
 =back
 
@@ -652,7 +692,7 @@ A callback that is invoked when a response to this request has been received.
 It will be passed an L<HTTP::Response> object containing the response the
 server sent.
 
- $on_response->( $response )
+   $on_response->( $response )
 
 =item on_header => CODE
 
@@ -662,23 +702,23 @@ handling chunks of body content. This C<CODE> reference will be invoked with
 no arguments once the end of the request has been reached, and whatever it
 returns will be used as the result of the returned C<Future>, if there is one.
 
- $on_body_chunk = $on_header->( $header )
+   $on_body_chunk = $on_header->( $header )
 
-    $on_body_chunk->( $data )
-    $response = $on_body_chunk->()
+      $on_body_chunk->( $data )
+      $response = $on_body_chunk->()
 
 =item on_error => CODE
 
 A callback that is invoked if an error occurs while trying to send the request
 or obtain the response. It will be passed an error message.
 
- $on_error->( $message )
+   $on_error->( $message )
 
 If this is invoked because of a received C<4xx> or C<5xx> error code in an
 HTTP response, it will be invoked with the response and request objects as
 well.
 
- $on_error->( $message, $response, $request )
+   $on_error->( $message, $response, $request )
 
 =back
 
@@ -1055,7 +1095,16 @@ sub prepare_request
    my ( $request ) = @_;
 
    $request->init_header( 'User-Agent' => $self->{user_agent} ) if length $self->{user_agent};
-   $request->init_header( "Connection" => "keep-alive" );
+   if( $self->{close_after_request} ) {
+      $request->header( "Connection" => "close" );
+   }
+   else {
+      $request->init_header( "Connection" => "keep-alive" );
+   }
+
+   foreach ( pairs @{ $self->{headers} } ) {
+      $request->init_header( $_->key, $_->value );
+   }
 
    $self->{cookie_jar}->add_cookie_header( $request ) if $self->{cookie_jar};
 }
@@ -1155,13 +1204,13 @@ order to decode this encoding type, C<$make_decoder> will be invoked with no
 paramters, and expected to return a CODE reference to perform one instance of
 decoding.
 
- $decoder = $make_decoder->()
+   $decoder = $make_decoder->()
 
 This decoder will be invoked on string buffers to decode them until
 the end of stream is reached, when it will be invoked with no arguments.
 
- $content = $decoder->( $encoded_content )
- $content = $decoder->() # EOS
+   $content = $decoder->( $encoded_content )
+   $content = $decoder->() # EOS
 
 =cut
 
@@ -1199,26 +1248,29 @@ the end of stream is reached, when it will be invoked with no arguments.
 The C<Future>-returning C<GET> method makes it easy to await multiple URLs at
 once, by using the L<Future::Utils> C<fmap_void> utility 
 
- my @URLs = ( ... );
+   use Future::Utils qw( fmap_void );
 
- my $http = Net::Async::HTTP->new( ... );
- $loop->add( $http );
+   my @URLs = ( ... );
 
- my $future = fmap_void {
-    my ( $url ) = @_;
-    $http->GET( $url )
-         ->on_done( sub {
-            my $response = shift;
-            say "$url succeeded: ", $response->code;
-            say "  Content-Type":", $response->content_type;
-         } )
-         ->on_fail( sub {
-            my $failure = shift;
-            say "$url failed: $failure";
-         } );
- } foreach => \@URLs;
+   my $http = Net::Async::HTTP->new( ... );
+   $loop->add( $http );
 
- $loop->await( $future );
+   my $future = fmap_void {
+      my ( $url ) = @_;
+      $http->GET( $url )
+           ->on_done( sub {
+              my $response = shift;
+              say "$url succeeded: ", $response->code;
+              say "  Content-Type:", $response->content_type;
+           } )
+           ->on_fail( sub {
+              my $failure = shift;
+              say "$url failed: $failure";
+           } );
+   } foreach => \@URLs,
+     concurrent => 5;
+
+   $loop->await( $future );
 
 =cut
 

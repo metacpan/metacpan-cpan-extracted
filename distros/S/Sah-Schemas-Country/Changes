@@ -1,8 +1,14 @@
-0.002   2018-04-08 (PERLANCAR)
+0.003   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
+	  0.034+).
+
+
+0.002   2018-04-08  Released-By: PERLANCAR
 
 	- [ux] Convert codes to lowercase.
 
 
-0.001   2018-03-25 (PERLANCAR)
+0.001   2018-03-25  Released-By: PERLANCAR
 
         - First release.

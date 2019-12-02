@@ -3,11 +3,14 @@ package XML::NewsML_G2;
 use XML::NewsML_G2::Audio;
 use XML::NewsML_G2::Binary;
 use XML::NewsML_G2::Concept;
+use XML::NewsML_G2::Concept_Item;
 use XML::NewsML_G2::Copyright_Holder;
 use XML::NewsML_G2::Creator;
 use XML::NewsML_G2::Desk;
 use XML::NewsML_G2::ElectionDistrict;
 use XML::NewsML_G2::ElectionProvince;
+use XML::NewsML_G2::Event_Item;
+use XML::NewsML_G2::Event_Ref;
 use XML::NewsML_G2::Facet;
 use XML::NewsML_G2::Genre;
 use XML::NewsML_G2::Graphics;
@@ -38,16 +41,21 @@ use XML::NewsML_G2::Service;
 use XML::NewsML_G2::SportFacet;
 use XML::NewsML_G2::SportFacetValue;
 use XML::NewsML_G2::StoryType;
+use XML::NewsML_G2::Substancial_Item;
 use XML::NewsML_G2::Topic;
+use XML::NewsML_G2::Translatable_Text;
 use XML::NewsML_G2::Video;
+use XML::NewsML_G2::Writer::Concept_Item;
+use XML::NewsML_G2::Writer::Event_Item;
 use XML::NewsML_G2::Writer::News_Item;
 use XML::NewsML_G2::Writer::News_Message;
 use XML::NewsML_G2::Writer::Package_Item;
+use XML::NewsML_G2::Writer::Substancial_Item;
 
 use warnings;
 use strict;
 
-use version; our $VERSION = qv('0.3.3');
+use version; our $VERSION = qv('0.3.4');
 
 1;
 
@@ -60,7 +68,7 @@ XML::NewsML_G2 - generate NewsML-G2 news items
 
 =head1 VERSION
 
-0.3.3
+0.3.4
 
 =begin readme
 

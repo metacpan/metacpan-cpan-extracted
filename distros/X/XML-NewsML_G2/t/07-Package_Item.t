@@ -33,7 +33,12 @@ sub basic_checks {
     return;
 }
 
-my %args = ( language => 'de', provider => $prov_apa, guid => $guid_pkg );
+my %args = (
+    language => 'de',
+    provider => $prov_apa,
+    guid     => $guid_pkg,
+    timezone => 'UTC'
+);
 
 ok( my $pi = XML::NewsML_G2::Package_Item->new(%args),
     'create Package_Item' );
@@ -67,7 +72,7 @@ ok( my $sm = XML::NewsML_G2::Scheme_Manager->new(%schemes),
 
 ok( my $writer = XML::NewsML_G2::Writer::Package_Item->new(
         package_item   => $pi,
-        scheme_manager => $sm
+        scheme_manager => $sm,
     ),
     'create package writer'
 );
@@ -110,7 +115,7 @@ $inner_group->add_item( $text, $pic );
 
 ok( $writer = XML::NewsML_G2::Writer::Package_Item->new(
         package_item   => $pi,
-        scheme_manager => $sm
+        scheme_manager => $sm,
     ),
     'create package writer'
 );

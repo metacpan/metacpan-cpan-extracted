@@ -1,0 +1,51 @@
+* Dancer::Plugin::RPC ==> Example
+
+* This example app has 6 functions grouped in 2 groups:
+    system: get_status, list_methods
+    db:     create_person, get_person, update_person, get_persons
+These 6 functions are reachable with 2 different protocols (jsonrpc2
+and restish) on the same daemon.
+
+* Dependencies
+This example code uses some extra dependencies, I've stated all of them in the cpanfile.
+To install these dependencies in the local directory using Carton:
+
+    $ cd example
+    $ carton install
+
+This installs all dependencies in the example/local directory.
+
+* Start Example app
+Start the Example daemon (simple way it's a Deamon::Control wrapper`):
+
+    $ cd example
+    $ carton exec -- bin/example.pl <start | foreground>
+
+* Testing Example app
+Testing the daemon (with curl):
+
+    $ cd example
+
+Any of:
+    $ curl http://localhost:3333/system/status
+    $ curl http://localhost:3333/system/methods
+    $ curl http://localhost:3333/system/methods/restish
+
+    $ curl -XPOST -H'Content-type: application/json' http://localhost:3333/system \
+      -d'{"jsonrpc":"2.0","id":42,"method":"status"}'
+    $ curl -XPOST -H'Content-type: application/json' http://localhost:3333/system \
+      -d'{"jsonrpc":"2.0","id":42,"method":"list_methods", "params":{"plugin":"jsonrpc"}}'
+
+    $ curl -H'Content-type: application/json' http://localhost:3333/db/person \
+      -XPUT -d'{"name":"abeltje","job":"hacker"}'
+    $ curl -H'Content-type: application/json' http://localhost:3333/db/person \
+      -XPUT -d'{"name":"tux","job":"hacker"}'
+    $ curl http://localhost:3333/db/persons
+    $ curl -H'Content-type: application/json' http://localhost:3333/db/person/1 \
+      -XPOST -d'{"job":"haxor"}'
+    $ curl http://localhost:3333/db/persons 2>/dev/null | perl -MJSON -nE \
+      'BEGIN{$j=JSON->new()->pretty(1)} say $j->encode($j->decode($_))'
+
+    $ curl -H'Content-type: application/json' http://localhost:3333/db \
+      -XPOST -d'{"jsonrpc":"2.0","id":42,"method":"get_persons"}' 2>/dev/null | perl -MJSON \
+      -nE 'BEGIN{$j=JSON->new()->pretty(1)} say $j->encode($j->decode($_))'

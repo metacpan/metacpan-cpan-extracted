@@ -107,6 +107,7 @@ my $ConfObj     = CPANPLUS::Configure->new;
 my $Config      = CONFIG_BOXED;
 my $Util        = 'CPANPLUS::Internals::Utils';
 my $ConfigFile  = $ConfObj->_config_pm_to_file( $Config => $PRIV_LIB );
+my $AutoFlush   = File::Spec->catfile( $PRIV_LIB, split('::','CPANPLUS::Internals::Utils::Autoflush.pm') );
 
 ### setup the environment if needed
 {   ### no base dir even, set it up
@@ -121,6 +122,16 @@ my $ConfigFile  = $ConfObj->_config_pm_to_file( $Config => $PRIV_LIB );
         $ConfObj->set_conf( verbose => 1     );     # be verbose
         $ConfObj->set_conf( prereqs => 1     );     # install prereqs
         $ConfObj->save(     $Config => $PRIV_LIB ); # save the pm in that dir
+    }
+
+    ### no Autoflush exists yet, copy it from lib/
+    unless( -e $AutoFlush ) {
+        my $targ = File::Spec->catdir( $PRIV_LIB, split('::','CPANPLUS::Internals::Utils') );
+        $Util->_mkdir( dir => $targ );
+        $Util->_copy(
+          file => File::Spec->catfile( $LIB_DIR, split('::','CPANPLUS::Internals::Utils::Autoflush.pm') ),
+          to   => $targ,
+        ) or die CPANPLUS::Error->stack_as_string;
     }
 }
 

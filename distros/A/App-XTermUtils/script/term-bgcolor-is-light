@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /XTerm/Util/term_bgcolor_is_light
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-08-20'; # DATE
+our $DATE = '2019-11-27'; # DATE
 our $DIST = 'App-XTermUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ term-bgcolor-is-light - Check if terminal background color is light
 
 =head1 VERSION
 
-This document describes version 0.005 of term-bgcolor-is-light (from Perl distribution App-XTermUtils), released on 2019-08-20.
+This document describes version 0.006 of term-bgcolor-is-light (from Perl distribution App-XTermUtils), released on 2019-11-27.
 
 =head1 SYNOPSIS
 

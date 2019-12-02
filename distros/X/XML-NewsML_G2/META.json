@@ -62,7 +62,7 @@
    "provides" : {
       "XML::NewsML_G2" : {
          "file" : "lib/XML/NewsML_G2.pm",
-         "version" : "v0.3.3"
+         "version" : "v0.3.4"
       },
       "XML::NewsML_G2::AnyItem" : {
          "file" : "lib/XML/NewsML_G2/AnyItem.pm"
@@ -75,6 +75,9 @@
       },
       "XML::NewsML_G2::Concept" : {
          "file" : "lib/XML/NewsML_G2/Concept.pm"
+      },
+      "XML::NewsML_G2::Concept_Item" : {
+         "file" : "lib/XML/NewsML_G2/Concept_Item.pm"
       },
       "XML::NewsML_G2::Copyright_Holder" : {
          "file" : "lib/XML/NewsML_G2/Copyright_Holder.pm"
@@ -93,6 +96,12 @@
       },
       "XML::NewsML_G2::ElectionProvince" : {
          "file" : "lib/XML/NewsML_G2/ElectionProvince.pm"
+      },
+      "XML::NewsML_G2::Event_Item" : {
+         "file" : "lib/XML/NewsML_G2/Event_Item.pm"
+      },
+      "XML::NewsML_G2::Event_Ref" : {
+         "file" : "lib/XML/NewsML_G2/Event_Ref.pm"
       },
       "XML::NewsML_G2::Facet" : {
          "file" : "lib/XML/NewsML_G2/Facet.pm"
@@ -181,6 +190,9 @@
       "XML::NewsML_G2::Role::Writer" : {
          "file" : "lib/XML/NewsML_G2/Role/Writer.pm"
       },
+      "XML::NewsML_G2::Role::Writer::Event_Item" : {
+         "file" : "lib/XML/NewsML_G2/Role/Writer/Event_Item.pm"
+      },
       "XML::NewsML_G2::Role::Writer::News_Item_Audio" : {
          "file" : "lib/XML/NewsML_G2/Role/Writer/News_Item_Audio.pm"
       },
@@ -235,8 +247,14 @@
       "XML::NewsML_G2::StoryType" : {
          "file" : "lib/XML/NewsML_G2/StoryType.pm"
       },
+      "XML::NewsML_G2::Substancial_Item" : {
+         "file" : "lib/XML/NewsML_G2/Substancial_Item.pm"
+      },
       "XML::NewsML_G2::Topic" : {
          "file" : "lib/XML/NewsML_G2/Topic.pm"
+      },
+      "XML::NewsML_G2::Translatable_Text" : {
+         "file" : "lib/XML/NewsML_G2/Translatable_Text.pm"
       },
       "XML::NewsML_G2::Types" : {
          "file" : "lib/XML/NewsML_G2/Types.pm"
@@ -247,6 +265,12 @@
       "XML::NewsML_G2::Writer" : {
          "file" : "lib/XML/NewsML_G2/Writer.pm"
       },
+      "XML::NewsML_G2::Writer::Concept_Item" : {
+         "file" : "lib/XML/NewsML_G2/Writer/Concept_Item.pm"
+      },
+      "XML::NewsML_G2::Writer::Event_Item" : {
+         "file" : "lib/XML/NewsML_G2/Writer/Event_Item.pm"
+      },
       "XML::NewsML_G2::Writer::News_Item" : {
          "file" : "lib/XML/NewsML_G2/Writer/News_Item.pm"
       },
@@ -255,6 +279,9 @@
       },
       "XML::NewsML_G2::Writer::Package_Item" : {
          "file" : "lib/XML/NewsML_G2/Writer/Package_Item.pm"
+      },
+      "XML::NewsML_G2::Writer::Substancial_Item" : {
+         "file" : "lib/XML/NewsML_G2/Writer/Substancial_Item.pm"
       }
    },
    "release_status" : "stable",
@@ -270,6 +297,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#xml-newsml-g2"
    },
-   "version" : "v0.3.3",
+   "version" : "v0.3.4",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

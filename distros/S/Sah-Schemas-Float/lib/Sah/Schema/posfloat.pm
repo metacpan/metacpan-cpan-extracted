@@ -1,7 +1,7 @@
 package Sah::Schema::posfloat;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $schema = [float => {
     summary   => 'Positive float',
@@ -26,7 +26,7 @@ Sah::Schema::posfloat - Positive float
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::posfloat (from Perl distribution Sah-Schemas-Float), released on 2019-07-26.
+This document describes version 0.006 of Sah::Schema::posfloat (from Perl distribution Sah-Schemas-Float), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

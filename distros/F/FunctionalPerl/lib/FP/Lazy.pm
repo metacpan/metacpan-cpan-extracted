@@ -19,7 +19,12 @@ FP::Lazy - lazy evaluation (delayed evaluation, promises)
     eval {
         print force $a
     };
-    like $@, qr/division by zero/;
+    like $@, qr/^Illegal division by zero/;
+
+    eval {
+        $a + 2
+    };
+    like $@, qr/^non-auto-forcing promise accessed via 0\+ operation/;
 
     my $count= 0;
     my $b = lazy { $count++; 1 / 2 };
@@ -79,7 +84,7 @@ FP::Lazy - lazy evaluation (delayed evaluation, promises)
         # the overhead of two subroutine calls, though)
         condprom 0
     };
-    like $@, qr/division by zero/;
+    like $@, qr/^Illegal division by zero/;
 
 
 =head1 DESCRIPTION
@@ -149,6 +154,24 @@ to implement them safely, correct?)
 FP_Show_show: instead of "DUMMY", show file/line of the thunk's
 definition?
 
+=head1 DEBUGGING
+
+Lazy code can be difficult to debug because the context in which the
+code that evaluates a promise runs is not the same context in which
+the promise was captured. There are two approaches to make this
+easier:
+
+C<$ENV{DEBUG_FP_LAZY}="1"> or C<local $FP::Lazy::debug=1> -- captures
+a backtrace in every promise (slow, of course!). Use the optionally
+exported C<lazy_backtrace> function to get the backtrace (or look at
+it via the repl's :d (Data::Dumper) mode).
+
+C<$ENV{DEBUG_FP_LAZY}="eager"> or C<local $FP::Lazy::eager=1> --
+completely turns of any lazyness (except for lazyLight, currently);
+easy stack traces and flow logic but of course the program behaves
+differently; beware of infinite lists!
+
+
 =head1 SEE ALSO
 
 https://en.wikipedia.org/wiki/Futures_and_promises
@@ -159,9 +182,12 @@ Alternative Scalar::Defer?
 
 L<FP::TransparentLazy>
 
+L<FP::Mixin::Utils> -- Lazy implements this as a fallback (lower priority than forcing the promise and finding the method on the result)
+
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -169,27 +195,42 @@ This is alpha software! Read the package README.
 package FP::Lazy;
 @ISA="Exporter"; require Exporter;
 @EXPORT=qw(lazy lazy_if lazyLight force FORCE is_promise);
-@EXPORT_OK=qw(delay force_noeval);
+@EXPORT_OK=qw(delay force_noeval lazy_backtrace);
 %EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
-our $debug= $ENV{DEBUG_FP_LAZY} ? 1 : '';
+use Carp;
+use FP::Mixin::Utils;
+use FP::Show;
+
+
+our $eager= ($ENV{DEBUG_FP_LAZY} and $ENV{DEBUG_FP_LAZY}=~ /^eager$/i);
+our $debug= $ENV{DEBUG_FP_LAZY} ? (not $eager) : '';
 
 # A promise is an array with two fields:
 # index 0: thunk when unevaluated, undef once evaluated
 # index 1: value once evaluated
 # index 2: backtrace if $debug is true
 
+sub lazy_backtrace ($) { # not a method to avoid shadowing any
+                         # 'contained' method
+    my ($v)=@_;
+    UNIVERSAL::isa($v, "FP::Lazy::Promise") # not working for Light ones*!*
+        or die "not a FP::Lazy::Promise: ".show($v);
+    $$v[2]
+}
+
 sub lazy (&) {
-    bless [$_[0],
-           undef,
-           $debug && FP::Repl::Stack->get(1)->backtrace
-          ], "FP::Lazy::Promise"
-      }
+    $eager ? goto $_[0] :
+        bless [$_[0],
+               undef,
+               $debug && FP::Repl::Stack->get(1)->backtrace
+        ], "FP::Lazy::Promise"
+}
 
 sub lazy_if (&$) {
-    ($_[1] ?
+    (($_[1] and not $eager) ?
      bless ([$_[0],
              undef,
              $debug && FP::Repl::Stack->get(1)->backtrace
@@ -203,11 +244,12 @@ sub lazy_if (&$) {
 
 # not providing for caching (1-time-only evaluation)
 sub lazyLight (&) {
-    bless $_[0], "FP::Lazy::PromiseLight"
+    $eager ? goto $_[0] :
+        bless $_[0], "FP::Lazy::PromiseLight"
 }
 
 sub is_promise ($) {
-    length ref $_[0] ? UNIVERSAL::isa ($_[0], "FP::Lazy::Promise") : ''
+    length ref $_[0] ? UNIVERSAL::isa ($_[0], "FP::Lazy::AnyPromise") : ''
 }
 
 sub delay (&);  *delay = \&lazy;
@@ -269,15 +311,41 @@ sub FORCE {
     wantarray ? @_ : $_[-1]
 }
 
-{
-    package FP::Lazy::Promise;
+
+# `use overload` arguments, to prevent from accidental use as if it
+# were FP::TransparentLazy
+
+our $allow_access= 0; # true 'turns off' the overload
+
+sub overloads {
+    my ($with_application_overload)= @_;
+    ((map {
+        my $ctx= $_;
+        $ctx=> sub {
+            $allow_access ? $_[0] :
+                Carp::croak "non-auto-forcing promise accessed via $ctx operation"
+        }
+      }
+      ($with_application_overload ? ("&{}") : ()),
+      # (XX can't overload '@{}'?)
+      qw(0+ "" bool qr ${} %{} *{})
+     ),
+     fallback=> 1
+    )
+}
+
+package FP::Lazy::AnyPromise {
+
     *force= *FP::Lazy::force;
+
     sub FORCE {
         $_[0] = force ($_[0]);
     }
+
     sub DESTROY {
         # nothing, catch this to prevent it from entering AUTOLOAD
     }
+
     our $AUTOLOAD; # needs to be declared even though magical
     sub AUTOLOAD {
         my $methodname= $AUTOLOAD;
@@ -290,7 +358,8 @@ sub FORCE {
         my $method=
           ($methodname=~ /^stream_/ ? UNIVERSAL::can($v, $methodname)
            : UNIVERSAL::can($v, "stream_$methodname")
-             // UNIVERSAL::can($v, $methodname));
+           // UNIVERSAL::can($v, $methodname)
+           // UNIVERSAL::can("FP::Mixin::Utils", $methodname));
         if ($method) {
             # can't change @_ or it would break 'env clearing' ability
             # of the method. Thus assign to $_[0], which will effect
@@ -298,52 +367,55 @@ sub FORCE {
             $_[0]= $v; goto &$method;
         } else {
             # XX imitate perl's ~exact error message?
-            die "no method '$methodname' found for object: $v";
+            Carp::croak "no method '$methodname' found for object: $v";
         }
     }
 
     # should really have a maybe_ prefix, but since it's for debugging
     # purposes only (and in that case also likely always returns a
     # value) and we like short names for that, leave it at this, ok?
+    # XXX avoid spamming with such a short name; use FP_Lazy_bt [or
+    # de-priorize it like the FP::Mixin::Utils stuff?]
     sub bt {
         my $s=shift;
         $$s[2]
     }
 
+}
+
+use FP::Show qw(subprefix_to_show_coderef);
+
+my $lazy_thunk_show= subprefix_to_show_coderef("lazy ");
+
+package FP::Lazy::Promise {
+    our @ISA= 'FP::Lazy::AnyPromise';
+
+    use overload FP::Lazy::overloads(1);
+
     sub FP_Show_show {
         my ($s,$show)=@_;
         # do not force unforced promises
         if ($$s[0]) {
-            'lazy { "DUMMY" }'
+            &$lazy_thunk_show($$s[0])
         } else {
             &$show($$s[1])
         }
     }
 }
 
-{
-    package FP::Lazy::PromiseLight;
-    our @ISA= qw(FP::Lazy::Promise);
+my $lazyLight_thunk_show= subprefix_to_show_coderef("lazyLight ");
+
+package FP::Lazy::PromiseLight {
+    our @ISA= qw(FP::Lazy::AnyPromise);
+
+    use overload FP::Lazy::overloads(0);
 
     sub FP_Show_show {
         my ($s,$show)=@_;
         # do not force unforced promises
-        'lazyLight { "DUMMY" }'
+        &$lazyLight_thunk_show($s)
     }
 }
-
-use Chj::TEST;
-
-TEST {
-    our $foo= "";
-    sub moo {
-        my ($bar)=@_;
-        local $foo= "Hello";
-        lazy { "$foo $bar" }
-    }
-    moo ("you")->force
-}
-  " you";
 
 
 1

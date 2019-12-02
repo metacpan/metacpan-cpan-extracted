@@ -2,24 +2,24 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
 plan tests => 38 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/array/str_or_array_expand_perl_modname_wildcard.pm',
-    'Data/Sah/Coerce/perl/array/str_or_array_expand_perl_modprefix_wildcard.pm',
-    'Data/Sah/Coerce/perl/obj/str_perl_version.pm',
-    'Data/Sah/Coerce/perl/str/str_convert_perl_pm_or_pod_to_path.pm',
-    'Data/Sah/Coerce/perl/str/str_convert_perl_pm_to_path.pm',
-    'Data/Sah/Coerce/perl/str/str_convert_perl_pod_or_pm_to_path.pm',
-    'Data/Sah/Coerce/perl/str/str_convert_perl_pod_to_path.pm',
-    'Data/Sah/Coerce/perl/str/str_normalize_perl_distname.pm',
-    'Data/Sah/Coerce/perl/str/str_normalize_perl_modname.pm',
-    'Data/Sah/Coerce/perl/str/str_normalize_perl_modname_or_prefix.pm',
-    'Data/Sah/Coerce/perl/str/str_normalize_perl_modprefix.pm',
+    'Data/Sah/Coerce/perl/To_array/From_str_or_array/expand_perl_modname_wildcard.pm',
+    'Data/Sah/Coerce/perl/To_array/From_str_or_array/expand_perl_modprefix_wildcard.pm',
+    'Data/Sah/Coerce/perl/To_obj/From_str/perl_version.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pm_or_pod_to_path.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pm_to_path.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pod_or_pm_to_path.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pod_to_path.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_distname.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modname.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modname_or_prefix.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modprefix.pm',
     'Sah/Schema/perl/distname.pm',
     'Sah/Schema/perl/filename.pm',
     'Sah/Schema/perl/modargs.pm',
@@ -53,7 +53,9 @@ my @module_files = (
 
 # no fake home requested
 
-my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
+my @switches = (
+    -d 'blib' ? '-Mblib' : '-Ilib',
+);
 
 use File::Spec;
 use IPC::Open3;
@@ -67,14 +69,18 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-e', "require q[$lib]"))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

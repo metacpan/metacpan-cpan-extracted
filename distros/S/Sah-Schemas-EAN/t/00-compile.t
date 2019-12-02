@@ -9,8 +9,8 @@ use Test::More;
 plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/str/str_to_ean13.pm',
-    'Data/Sah/Coerce/perl/str/str_to_ean8.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/to_ean13.pm',
+    'Data/Sah/Coerce/perl/To_str/From_str/to_ean8.pm',
     'Sah/Schema/ean13.pm',
     'Sah/Schema/ean8.pm',
     'Sah/SchemaR/ean13.pm',

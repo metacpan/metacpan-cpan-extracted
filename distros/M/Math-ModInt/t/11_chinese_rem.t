@@ -1,8 +1,6 @@
-# Copyright (c) 2009-2012 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: 11_chinese_rem.t 39 2012-08-26 23:34:16Z demetri $
+# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Tests of the Math::ModInt::ChineseRemainder utility module.
 

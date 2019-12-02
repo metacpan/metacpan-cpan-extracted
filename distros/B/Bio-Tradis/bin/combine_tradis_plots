@@ -1,7 +1,9 @@
 #!/usr/bin/env perl
 
 package Bio::Tradis::Bin::CombineTradisPlots;
-$Bio::Tradis::Bin::CombineTradisPlots::VERSION = '1.4.1';
+$Bio::Tradis::Bin::CombineTradisPlots::VERSION = '1.4.3';
+use FindBin qw($Bin); 
+
 # ABSTRACT: Combine multiple plotfiles and generate updated statistics for the combined files
 
 # PODNAME: combine_tradis_plot
@@ -10,6 +12,7 @@ $Bio::Tradis::Bin::CombineTradisPlots::VERSION = '1.4.1';
 BEGIN { unshift( @INC, '../lib' ) }
 BEGIN { unshift( @INC, './lib' ) }
 BEGIN { unshift( @INC, '/software/pathogen/internal/prod/lib/' ) }
+BEGIN { unshift( @INC, "$Bin/../lib/" ) }
 
 use Bio::Tradis::CommandLine::PlotCombine;
 
@@ -27,7 +30,7 @@ combine_tradis_plot - Combine multiple plotfiles and generate updated statistics
 
 =head1 VERSION
 
-version 1.4.1
+version 1.4.3
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package File::Slurp;
 use strict;
 use warnings ;
 
-our $VERSION = '9999.28';
+our $VERSION = '9999.29';
 $VERSION = eval $VERSION;
 
 use Carp ;
@@ -671,7 +671,7 @@ L<File::Slurp> implements the following functions.
 
 =head2 append_file
 
-	use File::Spec qw(append_file write_file);
+	use File::Slurp qw(append_file write_file);
 	my $res = append_file('/path/file', "Some text");
 	# same as
 	my $res = write_file('/path/file', {append => 1}, "Some text");
@@ -761,7 +761,7 @@ function.
 
 =head2 overwrite_file
 
-	use File::Spec qw(overwrite_file);
+	use File::Slurp qw(overwrite_file);
 	my $res = overwrite_file('/path/file', "Some text");
 
 The C<overwrite_file> function is simply a synonym for the
@@ -798,7 +798,7 @@ a consistent file.
 
 =head2 read_dir
 
-	use File::Spec qw(read_dir);
+	use File::Slurp qw(read_dir);
 	my @files = read_dir('/path/to/dir');
 	# all files, even the dots
 	my @files = read_dir('/path/to/dir', keep_dot_dot => 1);
@@ -947,7 +947,7 @@ copy of the file to return.
 
 =head2 rf
 
-	use File::Spec qw(rf);
+	use File::Slurp qw(rf);
 	my $text = rf('/path/file');
 
 The C<rf> function is simply a synonym for the L<File::Slurp/"read_file">
@@ -955,7 +955,7 @@ function.
 
 =head2 slurp
 
-	use File::Spec qw(slurp);
+	use File::Slurp qw(slurp);
 	my $text = slurp('/path/file');
 
 The C<slurp> function is simply a synonym for the L<File::Slurp/"read_file">
@@ -963,7 +963,7 @@ function.
 
 =head2 wf
 
-	use File::Spec qw(wf);
+	use File::Slurp qw(wf);
 	my $res = wf('/path/file', "Some text");
 
 

@@ -1,7 +1,7 @@
 package Sah::Schema::cryptocurrency::code_or_name;
 
-our $DATE = '2019-10-24'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [str => {
     summary => 'Cryptocurrency code or name',
@@ -29,7 +29,7 @@ Sah::Schema::cryptocurrency::code_or_name - Cryptocurrency code or name
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::cryptocurrency::code_or_name (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-10-24.
+This document describes version 0.013 of Sah::Schema::cryptocurrency::code_or_name (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

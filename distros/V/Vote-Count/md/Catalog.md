@@ -1,10 +1,8 @@
+# ABSTRACT: Catalog of Voting Methods and their Vote::Count Implementations
+
 # NAME
 
 Catalog
-
-# VERSION 0.022
-
-#ABSTRACT: Catalog and Examples of Common Voting Methods with Vote::Count
 
 # Description
 
@@ -14,40 +12,38 @@ A catalog of common Vote Counting Systems and their implementation in Vote::Coun
 
 ## Borda Count
 
-As of 0.17 the Borda Count implementation does not yet cover all common weighting rule variations.
+The Borda Count implementation does not yet cover all common weighting rule variations.
 
-* Borda Count: core Vote::Count
+* Borda Count: core [Vote::Count::Borda](https://metacpan.org/pod/Vote::Count::Borda)
 * Nansen: *needs example*
 * Baldwin: *needs example*
 * Minet: *needs example*
-* Star: *needs Range Ballot support*
+* STAR: [Vote::Count::Method::STAR](https://metacpan.org/pod/Vote::Count::Method::STAR)
 
 ## Instant Runoff Voting
 
-Also known as Alternative Vote.
-
-* Instant Runoff Voting: core Vote::Count
-* Benham Condorcet IRV: HandCount methods documentation
-* SmithSet IRV: Vote::Count::CondorcetIRV
+* Instant Runoff Voting: core [Vote::Count::IRV](https://metacpan.org/pod/Vote::Count::IRV)
+* Benham Condorcet IRV: [Hand Count](https://metacpan.org/pod/release/BRAINBUZ/Vote-Count/Hand_Count.pod) methods documentation, implemented by [Vote::Count::Method::CondorcetDropping](https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping)
+* SmithSet IRV: [Vote::Count::Method::CondorcetIRV](https://metacpan.org/pod/Vote::Count::Method::CondorcetIRV)
 
 ## Condorcet
 
 ### Simple Condorcet
 
-* Benham Condorcet IRV: HandCount documentation
-* Simple Dropping: Vote::Count::Method::CondorcetDropping
-* SmithSet IRV: Vote::Count::CondorcetIRV
+* Benham Condorcet IRV: [HandCount](https://metacpan.org/pod/release/BRAINBUZ/Vote-Count/Hand_Count.pod) methods documentation, implemented by [Vote::Count::Method::CondorcetDropping](https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping)
+* Simple Dropping: [Vote::Count::Method::CondorcetDropping](https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping)
+* SmithSet IRV: [Vote::Count::Method::CondorcetIRV](https://metacpan.org/pod/Vote::Count::Method::CondorcetIRV)
 
 ### Complex Condorcet
 
-* Condorcet vs IRV: *Vote::Count::CondorcetIRV -- implementation in progress*
+* Condorcet vs IRV: [Vote::Count::Method::CondorcetVsIRV](https://metacpan.org/pod/Vote::Count::Method::CondorcetVsIRV)
 * Tiedeman: *unimplemented*
 * SSD: *unimplemented*
 * Kemmeny-Young: *unimplemented*
 
 ### Redacting Condorcet
 
-* Condorcet vs IRV: *Vote::Count::CondorcetIRV -- implementation in progress*
+* Condorcet vs IRV: [Vote::Count::Method::CondorcetVsIRV](https://metacpan.org/pod/Vote::Count::Method::CondorcetVsIRV)
 
 ## AUTHOR
 

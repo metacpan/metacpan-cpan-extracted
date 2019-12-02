@@ -1,0 +1,338 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/TrimHistories/trim_histories
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
+
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-TrimHistories'; # DIST
+our $VERSION = '0.006'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/TrimHistories/trim_histories",
+    program_name => "trim-histories",
+    log => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Keep only a certain number of sets of file histories, delete the rest
+# PODNAME: trim-histories
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+trim-histories - Keep only a certain number of sets of file histories, delete the rest
+
+=head1 VERSION
+
+This document describes version 0.006 of trim-histories (from Perl distribution App-TrimHistories), released on 2019-11-29.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % trim-histories [options] <file> ...
+
+Examples:
+
+By default keeps 7 daily, 4 weekly, 6 monthly histories, but older files are kept to fill the sets:
+
+ % trim-histories *
+
+Like previous, but older and younger files are deleted:
+
+ % trim-histories --discard-old --discard-young *
+
+Only keep 5 daily, 2 weekly histories:
+
+ % trim-histories --sets daily,5,weekly,2 *
+
+=head1 DESCRIPTION
+
+This script can be used to delete old backup or log files. The files must be
+named with timestamps, e.g. C<mydb-2017-06-14.sql.gz>. By default, it keeps only
+7 daily, 4 weekly, and 6 monthly histories. The rest will be deleted.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--discard-old-histories>
+
+=item B<--discard-young-histories>
+
+=item B<--file>=I<s@>*
+
+Each file name must be unique and contain date, e.g. `backup-2017-06-14.tar.gz`.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+Each file name must be unique and contain date, e.g. `backup-2017-06-14.tar.gz` (JSON-encoded).
+
+See C<--file>.
+
+=item B<--sets-json>=I<s>
+
+History sets to keep (JSON-encoded).
+
+See C<--sets>.
+
+=item B<--sets>=I<s@>
+
+History sets to keep.
+
+Default value:
+
+ ["daily",7,"weekly",4,"monthly",6]
+
+Expressed as a list of (period, num-to-keep) pairs. Period can be number of
+seconds or either `hourly`, `daily`, `weekly`, `monthly`, `yearly`. The default
+is:
+
+    ['daily', 7, 'weekly', 4, 'monthly', 6]
+
+which means to keep 7 daily, 4 weekly, and 6 monthly histories. It is equivalent
+to:
+
+    [86400, 7, 7*86400, 4, 30*86400, 6]
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--dry-run>
+
+Run in simulation mode (also via DRY_RUN=1).
+
+Default value:
+
+ ""
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C trim-histories trim-histories
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete trim-histories 'p/*/`trim-histories`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/trim-histories.conf>, F<~/trim-histories.conf>, or F</etc/trim-histories.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ discard_old_histories (see --discard-old-histories)
+ discard_young_histories (see --discard-young-histories)
+ files (see --file)
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ sets (see --sets)
+
+=head1 ENVIRONMENT
+
+=head2 TRIM_HISTORIES_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/trim-histories.conf>
+
+F<~/trim-histories.conf>
+
+F</etc/trim-histories.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-TrimHistories>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-TrimHistories>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-TrimHistories>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

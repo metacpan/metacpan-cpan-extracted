@@ -58,11 +58,10 @@ my %WriteMakefileArgs = (
     "Perl::Critic::Utils"  => 0
   },
   "TEST_REQUIRES" => {
-    "Perl::Critic::TestUtils"    => 0,
     "Test2::V0"                  => "0.000060",
     "Test::Perl::Critic::Policy" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -71,7 +70,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "PPIx::Regexp"               => 0,
   "Perl::Critic::Policy"       => 0,
-  "Perl::Critic::TestUtils"    => 0,
   "Perl::Critic::Utils"        => 0,
   "Test2::V0"                  => "0.000060",
   "Test::Perl::Critic::Policy" => 0

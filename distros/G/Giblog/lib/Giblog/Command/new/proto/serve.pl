@@ -1,16 +1,15 @@
 use strict;
 use warnings;
+use utf8;
 
-my $cmd = 'giblog build';
-system($cmd) == 0
-  or die "Can't execute $cmd: $!";
-
+use Giblog;
 use Mojolicious::Lite;
 
-get '/' => sub {
-  my $c = shift;
-  
-  $c->reply->static('index.html');
-};
+# Build
+Giblog->build;
 
-app->start;
+# Mojolicious::Lite Application
+my $app = app;
+
+# Serve
+Giblog->serve($app);

@@ -2,8 +2,8 @@ NAME
     Text::Table::CSV - Generate CSV
 
 VERSION
-    This document describes version 0.021 of Text::Table::CSV (from Perl
-    distribution Text-Table-CSV), released on 2019-01-17.
+    This document describes version 0.023 of Text::Table::CSV (from Perl
+    distribution Text-Table-CSV), released on 2019-11-29.
 
 SYNOPSIS
      use Text::Table::CSV;
@@ -37,10 +37,15 @@ FUNCTIONS
     The "table" function understands these arguments, which are passed as a
     hash.
 
-    *   rows (aoaos)
+    *   rows* (aoaos)
 
-        Takes an array reference which should contain one or more rows of
-        data, where each row is an array reference.
+        Required. Takes an array reference which should contain one or more
+        rows of data, where each row is an array reference.
+
+    *   header_row (bool)
+
+        Optional, default true. Whether to print the first row (which is
+        assumed to be the header row).
 
 HOMEPAGE
     Please visit the project's homepage at

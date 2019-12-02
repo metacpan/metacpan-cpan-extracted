@@ -19,7 +19,8 @@ run by test suite
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -91,24 +92,37 @@ TEST{equal "a", "a"} 1;
 TEST{tequals "2", 2} 1;
 TEST{tequals "2.0", 2.0} '';
 
-my $inf= $^V->{version}[1] > 20 ?
-  # XX where exactly was it changed?
-  # v5.14.2: inf
-  # v5.21.11-27-g57e8809: Inf
-  "Inf" : "inf";
+# Somewhere around version 5.20-5.21 Perl changed the formatting of
+# inf from "inf" to "Inf". Instead of trying to figure out which
+# version exactly changed it (if it's a precise version at all) try to
+# determine the right way automatically:
+sub positive_inf {
+    my $inf= "inf"+0;
+    $inf=~ /^\+?inf$/i
+        or warn "positive_inf: got '$inf'";
+    $inf
+}
+sub negative_inf {
+    my $inf= -positive_inf;
+    $inf=~ /^-inf$/i
+        or warn "negative_inf: got '$inf'";
+    $inf
+}
 
-TEST{tequals 1e+20000, $inf} 1;
+
+TEST{tequals 1e+20000, positive_inf} 1;
 TEST{ 1e+20000 == "inf" } 1;
-TEST{tequals 1/(-1e+2000), 1/(1e+2000) } 1;
-TEST{ 1/(-1e+2000) == 1/(1e+2000) } 1;
+TEST{tequals 1/(-1e+20000), 1/(1e+20000) } 1;
+TEST{ 1/(-1e+20000) == 1/(1e+20000) } 1;
 # so, no need to have both eq and == for those cases!
 
 # but that's not the case here, of course:
 TEST{ -1e1000 == "-1e1000" } 1;
 TEST{ -1e1000 eq "-1e1000" } '';
-TEST{ tequals -1e1000, "-1e1000" } '';
-TEST{ tequals -1e1000, "-$inf" } 1;
-TEST{ -1e1000 == "-inf" } 1;
+TEST{ tequals -1e100, "-1e100" } '';
+TEST{ tequals -1e10000, "-1e10000" } '';
+TEST{ tequals -1e10000, negative_inf } 1;
+TEST{ -1e10000 == "-inf" } 1;
 
 TEST{tequals 2, 2.0} 1;    # those are converted to the same value at
                            # compile time.

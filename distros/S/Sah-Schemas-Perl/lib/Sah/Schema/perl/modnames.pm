@@ -1,7 +1,7 @@
 package Sah::Schema::perl::modnames;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 our $schema = [array => {
     summary => 'Perl module names',
@@ -25,7 +25,7 @@ _
     of => ["perl::modname", {req=>1}, {}],
 
     'x.perl.coerce_rules' => [
-        'str_or_array_expand_perl_modname_wildcard',
+        'From_str_or_array::expand_perl_modname_wildcard',
     ],
 
     # provide a default completion which is from list of installed perl modules
@@ -48,7 +48,7 @@ Sah::Schema::perl::modnames - Perl module names
 
 =head1 VERSION
 
-This document describes version 0.023 of Sah::Schema::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2019-07-26.
+This document describes version 0.025 of Sah::Schema::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

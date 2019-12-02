@@ -1,0 +1,7 @@
+Summary of important user-visible changes for Bio-DB-RefSeq
+-----------------------------------------------------------
+
+1.7.3     2019-11-28 00:44:59-06:00 America/Chicago
+  * First release after split from bioperl-live
+  * Address database connection failures (issue #2). Works for nucleotide 
+    sequences only at the moment

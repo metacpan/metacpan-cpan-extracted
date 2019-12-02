@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.031';    # VERSION
+our $VERSION = '0.033';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace cone.
 
@@ -89,7 +89,7 @@ Chart::Plotly::Trace::Cone::Lighting - This attribute is one of the possible opt
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 

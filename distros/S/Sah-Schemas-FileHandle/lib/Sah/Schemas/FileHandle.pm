@@ -1,7 +1,7 @@
 package Sah::Schemas::FileHandle;
 
-our $DATE = '2019-04-09'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas for flilehandle
@@ -18,7 +18,7 @@ Sah::Schemas::FileHandle - Sah schemas for flilehandle
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::FileHandle (from Perl distribution Sah-Schemas-FileHandle), released on 2019-04-09.
+This document describes version 0.003 of Sah::Schemas::FileHandle (from Perl distribution Sah-Schemas-FileHandle), released on 2019-11-28.
 
 =head1 SAH SCHEMAS
 

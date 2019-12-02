@@ -1,7 +1,7 @@
 package Sah::Schema::filesize;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $schema = ['float' => {
     summary => 'File size',
@@ -18,7 +18,7 @@ Can be coerced from string that contains units, e.g.:
 
 _
     min => 0,
-    'x.perl.coerce_rules' => ['str_suffix_filesize'],
+    'x.perl.coerce_rules' => ['From_str::suffix_filesize'],
 }, {}];
 
 1;
@@ -37,7 +37,7 @@ Sah::Schema::filesize - File size
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-07-25.
+This document describes version 0.004 of Sah::Schema::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

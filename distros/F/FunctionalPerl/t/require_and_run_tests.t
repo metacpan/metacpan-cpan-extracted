@@ -15,11 +15,19 @@ our ($mydir, $myname); BEGIN {
     ($mydir, $myname)=($1,$2);
 }
 
+BEGIN {
+    # switch Chj::TEST to TAP style testing (unless requested 'old'), and
+    # disable FP::Repl::Trap / FP::Repl::AutoTrap (unless requested
+    # otherwise by another setting than "1"):
+    $ENV{RUN_TESTS} ||= 1;
+}
+
 use Test::More;
 use lib "./meta";
 use FunctionalPerl::TailExpand;
 use FunctionalPerl::ModuleList;
 use FunctionalPerl::Dependencies 'module_needs';
+use Chj::Backtrace;
 
 require "./meta/find-perl.pl";
 
@@ -39,7 +47,7 @@ subtest "require"=> sub {
 };
 
 subtest "run_tests"=> sub {
-    $ENV{RUN_TESTS}=1; # to switch to TAP style testing
+    # already loaded by require_ok above:
     Chj::TEST::run_tests();
 };
 

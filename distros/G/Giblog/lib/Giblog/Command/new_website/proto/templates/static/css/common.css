@@ -13,32 +13,35 @@
   
   /* header */
   .header {
-    background:#212121;
+    margin:0 auto;
+    background:#fff;
     margin-bottom:15px;
+    border-bottom:5px solid #D9D9D9;
   }
   
   /* footer */
   .footer {
-    background:white;
+    background:#1A1A1A;
     margin-top:15px;
     text-align:center;
     padding:15px 0;
     border-top:1px solid #ccc;
   }
   .footer a, .footer a:visited {
-    color:#000;
+    color:white;
   }
   
   /* container */
   .container {
-    background:#F2EFE2;
+    background:#F2EFE;
   }
   
   /* main */
   .main {
     max-width:960px;
     width:100%;
-    margin: 0 auto 15px auto;
+    margin: 0 auto;
+    padding:0 5px;
   }
   .main:after {
     content:"";
@@ -49,15 +52,12 @@
   /* content */
   .content {
     float:left;
-    width:74%;
+    width:calc(100% - 280px - 30px);
   }
   
   /* entry */
   .entry {
-    border:1px solid #C0C0C0;
     background:white;
-    box-shadow: 0 0 3px rgba(0,0,0,.1);
-    padding:15px 25px;
     margin-bottom:10px;
   }
   .entry li {
@@ -68,45 +68,52 @@
   /* side */
   .side {
     float:left;
-    width:25%;
-    margin-left:1%;
+    width:280px;
+    margin-left:30px;
+    padding-top:16px;
   }
   
   /* tags */
   h1 {
-    max-width:960px;
+    max-width:1020px;
     width:100%;
-    font-size:30px;
-    padding:12px 10px 10px 13px;
-    margin: 0 auto;
+    font-size:28px;
+    padding:19px 10px 15px 73px;
+    background:url(/images/giblog-logo.png) no-repeat 10px 15px;
+    background-size:48px;
   }
   h1 a, h1 a:visited {
     color:white;
     text-decoration:none;
-    color:white;
+    color:#333;
   }
   h2 {
-    font-size:23px;
-    padding:10px 0;
+    font-size:24px;
+    margin:10px 0;
+    padding-left:20px;
     letter-spacing:0.5px;
+    border-left:8px solid #00A78C;
   }
   h2 a, h2 a:visited {
     text-decoration:none;
     color:#000;
   }
   h3 {
-    font-size:18px;
-    border-left:7px solid #ddd;
-    padding:6px 0px 4px 12px;
+    font-size:20px;
+    border-top:4px solid #ddd;
+    padding:16px 0px 15px 18px;
     letter-spacing:0.5px;
     margin:15px 0 10px 0;
+    background:#F5F5F5;
+    margin-top:30px;
   }
   h4 {
-    font-size:17px;
+    font-size:20px;
     font-weight:bold;
     padding:6px 0px 4px 5px;
     letter-spacing:0.5px;
-    margin:15px 0 10px 0;
+    margin:15px 0 18px 0;
+    border-bottom:dashed 1px #ddd;
   }
   p {
     font-size:16px;
@@ -163,12 +170,12 @@
     box-shadow: 0 0 3px rgba(0,0,0,.1);
   }
   .side-list-title {
-    background:#222;
+    background:#009D82;
     color:white;
     font-weight:bold;
-    padding: 7px 0px 5px 0px;
+    padding: 12px 0px 10px 0px;
     text-align:center;
-    border:1px solid #ccc;
+    border:1px solid #E5E5E5;
     border-bottom:none;
   }
   .side-list ul {
@@ -177,8 +184,8 @@
   .side-list li {
     list-style:none;
     background:white;
-    border-bottom:1px solid #ccc;
-    padding:7px 10px 5px 10px;
+    border-bottom:1px solid #E5E5E5;
+    padding:12px 0px 10px 15px;
   }
   .side li:last-child {
     border-bottom:none;

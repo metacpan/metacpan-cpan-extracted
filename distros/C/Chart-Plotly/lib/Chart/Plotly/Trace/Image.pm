@@ -9,7 +9,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Image::Hoverlabel;
 use Chart::Plotly::Trace::Image::Stream;
 
-our $VERSION = '0.031';    # VERSION
+our $VERSION = '0.033';    # VERSION
 
 # ABSTRACT: Display an image, i.e. data on a 2D regular raster. By default, when an image is displayed in a subplot, its y axis will be reversed (ie. `autorange: 'reversed'`), constrained to the domain (ie. `constrain: 'domain'`) and it will have the same scale as its x axis (ie. `scaleanchor: 'x,`) in order for pixels to be rendered as squares.
 
@@ -239,7 +239,7 @@ Chart::Plotly::Trace::Image - Display an image, i.e. data on a 2D regular raster
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 

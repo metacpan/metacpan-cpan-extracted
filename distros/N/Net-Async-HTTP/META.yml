@@ -20,13 +20,13 @@ name: Net-Async-HTTP
 provides:
   Net::Async::HTTP:
     file: lib/Net/Async/HTTP.pm
-    version: '0.44'
+    version: '0.45'
   Net::Async::HTTP::Connection:
     file: lib/Net/Async/HTTP/Connection.pm
-    version: '0.44'
+    version: '0.45'
   Net::Async::HTTP::StallTimer:
     file: lib/Net/Async/HTTP/StallTimer.pm
-    version: '0.44'
+    version: '0.45'
 recommends:
   Compress::Raw::Zlib: '2.057'
 requires:
@@ -46,5 +46,5 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.44'
+version: '0.45'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTTP-Cookies/issues
   homepage: https://github.com/libwww-perl/HTTP-Cookies
   repository: https://github.com/libwww-perl/HTTP-Cookies.git
-version: '6.07'
+version: '6.08'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -343,7 +343,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.24.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.046'
@@ -351,7 +351,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.23.0
+          git_version: 2.24.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -438,7 +438,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.24.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -451,11 +451,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.07
+          tag: v6.08
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.24.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -492,7 +492,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.24.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -506,7 +506,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.24.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.046'

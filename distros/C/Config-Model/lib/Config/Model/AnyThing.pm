@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyThing 2.136;
+package Config::Model::AnyThing 2.137;
 
 use Mouse;
 
@@ -198,7 +198,7 @@ sub annotation {
     my $self = shift;
     my $old_note = $self->{annotation} || '';
     if (@_ and not $self->instance->preset and not $self->instance->layered) {
-        my $new = $self->{annotation} = join( "\n", grep ( defined $_, @_ ) );
+        my $new = $self->{annotation} = join( "\n", grep { defined $_} @_ );
         $self->notify_change(note => 'updated annotation') unless $new eq $old_note;
     }
 
@@ -257,8 +257,14 @@ sub searcher {
 
 sub dump_as_data {
     my $self   = shift;
+    my %args = @_;
+    my $full = delete $args{full_dump} || 0;
+    if ($full) {
+        carp "dump_as_data: full_dump parameter is deprecated. Please use 'mode => user' instead";
+        $args{mode} //= 'user';
+    }
     my $dumper = Config::Model::DumpAsData->new;
-    $dumper->dump_as_data( node => $self, @_ );
+    $dumper->dump_as_data( node => $self, %args );
 }
 
 # hum, check if the check information is valid
@@ -327,7 +333,7 @@ Config::Model::AnyThing - Base class for configuration tree item
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 
@@ -355,6 +361,11 @@ containing this object.
 
 Returns the node containing this object. May return undef if C<parent>
 is called on the root of the tree.
+
+=head2 container
+
+A bit like parent, this method returns the element containing this
+object. See L</container_type>
 
 =head2 container_type
 

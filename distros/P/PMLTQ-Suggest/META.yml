@@ -21,16 +21,16 @@ no_index: {}
 provides:
   PMLTQ::Command::suggest:
     file: lib/PMLTQ/Command/suggest.pm
-    version: v1.0.4
+    version: v1.1.0
   PMLTQ::Suggest:
     file: lib/PMLTQ/Suggest.pm
-    version: v1.0.4
+    version: v1.1.0
   PMLTQ::Suggest::Server:
     file: lib/PMLTQ/Suggest/Server.pm
-    version: v1.0.4
+    version: v1.1.0
   PMLTQ::Suggest::Utils:
     file: lib/PMLTQ/Suggest/Utils.pm
-    version: v1.0.4
+    version: v1.1.0
 requires:
   File::Find::Rule: '0.34'
   Getopt::Long: '0'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/ufal/pmltq-suggest-server/issues
   homepage: http://ufal.mff.cuni.cz/pmltq/
   repository: https://github.com/ufal/pmltq-suggest-server.git
-version: 1.0.4
+version: 1.1.0
 x_authority: cpan:MATY
 x_authority_from_module: PMLTQ::Suggest
 x_permissions_from_module: PMLTQ::Suggest

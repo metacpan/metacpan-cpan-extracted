@@ -1,5 +1,5 @@
 package Util::Medley::List;
-$Util::Medley::List::VERSION = '0.013';
+$Util::Medley::List::VERSION = '0.016';
 #########################################################################################
 
 use Modern::Perl;
@@ -16,7 +16,7 @@ Util::Medley::List - utility methods for working with lists
 
 =head1 VERSION
 
-version 0.013
+version 0.016
 
 =cut
 

@@ -50,6 +50,8 @@ for details.)
 Right now this doesn’t try for interoperability with other promise
 classes. If that’s something you want, make a feature request.
 
+See [Promise::ES6::Future](https://metacpan.org/pod/Promise::ES6::Future) if you need to interact with [Future](https://metacpan.org/pod/Future).
+
 # UNHANDLED REJECTIONS
 
 As of version 0.05, unhandled rejections prompt a warning _only_ if one
@@ -86,7 +88,8 @@ A key advantage of this design is that Promise::ES6 instances can abstract
 over whether a given function works synchronously or asynchronously.
 
 If you want a Promises/A+-compliant implementation, look at
-[Promise::ES6::IOAsync](https://metacpan.org/pod/Promise::ES6::IOAsync), [Promise::ES6::AnyEvent](https://metacpan.org/pod/Promise::ES6::AnyEvent), or one of the alternatives
+[Promise::ES6::IOAsync](https://metacpan.org/pod/Promise::ES6::IOAsync), [Promise::ES6::Mojo](https://metacpan.org/pod/Promise::ES6::Mojo),
+[Promise::ES6::AnyEvent](https://metacpan.org/pod/Promise::ES6::AnyEvent), or one of the alternatives
 that that module’s documentation suggests.
 
 # CANCELLATION

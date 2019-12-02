@@ -2,8 +2,8 @@ NAME
     Data::Sah - Fast and featureful data structure validation
 
 VERSION
-    This document describes version 0.902 of Data::Sah (from Perl
-    distribution Data-Sah), released on 2019-10-24.
+    This document describes version 0.903 of Data::Sah (from Perl
+    distribution Data-Sah), released on 2019-11-29.
 
 SYNOPSIS
     Non-OO interface:
@@ -146,7 +146,7 @@ MODULE ORGANIZATION
     Perl compiler, Data::Sah::Compiler::perl::FSH::Core is the Core funcset
     handler for Perl compiler.
 
-    Data::Sah::Coerce::$LANG::$TARGET_TYPE::$SOURCE_TYPE_AND_EXTRA_DESCRIPTI
+    Data::Sah::Coerce::$LANG::To_$TARGET_TYPE::From_$SOURCE_TYPE::$DESCRIPTI
     ON contains coercion rules.
 
     Data::Sah::TypeX::$TYPENAME::$CLAUSENAME namespace can be used to name

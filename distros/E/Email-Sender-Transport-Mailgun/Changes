@@ -1,5 +1,9 @@
 Revision history for Perl extension Email-Sender-Transport-Mailgun
 
+0.02 2019-11-27T01:34:18Z
+
+    - support for Mailgun regions (fhelmberger)
+
 0.01 2016-09-28T06:38:43Z
 
     - original version

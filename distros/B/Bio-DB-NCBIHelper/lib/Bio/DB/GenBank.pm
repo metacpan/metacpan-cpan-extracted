@@ -165,7 +165,7 @@ preceded with a _
 # Let the code begin...
 
 package Bio::DB::GenBank;
-$Bio::DB::GenBank::VERSION = '1.7.4';
+$Bio::DB::GenBank::VERSION = '1.7.5';
 use strict;
 use vars qw(%PARAMSTRING $DEFAULTFORMAT $DEFAULTMODE);
 

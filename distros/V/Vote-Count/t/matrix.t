@@ -18,17 +18,16 @@ use Path::Tiny;
 
 use Vote::Count;
 use Vote::Count::Matrix;
-use Vote::Count::ReadBallots 'read_ballots';
+use Vote::Count::ReadBallots 'read_ballots', 'read_range_ballots';
 
 my $M1 =
   Vote::Count::Matrix->new( 'BallotSet' => read_ballots('t/data/ties1.txt'),
   );
 
-my $M1GJ =
-    Vote::Count::Matrix->new( 
-      'BallotSet' => read_ballots('t/data/ties1.txt'), 
-      'TieBreakMethod' => 'grandjunction',
-    );
+my $M1GJ = Vote::Count::Matrix->new(
+  'BallotSet'      => read_ballots('t/data/ties1.txt'),
+  'TieBreakMethod' => 'grandjunction',
+);
 
 my $M2 =
   Vote::Count::Matrix->new( 'BallotSet' => read_ballots('t/data/data1.txt'),
@@ -46,20 +45,23 @@ my $KnotSet =
   Vote::Count::Matrix->new( 'BallotSet' => read_ballots('t/data/knot1.txt'),
   );
 
+my $FastFood =
+  Vote::Count::Matrix->new(
+  'BallotSet' => read_range_ballots('t/data/fastfood.range.json'), );
+
 isa_ok( $M1, ['Vote::Count::Matrix'], 'The matrix is a Vote::Count::Matrix' );
 
-note 'Testing with Condorcet removal including choices with a tie.' ;
+note 'Testing with Condorcet removal including choices with a tie.';
 my $N1 =
   Vote::Count::Matrix->new( 'BallotSet' => read_ballots('t/data/ties1.txt'),
   );
-my $mmm = $N1->CondorcetLoser( 1 );
-is( $mmm->{'eliminations'}, 11,
-'11 eliminated Condorcet losers in sample with ties');
-
+my $mmm = $N1->CondorcetLoser(1);
+is( $mmm->{'eliminations'},
+  11, '11 eliminated Condorcet losers in sample with ties' );
 
 subtest '_conduct_pair returns hash with pairing info' => sub {
-  my $t1 = Vote::Count::Matrix::_conduct_pair( $M1, 'RUMRAISIN',
-    'STRAWBERRY' );
+  my $t1 =
+    Vote::Count::Matrix::_conduct_pair( $M1, 'RUMRAISIN', 'STRAWBERRY' );
   my $x1 = {
     loser      => "",
     margin     => 0,
@@ -69,8 +71,8 @@ subtest '_conduct_pair returns hash with pairing info' => sub {
     winner     => "",
   };
   is_deeply( $t1, $x1, 'A Tie' );
-  my $t2 = Vote::Count::Matrix::_conduct_pair( $M1, 'RUMRAISIN',
-    'FUDGESWIRL' );
+  my $t2 =
+    Vote::Count::Matrix::_conduct_pair( $M1, 'RUMRAISIN', 'FUDGESWIRL' );
   my $x2 = {
     FUDGESWIRL => 6,
     loser      => "RUMRAISIN",
@@ -134,7 +136,7 @@ subtest 'check that ties are broken with grandjunction' => sub {
   my $RockStraw = $M1GJ->{'Matrix'}{'ROCKYROAD'}{'STRAWBERRY'};
   is_deeply( $xRockStraw, $RockStraw, 'one with a winner' );
 
-  $M1GJ->LogTo( '/tmp/m1gj_matrix');
+  $M1GJ->LogTo('/tmp/m1gj_matrix');
   $M1GJ->WriteLog();
   # note $M1GJ->logv;
 };
@@ -238,36 +240,60 @@ subtest 'CondorcetWinner' => sub {
   );
 };
 
-
 subtest 'GetPairResult' => sub {
-  is(
-    $M1->GetPairWinner( 'FUDGESWIRL', 'ROCKYROAD' ),
-    'FUDGESWIRL',
-    'Lookup the winner of a pairing with GetPairWinner');
-  my  $STFS = {
-        'FUDGESWIRL' =>  6,
-        'loser'      =>  "STRAWBERRY",
-        'margin'     =>  2,
-        'STRAWBERRY' =>  4,
-        'tie'        =>  0,
-        'winner'     =>  "FUDGESWIRL"
-    };
-  is_deeply(
-    $M1->GetPairResult( "FUDGESWIRL", "STRAWBERRY"),
-    $STFS,
-    "Check the hashref returned by GetPairResult");
+  is( $M1->GetPairWinner( 'FUDGESWIRL', 'ROCKYROAD' ),
+    'FUDGESWIRL', 'Lookup the winner of a pairing with GetPairWinner' );
+  my $STFS = {
+    'FUDGESWIRL' => 6,
+    'loser'      => "STRAWBERRY",
+    'margin'     => 2,
+    'STRAWBERRY' => 4,
+    'tie'        => 0,
+    'winner'     => "FUDGESWIRL"
+  };
+  is_deeply( $M1->GetPairResult( "FUDGESWIRL", "STRAWBERRY" ),
+    $STFS, "Check the hashref returned by GetPairResult" );
 };
 
 subtest 'GreatestLoss' => sub {
+  is( $M1->RankGreatestLoss()->Leader()->{'winner'}, 'CARAMEL', 
+    'CARAMEL had greatest loss and is reported as the winner');
   $M1->ResetActive();
-  is( $M1->GreatestLoss( 'FUDGESWIRL'), 2, 'M1 fudgeswirl' );
+  is( $M1->GreatestLoss('FUDGESWIRL'), 2, 'M1 fudgeswirl' );
   $KnotSet->ResetActive();
-  is( $KnotSet->GreatestLoss( 'STRAWBERRY'), 13, 'knotset strawberry');
-  is( $KnotSet->GreatestLoss( 'PISTACHIO'), 9 , 'knotset pistachio');
+  is( $KnotSet->GreatestLoss('STRAWBERRY'), 13, 'knotset strawberry' );
+  is( $KnotSet->GreatestLoss('PISTACHIO'),  9,  'knotset pistachio' );
 };
 
-# note( $KnotSet->RankGreatestLoss()->RankTable );
+subtest 'Range Ballots' => sub {
+  my $ffr = $FastFood->_conduct_pair( 'BURGERKING', 'CHICKFILA' );
+  my $expectffrpair = {
+    BURGERKING => 11,
+    CHICKFILA  => 3,
+    loser      => "CHICKFILA",
+    margin     => 8,
+    tie        => 0,
+    winner     => "BURGERKING"
+  };
+  is_deeply( $ffr, $expectffrpair, 'check pairing result _conduct_pair' );
+  is( $FastFood->GetPairWinner( 'BURGERKING', 'MCDONALDS' ),
+    'BURGERKING', 'use GetPairWinner to find winner of a pairing' );
+  my $FastFood2 = Vote::Count::Matrix->new(
+    TieBreakMethod => 'approval',
+    BallotSet      => $FastFood->BallotSet()
+  );
+  my $scored1 = $FastFood->ScoreMatrix();
+  my $scored2 = $FastFood2->ScoreMatrix();
+  is( $scored1->{'CHICKFILA'},
+    4, 'scorematrix count wins for a choice with no tiebreaker' );
+  is( $scored2->{'CHICKFILA'},
+    6, 'scorematrix count wins for same choice with approval tiebreaker' );
+};
 
-# note( $KnotSet->PairingVotesTable );
+subtest 'ScoreTable' => sub {
+  my $st = $FastFood->ScoreTable();
+  like( $st, qr/\| INNOUT     \| 11    \|/, 
+    'check an expected formated line from ScoreTable');
+};
 
 done_testing();

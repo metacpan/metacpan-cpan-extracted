@@ -26,7 +26,8 @@ my $ni = XML::NewsML_G2::News_Item_Text->new(
     message_id      => $apa_id,
     language        => 'de',
     title           => 'Facet test',
-    content_created => DateTime->now()
+    content_created => DateTime->now(),
+    timezone        => 'UTC'
 );
 
 my $mt = XML::NewsML_G2::Media_Topic->new(
@@ -74,7 +75,7 @@ my $sm = XML::NewsML_G2::Scheme_Manager->new(%schemes);
 my $writer = XML::NewsML_G2::Writer::News_Item->new(
     news_item      => $ni,
     scheme_manager => $sm,
-    g2_version     => 2.28
+    g2_version     => 2.28,
 );
 
 ok( my $dom = $writer->create_dom(), 'V 2.28 DOM created' );
@@ -84,7 +85,7 @@ foreach (qw/2.9 2.12 2.15 2.18/) {
     my $writer = XML::NewsML_G2::Writer::News_Item->new(
         news_item      => $ni,
         scheme_manager => $sm,
-        g2_version     => $_
+        g2_version     => $_,
     );
     throws_ok( sub { $writer->create_dom() },
         qr/Unimplemented/, "No concept suppport for version $_" );

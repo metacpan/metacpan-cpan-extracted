@@ -1,8 +1,6 @@
-# Copyright (c) 2009-2015 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: 01_basics.t 53 2015-05-17 21:36:50Z demetri $
+# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Basic tests.
 
@@ -25,7 +23,7 @@ ok(1);          # module loaded
 sub check_mod {
     my ($obj, $r, $mod) = @_;
     my $ref = ref $obj;
-    my $got = 
+    my $got =
         !defined $obj?              'undef':
         !$ref &&
         looks_like_number($obj)?    "number $obj":

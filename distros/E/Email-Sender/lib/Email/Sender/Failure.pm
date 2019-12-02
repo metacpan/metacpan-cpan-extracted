@@ -1,6 +1,6 @@
 package Email::Sender::Failure;
 # ABSTRACT: a report of failure from an email sending transport
-$Email::Sender::Failure::VERSION = '1.300031';
+$Email::Sender::Failure::VERSION = '1.300033';
 use Moo;
 extends 'Throwable::Error';
 
@@ -96,7 +96,7 @@ Email::Sender::Failure - a report of failure from an email sending transport
 
 =head1 VERSION
 
-version 1.300031
+version 1.300033
 
 =head1 ATTRIBUTES
 
@@ -144,7 +144,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2019 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

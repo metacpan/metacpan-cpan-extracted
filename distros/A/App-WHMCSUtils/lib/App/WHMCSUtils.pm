@@ -2,8 +2,10 @@
 
 package App::WHMCSUtils;
 
-our $DATE = '2019-09-19'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-WHMCSUtils'; # DIST
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,7 +15,7 @@ use Log::ger;
 use Digest::MD5 qw(md5_hex);
 use File::chdir;
 use IPC::System::Options qw(system readpipe);
-use LWP::UserAgent::Patch::HTTPSHardTimeout;
+use LWP::UserAgent::Patch::Retry -n=>60, -delay=>10;
 use LWP::UserAgent;
 use Path::Tiny;
 use WWW::Mechanize;
@@ -331,9 +333,40 @@ $SPEC{calc_deferred_revenue} = {
     v => 1.1,
     description => <<'_',
 
+Deferring revenue is the process of recognizing revenue as you earn it, in
+contrast to as you receive the cash. This is the principle of accrual
+accounting, as opposed to cash-based accounting.
+
+For example, suppose on Nov 1, 2019 you receive an amount of $12 for 12 months
+of hosting (up until Oct 31, 2020). In cash-based accounting, you immediately
+recognize the $12 as revenue on Nov 1, 2019. In accrual accounting, you
+recognize $1 revenue for each month you are performing the hosting obligation,
+for 12 times, from Nov 2019 to Oct 2020.
+
+As another example, suppose you have three invoices:
+
+    invoice num    type                  amount    note
+    -----------    ------                ------    ----
+    1001           domain registration     10.5    example.com, from 2019-11-11 to 2020-11-10
+    1002           hosting                  9.0    example.com, from 2019-11-11 to 2020-02-10 (3 months)
+    1003           hosting                 12.0    example.com, from 2019-11-01 to 2020-04-30 (6 months)
+
+The first invoice is not deferred, since we have earned (or performed the
+obligation of domain registration) immediately. The second and third invoices
+are deferred. This is how the deferment will go:
+
+    invoice \ period   2019-11   2019-12   2020-01   2020-02   2020-03   2020-04
+    ----------------   -------   -------   -------   -------   -------   -------
+    1001                  10.5
+    1002                   3.0       3.0       3.0
+    1003                   2.0       2.0       2.0       2.0       2.0       2.0
+
+    TOTAL                 15.5       5.0       5.0       2.0       2.0       2.0
+
 This utility collects invoice items from paid invoices, filters eligible ones,
-then defers the revenue to separate months for items that should be deferred,
-and finally sums the amounts to calculate total monthly deferred revenues.
+then defers the revenue to separate months for items that should be deferred
+(determined using some heuristic and additionally configurable options), and
+finally sums the amounts to calculate total monthly deferred revenues.
 
 This utility can also be instructed (via setting the `full` option to true) to
 output the full CSV report (each items with their categorizations and deferred
@@ -780,8 +813,11 @@ _
         include_client_ids => {
             #'x.name.is_plural' => 1,
             #'x.name.singular' => 'include_client_id',
-            schema => ['array*', of=>'uint*', 'x.perl.coerce_rules'=>['str_comma_sep']],
+            schema => ['array*', of=>'uint*', 'x.perl.coerce_rules'=>['From_str::comma_sep']],
             tags => ['category:filtering'],
+        },
+        include_client_ids_from => {
+            schema => 'filename*',
         },
         include_active => {
             summary => 'Whether to include active clients',
@@ -823,6 +859,15 @@ sub send_verification_emails {
 
     my $dbh = _connect_db(%args);
 
+    my @included_client_ids;
+    if (defined $args{include_client_ids_from}) {
+        open my $fh, "<", $args{include_client_ids_from} or die "Can't open $args{include_client_ids_from}: $!";
+        while (<$fh>) {
+            chomp;
+            push @included_client_ids, $_;
+        }
+    }
+
     my $sth = $dbh->prepare(
         join("",
              "SELECT id,firstname,lastname,companyname,email FROM tblclients ",
@@ -830,6 +875,7 @@ sub send_verification_emails {
              (defined $args{include_active}   && !$args{include_active}   ? "AND status <> 'Active' "   : ""),
              (defined $args{include_inactive} && !$args{include_inactive} ? "AND status <> 'Inactive' " : ""),
              ($args{include_client_ids} ? "AND id IN (".join(",",map{$_+0} @{ $args{include_client_ids} }).")" : ""),
+             (@included_client_ids ? "AND id IN (".join(",",@included_client_ids).")" : ""),
              "ORDER BY ".($args{random} ? "RAND()" : "id"),
          ),
     );
@@ -890,7 +936,7 @@ App::WHMCSUtils - CLI utilities related to WHMCS
 
 =head1 VERSION
 
-This document describes version 0.009 of App::WHMCSUtils (from Perl distribution App-WHMCSUtils), released on 2019-09-19.
+This document describes version 0.011 of App::WHMCSUtils (from Perl distribution App-WHMCSUtils), released on 2019-11-29.
 
 =head1 FUNCTIONS
 
@@ -901,9 +947,40 @@ Usage:
 
  calc_deferred_revenue(%args) -> [status, msg, payload, meta]
 
+Deferring revenue is the process of recognizing revenue as you earn it, in
+contrast to as you receive the cash. This is the principle of accrual
+accounting, as opposed to cash-based accounting.
+
+For example, suppose on Nov 1, 2019 you receive an amount of $12 for 12 months
+of hosting (up until Oct 31, 2020). In cash-based accounting, you immediately
+recognize the $12 as revenue on Nov 1, 2019. In accrual accounting, you
+recognize $1 revenue for each month you are performing the hosting obligation,
+for 12 times, from Nov 2019 to Oct 2020.
+
+As another example, suppose you have three invoices:
+
+ invoice num    type                  amount    note
+ -----------    ------                ------    ----
+ 1001           domain registration     10.5    example.com, from 2019-11-11 to 2020-11-10
+ 1002           hosting                  9.0    example.com, from 2019-11-11 to 2020-02-10 (3 months)
+ 1003           hosting                 12.0    example.com, from 2019-11-01 to 2020-04-30 (6 months)
+
+The first invoice is not deferred, since we have earned (or performed the
+obligation of domain registration) immediately. The second and third invoices
+are deferred. This is how the deferment will go:
+
+ invoice \ period   2019-11   2019-12   2020-01   2020-02   2020-03   2020-04
+ ----------------   -------   -------   -------   -------   -------   -------
+ 1001                  10.5
+ 1002                   3.0       3.0       3.0
+ 1003                   2.0       2.0       2.0       2.0       2.0       2.0
+ 
+ TOTAL                 15.5       5.0       5.0       2.0       2.0       2.0
+
 This utility collects invoice items from paid invoices, filters eligible ones,
-then defers the revenue to separate months for items that should be deferred,
-and finally sums the amounts to calculate total monthly deferred revenues.
+then defers the revenue to separate months for items that should be deferred
+(determined using some heuristic and additionally configurable options), and
+finally sums the amounts to calculate total monthly deferred revenues.
 
 This utility can also be instructed (via setting the C<full> option to true) to
 output the full CSV report (each items with their categorizations and deferred
@@ -1134,6 +1211,8 @@ Hook is expected to return the sender email.
 Whether to include active clients.
 
 =item * B<include_client_ids> => I<array[uint]>
+
+=item * B<include_client_ids_from> => I<filename>
 
 =item * B<include_inactive> => I<bool> (default: 0)
 

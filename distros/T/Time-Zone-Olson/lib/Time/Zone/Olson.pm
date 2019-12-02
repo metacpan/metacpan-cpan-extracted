@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -76,11 +76,19 @@ sub _MAX_SIZE_FOR_A_GUESS_FILE_CONTENTS    { return 4096 }
 
 sub _TZ_DEFINITION_KEYS {
     return
-      qw(std_name std_sign std_hours std_minutes std_seconds dst_name dst_sign dst_hours dst_minutes dst_seconds start_julian_without_feb29 end_julian_withou_feb29 start_julian_with_feb29 end_julian_with_feb29 start_month end_month start_week end_week start_day end_day start_hour end_hour start_minute end_minute start_second end_second);
+      qw(std_name std_sign std_hours std_minutes std_seconds dst_name dst_sign dst_hours dst_minutes dst_seconds start_julian_without_feb29 end_julian_without_feb29 start_julian_with_feb29 end_julian_with_feb29 start_month end_month start_week end_week start_day end_day start_hour end_hour start_minute end_minute start_second end_second);
+}
+
+my $_modern_regexs_work = 1;
+my $_timezone_full_name_regex =
+  eval 'qr/(?<tz>(?<area>\w+)(?:\/(?<location>[\w\-\/+]+))?)/smx'
+  or do { $_modern_regexs_work = undef };
+if ( !$_modern_regexs_work ) {
+    $_timezone_full_name_regex = qr/((\w+)(?:\/([\w\-\/+]+)))/smx;
 }
 
 sub _TIMEZONE_FULL_NAME_REGEX {
-    return qr/(?<tz>(?<area>\w+)(?:\/(?<location>[\w\-\/+]+))?)/smx;
+    return $_timezone_full_name_regex;
 }
 
 sub _WIN32_ERROR_FILE_NOT_FOUND {
@@ -834,7 +842,9 @@ sub areas {
     foreach my $timezone ( $self->_timezones() ) {
         my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
         if ( $timezone =~ /^$timezone_full_name_regex$/smx ) {
-            $areas{ $LAST_PAREN_MATCH{area} } = 1;
+            my ( $tz, $area, $location ) =
+              $self->_matched_timezone_full_name_regex_all();
+            $areas{$area} = 1;
         }
         else {
             Carp::croak(
@@ -854,10 +864,12 @@ sub locations {
     foreach my $timezone ( $self->_timezones() ) {
         my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
         if ( $timezone =~ /^$timezone_full_name_regex$/smx ) {
-            if (   ( $area eq $LAST_PAREN_MATCH{area} )
-                && ( $LAST_PAREN_MATCH{location} ) )
+            my ( $tz, $extracted_area, $location ) =
+              $self->_matched_timezone_full_name_regex_all();
+            if (   ( $area eq $extracted_area )
+                && ($location) )
             {
-                $locations{ $LAST_PAREN_MATCH{location} } = 1;
+                $locations{$location} = 1;
             }
         }
         else {
@@ -900,15 +912,40 @@ sub location {
     return $self->{location};
 }
 
+sub _matched_timezone_full_name_regex_all {
+    my ($self) = @_;
+    my ( $tz, $area, $location );
+    if ($_modern_regexs_work) {
+        $tz       = $LAST_PAREN_MATCH{tz};
+        $area     = $LAST_PAREN_MATCH{area};
+        $location = $LAST_PAREN_MATCH{location};
+    }
+    else {
+        ( $tz, $area, $location ) = ( $1, $2, $3 );
+    }
+    return ( $tz, $area, $location );
+}
+
+sub _matched_timezone_full_name_regex_tz {
+    my ($self) = @_;
+    ( my $tz, $self->{area}, my $location ) =
+      $self->_matched_timezone_full_name_regex_all();
+    if ( defined $location ) {
+        $self->{location} = $location;
+    }
+    else {
+        delete $self->{location};
+    }
+    return $tz;
+}
+
 sub timezone {
     my ( $self, $new ) = @_;
     my $old = $self->{tz};
     if ( defined $new ) {
         my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
         if ( $new =~ /^$timezone_full_name_regex$/smx ) {
-            $self->{tz}       = $LAST_PAREN_MATCH{tz};
-            $self->{area}     = $LAST_PAREN_MATCH{area};
-            $self->{location} = $LAST_PAREN_MATCH{location};
+            $self->{tz} = $self->_matched_timezone_full_name_regex_tz();
             if ( $self->win32_registry() ) {
                 my %mapping = $self->win32_mapping();
                 if ( !defined $mapping{$new} ) {
@@ -987,11 +1024,7 @@ sub _guess_olson_tz {
     if ( my $readlink = readlink $path ) {
         my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
         if ( $readlink =~ /$quoted_base.$timezone_full_name_regex$/smx ) {
-            my $guessed = $LAST_PAREN_MATCH{tz};
-            $self->{area} = $LAST_PAREN_MATCH{area};
-            if ( defined $LAST_PAREN_MATCH{location} ) {
-                $self->{location} = $LAST_PAREN_MATCH{location};
-            }
+            my $guessed = $self->_matched_timezone_full_name_regex_tz();
             $self->{determining_path} = $path;
             return $guessed;
         }
@@ -1082,11 +1115,7 @@ sub _guess_olson_tz_from_file_contents {
                 if (   ( $olson_to_win32_timezones{$possible} eq $line )
                     && ( $possible =~ /^$timezone_full_name_regex$/smx ) )
                 {
-                    my $guessed = $LAST_PAREN_MATCH{tz};
-                    $self->{area} = $LAST_PAREN_MATCH{area};
-                    if ( defined $LAST_PAREN_MATCH{location} ) {
-                        $self->{location} = $LAST_PAREN_MATCH{location};
-                    }
+                    my $guessed = $self->_matched_timezone_full_name_regex_tz();
                     $self->{determining_path} = $path;
                     return $guessed;
 
@@ -1101,11 +1130,7 @@ sub _guess_olson_tz_from_file_contents {
                                 $}smx
           )
         {
-            my $guessed = $LAST_PAREN_MATCH{tz};
-            $self->{area} = $LAST_PAREN_MATCH{area};
-            if ( defined $LAST_PAREN_MATCH{location} ) {
-                $self->{location} = $LAST_PAREN_MATCH{location};
-            }
+            my $guessed = $self->_matched_timezone_full_name_regex_tz();
             $self->{determining_path} = $path;
             return $guessed;
         }
@@ -1118,11 +1143,9 @@ sub _guess_olson_tz_from_filesystem {
     my $quoted_base              = quotemeta $base;
     my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
     if ( $File::Find::name =~ /^$quoted_base.$timezone_full_name_regex$/smx ) {
-        my $area = $LAST_PAREN_MATCH{area};
-        my ( $location, $path );
-        if ( defined $LAST_PAREN_MATCH{location} ) {
-            $location = $LAST_PAREN_MATCH{location};
-        }
+        my ( $tz, $area, $location ) =
+          $self->_matched_timezone_full_name_regex_all();
+        my $path;
         if ( $self->_check_area_location( $area, $location ) ) {
             if ( defined $location ) {
                 $path = File::Spec->catfile( $base, $area, $location );
@@ -1220,10 +1243,7 @@ sub _guess_win32_tz {
     foreach my $key ( sort { $a cmp $b } keys %mapping ) {
         if ( $mapping{$key} eq $win32_timezone_name ) {
             if ( $key =~ /^$timezone_full_name_regex$/smx ) {
-                $self->{area} = $LAST_PAREN_MATCH{area};
-                if ( defined $LAST_PAREN_MATCH{location} ) {
-                    $self->{location} = $LAST_PAREN_MATCH{location};
-                }
+                $self->_matched_timezone_full_name_regex_tz();
             }
             return $key;
         }
@@ -1324,10 +1344,7 @@ sub _guess_old_win32_tz {
     my $timezone_full_name_regex = _TIMEZONE_FULL_NAME_REGEX();
     if ( defined $win32_timezone_name ) {
         if ( $win32_timezone_name =~ /^$timezone_full_name_regex$/smx ) {
-            $self->{area} = $LAST_PAREN_MATCH{area};
-            if ( defined $LAST_PAREN_MATCH{location} ) {
-                $self->{location} = $LAST_PAREN_MATCH{location};
-            }
+            $self->_matched_timezone_full_name_regex_tz();
         }
     }
     return $win32_timezone_name;
@@ -1350,9 +1367,12 @@ sub _is_leap_year {
     return $leap_year;
 }
 
+my $_x = 0;
+
 sub _in_dst_according_to_v2_tz_rule {
     my ( $self, $check_time, $tz_definition ) = @_;
 
+    my ( $dst_start_time, $dst_end_time );
     if (   ( defined $tz_definition->{start_day} )
         && ( defined $tz_definition->{end_day} )
         && ( defined $tz_definition->{start_week} )
@@ -1363,7 +1383,7 @@ sub _in_dst_according_to_v2_tz_rule {
         my $check_year =
           ( $self->_gm_time($check_time) )[ _LOCALTIME_YEAR_INDEX() ] +
           _LOCALTIME_BASE_YEAR();
-        my $dst_start_time = $self->_get_time_for_wday_week_month_year_offset(
+        $dst_start_time = $self->_get_time_for_wday_week_month_year_offset(
             day    => $tz_definition->{start_day},
             week   => $tz_definition->{start_week},
             month  => $tz_definition->{start_month},
@@ -1377,7 +1397,7 @@ sub _in_dst_according_to_v2_tz_rule {
               $tz_definition->{start_second} -
               $tz_definition->{std_offset_in_seconds}
         );
-        my $dst_end_time = $self->_get_time_for_wday_week_month_year_offset(
+        $dst_end_time = $self->_get_time_for_wday_week_month_year_offset(
             day    => $tz_definition->{end_day},
             week   => $tz_definition->{end_week},
             month  => $tz_definition->{end_month},
@@ -1391,7 +1411,74 @@ sub _in_dst_according_to_v2_tz_rule {
               $tz_definition->{end_second} -
               $tz_definition->{dst_offset_in_seconds}
         );
-
+    }
+    elsif (( defined $tz_definition->{start_julian_with_feb29} )
+        && ( defined $tz_definition->{end_julian_with_feb29} ) )
+    {
+        my $check_year =
+          ( $self->_gm_time($check_time) )[ _LOCALTIME_YEAR_INDEX() ] +
+          _LOCALTIME_BASE_YEAR();
+        $dst_start_time = $self->_get_time_for_julian(
+            day     => $tz_definition->{start_julian_with_feb29},
+            year    => $check_year,
+            without => 0,
+            offset  => (
+                $tz_definition->{start_hour} *
+                  _SECONDS_IN_ONE_MINUTE() *
+                  _MINUTES_IN_ONE_HOUR()
+              ) +
+              ( $tz_definition->{start_minute} * _SECONDS_IN_ONE_MINUTE() ) +
+              $tz_definition->{start_second} -
+              $tz_definition->{std_offset_in_seconds}
+        );
+        $dst_end_time = $self->_get_time_for_julian(
+            day     => $tz_definition->{end_julian_with_feb29},
+            year    => $check_year,
+            without => 0,
+            offset  => (
+                $tz_definition->{end_hour} *
+                  _SECONDS_IN_ONE_MINUTE() *
+                  _MINUTES_IN_ONE_HOUR()
+              ) +
+              ( $tz_definition->{end_minute} * _SECONDS_IN_ONE_MINUTE() ) +
+              $tz_definition->{end_second} -
+              $tz_definition->{dst_offset_in_seconds}
+        );
+    }
+    elsif (( defined $tz_definition->{start_julian_without_feb29} )
+        && ( defined $tz_definition->{end_julian_without_feb29} ) )
+    {
+        my $check_year =
+          ( $self->_gm_time($check_time) )[ _LOCALTIME_YEAR_INDEX() ] +
+          _LOCALTIME_BASE_YEAR();
+        $dst_start_time = $self->_get_time_for_julian(
+            day     => $tz_definition->{start_julian_without_feb29},
+            year    => $check_year,
+            without => 1,
+            offset  => (
+                $tz_definition->{start_hour} *
+                  _SECONDS_IN_ONE_MINUTE() *
+                  _MINUTES_IN_ONE_HOUR()
+              ) +
+              ( $tz_definition->{start_minute} * _SECONDS_IN_ONE_MINUTE() ) +
+              $tz_definition->{start_second} -
+              $tz_definition->{std_offset_in_seconds}
+        );
+        $dst_end_time = $self->_get_time_for_julian(
+            day     => $tz_definition->{end_julian_without_feb29},
+            year    => $check_year,
+            without => 1,
+            offset  => (
+                $tz_definition->{end_hour} *
+                  _SECONDS_IN_ONE_MINUTE() *
+                  _MINUTES_IN_ONE_HOUR()
+              ) +
+              ( $tz_definition->{end_minute} * _SECONDS_IN_ONE_MINUTE() ) +
+              $tz_definition->{end_second} -
+              $tz_definition->{dst_offset_in_seconds}
+        );
+    }
+    if ( ( defined $dst_start_time ) && ( defined $dst_end_time ) ) {
         if ( $dst_start_time < $dst_end_time ) {
             if (   ( $dst_start_time <= $check_time )
                 && ( $check_time < $dst_end_time ) )
@@ -1407,8 +1494,59 @@ sub _in_dst_according_to_v2_tz_rule {
             }
         }
     }
-
     return 0;
+}
+
+sub _get_time_for_julian {
+    my ( $self, %params ) = @_;
+    my $check_year = _EPOCH_YEAR();
+    my $time       = $params{offset};
+    my $increment  = 0;
+    my $leap_year  = 1;
+    if ( $check_year > $params{year} ) {
+        while ( $check_year > $params{year} ) {
+            $check_year -= 1;
+            if ( $self->_is_leap_year($check_year) ) {
+                $increment = _DAYS_IN_A_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
+                $leap_year = 1;
+            }
+            else {
+                $increment = _DAYS_IN_A_NON_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
+                $leap_year = 0;
+            }
+            $time -= $increment;
+        }
+    }
+    else {
+        while ( $check_year < $params{year} ) {
+            if ( $self->_is_leap_year($check_year) ) {
+                $increment = _DAYS_IN_A_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
+            }
+            else {
+                $increment = _DAYS_IN_A_NON_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
+            }
+            $time       += $increment;
+            $check_year += 1;
+            if ( $self->_is_leap_year($check_year) ) {
+                $leap_year = 1;
+            }
+            else {
+                $leap_year = 0;
+            }
+        }
+    }
+    if ( $params{without} ) {
+        $params{day} =
+          (
+            ($leap_year)
+              && ( $params{day} >
+                _DAYS_IN_JANUARY() + _DAYS_IN_FEBRUARY_LEAP_YEAR() )
+          )
+          ? $params{day}
+          : $params{day} - 1;
+    }
+    $time += ( $params{day} * _SECONDS_IN_ONE_DAY() );
+    return $time;
 }
 
 sub _get_time_for_wday_week_month_year_offset {
@@ -1503,8 +1641,9 @@ sub _get_time_for_wday_week_month_year_offset {
 }
 
 sub tz_definition {
-    my ($self)        = @_;
-    my $tz            = $self->timezone();
+    my ($self) = @_;
+    my $tz = $self->timezone();
+    $self->_read_tzfile();
     my $tz_definition = $self->{_tzdata}->{$tz}->{tz_definition}->{tz};
     return $tz_definition;
 }
@@ -2350,6 +2489,108 @@ sub _read_tz_definition {
 
 sub _parse_tz_variable {
     my ( $self, $tz_variable, $path ) = @_;
+    if ($_modern_regexs_work) {
+        return $self->_modern_parse_tz_variable( $tz_variable, $path );
+    }
+    else {
+        return $self->_ancient_parse_tz_variable( $tz_variable, $path );
+    }
+}
+
+sub _ancient_parse_tz_variable {
+    my ( $self, $tz_variable, $path ) = @_;
+    my $abbr_regex = qr/([[:alpha:]]+|<[\-+]?\d+(?:\d+)?>)/smx;
+    my $name_regex =
+      qr/(?:$abbr_regex(\-)?(\d+)(?::(\d+))?$abbr_regex(\-)?(\d+)?)/smx;
+    my $short_name_regex = qr/([[:alpha:]]+|<[[:alpha:]]*[\-+]?\d+>)/smx;
+    my $month_regex      = qr/(M\d+[.]\d+[.]\d+(?:\/\-?\d+(?::\d+)?)?)/smx;
+    my $julian_regex     = qr/J(\d+)\/(\d+)/smx;
+    my $tz_definition    = { tz => $tz_variable };
+    if ( $tz_variable =~ /^$name_regex,$month_regex,$month_regex$/smx ) {
+        (
+            $tz_definition->{std_name},  $tz_definition->{std_sign},
+            $tz_definition->{std_hours}, $tz_definition->{std_minutes},
+            $tz_definition->{dst_name},  $tz_definition->{dst_sign},
+            $tz_definition->{dst_hours}, my $start_date,
+            my $end_date
+        ) = ( $1, $2, $3, $4, $5, $6, $7, $8, $9 );
+        my $month_breakdown_regex =
+          qr/M(\d+)[.](\d+)[.](\d+)(?:\/([\-+]?\d+)(?::(\d+))?)?/smx;
+        if ( $start_date =~ /^$month_breakdown_regex$/smx ) {
+            (
+                $tz_definition->{start_month}, $tz_definition->{start_week},
+                $tz_definition->{start_day},   $tz_definition->{start_hour},
+                $tz_definition->{start_minute}
+            ) = ( $1, $2, $3, $4, $5 );
+        }
+        else {
+            Carp::croak(
+"Failed to parse the tz definition of $tz_variable from $path (1)"
+            );
+        }
+        if ( $end_date =~ /^$month_breakdown_regex$/smx ) {
+            (
+                $tz_definition->{end_month}, $tz_definition->{end_week},
+                $tz_definition->{end_day},   $tz_definition->{end_hour},
+                $tz_definition->{end_minute}
+            ) = ( $1, $2, $3, $4, $5 );
+        }
+        else {
+            Carp::croak(
+"Failed to parse the tz definition of $tz_variable from $path (2)"
+            );
+        }
+    }
+    elsif ( $tz_variable =~ /^$short_name_regex([\-+])?(\d+)(?::(\d+))?$/smx ) {
+        (
+            $tz_definition->{std_name},  $tz_definition->{std_sign},
+            $tz_definition->{std_hours}, $tz_definition->{std_minutes},
+            $tz_definition->{start_hour}
+        ) = ( $1, $2, $3, $4, $5 );
+    }
+    elsif ( $tz_variable =~
+        /^<([+]\d+)>(\-)?(\d+):(\d+)<([+]\d+)>,$julian_regex,$julian_regex$/smx
+      )
+    {
+        (
+            $tz_definition->{std_name},
+            $tz_definition->{std_sign},
+            $tz_definition->{std_hours},
+            $tz_definition->{std_minutes},
+            $tz_definition->{dst_name},
+            $tz_definition->{start_julian_without_feb29},
+            $tz_definition->{start_hour},
+            $tz_definition->{end_julian_without_feb29},
+            $tz_definition->{end_hour},
+        ) = ( $1, $2, $3, $4, $5, $6, $7, $8, $9 );
+    }
+    else {
+        Carp::croak(
+            "Failed to parse the tz definition of $tz_variable from $path (3)");
+    }
+    foreach my $key ( sort { $a cmp $b } keys %{$tz_definition} ) {
+        if ( !defined $tz_definition->{$key} ) {
+            delete $tz_definition->{$key};
+        }
+    }
+    $self->_initialise_undefined_tz_definition_values($tz_definition);
+    $self->_cleanup_bracketed_names($tz_definition);
+    return $tz_definition;
+}
+
+sub _cleanup_bracketed_names {
+    my ( $self, $tz_definition ) = @_;
+    foreach my $key (qw(std_name dst_name)) {
+        if ( defined $tz_definition->{$key} ) {
+            $tz_definition->{$key} =~ s/^<([^>]+)>$/$1/smx;
+        }
+    }
+    return;
+}
+
+sub _compile_modern_tz_regex {
+    my $modern_tz_regex;
+    eval '
     my $timezone_abbr_name_regex =
       qr/(?:[^:\d,+-][^\d,+-]{2,}|[<]\w*[+-]?\d+[>])/smx;
     my $std_name_regex = qr/(?<std_name>$timezone_abbr_name_regex)/smx
@@ -2403,11 +2644,18 @@ qr/(?:$end_julian_without_feb29_regex|$end_julian_with_feb29_regex|$end_month_we
     my $end_time_regex =
       qr/[\/]$end_hour_regex$end_minute_regex?$end_second_regex?/smx;
     my $end_datetime_regex = qr/$end_date_regex(?:$end_time_regex)?/smx;
+    $modern_tz_regex =
+qr/($std_name_regex$std_offset_regex(?:$dst_name_regex(?:$dst_offset_regex)?,$start_datetime_regex,$end_datetime_regex)?)/smx;'
+      or ( !$_modern_regexs_work )
+      or Carp::croak("Failed to compile TZ regular expression:$EVAL_ERROR");
+    return $modern_tz_regex;
+}
 
-    if ( $tz_variable =~
-/^($std_name_regex$std_offset_regex(?:$dst_name_regex(?:$dst_offset_regex)?,$start_datetime_regex,$end_datetime_regex)?)$/smx
-      )
-    {
+my $_modern_tz_regex = _compile_modern_tz_regex();
+
+sub _modern_parse_tz_variable {
+    my ( $self, $tz_variable, $path ) = @_;
+    if ( $tz_variable =~ /^$_modern_tz_regex$/smx ) {
         my $tz_definition = { tz => $1 };
         foreach my $key ( _TZ_DEFINITION_KEYS() ) {
             if ( defined $LAST_PAREN_MATCH{$key} ) {
@@ -2415,6 +2663,7 @@ qr/(?:$end_julian_without_feb29_regex|$end_julian_with_feb29_regex|$end_month_we
             }
         }
         $self->_initialise_undefined_tz_definition_values($tz_definition);
+        $self->_cleanup_bracketed_names($tz_definition);
         return $tz_definition;
     }
     else {
@@ -2933,7 +3182,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.28
+Version 0.30
 
 =cut
 
@@ -2977,7 +3226,7 @@ This method accepts a area (such as Asia, Australia, Africa, America, Europe) as
 
 =head2 comment
 
-This method accepts the name of time zone such as C<"Australia/Melbourne"> as a parameter and will return the matching comment from the zone.tab file.  For example, if C<"Australia/Melbourne"> was passed as a parameter, the L</comment> function would return C<"Victoria">.  For Windows platforms, it will return the contents of the C<Display> registry setting.  For example, for C<"Australia/Melbourne">, it would return C<"(UTC+10) Canberra, Melbourne, Sydney">.
+This method accepts the name of time zone such as C<"Australia/Melbourne"> as a parameter and will return the matching comment from the zone.tab file.  For example, if C<"Australia/Melbourne"> was passed as a parameter, the L</comment> function would return C<"Victoria">.  For Windows platforms, it will return the contents of the C<Display> registry setting.  For example, for C<"Australia/Melbourne"> using English as a language, it would return C<"(UTC+10) Canberra, Melbourne, Sydney">.
 
 =head2 directory
 
@@ -3121,14 +3370,7 @@ Time::Zone::Olson requires no configuration files or environment variables.  How
 
 =head1 DEPENDENCIES
 
-Time::Zone::Olson requires Perl 5.10 or better.  For environments where the unpack 'q' parameter is not supported, the following module is also required
-
-=over
-
-=item *
-L<Math::Int64|Math::Int64>
-
-=back
+For environments where the unpack 'q' parameter is not supported, the L<Math::Int64|Math::Int64> module is required
 
 =head1 INCOMPATIBILITIES
 
@@ -3137,6 +3379,8 @@ None reported
 =head1 BUGS AND LIMITATIONS
 
 On Windows platforms, the Olson TZ database is usually unavailable.  In an attempt to provide a workable alternative, the Windows Registry is interrogated and translated to allow Olson time zones (such as Australia/Melbourne) to be used on Windows nodes.  Therefore, the use of Time::Zone::Olson should be cross-platform compatible, but the actual results may be different, depending on the compatibility of the Windows Registry time zones and the Olson TZ database.
+
+For perl versions less than 5.10, support for TZ environment variable parsing is not complete.  It should cover all existing cases in the Olson time zone database though.
 
 Please report any bugs or feature requests to C<bug-time-zone-olson at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Time-Zone-Olson>.  I will be notified, and then you'll

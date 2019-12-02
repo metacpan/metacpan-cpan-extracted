@@ -65,7 +65,8 @@ L<Chj::noTEST>
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -84,7 +85,7 @@ use Chj::singlequote;
 # get the style
 sub run_tests_style { # "old" or "tap"
     if (my $rt= $ENV{RUN_TESTS}) {
-        ($rt=~ /old/i ? "old" :
+        ($rt=~ /(old|pod_snippets)/i ? "old" :
          #$rt=~ /(new|tap)/i ? "tap" :
          "tap")
     } else {
@@ -137,11 +138,14 @@ sub import {
             if (eval $code) {
                 # ok
             } else {
-                if ($ENV{RUN_TESTS}) {
-                    #carp "RUN_TESTS is set and we failed to $smallcode";
-                    require Test::More;
-                    Test::More::plan (skip_all=> "failed to $smallcode");
-                    exit 1; # necessary?
+                if (my $rt= $ENV{RUN_TESTS}) {
+                    if ($rt=~ /pod_snippets/i) {
+                        die "TEST use<$module> failed: $smallcode";
+                    } else {
+                        require Test::More;
+                        Test::More::plan (skip_all=> "could not $smallcode");
+                        exit 1; # necessary?
+                    }
                 } else {
                     die $@
                 }
@@ -238,7 +242,7 @@ package Chj::TEST::Test::Builder {
 }
 
 
-use FP::DumperEqual;
+use FP::Equal qw(relaxedequal);
 use FP::Show;
 
 sub eval_test ($$) {
@@ -275,8 +279,7 @@ sub eval_test ($$) {
 
     my $location= "at $filename line $line";
     my $nicelocation= "line $line";
-    if (! $maybe_e and
-        dumperequal($got, $res) or dumperequal_utf8($got, $res)) {
+    if (! $maybe_e and relaxedequal($got, $res)) {
         style_switch +{
             old=> sub {
                 print "ok\n";
@@ -310,7 +313,11 @@ sub eval_test ($$) {
                 # *remains* blessed!
                 local $Chj::TEST::Test::Builder::fake_caller=
                     [$package, $filename, $line];
-                $tb->ok( 0, $nicelocation);
+                #$tb->ok( 0, $nicelocation);
+                # On some systems (Test::Builder versions?), the above
+                # hackery doesn't work (sigh, move to Test2::*?), thus
+                # provide the full location info anyway:
+                $tb->ok( 0, $location);
 
                 if (defined $maybe_e) {
                     diag("Exception: $$maybe_e[0]");
@@ -421,7 +428,21 @@ sub run_tests_ {
         delete $$args{no};
     for (sort keys %$args) { warn "run_tests_: unknown argument '$_'" }
 
+    local $run_tests_style //= run_tests_style;
+
     local $|= 1;
+
+    style_switch +{
+        old=> sub {
+            print "==== run_tests in $run_tests_style style ====\n";
+        },
+        tap=> sub {
+            # if run_tests is called from perhaps_run_tests this was
+            # already done but can't count on that:
+            require Test::More;
+            import Test::More;
+        },
+    };
 
     my $stat= bless {success=>0, fail=>0}, "Chj::TEST::Result";
 
@@ -455,21 +476,8 @@ sub run_tests_ {
 
 
 sub run_tests {
-    local $run_tests_style //= run_tests_style;
     my $packages= [@_];
-    style_switch +{
-        old=> sub {
-            print "==== run_tests in $run_tests_style style ====\n";
-            run_tests_ packages=> $packages;
-        },
-        tap=> sub {
-            # if run_tests is called from perhaps_run_tests this was
-            # already done but can't count on that:
-            require Test::More;
-            import Test::More;
-            run_tests_ packages=> $packages;
-        },
-    };
+    run_tests_ packages=> $packages;
 }
 
 # run tests for test suite:

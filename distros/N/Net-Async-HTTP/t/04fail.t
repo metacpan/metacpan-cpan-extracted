@@ -28,7 +28,7 @@ local *IO::Async::Handle::connect = sub {
    ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
    $self->set_handle( $selfsock );
 
-   return Future->new->done( $self );
+   return Future->done( $self );
 };
 
 # fail_on_error false
@@ -61,9 +61,8 @@ local *IO::Async::Handle::connect = sub {
       "Not Found"
    );
 
-   wait_for { $future->is_ready };
+   my $response = wait_for_future( $future )->get;
 
-   my $response = $future->get;
    isa_ok( $response, "HTTP::Response", '$future->get for fail_on_error false' );
 
    is( $response->code, 404, '$response->code for fail_on_error false' );
@@ -104,7 +103,7 @@ local *IO::Async::Handle::connect = sub {
       "Not Found"
    );
 
-   wait_for { $future->is_ready };
+   wait_for_future( $future );
 
    is( scalar $future->failure, "404 Not Found", '$future->failure for fail_on_error true' );
    my ( undef, undef, $response_f, $request_f ) = $future->failure;
@@ -132,8 +131,7 @@ local *IO::Async::Handle::connect = sub {
       "Here I am"
    );
 
-   wait_for { $future->is_ready };
-   my $response = $future->get;
+   my $response = wait_for_future( $future )->get;
 
    is( $response->code, 200, '$response->code for non-fail' );
 }

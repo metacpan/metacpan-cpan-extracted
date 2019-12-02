@@ -5,31 +5,42 @@ use Test::More;
 use HTTP::Response;
 use HTTP::Request;
 use Digest::MD5;
+use File::Temp 'tempdir';
 use LWP::UserAgent::Cached;
-
-eval {
-	require File::Temp;
-	File::Temp->import('tempdir');
-};
-if ($@) {
-	plan skip_all => 'File::Temp not installed';
-}
-
-eval {
-	require Test::Mock::LWP::Dispatch;
-};
-if ($@) {
-	plan skip_all => 'Test::Mock::LWP::Dispatch not installed';
-}
 
 my $cache_dir = eval {
 	tempdir(CLEANUP => 1)
 };
 
-
 unless ($cache_dir) {
 	plan skip_all => "Сan't create temp dir";
 }
+
+my %MAP;
+no warnings ('redefine', 'once');
+*LWP::UserAgent::send_request = sub {
+	my ($self, $req) = @_;
+	
+	if (my $resp = $MAP{$req->uri}) {
+		$resp->request($req);
+		return $resp;
+	}
+	
+	return HTTP::Response->new(404);
+};
+
+*LWP::UserAgent::map = sub {
+	my ($self, $uri, $resp) = @_;
+	
+	$MAP{$uri} = $resp;
+	return $uri;
+};
+
+*LWP::UserAgent::unmap = sub {
+	my ($self, $uri) = @_;
+	delete $MAP{$uri};
+};
+use warnings ('redefine', 'once');
 
 my $ua = LWP::UserAgent::Cached->new(cache_dir => $cache_dir, cookie_jar => {});
 
@@ -44,7 +55,7 @@ is($ua->get('http://www.google.com/')->code, 200, 'Cached 200 ok response');
 my $response = HTTP::Response->new(301, 'Moved Permanently', [Location => 'http://www.yahoo.com/']);
 $response->request(HTTP::Request->new(GET => 'http://yahoo.com'));
 $mid = $ua->map('http://yahoo.com', $response);
-my $y_mid = $ua->map('http://www.yahoo.com/', HTTP::Response->new(200, 'Ok', ['Set-Cookie' => 'lwp=true; cached=yes'], 'This is a test'));
+my $y_mid = $ua->map('http://www.yahoo.com/', HTTP::Response->new(200, 'Ok', ['Set-Cookie' => 'lwp=true', 'Set-Cookie' => 'cached=yes'], 'This is a test'));
 $ua->get('http://yahoo.com'); # make cache
 is(scalar($ua->last_cached), 2, '@last_cached length = 2 on redirect');
 is(scalar($ua->last_used_cache), 2, '@last_used_cache length = 2 on redirect');
@@ -53,9 +64,18 @@ $ua->cookie_jar->clear();
 my $resp = $ua->get('http://yahoo.com');
 is($resp->code, 200, 'Cached response with redirect');
 ok(index($resp->content, 'This is a test')!=-1, 'Cached response content') or diag "Content: ", $resp->content;
-ok($ua->cookie_jar->as_string =~ /^(?=.*?lwp=true).*?cached=yes/, 'Cookies from the cache') or diag "Cookies: ", $ua->cookie_jar->as_string;
+my @cookies;
+$ua->cookie_jar->scan(sub { my ($ver, $key, $val) = @_; push @cookies, "$key=$val" });
+is(@cookies, 2, 'Got correct cookies count from the cache');
+@cookies = sort @cookies;
+is($cookies[0], 'cached=yes', 'Got correct first cookie');
+is($cookies[1], 'lwp=true', 'Got correct second cookie');
 is(scalar($ua->last_cached), 0, '@last_cached length = 0 when get from cache');
 is(scalar($ua->last_used_cache), 2, '@last_used_cache length = 2 when get from cache');
+# cookies bug (#gh5)
+$resp = $ua->get('http://www.yahoo.com/');
+is(() = $resp->request->header('Cookie') =~ /lwp=true/g, 1, 'correct cookie 1 sent in the request');
+is(() = $resp->request->header('Cookie') =~ /cached=yes/g, 1, 'correct cookie 2 sent in the request');
 
 # binary content test
 my $content = "\0\1\2\3\4\5\6";
@@ -69,8 +89,6 @@ $mid = $ua->map('http://mail.com/bin2', HTTP::Response->new(200, 'OK', [], $cont
 $ua->get('http://mail.com/bin2');
 $ua->unmap($mid);
 is($ua->get('http://mail.com/bin2')->decoded_content, $content, "got right binary content with trailing new line");
-
-
 
 # nocache_if test
 $ua->nocache_if(sub {

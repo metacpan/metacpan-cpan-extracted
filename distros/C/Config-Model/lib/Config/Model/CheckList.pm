@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::CheckList 2.136;
+package Config::Model::CheckList 2.137;
 
 use Mouse;
 use 5.010;
@@ -104,7 +104,9 @@ sub set_properties {
     my $self = shift;
 
     # cleanup all parameters that are handled by warp
-    map( delete $self->{$_}, @allowed_warp_params );
+    for (@allowed_warp_params) {
+        delete $self->{$_},
+    }
 
     if ( $logger->is_trace() ) {
         my %h = @_;
@@ -116,7 +118,9 @@ sub set_properties {
     my %args = ( %{ $self->{backup} }, @_ );
 
     # these are handled by Node or Warper
-    map { delete $args{$_} } qw/level/;
+    for (qw/level/) {
+        delete $args{$_}
+    }
 
     $self->{ordered} = delete $args{ordered} || 0;
 
@@ -165,7 +169,9 @@ sub setup_choice {
     # store all enum values in a hash. This way, checking
     # whether a value is present in the enum set is easier
     delete $self->{choice_hash} if defined $self->{choice_hash};
-    map { $self->{choice_hash}{$_} = 1; } @choice;
+    for (@choice) {
+        $self->{choice_hash}{$_} = 1;
+    }
 
     $self->{choice} = \@choice;
 
@@ -265,7 +271,9 @@ sub check {
     }
 
     my @changed;
-    map { push @changed, $_ if $self->_store( $_, 1, $check ) } @list;
+    for (@list) {
+        push @changed, $_ if $self->_store( $_, 1, $check )
+    }
 
     $self->notify_change( note => "check @changed" )
         unless $self->instance->initial_load;
@@ -377,7 +385,9 @@ sub uncheck {
     }
 
     my @changed;
-    map { push @changed, $_ if $self->_store( $_, 0, $check ) } @$list;
+    for ( @$list ) {
+        push @changed, $_ if $self->_store( $_, 0, $check )
+    }
 
     $self->notify_change( note => "uncheck @changed" )
         unless $self->instance->initial_load;
@@ -389,8 +399,18 @@ sub has_data {
     return scalar @set;
 }
 
-my %accept_mode =
-    map { ( $_ => 1 ) } qw/custom standard preset default layered upstream_default user/;
+{
+    my %accept_mode = map { ( $_ => 1 ) }
+        qw/custom standard preset default layered upstream_default non_upstream_default user/;
+
+    sub is_bad_mode {
+        my ($self, $mode) = @_;
+        if ( $mode and not defined $accept_mode{$mode} ) {
+            my $good_ones = join( ' or ', sort keys %accept_mode );
+            return "expected $good_ones as mode parameter, not $mode";
+        }
+    }
+}
 
 sub is_checked {
     my $self   = shift;
@@ -403,9 +423,8 @@ sub is_checked {
 
     if ($ok) {
 
-        if ( $mode and not defined $accept_mode{$mode} ) {
-            croak "is_checked: expected ", join( ' or ', keys %accept_mode ),
-                "parameter, not $mode";
+        if ( my $err = $self->is_bad_mode($mode) ) {
+            croak "is_checked: $err";
         }
 
         my $dat    = $self->{data}{$choice};
@@ -414,6 +433,7 @@ sub is_checked {
         my $ud     = $self->{upstream_default_data}{$choice};
         my $lay    = $self->{layered}{$choice};
         my $std_v  = $pre // $def // 0;
+        my $non_up_def = $dat // $pre // $lay // $def // 0;
         my $user_v = $dat // $pre // $lay // $def // $ud // 0;
 
         my $result =
@@ -423,6 +443,7 @@ sub is_checked {
             : $mode eq 'upstream_default' ? $ud
             : $mode eq 'default'          ? $def
             : $mode eq 'standard'         ? $std_v
+            : $mode eq 'non_upstream_default' ? $ud
             : $mode eq 'user'             ? $user_v
             :                               $dat // $std_v;
 
@@ -492,7 +513,10 @@ sub get_help {
 
 sub clear {
     my $self = shift;
-    map { $self->clear_item($_) } $self->get_choice;    # also triggers notify changes
+    # also triggers notify changes
+    for ($self->get_choice) {
+        $self->clear_item($_)
+    }
 }
 
 sub clear_values { goto &clear; }
@@ -515,10 +539,8 @@ sub get_checked_list_as_hash {
         carp $self->location, " warning: deprecated mode parameter: $k, ", "expected $mode\n";
     }
 
-    if ( $mode and not defined $accept_mode{$mode} ) {
-        croak "get_checked_list_as_hash: expected ",
-            join( ' or ', keys %accept_mode ),
-            " parameter, not $mode";
+    if ( my $err = $self->is_bad_mode($mode)) {
+        croak "get_checked_list_as_hash: $err";
     }
 
     my $dat = $self->{data};
@@ -785,7 +807,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 
@@ -905,7 +927,7 @@ For example:
 
 =item *
 
-A simple check list with help:
+A check list with help:
 
  choice_list => {
      type   => 'check_list',
@@ -1107,7 +1129,8 @@ Reset an element of the checklist.
 
 =head2 get_checked_list_as_hash
 
-Parameters: C<< ( [ custom | preset | standard | default ] ) >>
+Accept a parameter (refered below as C<mode> parameter) similar to
+C<mode> in L<Config::Model::Value/fetch>.
 
 Returns a hash (or a hash ref) of all items. The boolean value is the
 value of the hash.
@@ -1119,7 +1142,8 @@ Example:
 By default, this method returns all items set by the user, or
 items set in preset mode or checked by default.
 
-With a parameter, this method returns either:
+With a parameter set to a value from the list below, this method
+returns:
 
 =over
 
@@ -1154,7 +1178,11 @@ model)
 =item user
 
 The set that is active in the application. (ie. set by user or
-by layered data or preset or default)
+by layered data or preset or default or upstream_default)
+
+=item non_upstream_default
+
+The choice set by user or by layered data or preset or default.
 
 =back
 
@@ -1266,23 +1294,36 @@ Example:
  $cl->load_data( { A => 1, B => 1 } )
  $cl->load_data( data => { A => 1, B => 1 }, check => 'yes')
 
+=head2 is_bad_mode
+
+Accept a mode parameter. This function checks if the mode is accepted
+by L</fetch> method. Returns an error message if not. For instance:
+
+ if (my $err = $val->is_bad_mode('foo')) {
+    croak "my_function: $err";
+ }
+
+This method is intented as a helper ti avoid duplicating the list of
+accepted modes for functions that want to wrap fetch methods (like
+L<Config::Model::Dumper> or L<Config::Model::DumpAsData>)
+
 =head1 Ordered checklist methods
 
 All the methods below are valid only for ordered checklists.
 
-=head1 swap
+=head2 swap
 
 Parameters: C<< ( choice_a, choice_b) >>
 
 Swap the 2 given choice in the list. Both choice must be already set.
 
-=head1 move_up
+=head2 move_up
 
 Parameters: C<< ( choice ) >>
 
 Move the choice up in the checklist.
 
-=head1 move_down
+=head2 move_down
 
 Parameters: C<< ( choice ) >>
 

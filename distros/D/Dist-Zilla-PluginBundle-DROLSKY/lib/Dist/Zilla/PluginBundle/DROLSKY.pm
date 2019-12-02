@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.02';
+our $VERSION = '1.05';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
@@ -236,6 +236,16 @@ has _files_to_copy_from_build => (
     builder  => '_build_files_to_copy_from_build',
 );
 
+has _running_in_ci => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => sub {
+
+        # AGENT_ID is Azure Pipelines.
+        return $ENV{TRAVIS} || $ENV{AGENT_ID} ? 1 : 0;
+    },
+);
+
 my @array_params = grep { !/^_/ } map { $_->name }
     grep {
            $_->has_type_constraint
@@ -426,9 +436,9 @@ sub _build_files_to_copy_from_build {
 }
 
 sub _github_plugins {
-    return if $ENV{TRAVIS};
-
     my $self = shift;
+
+    return if $self->_running_in_ci;
 
     return (
         [
@@ -850,7 +860,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 1.02
+version 1.05
 
 =head1 SYNOPSIS
 

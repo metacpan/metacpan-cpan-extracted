@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2019 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -13,12 +13,18 @@ FunctionalPerl::Htmlgen::Htmlparse
 
 =head1 SYNOPSIS
 
+    use FunctionalPerl::Htmlgen::Htmlparse qw(htmlparse);
+    my $b= htmlparse '<p>hi</p> <p>there!', 'body';
+    is ref($b), 'PXML::_::XHTML';
+    is $b->string, '<body><p>hi</p><p>there!</p></body>';
+
 =head1 DESCRIPTION
 
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -32,12 +38,13 @@ package FunctionalPerl::Htmlgen::Htmlparse;
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 use Function::Parameters qw(:strict);
 use Sub::Call::Tail;
-
+use FP::Docstring;
 use HTML::TreeBuilder;
-use PXML::Element;
+#use PXML::Element;
+use PXML::XHTML;
 use Chj::TEST;
 
-fun htmlparse_raw ($htmlstr,$whichtag) {
+fun htmlparse_raw ($htmlstr, $whichtag) {
     my $t= HTML::TreeBuilder->new;
     $t->ignore_unknown(0); # allow <with_toc> elements
     $t->parse_content ($htmlstr);
@@ -47,8 +54,9 @@ fun htmlparse_raw ($htmlstr,$whichtag) {
 }
 
 
-# convert it to PXML
 fun htmlmap ($e) {
+    __  '(HTML::Element) -> PXML::_::XHTML '.
+        '-- convert output from HTML::TreeBuilder to PXML::XHTML (PXML::Element)';
     my $name= lc($e->tag);
     my $atts={};
     for ($e->all_external_attr_names) {
@@ -56,7 +64,10 @@ fun htmlmap ($e) {
         die "att name '$_'" unless /^\w+\z/s;
         $$atts{lc $_}= $e->attr($_);
     }
-    PXML::Element->new
+    # XX unsafe, if we don't check that a corresponding constructor
+    # exists! Could fall back to just PXML::Element (which
+    # PXML::_::XHTML is):
+    PXML::_::XHTML->new
         ($name,
          $atts,
          [
@@ -73,8 +84,10 @@ fun htmlmap ($e) {
          ]);
 }
 
-# parse HTML string to PXML
-fun htmlparse ($str,$whichtag) {
+fun htmlparse ($str, $whichtag) {
+    __  '($str,$whichtag) -> PXML::Element '.
+        '-- parse HTML string to PXML; $whichtag is passed to'.
+        ' find_by_tag_name from HTML::TreeBuilder';
     htmlmap (htmlparse_raw ($str,$whichtag))
 }
 

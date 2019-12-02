@@ -4,12 +4,12 @@ author:
   - 'Ryan Thompson <rjt@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  List::Util: '0'
-  Test::Exception: '0'
-  Test::MockModule: '0'
-  Test::More: '0'
-  Test::Output: '0'
-  Test::Warnings: '0'
+  List::Util: '1.33'
+  Test::Exception: '0.43'
+  Test::MockModule: '0.17'
+  Test::More: '1.3'
+  Test::Output: '1.03'
+  Test::Warnings: '0.026'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -24,15 +24,15 @@ no_index:
     - t
     - inc
 requires:
-  IO::Select: '0'
-  IO::Socket::IP: '0'
+  IO::Select: '1.17'
+  IO::Socket::IP: '0.38'
   Mouse: '0'
   Mouse::Util::TypeConstraints: '0'
-  Term::ANSIColor: '0'
+  Term::ANSIColor: '3.01'
   perl: '5.008'
 resources:
   X_metaspec:
     version: 2
   repository: https://github.com/rjt-pl/Net-RCON-Minecraft.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

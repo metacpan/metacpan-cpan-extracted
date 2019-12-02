@@ -6,9 +6,9 @@ Date::Manip::Offset::off027;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Aug 29 14:13:11 EDT 2019
-#    Data version: tzdata2019b
-#    Code version: tzcode2019b
+#    Generated on: Mon Dec  2 09:46:53 EST 2019
+#    Data version: tzdata2019c
+#    Code version: tzcode2019c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.78';
+$VERSION='6.79';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);

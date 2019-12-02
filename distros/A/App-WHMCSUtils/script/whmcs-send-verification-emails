@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/WHMCSUtils/send_verification_emails
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-09-19'; # DATE
+our $DATE = '2019-11-29'; # DATE
 our $DIST = 'App-WHMCSUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ whmcs-send-verification-emails - Send verification emails for clients who have n
 
 =head1 VERSION
 
-This document describes version 0.009 of whmcs-send-verification-emails (from Perl distribution App-WHMCSUtils), released on 2019-09-19.
+This document describes version 0.011 of whmcs-send-verification-emails (from Perl distribution App-WHMCSUtils), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -117,6 +117,8 @@ setting (`Email` setting in the configuration table).
 Hook is expected to return the sender email.
 
 
+=item B<--include-client-ids-from>=I<s>
+
 =item B<--limit>=I<s>
 
 Only process this many clients then stop.
@@ -130,6 +132,10 @@ See C<--action>.
 =item B<--mech-user-agent>=I<s>
 
 =item B<--no-random>
+
+=item B<--url-json>=I<s>
+
+See C<--url>.
 
 =item B<--url>=I<s>*
 
@@ -174,7 +180,13 @@ Do not read environment for default options.
 
 =item B<--exclude-active>
 
-=item B<--include-client-ids>=I<s>
+=item B<--include-client-ids-json>=I<s>
+
+See C<--include-client-ids>.
+
+=item B<--include-client-ids>=I<s@>
+
+Can be specified multiple times.
 
 =item B<--include-inactive>
 
@@ -255,6 +267,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
 Run in simulation mode (also via DRY_RUN=1).
 
+Default value:
+
+ ""
+
 =item B<--help>, B<-h>, B<-?>
 
 Display help message and exit.
@@ -329,6 +345,7 @@ List of available configuration parameters:
  hook_set_sender_email (see --hook-set-sender-email)
  include_active (see --exclude-active)
  include_client_ids (see --include-client-ids)
+ include_client_ids_from (see --include-client-ids-from)
  include_inactive (see --include-inactive)
  limit (see --limit)
  log_level (see --log-level)

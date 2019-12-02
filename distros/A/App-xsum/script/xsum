@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/xsum/xsum
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-09-12'; # DATE
+our $DATE = '2019-11-29'; # DATE
 our $DIST = 'App-xsum'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ xsum - Compute and check file checksums/digests (using various algorithms)
 
 =head1 VERSION
 
-This document describes version 0.007 of xsum (from Perl distribution App-xsum), released on 2019-09-12.
+This document describes version 0.009 of xsum (from Perl distribution App-xsum), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -126,19 +126,27 @@ Read checksum from files and check them.
 
 Supply checksum(s) (JSON-encoded).
 
-=item B<--digest-args>=I<s>, B<-A>
+See C<--file>.
+
+=item B<--digest-args-json>=I<s>, B<-A>
+
+See C<--digest-args>.
+
+=item B<--digest-args>=I<s@>
 
 If you use `Digest` as the algorithm, you can pass arguments for the <pm:Digest>
 module here.
 
 
-=item B<--file>=I<s@>*
+Can be specified multiple times.
+
+=item B<--file>=I<s@>
+
+Supply checksum(s).
 
 Can be specified multiple times.
 
 =item B<--files-json>=I<s>
-
-See C<--file>.
 
 =item B<--tag>
 

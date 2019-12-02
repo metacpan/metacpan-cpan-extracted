@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
 
 package Net::Async::HTTP::Server;
 
@@ -10,7 +10,7 @@ use warnings;
 use base qw( IO::Async::Listener );
 IO::Async::Listener->VERSION( '0.61' );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp;
 
@@ -62,6 +62,15 @@ an HTTP request is received, allowing the program to respond to it.
 For accepting HTTP connections via L<PSGI> and L<Plack>, see also
 L<Plack::Handler::Net::Async::HTTP::Server>.
 
+=head2 Prometheus Metrics
+
+If L<Net::Prometheus> at least version C<0.07_001> is also loaded into the
+running perl instance (i.e. not just installed and available, but actually
+loaded) then some integration code will be run which exports basic metrics on
+received requests and send responses. This is largely experimental and
+undocumented for now. It is implemented in
+C<Net::Async::HTTP::Server::PrometheusCollector>.
+
 =cut
 
 =head1 EVENTS
@@ -95,6 +104,13 @@ Specifically, see the L<IO::Async::Listener/listen> method on how to actually
 bind the server to a listening socket to make it accept requests.
 
 =cut
+
+my $METRICS;
+
+push @Net::Prometheus::MAKE_COLLECTOR, sub {
+   require Net::Async::HTTP::Server::PrometheusCollector;
+   return $METRICS //= Net::Async::HTTP::Server::PrometheusCollector->new;
+};
 
 sub _init
 {
@@ -170,7 +186,17 @@ sub _received_request
    my $self = shift;
    my ( $request ) = @_;
 
+   $METRICS->observe_request( $request ) if $METRICS;
+
    $self->invoke_event( on_request => $request );
+}
+
+sub _done_request
+{
+   my $self = shift;
+   my ( $request ) = @_;
+
+   $METRICS->observe_response( $request ) if $METRICS;
 }
 
 =head1 TODO

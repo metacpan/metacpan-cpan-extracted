@@ -1,0 +1,50 @@
+---
+ballots:
+- count: 3
+  votes:
+    BURGERKING: 2
+    CHICKFILA: 1
+    KFC: 1
+    MCDONALDS: 3
+    POPEYES: 1
+    QUICK: 2
+    TACOBELL: 1
+    WENDYS: 3
+- count: 1
+  votes:
+    CHICKFILA: 1
+    KFC: 2
+    POPEYES: 1
+    TACOBELL: 3
+- count: 2
+  votes:
+    CHICKFILA: 3
+    INNOUT: 2
+- count: 2
+  votes:
+    BURGERKING: 1
+    INNOUT: 3
+    MCDONALDS: 1
+- count: 1
+  votes:
+    CARLS: 2
+- count: 6
+  votes:
+    BURGERKING: 1
+    CARLS: 1
+    FIVEGUYS: 2
+    INNOUT: 3
+choices:
+- FIVEGUYS
+- MCDONALDS
+- WIMPY
+- WENDYS
+- QUICK
+- BURGERKING
+- INNOUT
+- CARLS
+- KFC
+- TACOBELL
+- CHICKFILA
+- POPEYES
+depth: 3

@@ -1,7 +1,7 @@
 use 5.014;
 
 package Mojo::UserAgent::Mockable;
-$Mojo::UserAgent::Mockable::VERSION = '1.56';
+$Mojo::UserAgent::Mockable::VERSION = '1.57';
 use warnings::register;
 
 use Carp;
@@ -268,7 +268,7 @@ Mojo::UserAgent::Mockable - A Mojo User-Agent that can record and play back requ
 
 =head1 VERSION
 
-version 1.56
+version 1.57
 
 =head1 SYNOPSIS
 
@@ -598,7 +598,7 @@ Kit Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Kit Peters.
+This software is copyright (c) 2019 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

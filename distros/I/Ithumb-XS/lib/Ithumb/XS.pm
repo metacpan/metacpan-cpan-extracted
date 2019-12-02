@@ -17,7 +17,7 @@ Peter P. Neuromantic <p.brovchenko@protonmail.com>
 
 =cut
 
-use 5.020001;
+use 5.024000;
 use strict;
 use warnings;
 
@@ -25,9 +25,9 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = qw( create_thumbnail );
+our @EXPORT_OK = qw( convert_image );
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.3.0';
 
 require XSLoader;
 XSLoader::load('Ithumb::XS', $VERSION);
@@ -40,11 +40,11 @@ __END__
 
   use Ithumb::XS ();
 
-  Ithumb::XS::create_thumbnail({
+  Ithumb::XS::convert_image({
       width     => 800,
       height    => 600,
-      src_image => 'source_image.jpg',
-      dst_image => 'destination_result_image.jpg'
+      src_image => 'src_image.jpg',
+      dst_image => 'dst_image.jpg'
   });
 
 OO-interface:
@@ -55,13 +55,13 @@ OO-interface:
   $ithumb->convert({
       width     => 800,
       height    => 600,
-      src_image => 'source_image.jpg',
-      dst_image => 'destination_result_image.jpg'
+      src_image => 'src_image.jpg',
+      dst_image => 'dst_image.jpg'
   });
 
 =head1 METHODS
 
-=head2 create_thumbnail($);
+=head2 convert_image($);
 
 Creates a small copy (with cropping) of the image.
 
@@ -74,7 +74,7 @@ Creates a small copy (with cropping) of the image.
 =item $_[0]->{src_image} - path to the source image
 
 =item $_[0]->{dst_image} - path to the destionation result image
-  
+
 =back
 
 =head2 convert($);
@@ -90,7 +90,7 @@ Creates a small copy (with cropping) of the image for OO-interface.
 =item $_[0]->{src_image} - path to the source image
 
 =item $_[0]->{dst_image} - path to the destionation result image
-  
+
 =back
 
 =head1 LICENSE

@@ -1,5 +1,5 @@
 ---
-abstract: 'FunctionalPerl - functional programming on Perl'
+abstract: 'FunctionalPerl - functional programming in Perl'
 author:
   - 'Christian Jaeger <copying@christianjaeger.ch>'
 build_requires:
@@ -42,8 +42,10 @@ recommends:
 requires:
   Capture::Tiny: '0'
   Digest: '0'
+  File::Path: '0'
   Getopt::Long: '0'
   Import::Into: '0'
+  Math::BigInt: '0'
   NEXT: '0'
   Scalar::Util: '0'
   Sub::Util: '0'
@@ -53,10 +55,10 @@ requires:
   autobox: '0'
   base: '0'
   overload: '0'
-  perl: '5.014002'
+  perl: '5.016004'
   utf8: '0'
   warnings: '0'
 resources:
   repository: https://github.com/pflanze/functional-perl.git
-version: v0.72.11
+version: v0.72.18
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

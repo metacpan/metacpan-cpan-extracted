@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.107';
+our $VERSION = '0.108';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf
@@ -138,8 +138,9 @@ sub _valid_options {
         alignment           => '[ 0 1 2 ]',
         color               => '[ 0 1 2 ]',
         layout              => '[ 0 1 2 3 ]',
-        lf                  => 'ARRAY',
         mark                => 'ARRAY',
+        tabs_info           => 'ARRAY',
+        tabs_prompt         => 'ARRAY',
         busy_string         => 'Str',
         info                => 'Str',
         init_dir            => 'Str',
@@ -203,7 +204,8 @@ sub _defaults {
         #filter        => undef,
         keep_chosen    => 0,
         layout         => 1,
-        #lf            => undef,
+        #tabs_info     => undef,
+        #tabs_prompt   => undef,
         add_dir        => 'ADD_DIR',
         back           => 'BACK',
         show_files     => 'SHOW_FILES',
@@ -217,11 +219,11 @@ sub _defaults {
         reset          => 'reset',
         show_hidden    => 1,
         small_first    => 0,
-        cs_begin     => '',
-        cs_end       => '',
-        #cs_label    => undef,
-        cs_separator => ', ',
-        thousands_separator         => ',',
+        cs_begin       => '',
+        cs_end         => '',
+        #cs_label      => undef,
+        cs_separator   => ', ',
+        thousands_separator => ',',
 
     };
 };
@@ -229,7 +231,7 @@ sub _defaults {
 
 sub _routine_options {
     my ( $caller ) = @_;
-    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color lf cs_label
+    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color tabs_info tabs_prompt cs_label
 
                   dir name justify up thsd_sep sofar_begin sofar_end sofar_separator
                   current_selection_label current_selection_begin current_selection_end current_selection_separator ) );
@@ -245,7 +247,7 @@ sub _routine_options {
         $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden parent_dir decoded show_files filter ) ];
     }
     elsif ( $caller eq 'choose_a_number' ) {
-        $options = [ @every, qw( small_first reset thousands_separator) ];
+        $options = [ @every, qw( small_first reset thousands_separator ) ];
     }
     elsif ( $caller eq 'choose_a_subset' ) {
         $options = [ @every, qw( layout order alignment enchanted keep_chosen index prefix all_by_default cs_begin cs_end cs_separator mark busy_string ) ];
@@ -629,16 +631,9 @@ sub choose_a_number {
         $digits = 7;
     }
     $self->__prepare_opt( $opt );
-    my $tab        = '  -  ';
+    my $tab   = '  -  ';
     my $tab_w = print_columns( $tab );
-    my $sep_w;
-    if ( $self->{color} ) {
-        ( my $tmp_sep = $self->{thousands_separator} ) =~ s/\e\[[\d;]*m//msg;
-        $sep_w = print_columns( $tmp_sep );
-    }
-    else {
-        $sep_w = print_columns( $self->{thousands_separator} );
-    }
+    my $sep_w = print_columns_ext( $self->{thousands_separator}, $self->{color} );
     my $longest = $digits + int( ( $digits - 1 ) / 3 ) * $sep_w;
     my @choices_range = ();
     for my $di ( 0 .. $digits - 1 ) {
@@ -646,29 +641,12 @@ sub choose_a_number {
         $begin = 0 if $di == 0;
         $begin = insert_sep( $begin, $self->{thousands_separator} );
         ( my $end = $begin ) =~ s/^[01]/9/;
-        unshift @choices_range, sprintf " %*s%s%*s", $longest, $begin, $tab, $longest, $end;
+        unshift @choices_range,  unicode_sprintf( $begin, $longest, { right_justify => 1, color => $self->{color} } )
+                               . $tab
+                               . unicode_sprintf( $end, $longest, { right_justify => 1, color => $self->{color} } );
     }
-    my ( $back_w, $confirm_w );
-    if ( $self->{color} ) {
-        ( my $tmp_back    = $self->{back}    ) =~ s/\e\[[\d;]*m//msg;
-        ( my $tmp_confirm = $self->{confirm} ) =~ s/\e\[[\d;]*m//msg;
-        $back_w    = print_columns( $tmp_back    );
-        $confirm_w = print_columns( $tmp_confirm );
-    }
-    else {
-        $back_w    = print_columns( $self->{back}    );
-        $confirm_w = print_columns( $self->{confirm} );
-    }
-    my $back_tmp = $self->{back};
-    my $space_count_back = $longest * 2 + $tab_w + 1 - $back_w;
-    if ( $space_count_back > 0 ) {
-        $back_tmp .= ' ' x $space_count_back;
-    }
-    my $confirm_tmp = $self->{confirm};
-    my $space_count_confirm = $longest * 2 + $tab_w + 1 - $confirm_w;
-    if ( $space_count_confirm > 0 ) {
-        $confirm_tmp .= ' ' x $space_count_confirm;
-    }
+    my $back_tmp    = unicode_sprintf( $self->{back},    $longest * 2 + $tab_w + 1, { color => $self->{color} } );
+    my $confirm_tmp = unicode_sprintf( $self->{confirm}, $longest * 2 + $tab_w + 1, { color => $self->{color} } );
     if ( print_columns( "$choices_range[0]" ) > get_term_width() ) {
         @choices_range = ();
         for my $di ( 0 .. $digits - 1 ) {
@@ -704,7 +682,7 @@ sub choose_a_number {
             $self->{small_first} ? [ @pre, reverse @choices_range ] : [ @pre, @choices_range ],
             { info => $self->{info}, prompt => $lines, layout => 3, alignment => 1, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, color => $self->{color},
-              lf => $self->{lf}, undef => $back_tmp }
+              tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt}, undef => $back_tmp }
         );
         if ( ! defined $range ) {
             if ( defined $result ) {
@@ -776,7 +754,6 @@ sub choose_a_subset {
         if ( defined $self->{cs_label} ) {
             $sofar .= $self->{cs_label};
         }
-        #if ( @{$available}[@$new_idx] ) {
         if ( @$new_idx ) {
             $sofar .= $self->{cs_begin} . join( $self->{cs_separator}, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] ) . $self->{cs_end};
         }
@@ -856,13 +833,7 @@ sub settings_menu {
     my $name_w  = {};
     for my $sub ( @$menu ) {
         my ( $key, $name ) = @$sub;
-        if ( $self->{color} ) {
-            ( my $tmp_name = $name ) =~ s/\e\[[\d;]*m//msg;
-            $name_w->{$key} = print_columns( $tmp_name );
-        }
-        else {
-            $name_w->{$key} = print_columns( $name );
-        }
+        $name_w->{$key} = print_columns_ext( $name, $self->{color} );
         $longest      = $name_w->{$key} if $name_w->{$key} > $longest;
         $curr->{$key} = 0       if ! defined $curr->{$key};
         $new->{$key}  = $curr->{$key};
@@ -974,29 +945,41 @@ sub get_term_height {
 
 
 sub unicode_sprintf {
-    #my ( $unicode, $avail_width, $right_justify, $add_dots ) = @_;
-    my $colwidth = print_columns( $_[0] );
-    if ( $colwidth > $_[1] ) {
-        if ( $_[3] ) {
-            return cut_to_printwidth( $_[0], $_[1] - 3 ) . '...';
-        }
-        return cut_to_printwidth( $_[0], $_[1] );
+    my ( $unicode, $avail_width, $opt ) = @_;
+    if ( ! defined $opt ) {
+        $opt = {};
     }
-    elsif ( $colwidth < $_[1] ) {
-        if ( $_[2] ) {
-            return " " x ( $_[1] - $colwidth ) . $_[0];
+    my $colwidth = print_columns_ext( $unicode, $opt->{color} );
+    if ( $colwidth > $avail_width ) {
+        if ( $opt->{add_dots} ) {
+            return cut_to_printwidth( $unicode, $avail_width - 3 ) . '...';
+        }
+        return cut_to_printwidth( $unicode, $avail_width );
+    }
+    elsif ( $colwidth < $avail_width ) {
+        if ( $opt->{right_justify} ) {
+            return " " x ( $avail_width - $colwidth ) . $unicode;
         }
         else {
-            return $_[0] . " " x ( $_[1] - $colwidth );
+            return $unicode . " " x ( $avail_width - $colwidth );
         }
     }
     else {
-        return $_[0];
+        return $unicode;
     }
 }
 
 
-
+sub print_columns_ext {
+    #my ( $str, $color ) = @_;
+    if ( $_[1] ) {
+        ( my $tmp = $_[0] ) =~ s/\e\[[\d;]*m//msg;
+        return print_columns( $tmp );
+    }
+    else {
+        return print_columns( $_[0] );
+    }
+}
 
 
 
@@ -1015,7 +998,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.107
+Version 0.108
 
 =cut
 

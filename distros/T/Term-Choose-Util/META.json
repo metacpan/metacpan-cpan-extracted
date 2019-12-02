@@ -41,7 +41,7 @@
             "File::HomeDir" : "0",
             "File::Spec::Functions" : "0",
             "List::Util" : "0",
-            "Term::Choose" : "1.706",
+            "Term::Choose" : "1.707",
             "perl" : "5.008003",
             "strict" : "0",
             "warnings" : "0"
@@ -56,6 +56,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose-Util"
       }
    },
-   "version" : "0.107",
+   "version" : "0.108",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

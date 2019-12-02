@@ -1,3 +1,8 @@
+0.728   2019-10-17  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Simplify CLI scripts by turning off config/env reading.
+
+
 0.727   2019-09-09  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -1,7 +1,7 @@
 package Sah::Schema::cryptoexchange::currency_pair;
 
-our $DATE = '2019-10-24'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [str => {
     summary => 'Currency pair, e.g. LTC/USD',
@@ -20,7 +20,7 @@ Will be normalized to uppercase.
 _
     match => qr(\A\S+/\S+\z),
     #'x.completion' => 'cryptoexchange_currency_pair',
-    'x.perl.coerce_rules' => ['str_to_cryptoexchange_currency_pair'],
+    'x.perl.coerce_rules' => ['From_str::to_cryptoexchange_currency_pair'],
 }, {}];
 
 1;
@@ -38,7 +38,7 @@ Sah::Schema::cryptoexchange::currency_pair - Currency pair, e.g. LTC/USD
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::cryptoexchange::currency_pair (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-10-24.
+This document describes version 0.013 of Sah::Schema::cryptoexchange::currency_pair (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

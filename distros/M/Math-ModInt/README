@@ -1,4 +1,4 @@
-Math-ModInt version 0.011
+Math-ModInt version 0.012
 =========================
 
 Math::ModInt is a Perl class providing modular integer arithmetic
@@ -26,13 +26,13 @@ This distribution requires these other modules and libraries:
 
   perl version 5.6.0 or higher
   overload                             (usually bundled with perl)
+  Carp                                 (usually bundled with perl)
   Math::BigInt version 1.991 or higher (usually bundled with perl)
 
-COPYRIGHT AND LICENCE
+COPYRIGHT AND LICENSE
 
-Copyright (c) 2009-2015 by Martin Becker.  All rights reserved.
+Copyright (c) 2009-2019 by Martin Becker, Blaubeuren.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.6.0 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see LICENSE file).
 

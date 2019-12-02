@@ -1,8 +1,108 @@
-DESCRIPTION
+NAME
+    App::ZodiacUtils - CLI utilities related to zodiac
 
+VERSION
+    This document describes version 0.110 of App::ZodiacUtils (from Perl
+    distribution App-ZodiacUtils), released on 2019-11-29.
+
+DESCRIPTION
     This distribution includes the following CLI utilities:
 
-    #INSERT_EXECS_LIST
+    *   chinese-zodiac-of
+
+    *   zodiac-of
+
+FUNCTIONS
+  chinese_zodiac_of
+    Usage:
+
+     chinese_zodiac_of(%args) -> any
+
+    Show Chinese zodiac for a date.
+
+    Examples:
+
+    *   Example #1:
+
+         chinese_zodiac_of(dates => ["1980-02-17"]); # -> "monkey (metal)"
+
+    *   Multiple dates:
+
+         chinese_zodiac_of(dates => ["2015-12-17", "2016-12-17"]);
+
+        Result:
+
+         [
+           ["2015-12-17", "goat (wood)"],
+           ["2016-12-17", "monkey (fire)"],
+         ]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dates* => *array[date]*
+
+        Dates.
+
+    Return value: (any)
+
+  zodiac_of
+    Usage:
+
+     zodiac_of(%args) -> any
+
+    Show zodiac for a date.
+
+    Examples:
+
+    *   Example #1:
+
+         zodiac_of(dates => ["2015-06-15"]); # -> "gemini"
+
+    *   Multiple dates:
+
+         zodiac_of(dates => ["2015-12-17", "2015-12-29"]);
+
+        Result:
+
+         [["2015-12-17", "sagittarius"], ["2015-12-29", "capricornus"]]
+
+        If multiple dates are specified, the result will include the date to
+        differentiate which zodiac belongs to which date.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dates* => *array[date]*
+
+        Dates.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ZodiacUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ZodiacUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ZodiacUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

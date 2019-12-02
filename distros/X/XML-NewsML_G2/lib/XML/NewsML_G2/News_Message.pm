@@ -25,8 +25,11 @@ has 'items',
     traits  => ['Array'],
     handles => { add_item => 'push' };
 
+has 'timezone', is => 'ro', isa => 'Str', default => 'local';
+
 sub _build_sent {
-    return DateTime->now( time_zone => 'local' );
+    my ($self) = @_;
+    return DateTime->now( time_zone => $self->timezone );
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -56,7 +59,7 @@ or Package Items
 
 =item sent
 
-Timestemp generated automatically
+Timestamp generated automatically
 
 =item destination
 

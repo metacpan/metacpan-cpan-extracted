@@ -2,15 +2,15 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
 plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/any/validate_dirhandle.pm',
-    'Data/Sah/Coerce/perl/any/validate_filehandle.pm',
+    'Data/Sah/Coerce/perl/To_any/From_any/validate_dirhandle.pm',
+    'Data/Sah/Coerce/perl/To_any/From_any/validate_filehandle.pm',
     'Sah/Schema/dirhandle.pm',
     'Sah/Schema/filehandle.pm',
     'Sah/SchemaR/dirhandle.pm',
@@ -49,7 +49,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

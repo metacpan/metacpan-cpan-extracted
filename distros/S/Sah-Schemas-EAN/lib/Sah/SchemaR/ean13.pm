@@ -1,9 +1,9 @@
 package Sah::SchemaR::ean13;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.005'; # VERSION
 
-our $rschema = ["str",[{description=>"\nNondigits [^0-9] will be removed during coercion.\n\nChecksum digit must be valid.\n\n",match=>"\\A[0-9]{13}\\z",summary=>"EAN-13 number","x.perl.coerce_rules"=>["str_to_ean13"]}],["str"]];
+our $rschema = ["str",[{description=>"\nNondigits [^0-9] will be removed during coercion.\n\nChecksum digit must be valid.\n\n",match=>"\\A[0-9]{13}\\z",summary=>"EAN-13 number","x.perl.coerce_rules"=>["From_str::to_ean13"]}],["str"]];
 
 1;
 # ABSTRACT: EAN-13 number
@@ -20,7 +20,7 @@ Sah::SchemaR::ean13 - EAN-13 number
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::ean13 (from Perl distribution Sah-Schemas-EAN), released on 2019-07-25.
+This document describes version 0.005 of Sah::SchemaR::ean13 (from Perl distribution Sah-Schemas-EAN), released on 2019-11-28.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

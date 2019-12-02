@@ -34,7 +34,7 @@ FP::Struct - classes for functional perl
     eval {
          new FPStructExample::Foo ("Tim", 0)
     };
-    like $@, qr/unacceptable value for field 'animals': 0 /;
+    like $@, qr/^unacceptable value for field 'animals': 0 /;
     is (new FPStructExample::Foo (undef, ["Struppi"])->animals->[0], "Struppi");
     is (new_ FPStructExample::Foo (animals=> ["Struppi"])->animals->[0], "Struppi");
 
@@ -157,7 +157,8 @@ cloning?)).)
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -168,8 +169,7 @@ use strict; use warnings; use warnings FATAL => 'uninitialized';
 use Carp;
 use Chj::NamespaceClean;
 use FP::Show qw(show);
-use FP::Interfaces qw(require_package
-                      package_check_possible_interface);
+use FP::Interface qw(require_package package_check_possible_interface);
 
 
 sub all_fields {

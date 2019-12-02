@@ -3,14 +3,15 @@ package Catmandu::Importer::SRU;
 use Catmandu::Sane;
 use Catmandu::Importer::SRU::Parser;
 use Catmandu::Util qw(:is :check);
-use URI::Escape;
+use URI::Escape qw(uri_escape uri_escape_utf8);
 use Moo;
 use HTTP::Tiny;
 use Carp;
 use XML::LibXML;
 use XML::LibXML::XPathContext;
+use namespace::clean;
 
-our $VERSION = '0.427';
+our $VERSION = '0.428';
 
 with 'Catmandu::Importer';
 
@@ -196,9 +197,10 @@ sub url {
     my $url = $self->base;
     $url .= '?version=' . uri_escape($self->version);
     $url .= '&operation=' . uri_escape($self->operation);
-    $url .= '&query=' . uri_escape($self->query);
+    $url .= '&query=' . uri_escape_utf8($self->query);
     $url .= '&recordSchema=' . uri_escape($self->recordSchema);
-    $url .= '&sortKeys=' . uri_esacpe($self->sortKeys) if $self->sortKeys;
+    $url .= '&sortKeys=' . uri_escape_utf8($self->sortKeys)
+        if $self->sortKeys;
     $url .= '&startRecord=' . uri_escape($start);
     $url .= '&maximumRecords=' . uri_escape($limit);
 
@@ -298,7 +300,7 @@ sub count {
         . '&operation='
         . uri_escape($self->operation)
         . '&query='
-        . uri_escape($self->query)
+        . uri_escape_utf8($self->query)
         . '&recordSchema='
         . uri_escape($self->recordSchema)
         . '&maximumRecords=0';

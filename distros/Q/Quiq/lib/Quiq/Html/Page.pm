@@ -5,10 +5,11 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.165';
+our $VERSION = '1.166';
 
 use Quiq::Css;
 use Quiq::JavaScript;
+use Quiq::String;
 use Quiq::Template;
 
 # -----------------------------------------------------------------------------
@@ -88,7 +89,7 @@ ihre Werte.
 
 =item javaScript => $url|$jsCode|[...] (Default: undef)
 
-URL oder JavaScript-Code im Head der Seite. Mehrfach-Definition,
+URL oder JavaScript-Code am Ende der Seite. Mehrfach-Definition,
 wenn Array-Referenz. Das Attribut kann mehrfach auftreten, die
 Werte werden zu einer Liste zusammengefügt.
 
@@ -96,6 +97,19 @@ Werte werden zu einer Liste zusammengefügt.
 
 Setze den JavaScrip-Code nicht an das Ende des Body, sondern in
 den Head der HTML-Seite.
+
+=item ready => $jsCode (Default: [])
+
+Führe JavaScript-Code $jsCode aus, wenn das DOM geladen ist.
+Dies ist so implementiert, dass der Code wird in einen jQuery
+ready-Handler eingebettet wird:
+
+  $(function() {
+      $jsCode
+  });
+
+Das Konstrukt setzt also jQuery voraus. Das Attribut kann mehrfach
+auftreten, es werden dann mehrere ready-Handler aufgesetzt.
 
 =item styleSheet => $spec | \@specs (Default: undef)
 
@@ -141,6 +155,7 @@ sub new {
         placeholders => [],
         javaScript => [],
         javaScriptToHead => 0,
+        ready => [],
         styleSheet => [],
         title => '',
         topIndentation => 2,
@@ -150,7 +165,8 @@ sub new {
         my $key = shift;
         my $val = shift;
 
-        if ($key eq 'javaScript' || $key eq 'load' || $key eq 'styleSheet') {
+        if ($key eq 'javaScript' || $key eq 'load' || $key eq 'ready' ||
+                $key eq 'styleSheet') {
             my $arr = $self->get($key);
             push @$arr,ref $val? @$val: $val;
         }
@@ -184,9 +200,10 @@ sub html {
     my $self = ref $this? $this: $this->new(@_);
 
     my ($body,$comment,$encoding,$head,$loadA,$noNewline,$placeholders,
-        $title,$javaScript,$javaScriptToHead,$styleSheet, $topIndentation) =
+        $title,$javaScript,$javaScriptToHead,$readyA,$styleSheet,
+        $topIndentation) =
         $self->get(qw/body comment encoding head load noNewline placeholders
-        title javaScript javaScriptToHead styleSheet topIndentation/);
+        title javaScript javaScriptToHead ready styleSheet topIndentation/);
 
     # CSS- und JavaScript-Dateien laden (Test auf @$loadA wg. der
     # neuen Klasse Quiq::Html::Construct - bei Feher $h auf
@@ -200,6 +217,15 @@ sub html {
 
     # Script-Definition(en)
     my $scriptTags = Quiq::JavaScript->script($h,$javaScript);
+
+    # ready-Handler
+
+    my $readyHandlers = '';
+    for (@$readyA) {
+        my $ready = Quiq::String->indent($_,'  ');
+        $readyHandlers .= sprintf "\$(function() {\n%s\n});\n",$ready;
+    }
+    $readyHandlers &&= $h->tag('script',$readyHandlers);
 
     # Wenn $body keinen body-Tag enthält, fügen wir ihn hinzu.
 
@@ -234,6 +260,7 @@ sub html {
                 $loadTags,
                 $styleTags,
                 $javaScriptToHead? $scriptTags: (),
+                $readyHandlers,
             ),
             $body,
         ),
@@ -258,7 +285,7 @@ sub html {
 
 =head1 VERSION
 
-1.165
+1.166
 
 =head1 AUTHOR
 

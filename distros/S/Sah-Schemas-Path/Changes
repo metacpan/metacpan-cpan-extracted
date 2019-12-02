@@ -1,3 +1,17 @@
+0.010   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules again, revert to using lower_case
+	  notation for the description part, because CamelCase is really,
+	  REALLY ugly when we have many words.
+
+
+0.009   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule module from
+	  Data-Sah-Coerce-perl-str-str_strip_slashes to
+	  Data-Sah-Coerce-perl-To_str-From_str-StripSlashes.
+
+
 0.008   2019-07-25  Released-By: PERLANCAR; Urgency: medium
 
 	- Update metadata version of coerce rule module(s) 3->4.

@@ -1,6 +1,6 @@
 package Email::Sender::Transport::SMTP;
 # ABSTRACT: send email over SMTP
-$Email::Sender::Transport::SMTP::VERSION = '1.300031';
+$Email::Sender::Transport::SMTP::VERSION = '1.300033';
 use Moo;
 
 use Email::Sender::Failure::Multi;
@@ -46,11 +46,40 @@ use utf8 (); # See below. -- rjbs, 2015-05-14
 sub BUILD {
   my ($self) = @_;
   Carp::croak("do not pass port number to SMTP transport in host, use port parameter")
-    if $self->host =~ /:/;
+    if grep {; /:/ } $self->hosts;
 }
 
-has host => (is => 'ro', isa => Str, default => sub { 'localhost' });
+sub BUILDARGS {
+  my ($self, @rest) = @_;
+  my $arg = $self->SUPER::BUILDARGS(@rest);
+
+  if (exists $arg->{host}) {
+    Carp::croak("can't pass both host and hosts to constructor")
+      if exists $arg->{hosts};
+
+    $arg->{hosts} = [ delete $arg->{host} ];
+  }
+
+  return $arg;
+}
+
 has ssl  => (is => 'ro', isa => Str, default => sub { 0 });
+
+has _hosts => (
+  is  => 'ro',
+  isa => sub {
+    die "invalid hosts in Email::Sender::Transport::SMTP constructor"
+      unless defined $_[0]
+          && (ref $_[0] eq 'ARRAY')
+          && (grep {; length } @{ $_[0] }) > 0;
+  },
+  default  => sub {  [ 'localhost' ]  },
+  init_arg => 'hosts',
+);
+
+sub hosts { @{ $_[0]->_hosts } }
+
+sub host  { $_[0]->_hosts->[0] }
 
 has _security => (
   is   => 'ro',
@@ -142,8 +171,8 @@ sub _smtp_client {
 
   unless ($smtp) {
     $self->_throw(
-      sprintf "unable to establish SMTP connection to %s port %s",
-        $self->host,
+      sprintf "unable to establish SMTP connection to (%s) port %s",
+        (join q{, }, $self->hosts),
         $self->port,
     );
   }
@@ -173,7 +202,7 @@ sub _net_smtp_args {
   my ($self) = @_;
 
   return (
-    $self->host,
+    [ $self->hosts ],
     Port    => $self->port,
     Timeout => $self->timeout,
     Debug   => $self->debug,
@@ -323,7 +352,7 @@ Email::Sender::Transport::SMTP - send email over SMTP
 
 =head1 VERSION
 
-version 1.300031
+version 1.300033
 
 =head1 DESCRIPTION
 
@@ -382,7 +411,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2019 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

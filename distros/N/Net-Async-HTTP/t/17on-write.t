@@ -32,7 +32,7 @@ local *IO::Async::Handle::connect = sub {
 
    $self->configure( write_len => 10 );
 
-   return Future->new->done( $self );
+   return Future->done( $self );
 };
 
 {
@@ -58,7 +58,7 @@ local *IO::Async::Handle::connect = sub {
                         "Connection: Keep-Alive$CRLF" .
                         $CRLF );
 
-   wait_for { $req_f->is_ready };
+   wait_for_future( $req_f );
 
    is_deeply( \@written,
               [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],

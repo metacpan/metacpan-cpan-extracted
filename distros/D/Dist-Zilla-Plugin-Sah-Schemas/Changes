@@ -1,47 +1,55 @@
-0.015   2019-05-07 (PERLANCAR)
+0.016   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Update naming of Sah coerce rule module from
+	  Data::Sah::Coerce::<TARGET_TYPE>::<RULE_NAME> to
+	  Data::Sah::Coerce::To_<TARGET_TYPE>::<RULE_NAME>
+	  (Data::Sah::Coerce 0.034+).
+
+
+0.015   2019-05-07  Released-By: PERLANCAR
 
 	- [bugfix] Fix adding prereq to coerce rule modules, should be
 	  using resolved/base type name.
 
 
-0.014   2018-06-26 (PERLANCAR)
+0.014   2018-06-26  Released-By: PERLANCAR
 
 	- [Bugfix] Avoid adding prereqs for packages defined by self.
 
 
-0.013   2018-06-07 (PERLANCAR)
+0.013   2018-06-07  Released-By: PERLANCAR
 
 	- Use minimum version from pmversions.ini.
 
 
-0.012   2018-05-31 (PERLANCAR)
+0.012   2018-05-31  Released-By: PERLANCAR
 
 	- Generate prereq to Data::Sah::Coerce::perl::* modules.
 
 
-0.011   2018-04-06 (PERLANCAR)
+0.011   2018-04-06  Released-By: PERLANCAR
 
 	- [Bugfix] Force reload Sah::Schema module from build version; it
 	  might have already been loaded by other plugin.
 
 
-0.010   2018-01-14 (PERLANCAR)
+0.010   2018-01-14  Released-By: PERLANCAR
 
 	- [Bugfix] Handle cases where x.completion is an arrayref or
 	  coderef.
 
 
-0.009   2018-01-14 (PERLANCAR)
+0.009   2018-01-14  Released-By: PERLANCAR
 
 	- Add prereq to Perinci::Sub::XCompletion::* modules.
 
 
-0.008   2017-01-31 (PERLANCAR)
+0.008   2017-01-31  Released-By: PERLANCAR
 
 	- Replace Data::Dump with Data::Dmp so we can deparse coderefs.
 
 
-0.007   2017-01-15 (PERLANCAR)
+0.007   2017-01-15  Released-By: PERLANCAR
 
 	- [Bugfix] Fix regression bug when introducing use of
 	  Dist::Zilla::Role::RequireFromBuild.
@@ -49,19 +57,19 @@
 	- Use Require::Hook::DzilBuild instead of DZR:RequireFromBuild.
 
 
-0.006   2017-01-09 (PERLANCAR)
+0.006   2017-01-09  Released-By: PERLANCAR
 
 	- UPDATE 2017-01-15: this release is broken, don't use.
 
         - Use Dist::Zilla::Role::RequireFromBuild.
 
 
-0.005   2016-12-26 (PERLANCAR)
+0.005   2016-12-26  Released-By: PERLANCAR
 
 	- Fix typo in generated text [RT#119466].
 
 
-0.004   2016-08-04 (PERLANCAR)
+0.004   2016-08-04  Released-By: PERLANCAR
 
 	- Add some description in generated Sah::SchemaR::* about what the
 	  module is for.
@@ -69,13 +77,13 @@
 	- Handle (skip) when schema cannot be resolved, e.g. recursive.
 
 
-0.003   2016-07-22 (PERLANCAR)
+0.003   2016-07-22  Released-By: PERLANCAR
 
 	- Produce Sah::SchemaR::* modules (pre-resolved edition of
 	  schemas).
 
 
-0.002   2016-07-20 (PERLANCAR)
+0.002   2016-07-20  Released-By: PERLANCAR
 
 	- Add prereq to other Sah::Schema::* modules used by each
 	  Sah::Schema::* module in the distribution.
@@ -83,6 +91,6 @@
 	- Tweak error message to make it clearer.
 
 
-0.001   2016-05-08 (PERLANCAR)
+0.001   2016-05-08  Released-By: PERLANCAR
 
         - First release.

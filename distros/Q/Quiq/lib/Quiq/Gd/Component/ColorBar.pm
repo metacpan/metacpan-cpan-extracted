@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.165';
+our $VERSION = '1.166';
 
 # -----------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ Farben des Farbverlaufs.
 Code:
 
   use Quiq::Gd::Image;
-  use Quiq::Gd::Graphic::ColorBar;
+  use Quiq::Gd::Component::ColorBar;
   
   # Konfiguration
   
@@ -54,7 +54,7 @@ Code:
   
   # Grafik-Objekt instantiieren
   
-  my $g = Quiq::Gd::Graphic::ColorBar->new(
+  my $g = Quiq::Gd::Component::ColorBar->new(
       width=>$width,
       height=>$height,
   );
@@ -166,7 +166,7 @@ siehe L<BASE CLASS|"BASE CLASS">
 
 =head1 VERSION
 
-1.165
+1.166
 
 =head1 AUTHOR
 

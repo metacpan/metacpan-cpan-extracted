@@ -1,7 +1,9 @@
 package Sah::Schema::cryptoexchange::account;
 
-our $DATE = '2018-06-09'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'Sah-Schemas-App-cryp'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 our $schema = [str => {
     summary => 'Account at a cryptocurrency exchange',
@@ -15,7 +17,7 @@ optional and will be assumed to be "/default" if not specified.
 
 _
     'x.completion' => 'cryptoexchange_account',
-    'x.perl.coerce_rules' => ['str_normalize_cryptoexchange_account'],
+    'x.perl.coerce_rules' => ['From_str::normalize_cryptoexchange_account'],
 }, {}];
 
 1;
@@ -33,7 +35,7 @@ Sah::Schema::cryptoexchange::account - Account at a cryptocurrency exchange
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::cryptoexchange::account (from Perl distribution Sah-Schemas-App-cryp), released on 2018-06-09.
+This document describes version 0.004 of Sah::Schema::cryptoexchange::account (from Perl distribution Sah-Schemas-App-cryp), released on 2019-11-29.
 
 =head1 DESCRIPTION
 
@@ -65,7 +67,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

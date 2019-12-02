@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.136;
+package Config::Model::Value 2.137;
 
 use 5.10.1;
 
@@ -126,6 +126,7 @@ has warning_list => (
         clear_warnings => 'clear',
         warning_msg    => [ join => "\n\t" ],
         has_warning    => 'count',
+        has_warnings    => 'count',
         all_warnings   => 'elements',
     } );
 
@@ -299,11 +300,11 @@ sub perform_compute {
     my $result = $self->compute_obj->compute;
 
     # check if the computed result fits with the constraints of the
-    # Value object
-    my $ok = $self->check_fetched_value($result);
+    # Value model
+    my ($ok, $value, $error, $warn) = $self->_check_value(value => $result);
 
     if ( not $ok ) {
-        my $error = $self->error_msg . "\n\t" . $self->compute_info;
+        my $error = join("\n", (@$error, $self->compute_info));
 
         Config::Model::Exception::WrongValue->throw(
             object => $self,
@@ -405,15 +406,16 @@ sub setup_enum_choice {
     # whether a value is present in the enum set is easier
     delete $self->{choice_hash} if defined $self->{choice_hash};
 
-    map { $self->{choice_hash}{$_} = 1; } @choice;
+    for ( @choice ) { $self->{choice_hash}{$_} = 1; }
 
     # delete the current value if it does not fit in the new
     # choice
-    map {
+    for ( qw/data preset/ ) {
         my $lv = $self->{$_};
-
-        delete $self->{$_} if ( defined $lv and not defined $self->{choice_hash}{$lv} );
-    } qw/data preset/;
+        if ( defined $lv and not defined $self->{choice_hash}{$lv} ) {
+            delete $self->{$_};
+        }
+    }
 }
 
 sub setup_match_regexp {
@@ -524,13 +526,13 @@ sub set_properties {
     my $self = shift;
 
     # cleanup all parameters that are handled by warp
-    map( delete $self->{$_}, @allowed_warp_params );
+    for ( @allowed_warp_params ) { delete $self->{$_} }
 
     # merge data passed to the constructor with data passed to set_properties
     my %args = ( %{ $self->{backup} }, @_ );
 
     # these are handled by Node or Warper
-    map { delete $args{$_} } qw/level/;
+    for ( qw/level/ ) { delete $args{$_} }
 
     if ( $logger->is_trace ) {
         $logger->trace( "Leaf '" . $self->name . "' set_properties called with '",
@@ -548,9 +550,10 @@ sub set_properties {
         );
     }
 
-    map { $self->{$_} = delete $args{$_} if defined $args{$_} }
-        qw/min max mandatory warn replace_follow assert warn_if warn_unless
-        write_as/;
+    for (qw/min max mandatory warn replace_follow assert warn_if warn_unless
+            write_as/) {
+        $self->{$_} = delete $args{$_} if defined $args{$_};
+    }
 
     if ($args{replace}) {
         $self->{replace} = delete $args{replace};
@@ -702,7 +705,13 @@ sub get_cargo_type {
 sub can_store {
     my $self = shift;
 
-    return not defined $self->compute || $self->compute_obj->allow_user_override;
+    if ( not defined $self->compute ) {
+        return 1;
+    }
+    if ( $self->compute_obj->allow_user_override ) {
+        return 1;
+    }
+    return;
 }
 
 sub get_default_choice {
@@ -749,7 +758,7 @@ sub enum_error {
         return @error;
     }
 
-    my @choice    = map( "'$_'", $self->get_choice );
+    my @choice    = map { "'$_'" } $self->get_choice;
     my $var       = $self->{value_type};
     my $str_value = defined $value ? $value : '<undef>';
     push @error,
@@ -762,7 +771,7 @@ sub enum_error {
     return @error;
 }
 
-sub check_value {
+sub _check_value {
     my $self = shift;
     croak "check_value needs a value to check" unless @_ > 1;
 
@@ -772,9 +781,6 @@ sub check_value {
     my $check     = $args{check} || 'yes';
     my $apply_fix = $args{fix} || 0;
     my $mode      = $args{mode} || 'backend';
-    my $cb        = delete $args{callback};
-
-    carp "callback parameter is deprecated" if defined $cb;
 
     #croak "Cannot specify a value with fix = 1" if $apply_fix and exists $args{value} ;
 
@@ -944,17 +950,24 @@ sub check_value {
         scalar @error,
         " errors and ", scalar @warn, " warnings"
     );
+
+    my $ok = not @error;
+    return ($ok, $value, \@error, \@warn);
+}
+
+
+sub check_value {
+    my $self = shift;
+
+    my ($ok, $value, $error, $warn) = $self->_check_value(@_);
     $self->clear_errors;
     $self->clear_warnings;
-    $self->add_error(@error)  if @error;
-    $self->add_warning(@warn) if @warn;
-
-    $args{value} = $value;    # may be updated by apply_fix
+    $self->add_error(@$error)  if @$error;
+    $self->add_warning(@$warn) if @$warn;
 
     $logger->trace("done");
 
-    $cb->( %args, ok => not @error ) if $cb;
-    my $ok = not @error;
+    # return $value because it may be updated by apply_fix
     return wantarray ? ($ok, $value) : $ok;
 }
 
@@ -1073,6 +1086,8 @@ sub apply_fixes {
             );
         }
     } while ( $self->{nb_of_fixes} and $old > $new );
+
+    $self->show_warnings($self->_fetch_no_check);
 }
 
 # internal: called by check when a fix is required
@@ -1178,12 +1193,12 @@ sub check_fetched_value {
         $logger->debug("is not needed");
     }
 
-    $self->store_warning($value, $silent);
+    $self->show_warnings($value, $silent);
 
     return wantarray ? $self->all_errors : $self->is_ok;
 }
 
-sub store_warning {
+sub show_warnings {
     my ($self, $value, $silent) = @_ ;
 
     # old_warn is used to avoid warning the user several times for the
@@ -1193,17 +1208,23 @@ sub store_warning {
     my %warn_h;
 
     if ( $self->has_warning and not $nowarning and not $silent ) {
+        my $str = $value // '<undef>';
+        chomp $str;
+        my $w_str = $str =~ /\n/ ? "\n+++++\n$str\n+++++" : "'$str'";
         foreach my $w ( $self->all_warnings ) {
             $warn_h{$w} = 1;
-            next if $old_warn->{$w};
-            my $str = $value // '<undef>';
-            chomp $str;
-            my $w_str = $str =~ /\n/ ? "\n+++++\n$str\n+++++" : "'$str'";
-            if ($::_use_log4perl_to_warn) {
-                $user_logger->warn("Warning in '" . $self->location_short . "': $w\nOffending value: $w_str");
+            my $w_msg = "Warning in '" . $self->location_short . "': $w\nOffending value: $w_str";
+            if ($old_warn->{$w}) {
+                # user has already seen the warning, let's use info level (required by tests)
+                $user_logger->info($w_msg);
             }
             else {
-                warn "Warning in '" . $self->location_short . "': $w\nOffending value: $w_str\n";
+                if ($::_use_log4perl_to_warn) {
+                    $user_logger->warn($w_msg);
+                }
+                else {
+                    warn "$w_msg\n";
+                }
             }
         }
     }
@@ -1314,7 +1335,7 @@ sub _store {
     if ( $logger->is_debug ) {
         my $i   = $self->instance;
         my $msg = "value store ". ($value // '<undef>')." ok '$ok', check is $check";
-        map { $msg .= " $_" if $i->$_() } qw/layered preset/;
+        for ( qw/layered preset/ ) { $msg .= " $_" if $i->$_() }
         $logger->debug($msg);
     }
 
@@ -1372,10 +1393,10 @@ sub transform_boolean {
 
     if ( my $wa = $self->{write_as} ) {
         my $i = 0;
-        map {
+        for ( @$wa ) {
             $$v_ref = $i if ( $wa->[$i] eq $$v_ref );
             $i++
-        } @$wa;
+        }
     }
 
     # convert yes no to 1 or 0
@@ -1464,7 +1485,7 @@ sub check_stored_value {
     # must always warn when storing a value, hence clearing the list
     # of already issued warnings
     $self->{old_warning_hash} = {};
-    $self->store_warning($value, $silent);
+    $self->show_warnings($value, $silent);
 
     return wantarray ? ($ok,$fixed_value) : $ok;
 }
@@ -1600,8 +1621,18 @@ my %old_mode = (
     non_built_in => 'non_upstream_default',
 );
 
-my %accept_mode = map { ( $_ => 1 ) } qw/custom standard preset default upstream_default
-    layered non_upstream_default allow_undef user backend/;
+{
+    my %accept_mode = map { ( $_ => 1 ) } qw/custom standard preset default upstream_default
+                                             layered non_upstream_default allow_undef user backend/;
+
+    sub is_bad_mode {
+        my ($self, $mode) = @_;
+        if ( $mode and not defined $accept_mode{$mode} ) {
+            my $good_ones = join( ' or ', sort keys %accept_mode );
+            return "expected $good_ones as mode parameter, not $mode";
+        }
+    }
+}
 
 sub _fetch {
     my ( $self, $mode, $check ) = @_;
@@ -1636,10 +1667,8 @@ sub _fetch {
         carp $self->location, " warning: deprecated mode parameter: $k, ", "expected $mode\n";
     }
 
-    if ( $mode and not defined $accept_mode{$mode} ) {
-        croak "fetch_no_check: expected ",
-            join( ' or ', sort keys %accept_mode ),
-            " parameter, not $mode";
+    if (my $err = $self->is_bad_mode($mode)) {
+        croak "fetch_no_check: $err";
     }
 
     if ( $mode eq 'custom' ) {
@@ -1733,9 +1762,8 @@ sub fetch {
         $logger->debug( "_fetch returns " . ( defined $value ? $value : '<undef>' ) );
     }
 
-    if ( $mode and not defined $accept_mode{$mode} ) {
-        croak "fetch: expected ", not scalar join( ' or ', sort keys %accept_mode ),
-            " parameter, not $mode";
+    if ( my $err = $self->is_bad_mode($mode) ) {
+        croak "fetch: $err";
     }
 
     if ( defined $self->{replace_follow} and defined $value ) {
@@ -1757,7 +1785,7 @@ sub fetch {
     # mode may not trigger the warnings. Hence confusion afterwards)
     my $ok = 1;
     $ok = $self->check( value => $value, silent => $silent, mode => $mode )
-        if $mode =~ /backend|custom|user/;
+        if $mode =~ /backend|custom|user/ and $check ne 'no';
 
     $logger->trace( "$mode fetch (almost) done for " . $self->location )
         if $logger->is_trace;
@@ -1919,7 +1947,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 
@@ -2597,6 +2625,19 @@ L</warning_msg>.
 
 Without C<value> argument, this method checks the value currently stored.
 
+=head2 is_bad_mode
+
+Accept a mode parameter. This function checks if the mode is accepted
+by L</fetch> method. Returns an error message if not. For instance:
+
+ if (my $err = $val->is_bad_mode('foo')) {
+    croak "my_function: $err";
+ }
+
+This method is intented as a helper to avoid duplicating the list of
+accepted modes for functions that want to wrap fetch methods (like
+L<Config::Model::Dumper> or L<Config::Model::DumpAsData>)
+
 =head1 Information management
 
 =head2 store
@@ -2605,8 +2646,8 @@ Parameters: C<< ( $value ) >>
 or C<< value => ...,	check => yes|no|skip ), silent => 0|1 >>
 
 Store value in leaf element. C<check> parameter can be used to
-skip validation check (default ies 'yes').
-C<silent> cane be used to suppress warnings.
+skip validation check (default is 'yes').
+C<silent> can be used to suppress warnings.
 
 Optional C<callback> is now deprecated.
 
@@ -2619,10 +2660,10 @@ computed or migrated value).
 
 Parameters: C<< ( $value ) >>
 
-Load scalar data. Data is forwarded to L</"store">.
+Called with the same parameters are C<store> method.
 
-Called with C<load_data> or C<load_data> or
-with the same parameters are C<store> method.
+Load scalar data. Data is forwarded to L</"store"> after checking that
+the passed value is not a reference.
 
 =head2 fetch_custom
 

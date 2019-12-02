@@ -1,21 +1,26 @@
-0.120   2017-08-16 (PERLANCAR)
+0.121   2019-10-17  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Simplify CLI scripts by turning off config/env reading.
+
+
+0.120   2017-08-16  Released-By: PERLANCAR
 
 	- Add utilities: pldoc, plhtml.
 
 
-0.11    2016-07-20 (PERLANCAR)
+0.11    2016-07-20  Released-By: PERLANCAR
 
         - Use more specific schemas for the arguments (filename & perl::modname
           instead of str) to reduce duplication.
 
 
-0.10    2015-09-17 (PERLANCAR)
+0.10    2015-09-17  Released-By: PERLANCAR
 
 	- Adjust to Complete::Util 0.36 (complete_program() split to
 	  Complete-Program).
 
 
-0.09    2015-09-03 (PERLANCAR)
+0.09    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -24,7 +29,7 @@
 	  requirement.
 
 
-0.08    2015-03-21 (PERLANCAR)
+0.08    2015-03-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -32,43 +37,43 @@
 	  & more complete See Also.
 
 
-0.07    2015-01-25 (PERLANCAR)
+0.07    2015-01-25  Released-By: PERLANCAR
 
 	- Add utility: pllines.
 
 
-0.06    2015-01-03 (PERLANCAR)
+0.06    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.05    2014-12-28 (PERLANCAR)
+0.05    2014-12-28  Released-By: PERLANCAR
 
 	- Depend on Complete::Module (and Complete::Util) directly instead
 	  of App::PMUtils (and App::PlUtils).
 
 
-0.04    2014-12-03 (PERLANCAR)
+0.04    2014-12-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch {SHARYANTO::Module::Path,Module::Path::More}.
 
 
-0.03    2014-11-09 (PERLANCAR)
+0.03    2014-11-09  Released-By: PERLANCAR
 
         - Add utility: plcost.
 
 
-0.02    2014-09-17 (PERLANCAR)
+0.02    2014-09-17  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Add sample outputs in Synopsis.
 
 
-0.01    2014-09-17 (PERLANCAR)
+0.01    2014-09-17  Released-By: PERLANCAR
 
         - First release.

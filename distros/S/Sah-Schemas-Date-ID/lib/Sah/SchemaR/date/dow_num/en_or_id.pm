@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::dow_num::en_or_id;
 
-our $DATE = '2019-07-21'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
-our $rschema = ["int",[{max=>7,min=>1,summary=>"Day-of-week number (1-7, 1=Monday)","x.completion"=>["date_dow_num_en_or_id"],"x.perl.coerce_rules"=>["str_convert_en_or_id_dow_name_to_num"]}],["int"]];
+our $rschema = ["int",[{max=>7,min=>1,summary=>"Day-of-week number (1-7, 1=Monday)","x.completion"=>["date_dow_num_en_or_id"],"x.perl.coerce_rules"=>["From_str::convert_en_or_id_dow_name_to_num"]}],["int"]];
 
 1;
 # ABSTRACT: Day-of-week number (1-7, 1=Monday)
@@ -20,7 +20,7 @@ Sah::SchemaR::date::dow_num::en_or_id - Day-of-week number (1-7, 1=Monday)
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::date::dow_num::en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-07-21.
+This document describes version 0.003 of Sah::SchemaR::date::dow_num::en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
 
 =head1 DESCRIPTION
 

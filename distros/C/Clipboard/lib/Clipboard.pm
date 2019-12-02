@@ -1,5 +1,5 @@
 package Clipboard;
-$Clipboard::VERSION = '0.20';
+$Clipboard::VERSION = '0.21';
 use strict;
 use warnings;
 
@@ -66,13 +66,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-Clipboard
-
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -97,10 +93,6 @@ in a cross-platform-consistent API, from your Perl code.
 =head1 NAME
 
 Clipboard - Copy and paste with any OS
-
-=head1 VERSION
-
-version 0.20
 
 =head1 STATUS
 

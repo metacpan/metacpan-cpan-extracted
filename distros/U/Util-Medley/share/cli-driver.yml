@@ -33,23 +33,27 @@ encrypt-str:
   class:
     name: Util::Medley::Exec
     attr:
+      required:
+      optional:
   method:
     name: encryptStr
     args:
       required:
         hard: 
-          k: key
           s: str
-
+      optional:
+        k: key
+      
 decrypt-str:
   class:
     name: Util::Medley::Exec
     attr:
+      optional:
   method:
     name: decryptStr
     args:
       required:
         hard: 
-          k: key
           s: str 
-  
+      optional:
+        k: key 

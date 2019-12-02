@@ -32,13 +32,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-clipaccumulate
-
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 USAGE
 
@@ -60,10 +56,6 @@ anyone?)
 =head1 NAME
 
 clipaccumulate - Make a bunch of little clipboards into one big one.
-
-=head1 VERSION
-
-version 0.20
 
 =head1 MOTIVATION
 

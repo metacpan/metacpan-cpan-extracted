@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.023 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2019-06-06.
+    This document describes version 0.025 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2019-11-29.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -47,6 +47,8 @@ DESCRIPTION
     *   csv-sort-fields
 
     *   csv-sort-rows
+
+    *   csv-split
 
     *   csv-sum
 
@@ -1267,6 +1269,59 @@ FUNCTIONS
 
     Return value: (any)
 
+  csv_split
+    Usage:
+
+     csv_split(%args) -> [status, msg, payload, meta]
+
+    Split CSV file into several files.
+
+    Will output split files xaa, xab, and so on. Each split file will
+    contain a maximum of "lines" rows (options to limit split files' size
+    based on number of characters and bytes will be added). Each split file
+    will also contain CSV header.
+
+    Warning: by default, existing split files xaa, xab, and so on will be
+    overwritten.
+
+    Interface is loosely based on the "split" Unix utility.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
+
+    *   lines => *uint* (default: 1000)
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   csv_sum
     Usage:
 
@@ -1348,7 +1403,11 @@ SEE ALSO
 
     csvgrep.
 
+    csv-select-row.
+
     setop.
+
+    csv-split.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /XTerm/Util/set_term_bgcolor
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-08-20'; # DATE
+our $DATE = '2019-11-27'; # DATE
 our $DIST = 'App-XTermUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ set-term-bgcolor - Set terminal background color
 
 =head1 VERSION
 
-This document describes version 0.005 of set-term-bgcolor (from Perl distribution App-XTermUtils), released on 2019-08-20.
+This document describes version 0.006 of set-term-bgcolor (from Perl distribution App-XTermUtils), released on 2019-11-27.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ Usage:
 =head1 DESCRIPTION
 
 Set terminal background color. This prints the following xterm control sequence
-to STDOUT (or STDERR, if ~stderr~ is set to true:
+to STDOUT (or STDERR, if ~stderr~ is set to true):
 
  \e]11;#123456\a
 

@@ -20487,7 +20487,7 @@ sub cwd
             $target_dir=$self->{_homedir}.'/'.$target_dir;
          }
          if (exists $self->{_cmd_handle} && $self->{_cmd_handle}) {
-            ($output,$stderr)=Rem_Command(
+            ($output,$stderr)=Rem_Command::cmd(
                   { _cmd_handle=>$self->{_cmd_handle},
                     _host_label=>[ $hostlabel,'' ] },
                     "cd $target_dir");
@@ -28019,7 +28019,7 @@ print $Net::FullAuto::FA_Core::LOG "WHAT IS THE ERROR=$cmd_errmsg<=== and RETRYS
                ($stdout,$stderr)=&Net::FullAuto::FA_Core::kill(
                   $cmd_pid,$kill_arg) if
                   &Net::FullAuto::FA_Core::testpid($cmd_pid);
-               $cmd_handle->close;next;
+               $cmd_handle->close if $cmd_handle;next;
             } else {
                my $host= $hostname ? $hostname : $ip;
                my $hostl=$hostlabel;
@@ -28673,8 +28673,8 @@ sub ftpcmd
                $output=~tr/\0-\11\13-\37\177-\377//d;
                $output=~tr/ //s;
                my $save='';
-               #print $output if $display;
-               $save=&display($output,'ftp> ',$save)
+               my $prompt=($handle->{_ftp_type} eq 'ftp')?'ftp>':'sftp>';
+               $save=&display($output,$prompt,$save)
                   if $display;
                if ($output=~/s*ftp> ?$/s || $stdout=~/s*ftp> ?$/s || $more) {
                   $nfound=select
@@ -29202,23 +29202,6 @@ print $Net::FullAuto::FA_Core::LOG "FTP-STDERR-500-DETECTED=$stderr<==\n"
          $stdout=~s/^$cmd\s*(.*)\s*sftp>\s*$/$1/s;
          $stdout=~tr/\r//d;
          $stdout=~s/\s*$//s;
-         if ($stdout=~s/^\n*Uploading/\n\nUploading/gs) {
-            if ((!$Net::FullAuto::FA_Core::cron
-                  || $Net::FullAuto::FA_Core::debug)
-                  && !$Net::FullAuto::FA_Core::quiet) {
-               STDOUT->autoflush(1);
-               print $stdout."\n\n";
-               STDOUT->autoflush(0);
-            }
-         } elsif ($stdout=~s/^\n*Fetch/\n\nFetch/gs) {
-            if ((!$Net::FullAuto::FA_Core::cron
-                  || $Net::FullAuto::FA_Core::debug)
-                  && !$Net::FullAuto::FA_Core::quiet) {
-               STDOUT->autoflush(1);
-               print $stdout,"\n\n";
-               STDOUT->autoflush(0);
-            }
-         }
          if (exists $handle->{_cmd_handle} && $handle->{_cmd_handle}) {
             if ($stdout=~/Couldn\'t canonicalise:/s) {
                if ($cmd=~/^ls$|^ls /) {
@@ -30255,13 +30238,18 @@ print "GOING TO INT SIX\n";
                         $test_stripped_output.=$output;
                      }
                      $test_stripped_output=~s/\s*//gs;
-                     $test_stripped_output=~
-                        s#-+e+'+s+/+\^+/+s+t+d+o+u+t+:+/+'+2+>+&+1+#-e's/^/stdout:/'2>&1#s;
-                     $test_stripped_output=~s#2+[>]+&+1+#2>&1#s;
-                     $test_stripped_output=~s/$cmd_prompt$//s;
                      my $stripped_live_command=$live_command;
                      $stripped_live_command=~s/\s*//gs;
                      my $lslc=length $stripped_live_command;
+                     my $s='-e\'s/^/stdout:/\'2>&1';
+                     $test_stripped_output=~
+                        s#-+e+'+s+/+\^+/+s+t+d+o+u+t+:+/+'+2+>+&+1+#$s#s;
+                     if (-1<index $stripped_live_command,'22>') {
+                        $test_stripped_output=~s#2[>]+&+1+#2>&1#s
+                     } else {
+                        $test_stripped_output=~s#2+[>]+&+1+#2>&1#s
+                     }
+                     $test_stripped_output=~s/$cmd_prompt$//s;
                      my $ltso=length $test_stripped_output;
                      if (($test_stripped_output eq $stripped_live_command) ||
                            (($lslc<$ltso) &&
@@ -30352,21 +30340,32 @@ print $Net::FullAuto::FA_Core::LOG "LSLC=$lslc and LTSO=$ltso and UNPACK=",unpac
                               } else {
                                  $output=unpack("x$llc a*",$output);
                               }
-                              $first=0;$growoutput=$output;
-                              $growoutput=~s/^(.*)($cmd_prompt)*$/$1/s;
-print $Net::FullAuto::FA_Core::LOG "GRO_OUT_AFTER_MEGA_STRIP=$growoutput\n"
-   if $Net::FullAuto::FA_Core::log && (-1<index $Net::FullAuto::FA_Core::LOG,'*');
-                              if ($output=~/$cmd_prompt$/s &&
-                                    $growoutput!~/$cmd_prompt$/s) {
-                                 # Strip noise characters
-                                 $output=~s/^.*?(stdout:.*)$/$1/s;
-print $Net::FullAuto::FA_Core::LOG "GRO_OUT_AFTER_NOISE_STRIP=$output\n"
-   if $Net::FullAuto::FA_Core::log && (-1<index $Net::FullAuto::FA_Core::LOG,'*');
-
-                                 $growoutput=$output;
-                                 $output='';
+                              $first=0;
+                              my $tou=$output;
+                              $tou=~s/^\s?$cmd_prompt\s*//;
+                              my $ltu=length $tou;
+                              $test_stripped_output=$tou;
+                              $test_stripped_output=~s/\s*//gs;
+                              my $ltso=length $test_stripped_output;
+                              if (($lslc<$ltso) &&
+                                    (unpack("a$lslc",$test_stripped_output) eq
+                                    $stripped_live_command)) {
+                                 my $llc=length $live_command;
+                                 $output=~s/^\s?$cmd_prompt\s*//;
+                                 $growoutput=unpack("x$llc a*",$tou);
+                                 $output=$growoutput;
+                                 $output=~s/^\s*//s;
                                  $command_stripped_from_output=1;
+                              } else {
+                                 $output=~s/^\s*//s;
+                                 $growoutput=$output;
+                                 $growoutput=~s/^\s*(.*)($cmd_prompt)*$/$1/s;
                               }
+print $Net::FullAuto::FA_Core::LOG "GRO_OUT_AFTER_MEGA_STRIP=$growoutput\n"
+   if $Net::FullAuto::FA_Core::log
+   && (-1<index $Net::FullAuto::FA_Core::LOG,'*');
+                              $save=&display($output,$cmd_prompt,$save)
+                                 if $display;
                               $output='';
                            } elsif (($lslc<$ltso) &&
                                  (-1<index $test_stripped_output,
@@ -30536,6 +30535,10 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                         $lastline=$cmd_prompt;
                         $output='';$fulloutput='';
                      } elsif ($output=~/$cmd_prompt$/s) {
+                        if ($output=~
+                              /^(.*)stdout: (\d)\s+\]0;.*$cmd_prompt$/s) {
+                           $output="${1}stdout: $2\n$cmd_prompt";
+                        }
                         $growoutput.=$output;
                         $lastline=$cmd_prompt;
                         $save=&display($output,$cmd_prompt,$save)
@@ -31232,6 +31235,7 @@ sub cmd_raw
 sub display
 {
    #print "DISPLAY_CALLER=",caller,"\n";sleep 1;
+   select(undef,undef,undef,0.50);
    my $line=$_[0];
    return '' if -1<index $line,'[sudo]';
    my $cmd_prompt=$_[1];
@@ -31284,8 +31288,8 @@ sub display
       return '';
    } else {
       $line=~s/\s+\d\s*$//s;
-      print $line;
-      print $OUTPUT $line if $print_out;
+      print $line."\n";
+      print $OUTPUT $line."\n" if $print_out;
       return '';
    }
 }

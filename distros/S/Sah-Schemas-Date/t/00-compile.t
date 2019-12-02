@@ -9,8 +9,8 @@ use Test::More;
 plan tests => 31 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/int/str_convert_en_dow_name_to_num.pm',
-    'Data/Sah/Coerce/perl/int/str_convert_en_month_name_to_num.pm',
+    'Data/Sah/Coerce/perl/To_int/From_str/convert_en_dow_name_to_num.pm',
+    'Data/Sah/Coerce/perl/To_int/From_str/convert_en_month_name_to_num.pm',
     'Perinci/Sub/XCompletion/date_dow_num.pm',
     'Perinci/Sub/XCompletion/date_dow_nums.pm',
     'Perinci/Sub/XCompletion/date_month_num.pm',

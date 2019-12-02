@@ -2,7 +2,6 @@ Build.PL
 Changes
 Example.md
 LICENSE
-MANIFEST
 MANIFEST.SKIP
 META.json
 README.md
@@ -23,8 +22,6 @@ lib/App/Greple/find.pm
 lib/App/Greple/line.pm
 lib/App/Greple/perl.pm
 lib/App/Greple/pgp.pm
-lib/App/Greple/subst.pm
-lib/App/Greple/subst.sample
 minil.toml
 script/greple
 t/00_load.t
@@ -35,9 +32,11 @@ t/05_reverse_regions.t
 t/06_matchcount.t
 t/08_region.t
 t/09_filter.t
+t/10_select.t
 t/JA.txt
 t/SAMPLE.txt
 t/Util.pm
 t/pod-coverage.t
 t/pod.t
 META.yml
+MANIFEST

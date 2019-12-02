@@ -6,9 +6,9 @@ Date::Manip::TZ::amvanc00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Aug 29 14:11:52 EDT 2019
-#    Data version: tzdata2019b
-#    Code version: tzcode2019b
+#    Generated on: Mon Dec  2 09:44:58 EST 2019
+#    Data version: tzdata2019c
+#    Code version: tzcode2019c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.78';
+$VERSION='6.79';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -68,11 +68,11 @@ END { undef $VERSION; }
    1946 =>
      [
         [ [1946,4,28,10,0,0],[1946,4,28,3,0,0],'-07:00:00',[-7,0,0],
-          'PDT',1,[1946,10,13,8,59,59],[1946,10,13,1,59,59],
-          '1946042810:00:00','1946042803:00:00','1946101308:59:59','1946101301:59:59' ],
-        [ [1946,10,13,9,0,0],[1946,10,13,1,0,0],'-08:00:00',[-8,0,0],
+          'PDT',1,[1946,9,29,8,59,59],[1946,9,29,1,59,59],
+          '1946042810:00:00','1946042803:00:00','1946092908:59:59','1946092901:59:59' ],
+        [ [1946,9,29,9,0,0],[1946,9,29,1,0,0],'-08:00:00',[-8,0,0],
           'PST',0,[1947,4,27,9,59,59],[1947,4,27,1,59,59],
-          '1946101309:00:00','1946101301:00:00','1947042709:59:59','1947042701:59:59' ],
+          '1946092909:00:00','1946092901:00:00','1947042709:59:59','1947042701:59:59' ],
      ],
    1947 =>
      [

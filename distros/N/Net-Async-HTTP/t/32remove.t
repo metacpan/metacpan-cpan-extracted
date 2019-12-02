@@ -32,7 +32,7 @@ local *IO::Async::Handle::connect = sub {
    ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
    $self->set_handle( $selfsock );
 
-   return Future->new->done( $self );
+   return Future->done( $self );
 };
 
 my $f = $http->do_request(
@@ -49,7 +49,7 @@ $peersock->print( "HTTP/1.1 200 OK$CRLF" .
                   "Content-Length: 0$CRLF" .
                   $CRLF );
 
-wait_for { $f->is_ready };
+wait_for_future( $f );
 
 # gut-wrenching
 my $conn = $http->{connections}{"$host:80"}[0];

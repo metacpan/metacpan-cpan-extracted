@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2019 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -18,7 +18,8 @@ FunctionalPerl::Htmlgen::Cost
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -33,10 +34,11 @@ use strict; use warnings; use warnings FATAL => 'uninitialized';
 use Function::Parameters qw(:strict);
 use Sub::Call::Tail;
 
-{
-    package PFLANZE::Cost;
+package FunctionalPerl::Htmlgen::Cost::_::Cost {
     use FP::Array ":all";
+
     use FP::Struct [qw(name is_purchaseable basecosts val)];
+
     method cost ($index) {
         $$self{_cost} ||= do {
             add($self->val,
@@ -48,10 +50,12 @@ use Sub::Call::Tail;
     }
     _END_
 }
-{
-    package PFLANZE::Totalcost;
+
+package FunctionalPerl::Htmlgen::Cost::_::Totalcost {
     use FP::Array_sort ":all";
+
     use FP::Struct [qw(costs)];
+
     method range () {
         @{$$self{costs}} or die "no costs given";#
         my $index;

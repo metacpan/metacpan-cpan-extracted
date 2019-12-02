@@ -1,3 +1,8 @@
+0.003   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules (Data::Sah::Coerce 0.037+).
+
+
 0.002   2019-07-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Add schemas: date::dow_num::{id,en_or_id},

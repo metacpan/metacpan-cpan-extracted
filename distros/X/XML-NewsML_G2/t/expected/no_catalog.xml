@@ -14,10 +14,10 @@
     <provider qcode="nprov:apa">
       <name>APA - Austria Presse Agentur</name>
     </provider>
-    <versionCreated>2012-01-01T14:00:00+01:00</versionCreated>
+    <versionCreated>2012-01-01T13:00:00+00:00</versionCreated>
     <embargoed>2012-03-15T12:00:00+01:00</embargoed>
     <pubStatus qcode="stat:usable"/>
-    <generator versioninfo="0.3.3">XML::NewsML_G2</generator>
+    <generator versioninfo="0.3.4">XML::NewsML_G2</generator>
     <edNote>frei für Dienstagsausgaben</edNote>
     <edNote>Schluss</edNote>
     <edNote>Bilder zum Schweizerhaus sind im AOM, z.B. ABD0019 vom 23. März 2006, abrufbar</edNote>

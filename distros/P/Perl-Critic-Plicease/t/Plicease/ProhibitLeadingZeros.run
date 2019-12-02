@@ -1,0 +1,71 @@
+## name Bad1
+## failures 1
+## cut
+
+$x = 0100;
+
+## name Okayish
+## failures 0
+## cut
+
+$x = 0000;
+
+## name Chmod1
+## failures 0
+## cut
+
+chmod 0200, "filename";
+
+## name Chmod2
+## failures 0
+## cut
+
+chmod(0200, "filename");
+
+## name Chmod3
+## failures 0
+## cut
+
+chmod(0000, "filename");
+
+## name Chmod4
+## failures 0
+## cut
+
+chmod oct(0200), "filename";
+
+## name MkPath1
+## failures 0
+## cut
+
+mkpath "/foo/bar/baz", 1, 0755;
+
+## name MkPath2
+## failures 0
+## cut
+
+mkpath("/foo/bar/baz", 1, 0755);
+
+## name MkPath2
+## failures 0
+## cut
+
+mkpath("/foo/bar/baz", 1, 0000);
+
+## name MkPath3
+## failures 0
+## cut
+
+mkpath("/foo/bar/baz", 1, oct(700));
+
+## name MkPathMethod1
+## failures 0
+## cut
+
+dir()->mkpath("/foo/bar/baz", 0700);
+
+## name MkPathMethod2
+## failures 0
+## cut
+
+$data->mkpath("/foo/bar/baz", 0700);

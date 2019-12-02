@@ -3,8 +3,8 @@ NAME
     attributes
 
 VERSION
-    This document describes version 0.032 of App::ppgrep (from Perl
-    distribution App-ppgrep), released on 2019-07-04.
+    This document describes version 0.033 of App::ppgrep (from Perl
+    distribution App-ppgrep), released on 2019-11-29.
 
 SYNOPSIS
     See included script ppgrep.

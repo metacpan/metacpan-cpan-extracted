@@ -39,6 +39,7 @@ my $command = qq(
   -mMethod::Generate::DemolishAll
   -mMoo::HandleMoose::_TypeMap
   -mJSON::PP
+  -mDevel::GlobalDestruction
   -e 'print join "\\n", \%INC'
 );
 

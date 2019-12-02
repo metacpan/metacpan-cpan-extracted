@@ -15,7 +15,7 @@ Sah::Schemas::Date - Sah schemas related to date
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schemas::Date (from Perl distribution Sah-Schemas-Date), released on 2019-07-21.
+This document describes version 0.007 of Sah::Schemas::Date (from Perl distribution Sah-Schemas-Date), released on 2019-11-28.
 
 =head1 SYNOPSIS
 

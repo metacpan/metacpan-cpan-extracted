@@ -35,13 +35,12 @@
          "requires" : {
             "App::MysqlUtils" : "0",
             "DBIx::Connect::MySQL" : "0",
-            "Data::Sah::Coerce::perl::array::str_comma_sep" : "0.007",
-            "Data::Sah::Coerce::perl::date::float_epoch" : "0.025",
-            "Data::Sah::Coerce::perl::date::obj_DateTime" : "0.025",
-            "Data::Sah::Coerce::perl::date::obj_TimeMoment" : "0.025",
-            "Data::Sah::Coerce::perl::date::str_iso8601" : "0.025",
-            "Data::Sah::Coerce::perl::obj::str_url" : "0",
-            "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" : "0",
+            "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" : "0",
+            "Data::Sah::Coerce::perl::To_date::From_float::epoch" : "0",
+            "Data::Sah::Coerce::perl::To_date::From_obj::datetime" : "0",
+            "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" : "0",
+            "Data::Sah::Coerce::perl::To_date::From_str::iso8601" : "0",
+            "Data::Sah::Coerce::perl::To_obj::From_str::url" : "0",
             "Data::Sah::Compiler::perl::TH::any" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
@@ -56,7 +55,7 @@
             "File::chdir" : "0",
             "IPC::System::Options" : "0.332",
             "LWP::UserAgent" : "0",
-            "LWP::UserAgent::Patch::HTTPSHardTimeout" : "0",
+            "LWP::UserAgent::Patch::Retry" : "0",
             "Log::ger" : "0.027",
             "Path::Tiny" : "0",
             "Perinci::CmdLine::Any" : "0",
@@ -98,10 +97,10 @@
          "web" : "https://github.com/perlancar/perl-App-WHMCSUtils"
       }
    },
-   "version" : "0.009",
+   "version" : "0.011",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028002"
+         "version" : "5.030000"
       },
       "plugins" : [
          {
@@ -201,6 +200,11 @@
             "version" : "6.012"
          },
          {
+            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
+            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
+            "version" : "6.012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.012"
@@ -208,7 +212,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.597"
+            "version" : "0.599"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -249,7 +253,7 @@
                   ]
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -294,7 +298,7 @@
          {
             "class" : "Dist::Zilla::Plugin::OurPkgVersion",
             "name" : "@Author::PERLANCAR/OurPkgVersion",
-            "version" : "0.15"
+            "version" : "0.21"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -433,7 +437,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.07"
+                        "version" : "0.06"
                      }
                   ]
                }
@@ -495,9 +499,16 @@
             "version" : "2.058"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
-            "name" : "@Author::PERLANCAR/Test::Perl::Critic",
-            "version" : "3.001"
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic::Subset",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
+                  "finder" : [
+                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                  ]
+               }
+            },
+            "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
+            "version" : "3.001.003"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
@@ -622,8 +633,8 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
-   "x_generated_by_perl" : "v5.28.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_static_install" : 1
 }
 

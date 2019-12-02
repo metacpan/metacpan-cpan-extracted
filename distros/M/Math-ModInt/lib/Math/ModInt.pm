@@ -1,8 +1,6 @@
-# Copyright (c) 2009-2015 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: ModInt.pm 60 2015-05-18 08:47:12Z demetri $
+# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 package Math::ModInt;
 
@@ -42,7 +40,7 @@ BEGIN {
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(mod divmod qmod);
     our @CARP_NOT  = qw(Math::ModInt::ChineseRemainder);
-    our $VERSION   = '0.011';
+    our $VERSION   = '0.012';
 }
 
 sub _max_modulus_perl {
@@ -320,7 +318,7 @@ Math::ModInt - modular integer arithmetic
 
 =head1 VERSION
 
-This documentation refers to version 0.011 of Math::ModInt.
+This documentation refers to version 0.012 of Math::ModInt.
 
 =head1 SYNOPSIS
 
@@ -753,11 +751,10 @@ hall of fame.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2015 by Martin Becker.  All rights reserved.
+Copyright (c) 2009-2019 by Martin Becker, Blaubeuren.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.6.0 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see LICENSE file).
 
 =head1 DISCLAIMER OF WARRANTY
 

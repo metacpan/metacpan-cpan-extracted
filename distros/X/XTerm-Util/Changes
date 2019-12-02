@@ -1,3 +1,11 @@
+0.006   2019-11-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add fgcolor functions ({g,s}et_term_fgcolor,
+          term_fgcolor_is_{dark,light}).
+
+	- [doc] Show software compatibility/support using a table.
+
+
 0.005   2019-07-12  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

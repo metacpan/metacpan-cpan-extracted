@@ -10,8 +10,18 @@ BEGIN {
 		use_ok('Bio::DB::EntrezGene');
 }
 
+my %params;
+
+if (defined $ENV{BIOPERLEMAIL}) {
+    $params{'-email'} = $ENV{BIOPERLEMAIL};
+    $params{'-delay'} = 2;
+}
+
+$params{'-verbose'} = $ENV{BIOPERLDEBUG};
+
+
 my ($gb, $seq, $seqio);
-ok $gb = Bio::DB::EntrezGene->new(-retrievaltype => 'tempfile', -delay => 0);
+ok $gb = Bio::DB::EntrezGene->new(-retrievaltype => 'tempfile', %params);
 
 #
 # Bio::DB::EntrezGene

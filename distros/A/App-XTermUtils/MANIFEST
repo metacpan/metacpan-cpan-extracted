@@ -9,9 +9,13 @@ README
 dist.ini
 lib/App/XTermUtils.pm
 script/get-term-bgcolor
+script/get-term-fgcolor
 script/set-term-bgcolor
+script/set-term-fgcolor
 script/term-bgcolor-is-dark
 script/term-bgcolor-is-light
+script/term-fgcolor-is-dark
+script/term-fgcolor-is-light
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

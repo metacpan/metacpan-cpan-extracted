@@ -1,7 +1,7 @@
 package Sah::Schemas::EAN;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Various Sah schemas related to EAN (International/European Article Number)
@@ -18,7 +18,7 @@ Sah::Schemas::EAN - Various Sah schemas related to EAN (International/European A
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schemas::EAN (from Perl distribution Sah-Schemas-EAN), released on 2019-07-25.
+This document describes version 0.005 of Sah::Schemas::EAN (from Perl distribution Sah-Schemas-EAN), released on 2019-11-28.
 
 =head1 SAH SCHEMAS
 
@@ -74,7 +74,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

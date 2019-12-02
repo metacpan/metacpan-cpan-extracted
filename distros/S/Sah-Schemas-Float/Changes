@@ -1,3 +1,8 @@
+0.006   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule module(s) (0.034+).
+
+
 0.005   2019-07-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump dependency Data::Sah::Coerce to 0.032 [CT].

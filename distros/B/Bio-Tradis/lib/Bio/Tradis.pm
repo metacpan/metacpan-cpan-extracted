@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Bio::Tradis;
-$Bio::Tradis::VERSION = '1.4.1';
+$Bio::Tradis::VERSION = '1.4.3';
 # ABSTRACT: Bio-Tradis contains a set of tools to analyse the output from TraDIS analyses. For more information on the TraDIS method, see http://genome.cshlp.org/content/19/12/2308
 
 1;
@@ -18,7 +18,7 @@ Bio::Tradis - Bio-Tradis contains a set of tools to analyse the output from TraD
 
 =head1 VERSION
 
-version 1.4.1
+version 1.4.3
 
 =head1 SYNOPSIS
 

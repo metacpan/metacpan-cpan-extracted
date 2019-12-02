@@ -79,21 +79,13 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-clipedit
-
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 NAME
 
 clipedit - Edit clipboard contents in one swoop.
-
-=head1 VERSION
-
-version 0.20
 
 =head1 MOTIVATION
 

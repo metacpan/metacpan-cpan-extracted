@@ -1,9 +1,9 @@
 package Sah::SchemaR::url;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.011'; # VERSION
 
-our $rschema = ["obj",[{isa=>"URI",summary=>"URL string","x.perl.coerce_rules"=>["str_url"]}],["obj"]];
+our $rschema = ["obj",[{isa=>"URI",summary=>"URL string","x.perl.coerce_rules"=>["From_str::url"]}],["obj"]];
 
 1;
 # ABSTRACT: URL string
@@ -20,7 +20,7 @@ Sah::SchemaR::url - URL string
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::url (from Perl distribution Sah-Schemas-URL), released on 2019-07-25.
+This document describes version 0.011 of Sah::SchemaR::url (from Perl distribution Sah-Schemas-URL), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

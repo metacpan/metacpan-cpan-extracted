@@ -1,5 +1,5 @@
 package Util::Medley::File;
-$Util::Medley::File::VERSION = '0.013';
+$Util::Medley::File::VERSION = '0.016';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -21,7 +21,7 @@ Util::Medley::File - utility file methods
 
 =head1 VERSION
 
-version 0.013
+version 0.016
 
 =cut
 
@@ -352,7 +352,8 @@ multi method find (Str :$dir!) {
 	my $next = $rule->iter($dir);
 
 	while ( defined( my $path = $next->() ) ) {
-		
+	
+		next if $path eq $dir; # don't return self	
 		push @paths, $path;
 	}
 

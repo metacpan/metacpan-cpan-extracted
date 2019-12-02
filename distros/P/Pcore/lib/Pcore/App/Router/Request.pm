@@ -11,7 +11,7 @@ has path => ( required => 1 );
 
 has _auth => ( init_arg => undef );    # request authentication result
 
-sub authenticate ( $self ) {
+sub authenticate ( $self, $cookie_name = undef ) {
 
     # request is already authenticated
     if ( exists $self->{_auth} ) {
@@ -28,26 +28,26 @@ sub authenticate ( $self ) {
         my $token;
 
         # get token from query string: access_token=<token>
-        if ( $env->{QUERY_STRING} && $env->{QUERY_STRING} =~ /\baccess_token=([^&]+)/sm ) {
-            $token = $1;
-        }
+        # if ( $env->{QUERY_STRING} && $env->{QUERY_STRING} =~ /\baccess_token=([^&]+)/sm ) {
+        #     $token = $1;
+        # }
 
         # get token from HTTP header: Authorization: Token <token>
-        elsif ( $env->{HTTP_AUTHORIZATION} && $env->{HTTP_AUTHORIZATION} =~ /Token\s+(.+)\b/smi ) {
+        if ( $env->{HTTP_AUTHORIZATION} && $env->{HTTP_AUTHORIZATION} =~ /Token\s+(.+)\b/smi ) {
             $token = $1;
         }
 
         # get token from HTTP Basic authoriation header
-        elsif ( $env->{HTTP_AUTHORIZATION} && $env->{HTTP_AUTHORIZATION} =~ /Basic\s+(.+)\b/smi ) {
-            $token = eval { from_b64 $1};
+        # elsif ( $env->{HTTP_AUTHORIZATION} && $env->{HTTP_AUTHORIZATION} =~ /Basic\s+(.+)\b/smi ) {
+        #     $token = eval { from_b64 $1};
 
-            $token = [ split /:/sm, $token ] if $token;
+        #     $token = [ split /:/sm, $token ] if $token;
 
-            undef $token if !defined $token->[0];
-        }
+        #     undef $token if !defined $token->[0];
+        # }
 
         # get token from HTTP cookie "token"
-        elsif ( $env->{HTTP_COOKIE} && $env->{HTTP_COOKIE} =~ /\btoken=([^;]+)\b/sm ) {
+        elsif ( $cookie_name && $env->{HTTP_COOKIE} && $env->{HTTP_COOKIE} =~ /\b$cookie_name=([^;]+)\b/sm ) {
             $token = $1;
         }
 

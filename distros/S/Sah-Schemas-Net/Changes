@@ -1,3 +1,8 @@
+0.008   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules (Data::Sah::Coerce 0.034+).
+
+
 0.007   2019-07-25  Released-By: PERLANCAR; Urgency: medium
 
 	- Update metadata version 3->4.

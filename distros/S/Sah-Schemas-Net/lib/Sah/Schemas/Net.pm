@@ -1,7 +1,7 @@
 package Sah::Schemas::Net;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 1;
 # ABSTRACT: Schemas related to network (IP address, hostnames, etc)
@@ -18,7 +18,7 @@ Sah::Schemas::Net - Schemas related to network (IP address, hostnames, etc)
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schemas::Net (from Perl distribution Sah-Schemas-Net), released on 2019-07-25.
+This document describes version 0.008 of Sah::Schemas::Net (from Perl distribution Sah-Schemas-Net), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

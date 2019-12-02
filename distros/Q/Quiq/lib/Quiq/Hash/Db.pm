@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.165';
+our $VERSION = '1.166';
 
 use Fcntl ();
 use DB_File ();
@@ -159,7 +159,7 @@ sub close {
 
 =head1 VERSION
 
-1.165
+1.166
 
 =head1 AUTHOR
 

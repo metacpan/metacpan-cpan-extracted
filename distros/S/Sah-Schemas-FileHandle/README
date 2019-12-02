@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::FileHandle - Sah schemas for flilehandle
 
 VERSION
-    This document describes version 0.002 of Sah::Schemas::FileHandle (from
-    Perl distribution Sah-Schemas-FileHandle), released on 2019-04-09.
+    This document describes version 0.003 of Sah::Schemas::FileHandle (from
+    Perl distribution Sah-Schemas-FileHandle), released on 2019-11-28.
 
 SAH SCHEMAS
     *   dirhandle

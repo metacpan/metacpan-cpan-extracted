@@ -1,7 +1,9 @@
 package App::CSVUtils;
 
-our $DATE = '2019-06-06'; # DATE
-our $VERSION = '0.023'; # VERSION
+# AUTHOR
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-CSVUtils'; # DIST
+our $VERSION = '0.025'; # VERSION
 
 use 5.010001;
 use strict;
@@ -272,7 +274,7 @@ our %args_sort_fields = (
     },
     sort_example => {
         schema => ['array*', of=>'str*',
-                   'x.perl.coerce_rules' => ['str_comma_sep']],
+                   'x.perl.coerce_rules' => ['From_str::comma_sep']],
     },
 );
 
@@ -335,6 +337,7 @@ $SPEC{csvutil} = {
                 'sum',
                 'avg',
                 'select-row',
+                'split',
                 'grep',
                 'map',
                 'each-row',
@@ -388,6 +391,9 @@ sub csvutil {
     my @summary_row;
     my $selected_row;
     my $row_spec_sub;
+
+    # for action=split
+    my ($split_fh, $split_filename, $split_lines);
 
     my $row0;
     my $code_getline = sub {
@@ -618,6 +624,27 @@ sub csvutil {
             if ($i == 1 || $row_spec_sub->($i)) {
                 $res .= _get_csv_row($csv, $row, $i, $has_header);
             }
+        } elsif ($action eq 'split') {
+            next if $i == 1;
+            unless (defined $split_fh) {
+                $split_filename = "xaa";
+                $split_lines = 0;
+                open $split_fh, ">", $split_filename
+                    or die "Can't open '$split_filename': $!\n";
+            }
+            if ($split_lines >= $args{lines}) {
+                $split_filename++;
+                $split_lines = 0;
+                open $split_fh, ">", $split_filename
+                    or die "Can't open '$split_filename': $!\n";
+            }
+            if ($split_lines == 0 && $has_header) {
+                $csv->print($split_fh, $fields);
+                print $split_fh "\n";
+            }
+            $csv->print($split_fh, $row);
+            print $split_fh "\n";
+            $split_lines++;
         } elsif ($action eq 'grep') {
             unless ($code) {
                 $code = _compile($args{eval});
@@ -1139,11 +1166,54 @@ $SPEC{csv_select_row} = {
             pos => 1,
         },
     },
+    links => [
+        {url=>"prog:csv-split"},
+    ],
 };
 sub csv_select_row {
     my %args = @_;
 
     csvutil(%args, action=>'select-row');
+}
+
+$SPEC{csv_split} = {
+    v => 1.1,
+    summary => 'Split CSV file into several files',
+    description => <<'_',
+
+Will output split files xaa, xab, and so on. Each split file will contain a
+maximum of `lines` rows (options to limit split files' size based on number of
+characters and bytes will be added). Each split file will also contain CSV
+header.
+
+Warning: by default, existing split files xaa, xab, and so on will be
+overwritten.
+
+Interface is loosely based on the `split` Unix utility.
+
+_
+    args => {
+        %args_common,
+        %arg_filename_0,
+        lines => {
+            schema => ['uint*', min=>1],
+            default => 1000,
+            cmdline_aliases => {l=>{}},
+        },
+        # XXX --bytes (-b)
+        # XXX --line-bytes (-C)
+        # XXX -d (numeric suffix)
+        # --suffix-length (-a)
+        # --number, -n (chunks)
+    },
+    links => [
+        {url=>"prog:csv-select-row"},
+    ],
+};
+sub csv_split {
+    my %args = @_;
+
+    csvutil(%args, action=>'split');
 }
 
 $SPEC{csv_grep} = {
@@ -1975,7 +2045,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.023 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-06-06.
+This document describes version 0.025 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-11-29.
 
 =head1 DESCRIPTION
 
@@ -2022,6 +2092,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-sort-fields>
 
 =item * L<csv-sort-rows>
+
+=item * L<csv-split>
 
 =item * L<csv-sum>
 
@@ -2114,6 +2186,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_avg
 
 Usage:
@@ -2162,6 +2235,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_concat
@@ -2240,6 +2314,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_convert_to_hash
 
 Usage:
@@ -2288,6 +2363,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_delete_field
@@ -2340,6 +2416,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_dump
 
 Usage:
@@ -2388,6 +2465,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_each_row
@@ -2458,6 +2536,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_grep
@@ -2542,6 +2621,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_info
 
 Usage:
@@ -2588,6 +2668,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_list_field_names
 
 Usage:
@@ -2632,6 +2713,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_lookup_fields
@@ -2720,6 +2802,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_map
 
 Usage:
@@ -2802,6 +2885,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_munge_field
 
 Usage:
@@ -2862,6 +2946,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_replace_newline
 
 Usage:
@@ -2914,6 +2999,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_select_fields
@@ -2970,6 +3056,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_select_row
 
 Usage:
@@ -3018,6 +3105,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_setop
@@ -3147,6 +3235,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 csv_sort_fields
 
 Usage:
@@ -3214,6 +3303,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 csv_sort_rows
@@ -3343,6 +3433,66 @@ that contains extra information.
 Return value:  (any)
 
 
+
+=head2 csv_split
+
+Usage:
+
+ csv_split(%args) -> [status, msg, payload, meta]
+
+Split CSV file into several files.
+
+Will output split files xaa, xab, and so on. Each split file will contain a
+maximum of C<lines> rows (options to limit split files' size based on number of
+characters and bytes will be added). Each split file will also contain CSV
+header.
+
+Warning: by default, existing split files xaa, xab, and so on will be
+overwritten.
+
+Interface is loosely based on the C<split> Unix utility.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<lines> => I<uint> (default: 1000)
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 csv_sum
 
 Usage:
@@ -3437,7 +3587,11 @@ L<App::SerializeUtils>
 
 L<csvgrep>.
 
+L<csv-select-row>.
+
 L<setop>.
+
+L<csv-split>.
 
 =head1 AUTHOR
 

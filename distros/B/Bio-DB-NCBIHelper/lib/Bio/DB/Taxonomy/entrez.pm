@@ -101,7 +101,7 @@ Internal methods are usually preceded with a _
 # Let the code begin...
 
 package Bio::DB::Taxonomy::entrez;
-$Bio::DB::Taxonomy::entrez::VERSION = '1.7.4';
+$Bio::DB::Taxonomy::entrez::VERSION = '1.7.5';
 use vars qw($EntrezLocation $UrlParamSeparatorValue %EntrezParams
             $EntrezGet $EntrezSummary $EntrezFetch %SequenceParams
             $XMLTWIG $DATA_CACHE $RELATIONS);
@@ -168,7 +168,7 @@ sub _initialize {
 
   $self->SUPER::_initialize(@_);
 
-  my ($location,$params) = $self->_rearrange([qw(LOCATION PARAMS)],@_);
+  my ($location,$params,$email) = $self->_rearrange([qw(LOCATION PARAMS EMAIL)],@_);
 
   if( $params ) {
       if( ref($params) !~ /HASH/i ) {
@@ -177,6 +177,9 @@ sub _initialize {
       }
   } else {
       $params = \%EntrezParams;
+  }
+  if ($email) {
+      $params->{email} = $email;
   }
   $self->entrez_params($params);
   $self->entrez_url($location || $EntrezLocation );
@@ -593,7 +596,6 @@ sub entrez_params{
     return %$f;
 }
 
-
 =head2 Bio::DB::WebBase methods
 
 =head2 proxy_string
@@ -667,6 +669,7 @@ sub _run_query {
     # Given an eutil url, run the eutil query and parse the response into an
     # XML Twig object
     my ($self, $url) = @_;
+    $self->sleep();
     my $response = $self->get($url);
     if ($response->is_success) {
         $response = $response->content;

@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/pmgrep/pmgrep
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-09-09'; # DATE
+our $DATE = '2019-10-17'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.727'; # VERSION
+our $VERSION = '0.728'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,7 +41,7 @@ pmgrep - Print lines from installed Perl module sources matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.727 of pmgrep (from Perl distribution App-PMUtils), released on 2019-09-09.
+This document describes version 0.728 of pmgrep (from Perl distribution App-PMUtils), released on 2019-10-17.
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ See C<--regexp>.
 
 =item B<-e>=I<s@>
 
-Alias for -e.
+Alias for --regexp.
 
 See C<--regexp>.
 

@@ -107,7 +107,6 @@ of Dec 31, it'll be fine.
 
 Currently, the following warn (but have been cleared as safe):
     Pacific/Fiji
-    Pacific/Tongatapu
 
 NOTE 3: These steps often require manual intervention described
 below. After the intervention, rerun the command to make sure no
@@ -122,11 +121,11 @@ any previous value for the entry.  It is especially important that the first
 line in each entry should remain unchanged unless there is good reason
 to change it. The order of remaining lines may change to some extent.
 
-If the '-o' option produces any output, the entries need to be added
-to the data.offset.pl file.
+If the '-o' option produces any output, the entries need to be verified and
+added to the data.offset.pl file.
 
-If the '-z' option produces any output, the entries need to be added
-to the data.alias.pl or data.abbrev.pl file.
+If the '-z' option produces any output, the entries need to be verified and
+added to the data.alias.pl or data.abbrev.pl file.
 
 After adding a new value, rerun the command to make sure there are no more
 problems.

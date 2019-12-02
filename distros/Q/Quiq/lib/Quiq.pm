@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.165';
+our $VERSION = '1.166';
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Quiq - Class library for rapid development (German documentation)
 =head1 DESCRIPTION
 
 Diese Klassenbibliothek enthält anwendungsunabhängige Klassen,
-die ich in Perl-Projekten (nur Unix) einsetze. Sie sind nach
+die ich in Perl-Projekten (nur Unix/Linux) einsetze. Sie sind nach
 einheitlichen Prinzipien konzipiert. Die Bibliothek befindet
 sich unter kontinuierlicher Weiterentwicklung.
 
@@ -36,7 +36,7 @@ L<Quiq::Array> - Operationen auf Arrays
 
 =item *
 
-L<Quiq::AsciiTable> - Parse ASCII-Tabelle
+L<Quiq::AsciiTable> - Analysiere ASCII-Tabelle
 
 =item *
 
@@ -68,7 +68,7 @@ L<Quiq::Cascm> - Schnittstelle zu CA Harvest SCM
 
 =item *
 
-L<Quiq::ChartJs::TimeSeries> - Zeitreihen-Plot mittels Chart.js
+L<Quiq::ChartJs::TimeSeries> - Erzeuge Zeitreihen-Plot auf Basis von Chart.js
 
 =item *
 
@@ -700,7 +700,7 @@ L<Quiq::Stopwatch> - Zeitmesser
 
 =item *
 
-L<Quiq::Storable> - Persistenz für Perl-Datenstrukturen
+L<Quiq::Storable> - Perl-Datenstrukturen persistent speichern
 
 =item *
 
@@ -818,7 +818,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.165
+1.166
 
 =head1 AUTHOR
 

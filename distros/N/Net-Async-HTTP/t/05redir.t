@@ -39,7 +39,7 @@ $loop->add( $http );
       ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
       $self->set_handle( $selfsock );
 
-      return Future->new->done( $self );
+      return Future->done( $self );
    };
 
    my $future = $http->do_request(
@@ -128,7 +128,7 @@ $loop->add( $http );
       ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
       $self->set_handle( $selfsock );
 
-      return Future->new->done( $self );
+      return Future->done( $self );
    };
 
    $http->do_request(
@@ -199,7 +199,7 @@ $loop->add( $http );
       ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
       $self->set_handle( $selfsock );
 
-      return Future->new->done( $self );
+      return Future->done( $self );
    };
 
    my $f = $http->do_request(
@@ -214,9 +214,8 @@ $loop->add( $http );
    $peersock->syswrite( "HTTP/1.1 304 Not Modified$CRLF" .
                         $CRLF ); # 304 has no body
 
-   wait_for { $f->is_ready };
+   my $response = wait_for_future( $f )->get;
 
-   my $response = $f->get;
    is( $response->code, 304, 'HTTP 304 response not redirected' );
 }
 
@@ -233,7 +232,7 @@ $loop->add( $http );
       ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
       $self->set_handle( $selfsock );
 
-      return Future->new->done( $self );
+      return Future->done( $self );
    };
 
    my $f = $http->do_request(
@@ -253,9 +252,8 @@ $loop->add( $http );
                         "Location: /somewhere/else$CRLF" .
                         $CRLF );
 
-   wait_for { $f->is_ready };
+   my $response = wait_for_future( $f )->get;
 
-   my $response = $f->get;
    is( $response->code, 301, 'POST request not redirected' );
 }
 

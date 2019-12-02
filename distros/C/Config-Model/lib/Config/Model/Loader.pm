@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.136;
+package Config::Model::Loader 2.137;
 
 use Carp;
 use strict;
@@ -169,7 +169,7 @@ sub _split_cmd {
                 | (
                     /[^/]+/      # regexp
                     | (?:
-                       $quoted_string
+                       $quoted_string (?:,)?
                        | [^#=\.<>]+    # non action chars
                       )+
                   )
@@ -456,7 +456,7 @@ sub _load_check_list {
     if ( not defined $action and defined $subaction ) {
         Config::Model::Exception::Load->throw(
             object  => $element,
-            command => join( '', grep ( defined $_, @$inst ) ),
+            command => join( '', grep { defined $_} @$inst ),
             error   => "Wrong assignment with '$subaction' on check_list"
         );
     }
@@ -656,7 +656,7 @@ sub _load_list {
     if ( not defined $action and defined $subaction ) {
         Config::Model::Exception::Load->throw(
             object  => $element,
-            command => join( '', grep ( defined $_, @$inst ) ),
+            command => join( '', grep { defined $_} @$inst ),
             error   => "Wrong assignment with '$subaction' on "
                 . "element type: $elt_type, cargo_type: $cargo_type"
         );
@@ -989,7 +989,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 

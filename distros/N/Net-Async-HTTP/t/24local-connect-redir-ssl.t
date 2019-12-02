@@ -108,7 +108,7 @@ is( $response->content, "OK", '$response->content' );
 
    my $f = $http->GET( "https://127.0.0.1:$port/redir" );
 
-   wait_for { $f->is_ready };
+   wait_for_future( $f );
 
    ok( $f->failure, '->GET on http with require_SSL fails' );
    like( scalar $f->failure, qr/require_SSL/, 'require_SSL failure' );

@@ -1,0 +1,54 @@
+NAME
+    Data::Sah::Coerce::perl::To_str::From_str::to_cryptoexchange_currency_pa
+    ir - Coerce string into cryptoexchange currency pair, e.g. LTC/USD
+
+VERSION
+    This document describes version 0.005 of
+    Data::Sah::Coerce::perl::To_str::From_str::to_cryptoexchange_currency_pa
+    ir (from Perl distribution
+    Data-Sah-Coerce-perl-To_str-From_str-to_cryptoexchange_currency_pair),
+    released on 2019-11-28.
+
+SYNOPSIS
+    To use in a Sah schema:
+
+     ["str",{"x.perl.coerce_rules"=>["From_str::to_cryptoexchange_currency_pair"]}]
+
+DESCRIPTION
+    This coercion rules checks that:
+
+    *   string is in the form of "*currency1*/*currency2*"
+
+    *   *currency1* is a known cryptocurrency code
+
+    *   *currency2* is a known fiat currency or cryptocurrency code
+
+    *   *currency1* is not the same as *currency2*
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-Coerce-perl-To_str-From_str-to_cr
+    yptoexchange_currency_pair>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-Coerce-perl-To_str-From_str-
+    to_cryptoexchange_currency_pair>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce-perl-
+    To_str-From_str-to_cryptoexchange_currency_pair>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

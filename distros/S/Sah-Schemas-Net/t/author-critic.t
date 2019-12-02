@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.003
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/Data/Sah/Coerce/perl/To_obj/From_str/net_ipv4.pm','lib/Sah/Schema/net/hostname.pm','lib/Sah/Schema/net/ipv4.pm','lib/Sah/Schema/net/port.pm','lib/Sah/SchemaR/net/hostname.pm','lib/Sah/SchemaR/net/ipv4.pm','lib/Sah/SchemaR/net/port.pm','lib/Sah/Schemas/Net.pm'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

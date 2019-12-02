@@ -79,7 +79,8 @@ that are false.
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -91,6 +92,7 @@ package FP::Predicates;
               is_pure_object
               is_pure_class
               is_string
+              is_string_not_number
               is_nonnullstring
               is_natural0
               is_natural
@@ -110,6 +112,7 @@ package FP::Predicates;
 
               is_filename
               is_sequence
+              is_seq
 
               less_than
               greater_than
@@ -137,6 +140,8 @@ use Chj::TEST;
 use FP::Abstract::Pure;
 use Chj::BuiltinTypePredicates 'is_filehandle';
 # ^ should probably move more lowlevel predicates there
+use Scalar::Util qw(looks_like_number);
+
 
 # Only use `FP::Failure` features if $FP::Failure::use_failure is
 # true--which means that FP::Failure should be loaded, no need to
@@ -190,6 +195,14 @@ sub is_string ($) {
     my ($v)=@_;
     (defined $v
      and not ref $v) # relax?
+        or fail "is_string", $v
+}
+
+sub is_string_not_number ($) {
+    my ($v)=@_;
+    (defined $v
+     and not ref $v # relax?
+     and not looks_like_number($v))
         or fail "is_string", $v
 }
 
@@ -412,19 +425,23 @@ sub is_filename ($) {
         or fail "is_filename", $v
 }
 
+
 # can't be in `FP::Abstract::Sequence` since that package is for OO, well, what
 # to do about it?
 use FP::Lazy; # sigh dependency, too.
-sub is_sequence ($);
+
 sub is_sequence ($) {
-    (length ref $_[0] ?
-     (UNIVERSAL::isa($_[0], "FP::Abstract::Sequence")
-      or
-      # XX evil: inlined `is_promise`
-      UNIVERSAL::isa($_[0], "FP::Lazy::Promise")
-      && is_sequence (force $_[0]))
-     : '')
-        or fail "is_sequence", $_[0]
+    my $v= force $_[0];
+    UNIVERSAL::isa($v, "FP::Abstract::Sequence")
+        or fail "is_sequence", $v
+}
+
+# Like is_sequence but only returns true when the sequence isn't empty
+sub is_seq ($) {
+    my $v= force $_[0];
+    UNIVERSAL::isa($v, "FP::Abstract::Sequence")
+        && (not $v->is_null)
+        or fail "is_sequence", $v
 }
 
 

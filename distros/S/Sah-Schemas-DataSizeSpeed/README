@@ -3,9 +3,9 @@ NAME
     (filesize, transfer speed, etc)
 
 VERSION
-    This document describes version 0.002 of Sah::Schemas::DataSizeSpeed
+    This document describes version 0.004 of Sah::Schemas::DataSizeSpeed
     (from Perl distribution Sah-Schemas-DataSizeSpeed), released on
-    2019-07-25.
+    2019-11-29.
 
 SAH SCHEMAS
     *   filesize

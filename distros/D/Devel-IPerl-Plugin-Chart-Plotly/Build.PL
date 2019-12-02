@@ -18,32 +18,22 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Devel-IPerl-Plugin-Chart-Plotly",
-  "dist_version" => "0.006",
+  "dist_version" => "0.007",
   "license" => "mit",
   "module_name" => "Devel::IPerl::Plugin::Chart::Plotly",
   "recursive_test_files" => 1,
   "requires" => {
-    "Chart::Plotly" => "0.031",
-    "Chart::Plotly::Plot" => 0,
-    "Devel::IPerl::Display::HTML" => 0,
-    "Module::Find" => 0,
-    "Moo::Role" => 0,
-    "Role::Tiny" => 0,
-    "namespace::autoclean" => 0,
+    "Chart::Plotly" => "0.033",
     "perl" => "5.008",
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
-  },
-  "test_requires" => {
-    "Test::More" => 0
   }
 );
 
 
 my %fallback_build_requires = (
-  "Module::Build" => "0.28",
-  "Test::More" => 0
+  "Module::Build" => "0.28"
 );
 
 

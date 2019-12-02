@@ -1,5 +1,5 @@
 package Bio::Tradis::Samtools;
-$Bio::Tradis::Samtools::VERSION = '1.4.1';
+$Bio::Tradis::Samtools::VERSION = '1.4.3';
 # ABSTRACT: Change samtools syntax depending on version found
 
 
@@ -100,7 +100,7 @@ Bio::Tradis::Samtools - Change samtools syntax depending on version found
 
 =head1 VERSION
 
-version 1.4.1
+version 1.4.3
 
 =head1 SYNOPSIS
 

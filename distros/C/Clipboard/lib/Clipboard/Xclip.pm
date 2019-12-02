@@ -1,5 +1,5 @@
 package Clipboard::Xclip;
-$Clipboard::Xclip::VERSION = '0.20';
+$Clipboard::Xclip::VERSION = '0.21';
 use strict;
 use warnings;
 
@@ -85,13 +85,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-Clipboard::Xclip
-
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

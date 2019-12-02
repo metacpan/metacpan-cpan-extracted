@@ -1,4 +1,4 @@
-Ithumb-XS v0.2.0
+Ithumb-XS v0.3.0
 ================
 
 Ithumb::XS - is a fast, small (one function) and simple Perl-XS module
@@ -15,13 +15,13 @@ To manual install this module type the following:
 
 To automatical install:
 
-   cpan install Ithumb::XS
+   cpan -i Ithumb::XS
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Imlib2
+  Imlib2 (binary and headers)
 
 USAGE
 
@@ -29,11 +29,11 @@ USAGE
 
   use Ithumb::XS ();
 
-  Ithumb::XS::create_thumbnail({
+  Ithumb::XS::convert_image({
       width     => 800,
       height    => 600,
-      src_image => 'source_image.jpg',
-      dst_image => 'destination_result_image.jpg'
+      src_image => 'src_image.jpg',
+      dst_image => 'dst_image.jpg'
   });
 
 OO-interface:
@@ -44,8 +44,8 @@ OO-interface:
   $ithumb->convert({
       width     => 800,
       height    => 600,
-      src_image => 'source_image.jpg',
-      dst_image => 'destination_result_image.jpg'
+      src_image => 'src_image.jpg',
+      dst_image => 'dst_image.jpg'
   });
 
 COPYRIGHT AND LICENCE

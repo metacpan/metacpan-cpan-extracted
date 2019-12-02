@@ -1,5 +1,67 @@
 Revision history for FunctionalPerl
 
+0.72.18 2019-12-2
+    - some doc improvements
+    - website: link modules to CPAN url (over Github) if available;
+      fix bug due to sub prototype
+    - Predicates: add `is_string_not_number`, but is probably of no
+      use
+
+0.72.17 2019-12-2
+    - tests: avoid the word 'failed' in messages checking dependencies
+    - tests: fix(?) for Windows: do not use -x
+    - tests: more "make Inf properly version independent"
+    - dependencies: htmlgen/gen: depend on Trap only if --trap given
+    - documentation improvements (markdown files)
+    - Predicates: fix: remove hand inlining of 'force'; add `is_seq`
+    - Repl fix accessing values in boolean context
+    - Show,Lazy: show location information in unevaluated promises
+    - Show: do not show sub/promise details when running in test suite
+    - avoid using PFLANZE:: namespaces (there are still some in meta)
+    - create (beginnings of) FP::PureHash, FP::Abstract::Map
+    - export `pointer_eq`
+    - create FP::Docstring
+    - htmlgen: cleanups, docstrings, pod snippets, use PXML::XHTML
+      (making code more worthy to look at)
+    - htmlgen: add capability to use PerlTidy
+    - Sequence: add `split_at`; Stream: make `append` n-ary
+    - create meta/update-pod
+
+0.72.16 2019-11-29
+    - declare dependency on new example script (d'oh)
+
+0.72.15 2019-11-29
+    - documentation improvements, add functional-classes example
+    - fix test failure involving TailExpand's pod snippets
+    - rename method fp_interface_method_names ->
+      FP_Interface__method_names
+
+0.72.14 2019-11-28
+    - fix test failure with "Inf" vs. "inf"
+    - add FP::Mixin::Utils with a `F` utility method, added to Show
+      protocol and FP::Lazy-derived promises
+    - Makefile.PL: increase minimal Perl version to avoid Perl bugs
+    - Lazy: overload to error-describing exception to prevent
+      accidental use
+    - some docs
+
+0.72.13 2019-11-27
+    - documentation improvements
+    - fix for Windows
+    - Chj::TEST run_tests_ fix
+    - handle missing module dependencies in pod snippets correctly
+
+0.72.12 2019-11-26
+    - More Windows support work
+    - add relaxedequal to FP::Equal
+    - change Chj::TEST to use FP::Equal'relaxedequal instead of
+      dumperequal
+    - add `string` function to Ops
+    - create FP::BigInt
+    - change examples/fib to bigint to solve test failures due to
+      unreliable number implementation in base Perl
+    - workaround for failed TEST TAP location hack
+
 0.72.11 2019-11-26
     - reimplement repl+ in Perl for Windows
     - clean up tail expansion dependencies during testing, hopefully

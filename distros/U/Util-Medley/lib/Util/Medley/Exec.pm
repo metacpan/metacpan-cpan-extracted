@@ -1,5 +1,5 @@
 package Util::Medley::Exec;
-$Util::Medley::Exec::VERSION = '0.013';
+$Util::Medley::Exec::VERSION = '0.016';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -7,19 +7,37 @@ use Kavorka '-all';
 use Data::Printer alias => 'pdump';
 use Util::Medley::Crypt;
 
-method encryptStr (Str :$str!,
-				   Str :$key!) {
+=head1 NAME
 
+Util::Medley::Exec - proxy for cmdline to libs
+
+=head1 VERSION
+
+version 0.016
+
+=cut
+
+method encryptStr (Str :$str!,
+				   Str :$key) {
+
+	my %a;
+	$a{str} = $str;
+	$a{key} = $key if $key;
+	
 	my $crypt = Util::Medley::Crypt->new;
-	my $encrypted = $crypt->encryptStr(str => $str, key => $key);
+	my $encrypted = $crypt->encryptStr(%a);
 	say $encrypted;
 }
 
 method decryptStr (Str :$str!,
-				   Str :$key!) {
+				   Str :$key) {
 
+	my %a;
+	$a{str} = $str;
+	$a{key} = $key if $key;
+	
 	my $crypt = Util::Medley::Crypt->new;
-	my $decrypted = $crypt->decryptStr(str => $str, key => $key);
+	my $decrypted = $crypt->decryptStr(%a);
 	say $decrypted;
 }
 

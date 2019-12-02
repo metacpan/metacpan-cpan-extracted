@@ -14,6 +14,7 @@ lib/Perl/Critic/Policy/Plicease/ProhibitLeadingZeros.pm
 lib/Perl/Critic/Policy/Plicease/ProhibitUnicodeDigitInRegexp.pm
 perlcriticrc
 t/00_diag.t
+t/Plicease/ProhibitLeadingZeros.run
 t/Plicease/ProhibitUnicodeDigitInRegexp.run
 t/perl_critic_plicease.t
 t/perl_critic_policy_plicease_prohibitleadingzeros.t

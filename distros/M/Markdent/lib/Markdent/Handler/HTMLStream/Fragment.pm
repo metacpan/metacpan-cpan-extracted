@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use Moose;
 use MooseX::SemiAffordanceAccessor;
@@ -32,7 +32,7 @@ Markdent::Handler::HTMLStream::Fragment - Turns Markdent events into an HTML fra
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,8 @@
+Summary of important user-visible changes for Bio-Procedural
+------------------------------------------------------------
+
+1.7.4     2019-11-29 14:46:16-06:00 America/Chicago
+  * Make abstract for distribution more specific (minor fix)
+
+1.7.3     2019-11-29 14:32:24-06:00 America/Chicago
+  * First release after split from bioperl-live.

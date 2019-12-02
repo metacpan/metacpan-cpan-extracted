@@ -73,9 +73,10 @@ sub _build_upstream ($self) {
 }
 
 sub git_run ( $self, $cmd, $root = undef ) {
+    $root = $self->{root} if @_ == 2;    # use default value if root arg is not exists
+
     my $proc = P->sys->run_proc(
-        [ is_plain_arrayref $cmd ? ( 'git', $cmd->@* ) : 'git ' . $cmd ],
-        chdir  => @_ == 2 ? $self->{root} : $root,    # take default value if $root argument was not specified
+        [ is_plain_arrayref $cmd ? ( 'git', ( defined $root ? ( '-C', $root ) : () ), $cmd->@* ) : 'git ' . ( defined $root ? qq[-C "$root" ] : $EMPTY ) . $cmd ],
         use_fh => 1,
         stdout => 1,
         stderr => 1,

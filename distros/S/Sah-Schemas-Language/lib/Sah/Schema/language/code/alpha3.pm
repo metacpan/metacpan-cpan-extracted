@@ -1,7 +1,7 @@
 package Sah::Schema::language::code::alpha3;
 
-our $DATE = '2018-03-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use Locale::Codes::Language_Codes ();
 
@@ -20,7 +20,7 @@ Accept only current (not retired) codes. Only alpha-3 codes are accepted.
 _
     match => '\A[a-z]{3}\z',
     in => $codes,
-    'x.perl.coerce_rules' => ['str_tolower'],
+    'x.perl.coerce_rules' => ['From_str::to_lower'],
 }, {}];
 
 1;
@@ -38,7 +38,7 @@ Sah::Schema::language::code::alpha3 - Language code (alpha-3)
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::language::code::alpha3 (from Perl distribution Sah-Schemas-Language), released on 2018-03-25.
+This document describes version 0.003 of Sah::Schema::language::code::alpha3 (from Perl distribution Sah-Schemas-Language), released on 2019-11-29.
 
 =head1 DESCRIPTION
 
@@ -72,7 +72,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

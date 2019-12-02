@@ -11,8 +11,8 @@ use Test::More;
 my @pipe_data = (
     '',
     'abc',
+    'abc' x 100,
     'abc' x 1000,
-    'abc' x 10_000,
 );
 
 plan tests => scalar(@pipe_data);

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Maty\x{e1}\x{161} Kopp <matyas.kopp\@gmail.com>"
   ],
   "dist_name" => "PMLTQ-Suggest",
-  "dist_version" => "1.0.4",
+  "dist_version" => "1.1.0",
   "license" => "perl",
   "module_name" => "PMLTQ::Suggest",
   "recursive_test_files" => 1,

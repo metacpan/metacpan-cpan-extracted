@@ -85,7 +85,6 @@ sub rcon_mock {
 
     # IO::Select Mock
     my %handles;
-    my $smock  = Test::MockModule->new('IO::Select');
     my %smocks = (
         new      => sub { bless [undef,0], shift },
         remove   => sub { delete @handles{@_} },
@@ -96,7 +95,7 @@ sub rcon_mock {
             0 < length $mock->{read_buf};
         },
     );
-    $smock->mock($_ => $smocks{$_}) for keys %smocks;
+    $mock->{smock}->mock($_ => $smocks{$_}) for keys %smocks;
 
     %mocks = (
         %default_mock,

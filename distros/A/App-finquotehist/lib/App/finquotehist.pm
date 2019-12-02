@@ -1,7 +1,9 @@
 package App::finquotehist;
 
-our $DATE = '2018-09-07'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-finquotehist'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,7 +15,7 @@ our %SPEC;
 my $sch_date = [
     'date*', {
         'x.perl.coerce_to' => 'DateTime',
-        'x.perl.coerce_rules' => ['str_natural'],
+        'x.perl.coerce_rules' => ['From_str::natural'],
     },
 ];
 
@@ -111,7 +113,7 @@ sub finquotehist {
     if ($action eq 'list_engines') {
         require PERLANCAR::Module::List;
         my $mods = PERLANCAR::Module::List::list_modules(
-            "Finance::QuoteHist::", {list_modules=>1});
+            "Finance::QuoteHist::", {list_modules=>1, recurse=>1});
         return [200, "OK", [
             grep {!/\A(Generic)\z/}
                 map {my $x = $_; $x =~ s/\AFinance::QuoteHist:://; $x}
@@ -190,7 +192,7 @@ App::finquotehist - Fetch historical stock quotes
 
 =head1 VERSION
 
-This document describes version 0.001 of App::finquotehist (from Perl distribution App-finquotehist), released on 2018-09-07.
+This document describes version 0.002 of App::finquotehist (from Perl distribution App-finquotehist), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -203,7 +205,7 @@ See L<finquotehist> script.
 
 Usage:
 
- finquotehist(%args) -> [status, msg, result, meta]
+ finquotehist(%args) -> [status, msg, payload, meta]
 
 Fetch historical stock quotes.
 
@@ -275,7 +277,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -303,7 +305,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

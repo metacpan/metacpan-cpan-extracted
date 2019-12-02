@@ -1,15 +1,21 @@
-0.003   2019-06-08 (PERLANCAR)
+0.004   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
+	  0.034+).
+
+
+0.003   2019-06-08  Released-By: PERLANCAR
 
         - Add utilities: retry-{lild,limd,mild,mimd}.
 
         - Update to Algoritm-Backoff 0.006.
 
 
-0.002   2019-06-07 (PERLANCAR)
+0.002   2019-06-07  Released-By: PERLANCAR
 
 	- Add utilities: retry, show-backoff-delays.
 
 
-0.001   2019-06-05 (PERLANCAR)
+0.001   2019-06-05  Released-By: PERLANCAR
 
         - First release.

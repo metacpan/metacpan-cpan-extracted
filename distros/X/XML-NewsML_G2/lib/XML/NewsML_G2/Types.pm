@@ -8,7 +8,7 @@ use warnings;
 use strict;
 
 enum 'XML::NewsML_G2::Types::Nature',
-    [qw(text picture graphics audio video composite)];
+    [qw(text picture graphics audio video composite concept)];
 
 enum 'XML::NewsML_G2::Types::Group_Mode', [qw(bag sequential alternative)];
 
@@ -34,6 +34,10 @@ subtype 'XML::NewsML_G2::ArrayRefOfCreators',
 coerce 'XML::NewsML_G2::ArrayRefOfCreators', from 'ArrayRef[Str]', via {
     [ map { XML::NewsML_G2::Creator->new( name => $_ ) } @$_ ]
 };
+
+class_type 'XML::NewsML_G2::Translatable_Text';
+coerce 'XML::NewsML_G2::Translatable_Text', from 'Str',
+    via { use_module('XML::NewsML_G2::Translatable_Text')->new( text => $_ ) };
 
 1;
 __END__

@@ -1,9 +1,9 @@
 package Sah::SchemaR::filehandle;
 
-our $DATE = '2019-04-09'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
-our $rschema = ["any",[{summary=>"Filehandle","x.perl.coerce_rules"=>["validate_filehandle"]}],["any"]];
+our $rschema = ["any",[{summary=>"Filehandle","x.perl.coerce_rules"=>["From_any::validate_filehandle"]}],["any"]];
 
 1;
 # ABSTRACT: Filehandle
@@ -20,7 +20,7 @@ Sah::SchemaR::filehandle - Filehandle
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::filehandle (from Perl distribution Sah-Schemas-FileHandle), released on 2019-04-09.
+This document describes version 0.003 of Sah::SchemaR::filehandle (from Perl distribution Sah-Schemas-FileHandle), released on 2019-11-28.
 
 =head1 DESCRIPTION
 

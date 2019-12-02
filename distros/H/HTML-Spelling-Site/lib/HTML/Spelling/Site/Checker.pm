@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Checker;
-$HTML::Spelling::Site::Checker::VERSION = '0.4.0';
+$HTML::Spelling::Site::Checker::VERSION = '0.4.1';
 use strict;
 use warnings;
 use autodie;
@@ -160,7 +160,7 @@ s{\A(?:(?:ֹו?(?:ש|ל|מ|ב|כש|לכש|מה|שה|לכשה|ב-))|ו)-?}{};
             }
         };
 
-        open( my $fh, "<:utf8", $filename );
+        open( my $fh, "<:encoding(UTF-8)", $filename );
 
         HTML::Parser->new(
             api_version => 3,
@@ -240,13 +240,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-HTML::Spelling::Site::Checker
-
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 
@@ -409,10 +405,6 @@ local HTML files.
 =head1 NAME
 
 HTML::Spelling::Site::Checker - does the actual checking.
-
-=head1 VERSION
-
-version 0.4.0
 
 =head1 METHODS
 

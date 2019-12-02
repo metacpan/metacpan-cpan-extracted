@@ -1,353 +1,42 @@
 {
-   "abstract" : "Aspose.Slides Cloud SDK for Perl",
+   "abstract" : "Aspose.Slides Cloud SDK",
    "author" : [
-      "Farooq Sheikh <support@aspose.com>"
+      "Victor Putrov"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "AsposeSlidesCloud-SlidesApi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.10"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "AsposeStorageCloud::StorageApi" : "0",
-            "Carp" : "0",
-            "Data::Dumper" : "0",
-            "Date::Parse" : "0",
-            "DateTime" : "0",
-            "Digest::HMAC_SHA1" : "0",
-            "Exporter" : "0",
-            "File::Slurp" : "0",
-            "HTTP::Headers" : "0",
-            "HTTP::Request::Common" : "0",
-            "HTTP::Response" : "0",
-            "HTTP::Status" : "0",
-            "JSON" : "0",
-            "LWP::UserAgent" : "0",
-            "Log::Any" : "0",
-            "MIME::Base64" : "0",
-            "Module::Runtime" : "0",
-            "Scalar::Util" : "0",
-            "Test::Exception" : "0",
-            "URI::Escape" : "0",
-            "URI::Query" : "0",
-            "perl" : "v5.6.0",
-            "strict" : "0",
-            "utf8" : "0",
-            "warnings" : "0"
+            "perl" : "5.008004"
          }
       }
    },
-   "provides" : {
-      "AsposeSlidesCloud::ApiClient" : {
-         "file" : "lib/AsposeSlidesCloud/ApiClient.pm"
-      },
-      "AsposeSlidesCloud::Configuration" : {
-         "file" : "lib/AsposeSlidesCloud/Configuration.pm"
-      },
-      "AsposeSlidesCloud::Object::ArrowHeadProperties" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ArrowHeadProperties.pm"
-      },
-      "AsposeSlidesCloud::Object::AutoShapeType" : {
-         "file" : "lib/AsposeSlidesCloud/Object/AutoShapeType.pm"
-      },
-      "AsposeSlidesCloud::Object::BaseObject" : {
-         "file" : "lib/AsposeSlidesCloud/Object/BaseObject.pm"
-      },
-      "AsposeSlidesCloud::Object::ColorScheme" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ColorScheme.pm"
-      },
-      "AsposeSlidesCloud::Object::ColorSchemeResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ColorSchemeResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::CommonResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/CommonResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::CustomDashPattern" : {
-         "file" : "lib/AsposeSlidesCloud/Object/CustomDashPattern.pm"
-      },
-      "AsposeSlidesCloud::Object::Document" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Document.pm"
-      },
-      "AsposeSlidesCloud::Object::DocumentProperties" : {
-         "file" : "lib/AsposeSlidesCloud/Object/DocumentProperties.pm"
-      },
-      "AsposeSlidesCloud::Object::DocumentPropertiesResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/DocumentPropertiesResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::DocumentProperty" : {
-         "file" : "lib/AsposeSlidesCloud/Object/DocumentProperty.pm"
-      },
-      "AsposeSlidesCloud::Object::DocumentPropertyResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/DocumentPropertyResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::DocumentResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/DocumentResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::ExportFormats" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ExportFormats.pm"
-      },
-      "AsposeSlidesCloud::Object::FillFormat" : {
-         "file" : "lib/AsposeSlidesCloud/Object/FillFormat.pm"
-      },
-      "AsposeSlidesCloud::Object::FillType" : {
-         "file" : "lib/AsposeSlidesCloud/Object/FillType.pm"
-      },
-      "AsposeSlidesCloud::Object::FontScheme" : {
-         "file" : "lib/AsposeSlidesCloud/Object/FontScheme.pm"
-      },
-      "AsposeSlidesCloud::Object::FontSchemeResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/FontSchemeResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::FontSet" : {
-         "file" : "lib/AsposeSlidesCloud/Object/FontSet.pm"
-      },
-      "AsposeSlidesCloud::Object::FormatScheme" : {
-         "file" : "lib/AsposeSlidesCloud/Object/FormatScheme.pm"
-      },
-      "AsposeSlidesCloud::Object::FormatSchemeResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/FormatSchemeResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::HtmlExportOptions" : {
-         "file" : "lib/AsposeSlidesCloud/Object/HtmlExportOptions.pm"
-      },
-      "AsposeSlidesCloud::Object::HttpResponseMessage" : {
-         "file" : "lib/AsposeSlidesCloud/Object/HttpResponseMessage.pm"
-      },
-      "AsposeSlidesCloud::Object::HttpStatusCode" : {
-         "file" : "lib/AsposeSlidesCloud/Object/HttpStatusCode.pm"
-      },
-      "AsposeSlidesCloud::Object::Image" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Image.pm"
-      },
-      "AsposeSlidesCloud::Object::Images" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Images.pm"
-      },
-      "AsposeSlidesCloud::Object::ImagesResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ImagesResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::Int32" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Int32.pm"
-      },
-      "AsposeSlidesCloud::Object::LineAlignment" : {
-         "file" : "lib/AsposeSlidesCloud/Object/LineAlignment.pm"
-      },
-      "AsposeSlidesCloud::Object::LineArrowheadLength" : {
-         "file" : "lib/AsposeSlidesCloud/Object/LineArrowheadLength.pm"
-      },
-      "AsposeSlidesCloud::Object::LineArrowheadStyle" : {
-         "file" : "lib/AsposeSlidesCloud/Object/LineArrowheadStyle.pm"
-      },
-      "AsposeSlidesCloud::Object::LineArrowheadWidth" : {
-         "file" : "lib/AsposeSlidesCloud/Object/LineArrowheadWidth.pm"
-      },
-      "AsposeSlidesCloud::Object::LineCapStyle" : {
-         "file" : "lib/AsposeSlidesCloud/Object/LineCapStyle.pm"
-      },
-      "AsposeSlidesCloud::Object::LineDashStyle" : {
-         "file" : "lib/AsposeSlidesCloud/Object/LineDashStyle.pm"
-      },
-      "AsposeSlidesCloud::Object::LineFormat" : {
-         "file" : "lib/AsposeSlidesCloud/Object/LineFormat.pm"
-      },
-      "AsposeSlidesCloud::Object::LineJoinStyle" : {
-         "file" : "lib/AsposeSlidesCloud/Object/LineJoinStyle.pm"
-      },
-      "AsposeSlidesCloud::Object::LineNumberRestartMode" : {
-         "file" : "lib/AsposeSlidesCloud/Object/LineNumberRestartMode.pm"
-      },
-      "AsposeSlidesCloud::Object::LineStyle" : {
-         "file" : "lib/AsposeSlidesCloud/Object/LineStyle.pm"
-      },
-      "AsposeSlidesCloud::Object::NumberStyle" : {
-         "file" : "lib/AsposeSlidesCloud/Object/NumberStyle.pm"
-      },
-      "AsposeSlidesCloud::Object::OrderedMergeRequest" : {
-         "file" : "lib/AsposeSlidesCloud/Object/OrderedMergeRequest.pm"
-      },
-      "AsposeSlidesCloud::Object::Orientation" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Orientation.pm"
-      },
-      "AsposeSlidesCloud::Object::PageBorderAppliesTo" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PageBorderAppliesTo.pm"
-      },
-      "AsposeSlidesCloud::Object::PageBorderDistanceFrom" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PageBorderDistanceFrom.pm"
-      },
-      "AsposeSlidesCloud::Object::PageVerticalAlignment" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PageVerticalAlignment.pm"
-      },
-      "AsposeSlidesCloud::Object::PaperSize" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PaperSize.pm"
-      },
-      "AsposeSlidesCloud::Object::PdfCompliance" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PdfCompliance.pm"
-      },
-      "AsposeSlidesCloud::Object::PdfExportOptions" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PdfExportOptions.pm"
-      },
-      "AsposeSlidesCloud::Object::PdfTextCompression" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PdfTextCompression.pm"
-      },
-      "AsposeSlidesCloud::Object::Placeholder" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Placeholder.pm"
-      },
-      "AsposeSlidesCloud::Object::PlaceholderOrientation" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PlaceholderOrientation.pm"
-      },
-      "AsposeSlidesCloud::Object::PlaceholderResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PlaceholderResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::PlaceholderSize" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PlaceholderSize.pm"
-      },
-      "AsposeSlidesCloud::Object::PlaceholderType" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PlaceholderType.pm"
-      },
-      "AsposeSlidesCloud::Object::Placeholders" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Placeholders.pm"
-      },
-      "AsposeSlidesCloud::Object::PlaceholdersResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PlaceholdersResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::Portion" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Portion.pm"
-      },
-      "AsposeSlidesCloud::Object::PortionResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PortionResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::PresentationStringReplaceResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PresentationStringReplaceResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::PresentationToMerge" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PresentationToMerge.pm"
-      },
-      "AsposeSlidesCloud::Object::PresentationsMergeRequest" : {
-         "file" : "lib/AsposeSlidesCloud/Object/PresentationsMergeRequest.pm"
-      },
-      "AsposeSlidesCloud::Object::ReportType" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ReportType.pm"
-      },
-      "AsposeSlidesCloud::Object::ResourceUri" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ResourceUri.pm"
-      },
-      "AsposeSlidesCloud::Object::ResourceUriElement" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ResourceUriElement.pm"
-      },
-      "AsposeSlidesCloud::Object::ResponseMessage" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ResponseMessage.pm"
-      },
-      "AsposeSlidesCloud::Object::SectionStart" : {
-         "file" : "lib/AsposeSlidesCloud/Object/SectionStart.pm"
-      },
-      "AsposeSlidesCloud::Object::Shape" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Shape.pm"
-      },
-      "AsposeSlidesCloud::Object::ShapeResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ShapeResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::Shapes" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Shapes.pm"
-      },
-      "AsposeSlidesCloud::Object::ShapesResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ShapesResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::Single" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Single.pm"
-      },
-      "AsposeSlidesCloud::Object::Slide" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Slide.pm"
-      },
-      "AsposeSlidesCloud::Object::SlideBackground" : {
-         "file" : "lib/AsposeSlidesCloud/Object/SlideBackground.pm"
-      },
-      "AsposeSlidesCloud::Object::SlideBackgroundResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/SlideBackgroundResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::SlideComment" : {
-         "file" : "lib/AsposeSlidesCloud/Object/SlideComment.pm"
-      },
-      "AsposeSlidesCloud::Object::SlideComments" : {
-         "file" : "lib/AsposeSlidesCloud/Object/SlideComments.pm"
-      },
-      "AsposeSlidesCloud::Object::SlideCommentsResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/SlideCommentsResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::SlideListResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/SlideListResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::SlideResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/SlideResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::SlideStringReplaceResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/SlideStringReplaceResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::Slides" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Slides.pm"
-      },
-      "AsposeSlidesCloud::Object::SplitDocumentResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/SplitDocumentResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::SplitDocumentResult" : {
-         "file" : "lib/AsposeSlidesCloud/Object/SplitDocumentResult.pm"
-      },
-      "AsposeSlidesCloud::Object::String" : {
-         "file" : "lib/AsposeSlidesCloud/Object/String.pm"
-      },
-      "AsposeSlidesCloud::Object::StyleIdentifier" : {
-         "file" : "lib/AsposeSlidesCloud/Object/StyleIdentifier.pm"
-      },
-      "AsposeSlidesCloud::Object::TextEffect" : {
-         "file" : "lib/AsposeSlidesCloud/Object/TextEffect.pm"
-      },
-      "AsposeSlidesCloud::Object::TextItem" : {
-         "file" : "lib/AsposeSlidesCloud/Object/TextItem.pm"
-      },
-      "AsposeSlidesCloud::Object::TextItems" : {
-         "file" : "lib/AsposeSlidesCloud/Object/TextItems.pm"
-      },
-      "AsposeSlidesCloud::Object::TextItemsResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/TextItemsResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::Theme" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Theme.pm"
-      },
-      "AsposeSlidesCloud::Object::ThemeResponse" : {
-         "file" : "lib/AsposeSlidesCloud/Object/ThemeResponse.pm"
-      },
-      "AsposeSlidesCloud::Object::TiffExportOptions" : {
-         "file" : "lib/AsposeSlidesCloud/Object/TiffExportOptions.pm"
-      },
-      "AsposeSlidesCloud::Object::Underline" : {
-         "file" : "lib/AsposeSlidesCloud/Object/Underline.pm"
-      },
-      "AsposeSlidesCloud::SlidesApi" : {
-         "file" : "lib/AsposeSlidesCloud/SlidesApi.pm",
-         "version" : "1.03"
-      }
-   },
    "release_status" : "stable",
-   "resources" : {
-      "license" : [
-         "http://www.opensource.org/licenses/mit-license.php"
-      ]
-   },
-   "version" : "1.03",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "v19.11.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

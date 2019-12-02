@@ -1,3 +1,4 @@
+AUTHORS
 bin/transmission-client.pl
 Changes
 inc/Module/AutoInstall.pm
@@ -29,6 +30,7 @@ t/00-pod-coverage.t
 t/00-pod.t
 t/05-utils.t
 t/10-client.t
+t/10-stats.t
 t/10-torrent.t
 t/10-types.t
 t/20-real.t

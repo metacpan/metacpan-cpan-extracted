@@ -4,7 +4,7 @@ use Scalar::Util qw(looks_like_number);
 use Moose;
 use namespace::autoclean;
 
-extends 'XML::NewsML_G2::Writer';
+extends 'XML::NewsML_G2::Writer::Substancial_Item';
 
 has 'news_item',
     isa      => 'XML::NewsML_G2::News_Item',
@@ -101,90 +101,6 @@ sub _create_subjects_storytypes {
         $self->scheme_manager->add_qcode_or_literal( $s, 'storytype',
             $_->qcode );
     }
-    return @res;
-}
-
-sub _create_subjects_media_topic {
-    my $self = shift;
-    my @res;
-
-    push @res, $self->doc->createComment('media topics')
-        if $self->news_item->has_media_topics;
-    foreach my $mt_qcode ( sort keys %{ $self->news_item->media_topics } ) {
-        my $mt = $self->news_item->media_topics->{$mt_qcode};
-        my $why = $mt->direct ? 'why:direct' : 'why:ancestor';
-        push @res,
-            my $s = $self->create_element(
-            'subject',
-            type       => 'cpnat:abstract',
-            why        => $why,
-            _name_text => $mt
-            );
-        $self->scheme_manager->add_qcode_or_literal( $s, 'medtop',
-            $mt->qcode );
-        foreach my $lang ( sort keys %{ $mt->translations } ) {
-            $s->appendChild(
-                $self->create_element(
-                    'name',
-                    'xml:lang' => $lang,
-                    _text      => $mt->translations->{$lang}
-                )
-            );
-        }
-        if ( $mt->parent ) {
-            $s->appendChild( my $b = $self->create_element('broader') );
-            $self->scheme_manager->add_qcode_or_literal( $b, 'medtop',
-                $mt->parent->qcode );
-            my $hierarchy = $self->_create_hierarchy( $mt, 'medtop' );
-            $b->appendChild($hierarchy) if $hierarchy;
-        }
-    }
-    return @res;
-}
-
-sub _create_subject_concept {
-    my ( $self, $name, $item, $qcode_prefix ) = @_;
-
-    my $elem = $self->create_element( $name, _name_text => $item );
-    $self->scheme_manager->add_qcode_or_literal( $elem, $qcode_prefix,
-        $item->qcode );
-    foreach my $lang ( sort keys %{ $item->translations } ) {
-        $elem->appendChild(
-            $self->create_element(
-                'name',
-                'xml:lang' => $lang,
-                _text      => $item->translations->{$lang}
-            )
-        );
-    }
-    return $elem;
-}
-
-sub _create_subjects_concepts {
-    my ($self) = @_;
-
-    my @res;
-    push @res, $self->doc->createComment('concepts')
-        if $self->news_item->has_concepts;
-    foreach my $concept_uid ( sort keys %{ $self->news_item->concepts } ) {
-        my $concept = $self->news_item->concepts->{$concept_uid};
-        push @res, my $s = $self->create_element('subject');
-        $s->appendChild(
-            $self->_create_subject_concept(
-                'mainConcept', $concept->main, 'medtop'
-            )
-        );
-        foreach my $facet_qcode ( sort keys %{ $concept->facets } ) {
-            my $facet = $concept->facets->{$facet_qcode};
-            my ($facet_cls) = reverse split '::', $facet->meta->name;
-            $s->appendChild(
-                $self->_create_subject_concept(
-                    'facetConcept', $facet, lc $facet_cls
-                )
-            );
-        }
-    }
-
     return @res;
 }
 
@@ -302,15 +218,37 @@ sub _create_subjects_product {
     return @res;
 }
 
+sub _create_subjects_event_refs {
+    my $self = shift;
+
+    my @res;
+
+    push @res, $self->doc->createComment('events')
+        if $self->news_item->has_event_references;
+
+    foreach my $event_ref ( @{ $self->news_item->event_references } ) {
+        push @res,
+            my $p = $self->create_element(
+            'subject',
+            type       => 'cpnat:event',
+            _name_text => $event_ref->name
+            );
+        $self->scheme_manager->add_qcode_or_literal( $p, 'eventid',
+            $event_ref->event_id );
+    }
+    return @res;
+}
+
 sub _create_subjects {
     my $self = shift;
     my @res;
 
     push @res, $self->_create_subjects_storytypes();
     push @res, $self->_create_subjects_desk();
+    push @res, $self->_create_subjects_event_refs();
     push @res, $self->_create_subjects_media_topic();
     push @res, $self->_create_subjects_concepts()
-        if $self->news_item->has_concepts;
+        if ( $self->news_item->has_concepts );
     push @res, $self->_create_subjects_location();
     push @res, $self->_create_subjects_organisation();
     push @res, $self->_create_subjects_topic();

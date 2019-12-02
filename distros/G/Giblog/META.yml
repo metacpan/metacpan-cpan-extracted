@@ -21,4 +21,4 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/yuki-kimoto/giblog.git
-version: '1.00'
+version: '1.01'

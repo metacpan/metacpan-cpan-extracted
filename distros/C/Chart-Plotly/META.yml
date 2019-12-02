@@ -21,21 +21,27 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Chart-Plotly
+recommends:
+  Devel::IPerl: '0.009'
 requires:
   Exporter: '0'
   File::ShareDir: '0'
   File::Which: '0'
   HTML::Show: '0'
   JSON: '0'
+  Module::Find: '0'
   Module::Load: '0'
+  Moo::Role: '0'
   Moose: '0'
   Moose::Util::TypeConstraints: '0'
   MooseX::ExtraArgs: '0'
   Params::Validate: '0'
   Path::Tiny: '0'
   Ref::Util: '0'
+  Role::Tiny: '0'
   Text::Template: '0'
   UUID::Tiny: '0'
+  namespace::autoclean: '0'
   overload: '0'
   perl: '5.010'
   strict: '0'
@@ -46,8 +52,9 @@ resources:
   bugtracker: https://github.com/pablrod/p5-Chart-Plotly/issues
   homepage: https://github.com/pablrod/p5-Chart-Plotly
   repository: https://github.com/pablrod/p5-Chart-Plotly.git
-version: '0.031'
+version: '0.033'
 x_contributors:
+  - 'Roy Storey <kiwiroy@users.noreply.github.com>'
   - 'stphnlyd <stephanloyd9@gmail.com>'
   - 'weatherwax <s.g.lobo@hotmail.com>'
 x_generated_by_perl: v5.30.0

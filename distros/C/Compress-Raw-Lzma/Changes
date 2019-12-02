@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  2.092 1 December 2019
+
+      * use lzma_llocator
+        Issue https://github.com/pmqs/Compress-Raw-Lzma/issues/2
+        2cf13f99ef6ce862b138f83f6d3d9597d59106b9
+
   2.091 23 November 2019
 
       * More updates for memory leak in raw_decoder
@@ -23,7 +29,7 @@ CHANGES
   2.089 3 November 2019
 
       * No Changes
-  
+
   2.088 31 October 2019
 
       * Add SUPPPORT section
@@ -40,7 +46,7 @@ CHANGES
   2.085 12 January 2019
 
       * t/050interop-xz.t
-      Test harness can use a lot of memory. 
+      Test harness can use a lot of memory.
       On systems with small memory t/050interop-xz.t can fail.
       Free memory before invoking xz.
       [rt.cpan.org #128194]  may fail (memory leak?)
@@ -115,10 +121,10 @@ CHANGES
 
       * fix typos
         [RT #86418]
-        
+
   2.061 19 May 2013
 
-      * silence compiler warning by making 2nd parameter to 
+      * silence compiler warning by making 2nd parameter to
         DispStream a const char*
 
   2.060 7 January 2013
@@ -192,7 +198,7 @@ CHANGES
       * A number of changes to facilitate adding LZMA support to
         IO::Compress::Zip & IO::Uncompress::Unzip
 
-          * Added preset filters Lzma::Filter::Lzma1::Preset & 
+          * Added preset filters Lzma::Filter::Lzma1::Preset &
             Lzma::Filter::Lzma2::Preset
 
           * Added forZip option to Compress::Raw::Lzma::Encoder
@@ -229,7 +235,7 @@ CHANGES
 
   2.028 3 May 2010
 
-      * Remove 'Persistent' option from  Lzma::Filter::Lzma. 
+      * Remove 'Persistent' option from  Lzma::Filter::Lzma.
         The underlying lzma library doesn't support it anymore.
         [RT #57080]
 
@@ -256,7 +262,7 @@ CHANGES
 
       * Fixed a problem with the code that generated the LZMA constants.
         This issue was found in with the version of the lzma library that
-        comes with Ubuntu 9.10 
+        comes with Ubuntu 9.10
         Pronlem reported by Graham Jenkins
 
   2.023 9 November 2009

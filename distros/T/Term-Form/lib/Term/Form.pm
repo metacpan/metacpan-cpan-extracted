@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.522';
+our $VERSION = '0.524';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -60,9 +60,9 @@ sub _valid_options {
         return {
             clear_screen     => '[ 0 1 ]',
             codepage_mapping => '[ 0 1 ]',
-            color            => '[ 0 1 ]',
             show_context     => '[ 0 1 ]',
             auto_up          => '[ 0 1 2 ]',
+            color            => '[ 0 1 2 ]',
             hide_cursor      => '[ 0 1 2 ]',
             no_echo          => '[ 0 1 2 ]',
             read_only        => 'ARRAY',
@@ -77,8 +77,8 @@ sub _valid_options {
         return {
             clear_screen     => '[ 0 1 ]',
             codepage_mapping => '[ 0 1 ]',
-            color            => '[ 0 1 ]',
             show_context     => '[ 0 1 ]',
+            color            => '[ 0 1 2 ]',
             hide_cursor      => '[ 0 1 2 ]',
             no_echo          => '[ 0 1 2 ]',
             default          => 'Str',
@@ -89,8 +89,8 @@ sub _valid_options {
         return {
             clear_screen     => '[ 0 1 ]',
             codepage_mapping => '[ 0 1 ]',
-            color            => '[ 0 1 ]',
             auto_up          => '[ 0 1 2 ]',
+            color            => '[ 0 1 2 ]',
             hide_cursor      => '[ 0 1 2 ]',
             read_only        => 'ARRAY',
             back             => 'Str',
@@ -857,7 +857,7 @@ sub __get_row {
     }
     if ( ! defined $self->{i}{keys}[$idx] ) {
         my $key = $list->[$idx][0];
-        $self->{i}{keys}[$idx] = unicode_sprintf( $key, $self->{i}{max_key_w}, 0 );
+        $self->{i}{keys}[$idx] = unicode_sprintf( $key, $self->{i}{max_key_w} );
     }
     if ( ! defined $self->{i}{seps}[$idx] ) {
         my $sep;
@@ -1324,7 +1324,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.522
+Version 0.524
 
 =cut
 

@@ -1,5 +1,13 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.33 2019-11-29
+
+ - Fix muse-compile --output-templates option
+
+1.32 2019-11-27
+
+ - Minor CSS change for right and center environments
+
 1.31 2019-07-30
 
  - Permit loading of format-specific templates from the template

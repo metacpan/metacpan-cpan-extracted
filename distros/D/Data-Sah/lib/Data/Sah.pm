@@ -1,7 +1,7 @@
 package Data::Sah;
 
-our $DATE = '2019-10-24'; # DATE
-our $VERSION = '0.902'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.903'; # VERSION
 
 use 5.010001;
 use strict;
@@ -124,7 +124,7 @@ Data::Sah - Fast and featureful data structure validation
 
 =head1 VERSION
 
-This document describes version 0.902 of Data::Sah (from Perl distribution Data-Sah), released on 2019-10-24.
+This document describes version 0.903 of Data::Sah (from Perl distribution Data-Sah), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -274,7 +274,7 @@ L<Data::Sah::Compiler::perl::TH::bool> is the bool type handler for the Perl
 compiler, L<Data::Sah::Compiler::perl::FSH::Core> is the Core funcset handler
 for Perl compiler.
 
-B<Data::Sah::Coerce::$LANG::$TARGET_TYPE::$SOURCE_TYPE_AND_EXTRA_DESCRIPTION>
+B<Data::Sah::Coerce::$LANG::To_$TARGET_TYPE::From_$SOURCE_TYPE::$DESCRIPTION>
 contains coercion rules.
 
 B<Data::Sah::TypeX::$TYPENAME::$CLAUSENAME> namespace can be used to name

@@ -1,7 +1,9 @@
 package App::dateseq;
 
-our $DATE = '2019-07-22'; # DATE
-our $VERSION = '0.097'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-dateseq'; # DIST
+our $VERSION = '0.098'; # VERSION
 
 use 5.010001;
 use strict;
@@ -28,7 +30,7 @@ _
             summary => 'Starting date',
             schema => ['date*', {
                 'x.perl.coerce_to' => 'DateTime',
-                'x.perl.coerce_rules' => ['str_natural'],
+                'x.perl.coerce_rules' => ['From_str::natural'],
             }],
             pos => 0,
         },
@@ -36,7 +38,7 @@ _
             summary => 'End date, if not specified will generate an infinite* stream of dates',
             schema => ['date*', {
                 'x.perl.coerce_to' => 'DateTime',
-                'x.perl.coerce_rules' => ['str_natural'],
+                'x.perl.coerce_rules' => ['From_str::natural'],
             }],
             pos => 1,
         },
@@ -193,12 +195,14 @@ _
             src => '[[prog]] 2015-01-01 2015-02-28 --include-dow Mo,We,Fr -f "%Y-%m-%d(%a)"',
             src_plang => 'bash',
             'x.doc.max_result_lines' => 5,
+            'x.doc.show_result' => 0, # temp, coerce fail
         },
         {
             summary => 'Show dates (except Mondays) after 2015-01-01 and 2015-02-28',
             src => '[[prog]] 2015-01-01 2015-02-28 --exclude-dow Mo -f "%Y-%m-%d(%a)"',
             src_plang => 'bash',
             'x.doc.max_result_lines' => 5,
+            'x.doc.show_result' => 0, # temp, coerce fail
         },
         {
             summary => 'Generate a CSV data',
@@ -370,7 +374,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.097 of App::dateseq (from Perl distribution App-dateseq), released on 2019-07-22.
+This document describes version 0.098 of App::dateseq (from Perl distribution App-dateseq), released on 2019-11-29.
 
 =head1 FUNCTIONS
 

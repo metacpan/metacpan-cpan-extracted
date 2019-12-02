@@ -68,7 +68,7 @@ $SIG{'HUB'} = $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = \&finis
 
 my $sinfo = $F->screen_dimensions();
 $F->cls('OFF');
-$F->graphics_mode();
+
 my $screen_width  = $sinfo->{'width'};
 my $screen_height = $sinfo->{'height'};
 
@@ -110,13 +110,29 @@ foreach my $file (@files) {
     );
     last unless($RUNNING);
 }
-foreach my $tt (@th_images) {
+while (threads->list(threads::running)) {
+    foreach my $tt (threads->list(threads::joinable)) {
+        my $image = $tt->join();
+        if (defined($image)) {
+            push(@IMAGES, $image);
+            $F->vsync();
+            $F->blit_write($image);
+            $F->vsync();
+        }
+    }
+    threads->yield();
+    sleep .01;
+}
+foreach my $tt (threads->list(threads::joinable)) {
     my $image = $tt->join();
     if (defined($image)) {
         push(@IMAGES, $image);
+        $F->vsync();
+        $F->blit_write($image);
+        $F->vsync();
     }
 }
-
+$F->graphics_mode();
 $F->cls();
 
 ##################################
@@ -245,7 +261,7 @@ my @order : shared = (
     'Blitting',
 #    'Blit Move',
     'Rotate',
-#    'Flipping',
+    'Flipping',
     'Monochrome',
 #    'XOR Mode Drawing',
 #    'OR Mode Drawing',
@@ -267,6 +283,7 @@ if ($RUNNING) {
     }
     while($RUNNING) {
         threads->yield();
+        sleep .1;
     }
     foreach my $t (@th) {
         $t->join();
@@ -298,6 +315,7 @@ sub finish {
     foreach my $thr (threads->list()) {
         $thr->kill('KILL')->detach();
     }
+    $F->text_mode();
     exec('reset');
 } ## end sub finish
 
@@ -306,11 +324,11 @@ sub load_image {
     my $F    = shift;
 
     local $SIG{'ALRM'} = undef;
-    local $SIG{'INT'}  = sub { $F->text_mode(); threads->exit(); };
-    local $SIG{'QUIT'} = sub { $F->text_mode(); threads->exit(); };
-    local $SIG{'KILL'} = sub { $F->text_mode(); threads->exit(); };
-    local $SIG{'TERM'} = sub { $F->text_mode(); threads->exit(); };
-    local $SIG{'HUP'}  = sub { $F->text_mode(); threads->exit(); };
+    local $SIG{'INT'}  = sub { threads->exit(); };
+    local $SIG{'QUIT'} = sub { threads->exit(); };
+    local $SIG{'KILL'} = sub { threads->exit(); };
+    local $SIG{'TERM'} = sub { threads->exit(); };
+    local $SIG{'HUP'}  = sub { threads->exit(); };
 
     print_it($F,"Loading Image > $file", '00FFFFFF', undef, 1);
 
@@ -325,6 +343,7 @@ sub load_image {
             'center'       => CENTER_XY,
         }
     );
+    print_it($F,"Image loaded > $file", 'FFFF00FF', undef, 1);
     return($image);
 }
 
@@ -332,7 +351,7 @@ sub run_thread {
     my $thread = shift;
     my $dev    = shift;
 
-    my $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE);
+    my $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => FALSE);
 
     local $SIG{'ALRM'} = undef;
     local $SIG{'INT'}  = sub { $F->text_mode(); threads->exit(); };
@@ -1433,9 +1452,6 @@ sub flipping {
                         'blit_data' => $image
                     }
                 );
-                $rot->{'image'} = "$rot->{'image'}";
-                $rot->{'x'}     = abs(($XX - $rot->{'width'}) / 2);
-                $rot->{'y'}     = abs((($YY - $F->{'Y_CLIP'}) - $rot->{'height'}) / 2);
                 $F->blit_write($rot);
             } else {
                 $r                = rand(scalar(@IMAGES));

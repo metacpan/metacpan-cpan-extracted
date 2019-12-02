@@ -1,20 +1,26 @@
-0.200   2019-05-18 (PERLANCAR)
+0.201   2019-10-17  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Simplify CLI scripts by turning off config/env reading to
+	  the rest of the scripts.
+
+
+0.200   2019-05-18  Released-By: PERLANCAR
 
 	- Add utility: list-all-programs-in-path (allprogs).
 
 
-0.19    2017-02-09 (PERLANCAR)
+0.19    2017-02-09  Released-By: PERLANCAR
 
 	- Add utility: proglist.
 
 
-0.18    2016-07-20 (PERLANCAR)
+0.18    2016-07-20  Released-By: PERLANCAR
 
         - Use more specific schemas to reduce code duplication (filename instead
           of just str).
 
 
-0.17    2015-09-17 (PERLANCAR)
+0.17    2015-09-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -22,7 +28,7 @@
 	  complete_program() split to Complete-File & Complete-Program).
 
 
-0.16    2015-09-03 (PERLANCAR)
+0.16    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -31,7 +37,7 @@
 	  requirement.
 
 
-0.15    2015-03-21 (PERLANCAR)
+0.15    2015-03-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -39,7 +45,7 @@
 	  & more complete See Also.
 
 
-0.14    2014-11-28 (PERLANCAR)
+0.14    2014-11-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -49,12 +55,12 @@
 	  build via Pod::Weaver::Section::BashCompletion::PerinciCmdLine).
 
 
-0.13    2014-10-27 (PERLANCAR)
+0.13    2014-10-27  Released-By: PERLANCAR
 
 	- Add utility: progcat.
 
 
-0.12    2014-09-16 (PERLANCAR)
+0.12    2014-09-16  Released-By: PERLANCAR
 
 	- Add utility: progpath.
 
@@ -64,14 +70,14 @@
          - Use Perinci::CmdLine::Any.
 
 
-0.10    2014-07-18 (SHARYANTO)
+0.10    2014-07-18  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Adjust to Complete::Bash 0.06.
 
 
-0.09    2014-07-18 (SHARYANTO)
+0.09    2014-07-18  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -79,13 +85,13 @@
           completion.
 
 
-0.08    2014-07-13 (SHARYANTO)
+0.08    2014-07-13  Released-By: SHARYANTO
 
         - Now can also search program in current directory or its path (e.g.
           "progless script.pl" or "progedit ../foo").
 
 
-0.07    2014-07-11 (SHARYANTO)
+0.07    2014-07-11  Released-By: SHARYANTO
 
         - [Bugfix] Adjust to Complete::Util 0.12.
 
@@ -94,7 +100,7 @@
           complete_file().
 
 
-0.06    2014-07-02 (SHARYANTO)
+0.06    2014-07-02  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -103,7 +109,7 @@
           installing [RT#96884]
 
 
-0.05    2014-06-29 (SHARYANTO)
+0.05    2014-06-29  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -111,23 +117,23 @@
           mimic_shell_dir_completion).
 
 
-0.04    2014-06-27 (SHARYANTO)
+0.04    2014-06-27  Released-By: SHARYANTO
 
         - Turn off log_any_app so programs start a bit faster.
 
 
-0.03    2014-06-26 (SHARYANTO)
+0.03    2014-06-26  Released-By: SHARYANTO
 
         - Complete programs case insensitively for convenience.
 
 
-0.02    2014-06-25 (SHARYANTO)
+0.02    2014-06-25  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Use Complete::Util which replaces SHARYANTO::Complete::Util.
 
 
-0.01    2014-06-24 (SHARYANTO)
+0.01    2014-06-24  Released-By: SHARYANTO
 
         - First release.

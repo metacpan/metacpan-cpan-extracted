@@ -2,8 +2,8 @@ NAME
     Data::Sah::Coerce - Coercion rules for Data::Sah
 
 VERSION
-    This document describes version 0.033 of Data::Sah::Coerce (from Perl
-    distribution Data-Sah-Coerce), released on 2019-01-26.
+    This document describes version 0.039 of Data::Sah::Coerce (from Perl
+    distribution Data-Sah-Coerce), released on 2019-11-28.
 
 SYNOPSIS
      use Data::Sah::Coerce qw(gen_coercer);
@@ -27,11 +27,12 @@ DESCRIPTION
     used independently.
 
     A coercion rule is put in
-    "Data::Sah::Coerce::$COMPILER::$TARGET_TYPE::$SOURCE_TYPE_AND_EXTRA_DESC
-    RIPTION" module, for example: Data::Sah::Coerce::perl::date::float_epoch
-    for converting date from integer (Unix epoch) or
-    Data::Sah::Coerce::perl::date::str_iso8601 for converting date from
-    ISO8601 strings like "2016-05-15".
+    "Data::Sah::Coerce::$COMPILER::To_$TARGET_TYPE::From_$SOURCE_TYPE::DESCR
+    IPTION" module, for example:
+    Data::Sah::Coerce::perl::To_date::From_float::Epoch for converting date
+    from integer (Unix epoch) or
+    Data::Sah::Coerce::perl::To_date::From_str::ISO8601 for converting date
+    from ISO8601 strings like "2016-05-15".
 
     Basically, a coercion rule will provide an expression ("expr_match")
     that evaluates to true when data can be coerced, and an expression
@@ -43,7 +44,7 @@ DESCRIPTION
 
     *   v* => int (default: 1)
 
-        Metadata specification version. Currently at 4.
+        Metadata specification version. From DefHash. Currently at 4.
 
         History: bumped from 3 to 4 to remove "enable_by_default" property.
         Now the list of standard (enabled-by-default) coercion rules is
@@ -59,6 +60,10 @@ DESCRIPTION
         message and coerced data, instead of just coerced data.
 
         History: Bumped from 1 to 2 to exclude old module names.
+
+    *   summary => str
+
+        From DefHash.
 
     *   might_fail => bool (default: 0)
 
@@ -92,14 +97,15 @@ DESCRIPTION
         dies when failing to parse the string. So in "str_natural" rule,
         you'll find this metadata:
 
-         precludes => [qr/\Astr_alami(_.+)?\z/]
+         precludes => [qr/\AFrom_str::Alami(_.+)?\z/]
 
-        and in "str_alami" rule you'll find this metadata:
+        and in "From_str::Alami" rule you'll find this metadata:
 
-         precludes => [qr/\Astr_alami(_.+)?\z/, 'str_natural']
+         precludes => [qr/\AFrom_str::Alami(_.+)?\z/, 'From_str::Natural']
 
-        Note that the "str_alami" rule also precludes other "str_alami_*"
-        rules (like "str_alami_en" and "str_alami_id").
+        Note that the "From_str::Alami" rule also precludes other
+        "From_str::Alami_*" rules (like "From_str::Alami_EN" and
+        "From_str::Alami_ID").
 
         Also note that rules which are specifically requested to be used
         (e.g. using "x.perl.coerce_rules" attribute in Sah schema) will
@@ -127,9 +133,9 @@ DESCRIPTION
 
         Expression in the target language to test whether the data can be
         coerced. For example, in
-        "Data::Sah::Coerce::perl::date::float_epoch", only integers ranging
-        from 10^8 to 2^31 are converted into date. Non-integers or integers
-        outside this range are not coerced.
+        "Data::Sah::Coerce::perl::To_date::From_float::Epoch", only integers
+        ranging from 10^8 to 2^31 are converted into date. Non-integers or
+        integers outside this range are not coerced.
 
     *   expr_coerce => str
 

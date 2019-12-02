@@ -1,0 +1,32 @@
+---
+ballots:
+- count: 15
+  votes:
+    CHATTANOOGA: 5
+    KNOXVILLE: 4
+    MEMPHIS: 1
+    NASHVILLE: 3
+- count: 17
+  votes:
+    CHATTANOOGA: 4
+    KNOXVILLE: 5
+    MEMPHIS: 1
+    NASHVILLE: 3
+- count: 26
+  votes:
+    CHATTANOOGA: 4
+    KNOXVILLE: 3
+    MEMPHIS: 1
+    NASHVILLE: 5
+- count: 42
+  votes:
+    CHATTANOOGA: 1
+    KNOXVILLE: 2
+    MEMPHIS: 5
+    NASHVILLE: 3
+choices:
+- CHATTANOOGA
+- KNOXVILLE
+- MEMPHIS
+- NASHVILLE
+depth: 5

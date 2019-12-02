@@ -85,7 +85,7 @@ preceded with a _
 # Let the code begin...
 
 package Bio::DB::NCBIHelper;
-$Bio::DB::NCBIHelper::VERSION = '1.7.4';
+$Bio::DB::NCBIHelper::VERSION = '1.7.5';
 use strict;
 
 use Bio::DB::Query::GenBank;
@@ -261,6 +261,7 @@ sub get_request {
             '-format'     => $format,
             '-email'      => $email
         );
+        $self->_sleep();
         return $self->get_request(%qualifiers);
     }
     else {
@@ -269,6 +270,116 @@ sub get_request {
     }
 }
 
+=head2 get_seq_stream
+
+ Title   : get_seq_stream
+ Usage   : my $seqio = $self->get_seq_stream(%qualifiers)
+ Function: builds a url and queries a web db
+ Returns : a Bio::SeqIO stream capable of producing sequence
+ Args    : %qualifiers = a hash qualifiers that the implementing class
+           will process to make a url suitable for web querying
+
+=cut
+
+sub get_seq_stream {
+	my ($self, %qualifiers) = @_;
+	my ($rformat, $ioformat) = $self->request_format();
+	my $seen = 0;
+	foreach my $key ( keys %qualifiers ) {
+		if( $key =~ /format/i ) {
+			$rformat = $qualifiers{$key};
+			$seen = 1;
+		}
+	}
+	$qualifiers{'-format'} = $rformat if( !$seen);
+	($rformat, $ioformat) = $self->request_format($rformat);
+	# These parameters are implemented for Bio::DB::GenBank objects only
+	if($self->isa('Bio::DB::GenBank')) {
+		$self->seq_start() &&  ($qualifiers{'-seq_start'} = $self->seq_start());
+		$self->seq_stop() && ($qualifiers{'-seq_stop'} = $self->seq_stop());
+		$self->strand() && ($qualifiers{'-strand'} = $self->strand());
+        $self->email() && ($qualifiers{'-email'} = $self->email());
+		defined $self->complexity() && ($qualifiers{'-complexity'} = $self->complexity());
+	}
+	my $request = $self->get_request(%qualifiers);
+	$request->proxy_authorization_basic($self->authentication)
+	    if ( $self->authentication);
+	$self->debug("request is ". $request->as_string(). "\n");
+
+	# workaround for MSWin systems
+	$self->retrieval_type('io_string') if $self->retrieval_type =~ /pipeline/ && $^O =~ /^MSWin/;
+
+	if ($self->retrieval_type =~ /pipeline/) {
+		# Try to create a stream using POSIX fork-and-pipe facility.
+		# this is a *big* win when fetching thousands of sequences from
+		# a web database because we can return the first entry while
+		# transmission is still in progress.
+		# Also, no need to keep sequence in memory or in a temporary file.
+		# If this fails (Windows, MacOS 9), we fall back to non-pipelined access.
+
+		# fork and pipe: _stream_request()=><STREAM>
+		my ($result,$stream) = $self->_open_pipe();
+
+		if (defined $result) {
+			$DB::fork_TTY = File::Spec->devnull; # prevents complaints from debugger
+			if (!$result) { # in child process
+			    $self->_stream_request($request,$stream);
+			    POSIX::_exit(0); #prevent END blocks from executing in this forked child
+			}
+			else {
+				return Bio::SeqIO->new('-verbose' => $self->verbose,
+						       '-format'  => $ioformat,
+						       '-fh'      => $stream);
+			}
+		}
+		else {
+			$self->retrieval_type('io_string');
+		}
+	}
+
+	if ($self->retrieval_type =~ /temp/i) {
+		my $dir = $self->io->tempdir( CLEANUP => 1);
+		my ( $fh, $tmpfile) = $self->io()->tempfile( DIR => $dir );
+		close $fh;
+		my $resp = $self->_request($request, $tmpfile);
+		if( ! -e $tmpfile || -z $tmpfile || ! $resp->is_success() ) {
+			$self->throw("WebDBSeqI Error - check query sequences!\n");
+		}
+		$self->postprocess_data('type' => 'file',
+				        'location' => $tmpfile);
+		# this may get reset when requesting batch mode
+		($rformat,$ioformat) = $self->request_format();
+		if( $self->verbose > 0 ) {
+			open my $ERR, '<', $tmpfile or $self->throw("Could not read file '$tmpfile': $!");
+			while(<$ERR>) { $self->debug($_);}
+			close $ERR;
+		}
+
+		return Bio::SeqIO->new('-verbose' => $self->verbose,
+									  '-format' => $ioformat,
+									  '-file'   => $tmpfile);
+	}
+
+	if ($self->retrieval_type =~ /io_string/i ) {
+		my $resp = $self->_request($request);
+		my $content = $resp->content_ref;
+		$self->debug( "content is $$content\n");
+		if (!$resp->is_success() || length($$content) == 0) {
+			$self->throw("WebDBSeqI Error - check query sequences!\n");
+		}
+		($rformat,$ioformat) = $self->request_format();
+		$self->postprocess_data('type'=> 'string',
+				        'location' => $content);
+		$self->debug( "str is $$content\n");
+		return Bio::SeqIO->new('-verbose' => $self->verbose,
+				       '-format' => $ioformat,
+				       '-fh'   => new IO::String($$content));
+	}
+
+	# if we got here, we don't know how to handle the retrieval type
+	$self->throw("retrieval type " . $self->retrieval_type .
+					 " unsupported\n");
+}
 
 =head2 get_Stream_by_batch
 

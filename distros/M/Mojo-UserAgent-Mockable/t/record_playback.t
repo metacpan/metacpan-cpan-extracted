@@ -105,8 +105,23 @@ for my $cookie (@{$mock->cookie_jar->all}) {
     my $name = $cookie->name;
     my $original_cookie = $cookies{$domain}{$name};
     subtest qq{Cookie "$name"} => sub {
-        for my $attr (qw/domain expires httponly max_age path secure/) {
+        for my $attr (qw/domain httponly max_age path secure/) {
             is $cookie->$attr, $original_cookie->$attr, qq{"$attr" matches};
+        }
+
+        # If "max_age" is set, "expires" is re-calculated, so isn't
+        # expected to be the same as the previous value
+        my $expires = $cookie->expires;
+        if ( my $max_age = $cookie->max_age ) {
+            my $margin = 5; # account for slow test runs
+            my $new_expires = time() + $max_age - $margin;
+            cmp_ok(
+                $expires, ">=", $new_expires,
+                qq{"expires" is re-calculated from current time: $expires >= $new_expires},
+            );
+        }
+        else {
+            is $expires, $original_cookie->expires, qq{"expires" matches};
         }
     };
 }

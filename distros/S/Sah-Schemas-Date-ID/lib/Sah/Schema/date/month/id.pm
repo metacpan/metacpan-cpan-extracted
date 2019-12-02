@@ -1,7 +1,7 @@
 package Sah::Schema::date::month::id;
 
-our $DATE = '2019-07-21'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [cistr => {
     summary => 'Month number/name (abbreviated or full, in Indonesian)',
@@ -28,7 +28,7 @@ Sah::Schema::date::month::id - Month number/name (abbreviated or full, in Indone
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::date::month::id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-07-21.
+This document describes version 0.003 of Sah::Schema::date::month::id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
 
 =head1 HOMEPAGE
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2013-2019 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -18,7 +18,8 @@ PXML::XHTML
 
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
 
@@ -133,7 +134,7 @@ our $funcs=
         uc $tag,
         sub {
             my $atts= ref($_[0]) eq "HASH" ? shift : undef;
-            PXML::PXHTML->new($tag, $atts, [@_]);
+            PXML::_::XHTML->new($tag, $atts, [@_]);
         }
        ]
    } @$tags
@@ -148,8 +149,8 @@ for (@$funcs) {
 our @EXPORT_OK= ('$nbsp', map { $$_[0] } @$funcs);
 our %EXPORT_TAGS=(all=>\@EXPORT_OK);
 
-{
-    package PXML::PXHTML;
+
+package PXML::_::XHTML {
     our @ISA= "PXML::Element";
 
     # serialize to HTML5 compatible representation:
@@ -176,7 +177,7 @@ our %EXPORT_TAGS=(all=>\@EXPORT_OK);
         my $b= $s->body;
         (uc($s->name)."(".
          join(", ",
-              defined $a ? &$show($a) : (),
+              (defined($a) and keys %$a) ? &$show($a) : (),
               ref($b) eq "ARRAY" ? join(", ",map { &$show($_) } @$b)
               : &$show($b)).
          ")")

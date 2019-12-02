@@ -68,7 +68,7 @@ local *IO::Async::Handle::connect = sub {
                         "Content-Length: 0$CRLF" .
                         $CRLF );
 
-   wait_for { $f2->is_ready };
+   wait_for_future( $f2 );
    ok( !$f2->failure, '$f2 completes successfully' );
 }
 
@@ -113,7 +113,7 @@ local *IO::Async::Handle::connect = sub {
                         "Content-Length: 0$CRLF" .
                         $CRLF );
 
-   wait_for { $f2->is_ready };
+   wait_for_future( $f2 );
    ok( !$f2->failure, '$f2 completes successfully' );
 }
 

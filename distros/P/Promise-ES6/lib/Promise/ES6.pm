@@ -3,7 +3,7 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use constant _has_current_sub => $^V ge v5.16.0;
 
@@ -76,6 +76,8 @@ for details.)
 Right now this doesn’t try for interoperability with other promise
 classes. If that’s something you want, make a feature request.
 
+See L<Promise::ES6::Future> if you need to interact with L<Future>.
+
 =head1 UNHANDLED REJECTIONS
 
 As of version 0.05, unhandled rejections prompt a warning I<only> if one
@@ -117,7 +119,8 @@ A key advantage of this design is that Promise::ES6 instances can abstract
 over whether a given function works synchronously or asynchronously.
 
 If you want a Promises/A+-compliant implementation, look at
-L<Promise::ES6::IOAsync>, L<Promise::ES6::AnyEvent>, or one of the alternatives
+L<Promise::ES6::IOAsync>, L<Promise::ES6::Mojo>,
+L<Promise::ES6::AnyEvent>, or one of the alternatives
 that that module’s documentation suggests.
 
 =head1 CANCELLATION

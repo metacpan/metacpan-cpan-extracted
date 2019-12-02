@@ -19,7 +19,8 @@ has 'root_role', isa => 'Str', is => 'ro', default => 'main';
 has 'root_id',   isa => 'Str', is => 'ro', default => 'root_group';
 
 sub _build_sent {
-    return DateTime->now( time_zone => 'local' );
+    my ($self) = @_;
+    return DateTime->now( time_zone => $self->timezone );
 }
 
 sub _build_root_group {

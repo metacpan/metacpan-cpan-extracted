@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-06'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,7 +29,7 @@ csv2tsv - Convert CSV to TSV
 
 =head1 VERSION
 
-This document describes version 0.023 of csv2tsv (from Perl distribution App-CSVUtils), released on 2019-06-06.
+This document describes version 0.025 of csv2tsv (from Perl distribution App-CSVUtils), released on 2019-11-29.
 
 =head1 SYNOPSIS
 

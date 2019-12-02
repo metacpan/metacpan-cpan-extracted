@@ -1,5 +1,12 @@
 Revision history for Perl extension Math::ModInt.
 
+0.012   Sat, 30 Nov 2019 11:31:39 +0100
+        Minor improvements:
+        - performance for short-lived event traps
+        - performance for moduli <= 3
+        - metadata
+        - Artistic License 2.0
+
 0.011   Mon, 18 May 2015 08:38:13 +0200
         Compatibility fix:
         - older perls (before 5.14.0) lost text of LoadingFailure

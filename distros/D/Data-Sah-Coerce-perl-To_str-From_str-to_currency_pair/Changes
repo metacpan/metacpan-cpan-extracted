@@ -1,0 +1,27 @@
+0.005   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules again, revert to using lower_case
+	  notation for the description part, because CamelCase is really,
+	  REALLY ugly when we have many words.
+
+
+0.004   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module/dist from
+	  Data::Sah::Coerce::perl::{str::str_to_currency_pair,To_str::From_
+	  str::ToCurrencyPair}.
+
+
+0.003   2019-07-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Data::Sah::Coerce to 0.032 [CT].
+
+
+0.002   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version of coerce rule module(s) 3->4.
+
+
+0.001   2018-06-18  Released-By: PERLANCAR
+
+        - First release.

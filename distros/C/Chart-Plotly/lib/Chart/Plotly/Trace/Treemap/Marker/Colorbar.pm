@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Treemap::Marker::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Treemap::Marker::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Treemap::Marker::Colorbar::Title;
 
-our $VERSION = '0.031';    # VERSION
+our $VERSION = '0.033';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace treemap.
 
@@ -281,7 +281,7 @@ Chart::Plotly::Trace::Treemap::Marker::Colorbar - This attribute is one of the p
 
 =head1 VERSION
 
-version 0.031
+version 0.033
 
 =head1 SYNOPSIS
 

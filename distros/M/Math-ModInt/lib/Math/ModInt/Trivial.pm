@@ -1,8 +1,6 @@
-# Copyright (c) 2009-2015 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: Trivial.pm 60 2015-05-18 08:47:12Z demetri $
+# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 package Math::ModInt::Trivial;
 
@@ -22,8 +20,11 @@ use constant NFIELDS   => 0;
 BEGIN {
     require Math::ModInt;
     our @ISA     = qw(Math::ModInt);
-    our $VERSION = '0.011';
+    our $VERSION = '0.012';
 }
+
+*signed_residue   =
+*centered_residue = \&residue;
 
 my $singleton = bless [];
 
@@ -41,7 +42,6 @@ sub _NEW2 { $_[1], $singleton }
 
 sub modulus { 1 }
 sub residue { 0 }
-sub signed_residue { 0 }
 
 1;
 
@@ -53,7 +53,7 @@ Math::ModInt::Trivial - integer arithmetic modulo one
 
 =head1 VERSION
 
-This documentation refers to version 0.011 of Math::ModInt::Trivial.
+This documentation refers to version 0.012 of Math::ModInt::Trivial.
 
 =head1 SYNOPSIS
 
@@ -103,11 +103,10 @@ Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2015 by Martin Becker.  All rights reserved.
+Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.6.0 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see LICENSE file).
 
 =head1 DISCLAIMER OF WARRANTY
 

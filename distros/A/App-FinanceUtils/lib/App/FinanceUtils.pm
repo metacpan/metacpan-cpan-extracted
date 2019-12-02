@@ -1,7 +1,9 @@
 package App::FinanceUtils;
 
-our $DATE = '2017-03-14'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-FinanceUtils'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,7 +27,7 @@ my $res = gen_funcs_from_formulas(
         r => {
             caption => 'return rate',
             summary => 'Return rate (e.g. 0.06 for 6%)',
-            schema => ['float*', 'x.perl.coerce_rules'=>['str_percent']],
+            schema => ['float*', 'x.perl.coerce_rules'=>['From_str::percent']],
         },
         n => {
             caption => 'periods',
@@ -94,7 +96,7 @@ App::FinanceUtils - Financial CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.002 of App::FinanceUtils (from Perl distribution App-FinanceUtils), released on 2017-03-14.
+This document describes version 0.003 of App::FinanceUtils (from Perl distribution App-FinanceUtils), released on 2019-11-29.
 
 =head1 DESCRIPTION
 
@@ -119,7 +121,7 @@ Examples:
 
 =item * Invest $100 at 6% annual return rate for 5 years:
 
- calc_fv_future_value(pv => 100, r => 0.06, n => 5); # -> 133.82255776
+ calc_fv_future_value(pv => 100, r => 0.06, n => 5); # -> [200, "OK", 133.82255776]
 
 =back
 
@@ -150,6 +152,7 @@ Return rate (e.g. 0.06 for 6%).
 Return value:  (any)
 
 
+
 =head2 calc_fv_periods
 
 Usage:
@@ -164,7 +167,7 @@ Examples:
 
 =item * Want to get $120 using $100 investment with annual 6% return rate, how many years must we wait?:
 
- calc_fv_periods(fv => 120, pv => 100, r => 0.06); # -> 3.12896813521953
+ calc_fv_periods(fv => 120, pv => 100, r => 0.06); # -> [200, "OK", 3.12896813521953]
 
 =back
 
@@ -195,6 +198,7 @@ Return rate (e.g. 0.06 for 6%).
 Return value:  (any)
 
 
+
 =head2 calc_fv_present_value
 
 Usage:
@@ -209,7 +213,7 @@ Examples:
 
 =item * Want to get $100 after 5 years at 6% annual return rate, how much to invest?:
 
- calc_fv_present_value(fv => 100, r => 0.06, n => 5); # -> 74.7258172866057
+ calc_fv_present_value(fv => 100, r => 0.06, n => 5); # -> [200, "OK", 74.7258172866057]
 
 =back
 
@@ -240,6 +244,7 @@ Return rate (e.g. 0.06 for 6%).
 Return value:  (any)
 
 
+
 =head2 calc_fv_return_rate
 
 Usage:
@@ -254,7 +259,7 @@ Examples:
 
 =item * Want to get $120 in 5 years using $100 investment, what is the required return rate?:
 
- calc_fv_return_rate(fv => 120, pv => 100, n => 5); # -> 0.0371372893366482
+ calc_fv_return_rate(fv => 120, pv => 100, n => 5); # -> [200, "OK", 0.0371372893366482]
 
 =back
 
@@ -306,7 +311,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

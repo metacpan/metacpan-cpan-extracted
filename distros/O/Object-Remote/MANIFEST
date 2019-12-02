@@ -70,9 +70,9 @@ xt/bridged-remote.t
 xt/lib/TestBridge.pm
 xt/lib/TestClass.pm
 xt/lib/TestFindUser.pm
-xt/lib/TestIOAsync.pm
 xt/load_optional.t
 xt/local-sudo.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

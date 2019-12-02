@@ -1,3 +1,15 @@
+0.013   2019-11-29  Released-By: PERLANCAR; Urgency: high
+
+	- Merge two releases 0.012 and 0.012.1.
+
+
+0.012.1 2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce 0.034+).
+	  UPDATE 2019-11-29T01:46:00Z: rename release to 0.012.1, cancel release
+	  (duplicate version).
+
+
 0.012   2019-10-24  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

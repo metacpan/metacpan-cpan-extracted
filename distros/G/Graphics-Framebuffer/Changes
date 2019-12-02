@@ -1549,3 +1549,17 @@ Revision history for Graphics-Framebuffer
 6.40  Nov 4, 2019
 
       Fixed some installation documentation related to installing.
+
+6.41  Nov 30, 2019
+
+      CentOS/Redhat 8 has an empty fonts bug.  This fix accounts for it.
+
+      The "examples/multiprocessing/threaded-primitives.pl" had a CPU hog bug,
+      it's now fixed.
+
+      Thank you Mario Roy for the heads-up on these issues.
+
+6.42  Dec 1, 2019
+
+      Apparently the CentOS/Redhat issue was not quite fixed.  This update
+      addresses that.

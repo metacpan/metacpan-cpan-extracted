@@ -1,16 +1,13 @@
 #!perl
 
-our $DATE = '2018-10-30'; # DATE
-our $VERSION = '0.624'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.625'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
-
-# workaround for current bug
-$ENV{LOG} //= 1;
 
 Perinci::CmdLine::Any->new(
     url => '/Git/Bunch/',
@@ -39,7 +36,7 @@ gitbunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.624 of gitbunch (from Perl distribution Git-Bunch), released on 2018-10-30.
+This document describes version 0.625 of gitbunch (from Perl distribution Git-Bunch), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -135,7 +132,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -254,18 +251,6 @@ Exclude some repos from processing.
 
 Can be specified multiple times.
 
-=item B<--include-files>
-
-Alias for --no-exclude-files.
-
-See C<--exclude-files>.
-
-=item B<--include-non-git-dirs>
-
-Alias for --no-exclude-non-git-dirs.
-
-See C<--exclude-non-git-dirs>.
-
 =item B<--include-repos-json>=I<s>
 
 Specific git repos to sync, if not specified all repos in the bunch will be processed (JSON-encoded).
@@ -341,18 +326,6 @@ Exclude some repos from processing.
 
 Can be specified multiple times.
 
-=item B<--include-files>
-
-Alias for --no-exclude-files.
-
-See C<--exclude-files>.
-
-=item B<--include-non-git-dirs>
-
-Alias for --no-exclude-non-git-dirs.
-
-See C<--exclude-non-git-dirs>.
-
 =item B<--include-repos-json>=I<s>
 
 Specific git repos to sync, if not specified all repos in the bunch will be processed (JSON-encoded).
@@ -427,18 +400,6 @@ Specify regex pattern of repos to exclude.
 Exclude some repos from processing.
 
 Can be specified multiple times.
-
-=item B<--include-files>
-
-Alias for --no-exclude-files.
-
-See C<--exclude-files>.
-
-=item B<--include-non-git-dirs>
-
-Alias for --no-exclude-non-git-dirs.
-
-See C<--exclude-non-git-dirs>.
 
 =item B<--include-repos-json>=I<s>
 
@@ -564,18 +525,6 @@ Specify regex pattern of repos to exclude.
 Exclude some repos from processing.
 
 Can be specified multiple times.
-
-=item B<--include-files>
-
-Alias for --no-exclude-files.
-
-See C<--exclude-files>.
-
-=item B<--include-non-git-dirs>
-
-Alias for --no-exclude-non-git-dirs.
-
-See C<--exclude-non-git-dirs>.
 
 =item B<--include-repos-json>=I<s>
 
@@ -816,7 +765,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

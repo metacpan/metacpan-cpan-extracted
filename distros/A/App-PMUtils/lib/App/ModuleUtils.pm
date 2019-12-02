@@ -1,7 +1,7 @@
 package App::ModuleUtils;
 
-our $DATE = '2019-09-09'; # DATE
-our $VERSION = '0.727'; # VERSION
+our $DATE = '2019-10-17'; # DATE
+our $VERSION = '0.728'; # VERSION
 
 1;
 # ABSTRACT: Alias for App::PMUtils
@@ -18,7 +18,7 @@ App::ModuleUtils - Alias for App::PMUtils
 
 =head1 VERSION
 
-This document describes version 0.727 of App::ModuleUtils (from Perl distribution App-PMUtils), released on 2019-09-09.
+This document describes version 0.728 of App::ModuleUtils (from Perl distribution App-PMUtils), released on 2019-10-17.
 
 =head1 HOMEPAGE
 

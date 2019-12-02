@@ -4,7 +4,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.02
+Version 2.03
 
 =head1 SYNOPSIS
 
@@ -39,12 +39,12 @@ done in order.
 
 =end comment
 
-Dictionary file is given by B<--dict> option and contians pattern and
+Dictionary file is given by B<--dict> option and contains pattern and
 correct string pairs.
 
     greple -Msubst --dict DICT
 
-If the dictionary file cotains following data:
+If the dictionary file contains following data:
 
     colou?r      color
     cent(er|re)  center
@@ -73,7 +73,7 @@ string to be converted.  See the next example:
     Black-\KMonday  // Monday  Friday
 
 Pattern matches to string "Monday", but requires string "Black-" is
-preceeding to it.  Substitution is done just for string "Monday",
+preceding to it.  Substitution is done just for string "Monday",
 which does not match to the original pattern.  As a matter of fact,
 look-ahead and look-behind pattern is removed automatically, next
 example works as expected.
@@ -121,7 +121,8 @@ about incorrect words.  Works with B<--check> option.
 
 =item B<--subst>
 
-Substitute matched pattern to correct string.
+Substitute matched pattern to correct string.  Pattern without
+replacement string is not changed.
 
 =item B<--diff>
 
@@ -166,7 +167,7 @@ Kazumasa Utashiro
 
 package App::Greple::subst;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use v5.14;
 use strict;
@@ -336,7 +337,7 @@ sub subst_stat_show {
 
     for my $i (0 .. $#fromto) {
 	my $p = $fromto[$i] // next;
-	my($from_re, $to) = ($p->string, $p->correct);
+	my($from_re, $to) = ($p->string, $p->correct // '');
 
 	my $hash = $match_list[$i];
 	my @keys = keys %{$hash};
@@ -398,14 +399,15 @@ sub subst_search {
     my @matched;
     for my $index (0 .. $#fromto) {
 	my $p = $fromto[$index] // next;
-	my($from_re, $to) = ($p->string, $p->correct);
+	my($from_re, $to) = ($p->string, $p->correct // '');
 	my @r = match_regions(pattern => $p->regex);
 	next if @r == 0 and $opt_check ne 'all';
 	my $callback = sub {
 	    my($ms, $me, $i, $s) = @_;
 	    my $format = @opt_format[ $i % @opt_format ];
 	    sprintf($format,
-		    ($opt_subst && $s =~ s/\R//gr ne $to) ? $to : $s);
+		    ($opt_subst && $to ne '' && $s =~ s/\R//gr ne $to) ?
+		    $to : $s);
 	};
 	my(@ok, @ng);
 	for (@r) {
@@ -504,7 +506,10 @@ builtin check=s            $opt_check
 builtin select=s           $opt_subst_select
 builtin linefold!          $opt_linefold
 
-option default   --begin subst_begin --le &subst_search --subst-color
+option default \
+	--begin subst_begin \
+	--le &subst_search --no-regioncolor \
+	--subst-color
 option --stat    --begin subst_stat --epilogue subst_stat_show
 expand ++dump    --all --need 0 -h --nocolor
 option --diff    --subst ++dump --of &subst_diff
@@ -538,3 +543,6 @@ option  --subst-color \
         --cm 555D/212,K/545 \
         --cm 555D/221,K/554 \
         --cm 555D/222,K/L23
+
+#  LocalWords:  subst Greple greple ng ok outstand linefold dict diff
+#  LocalWords:  regex Kazumasa Utashiro

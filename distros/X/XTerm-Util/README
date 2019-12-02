@@ -2,13 +2,19 @@ NAME
     XTerm::Util - Utility routines for xterm-compatible terminal (emulator)s
 
 VERSION
-    This document describes version 0.005 of XTerm::Util (from Perl
-    distribution XTerm-Util), released on 2019-07-12.
+    This document describes version 0.006 of XTerm::Util (from Perl
+    distribution XTerm-Util), released on 2019-11-27.
 
 SYNOPSIS
      use XTerm::Util qw(
+         get_term_fgcolor
          get_term_bgcolor
+         set_term_fgcolor
          set_term_bgcolor
+         term_fgcolor_is_dark
+         term_fgcolor_is_light
+         term_bgcolor_is_dark
+         term_bgcolor_is_light
      );
 
      # when you're on a black background
@@ -22,6 +28,26 @@ SYNOPSIS
 
 DESCRIPTION
     Keywords: xterm, xterm-256color, terminal
+
+COMPATIBILITY NOTES
+    Versions of software tested:
+
+        MATE Terminal (1.20.2)
+        GNOME Terminal (3.23.)
+        Konsole (18.12.3)
+        XTerm (330)
+        LXTerminal (0.2.0)
+        rxvt (2.7.10)
+
+     |                                   | mate  | gnome | konsole | xterm | lxterm | rxvt |
+     |-----------------------------------+-------+-------+---------+-------+--------+------|
+     | Getting terminal background color | no 1) | no 1) | yes     | yes   | no     | no   |
+     | Getting terminal foreground color | no 1) | no 1) | no 2)   | yes   | no     | no   |
+     | Setting terminal background color | yes   | yes   | yes     | yes   | no     | no   |
+     | Setting terminal foreground color | yes   | yes   | yes     | yes   | no     | no   |
+
+     1) cannot be captured
+     2) terminal does not respond back
 
 FUNCTIONS
   get_term_bgcolor
@@ -41,29 +67,52 @@ FUNCTIONS
 
      \e]11;?\a
 
-    and a compatible terminal will issue back the same sequence but with the
-    question mark replaced by the RGB code, e.g.:
+    (or \e]11;?\017). A compatible terminal will issue back the same
+    sequence but with the question mark replaced by the RGB code, e.g.:
 
      \e]11;rgb:0000/0000/0000\a
-
-    I have tested that this works on the following terminal software (and
-    version) on Linux:
-
-     MATE Terminal (1.18.2)
-     GNOME Terminal (3.18.3)
-     Konsole (16.04.3)
-
-    And does not work with the following terminal software (and version) on
-    Linux:
-
-     LXTerminal (0.2.0)
-     rxvt (2.7.10)
 
     *read_colorfgbg*. Some terminals like Konsole set the environment
     variable "COLORFGBG" containing 16-color color code for foreground and
     background, e.g.: "15;0".
 
     This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   query_terminal => *bool* (default: 1)
+
+    *   read_colorfgbg => *bool* (default: 1)
+
+    Return value: (any)
+
+  get_term_fgcolor
+    Usage:
+
+     get_term_fgcolor(%args) -> any
+
+    Get terminal text (foreground) color.
+
+    Get the terminal's current text (foreground) color (in 6-hexdigit format
+    e.g. 000000 or ffff33), or undef if unavailable. This routine tries the
+    following mechanisms, from most useful to least useful, in order. Each
+    mechanism can be turned off via argument.
+
+    *query_terminal*. Querying the terminal is done via sending the
+    following xterm control sequence:
+
+     \e]10;?\a
+
+    (or \e]10;?\017). A compatible terminal will issue back the same
+    sequence but with the question mark replaced by the RGB code, e.g.:
+
+     \e]10;rgb:0000/0000/0000\a
+
+    *read_colorfgbg*. Some terminals like Konsole set the environment
+    variable "COLORFGBG" containing 16-color color code for foreground and
+    background, e.g.: "15;0".
+
+    This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
@@ -81,13 +130,37 @@ FUNCTIONS
     Set terminal background color.
 
     Set terminal background color. This prints the following xterm control
-    sequence to STDOUT (or STDERR, if ~stderr~ is set to true:
+    sequence to STDOUT (or STDERR, if ~stderr~ is set to true):
 
      \e]11;#123456\a
 
     where *123456* is the 6-hexdigit RGB color code.
 
     This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $rgb* => *color::rgb24*
+
+    *   $stderr => *true*
+
+    Return value: (any)
+
+  set_term_fgcolor
+    Usage:
+
+     set_term_fgcolor($rgb, $stderr) -> any
+
+    Set terminal background color.
+
+    Set terminal background color. This prints the following xterm control
+    sequence to STDOUT (or STDERR, if ~stderr~ is set to true):
+
+     \e]11;#123456\a
+
+    where *123456* is the 6-hexdigit RGB color code.
+
+    This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
@@ -157,6 +230,66 @@ FUNCTIONS
 
     Return value: (any)
 
+  term_fgcolor_is_dark
+    Usage:
+
+     term_fgcolor_is_dark(%args) -> [status, msg, payload, meta]
+
+    Check if terminal text (foreground) color is dark.
+
+    This is basically get_term_fgcolor + rgb_is_dark.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   query_terminal => *bool* (default: 1)
+
+    *   quiet => *bool*
+
+    *   read_colorfgbg => *bool* (default: 1)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  term_fgcolor_is_light
+    Usage:
+
+     term_fgcolor_is_light(%args) -> [status, msg, payload, meta]
+
+    Check if terminal text (foreground) color is light.
+
+    This is basically get_term_fgcolor + rgb_is_light.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   query_terminal => *bool* (default: 1)
+
+    *   quiet => *bool*
+
+    *   read_colorfgbg => *bool* (default: 1)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 ENVIRONMENT
   COLORFGBG
 HOMEPAGE
@@ -177,7 +310,8 @@ SEE ALSO
     Color::ANSI::Util
 
     XTerm control sequence:
-    <http://invisible-island.net/xterm/ctlseqs/ctlseqs.html>.
+    <http://invisible-island.net/xterm/ctlseqs/ctlseqs.html>, or
+    <http://www.xfree86.org/4.7.0/ctlseqs.html>
 
 AUTHOR
     perlancar <perlancar@cpan.org>

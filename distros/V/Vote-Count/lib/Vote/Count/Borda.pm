@@ -7,14 +7,16 @@ package Vote::Count::Borda;
 
 use Moose::Role;
 
+# use Storable 3.15 qw(dclone);
+# use Try::Tiny;
 
-our $VERSION='0.02401';
+our $VERSION='1.00';
 
 =head1 NAME
 
 Vote::Count::Borda
 
-=head1 VERSION 0.02401
+=head1 VERSION 1.00
 
 =cut
 
@@ -28,15 +30,15 @@ use Vote::Count::RankCount;
 # use Data::Printer;
 
 has 'bordaweight' => (
-  is => 'rw',
-  isa => 'CodeRef',
+  is      => 'rw',
+  isa     => 'CodeRef',
   builder => '_buildbordaweight',
-  lazy => 1,
+  lazy    => 1,
 );
 
 has 'bordadepth' => (
-  is => 'rw',
-  isa => 'Int',
+  is      => 'rw',
+  isa     => 'Int',
   default => 0,
 );
 
@@ -44,10 +46,11 @@ has 'bordadepth' => (
 
 =head1 Synopsis
 
-  my $VC1 = Vote::Count->new(
+  my $RCV = Vote::Count->new(
     BallotSet  => read_ballots('t/data/data1.txt'),
     bordadepth => 5
   );
+  my $bordacount = $RCV->Borda();
 
 =head1 Borda Count
 
@@ -63,7 +66,7 @@ One alternative is to score for the number of choices after the current one -- i
 
 One major criticism of the count is that when there are many choices the difference between a first and second choice becomes negligable. Many of the alternate weights address this by either limiting the maximum depth, fixing the depth or using a different scaling such as 1/x where x is the position of the choice (1 is worth 1, 3 is 1/3).
 
-Range Voting Proposals such as STAR typically use a fixed depth count where voters may rank choices equally.
+Range Voting Methods such as STAR typically use a fixed depth count where voters may rank choices equally.
 
 When Creating a VoteCount object the Borda weight may be set by passing a coderef. The coderef takes two arguments. The first argument is the
 position of the choice in question. The second argument is the depth of the ballot. The optional bordadepth attribute will set an arbitrary
@@ -79,17 +82,26 @@ depth. Some popular options such inversion (where choice $c becomes $c/1 then in
     bordaweight => $testweight,
   );
 
+=head1 Method Borda
+
+Returns a RankCount Object with the scores per the weighting rule, for Ranked Choice Ballots.
+
+=head1 Method Score
+
+Returns a RankCount Object with the choices scored using the scores set by the voters, for Range Ballots.
+
 =head1 To Do
 
-Since there are so many variations of Borda, it would be nice to offer a large array of presets. Currently options are only handled by passing a coderef at object creation. Borda is not a priority for the developer, who considers Borda primarily useful as a tie breaking option or in systems like STAR that use a fixed field depth.
+Since there are so many variations of Borda, it would be nice to offer a large array of presets. Currently options are only handled by passing a coderef at object creation. Borda for RCV is not a priority for the developer.
 
 =cut
 
 sub _buildbordaweight {
-   return sub {
-    my ( $x, $y ) = @_ ;
-    return ( $y +1 - $x) }
-  }
+  return sub {
+    my ( $x, $y ) = @_;
+    return ( $y + 1 - $x );
+    }
+}
 
 =pod
 
@@ -103,35 +115,35 @@ choices are removed later choices are promoted.
 
 sub _bordashrinkballot ( $BallotSet, $active ) {
   my $newballots = {};
-  my %ballots = $BallotSet->{'ballots'}->%* ;
+  my %ballots    = $BallotSet->{'ballots'}->%*;
   for my $b ( keys %ballots ) {
     my @newballot = ();
     for my $item ( $ballots{$b}{'votes'}->@* ) {
-      if ( defined $active->{ $item }) {
-        push @newballot, $item ;
+      if ( defined $active->{$item} ) {
+        push @newballot, $item;
       }
     }
-    if (scalar( @newballot )) {
+    if ( scalar(@newballot) ) {
       $newballots->{$b}{'votes'} = \@newballot;
       $newballots->{$b}{'count'} =
-    $ballots{$b}->{'count'};
+        $ballots{$b}->{'count'};
     }
   }
   return $newballots;
 }
 
-sub _dobordacount( $self, $BordaTable, $active) {
+sub _dobordacount ( $self, $BordaTable, $active ) {
   my $BordaCount = {};
-  my $weight = $self->bordaweight;
-  my $depth = $self->bordadepth
+  my $weight     = $self->bordaweight;
+  my $depth =
+      $self->bordadepth
     ? $self->bordadepth
     : scalar( keys %{$active} );
-  for my $c ( keys $BordaTable->%*) {
+  for my $c ( keys $BordaTable->%* ) {
     for my $rank ( keys $BordaTable->{$c}->%* ) {
-      $BordaCount->{ $c } = 0 unless defined $BordaCount->{ $c };
-      $BordaCount->{ $c } +=
-        $BordaTable->{$c}{$rank} *
-        $weight->( $rank, $depth ) ;
+      $BordaCount->{$c} = 0 unless defined $BordaCount->{$c};
+      $BordaCount->{$c} +=
+        $BordaTable->{$c}{$rank} * $weight->( $rank, $depth );
     }
   }
   return $BordaCount;
@@ -141,31 +153,21 @@ sub Borda ( $self, $active = undef ) {
   my %BallotSet = $self->BallotSet()->%*;
   my %ballots   = ();
   $active = $self->Active() unless defined $active;
-  %ballots = %{_bordashrinkballot( \%BallotSet, $active )};
+  %ballots = %{ _bordashrinkballot( \%BallotSet, $active ) };
   my %BordaTable = ( map { $_ => {} } keys( $active->%* ) );
   for my $b ( keys %ballots ) {
     my @votes  = $ballots{$b}->{'votes'}->@*;
     my $bcount = $ballots{$b}->{'count'};
     for ( my $i = 0 ; $i < scalar(@votes) ; $i++ ) {
       my $c = $votes[$i];
-      if ( defined $BordaTable{$c} ) {
-        $BordaTable{$c}->{ $i + 1 } += $bcount;
-      }
-      else {
-        $BordaTable{$c}->{ $i + 1 } = $bcount;
-      }
+      $BordaTable{$c}->{ $i + 1 } += $bcount;
     }
   }
-  my $BordaCounted =
-         _dobordacount(
-           $self,
-           \%BordaTable,
-           $active );
-  return Vote::Count::RankCount->Rank( $BordaCounted );
+  my $BordaCounted = _dobordacount( $self, \%BordaTable, $active );
+  return Vote::Count::RankCount->Rank($BordaCounted);
 }
 
 1;
-
 
 #FOOTER
 

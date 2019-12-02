@@ -1,0 +1,4 @@
+# CPAN RT#59085
+seq:
+    - seq: 't/08_CPANPLUS-Backend.t'
+    - par: '**'

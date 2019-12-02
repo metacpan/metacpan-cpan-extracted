@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Module::CoreList;
 
-our $VERSION = '5.20190620';
+our $VERSION = '5.20191120';
 our %utilities;
 
 sub utilities {
@@ -1509,11 +1509,54 @@ my %delta = (
         }
     },
     5.031001 => {
-        delta_from => 5.031000,
+        delta_from => 5.031,
         changed => {
         },
         removed => {
             'podselect'             => 1,
+        }
+    },
+    5.031002 => {
+        delta_from => 5.031001,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.031003 => {
+        delta_from => 5.031002,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.031004 => {
+        delta_from => 5.031003,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.031005 => {
+        delta_from => 5.031004,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.030001 => {
+        delta_from => 5.03,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.031006 => {
+        delta_from => 5.031005,
+        changed => {
+            'streamzip'             => '1',
+        },
+        removed => {
         }
     },
 );

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::BackendTrackOrder 2.136;
+package Config::Model::BackendTrackOrder 2.137;
 
 # ABSTRACT: Track read order of elements from configuration
 
@@ -121,7 +121,9 @@ sub get_ordered_element_names {
     }
     else {
         # triggers a registration of all remaining elements in _creation_order
-        map { $self->register_element($_);} $self->get_element_names;
+        for ( $self->get_element_names ) {
+            $self->register_element($_);
+        }
         return $self->get_element_names_as_created;
     }
 }
@@ -140,7 +142,7 @@ Config::Model::BackendTrackOrder - Track read order of elements from configurati
 
 =head1 VERSION
 
-version 2.136
+version 2.137
 
 =head1 SYNOPSIS
 

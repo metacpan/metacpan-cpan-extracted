@@ -99,7 +99,7 @@ my $hd       = XML::NewsML_G2::Video->new(
 $ni_video->add_remote( 'file://tmp/files/123.hd.mp4', $hd );
 my $ni_text = create_ni_text();
 
-my $nm = XML::NewsML_G2::News_Message->new();
+my $nm = XML::NewsML_G2::News_Message->new( timezone => 'UTC' );
 $nm->add_item($ni_video);
 $nm->add_item($ni_text);
 
@@ -107,7 +107,7 @@ foreach my $version (qw(2.12 2.15 2.18 2.28)) {
     my $writer = XML::NewsML_G2::Writer::News_Message->new(
         news_message   => $nm,
         scheme_manager => $sm,
-        g2_version     => $version
+        g2_version     => $version,
     );
     ok( my $dom = $writer->create_dom(), "$version create DOM" );
     ok( my $xpc = XML::LibXML::XPathContext->new($dom),
@@ -120,7 +120,12 @@ foreach my $version (qw(2.12 2.15 2.18 2.28)) {
 
 #Package Item Test
 
-my %args = ( language => 'de', provider => $prov_apa, guid => $guid_pkg );
+my %args = (
+    language => 'de',
+    provider => $prov_apa,
+    guid     => $guid_pkg,
+    timezone => 'UTC'
+);
 
 ok( my $pi = XML::NewsML_G2::Package_Item->new(%args),
     'create Package_Item' );
@@ -158,7 +163,8 @@ $nm = XML::NewsML_G2::News_Message->new(
             name => 'MAIL1',
             role => 'dest:mailing'
         ),
-    ]
+    ],
+    timezone => 'UTC'
 );
 $nm->add_item($pi);
 $nm->add_item($text);
@@ -168,7 +174,7 @@ foreach my $version (qw(2.12 2.15 2.18 2.28)) {
     my $writer = XML::NewsML_G2::Writer::News_Message->new(
         news_message   => $nm,
         scheme_manager => $sm,
-        g2_version     => $version
+        g2_version     => $version,
     );
     ok( my $dom = $writer->create_dom(),
         "$version package writer creates DOM"

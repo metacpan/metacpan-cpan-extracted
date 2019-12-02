@@ -1,6 +1,7 @@
 package Pcore::Core::Exporter;
 
 use common::header;
+use Scalar::Util qw[looks_like_number];
 
 our $CACHE;
 
@@ -11,7 +12,8 @@ sub import {
     my $import = parse_import( $self, @_ );
 
     # find caller
-    my $caller = $import->{pragma}->{caller} // caller( $import->{pragma}->{level} // 0 );
+    my $caller = $import->{pragma}->{caller} // 0;
+    $caller = caller $caller if looks_like_number $caller;
 
     # export import method
     *{"$caller\::import"} = \&_import;
@@ -37,8 +39,8 @@ sub parse_import {
         elsif ( substr( $arg, 0, 1 ) eq q[-] ) {
             substr $arg, 0, 1, q[];
 
-            if ( $arg eq 'level' || $arg eq 'caller' ) {
-                $res->{pragma}->{$arg} = shift;
+            if ( $arg eq 'caller' ) {
+                $res->{pragma}->{caller} = shift;
             }
             elsif ( $export_pragma && exists $export_pragma->{$arg} ) {
                 $res->{pragma}->{$arg} = 1;
@@ -62,7 +64,8 @@ sub _import {
     my $import = parse_import( $from, @_ );
 
     # find caller
-    my $to = $import->{pragma}->{caller} // caller( $import->{pragma}->{level} // 0 );
+    my $to = $import->{pragma}->{caller} // 0;
+    $to = caller $to if looks_like_number $to;
 
     # protection from re-export to myself
     return if $to eq $from;
@@ -232,10 +235,10 @@ sub _export_tags ( $from, $to, $import ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 35, 47, 93, 110,     | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 143, 166, 184, 221   |                                                                                                                |
+## |    3 | 37, 49, 96, 113,     | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 146, 169, 187, 224   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 131                  | Subroutines::ProhibitExcessComplexity - Subroutine "_export_tags" with high complexity score (29)              |
+## |    3 | 134                  | Subroutines::ProhibitExcessComplexity - Subroutine "_export_tags" with high complexity score (29)              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 1                    | Modules::RequireVersionVar - No package-scoped "$VERSION" variable found                                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

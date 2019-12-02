@@ -9,16 +9,15 @@
 
 =head1 NAME
 
-FunctionalPerl - functional programming on Perl
+FunctionalPerl - functional programming in Perl
 
 =head1 SYNOPSIS
 
     use FunctionalPerl;
     FunctionalPerl->VERSION # or $FunctionalPerl::VERSION
 
-    # But all the actual modules are under FP::*, like:
+    # The actual modules are in the FP:: namespace hierarchy, like:
     use FP::List;
-    # etc.
 
     # But you can also import sets of modules from here, e.g.:
     use FunctionalPerl qw(:sequences :repl);
@@ -60,7 +59,7 @@ C<:chars>: L<FP::Char>
 
 C<:csv>: L<FP::Text::CSV>
 
-C<:datastructures>: C<:chars>, C<:maps>, C<:sequences>, C<:sets>, C<:tries>
+C<:datastructures>: C<:chars>, C<:maps>, C<:numbers>, C<:sequences>, C<:sets>, C<:tries>
 
 C<:dbi>: L<FP::DBI>
 
@@ -68,13 +67,15 @@ C<:debug>: C<:equal>, C<:show>, L<Chj::Backtrace>, L<Chj::pp>, L<Chj::time_this>
 
 C<:dev>: C<:debug>, C<:repl>, C<:test>, L<Chj::ruse>
 
+C<:doc>: L<FP::Docstring>
+
 C<:equal>: L<FP::Equal>
 
 C<:failure>: L<FP::Failure>
 
 C<:fix>: L<FP::fix>
 
-C<:functions>: C<:equal>, C<:failure>, C<:show>, L<FP::Combinators>, L<FP::Div>, L<FP::Memoizing>, L<FP::Ops>, L<FP::Optional>, L<FP::Untainted>, L<FP::Values>, L<FP::uncurry>
+C<:functions>: C<:equal>, C<:failure>, C<:show>, L<FP::Combinators>, L<FP::Div>, L<FP::Memoizing>, L<FP::Ops>, L<FP::Optional>, L<FP::Predicates>, L<FP::Untainted>, L<FP::Values>, L<FP::uncurry>
 
 C<:git>: L<FP::Git::Repository>
 
@@ -82,9 +83,11 @@ C<:io>: L<Chj::tempdir>, L<Chj::xIO>, L<Chj::xhome>, L<Chj::xopen>, L<Chj::xopen
 
 C<:lazy>: C<:stream>, L<FP::Lazy>, L<FP::Weak>
 
-C<:maps>: L<FP::Hash>
+C<:maps>: L<FP::Hash>, L<FP::PureHash>
 
-C<:most>: C<:autobox>, C<:datastructures>, C<:debug>, C<:equal>, C<:failure>, C<:functions>, C<:lazy>, C<:show>
+C<:most>: C<:autobox>, C<:datastructures>, C<:debug>, C<:doc>, C<:equal>, C<:failure>, C<:functions>, C<:lazy>, C<:show>
+
+C<:numbers>: L<FP::BigInt>
 
 C<:path>: L<FP::Path>
 
@@ -110,12 +113,15 @@ C<:transparentlazy>: C<:stream>, L<FP::TransparentLazy>, L<FP::Weak>
 
 C<:tries>: L<FP::Trie>
 
-
 =head1 NOTE
 
-This is alpha software! Read the package README.
+This is alpha software! Read the status section in the package README
+or on the L<website|http://functional-perl.org/>.
 
 =cut
+
+#   **NOTE**  there is no need to keep SEE ALSO in sync with the definitions,
+#   **NOTE**  running meta/update-pod (at release time) will take care of it.
 
 
 package FunctionalPerl;
@@ -126,13 +132,15 @@ package FunctionalPerl;
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
-our $VERSION= "0.72.11";
+our $VERSION= "0.72.18";
 
 
 # Export tag to modules and/or other tags; each module will be
 # imported with ":all" by default. Where a module name contains "=",
 # the part after the "=" is the comma-separated list of tag names to
 # import.
+# NOTE: the documentation in "SEE ALSO" is auto-generated from this,
+# you do not need to keep it in sync manually.
 our $export_desc=
   +{
     ":autobox"=> [qw(FP::autobox=)],
@@ -142,6 +150,7 @@ our $export_desc=
     ":transparentlazy"=> [qw(FP::TransparentLazy :stream FP::Weak)],
     ":failure"=> [qw(FP::Failure)],
 
+    ":doc"=> [qw(FP::Docstring)],
     ":show"=> [qw(FP::Show)],
     ":equal"=> [qw(FP::Equal)],
     ":debug"=> [qw(:show :equal Chj::Backtrace Chj::time_this Chj::pp)],
@@ -150,6 +159,7 @@ our $export_desc=
     ":dev"=> [qw(:repl :test :debug Chj::ruse)],
 
     ":functions"=> [qw(FP::Combinators FP::Ops FP::Div
+                       FP::Predicates
                        FP::Optional FP::Values
                        FP::Memoizing FP::uncurry
                        FP::Untainted
@@ -157,15 +167,16 @@ our $export_desc=
     ":git"=> [qw(FP::Git::Repository)],
     ":pxml"=> [qw(PXML::Util PXML::XHTML PXML::Serialize)],
 
+    ":numbers"=> [qw(FP::BigInt)],
     ":chars"=> [qw(FP::Char)],
     ":sequences"=> [qw(FP::List FP::StrictList FP::MutableArray
                        FP::Array FP::Array_sort
                        FP::PureArray
                        :stream)],
-    ":maps"=> [qw(FP::Hash)],
+    ":maps"=> [qw(FP::Hash FP::PureHash)],
     ":sets"=> [qw(FP::HashSet FP::OrderedCollection)],
     ":tries"=> [qw(FP::Trie)],
-    ":datastructures"=> [qw(:chars :sequences :maps :sets :tries)],
+    ":datastructures"=> [qw(:chars :numbers :sequences :maps :sets :tries)],
 
     ":io"=> [qw(Chj::xIO Chj::xopen Chj::xtmpfile= Chj::tempdir
                 Chj::xpipe= Chj::xoutpipe= Chj::xopendir= Chj::xperlfunc
@@ -179,7 +190,7 @@ our $export_desc=
     ":path"=> [qw(FP::Path)],
 
     ":most"=> [qw(:lazy :datastructures :equal :show :functions :failure :debug
-                  :autobox)],
+                  :autobox :doc)],
     ":rare"=> [qw(:csv :path :git :dbi  :trampoline :fix)],
     ":all"=> [qw(:most :rare :io :dev)],
    };
@@ -223,7 +234,6 @@ sub split_moduledesc {
 }
 
 sub export_desc2pod {
-    print
     join("",
          map {
              my $a= $$export_desc{$_};

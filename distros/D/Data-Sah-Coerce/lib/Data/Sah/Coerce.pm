@@ -1,7 +1,8 @@
 package Data::Sah::Coerce;
 
-our $DATE = '2019-01-26'; # DATE
-our $VERSION = '0.033'; # VERSION
+our $DATE = '2019-11-28'; # DATE
+our $DIST = 'Data-Sah-Coerce'; # DIST
+our $VERSION = '0.039'; # VERSION
 
 use 5.010001;
 use strict;
@@ -142,7 +143,7 @@ Data::Sah::Coerce - Coercion rules for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.033 of Data::Sah::Coerce (from Perl distribution Data-Sah-Coerce), released on 2019-01-26.
+This document describes version 0.039 of Data::Sah::Coerce (from Perl distribution Data-Sah-Coerce), released on 2019-11-28.
 
 =head1 SYNOPSIS
 
@@ -167,11 +168,11 @@ This distribution contains a standard set of coercion rules for L<Data::Sah>. It
 is separated from the C<Data-Sah> distribution and can be used independently.
 
 A coercion rule is put in
-C<Data::Sah::Coerce::$COMPILER::$TARGET_TYPE::$SOURCE_TYPE_AND_EXTRA_DESCRIPTION>
-module, for example: L<Data::Sah::Coerce::perl::date::float_epoch> for
+C<Data::Sah::Coerce::$COMPILER::To_$TARGET_TYPE::From_$SOURCE_TYPE::DESCRIPTION>
+module, for example: L<Data::Sah::Coerce::perl::To_date::From_float::Epoch> for
 converting date from integer (Unix epoch) or
-L<Data::Sah::Coerce::perl::date::str_iso8601> for converting date from ISO8601
-strings like "2016-05-15".
+L<Data::Sah::Coerce::perl::To_date::From_str::ISO8601> for converting date from
+ISO8601 strings like "2016-05-15".
 
 Basically, a coercion rule will provide an expression (C<expr_match>) that
 evaluates to true when data can be coerced, and an expression (C<expr_coerce>)
@@ -185,7 +186,7 @@ the following keys (C<*> marks that the key is required):
 
 =item * v* => int (default: 1)
 
-Metadata specification version. Currently at 4.
+Metadata specification version. From L<DefHash>. Currently at 4.
 
 History: bumped from 3 to 4 to remove C<enable_by_default> property. Now the
 list of standard (enabled-by-default) coercion rules is maintained in
@@ -200,6 +201,10 @@ return array containing error message and coerced data, instead of just coerced
 data.
 
 History: Bumped from 1 to 2 to exclude old module names.
+
+=item * summary => str
+
+From L<DefHash>.
 
 =item * might_fail => bool (default: 0)
 
@@ -231,14 +236,14 @@ string; there is usually little to none of usefulness in using both; besides,
 both rules match all string and dies when failing to parse the string. So in
 C<str_natural> rule, you'll find this metadata:
 
- precludes => [qr/\Astr_alami(_.+)?\z/]
+ precludes => [qr/\AFrom_str::Alami(_.+)?\z/]
 
-and in C<str_alami> rule you'll find this metadata:
+and in C<From_str::Alami> rule you'll find this metadata:
 
- precludes => [qr/\Astr_alami(_.+)?\z/, 'str_natural']
+ precludes => [qr/\AFrom_str::Alami(_.+)?\z/, 'From_str::Natural']
 
-Note that the C<str_alami> rule also precludes other C<str_alami_*> rules (like
-C<str_alami_en> and C<str_alami_id>).
+Note that the C<From_str::Alami> rule also precludes other C<From_str::Alami_*>
+rules (like C<From_str::Alami_EN> and C<From_str::Alami_ID>).
 
 Also note that rules which are specifically requested to be used (e.g. using
 C<x.perl.coerce_rules> attribute in Sah schema) will still be precluded.
@@ -272,9 +277,9 @@ indicates required keys):
 =item * expr_match => str
 
 Expression in the target language to test whether the data can be coerced. For
-example, in C<Data::Sah::Coerce::perl::date::float_epoch>, only integers ranging
-from 10^8 to 2^31 are converted into date. Non-integers or integers outside this
-range are not coerced.
+example, in C<Data::Sah::Coerce::perl::To_date::From_float::Epoch>, only
+integers ranging from 10^8 to 2^31 are converted into date. Non-integers or
+integers outside this range are not coerced.
 
 =item * expr_coerce => str
 

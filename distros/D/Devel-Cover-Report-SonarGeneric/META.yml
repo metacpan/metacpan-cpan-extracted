@@ -20,12 +20,12 @@ no_index:
     - inc
     - t
 requires:
-  Devel::Cover: '0'
+  Devel::Cover: '1.25'
   Path::Tiny: '0.013'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/tomk3003/devel-cover-report-sonargeneric/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/tomk3003/devel-cover-report-sonargeneric
-version: '0.5'
+version: '0.6'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

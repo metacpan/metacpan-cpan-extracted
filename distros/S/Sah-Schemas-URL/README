@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::URL - Sah schemas related to URL
 
 VERSION
-    This document describes version 0.010 of Sah::Schemas::URL (from Perl
-    distribution Sah-Schemas-URL), released on 2019-07-25.
+    This document describes version 0.011 of Sah::Schemas::URL (from Perl
+    distribution Sah-Schemas-URL), released on 2019-11-29.
 
 SAH SCHEMAS
     *   url

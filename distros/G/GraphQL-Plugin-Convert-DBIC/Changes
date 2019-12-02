@@ -1,3 +1,7 @@
+0.16 2019-12-01
+- add set and mediumint types - thanks @nebulous
+- apply DBIx::Class::ResultClass::HashRefInflator correctly, fix typo - thanks @schroeer
+
 0.15 2019-05-04
  - update now uses *UpdateInput = *IDInput, *SearchInput
  - make just one field-resolver, not lots

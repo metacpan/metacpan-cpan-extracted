@@ -2,12 +2,12 @@ Build.PL
 Changes
 examples/hello-world.pl
 lib/Net/Async/HTTP/Server.pm
+lib/Net/Async/HTTP/Server/PrometheusCollector.pm
 lib/Net/Async/HTTP/Server/Protocol.pm
 lib/Net/Async/HTTP/Server/PSGI.pm
 lib/Net/Async/HTTP/Server/Request.pm
 lib/Plack/Handler/Net/Async/HTTP/Server.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
@@ -26,6 +26,7 @@ t/10request-HTTP.t
 t/20psgi.t
 t/21psgi-streaming.t
 t/80cross-http.t
+t/80server+net-prometheus.t
 t/81cross-https.t
 t/99pod.t
 t/privkey.pem

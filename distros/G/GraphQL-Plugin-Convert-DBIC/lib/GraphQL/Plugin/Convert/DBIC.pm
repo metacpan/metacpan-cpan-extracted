@@ -6,7 +6,7 @@ use GraphQL::Debug qw(_debug);
 use Lingua::EN::Inflect::Number qw(to_S to_PL);
 use Carp qw(confess);
 
-our $VERSION = "0.15";
+our $VERSION = "0.16";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %GRAPHQL_TYPE2SQLS = (
@@ -37,6 +37,7 @@ my %GRAPHQL_TYPE2SQLS = (
     'multiset',
     'multiset_locator',
     # mysql
+    'set',
     'text',
     'tinytext',
     'mediumtext',
@@ -51,6 +52,7 @@ my %GRAPHQL_TYPE2SQLS = (
     'tinyint',
     'integer',
     'smallint',
+    'mediumint',
     'interval',
     'interval_year',
     'interval_month',
@@ -256,10 +258,12 @@ sub _query_resolver {
   $args = +{ map { ("me.$_" => $args->{$_}) } keys %$args };
   DEBUG and _debug('DBIC.root_value', $name, $method, $args, \@subfieldrels, $info);
   my $rs = $dbic_schema->resultset($name);
-  $rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
   my $result = $rs->$method(
     $args,
-    { prefetch => { map %$, @subfieldrels } },
+    {
+      prefetch => { map %$_, @subfieldrels },
+      result_class => 'DBIx::Class::ResultClass::HashRefInflator'
+    },
   );
   $result = [ $result->all ] if $method eq 'search';
   $result;

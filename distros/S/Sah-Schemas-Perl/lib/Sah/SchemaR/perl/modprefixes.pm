@@ -1,9 +1,9 @@
 package Sah::SchemaR::perl::modprefixes;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.025'; # VERSION
 
-our $rschema = ["array",[{description=>"\nArray of Perl module prefixes, where each element is of `perl::modprefix`\nschema, e.g. `Foo::`, `Foo::Bar::`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Module::C*\n\nand it will be expanded to e.g.:\n\n    [\"Module::CPANTS::\", \"Module::CPANfile::\", \"Module::CheckVersion::\", \"Module::CoreList::\"]\n\nThe wildcard syntax supports jokers (`?`, '*`) and brackets (`[abc]`). See the\n`unix` type of wildcard in <pm:Regexp::Wildcards>, which this coercion rule\nuses.\n\n",of=>["perl::modprefix",{req=>1},{}],summary=>"Perl module prefixes","x.element_completion"=>"perl_modprefix","x.perl.coerce_rules"=>["str_or_array_expand_perl_modprefix_wildcard"]}],["array"]];
+our $rschema = ["array",[{description=>"\nArray of Perl module prefixes, where each element is of `perl::modprefix`\nschema, e.g. `Foo::`, `Foo::Bar::`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Module::C*\n\nand it will be expanded to e.g.:\n\n    [\"Module::CPANTS::\", \"Module::CPANfile::\", \"Module::CheckVersion::\", \"Module::CoreList::\"]\n\nThe wildcard syntax supports jokers (`?`, '*`) and brackets (`[abc]`). See the\n`unix` type of wildcard in <pm:Regexp::Wildcards>, which this coercion rule\nuses.\n\n",of=>["perl::modprefix",{req=>1},{}],summary=>"Perl module prefixes","x.element_completion"=>"perl_modprefix","x.perl.coerce_rules"=>["From_str_or_array::expand_perl_modprefix_wildcard"]}],["array"]];
 
 1;
 # ABSTRACT: Perl module prefixes
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::modprefixes - Perl module prefixes
 
 =head1 VERSION
 
-This document describes version 0.023 of Sah::SchemaR::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2019-07-26.
+This document describes version 0.025 of Sah::SchemaR::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

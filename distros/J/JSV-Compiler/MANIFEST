@@ -10,5 +10,6 @@ t/05_allof.t
 t/06_anyof.t
 t/07_oneof.t
 t/08_not.t
+t/09_strictness.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

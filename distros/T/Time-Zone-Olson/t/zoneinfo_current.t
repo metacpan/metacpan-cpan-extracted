@@ -68,8 +68,8 @@ if ($timezone->location()) {
 ok((grep /^Australia$/, $timezone->areas()), "Found 'Australia' in \$timezone->areas()");
 ok((grep /^Melbourne$/, $timezone->locations('Australia')), "Found 'Melbourne' in \$timezone->areas('Australia')");
 if ($^O eq 'MSWin32') {
-	diag("$^O comment for Australia/Melbourne is '" . $timezone->comment('Australia/Melbourne') . "'");
-	ok($timezone->comment('Australia/Melbourne') =~ /Canberra/smx, "\$timezone->comment('Australia/Melbourne') contains /Canberra/");
+	diag("$^O comment for Australia/Melbourne is '" . Encode::encode('UTF-8', $timezone->comment('Australia/Melbourne'), 1) . "'");
+	ok($timezone->comment('Australia/Melbourne') =~ /^[(]GMT[+]10:00[)][ ]/smx, "\$timezone->comment('Australia/Melbourne') contains //^[(]GMT[+]10:00[)][ ]");
 } else {
 	ok($timezone->comment('Australia/Melbourne') =~ /Victoria/smx, "\$timezone->comment('Australia/Melbourne') contains /Victoria/");
 }

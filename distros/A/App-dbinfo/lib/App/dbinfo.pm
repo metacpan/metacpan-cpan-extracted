@@ -1,7 +1,9 @@
 package App::dbinfo;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'App-dbinfo'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -163,7 +165,7 @@ our %args_dump_table = (
         'x.name.singular' => 'exclude_column',
         schema => ['array*', {
             of=>'str*',
-            #'x.perl.coerce_rules'=>['str_comma_sep'],
+            #'x.perl.coerce_rules'=>['From_str::comma_sep'],
         }],
         cmdline_aliases => {C=>{}},
     },
@@ -172,7 +174,7 @@ our %args_dump_table = (
         'x.name.singular' => 'include_column',
         schema => ['array*', {
             of=>'str*',
-            #'x.perl.coerce_rules'=>['str_comma_sep'],
+            #'x.perl.coerce_rules'=>['From_str::comma_sep'],
         }],
         cmdline_aliases => {c=>{}},
     },
@@ -304,7 +306,7 @@ App::dbinfo - Get/extract information from database
 
 =head1 VERSION
 
-This document describes version 0.004 of App::dbinfo (from Perl distribution App-dbinfo), released on 2018-04-03.
+This document describes version 0.005 of App::dbinfo (from Perl distribution App-dbinfo), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -317,7 +319,7 @@ See included script L<dbinfo>.
 
 Usage:
 
- dump_table(%args) -> [status, msg, result, meta]
+ dump_table(%args) -> [status, msg, payload, meta]
 
 Dump table into various formats.
 
@@ -389,18 +391,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (str)
 
 
+
 =head2 list_columns
 
 Usage:
 
- list_columns(%args) -> [status, msg, result, meta]
+ list_columns(%args) -> [status, msg, payload, meta]
 
 List columns of a table.
 
@@ -450,18 +453,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_tables
 
 Usage:
 
- list_tables(%args) -> [status, msg, result, meta]
+ list_tables(%args) -> [status, msg, payload, meta]
 
 List tables in the database.
 
@@ -493,7 +497,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -527,7 +531,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,6 +4,8 @@ A set of tools to analyse the output from TraDIS analyses
 [![Build Status](https://travis-ci.org/sanger-pathogens/Bio-Tradis.svg?branch=master)](https://travis-ci.org/sanger-pathogens/Bio-Tradis)  
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-brightgreen.svg)](https://github.com/sanger-pathogens/Bio-Tradis/blob/master/software_license)  
 [![status](https://img.shields.io/badge/Bioinformatics-10.1093-brightgreen.svg)](https://doi.org/10.1093/bioinformatics/btw022)  
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/biotradis/README.html)   
+[![Container ready](https://img.shields.io/badge/container-ready-brightgreen.svg)](https://quay.io/repository/biocontainers/biotradis)  
 [![Docker Build Status](https://img.shields.io/docker/build/sangerpathogens/bio-tradis.svg)](https://hub.docker.com/r/sangerpathogens/bio-tradis)  
 [![Docker Pulls](https://img.shields.io/docker/pulls/sangerpathogens/bio-tradis.svg)](https://hub.docker.com/r/sangerpathogens/bio-tradis)  
 [![codecov](https://codecov.io/gh/sanger-pathogens/bio-tradis/branch/master/graph/badge.svg)](https://codecov.io/gh/sanger-pathogens/bio-tradis)
@@ -14,6 +16,7 @@ A set of tools to analyse the output from TraDIS analyses
     * [Required dependencies](#required-dependencies)
     * [Bioconda](#bioconda)
     * [Docker](#docker)
+    * [Running the tests](#running-the-tests)
   * [Usage](#usage)
     * [Scripts](#scripts)
     * [Analysis Scripts](#analysis-scripts)
@@ -32,6 +35,7 @@ For more information on the TraDIS method, see http://bioinformatics.oxfordjourn
 Bio-Tradis has the following dependencies:
 
 ### Required dependencies
+* bwa
 * smalt
 * samtools
 * tabix
@@ -44,17 +48,8 @@ There are a number of ways to install Bio-Tradis and details are provided below.
 Install conda and enable the bioconda channel.
 
 ```
-conda config --add channels r
-conda config --add channels defaults
-conda config --add channels conda-forge
-conda config --add channels bioconda
-conda install r smalt samtools perl-app-cpanminus
+conda install-c bioconda biotradis=1.4.1.dev
 
-sudo cpanm -f Bio::Tradis
-R 
-source("http://bioconductor.org/biocLite.R")
-biocLite()
-biocLite(c("edgeR","getopt", "MASS"))
 ```
 
 ### Docker
@@ -65,6 +60,11 @@ Bio-Tradis can be run in a Docker container. First install Docker, then install 
 To use Bio-Tradis use a command like this (substituting in your directories), where your files are assumed to be stored in /home/ubuntu/data:
 
     docker run --rm -it -v /home/ubuntu/data:/data sangerpathogens/bio-tradis bacteria_tradis -h
+
+### Running the tests
+The test can be run with dzil from the top level directory:  
+  
+`dzil test`  
 
 ## Usage
 
@@ -88,7 +88,7 @@ Executable scripts to carry out most of the listed functions are available in th
 * `filter_tradis_tags` - Create a fastq file containing reads that match the supplied tag
 * `remove_tradis_tags` - Creates a fastq file containing reads with the supplied tag removed from the sequences
 * `tradis_plot` - Creates an gzipped insertion site plot
-* `bacteria_tradis` - Runs complete analysis, starting with a fastq file and produces mapped BAM files and plot files for each file in the given file list and a statistical summary of all files. Note that the -f option expects a text file containing a list of fastq files, one per line.
+* `bacteria_tradis` - Runs complete analysis, starting with a fastq file and produces mapped BAM files and plot files for each file in the given file list and a statistical summary of all files. Note that the -f option expects a text file containing a list of fastq files, one per line. This script can be run with or without supplying tags. 
 
 A help menu for each script can be accessed by running the script with no parameters.
 
@@ -155,15 +155,16 @@ __Bio::Tradis::Map__
 * Methods:
 	* `index_ref` - create index files of the reference genome. These are required
 				for the mapping step. Only skip this step if index files already
-				exist. -k and -s options for referencing are calculated based
+				exist. If SMALT is used as the aligner -sk and -ss options for referencing are calculated based
 				on the length of the reads being mapped:
-		* <70 : `-k 13 -s 4`
-		* >70 & <100 : `-k 13 -s 6`
-		* >100 : `-k 20 -s 13`
+		* <70 : `-sk 13 -ss 4`
+		* >70 & <100 : `-sk 13 -ss 6`
+		* >100 : `-sk 20 -ss 13`
 	* `do_mapping` - map `fastqfile` to `reference`. Options used for mapping are:
-				 `-r -1, -x and -y 0.96`
+				 `-k the min seed length for BWA`
+				 `-s (for using SMALT as alternative aligner) -r -1, -x and -y 0.96 for SMALT (see SMALT manual)`
 				
-	For more information on the mapping and indexing options discussed here, see the SMALT manual (ftp://ftp.sanger.ac.uk/pub4/resources/software/smalt/smalt-manual-0.7.4.pdf)
+	For more information on the mapping and indexing options discussed here, see the BWA manual (http://rothlab.ucdavis.edu/howto/attachments/bwa_manpage.pdf) and/or SMALT manual (ftp://ftp.sanger.ac.uk/pub4/resources/software/smalt/smalt-manual-0.7.4.pdf)
 				
 __Bio::Tradis::TradisPlot__  
 * Required parameters:

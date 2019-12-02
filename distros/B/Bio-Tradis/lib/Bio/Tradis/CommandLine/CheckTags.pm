@@ -1,5 +1,5 @@
 package Bio::Tradis::CommandLine::CheckTags;
-$Bio::Tradis::CommandLine::CheckTags::VERSION = '1.4.1';
+$Bio::Tradis::CommandLine::CheckTags::VERSION = '1.4.3';
 # ABSTRACT: Check for presence of tr tag in BAM file
 
 
@@ -76,7 +76,7 @@ Bio::Tradis::CommandLine::CheckTags - Check for presence of tr tag in BAM file
 
 =head1 VERSION
 
-version 1.4.1
+version 1.4.3
 
 =head1 SYNOPSIS
 

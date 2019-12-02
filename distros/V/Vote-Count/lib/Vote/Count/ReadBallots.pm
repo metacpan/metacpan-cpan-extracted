@@ -5,22 +5,24 @@ use feature qw/postderef signatures/;
 no warnings qw/experimental/;
 use Path::Tiny 0.108;
 use Carp;
+use JSON::MaybeXS;
+use YAML::XS;
 # use Data::Dumper;
-# use Data::Printer;
+use Data::Printer;
 
 # ABSTRACT: Read Ballots for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='0.02401';
+our $VERSION='1.00';
 
 =head1 NAME
 
 Vote::Count::ReadBallots
 
-=head1 VERSION 0.02401
+=head1 VERSION 1.00
 
 =head1 SYNOPSIS
 
-  Vote::Count::ReadBallots 'read_ballots';
+  Vote::Count::ReadBallots;
 
   my $data1 = read_ballots('t/data/data1.txt');
 
@@ -28,9 +30,11 @@ Vote::Count::ReadBallots
 
 Reads a file containing vote data. Retruns a HashRef of a Vote::Count BallotSet.
 
+All public methods are exported.
+
 =head1 BallotSet Data Structure
 
- ballots   {
+    ballots   {
         CHOCOLATE:MINTCHIP:VANILLA {
             count   1,
             votes   [
@@ -72,16 +76,51 @@ Reads a data file in the standard Vote::Count format and returns a BallotSet.
 
 Write out a ballotset. Useful for creating a compressed version of a raw file.
 
-=head2 Other Formats
+=head1 Range Ballots
 
-It is planned to add support in the future for ranged voting. JSON, XML, and YAML formats may also be provided in the future.
+Range Ballots are supported in both JSON and YAML format. The read method doesn't perform validation like B<read_ballots> does.
+
+=head2 Range Ballot Format in JSON
+
+  {
+    "choices": [
+      "TWEEDLEDEE",
+      "TWEEDLEDUM",
+      "HUMPTYDUMPTY"
+    ],
+    "ballots": [
+      {
+        "votes": {
+          "TWEEDLEDEE": 1,
+          "TWEEDLEDUM": 1,
+          "HUMPTYDUMPTY": 3
+        },
+        "count": 3
+      }
+    ],
+    "depth": 3
+  }
+
+=head2 read_range_ballots
+
+Requires a parameter of a JSON or YAML file. The second parameter may be either 'json' or 'yaml', defaulting to 'json'.
+
+  my $BestFastFood = read_range_ballots('t/data/fastfood.range.json');
+  my $BestFastFood = read_range_ballots('t/data/fastfood.range.yml', 'yaml');
+
+=head2 write_range_ballots
+
+Takes three parameters, a BallotSet, a file location, and a value of 'json' or 'yaml'. The first two parameters are required, the third defaults to 'json'.
+
+  write_range_ballots( $BestFastFood, '/tmp/fast.json', 'json' );
 
 =cut
 
+use Exporter::Easy ( EXPORT =>
+    [qw( read_ballots write_ballots read_range_ballots write_range_ballots)],
+);
 
-use Exporter::Easy (
-       OK => [ qw( read_ballots write_ballots ) ],
-   );
+my $coder = Cpanel::JSON::XS->new->ascii->pretty;
 
 sub _choices ( $choices ) {
   my %C = ();
@@ -92,15 +131,14 @@ sub _choices ( $choices ) {
   return \%C;
 }
 
-## Add ballotscount !
-
 sub read_ballots( $filename ) {
   my %data = (
-    'choices' => undef,
-    'ballots' => {},
-    'options' => { 'rcv' => 1 },
-    'votescast' => 0 ,
-    'comment' => '' );
+    'choices'   => undef,
+    'ballots'   => {},
+    'options'   => { 'rcv' => 1 },
+    'votescast' => 0,
+    'comment'   => ''
+  );
 BALLOTREADLINES:
   for my $line_raw ( path($filename)->lines ) {
     if ( $line_raw =~ m/^\#/ ) {
@@ -129,8 +167,8 @@ BALLOTREADLINES:
       for my $choice ( split( /:/, $line ) ) {
         unless ( $data{'choices'}{$choice} ) {
           die "Choice: $choice is not in defined choice list: "
-            . join( ", ", keys( $data{'choices'}->%* ) ) .
-            "\n -- $line\n";
+            . join( ", ", keys( $data{'choices'}->%* ) )
+            . "\n -- $line\n";
         }
         push @votes, $choice;
       }
@@ -138,21 +176,51 @@ BALLOTREADLINES:
       $data{'ballots'}{$line}{'votes'} = \@votes;
     }
   }
-  return \%data ;
+  return \%data;
 }
 
 sub write_ballots ( $BallotSet, $destination ) {
-  my @data = ( '# Data rewritten in compressed form.');
-  my $choicelist = join( ':', sort keys($BallotSet->{'choices'}->%*));
+  my @data = ('# Data rewritten in compressed form.');
+  my $choicelist = join( ':', sort keys( $BallotSet->{'choices'}->%* ) );
   push @data, "CHOICES:$choicelist";
   for my $k ( sort keys $BallotSet->{'ballots'}->%* ) {
     my $cnt = $BallotSet->{'ballots'}{$k}{'count'};
     push @data, "$cnt:$k";
   }
   for (@data) { $_ .= "\n" if $_ !~ /\n$/ }
-  path( $destination )->spew( @data );
+  path($destination)->spew(@data);
 }
 
+sub write_range_ballots ( $BallotSet, $destination, $format = 'json' ) {
+  $BallotSet->{'choices'} = [ sort keys $BallotSet->{'choices'}->%* ];
+  if ( $format eq 'json' ) {
+    path($destination)->spew( $coder->encode($BallotSet) );
+  }
+  elsif ( $format eq 'yaml' ) {
+    $BallotSet = Load path->($destination)->slurp;
+    path($destination)->spew( Dump $BallotSet);
+  }
+  else { die "invalid score ballot format $format." }
+}
+
+sub read_range_ballots ( $source, $format = 'json' ) {
+  my $BallotSet = undef;
+  if ( $format eq 'json' ) {
+    $BallotSet = $coder->decode( path($source)->slurp );
+  }
+  elsif ( $format eq 'yaml' ) {
+    $BallotSet = Load path($source)->slurp;
+  }
+  else { die "invalid score ballot format $format." }
+  $BallotSet->{'votescast'} = 0;
+  $BallotSet->{'options'} = { 'range' => 1, 'rcv' => 0 };
+  my @choices = $BallotSet->{'choices'}->@*;
+  $BallotSet->{'choices'} = { map { $_ => 1 } @choices };
+  for my $ballot ( $BallotSet->{'ballots'}->@* ) {
+    $BallotSet->{'votescast'} += $ballot->{'count'};
+  }
+  return $BallotSet;
+}
 
 1;
 

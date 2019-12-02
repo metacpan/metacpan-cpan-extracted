@@ -1,7 +1,7 @@
 package Data::Sah::Compiler;
 
-our $DATE = '2019-10-24'; # DATE
-our $VERSION = '0.902'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.903'; # VERSION
 
 use 5.010;
 use strict;
@@ -773,7 +773,7 @@ Data::Sah::Compiler - Base class for Sah compilers (Data::Sah::Compiler::*)
 
 =head1 VERSION
 
-This document describes version 0.902 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2019-10-24.
+This document describes version 0.903 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2019-11-29.
 
 =for Pod::Coverage ^(check_compile_args|def|expr|init_cd|literal|name|add_module|add_compile_module|add_runtime_module)$
 
@@ -985,12 +985,12 @@ the module, e.g. for pragma, like C<no warnings 'void'>).
 
 There are also I<compile-time> modules (C<phase> key set to C<compile>), which
 are required during compilation of schema. This include coercion rule modules
-like L<Data::Sah::Coerce::perl::date::float_epoch>, and so on. This information
-might be useful for distributions that use Data::Sah. Because Data::Sah is a
-modular library, where there are third party extensions for types, coercion
-rules, and so on, listing these modules as dependencies instead of a single
-C<Data::Sah> will ensure that dependants will pull the right distribution during
-installation.
+like L<Data::Sah::Coerce::perl::To_date::From_float::Epoch>, and so on. This
+information might be useful for distributions that use Data::Sah. Because
+Data::Sah is a modular library, where there are third party extensions for
+types, coercion rules, and so on, listing these modules as dependencies instead
+of a single C<Data::Sah> will ensure that dependants will pull the right
+distribution during installation.
 
 =item * ccls => [HASH, ...]
 

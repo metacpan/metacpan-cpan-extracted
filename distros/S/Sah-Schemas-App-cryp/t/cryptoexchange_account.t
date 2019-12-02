@@ -16,24 +16,24 @@ subtest "basics" => sub {
     my ($res, $val);
 
     # invalid account syntax
-    ($res, $val) = @{ $v->("gdax/a b") };
+    ($res, $val) = @{ $v->("indodax/a b") };
     ok($res);
 
     # account too long
-    ($res, $val) = @{ $v->("gdax/".("a" x 65)) };
+    ($res, $val) = @{ $v->("indodax/".("a" x 65)) };
     ok($res);
 
     # unknown cryptoexchange
     ($res, $val) = @{ $v->("foo/acc1") };
     ok($res);
 
-    ($res, $val) = @{ $v->("gdax") };
+    ($res, $val) = @{ $v->("indodax") };
     ok(!$res);
-    is($val, "gdax/default");
+    is($val, "indodax/default");
 
-    ($res, $val) = @{ $v->("GDAX/acc1") };
-    ok(!$res);
-    is($val, "gdax/acc1");
+    #($res, $val) = @{ $v->("GDAX/acc1") };
+    #ok(!$res);
+    #is($val, "gdax/acc1");
 
 };
 

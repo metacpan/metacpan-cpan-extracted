@@ -1,9 +1,9 @@
 package Sah::SchemaR::cryptoexchange::safename;
 
-our $DATE = '2019-10-24'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = ["str",[{summary=>"Cryptocurrency exchange safename","x.completion"=>"cryptoexchange_safename","x.perl.coerce_rules"=>["str_tolower"]}],["str"]];
+our $rschema = ["str",[{summary=>"Cryptocurrency exchange safename","x.completion"=>"cryptoexchange_safename","x.perl.coerce_rules"=>["From_str::to_lower"]}],["str"]];
 
 1;
 # ABSTRACT: Cryptocurrency exchange safename
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptoexchange::safename - Cryptocurrency exchange safename
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::cryptoexchange::safename (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-10-24.
+This document describes version 0.013 of Sah::SchemaR::cryptoexchange::safename (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-11-29.
 
 =head1 DESCRIPTION
 

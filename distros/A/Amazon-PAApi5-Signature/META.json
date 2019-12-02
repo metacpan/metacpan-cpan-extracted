@@ -1,0 +1,71 @@
+{
+   "abstract" : "Amazon Product Advertising API(PA-API) 5.0 Helper",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4229",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Amazon-PAApi5-Signature",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Lite" : "0",
+            "Digest::SHA" : "0",
+            "JSON" : "0",
+            "POSIX" : "0",
+            "String::CamelCase" : "0",
+            "perl" : "5.008005",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Amazon::PAApi5::Payload" : {
+         "file" : "lib/Amazon/PAApi5/Payload.pm"
+      },
+      "Amazon::PAApi5::Signature" : {
+         "file" : "lib/Amazon/PAApi5/Signature.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/Amazon-PAApi5-Signature/issues"
+      },
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/Amazon-PAApi5-Signature"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

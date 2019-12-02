@@ -66,6 +66,8 @@ has 'indicators',
     traits  => ['Array'],
     handles => { add_indicator => 'push' };
 
+has 'timezone', is => 'ro', isa => 'Str', default => 'local';
+
 sub _build_guid {
     return UUID::Tiny::create_uuid_as_string();
 }

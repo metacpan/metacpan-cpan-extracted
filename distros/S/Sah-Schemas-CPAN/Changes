@@ -1,18 +1,23 @@
-0.004   2019-01-13 (PERLANCAR)
+0.005   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names (Data::Sah::Coerce 0.034+).
+
+
+0.004   2019-01-13  Released-By: PERLANCAR
 
 	- Add completion for cpan::pause_id.
 
 
-0.003   2018-09-02 (PERLANCAR)
+0.003   2018-09-02  Released-By: PERLANCAR
 
 	- Rebuild to correct regex for PAUSE ID (uppercase intead of lowercase).
 
 
-0.002   2018-04-06 (PERLANCAR)
+0.002   2018-04-06  Released-By: PERLANCAR
 
 	- [ux] cpan::pause_id: Convert to uppercase.
 
 
-0.001   2017-01-08 (PERLANCAR)
+0.001   2017-01-08  Released-By: PERLANCAR
 
         - First release.

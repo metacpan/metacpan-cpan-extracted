@@ -1,7 +1,9 @@
 package Bencher::Backend;
 
-our $DATE = '2019-10-15'; # DATE
-our $VERSION = '1.045'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-02'; # DATE
+our $DIST = 'Bencher-Backend'; # DIST
+our $VERSION = '1.046'; # VERSION
 
 use 5.010001;
 use strict;
@@ -2607,7 +2609,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include modules specified in this list',
             'summary.alt.plurality.singular' => 'Add module to include list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_participant_module(@_, apply_filters=>0) },
             completion => sub { _complete_participant_modules_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2621,7 +2623,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude modules specified in this list',
             'summary.alt.plurality.singular' => 'Add module to exclude list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_participant_module(@_, apply_filters=>0) },
             completion => sub { _complete_participant_modules_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2649,7 +2651,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include functions specified in this list',
             'summary.alt.plurality.singular' => 'Add function to include list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_function(@_, apply_filters=>0) },
             completion => sub { _complete_functions_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2663,7 +2665,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude functions specified in this list',
             'summary.alt.plurality.singular' => 'Add function to exclude list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_function(@_, apply_filters=>0) },
             completion => sub { _complete_functions_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2678,7 +2680,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include participants whose seq/name matches this',
             'summary.alt.plurality.singular' => 'Add participant (by name/seq) to include list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_participant(@_, apply_filters=>0) },
             completion => sub { _complete_participants_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2687,7 +2689,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include participants whose name matches this',
             'summary.alt.plurality.singular' => 'Add participant (by name) to include list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_participant(@_, apply_filters=>0, seq=>0) },
             completion => sub { _complete_participant_names_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2696,7 +2698,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include participants whose sequence number matches this',
             'summary.alt.plurality.singular' => 'Add participant (by sequence number) to include list',
-            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_participant(@_, apply_filters=>0, name=>0) },
             completion => sub { _complete_participant_seqs_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2715,7 +2717,7 @@ _
 You can specify `A & B` to include participants that have _both_ tags A and B.
 
 _
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_participant_tag(@_, apply_filters=>0) },
             completion => sub { _complete_participant_tags_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2724,7 +2726,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude participants whose seq/name matches this',
             'summary.alt.plurality.singular' => 'Add participant (by name/seq) to exclude list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_participant(@_, apply_filters=>0) },
             completion => sub { _complete_participants_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2733,7 +2735,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude participants whose name matches this',
             'summary.alt.plurality.singular' => 'Add participant (by name) to exclude list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_participant(@_, apply_filters=>0, seq=>0) },
             completion => sub { _complete_participant_names_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2742,7 +2744,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude participants whose sequence number matches this',
             'summary.alt.plurality.singular' => 'Add participant (by sequence number) to exclude list',
-            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_participant(@_, apply_filters=>0, name=>0) },
             completion => sub { _complete_participant_seqs_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2761,7 +2763,7 @@ _
 You can specify `A & B` to exclude participants that have _both_ tags A and B.
 
 _
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_participant_tag(@_, apply_filters=>0) },
             completion => sub { _complete_participant_tags_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2771,7 +2773,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include items whose seq/name matches this',
             'summary.alt.plurality.singular' => 'Add item (by name/seq) to include list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_item(@_, apply_filters=>0) },
             completion => sub { _complete_items_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2780,7 +2782,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include items whose name matches this',
             'summary.alt.plurality.singular' => 'Add item (by name) to include list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_item(@_, apply_filters=>0, seq=>0) },
             completion => sub { _complete_item_names_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2789,7 +2791,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include items whose sequence number matches this',
             'summary.alt.plurality.singular' => 'Add item (by sequence number) to include list',
-            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_item(@_, apply_filters=>0, name=>0) },
             completion => sub { _complete_item_seqs_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2803,7 +2805,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude items whose seq/name matches this',
             'summary.alt.plurality.singular' => 'Add item (by name/seq) to exclude list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_item(@_, apply_filters=>0) },
             completion => sub { _complete_items_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2812,7 +2814,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude items whose name matches this',
             'summary.alt.plurality.singular' => 'Add item (by name) to exclude list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_item(@_, apply_filters=>0, seq=>0) },
             completion => sub { _complete_item_names_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2821,7 +2823,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude items whose sequence number matches this',
             'summary.alt.plurality.singular' => 'Add item (by sequence number) to exclude list',
-            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_item(@_, apply_filters=>0, name=>0) },
             completion => sub { _complete_item_seqs_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2836,7 +2838,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include datasets whose seq/name matches this',
             'summary.alt.plurality.singular' => 'Add dataset (by name/seq) to include list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_dataset(@_, apply_filters=>0) },
             completion => sub { _complete_datasets_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2845,7 +2847,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include datasets whose name matches this',
             'summary.alt.plurality.singular' => 'Add dataset (by name) to include list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_dataset(@_, apply_filters=>0) },
             completion => sub { _complete_dataset_names_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2854,7 +2856,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include datasets whose sequence number matches this',
             'summary.alt.plurality.singular' => 'Add dataset (by sequence number) to include list',
-            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_dataset(@_, apply_filters=>0, name=>0) },
             completion => sub { _complete_dataset_seqs_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2868,7 +2870,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude datasets whose seq/name matches this',
             'summary.alt.plurality.singular' => 'Add dataset (by name/seq) to exclude list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_dataset(@_, apply_filters=>0) },
             completion => sub { _complete_datasets_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2877,7 +2879,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude datasets whose name matches this',
             'summary.alt.plurality.singular' => 'Add dataset (by name) to exclude list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_dataset(@_, apply_filters=>0) },
             completion => sub { _complete_dataset_names_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2886,7 +2888,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude datasets whose sequence number matches this',
             'summary.alt.plurality.singular' => 'Add dataset (by sequence number) to exclude list',
-            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['int*', min=>0], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_dataset(@_, apply_filters=>0, name=>0) },
             completion => sub { _complete_dataset_seqs_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2905,7 +2907,7 @@ _
 You can specify `A & B` to include datasets that have _both_ tags A and B.
 
 _
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_dataset_tag(@_, apply_filters=>0) },
             completion => sub { _complete_dataset_tags_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2919,7 +2921,7 @@ _
 You can specify `A & B` to exclude datasets that have _both_ tags A and B.
 
 _
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_dataset_tag(@_, apply_filters=>0) },
             completion => sub { _complete_dataset_tags_comma_sep(@_) },
             tags => ['category:filtering'],
@@ -2948,7 +2950,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Only include some perls',
             'summary.alt.plurality.singular' => 'Add specified perl to include list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_perl(@_) },
             tags => ['category:filtering'],
         },
@@ -2956,7 +2958,7 @@ _
             'x.name.is_plural' => 1,
             summary => 'Exclude some perls',
             'summary.alt.plurality.singular' => 'Add specified perl to exclude list',
-            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_perl(@_) },
             tags => ['category:filtering'],
         },
@@ -2985,7 +2987,7 @@ _
                        # and this breaks routines that expect this argument to
                        # be an array
 
-                       #'x.perl.coerce_rules' => ['str_comma_sep'],
+                       #'x.perl.coerce_rules' => ['From_str::comma_sep'],
                    ],
             description => <<'_',
 
@@ -3032,7 +3034,7 @@ _
             schema => ['array*', {
                 of => ['str*'],
                 min_len => 1,
-                'x.perl.coerce_rules' => ['str_comma_sep'],
+                'x.perl.coerce_rules' => ['From_str::comma_sep'],
             }],
             default => ['-time'],
             element_completion => sub {
@@ -4248,7 +4250,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.045 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2019-10-15.
+This document describes version 1.046 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2019-12-02.
 
 =head1 FUNCTIONS
 

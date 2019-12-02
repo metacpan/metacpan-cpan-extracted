@@ -1,6 +1,6 @@
 package Email::Sender::Transport::DevNull;
 # ABSTRACT: happily throw away your mail
-$Email::Sender::Transport::DevNull::VERSION = '1.300031';
+$Email::Sender::Transport::DevNull::VERSION = '1.300033';
 use Moo;
 with 'Email::Sender::Transport';
 
@@ -28,7 +28,7 @@ Email::Sender::Transport::DevNull - happily throw away your mail
 
 =head1 VERSION
 
-version 1.300031
+version 1.300033
 
 =head1 DESCRIPTION
 
@@ -41,7 +41,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2019 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

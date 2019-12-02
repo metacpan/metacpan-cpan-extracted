@@ -1,7 +1,9 @@
 package Proc::Govern;
 
-our $DATE = '2019-09-03'; # DATE
-our $VERSION = '0.208'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-11-29'; # DATE
+our $DIST = 'Proc-Govern'; # DIST
+our $VERSION = '0.209'; # VERSION
 
 use 5.010001;
 use strict;
@@ -141,7 +143,7 @@ _
             tags => ['category:load-control'],
         },
         load_check_every => {
-            schema => [duration => {default => 10, 'x.perl.coerce_rules'=>['str_human']}],
+            schema => [duration => {default => 10, 'x.perl.coerce_rules'=>['From_str::human']}],
             summary => 'Frequency of load checking',
             tags => ['category:load-control'],
         },
@@ -231,7 +233,7 @@ _
             tags => ['category:output-control'],
         },
         timeout => {
-            schema => ['duration*', 'x.perl.coerce_rules'=>['str_human']],
+            schema => ['duration*', 'x.perl.coerce_rules'=>['From_str::human']],
             summary => 'Apply execution time limit, in seconds',
             description => <<'_',
 
@@ -253,7 +255,7 @@ _
         },
         # not yet defined
         #restart_delay => {
-        #    schema => ['duration*', default=>0, 'x.perl.coerce_rules'=>['str_human']],
+        #    schema => ['duration*', default=>0, 'x.perl.coerce_rules'=>['From_str::human']],
         #    tags => ['category:restart'],
         #},
         #check_alive => {
@@ -637,7 +639,7 @@ Proc::Govern - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.208 of Proc::Govern (from Perl distribution Proc-Govern), released on 2019-09-03.
+This document describes version 0.209 of Proc::Govern (from Perl distribution Proc-Govern), released on 2019-11-29.
 
 =head1 SYNOPSIS
 

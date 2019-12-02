@@ -5,9 +5,9 @@ package Date::Manip::Zones;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Aug 29 14:13:15 EDT 2019
-#    Data version: tzdata2019b
-#    Code version: tzcode2019b
+#    Generated on: Mon Dec  2 09:47:31 EST 2019
+#    Data version: tzdata2019c
+#    Code version: tzcode2019c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -18,7 +18,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.78';
+$VERSION='6.79';
 END { undef $VERSION; }
 
 our ($TzdataVersion,$TzcodeVersion,
@@ -37,8 +37,8 @@ END {
    undef %Offmod;
 }
 
-$TzdataVersion = 'tzdata2019b';
-$TzcodeVersion = 'tzcode2019b';
+$TzdataVersion = 'tzdata2019c';
+$TzcodeVersion = 'tzcode2019c';
 $FirstDate     = '0001010200:00:00';
 $LastDate      = '9999123100:00:00';
 $LastYear      = '2089';
@@ -2060,8 +2060,8 @@ $LastYear      = '2089';
                      'asia/amman',
                      'europe/bucharest',
                      'europe/chisinau',
-                     'africa/tripoli',
                      'europe/kaliningrad',
+                     'africa/tripoli',
                      'europe/uzhgorod',
                      'europe/istanbul',
                      'europe/simferopol',
@@ -2163,6 +2163,7 @@ $LastYear      = '2089';
                      'pacific/honolulu' ],
   'hkst'        => [ 'asia/hong_kong' ],
   'hkt'         => [ 'asia/hong_kong' ],
+  'hkwt'        => [ 'asia/hong_kong' ],
   'hmt'         => [ 'asia/dhaka',
                      'america/havana',
                      'europe/helsinki',
