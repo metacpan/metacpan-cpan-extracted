@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.228    2019-12-08
+        - Bugfix in 'merge_rows'.
+
+2.227    2019-12-08
+        - New option: glob filter for input files.
+        - New option: show hidden files.
+
 2.226    2019-11-17
         - Bugfix in filter split_column.
 

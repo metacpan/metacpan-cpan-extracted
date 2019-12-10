@@ -4,13 +4,14 @@ use utf8;
 
 use Moo;
 
+use Encode qw(decode);
 use List::Util qw(max);
 use HTML::ExtractContent;
 use Mojo::DOM;
 use Types::Standard qw(Str InstanceOf Maybe);
 
 use Importer 'NewsExtractor::TextUtil'  => qw( normalize_whitespace );
-use Importer 'NewsExtractor::Constants' => qw( %SNRE );
+use Importer 'NewsExtractor::Constants' => qw( %RE );
 
 has tx => ( required => 1, is => 'ro', isa => InstanceOf['Mojo::Transaction::HTTP'] );
 
@@ -21,7 +22,26 @@ has site_name => (
 
 no Moo;
 
-sub dom { $_[0]->tx->result->dom }
+sub dom {
+    my $tx = $_[0]->tx;
+    my $dom = $tx->result->dom;
+
+    my $charset;
+    if ($tx->result->headers->content_type =~ /charset=(\S+)/) {
+        $charset = $1;
+    } elsif (my $el = $dom->at('meta[http-equiv="content-type" i]')) {
+        if ($el->attr("content") =~ /\;\s*charset=(\S+)/i) {
+            $charset = $1;
+        }
+    }
+
+    if ($charset) {
+        my $body = decode($charset, $tx->result->body);
+        $dom = Mojo::DOM->new($body);
+    }
+
+    return $dom;
+}
 
 sub _build_site_name {
     my ($self) = @_;
@@ -58,8 +78,8 @@ sub headline {
     }
     if (defined($title)) {
         my $delim = qr<(?: \p{Punct} | \| )>x;
-        $title =~ s/ \s* $delim \s* $SNRE{newspaper_names} \s* \z//x;
-        $title =~ s/\A $SNRE{newspaper_names} \s* $delim \s* //x;
+        $title =~ s/ \s* $delim \s* $RE{newspaper_names} \s* \z//x;
+        $title =~ s/\A $RE{newspaper_names} \s* $delim \s* //x;
         $title =~ s/\r\n/\n/g;
         $title =~ s/\A\s+//;
         $title =~ s/\s+\z//;
@@ -234,7 +254,7 @@ sub content_text {
         $paragraphs[-1] =~ s/${site_name}//x;
     }
 
-    $paragraphs[-1] =~ s/\A \s* \p{Punct}? \s* $SNRE{newspaper_names} \s* \p{Punct}? \s* \z//x;
+    $paragraphs[-1] =~ s/\A \s* \p{Punct}? \s* $RE{newspaper_names} \s* \p{Punct}? \s* \z//x;
 
     pop @paragraphs if $paragraphs[-1] eq '';
 

@@ -6,6 +6,7 @@ use POSIX 'strftime';
 
 use lib 't/lib';
 use LSF;
+use Test::LogSyslogFast;
 
 eval 'local $^W = 0; use IO::Socket::INET6;';
 
@@ -143,7 +144,7 @@ for my $p (sort keys %servers) {
             ok($buf =~ /test2\[/, "$p: ->send after set_name has the right name");
             ok($buf =~ /\[12345\]/, "$p: ->send after set_name has the right pid");
             ok($buf =~ /$msg$/, "$p: ->send after accessors sends right message");
-            ok(payload_ok($buf, @payload_params), "$p: ->send $msg has correct payload");
+            payload_ok($buf, @payload_params, "$p: ->send $msg has correct payload");
         }
     };
     diag($@) if $@;
@@ -204,23 +205,6 @@ eval {
     $logger->nonexistent_method();
 };
 like($@, qr{at t/05-ipv6.}, 'error in caller'); # not Fast.pm
-
-sub expected_payload {
-    my ($facility, $severity, $sender, $name, $pid, $msg, $time) = @_;
-    return sprintf "<%d>%s %s %s[%d]: %s",
-        ($facility << 3) | $severity,
-        strftime("%h %e %T", localtime($time)),
-        $sender, $name, $pid, $msg;
-}
-
-sub payload_ok {
-    my ($payload, @payload_params) = @_;
-    for my $offset (0, -1, 1) {
-        my $allowed = expected_payload(@payload_params);
-        return 1 if $allowed eq $payload;
-    }
-    return 0;
-}
 
 }
 

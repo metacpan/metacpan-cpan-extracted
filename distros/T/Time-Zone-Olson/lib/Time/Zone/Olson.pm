@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -73,6 +73,9 @@ sub _DEFAULT_DST_START_HOUR                { return 2 }
 sub _DEFAULT_DST_END_HOUR                  { return 2 }
 sub _DAY_OF_WEEK_AT_EPOCH                  { return 4 }
 sub _MAX_SIZE_FOR_A_GUESS_FILE_CONTENTS    { return 4096 }
+sub _MAXIMUM_32_BIT_SIGNED_NUMBER          { return 2_147_483_648 }
+sub _MAXIMUM_32_BIT_UNSIGNED_NUMBER        { return 4_294_967_296 }
+sub _MINIMUM_PERL_FOR_FORCE_BIG_ENDIAN     { return 5.010 }
 
 sub _TZ_DEFINITION_KEYS {
     return
@@ -81,7 +84,8 @@ sub _TZ_DEFINITION_KEYS {
 
 my $_modern_regexs_work = 1;
 my $_timezone_full_name_regex =
-  eval 'qr/(?<tz>(?<area>\w+)(?:\/(?<location>[\w\-\/+]+))?)/smx'
+  eval ## no critic (ProhibitStringyEval) required to allow old perl (pre 5.10) to compile
+  'qr/(?<tz>(?<area>\w+)(?:\/(?<location>[\w\-\/+]+))?)/smx'
   or do { $_modern_regexs_work = undef };
 if ( !$_modern_regexs_work ) {
     $_timezone_full_name_regex = qr/((\w+)(?:\/([\w\-\/+]+)))/smx;
@@ -2293,7 +2297,7 @@ sub _read_header {
     }
     my ( $magic, $version, $ttisgmtcnt, $ttisstdcnt, $leapcnt, $timecnt,
         $typecnt, $charcnt )
-      = unpack 'A4A1x15N!N!N!N!N!N!', $buffer;
+      = unpack 'A4A1x15NNNNNN', $buffer;
     ( $magic eq 'TZif' ) or Carp::croak("$path is not a TZ file");
     my $header = {
         magic      => $magic,
@@ -2326,7 +2330,7 @@ sub _read_transition_times {
     }
     my @transition_times;
     if ( $sizeof_transition_time == _SIZE_OF_TRANSITION_TIME_V1() ) {
-        @transition_times = unpack 'l>' . $timecnt, $buffer;
+        @transition_times = unpack 'N' . $timecnt, $buffer;
     }
     elsif ( $sizeof_transition_time == _SIZE_OF_TRANSITION_TIME_V2() ) {
         eval { @transition_times = unpack 'q>' . $timecnt, $buffer; 1; } or do {
@@ -2375,9 +2379,19 @@ sub _read_local_time_types {
     my @local_time_types;
     foreach my $local_time_type ( unpack '(a6)' . $typecnt, $buffer ) {
         my ( $c1, $c2, $c3 ) = unpack 'a4aa', $local_time_type;
-        my $gmtoff  = unpack 'l>', $c1;
-        my $isdst   = unpack 'C',  $c2;
-        my $abbrind = unpack 'C',  $c3;
+        my $gmtoff;
+        if ( $] > _MINIMUM_PERL_FOR_FORCE_BIG_ENDIAN() ) {
+            $gmtoff = unpack 'l>', $c1;
+        }
+        else {
+            $gmtoff = unpack 'N', $c1;
+            if ( $gmtoff > _MAXIMUM_32_BIT_SIGNED_NUMBER() ) {
+                $gmtoff = _MAXIMUM_32_BIT_UNSIGNED_NUMBER() - $gmtoff;
+                $gmtoff *= _NEGATIVE_ONE();
+            }
+        }
+        my $isdst   = unpack 'C', $c2;
+        my $abbrind = unpack 'C', $c3;
         push @local_time_types,
           { gmtoff => $gmtoff, isdst => $isdst, abbrind => $abbrind };
     }
@@ -2417,7 +2431,7 @@ sub _read_leap_seconds {
         Carp::croak(
             "Failed to read leap seconds from $path:$EXTENDED_OS_ERROR");
     }
-    my @paired_leap_seconds = unpack 'L>' . $leapcnt, $buffer;
+    my @paired_leap_seconds = unpack 'N' . $leapcnt, $buffer;
     my %leap_seconds;
     while (@paired_leap_seconds) {
         my $time_leap_second_occurs      = shift @paired_leap_seconds;
@@ -2590,7 +2604,8 @@ sub _cleanup_bracketed_names {
 
 sub _compile_modern_tz_regex {
     my $modern_tz_regex;
-    eval '
+    eval ## no critic (ProhibitStringyEval) required to allow old perl (pre 5.10) to compile
+      <<'_REGEX_' or ( !$_modern_regexs_work ) or Carp::croak("Failed to compile TZ regular expression:$EVAL_ERROR");
     my $timezone_abbr_name_regex =
       qr/(?:[^:\d,+-][^\d,+-]{2,}|[<]\w*[+-]?\d+[>])/smx;
     my $std_name_regex = qr/(?<std_name>$timezone_abbr_name_regex)/smx
@@ -2645,9 +2660,8 @@ qr/(?:$end_julian_without_feb29_regex|$end_julian_with_feb29_regex|$end_month_we
       qr/[\/]$end_hour_regex$end_minute_regex?$end_second_regex?/smx;
     my $end_datetime_regex = qr/$end_date_regex(?:$end_time_regex)?/smx;
     $modern_tz_regex =
-qr/($std_name_regex$std_offset_regex(?:$dst_name_regex(?:$dst_offset_regex)?,$start_datetime_regex,$end_datetime_regex)?)/smx;'
-      or ( !$_modern_regexs_work )
-      or Carp::croak("Failed to compile TZ regular expression:$EVAL_ERROR");
+qr/($std_name_regex$std_offset_regex(?:$dst_name_regex(?:$dst_offset_regex)?,$start_datetime_regex,$end_datetime_regex)?)/smx;
+_REGEX_
     return $modern_tz_regex;
 }
 
@@ -3182,7 +3196,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 

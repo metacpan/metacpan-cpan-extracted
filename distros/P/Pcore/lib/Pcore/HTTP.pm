@@ -238,7 +238,7 @@ sub _request ($args) {
     while () {
 
         # validate url
-        $res->set_status( $HANDLE_STATUS_PROTOCOL_ERROR, q[Invalid url scheme] ) || last if !$res->{url}->{is_http};
+        $res->set_status( [ $HANDLE_STATUS_PROTOCOL_ERROR, 'Invalid url scheme' ] ) || last if !$res->{url}->{is_http};
 
         my $h;
 
@@ -265,14 +265,14 @@ sub _request ($args) {
         }
 
         # connect error
-        $res->set_status( $h->{status}, $h->{reason} ) || last if !$h;
+        $res->set_status( [ $h->{status}, $h->{reason} ] ) || last if !$h;
 
         # start TLS, only if TLS is required and TLS is not established yet
         if ( $res->{url}->{is_secure} && !$h->{tls} ) {
             $h->starttls( http2 => $args->{http2} );
 
             # start TLS error
-            $res->set_status( $h->{status}, $h->{reason} ) || last if !$h;
+            $res->set_status( [ $h->{status}, $h->{reason} ] ) || last if !$h;
         }
 
         # HTTP2 requirest
@@ -382,7 +382,7 @@ sub _write_headers ( $h, $args, $res ) {
 
     # write error
     if ( !$h ) {
-        $res->set_status( $h->{status}, $h->{reason} );
+        $res->set_status( [ $h->{status}, $h->{reason} ] );
 
         return;
     }
@@ -424,7 +424,7 @@ sub _write_data ( $h, $args, $res ) {
 
     # write error
     if ( !$h ) {
-        $res->set_status( $h->{status}, $h->{reason} );
+        $res->set_status( [ $h->{status}, $h->{reason} ] );
 
         return;
     }
@@ -437,7 +437,7 @@ sub _read_headers ( $h, $args, $res ) {
 
     # read headers error
     if ( !$headers ) {
-        $res->set_status( $h->{status}, $h->{reason} );
+        $res->set_status( [ $h->{status}, $h->{reason} ] );
 
         return;
     }
@@ -471,12 +471,12 @@ sub _process_headers ( $h, $args, $res, $headers ) {
     if ( !$res->{is_redirect} && $args->{on_headers} && !$args->{on_headers}->($res) ) {
         $h->set_protocol_error(q[Request cancelled by "on_headers"]);
 
-        $res->set_status( $h->{status}, $h->{reason} );
+        $res->set_status( [ $h->{status}, $h->{reason} ] );
 
         return;
     }
 
-    $res->set_status( $headers->{status}, $headers->{reason} );
+    $res->set_status( [ $headers->{status}, $headers->{reason} ] );
 
     return 1;
 }
@@ -499,7 +499,7 @@ sub _read_data ( $h, $args, $res ) {
                     if ( $status != Compress::Raw::Zlib::Z_OK() && $status != Compress::Raw::Zlib::Z_STREAM_END() ) {
                         $h->set_protocol_error('Stream decode error');
 
-                        $res->set_status( $h->{status}, $h->{reason} );
+                        $res->set_status( [ $h->{status}, $h->{reason} ] );
 
                         return;
                     }
@@ -522,7 +522,7 @@ sub _read_data ( $h, $args, $res ) {
                     if ($@) {
                         $h->set_protocol_error('Stream decode error');
 
-                        $res->set_status( $h->{status}, $h->{reason} );
+                        $res->set_status( [ $h->{status}, $h->{reason} ] );
 
                         return;
                     }
@@ -553,7 +553,7 @@ sub _read_data ( $h, $args, $res ) {
 
         # read error
         if ( !$data ) {
-            $res->set_status( $h->{status}, $h->{reason} );
+            $res->set_status( [ $h->{status}, $h->{reason} ] );
 
             return;
         }
@@ -666,7 +666,7 @@ sub _read_data ( $h, $args, $res ) {
         if ( !defined $bytes ) {
 
             # unexpected EOF or other error, maybe timeout
-            $res->set_status( $h->{status}, $h->{reason} );
+            $res->set_status( [ $h->{status}, $h->{reason} ] );
 
             undef $res->{data};
 
@@ -772,7 +772,7 @@ sub _http2_request ( $h, $args, $res ) {
         on_error => sub ($error) {
             $http2_is_finished = 1;
 
-            $res->set_status( $HANDLE_STATUS_PROTOCOL_ERROR, qq[HTTP2 protocol error: $error] );
+            $res->set_status( [ $HANDLE_STATUS_PROTOCOL_ERROR, qq[HTTP2 protocol error: $error] ] );
 
             return;
         },
@@ -788,7 +788,7 @@ sub _http2_request ( $h, $args, $res ) {
         $h->write($frame);
 
         # write error
-        return $res->set_status( $h->{status}, $h->{reason} ) if !$h;
+        return $res->set_status( [ $h->{status}, $h->{reason} ] ) if !$h;
     }
 
     # check upgrade header, read HTTP1 body if not upgaded
@@ -813,7 +813,7 @@ sub _http2_request ( $h, $args, $res ) {
     my $buf = $h->read;
 
     # read error
-    return $res->set_status( $h->{status}, $h->{reason} ) if !$h;
+    return $res->set_status( [ $h->{status}, $h->{reason} ] ) if !$h;
 
     $http2->feed( $buf->$* );
 
@@ -822,7 +822,7 @@ sub _http2_request ( $h, $args, $res ) {
         $h->write($frame);
 
         # write error
-        return $res->set_status( $h->{status}, $h->{reason} ) if !$h;
+        return $res->set_status( [ $h->{status}, $h->{reason} ] ) if !$h;
     }
 
     goto READ if !$http2_is_finished;

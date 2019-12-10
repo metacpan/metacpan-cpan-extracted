@@ -2,14 +2,14 @@ package Net::RCON::Minecraft::Response;
 
 # Minecraft command response
 
-use 5.008;
+use 5.010;
 use Mouse;
 use Mouse::Util::TypeConstraints;
 use Term::ANSIColor;
 use Carp;
 no warnings 'uninitialized';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use overload q("") => sub { shift->plain },
               '++' => sub { $_[0] = $_[0]->plain + 1 },

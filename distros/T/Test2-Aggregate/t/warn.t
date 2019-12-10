@@ -3,12 +3,15 @@ use Test2::Aggregate;
 
 my $root = (grep {/^\.$/i} @INC) ? undef : './';
 
-Test2::Aggregate::run_tests(
+my $run = Test2::Aggregate::run_tests(
     dirs          => ['xt/aggregate'],
     lists         => ['xt/aggregate/aggregate.lst'],
-    root          => $root,
+    root          => './',
+    sort          => 1,
     test_warnings => 1
 );
+
+check_output($run, "No warning", './');
 
 like(
     warnings {
@@ -27,7 +30,6 @@ like(
 );
 
 local $ENV{AGGREGATE_TEST_WARN} = 1;
-my $run;
 
 intercept {
     $run = Test2::Aggregate::run_tests(
@@ -39,7 +41,7 @@ intercept {
     );
 };
 
-check_output($run);
+check_output($run, "including failure");
 
 eval "use Test2::Plugin::BailOnFail";
 
@@ -54,33 +56,37 @@ unless ($@) {
                 test_warnings => 1
             );
         },
-        "Test warning output:\n<xt/aggregate/check_env.t>\nAGGREGATE_TEST_WARN\n",
+        match(qr#Test warning output:\n<.*check_env.t>\nAGGREGATE_TEST_WARN\n#),
         "Got expected warning"
     );
-    check_output($run);
+    check_output($run, "including failure on repeat == -1");
 }
 
 done_testing;
 
 sub check_output {
-    my $run = shift;
+    my $run  = shift;
+    my $msg  = shift;
+    my $r    = shift || $root || '';
+    my %warn = ();
+    my $pass = $ENV{AGGREGATE_TEST_WARN} ? 0 : 100;
+    $warn{warnings} = 'AGGREGATE_TEST_WARN' if $ENV{AGGREGATE_TEST_WARN};
 
     is(
         $run,
         {
-            'xt/aggregate/check_env.t' => {
+            $r.'xt/aggregate/check_env.t' => {
                 'timestamp' => E(),
-                'pass_perc' => 0,
-                'warnings'  =>  'AGGREGATE_TEST_WARN',
-                'test_no'   => 1
+                'pass_perc' => $pass,
+                'test_no'   => 1,
+                %warn
             },
-            'xt/aggregate/check_plan.t' => {
+            $r.'xt/aggregate/check_plan.t' => {
                 'test_no'   => 2,
                 'timestamp' => E(),
                 'pass_perc' => 100
             }
         },
-        "Correct output including failure."
+        "Correct output - $msg"
     );
 }
-

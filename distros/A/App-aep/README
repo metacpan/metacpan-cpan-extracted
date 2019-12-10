@@ -1,0 +1,195 @@
+NAME
+    App::aep - Advanced Entry Point (for docker and other containers)
+
+SYNOPSIS
+        From within your dockerfile, simply use cpan or cpanm to add App::aep
+
+        It should then be possible to use 'aep' as the entrypoint in the dockerfile
+
+        Please see the EXAMPLES section for a small dockerfile to create a working 
+        example
+
+DESCRIPTION
+    This app is a dynamic entry point for use in container systems such as
+    docker, unlike most perl modules, this has been created to correctly
+    react to signals so it will respond correctly.
+
+    Signals passed to this entrypoint will also be passed down to the child.
+
+ARGUMENTS
+  config related
+   config-env
+    Default value: disabled
+
+    Only read command line options from the enviroment
+
+   config-file
+    Default value: disabled
+
+    Only read command line options from the enviroment
+
+   config-args
+    Default value: disabled
+
+    Only listen to command line arguments
+
+   config-merge (default)
+    Default value: enabled
+
+    Merge together env, config and args to generate a config
+
+   config-order (default)
+    Default value: 'env,conf,args' (left to right)
+
+    The order to merge options together,
+
+  environment related
+   env-prefix (default)
+    Default value: aep-
+
+    When scanning the enviroment aep will look for this prefix to know which
+    environment variables it should pay attention to.
+
+  Command related (what to run)
+   command (string)
+    What to actually run within the container, default is print aes help.
+
+   command-args (string)
+    The arguments to add to the command comma seperated, default is nothing.
+
+    Example: --list,--as-service,--with-long "arg",--foreground
+
+   command-restart (integer)
+    If the command exits how many times to retry it, default 0 set to -1 for
+    infinate
+
+   command-restart-delay (integer)
+    The time in milliseconds to wait before retrying the command, default
+    1000
+
+  Lock commands (server)
+    These are for if you have concerns of 'race' conditions.
+
+   lock-server
+    Default value: disabled
+
+    Act like a lock server, this means we will expect other aeps to connect
+    to us, we in turn will say when they should actually start, this is to
+    counter-act race issues when starting multi image containers such as
+    docker-compose.
+
+   lock-server-host (string)
+    What host to bind to, defaults to 0.0.0.0
+
+   lock-server-port (integer)
+    What port to bind to, defaults to 60000
+
+   lock-server-default-run
+    Default value: disabled
+
+    If we get sent an ID we do not know what to do with, tell it to run.
+
+   lock-server-default-ignore
+    Default value: enabled
+
+    If we get sent an ID we do not know what to do with, ignore it.
+
+   lock-server-order (string)
+    The list of ids and the order to allow them to run, allows OR ||
+    operators, for example: db,redis1||redis2,redis1||redis2,nginx
+
+    Beware the the lock-server-default-ignore config flag!
+
+   lock-server-exhaust-action (string)
+    Default value: idle
+
+    What to do if all clients have been started (list end), options are:
+
+    *   exit- Exit 0
+
+    *   idle - Do nothing, just sit there doing nothing
+
+    *   restart - Reset the lock-server-order list and continue operating
+
+    *   execute - Read in any passed commands and args and run them like a
+        normal aep
+
+  Lock commands (client)
+   lock-client
+    Default value: disabled
+
+    Become a lock client, this will mean your aep will connect to another
+    aep to learn when it should run its command.
+
+   lock-server-host (string)
+    What host to connect to, defaults to 'aep-master'
+
+   lock-server-port (integer)
+    What port to connect to, defaults to 60000
+
+   lock-trigger (string)
+    Default: none:time:10000
+
+    What to look for to know that our target command has executed correctly,
+    if the target command dies or exits before this filter can complete, the
+    success will never be reported, if you have also set restart options the
+    lock-trigger will continue to try to validate the service.
+
+    The syntax for the filters is:
+
+        handle:filter:specification
+
+    handle can be stderr, stdout, both or none
+
+    So an example for a filter that will match 'now serving requests':
+
+        both:text:now serving requests
+
+    Several standard filters are availible:
+
+    *   time - Wait this many milliseconds and then report success.
+
+        Example: none:time:2000
+
+    *   regex - Wait till this regex matches to report success.
+
+        Example: both:regex:ok|success
+
+    *   text - Wait till this line of text is seen.
+
+        Example: both:text:success
+
+    *   script - Run a script or binary somewhere else on the system and use
+        its exit code to determine success or failure.
+
+        Example: none:script:/opt/check_state
+
+    *   connect - Try to connect to a tcp port, no data is sent and any
+        recieved is ignored. Will be treated as success if the connect its
+        self succeeds.
+
+        Example: none:connect:127.0.0.1:6767
+
+   lock-id (string)
+    What ID we should say we are
+
+BUGS
+    For any feature requests or bug reports please visit:
+
+    * Github <https://github.com/PaulGWebster/p5-App-aep>
+
+    You may also catch up to the author 'daemon' on IRC:
+
+    * irc.freenode.net
+
+    * #perl
+
+AUTHOR
+    Paul G Webster <daemon@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by Paul G Webster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

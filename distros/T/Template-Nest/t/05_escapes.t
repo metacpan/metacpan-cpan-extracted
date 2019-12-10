@@ -101,4 +101,16 @@ $html =~ s/\s*//g;
 
 is( $html, $x_html, 'escape_char=E template escape_char=\ with params');
 
+$x_html = "<div>\\1</div><div>NN</div><div>\\\\3</div>";
+$nest->defaults({ imnotescaped => 'NN' });
+$html = $nest->render({
+    NAME => 'escapes',
+    imescaped => '1',
+    neitherami => '3'
+});
+
+$html =~ s/\s*//g;
+is( $html, $x_html, 'escape_char=E template escape_char=\ with defaults');
+
+
 done_testing();

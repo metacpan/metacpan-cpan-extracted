@@ -14,17 +14,17 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 b6e2ae51a860a0683e421657be6afc96850e7a11 Changes
+SHA1 0ddffe4114135a288fb4bf01917eb9384458c62d Changes
 SHA1 0a3224be32be8a39834f4c2d84648064fadeb559 LICENSE
 SHA1 dadd83dee3c1760bfa4bc8d24a161cc67f1888d7 MANIFEST
-SHA1 ed3cc2f9b1211837e41f431006a2adf0f5f27bd9 META.yml
+SHA1 e5261bf538230dfd96466f404db7ce43de2373bc META.yml
 SHA1 5c6a53ad27ec3a6739930fc6df289ce841e8e332 Makefile.PL
 SHA1 15b5d0752ac7a78511be9443a5109f52101d714f README
 SHA1 154ad31cb1b046a211a64ce08d8acb8f3040106c README.md
 SHA1 917618c1d5a46da920f938c6f5bad4518d3d1718 etc/Memo_Config.pm
 SHA1 f85c2a0d9bda10314bab291e7a2fb14d6da39289 html/Callbacks/RT-Extension-Memo/Elements/JavascriptConfig/Data
 SHA1 2df1315d7ee9e5a565494f69c9d7d9c31c375fd2 html/Callbacks/RT-Extension-Memo/Ticket/Display.html/BeforeShowHistory
-SHA1 92b770a16d1eafc2bf2c5823075909134e84e020 html/Elements/Memo
+SHA1 abdd4fdf0148bb97ec72928f28f083d1b0974d60 html/Elements/Memo
 SHA1 0de0dd566e5351c123220a63b97b5fb99d0f6feb html/Helpers/GetMemo
 SHA1 9c21ac53a3a97365737d17c8b0020228cde7ac1c html/Helpers/SetMemo
 SHA1 707278f4ee3fa8eb21b9a2d40fe26447113244a3 inc/Module/AutoInstall.pm
@@ -43,7 +43,7 @@ SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
 SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
 SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
 SHA1 1bb8b3e76788e691f83dacdee5a2c02aacf1222a inc/YAML/Tiny.pm
-SHA1 54ed2eb94218447739ff73a8955784b5d2c01a56 lib/RT/Extension/Memo.pm
+SHA1 09788ee5ed5aa680296e1699132de4144f3f4906 lib/RT/Extension/Memo.pm
 SHA1 9ec316adbdaf9a4d57688a320a83605f168c3f04 lib/RT/Extension/Memo/Test.pm.in
 SHA1 c7d3de72a6488d89c9ff900749a4c31bb5f8d649 po/fr.po
 SHA1 fd2672f2e796478287803a003cc80eb8d32bb8dd static/css/memo.css
@@ -51,11 +51,11 @@ SHA1 5f4ce3c3f8c15ac0e85a8e02644edab96af64f8c static/js/memo.js
 SHA1 94eeb2d233d47d132f3effb8d779f3f2501018d3 xt/00-load.t
 SHA1 baaef08c94811472a91bcfa632ce688eb8bf482d xt/memo.t
 SHA1 39f5c15e228880f041edc0f92a734915ec94150b xt/merge.t
-SHA1 6b83a4cea5bc26f3675d76c70c34b62c7e317835 xt/richtext.t
+SHA1 9f9b9338397d3dc95dcfa3fe1d9cab1bcb8b2caf xt/richtext.t
 SHA1 a0f21462278d8ac0506d1bc561d45998ea817cf3 xt/rights.t
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQRR24FY+Z56D/YyPs7z3XhnulP5PwUCW4zg8AAKCRDz3XhnulP5
-P6yRAKCOdgtpr63r9aK1TpcnGJLln0V3kwCeLWf+x058vMVebYdf7DTTa/hKKjQ=
-=abQr
+iF0EARECAB0WIQRR24FY+Z56D/YyPs7z3XhnulP5PwUCXe4g/AAKCRDz3XhnulP5
+PxKsAJ0Zdq12aRZzcAuz2XCBBeUq3d4hAwCgh+KQyhcZ/JcoX2vhsWGHafM85tE=
+=TbUy
 -----END PGP SIGNATURE-----

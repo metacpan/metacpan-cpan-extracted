@@ -3,6 +3,7 @@ abstract: 'A collection of commonly used utilities.'
 author:
   - 'John Gravatt <gravattj@cpan.org>'
 build_requires:
+  File::RandomGenerator: '0'
   Test2::Plugin::DieOnFail: '0'
   Test2::V0: '0'
 configure_requires:
@@ -28,6 +29,7 @@ requires:
   File::LibMagic: '0'
   File::Path: '0'
   File::ShareDir: '0'
+  File::Touch: '0'
   FileHandle: '0'
   Getopt::Long: '0'
   IPC::Run3: '0'
@@ -46,8 +48,9 @@ requires:
   Try::Tiny: '0'
   constant: '0'
   namespace::autoclean: '0'
+  perl: v5.16.0
   vars: '0'
   warnings: '0'
-version: '0.016'
+version: '0.020'
 x_generated_by_perl: v5.16.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -2,8 +2,8 @@ NAME
     Log::ger::For::Class - Add logging to class
 
 VERSION
-    This document describes version 0.003 of Log::ger::For::Class (from Perl
-    distribution Log-ger-For-Class), released on 2019-01-06.
+    This document describes version 0.004 of Log::ger::For::Class (from Perl
+    distribution Log-ger-For-Class), released on 2019-12-09.
 
 SYNOPSIS
      use Log::ger::For::Class qw(add_logging_to_class);

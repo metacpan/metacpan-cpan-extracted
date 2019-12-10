@@ -56,7 +56,7 @@ my $new_url = $GoCardless->new_bill_url(
 	# not sure about having the amount + currency in the redirect URL (what's
 	# to stop user from changing it?) but can't see any other way to be back
 	# compat with the Basic API
-    success_redirect_url => "http://localhost:3000/rflow/confirm/bill/100/EUR",
+    success_redirect_url => "http://localhost:3000/rflow/confirm/bill/100/GBP",
 );
 
 _post_to_gocardless( $new_url,'bill' );
@@ -92,7 +92,7 @@ while ( my @bills = $Paginator->next ) {
 my $new_pre_auth_url = $GoCardless->new_pre_authorization_url(
 	session_token        => 'bar',
 	description          => "Test Pre Auth",
-    success_redirect_url => "http://localhost:3000/rflow/confirm/pre_auth/100/EUR",
+    success_redirect_url => "http://localhost:3000/rflow/confirm/pre_auth/100/GBP",
 	user => {
           'billing_address1' => '',
           'billing_address2' => '',
@@ -120,7 +120,7 @@ isa_ok(
 isa_ok(
 	my $Payment = $GoCardless->create_payment(
 		amount   => 100,
-		currency => 'EUR',
+		currency => 'GBP',
 		links    => { mandate => $PreAuthorization->mandate->id },
 	),
 	'Business::GoCardless::Payment',
@@ -131,7 +131,7 @@ note explain $Payment if $DEBUG;
 
 ok( $Bill = $PreAuthorization->bill(
 	amount   => 100,
-	currency => 'EUR',
+	currency => 'GBP',
 ),'PreAuthorization->bill' );
 ok( $Bill->cancel,'->cancel' );
 
@@ -146,7 +146,7 @@ my $new_subscription_url = $GoCardless->new_subscription_url(
 	session_token        => 'bar',
 	description          => "Test Subscription",
     success_redirect_url => "http://localhost:3000/rflow/confirm/subscription"
-		. "/100/EUR/monthly/1/" . strftime( "%Y-12-31",gmtime ),
+		. "/100/GBP/monthly/1/" . strftime( "%Y-12-31",gmtime ),
 );
 
 _post_to_gocardless( $new_subscription_url,'subscription' );
@@ -190,7 +190,6 @@ sub _post_to_gocardless {
 		close( $out );
 	}
 
-	my $token = $res->dom->at('input[name=authenticity_token]')->val;
 	my $post_url = $res->dom->find('form')->map( attr => 'action' )->first;
 
 	note( $post_url ) if $DEBUG;
@@ -201,7 +200,6 @@ sub _post_to_gocardless {
 		'customer[family_name]'         => 'Jøhñsön',
 		'customer[country_code]'        => 'FR',
 		'customer[bank_accounts][iban]' => 'FR1420041010050500013M02606',
-		'authenticity_token'            => $token,
 		'utf8'                          => '✓',
 		'customer[bank_accounts][account_holder_name]' => 'Lee Jøhñsön',
 	};
@@ -210,7 +208,7 @@ sub _post_to_gocardless {
 
 	$post_url = "https://pay-sandbox.gocardless.com$post_url";
 	my $tx = $ua->post( $post_url => form => $account_params );
-	ok( $tx->success,"POST $post_url" );
+	ok( $tx->result,"POST $post_url" );
 
 	if ( $DEBUG ) {
 		open( my $out,'>','after.html' );
@@ -218,7 +216,7 @@ sub _post_to_gocardless {
 		close( $out );
 	}
 
-	if ( ! $tx->success ) {
+	if ( ! $tx->result ) {
 		my $err = $tx->error;
 		BAIL_OUT( "$err->{code} response: $err->{message}" ) if $err->{code};
 		BAIL_OUT( "Connection error: $err->{message}" );

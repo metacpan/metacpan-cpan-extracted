@@ -42,7 +42,7 @@ sub BUILD ( $self, $args ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 5                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 50                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 54 does not match the package declaration       |
+## |    1 | 38                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 42 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -48,7 +48,7 @@ use vars qw[$VERSION $PREFER_BIN $PROGRAMS $WARN $DEBUG
             $_ALLOW_BIN $_ALLOW_PURE_PERL $_ALLOW_TAR_ITER
          ];
 
-$VERSION            = '0.82';
+$VERSION            = '0.86';
 $PREFER_BIN         = 0;
 $WARN               = 1;
 $DEBUG              = 0;
@@ -650,7 +650,7 @@ sub have_old_bunzip2 {
 ### as a remote shell, and the extract fails.
 {   my @ExtraTarFlags;
     if( ON_WIN32 and my $cmd = __PACKAGE__->bin_tar ) {
-
+        $cmd = $1 if $cmd =~ m{^(.+)}s; # Tainted perl #
         ### if this is gnu tar we are running, we need to use --force-local
         push @ExtraTarFlags, '--force-local' if `$cmd --version` =~ /gnu tar/i;
     }
@@ -729,7 +729,7 @@ sub have_old_bunzip2 {
                 ### a weird output format... we might also be using
                 ### /usr/local/bin/tar, which is gnu tar, which is perfectly
                 ### fine... so we have to do some guessing here =/
-                my @files = map { chomp;
+                my @files = map { chomp; s!\x0D!!g if ON_WIN32;
                               !ON_SOLARIS ? $_
                                           : (m|^ x \s+  # 'xtract' -- sigh
                                                 (.+?),  # the actual file name

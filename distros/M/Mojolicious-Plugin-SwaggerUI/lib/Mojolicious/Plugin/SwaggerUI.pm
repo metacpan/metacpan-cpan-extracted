@@ -5,7 +5,7 @@ use Mojo::File qw(path);
 
 use File::ShareDir qw(dist_dir);
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -33,7 +33,7 @@ sub register {
 
 =head1 NAME
 
-    Mojolicious::Plugin::SwaggerUI - Swagger UI plugin for Mojolicious
+Mojolicious::Plugin::SwaggerUI - Swagger UI plugin for Mojolicious
 
 =head1 SYNOPSIS
 

@@ -40,6 +40,7 @@ can_ok(
         created_at
         currency
         deducted_fees
+        fx
         id
         links
         payout_type

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package MooseX::Daemonize; # git description: v0.20-8-g6d23389
+package MooseX::Daemonize; # git description: v0.21-12-g88beb0d
 # ABSTRACT: Role for daemonizing your Moose based application
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Moose::Role;
 use MooseX::Types::Path::Class;
@@ -326,7 +326,7 @@ MooseX::Daemonize - Role for daemonizing your Moose based application
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -614,7 +614,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Michael Reddick Yuval Kogman Ash Berlin Brandon L Black David Steinbrunner Dave Rolsky Chisel Wright
+=for stopwords Karen Etheridge Michael Reddick Yuval Kogman Ash Berlin Brandon L Black Jonathan Sailor David Steinbrunner Schwern Shoichi Kaji Dave Rolsky Chisel Wright
 
 =over 4
 
@@ -640,7 +640,19 @@ Brandon L Black <blblack@gmail.com>
 
 =item *
 
+Jonathan Sailor <jsailor@cpan.org>
+
+=item *
+
 David Steinbrunner <dsteinbrunner@pobox.com>
+
+=item *
+
+Michael Schwern <mschwern@cpan.org>
+
+=item *
+
+Shoichi Kaji <skaji@cpan.org>
 
 =item *
 

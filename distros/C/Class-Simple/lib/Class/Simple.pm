@@ -1,4 +1,4 @@
-#$Id: Simple.pm,v 1.31 2008/02/01 00:38:06 sullivan Exp $
+#$Id: Simple.pm,v 1.29 2008/01/01 16:34:15 sullivan Exp $
 #
 #	See the POD documentation starting towards the __END__ of this file.
 
@@ -8,11 +8,13 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '1.1';
 
 use Scalar::Util qw(refaddr);
 use Carp;
+## no critic
 use Class::ISA;
+## use critic
 use List::Util qw( first );
 
 my %STORAGE;
@@ -21,60 +23,29 @@ my %READONLY;
 my @internal_attributes = qw(CLASS);
 
 our $AUTOLOAD;
-our $No_serialized_code;
 
 sub AUTOLOAD
 {
-my $self = $_[0]; # DO NOT use shift().  It causes problems with goto.
+my $self = shift;
+my @args = @_;
 
 	no strict 'refs';
 
-	$AUTOLOAD =~ /(.*)::((get|set|clear|raise|readonly|_)_)?(\w+)/;
+	$AUTOLOAD =~ /(.*)::((get|set|clear|raise|readonly)_)?(\w+)/;
 	my $pkg = $1;
+	my $full_method = $AUTOLOAD;
 	my $prefix = $3 || '';
 	my $attrib = $4;
-
-	#
-	#	$obj->set__foo and $obj->get__foo
-	#
-	my $store_as;
-	if ($prefix eq '_')
-	{
-		$attrib = "_$attrib";
-		$store_as = $attrib;
-	}
-	#
-	#	$obj->_foo
-	#
-	elsif (($attrib =~ /^_/) && !$prefix)
-	{
-		$store_as = $attrib;
-		$store_as =~ s/^_//;
-	}
-	else
-	{
-		$store_as = $attrib;
-	}
-
-	my $setter = "set_$attrib";
-	my $getter = "get_$attrib";
+	$prefix = '' if ($attrib =~ /^_/);
+	my $store_as = $attrib;
+	$store_as =~ s/^_// unless $prefix;
 
 	if (my $get_attributes = $self->can('ATTRIBUTES'))
 	{
 		my @attributes = &$get_attributes();
 		push(@attributes, @internal_attributes);
 		croak("$attrib is not a defined attribute in $pkg")
-		  unless first(sub {$_ eq $attrib}, @attributes);
-	}
-
-	if (my $get_private = $pkg->can('PRIVATIZE'))
-	{
-		my @privates = &$get_private();
-		if ( first(sub {$_ eq $attrib}, @privates)
-		  && (_my_caller() ne $pkg) )
-		{
-			croak("$attrib is private to $pkg.");
-		}
+		  unless first {$_ eq $attrib} @attributes;
 	}
 
 	#
@@ -88,10 +59,20 @@ my $self = $_[0]; # DO NOT use shift().  It causes problems with goto.
 		my $self = shift;
 
 			my $ref = refaddr($self);
-			my $store_as = $self->_caller_class($store_as);
 			croak("$attrib is readonly:  cannot set.")
 			  if ($READONLY{$ref}->{$store_as});
-			return ($STORAGE{$ref}->{$store_as} = shift(@_));
+			if (@_ > 1) {
+				# Must be initialized (in new or init) as an array ref or hash ref.
+				if (ref $STORAGE{$ref}->{$store_as} eq 'ARRAY') {
+					@{$STORAGE{$ref}->{$store_as}}[$_[0]] = $_[1];
+					return (@{$STORAGE{$ref}->{$store_as}}[$_[0]]);
+				} elsif (ref $STORAGE{$ref}->{$store_as} eq 'HASH') {
+					$STORAGE{$ref}->{$store_as}->{$_[0]} = $_[1];
+					return ($STORAGE{$ref}->{$store_as}->{$_[0]});
+				}
+			} else {
+				return ($STORAGE{$ref}->{$store_as} = shift(@_));
+			}
 		};
 	}
 	elsif ($prefix eq 'get')
@@ -101,16 +82,14 @@ my $self = $_[0]; # DO NOT use shift().  It causes problems with goto.
 		my $self = shift;
 
 			my $ref = refaddr($self);
-			my $store_as = $self->_caller_class($store_as,
-			  $STORAGE{$ref});
 			return ($STORAGE{$ref}->{$store_as});
 		};
 	}
 #
 #	Bug #7528 in Perl keeps this from working.
 #	http://rt.perl.org/rt3/Public/Bug/Display.html?id=7528
-#	I could make people declare methods they want to use lv_ with
-#	but that goes against the philosophy of being ::Simple.
+#	I could make people declare methods they want to use lv_
+#	with but that goes against the philosophy of being ::Simple.
 #
 #	elsif ($prefix eq 'lv')
 #	{
@@ -119,7 +98,6 @@ my $self = $_[0]; # DO NOT use shift().  It causes problems with goto.
 #		my $self = shift;
 #
 #			my $ref = refaddr($self);
-#			my $store_as = $self->_caller_class($store_as);
 #			croak("$attrib is readonly:  cannot set.")
 #			  if ($READONLY{$ref}->{$store_as});
 #			return ($STORAGE{$ref}->{$store_as});
@@ -127,6 +105,7 @@ my $self = $_[0]; # DO NOT use shift().  It causes problems with goto.
 #	}
 	elsif ($prefix eq 'clear')
 	{
+		my $setter = "set_$attrib";
 		*{$AUTOLOAD} = sub
 		{
 		my $self = shift;
@@ -136,6 +115,7 @@ my $self = $_[0]; # DO NOT use shift().  It causes problems with goto.
 	}
 	elsif ($prefix eq 'raise')
 	{
+		my $setter = "set_$attrib";
 		*{$AUTOLOAD} = sub
 		{
 		my $self = shift;
@@ -145,13 +125,13 @@ my $self = $_[0]; # DO NOT use shift().  It causes problems with goto.
 	}
 	elsif ($prefix eq 'readonly')
 	{
+		my $setter = "set_$attrib";
 		*{$AUTOLOAD} = sub
 		{
 		my $self = shift;
 
 			my $ret = $self->$setter(@_);
 			my $ref = refaddr($self);
-			my $store_as = $self->_caller_class($store_as);
 			$READONLY{$ref}->{$store_as} = 1;
 			return ($ret);
 		};
@@ -172,7 +152,7 @@ my $self = $_[0]; # DO NOT use shift().  It causes problems with goto.
 	{
 		if (my $method = $pkg->can($attrib))
 		{
-			goto &$method;
+			return &$method($self, @args);
 		}
 
 		*{$AUTOLOAD} = sub
@@ -184,21 +164,20 @@ my $self = $_[0]; # DO NOT use shift().  It causes problems with goto.
 			my $ref = refaddr($self);
 			if (scalar(@_))
 			{
-				my $store_as = $self->_caller_class($store_as);
 				croak("$attrib is readonly:  cannot set.")
 				  if ($READONLY{$ref}->{$store_as});
 				return ($STORAGE{$ref}->{$store_as} =shift(@_));
 			}
 			else
 			{
-				my $store_as = $self->_caller_class($store_as,
-				  $STORAGE{$ref});
 				return ($STORAGE{$ref}->{$store_as});
 			}
 		};
 	}
 	else
 	{
+		my $setter = "set_$store_as";
+		my $getter = "get_$store_as";
 		*{$AUTOLOAD} = sub
 		{
 		my $self = shift;
@@ -208,7 +187,7 @@ my $self = $_[0]; # DO NOT use shift().  It causes problems with goto.
 			  : $self->$getter());
 		};
 	}
-	goto &$AUTOLOAD;
+	return (&{$AUTOLOAD}($self, @args));
 }
 
 
@@ -253,62 +232,7 @@ my $func = shift;
 			$self->$in(@_);
 		}
 	}
-	$self->$func(@_) if $self->can($func);
-}
-
-
-
-#
-#	Figures out the class of the caller, going up the class hierarchy
-#	starting at the current class and going up until we find something
-#	stored.  Confusing, eh?  We're trying to properly handle the following:
-#
-#	package Foo;
-#	use base qw(Bar);
-#	...
-#	$self->set_a(1);
-#	...
-#	package Bar;
-#	use base qw(Class::Simple);
-#	...
-#	$self->set_a(2);
-#
-#	The set_a in Bar should not affect the set_a in Foo and neither should
-#	affect an Foo object that has done its own set_a.
-#
-sub _caller_class
-{
-my $self = shift;
-my $store_as = shift;
-my $storage = shift;
-
-	#
-	#	There is a problem with multiple-inheritance.  Until I
-	#	can figure out a solution, just return $store_as to
-	#	disable this feature.
-	#
-	return $store_as;
-#	for (my $i = 0; my $c = scalar(caller($i)); ++$i)
-#	{
-#		next if ($c eq __PACKAGE__);
-#		my $sa = "${c}::${store_as}";
-#		if ($storage)
-#		{
-#			next unless $self->isa($c);
-#			my @path = reverse(Class::ISA::super_path($c));
-#			foreach my $p ($c, @path)
-#			{
-#				my $sa = "${p}::${store_as}";
-#				return ($sa) if exists($storage->{$sa});
-#			}
-#		}
-#		else
-#		{
-#			return ($sa) if $self->isa($c);
-#		}
-#	}
-#	my $sa = ref($self) . "::${store_as}";
-#	return ($sa); # Shouldn't get here but just in case
+	$self->$func(@_) if $self->can($func);;
 }
 
 
@@ -385,7 +309,6 @@ my $class = shift;
 		my $getter = "${class}::get_$method";
 		my $setter = "${class}::set_$method";
 		my $generic = "${class}::$method";
-
 		*{$getter} = sub
 		{
 		my $self = shift;
@@ -394,8 +317,7 @@ my $class = shift;
 			croak("Cannot call $getter:  Private method to $class.")
 			  unless $class->isa(Class::Simple::_my_caller());
 			my $ref = refaddr($self);
-			my $store_as = $self->_caller_class($method);
-			return ($STORAGE{$ref}->{$store_as});
+			return ($STORAGE{$ref}->{$method});
 		};
 		*$setter = sub
 		{
@@ -405,10 +327,9 @@ my $class = shift;
 			croak("Cannot call $setter:  Private method to $class.")
 			  unless $class->isa(Class::Simple::_my_caller());
 			my $ref = refaddr($self);
-			my $store_as = $self->_caller_class($method);
 			croak("$method is readonly:  cannot set.")
-			  if ($READONLY{$ref}->{$store_as});
-			return ($STORAGE{$ref}->{$store_as} = shift(@_));
+			  if ($READONLY{$ref}->{$method});
+			return ($STORAGE{$ref}->{$method} = shift(@_));
 		};
 		*$generic = sub
 		{
@@ -451,6 +372,18 @@ sub _my_caller
 sub init
 {
 my $self = shift;
+
+        #
+        # If we see an even number of arguments, assume they are initializers.
+        # Don't like that behavior?  Override init().
+        #
+        if (scalar(@_) && scalar(@_) % 2 == 0) {
+                my %args = @_;
+                while ( my ($k, $v) = each(%args) )
+                {
+                        $self->$k($v);
+                }
+        }
 
 	$self->_travel_isa('init', 'BUILD', @_);
 	return ($self);
@@ -508,7 +441,6 @@ my $cloning = shift;
 	croak("Cannot use STORABLE_freeze(): module Storable not found.\n")
 	  unless (eval 'require Storable; 1');
 
-	$Storable::Deparse = !$No_serialized_code;
 	my $ref = refaddr($self);
 	return Storable::freeze($STORAGE{$ref});
 }
@@ -527,7 +459,6 @@ my $serialized = shift;
 	croak("Cannot use STORABLE_thaw(): module Storable not found.\n")
 	  unless (eval 'require Storable; 1');
 
-	$Storable::Eval = !$No_serialized_code;
 	my $ref = refaddr($self);
 	$STORAGE{$ref} = Storable::thaw($serialized);
 }
@@ -579,10 +510,7 @@ Class::Simple - Simple Object-Oriented Base Class
   # Save $str to a file
   ...
   # Read contents of file into $new_str
-  $obj = Storable::thaw($str);
-  ...
-  # Clone an object
-  $new_obj = Storable::dclone($obj);
+  $new_obj = Storable::thaw($new_str);
 
   sub BUILD
   {
@@ -599,7 +527,7 @@ simple so I can get just going (no doubt because I am a simple guy)
 so I use this.
 
 What do I mean by simple?  First off, I don't want to have to list out
-all my attributes beforehand.  I just want to use them (Yeah, yeah, it doesn't
+all my methods beforehand.  I just want to use them (Yeah, yeah, it doesn't
 catch typos...well, by default--see B<ATTRIBUTES()> below).
 Next, I want to be able to
 call my methods by $obj->foo(1) or $obj->set_foo(1), by $obj->foo() or
@@ -613,7 +541,7 @@ privatization of methods is supported, as is serialization out and back
 in again.
 
 It's important to note, though, that one does not have to use the extra
-features to use C<Class::Simple>.  All you need to get going is:
+features to use B<Class::Simple>.  All you need to get going is:
 
 	package MyPackage;
 	use base qw(Class::Simple);
@@ -638,7 +566,7 @@ to do some testing and debugging.
 
 =head2 Garbage Collection
 
-Garbage collection is handled automatically by C<Class::Simple>.
+Garbage collection is handled automatically by B<Class::Simple>.
 The only thing the user has to worry about is cleaning up dangling
 and circular references.
 
@@ -652,11 +580,11 @@ Example:
 	}
 	print $a->next->yell;
 
-Even though C<$b> goes out of scope when the block exits,
-C<$a-E<gt>next()> still refers to it so C<DESTROY> is never called on C<$b>
+Even though B<$b> goes out of scope when the block exits,
+B<$a->next()> still refers to it so B<DESTROY> is never called on B<$b>
 and "Ouch!" is printed.
-Why is C<$a> referring to an out-of-scope object in the first place?
-Programmer error--there is only so much that C<Class::Simple> can fix :-).
+Why is B<$a> referring to an out-of-scope object in the first place?
+Programmer error--there is only so much that B<Class::Simple> can fix :-).
 
 =head1 METHODS
 
@@ -664,16 +592,19 @@ Programmer error--there is only so much that C<Class::Simple> can fix :-).
 
 =over 4
 
-=item B<new()>
+=item B<new(>[attr => val...]B<)>
 
-Returns the object and calls C<BUILD()>.
+Returns the object and calls B<BUILD()>.
+
+If key/value pairs are included, the keys will be treated as attributes
+and the values will be used to initialize its respective attribute.
 
 =item B<privatize(>qw(method1 method2 ...B<)>
 
 Mark the given methods as being private to the class.
 They will only be accessible to the class or its ancestors.
 Make sure this is called before you start instantiating objects.
-It should probably be put in a C<BEGIN> or C<INIT> block.
+It should probably be put in a B<BEGIN> or B<INIT> block.
 
 =back
 
@@ -685,14 +616,12 @@ It should probably be put in a C<BEGIN> or C<INIT> block.
 
 If there is initialization that you would like to do after an
 object is created, this is the place to do it.
-Note that if you want to raise an exception in your BUILD(),
-use die() and not the croak() family.
 
 =item B<NONEW()>
 
-If this is defined in a class, C<new()> will not work for that class.
+If this is defined in a class, B<new()> will not work for that class.
 You can use this in an abstract class when only concrete classes
-descended from the abstract class should have C<new()>.
+descended from the abstract class should have B<new()>.
 
 =item B<DEMOLISH()>
 
@@ -707,7 +636,7 @@ If this is defined in your class, it needs to return an array of
 attribute names.
 If it is defined, only the attributes returned will be allowed
 to be used.
-Trying to get or set an attribute not returned will be a fatal error.
+Trying to get or set an attribute not in the list will be a fatal error.
 Note that this is an B<optional> method.
 You B<do not> have to define your attributes ahead of time to use
 Class::Simple.
@@ -721,12 +650,12 @@ This provides an optional layer of error-checking.
 
 =item B<init()>
 
-I lied above when I wrote that C<new()> called C<BUILD()>.
-It really calls C<init()> and C<init()> calls C<BUILD()>.
-Actually, it calls all the C<BUILD()>s of all the ancestor classes
+I lied above when I wrote that B<new()> called B<BUILD()>.
+It really calls B<init()> and B<init()> calls B<BUILD()>.
+Actually, it calls all the B<BUILD()>s of all the ancestor classes
 (in a recursive, left-to-right fashion).
 If, for some reason, you do not want to do that,
-simply write your own C<init()> and this will be short-circuited.
+simply write your own B<init()> and this will be short-circuited.
 
 =item B<CLASS>
 
@@ -737,9 +666,11 @@ It is readonly (see below).
 
 =item B<STORABLE_freeze>
 
+See B<Serialization> below.
+
 =item B<STORABLE_thaw>
 
-See B<Serialization and Cloning> below.
+See B<Serialization> below.
 
 =back
 
@@ -779,15 +710,15 @@ Returns the value.
 =item B<_foo(>[val]B<)>
 
 If you have an attribute foo but you want to override the default method,
-you can use C<_foo> to keep the data.
+you can use B<_foo> to keep the data.
 That way you don't have to roll your own way of storing the data,
 possibly breaking inside-out.
 Underscore methods are automatically privatized.
-Also works as C<set__foo> and C<get__foo>.
+Also works as B<set__foo> and B<get__foo>.
 
 =back
 
-=head2 Serialization and Cloning
+=head2 Serialization
 
 There are hooks here to work with L<Storable> to serialize objects.
 To serialize a Class::Simple-derived object:
@@ -796,24 +727,27 @@ To serialize a Class::Simple-derived object:
 
     my $serialized = Storable::freeze($obj);
 
-To reconstitute an object saved with C<freeze()>:
+To reconstitute an object saved with B<freeze()>:
 
     my $new_obj = Storable::thaw($serialized_str);
-
-L<Storable>'s C<dclone> also works if you want to clone an object:
-
-    my $new_obj = Storable::dclone($old_obj);
 
 =head1 CAVEATS
 
 If an ancestor class has a B<foo> attribute, children cannot have their
 own B<foo>.  They get their parent's B<foo>.
 
+I don't actually have a need for DUMP and SLURP but I thought they
+would be nice to include.
+If you know how I can make them useful for someone who would actually
+use them, let me know.
+
 =head1 SEE ALSO
 
 L<Class::Std> is an excellent introduction to the concept
-of inside-out objects in Perl.
-Many things here, like the name C<DEMOLISH()>, were shamelessly stolen from it.
+of inside-out objects in Perl
+(they are referred to as the "flyweight pattern" in Damian Conway's
+I<Object Oriented Perl>).
+Many things here, like the name B<DEMOLISH()>, were shamelessly stolen from it.
 Standing on the shoulders of giants and all that.
 
 L<Storable>

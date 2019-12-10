@@ -9,7 +9,7 @@ package Rex::Helper::File::Spec;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.0'; # VERSION
+our $VERSION = '1.7.1'; # VERSION
 
 require File::Spec::Unix;
 require File::Spec::Win32;

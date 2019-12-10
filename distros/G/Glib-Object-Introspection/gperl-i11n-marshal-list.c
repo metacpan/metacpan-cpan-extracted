@@ -1,14 +1,14 @@
 /* -*- mode: c; indent-tabs-mode: t; c-basic-offset: 8; -*- */
 
 static void
-free_list (GList *list)
+_free_list (gpointer list)
 {
 	dwarn ("%p\n", list);
 	g_list_free (list);
 }
 
 static void
-free_slist (GSList *list)
+_free_slist (gpointer list)
 {
 	dwarn ("%p\n", list);
 	g_slist_free (list);
@@ -53,7 +53,11 @@ glist_to_sv (GITypeInfo* info,
 		GIArgument arg = {0,};
 		dwarn ("  element %p: %p\n", i, i->data);
 		arg.v_pointer = i->data;
-		value = arg_to_sv (&arg, param_info, item_transfer, NULL);
+		value = arg_to_sv (&arg,
+		                   param_info,
+		                   item_transfer,
+		                   GPERL_I11N_MEMORY_SCOPE_IRRELEVANT,
+		                   NULL);
 		if (value)
 			av_push (av, value);
 	}
@@ -125,7 +129,7 @@ sv_to_glist (GITransfer transfer, GITypeInfo * type_info, SV * sv, GPerlI11nInvo
 
 	if (GI_TRANSFER_NOTHING == transfer)
 		free_after_call (iinfo,
-		                 is_slist ? ((GFunc)free_slist) : ((GFunc)free_list),
+		                 is_slist ? _free_slist : _free_list,
 		                 list);
 
 	dwarn ("  -> list = %p, length = %d\n", list, g_list_length (list));

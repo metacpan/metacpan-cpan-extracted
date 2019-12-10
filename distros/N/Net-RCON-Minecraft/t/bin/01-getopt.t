@@ -1,5 +1,4 @@
 #!perl
-use 5.008;
 use strict;
 use lib qw<bin t/lib>;
 use Test::More;

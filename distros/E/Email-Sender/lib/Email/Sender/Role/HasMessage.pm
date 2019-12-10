@@ -1,6 +1,6 @@
 package Email::Sender::Role::HasMessage;
 # ABSTRACT: an object that has a message
-$Email::Sender::Role::HasMessage::VERSION = '1.300033';
+$Email::Sender::Role::HasMessage::VERSION = '1.300034';
 use Moo::Role;
 
 #pod =attr message
@@ -29,7 +29,7 @@ Email::Sender::Role::HasMessage - an object that has a message
 
 =head1 VERSION
 
-version 1.300033
+version 1.300034
 
 =head1 ATTRIBUTES
 

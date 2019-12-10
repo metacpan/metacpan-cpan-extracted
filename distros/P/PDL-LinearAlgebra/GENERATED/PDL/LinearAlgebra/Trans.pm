@@ -20,7 +20,7 @@ use DynaLoader;
 
 
 
-   $PDL::LinearAlgebra::Trans::VERSION = '0.12';
+   $PDL::LinearAlgebra::Trans::VERSION = '0.14';
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Trans $VERSION;
@@ -1426,11 +1426,11 @@ Improve (msqrt,mlog) / r2C
 
 =head1 AUTHOR
 
-Copyright (C) Grégory Vanuxem 2005-2007.
+Copyright (C) Grégory Vanuxem 2005-2018.
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the artistic license as specified in the Artistic
-file.
+it under the terms of the Perl Artistic License as in the file Artistic_2
+in this distribution.
 
 =cut
 

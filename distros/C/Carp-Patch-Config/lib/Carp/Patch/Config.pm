@@ -1,13 +1,15 @@
 package Carp::Patch::Config;
 
-our $DATE = '2016-06-02'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-09'; # DATE
+our $DIST = 'Carp-Patch-Config'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 no warnings;
 
-use Module::Patch 0.24 qw();
+use Module::Patch qw();
 use base qw(Module::Patch);
 
 my @oldvals;
@@ -19,16 +21,41 @@ sub patch_data {
         patches => [
         ],
         config => {
-            MaxArgLen  => {schema=>'int*'},
-            MaxArgNums => {schema=>'int*'},
+            -MaxArgLen  => {
+                schema => 'int*',
+            },
+            -MaxArgNums => {
+                schema => 'int*',
+            },
+            -Dump => {
+                schema => 'bool*',
+                description => <<'_',
+
+This is not an actual configuration for Carp, but a shortcut for:
+
+    $Carp::RefArgFormatter = sub {
+        require Data::Dmp;
+        Data::Dmp::dmp($_[0]);
+    };
+
+_
+            },
         },
         after_patch => sub {
             no strict 'refs';
             my $oldvals = {};
-            for (keys %config) {
-                next unless defined($config{$_});
-                $oldvals->{$_} = ${"Carp::$_"};
-                ${"Carp::$_"} = $config{$_};
+            for my $name (keys %config) {
+                my $carp_config_name = $name;
+                my $carp_config_val  = $config{$name};
+                if ($name =~ /\A-?Dump\z/) {
+                    $carp_config_name = 'RefArgFormatter';
+                    $carp_config_val  = $config{$name} ? sub {
+                        require Data::Dmp;
+                        Data::Dmp::dmp($_[0]);
+                    } : undef;
+                }
+                $oldvals->{$carp_config_name} = ${"Carp::$carp_config_name"};
+                ${"Carp::$carp_config_name"} = $carp_config_val;
             }
             push @oldvals, $oldvals;
         },
@@ -57,11 +84,11 @@ Carp::Patch::Config - Set some Carp variables
 
 =head1 VERSION
 
-This document describes version 0.002 of Carp::Patch::Config (from Perl distribution Carp-Patch-Config), released on 2016-06-02.
+This document describes version 0.004 of Carp::Patch::Config (from Perl distribution Carp-Patch-Config), released on 2019-12-09.
 
 =head1 SYNOPSIS
 
- % perl -MCarp::Patch::Config=MaxArgNums,20 -d:Confess ...
+ % perl -MCarp::Patch::Config=-MaxArgNums,20,-Dump,1 -d:Confess ...
 
 =head1 DESCRIPTION
 
@@ -79,9 +106,19 @@ C<MaxArgLen>, C<MaxArgNums>.
 
 =over
 
-=item * MaxArgLen => int
+=item * -Dump => bool
 
-=item * MaxArgNums => int
+This is not an actual configuration for Carp, but a shortcut for:
+
+ $Carp::RefArgFormatter = sub {
+     require Data::Dmp;
+     Data::Dmp::dmp($_[0]);
+ };
+
+
+=item * -MaxArgLen => int
+
+=item * -MaxArgNums => int
 
 =back
 
@@ -117,7 +154,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

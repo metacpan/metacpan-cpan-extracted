@@ -205,6 +205,7 @@ CREDITS
      Debian Perl Group
      Tim Bunce
      Ricardo Signes
+     Felix Ostmann
 
 SEE ALSO
     dateparse, DateTime, Date::Calc, <http://datetime.perl.org>

@@ -1,0 +1,242 @@
+#!perl
+
+# Internal perl
+use 5.010001;
+use feature 'say';
+
+# Internal perl modules
+use warnings;
+use strict;
+use Data::Dumper;
+
+# External modules 
+use App::aep;
+use YAML::XS;
+use Getopt::Long::Descriptive;
+
+# Version of this software
+our $VERSION = '0.008';
+
+my $app = App::aep->new(\&signal_handle);
+
+my ($opt, $usage) = describe_options(
+    'aep %o <some-arg>',
+    [
+        'config-env',
+        'Read config values from ehe enviroment only.',
+        {
+            default =>  0
+        }
+    ],
+    [ 
+        'config-file',
+        'Read config from a config file only.',
+        {
+            default =>  0
+        }
+    ],
+    [ 
+        'config-args',
+        'Read config values from arguments only.',
+        {
+            default =>  0
+        }
+    ],
+    [ 
+        'config-merge',
+        'Merge together env, file and args to generate a config.',
+        {
+            default =>  1
+        }
+    ],
+    [ 
+        'config-order=s',
+        'The order to merge options together, comma separated, default is: env,file,args',
+        { 
+            default => 'env,file,args'
+        }
+    ],
+    [],
+    [ 
+        'env-prefix=s',
+        'What prefix to look for on enviromentals, default is aep-',
+        {
+            default => 'aep-'
+        }
+    ],
+    [],
+    [
+        'command=s',
+        'What to actually run within the container, default is print aes help.'
+    ],
+    [
+        'command-args',
+        'The arguments to add to the command, default is nothing.',
+        {
+            default =>  'aep,--help'
+        }
+    ],
+    [
+        'command-restart=i',
+        'If the command exits how many times to retry it, default 0 set to -1 for infinate',
+        {
+            default =>  0
+        }
+    ],
+    [
+        'command-restart-delay=i',
+        'The time in milliseconds to wait before retrying the command, default 1000',
+        {
+            default =>  1000
+        }
+    ],
+    [],
+    [
+        'lock-server',
+        'Act like a lock server, this means we will expect other aeps to connect to us, we in turn will say when they should actually start, this is to counter-act race issues when starting multi image containers such as docker-compose, default: no',
+        {
+            default =>  0
+        }
+    ],
+    [
+        'lock-server-host=s',
+        'What host to bind to, defaults to 0.0.0.0',
+        {
+            default =>  '0.0.0.0'
+        }
+    ],
+    [
+        'lock-server-port=i',
+        'What port to bind to, defaults to 60000',
+        {
+            default =>  60000
+        }
+    ],
+    [
+        'lock-server-default-run',
+        'If we get sent an ID we do not know what to do with, tell it to run',
+        {
+            default =>  0
+        }
+    ],
+    [
+        'lock-server-default-ignore',
+        'If we get sent an ID we do not know what to do with, ignore it',
+        {
+            default =>  1
+        }
+    ],
+    [
+        'lock-server-order',
+        'The list of ids and the order to allow them to run, allows OR || operators, for example: db,redis1||redis2,redis1||redis2,nginx',
+        {
+            default =>  ''
+        }
+    ],
+    [
+        'lock-server-exhaust-action=s',
+        'What to do if all clients have been started (list end), options are: exit, idle, restart or execute. The default is idle',
+        {
+            default =>  'idle'
+        }
+    ],
+    [],
+    [
+        'lock-client',
+        'Become a lock client, this will mean your aep will connect to another aep to learn when it should run its command.',
+        {
+            default =>  0
+        }
+    ],
+    [
+        'lock-server-host=s',
+        'What host to connect to, defaults to: aep-master',
+        {
+            default =>  'aep-master'
+        }
+    ],
+    [
+        'lock-server-port=i',
+        'What port to connect to, defaults to 60000',
+        {
+            default =>  60000
+        }
+    ],
+    [
+        'lock-trigger=s',
+        'Please read perldoc App::aep example is to large for here, default is: none:time:10000',
+        {
+            default =>  'none:time:10000'
+        }
+    ],
+    [
+        'lock-id=s',
+        'What ID we should say we are, mandatory when acting as a lock-client',
+        {
+            default =>  $$
+        }
+    ],
+    [],
+    [ 
+        'help',
+        'print usage message and exit', 
+        { 
+            shortcircuit => 1 
+        } 
+    ],
+);
+
+#print($usage->text), exit if 
+# say $usage->text;
+
+if (
+    $opt->help
+) 
+{
+    say $usage->text;
+    exit 0;
+}
+
+say Dumper($opt);
+
+# Sub routines
+
+sub signal_handle 
+{
+    my ($value,@other) = @_;
+
+    say "Signal: $value";
+
+    if ($value eq 'INT') 
+    {
+        # Pass the message to children, then exit yourself or perhaps wait 
+        # on them dieing for a little while?
+
+        # Clean up any run wheels
+
+        # Exit cleanly
+        exit 0;
+    }
+    
+}
+
+=head1 NAME
+
+aep - Binary for using as an entry point within containers
+
+=head1 DESCRIPTION
+
+=for comment The module's description.
+
+Please refer to L<App::aep> for documentation.
+
+=head1 AUTHOR
+
+Paul G Webster <daemon@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Paul G Webster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

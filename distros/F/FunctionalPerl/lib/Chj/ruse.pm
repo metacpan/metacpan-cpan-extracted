@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2004-2014 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2004-2019 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -22,6 +22,8 @@ Chj::ruse - reload modules
     > ruse; # reloads all changed modules, and re-does all imports
             # which have happened for those modules since Chj::ruse has
             # been loaded.
+
+    use Chj::ruse 'r'; # imports alias `r` for `ruse` (shorter to type)
 
 =head1 DESCRIPTION
 
@@ -126,7 +128,8 @@ sub new_import {
             }
             0
         };
-        while (my ($key, $file) = each %INC) {
+        my %inc= %INC;
+        while (my ($key, $file) = each %inc) {
             my $reload= sub {
                 delete $INC{$key};
                 wipeout_namespace($key);
@@ -203,10 +206,26 @@ sub ruse {
 }
 
 sub import {
-    my $caller=caller;#mann ich döbel
+    my $class= shift;
+    my $caller= caller;
     no strict 'refs';
     warn "Copying ruse function to '${caller}::ruse'" if $DEBUG>1;
-    *{"${caller}::ruse"}= \&ruse;
+    if (@_) {
+        for my $name (@_) {
+            if ($name eq 'r') {
+                *{"${caller}::r"}= \&ruse;
+            } elsif ($name eq 'ruse') {
+                *{"${caller}::ruse"}= \&ruse;
+            } elsif ($name eq ':all') {
+                *{"${caller}::r"}= \&ruse;
+                *{"${caller}::ruse"}= \&ruse;
+            } else {
+                die "no such export: $name";
+            }
+        }
+    } else {
+        *{"${caller}::ruse"}= \&ruse;
+    }
 }
 
 

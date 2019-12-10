@@ -1,7 +1,9 @@
 package Sah::Schema::unix::local_groupname;
 
-our $DATE = '2019-09-11'; # DATE
-our $VERSION = '0.005'; # VERSION
+# AUTHOR
+our $DATE = '2019-12-09'; # DATE
+our $DIST = 'Sah-Schemas-Unix'; # DIST
+our $VERSION = '0.009'; # VERSION
 
 our $schema = ['unix::groupname' => {
     summary => 'Unix group name that must exist on the system',
@@ -10,7 +12,7 @@ our $schema = ['unix::groupname' => {
 Support coercion from GID.
 
 _
-    'x.perl.coerce_rules' => ['int_convert_gid_to_unix_group', 'str_check_unix_group_exists'],
+    'x.perl.coerce_rules' => ['From_int::convert_gid_to_unix_group', 'From_str::check_unix_group_exists'],
 }, {}];
 
 1;
@@ -28,7 +30,7 @@ Sah::Schema::unix::local_groupname - Unix group name that must exist on the syst
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::unix::local_groupname (from Perl distribution Sah-Schemas-Unix), released on 2019-09-11.
+This document describes version 0.009 of Sah::Schema::unix::local_groupname (from Perl distribution Sah-Schemas-Unix), released on 2019-12-09.
 
 =head1 DESCRIPTION
 

@@ -32,6 +32,7 @@ switched off
     created_at
     currency
     deducted_fees
+    fx
     id
     links
     payout_type
@@ -53,6 +54,7 @@ has [ qw/
     created_at
     currency
     deducted_fees
+    fx
     id
     links
     payout_type

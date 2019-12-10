@@ -1,5 +1,8 @@
 Changelog for Mojolicious-Plugin-AutoRoutePm
 
+0.13 2019-12-09T10:55:28
+- Add full support for short link when component ends with default_index
+
 0.12 2019-05-14T15:17:26
  - Add support for /url_component_pm/a/b/c that is match by a *query
    parameter.

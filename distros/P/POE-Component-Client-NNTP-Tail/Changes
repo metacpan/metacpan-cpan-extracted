@@ -1,5 +1,8 @@
 Revision history for POE-Component-Client-NNTP-Tail
 
+0.04      2019-12-05 19:56:42+00:00 Europe/London
+    - Add TimeOut option and handler for 503 errors
+
 0.03      2011-08-19 09:38:35 America/New_York
     - Squelch some test warnings
 

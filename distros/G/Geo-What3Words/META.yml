@@ -15,23 +15,25 @@ name: Geo-What3Words
 provides:
   Geo::What3Words:
     file: lib/Geo/What3Words.pm
-    version: v2.1.2
+    version: v2.1.6
 requires:
   Cpanel::JSON::XS: '0'
   Data::Dumper: '0'
-  LWP::Protocol::https: '0'
-  LWP::UserAgent: '0'
+  HTTP::Tiny: '0'
+  IO::Socket::IP: '0.39'
+  IO::Socket::SSL: '2.060'
   List::Util: '0'
   Net::Ping: '0'
   Net::Ping::External: '0'
+  Net::SSLeay: '1.49'
+  Ref::Util: '0'
   Test::Exception: '0'
-  Test::LWP::Recorder: '0'
   Test::More: '0.88'
   Test::Warn: '0'
   URI: '0'
   perl: '5.010'
 resources:
   repository: https://github.com/opencagedata/perl-Geo-What3Words.git
-version: 2.1.2
-x_generated_by_perl: v5.18.4
+version: 2.1.6
+x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

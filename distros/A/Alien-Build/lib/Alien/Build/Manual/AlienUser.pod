@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienUser - Alien user documentation
 
 =head1 VERSION
 
-version 1.92
+version 1.93
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ What follows are the main use cases.
      'Alien::Foo'           => '0',
      ...
    },
-   Alien::Base::Wrapper->mb_args
+   Alien::Base::Wrapper->mb_args,
    ...
  );
  
@@ -78,7 +78,7 @@ prerequisite.
      'Alien::Base::Wrapper' => '0',
      'Alien::Foo'           => '0',
    },
-   Alien::Base::Wrapper->mm_args
+   Alien::Base::Wrapper->mm_args,
    ...
  );
 
@@ -156,7 +156,7 @@ need to be a regular run time prerequisite.
  use Alien::Foo;
  use Env qw( @PATH );
  
- unshift @ENV, Alien::Foo->bin_dir;
+ unshift @PATH, Alien::Foo->bin_dir;
  system 'foo', '--bar', '--baz';
 
 Some L<Alien>s provide tools instead of or in addition to a library.

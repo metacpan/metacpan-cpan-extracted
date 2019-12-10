@@ -1,0 +1,9 @@
+<%
+    my $version = stash( 'version' ) // '4.4.1';
+    my @urls = (
+        sprintf( '//maxcdn.bootstrapcdn.com/bootstrap/%s/css/bootstrap.min.css', $version ),
+    );
+%>
+% for my $url ( @urls ) {
+    %= stylesheet $url
+% }

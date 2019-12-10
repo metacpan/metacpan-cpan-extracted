@@ -4,7 +4,7 @@ package Ithumb::XS;
 
 =head1 NAME
 
-Ithumb::XS - image thumbnail creation routines
+Ithumb::XS - Image thumbnail creation routines
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( convert_image );
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.4.0';
 
 require XSLoader;
 XSLoader::load('Ithumb::XS', $VERSION);

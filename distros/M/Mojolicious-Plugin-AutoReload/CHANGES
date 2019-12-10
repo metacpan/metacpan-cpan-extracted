@@ -1,5 +1,18 @@
 Changelog for Mojolicious-Plugin-AutoReload
 
+0.008     2019-12-03 20:20:58-06:00 America/Chicago
+
+    [Added]
+
+    - Added a long-polling option so that this plugin works without
+      WebSocket support. Thanks Grant Street Group for funding this
+      feature! [Github #5]
+
+    - The plugin now waits until the server is responsive again before
+      reloading. While waiting, a small dialog box appears showing how
+      long it's been waiting. Thanks Grant Street Group for funding this
+      feature! [Github #5]
+
 0.007     2019-10-01 23:07:21-05:00 America/Chicago
 
     [Fixed]

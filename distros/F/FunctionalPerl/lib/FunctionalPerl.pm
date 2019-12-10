@@ -45,13 +45,15 @@ Tags can be expanded via:
     is $$modules{"FP::Failure"}, 2; # number of times used.
     use FP::Equal 'is_equal';
     is_equal $unused_tags,
-             [':all', ':csv', ':dbi', ':fix', ':git', ':io', ':path', ':pxml', ':rare', ':trampoline', ':transparentlazy'];
+             [':all', ':ast', ':csv', ':dbi', ':fix', ':git', ':io', ':path', ':pxml', ':rare', ':trampoline', ':transparentlazy'];
 
 =head1 SEE ALSO
 
 This is the list of supported import tags and the modules that they import:
 
 C<:all>: C<:dev>, C<:io>, C<:most>, C<:rare>
+
+C<:ast>: L<FP::AST::Perl>
 
 C<:autobox>: L<FP::autobox>
 
@@ -75,7 +77,7 @@ C<:failure>: L<FP::Failure>
 
 C<:fix>: L<FP::fix>
 
-C<:functions>: C<:equal>, C<:failure>, C<:show>, L<FP::Combinators>, L<FP::Div>, L<FP::Memoizing>, L<FP::Ops>, L<FP::Optional>, L<FP::Predicates>, L<FP::Untainted>, L<FP::Values>, L<FP::uncurry>
+C<:functions>: C<:equal>, C<:failure>, C<:show>, L<FP::Combinators>, L<FP::Combinators2>, L<FP::Div>, L<FP::Memoizing>, L<FP::Ops>, L<FP::Optional>, L<FP::Predicates>, L<FP::Untainted>, L<FP::Values>, L<FP::uncurry>
 
 C<:git>: L<FP::Git::Repository>
 
@@ -132,7 +134,7 @@ package FunctionalPerl;
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
-our $VERSION= "0.72.18";
+our $VERSION= "0.72.25";
 
 
 # Export tag to modules and/or other tags; each module will be
@@ -158,7 +160,8 @@ our $export_desc=
     ":repl"=> [qw(FP::Repl FP::Repl::AutoTrap)],
     ":dev"=> [qw(:repl :test :debug Chj::ruse)],
 
-    ":functions"=> [qw(FP::Combinators FP::Ops FP::Div
+    ":functions"=> [qw(FP::Combinators FP::Combinators2
+                       FP::Ops FP::Div
                        FP::Predicates
                        FP::Optional FP::Values
                        FP::Memoizing FP::uncurry
@@ -166,6 +169,7 @@ our $export_desc=
                        :show :equal :failure)],
     ":git"=> [qw(FP::Git::Repository)],
     ":pxml"=> [qw(PXML::Util PXML::XHTML PXML::Serialize)],
+    ":ast"=> [qw(FP::AST::Perl)],
 
     ":numbers"=> [qw(FP::BigInt)],
     ":chars"=> [qw(FP::Char)],

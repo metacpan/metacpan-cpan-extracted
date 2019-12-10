@@ -6,7 +6,7 @@ use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32API::File';
 use Pcore::Util::Data qw[to_cbor from_cbor];
 use Pcore::Util::Scalar qw[weaken];
-use Pcore::Util::Sys::Proc;
+use Pcore::Util::Sys::Proc qw[:PROC_REDIRECT];
 
 has fh        => ();    # fh
 has on_finish => ();    # CodeRef->($self)
@@ -76,7 +76,11 @@ around new => sub ( $orig, $self, $type, % ) {
         };
 
         # create proc
-        $proc = P->sys->run_proc( [ $perl, "-MPcore::Node=$type" ], stdin => 1, kill_on_destroy => 0 );
+        $proc = P->sys->run_proc(
+            [ $perl, "-MPcore::Node=$type" ],
+            stdin           => $PROC_REDIRECT_SOCKET,
+            kill_on_destroy => 0
+        );
 
         # send configuration to the proc STDIN
         $proc->{stdin}->write( unpack( 'H*', to_cbor $boot_args ) . "\n" );

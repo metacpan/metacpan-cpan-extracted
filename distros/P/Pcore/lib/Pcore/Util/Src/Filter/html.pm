@@ -1,75 +1,67 @@
 package Pcore::Util::Src::Filter::html;
 
 use Pcore -class, -res;
-use Pcore::Util::Text qw[trim];
+use Pcore::Util::Src qw[:FILTER_STATUS];
 use Pcore::Util::Src::Filter::js;
 use Pcore::Util::Src::Filter::css;
 
 with qw[Pcore::Util::Src::Filter];
 
 sub decompress ($self) {
-    return res 200 if !length $self->{data}->$*;
+    return $SRC_OK if $self->has_kolon;
 
-    return res 200 if $self->has_kolon;
+    my $res = $self->filter_prettier('--parser=html');
 
-    my $temp = P->file1->tempfile;
-
-    P->file->write_bin( $temp, $self->{data} );
-
-    my $proc = P->sys->run_proc(qq[html-beautify --quiet --indent-scripts separate --replace "$temp"])->wait;
-
-    $self->{data}->$* = P->file->read_bin($temp);
-
-    return res 200;
+    return $res;
 }
 
 sub compress ($self) {
-    return res 200 if !length $self->{data}->$*;
-
-    return res 200 if $self->has_kolon;
+    return $SRC_OK if $self->has_kolon;
 
     # compress js
-    my @script = split m[(<script[^>]*>)(.*?)(</script[^>]*>)]smi, $self->{data}->$*;
+    my @script = split m[(<script[^>]*>)(.*?)(</script[^>]*>)]smi, $self->{data};
 
     for my $i ( 0 .. $#script ) {
-        if ( $script[$i] =~ m[\A</script]sm && $script[ $i - 1 ] ) {
-            Pcore::Util::Src::Filter::js->new( { data => \$script[ $i - 1 ] } )->compress;
+        if ( $script[$i] =~ m/\A<script/sm && $script[ $i + 1 ] ) {
+            my $res = Pcore::Util::Src::Filter::js->compress( \$script[ $i + 1 ] );
 
-            trim $script[ $i - 1 ];
+            return $res if !$res;
         }
     }
 
-    $self->{data}->$* = join $EMPTY, @script;
+    $self->{data} = join $EMPTY, @script;
 
     # compress css
-    my @css = split m[(<style[^>]*>)(.*?)(</style[^>]*>)]smi, $self->{data}->$*;
+    my @css = split m[(<style[^>]*>)(.*?)(</style[^>]*>)]smi, $self->{data};
 
     for my $i ( 0 .. $#css ) {
-        if ( $css[$i] =~ m[\A</style]sm && $css[ $i - 1 ] ) {
-            Pcore::Util::Src::Filter::css->new( { data => \$css[ $i - 1 ] } )->compress;
+        if ( $css[$i] =~ m/\A<style/sm && $css[ $i + 1 ] ) {
+            my $res = Pcore::Util::Src::Filter::css->compress( \$css[ $i + 1 ] );
+
+            return $res if !$res;
         }
     }
 
-    $self->{data}->$* = join $EMPTY, @css;
+    $self->{data} = join $EMPTY, @css;
 
-    require HTML::Packer;
+    my $res = $self->filter_html_packer;
 
-    eval { $self->{data}->$* = HTML::Packer->init->minify( $self->{data}, { remove_comments => 0, remove_newlines => 1, html5 => 1 } ) };
+    return $res;
+}
 
-    return res 200;
+sub filter_html_packer ($self) {
+    state $packer = do {
+        require HTML::Packer;
+
+        HTML::Packer->init;
+    };
+
+    $packer->minify( \$self->{data}, { remove_comments => 0, remove_newlines => 1, html5 => 1 } );
+
+    return $SRC_OK;
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 57                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

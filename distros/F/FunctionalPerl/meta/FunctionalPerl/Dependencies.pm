@@ -53,15 +53,9 @@ our %dependencies=
        'Function::Parameters',
        'URI'
    ],
-   'FunctionalPerl::Htmlgen::Toc'=> [
-       'Function::Parameters'
-   ],
-   'FunctionalPerl::Htmlgen::PXMLMapper'=> [
-       'Function::Parameters'
-   ],
    'FunctionalPerl::Htmlgen::PathUtil'=> [
        'Function::Parameters',
-       'File::Spec'
+       'File::Spec',
    ],
    'FunctionalPerl::Htmlgen::PathTranslate'=> [
        'Function::Parameters',
@@ -70,7 +64,7 @@ our %dependencies=
    'FunctionalPerl::Htmlgen::Mediawiki'=> [
        'Function::Parameters',
        'Encode',
-       'URI'
+       'URI',
    ],
    'FunctionalPerl::Htmlgen::MarkdownPlus'=> [
        'Function::Parameters',
@@ -86,25 +80,28 @@ our %dependencies=
    ],
    'FunctionalPerl::Htmlgen::Htmlparse'=> [
        'Function::Parameters',
-       'HTML::TreeBuilder'
-   ],
-   'FunctionalPerl::Htmlgen::FileUtil'=> [
-       'Function::Parameters'
-   ],
-   'FunctionalPerl::Htmlgen::default_config'=> [
-       'Function::Parameters'
-   ],
-   'FunctionalPerl::Htmlgen::Cost'=> [
-       'Function::Parameters'
-   ],
-   'FunctionalPerl::Htmlgen::Nav'=> [
-       'Function::Parameters'
+       'HTML::TreeBuilder',
    ],
    'Chj::HTTP::Daemon'=> [
-       'HTTP::Request'
+       'HTTP::Request',
    ],
-   map { $_ => ['FP::Repl::Dependencies'] }
-   qw(
+   'FunctionalPerl::Htmlgen::PerlTidy'=> [
+       'Function::Parameters',
+       'Perl::Tidy',
+   ],
+   (map { $_ => [ 'Function::Parameters' ] }
+    qw(
+         FP::AST::Perl
+         FunctionalPerl::Htmlgen::Toc
+         FunctionalPerl::Htmlgen::PXMLMapper
+         FunctionalPerl::Htmlgen::FileUtil
+         FunctionalPerl::Htmlgen::default_config
+         FunctionalPerl::Htmlgen::Cost
+         FunctionalPerl::Htmlgen::Nav
+         FunctionalPerl::Htmlgen::Sourcelang
+    )),
+   (map { $_ => ['FP::Repl::Dependencies'] }
+    qw(
          FP::Repl::Dependencies
          FP::Repl::Repl
          FP::Repl::StackPlus
@@ -112,7 +109,7 @@ our %dependencies=
          FP::Repl::WithRepl
          FP::Repl
          FP::Trie::t
-    ),
+    )),
   );
 
 

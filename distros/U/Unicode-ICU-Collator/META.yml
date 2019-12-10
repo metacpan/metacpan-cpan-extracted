@@ -20,5 +20,8 @@ no_index:
 requires:
   Test::More: '0.47'
   XSLoader: '0'
-version: '0.003'
+resources:
+  bugtracker: https://github.com/tonycoz/Unicode-ICU/issues
+  repository: https://github.com/tonycoz/Unicode-ICU.git
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

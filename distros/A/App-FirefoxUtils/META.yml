@@ -17,14 +17,16 @@ meta-spec:
   version: '1.4'
 name: App-FirefoxUtils
 requires:
-  Data::Sah::Coerce::perl::To_int::From_int::CheckUIDExists: '0'
-  Data::Sah::Coerce::perl::To_int::From_str::ConvertUnixUserToUID: '0'
+  Data::Sah::Coerce::perl::To_int::From_int::check_uid_exists: '0'
+  Data::Sah::Coerce::perl::To_int::From_str::convert_unix_user_to_uid: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
+  Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Log::ger: '0.027'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
   Proc::Find: '0.051'
+  Sah::Schema::true: '0'
   Sah::Schema::unix::local_uid: '0'
   perl: '5.010001'
   strict: '0'
@@ -33,18 +35,26 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FirefoxUtils
   homepage: https://metacpan.org/release/App-FirefoxUtils
   repository: git://github.com/perlancar/perl-App-FirefoxUtils.git
-version: '0.003'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript firefox-is-paused'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript kill-firefox'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript pause-firefox'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript unpause-firefox'
+      name: 'GenPericmdScript ps-firefox'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -52,7 +62,7 @@ x_Dist_Zilla:
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript kill-firefox'
+      name: 'GenPericmdScript unpause-firefox'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::InsertExecsList

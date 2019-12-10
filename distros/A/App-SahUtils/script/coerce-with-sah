@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.465'; # VERSION
+our $DATE = '2019-12-09'; # DATE
+our $VERSION = '0.471'; # VERSION
 
 use 5.010;
 use strict;
@@ -164,7 +164,7 @@ _
         },
         {
             summary => 'Add one or more coerce rules',
-            src => q([[prog]] duration --coerce-rule str_human --coerce-rule str_iso8601 --data-as-perl '"P1Y2M"'),
+            src => q([[prog]] duration --coerce-rule From_str::human --coerce-rule From_str::iso8601 --data-as-perl '"P1Y2M"'),
             src_plang => 'bash',
         },
         {
@@ -317,7 +317,7 @@ coerce-with-sah - Coerce data
 
 =head1 VERSION
 
-This document describes version 0.465 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2019-07-25.
+This document describes version 0.471 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2019-12-09.
 
 =head1 SYNOPSIS
 
@@ -356,22 +356,22 @@ Examples:
                                                                "EBhm"              => "E h:mm B",
                                                                "EBhms"             => "E h:mm:ss B",
                                                                "Ed"                => "d E",
-                                                               "Ehm"               => "E h:mm a",
                                                                "EHm"               => "E HH:mm",
+                                                               "Ehm"               => "E h:mm a",
                                                                "EHms"              => "E HH:mm:ss",
                                                                "Ehms"              => "E h:mm:ss a",
                                                                "Gy"                => "y G",
                                                                "GyMMM"             => "MMM y G",
                                                                "GyMMMd"            => "MMM d, y G",
                                                                "GyMMMEd"           => "E, MMM d, y G",
-                                                               "H"                 => "HH",
                                                                "h"                 => "h a",
-                                                               "Hm"                => "HH:mm",
+                                                               "H"                 => "HH",
                                                                "hm"                => "h:mm a",
-                                                               "Hms"               => "HH:mm:ss",
+                                                               "Hm"                => "HH:mm",
                                                                "hms"               => "h:mm:ss a",
-                                                               "hmsv"              => "h:mm:ss a v",
+                                                               "Hms"               => "HH:mm:ss",
                                                                "Hmsv"              => "HH:mm:ss v",
+                                                               "hmsv"              => "h:mm:ss a v",
                                                                "hmv"               => "h:mm a v",
                                                                "Hmv"               => "HH:mm v",
                                                                "M"                 => "L",
@@ -685,7 +685,7 @@ Coerce multiple data:
 
 Add one or more coerce rules:
 
- % coerce-with-sah duration --coerce-rule str_human --coerce-rule str_iso8601 --data-as-perl '"P1Y2M"'
+ % coerce-with-sah duration --coerce-rule From_str::human --coerce-rule From_str::iso8601 --data-as-perl '"P1Y2M"'
  36817200
 
 Show source code:

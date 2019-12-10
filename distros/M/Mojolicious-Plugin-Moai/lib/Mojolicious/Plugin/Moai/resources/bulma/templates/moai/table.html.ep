@@ -1,0 +1,36 @@
+<%
+    my $stash_class = stash( 'class' ) // {};
+    my %classes = (
+        wrapper => $stash_class->{ wrapper },
+        table => join( ' ', 'table', $stash_class->{ table } ),
+        thead => $stash_class->{ thead } // '',
+    );
+%>
+<% if ( $classes{wrapper} ) { %><div class="<%= $classes{wrapper} %>"><% } %>
+<table class="table <%= $classes{table} %>" id="<%= stash( 'id' ) %>">
+    <thead class="<%= $classes{thead} %>">
+        <tr>
+            % for my $column ( @$columns ) {
+                <th scope="col" class="<%= $column->{class}{col} // '' %>">
+                    <%= $column->{title} %>
+                </th>
+            % }
+        </tr>
+    </thead>
+    <tbody>
+        % for my $item ( @$items ) {
+        <tr>
+            % for my $column ( @$columns ) {
+                <td class="<%= $column->{class}{col} // '' %>">
+                    <% if ( my $route = $column->{link_to} ) { %>
+                        <a href="<%= url_for $route, $item %>">
+                    <% } %>
+                    <%= $item->{ $column->{key} } %>
+                    <% if ( $column->{link_to} ) { %></a><% } %>
+                </td>
+            % }
+        </tr>
+        % }
+    </tbody>
+</table>
+<% if ( $classes{wrapper} ) { %></div><% } %>

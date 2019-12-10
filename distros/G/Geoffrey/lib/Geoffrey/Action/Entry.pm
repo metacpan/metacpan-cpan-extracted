@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Entry::VERSION = '0.000204';
+$Geoffrey::Action::Entry::VERSION = '0.000205';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -81,7 +81,7 @@ Geoffrey::Action::Entry - Action to insert change or delete entries from tables
 
 =head1 VERSION
 
-Version 0.000204
+Version 0.000205
 
 =head1 DESCRIPTION
 

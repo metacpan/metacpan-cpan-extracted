@@ -13,16 +13,6 @@ my $d = MIDI::Drummer::Tiny->new(
 
 $d->count_in(1);
 
-for ( 1 .. $d->bars ) {
-    $d->note( $d->eighth, $d->closed_hh, $d->kick );
-    $d->note( $d->eighth, $d->closed_hh );
-    $d->note( $d->eighth, $d->closed_hh, $d->snare );
-    $d->note( $d->eighth, $d->closed_hh );
-
-    $d->note( $d->eighth, $d->closed_hh, $d->kick );
-    $d->note( $d->eighth, $d->closed_hh, $d->kick );
-    $d->note( $d->eighth, $d->closed_hh, $d->snare );
-    $d->note( $d->eighth, $d->closed_hh );
-}
+$d->metronome;
 
 $d->write;

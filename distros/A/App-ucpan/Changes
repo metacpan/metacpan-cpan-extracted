@@ -1,5 +1,11 @@
 Revision history for Perl extension App-ucpan
 
+1.13 2019-12-09T08:48:24Z
+    - Add App::cpanoutdated to required module
+
+1.12 2019-12-05T08:22:05Z
+    - Fix shebang
+
 1.11 2019-04-09T03:02:14Z
     - Fix prereq ( Win32::Console::ANSI is removed because of cpanfile limitation )
 

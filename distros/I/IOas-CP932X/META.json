@@ -1,6 +1,6 @@
 {
     "name" : "IOas-CP932X",
-    "version" : "0.08",
+    "version" : "0.09",
     "abstract" : "provides CP932X I/O subroutines for UTF-8 script",
     "author" : [
         "ina <ina@cpan.org>"

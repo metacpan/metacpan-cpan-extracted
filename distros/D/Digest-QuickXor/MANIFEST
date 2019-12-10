@@ -1,0 +1,23 @@
+.clang-format
+base64.h
+Changes
+cpanfile
+lib/Digest/QuickXor.pm
+Makefile.PL
+MANIFEST			This list of files
+QuickXor.xs
+qxhash.c
+qxhash.h
+t/00-basic.t
+t/01-object.t
+t/02-text.t
+t/03-file.t
+t/04-function.t
+t/resources/longer_text.txt
+t/resources/perl_camel.png
+t/resources/perl_logo.svg
+t/resources/quickxorhashes.txt
+t/resources/short_text.txt
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -10,16 +10,16 @@ use IO::File;
 use Carp;
 use Scalar::Util ();
 
-use IO::Compress::Base::Common  2.090 qw(:Status);
-use IO::Compress::Zip::Constants 2.090 ;
-use IO::Uncompress::Unzip 2.090 ;
+use IO::Compress::Base::Common  2.093 qw(:Status);
+use IO::Compress::Zip::Constants 2.093 ;
+use IO::Uncompress::Unzip 2.093 ;
 
 
 require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleUnzipError);
 
-$VERSION = '0.032';
+$VERSION = '0.035';
 $SimpleUnzipError = '';
 
 @ISA    = qw(IO::Uncompress::Unzip Exporter);

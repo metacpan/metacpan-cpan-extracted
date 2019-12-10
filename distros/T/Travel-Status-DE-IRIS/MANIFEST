@@ -15,6 +15,7 @@ scripts/debug
 share/csv2json
 share/json2csv
 share/json2json
+share/stations.csv
 share/stations.json
 t/20-iris-class.t
 t/21-iris-stations.t

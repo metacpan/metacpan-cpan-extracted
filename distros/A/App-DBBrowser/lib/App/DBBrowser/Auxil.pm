@@ -12,7 +12,7 @@ use JSON qw( decode_json );
 use Term::Choose            qw();
 use Term::Choose::LineFold  qw( line_fold print_columns );
 use Term::Choose::Screen    qw( clear_screen );
-use Term::Choose::Util      qw( insert_sep get_term_width get_term_height unicode_sprintf);
+use Term::Choose::Util      qw( insert_sep get_term_width get_term_height unicode_sprintf );
 use Term::Form              qw();
 
 
@@ -164,7 +164,7 @@ sub _prepare_table_row {
     my ( $row, $indent, $term_w ) = @_;
     my $list_sep = ', ';
     no warnings 'uninitialized';
-    return unicode_sprintf( $indent . join( $list_sep, map { s/\n/[NL]/g; $_ } @$row ), $term_w, 0, 1 );
+    return unicode_sprintf( $indent . join( $list_sep, map { s/\n/[NL]/g; $_ } @$row ), $term_w, { add_dots => 1 } );
 }
 
 

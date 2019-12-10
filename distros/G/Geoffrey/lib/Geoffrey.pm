@@ -7,7 +7,7 @@ use warnings;
 use Readonly;
 use Geoffrey::Action::Table;
 
-$Geoffrey::VERSION = '0.000204';
+$Geoffrey::VERSION = '0.000205';
 
 use parent 'Geoffrey::Role::Core';
 
@@ -106,7 +106,7 @@ Geoffrey - Continuous Database Migration
 
 =head1 VERSION
 
-Version 0.000204
+Version 0.000205
 
 =head1 DESCRIPTION
 

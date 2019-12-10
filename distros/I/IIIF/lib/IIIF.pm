@@ -1,7 +1,7 @@
 package IIIF;
 use 5.014001;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 1;
 __END__
@@ -25,7 +25,9 @@ IIIF - IIIF Image API implementation
 =head1 DESCRIPTION
 
 Package IIIF provides an implementation of L<IIIF ImageAPI|https://iiif.io/api/image/3.0/>
-based on the L<ImageMagick|https://www.imagemagick.org/> command line application.
+based on the L<ImageMagick|https://www.imagemagick.org/> command line application: Requests
+to get a specific segment of an image are mapped to command line arguments of ImageMagick
+to perform the requested segment extraction. See L<i3f/EXAMPLES> for examples.
 
 =head1 FEATURES
 
@@ -46,16 +48,10 @@ Web service (L<IIIF::ImageAPI>) and command line client (L<i3f>)
 
 =item
 
-Heavily tested
-
-=over
-
-=item
-
 fully passing the L<IIIF Image API Validator|https://iiif.io/api/image/validator/>
-with all Level 2 plus all optional features expect C<Canonical Link Header>
-and some L<inexplicable test failures|https://github.com/nichtich/IIIF/issues/8#issuecomment-545852786>
-with PDF, WebP, and JP2 format.
+with all Level 2 features (except some 
+L<inexplicable test failures|https://github.com/nichtich/IIIF/issues/8#issuecomment-545852786>
+with PDF, WebP, and JP2 format).
 
 =item
 
@@ -68,14 +64,12 @@ level, (>90% on branch level and >70% on condition level).
 
 =back
 
-=back
-
 =head1 INSTALLATION
 
 See also L<IIIF::Magick/REQUIREMENTS> for additional installation for optional
 features.
 
-=head1 UNIX
+=head2 UNIX
 
 Most Unixes include system Perl by default. You should also install ImageMagick and
 L<cpanminus|https://metacpan.org/pod/App::cpanminus#INSTALLATION>. For instance at
@@ -97,7 +91,7 @@ Then install IIIF with Perl package manager:
 
 =head2 WINDOWS
 
-Install ImageMagick and Perl, for instance with C<Chocolatey|https://chocolatey.org>:
+Install ImageMagick and Perl, for instance with L<Chocolatey|https://chocolatey.org>:
 
   choco install imagemagick.tool
   choco install strawberryperl

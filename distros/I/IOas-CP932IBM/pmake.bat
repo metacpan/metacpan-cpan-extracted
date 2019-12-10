@@ -210,7 +210,7 @@ for my $target (@ARGV) {
             IOas::CP932          0.06
             IOas::CP932IBM       0.06
             IOas::CP932NEC       0.06
-            IOas::CP932X         0.06
+            IOas::CP932IBM         0.06
             IOas::SJIS2004       0.06
             Jacode4e::RoundTrip  2.13.81.8
             UTF8::R2             0.05

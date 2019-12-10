@@ -1,0 +1,33 @@
+Changelog for Mojolicious-Plugin-Moai
+
+0.004     2019-12-08 13:24:11-06:00 America/Chicago
+
+    [Added]
+
+    - Added support for Bulma. Bulma is a CSS-only UI library.
+
+0.003     2019-12-06 20:43:42-06:00 America/Chicago
+
+    [Added]
+
+    - Added id configuration to table and pager. We will need some way
+      to identify our elements when writing tests!
+    - Added class configuration to table, thead, columns, and a wrapper.
+      This should enable all of the features available to Bootstrap 4's
+      table.
+    - Added `link_to` for table cells. You can specify a route name, and
+      the route will be filled in with data from the current row.
+
+0.002     2019-12-06 10:25:11-06:00 America/Chicago
+
+    [Fixed]
+
+    - Renamed 'cdn' widgets to 'lib'. This better indicates their
+      function and allows for more meaningful overriding (if one wants
+      to load libraries locally instead of from the CDN)
+
+0.001     2019-12-05 01:19:40-06:00 America/Chicago
+
+    - Initial release
+    - Added initial table and pager widgets
+    - Added CDN widgets to quickly get up and running

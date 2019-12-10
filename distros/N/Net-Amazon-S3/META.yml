@@ -77,13 +77,15 @@ requires:
 resources:
   bugtracker: https://github.com/rustyconover/net-amazon-s3/issues
   repository: https://github.com/rustyconover/net-amazon-s3
-version: '0.86'
+version: '0.87'
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'
   - 'Ali Anari <ali@anari.me>'
   - 'Branislav Zahradnik <branislav.zahradnik@gooddata.com>'
+  - 'Branislav Zahradník <happy.barney@gmail.com>'
   - 'Christian Lackas <lackas@invicro.com>'
   - 'Dylan William Hardison <dylan@hardison.net>'
+  - 'Eden Crane <>'
   - 'Florian Schlichting <fsfs@debian.org>'
   - 'Gabriel Andrade <gabriel@zumba.home>'
   - 'Gabriel Andrade <gabriel@Zumba.local>'
@@ -92,6 +94,7 @@ x_contributors:
   - 'Leo Lapworth <leo@cuckoo.org>'
   - 'Leon Brocard <acme@astray.com>'
   - 'Michael Schout <schoutm@gmail.com>'
+  - 'Michal Josef Špaček <michal.spacek@gooddata.com>'
   - 'Michele Beltrame <mb@cattlegrid.info>'
   - 'Michele Beltrame <mb@italpro.net>'
   - 'Miquel Ruiz <mruiz@cpan.org>'
@@ -115,5 +118,5 @@ x_contributors:
   - 'Tom Hukins <tom@eborcom.com>'
   - 'toritori0318 <toritori0318@gmail.com>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

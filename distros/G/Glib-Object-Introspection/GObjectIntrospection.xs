@@ -17,13 +17,15 @@
  *
  */
 
-#include "build/gi-version.h"
-
 #include <gperl.h>
 #include <gperl_marshal.h>
 
 #include <girepository.h>
 #include <girffi.h>
+
+#ifndef GI_CHECK_VERSION
+# include "build/gi-version.h"
+#endif
 
 /* #define NOISY */
 #ifdef NOISY
@@ -160,6 +162,11 @@ typedef struct {
 	GPerlI11nInvocationInfo base;
 } GPerlI11nPerlInvocationInfo;
 
+typedef enum {
+	GPERL_I11N_MEMORY_SCOPE_IRRELEVANT,
+	GPERL_I11N_MEMORY_SCOPE_TEMPORARY,
+} GPerlI11nMemoryScope;
+
 /* callbacks */
 static GPerlI11nPerlCallbackInfo * create_perl_callback_closure_for_named_sub (GIBaseInfo *cb_info, gchar *sub_name);
 static GPerlI11nPerlCallbackInfo * create_perl_callback_closure (GIBaseInfo *cb_info, SV *code);
@@ -176,7 +183,7 @@ static void prepare_invocation_info (GPerlI11nInvocationInfo *iinfo,
 static void clear_invocation_info (GPerlI11nInvocationInfo *iinfo);
 
 static void free_after_call (GPerlI11nInvocationInfo *iinfo,
-                             GFunc func, gpointer data);
+                             GDestroyNotify func, gpointer data);
 static void invoke_free_after_call_handlers (GPerlI11nInvocationInfo *iinfo);
 
 #if GI_CHECK_VERSION (1, 33, 10)
@@ -220,6 +227,7 @@ static gboolean is_forbidden_sub_name (const gchar *name);
 static SV * interface_to_sv (GITypeInfo* info,
                              GIArgument *arg,
                              gboolean own,
+                             GPerlI11nMemoryScope mem_scope,
                              GPerlI11nInvocationInfo *iinfo);
 static void sv_to_interface (GIArgInfo * arg_info,
                              GITypeInfo * type_info,
@@ -242,6 +250,7 @@ static void sv_to_arg (SV * sv,
 static SV * arg_to_sv (GIArgument * arg,
                        GITypeInfo * info,
                        GITransfer transfer,
+                       GPerlI11nMemoryScope mem_scope,
                        GPerlI11nInvocationInfo *iinfo);
 
 static gpointer sv_to_callback (GIArgInfo * arg_info, GITypeInfo * type_info, SV * sv, GPerlI11nInvocationInfo * invocation_info);
@@ -592,7 +601,11 @@ _fetch_constant (class, basename, constant)
 	/* FIXME: What am I suppossed to do with the return value? */
 	g_constant_info_get_value (info, &value);
 	/* No PUTBACK/SPAGAIN needed here. */
-	RETVAL = arg_to_sv (&value, type_info, GI_TRANSFER_NOTHING, NULL);
+	RETVAL = arg_to_sv (&value,
+	                    type_info,
+	                    GI_TRANSFER_NOTHING,
+	                    GPERL_I11N_MEMORY_SCOPE_IRRELEVANT,
+	                    NULL);
 #if GI_CHECK_VERSION (1, 30, 1)
 	g_constant_info_free_value (info, &value);
 #endif

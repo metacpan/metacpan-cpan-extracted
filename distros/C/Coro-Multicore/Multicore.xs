@@ -191,6 +191,16 @@ start_thread (void)
 {
   xthread_t tid;
 
+  if (!curthreads)
+    {
+      X_UNLOCK (release_m);
+      {
+        dTHX;
+        eval_pv ("Coro::Multicore::init", 1);
+      }
+      X_LOCK (release_m);
+    }
+
   if (curthreads >= max_threads && 0)
     return;
 

@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/sisimai/p5-Sisimai.svg)](https://coveralls.io/r/sisimai/p5-Sisimai)
 [![Build Status](https://travis-ci.org/sisimai/p5-Sisimai.svg?branch=master)](https://travis-ci.org/sisimai/p5-Sisimai) 
 [![Perl](https://img.shields.io/badge/perl-v5.10--v5.30-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v4.25.3-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v4.25.4-blue.svg)](https://metacpan.org/pod/Sisimai)
 
 - [**README(English)**](README.md)
 - [シシマイ? | What is Sisimai](#what-is-sisimai)
@@ -56,6 +56,7 @@ Key features
   * 29種類のMTAに対応
   * 22種類の著名なMSPに対応
   * 2種類の著名なメール配信クラウドに対応(JSON)
+    * **Sisimai 4.25.5で削除予定**
   * Feedback Loopにも対応
   * 29種類のエラー理由を検出
 * __bounceHammer 2.7.13p3よりも高速に解析__
@@ -167,6 +168,8 @@ my $j = Sisimai->dump('/path/to/mbox', 'delivered' => 1);
 
 Read bounce object
 -------------------------------------------------------------------------------
+**この機能はSisimai 4.25.5で削除されます**
+
 メール配信クラウドからAPIで取得したバウンスオブジェクト(JSON)を読んで解析する
 場合は、次のようなコードを書いてください。この機能はSisimai v4.20.0で実装され
 ました。

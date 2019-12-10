@@ -19,6 +19,7 @@
 *.compute.amazonaws.com.cn;*.compute.amazonaws.com.cn
 *.compute.estate;*.compute.estate
 *.cryptonomic.net;*.cryptonomic.net
+*.customer-oci.com;*.customer-oci.com
 *.dapps.earth;*.dapps.earth
 *.dweb.link;*.dweb.link
 *.elb.amazonaws.com;*.elb.amazonaws.com
@@ -45,6 +46,10 @@
 *.nagoya.jp;*.nagoya.jp
 *.nom.br;*.nom.br
 *.np;*.np
+*.oci.customer-oci.com;*.oci.customer-oci.com
+*.ocp.customer-oci.com;*.ocp.customer-oci.com
+*.ocs.customer-oci.com;*.ocs.customer-oci.com
+*.on-k3s.io;*.on-k3s.io
 *.on-rancher.cloud;*.on-rancher.cloud
 *.on-rio.io;*.on-rio.io
 *.otap.co;*.otap.co
@@ -52,6 +57,7 @@
 *.platform.sh;*.platform.sh
 *.platformsh.site;*.platformsh.site
 *.quipelements.com;*.quipelements.com
+*.r.appspot.com;*.r.appspot.com
 *.s5y.io;*.s5y.io
 *.sapporo.jp;*.sapporo.jp
 *.sch.uk;*.sch.uk
@@ -61,6 +67,7 @@
 *.statics.cloud;*.statics.cloud
 *.stg.dev;*.stg.dev
 *.stolos.io;*.stolos.io
+*.sys.qcx.io;*.sys.qcx.io
 *.telebit.xyz;*.telebit.xyz
 *.transurl.be;*.transurl.be
 *.transurl.eu;*.transurl.eu
@@ -73,6 +80,7 @@
 *.yokohama.jp;*.yokohama.jp
 0.bg;0.bg
 001www.com;001www.com
+0e.vc;0e.vc
 0emm.com;0emm.com
 1.bg;1.bg
 12hp.at;12hp.at
@@ -349,6 +357,7 @@ amli.no;amli.no
 amot.no;amot.no
 amsterdam;amsterdam
 amsterdam.museum;amsterdam.museum
+amsw.nl;amsw.nl
 amune.org;amune.org
 amusement.aero;amusement.aero
 an.it;an.it
@@ -589,6 +598,7 @@ aw;aw
 awaji.hyogo.jp;awaji.hyogo.jp
 awdev.ca;awdev.ca
 aws;aws
+awsmppl.com;awsmppl.com
 ax;ax
 axa;axa
 axis.museum;axis.museum
@@ -1019,6 +1029,7 @@ build;build
 builder.nu;builder.nu
 builders;builders
 building.museum;building.museum
+builtwithdark.com;builtwithdark.com
 bukhara.su;bukhara.su
 bulsan-sudtirol.it;bulsan-sudtirol.it
 bulsan-suedtirol.it;bulsan-suedtirol.it
@@ -1727,6 +1738,7 @@ cust.disrec.thingdust.io;cust.disrec.thingdust.io
 cust.prod.thingdust.io;cust.prod.thingdust.io
 cust.testing.thingdust.io;cust.testing.thingdust.io
 custom.metacentrum.cz;custom.metacentrum.cz
+customer-oci.com;customer-oci.com
 customer.enonic.io;customer.enonic.io
 customer.speedpartner.de;customer.speedpartner.de
 cv;cv
@@ -2034,6 +2046,7 @@ ed.cr;ed.cr
 ed.jp;ed.jp
 ed.pw;ed.pw
 edeka;edeka
+edgestack.me;edgestack.me
 edogawa.tokyo.jp;edogawa.tokyo.jp
 edu;edu
 edu.ac;edu.ac
@@ -2202,6 +2215,7 @@ emiliaromagna.it;emiliaromagna.it
 emp.br;emp.br
 empresa.bo;empresa.bo
 emr.it;emr.it
+en-root.fr;en-root.fr
 en.it;en.it
 ena.gifu.jp;ena.gifu.jp
 encyclopedic.museum;encyclopedic.museum
@@ -2724,6 +2738,7 @@ genkai.saga.jp;genkai.saga.jp
 genoa.it;genoa.it
 genova.it;genova.it
 gent;gent
+gentapps.com;gentapps.com
 genting;genting
 geology.museum;geology.museum
 geometre-expert.fr;geometre-expert.fr
@@ -4375,7 +4390,6 @@ lanbib.se;lanbib.se
 lancashire.museum;lancashire.museum
 lancaster;lancaster
 lancia;lancia
-lancome;lancome
 land;land
 land-4-sale.us;land-4-sale.us
 landes.museum;landes.museum
@@ -5565,6 +5579,7 @@ ng.ink;ng.ink
 ng.school;ng.school
 ngo;ngo
 ngo.lk;ngo.lk
+ngo.ng;ngo.ng
 ngo.ph;ngo.ph
 ngo.za;ngo.za
 ngrok.io;ngrok.io
@@ -5825,6 +5840,9 @@ obuse.nagano.jp;obuse.nagano.jp
 oceanographic.museum;oceanographic.museum
 oceanographique.museum;oceanographique.museum
 ochi.kochi.jp;ochi.kochi.jp
+oci.customer-oci.com;oci.customer-oci.com
+ocp.customer-oci.com;ocp.customer-oci.com
+ocs.customer-oci.com;ocs.customer-oci.com
 od.ua;od.ua
 odate.akita.jp;odate.akita.jp
 odawara.kanagawa.jp;odawara.kanagawa.jp
@@ -5931,6 +5949,7 @@ omotego.fukushima.jp;omotego.fukushima.jp
 omura.nagasaki.jp;omura.nagasaki.jp
 omuta.fukuoka.jp;omuta.fukuoka.jp
 on-aptible.com;on-aptible.com
+on-k3s.io;on-k3s.io
 on-rancher.cloud;on-rancher.cloud
 on-rio.io;on-rio.io
 on-the-web.tv;on-the-web.tv
@@ -6220,6 +6239,7 @@ ownprovider.com;ownprovider.com
 ox.rs;ox.rs
 oxford.museum;oxford.museum
 oy.lc;oy.lc
+oya.to;oya.to
 oyabe.toyama.jp;oyabe.toyama.jp
 oyama.tochigi.jp;oyama.tochigi.jp
 oyamazaki.kyoto.jp;oyamazaki.kyoto.jp
@@ -6296,6 +6316,7 @@ per.sg;per.sg
 perso.ht;perso.ht
 perso.sn;perso.sn
 perso.tn;perso.tn
+perspecta.cloud;perspecta.cloud
 perugia.it;perugia.it
 pesaro-urbino.it;pesaro-urbino.it
 pesarourbino.it;pesarourbino.it
@@ -6525,6 +6546,7 @@ qa;qa
 qa2.com;qa2.com
 qc.ca;qc.ca
 qc.com;qc.com
+qcx.io;qcx.io
 qh.cn;qh.cn
 qld.au;qld.au
 qld.edu.au;qld.edu.au
@@ -6539,6 +6561,7 @@ quickconnect.to;quickconnect.to
 quicksytes.com;quicksytes.com
 quipelements.com;quipelements.com
 qvc;qvc
+r.appspot.com;r.appspot.com
 r.bg;r.bg
 r.cdn77.net;r.cdn77.net
 r.se;r.se
@@ -7267,6 +7290,7 @@ skodje.no;skodje.no
 skole.museum;skole.museum
 sky;sky
 skydiving.aero;skydiving.aero
+skygearapp.com;skygearapp.com
 skype;skype
 skánit.no;xn--sknit-yqa.no
 skånland.no;xn--sknland-fxa.no
@@ -7523,6 +7547,7 @@ syno-ds.de;syno-ds.de
 synology-diskstation.de;synology-diskstation.de
 synology-ds.de;synology-ds.de
 synology.me;synology.me
+sys.qcx.io;sys.qcx.io
 systems;systems
 sytes.net;sytes.net
 sz;sz

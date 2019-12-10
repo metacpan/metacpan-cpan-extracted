@@ -1,7 +1,9 @@
 package Log::ger::For::Package;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-09'; # DATE
+our $DIST = 'Log-ger-For-Class'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010;
 use strict;
@@ -9,14 +11,14 @@ use warnings;
 use experimental 'smartmatch';
 use Log::ger;
 
-use Data::Clean::JSON;
+use Data::Clean::ForJSON;
 use Package::Stash;
 use Package::Util::Lite qw(package_exists list_subpackages);
 use Sub::Uplevel;
 
 our %SPEC;
 
-my $cleanser = Data::Clean::JSON->new(-ref => ['stringify']);
+my $cleanser = Data::Clean::ForJSON->new(-ref => ['stringify']);
 my $import_hook_installed;
 
 sub import {
@@ -378,7 +380,7 @@ Log::ger::For::Package - Add logging to package
 
 =head1 VERSION
 
-This document describes version 0.003 of Log::ger::For::Package (from Perl distribution Log-ger-For-Class), released on 2019-01-06.
+This document describes version 0.004 of Log::ger::For::Package (from Perl distribution Log-ger-For-Class), released on 2019-12-09.
 
 =head1 SYNOPSIS
 

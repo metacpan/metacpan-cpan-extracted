@@ -7,6 +7,11 @@ Bug tracker:  <https://github.com/kjetilk/p5-rdf-doap/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.104	2019-12-10
+
+ - Sort the output of $project->homepage to prioritize non-metacpan
+   homepages over metacpan homepages.
+
 0.103	2019-11-23
 
  - If versions 10 and 12 both offer changelogs since version 8, then omit

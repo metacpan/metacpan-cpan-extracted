@@ -12,7 +12,9 @@
 ###                      15.08.19 Version 6.10                                 ###
 ##################################################################################
 
-   - Korrektur in den Testdateien für Perl; alles andere ist (für Perl) unverändert
+   - Korrektur in den Testdateien für Perl
+   - neue Funktion lut_valid_date(), um die Gültigkeitsdaten einer LUT-Datei zu
+     bestimmen (nur in C und PHP)
 
 ##################################################################################
 ###                      13.05.19 Version 6.09                                 ###

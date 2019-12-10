@@ -1,0 +1,38 @@
+---
+abstract: 'Check if keys exist in the cache'
+author:
+  - 'Adam Hopkins <srchulo@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Cache-Role-Exists
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Mojolicious: '7.40'
+  Role::Tiny: '2.000001'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/srchulo/Mojo-Cache-Role-Exists/issues
+  homepage: https://github.com/srchulo/Mojo-Cache-Role-Exists
+  repository: https://github.com/srchulo/Mojo-Cache-Role-Exists.git
+version: '0.01'
+x_contributors:
+  - 'Adam Hopkins <violapiratejunky@gmail.com>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

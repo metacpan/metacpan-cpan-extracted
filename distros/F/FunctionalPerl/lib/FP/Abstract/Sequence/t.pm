@@ -39,11 +39,10 @@ use FP::StrictList;
 use FP::List;
 use FP::Stream;
 use FP::Array 'array';
-
+use FP::Ops qw(the_method);
 use Chj::TEST;
 
-sub t_fn {
-    my ($fn)= @_;
+my $t_vals=
     list(purearray(3,4),
          strictlist(3,4),
          list(3,4),
@@ -61,14 +60,36 @@ sub t_fn {
          3,
          "character sequence",
          {3=>4},
-        )->map($fn)->array
+    );
+
+sub t_fn {
+    my ($fn)= @_;
+    $t_vals->map($fn)->array
 }
 
 TEST { t_fn *is_sequence }
  [ 1,1,1,1, 1,1,1,1, 1,0,0,0,0,0 ];
 
+TEST { t_fn *is_proper_sequence }
+ [ 1,1,1,1, 1,1,1,1, 0,0,0,0,0,0 ];
+
 TEST { t_fn *is_seq }
  [ 1,1,1,1, 0,0,0,0, 1,0,0,0,0,0 ];
+
+my $t_seqs= $t_vals->filter(*is_proper_sequence);
+TEST { $t_seqs->map(the_method "stream")->map(the_method "list") } GIVES {
+    list (list(3,4),
+         list(3,4),
+         list(3,4),
+         list(3,4),
+
+         list(),
+         list(),
+         list(),
+         list(),
+        )
+};
+
 
 
 # more tests:
@@ -168,6 +189,15 @@ TEST {
 
 TEST { [ list(qw(a b c d e f g))->split_at(3) ] }
        [list('a', 'b', 'c'), list('d', 'e', 'f', 'g')];
+
+
+TEST { purearray(qw(a b c d e f))->chunks_of(4)->array }
+   [purearray('a', 'b', 'c', 'd'), purearray('e', 'f')];
+# XX chunks_of returns a stream in this case; fine? Make up some rules
+# about this...
+
+TEST_EXCEPTION { purearray(qw(a b c d e f))->strictly_chunks_of(4)->array }
+    'premature end of input';
 
 
 1

@@ -5,7 +5,7 @@ use utf8;
 use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.016';    # VERSION
+our $VERSION = '0.018';    # VERSION
 
 requires 'execute_command';
 
@@ -25,7 +25,7 @@ Bat::Interpreter::Role::Executor
 
 =head1 VERSION
 
-version 0.016
+version 0.018
 
 =head1 DESCRIPTION
 

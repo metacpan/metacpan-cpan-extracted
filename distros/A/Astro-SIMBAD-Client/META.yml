@@ -19,10 +19,10 @@ no_index:
 provides:
   Astro::SIMBAD::Client:
     file: lib/Astro/SIMBAD/Client.pm
-    version: '0.040'
+    version: '0.041'
   Astro::SIMBAD::Client::WSQueryInterfaceService:
     file: lib/Astro/SIMBAD/Client/WSQueryInterfaceService.pm
-    version: '0.040'
+    version: '0.041'
 requires:
   HTTP::Request::Common: '0'
   LWP::Protocol: '0'
@@ -35,5 +35,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SIMBAD-Client
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-SIMBAD-Client.git
-version: '0.040'
+version: '0.041'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,17 +1,17 @@
 /* plug_openssl.c - plug-in openssl algorithms
  *
- * Copyright: 2011-2012 Aleksey Kravchenko <rhash.admin@gmail.com>
+ * Copyright (c) 2011, Aleksey Kravchenko <rhash.admin@gmail.com>
  *
- * Permission is hereby granted,  free of charge,  to any person  obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction,  including without limitation
- * the rights to  use, copy, modify,  merge, publish, distribute, sublicense,
- * and/or sell copies  of  the Software,  and to permit  persons  to whom the
- * Software is furnished to do so.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted.
  *
- * This program  is  distributed  in  the  hope  that it will be useful,  but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  Use this program  at  your own risk!
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+ * REGARD TO THIS SOFTWARE  INCLUDING ALL IMPLIED WARRANTIES OF  MERCHANTABILITY
+ * AND FITNESS.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+ * INDIRECT,  OR CONSEQUENTIAL DAMAGES  OR ANY DAMAGES WHATSOEVER RESULTING FROM
+ * LOSS OF USE,  DATA OR PROFITS,  WHETHER IN AN ACTION OF CONTRACT,  NEGLIGENCE
+ * OR OTHER TORTIOUS ACTION,  ARISING OUT OF  OR IN CONNECTION  WITH THE USE  OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 #if defined(USE_OPENSSL) || defined(OPENSSL_RUNTIME)
 
@@ -79,8 +79,8 @@ OS_METHOD(WHIRLPOOL);
 #endif
 
 
-/* The openssl * _Update functions have the same signature as RHash ones:
- * void update_func(void *ctx, const void* msg, size_t size),
+/* The openssl *_Update functions have the same signature as RHash ones:
+ * void update_func(void* ctx, const void* msg, size_t size),
  * so we can use them in RHash directly. But the _Final functions
  * have different order of arguments, so we need to wrap them. */
 #define WRAP_FINAL(name) WRAP_FINAL2(name, name##_CTX)
@@ -181,7 +181,7 @@ static int load_openssl_runtime(void)
 	};
 	void* handle = 0;
 	size_t i;
-	for (i = 0; !handle && i < (sizeof(libNames)/sizeof(*libNames)); i++)
+	for (i = 0; !handle && i < (sizeof(libNames) / sizeof(*libNames)); i++)
 		handle = dlopen(libNames[i], RTLD_NOW);
 #endif
 
@@ -230,7 +230,7 @@ int rhash_plug_openssl(void)
 	/* replace internal rhash methods with the OpenSSL ones */
 	for (i = 0; i < (int)(sizeof(rhash_openssl_methods) / sizeof(rhash_hash_info)); i++)
 	{
-		rhash_hash_info *method = &rhash_openssl_methods[i];
+		rhash_hash_info* method = &rhash_openssl_methods[i];
 		if (!method->init) continue;
 		openssl_available_algorithms_hash_mask |= method->info->hash_id;
 		if ((rhash_openssl_hash_mask & method->info->hash_id) == 0) continue;

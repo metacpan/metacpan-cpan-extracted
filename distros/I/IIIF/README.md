@@ -11,7 +11,9 @@ IIIF - IIIF Image API implementation
 # DESCRIPTION
 
 Package IIIF provides an implementation of [IIIF ImageAPI](https://iiif.io/api/image/3.0/)
-based on the [ImageMagick](https://www.imagemagick.org/) command line application.
+based on the [ImageMagick](https://www.imagemagick.org/) command line application: Requests
+to get a specific segment of an image are mapped to command line arguments of ImageMagick
+to perform the requested segment extraction. See ["EXAMPLES" in i3f](https://metacpan.org/pod/i3f#EXAMPLES) for examples.
 
 # FEATURES
 
@@ -19,21 +21,20 @@ based on the [ImageMagick](https://www.imagemagick.org/) command line applicatio
 - Support abbreviated requests (e.g. `300,200` to select size, `90/gray` to
 select rotation and quality...).
 - Web service ([IIIF::ImageAPI](https://metacpan.org/pod/IIIF::ImageAPI)) and command line client ([i3f](https://metacpan.org/pod/i3f))
-- Heavily tested
-    - fully passing the [IIIF Image API Validator](https://iiif.io/api/image/validator/)
-    with all Level 2 plus all optional features expect `Canonical Link Header`
-    and some [inexplicable test failures](https://github.com/nichtich/IIIF/issues/8#issuecomment-545852786)
-    with PDF, WebP, and JP2 format.
-    - works with ImageMagick 6 (tested on Ubuntu Linux) and ImageMagick 7 (tested on Windows)
-    - 100% [test coverage](https://coveralls.io/github/nichtich/IIIF) on statement
-    level, (>90% on branch level and >70% on condition level).
+- fully passing the [IIIF Image API Validator](https://iiif.io/api/image/validator/)
+with all Level 2 features (except some 
+[inexplicable test failures](https://github.com/nichtich/IIIF/issues/8#issuecomment-545852786)
+with PDF, WebP, and JP2 format).
+- works with ImageMagick 6 (tested on Ubuntu Linux) and ImageMagick 7 (tested on Windows)
+- 100% [test coverage](https://coveralls.io/github/nichtich/IIIF) on statement
+level, (>90% on branch level and >70% on condition level).
 
 # INSTALLATION
 
 See also ["REQUIREMENTS" in IIIF::Magick](https://metacpan.org/pod/IIIF::Magick#REQUIREMENTS) for additional installation for optional
 features.
 
-# UNIX
+## UNIX
 
 Most Unixes include system Perl by default. You should also install ImageMagick and
 [cpanminus](https://metacpan.org/pod/App::cpanminus#INSTALLATION). For instance at
@@ -55,7 +56,7 @@ Then install IIIF with Perl package manager:
 
 ## WINDOWS
 
-Install ImageMagick and Perl, for instance with `Chocolatey|https://chocolatey.org`:
+Install ImageMagick and Perl, for instance with [Chocolatey](https://chocolatey.org):
 
     choco install imagemagick.tool
     choco install strawberryperl

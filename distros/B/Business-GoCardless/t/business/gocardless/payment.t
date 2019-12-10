@@ -33,6 +33,7 @@ can_ok(
         created_at
         currency
         description
+        fx
         id
         links
         metadata

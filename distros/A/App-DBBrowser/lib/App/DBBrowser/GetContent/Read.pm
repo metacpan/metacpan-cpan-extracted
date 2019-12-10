@@ -8,7 +8,7 @@ use 5.010001;
 use Cwd                   qw( realpath );
 use Encode                qw( encode decode );
 use File::Basename        qw( basename );
-use File::Spec::Functions qw( catfile );
+use File::Spec::Functions qw( catfile catdir );
 
 use List::MoreUtils qw( all uniq );
 use Encode::Locale  qw();
@@ -178,16 +178,21 @@ sub from_file {
         if ( ! defined $dir_ec ) {
             return;
         }
-        opendir my $dir_h, $dir_ec or die "$dir_ec: $!";
-        my @files_ec;
-        while ( my $file_ec = readdir( $dir_h ) ) {
-            next if $file_ec =~ m/^\./;
-            $file_ec = catfile $dir_ec, $file_ec;
-            next if ! -f $file_ec;
-            push @files_ec, $file_ec;
+        my @tmp_files;
+        if ( length $sf->{o}{insert}{file_filter} ) {
+            @tmp_files = map { basename $_} grep { -e $_ } glob( catfile( $dir_ec, $sf->{o}{insert}{file_filter} ) );
         }
-        close $dir_h;
-        @files_ec = sort @files_ec;
+        else {
+            opendir( my $dh, $dir_ec ) or die $!;
+            @tmp_files = readdir $dh;
+            closedir $dh;
+        }
+        my @files_ec;
+        for my $file ( sort @tmp_files ) {
+            next if $file =~ /^\./ && ! $sf->{o}{insert}{show_hidden_files};
+            next if -d catdir $dir_ec, $file;
+            push @files_ec, catfile( $dir_ec, $file );
+        }
         my @files = map { '  ' . decode( 'locale_fs', basename $_ ) } @files_ec;
         my $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
         $sf->{i}{gc}{old_file_idx} //= 1;
@@ -213,8 +218,11 @@ sub from_file {
                 $sf->{i}{gc}{old_file_idx} = $idx;
             }
             if ( $choices->[$idx] eq $hidden ) {
-                say "Hallo, World!";
-                sleep 4;
+                require App::DBBrowser::Opt::Set;
+                my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+                say "Settings";
+                $opt_set->set_options( $sf->__file_setting_menu_entries() );
+                next DIR;
             }
             my $file_ec = $files_ec[$idx-@pre];
             return 1, $file_ec;
@@ -236,30 +244,39 @@ sub __directory {
             return realpath encode 'locale_fs', $h_ref->{dirs}[0];
         }
     }
-    $sf->{i}{gc}{old_dir_idx} //= 0;
+    $sf->{i}{gc}{old_dir_idx} //= 1;
 
     DIR: while ( 1 ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} );
         my @dirs = sort @{$h_ref->{dirs}||[]};
-        my $prompt = sprintf "Choose a dir:";
-        my @pre = ( undef, '  NEW search' );
+        my $hidden = "Choose a dir:";
+        my $new_search = '  NEW search';
+        my @pre = ( $hidden, undef, $new_search );
+        my $choices = [ @pre, map( '- ' . $_, @dirs ) ];
         # Choose
         my $idx = $tc->choose(
-            [ @pre, map( '- ' . $_, @dirs ) ],
-            { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $sf->{i}{gc}{old_dir_idx}, undef => '  <=' }
+            $choices,
+            { %{$sf->{i}{lyt_v_clear}}, prompt => '', index => 1, default => $sf->{i}{gc}{old_dir_idx}, undef => '  <=' }
         );
-        if ( ! $idx ) {
+        if ( ! defined $idx || ! defined $choices->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
             if ( $sf->{i}{gc}{old_dir_idx} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $sf->{i}{gc}{old_dir_idx} = 0;
+                $sf->{i}{gc}{old_dir_idx} = 1;
                 next DIR;
             }
             $sf->{i}{gc}{old_dir_idx} = $idx;
         }
         my $dir_ec;
-        if ( $idx == $#pre ) {
+        if ( $choices->[$idx] eq $hidden ) {
+            require App::DBBrowser::Opt::Set;
+            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+            say "Settings";
+            $opt_set->set_options( $sf->__file_setting_menu_entries() );
+            next DIR;
+        }
+        elsif ( $choices->[$idx] eq $new_search ) {
             $dir_ec = $sf->__new_dir_search();
             # Choose
             if ( ! defined $dir_ec || ! length $dir_ec ) {
@@ -307,7 +324,21 @@ sub __add_to_history {
 
 
 
+sub __file_setting_menu_entries {
+    my ( $sf ) = @_;
+    my $groups = [
+        { name => 'group_insert', text => '' }
+    ];
+    my $options = [
+        { name => '_file_filter',       text => "- File filter",   section => 'insert' },
+        { name => '_show_hidden_files', text => "- Show hidden",   section => 'insert' },
+        { name => 'history_dirs',       text => "- Dir History",   section => 'insert' },
+        { name => '_file_encoding',     text => "- File Encoding", section => 'insert' },
 
+    ];
+    return $groups, $options;
+
+}
 
 
 

@@ -7,9 +7,9 @@ has root     => ( required => 1 );
 has interval => ( required => 1 );
 has cb       => ( required => 1 );
 
-has id => ( sub {uuid_v1mc_str}, init_arg => undef );
+has id           => ( sub {uuid_v1mc_str}, init_arg => undef );
 has last_checked => ( 0, init_arg => undef );
-has stat         => ( init_arg    => undef );
+has stat         => ( init_arg => undef );
 
 sub DESTROY ($self) {
     delete $Pcore::Util::Path::Poll::POLL->{ $self->{id} } if ${^GLOBAL_PHASE} ne 'DESTRUCT';

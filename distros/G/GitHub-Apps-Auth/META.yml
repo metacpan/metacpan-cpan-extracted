@@ -1,0 +1,48 @@
+---
+abstract: 'The fetcher that get a token for GitHub Apps'
+author:
+  - 'mackee <macopy123@gmail.com>'
+build_requires:
+  Test::Mock::Guard: '0'
+  Test::More: '0.98'
+  Test::Time: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GitHub-Apps-Auth
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  GitHub::Apps::Auth:
+    file: lib/GitHub/Apps/Auth.pm
+    version: '0.03'
+requires:
+  Class::Accessor::Lite: '0.08'
+  Crypt::JWT: '0.025'
+  CryptX: '0.066'
+  Furl: '3.13'
+  IO::Socket::SSL: '0'
+  JSON: '4.02'
+  Time::Moment: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/mackee/GitHub-Apps-Auth/issues
+  homepage: https://github.com/mackee/GitHub-Apps-Auth
+  repository: git://github.com/mackee/GitHub-Apps-Auth.git
+version: '0.03'
+x_authority: cpan:MACOPY
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

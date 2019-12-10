@@ -1,0 +1,7 @@
+About Perl
+What is Perl? Features and History.
+
+Powerful, stable, mature, portable
+Perl 5 is a highly capable, feature-rich programming language with over 30 years of development. Perl 5 runs on over 100 platforms from portables to mainframes and is suitable for both rapid prototyping and large scale development projects.
+
+"Perl" is a family of languages, "Perl 6" is part of the family, but it is a separate language which has its own development team. Its existence has no significant impact on the continuing development of "Perl 5".

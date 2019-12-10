@@ -141,10 +141,13 @@ mkdir 'build', 0777;
 
 compile_test_libraries();
 
-ExtUtils::PkgConfig->write_version_macros (
-  "build/gi-version.h",
-  "gobject-introspection-1.0" => "GI",
-);
+my $have_gi_1_60 = ExtUtils::PkgConfig->atleast_version('gobject-introspection-1.0', '1.60.0');
+if (!$have_gi_1_60) {
+  ExtUtils::PkgConfig->write_version_macros (
+    "build/gi-version.h",
+    "gobject-introspection-1.0" => "GI",
+  );
+}
 
 my $deps = ExtUtils::Depends->new ('Glib::Object::Introspection' => 'Glib');
 $deps->set_inc ($cfg{cflags});

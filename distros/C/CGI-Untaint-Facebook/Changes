@@ -1,5 +1,8 @@
 Revision history for CGI-Untaint-Facebook
 
+0.15	Tue 10 Dec 09:50:11 EST 2019
+	RT#91825
+
 0.14
 	Disallow spaces in the middle of Facebook page names
 

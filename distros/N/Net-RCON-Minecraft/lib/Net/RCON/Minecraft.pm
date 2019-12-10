@@ -2,7 +2,7 @@
 
 package Net::RCON::Minecraft;
 
-use 5.008;
+use 5.010;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -13,7 +13,7 @@ use Carp;
 
 no warnings 'uninitialized';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant {
     # Packet types

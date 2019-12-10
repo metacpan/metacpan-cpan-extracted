@@ -14,6 +14,6 @@ is $d->beats, 4, 'beats computed';
 is $d->divisions, 4, 'divisions computed';
 
 my @score = $d->score->Score;
-is($score[1]->[0], 'time_signature', 'time signature added');
+is $score[1]->[0], 'time_signature', 'time signature added';
 
 done_testing();

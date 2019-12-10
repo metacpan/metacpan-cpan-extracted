@@ -1,7 +1,7 @@
 package Perl::Tidy::VerticalAligner;
 use strict;
 use warnings;
-our $VERSION = '20190915';
+our $VERSION = '20191203';
 
 use Perl::Tidy::VerticalAligner::Alignment;
 use Perl::Tidy::VerticalAligner::Line;
@@ -1627,8 +1627,11 @@ sub salvage_equality_matches {
     # If we had a peek at the subsequent line we could make a much better
     # decision here, but for now this is not available.
     for ( my $j = 1 ; $j < $jmax_new - 1 ; $j++ ) {
-        my $new_tok           = $rtokens->[$j];
-        my $is_good_alignment = ( $new_tok =~ /^(=|\?|if|unless|\|\||\&\&)/ );
+        my $new_tok = $rtokens->[$j];
+
+        # git#16: do not consider fat commas as good aligmnents here
+        my $is_good_alignment =
+          ( $new_tok =~ /^(=|\?|if|unless|\|\||\&\&)/ && $new_tok !~ /^=>/ );
         return if ($is_good_alignment);
     }
 
@@ -2270,6 +2273,38 @@ EOM
     return;
 }
 
+sub decode_alignment_token {
+
+    # Unpack the values packed in an alignment token
+    #
+    # Usage:
+    #        my ( $raw_tok, $lev, $tag, $tok_count ) =
+    #          decode_alignment_token($token);
+
+    # Alignment tokens have a trailing decimal level and optional tag (for
+    # commas):
+    # For example, the first comma in the following line
+    #     sub banner  { crlf; report( shift, '/', shift ); crlf }
+    # is decorated as follows:
+    #    ,2+report-6  => (tok,lev,tag) =qw( ,   2   +report-6)
+
+    # An optional token count may be appended with a leading dot.
+    # Currently this is only done for '=' tokens but this could change.
+    # For example, consider the following line:
+    #   $nport   = $port = shift || $name;
+    # The first '=' may either be '=0' or '=0.1' [level 0, first equals]
+    # The second '=' will be '=0.2' [level 0, second equals]
+    my ($tok) = @_;
+    my ( $raw_tok, $lev, $tag, $tok_count ) = ( $tok, 0, "", 1 );
+    if ( $tok =~ /^(\D+)(\d+)([^\.]*)(\.(\d+))?$/ ) {
+        $raw_tok   = $1;
+        $lev       = $2;
+        $tag       = $3 if ($3);
+        $tok_count = $5 if ($5);
+    }
+    return ( $raw_tok, $lev, $tag, $tok_count );
+}
+
 {    # sub is_deletable_token
 
     my %is_deletable_equals;
@@ -2291,29 +2326,24 @@ EOM
         # improve chances of making an alignment.
         my ( $token, $i, $imax, $jline, $i_eq ) = @_;
 
-        # Strip off the level and other stuff appended to the token.
-        # Tokens have a trailing decimal level and optional tag (for commas):
-        # For example, the first comma in the following line
-        #     sub banner  { crlf; report( shift, '/', shift ); crlf }
-        # is decorated as follows:
-        #    ,2+report-6  => (tok,lev,tag) =qw( ,   2   +report-6)
-        my ( $tok, $lev, $tag ) = ( $token, 0, "" );
-        if ( $tok =~ /^(\D+)(\d+)(.*)$/ ) { $tok = $1; $lev = $2; $tag = $3 }
-        ##print "$token >> $tok   $lev   $tag\n";
+        my ( $raw_tok, $lev, $tag, $tok_count ) =
+          decode_alignment_token($token);
+
+        # okay to delete second and higher copies of a token
+        if ( $tok_count > 1 ) { return 1 }
 
         # only remove lower level commas
-        ##if ( $tok eq ',' ) { return unless $lev > $group_level; }
-        if ( $tok eq ',' ) {
+        if ( $raw_tok eq ',' ) {
 
-            #print "tok=$tok, lev=$lev, gl=$group_level, i=$i, ieq=$i_eq\n";
             return if ( defined($i_eq) && $i < $i_eq );
             return if ( $lev <= $group_level );
         }
 
         # most operators with an equals sign should be retained if at
         # same level as this statement
-        elsif ( $tok =~ /=/ ) {
-            return unless ( $lev > $group_level || $is_deletable_equals{$tok} );
+        elsif ( $raw_tok =~ /=/ ) {
+            return
+              unless ( $lev > $group_level || $is_deletable_equals{$raw_tok} );
         }
 
         # otherwise, ok to delete the token
@@ -2350,17 +2380,14 @@ sub delete_unmatched_tokens {
         my $i_eq;
         my $lev_min;
         foreach my $tok ( @{$rtokens} ) {
-            my $lev     = 0;
-            my $raw_tok = "";
-            my $desc    = "";
-            if ( $tok =~ /^(\D+)(\d+)(.*)/ ) {
-                $raw_tok = $1;
-                $lev     = $2;
-                $desc    = $3;
-            }
+            my ( $raw_tok, $lev, $tag, $tok_count ) =
+              decode_alignment_token($tok);
             if ( !defined($lev_min) || $lev < $lev_min ) { $lev_min = $lev }
 
-            $rhash->{$tok} = [ $i, undef, undef, $lev ];
+            # Possible future upgrade: for multiple matches,
+            # record [$i1, $i2, ..] instead of $i
+            $rhash->{$tok} =
+              [ $i, undef, undef, $raw_tok, $lev, $tag, $tok_count ];
 
             # remember the first equals at line level
             if ( !defined($i_eq) && $raw_tok eq '=' ) {
@@ -2444,11 +2471,6 @@ sub delete_unmatched_tokens {
             }
         }
 
-        # Leave two lines alone unless they are an if/else or ternary pair.
-        # Alignment of just two lines can be annoying, so it is best to let the
-        # two-line rules decide if they should be aligned.
-        next if ( $nlines <= 2 && !$is_full_block );
-
         # remove unwanted alignment tokens
         for ( my $jj = $jbeg ; $jj <= $jend ; $jj++ ) {
             my $line    = $rnew_lines->[$jj];
@@ -2458,11 +2480,13 @@ sub delete_unmatched_tokens {
             my $i_eq    = $i_equals[$jj];
             my @idel;
             my $imax = @{$rtokens} - 2;
+            my $delete_above_level;
 
             for ( my $i = 0 ; $i <= $imax ; $i++ ) {
                 my $tok = $rtokens->[$i];
                 next if ( $tok eq '#' );    # shouldn't happen
-                my ( $il, $ir ) = @{ $rhash->{$tok} }[ 1, 2 ];
+                my ( $iii, $il, $ir, $raw_tok, $lev, $tag, $tok_count ) =
+                  @{ $rhash->{$tok} };
 
                 # always remove unmatched tokens
                 my $delete_me = !defined($il) && !defined($ir);
@@ -2471,6 +2495,23 @@ sub delete_unmatched_tokens {
                 # remove all alignments which are not also in every line
                 $delete_me ||=
                   ( $is_full_block && $token_line_count{$tok} < $nlines );
+
+                # Remove all tokens above a certain level following a previous
+                # deletion.  For example, we have to remove tagged higher level
+                # alignment tokens following a => deletion because the tags of
+                # higher level tokens will now be incorrect. For example, this
+                # will prevent aligning commas as follows after deleting the
+                # second =>
+                #    $w->insert(
+                #	ListBox => origin => [ 270, 160 ],
+                #	size    => [ 200,           55 ],
+                #    );
+                if ( defined($delete_above_level) ) {
+                    if ( $lev > $delete_above_level ) {
+                        $delete_me ||= 1;    #$tag;
+                    }
+                    else { $delete_above_level = undef }
+                }
 
                 if (
                     $delete_me
@@ -2486,6 +2527,19 @@ sub delete_unmatched_tokens {
                   )
                 {
                     push @idel, $i;
+                    if ( !defined($delete_above_level)
+                        || $lev < $delete_above_level )
+                    {
+
+                        # delete all following higher level alignments
+                        $delete_above_level = $lev;
+
+                        # but keep deleting after => to next lower level
+                        # to avoid some bizarre alignments
+                        if ( $raw_tok eq '=>' ) {
+                            $delete_above_level = $lev - 1;
+                        }
+                    }
                 }
             }
 
@@ -2496,68 +2550,192 @@ sub delete_unmatched_tokens {
     return;
 }
 
-sub decide_if_aligned_pair {
+{        # decide_if_aligned_pair
 
-    # Do not try to align two lines which are not really similar
-    return unless ( @group_lines == 2 );
-    return if ($is_matching_terminal_line);
+    my %is_if_or;
+    my %is_assignment;
 
-    my $group_list_type = $group_lines[0]->get_list_type();
+    BEGIN {
 
-    my $rtokens        = $group_lines[0]->get_rtokens();
-    my $leading_equals = ( $rtokens->[0] =~ /=/ );
+        my @q = qw(
+          if or ||
+        );
+        @is_if_or{@q} = (1) x scalar(@q);
 
-   # A marginal match is a match which has different patterns. Normally, we
-   # should not allow exactly two lines to match if marginal. But we will modify
-   # this rule for two lines with a leading equals-like operator such that we
-   # match if the patterns to the left of the equals are the same. So for
-   # example the following two lines are a marginal match but have the same
-   # left side patterns, so we will align the equals.
-   #     my $orig = my $format = "^<<<<< ~~\n";
-   #     my $abc  = "abc";
-   # But these have a different left pattern so they will not be aligned
-   #     $xmldoc .= $`;
-   #     $self->{'leftovers'} .= "<bx-seq:seq" . $';
-    my $is_marginal = $marginal_match;
-    if ( $leading_equals && $is_marginal ) {
-        my $rpatterns0 = $group_lines[0]->get_rpatterns();
-        my $rpatterns1 = $group_lines[1]->get_rpatterns();
-        my $pat0       = $rpatterns0->[0];
-        my $pat1       = $rpatterns1->[0];
-        $is_marginal = $pat0 ne $pat1;
+        @q = qw(
+          = **= += *= &= <<= &&=
+          -= /= |= >>= ||= //=
+          .= %= ^=
+          x=
+        );
+        @is_assignment{@q} = (1) x scalar(@q);
     }
 
-    my $do_not_align = (
+    sub decide_if_aligned_pair {
+
+        # Do not try to align two lines which are not really similar
+        return unless ( @group_lines == 2 );
+        return if ($is_matching_terminal_line);
 
         # always align lists
-        !$group_list_type
+        my $group_list_type = $group_lines[0]->get_list_type();
+        return 0 if ($group_list_type);
 
-          && (
+        my $jmax0          = $group_lines[0]->get_jmax();
+        my $jmax1          = $group_lines[1]->get_jmax();
+        my $rtokens        = $group_lines[0]->get_rtokens();
+        my $leading_equals = ( $rtokens->[0] =~ /=/ );
 
-            # don't align if it was just a marginal match
-            $is_marginal    ##$marginal_match
+        # scan the tokens on the second line
+        my $rtokens1 = $group_lines[1]->get_rtokens();
+        my $saw_if_or;    # if we saw an 'if' or 'or' at group level
+        my $raw_tokb = "";    # first token seen at group level
+        for ( my $j = 0 ; $j < $jmax1 - 1 ; $j++ ) {
+            my ( $raw_tok, $lev, $tag, $tok_count ) =
+              decode_alignment_token( $rtokens1->[$j] );
+            if ( $raw_tok && $lev == $group_level ) {
+                if ( !$raw_tokb ) { $raw_tokb = $raw_tok }
+                $saw_if_or ||= $is_if_or{$raw_tok};
+            }
+        }
 
-            # don't align two lines with big gap
-            # NOTE: I am not sure if this test is actually functional any longer
-            || $group_maximum_gap > 12
+        # A marginal match is a match which has different patterns. Normally,
+        # we should not allow exactly two lines to match if marginal. But
+        # we can allow matching in some specific cases.
+        my $is_marginal = $marginal_match;
 
-            # or lines with differing number of alignment tokens
-            || ( $previous_maximum_jmax_seen != $previous_minimum_jmax_seen
-                && !$leading_equals )
-          )
-    );
+        # lines with differing number of alignment tokens are marginal
+        $is_marginal ||=
+          $previous_maximum_jmax_seen != $previous_minimum_jmax_seen
+          && !$is_assignment{$raw_tokb};
 
-    # But try to convert them into a simple comment group if the first line
-    # a has side comment
-    my $rfields             = $group_lines[0]->get_rfields();
-    my $maximum_field_index = $group_lines[0]->get_jmax();
-    if ( $do_not_align
-        && ( length( $rfields->[$maximum_field_index] ) > 0 ) )
-    {
-        combine_fields();
-        $do_not_align = 0;
+        # We will use the line endings to help decide on alignments...
+        # See if the lines end with semicolons...
+        my $rpatterns0 = $group_lines[0]->get_rpatterns();
+        my $rpatterns1 = $group_lines[1]->get_rpatterns();
+        my $sc_term0;
+        my $sc_term1;
+        if ( $jmax0 < 1 || $jmax1 < 1 ) {
+
+            # shouldn't happen
+        }
+        else {
+            my $pat0 = $rpatterns0->[ $jmax0 - 1 ];
+            my $pat1 = $rpatterns1->[ $jmax1 - 1 ];
+            $sc_term0 = $pat0 =~ /;b?$/;
+            $sc_term1 = $pat1 =~ /;b?$/;
+        }
+
+        if ( !$is_marginal && !$sc_term0 ) {
+
+            # First line of assignment should be semicolon terminated.
+            # For example, do not align here:
+            #  $$href{-NUM_TEXT_FILES} = $$href{-NUM_BINARY_FILES} =
+            #    $$href{-NUM_DIRS} = 0;
+            if ( $is_assignment{$raw_tokb} ) {
+                $is_marginal = 1;
+            }
+        }
+
+        # Try to avoid some undesirable alignments of opening tokens
+        # for example, the space between grep and { here:
+        #  return map { ( $_ => $_ ) }
+        #    grep     { /$handles/ } $self->_get_delegate_method_list;
+        $is_marginal ||=
+             ( $raw_tokb eq '(' || $raw_tokb eq '{' )
+          && $jmax1 == 2
+          && $sc_term0 ne $sc_term1;
+
+        # Undo the marginal match flag in certain cases,
+        if ($is_marginal) {
+
+            # Two lines with a leading equals-like operator are allowed to
+            # align if the patterns to the left of the equals are the same.
+            # For example the following two lines are a marginal match but have
+            # the same left side patterns, so we will align the equals.
+            #     my $orig = my $format = "^<<<<< ~~\n";
+            #     my $abc  = "abc";
+            # But these have a different left pattern so they will not be
+            # aligned
+            #     $xmldoc .= $`;
+            #     $self->{'leftovers'} .= "<bx-seq:seq" . $';
+
+            # First line semicolon terminated but second not, usually ok:
+            #               my $want = "'ab', 'a', 'b'";
+            #               my $got  = join( ", ",
+            #                    map { defined($_) ? "'$_'" : "undef" }
+            #                          @got );
+            #  First line not semicolon terminated, Not OK to match:
+            #   $$href{-NUM_TEXT_FILES} = $$href{-NUM_BINARY_FILES} =
+            #      $$href{-NUM_DIRS} = 0;
+            my $pat0 = $rpatterns0->[0];
+            my $pat1 = $rpatterns1->[0];
+
+            ##########################################################
+            # Turn off the marginal flag for some types of assignments
+            ##########################################################
+            if ( $is_assignment{$raw_tokb} ) {
+
+                # undo marginal flag if first line is semicolon terminated
+                # and leading patters match
+                if ($sc_term0) {    # && $sc_term1) {
+                    $is_marginal = $pat0 ne $pat1;
+                }
+            }
+            elsif ( $raw_tokb eq '=>' ) {
+
+                # undo marginal flag if patterns match
+                $is_marginal = $pat0 ne $pat1;
+            }
+            elsif ( $raw_tokb eq '=~' ) {
+
+                # undo marginal flag if both lines are semicolon terminated
+                # and leading patters match
+                if ( $sc_term1 && $sc_term0 ) {
+                    $is_marginal = $pat0 ne $pat1;
+                }
+            }
+
+            ######################################################
+            # Turn off the marginal flag if we saw an 'if' or 'or'
+            ######################################################
+
+            # A trailing 'if' and 'or' often gives a good alignment
+            # For example, we can align these:
+            #  return -1     if $_[0] =~ m/^CHAPT|APPENDIX/;
+            #  return $1 + 0 if $_[0] =~ m/^SECT(\d*)$/;
+
+            # or
+            #  $d_in_m[2] = 29          if ( &Date_LeapYear($y) );
+            #  $d         = $d_in_m[$m] if ( $d > $d_in_m[$m] );
+
+            if ($saw_if_or) {
+
+                # undo marginal flag if both lines are semicolon terminated
+                if ( $sc_term0 && $sc_term1 ) {
+                    $is_marginal = 0;
+                }
+            }
+        }
+
+        ###############################
+        # Set the return flag:
+        # Don't align if still marginal
+        ###############################
+        my $do_not_align = $is_marginal;
+
+        # But try to convert them into a simple comment group if the first line
+        # a has side comment
+        my $rfields             = $group_lines[0]->get_rfields();
+        my $maximum_field_index = $group_lines[0]->get_jmax();
+        if ( $do_not_align
+            && ( length( $rfields->[$maximum_field_index] ) > 0 ) )
+        {
+            combine_fields();
+            $do_not_align = 0;
+        }
+        return $do_not_align;
     }
-    return $do_not_align;
 }
 
 sub adjust_side_comment {

@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Treemap::Marker::Colorbar;
 use Chart::Plotly::Trace::Treemap::Marker::Line;
 use Chart::Plotly::Trace::Treemap::Marker::Pad;
 
-our $VERSION = '0.033';    # VERSION
+our $VERSION = '0.034';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace treemap.
 
@@ -140,7 +140,7 @@ Chart::Plotly::Trace::Treemap::Marker - This attribute is one of the possible op
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 SYNOPSIS
 

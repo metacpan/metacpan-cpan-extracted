@@ -1,6 +1,6 @@
 package Email::Sender::Success::Partial;
 # ABSTRACT: a report of partial success when delivering
-$Email::Sender::Success::Partial::VERSION = '1.300033';
+$Email::Sender::Success::Partial::VERSION = '1.300034';
 use Moo;
 extends 'Email::Sender::Success';
 
@@ -37,7 +37,7 @@ Email::Sender::Success::Partial - a report of partial success when delivering
 
 =head1 VERSION
 
-version 1.300033
+version 1.300034
 
 =head1 DESCRIPTION
 

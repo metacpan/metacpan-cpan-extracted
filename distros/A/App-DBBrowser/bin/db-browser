@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.226';
+our $VERSION = '2.228';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.226
+Version 2.228
 
 =head1 SYNOPSIS
 
@@ -315,13 +315,17 @@ activated.
 
 =head3 Create Table
 
-Selecting I<Create Table> opens a sub-menu with these entries:
+Selecting I<Create Table> opens a sub-menu where one can choose the type of the data source.
 
 =over
 
+=item Prompt line
+
+Selecting the prompt line of this sub-menu allows one to set the parse settings described in L</Insert Data>.
+
 =item Plain
 
-Create a table.
+Insert the data cell by cell.
 
 =item Copy and Paste
 
@@ -336,9 +340,10 @@ Like I<Copy and Paste> with the difference that the data is read from a chosen f
 
 Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
 
-=back
+Selecting the prompt line of this sub-menu allows one to set different directory and file settings described in
+L</Insert Data>.
 
-Selecting the prompt line of this sub-menu allows one to set the options described in L</Insert Data>.
+=back
 
 =head3 Drop table
 
@@ -359,13 +364,17 @@ I<Delete>, I<Update> or I<Insert Into>  may not be available with C<JOIN> and C<
 
 =head3 Insert Into
 
-Three different ways to insert data into a table are available:
+Selecting I<Insert Into> opens a sub-menu where one can choose the type of the data source.
 
 =over
 
+=item Prompt line
+
+Selecting the prompt line of this sub-menu allows one to set the parse settings described in L</Insert Data>.
+
 =item Plain
 
-Insert data column by column.
+Insert the data cell by cell.
 
 =item Copy and Paste
 
@@ -378,6 +387,9 @@ The input filter L</Reparse> allows one to change the parse-settings.
 Read the input from am file.
 
 Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
+
+Selecting the prompt line of this sub-menu allows one to set different directory and file settings described in
+L</Insert Data>.
 
 =back
 

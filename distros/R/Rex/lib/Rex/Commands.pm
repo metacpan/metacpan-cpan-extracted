@@ -111,7 +111,7 @@ package Rex::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.0'; # VERSION
+our $VERSION = '1.7.1'; # VERSION
 
 require Rex::Exporter;
 use Rex::TaskList;

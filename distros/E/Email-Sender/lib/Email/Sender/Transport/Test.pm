@@ -1,6 +1,6 @@
 package Email::Sender::Transport::Test;
 # ABSTRACT: deliver mail in memory for testing
-$Email::Sender::Transport::Test::VERSION = '1.300033';
+$Email::Sender::Transport::Test::VERSION = '1.300034';
 use Moo;
 
 use Email::Sender::Failure::Multi;
@@ -141,7 +141,7 @@ Email::Sender::Transport::Test - deliver mail in memory for testing
 
 =head1 VERSION
 
-version 1.300033
+version 1.300034
 
 =head1 DESCRIPTION
 

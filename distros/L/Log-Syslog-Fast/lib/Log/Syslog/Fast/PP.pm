@@ -77,6 +77,10 @@ sub update_prefix {
         $self->[PREFIX] = sprintf "<%d>1 %s %s %s %d - - ",
             $self->[PRIORITY], $timestr, $self->[SENDER], $self->[NAME], $self->[PID];
     }
+    if ($self->[FORMAT] == LOG_RFC3164_LOCAL) {
+        $self->[PREFIX] = sprintf "<%d>%s %s[%d]: ",
+            $self->[PRIORITY], $timestr, $self->[NAME], $self->[PID];
+    }
 }
 
 sub set_receiver {

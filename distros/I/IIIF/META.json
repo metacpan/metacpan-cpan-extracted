@@ -58,19 +58,19 @@
    "provides" : {
       "IIIF" : {
          "file" : "lib/IIIF.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "IIIF::ImageAPI" : {
          "file" : "lib/IIIF/ImageAPI.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "IIIF::Magick" : {
          "file" : "lib/IIIF/Magick.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "IIIF::Request" : {
          "file" : "lib/IIIF/Request.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/nichtich/IIIF"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
       "Jakob Voß <jakob.voss@gbv.de>",
       "Mohammad S Anwar <Mohammad.Anwar@yahoo.com>"

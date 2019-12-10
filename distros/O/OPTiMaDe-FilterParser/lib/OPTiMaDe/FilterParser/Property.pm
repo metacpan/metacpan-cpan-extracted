@@ -3,28 +3,45 @@ package OPTiMaDe::FilterParser::Property;
 use strict;
 use warnings;
 
-sub new {
-    my( $class ) = @_;
-    return bless { name => [] }, $class;
-}
+use overload '@{}' => sub { return $_[0]->{name} },
+             '""'  => sub { return $_[0]->to_filter };
 
-sub push_identifier {
-    my( $self, $identifier ) = @_;
-    push @{$self->{name}}, $identifier;
+sub new {
+    my $class = shift;
+    return bless { name => \@_ }, $class;
 }
 
 sub to_filter
 {
     my( $self ) = @_;
-    return join '.', @{$self->{name}};
+    return join '.', @$self;
 }
 
 sub to_SQL
 {
-    my( $self, $delim ) = @_;
+    my( $self, $options ) = @_;
+    $options = {} unless $options;
+    my( $delim, $placeholder ) = (
+        $options->{delim},
+        $options->{placeholder},
+    );
     $delim = "'" unless $delim;
 
-    return join '.', map { "${delim}$_${delim}" } @{$self->{name}};
+    my $sql = join '.', map { "${delim}$_${delim}" } @$self;
+
+    if( wantarray ) {
+        return ( $sql, [] );
+    } else {
+        return $sql;
+    }
+}
+
+sub modify
+{
+    my $self = shift;
+    my $code = shift;
+
+    return $code->( $self, @_ );
 }
 
 1;

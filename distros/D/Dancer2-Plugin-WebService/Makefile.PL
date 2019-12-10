@@ -16,10 +16,10 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Dancer2::Plugin::WebService",
   "PREREQ_PM" => {
+    "Cpanel::JSON::XS" => 0,
     "Dancer2" => 0,
     "Dancer2::Plugin" => 0,
     "Data::Dumper" => 0,
-    "JSON::XS" => 0,
     "Moo" => 0,
     "Plack" => 0,
     "Plack::Middleware::Deflater" => 0,
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "XML::Hash::XS" => 0,
     "YAML::Syck" => 0
   },
-  "VERSION" => "4.2.9",
+  "VERSION" => "4.3.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,10 +36,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Cpanel::JSON::XS" => 0,
   "Dancer2" => 0,
   "Dancer2::Plugin" => 0,
   "Data::Dumper" => 0,
-  "JSON::XS" => 0,
   "Moo" => 0,
   "Plack" => 0,
   "Plack::Middleware::Deflater" => 0,

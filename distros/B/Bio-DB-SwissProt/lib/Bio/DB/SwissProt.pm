@@ -108,7 +108,7 @@ methods. Internal methods are usually preceded with a _
 # Let the code begin...
 
 package Bio::DB::SwissProt;
-$Bio::DB::SwissProt::VERSION = '1.7.3';
+$Bio::DB::SwissProt::VERSION = '1.7.4';
 use strict;
 
 use HTTP::Request::Common;

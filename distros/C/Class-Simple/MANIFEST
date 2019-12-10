@@ -14,7 +14,9 @@ t/pod.t
 t/private1.t
 t/private2.t
 t/private3.t
-t/separate_vars.t
 t/storable.t
+t/uninit1.t
+t/uninit2.t
 lib/Class/Simple.pm
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

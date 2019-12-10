@@ -2,7 +2,7 @@ package Data::Processor;
 
 use strict;
 use 5.010_001;
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.4';
 
 use Carp;
 use Scalar::Util qw(blessed);
@@ -232,6 +232,11 @@ sub validate_schema {
                     validator => sub {
                         ref shift eq 'CODE' ? undef : 'expected a callback'
                     }
+                },
+                'x-.+' => {
+                    optional => 1,
+                    regex => 1,
+                    description => 'metadata'
                 }
             }
         }
@@ -327,6 +332,16 @@ sub merge_schema {
     $mergeSubSchema->($mergeNode, $schema);
 
     return $self->validate_schema;
+}
+
+=head2 schema
+
+Returns the schema. Useful after schema merging.
+
+=cut
+
+sub schema{
+    return shift->{schema};
 }
 
 =head2 transform_data

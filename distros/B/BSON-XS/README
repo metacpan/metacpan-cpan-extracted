@@ -2,7 +2,7 @@ NAME
     BSON::XS - XS implementation of MongoDB's BSON serialization
 
 VERSION
-    version v0.8.1
+    version v0.8.2
 
 END OF LIFE NOTICE
     Version v0.8.0 is the final feature release of the MongoDB BSON::XS

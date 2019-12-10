@@ -1,10 +1,10 @@
 use strict;
-use Test::More tests => 27;
+use HTTP::Tiny;
+use Test::More;
 use Test::Exception;
 use Test::Warn;
 use Data::Dumper;
 use List::Util qw(first);
-use Test::LWP::Recorder;
 
 use utf8; # this file is written in utf8
 binmode STDOUT, ':encoding(UTF-8)';
@@ -25,49 +25,53 @@ my $logging_callback = sub {
   note $message;
 };
 
-
-## Instead of live HTTP requests we recorded the responses. To re-record
-## them set these two variables, e.g.
-## PERLLIB=./lib W3W_RECORD_REQUESTS=1 W3W_API_KEY=<your key> perl t/base.t
+## to run tests with an W3W API key
+## PERLLIB=./lib W3W_API_KEY=<your key> perl t/base.t
 ##
-my $w3w_record = $ENV{W3W_RECORD_REQUESTS} ? 1 : 0;
 my $api_key    = $ENV{W3W_API_KEY} || 'randomteststring';
-
-my $ua = Test::LWP::Recorder->new({
-    record => $w3w_record,
-    cache_dir => 't/LWPCache',
-    filter_params => [qw(key)],
-    filter_header => [qw(Client-Peer Expires Client-Date Cache-Control)],
-});
+my $ua = HTTP::Tiny->new();
 
 use Geo::What3Words;
-
-
 
 ## Missing API key
 ##
 dies_ok {
-  Geo::What3Words->new( logging => $logging_callback);
-} 'missing key';
+  Geo::What3Words->new( logging => $logging_callback );
+} 'dies when missing key';
+
+## These methods don't access the HTTP API
+##
+{
+  my $w3w = Geo::What3Words->new( key => $api_key, ua => $ua, logging => $logging_callback );    
+  is( $w3w->valid_words_format('abc.def.ghi'),     1, 'valid_words_format - valid' );
+  is( $w3w->valid_words_format('abcdef.ghi'),      0, 'valid_words_format - only two' );
+  is( $w3w->valid_words_format('abc.def.ghi.jkl'), 0, 'valid_words_format - too many' );
+  is( $w3w->valid_words_format('Abc.def.ghi'),     0, 'valid_words_format - not all lowercase' );
+  is( $w3w->valid_words_format(''),                0, 'valid_words_format - empty' );
+  is( $w3w->valid_words_format(),                  0, 'valid_words_format - undef' );
+
+  is( $w3w->valid_words_format('meyal.şifalı.döşeme'),   1, 'valid_words_format - valid Turkish utf8' );
+  is( $w3w->valid_words_format('диета.новшество.компаньон'),   1, 'valid_words_format - valid Russian utf8' );
+  is( $w3w->valid_words_format('Mосква.def.ghi'),  0, 'valid_words_format - not all lowercase utf8' );
+}
+
 
 ## Invalid API key
 ##
 warning_like {
   my $w3w = Geo::What3Words->new( key => 'rubbish-key', ua => $ua, logging => $logging_callback );
   is( $w3w->pos2words('1,2'), undef, 'invalid key');
-} qr/Unauthorized/, 'got warning';
-
-
-
+} qr/401/, 'got 401 warning';
 
 
 my $w3w = Geo::What3Words->new( key => $api_key, ua => $ua, logging => $logging_callback );
 isa_ok($w3w, 'Geo::What3Words');
 
-
-
-
-
+if ($api_key eq 'randomteststring') {
+    note "Set W3W_API_KEY environment variable to run rest of tests";
+    done_testing();
+    exit;
+}
 
 
 ##
@@ -99,8 +103,6 @@ my $three_words_string_russian;
 
 {
   my $res = $w3w->position_to_words($lat . ',' . $lng);
-
-
 
   is($res->{language}, 'en', 'words_to_position - language');
   is_deeply(
@@ -162,20 +164,5 @@ my $three_words_string_russian;
 }
 
 
-
-## These methods don't access the HTTP API
-##
-{
-  is( $w3w->valid_words_format('abc.def.ghi'),     1, 'valid_words_format - valid' );
-  is( $w3w->valid_words_format('abcdef.ghi'),      0, 'valid_words_format - only two' );
-  is( $w3w->valid_words_format('abc.def.ghi.jkl'), 0, 'valid_words_format - too many' );
-  is( $w3w->valid_words_format('Abc.def.ghi'),     0, 'valid_words_format - not all lowercase' );
-  is( $w3w->valid_words_format(''),                0, 'valid_words_format - empty' );
-  is( $w3w->valid_words_format(),                  0, 'valid_words_format - undef' );
-
-  is( $w3w->valid_words_format('meyal.şifalı.döşeme'),   1, 'valid_words_format - valid Turkish utf8' );
-  is( $w3w->valid_words_format('диета.новшество.компаньон'),   1, 'valid_words_format - valid Russian utf8' );
-  is( $w3w->valid_words_format('Mосква.def.ghi'),  0, 'valid_words_format - not all lowercase utf8' );
-}
-
-
+done_testing();
+1;

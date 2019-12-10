@@ -25,16 +25,16 @@ Test2::Aggregate - Aggregate tests
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 
 =head1 DESCRIPTION
 
-Aggregates all tests specified in C<dirs> (which can even be individual tests), 
+Aggregates all tests specified with C<dirs> (which can even be individual tests)
 to avoid forking, reloading etc that can help with performance (dramatically if
 you have numerous small tests) and also facilitate group profiling.
 Test files are expected to end in B<.t> and are run as subtests of a single
@@ -46,8 +46,8 @@ tools like Test2). It does not even try to package each test by default, which m
 be good or bad (e.g. redefines), depending on your requirements.
 
 Generally, the way to use this module is to try to aggregate sets of quick tests
-(e.g. unit tests). Try to iterativelly add tests to the aggregator dropping those
-that do not work.
+(e.g. unit tests). Try to iterativelly add tests to the aggregator, dropping those
+that do not work. 
 
 =head1 METHODS
  
@@ -56,12 +56,14 @@ that do not work.
     my $stats = Test2::Aggregate::run_tests(
         dirs          => \@dirs,              # optional if lists defined
         lists         => \@lists,             # optional if dirs defined
+        excludes      => \@exclude_regexes,   # optional
         root          => '/testroot/',        # optional
         load_modules  => \@modules,           # optional
         package       => 0,                   # optional
         shuffle       => 0,                   # optional
         sort          => 0,                   # optional
         reverse       => 0,                   # optional
+        unique        => 1,                   # optional
         repeat        => 1,                   # optional, requires Test2::Plugin::BailOnFail for < 0
         slow          => 0,                   # optional
         override      => \%override,          # optional, requires Sub::Override
@@ -97,6 +99,10 @@ true) will be processed and tests run in order specified.
 Arrayref of flat files from which each line will be pushed to C<dirs>
 (so they have a lower precedence - note C<root> still applies).
 
+=item * C<excludes> (optional)
+
+Arrayref of strings with regex patterns to filter out tests that you want excluded.
+
 =item * C<root> (optional)
 
 If defined, must be a valid root directory that will prefix all C<dirs> and
@@ -110,7 +116,9 @@ test. Useful for testing modules with special namespace requirements.
 
 =item * C<package> (optional)
 
-Will package each test in its own namespace (no redefine warnings etc).
+Will package each test in its own namespace. While it will help avoid things like
+redefine warnings, it may break some tests when aggregating them, so it is disabled
+by default.
 
 =item * C<override> (optional)
 
@@ -121,6 +129,12 @@ Pass C<Sub::Override> key/values as a hashref.
 Number of times to repeat the test(s) (default is 1 for a single run). If
 C<repeat> is negative, the tests will repeat until they fail (or produce a
 warning if C<test_warnings> is also set).
+
+=item * C<unique> (optional)
+
+From v0.11, duplicate tests are by default removed from the running list as that
+could mess up the stats output. You can still define it as false to allow duplicate
+tests in the list.
 
 =item * C<shuffle> (optional)
 
@@ -149,21 +163,27 @@ they are generated (for debugging etc), then leave this option disabled.
 
 =item * C<stats_output_path> (optional)
 
-C<stats_output_path> when defined specifies a path where a file with running
-time per test (average if multiple iterations are specified), starting with the
-slowest test and passing percentage gets written. On negative C<repeat> the
-stats of each successful run will be written separately instead of the averages.
+C<stats_output_path> specifies a path where a file will be created to print out
+running time per test (average if multiple iterations) and passing percentage.
+Output is sorted from slowest test to fastest. On negative C<repeat> the stats
+of each successful run will be written separately instead of the averages.
 The name of the file is C<caller_script-YYYYMMDDTHHmmss.txt>.
-If C<-> is passed instead of a path, then STDOUT will be used instead.
+If C<-> is passed instead of a path, then the output will be written to STDOUT.
 The timing stats are useful because the test harness doesn't normally measure
-time per subtest.
+time per subtest (remember, your individual aggregated tests become subtests).
 
 =item * C<extend_stats> (optional)
 
-This option is to allow for the default output of C<stats_output_path> to be
-fixed/reliable and anything added in future versions will only be written when
-C<extend_stats> is enabled.
-Currently starting date/time in ISO_8601 is added when the extend option is set.
+This option is to make the default output of C<stats_output_path> be fixed, but
+still allow additions in future versions that will only be written with the
+C<extend_stats> option enabled.
+Additions with C<extend_stats> as of current version:
+
+=over 4
+
+- starting date/time in ISO_8601.
+
+=back
 
 =back
 
@@ -199,19 +219,14 @@ sub run_tests {
             if @dirs;
     }
 
-    @tests = reverse @tests if $args{reverse};
+    $args{unique} = 1 unless defined $args{unique};
+    $args{repeat} ||= 1;
 
-    if ($args{shuffle}) {
-        require List::Util;
-        @tests = List::Util::shuffle @tests;
-    } elsif ($args{sort}) {
-        @tests = sort @tests;
-    }
+    _process_run_order(\@tests, \%args);
 
     my @stack = caller();
     $args{caller} = $stack[1] || 'aggregate';
     $args{caller} =~ s#^.*?([^/]+)$#$1#;
-    $args{repeat} ||= 1;
 
     my $warnings = [];
     if ($args{repeat} < 0) {
@@ -249,6 +264,25 @@ sub run_tests {
     return $args{stats};
 }
 
+sub _process_run_order {
+    my $tests = shift;
+    my $args  = shift;
+
+    foreach my $regex (@{$args->{excludes}}) {
+        @$tests = grep(!/$regex/, @$tests);
+    }
+
+    @$tests = _uniq(@$tests)  if $args->{unique};
+    @$tests = reverse @$tests if $args->{reverse};
+
+    if ($args->{shuffle}) {
+        require List::Util;
+        @$tests = List::Util::shuffle @$tests;
+    } elsif ($args->{sort}) {
+        @$tests = sort @$tests;
+    }
+}
+
 sub _process_warnings {
     my $warnings = shift;
     my $args     = shift;
@@ -271,19 +305,18 @@ sub _run_tests {
 
     my $repeat = $args->{repeat};
     $repeat = 1 if $repeat < 0;
-    my %stats;
+    my (%stats, $start);
 
     require Time::HiRes if $args->{stats_output};
 
     for my $i (1 .. $repeat) {
         my $iter = $repeat > 1 ? "Iter: $i/$repeat - " : '';
-        my $count = 0;
+        my $count = 1;
         foreach my $test (@$tests) {
-            my $start;
 
             warn "$test->Test2::Aggregate\n" if $args->{test_warnings};
 
-            $stats{$test}{test_no}=++$count;
+            $stats{$test}{test_no} = $count unless $stats{$test}{test_no};
             $start = Time::HiRes::time() if $args->{stats_output};
             $stats{$test}{timestamp} = _timestamp();
 
@@ -298,6 +331,7 @@ sub _run_tests {
             $stats{$test}{time} += (Time::HiRes::time() - $start)/$repeat
                 if $args->{stats_output};
             $stats{$test}{pass_perc} += $result ? 100/$repeat : 0;
+            $count++;
         }
     }
 
@@ -350,6 +384,11 @@ sub _print_stats {
     close $fh unless $args->{stats_output} =~ /^-$/;
 }
 
+sub _uniq {
+    my %seen;
+    grep !$seen{$_}++, @_;
+}
+
 sub _timestamp {
     my ($s, $m, $h, $D, $M, $Y) = localtime(time);
     return sprintf "%04d%02d%02dT%02d%02d%02d", $Y+1900, $M+1, $D, $h, $m, $s;
@@ -369,9 +408,10 @@ returns in a script that tries to add more tests automatically to an aggregate l
 to see which added tests passed and keep them, dropping failures.
 
 The environment variable C<AGGREGATE_TESTS> will be set while the tests are running
-for your convenience. Example usage is a module that can only be loaded once, so
-you load it on the aggregated test file and then use something like this in the
-individual test files:
+for your convenience. Example usage is making a test you know cannot run under the
+aggregator check and croak if it was run under it, or a module that can only be loaded
+once, so you load it on the aggregated test file and then use something like this in
+the individual test files:
 
  eval 'use My::Module' unless $ENV{AGGREGATE_TESTS};
 

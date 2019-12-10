@@ -1,5 +1,9 @@
 Revision history for Perl module Perl5::Build::Warnings
 
+0.04 Thu Dec  5 17:42:24 EST 2019
+    - Correct spelling errors in documentation
+    - Regenerate README.md with '-t markdown_github'
+
 0.03 Wed Oct 31 18:12:20 EDT 2018
     - Add ability to handle gzip-compressed input files.
     - Add methods get_warnings_for_group() and

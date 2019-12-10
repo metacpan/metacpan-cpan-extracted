@@ -4,16 +4,11 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use Data::RecordStore;
 use Data::RecordStore::Converter;
-use File::Copy;
-use File::Path qw( make_path );
 
-die "$0 : requires Data::RecordStore version of at least 5" unless $Data::RecordStore::VERSION >= 5;
-
-my( $source_dir, $dest_dir, $working_dir ) = @ARGV;
+my( $source_dir, $dest_dir ) = @ARGV;
 eval {
-    Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
+    Data::RecordStore::Converter->convert( $source_dir, $dest_dir );
 };
 if( $@ ) {
     print STDERR "$0 : $@\n";

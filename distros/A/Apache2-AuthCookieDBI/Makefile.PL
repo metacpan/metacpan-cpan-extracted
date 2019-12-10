@@ -2,25 +2,25 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'INSTALLDIRS' => 'site',
+  'NAME' => 'Apache2::AuthCookieDBI',
+  'PL_FILES' => {},
   'PREREQ_PM' => {
-                   'Crypt::CBC' => '2.13',
-                   'Apache2::AuthCookie' => '3.08',
-                   'FindBin' => 0,
-                   'Apache2::Const' => 0,
                    'DBI' => '1.4',
-                   'Digest::MD5' => 0,
                    'Digest::SHA' => '5.47',
-                   'Date::Calc' => 0,
-                   'mod_perl2' => '1.999022',
                    'Test::More' => '0.4',
+                   'Apache2::AuthCookie' => '3.08',
+                   'Apache2::RequestRec' => 0,
+                   'Digest::MD5' => 0,
+                   'FindBin' => 0,
+                   'Crypt::CBC' => '2.13',
+                   'mod_perl2' => '1.999022',
                    'Apache2::ServerUtil' => 0,
                    'Carp' => 0,
-                   'Apache2::RequestRec' => 0
+                   'Date::Calc' => 0,
+                   'Apache2::Const' => 0
                  },
-  'INSTALLDIRS' => 'site',
-  'EXE_FILES' => [],
   'VERSION_FROM' => 'lib/Apache2/AuthCookieDBI.pm',
-  'PL_FILES' => {},
-  'NAME' => 'Apache2::AuthCookieDBI'
+  'EXE_FILES' => []
 )
 ;

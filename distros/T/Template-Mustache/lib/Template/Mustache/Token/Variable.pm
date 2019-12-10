@@ -1,13 +1,14 @@
 package Template::Mustache::Token::Variable;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Object representing a Variable block
-$Template::Mustache::Token::Variable::VERSION = '1.3.2';
+$Template::Mustache::Token::Variable::VERSION = '1.3.3';
 use Escape::Houdini qw/ escape_html /;
 use Scalar::Util qw/ looks_like_number /;
+use Math::BigFloat;
 
 use Moo;
 
-use MooseX::MungeHas { 
+use MooseX::MungeHas {
     has_ro => [ 'is_ro' ] ,
     has_rw => [ 'is_rw' ] ,
 };
@@ -23,7 +24,7 @@ has escape => (
 sub render {
     my( $self, $context,$partials, $indent ) = @_;
 
-    my $value = 
+    my $value =
         Template::Mustache::resolve_context( $self->name, $context ) // '';
 
     if( ref $value eq 'CODE' ) {
@@ -39,7 +40,7 @@ sub render {
 
     eval { $value = escape_html($value) } if $self->escape;
 
-    $value += 0 if looks_like_number($value);
+    $value = Math::BigFloat->new($value)->bstr if looks_like_number($value);
 
     return $value;
 }
@@ -58,7 +59,7 @@ Template::Mustache::Token::Variable - Object representing a Variable block
 
 =head1 VERSION
 
-version 1.3.2
+version 1.3.3
 
 =head1 AUTHORS
 

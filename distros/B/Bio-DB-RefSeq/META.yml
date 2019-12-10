@@ -3,12 +3,14 @@ abstract: 'Database object interface for RefSeq retrieval'
 author:
   - 'Heikki Lehvaslaiho <heikki@bioperl.org>'
 build_requires:
-  Bio::Root::Test: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
+  Test::Needs: '0'
+  Test::RequiresInternet: '0'
   perl: '5.006'
+  utf8: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -28,7 +30,7 @@ resources:
   bugtracker: https://github.com/bioperl/bio-db-refseq/issues
   homepage: https://metacpan.org/release/Bio-DB-RefSeq
   repository: git://github.com/bioperl/bio-db-refseq.git
-version: 1.7.3
+version: 1.7.4
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -201,7 +203,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: Bio-DB-RefSeq-v1.7.3
+          tag: Bio-DB-RefSeq-v1.7.4
           tag_format: '%N-v%v'
           tag_message: '%N-v%v'
         Dist::Zilla::Role::Git::Repo:

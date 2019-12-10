@@ -8,14 +8,15 @@ use Test::More;
 
 use File::Temp;
 use File::Slurper;
+use Time::HiRes;
 
 our $CRLF = "\x0d\x0a";
-our $HEAD = join(
+our $HEAD_START = join(
     $CRLF,
     'HTTP/1.0 200 OK',
     'X-test: Yay',
     'Content-type: text/plain',
-    q<>, q<>,
+    q<>
 );
 
 our $BIGGIE = ('x' x 512);
@@ -61,9 +62,30 @@ sub DESTROY {
 
     diag "Destroying server (PID $pid) …";
 
-    warn if !eval { kill 'TERM', $pid; 1 };
+    my $reaped;
 
-    waitpid $pid, 0;
+    my $SIG = 'QUIT';
+
+    while ( 1 ) {
+        if (1 == waitpid $pid, 1) {
+            diag "Reaped";
+
+            $reaped = 1;
+            last;
+        }
+
+        last if !CORE::kill $SIG, $pid;
+
+        Time::HiRes::sleep(0.1);
+    }
+
+    if (!$reaped) {
+        diag "Done sending SIG$SIG; waiting …";
+
+        waitpid $pid, 0;
+    }
+
+    diag "Finished waiting.";
 
     return;
 }
@@ -102,9 +124,13 @@ sub post_bind_hook {
 sub process_http_request {
     my $self = shift;
 
-    print $MyServer::HEAD;
-
     my $uri_path = $ENV{'PATH_INFO'};
+
+    local $| = 1;
+
+    print $MyServer::HEAD_START;
+    print "X-URI: $uri_path$CRLF";
+    print $CRLF;
 
     print( $uri_path eq '/biggie' ? $MyServer::BIGGIE : $uri_path );
 }

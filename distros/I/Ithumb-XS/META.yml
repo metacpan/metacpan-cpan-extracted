@@ -1,5 +1,5 @@
 ---
-abstract: 'image thumbnail creation routines'
+abstract: 'Image thumbnail creation routines'
 author:
   - 'Peter P. Neuromantic <p.brovchenko@protonmail.com>'
 build_requires:
@@ -20,5 +20,5 @@ no_index:
 requires:
   XSLoader: '0'
   perl: '5.024000'
-version: v0.3.0
+version: v0.4.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -188,7 +188,7 @@ sub _build_recaptcha ($self) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 161                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 196                  | Documentation::RequirePackageMatchesPodName - Pod NAME on line 200 does not match the package declaration      |
+## |    1 | 182                  | Documentation::RequirePackageMatchesPodName - Pod NAME on line 186 does not match the package declaration      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

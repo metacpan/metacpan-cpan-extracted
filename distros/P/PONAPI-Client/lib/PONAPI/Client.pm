@@ -1,7 +1,7 @@
 # ABSTRACT: Client to a {JSON:API} service (http://jsonapi.org/) v1.0
 package PONAPI::Client;
 
-our $VERSION = '0.002011';
+our $VERSION = '0.002012';
 
 use Moose;
 
@@ -151,8 +151,8 @@ sub _send_ponapi_request {
     my %args = @_;
 
     my @mt_header = (
-        ( $args{body} ? 'Content-Type' : 'Accept' ),
-        'application/vnd.api+json'
+        ( $args{body} ? ( 'Content-Type', 'application/vnd.api+json' ) : () ),
+        'Accept', 'application/vnd.api+json'
     );
 
     my ($status, $content, $failed, $e);
@@ -220,7 +220,7 @@ PONAPI::Client - Client to a {JSON:API} service (http://jsonapi.org/) v1.0
 
 =head1 VERSION
 
-version 0.002011
+version 0.002012
 
 =head1 SYNOPSIS
 

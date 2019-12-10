@@ -1,6 +1,6 @@
 package Email::Sender::Failure;
 # ABSTRACT: a report of failure from an email sending transport
-$Email::Sender::Failure::VERSION = '1.300033';
+$Email::Sender::Failure::VERSION = '1.300034';
 use Moo;
 extends 'Throwable::Error';
 
@@ -96,7 +96,7 @@ Email::Sender::Failure - a report of failure from an email sending transport
 
 =head1 VERSION
 
-version 1.300033
+version 1.300034
 
 =head1 ATTRIBUTES
 

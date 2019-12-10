@@ -1,6 +1,13 @@
 CHANGES
 -------
 
+  2.093 7 December 2019
+
+      * Lzma.xs -- add allocator to lzma_properties_decode
+        Fixes chach on Windows.
+        Issue https://github.com/pmqs/Compress-Raw-Lzma/issues/2
+        155b1730163301f59260316b2c011ec41ff4e378
+
   2.092 1 December 2019
 
       * use lzma_llocator

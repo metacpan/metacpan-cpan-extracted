@@ -93,7 +93,7 @@ methods. Internal methods are usually preceded with a _
 # Let the code begin...
 
 package Bio::DB::GenPept;
-$Bio::DB::GenPept::VERSION = '1.7.5';
+$Bio::DB::GenPept::VERSION = '1.7.6';
 use strict;
 use vars qw($DEFAULTFORMAT $DEFAULTMODE %PARAMSTRING);
 

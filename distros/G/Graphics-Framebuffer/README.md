@@ -10,6 +10,8 @@ Sometimes you can force a VESA framebuffer console driver to be loaded by adding
 
 ### ATTENTION CPAN TESTERS!  Please make sure the above is noted before testing (and marking a fail)
 
+If you want a more detailed instruction then this document, then read "INSTALL".
+
 I highly recommend you install the system (or package) version of the "Imager" library, as it is already pre-compiled with all the needed C libraries for it to work with this module.  In Yum (RedHat) and Aptitude (Debian/Ubuntu) this module is called "libimager-perl" (or "perl-libImager").  However, if you desire to install it yourself, please do it manually, and not via CPAN.  When you do it manually, you can see the missing C libraries it is looking for in the "Makefile.PL" process and stop it there.  You can then install these libraries until it no longer says something is missing.  You see, it just turns off functionality if it can't find a library (when installing from CPAN), instead of stopping.  Libraries usually missing are those for GIF, JPEG, PNG, TrueType and FreeType fonts.  These are necessary not optional, if you wish to be able to work with fonts and images.
 
 The "build-essential" tools need to be installed. This is generally a C compiler, linker, and standard C libraries (usually gcc variety).  The module "Inline::C", which this module uses, requires it.  Also, the package "kernel-headers".
@@ -25,15 +27,13 @@ To make your system ready for this module, then please install the following:
 ### DEBIAN BASED SYSTEMS (Ubuntu, Mint, Raspian, etc):
 
 ```bash
-sudo apt update`
-sudo apt install build-essential libimager-perl libinline-c-perl libmath-gradient-perl libmath-bezier-perl libfile-map-perl libtest-most-perl libsys-cpu-perl fonts-wine
+installation/install-prerequisites-debian.sh
 ```
 
 ### REDHAT BASED SYSTEMS (Fedora, CentOS, etc):
 
 ```bash
-sudo yum update
-sudo yum upgrade build-essential perl-math-gradient perl-math-bezier perl-file-map perl-imager perl-inline-c perl-sys-cpu perl-test-most
+installation/install-prerequisites-redhat.sh
 ```
 
 ## Continuing...

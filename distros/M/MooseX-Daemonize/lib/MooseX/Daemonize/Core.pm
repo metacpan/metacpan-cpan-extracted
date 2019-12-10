@@ -3,7 +3,7 @@ use warnings;
 package MooseX::Daemonize::Core;
 # ABSTRACT: A Role with the core daemonization features
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use MooseX::Getopt; # to load the NoGetopt metaclass
 use Moose::Role;
@@ -76,8 +76,8 @@ sub daemon_detach {
     $self->_get_options( %options );
     # now we are in the daemon ...
 
-    (POSIX::setsid)  # set session id
-        || confess "Cannot detach from controlling process";
+    POSIX::setsid == -1  # set session id
+        and confess "Cannot detach from controlling process";
 
     unless ( $self->no_double_fork ) {
         $SIG{'HUP'} = 'IGNORE';
@@ -154,7 +154,7 @@ MooseX::Daemonize::Core - A Role with the core daemonization features
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -370,10 +370,6 @@ This code is based B<HEAVILY> on L<Proc::Daemon>, we originally
 depended on it, but we needed some more flexibility, so instead
 we just stole the code.
 
-=head1 COPYRIGHT AND LICENCE
-
-Portions heavily borrowed from L<Proc::Daemon> which is copyright Earl Hood.
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Daemonize>
@@ -405,5 +401,7 @@ This software is copyright (c) 2007 by Chris Prather.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+Portions heavily borrowed from L<Proc::Daemon> which is copyright Earl Hood.
 
 =cut

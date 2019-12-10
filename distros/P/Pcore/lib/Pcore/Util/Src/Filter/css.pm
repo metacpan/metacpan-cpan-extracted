@@ -1,22 +1,32 @@
 package Pcore::Util::Src::Filter::css;
 
 use Pcore -class, -res;
-use CSS::Packer qw[];
+use Pcore::Util::Src qw[:FILTER_STATUS];
 
 with qw[Pcore::Util::Src::Filter];
 
-my $PACKER = CSS::Packer->init;
-
 sub decompress ($self) {
-    $PACKER->minify( $self->{data}, { compress => 'pretty', indent => 4 } );
+    my $res = $self->filter_prettier('--parser=css');
 
-    return res 200;
+    return $res;
 }
 
 sub compress ($self) {
-    $PACKER->minify( $self->{data}, { compress => 'minify' } );
+    my $res = $self->filter_css_packer;
 
-    return res 200;
+    return $res;
+}
+
+sub filter_css_packer ($self) {
+    state $packer = do {
+        require CSS::Packer;
+
+        CSS::Packer->init;
+    };
+
+    $packer->minify( \$self->{data}, { compress => 'minify' } );
+
+    return $SRC_OK;
 }
 
 1;

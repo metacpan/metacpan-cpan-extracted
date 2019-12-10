@@ -10,6 +10,14 @@ use parent qw( X::Tiny::Base );
 
 #----------------------------------------------------------------------
 
+package t::X::CannotSpew;
+
+use parent qw( X::Tiny::Base );
+
+sub to_string { die 'nonono' }
+
+#----------------------------------------------------------------------
+
 package t::basic;
 
 sub get_spewage {
@@ -21,7 +29,7 @@ sub get_spewage {
 package t::main;
 
 use Test::More;
-plan tests => 6;
+plan tests => 7;
 
 like(
     t::basic::get_spewage(),
@@ -34,6 +42,9 @@ is(
     'Bad!',
     'get_message()',
 );
+
+my $nospew = t::X->create('CannotSpew');
+ok( !!$nospew, 'boolean evaluation doesn’t require a spew' );
 
 SKIP: {
     if ( $^V le v5.8.9 ) {

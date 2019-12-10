@@ -61,8 +61,10 @@ qr{
                                         ( $MATCH ne lc($MATCH) )  })>
     <rule: raw_content> 
 #                .*?
-                        (?:(?!^<spaces=hs>?=\w+).)*   # match everythig, except
+                        (?:(?!^=\w+).)*   # match everythig, except
                                                       # it looks like directive
+#                        (?:(?!^<spaces=hs>?=\w+).)*   # match everythig, except
+#                                                      # it looks like directive
                     (?{ $MATCH{type} = "raw"})
 
     <rule: block_content> 

@@ -5,6 +5,7 @@
 
 #define LOG_RFC3164 0
 #define LOG_RFC5424 1
+#define LOG_RFC3164_LOCAL 2
 
 typedef struct {
 
@@ -13,7 +14,7 @@ typedef struct {
     char*  sender;              /* sender hostname */
     char*  name;                /* sending program name */
     int    pid;                 /* sending program pid */
-    int    format;              /* RFC3164 or RFC5424 */
+    int    format;              /* RFC3164 or RFC5424 or RFC3164_LOCAL */
 
     /* resource handles */
     int    sock;                /* socket fd */

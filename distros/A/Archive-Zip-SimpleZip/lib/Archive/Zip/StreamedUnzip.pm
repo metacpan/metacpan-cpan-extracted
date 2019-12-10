@@ -10,9 +10,9 @@ use IO::File;
 use Carp;
 use Scalar::Util ();
 
-use IO::Compress::Base::Common  2.091 qw(:Status);
-use IO::Compress::Zip::Constants 2.091 ;
-use IO::Uncompress::Unzip 2.091 ;
+use IO::Compress::Base::Common  2.093 qw(:Status);
+use IO::Compress::Zip::Constants 2.093 ;
+use IO::Uncompress::Unzip 2.093 ;
 
 
 require Exporter ;
@@ -639,7 +639,7 @@ prints matching strings.
 =head2 Nested Zip
 
 Here is a script that will list the contents of a zip file along with any zip files that are embedded in it.
-In fact it will work with any level of nexting.
+In fact it will work with any level of nesting.
 
     sub walk
     {

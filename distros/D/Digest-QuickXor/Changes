@@ -1,0 +1,11 @@
+Revision history for perl distribution Digest-Quickxor
+
+0.03 2019-12-06T18:51:43+0100
+ - Function quickxorhash
+ - Only accept file handles
+
+0.02 2019-12-02T17:38:59+0100
+ - First Release
+
+0.01 2019-11-19T06:58:18+0100
+ - Started project

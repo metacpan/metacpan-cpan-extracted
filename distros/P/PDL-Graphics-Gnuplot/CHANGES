@@ -1,5 +1,25 @@
-2.011 (released 2-April-2017)
+2.012 (released 2-Dec-2019)
+ - Stabilization release incorporates many smaller bug fixes
 
+2.011_04 - development release toward 2.012
+ - be quiet in the case that the gnuplot died before destruction
+   ( makes everything quieter for forked processes )
+  - remove spurious warnings for 'pc' and 'pcp' plot options
+
+2.011_03 - development release toward 2.012
+ - anti-aliasing for JPEG and GIF terminals
+ 
+2.011_02 - developmenet release toward 2.012
+ - taking potshots at the Cygwin problem.  Set ms_io_braindamage for cygwin.
+
+2.011_01 - development release toward 2.012
+ - Add collision logic for 'clut', 'pc', and 'pcp' plot options
+ - Reset more state in multiplots (xrange & yrange), avoiding a problem
+     where image axis range state leaked into subsequent panels
+ - Enable post-facto antialiasing for select terminals (notably pngcairo)
+
+
+2.011 (released 2-April-2017)
  - Add support for PDL::Transform::Color, including photometric palettes
      (new "pseudocolor" and "perceptual" plot options)
  - Fix a regexp typo that was preventing some chatter from being suppressed under MS Windows

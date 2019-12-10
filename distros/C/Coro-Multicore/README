@@ -212,6 +212,10 @@ API FUNCTIONS
         by default, and enable it only for selected threads or scopes, by
         calling "Coro::Multicore::scoped_enable".
 
+        Note that this setting nonly affects the *global default* - it will
+        not reflect whether multicore functionality is enabled for the
+        current thread.
+
         The function returns the previous value of the enable flag.
 
     Coro::Multicore::scoped_enable
@@ -350,6 +354,6 @@ AUTHOR
      Marc Lehmann <schmorp@schmorp.de>
      http://software.schmorp.de/pkg/AnyEvent-XSThreadPool.html
 
-    Additional thanks to Zsb·n Ambrus, who gave considerable desing input
+    Additional thanks to Zsb√°n Ambrus, who gave considerable desing input
     for this module and the perl multicore specification.
 

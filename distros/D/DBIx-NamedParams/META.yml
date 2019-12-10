@@ -1,0 +1,51 @@
+---
+abstract: "use named parameters instead of '?'"
+author:
+  - L<TakeAsh|https://github.com/TakeAsh/>
+build_requires:
+  DBD::SQLite: '1.62'
+  FindBin::libs: '0'
+  Test::More: '0.98'
+  Test::More::UTF8: '0'
+  YAML::Syck: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-NamedParams
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::NamedParams:
+    file: lib/DBIx/NamedParams.pm
+    version: v0.0.8
+requires:
+  DBI: '0'
+  DBI::Const::GetInfoType: '0'
+  Encode: '0'
+  Log::Dispatch: '0'
+  Term::Encoding: '0'
+  parent: '0'
+  perl: '5.008001'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/TakeAsh/p-DBIx-NamedParams/issues
+  homepage: https://github.com/TakeAsh/p-DBIx-NamedParams
+  repository: git://github.com/TakeAsh/p-DBIx-NamedParams.git
+version: v0.0.8
+x_contributors:
+  - 'TakeAsh <take@TakeAsh.net>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

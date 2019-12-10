@@ -1,12 +1,65 @@
 Revision history for PDL-DSP-Windows
 
+0.008     2019-12-09 19:06:23 GMT
+
+Fixes:
+  * Remove remaining uses of unsupported windows for tests.
+
+0.007005  2019-12-09 12:12:07 GMT
+
+Fixes:
+  * Do not run tests on unsupported windows
+
+0.007004  2019-12-08 21:11:30 GMT
+
+Changes:
+  * Minor re-phrasing of deprecation warnings.
+  * Expand test coverage
+
+0.007003  2019-11-04 22:46:43 GMT (TRIAL RELEASE)
+
+Fixes:
+  * Fixed check on exception test.
+
+0.007002  2019-11-04 22:36:26 GMT (TRIAL RELEASE)
+
+Fixes:
+  * Apply fix for chebyshev window to PDL > 2.007
+  * Avoid using PDL::LiteF in tests, since this module started being
+    indexed by CPAN only with PDL 2.012.
+  * Add Try::Tiny to missing test dependencies.
+  * Re-instate support for Perl < 5.12 by removing use of non-destructive
+    substitutions. Minimum supported version of Perl is now 5.10.
+
+Changes:
+  * Avoid using PDL::Lite and PDL::LiteF to support older PDL releases
+
+0.007001  2019-11-01 23:33:11 GMT (TRIAL RELEASE)
+
+Deprecated:
+  * Deprecate undocumented package variables: trying to read or write from
+    them will now trigger a warning
+
+Fixes:
+  * Fix typos in plotted strings
+  * Fixed an error triggered when running $win->get('modfreqs')
+  * Fixed chebyshev window calculation with PDL >= 2.006_04
+  * Fixed errors triggered by using piddles in conditionals
+
+Changes:
+  * Removed dependencies on PDL::Constants and base
+  * Move to statically generated source file instead of using
+    a code generator
+  * Move to Dist::Zilla for managing releases
+  * Move compwin.pl sample script to 'examples'
+
 0.007  Fri, 27 Jul 2012 18:23:43 +0200
        GJL. utf in pod
 
 0.006  Fri, 27 Jul 2012 10:33:47 +0200
        GJL. try to get cpan to display doc.
 
-0.005  Thu, 26 Jul 2012 11:58:30 +0200 
+0.005  Thu, 26 Jul 2012 11:58:30 +0200
        GJL. condition running tests on presence of
             libraries.
 

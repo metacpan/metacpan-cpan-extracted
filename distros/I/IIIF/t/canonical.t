@@ -31,6 +31,7 @@ while ( my ( $req, $exp ) = splice @tests, 0, 2 ) {
     check_canonical( $req, $exp, 300, 200 );
 }
 
+
 # region
 check_canonical( 'square', 'full', 100, 100 );
 
@@ -45,18 +46,31 @@ check_invalid( '!225,300', 300, 200 ); # upscale needed
 # size and region
 check_invalid( '0,0,10,10/pct:1', 200, 200 ); # too small
 
+# upscale to maxWidth / maxHeight
+check_canonical( '^max', '^100,150', 20, 30, maxWidth => 100, maxHeight => 200 );
+check_canonical( '^max', '^67,100', 20, 30, maxHeight => 100 );
+check_canonical( '^max', '^max', 20, 30, maxWidth => 100 ); # ignore if maxHeight missing
+
+# constraints by maxWidth / maxHeight
+check_invalid( 'max', 200, 200, maxHeight => 100 );
+check_invalid( '^100,200', 100, 100, maxHeight => 100 );
+check_invalid( ',200', 100, 100, maxHeight => 100 );
+check_invalid( '100,', 100, 120, maxHeight => 100 );
+
 sub check_invalid {
-    my ( $req, $width, $height ) = @_;
-    ok !IIIF::Request->new($req)->canonical( $width, $height ),
-      "$req invalid at ${width}x$height";
+    my ( $req, $width, $height, %max ) = @_;
+    ok !IIIF::Request->new($req)->canonical( $width, $height, %max ),
+      "$req invalid at ${width}x$height" .
+      join '', map { " $_=" . $max{$_} } keys %max;
 }
 
 sub check_canonical {
-    my ( $req, $exp, $width, $height ) = @_;
+    my ( $req, $exp, $width, $height, %max ) = @_;
     $req = IIIF::Request->new($req);
     $exp = IIIF::Request->new($exp);
-    is $req->canonical( $width, $height ), $exp,
-      "$req => $exp at ${width}x$height";
+    is $req->canonical( $width, $height, %max ), $exp,
+      "$req => $exp at ${width}x$height" .
+      join '', map { " $_=" . $max{$_} } keys %max;
 }
 
 done_testing;

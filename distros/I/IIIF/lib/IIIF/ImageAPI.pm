@@ -1,7 +1,7 @@
 package IIIF::ImageAPI;
 use 5.014001;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use parent 'Plack::Component';
 
@@ -23,7 +23,7 @@ use Cwd;
 use Plack::Util;
 
 use Plack::Util::Accessor
-  qw(images base cache formats rights service canonical magick_args);
+  qw(images base cache formats rights service canonical magick_args preferredFormats maxWidth maxHeight maxArea);
 
 our @FORMATS = qw(jpg png gif);
 
@@ -69,47 +69,45 @@ sub response {
         return error_response( 400, ( split( " at ", $@ ) )[0] );
     }
 
-    $request->{format} = $request->{format} // $file->{format};
+    $request->{format} = $request->{format}
+      // ( $self->{preferredFormats} || [] )->[0] // $file->{format};
 
     return error_response( 400, "unsupported format" )
       unless grep { $_ eq $request->{format} } @{ $self->formats };
 
-    if ( $self->canonical ) {
-        my $info = info( $file->{path} );
-        my $canonical = $request->canonical( $info->{width}, $info->{height} )
-          or return error_response();
-        $request = IIIF::Request->new($canonical);
+    if ( !$self->canonical && "$request" ne $local ) {
+        return redirect( $file->{id} . "/$request" );
     }
 
-    if ( "$request" ne $local ) {
-        return redirect( $file->{id} . "/$request" );
+    my $info = info( $file->{path} );
+    my $norm = $request->canonical( $info->{width}, $info->{height}, %$self )
+      or return error_response();
+    $request = IIIF::Request->new($norm);
+    my $canonical = $file->{id} . "/$request";
+
+    if ( $self->canonical && "$request" ne $local ) {
+        return redirect($canonical);
     }
 
     # Image Request
 
     # directly serve unmodified image
     if ( $request->is_default && $request->{format} eq $file->{format} ) {
-        return image_response( $file->{path} );
+        return image_response( $file->{path}, $canonical );
     }
 
+    # cache image segment and directly serve if found
     my $cache = $self->cache // $self->cache( tempdir( CLEANUP => 1 ) );
     my $cache_file = File::Spec->catfile( $cache,
         md5_hex("$request") . ".$request->{format}" );
 
     if ( -r $cache_file ) {
-        return image_response($cache_file);
+        return image_response( $cache_file, $canonical );
     }
     else {
-
-        # TODO: only get image dimensions once and only if actually needed
-        my $info = info( $file->{path} );
-        if ( !$request->canonical( $info->{width}, $info->{height} ) ) {
-            return error_response();
-        }
-
         my @args = ( $request, $file->{path}, $cache_file );
         push @args, @{ $self->{magick_args} || [] };
-        return image_response($cache_file) if convert(@args);
+        return image_response( $cache_file, $canonical ) if convert(@args);
     }
 
     error_response( 500, "Conversion failed" );
@@ -123,19 +121,24 @@ sub info_response {
         id      => $file->{id},
         profile => 'level2',
 
-        # TODO: maxWidth or maxArea, maxHeight (required!)
-
         extraQualities => [qw(color gray bitonal default)],
         extraFormats   => $self->formats,
         extraFeatures  => [
             qw(
-              baseUriRedirect cors jsonldMediaType mirroring
+              baseUriRedirect canonicalLinkHeader cors jsonldMediaType mirroring
               profileLinkHeader
               regionByPct regionByPx regionSquare rotationArbitrary rotationBy90s
               sizeByConfinedWh sizeByH sizeByPct sizeByW sizeByWh sizeUpscaling
               )
         ]
     );
+
+    $info->{$_} = $self->{$_}
+      for grep { $self->{$_} } qw(maxWidth maxHeight maxArea);
+
+    if ( $self->preferredFormats ) {
+        $info->{preferredFormats} = $self->preferredFormats;
+    }
 
     # TODO: canonicalLinkHeader?
 
@@ -147,15 +150,28 @@ sub info_response {
     );
 }
 
+sub find_file {
+    my ( $self, $identifier ) = @_;
+
+    foreach ( @{ $self->formats } ) {
+        my $file = File::Spec->catfile( $self->images, "$identifier.$_" );
+        return $file if -r $file;
+    }
+}
+
 sub file {
     my ( $self, $identifier ) = @_;
 
-    for my $format ( @{ $self->formats } ) {
-        my $path = File::Spec->catfile( $self->images, "$identifier.$format" );
-        if ( -r $path ) {
+    my $path =
+      ref $self->images eq 'CODE'
+      ? $self->images->($identifier)
+      : $self->find_file($identifier);
+
+    if ( -f $path && $path =~ /\.([^.]+)$/ ) {
+        if ( grep { $1 eq $_ } @{ $self->formats } ) {
             return {
                 path   => $path,
-                format => $format
+                format => $1
             };
         }
     }
@@ -167,10 +183,10 @@ sub redirect {
 
 # adopted from Plack::App::File
 sub image_response {
-    my ($file) = @_;
+    my ( $file, $canonical ) = @_;
 
     open my $fh, "<:raw", $file
-      or return error_response( 403, "Forbidden" );
+      or return error_response( 403, " Forbidden " );
 
     my $type = Plack::MIME->mime_type($file) // 'image';
     my @stat = stat $file;
@@ -183,7 +199,8 @@ sub image_response {
             'Content-Type'   => $type,
             'Content-Length' => $stat[7],
             'Last-Modified'  => HTTP::Date::time2str( $stat[9] ),
-            'Link' => '<http://iiif.io/api/image/3/level2.json>;rel="profile"'
+            'Link' => '<http://iiif.io/api/image/3/level2.json>;rel="profile"',
+            'Link' => "<$canonical>;rel=\"canonical\""
         ],
         $fh,
     ];
@@ -207,7 +224,7 @@ sub json_response {
 sub error_response {
     my $code = shift // 400;
     my $message = shift
-      // "Invalid IIIF Image API Request: region or size out of bounds";
+      // " Invalid IIIF Image API Request : region or size out of bounds ";
     json_response( $code, { message => $message } );
 }
 
@@ -237,11 +254,14 @@ IIIF::ImageAPI - IIIF Image API implementation as Plack application
 
 =item images
 
-Image directory
+Either an image directory (set to the current directory by default) or a code
+reference of a function that maps image identifiers to image files.
 
 =item cache
 
-Cache directory. Set to a temporary per-process directory by default.
+Cache directory. Set to a temporary per-process directory by default. Please
+use different cache directories for different settings of C<maxWidth> and
+C<maxHeight>.
 
 =item base
 
@@ -251,13 +271,31 @@ required if the service is put behind a web proxy.
 =item canonical
 
 Redirect requests to the L<canonical URI syntax|https://iiif.io/api/image/3.0/#47-canonical-uri-syntax>
-and include (disabled by default).
+and include (disabled by default). A canonical Link header is set anyway.
 
 =item formats
 
 List of supported image formats. Set to C<['jpg', 'png', 'gif']> by default. On
 configuration with other formats make sure ImageMagick supports them (see
 L<IIIF::Magick/REQUIREMENTS>).
+
+=item preferredFormats
+
+Optional list of preferred image formats. MUST be a subset of or equal to
+C<formats>. The first preferred format, if given, will be used as default if a
+request does no specify a file format.
+
+=item maxWidth
+
+Optional maximum width in pixels to be supported.
+
+=item maxHeight
+
+Optional maximum height in pixels to be supported.
+
+=item maxArea
+
+Optional maximum pixel area (width x height) to be supported.
 
 =item rights
 

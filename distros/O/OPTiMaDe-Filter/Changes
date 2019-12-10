@@ -1,0 +1,45 @@
+0.5.0 2019-12-09
+
+    - Renaming package from OPTiMaDe::FilterParser to OPTiMaDe::Filter.
+    - Implementing right-hand side properties as per
+      Materials-Consortia/OPTiMaDe#178.
+    - Properties of three or more identifiers have no SQL representation.
+    - Replacing OPTiMaDe::Filter::Comparison::set_operator() with
+      operator().
+    - Replacing OPTiMaDe::Filter::ListComparison::set_<attribute>() with
+      <attribute>().
+    - Replacing OPTiMaDe::Filter::Zip::set_<attribute>() with <attribute>().
+
+0.4.1 2019-12-05
+
+    - Fixing SQL placeholders for fuzzy search of strings.
+
+0.4.0 2019-12-05
+
+    - Adding overloads for OPTiMaDe::FilterParser::Property. Replacing
+      push_identifier() via direct push to object.
+    - Adding convenience methods left() and right() for
+      OPTiMaDe::FilterParser::Comparison.
+    - Introducing classes OPTiMaDe::FilterParser::Negation,
+      OPTiMaDe::FilterParser::AndOr and OPTiMaDe::FilterParser::Known.
+    - Changing the way the delimiter is passed to to_SQL() methods.
+    - Implementing SQL output with placeholders instead of values.
+
+0.3.0 2019-08-19
+
+    - Introducing method modify(), which traverses and modifies the built
+      filter tree.
+    - Modifying the constructor for OPTiMaDe::FilterParser::Property.
+    - Adding 'Changes' (this file) to MANIFEST.
+
+0.2.0 2019-08-12
+ 
+    - Combining 'IS' and 'KNOWN'/'UNKNOWN' lexems together.
+    - Fixing 'IS KNOWN'/'IS UNKNOWN' translation to SQL.
+    - Implementing backwards translation to the string representation.
+    - Unifying layout of parsed lists.
+    - Adding roundtrip tests.
+ 
+0.1.0 2019-07-20
+
+    - Initial release.

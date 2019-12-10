@@ -2,7 +2,7 @@
 
 
 do('../Config');
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 pp_setversion(qq{'$VERSION'});
 $VERSION = eval $VERSION;
 
@@ -46,6 +46,10 @@ typedef logical (*L_fp)();
 #ifndef max
 #define max(a,b) ((a) >= (b) ? (a) : (b))
 #endif
+
+extern integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
+integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
+opts_len);
 
 
 static integer c_zero = 0;
@@ -405,38 +409,29 @@ pp_defc("ggsvd",
 
              types(F) %{
 
-		extern int cggsvd_(char *jobu, char *jobv, char *jobq, integer *m, 
+		extern int cggsvd3_(char *jobu, char *jobv, char *jobq, integer *m,
 		integer *n, integer *p, integer *k, integer *l, float *a, 
 		integer *lda, float *b, integer *ldb, float *alpha, 
 		float *beta, float *u, integer *ldu, float *v, integer 
-		*ldv, float *q, integer *ldq, float *work, float *rwork, integer *iwork, 
+		*ldv, float *q, integer *ldq, float *work, integer *lwork, float *rwork, integer *iwork,
 		integer *info);
-		float *work, *rwork;
+		float *work, *rwork, twork[1];
              %}
              types(D) %{
 
-		extern int zggsvd_(char *jobu, char *jobv, char *jobq, integer *m, 
+		extern int zggsvd3_(char *jobu, char *jobv, char *jobq, integer *m,
 		integer *n, integer *p, integer *k, integer *l, double *a, 
 		integer *lda, double *b, integer *ldb, double *alpha, 
 		double *beta, double *u, integer *ldu, double *v, integer 
-		*ldv, double *q, integer *ldq, double *work, double *rwork, integer *iwork, 
+		*ldv, double *q, integer *ldq, double *work, integer *lwork, double *rwork, integer *iwork,
 		integer *info);
-		double *work, *rwork;
+		double *work, *rwork, twork[1];
              %}
-		integer lwork = ($SIZE (m) < $SIZE (n)) ? $SIZE (n): $SIZE (m);
+		//integer lwork = ($SIZE (m) < $SIZE (n)) ? $SIZE (n): $SIZE (m);
+		integer lwork = -1;
 
-		if ($SIZE (p) > lwork)
-			lwork = $SIZE (p);
-		
-		types(F) %{
-			work = (float *)malloc(2*(3*lwork +  $SIZE (n))*  sizeof(float));
-			rwork = (float *)malloc(2 * $SIZE (n) *  sizeof(float));
-		%}
-		types(D) %{
-			work = (double *)malloc(2*(3*lwork +  $SIZE (n)) *  sizeof(double));
-			rwork = (double *)malloc(2 * $SIZE (n) *  sizeof(double));
-		%}		
-
+		//if ($SIZE (p) > lwork)
+		//	lwork = $SIZE (p);
 		if ($jobu())
 			pjobu = \'U\';
 		if ($jobv())
@@ -444,8 +439,48 @@ pp_defc("ggsvd",
 		if ($jobq())
 			pjobq = \'Q\';
 
+		$TFD(cggsvd3_,zggsvd3_)(
+		&pjobu,
+		&pjobv,
+		&pjobq,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__p_size)},
+		$P(k),
+		$P(l),
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(alpha),
+		$P(beta),
+		$P(U),
+		&(integer){$PRIV(__q_size)},
+		$P(V),
+		&(integer){$PRIV(__s_size)},
+		$P(Q),
+		&(integer){$PRIV(__u_size)},
+		&twork[0],
+		&lwork,
+		rwork,
+		$P(iwork),
+		$P(info));
+
+		lwork = (integer) twork[0];
+
 		
-		$TFD(cggsvd_,zggsvd_)(
+		types(F) %{
+			work = (float *)malloc(2*(lwork * sizeof(float)));
+			rwork = (float *)malloc(2 * $SIZE (n) *  sizeof(float));
+		%}
+		types(D) %{
+			work = (double *)malloc(2*(lwork * sizeof(double)));
+			rwork = (double *)malloc(2 * $SIZE (n) *  sizeof(double));
+		%}		
+
+
+		
+		$TFD(cggsvd3_,zggsvd3_)(
 		&pjobu,
 		&pjobv,
 		&pjobq,
@@ -467,6 +502,7 @@ pp_defc("ggsvd",
 		$P(Q),
 		&(integer){$PRIV(__u_size)},
 		work,
+		&lwork,
 		rwork,
 		$P(iwork),
 		$P(info));
@@ -1626,9 +1662,6 @@ pp_defc("ggesx",
 		char psens = \'N\';
 		integer *bwork;
 		integer *iwork;
-		extern integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
-		integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
-		opts_len);
              types(F) %{
 		extern int cggesx_(char *jobvsl, char *jobvsr, char *sort, L_fp
 		delctg, char *sense, integer *n, float *a, integer *lda, float *b,
@@ -3412,9 +3445,6 @@ pp_defc("gelsd",
 		integer smlsiz, size_i, nlvl, *iwork;
 		integer minmn = min( $SIZE(m), $SIZE(n) );
 
-		extern integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
-		integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
-		opts_len);
 
              types(F) %{
 		extern int cgelsd_(integer *m, integer *n, integer *nrhs,
@@ -3816,9 +3846,6 @@ pp_defc("chetrf",
 	     integer lwork = -1;
 	     integer blocksiz;
 
-		extern integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
-		integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
-		opts_len);
 
 	     types(F) %{
 		extern int chetrf_(char *uplo, integer *n, float *a, integer *
@@ -7044,11 +7071,11 @@ pp_addpm({At=>'Bot'},<<'EOD');
 
 =head1 AUTHOR
 
-Copyright (C) Grégory Vanuxem 2005-2007.
+Copyright (C) Grégory Vanuxem 2005-2018.
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the artistic license as specified in the Artistic
-file.
+it under the terms of the Perl Artistic License as in the file Artistic_2
+in this distribution.
 
 =cut
 

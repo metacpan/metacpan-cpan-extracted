@@ -1,6 +1,16 @@
 CHANGES
 -------
 
+  2.093 7 December 2019
+
+      * Fixed minor typo in the pod.
+        PR https://github.com/pmqs/IO-Compress-Lzf/pull/1
+        49af266c2333279b97e7647c061e0ca7b8d46faa
+
+  2.092 4 December 2019
+
+      * No changes
+      
   2.091 23 November 2019
 
       * No Changes

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Time::HiRes qw/ time /;
 
-$Geoffrey::Action::Constraint::PrimaryKey::VERSION = '0.000204';
+$Geoffrey::Action::Constraint::PrimaryKey::VERSION = '0.000205';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -72,7 +72,7 @@ Geoffrey::Action::Constraint::PrimaryKey - Action handler for primary keys
 
 =head1 VERSION
 
-Version 0.000204
+Version 0.000205
 
 =head1 DESCRIPTION
 

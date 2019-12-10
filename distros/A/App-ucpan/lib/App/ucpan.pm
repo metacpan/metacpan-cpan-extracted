@@ -1,7 +1,7 @@
 package App::ucpan;
 use strict;
 use warnings;
-our $VERSION = "1.11";
+our $VERSION = "1.13";
 1;
 __END__
 

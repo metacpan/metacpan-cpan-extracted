@@ -1,0 +1,9 @@
+Summary of important user-visible changes for Bio-Variation
+-----------------------------------------------------------
+
+1.7.4     2019-12-07 16:56:21-06:00 America/Chicago
+  * Add named module (very simple for now)
+  * Minor release to address CPAN indexing and permissions issues
+
+1.7.3     2019-12-07 16:40:04-06:00 America/Chicago
+  * First release after split from bioperl-live.

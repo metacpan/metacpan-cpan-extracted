@@ -41,7 +41,11 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Win32::Console::ANSI" : "0"
+         },
          "requires" : {
+            "App::cpanoutdated" : "0",
             "Config" : "0",
             "File::Copy" : "0",
             "File::Which" : "0",
@@ -68,15 +72,15 @@
    },
    "provides" : {
       "App::ucpan" : {
-         "file" : "lib/App/ucpan.pm",
-         "version" : "1.11"
+         "file" : "lib/App\\ucpan.pm",
+         "version" : "1.13"
       }
    },
    "release_status" : "stable",
-   "version" : "1.11",
+   "version" : "1.13",
    "x_authority" : "cpan:KPEE",
    "x_contributors" : [
       "KPEE <kpee.cpanx@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -19,9 +19,6 @@ I did want some neat features, though, so these are inside-out objects
 muck with attributtes outside of methods), privatization of methods is
 supported, as is serialization out and back in again.
 
-Note that this is my first module for CPAN so please be gentle
-with the noob.
-
 INSTALLATION
 
 To install this module type the following:
@@ -33,9 +30,16 @@ To install this module type the following:
 
 DEPENDENCIES
 
-This module requires these other modules and libraries:
+This module requires these other modules to run:
 
   Class::ISA
+  Scalar::Util
+  List::Util
+
+and these to test:
+
+  Test::Perl::Critic
+  Test::Exception
 
 COPYRIGHT AND LICENCE
 

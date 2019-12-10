@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Tradis::Bin::TradisPlot;
-$Bio::Tradis::Bin::TradisPlot::VERSION = '1.4.3';
+$Bio::Tradis::Bin::TradisPlot::VERSION = '1.4.5';
 use FindBin qw($Bin); 
 
 # ABSTRACT: Generate plots as part of a tradis analysis
@@ -29,7 +29,7 @@ tradis_plot - Generate plots as part of a tradis analysis
 
 =head1 VERSION
 
-version 1.4.3
+version 1.4.5
 
 =head1 SYNOPSIS
 

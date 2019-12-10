@@ -16,6 +16,11 @@ if( $options{'--allow-LIKE-operator'} ) {
     $OPTiMaDe::FilterParser::allow_LIKE_operator = 1;
 }
 
+my $use_placeholders = 0;
+if( $options{'--use-placeholders'} ) {
+    $use_placeholders = 1;
+}
+
 @ARGV = ( '-' ) unless @ARGV;
 
 for (@ARGV) {
@@ -23,44 +28,19 @@ for (@ARGV) {
     my $tree = $parser->Run( $_ );
     print Dumper $tree;
     print "== Filter ==\n";
-    print to_filter( $tree ) . "\n";
+    print $tree->to_filter . "\n";
     print "== SQL ==\n";
-    print to_SQL( $tree ) . "\n";
+    if( $use_placeholders ) {
+        my( $sql, $values ) = $tree->to_SQL( { placeholder => '?' } );
+        print "$sql\n";
+        print "=== Values ===\n";
+        print Dumper $values;
+    } else {
+        print $tree->to_SQL . "\n";
+    }
 
-    my $filter = to_filter( $tree );
+    my $filter = $tree->to_filter;
     $parser = new OPTiMaDe::FilterParser;
     my $tree_now = $parser->parse_string( $filter );
     Compare( $tree, $tree_now ) || print "Roundtrip NOT passed\n";
-}
-
-sub to_filter
-{
-    my( $node ) = @_;
-    if( blessed $node && $node->can( 'to_filter' ) ) {
-        return $node->to_filter;
-    } elsif( blessed $node ) {
-        return '<no filter representation>';
-    } elsif( ref $node && ref $node eq 'ARRAY' ) {
-        return '(' . join( ' ', map { to_filter( $_ ) } @{$node} ) . ')';
-    } else {
-        return $node;
-    }
-}
-
-sub to_SQL
-{
-    my( $node ) = @_;
-    if( blessed $node && $node->can( 'to_SQL' ) ) {
-        return $node->to_SQL;
-    } elsif( blessed $node ) {
-        return '<no SQL representation>';
-    } elsif( ref $node && ref $node eq 'ARRAY' ) {
-        return '(' . join( ' ', map { to_SQL( $_ ) } @{$node} ) . ')';
-    } elsif( $node eq 'IS KNOWN' ) {
-        $node = 'IS NOT NULL';
-    } elsif( $node eq 'IS UNKNOWN' ) {
-        $node = 'IS NULL';
-    } else {
-        return $node;
-    }
 }

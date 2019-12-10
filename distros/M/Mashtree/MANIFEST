@@ -4,6 +4,7 @@ bin/mashtree_init.pl
 bin/mashtree_jackknife.pl
 bin/mashtree_bootstrap.pl
 bin/min_abundance_finder.pl
+bin/mashtree_checkReads.sh
 CHANGES
 docs/SQL.md
 lib/Bio/Kmer.pm
@@ -38,5 +39,3 @@ t/10_sqlite.t
 MANIFEST
 Makefile.PL
 
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

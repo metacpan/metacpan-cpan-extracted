@@ -1,2 +1,47 @@
+NAME
+    Bencher::Scenarios::Perl - A collection of bencher scenarios to
+    benchmark perl
+
+VERSION
+    This document describes version 0.050 of Bencher::Scenarios::Perl (from
+    Perl distribution Bencher-Scenarios-Perl), released on 2019-10-20.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::Perl::5220Perf_length
+
+    *   Bencher::Scenario::Perl::5200Perf_return
+
+    *   Bencher::Scenario::Perl::Startup
+
+    *   Bencher::Scenario::Perl::Swap
+
+    *   Bencher::Scenario::Perl::Hash
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-Perl>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenarios-Perl>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Per
+    l>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

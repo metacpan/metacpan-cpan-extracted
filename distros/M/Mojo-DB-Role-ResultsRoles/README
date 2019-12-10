@@ -1,0 +1,51 @@
+NAME
+
+    Mojo::DB::Role::ResultsRoles - Apply roles to Mojo database results
+
+SYNOPSIS
+
+      use Mojo::Pg;
+      my $pg = Mojo::Pg->new(...)->with_roles('Mojo::DB::Role::ResultsRoles');
+      push @{$pg->results_roles}, 'Mojo::DB::Results::Role::Something';
+      my $results = $pg->db->query(...);
+      # $results does Mojo::DB::Results::Role::Something
+
+DESCRIPTION
+
+    This role allows roles to be applied to the results objects returned by
+    Mojo::Pg or similar database APIs. The manager object must create
+    database connections via a db method, which must have a results_class
+    attribute used to instantiate results objects.
+
+ATTRIBUTES
+
+    Mojo::DB::Role::ResultsRoles composes the following attributes.
+
+ results_roles
+
+      my $roles = $manager->results_roles;
+      $manager  = $manager->results_roles(\@roles);
+
+    Array reference of roles to compose into results objects. This only
+    affects database objects created by subsequent calls to the db method.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Mojo::Pg, Mojo::mysql, Mojo::SQLite
+

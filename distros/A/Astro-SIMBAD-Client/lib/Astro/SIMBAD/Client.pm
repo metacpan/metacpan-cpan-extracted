@@ -116,7 +116,7 @@ BEGIN {
 	|| sub { return $_[0] };
 }
 
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 
 our @CARP_NOT = qw{Astro::SIMBAD::Client::WSQueryInterfaceService};
 
@@ -332,7 +332,7 @@ VOTables back (rather than a parse error) if that is what the input
 contains.
 
 This is B<not> a full-grown VOTable parser capable of handling
-the full spec (see L<http://www.ivoa.net/Documents/latest/VOT.html>).
+the full spec (see L<http://www.ivoa.net/documents/latest/VOT.html>).
 It is oriented toward returning E<lt>TABLEDATAE<gt> contents, and the
 metadata that can reasonably be associated with those contents.
 

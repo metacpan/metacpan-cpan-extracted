@@ -1,3 +1,6 @@
+0.27 2019-12-06
+        - Fixed bug where the 'secure' parameter was not respected.
+
 0.26 2018-12-31
         - Fixed Mojo dependency.
 

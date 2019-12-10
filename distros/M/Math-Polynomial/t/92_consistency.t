@@ -1,6 +1,6 @@
-# Copyright (c) 2008-2019 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# Copyright (c) 2008-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Checking package consistency (version numbers, file names, ...).
 # These are tests for the distribution maintainer.
@@ -93,7 +93,7 @@ undef $/;
 
 maintainer_only();
 
-plan 42;
+plan 43;
 
 my $MAKEFILE_PL            = 'Makefile.PL';
 my $README                 = 'README';
@@ -109,7 +109,9 @@ $modfilename .= '.pm';
 my $items_to_provide       = undef;
 
 my %ignore_copyright = map {($_ => 1)} qw(
+    CONTRIBUTING
     Changes
+    LICENSE
     MANIFEST
     META.json
     META.yml
@@ -118,6 +120,10 @@ my %ignore_copyright = map {($_ => 1)} qw(
     SIGNATURE
     t/data/AGENDA.yml
     t/data/KNOWN_VERSIONS
+);
+
+my %ignore_whitespace = map {($_ => 1)} qw(
+    LICENSE
 );
 
 my %pattern = (
@@ -335,6 +341,7 @@ my @todo_distfiles      = ();
 my @debug_distfiles     = ();
 my @badchar_distfiles   = ();
 my @hardtab_distfiles   = ();
+my @invspace_distfiles  = ();
 my @lacking_copyright   = ();
 my @lacking_revision_id = ();
 my @lacking_author_pod  = ();
@@ -368,6 +375,7 @@ if ($manifest_open) {
                 my $seen_debug       = 0;
                 my $seen_badchar     = 0;
                 my $seen_hardtab     = 0;
+                my $seen_invspace    = 0;
                 my $in_signature     = 0;
                 my $before_end       = 1;
                 my $in_author        = 0;
@@ -401,6 +409,9 @@ if ($manifest_open) {
                     }
                     if (/\t/) {
                         ++$seen_hardtab;
+                    }
+                    if (/[^\S\n]\n/) {
+                        ++$seen_invspace;
                     }
                     if (/-----(BEGIN|END) PGP SIGNATURE-----/) {
                         $in_signature = 'BEGIN' eq $1;
@@ -460,8 +471,13 @@ if ($manifest_open) {
                 if ($seen_badchar) {
                     push @badchar_distfiles, $file;
                 }
-                elsif ($seen_hardtab) {
-                    push @hardtab_distfiles, $file;
+                elsif (!exists $ignore_whitespace{$file}) {
+                    if ($seen_hardtab) {
+                        push @hardtab_distfiles, $file;
+                    }
+                    if ($seen_invspace) {
+                        push @invspace_distfiles, $file;
+                    }
                 }
                 if ($seen_revision_id) {
                     if (!defined $checkin_year) {
@@ -470,6 +486,7 @@ if ($manifest_open) {
                     else {
                         if (
                             defined($copyright_year) &&
+                            !defined($ignore_copyright{$file}) &&
                             $copyright_year ne $checkin_year
                         ) {
                             push @stale_copyright, $file;
@@ -484,6 +501,7 @@ if ($manifest_open) {
                     my $myear = (localtime $mtime)[5] + 1900;
                     if (
                         defined($copyright_year) &&
+                        !defined($ignore_copyright{$file}) &&
                         $copyright_year ne $myear
                     ) {
                         push @mtime_copyright, $file;
@@ -579,6 +597,10 @@ if ($manifest_open) {
         print "# file with hardtab characters: $file\n";
     }
     test !@hardtab_distfiles, 'no text files with hardtab characters';
+    foreach my $file (@invspace_distfiles) {
+        print "# file with whitespace at end of line: $file\n";
+    }
+    test !@invspace_distfiles, 'no text files with whitespace at end of line';
     foreach my $file (@lacking_author_pod) {
         print "# POD source file without AUTHOR section: $file\n";
     }

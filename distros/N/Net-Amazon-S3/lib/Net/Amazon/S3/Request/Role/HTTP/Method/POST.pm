@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::HTTP::Method::POST;
 # ABSTRACT: HTTP POST method role
-$Net::Amazon::S3::Request::Role::HTTP::Method::POST::VERSION = '0.86';
+$Net::Amazon::S3::Request::Role::HTTP::Method::POST::VERSION = '0.87';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::HTTP::Method' => { method => 'POST' };
@@ -19,7 +19,7 @@ Net::Amazon::S3::Request::Role::HTTP::Method::POST - HTTP POST method role
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 AUTHOR
 

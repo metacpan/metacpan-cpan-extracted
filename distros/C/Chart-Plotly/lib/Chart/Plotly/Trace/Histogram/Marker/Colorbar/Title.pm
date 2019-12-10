@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Histogram::Marker::Colorbar::Title::Font;
 
-our $VERSION = '0.033';    # VERSION
+our $VERSION = '0.034';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace histogram.
 
@@ -67,7 +67,7 @@ Chart::Plotly::Trace::Histogram::Marker::Colorbar::Title - This attribute is one
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 SYNOPSIS
 

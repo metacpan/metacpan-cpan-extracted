@@ -1,6 +1,6 @@
 package Email::Sender::Transport::Sendmail;
 # ABSTRACT: send mail via sendmail(1)
-$Email::Sender::Transport::Sendmail::VERSION = '1.300033';
+$Email::Sender::Transport::Sendmail::VERSION = '1.300034';
 use Moo;
 with 'Email::Sender::Transport';
 
@@ -112,7 +112,7 @@ Email::Sender::Transport::Sendmail - send mail via sendmail(1)
 
 =head1 VERSION
 
-version 1.300033
+version 1.300034
 
 =head2 DESCRIPTION
 

@@ -1,6 +1,9 @@
 Summary of important user-visible changes for Bio-DB-RefSeq
 -----------------------------------------------------------
 
+1.7.4     2019-12-07 16:09:01-06:00 America/Chicago
+  * Fixes for issues related to using Bio::Root::Test (issue #3)
+
 1.7.3     2019-11-28 00:44:59-06:00 America/Chicago
   * First release after split from bioperl-live
   * Address database connection failures (issue #2). Works for nucleotide 

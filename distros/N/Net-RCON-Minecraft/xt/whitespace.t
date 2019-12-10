@@ -1,6 +1,5 @@
 #!perl
 
-use 5.008;
 use Test::More;
 no warnings 'uninitialized';
 

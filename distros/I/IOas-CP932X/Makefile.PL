@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{IOas::CP932X},
-    'VERSION'   => q{0.08},
+    'VERSION'   => q{0.09},
     'ABSTRACT'  => q{provides CP932X I/O subroutines for UTF-8 script},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

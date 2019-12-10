@@ -4,12 +4,17 @@
 
 use warnings;
 
+use Scalar::Util qw(blessed);
+
+use OPTiMaDe::FilterParser::AndOr;
 use OPTiMaDe::FilterParser::Comparison;
+use OPTiMaDe::FilterParser::Known;
 use OPTiMaDe::FilterParser::ListComparison;
+use OPTiMaDe::FilterParser::Negation;
 use OPTiMaDe::FilterParser::Property;
 use OPTiMaDe::FilterParser::Zip;
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.4.1';
 our $OPTiMaDe_VERSION = '0.10.0';
 
 our $allow_LIKE_operator = 0;
@@ -91,14 +96,14 @@ value_zip_list: value_zip
 expression: expression_clause
           | expression_clause OR expression
             {
-                return [ @_[1..$#_] ];
+                return OPTiMaDe::FilterParser::AndOr->new( @_[1..$#_] );
             }
           ;
 
 expression_clause: expression_phrase
                  | expression_phrase AND expression_clause
                     {
-                        return [ @_[1..$#_] ];
+                        return OPTiMaDe::FilterParser::AndOr->new( @_[1..$#_] );
                     }
                  ;
 
@@ -110,15 +115,15 @@ expression_phrase: comparison
                     }
                  | NOT comparison
                     {
-                        return [ @_[1..$#_] ];
+                        return OPTiMaDe::FilterParser::Negation->new( $_[2] );
                     }
                  | NOT predicate_comparison
                     {
-                        return [ @_[1..$#_] ];
+                        return OPTiMaDe::FilterParser::Negation->new( $_[2] );
                     }
                  | NOT openingbrace expression closingbrace
                     {
-                        return [ $_[1], $_[3] ];
+                        return OPTiMaDe::FilterParser::Negation->new( $_[3] );
                     }
                  ;
 
@@ -131,7 +136,8 @@ property_first_comparison: property value_op_rhs
                                 }
                            | property known_op_rhs
                                 {
-                                    return [ $_[1], @{$_[2]} ];
+                                    $_[2]->property( $_[1] );
+                                    return $_[2];
                                 }
                            | property fuzzy_string_op_rhs
                                 {
@@ -169,11 +175,11 @@ value_op_rhs: operator value
 
 known_op_rhs: IS KNOWN
                 {
-                    return [ "$_[1] $_[2]" ];
+                    return OPTiMaDe::FilterParser::Known->new( 1 );
                 }
             | IS UNKNOWN
                 {
-                    return [ "$_[1] $_[2]" ];
+                    return OPTiMaDe::FilterParser::Known->new( 0 );
                 }
             ;
 
@@ -299,13 +305,11 @@ property_zip_addon: colon property
 
 property: identifier
             {
-                my $id = OPTiMaDe::FilterParser::Property->new;
-                $id->push_identifier( $_[1] );
-                return $id;
+                return OPTiMaDe::FilterParser::Property->new( $_[1] );
             }
         | property dot identifier
             {
-                $_[1]->push_identifier( $_[3] );
+                push @{$_[1]}, $_[3];
                 return $_[1];
             }
         ;
@@ -458,6 +462,20 @@ sub parse_string
     $self->{USER}{LINENO} = 0;
     $self->{USER}{CHARNO} = 0;
     return $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error );
+}
+
+sub modify
+{
+    my $node = shift;
+    my $code = shift;
+
+    if( blessed $node && $node->can( 'modify' ) ) {
+        return $node->modify( $code, @_ );
+    } elsif( ref $node eq 'ARRAY' ) {
+        return [ map { modify( $_, $code, @_ ) } @$node ];
+    } else {
+        return $code->( $node, @_ );
+    }
 }
 
 1;

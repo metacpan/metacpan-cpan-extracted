@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienAuthor - Alien author documentation
 
 =head1 VERSION
 
-version 1.92
+version 1.93
 
 =head1 SYNOPSIS
 
@@ -68,6 +68,12 @@ a shell manually.  The easiest way to automate those instructions is to
 just put the commands in your L<alienfile>.  For example, lets suppose 
 that libfoo is built using autoconf and provides a C<pkg-config> C<.pc>
 file.
+
+We will also later discuss plugins.  For common build systems like
+autoconf or CMake, it is usually better to use the appropriate plugin
+because they will handle corner cases better than a simple set of
+commands.  We're going to take a look at commands first because it's
+easier to understand the different phases with commands.
 
 (Aside, autoconf is a series of tools and macros used to configure 
 (usually) a C or C++ library or tool by generating any number of 
@@ -416,10 +422,25 @@ Once you have a working L<alienfile> you can write your C<Makefile.PL>.
  my $abmm = Alien::Build::MM->new;
  
  WriteMakefile($abmm->mm_args(
-   ABSTRACT => 'Discover or download and install libfoo',
-   DISTNAME => 'Alien-Libfoo',
-   NAME     => 'Alien::Libfoo',
-   VERSION_FROM => 'lib/Alien/Libfoo.pm',
+   ABSTRACT           => 'Discover or download and install libfoo',
+   DISTNAME           => 'Alien-Libfoo',
+   NAME               => 'Alien::Libfoo',
+   VERSION_FROM       => 'lib/Alien/Libfoo.pm',
+   CONFIGURE_REQUIRES => {
+     'Alien::Build::MM' => 0,
+   },
+   BUILD_REQUIRES => {
+     'Alien::Build::MM' => 0,
+   },
+   PREREQ_PM => {
+     'Alien::Base' => 0,
+   },
+   # If you are going to write the recommended
+   # tests you will will want these:
+   TEST_REQUIRES => {
+     'Test::Alien' => 0,
+     'Test2::V0'   => 0,
+   },
  ));
  
  sub MY::postamble {
@@ -506,7 +527,7 @@ alien will work with any XS modules that are going to use it:
  
  MODULE = Foo PACKAGE = Foo
  
- int something(class)
+ int something()
 
 You can also use L<Test::Alien> to test tools instead of libraries:
 
@@ -519,6 +540,38 @@ You can also use L<Test::Alien> to test tools instead of libraries:
    ->exit_is(0);
  
  done_testing;
+
+You can also write tests specifically for L<FFI::Platypus>, if your
+alien is going to be used to write FFI bindings.  (the test below
+is the FFI equivalent to the XS example above).
+
+ use Test2::V0;
+ use Test::Alien;
+ use Alien::Libfoo;
+
+ alien_ok 'Alien::Libfoo';
+ ffi_ok { symbols => [ 'something' ] }, with_subtest {
+   # $ffi is an instance of FFI::Platypus with the lib
+   # set appropriately.
+   my($ffi) = @_;
+   my $something = $ffi->function( something => [] => 'int' );
+   is $something->call(), 1, 'Foo::something() returns 1';
+ };
+
+If you do use C<ffi_ok> you want to make sure that your alien reliably
+produces dynamic libraries.  If it isn't consistent (if for example
+some platforms tend not to provide or build dynamic libraries), you can
+check that C<dynamic_libs> doesn't return an empty list.
+
+ ...
+ alien_ok 'Alien::Libfoo';
+ SKIP: {
+   skip "This test requires a dynamic library"
+     unless Alien::Libfoo->dynamic_libs;
+   ffi_ok { symbols [ 'something' ] }, with_subtest {
+     ...
+   };
+ }
 
 More details on testing L<Alien> modules can be found in the 
 L<Test::Alien> documentation.

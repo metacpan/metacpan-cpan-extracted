@@ -1,18 +1,24 @@
 Changes
-MANIFEST
-Makefile.PL
-README
 ignore.txt
 lib/CGI/Untaint/Twitter.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
 t/00-load.t
 t/boiler.t
+t/changes.t
 t/coverage.t
 t/critic.t
 t/cv.t
+t/dist.t
 t/gv.t
+t/is_valid.t
 t/kwalitee.t
 t/manifest.t
 t/metrics.t
+t/namespaces.t
 t/noplan.t
 t/pod-cm.t
 t/pod.t
@@ -24,7 +30,8 @@ t/strict.t
 t/taint.t
 t/twitter.t
 t/untaint.t
+t/unused.t
+t/used.t
 t/vars.t
-META.yml                                 Module meta-data (added by MakeMaker)
-MYMETA.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

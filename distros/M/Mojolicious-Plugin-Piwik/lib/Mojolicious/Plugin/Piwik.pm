@@ -6,7 +6,7 @@ use Mojo::UserAgent;
 use Mojo::Promise;
 use Mojo::IOLoop;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 # Todo:
 # - Better test tracking API support
@@ -215,7 +215,7 @@ SCRIPTTAG
 
       # TODO:
       #   Simplify and deprecate secure parameter
-      if (index($url, '/') != 0) {
+      if (!defined $param->{secure} && index($url, '/') != 0) {
         if ($url =~ s{^(?:http(s)?:)?//}{}i && $1) {
           $param->{secure} = 1;
         };
@@ -857,14 +857,14 @@ L<Mojolicious>.
 Please make sure you are using Matomo (Piwik) in compliance to the law.
 For german users,
 L<this information|https://www.datenschutzzentrum.de/uploads/projekte/verbraucherdatenschutz/20110315-webanalyse-piwik.pdf>
-(last accessed on 2018-11-13)
+(last accessed on 2019-12-06)
 may help you to design your service correctly.
 You may need to inform your users about your usage of
 Piwik, especially if you are located in the European Union.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2018, L<Nils Diewald|https://nils-diewald.de/>.
+Copyright (C) 2012-2019, L<Nils Diewald|https://nils-diewald.de/>.
 
 This program is free software, you can redistribute it and/or
 modify it under the terms of the Artistic License version 2.0.

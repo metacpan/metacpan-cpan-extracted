@@ -15,22 +15,17 @@
 .git/index
 .git/info/exclude
 .git/logs/HEAD
-.git/logs/refs/heads/deparallelize-testing-20181229
 .git/logs/refs/heads/fix-validate-list-sequence
 .git/logs/refs/heads/limit_current_end_idx
 .git/logs/refs/heads/master
-.git/logs/refs/heads/multisect-builds-20181224
-.git/logs/refs/heads/multisect-builds-20190103
-.git/logs/refs/heads/no_objects
-.git/logs/refs/heads/outwit_cpantesters
 .git/logs/refs/heads/subtree_experiment_2
 .git/logs/refs/heads/try-build-FAILURE
+.git/logs/refs/heads/warnings-transitions
 .git/logs/refs/heads/weirdcase
 .git/logs/refs/remotes/origin/fix-validate-list-sequence
 .git/logs/refs/remotes/origin/master
-.git/logs/refs/remotes/origin/multisect-builds-20181224
-.git/logs/refs/remotes/origin/multisect-builds-20190103
 .git/logs/refs/remotes/origin/subtree_experiment_2
+.git/logs/refs/remotes/origin/warnings-transitions
 .git/logs/refs/remotes/origin/weirdcase
 .git/logs/refs/stash
 .git/modules/master/config
@@ -195,22 +190,17 @@
 .git/modules/t/lib/refs/heads/master
 .git/modules/t/lib/refs/remotes/origin/HEAD
 .git/ORIG_HEAD
-.git/refs/heads/deparallelize-testing-20181229
 .git/refs/heads/fix-validate-list-sequence
 .git/refs/heads/limit_current_end_idx
 .git/refs/heads/master
-.git/refs/heads/multisect-builds-20181224
-.git/refs/heads/multisect-builds-20190103
-.git/refs/heads/no_objects
-.git/refs/heads/outwit_cpantesters
 .git/refs/heads/subtree_experiment_2
 .git/refs/heads/try-build-FAILURE
+.git/refs/heads/warnings-transitions
 .git/refs/heads/weirdcase
 .git/refs/remotes/origin/fix-validate-list-sequence
 .git/refs/remotes/origin/master
-.git/refs/remotes/origin/multisect-builds-20181224
-.git/refs/remotes/origin/multisect-builds-20190103
 .git/refs/remotes/origin/subtree_experiment_2
+.git/refs/remotes/origin/warnings-transitions
 .git/refs/remotes/origin/weirdcase
 .git/refs/stash
 .git/refs/tags/v0.01
@@ -224,6 +214,7 @@
 .git/refs/tags/v0.09
 .git/refs/tags/v0.10
 .git/refs/tags/v0.11
+.git/refs/tags/v0.12
 .gitignore
 .gitmodules
 Changes
@@ -334,5 +325,7 @@ t/lib/output2.txt
 xt/101-clang-build-transitions.t
 xt/102-gcc-build-transitions.t
 xt/103-g++-build-transitions.t
+xt/104-gcc-build-transitions-warnings.t
+xt/105-buildtransitions.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

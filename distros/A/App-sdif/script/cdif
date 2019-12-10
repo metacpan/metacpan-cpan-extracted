@@ -465,6 +465,9 @@ while (<DIFF>) {
 	}
     }
 }
+continue {
+    STDOUT->flush;
+}
 close DIFF;
 
 if ($opt_stat) {

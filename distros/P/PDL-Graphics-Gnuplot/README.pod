@@ -716,7 +716,7 @@ e.g. C<< grid=>["noxtics","ymtics"] >> draws no X gridlines and draws
 C<< grid=>["xtics","ytics"] >> or C<< grid=>["xtics ytics"] >> will draw both
 vertical (X) and horizontal (Y) grid lines on major tics.
 
-To draw a coordinate grid with default values, set C<< grid=>1 >>.  For more
+vTo draw a coordinate grid with default values, set C<< grid=>1 >>.  For more
 control, feed in a list ref with zero or more of the following parameters, in order:
 
 The C<zeroaxis> keyword indicates whether to actually draw each axis
@@ -2062,6 +2062,14 @@ processing (e.g. for superscripts and subscripts).  Set it to a false
 value for plain text, to a true value for enhanced text (which includes
 LaTeX-like markup for super/sub scripts and fonts).
 
+=item aa
+
+For certain pixel-grid terminals (currently only C<pncairo> and
+C<png>, as of v2.012), you can specify an antialiasing factor for the
+output.  The output is rendered oversized by a factor of C<aa>, then
+scaled down using C<PDL::Transform>.  Fixed font sized, line widths,
+and point sizes are autoscaled -- but you must handle variable ones
+explicitly.
 
 =back
 

@@ -201,3 +201,10 @@ Revision history for PPR
 0.000023  Fri Feb 15 09:20:25 2019
 
     * Fixed (?&PerlScalarExpression)
+
+
+0.000024  Tue Dec 10 05:20:23 2019
+
+    * Relaxed parsing of __DATA__ and __END__ in line with actual Perl parser
+
+    * Numerous doc bugs fixed (thanks F.Li!)

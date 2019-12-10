@@ -56,29 +56,35 @@ sub res ( $status, @args ) {
 
     my $reason;
 
-  REDO:
+    # expand status arrayref
     if ( is_plain_arrayref $status) {
-        ( $status, $reason ) = $status->@*;
+        $reason = $status->[1];
 
-        goto REDO;
+        $status = $status->[0];
     }
-    elsif ( is_res $status) {
-        $self->{status} = $status->{status};
 
-        $self->{reason} = $status->{reason};
+    # process status
+    if ( is_res $status) {
+        $self->{status} = $status = $status->{status};
+
+        $self->{reason} //= $status->{reason};
     }
     else {
         $self->{status} = $status;
+    }
 
-        if ( !defined $reason ) {
-            $self->{reason} = resolve_reason($status);
-        }
-        elsif ( is_plain_hashref $reason) {
-            $self->{reason} = resolve_reason( $status, $reason );
-        }
-        else {
-            $self->{reason} = $reason;
-        }
+    # process reason
+    if ( !defined $reason ) {
+        $self->{reason} = resolve_reason($status);
+    }
+    elsif ( is_res $reason) {
+        $self->{reason} = $reason->{reason};
+    }
+    elsif ( is_plain_hashref $reason) {
+        $self->{reason} = resolve_reason( $status, $reason );
+    }
+    else {
+        $self->{reason} = $reason;
     }
 
     return $self;

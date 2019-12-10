@@ -1,4 +1,4 @@
-# $Id: Class-Simple.t,v 1.8 2008/01/30 18:04:31 sullivan Exp $
+# $Id: Class-Simple.t,v 1.8 2008/01/01 16:38:37 sullivan Exp $
 #
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Class-Simple.t'

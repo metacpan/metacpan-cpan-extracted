@@ -82,6 +82,7 @@ DESCRIPTION
         Add a new watcher to the given notifier. The watcher will create
         events on the pathname $name as given in $mask, which can be any of
         the following constants (all exported by default) ORed together.
+        Constants unavailable on your system will evaluate to 0.
 
         "file" refers to any file system object in the watched object
         (always a directory), that is files, directories, symlinks, device

@@ -1,0 +1,14 @@
+Revision history for Perl extension GitHub-Apps-Auth
+
+0.03 2019-12-04T08:59:42Z
+
+    - auto detecting installation_id by login name
+
+0.02 2019-12-04T07:24:52Z
+
+    - fix cpanfile.
+
+0.01 2019-12-04T07:00:52Z
+
+    - original version
+

@@ -4,7 +4,7 @@
 
 do('../Config');
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 pp_setversion(qq{'$VERSION'});
 $VERSION = eval $VERSION;
 
@@ -68,6 +68,10 @@ typedef logical (*L_fp)();
 
 static integer c_zero = 0;
 static integer c_nine = 9;
+extern integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
+		integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
+		opts_len);
+
 ');
 
 pp_addpm({At=>'Top'},<<'EOD');
@@ -490,38 +494,31 @@ pp_def("ggsvd",
 
              types(F) %{
 
-		extern int sggsvd_(char *jobu, char *jobv, char *jobq, integer *m, 
+		extern int sggsvd3_(char *jobu, char *jobv, char *jobq, integer *m,
 		integer *n, integer *p, integer *k, integer *l, float *a, 
 		integer *lda, float *b, integer *ldb, float *alpha, 
 		float *beta, float *u, integer *ldu, float *v, integer 
-		*ldv, float *q, integer *ldq, float *work, integer *iwork, 
+		*ldv, float *q, integer *ldq, float *work, integer *lwork, integer *iwork,
 		integer *info);
 
-		float *work;
+		float *work, twork[1];
              %}
              types(D) %{
 
-		extern int dggsvd_(char *jobu, char *jobv, char *jobq, integer *m, 
+		extern int dggsvd3_(char *jobu, char *jobv, char *jobq, integer *m,
 		integer *n, integer *p, integer *k, integer *l, double *a, 
 		integer *lda, double *b, integer *ldb, double *alpha, 
 		double *beta, double *u, integer *ldu, double *v, integer 
-		*ldv, double *q, integer *ldq, double *work, integer *iwork, 
+		*ldv, double *q, integer *ldq, double *work, integer *lwork, integer *iwork,
 		integer *info);
 
-		double *work;
+		double *work, twork[1];
              %}
-		integer lwork = ($SIZE (m) < $SIZE (n)) ? $SIZE (n): $SIZE (m);
+		integer lwork = -1; // = ($SIZE (m) < $SIZE (n)) ? $SIZE (n): $SIZE (m);
 
-		if ($SIZE (p) > lwork)
-			lwork = $SIZE (p);
+		//if ($SIZE (p) > lwork)
+		//	lwork = $SIZE (p);
 		
-		types(F) %{
-			work = (float *)malloc((3*lwork +  $SIZE (n))*  sizeof(float));
-		%}
-		types(D) %{
-			work = (double *)malloc((3*lwork +  $SIZE (n)) *  sizeof(double));
-		%}		
-
 		if ($jobu())
 			pjobu = \'U\';
 		if ($jobv())
@@ -529,8 +526,42 @@ pp_def("ggsvd",
 		if ($jobq())
 			pjobq = \'Q\';
 
+		$TFD(sggsvd3_,dggsvd3_)(
+		&pjobu,
+		&pjobv,
+		&pjobq,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__p_size)},
+		$P(k),
+		$P(l),
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(alpha),
+		$P(beta),
+		$P(U),
+		&(integer){$PRIV(__q_size)},
+		$P(V),
+		&(integer){$PRIV(__s_size)},
+		$P(Q),
+		&(integer){$PRIV(__u_size)},
+		&twork[0],
+		&lwork,
+		$P(iwork),
+		$P(info));
+
+		lwork = (integer) twork[0];
 		
-		$TFD(sggsvd_,dggsvd_)(
+		types(F) %{
+			work = (float *)malloc(lwork *  sizeof(float));
+		%}
+		types(D) %{
+			work = (double *)malloc(lwork *  sizeof(double));
+		%}
+
+		$TFD(sggsvd3_,dggsvd3_)(
 		&pjobu,
 		&pjobv,
 		&pjobq,
@@ -552,6 +583,7 @@ pp_def("ggsvd",
 		$P(Q),
 		&(integer){$PRIV(__u_size)},
 		work,
+		&lwork,
 		$P(iwork),
 		$P(info));
 		free(work);
@@ -2609,9 +2641,6 @@ pp_def("ggesx",
 		char psens = \'N\';
 		integer *bwork;
 		integer *iwork;
-		extern integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
-		integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
-		opts_len);
              types(F) %{
 		extern int sggesx_(char *jobvsl, char *jobvsr, char *sort, L_fp
 		delctg, char *sense, integer *n, float *a, integer *lda, float *b,
@@ -5872,9 +5901,6 @@ pp_def("gelsd",
 		integer smlsiz, size_i, nlvl, *iwork;
 		integer minmn = min( $SIZE(m), $SIZE(n) );
 
-		extern integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
-		integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
-		opts_len);
 
              types(F) %{
 		extern int sgelsd_(integer *m, integer *n, integer *nrhs,
@@ -12359,11 +12385,11 @@ pp_addpm({At=>'Bot'},<<'EOD');
 
 =head1 AUTHOR
 
-Copyright (C) Grégory Vanuxem 2005-2007.
+Copyright (C) Grégory Vanuxem 2005-2018.
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the artistic license as specified in the Artistic
-file.
+it under the terms of the Perl Artistic License as in the file Artistic_2
+in this distribution.
 
 =cut
 

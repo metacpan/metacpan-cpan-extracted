@@ -1,5 +1,5 @@
 package Net::Amazon::S3;
-$Net::Amazon::S3::VERSION = '0.86';
+$Net::Amazon::S3::VERSION = '0.87';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -406,7 +406,12 @@ sub _xpc_of_content {
     # warn $doc->toString(1);
 
     my $xpc = XML::LibXML::XPathContext->new($doc);
-    $xpc->registerNs( 's3', 'http://s3.amazonaws.com/doc/2006-03-01/' );
+
+    # Set default XML document NS as S3 namespace.
+    # Or default Amazon xmlns (for documents without NS).
+    my $s3_ns = $doc->documentElement->lookupNamespaceURI
+       || 'http://s3.amazonaws.com/doc/2006-03-01/';
+    $xpc->registerNs( 's3', $s3_ns );
 
     return $xpc;
 }
@@ -451,7 +456,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::SetBucketAccessControl;
-$Net::Amazon::S3::Request::SetBucketAccessControl::VERSION = '0.86';
+$Net::Amazon::S3::Request::SetBucketAccessControl::VERSION = '0.87';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request::Bucket';
@@ -47,7 +47,7 @@ Net::Amazon::S3::Request::SetBucketAccessControl - An internal class to set a bu
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 SYNOPSIS
 

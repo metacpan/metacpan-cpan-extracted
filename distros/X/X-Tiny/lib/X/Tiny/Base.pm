@@ -223,7 +223,12 @@ sub _check_overload {
 
     $_OVERLOADED{$class} ||= eval qq{
         package $class;
-        use overload (q<""> => __PACKAGE__->can('__spew'));
+
+        use overload (
+            q<""> => __PACKAGE__->can('__spew'),
+            bool => __PACKAGE__->can('_TRUE'),
+        );
+
         1;
     };
 
@@ -279,6 +284,8 @@ sub _arg_to_printable {
         "'$copy'";
     };
 }
+
+use constant _TRUE => 1;
 
 sub __spew {
     my ($self) = @_;

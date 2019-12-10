@@ -23,10 +23,10 @@ my $test_data = {
         [ 'aaa.ck', 'aaa.ck', 1 ],              # permit to set cover cookie from pub. suffix
     ],
     get_cookies => [
-        [ 'www.aaa.ru', ['1;domain=;path='],       'www.aaa.ru', [qw[1]] ],
-        [ 'www.aaa.ru', ['2;domain=;path='],       'www.aaa.ru', [qw[1 2]] ],
-        [ 'www.aaa.ru', ['3;domain=aaa.ru;path='], 'www.aaa.ru', [qw[1 2 3]] ],
-        [ 'www.aaa.ru', [], 'ccc.www.aaa.ru', [qw[3]] ],
+        [ 'www.aaa.ru', ['1;domain=;path='],       'www.aaa.ru',     [qw[1]] ],
+        [ 'www.aaa.ru', ['2;domain=;path='],       'www.aaa.ru',     [qw[1 2]] ],
+        [ 'www.aaa.ru', ['3;domain=aaa.ru;path='], 'www.aaa.ru',     [qw[1 2 3]] ],
+        [ 'www.aaa.ru', [],                        'ccc.www.aaa.ru', [qw[3]] ],
 
         # compute.amazonaws.com only covers itself, since it's a public suffix;
         # amazonaws.com covers amazonaws.com, www.amazonaws.com, foo.www.amazonaws.com, and compute.amazonaws.com;
@@ -34,9 +34,9 @@ my $test_data = {
 
         [ 'compute.amazonaws.com', ['4;domain=compute.amazonaws.com'], 'compute.amazonaws.com', [qw[4]] ],
         [ 'amazonaws.com',         ['5;domain=amazonaws.com'],         'amazonaws.com',         [qw[5]] ],
-        [ 'amazonaws.com', [], 'www.amazonaws.com',     [qw[5]] ],
-        [ 'amazonaws.com', [], 'foo.www.amazonaws.com', [qw[5]] ],
-        [ 'amazonaws.com', [], 'compute.amazonaws.com', [qw[4 5]] ],
+        [ 'amazonaws.com',         [],                                 'www.amazonaws.com',     [qw[5]] ],
+        [ 'amazonaws.com',         [],                                 'foo.www.amazonaws.com', [qw[5]] ],
+        [ 'amazonaws.com',         [],                                 'compute.amazonaws.com', [qw[4 5]] ],
 
         # [ 'amazonaws.com', [], 'foo.compute.amazonaws.com',     [] ],
         # [ 'amazonaws.com', [], 'www.foo.compute.amazonaws.com', [] ],

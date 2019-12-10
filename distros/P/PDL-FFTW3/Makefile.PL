@@ -84,6 +84,7 @@ $descriptor{NO_MYMETA} = 0;
 $descriptor{NAME}   = "PDL::FFTW3";
 $descriptor{AUTHOR} = "Dima Kogan <dima\@secretsauce.net>, Craig DeForest <deforest\@boulder.swri.edu>";
 $descriptor{ABSTRACT} = "PDL interface to the Fastest Fourier Transform in the West";
+$descriptor{LICENSE}  = "gpl_3";
 
 $descriptor{META_MERGE} = {
   resources => {

@@ -21,16 +21,19 @@ FP::Combinators - function combinators
 
 =head1 DESCRIPTION
 
-"A combinator is a higher-order function that uses only function
+=over 4
+
+I<A combinator is a higher-order function that uses only function
 application and earlier defined combinators to define a result from
-its arguments."
+its arguments.>
 
-(from https://en.wikipedia.org/wiki/Combinator)
+L<Combinator (wikipedia.org)|https://en.wikipedia.org/wiki/Combinator>
 
+=back
 
 =head1 SEE ALSO
 
-L<FP::Optional>
+L<FP::Optional>, L<FP::Combinators2>, L<FP::Predicates>, L<FP::Ops>
 
 =head1 NOTE
 

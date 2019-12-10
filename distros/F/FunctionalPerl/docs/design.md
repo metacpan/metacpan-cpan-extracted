@@ -187,16 +187,17 @@ way of checking for a '(&' method?))
 
 ### Naming conventions
 
-* Functions names are generally choosen to prefer "established"
-  functional languages (like Scheme, Haskell, Ocaml, rather than
-  JavaScript or even Clojure). The name `fold` is hence preferred over
-  `reduce` (which has a slightly different interface in JavaScript and
-  Clojure; well, no problem if you really want it with that interface,
-  we could add it, too). Also all other languages call the filtering
-  function `filter`, not `grep`, for example, and hence it's
-  `list_filter` or the method name `filter` here. (Hopefully you'll be
-  ok with that recognizing that the Perl builtin has a weird,
-  "non-functional" interface anyway.)
+* Functions names are generally choosen to prefer the naming in
+  "established" functional languages. For example the filtering
+  methods on `FP::Abstract::Sequence` are called `filter`, not `grep`
+  (likewise for the type-prefixed functions like `list_filter` in
+  `FP::List`, `array_filter` in `FP::Array`, etc.). Or as an other
+  example, `FP::Abstract::Sequence` also defines `fold` and
+  `fold_right` (see
+  [Fold (higher-order function)](https://en.wikipedia.org/wiki/Fold_%28higher-order_function%29))
+  according to traditional functional languages, in addition to
+  `reduce` which has a slightly different API and is close to
+  Clojure's reduce.
 
 * Function names *start* with the data type that they are made for;
   for example `array_map` versus `list_map`. (This follows the
@@ -270,6 +271,14 @@ way of checking for a '(&' method?))
   consistent with the Scheme naming conventions (first the type, then
   the field name, then the operation), and hints that it's different
   from imperative code.)
+
+* Functions and methods ending in an underscore are used to indicate
+  those taking key => value parameter pairs (as in the generated
+  constructor methods and functions from `FP::Struct`), or which are
+  curried, i.e. will return a parametrized function
+  (e.g. `left_associate_` and `right_associate_` from
+  `FP::Combinators2`) (this latter naming is experimental, is there a
+  better idea?).
 
 * Procedures and methods which are not safe, i.e. can lead to delayed
   failures instead of reporting an exception right away or lead to

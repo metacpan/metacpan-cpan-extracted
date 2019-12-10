@@ -1,6 +1,6 @@
 % if ($Object->CurrentUserHasRight('SeeMemo')) {
 <div class="memo-container" id="memo-container-<% $Name %>">
-    <div class="memo-content" id="<% $Name %>" data-objectclass="<% ref($Object) %>" data-objectid="<% $Object->id %>"><% $memo_content_html|n %></div>
+    <div class="memo-content" id="<% $Name %>" data-objectclass="<% ref($Object) %>" data-objectid="<% $Object->id %>"><% $Type eq 'text/html' ? $memo_content_html : $memo_linefeeds |n %></div>
 
 %   if ($Object->CurrentUserHasRight('ModifyMemo')) {
     <textarea autocomplete="off" class="memo-edit-content<% $Type eq 'text/html' ? ' richtext' : '' %>" style="width: 100%" rows="<% $Height %>" <% $wrap_type |n %> name="<% $Name %>Edit" id="<% $Name %>Edit"><% $memo_value %></textarea>
@@ -27,6 +27,9 @@ if ($Object->CurrentUserHasRight('SeeMemo') && $attr && $attr->Content && $attr-
     $memo_value = $attr->Content;
 }
 my $memo_content_html = $memo_value;
+$memo_content_html =~ s/\n/<br \/>/g unless $memo_content_html =~ /<br \/>/;
+my $memo_linefeeds = $memo_value;
+$memo_linefeeds =~ s/\n/<br \/>/g;
 
 # wrap="something" seems to really break IE + richtext
 my $wrap_type = $Type eq 'text/html' ? '' : 'wrap="soft"';

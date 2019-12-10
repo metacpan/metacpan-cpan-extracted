@@ -27,7 +27,7 @@ my %module_build_args = (
     "Dominique Dumont"
   ],
   "dist_name" => "Config-Model-Tester",
-  "dist_version" => "4.004",
+  "dist_version" => "4.005",
   "license" => "lgpl",
   "module_name" => "Config::Model::Tester",
   "recursive_test_files" => 1,

@@ -47,7 +47,11 @@
    "provides" : {
       "Apache2::AuthCookieDBI" : {
          "file" : "lib/Apache2/AuthCookieDBI.pm",
-         "version" : "2.18"
+         "version" : "2.19"
+      },
+      "Apache2_4::AuthCookieDBI" : {
+         "file" : "lib/Apache2_4/AuthCookieDBI.pm",
+         "version" : "2.19"
       }
    },
    "release_status" : "stable",
@@ -59,6 +63,6 @@
          "url" : "https://github.com/matisse/Apache-AuthCookieDBI"
       }
    },
-   "version" : "2.18",
+   "version" : "2.19",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

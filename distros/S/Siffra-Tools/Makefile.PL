@@ -35,6 +35,7 @@ my %WriteMakefileArgs = (
         'JSON::XS'              => 0,
         'MIME::Types'           => 0,
         'IO::Uncompress::Unzip' => 0,
+        'Term::ProgressBar'     => 0,
     },
     BUILD_REQUIRES => {
         'Test::More'          => 0,

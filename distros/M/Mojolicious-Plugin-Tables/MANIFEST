@@ -31,7 +31,6 @@ t/01template_override.t
 t/02json.t
 t/blah/lib/Blah.pm
 t/blah/script/blah
-t/blah/t/basic.t
 t/blah/templates/track/layouts/tables.html.ep
 t/blah/templates/track/tables/view.html.ep
 t/example.db

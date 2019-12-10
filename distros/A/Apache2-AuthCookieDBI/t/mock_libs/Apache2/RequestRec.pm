@@ -46,8 +46,16 @@ sub user {
 }
 
 sub subprocess_env {
-    my ( $self, %args ) = @_;
-    $self->{'subprocess_env'} = \%args;
+    my ( $self, @args ) = @_;
+    if ( @args == 1 ) {
+        unless ( ref($self->{'subprocess_env'}) ) {
+            $self->{'subprocess_env'} = {};
+        }
+        return $self->{'subprocess_env'}{$args[0]};
+    }
+    else {
+        $self->{'subprocess_env'} = { @args };
+    }
     return $self;
 }
 

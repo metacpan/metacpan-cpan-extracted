@@ -1,5 +1,5 @@
 package Bio::Tradis::AddTagsToSeq;
-$Bio::Tradis::AddTagsToSeq::VERSION = '1.4.3';
+$Bio::Tradis::AddTagsToSeq::VERSION = '1.4.5';
 # ABSTRACT: Takes a BAM file and creates a new BAM with tr and tq tags added to the sequence and quality strings.
 
 
@@ -181,7 +181,7 @@ Bio::Tradis::AddTagsToSeq - Takes a BAM file and creates a new BAM with tr and t
 
 =head1 VERSION
 
-version 1.4.3
+version 1.4.5
 
 =head1 SYNOPSIS
 

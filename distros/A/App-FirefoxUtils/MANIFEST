@@ -8,8 +8,10 @@ Makefile.PL
 README
 dist.ini
 lib/App/FirefoxUtils.pm
+script/firefox-is-paused
 script/kill-firefox
 script/pause-firefox
+script/ps-firefox
 script/terminate-firefox
 script/unpause-firefox
 t/00-compile.t

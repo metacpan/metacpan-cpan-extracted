@@ -98,6 +98,10 @@ METHODS
     elements will be added from merging schema - validators from existing
     and merging schema get combined
 
+ schema
+
+    Returns the schema. Useful after schema merging.
+
  transform_data
 
     Transform one key in the data according to rules specified as callbacks

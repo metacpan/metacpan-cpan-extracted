@@ -14,8 +14,10 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-FirefoxUtils",
   "EXE_FILES" => [
+    "script/firefox-is-paused",
     "script/kill-firefox",
     "script/pause-firefox",
+    "script/ps-firefox",
     "script/terminate-firefox",
     "script/unpause-firefox"
   ],
@@ -23,14 +25,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::FirefoxUtils",
   "PREREQ_PM" => {
-    "Data::Sah::Coerce::perl::To_int::From_int::CheckUIDExists" => 0,
-    "Data::Sah::Coerce::perl::To_int::From_str::ConvertUnixUserToUID" => 0,
+    "Data::Sah::Coerce::perl::To_int::From_int::check_uid_exists" => 0,
+    "Data::Sah::Coerce::perl::To_int::From_str::convert_unix_user_to_uid" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
+    "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Log::ger" => "0.027",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.820",
     "Proc::Find" => "0.051",
+    "Sah::Schema::true" => 0,
     "Sah::Schema::unix::local_uid" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -41,7 +45,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,9 +53,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah::Coerce::perl::To_int::From_int::CheckUIDExists" => 0,
-  "Data::Sah::Coerce::perl::To_int::From_str::ConvertUnixUserToUID" => 0,
+  "Data::Sah::Coerce::perl::To_int::From_int::check_uid_exists" => 0,
+  "Data::Sah::Coerce::perl::To_int::From_str::convert_unix_user_to_uid" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
+  "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -60,6 +65,7 @@ my %FallbackPrereqs = (
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.820",
   "Proc::Find" => "0.051",
+  "Sah::Schema::true" => 0,
   "Sah::Schema::unix::local_uid" => 0,
   "Test::More" => 0,
   "strict" => 0,

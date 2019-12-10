@@ -11,7 +11,7 @@ use ExtUtils::MakeMaker 7.1101;
 die 'OS unsupported' if ( $^O eq 'MSWin32' && scalar((Win32::GetOSVersion())[1]) < 6 );
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Remote Execution",
+  "ABSTRACT" => "the friendly automation framework",
   "AUTHOR" => "Jan Gehring <jfried\@rexify.org>",
   "BUILD_REQUIRES" => {
     "Test::Pod" => 0,
@@ -91,7 +91,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::UseAllModules" => "0.15"
   },
-  "VERSION" => "1.7.0",
+  "VERSION" => "1.7.1",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/issue/*.t"
   }

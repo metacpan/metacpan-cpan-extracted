@@ -11,7 +11,7 @@ has color  => (0);    # colorize dump
 has tags   => (0);    # do not add tags
 has indent => (4);    # indent spaces
 
-has _indent => ( init_arg => undef );
+has _indent => ( init_arg             => undef );
 has _seen   => ( sub { {} }, init_arg => undef );    # HashRef
 
 our $COLOR = {

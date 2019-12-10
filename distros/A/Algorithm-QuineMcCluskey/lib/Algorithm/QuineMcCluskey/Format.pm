@@ -11,15 +11,14 @@ use strict;
 use warnings;
 use 5.016001;
 
-use Algorithm::QuineMcCluskey::Util qw(matchcount);
-use List::MoreUtils qw(uniq firstidx);
+use List::Util qw(any uniqstr);
 
 use Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(arrayarray hasharray chart);
 
-our $VERSION = 1.00;
+our $VERSION = 1.01;
 
 =head1 DESCRIPTION
 
@@ -86,7 +85,7 @@ sub chart
 	my($hr, $width) = @_;
 
 	my @rows = sort setbit_cmp keys %$hr;
-	my @columns = sort(uniq(map{ @{ $hr->{$_} } } @rows));
+	my @columns = sort(uniqstr(map{ @{ $hr->{$_} } } @rows));
 	my $fmt = "%" . ($width+2) . "s";
 	my @output;
 
@@ -98,9 +97,9 @@ sub chart
 	#
 	for my $r (@rows)
 	{
-		my @present = map {my $v = $_; (firstidx{$v eq $_} @{ $hr->{$r} }) } @columns;
+		my @present = map {my $v = $_; (any{$v eq $_} @{ $hr->{$r} }) } @columns;
 
-		my @marks = map{ sprintf($fmt, ($_ == -1)? '.': 'x') } @present;
+		my @marks = map{ sprintf($fmt, $_? 'x': '.') } @present;
 
 		push @output, join("", sprintf($fmt, $r), @marks);
 	}
@@ -119,12 +118,16 @@ and hasharray() functions.
 
 sub setbit_cmp
 {
-	return ((matchcount($a, '1') <=> matchcount($b, '1')) || ($a cmp $b));
+	my $a1 = scalar(() = $a=~ m/1/g);
+	my $b1 = scalar(() = $b=~ m/1/g);
+	return (($a1 <=> $b1) || ($a cmp $b));
 }
 
 sub unsetbit_cmp
 {
-	return ((matchcount($a, '0') <=> matchcount($b, '0')) || ($b cmp $a));
+	my $a0 = scalar(() = $a=~ m/0/g);
+	my $b0 = scalar(() = $b=~ m/0/g);
+	return (($a0 <=> $b0) || ($a cmp $b));
 }
 
 =head1 SEE ALSO

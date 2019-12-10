@@ -1,0 +1,26 @@
+=head1 NAME
+
+overload::open - Hooks the native open function
+
+=head1 SYNOPSIS
+
+  my %opened_files;
+  sub my_callback { return if !@_; $opened_files{shift}++ }
+  use overload::open 'my_callback';
+
+  open my $fh, '>', "foo.txt";
+
+=head1 DESCRIPTION
+
+This module hooks the native open() function and sends it to your
+function instead. It passes the filename opened as its argument. It does this
+using XS and replacing the OP_OPEN opcode with a custom one, which calls the
+Perl function you supply, then calls the original OP_OPEN opcode.
+
+=head1 AUTHOR
+
+Samantha McVey <samantham@posteo.net>
+
+=head1 LICENSE
+
+This module is available under the same licences as perl, the Artistic license and the GPL.

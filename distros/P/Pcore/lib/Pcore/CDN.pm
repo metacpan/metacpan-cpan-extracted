@@ -152,7 +152,7 @@ sub sync ( $self, $local, $remote, @locations ) {
     return $remote->sync( [ map { $_->{path} } $self->{locations}->@{@locations} ], $tree );
 }
 
-sub get_nginx_cfg($self) {
+sub get_nginx_cfg ($self) {
     my @buf;
 
     while ( my ( $bucket_name, $bucket ) = each $self->{buckets}->%* ) {

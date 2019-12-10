@@ -151,4 +151,28 @@ is($sd->[4], 152, 'getMultiArray 7');
 is($sd->[5], 'test', 'getMultiArray 8');
 is($sd->[6]->{42}, 'end', 'getMultiArray 9');
 
+# Do not overwrite secure parameter
+$url = $app->piwik->api_url(
+  Track => {
+    action_url => 'http://khm.li/Test',
+    action_name => 'Märchen/Test',
+    url => 'https://test',
+    secure => 0,
+});
+
+like($url, qr{^https://test}, 'Get url');
+unlike($url, qr{secure=1}, 'Overwrite secure');
+
+$url = $app->piwik->api_url(
+  Track => {
+    action_url => 'http://khm.li/Test',
+    action_name => 'Märchen/Test',
+    url => 'http://test',
+    secure => 1,
+});
+
+like($url, qr{^http://test}, 'Get url');
+like($url, qr{secure=1}, 'Overwrite secure');
+
+
 done_testing;

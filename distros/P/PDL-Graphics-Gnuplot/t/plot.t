@@ -203,7 +203,7 @@ eval { $w->plot( xvals(5), xvals(5)**2 ); };
 ok(!$@, "ascii plot succeeded");
 
 eval { $w->plot( xvals(10000), xvals(10000)->sqrt ); };
-ok(!$@, "looong ascii plot succeeded");
+ok(!$@, "looong ascii plot succeeded ".($@?"($@)":""));
 
 
 ##############################
@@ -258,7 +258,10 @@ $w->restart;
 unlink($testoutput) or warn "\$!: $!";
 ok(@l3==24,"test replot again made 24 lines");
 
-if($w->{gp_version} == 5.0 and $Alien::Gnuplot::pl==0) {
+if($w->{gp_version} == 5.0 && $Alien::Gnuplot::pl==0
+   or
+   $w->{gp_version} == 5.2 && $Alien::Gnuplot::pl==0
+) {
     # gnuplot 5.0 patchlevel 0 uses plusses and hyphens to draw curves in ASCII
     # match whitespace / curve / whitespace / curve / whitespace  on line 12
     ok($l3[12] =~ m/\s+[\-\+]+\s+[\-\+]+\s+/, "test plot has two curves");
@@ -859,7 +862,12 @@ SKIP:{
     open FOO,"<$testoutput";
     @lines = <FOO>;
     close FOO;
-    ok($lines[1] =~ m/^\s*$/, "Setting empty plot title sets an empty title");
+    if($w->{gp_version} < 5.2) {
+	ok($lines[1] =~ m/^\s*$/, "Setting empty plot title sets an empty title");
+    } else {
+	# Late-model gnuplots use the top lines if there is no title
+	ok($lines[1] =~ m/\-{50,70}/);
+    }
 }
 
 ##############################

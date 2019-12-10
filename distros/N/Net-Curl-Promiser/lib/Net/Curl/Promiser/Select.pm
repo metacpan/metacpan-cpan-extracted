@@ -16,6 +16,11 @@ L<select()|perlfunc/select> built-in.
 
 See F</examples> in the distribution for a fleshed-out demonstration.
 
+This is “the hard way” to do this, by the way. Your life will be simpler
+if you use (or create) an event-loop-based implementation like
+L<Net::Curl::Promiser::AnyEvent> or L<Net::Curl::Promiser::IOAsync>.
+See F</examples> for comparisons.
+
 =cut
 
 #----------------------------------------------------------------------
@@ -68,8 +73,8 @@ sub get_fds {
 
 =head2 @fds = I<OBJ>->get_timeout();
 
-Calls the base class’s implementation of this method and then
-translates it to seconds (since that’s what C<select()> expects).
+Translates the base class’s implementation of this method to seconds
+(since that’s what C<select()> expects).
 
 =cut
 

@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.166';
+our $VERSION = '1.167';
 
 use Quiq::Path;
 use Scalar::Util ();
@@ -114,7 +114,7 @@ sub line {
 
 =head4 Synopsis
 
-  $scriptTags = Quiq::JavaScript->script($h,@specs);
+  $html = Quiq::JavaScript->script($h,@specs);
 
 =head4 Arguments
 
@@ -159,13 +159,13 @@ Wird zu @specs expandiert.
 
 Code zum Laden einer JavaScript-Datei über URL:
 
-  $script = Quiq::JavaScript->script($h,'https://host.dom/scr.js');
+  $html = Quiq::JavaScript->script($h,'https://host.dom/scr.js');
   =>
   <script src="https://host.dom/scr.js" type="text/javascript"></script>
 
 Code aus Datei einfügen:
 
-  $style = Quiq::JavaScript->script($h,'inline:js/script.css');
+  $html = Quiq::JavaScript->script($h,'inline:js/script.css');
   =>
   <script type="text/javascript">
     ...
@@ -173,7 +173,7 @@ Code aus Datei einfügen:
 
 Code direkt einfügen:
 
-  $style = Quiq::JavaScript->script($h,q|
+  $html = Quiq::JavaScript->script($h,q|
       ...
   |);
   =>
@@ -183,14 +183,14 @@ Code direkt einfügen:
 
 Mehrere Code-Spezifikationen:
 
-  $style = Quiq::JavaScript->script(
+  $html = Quiq::JavaScript->script(
       '...'
       '...'
   );
 
 Mehrere Code-Spezifikationen via Arrayreferenz:
 
-  $style = Quiq::JavaScript->script(
+  $html = Quiq::JavaScript->script(
       ['...','...']
   );
 
@@ -255,7 +255,7 @@ sub script {
 
 =head1 VERSION
 
-1.166
+1.167
 
 =head1 AUTHOR
 

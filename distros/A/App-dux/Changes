@@ -1,4 +1,9 @@
-1.53    2017-07-10 (PERLANCAR)
+1.540   2019-10-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Simplify CLI, turn off config reading.
+
+
+1.53    2017-07-10  Released-By: PERLANCAR
 
 	- Replace code to check for installed module from using
 	  Module::Path::More to using Module::Installed::Tiny (works with
@@ -7,7 +12,7 @@
 	- Replace Log::Any with Log::ger.
 
 
-1.52    2016-04-27 (PERLANCAR)
+1.52    2016-04-27  Released-By: PERLANCAR
 
 	- [Bugfix] Output was broken for actions other than call (e.g.
 	  help) because 'out' is only defined for action=call.
@@ -15,7 +20,7 @@
 	- We don't need to read env for now (e.g. DUX_OPT).
 
 
-1.51    2015-11-22 (PERLANCAR)
+1.51    2015-11-22  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -24,30 +29,30 @@
 	  output is being piped.
 
 
-1.50    2015-08-17 (PERLANCAR)
+1.50    2015-08-17  Released-By: PERLANCAR
 
 	- [Bugfix] Unbreak: update to recent Perinci::CmdLine::Lite.
 
 
-1.49    2015-08-17 (PERLANCAR)
+1.49    2015-08-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-1.48    2014-12-27 (PERLANCAR)
+1.48    2014-12-27  Released-By: PERLANCAR
 
 	- Replace Module::Path with Module::Path::More.
 
 
-1.47    2014-10-30 (PERLANCAR)
+1.47    2014-10-30  Released-By: PERLANCAR
 
 	- Turn off streaming if response is an error response, so user can
 	  see the error.
 
 
-1.46    2014-09-16 (PERLANCAR)
+1.46    2014-09-16  Released-By: PERLANCAR
 
         - Fix broken stuff (adjust to new Perinci::CmdLine::*).
 
@@ -55,30 +60,30 @@
           startup.
 
 
-1.45    2014-05-02 (SHARYANTO)
+1.45    2014-05-02  Released-By: SHARYANTO
 
         - Forgot to add summary in --long -l.
 
 
-1.44    2014-05-02 (SHARYANTO)
+1.44    2014-05-02  Released-By: SHARYANTO
 
         - Add --long option for -l.
 
 
-1.43    2014-04-25 (SHARYANTO)
+1.43    2014-04-25  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - Fix regex in 'dux -l' to show Data::Unixish::ANSI::* functions.
 
 
-1.42    2014-04-24 (SHARYANTO)
+1.42    2014-04-24  Released-By: SHARYANTO
 
         - Pass -cmdline object to function, to let dux functions be aware when
           called under CLI.
 
 
-1.41    2014-04-20 (SHARYANTO)
+1.41    2014-04-20  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -87,7 +92,7 @@
           backward-compat for now.
 
 
-1.40    2014-04-18 (SHARYANTO)
+1.40    2014-04-18  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -95,7 +100,7 @@
           'call').
 
 
-1.39    2013-12-13 (SHARYANTO)
+1.39    2013-12-13  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -103,19 +108,19 @@
           Locale::TextDomain).
 
 
-1.38    2013-11-11 (SHARYANTO)
+1.38    2013-11-11  Released-By: SHARYANTO
 
         - Read input and print output as UTF-8.
 
 
-1.37    2013-11-11 (SHARYANTO)
+1.37    2013-11-11  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Show also Data::Unixish version in --version.
 
 
-1.36    2013-11-07 (SHARYANTO)
+1.36    2013-11-07  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -123,27 +128,27 @@
           indexed by MetaCPAN).
 
 
-1.35    2013-10-04 (SHARYANTO)
+1.35    2013-10-04  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Adjust to recent version of Perinci::CmdLine (which has color themes).
 
 
-1.34    2013-09-30 (SHARYANTO)
+1.34    2013-09-30  Released-By: SHARYANTO
 
         - Add special argument to dux function -dux_cli => 1 to let function be
           aware it is being run under 'dux' CLI app.
 
 
-1.33    2013-04-19 (SHARYANTO)
+1.33    2013-04-19  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - 'dux -l' didn't recurse.
 
 
-1.32    2013-04-14 (SHARYANTO)
+1.32    2013-04-14  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -154,12 +159,12 @@
           to it.
 
 
-1.31    2013-04-13 (SHARYANTO)
+1.31    2013-04-13  Released-By: SHARYANTO
 
         - No functional changes. Set Perinci::CmdLine dep version.
 
 
-1.30    2013-04-13 (SHARYANTO)
+1.30    2013-04-13  Released-By: SHARYANTO
 
         [REMOVED FEATURES]
 
@@ -168,13 +173,13 @@
           'x.perinci.cmdline.default_format' attribute.
 
 
-1.29    2013-04-12 (SHARYANTO)
+1.29    2013-04-12  Released-By: SHARYANTO
 
         - No functional changes. Fix small bug in setting format from
           x.dux.default_format.
 
 
-1.28    2013-04-12 (SHARYANTO)
+1.28    2013-04-12  Released-By: SHARYANTO
 
         - Observe 'x.dux.default_format' Rinci metadata attribute.
 
@@ -182,30 +187,30 @@
           Module::Load exception).
 
 
-1.27    2013-04-11 (SHARYANTO)
+1.27    2013-04-11  Released-By: SHARYANTO
 
         - Observe 'x.dux.strip_newlines' Rinci metadata attribute.
 
         - Sort -l output.
 
 
-1.26    2012-08-08 (SHARYANTO)
+1.26    2012-08-08  Released-By: SHARYANTO
 
         - Add --list (-l) option to list available dux functions.
 
 
-1.25    2012-08-08 (SHARYANTO)
+1.25    2012-08-08  Released-By: SHARYANTO
 
         - No functional changes. Increase Perl minimum version 5.10.0 -> 5.10.1
           (uses 'parent').
 
 
-1.24    2012-08-07 (SHARYANTO)
+1.24    2012-08-07  Released-By: SHARYANTO
 
         - No functional changes. Fix Abstract.
 
 
-1.23    2012-08-07 (SHARYANTO)
+1.23    2012-08-07  Released-By: SHARYANTO
 
         - First version. Split from Data-Unixish to resolve circular dependency
           problem (reported by Dagfinn Ilmari Mannsåker).

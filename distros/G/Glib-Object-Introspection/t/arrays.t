@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-plan tests => 72;
+plan tests => 88;
 
 ok (Regress::test_strv_in ([ '1', '2', '3' ]));
 
@@ -178,4 +178,52 @@ SKIP: {
     is ($data, 'user23');
   }, 'user23');
   $obj->emit_sig_with_array_len_prop ();
+}
+
+# -----------------------------------------------------------------------------
+
+SKIP: {
+  my $have_poppler = eval {
+    Glib::Object::Introspection->setup (
+      basename    => 'Poppler',
+      version     => '0.18',
+      package     => 'Poppler');
+    1;
+  };
+  skip 'flat array tests using Poppler', 16
+    unless $have_poppler;
+
+  my $pdf = <<__PDF__; # https://github.com/mathiasbynens/small/blob/master/pdf.pdf
+%PDF-1.
+1 0 obj<</Pages 2 0 R>>endobj
+2 0 obj<</Kids[3 0 R]/Count 1>>endobj
+3 0 obj<</Parent 2 0 R>>endobj
+trailer <</Root 1 0 R>>
+__PDF__
+
+  my ($major, $minor, $micro) = split /\./, Poppler::get_version ();
+  my @args = ($major > 0 || $minor >= 78) ? ([map ord, split //, $pdf], undef) : ($pdf, length $pdf, undef);
+  my $doc = Poppler::Document->new_from_data (@args);
+  my $quads = [
+    Glib::Boxed::new ('Poppler::Quadrilateral',
+                      {p1 => {x => 0, y => 0},
+                       p2 => {x => 1, y => 1},
+                       p3 => {x => 2, y => 2},
+                       p4 => {x => 3, y => 3}}),
+    Glib::Boxed::new ('Poppler::Quadrilateral',
+                      {p1 => {x => 4, y => 4},
+                       p2 => {x => 5, y => 5},
+                       p3 => {x => 6, y => 6},
+                       p4 => {x => 7, y => 7}}),
+  ];
+  my $rect = Glib::Boxed::new ('Poppler::Rectangle', {x1 => 0, y1 => 0, x2 => 9, y2 => 9});
+  my $annot = Poppler::AnnotTextMarkup->new_highlight ($doc, $rect, $quads);
+  my $new_quads = $annot->get_quadrilaterals ();
+  for my $index (0 .. 1) {
+    for my $point (qw/p1 p2 p3 p4/) {
+      for my $coord (qw/x y/) {
+        is ($new_quads->[$index]->$point->$coord, $quads->[$index]->$point->$coord);
+      }
+    }
+  }
 }

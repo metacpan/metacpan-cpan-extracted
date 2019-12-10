@@ -1,5 +1,5 @@
 package Util::Medley::Roles::Attributes::File;
-$Util::Medley::Roles::Attributes::File::VERSION = '0.016';
+$Util::Medley::Roles::Attributes::File::VERSION = '0.020';
 use Modern::Perl;
 use Moose::Role;
 use Util::Medley::File;
@@ -10,7 +10,7 @@ Util::Medley::Roles::Attributes::File
 
 =head1 VERSION
 
-version 0.016
+version 0.020
 
 =cut
 

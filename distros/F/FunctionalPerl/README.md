@@ -6,9 +6,9 @@ properly formatted versions of these documents.
 # Functional programming in Perl
 
 This project aims to make it easier to reduce the number of places in
-Perl programs where side effects are being used, by providing
-facilities like data structures to enable it and tutorials and
-introductions to show good ways to go about it.
+Perl programs where side effects are used, by providing facilities
+like data structures to enable it and tutorials and introductions to
+show good ways to go about it.
 
 Side effects (mutation and input/output), unless they are contained
 locally (transparent to the user of a subroutine/method/API) are not
@@ -16,23 +16,36 @@ part of the method/subroutine calling interface but are implicit
 (hopefully at least documented), and such a call has lingering
 effects, possibly at a distance. This makes tracking down bugs more
 difficult, and can hinder the reuse of program parts in newly combined
-ways. Also, code using side effects means re-running it may not be
-idempotent (hence produce failures) or be calculating different
-values, which prevents its use in an interactive way, like from a
-read-eval print loop or debugger, and makes writing tests more
-difficult.
+ways. Also, code that uses side effects may not be idempotent (hence
+produce failures) or be calculating different values when re-run,
+which prevents its use in an interactive way, like from a read-eval
+print loop or debugger, and makes writing tests more difficult.
 
 <with_toc>
 
 ## Examples
 
-Work more comfortably with sequences:
+Work more easily with sequences:
 
     use Test::More;
     use FunctionalPerl ":all"; # includes autoboxing (methods on arrays work)
     
     is [2, 3, 4]->reduce(\&add), 9; # the `sum` method does the same
     is [2, 3, 4]->map(\&square)->sum, 29;
+
+There are short constructor functions like `list` for non-native data
+structures; `equal` knows how to deal with all comparable data
+structures:
+
+    use FP::Equal;
+    ok equal( ["a".."z"]->chunks_of(2)->take(3)->list,
+              list(purearray('a', 'b'), purearray('c', 'd'), purearray('e', 'f')) );
+
+`purearray`s (`FP::PureArray`) are arrays but immutable to prevent
+accidental mutation. You could request mutable ones:
+
+    ok equal( ["a".."z"]->chunks_of(2)->take(3)->map(the_method "array")->array,
+              [['a', 'b'], ['c', 'd'], ['e', 'f']] );
 
 Make some XML document:
 
@@ -49,19 +62,19 @@ Make some XML document:
 Now create a bigger document, with its inner parts built from external
 inputs:
 
-    MYEXAMPLE
-      (PROTOCOL_VERSION("0.123"),
-       RECORDS
-       (csv_file_to_rows($inpath, {eol=> "\n", sep_char=> ";"})
-        # skip the header row
-        ->rest
-        # map rows to XML elements
-        ->map(sub {
-                  my ($a,$b,$c,$d)= @{$_[0]};
-                  RECORD(A($a), B($b), C($c), D($d))
-              })))
-      # print XML document to disk
-      ->xmlfile($outpath);
+    MYEXAMPLE(
+        PROTOCOL_VERSION("0.123"),
+        RECORDS(
+            csv_file_to_rows($inpath, {eol=> "\n", sep_char=> ";"})
+            # skip the header row
+            ->rest
+            # map rows to XML elements
+            ->map(sub {
+                      my ($a,$b,$c,$d)= @{$_[0]};
+                      RECORD(A($a), B($b), C($c), D($d))
+                  })))
+        # print XML document to disk
+        ->xmlfile($outpath);
 
 The `MYEXAMPLE` document above is built lazily: `csv_file_to_rows`
 returns a *lazy* list of rows, `->rest` causes the first CSV row to be
@@ -71,7 +84,7 @@ which returns a `PXML` object representing a 'records' XML element,
 that is then passed to `MYEXAMPLE` which returns a `PXML` object
 representing a 'myexample' XML element. `PXML` objects come with an
 `xmlfile` method which serializes the document to a file, and only
-while it runs, when it encounters the embedded lazy lists, it walks
+while it runs, when it encounters the embedded lazy lists, does it walk
 those evaluating the list items one at a time and dropping each item
 immediately after printing. This means that only one row of the CSV
 file needs to be held in memory at any given point.

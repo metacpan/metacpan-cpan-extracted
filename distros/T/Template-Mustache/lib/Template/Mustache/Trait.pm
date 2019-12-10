@@ -1,7 +1,7 @@
 package Template::Mustache::Trait;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: turn an attribute into a Mustache template
-$Template::Mustache::Trait::VERSION = '1.3.2';
+$Template::Mustache::Trait::VERSION = '1.3.3';
 
 use Moose::Role;
 
@@ -24,7 +24,7 @@ before _process_options => sub {
 
 package Moose::Meta::Attribute::Custom::Trait::Mustache;
 our $AUTHORITY = 'cpan:YANICK';
-$Moose::Meta::Attribute::Custom::Trait::Mustache::VERSION = '1.3.2';
+$Moose::Meta::Attribute::Custom::Trait::Mustache::VERSION = '1.3.3';
 sub register_implementation { 'Template::Mustache::Trait' }
 
 1;
@@ -41,7 +41,7 @@ Template::Mustache::Trait - turn an attribute into a Mustache template
 
 =head1 VERSION
 
-version 1.3.2
+version 1.3.3
 
 =head1 SYNOPSIS
 

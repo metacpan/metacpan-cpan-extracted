@@ -25,6 +25,7 @@ requires:
   JSON: '0'
   Log::ger: '0.027'
   Nodejs::Util: '0.007'
+  Time::Duration::Parse::AsHash: '0'
   perl: '5.010001'
   strict: '0'
   subroutines: '0'
@@ -33,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce
   homepage: https://metacpan.org/release/Data-Sah-Coerce
   repository: git://github.com/perlancar/perl-Data-Sah-Coerce.git
-version: '0.039'
+version: '0.040'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

@@ -1,7 +1,0 @@
-{
-    "AppSid": "slides.cloud",
-    "AppKey": "slides.cloud",
-    "BaseUrl" : "https://api-qa.aspose.cloud",
-    "AuthBaseUrl" : "https://api-qa.aspose.cloud",
-    "Debug" : false
-}

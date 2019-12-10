@@ -1,7 +1,7 @@
 package Sah::Schema::unix::signal;
 
-our $DATE = '2019-09-11'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-12-09'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 our $schema = ['str' => {
     'summary' => 'Unix signal name (e.g. TERM or KILL) or number (9 or 15)',
@@ -24,7 +24,7 @@ Sah::Schema::unix::signal - Unix signal name (e.g. TERM or KILL) or number (9 or
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2019-09-11.
+This document describes version 0.009 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2019-12-09.
 
 =head1 HOMEPAGE
 

@@ -7,6 +7,7 @@ README
 t/00-load.t
 t/bail.t
 t/dirs.t
+t/excludes.t
 t/lists.t
 t/override.t
 t/package.t
@@ -14,6 +15,8 @@ t/repeat.t
 t/shuffle.t
 t/slow.t
 t/stats.t
+t/stats2.t
+t/unique.t
 t/warn.t
 xt/aggregate/aggregate.lst
 xt/aggregate/check_env.t

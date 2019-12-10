@@ -69,8 +69,8 @@ sub new_image_captcha ( $self, $image, %args ) {
         api    => $self,
         params => {
             %args,
-            type => $args{is_russian} ? $ANTICAPTCHA_QUEUE_IMAGE_RU : $ANTICAPTCHA_QUEUE_IMAGE_EN,
-            image => is_plain_scalarref $image ? $image : \$image,
+            type  => $args{is_russian}         ? $ANTICAPTCHA_QUEUE_IMAGE_RU : $ANTICAPTCHA_QUEUE_IMAGE_EN,
+            image => is_plain_scalarref $image ? $image                      : \$image,
         }
     } );
 }

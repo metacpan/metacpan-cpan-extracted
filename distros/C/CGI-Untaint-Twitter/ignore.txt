@@ -9,4 +9,8 @@ pm_to_blib*
 .lwpcookies
 cover_db
 pod2htm*.tmp
+.git
+*.swp
 CGI-Untaint-Twitter-*
+.travis.yml
+.appveyor.yml

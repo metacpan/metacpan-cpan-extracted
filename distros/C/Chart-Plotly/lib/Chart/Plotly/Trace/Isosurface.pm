@@ -17,7 +17,7 @@ use Chart::Plotly::Trace::Isosurface::Spaceframe;
 use Chart::Plotly::Trace::Isosurface::Stream;
 use Chart::Plotly::Trace::Isosurface::Surface;
 
-our $VERSION = '0.033';    # VERSION
+our $VERSION = '0.034';    # VERSION
 
 # ABSTRACT: Draws isosurfaces between iso-min and iso-max values with coordinates given by four 1-dimensional arrays containing the `value`, `x`, `y` and `z` of every vertex of a uniform or non-uniform 3-D grid. Horizontal or vertical slices, caps as well as spaceframe between iso-min and iso-max values could also be drawn using this trace.
 
@@ -334,7 +334,7 @@ Chart::Plotly::Trace::Isosurface - Draws isosurfaces between iso-min and iso-max
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 SYNOPSIS
 

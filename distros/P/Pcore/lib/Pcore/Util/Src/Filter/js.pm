@@ -1,193 +1,88 @@
 package Pcore::Util::Src::Filter::js;
 
 use Pcore -class, -res;
+use Pcore::Util::Src qw[:FILTER_STATUS];
 use Pcore::Util::Text qw[rcut_all encode_utf8];
+use Pcore::Util::Sys::Proc qw[:PROC_REDIRECT];
 
 with qw[Pcore::Util::Src::Filter];
 
-has jshint => 1;    # use jshint on decompress
-
-my $JS_PACKER;
-
-sub decompress ($self) {
-    require JavaScript::Beautifier;
-
-    $self->{data}->$* = JavaScript::Beautifier::js_beautify(
-        $self->{data}->$*,
-        {   indent_size               => 4,
-            indent_character          => $SPACE,
-            preserve_newlines         => 1,
-            space_after_anon_function => 1,
-        }
-    );
-
-    my $log;
-
-    my $jshint_output;
-
-    if ( $self->{jshint} && length $self->{data}->$* ) {
-
-        $jshint_output = $self->_run_jshint;
-
-        # $jshint_output = $self->_run_eslint;
-
-        if ( $jshint_output->{data}->@* ) {
-            for my $rec ( $jshint_output->{data}->@* ) {
-                $log .= qq[ * $rec->{code}, line: $rec->{line}, col: $rec->{col}, $rec->{msg}\n];
-            }
-        }
-    }
-
-    $self->_append_log($log);
-
-    if ( $self->{jshint} ) {
-        if ( $jshint_output->{has_errors} ) {
-            return res [ 500, 'Error, jshint' ];
-        }
-        elsif ( $jshint_output->{has_warns} ) {
-            return res [ 201, 'Warning, jshint' ];
-        }
-    }
-
-    return res 200;
+sub decompress ( $self ) {
+    return $self->filter_eslint;
 }
 
 sub compress ($self) {
-    require JavaScript::Packer;
+    my $options = $self->dist_cfg->{terser_compress} || $self->src_cfg->{terser_compress};
 
-    $JS_PACKER //= JavaScript::Packer->init;
-
-    $JS_PACKER->minify( $self->{data}, { compress => 'clean' } );
-
-    return res 200;
+    return $self->filter_terser( $options->@* );
 }
 
 sub obfuscate ($self) {
-    require JavaScript::Packer;
+    my $options = $self->dist_cfg->{terser_obfuscate} || $self->src_cfg->{terser_obfuscate};
 
-    $JS_PACKER //= JavaScript::Packer->init;
-
-    $JS_PACKER->minify( $self->{data}, { compress => 'obfuscate' } );
-
-    return res 200;
+    return $self->filter_terser( $options->@* );
 }
 
-sub _append_log ( $self, $log ) {
-    $self->_cut_log;
+sub update_log ( $self, $log = undef ) {
 
+    # clear log
+    $self->{data} =~ s[// -----SOURCE FILTER LOG BEGIN-----.*-----SOURCE FILTER LOG END-----][]sm;
+
+    rcut_all $self->{data};
+
+    # insert log
     if ($log) {
         encode_utf8 $log;
 
-        $self->{data}->$* .= qq[\n/* -----SOURCE FILTER LOG BEGIN-----\n *\n];
+        $self->{data} .= qq[\n// -----SOURCE FILTER LOG BEGIN-----\n//\n];
 
-        $self->{data}->$* .= $log;
+        $self->{data} .= $log =~ s[^][// ]smgr;
 
-        $self->{data}->$* .= qq[ *\n * -----SOURCE FILTER LOG END----- */];
+        $self->{data} .= qq[//\n// -----SOURCE FILTER LOG END-----];
     }
 
     return;
 }
 
-sub _cut_log ($self) {
-    $self->{data}->$* =~ s[/[*] -----SOURCE FILTER LOG BEGIN-----.*-----SOURCE FILTER LOG END----- [*]/\n*][]sm;
+sub filter_terser ( $self, @options ) {
+    my $temp = P->file1->tempfile( suffix1 => 'js' );
 
-    rcut_all $self->{data}->$*;
-
-    return;
-}
-
-sub _run_jshint ($self) {
-    my $jshint_args = $self->dist_cfg->{jshint} || $self->src_cfg->{jshint};
-
-    my $in_temp = P->file1->tempfile;
-    P->file->write_bin( $in_temp, $self->{data} );
+    P->file->write_bin( $temp, $self->{data} );
 
     my $proc = P->sys->run_proc(
-        qq[jshint $jshint_args "$in_temp"],
-        use_fh => 1,
-        stdout => 1,
-        stderr => 1,
+        [ 'terser', $temp, @options ],
+        stdout => $PROC_REDIRECT_FH,
+        stderr => $PROC_REDIRECT_FH,
     )->capture;
 
-    my $res = {
-        has_errors => 0,
-        has_warns  => 0,
-        data       => [],
-    };
+    if ( !$proc ) {
+        my $reason;
 
-    for my $line ( split /\n/sm, $proc->{stdout}->$* ) {
-        next unless $line =~ s/^.+?: line/line/smg;
+        if ( $proc->{stderr} ) {
+            my @log = split /\n/sm, $proc->{stderr}->$*;
 
-        my $descriptor = { raw => $line };
-
-        ( $descriptor->{line}, $descriptor->{col}, $descriptor->{msg}, $descriptor->{code} ) = $line =~ /line (\d+), col (\d+|undefined), (.+)? [(]([WE]\d+)[)]/sm;
-
-        if ( index( $descriptor->{code}, 'E', 0 ) == 0 ) {
-            $descriptor->{is_error} = 1;
-
-            $res->{has_errors}++;
-        }
-        else {
-            $descriptor->{is_warn} = 1;
-
-            $res->{has_warns}++;
+            $reason = $log[0];
         }
 
-        push $res->{data}->@*, $descriptor;
+        return res [ $SRC_FATAL, $reason || $proc->{reason} ];
     }
 
-    return $res;
+    $self->{data} = $proc->{stdout}->$*;
+
+    return $SRC_OK;
 }
 
-# sub _run_eslint ($self) {
+sub filer_js_packer ( $self, $obfuscate = undef ) {
+    state $packer = do {
+        require JavaScript::Packer;
 
-#     # my $jshint_args = $self->dist_cfg->{jshint} || $self->src_cfg->{jshint};
+        JavaScript::Packer->init;
+    };
 
-#     my $in_temp = P->file1->tempfile;
+    $packer->minify( \$self->{data}, { compress => $obfuscate ? 'obfuscate' : 'clean' } );
 
-#     P->file->write_bin( $in_temp, $self->{data} );
-
-#     my $out_temp = "$ENV->{TEMP_DIR}/tmp-jshint-@{[ int rand 99_999 ]}.json";
-
-#     my $config = '/var/local/pcore-lib/arbitrator/data/cdn/app/09bc0f7872d3f6ddeae90acd113c0cab/.eslintrc.yaml';
-
-#     my $proc = P->sys->run_proc( qq[eslint --format json --config "$config" -o "$out_temp" "$in_temp"] )->wait;
-
-#     my $jshint_output = P->cfg->read($out_temp);
-
-#     unlink $out_temp;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
-
-#     my $res = {
-#         has_errors => 0,
-#         has_warns  => 0,
-#         data       => [],
-#     };
-
-#     return $res;
-
-#     # for my $line ( $jshint_output->@* ) {
-#     #     next unless $line =~ s/^.+?: line/line/smg;
-
-#     #     my $descriptor = { raw => $line };
-
-#     #     ( $descriptor->{line}, $descriptor->{col}, $descriptor->{msg}, $descriptor->{code} ) = $line =~ /line (\d+), col (\d+|undefined), (.+)? [(]([WE]\d+)[)]/sm;
-
-#     #     if ( index( $descriptor->{code}, 'E', 0 ) == 0 ) {
-#     #         $descriptor->{is_error} = 1;
-
-#     #         $res->{has_errors}++;
-#     #     }
-#     #     else {
-#     #         $descriptor->{is_warn} = 1;
-
-#     #         $res->{has_warns}++;
-#     #     }
-
-#     #     push $res->{data}->@*, $descriptor;
-#     # }
-
-#     # return $res;
-# }
+    return $SRC_OK;
+}
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -196,7 +91,7 @@ sub _run_jshint ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 92                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
+## |    3 | 29                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

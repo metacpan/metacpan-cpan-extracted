@@ -13,14 +13,27 @@
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
-use Test::Requires qw(Test::Pod::Snippets);
-use Test::More;
 use lib "./meta";
 use FunctionalPerl::TailExpand;
 use FunctionalPerl::ModuleList;
 use FunctionalPerl::Dependencies 'module_needs';
 use Chj::Backtrace;
 use Chj::xperlfunc ":all";
+use Test::Requires qw(Test::Pod::Snippets);
+use Test::More;
+
+use FP::Repl::AutoTrap;
+use FP::Repl::WithRepl qw(withrepl WithRepl_eval);
+sub myeval ($) {
+    my ($str)=@_;
+    if (FP::Repl::AutoTrap::possibly_activate) {
+        withrepl {
+            &WithRepl_eval($str)
+        }
+    } else {
+        &WithRepl_eval($str)
+    }
+}
 
 require "./meta/find-perl.pl";
 
@@ -132,7 +145,7 @@ for my $module (@$modules) {
             $code=~ s/(;\s*)no warnings;/${1};/;
             $code=~ s/(;\s*)no strict;/${1}use strict;/;
             $namespacenum++;
-            if (eval "package t_pod_snippets_$namespacenum; $code; \n1") {
+            if (myeval "package t_pod_snippets_$namespacenum; $code; \n1") {
                 my $fail_after= numfailures;
                 if ($fail_after == $fail_before) {
                     # done_testing("snippets in $module") but that's part of $code

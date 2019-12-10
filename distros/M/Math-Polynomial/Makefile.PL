@@ -1,6 +1,6 @@
-# Copyright (c) 2008-2019 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# Copyright (c) 2008-2019 by Martin Becker, Blaubeuren.
+# This library is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see the LICENSE file).
 
 use strict;
 use ExtUtils::MakeMaker;
@@ -33,7 +33,7 @@ WriteMakefile(
         SIGN       => 1,
     ): (),
     $ExtUtils::MakeMaker::VERSION >= 6.31? (
-        LICENSE    => 'perl',
+        LICENSE    => 'artistic_2',
     ): (),
     $ExtUtils::MakeMaker::VERSION >= 6.46? (
         META_MERGE => {

@@ -1,3 +1,4 @@
+.appveyor.yml
 .gitignore
 .travis.yml
 Changes
@@ -7,11 +8,18 @@ Makefile.PL
 README.md
 examples/anyevent.pl
 examples/epoll.pl
+examples/io_async.pl
+examples/mojo.pl
 examples/select.pl
 lib/Net/Curl/Promiser.pm
 lib/Net/Curl/Promiser/AnyEvent.pm
+lib/Net/Curl/Promiser/IOAsync.pm
+lib/Net/Curl/Promiser/LoopBase.pm
+lib/Net/Curl/Promiser/Mojo.pm
 lib/Net/Curl/Promiser/Select.pm
 t/Net-Curl-Promiser-AnyEvent.t
+t/Net-Curl-Promiser-IOAsync.t
+t/Net-Curl-Promiser-Mojo.t
 t/Net-Curl-Promiser-Select.t
 t/lib/ClientTest.pm
 t/lib/MyServer.pm

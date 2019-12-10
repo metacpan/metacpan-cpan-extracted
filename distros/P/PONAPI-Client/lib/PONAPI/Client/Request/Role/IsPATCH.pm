@@ -19,7 +19,7 @@ PONAPI::Client::Request::Role::IsPATCH - request - role - is PATCH
 
 =head1 VERSION
 
-version 0.002011
+version 0.002012
 
 =head1 AUTHORS
 

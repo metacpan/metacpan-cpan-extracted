@@ -3,7 +3,7 @@ use warnings;
 package MooseX::Daemonize::Pid::File;
 # ABSTRACT: PID file management for MooseX::Daemonize
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Moose;
 use Moose::Util::TypeConstraints qw(coerce from via);
@@ -65,6 +65,7 @@ override 'is_running' => sub {
     super();
 };
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -79,7 +80,7 @@ MooseX::Daemonize::Pid::File - PID file management for MooseX::Daemonize
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 DESCRIPTION
 

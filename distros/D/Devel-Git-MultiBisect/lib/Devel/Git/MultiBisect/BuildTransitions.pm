@@ -36,8 +36,6 @@ Devel::Git::MultiBisect::BuildTransitions - Gather build-time output where it ch
 
 =head1 DESCRIPTION
 
-TK
-
 When the number of commits in the specified range is large and you only need
 the build-time output at those commits where the output materially changed, you can
 use this package, F<Devel::Git::MultiBisect::BuildTransitions>.
@@ -77,7 +75,14 @@ human inspection.
 
     $self->multisect_builds();
 
-None; all data needed is already present in the object.
+    $self->multisect_builds({ probe => 'error' });
+
+    $self->multisect_builds({ probe => 'warning' });
+
+Optionally takes one hash reference.  At present that hashref may contain only
+one element whose key is C<probe> and whose possible values are C<error> or
+C<warning>.  Defaults to C<error>.  Select between those values depending on
+whether you are probing for changes in errors or changes in warnings.
 
 =item * Return Value
 
@@ -105,7 +110,24 @@ disk for later human inspection.
 =cut
 
 sub multisect_builds {
-    my ($self) = @_;
+    my ($self, $args) = @_;
+
+    if (defined $args) {
+        croak "Argument passed to multisect_builds() must be hashref"
+            unless ref($args) eq 'HASH';
+        my %good_keys = map {$_ => 1} (qw| probe |);
+        for my $k (keys %{$args}) {
+            croak "Invalid key '$k' in hashref passed to multisect_builds()"
+                unless $good_keys{$k};
+        }
+        my %good_values = map {$_ => 1} (qw| error warning |);
+        for my $v (values %{$args}) {
+            croak "Invalid value '$v' in 'probe' element in hashref passed to multisect_builds()"
+                unless $good_values{$v};
+        }
+    }
+    $args->{probe} = 'error' unless defined $args->{probe};
+    $self->{probe} = $args->{probe};
 
     # Prepare data structures in the object to hold results of build runs on a
     # per target, per commit basis.
@@ -115,8 +137,6 @@ sub multisect_builds {
 
     my $start_time = time();
     my $all_outputs = $self->_prepare_for_multisection();
-    #say STDERR "AAA: In multisect_builds(), after _prepare_for_multisection()";
-    #pp($all_outputs);
 
 =pod
 
@@ -144,7 +164,7 @@ commit has not yet been visited, the element is C<undef>.
       },
     ]
 
-Unlike F<Devel::Git::MultiBisect::Transitions -- where we could have been
+Unlike F<Devel::Git::MultiBisect::Transitions> -- where we could have been
 testing multiple test files on each commit -- here we're only concerned with
 recording the presence or absence of build-time errors.  Hence, we only need
 an array of hash refs rather than an array of arrays of hash refs.
@@ -271,7 +291,7 @@ sub run_build_on_one_commit {
 }
 
 sub _build_one_commit {
-    my ($self, $commit) = @_; 
+    my ($self, $commit) = @_;
     my $short_sha = substr($commit,0,$self->{short});
     my $build_log = File::Spec->catfile(
         $self->{outputdir},
@@ -284,15 +304,14 @@ sub _build_one_commit {
     );
     my $command_raw = $self->{make_command};
     my $cmd = qq|$command_raw > $build_log 2>&1|;
-    say "Running '$cmd'" if $self->{verbose};
     my $rv = system($cmd);
-    my $filtered_errors_file = $self->_filter_build_log($build_log, $short_sha);
-    say "Created $filtered_errors_file" if $self->{verbose};
+    my $filtered_probes_file = $self->_filter_build_log($build_log, $short_sha);
+    say "Created $filtered_probes_file" if $self->{verbose};
     return {
         commit => $commit,
         commit_short => $short_sha,
-        file => $filtered_errors_file,
-        md5_hex => hexdigest_one_file($filtered_errors_file),
+        file => $filtered_probes_file,
+        md5_hex => hexdigest_one_file($filtered_probes_file),
     };
 }
 
@@ -300,38 +319,70 @@ sub _filter_build_log {
     my ($self, $buildlog, $short_sha) = @_;
     say "short_sha: $short_sha";
     my $tdir = tempdir( CLEANUP => 1 );
-    
-    my $ackpattern = q|-A2 '^[^:]+:\d+:\d+:\s+error:'|;
-    my @raw_acklines = grep { ! m/^--\n/ } `ack $ackpattern $buildlog`;
-    chomp(@raw_acklines);
-    #pp(\@raw_acklines);
-    croak "Got incorrect count of lines from ack; should be divisible by 3"
-        unless scalar(@raw_acklines) % 3 == 0;
-    
-    my @refined_errors = ();
-    for (my $i=0; $i <= $#raw_acklines; $i += 3) {
-        my $j = $i + 2;
-        my @this_error = ();
-        my ($normalized) =
-            $raw_acklines[$i] =~ s/^([^:]+):\d+:\d+:(.*)$/$1:_:_:$2/r;
-        push @this_error, ($normalized, @raw_acklines[$i+1 .. $j]);
-        push @refined_errors, \@this_error;
-    }
-    
-    my $error_report_file =
-        File::Spec->catfile($self->{workdir}, "$short_sha.make.errors.rpt.txt");
-    say "rpt: $error_report_file";
-    open my $OUT, '>', $error_report_file
-        or croak "Unable to open $error_report_file for writing";
-    if (@refined_errors) {
-        for (my $i=0; $i<=($#refined_errors -1); $i++) {
-            say $OUT join "\n" => @{$refined_errors[$i]};
-            say $OUT "--";
+
+    if ($self->{probe} eq 'error') {
+        # the default case:  probing for build-time errors
+        my $ackpattern = q|-A2 '^[^:]+:\d+:\d+:\s+error:'|;
+        my @raw_acklines = grep { ! m/^--\n/ } `ack $ackpattern $buildlog`;
+        chomp(@raw_acklines);
+        #pp(\@raw_acklines);
+        croak "Got incorrect count of lines from ack; should be divisible by 3"
+            unless scalar(@raw_acklines) % 3 == 0;
+
+        my @refined_errors = ();
+        for (my $i=0; $i <= $#raw_acklines; $i += 3) {
+            my $j = $i + 2;
+            my @this_error = ();
+            my ($normalized) =
+                $raw_acklines[$i] =~ s/^([^:]+):\d+:\d+:(.*)$/$1:_:_:$2/r;
+            push @this_error, ($normalized, @raw_acklines[$i+1 .. $j]);
+            push @refined_errors, \@this_error;
         }
-        say $OUT join "\n" => @{$refined_errors[-1]};
+
+        my $error_report_file =
+            File::Spec->catfile($self->{workdir}, "$short_sha.make.errors.rpt.txt");
+        say "rpt: $error_report_file";
+        open my $OUT, '>', $error_report_file
+            or croak "Unable to open $error_report_file for writing";
+        if (@refined_errors) {
+            for (my $i=0; $i<=($#refined_errors -1); $i++) {
+                say $OUT join "\n" => @{$refined_errors[$i]};
+                say $OUT "--";
+            }
+            say $OUT join "\n" => @{$refined_errors[-1]};
+        }
+        close $OUT or croak "Unable to close $error_report_file after writing";
+        return $error_report_file;
     }
-    close $OUT or croak "Unable to close $error_report_file after writing";
-    return $error_report_file;
+    else {
+        my $ackpattern = qr/^
+            ([^:]+):
+            (\d+):
+            (\d+):\s+warning:\s+
+            (.*?)\s+\[-
+            (W.*)]$
+        /x;
+
+        my @refined_warnings = ();
+        open my $IN, '<', $buildlog or croak "Unable to open $buildlog for reading";
+        while (my $l = <$IN>) {
+            chomp $l;
+            next unless $l =~ m/$ackpattern/;
+            my ($source, $line, $character, $text, $class) = ($1, $2, $3, $4, $5);
+            my $rl = "$source:_:_: warning: $text [$class]";
+            push @refined_warnings, $rl;
+        }
+        close $IN or croak "Unable to close $buildlog after reading";
+
+        my $warning_report_file =
+            File::Spec->catfile($self->{workdir}, "$short_sha.make.warnings.rpt.txt");
+        say "rpt: $warning_report_file";
+        open my $OUT, '>', $warning_report_file
+            or croak "Unable to open $warning_report_file for writing";
+        say $OUT $_ for @refined_warnings;
+        close $OUT or croak "Unable to close $warning_report_file after writing";
+        return $warning_report_file;
+    }
 }
 
 sub _evaluate_status_of_build_runs {
@@ -402,9 +453,6 @@ elements have the following keys:
     md5_hex
 
 =back
-
-Example:
-
 
 =back
 

@@ -38,7 +38,7 @@ use constant _NFIELDS  => 4;
 
 # ----- static data -----
 
-our $VERSION      = '1.015';
+our $VERSION      = '1.016';
 our $max_degree   = 10_000;    # limit for power operator
 
 # default values for as_string options
@@ -261,6 +261,12 @@ sub proper_degree {
     my ($this) = @_;
     my $degree = $this->degree;
     return 0 <= $degree? $degree: undef;
+}
+
+sub number_of_terms {
+    my ($this) = @_;
+    my $zero   = $this->coeff_zero;
+    return scalar grep { $zero != $_ } $this->coeff;
 }
 
 sub evaluate {
@@ -905,7 +911,7 @@ Math::Polynomial - Perl class for polynomials in one variable
 
 =head1 VERSION
 
-This documentation refers to version 1.015 of Math::Polynomial.
+This documentation refers to version 1.016 of Math::Polynomial.
 
 =head1 SYNOPSIS
 
@@ -928,7 +934,7 @@ This documentation refers to version 1.015 of Math::Polynomial.
   $u = $r->gcd($q);                        # greatest common divisor,
                                            # here: u = 3 x
   $v = $u->monize;                         # v = x
-  
+
   $y = $p->evaluate(0.5);                     # y = p(0.5) = -0.875
   $d = $q->degree;                            # d = degree(q) = 5
 
@@ -1180,6 +1186,11 @@ C<$p-E<gt>proper_degree> returns B<undef> if C<$p> is a zero
 polynomial, otherwise the degree of C<$p>.  This can be useful in
 order to catch incorrect numerical uses of degrees where zero
 polynomials might be involved.
+
+=item I<number_of_terms>
+
+C<$p-E<gt>number_of_terms> returns the number of non-zero coefficients
+of the polynomial C<$p>.
 
 =item I<is_monic>
 
@@ -2509,11 +2520,10 @@ and Kevin Ryde.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2007-2019 by Martin Becker.  All rights reserved.
+Copyright (c) 2007-2019 by Martin Becker, Blaubeuren.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.6.0 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
 
 =head1 DISCLAIMER OF WARRANTY
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension DBD::Mock.
 
+1.53 2019-12-03T10:50:57Z
+    - Error handling in mock_add_resultset is no longer experimental
+    - Attribute Aliasing is no longer experimental
+
 1.52 2019-10-28T11:35:41Z
     - Added in callback feature for result sets so that their contents
       can be more dynamic.

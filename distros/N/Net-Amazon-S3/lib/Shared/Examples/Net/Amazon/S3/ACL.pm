@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3::ACL;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::ACL::VERSION = '0.86';
+$Shared::Examples::Net::Amazon::S3::ACL::VERSION = '0.87';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ Shared::Examples::Net::Amazon::S3::ACL - used for testing and as example
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 AUTHOR
 

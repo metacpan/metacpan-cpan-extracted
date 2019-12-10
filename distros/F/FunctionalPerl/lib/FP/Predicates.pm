@@ -92,7 +92,7 @@ package FP::Predicates;
               is_pure_object
               is_pure_class
               is_string
-              is_string_not_number
+              is_nonnumeric_string
               is_nonnullstring
               is_natural0
               is_natural
@@ -112,6 +112,7 @@ package FP::Predicates;
 
               is_filename
               is_sequence
+              is_proper_sequence
               is_seq
 
               less_than
@@ -198,7 +199,7 @@ sub is_string ($) {
         or fail "is_string", $v
 }
 
-sub is_string_not_number ($) {
+sub is_nonnumeric_string ($) {
     my ($v)=@_;
     (defined $v
      and not ref $v # relax?
@@ -433,6 +434,13 @@ use FP::Lazy; # sigh dependency, too.
 sub is_sequence ($) {
     my $v= force $_[0];
     UNIVERSAL::isa($v, "FP::Abstract::Sequence")
+        or fail "is_sequence", $v
+}
+
+sub is_proper_sequence ($) {
+    my $v= force $_[0];
+    (UNIVERSAL::isa($v, "FP::Abstract::Sequence")
+     and $v->is_proper_sequence)
         or fail "is_sequence", $v
 }
 

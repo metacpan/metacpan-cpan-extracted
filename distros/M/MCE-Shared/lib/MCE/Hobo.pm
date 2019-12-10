@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.863';
+our $VERSION = '1.864';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -569,15 +569,19 @@ sub wait_one {
 sub yield {
    _croak('Usage: MCE::Hobo->yield()') if ref($_[0]);
    shift if ( defined $_[0] && $_[0] eq __PACKAGE__ );
-   my $pkg = $_SELF->{PKG};
 
-   return unless ( my $mngd = $_MNGD->{$pkg} );
+   my $pkg = $_SELF->{PKG} || do {
+      my $mngd = $_MNGD->{ "$$.$_tid.".caller() } || do {
+         # construct mngd internally on first use unless defined
+         init(); $_MNGD->{ "$$.$_tid.".caller() };
+      };
+      $mngd->{PKG};
+   };
 
-   ( $INC{'Coro/AnyEvent.pm'} )
-      ? Coro::AnyEvent::sleep( $_DELY->{$pkg}->seconds(@_) )
-      : sleep $_DELY->{$pkg}->seconds(@_);
+   return unless $_DELY->{$pkg};
+   my $seconds = $_DELY->{$pkg}->seconds(@_);
 
-   return;
+   MCE::Util::_sleep( $seconds );
 }
 
 ###############################################################################
@@ -802,12 +806,15 @@ sub new {
 
 sub seconds {
    my ( $self, $how_long ) = @_;
-   my ( $delay, $time ) = ( $how_long || $self->[0], Time::HiRes::time() );
-   my ( $lapse ) = $self->[1]->recv();
+   my $delay = defined($how_long) ? $how_long : $self->[0];
+   my $lapse = $self->[1]->recv();
+   my $time  = MCE::Util::_time();
 
-   if ( !$lapse || $time >= $lapse ) {
-      $self->[1]->send($time + $delay);
-      return $delay;
+   if ( !$delay || !defined $lapse ) {
+      $lapse = $time;
+   }
+   elsif ( $lapse + $delay - $time < 0 ) {
+      $lapse += int( abs($time - $lapse) / $delay + 0.5 ) * $delay;
    }
 
    $self->[1]->send( $lapse += $delay );
@@ -924,7 +931,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.863
+This document describes MCE::Hobo version 1.864
 
 =head1 SYNOPSIS
 
@@ -1536,6 +1543,9 @@ Current API available since 1.827.
 Give other workers a chance to run, optionally for given time. Yield behaves
 similarly to MCE's interval option. It throttles workers from running too fast.
 A demonstration is provided in the next section for fetching URLs in parallel.
+
+The default C<floating_seconds> is 0.008 and 0.015 on UNIX and Windows,
+respectively. Pass 0 if you want to give other workers a chance to run.
 
  # total run time: 1.00 second
 

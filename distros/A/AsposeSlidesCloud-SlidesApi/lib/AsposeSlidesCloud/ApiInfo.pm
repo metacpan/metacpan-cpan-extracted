@@ -30,9 +30,9 @@ use strict;
 use warnings;
 use utf8;
 
-use constant VERSION => '19.11.0';
+use constant VERSION => '19.11.1';
 
-our $VERSION = "19.11.0"
+our $VERSION = "19.11.1";
 
 =head1 NAME
 

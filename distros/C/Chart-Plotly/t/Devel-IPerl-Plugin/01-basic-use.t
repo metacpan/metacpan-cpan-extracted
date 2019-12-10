@@ -6,7 +6,7 @@ use Test::More;
 
 eval 'use Devel::IPerl::Plugin::Chart::Plotly';
 plan skip_all => "Can't load Devel::IPerl::Plugin::Chart::Plotly. Devel::IPerl not installed"
-  if ( $@ =~ /Display::HTML/ );
+  if ( $@ =~ /Display(::|\/|\\)HTML/ );
 
 # Loading errors are tested by 00-load-devel_iperl_plugin.t
 

@@ -1,42 +1,40 @@
 /* rhash.c - implementation of LibRHash library calls
  *
- * Copyright: 2008-2012 Aleksey Kravchenko <rhash.admin@gmail.com>
+ * Copyright (c) 2008, Aleksey Kravchenko <rhash.admin@gmail.com>
  *
- * Permission is hereby granted,  free of charge,  to any person  obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction,  including without limitation
- * the rights to  use, copy, modify,  merge, publish, distribute, sublicense,
- * and/or sell copies  of  the Software,  and to permit  persons  to whom the
- * Software is furnished to do so.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted.
  *
- * This program  is  distributed  in  the  hope  that it will be useful,  but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  Use this program  at  your own risk!
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+ * REGARD TO THIS SOFTWARE  INCLUDING ALL IMPLIED WARRANTIES OF  MERCHANTABILITY
+ * AND FITNESS.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+ * INDIRECT,  OR CONSEQUENTIAL DAMAGES  OR ANY DAMAGES WHATSOEVER RESULTING FROM
+ * LOSS OF USE,  DATA OR PROFITS,  WHETHER IN AN ACTION OF CONTRACT,  NEGLIGENCE
+ * OR OTHER TORTIOUS ACTION,  ARISING OUT OF  OR IN CONNECTION  WITH THE USE  OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
-
-/* macros for large file support, must be defined before any include file */
-#define _LARGEFILE64_SOURCE
-#define _FILE_OFFSET_BITS 64
-
-#include <string.h> /* memset() */
-#include <stdlib.h> /* free() */
-#include <stddef.h> /* ptrdiff_t */
-#include <stdio.h>
-#include <assert.h>
-#include <errno.h>
 
 /* modifier for Windows DLL */
 #if (defined(_WIN32) || defined(__CYGWIN__)) && defined(RHASH_EXPORTS)
 # define RHASH_API __declspec(dllexport)
 #endif
 
-#include "byte_order.h"
+/* macros for large file support, must be defined before any include file */
+#define _LARGEFILE64_SOURCE
+#define _FILE_OFFSET_BITS 64
+
+#include "rhash.h"
 #include "algorithms.h"
-#include "torrent.h"
-#include "plug_openssl.h"
-#include "util.h"
+#include "byte_order.h"
 #include "hex.h"
-#include "rhash.h" /* RHash library interface */
+#include "plug_openssl.h"
+#include "torrent.h"
+#include "util.h"
+#include <assert.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <stddef.h>
+#include <string.h>
 
 #define STATE_ACTIVE  0xb01dbabe
 #define STATE_STOPED  0xdeadbeef
@@ -45,7 +43,7 @@
 #define RCTX_FINALIZED  0x2
 #define RCTX_FINALIZED_MASK (RCTX_AUTO_FINAL | RCTX_FINALIZED)
 #define RHPR_FORMAT (RHPR_RAW | RHPR_HEX | RHPR_BASE32 | RHPR_BASE64)
-#define RHPR_MODIFIER (RHPR_UPPERCASE | RHPR_REVERSE)
+#define RHPR_MODIFIER (RHPR_UPPERCASE | RHPR_URLENCODE | RHPR_REVERSE)
 
 void rhash_library_init(void)
 {
@@ -66,7 +64,7 @@ RHASH_API rhash rhash_init(unsigned hash_id)
 {
 	unsigned tail_bit_index; /* index of hash_id trailing bit */
 	unsigned num = 0;        /* number of hashes to compute */
-	rhash_context_ext *rctx = NULL; /* allocated rhash context */
+	rhash_context_ext* rctx = NULL; /* allocated rhash context */
 	size_t hash_size_sum = 0;   /* size of hash contexts to store in rctx */
 
 	unsigned i, bit_index, id;
@@ -250,7 +248,7 @@ static void rhash_put_digest(rhash ctx, unsigned hash_id, unsigned char* result)
 {
 	rhash_context_ext* const ectx = (rhash_context_ext*)ctx;
 	unsigned i;
-	rhash_vector_item *item;
+	rhash_vector_item* item;
 	struct rhash_hash_info* info;
 	unsigned char* digest;
 
@@ -311,7 +309,8 @@ RHASH_API int rhash_file_update(rhash ctx, FILE* fd)
 {
 	rhash_context_ext* const ectx = (rhash_context_ext*)ctx;
 	const size_t block_size = 8192;
-	unsigned char *buffer, *pmem;
+	unsigned char* buffer;
+	unsigned char* pmem;
 	size_t length = 0, align8;
 	int res = 0;
 	if (ectx->state != STATE_ACTIVE) return 0; /* do nothing if canceled */
@@ -463,7 +462,7 @@ static size_t rhash_get_magnet_url_size(const char* filepath,
 	}
 
 	if (filepath) {
-		size += 4 + rhash_urlencode(NULL, filepath);
+		size += 4 + rhash_urlencode(NULL, filepath, strlen(filepath), 0);
 	}
 
 	/* loop through hash values */
@@ -474,7 +473,7 @@ static size_t rhash_get_magnet_url_size(const char* filepath,
 
 		size += (7 + 2) + strlen(name);
 		size += rhash_print(NULL, context, bit,
-			(bit & (RHASH_SHA1 | RHASH_BTIH) ? RHPR_BASE32 : 0));
+			(bit & RHASH_SHA1 ? RHPR_BASE32 : 0));
 	}
 
 	return size;
@@ -486,8 +485,8 @@ RHASH_API size_t rhash_print_magnet(char* output, const char* filepath,
 	int i;
 	const char* begin = output;
 
-	if (output == NULL) return rhash_get_magnet_url_size(
-		filepath, context, hash_mask, flags);
+	if (output == NULL)
+		return rhash_get_magnet_url_size(filepath, context, hash_mask, flags);
 
 	/* RHPR_NO_MAGNET, RHPR_FILESIZE */
 	if ((flags & RHPR_NO_MAGNET) == 0) {
@@ -502,13 +501,13 @@ RHASH_API size_t rhash_print_magnet(char* output, const char* filepath,
 		*(output++) = '&';
 	}
 
+	flags &= RHPR_UPPERCASE;
 	if (filepath) {
 		strcpy(output, "dn=");
 		output += 3;
-		output += rhash_urlencode(output, filepath);
+		output += rhash_urlencode(output, filepath, strlen(filepath), flags);
 		*(output++) = '&';
 	}
-	flags &= RHPR_UPPERCASE;
 
 	for (i = 0; i < 2; i++) {
 		unsigned bit;
@@ -529,7 +528,7 @@ RHASH_API size_t rhash_print_magnet(char* output, const char* filepath,
 			output += strlen(name);
 			*(output++) = ':';
 			output += rhash_print(output, context, bit,
-				(bit & (RHASH_SHA1 | RHASH_BTIH) ? flags | RHPR_BASE32 : flags));
+				(bit & RHASH_SHA1 ? flags | RHPR_BASE32 : flags));
 			*(output++) = '&';
 		}
 	}
@@ -541,32 +540,34 @@ RHASH_API size_t rhash_print_magnet(char* output, const char* filepath,
 
 /* HASH SUM OUTPUT INTERFACE */
 
-size_t rhash_print_bytes(char* output, const unsigned char* bytes,
-	size_t size, int flags)
+size_t rhash_print_bytes(char* output, const unsigned char* bytes, size_t size, int flags)
 {
-	size_t str_len;
+	size_t result_length;
 	int upper_case = (flags & RHPR_UPPERCASE);
 	int format = (flags & ~RHPR_MODIFIER);
 
 	switch (format) {
 	case RHPR_HEX:
-		str_len = size * 2;
-		rhash_byte_to_hex(output, bytes, (unsigned)size, upper_case);
+		result_length = size * 2;
+		rhash_byte_to_hex(output, bytes, size, upper_case);
 		break;
 	case RHPR_BASE32:
-		str_len = BASE32_LENGTH(size);
-		rhash_byte_to_base32(output, bytes, (unsigned)size, upper_case);
+		result_length = BASE32_LENGTH(size);
+		rhash_byte_to_base32(output, bytes, size, upper_case);
 		break;
 	case RHPR_BASE64:
-		str_len = BASE64_LENGTH(size);
-		rhash_byte_to_base64(output, bytes, (unsigned)size);
+		result_length = rhash_base64_url_encoded_helper(output, bytes, size, (flags & RHPR_URLENCODE), upper_case);
 		break;
 	default:
-		str_len = size;
-		memcpy(output, bytes, size);
+		if (flags & RHPR_URLENCODE) {
+			result_length = rhash_urlencode(output, (char*)bytes, size, upper_case);
+		} else {
+			memcpy(output, bytes, size);
+			result_length = size;
+		}
 		break;
 	}
-	return str_len;
+	return result_length;
 }
 
 size_t RHASH_API rhash_print(char* output, rhash context, unsigned hash_id, int flags)
@@ -589,15 +590,16 @@ size_t RHASH_API rhash_print(char* output, rhash context, unsigned hash_id, int 
 	}
 
 	if (output == NULL) {
+		size_t multiplier = (flags & RHPR_URLENCODE ? 3 : 1);
 		switch (flags & RHPR_FORMAT) {
 		case RHPR_HEX:
 			return (digest_size * 2);
 		case RHPR_BASE32:
 			return BASE32_LENGTH(digest_size);
 		case RHPR_BASE64:
-			return BASE64_LENGTH(digest_size);
+			return BASE64_LENGTH(digest_size) * multiplier;
 		default:
-			return digest_size;
+			return digest_size * multiplier;
 		}
 	}
 
@@ -606,7 +608,8 @@ size_t RHASH_API rhash_print(char* output, rhash context, unsigned hash_id, int 
 
 	if ((flags & ~RHPR_UPPERCASE) == (RHPR_REVERSE | RHPR_HEX)) {
 		/* reverse the digest */
-		unsigned char *p = digest, *r = digest + digest_size - 1;
+		unsigned char* p = digest;
+		unsigned char* r = digest + digest_size - 1;
 		char tmp;
 		for (; p < r; p++, r--) {
 			tmp = *p;

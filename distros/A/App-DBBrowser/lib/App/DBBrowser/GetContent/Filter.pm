@@ -682,7 +682,7 @@ sub __merge_rows {
         @stringified_rows = map {
             my $str_row = join( ',', @$_ );
             if ( print_columns( $str_row ) > $term_w ) {
-                unicode_sprintf( $str_row, $term_w, 0, 1 );
+                unicode_sprintf( $str_row, $term_w, { add_dots => 1 } );
             }
             else {
                 $str_row;

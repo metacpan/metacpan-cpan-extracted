@@ -7,7 +7,7 @@ use warnings FATAL => 'all';
 use Geoffrey::Template;
 use Geoffrey::Changeset;
 
-$Geoffrey::Read::VERSION = '0.000204';
+$Geoffrey::Read::VERSION = '0.000205';
 
 use parent 'Geoffrey::Role::Core';
 
@@ -141,7 +141,7 @@ Geoffrey::Read - Read existing db scheme.
 
 =head1 VERSION
 
-Version 0.000204
+Version 0.000205
 
 =head1 DESCRIPTION
 

@@ -11,9 +11,16 @@ HTTP requests with Promise objects.
 an interface to whatever event loop you use. See ["SUBCLASS INTERFACE"](#subclass-interface)
 below.
 
-This distribution provides [Net::Curl::Promiser::Select](https://metacpan.org/pod/Net::Curl::Promiser::Select) and
-[Net::Curl::Promiser::AnyEvent](https://metacpan.org/pod/Net::Curl::Promiser::AnyEvent) as both demonstrations and easily portable
-implementations. See the distribution’s `/examples` directory for another.
+This distribution provides the following as both demonstrations and
+portable implementations:
+
+- [Net::Curl::Promiser::Select](https://metacpan.org/pod/Net::Curl::Promiser::Select)
+- [Net::Curl::Promiser::IOAsync](https://metacpan.org/pod/Net::Curl::Promiser::IOAsync) (for [IO::Async](https://metacpan.org/pod/IO::Async))
+- [Net::Curl::Promiser::Mojo](https://metacpan.org/pod/Net::Curl::Promiser::Mojo) (for [Mojolicious](https://metacpan.org/pod/Mojolicious))
+- [Net::Curl::Promiser::AnyEvent](https://metacpan.org/pod/Net::Curl::Promiser::AnyEvent) (for [AnyEvent](https://metacpan.org/pod/AnyEvent))
+
+(See the distribution’s `/examples` directory for one based on Linux’s
+`epoll`.)
 
 # PROMISE IMPLEMENTATION
 
@@ -37,7 +44,7 @@ method of the same name, but the return is given as a Promise object.
 
 That promise resolves with the passed-in $EASY object.
 It rejects with either the error given to `fail_handle()` or the
-error that [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object’s `info_read()` returns;
+error that [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object’s `info_read()` returns.
 
 **IMPORTANT:** As with libcurl itself, HTTP-level failures
 (e.g., 4xx and 5xx responses) are **NOT** considered failures at this level.
@@ -59,17 +66,21 @@ This may not suit your needs; if you wish/need, you can handle timeouts
 via the [CURLMOPT\_TIMERFUNCTION](https://metacpan.org/pod/Net::Curl::Multi#CURLMOPT_TIMERFUNCTION)
 callback instead.
 
+This should only be called (if it’s called at all) from event loop logic.
+
 ## $obj = _OBJ_->process( @ARGS )
 
 Tell the underlying [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object which socket events have
 happened.
 
 If, in fact, no events have happened, then this calls
-`` `socket_action(CURL_SOCKET_TIMEOUT)` on the
-[Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object (similar to `time_out()`). ``
+`socket_action(CURL_SOCKET_TIMEOUT)` on the
+[Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object (similar to `time_out()`).
 
 Finally, this reaps whatever pending HTTP responses may be ready and
 resolves or rejects the corresponding Promise objects.
+
+This should only be called from event loop logic.
 
 Returns _OBJ_.
 
@@ -84,6 +95,8 @@ that operation returns.
 
 Since `process()` can also do the work of this function, a call to this
 function is just an optimization.
+
+This should only be called from event loop logic.
 
 ## $obj = _OBJ_->setopt( … )
 
@@ -128,16 +141,12 @@ See the distribution’s `/examples` directory.
 If you use [AnyEvent](https://metacpan.org/pod/AnyEvent), then [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises) with
 [AnyEvent::YACurl](https://metacpan.org/pod/AnyEvent::YACurl) may be a nicer fit for you.
 
+# REPOSITORY
+
+[https://github.com/FGasper/p5-Net-Curl-Promiser](https://github.com/FGasper/p5-Net-Curl-Promiser)
+
 # LICENSE & COPYRIGHT
 
 Copyright 2019 Gasper Software Consulting.
 
 This library is licensed under the same terms as Perl itself.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 158:
-
-    Unterminated C<...> sequence

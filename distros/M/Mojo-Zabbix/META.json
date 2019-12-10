@@ -4,13 +4,13 @@
       "Orange <bollwarm@ijz.me>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojo-Zabbix",
    "no_index" : {
@@ -48,5 +48,5 @@
          "web" : "http://ijz.me"
       }
    },
-   "version" : "0.11"
+   "version" : "0.14"
 }

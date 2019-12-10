@@ -112,7 +112,11 @@ invoke_perl_code (ffi_cif* cif, gpointer resp, gpointer* args, gpointer userdata
 				? *((gpointer *) args[i+args_offset])
 				: args[i+args_offset];
 			raw_to_arg (raw, &arg, arg_type);
-			sv = SAVED_STACK_SV (arg_to_sv (&arg, arg_type, transfer, &iinfo.base));
+			sv = SAVED_STACK_SV (arg_to_sv (&arg,
+			                                arg_type,
+			                                transfer,
+			                                GPERL_I11N_MEMORY_SCOPE_IRRELEVANT,
+			                                &iinfo.base));
 			/* If arg_to_sv returns NULL, we take that as 'skip
 			 * this argument'; happens for GDestroyNotify, for
 			 * example. */

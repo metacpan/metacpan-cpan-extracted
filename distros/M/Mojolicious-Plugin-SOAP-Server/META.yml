@@ -1,0 +1,36 @@
+---
+abstract: 'Hook a SOAP Server into your regular mojolicious server'
+author:
+  - 'Tobias Oetiker <tobi@oetiker.ch>'
+build_requires:
+  CPAN::Uploader: '0'
+  Mojo::SOAP::Client: '0'
+  Pod::Markdown::Github: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-SOAP-Server
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - eg
+requires:
+  CGI: '0'
+  Mojolicious: '8.26'
+  XML::Compile::SOAP: '0'
+  XML::Compile::SOAP12: '0'
+  XML::Compile::SOAP::Daemon: '3.14'
+  perl: '5.020001'
+resources:
+  bugtracker: https://github.com/oetiker/mojolicious-plugin-soap-server/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/oetiker/mojolicious-plugin-soap-server
+version: v0.1.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

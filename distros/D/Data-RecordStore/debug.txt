@@ -1,0 +1,380 @@
+[Mon Sep 09 10:38:20.718994 2019] [mpm_prefork:notice] [pid 22958] AH00170: caught SIGWINCH, shutting down gracefully
+[Mon Sep 09 10:38:21.836156 2019] [suexec:notice] [pid 23681] AH01232: suEXEC mechanism enabled (wrapper: /usr/sbin/suexec)
+[Mon Sep 09 10:38:21.861208 2019] [lbmethod_heartbeat:notice] [pid 23681] AH02282: No slotmem from mod_heartmonitor
+[Mon Sep 09 10:38:21.864653 2019] [mpm_prefork:notice] [pid 23681] AH00163: Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips mod_perl/2.0.10 Perl/v5.16.3 configured -- resuming normal operations
+[Mon Sep 09 10:38:21.864778 2019] [core:notice] [pid 23681] AH00094: Command line: '/usr/sbin/httpd -D FOREGROUND'
+[ A ] OPEN STORE  /opt/yote/data_store
+[ A ] FETCH  1
+[ A ] NEXT ID 
+[ A ] NEXT ID 
+[ A ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ A ] USE TRANSACATION  
+[ A ] START TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x2be99f8)
+[ A ] STOW  1, Data::ObjectStore::Container|1568050706.0199|1568050706.0204 db_version`v5.03`created_time`v1568050706.0199`root`r2`last_update_time`v1568050706.0199`ObjectStore_version`v2.10
+[ A ] STOW  2, Data::ObjectStore::Container|1568050706.02031|1568050706.02035 
+[ A ] STOW  1, Data::ObjectStore::Container|1568050706.0199|1568050706.02291 db_version`v5.03`created_time`v1568050706.0199`root`r2`last_update_time`v1568050706.02041`ObjectStore_version`v2.10
+[ A ] COMMIT TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x2be99f8)
+[ C ] OPEN STORE (23866) /opt/yote/data_store
+[ C ] FETCH  1
+[ C ] FETCH  2
+[ C ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ C ] USE TRANSACATION  
+[ A ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ A ] USE TRANSACATION  
+[ C ] START TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x15e4c58)
+[ C ] STOW  1, Data::ObjectStore::Container|1568050706.0199|1568050706.02661 db_version`v5.03`created_time`v1568050706.0199`last_update_time`v1568050706.02554`root`r2`ObjectStore_version`v2.10
+[ A ] START TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x2be99e0)
+[ A ] STOW  1, Data::ObjectStore::Container|1568050706.0199|1568050706.02711 db_version`v5.03`created_time`v1568050706.0199`root`r2`last_update_time`v1568050706.02595`ObjectStore_version`v2.10
+[ C ] COMMIT TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x15e4c58)
+[ A ] COMMIT TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x2be99e0)
+[ C ] initializing yote Yote at /opt/yote/lib/Yote.pm line 41.
+[ C ] NEXT ID 
+[ A ] initializing yote Yote at /opt/yote/lib/Yote.pm line 41.
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] Adding domain : 'localhost' at /opt/yote/lib/Yote.pm line 98.
+[ A ] Adding domain : 'localhost' at /opt/yote/lib/Yote.pm line 98.
+[ C ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] NEXT ID 
+[ A ] NEXT ID 
+[ A ] NEXT ID 
+[ C ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ C ] USE TRANSACATION  
+[ C ] START TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x1888878)
+[ C ] STOW  32, Yote::App::PageCounter|1568050706.05515|1568050706.05759 _session_pool`r38`_app_path`vpageCounter`_methods_access_levels`r34`_site`vlocalhost`_domain`r7`_session`r36`_login`r42`_resets`r40`_email`r44
+[ A ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ A ] USE TRANSACATION  
+[ C ] STOW  70, Data::ObjectStore::Hash|1568050706.05967|1568050706.06041 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r72
+[ A ] START TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x2ea6360)
+[ A ] STOW  67, Data::ObjectStore::Hash|1568050706.05933|1568050706.05984 0`29`1`Yote::App::PageCounter`r69
+[ C ] STOW  7, Yote::Domain|1568050706.05155|1568050706.05188 domain`vlocalhost`apps`r8
+[ A ] STOW  33, Data::ObjectStore::Hash|1568050706.05528|1568050706.05529 0`29`0
+[ C ] STOW  80, Data::ObjectStore::Hash|1568050706.06083|1568050706.06109 0`29`2`CLASS`vData::RecordStore`OPTIONS`r82
+[ A ] STOW  63, Data::ObjectStore::Hash|1568050706.05884|1568050706.06077 0`29`2`pageCounter2`r65`pageCounter`r73
+[ C ] STOW  68, Data::ObjectStore::Array|1568050706.05944|1568050706.05948 0`1000000`3`0`vupdate_counter`vupdate`vfetch
+[ A ] STOW  21, Data::ObjectStore::Hash|1568050706.05377|1568050706.05378 0`29`0
+[ C ] STOW  26, Data::ObjectStore::Hash|1568050706.0544|1568050706.05445 0`29`3`update_counter`v1`fetch`v1`update`v1
+[ A ] STOW  71, Data::ObjectStore::Array|1568050706.05979|1568050706.05983 0`1000000`3`0`vupdate_counter`vupdate`vfetch
+[ C ] STOW  2, Data::ObjectStore::Container|1568050706.02031|1568050706.03165 yote`r3
+[ A ] STOW  17, Data::ObjectStore::Hash|1568050706.05329|1568050706.05331 0`29`0
+[ C ] STOW  18, Data::ObjectStore::Hash|1568050706.05341|1568050706.05342 0`29`0
+[ A ] STOW  2, Data::ObjectStore::Container|1568050706.02031|1568050706.03178 yote`r4
+[ C ] STOW  72, Data::ObjectStore::Hash|1568050706.0599|1568050706.06041 0`29`1`Yote::App::PageCounter`r74
+[ A ] STOW  55, Data::ObjectStore::Hash|1568050706.05789|1568050706.0579 0`29`0
+[ C ] STOW  30, Data::ObjectStore::Hash|1568050706.05488|1568050706.05489 0`29`0
+[ A ] STOW  84, Data::ObjectStore::Hash|1568050706.06183|1568050706.06185 0`29`1`BASE_PATH`v/opt/yote/data_store
+[ C ] STOW  16, Data::ObjectStore::Array|1568050706.05317|1568050706.05318 0`1000000`0`0
+[ A ] STOW  25, Data::ObjectStore::Hash|1568050706.05427|1568050706.05429 0`29`0
+[ C ] STOW  44, Data::ObjectStore::Hash|1568050706.0566|1568050706.05661 0`29`0
+[ A ] STOW  27, Data::ObjectStore::Hash|1568050706.05453|1568050706.0553 0`29`3`PUBLIC`r29`ADMIN-REQUIRED`r33`LOGIN-REQUIRED`r31
+[ C ] STOW  82, Data::ObjectStore::Hash|1568050706.06106|1568050706.06109 0`29`1`BASE_PATH`v/opt/yote/data_store
+[ A ] STOW  83, Data::ObjectStore::Hash|1568050706.06118|1568050706.06186 0`29`2`CLASS`vData::RecordStore`OPTIONS`r84
+[ C ] STOW  74, Data::ObjectStore::Hash|1568050706.06013|1568050706.0604 0`29`1`PUBLIC`r76
+[ A ] STOW  75, Data::ObjectStore::Hash|1568050706.06025|1568050706.06076 0`29`1`Yote::App::PageCounter`r77
+[ C ] STOW  28, Data::ObjectStore::Hash|1568050706.05464|1568050706.05466 0`29`0
+[ A ] STOW  57, Data::ObjectStore::Hash|1568050706.05814|1568050706.06186 0`29`2`DOMAINS`r59`DATA-STORE`r83
+[ C ] STOW  40, Data::ObjectStore::Hash|1568050706.05613|1568050706.05614 0`29`0
+[ A ] STOW  61, Data::ObjectStore::Hash|1568050706.05861|1568050706.06098 0`29`2`APPS`r63`OPTIONS`r81
+[ C ] STOW  14, Data::ObjectStore::Hash|1568050706.05292|1568050706.05294 0`29`0
+[ A ] STOW  69, Data::ObjectStore::Hash|1568050706.05956|1568050706.05984 0`29`1`PUBLIC`r71
+[ C ] STOW  20, Data::ObjectStore::Hash|1568050706.05365|1568050706.05366 0`29`0
+[ A ] STOW  59, Data::ObjectStore::Hash|1568050706.05838|1568050706.06098 0`29`1`localhost`r61
+[ C ] STOW  24, Data::ObjectStore::Hash|1568050706.05414|1568050706.0549 0`29`3`PUBLIC`r26`ADMIN-REQUIRED`r30`LOGIN-REQUIRED`r28
+[ A ] STOW  49, Data::ObjectStore::Hash|1568050706.05718|1568050706.05791 0`29`3`PUBLIC`r51`ADMIN-REQUIRED`r55`LOGIN-REQUIRED`r53
+[ C ] STOW  11, Yote::App::PageCounter|1568050706.05239|1568050706.05493 _session_pool`r16`_app_path`vpageCounter2`_methods_access_levels`r12`_site`vlocalhost`_domain`r7`_session`r14`_login`r20`_resets`r18`_email`r22
+[ A ] STOW  10, Data::ObjectStore::Hash|1568050706.0522|1568050706.05795 0`29`2`pageCounter2`r13`pageCounter`r35
+[ C ] STOW  78, Data::ObjectStore::Hash|1568050706.0606|1568050706.06062 0`29`1`ENDPOINT`vlocalhost/app-endpoint
+[ A ] STOW  31, Data::ObjectStore::Hash|1568050706.055|1568050706.05501 0`29`0
+[ C ] STOW  48, Data::ObjectStore::Hash|1568050706.05706|1568050706.05711 0`29`3`update_counter`v1`fetch`v1`update`v1
+[ A ] STOW  35, Yote::App::PageCounter|1568050706.05555|1568050706.05793 _session_pool`r41`_app_path`vpageCounter`_methods_access_levels`r37`_site`vlocalhost`_domain`r9`_session`r39`_login`r45`_resets`r43`_email`r47
+[ C ] STOW  22, Data::ObjectStore::Hash|1568050706.05388|1568050706.05389 0`29`0
+[ A ] STOW  53, Data::ObjectStore::Hash|1568050706.05767|1568050706.05768 0`29`0
+[ C ] STOW  42, Data::ObjectStore::Hash|1568050706.05637|1568050706.05638 0`29`0
+[ A ] STOW  79, Data::ObjectStore::Array|1568050706.06072|1568050706.06075 0`1000000`3`0`vupdate_counter`vupdate`vfetch
+[ C ] STOW  46, Data::ObjectStore::Hash|1568050706.05683|1568050706.05757 0`29`3`PUBLIC`r48`ADMIN-REQUIRED`r52`LOGIN-REQUIRED`r50
+[ A ] STOW  77, Data::ObjectStore::Hash|1568050706.06049|1568050706.06075 0`29`1`PUBLIC`r79
+[ C ] STOW  50, Data::ObjectStore::Hash|1568050706.05731|1568050706.05732 0`29`0
+[ A ] STOW  13, Yote::App::PageCounter|1568050706.0528|1568050706.05533 _session_pool`r19`_app_path`vpageCounter2`_methods_access_levels`r15`_site`vlocalhost`_domain`r9`_session`r17`_login`r23`_resets`r21`_email`r25
+[ C ] STOW  64, Data::ObjectStore::Hash|1568050706.05896|1568050706.05949 0`29`1`Yote::App::PageCounter`r66
+[ A ] STOW  23, Data::ObjectStore::Hash|1568050706.054|1568050706.05401 0`29`0
+[ C ] STOW  3, Yote|1568050706.03132|1568050706.06111 domains`r5`root_dir`v/opt/yote/`config`r54
+[ A ] STOW  29, Data::ObjectStore::Hash|1568050706.05476|1568050706.05482 0`29`3`update_counter`v1`fetch`v1`update`v1
+[ C ] STOW  36, Data::ObjectStore::Hash|1568050706.05567|1568050706.05569 0`29`0
+[ A ] STOW  65, Data::ObjectStore::Hash|1568050706.05908|1568050706.05985 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r67
+[ C ] STOW  12, Data::ObjectStore::Hash|1568050706.05264|1568050706.05417 0`29`1`Yote::App::PageCounter`r24
+[ A ] STOW  6, Data::ObjectStore::Hash|1568050706.03171|1568050706.05233 0`29`1`localhost`r9
+[ C ] STOW  58, Data::ObjectStore::Hash|1568050706.05826|1568050706.06063 0`29`2`APPS`r60`OPTIONS`r78
+[ A ] STOW  39, Data::ObjectStore::Hash|1568050706.05601|1568050706.05603 0`29`0
+[ C ] STOW  8, Data::ObjectStore::Hash|1568050706.05179|1568050706.05761 0`29`2`pageCounter2`r11`pageCounter`r32
+[ A ] STOW  9, Yote::Domain|1568050706.05196|1568050706.05229 domain`vlocalhost`apps`r10
+[ C ] STOW  38, Data::ObjectStore::Array|1568050706.0559|1568050706.05591 0`1000000`0`0
+[ A ] STOW  51, Data::ObjectStore::Hash|1568050706.05742|1568050706.05747 0`29`3`update_counter`v1`fetch`v1`update`v1
+[ C ] STOW  52, Data::ObjectStore::Hash|1568050706.05755|1568050706.05756 0`29`0
+[ A ] STOW  41, Data::ObjectStore::Array|1568050706.05625|1568050706.05626 0`1000000`0`0
+[ C ] STOW  60, Data::ObjectStore::Hash|1568050706.05849|1568050706.06042 0`29`2`pageCounter2`r62`pageCounter`r70
+[ A ] STOW  15, Data::ObjectStore::Hash|1568050706.05305|1568050706.05455 0`29`1`Yote::App::PageCounter`r27
+[ C ] STOW  34, Data::ObjectStore::Hash|1568050706.05539|1568050706.05685 0`29`1`Yote::App::PageCounter`r46
+[ A ] STOW  47, Data::ObjectStore::Hash|1568050706.05695|1568050706.05696 0`29`0
+[ C ] STOW  56, Data::ObjectStore::Hash|1568050706.05801|1568050706.06063 0`29`1`localhost`r58
+[ A ] STOW  81, Data::ObjectStore::Hash|1568050706.06095|1568050706.06097 0`29`1`ENDPOINT`vlocalhost/app-endpoint
+[ C ] STOW  66, Data::ObjectStore::Hash|1568050706.0592|1568050706.05949 0`29`1`PUBLIC`r68
+[ A ] STOW  4, Yote|1568050706.03146|1568050706.06187 domains`r6`root_dir`v/opt/yote/`config`r57
+[ C ] STOW  76, Data::ObjectStore::Array|1568050706.06037|1568050706.0604 0`1000000`3`0`vupdate_counter`vupdate`vfetch
+[ A ] STOW  73, Data::ObjectStore::Hash|1568050706.06002|1568050706.06077 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r75
+[ C ] STOW  62, Data::ObjectStore::Hash|1568050706.05872|1568050706.0595 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r64
+[ A ] STOW  37, Data::ObjectStore::Hash|1568050706.05579|1568050706.05719 0`29`1`Yote::App::PageCounter`r49
+[ C ] STOW  5, Data::ObjectStore::Hash|1568050706.03158|1568050706.05192 0`29`1`localhost`r7
+[ A ] STOW  45, Data::ObjectStore::Hash|1568050706.05672|1568050706.05673 0`29`0
+[ C ] STOW  54, Data::ObjectStore::Hash|1568050706.05778|1568050706.0611 0`29`2`DOMAINS`r56`DATA-STORE`r80
+[ A ] STOW  19, Data::ObjectStore::Array|1568050706.05353|1568050706.05355 0`1000000`0`0
+[ C ] STOW  1, Data::ObjectStore::Container|1568050706.0199|1568050706.10732 db_version`v5.03`created_time`v1568050706.0199`last_update_time`v1568050706.06113`root`r2`ObjectStore_version`v2.10
+[ A ] STOW  43, Data::ObjectStore::Hash|1568050706.05648|1568050706.0565 0`29`0
+[ C ] COMMIT TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x1888878)
+[ A ] STOW  1, Data::ObjectStore::Container|1568050706.0199|1568050706.10889 db_version`v5.03`created_time`v1568050706.0199`root`r2`last_update_time`v1568050706.06189`ObjectStore_version`v2.10
+[ C ] 
+[ C ] IN  <-----   localhost, {"action":"fetch","args":"u","app":"pageCounter","sess_id":"v9083880713144565760"} HANDLE
+[ C ] LOCK  Yote::App::SESSION
+[ A ] COMMIT TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x2ea6360)
+[ C ] NEXT ID 
+[ A ] 
+[ C ] NEXT ID 
+[ A ] IN <23867> <-----   localhost, {"action":"fetch","args":"u","app":"pageCounter2","sess_id":"v1231756146080022528"} HANDLE
+[ A ] LOCK  Yote::App::SESSION
+[ C ] NEXT ID 
+[ C ] SESSION SESS ID () *85*
+[ C ] SESSION SESS ID (12360109430417719296) *85*
+[ C ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ C ] USE TRANSACATION  
+[ C ] START TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x1893d48)
+[ C ] STOW  87, Data::ObjectStore::Hash|1568050706.12795|1568050706.12796 0`29`0
+[ C ] STOW  85, Yote::App::Session|1568050706.12746|1568050706.12814 app`r32`_session_id`v12360109430417719296`login`u`root_cache`r87`cache`r86
+[ C ] STOW  36, Data::ObjectStore::Hash|1568050706.05567|1568050706.12819 0`29`1`12360109430417719296`r85
+[ C ] STOW  86, Data::ObjectStore::Hash|1568050706.12773|1568050706.12775 0`29`0
+[ C ] STOW  1, Data::ObjectStore::Container|1568050706.0199|1568050706.13138 db_version`v5.03`created_time`v1568050706.0199`last_update_time`v1568050706.12821`root`r2`ObjectStore_version`v2.10
+[ C ] COMMIT TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x1893d48)
+[ C ] UNLOCK 
+[ C ] Endpoint Looking up session 'v9083880713144565760' --> v12360109430417719296 *85* 
+[ C ] EMPTY CACHE
+[ C ] FETCH  86
+[ C ] SESSION SESS ID (12360109430417719296) *85*
+[ C ] Endpoing send back session id '12360109430417719296' 
+[ C ] FETCH  87
+[ C ] FETCH  34
+[ A ] NEXT ID 
+[ C ] FETCH  46
+[ A ] NEXT ID 
+[ C ] UNLOCK 
+[ C ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ C ] USE TRANSACATION  
+[ A ] NEXT ID 
+[ C ] START TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x1886798)
+[ C ] STOW  87, Data::ObjectStore::Hash|1568050706.12795|1568050706.1351 0`29`1`32`r32
+[ A ] SESSION SESS ID () *88*
+[ A ] SESSION SESS ID (266713600675086336) *88*
+[ A ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ A ] USE TRANSACATION  
+[ C ] STOW  85, Yote::App::Session|1568050706.12746|1568050706.13562 app`r32`_session_id`v12360109430417719296`_last_updated`v1568050706.13507`login`u`root_cache`r87`cache`r86
+[ A ] START TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x2eaf3c0)
+[ A ] STOW  90, Data::ObjectStore::Hash|1568050706.13645|1568050706.13646 0`29`0
+[ C ] STOW  86, Data::ObjectStore::Hash|1568050706.12773|1568050706.13516 0`29`1`32`r32
+[ A ] STOW  88, Yote::App::Session|1568050706.1355|1568050706.13662 app`r13`_session_id`v266713600675086336`login`u`root_cache`r90`cache`r89
+[ C ] STOW  1, Data::ObjectStore::Container|1568050706.0199|1568050706.13949 db_version`v5.03`created_time`v1568050706.0199`last_update_time`v1568050706.13567`root`r2`ObjectStore_version`v2.10
+[ A ] STOW  89, Data::ObjectStore::Hash|1568050706.13576|1568050706.13578 0`29`0
+[ C ] COMMIT TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x1886798)
+[ A ] STOW  17, Data::ObjectStore::Hash|1568050706.05329|1568050706.13668 0`29`1`266713600675086336`r88
+[ C ] UNLOCK 
+[ C ] OUT  --> {"defs":{"Yote::App::PageCounter":["update_counter","fetch","update"]},"remove":[],"ret":"r32","sess_id":"v12360109430417719296","data":{"32":{"_cls":"Yote::App::PageCounter"}},"succ":1}
+[ C ] 
+[ A ] STOW  1, Data::ObjectStore::Container|1568050706.0199|1568050706.14463 db_version`v5.03`created_time`v1568050706.0199`root`r2`last_update_time`v1568050706.13669`ObjectStore_version`v2.10
+[ A ] COMMIT TRANSACATION  Data::RecordStore::Transaction=ARRAY(0x2eaf3c0)
+[ A ] UNLOCK 
+[ A ] Endpoint Looking up session 'v1231756146080022528' --> v266713600675086336 *88* <23867>
+[ A ] EMPTY CACHE
+[ A ] FETCH  89
+[ A ] ERRR (Data::RecordStore::Silo->get_record : index 94 out of bounds for silo /opt/yote/data_store/silos/12_RECSTORE. Silo has entry count of 90 at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 770.
+[ A ] ) <23867>
+[ A ] got Data::RecordStore::Silo->get_record : index 94 out of bounds for silo /opt/yote/data_store/silos/12_RECSTORE. Silo has entry count of 90 at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 770.
+[ A ] 
+[ A ] UNLOCK 
+[ A ] OUT <23867> --> {"ret":"failed","sess_id":"vv1231756146080022528","succ":0}
+[ A ] 
+[ B ] OPEN STORE (23868) /opt/yote/data_store
+[ B ] FETCH (23868) 1
+[ B ] FETCH (23868) 2
+[ B ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ B ] USE TRANSACATION (23868) 
+[ B ] START TRANSACATION (23868) Data::RecordStore::Transaction=ARRAY(0x1e0cb40)
+[ B ] STOW (23868) 1, Data::ObjectStore::Container|1568050706.0199|1568050706.23006 db_version`v5.03`created_time`v1568050706.0199`last_update_time`v1568050706.22926`root`r2`ObjectStore_version`v2.10
+[ B ] COMMIT TRANSACATION (23868) Data::RecordStore::Transaction=ARRAY(0x1e0cb40)
+[ B ] FETCH (23868) 4
+[ B ] FETCH (23868) 57
+[ B ] FETCH (23868) 59
+[ B ] FETCH (23868) 61
+[ B ] FETCH (23868) 6
+[ B ] FETCH (23868) 9
+[ B ] FETCH (23868) 10
+[ B ] FETCH (23868) 13
+[ B ] FETCH (23868) 35
+[ B ] FETCH (23868) 15
+[ B ] FETCH (23868) 27
+[ B ] FETCH (23868) 29
+[ B ] FETCH (23868) 31
+[ B ] FETCH (23868) 33
+[ B ] FETCH (23868) 37
+[ B ] FETCH (23868) 49
+[ B ] FETCH (23868) 51
+[ B ] FETCH (23868) 53
+[ B ] FETCH (23868) 55
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ B ] USE TRANSACATION (23868) 
+[ B ] START TRANSACATION (23868) Data::RecordStore::Transaction=ARRAY(0x20a6e68)
+[ B ] STOW (23868) 104, Data::ObjectStore::Hash|1568050706.26178|1568050706.26206 0`29`2`CLASS`vData::RecordStore`OPTIONS`r105
+[ B ] STOW (23868) 102, Data::ObjectStore::Array|1568050706.26126|1568050706.26129 0`1000000`3`0`vupdate_counter`vupdate`vfetch
+[ B ] STOW (23868) 91, Data::ObjectStore::Hash|1568050706.25904|1568050706.26207 0`29`2`DOMAINS`r92`DATA-STORE`r104
+[ B ] STOW (23868) 99, Data::ObjectStore::Hash|1568050706.2607|1568050706.26131 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r100
+[ B ] STOW (23868) 93, Data::ObjectStore::Hash|1568050706.25945|1568050706.26156 0`29`2`APPS`r94`OPTIONS`r103
+[ B ] STOW (23868) 105, Data::ObjectStore::Hash|1568050706.26201|1568050706.26205 0`29`1`BASE_PATH`v/opt/yote/data_store
+[ B ] STOW (23868) 100, Data::ObjectStore::Hash|1568050706.2609|1568050706.26131 0`29`1`Yote::App::PageCounter`r101
+[ B ] STOW (23868) 29, Data::ObjectStore::Hash|1568050706.05476|1568050706.25745 0`29`3`update_counter`v1`fetch`v1`update`v1
+[ B ] STOW (23868) 96, Data::ObjectStore::Hash|1568050706.26006|1568050706.26052 0`29`1`Yote::App::PageCounter`r97
+[ B ] STOW (23868) 95, Data::ObjectStore::Hash|1568050706.25986|1568050706.26053 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r96
+[ B ] STOW (23868) 94, Data::ObjectStore::Hash|1568050706.25964|1568050706.26132 0`29`2`pageCounter2`r95`pageCounter`r99
+[ B ] STOW (23868) 97, Data::ObjectStore::Hash|1568050706.26025|1568050706.26051 0`29`1`PUBLIC`r98
+[ B ] STOW (23868) 51, Data::ObjectStore::Hash|1568050706.05742|1568050706.25844 0`29`3`update_counter`v1`fetch`v1`update`v1
+[ B ] STOW (23868) 92, Data::ObjectStore::Hash|1568050706.25923|1568050706.26156 0`29`1`localhost`r93
+[ B ] STOW (23868) 4, Yote|1568050706.03146|1568050706.2621 domains`r6`root_dir`v/opt/yote/`config`r91
+[ B ] STOW (23868) 98, Data::ObjectStore::Array|1568050706.26045|1568050706.2605 0`1000000`3`0`vupdate_counter`vupdate`vfetch
+[ B ] STOW (23868) 103, Data::ObjectStore::Hash|1568050706.26153|1568050706.26155 0`29`1`ENDPOINT`vlocalhost/app-endpoint
+[ B ] STOW (23868) 101, Data::ObjectStore::Hash|1568050706.26108|1568050706.2613 0`29`1`PUBLIC`r102
+[ B ] STOW (23868) 1, Data::ObjectStore::Container|1568050706.0199|1568050706.27449 db_version`v5.03`created_time`v1568050706.0199`last_update_time`v1568050706.26213`root`r2`ObjectStore_version`v2.10
+[ B ] COMMIT TRANSACATION (23868) Data::RecordStore::Transaction=ARRAY(0x20a6e68)
+[ B ] 
+[ B ] IN <23868> <-----   localhost, {"action":"update_counter","args":"u","app":"pageCounter","sess_id":"v12360109430417719296"} HANDLE
+[ B ] FETCH (23868) 39
+[ B ] LOCK (23868) Yote::App::SESSION
+[ B ] FETCH (23868) 41
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] NEXT ID (23868)
+[ B ] SESSION SESS ID () *106*
+[ B ] SESSION SESS ID (805610603367432192) *106*
+[ B ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ B ] USE TRANSACATION (23868) 
+[ B ] START TRANSACATION (23868) Data::RecordStore::Transaction=ARRAY(0x20ad870)
+[ B ] STOW (23868) 39, Data::ObjectStore::Hash|1568050706.05601|1568050706.28431 0`29`1`805610603367432192`r106
+[ B ] STOW (23868) 106, Yote::App::Session|1568050706.28342|1568050706.28423 app`r35`_session_id`v805610603367432192`login`u`root_cache`r108`cache`r107
+[ B ] STOW (23868) 108, Data::ObjectStore::Hash|1568050706.28403|1568050706.28404 0`29`0
+[ B ] STOW (23868) 107, Data::ObjectStore::Hash|1568050706.28378|1568050706.2838 0`29`0
+[ B ] STOW (23868) 1, Data::ObjectStore::Container|1568050706.0199|1568050706.28751 db_version`v5.03`created_time`v1568050706.0199`last_update_time`v1568050706.28432`root`r2`ObjectStore_version`v2.10
+[ B ] COMMIT TRANSACATION (23868) Data::RecordStore::Transaction=ARRAY(0x20ad870)
+[ B ] UNLOCK (23868)
+[ B ] Endpoint Looking up session 'v12360109430417719296' --> v805610603367432192 *106* <23868>
+[ B ] LOCK (23868) PAGECOUNTER
+[ B ] SESSION SESS ID (805610603367432192) *106*
+[ B ] Endpoing send back session id '805610603367432192' <23868>
+[ B ] FETCH (23868) 108
+[ B ] FETCH (23868) 107
+[ B ] UNLOCK (23868)
+[ B ] LOCK (23868) Yote::App-pageCounter-NOTES
+[ B ] NEXT ID (23868)
+[ B ] Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182.
+[ B ] USE TRANSACATION (23868) 
+[ B ] START TRANSACATION (23868) Data::RecordStore::Transaction=ARRAY(0x209d098)
+[ B ] STOW (23868) 109, Data::ObjectStore::Array|1568050706.29195|1568050706.29196 0`1000000`0`0
+[ B ] STOW (23868) 35, Yote::App::PageCounter|1568050706.05555|1568050706.29198 _session_pool`r41`_methods_access_levels`r37`_app_path`vpageCounter`_site`vlocalhost`_session`r39`_domain`r9`_secret_count`v11`hits`v1`_login`r45`_resets`r43`_logs`r109`_email`r47
+[ B ] STOW (23868) 106, Yote::App::Session|1568050706.28342|1568050706.29163 app`r35`_session_id`v805610603367432192`_last_updated`v1568050706.29159`login`u`root_cache`r108`cache`r107
+[ B ] STOW (23868) 1, Data::ObjectStore::Container|1568050706.0199|1568050706.29487 db_version`v5.03`created_time`v1568050706.0199`last_update_time`v1568050706.292`root`r2`ObjectStore_version`v2.10
+[ B ] COMMIT TRANSACATION (23868) Data::RecordStore::Transaction=ARRAY(0x209d098)
+[ B ] UNLOCK (23868)
+[ B ] OUT <23868> --> {"defs":{},"remove":[],"ret":"v1","sess_id":"v805610603367432192","data":{},"succ":1}
+

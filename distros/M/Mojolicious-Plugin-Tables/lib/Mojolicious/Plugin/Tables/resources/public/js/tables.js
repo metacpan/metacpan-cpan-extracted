@@ -140,13 +140,13 @@ function init() {
     $('div.navigators button').click(function(){
         var $this = $(this);
         if ($this.hasClass('save' )) return true; // allows post to proceed
-        var newloc = '/tables/' + shipped.table;
+        var newloc = shipped.urlbase + '/tables/' + shipped.table;
         if ($this.hasClass('list' )) {
-            document.location = shipped.urlbase + newloc;
+            document.location = newloc;
             return;
         }
         if ($this.hasClass('add' )) {
-            document.location = shipped.urlbase + newloc + '/add';
+            document.location = newloc + '/add';
             return;
         }
         newloc += '/' + shipped.id;
@@ -155,14 +155,14 @@ function init() {
             if ($this.hasClass(act)) more = act
         });
         if (more) {
-            document.location = shipped.urlbase + newloc + '/' + more;
+            document.location = newloc + '/' + more;
             return false;
         }
 
         $.each(['prev','start','next','end'], function(i,nav) {
             if ($this.hasClass(nav)) more = nav
         });
-        if (more) document.location = shipped.urlbase + newloc + '/navigate?to=' + more;
+        if (more) document.location = newloc + '/navigate?to=' + more;
         return false;
     });
 
@@ -183,12 +183,12 @@ function init() {
             if ($this.hasClass('next' )) cdata.offset += 10;
             if ($this.hasClass('end'  )) cdata.offset = -1;
             if ($this.hasClass('list' )) cdata.offset = -2;
-            var url = '/tables/' + shipped.table + '/' + shipped.id + '/' + cdata.collection + '.json';
+            var url = shipped.urlbase + '/tables/' + shipped.table + '/' + shipped.id + '/' + cdata.collection + '.json';
             $.post(url, {offset:cdata.offset})
              .done(function(rows){
                 $('table.rows', $fldset).empty().append(
                     $.map(rows, function(d,i){
-                        var href = '/tables/' + cdata.ctable + '/' + d.id + '/view';
+                        var href = shipped.urlbase + '/tables/' + cdata.ctable + '/' + d.id + '/view';
                         return '<tr><td><a href="' + href + '">'+d.label+'</a></td></tr>'
                     })
                 );

@@ -1,7 +1,7 @@
 package Template::Mustache::Token::Partial;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Object representing a Partial block
-$Template::Mustache::Token::Partial::VERSION = '1.3.2';
+$Template::Mustache::Token::Partial::VERSION = '1.3.3';
 use Moo;
 
 use MooseX::MungeHas { has_ro => [ 'is_ro' ], has_rw => [ 'is_rw' ] };
@@ -46,7 +46,7 @@ Template::Mustache::Token::Partial - Object representing a Partial block
 
 =head1 VERSION
 
-version 1.3.2
+version 1.3.3
 
 =head1 AUTHORS
 

@@ -347,7 +347,7 @@ setupFilters(di_stream* s, AV* filters, const char* properties)
     if (properties) {
         s->filters[0].id = LZMA_FILTER_LZMA1;
 
-        if (lzma_properties_decode(&s->filters[0], NULL, 
+        if (lzma_properties_decode(&s->filters[0], s->stream.allocator, 
                 (const uint8_t*)properties, 5) != LZMA_OK)
             return FALSE;
 

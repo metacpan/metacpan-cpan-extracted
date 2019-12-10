@@ -236,6 +236,7 @@ invoke_c_code (GICallableInfo *info,
 		value = SAVED_STACK_SV (arg_to_sv (&return_value,
 		                                   &iinfo.base.return_type_info,
 		                                   iinfo.base.return_type_transfer,
+		                                   GPERL_I11N_MEMORY_SCOPE_IRRELEVANT,
 		                                   &iinfo.base));
 		if (value) {
 			XPUSHs (sv_2mortal (value));
@@ -268,6 +269,7 @@ invoke_c_code (GICallableInfo *info,
 			sv = SAVED_STACK_SV (arg_to_sv (iinfo.out_args[i].v_pointer,
 			                                &(iinfo.base.arg_types[i]),
 			                                transfer,
+			                                GPERL_I11N_MEMORY_SCOPE_IRRELEVANT,
 			                                &iinfo.base));
 			if (sv) {
 				XPUSHs (sv_2mortal (sv));

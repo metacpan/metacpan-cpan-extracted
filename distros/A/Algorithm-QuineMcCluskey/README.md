@@ -1,17 +1,19 @@
 # Algorithm-QuineMcCluskey
 
-## version 1.00
+## version 1.01
 
 This module creates objects designed to solve boolean expressions via
-the Quine-McCluskey algorithm. Its effectiveness is dependent on the
-size of problem; the number of minterms that can be set goes up
-exponentially with the number of variables, which limits the size of
-the problems that can be solved.
+the Quine-McCluskey algorithm. The effectiveness of the algorithm is
+dependent upon the size of problem; the number of minterms that can be set
+goes up exponentially (approximately 3^n/n) with the number of variables.
+This does limit, unfortunately, the size of the problems that can be solved
+with this algorithm.
 
-Currently, a test with 12 variables (meaning there are 4,096 terms)
-takes 3 minutes to solve on a not-terribly-modern i7 Pentium laptop
-computer with 4G of memory. This would seem to be a reasonable
-upper limit to what this algorithm can solve.
+For example, a test with 12 variables (resulting in 4,096 possible input
+combinations) currently takes 3 minutes to solve on a not-terribly-modern
+Intel Core i7 laptop computer with 4G of memory. A 12-input problem would
+therefore seem to be a reasonable upper limit to what this algorithm can
+solve.
 
 ## INSTALLATION
 

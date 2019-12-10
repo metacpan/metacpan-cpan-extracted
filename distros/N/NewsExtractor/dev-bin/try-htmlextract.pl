@@ -1,9 +1,9 @@
 use v5.28;
-use strict;
+use warnings;
 
+use Try::Tiny;
+use JSON;
 use Encode qw(encode);
-use Mojo::UserAgent;
-use YAML::Dumper;
 use Getopt::Long qw< GetOptions >;
 
 use NewsExtractor;
@@ -12,25 +12,31 @@ my %opts;
 GetOptions(
     \%opts,
 );
-my $url = shift @ARGV or die;
+@ARGV or die;
 
-my $dumper = YAML::Dumper->new;
-$dumper->indent_width(4);
+my $json = JSON->new->pretty->canonical->utf8->allow_blessed->convert_blessed;
 
-my $x = NewsExtractor->new( url => $url );
-my ($err, $y) = $x->download;
+for my $url (@ARGV) {
+    my $x = NewsExtractor->new( url => $url );
+    my ($err, $y) = $x->download;
 
-if ($err) {
-    print "Download Failed\n";
-    print $dumper->dump({ message => $err->message, debug => $err->debug });
-
-} else {
-    ($err, my $article) = $y->parse;
-
-    if ($article) {
-        print encode( "utf8" => $dumper->dump({ %$article }) );
+    if ($err) {
+        print $json->encode({
+            url => $url,
+            DownloadFailure => { message => $err->message, debug => $err->debug }});
     } else {
-        print "No Article\n";
-        print $dumper->dump({ message => $err->message, debug => $err->debug });
+        my $article;
+
+        try {
+            ($err, $article) = $y->parse;
+        } catch {
+            $err = $_;
+        };
+
+        if ($article) {
+            print $json->encode({ url => $url, Article => $article });
+        } else {
+            print $json->encode({ url => $url, NoArticle => { message => $err->message, debug => $err->debug }});
+        }
     }
 }

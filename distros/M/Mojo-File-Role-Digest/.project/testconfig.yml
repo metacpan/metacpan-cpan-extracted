@@ -1,0 +1,4 @@
+---
+compose_file: containertest/mojo-24-latest.yml
+forks: 4
+module: Mojo::File::Role::Digest

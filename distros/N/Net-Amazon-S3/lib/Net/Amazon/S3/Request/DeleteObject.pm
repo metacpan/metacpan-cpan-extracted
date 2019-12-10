@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::DeleteObject;
-$Net::Amazon::S3::Request::DeleteObject::VERSION = '0.86';
+$Net::Amazon::S3::Request::DeleteObject::VERSION = '0.87';
 use Moose 0.85;
 use Moose::Util::TypeConstraints;
 extends 'Net::Amazon::S3::Request::Object';
@@ -24,7 +24,7 @@ Net::Amazon::S3::Request::DeleteObject - An internal class to delete an object
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 SYNOPSIS
 

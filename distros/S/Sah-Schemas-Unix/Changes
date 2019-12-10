@@ -1,3 +1,31 @@
+0.009   2019-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] For better error message, coercion rules that convert UID/GID <->
+	  username/groupname now die/fail when they cannot convert; the
+	  leave-as-is-when-cannot-convert variants are now moved to
+	  try_convert_*.
+
+
+0.008   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules again, revert to using lower_case
+	  notation for the description part, because CamelCase is really,
+	  REALLY ugly when we have many words.
+
+
+0.007   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with updated dzil plugin [Sah::Schemas] (0.016) which
+          now adds dependencies to the updated Data::Sah::Coerce::perl::To_*
+          coercion rule modules.
+
+
+0.006   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule module to use new naming scheme
+	  (Data::Sah::Coerce 0.034+).
+
+
 0.005   2019-09-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Add schema: unix::signal.

@@ -1,4 +1,4 @@
-use 5.008;
+use 5.010;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM        => 'lib/Net/RCON/Minecraft.pm',
     ABSTRACT_FROM       => 'lib/Net/RCON/Minecraft.pod',
     LICENSE             => 'perl_5',
-    MIN_PERL_VERSION    => '5.008',
+    MIN_PERL_VERSION    => '5.010',
     CONFIGURE_REQUIRES  => { 'ExtUtils::MakeMaker' => 0, },
     EXE_FILES           => [ qw< bin/rcon-minecraft > ],
 

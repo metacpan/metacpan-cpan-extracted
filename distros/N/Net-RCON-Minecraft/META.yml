@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,10 +29,10 @@ requires:
   Mouse: '0'
   Mouse::Util::TypeConstraints: '0'
   Term::ANSIColor: '3.01'
-  perl: '5.008'
+  perl: '5.010'
 resources:
   X_metaspec:
     version: 2
   repository: https://github.com/rjt-pl/Net-RCON-Minecraft.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

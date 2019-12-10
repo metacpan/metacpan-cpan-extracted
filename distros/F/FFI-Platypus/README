@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.01
+    version 1.02
 
 SYNOPSIS
 
@@ -134,7 +134,7 @@ CONSTRUCTORS
 	records and type decoration on basic types. Using API level 1 prior
 	to Platypus version 1.00 will trigger a (noisy) warning.
 
-	All new code should be written with api = 1>! The Platypus
+	All new code should be written with this set to 1! The Platypus
 	documentation assumes this api level is set.
 
     lib

@@ -1,3 +1,10 @@
+0.004 - 06 Dec 2019
+
+ - use pkg-config to probe the ICU headers/libraries, only use
+   icu-config if that fails. (cpan #86373)
+
+ - move bugs to github (the repo was always there)
+
 0.003 - 08 Jan 2018
 
  - remove ULOC_REQUESTED_LOCALE, this was deprecated and removed by

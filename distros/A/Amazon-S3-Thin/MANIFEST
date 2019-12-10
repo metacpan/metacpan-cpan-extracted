@@ -21,9 +21,12 @@ t/02_signer_v4.t
 t/03_request.t
 t/04_request_v2.t
 t/05_presigned_post.t
+t/06_request_virtual_host.t
 xt/90_functional.t
 xt/91_functional.t
 xt/92_presigned_post.t
 xt/93_session_token.t
+xt/94_virtual_host.t
+xt/95_delete_multiple_objects.t
 xt/upload.txt
 META.yml

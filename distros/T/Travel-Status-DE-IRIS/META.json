@@ -16,7 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "File::Slurp" : "9999.26",
+            "File::Slurp" : "9999.19",
             "JSON" : "0",
             "Test::Compile" : "0",
             "Test::Fatal" : "0",
@@ -54,15 +54,15 @@
    "provides" : {
       "Travel::Status::DE::IRIS" : {
          "file" : "lib/Travel/Status/DE/IRIS.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       },
       "Travel::Status::DE::IRIS::Result" : {
          "file" : "lib/Travel/Status/DE/IRIS/Result.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       },
       "Travel::Status::DE::IRIS::Stations" : {
          "file" : "lib/Travel/Status/DE/IRIS/Stations.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       }
    },
    "release_status" : "stable",
@@ -74,6 +74,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-IRIS"
       }
    },
-   "version" : "1.36",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.37",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

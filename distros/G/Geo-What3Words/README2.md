@@ -12,6 +12,9 @@ DEVELOPMENT
 	# running the test-suite
 	TEST_AUTHOR=1 PERLLIB=./lib prove -r t/
 
+	# running the test-suite with calls to w3w
+	TEST_AUTHOR=1 PERLLIB=./lib W3W_API_KEY=XXXXX prove -r t/
+        
 	dzil build
 
 	# git push, upload to CPAN
@@ -20,7 +23,7 @@ DEVELOPMENT
 
 COPYRIGHT AND LICENCE
 
-Copyright 2018 OpenCage Data Ltd <cpan@opencagedata.com>
+Copyright 2019 OpenCage GmbH <cpan@opencagedata.com>
 
 
 This library is free software; you can redistribute it and/or modify

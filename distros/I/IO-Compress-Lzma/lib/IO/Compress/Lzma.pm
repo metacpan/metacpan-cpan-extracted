@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.091 ;
+use IO::Compress::Base 2.093 ;
 
-use IO::Compress::Base::Common  2.091 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.091 ;
+use IO::Compress::Base::Common  2.093 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.093 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.091';
+$VERSION = '2.093';
 $LzmaError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -213,7 +213,7 @@ It can take one of the following forms:
 
 =item A filename
 
-If the <$input_filename_or_reference> parameter is a simple scalar, it is
+If the C<$input_filename_or_reference> parameter is a simple scalar, it is
 assumed to be a filename. This file will be opened for reading and the
 input data will be read from it.
 

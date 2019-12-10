@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 use utf8;
 
 # Class for $PPR::ERROR objects...
@@ -1052,7 +1052,7 @@ our $GRAMMAR = qr{
         |   (?&PerlContextualMatch)
         |   (?&PerlQuotelikeS)
         |   (?&PerlQuotelikeTR)
-    )
+        )
     ) # End of rule
 
     (?<PerlHeredoc>
@@ -1463,7 +1463,7 @@ our $GRAMMAR = qr{
             |  sub | format | use | no
             |  (?&PPR_named_op)
             |  [msy] | q[wrxq]?+ | tr
-            |   __ (?> END | DATA ) __ \n
+            |   __ (?> END | DATA ) __
             )
             \b
         )
@@ -1918,7 +1918,7 @@ PPR - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR version 0.000023
+This document describes PPR version 0.000024
 
 
 =head1 SYNOPSIS
@@ -2304,29 +2304,29 @@ Matches any variable or parenthesized list of variables that could
 be assigned to.
 
 
-=head3 C<< (?<PerlPackageDeclaration> >>
+=head3 C<< (?&PerlPackageDeclaration) >>
 
 Matches the declaration of any package
 (with or without a defining block).
 
 
-=head3 C<< (?<PerlSubroutineDeclaration> >>
+=head3 C<< (?&PerlSubroutineDeclaration) >>
 
 Matches the declaration of any named subroutine
 (with or without a defining block).
 
 
-=head3 C<< (?<PerlUseStatement> >>
+=head3 C<< (?&PerlUseStatement) >>
 
 Matches a C<< use <module name> ...; >> or C<< use <version number>; >> statement.
 
 
-=head3 C<< (?<PerlReturnStatement> >>
+=head3 C<< (?&PerlReturnStatement) >>
 
 Matches a C<< return <expression>; >> or C<< return; >> statement.
 
 
-=head3 C<< (?<PerlReturnExpression> >>
+=head3 C<< (?&PerlReturnExpression) >>
 
 Matches a C<< return <expression> >>
 as an expression without trailing end-of-statement markers.

@@ -5,6 +5,8 @@ LICENSE
 README
 README.md
 XS.xs
+ithumb.c
+ithumb.h
 t/create_thumbnail.t
 t/src.png
 lib/Ithumb/XS.pm

@@ -1,0 +1,23 @@
+Revision history for perl application aep (Advanced Entry Point)
+
+0.008     2019-12-08 01:25:15 GMT
+  - Added base POE in, updated cpanfile
+  - Updated several documentation aspects
+  - Added all defaults in
+0.007     2019-12-07 23:36:46 GMT
+  - Greatly increased documentation to show how the config will be handled
+  - Added exit on INT to signal handler
+0.006     2019-12-07 19:09:57 GMT
+  - Added in BUGS section to documentation with link to source on github
+0.005     2019-12-07 18:52:21 GMT
+  - Added a capture for INT
+0.004     2019-12-07 18:47:49 GMT
+  - Updated some documentation and dist::zilla config
+0.003     2019-12-07 18:40:20 GMT
+  - Tidied up a little
+0.002     2019-12-07 18:29:10 GMT
+  - Adding in signal captures
+  - Updated bin/aep to initilize signal capture
+0.001     2019-12-07 16:46:00+00:00 Europe/London
+  - Added in a small test creating a binary called aep
+  - Initial module creation

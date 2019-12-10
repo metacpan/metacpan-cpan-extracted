@@ -1,7 +1,7 @@
 package IIIF::Magick;
 use 5.014001;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use parent 'Exporter';
 our @EXPORT = qw(info available convert convert_command convert_args);

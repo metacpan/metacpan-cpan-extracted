@@ -1,7 +1,7 @@
 package IIIF::Request;
 use 5.014001;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use Plack::Util::Accessor qw(region size rotation quality format);
 use Carp qw(croak);
@@ -103,7 +103,7 @@ sub error {
 }
 
 sub canonical {
-    my ( $self, $width, $height ) = @_;
+    my ( $self, $width, $height, %max ) = @_;
 
     # convert region to /full|x,y,w,h/
     my $region = $self->{region};
@@ -139,19 +139,32 @@ sub canonical {
     # convert size to /[^]?(max|w,h)/
     my $size    = $self->{size};
     my $upscale = $self->{upscale};
-    if ( $size !~ /\^?max/ ) {    # TODO: respect maxWidth, maxHeight, maxArea
+    my $ratio   = $self->{ratio};
+    my $size_px = $self->{size_px};
+
+    my $maxHeight = $max{maxHeight};
+    my $maxWidth = $max{maxWidth} || $maxHeight;
+
+    if ( $size eq '^max' && $maxHeight ) {
+        $size_px = [ $maxWidth, $maxHeight ];
+        $upscale = 1;
+        $ratio   = 1;
+        $size    = '^!' . join ',', @$size_px;
+    }
+
+    if ( $size !~ /\^?max/ ) {
         if ( $self->{size_pct} ) {
             $size = join ',',
               map { pct2px( $self->{size_pct}, $_ ) } ( $width, $height );
             $size = "^$size" if $upscale;
         }
         else {
-            my ( $w, $h ) = @{ $self->{size_px} };
+            my ( $w, $h ) = @$size_px;
             return if !$w && !$h;
             return if !$upscale && ( $h > $height || $w > $width );
 
             if ( $w && $h ) {
-                if ( $self->{ratio} ) {
+                if ($ratio) {
                     if ( $w / $h > $width / $height ) {
                         $w = pct2px( 100 * $width / $height, $h );
                     }
@@ -173,6 +186,12 @@ sub canonical {
         }
 
         $size = "max" if $size =~ /^\^?$width,$height$/;
+    }
+
+    # give up if image too large
+    if ($maxHeight) {
+        ( $width, $height ) = ( $1, $2 ) if $size =~ /^\^?(\d+),(\d+)$/;
+        return if $width > $maxWidth || $height > $maxHeight;
     }
 
     my $str = join '/', $region, $size, $self->{rotation}, $self->{quality};
@@ -262,12 +281,16 @@ Returns the full request string. Percentage values and degrees are normalized.
 Returns whether the request (without format) is the default request
 C<full/max/0/default> to get an unmodified image.
 
-=head2 canonical( $width, $height )
+=head2 canonical( $width, $height [, %max ] )
 
 Returns the L<canonical request|https://iiif.io/api/image/3.0/#47-canonical-uri-syntax>
 for an image of given width and height or C<undef> if this would result in an
 invalid request (because region or size would be out of bounds). In contrast to
 the specification, the C<format> is not required part of the canonical request.
+
+Optional named arguments C<maxWidth> and C<maxHeight> in C<%max> can be used to
+control maximum allowed image size. As specified, C<maxWidth> is ignored unless
+C<maxHeight> is also given. Option C<maxArea> is not supported.
 
 =head2 error
 

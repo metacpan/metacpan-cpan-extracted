@@ -8,12 +8,14 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/five
 eg/metronome
 eg/swing
 lib/MIDI/Drummer/Tiny.pm
 t/00-compile.t
 t/01-methods.t
 t/author-eol.t
+t/author-no-tabs.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/author-synopsis.t

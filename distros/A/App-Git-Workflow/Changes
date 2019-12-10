@@ -1,5 +1,20 @@
 Revision history for git-workflow-tools
 
+1.1.11   2019-12-04
+        Updating for release of version 1.1.11
+        Making test not run if it unable to write to the directory (Ivan Wills)
+        Removed dynamically created build file (Ivan Wills)
+        Fixed missing documentation and tidied up unmerged logic (Ivan Wills)
+
+1.1.10   2019-12-03
+        Updating for release of version 1.1.10
+        One more missing file (Ivan Wills)
+
+1.1.9   2019-12-02
+        Updating for release of version 1.1.9
+        Adding missing file to manifest (Ivan Wills)
+        ignoring temporary test file (Ivan Wills)
+
 1.1.8   2019-11-03
         Updating for release of version 1.1.8
         Adding missing dependency (Ivan Wills)

@@ -1,4 +1,4 @@
-package Pcore::Ext v0.40.0;
+package Pcore::Ext v0.40.1;
 
 use Pcore -dist, -class;
 use Pcore::Ext::App;

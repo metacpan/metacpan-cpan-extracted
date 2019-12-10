@@ -231,16 +231,12 @@ sub __set_table_name {
             }
             $sf->{i}{ct}{default_table_name} =~ s/ /_/g;
         }
-        my $default;
-        if ( ! $no_default_table_name ) {
-            $default = $sf->{i}{ct}{default_table_name};
-        }
         $sf->{i}{occupied_term_height} = 1;
         $sf->{i}{occupied_term_height} += 1 if $info;
         $ax->print_sql( $sql );
         # Readline
         $table = $tf->readline( 'Table name: ',
-            { info => $info, default => $default }
+            { info => $info, default => $no_default_table_name ? undef : $sf->{i}{ct}{default_table_name} }
         );
         if ( ! length $table ) {
             return;

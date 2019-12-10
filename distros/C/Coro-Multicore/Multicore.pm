@@ -221,6 +221,9 @@ This can be used to effectively disable this module's functionality by
 default, and enable it only for selected threads or scopes, by calling
 C<Coro::Multicore::scoped_enable>.
 
+Note that this setting nonly affects the I<global default> - it will not
+reflect whether multicore functionality is enabled for the current thread.
+
 The function returns the previous value of the enable flag.
 
 =item Coro::Multicore::scoped_enable
@@ -243,10 +246,9 @@ I<not> handle the next multicore-enabled request.
 package Coro::Multicore;
 
 use Coro ();
-use AnyEvent ();
 
 BEGIN {
-   our $VERSION = '1.03';
+   our $VERSION = '1.05';
 
    use XSLoader;
    XSLoader::load __PACKAGE__, $VERSION;
@@ -262,7 +264,14 @@ sub import {
    enable 1;
 }
 
-our $WATCHER = AE::io fd, 0, \&poll;
+our $WATCHER;
+
+# called when first thread is started, on first release. can
+# be called manually, but is not currently a public interface.
+sub init {
+   require AnyEvent; # maybe load it unconditionally?
+   $WATCHER ||= AE::io (fd, 0, \&poll);
+}
 
 =head1 THREAD SAFETY OF SUPPORTING XS MODULES
 

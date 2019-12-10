@@ -51,6 +51,13 @@ prepare_invocation_info (GPerlI11nInvocationInfo *iinfo,
 }
 
 static void
+_free_array_info (gpointer ai, gpointer user_data)
+{
+	PERL_UNUSED_VAR (user_data);
+	g_free (ai);
+}
+
+static void
 clear_invocation_info (GPerlI11nInvocationInfo *iinfo)
 {
 	g_slist_free (iinfo->free_after_call);
@@ -61,7 +68,7 @@ clear_invocation_info (GPerlI11nInvocationInfo *iinfo)
 	g_slist_free (iinfo->callback_infos);
 	iinfo->callback_infos = NULL;
 
-	g_slist_foreach (iinfo->array_infos, (GFunc) g_free, NULL);
+	g_slist_foreach (iinfo->array_infos, _free_array_info, NULL);
 	g_slist_free (iinfo->array_infos);
 	iinfo->array_infos = NULL;
 }
@@ -69,12 +76,12 @@ clear_invocation_info (GPerlI11nInvocationInfo *iinfo)
 /* ------------------------------------------------------------------------- */
 
 typedef struct {
-	GFunc func;
+	GDestroyNotify func;
 	gpointer data;
 } FreeClosure;
 
 static void
-free_after_call (GPerlI11nInvocationInfo *iinfo, GFunc func, gpointer data)
+free_after_call (GPerlI11nInvocationInfo *iinfo, GDestroyNotify func, gpointer data)
 {
 	FreeClosure *closure = g_new (FreeClosure, 1);
 	closure->func = func;
@@ -84,9 +91,11 @@ free_after_call (GPerlI11nInvocationInfo *iinfo, GFunc func, gpointer data)
 }
 
 static void
-_invoke_free_closure (FreeClosure *closure)
+_invoke_free_closure (gpointer closure_in, gpointer user_data)
 {
-	closure->func (closure->data, NULL);
+	FreeClosure *closure = closure_in;
+	PERL_UNUSED_VAR (user_data);
+	closure->func (closure->data);
 	g_free (closure);
 }
 
@@ -96,5 +105,5 @@ invoke_free_after_call_handlers (GPerlI11nInvocationInfo *iinfo)
 	/* We free the FreeClosures themselves directly after invoking them.  The list
 	   is freed in clear_invocation_info. */
 	g_slist_foreach (iinfo->free_after_call,
-	                 (GFunc) _invoke_free_closure, NULL);
+	                 _invoke_free_closure, NULL);
 }

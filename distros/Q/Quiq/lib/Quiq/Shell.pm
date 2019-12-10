@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.166';
+our $VERSION = '1.167';
 
 use Time::HiRes ();
 use Quiq::Duration;
@@ -630,7 +630,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.166
+1.167
 
 =head1 AUTHOR
 

@@ -1,5 +1,9 @@
 Revision history for CGI-Untaint-Twitter
 
+0.05	Tue  3 Dec 09:36:58 EST 2019
+	Fix RT108889
+	Only allow @ at the start of handles
+
 0.04	Wed Nov 26 10:59:21 EST 2014
 	Ensure ssl => 1 is passed in
 

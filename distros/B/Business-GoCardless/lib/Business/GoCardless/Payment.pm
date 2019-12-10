@@ -25,6 +25,7 @@ extends 'Business::GoCardless::Resource';
     created_at
     currency
     description
+    fx
     id
     links
     metadata
@@ -40,6 +41,7 @@ has [ qw/
     created_at
     currency
     description
+    fx
     id
     links
     metadata

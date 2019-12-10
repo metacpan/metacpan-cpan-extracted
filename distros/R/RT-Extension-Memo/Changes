@@ -1,5 +1,9 @@
 Revision history for RT-Extension-Memo
 
+0.06 2019-12-09
+ - Fix display with linefeeds for text/plain stored attribute
+ - Fix tests of CKEDITOR since instances are frozen on 'unloaded' state with phantomjs
+
 0.05 2018-09-03
  - Merge memo in merged ticket
  - Setup a max-height

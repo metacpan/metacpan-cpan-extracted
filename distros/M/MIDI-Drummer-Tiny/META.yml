@@ -25,9 +25,9 @@ requires:
   Moo: '2'
   perl: '5.006'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MIDI-Drummer-Tiny
-  repository: https://github.com/ology/MIDI-Drummer-Tiny
-version: '0.0801'
+  homepage: https://github.com/ology/MIDI-Drummer-Tiny
+  repository: https://github.com/ology/MIDI-Drummer-Tiny.git
+version: '0.0802'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -143,6 +143,17 @@ x_Dist_Zilla:
       name: PodSyntaxTests
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::Test::NoTabs
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          filename: xt/author/no-tabs.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+      name: Test::NoTabs
+      version: '0.15'
+    -
       class: Dist::Zilla::Plugin::Test::EOL
       config:
         Dist::Zilla::Plugin::Test::EOL:
@@ -185,9 +196,9 @@ x_Dist_Zilla:
       name: MetaJSON
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.012'
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -201,7 +212,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
-          exclude_match: []
+          exclude_match:
+            - \.mid
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''
@@ -311,4 +323,4 @@ x_Dist_Zilla:
     version: '6.012'
 x_authority: cpan:GENE
 x_generated_by_perl: v5.27.7
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

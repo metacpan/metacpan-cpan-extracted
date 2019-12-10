@@ -1,5 +1,12 @@
 Changelog for Statocles
 
+0.096     2019-12-05 10:24:21-06:00 America/Chicago
+
+    [Added]
+
+    - Added option to stop deployment if the link check fails. Thanks
+      @ferki! [Github #594]
+
 0.095     2019-10-11 22:15:19-05:00 America/Chicago
 
     [Added]

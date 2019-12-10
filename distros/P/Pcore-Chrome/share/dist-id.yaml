@@ -1,11 +1,11 @@
 ---
 branch: master
-date: 2019-11-25T15:57:16Z
-hash: f7ccbe4fd437a1038aebeec42aedb78a3510f5df
-hash_short: f7ccbe4
+date: 2019-12-06T10:46:36Z
+hash: 12363c3a8f7f060189395ae18204f197a43fcf1f
+hash_short: 12363c3
 is_dirty: 0
-release: v0.11.0
+release: v0.11.1
 release_distance: ~
 tags:
-- v0.11.0
+- v0.11.1
 - latest

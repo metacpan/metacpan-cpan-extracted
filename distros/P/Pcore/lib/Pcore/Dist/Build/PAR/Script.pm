@@ -15,9 +15,9 @@ has clean  => ( required => 1 );
 has gui    => ( required => 1 );
 has mod    => ( required => 1 );    # HashRef
 
-has tree => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::Util::File::Tree']
+has tree           => ( is => 'lazy', init_arg => undef );                # InstanceOf ['Pcore::Util::File::Tree']
 has main_mod       => ( sub { {} }, is => 'lazy', init_arg => undef );    # HashRef, main modules, found during deps processing
-has shared_objects => ( init_arg       => undef );                        # HashRef
+has shared_objects => ( init_arg => undef );                              # HashRef
 
 sub _build_tree ($self) {
     return Pcore::Util::File::Tree->new;

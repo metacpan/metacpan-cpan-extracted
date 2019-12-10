@@ -2,7 +2,7 @@ package Devel::Git::MultiBisect::Opts;
 use strict;
 use warnings;
 use v5.10.0;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     process_options

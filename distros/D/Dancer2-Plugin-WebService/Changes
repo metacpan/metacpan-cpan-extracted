@@ -1,3 +1,12 @@
+4.3.1  2019-12-10
+
+  - reply halts the route
+
+4.3.0  2019-12-08
+
+  - use Cpanel::JSON::XS instead of JSON::XS
+  - spaces at json encoding
+
 4.2.9  2019-11-20
 
   - Uniocode corrections while encoding json structures

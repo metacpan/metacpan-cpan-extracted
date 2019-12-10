@@ -17,7 +17,7 @@ sub run ( $self, $req ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 25                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 29 does not match the package declaration       |
+## |    1 | 13                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 17 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

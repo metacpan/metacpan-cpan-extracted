@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::VERSION = '0.86';
+$Shared::Examples::Net::Amazon::S3::VERSION = '0.87';
 use strict;
 use warnings;
 
@@ -43,6 +43,7 @@ sub s3_api_with_signature_4 {
 
 sub s3_api_with_signature_2 {
     Net::Amazon::S3->new (
+        @_,
         aws_access_key_id     => 'AKIDEXAMPLE',
         aws_secret_access_key => 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY',
         authorization_method  => 'Net::Amazon::S3::Signature::V2',
@@ -436,7 +437,7 @@ Shared::Examples::Net::Amazon::S3 - used for testing and as example
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 AUTHOR
 

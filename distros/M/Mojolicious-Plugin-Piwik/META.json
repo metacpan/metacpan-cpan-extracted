@@ -51,6 +51,6 @@
          "web" : "https://github.com/Akron/Mojolicious-Plugin-Piwik"
       }
    },
-   "version" : "0.26",
+   "version" : "0.27",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

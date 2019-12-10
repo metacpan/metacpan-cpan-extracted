@@ -1,3 +1,9 @@
+0.040   2019-12-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add missing dependency: Time::Duration::Parse::AsHash
+	  [RT#131112].
+
+
 0.039   2019-11-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Observe PERL_DATA_SAH_COERCE_SUPPORT_OLD_PREFIX.

@@ -19,6 +19,8 @@ use threads::shared;
 
 use FindBin;
 use lib "$FindBin::RealBin/../lib";
+use lib "$FindBin::RealBin/../lib/perl5";
+use File::Which qw/which/;
 use Mashtree qw/logmsg @fastqExt @fastaExt @mshExt @richseqExt _truncateFilename createTreeFromPhylip $MASHTREE_VERSION/;
 use Mashtree::Db;
 use Bio::Tree::DistanceFactory;
@@ -36,7 +38,7 @@ exit main();
 
 sub main{
   my $settings={};
-  GetOptions($settings,qw(help file-of-files outtree=s outmatrix=s tempdir=s numcpus=i genomesize=i mindepth|min-depth=i truncLength=i kmerlength=i sort-order=s sketch-size=i version save-sketches:s seed=i)) or die $!;
+  GetOptions($settings,qw(help file-of-files outtree=s outmatrix=s tempdir=s numcpus=i genomesize=i mindepth|min-depth=i truncLength=i kmerlength=i sort-order=s sketch-size=i citation version save-sketches:s seed=i)) or die $!;
   $$settings{numcpus}||=1;
   $$settings{truncLength}||=250;  # how long a genome name is
   $$settings{tempdir}||=tempdir("MASHTREE.XXXXXX",CLEANUP=>1,TMPDIR=>1);
@@ -54,9 +56,16 @@ sub main{
     $$settings{$_}=lc($$settings{$_});
   }
 
-  die usage() if($$settings{help});
+  if($$settings{help}){
+    print usage();
+    return 0;
+  }
   if($$settings{version}){
     print "Mashtree $MASHTREE_VERSION\n";
+    return 0;
+  }
+  if($$settings{citation}){
+    print "Katz, L. S., Griswold, T., & Carleton, H. A. (2017, October 8-11). Generating WGS Trees with Mashtree. Poster presented at the American Society for Microbiology Conference on Rapid Applied Microbial Next-Generation Sequencing and Bioinformatic Pipelines, Washington, DC.\n";
     return 0;
   }
 
@@ -66,9 +75,18 @@ sub main{
 
   # Check for prereq executables.
   for my $exe(qw(mash quicktree)){
-    system("$exe -h > /dev/null 2>&1");
-    die "ERROR: could not find $exe in your PATH" if $?;
+    if(!which($exe)){
+      die "ERROR: could not find $exe in your PATH";
+    }
   }
+
+  # Check mash version
+  my $mashVersion = `mash --version`;
+  die "ERROR running mash: $!" if $?;
+  chomp($mashVersion);
+  $mashVersion=~s/\..*//;
+  die "ERROR: need mash version > 2" if($mashVersion < 2);
+  logmsg "Found mash version $mashVersion - ".which('mash');
 
   # Distributed cpus if we have few genomes but high numcpus
   $$settings{cpus_per_mash}=floor($$settings{numcpus}/@reads);
@@ -484,6 +502,7 @@ sub usage{
                             this file and not to stdout. Log messages
                             will still go to stderr.
   --version                 Display the version and exit
+  --citation                Display the preferred citation and exit
 
   TREE OPTIONS
   --truncLength        250  How many characters to keep in a filename

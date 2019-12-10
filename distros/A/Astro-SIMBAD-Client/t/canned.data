@@ -12,7 +12,8 @@
 	pmra => -1093.39,
 	pmdec => -2000.06,
 ###	radial => -5.19,
-	radial => -5,
+###	radial => -5,
+	radial => -5.229,		# As of 03-Dec-2019
 	redshift => -0.000017,
 	spec => 'K1.5III',
 	bmag => 1.19,

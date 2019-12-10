@@ -3,7 +3,7 @@ NAME
     posted to an NNTP newsgroup
 
 VERSION
-    version 0.03
+    version 0.04
 
 SYNOPSIS
        use POE qw( Component::Client::NNTP::Tail );
@@ -85,6 +85,9 @@ USAGE
     *   Interval -- minimum number of seconds between checks for new
         messages (defaults to 60)
 
+    *   TimeOut -- number of seconds to wait for a response from server
+        (defaults to 30)
+
     *   Alias -- POE::Session alias name (defaults to the newsgroup name)
 
     *   Port -- server port for NNTP connections
@@ -164,26 +167,26 @@ SEE ALSO
 
 SUPPORT
   Bugs / Feature Requests
-    Please report any bugs or feature requests by email to
-    "bug-poe-component-client-nntp-tail at rt.cpan.org", or through the web
-    interface at
-    <http://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Client-N
-    NTP-Tail>. You will be automatically notified of any progress on the
-    request by the system.
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/poe-component-client-nntp-tail/issues>. You
+    will be notified automatically of any progress on your issue.
 
   Source Code
     This is open source software. The code repository is available for
     public review and contribution under the terms of the license.
 
-    <http://github.com/dagolden/poe-component-client-nntp-tail>
+    <https://github.com/dagolden/poe-component-client-nntp-tail>
 
-      git clone http://github.com/dagolden/poe-component-client-nntp-tail
+      git clone https://github.com/dagolden/poe-component-client-nntp-tail.git
 
 AUTHOR
     David Golden <dagolden@cpan.org>
 
+CONTRIBUTOR
+    Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2011 by David Golden.
+    This software is Copyright (c) 2019 by David Golden.
 
     This is free software, licensed under:
 

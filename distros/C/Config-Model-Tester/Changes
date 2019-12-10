@@ -1,3 +1,8 @@
+4.005 2019-12-09
+
+  Bug fixes:
+  * fix setup with symlinks
+
 4.004 2019-11-10
 
   Main change:

@@ -128,11 +128,21 @@ is($t3x->at(3,1), 'BAD', '$t3x->at(3,1)');
 is($t3x->at(4,2), 'BAD', '$t3x->at(4,2)');
 
 {
-  my $csv = "H1,H2,H3\nH1,H2,H3\n1,2,3\n1,2,3\n1,2,3";
+  my $csv = "H1,H2,H3\n".
+            "H1,H2,H3\n".
+            "1, 2, 3\n".
+            "4, 5, 6\n".
+            "7, 8, 9\n";
   my $p1   = rcsv2D(\$csv, {header=>2});
+  is($p1->info, "PDL: Double D [3,3]");
+  delta_ok($p1->transpose->unpdl, [[1,2,3],[4,5,6],[7,8,9]], '$p1->unpdl');
+
   my @p2   = rcsv1D(\$csv, {header=>2});
-  is($p1->info, "PDL: Double D [2,3]");
+  is(scalar(@p2), 3);
   is($p2[0]->info, "PDL: Double D [3]");
+  delta_ok($p2[0]->unpdl, [1,4,7], '$p2[0]->unpdl');
+  delta_ok($p2[1]->unpdl, [2,5,8], '$p2[1]->unpdl');
+  delta_ok($p2[2]->unpdl, [3,6,9], '$p2[2]->unpdl');
 }
 
 done_testing;

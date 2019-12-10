@@ -5,8 +5,8 @@ use warnings;
 
 use Module::Functions;
 
-our %SNRE;
-our @EXPORT_OK = ('%SNRE', get_public_functions());
+our %RE;
+our @EXPORT_OK = ('%RE', get_public_functions());
 
 use constant {
     NEWSPAPER_NAMES => [
@@ -51,6 +51,8 @@ use constant {
         '生活發現',
     ],
 };
-$SNRE{newspaper_names} = '(?:' . join('|', map { qr($_) } @{ NEWSPAPER_NAMES() }) . ')';
+
+$RE{newspaper_names} = '(?:' . join('|', map { qr($_) } @{ NEWSPAPER_NAMES() }) . ')';
+$RE{category_names} = '(?:' . join('|', map { qr($_) } @{ CATEGORY_NAMES() }) . ')';
 
 1;

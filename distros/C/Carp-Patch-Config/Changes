@@ -1,12 +1,22 @@
-Revision history for Carp-Patch-Config
+0.004   2019-12-09  Released-By: PERLANCAR; Urgency: medium
 
-0.002   2016-06-02 (PERLANCAR)
+	- Add configuration: -Dump to conveniently enable data structure
+	  dumping.
+
+
+0.003   2019-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Update stuffs (Module::Patch now requires config to start with
+	  dash).
+
+
+0.002   2016-06-02  Released-By: PERLANCAR
 
         - Restore old values on unimport.
 
         - [doc] Mention Devel::Confess.
 
 
-0.001   2016-06-02 (PERLANCAR)
+0.001   2016-06-02  Released-By: PERLANCAR
 
         - First release.

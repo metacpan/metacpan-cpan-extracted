@@ -154,15 +154,6 @@ lib/AsposeSlidesCloud/TestUtils.pm
 LICENSE
 MakeFile.pl
 MANIFEST			This list of files
-prove.pl
 README.md
-t/SlidesApiTest.t
-testConfig.json
-TestData/placeholders.pptx
-TestData/TemplateCV.pptx
-TestData/TemplatingCVDataWithBase64.xml
-TestData/test-unprotected.ppt
-TestData/test.ppt
-testRules.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

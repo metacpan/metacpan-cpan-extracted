@@ -15,14 +15,14 @@ name: Mojolicious-Plugin-SwaggerUI
 provides:
   Mojolicious::Plugin::SwaggerUI:
     file: lib/Mojolicious/Plugin/SwaggerUI.pm
-    version: v0.0.2
+    version: v0.0.3
 requires:
   File::ShareDir: '1.00'
   Mojolicious: '8.25'
 resources:
   license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: https://gitlab.com/marghidanu/mojolicious-plugin-swaggerui.git
-version: v0.0.2
+version: v0.0.3
 x_contributors:
   - 'Tudor Marghidanu <tudor@marghidanu.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

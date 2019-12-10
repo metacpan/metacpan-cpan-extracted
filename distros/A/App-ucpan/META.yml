@@ -25,9 +25,12 @@ no_index:
     - builder
 provides:
   App::ucpan:
-    file: lib/App/ucpan.pm
-    version: '1.11'
+    file: lib/App\ucpan.pm
+    version: '1.13'
+recommends:
+  Win32::Console::ANSI: '0'
 requires:
+  App::cpanoutdated: '0'
   Config: '0'
   File::Copy: '0'
   File::Which: '0'
@@ -44,7 +47,7 @@ requires:
   utf8: '0'
   version: '0'
   warnings: '0'
-version: '1.11'
+version: '1.13'
 x_authority: cpan:KPEE
 x_contributors:
   - 'KPEE <kpee.cpanx@gmail.com>'

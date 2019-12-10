@@ -117,6 +117,7 @@ lib/Chj/xoutpipe.pm
 lib/Chj/xperlfunc.pm
 lib/Chj/xpipe.pm
 lib/Chj/xtmpfile.pm
+lib/FP/AST/Perl.pm
 lib/FP/Abstract/Equal.pm
 lib/FP/Abstract/Interface.pm
 lib/FP/Abstract/Map.pm
@@ -130,6 +131,7 @@ lib/FP/Array_sort.pm
 lib/FP/BigInt.pm
 lib/FP/Char.pm
 lib/FP/Combinators.pm
+lib/FP/Combinators2.pm
 lib/FP/DBI.pm
 lib/FP/Div.pm
 lib/FP/Docstring.pm
@@ -172,6 +174,7 @@ lib/FP/Show/t.pm
 lib/FP/Stream.pm
 lib/FP/StrictList.pm
 lib/FP/Struct.pm
+lib/FP/Struct/Equal.pm
 lib/FP/Struct/Show.pm
 lib/FP/Text/CSV.pm
 lib/FP/Trampoline.pm

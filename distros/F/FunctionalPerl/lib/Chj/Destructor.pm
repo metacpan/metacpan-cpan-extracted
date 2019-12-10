@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -28,6 +28,8 @@ Util to help debug or test memory deallocation.
 
 =head1 SEE ALSO
 
+Implements: L<FP::Struct::Show>, L<FP::Abstract::Pure>
+
 End.pm, but that one does not type-check the destructor argument
 early, nor does it localize error variables in its DESTROY method.
 
@@ -48,9 +50,10 @@ package Chj::Destructor;
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
 {
-    package Chj::Destructor::_;
+    package Chj::_::Destructor;
     use FP::Predicates ":all";
-    use FP::Struct [[*is_procedure, "thunk"]];
+    use FP::Struct [[*is_procedure, "thunk"]],
+        'FP::Struct::Show', 'FP::Abstract::Pure';
     sub DESTROY {
         my ($self)=@_;
         local ($@,$!,$?,$^E,$.);
@@ -59,8 +62,9 @@ use strict; use warnings; use warnings FATAL => 'uninitialized';
     _END_
 }
 
+# Chj::_::Destructor::constructors->import -- no, special prototype:
 sub Destructor (&) {
-    Chj::Destructor::_->new ($_[0])
+    Chj::_::Destructor->new ($_[0])
 }
 
 use Chj::TEST;

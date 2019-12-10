@@ -17,6 +17,9 @@ requires:
   File::Find::Rule: '0'
   Module::Load: '0'
   Mojolicious: '0'
-version: '0.12'
+resources:
+  homepage: https://github.com/EmilianoBruni/mojolicious-plugin-autoroutepm
+  repository: https://github.com/EmilianoBruni/mojolicious-plugin-autoroutepm.git
+version: '0.13'
 x_generated_by_perl: v5.14.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

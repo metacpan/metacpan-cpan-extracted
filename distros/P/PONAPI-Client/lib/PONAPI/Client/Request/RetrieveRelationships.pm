@@ -27,7 +27,7 @@ PONAPI::Client::Request::RetrieveRelationships - request - retrieve relationship
 
 =head1 VERSION
 
-version 0.002011
+version 0.002012
 
 =head1 AUTHORS
 

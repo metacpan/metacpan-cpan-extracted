@@ -10,7 +10,7 @@ Direct drawing for 32/24/16 bit framebuffers (others would be supported if asked
 
  use Graphics::Framebuffer;
 
- our $fb = Graphics::Framebuffer->new('FB_DEVICE' => '/dev/fb0');
+ our $fb = Graphics::Framebuffer->new();
 
 Drawing is this simple
 
@@ -50,48 +50,13 @@ Make sure you have read/write access to the framebuffer device.  Usually this ju
 
 =head1 INSTALLATION
 
-Before you install this, please note it requires the Perl module "Imager".  If you are installing via CPAN, then please first make sure your system has the appropriate JPEG, GIF, PNG, TIFF, Freetype, and Type1 development libraries installed first.  If you don't, then Imager will just be compiled without support for those kinds of files, which pretty much makes it useless.
-
-If you are using a Debian based system (Ubuntu, Weezy, Mint, Raspian, etc.) then run the following command (and answer yes to the prompt) before doing anything else:
-
-=over 6
-
- sudo apt update
- sudo apt upgrade
- sudo apt install build-essential fbset libimager-perl libinline-c-perl libmath-bezier-perl libmath-gradient-perl libfile-map-perl libtest-most-perl
-
-=back
-
-If you are using a RedHat based system (Fedora, CentOS, etc):
-
-=over 6
-
- sudo yum update
- sudo yum upgrade
- sudo yum upgrade build-essential perl-math-bezier perl-math-gradient perl-file-map perl-imager perl-inline-c perl-test-most
+Read the file "installing/INSTALL" and follow its instructions.
 
 =back
 
 When you install this module, please do it within a console, not a console window in X-Windows, but the actual Linux/FreeBSD console outside of X-Windows.
 
 If you are in X-Windows, and don't know how to get to a console, then just hit CTRL-ALT-F1 (actually CTRL-ALT-F1 through CTRL-ALT-F6 works) and it should show you a console.  ALT-F7 or ALT-F8 will get you back to X-Windows.
-
-If you are using CPAN, then installation is simple, but if you are installing manually, then the typical steps apply:
-
-=over 6
-
- perl Makefile.PL
- make
- make test
- make install
-
-=back
-
-Please note, that the install step may require root permissions (run it with sudo, "sudo make install").  "Build.PL" is not used due to lack of support by Inline::C.
-
-If testing fails, it will usually be ok to install it anyway, as it will likely work.  The testing is flakey (thank Perl's test/taint mode for that).
-
-I recommend running the scripts inside of the "examples" directory for real testing instead.
 
 =head1 OPERATIONAL THEORY
 
@@ -142,6 +107,16 @@ If your installation of Imager has Adobe Type 1 font capability, then this will 
 =item B<Imager-Has-Freetype2>
 
 If your installation of Imager has the FreeType2 library rendering capability, then this will be 1
+
+=item B<Imager-Image-Types>
+
+An anonymous array of supported image file types.
+
+=item B<HATCHES>
+
+An anomyous array of hatch names for hatch fills.
+
+This is also exported as @HATCHES
 
 =item B<X_CLIP>
 
@@ -215,7 +190,6 @@ Boolean constants
 =over 8
 
 =item B<TRUE>  ( 1 )
-
 =item B<FALSE> ( 0 )
 
 =back
@@ -225,25 +199,15 @@ Draw mode constants
 =over 8
 
 =item B<NORMAL_MODE>   ( 0  )
-
 =item B<XOR_MODE>      ( 1  )
-
 =item B<OR_MODE>       ( 2  )
-
 =item B<AND_MODE>      ( 3  )
-
 =item B<MASK_MODE>     ( 4  )
-
 =item B<UNMASK_MODE>   ( 5  )
-
 =item B<ALPHA_MODE>    ( 6  )
-
 =item B<ADD_MODE>      ( 7  )
-
 =item B<SUBTRACT_MODE> ( 8  )
-
 =item B<MULTIPLY_MODE> ( 9  )
-
 =item B<DIVIDE_MODE>   ( 10 )
 
 =back
@@ -253,9 +217,7 @@ Draw Arc constants
 =over 8
 
 =item B<ARC>      ( 0 )
-
 =item B<PIE>      ( 1 )
-
 =item B<POLY_ARC> ( 2 )
 
 =back
@@ -265,15 +227,10 @@ Virtual framebuffer color mode constants
 =over 8
 
 =item B<RGB> ( 0 )
-
 =item B<RBG> ( 1 )
-
 =item B<BGR> ( 2 )
-
 =item B<BRG> ( 3 )
-
 =item B<GBR> ( 4 )
-
 =item B<GRB> ( 5 )
 
 =back
@@ -283,11 +240,8 @@ Text rendering centering constants
 =over 8
 
 =item B<CENTER_NONE> ( 0 )
-
 =item B<CENTER_X>    ( 1 )
-
 =item B<CENTER_Y>    ( 2 )
-
 =item B<CENTER_XY>   ( 3 )
 
 =back
@@ -297,9 +251,7 @@ Acceleration method constants
 =over 8
 
 =item B<PERL>     ( 0 )
-
 =item B<SOFTWARE> ( 1 )
-
 =item B<HARDWARE> ( 2 )
 
 =back
@@ -380,6 +332,10 @@ use constant {
     FBINFO_HWACCEL_YWRAP     => 0x4000,
 };
 
+### THREADS ###
+use if ($Config{'useithreads'}), 'threads', 'yield', 'stringify', 'stack_size' => 131076, 'exit' => 'threads_only';
+use if ($Config{'useithreads'}), 'threads::shared';
+
 use POSIX ();
 use POSIX qw(modf);
 use Time::HiRes qw(sleep time);                                  # The time accuracy has to be milliseconds on many routines
@@ -395,7 +351,6 @@ use Imager::Fountain;                                            #
 use Imager::Font::Wrap;
 use Graphics::Framebuffer::Mouse;                                # The mouse handler
 use Graphics::Framebuffer::Splash;                               # The splash code is here
-### THREADS ###
 
 Imager->preload; # The Imager documentation says to do this, but doesn't give much of an explanation why.  However, I assume it is to initialize global variables ahead of time.
 
@@ -406,7 +361,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.43';
+    our $VERSION   = '6.45';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -2160,7 +2115,6 @@ C_CODE
 
 our @HATCHES    = Imager::Fill->hatches;
 our @COLORORDER = (qw( RGB RBG BGR BRG GBR GRB ));
-our @dp_cache;
 
 =head1 METHODS
 
@@ -2303,6 +2257,8 @@ Defines the colorspace for the graphics routines to draw in.  The possible (and 
     'BRG'  for Blue-Red-Green
     'BGR'  for Blue-Green-Red (Many video cards are this)
 
+Why do many video cards use the BGR color order?  Simple, their GPUs operate with the high to low byte order for long words.  To the video card, it is RGB, but to a CPU that stores bytes in low to high byte order.
+
 =back
 
 ##############################################################################
@@ -2330,19 +2286,19 @@ sub new {
         'Imager-Has-Freetype2' => $Imager::formats{'ft2'} || 0,
         'Imager-Image-Types'   => [ map( {uc($_) } Imager->read_types()) ],
 
+        'X'           => 0,                 # Last position plotted X
+        'Y'           => 0,                 # Last position plotted Y
+        'X_CLIP'      => 0,                 # Top left clip start X
+        'Y_CLIP'      => 0,                 # Top left clip start Y
+        'YY_CLIP'     => undef,             # Bottom right clip end X
+        'XX_CLIP'     => undef,             # Bottom right clip end Y
+        'CLIPPED'     => FALSE,             # Indicates if clipping is less than the full screen
         'IMAGER_FOREGROUND_COLOR' => undef, # Imager foreground color
         'IMAGER_BACKGROUND_COLOR' => undef, # Imager background color
-        'X'           => 0,               # Last position plotted X
-        'Y'           => 0,               # Last position plotted Y
-        'X_CLIP'      => 0,               # Top left clip start X
-        'Y_CLIP'      => 0,               # Top left clip start Y
-        'YY_CLIP'     => undef,           # Bottom right clip end X
-        'XX_CLIP'     => undef,           # Bottom right clip end Y
-        'CLIPPED'     => FALSE,           # Indicates if clipping is less than the full screen
-        'RAW_FOREGROUND_COLOR'       => undef,           # Global foreground color (Raw string)
-        'RAW_BACKGROUND_COLOR'     => undef,           # Global Background Color
-        'DRAW_MODE'   => NORMAL_MODE,     # Drawing mode (Normal default)
-        'DIAGNOSTICS' => FALSE,           # Determines if diagnostics are shown when images are loaded.
+        'RAW_FOREGROUND_COLOR'    => undef, # Global foreground color (Raw string)
+        'RAW_BACKGROUND_COLOR'    => undef, # Global Background Color
+        'DRAW_MODE'   => NORMAL_MODE,       # Drawing mode (Normal default)
+        'DIAGNOSTICS' => FALSE,             # Determines if diagnostics are shown when images are loaded.
 
         'SHOW_ERRORS' => FALSE,             # If on, it will output any errors in Imager or elsewhere, else all errors are squelched
 
@@ -2380,25 +2336,25 @@ sub new {
         'MULTIPLY_MODE' => MULTIPLY_MODE,
         'DIVIDE_MODE'   => DIVIDE_MODE,
 
-        'ARC'      => ARC,                  #   Constants for "draw_arc" method
+        'ARC'      => ARC,            #   Constants for "draw_arc" method
         'PIE'      => PIE,
         'POLY_ARC' => POLY_ARC,
 
-        'RGB' => RGB,                                           #   Constants for color mapping
-        'RBG' => RBG,                                           #   Constants for color mapping
-        'BGR' => BGR,                                           #   Constants for color mapping
-        'BRG' => BRG,                                           #   Constants for color mapping
-        'GBR' => GBR,                                           #   Constants for color mapping
-        'GRB' => GRB,                                           #   Constants for color mapping
+        'RGB' => RGB,                 #   Constants for color mapping
+        'RBG' => RBG,                 #   Constants for color mapping
+        'BGR' => BGR,                 #   Constants for color mapping
+        'BRG' => BRG,                 #   Constants for color mapping
+        'GBR' => GBR,                 #   Constants for color mapping
+        'GRB' => GRB,                 #   Constants for color mapping
 
-        'CENTER_NONE' => CENTER_NONE,                           #   Constants for centering
-        'CENTER_X'    => CENTER_X,                              #   Constants for centering
-        'CENTER_Y'    => CENTER_Y,                              #   Constants for centering
-        'CENTER_XY'   => CENTER_XY,                             #   Constants for centering
-        'CENTRE_NONE' => CENTRE_NONE,                           #   Constants for centering
-        'CENTRE_X'    => CENTRE_X,                              #   Constants for centering
-        'CENTRE_Y'    => CENTRE_Y,                              #   Constants for centering
-        'CENTRE_XY'   => CENTRE_XY,                             #   Constants for centering
+        'CENTER_NONE' => CENTER_NONE, #   Constants for centering
+        'CENTER_X'    => CENTER_X,    #   Constants for centering
+        'CENTER_Y'    => CENTER_Y,    #   Constants for centering
+        'CENTER_XY'   => CENTER_XY,   #   Constants for centering
+        'CENTRE_NONE' => CENTRE_NONE, #   Constants for centering
+        'CENTRE_X'    => CENTRE_X,    #   Constants for centering
+        'CENTRE_Y'    => CENTRE_Y,    #   Constants for centering
+        'CENTRE_XY'   => CENTRE_XY,   #   Constants for centering
         ####################################################################
 
         'KD_GRAPHICS'         => 1,
@@ -2461,22 +2417,26 @@ sub new {
           'S' .                            # 16 bits for capabilities
           'S2',                            # 16 bits x 2 reserved
 
-
         # Default values
         'GARBAGE'     => FALSE,
-        'VXRES'       => 640,                    # Virtual X resolution
-        'VYRES'       => 480,                    # Virtual Y resolution
-        'BITS'        => 32,                     # Bits per pixel
-        'BYTES'       => 4,                      # Bytes per pixel
-        'XOFFSET'     => 0,                      # Visible screen X offset
-        'YOFFSET'     => 0,                      # Visible screen Y offset
-        'FB_DEVICE'   => undef,                  # Framebuffer device name (defined later)
-        'COLOR_ORDER' => 'RGB',                  # Default color Order.  Redefined later to be an integer
-        'ACCELERATED' => SOFTWARE,               # Use accelerated graphics
-                                                 #   0 = Pure Perl
-                                                 #   1 = C Accelerated (but still software)
-                                                 #   2 = C & Hardware accelerated.
-        @_
+        'VXRES'       => 640,      # Virtual X resolution
+        'VYRES'       => 480,      # Virtual Y resolution
+        'BITS'        => 32,       # Bits per pixel
+        'BYTES'       => 4,        # Bytes per pixel
+        'XOFFSET'     => 0,        # Visible screen X offset
+        'YOFFSET'     => 0,        # Visible screen Y offset
+        'FB_DEVICE'   => undef,    # Framebuffer device name (defined later)
+        'COLOR_ORDER' => 'RGB',    # Default color Order.  Redefined later to be an integer
+        'ACCELERATED' => SOFTWARE, # Use accelerated graphics
+                                   #   0 = Pure Perl
+                                   #   1 = C Accelerated (but still software)
+                                   #   2 = C & Hardware accelerated.
+        'FBIO_WAITFORVSYNC'   => 0x4620,
+        'VT_GETSTATE'         => 0x5603,
+        'KDSETMODE'           => 0x4B3A,
+        'FBIOGET_VSCREENINFO' => 0x4600,    # These come from "fb.h" in the kernel source
+        'FBIOGET_FSCREENINFO' => 0x4602,
+        @_                         # Pull in the overrides
     };
     if ($self->{'GARBAGE'}) {
         my $garbage = {
@@ -2627,9 +2587,7 @@ sub new {
             # These "fb.h" constants may go away in future versions, as the data needed to get from these
             # Is available from Inline::C now.
             # Commands
-            'FBIOGET_VSCREENINFO' => 0x4600,    # These come from "fb.h" in the kernel source
             'FBIOPUT_VSCREENINFO' => 0x4601,
-            'FBIOGET_FSCREENINFO' => 0x4602,
             'FBIOGETCMAP'         => 0x4604,
             'FBIOPUTCMAP'         => 0x4605,
             'FBIOPAN_DISPLAY'     => 0x4606,
@@ -2642,9 +2600,6 @@ sub new {
             'FBIOGET_HWCINFO'     => 0x4616,
             'FBIOPUT_MODEINFO'    => 0x4617,
             'FBIOGET_DISPINFO'    => 0x4618,
-            'FBIO_WAITFORVSYNC'   => 0x4620,
-            'VT_GETSTATE'         => 0x5603,
-            'KDSETMODE'           => 0x4B3A,
         };
         $self = { %{$self},%{$garbage} };
     }
@@ -3885,12 +3840,12 @@ sub angle_line {
     my ($dp_cos, $dp_sin);
     my $index = int($params->{'angle'} * 100);
 
-    if (defined($dp_cache[$index])) {
-        ($dp_cos, $dp_sin) = (@{ $dp_cache[$index] });
+    if (defined($self->{'dp_cache'}->[$index])) {
+        ($dp_cos, $dp_sin) = (@{ $self->{'dp_cache'}->[$index] });
     } else {
         my $dp             = ($params->{'angle'} * pi) / 180;
         ($dp_cos, $dp_sin) = (cos($dp), sin($dp));
-        $dp_cache[$index]  = [$dp_cos, $dp_sin];
+        $self->{'dp_cache'}->[$index]  = [$dp_cos, $dp_sin];
     }
     $params->{'xx'} = int($params->{'x'} - ($params->{'radius'} * $dp_sin));
     $params->{'yy'} = int($params->{'y'} - ($params->{'radius'} * $dp_cos));
@@ -4305,12 +4260,12 @@ sub draw_arc {
         if ($start_degrees > $end_degrees) {
             do {
                 my $index = int($degrees * 100);
-                if (defined($dp_cache[$index])) {
-                    ($dp_cos, $dp_sin) = (@{ $dp_cache[$index] });
+                if (defined($self->{'dp_cache'}->[$index])) {
+                    ($dp_cos, $dp_sin) = (@{ $self->{'dp_cache'}->[$index] });
                 } else {
                     my $dp             = ($degrees * pi) / 180;
                     ($dp_cos, $dp_sin) = (cos($dp), sin($dp));
-                    $dp_cache[$index]  = [$dp_cos, $dp_sin];
+                    $self->{'dp_cache'}->[$index]  = [$dp_cos, $dp_sin];
                 }
                 $sx = int($x - ($radius * $dp_sin));
                 $sy = int($y - ($radius * $dp_cos));
@@ -4339,12 +4294,12 @@ sub draw_arc {
         $plotted = FALSE;
         do {
             my $index = int($degrees * 100);
-            if (defined($dp_cache[$index])) {
-                ($dp_cos, $dp_sin) = (@{ $dp_cache[$index] });
+            if (defined($self->{'dp_cache'}->[$index])) {
+                ($dp_cos, $dp_sin) = (@{ $self->{'dp_cache'}->[$index] });
             } else {
                 my $dp = ($degrees * pi) / 180;
                 ($dp_cos, $dp_sin) = (cos($dp), sin($dp));
-                $dp_cache[$index]  = [$dp_cos, $dp_sin];
+                $self->{'dp_cache'}->[$index]  = [$dp_cos, $dp_sin];
             }
             $sx = int($x - ($radius * $dp_sin));
             $sy = int($y - ($radius * $dp_cos));
@@ -5601,8 +5556,6 @@ Draws a box from point x,y to point xx,yy, either as an outline, if 'filled' is 
 
 =back
 
-* This is not affected by the Acceleration setting
-
 =cut
 
 sub box {
@@ -6142,7 +6095,7 @@ sub replace_color {
     );
 
     eval(" \$save->{'image'} =~ s/$old/$new/sg; ");
-    $self->blit_write($save);
+        $self->blit_write($save);
 
     $self->{'DRAW_MODE'} = $old_mode;
 }
@@ -7359,9 +7312,6 @@ sub ttf_print {
             ($TTF_pw, $TTF_ph) = ($right - $left, $bottom - $top);
             $params->{'pwidth'}  = $TTF_pw;
             $params->{'pheight'} = $TTF_ph;
-
-            #        $TTF_x = $left;
-            #        $TTF_y = $miny;
         };
         warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
     } else {
@@ -7793,7 +7743,7 @@ sub load_image {
     my $bench_subtotal = $bench_start;
     my $bench_load     = $bench_start;
     my $color_order    = $self->{'COLOR_ORDER'};
-    if ($params->{'file'} =~ /\.(gif|png)$/i) {
+    if ($params->{'file'} =~ /\.(gif|png|apng)$/i) {
         eval {
             @Img = Imager->read_multi(
                 'file'             => $params->{'file'},
@@ -9062,7 +9012,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.43 (Dec 2, 2019)
+Version 6.45 (Dec 10, 2019)
 
 =head1 THANKS
 

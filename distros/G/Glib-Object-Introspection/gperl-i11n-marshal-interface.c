@@ -242,7 +242,7 @@ sv_to_interface (GIArgInfo * arg_info,
 				} else {
 					gsize n_bytes = g_struct_info_get_size (interface);
 					gpointer mem = gperl_get_boxed_check (sv, type);
-					g_memmove (arg->v_pointer, mem, n_bytes);
+					memmove (arg->v_pointer, mem, n_bytes);
 				}
 			} else {
 				if (may_be_null && !gperl_sv_is_defined (sv)) {
@@ -317,13 +317,18 @@ sv_to_interface (GIArgInfo * arg_info,
  * struct_to_sv), so it needs to be wrapped with PUTBACK/SPAGAIN by the
  * caller. */
 static SV *
-interface_to_sv (GITypeInfo* info, GIArgument *arg, gboolean own, GPerlI11nInvocationInfo *iinfo)
+interface_to_sv (GITypeInfo* info,
+                 GIArgument *arg,
+                 gboolean own,
+                 GPerlI11nMemoryScope mem_scope,
+                 GPerlI11nInvocationInfo *iinfo)
 {
 	GIBaseInfo *interface;
 	GIInfoType info_type;
 	SV *sv = NULL;
 
 	dwarn ("arg %p, info %p\n", arg, info);
+	dwarn ("  is pointer: %d\n", g_type_info_is_pointer (info));
 
 	interface = g_type_info_get_interface (info);
 	if (!interface)
@@ -382,7 +387,14 @@ interface_to_sv (GITypeInfo* info, GIArgument *arg, gboolean own, GPerlI11nInvoc
 		else if (g_type_is_a (type, G_TYPE_BOXED)) {
 			dwarn ("  -> boxed: pointer=%p, type=%"G_GSIZE_FORMAT" (%s), own=%d\n",
 			       arg->v_pointer, type, g_type_name (type), own);
-			sv = gperl_new_boxed (arg->v_pointer, type, own);
+			switch (mem_scope) {
+			    case GPERL_I11N_MEMORY_SCOPE_TEMPORARY:
+				g_assert (own == TRUE);
+				sv = gperl_new_boxed_copy (arg->v_pointer, type);
+				break;
+    			    default:
+				sv = gperl_new_boxed (arg->v_pointer, type, own);
+			}
 		}
 
 #if GLIB_CHECK_VERSION (2, 24, 0)
@@ -463,7 +475,7 @@ _sv_to_class_struct_pointer (SV *sv, GPerlI11nInvocationInfo *iinfo)
 			/* If peek() produced NULL, the class has not been
 			 * instantiated yet and needs to be created. */
 			pointer = g_type_class_ref (class_type);
-			free_after_call (iinfo, (GFunc) g_type_class_unref, pointer);
+			free_after_call (iinfo, g_type_class_unref, pointer);
 		}
 		dwarn ("     type class = %p\n", pointer);
 	}

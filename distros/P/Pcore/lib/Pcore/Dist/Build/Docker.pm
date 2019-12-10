@@ -6,7 +6,7 @@ use Pcore::Util::Scalar qw[is_plain_arrayref];
 has dist => ();                                     # InstanceOf ['Pcore::Dist']
 has api  => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::API::Docker::Hub']
 
-sub _build_api($self) {
+sub _build_api ($self) {
     require Pcore::API::Docker::Hub;
 
     return Pcore::API::Docker::Hub->new;

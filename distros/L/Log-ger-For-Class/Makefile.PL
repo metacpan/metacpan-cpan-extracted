@@ -17,8 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Log::ger::For::Class",
   "PREREQ_PM" => {
-    "Data::Clean::JSON" => "0.390",
-    "Log::ger" => "0.023",
+    "Data::Clean::ForJSON" => 0,
+    "Log::ger" => "0.027",
     "Package::Stash" => 0,
     "Package::Util::Lite" => 0,
     "Perinci::Sub::Util" => "0.46",
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,11 +42,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Clean::JSON" => "0.390",
+  "Data::Clean::ForJSON" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.023",
+  "Log::ger" => "0.027",
   "Package::Stash" => 0,
   "Package::Util::Lite" => 0,
   "Perinci::Sub::Util" => "0.46",

@@ -1,5 +1,56 @@
 Revision history for FunctionalPerl
 
+0.72.25 2019-12-8
+    - t/pod_snippets.t: Trap to repl if running test in a terminal
+    - AutoTrap: add possibly_activate (used for the above)
+    - WithRepl: WithRepl_eval*: avoid lexical variable capture
+    (An attempt at moving away from globs in FP::AST::Perl failed (see
+    Git history).)
+
+0.72.24 2019-12-8
+    - proper POD formatting in some modules, move tests to POD
+    - Struct: make immutable if is_pure
+    - Struct: do not automatically inherit FP::Abstract::Pure anymore,
+      update other modules
+    - update/implement Show, Pure etc. in various modules
+    - rename Chj::Destructor::_ to Chj::_::Destructor
+    - Create FP::Combinators2
+    - FP::AST::Perl: semicolons, Let
+
+0.72.23 2019-12-7
+    - Ops: rename `string` to `stringify`
+    - create FP::Struct::Equal
+    - create (the beginnings of) FP::AST::Perl
+    - some doc improvements
+
+0.72.22 2019-12-6
+    - FP::Repl::Repl: ,p as shortcut for ,package (,P for print)
+    - FP::Repl::Repl: alias `set_package` for `set_maybe_package`
+      etc. (so that `repl package=> 'Foo::Bar'` works instead of just
+      `repl maybe_package=> 'Foo::Bar'`)
+    - FP::Repl::Repl: transparently try to force promises then getting
+      completions on values
+    - Chj::ruse: export "p" as shortcut
+    - Chj::ruse: fix %INC iteration (make copy)
+    - Chj::Backtrace: detect when loaded after FP::Repl::Trace
+      etc. and inactivate
+
+0.72.21 2019-12-4
+    - fix: avoid running into an error when reporting an error in Lazy
+    - fix Repl,WithRepl to use show when showing a backtrace or exception
+    - Sequence,Predicates: add is_proper_sequence
+    - fix List's ->stream (oh; that could use a compile time warning)
+    - Stream,Sequence: add chunks_of and strictly_chunks_of
+    - update docs, more exahhhmples in README
+
+0.72.20 2019-12-3
+    - fix "fix tests: add the new htmlgen modules to ::Dependencies"
+    - fix dependency on Perl::Tidy
+
+0.72.19 2019-12-3
+    - fix tests: add the new htmlgen modules to ::Dependencies
+    - Rename `is_string_not_number` -> `is_nonnumeric_string`
+
 0.72.18 2019-12-2
     - some doc improvements
     - website: link modules to CPAN url (over Github) if available;

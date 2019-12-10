@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_datenotime::From_str::iso8601;
 
 # AUTHOR
-our $DATE = '2019-11-28'; # DATE
+our $DATE = '2019-12-04'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.039'; # VERSION
+our $VERSION = '0.040'; # VERSION
 
 use 5.010001;
 use strict;
@@ -67,7 +67,7 @@ Data::Sah::Coerce::perl::To_datenotime::From_str::iso8601 - Coerce datenotime fr
 
 =head1 VERSION
 
-This document describes version 0.039 of Data::Sah::Coerce::perl::To_datenotime::From_str::iso8601 (from Perl distribution Data-Sah-Coerce), released on 2019-11-28.
+This document describes version 0.040 of Data::Sah::Coerce::perl::To_datenotime::From_str::iso8601 (from Perl distribution Data-Sah-Coerce), released on 2019-12-04.
 
 =head1 DESCRIPTION
 

@@ -14,7 +14,9 @@ my $builder = Module::Build->new(
     license            => 'perl',
     module_name        => 'Data::ObjectStore',
     release_status     => 'stable',
-    test_files         => [ 't/object_store.t' ],
+    test_files         => [ 't/object_store.t',
+                            't/cache.t',
+                        ],
     requires => {
         'perl'              => 'v5.16',
         'Data::RecordStore' => 5.03,

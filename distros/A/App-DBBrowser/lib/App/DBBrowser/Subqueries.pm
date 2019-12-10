@@ -10,7 +10,7 @@ use File::Spec::Functions qw( catfile );
 use List::MoreUtils qw( any uniq );
 
 use Term::Choose           qw();
-use Term::Choose::LineFold qw( print_columns line_fold );
+use Term::Choose::LineFold qw( line_fold );
 use Term::Choose::Util     qw( get_term_width );
 use Term::Form             qw();
 

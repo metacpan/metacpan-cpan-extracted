@@ -5,6 +5,7 @@ use POSIX 'strftime';
 
 use lib 't/lib';
 use LSF;
+use Test::LogSyslogFast;
 
 # strerror(3) messages on linux in the "C" locale are included below for reference
 
@@ -43,27 +44,10 @@ for my $p (qw(udp)) {
 
             ok($buf =~ /^<38>/, "$p: ->send has the right priority");
             ok($buf =~ /$msg$/, "$p: ->send has the right message");
-            ok(payload_ok($buf, @payload_params), "$p: ->send has correct payload");
+            payload_ok($buf, @payload_params, "$p: ->send has correct payload");
         }
     };
     diag($@) if $@;
-}
-
-sub expected_payload {
-    my ($facility, $severity, $sender, $name, $pid, $msg, $time) = @_;
-    return sprintf "<%d>%s %s %s[%d]: %s",
-        ($facility << 3) | $severity,
-        strftime("%h %e %T", localtime($time)),
-        $sender, $name, $pid, $msg;
-}
-
-sub payload_ok {
-    my ($payload, @payload_params) = @_;
-    for my $offset (0, -1, 1) {
-        my $allowed = expected_payload(@payload_params);
-        return 1 if $allowed eq $payload;
-    }
-    return 0;
 }
 
 1;

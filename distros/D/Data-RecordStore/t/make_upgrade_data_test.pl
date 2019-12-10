@@ -265,6 +265,7 @@ sub make_4_or_5 {
   my $last_new_id = 12;
   my $stows = 0;
   my $recs = 0;
+
   for my $old_silo_id (1..12,12) {
     my $old_max_size = int( exp( $old_silo_id ) );
     $old_max_size -= 4; # long,rest. Its the rest that we get the size for

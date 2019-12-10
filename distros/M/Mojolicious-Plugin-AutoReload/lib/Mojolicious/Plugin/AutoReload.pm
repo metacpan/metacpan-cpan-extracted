@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::AutoReload;
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 # ABSTRACT: Automatically reload open browser windows when your application changes
 
 #pod =head1 SYNOPSIS
@@ -64,6 +64,11 @@ our $VERSION = '0.007';
 #pod
 #pod L<Mojolicious>
 #pod
+#pod =head1 THANKS
+#pod
+#pod Thanks to L<Grant Street Group|https://grantstreet.com> for funding
+#pod continued development of this plugin!
+#pod
 #pod =cut
 
 use Mojo::Base 'Mojolicious::Plugin';
@@ -74,13 +79,26 @@ sub register {
     my ( $self, $app, $config ) = @_;
 
     if ( $app->mode eq 'development' ) {
-        $app->routes->websocket( '/auto_reload' => sub {
+        $app->routes->get( '/auto_reload' => sub {
             my ( $c ) = @_;
-            $c->inactivity_timeout( 60 );
-            my $timer_id = Mojo::IOLoop->recurring( 30, sub { $c->send( 'ping' ) } );
-            $c->on( finish => sub {
-                Mojo::IOLoop->remove( $timer_id );
-            } );
+            if ( $c->param( 'restart' ) ) {
+                return $c->rendered( 204 );
+            }
+            if ( $ENV{PLACK_ENV} ) {
+                # Blocking long-polling
+                $c->inactivity_timeout( 300 );
+                $c->render_later;
+                sleep 240;
+                $c->rendered( 204 );
+                return;
+            }
+            else {
+                $c->inactivity_timeout( 60 );
+                my $timer_id = Mojo::IOLoop->recurring( 30, sub { $c->send( 'ping' ) } );
+                $c->on( finish => sub {
+                    Mojo::IOLoop->remove( $timer_id );
+                } );
+            }
         } )->name( 'auto_reload' );
 
         $app->hook(after_render => sub {
@@ -108,22 +126,141 @@ sub register {
         if ( $app->mode eq 'development' && !$c->stash( 'plugin.auto_reload.disable' ) ) {
             $c->stash( 'plugin.auto_reload.disable' => 1 );
             my $auto_reload_end_point = $c->url_for( 'auto_reload' );
+            my $mechanism = $ENV{PLACK_ENV} ? 'poll' : 'websocket';
             return unindent trim( <<"ENDHTML" );
-                <script>
-                    // If we lose our websocket connection, the web server must
-                    // be restarting, and we should reload the page
-                    var proto = "ws";
-                    if ( document.location.protocol === "https:" ) {
-                        proto = "wss";
+                <style>
+                @-webkit-keyframes auto-reload-spinner-border {
+                    to {
+                        -webkit-transform: rotate(360deg);
+                        transform: rotate(360deg);
                     }
-                    var autoReloadWs = new WebSocket( proto + "://" + location.host + "$auto_reload_end_point" );
-                    autoReloadWs.addEventListener( "close", function (event) {
-                        // Wait one second then force a reload from the server
+                }
+                \@keyframes auto-reload-spinner-border {
+                    to {
+                        -webkit-transform: rotate(360deg);
+                        transform: rotate(360deg);
+                    }
+                }
+
+                .auto-reload-alert {
+                    position: fixed;
+                    top: 1.5em;
+                    right: 1.5em;
+                    background: rgba( 255, 255, 255, 128 );
+                    padding: 1.25rem 1.75rem;
+                    border-radius: .25rem;
+                    border: 2px solid grey;
+                }
+
+                .auto-reload-spinner {
+                    display: inline-block;
+                    width: 2em;
+                    height: 2em;
+                    vertical-align: middle;
+                    border: .25em solid black;
+                    border-right-color: transparent;
+                    border-radius: 50%;
+                    margin: .25em;
+                    animation: auto-reload-spinner-border .75s linear infinite;
+                }
+
+                .auto-reload-text {
+                    vertical-align: middle;
+                }
+
+                </style>
+                <script>
+                    var autoReloadUrl = "$auto_reload_end_point";
+                    var mechanism = "$mechanism";
+                    var restartTries = 1;
+
+                    function openWebsocket() {
+                        // If we lose our websocket connection, the web server must
+                        // be restarting, and we should reload the page
+                        var opened = false;
+                        var proto = "ws";
+                        if ( document.location.protocol === "https:" ) {
+                            proto = "wss";
+                        }
+                        var autoReloadWs = new WebSocket( proto + "://" + location.host + autoReloadUrl );
+                        autoReloadWs.addEventListener( "open", function (event) {
+                            opened = true;
+                        } );
+                        autoReloadWs.addEventListener( "close", function (event) {
+                            if ( !opened ) {
+                                // This server doesn't support websockets, so try long-polling
+                                runPoller();
+                                return;
+                            }
+                            waitForRestart();
+                        } );
+                        // Send pings to ensure that the connection stays up, or we learn
+                        // of the connection's death
+                        setInterval( function () { autoReloadWs.send( "ping" ) }, 30000 );
+                    }
+
+                    // If opening a websocket doesn't work, try long polling!
+                    function runPoller() {
+                        var request = new XMLHttpRequest();
+                        request.timeout = 300000;
+                        request.open('GET', autoReloadUrl, true);
+                        request.onreadystatechange = function () {
+                            if (request.readyState == XMLHttpRequest.DONE ) {
+                                if ( request.status == 204 /* NO CONTENT */ ) {
+                                    runPoller();
+                                }
+                                else {
+                                    waitForRestart();
+                                }
+                            }
+                        };
+                        request.send();
+                    }
+
+                    function autoReload() {
+                        // Wait a few seconds then force a reload from the server
                         setTimeout( function () { location.reload(true); }, 1000 );
-                    } );
-                    // Send pings to ensure that the connection stays up, or we learn
-                    // of the connection's death
-                    setInterval( function () { autoReloadWs.send( "ping" ) }, 30000 );
+                    }
+
+                    function waitForRestart() {
+                        var alert = document.createElement( 'div' );
+                        alert.className = 'auto-reload-alert';
+                        // Spinner from Bootstrap
+                        var spinner = document.createElement( 'div' );
+                        spinner.className = 'auto-reload-spinner';
+                        alert.appendChild( spinner );
+
+                        var textSpan = document.createElement( 'span' );
+                        textSpan.className = 'auto-reload-text';
+                        textSpan.appendChild( document.createTextNode( 'Restarting... ' + restartTries ) );
+                        alert.appendChild( textSpan );
+                        document.body.appendChild( alert );
+
+                        var tryRequest = function () {
+                            textSpan.removeChild( textSpan.lastChild );
+                            textSpan.appendChild( document.createTextNode( 'Restarting... ' + ++restartTries ) );
+
+                            var request = new XMLHttpRequest();
+                            request.timeout = 500;
+                            request.open('GET', autoReloadUrl + '?restart=1', true);
+                            request.onreadystatechange = function () {
+                                if (request.readyState == XMLHttpRequest.DONE ) {
+                                    if ( request.status == 204 /* NO CONTENT */ ) {
+                                        autoReload();
+                                    }
+                                }
+                            };
+                            request.send();
+                        };
+                        setInterval( tryRequest, 1000 );
+                    }
+
+                    if ( mechanism == 'websocket' ) {
+                        openWebsocket();
+                    }
+                    else {
+                        runPoller();
+                    }
                 </script>
 ENDHTML
         }
@@ -143,7 +280,7 @@ Mojolicious::Plugin::AutoReload - Automatically reload open browser windows when
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -205,6 +342,11 @@ This plugin adds a C</auto_reload> WebSocket route to your application.
 =head1 SEE ALSO
 
 L<Mojolicious>
+
+=head1 THANKS
+
+Thanks to L<Grant Street Group|https://grantstreet.com> for funding
+continued development of this plugin!
 
 =head1 AUTHOR
 

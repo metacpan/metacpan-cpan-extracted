@@ -6,6 +6,7 @@ use base qw/Quiq::Test::Class/;
 use v5.10;
 use strict;
 use warnings;
+use utf8;
 
 use Quiq::Test::Class;
 use Quiq::FileHandle;
@@ -47,15 +48,22 @@ sub test_unitTest: Test(2) {
     }
     $fh->close;
 
+    # Koordinaten für die Klasse erstellen
+
+    my (@t,@y);
+    for (@rows) {
+        my ($iso,$val) = split /\t/;
+        push @t,Quiq::Epoch->new($iso)->epoch*1000;
+        push @y,$val;
+    }
+
     my $ch = Quiq::ChartJs::TimeSeries->new(
+        t => \@t,
+        y => \@y,
         parameter => 'Windspeed',
         unit => 'm/s',
-        points => \@rows,
-        pointCallback => sub {
-             my ($point,$i) = @_;
-             my ($iso,$val) = split /\t/,$point,2;
-             return [Quiq::Epoch->new($iso)->epoch*1000,$val];
-        },
+        yMin => 0,
+        showMedian => 1,
     );
     $self->is(ref($ch),'Quiq::ChartJs::TimeSeries');
     $self->is($ch->name,'plot');

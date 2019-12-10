@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Tradis::Bin::RemoveTags;
-$Bio::Tradis::Bin::RemoveTags::VERSION = '1.4.3';
+$Bio::Tradis::Bin::RemoveTags::VERSION = '1.4.5';
 use FindBin qw($Bin); 
 
 # ABSTRACT: remove user specified tags from start of fastq sequences
@@ -29,7 +29,7 @@ remove_tags - remove user specified tags from start of fastq sequences
 
 =head1 VERSION
 
-version 1.4.3
+version 1.4.5
 
 =head1 SYNOPSIS
 

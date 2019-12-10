@@ -48,3 +48,7 @@ Revision history for Perl module Devel::Git::MultiBisect
 
 0.12 Mon Feb 11 19:00:29 EST 2019
     - Minor documentation and metadata changes only.
+
+0.13 Fri Dec  6 13:10:28 EST 2019
+    - BuildTransitions:  Enable multisection for changes in build-time
+      warnings.

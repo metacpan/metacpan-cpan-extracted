@@ -33,8 +33,8 @@ has on_notification => ();            # CodeRef->( $self, $pid, $channel, $paylo
 
 has is_pgsql   => 1, init_arg => undef;
 has active_dbh => 0, init_arg => undef;
-has _dbh_pool => sub { Pcore::Util::Hash::HashArray->new }, init_arg => undef;
-has _get_dbh_queue => sub { [] }, init_arg => undef;    # ArrayRef
+has _dbh_pool      => sub { Pcore::Util::Hash::HashArray->new }, init_arg => undef;
+has _get_dbh_queue => sub { [] }, init_arg => undef;                                  # ArrayRef
 
 # DBH POOL METHODS
 sub get_dbh ( $self ) {

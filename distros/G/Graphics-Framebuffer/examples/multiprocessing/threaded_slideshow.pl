@@ -126,9 +126,18 @@ while ($RUNNING) {    # Monitors the running threads and restores them if one di
                 }
             }
         }
-    } else {
+    } elsif ($RUNNING) {
         threads->yield();
+        sleep .01;
     }
+}
+
+while (threads->list()) {
+    foreach my $thrd (threads->list(threads::joinable)) {
+        $thrd->join();
+    }
+    threads->yield();
+    sleep .01;
 }
 
 exit(0);
@@ -140,12 +149,8 @@ sub finish {
         exec('reset');
     };
     alarm 20;
-    print "\n\nSHUTTING DOWN...\n\n";
-    # Just brute for kill the threads for speed.  No need to be as elegant as before
-    foreach my $thr (threads->list()) {
-        $thr->kill('KILL')->detach();
-    }
-    exec('reset');
+    sleep 1;
+    print STDERR "\n\n\rSHUTTING DOWN THREADS...\n\n";
 } ## end sub finish
 
 sub gather {
@@ -383,8 +388,6 @@ sub show {
     my $show_name = shift || 0;
     my ($nx, $ny) = @_;
 
-    local $SIG{'ALRM'} = undef;
-
     my $FB = (defined($nx)) ?
       Graphics::Framebuffer->new(
           'SHOW_ERRORS' => $errors,
@@ -403,11 +406,7 @@ sub show {
           'FB_DEVICE'   => $dev,
           'SPLASH'      => $display,
       );
-    local $SIG{'INT'}  = sub { $FB->text_mode(); print "Thread exiting...\n"; threads->exit(); };
-    local $SIG{'QUIT'} = sub { $FB->text_mode(); print "Thread exiting...\n"; threads->exit(); };
-    local $SIG{'KILL'} = sub { $FB->text_mode(); print "Thread exiting...\n"; threads->exit(); };
-    local $SIG{'TERM'} = sub { $FB->text_mode(); print "Thread exiting...\n"; threads->exit(); };
-    local $SIG{'HUP'}  = sub { $FB->text_mode(); print "Thread exiting...\n"; threads->exit(); };
+    local $SIG{'ALRM'} = local $SIG{'INT'}  = local $SIG{'QUIT'} = local $SIG{'KILL'} = local $SIG{'TERM'} = local $SIG{'HUP'} = undef;
 
     $FB->wait_for_console(1);
     $FB->acceleration(! $noaccel);
@@ -443,11 +442,10 @@ sub show {
         my $tdelay = 0;
         if (ref($image) ne 'ARRAY') {
             $tdelay = $delay - $image->{'benchmark'}->{'total'};
-#            next if (exists($image->{'tags'}->{'jpeg_color_space'}) && $image->{'tags'}->{'jpeg_color_space'} <= 1);
         }
         $tdelay = 0 if ($tdelay < 0);
-        if (defined($image)) {
-            if ($display) {
+        if (defined($image) && $RUNNING) {
+            if ($display && $RUNNING) {
                 $display = FALSE;
                 $FB->cls('OFF');
                 $GO = TRUE;
@@ -461,9 +459,9 @@ sub show {
                 }
             }
             $FB->rbox({ 'x' => $X, 'y' => $Y, 'width' => $W, 'height' => $H, 'filled' => 1 });
-            $FB->wait_for_console(); # Results will vary
+            $FB->wait_for_console() if ($RUNNING); # Results will vary
             print_it($FB, $X, $Y, basename($name)) if ($show_name);
-            if (ref($image) eq 'ARRAY') {
+            if (ref($image) eq 'ARRAY' && $RUNNING) {
                 my $s = time + ($delay * 2);
                 while ($RUNNING && time <= $s) {    # We play it as many times as the delay allows, but at least once.
                     # We don't use "play_animation" for threads.  This is so we can stop the playback quickly.
@@ -475,11 +473,11 @@ sub show {
                         # show an accurate animation.
                         threads->yield(); # Yielding takes time, and the delay calculation should be after.
                         my $d = (($image->[$frame]->{'tags'}->{'gif_delay'} * .01) - (time - $begin));
-                        sleep $d if ($d > 0);
+                        sleep $d if ($d > 0 && $RUNNING);
                         last unless ($RUNNING);
                     } ## end for (my $frame = 0; $frame...)
                 } ## end while ($RUNNING && time <=...)
-            } else {
+            } elsif ($RUNNING) {
                 if ($image->{'width'} < $W) {
                     my $x = ($W - $image->{'width'}) / 2;
                     $image->{'x'} += $x;

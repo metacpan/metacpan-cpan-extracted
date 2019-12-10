@@ -1,20 +1,8 @@
 Revision history for Perl extension Class::Simple.
-$Id: Changes,v 1.19 2008/02/01 00:38:45 sullivan Exp $
+$Id: Changes,v 1.16 2007/10/29 21:13:40 sullivan Exp $
 
-0.19 Thu Jan 31 16:38:15 PST 2008
-	- Cleaned up the whole set__foo() and _foo() stuff.  I think.
-
-0.18 Wed Jan 30 09:55:37 PST 2008
-	- Took out the conflict resolution feature.  There was a problem
-	caused by multiple inheritance that I don't have time to ponder
-	right now.
-
-	Removed uninitialized().
-
-0.17 Mon Dec 31 11:55:17 PST 2007
-	- Added conflict resolution for inherited attributes.  That means
-	  you can do $obj->set_a(1) and it won't conflict with the derived
-	  class doing a $self->set_a(2).
+1.1 Sat Dec  7 18:15:49 PST 2019
+        - Added initialization of attributes during new().
 
 0.16 Mon Oct 29 14:06:05 PDT 2007
 	- Added STORABLE_freeze() and STORABLE_thaw() to support Storable.

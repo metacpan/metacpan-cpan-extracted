@@ -59,91 +59,91 @@
    "provides" : {
       "RDF::DOAP" : {
          "file" : "lib/RDF/DOAP.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change" : {
          "file" : "lib/RDF/DOAP/Change.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change::Addition" : {
          "file" : "lib/RDF/DOAP/Change/Addition.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change::BackCompat" : {
          "file" : "lib/RDF/DOAP/Change/BackCompat.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change::Bugfix" : {
          "file" : "lib/RDF/DOAP/Change/Bugfix.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change::Documentation" : {
          "file" : "lib/RDF/DOAP/Change/Documentation.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change::Packaging" : {
          "file" : "lib/RDF/DOAP/Change/Packaging.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change::Regression" : {
          "file" : "lib/RDF/DOAP/Change/Regression.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change::Removal" : {
          "file" : "lib/RDF/DOAP/Change/Removal.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change::SecurityFix" : {
          "file" : "lib/RDF/DOAP/Change/SecurityFix.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change::SecurityRegression" : {
          "file" : "lib/RDF/DOAP/Change/SecurityRegression.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change::Tests" : {
          "file" : "lib/RDF/DOAP/Change/Tests.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Change::Update" : {
          "file" : "lib/RDF/DOAP/Change/Update.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::ChangeSet" : {
          "file" : "lib/RDF/DOAP/ChangeSet.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Issue" : {
          "file" : "lib/RDF/DOAP/Issue.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Person" : {
          "file" : "lib/RDF/DOAP/Person.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Project" : {
          "file" : "lib/RDF/DOAP/Project.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Repository" : {
          "file" : "lib/RDF/DOAP/Repository.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Resource" : {
          "file" : "lib/RDF/DOAP/Resource.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Types" : {
          "file" : "lib/RDF/DOAP/Types.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Utils" : {
          "file" : "lib/RDF/DOAP/Utils.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       },
       "RDF::DOAP::Version" : {
          "file" : "lib/RDF/DOAP/Version.pm",
-         "version" : "0.103"
+         "version" : "0.104"
       }
    },
    "release_status" : "stable",
@@ -163,7 +163,7 @@
       "x_IRC" : "irc://irc.perl.org/#perlrdf",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-DOAP/project"
    },
-   "version" : "0.103",
+   "version" : "0.104",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

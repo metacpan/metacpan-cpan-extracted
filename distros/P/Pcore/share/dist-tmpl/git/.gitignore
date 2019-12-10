@@ -1,11 +1,13 @@
-# pcore
-/data/
-/wiki/
+# common
+data/
+wiki/
 
-# phonegap / cordova
-/hooks/
-/node_modules/
-/platforms/
-/plugins/
-/package.json
-/package-lock.json
+# node
+dist/
+lib/
+node_modules/
+
+# cordova
+hooks/
+platforms/
+plugins/

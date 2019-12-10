@@ -77,103 +77,103 @@
    "provides" : {
       "Bio::Tradis" : {
          "file" : "lib/Bio/Tradis.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::AddTagsToSeq" : {
          "file" : "lib/Bio/Tradis/AddTagsToSeq.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::Analysis::Exceptions" : {
          "file" : "lib/Bio/Tradis/Analysis/Exceptions.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::Analysis::InsertSite" : {
          "file" : "lib/Bio/Tradis/Analysis/InsertSite.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::CombinePlots" : {
          "file" : "lib/Bio/Tradis/CombinePlots.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::CommandLine::AddTags" : {
          "file" : "lib/Bio/Tradis/CommandLine/AddTags.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::CommandLine::CheckTags" : {
          "file" : "lib/Bio/Tradis/CommandLine/CheckTags.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::CommandLine::FilterFastqTags" : {
          "file" : "lib/Bio/Tradis/CommandLine/FilterFastqTags.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::CommandLine::PlotCombine" : {
          "file" : "lib/Bio/Tradis/CommandLine/PlotCombine.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::CommandLine::PlotTradis" : {
          "file" : "lib/Bio/Tradis/CommandLine/PlotTradis.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::CommandLine::RemoveFastqTags" : {
          "file" : "lib/Bio/Tradis/CommandLine/RemoveFastqTags.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::CommandLine::RunMapping" : {
          "file" : "lib/Bio/Tradis/CommandLine/RunMapping.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::CommandLine::TradisAnalysis" : {
          "file" : "lib/Bio/Tradis/CommandLine/TradisAnalysis.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::CommandLine::TradisBam" : {
          "file" : "lib/Bio/Tradis/CommandLine/TradisBam.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::DetectTags" : {
          "file" : "lib/Bio/Tradis/DetectTags.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::Exception" : {
          "file" : "lib/Bio/Tradis/Exception.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::FilterTags" : {
          "file" : "lib/Bio/Tradis/FilterTags.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::Map" : {
          "file" : "lib/Bio/Tradis/Map.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::Parser::Bam" : {
          "file" : "lib/Bio/Tradis/Parser/Bam.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::Parser::Cigar" : {
          "file" : "lib/Bio/Tradis/Parser/Cigar.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::Parser::Fastq" : {
          "file" : "lib/Bio/Tradis/Parser/Fastq.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::RemoveTags" : {
          "file" : "lib/Bio/Tradis/RemoveTags.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::RunTradis" : {
          "file" : "lib/Bio/Tradis/RunTradis.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::Samtools" : {
          "file" : "lib/Bio/Tradis/Samtools.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       },
       "Bio::Tradis::TradisPlot" : {
          "file" : "lib/Bio/Tradis/TradisPlot.pm",
-         "version" : "v1.4.3"
+         "version" : "v1.4.5"
       }
    },
    "release_status" : "stable",
@@ -185,7 +185,7 @@
          "web" : "https://github.com/sanger-pathogens/Bio-Tradis"
       }
    },
-   "version" : "1.4.3",
+   "version" : "1.4.5",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -256,7 +256,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.4.3",
+                  "tag" : "v1.4.5",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

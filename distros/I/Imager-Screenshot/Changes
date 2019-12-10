@@ -1,3 +1,9 @@
+0.014 5 Dec 2019
+
+ - for X11 fetch the window image from the root window instead of
+   trying to fetch from the specified window, clipping to the window.
+   This fixes black images in some cases.
+
 0.013 11 Jan 2013
 
  - use Imager::Probe to find libraries instead of custom code

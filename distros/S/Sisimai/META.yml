@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v4.25.3
+    version: v4.25.4
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -35,116 +35,8 @@ provides:
     file: lib/Sisimai/Bite.pm
   Sisimai::Bite::Email:
     file: lib/Sisimai/Bite/Email.pm
-  Sisimai::Bite::Email::Activehunter:
-    file: lib/Sisimai/Bite/Email/Activehunter.pm
-  Sisimai::Bite::Email::Amavis:
-    file: lib/Sisimai/Bite/Email/Amavis.pm
-  Sisimai::Bite::Email::AmazonSES:
-    file: lib/Sisimai/Bite/Email/AmazonSES.pm
-  Sisimai::Bite::Email::AmazonWorkMail:
-    file: lib/Sisimai/Bite/Email/AmazonWorkMail.pm
-  Sisimai::Bite::Email::Aol:
-    file: lib/Sisimai/Bite/Email/Aol.pm
-  Sisimai::Bite::Email::ApacheJames:
-    file: lib/Sisimai/Bite/Email/ApacheJames.pm
-  Sisimai::Bite::Email::Bigfoot:
-    file: lib/Sisimai/Bite/Email/Bigfoot.pm
-  Sisimai::Bite::Email::Biglobe:
-    file: lib/Sisimai/Bite/Email/Biglobe.pm
-  Sisimai::Bite::Email::Courier:
-    file: lib/Sisimai/Bite/Email/Courier.pm
-  Sisimai::Bite::Email::Domino:
-    file: lib/Sisimai/Bite/Email/Domino.pm
-  Sisimai::Bite::Email::EZweb:
-    file: lib/Sisimai/Bite/Email/EZweb.pm
-  Sisimai::Bite::Email::EinsUndEins:
-    file: lib/Sisimai/Bite/Email/EinsUndEins.pm
-  Sisimai::Bite::Email::Exchange2003:
-    file: lib/Sisimai/Bite/Email/Exchange2003.pm
-  Sisimai::Bite::Email::Exchange2007:
-    file: lib/Sisimai/Bite/Email/Exchange2007.pm
-  Sisimai::Bite::Email::Exim:
-    file: lib/Sisimai/Bite/Email/Exim.pm
-  Sisimai::Bite::Email::FML:
-    file: lib/Sisimai/Bite/Email/FML.pm
-  Sisimai::Bite::Email::Facebook:
-    file: lib/Sisimai/Bite/Email/Facebook.pm
-  Sisimai::Bite::Email::GMX:
-    file: lib/Sisimai/Bite/Email/GMX.pm
-  Sisimai::Bite::Email::GSuite:
-    file: lib/Sisimai/Bite/Email/GSuite.pm
-  Sisimai::Bite::Email::Google:
-    file: lib/Sisimai/Bite/Email/Google.pm
-  Sisimai::Bite::Email::IMailServer:
-    file: lib/Sisimai/Bite/Email/IMailServer.pm
-  Sisimai::Bite::Email::InterScanMSS:
-    file: lib/Sisimai/Bite/Email/InterScanMSS.pm
-  Sisimai::Bite::Email::KDDI:
-    file: lib/Sisimai/Bite/Email/KDDI.pm
-  Sisimai::Bite::Email::MXLogic:
-    file: lib/Sisimai/Bite/Email/MXLogic.pm
-  Sisimai::Bite::Email::MailFoundry:
-    file: lib/Sisimai/Bite/Email/MailFoundry.pm
-  Sisimai::Bite::Email::MailMarshalSMTP:
-    file: lib/Sisimai/Bite/Email/MailMarshalSMTP.pm
-  Sisimai::Bite::Email::MailRu:
-    file: lib/Sisimai/Bite/Email/MailRu.pm
-  Sisimai::Bite::Email::McAfee:
-    file: lib/Sisimai/Bite/Email/McAfee.pm
-  Sisimai::Bite::Email::MessageLabs:
-    file: lib/Sisimai/Bite/Email/MessageLabs.pm
-  Sisimai::Bite::Email::MessagingServer:
-    file: lib/Sisimai/Bite/Email/MessagingServer.pm
-  Sisimai::Bite::Email::Notes:
-    file: lib/Sisimai/Bite/Email/Notes.pm
-  Sisimai::Bite::Email::Office365:
-    file: lib/Sisimai/Bite/Email/Office365.pm
-  Sisimai::Bite::Email::OpenSMTPD:
-    file: lib/Sisimai/Bite/Email/OpenSMTPD.pm
-  Sisimai::Bite::Email::Outlook:
-    file: lib/Sisimai/Bite/Email/Outlook.pm
-  Sisimai::Bite::Email::Postfix:
-    file: lib/Sisimai/Bite/Email/Postfix.pm
-  Sisimai::Bite::Email::ReceivingSES:
-    file: lib/Sisimai/Bite/Email/ReceivingSES.pm
-  Sisimai::Bite::Email::SendGrid:
-    file: lib/Sisimai/Bite/Email/SendGrid.pm
-  Sisimai::Bite::Email::Sendmail:
-    file: lib/Sisimai/Bite/Email/Sendmail.pm
-  Sisimai::Bite::Email::SurfControl:
-    file: lib/Sisimai/Bite/Email/SurfControl.pm
-  Sisimai::Bite::Email::UserDefined:
-    file: lib/Sisimai/Bite/Email/UserDefined.pm
-  Sisimai::Bite::Email::V5sendmail:
-    file: lib/Sisimai/Bite/Email/V5sendmail.pm
-  Sisimai::Bite::Email::Verizon:
-    file: lib/Sisimai/Bite/Email/Verizon.pm
-  Sisimai::Bite::Email::X1:
-    file: lib/Sisimai/Bite/Email/X1.pm
-  Sisimai::Bite::Email::X2:
-    file: lib/Sisimai/Bite/Email/X2.pm
-  Sisimai::Bite::Email::X3:
-    file: lib/Sisimai/Bite/Email/X3.pm
-  Sisimai::Bite::Email::X4:
-    file: lib/Sisimai/Bite/Email/X4.pm
-  Sisimai::Bite::Email::X5:
-    file: lib/Sisimai/Bite/Email/X5.pm
-  Sisimai::Bite::Email::Yahoo:
-    file: lib/Sisimai/Bite/Email/Yahoo.pm
-  Sisimai::Bite::Email::Yandex:
-    file: lib/Sisimai/Bite/Email/Yandex.pm
-  Sisimai::Bite::Email::Zoho:
-    file: lib/Sisimai/Bite/Email/Zoho.pm
-  Sisimai::Bite::Email::mFILTER:
-    file: lib/Sisimai/Bite/Email/mFILTER.pm
-  Sisimai::Bite::Email::qmail:
-    file: lib/Sisimai/Bite/Email/qmail.pm
   Sisimai::Bite::JSON:
     file: lib/Sisimai/Bite/JSON.pm
-  Sisimai::Bite::JSON::AmazonSES:
-    file: lib/Sisimai/Bite/JSON/AmazonSES.pm
-  Sisimai::Bite::JSON::SendGrid:
-    file: lib/Sisimai/Bite/JSON/SendGrid.pm
   Sisimai::Data:
     file: lib/Sisimai/Data.pm
   Sisimai::Data::JSON:
@@ -153,6 +45,112 @@ provides:
     file: lib/Sisimai/Data/YAML.pm
   Sisimai::DateTime:
     file: lib/Sisimai/DateTime.pm
+  Sisimai::Lhost:
+    file: lib/Sisimai/Lhost.pm
+  Sisimai::Lhost::Activehunter:
+    file: lib/Sisimai/Lhost/Activehunter.pm
+  Sisimai::Lhost::Amavis:
+    file: lib/Sisimai/Lhost/Amavis.pm
+  Sisimai::Lhost::AmazonSES:
+    file: lib/Sisimai/Lhost/AmazonSES.pm
+  Sisimai::Lhost::AmazonWorkMail:
+    file: lib/Sisimai/Lhost/AmazonWorkMail.pm
+  Sisimai::Lhost::Aol:
+    file: lib/Sisimai/Lhost/Aol.pm
+  Sisimai::Lhost::ApacheJames:
+    file: lib/Sisimai/Lhost/ApacheJames.pm
+  Sisimai::Lhost::Bigfoot:
+    file: lib/Sisimai/Lhost/Bigfoot.pm
+  Sisimai::Lhost::Biglobe:
+    file: lib/Sisimai/Lhost/Biglobe.pm
+  Sisimai::Lhost::Courier:
+    file: lib/Sisimai/Lhost/Courier.pm
+  Sisimai::Lhost::Domino:
+    file: lib/Sisimai/Lhost/Domino.pm
+  Sisimai::Lhost::EZweb:
+    file: lib/Sisimai/Lhost/EZweb.pm
+  Sisimai::Lhost::EinsUndEins:
+    file: lib/Sisimai/Lhost/EinsUndEins.pm
+  Sisimai::Lhost::Exchange2003:
+    file: lib/Sisimai/Lhost/Exchange2003.pm
+  Sisimai::Lhost::Exchange2007:
+    file: lib/Sisimai/Lhost/Exchange2007.pm
+  Sisimai::Lhost::Exim:
+    file: lib/Sisimai/Lhost/Exim.pm
+  Sisimai::Lhost::FML:
+    file: lib/Sisimai/Lhost/FML.pm
+  Sisimai::Lhost::Facebook:
+    file: lib/Sisimai/Lhost/Facebook.pm
+  Sisimai::Lhost::GMX:
+    file: lib/Sisimai/Lhost/GMX.pm
+  Sisimai::Lhost::GSuite:
+    file: lib/Sisimai/Lhost/GSuite.pm
+  Sisimai::Lhost::Google:
+    file: lib/Sisimai/Lhost/Google.pm
+  Sisimai::Lhost::IMailServer:
+    file: lib/Sisimai/Lhost/IMailServer.pm
+  Sisimai::Lhost::InterScanMSS:
+    file: lib/Sisimai/Lhost/InterScanMSS.pm
+  Sisimai::Lhost::KDDI:
+    file: lib/Sisimai/Lhost/KDDI.pm
+  Sisimai::Lhost::MXLogic:
+    file: lib/Sisimai/Lhost/MXLogic.pm
+  Sisimai::Lhost::MailFoundry:
+    file: lib/Sisimai/Lhost/MailFoundry.pm
+  Sisimai::Lhost::MailMarshalSMTP:
+    file: lib/Sisimai/Lhost/MailMarshalSMTP.pm
+  Sisimai::Lhost::MailRu:
+    file: lib/Sisimai/Lhost/MailRu.pm
+  Sisimai::Lhost::McAfee:
+    file: lib/Sisimai/Lhost/McAfee.pm
+  Sisimai::Lhost::MessageLabs:
+    file: lib/Sisimai/Lhost/MessageLabs.pm
+  Sisimai::Lhost::MessagingServer:
+    file: lib/Sisimai/Lhost/MessagingServer.pm
+  Sisimai::Lhost::Notes:
+    file: lib/Sisimai/Lhost/Notes.pm
+  Sisimai::Lhost::Office365:
+    file: lib/Sisimai/Lhost/Office365.pm
+  Sisimai::Lhost::OpenSMTPD:
+    file: lib/Sisimai/Lhost/OpenSMTPD.pm
+  Sisimai::Lhost::Outlook:
+    file: lib/Sisimai/Lhost/Outlook.pm
+  Sisimai::Lhost::Postfix:
+    file: lib/Sisimai/Lhost/Postfix.pm
+  Sisimai::Lhost::ReceivingSES:
+    file: lib/Sisimai/Lhost/ReceivingSES.pm
+  Sisimai::Lhost::SendGrid:
+    file: lib/Sisimai/Lhost/SendGrid.pm
+  Sisimai::Lhost::Sendmail:
+    file: lib/Sisimai/Lhost/Sendmail.pm
+  Sisimai::Lhost::SurfControl:
+    file: lib/Sisimai/Lhost/SurfControl.pm
+  Sisimai::Lhost::UserDefined:
+    file: lib/Sisimai/Lhost/UserDefined.pm
+  Sisimai::Lhost::V5sendmail:
+    file: lib/Sisimai/Lhost/V5sendmail.pm
+  Sisimai::Lhost::Verizon:
+    file: lib/Sisimai/Lhost/Verizon.pm
+  Sisimai::Lhost::X1:
+    file: lib/Sisimai/Lhost/X1.pm
+  Sisimai::Lhost::X2:
+    file: lib/Sisimai/Lhost/X2.pm
+  Sisimai::Lhost::X3:
+    file: lib/Sisimai/Lhost/X3.pm
+  Sisimai::Lhost::X4:
+    file: lib/Sisimai/Lhost/X4.pm
+  Sisimai::Lhost::X5:
+    file: lib/Sisimai/Lhost/X5.pm
+  Sisimai::Lhost::Yahoo:
+    file: lib/Sisimai/Lhost/Yahoo.pm
+  Sisimai::Lhost::Yandex:
+    file: lib/Sisimai/Lhost/Yandex.pm
+  Sisimai::Lhost::Zoho:
+    file: lib/Sisimai/Lhost/Zoho.pm
+  Sisimai::Lhost::mFILTER:
+    file: lib/Sisimai/Lhost/mFILTER.pm
+  Sisimai::Lhost::qmail:
+    file: lib/Sisimai/Lhost/qmail.pm
   Sisimai::MDA:
     file: lib/Sisimai/MDA.pm
   Sisimai::MIME:
@@ -257,6 +255,8 @@ provides:
     file: lib/Sisimai/Rhost/GoDaddy.pm
   Sisimai::Rhost::GoogleApps:
     file: lib/Sisimai/Rhost/GoogleApps.pm
+  Sisimai::Rhost::IUA:
+    file: lib/Sisimai/Rhost/IUA.pm
   Sisimai::Rhost::KDDI:
     file: lib/Sisimai/Rhost/KDDI.pm
   Sisimai::Rhost::TencentQQ:
@@ -284,19 +284,21 @@ resources:
   bugtracker: https://github.com/sisimai/p5-Sisimai/issues
   homepage: https://libsisimai.org/
   repository: git://github.com/sisimai/p5-Sisimai.git
-version: v4.25.3
+version: v4.25.4
 x_contributors:
-  - 'jcbf <underspell@gmail.com>'
-  - 'Jonathan Leroy <jonathan@inikup.com>'
   - '0xcdcdcdcd <0xcdcdcdcd@gmail.com>'
-  - 'azumakuniyuki <perl.org@azumakuniyuki.org>'
-  - 'azumakuniyuki <azumakuniyuki+github.com@gmail.com>'
-  - 'Mutsutoshi Yoshimoto <negachov@gmail.com>'
-  - 'Jon Jensen <jon@endpoint.com>'
   - 'Adrian Yee <adrian@gt.net>'
-  - 'root <root@bwt-1.squaremx.com>'
-  - 'batarian71 <36008612+batarian71@users.noreply.github.com>'
-  - 'Xavier Guimard <x.guimard@free.fr>'
+  - 'Jon Jensen <jon@endpoint.com>'
+  - 'Jonathan Leroy <jonathan@inikup.com>'
+  - 'Mutsutoshi Yoshimoto <negachov@gmail.com>'
   - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
+  - 'Xavier Guimard <x.guimard@free.fr>'
   - 'azuma, kuniyuki <azumakuniyuki@users.noreply.github.com>'
+  - 'azumakuniyuki <azumakuniyuki+github.com@gmail.com>'
   - 'azumakuniyuki <azumakuniyuki@gmail.com>'
+  - 'azumakuniyuki <perl.org@azumakuniyuki.org>'
+  - 'batarian71 <36008612+batarian71@users.noreply.github.com>'
+  - 'jcbf <underspell@gmail.com>'
+  - 'root <root@bwt-1.squaremx.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

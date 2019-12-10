@@ -13,7 +13,7 @@ use Data::Dumper;
 use Rex::Commands::Box;
 require Rex::CLI;
 
-our $VERSION = '1.7.0'; # VERSION
+our $VERSION = '1.7.1'; # VERSION
 
 BEGIN {
   use Rex::Shared::Var;

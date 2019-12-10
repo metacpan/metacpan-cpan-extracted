@@ -9,7 +9,7 @@ has broker => ( required => 1 );    # InstanceOf ['Pcore::Core::Event']
 has uri    => ( required => 1 );
 has is_suspended => 0;
 
-has id       => ( init_arg => undef );
+has id       => ( init_arg             => undef );
 has bindings => ( sub { {} }, init_arg => undef );
 
 sub BUILD ( $self, $args ) { }

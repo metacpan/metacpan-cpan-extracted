@@ -1,3 +1,23 @@
+v0.107.0 2019-12-06T10:43:46Z
+ - resources updated
+ - set_status args fixed
+ - src refactored
+ - src always skip node_modules
+ - gitignore updated
+ - eslint
+ - run_proc api update
+ - eslint find config
+ - vue syntax
+ - status parser improved
+ - perltidy
+ - readme updated
+
+v0.106.0 2019-12-02T20:57:53Z
+ - elsint
+ - resources updated
+ - websockert protocol pcore renamed to softvisio
+ - src filters updated
+
 v0.105.0 2019-11-27T08:20:24Z
  - wrappers updated
  - wrapper updated

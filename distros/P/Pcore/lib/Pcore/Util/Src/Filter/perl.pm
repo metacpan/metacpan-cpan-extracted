@@ -1,6 +1,7 @@
 package Pcore::Util::Src::Filter::perl;
 
 use Pcore -class, -const, -res, -sql;
+use Pcore::Util::Src qw[:FILTER_STATUS];
 use Pcore::Util::Text qw[decode_utf8 encode_utf8 rcut_all trim];
 use Clone qw[];
 
@@ -20,30 +21,179 @@ has perl_strip_comment        => 1;
 has perl_strip_pod            => 1;
 has perl_encrypt              => 0;
 
-const our $PERLCRITIC_ERROR => 4;
-const our $SEVERITY         => {
-
-    # valid
-    0 => 200,
+const our $PERLCRITIC_ERROR_THRESHOLD => 4;
+const our $PERLCRITIC_SEVERITY        => {
 
     # warning
-    1 => [ 201, 'Warning, perlcritic(1)' ],
-    2 => [ 201, 'Warning, perlcritic(2)' ],
-    3 => [ 201, 'Warning, perlcritic(3)' ],
+    1 => [ $SRC_WARN, 'Warn, perlcritic(1)' ],
+    2 => [ $SRC_WARN, 'Warn, perlcritic(2)' ],
+    3 => [ $SRC_WARN, 'Warn, perlcritic(3)' ],
 
     # error
-    4        => [ 500, 'Error, perlcritic(4)' ],
-    5        => [ 500, 'Error, perlcritic(5)' ],
-    perltidy => [ 500, 'Error, perltidy' ],
+    4 => [ $SRC_ERROR, 'Error, perlcritic(4)' ],
+    5 => [ $SRC_ERROR, 'Error, perlcritic(5)' ],
 };
 
 sub decompress ( $self ) {
-    my $err = $EMPTY;
-    my $log = $EMPTY;
 
-    # format heredocs
-    $self->_format_heredoc;
+    # heredocs
+    my $res = $self->filter_perlheredoc;
 
+    return $res if !$res;
+
+    # perltidy
+    $res = $self->filter_perltidy;
+
+    return $res if !$res;
+
+    # perlcritic
+    $res = $self->filter_perlcritic;
+
+    return $res;
+}
+
+sub compress ( $self ) {
+    state $dbh = do {
+        my $_dbh = P->handle("sqlite:$ENV->{PCORE_USER_BUILD_DIR}/perl-compress.sqlite");
+
+        $_dbh->add_schema_patch(
+            1 => <<'SQL'
+                CREATE TABLE "cache" (
+                    "id" TEXT PRIMARY KEY NOT NULL,
+                    "code" BLOB NOT NULL
+                );
+SQL
+        );
+
+        $_dbh->upgrade_schema;
+
+        $_dbh;
+    };
+
+    # cut __END__ or __DATA__ sections
+    my $data_section = $EMPTY;
+
+    if ( $self->{data} =~ s/(\n__(END|DATA)__(?:\n.*|))\z//sm ) {
+        $data_section = $1 if $self->{perl_compress_end_section} || $2 eq 'DATA';
+    }
+
+    my $md5 = P->digest->md5_hex( $self->{data} );
+
+    my ( $key, $code );
+
+    if ( $self->{perl_compress} ) {
+
+        # NOTE keep_nl is not supported
+        $self->{perl_compress_keep_ln} = 0;
+
+        my $optimise_size = 1;
+
+        $key = 'compress_' . $self->{perl_compress_keep_ln} . $optimise_size . $md5;
+
+        $code = $dbh->selectrow( 'SELECT "code" FROM "cache" WHERE "id" = ?', [$key] )->{data}->{code};
+
+        if ( !defined $code ) {
+            require Perl::Strip;
+
+            my $transform = Perl::Strip->new( optimise_size => $optimise_size, keep_nl => $self->{perl_compress_keep_ln} );
+
+            $code = rcut_all $transform->strip( $self->{data} );
+
+            $dbh->do( 'INSERT INTO "cache" ("id", "code") VALUES (?, ?)', [ $key, SQL_BYTEA $code ] );
+        }
+    }
+    else {
+        $key = 'strip_' . $self->{perl_compress_keep_ln} . $self->{perl_strip_ws} . $self->{perl_strip_comment} . $self->{perl_strip_pod} . $md5;
+
+        $code = $dbh->selectrow( 'SELECT "code" FROM "cache" WHERE "id" = ?', [$key] )->{data}->{code};
+
+        if ( !defined $code ) {
+            require Perl::Stripper;
+
+            my $transform = Perl::Stripper->new(
+                maintain_linum => $self->{perl_compress_keep_ln},    # keep line numbers unchanged
+                strip_ws       => $self->{perl_strip_ws},            # strip extra whitespace
+                strip_comment  => $self->{perl_strip_comment},
+                strip_pod      => $self->{perl_strip_pod},
+                strip_log      => 0,                                 # strip Log::Any log statements
+            );
+
+            $code = rcut_all $transform->strip( $self->{data} );
+
+            $dbh->do( 'INSERT INTO "cache" ("id", "code") VALUES (?, ?)', [ $key, SQL_BYTEA $code ] );
+        }
+    }
+
+    $self->{data} = $code . $data_section;
+
+    if ( $self->{perl_encrypt} ) {
+        require Filter::Crypto::CryptFile;
+
+        my $hashbang = $EMPTY;
+
+        # remove hashbang
+        if ( $code =~ s/\A(#!.+?\n)//sm ) {
+            $hashbang = $1;
+        }
+
+        # file is not encrypted
+        if ( $code !~ /\Ause Filter::Crypto::Decrypt;/sm ) {
+            my $temp = P->file1->tempfile;
+
+            P->file->write_bin( $temp, $code );
+
+            Filter::Crypto::CryptFile::crypt_file( "$temp", Filter::Crypto::CryptFile::CRYPT_MODE_ENCRYPTED() );
+
+            # encryption error
+            if ($Filter::Crypto::CryptFile::ErrStr) {
+                return res [ $SRC_FATAL, $Filter::Crypto::CryptFile::ErrStr ];
+            }
+            else {
+                $self->{data} = $hashbang . P->file->read_bin($temp);
+            }
+        }
+    }
+
+    return $SRC_OK;
+}
+
+sub update_log ( $self, $log ) {
+    $self->{data} =~ s/^## -----SOURCE FILTER LOG BEGIN-----.*?## -----SOURCE FILTER LOG END-----\n?//sm;    ## no critic qw[RegularExpressions::ProhibitComplexRegexes]
+
+    rcut_all $self->{data};
+
+    if ($log) {
+        encode_utf8 $log;
+
+        $log = qq[-----SOURCE FILTER LOG BEGIN-----\n\n$log\n-----SOURCE FILTER LOG END-----\n];
+
+        $log =~ s/^/## /smg;
+
+        # insert log befor __END__ or __DATA__ token
+        # or append to end end or src
+        if ( $self->{data} =~ /^__(END|DATA)__$/sm ) {
+            my $section = $1;
+
+            $self->{data} =~ s/^__${section}__$/${log}__${section}__/sm;
+        }
+        else {
+            $self->{data} .= "\n$log";
+        }
+    }
+
+    return;
+}
+
+sub filter_perlheredoc ($self) {
+
+    # TODO PCORE-72
+    # parse heredocs in $self->{data}
+    # call correspondednt formatters
+
+    return $SRC_OK;
+}
+
+sub filter_perltidy ($self) {
     state $init = do {
 
         # redefine $Coro::State::DIEHOOK, required under MSWin to handle Time::HiRes::utime import
@@ -52,7 +202,7 @@ sub decompress ( $self ) {
         !!require Perl::Tidy;
     };
 
-    my $perltidy_argv = $self->src_cfg->{perltidy};
+    my $perltidy_argv = join ' ', $self->src_cfg->{perltidy}->@*;
 
     $perltidy_argv .= $EMPTY . $self->dist_cfg->{perltidy} if $self->dist_cfg->{perltidy};
 
@@ -62,44 +212,55 @@ sub decompress ( $self ) {
 
     # temporary conver source to the utf8
     # https://rt.cpan.org/Public/Bug/Display.html?id=32905
-    # decode_utf8 $self->{data}->$*;
+    # decode_utf8 $self->{data};
+
+    my ( $perltidy_err, $perltidy_log );
 
     Perl::Tidy::perltidy(
-        source      => $self->{data},
-        destination => $self->{data},
-        stderr      => \$err,
-        errorfile   => \$err,
-        logfile     => \$log,            # for verbose output only
+        source      => \$self->{data},
+        destination => \$self->{data},
+        stderr      => \$perltidy_err,
+        errorfile   => \$perltidy_err,
+        logfile     => \$perltidy_log,    # for verbose output only
         argv        => $perltidy_argv,
     );
 
     # convert source back to raw
-    encode_utf8 $self->{data}->$*;
+    encode_utf8 $self->{data};
 
-    my $error_log;
-
-    my $res;
+    my ( $log, $res );
 
     # perltidy error
-    if ($err) {
-        $res = res $SEVERITY->{perltidy};
+    if ($perltidy_err) {
+        $res = res [ $SRC_ERROR, 'Error, perltidy' ];
 
-        $err =~ s/^<source_stream>://smg;
+        $perltidy_err =~ s/^<source_stream>://smg;
 
-        $error_log = "PerlTidy:\n$err";
+        $log = "PerlTidy:\n$perltidy_err";
 
-        $error_log .= "\n$log" if $self->{perl_verbose};
+        $log .= "\n$perltidy_log" if $self->{perl_verbose};
+    }
+    else {
+        $res = res $SRC_OK;
     }
 
+    $self->update_log($log);
+
+    return $res;
+}
+
+sub filter_perlcritic ($self) {
+    my ( $res, $log );
+
     # perltidy ok, run perlcritic, if enabled
-    elsif ( my $perl_critic_profile_name = $self->_get_perlcritic_profile_name( $self->{perl_critic} ) ) {
+    if ( my $perl_critic_profile_name = $self->_get_perlcritic_profile_name( $self->{perl_critic} ) ) {
         require Perl::Critic;
 
-        my @violations = eval { $self->_get_perlcritic_object($perl_critic_profile_name)->critique( $self->{data} ) };
+        my @violations = eval { $self->_get_perlcritic_object($perl_critic_profile_name)->critique( \$self->{data} ) };
 
         # perlcritic exception
         if ($@) {
-            $res = res $SEVERITY->{5};
+            $res = res $SRC_FATAL;
         }
 
         # index violations
@@ -191,7 +352,7 @@ sub decompress ( $self ) {
                 }
 
                 # add diagnostic
-                $report .= $tbl->render_row( [ $EMPTY, $EMPTY, "\nDiagnostics:\n$violations->{$v}->{diag}" ] ) if $self->{perl_verbose} && $violations->{$v}->{severity} >= $PERLCRITIC_ERROR;
+                $report .= $tbl->render_row( [ $EMPTY, $EMPTY, "\nDiagnostics:\n$violations->{$v}->{diag}" ] ) if $self->{perl_verbose} && $violations->{$v}->{severity} >= $PERLCRITIC_ERROR_THRESHOLD;
 
                 # add table row line
                 if ( --$total_violations ) {
@@ -202,164 +363,34 @@ sub decompress ( $self ) {
                 }
             }
 
-            $error_log = qq[PerlCritic profile "$perl_critic_profile_name" policy violations:\n];
+            $log = qq[PerlCritic profile "$perl_critic_profile_name" policy violations:\n];
 
-            $error_log .= $report;
+            $log .= $report;
 
-            $res = res $SEVERITY->{$max_severity};
+            $res = res $PERLCRITIC_SEVERITY->{$max_severity};
         }
 
         # no perlcritic violations found
         else {
-            $res = res $SEVERITY->{0};
+            $res = res $SRC_OK;
         }
     }
 
-    # perltidy ok, percritic - not run
+    # percritic skipped
     else {
-        $res = res $SEVERITY->{0};
+        $res = res $SRC_OK;
     }
 
-    $self->_append_log($error_log);
+    $self->update_log($log);
 
     return $res;
-}
-
-sub compress ( $self ) {
-    state $dbh = do {
-        my $_dbh = P->handle("sqlite:$ENV->{PCORE_USER_BUILD_DIR}/perl-compress.sqlite");
-
-        $_dbh->add_schema_patch(
-            1 => <<'SQL'
-                CREATE TABLE "cache" (
-                    "id" TEXT PRIMARY KEY NOT NULL,
-                    "code" BLOB NOT NULL
-                );
-SQL
-        );
-
-        $_dbh->upgrade_schema;
-
-        $_dbh;
-    };
-
-    # cut __END__ or __DATA__ sections
-    my $data_section = $EMPTY;
-
-    if ( $self->{data}->$* =~ s/(\n__(END|DATA)__(?:\n.*|))\z//sm ) {
-        $data_section = $1 if $self->{perl_compress_end_section} || $2 eq 'DATA';
-    }
-
-    my $md5 = P->digest->md5_hex( $self->{data}->$* );
-
-    my ( $key, $code );
-
-    if ( $self->{perl_compress} ) {
-
-        # NOTE keep_nl is not supported
-        $self->{perl_compress_keep_ln} = 0;
-
-        my $optimise_size = 1;
-
-        $key = 'compress_' . $self->{perl_compress_keep_ln} . $optimise_size . $md5;
-
-        $code = $dbh->selectrow( 'SELECT "code" FROM "cache" WHERE "id" = ?', [$key] )->{data}->{code};
-
-        if ( !defined $code ) {
-            require Perl::Strip;
-
-            my $transform = Perl::Strip->new( optimise_size => $optimise_size, keep_nl => $self->{perl_compress_keep_ln} );
-
-            $code = rcut_all $transform->strip( $self->{data}->$* );
-
-            $dbh->do( 'INSERT INTO "cache" ("id", "code") VALUES (?, ?)', [ $key, SQL_BYTEA $code ] );
-        }
-    }
-    else {
-        $key = 'strip_' . $self->{perl_compress_keep_ln} . $self->{perl_strip_ws} . $self->{perl_strip_comment} . $self->{perl_strip_pod} . $md5;
-
-        $code = $dbh->selectrow( 'SELECT "code" FROM "cache" WHERE "id" = ?', [$key] )->{data}->{code};
-
-        if ( !defined $code ) {
-            require Perl::Stripper;
-
-            my $transform = Perl::Stripper->new(
-                maintain_linum => $self->{perl_compress_keep_ln},    # keep line numbers unchanged
-                strip_ws       => $self->{perl_strip_ws},            # strip extra whitespace
-                strip_comment  => $self->{perl_strip_comment},
-                strip_pod      => $self->{perl_strip_pod},
-                strip_log      => 0,                                 # strip Log::Any log statements
-            );
-
-            $code = rcut_all $transform->strip( $self->{data}->$* );
-
-            $dbh->do( 'INSERT INTO "cache" ("id", "code") VALUES (?, ?)', [ $key, SQL_BYTEA $code ] );
-        }
-    }
-
-    $self->{data}->$* = $code . $data_section;
-
-    if ( $self->{perl_encrypt} ) {
-        require Filter::Crypto::CryptFile;
-
-        my $hashbang = $EMPTY;
-
-        # remove hashbang
-        if ( $code =~ s/\A(#!.+?\n)//sm ) {
-            $hashbang = $1;
-        }
-
-        # file is not encrypted
-        if ( $code !~ /\Ause Filter::Crypto::Decrypt;/sm ) {
-            my $temp = P->file1->tempfile;
-
-            P->file->write_bin( $temp, $code );
-
-            Filter::Crypto::CryptFile::crypt_file( "$temp", Filter::Crypto::CryptFile::CRYPT_MODE_ENCRYPTED() );
-
-            # encryption error
-            if ($Filter::Crypto::CryptFile::ErrStr) {
-                return res [ 500, $Filter::Crypto::CryptFile::ErrStr ];
-            }
-            else {
-                $self->{data}->$* = $hashbang . P->file->read_bin($temp);
-            }
-        }
-    }
-
-    return res $SEVERITY->{0};
-}
-
-sub _append_log ( $self, $log ) {
-    $self->_cut_log;
-
-    if ($log) {
-        encode_utf8 $log;
-
-        $log = qq[-----SOURCE FILTER LOG BEGIN-----\n\n$log\n-----SOURCE FILTER LOG END-----\n];
-
-        $log =~ s/^/## /smg;
-
-        # insert log befor __END__ or __DATA__ token
-        # or append to end end or src
-        if ( $self->{data}->$* =~ /^__(END|DATA)__$/sm ) {
-            my $section = $1;
-
-            $self->{data}->$* =~ s/^__${section}__$/${log}__${section}__/sm;
-        }
-        else {
-            $self->{data}->$* .= "\n$log";
-        }
-    }
-
-    return;
 }
 
 sub _get_perlcritic_profile_name ( $self, $profile ) {
     if ( $profile eq '1' ) {
         $profile = 0;
 
-        my $is_pcore = $self->{data}->$* =~ /^use\s+Pcore(?:\s|;)/sm ? 1 : 0;
+        my $is_pcore = $self->{data} =~ /^use\s+Pcore(?:\s|;)/sm ? 1 : 0;
 
         for my $name ( keys $self->src_cfg->{perlcritic}->%* ) {
             next if !defined $self->src_cfg->{perlcritic}->{$name}->{__pcore__};
@@ -414,23 +445,6 @@ sub _get_perlcritic_object ( $self, $name ) {
     return $perlcritic_object_cache->{$name};
 }
 
-sub _format_heredoc ($self) {
-
-    # TODO PCORE-72
-    # parse heredocs in $self->{data}
-    # call correspondednt formatters
-
-    return;
-}
-
-sub _cut_log ($self) {
-    $self->{data}->$* =~ s/^## -----SOURCE FILTER LOG BEGIN-----.*?## -----SOURCE FILTER LOG END-----\n?//sm;    ## no critic qw[RegularExpressions::ProhibitComplexRegexes]
-
-    rcut_all $self->{data}->$*;
-
-    return;
-}
-
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -438,9 +452,11 @@ sub _cut_log ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 40                   | Subroutines::ProhibitExcessComplexity - Subroutine "decompress" with high complexity score (29)                |
+## |    3 | 252                  | Subroutines::ProhibitExcessComplexity - Subroutine "filter_perlcritic" with high complexity score (24)         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 176                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    2 | 205                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 337                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

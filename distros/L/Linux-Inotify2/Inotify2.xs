@@ -9,6 +9,10 @@
 
 #include <sys/inotify.h>
 
+#ifndef IN_EXCL_UNLINK
+  #define IN_EXCL_UNLINK 0
+#endif
+
 MODULE = Linux::Inotify2                PACKAGE = Linux::Inotify2
 
 PROTOTYPES: ENABLE
@@ -37,9 +41,7 @@ BOOT:
           { "IN_MOVE"         , IN_MOVE          },
           { "IN_ONLYDIR"      , IN_ONLYDIR       },
           { "IN_DONT_FOLLOW"  , IN_DONT_FOLLOW   },
-#if IN_EXCL_UNLINK
           { "IN_EXCL_UNLINK"  , IN_EXCL_UNLINK   },
-#endif
           { "IN_MASK_ADD"     , IN_MASK_ADD      },
           { "IN_ISDIR"        , IN_ISDIR         },
           { "IN_ONESHOT"      , IN_ONESHOT       },

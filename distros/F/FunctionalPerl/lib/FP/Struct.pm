@@ -108,52 +108,47 @@ object so as to leave the original unharmed), take predicate functions
 (not magic strings) for dynamic type checking, simpler than
 Class::Struct.
 
-Also creates constructor methods: `new` that takes positional
-arguments, `new_` which takes name=> value pairs, `new__` which takes
+Also creates constructor methods: C<new> that takes positional
+arguments, C<new_> which takes name=> value pairs, C<new__> which takes
 a hash with name=> value pairs as a single argument, and
-`unsafe_new__` which does the same as `new__` but reuses the given
+C<unsafe_new__> which does the same as C<new__> but reuses the given
 hash (unsafe if the latter is modified later on).
 
 Also creates constructor functions (i.e. subroutine instead of method
-calling interface) `Foo::Bar::c::Bar()` for positional and
-`Foo::Bar::c::Bar_()` for named arguments for package Foo::Bar. These
-are also in `Foo::Bar::constructors::` and can be imported using
+calling interface) C<Foo::Bar::c::Bar()> for positional and
+C<Foo::Bar::c::Bar_()> for named arguments for package Foo::Bar. These
+are also in C<Foo::Bar::constructors::> and can be imported using
 (without arguments, it imports both):
 
     import Foo::Bar::constructors qw(Bar Bar_);
 
-_END_ does namespace cleaning: any sub that was defined before the use
-FP::Struct call is removed by the _END_ call (those that are not the
+C<_END_> does namespace cleaning: any sub that was defined before the C<use
+FP::Struct> call is removed by the C<_END_> call (those that are not the
 same sub ref anymore, i.e. have been redefined, are left
-unchanged). This means that if the 'use FP::Struct' statement is put
+unchanged). This means that if the C<use FP::Struct> statement is put
 after any other (procedure-importing) 'use' statement, but before the
 definition of the methods, that the imported procedures can be used
 from within the defined methods, but are not around afterwards,
 i.e. they will not shadow super class methods. (Thanks to Matt S Trout
 for pointing out the idea.) To avoid the namespace cleaning, write
-_END__ instead of _END_.
+C<_END__> instead of C<_END_>.
 
-See FP::Predicates for some useful predicates (others are in the
-respective modules that define them, like `is_pair` in `FP::List`).
+See L<FP::Predicates> for some useful predicates (others are in the
+respective modules that define them, like C<is_pair> in L<FP::List>).
 
 =head1 PURITY
 
-FP::Struct uses `FP::Abstract::Pure` as default base class (i.e. when no other
-base class is given). This means objects from classes based on
-FP::Struct are automatically treated as pure by `is_pure` from
-`FP::Predicates`.
+It is recommended to use L<FP::Abstract::Pure> as a base class. This
+means objects from classes based on FP::Struct are automatically
+treated as pure by C<is_pure> from L<FP::Predicates>.
 
-To hold this promise true, your code must not mutate any object fields
-except when it's impossible for the outside world to detect
-(e.g. using a hash key to hold a cached result is fine as long as you
-also override all the functional setters for fields that are used for
-the calculation of the cached value to clean the cache (TODO: provide
-option to turn off generation of setters, and/or provide hook (for
-cloning?)).)
+If C<$FP::Struct::immutable> is true (default), then if
+L<FP::Abstract::Pure> is inherited the objects are made immutable to
+ensure purity.
 
 =head1 ALSO SEE
 
-<FP::Struct::Show>
+L<FP::Abstract::Pure>, <FP::Struct::Show>, <FP::Struct::Equal>
 
 =head1 NOTE
 
@@ -161,6 +156,18 @@ This is alpha software! Read the status section in the package README
 or on the L<website|http://functional-perl.org/>.
 
 =cut
+
+
+# XX todo: solve mutable private fields (which would leave those
+#    mutable, but still allow to inherit Pure). Deal with these thoughts:
+# "To hold this promise true, your code must not mutate any object fields
+# except when it's impossible for the outside world to detect
+# (e.g. using a hash key to hold a cached result is fine as long as you
+# also override all the functional setters for fields that are used for
+# the calculation of the cached value to clean the cache (TODO: provide
+# option to turn off generation of setters, and/or provide hook (for
+# cloning?)).)"
+
 
 
 package FP::Struct;
@@ -212,6 +219,8 @@ sub field_has_predicate ($) {
 }
 
 
+our $immutable= 1; # only used if also is_pure
+
 sub import {
     my $_importpackage= shift;
     return unless @_;
@@ -228,10 +237,11 @@ sub import {
       $perhaps_isa[0]
         : @perhaps_isa;
 
-    @isa= "FP::Abstract::Pure" unless @isa;
     require_package $_ for @isa;
     no strict 'refs';
     *{"${package}::ISA"}= \@isa;
+
+    my $is_pure= UNIVERSAL::isa($package, "FP::Abstract::Pure");
 
     my $allfields=[ all_fields (\@isa), @$fields ];
     # (^ ah, could store them in the package as well; but well, no
@@ -268,13 +278,19 @@ sub import {
         }
         my %s;
         for (my $i=0; $i< @_; $i++) {
-            $s{ $$allfields_name[$i] }= $_[$i];
+            my $fieldname= $$allfields_name[$i];
+            $s{$fieldname}= $_[$i];
+            Internals::SvREADONLY $s{$fieldname}, 1
+                if $is_pure && $immutable;
         }
-        bless \%s, $class
+        my $s= bless \%s, $class;
+        Internals::SvREADONLY %$s, 1
+            if $is_pure && $immutable;
+        $s
     };
-    # XX bah, almost copy-paste, because want to avoid sub call
-    # overhead (inlining please finally?):
     *{"${package}::c::${package_lastpart}"}= my $constructor= sub {
+        # XX bah, almost copy-paste, because want to avoid sub call
+        # overhead (inlining please finally?):
         @_ <= @$allfields
           or croak "too many arguments to ${package}::new";
         for (@$allfields_i_with_predicate) {
@@ -284,9 +300,15 @@ sub import {
         }
         my %s;
         for (my $i=0; $i< @_; $i++) {
-            $s{ $$allfields_name[$i] }= $_[$i];
+            my $fieldname= $$allfields_name[$i];
+            $s{$fieldname}= $_[$i];
+            Internals::SvREADONLY $s{$fieldname}, 1
+                if $is_pure && $immutable;
         }
-        bless \%s, $package
+        my $s= bless \%s, $package;
+        Internals::SvREADONLY %$s, 1
+            if $is_pure && $immutable;
+        $s
     };
 
 
@@ -318,13 +340,18 @@ sub import {
           or croak "too many arguments to ${package}::new_";
         for (keys %$s) {
             exists $$allfields_h{$_} or die "unknown field '$_'";
+            Internals::SvREADONLY $$s{$_}, 1
+                if $is_pure && $immutable;
         }
         for (@$allfields_with_predicate) {
             my ($pred,$name)=@$_;
             &$pred ($$s{$name})
               or die "unacceptable value for field '$name': ".show($$s{$name});
         }
-        bless $s, $class
+        bless $s, $class;
+        Internals::SvREADONLY %$s, 1
+            if $is_pure && $immutable;
+        $s
     };
 
     # constructor exports: -- XX why did I decide to not use ::c:: for this? historic?

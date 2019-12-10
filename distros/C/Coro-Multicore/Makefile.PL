@@ -61,7 +61,7 @@ print <<EOF;
 
 *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
 
-Coro::Multicore cna do some simple checks to make sure perlinterp_release
+Coro::Multicore can do some simple checks to make sure perlinterp_release
 is called only with a valid perl context, and perlinterp_acquire without,
 ensuring that they are always called in proper pairs. This is very useful
 for development of your XS module.

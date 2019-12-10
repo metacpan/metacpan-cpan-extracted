@@ -1,6 +1,20 @@
 CHANGES
 -------
 
+  2.093 7 December 2019
+
+      * Fixed minor typo in the pod.
+        PR https://github.com/pmqs/IO-Compress-Lzma/pull/3
+        e50eb1253e779f79918a3c9bd6a6fd714d1ef261
+
+  2.092 5 December 2019
+
+      * t/oooprereq.t: Fix list of dumped packages
+        90ebd567797ac332b210ef01a5af19af86eb94bc 
+
+      * t/oooprereq.t:Dump version data
+        227544c3ee3ffc181d0ffa93d60e5846930b497f
+
   2.091 23 November 2019
 
       * No Changes

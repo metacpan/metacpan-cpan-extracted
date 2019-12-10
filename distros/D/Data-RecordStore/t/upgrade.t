@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
 no warnings 'numeric';
@@ -6,19 +7,15 @@ use Data::RecordStore;
 
 use Data::Dumper;
 use File::Copy::Recursive qw/dircopy/;
-use File::Path qw/remove_tree/;
+use File::Path qw/remove_tree make_path/;
 use File::Temp qw/ :mktemp tempdir /;
 use Test::More;
 
+use Data::RecordStore;
+use Data::RecordStore::Converter;
+
 use Carp 'longmess'; 
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
-
-BEGIN {
-    use_ok( "Data::RecordStore" ) || BAIL_OUT( "Unable to load Data::RecordStore" );
-    use_ok( "Data::RecordStore::Converter" ) || BAIL_OUT( "Unable to load Data::RecordStore::Converter" );
-}
-
-my $is_windows = $^O eq 'MSWin32';
 
 eval {
     test_suite();
@@ -27,7 +24,6 @@ fail( "failed $@ $! $?") if $@;
 done_testing;
 
 exit;
-
 
 sub test_suite {
 
@@ -48,14 +44,20 @@ sub test_suite {
     }
     $id++;
   }
+  sub chk  {
+      my( $new, $old, $msg ) = @_;
+      is( length( $new ), length( $old ), "$msg size check" );
+#      is( $new, $old, "$msg full check" );
+  };
 
   sub failright {
-      my( $sub, $failmsg, $errrx, $succmsg ) = @_;
+      my( $sub, $errm, $msg ) = @_;
       eval {
-          &$sub();
-          fail( $failmsg );
+          $sub->();
+          fail( $msg );
       };
-      like( $@, $errrx, $succmsg );
+      like( $@, qr/$errm/, $msg );
+      undef $@;
   }
 
   # test the directory that isn't there, really.
@@ -68,303 +70,320 @@ sub test_suite {
 
   # error matrix
   failright( sub { Data::RecordStore::Converter->convert( "$base/4.03" ); },
-             "did not die when trying given no destination directory",
-             qr/must be given a destination/, 
-             "error message for convert dest directory not given" );
+             'must be given a destination',
+             "did not die when trying given no destination directory" );
 
-  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03", $notthere ); },
-             "did not die when given no working directory",
-             qr/must be given a working/,
-             "error message for convert working directory not given" );
+  failright( sub { Data::RecordStore::Converter->convert( "$base/nothinghere", "$base/whereelse" ); },
+             'cannot find source',
+             "no source directory given" );
 
-  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03", $notthere, $notthere ); },
-             "did not die when working directory same as dest directory",
-             qr/destination and working directories may not be the same/,
-             "error message for same dest and working directory" );
+  failright( sub { Data::RecordStore::Converter->convert( undef, "$base/whereelse" ); },
+             'must be given a source directory',
+             "no source directory given" );
 
-  failright( sub { Data::RecordStore::Converter->convert( $notthere, $notthere_too, $notthere_three ); },
-             "did not die when working directory same as dest directory",
-             qr/cannot find source directory/,
-             "error message for source directory missing" );
-
-  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03", $isthere, $notthere ); },
-             "did not die when dest directory exists",
-             qr/destination directory.*already exists/i,
-             "error message for existing dest directory" );
-
-  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03", $notthere, $isthere ); },
-             "did not die when working directory exists",
-             qr/working directory.*already exists/i,
-             "error message for existing working directory" );
-
-  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03", $isthere, $isthere_too ); },
-             "did not die when dest directory exists",
-             qr/destination directory.*already exists/i,
-             "error message for existing dest directory" );
+  failright( sub { Data::RecordStore::Converter->convert( "$base/4.03", "$base/3.22" ); },
+             'destination directory.*already exists/',
+             "did not die when dest directory exists" );
 
   for my $old_version_store (grep { $_ > 0 } @subs) {
-
-    diag "Testing $old_version_store";
-    my $tmp = tempdir( CLEANUP => 1 );
-    my $dest_dir = "$tmp/new_version";
-    my $working_dir = "$tmp/working";
-    my $source_dir  = "$tmp/old_version";
-
-    # copy the source dir to a temp directory
-    dircopy( "$base/$old_version_store", $source_dir );
-
-    $id = 1;
-    if( $old_version_store eq '5.0' ) {
-      local( *STDERR );
-      my $out;
-      open( STDERR, ">>", \$out );
+      my $tmp = tempdir( CLEANUP => 1 );
+      my $dest_dir = "$tmp/new_version";
+      my $source_dir  = "$tmp/old_version";
       
-      Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
-      like( $out, qr/already at version/, 'warning message for trying to convert store that didnt need it' );
-      close $out;
+      # copy the source dir to a temp directory
+      dircopy( "$base/$old_version_store", $source_dir );
+      $id = 1;
+      if( $old_version_store > 3.22 ) {
 
-      ok( Data::RecordStore->open_store( $source_dir ), "able to open correct version" );
-    } #5.0
-    if( $old_version_store eq '4.03' ) {
+          if( $old_version_store eq '4.03' ) {
+              # test that an empty existing directory is fine
+              make_path( $dest_dir );
+          }
+          Data::RecordStore::Converter->convert( $source_dir, $dest_dir );
 
-        Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
+          my $store = Data::RecordStore->open_store( $dest_dir );
+          
 
-        my $store = Data::RecordStore->open_store( $dest_dir );
-        
+          # the store created was touched up manually, the last few blank entries not created by the creation program. 
+          # Make them match and update the tests.";
+          
+          is( $store->entry_count, 49, "$old_version_store store has 49 entries" );
+          #        is( $store->active_entry_count, 37, '4 store has 37 active entries' );
+          #        is( $store->record_count, 37, '4 store has 37 records' );
+          my $old_min_size = 0;
+          my $last_new_id = 12;
+          my $stows = 0;
+          my $recs = 0;
 
-        # the store created was touched up manually, the last few blank entries not created by the creation program. 
-        # Make them match and update the tests.";
-        is( $store->entry_count, 49, '4 store has 49 entries' );
-        is( $store->active_entry_count, 37, '4 store has 37 active entries' );
-        is( $store->record_count, 37, '4 store has 37 records' );
-    } #4.03
-    elsif( $old_version_store eq '3.22' ) {
-      failright( sub { Data::RecordStore->open_store( $source_dir ); },
-                 "was able to open store with older version",
-                 qr/run the record_store_convert/,
-                 "fail message for opening store without version" );
+          for my $old_silo_id (1..12) {
+              my $old_max_size = int( exp( $old_silo_id ) );
+              $old_max_size -= 4; # long,rest. Its the rest that we get the size for
+              if ( $old_max_size < 0 ) {
+                  next;
+              }
+              my $new_size = 4 + $old_max_size;
+              if ( $new_size < 1 ) {
+                  $new_size = 1;
+              }
+              my $new_silo_id = log( $new_size ) / log( 2 );
+              if ( int( $new_silo_id ) < $new_silo_id ) {
+                  $new_silo_id = 1 + int( $new_silo_id );
+              }
+              if ( $new_silo_id < 12 ) {
+                  $new_silo_id = 12;       #4096
+              }
+              my $avg = int( ($old_min_size+$old_max_size) / 2 );
 
-      Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
-      my $store = Data::RecordStore->open_store( $dest_dir );
+              if( $old_min_size ) {
+                  chk( $store->fetch( $id++ ), 'x'x$old_min_size, "old min size for $old_silo_id $old_version_store check" );
+              }
+              is( $store->fetch( $id++ ), '', "old max size -4 was deleted for $old_silo_id $old_version_store check" );
+              chk( $store->fetch( $id++ ), 'x'x($old_max_size), "old max size for $old_silo_id $old_version_store check" );
 
-      #the store created was touched up manually, the last few blank entries not created by the creation program. Make them match and update the tests.";
-      is( $store->entry_count, 45, 'converted store has 45 entries' );
-      is( $store->active_entry_count, 34, 'converted store has 34 active entries' );
-      is( $store->record_count, 34, 'converted store has 34 records' );
-    
+              if ( $new_silo_id > ($last_new_id+1) ) {
+                  my $mid_boundary = 2**($last_new_id+1);
+                  chk( $store->fetch( $id++ ), 'x'x($mid_boundary-1), "mid boundary -1 for $old_silo_id $old_version_store check" );
+                  chk( $store->fetch( $id++ ), 'x'x($mid_boundary), "mid boundary for $old_silo_id $old_version_store check" );
 
-      my $old_min_size = 0;
-      my $last_new_id = 12;
-      for my $old_store_id (1..12,12) {
-        my $old_max_size = int( exp( $old_store_id ) );
-        $old_max_size -= 12; # long,id,rest. Its the rest that we get the size for
-        if ( $old_max_size < 0 ) {
-          next;
-        }
-        my $new_size = 4 + $old_max_size;
-        if ( $new_size < 1 ) {
-          $new_size = 1;
-        }
-        my $new_store_id = log( $new_size ) / log( 2 );
-        if ( int( $new_store_id ) < $new_store_id ) {
-          $new_store_id = 1 + int( $new_store_id );
-        }
-        if ( $new_store_id < 12 ) {
-          $new_store_id = 12;   #4096
-        }
-        my $avg = int( ($old_max_size+$old_max_size) / 2 );
+              } 
+              else {
+                  chk( $store->fetch( $id++ ), 'x'x($avg), "avg for $old_silo_id $old_version_store check" );
+              }
+              
+              $last_new_id = $new_silo_id;
+              $old_min_size = $old_max_size + 1;
+          }
+          
+      } #4.03
+      elsif( $old_version_store eq '3.22' ) {
+          failright( sub { Data::RecordStore->reopen_store( $source_dir ); },
+                     "was able to open store with older version",
+                     qr/run the record_store_convert/,
+                     "fail message for opening store without version" );
 
-        check( $store, $old_min_size, $old_store_id, $new_store_id, $old_version_store ) if $old_min_size;
-        $id++;
-        check( $store, $old_max_size, $old_store_id, $new_store_id, $old_version_store );
+          Data::RecordStore::Converter->convert( $source_dir, $dest_dir );
+          my $store = Data::RecordStore->open_store( $dest_dir );
 
-        if ( $new_store_id > ($last_new_id+1) ) {
-          my $mid_boundary = 2**($last_new_id+1);
-          check( $store, $mid_boundary-1, $old_store_id, $new_store_id, $old_version_store );
-          check( $store, $mid_boundary, $old_store_id, $new_store_id, $old_version_store );
-        } 
-        else {
-          check( $store, $avg, $old_store_id, $new_store_id, $old_version_store );
-        }
-        
-        $last_new_id = $new_store_id;
-        $old_min_size = $old_max_size + 1;
-      }
-    } #3.22 
-    elsif( $old_version_store eq '3.00' ) {
-      eval {
-        Data::RecordStore->open_store( $source_dir );
-        fail( "was able to open store with older version" );
-      };
-      like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
+          #the store created was touched up manually, the last few blank entries not created by the creation program. Make them match and update the tests.";
+          is( $store->entry_count, 45, 'converted store has 45 entries' );
+          #      is( $store->active_entry_count, 34, 'converted store has 34 active entries' );
+          #      is( $store->record_count, 34, 'converted store has 34 records' );
+          
+          my $old_min_size = 0;
+          my $last_new_id = 12;
+          my $stows = 0;
+          my $recs = 0;
 
-      Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
-      my $store = Data::RecordStore->open_store( $dest_dir );
+          for my $old_store_id (1..12) {
+              my $old_max_size = int( exp( $old_store_id ) );
+              $old_max_size -= 12; # long,id,rest. Its the rest that we get the size for
+              if ( $old_max_size < 0 ) {
+                  next;
+                  $old_store_id = 3;
+              }
+              my $new_size = 4 + $old_max_size;
+              if ( $new_size < 1 ) {
+                  $new_size = 1;
+              }
+              my $new_store_id = log( $new_size ) / log( 2 );
+              if ( int( $new_store_id ) < $new_store_id ) {
+                  $new_store_id = 1 + int( $new_store_id );
+              }
+              if ( $new_store_id < 12 ) {
+                  $new_store_id = 12;       #4096
+              }
+              my $avg = int( ($old_max_size+$old_max_size) / 2 );
 
-      is( $store->entry_count, 49, 'converted store has 49 entries' );
-      is( $store->active_entry_count, 37, 'converted store has 37 active entries' );
-      is( $store->record_count, 37, 'converted store has 37 records' );
+              if( $old_min_size ) {
+                  chk( $store->fetch( $id++ ), 'x'x$old_min_size, "old min size for $old_store_id 3.1 check" );
+              }
+              is( $store->fetch( $id++ ), '', "old max size -4 was deleted for $old_store_id 3.1 check" );
+              chk( $store->fetch( $id++ ), 'x'x($old_max_size), "old max size for $old_store_id 3.10 check" );
 
-      my $old_min_size = 0;
-      my $last_new_id = 12;
-      my $stows = 0;
-      for my $old_store_id (1..12,12) {
-        my $old_max_size = int( exp( $old_store_id ) );
-        $old_max_size -= 4; # long,rest. Its the rest that we get the size for
-        if ( $old_max_size < 0 ) {
-          next;
-        }
-        my $new_size = 4 + $old_max_size;
-        if ( $new_size < 1 ) {
-          $new_size = 1;
-        }
-        my $new_store_id = log( $new_size ) / log( 2 );
-        if ( int( $new_store_id ) < $new_store_id ) {
-          $new_store_id = 1 + int( $new_store_id );
-        }
-        if ( $new_store_id < 12 ) {
-          $new_store_id = 12;   #4096
-        }
-        my $avg = int( ($old_min_size+$old_max_size) / 2 );
+              if ( $new_store_id > ($last_new_id+1) ) {
+                  my $mid_boundary = 2**($last_new_id+1);
+                  chk( $store->fetch( $id++ ), 'x'x($mid_boundary-1), "mid boundary -1 for $old_store_id 3.10 check" );
+                  chk( $store->fetch( $id++ ), 'x'x($mid_boundary), "mid boundary for $old_store_id 3.10 check" );
+              } 
+              else {
+                  chk( $store->fetch( $id++ ), 'x'x($avg), "avg for $old_store_id 3.10 check" );            
+              }
+              
+              $last_new_id = $new_store_id;
+              $old_min_size = $old_max_size + 1;
+          }
+      } #3.22 
+      elsif( $old_version_store eq '3.00' ) {
+          failright( sub { Data::RecordStore->reopen_store( $source_dir ) },
+                     'run the record_store_convert',
+                     "was able to open store with older version" );
 
-        if( $old_min_size ) {
-          check( $store, $old_min_size, $old_store_id, $new_store_id, $old_version_store );
-        }
+          Data::RecordStore::Converter->convert( $source_dir, $dest_dir );
+          my $store = Data::RecordStore->open_store( $dest_dir );
 
-        check( $store, 0, $old_store_id, $new_store_id, $old_version_store ); #check the deleted one
+          is( $store->entry_count, 49, 'converted store has 49 entries' );
 
-        check( $store, $old_max_size, $old_store_id, $new_store_id, $old_version_store );
+          my $old_min_size = 0;
+          my $last_new_id = 12;
+          for my $old_store_id (1..12,12) {
+              my $old_max_size = int( exp( $old_store_id ) );
+              $old_max_size -= 4; # long,rest. Its the rest that we get the size for
+              if ( $old_max_size < 0 ) {
+                  next;
+              }
+              my $new_size = 4 + $old_max_size;
+              if ( $new_size < 1 ) {
+                  $new_size = 1;
+              }
+              my $new_store_id = log( $new_size ) / log( 2 );
+              if ( int( $new_store_id ) < $new_store_id ) {
+                  $new_store_id = 1 + int( $new_store_id );
+              }
+              if ( $new_store_id < 12 ) {
+                  $new_store_id = 12;       #4096
+              }
+              my $avg = int( ($old_min_size+$old_max_size) / 2 );
 
-        if ( $new_store_id > ($last_new_id+1) ) {
-          my $mid_boundary = 2**($last_new_id+1);
-          check( $store, $mid_boundary-1, $old_store_id, $new_store_id, $old_version_store );
-          check( $store, $mid_boundary, $old_store_id, $new_store_id, $old_version_store );
-        } 
-        else {
-          check( $store, $avg, $old_store_id, $new_store_id, $old_version_store );
-        }
-    
-        $last_new_id = $new_store_id;
-        $old_min_size = $old_max_size + 1;
-      }
+              if( $old_min_size ) {
+                  chk( $store->fetch( $id ), 'x'x$old_min_size, "old min size (id ".($id++).") for $old_store_id 3.00 check" );
+              }
+
+              is( $store->fetch( $id ), '', "old max size -4 (id ".($id++).") was deleted for $old_store_id 3.00 check" );
+              chk( $store->fetch( $id ), 'x'x($old_max_size), "old max size (id ".($id++).") for $old_store_id 3.00 check" );
+
+              if ( $new_store_id > ($last_new_id+1) ) {
+                  my $mid_boundary = 2**($last_new_id+1);
+                  chk( $store->fetch( $id++ ), 'x'x($mid_boundary-1), "mid boundary -1 for $old_store_id 3.00 check" );
+                  chk( $store->fetch( $id++ ), 'x'x($mid_boundary), "mid boundary for $old_store_id 3.00 check" );
+
+              } 
+              else {
+                  chk( $store->fetch( $id ), 'x'x($avg), "avg (id ".($id++).") for $old_store_id 3.00 check" );
+              }
+              
+              $last_new_id = $new_store_id;
+              $old_min_size = $old_max_size + 1;
+          }
+          
+      } #3.00
+      elsif( $old_version_store eq '2.03' ) {
+          eval {
+              Data::RecordStore->reopen_store( $source_dir );
+              fail( "was able to open store with older version" );
+          };
+          like( $@, qr/could not find record store in/, "fail message for opening store without version" );
+
+
+          Data::RecordStore::Converter->convert( $source_dir, $dest_dir );
+          my $store = Data::RecordStore->open_store( $dest_dir );
+
+          is( $store->entry_count, 49, 'converted store has 49 entries' );
+
+
+          my $old_min_size = 0;
+          my $last_new_id = 12;
+          my $id = 1;
+          
+          for my $old_store_id (1..12) {
+              my $old_max_size = int( exp( $old_store_id ) );
+              $old_max_size -= 4; # long,rest. Its the rest that we get the size for
+              if ( $old_max_size < 0 ) {
+                  next;
+              }
+              my $new_size = 4 + $old_max_size;
+              if ( $new_size < 1 ) {
+                  $new_size = 1;
+              }
+              my $new_store_id = log( $new_size ) / log( 2 );
+              if ( int( $new_store_id ) < $new_store_id ) {
+                  $new_store_id = 1 + int( $new_store_id );
+              }
+              if ( $new_store_id < 12 ) {
+                  $new_store_id = 12;       #4096
+              }
+              my $avg = int( ($old_min_size+$old_max_size) / 2 );
+
+              if( $old_min_size ) {
+                  chk( $store->fetch( $id++ ), 'x'x$old_min_size, "old min size for $old_store_id 2.03 check" );
+              }
+              #              chk( $store->fetch( $id++ ), 'x'x($old_max_size-4), "old max size -4 for $old_store_id 2.03 check" );
+              is( $store->fetch( $id++ ), '', "old max size -4 was deleted for $old_store_id 2.03 check" );
+              chk( $store->fetch( $id++ ), 'x'x($old_max_size), "old max size for $old_store_id 2.03 check" );
+
+
+              if ( $new_store_id > ($last_new_id+1) ) {
+                  my $mid_boundary = 2**($last_new_id+1);
+
+                  chk( $store->fetch( $id++ ), 'x'x($mid_boundary-1), "mid boundary -1 for $old_store_id 2.03 check" );
+                  chk( $store->fetch( $id++ ), 'x'x($mid_boundary), "mid boundary for $old_store_id 2.03 check" );
+              } 
+              else {
+                  chk( $store->fetch( $id++ ), 'x'x($avg), "avg for $old_store_id 2.03 check" );
+              }
+              $last_new_id = $new_store_id;
+              $old_min_size = $old_max_size + 1;
+          }
+      } #2.03
+      elsif( $old_version_store eq '1.07' ) {
+
+          failright( sub { Data::RecordStore->reopen_store( $source_dir ) },
+                    'run the record_store_convert',
+                     "was able to open store with older version" );
+
+          my $nada = "$tmp/no_version";
+          make_path( $nada );
+          failright( sub { Data::RecordStore::Converter->convert( $nada, $dest_dir ) },
+                    'No store found',
+                     "try to convert with nothing at all" );
+
+          Data::RecordStore::Converter->convert( $source_dir, $dest_dir );
+          my $store = Data::RecordStore->open_store( $dest_dir );
+
+          #the store created was touched up manually, the last few blank entries not created by the creation program. Make them match and update the tests.";
+          is( $store->entry_count, 24, 'converted store has 24 entries' );
+
+          my $old_min_size = 0;
+          my $last_new_id = 12;
+          my $old_size_chunk = 500;
+
+          my $id = 1;          
+          
+          for my $old_store_id (1..12) {
+              my $old_max_size = $old_size_chunk * $old_store_id;
+              my $new_store_id = log( $old_max_size + 1 ) / log( 2 );
+              if ( int( $new_store_id ) < $new_store_id ) {
+                  $new_store_id = 1 + int( $new_store_id );
+              }
+              if ( $new_store_id < 12 ) {
+                  $new_store_id = 12;   #4096
+              }
+              my $avg = int( ($old_min_size + $old_max_size) / 2 );
+
+              if( $old_store_id == 12 ) {
+                  chk( $store->fetch( $id++ ), 'x'x(8192-5), "last iteration for $old_store_id 1.07 check" );
+              }
+
+              if( $old_min_size ) {
+                  chk( $store->fetch( $id++ ), 'x'x$old_min_size, "old min size for $old_store_id 1.07 check" );
+              }
+
+              if ( $new_store_id > ($last_new_id+1) ) {
+                  my $mid_boundary = 2**($last_new_id+1);
+                  chk( $store->fetch( $id++ ), 'x'x($mid_boundary-1), "under mid boundary for $old_store_id 1.07 check" );
+                  chk( $store->fetch( $id++ ), 'x'x($mid_boundary), "under mid boundary for $old_store_id 1.07 check" );
+              } 
+              else {
+                  chk( length($store->fetch( $id++ )), length('x'x($avg)), "under avg for $old_store_id 1.07 check" );
+              }
+              
+              $last_new_id = $new_store_id;
+              $old_min_size = $old_max_size + 1;
+          }
+      } # 1.07
       
-    } #3.00
-    elsif( $old_version_store eq '2.03' ) {
-      eval {
-        Data::RecordStore->open_store( $source_dir );
-        fail( "was able to open store with older version" );
-      };
-      like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
-
-
-      Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
-      my $store = Data::RecordStore->open_store( $dest_dir );
-
-      is( $store->entry_count, 49, 'converted store has 49 entries' );
-      is( $store->active_entry_count, 37, 'converted store has 37 active entries' );
-      is( $store->record_count, 37, 'converted store has 37 records' );
-
-      my $old_min_size = 0;
-      my $last_new_id = 12;
-      my $stows = 0;
-      for my $old_store_id (1..12,12) {
-        my $old_max_size = int( exp( $old_store_id ) );
-        $old_max_size -= 4; # long,rest. Its the rest that we get the size for
-        if ( $old_max_size < 0 ) {
-          next;
-        }
-        my $new_size = 4 + $old_max_size;
-        if ( $new_size < 1 ) {
-          $new_size = 1;
-        }
-        my $new_store_id = log( $new_size ) / log( 2 );
-        if ( int( $new_store_id ) < $new_store_id ) {
-          $new_store_id = 1 + int( $new_store_id );
-        }
-        if ( $new_store_id < 12 ) {
-          $new_store_id = 12;   #4096
-        }
-        my $avg = int( ($old_min_size+$old_max_size) / 2 );
-
-        if( $old_min_size ) {
-          check( $store, $old_min_size, $old_store_id, $new_store_id, $old_version_store );
-        }
-
-        check( $store, 0, $old_store_id, $new_store_id, $old_version_store ); #check the deleted one
-
-        check( $store, $old_max_size, $old_store_id, $new_store_id, $old_version_store );
-
-        if ( $new_store_id > ($last_new_id+1) ) {
-          my $mid_boundary = 2**($last_new_id+1);
-          check( $store, $mid_boundary-1, $old_store_id, $new_store_id, $old_version_store );
-          check( $store, $mid_boundary, $old_store_id, $new_store_id, $old_version_store );
-        } 
-        else {
-          check( $store, $avg, $old_store_id, $new_store_id, $old_version_store );
-        }
-    
-        $last_new_id = $new_store_id;
-        $old_min_size = $old_max_size + 1;
+      if( $old_version_store < 6 ) {
+          is( Data::RecordStore->detect_version( $dest_dir ), $Data::RecordStore::VERSION, "upgrade to current version" );
       }
-    } #2.03
-    elsif( $old_version_store eq '1.07' ) {
-
-      eval {
-        Data::RecordStore->open_store( $source_dir );
-        fail( "was able to open store with older version" );
-      };
-      like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
-
-
-      Data::RecordStore::Converter->convert( $source_dir, $dest_dir, $working_dir );
-      my $store = Data::RecordStore->open_store( $dest_dir );
-
-      #the store created was touched up manually, the last few blank entries not created by the creation program. Make them match and update the tests.";
-      is( $store->entry_count, 24, 'converted store has 24 entries' );
-      is( $store->active_entry_count, 24, 'converted store has 24 active entries' );
-      is( $store->record_count, 24, 'converted store has 24 records' );
-
-      my $old_min_size = 0;
-      my $last_new_id = 12;
-      my $old_size_chunk = 500;
-
-      for my $old_store_id (1..12) {
-        my $old_max_size = $old_size_chunk * $old_store_id;
-
-        my $new_store_id = log( $old_max_size + 1 ) / log( 2 );
-        if ( int( $new_store_id ) < $new_store_id ) {
-          $new_store_id = 1 + int( $new_store_id );
-        }
-        if ( $new_store_id < 12 ) {
-          $new_store_id = 12;   #4096
-        }
-        my $avg = int( ($old_min_size + $old_max_size) / 2 );
-
-        if( $old_store_id == 12 ) {
-          check( $store, (8192-5), 3, 13, $old_version_store );
-        }
-
-        if( $old_min_size ) {
-          check( $store, $old_min_size, $old_store_id, $new_store_id, $old_version_store );
-        }
-
-        if ( $new_store_id > ($last_new_id+1) ) {
-          my $mid_boundary = 2**($last_new_id+1);
-          check( $store, $mid_boundary-1, $old_store_id, $new_store_id, $old_version_store );
-          check( $store, $mid_boundary, $old_store_id, $new_store_id, $old_version_store );
-        } 
-        else {
-          check( $store, $avg, $old_store_id, $new_store_id, $old_version_store );
-        }
-        
-        $last_new_id = $new_store_id;
-        $old_min_size = $old_max_size + 1;
-      }
-    } # 1.07
-    
-    if( $old_version_store < 5 ) {
-        is( Data::RecordStore->detect_version( $dest_dir ), 5, "upgrade to current version" );
-    }
   } #each version test
 } #test_suite
 
@@ -382,3 +401,5 @@ old store 9 is from 2969 to 8091 -> to store 13.
 old store 10 is from 8092 to 22014 -> to store 15. 
 old store 11 is from 22015 to 59862 -> to store 16. 
 old store 12 is from 59863 to 162742 -> to store 18. 
+
+______________________________-

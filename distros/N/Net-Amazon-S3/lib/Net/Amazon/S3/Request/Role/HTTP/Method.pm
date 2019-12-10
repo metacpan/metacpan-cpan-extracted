@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::HTTP::Method;
 # ABSTRACT: HTTP method role
-$Net::Amazon::S3::Request::Role::HTTP::Method::VERSION = '0.86';
+$Net::Amazon::S3::Request::Role::HTTP::Method::VERSION = '0.87';
 use MooseX::Role::Parameterized;
 
 use Net::Amazon::S3::HTTPRequest;
@@ -43,7 +43,7 @@ Net::Amazon::S3::Request::Role::HTTP::Method - HTTP method role
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 AUTHOR
 

@@ -1,9 +1,10 @@
-package Pcore::PDF v0.8.2;
+package Pcore::PDF v0.8.3;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
 use Pcore::Util::Data qw[to_json from_json];
 use Pcore::Util::Scalar qw[is_plain_scalarref];
+use Pcore::Util::Sys::Proc qw[:PROC_REDIRECT];
 
 const our $PAGE_SIZE => {
     A0        => '841 x 1189 mm',
@@ -138,7 +139,12 @@ sub remove_logo ( $self, $pdf_ref ) {
 }
 
 sub _create_princexml_proc ($self) {
-    my $proc = P->sys->run_proc( [ $self->{bin}, '--control' ], stdin => 1, stdout => 1, stderr => 1 );
+    my $proc = P->sys->run_proc(
+        [ $self->{bin}, '--control' ],
+        stdin  => $PROC_REDIRECT_SOCKET,
+        stdout => $PROC_REDIRECT_SOCKET,
+        stderr => $PROC_REDIRECT_SOCKET,
+    );
 
     undef $proc->{child_stdout};
     undef $proc->{child_stderr};

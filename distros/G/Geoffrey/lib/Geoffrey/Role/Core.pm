@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Role::Core::VERSION = '0.000204';
+$Geoffrey::Role::Core::VERSION = '0.000205';
 
 sub new {
     my $class = shift;
@@ -70,7 +70,7 @@ Geoffrey::Role::Core - Abstract core class.
 
 =head1 VERSION
 
-Version 0.000204
+Version 0.000205
 
 =head1 DESCRIPTION
 

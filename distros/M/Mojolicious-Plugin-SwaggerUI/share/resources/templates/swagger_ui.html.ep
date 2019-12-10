@@ -1,6 +1,26 @@
 <html>
 <head>
+    <title>Swagger UI</title>
     <link rel="stylesheet" type="text/css" href="/swagger-ui/swagger-ui.css">
+    <style>
+      html
+      {
+        box-sizing: border-box;
+        overflow: -moz-scrollbars-vertical;
+        overflow-y: scroll;
+      }
+      *,
+      *:before,
+      *:after
+      {
+        box-sizing: inherit;
+      }
+      body
+      {
+        margin:0;
+        background: #fafafa;
+      }
+    </style>
 </head>
 
 <body>
@@ -17,7 +37,8 @@
                 presets: [
                     SwaggerUIBundle.presets.apis,
                     SwaggerUIStandalonePreset
-                ]
+                ],
+                layout: "StandaloneLayout"
             })
 
             window.ui = ui

@@ -12,7 +12,7 @@
 package Perl::Tidy::LineBuffer;
 use strict;
 use warnings;
-our $VERSION = '20190915';
+our $VERSION = '20191203';
 
 sub new {
 

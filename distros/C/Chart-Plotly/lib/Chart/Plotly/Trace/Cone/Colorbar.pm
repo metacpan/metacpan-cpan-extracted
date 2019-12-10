@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Cone::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Cone::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Cone::Colorbar::Title;
 
-our $VERSION = '0.033';    # VERSION
+our $VERSION = '0.034';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace cone.
 
@@ -281,7 +281,7 @@ Chart::Plotly::Trace::Cone::Colorbar - This attribute is one of the possible opt
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 SYNOPSIS
 

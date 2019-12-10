@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tester 4.004;
+package Config::Model::Tester 4.005;
 # ABSTRACT: Test framework for Config::Model
 
 use warnings;
@@ -97,10 +97,13 @@ sub setup_test {
             my $data = $data_file->slurp() ;
             $destination->spew( $data );
             if (ref $map eq 'ARRAY') {
-                foreach my $link (@$map) {
-                    $link =~ s!~/!$home_for_test/! if $home_for_test;
-                    symlink $destination->absolute->stringify, $wr_dir->child($link)->stringify
-                        unless $destination eq $link;
+                my @tmp = @$map;
+                pop @tmp; # remove destination
+                foreach my $link_str (@tmp) {
+                    $link_str =~ s!~/!$home_for_test/! if $home_for_test;
+                    my $link = $wr_dir->child($link_str);
+                    $link->parent->mkpath( { mode => oct(755) }) ;
+                    symlink $destination->absolute->stringify, $link->stringify;
                 }
             }
             @file_list = list_test_files ($wr_dir);
@@ -753,7 +756,7 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 4.004
+version 4.005
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,12 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.13.2 2019-12-03T11:51:58Z
+
+    - Flush STDOUT after processing each chunk.
+
+    This is necessary to forward "git add -p" output to other pane of
+    tmux using "nc" command.
+
 4.13.1 2019-11-09T00:54:05Z
 
     - Fix bug in handling --cdifopts option.

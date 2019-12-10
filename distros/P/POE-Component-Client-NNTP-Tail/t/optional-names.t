@@ -60,7 +60,7 @@ sub _setup {
   my ($kernel, $session, $heap) = @_[KERNEL, SESSION, HEAP];
   # start the server
   $heap->{server} = DummyServer->spawn( 
-    port => 10119, 
+    port => 11119, 
     Debug => $DEBUG, 
   );
   isa_ok( $heap->{server}, 'DummyServer' );
@@ -73,7 +73,7 @@ sub _setup {
     Alias => 'MyTail',
     Group => 'test.group',
     NNTPServer => '127.0.0.1',
-    Port => 10119,
+    Port => 11119,
     Interval => 1,
     Debug => $DEBUG,
   );

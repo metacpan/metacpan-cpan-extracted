@@ -10,7 +10,7 @@ use Locale::Maketext::Simple    Class => 'CPANPLUS', Style => 'gettext';
 use CPANPLUS::Internals::Constants;
 
 use vars qw[$VERSION];
-$VERSION = "0.9902";
+$VERSION = "0.9904";
 
 $Params::Check::VERBOSE = 1;
 
@@ -74,6 +74,7 @@ CPANPLUS::Selfupdate - self-updating for CPANPLUS
             ( check_install( module => 'CPANPLUS::Dist::Build' )
                 && !check_install( module => 'CPANPLUS::Dist::Build', version => '0.60' )
               ? ( 'CPANPLUS::Dist::Build' => '0.60' ) : () ),
+            ( $^O eq 'MSWin32' ? ( 'Archive::Extract' => '0.86' ) : () ), # Fixes issue with AE and bintar on MSWin32
         },
 
         features => {

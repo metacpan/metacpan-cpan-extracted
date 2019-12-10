@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Bio::DB::NCBIHelper",
   "PREREQ_PM" => {
-    "Bio::DB::Query::WebQuery" => 0,
+    "Bio::DB::Query::WebQuery" => "1.7.7",
     "Bio::DB::Taxonomy" => 0,
     "Bio::DB::WebDBSeqI" => 0,
     "Bio::Root::IO" => 0,
@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "1.7.5",
+  "VERSION" => "1.7.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,7 +63,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Bio::DB::Query::WebQuery" => 0,
+  "Bio::DB::Query::WebQuery" => "1.7.7",
   "Bio::DB::Taxonomy" => 0,
   "Bio::DB::WebDBSeqI" => 0,
   "Bio::Root::IO" => 0,

@@ -201,7 +201,10 @@ lib/Pcore/Util/Src/Filter/css.pm
 lib/Pcore/Util/Src/Filter/html.pm
 lib/Pcore/Util/Src/Filter/js.pm
 lib/Pcore/Util/Src/Filter/json.pm
+lib/Pcore/Util/Src/Filter/md.pm
 lib/Pcore/Util/Src/Filter/perl.pm
+lib/Pcore/Util/Src/Filter/vue.pm
+lib/Pcore/Util/Src/Filter/yaml.pm
 lib/Pcore/Util/Sys.pm
 lib/Pcore/Util/Sys/ForkTmpl.pm
 lib/Pcore/Util/Sys/Proc.pm
@@ -226,8 +229,8 @@ lib/Pcore/Util/URI/wss.pm
 lib/Pcore/Util/UUID.pm
 lib/Pcore/Util/UUID/Obj.pm
 lib/Pcore/WebSocket/Handle.pm
-lib/Pcore/WebSocket/pcore.pm
 lib/Pcore/WebSocket/raw.pm
+lib/Pcore/WebSocket/softvisio.pm
 lib/pod/csv.pod
 lib/pod/ext.pod
 lib/pod/ext/model.pod
@@ -241,6 +244,7 @@ script/pcore
 script/pcore-vim-rpc.pl
 script/src
 script/update-pcore-share.pl
+share/data/.eslintrc.yaml
 share/data/cacert.pem
 share/data/dhparam-2048.pem
 share/data/dhparam-4096.pem

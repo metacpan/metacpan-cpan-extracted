@@ -121,6 +121,7 @@ sub schema {
         GENERAL => {
             description => 'general settings',
             error_msg   => 'Section GENERAL missing',
+            'x-meta'    => 'metadata',
             members => {
                 logfile => {
                     value       => qr{/.*},

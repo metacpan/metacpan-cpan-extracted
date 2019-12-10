@@ -1,5 +1,5 @@
 package Statocles::Theme;
-our $VERSION = '0.095';
+our $VERSION = '0.096';
 # ABSTRACT: Templates, headers, footers, and navigation
 
 use Statocles::Base 'Class';
@@ -317,7 +317,7 @@ Statocles::Theme - Templates, headers, footers, and navigation
 
 =head1 VERSION
 
-version 0.095
+version 0.096
 
 =head1 SYNOPSIS
 

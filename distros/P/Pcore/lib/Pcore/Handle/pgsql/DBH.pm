@@ -10,8 +10,8 @@ use Pcore::Util::Data qw[from_json];
 has pool => ( required => 1 );    # InstanceOf ['Pcore::Handle::pgsql']
 
 has is_pgsql => ( 1, init_arg => undef );
-has state => ( $STATE_CONNECT, init_arg => undef );
-has id    => sub { P->uuid->v1mc_str }, init_arg => undef;
+has state    => ( $STATE_CONNECT, init_arg => undef );
+has id       => sub { P->uuid->v1mc_str }, init_arg => undef;
 
 has _on_connect_guard => ( init_arg => undef );    # $self
 has h                 => ( init_arg => undef );    # InstanceOf['Pcore::Handle']

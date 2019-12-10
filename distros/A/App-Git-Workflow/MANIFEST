@@ -15,6 +15,7 @@ bin/git-pom
 bin/git-popb
 bin/git-pushb
 bin/git-recent
+bin/git-reset-to
 bin/git-search
 bin/git-tag-grep
 bin/git-up-to-date
@@ -43,6 +44,7 @@ lib/App/Git/Workflow/Command/Pom.pm
 lib/App/Git/Workflow/Command/Popb.pm
 lib/App/Git/Workflow/Command/Pushb.pm
 lib/App/Git/Workflow/Command/Recent.pm
+lib/App/Git/Workflow/Command/ResetTo.pm
 lib/App/Git/Workflow/Command/Search.pm
 lib/App/Git/Workflow/Command/TagGrep.pm
 lib/App/Git/Workflow/Command/UpToDate.pm
@@ -87,7 +89,6 @@ t/data/git-files/file2
 t/data/git-files/file3
 t/data/git-files/git/FETCH_HEAD
 t/data/git-files/git/HEAD
-t/data/git-pushb/stack-0/brs
 t/data/git-pushb/stack-0/FETCH_HEAD
 t/data/git-pushb/stack-0/HEAD
 t/data/git-pushb/stack-1/FETCH_HEAD

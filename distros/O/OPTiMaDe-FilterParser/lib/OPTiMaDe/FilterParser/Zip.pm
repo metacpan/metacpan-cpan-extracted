@@ -56,4 +56,21 @@ sub to_filter {
                  join( ', ', @zip_list ) . ')';
 }
 
+sub to_SQL
+{
+    die "no SQL representation\n";
+}
+
+sub modify
+{
+    my $self = shift;
+    my $code = shift;
+
+    $self->{properties} = [ map { $_->modify( $code, @_ ) } @{$self->{properties}} ];
+    $self->{values} = [ map { [ OPTiMaDe::FilterParser::modify( $_->[0], $code, @_ ),
+                                OPTiMaDe::FilterParser::modify( $_->[1], $code, @_ ) ] }
+                            @{$self->{values}} ];
+    return $code->( $self, @_ );
+}
+
 1;

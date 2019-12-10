@@ -70,6 +70,7 @@ data from zabbix data include host,items, Triggers and warns and so on.
 =cut
 
 #### 初始化的Mojo::zabbix ，必须安装Mojo::zabbix模块,可用cpanm Mojo::zabbix 安装
+
 my %EVcache;
 my %HTcache;
 my %Vcache;
@@ -146,14 +147,21 @@ sub pHitems {
 
 sub pTriggers {
 
-    my $z = shift;
+    my ($z,$time )= @_;
     my $info;
-    my $reslut = getTriggers($z);
-    $info = "\n\nWarning info of Triggers \n\n";
+    my $result;
+    
+    if($time){ 
+      $result = getTriggers($z,$time);
+    }else{
+      $result = getTriggers($z);
 
-    for ( sort { $b <=> $a } keys %{$reslut} ) {
+     }
+ #   $info = "\n\nWarning info of Triggers \n\n";
 
-        $info .= "$reslut->{$_}";
+    for ( sort { $b <=> $a } keys %{$result} ) {
+
+        $info .= "$result->{$_}";
 
     }
     return $info;
@@ -370,7 +378,7 @@ sub getAllhostid {
 ####获取所有的有问题触发警告信息,返回一个包含时间、主机ip和描述的哈希引用
 
 sub getTriggers {
-    my $z        = shift;
+    my ($z,$time)        = @_;
     my $V=pVersion($z);
        $V=~s/(\d).*/$1/;
     my $getv3={
@@ -405,7 +413,13 @@ sub getTriggers {
         my $host=$r->{'result'};
         for (@$host) {
         my $hostid   = gethostID( $z, $_->{'host'});
-        my $etime = getTgtime( $z, $_->{'triggerid'}, $hostid );
+        my $etime;
+        if($time){
+         $etime = getTgtime( $z, $_->{'triggerid'}, $hostid ,$time);
+         }else {
+          $etime = getTgtime( $z, $_->{'triggerid'}, $hostid);
+
+         } 
         next unless $etime;
         my $time = strftime( "%Y-%m-%d %H:%M:%S", localtime($etime) );
         $hresult->{$etime} =
@@ -419,7 +433,12 @@ sub getTriggers {
          for (@$host) {
         my $hostid = $_->{'hosts'}->[0]->{'hostid'};
         my $host=getHost($z,$hostid);
-        my $etime = getTgtime( $z, $_->{'triggerid'}, $_->{'hosts'}->[0]->{'hostid'} );
+        my $etime;
+        if($time){
+           $etime = getTgtime( $z, $_->{'triggerid'}, $_->{'hosts'}->[0]->{'hostid'},$time );
+        } else {
+           $etime = getTgtime( $z, $_->{'triggerid'}, $_->{'hosts'}->[0]->{'hostid'} );
+        }
         next unless $etime;
         my $time = strftime( "%Y-%m-%d %H:%M:%S", localtime($etime) );
            $hresult->{$etime} =
@@ -431,37 +450,35 @@ sub getTriggers {
 
 ### 给定触发器，触发器处罚时间(限制24小时候内的).
 
+
 sub getTgtime {
 
-    my ( $z, $tgid, $host ) = @_;
+    my ( $z, $tgid, $host,$time ) = @_;
     my $hostid=$host;
-    #my $hostid   = gethostID( $z, $host );
-    my $ysterday = time() - 20 * 3600;
+    my $ysterday;
+    if($time) {
+      $ysterday = time() - $time * 60 ;
+     } else {
+      
+      $ysterday = time() - 20 * 3600;
+     
+      }   
     my $vkey     = $tgid . $hostid;
     unless ( exists $EVcache{$vkey} ) {
         my $r = $z->get(
             "event",
             {
                 filter => {
-
-                    # value => 1,
-                    # objectids => '19011' ,
-                    # triggerids  => '19011' ,
-                    #source  => 0,
                 },
 
                 objectids  => $tgid,
                 triggerids => $tgid,
                 time_from  => $ysterday,
                 hostids    => $hostid,
-
-                #select_acknowledges => "extend",
                 output => "extend",
-
                 sortfield => "eventid",
                 sortorder => "DESC",
 
-                #  expandData=>"host",
 
             },
         );

@@ -31,8 +31,8 @@ my $action_button = $mjs->selector('#ActionMemo', single => 1);
 $mjs->click($action_button);
 my $textarea = $mjs->selector('#MemoContentEdit', single => 1);
 is($textarea->get_value, 'This is a <strong>memo</strong>', 'Edit memo in textarea');
-my $richtext = $mjs->selector('#cke_MemoContentEdit', maybe => 1);
-is($richtext, undef, 'No richtext');
+my ($no_cke, $no_type) = $mjs->eval('Object.keys(CKEDITOR.instances).length');
+is($no_cke, 0, 'No richtext instance created for editing memo');
 
 # Set Richtext preference
 $user->SetPreferences($RT::System, {'MemoRichText' => 1});
@@ -42,5 +42,5 @@ $action_button = $mjs->selector('#ActionMemo', single => 1);
 $mjs->click($action_button);
 $textarea = $mjs->selector('#MemoContentEdit', single => 1);
 ok($textarea->is_hidden, 'No textarea');
-$richtext = $mjs->selector('#cke_MemoContentEdit', maybe => 1);
-ok($richtext->is_displayed, 'Edit memo in richtext');
+my ($cke_id, $type) = $mjs->eval('CKEDITOR.instances.MemoContentEdit.id');
+is($cke_id, 'cke_1', 'Richtext instance created for editing memo');

@@ -18,11 +18,11 @@ CGI::Untaint::Facebook - Validate a string is a valid Facebook URL or ID
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -164,10 +164,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-Facebook>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/CGI-Untaint-Facebook>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Untaint-Facebook>
@@ -183,9 +179,9 @@ L<http://search.cpan.org/dist/CGI-Untaint-Facebook>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2017 Nigel Horne.
+Copyright 2012-2019 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 
 =cut

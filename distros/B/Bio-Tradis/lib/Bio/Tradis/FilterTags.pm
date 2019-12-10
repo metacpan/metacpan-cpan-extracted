@@ -1,5 +1,5 @@
 package Bio::Tradis::FilterTags;
-$Bio::Tradis::FilterTags::VERSION = '1.4.3';
+$Bio::Tradis::FilterTags::VERSION = '1.4.5';
 # ABSTRACT: Filter tags in a fastq file
 
 
@@ -135,7 +135,7 @@ Bio::Tradis::FilterTags - Filter tags in a fastq file
 
 =head1 VERSION
 
-version 1.4.3
+version 1.4.5
 
 =head1 SYNOPSIS
 

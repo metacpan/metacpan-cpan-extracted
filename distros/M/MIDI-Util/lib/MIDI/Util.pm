@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.0401';
+our $VERSION = '0.0402';
 
 use strict;
 use warnings;
@@ -63,9 +63,9 @@ sub set_chan_patch {
     my ( $score, $channel, $patch ) = @_;
 
     $channel //= 0;
-    $patch   //= 0;
 
-    $score->patch_change( $channel, $patch );
+    $score->patch_change( $channel, $patch )
+        if defined $patch;
 
     $score->noop( 'c' . $channel );
 }
@@ -171,7 +171,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.0401
+version 0.0402
 
 =head1 SYNOPSIS
 
@@ -238,9 +238,9 @@ Named parameters and defaults:
 
 =head2 set_chan_patch
 
-  MIDI::Util::set_chan_patch($score);  # Use defaults
+  MIDI::Util::set_chan_patch( $score, $channel );  # Just set the channel
 
-  MIDI::Util::set_chan_patch( $score, $channel, $patch );  # Override defaults
+  MIDI::Util::set_chan_patch( $score, $channel, $patch );
 
 Set the MIDI channel and patch.
 
@@ -248,7 +248,7 @@ Positional parameters and defaults:
 
   score:   undef (required)
   channel: 0
-  patch:   0
+  patch:   undef
 
 =head2 dump
 

@@ -8,13 +8,6 @@ Makefile.PL
 README2.md
 dist.ini
 lib/Geo/What3Words.pm
-t/LWPCache/0eec93819aa9b397c15305a3a0a0222e
-t/LWPCache/3243964bb33504f892dd0cdc0f86b0c5
-t/LWPCache/8ce9715af7d5cf7879425e6f9f079b8b
-t/LWPCache/a1e6ac622622155549eaa150bde5d01c
-t/LWPCache/b4bdd4bd1abe8768d94a266dbf0362a5
-t/LWPCache/bf9e8c029320341e563e1635aa56e6ce
-t/LWPCache/c4a1915ea4681fdb15ffc3fe0bd39b21
 t/base.t
 t/critic.t
 t/perlcriticrc

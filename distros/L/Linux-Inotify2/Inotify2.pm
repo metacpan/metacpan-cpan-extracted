@@ -80,7 +80,7 @@ use common::sense;
 use Exporter qw(import);
 
 BEGIN {
-   our $VERSION = '2.1';
+   our $VERSION = '2.2';
    our @EXPORT = qw(
       IN_ACCESS IN_MODIFY IN_ATTRIB IN_CLOSE_WRITE
       IN_CLOSE_NOWRITE IN_OPEN IN_MOVED_FROM IN_MOVED_TO
@@ -130,7 +130,8 @@ sub new {
 
 Add a new watcher to the given notifier. The watcher will create events
 on the pathname C<$name> as given in C<$mask>, which can be any of the
-following constants (all exported by default) ORed together.
+following constants (all exported by default) ORed together. Constants
+unavailable on your system will evaluate to C<0>.
 
 "file" refers to any file system object in the watched object (always a
 directory), that is files, directories, symlinks, device nodes etc., while

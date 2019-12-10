@@ -176,6 +176,89 @@ use Pcore;
         }
     },
 
+    # vue
+    vue => sub ( $cdn, $native, $args ) {
+        my $ver = version->parse( $args->{ver} // v2.6.10 );
+
+        state $native_prefix = 'https://cdn.jsdelivr.net/npm/vue@';
+
+        if (wantarray) {
+            my @res;
+
+            my $devel = $args->{devel} ? $EMPTY : '.min';
+
+            push @res, $cdn->get_script_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/dist/vue${devel}.js" : $cdn->("/static/vue/$ver/vue${devel}.js") );
+
+            return @res;
+        }
+        else {
+            return $native ? "$native_prefix/" . substr( $ver, 1 ) . '/dist' : $cdn->("/static/vue/$ver");
+        }
+    },
+
+    # vue-router
+    'vue-router' => sub ( $cdn, $native, $args ) {
+        my $ver = version->parse( $args->{ver} // v3.1.3 );
+
+        state $native_prefix = 'https://cdn.jsdelivr.net/npm/vue-router@';
+
+        if (wantarray) {
+            my @res;
+
+            my $devel = $args->{devel} ? $EMPTY : '.min';
+
+            push @res, $cdn->get_script_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/dist/vue-router${devel}.js" : $cdn->("/static/vue-router/$ver/vue-router${devel}.js") );
+
+            return @res;
+        }
+        else {
+            return $native ? "$native_prefix/" . substr( $ver, 1 ) . '/dist' : $cdn->("/static/vue-router/$ver");
+        }
+    },
+
+    # vuetify
+    vuetify => sub ( $cdn, $native, $args ) {
+        my $ver = version->parse( $args->{ver} // v2.1.12 );
+
+        state $native_prefix = 'https://cdn.jsdelivr.net/npm/vuetify@';
+
+        if (wantarray) {
+            my @res;
+
+            my $devel = $args->{devel} ? $EMPTY : '.min';
+
+            push @res, $cdn->get_css_tag('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900');
+
+            push @res, $cdn->get_css_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/dist/vuetify${devel}.css" : $cdn->("/static/vuetify/$ver/vuetify${devel}.css") );
+
+            push @res, $cdn->get_script_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/dist/vuetify${devel}.js" : $cdn->("/static/vuetify/$ver/vuetify${devel}.js") );
+
+            return @res;
+        }
+        else {
+            return $native ? "$native_prefix/" . substr( $ver, 1 ) . '/dist' : $cdn->("/static/vuetify/$ver");
+        }
+    },
+
+    # vuex
+    vuex => sub ( $cdn, $native, $args ) {
+        my $ver = version->parse( $args->{ver} // v3.1.2 );
+
+        state $native_prefix = 'https://cdn.jsdelivr.net/npm/vuex@';
+
+        if (wantarray) {
+            my @res;
+
+            my $devel = $args->{devel} ? $EMPTY : '.min';
+
+            push @res, $cdn->get_script_tag( $native ? "$native_prefix/@{[ substr $ver, 1 ]}/dist/vuex${devel}.js" : $cdn->("/static/vuex/$ver/vuex${devel}.js") );
+
+            return @res;
+        }
+        else {
+            return $native ? "$native_prefix/" . substr( $ver, 1 ) . '/dist' : $cdn->("/static/vuex/$ver");
+        }
+    },
 }
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -183,7 +266,7 @@ use Pcore;
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (36)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (57)                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

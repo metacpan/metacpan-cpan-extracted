@@ -2,6 +2,7 @@ package Pcore::API::Git;
 
 use Pcore -class, -res, -const, -export;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
+use Pcore::Util::Sys::Proc qw[:PROC_REDIRECT];
 
 has root        => ( required => 1 );
 has max_threads => 50;
@@ -77,9 +78,8 @@ sub git_run ( $self, $cmd, $root = undef ) {
 
     my $proc = P->sys->run_proc(
         [ is_plain_arrayref $cmd ? ( 'git', ( defined $root ? ( '-C', $root ) : () ), $cmd->@* ) : 'git ' . ( defined $root ? qq[-C "$root" ] : $EMPTY ) . $cmd ],
-        use_fh => 1,
-        stdout => 1,
-        stderr => 1,
+        stdout => $PROC_REDIRECT_FH,
+        stderr => $PROC_REDIRECT_FH,
     );
 
     $proc->capture;

@@ -67,7 +67,7 @@ FP::Failure - failure values
                               },
                               $v->message(1)),
              join("\n", "failure: 666 at lib/FP/Failure.pm line ...",
-                        "    (eval) at t/pod_snippets.t line ...",
+                        "    (eval) at lib/FP/Repl/WithRepl.pm line ...",
                         "  because:",
                         "  failure: 'not good'");
 
@@ -134,6 +134,10 @@ Perl booleans, and a little bit faster).
 Instead of using `FP::Failure::Failure` as base class, create a
 failure protocol (FP::Abstract::Failure) instead?
 
+=head1 SEE ALSO
+
+Implements: L<FP::Abstract::Pure>, L<FP::Struct::Show>
+
 =head1 NOTE
 
 This is alpha software! Read the status section in the package README
@@ -174,6 +178,7 @@ package FP::Failure::Failure {
          ],
         "maybe_trace", # [[caller(0)],...]
         ],
+        'FP::Abstract::Pure',
         'FP::Struct::Show';
 
     use overload
@@ -268,6 +273,7 @@ sub fails ($;$) {
 
 package FP::Failure::Abstract::Message {
     use FP::Struct [],
+        'FP::Abstract::Pure',
         'FP::Struct::Show';
     _END_
 }

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::ListAllMyBuckets;
-$Net::Amazon::S3::Request::ListAllMyBuckets::VERSION = '0.86';
+$Net::Amazon::S3::Request::ListAllMyBuckets::VERSION = '0.87';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request::Service';
@@ -10,11 +10,15 @@ with 'Net::Amazon::S3::Request::Role::HTTP::Method::GET';
 
 __PACKAGE__->meta->make_immutable;
 
+# AWS routes request without specific region to us-east-1
+#
+# https://docs.aws.amazon.com/general/latest/gr/rande.html
+
 sub http_request {
     my $self    = shift;
     return $self->_build_http_request(
         use_virtual_host => 0,
-        authorization_method => 'Net::Amazon::S3::Signature::V2',
+        region => 'us-east-1',
     );
 }
 
@@ -32,7 +36,7 @@ Net::Amazon::S3::Request::ListAllMyBuckets - An internal class to list all bucke
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 SYNOPSIS
 

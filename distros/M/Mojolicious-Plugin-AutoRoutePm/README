@@ -1,17 +1,22 @@
 NAME
+
     Mojolicious::Plugin::AutoRoutePm - Mojolicious plugin to create routes
     by *.pm modules which are a controller
 
 VERSION
-    version 0.12
+
+    version 0.13
 
 METHODS
-  register
+
+ register
+
       plugin->register($app);
 
     Register plugin in Mojolicious application.
 
 USAGE
+
     This module recursive passes through template_base_dir to find perl
     module (*.pm) that are a subclass of Mojolicious::Controller and some
     paths;
@@ -20,9 +25,14 @@ USAGE
 
       x/y/z
       x/y/z/index
-      x/y/z/index/other/path
+      x/y/z/index/*query
 
     all redirect to action route inside module.
+
+    If Z is default_index it adds also
+
+      x/y
+      x/y/*query
 
     The last structure is useful for routing seach. But be careful to
     correct relative urls of other items in html page.
@@ -34,12 +44,15 @@ USAGE
       <base href="<%= $base_url %>" />
 
 SEE ALSO
-    Mojolicious, Mojolicious::Guides, <http://mojolicio.us>.
+
+    Mojolicious, Mojolicious::Guides, http://mojolicio.us.
 
 AUTHOR
+
     Emiliano Bruni <info@ebruni.it>
 
 COPYRIGHT AND LICENSE
+
     This software is copyright (c) 2019 by Emiliano Bruni.
 
     This is free software; you can redistribute it and/or modify it under

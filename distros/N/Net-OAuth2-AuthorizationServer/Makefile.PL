@@ -18,7 +18,6 @@ WriteMakefile(
     'Time::HiRes'     => 0,
     'Carp'            => 0,
     'CryptX'          => '0.021',
-    'Mojo::JWT'       => '0.04',
     'Try::Tiny'       => '0.22',
     'Crypt::JWT'      => '0.023',
   },

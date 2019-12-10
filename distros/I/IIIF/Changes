@@ -1,5 +1,9 @@
 Revision history for Perl extension IIIF
 
+0.07 2019-12-09T12:21:26Z
+    - add canonicalLinkHeader (#16)
+    - support maxWidth and maxHeight (to some degree, see #6)
+
 0.06 2019-10-24T10:28:48Z
     - Extend documentation
     - Propagate features in JSON response

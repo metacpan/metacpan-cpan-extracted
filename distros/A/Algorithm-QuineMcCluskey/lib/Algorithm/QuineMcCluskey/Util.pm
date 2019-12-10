@@ -36,7 +36,7 @@ our @EXPORT_OK = (
 	@{ $EXPORT_TAGS{all} }
 );
 
-our $VERSION = 1.00;
+our $VERSION = 1.01;
 
 =head1 DESCRIPTION
 
@@ -256,7 +256,16 @@ sub covered_least
 	#
 	my %bterms;
 	$bterms{$_} += 1 for (map {@$_} values %{$primes});
+
+	#
+	# Find out which keys in the primes hash
+	# cover each term (that is, have the term
+	# in each primes' arrays).
+	#
 	my @t = keys %bterms;
+	my @pkeys = keys %$primes;
+	my $count = 1 + scalar @pkeys;
+	my $term = "";
 
 	#print STDERR "bit terms hash:\n";
 	#for my $j (@t)
@@ -264,15 +273,6 @@ sub covered_least
 	#	print STDERR "\t$j => " . $bterms{$j} . "\n";
 	#}
 	#print STDERR "\n";
-
-	#
-	# Find out which keys in the primes hash
-	# cover each term (that is, have the term
-	# in each primes' arrays).
-	#
-	my @pkeys = keys %$primes;
-	my $count = 1 + scalar @pkeys;
-	my $term = "";
 
 	#
 	# Now find a term with the lowest number of covers.

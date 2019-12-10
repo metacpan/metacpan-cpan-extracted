@@ -4,6 +4,9 @@ custom_suffix:
     - text/x-script.perl
     - perl
     - perl-script-auto
+    md:
+    - text/markdown
+    - markdown
     perl:
     - text/x-script.perl
     - perl
@@ -12,6 +15,9 @@ custom_suffix:
     - text/x-script.perl
     - perl
     - perl-script
+    vue:
+    - text/vue
+    - vue
 filename:
     cpanfile:
     - text/x-script.perl
@@ -2038,12 +2044,14 @@ suffix:
     - application/x-xz
     yaml:
     - text/yaml
+    - yaml
     yang:
     - application/yang
     yin:
     - application/yin+xml
     yml:
     - text/yaml
+    - yaml
     z1:
     - application/x-zmachine
     z2:

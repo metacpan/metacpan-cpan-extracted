@@ -11,6 +11,9 @@ bin/yancy
 cpanfile
 dist.ini
 eg/README.md
+eg/auth-demo/README.md
+eg/auth-demo/cpanfile
+eg/auth-demo/myapp.pl
 eg/doc-site/.gitignore
 eg/doc-site/README.md
 eg/doc-site/cpanfile
@@ -77,6 +80,7 @@ lib/Yancy/Command/backend/copy.pm
 lib/Yancy/Controller/Yancy.pm
 lib/Yancy/Controller/Yancy/API.pm
 lib/Yancy/Controller/Yancy/MultiTenant.pm
+lib/Yancy/Help/Auth.pod
 lib/Yancy/Help/Config.pod
 lib/Yancy/Help/Standalone.pod
 lib/Yancy/Help/Upgrading.pod

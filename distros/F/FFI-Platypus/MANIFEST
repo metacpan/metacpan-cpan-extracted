@@ -172,7 +172,6 @@ lib/FFI/Probe/Runner/Result.pm
 lib/FFI/Temp.pm
 lib/FFI/typemap
 maint/cip-before-install
-maint/cip-test
 maint/cip-test-cpan
 maint/cip-test-examples
 maint/generate-abw

@@ -16968,6 +16968,38 @@ sub setuid_cmd
    } else { return $stdout }
 }
 
+sub print
+{
+
+   my @topcaller=caller;
+   print "main::print() CALLER=",
+      (join ' ',@topcaller),"\n" if $Net::FullAuto::FA_Core::debug;
+   print $Net::FullAuto::FA_Core::LOG "main::print() CALLER=",
+      (join ' ',@topcaller),
+      "\n" if $Net::FullAuto::FA_Core::log &&
+      -1<index $Net::FullAuto::FA_Core::LOG,'*';
+   my $self=shift @_;
+   return $self->{_cmd_handle}->print(@_);
+
+}
+
+sub prompt
+{
+
+   my @topcaller=caller;
+   print "main::prompt() CALLER=",
+      (join ' ',@topcaller),"\n" if $Net::FullAuto::FA_Core::debug;
+   print $Net::FullAuto::FA_Core::LOG "main::prompt() CALLER=",
+      (join ' ',@topcaller),
+      "\n" if $Net::FullAuto::FA_Core::log &&
+      -1<index $Net::FullAuto::FA_Core::LOG,'*';
+   my $self=shift @_;
+   if (-1<$#_) {
+      return $self->{_cmd_handle}->prompt(@_);
+   } return substr($self->{_cmd_handle}->prompt(),1,-1);
+
+}
+
 sub cmd
 {
 
@@ -17165,15 +17197,6 @@ sub tmp
       if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    return File_Transfer::tmp(@_);
-}
-
-sub print
-{
-my @topcaller=caller;
-print "PARENTPRINTCALLER=",(join ' ',@topcaller),"\n" if $Net::FullAuto::FA_Core::debug;
-print $Net::FullAuto::FA_Core::LOG "PARENTPRINTCALLER=",(join ' ',@topcaller),
-      "\nand ARGS=@_\n" if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-   return Net::Telnet::print(@_);
 }
 
 sub scrub_passwd_file
@@ -17935,6 +17958,38 @@ sub cmd_raw
          if $display;
    }
    return $alloutput;
+
+}
+
+sub print
+{
+
+   my @topcaller=caller;
+   print "File_Transfer::print() CALLER=",
+      (join ' ',@topcaller),"\n" if $Net::FullAuto::FA_Core::debug;
+   print $Net::FullAuto::FA_Core::LOG "File_Transfer::print() CALLER=",
+      (join ' ',@topcaller),
+      "\n" if $Net::FullAuto::FA_Core::log &&
+      -1<index $Net::FullAuto::FA_Core::LOG,'*';
+   my $self=shift @_;
+   return $self->{_cmd_handle}->print(@_);
+
+}
+
+sub prompt
+{
+
+   my @topcaller=caller;
+   print "File_Transfer::prompt() CALLER=",
+      (join ' ',@topcaller),"\n" if $Net::FullAuto::FA_Core::debug;
+   print $Net::FullAuto::FA_Core::LOG "File_Transfer::prompt() CALLER=",
+      (join ' ',@topcaller),
+      "\n" if $Net::FullAuto::FA_Core::log &&
+      -1<index $Net::FullAuto::FA_Core::LOG,'*';
+   my $self=shift @_;
+   if (-1<$#_) {
+      return $self->{_cmd_handle}->prompt(@_);
+   } return substr($self->{_cmd_handle}->prompt(),1,-1);
 
 }
 
@@ -26629,7 +26684,9 @@ sub prompt
       "\n" if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    my $self=shift @_;
-   return $self->{_cmd_handle}->prompt(@_);
+   if (-1<$#_) {
+      return $self->{_cmd_handle}->prompt(@_);
+   } return substr($self->{_cmd_handle}->prompt(),1,-1);
 
 }
 

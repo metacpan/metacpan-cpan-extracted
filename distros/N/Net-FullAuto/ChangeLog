@@ -20,6 +20,13 @@
 #######################################################################
 
 
+2019-12-08  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000483 released
+
+        * Added print() & prompt() to other classes.
+
+
 2019-11-28  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000482 released

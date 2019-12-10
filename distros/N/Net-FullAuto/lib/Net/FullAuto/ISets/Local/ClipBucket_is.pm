@@ -1405,6 +1405,7 @@ END
    my $make_nginx=$sudo.'./configure --sbin-path=/usr/local/nginx/nginx '.
                   '--conf-path=/usr/local/nginx/nginx.conf '.
                   '--pid-path=/usr/local/nginx/nginx.pid '.
+                  '--with-http_v2_module '.
                   "--with-http_ssl_module --with-pcre=objs/lib/$pcre ".
                   "--with-zlib=objs/lib/zlib-$zlib_ver";
    ($stdout,$stderr)=$handle->cmd($make_nginx,'__display__');

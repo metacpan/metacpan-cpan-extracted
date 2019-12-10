@@ -2,9 +2,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 6;
+use Test::More tests => 1 + 7;
 use Test::Deep;
 use Test::Warnings;
+
+use Shared::Examples::Net::Amazon::S3 (
+    qw[ s3_api_with_signature_2 ],
+);
 
 use Shared::Examples::Net::Amazon::S3::API (
     qw[ expect_api_bucket_objects_list ],
@@ -15,6 +19,7 @@ use Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::List (
     qw[ list_bucket_objects_v1_with_filter_truncated ],
     qw[ list_bucket_objects_v1_with_delimiter ],
     qw[ list_bucket_objects_v1_with_prefix_and_delimiter ],
+    qw[ list_bucket_objects_v1_google_cloud_storage ],
 );
 
 use Shared::Examples::Net::Amazon::S3::Error (
@@ -153,3 +158,34 @@ expect_api_bucket_objects_list 'error no such bucket' => (
     expect_s3_errstr        => 'No such bucket error message',
 );
 
+expect_api_bucket_objects_list 'list objects (version 1) on Google Cloud Storage' => (
+    with_bucket             => 'gcs-bucket',
+    with_response_data      => list_bucket_objects_v1_google_cloud_storage,
+    with_s3                 => s3_api_with_signature_2(host => 'storage.googleapis.com'),
+    expect_request          => { GET => 'https://gcs-bucket.storage.googleapis.com/' },
+    expect_data             => {
+        bucket => 'gcs-bucket',
+        prefix => '',
+        marker => '',
+        max_keys => '',
+        next_marker => 'next/marker/is/foo',
+        is_truncated => bool (1),
+        keys => [ {
+            key => 'path/to/value',
+            last_modified => '2017-04-21T22:06:03.413Z',
+            etag => '1f52bad2879ca96dacd7a40f33001230',
+            size => 742213,
+            storage_class => '',
+            owner_id => '',
+            owner_displayname => '',
+        }, {
+            key => 'path/to/value2',
+            last_modified => '2018-04-21T22:06:03.413Z',
+            etag => '1f52bad2889ca96dacd7a40f33001230',
+            size => 742214,
+            storage_class => '',
+            owner_id => '',
+            owner_displayname => '',
+        } ],
+    },
+);

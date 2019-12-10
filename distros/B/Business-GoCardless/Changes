@@ -1,5 +1,8 @@
 Revision history for Business-GoCardless
 
+0.34     2019-12-03
+        - Add fx to Payout and Payment objects (GH #14)
+
 0.33     2019-04-02
         - Fix support more legacy params in call to redirect flows
 

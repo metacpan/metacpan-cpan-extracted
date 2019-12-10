@@ -3,7 +3,7 @@ package Net::Curl::Promiser;
 use strict;
 use warnings;
 
-our $VERSION = 0.01;
+our $VERSION = '0.04';
 
 =encoding utf-8
 
@@ -20,9 +20,23 @@ L<Net::Curl::Promiser> itself is a base class; you’ll need to provide
 an interface to whatever event loop you use. See L</SUBCLASS INTERFACE>
 below.
 
-This distribution provides L<Net::Curl::Promiser::Select> and
-L<Net::Curl::Promiser::AnyEvent> as both demonstrations and easily portable
-implementations. See the distribution’s F</examples> directory for another.
+This distribution provides the following as both demonstrations and
+portable implementations:
+
+=over
+
+=item * L<Net::Curl::Promiser::Select>
+
+=item * L<Net::Curl::Promiser::IOAsync> (for L<IO::Async>)
+
+=item * L<Net::Curl::Promiser::Mojo> (for L<Mojolicious>)
+
+=item * L<Net::Curl::Promiser::AnyEvent> (for L<AnyEvent>)
+
+=back
+
+(See the distribution’s F</examples> directory for one based on Linux’s
+C<epoll>.)
 
 =head1 PROMISE IMPLEMENTATION
 
@@ -92,7 +106,7 @@ method of the same name, but the return is given as a Promise object.
 
 That promise resolves with the passed-in $EASY object.
 It rejects with either the error given to C<fail_handle()> or the
-error that L<Net::Curl::Multi> object’s C<info_read()> returns;
+error that L<Net::Curl::Multi> object’s C<info_read()> returns.
 
 B<IMPORTANT:> As with libcurl itself, HTTP-level failures
 (e.g., 4xx and 5xx responses) are B<NOT> considered failures at this level.
@@ -126,6 +140,8 @@ sub fail_handle {
     return $self;
 }
 
+#----------------------------------------------------------------------
+
 =head2 $num = I<OBJ>->get_timeout()
 
 Returns the underlying L<Net::Curl::Multi> object’s C<timeout()>
@@ -137,6 +153,8 @@ less than 0.
 This may not suit your needs; if you wish/need, you can handle timeouts
 via the L<CURLMOPT_TIMERFUNCTION|Net::Curl::Multi/CURLMOPT_TIMERFUNCTION>
 callback instead.
+
+This should only be called (if it’s called at all) from event loop logic.
 
 =cut
 
@@ -156,11 +174,13 @@ Tell the underlying L<Net::Curl::Multi> object which socket events have
 happened.
 
 If, in fact, no events have happened, then this calls
-C<C<socket_action(CURL_SOCKET_TIMEOUT)> on the
+C<socket_action(CURL_SOCKET_TIMEOUT)> on the
 L<Net::Curl::Multi> object (similar to C<time_out()>).
 
 Finally, this reaps whatever pending HTTP responses may be ready and
 resolves or rejects the corresponding Promise objects.
+
+This should only be called from event loop logic.
 
 Returns I<OBJ>.
 
@@ -173,6 +193,7 @@ sub process {
 
     if (%$fd_action_hr) {
         for my $fd (keys %$fd_action_hr) {
+            local $self->{'_removed_fd'};
             $self->{'multi'}->socket_action( $fd, $fd_action_hr->{$fd} );
         }
     }
@@ -198,6 +219,8 @@ that operation returns.
 
 Since C<process()> can also do the work of this function, a call to this
 function is just an optimization.
+
+This should only be called from event loop logic.
 
 =cut
 
@@ -288,6 +311,10 @@ sub _socket_fn {
     }
     elsif ($action == Net::Curl::Multi::CURL_POLL_REMOVE) {
         $self->_STOP_POLL($fd);
+        $self->{'_removed_fd'} = $fd;
+    }
+    else {
+        warn "$self: Unrecognized action $action on FD $fd\n";
     }
 
     return 0;
@@ -360,6 +387,10 @@ See the distribution’s F</examples> directory.
 
 If you use L<AnyEvent>, then L<AnyEvent::XSPromises> with
 L<AnyEvent::YACurl> may be a nicer fit for you.
+
+=head1 REPOSITORY
+
+L<https://github.com/FGasper/p5-Net-Curl-Promiser>
 
 =head1 LICENSE & COPYRIGHT
 

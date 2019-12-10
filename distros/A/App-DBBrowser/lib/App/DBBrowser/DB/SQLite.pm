@@ -83,9 +83,9 @@ sub get_databases {
     if ( $choice eq $change ) {
         my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
         my $info = 'Curr: ' . join( ', ', @$dirs );
-        my $name = 'New : ';
+        my $name = 'Dirs: ';
         my $new_dirs = $tu->choose_directories(
-            { current_selection_label => $name, info => "Where to search for databases?\n" . $info }
+            { cs_label => $name, info => "Where to search for databases?\n" . $info }
         );
         if ( defined $new_dirs && @$new_dirs ) {
             $dirs = $new_dirs;
@@ -98,14 +98,15 @@ sub get_databases {
         for my $dir ( @$dirs ) {
             File::Find::find( {
                 wanted => sub {
-                    my $file = $_;
-                    return if ! -f $file;
+                    my $file_fs = $_;
+                    return if ! -f $file_fs;
+                    my $file = decode( 'locale_fs', $file_fs );
                     print "$file\n";
                     if ( ! eval {
-                        open my $fh, '<:raw', $file or die "$file: $!";
+                        open my $fh, '<:raw', $file_fs or die "$file: $!";
                         defined( read $fh, my $string, 13 ) or die "$file: $!";
                         close $fh;
-                        push @$databases, decode( 'locale_fs', $file ) if $string eq 'SQLite format';
+                        push @$databases, $file if $string eq 'SQLite format';
                         1 }
                     ) {
                         utf8::decode( $@ );
@@ -126,14 +127,15 @@ sub get_databases {
         for my $dir ( @$dirs ) {
             File::Find::find( {
                 wanted => sub {
-                    my $file = $_;
-                    return if ! -f $file;
+                    my $file_fs = $_;
+                    return if ! -f $file_fs;
+                    my $file = decode( 'locale_fs', $file_fs );
                     print "$file\n";
                     eval {
-                        open my $fh, '<:raw', $file or die "$file: $!";
+                        open my $fh, '<:raw', $file_fs or die "$file: $!";
                         defined( read $fh, my $string, 13 ) or die "$file: $!";
                         close $fh;
-                        push @$databases, decode( 'locale_fs', $file ) if $string eq 'SQLite format';
+                        push @$databases, $file if $string eq 'SQLite format';
                     };
                 },
                 no_chdir => 1,

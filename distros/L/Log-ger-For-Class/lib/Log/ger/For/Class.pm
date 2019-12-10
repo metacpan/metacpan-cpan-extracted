@@ -1,7 +1,9 @@
 package Log::ger::For::Class;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-09'; # DATE
+our $DIST = 'Log-ger-For-Class'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -123,7 +125,7 @@ Log::ger::For::Class - Add logging to class
 
 =head1 VERSION
 
-This document describes version 0.003 of Log::ger::For::Class (from Perl distribution Log-ger-For-Class), released on 2019-01-06.
+This document describes version 0.004 of Log::ger::For::Class (from Perl distribution Log-ger-For-Class), released on 2019-12-09.
 
 =head1 SYNOPSIS
 

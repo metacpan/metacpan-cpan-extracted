@@ -1,9 +1,56 @@
 ==================================================
-Changes from 2018-11-26 00:00:00 +0000 to present.
+Changes from 2018-12-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.016 at 2019-11-26 20:02:11 +0000
+version 0.020 at 2019-12-05 20:35:40 +0000
+------------------------------------------
+
+  Change: 6f57c1936f10ad25d39ce87838a96a6ca6e8cb8a
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-12-05 14:33:45 +0000
+
+    - fixed pod for findFiles - modified nsort to sort without regard to
+    locale 
+
+------------------------------------------
+version 0.019 at 2019-12-02 21:00:33 +0000
+------------------------------------------
+
+  Change: 21635abd849d7ee47cd8f1ec6fd49e91599b3a39
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-12-02 15:00:33 +0000
+
+    fixed bug in File::findFiles method 
+
+------------------------------------------
+version 0.018 at 2019-12-02 20:52:21 +0000
+------------------------------------------
+
+  Change: fe1c534c65990924402aa1277d91eb3da2c7a346
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-12-02 14:52:21 +0000
+
+    added File::touch method 
+
+  Change: e605c6d9c68ed09b6dc2ebc0e0859562a12e9eb0
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-12-02 13:45:11 +0000
+
+    updated find perldoc 
+
+------------------------------------------
+version 0.017 at 2019-12-02 19:42:40 +0000
+------------------------------------------
+
+  Change: 5ce8ee03c041921bdeeab759744b6153d7019553
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-12-02 13:42:40 +0000
+
+    added maxDepth option to find* methods 
+
+------------------------------------------
+version 0.016 at 2019-11-26 20:01:26 +0000
 ------------------------------------------
 
   Change: b5ffab2061337f9129ef0880f3e9c21ff01eddfc

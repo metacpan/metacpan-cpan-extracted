@@ -3,7 +3,7 @@ use warnings;
 package MooseX::Daemonize::Pid;
 # ABSTRACT: PID management for MooseX::Daemonize
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Moose;
 use Moose::Util::TypeConstraints qw(coerce from via);
@@ -25,6 +25,7 @@ has 'pid' => (
 
 sub is_running { kill(0, (shift)->pid) ? 1 : 0 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -39,7 +40,7 @@ MooseX::Daemonize::Pid - PID management for MooseX::Daemonize
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 DESCRIPTION
 

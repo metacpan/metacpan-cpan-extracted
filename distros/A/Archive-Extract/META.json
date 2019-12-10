@@ -50,6 +50,6 @@
          "url" : "https://github.com/jib/archive-extract"
       }
    },
-   "version" : "0.82",
+   "version" : "0.86",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

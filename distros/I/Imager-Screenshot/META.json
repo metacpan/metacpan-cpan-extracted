@@ -1,0 +1,57 @@
+{
+   "abstract" : "Screen/Window capture to Imager images",
+   "author" : [
+      "Tony Cook <tonyc@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Imager-Screenshot",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Imager" : "0.88",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Imager" : "0.88",
+            "Imager::Probe" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Imager" : "0.88",
+            "Imager::Probe" : "0",
+            "XSLoader" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager-Screenshot"
+      },
+      "homepage" : "http://imager.perl.org/",
+      "repository" : {
+         "url" : "git://git.imager.perl.org/imager-screenshot.git"
+      }
+   },
+   "version" : "0.014",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

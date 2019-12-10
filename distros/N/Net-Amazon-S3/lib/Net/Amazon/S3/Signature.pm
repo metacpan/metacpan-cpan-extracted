@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Signature;
 # ABSTRACT: S3 Signature implementation base class
-$Net::Amazon::S3::Signature::VERSION = '0.86';
+$Net::Amazon::S3::Signature::VERSION = '0.87';
 use Moose;
 
 has http_request => (
@@ -34,7 +34,7 @@ Net::Amazon::S3::Signature - S3 Signature implementation base class
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 METHODS
 

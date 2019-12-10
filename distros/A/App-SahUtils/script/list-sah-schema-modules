@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.465'; # VERSION
+our $DATE = '2019-12-09'; # DATE
+our $VERSION = '0.471'; # VERSION
 
 #use 5.010001;
 use strict;
@@ -27,6 +27,7 @@ my $res = gen_read_table_func(
             require $mod_pm;
             my $sch = ${"$mod\::schema"};
             $row->{base} = $sch->[0];
+            $row->{summary} = $sch->[1]{summary};
             push @rows, $row;
         }
         {data => \@rows};
@@ -66,7 +67,7 @@ list-sah-schema-modules - List Sah coerce rule modules
 
 =head1 VERSION
 
-This document describes version 0.465 of list-sah-schema-modules (from Perl distribution App-SahUtils), released on 2019-07-25.
+This document describes version 0.471 of list-sah-schema-modules (from Perl distribution App-SahUtils), released on 2019-12-09.
 
 =head1 SYNOPSIS
 
@@ -144,21 +145,87 @@ as list/array (field value, field value, ...).
 
 =back
 
-=head2 Filtering for enable_by_default options
+=head2 Filtering for dist options
 
 =over
 
-=item B<--enable-by-default>
+=item B<--dist-contains>=I<s>
 
-Only return records where the 'enable_by_default' field equals specified value.
+Only return records where the 'dist' field contains specified text.
 
-=item B<--enable-by-default-is>
+=item B<--dist-in-json>=I<s>
 
-Only return records where the 'enable_by_default' field equals specified value.
+Only return records where the 'dist' field is in the specified values (JSON-encoded).
 
-=item B<--enable-by-default-isnt>
+See C<--dist-in>.
 
-Only return records where the 'enable_by_default' field does not equal specified value.
+=item B<--dist-in>=I<s@>
+
+Only return records where the 'dist' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--dist-is>=I<s>
+
+Only return records where the 'dist' field equals specified value.
+
+=item B<--dist-isnt>=I<s>
+
+Only return records where the 'dist' field does not equal specified value.
+
+=item B<--dist-max>=I<s>
+
+Only return records where the 'dist' field is less than or equal to specified value.
+
+=item B<--dist-min>=I<s>
+
+Only return records where the 'dist' field is greater than or equal to specified value.
+
+=item B<--dist-not-contains>=I<s>
+
+Only return records where the 'dist' field does not contain specified text.
+
+=item B<--dist-not-in-json>=I<s>
+
+Only return records where the 'dist' field is not in the specified values (JSON-encoded).
+
+See C<--dist-not-in>.
+
+=item B<--dist-not-in>=I<s@>
+
+Only return records where the 'dist' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--dist-xmax>=I<s>
+
+Only return records where the 'dist' field is less than specified value.
+
+=item B<--dist-xmin>=I<s>
+
+Only return records where the 'dist' field is greater than specified value.
+
+=item B<--dist>=I<s>
+
+Only return records where the 'dist' field equals specified value.
+
+=back
+
+=head2 Filtering for might_fail options
+
+=over
+
+=item B<--might-fail>
+
+Only return records where the 'might_fail' field equals specified value.
+
+=item B<--might-fail-is>
+
+Only return records where the 'might_fail' field equals specified value.
+
+=item B<--might-fail-isnt>
+
+Only return records where the 'might_fail' field does not equal specified value.
 
 =back
 
@@ -283,6 +350,72 @@ Only return records where the 'rule' field is greater than specified value.
 =item B<--rule>=I<s>
 
 Only return records where the 'rule' field equals specified value.
+
+=back
+
+=head2 Filtering for summary options
+
+=over
+
+=item B<--summary-contains>=I<s>
+
+Only return records where the 'summary' field contains specified text.
+
+=item B<--summary-in-json>=I<s>
+
+Only return records where the 'summary' field is in the specified values (JSON-encoded).
+
+See C<--summary-in>.
+
+=item B<--summary-in>=I<s@>
+
+Only return records where the 'summary' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-is>=I<s>
+
+Only return records where the 'summary' field equals specified value.
+
+=item B<--summary-isnt>=I<s>
+
+Only return records where the 'summary' field does not equal specified value.
+
+=item B<--summary-max>=I<s>
+
+Only return records where the 'summary' field is less than or equal to specified value.
+
+=item B<--summary-min>=I<s>
+
+Only return records where the 'summary' field is greater than or equal to specified value.
+
+=item B<--summary-not-contains>=I<s>
+
+Only return records where the 'summary' field does not contain specified text.
+
+=item B<--summary-not-in-json>=I<s>
+
+Only return records where the 'summary' field is not in the specified values (JSON-encoded).
+
+See C<--summary-not-in>.
+
+=item B<--summary-not-in>=I<s@>
+
+Only return records where the 'summary' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-xmax>=I<s>
+
+Only return records where the 'summary' field is less than specified value.
+
+=item B<--summary-xmin>=I<s>
+
+Only return records where the 'summary' field is greater than specified value.
+
+=item B<--summary>=I<s>
+
+Only return records where the 'summary' field equals specified value.
 
 =back
 
@@ -512,11 +645,22 @@ Finally, you can filter a section by environment variable using the filter C<env
 List of available configuration parameters:
 
  detail (see --detail)
- enable_by_default (see --enable-by-default)
- enable_by_default.is (see --enable-by-default-is)
- enable_by_default.isnt (see --enable-by-default-isnt)
+ dist (see --dist)
+ dist.contains (see --dist-contains)
+ dist.in (see --dist-in)
+ dist.is (see --dist-is)
+ dist.isnt (see --dist-isnt)
+ dist.max (see --dist-max)
+ dist.min (see --dist-min)
+ dist.not_contains (see --dist-not-contains)
+ dist.not_in (see --dist-not-in)
+ dist.xmax (see --dist-xmax)
+ dist.xmin (see --dist-xmin)
  fields (see --field)
  format (see --format)
+ might_fail (see --might-fail)
+ might_fail.is (see --might-fail-is)
+ might_fail.isnt (see --might-fail-isnt)
  naked_res (see --naked-res)
  prio (see --prio)
  prio.in (see --prio-in)
@@ -543,6 +687,17 @@ List of available configuration parameters:
  rule.xmax (see --rule-xmax)
  rule.xmin (see --rule-xmin)
  sort (see --sort)
+ summary (see --summary)
+ summary.contains (see --summary-contains)
+ summary.in (see --summary-in)
+ summary.is (see --summary-is)
+ summary.isnt (see --summary-isnt)
+ summary.max (see --summary-max)
+ summary.min (see --summary-min)
+ summary.not_contains (see --summary-not-contains)
+ summary.not_in (see --summary-not-in)
+ summary.xmax (see --summary-xmax)
+ summary.xmin (see --summary-xmin)
  v (see --v-arg)
  v.contains (see --v-contains)
  v.in (see --v-in)

@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'JSON::Validator' => '3.15',
+  'JSON::Validator' => '3.16',
   'Mojolicious' => '8.00'
 }
 ,
@@ -32,7 +32,10 @@ my %WriteMakefileArgs = (
       },
     },
     'x_contributors' => [
-  'Jan Henning Thorsen'
+  'Henrik Andersen',
+  'Ilya Rassadin',
+  'Jan Henning Thorsen',
+  'Joel Berger'
 ]
 ,
   },

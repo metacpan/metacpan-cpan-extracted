@@ -1,454 +1,390 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
 
-use Data::RecordStore;
-
+use Carp;
 use Data::Dumper;
+use Errno qw(ENOENT);
 use File::Temp qw/ :mktemp tempdir /;
 use Test::More;
+use Time::HiRes qw(usleep);
 
-use Carp;
-use Errno qw(ENOENT);
+use lib 't/lib';
+use forker;
 
-$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+#$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
-BEGIN {
-    use_ok( "Data::RecordStore" ) || BAIL_OUT( "Unable to load Data::RecordStore" );
-}
+use Data::RecordStore::Silo;
 
-my $is_windows = $^O eq 'MSWin32';
+my $is_root = `whoami` =~ /root/;
 
 # -----------------------------------------------------
 #               init
 # -----------------------------------------------------
 
-test_suite();
-
+test_init();
+test_use();
+test_async();
 done_testing;
 
 exit( 0 );
 
+sub failnice {
+    my( $subr, $errm, $msg ) = @_;
+    eval {
+        $subr->();
+        fail( $msg );
+    };
+    like( $@, qr/$errm/, "$msg error" );
+    undef $@;
+}
 
-sub test_suite {
-    test_open_silo();
-    test_put_record();
-    test_broken_file();
-} #test_suite
-
-sub test_open_silo {
+sub test_init {
     my $dir = tempdir( CLEANUP => 1 );
+    my $size = 2 ** 10;
+    my $silo = Data::RecordStore::Silo->open_silo( $dir, 'LZ*', $size );
+    ok( $silo, "Got a silo" );
+    my $new_silo = Data::RecordStore::Silo->open_silo( $dir, 'LZ*', $size );
+    ok( $new_silo, "able to renit already inited silo with same params" );
 
-    local $Data::RecordStore::Silo::MAX_SIZE = 80;
-    my $silo;
+    failnice( sub { Data::RecordStore::Silo->open_silo( $dir, 'LZ*' ) },
+              "no record size given to open silo",
+              "was able to reinit silo withthout specifying record size" );
+    failnice( sub { Data::RecordStore::Silo->open_silo( $dir, undef, 100 ) },
+              "must supply template to open silo",
+              "was able to reinit silo withthout specifying template" );
 
-    my $silo_dir = "$dir/silo";
-
-    eval { $silo = Data::RecordStore::Silo->open_silo( 'A*', $silo_dir ); };
-    like( $@, qr/annot open a zero/, 'tried to open zero store' );
-    undef $@;
-    ok( !( -e "$silo_dir/0" ), 'nothing created silo file created' );
-
-    {
-        local( $SIG{ __WARN__ } ) = $SIG{ __DIE__ };
-
-        eval {$silo = Data::RecordStore::Silo->open_silo( 'A*', $silo_dir, 199 ); };
-        like( $@, qr/above the set max size/, 'got warning for opening a silo with a single record larger than the max size' );
-        undef $@;
-        ok( !( -e "$silo_dir/0" ), 'still nothing created silo file created' );
-    }
-
-    my $toobigdir = "$dir/toobig";
-    eval {$silo = Data::RecordStore::Silo->open_silo( 'A*', "$toobigdir", 199 ); };
-    ok( ! $@, "no die for opening a store with a record larger than the max silo size (just a warning)" );
-    ok( -e "$toobigdir/0", 'initial silo file created for toobig' );
-    is( $silo->[1], 199, "199 record size" );
-    is( $silo->[2], 199, "199 file size" );
-    is( $silo->[3], 1,  "1 max records per silo file" );
-
-
-    my $cantdir = "$dir/cant";
-
-    open my $out, ">", $cantdir;
-    print $out "TOUCH\n";
-    close $out;
-    eval {$silo = Data::RecordStore::Silo->open_silo( 'A*', "$cantdir", 30 ); };
-    like( $@, qr/not a directory/, 'dies if directory is not a directory' );
-    undef $@;
-
-    unlink $cantdir;
-    mkdir $cantdir, 0444;
-
-    if( ! -w $cantdir ) {
-        # this test is useless if performed by root which would always be allowed
-        # to write
-        eval {$silo = Data::RecordStore::Silo->open_silo( 'A*', "$cantdir", 30 ); };
-        like( $@, qr/Unable to open/, 'directory exists not writeable' );
-        undef $@
-    }
-
-    $silo = Data::RecordStore::Silo->open_silo( 'A*', $silo_dir, 20 );
-    is( $silo->[1], 20, "20 record size" );
-    is( $silo->[2], 80, "80 file size" );
-    is( $silo->[3], 4,  "4 max records per silo file" );
-
-    $silo = Data::RecordStore::Silo->open_silo( 'AAA', $silo_dir );
-    is( $silo->[1], 3, "record size 3" );
-
-    eval {$silo = Data::RecordStore::Silo->open_silo( 'AAA', $silo_dir, 30 ); };
-    like( $@, qr/record size \d+ does not agree/, 'template and size given dont agree' );
-    undef $@;
-
-    $silo = Data::RecordStore::Silo->open_silo( 'A*', $silo_dir, 30 );
-    is( $silo->[1], 30, "30 record size" );
-    is( $silo->[2], 60, "60 file size" );
-    is( $silo->[3], 2,  "2 max records per silo file" );
-
-    $silo = Data::RecordStore::Silo->open_silo( 'A*', $silo_dir, 41 );
-    is( $silo->[1], 41, "41 record size" );
-    is( $silo->[2], 41, "41 file size" );
-    is( $silo->[3], 1,  "1 max records per silo file" );
-
-    $silo = Data::RecordStore::Silo->open_silo( 'A*', $silo_dir, 20 );
-    $silo->_ensure_entry_count( 9 );
-
-    my( @files ) = $silo->_files;
-
-    is( $silo->[0], "$dir/silo", "directory" );
-    is_deeply( \@files, [ 0, 1, 2 ], 'three silo files' );
-    is( $silo->entry_count, 9, "9 entries" );
-    is( -s "$dir/silo/0", 80, "first file 80 bytes" );
-    is( -s "$dir/silo/1", 80, "second file 80 bytes" );
-    is( -s "$dir/silo/2", 20, "last file 20 bytes" );
-
-    $silo->empty;
-    ok( -e "$dir/silo/0", "first file still exists" );
-    is( -s "$dir/silo/0", 0, "first file zero bytes after empty" );
-    ok( ! (-e "$dir/silo/1"), "second file gone" );
-    ok( ! (-e "$dir/silo/2"), "third file gone" );
-
-    $silo->unlink_store;
-    ok( ! (-e "$dir/silo"), "unlinked completely" );
+    failnice( sub { Data::RecordStore::Silo->open_silo() },
+              "must supply directory to open silo",
+              "was able to reinit silo withthout specifying dir" );
 
     $dir = tempdir( CLEANUP => 1 );
-    eval {
-        $silo = Data::RecordStore::Silo->open_silo( 'A', $dir, 20 );
-        fail( "created silo that had a size and template mismatch" );
-    };
-    like( $@, qr/given record size \d+ does not agree with template size/, "correct error message for template and size mismatch" );
-    eval {
-        $silo = Data::RecordStore::Silo->open_silo( 'L', $dir, 4 );
-        pass( "created silo with a match between template size and given size" );
-    };
-    my $ndir = tempdir( CLEANUP => 1 );
-    diag( " $ndir  ".(-d $ndir)." )" );
 
-    $silo = Data::RecordStore::Silo->open_silo( 'L', $ndir, 4 );
+    failnice( sub { Data::RecordStore::Silo->open_silo( $dir, 'LLL', 800 ) },
+              'do not match',
+              'template size and given size do not match' );
     
-
-    $silo->push( [ 100 ] );
-    is_deeply( $silo->get_record( 1 ), [ 100 ], "able to read" );
-
-    unless( $is_windows ) {
-        chmod 0444, "$ndir/0";
-
-        eval {
-            $silo->put_record( 1, [ 200 ] );
-            fail( "able to ensure size with unwriteable data file" );
-        };
-        like( $@, qr/unable to open/, 'error for unwriteable data file' );
-        eval {
-            $silo->push( [ 200 ] );
-            fail( "able to ensure size with unwriteable data file" );
-        };
-        like( $@, qr/unable to open/, 'error for unwriteable data file' );
-
-
-        chmod 0444, "$ndir/0";
-
-        is_deeply( $silo->get_record( 1 ), [ 100 ], "able to read" );
-
-        chmod 0333, "$ndir/0";
-        eval {
-            my $rec = $silo->get_record( 1 );
-            fail( "able to get record from unreadable silo file" );
-        };
-        is( ENOENT, 2, "could not write to readable directory" );
-    }
     
+    $silo = Data::RecordStore::Silo->open_silo( $dir, 'LLL' );
+    is( $silo->template, 'LLL', 'given template matches' );
 
-} #test_open_silo
+    $silo = Data::RecordStore::Silo->reopen_silo( $dir );
+    is( $silo->template, 'LLL', 'given template matches for reopened silo' );
+    
+    is( $silo->max_file_size, 2_000_000_000, "silo is default max size" );
+    is( $silo->record_size, 12, "silo has 32 bytes per record" );
+    is( $silo->records_per_subsilo, 166_666_666, "166,666,666 records per file" );
 
-sub test_put_record {
-    # actually open a silo
+    if( ! $is_root ) {
+        $dir = tempdir( CLEANUP => 1 );
+        chmod 0444, $dir;
+        my $cantdir = "$dir/cant";
+        failnice( sub { Data::RecordStore::Silo->open_silo( $cantdir, 'LL' ) },
+                  "Permission denied",
+                  'was able to init a silo in an unwritable directory' );
+     }
+    $Data::RecordStore::Silo::DEFAULT_MAX_FILE_SIZE = 2_000_000_000;
+} #test_init
 
+sub test_use {
     my $dir = tempdir( CLEANUP => 1 );
-    my $silo_dir = "$dir/silo";
+    my $size = 2 ** 10;
+    my $silo = Data::RecordStore::Silo->open_silo( $dir, 'Z*', $size, $size * 10, );
+    is( $silo->size, 0, 'nothing in the silo, no size' );
+    is( $silo->entry_count, 0, 'nothing in the silo, no entries' );
+    is_deeply( [$silo->subsilos], [0], 'one subsilo upon creation' );
 
-    local $Data::RecordStore::Silo::MAX_SIZE = 80;
+    is( $silo->pop, undef, "nothing to pop" );
+    is( $silo->peek, undef, "nothing to peek" );
 
-    my $silo = Data::RecordStore::Silo->open_silo( 'A*', $silo_dir, 20 );
+    is( $silo->size, 0, 'nothing in the silo, no size still' );
+    is( $silo->entry_count, 0, 'nothing in the silo, no entries still' );
+    is_deeply( [$silo->subsilos], [0], 'one subsilo upon creation still' );
+    
+    $silo->ensure_entry_count( 1 );
+    is( $silo->size, $size, 'silo now with one record. correct size' );
+    is( $silo->entry_count, 1, 'silo now with one record. correct count' );
+    failnice( sub { $silo->get_record(0) },
+              'index 0 out of bounds',
+              "got a record zero" );
+    failnice( sub { $silo->get_record(2) },
+              'index 2 out of bound',
+              "got a record two" );
+    is_deeply( $silo->get_record( 1 ), [''], 'empty record' );
+    is_deeply( $silo->peek, [''], "empty peek" );
 
-    # make sure 0 file was created
-    ok( -e "$silo_dir/0", 'initial silo file created' );
-
-    eval { $silo->put_record( 0, "x" x 2 ); };
-    like( $@, qr/out of bounds/, 'id too low' );
-    undef $@;
-
-    eval { $silo->put_record( -1, "x" x 2 ); };
-    like( $@, qr/out of bounds/, 'id way too low' );
-    undef $@;
-
-    eval { $silo->put_record( 2, "x" x 2 ); };
-    like( $@, qr/out of bounds/, 'id too high' );
-
-    is( $silo->entry_count, 0, "no entries yet" );
-
-    eval { $silo->put_record( 1, "x" x 2 ); };
-    like( $@, qr/out of bounds/, 'id too high' );
-
-    is( $silo->entry_count, 0, "still no entries yet" );
-
-    my $id = $silo->next_id;
-    is( $silo->entry_count, 1, "first entry" );
-    is( $id, 1, "first entry id" );
-
-    # what happens if you try to write a record that is too big
-    eval { $silo->put_record( 1, "x" x 22 ); };
-    like( $@, qr/record size 22 too large/, 'record size 22 too large' );
-
-    eval { $silo->put_record( 2, "x" x 2 ); };
-    like( $@, qr/out of bounds/, 'id too high' );
-
-    is_deeply( $silo->get_record( 1 ), [''], "no data in first entry yet" );
-
-    eval { $silo->get_record( 2 ); };
-    like( $@, qr/out of bounds/, 'id too high' );
-
-
-    eval { $silo->get_record( 0 ); };
-    like( $@, qr/out of bounds/, 'id too low' );
-
-    # test how many silo files are generated
-    my( @files ) = $silo->_files;
-    is_deeply( \@files, [ 0 ], 'one silo file' );
-
-    is( $silo->[3], 4, 'four max records per silo file' );
-    is( $silo->[2], 80, '80 sized silo file' );
-
-    $silo->empty;
-
-    local $Data::RecordStore::Silo::MAX_SIZE = 27; #3 records
-
-    $silo = Data::RecordStore::Silo->open_silo( 'IAI', $silo_dir );
-    is( $silo->[1], 9, "record size 9 bytes");
-    $id = $silo->next_id;
-    is( $id, 1, "first id" );
-    is( $silo->entry_count, 1, "ec 1" );
-    $silo->put_record( 1, [ 43, "Q", 22 ] );
-    is( -s "$silo_dir/0", 9, "file size now 9 bytes" );
-    my $data = $silo->get_record( 1 );
-    is_deeply( $data, [  43, "Q", 22 ], 'correct data stored for first record' );
-    is( $silo->entry_count, 1, "ec still 1" );
-
-    my $pop_data = $silo->pop;
-    is_deeply( $pop_data, $data, 'popped data is the first record' );
-    is( $silo->entry_count, 0, "ec back to 0" );
-    $id = $silo->next_id;
-    is( $id, 1, "back to first id" );
     $silo->pop;
-    is( $silo->entry_count, 0, "ec back to 0" );
+    is( $silo->size, 0, 'nothing in the silo, no size after pop' );
+    is( $silo->entry_count, 0, 'nothing in the silo, no entries after pop' );
+    is_deeply( [$silo->subsilos], [0], 'one subsilo upon creation after pop' );
+    $silo->ensure_entry_count( 1 );
 
-    my $next_id = $silo->push( [ 1, "A", 1001 ] );
-    is( $next_id, 1, "pushed id" );
-    $next_id = $silo->push( [ 2, "b", 1001 ] );
-    is( $next_id, 2, "pushed id" );
-    $next_id = $silo->push( [ 3, "c", 1001 ] );
-    is( $next_id, 3, "pushed id" );
-    $next_id = $silo->push( [ 4, "D", 1001 ] );
-    is( $next_id, 4, "pushed id" );
+    
+    is( $silo->next_id, 2, "next id" );
 
-    is( $silo->entry_count, 4, "now at 4 things" );
-    is( -s "$silo_dir/0", 27, "first file now 27" );
-    is( -s "$silo_dir/1", 9, "second file now 9" );
+    is( $silo->size, 2*$size, 'silo now with two. correct size' );
+    is( $silo->entry_count, 2, 'silo now with two. correct count' );
 
-    is_deeply( $silo->last_entry, [ 4, "D", 1001 ], "LAST ENTRY AGREES" );
-    is( $silo->entry_count, 4, "now at 4 things" );
-    is( -s "$silo_dir/0", 27, "first file now 27" );
-    is( -s "$silo_dir/1", 9, "second file now 9" );
+    $silo->ensure_entry_count( 12 );
+    is( $silo->size, 12*$size, 'silo now with 12. correct size' );
+    is( $silo->entry_count, 12, 'silo now with 12. correct count' );
+    is_deeply( [$silo->subsilos], [0,1], 'one subsilo upon creation' );
 
-    $data = $silo->pop;
-    is_deeply( $silo->last_entry, [ 3, "c", 1001 ], "LAST ENTRY AGREES" );
-    ok( !(-e "$silo_dir/1"), "second file removed" );
-    is_deeply( $data, [ 4, "D", 1001 ], "pop 4" );
+    is_deeply( $silo->pop, [''], 'empty popped record' );
+    is( $silo->size, 11*$size, 'silo now with 11. correct size after pop one' );
+    is( $silo->entry_count, 11, 'silo now with 11. correct count after pop one' );
+    is_deeply( [$silo->subsilos], [0, 1], 'same subsilos after pop one' );
+    
+    is_deeply( $silo->pop, [''], 'empty popped record' );
+    is( $silo->size, 10*$size, 'silo back to 10. correct size ' );
+    is( $silo->entry_count, 10, 'silo back to 10. correct count' );
+    is_deeply( [$silo->subsilos], [0], 'one less subsilo after pop two' );
 
-    $data = $silo->pop;
-    is_deeply( $silo->last_entry, [ 2, "b", 1001 ], "LAST ENTRY AGREES" );
-    is( -s "$silo_dir/0", 18, "first file smaller" );
-    is_deeply( $data, [ 3, "c", 1001 ], "pop 3" );
+    $silo->ensure_entry_count( 40 );
+    is( $silo->size, 40*$size, 'silo to 40. correct size ' );
+    is( $silo->entry_count, 40, 'silo to 40. correct count' );
+    is_deeply( [$silo->subsilos], [0,1,2,3], 'four subsilos after 40 entries' );
 
-    $data = $silo->pop;
-    is_deeply( $silo->last_entry, [ 1, "A", 1001 ], "LAST ENTRY AGREES" );
-    is( -s "$silo_dir/0", 9, "first file smaller" );
-    is_deeply( $data, [ 2, "b", 1001 ], "pop 2" );
+    $silo->ensure_entry_count( 30 );
+    is( $silo->size, 40*$size, 'silo still 40. correct size ' );
+    is( $silo->entry_count, 40, 'silo still 40. correct count' );
+    is_deeply( [$silo->subsilos], [0,1,2,3], 'four subsilos still 40 entries' );
 
-    $data = $silo->pop;
-    is( $silo->last_entry, undef, "No last entry" );
-    is( $silo->entry_count, 0, "no entries after pop" );
-    is( -s "$silo_dir/0", 0, "first file emptied" );
-    ok( ! (-e "$silo_dir/1"), "no second file" );
-    ok( ! (-e "$silo_dir/2"), "no third file" );
-    is_deeply( $data, [ 1, "A", 1001 ], "pop 1" );
+    ok( $silo->put_record( 10, ["BLBLBLBLBLBL"] ), "put a record" );
+    is( $silo->size, 40*$size, 'silo still 40. correct size after put' );
+    is( $silo->entry_count, 40, 'silo still 40. correct count after put' );
+    is_deeply( [$silo->subsilos], [0,1,2,3], 'four subsilos still 40 entries after put' );
 
-    # 3 records, 2 files
-    $silo->push( [ 1, "A", 1001 ] ); #0
-    is( $silo->entry_count, 1, "push 1" );
-    $silo->push( [ 22, "b", 10003 ] ); #1
-    is( $silo->entry_count, 2, "push 2" );
-    $silo->push( [ 333, "C", 10003 ] ); #2
-    is( $silo->entry_count, 3, "push 3" );
-    $silo->push( [ 4444, "d", 10003 ] ); #3
-    is( $silo->entry_count, 4, "push 4" );
-    $silo->push( [ 55555, "C", 10003 ] ); #4
-    is( $silo->entry_count, 5, "push 5" );
+    is_deeply( $silo->get_record( 10 ), [ "BLBLBLBLBLBL" ], "record was created" );
+    is_deeply( $silo->get_record( 9 ), [''], "empty 9" );
+    is_deeply( $silo->get_record( 11 ), [''], "empty 11" );
 
-    eval { $silo->_copy_record( 0, -1 ); };
-    like( $@, qr/to_index -1 out of bounds/, 'to id too low' );
-    undef $@;
+    is( $silo->push( "UUUUUUUU" ), 41, "pushed with id 41" );
+    is( $silo->size, 41*$size, 'silo pushed to 41. correct size after put' );
+    is( $silo->entry_count, 41, 'silo pushed to 41. correct count' );
+    is_deeply( [$silo->subsilos], [0,1,2,3,4], 'five subsilos for 41 entries' );
+    
+    is_deeply( $silo->peek, [ 'UUUUUUUU' ], 'last pushed record' );
+    is_deeply( $silo->pop, [ 'UUUUUUUU' ], 'last pushed record' );
 
-    eval { $silo->_copy_record( 0, 5 ); };
-    like( $@, qr/to_index 5 out of bounds/, 'to id too high' );
-    undef $@;
-
-    eval { $silo->_copy_record( -1, 0 ); };
-    like( $@, qr/from_index -1 out of bounds/, 'from id too low' );
-    undef $@;
-
-    eval { $silo->_copy_record( 5, 0 ); };
-    like( $@, qr/from_index 5 out of bounds/, 'from id too high' );
-    undef $@;
-
-
-    $silo->_copy_record( 3, 2 ); # idx used, not id like below
-    is_deeply( $silo->get_record( 4 ), [ 4444, "d", 10003 ], "record after copy" );
-    is_deeply( $silo->get_record( 3 ), [ 4444, "d", 10003 ], "copied record" );
-  {
-    local $Data::RecordStore::Silo::MAX_SIZE = 80;
-    $dir = tempdir( CLEANUP => 1 );
-    $silo = Data::RecordStore::Silo->open_silo( 'Z*', $dir, 80 );
-    $silo->push( [ 'x' x 79 ] );
-    ok( -e "$dir/0", "0 directory exists" );
-    ok( ! -e "$dir/1", "1 directory doesnt exist" );
-    open my $out, ">", "$dir/1";
-    print $out '';
-    close $out;
-    ok( -e "$dir/1", "touched 1 directory exists" );
+    is( $silo->size, 40*$size, 'silo still 40. correct size after pop' );
+    is( $silo->entry_count, 40, 'silo still 40. correct count after pop' );
+    is_deeply( [$silo->subsilos], [0,1,2,3], 'four subsilos still 40 entries after pop' );
 
     eval {
-      $silo->push( [ 'x' x 79 ] );
-      fail( "tried to create new data file but it existed" );
+        $silo->put_record( 41, "WRONG" );
+        fail( 'was able to put record beyond end of bounds' );
     };
-    like( $@, qr/already exists/, "could not create new data file where one existed" );
-
-    chmod 0644, "$dir/1";
-    unlink "$dir/1";
-    ok( ! -e "$dir/1", "touched 1 directory removed" );
-    $silo->push( [ 'y' x 79 ] );
-    ok( -e "$dir/1", "1 directory exists" );
-    chmod 0644, "$dir/1";
-
-    open $out, ">", "$dir/2";
-    print $out '';
-    close $out;
-  }
+    like( $@, qr/out of bounds/, 'error message for put past entries' );
+    
     eval {
-        $silo->_ensure_entry_count( 10 );
-        fail( "tried to ensure entry count when an existing data file was there" );
+        $silo->put_record( 0, "WRONG" );
+        fail( 'was able to put record with index of 0' );
     };
-    like( $@, qr/already exists/, "could not ensure entry count where a data file already existed" );    
+    like( $@, qr/out of bounds/, 'error message for zero index' );
     
-    unless( $is_windows ) {
-        unlink "$dir/1";
-        chmod 544, $dir;
-        eval {
-            $silo->push( [ 'x' x 79 ] );
-            fail( "tried to create new data file in unwriteable directory" );
-        };
-        like( $@, qr/can.t open/, "could not create new data in unwriteable directory" );
-        ok( ! -e "$dir/1", "touched 1 directory gone" );
-          
-        eval {
-            $silo->_ensure_entry_count( 10 );
-            fail( "tried to ensure entry count when there is an unwriteable directory" );
-        };
-    
-        like( $@, qr/can.t open/, "could not ensure entry count in unwriteable directory" );
-        ok( ! -e "$dir/1", "touched 1 directory gone" );
+    eval {
+        $silo->put_record( -1, "WRONG" );
+        fail( 'was able to put record with index < 0' );
+    };
+    like( $@, qr/out of bounds/, 'error message for wrong index' );
 
-        chmod 755, $dir;
+    eval {
+        $silo->put_record( 5, "WRONG".('x'x$size) );
+        fail( 'was able to put record too big' );
+    };
+    like( $@, qr/too large/, 'error message for too big data' );
 
-        unlink "$dir/0";
-        ok( ! -e "$dir/0", " directory 0 gone" );
+    unless( $is_root ) {
+        $silo = Data::RecordStore::Silo->open_silo( $dir, 'Z*', $size, $size * 10 );
+        chmod 0000, "$dir";
         eval {
-            $silo->get_record(10);
-            fail( "able to get a record with the data files blown away" );
+            $silo->subsilos;
+            fail( "Was able to access subsilos despite dark directory" );
         };
-        like( $@, qr/can.t open/, "could not get record when data files were blown away" );
+        like( $@, qr/can't open/, 'error msg for dark dir' );
+        chmod 0777, "$dir";
+        is_deeply( [$silo->subsilos], [ 0, 1,2,3], "still four subsilos after reopen" );
+
+        chmod 0444, "$dir/3";
+        eval {
+            $silo->peek;
+        };
+        like( $@, qr/Unable to open|Permission denied/, 'error msg for readonly file' );
+
+        chmod 0777, "$dir/3";
+
+        $silo->put_record(40,'LAST');
+        is_deeply( $silo->peek, ['LAST'], 'last is last' );
+        
+        $silo->put_record(1,'FIRST');
+        is_deeply( $silo->get_record(1), ['FIRST'], 'first is first' );
+
+        $silo->put_record(1,'FIR');
+        is_deeply( $silo->get_record(1), ['FIR'], 'fir is first' );
+        
+        $silo->put_record(1,'FIRST');
+        is_deeply( $silo->get_record(1), ['FIRST'], 'first is again first' );
+        
+        $silo->put_record(1,'');
+        is_deeply( $silo->get_record(1), [''], 'empty is first' );
+        
+        $silo->put_record(1,'F');
+        is_deeply( $silo->get_record(1), ['F'], 'f is first' );
+
+        
+        $silo->empty_silo;
+        is_deeply( [$silo->peek], [undef], 'nothing to peek at after empty silo' );
+        is_deeply( [$silo->subsilos], [ 0], "empty only has first subsilo " );
+
+        open my $fh, '>', "$dir/3";
+        print $fh '';
+        close $fh;
+        eval {
+            $silo->ensure_entry_count( 40 );
+            fail( 'able to ensure count with wacky extra subsilo hanging out' );
+        };
+        open $fh, '>', "$dir/2";
+        print $fh '';
+        close $fh;
+        eval {
+            $silo->ensure_entry_count( 40 );
+            fail( 'able to ensure count with wacky extra subsilos hanging out' );
+        };
+
+        $silo->empty_silo;
+        chmod 0444, "$dir/0";
+        eval {
+            $silo->ensure_entry_count( 3 );
+            fail( 'able to ensure count with unwriteable fi9rst' );
+        };
+        
     }
+
+    $silo->unlink_silo;
+
+    eval {
+        is_deeply( [$silo->subsilos], [], "no subsilos after unlink silo" );
+        fail( 'was able to call subsilos on this destroyed silo' );
+    };
+
+
+    $dir = tempdir( CLEANUP => 1 );
+    $size = 2 ** 10;
+    $silo = Data::RecordStore::Silo->open_silo( $dir, 'LIZ*', $size, $size * 10 );
+    my $id = $silo->next_id;
+    is_deeply( $silo->get_record(1), [0,0,''], 'starting with nothing' );
+    $silo->put_record( $id, [12,8,"FOOFOO"] );
+    is_deeply( $silo->get_record(1), [12,8,'FOOFOO'], 'starting with 12, FOOFOO' );
+    $silo->put_record( $id, [42], 'L' );
+    is_deeply( $silo->get_record(1), [42,8,'FOOFOO'], 'starting with FOOFOO but adjusted 12 --> 42 ' );
+    is_deeply( $silo->get_record(1,'L'), [42], 'just the 42 ' );
+
+    $silo->put_record( $id, [333], 'I', 4 );
+    is_deeply( $silo->get_record(1), [42,333,'FOOFOO'], 'starting with FOOFOO but adjusted 8 --> 333 ' );
+    is_deeply( $silo->get_record(1, 'L', 0 ), [42], 'picking out 333 ' );
+    is_deeply( $silo->get_record(1, 'I', 4 ), [333], 'picking out  333 ' );
+
+    $dir = tempdir( CLEANUP => 1 );
+    $size = 2 ** 10;
+    $silo = Data::RecordStore::Silo->open_silo( $dir, 'Z*', $size );
+    $id = $silo->push( "BARFY" );
+    is_deeply( $silo->get_record($id), ['BARFY'], 'got record after single item on' );
+    $silo->put_record( $id, "BARFYYY", "Z*" );
+    is_deeply( $silo->get_record($id), ['BARFYYY'], 'got record after single item on with put record' );
+    $silo->put_record( $id, ["BARFYYYZ"], "Z*" );
+    is_deeply( $silo->get_record($id), ['BARFYYYZ'], 'got record after array item plus template on with put record' );
+
+    is_deeply( $silo->get_record($id,"Z*"), [''], 'star template doesnt work with get_record. must use size ' );
+    is_deeply( $silo->get_record($id,4), ['BARF'], 'use size rather than template for get_record ' );
+
+    $dir = tempdir( CLEANUP => 1 );
+    $silo = Data::RecordStore::Silo->open_silo( $dir, 'LIL' );
+    $silo->push( [234,4,6654] );
+    is_deeply( $silo->get_record( 1, 'LI' ), [234,4], 'get front part' );
+    is_deeply( $silo->get_record( 1, 'I', 4 ), [4], 'get second' );
+
+    
+    $Data::RecordStore::Silo::DEFAULT_MAX_FILE_SIZE = 2_000_000_000;
+
+    # test copy numbers
+    $dir = tempdir( CLEANUP => 1 );
+    $silo = Data::RecordStore::Silo->open_silo( $dir, 'LL' );
+    $silo->push( [ 3, 56 ] );
+    $id = $silo->next_id;
+    $silo->copy_record( 1, 2 );
+    is_deeply( $silo->get_record(2), [3,56], 'copied numbers' );
     
     
-} #test_put_record
+    # test copy
+    $dir = tempdir( CLEANUP => 1 );
+    $silo = Data::RecordStore::Silo->open_silo( $dir, 'Z*', 2 ** 12 );
+    $silo->push( "SOMETHING EXCELLENT" );
+    failnice( sub { $silo->copy_record( 1, 0 ) },
+              'out of bounds',
+              'copy to zero dest' );
+    failnice( sub { $silo->copy_record( 0, 1 ) },
+              'out of bounds',
+              'copy from zero source' );
+    failnice( sub { $silo->copy_record( 3, 1 ) },
+              'out of bounds',
+              'copy from too big source' );
+    failnice( sub { $silo->copy_record( 1, 3 ) },
+              'out of bounds',
+              'copy to too big dest' );
+    $id = $silo->next_id;
+    is_deeply( $silo->get_record(2), [''], 'nothing for new next id' );
+    $silo->copy_record( 1, 2 );
+    is_deeply( $silo->get_record(2), ['SOMETHING EXCELLENT'], 'copy worked for new id' );
+    is_deeply( $silo->get_record(1), ['SOMETHING EXCELLENT'], 'original still there' );
+} #test_use
 
-sub test_broken_file {
-
+sub test_async {
+    
     my $dir = tempdir( CLEANUP => 1 );
-    my $silo_dir = "$dir/silo";
+    my $forker = forker->new( $dir );
+    my $size = 2 ** 10;
+    my $silo = Data::RecordStore::Silo->open_silo( $dir, 'Z*', $size );
+    
+    $forker->init();
 
-    local $Data::RecordStore::Silo::MAX_SIZE = 80;
+    my $A = fork;    
+    unless( $A ) {
+        $silo = Data::RecordStore::Silo->open_silo( $dir, 'Z*', $size );
+        $forker->expect( '1' );
+        usleep( 5000 );
+        my $id = $silo->next_id;
+        $forker->put( "ID A $id" );
+        exit;
+    }
 
-    my $silo = Data::RecordStore::Silo->open_silo( 'A*', $silo_dir, 20 );
+    my $B = fork;    
+    unless( $B ) {
+        $silo = Data::RecordStore::Silo->open_silo( $dir, 'Z*', $size );
+        $forker->spush( '1' );
+        $forker->expect( "ID A 1" );
+        my $id = $silo->push( "SOUPS" );
+        $forker->put( "ID B 2" );
+        exit;
+    }
 
-    # make sure 0 file was created
-    ok( -e "$silo_dir/0", 'initial silo file created' );
+    my $C = fork;    
+    unless( $C ) {
+        $silo = Data::RecordStore::Silo->open_silo( $dir, 'Z*', $size );
+        $forker->spush( '1' );
+        $forker->spush( "ID A 1" );
+        $forker->expect( "ID B 2" );
+        my $val = $silo->get_record( 2 );
+        $forker->put( "VAL $val->[0]" );
+        exit;
+    }
+    $forker->put( '1' );
+    
+    waitpid $A, 0;
+    waitpid $B, 0;
+    waitpid $C, 0;
 
-    $silo->_ensure_entry_count( 4 );
-    is( $silo->entry_count, 4, "store has four entries" );
-    my $next_id = $silo->next_id;
-    is( $next_id, 5, "next id is 5" );
-    is( $silo->entry_count, 5, "store has 5 entries" );
+    is_deeply( $forker->get, [ '1', 'ID A 1' , 'ID B 2', 'VAL SOUPS' ], "correct order for things" );
 
-    my( @files ) = $silo->_files;
-    is_deeply( \@files, [ 0, 1 ], 'two silo files' );
-
-    # break the last file here
-    truncate "$silo->[0]/1", 19; #remove the last byte from this record 'breaking' it
-    is( $silo->entry_count, 4, "entry count back down to 4" );
-    eval { $silo->get_record( 5 ) };
-    like( $@, qr/out of bounds/, "garbled record not getable" );
-    undef $@;
-    $next_id = $silo->next_id;
-    is( $next_id, 5, "next id is again 5" );
-    is( $silo->entry_count, 5, "store back up to 5 entries" );
-
-
-    # remove the last file and mess with the first one.
-    unlink "$silo->[0]/1";
-    truncate "$silo->[0]/0", 71;
-
-    eval { $silo->get_record( 5 ) };
-    like( $@, qr/out of bounds/, "truncated not getable" );
-    undef $@;
-
-    eval { $silo->get_record( 4 ) };
-    like( $@, qr/out of bounds/, "partially truncated not getable" );
-    undef $@;
-
-    is( $silo->entry_count, 3, "entry count back down to 3" );
-    $next_id = $silo->next_id;
-    is( $next_id, 4, "next id is again 4" );
-
-
-
-} #test_broken_file
-
-__END__
+    
+} #test_async

@@ -10,7 +10,7 @@
 # I generate code for up to 10-dimensional FFTs
 my $maxrank = 10;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 pp_addpm( {At => 'Top'}, slurp('README.pod') );
 

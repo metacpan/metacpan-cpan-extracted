@@ -1,9 +1,12 @@
 package POE::Component::Client::NNTP::Tail;
+
 use 5.006;
 use strict;
 use warnings;
 # ABSTRACT: Sends events for new articles posted to an NNTP newsgroup
-our $VERSION = '0.03'; # VERSION
+# VERSION
+
+our $VERSION = '0.04';
 
 use Carp::POE;
 use Params::Validate;
@@ -15,6 +18,7 @@ my %spawn_args = (
   NNTPServer    => 1,
   # optional with defaults
   Interval      => { default => 60 },
+  TimeOut       => { default => 30 },
   # purely optional
   Port          => 0,
   LocalAddr     => 0,
@@ -43,6 +47,7 @@ sub spawn {
         nntp_411          => '_nntp_no_group',
         nntp_423          => '_nntp_no_article',
         nntp_430          => '_nntp_no_article',
+        nntp_503          => '_nntp_503_error',
       },
       # session events
       $class => [ qw( _start _stop _child  ) ],
@@ -80,7 +85,7 @@ sub _start {
 
   # setup NNTP including optional args if defined;
   my %nntp_args;
-  for my $k ( qw/NNTPServer Port LocalAddr/ ) {
+  for my $k ( qw/NNTPServer Port LocalAddr TimeOut/ ) {
     $nntp_args{$k} = $heap->{$k} if exists $heap->{$k};
   }
   my $alias = "NNTP-Client-" . $session->ID;
@@ -266,6 +271,15 @@ sub _nntp_no_article {
   return;
 }
 
+# 503 error in response to group query reconnect
+sub _nntp_503_error {
+  my ($kernel, $heap, $sender) = @_[KERNEL, HEAP, SENDER];
+  &_debug if $heap->{Debug};
+  $heap->{connected} = 0;
+  $kernel->delay( '_reconnect' => $heap->{Interval} );
+  return;
+}
+
 # if there are new articles, request their headers
 # also schedules the next check
 sub _nntp_group_selected {
@@ -317,9 +331,11 @@ sub _nntp_got_article {
 
 1;
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -327,7 +343,7 @@ POE::Component::Client::NNTP::Tail - Sends events for new articles posted to an 
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -418,6 +434,11 @@ Group (required) -- newsgroup to follow
 
 Interval -- minimum number of seconds between checks for new messages
 (defaults to 60)
+
+=item *
+
+TimeOut -- number of seconds to wait for a response from server
+(defaults to 30)
 
 =item *
 
@@ -521,40 +542,41 @@ L<POE::Component::Client::NNTP>
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
 =head2 Bugs / Feature Requests
 
-Please report any bugs or feature requests by email to C<bug-poe-component-client-nntp-tail at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Client-NNTP-Tail>. You will be automatically notified of any
-progress on the request by the system.
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/dagolden/poe-component-client-nntp-tail/issues>.
+You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
 
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<http://github.com/dagolden/poe-component-client-nntp-tail>
+L<https://github.com/dagolden/poe-component-client-nntp-tail>
 
-  git clone http://github.com/dagolden/poe-component-client-nntp-tail
+  git clone https://github.com/dagolden/poe-component-client-nntp-tail.git
 
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Chris 'BinGOs' Williams
+
+Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by David Golden.
+This software is Copyright (c) 2019 by David Golden.
 
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
 
 =cut
-
-
-__END__
-
-

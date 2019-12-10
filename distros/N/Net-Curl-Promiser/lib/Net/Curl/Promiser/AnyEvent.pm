@@ -7,16 +7,16 @@ use warnings;
 
 =head1 NAME
 
-Net::Curl::Promiser::AnyEvent
+Net::Curl::Promiser::AnyEvent - support for L<AnyEvent>
 
 =head1 SYNOPSIS
 
     my $promiser = Net::Curl::Promiser::AnyEvent->new();
 
-    my $cv = AnyEvent->condvar();
-
     my $handle = Net::Curl::Easy->new();
     $handle->setopt( CURLOPT_URL() => $url );
+
+    my $cv = AnyEvent->condvar();
 
     $promiser->add_handle($handle)->then(
         sub { print "$url completed.$/" },
@@ -32,26 +32,14 @@ L<Net::Curl::Promiser>.
 
 See F</examples> in the distribution for a fleshed-out demonstration.
 
-=head1 INVALID METHODS
-
-The following methods from L<Net::Curl::Promiser> are unneeded in this
-class and thus produce an exception if called:
-
-=over
-
-=item C<process()>
-
-=item C<time_out()>
-
-=item C<get_timeout()>
-
-=back
+B<NOTE:> The actual interface is that provided by
+L<Net::Curl::Promiser::LoopBase>.
 
 =cut
 
 #----------------------------------------------------------------------
 
-use parent 'Net::Curl::Promiser';
+use parent 'Net::Curl::Promiser::LoopBase';
 
 use Net::Curl::Multi ();
 
@@ -74,8 +62,10 @@ sub _cb_timer {
     my ($multi, $timeout_ms, $self) = @_;
 
     my $cb = sub {
-        $self->SUPER::time_out();
+        $self->_time_out_in_loop();
     };
+
+    delete $self->{'timer'};
 
     if ($timeout_ms < 0) {
         if ($multi->handles()) {
@@ -84,9 +74,6 @@ sub _cb_timer {
                 interval => 5,
                 cb => $cb,
             );
-        }
-        else {
-            delete $self->{'timer'};
         }
     }
     else {
@@ -99,16 +86,6 @@ sub _cb_timer {
     return 1;
 }
 
-sub process { die 'Unneeded method: ' . (caller 0)[3] };
-sub get_timeout { die 'Unneeded method: ' . (caller 0)[3] };
-sub time_out { die 'Unneeded method: ' . (caller 0)[3] };
-
-sub _GET_FD_ACTION {
-    my ($self, $args_ar) = @_;
-
-    return +{ @$args_ar };
-}
-
 sub _io {
     my ($self, $fd, $direction, $action_num) = @_;
 
@@ -116,7 +93,7 @@ sub _io {
         fh => $fd,
         poll => $direction,
         cb => sub {
-            $self->SUPER::process($fd, $action_num);
+            $self->_process_in_loop($fd, $action_num);
         },
     );
 

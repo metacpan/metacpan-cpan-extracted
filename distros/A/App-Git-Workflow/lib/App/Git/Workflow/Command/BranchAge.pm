@@ -16,7 +16,7 @@ use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 use DateTime::Format::HTTP;
 
-our $VERSION  = version->new(1.1.8);
+our $VERSION  = version->new(1.1.11);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option = (
@@ -140,19 +140,19 @@ sub formatted {
     return ("$fmt\n", @fields);
 }
 
-my @master;
+my %dest;
 sub unmerged {
-    my ($branch, $master) = @_;
+    my ($source, $dest) = @_;
 
-    if ( ! @master ) {
-        @master = map {/^(.*)\n/; $1} `git log --format=format:%H $master`;
-        die "No master" if !@master;
+    if ( ! $dest{$dest} ) {
+        @{$dest{$dest}} = map {/^(.*)\n/; $1} `git log --format=format:%H $dest`;
+        die "No destination branch commits for '$dest'" if !@{$dest{$dest}};
     }
 
-    my $source_sha = `git log --format=format:%H -n 1 $branch`;
+    my $source_sha = `git log --format=format:%H -n 1 $source`;
     chomp $source_sha;
 
-    return scalar grep {$_ && $_ eq $source_sha} @master;
+    return scalar grep {$_ && $_ eq $source_sha} @{$dest{$dest}};
 }
 
 1;
@@ -165,7 +165,7 @@ git-branch-age - grep tags
 
 =head1 VERSION
 
-This documentation refers to git-branch-age version 1.1.8
+This documentation refers to git-branch-age version 1.1.11
 
 =head1 SYNOPSIS
 
@@ -204,6 +204,14 @@ C<git branch | grep -P 'regex'>
 =head2 C<run ()>
 
 Executes the git workflow command
+
+=head2 C<unmerged ($source, $dest)>
+
+Check if there are any commits in C<$source> that are not in C<$dest>
+
+=head2 C<formatted ($format, $max)>
+
+Creates a format for printf to output a line
 
 =head1 DIAGNOSTICS
 

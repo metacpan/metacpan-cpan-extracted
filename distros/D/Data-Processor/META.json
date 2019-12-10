@@ -58,14 +58,15 @@
          "web" : "https://github.com/maettu/Data-Processor"
       }
    },
-   "version" : "1.0.2",
+   "version" : "1.0.4",
    "x_contributors" : [
       "Dominik Hassler <hadfl@cpan.org>",
+      "Dominik Hassler <hadfl@omniosce.org>",
       "joe <draxil@gmail.com>",
       "Tobias Oetiker <tobi@oetiker.ch>"
    ],
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17",
    "x_static_install" : 1
 }
 

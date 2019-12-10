@@ -1,0 +1,22 @@
+0.1.4 2019-12-06 12:18:15 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - added proper tests
+
+0.1.3 2019-12-06 12:08:48 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - added documentation
+
+0.1.2 2019-12-06 11:19:52 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add port to the ->call to make wsdl definitions with multiple
+   ports work properly
+
+0.1.1 2019-12-06 09:31:56 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix dependencies
+ - remove (broken) example
+
+0.1.0 2019-12-05 17:59:14 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - first release
+

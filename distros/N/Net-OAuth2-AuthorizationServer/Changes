@@ -1,5 +1,8 @@
 Revision history for Net-OAuth2-AuthorizationServer
 
+0.24     2019-12-09
+        - Remove hard dependency on Mojo::JWT (GH #26, with thanks to ap)
+
 0.23     2019-06-04
         - Fix examples to work with recent version of deps (GH #23, GH #25)
 

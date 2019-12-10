@@ -19,7 +19,7 @@ PONAPI::Client::Request::Role::IsGET - request - role - is GET
 
 =head1 VERSION
 
-version 0.002011
+version 0.002012
 
 =head1 AUTHORS
 

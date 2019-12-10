@@ -65,8 +65,7 @@ foreach my $tz (
 foreach my $tz (
 			'<GMT+10>+10', 
 			'<+07>-7',
-			'UTC',
-			'Etc/GMT-0',
+			($] >= 5.010 ? ('UTC', 'Etc/GMT-0') : ()),
 		) {
         next if ($^O eq 'MSWin32');
 	my $zone = Time::Zone::Olson->new(timezone => $tz);

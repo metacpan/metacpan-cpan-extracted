@@ -11,7 +11,6 @@ with 'Net::OAuth2::AuthorizationServer::Defaults';
 use Test::Most;
 use Test::Exception;
 use Crypt::JWT qw/ decode_jwt /;
-use Mojo::JWT;
 
 isa_ok( my $t = Test::Defaults->new,'Test::Defaults' );
 
@@ -48,8 +47,6 @@ my $jwt = $t->token(
 );
 
 my $details    = decode_jwt( alg => 'HS256', key => 'Some Secret Key', token => $jwt );
-my $mj_details = Mojo::JWT->new( secret => 'Some Secret Key' )
-   ->decode( $jwt );
 
 cmp_deeply(
 	$details,
@@ -71,7 +68,11 @@ cmp_deeply(
 	'jwt_claims_cb used (JWT)',
 );
 
-cmp_deeply( $details,$mj_details,'backwards compat with Mojo::JWT' );
+SKIP: {
+	skip "Couldn't load Mojo::JWT: $@", 1 unless eval 'use Mojo::JWT 0.04; 1';
+	my $mj_details = Mojo::JWT->new( secret => 'Some Secret Key' )->decode( $jwt );
+	cmp_deeply( $details,$mj_details,'backwards compat with Mojo::JWT' );
+}
 
 *Test::Defaults::jwt_algorithm  = sub { 'PBES2-HS512+A256KW' };
 *Test::Defaults::jwt_encryption = sub { 'A256CBC-HS512' };

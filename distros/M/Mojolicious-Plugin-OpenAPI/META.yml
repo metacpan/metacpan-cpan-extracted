@@ -18,13 +18,16 @@ no_index:
     - t
     - inc
 requires:
-  JSON::Validator: '3.15'
+  JSON::Validator: '3.16'
   Mojolicious: '8.00'
 resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-openapi/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-openapi
   repository: https://github.com/jhthorsen/mojolicious-plugin-openapi.git
-version: '2.18'
+version: '2.19'
 x_contributors:
+  - 'Henrik Andersen'
+  - 'Ilya Rassadin'
   - 'Jan Henning Thorsen'
+  - 'Joel Berger'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

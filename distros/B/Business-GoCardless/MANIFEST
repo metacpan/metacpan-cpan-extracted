@@ -26,7 +26,6 @@ MANIFEST
 README.md
 README.pod
 t/001_compiles_pod.t
-t/002_end_to_end.t
 t/003_changes.t
 t/004_end_to_end_pro.t
 t/business/gocardless.t

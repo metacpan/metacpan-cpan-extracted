@@ -22,7 +22,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.36';
+our $VERSION = '1.37';
 
 # Automatically generated, see share/stations.json
 my @stations = (
@@ -3118,6 +3118,7 @@ my @stations = (
 ['XSGU','Güttingen',8506124,9.29222710394305,47.608749428579],
 ['XBHA','Haaltert',8800366],
 ['KHAN','Haan',8002490,6.998018,51.18812],
+['KGUA','Haan-Gruiten',8000138,7.0041472,51.21378326],
 ['MHR','Haar',8002491,11.73115,48.111413],
 ['UHSN','Haarhausen',8011792,10.905715,50.867437],
 ['XNHE','Haarlem',8400285,5.8225002288818,52.38777923584],
@@ -6139,12 +6140,12 @@ my @stations = (
 ['MPP','Pappenheim',8004753,10.964028,48.926405],
 ['WPM','Parchim',8010267,11.831265,53.43032],
 ['XTPAR','Pardubice hl.n.',5400161],
-['XFPA','Paris Austerlitz',8700010],
-['XFPO','Paris Est',8700011],
-['XFPG','Paris Gare de Lyon',8700012],
-['XFPMP','Paris Montparnasse',8700013],
-['XFPN','Paris Nord',8700014],
-['XFPSL','Paris St Lazare',8700015],
+['XFPA','Paris Austerlitz',8700010,2.364891,48.842285],
+['XFPO','Paris Est',8700011,2.358424,48.876742],
+['XFPG','Paris Gare de Lyon',8700012,2.37352,48.844888],
+['XFPMP','Paris Montparnasse',8700013,2.320514,48.841172],
+['XFPN','Paris Nord',8700014,2.355151,48.880185],
+['XFPSL','Paris St Lazare',8700015,2.325331,48.876242],
 ['WPA','Parkentin',8012609,11.978983,54.081256],
 ['XAPD','Parndorf',8101335,16.8716517108747,47.9869323700954],
 ['NPB','Parsberg',8004755,11.723355,49.164355],
@@ -7517,7 +7518,7 @@ my @stations = (
 ['WSR','Stralsund Hbf',8010338,13.077321,54.308626],
 ['WSRR','Stralsund Rügendamm',8013062,13.107522,54.305322],
 ['WSRB','Stralsund-Grünhufe',8011778,13.04393,54.304298],
-['XFSTG','Strasbourg',8700023],
+['XFSTG','Strasbourg',8700023,7.734584,48.584967],
 ['WSB','Strasburg(Uckerm)',8010339,13.745272,53.515101],
 ['XASTH','Strasshof',8101595],
 ['NST','Straubing',8000095,12.574094,48.876978],
@@ -8915,7 +8916,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.09
+version 1.37
 
 =head1 DESCRIPTION
 

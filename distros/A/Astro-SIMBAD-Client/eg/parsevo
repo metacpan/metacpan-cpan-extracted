@@ -39,7 +39,7 @@ None.
 =head1 DETAILS
 
 This script uses the L<Astro::SIMBAD::Client|Astro::SIMBAD::Client>
-L<Parse_VO_Table()|Astro::SIMBAD::Client/Parse_VO_Table> subroutine to
+L<Parse_VO_Table()|Astro::SIMBAD::Client> subroutine to
 parse one or more files in C<votable> format, and display the result in
 L<Data::Dumper|Data::Dumper> format.
 

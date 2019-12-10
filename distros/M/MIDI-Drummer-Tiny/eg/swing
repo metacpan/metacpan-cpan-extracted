@@ -9,10 +9,9 @@ my $d = MIDI::Drummer::Tiny->new(
     bpm       => 90,
     signature => '4/4',
     bars      => 8,
-    patch     => 41, # brushes
 );
 
-$d->count_in;
+$d->count_in(1);
 
 for ( 1 .. $d->bars ) {
     $d->note( $d->quarter,          $d->ride1, $d->kick );

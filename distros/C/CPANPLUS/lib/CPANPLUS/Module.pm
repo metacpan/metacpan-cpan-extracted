@@ -2,7 +2,7 @@ package CPANPLUS::Module;
 
 use strict;
 use vars qw[@ISA $VERSION];
-$VERSION = "0.9902";
+$VERSION = "0.9904";
 
 use CPANPLUS::Dist;
 use CPANPLUS::Error;

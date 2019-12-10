@@ -1,14 +1,11 @@
 #!/usr/bin/env perl
 use v5.14.1;
 use IIIF::Request;
+use Pod::Usage qw(pod2usage);
 use IIIF::Magick qw(info convert convert_command);
 use JSON::PP;
 
-if ( !@ARGV ) {
-    say
-"usage: i3f [file] [{region}/{size}/{rotation}/{quality}.{format} [target]]";
-    exit;
-}
+pod2usage( -verbose => 99 ) if !@ARGV;
 
 if ( -f $ARGV[0] && @ARGV == 1 ) {
     my ($file) = @ARGV;
@@ -21,7 +18,7 @@ else {
         exit !convert( $req, @ARGV );
     }
     else {
-        say convert_command($req, @ARGV);
+        say convert_command( $req, @ARGV );
     }
 }
 
@@ -31,23 +28,36 @@ __END__
 
 i3f - apply IIIF Image API requests on the command line
 
+=head1 SYNOPSIS
+
+i3f [file] [{region}/{size}/{rotation}/{quality}.{format} [target]]
+
 =head1 DESCRIPTION
 
-This script uses ImageMagick to transform an image file as specified with an
-IIIF Image API Request. It can also be used to get IIIF Image Information.
+Uses ImageMagick to transform an image file as specified with an IIIF Image API
+Request. Can also be used to get IIIF Image Information.
 
-=head1 EXAMPLE
+=head1 EXAMPLES
 
-    # convert IIIF Image API Request into ImageMagick convert syntax
-    $ i3f 100,120,15,20/\!12
+Convert IIIF Image API Request into ImageMagick convert syntax:
+
+    > i3f 90
+    convert -rotate 90
+
+    > i3f 100,120,15,20/\!12
     convert -crop 15x20+100+120 -flop -rotate 12 -background none
 
-    # Apply IIIF Image API Request to transform image into another
-    $ i3f 64,64 image.png image-selection.png
+Apply IIIF Image API Request to transform an image into another:
 
-=head1 SEE ALSO
+    > i3f 64,64 image.png image-selection.png
 
-This script is part of Perl package L<IIIF> with core implementation in module
-L<IIIF::Magick>.
+Get IIIF Image Information
+
+    > i3f image.png
+
+=head1 BACKGROUND
+
+This script is part of Perl package L<IIIF> with module L<IIIF::Magick>.
+IIIF Image API is defined at L<https://iiif.io/api/image/3.0/>.
 
 =cut

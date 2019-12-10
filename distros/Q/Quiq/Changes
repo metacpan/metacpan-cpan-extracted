@@ -1,3 +1,19 @@
+1.167 2019-12-08
+================
+
+[Quiq::ChartJs::TimeSeries]
+* Klasse überarbeitet
+* Durchschnitt und Median hinzugefügt
+
+[Quiq::JavaScript]
+* Doku bearbeitet
+
+[Quiq::Jason]
+* Klasse hinzugefügt
+
+[Quiq::Template]
+* Einrückung von Text bei Platzhalterersetzung erweitert
+
 1.166 2019-11-29
 ================
 

@@ -3,7 +3,7 @@ use warnings;
 package Test::MooseX::Daemonize;
 # ABSTRACT: Tool to help test MooseX::Daemonize applications
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 # BEGIN CARGO CULTING
 use Sub::Exporter -setup => {
@@ -35,7 +35,6 @@ sub check_test_output {
       or die "can't open test output: $!";
     while ( my $line = <$stdout_in> ) {
         $line =~ s/\s+\z//;
-        my $label;
         if ( $line =~ /\A(?:(not\s+)?ok)(?:\s+-)(?:\s+(.*))\z/ ) {
             my ( $not, $text ) = ( $1, $2, $3 );
             $text ||= '';
@@ -51,7 +50,7 @@ sub check_test_output {
             $Test->diag($line);
         }
         else {
-            $Test->diag("$label: $line (unrecognised)\n");
+            $Test->diag("$line (unrecognised)\n");
         }
     }
 }
@@ -97,7 +96,7 @@ Test::MooseX::Daemonize - Tool to help test MooseX::Daemonize applications
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 

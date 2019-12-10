@@ -57,7 +57,7 @@ has 'max_bits'	=> (
 	predicate => 'has_max_bits'
 );
 
-our $VERSION = 1.00;
+our $VERSION = 1.01;
 
 sub BUILD
 {
@@ -240,7 +240,8 @@ sub generate_primes
 	#
 	for ($self->all_bit_terms())
 	{
-		push @{$bits[0][ matchcount($_, '1') ]}, $_;
+		my $setcount = scalar(() = $_ =~ m/1/g);
+		push @{$bits[0][ $setcount ]}, $_;
 	}
 
 	#
@@ -430,7 +431,7 @@ sub recurse_solve
 	do
 	{
 		#
-		##### recurse_solve() do loop, essentials: %ess
+		##### recurse_solve() do loop, essentials: @essentials
 		#
 		# Remove the essential prime implicants from
 		# the prime implicants table.
@@ -466,7 +467,7 @@ sub recurse_solve
 
 		@essentials_next = find_essentials(\%primes);
 
-		##### recurse_solve() essentials after purge/dom: %ess
+		##### recurse_solve() essentials after purge/dom: @essentials
 
 	} until (is_LequivalentR([
 			[ @essentials] => [ @essentials_next ]
@@ -784,7 +785,7 @@ prints
 
     -010, -10-, 0-00, 00-0, 001-, 1-10, 11--
 
-See the chart() function in Algorithm::QuineMcCluskey::Format
+See the function L<Algorithm::QuineMcCluskey::Format/"chart()">
 for an example of the prime implicant/term chart.
 
 =head3 get_essentials()

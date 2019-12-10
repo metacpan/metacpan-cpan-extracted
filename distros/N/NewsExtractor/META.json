@@ -32,7 +32,7 @@
             "Importer" : "0",
             "JSON" : "0",
             "Module::Functions" : "0",
-            "Mojolicious" : "0",
+            "Mojolicious" : "8.25",
             "Moo" : "0",
             "SemanticWeb::Schema" : "0",
             "Test2::V0" : "0",
@@ -46,10 +46,13 @@
    "provides" : {
       "NewsExtractor" : {
          "file" : "lib/NewsExtractor.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       },
       "NewsExtractor::Article" : {
          "file" : "lib/NewsExtractor/Article.pm"
+      },
+      "NewsExtractor::CSSExtractor" : {
+         "file" : "lib/NewsExtractor/CSSExtractor.pm"
       },
       "NewsExtractor::Constants" : {
          "file" : "lib/NewsExtractor/Constants.pm"
@@ -59,6 +62,12 @@
       },
       "NewsExtractor::Error" : {
          "file" : "lib/NewsExtractor/Error.pm"
+      },
+      "NewsExtractor::ExtractableWithCSS" : {
+         "file" : "lib/NewsExtractor/ExtractableWithCSS.pm"
+      },
+      "NewsExtractor::Extractor" : {
+         "file" : "lib/NewsExtractor/Extractor.pm"
       },
       "NewsExtractor::GenericExtractor" : {
          "file" : "lib/NewsExtractor/GenericExtractor.pm"
@@ -71,7 +80,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.2",
+   "version" : "v0.0.3",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : "CC0-1.0",
    "x_static_install" : "1"

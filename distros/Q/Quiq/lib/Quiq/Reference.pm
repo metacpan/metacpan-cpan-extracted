@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.166';
+our $VERSION = '1.167';
 
 use Scalar::Util ();
 
@@ -174,7 +174,7 @@ sub isRegexRef {
 
 =head1 VERSION
 
-1.166
+1.167
 
 =head1 AUTHOR
 

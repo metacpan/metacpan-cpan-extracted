@@ -8,10 +8,10 @@ package IOas::SJIS2004;
 # Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-use 5.00503;    # Galapagos Consensus 1998 for primetools
+use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 $VERSION = $VERSION;
 
 use strict;
@@ -51,12 +51,16 @@ sub _io_output ($) {
     my($s) = @_;
     Jacode4e::RoundTrip::convert(\$s, $io_encoding, 'utf8.1', {
         'OVERRIDE_MAPPING' => {
-            "\xE2\x80\x95" => "\x81\x5C",
-            "\xE2\x88\xA5" => "\x81\x61",
-            "\xEF\xBC\x8D" => "\x81\x7C",
-            "\xE2\x80\x94" => "\x81\x5C",
-            "\xE2\x80\x96" => "\x81\x61",
-            "\xE2\x88\x92" => "\x81\x7C",
+
+            # UTF-8.0 was popular in old days
+            "\xE2\x80\x95" => "\x81\x5C", # U+2015 HORIZONTAL BAR
+            "\xE2\x88\xA5" => "\x81\x61", # U+2225 PARALLEL TO
+            "\xEF\xBC\x8D" => "\x81\x7C", # U+FF0D FULLWIDTH HYPHEN-MINUS
+
+            # UTF-8.1 will be popular in someday
+            "\xE2\x80\x94" => "\x81\x5C", # U+2014 EM DASH
+            "\xE2\x80\x96" => "\x81\x61", # U+2016 DOUBLE VERTICAL LINE
+            "\xE2\x88\x92" => "\x81\x7C", # U+2212 MINUS SIGN
         },
     });
     return $s;
@@ -95,8 +99,8 @@ sub substr ($$;$$) {
 #-----------------------------------------------------------------------------
 
 sub cmp ($$) { _io_output($_[0]) cmp _io_output($_[1]) }
-sub eq  ($$) { _io_output($_[0]) eq  _io_output($_[1]) }
-sub ne  ($$) { _io_output($_[0]) ne  _io_output($_[1]) }
+sub eq  ($$) { _io_output($_[0]) eq  _io_output($_[1]) } # must not optimize like "$_[0] eq $_[1]"
+sub ne  ($$) { _io_output($_[0]) ne  _io_output($_[1]) } # must not optimize like "$_[0] ne $_[1]"
 sub ge  ($$) { _io_output($_[0]) ge  _io_output($_[1]) }
 sub gt  ($$) { _io_output($_[0]) gt  _io_output($_[1]) }
 sub le  ($$) { _io_output($_[0]) le  _io_output($_[1]) }
@@ -131,7 +135,7 @@ sub getc (;*) {
 
 sub readline (;*) {
     my $fh = @_ ? Symbol::qualify_to_ref($_[0],caller()) : \*ARGV;
-    return wantarray ? map { _io_input($_) } <$fh> : _io_input(<$fh>);
+    return wantarray ? map { _io_input($_) } <$fh> : _io_input(scalar <$fh>);
 }
 
 sub print (;*@) {
@@ -163,6 +167,8 @@ IOas::SJIS2004 - provides SJIS2004 I/O subroutines for UTF-8 script
     $result = IOas::SJIS2004::length($utf8str);
     $result = IOas::SJIS2004::sprintf($utf8format, @utf8list);
     $result = IOas::SJIS2004::substr($utf8expr, $offset_as_sjis2004, $length_as_sjis2004, $utf8replacement);
+    $result = IOas::SJIS2004::substr($utf8expr, $offset_as_sjis2004, $length_as_sjis2004);
+    $result = IOas::SJIS2004::substr($utf8expr, $offset_as_sjis2004);
 
     # String Comparison as I/O Encoding
     $result = IOas::SJIS2004::cmp($utf8str_a, $utf8str_b);
@@ -176,8 +182,8 @@ IOas::SJIS2004 - provides SJIS2004 I/O subroutines for UTF-8 script
 
     # Encoding Convert on I/O Operations
     $result = IOas::SJIS2004::getc(FILEHANDLE);
-    $result = IOas::SJIS2004::readline(FILEHANDLE);
-    @result = IOas::SJIS2004::readline(FILEHANDLE);
+    $scalar = IOas::SJIS2004::readline(FILEHANDLE);
+    @list   = IOas::SJIS2004::readline(FILEHANDLE);
     $result = IOas::SJIS2004::print(FILEHANDLE, @utf8str);
     $result = IOas::SJIS2004::printf(FILEHANDLE, $utf8format, @utf8list);
 

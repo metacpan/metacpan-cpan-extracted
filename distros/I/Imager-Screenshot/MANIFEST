@@ -26,3 +26,4 @@ t/90pod.t			Test - check POD is valid
 t/91podcover.t			Test - check all functions are covered by POD
 t/92manifest.t			Test - check we match the MANIFEST
 typemap				Type conversion
+META.json                                Module JSON meta-data (added by MakeMaker)

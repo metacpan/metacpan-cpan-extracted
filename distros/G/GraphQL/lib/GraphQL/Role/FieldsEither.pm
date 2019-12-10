@@ -103,6 +103,12 @@ method _make_fieldtuples(
     $line .= ' = ' . $JSON_noutf8->encode(
       $type->perl_to_graphql($field->{default_value})
     ) if exists $field->{default_value};
+    my @directives = map {
+      my $args = $_->{arguments};
+      my @argtuples = map { "$_: " . $JSON_noutf8->encode($args->{$_}) } keys %$args;
+      '@' . $_->{name} . (@argtuples ? '(' . join(', ', @argtuples) . ')' : '');
+    } @{ $field->{directives} || [] };
+    $line .= join(' ', ('', @directives)) if @directives;
     [
       $self->_to_doc_field_deprecate($line, $field),
       $self->_description_doc_lines($field->{description}),

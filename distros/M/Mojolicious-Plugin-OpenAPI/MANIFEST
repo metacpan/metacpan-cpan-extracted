@@ -47,6 +47,11 @@ t/security-disabled.t
 t/set-request.t
 t/spec.t
 t/spec/bundlecheck.json
+t/spec/v3-invalid_file_refs.yaml
+t/spec/v3-invalid_file_refs_no_path.yaml
+t/spec/v3-invalid_include.yaml
+t/spec/v3-valid_file_refs.yaml
+t/spec/v3-valid_include.yaml
 t/swagger2.t
 t/tutorial.t
 t/tutorial_v3.t
@@ -55,8 +60,12 @@ t/v2-formats.t
 t/v2-readonly.t
 t/v2-security.t
 t/v3-body.t
+t/v3-default.t
+t/v3-invalid_file_refs.t
+t/v3-invalid_file_refs_no_path.t
 t/v3-nullable.t
 t/v3-security.t
+t/v3-valid_file_refs.t
 t/v3.t
 t/validate.t
 t/x-mojo-placeholder.t

@@ -42,24 +42,42 @@ _free_raw_array (gpointer raw_array)
 }
 
 static void
-_free_array (GArray *array)
+_free_array (GArray *array, gboolean free_content)
 {
-	dwarn ("%p\n", array);
-	g_array_free (array, TRUE);
+	dwarn ("%p: free_content=%d\n", array, free_content);
+	g_array_free (array, free_content);
 }
 
 static void
-_free_ptr_array (GPtrArray *array)
+_free_array_and_content (gpointer array)
 {
-	dwarn ("%p\n", array);
-	g_ptr_array_free (array, TRUE);
+	_free_array (array, TRUE);
 }
 
 static void
-_free_byte_array (GByteArray *array)
+_free_ptr_array (GPtrArray *array, gboolean free_content)
 {
-	dwarn ("%p\n", array);
-	g_byte_array_free (array, TRUE);
+	dwarn ("%p: free_content=%d\n", array, free_content);
+	g_ptr_array_free (array, free_content);
+}
+
+static void
+_free_ptr_array_and_content (gpointer array)
+{
+	_free_ptr_array (array, TRUE);
+}
+
+static void
+_free_byte_array (GByteArray *array, gboolean free_content)
+{
+	dwarn ("%p: free_content=%d\n", array, free_content);
+	g_byte_array_free (array, free_content);
+}
+
+static void
+_free_byte_array_and_content (gpointer array)
+{
+	_free_byte_array (array, TRUE);
 }
 
 /* This may call Perl code (via arg_to_sv), so it needs to be wrapped with
@@ -76,6 +94,7 @@ array_to_sv (GITypeInfo *info,
 	GITypeTag param_tag;
 	gsize item_size;
 	GITransfer item_transfer;
+	gboolean free_element_data;
 	gboolean need_struct_value_semantics;
 	gssize length = -1, i;
 	AV *av;
@@ -107,7 +126,9 @@ array_to_sv (GITypeInfo *info,
 				g_assert (iinfo && iinfo->aux_args);
 				conversion_sv = arg_to_sv (&(iinfo->aux_args[length_pos]),
 				                           &(iinfo->arg_types[length_pos]),
-				                           GI_TRANSFER_NOTHING, NULL);
+				                           GI_TRANSFER_NOTHING,
+				                           GPERL_I11N_MEMORY_SCOPE_IRRELEVANT,
+				                           NULL);
 				length = SvIV (conversion_sv);
 				SvREFCNT_dec (conversion_sv);
 			}
@@ -132,6 +153,10 @@ array_to_sv (GITypeInfo *info,
 		ccroak ("Could not determine the length of the array");
 	}
 
+	param_info = g_type_info_get_param_type (info, 0);
+	param_tag = g_type_info_get_tag (param_info);
+	item_size = size_of_type_info (param_info);
+
 	/* FIXME: What about an array containing arrays of strings, where the
 	 * outer array is GI_TRANSFER_EVERYTHING but the inner arrays are
 	 * GI_TRANSFER_CONTAINER? */
@@ -139,14 +164,11 @@ array_to_sv (GITypeInfo *info,
 		? GI_TRANSFER_EVERYTHING
 		: GI_TRANSFER_NOTHING;
 
-	param_info = g_type_info_get_param_type (info, 0);
-	param_tag = g_type_info_get_tag (param_info);
-	item_size = size_of_type_info (param_info);
-
 	av = newAV ();
 
 	need_struct_value_semantics =
 		_need_struct_value_semantics (array_type, param_info, param_tag);
+	dwarn ("value semantics = %d\n", need_struct_value_semantics);
 
 	dwarn ("type %d, array %p, elements %p\n",
 	       array_type, array, elements);
@@ -159,32 +181,39 @@ array_to_sv (GITypeInfo *info,
 
 	for (i = 0; i < length; i++) {
 		GIArgument arg;
-		SV *value;
+		SV *value = NULL;
 		gpointer element = elements + ((gsize) i) * item_size;
-		dwarn ("  element %"G_GSSIZE_FORMAT": %p\n", i, element);
+		gpointer raw_pointer = element;
+		GPerlI11nMemoryScope mem_scope = GPERL_I11N_MEMORY_SCOPE_IRRELEVANT;
 		if (need_struct_value_semantics) {
-			raw_to_arg (&element, &arg, param_info);
-		} else {
-			raw_to_arg (element, &arg, param_info);
+			raw_pointer = &element;
+			mem_scope = GPERL_I11N_MEMORY_SCOPE_TEMPORARY;
 		}
-		value = arg_to_sv (&arg, param_info, item_transfer, iinfo);
+		dwarn ("  element %"G_GSSIZE_FORMAT": %p, pointer: %p\n", i, element, raw_pointer);
+		raw_to_arg (raw_pointer, &arg, param_info);
+		value = arg_to_sv (&arg, param_info, item_transfer, mem_scope, iinfo);
 		if (value)
 			av_push (av, value);
 	}
 
 	if (transfer >= GI_TRANSFER_CONTAINER) {
+		/* When we were transfered ownership of the array, we need to
+		   free it and its element storage here.  This is safe since,
+		   if the array was flat, we made sure to take copies of the
+		   elements above. */
+		free_element_data = TRUE;
 		switch (array_type) {
 		case GI_ARRAY_TYPE_C:
 			_free_raw_array (array);
 			break;
 		case GI_ARRAY_TYPE_ARRAY:
-			_free_array (array);
+			_free_array (array, free_element_data);
 			break;
 		case GI_ARRAY_TYPE_PTR_ARRAY:
-			_free_ptr_array (array);
+			_free_ptr_array (array, free_element_data);
 			break;
 		case GI_ARRAY_TYPE_BYTE_ARRAY:
-			_free_byte_array (array);
+			_free_byte_array (array, free_element_data);
 			break;
 		}
 	}
@@ -213,7 +242,7 @@ sv_to_array (GITransfer transfer,
 	GPerlI11nArrayInfo *array_info = NULL;
 	gpointer array = NULL;
 	gpointer return_array;
-	GFunc return_array_free_func;
+	GDestroyNotify return_array_free_func;
 	gboolean is_zero_terminated = FALSE;
 	gsize item_size;
 	gboolean need_struct_value_semantics;
@@ -318,16 +347,16 @@ sv_to_array (GITransfer transfer,
 	switch (array_type) {
 	case GI_ARRAY_TYPE_C:
 		return_array = g_array_free (array, FALSE);
-		return_array_free_func = (GFunc) _free_raw_array;
+		return_array_free_func = _free_raw_array;
 		break;
 	case GI_ARRAY_TYPE_ARRAY:
-		return_array_free_func = (GFunc) _free_array;
+		return_array_free_func = _free_array_and_content;
 		break;
 	case GI_ARRAY_TYPE_PTR_ARRAY:
-		return_array_free_func = (GFunc) _free_ptr_array;
+		return_array_free_func = _free_ptr_array_and_content;
 		break;
 	case GI_ARRAY_TYPE_BYTE_ARRAY:
-		return_array_free_func = (GFunc) _free_byte_array;
+		return_array_free_func = _free_byte_array_and_content;
 		break;
 	}
 

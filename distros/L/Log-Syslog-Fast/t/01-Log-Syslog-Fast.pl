@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 206;
+use Test::More tests => 278;
 use lib 't/lib';
 use LSF;
 
@@ -164,6 +164,47 @@ for my $p (qw( tcp udp unix_dgram unix_stream )) {
     };
     diag($@) if $@;
 
+    # LOG_RFC3164_LOCAL format
+    eval {
+        my @params = (LOG_AUTH, LOG_INFO, 'localhost', 'test0');
+        my $server = make_server($p);
+        ok($server->{listener}, "$p: listen") or diag("listen failed: $!");
+
+        my $logger = $server->connect($::CLASS => @params);
+        ok($logger, "$p: ->new returns something");
+        is(ref $logger, $CLASS, "$p: ->new returns a $main::CLASS object");
+
+        my $receiver = $server->accept;
+        ok($receiver, "$p: accepted");
+
+        my $time = time;
+        for my $config (['without time'], ['with time', $time]) {
+            my ($msg, @extra) = @$config;
+
+            eval { $logger->set_format(LOG_RFC3164_LOCAL) };
+            ok(!$@, "$p: ->set_format doesn't throw");
+
+            my @payload_params = (@params, $$, $msg, $time);
+            my $expected = expected_payload(@payload_params, LOG_RFC3164_LOCAL);
+
+            my $sent = eval { $logger->send($msg, @extra) };
+            ok(!$@, "$p: ->send $msg doesn't throw");
+            is($sent, length $expected, "$p: ->send $msg sent whole payload");
+
+            my $found = wait_for_readable($receiver);
+            ok($found, "$p: didn't time out while waiting for data $msg");
+
+            if ($found) {
+                $receiver->recv(my $buf, 256);
+            
+                ok($buf =~ /^<38>/, "$p: ->send $msg has the right priority");
+                ok($buf =~ /$msg$/, "$p: ->send $msg has the right message");
+                is($buf, expected_payload(@payload_params, LOG_RFC3164_LOCAL), "$p: ->send $msg has correct payload");
+            }
+        }
+    };
+    diag($@) if $@;
+
     # test failure behavior when server is unreachable
     eval {
 
@@ -255,6 +296,10 @@ sub expected_payload {
     my ($facility, $severity, $sender, $name, $pid, $msg, $time, $format) = @_;
     my $time_format = "%h %e %T";
     my $msg_format = "<%d>%s %s %s[%d]: %s";
+
+    if ($format == LOG_RFC3164_LOCAL) {
+        $msg_format = "<%d>%s %.0s%s[%d]: %s";
+    }
 
     if ($format == LOG_RFC5424) {
         $time_format = "%Y-%m-%dT%H:%M:%S%z";

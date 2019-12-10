@@ -96,7 +96,7 @@ sub run ( $self ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 16, 17, 65           | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 104                  | Documentation::RequirePackageMatchesPodName - Pod NAME on line 108 does not match the package declaration      |
+## |    1 | 90                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 94 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

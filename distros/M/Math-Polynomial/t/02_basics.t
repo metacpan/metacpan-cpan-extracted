@@ -1,6 +1,6 @@
-# Copyright (c) 2007-2017 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# Copyright (c) 2007-2019 by Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Checking basic constructors and attribute accessors.
 
@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 40 };
+BEGIN { plan tests => 42 };
 use Math::Polynomial 1.000;
 ok(1);  # module loaded
 
@@ -120,6 +120,7 @@ ok(0 == $sp->coeff_zero);
 ok(1 == $sp->coeff_one);
 ok(2 == $sp->degree);
 ok(2 == $sp->proper_degree);
+ok(3 == $sp->number_of_terms);
 
 my $zp = $sp->new;
 ok(0 == $zp->coeff_zero);
@@ -127,6 +128,7 @@ ok(1 == $zp->coeff_one);
 ok(-1 == $zp->degree);
 my @res = $zp->proper_degree;
 ok(1 == @res && !defined $res[0]);      # zero polynomial / proper_degree
+ok(0 == $zp->number_of_terms);
 
 $sp = $sp->new(-1, -2, 1);
 @samples = (

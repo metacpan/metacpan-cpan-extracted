@@ -168,17 +168,19 @@
 
 #if _WIN32>0 || _WIN64>0
 #  if USE_CDECL
-#    if BUILD_DLL /* DLL kompilieren */
-#      define DLL_EXPORT __declspec (dllexport)
-#      define DLL_EXPORT_V __declspec (dllexport)
-#    elif USE_DLL /* DLL in einem anderen Programm benutzen */
-#      define DLL_EXPORT __declspec (dllimport)
-#      define DLL_EXPORT_V __declspec (dllimport)
-#    else /* kein DLL-Krempel erforderlich */
-#      define DLL_EXPORT
-#      define DLL_EXPORT_V
-#    endif
+#     define STDCALL
+#     if BUILD_DLL /* DLL kompilieren */
+#       define DLL_EXPORT __declspec (dllexport)
+#       define DLL_EXPORT_V __declspec (dllexport)
+#     elif USE_DLL /* DLL in einem anderen Programm benutzen */
+#       define DLL_EXPORT __declspec (dllimport)
+#       define DLL_EXPORT_V __declspec (dllimport)
+#     else /* kein DLL-Krempel erforderlich */
+#       define DLL_EXPORT
+#       define DLL_EXPORT_V
+#     endif
 #  else
+#     define STDCALL __stdcall
 #     if BUILD_DLL /* DLL kompilieren */
 #      define DLL_EXPORT __declspec (dllexport) __stdcall 
 #      define DLL_EXPORT_V __declspec (dllexport)
@@ -186,12 +188,13 @@
 #      define DLL_EXPORT __declspec (dllimport) __stdcall 
 #      define DLL_EXPORT_V __declspec (dllimport)
 #    else /* kein DLL-Krempel erforderlich */
-#      define DLL_EXPORT
+#      define DLL_EXPORT __stdcall
 #      define DLL_EXPORT_V
 #    endif
 #  endif
 #  define localtime_r(timep,result) localtime(timep)
 #else
+#  define STDCALL
 #  define DLL_EXPORT
 #  define DLL_EXPORT_V
 #endif
@@ -500,7 +503,7 @@ extern const char *lut2_feld_namen[256];
 #define OK_SHORT_BIC_USED                       26
 #define OK_SCL_EXTENSION_BIC_USED               27
 #define OK_SCL_WILDCARD_BIC_USED                28
-#line 279 "konto_check_h.lx"
+#line 282 "konto_check_h.lx"
 
 #define MAX_BLZ_CNT 30000  /* maximale Anzahl BLZ's in generate_lut() */
 

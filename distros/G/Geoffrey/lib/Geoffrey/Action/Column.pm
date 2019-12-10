@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Column::VERSION = '0.000204';
+$Geoffrey::Action::Column::VERSION = '0.000205';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -118,7 +118,7 @@ Geoffrey::Action::Column - Action handler for table columns
 
 =head1 VERSION
 
-Version 0.000204
+Version 0.000205
 
 =head1 DESCRIPTION
 

@@ -1,25 +1,33 @@
 package Pcore::Util::Src;
 
-use Pcore -const, -res, -ansi;
+use Pcore -const, -res, -ansi, -export;
 use Pcore::Util::Scalar qw[is_path is_plain_arrayref is_plain_hashref];
 use Pcore::Util::Text qw[encode_utf8 decode_eol lcut_all rcut_all rtrim_multi remove_bom];
 use Pcore::Util::Digest qw[md5_hex];
 
-const our $STATUS_REASON => {
-    200 => 'OK',
-    201 => 'Warning',
-    202 => 'File skipped',
-    404 => 'File not found',
-    500 => 'Error',
-    510 => 'Params error',
+our $EXPORT = {    #
+    FILTER_STATUS => [qw[$SRC_OK $SRC_WARN $SRC_ERROR $SRC_FATAL]],
 };
 
-const our $STATUS_COLOR => {
-    200 => $BOLD . $GREEN,
-    201 => $YELLOW,
-    404 => $BOLD . $RED,
-    500 => $BOLD . $RED,
+const our $STATUS => {
+    200 => [ 'OK',             1, $BOLD . $GREEN ],
+    201 => [ 'Warn',           1, $BOLD . $YELLOW ],
+    202 => [ 'File Ignored',   1, $YELLOW ],
+    400 => [ 'Error',          1, $BOLD . $WHITE . $ON_RED ],
+    404 => [ 'File Not Found', 1, $BOLD . $RED ],
+    500 => [ 'Fatal',          1, $BOLD . $WHITE . $ON_RED ],
+    510 => [ 'Params Error',   0, $BOLD . $RED ],
 };
+
+const our $SRC_OK    => res [ 200, $STATUS->{200}->[0] ];    # content is OK
+const our $SRC_WARN  => res [ 201, $STATUS->{201}->[0] ];    # content has warnings
+const our $SRC_ERROR => res [ 400, $STATUS->{400}->[0] ];    # content has errors
+const our $SRC_FATAL => res [ 500, $STATUS->{500}->[0] ];    # unable to run filter, runtime error
+
+const our $SRC_FILE_IGNORED   => res [ 202, $STATUS->{202}->[0] ];
+const our $SRC_FILE_NOT_FOUND => res [ 404, $STATUS->{404}->[0] ];
+
+const our $SRC_PARAMS_ERROR => res [ 510, $STATUS->{510}->[0] ];
 
 # CLI
 sub CLI ($self) {
@@ -37,8 +45,8 @@ TXT
                 default => 'decompress',
             },
             type => {
-                desc => 'define source files to process. Mandatory, if <source> is a directory. Recognized types: perl, html, css, js, json',
-                isa  => [qw[perl html css js json]],
+                desc => 'define source files to process. Mandatory, if <source> is a directory. Recognized types: ' . join( ', ', supported_types()->@* ),
+                isa  => supported_types(),
                 max  => 0,
             },
             report => {
@@ -56,6 +64,11 @@ TXT
                 isa   => 'Str',
                 desc  => q[for internal use with commit hook],
                 max   => 1,
+            },
+            report_ignored => {
+                short   => undef,
+                desc    => q[report ignored files],
+                default => 1,
             },
         },
         arg => [
@@ -77,9 +90,10 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     }
 
     if ( $opt->{action} eq 'commit' ) {
-        $opt->{action} = 'decompress';
-        $opt->{type}   = 'perl';
-        $opt->{prefix} = P->path( $opt->{prefix}, from_mswin => 1 )->to_abs;
+        $opt->{action}         = 'decompress';
+        $opt->{report_ignored} = 0;
+        $opt->{type}           = 'perl';
+        $opt->{prefix}         = P->path( $opt->{prefix}, from_mswin => 1 )->to_abs;
     }
     else {
         undef $opt->{prefix};
@@ -87,11 +101,12 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 
     my $res = P->src->run(
         $opt->{action},
-        {   path    => $arg->{path},
-            type    => $opt->{type},
-            report  => $opt->{report},
-            dry_run => $opt->{dry_run},
-            prefix  => $opt->{prefix},
+        {   path           => $arg->{path},
+            type           => $opt->{type},
+            report         => $opt->{report},
+            dry_run        => $opt->{dry_run},
+            prefix         => $opt->{prefix},
+            report_ignored => $opt->{report_ignored},
         }
     );
 
@@ -104,6 +119,12 @@ sub cfg {
     return $cfg;
 }
 
+sub supported_types {
+    my $cfg = cfg();
+
+    return state $types = [ sort keys { map { $cfg->{mime_tag}->{$_}->{type} => 1 } keys $cfg->{mime_tag}->%* }->%* ];
+}
+
 sub decompress ( %args ) { return run( 'decompress', \%args ) }
 
 sub compress ( %args ) { return run( 'compress', \%args ) }
@@ -114,6 +135,7 @@ sub obfuscate ( %args ) { return run( 'obfuscate', \%args ) }
 # data, Str
 # type, ArrayRef[ Enum ['css', 'html', 'js', 'json', 'perl']], list of types to process, used if path is directory
 # ignore, Bool, ignore unsupported file types
+# report_ignored, Bool
 # filter, HashRef, additional filter arguments
 # dry_run, Bool, if true - do not write results to the source path
 # report, print report
@@ -144,7 +166,7 @@ sub run ( $action, $args ) {
         my $filter_profile = _get_filter_profile( $args, $path, $args->{data} );
 
         # ignore file
-        return res [ 202, $STATUS_REASON ] if !defined $filter_profile;
+        return $SRC_FILE_IGNORED if !defined $filter_profile;
 
         # process file
         $res = _process_file( $args, $action, $filter_profile, $path, $args->{data} );
@@ -173,10 +195,15 @@ sub _process_files ( $args, $action ) {
 
         # path is directory
         if ( -d $path ) {
-            return res [ 510, 'Type must be specified in path is directory' ] if !defined $args->{type};
+            return res [ $SRC_PARAMS_ERROR, 'Type must be specified in path is directory' ] if !defined $args->{type};
 
             # read dir
             for my $path ( ( $path->read_dir( abs => 1, max_depth => 0, is_dir => 0 ) // [] )->@* ) {
+
+                # ignore any file inside "node_modules" dir
+                if ( $path =~ m[/node_modules/]sm ) {
+                    next;
+                }
 
                 # get filter profile
                 if ( my $filter_profile = _get_filter_profile( $args, $path ) ) {
@@ -189,7 +216,13 @@ sub _process_files ( $args, $action ) {
         else {
 
             # get filter profile
-            if ( my $filter_profile = _get_filter_profile( $args, $path ) ) {
+            my $filter_profile = _get_filter_profile( $args, $path );
+
+            # file is ignored
+            if ( !$filter_profile ) {
+                $tasks{$path} = [ $filter_profile, $path, $SRC_FILE_IGNORED ] if $args->{report} && $args->{report_ignored};
+            }
+            else {
                 $tasks{$path} = [ $filter_profile, $path ];
             }
         }
@@ -239,20 +272,17 @@ sub _process_files ( $args, $action ) {
 
     my $tbl;
 
+    # process files
     for my $path ( sort keys %tasks ) {
-        my $res = _process_file( $args, $action, $tasks{$path}->@* );
+        my $res = $tasks{$path}->[2] // _process_file( $args, $action, $tasks{$path}->@* );
 
-        if ( $res != 202 ) {
-            if ( $res->{status} > $total->{status} ) {
-                $total->{status} = $res->{status};
-                $total->{reason} = $STATUS_REASON->{ $total->{status} };
-            }
+        # update result status
+        $total->set_status( [ $res, $STATUS->{ $res->{status} }->[0] ] ) if $res->{status} > $total->{status};
 
-            $total->{ $res->{status} }++;
-            $total->{modified}++ if $res->{is_modified};
+        $total->{data}->{ $res->{status} }++;
+        $total->{modified}++ if $res->{is_modified};
 
-            _report_file( \$tbl, $use_prefix ? substr $path, length $prefix : $path, $res, $max_path_len ) if $args->{report};
-        }
+        _report_file( \$tbl, $use_prefix ? substr $path, length $prefix : $path, $res, $max_path_len ) if $args->{report};
     }
 
     print $tbl->finish if defined $tbl;
@@ -263,7 +293,7 @@ sub _process_files ( $args, $action ) {
 }
 
 sub _process_file ( $args, $action, $filter_profile, $path = undef, $data = undef ) {
-    my $res = res [ 200, $STATUS_REASON ],
+    my $res = res $SRC_OK,
       is_modified => 0,
       in_size     => 0,
       out_size    => 0,
@@ -281,8 +311,8 @@ sub _process_file ( $args, $action, $filter_profile, $path = undef, $data = unde
 
         # file not found
         else {
-            $res->{status} = 404;
-            $res->{reason} = $STATUS_REASON->{404};
+            $res->set_status($SRC_FILE_NOT_FOUND);
+
             return $res;
         }
     }
@@ -290,7 +320,7 @@ sub _process_file ( $args, $action, $filter_profile, $path = undef, $data = unde
         encode_utf8 $data;
     }
 
-    $res->{in_size} = bytes::length $data;
+    $res->{in_size} = length $data;
     my $in_md5 = md5_hex $data;
 
     # run filter
@@ -299,10 +329,12 @@ sub _process_file ( $args, $action, $filter_profile, $path = undef, $data = unde
         # merge filter args
         $filter_profile->@{ keys $args->{filter}->%* } = values $args->{filter}->%* if defined $args->{filter};
 
-        my $filter_res = P->class->load( $filter_type, ns => 'Pcore::Util::Src::Filter' )->new( $filter_profile->%*, data => \$data, )->$action;
+        my $filter_res = P->class->load( $filter_type, ns => 'Pcore::Util::Src::Filter' )->$action( \$data, $path, $filter_profile->%* );
 
         $res->{status} = $filter_res->{status};
         $res->{reason} = $filter_res->{reason};
+
+        encode_utf8 $data;
     }
 
     # trim
@@ -322,7 +354,7 @@ sub _process_file ( $args, $action, $filter_profile, $path = undef, $data = unde
 
     my $out_md5 = md5_hex $data;
     $res->{is_modified} = $in_md5 ne $out_md5;
-    $res->{out_size}    = bytes::length $data;
+    $res->{out_size}    = length $data;
     $res->{size_delta}  = $res->{out_size} - $res->{in_size};
 
     # write file
@@ -361,6 +393,8 @@ sub _get_filter_profile ( $args, $path, $data = undef ) {
     elsif ( $args->{ignore} ) {
         return;
     }
+
+    # return empty filter profile
     else {
         return {};
     }
@@ -377,7 +411,7 @@ sub _report_file ( $tbl, $path, $res, $max_path_len ) {
                     align => -1,
                 },
                 severity => {
-                    width => 24,
+                    width => 30,
                     align => 1,
                 },
                 size => {
@@ -405,7 +439,7 @@ sub _report_file ( $tbl, $path, $res, $max_path_len ) {
     push @row, $path;
 
     # severity
-    push @row, $STATUS_COLOR->{ $res->{status} } . uc( $res->{reason} ) . $RESET;
+    push @row, "$STATUS->{ $res->{status} }->[2] $res->{reason} $RESET";
 
     # size
     push @row, $res->{out_size};
@@ -430,13 +464,13 @@ sub _report_file ( $tbl, $path, $res, $max_path_len ) {
 }
 
 sub _report_total ( $total ) {
-    return if !defined $total;
+    return if !defined $total || !$total->{data}->%*;
 
     my $tbl = P->text->table(
         style => 'full',
         cols  => [
             type => {
-                width => 16,
+                width => 20,
                 align => 1,
             },
             count => {
@@ -448,11 +482,14 @@ sub _report_total ( $total ) {
 
     print $tbl->render_header;
 
-    for my $status ( 200, 201, 500, 404 ) {
-        print $tbl->render_row( [ $STATUS_COLOR->{$status} . uc( $STATUS_REASON->{$status} ) . $RESET, $STATUS_COLOR->{$status} . ( $total->{$status} // 0 ) . $RESET ] );
+    for my $status ( sort grep { $STATUS->{$_}->[1] } keys $STATUS->%* ) {
+        print $tbl->render_row( [    #
+            "$STATUS->{$status}->[2] $STATUS->{$status}->[0] $RESET",
+            "$STATUS->{$status}->[2]  @{[ $total->{data}->{$status} // 0 ]}  $RESET",
+        ] );
     }
 
-    print $tbl->render_row( [ 'MODIFIED', $total->{modified} // 0 ] );
+    print $tbl->render_row( [ 'Modified', $total->{modified} // 0 ] );
 
     print $tbl->finish;
 
@@ -466,11 +503,9 @@ sub _report_total ( $total ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 161                  | Subroutines::ProhibitExcessComplexity - Subroutine "_process_files" with high complexity score (32)            |
+## |    3 | 183                  | Subroutines::ProhibitExcessComplexity - Subroutine "_process_files" with high complexity score (35)            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 265, 369             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 302                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |    3 | 295, 403             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
 no warnings 'uninitialized';
@@ -49,7 +50,6 @@ test_overload();
 test_subclass();
 test_vol();
 test_lock();
-
 test_suite();
 test_upgrade_db();
 test_circular();
@@ -57,10 +57,19 @@ test_loop();
 test_arry();
 test_hash();
 test_connections();
+test_fields();
+test_classes();
+test_purge();
+test_bighash();
 
 done_testing;
 
 exit( 0 );
+
+sub approx {
+    my( $a, $b, $tol, $test ) = @_;
+    ok( abs($a-$b) <= $tol, $test );
+}
 
 sub test_overload {
 
@@ -176,7 +185,11 @@ sub test_vol {
 
       $root->vol( "TEST", "VALUE" );
       $root->vol( "TEST2", "VALUE2" );
-      $root->clearvols( "TEST2", "TEST" );
+      is_deeply( [sort @{$root->vol_fields}], [qw( TEST TEST2)], "correct vol fields" );
+      $root->clearvols( "TEST2" );
+      is_deeply( [sort @{$root->vol_fields}], [qw( TEST)], "correct vol fields after clearing one" );
+      $root->clearvols;
+      is_deeply( $root->vol_fields, [], "cleared vol fields" );
       ok( ! $store->load_root_container->vol( "TEST2" ), "VOL cleared from store" );
       ok( ! $store->load_root_container->vol( "TEST" ), "VOL cleared from store" );
 
@@ -270,7 +283,6 @@ sub test_suite {
     # Make sure 6 items got saved...(infoNode), (rootNode), (myList), (hash in mylist), (obj in hash) and (obj in obj)
     #
     is( $store->[DATA_PROVIDER]->entry_count, 6, "correct entry count" );
-    is( $store->[DATA_PROVIDER]->record_count, 6, "correct entry count silo method" );
     is( $store->[DATA_PROVIDER]->active_entry_count, 6, "correct active entry count silo method" );
 
     #
@@ -344,13 +356,12 @@ sub test_suite {
 
     # the seventh entry was written to the record store index, but not yet
     # saved to a silo until save
-    is( $store->[DATA_PROVIDER]->record_count, 6, "correct entry count silo method" );
+    is( $store->[DATA_PROVIDER]->active_entry_count, 6, "correct entry count silo method" );
 
     $store->save;
     $store->quick_purge;
 
     is( $store->[DATA_PROVIDER]->entry_count, 7, "correct entry count after nuking the list" );
-    is( $store->[DATA_PROVIDER]->record_count, 3, "correct entry count silo method" );
     is( $store->[DATA_PROVIDER]->active_entry_count, 3, "correct active entry count after nuking the list" );
 
     undef $list_to_remove;
@@ -358,16 +369,16 @@ sub test_suite {
     undef $objy;
     undef $someobj;
 
-    ok( ! $store->_fetch( $list_to_remove_id ), "removed list still removed" );
-    ok( ! $store->_fetch( $hash_in_list_id ), "removed hash id still removed" );
-    ok( ! $store->_fetch( $objy_id ), "removed objy still removed" );
-    ok( ! $store->_fetch( $someobj_id ), "removed someobj still removed" );
+    ok( ! $store->fetch( $list_to_remove_id ), "removed list still removed" );
+    ok( ! $store->fetch( $hash_in_list_id ), "removed hash id still removed" );
+    ok( ! $store->fetch( $objy_id ), "removed objy still removed" );
+    ok( ! $store->fetch( $someobj_id ), "removed someobj still removed" );
 
     undef $dup_root;
 
     undef $root_node;
 
-    $Data::ObjectStore::Hash::SIZE = 7;
+    $Data::ObjectStore::Hash::BUCKET_SIZE = 7;
 
     my $thash = $store->load_root_container->set_test_hash({});
     # test for hashes large enough that subhashes are inside
@@ -571,11 +582,6 @@ sub test_suite {
 
     my $root = $store->load_root_container;
 
-    eval {
-        $old_store->_knot( $root );
-        fail( "Was able to get the knot for mismatched store" );
-    };
-    like( $@, qr/from an other store/, 'fail message for getting knot of mismatched store' );
 
     my $othing = new OtherThing;
     ok( ! $old_store->_knot( $othing ), ' knot returns undef for non Yote container' );
@@ -613,7 +619,10 @@ sub test_suite {
     };
     like( $@, qr/Malformed record/, "error message for garbled record" );
 
+    is( $store->existing_id( "IMNOTOBJ" ), undef, "no id for a non object" );
+    is( $store->existing_id( [] ), undef, "no id for an object not put in" );
 
+    
 
 } #test_suite
 
@@ -634,7 +643,6 @@ sub test_no_auto_clean {
     );
     $root_node = $store->load_root_container;
     is( $root_node->get_foo, "BARZY", "same datastore run with different objectstore" );
-
     $dir = tempdir( CLEANUP => 1 );
     $store = Data::ObjectStore->open_store(
         DATA_PROVIDER => $dir,
@@ -668,7 +676,6 @@ sub test_no_auto_clean {
     $root_node->add_to_myList( 'we three ` foo foo', 'DOOPY' );
 
     is( $store->_has_dirty, 5, "now has 5 dirty" );
-
     $store->save( $root_node->get_myList );
 
     is( $store->_has_dirty, 4, "now has 4 dirty after specific save" );
@@ -688,8 +695,7 @@ sub test_no_auto_clean {
     # Make sure 6 items got saved...(infoNode), (rootNode), (myList), (hash in mylist), (obj in hash) and (obj in obj)
     #
     is( $store->[DATA_PROVIDER]->entry_count, 6, "correct entry count" );
-    is( $store->[DATA_PROVIDER]->record_count, 6, "correct entry count silo method" );
-    is( $store->[DATA_PROVIDER]->active_entry_count, 6, "correct active entry count silo method" );
+    is( $store->[DATA_PROVIDER]->active_entry_count, 6, "correct active entry count " );
 
     #
     # Check to make sure opening the store again will have all the same values.
@@ -697,7 +703,6 @@ sub test_no_auto_clean {
     my $dup_store = Data::ObjectStore->open_store(
         DATA_PROVIDER => $dir,
     );
-
     my $dup_root = $dup_store->load_root_container;
 
     is( $dup_root->[Data::ObjectStore::Container::ID], $root_node->[Data::ObjectStore::Container::ID] );
@@ -717,7 +722,7 @@ sub test_no_auto_clean {
 
     $oy->set_other_objy( $oy->get_someobj->get_innerval );
     $root_node->add_to_myList( $oy, $oy->get_someobj->get_innerval );
-    
+
     #
     # test ` seperator esccapint working
     #
@@ -741,7 +746,6 @@ sub test_no_auto_clean {
     $list_to_remove->[9] = "NINE";
 
     $store->save;
-
     $list_to_remove = $root_node->get_myList();
 
     is( $list_to_remove->[9], 'NINE' );
@@ -771,14 +775,13 @@ sub test_no_auto_clean {
 
     # the seventh entry was written to the record store index, but not yet
     # saved to a silo until save
-    is( $store->[DATA_PROVIDER]->record_count, 6, "correct entry count silo method" );
+    is( $store->[DATA_PROVIDER]->active_entry_count, 6, "correct entry count silo method" );
 
     $store->save;
 
     ok( $store->[DATA_PROVIDER]->fetch( $list_to_remove_id ), "removed list before purge" );
     
     is( $store->[DATA_PROVIDER]->entry_count, 7, "correct entry count after nuking the list" );
-    is( $store->[DATA_PROVIDER]->record_count, 7, "correct entry count silo method before syncing store" );
     is( $store->[DATA_PROVIDER]->active_entry_count, 7, "correct active entry count before syncing the store" );
 
     ok( $store->[DATA_PROVIDER]->fetch( $list_to_remove_id ), "removed list still in cache" );
@@ -788,22 +791,20 @@ sub test_no_auto_clean {
     undef $objy;
     undef $someobj;
 
-    $store->clean_store;
-
-    is( $store->[DATA_PROVIDER]->record_count, 3, "correct entry count silo method" );
+    $store->quick_purge;
     is( $store->[DATA_PROVIDER]->active_entry_count, 3, "correct active entry count after nuking the list" );
     
     ok( ! $store->[DATA_PROVIDER]->fetch( $list_to_remove_id ), "removed list removed from store" );
-    ok( ! $store->_fetch( $list_to_remove_id ), "removed list still removed" );
-    ok( ! $store->_fetch( $hash_in_list_id ), "removed hash id still removed" );
-    ok( ! $store->_fetch( $objy_id ), "removed objy still removed" );
-    ok( ! $store->_fetch( $someobj_id ), "removed someobj still removed" );
+    ok( ! $store->fetch( $list_to_remove_id ), "removed list still removed" );
+    ok( ! $store->fetch( $hash_in_list_id ), "removed hash id still removed" );
+    ok( ! $store->fetch( $objy_id ), "removed objy still removed" );
+    ok( ! $store->fetch( $someobj_id ), "removed someobj still removed" );
 
     undef $dup_root;
 
     undef $root_node;
 
-    $Data::ObjectStore::Hash::SIZE = 7;
+    $Data::ObjectStore::Hash::BUCKET_SIZE = 7;
 
     my $thash = $store->load_root_container->set_test_hash({});
     # test for hashes large enough that subhashes are inside
@@ -861,6 +862,7 @@ sub test_no_auto_clean {
     is_deeply( [sort keys %$thash], [sort ("B".."G","AA".."ZZ")], "hash keys works for the heftier hashes" );
 
     is_deeply( $thash, \%confirm_hash, "hash checks out keys and values" );
+    
 
     # array tests
     # listy test because
@@ -1013,12 +1015,6 @@ sub test_no_auto_clean {
 
     my $root = $store->load_root_container;
 
-    eval {
-        $old_store->_knot( $root );
-        fail( "Was able to get the knot for mismatched store" );
-    };
-    like( $@, qr/from an other store/, 'fail message for getting knot of mismatched store' );
-
     my $othing = new OtherThing;
     ok( !$old_store->_knot( $othing ), 'getting knot for non container returns undef' );
 
@@ -1100,12 +1096,12 @@ sub test_no_auto_clean {
     $store->save;
     my $prov = $store->[DATA_PROVIDER];
     is( $prov->active_entry_count, 6, 'six things created' );
-    $store->clean_store;
+    $store->quick_purge;
     $root_node->set_myList([]);
     $store->save;
     is( $prov->active_entry_count, 7, 'now seven things created' );
 
-    $store->clean_store;
+    $store->quick_purge;
     $store->save;
     is_deeply( $root_node->get_myList, [], "root node mylist after clean and stuff" );
     is( $prov->active_entry_count, 3, 'now just 3 things' );
@@ -1159,25 +1155,22 @@ sub test_upgrade_db {
         my $store = Data::ObjectStore->open_store( $source_dir );
         fail( "was able to open a store with an old incompatable version" );
     };
-    like( $@, qr/Unable to open/i, 'error message for opeining store with incompatable message' );
+    like( $@, qr/Unable to open|lock file did not exist/i, 'error message for opeining store with incompatable message' );
 
 
     # allows the store to be open anyway
     $Data::ObjectStore::UPGRADING = 1;
     my $store = Data::ObjectStore->open_store( $source_dir );
 
-    is( $store->[DATA_PROVIDER]->entry_count, 8, "upgrade eight IDS to start" );
-    is( $store->[DATA_PROVIDER]->record_count, 7, "upgrade seven records to start" );
-    is( $store->[DATA_PROVIDER]->active_entry_count, 7, "upgrade seven active IDS to start" );
+    is( $store->[DATA_PROVIDER]->entry_count, 8, "upgrade eight IDs to start" );
+    is( $store->[DATA_PROVIDER]->active_entry_count, 8, "upgrade seven active IDS to start" );
 
     $Data::ObjectStore::UPGRADING = 0;
-
     eval {
         Data::ObjectStore::upgrade_store( $source_dir, $dest_dir );
         pass( "able to upgrade store" );
     };
     ok( !$@, "got error '$@' upgrading store" );
-
     $store = Data::ObjectStore->open_store( $dest_dir );
     my $root = $store->load_root_container;
 
@@ -1189,7 +1182,6 @@ sub test_upgrade_db {
     my $obj = $hash->{foo};
 
     is( $store->[DATA_PROVIDER]->entry_count, 5, "upgrade five IDS after" );
-    is( $store->[DATA_PROVIDER]->record_count, 5, "upgrade five records after" );
     is( $store->[DATA_PROVIDER]->active_entry_count, 5, "upgrade five active IDS after" );
 
     eval {
@@ -1215,14 +1207,13 @@ sub test_circular {
 
     my $info_node = $store->_fetch_store_info_node;
     my $root      = $store->load_root_container;
-
     my $h = {};
     my $l = [$h];
     my $o = $store->create_container( {
         list => $l,
         hash => $h,
     } );
-    is( $store->last_updated( $o ), $store->created( $o ), "obj created and last updated same time" );
+    approx( $store->last_updated( $o ), $store->created( $o ), .5 , "obj created and last updated same time" );
 
     ok( ! $store->last_updated("FOO"), "no update for a scalar" );
     ok( ! $store->created("FOO"), "no update for a scalar" );
@@ -1232,7 +1223,6 @@ sub test_circular {
     $h->{foo} = $o;
     $h->{bar} = $h;
     push @$l, $l, $h;
-
     # make sure the root and the info node can't be added to other nodes.
     eval {
         $h->{root} = $root;
@@ -1278,7 +1268,6 @@ sub test_circular {
     my $lt = $store->_knot( $l );
 
     $store->save;
-
     $store = Data::ObjectStore->open_store( $dir );
     $root = $store->load_root_container;
     $l = $root->get_list;
@@ -1299,7 +1288,7 @@ sub test_loop {
     my $list = [ 1, 2, 3, 4, 5 ];
     unshift @$list, $list;
     $new_root_node->set_list( $list );
-    is( $new_store->last_updated( $list ), $new_store->created( $list ), "list created and last updated same time" );
+    approx( $new_store->last_updated( $list ), $new_store->created( $list ), .5, "list created and last updated same time" );
     $new_store->save;
 
     $new_store = Data::ObjectStore->open_store( $dir );
@@ -1315,7 +1304,7 @@ sub test_loop {
     my $h = { foo => 'bar' };
     $h->{h} = $h;
     push @$list, $h;
-    is( $new_store->last_updated( $h ), $new_store->created( $h ), "created and last updated same time" );
+    approx( $new_store->last_updated( $h ), $new_store->created( $h ), .5, "created and last updated same time" );
     $new_store->save;
 
     is( $new_store->[DATA_PROVIDER]->active_entry_count, 4, 'one list, hash and root' );
@@ -1357,7 +1346,7 @@ sub _cmph {
     while ( @pairs ) {
         my $actual = shift @pairs;
         my $expected = shift @pairs;
-        if ( ref( $expected ) ) {
+        if ( ref( $expected ) ) {            
             is_deeply( [sort keys( %$actual )], [sort  keys( %$expected ) ], "$title keys" );
             is_deeply( [sort values( %$actual )], [sort  values( %$expected ) ], "$title values" );
             is( scalar( values( %$actual )), scalar(  values( %$expected ) ), "$title value counts" );
@@ -1369,16 +1358,36 @@ sub _cmph {
     }
 } #_cmph
 
+sub test_purge {
+    my $dir = tempdir( CLEANUP => 1 );
+    my $store = Data::ObjectStore->open_store( DATA_PROVIDER => $dir, CACHE => 900 );
+    my $root = $store->load_root_container;
+    my $keep = $root->set_keep( $store->create_container );
+    $keep->set_me( $keep );
+    my $dontkeep = $root->set_dontkeep( $store->create_container );
+    $dontkeep->set_me( $dontkeep );
+    $store->save;
+    $root->remove_field( 'dontkeep' );
+    $store->save;
+    my $recstore = $store->data_store;
+    is( ref( $recstore ), 'Data::RecordStore', "data store is record store" );
+    is( $recstore->active_entry_count, 4, '4 active entries' );
+
+    is( $store->quick_purge, 1, 'one thing purged' );
+    is( $recstore->active_entry_count, 3, '3 active entries after purge' );
+} #test_purge
+
 
 sub test_hash {
 
     my $dir = tempdir( CLEANUP => 1 );
     my $store = Data::ObjectStore->open_store( DATA_PROVIDER => $dir, CACHE => 900 );
-    #my $store = Data::ObjectStore->open_store( $dir );
     my $root_node = $store->load_root_container;
     my $hash;
-    for my $SZ (2..30) {
-        $Data::ObjectStore::Hash::SIZE = $SZ;
+    for my $pair ([20,2], [20,10 ] ) {
+        ( $Data::ObjectStore::Hash::MAX_SIZE,
+          $Data::ObjectStore::Hash::BUCKET_SIZE ) = @$pair;
+
         $hash = $root_node->set_hash({});
         my $match = {};
         $hash->{FOO} = "BAR";
@@ -1396,7 +1405,7 @@ sub test_hash {
             my $k = shift @keys;
             my $v = shift @vals;
             if ( $k eq 'ROOT' ) {
-                if ( $SZ == 25 ) {
+                if ( $pair->[1] == 10 ) {
                     eval {
                         $hash->{$k} = $v;
                         fail( "Was able to put the root into a hash" );
@@ -1406,11 +1415,22 @@ sub test_hash {
             }
             else {
                 $hash->{$k} = $v;
+                ok(exists $hash->{$k}, "Hash has key" );
                 $match->{$k} = $v;
             }
         }
-        _cmph( "alphawet buckets $SZ", $hash, $match );
-        if ( $SZ == 3 ) {
+        my( @kv );
+        while( my($k,$v) = each %$hash ) {
+            push @kv, "$k$v";
+        }
+        is_deeply( [sort @kv], [sort map { "$_$hash->{$_}" } keys( %$hash ) ], "alphabuck keys each" );
+        _cmph( "alphawet buckets @$pair", $hash, $match );
+        $store->save;
+        my $news = Data::ObjectStore->open_store( DATA_PROVIDER => $dir, CACHE => 900 );
+        my $nooroo = $news->load_root_container;
+        my $newh = $nooroo->get_hash;
+        _cmph( "alphawet buckets @$pair loaded", $hash, $match );
+        if ( $pair->[1] == 2 ) {
             is( delete $hash->{BOOGA}, undef, 'nothing to delete from big hash' );
             is( delete $hash->{A}, 1, 'deleted from big hash' );
             is( $hash->{B}, 2, 'get from big hash' );
@@ -1419,15 +1439,16 @@ sub test_hash {
 
             is( $hash->{BA}, undef, 'nothing to get from big hash' );
         }
-    }                           #each size
+    } #each size
 
-    $root_node->set_bigdoubler( { map { $_ => 2*$_ } (0..$Data::ObjectStore::Hash::SIZE) } );
-    is_deeply( $root_node->get_bigdoubler, { map { $_ => 2*$_ } (0..$Data::ObjectStore::Hash::SIZE) }, "hash made okey that was larger than the default bucket size" );
+    $root_node->set_bigdoubler( { map { $_ => 2*$_ } (0..$Data::ObjectStore::Hash::BUCKET_SIZE) } );
+    is_deeply( $root_node->get_bigdoubler, { map { $_ => 2*$_ } (0..$Data::ObjectStore::Hash::BUCKET_SIZE) }, "hash made okey that was larger than the default bucket size" );
     $store->save;
-    is_deeply( $root_node->get_bigdoubler, { map { $_ => 2*$_ } (0..$Data::ObjectStore::Hash::SIZE) }, "hash made okey that was larger than the default bucket size, still okey after save" );
+    is_deeply( $root_node->get_bigdoubler, { map { $_ => 2*$_ } (0..$Data::ObjectStore::Hash::BUCKET_SIZE) }, "hash made okey that was larger than the default bucket size, still okey after save" );
 
     $dir = tempdir( CLEANUP => 1 );
-    $store = Data::ObjectStore->open_store( DATA_PROVIDER => $dir, CACHE => 900 );
+    my $cache = Data::ObjectStore::Cache->new( 900 );
+    $store = Data::ObjectStore->open_store( DATA_PROVIDER => $dir, CACHE => $cache );
 #    $store = Data::ObjectStore->open_store( $dir );
     $root_node = $store->load_root_container;
 
@@ -1448,7 +1469,7 @@ sub test_hash {
     delete $h->{OBJY};
     $h->{NOTHING} = undef;
     $store->save;
-    $store->quick_purge;
+    is( $store->quick_purge, 1, 'one thing purged' );
     
     is( $store->[DATA_PROVIDER]->active_entry_count, 3, 'removed obj from hash' );
 
@@ -1469,7 +1490,95 @@ sub test_hash {
     %$h = ();
     ok( ! $store->_has_dirty, "cleared hash that was already cleared so not dirty" );
 
+    my $tied = $store->_knot( $h );
+    is( ref( $h ), 'HASH', "hash is correct class" );
+    is( ref( $tied ), 'Data::ObjectStore::Hash', "tied hash is correct class" );
+    is( ref( $tied->store ), 'Data::ObjectStore', "can access store thru tied" );
+
+    is( $store->_knot( { my => 'hash' } ), undef, "not tied hash" );
+    is_deeply( $tied, $store->_knot( $tied ), "tied hash knot returns itself" );
+
+    $dir = tempdir( CLEANUP => 1 );
+
+    $store = Data::ObjectStore->open_store( DATA_PROVIDER => $dir, CACHE => 900 );
+    my $root = $store->load_root_container;
+    $Data::ObjectStore::Hash::BUCKET_SIZE = 3;
+    $h = $root->set_hash( { 1 => 1, 2 => 2, 3 => 3 } );
+    $h->{4} = 4;
+    eval {
+        $h->{root} = $root;
+        fail( "Was able to store the root in the hash" );
+    };
+    like( $@, qr/cannot store a root node in a hash/, "unable to store the root in the hash" );
+    eval {
+        $h->{extra_to_make_sure_newkey_also_works} = $root;
+        fail( "Was able to store the root in the hash" );
+    };
+    like( $@, qr/cannot store a root node in a hash/, "unable to store the root in the hash" );
+
+    eval {
+        $h->{must_hash_to_new_bucket} = $root;
+        fail( "Was able to store the root in the hash" );
+    };
+    like( $@, qr/cannot store a root node in a hash/, "unable to store the root in the hash" );
 } #test_hash
+
+sub test_bighash {
+    ( $Data::ObjectStore::Hash::MAX_SIZE,
+      $Data::ObjectStore::Hash::BUCKET_SIZE ) = ( 4, 7 );
+    my $dir = tempdir( CLEANUP => 1 );
+    my $store = Data::ObjectStore->open_store( DATA_PROVIDER => $dir, CACHE => 900 );
+    my $root_node = $store->load_root_container;
+    my $h = $root_node->set_hash({});
+    my $top = 20;
+    for (1 .. $top ) {
+        $h->{$_} = $_;
+    }
+    is_deeply( $h, { map { $_ => $_ } (1..$top) }, "in hash 5x5" );
+    $h->{BAGEL} = [];
+    $store->save;
+
+    $store = Data::ObjectStore->open_store( DATA_PROVIDER => $dir, CACHE => 900 );
+    $root_node = $store->load_root_container;
+    $h = $root_node->get_hash;
+    is_deeply( $h, { BAGEL => [], map { $_ => $_ } (1..$top) }, "in hash 5x5, loaded store" );
+
+    delete $h->{BAGEL};
+    is_deeply( $h, { map { $_ => $_ } (1..$top) }, "in hash 5x5, loaded store" );
+    $store->save;
+    $store = Data::ObjectStore->open_store( DATA_PROVIDER => $dir, CACHE => 900 );
+    $root_node = $store->load_root_container;
+    $h = $root_node->get_hash;
+    is_deeply( $h, { map { $_ => $_ } (1..$top) }, "in hash 5x5, loaded store" );
+    ( $Data::ObjectStore::Hash::MAX_SIZE,
+      $Data::ObjectStore::Hash::BUCKET_SIZE ) = ( 4, 1000 );
+    $dir = tempdir( CLEANUP => 1 );    
+    $store = Data::ObjectStore->open_store( DATA_PROVIDER => $dir, CACHE => 900 );
+    $root_node = $store->load_root_container;
+    $h = $root_node->get_hash({});
+    
+    for (3 .. 7) {
+        $h->{$_} = $_*2;
+    }
+    my $t = tied %$h;
+
+    eval {
+        $h->{ROOT} = $root_node;
+        fail( "could attach root node" );
+    };
+    my( @keys );
+    while( my( $k, $v ) = each %$h ) {
+        push @keys, $k;
+        is( $k*2, $v, "each $k correct" );
+    }
+    is_deeply( [sort @keys], [3..7], 'keys from hash got by each' );
+    is_deeply( [sort keys %$h], [3..7], 'keys from hash' );
+    
+    ( $Data::ObjectStore::Hash::MAX_SIZE,
+      $Data::ObjectStore::Hash::BUCKET_SIZE ) = ( 1_062_599, 29 );
+
+    
+} #test_bighash
 
 sub test_arry {
 
@@ -1698,21 +1807,50 @@ sub test_arry {
     splice @$spli, 10, 0, "NOINS";
     is_deeply( $spli, [1..5,"A","B","D","E","NOINS"], "spliced added no insert into block case" );
 
+    # the following makes sure that the tied UNSHIFT doesn't barf but perl freaks out and
+    # warns if unshift isn't give a value to unshift.
+    no warnings 'syntax';
     unshift @$spli;
+    use warnings 'syntax';
+
     is_deeply( $spli, [1..5,"A","B","D","E","NOINS"], "after empty unshift" );
-    splice @$spli, 0, 100, "Q".."Z";
+    my( @gone ) = splice @$spli, 0, 100, "Q".."Z";
+    is_deeply( \@gone, [1..5,"A","B","D","E","NOINS"], "after big splice" );
     is_deeply( $spli, ["Q".."Z"], "after biiggy splice" );
-    splice @$spli, 0, -2, "A", "B";
+    (@gone) = splice @$spli, 0, -2, "A", "B";
     is_deeply( $spli, ["A","B","Y","Z"], "after neg offset" );
-    splice @$spli, 1, -2, "C", "D";
+    is_deeply( \@gone, ["Q".."X"], "after big splice and neg offset" );
+    
+    (@gone) = splice @$spli, 1, -2, "C", "D";
     is_deeply( $spli, ["A","C","D","Y","Z"], "after neg offset" );
+    is_deeply( \@gone, ["B"], "after small splice and neg offset" );
 
     my $c = $store->create_container;
-    splice @$spli, -3, 0, 1, 2, $c;
+    (@gone) = splice @$spli, -3, 0, 1, 2, $c;
     is_deeply( $spli, ["A","C",1,2,$c,"D","Y","Z"], "after neg offset" );
+    is_deeply( \@gone, [], "after neg offset no remove" );
     my( $rc ) = splice @$spli, 4, 1;
     is( $rc, $c, "spliced out an object" );
+    is_deeply( $spli, ["A","C",1,2,"D","Y","Z"], "after splicing out container" );
+    
+    ( @gone ) = splice @$spli;
+    is_deeply( \@gone, ["A","C",1,2,"D","Y","Z"], "when everything removed" );
+    is_deeply( $spli, [], "what is left when everything removed" );
 
+    my $tied = $store->_knot( $spli );
+    is( ref( $spli ), 'ARRAY', "array is correct class" );
+    is( ref( $tied ), 'Data::ObjectStore::Array', "tied is correct class" );
+    is( ref( $tied->store ), 'Data::ObjectStore', "can access store thru tied" );
+
+    is_deeply( $tied, $store->_knot( $tied ), "tied array knot returns itself" );
+
+    
+    is( $store->_knot( [ 'my','arry' ] ), undef, "not tied arry" );
+
+    $root_node->set_poparry([]);
+    is( pop( @{$root_node->get_poparry} ), undef, "popping empty array" );
+
+    is( shift( @{$root_node->get_poparry} ), undef, "shifting empty array" );
 
 } #test_arry
 
@@ -1722,7 +1860,7 @@ sub test_connections {
     my $dir = tempdir( CLEANUP => 1 );
     my $store = Data::ObjectStore->open_store( $dir );
 
-    my $root = $store->load_root_container;
+    my $root = $store->load_root_container; # 1, 2 entries
 
     my $other_thing = new OtherThing;
     eval {
@@ -1731,38 +1869,38 @@ sub test_connections {
     };
     like( $@, qr/Cannot ingest/, "error message for setting non container object" );
 
-    my $hash = $root->set_hash({});
+    my $hash = $root->set_hash({}); # 1, 2, 3 entries
     my $tha = $store->_knot( $hash );
 
-    my $obj_rand = $store->create_container;
+    my $obj_rand = $store->create_container; # 1, 2, 3, 4 entries
     $root->set_rand( $obj_rand );
 
-    my $obj_refd = $store->create_container;
+    my $obj_refd = $store->create_container; # 1, 2, 3, 4, 5 entries
     my $refd_id = $obj_refd->[ID];
 
-    my $obj_unrefd = $store->create_container;
+    my $obj_unrefd = $store->create_container; # 1, 2, 3, 4, 5, 6 entries
     my $unrefd_id = $obj_unrefd->[ID];
     $obj_refd->set_unrefd( $obj_unrefd );
     undef $obj_unrefd;
 
     $obj_refd->get_unrefd->set_rand( $obj_rand );
 
-    $root->set_refd( $obj_refd );
+    $root->set_refd( $obj_refd ); # 1, 2, 3, 4, 5, 6 entries all conneccted
 
-    $root->set_refd( undef );
+    $root->set_refd( undef );  # 1, 2, 3, 4 entries conneccted,  5, 6 unconnected
 
-    ok( $root->[DSTORE]->_fetch( $unrefd_id ), 'unref id not gone from store before save' );
-    ok( $root->[DSTORE]->_fetch( $refd_id ), 'ref obj not yet gone from store' );
+    ok( $root->[DSTORE]->fetch( $unrefd_id ), 'unref id not gone from store before save' );
+    ok( $root->[DSTORE]->fetch( $refd_id ), 'ref obj not yet gone from store' );
 
     $store->save;
 
     undef $obj_refd;
 
     $store->save;
-    $store->quick_purge;
+    is( $store->quick_purge, 2, 'two thing purged' );
 
-    ok( ! $root->[DSTORE]->_fetch( $unrefd_id ), 'unref id gone from store' );
-    ok( ! $root->[DSTORE]->_fetch( $refd_id ), 'ref obj now gone from store' );
+    ok( ! $root->[DSTORE]->fetch( $unrefd_id ), 'unref id gone from store' );
+    ok( ! $root->[DSTORE]->fetch( $refd_id ), 'ref obj now gone from store' );
 
     $root->add_to_myList( { foo => "bar" } );
 
@@ -1781,7 +1919,7 @@ sub test_connections {
     $store->load_root_container->set_zon( $zon );
     $store->save( $con );
     $store->save( $pon );
-    $store->quick_purge;
+    is( $store->quick_purge, 1, 'one thing purged' );
     
     is( $store->[DATA_PROVIDER]->active_entry_count, 3, 'root nodes and 2 containers saved, but only one of the containers connects' );
     $store->save;
@@ -1789,6 +1927,107 @@ sub test_connections {
     is( $store->[DATA_PROVIDER]->active_entry_count, 4, 'root nodes and 2 containers saved, one container not connected' );
 
 } #test_connections
+
+sub test_classes {
+    my $dir = tempdir( CLEANUP => 1 );
+    my $store = Data::ObjectStore->open_store( $dir );
+
+    my $root = $store->load_root_container;
+
+    require SomeThing;
+    my $newid;
+    {
+        my $newy = $root->set_newy( $store->create_container( 'SomeThing' ) );
+        $newid = $store->existing_id( $newy );
+        ok( $newid > 0, "got an existing id for the other thing" );
+        $store->save;
+    }
+    {
+        local @INC = grep { $_ ne 't/lib' } @INC;
+        local %INC = %INC;
+        delete $INC{"SomeThing.pm"};
+        eval {
+            require SomeThing;
+        };
+        like( $@, qr/Can't locate SomeThing.pm/, "removed otherthing from includable path" );
+        undef $@;
+        eval {
+            my $newy = $root->get_newy;
+            fail( 'was able to instantiate newy without SomeThing in path' );
+        };
+        like( $@, qr/Can't locate SomeThing.pm/, "removed otherthing from includable path" );
+        
+        eval {
+            my $newy = $store->fetch( $newid );
+            fail( 'was able to instantiate newy without SomeThing in path from fetch' );
+        };
+        like( $@, qr/Can't locate SomeThing.pm/, "removed otherthing from includable path from fetch" );
+        
+        local( *STDERR );
+        my $errout;
+        open( STDERR, ">>", \$errout );
+        my $newy = $store->fetch( $newid, 1 );
+        is( ref($newy), 'Data::ObjectStore::Container', "Was able to force newy to be a container" );
+        like( $errout, qr/Forcing 'SomeThing' to be 'Data::ObjectStore::Container'/, "force warning" );
+    }
+    
+    my $newy = $store->create_container( 'SomeThing' );
+    is( ref( $newy ), 'SomeThing', "made an obj" );
+    $store->save( $newy );
+    {
+        is( SomeThing->isa( 'Data::ObjectStore::Container' ), 1, "something is still a container" );
+        local @INC = grep { $_ ne 't/lib' } @INC;
+        local %INC = %INC;
+        delete $INC{"SomeThing.pm"};
+        unshift @INC, 't/lib2';
+        # simulate SomeThing being changed from a container to not a container
+        require SomeThing;
+        is( SomeThing->isa( 'Data::ObjectStore::Container' ), '', "something is no longer a container" );
+        eval {
+            my $newy = $store->fetch( $newid );
+            fail( 'was able to instantiate newy with augmented non container SomeThing' );
+        };
+        like( $@, qr/is not a 'Data::ObjectStore::Container'/, "removed otherthing from includable path from fetch" );
+
+        local( *STDERR );
+        my $errout;
+        open( STDERR, ">>", \$errout );
+        $newy = $store->fetch( $newid, 1 );
+        like( $errout, qr/Forcing 'SomeThing' to be 'Data::ObjectStore::Container'/, "force warning" );
+        is( ref($newy), 'Data::ObjectStore::Container', "Was able to force newy to be a container" );
+    }
+#    unshift @INC, 't/lib';
+    require SomeThingElse;
+    require Tainer;
+    my $other = $root->set_othur( $store->create_container('Tainer') );
+    is( ref($other), 'Tainer', 'starts as other' );
+    $store->save( $other, 'SomeThingElse' );
+    $store->save;
+    $store = Data::ObjectStore->open_store( $dir );
+    $root = $store->load_root_container;
+    is( ref($root->get_othur), 'SomeThingElse', 'is now some' );
+} #test_classes
+
+sub test_fields {
+    my $dir = tempdir( CLEANUP => 1 );
+    my $store = Data::ObjectStore->open_store( $dir );
+
+    my $root = $store->load_root_container;
+
+    $root->get_foo( undef );
+    $root->get_bar;
+    $root->get_zap( 0 );
+    is_deeply( [sort @{$root->fields}], [sort qw( zap ) ], "one fields defined" );
+    $root->set_foo( undef );
+    $root->set_bar;
+    is_deeply( [sort @{$root->fields}], [sort qw( bar foo zap ) ], "now three fields defined" );
+    $root->set_zap( undef );
+    is_deeply( [sort @{$root->fields}], [sort qw( bar foo zap ) ], "still three fields defined" );
+
+    $root->remove_field( 'zap' );
+    is_deeply( [sort @{$root->fields}], [sort qw( bar foo ) ], "now two fields defined" );
+
+} #test_fields
 
 __END__
 

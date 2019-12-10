@@ -1,5 +1,52 @@
 # Perltidy Change Log
 
+## 2019 12 03
+
+    - Fixed issue RT#131115: -bli option not working correctly.
+      Closing braces were not indented in some cases due to a glitch
+      introduced in version 20181120.
+
+    - Fixed issue RT#130394: Allow short nested blocks.  Given the following
+
+        $factorial = sub { reduce { $a * $b } 1 .. 11 };
+   
+      Previous versions would always break the sub block because it
+      contains another block (the reduce block).  The fix keeps
+      short one-line blocks such as this intact.
+
+    - Implement issue RT#130640: Allow different subroutine keywords.
+      Added a flag --sub-alias-list=s or -sal=s, where s is a string with
+      one or more aliases for 'sub', separated by spaces or commas.
+      For example,
+
+        perltidy -sal='method fun' 
+
+      will cause the perltidy to treat the words 'method' and 'fun' to be
+      treated the same as if they were 'sub'.
+
+    - Added flag --space-prototype-paren=i, or -spp=i, to control spacing 
+      before the opening paren of a prototype, where i=0, 1, or 2:
+      i=0 no space
+      i=1 follow input [current and default]
+      i=2 always space
+
+      Previously, perltidy always followed the input.
+      For example, given the following input 
+
+         sub usage();
+
+      The result will be:
+        sub usage();    # i=0 [no space]
+        sub usage();    # i=1 [default; follows input]
+        sub usage ();   # i=2 [space]
+
+    - Fixed issue git#16, minor vertical alignment issue.
+
+    - Fixed issue git#10, minor conflict of -wn and -ce
+
+    - Improved some vertical alignments involving two lines.
+
+
 ## 2019 09 15
 
     - fixed issue RT#130344: false warning "operator in print statement" 

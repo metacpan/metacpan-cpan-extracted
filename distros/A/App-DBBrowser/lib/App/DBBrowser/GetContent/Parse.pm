@@ -109,18 +109,18 @@ sub __print_template_info {
     my $end_idx = $#{$rows};
     if ( @$rows > $avail_h ) {
         for my $row ( @{$rows}[ 0 .. $first_part_end ] ) {
-            $info .= "\n" . unicode_sprintf( $row, $term_w, 0, 1 );
+            $info .= "\n" . unicode_sprintf( $row, $term_w, { add_dots => 1 } );
         }
         $info .= "\n[...]";
         for my $row ( @{$rows}[ $end_idx - $second_part_begin .. $end_idx ] ) {
-            $info .= "\n" . unicode_sprintf( $row, $term_w, 0, 1 );
+            $info .= "\n" . unicode_sprintf( $row, $term_w, { add_dots => 1 } );
         }
         my $row_count = scalar( @$rows );
-        $info .= "\n" . unicode_sprintf( '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]', $term_w, 0, 1 );
+        $info .= "\n" . unicode_sprintf( '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]', $term_w, { add_dots => 1 } );
     }
     else {
         for my $row ( @$rows ) {
-            $info .= "\n" . unicode_sprintf( $row, $term_w, 0, 1 );
+            $info .= "\n" . unicode_sprintf( $row, $term_w, { add_dots => 1 } );
         }
     }
     $info .= "\n";

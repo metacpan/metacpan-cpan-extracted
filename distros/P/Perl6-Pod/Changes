@@ -4,6 +4,9 @@ TODO:
     - Formatting code: P<>, S<>, M<>, 
     - Config: :margin, :formatted
 
+0.73 2019-12-07
+    * fix =code's raw content
+
 0.72 2015-12-16
     * fix deps
 

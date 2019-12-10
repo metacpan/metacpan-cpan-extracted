@@ -284,7 +284,7 @@ sub _format_amz_date {
 }
 
 sub _now {
-	return scalar Time::Piece::gmtime;
+	return scalar Time::Piece->gmtime;
 }
 
 sub _req_timepiece {
@@ -315,7 +315,7 @@ Net::Amazon::S3::Signature::V4Implementation - Implements the Amazon Web Service
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 SYNOPSIS
 

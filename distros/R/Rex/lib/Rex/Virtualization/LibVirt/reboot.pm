@@ -9,7 +9,7 @@ package Rex::Virtualization::LibVirt::reboot;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.0'; # VERSION
+our $VERSION = '1.7.1'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;

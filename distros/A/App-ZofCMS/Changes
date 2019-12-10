@@ -1,5 +1,8 @@
 Revision history for App-ZofCMS
 
+1.001008 2019-12-05
+    - Fixed incorrect plugin priority handling on newer perls
+
 1.001007 2017-01-04
     - Update for 5.26 '{' in regex stuff
 

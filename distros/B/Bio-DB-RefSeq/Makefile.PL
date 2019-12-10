@@ -23,14 +23,16 @@ my %WriteMakefileArgs = (
     "vars" => 0
   },
   "TEST_REQUIRES" => {
-    "Bio::Root::Test" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0,
+    "Test::Needs" => 0,
+    "Test::RequiresInternet" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.7.3",
+  "VERSION" => "1.7.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,13 +41,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Bio::DB::DBFetch" => 0,
-  "Bio::Root::Test" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Test::More" => 0,
+  "Test::Needs" => 0,
+  "Test::RequiresInternet" => 0,
   "base" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "vars" => 0,
   "warnings" => 0
 );

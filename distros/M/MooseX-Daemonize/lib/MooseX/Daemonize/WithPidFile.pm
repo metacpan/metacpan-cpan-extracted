@@ -3,7 +3,7 @@ use warnings;
 package MooseX::Daemonize::WithPidFile;
 # ABSTRACT: A Role with the core daemonization and pidfile management
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use MooseX::Getopt; # to load the Getopt metaclass
 use Moose::Role;
@@ -55,7 +55,7 @@ MooseX::Daemonize::WithPidFile - A Role with the core daemonization and pidfile 
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -126,10 +126,6 @@ The C<meta()> method from L<Class::MOP::Class>
 
 L<Moose::Role>, L<MooseX::Getopt> and L<MooseX::Daemonize::Pid::File>
 
-=head1 COPYRIGHT AND LICENCE
-
-Portions heavily borrowed from L<Proc::Daemon> which is copyright Earl Hood.
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Daemonize>
@@ -161,5 +157,7 @@ This software is copyright (c) 2007 by Chris Prather.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+Portions heavily borrowed from L<Proc::Daemon> which is copyright Earl Hood.
 
 =cut

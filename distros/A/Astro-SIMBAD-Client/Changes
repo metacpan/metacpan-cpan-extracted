@@ -1,3 +1,8 @@
+0.041		2019-12-09	T. R. Wyant
+    Track change in Arcturus radial velocity (in test)
+
+    Prohibit redirects in URL POD links.
+
 0.040		2019-08-04	T. R. Wyant
     Fix POD link errors and add test to ensure that they stay fixed.
 
@@ -45,23 +50,20 @@
   Add GitHub repository to metadata.
 
 0.033		2014-10-25	T. R. Wyant
-  No changes since 0.032_01.
-
-0.032_01	2014-10-18	T. R. Wyant
   Remove installer question. The simbadc script is now installed by
     default. If you do not want it, run the installer with the -n
     option.
+
   Restructure data retrieval code to facilitate debugging.
 
 0.032		2014-06-12	T. R. Wyant
-  No changes since version 0.031_01.
-
-0.031_01	2014-06-04	T. R. Wyant
   Add attribute emulate_soap_queries. If true, this attribute causes the
     query() method (and friends) to generate canned script queries
     rather than SOAP queries. If we are not using SOAP, query() and
     friends do not produce warnings.
+
   Eliminate use of each() built-in.
+
   Remove VO-format url_query test of MAIN_ID. A note from SIMBAD support
     January 6 2014 says they do not support any way to change what is in
     the MAIN_ID field in a url_query VO-format return. It _is_ supported
@@ -72,6 +74,7 @@
     remove the 'install simbadc?' question and simply install it by
     default. The command-line options -y and -n will remain available.
     This is schedued for the first release after September 1 2014.
+
   Mark VO url query 'name' test TODO
     This started failing Feb 3 (returning '* alf Boo' rather than 'NAME
     Arcturus'). I found parameters that seem to influence the MAIN_iD
@@ -91,20 +94,17 @@
     'RA' and 'DEC'.
 
 0.028		2013-11-08	T. R. Wyant
-  No changes since 0.027_01.
-
-0.027_01	2013-10-28	T. R. Wyant
   Deprecate the use of SOAP. This includes the query() method and all
     methods that use it.
 
 0.027		2013-07-28	T. R. Wyant
-  No substantive changes since 0.026_01.
-
-0.026_01	2013-07-22	T. R. Wyant
   Make use of the relevant FORMAT_* constants in t/simple.t and
     t/yaml.t.
+
   Make SOAP::Lite and XML::Parser optional. Especially the former.
+
   Strip the literal newlines from the FORMAT_TXT_* canned formats.
+
   Remove (well, rename) author test that fails when SOAP VO queries
     start working, and remove TODO for SOAP in t/vo.t, on receiving
     letter saying that the problem is fixed.
@@ -115,6 +115,7 @@
     is a server-side problem (famous last words!) I have made the
     relevant tests TODO and put a NOTICE in the Astro::SIMBAD::Client
     POD.
+
   Replace code that feels around for a working YAML module with code
     that just uses YAML itself.
 
@@ -127,27 +128,28 @@
     address.
 
 0.023		2011-11-01	T. R. Wyant
-  No changes from 0.022_03, other than version.
-
-0.022_03	2011-10-23	T. R. Wyant
   Correct the t/yaml.t script so that the script_file( 't/arcturus.yaml' )
     tests are skipped if neither YAML nor YAML::Syck can be loaded.
+
   Add optional modules tests to the author tests, to be sure the above
     is fixed, and stays that way.
+
   Removed debug output from t/yaml.t
 
-0.022_02	2011-10-23	T. R. Wyant
   Have the Astro::SIMBAD::Client script_file() method post the file to
     field 'scriptFile', not 'CriteriaFile', to match the current HTML
     form being emulated.
+
   Add debug output to t/yaml.t to try to track down why there are so
     many test failures in script_file( 't/arcturus.yaml' ).
 
-0.022_01	2011-10-18	T. R. Wyant
   Update dependencies.
+
   Rewrite tests to use Test::More 0.88, and update build_requires for this.
+
   Comment tweaks to avoid a bug in Module::ExtractUse (i.e., play the
     CPANTS game).
+
   Correct t/vo.t radial velocity test.
 
 0.022		2011-07-26	T. R. Wyant
@@ -165,19 +167,27 @@
 
 0.019		2011-03-03	T. R. Wyant
   Convert to Perl Foundation-recommended license.
+
   Reorganize author tests to run on separate Build.PL tag, not a magic
     environment variable.
+
   Module::Build is no longer required for configuration since you can
     use ExtUtils::MakeMaker if you wish.
 
 0.018		2009-04-09	T. R. Wyant
   Distribute developer tests, but only run if DEVELOPER_TEST is set.
+
   Comply with Perl::Critic using profile t/perlcriticrc.
+
   Criticize code as part of developer testing.
+
   Drop unneeded 'use FileHandle' from Build.PL.
+
   Have Build.PL and Makefile.PL handle -y and -n to supress prompt and
     install or not install simbadc respectively.
+
   Correct 'help client' in bin/simbadc
+
   Update t/vo.t to track the fact that the SIMBAD4 URL query has gone
     back to decimal degrees for position.
 
@@ -186,6 +196,7 @@
 
 0.016		2008-11-17	T. R. Wyant
   Eliminate calls to UNIVERSAL::isa as a function.
+
   Revise tests to deal more gracefully with 5xx errors.
 
 0.015		2008-10-29	T. R. Wyant
@@ -193,32 +204,35 @@
     for bookkeeping purposes.
 
 0.014		2008-08-30	T. R. Wyant
-  Astro::SIMBAD::Client, Makefile.PL, Build.PL
-    Require Perl 5.008, because MailTools does, and SOAP::Lite requires
-      MailTools, and we require SOAP::Lite.
-    Fix TAP emitted by t::TestSimbad, so that we get useful output when
-      the server is unreachable or unresponsive.
+  In Astro::SIMBAD::Client, Makefile.PL, Build.PL, require Perl 5.008,
+    because MailTools does, and SOAP::Lite requires MailTools, and we
+    require SOAP::Lite.
+
+  Fix TAP emitted by t::TestSimbad, so that we get useful output when
+    the server is unreachable or unresponsive.
 
 0.013		2008-07-24	T. R. Wyant
-  Astro::SIMBAD::Client
-    Add =head1 LICENSE (CPANTS game)
-  t/canned.data
-    Track change in data returned by %OTYPE in SIMBAD4 1.092 21-Jul-2008
+
+  Astro::SIMBAD::Client: Add =head1 LICENSE (CPANTS game)
+
+  t/canned.data: Track change in data returned by %OTYPE in SIMBAD4
+  1.092 21-Jul-2008
 
 0.012		2008-02-21	T. R. Wyant
-  Astro::SIMBAD::Client
-    Add url_args attribute to provide default arguments to the url_query
-      method.
-    Add 'Astro::SIMBAD::Client' and version number to user agent string.
-    Add Scalar::Util as a requirement, since this is not bundled with
-      Perl 5.6.
-    Add a delay (3 seconds by default) between queries of a given
-      server. The 'delay' attribute controls this. Subsecond delays are
-      available if Time::HiRes can be loaded.
-    Update copyright.
-  bin/simbadc
-    Parse <filename as replacing the token with the contents of the file.
-    Update copyright.
+  Add url_args attribute to provide default arguments to the url_query
+    method.
+
+  Add 'Astro::SIMBAD::Client' and version number to user agent string.
+
+  Add Scalar::Util as a requirement, since this is not bundled with
+    Perl 5.6.
+
+  Add a delay (3 seconds by default) between queries of a given
+    server. The 'delay' attribute controls this. Subsecond delays are
+    available if Time::HiRes can be loaded.
+
+  In bin/simbadc, parse <filename as replacing the token with the
+    contents of the file.
 
 0.011		2007-11-12	T. R. Wyant
   Modify parse module loader to use 'eval "require $module"' rather
@@ -227,16 +241,21 @@
 
 0.010		2007-10-18	T. R. Wyant
   Specify minimum Perl version of 5.006 in Build.PL and Makefile.PL.
+
   Change url_query VOTable tests from todo back to test, since they
     now work as of 18-Oct-2007.
+
   Corrected the code used to escape URLs in the centralized requester
     (use URL::Escape, not HTML::Entities).
 
 0.009		2007-10-17	T. R. Wyant
   Add 'post' attribute.
+
   Mark url_query VOTable tests todo, since they stopped working
     15-Oct-2007. Document this under 'NOTICES' in the code.
+
   Clean up the POD tests.
+
   Remove shebang lines where not warranted.
 
 0.008		2007-08-30	T. R. Wyant
@@ -246,6 +265,7 @@
   Change FORMAT_VO_BASIC to return decimal degrees for right ascension
     and declination. This was always the intent, but could not be tested
     until 'vo' web service queries started working.
+
   Document change in status of web service 'vo' queries.
 
 0.006		2007-03-20	T. R. Wyant
@@ -257,19 +277,24 @@
 
 0.004		2007-02-22	T. R. Wyant
   Explicitly load URI::Escape.
+
   Add HTML::Entities and URI::Escape as required by this class.
 
 0.003		2007-02-12	T. R. Wyant
   Have Makefile.PL generate LICENSE tag if supported by the version of
     ExtUtils::MakeMaker in use.
+
   Make Astro::SIMBAD::Client work with SOAP::Lite 0.55, which is what
     ships with ActivePerl.
 
 0.002		2007-01-26	T. R. Wyant
   Modified Build.PL and Makefile.PL to ask if simbadc is to be installed.
+
   Modified vo tests to follow change of VOTable coordinate format
     to sexagesimal about SIMBAD4 1.005 January 26 2007.
+
   Corrected Astro::SIMBAD::Client documentation.
+
   Corrected simbadc documentation.
 
 0.001		2006-12-13	T. R. Wyant

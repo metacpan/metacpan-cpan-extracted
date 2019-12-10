@@ -151,14 +151,14 @@ $buffer = '';
 }
 like $buffer, qr/Your Mojo is working!/, 'right output';
 my $template
-  = '<p><%= param "just" %> <%= $c->req->headers->header("X-Test") %></p>';
+  = '<p></p><p><%= param "just" %> <%= $c->req->headers->header("X-Test") %></p>';
 $get->app->plugins->once(
   before_dispatch => sub { shift->render(inline => $template) });
 $buffer = '';
 {
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
-  $get->run('-f', 'just=works', '-H', 'X-Test: fine', '/html', 'p', 'text');
+  $get->run('-f', 'just=works', '-H', 'X-Test: fine', '/html', 'p', 1, 'text');
 }
 like $buffer, qr/works fine/, 'right output';
 $get->app->plugins->once(
@@ -405,5 +405,23 @@ $buffer = '';
 like $buffer, qr/Perl/, 'right output';
 like $buffer, qr/You might want to update your Mojolicious to 1000!/,
   'right output';
+
+# Hooks
+$app = Mojolicious->new;
+$app->hook(
+  before_command => sub {
+    my ($command, $args) = @_;
+    return unless $command->isa('Mojolicious::Command::eval');
+    $command->app->config->{test} = 'works!';
+    unshift @$args, '-v';
+  }
+);
+$buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDOUT = $handle;
+  $app->start('eval', 'app->config->{test}');
+}
+like $buffer, qr/works!/, 'right output';
 
 done_testing();

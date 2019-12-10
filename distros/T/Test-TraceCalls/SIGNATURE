@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 5cac067a0f708634b5e5767d8334c1ca510f0b1a44ca1c4472dd2513e5f712c7 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 bccb8f9b225c819c6648364385df178d27dacd816dc698e4b13713fec2a5a155 Changes
+SHA256 8e415aeff12dea09d3ff39f82f54140ca06892817be7bc4b13d447a8a02f7b39 INSTALL
+SHA256 5c791221f0dde289392a38a5921b66d4a1be8248cc64ee6de15f3c2426892673 LICENSE
+SHA256 66c4d29e490c8bf889aedd46dfd53554d7a355b64e0c44ddbc47449302ae4fec MANIFEST
+SHA256 bf86c224ce8d01d2a8d90c4f425c724a1ce8987193f1655d1614a006be125a5e META.json
+SHA256 112ed918dcc3f7ce92b709f6309a6fd81a667c18cad18970a5cd94b32354002f META.yml
+SHA256 8fc2eb14d65087564fc4ff48b21bdc708eb0fafe6052bc3b22b068f5d6dd7c80 Makefile.PL
+SHA256 1f460854f5453514e679bb1369b2bcb8ddaaef677010f9e4ba4f1bc3eeac7b8b README
+SHA256 2bd7d01d7dcfe05c50e8193ca433c8102f5e74122ac0d5a5a49aa8fa4dccd97f dist.ini
+SHA256 a3fa9fa4c5c1ae473e6641a11429511c507a3fe61893bd1de364f38838def809 doap.ttl
+SHA256 8f682b500bb64c032f0731b4946c09fade1bf93f89a590e1d730ef568797be43 lib/Test/TraceCalls.pm
+SHA256 6114622c9e41816dfcbea1c60070dc4c6abfa890f70bdda2570787724491725e t/01basic.t
+SHA256 22eb8b74359333987cc3c3cec5470b07378d3120ee1ee3e10f91ef1fb53f977a t/Local-Example/lib/Local/Example.pm
+SHA256 88c6b6bbd0e116033e9ea4ea173f9718343c00be0b3c5e30af8541c379749d90 t/Local-Example/lib/Local/Example/Module1.pm
+SHA256 b56ac3ba40a287a954e642b8c3da5d71227d94020e237fab6cc5e8184bc1ab86 t/Local-Example/lib/Local/Example/Module2.pm
+SHA256 a6e6d8c85f4ab6a27588f0b0e0d9399a4b7bfcb75aac71c1f93dd590ac02a22b t/Local-Example/t/test1.t
+SHA256 8d1db2e3876f27a5ab02292097dc55256247d8fa910f4fef4c7a7b5598520c5d t/Local-Example/t/test2.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCXeVxwQAKCRDOv4Eoaip9
+OSJpAKCEL6eaNMatPk0Nma+VLTN+wDaA/ACgrujgSJFUulqMMo4wL2Ivirtg7bs=
+=4CDO
+-----END PGP SIGNATURE-----

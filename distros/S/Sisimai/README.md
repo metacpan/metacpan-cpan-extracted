@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/sisimai/p5-Sisimai.svg)](https://coveralls.io/r/sisimai/p5-Sisimai)
 [![Build Status](https://travis-ci.org/sisimai/p5-Sisimai.svg?branch=master)](https://travis-ci.org/sisimai/p5-Sisimai) 
 [![Perl](https://img.shields.io/badge/perl-v5.10--v5.30-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v4.25.3-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v4.25.4-blue.svg)](https://metacpan.org/pod/Sisimai)
 
 - [**README-JA(日本語)**](README-JA.md)
 - [What is Sisimai](#what-is-sisimai)
@@ -57,6 +57,7 @@ Key features
   * Support 24 known MTAs and 5 unknown MTAs
   * Support 22 major MSPs(Mail Service Providers)
   * Support  2 major Cloud Email Delivery Services(JSON format)
+    * **WILL BE REMOVED AT Sisimai 4.25.5**
   * Support Feedback Loop Message(ARF)
   * Can detect 29 error reasons
 * __Faster than bounceHammer 2.7.13p3__
@@ -172,9 +173,11 @@ my $j = Sisimai->dump('/path/to/mbox', 'delivered' => 1);
 
 Read bounce object
 -------------------------------------------------------------------------------
+**THIS FEATURE WILL BE REMOVED AT SISIMAI 4.25.5**
+
 The way to read a bounce object retrived from Cloud Email Services as JSON using
-their API is the following code. This feature is available at Sisimai 4.20.0 or
-later.
+their API is the following code. This feature is available at between v4.20.0
+and **v4.25.5**.
 
 ```perl
 #! /usr/bin/env perl

@@ -1,5 +1,8 @@
 Revision history for PONAPI-Client
 
+0.002012     2019-Dec-08
+             * Adding 'Accept: application/vnd.api+json' header to all JSON API requests (Andrius Merkys, GH#92)
+
 0.002011     2019-May-06
              * Fix Client::UA::YAHC work with SSL (Andrius Merkys, GH#90)
 

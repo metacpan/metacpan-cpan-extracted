@@ -528,8 +528,8 @@ sub _parse_frame_header ( $h ) {
 
         return if !$buf;
 
-        $header->{len} = unpack 'n', substr $buf->$*, 0, 2;
-        $header->{mask} = substr $buf->$*, 2, 4 if $masked;
+        $header->{len}  = unpack 'n',      substr $buf->$*, 0, 2;
+        $header->{mask} = substr $buf->$*, 2,               4 if $masked;
     }
 
     # extended payload (64-bit with 32-bit fallback)
@@ -538,8 +538,8 @@ sub _parse_frame_header ( $h ) {
 
         return if !$buf;
 
-        $header->{len} = unpack 'Q>', substr $buf->$*, 0, 8;
-        $header->{mask} = substr $buf->$*, 8, 4 if $masked;
+        $header->{len}  = unpack 'Q>',     substr $buf->$*, 0, 8;
+        $header->{mask} = substr $buf->$*, 8,               4 if $masked;
     }
 
     return $header;

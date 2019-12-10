@@ -9,7 +9,7 @@ use Pcore -dist;
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    1 | 17                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 21 does not match the package declaration       |
+## |    1 | 7                    | Documentation::RequirePackageMatchesPodName - Pod NAME on line 11 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

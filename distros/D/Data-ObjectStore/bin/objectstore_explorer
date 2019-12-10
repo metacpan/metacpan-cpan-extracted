@@ -18,7 +18,7 @@ my $store = Data::ObjectStore->open_store( $db_dir );
 sub fetch {
     my $id = shift;
     my $val;
-    $val = $store->_fetch( $id, 'force' );
+    $val = $store->fetch( $id, 'force' );
     return $val;
 }
 

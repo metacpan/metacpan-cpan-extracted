@@ -115,6 +115,7 @@ sub main{
   }
 
   # Sample the mash sketches with replacement for rapid bootstrapping
+  logmsg "Running mashtree single-threaded among $$settings{reps} replicates using $$settings{numcpus} total threads.";
   my @bsThread;
   for my $i(0..$$settings{numcpus}-1){
     my %settingsCopy = %$settings;
@@ -234,8 +235,6 @@ sub usage{
   --outmatrix          ''   Output file for distance matrix
   --reps               0    How many bootstrap repetitions to run;
                             If zero, no bootstrapping.
-                            Bootstrapping will only work on compressed fastq
-                            files.
   --numcpus            1    This will be passed to mashtree and will
                             be used to multithread reps.
   

@@ -1,0 +1,59 @@
+{
+   "abstract" : "A role for Mojo::File to calculate digests",
+   "author" : [
+      "Rolf Stöckli <tekki@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojo-File-Role-Digest",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "8",
+            "Role::Tiny" : "v2.1.4",
+            "perl" : "v5.24.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Tekki/mojo-file-role-digest/issues"
+      },
+      "homepage" : "https://github.com/Tekki/mojo-file-role-digest",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Tekki/mojo-file-role-digest.git",
+         "web" : "https://github.com/Tekki/mojo-file-role-digest"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

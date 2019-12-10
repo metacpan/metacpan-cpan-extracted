@@ -8,6 +8,16 @@ has article_body  => ( required => 1, is => 'ro', isa => Text );
 has dateline   => ( predicate => 1, is => 'ro', isa => Text1K );
 has journalist => ( predicate => 1, is => 'ro', isa => Text1K );
 
+sub TO_JSON {
+    my ($self) = @_;
+    return {
+        headline => $self->headline,
+        article_body => $self->article_body,
+        dateline => $self->dateline,
+        journalist => $self->journalist,
+    }
+}
+
 1;
 
 __END__

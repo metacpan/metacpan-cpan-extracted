@@ -4,13 +4,13 @@
       "Craig DeForest <craig@deforest.org>, Dima Kogan <dima@secretsauce.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDL-Graphics-Gnuplot",
    "no_index" : {
@@ -54,8 +54,10 @@
       },
       "homepage" : "http://github.com/drzowie/PDL-Graphics-Gnuplot",
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/drzowie/PDL-Graphics-Gnuplot.git"
       }
    },
-   "version" : "2.011"
+   "version" : "2.012",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

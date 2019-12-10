@@ -29,7 +29,7 @@
    "provides" : {
       "Mojolicious::Plugin::SwaggerUI" : {
          "file" : "lib/Mojolicious/Plugin/SwaggerUI.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
@@ -41,7 +41,7 @@
          "url" : "https://gitlab.com/marghidanu/mojolicious-plugin-swaggerui.git"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.0.3",
    "x_contributors" : [
       "Tudor Marghidanu <tudor@marghidanu.com>"
    ],

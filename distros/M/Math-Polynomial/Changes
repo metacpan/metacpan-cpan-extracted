@@ -1,5 +1,9 @@
 Revision history for Perl extension Math::Polynomial.
 
+1.016   2019-11-20
+        - Added number_of_terms.
+        - Changed license to Artistic License 2.0.
+
 1.015   2019-09-11
         - Renamed undocumented methods for protection.
         - Documented now protected _NFIELDS method.

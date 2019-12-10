@@ -1,0 +1,395 @@
+[Mon Sep 09 09:54:11.296009 2019] [mpm_prefork:notice] [pid 27248] AH00170: caught SIGWINCH, shutting down gracefully
+[Mon Sep 09 09:54:12.437408 2019] [suexec:notice] [pid 1204] AH01232: suEXEC mechanism enabled (wrapper: /usr/sbin/suexec)
+[Mon Sep 09 09:54:12.465719 2019] [lbmethod_heartbeat:notice] [pid 1204] AH02282: No slotmem from mod_heartmonitor
+[Mon Sep 09 09:54:12.470450 2019] [mpm_prefork:notice] [pid 1204] AH00163: Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips mod_perl/2.0.10 Perl/v5.16.3 configured -- resuming normal operations
+[Mon Sep 09 09:54:12.470494 2019] [core:notice] [pid 1204] AH00094: Command line: '/usr/sbin/httpd -D FOREGROUND'
+ AH01215: OPEN STORE (1457) /opt/yote/data_store, referer: http://localhost/yote/
+ AH01215: FETCH (1457) 1, referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1457) , referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1457) Data::RecordStore::Transaction=ARRAY(0x1321288), referer: http://localhost/yote/
+ AH01215: STOW (1457) 1, Data::ObjectStore::Container|1568048057.0485|1568048057.0489 db_version`v5.03`created_time`v1568048057.0485`root`r2`last_update_time`v1568048057.0485`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: OPEN STORE (1458) /opt/yote/data_store, referer: http://localhost/yote/
+ AH01215: FETCH (1458) 1, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 2, Data::ObjectStore::Container|1568048057.04884|1568048057.04887 , referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 1, Data::ObjectStore::Container|1568048057.0485|1568048057.05132 db_version`v5.03`created_time`v1568048057.0485`root`r2`last_update_time`v1568048057.04891`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1458) , referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1457) Data::RecordStore::Transaction=ARRAY(0x1321288), referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1458) Data::RecordStore::Transaction=ARRAY(0x1b04d28), referer: http://localhost/yote/
+ AH01215: STOW (1458) 4, Data::ObjectStore::Container|1568048057.05154|1568048057.05157 , referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1457) , referer: http://localhost/yote/
+ AH01215: STOW (1458) 1, Data::ObjectStore::Container|1568048057.05073|1568048057.05161 db_version`v5.03`created_time`v1568048057.05073`root`r4`last_update_time`v1568048057.05073`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1457) Data::RecordStore::Transaction=ARRAY(0x1321270), referer: http://localhost/yote/
+ AH01215: STOW (1457) 1, Data::ObjectStore::Container|1568048057.0485|1568048057.05612 db_version`v5.03`created_time`v1568048057.0485`root`r2`last_update_time`v1568048057.0548`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: STOW (1458) 1, Data::ObjectStore::Container|1568048057.05073|1568048057.05675 db_version`v5.03`created_time`v1568048057.05073`root`r4`last_update_time`v1568048057.05162`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1457) Data::RecordStore::Transaction=ARRAY(0x1321270), referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1458) Data::RecordStore::Transaction=ARRAY(0x1b04d28), referer: http://localhost/yote/
+ AH01215: initializing yote Yote at /opt/yote/lib/Yote.pm line 41., referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1458) , referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1458) Data::RecordStore::Transaction=ARRAY(0x1b0a9e0), referer: http://localhost/yote/
+ AH01215: STOW (1458) 1, Data::ObjectStore::Container|1568048057.05073|1568048057.06191 db_version`v5.03`created_time`v1568048057.05073`root`r4`last_update_time`v1568048057.06116`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: Adding domain : 'localhost' at /opt/yote/lib/Yote.pm line 98., referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1458) Data::RecordStore::Transaction=ARRAY(0x1b0a9e0), referer: http://localhost/yote/
+ AH01215: initializing yote Yote at /opt/yote/lib/Yote.pm line 41., referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: Adding domain : 'localhost' at /opt/yote/lib/Yote.pm line 98., referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1457) , referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1457) Data::RecordStore::Transaction=ARRAY(0x15dca10), referer: http://localhost/yote/
+ AH01215: STOW (1457) 32, Data::ObjectStore::Hash|1568048057.08579|1568048057.08581 0`29`0, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 70, Data::ObjectStore::Hash|1568048057.09062|1568048057.09064 0`29`1`ENDPOINT`vlocalhost/app-endpoint, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 68, Data::ObjectStore::Array|1568048057.09039|1568048057.09042 0`1000000`3`0`vupdate_counter`vupdate`vfetch, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 26, Data::ObjectStore::Hash|1568048057.08507|1568048057.08657 0`29`1`Yote::App::PageCounter`r38, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 17, Data::ObjectStore::Hash|1568048057.08345|1568048057.08346 0`29`0, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 2, Data::ObjectStore::Container|1568048057.04884|1568048057.06208 yote`r5, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 18, Data::ObjectStore::Hash|1568048057.0837|1568048057.08456 0`29`3`PUBLIC`r20`ADMIN-REQUIRED`r23`LOGIN-REQUIRED`r22, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 72, Data::ObjectStore::Hash|1568048057.09086|1568048057.09112 0`29`2`CLASS`vData::RecordStore`OPTIONS`r74, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 30, Data::ObjectStore::Array|1568048057.08556|1568048057.08557 0`1000000`0`0, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 16, Data::ObjectStore::Hash|1568048057.08326|1568048057.08327 0`29`0, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: STOW (1457) 44, Data::ObjectStore::Hash|1568048057.08748|1568048057.0875 0`29`0, referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1458) , referer: http://localhost/yote/
+ AH01215: STOW (1457) 74, Data::ObjectStore::Hash|1568048057.09109|1568048057.09111 0`29`1`BASE_PATH`v/opt/yote/data_store, referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1458) Data::RecordStore::Transaction=ARRAY(0x1db8c98), referer: http://localhost/yote/
+ AH01215: STOW (1458) 67, Data::ObjectStore::Hash|1568048057.09027|1568048057.09029 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 28, Data::ObjectStore::Hash|1568048057.08533|1568048057.08534 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1458) 33, Data::ObjectStore::Hash|1568048057.08594|1568048057.08595 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 40, Data::ObjectStore::Hash|1568048057.08684|1568048057.08689 0`29`3`update_counter`v1`fetch`v1`update`v1, referer: http://localhost/yote/
+ AH01215: STOW (1458) 63, Data::ObjectStore::Hash|1568048057.0898|1568048057.08986 0`29`3`update_counter`v1`fetch`v1`update`v1, referer: http://localhost/yote/
+ AH01215: STOW (1457) 14, Data::ObjectStore::Array|1568048057.08286|1568048057.08288 0`1000000`0`0, referer: http://localhost/yote/
+ AH01215: STOW (1458) 21, Data::ObjectStore::Hash|1568048057.08422|1568048057.09033 0`29`2`pageCounter2`r25`pageCounter`r47, referer: http://localhost/yote/
+ AH01215: STOW (1457) 20, Data::ObjectStore::Hash|1568048057.08407|1568048057.08412 0`29`3`update_counter`v1`fetch`v1`update`v1, referer: http://localhost/yote/
+ AH01215: STOW (1458) 71, Data::ObjectStore::Hash|1568048057.09074|1568048057.10076 0`29`1`localhost`r73, referer: http://localhost/yote/
+ AH01215: STOW (1457) 24, Yote::App::PageCounter|1568048057.08481|1568048057.08752 _session_pool`r30`_app_path`vpageCounter`_methods_access_levels`r26`_site`vlocalhost`_domain`r9`_session`r28`_login`r34`_resets`r32`_email`r36, referer: http://localhost/yote/
+ AH01215: STOW (1458) 7, Yote|1568048057.06403|1568048057.10343 domains`r8`root_dir`v/opt/yote/`config`r69, referer: http://localhost/yote/
+ AH01215: STOW (1457) 10, Data::ObjectStore::Hash|1568048057.08162|1568048057.08754 0`29`2`pageCounter2`r11`pageCounter`r24, referer: http://localhost/yote/
+ AH01215: STOW (1458) 80, Data::ObjectStore::Hash|1568048057.09565|1568048057.09931 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r81, referer: http://localhost/yote/
+ AH01215: STOW (1457) 11, Yote::App::PageCounter|1568048057.08223|1568048057.08459 _session_pool`r14`_app_path`vpageCounter2`_methods_access_levels`r12`_site`vlocalhost`_domain`r9`_session`r13`_login`r16`_resets`r15`_email`r17, referer: http://localhost/yote/
+ AH01215: STOW (1458) 82, Data::ObjectStore::Hash|1568048057.09787|1568048057.0993 0`29`1`PUBLIC`r83, referer: http://localhost/yote/
+ AH01215: STOW (1457) 48, Data::ObjectStore::Hash|1568048057.08801|1568048057.09065 0`29`1`localhost`r50, referer: http://localhost/yote/
+ AH01215: STOW (1458) 55, Data::ObjectStore::Hash|1568048057.08884|1568048057.08886 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 22, Data::ObjectStore::Hash|1568048057.08435|1568048057.08437 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1458) 84, Data::ObjectStore::Hash|1568048057.10072|1568048057.10075 0`29`1`ENDPOINT`vlocalhost/app-endpoint, referer: http://localhost/yote/
+ AH01215: STOW (1457) 42, Data::ObjectStore::Hash|1568048057.08714|1568048057.08715 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1458) 25, Yote::App::PageCounter|1568048057.08495|1568048057.08766 _session_pool`r31`_app_path`vpageCounter2`_methods_access_levels`r27`_site`vlocalhost`_domain`r19`_session`r29`_login`r35`_resets`r33`_email`r37, referer: http://localhost/yote/
+ AH01215: STOW (1457) 46, Data::ObjectStore::Hash|1568048057.08772|1568048057.09113 0`29`2`DOMAINS`r48`DATA-STORE`r72, referer: http://localhost/yote/
+ AH01215: STOW (1458) 27, Data::ObjectStore::Hash|1568048057.0852|1568048057.08675 0`29`1`Yote::App::PageCounter`r39, referer: http://localhost/yote/
+ AH01215: STOW (1457) 13, Data::ObjectStore::Hash|1568048057.08267|1568048057.08268 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1458) 83, Data::ObjectStore::Array|1568048057.09926|1568048057.09929 0`1000000`3`0`vupdate_counter`vupdate`vfetch, referer: http://localhost/yote/
+ AH01215: STOW (1457) 23, Data::ObjectStore::Hash|1568048057.08454|1568048057.08455 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1458) 75, Data::ObjectStore::Hash|1568048057.09121|1568048057.09932 0`29`2`pageCounter2`r76`pageCounter`r80, referer: http://localhost/yote/
+ AH01215: STOW (1457) 6, Data::ObjectStore::Hash|1568048057.06201|1568048057.08175 0`29`1`localhost`r9, referer: http://localhost/yote/
+ AH01215: STOW (1458) 57, Data::ObjectStore::Hash|1568048057.08908|1568048057.08909 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 50, Data::ObjectStore::Hash|1568048057.08825|1568048057.09065 0`29`2`APPS`r52`OPTIONS`r70, referer: http://localhost/yote/
+ AH01215: STOW (1458) 61, Data::ObjectStore::Hash|1568048057.08955|1568048057.09029 0`29`3`PUBLIC`r63`ADMIN-REQUIRED`r67`LOGIN-REQUIRED`r65, referer: http://localhost/yote/
+ AH01215: STOW (1457) 64, Data::ObjectStore::Hash|1568048057.08992|1568048057.09043 0`29`1`Yote::App::PageCounter`r66, referer: http://localhost/yote/
+ AH01215: STOW (1458) 69, Data::ObjectStore::Hash|1568048057.09051|1568048057.10341 0`29`2`DOMAINS`r71`DATA-STORE`r85, referer: http://localhost/yote/
+ AH01215: STOW (1457) 36, Data::ObjectStore::Hash|1568048057.0863|1568048057.08631 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1458) 59, Data::ObjectStore::Hash|1568048057.08932|1568048057.08933 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 9, Yote::Domain|1568048057.08138|1568048057.08171 domain`vlocalhost`apps`r10, referer: http://localhost/yote/
+ AH01215: STOW (1458) 49, Data::ObjectStore::Hash|1568048057.08813|1568048057.08957 0`29`1`Yote::App::PageCounter`r61, referer: http://localhost/yote/
+ AH01215: STOW (1457) 58, Data::ObjectStore::Hash|1568048057.08919|1568048057.08948 0`29`1`PUBLIC`r60, referer: http://localhost/yote/
+ AH01215: STOW (1458) 31, Data::ObjectStore::Array|1568048057.08568|1568048057.0857 0`1000000`0`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 12, Data::ObjectStore::Hash|1568048057.08248|1568048057.08372 0`29`1`Yote::App::PageCounter`r18, referer: http://localhost/yote/
+ AH01215: STOW (1458) 35, Data::ObjectStore::Hash|1568048057.08618|1568048057.0862 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 15, Data::ObjectStore::Hash|1568048057.08306|1568048057.08307 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1458) 53, Data::ObjectStore::Array|1568048057.08861|1568048057.08862 0`1000000`0`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 38, Data::ObjectStore::Hash|1568048057.08655|1568048057.0875 0`29`3`PUBLIC`r40`ADMIN-REQUIRED`r44`LOGIN-REQUIRED`r42, referer: http://localhost/yote/
+ AH01215: STOW (1458) 78, Data::ObjectStore::Hash|1568048057.09338|1568048057.09465 0`29`1`PUBLIC`r79, referer: http://localhost/yote/
+ AH01215: STOW (1457) 52, Data::ObjectStore::Hash|1568048057.08849|1568048057.09044 0`29`2`pageCounter2`r54`pageCounter`r62, referer: http://localhost/yote/
+ AH01215: STOW (1458) 79, Data::ObjectStore::Array|1568048057.0946|1568048057.09465 0`1000000`3`0`vupdate_counter`vupdate`vfetch, referer: http://localhost/yote/
+ AH01215: STOW (1457) 60, Data::ObjectStore::Array|1568048057.08943|1568048057.08947 0`1000000`3`0`vupdate_counter`vupdate`vfetch, referer: http://localhost/yote/
+ AH01215: STOW (1458) 77, Data::ObjectStore::Hash|1568048057.09263|1568048057.09466 0`29`1`Yote::App::PageCounter`r78, referer: http://localhost/yote/
+ AH01215: STOW (1457) 34, Data::ObjectStore::Hash|1568048057.08605|1568048057.08606 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1458) 29, Data::ObjectStore::Hash|1568048057.08544|1568048057.08546 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 56, Data::ObjectStore::Hash|1568048057.08896|1568048057.08949 0`29`1`Yote::App::PageCounter`r58, referer: http://localhost/yote/
+ AH01215: STOW (1458) 65, Data::ObjectStore::Hash|1568048057.09003|1568048057.09005 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 66, Data::ObjectStore::Hash|1568048057.09015|1568048057.09042 0`29`1`PUBLIC`r68, referer: http://localhost/yote/
+ AH01215: STOW (1458) 85, Data::ObjectStore::Hash|1568048057.10202|1568048057.1034 0`29`2`CLASS`vData::RecordStore`OPTIONS`r86, referer: http://localhost/yote/
+ AH01215: STOW (1457) 62, Data::ObjectStore::Hash|1568048057.08969|1568048057.09043 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r64, referer: http://localhost/yote/
+ AH01215: STOW (1458) 39, Data::ObjectStore::Hash|1568048057.08673|1568048057.08762 0`29`3`PUBLIC`r41`ADMIN-REQUIRED`r45`LOGIN-REQUIRED`r43, referer: http://localhost/yote/
+ AH01215: STOW (1457) 5, Yote|1568048057.06131|1568048057.09114 domains`r6`root_dir`v/opt/yote/`config`r46, referer: http://localhost/yote/
+ AH01215: STOW (1458) 51, Data::ObjectStore::Hash|1568048057.08838|1568048057.08839 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 54, Data::ObjectStore::Hash|1568048057.08873|1568048057.08949 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r56, referer: http://localhost/yote/
+ AH01215: STOW (1458) 41, Data::ObjectStore::Hash|1568048057.08703|1568048057.08711 0`29`3`update_counter`v1`fetch`v1`update`v1, referer: http://localhost/yote/
+ AH01215: STOW (1457) 1, Data::ObjectStore::Container|1568048057.0485|1568048057.14376 db_version`v5.03`created_time`v1568048057.0485`root`r2`last_update_time`v1568048057.09115`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: STOW (1458) 47, Yote::App::PageCounter|1568048057.0879|1568048057.09031 _session_pool`r53`_app_path`vpageCounter`_methods_access_levels`r49`_site`vlocalhost`_domain`r19`_session`r51`_login`r57`_resets`r55`_email`r59, referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1457) Data::RecordStore::Transaction=ARRAY(0x15dca10), referer: http://localhost/yote/
+ AH01215: STOW (1458) 81, Data::ObjectStore::Hash|1568048057.09633|1568048057.09931 0`29`1`Yote::App::PageCounter`r82, referer: http://localhost/yote/
+ AH01215: , referer: http://localhost/yote/
+ AH01215: IN <1457> <-----   localhost, {"action":"fetch","args":"u","app":"pageCounter","sess_id":"v7053250394985660416"} HANDLE, referer: http://localhost/yote/
+ AH01215: STOW (1458) 8, Data::ObjectStore::Hash|1568048057.06428|1568048057.08436 0`29`1`localhost`r19, referer: http://localhost/yote/
+ AH01215: STOW (1458) 4, Data::ObjectStore::Container|1568048057.05154|1568048057.06434 yote`r7, referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: STOW (1458) 45, Data::ObjectStore::Hash|1568048057.0876|1568048057.08762 0`29`0, referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: STOW (1458) 37, Data::ObjectStore::Hash|1568048057.08644|1568048057.08645 0`29`0, referer: http://localhost/yote/
+ AH01215: NEXT ID (1457), referer: http://localhost/yote/
+ AH01215: STOW (1458) 73, Data::ObjectStore::Hash|1568048057.09098|1568048057.10076 0`29`2`APPS`r75`OPTIONS`r84, referer: http://localhost/yote/
+ AH01215: SESSION SESS ID () *87*, referer: http://localhost/yote/
+ AH01215: SESSION SESS ID (250713760870760448) *87*, referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1457) , referer: http://localhost/yote/
+ AH01215: STOW (1458) 86, Data::ObjectStore::Hash|1568048057.10337|1568048057.10339 0`29`1`BASE_PATH`v/opt/yote/data_store, referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1457) Data::RecordStore::Transaction=ARRAY(0x1605108), referer: http://localhost/yote/
+ AH01215: STOW (1457) 87, Yote::App::Session|1568048057.15713|1568048057.15868 app`r24`_session_id`v250713760870760448`login`u`root_cache`r89`cache`r88, referer: http://localhost/yote/
+ AH01215: STOW (1458) 43, Data::ObjectStore::Hash|1568048057.08736|1568048057.08738 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 28, Data::ObjectStore::Hash|1568048057.08533|1568048057.15873 0`29`1`250713760870760448`r87, referer: http://localhost/yote/
+ AH01215: STOW (1458) 19, Yote::Domain|1568048057.08396|1568048057.08432 domain`vlocalhost`apps`r21, referer: http://localhost/yote/
+ AH01215: STOW (1457) 88, Data::ObjectStore::Hash|1568048057.1578|1568048057.15781 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1458) 76, Data::ObjectStore::Hash|1568048057.09187|1568048057.09467 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r77, referer: http://localhost/yote/
+ AH01215: STOW (1457) 89, Data::ObjectStore::Hash|1568048057.1585|1568048057.15851 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1458) 1, Data::ObjectStore::Container|1568048057.05073|1568048057.16367 db_version`v5.03`created_time`v1568048057.05073`root`r4`last_update_time`v1568048057.10345`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: STOW (1457) 1, Data::ObjectStore::Container|1568048057.0485|1568048057.16423 db_version`v5.03`created_time`v1568048057.0485`root`r2`last_update_time`v1568048057.15874`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1458) Data::RecordStore::Transaction=ARRAY(0x1db8c98), referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1457) Data::RecordStore::Transaction=ARRAY(0x1605108), referer: http://localhost/yote/
+ AH01215: , referer: http://localhost/yote/
+ AH01215: IN <1458> <-----   localhost, {"action":"fetch","args":"u","app":"pageCounter2","sess_id":"v8672989313719402496"} HANDLE, referer: http://localhost/yote/
+ AH01215: Endpoint Looking up session 'v7053250394985660416' --> v250713760870760448 *87* <1457>, referer: http://localhost/yote/
+ AH01215: EMPTY CACHE, referer: http://localhost/yote/
+ AH01215: FETCH (1457) 88, referer: http://localhost/yote/
+ AH01215: SESSION SESS ID (250713760870760448) *87*, referer: http://localhost/yote/
+ AH01215: Endpoing send back session id '250713760870760448' <1457>, referer: http://localhost/yote/
+ AH01215: FETCH (1457) 89, referer: http://localhost/yote/
+ AH01215: FETCH (1457) 26, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: FETCH (1457) 38, referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1457) , referer: http://localhost/yote/
+ AH01215: NEXT ID (1458), referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1457) Data::RecordStore::Transaction=ARRAY(0x15daa90), referer: http://localhost/yote/
+ AH01215: STOW (1457) 87, Yote::App::Session|1568048057.15713|1568048057.1802 app`r24`_session_id`v250713760870760448`_last_updated`v1568048057.17964`login`u`root_cache`r89`cache`r88, referer: http://localhost/yote/
+ AH01215: SESSION SESS ID () *90*, referer: http://localhost/yote/
+ AH01215: SESSION SESS ID (4133016411477966848) *90*, referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1458) , referer: http://localhost/yote/
+ AH01215: STOW (1457) 88, Data::ObjectStore::Hash|1568048057.1578|1568048057.17975 0`29`1`24`r24, referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1458) Data::RecordStore::Transaction=ARRAY(0x1dc8e48), referer: http://localhost/yote/
+ AH01215: STOW (1458) 92, Data::ObjectStore::Hash|1568048057.18105|1568048057.18106 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1457) 89, Data::ObjectStore::Hash|1568048057.1585|1568048057.17969 0`29`1`24`r24, referer: http://localhost/yote/
+ AH01215: STOW (1458) 90, Yote::App::Session|1568048057.18013|1568048057.18122 app`r25`_session_id`v4133016411477966848`login`u`root_cache`r92`cache`r91, referer: http://localhost/yote/
+ AH01215: STOW (1457) 1, Data::ObjectStore::Container|1568048057.0485|1568048057.18434 db_version`v5.03`created_time`v1568048057.0485`root`r2`last_update_time`v1568048057.18023`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: STOW (1458) 91, Data::ObjectStore::Hash|1568048057.18041|1568048057.18042 0`29`0, referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1457) Data::RecordStore::Transaction=ARRAY(0x15daa90), referer: http://localhost/yote/
+ AH01215: STOW (1458) 29, Data::ObjectStore::Hash|1568048057.08544|1568048057.18127 0`29`1`4133016411477966848`r90, referer: http://localhost/yote/
+ AH01215: OUT <1457> --> {"defs":{"Yote::App::PageCounter":["update_counter","fetch","update"]},"remove":[],"ret":"r24","sess_id":"v250713760870760448","data":{"24":{"_cls":"Yote::App::PageCounter"}},"succ":1}, referer: http://localhost/yote/
+ AH01215: , referer: http://localhost/yote/
+ AH01215: STOW (1458) 1, Data::ObjectStore::Container|1568048057.05073|1568048057.18982 db_version`v5.03`created_time`v1568048057.05073`root`r4`last_update_time`v1568048057.18127`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1458) Data::RecordStore::Transaction=ARRAY(0x1dc8e48), referer: http://localhost/yote/
+ AH01215: Endpoint Looking up session 'v8672989313719402496' --> v4133016411477966848 *90* <1458>, referer: http://localhost/yote/
+ AH01215: EMPTY CACHE, referer: http://localhost/yote/
+ AH01215: FETCH (1458) 91, referer: http://localhost/yote/
+ AH01215: ERRR (Data::RecordStore::Silo->get_record : index 95 out of bounds for silo /opt/yote/data_store/silos/12_RECSTORE. Silo has entry count of 91 at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 768., referer: http://localhost/yote/
+ AH01215: ) <1458>, referer: http://localhost/yote/
+ AH01215: got Data::RecordStore::Silo->get_record : index 95 out of bounds for silo /opt/yote/data_store/silos/12_RECSTORE. Silo has entry count of 91 at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 768., referer: http://localhost/yote/
+ AH01215: , referer: http://localhost/yote/
+ AH01215: OUT <1458> --> {"ret":"failed","sess_id":"vv8672989313719402496","succ":0}, referer: http://localhost/yote/
+ AH01215: , referer: http://localhost/yote/
+ AH01215: OPEN STORE (1460) /opt/yote/data_store, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 1, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 4, referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1460) , referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1460) Data::RecordStore::Transaction=ARRAY(0x2880440), referer: http://localhost/yote/
+ AH01215: STOW (1460) 1, Data::ObjectStore::Container|1568048057.05073|1568048057.29362 db_version`v5.03`created_time`v1568048057.05073`last_update_time`v1568048057.2929`root`r4`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1460) Data::RecordStore::Transaction=ARRAY(0x2880440), referer: http://localhost/yote/
+ AH01215: FETCH (1460) 7, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 69, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 71, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 73, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 8, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 19, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 21, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 25, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 47, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 27, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 39, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 41, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 43, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 45, referer: http://localhost/yote/
+ AH01215: replacing domain 'localhost' app 'pageCounter' which was class 'HASH' with app of class 'Yote::App::PageCounter' at /opt/yote/lib/Yote/Domain.pm line 87., referer: http://localhost/yote/
+ AH01215: Removing app 'pageCounter' from domain 'localhost' (but archiving it to /yote/domains/localhost/_deleted_apps) at /opt/yote/lib/Yote/Domain.pm line 104., referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1460) , referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1460) Data::RecordStore::Transaction=ARRAY(0x2b1f748), referer: http://localhost/yote/
+ AH01215: STOW (1460) 104, Data::ObjectStore::Hash|1568048057.3233|1568048057.32331 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1460) 21, Data::ObjectStore::Hash|1568048057.08422|1568048057.32338 0`29`2`pageCounter2`r25`pageCounter`r94, referer: http://localhost/yote/
+ AH01215: STOW (1460) 118, Data::ObjectStore::Hash|1568048057.32596|1568048057.32616 0`29`2`CLASS`vData::RecordStore`OPTIONS`r119, referer: http://localhost/yote/
+ AH01215: STOW (1460) 7, Yote|1568048057.06403|1568048057.32618 domains`r8`root_dir`v/opt/yote/`config`r105, referer: http://localhost/yote/
+ AH01215: STOW (1460) 102, Data::ObjectStore::Hash|1568048057.32291|1568048057.32296 0`29`3`update_counter`v1`fetch`v1`update`v1, referer: http://localhost/yote/
+ AH01215: STOW (1460) 107, Data::ObjectStore::Hash|1568048057.32394|1568048057.32579 0`29`2`APPS`r108`OPTIONS`r117, referer: http://localhost/yote/
+ AH01215: STOW (1460) 119, Data::ObjectStore::Hash|1568048057.32613|1568048057.32615 0`29`1`BASE_PATH`v/opt/yote/data_store, referer: http://localhost/yote/
+ AH01215: STOW (1460) 99, Data::ObjectStore::Hash|1568048057.32229|1568048057.32231 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1460) 116, Data::ObjectStore::Array|1568048057.32556|1568048057.32559 0`1000000`3`0`vupdate_counter`vupdate`vfetch, referer: http://localhost/yote/
+ AH01215: STOW (1460) 93, Data::ObjectStore::Array|1568048057.32101|1568048057.32109 0`1000000`1`0`r47, referer: http://localhost/yote/
+ AH01215: STOW (1460) 106, Data::ObjectStore::Hash|1568048057.32376|1568048057.3258 0`29`1`localhost`r107, referer: http://localhost/yote/
+ AH01215: STOW (1460) 105, Data::ObjectStore::Hash|1568048057.32358|1568048057.32616 0`29`2`DOMAINS`r106`DATA-STORE`r118, referer: http://localhost/yote/
+ AH01215: STOW (1460) 100, Data::ObjectStore::Hash|1568048057.32249|1568048057.3225 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1460) 96, Data::ObjectStore::Hash|1568048057.3217|1568048057.32172 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1460) 110, Data::ObjectStore::Hash|1568048057.32449|1568048057.3249 0`29`1`Yote::App::PageCounter`r111, referer: http://localhost/yote/
+ AH01215: STOW (1460) 95, Data::ObjectStore::Hash|1568048057.32151|1568048057.32275 0`29`1`Yote::App::PageCounter`r101, referer: http://localhost/yote/
+ AH01215: STOW (1460) 94, Yote::App::PageCounter|1568048057.32126|1568048057.32335 _session_pool`r97`_app_path`vpageCounter`_methods_access_levels`r95`_site`vlocalhost`_domain`r19`_session`r96`_login`r99`_resets`r98`_email`r100, referer: http://localhost/yote/
+ AH01215: STOW (1460) 97, Data::ObjectStore::Array|1568048057.32189|1568048057.3219 0`1000000`0`0, referer: http://localhost/yote/
+ AH01215: STOW (1460) 114, Data::ObjectStore::Hash|1568048057.32524|1568048057.3256 0`29`1`Yote::App::PageCounter`r115, referer: http://localhost/yote/
+ AH01215: STOW (1460) 111, Data::ObjectStore::Hash|1568048057.32466|1568048057.32489 0`29`1`PUBLIC`r112, referer: http://localhost/yote/
+ AH01215: STOW (1460) 108, Data::ObjectStore::Hash|1568048057.32411|1568048057.32561 0`29`2`pageCounter2`r109`pageCounter`r113, referer: http://localhost/yote/
+ AH01215: STOW (1460) 115, Data::ObjectStore::Hash|1568048057.3254|1568048057.32559 0`29`1`PUBLIC`r116, referer: http://localhost/yote/
+ AH01215: STOW (1460) 41, Data::ObjectStore::Hash|1568048057.08703|1568048057.32032 0`29`3`update_counter`v1`fetch`v1`update`v1, referer: http://localhost/yote/
+ AH01215: STOW (1460) 112, Data::ObjectStore::Array|1568048057.32484|1568048057.32488 0`1000000`3`0`vupdate_counter`vupdate`vfetch, referer: http://localhost/yote/
+ AH01215: STOW (1460) 109, Data::ObjectStore::Hash|1568048057.3243|1568048057.3249 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r110, referer: http://localhost/yote/
+ AH01215: STOW (1460) 98, Data::ObjectStore::Hash|1568048057.3221|1568048057.32211 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1460) 103, Data::ObjectStore::Hash|1568048057.32312|1568048057.32313 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1460) 101, Data::ObjectStore::Hash|1568048057.32273|1568048057.32332 0`29`3`PUBLIC`r102`ADMIN-REQUIRED`r104`LOGIN-REQUIRED`r103, referer: http://localhost/yote/
+ AH01215: STOW (1460) 117, Data::ObjectStore::Hash|1568048057.32576|1568048057.32579 0`29`1`ENDPOINT`vlocalhost/app-endpoint, referer: http://localhost/yote/
+ AH01215: STOW (1460) 19, Yote::Domain|1568048057.08396|1568048057.32105 domain`vlocalhost`_deleted_apps`r93`apps`r21, referer: http://localhost/yote/
+ AH01215: STOW (1460) 113, Data::ObjectStore::Hash|1568048057.32506|1568048057.32561 0`29`2`MAIN-APP-CLASS`vYote::App::PageCounter`APP-METHODS`r114, referer: http://localhost/yote/
+ AH01215: STOW (1460) 1, Data::ObjectStore::Container|1568048057.05073|1568048057.3461 db_version`v5.03`created_time`v1568048057.05073`last_update_time`v1568048057.3262`root`r4`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1460) Data::RecordStore::Transaction=ARRAY(0x2b1f748), referer: http://localhost/yote/
+ AH01215: , referer: http://localhost/yote/
+ AH01215: IN <1460> <-----   localhost, {"action":"update_counter","args":"u","app":"pageCounter","sess_id":"v250713760870760448"} HANDLE, referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: SESSION SESS ID () *120*, referer: http://localhost/yote/
+ AH01215: SESSION SESS ID (15955493783022403584) *120*, referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1460) , referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1460) Data::RecordStore::Transaction=ARRAY(0x2b28258), referer: http://localhost/yote/
+ AH01215: STOW (1460) 120, Yote::App::Session|1568048057.35754|1568048057.35824 app`r94`_session_id`v15955493783022403584`login`u`root_cache`r122`cache`r121, referer: http://localhost/yote/
+ AH01215: STOW (1460) 122, Data::ObjectStore::Hash|1568048057.35804|1568048057.35806 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1460) 96, Data::ObjectStore::Hash|1568048057.3217|1568048057.35831 0`29`1`15955493783022403584`r120, referer: http://localhost/yote/
+ AH01215: STOW (1460) 121, Data::ObjectStore::Hash|1568048057.35782|1568048057.35784 0`29`0, referer: http://localhost/yote/
+ AH01215: STOW (1460) 1, Data::ObjectStore::Container|1568048057.05073|1568048057.3622 db_version`v5.03`created_time`v1568048057.05073`last_update_time`v1568048057.35832`root`r4`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1460) Data::RecordStore::Transaction=ARRAY(0x2b28258), referer: http://localhost/yote/
+ AH01215: Endpoint Looking up session 'v250713760870760448' --> v15955493783022403584 *120* <1460>, referer: http://localhost/yote/
+ AH01215: SESSION SESS ID (15955493783022403584) *120*, referer: http://localhost/yote/
+ AH01215: Endpoing send back session id '15955493783022403584' <1460>, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 122, referer: http://localhost/yote/
+ AH01215: FETCH (1460) 121, referer: http://localhost/yote/
+ AH01215: NEXT ID (1460), referer: http://localhost/yote/
+ AH01215: Use of uninitialized value $trans in concatenation (.) or string at /home/wolf/open_source/recordstore/lib/Data/RecordStore.pm line 182., referer: http://localhost/yote/
+ AH01215: USE TRANSACATION (1460) , referer: http://localhost/yote/
+ AH01215: START TRANSACATION (1460) Data::RecordStore::Transaction=ARRAY(0x2b1c928), referer: http://localhost/yote/
+ AH01215: STOW (1460) 123, Data::ObjectStore::Array|1568048057.36807|1568048057.36809 0`1000000`0`0, referer: http://localhost/yote/
+ AH01215: STOW (1460) 120, Yote::App::Session|1568048057.35754|1568048057.36776 app`r94`_session_id`v15955493783022403584`_last_updated`v1568048057.36771`login`u`root_cache`r122`cache`r121, referer: http://localhost/yote/
+ AH01215: STOW (1460) 94, Yote::App::PageCounter|1568048057.32126|1568048057.3681 _session_pool`r97`_app_path`vpageCounter`_methods_access_levels`r95`_site`vlocalhost`_domain`r19`_session`r96`_secret_count`v11`hits`v1`_login`r99`_resets`r98`_logs`r123`_email`r100, referer: http://localhost/yote/
+ AH01215: STOW (1460) 1, Data::ObjectStore::Container|1568048057.05073|1568048057.3706 db_version`v5.03`created_time`v1568048057.05073`last_update_time`v1568048057.36813`root`r4`ObjectStore_version`v2.10, referer: http://localhost/yote/
+ AH01215: COMMIT TRANSACATION (1460) Data::RecordStore::Transaction=ARRAY(0x2b1c928), referer: http://localhost/yote/
+ AH01215: OUT <1460> --> {"defs":{},"remove":[],"ret":"v1","sess_id":"v15955493783022403584","data":{},"succ":1}, referer: http://localhost/yote/
+ AH01215: , referer: http://localhost/yote/

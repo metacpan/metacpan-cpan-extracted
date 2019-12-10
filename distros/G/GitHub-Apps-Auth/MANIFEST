@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/GitHub/Apps/Auth.pm
+minil.toml
+t/00_compile.t
+t/01_issued_token.t
+t/02_overload.t
+t/03_join.t
+t/04_installations.t
+META.yml
+MANIFEST

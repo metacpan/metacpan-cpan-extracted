@@ -1,23 +1,20 @@
 # ABSTRACT: turn WGS84 coordinates into three word addresses and vice-versa using what3words.com HTTPS API
 
-
 package Geo::What3Words;
-$Geo::What3Words::VERSION = '2.1.2';
+$Geo::What3Words::VERSION = '2.1.6';
 use strict;
 use warnings;
-use URI;
-use LWP::UserAgent;
-use LWP::Protocol::https;
 use Cpanel::JSON::XS;
 use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
+use Encode qw( decode_utf8 );
+use HTTP::Tiny;
 use Net::Ping;
 use Net::Ping::External;
-use Encode;
+use Ref::Util qw( is_hashref is_coderef );
+use URI;
+
 my $JSONXS = Cpanel::JSON::XS->new->allow_nonref(1);
-
-
-
-
 
 
 
@@ -33,18 +30,13 @@ sub new {
 
   ## _ua is used for testing. But could also be used to
   ## set proxies or such
-  $self->{ua} = $params{ua} || LWP::UserAgent->new;
+  $self->{ua} = $params{ua} || HTTP::Tiny->new;
 
   my $version  = $Geo::What3Words::VERSION || '';
   $self->{ua}->agent("Perl Geo::What3Words $version");
 
   return bless($self,$class);
 }
-
-
-
-
-
 
 
 sub ping {
@@ -65,45 +57,26 @@ sub ping {
 }
 
 
-
-
-
-
-
-
 sub words2pos {
   my ($self, @params) = @_;
-  my $res = $self->words_to_position(@params);
 
-  if ( $res && ref($res) eq 'HASH' && exists($res->{geometry}) ){
-    return $res->{geometry}->{lat} . ',' . $res->{geometry}->{lng};
+  my $res = $self->words_to_position(@params);
+  if ( $res && is_hashref($res) && exists($res->{geometry}) ){
+      return $res->{geometry}->{lat} . ',' . $res->{geometry}->{lng};
   }
   return;
 }
-
-
-
-
-
 
 
 
 sub pos2words {
   my ($self, @params) = @_;
   my $res = $self->position_to_words(@params);
-
-  if ( $res && ref($res) eq 'HASH' && exists($res->{words}) ){
-    return $res->{words};
+  if ( $res && is_hashref($res) && exists($res->{words}) ){
+      return $res->{words};
   }
   return;
 }
-
-
-
-
-
-
-
 
 
 sub valid_words_format {
@@ -120,10 +93,6 @@ sub valid_words_format {
 }
 
 
-
-
-
-
 sub words_to_position {
   my $self = shift;
   my $words = shift;
@@ -131,15 +100,6 @@ sub words_to_position {
 
   return $self->_query_remote_api('forward', {addr => $words, lang => $language });
 }
-
-
-
-
-
-
-
-
-
 
 
 sub position_to_words {
@@ -154,7 +114,6 @@ sub position_to_words {
 sub get_languages {
   my $self = shift;
   my $position = shift;
-
   return $self->_query_remote_api('languages');
 }
 
@@ -169,13 +128,14 @@ sub _query_remote_api {
   my $rh_params   = shift || {};
 
   my $rh_fields = {
-    a=> 1,
+      a      => 1,
       key    => $self->{key},
       format => 'json',
       %$rh_params
   };
+
   foreach my $key (keys %$rh_fields){
-    delete $rh_fields->{$key} if (!defined($rh_fields->{$key}));
+      delete $rh_fields->{$key} if (!defined($rh_fields->{$key}));
   }
 
   my $uri = URI->new($self->{api_endpoint} . $method_name);
@@ -185,13 +145,13 @@ sub _query_remote_api {
   $self->_log("GET $url");
   my $response = $self->{ua}->get($url);
 
-  if ( ! $response->is_success) {
-    warn "got failed response from $url: " . $response->status_line;
-    $self->_log("got failed response from $url: " . $response->status_line);
+  if ( ! $response->{success}) {
+    warn "got failed response from $url: " . $response->{status};
+    $self->_log("got failed response from $url: " . $response->{status});
     return;
   }
 
-  my $json = $response->decoded_content;
+  my $json = $response->{content};
   $json = decode_utf8($json);
   $self->_log($json);
 
@@ -203,12 +163,12 @@ sub _log {
   my $message = shift;
   return unless $self->{logging};
 
-  if ( ref($self->{logging}) eq 'CODE' ){
-    my $lc = $self->{logging};
-    &$lc("Geo::What3Words -- " . $message);
+  if ( is_coderef($self->{logging}) ){
+      my $lc = $self->{logging};
+      &$lc("Geo::What3Words -- " . $message);
   }
   else {
-    print "Geo::What3Words -- " . $message . "\n";
+      print "Geo::What3Words -- " . $message . "\n";
   }
   return;
 }
@@ -228,7 +188,7 @@ Geo::What3Words - turn WGS84 coordinates into three word addresses and vice-vers
 
 =head1 VERSION
 
-version 2.1.2
+version 2.1.6
 
 =head1 SYNOPSIS
 
@@ -253,7 +213,7 @@ This module calls API version 2 (https://docs.what3words.com/api/v2/) to convert
 coordinates into those 3 word addresses (forward) and 3 words into coordinates
 (reverse).
 
-Version 1 is deprecated and will stop working December 2016.
+Version 1 is deprecated and no longer works
 
 You need to sign up at http://what3words.com/login and then register for an API key
 at https://what3words.com/get-api-key/
@@ -426,7 +386,7 @@ mtmail <mtmail-cpan@gmx.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by OpenCage Data Limited.
+This software is copyright (c) 2019 by OpenCage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

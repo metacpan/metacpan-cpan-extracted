@@ -357,7 +357,7 @@ sub get_json ( @args ) {
         allow_blessed   => 1,    # allow blessed objects
         convert_blessed => 1,    # use TO_JSON method of blessed objects
         allow_bignum    => 1,
-        escape_slash    => 1,
+        escape_slash    => 0,
         relaxed         => 1,
         @args,
     );

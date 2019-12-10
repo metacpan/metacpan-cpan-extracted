@@ -17,4 +17,4 @@ $cmd_file =~ s/\.t/\.cmd/;
 
 $interpreter->run($cmd_file);
 
-is_deeply( ['cp file1 file2'], $interpreter->executor->commands_executed );
+is_deeply( [ 'cp file1 file2', 'cp file4 file7' ], $interpreter->executor->commands_executed );

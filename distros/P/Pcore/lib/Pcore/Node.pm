@@ -5,7 +5,7 @@ use Pcore::Util::Scalar qw[weaken refaddr is_ref is_blessed_hashref is_plain_has
 use Pcore::HTTP::Server;
 use Pcore::Node::Server;
 use Pcore::Node::Proc;
-use Pcore::WebSocket::pcore;
+use Pcore::WebSocket::softvisio;
 use Pcore::Util::UUID qw[uuid_v4_str];
 
 has type     => ( required => 1 );
@@ -82,8 +82,8 @@ sub BUILD ( $self, $args ) {
     $self->{listen}->set_username(uuid_v4_str) if !defined $self->{listen}->{username};
 
     # init node status
-    $self->{status} = $self->{_has_requires} ? $NODE_STATUS_CONNECTING : $NODE_STATUS_ONLINE;
-    $self->{is_online} = $self->{status} == $NODE_STATUS_ONLINE ? 1 : 0;
+    $self->{status}    = $self->{_has_requires}                 ? $NODE_STATUS_CONNECTING : $NODE_STATUS_ONLINE;
+    $self->{is_online} = $self->{status} == $NODE_STATUS_ONLINE ? 1                       : 0;
 
     $self->{on_status}->( $self, $self->{status}, $NODE_STATUS_UNKNOWN ) if defined $self->{on_status};
 
@@ -194,7 +194,7 @@ sub _connect_to_remote_server ($self) {
     Coro::async_pool {
         return if !defined $self;
 
-        my $h = Pcore::WebSocket::pcore->connect(
+        my $h = Pcore::WebSocket::softvisio->connect(
             $self->{server},
             compression   => $self->{compression},
             pong_timeout  => $self->{pong_timeout},
@@ -259,7 +259,7 @@ sub _run_http_server ($self) {
         listen     => $self->{listen},
         on_request => sub ($req) {
             if ( $req->is_websocket_connect_request ) {
-                return Pcore::WebSocket::pcore->accept(
+                return Pcore::WebSocket::softvisio->accept(
                     $req,
                     compression   => $self->{compression},
                     on_disconnect => sub ($h) {
@@ -338,7 +338,7 @@ sub _connect_node ( $self, $node_id, $check_connecting = 1 ) {
     weaken $self;
 
     Coro::async_pool {
-        my $h = Pcore::WebSocket::pcore->connect(
+        my $h = Pcore::WebSocket::softvisio->connect(
             $node->{listen},
             compression   => $self->{compression},
             pong_timeout  => $self->{pong_timeout},

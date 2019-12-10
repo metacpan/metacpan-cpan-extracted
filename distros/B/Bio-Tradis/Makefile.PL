@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "1.4.3",
+  "VERSION" => "1.4.5",
   "test" => {
     "TESTS" => "t/*.t t/Bio/Tradis/*.t t/Bio/Tradis/Analysis/*.t t/Bio/Tradis/CommandLine/*.t t/Bio/Tradis/Parser/*.t"
   }

@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Data-RecordStore",
    "prereqs" : {
@@ -22,7 +22,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.40"
          }
       },
       "runtime" : {
@@ -35,19 +35,68 @@
    "provides" : {
       "Data::RecordStore" : {
          "file" : "lib/Data/RecordStore.pm",
-         "version" : "5.03"
+         "version" : "6.00"
       },
       "Data::RecordStore::Converter" : {
          "file" : "lib/Data/RecordStore/Converter.pm"
       },
-      "Data::RecordStore::Converter::OldSilo" : {
-         "file" : "lib/Data/RecordStore/Converter.pm"
+      "Data::RecordStore::New" : {
+         "file" : "lib/Data/RecordStore/New.pm"
+      },
+      "Data::RecordStore::PopSilo" : {
+         "file" : "lib/Data/RecordStore/PopSilo.pm"
+      },
+      "Data::RecordStore::REST" : {
+         "file" : "lib/Data/RecordStore/REST.pm"
+      },
+      "Data::RecordStore::SQL" : {
+         "file" : "lib/Data/RecordStore/SQL.pm",
+         "version" : "0.1"
+      },
+      "Data::RecordStore::Shard" : {
+         "file" : "lib/Data/RecordStore/Shard.pm"
       },
       "Data::RecordStore::Silo" : {
-         "file" : "lib/Data/RecordStore.pm"
+         "file" : "lib/Data/RecordStore/Silo.pm",
+         "version" : "6.00"
+      },
+      "Data::RecordStore::SiloPack" : {
+         "file" : "lib/Data/RecordStore/Versioned.pm"
       },
       "Data::RecordStore::Transaction" : {
-         "file" : "lib/Data/RecordStore.pm"
+         "file" : "lib/Data/RecordStore/Transaction.pm",
+         "version" : "0.01"
+      },
+      "Data::RecordStore::Versioned" : {
+         "file" : "lib/Data/RecordStore/Versioned.pm",
+         "version" : "0.01"
+      },
+      "RS_1" : {
+         "file" : "lib/Data/RecordStore/Converter.pm"
+      },
+      "RS_2" : {
+         "file" : "lib/Data/RecordStore/Converter.pm"
+      },
+      "RS_3" : {
+         "file" : "lib/Data/RecordStore/Converter.pm"
+      },
+      "RS_3_1" : {
+         "file" : "lib/Data/RecordStore/Converter.pm"
+      },
+      "RS_4" : {
+         "file" : "lib/Data/RecordStore/Converter.pm"
+      },
+      "RS_5" : {
+         "file" : "lib/Data/RecordStore/Converter.pm"
+      },
+      "RS_6" : {
+         "file" : "lib/Data/RecordStore/Converter.pm"
+      },
+      "Silo3_and_later" : {
+         "file" : "lib/Data/RecordStore/Converter.pm"
+      },
+      "SiloPre3" : {
+         "file" : "lib/Data/RecordStore/Converter.pm"
       }
    },
    "release_status" : "stable",
@@ -56,6 +105,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "5.03",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "6.00"
 }

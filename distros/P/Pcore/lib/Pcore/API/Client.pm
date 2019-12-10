@@ -155,7 +155,7 @@ sub _get_ws ( $self ) {
 
     $self->{_get_ws_threads} = 1;
 
-    my $h = Pcore::WebSocket::pcore->connect(
+    my $h = Pcore::WebSocket::softvisio->connect(
         $self->{uri},
 
         # connection

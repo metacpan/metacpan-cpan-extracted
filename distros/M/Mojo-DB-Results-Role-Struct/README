@@ -1,0 +1,78 @@
+NAME
+
+    Mojo::DB::Results::Role::Struct - Database query results as structs
+
+SYNOPSIS
+
+      use Mojo::SQLite;
+      my $sqlite = Mojo::SQLite->new(...);
+      my $results = $sqlite->db->query('SELECT * FROM "table" WHERE "foo" = ?', 42);
+      my $struct = $results->with_roles('Mojo::DB::Results::Role::Struct')->structs->first;
+      my $bar = $struct->bar; # dies unless column "bar" exists
+    
+      use Mojo::Pg;
+      my $pg = Mojo::Pg->new(...)->with_roles('Mojo::DB::Role::ResultsRoles');
+      push @{$pg->results_roles}, 'Mojo::DB::Results::Role::Struct';
+      my $results = $pg->db->query('SELECT "foo", "bar" FROM "table"');
+      foreach my $row ($results->structs->each) {
+        my $foo = $row->foo;
+        my $bar = $row->baz; # dies
+      }
+
+DESCRIPTION
+
+    This role can be applied to a results object for Mojo::Pg or similar
+    database APIs. It provides "struct" and "structs" methods which return
+    Struct::Dumb records, providing read-only accessors only for the
+    expected column names. Note that a column name that is not a valid
+    identifier is trickier to access in this manner.
+
+      my $row = $results->struct;
+      my $col_name = 'foo.bar';
+      my $val = $row->$col_name;
+      # or
+      my $val = $row->${\'foo.bar'};
+
+    You can apply the role to a results object using "with_roles" in
+    Mojo::Base, or apply it to all results objects created by a database
+    manager using Mojo::DB::Role::ResultsRoles as shown in the synopsis.
+
+METHODS
+
+    Mojo::DB::Results::Role::Struct composes the following methods.
+
+ struct
+
+      my $struct = $results->struct;
+
+    Fetch next row from the statement handle with the result object's array
+    method, and return it as a struct.
+
+ structs
+
+      my $collection = $results->structs;
+
+    Fetch all rows from the statement handle with the result object's
+    arrays method, and return them as a Mojo::Collection object containing
+    structs.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Mojo::DB::Role::ResultsRoles, Mojo::Pg, Mojo::SQLite, Mojo::mysql
+

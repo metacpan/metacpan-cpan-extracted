@@ -21,8 +21,8 @@
          "t"
       ],
       "package" : [
-         "Mojo::Exception::_Guard",
-         "Mojo::Server::PSGI::_IO"
+         "Mojo::Server::PSGI::_IO",
+         "Mojo::Util::_Guard"
       ]
    },
    "prereqs" : {
@@ -62,6 +62,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "8.26",
+   "version" : "8.27",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

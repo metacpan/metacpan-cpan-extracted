@@ -1,5 +1,9 @@
 Changes for PDL::IO::CSV
 
+0.011   2019/12/04
+        - fix: header option eats extra line #2
+        - fix: cpantesters failure on long-double perls
+
 0.010   2016/12/23
         - fix: tests fail without PDL::DateTime #1
 

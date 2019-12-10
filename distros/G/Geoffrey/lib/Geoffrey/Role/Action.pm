@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings FATAL => 'all';
 
-$Geoffrey::Role::Action::VERSION = '0.000204';
+$Geoffrey::Role::Action::VERSION = '0.000205';
 
 sub new {
     my $class = shift;
@@ -61,7 +61,7 @@ sub do {
     return $s_sql if $self->dryrun;
     require Geoffrey::Exception::Database;
     Geoffrey::Exception::Database::throw_no_dbh() if !$self->dbh;
-    $self->dbh->do($s_sql) or Geoffrey::Exception::Database::throw_sql_handle( $!, $s_sql );
+    $self->dbh->do($s_sql) || Geoffrey::Exception::Database::throw_sql_handle( $self->dbh->errstr . "\n" . $self->dbh->err . "\n" . $!, $s_sql );
     return $s_sql;
 }
 
@@ -72,7 +72,7 @@ sub do_arrayref {
     require Geoffrey::Exception::Database;
     Geoffrey::Exception::Database::throw_no_dbh() if !$self->dbh;
     return $self->dbh->selectall_arrayref( $s_sql, { Slice => {} }, @{$options} )
-      || Geoffrey::Exception::Database::throw_sql_handle( $!, $s_sql );
+      || Geoffrey::Exception::Database::throw_sql_handle( $self->dbh->errstr . "\n" . $self->dbh->err . "\n" . $!, $s_sql );
 }
 
 sub do_prepared {
@@ -98,7 +98,7 @@ Geoffrey::Role::Action - Abstract action class.
 
 =head1 VERSION
 
-Version 0.000204
+Version 0.000205
 
 =head1 DESCRIPTION
 

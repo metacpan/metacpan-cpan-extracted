@@ -146,7 +146,7 @@ sub validate_email ( $self, $email ) {
 }
 
 # AUTHENTICATE
-sub authenticate ( $self, $token ) {
+sub authenticate ( $self, $token = undef ) {
 
     # no auth token provided
     return $self->_get_unauthenticated_descriptor if !defined $token;

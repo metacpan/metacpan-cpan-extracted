@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -15,6 +15,10 @@ FP::Git::Repository
 
 =head1 DESCRIPTION
 
+
+=head1 SEE ALSO
+ 
+Implements: L<FP::Abstract::Show>
 
 =head1 NOTE
 
@@ -53,8 +57,9 @@ sub make_perhaps_VAR {
 
 use FP::Struct [[maybe(\&is_nonnullstring), "git_dir"],
                 [maybe(\&is_nonnullstring), "work_tree"],
-                [maybe(\&is_nonnullstring), "chdir"]
-               ];
+                [maybe(\&is_nonnullstring), "chdir"]],
+    # 'FP::Abstract::Pure', can't, setting _git_dir_from_work_tree
+    'FP::Struct::Show';
 
 sub git_dir_from_work_tree {
     my $self=shift;
@@ -72,7 +77,8 @@ sub git_dir_from_work_tree {
 
 sub git_dir {
     my $self=shift;
-    $$self{git_dir} // $self->git_dir_from_work_tree
+    (exists $$self{git_dir} ? $$self{git_dir} : undef)
+        // $self->git_dir_from_work_tree
 }
 
 

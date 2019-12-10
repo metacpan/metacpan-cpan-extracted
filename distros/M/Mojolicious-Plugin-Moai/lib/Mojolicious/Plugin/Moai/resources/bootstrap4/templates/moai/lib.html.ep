@@ -1,0 +1,2 @@
+%= include 'moai/lib/stylesheet'
+%= include 'moai/lib/javascript'

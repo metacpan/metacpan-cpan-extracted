@@ -1,7 +1,7 @@
 package Sah::Schema::unix::gid;
 
-our $DATE = '2019-09-11'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-12-09'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [uint => {
     summary => 'Group identifier (GID)',
@@ -25,7 +25,7 @@ Sah::Schema::unix::gid - Group identifier (GID)
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::unix::gid (from Perl distribution Sah-Schemas-Unix), released on 2019-09-11.
+This document describes version 0.009 of Sah::Schema::unix::gid (from Perl distribution Sah-Schemas-Unix), released on 2019-12-09.
 
 =head1 DESCRIPTION
 

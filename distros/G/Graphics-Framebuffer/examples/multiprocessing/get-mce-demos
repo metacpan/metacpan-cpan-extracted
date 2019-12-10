@@ -4,13 +4,6 @@ git clone https://github.com/marioroy/mce-examples.git
 echo "Moving framebuffer demos into examples"
 mv -f mce-examples/framebuffer/*pl .
 
-sed -i 's/\S$VERSION/($Graphics::Framebuffer::VERSION/g' many_boxes.pl
-sed -i 's/\S$VERSION/($Graphics::Framebuffer::VERSION/g' many_ellipses.pl
-sed -i 's/\S$VERSION/($Graphics::Framebuffer::VERSION/g' many_lines.pl
-sed -i 's/\S$VERSION/($Graphics::Framebuffer::VERSION/g' mcechnl_primitives.pl
-sed -i 's/\S$VERSION/($Graphics::Framebuffer::VERSION/g' mcehobo_primitives.pl
-sed -i 's/\S$VERSION/($Graphics::Framebuffer::VERSION/g' mcehobo_slideshow.pl
-
 echo "Cleaning up"
 rm -Rf mce-examples
 echo "Done"

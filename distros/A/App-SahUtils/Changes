@@ -1,3 +1,42 @@
+0.471   2019-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [list-sah-coerce-rule-modules] Show summary in --detail (-l).
+
+
+0.470   2019-11-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Simplify CLI scripts by disabling reading of config/env.
+
+
+0.469   2019-11-23  Released-By: PERLANCAR; Urgency: high
+
+        - Merge two releases (0.468.1 & 0.468).
+
+
+0.468.1 2019-11-23  Released-By: PERLANCAR; Urgency: medium
+
+	- [list-sah-schema-modules] Show summary.
+
+        - UPDATE 2019-11-26: rename 0.466 -> 0.468.1, cancel release (duplicate
+          version).
+
+
+0.468   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	- list-sah-coerce-rule-modules: show dist field.
+
+
+0.467   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Derp, forgot to actually return the new field.
+
+
+0.466   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	- list-sah-coerce-rule-modules: remove enable_by_default field
+	  (old, for v <= 3), add might_fail field.
+
+
 0.465   2019-07-25  Released-By: PERLANCAR; Urgency: medium
 
 	- list-sah-coerce-rule-modules: Show metadata v when --detail.

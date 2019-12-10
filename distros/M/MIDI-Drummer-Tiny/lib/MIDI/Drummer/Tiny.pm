@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.0801';
+our $VERSION = '0.0802';
 
 use Moo;
 use MIDI::Simple;
@@ -95,13 +95,26 @@ sub count_in {
 sub metronome {
     my $self = shift;
     my $bars = shift || $self->bars;
+
+    my $i = 0;
+
     for my $n ( 1 .. $self->beats * $bars ) {
-        if ( $self->beats % 3 == 0 )
+        if ( $n % 2 == 0 )
         {
-            $self->note( $self->quarter, $self->open_hh, $n % 3 ? $self->kick : $self->snare );
+            $self->note( $self->quarter, $self->open_hh, $self->snare );
         }
         else {
-            $self->note( $self->quarter, $self->open_hh, $n % 2 ? $self->kick : $self->snare );
+            if ( $i % 2 == 0 )
+            {
+                $self->note( $self->quarter, $self->open_hh, $self->kick );
+            }
+            else
+            {
+                $self->note( $self->eighth, $self->open_hh, $self->kick );
+                $self->note( $self->eighth, $self->kick );
+            }
+
+            $i++;
         }
     }
 }
@@ -126,7 +139,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.0801
+version 0.0802
 
 =head1 SYNOPSIS
 
@@ -137,14 +150,16 @@ version 0.0801
     bpm       => 100,
     signature => '3/4',
     bars      => 32,
+    kick      => 'n36', # Override default patch
+    snare     => 'n40', # "
  );
 
- $d->count_in(1);  # HH for 1 bar
+ $d->count_in(1);  # Closed hi-hat for 1 bar
 
  $d->note( $d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare )
     for 1 .. $d->beats * $d->bars;  # Alternate kick and snare
 
- $d->metronome();  # Similar but honoring time signature
+ $d->metronome();
 
  $d->write();
 
@@ -206,8 +221,6 @@ Default: 4/4
 B<beats>/B<divisions>
 
 =head1 KIT
-
-These patches may be overridden as with any other attribute.
 
 =over 4
 
@@ -318,6 +331,8 @@ Output the score to the F<*.mid> file given in the constuctor.
 L<Moo>
 
 L<MIDI::Simple>
+
+L<https://en.wikipedia.org/wiki/General_MIDI#Percussion>
 
 =head1 AUTHOR
 

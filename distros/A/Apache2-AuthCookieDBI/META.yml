@@ -17,7 +17,10 @@ name: Apache2-AuthCookieDBI
 provides:
   Apache2::AuthCookieDBI:
     file: lib/Apache2/AuthCookieDBI.pm
-    version: '2.18'
+    version: '2.19'
+  Apache2_4::AuthCookieDBI:
+    file: lib/Apache2_4/AuthCookieDBI.pm
+    version: '2.19'
 recommends:
   Digest::SHA: '5.47'
 requires:
@@ -35,5 +38,5 @@ requires:
 resources:
   license: http://opensource.org/licenses/lgpl-license.php
   repository: https://github.com/matisse/Apache-AuthCookieDBI
-version: '2.18'
+version: '2.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

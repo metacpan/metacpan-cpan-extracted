@@ -1,6 +1,6 @@
-# Copyright (c) 2009-2017 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Checking if $VERSION strings of updated perl modules have been updated.
 # These are tests for the distribution maintainer.
@@ -64,7 +64,7 @@ if (
     }msx
 ) {
     my $checksums_txt = $1;
-    while ($checksums_txt =~ m/^(\S+)\s+([a-f\d]+)\s+(.*)$/mgo) {
+    while ($checksums_txt =~ m/^(\w+) ([a-f\d]+)\s+(.*)$/mgo) {
         $checksums{$3} = [$1, $2];
     }
 }

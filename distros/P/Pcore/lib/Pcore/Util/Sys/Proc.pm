@@ -1,7 +1,8 @@
 package Pcore::Util::Sys::Proc;
 
-use Pcore -const, -class;
-use Pcore::Util::Scalar qw[is_ref weaken];
+use Pcore -const, -class, -export;
+use Pcore::Util::Scalar qw[is_path is_ref is_plain_scalarref weaken];
+use Pcore::Util::Text qw[encode_utf8];
 use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32::Process';
 use if $MSWIN, 'Win32API::File';
@@ -13,9 +14,10 @@ use overload    #
   q[""]    => sub { return $_[0]->{status} . $SPACE . $_[0]->{reason} },
   fallback => undef;
 
+our $EXPORT = { PROC_REDIRECT => [qw[$PROC_REDIRECT_SOCKET $PROC_REDIRECT_STDOUT $PROC_REDIRECT_FH]], };
+
 has win32_alive_timeout => 0.5;
 has kill_on_destroy     => 1;
-has use_fh              => ();    # use file handles to redirect output
 
 has stdin  => ();
 has stdout => ();
@@ -26,9 +28,16 @@ has exit_code => ();
 has status    => ();
 has reason    => ();
 
+has child_stdin  => ( init_arg => undef );
+has child_stderr => ( init_arg => undef );
+
 has _win32_proc => ();
 has _watcher    => ();
 has _watcher_cb => ();
+
+const our $PROC_REDIRECT_SOCKET => 1;
+const our $PROC_REDIRECT_STDOUT => 2;
+const our $PROC_REDIRECT_FH     => 3;
 
 const our $PROC_STATUS_ACTIVE             => 0;
 const our $PROC_STATUS_TERMINATED_SUCCESS => 200;
@@ -80,10 +89,7 @@ sub DESTROY ( $self ) {
 around new => sub ( $orig, $self, $cmd, %args ) {
     $cmd = [$cmd] if !is_ref $cmd;
 
-    $self = $self->$orig(
-        kill_on_destroy => $args{kill_on_destroy} // 1,
-        use_fh          => $args{use_fh},
-    );
+    $self = $self->$orig( kill_on_destroy => $args{kill_on_destroy} // 1, );
 
     if ($MSWIN) {
         $self->{win32_alive_timeout} = $args{win32_alive_timeout} if defined $args{win32_alive_timeout};
@@ -93,127 +99,10 @@ around new => sub ( $orig, $self, $cmd, %args ) {
         $args{setpgid} //= 1;
     }
 
-    my ( $child_stdin,  $child_stdout,  $child_stderr );
-    my ( $backup_stdin, $backup_stdout, $backup_stderr );
-
-    # redirect STDIN
-    if ( $args{stdin} ) {
-        ( $child_stdin, my $parent_stdin ) = portable_socketpair();
-
-        $self->{stdin} = P->handle($parent_stdin);
-
-        # backup and redirect
-        open $backup_stdin, '<&', *STDIN or do {    ## no critic qw[InputOutput::RequireBriefOpen]
-
-            # windows os native fh is invalid, reopen STDIN to NUL
-            if ( $MSWIN && Win32API::File::GetOsFHandle(*STDIN) == 18446744073709551614 ) {
-                open $backup_stdin, '<', 'NUL' or die $!;
-            }
-            else {
-                die $!;
-            }
-        };
-
-        open *STDIN, '<&', $child_stdin or die $!;
-    }
-
-    # redirect STDOUT
-    if ( $args{stdout} ) {
-        open $backup_stdout, '>&', *STDOUT or do {    ## no critic qw[InputOutput::RequireBriefOpen]
-
-            # windows os native fh is invalid, reopen STDOUT to NUL
-            if ( $MSWIN && Win32API::File::GetOsFHandle(*STDERR) == 18446744073709551614 ) {
-                open $backup_stdout, '>', 'NUL' or die $!;
-            }
-            else {
-                die $!;
-            }
-        };
-
-        if ( $args{use_fh} ) {
-            $self->{stdout} = P->file1->tempfile;
-
-            # redirect STDOUT
-            open *STDOUT, '>', $self->{stdout} or die $!;
-        }
-        else {
-            ( my $parent_stdout, $child_stdout ) = portable_socketpair();
-
-            $self->{child_stdout} = $child_stdout;
-
-            $self->{stdout} = P->handle($parent_stdout);
-
-            # redirect STDOUT
-            open *STDOUT, '>&', $child_stdout or die $!;
-        }
-    }
-
-    # redirect STDERR
-    if ( $args{stderr} ) {
-
-        # backup STDERR
-        open $backup_stderr, '>&', *STDERR or do {    ## no critic qw[InputOutput::RequireBriefOpen]
-
-            # windows os native fh is invalid, reopen STDERR to NUL
-            if ( $MSWIN && Win32API::File::GetOsFHandle(*STDERR) == 18446744073709551614 ) {
-                open $backup_stderr, '>', 'NUL' or die $!;
-            }
-            else {
-                die $!;
-            }
-        };
-
-        if ( $args{use_fh} ) {
-
-            # redirect STDERR to STDOUT
-            if ( $args{stderr} == 2 ) {
-
-                # redirect STDERR to child STDOUT
-                if ( $args{stdout} ) {
-
-                    # redirect
-                    open *STDERR, '>', $self->{stdout} or die $!;
-                }
-
-                # redirect STDERR to parent STDOUT
-                else {
-                    open *STDERR, '>&', *STDOUT or die $!;
-                }
-            }
-            else {
-                $self->{stderr} = P->file1->tempfile;
-
-                # redirect STDERR
-                open *STDERR, '>', $self->{stderr} or die $!;
-            }
-        }
-        else {
-
-            # redirect STDERR to STDOUT
-            if ( $args{stderr} == 2 ) {
-
-                # redirect STDERR to child STDOUT
-                if ( $args{stdout} ) {
-                    $child_stderr = $child_stdout;
-                }
-
-                # redirect STDERR to parent STDOUT
-                else {
-                    open $child_stderr, '>&', *STDOUT or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
-                }
-            }
-            else {
-                ( my $parent_stderr, $child_stderr ) = portable_socketpair();
-
-                $self->{child_stderr} = $child_stderr;
-
-                $self->{stderr} = P->handle($parent_stderr);
-            }
-
-            # redirect STDERR
-            open *STDERR, '>&', $child_stderr or die $!;
-        }
-    }
+    # redirect handles
+    my $backup_stdin  = $args{stdin}  ? $self->_redirect_stdin( \%args )  : undef;
+    my $backup_stdout = $args{stdout} ? $self->_redirect_stdout( \%args ) : undef;
+    my $backup_stderr = $args{stderr} ? $self->_redirect_stderr( \%args ) : undef;
 
     # create process
     $self->_create_process(
@@ -232,6 +121,138 @@ around new => sub ( $orig, $self, $cmd, %args ) {
 
     return $self;
 };
+
+sub _redirect_stdin ( $self, $args ) {
+    my ( $backup, $child );
+
+    # backup
+    open $backup, '<&', *STDIN or do {    ## no critic qw[InputOutput::RequireBriefOpen]
+
+        # windows os native fh is invalid, reopen STDIN to NUL
+        if ( $MSWIN && Win32API::File::GetOsFHandle(*STDIN) == 18446744073709551614 ) {
+            open $backup, '<', 'NUL' or die $!;
+        }
+        else {
+            die $!;
+        }
+    };
+
+    # redirect to the temporary filehandle
+    if ( is_plain_scalarref $args->{stdin} ) {
+        my $temp = $self->{stdin} = P->file1->tempfile;
+
+        P->file->write_bin( $temp, encode_utf8 $args->{stdin}->$* );
+
+        open $child, '<:raw', $temp or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
+    }
+
+    # redirect to the socket
+    elsif ( $args->{stdin} == $PROC_REDIRECT_SOCKET ) {
+        ( $child, my $parent ) = portable_socketpair();
+
+        $self->{stdin} = P->handle($parent);
+    }
+    else {
+        die 'Invalid redirect target for STDIN';
+    }
+
+    # redirect
+    open *STDIN, '<&', $child or die $!;
+
+    return $backup;
+}
+
+sub _redirect_stdout ( $self, $args ) {
+    my $backup;
+
+    # backup
+    open $backup, '>&', *STDOUT or do {    ## no critic qw[InputOutput::RequireBriefOpen]
+
+        # windows os native fh is invalid, reopen STDOUT to NUL
+        if ( $MSWIN && Win32API::File::GetOsFHandle(*STDERR) == 18446744073709551614 ) {
+            open $backup, '>', 'NUL' or die $!;
+        }
+        else {
+            die $!;
+        }
+    };
+
+    # redirect to the temporary filehandle
+    if ( $args->{stdout} == $PROC_REDIRECT_FH ) {
+        $self->{stdout} = P->file1->tempfile;
+
+        # redirect
+        open *STDOUT, '>:raw', $self->{stdout} or die $!;
+    }
+
+    # redirect to the socket
+    elsif ( $args->{stdout} == $PROC_REDIRECT_SOCKET ) {
+        my ( $parent, $child ) = portable_socketpair();
+
+        $self->{child_stdout} = $child;
+
+        $self->{stdout} = P->handle($parent);
+
+        # redirect
+        open *STDOUT, '>&', $child or die $!;
+    }
+    else {
+        die 'Invalid redirect target for STDOUT';
+    }
+
+    return $backup;
+}
+
+sub _redirect_stderr ( $self, $args ) {
+    my $backup;
+
+    # backup
+    open $backup, '>&', *STDERR or do {    ## no critic qw[InputOutput::RequireBriefOpen]
+
+        # windows os native fh is invalid, reopen STDERR to NUL
+        if ( $MSWIN && Win32API::File::GetOsFHandle(*STDERR) == 18446744073709551614 ) {
+            open $backup, '>', 'NUL' or die $!;
+        }
+        else {
+            die $!;
+        }
+    };
+
+    # redirect to the temporary filehandle
+    if ( $args->{stderr} == $PROC_REDIRECT_FH ) {
+        $self->{stderr} = P->file1->tempfile;
+
+        # redirect STDERR
+        open *STDERR, '>:raw', $self->{stderr} or die $!;
+    }
+
+    # redirect to the socket
+    elsif ( $args->{stderr} == $PROC_REDIRECT_SOCKET ) {
+        my ( $parent, $child ) = portable_socketpair();
+
+        $self->{child_stderr} = $child;
+
+        $self->{stderr} = P->handle($parent);
+
+        # redirect
+        open *STDERR, '>&', $child or die $!;
+    }
+
+    # redirect to the STDOUT
+    elsif ( $args->{stderr} == $PROC_REDIRECT_STDOUT ) {
+        if ( defined $self->{stdout} ) {
+            open *STDERR, '>:raw', $self->{stdout} or die $!;
+        }
+        else {
+            open *STDERR, '>&', *STDOUT or die $!;
+        }
+    }
+    else {
+        die 'Invalid redirect target for STDERR';
+    }
+
+    return $backup;
+}
 
 # TODO under windows run directly and handle process creation error
 sub _create_process ( $self, $cmd, $args, $restore ) {
@@ -386,17 +407,36 @@ sub wait ($self) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
 sub capture ( $self, %args ) {
     $self->wait;
 
-    if ( $self->{use_fh} ) {
-        $self->{stdout} = \P->file->read_bin( $self->{stdout} ) if defined $self->{stdout};
+    # capture STDOUT
+    if ( $self->{stdout} ) {
 
-        $self->{stderr} = \P->file->read_bin( $self->{stderr} ) if defined $self->{stderr};
+        # capture from the fh
+        if ( is_path $self->{stdout} ) {
+            $self->{stdout} = \P->file->read_bin( $self->{stdout} );
+        }
+
+        # capture from the socket
+        else {
+            undef $self->{child_stdout};
+
+            $self->{stdout} = $self->{stdout}->read_eof( timeout => $args{timeout} );
+        }
     }
-    else {
-        undef $self->{child_stdout};
-        $self->{stdout} = $self->{stdout}->read_eof( timeout => $args{timeout} ) if $self->{stdout};
 
-        undef $self->{child_stderr};
-        $self->{stderr} = $self->{stderr}->read_eof( timeout => $args{timeout} ) if $self->{stderr};
+    # capture STDERR
+    if ( $self->{stderr} ) {
+
+        # capture from the fh
+        if ( is_path $self->{stderr} ) {
+            $self->{stderr} = \P->file->read_bin( $self->{stderr} );
+        }
+
+        # capture from the socket
+        else {
+            undef $self->{child_stderr};
+
+            $self->{stderr} = $self->{stderr}->read_eof( timeout => $args{timeout} );
+        }
     }
 
     return $self;
@@ -475,9 +515,7 @@ sub _set_exit_code ( $self, $exit_code, $reason = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (52)                               |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 109, 125, 158        | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
+## |    2 | 132, 172, 213        | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -494,7 +532,6 @@ Pcore::Util::Sys::Proc
 
     my $proc = P->sys->run_proc(
         $cmd,
-        use_fh                 => 0,
         stdin                  => 0,
         stdout                 => 0,
         stderr                 => 0,

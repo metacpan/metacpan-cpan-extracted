@@ -43,7 +43,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.26';
+    $VERSION = '0.27';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -651,6 +651,37 @@ sub trim()
 
     return $string;
 } ## end sub trim
+
+=head2 C<getProgressBar()>
+=cut
+
+sub getProgressBar()
+{
+    my ( $self, %parameters ) = @_;
+    my $name   = $parameters{ name }   // 'Progress';
+    my $count  = $parameters{ count }  // 0;
+    my $remove = $parameters{ remove } // 1;
+    my $eta    = $parameters{ eta }    // 'linear';
+    my $silent = $parameters{ silent } // !DEBUG;
+
+    eval { require Term::ProgressBar; };
+    if ( $@ )
+    {
+        die Dumper 'Sem o Term::ProgressBar...';
+    }
+
+    my $progress = Term::ProgressBar->new(
+        {
+            name   => $name,
+            count  => $count,
+            remove => $remove,
+            ETA    => $eta,
+            silent => $silent,
+        }
+    );
+
+    return $progress;
+} ## end sub getProgressBar
 
 =head2 C<getTimeStampHash()>
 =cut

@@ -10,7 +10,7 @@ push @ISA, 'Exporter';
 BEGIN {
   require Exporter;
   @ISA = qw(Exporter);
-  $VERSION = '0.013';
+  $VERSION = '0.014';
 
   require XSLoader;
   XSLoader::load('Imager::Screenshot' => $VERSION);
@@ -29,6 +29,7 @@ sub screenshot {
      right => 0,
      bottom => 0,
      monitor => 0,
+     direct => 0,
      @_);
 
   my $result;
@@ -43,7 +44,7 @@ sub screenshot {
     defined &_x11
       or die "X11 driver not enabled\n";
     $result = _x11($opts{display}, $opts{id}, $opts{left}, $opts{top},
-		   $opts{right}, $opts{bottom});
+		   $opts{right}, $opts{bottom}, $opts{direct});
   }
   elsif (defined $opts{darwin}) { # as long as it's there
     defined &_darwin
@@ -212,6 +213,12 @@ Retrieve a screenshot under X11, if I<id> is zero, capture the root
 window.  I<display object> is a integer version of an X11 C< Display *
 >, if this isn't supplied C<screenshot()> will attempt connect to the
 the display specified by $ENV{DISPLAY}.
+
+By default this works by always capturing from the root window,
+adjusting for the position of the supplied window if one is supplied.
+
+To capture directly from the window, which returns a completely black
+image on some platforms, supply a C<< direct => 1 >> parameter.
 
 Note: taking a screenshot of a remote display is slow.
 

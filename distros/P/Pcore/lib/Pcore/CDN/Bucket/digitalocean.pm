@@ -6,7 +6,7 @@ extends qw[Pcore::CDN::Bucket::s3];
 
 has edge_links => 0;    # generate edge links by default
 
-has service => ( 's3', init_arg => undef );
+has service  => ( 's3',                     init_arg => undef );
 has endpoint => ( 'digitaloceanspaces.com', init_arg => undef );
 has prefix      => ( init_arg => undef );
 has prefix_edge => ( init_arg => undef );

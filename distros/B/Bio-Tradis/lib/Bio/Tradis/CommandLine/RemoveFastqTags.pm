@@ -1,5 +1,5 @@
 package Bio::Tradis::CommandLine::RemoveFastqTags;
-$Bio::Tradis::CommandLine::RemoveFastqTags::VERSION = '1.4.3';
+$Bio::Tradis::CommandLine::RemoveFastqTags::VERSION = '1.4.5';
 # ABSTRACT: Remove given tags from the start of the sequence
 
 
@@ -90,7 +90,7 @@ Bio::Tradis::CommandLine::RemoveFastqTags - Remove given tags from the start of 
 
 =head1 VERSION
 
-version 1.4.3
+version 1.4.5
 
 =head1 SYNOPSIS
 

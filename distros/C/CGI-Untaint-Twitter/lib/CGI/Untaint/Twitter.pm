@@ -13,11 +13,11 @@ CGI::Untaint::Twitter - Validate a Twitter ID in a CGI script
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our $consumer_key;
 our $consumer_secret;
 our $access_token;
@@ -52,7 +52,7 @@ sub _untaint_re {
 	# Only allow letters and digits
 	# Remove the leading @ if any - leading spaces and so on will be
 	# ignored
-	return qr/\@?([a-zA-z0-9]+)/;
+	return qr/^\@?([a-zA-z0-9]+)$/;
 }
 
 sub is_valid {
@@ -170,10 +170,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-Twitter>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/CGI-Untaint-Twitter>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Untaint-Twitter>
@@ -190,7 +186,7 @@ L<http://search.cpan.org/dist/CGI-Untaint-Twitter>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2014 Nigel Horne.
+Copyright 2012-2019 Nigel Horne.
 
 This program is released under the following licence: GPL
 

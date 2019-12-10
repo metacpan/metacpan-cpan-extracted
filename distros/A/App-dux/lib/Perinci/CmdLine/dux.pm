@@ -1,7 +1,7 @@
 package Perinci::CmdLine::dux;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '1.53'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '1.540'; # VERSION
 
 use 5.010;
 use Log::ger;
@@ -15,7 +15,7 @@ extends 'Perinci::CmdLine::Lite';
 sub action_call {
     my ($self, $r) = @_;
 
-    binmode(STDOUT, ":utf8");
+    binmode(STDOUT, ":encoding(utf8)");
 
     # set `in` argument for the dux function
     my $chomp = $r->{meta}{"x.app.dux.strip_newlines"} //
@@ -119,7 +119,7 @@ Perinci::CmdLine::dux - Perinci::CmdLine subclass for dux cli
 
 =head1 VERSION
 
-This document describes version 1.53 of Perinci::CmdLine::dux (from Perl distribution App-dux), released on 2017-07-10.
+This document describes version 1.540 of Perinci::CmdLine::dux (from Perl distribution App-dux), released on 2019-10-26.
 
 =head1 DESCRIPTION
 
@@ -157,7 +157,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

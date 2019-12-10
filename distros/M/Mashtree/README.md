@@ -1,7 +1,12 @@
 # mashtree
+
 Create a tree using Mash distances.
 
-For simple usage, see `mashtree`.  For advanced options, look at `mashtree_wrapper.pl`.
+For simple usage, see `mashtree --help`. This is an example command:
+
+    mashtree *.fastq.gz > tree.dnd
+    
+For confidence values, run either with `--help`: `mashtree_bootstrap.pl` or `mashtree_jackknife.pl`.
 
 ## Two modes: fast or accurate
 
@@ -12,6 +17,8 @@ above file types.  You can compress with gz, bz2, or zip.
 
 **Output files**: Newick (.dnd).  If `--outmatrix` is supplied, then
 a distance matrix too.
+
+See the documentation on [the algorithms](docs/ALGORITHM.md) for more information.
 
 ### Faster
 
@@ -81,58 +88,17 @@ with a random seed.
     --sketch-size        10000
 
 
-Also see `mashtree_wrapper.pl` for advanced usage. Run either script with
-`--help` for additional information.
-
-## Requirements
-
-* Mash >= v1.1 - please upgrade to v2.0 for future releases of Mashtree.
-* SQLite3
-* Perl 
-  * multithreading 
-  * BioPerl library
-  * `DBD::SQLite`
-* Quicktree.  **Note**: Quicktree version 2.3 has been redistributed in this repo.  This version of Quicktree has been modified to increase the precision from 5 digits to 10 digits.
-
 ## Installation
 
-### Installation from Git
-
-After downloading the latest release, go into the directory and run `make`
-
-    $ cd mashtree
-    $ perl Makefile.PL 
-    $ make test
-
-Add `mashtree/bin` to `PATH` and you're good to go!
-
-### Installation from CPAN
-
-Installing from CPAN installs the latest stable version of Mashtree.  This method _should_ add the Mashtree perl modules to the correct place in your home directory and _should_ add the executables to your local bin directory.  However, I am new to CPAN, so please give me feedback via the issues tab if this is not correct.
-
-    $ cpanm -L ~ Mashtree
-    $ export PERL5LIB=$PERL5LIB:$HOME/lib/perl5
-    $ mashtree --help # verify it shows usage and not an error
-
-### Alternate method of installing from CPAN
-
-    $ cpan # initiates the CPAN command line prompt
-    cpan[1]> install Mashtree
-    cpan[2]> exit
-    $ export PERL5LIB=$PERL5LIB:$HOME/lib/perl5
-    $ mashtree --help # verify it shows usage and not an error
-
-### Uninstallation from CPAN
-
-I'm not sure _why_ you'd want to uninstall Mashtree but here is how you would clean it up.
-
-    $ cpanm --uninstall Mashtree --local-lib=$HOME
+**Please see [INSTALL.md](docs/INSTALL.md)**
 
 ## Further documentation
 
-For more information please see the [docs folder](docs/)
+For more information and help please see the [docs folder](docs/)
 
-For more information on plugins, see the [plugins folder](plugins).
+For more information on plugins, see the [plugins folder](plugins). (in development)
+
+For more information on contributions, please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## References
 
@@ -141,10 +107,15 @@ For more information on plugins, see the [plugins folder](plugins).
 
 ## Citation
 
-The paper is in preparation but for now, this is a valid citation:
+### In review, JOSS
 
-Katz, L. S., Griswold, T., & Carleton, H. A. (2017, October 8-11). [_Generating WGS Trees with Mashtree_](misc/mashtree%20ASM%20NGS.pptx). Poster presented at the American Society for Microbiology Conference on Rapid Applied Microbial Next-Generation Sequencing and Bioinformatic Pipelines, Washington, DC. 
+Katz, L. S., Griswold, T., Morrison, S., Caravas, J., Zhang, S., den Bakker, H.C., Deng, X., and Carleton, H. A., "Mashtree: a rapid comparison of whole genome sequence files."  Journal of Open Source Software, in review.  https://github.com/openjournals/joss-reviews/issues/1762#issuecomment-543736907
+
+### Poster
+
+Katz, L. S., Griswold, T., & Carleton, H. A. (2017, October 8-11). [_Generating WGS Trees with Mashtree_](misc/mashtree%20ASM%20NGS.pptx). Poster presented at the American Society for Microbiology Conference on Rapid Applied Microbial Next-Generation Sequencing and Bioinformatic Pipelines, Washington, DC. Poster number 27.
 
 ## GitHub stickers for Mashtree
 
 [![Build Status](https://travis-ci.org/lskatz/mashtree.svg?branch=master)](https://travis-ci.org/lskatz/mashtree)
+

@@ -1,3 +1,4 @@
+5.04 - cleanup and increase code coverage.
 5.03 - changed the open_store interface to either take a single
        directory or take options, which now include :
          MODE - SINGLE || MULTI - determines if flocking should be done

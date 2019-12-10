@@ -188,13 +188,35 @@ my @complex = (
     { '11 january next year'                       => '11.01.2007 00:00:00'     },
     { '11 january this year'                       => '11.01.2006 00:00:00'     },
     { '11 january last year'                       => '11.01.2005 00:00:00'     },
+    { '6 seconds before yesterday'                 => '22.11.2006 23:59:54'     },
+    { '6 minutes before yesterday'                 => '22.11.2006 23:54:00'     },
     { '6 hours before yesterday'                   => '22.11.2006 18:00:00'     },
+    { '6 seconds before today'                     => '23.11.2006 23:59:54'     },
+    { '6 minutes before today'                     => '23.11.2006 23:54:00'     },
+    { '6 hours before today'                       => '23.11.2006 18:00:00'     },
+    { '6 seconds before tomorrow'                  => '24.11.2006 23:59:54'     },
+    { '6 minutes before tomorrow'                  => '24.11.2006 23:54:00'     },
     { '6 hours before tomorrow'                    => '24.11.2006 18:00:00'     },
+    { '3 seconds after yesterday'                  => '23.11.2006 00:00:03'     },
+    { '3 minutes after yesterday'                  => '23.11.2006 00:03:00'     },
     { '3 hours after yesterday'                    => '23.11.2006 03:00:00'     },
+    { '3 seconds after today'                      => '24.11.2006 00:00:03'     },
+    { '3 minutes after today'                      => '24.11.2006 00:03:00'     },
+    { '3 hours after today'                        => '24.11.2006 03:00:00'     },
+    { '3 seconds after tomorrow'                   => '25.11.2006 00:00:03'     },
+    { '3 minutes after tomorrow'                   => '25.11.2006 00:03:00'     },
     { '3 hours after tomorrow'                     => '25.11.2006 03:00:00'     },
+    { '10 seconds before noon'                     => '24.11.2006 11:59:50'     },
+    { '10 minutes before noon'                     => '24.11.2006 11:50:00'     },
     { '10 hours before noon'                       => '24.11.2006 02:00:00'     },
+    { '10 seconds before midnight'                 => '23.11.2006 23:59:50'     },
+    { '10 minutes before midnight'                 => '23.11.2006 23:50:00'     },
     { '10 hours before midnight'                   => '23.11.2006 14:00:00'     },
+    { '5 seconds after noon'                       => '24.11.2006 12:00:05'     },
+    { '5 minutes after noon'                       => '24.11.2006 12:05:00'     },
     { '5 hours after noon'                         => '24.11.2006 17:00:00'     },
+    { '5 seconds after midnight'                   => '24.11.2006 00:00:05'     },
+    { '5 minutes after midnight'                   => '24.11.2006 00:05:00'     },
     { '5 hours after midnight'                     => '24.11.2006 05:00:00'     },
     { 'noon last friday'                           => '17.11.2006 12:00:00'     },
     { 'midnight last friday'                       => '17.11.2006 00:00:00'     },
@@ -281,7 +303,7 @@ my @specific = (
     { '+2d'                                => '26.11.2006 01:13:08'     },
 );
 
-_run_tests(669, [ [ \@simple ], [ \@complex ], [ \@specific ] ], \&compare);
+_run_tests(691, [ [ \@simple ], [ \@complex ], [ \@specific ] ], \&compare);
 
 sub compare
 {

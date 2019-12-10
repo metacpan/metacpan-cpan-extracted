@@ -1,3 +1,9 @@
+0.86    Thu Dec  5 20:53:07 GMT 2019
+* Fix RT#131072 which was due to tar.exe and CRLF line endings
+
+0.84    Wed Dec  4 21:20:04 GMT 2019
+* Fix RT#119084 - won't compile on MSWin32 with taint
+
 0.82    Fri Nov 22 19:09:35 GMT 2019
 * Correctly compare version string for Archive::Tar (#7)
 * Remove duplicate entry from the MANIFEST file. (#6)

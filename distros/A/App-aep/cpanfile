@@ -1,0 +1,6 @@
+requires    'perl' => '5.010001';
+requires    'YAML::XS';
+requires    'Getopt::Long::Descriptive';
+requires    'POE';
+requires    'POE::Filter::Reference';
+requires    'POE::Wheel::Run';

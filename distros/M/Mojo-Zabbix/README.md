@@ -1,18 +1,19 @@
 ##  Mojo::Zabbix 
 
-  IT is a  simple perl wrapper of Zabbix API. We build only authentication 
+Mojo::Zabbix  is a simple perl wrapper of Zabbix API. We build only authentication 
 and request methods and few helper methods to simplify calling methods 
 such ascreate/get/update/delete/exists. 
 
 ## 中文介绍
 
    Mojo::Zabix - 是对zabbix api函数的简单打包，以便更易于用perl脚本进行
-访问操作zabbix。目前仅支持认证和请求方法，可以用其进行create/get
-/update/delete/exists方法调用，见例子。本模块基于Mojo::useragent，结果
-可以用Mojo:DOM进行处理和内容提取。
-   本模块依赖Mojo，建议使用cpan包安装 cpanm Mojo::Zabbix
+访问操作zabbix。目前仅支持认证和请求方法，可以用其进行`create`/`get`
+/`update`/`delete`/`exists`方法调用，见例子。本模块基于`Mojo::useragent`，结果
+用`Mojo:DOM`进行处理和内容提取。
 
-###The more details ,please visting the Zabbix API documentation pages .
+  本模块依赖`Mojo`，建议使用`cpan`包安装`cpanm Mojo::Zabbix`
+
+### The more details ,please visting the Zabbix API documentation pages .
 
     - [Zabbix API Wiki](http://www.zabbix.org/)
     - [Zabbix 1.8 API](http://www.zabbix.com/documentation/1.8/api)
@@ -21,15 +22,17 @@ such ascreate/get/update/delete/exists.
     - [Zabbix 3.0 API](https://www.zabbix.com/documentation/3.0/)
     - [Zabbix 3.2 API](https://www.zabbix.com/documentation/3.2/)
     - [Zabbix 3.4 API](https://www.zabbix.com/documentation/3.4/)
+    - [Zabbix 4.0 API](https://www.zabbix.com/documentation/4.0/)
 
 ### Test
 
-The module is compatible and tested with Zabbix less version 3.0
+The module is compatible and tested with Zabbix less version 4.0
 
-本模块目前仅在3.0以前的模块下测试，3.0下基本可以使用，3.0可以使用，但是未严格测试
+本模块目前仅在4.0以前的模块下测试，4.0下基本可以使用，4.x可以使用，但是未严格测试
 
 ## Example
 
+```
      use Mojo::Zabbix;
 
      my $z = Net::Zabbix->new(
@@ -49,13 +52,16 @@ The module is compatible and tested with Zabbix less version 3.0
      }
      );
 
+```
 #### A example for print the zabbix api version 打印zabbix服务器版本.
 
     print $z->get("apiinfo.version",)->{result},"\n";
 
 #### A example for get the new warn message of triggerid 打印新警告触发器.
 
-      print getTriggers($z);
+```
+      print getTriggers($z); # 该函数和其他函数已经打包到Mojo::Zabbix::APP
+
       sub getTriggers {
         my $z=shift;
         my $ysterday=localtime(time()-24*3600);
@@ -80,6 +86,7 @@ The module is compatible and tested with Zabbix less version 3.0
         return $result;
       }
 
+```
 
 ## The result all 结果示意: 
 
@@ -133,11 +140,13 @@ Get data from zabbix data include host，items, Triggers and warns and so on.
 
 #### 定义zabbix服务器
 
-    my @myzinfo = ('test1  http://test1/zabbix    testuser pass');
+```
+ my @myzinfo = ('test1  http://test1/zabbix    testuser pass');
 
  @可以定义为多行数据，格式按照这种，一个zabbix 服务地址一个
 
     for (@myzinfo) {
+ 
      next if /^#/;
      next if /^\s*$/;
      my ( $name, $url,$user, $pass ) = split;
@@ -161,12 +170,13 @@ Get data from zabbix data include host，items, Triggers and warns and so on.
        
        ## Print the history data of given items, default for past 24 hours.
        ## 打印给定时间段的item历史数据，如果默认不给时间默认为过去24小时内的
-       pHitems($z);
+       pHitems($z); # 打印实时监控数据
 
      }
 
     }
 
+```
 
 ## 结果展示
 
@@ -186,19 +196,21 @@ Get data from zabbix data include host，items, Triggers and warns and so on.
 wo can add the program to crontab  and gain the result for mail
 or some Im tool.
 
-我们可以通过cron定时调用程序获得结果，也可以通过IM工具（qq，微信，
-目前有个webqq（https://github.com/sjdy521/Mojo-Webqq）的插件,交互
+我们可以通过cron定时调用程序获得结果，也可以通过IM工具（qq，微信），
+目前有个[Mojo-webqq](https://github.com/sjdy521/Mojo-Webqq)的插件,交互
 性获取监控数据。
 
 
 ## Git repo
  
-[github] (https://github.com/bollwarm/Mojo-Zabbix)
-[oschina] (https://git.oschina.net/ijz/Mojo-Zabbix.git) 
+[github](https://github.com/bollwarm/Mojo-Zabbix)
+
+[oschina](https://gitee.com/ijz/Mojo-Zabbix.git) 
 
 ## AUTHOR
  
-mail to orange: <bollwarm@ijz.me>
+[mail to me](bollwarm@ijz.me)
+
 [web|blog](http://ijz.me)
 
 ## License

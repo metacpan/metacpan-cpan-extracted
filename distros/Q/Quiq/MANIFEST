@@ -123,6 +123,7 @@ lib/Quiq/JQuery/DataTable.pm
 lib/Quiq/JQuery/Form/ViewEdit.pm
 lib/Quiq/JQuery/Function.pm
 lib/Quiq/JQuery/Tabs.pm
+lib/Quiq/Json.pm
 lib/Quiq/LaTeX/Code.pm
 lib/Quiq/LaTeX/Document.pm
 lib/Quiq/LaTeX/Figure.pm
@@ -324,6 +325,7 @@ t/bin/Quiq/JQuery/DataTable.t
 t/bin/Quiq/JQuery/Form/ViewEdit.t
 t/bin/Quiq/JQuery/Function.t
 t/bin/Quiq/JQuery/Tabs.t
+t/bin/Quiq/Json.t
 t/bin/Quiq/LaTeX/Code.t
 t/bin/Quiq/LaTeX/Document.t
 t/bin/Quiq/LaTeX/Figure.t

@@ -12,5 +12,13 @@ cp file2 file3
 
 cp file1 file2
 
+IF %VALUE:~-4,2% == 34 goto label2
 
+goto fin
+
+:label2
+
+cp file4 file7
+
+:fin
 

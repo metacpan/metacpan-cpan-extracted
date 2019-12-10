@@ -1,3 +1,162 @@
+commit 5fb4c31ec4513a18094de8bea8d1b99ad39f008b
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Dec 8 20:20:37 2019 +0000
+
+    remove noise files
+
+commit 029341323bf21d69202435e43088b039a338ef37
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Dec 8 20:13:10 2019 +0000
+
+    jscript patches for base handling
+
+commit 69f89a57f54c8353d9e467a6fd50e39753bf1df0
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Thu Apr 18 20:23:22 2019 +0100
+
+    Build version 1.01
+
+commit ec768a7ffa83bf148f20e7f0cf4ce9987ac3f0b3
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Thu Apr 18 20:18:03 2019 +0100
+
+    make a Tables app deployable under a path
+
+commit 189c85821063222960712db85e063558fe5fee77
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Jul 7 14:51:04 2017 +0000
+
+    Build version 0.08
+
+commit 1a03a303bfbe4ddd4c948bfe1c2c7dcfba63027c
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Jul 7 14:48:08 2017 +0000
+
+    build child-link using compound-ids
+
+commit a7d8801b18b51a881a60196e5f0aa6698acba0f5
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Dec 19 19:21:26 2016 +0000
+
+    Build version 0.07 with dist
+
+commit ec29ef0f84ae2e0882a5be34f281a103b7f12f1d
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Dec 19 19:20:32 2016 +0000
+
+    Build version 0.07
+
+commit 996a961dea152def4f27f77acf303516bba1e53e
+Merge: 003a27f 3606a70
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Dec 19 19:11:52 2016 +0000
+
+    Merge remote-tracking branch 'origin/master'
+
+commit 003a27f80b4ee226d7bd359cccd164ae33657759
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Dec 19 19:10:28 2016 +0000
+
+    Build version 0.06
+
+commit 88b7169ad43608d87cf02b06055896f8bf477837
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Dec 19 19:09:09 2016 +0000
+
+    tweak build instructions
+
+commit 3606a7032ecf4335d709499e98207be1afb16b22
+Merge: 39fcc81 821b4e6
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Dec 19 19:01:01 2016 +0000
+
+    Merge pull request #2 from manwar/fix-missing-prereqs
+    
+    Fix missing prereqs as reported by CPANTS.
+
+commit 821b4e68a07f48d36be921453e2039f71ac03af9
+Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+Date:   Mon Dec 19 11:45:17 2016 +0000
+
+    Fix missing prereqs as reported by CPANTS.
+    http://cpants.cpanauthors.org/dist/Mojolicious-Plugin-Tables
+
+commit 39fcc812f03fb1ca4d2aca4c16bcdb537db73e2d
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Dec 18 23:34:42 2016 +0000
+
+    Build version 0.05
+
+commit 4e4c6db5a0e6a15967ceac0765ae999fbbabc7e7
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Dec 18 23:22:58 2016 +0000
+
+    restore connect_info accessor
+
+commit c607837d8dd63b6bea9c56dab525378f2c4c03b7
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Dec 18 23:16:01 2016 +0000
+
+    Tables::Model::Row should inherit DBIx::Class::Core
+
+commit d4806baebc98de4547203d849894b2c0d434ed63
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Dec 18 20:15:13 2016 +0000
+
+    try dynamic loader again
+
+commit 47e1b797c67d1d2ea590546d8497ea7c4f8719e6
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sat Apr 16 09:44:27 2016 +0100
+
+    remove unnecessary stuff
+
+commit cfc13122d15d2b88a44e524e27b07a338d3af9f2
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sat Apr 16 09:12:54 2016 +0100
+
+    tar bundle 0.04
+
+commit cc783f3d18ea5b9d8f6275580f29bbae6e5b5873
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sat Apr 16 09:09:17 2016 +0100
+
+    Revert "NEW DYNAMIC DB LOADER!"
+    
+    This reverts commit a459cb76afd91684be9ac65196133a1df188ddaa.
+
+commit a459cb76afd91684be9ac65196133a1df188ddaa
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Apr 15 18:00:54 2016 +0100
+
+    NEW DYNAMIC DB LOADER!
+    
+    .. requires (still unpublished) DBIx::Class::Schema::Loader::DBI::Dynamic
+
+commit 99f2ba2b133328b521ff61e8d138547e371827cb
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Tue Apr 5 11:18:21 2016 +0100
+
+    view_extra_100
+
+commit 95b40cf93a78ed2222e1b7bd8e5fd0974f1dbe17
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Tue Apr 5 11:18:05 2016 +0100
+
+    minor refactor of model generation
+
+commit 1b2d0de4037d4a1083a9857c09c9995f1c18ee13
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Mar 14 19:36:09 2016 +0000
+
+    version bump to fix wrong distro bundled
+
+commit ba957d8ff12e44bf77c0aab0d954050fc34b539d
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Mar 14 17:01:31 2016 +0000
+
+    Write 'changes' file
+
 commit 8c9d7e9422921fc4d62b956f5fb85705c4e5dad6
 Author: Frank Carnovale <frank.carnovale@gmail.com>
 Date:   Mon Mar 14 17:00:51 2016 +0000

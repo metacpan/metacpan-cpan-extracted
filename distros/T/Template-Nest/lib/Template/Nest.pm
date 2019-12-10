@@ -6,7 +6,7 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 sub new{
 	my ($class,%opts) = @_;
@@ -274,14 +274,15 @@ sub _get_template{
 sub params{
     my ($self,$template_name) = @_;
 
+    my $esc = $self->{escape_char};
     my $template = $self->_get_template( $template_name );
-    my @frags = split( /\\\\/, $template );
+    my @frags = split( /\Q$esc$esc\E/, $template );
     my $tda = $self->{token_delims}[0];
     my $tdb = $self->{token_delims}[1];
 
     my %rem;
     for my $i (0..$#frags){
-        my @f = $frags[$i] =~ m/(?<!\\)$tda(.*?)$tdb/g;
+        my @f = $frags[$i] =~ m/(?<!\Q$esc\E)$tda(.*?)$tdb/g;
         for my $f ( @f ){
             $f =~ s/^\s*//;
             $f =~ s/\s*$//;
@@ -364,7 +365,7 @@ sub _fill_in{
         my $char = $self->{defaults_namespace_char};
         for my $i (0..$#frags){
 
-            my @rem = $frags[$i] =~ m/(?<!\\)$tda\s+(.*?)\s+$tdb/g;
+            my @rem = $frags[$i] =~ m/(?<!\Q$esc\E)$tda\s+(.*?)\s+$tdb/g;
             my %rem;
             for my $name ( @rem ){;
 #                $name =~ s/^\s*//;
@@ -376,7 +377,7 @@ sub _fill_in{
                 my @parts = ( $name );
                 @parts = split( /\Q$char\E/, $name ) if $char;
                 my $val = $self->_get_default_val($self->{defaults},@parts);
-                $frags[$i] =~ s/(?<!\\)$tda\s+$name\s+$tdb/$val/;
+                $frags[$i] =~ s/(?<!\Q$esc\E)$tda\s+$name\s+$tdb/$val/g;
             }
             
             if ( $esc ){

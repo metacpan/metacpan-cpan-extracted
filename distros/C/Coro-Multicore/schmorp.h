@@ -57,10 +57,12 @@
 typedef IV VAL64;
 # define SvVAL64(sv) SvIV (sv)
 # define newSVval64(i64) newSViv (i64)
+# define sv_setval64(sv,i64) sv_setiv ((sv), (i64))
 #else
 typedef NV VAL64;
 # define SvVAL64(sv) SvNV (sv)
 # define newSVval64(i64) newSVnv (i64)
+# define sv_setval64(sv,i64) sv_setnv ((sv), (i64))
 #endif
 
 /* typemap for the above */

@@ -11,7 +11,7 @@ use File::Spec::Functions qw( catfile );
 use FindBin               qw( $RealBin $RealScript );
 #use Pod::Usage            qw( pod2usage ); # required
 
-use Encode::Locale qw();
+use Encode::Locale  qw();
 
 use Term::Choose       qw();
 use Term::Choose::Util qw( insert_sep );
@@ -100,13 +100,15 @@ sub _options {
             { name => '_file_find_warnings', text => "- Warnings",      section => 'G' },
         ],
         group_insert => [
-            { name => '_parse_file',    text => "- Parse file",     section => 'insert' },
-            { name => '_parse_copy',    text => "- Parse C & P",    section => 'insert' },
-            { name => '_split_config',  text => "- split settings", section => 'split'  },
-            { name => '_csv_char',      text => "- CSV settings-a", section => 'csv'    },
-            { name => '_csv_options',   text => "- CSV settings-b", section => 'csv'    },
-            { name => '_file_encoding', text => "- File encoding",  section => 'insert' },
-            { name => 'history_dirs',   text => "- File history",   section => 'insert' },
+            { name => '_parse_file',    text => "- Parse file",        section => 'insert' },
+            { name => '_parse_copy',    text => "- Parse C & P",       section => 'insert' },
+            { name => '_split_config',  text => "- split settings",    section => 'split'  },
+            { name => '_csv_char',      text => "- CSV settings-a",    section => 'csv'    },
+            { name => '_csv_options',   text => "- CSV settings-b",    section => 'csv'    },
+            { name => '_file_encoding', text => "- File encoding",     section => 'insert' },
+            { name => 'history_dirs',   text => "- Dir history",       section => 'insert' },
+            { name => '_file_filter',       text => "- File filter", section => 'insert' },
+            { name => '_show_hidden_files', text => "- Show hidden", section => 'insert' },
         ],
     };
     return $groups->{$group};
@@ -251,12 +253,18 @@ sub set_options {
                 my $prompt = 'Choose operators';
                 $sf->__choose_a_subset_wrap( $section, $opt, $sf->{avail_operators}, $prompt );
             }
-
             elsif ( $opt eq '_file_encoding' ) {
                 my $items = [
                     { name => 'file_encoding', prompt => "file_encoding" },
                 ];
                 my $prompt = 'Encoding CSV files';
+                $sf->__group_readline( $section, $items, $prompt );
+            }
+            elsif ( $opt eq '_file_filter' ) {
+                my $items = [
+                    { name => 'file_filter', prompt => "file_filter" },
+                ];
+                my $prompt = 'Set glob file filter';
                 $sf->__group_readline( $section, $items, $prompt );
             }
             elsif ( $opt eq '_csv_char' ) {
@@ -299,7 +307,7 @@ sub set_options {
             }
             elsif ( $opt eq 'history_dirs' ) {
                 my $digits = 2;
-                my $prompt = 'Search history - Max dirs: ';
+                my $prompt = 'Number of saved dirs: ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits, 1 );
             }
             elsif ( $opt eq 'tab_width' ) {
@@ -317,7 +325,6 @@ sub set_options {
                 my $prompt = 'Set the threshold for the progress bar ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits, 0 );
             }
-
             elsif ( $opt eq 'max_rows' ) {
                 my $digits = 7;
                 my $prompt = 'Set the SQL auto LIMIT ';
@@ -507,6 +514,13 @@ sub set_options {
                 my $prompt = 'Data type guessing';
                 my $sub_menu = [
                     [ 'data_type_guessing', "- Enable data type guessing", [ $no, $yes ] ]
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq '_show_hidden_files' ) {
+                my $prompt = 'Show hidden files';
+                my $sub_menu = [
+                    [ 'show_hidden_files', "- Show hidden files", [ $no, $yes ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

@@ -1,15 +1,19 @@
-Build.PL
 Changes
+docker/httpd-2.2/Dockerfile
+docker/httpd-2.4/Dockerfile
+docker/README
 eg/bin/login.pl
 eg/html/login-failed.html
 eg/html/login.html
 generic_reg_auth_scheme.txt
 lib/Apache2/AuthCookieDBI.pm
+lib/Apache2_4/AuthCookieDBI.pm
 LICENSE
 MANIFEST
 MANIFEST.SKIP
 META.yml			Module meta-data (added by MakeMaker)
 README
+README-docker
 schema.sql
 t/basic.t
 t/mock_libs/Apache/DBI.pm
@@ -23,6 +27,7 @@ t/mock_libs/DBI.pm
 t/mock_libs/Digest/MD5.pm
 t/mock_libs/Mock/Tieable.pm
 t/utils.t
+t/utils24.t
 techspec.txt
 Makefile.PL
 META.json

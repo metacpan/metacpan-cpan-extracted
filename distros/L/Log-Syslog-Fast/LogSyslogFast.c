@@ -35,10 +35,17 @@ update_prefix(LogSyslogFast* logger, time_t t)
         timestr[22] = ':';
     }
 
-    logger->prefix_len = snprintf(
-        logger->linebuf, logger->bufsize, logger->msg_format,
-        logger->priority, timestr, logger->sender, logger->name, logger->pid
-    );
+    if (logger->format == LOG_RFC3164 || logger->format == LOG_RFC5424) {
+        logger->prefix_len = snprintf(
+            logger->linebuf, logger->bufsize, logger->msg_format,
+            logger->priority, timestr, logger->sender, logger->name, logger->pid
+        );
+    } else if (logger->format == LOG_RFC3164_LOCAL) { /* without sender */
+        logger->prefix_len = snprintf(
+            logger->linebuf, logger->bufsize, logger->msg_format,
+            logger->priority, timestr, logger->name, logger->pid
+        );   
+    }
 
     if (logger->prefix_len > logger->bufsize - 1)
         logger->prefix_len = logger->bufsize - 1;
@@ -194,6 +201,11 @@ LSF_set_format(LogSyslogFast* logger, int format)
 
         /* STRUCTURED-DATA and MSGID fields are omitted */
         logger->msg_format = "<%d>1 %s %s %s %d - - ";
+    }
+    else if (logger->format == LOG_RFC3164_LOCAL) {
+        /* Same as LOG_RFC3164 but without HOSTNAME */
+        logger->time_format = "%h %e %H:%M:%S";
+        logger->msg_format = "<%d>%s %s[%d]: ";
     }
     else {
         logger->err = "invalid format constant";

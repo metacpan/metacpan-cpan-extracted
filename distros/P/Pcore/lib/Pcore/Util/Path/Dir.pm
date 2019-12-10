@@ -44,9 +44,12 @@ sub parent ($self) {
     if ( !exists $self->{_dir_parent} ) {
         my $path = $self->{is_abs} ? $self : $self->clone->to_abs;
 
-        my $parent = $self->new("$self->{path}/..");
-
-        $self->{_dir_parent} = $parent->is_root ? undef : $parent;
+        if ( $path->is_root ) {
+            $self->{_dir_parent} = undef;
+        }
+        else {
+            $self->{_dir_parent} = $self->new("$self->{path}/..");
+        }
     }
 
     return $self->{_dir_parent};
@@ -228,9 +231,9 @@ sub empty_dir ( $path, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 55                   | Subroutines::ProhibitExcessComplexity - Subroutine "read_dir" with high complexity score (30)                  |
+## |    3 | 58                   | Subroutines::ProhibitExcessComplexity - Subroutine "read_dir" with high complexity score (30)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 58                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 61                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

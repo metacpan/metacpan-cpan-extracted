@@ -1,6 +1,6 @@
 package Email::Sender::Transport::SMTP;
 # ABSTRACT: send email over SMTP
-$Email::Sender::Transport::SMTP::VERSION = '1.300033';
+$Email::Sender::Transport::SMTP::VERSION = '1.300034';
 use Moo;
 
 use Email::Sender::Failure::Multi;
@@ -27,7 +27,9 @@ use utf8 (); # See below. -- rjbs, 2015-05-14
 #pod
 #pod =over 4
 #pod
-#pod =item C<host>: the name of the host to connect to; defaults to C<localhost>
+#pod =item C<hosts>: an arrayref of names of the host to try, in order; defaults to a single element array containing C<localhost>
+#pod
+#pod The attribute C<host> may be given, instead, which contains a single hostname.
 #pod
 #pod =item C<ssl>: if 'starttls', use STARTTLS; if 'ssl' (or 1), connect securely;
 #pod otherwise, no security
@@ -352,7 +354,7 @@ Email::Sender::Transport::SMTP - send email over SMTP
 
 =head1 VERSION
 
-version 1.300033
+version 1.300034
 
 =head1 DESCRIPTION
 
@@ -369,7 +371,9 @@ The following attributes may be passed to the constructor:
 
 =over 4
 
-=item C<host>: the name of the host to connect to; defaults to C<localhost>
+=item C<hosts>: an arrayref of names of the host to try, in order; defaults to a single element array containing C<localhost>
+
+The attribute C<host> may be given, instead, which contains a single hostname.
 
 =item C<ssl>: if 'starttls', use STARTTLS; if 'ssl' (or 1), connect securely;
 otherwise, no security

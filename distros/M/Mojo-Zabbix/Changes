@@ -1,6 +1,14 @@
 Revision history for Mojo-Zabbix
 
-0.11    2017-05-19/18
+0.13    2017-09-14/17
+
+* fix login params for support zabbix 4.x
+* Clean constants that are rarely used 
+
+0.12    2017-09-14/17
+* add support time scope parameter for Ptrigger function.
+
+0.11    2017-05-25/18
 
 * add group info get for Mojo-Zabbix—APP.
 

@@ -61,7 +61,6 @@
             "Devel::NYTProf" : "0",
             "Filter::Crypto" : "0",
             "HTML::Packer" : "0",
-            "JavaScript::Beautifier" : "v0.25.0",
             "JavaScript::Packer" : "0",
             "Module::Build::Tiny" : "0",
             "PAR::Packer" : "0",
@@ -166,6 +165,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.105.0",
+   "version" : "v0.107.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

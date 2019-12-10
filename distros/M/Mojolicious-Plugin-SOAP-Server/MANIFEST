@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+CHANGES
+lib/Mojolicious/Plugin/SOAP/Server.pm
+example/exsoaple.pl
+example/nameservice.xsd
+example/nameservice.wsdl
+t/basic.t
+.gitignore
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,7 +1,7 @@
 package Sah::SchemaR::unix::username;
 
-our $DATE = '2019-09-11'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-12-09'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 our $rschema = ["str",[{description=>"\nThe checking follows POSIX rules: does not begin with a hyphen and only contains\n[A-Za-z0-9._-].\n\nThe above rule allows integers like 1234, which can be confused with UID, so\nthis schema disallows pure integers.\n\nThe maximum length is 32 following libc6's limit.\n\n",match=>qr((?=\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\z)(?=.*[A-Za-z._-])),max_len=>32,min_len=>1,summary=>"Unix account name"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::username - Unix account name
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::SchemaR::unix::username (from Perl distribution Sah-Schemas-Unix), released on 2019-09-11.
+This document describes version 0.009 of Sah::SchemaR::unix::username (from Perl distribution Sah-Schemas-Unix), released on 2019-12-09.
 
 =head1 DESCRIPTION
 

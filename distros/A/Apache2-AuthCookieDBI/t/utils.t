@@ -567,7 +567,7 @@ sub test_group {
     Test::More::is_deeply(
         $r->{'subprocess_env'},
         { AUTH_COOKIE_DBI_GROUP => $group },
-        'group() sets AUTH_COOKIE_DBI_GROUP when OK'
+        'group() sets AUTH_COOKIE_DBI_GROUP when OK.'
     );
 
     # test failure to connect to database

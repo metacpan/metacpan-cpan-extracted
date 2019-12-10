@@ -7,13 +7,12 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  blib: '1.01'
   perl: '5.008'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,229 +21,229 @@ name: App-ZofCMS
 provides:
   App::ZofCMS:
     file: lib/App/ZofCMS.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Config:
     file: lib/App/ZofCMS/Config.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Output:
     file: lib/App/ZofCMS/Output.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin:
     file: lib/App/ZofCMS/Plugin.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::AccessDenied:
     file: lib/App/ZofCMS/Plugin/AccessDenied.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::AntiSpamMailTo:
     file: lib/App/ZofCMS/Plugin/AntiSpamMailTo.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::AutoDump:
     file: lib/App/ZofCMS/Plugin/AutoDump.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::AutoEmptyQueryDelete:
     file: lib/App/ZofCMS/Plugin/AutoEmptyQueryDelete.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::AutoIMGSize:
     file: lib/App/ZofCMS/Plugin/AutoIMGSize.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Barcode:
     file: lib/App/ZofCMS/Plugin/Barcode.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Base:
     file: lib/App/ZofCMS/Plugin/Base.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::BasicLWP:
     file: lib/App/ZofCMS/Plugin/BasicLWP.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::BoolSettingsManager:
     file: lib/App/ZofCMS/Plugin/BoolSettingsManager.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::BreadCrumbs:
     file: lib/App/ZofCMS/Plugin/BreadCrumbs.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::CRUD:
     file: lib/App/ZofCMS/Plugin/CRUD.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::CSSMinifier:
     file: lib/App/ZofCMS/Plugin/CSSMinifier.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Comments:
     file: lib/App/ZofCMS/Plugin/Comments.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::ConditionalRedirect:
     file: lib/App/ZofCMS/Plugin/ConditionalRedirect.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::ConfigToTemplate:
     file: lib/App/ZofCMS/Plugin/ConfigToTemplate.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Cookies:
     file: lib/App/ZofCMS/Plugin/Cookies.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::CurrentPageURI:
     file: lib/App/ZofCMS/Plugin/CurrentPageURI.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::DBI:
     file: lib/App/ZofCMS/Plugin/DBI.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::DBIPPT:
     file: lib/App/ZofCMS/Plugin/DBIPPT.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::DataToExcel:
     file: lib/App/ZofCMS/Plugin/DataToExcel.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::DateSelector:
     file: lib/App/ZofCMS/Plugin/DateSelector.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Debug::Dumper:
     file: lib/App/ZofCMS/Plugin/Debug/Dumper.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Debug::Validator::HTML:
     file: lib/App/ZofCMS/Plugin/Debug/Validator/HTML.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::DirTreeBrowse:
     file: lib/App/ZofCMS/Plugin/DirTreeBrowse.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Doctypes:
     file: lib/App/ZofCMS/Plugin/Doctypes.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::FeatureSuggestionBox:
     file: lib/App/ZofCMS/Plugin/FeatureSuggestionBox.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::FileList:
     file: lib/App/ZofCMS/Plugin/FileList.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::FileToTemplate:
     file: lib/App/ZofCMS/Plugin/FileToTemplate.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::FileTypeIcon:
     file: lib/App/ZofCMS/Plugin/FileTypeIcon.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::FileUpload:
     file: lib/App/ZofCMS/Plugin/FileUpload.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::FloodControl:
     file: lib/App/ZofCMS/Plugin/FloodControl.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::FormChecker:
     file: lib/App/ZofCMS/Plugin/FormChecker.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::FormFiller:
     file: lib/App/ZofCMS/Plugin/FormFiller.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::FormMailer:
     file: lib/App/ZofCMS/Plugin/FormMailer.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::FormToDatabase:
     file: lib/App/ZofCMS/Plugin/FormToDatabase.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::GetRemotePageTitle:
     file: lib/App/ZofCMS/Plugin/GetRemotePageTitle.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::GoogleCalculator:
     file: lib/App/ZofCMS/Plugin/GoogleCalculator.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::GooglePageRank:
     file: lib/App/ZofCMS/Plugin/GooglePageRank.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::GoogleTime:
     file: lib/App/ZofCMS/Plugin/GoogleTime.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::HTMLFactory::Entry:
     file: lib/App/ZofCMS/Plugin/HTMLFactory/Entry.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::HTMLFactory::PageToBodyId:
     file: lib/App/ZofCMS/Plugin/HTMLFactory/PageToBodyId.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::HTMLMailer:
     file: lib/App/ZofCMS/Plugin/HTMLMailer.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::InstalledModuleChecker:
     file: lib/App/ZofCMS/Plugin/InstalledModuleChecker.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::JavaScriptMinifier:
     file: lib/App/ZofCMS/Plugin/JavaScriptMinifier.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::LinkifyText:
     file: lib/App/ZofCMS/Plugin/LinkifyText.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::LinksToSpecs::CSS:
     file: lib/App/ZofCMS/Plugin/LinksToSpecs/CSS.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::LinksToSpecs::HTML:
     file: lib/App/ZofCMS/Plugin/LinksToSpecs/HTML.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::NavMaker:
     file: lib/App/ZofCMS/Plugin/NavMaker.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::PreferentialOrder:
     file: lib/App/ZofCMS/Plugin/PreferentialOrder.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::QueryToTemplate:
     file: lib/App/ZofCMS/Plugin/QueryToTemplate.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::QuickNote:
     file: lib/App/ZofCMS/Plugin/QuickNote.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::RandomBashOrgQuote:
     file: lib/App/ZofCMS/Plugin/RandomBashOrgQuote.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::RandomPasswordGeneratorPurePerl:
     file: lib/App/ZofCMS/Plugin/RandomPasswordGeneratorPurePerl.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::SendFile:
     file: lib/App/ZofCMS/Plugin/SendFile.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Session:
     file: lib/App/ZofCMS/Plugin/Session.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::SplitPriceSelect:
     file: lib/App/ZofCMS/Plugin/SplitPriceSelect.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::StartPage:
     file: lib/App/ZofCMS/Plugin/StartPage.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::StyleSwitcher:
     file: lib/App/ZofCMS/Plugin/StyleSwitcher.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Sub:
     file: lib/App/ZofCMS/Plugin/Sub.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Syntax::Highlight::CSS:
     file: lib/App/ZofCMS/Plugin/Syntax/Highlight/CSS.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Syntax::Highlight::HTML:
     file: lib/App/ZofCMS/Plugin/Syntax/Highlight/HTML.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::TOC:
     file: lib/App/ZofCMS/Plugin/TOC.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::TagCloud:
     file: lib/App/ZofCMS/Plugin/TagCloud.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::Tagged:
     file: lib/App/ZofCMS/Plugin/Tagged.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::UserLogin:
     file: lib/App/ZofCMS/Plugin/UserLogin.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::UserLogin::ChangePassword:
     file: lib/App/ZofCMS/Plugin/UserLogin/ChangePassword.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::UserLogin::ForgotPassword:
     file: lib/App/ZofCMS/Plugin/UserLogin/ForgotPassword.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::ValidationLinks:
     file: lib/App/ZofCMS/Plugin/ValidationLinks.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Plugin::YouTube:
     file: lib/App/ZofCMS/Plugin/YouTube.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Template:
     file: lib/App/ZofCMS/Template.pm
-    version: '1.001007'
+    version: '1.001008'
   App::ZofCMS::Test::Plugin:
     file: lib/App/ZofCMS/Test/Plugin.pm
-    version: '1.001007'
+    version: '1.001008'
 requires:
   CGI: '0'
   CSS::Minifier: '0'
@@ -295,15 +294,15 @@ resources:
   bugtracker: https://github.com/zoffixznet/app-zofcms/issues
   homepage: http://metacpan.org/release/App-ZofCMS
   repository: git://github.com/zoffixznet/app-zofcms.git
-version: '1.001007'
+version: '1.001008'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.028000'
   plugins:
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: '@Author::ZOFFIX/OurPkgVersion'
-      version: '0.10'
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -321,7 +320,7 @@ x_Dist_Zilla:
             - strict
             - warnings
       name: '@Author::ZOFFIX/PromptIfStale'
-      version: '0.051'
+      version: '0.055'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -334,54 +333,54 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::ZOFFIX/GatherDir'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::ZOFFIX/PruneCruft'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::ZOFFIX/ManifestSkip'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::ZOFFIX/MetaYAML'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::ZOFFIX/License'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Author::ZOFFIX/Readme'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::ZOFFIX/ExecDir'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::ZOFFIX/ShareDir'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::ZOFFIX/MakeMaker'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::ZOFFIX/Manifest'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::ZOFFIX/AutoPrereqs'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::ZOFFIX/MetaConfig'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs::AuthorDeps
       name: '@Author::ZOFFIX/Prereqs::AuthorDeps'
@@ -398,29 +397,33 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::ZOFFIX/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.007'
+              version: '6.012'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000031'
-          version: '0.004'
+          Module::Metadata: '1.000033'
+          version: '0.006'
       name: '@Author::ZOFFIX/MetaProvides::Package'
-      version: '2.004002'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
       name: '@Author::ZOFFIX/InstallGuide'
-      version: '1.200007'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
         Dist::Zilla::Role::FileWatcher:
           version: '0.006'
       name: '@Author::ZOFFIX/ReadmeAnyFromPod'
-      version: '0.161170'
+      version: '0.163250'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -436,8 +439,9 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
+          switch: []
       name: '@Author::ZOFFIX/Test::Compile'
-      version: '2.054'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::DistManifest
       name: '@Author::ZOFFIX/Test::DistManifest'
@@ -469,7 +473,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaTests
       name: '@Author::ZOFFIX/MetaTests'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
       name: '@Author::ZOFFIX/Test::CPAN::Meta::JSON'
@@ -492,7 +496,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::ZOFFIX/PodSyntaxTests'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Changes
       config:
@@ -507,18 +511,21 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000031'
-          version: '0.004'
+          Module::Metadata: '1.000033'
+          version: '0.006'
       name: '@Author::ZOFFIX/CheckSelfDependency'
       version: '0.011'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@Author::ZOFFIX/CheckPrereqsIndexed'
-      version: '0.018'
+      version: '0.020'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
+      config:
+        Dist::Zilla::Plugin::Test::MinimumVersion:
+          max_target_perl: '5.008008'
       name: '@Author::ZOFFIX/Test::MinimumVersion'
-      version: '2.000006'
+      version: '2.000010'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -527,9 +534,10 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
+          git_version: 1.7.10.4
           repo_root: .
       name: '@Author::ZOFFIX/Git::NextVersion'
-      version: '2.039'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::AutoMetaResources
       name: '@Author::ZOFFIX/AutoMetaResources'
@@ -546,7 +554,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::ZOFFIX/TestRelease'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: '@Author::ZOFFIX/InstallRelease'
@@ -554,7 +562,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::ZOFFIX/ConfirmRelease'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -567,15 +575,16 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 1.7.10.4
           repo_root: .
       name: '@Author::ZOFFIX/Git::Check'
-      version: '2.039'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -583,11 +592,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 1.7.10.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ZOFFIX/Git::Commit'
-      version: '2.039'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -595,15 +605,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.001007
-          tag_format: v%v
-          tag_message: v%v
+          tag: v1.001008
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
+          git_version: 1.7.10.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ZOFFIX/Git::Tag'
-      version: '2.039'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -612,13 +623,14 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
+          git_version: 1.7.10.4
           repo_root: .
       name: '@Author::ZOFFIX/Git::Push'
-      version: '2.039'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::ZOFFIX/UploadToCPAN'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Pod::Spiffy
       name: Pod::Spiffy
@@ -626,50 +638,51 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.007'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::ZOFFIX/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.007'
+      version: '6.012'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.007'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+    version: '6.012'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -21,8 +21,6 @@ my @urls = (
 
 my $promiser = Net::Curl::Promiser::AnyEvent->new();
 
-my $cv = AnyEvent->condvar();
-
 my @promises;
 
 for my $url (@urls) {
@@ -35,6 +33,8 @@ for my $url (@urls) {
         sub { warn "$url failed: " . shift },
     );
 }
+
+my $cv = AnyEvent->condvar();
 
 Promise::ES6->all(\@promises)->finally($cv);
 

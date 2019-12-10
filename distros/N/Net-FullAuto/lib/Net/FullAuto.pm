@@ -22,7 +22,7 @@ package Net::FullAuto;
 #######################################################################
 
 
-our $VERSION='1.0000482';
+our $VERSION='1.0000483';
 
 
 use 5.005;
@@ -501,7 +501,7 @@ The importance of I<persistent> connections when attempting to programmatically 
 
 To see FullAuto in action, please download and explore the "Self Service Demonstration" at L<http://sourceforge.net/projects/fullauto>. The demo contains an embedded YouTube video (L<https://youtu.be/gRwa1QoOS7M>) explaining and showing the entire automated process of setting up a complex multi-host infrastructure in the Amazon EC2 Cloud. After watching or while watching the video, you can run the demo and standup your own cloud infrastructure in just a few minutes.
 
-The Hadoop demo is particularly interesting and timely given the recent explosion of BIG DATA and the need to access it more powerfully. The Hadoop demo utilizes a special FullAuto L<Instruction Set|http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000482/lib/Net/FullAuto/ISets/Amazon/Hadoop_is.pm>" that stands up a complete 4 node/server cluster in the Amazon EC2 Cloud. Every element of the build and stand up is automated including using the EC2 API to launch servers, connecting to all 4 servers automatically with SSH & SFTP, downloading and compiling Hadoop source code from L<http://hadoop.apache.org|http://hadoop.apache.org>, downloading and installing Java and all other dependencies, and then cross-configuring all 4 nodes with discovered IP addresses and other information that was unknown at the beginning of the standup - and finally starting the cluster and launching an admin web portal.
+The Hadoop demo is particularly interesting and timely given the recent explosion of BIG DATA and the need to access it more powerfully. The Hadoop demo utilizes a special FullAuto L<Instruction Set|http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000483/lib/Net/FullAuto/ISets/Amazon/Hadoop_is.pm>" that stands up a complete 4 node/server cluster in the Amazon EC2 Cloud. Every element of the build and stand up is automated including using the EC2 API to launch servers, connecting to all 4 servers automatically with SSH & SFTP, downloading and compiling Hadoop source code from L<http://hadoop.apache.org|http://hadoop.apache.org>, downloading and installing Java and all other dependencies, and then cross-configuring all 4 nodes with discovered IP addresses and other information that was unknown at the beginning of the standup - and finally starting the cluster and launching an admin web portal.
 
 Imagine a scripting language that can essentially turn an entire network of computers into a truly interactive collective. This is precisely what FullAuto does.
 
@@ -2092,15 +2092,15 @@ A FullAuto Instruction Set is actually a Perl module that utilizes FullAuto to p
 
 <table><tr>
 <td style="width:35%">
-<a href="http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000482/lib/Net/FullAuto/ISets/Amazon/Catalyst_is.pm">Net::FullAuto::ISets::Amazon::Catalyst_is</a></td><td>Builds and Stands up a Catalyst Perl MVC Web Framework</td></tr><tr>
+<a href="http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000483/lib/Net/FullAuto/ISets/Amazon/Catalyst_is.pm">Net::FullAuto::ISets::Amazon::Catalyst_is</a></td><td>Builds and Stands up a Catalyst Perl MVC Web Framework</td></tr><tr>
 <td style="width:35%">
-<a href="http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000482/lib/Net/FullAuto/ISets/Amazon/Hadoop_is.pm">Net::FullAuto::ISets::Amazon::Hadoop_is</a></td><td>Builds and Stands up a Hadoop 4 node Cluster</td></tr><tr>
+<a href="http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000483/lib/Net/FullAuto/ISets/Amazon/Hadoop_is.pm">Net::FullAuto::ISets::Amazon::Hadoop_is</a></td><td>Builds and Stands up a Hadoop 4 node Cluster</td></tr><tr>
 <td style="width:35%">
-<a href="http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000482/lib/Net/FullAuto/ISets/Amazon/KaliLinux_is.pm">Net::FullAuto::ISets::Amazon::KaliLinux_is</a></td><td>Builds and Stands up a KaliLinux Security Tools Host</td></tr><tr>
+<a href="http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000483/lib/Net/FullAuto/ISets/Amazon/KaliLinux_is.pm">Net::FullAuto::ISets::Amazon::KaliLinux_is</a></td><td>Builds and Stands up a KaliLinux Security Tools Host</td></tr><tr>
 <td style="width:35%">
-<a href="http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000482/lib/Net/FullAuto/ISets/Amazon/Liferay_is.pm">Net::FullAuto::ISets::Amazon::Liferay_is</a></td><td>Builds and Stands up a Liferay Portal App Server with MySQL and Apache on different hosts</td></tr><tr>
+<a href="http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000483/lib/Net/FullAuto/ISets/Amazon/Liferay_is.pm">Net::FullAuto::ISets::Amazon::Liferay_is</a></td><td>Builds and Stands up a Liferay Portal App Server with MySQL and Apache on different hosts</td></tr><tr>
 <td style="width:35%">
-<a href="http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000482/lib/Net/FullAuto/ISets/Amazon/OpenLDAP_is.pm">Net::FullAuto::ISets::Amazon::OpenLDAP_is</a></td><td>Builds and Stands up an OpenLDAP Server with phpLDAPAdmin</td>
+<a href="http://cpansearch.perl.org/src/REEDFISH/Net-FullAuto-1.0000483/lib/Net/FullAuto/ISets/Amazon/OpenLDAP_is.pm">Net::FullAuto::ISets::Amazon::OpenLDAP_is</a></td><td>Builds and Stands up an OpenLDAP Server with phpLDAPAdmin</td>
 </tr></table>
 
 =end html

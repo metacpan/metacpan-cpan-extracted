@@ -4,13 +4,13 @@
       "Chris Marshall <chm@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDL-LinearAlgebra",
    "no_index" : {
@@ -39,12 +39,17 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/pdl-linearalgebra/issues"
+      },
       "homepage" : "http://pdl.perl.org/",
       "repository" : {
          "type" : "git",
-         "url" : "git://git.code.sf.net/p/pdl/pdl-linearalgebra",
-         "web" : "http://sourceforge.net/p/pdl/pdl-linearalgebra/ci/master/tree/"
+         "url" : "git://github.com/PDLPorters/pdl-linearalgebra.git",
+         "web" : "https://github.com/PDLPorters/pdl-linearalgebra"
       }
    },
-   "version" : "0.12"
+   "version" : "0.14",
+   "x_IRC" : "irc://irc.perl.org/#pdl",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

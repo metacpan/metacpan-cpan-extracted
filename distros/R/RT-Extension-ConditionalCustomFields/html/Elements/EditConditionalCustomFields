@@ -5,11 +5,18 @@
 %       if ($condition_cf->id) {
 %           my $condition_val = $condition->{vals} || '';
 %           my @condition_vals = ref($condition_val) eq 'ARRAY' ? @$condition_val : ($condition_val);
-%           $Grouping =~ s/\W//g if $Grouping;
-%           my $cf_id = GetCustomFieldInputName(Object => $Object, CustomField => $CustomField, Grouping => $Grouping );
-%           my $condition_grouping = $condition_cf->_findGrouping($Object);
-%           $condition_grouping =~ s/\W//g if $condition_grouping;
-%           my $condition_name = GetCustomFieldInputName(Object => $Object, CustomField => $condition_cf, Grouping => $condition_grouping );
+%           my ($cf_id, $condition_grouping, $condition_name);
+%           my $request_path = $HTML::Mason::Commands::r->path_info;
+%           if ($request_path =~ qr{^/SelfService/(Create|Update)\.html}) {
+%               $cf_id = GetCustomFieldInputName(Object => $Object, CustomField => $CustomField);
+%               $condition_name = GetCustomFieldInputName(Object => $Object, CustomField => $condition_cf);
+%            } else {
+%               $Grouping =~ s/\W//g if $Grouping;
+%               $cf_id = GetCustomFieldInputName(Object => $Object, CustomField => $CustomField, Grouping => $Grouping );
+%               $condition_grouping = $condition_cf->_findGrouping($Object);
+%               $condition_grouping =~ s/\W//g if $condition_grouping;
+%               $condition_name = GetCustomFieldInputName(Object => $Object, CustomField => $condition_cf, Grouping => $condition_grouping );
+%           }
 <script type="text/javascript">
 jQuery(function() {
     var condition_selector = get_selector('<% $condition_name |n%>', '<% $condition_cf->Type |n%>', '<% $condition_cf->RenderType |n%>');

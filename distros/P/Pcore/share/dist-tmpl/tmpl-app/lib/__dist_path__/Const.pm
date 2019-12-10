@@ -16,7 +16,7 @@ const our $USER_ACTION_TOKEN_PASSWORD => 2;
 ## |======+======================+================================================================================================================|
 ## |    3 | 1                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 24                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 28 does not match the package declaration       |
+## |    1 | 12                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 16 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,6 +1,12 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.864 Wed Dec 04 13:00:00 EST 2019
+
+  * Use monotonic clock if available in MCE::Hobo->yield.
+
+  * Bumped MCE dependency to 1.864.
+
 1.863 Sun Nov 26 20:00:00 EST 2019
 
   * Use MCE::Channel for MCE::Hobo->yield to not incur unnecessary delays

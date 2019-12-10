@@ -3,7 +3,7 @@ package Pcore::App::Controller::API;
 use Pcore -role, -const;
 use Pcore::Util::Data qw[from_json to_json from_cbor to_cbor];
 use Pcore::Util::Scalar qw[is_plain_arrayref];
-use Pcore::WebSocket::pcore;
+use Pcore::WebSocket::softvisio;
 
 with qw[Pcore::App::Controller];
 
@@ -19,7 +19,7 @@ sub run ( $self, $req ) {
     if ( $req->is_websocket_connect_request ) {
 
         # create connection and accept websocket connect request
-        return Pcore::WebSocket::pcore->accept(
+        return Pcore::WebSocket::softvisio->accept(
             $req,
             max_message_size => $WS_MAX_MESSAGE_SIZE,
             compression      => $WS_COMPRESSION,
@@ -33,7 +33,9 @@ sub run ( $self, $req ) {
                 return $self->on_event( $h, $ev );
             },
             on_rpc => sub ( $h, $tx ) {
-                return $h->{auth}->api_call( $tx->{method}, $tx->{args}->@* );
+                my $auth = $h->{auth} //= $self->{app}->{api}->authenticate;
+
+                return $auth->api_call( $tx->{method}, $tx->{args}->@* );
             }
         );
     }

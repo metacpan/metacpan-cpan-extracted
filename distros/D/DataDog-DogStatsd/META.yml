@@ -27,15 +27,18 @@ resources:
   bugtracker: https://github.com/binary-com/dogstatsd-perl/issues
   homepage: https://github.com/binary-com/dogstatsd-perl
   repository: https://github.com/binary-com/dogstatsd-perl.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Amin Marashi <marashi.s.amin@gmail.com>'
   - 'Chylli <chylli@binary.com>'
   - 'Fayland Lam <fayland@gmail.com>'
   - 'Jean-Yves Sireau <jy@binary.com>'
   - 'Lee Aylward <laylward@fastly.com>'
+  - 'Mohanad Zarzour <51309057+Binary-Mohanad@users.noreply.github.com>'
+  - 'Nael Alolwani <nael@binary.com>'
   - 'Tom Molesworth <tom@binary.com>'
+  - 'Torsten Förtsch <torsten@binary.com>'
   - 'Zak B. Elep <zakame@zakame.net>'
-x_generated_by_perl: v5.14.2
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

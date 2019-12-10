@@ -48,7 +48,7 @@ static bson_context_t gContextDefault;
 
 #if defined(__linux__)
 static uint16_t
-gettid (void)
+local_gettid (void)
 {
    return syscall (SYS_gettid);
 }
@@ -377,7 +377,7 @@ _bson_context_init (bson_context_t *context,    /* IN */
       if ((flags & BSON_CONTEXT_USE_TASK_ID)) {
          int32_t tid;
 
-         if ((tid = gettid ())) {
+         if ((tid = local_gettid ())) {
             pid = BSON_UINT16_TO_BE (tid);
          }
       }

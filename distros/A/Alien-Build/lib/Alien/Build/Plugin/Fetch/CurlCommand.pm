@@ -12,7 +12,7 @@ use List::Util 1.33 qw( any );
 use File::chdir;
 
 # ABSTRACT: Plugin for fetching files using curl
-our $VERSION = '1.92'; # VERSION
+our $VERSION = '1.93'; # VERSION
 
 
 sub curl_command
@@ -38,6 +38,26 @@ sub protocol_ok
   my($out, $err, $exit) = capture {
     system $curl, '--version';
   };
+
+  {
+    # make sure curl supports the -J option.
+    # CentOS 6 for example is recent enough
+    # that it does not.  gh#147, gh#148, gh#149
+    local $CWD = tempdir( CLEANUP => 1 );
+    my $file1 = path('foo/foo.txt');
+    $file1->parent->mkpath;
+    $file1->spew("hello world\n");
+    my $url = 'file://' . $file1->absolute;
+    my($out, $err, $exit) = capture {
+      system $curl, '-O', '-J', $url;
+    };
+    my $file2 = $file1->parent->child($file1->basename);
+    unlink "$file1";
+    unlink "$file2";
+    rmdir($file1->parent);
+    return 0 if $exit;
+  }
+
   foreach my $line (split /\n/, $out)
   {
     if($line =~ /^Protocols:\s*(.*)\s*$/)
@@ -219,7 +239,7 @@ Alien::Build::Plugin::Fetch::CurlCommand - Plugin for fetching files using curl
 
 =head1 VERSION
 
-version 1.92
+version 1.93
 
 =head1 SYNOPSIS
 

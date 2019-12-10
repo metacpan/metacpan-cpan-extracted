@@ -4,7 +4,7 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,6 @@
             "Crypt::JWT" : "0.023",
             "CryptX" : "0.021",
             "MIME::Base64" : "0",
-            "Mojo::JWT" : "0.04",
             "Moo" : "2.000002",
             "Time::HiRes" : "0",
             "Try::Tiny" : "0.22",
@@ -59,6 +58,6 @@
          "url" : "https://github.com/Humanstate/net-oauth2-authorizationserver"
       }
    },
-   "version" : "0.23",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

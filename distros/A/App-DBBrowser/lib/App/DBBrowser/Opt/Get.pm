@@ -90,6 +90,8 @@ sub defaults {
             history_dirs          => 4,
             parse_mode_input_copy => 1,
             parse_mode_input_file => 0,
+            show_hidden_files     => 0,
+            file_filter           => '',
         },
         create => {
             autoincrement_col_name => 'Id',

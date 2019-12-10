@@ -33,7 +33,7 @@ sv_to_callback (GIArgInfo * arg_info,
 	    case GI_SCOPE_TYPE_CALL:
 		dwarn ("  scope = 'call'\n");
 		free_after_call (invocation_info,
-		                 (GFunc) release_perl_callback, callback_info);
+		                 release_perl_callback, callback_info);
 		break;
 	    case GI_SCOPE_TYPE_NOTIFIED:
 		dwarn ("  scope = 'notified'\n");

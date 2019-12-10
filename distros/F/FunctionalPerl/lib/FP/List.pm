@@ -112,7 +112,8 @@ conflict with `Sub::Call::Tail`, hence those are not used here.
 
 =head1 SEE ALSO
 
-Implements: L<FP::Abstract::Sequence>.
+Implements: L<FP::Abstract::Pure>, L<FP::Abstract::Sequence>,
+L<FP::Abstract::Equal>, L<FP::Abstract::Show>
 
 L<FP::Stream>, L<FP::Array>, L<FP::PureArray>
 
@@ -213,7 +214,8 @@ our $immutable= 1; # whether pairs are to be made immutable
 
     sub stream {
         @_==1 or die "wrong number of arguments";
-        lazy { $_[0] }
+        my ($l)= @_;
+        lazy { $l }
     }
 
     sub preferred_fold {
@@ -555,6 +557,7 @@ sub is_list ($) {
       }
       : ''))
 }
+*FP::List::List::is_proper_sequence= \&is_list;
 
 TEST { is_list cons 1, cons 2, null } 1;
 TEST { is_list cons 1, cons 2, 3 } '';
@@ -1378,7 +1381,7 @@ sub list_map ($ $) {
     is_null $l ? $l : cons(&$fn(car $l), list_map ($fn,cdr $l))
 }
 
-TEST { list_to_array list_map sub{$_[0]*$_[0]}, list 1,2,-3 }
+TEST { list_to_array list_map sub { $_[0] * $_[0] }, list 1,2,-3 }
   [1,4,9];
 
 

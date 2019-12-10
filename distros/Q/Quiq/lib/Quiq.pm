@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.166';
+our $VERSION = '1.167';
 
 =encoding utf8
 
@@ -516,6 +516,10 @@ L<Quiq::JavaScript> - Generierung von JavaScript-Code
 
 =item *
 
+L<Quiq::Json> - Erzeuge JSON-Code in Perl
+
+=item *
+
 L<Quiq::LaTeX::Code> - Generator für LaTeX Code
 
 =item *
@@ -818,7 +822,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.166
+1.167
 
 =head1 AUTHOR
 

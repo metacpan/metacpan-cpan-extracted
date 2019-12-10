@@ -12,7 +12,7 @@ package Perl::Tidy::Formatter;
 use strict;
 use warnings;
 use Carp;
-our $VERSION = '20190915';
+our $VERSION = '20191203';
 
 # The Tokenizer will be loaded with the Formatter
 ##use Perl::Tidy::Tokenizer;    # for is_keyword()
@@ -762,10 +762,12 @@ sub new {
         K_closing_container => {},       # for quickly traversing structure
         K_opening_ternary   => {},       # for quickly traversing structure
         K_closing_ternary   => {},       # for quickly traversing structure
+        rcontainer_map      => {},       # hierarchical map of containers
         rK_phantom_semicolons =>
           undef,    # for undoing phantom semicolons if iterating
         rpaired_to_inner_container => {},
         rbreak_container           => {},    # prevent one-line blocks
+        rshort_nested              => {},    # blocks not forced open
         rvalid_self_keys           => [],    # for checking
         valign_batch_count         => 0,
     };
@@ -2937,6 +2939,17 @@ sub respace_tokens {
                 }
 
                 if ( $token =~ /$SUB_PATTERN/ ) {
+
+                    # -spp = 0 : no space before opening prototype paren
+                    # -spp = 1 : stable (follow input spacing)
+                    # -spp = 2 : always space before opening prototype paren
+                    my $spp = $rOpts->{'space-prototype-paren'};
+                    if ( defined($spp) ) {
+                        if    ( $spp == 0 ) { $token =~ s/\s+\(/\(/; }
+                        elsif ( $spp == 2 ) { $token =~ s/\(/ (/; }
+                    }
+
+                    # one space max, and no tabs
                     $token =~ s/\s+/ /g;
                     $rtoken_vars->[_TOKEN_] = $token;
                 }
@@ -3538,6 +3551,193 @@ sub K_previous_nonblank {
     return;
 }
 
+sub map_containers {
+
+    # Maps the container hierarchy
+    my $self = shift;
+    my $rLL  = $self->{rLL};
+    return unless ( defined($rLL) && @{$rLL} );
+
+    my $K_opening_container = $self->{K_opening_container};
+    my $K_closing_container = $self->{K_closing_container};
+    my $rcontainer_map      = $self->{rcontainer_map};
+
+    # loop over containers
+    my @stack;    # stack of container sequence numbers
+    my $KNEXT = 0;
+    while ( defined($KNEXT) ) {
+        my $KK = $KNEXT;
+        $KNEXT = $rLL->[$KNEXT]->[_KNEXT_SEQ_ITEM_];
+        my $rtoken_vars   = $rLL->[$KK];
+        my $type_sequence = $rtoken_vars->[_TYPE_SEQUENCE_];
+        if ( !$type_sequence ) {
+            next if ( $KK == 0 );    # first token in file may not be container
+            Fault("sequence = $type_sequence not defined at K=$KK");
+        }
+
+        my $token = $rtoken_vars->[_TOKEN_];
+        if ( $is_opening_token{$token} ) {
+            if (@stack) {
+                $rcontainer_map->{$type_sequence} = $stack[-1];
+            }
+            push @stack, $type_sequence;
+        }
+        if ( $is_closing_token{$token} ) {
+            if (@stack) {
+                my $seqno = pop @stack;
+                if ( $seqno != $type_sequence ) {
+
+                    # shouldn't happen unless file is garbage
+                }
+            }
+        }
+    }
+
+    # the stack should be empty for a good file
+    if (@stack) {
+
+        # unbalanced containers; file probably bad
+    }
+    else {
+        # ok
+    }
+    return;
+}
+
+sub mark_short_nested_blocks {
+
+    # This routine looks at the entire file and marks any short nested blocks
+    # which should not be broken.  The results are stored in the hash
+    #     $rshort_nested->{$type_sequence}
+    # which will be true if the container should remain intact.
+    #
+    # For example, consider the following line:
+
+    #   sub cxt_two { sort { $a <=> $b } test_if_list() }
+
+    # The 'sort' block is short and nested within an outer sub block.
+    # Normally, the existance of the 'sort' block will force the sub block to
+    # break open, but this is not always desirable. Here we will set a flag for
+    # the sort block to prevent this.  To give the user control, we will
+    # follow the input file formatting.  If either of the blocks is broken in
+    # the input file then we will allow it to remain broken. Otherwise we will
+    # set a flag to keep it together in later formatting steps.
+
+    # The flag which is set here will be checked in two places:
+    # 'sub print_line_of_tokens' and 'sub starting_one_line_block'
+
+    my $self = shift;
+    my $rLL  = $self->{rLL};
+    return unless ( defined($rLL) && @{$rLL} );
+
+    my $K_opening_container = $self->{K_opening_container};
+    my $K_closing_container = $self->{K_closing_container};
+    my $rbreak_container    = $self->{rbreak_container};
+    my $rshort_nested       = $self->{rshort_nested};
+    my $rcontainer_map      = $self->{rcontainer_map};
+    my $rlines              = $self->{rlines};
+
+    # Variables needed for estimating line lengths
+    my $starting_indent;
+    my $starting_lentot;
+    my $length_tol = 1;
+
+    my $excess_length_to_K = sub {
+        my ($K) = @_;
+
+        # Estimate the length from the line start to a given token
+        my $length = $self->cumulative_length_before_K($K) - $starting_lentot;
+        my $excess_length =
+          $starting_indent + $length + $length_tol - $rOpts_maximum_line_length;
+        return ($excess_length);
+    };
+
+    my $is_broken_block = sub {
+
+        # a block is broken if the input line numbers of the braces differ
+        my ($seqno) = @_;
+        my $K_opening = $K_opening_container->{$seqno};
+        return unless ( defined($K_opening) );
+        my $K_closing = $K_closing_container->{$seqno};
+        return unless ( defined($K_closing) );
+        return $rbreak_container->{$seqno}
+          || $rLL->[$K_closing]->[_LINE_INDEX_] !=
+          $rLL->[$K_opening]->[_LINE_INDEX_];
+    };
+
+    # loop over all containers
+    my @open_block_stack;
+    my $iline = -1;
+    my $KNEXT = 0;
+    while ( defined($KNEXT) ) {
+        my $KK = $KNEXT;
+        $KNEXT = $rLL->[$KNEXT]->[_KNEXT_SEQ_ITEM_];
+        my $rtoken_vars   = $rLL->[$KK];
+        my $type_sequence = $rtoken_vars->[_TYPE_SEQUENCE_];
+        if ( !$type_sequence ) {
+            next if ( $KK == 0 );    # first token in file may not be container
+
+            # an error here is most likely due to a recent programming change
+            Fault("sequence = $type_sequence not defined at K=$KK");
+        }
+
+        # We are just looking at code blocks
+        my $token = $rtoken_vars->[_TOKEN_];
+        my $type  = $rtoken_vars->[_TYPE_];
+        next unless ( $type eq $token );
+        my $block_type = $rtoken_vars->[_BLOCK_TYPE_];
+        next unless ($block_type);
+
+        # Keep a stack of all acceptable block braces seen.
+        # Only consider blocks entirely on one line so dump the stack when line
+        # changes.
+        my $iline_last = $iline;
+        $iline = $rLL->[$KK]->[_LINE_INDEX_];
+        if ( $iline != $iline_last ) { @open_block_stack = () }
+
+        if ( $token eq '}' ) {
+            if (@open_block_stack) { pop @open_block_stack }
+        }
+        next unless ( $token eq '{' );
+
+        # block must be balanced (bad scripts may be unbalanced)
+        my $K_opening = $K_opening_container->{$type_sequence};
+        my $K_closing = $K_closing_container->{$type_sequence};
+        next unless ( defined($K_opening) && defined($K_closing) );
+
+        # require that this block be entirely on one line
+        next if ( $is_broken_block->($type_sequence) );
+
+        # See if this block fits on one line of allowed length (which may
+        # be different from the input script)
+        $starting_lentot =
+          $KK <= 0 ? 0 : $rLL->[ $KK - 1 ]->[_CUMULATIVE_LENGTH_];
+        $starting_indent = 0;
+        if ( !$rOpts_variable_maximum_line_length ) {
+            my $level = $rLL->[$KK]->[_LEVEL_];
+            $starting_indent = $rOpts_indent_columns * $level;
+        }
+
+        # Dump the stack if block is too long and skip this block
+        if ( $excess_length_to_K->($K_closing) > 0 ) {
+            @open_block_stack = ();
+            next;
+        }
+
+        # OK, Block passes tests, remember it
+        push @open_block_stack, $type_sequence;
+
+        # We are only marking nested code blocks,
+        # so check for a previous block on the stack
+        next unless ( @open_block_stack > 1 );
+
+        # Looks OK, mark this as a short nested block
+        $rshort_nested->{$type_sequence} = 1;
+
+    }
+    return;
+}
+
 sub weld_containers {
 
     # do any welding operations
@@ -3644,12 +3844,15 @@ sub weld_cuddled_blocks {
 
     # loop over structure items to find cuddled pairs
     my $level = 0;
-    my $KK    = 0;
-    while ( defined( $KK = $rLL->[$KK]->[_KNEXT_SEQ_ITEM_] ) ) {
+    my $KNEXT = 0;
+    while ( defined($KNEXT) ) {
+        my $KK = $KNEXT;
+        $KNEXT = $rLL->[$KNEXT]->[_KNEXT_SEQ_ITEM_];
         my $rtoken_vars   = $rLL->[$KK];
         my $type_sequence = $rtoken_vars->[_TYPE_SEQUENCE_];
         if ( !$type_sequence ) {
-            Fault("sequence = $type_sequence not defined");
+            next if ( $KK == 0 );    # first token in file may not be container
+            Fault("sequence = $type_sequence not defined at K=$KK");
         }
 
         # We use the original levels because they get changed by sub
@@ -3937,6 +4140,36 @@ sub weld_nested_containers {
         # Do not weld if this makes our line too long
         $do_not_weld ||= $excess_length_to_K->($Kinner_opening) > 0;
 
+        # DO-NOT-WELD RULE 4; implemented for git#10:
+        # Do not weld an opening -ce brace if the next container is on a single
+        # line, different from the opening brace. (This is very rare).  For
+        # example, given the following with -ce, we will avoid joining the {
+        # and [
+
+        #  } else {
+        #      [ $_, length($_) ]
+        #  }
+
+        # because this would produce a terminal one-line block:
+
+        #  } else { [ $_, length($_) ]  }
+
+        # which may not be what is desired. But given this input:
+
+        #  } else { [ $_, length($_) ]  }
+
+        # then we will do the weld and retain the one-line block
+        if ( $rOpts->{'cuddled-else'} ) {
+            my $block_type = $rLL->[$Kouter_opening]->[_BLOCK_TYPE_];
+            if ( $block_type && $rcuddled_block_types->{'*'}->{$block_type} ) {
+                my $io_line = $inner_opening->[_LINE_INDEX_];
+                my $ic_line = $inner_closing->[_LINE_INDEX_];
+                my $oo_line = $outer_opening->[_LINE_INDEX_];
+                $do_not_weld ||=
+                  ( $oo_line < $io_line && $ic_line == $io_line );
+            }
+        }
+
         if ($do_not_weld) {
 
             # After neglecting a pair, we start measuring from start of point io
@@ -4088,12 +4321,15 @@ sub weld_nested_quotes {
     };
 
     # look for single qw quotes nested in containers
-    my $KK = 0;
-    while ( defined( $KK = $rLL->[$KK]->[_KNEXT_SEQ_ITEM_] ) ) {
+    my $KNEXT = 0;
+    while ( defined($KNEXT) ) {
+        my $KK = $KNEXT;
+        $KNEXT = $rLL->[$KNEXT]->[_KNEXT_SEQ_ITEM_];
         my $rtoken_vars = $rLL->[$KK];
         my $outer_seqno = $rtoken_vars->[_TYPE_SEQUENCE_];
         if ( !$outer_seqno ) {
-            Fault("sequence = $outer_seqno not defined");
+            next if ( $KK == 0 );    # first token in file may not be container
+            Fault("sequence = $outer_seqno not defined at K=$KK");
         }
 
         my $token = $rtoken_vars->[_TOKEN_];
@@ -4453,8 +4689,14 @@ sub finish_formatting {
     # remains fixed for the rest of this iteration.
     $self->respace_tokens();
 
+    # Make a hierarchical map of the containers
+    $self->map_containers();
+
     # Implement any welding needed for the -wn or -cb options
     $self->weld_containers();
+
+    # Locate small nested blocks which should not be broken
+    $self->mark_short_nested_blocks();
 
     # Finishes formatting and write the result to the line sink.
     # Eventually this call should just change the 'rlines' data according to the
@@ -5191,7 +5433,7 @@ sub token_sequence_length {
     # return length of tokens ($ibeg .. $iend) including $ibeg & $iend
     # returns 0 if $ibeg > $iend (shouldn't happen)
     my ( $ibeg, $iend ) = @_;
-    return 0 if ( $iend < 0 || $ibeg > $iend );
+    return 0                                  if ( $iend < 0 || $ibeg > $iend );
     return $summed_lengths_to_go[ $iend + 1 ] if ( $ibeg < 0 );
     return $summed_lengths_to_go[ $iend + 1 ] - $summed_lengths_to_go[$ibeg];
 }
@@ -5380,6 +5622,7 @@ sub check_options {
         }
     }
 
+    make_sub_matching_pattern();
     make_bli_pattern();
     make_block_brace_vertical_tightness_pattern();
     make_blank_line_pattern();
@@ -6034,6 +6277,24 @@ sub make_closing_side_comment_list_pattern {
     {
         $closing_side_comment_list_pattern =
           make_block_pattern( '-cscl', $rOpts->{'closing-side-comment-list'} );
+    }
+    return;
+}
+
+sub make_sub_matching_pattern {
+
+    $SUB_PATTERN  = '^sub\s+(::|\w)';
+    $ASUB_PATTERN = '^sub$';
+
+    if ( $rOpts->{'sub-alias-list'} ) {
+
+        # Note that any 'sub-alias-list' has been preprocessed to
+        # be a trimmed, space-separated list which includes 'sub'
+        # for example, it might be 'sub method fun'
+        my $sub_alias_list = $rOpts->{'sub-alias-list'};
+        $sub_alias_list =~ s/\s+/\|/g;
+        $SUB_PATTERN    =~ s/sub/\($sub_alias_list\)/;
+        $ASUB_PATTERN   =~ s/sub/\($sub_alias_list\)/;
     }
     return;
 }
@@ -6835,6 +7096,7 @@ EOM
 
         my $rLL              = $self->{rLL};
         my $rbreak_container = $self->{rbreak_container};
+        my $rshort_nested    = $self->{rshort_nested};
 
         if ( !defined($K_first) ) {
 
@@ -7166,11 +7428,13 @@ EOM
               (      $type eq '{'
                   && $token eq '{'
                   && $block_type
+                  && !$rshort_nested->{$type_sequence}
                   && $block_type ne 't' );
             my $is_closing_BLOCK =
               (      $type eq '}'
                   && $token eq '}'
                   && $block_type
+                  && !$rshort_nested->{$type_sequence}
                   && $block_type ne 't' );
 
             if (   $side_comment_follows
@@ -7937,6 +8201,7 @@ sub starting_one_line_block {
 
     my ( $self, $j, $jmax, $level, $slevel, $ci_level, $rtoken_array ) = @_;
     my $rbreak_container = $self->{rbreak_container};
+    my $rshort_nested    = $self->{rshort_nested};
 
     my $jmax_check = @{$rtoken_array};
     if ( $jmax_check < $jmax ) {
@@ -8056,15 +8321,26 @@ sub starting_one_line_block {
         if ( $rtoken_array->[$i]->[_TYPE_] eq 'b' ) { $pos += 1 }
         else { $pos += rtoken_length($i) }
 
+        # ignore some small blocks
+        my $type_sequence = $rtoken_array->[$i]->[_TYPE_SEQUENCE_];
+        my $nobreak       = $rshort_nested->{$type_sequence};
+
         # Return false result if we exceed the maximum line length,
         if ( $pos > maximum_line_length($i_start) ) {
             return 0;
         }
 
-        # or encounter another opening brace before finding the closing brace.
+        # keep going for non-containers
+        elsif ( !$type_sequence ) {
+
+        }
+
+        # return if we encounter another opening brace before finding the
+        # closing brace.
         elsif ($rtoken_array->[$i]->[_TOKEN_] eq '{'
             && $rtoken_array->[$i]->[_TYPE_] eq '{'
-            && $rtoken_array->[$i]->[_BLOCK_TYPE_] )
+            && $rtoken_array->[$i]->[_BLOCK_TYPE_]
+            && !$nobreak )
         {
             return 0;
         }
@@ -8072,7 +8348,8 @@ sub starting_one_line_block {
         # if we find our closing brace..
         elsif ($rtoken_array->[$i]->[_TOKEN_] eq '}'
             && $rtoken_array->[$i]->[_TYPE_] eq '}'
-            && $rtoken_array->[$i]->[_BLOCK_TYPE_] )
+            && $rtoken_array->[$i]->[_BLOCK_TYPE_]
+            && !$nobreak )
         {
 
             # be sure any trailing comment also fits on the line
@@ -10068,6 +10345,7 @@ sub send_lines_to_vertical_aligner {
         my $j = 0;    # field index
 
         $patterns[0] = "";
+        my %token_count;
         for my $i ( $ibeg .. $iend ) {
 
             # Keep track of containers balanced on this line only.
@@ -10137,13 +10415,20 @@ sub send_lines_to_vertical_aligner {
                     # if we are not aligning on this paren...
                     if ( $matching_token_to_go[$i] eq '' ) {
 
-                        # Sum length from previous alignment, or start of line.
-                        my $len =
-                          ( $i_start == $ibeg )
-                          ? total_line_length( $i_start, $i - 1 )
-                          : token_sequence_length( $i_start, $i - 1 );
+                        # Sum length from previous alignment
+                        my $len = token_sequence_length( $i_start, $i - 1 );
+                        if ( $i_start == $ibeg ) {
 
-                        # tack length onto the container name to make unique
+                            # For first token, use distance from start of line
+                            # but subtract off the indentation due to level.
+                            # Otherwise, results could vary with indentation.
+                            $len += leading_spaces_to_go($ibeg) -
+                              $levels_to_go[$i_start] * $rOpts_indent_columns;
+                            if ( $len < 0 ) { $len = 0 }
+                        }
+
+                        # tack this length onto the container name to try
+                        # to make a unique token name
                         $container_name[$depth] .= "-" . $len;
                     }
                 }
@@ -10217,6 +10502,23 @@ sub send_lines_to_vertical_aligner {
                     if ( $block_type =~ /^[A-Z]+$/ ) { $block_type = 'BEGIN' }
 
                     $tok .= $block_type;
+                }
+
+                # Mark multiple copies of certain tokens with the copy number
+                # This will allow the aligner to decide if they are matched.
+                # For now, only do this for equals. For example, the two
+                # equals on the next line will be labeled '=0' and '=0.2'.
+                # Later, the '=0.2' will be ignored in alignment because it
+                # has no match.
+
+                # $|          = $debug = 1 if $opt_d;
+                # $full_index = 1          if $opt_i;
+
+                if ( $raw_tok eq '=' || $raw_tok eq '=>' ) {
+                    $token_count{$tok}++;
+                    if ( $token_count{$tok} > 1 ) {
+                        $tok .= '.' . $token_count{$tok};
+                    }
                 }
 
                 # concatenate the text of the consecutive tokens to form
@@ -10709,7 +11011,14 @@ sub lookup_opening_indentation {
                 && defined($K_beg) )
             {
                 my $K_next_nonblank = $self->K_next_code($K_beg);
-                if ( defined($K_next_nonblank) ) {
+
+                # Patch for RT#131115: honor -bli flag at closing brace
+                my $is_bli =
+                     $rOpts_brace_left_and_indent
+                  && $block_type_to_go[$i_terminal]
+                  && $block_type_to_go[$i_terminal] =~ /$bli_pattern/o;
+
+                if ( !$is_bli && defined($K_next_nonblank) ) {
                     my $lev        = $rLL->[$K_beg]->[_LEVEL_];
                     my $level_next = $rLL->[$K_next_nonblank]->[_LEVEL_];
                     $adjust_indentation = 1 if ( $level_next < $lev );
@@ -11386,8 +11695,10 @@ sub get_seqno {
 
 {
     my %is_vertical_alignment_type;
+    my %is_not_vertical_alignment_token;
     my %is_vertical_alignment_keyword;
     my %is_terminal_alignment_type;
+    my %is_low_level_alignment_token;
 
     BEGIN {
 
@@ -11400,9 +11711,18 @@ sub get_seqno {
           #;
         @is_vertical_alignment_type{@q} = (1) x scalar(@q);
 
-        # only align these at end of line
+        # These 'tokens' are not aligned. We need this to remove [
+        # from the above list because it has type ='{'
+        @q = qw([);
+        @is_not_vertical_alignment_token{@q} = (1) x scalar(@q);
+
+        # these are the only types aligned at a line end
         @q = qw(&& ||);
         @is_terminal_alignment_type{@q} = (1) x scalar(@q);
+
+        # these tokens only align at line level
+        @q = ( '{', '(' );
+        @is_low_level_alignment_token{@q} = (1) x scalar(@q);
 
         # eq and ne were removed from this list to improve alignment chances
         @q = qw(if unless and or err for foreach while until);
@@ -11453,7 +11773,7 @@ sub get_seqno {
             $vert_last_nonblank_block_type        = '';
 
             # look at each token in this output line..
-            my $count = 0;
+            my $level_beg = $levels_to_go[$ibeg];
             foreach my $i ( $ibeg .. $iend ) {
                 my $alignment_type = '';
                 my $type           = $types_to_go[$i];
@@ -11463,6 +11783,15 @@ sub get_seqno {
                 # check for flag indicating that we should not align
                 # this token
                 if ( $matching_token_to_go[$i] ) {
+                    $matching_token_to_go[$i] = '';
+                    next;
+                }
+
+                # do not align tokens at lower level then start of line
+                # except for side comments
+                if (   $levels_to_go[$i] < $levels_to_go[$ibeg]
+                    && $types_to_go[$i] ne '#' )
+                {
                     $matching_token_to_go[$i] = '';
                     next;
                 }
@@ -11518,7 +11847,9 @@ sub get_seqno {
 
                 # align before one of these types..
                 # Note: add '.' after new vertical aligner is operational
-                elsif ( $is_vertical_alignment_type{$type} ) {
+                elsif ( $is_vertical_alignment_type{$type}
+                    && !$is_not_vertical_alignment_token{$token} )
+                {
                     $alignment_type = $token;
 
                     # Do not align a terminal token.  Although it might
@@ -11544,9 +11875,24 @@ sub get_seqno {
                     #  $code =
                     #      ( $case_matters ? $accessor : " lc($accessor) " )
                     #    . ( $yesno        ? " eq "       : " ne " )
+
+                    # Also, do not align a ( following a leading ? so we can
+                    # align something like this:
+                    #   $converter{$_}->{ushortok} =
+                    #     $PDL::IO::Pic::biggrays
+                    #     ? ( m/GIF/          ? 0 : 1 )
+                    #     : ( m/GIF|RAST|IFF/ ? 0 : 1 );
                     if (   $i == $ibeg + 2
-                        && $types_to_go[$ibeg] =~ /^[\.\:]$/
+                        && $types_to_go[$ibeg] =~ /^[\.\:\?]$/
                         && $types_to_go[ $i - 1 ] eq 'b' )
+                    {
+                        $alignment_type = "";
+                    }
+
+                    # Certain tokens only align at the same level as the
+                    # initial line level
+                    if (   $is_low_level_alignment_token{$token}
+                        && $levels_to_go[$i] != $level_beg )
                     {
                         $alignment_type = "";
                     }
@@ -11554,10 +11900,13 @@ sub get_seqno {
                     # For a paren after keyword, only align something like this:
                     #    if    ( $a ) { &a }
                     #    elsif ( $b ) { &b }
-                    if ( $token eq '(' && $vert_last_nonblank_type eq 'k' ) {
-                        $alignment_type = ""
-                          unless $vert_last_nonblank_token =~
-                          /^(if|unless|elsif)$/;
+                    if ( $token eq '(' ) {
+
+                        if ( $vert_last_nonblank_type eq 'k' ) {
+                            $alignment_type = ""
+                              unless $vert_last_nonblank_token =~
+                              /^(if|unless|elsif)$/;
+                        }
                     }
 
                     # be sure the alignment tokens are unique
@@ -11609,7 +11958,6 @@ sub get_seqno {
                 # then store the value
                 #--------------------------------------------------------
                 $matching_token_to_go[$i] = $alignment_type;
-                $count++ if ($alignment_type);
                 if ( $type ne 'b' ) {
                     $vert_last_nonblank_type       = $type;
                     $vert_last_nonblank_token      = $token;

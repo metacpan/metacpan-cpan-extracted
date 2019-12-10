@@ -1,17 +1,17 @@
 /* test_hashes.c - unit tests and benchmark for LibRHash algorithms
  *
- * Copyright: 2008-2012 Aleksey Kravchenko <rhash.admin@gmail.com>
+ * Copyright (c) 2008, Aleksey Kravchenko <rhash.admin@gmail.com>
  *
- * Permission is hereby granted,  free of charge,  to any person  obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction,  including without limitation
- * the rights to  use, copy, modify,  merge, publish, distribute, sublicense,
- * and/or sell copies  of  the Software,  and to permit  persons  to whom the
- * Software is furnished to do so.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted.
  *
- * This program  is  distributed  in  the  hope  that it will be useful,  but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  Use this program  at  your own risk!
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+ * REGARD TO THIS SOFTWARE  INCLUDING ALL IMPLIED WARRANTIES OF  MERCHANTABILITY
+ * AND FITNESS.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+ * INDIRECT,  OR CONSEQUENTIAL DAMAGES  OR ANY DAMAGES WHATSOEVER RESULTING FROM
+ * LOSS OF USE,  DATA OR PROFITS,  WHETHER IN AN ACTION OF CONTRACT,  NEGLIGENCE
+ * OR OTHER TORTIOUS ACTION,  ARISING OUT OF  OR IN CONNECTION  WITH THE USE  OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include <unistd.h>
@@ -563,7 +563,7 @@ static void log_message(char* format, ...)
  */
 static char* repeat_hash(unsigned hash_id, const char* chunk, size_t chunk_size, size_t msg_size, int set_filename)
 {
-	struct rhash_context *ctx;
+	struct rhash_context* ctx;
 	size_t left, size;
 	static char out[130];
 	assert(rhash_get_hash_length(hash_id) < 130);
@@ -789,11 +789,11 @@ static void test_long_strings(void)
  */
 static void test_results_consistency(void)
 {
-	const char * msg = "a";
+	const char* msg = "a";
 	size_t msg_size = strlen(msg);
 
 	size_t digest_size;
-	struct rhash_context *ctx;
+	struct rhash_context* ctx;
 	unsigned char res1[70];
 	char res2[70];
 	unsigned i, hash_id;
@@ -924,7 +924,7 @@ static void test_magnet(void)
 
 	assert_magnet("magnet:?xl=1&dn=test.txt&xt=urn:tree:tiger:czquwh3iyxbf5l3bgyugzhassmxu647ip2ike4y", ctx, RHASH_TTH, RHPR_FILESIZE | TEST_PATH);
 	assert_magnet("magnet:?xl=1&xt=urn:md5:0CC175B9C0F1B6A831C399E269772661", ctx, RHASH_MD5, RHPR_FILESIZE | RHPR_UPPERCASE);
-	assert_magnet("xt=urn:ed2k:bde52cb31de33e46245e05fbdbd6fb24&xt=urn:aich:q336in72uwt7zyk5dxolt2xk5i3xmz5y&xt=urn:sha1:q336in72uwt7zyk5dxolt2xk5i3xmz5y&xt=urn:btih:qj6nrgcg7qjs4lth4kocpbggkrb3wtob",
+	assert_magnet("xt=urn:ed2k:bde52cb31de33e46245e05fbdbd6fb24&xt=urn:aich:q336in72uwt7zyk5dxolt2xk5i3xmz5y&xt=urn:sha1:q336in72uwt7zyk5dxolt2xk5i3xmz5y&xt=urn:btih:827cd89846fc132e2e67e29c2784c65443bb4dc1",
 		ctx, RHASH_ED2K | RHASH_AICH | RHASH_SHA1 | RHASH_BTIH, RHPR_NO_MAGNET);
 
 	/* verify length calculation for all hashes */
@@ -996,7 +996,7 @@ static void print_openssl_status(void)
  * @param argv program arguments including the program name
  * @return program exit code
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 #ifndef USE_RHASH_DLL
 	rhash_library_init();
@@ -1017,7 +1017,7 @@ int main(int argc, char *argv[])
 			printf("%s", compiler_flags);
 			print_openssl_status();
 		} else {
-			printf("Options: [--speed [HASH_NAME]| --info]\n");
+			printf("Options: [--speed [HASH_NAME] | --info]\n");
 		}
 	} else {
 		test_all_known_strings();

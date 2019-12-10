@@ -113,7 +113,7 @@ PONAPI::Client::UA::YAHC - A wrapper for a YAHC UA
 
 =head1 VERSION
 
-version 0.002011
+version 0.002012
 
 =head1 AUTHORS
 

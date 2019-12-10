@@ -4,7 +4,7 @@
 
 package Local::Helpers;
 
-use 5.008;
+use 5.010;
 use strict;
 use warnings;
 use Test::Exception;

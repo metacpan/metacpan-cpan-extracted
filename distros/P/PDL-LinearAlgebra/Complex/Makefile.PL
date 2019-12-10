@@ -24,7 +24,6 @@ $hash{LDLOADLIBS} .= 'oldnames.lib kernel32.lib user32.lib gdi32.lib winspool.li
 WriteMakefile(
 	%hash,
 	'VERSION_FROM' => 'complex.pd',
-        'clean' => { FILES => '*~' },
 );
 
 # Add genpp rule

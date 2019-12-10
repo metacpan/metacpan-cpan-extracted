@@ -1,0 +1,10 @@
+Revision history for perl distribution Mojo-File-Role-Digest
+
+0.02 2019-12-10T06:17:16+0100
+ - Improved pod
+   Contributor: Mohammad S Anwar (#1)
+ - Set required Role::Tiny version to 2.1.4
+   Error reported by Slaven Rezić (#2)
+
+0.01 2019-12-08T06:30:35+0100
+ - First Release

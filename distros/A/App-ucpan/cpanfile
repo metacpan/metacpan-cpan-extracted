@@ -1,6 +1,7 @@
 requires 'perl', '5.008001';
 
 requires 'bytes';
+requires 'App::cpanoutdated';
 requires 'Config';
 requires 'constant';
 requires 'feature';
@@ -15,6 +16,7 @@ requires 'utf8';
 requires 'version';
 requires 'warnings';
 requires 'YAML';
+recommends 'Win32::Console::ANSI';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

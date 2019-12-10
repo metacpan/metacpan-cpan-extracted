@@ -1,0 +1,26 @@
+<ul class="pagination" id="<%= stash( 'id' ) %>">
+    % if ( $current_page > 1 ) {
+        <li class="page-item">
+            <a class="page-link" href="<%= url_with->query( page => $current_page - 1 ) %>">
+                Previous
+            </a>
+        </li>
+    % } else {
+        <li class="page-item disabled">
+            <span class="page-link">Previous</span>
+        </li>
+    % }
+
+    % if ( $current_page < $total_pages ) {
+        <li class="page-item">
+            <a class="page-link" href="<%= url_with->query( page => $current_page + 1 ) %>">
+                Next
+            </a>
+        </li>
+    % } else {
+        <li class="page-item disabled">
+            <span class="page-link">Next</span>
+        </li>
+    % }
+</ul>
+

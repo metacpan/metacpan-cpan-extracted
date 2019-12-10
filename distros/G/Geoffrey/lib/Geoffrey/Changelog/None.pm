@@ -7,7 +7,7 @@ use warnings;
 use File::Slurp qw/write_file read_file/;
 use Data::Dumper;
 
-$Geoffrey::Changelog::None::VERSION = '0.000204';
+$Geoffrey::Changelog::None::VERSION = '0.000205';
 
 use parent 'Geoffrey::Role::Changelog';
 
@@ -77,7 +77,7 @@ Geoffrey::Changelog::None - File declacration for plain hashrefs or so :-P.
 
 =head1 VERSION
 
-Version 0.000204
+Version 0.000205
 
 =head1 DESCRIPTION
 

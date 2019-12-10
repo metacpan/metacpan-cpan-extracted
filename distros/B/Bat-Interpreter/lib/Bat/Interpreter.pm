@@ -12,7 +12,7 @@ use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use namespace::autoclean;
 
-our $VERSION = '0.016';    # VERSION
+our $VERSION = '0.018';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -333,10 +333,16 @@ sub _variable_substitution {
             if ( defined $result ) {
                 if ( defined $manipulation && $manipulation ne '' ) {
                     $manipulation =~ s/^://;
-                    if ( $manipulation =~ /~(?<from>\d+),(?<length>\d+)/ ) {
+                    if ( $manipulation =~ /^~(?<from>\d+),(?<length>\d+)$/ ) {
                         $result = substr( $result, $+{'from'}, $+{'length'} );
-                    } elsif ( $manipulation =~ /\~(\-\d)+/ ) {
+                    } elsif ( $manipulation =~ /^~(?<from_end>-\d+),(?<length>\d+)$/ ) {
+                        $result = substr( $result, $+{'from_end'}, $+{'length'} );
+                    } elsif ( $manipulation =~ /^\~(\-\d)+$/ ) {
                         $result = substr( $result, $1 );
+                    } else {
+                        Carp::cluck
+                          "Variable manipulation not understood: $manipulation over variable: $variable_name. Returning unchanged variable: $result";
+                        return $result;
                     }
                 }
                 return $result;
@@ -405,7 +411,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.016
+version 0.018
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header::Acl_short;
 # ABSTRACT: x-amz-acl header role
-$Net::Amazon::S3::Request::Role::HTTP::Header::Acl_short::VERSION = '0.86';
+$Net::Amazon::S3::Request::Role::HTTP::Header::Acl_short::VERSION = '0.87';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::HTTP::Header' => {
@@ -24,7 +24,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header::Acl_short - x-amz-acl header role
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 AUTHOR
 

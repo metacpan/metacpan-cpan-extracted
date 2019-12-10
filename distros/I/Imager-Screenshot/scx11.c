@@ -16,10 +16,10 @@ my_handler(Display *display, XErrorEvent *error) {
 
 i_img *
 imss_x11(unsigned long display_ul, int window_id,
-	 int left, int top, int right, int bottom) {
+	 int left, int top, int right, int bottom, int direct) {
   Display *display = (Display *)display_ul;
   int own_display = 0; /* non-zero if we connect */
-  XImage *image;
+  XImage *image = NULL;
   XWindowAttributes attr;
   i_img *result;
   i_color *line, *cp;
@@ -27,6 +27,8 @@ imss_x11(unsigned long display_ul, int window_id,
   XColor *colors;
   XErrorHandler old_handler;
   int width, height;
+  int root_id;
+  int screen;
 
   i_clear_error();
 
@@ -37,23 +39,20 @@ imss_x11(unsigned long display_ul, int window_id,
     display = XOpenDisplay(NULL);
     ++own_display;
     if (!display) {
-      XSetErrorHandler(old_handler);
       i_push_error(0, "No display supplied and cannot connect");
-      return NULL;
+      goto fail;
     }
   }
 
+  screen = DefaultScreen(display);
+  root_id = RootWindow(display, screen);
   if (!window_id) {
-    int screen = DefaultScreen(display);
-    window_id = RootWindow(display, screen);
+    window_id = root_id;
   }
 
   if (!XGetWindowAttributes(display, window_id, &attr)) {
-    XSetErrorHandler(old_handler);
-    if (own_display)
-      XCloseDisplay(display);
     i_push_error(0, "Cannot XGetWindowAttributes");
-    return NULL;
+    goto fail;
   }
 
   /* adjust negative/zero values to window size */
@@ -65,6 +64,8 @@ imss_x11(unsigned long display_ul, int window_id,
     right += attr.width;
   if (bottom <= 0)
     bottom += attr.height;
+
+  mm_log((3, "window @(%d,%d) %dx%d\n", attr.x, attr.y, attr.width, attr.height));
   
   /* clamp */
   if (left < 0)
@@ -78,22 +79,65 @@ imss_x11(unsigned long display_ul, int window_id,
 
   /* validate */
   if (right <= left || bottom <= top) {
-    XSetErrorHandler(old_handler);
-    if (own_display)
-      XCloseDisplay(display);
     i_push_error(0, "image would be empty");
-    return NULL;
+    goto fail;
   }
   width = right - left;
   height = bottom - top;
-  image = XGetImage(display, window_id, left, top, width, height,
-                    -1, ZPixmap);
+  if (direct) {
+    /* try to get the pixels directly, this returns black images in
+       some ill-determined cases, I suspect compositing.
+    */
+    image = XGetImage(display, window_id, left, top, width, height,
+		      -1, ZPixmap);
+  }
+  else {
+    int rootx = left, rooty = top;
+    Window child_id; /* ignored */
+
+    if (root_id != window_id) {
+      XWindowAttributes root_attr;
+
+      if (!XTranslateCoordinates(display, window_id, root_id, left, top,
+				 &rootx, &rooty, &child_id)) {
+	i_push_error(0, "could not translate co-ordinates");
+	goto fail;
+      }
+
+      if (!XGetWindowAttributes(display, root_id, &root_attr)) {
+	i_push_error(0, "Cannot XGetWindowAttributes for root");
+	goto fail;
+      }
+
+      /* clip the window to the root, in case it's partly off the edge
+	 of the root window
+      */
+      if (rootx < 0) {
+	width += rootx;
+	rootx = 0;
+      }
+      if (rootx + width > root_attr.width) {
+	width = root_attr.width - rootx;
+      }
+      if (rooty < 0) {
+	height += rooty;
+	rooty = 0;
+      }
+      if (rooty + height > root_attr.height) {
+	height = root_attr.height - rooty;
+      }
+
+      if (width == 0 || height == 0) {
+	i_push_error(0, "window is completely clipped by the root window");
+	goto fail;
+      }
+    }
+    image = XGetImage(display, root_id, rootx, rooty,
+		      width, height, -1, ZPixmap);
+  }
   if (!image) {
-    XSetErrorHandler(old_handler);
-    if (own_display)
-      XCloseDisplay(display);
     i_push_error(0, "Cannot XGetImage");
-    return NULL;
+    goto fail;
   }
 
   result = i_img_8_new(width, height, 3);
@@ -130,6 +174,15 @@ imss_x11(unsigned long display_ul, int window_id,
   i_tags_setn(&result->tags, "ss_top", top);
 
   return result;
+
+ fail:
+  if (image)
+    XDestroyImage(image);
+
+  XSetErrorHandler(old_handler);
+  if (own_display)
+    XCloseDisplay(display);
+  return NULL;
 }
 
 unsigned long

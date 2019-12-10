@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Tradis::Bin::MergePlots;
-$Bio::Tradis::Bin::MergePlots::VERSION = '1.4.3';
+$Bio::Tradis::Bin::MergePlots::VERSION = '1.4.5';
 use FindBin qw($Bin); 
 
 # ABSTRACT: 
@@ -10,7 +10,7 @@ use FindBin qw($Bin);
 
 
 package TraDISMergePlots::Main;
-$TraDISMergePlots::Main::VERSION = '1.4.3';
+$TraDISMergePlots::Main::VERSION = '1.4.5';
 use Moose;
 use Getopt::Long;
 use File::Basename;
@@ -92,7 +92,7 @@ tradis_merge_plots -
 
 =head1 VERSION
 
-version 1.4.3
+version 1.4.5
 
 =head1 SYNOPSIS
 

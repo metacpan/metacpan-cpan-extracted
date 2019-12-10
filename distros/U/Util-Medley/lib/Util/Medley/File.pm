@@ -1,5 +1,5 @@
 package Util::Medley::File;
-$Util::Medley::File::VERSION = '0.016';
+$Util::Medley::File::VERSION = '0.020';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -8,6 +8,7 @@ use Data::Printer alias => 'pdump';
 use Carp;
 use File::LibMagic;
 use File::Path qw(make_path remove_tree);
+use File::Touch;
 use Try::Tiny;
 use Path::Iterator::Rule;
 
@@ -21,7 +22,7 @@ Util::Medley::File - utility file methods
 
 =head1 VERSION
 
-version 0.016
+version 0.020
 
 =cut
 
@@ -317,7 +318,7 @@ multi method fileType (Str $path) {
 =head2 find
 
 Pass-through to Path::Iterator::Rule.  Returns a list of all files and 
-directories.
+directories.  Note this does NOT return the dir passed in.
 
 =over
 
@@ -325,7 +326,9 @@ directories.
 
  @files = $util->find($dir);
  
- @files = $util->find(dir => $dir);
+ @files = $util->find( dir => $dir,
+                      [minDepth => $minDepth],
+                      [maxDepth => $maxDepth] );
 
 =item args:
 
@@ -335,22 +338,35 @@ directories.
 
 The directory path you wish to search.
 
+=item minDepth [Int] 
+
+Minimum directory depth to traverse.  Not availble for positional based method.
+
+=item maxDepth [Int]
+
+Maximum directory depth to traverse.  Not availble for positional based method.
+
 =back
 
 =back
 
 =cut
 
-multi method find (Str :$dir!) {
-
+multi method find (Str :$dir!,
+				   Int :$minDepth,
+				   Int :$maxDepth) {
+	
 	if ( !-d $dir ) {
 		confess "dir $dir does not exist";
 	}
 
+	my $rule = 	Path::Iterator::Rule->new;
+	$rule->min_depth($minDepth) if defined $minDepth;
+	$rule->max_depth($maxDepth) if defined $maxDepth;
+		
 	my @paths;
-	my $rule = Path::Iterator::Rule->new;
-	my $next = $rule->iter($dir);
-
+	my $next = $rule->iter($dir);	
+		
 	while ( defined( my $path = $next->() ) ) {
 	
 		next if $path eq $dir; # don't return self	
@@ -362,7 +378,7 @@ multi method find (Str :$dir!) {
 
 multi method find (Str $dir) {
 
-	return $self->find(dir => $dir);	
+	return $self->find(dir => $dir);
 }
 
 
@@ -377,7 +393,10 @@ convenience wrapper around find.
 
  @files = $util->findFiles($dir);
  
- @files = $util->find(dir => $dir);
+ @files = $util->findFiles( dir => $dir, 
+                           [minDepth => $minDepth],
+                           [maxDepth => $maxDepth],
+                           [extension => $extension] );
 
 =item args:
 
@@ -387,27 +406,59 @@ convenience wrapper around find.
 
 The directory path you wish to search.
 
+=item minDepth [Int] 
+
+Minimum directory depth to traverse.  Not availble for positional based method.
+
+=item maxDepth [Int]
+
+Maximum number of directeries (in terms of depth) to traverse.  Not availble 
+for positional based method.
+
+=item extension [Str]
+
+Only return files with the given extension.
+
 =back
 
 =back
 
 =cut
 
-multi method findFiles (Str :$dir!) {
+multi method findFiles (Str :$dir!,
+						Int :$minDepth,
+						Int :$maxDepth,
+						Str :$extension) {
 
-	my @paths = $self->find(dir => $dir);
+	# remove leading dot from extension if provided	
+	$extension =~ s/^\.// if $extension;
+	
+	my %a;
+	$a{dir} = $dir;
+	$a{minDepth} = $minDepth if defined $minDepth;
+	$a{maxDepth} = $maxDepth if defined $maxDepth;
+	my @paths = $self->find(%a);
+	
 	my @files;
 	
 	foreach my $path (@paths) {	
 		next if -d $path;
-		push @files, $path;	
+		
+		if ($extension) {
+			if ($path =~ /\.$extension$/) {
+				push @files, $path;	
+			}
+		}
+		else {	
+			push @files, $path;	
+		}
 	}
 	
 	return @files;
 }
 
 multi method findFiles (Str $dir) {
-
+							
 	return $self->findFiles(dir => $dir);
 }
 
@@ -423,7 +474,9 @@ convenience wrapper around find.
 
  @dirs = $util->findDirs($dir);
  
- @dirs = $util->findDirs(dir => $dir);
+ @dirs = $util->findDirs( dir      => $dir,
+                         [minDepth => $minDepth],
+                         [maxDepth => $maxDepth] );
 
 =item args:
 
@@ -433,15 +486,31 @@ convenience wrapper around find.
 
 The directory path you wish to search.
 
+=item minDepth [Int]
+
+Minimum directory depth to traverse.  Not availble for positional based method.
+
+=item maxDepth [Int]
+
+Maximum number of directeries (in terms of depth) to traverse.  Not availble 
+for positional based method.
+
 =back
 
 =back
 
 =cut
 
-multi method findDirs (Str :$dir!) {
+multi method findDirs (Str :$dir!,
+					   Int :$minDepth,
+					   Int :$maxDepth) {
 
-	my @paths = $self->find(dir => $dir);
+	my %a;
+	$a{dir} = $dir;
+	$a{minDepth} = $minDepth if defined $minDepth;
+	$a{maxDepth} = $maxDepth if defined $maxDepth;
+	my @paths = $self->find(%a);
+	
 	my @dirs;
 	
 	foreach my $path (@paths) {	
@@ -656,6 +725,44 @@ multi method rmdir (Str $dir) {
 }
 
 
+=head2 touch
+
+Just a pass-through to File::Touch.
+
+=over
+
+=item usage:
+
+ $util->touch($file);
+
+ $util->touch(path => $file);
+
+=item args:
+
+=over
+
+=item path [Str]
+
+File or directory to touch.
+
+=back
+
+=back
+
+=cut
+
+multi method touch (Str :$path) {
+
+	my $t = File::Touch->new;
+   	return $t->touch($path);
+}
+
+multi method touch (Str $path) {
+
+	return $self->touch(path => $path);
+}
+
+
 =head2 trimExt
 
 Trim the file extension from a filename.
@@ -696,7 +803,7 @@ multi method trimExt (Str $name) {
 
 =head2 unlink
 
-Pass-through to CORE::unlink().
+Pass-through to built-in unlink().
 
 =over
 
@@ -729,7 +836,7 @@ multi method unlink (Str $path) {
 
 	if ( -f $path ) {
 		$self->Logger->debug("unlink $path");
-		Core::unlink($path) or confess "failed to unlink $path: $!";
+		unlink($path) or confess "failed to unlink $path: $!";
 	}
 }
 

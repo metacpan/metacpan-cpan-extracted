@@ -28,7 +28,7 @@ PONAPI::Client::Request::Role::HasUriSingle - request - role - URI format for si
 
 =head1 VERSION
 
-version 0.002011
+version 0.002012
 
 =head1 AUTHORS
 

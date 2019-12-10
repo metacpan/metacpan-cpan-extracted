@@ -1,7 +1,8 @@
 package Util::Medley::List;
-$Util::Medley::List::VERSION = '0.016';
+$Util::Medley::List::VERSION = '0.020';
 #########################################################################################
 
+use v5.16;
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -16,7 +17,7 @@ Util::Medley::List - utility methods for working with lists
 
 =head1 VERSION
 
-version 0.016
+version 0.020
 
 =cut
 
@@ -137,8 +138,10 @@ multi method max (ArrayRef :$list!) {
 
 =head1 nsort 
 
-Sort an array naturally (case in-sensitive).  Just a passthrough to
-Sort::Naturally::nsort.
+Sort an array naturally (case in-sensitive).  This behaves the same way
+Sort::Naturally::nsort does with the exception of using fc (casefolding) 
+instead of lc (lowercase).  This guarantees the same results without
+regard to locale (which Sort::Naturally::nsort does use).
 
 =over
 
@@ -164,12 +167,91 @@ The list to act on.
 
 multi method nsort (ArrayRef :$list!) {
 
-	return $self->nsort(@$list);
-}
+	#
+	# parse each element into an arrayref splitting by number
+	#
+	my @bits;
+	foreach my $el (@$list) {
 
+		my $x   = defined($el) ? $el : '';
+		my @bit = ($x);
+
+		if ( $x =~ m/^[+-]?(?=\d|\.\d)\d*(?:\.\d*)?(?:[Ee](?:[+-]?\d+))?\z/s ) {
+
+			# pure numeric
+			push @bit, '', $x;
+		}
+		else {
+			# Consume the string.
+			while ( length $x ) {
+				push @bit, ( $x =~ s/^(\D+)//s ) ? fc($1) : '';
+				push @bit, ( $x =~ s/^(\d+)//s ) ? $1     : 0;
+			}
+		}
+
+		push @bits, \@bit;
+	}
+
+	#
+	# sort each element by its parsed bits
+	#
+	my @sorted_bits = sort {
+
+		# Uses $i as the index variable, $x as the result.
+		my $x;
+		my $i = 1;
+
+		while ( $i < @$a and $i < @$b ) {
+			$x = 0;
+
+			last if ( $x = ( $a->[$i] cmp $b->[$i] ) );    # lexicographic
+			++$i;
+
+			last if ( $x = ( $a->[$i] <=> $b->[$i] ) );    # numeric
+			++$i;
+		}
+
+		# unless we found a result for $x in the while loop,
+		# use length as a tiebreaker, otherwise use cmp
+		return $x || ( @$a <=> @$b ) || ( $a->[0] cmp $b->[0] );
+	} @bits;
+
+	#
+	# return the first element of each arrayref (which is the orig)
+	#
+	return map $_->[0], @sorted_bits;
+}
+	
 multi method nsort (@list) {
 
-	return Sort::Naturally::nsort(@list);
+	return $self->nsort(list => \@list);
+}
+    
+
+=head1 shuffle
+
+Just a passthrough to List::Util::shuffle()
+
+=over
+
+=item usage:
+
+ $max = $util->shuffle(@list);
+ 
+ $max = $util->shuffle(list => \@list);
+
+=back
+ 
+=cut
+
+multi method shuffle (@list) {
+
+    return List::Util::shuffle(@list);    
+}
+
+multi method shuffle (ArrayRef :$list!) {
+
+	return $self->shuffle(@$list);	
 }
 
 =head2 undefsToStrings

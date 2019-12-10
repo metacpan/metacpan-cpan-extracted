@@ -8,7 +8,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK   = qw(rcsv1D rcsv2D wcsv1D wcsv2D);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Config;
 use constant NO64BITINT => ($Config{ivsize} < 8) ? 1 : 0;
@@ -331,8 +331,9 @@ sub rcsv2D {
   my $bcount = 0;
 
   warn "Fetching 2D " . _dbg_msg($O, $C) . "\n" if $O->{debug};
-  # skip headers
-  $csv->getline($fh) for (1..$O->{header});
+  if ($O->{header}) {
+    $csv->getline($fh) for (1..$O->{header});
+  }
   while (!$finished) {
     my $bytes = '';
     my $rows = 0;
@@ -343,7 +344,6 @@ sub rcsv2D {
           ($c_type, $c_pack, $c_sizeof, $c_pdl, $c_bad, $c_dataref, $allocated, $cols) = _init_2D($coli, scalar @$r, $O);
           warn "Initialized size=$allocated, cols=$cols, type=$c_type\n" if $O->{debug};
           $pck = "$c_pack\[$cols\]";
-          next if $O->{header};
         }
         if ($dec_comma) {
           for (@$r) { s/,/./ if defined $_ };

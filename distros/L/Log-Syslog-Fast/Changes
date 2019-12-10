@@ -1,4 +1,7 @@
 Revision history for Perl extension Log::Syslog::Fast.
+0.66   Sun Dec  8 21:44:56 GMT 2019
+        - Add LOG_RFC3164_LOCAL mode for logging without a hostname,
+          courtesy of mikechris@github.
 0.65   Thu May  7 13:41:10 PDT 2015
         - Fix ipv6 test helper. Thanks to srezic@ for reporting #103433 and
           sjohnston@github for the patch.

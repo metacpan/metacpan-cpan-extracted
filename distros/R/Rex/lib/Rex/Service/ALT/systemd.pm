@@ -7,7 +7,7 @@ package Rex::Service::ALT::systemd;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.0'; # VERSION
+our $VERSION = '1.7.1'; # VERSION
 
 use Rex::Service::Redhat::systemd;
 use base qw(Rex::Service::Redhat::systemd);

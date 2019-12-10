@@ -6,12 +6,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Bencher/Scenario/Perl/5200Perf_return.pm',
     'Bencher/Scenario/Perl/5220Perf_length.pm',
+    'Bencher/Scenario/Perl/Hash.pm',
     'Bencher/Scenario/Perl/Startup.pm',
+    'Bencher/Scenario/Perl/Swap.pm',
+    'Bencher/ScenarioR/Perl/5200Perf_return.pm',
+    'Bencher/ScenarioR/Perl/5220Perf_length.pm',
+    'Bencher/ScenarioR/Perl/Hash.pm',
+    'Bencher/ScenarioR/Perl/Startup.pm',
+    'Bencher/ScenarioR/Perl/Swap.pm',
     'Bencher/Scenarios/Perl.pm'
 );
 

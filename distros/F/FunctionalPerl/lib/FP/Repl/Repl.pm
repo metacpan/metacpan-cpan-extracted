@@ -124,6 +124,8 @@ use FP::HashSet qw(hashset_union);
 use FP::Hash qw(hash_xref);
 use FP::Repl::StackPlus;
 use FP::Lazy;
+use FP::Show;
+
 
 sub maybe_tty {
     my $path= "/dev/tty";
@@ -196,6 +198,24 @@ sub new {
     $$self[Maybe_env_PATH]= $maybe_env_path
         if ${^TAINT};
     $self
+}
+
+my $maybe_setter= sub {
+    my ($method)=@_;
+    sub {
+        @_== 2 or die "wrong number of arguments";
+        my ($self, $v)= @_;
+        my $set_maybe_method= "set_maybe_${method}";
+        defined $v
+            or die "set_${method} does not accept undef, use $set_maybe_method instead";
+        $self->$set_maybe_method($v);
+    }
+};
+for my $method (qw(historypath settingspath prompt package keepResultIn
+                input output env_PATH)) {
+    no strict 'refs';
+    my $var= "set_$method";
+    *$var= &$maybe_setter($method);
 }
 
 sub use_lexical_persistence {
@@ -314,6 +334,7 @@ If a command line starts with a ':' or ',', then the remainder of the
 line is interpreted as follows:
 
   package \$package    use \$package as new compilation package
+  p \$package          shortcut for package
   DIGITS              shorthand for 'f n', see below
   -                   same as 'f n' where n is the current frameno - 1
   +                   same as 'f n' where n is the current frameno + 1
@@ -337,7 +358,7 @@ previously used mode (indicated on the left):
 $L 1  use scalar context
 $l l  use list context (default)
   formatter:
-$p p  print stringification
+$p P  print stringification
 $s s  show from FP::Show (experimental, does not show data sharing)
 $d d  Data::Dumper (default)
   viewer:
@@ -381,7 +402,6 @@ sub formatter {
              )
          },
          s=> sub {
-             require FP::Show;
              my $z=1;
              (
               join "",
@@ -389,7 +409,7 @@ sub formatter {
                   my $VARX= ($$self[DoKeepResultsInVARX] and not $terse) ?
                     '$VAR'.$z++.' = '
                       : '';
-                  $VARX . FP::Show::show($_). ";\n"
+                  $VARX . show($_). ";\n"
               } @_
              )
          },
@@ -406,7 +426,7 @@ sub formatter {
                  $res= Data::Dumper::Dumper(@v);
                  1
              } || do {
-                 warn "Data::Dumper: $@";
+                 warn "Data::Dumper: ".show($@);
              };
              $res
          }
@@ -446,10 +466,10 @@ sub viewers {
                 $o->xfinish;
                 1
             } || do {
-                my $e= $@;
-                unless ($e=~ /broken pipe/i) {
+                my $estr= show($@);
+                unless ($estr=~ /broken pipe/i) {
                     print $ERROR "error piping to pager ".
-                      "$pagercmd: $e\n"
+                      "$pagercmd: $estr\n"
                         or die $!;
                 }
             };
@@ -611,6 +631,16 @@ sub _completion_function {
                         }
                     }
                 };
+
+                # Force any potential promises, since we want to
+                # complete methods on the resulting value, OK? TODO
+                # once typing framework is ready (FP::Type): mark type
+                # in promise, thus no need to force it.  Have to catch
+                # (and ignore, OK?) exceptions.
+                eval {
+                    $val= force $val;
+                };
+
                 if (defined $val) {
                     #warn "got value from \$$varnam";
                     if ($r||=ref($val)) {
@@ -821,7 +851,7 @@ sub run {
     # both perl 5.6 and 5.8:
     sigaction SIGINT,
       new POSIX::SigAction __PACKAGE__.'::__signalhandler'
-        or die "Error setting SIGALRM handler: $!\n";
+        or die "Error setting SIGINT handler: $!\n";
 
     {
         local $SIG{__DIE__};
@@ -918,7 +948,7 @@ sub run {
                   $maybe_lexical_persistence->prelude("");
                 1
             } || do {
-                print $ERROR "Could not enable lexical persistence: $@";
+                print $ERROR "Could not enable lexical persistence: ".show($@);
                 0
             }
         };
@@ -963,6 +993,12 @@ sub run {
                                 my ($maybe_frameno)=
                                   $rest=~ /^\s*(\d+)?\s*\z/
                                     or die "expecting digits or no argument, got '$cmd'";
+                                local $FP::Lazy::allow_access= 1;
+                                # ^ XX should be generalized, not just
+                                # for FP::Lazy; or alternatively, use
+                                # overload::StrVal instead of
+                                # stringification in the backtrace
+                                # library.
                                 print $OUTPUT $stack->backtrace ($maybe_frameno
                                                                  // $frameno);
                                 $rest=""; # XX HACK; also, really
@@ -1016,9 +1052,10 @@ sub run {
                                                     $frameno + 1 : undef)
                                  },
                                  package=> $set_package,
+                                 p=> $set_package,
                                  1=> saving ($self, sub { $$self[Mode_context]="1" }),
                                  l=> saving ($self, sub { $$self[Mode_context]="l" }),
-                                 p=> saving ($self, sub { $$self[Mode_formatter]="p" }),
+                                 P=> saving ($self, sub { $$self[Mode_formatter]="p" }),
                                  s=> saving ($self, sub { $$self[Mode_formatter]="s" }),
                                  d=> saving ($self, sub { $$self[Mode_formatter]="d" }),
                                  V=> saving ($self, sub { $$self[Mode_viewer]="V" }),
@@ -1105,7 +1142,7 @@ sub run {
 
                             1
                         } || do {
-                            print $ERROR "$@";
+                            print $ERROR "error handling command $cmd: ".show($@);
                             redo READ;
                         }
                     }
@@ -1156,15 +1193,12 @@ sub run {
 
                         &$view_string(do {
                             if (ref $error or $error) {
-                                # XX todo: only do can in the case of
-                                # ref; but, remove this code anyway,
-                                # use FP::Show now?
                                 my $err= (UNIVERSAL::can($error,"plain") ?
                                           # error in plaintext; XX:
                                           # change to better
                                           # thought-out protocol?
                                           $error->plain
-                                          : "$error");
+                                          : show($error));
                                 chomp $err;
                                 $err."\n"; # no prefix? no safe way to differentiate.
                             } else {
@@ -1211,7 +1245,7 @@ sub run {
                 $f->xputback(0600);
             };
             if (ref $@ or $@) {
-                warn "could not write history file: $@"
+                warn "could not write history file: ".show($@)
             }
         }
         $SIG{INT}= defined($oldsigint)? $oldsigint : "DEFAULT";

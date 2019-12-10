@@ -1,7 +1,7 @@
-# $Id: private1.t,v 1.5 2008/02/01 00:39:26 sullivan Exp $
+# $Id: private1.t,v 1.4 2007/10/02 23:04:47 sullivan Exp $
 
 package Foo;
-use Test::More tests => 9;
+use Test::More tests => 7;
 BEGIN { use_ok('Class::Simple') };		##
 
 use base qw(Class::Simple);
@@ -26,9 +26,7 @@ $f->set_bar(2);
 is($f->_bar, 2, 'second underscore get');	##
 
 $f->set__shh(2);
-is($f->__shh, 2, 'Set double-underscore.');	##
+ok($f->_shh, 'Set double-underscore.');		##
 is($f->get__shh, 2, 'Get double-underscore.');	##
-ok(!$f->_shh, '__shh did not set _shh.');	##
-ok(!$f->get_shh, '_shh did not set shh.');	##
 
 1;

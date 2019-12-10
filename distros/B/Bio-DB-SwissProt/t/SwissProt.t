@@ -1,20 +1,14 @@
-# -*-Perl-*- Test Harness script for Bioperl
-# $Id$
+#!/usr/bin/env perl
+use utf8;
 
 use strict;
+use warnings;
 
-BEGIN {
-    use Bio::Root::Test;
+use Test::More;
+use Test::Needs qw(LWP::UserAgent HTTP::Request::Common Data::Stag);
+use Test::RequiresInternet;
 
-    test_begin(-tests               => 23,
-               -requires_modules    => [qw(IO::String
-                                           LWP::UserAgent
-                                           HTTP::Request::Common
-                                           Data::Stag)],
-               -requires_networking => 1);
-
-    use_ok('Bio::DB::SwissProt');
-}
+use Bio::DB::SwissProt;
 
 ok my $gb = Bio::DB::SwissProt->new(-retrievaltype => 'pipeline',
                                     -delay         => 0);
@@ -31,6 +25,7 @@ my %expected_lengths = (
 
 my ($seq, $seqio);
 
+# keep the SKIP block to deal with intermittent fails
 SKIP: {
     eval {$seq = $gb->get_Seq_by_id('YNB3_YEAST');};
     skip "Couldn't connect to SwissProt with Bio::DB::SwissProt.pm. Skipping those tests", 14 if $@;
@@ -91,5 +86,7 @@ SKIP: {
     cmp_ok(@{$map->{PYRC_YEAST}}, '>=', 2);
     like($map->{PYRC_YEAST}[0], qr/^[A-Z0-9]/);
 }
+
+done_testing();
 
 1;

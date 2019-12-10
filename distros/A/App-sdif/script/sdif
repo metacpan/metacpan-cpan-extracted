@@ -532,6 +532,9 @@ while (<DIFF>) {
 	print $painter->('UNKNOWN', $_);
     }
 }
+continue {
+    STDOUT->flush;
+}
 
 close DIFF;
 my $exit = $? >> 8;

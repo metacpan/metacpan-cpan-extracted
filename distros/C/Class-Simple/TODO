@@ -1,1 +1,4 @@
+Get set__foo(1) (two underscores) to work so we can do things like
+readonly__foo(1).
+
 Disallow set_2foo.  Perl doesn't like $obj->2foo.

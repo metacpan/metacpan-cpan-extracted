@@ -2,8 +2,8 @@ NAME
     Data::Sah::Coerce - Coercion rules for Data::Sah
 
 VERSION
-    This document describes version 0.039 of Data::Sah::Coerce (from Perl
-    distribution Data-Sah-Coerce), released on 2019-11-28.
+    This document describes version 0.040 of Data::Sah::Coerce (from Perl
+    distribution Data-Sah-Coerce), released on 2019-12-04.
 
 SYNOPSIS
      use Data::Sah::Coerce qw(gen_coercer);

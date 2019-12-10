@@ -17,11 +17,12 @@ use constant LOG_UNIX   => 2; # UNIX socket
 # formats
 use constant LOG_RFC3164 => 0;
 use constant LOG_RFC5424 => 1;
+use constant LOG_RFC3164_LOCAL => 2;
 
 our @EXPORT = ();
 our %EXPORT_TAGS = (
     protos =>  [qw/ LOG_TCP LOG_UDP LOG_UNIX /],
-    formats => [qw/ LOG_RFC3164 LOG_RFC5424 /],
+    formats => [qw/ LOG_RFC3164 LOG_RFC5424 LOG_RFC3164_LOCAL /],
 );
 $EXPORT_TAGS{$_} = $Log::Syslog::Constants::EXPORT_TAGS{$_}
     for qw(facilities severities);

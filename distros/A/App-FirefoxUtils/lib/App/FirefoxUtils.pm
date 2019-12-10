@@ -1,14 +1,14 @@
 package App::FirefoxUtils;
 
-our $DATE = '2019-11-28'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-05'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
-
 
 our %SPEC;
 
@@ -26,12 +26,24 @@ our %argopt_users = (
     },
 );
 
+our %argopt_quiet = (
+    quiet => {
+        schema => 'true*',
+        cmdline_aliases => {q=>{}},
+    },
+);
+
+our %args_common = (
+    %argopt_users,
+);
+
 sub _do_firefox {
     require Proc::Find;
 
     my ($which, %args) = @_;
 
-    my $pids = Proc::Find::find_proc(
+    my $procs = Proc::Find::find_proc(
+        detail => 1,
         filter => sub {
             my $p = shift;
 
@@ -44,21 +56,57 @@ sub _do_firefox {
         },
     );
 
-    if ($which eq 'pause') {
-        kill STOP => @$pids;
+    my @pids = map { $_->{pid} } @$procs;
+
+    if ($which eq 'ps') {
+        return [200, "OK", $procs, {'table.fields'=>[qw/pid uid euid state/]}];
+    } elsif ($which eq 'pause') {
+        kill STOP => @pids;
+        [200, "OK", "", {"func.pids" => \@pids}];
     } elsif ($which eq 'unpause') {
-        kill CONT => @$pids;
+        kill CONT => @pids;
+        [200, "OK", "", {"func.pids" => \@pids}];
     } elsif ($which eq 'terminate') {
-        kill KILL => @$pids;
+        kill KILL => @pids;
+        [200, "OK", "", {"func.pids" => \@pids}];
+    } elsif ($which eq 'is_paused') {
+        my $num_stopped = 0;
+        my $num_unstopped = 0;
+        my $num_total = 0;
+        for my $proc (@$procs) {
+            $num_total++;
+            if ($proc->{state} eq 'stop') { $num_stopped++ } else { $num_unstopped++ }
+        }
+        my $is_paused = $num_total == 0 ? undef : $num_stopped == $num_total ? 1 : 0;
+        my $msg = $num_total == 0 ? "There are no firefox processes" :
+            $num_stopped   == $num_total ? "Firefox is paused (all processes are in stop state)" :
+            $num_unstopped == $num_total ? "Firefox is NOT paused (all processes are not in stop state)" :
+            "Firefox is NOT paused (some processes are not in stop state)";
+        return [200, "OK", $is_paused, {
+            'cmdline.exit_code' => $is_paused ? 0:1,
+            'cmdline.result' => $args{quiet} ? '' : $msg,
+        }];
+    } else {
+        die "BUG: unknown command";
     }
-    [200, "OK", "", {"func.pids" => $pids}];
+}
+
+$SPEC{ps_firefox} = {
+    v => 1.1,
+    summary => "List Firefox processes",
+    args => {
+        %args_common,
+    },
+};
+sub ps_firefox {
+    _do_firefox('ps', @_);
 }
 
 $SPEC{pause_firefox} = {
     v => 1.1,
     summary => "Pause (kill -STOP) Firefox",
     args => {
-        %argopt_users,
+        %args_common,
     },
 };
 sub pause_firefox {
@@ -69,18 +117,35 @@ $SPEC{unpause_firefox} = {
     v => 1.1,
     summary => "Unpause (resume, continue, kill -CONT) Firefox",
     args => {
-        %argopt_users,
+        %args_common,
     },
 };
 sub unpause_firefox {
     _do_firefox('unpause', @_);
 }
 
+$SPEC{firefox_is_paused} = {
+    v => 1.1,
+    summary => "Check whether Firefox is paused",
+    description => <<'_',
+
+Firefox is defined as paused if *all* of its processes are in 'stop' state.
+
+_
+    args => {
+        %args_common,
+        %argopt_quiet,
+    },
+};
+sub firefox_is_paused {
+    _do_firefox('is_paused', @_);
+}
+
 $SPEC{terminate_firefox} = {
     v => 1.1,
     summary => "Terminate  (kill -KILL) Firefox",
     args => {
-        %argopt_users,
+        %args_common,
     },
 };
 sub terminate_firefox {
@@ -102,7 +167,7 @@ App::FirefoxUtils - Utilities related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.003 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2019-11-28.
+This document describes version 0.005 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2019-12-05.
 
 =head1 SYNOPSIS
 
@@ -112,9 +177,13 @@ This distribution includes several utilities related to Firefox:
 
 =over
 
+=item * L<firefox-is-paused>
+
 =item * L<kill-firefox>
 
 =item * L<pause-firefox>
+
+=item * L<ps-firefox>
 
 =item * L<terminate-firefox>
 
@@ -125,6 +194,43 @@ This distribution includes several utilities related to Firefox:
 =head1 FUNCTIONS
 
 
+=head2 firefox_is_paused
+
+Usage:
+
+ firefox_is_paused(%args) -> [status, msg, payload, meta]
+
+Check whether Firefox is paused.
+
+Firefox is defined as paused if I<all> of its processes are in 'stop' state.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<quiet> => I<true>
+
+=item * B<users> => I<array[unix::local_uid]>
+
+Kill Firefox processes of certain users only.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 pause_firefox
 
 Usage:
@@ -132,6 +238,39 @@ Usage:
  pause_firefox(%args) -> [status, msg, payload, meta]
 
 Pause (kill -STOP) Firefox.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<users> => I<array[unix::local_uid]>
+
+Kill Firefox processes of certain users only.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 ps_firefox
+
+Usage:
+
+ ps_firefox(%args) -> [status, msg, payload, meta]
+
+List Firefox processes.
 
 This function is not exported.
 
@@ -246,6 +385,8 @@ L<App::DumpFirefoxHistory>).
 L<App::ChromeUtils>
 
 L<App::OperaUtils>
+
+L<App::VivaldiUtils>
 
 =head1 AUTHOR
 

@@ -5,38 +5,37 @@
 # Joan Ntzougani, gravitalsun@hotmail.com
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.2.9';
+our	$VERSION = '4.3.1';
 use	strict;
 use	warnings;
 use Encode;
 use	Dancer2::Plugin;
 use	Storable;
-use	Data::Dumper;	$Data::Dumper::Sortkeys=0;     $Data::Dumper::Indent=2;     $Data::Dumper::Purity=1; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Trailingcomma=0;
-use YAML::Syck;     $YAML::Syck::ImplicitTyping=1; $YAML::Syck::Headless=0;     $YAML::Syck::ImplicitUnicode=0;
-use	XML::Hash::XS;	$XML::Hash::XS::root='Data';   $XML::Hash::XS::canonical=0; $XML::Hash::XS::indent=2; $XML::Hash::XS::utf8=1; $XML::Hash::XS::encoding='utf8'; $XML::Hash::XS::xml_decl=0; $XML::Hash::XS::doc=0;
-use JSON::XS;		my $JSON=JSON::XS->new; $JSON->canonical(0); $JSON->pretty(1); $JSON->indent(1); $JSON->space_before(0); $JSON->space_after(0); $JSON->max_size(0); $JSON->relaxed(0); $JSON->shrink(0); $JSON->allow_tags(1); $JSON->allow_nonref(0); $JSON->allow_unknown(0); $JSON->allow_blessed(1); $JSON->convert_blessed(1); $JSON->max_depth(1024); $JSON->utf8(0);
+use	Data::Dumper;     $Data::Dumper::Sortkeys=0;     $Data::Dumper::Indent=2;     $Data::Dumper::Purity=1; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Trailingcomma=0;
+use YAML::Syck;       $YAML::Syck::ImplicitTyping=1; $YAML::Syck::Headless=0;     $YAML::Syck::ImplicitUnicode=0;
+use	XML::Hash::XS;    $XML::Hash::XS::root='Data';   $XML::Hash::XS::canonical=0; $XML::Hash::XS::indent=2; $XML::Hash::XS::utf8=1; $XML::Hash::XS::encoding='utf8'; $XML::Hash::XS::xml_decl=0; $XML::Hash::XS::doc=0;
+use Cpanel::JSON::XS; my $JSON=Cpanel::JSON::XS->new;$JSON->canonical(0); $JSON->pretty(0); $JSON->indent(1); $JSON->space_before(1); $JSON->space_after(1); $JSON->max_size(0); $JSON->relaxed(0); $JSON->shrink(0); $JSON->allow_tags(1); $JSON->allow_nonref(0); $JSON->allow_unknown(0); $JSON->allow_blessed(1); $JSON->convert_blessed(1); $JSON->max_depth(1024); $JSON->utf8(0);
 
 if ($^O=~/(?i)MSWin/) {warn "Operating system is not supported\n"; exit 1}
 
-has error			=> (is=>'rw', lazy=>1, default=> 0);
-has formats			=> (is=>'ro', lazy=>0, default=> sub{ {json=> 'application/json', xml=> 'text/xml', yaml=> 'text/x-yaml', perl=> 'text/html', human=> 'text/html'} });
-has formats_regex	=> (is=>'ro', lazy=>0, default=> sub{ $_ = join '|', sort keys %{ $_[0]->formats }; $_ = qr/^($_)$/; $_ });
-has Format			=> (is=>'rw', lazy=>1, default=> sub{ {from=>undef, to=>undef}} );
-has sort			=> (is=>'rw', lazy=>1, default=> 0);
-has pretty			=> (is=>'rw', lazy=>1, default=> 2);
-has route_name		=> (is=>'rw', lazy=>1, default=> '');
-has ClientIP		=> (is=>'rw', lazy=>1, default=> '');
-has reply_text		=> (is=>'rw', lazy=>1, default=> '');
-has auth_method		=> (is=>'rw', lazy=>1, default=> '');
-has auth_command	=> (is=>'rw', lazy=>1, default=> '');
-has auth_config		=> (is=>'rw', lazy=>1, default=> sub{ {} });
-has data			=> (is=>'rw', lazy=>1, default=> sub{ {} });	# user posted data as hash
-has Session_timeout	=> (is=>'ro', lazy=>0, from_config=>'Session idle timeout',default=> sub{ 3600 }, isa => sub {unless ( $_[0]=~/^\d+$/ ) {warn "Session idle timeout \"$_[0]\" It is not a number\n"; exit 1}} );
-has rules			=> (is=>'ro', lazy=>0, from_config=>'Allowed hosts',       default=> sub{ ['127.0.*', '192.168.*', '10.*', '172.16.*'] });
-has rules_compiled	=> (is=>'ro', lazy=>0, default=> sub {my $array = [@{$_[0]->rules}]; for (@{$array}) { s/([^?*]+)/\Q$1\E/g; s|\?|.|g; s|\*+|.*?|g; $_ = qr/^$_$/i } $array});
-has dir_session		=> (is=>'ro', lazy=>0, default=> sub {my $dir = exists $_[0]->config->{'Session directory'} ? $_[0]->config->{'Session directory'}."/$_[0]->{app}->{name}" : "$_[0]->{app}->{config}->{appdir}/session"; $dir=~s|/+|/|g; my @MD = split /(?:\\|\/)+/, $dir; my $i; for ($i=$#MD; $i>=0; $i--) { last if -d join '/', @MD[0..$i] } for (my $j=$i+1; $j<=$#MD; $j++) { unless (mkdir join '/', @MD[0 .. $j]) {warn "Could not create the session directory \"$dir\" because $!\n"; exit 1} } $dir} );
-has rm				=> (is=>'ro', lazy=>0, default=> sub{for (split /:/,$ENV{PATH}) {return "$_/rm" if -f "$_/rm" && -x "$_/rm" } warn "Could not found utility rm\n"; exit 1});
-
+has error           => (is=>'rw', lazy=>1, default=> 0);
+has formats         => (is=>'ro', lazy=>0, default=> sub{ {json=> 'application/json', xml=> 'text/xml', yaml=> 'text/x-yaml', perl=> 'text/html', human=> 'text/html'} });
+has formats_regex   => (is=>'ro', lazy=>0, default=> sub{ $_ = join '|', sort keys %{ $_[0]->formats }; $_ = qr/^($_)$/; $_ });
+has Format          => (is=>'rw', lazy=>1, default=> sub{ {from => undef, to => undef} });
+has sort            => (is=>'rw', lazy=>1, default=> 0);
+has pretty          => (is=>'rw', lazy=>1, default=> 1);
+has route_name      => (is=>'rw', lazy=>1, default=> '');
+has ClientIP        => (is=>'rw', lazy=>1, default=> '');
+has reply_text      => (is=>'rw', lazy=>1, default=> '');
+has auth_method     => (is=>'rw', lazy=>1, default=> '');
+has auth_command    => (is=>'rw', lazy=>1, default=> '');
+has auth_config     => (is=>'rw', lazy=>1, default=> sub{ {} });
+has data            => (is=>'rw', lazy=>1, default=> sub{ {} });	# user posted data as hash
+has Session_timeout => (is=>'ro', lazy=>0, from_config=>'Session idle timeout',default=> sub{ 3600 }, isa => sub {unless ( $_[0]=~/^\d+$/ ) {warn "Session idle timeout \"$_[0]\" It is not a number\n"; exit 1}} );
+has rules           => (is=>'ro', lazy=>0, from_config=>'Allowed hosts',       default=> sub{ ['127.0.*', '192.168.*', '10.*', '172.16.*'] });
+has rules_compiled  => (is=>'ro', lazy=>0, default=> sub {my $array = [@{$_[0]->rules}]; for (@{$array}) { s/([^?*]+)/\Q$1\E/g; s|\?|.|g; s|\*+|.*?|g; $_ = qr/^$_$/i } $array});
+has dir_session     => (is=>'ro', lazy=>0, default=> sub {my $dir = exists $_[0]->config->{'Session directory'} ? $_[0]->config->{'Session directory'}."/$_[0]->{app}->{name}" : "$_[0]->{app}->{config}->{appdir}/session"; $dir=~s|/+|/|g; my @MD = split /(?:\\|\/)+/, $dir; my $i; for ($i=$#MD; $i>=0; $i--) { last if -d join '/', @MD[0..$i] } for (my $j=$i+1; $j<=$#MD; $j++) { unless (mkdir join '/', @MD[0 .. $j]) {warn "Could not create the session directory \"$dir\" because $!\n"; exit 1} } $dir} );
+has rm              => (is=>'ro', lazy=>0, default=> sub{for (split /:/,$ENV{PATH}) {return "$_/rm" if -f "$_/rm" && -x "$_/rm" } warn "Could not found utility rm\n"; exit 1});
 
 
 # Recursive walker of custom Perl Data Structures
@@ -143,6 +142,8 @@ print "Session idle timeout    : ", $plg->Session_timeout ," sec\n";
 print "Main PID                : $$\n";
 
 
+
+
 # Restore the valid sessions, and delete the expired
 opendir __SESSIONDIR, $plg->dir_session or die "Could not list session directory $plg->{dir_session} because $!\n";
 
@@ -181,7 +182,6 @@ closedir __SESSIONDIR;
 #print 'debug : '. Dumper( $plg->auth_config )      ;exit;
 #print 'debug : '. Dumper  \%TokenDB; exit;
 
-
 # Hook, BEFORE the main app process the request
 
 	$app->add_hook(Dancer2::Core::Hook->new(name=>'before_request', code=>sub{
@@ -219,18 +219,12 @@ closedir __SESSIONDIR;
 	# if the output should be sorted, sort([0|1])
 	$plg->{sort} = ((exists $app->request->query_parameters->{sort}) && ($app->request->query_parameters->{sort} =~/(?i)1|t|y/)) ? 1:0;
 
-	# if the output should be human readable : pretty([0|2])
+	# if the output should be human readable : pretty([0|1])
 	if (exists $app->request->query_parameters->{pretty}) {
-
-		if ($app->request->query_parameters->{pretty} =~/(?i)1|t|y/) {
-		$plg->pretty(2)
-		}
-		else {
-		$plg->pretty(0)
-		}
+	$app->request->query_parameters->{pretty} =~/(?i)1|t|y/ ? $plg->pretty(1) : $plg->pretty(0)
 	}
 	else {
-	$plg->pretty(2)
+	$plg->pretty(1)
 	}
 
 	# add header
@@ -241,7 +235,7 @@ closedir __SESSIONDIR;
 		if ($app->request->body) { 
 
 			eval  {
-			if    ($plg->Format->{from} eq 'json')	{ $plg->data(JSON::XS::decode_json   Encode::encode('UTF-8',$app->request->body)) }
+			if    ($plg->Format->{from} eq 'json')	{ $plg->data(Cpanel::JSON::XS::decode_json   Encode::encode('UTF-8',$app->request->body)) }
 			elsif ($plg->Format->{from} eq 'xml')	{ $plg->data(XML::Hash::XS::xml2hash $app->request->body) }
 			elsif ($plg->Format->{from} eq 'yaml')	{ $plg->data(YAML::Syck::Load        $app->request->body) }
 			elsif ($plg->Format->{from} eq 'perl')	{ $plg->data(eval                    $app->request->body) }
@@ -272,7 +266,6 @@ closedir __SESSIONDIR;
 			}
 		}
 	}));
-
 
 
 # Hook ONLY for the protected routes, before the main app do anything
@@ -359,7 +352,7 @@ closedir __SESSIONDIR;
 				Epoch				=> time,
 				Server				=> { address => $app->request->env->{SERVER_NAME}, ip => $app->request->env->{SERVER_PORT} },
 				'Login idle timeout'=> $plg->Session_timeout,
-				'Auth method'       => "ώπαρτις ". $plg->auth_method
+				'Auth method'       => $plg->auth_method
 				)
 			}
 			elsif ( $app->request->param('what') =~/(?i)c/ ) {
@@ -518,9 +511,21 @@ my $plg=shift;
 $plg->reply_text('');
 
 	eval {
-		if    ($plg->Format->{to} eq 'json') {
-		$JSON->pretty($plg->pretty);
+
+		if ($plg->Format->{to} eq 'json') {
 		$JSON->canonical($plg->sort);
+
+			if ($plg->pretty) {
+			$JSON->pretty(1);
+			$JSON->space_before(0);
+			$JSON->space_after(1)
+			}
+			else {
+			$JSON->pretty(0);
+			$JSON->space_before(0);
+			$JSON->space_after(0)
+			}
+		
 		$plg->{reply_text} = $JSON->encode($_[0])
 		}
 		elsif ($plg->Format->{to} eq 'xml') {
@@ -587,11 +592,10 @@ my $plg = shift;
 	}
 
 	if ($plg->error) {
-	$plg->__HASH_TO_STRING({error=> $plg->error});
-	$plg->dsl->halt( $plg->reply_text )
+	$plg->__HASH_TO_STRING({error=> $plg->error})
 	}
 
-$plg->reply_text
+$plg->dsl->halt( $plg->reply_text )
 }
 
 
@@ -767,7 +771,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.2.9
+version 4.3.1
 
 =head1 SYNOPSIS
 
@@ -809,6 +813,14 @@ The replies through this module have the extra key B<error> . At success B<error
   any  '/LoginNeeded_read'  => sub { reply session_get('s1', 's2') };
 
   dance;
+
+=head1 NAME
+
+Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, multiple in/out formats, IP security, role based access
+
+=head1 VERSION
+
+version 4.2.9
 
 =head1 Control output : sort, pretty, to, from
 
@@ -1165,6 +1177,17 @@ B<RPC::Any> A simple, unified interface to XML-RPC and JSON-RPC
 B<XML::RPC> Pure Perl implementation for an XML-RPC client and server.
 
 B<JSON::RPC> JSON RPC Server Implementation
+
+=head1 AUTHOR
+
+George Bouras <george.mpouras@yandex.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by George Bouras.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

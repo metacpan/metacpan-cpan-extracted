@@ -150,13 +150,14 @@ static SV *
 arg_to_sv (GIArgument * arg,
            GITypeInfo * info,
            GITransfer transfer,
+           GPerlI11nMemoryScope mem_scope,
            GPerlI11nInvocationInfo *iinfo)
 {
 	GITypeTag tag = g_type_info_get_tag (info);
 	gboolean own = transfer >= GI_TRANSFER_CONTAINER;
 
-	dwarn ("info = %p, tag = %d (%s)\n",
-	       info, tag, g_type_tag_to_string (tag));
+	dwarn ("info = %p, tag = %d (%s), transfer = %d, own = %d\n",
+	       info, tag, g_type_tag_to_string (tag), transfer, own);
 
 	switch (tag) {
 	    case GI_TYPE_TAG_VOID:
@@ -230,7 +231,7 @@ arg_to_sv (GIArgument * arg,
 		return array_to_sv (info, arg->v_pointer, transfer, iinfo);
 
 	    case GI_TYPE_TAG_INTERFACE:
-		return interface_to_sv (info, arg, own, iinfo);
+		return interface_to_sv (info, arg, own, mem_scope, iinfo);
 
 	    case GI_TYPE_TAG_GLIST:
 	    case GI_TYPE_TAG_GSLIST:

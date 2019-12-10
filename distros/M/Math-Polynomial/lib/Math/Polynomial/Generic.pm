@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw(carp croak);
 
-our $VERSION = '1.015';
+our $VERSION = '1.016';
 
 sub import {
     croak(__PACKAGE__ . " is no longer available");
@@ -58,11 +58,10 @@ Martin Becker, E<lt>becker-cpan-mp (at) cozap.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2019 by Martin Becker.  All rights reserved.
+Copyright (c) 2009-2019 by Martin Becker, Blaubeuren.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.6 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
 
 =head1 DISCLAIMER OF WARRANTY
 

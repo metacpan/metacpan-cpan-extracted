@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request;
-$Net::Amazon::S3::Request::VERSION = '0.86';
+$Net::Amazon::S3::Request::VERSION = '0.87';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Moose::Util::TypeConstraints;
@@ -21,6 +21,7 @@ enum 'LocationConstraint' => [
     'cn-north-1',
     'cn-northwest-1',
     'eu-central-1',
+    'eu-north-1',
     'eu-west-1',
     'eu-west-2',
     'eu-west-3',
@@ -183,7 +184,7 @@ Net::Amazon::S3::Request - Base class for request objects
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,11 @@
 Revision history for Perl module Net::Amazon::S3:
 
+0.87 Mon  9 Dec 2019 19:53:42 GMT
+    - Time::Piece fix from Eden Crane
+    - eu-north-1 region (happy-barney)
+    - drop hardcoded V2 in ListAllMyBuckets (happy-barney)
+    - Fix setting of S3 XML document namespace (michal-josef-spacek)
+
 0.86 Fri 12 Apr 2019 13:38:10 BST
     - Retry bucket HEAD few times see #51 (thanks Branislav Zahradník)
     - Support server side encryption also in Net::Amazon::S3::Bucket (thanks Branislav Zahradník)

@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.042';
+our $VERSION = '1.044';
 # ABSTRACT: A simple framework and editor for content-driven Mojolicious websites
 
 #pod =head1 SYNOPSIS
@@ -134,10 +134,19 @@ our $VERSION = '1.042';
 #pod L<OpenAPI|http://openapis.org> API specification. The API spec document
 #pod is located at C</yancy/api>.
 #pod
-#pod =head1 CONFIGURATION
+#pod =head1 GUIDES
 #pod
-#pod See L<Yancy::Help::Config> for how to configure Yancy in both plugin and
-#pod standalone mode.
+#pod =over
+#pod
+#pod =item * L<Yancy::Help::Config> - How to configure Yancy
+#pod
+#pod =item * L<Yancy::Help::Auth> - How to authenticate and authorize users
+#pod
+#pod =item * L<Yancy::Help::Standalone> - How to use Yancy without writing code
+#pod
+#pod =item * L<Yancy::Help::Upgrading> - How to upgrade from previous versions
+#pod
+#pod =back
 #pod
 #pod =head1 BUNDLED PROJECTS
 #pod
@@ -209,7 +218,7 @@ Yancy - A simple framework and editor for content-driven Mojolicious websites
 
 =head1 VERSION
 
-version 1.042
+version 1.044
 
 =head1 SYNOPSIS
 
@@ -339,10 +348,19 @@ This application creates a REST API using the standard
 L<OpenAPI|http://openapis.org> API specification. The API spec document
 is located at C</yancy/api>.
 
-=head1 CONFIGURATION
+=head1 GUIDES
 
-See L<Yancy::Help::Config> for how to configure Yancy in both plugin and
-standalone mode.
+=over
+
+=item * L<Yancy::Help::Config> - How to configure Yancy
+
+=item * L<Yancy::Help::Auth> - How to authenticate and authorize users
+
+=item * L<Yancy::Help::Standalone> - How to use Yancy without writing code
+
+=item * L<Yancy::Help::Upgrading> - How to upgrade from previous versions
+
+=back
 
 =head1 BUNDLED PROJECTS
 

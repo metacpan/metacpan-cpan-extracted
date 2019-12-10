@@ -8,24 +8,29 @@ mime_tag:
         type: js
     json:
         type: json
-    perl-config:                                            # *.perl
-        type: perl
+    markdown:
+        type: markdown
+    perl-config: # NOTE *.perl
         perl_critic: pcore-config
-    perl-cpanfile:                                          # cpanfile
         type: perl
+    perl-cpanfile: # NOTE cpanfile
         perl_critic: 0
+        type: perl
     perl-module:
-        type: perl
         perl_critic: 1
+        type: perl
     perl-script:
-        type: perl
+        perl_compress_end_section: 1
         perl_critic: 1
-        perl_compress_end_section: 1
-    perl-script-auto:                                       # *.PL
         type: perl
-        perl_critic: 0
+    perl-script-auto: # NOTE *.PL
         perl_compress_end_section: 1
-
+        perl_critic: 0
+        type: perl
+    vue:
+        type: vue
+    yaml:
+        type: yaml
 perlcritic:
     common:
         __pcore__: 0
@@ -36,7 +41,7 @@ perlcritic:
             severity: 4
         ClassHierarchies::ProhibitAutoloading:
             severity: 5
-        CodeLayout::RequireTidyCode: ~                      # covered by running perltidy separately
+        CodeLayout::RequireTidyCode: ~ # NOTE covered by running perltidy separately
         ControlStructures::ProhibitCascadingIfElse:
             max_elsif: 5
         ControlStructures::ProhibitPostfixControls:
@@ -50,10 +55,10 @@ perlcritic:
         Miscellanea::ProhibitUselessNoCritic:
             severity: 4
         Modules::ProhibitEvilModules:
-            modules: indirect                               # NOTE !!! exporting indirect pragma cause random crashes under windows
+            modules: indirect # NOTE !!! exporting indirect pragma cause random crashes under windows
         Modules::RequireNoMatchVarsWithUseEnglish: ~
         NamingConventions::Capitalization: ~
-        References::ProhibitDoubleSigils: ~                 # TODO enable, when bug with ->%* will be fixed, https://github.com/adamkennedy/PPI/issues/88
+        References::ProhibitDoubleSigils: ~ # TODO enable, when bug with ->%* will be fixed, https://github.com/Perl-Critic/Perl-Critic/issues/578
         RegularExpressions::ProhibitEscapedMetacharacters:
             severity: 4
         RegularExpressions::ProhibitUnusualDelimiters:
@@ -69,7 +74,7 @@ perlcritic:
             severity: 4
         Subroutines::ProhibitAmpersandSigils:
             severity: 4
-        Subroutines::ProhibitSubroutinePrototypes: ~        # TODO [PCORE-27] - remove this policy, https://github.com/Perl-Critic/Perl-Critic/issues/591
+        Subroutines::ProhibitSubroutinePrototypes: ~ # TODO [PCORE-27] - remove this policy, https://github.com/Perl-Critic/Perl-Critic/issues/591
         Subroutines::ProhibitUnusedPrivateSubroutines:
             private_name_regex: _(?!_?build_)\w+
         Subroutines::RequireArgUnpacking: ~
@@ -108,10 +113,8 @@ perlcritic:
             functions: :builtins
             severity: 4
         Modules::ProhibitEvilModules:
-
             # NOTE !!! exporting indirect pragma cause random crashes under windows
-            modules: >-
-                autodie indirect /\Aconstant/ /\AReadonly/ Const::Fast English
+            modules: autodie indirect /\Aconstant/ /\AReadonly/ Const::Fast English
                 Encode Sys::Hostname Scalar::Util List::Util List::Util::XS List::AllUtils
                 Hash::Util Sub::Util /JSON/ /Data::Dump/ Data::Printer File::Path
                 File::Slurp File::Temp Path::Tiny File::Copy Cwd File::Spec File::Basename
@@ -133,10 +136,33 @@ perlcritic:
         ValuesAndExpressions::ProhibitNoisyQuotes: ~
         ValuesAndExpressions::RequireInterpolationOfMetachars: ~
 
-jshint: --verbose # --show-non-errors
+perltidy:
+    - --perl-best-practices
+    - --tight-secret-operators
+    - --continuation-indentation=2
+    - --weld-nested-containers
+    - --one-line-block-semicolons=0
+    - --maximum-line-length=0
+    - --space-prototype-paren=2
+    - --format-skipping
+    - --format-skipping-begin="# <<<"
+    - --format-skipping-end="# >>>"
+    - --converge
+    - --nostandard-output
+    - --character-encoding=utf8
 
-perltidy: >-
-    --perl-best-practices --tight-secret-operators --continuation-indentation=2
-    --weld-nested-containers --one-line-block-semicolons=0 --maximum-line-length=0
-    --format-skipping --format-skipping-begin="# <<<" --format-skipping-end="# >>>"
-    --converge --nostandard-output --character-encoding=utf8
+# NOTE https://prettier.io/docs/en/options.html
+prettier:
+    - --end-of-line=lf
+    - --tab-width=4
+    - --print-width=999999
+    - --vue-indent-script-and-style
+    - --single-quote
+    - --trailing-comma=es5
+
+terser_compress:
+    - --compress
+
+terser_obfuscate:
+    - --compress
+    - --mangle

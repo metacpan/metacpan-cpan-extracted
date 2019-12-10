@@ -11,11 +11,13 @@ WriteMakefile(
            resources => {
               homepage => 'http://pdl.perl.org/',
               repository  => {
-                 url => 'git://git.code.sf.net/p/pdl/pdl-linearalgebra',
+                 url => 'git://github.com/PDLPorters/pdl-linearalgebra.git',
                  type => 'git',
-                 web => 'http://sourceforge.net/p/pdl/pdl-linearalgebra/ci/master/tree/',
+                 web => 'https://github.com/PDLPorters/pdl-linearalgebra',
               },
+              bugtracker => {web=>'https://github.com/PDLPorters/pdl-linearalgebra/issues'},
            },
+           x_IRC => 'irc://irc.perl.org/#pdl',
         },
         'CONFIGURE_REQUIRES' =>  { "PDL" => 0, },
         'BUILD_REQUIRES' =>  { "PDL" => 0, },

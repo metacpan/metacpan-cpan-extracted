@@ -4,7 +4,7 @@ Net::RCON::Minecraft - Minecraft RCON remote console
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

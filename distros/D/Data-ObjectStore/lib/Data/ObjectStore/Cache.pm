@@ -8,6 +8,12 @@ sub new {
     return bless [ $size, {}, {} ], $cls;
 }
 
+sub empty {
+    my $self = shift;
+    $self->[1] = {};
+    $self->[2] = {};
+}
+
 sub fetch {
     my( $self, $key ) = @_;
     my( $size, $c1, $c2 ) = @$self;
@@ -30,5 +36,13 @@ sub stow {
         $self->[2] = $c1;
     }
 }
+
+sub entries {
+    my $self = shift;
+    my( $size, $c1, $c2 ) = @$self;
+    my( %e ) = ( %$c1, %$c2 );
+    return keys %e;
+}
+
 
 1;

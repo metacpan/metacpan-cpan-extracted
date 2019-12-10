@@ -23,6 +23,8 @@ if ( defined( $ENV{NO_COLOR} ) ){
 	$ENV{ANSI_COLORS_DISABLED}=1;
 }
 
+
+
 # set all the templates the servers use to to fault
 my $search;
 my $options;
@@ -71,7 +73,7 @@ if ( defined( $check ) &&
 	 ( $check ne 'gte' ) &&
 	 ( $check ne 'lt' ) &&
 	 ( $check ne 'lte' )
-	){
+	) {
 	warn('-n is set, but is not gt, gte, lt, or lte');
 	exit 255;
 }

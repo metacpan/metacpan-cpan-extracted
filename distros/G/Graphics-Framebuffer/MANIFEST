@@ -2,16 +2,12 @@ Changes
 examples/text_mode.pl
 examples/dump.pl
 examples/fonts.pl
-examples/images/Cheerful_Dance.gif
-examples/images/Yang_Is_Pissed.gif
-examples/images/Anime_Red_Head.jpg
+examples/images/Yang Is Pissed.gif
 examples/images/Blonde_Pigtails.jpg
 examples/images/Halloween.jpg
-examples/images/RWBY_Ruby_Weiss.jpg
 examples/images/RWBY_White.jpg
 examples/images/Ryuko.jpg
 examples/images/Solid.jpg
-examples/images/Stance_Flag.jpg
 examples/images/4KTest_Pattern.png
 examples/images/RWBY_Beuowolf.png
 examples/images/RWBY_Crescent_Rose_Ruby.png
@@ -25,7 +21,6 @@ examples/multiprocessing/threaded_slideshow.pl
 examples/multiprocessing/threaded_primitives.pl
 examples/viewpic.pl
 ignore.txt
-KNOWN_ISSUES
 lib/Graphics/Framebuffer.pm
 lib/Graphics/Framebuffer/Splash.pm
 lib/Graphics/Framebuffer/Mouse.pm
@@ -39,4 +34,9 @@ README.md
 src/Framebuffer.c
 src/Framebuffer.pm.template
 t/01-splash.t
-TODO
+installing/TODO
+installing/install-prerequisites-debian.sh
+installing/install-prerequisites-redhat.sh
+installing/detect.sh
+installing/TROUBLESHOOTING
+installing/KNOWN_ISSUES

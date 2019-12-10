@@ -316,8 +316,8 @@ sub user_token_set_permissions ( $self, $token_id, $permissions, $dbh = undef ) 
 
             if ( !$token_permissions->{$name}->{has_user_permission} ) {
                 push $insert_user_permission->@*,
-                  { user_id       => SQL [ '(SELECT "user_id" FROM "user_token" WHERE "id" =', SQL_UUID $token_id, ')' ],
-                    permission_id => SQL [ '(SELECT "id" FROM "app_permission" WHERE "name" =', \$name, ')' ],
+                  { user_id       => SQL [ '(SELECT "user_id" FROM "user_token" WHERE "id" =',  SQL_UUID $token_id, ')' ],
+                    permission_id => SQL [ '(SELECT "id" FROM "app_permission" WHERE "name" =', \$name,             ')' ],
                     enabled       => SQL_BOOL 1,
                   };
             }

@@ -4,7 +4,7 @@ use Pcore -class, -res;
 use Pcore::Util::Scalar qw[weaken];
 use Pcore::Util::UUID qw[uuid_v4_str];
 use Pcore::HTTP::Server;
-use Pcore::WebSocket::pcore;
+use Pcore::WebSocket::softvisio;
 use Clone qw[clone];
 
 has listen      => ();
@@ -23,7 +23,7 @@ sub BUILD ( $self, $args ) {
         listen     => $self->{listen},
         on_request => sub ($req) {
             if ( $req->is_websocket_connect_request ) {
-                return Pcore::WebSocket::pcore->accept(
+                return Pcore::WebSocket::softvisio->accept(
                     $req,
                     compression   => $self->{compression},
                     on_disconnect => sub ($h) {

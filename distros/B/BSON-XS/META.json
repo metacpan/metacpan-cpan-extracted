@@ -111,7 +111,7 @@
    "provides" : {
       "BSON::XS" : {
          "file" : "lib/BSON/XS.pm",
-         "version" : "v0.8.1"
+         "version" : "v0.8.2"
       }
    },
    "release_status" : "stable",
@@ -126,12 +126,12 @@
          "web" : "https://github.com/mongodb/mongo-perl-bson-xs"
       }
    },
-   "version" : "v0.8.1",
+   "version" : "v0.8.2",
    "x_authority" : "cpan:MONGODB",
    "x_contributors" : [
       "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.15"
 }
 

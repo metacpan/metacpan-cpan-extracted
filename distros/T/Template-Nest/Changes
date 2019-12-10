@@ -23,3 +23,12 @@ Revision history for Perl extension Template::Nest.
 	
 0.06  Sat May 18 17:38:20 2019
 	- correct distribution errors
+
+0.07  Mon Dec 02 19:55:10 2019
+	- Remove lingering occurrence of hardcoded escape char
+	  references causing errors when defaults specified
+	  and escape char is not a backslash	  
+
+0.08  Wed Dec 04 23:40:02 2019
+	- Correct missing 'g' from substitution line when
+	  replacing defaults

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.016000;
 
 use ExtUtils::MakeMaker;
 
@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "bin/medley"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Util::Medley",
   "PREREQ_PM" => {
     "Archive::Zip" => 0,
@@ -38,6 +39,7 @@ my %WriteMakefileArgs = (
     "File::LibMagic" => 0,
     "File::Path" => 0,
     "File::ShareDir" => 0,
+    "File::Touch" => 0,
     "FileHandle" => 0,
     "Getopt::Long" => 0,
     "IPC::Run3" => 0,
@@ -60,10 +62,11 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "File::RandomGenerator" => 0,
     "Test2::Plugin::DieOnFail" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.020",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -82,7 +85,9 @@ my %FallbackPrereqs = (
   "File::Basename" => 0,
   "File::LibMagic" => 0,
   "File::Path" => 0,
+  "File::RandomGenerator" => 0,
   "File::ShareDir" => 0,
+  "File::Touch" => 0,
   "FileHandle" => 0,
   "Getopt::Long" => 0,
   "IPC::Run3" => 0,

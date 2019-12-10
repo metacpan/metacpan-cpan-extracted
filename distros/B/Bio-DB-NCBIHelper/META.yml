@@ -24,7 +24,7 @@ meta-spec:
   version: '1.4'
 name: Bio-DB-NCBIHelper
 requires:
-  Bio::DB::Query::WebQuery: '0'
+  Bio::DB::Query::WebQuery: v1.7.7
   Bio::DB::Taxonomy: '0'
   Bio::DB::WebDBSeqI: '0'
   Bio::Root::IO: '0'
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://github.com/bioperl/bio-db-ncbihelper/issues
   homepage: https://metacpan.org/release/Bio-DB-NCBIHelper
   repository: git://github.com/bioperl/bio-db-ncbihelper.git
-version: 1.7.5
+version: 1.7.6
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -220,7 +220,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: Bio-DB-NCBIHelper-v1.7.5
+          tag: Bio-DB-NCBIHelper-v1.7.6
           tag_format: '%N-v%v'
           tag_message: '%N-v%v'
         Dist::Zilla::Role::Git::Repo:

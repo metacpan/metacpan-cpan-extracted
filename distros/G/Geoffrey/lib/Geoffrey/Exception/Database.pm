@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp qw/longmess/;
 
-$Geoffrey::Exception::Database::VERSION = '0.000204';
+$Geoffrey::Exception::Database::VERSION = '0.000205';
 
 use Exception::Class 1.23 (
     'Geoffrey::Exception::Database' => { description => 'Unidentified exception', },

@@ -4,7 +4,7 @@ package App::ZofCMS::Template;
 use strict;
 use warnings;
 
-our $VERSION = '1.001007'; # VERSION
+our $VERSION = '1.001008'; # VERSION
 
 use HTML::Template;
 
@@ -227,8 +227,10 @@ sub sort_plugins {
                 next;
             }
 
-            @{ $_={} }{ qw/name priority/ } = %$_
-                if ref eq 'HASH' and 1 == keys %$_;
+            if (ref eq 'HASH' and 1 == keys %$_) {
+                my ($name, $priority) = %$_;
+                @{ $_={} }{ qw/name priority/ } = ($name, $priority);
+            }
         }
     }
 

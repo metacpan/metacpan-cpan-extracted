@@ -47,13 +47,21 @@ ghash_to_sv (GITypeInfo *info,
 
 		dwarn ("  key pointer %p\n", key_p);
 		arg.v_pointer = key_p;
-		key_sv = arg_to_sv (&arg, key_param_info, item_transfer, NULL);
+		key_sv = arg_to_sv (&arg,
+		                    key_param_info,
+		                    item_transfer,
+		                    GPERL_I11N_MEMORY_SCOPE_IRRELEVANT,
+		                    NULL);
 		if (key_sv == NULL)
                         break;
 
 		dwarn ("  value pointer %p\n", value_p);
 		arg.v_pointer = value_p;
-		value_sv = arg_to_sv (&arg, value_param_info, item_transfer, NULL);
+		value_sv = arg_to_sv (&arg,
+		                      value_param_info,
+		                      item_transfer,
+		                      GPERL_I11N_MEMORY_SCOPE_IRRELEVANT,
+		                      NULL);
 		if (value_sv == NULL)
 			break;
 

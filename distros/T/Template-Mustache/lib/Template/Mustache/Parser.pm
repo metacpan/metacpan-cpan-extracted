@@ -5,7 +5,7 @@
 
 package Template::Mustache::Parser;
 our $AUTHORITY = 'cpan:YANICK';
-$Template::Mustache::Parser::VERSION = '1.3.2';
+$Template::Mustache::Parser::VERSION = '1.3.3';
 
 use Parse::RecDescent;
 { my $ERRORS;
@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 package Parse::RecDescent::Template::Mustache::Parser;
 our $AUTHORITY = 'cpan:YANICK';
-$Parse::RecDescent::Template::Mustache::Parser::VERSION = '1.3.2';
+$Parse::RecDescent::Template::Mustache::Parser::VERSION = '1.3.3';
 
 use strict;
 use vars qw($skip $AUTOLOAD  );
@@ -7214,7 +7214,7 @@ Template::Mustache::Parser
 
 =head1 VERSION
 
-version 1.3.2
+version 1.3.3
 
 =head1 AUTHORS
 

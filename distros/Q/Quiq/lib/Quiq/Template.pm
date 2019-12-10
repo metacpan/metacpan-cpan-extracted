@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.166';
+our $VERSION = '1.167';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -292,11 +292,13 @@ sub replace {
 
         if ($val =~ tr/\n//) {
             # Ist der Wert mehrzeilig, gehen wir jede einzelne Fundstelle
-            # durch und rücken jede Zeile des Werts so weit ein wie der
-            # Platzhalter eingerückt ist.
+            # durch und rücken jede Zeile des Werts so weit ein wie die
+            # Zeile, in der der Platzhalter vorkommt, eingerückt ist.
 
             while (1) {
-                if ($self->{'string'} !~ /(^[ \t]*)?\Q$key/m) {
+                # vor 2019-12-08
+                # if ($self->{'string'} !~ /(^[ \t]*)?\Q$key/m) {
+                if ($self->{'string'} !~ /^([ \t]*).*\Q$key/m) {
                     # Ende: Key kommt nicht mehr vor
                     last;
                 }
@@ -803,7 +805,7 @@ sub asStringNL {
 
 =head1 VERSION
 
-1.166
+1.167
 
 =head1 AUTHOR
 
