@@ -1,5 +1,8 @@
 # mashtree
 
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.01762/status.svg)](https://doi.org/10.21105/joss.01762)
+[![Build Status](https://travis-ci.org/lskatz/mashtree.svg?branch=master)](https://travis-ci.org/lskatz/mashtree)
+
 Create a tree using Mash distances.
 
 For simple usage, see `mashtree --help`. This is an example command:
@@ -107,15 +110,12 @@ For more information on contributions, please see [CONTRIBUTING.md](CONTRIBUTING
 
 ## Citation
 
-### In review, JOSS
+### JOSS
 
-Katz, L. S., Griswold, T., Morrison, S., Caravas, J., Zhang, S., den Bakker, H.C., Deng, X., and Carleton, H. A., "Mashtree: a rapid comparison of whole genome sequence files."  Journal of Open Source Software, in review.  https://github.com/openjournals/joss-reviews/issues/1762#issuecomment-543736907
+Katz, L. S., Griswold, T., Morrison, S., Caravas, J., Zhang, S., den Bakker, H.C., Deng, X., and Carleton, H. A., (2019). Mashtree: a rapid comparison of whole genome sequence files. Journal of Open Source Software, 4(44), 1762, https://doi.org/10.21105/joss.01762
 
 ### Poster
 
 Katz, L. S., Griswold, T., & Carleton, H. A. (2017, October 8-11). [_Generating WGS Trees with Mashtree_](misc/mashtree%20ASM%20NGS.pptx). Poster presented at the American Society for Microbiology Conference on Rapid Applied Microbial Next-Generation Sequencing and Bioinformatic Pipelines, Washington, DC. Poster number 27.
 
-## GitHub stickers for Mashtree
-
-[![Build Status](https://travis-ci.org/lskatz/mashtree.svg?branch=master)](https://travis-ci.org/lskatz/mashtree)
 

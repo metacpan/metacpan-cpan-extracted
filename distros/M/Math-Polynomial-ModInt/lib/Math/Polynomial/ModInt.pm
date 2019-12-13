@@ -6,8 +6,9 @@ package Math::Polynomial::ModInt;
 use 5.006;
 use strict;
 use warnings;
-use Math::BigInt;
-use Math::ModInt     0.011;
+use Math::BigInt try => 'GMP';
+use Math::ModInt 0.012;
+use Math::ModInt::Event qw(UndefinedResult);
 use Math::Polynomial 1.015;
 use Carp qw(croak);
 
@@ -27,7 +28,8 @@ BEGIN {
     require Exporter;
     our @ISA       = qw(Math::Polynomial Exporter);
     our @EXPORT_OK = qw(modpoly);
-    our $VERSION   = '0.002';
+    our $VERSION   = '0.004';
+    our @CARP_NOT  = qw(Math::ModInt::Event::Trap Math::Polynomial);
 }
 
 my $default_string_config = {
@@ -43,6 +45,56 @@ my $lifted_string_config = {
 
 my $ipol = Math::Polynomial->new(Math::BigInt->new);
 $ipol->string_config($lifted_string_config);
+
+# ----- private subroutines -----
+
+# event catcher
+sub _bad_modulus {
+    croak 'modulus not prime';
+}
+
+# event catcher
+sub _no_inverse {
+    croak 'undefined inverse';
+}
+
+# wrapper for modular inverse to bail out early if not in a field
+sub _inverse {
+    my ($element) = @_;
+    my $trap = UndefinedResult->trap(\&_no_inverse);
+    return $element->inverse;
+}
+
+# Does a set of coefficient vectors have a zero linear combination?
+# We transform and include them one by one into a matrix in echelon form.
+# Argument is an iterator so we can short-cut generating superfluous vectors.
+# Supplied vectors may be modified.
+sub _linearly_dependent {
+    my ($it) = @_;
+    my $trap = UndefinedResult->trap(\&_bad_modulus);
+    my @ech = ();
+    while (defined(my $vec = $it->())) {
+        my $ex = 0;
+        for (; $ex < @ech; ++$ex) {
+            my $evec = $ech[$ex];
+            last if @{$evec} < @{$vec};
+            if (@{$evec} == @{$vec}) {
+                my $i = $#{$vec};
+                return 1 if !$i;
+                my $w = pop(@{$vec}) / $evec->[$i];
+                while ($i-- > 0) {
+                    $vec->[$i] -= $evec->[$i] * $w;
+                }
+                while (@{$vec} && !$vec->[-1]) {
+                    pop(@{$vec});
+                }
+            }
+        }
+        return 1 if !@{$vec};
+        splice @ech, $ex, 0, $vec;
+    }
+    return 0;
+}
 
 # ----- private methods -----
 
@@ -65,6 +117,17 @@ sub _xnew {
 }
 
 # ----- overridden public methods -----
+
+sub new {
+    my $this = shift;
+    if (!@_ && !ref $this) {
+        croak 'insufficient arguments';
+    }
+    if (grep {$_->is_undefined} @_) {
+        _bad_modulus();
+    }
+    return $this->SUPER::new(@_);
+}
 
 sub string_config {
     my $this = shift;
@@ -93,6 +156,21 @@ sub is_unequal {
         --$i;
     }
     return !$eq;
+}
+
+sub is_monic {
+    my ($this) = @_;
+    my $degree = $this->degree;
+    return 0 <= $degree && $this->coeff($degree)->residue == 1;
+}
+
+sub monize {
+    my ($this) = @_;
+    my $degree = $this->degree;
+    return $this if $degree < 0;
+    my $leader = $this->coeff($degree);
+    return $this if $leader->residue == 1;
+    return $this->mul_const(_inverse($leader));
 }
 
 # ----- public subroutine -----
@@ -160,6 +238,68 @@ sub lift       { $ipol->new(map { $_->residue          } $_[0]->coefficients) }
 
 sub centerlift { $ipol->new(map { $_->centered_residue } $_[0]->coefficients) }
 
+sub lambda_reduce {
+    my ($this, $lambda) = @_;
+    my $degree = $this->degree;
+    return $this if $degree <= $lambda;
+    my @coeff = map { $this->coeff($_) } 0 .. $lambda;
+    for (my $i = 1, my $n = $lambda+1; $n <= $degree; ++$i, ++$n) {
+        $coeff[$i] += $this->coeff($n);
+        $i = 0 if $i == $lambda;
+    }
+    return $this->new(@coeff);
+}
+
+sub first_root {
+    my ($this) = @_;
+    my $zero = $this->coeff_zero;
+    my $lsc  = $this->coeff(0);
+    return $zero if $lsc->is_zero;
+    if ($this->degree == 1) {
+        my $mscr = $this->coeff(1)->centered_residue;
+        return -$lsc if $mscr ==  1;
+        return  $lsc if $mscr == -1;
+    }
+    foreach my $n (1 .. $zero->modulus - 1) {
+        my $root = $zero->new($n);
+        return $root if $this->evaluate($root)->is_zero;
+    }
+    return undef;
+}
+
+# implementation restriction: defined for prime moduli only
+sub is_irreducible {
+    my ($this) = @_;
+    my $n = $this->degree;
+    return 0 if $n <= 0;
+    return 1 if $n == 1;
+    return 0 if !$this->coeff(0);
+    return 0 if $this->gcd($this->differentiate)->degree > 0;
+    my $p  = $this->modulus;
+    # optimization: O(p) zero search only for small p or very large n
+    if ($p <= 43 || log($p - 20) <= $n * 0.24 + 2.68) {
+        my $rp = 2 < $p && $p <= $n? $this->lambda_reduce($p-1): $this;
+        return 0 if defined $rp->first_root;
+        return 1 if $n <= 3;
+    }
+    # Berlekamp rank < $n - 1?
+    my $xp = $this->exp_mod($p);
+    my $aj = $xp;
+    my $bj = $this->monomial(1);
+    my $j  = 0;
+    return 0 if _linearly_dependent(
+        sub {
+            return undef if $j >= $n - 1;
+            if ($j++) {
+                $aj = $aj * $xp % $this;
+                $bj <<= 1;
+            }
+            return [($aj - $bj)->coeff];
+        }
+    );
+    return 1;
+}
+
 1;
 
 __END__
@@ -172,7 +312,7 @@ Math::Polynomial::ModInt - univariate polynomials over modular integers
 
 =head1 VERSION
 
-This documentation refers to version 0.002 of Math::Polynomial::ModInt.
+This documentation refers to version 0.004 of Math::Polynomial::ModInt.
 
 =head1 SYNOPSIS
 
@@ -198,6 +338,12 @@ This documentation refers to version 0.002 of Math::Polynomial::ModInt.
     $n = $p->number_of_terms;           # 4
     $u = $p->lift;                      # x^5 + 2*x^2 + x + 1
     $v = $p->centerlift;                # x^5 - x^2 + x + 1
+    $z = $p->first_root;                # undef
+    $m = $p->is_irreducible;            # true
+    $r = modpoly(131, 3);               # x^4 + x^3 - x^2 + x - 1
+    $x = $r->first_root;                # mod(2, 3)
+    $c = $r->is_irreducible;            # false
+    $f = $r->lambda_reduce(2);          # - x - 1 (mod 3)
 
 =head1 DESCRIPTION
 
@@ -219,13 +365,12 @@ its coefficients in ascending order of degrees.  C<@coeff> must have
 at least one value and all values must be Math::ModInt objects with the
 same modulus.
 
-Other constructors defined in the parent class Math::Polynomial,
-like I<monomial> and I<from_roots>, are also valid.  Note, however,
-that polynomial operations assuming that the coefficient space is a
-field, like I<interpolate> and I<divmod>, do not make sense with modular
-integers in general.  Some of them could be used with prime moduli, but
-specialized modules like Math::GaloisField implement similar operations
-more efficiently.
+Other constructors defined in the parent class Math::Polynomial, like
+I<monomial> and I<from_roots>, are also valid.  Note, however, that
+polynomial operations assuming that the coefficient space is a field,
+like I<interpolate> and I<divmod>, are safe to use only with prime moduli.
+Using them with a composite modulus may result in a "modulus not prime"
+exception.
 
 =item I<from_index>
 
@@ -262,8 +407,8 @@ C<$modulus> is a positive integer, does this.
 
 =item I<from_index>
 
-When called as an object method, the modulus argument of
-constructors can be omitted.  C<$p-E<gt>from_index($index)> is
+When called as an object method, the modulus argument of this
+constructor can be omitted.  C<$p-E<gt>from_index($index)> is
 equivalent to C<$p-E<gt>from_index($index, $p-E<gt>modulus)>, then.
 If a modulus is specified, it takes precedence over the invocant.
 Thus, C<$p-E<gt>from_index($index, $modulus)> is equivalent to
@@ -284,10 +429,13 @@ too.  Notably, addition, subtraction, and multiplication of modular
 integer polynomials is valid and indeed handled by the parent class.
 Invalid operations will yield exceptions from Math::ModInt.
 
+If the modulus is a prime number, division is valid in the coefficient
+space and thus all operators, including I<divmod> and I<gcd>, are safe.
+
 Additionally, a number of comparison operators are defined for modular
 integer polynomials only.  Currently, these are implemented in the
-L<Math::Polynomial::ModInt::Order|Math::Polynomial::ModInt::Order> helper
-module rather than as overloaded operators, for reasons explained there.
+L<Math::Polynomial::ModInt::Order> helper module rather than as overloaded
+operators, for reasons explained there.
 
 =head2 Property Accessors
 
@@ -300,7 +448,7 @@ modular integer polynomials are defined.
 =item I<index>
 
 C<$p-E<gt>index> calculates the index of a modular integer polynomial
-C<$p>, as defined above.  Cf. L<#from_index>.
+C<$p>, as defined above.  Cf. L</from_index>.
 
 Note that the index grows exponentially with the degree of the polynomial
 and is thus represented as a Math::BigInt object.
@@ -312,12 +460,52 @@ the modular integer polynomial C<$p>.
 
 =item I<number_of_terms>
 
-C<$p-E<gt>number_of_terms> returns the number of non-zero
-coefficients of the modular integer polynomial C<$p>.
+C<$p-E<gt>number_of_terms> returns the number of non-zero coefficients
+of the modular integer polynomial C<$p>.  Recent versions of the parent
+module also have this method.
 
-This method should actually better be provided by the parent class,
-as the property is not quite specific to modular integer coefficients.
-Expect this to be done in an upcoming Math::Polynomial release.
+=back
+
+=head2 Algebraic Operators
+
+=over 4
+
+=item I<lambda_reduce>
+
+C<$p-E<gt>lambda_reduce($lambda)> generates a polynomial of degree
+I<lambda> or lower from a high-degree polynomial in this way: Remove
+the highest degree coefficient (for degree I<n>) and add it to the
+coefficient of degree I<n - lambda>, and repeat until the degree of the
+remaining polynomial is less or equal to I<lambda>.
+
+If I<lambda> happens to be a multiple of the Carmichael totient of the
+modulus, which will be one less than the modulus if the modulus is a
+prime number, the reduced polynomial will evaluate point-wise equivalent
+to the original polynomial.
+
+=item I<first_root>
+
+C<$p-E<gt>first_root> returns the root with the smallest non-negative
+residue of the polynomial, if such roots exist, otherwise I<undef>.
+As currently implemented, this operation will be time-consuming for
+large moduli.
+
+=item I<is_irreducible>
+
+If C<$p> is a modular integer polynomial with prime modulus,
+C<$p-E<gt>is_irreducible> returns a boolean value telling if the
+polynomial is irreducibe.  An irreducible polynomial is a non-constant
+polynomial that is not a product of two or more other non-constant
+polynomials.
+
+Irreducibility is mostly of interest for prime moduli, where factorization
+is always unique.  This method therefore is implemented for prime moduli
+only.  Note, however, that primality of the modulus is not explicitly
+checked, as this can be done beforehand once and would unnecessarily
+slow down operations on several polynomials with the same modulus.
+As currently implemented, the method may either return a meaningless
+result or throw a 'modulus is not prime' exception when called with such
+a modulus.
 
 =back
 
@@ -358,20 +546,34 @@ yet more string representations of polynomials, if so desired.
 =head1 DIAGNOSTICS
 
 Dealing with Math::ModInt objects can generally trigger exceptions from
-L<Math::ModInt::Event|Math::ModInt::Event>.  Mixing different moduli or
-dividing non-coprime elements could be causes.
+L<Math::ModInt::Event>.  Mixing different moduli or dividing non-coprime
+elements could be causes.  These exceptions will correctly be propagated
+as failures of code calling Math::Polynomial::ModInt in general, but in
+some situations Math::Polynomial may be blamed.
 
 Other error conditions, like using non-integers or non-objects where they
 would be expected, are not rigorously checked and may yield unreliable
 behavior rather than error messages.
 
-The few error conditions that are actually diagnosed are these:
+The error conditions that are actually reported are these:
 
 =over 4
 
+=item C<modulus not prime>
+
+A method only defined for prime moduli, like I<is_irreducible>, has been
+called inappropriately.  Note that this is not always detected and the
+result might be just wrong in such cases.
+
+=item C<undefined inverse>
+
+A method needing the multiplicative inverse of a coefficient, like
+I<monize>, has been called where that coefficient had no inverse.
+This can occur with coefficients that are not coprime to the modulus.
+
 =item C<usage error: modulus parameter missing>
 
-The I<from_index> or I<from_int_poly> construcors have been used with
+The I<from_index> or I<from_int_poly> constructors have been used with
 insufficient information as to the value of the modulus.  They should
 be either invoked with an explicit modulus (recommended) or as an
 object method.
@@ -380,16 +582,47 @@ object method.
 
 =head1 DEPENDENCIES
 
-This library uses Math::ModInt (version 0.011 and up) for modular integer
+This library uses Math::ModInt (version 0.012 and up) for modular integer
 calculations and Math::Polynomial (version 1.015 and up) for polynomial
 arithmetic, as well as Carp (any version) for diagnostic messages.
 The minimal required perl version is 5.6.
 
+=head1 ROADMAP
+
+The toolbox of algebraic operations is by no means complete.
+Irreducibility checking is based on Berlekamp's factorization algorithm
+but full factorization is not yet implemented.  It is intended to be
+added in one of the next releases.
+
+Some applications of modular integer polynomials will be provided by
+the Math::GaloisField hierarchy of modules rather than in this package.
+Math::Polynomial::ModInt is meant for basic stuff that can more or less
+be expected in a sub-class of Math::Polynomial, while algebraic field
+properties are more appropriate in the other package.  For example,
+division means polynomial division with remainder here, and proper
+division governed by field arithmetic there.
+
+Ideally (pun not intended), the element type Math::Polynomial::ModInt
+with non-prime moduli should have a corresponding space type like
+Math::PolynomialRing::ModInt, where more algebraic ring stuff could
+have a home.  It is not yet planned, though, but some tidbits could
+make an appearance in the Math::Polynomial::ModInt examples collection
+in the meantime.
+
 =head1 BUGS AND LIMITATIONS
 
-Bug reports and suggestions are always welcome
+Most of the time, method arguments are not rigourosly checked to make
+sense.  Cf. Diagnostics.
+
+Some calculations, like root finding and checking for irreducibility,
+can be time-consuming.  Operations involving large integer numbers will
+be faster if Math::BigInt::GMP is installed.  So far, this package is
+pure perl only.  An XS version may be added eventually, but not in the
+near future.
+
+Bug reports and more suggestions are always welcome
 E<8212> please submit them through the CPAN RT,
-E<lt>http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Polynomial-ModIntE<gt>.
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Polynomial-ModInt>.
 
 =head1 SEE ALSO
 
@@ -409,7 +642,7 @@ L<Math::ModInt>
 
 =item *
 
-L<Math::GaloisField>
+Math::GaloisField (soon to be published)
 
 =back
 

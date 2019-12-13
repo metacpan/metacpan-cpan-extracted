@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215425;
+our $VERSION = 1.20191211212301;
 
 my $formatters = [
                 {
@@ -54,20 +54,27 @@ my $formatters = [
                 {
                   'format' => '$1 $2',
                   'leading_digits' => '
-            (?:
-              [12]0|
-              7
-            )0|
-            [368]
+            [12]00|
+            [368]|
+            70[07-9]
           ',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3,7})'
                 },
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '[12457]',
+                  'leading_digits' => '
+            [1245]|
+            7[135]
+          ',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{4,8})'
+                },
+                {
+                  'format' => '$1 $2',
+                  'leading_digits' => '7',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{6,10})'
                 }
               ];
 
@@ -93,22 +100,27 @@ my $validators = {
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '([67]00\\d{5,6})|(
-          (?:
-            10|
-            [23][09]
-          )\\d{4,8}|
-          60(?:
-            [12]\\d{5,6}|
-            6\\d{7}
-          )|
+          20\\d{4,8}|
+          60[12]\\d{5,6}|
           7(?:
-            (?:
-              1|
-              3\\d
-            )\\d{7}|
+            099\\d{4,5}|
             5[03-9]\\d{3,7}
           )|
-          20[2-59]\\d\\d
+          20[2-59]\\d\\d|
+          (?:
+            606|
+            7(?:
+              0[78]|
+              1|
+              3\\d
+            )
+          )\\d{7}|
+          (?:
+            10|
+            29|
+            3[09]|
+            70[1-5]\\d
+          )\\d{4,8}
         )',
                 'toll_free' => '800\\d{4,6}',
                 'voip' => ''

@@ -134,6 +134,20 @@ pull requests are very welcome!
 
 Jason McIntosh (jmac@jmac.org)
 
+=head1 Contributors
+
+=over
+
+=item *
+
+Mohammad S Anwar (mohammad.anwar@yahoo.com)
+
+=item *
+
+Tim Vroom (vroom@ziprecruiter.com)
+
+=back
+
 =head1 Copyright and licence
 
 This software is Copyright (c) 2019 by Jason McIntosh.

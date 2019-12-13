@@ -18,13 +18,13 @@ no_index:
     - t
     - inc
 requires:
-  Mojolicious: '8'
+  Mojolicious: '8.18'
   Role::Tiny: v2.1.4
   perl: v5.24.0
 resources:
   bugtracker: https://github.com/Tekki/mojo-file-role-digest/issues
   homepage: https://github.com/Tekki/mojo-file-role-digest
   repository: https://github.com/Tekki/mojo-file-role-digest.git
-version: '0.02'
+version: '0.03'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

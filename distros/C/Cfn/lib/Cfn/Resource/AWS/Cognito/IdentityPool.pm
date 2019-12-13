@@ -1,4 +1,4 @@
-# AWS::Cognito::IdentityPool generated from spec 2.25.0
+# AWS::Cognito::IdentityPool generated from spec 9.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cognito::IdentityPool',
@@ -115,6 +115,7 @@ package Cfn::Resource::Properties::AWS::Cognito::IdentityPool {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has AllowClassicFlow => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AllowUnauthenticatedIdentities => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has CognitoEvents => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has CognitoIdentityProviders => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Cognito::IdentityPool::CognitoIdentityProvider', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

@@ -1,5 +1,8 @@
-Text/Markup version 0.23
+Text/Markup version 0.24
 ========================
+
+[![CPAN version](https://badge.fury.io/pl/Text-Markup.svg)](https://badge.fury.io/pl/Text-Markup)
+[![Build Status](https://travis-ci.org/theory/text-markup.svg)](https://travis-ci.org/theory/text-markup)
 
 This library's module, Text::Markup, provides an single interface for parsing
 a large number of text markup formats and converting them to HTML. It
@@ -53,7 +56,7 @@ Text-Markup requires the following modules:
 Copyright and Licence
 ---------------------
 
-Copyright (c) 2011-2014 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2019 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

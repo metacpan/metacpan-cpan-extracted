@@ -15,10 +15,12 @@ use lib "$FindBin::Bin/lib";
 use MyServer;
 use ClientTest;
 
-plan tests => $ClientTest::TEST_COUNT;
+my $test_count = 2 + $ClientTest::TEST_COUNT;
+
+plan tests => $test_count;
 
 SKIP: {
-    eval { require Mojo::IOLoop; 1 } or skip "Mojo::IOLoop isn’t available: $@", $ClientTest::TEST_COUNT;
+    eval { require Mojo::IOLoop; 1 } or skip "Mojo::IOLoop isn’t available: $@", $test_count;
 
     require Net::Curl::Promiser::Mojo;
 
@@ -35,7 +37,11 @@ SKIP: {
 
     my $promiser = Net::Curl::Promiser::Mojo->new();
 
+    can_ok( $promiser, 'add_handle_p' );
+
     my $promise = ClientTest::run($promiser, $port)->then( sub { print "big resolve\n" }, sub { $@ = shift; warn } );
+
+    isa_ok( $promise, 'Mojo::Promise', 'promise object' );
 
     my $pr2 = $promise->finally( sub { Mojo::IOLoop->stop() } );
 

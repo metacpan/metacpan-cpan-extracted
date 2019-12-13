@@ -1,5 +1,9 @@
 Revision history for Perl module Net::Curl::Promiser
 
+0.05 Wed 10 Dec 2019
+- Add add_handle_p() to Mojo module.
+- Update examples/mojo.pl and POD example to be more idiomatic.
+
 0.04 Wed 10 Dec 2019
 - Fix glaring, prominent typo in Mojo module.
 

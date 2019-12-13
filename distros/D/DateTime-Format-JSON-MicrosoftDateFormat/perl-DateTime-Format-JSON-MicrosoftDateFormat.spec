@@ -1,5 +1,5 @@
 Name:           perl-DateTime-Format-JSON-MicrosoftDateFormat
-Version:        0.04
+Version:        0.05
 Release:        1%{?dist}
 Summary:        Parse and format JSON MicrosoftDateFormat datetime strings
 License:        gplv2

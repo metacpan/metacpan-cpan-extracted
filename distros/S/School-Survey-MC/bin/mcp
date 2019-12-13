@@ -10,6 +10,7 @@ binmode STDOUT, ":utf8";
 use YAML::Tiny 'LoadFile';
 use HTML::Entities;
 use Getopt::Args;
+use Data::Dumper;
 
 sub say { print "@_\n" } # say for perl below 5.10
 
@@ -20,15 +21,64 @@ arg quantity => (
 );
 
 arg file => (
-    isa => 'Str',
+    isa      => 'ArrayRef',
+    greedy   => 1,
     required => 1,
     comment  => 'Path to YAML file, containg multiple choice questions',
 );
 
 my $o = optargs;
 
-my @doc = LoadFile( $o->{file} );
-my @q   = @{$doc[0]};
+my @yaml_documents;
+foreach my $file (@{$o->{file}}) {
+    my @yaml_file = LoadFile( $file );
+    push @yaml_documents, @yaml_file;
+}
+
+# document default config
+my %c = ( lang => { dunno  => "don't know",
+                    answer => 'Answer',
+                    claim  => 'Claim',
+                    yes    => 'true',
+                    no     => 'false',
+                  }
+        );
+my @q; # questions
+
+foreach my $document (@yaml_documents) {
+
+    if ( ref $document eq 'HASH'
+             and exists $document->{config}
+             and $document->{config} eq 'true') {
+
+        # configuration detected
+        my %new_conf = %{$document};
+
+        # overload default config with new, if found
+        $c{lang}{dunno}  = $new_conf{lang}{dunno}  if $new_conf{lang}{dunno};
+        $c{lang}{answer} = $new_conf{lang}{answer} if $new_conf{lang}{answer};
+        $c{lang}{claim}  = $new_conf{lang}{claim}  if $new_conf{lang}{claim};
+        $c{lang}{yes}    = $new_conf{lang}{yes}    if $new_conf{lang}{yes};
+        $c{lang}{no}     = $new_conf{lang}{no}     if $new_conf{lang}{no};
+    }
+    elsif ( ref $document eq 'HASH'
+                and exists $document->{config}
+                and $document->{config} eq 'false') {
+
+        # configuration detected, but disabled
+        # nothing the see here, move on
+        say   STDERR 'skipping disbaled configuration:';
+        print STDERR Dumper $document;
+    }
+    elsif (ref $document eq 'ARRAY') {
+        # no configuration detected
+        push @q, @{$document};
+    }
+    else {
+        say   STDERR 'skipping unexpected YAML document format:';
+        print STDERR Dumper $document;
+    }
+}
 
 my $question_count = scalar @q;
 
@@ -67,7 +117,7 @@ say '<body>';
 say '<h1>Questions</h1>';
 say $o->{quantity} . " randomly picked questions out of $question_count.";
 say '<table border="1">';
-say "<tr><th>Answer</th><th>Claim</th></tr>";
+say "<tr><th>$c{lang}{answer}</th><th>$c{lang}{claim}</th></tr>";
 
 my $difficulty_sum = 0;
 my $difficulty_avg = 0;
@@ -87,15 +137,15 @@ for my $question (@choosen) {
     say '<td>';
     if (ref($question->{answer}) eq 'HASH') {
         while (my ($answer, $bool) = each(%{$question->{answer}})) {
-            say "\x{2610} $answer" if $bool =~ /false/i;
-            say "\x{2611} $answer" if $bool =~ /true/i;
+            say "\x{2610} $answer<br>" if $bool =~ /false/i;
+            say "\x{2611} $answer<br>" if $bool =~ /true/i;
         }
     }
     else {
-        say "\x{2610} true \x{2611} false" if $question->{answer} =~ /false/i;
-        say "\x{2611} true \x{2610} false" if $question->{answer} =~ /true/i;
+        say "\x{2610} $c{lang}{yes}<br>\x{2611} $c{lang}{no}<br>" if $question->{answer} =~ /false/i;
+        say "\x{2611} $c{lang}{yes}<br>\x{2610} $c{lang}{no}<br>" if $question->{answer} =~ /true/i;
     }
-    say "\x{2610} don't know";
+    say "\x{2610} $c{lang}{dunno}";
     say '</td>';
     say '<td>';
     say encode_entities($question->{q});
@@ -139,7 +189,7 @@ mcp - pick multiple choice questions randomly
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -155,7 +205,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Boris Däppen.
+This software is copyright (c) 2019 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

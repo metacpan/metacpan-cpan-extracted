@@ -2,7 +2,7 @@
     # automatically generated file, don't edit
 
     package Number::Phone::Country::Data;
-    $VERSION = '2.20190912215320';
+    $VERSION = '2.20191211212157';
         %Number::Phone::Country::idd_codes = (
     20 => 'EG',
 211 => 'SS',
@@ -513,10 +513,6 @@ $Number::Phone::Country::idd_codes{38649} = 'XK';
 $Number::Phone::Country::idd_codes{800} = 'InternationalFreephone';
 $Number::Phone::Country::idd_codes{808} = 'SharedCostServices';
 $Number::Phone::Country::idd_codes{870} = 'Inmarsat';
-$Number::Phone::Country::idd_codes{871} = 'Inmarsat';
-$Number::Phone::Country::idd_codes{872} = 'Inmarsat';
-$Number::Phone::Country::idd_codes{873} = 'Inmarsat';
-$Number::Phone::Country::idd_codes{874} = 'Inmarsat';
 $Number::Phone::Country::idd_codes{878} = 'UniversalPersonalTelecoms';
 $Number::Phone::Country::idd_codes{881} = 'GMSS';
 $Number::Phone::Country::idd_codes{8810} = 'ICO';
@@ -529,7 +525,6 @@ $Number::Phone::Country::idd_codes{882} = 'InternationalNetworks';
 $Number::Phone::Country::idd_codes{88213} = 'Telespazio';
 $Number::Phone::Country::idd_codes{88216} = 'Thuraya';
 $Number::Phone::Country::idd_codes{88220} = 'GarudaMobile';
-$Number::Phone::Country::idd_codes{88234} = 'AQ';
 $Number::Phone::Country::idd_codes{883} = 'InternationalNetworks';
 $Number::Phone::Country::idd_codes{883120} = 'Telenor';
 $Number::Phone::Country::idd_codes{883130} = 'Mobistar';

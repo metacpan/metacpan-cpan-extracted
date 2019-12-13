@@ -23,23 +23,21 @@ no_index:
 provides:
   Math::Polynomial::ModInt:
     file: lib/Math/Polynomial/ModInt.pm
-    version: '0.002'
+    version: '0.004'
   Math::Polynomial::ModInt::Order:
     file: lib/Math/Polynomial/ModInt/Order.pm
-    version: '0.002'
+    version: '0.004'
+recommends:
+  Math::BigInt::GMP: '0'
 requires:
   Carp: '0'
   Math::BigInt: '0'
-  Math::ModInt: '0.011'
+  Math::ModInt: '0.012'
   Math::Polynomial: '1.015'
   perl: '5.006'
 resources:
-  X_prereqs:
-    runtime:
-      recommends:
-        Math::BigInt::GMP: 0
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Polynomial-ModInt
   license: https://www.perlfoundation.org/artistic-license-20.html
   repository: git://github.com/mhasch/perl-Math-Polynomial-ModInt.git
-version: '0.002'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,127 +2,199 @@ NAME
     Type::Tiny::Manual - an overview of Type::Tiny
 
 SYNOPSIS
-    Type::Tiny is a small class for writing type constraints, inspired by
-    Moose's type constraint API. It has only one non-core dependency (and even
-    that is simply a module that was previously distributed as part of
-    Type::Tiny but has since been spun off), and can be used with Moose, Mouse
-    and Moo (or none of the above).
+    Type::Tiny is a small Perl <http://www.perl.org/> class for writing type
+    constraints, inspired by Moose's type constraint API and MooseX::Types. It
+    has only one non-core dependency (and even that is simply a module that
+    was previously distributed as part of Type::Tiny but has since been spun
+    off), and can be used with Moose, Mouse, or Moo (or none of the above).
+
+    Type::Tiny is used by over 800 Perl distributions on the CPAN
+    (Comprehensive Perl Archive Network) and can be considered a stable and
+    mature framework for efficiently and reliably enforcing data types.
 
     Type::Tiny is bundled with Type::Library a framework for organizing type
-    constraints into collections.
+    constraints into collections. Also bundled is Types::Standard, a
+    Moose-inspired library of useful type constraints. Type::Params is also
+    provided, to allow very fast checking and coercion of function and method
+    parameters.
 
-    Also bundled is Types::Standard, a Moose-inspired library of useful type
-    constraints.
+    The following example gives you an idea of some of the features of these
+    modules. If you don't understand it all, that's fine; that's what the rest
+    of the manual is for. Although the example uses Moo, the `use Moo` could
+    be changed to `use Moose` or `use Mouse` and it would still work.
 
-    Type::Params is also provided, to allow very fast checking and coercion of
-    function and method parameters.
+     use v5.12;
+     use strict;
+     use warnings;
+ 
+     package Horse {
+       use Moo;
+       use Types::Standard qw( Str Int Enum ArrayRef InstanceOf );
+       use Type::Params qw( compile );
+       use namespace::autoclean;
+   
+       has name => (
+         is       => 'ro',
+         isa      => Str,
+         required => 1,
+       );
+       has gender => (
+         is       => 'ro',
+         isa      => Enum[qw( f m )],
+       );
+       has age => (
+         is       => 'rw',
+         isa      => Int->where( '$_ >= 0' ),
+       );
+       has children => (
+         is       => 'ro',
+         isa      => ArrayRef[ InstanceOf['Horse'] ],
+         default  => sub { return [] },
+       );
+   
+       sub add_child {
+         # method signature
+         state $check = compile( InstanceOf['Horse'], InstanceOf['Horse'] );
+     
+         my ($self, $child) = $check->(@_);   # unpack @_
+         push @{ $self->children }, $child;
+     
+         return $self;
+       }
+     }
+ 
+     package main;
+ 
+     my $boldruler = Horse->new(
+       name    => "Bold Ruler",
+       gender  => 'm',
+       age     => 16,
+     );
+ 
+     my $secretariat = Horse->new(
+       name    => "Secretariat",
+       gender  => 'm',
+       age     => 0,
+     );
+ 
+     $boldruler->add_child( $secretariat );
+ 
+     use Types::Standard qw( is_Object assert_Object );
+ 
+     # is_Object will return a boolean
+     #
+     if ( is_Object($boldruler) ) {
+       say $boldruler->name;
+     }
+ 
+     # assert_Object will return $secretariat or die
+     #
+     say assert_Object($secretariat)->name;
 
-SEE ALSO
-    *   Libraries - how to build a type library with Type::Tiny, Type::Library
-        and Type::Utils
+MANUAL
+    Even if you are using Type::Tiny with other object-oriented programming
+    toolkits (such as Moose or Mouse), you should start with the Moo sections
+    of the manual. Most of the information is directly transferrable and the
+    Moose and Mouse sections of the manual list the minor differences between
+    using Type::Tiny with Moo and with them.
 
-    *   Coercions - adding coercions to type constraints
+    In general, this manual assumes you use Perl 5.12 or above and may use
+    examples that do not work on older versions of Perl. Type::Tiny does work
+    on earlier versions of Perl, but not all the examples and features in the
+    manual will run without adjustment. (For instance, you may need to replace
+    `state` variables with lexical variables, avoid the `package NAME { BLOCK
+    }` syntax, etc.)
 
-    *   Using with Moose - how to use Type::Tiny and Type::Library with Moose
+    *   Type::Tiny::Manual::Installation
 
-    *   Using with Mouse - how to use Type::Tiny and Type::Library with Mouse
+        How to install Type::Tiny. If Type::Tiny is already installed, you can
+        skip this.
 
-    *   Using with Moo - how to use Type::Tiny and Type::Library with Moo
+    *   Type::Tiny::Manual::UsingWithMoo
 
-    *   Using with Other OO Frameworks - how to use Type::Tiny and
-        Type::Library with other OO frameworks
+        Basic use of Type::Tiny with Moo, including attribute type
+        constraints, parameterized type constraints, coercions, and method
+        parameter checking.
 
-    *   Type::Tiny and friends don't need to be used within an OO framework.
-        See FreeMind::Node for an example that does not.
+    *   Type::Tiny::Manual::UsingWithMoo2
 
-    *   Processing arguments to subs - coerce and validate arguments to
-        functions and methods.
+        Advanced use of Type::Tiny with Moo, including unions and
+        intersections, `stringifies_to`, `numifies_to`,
+        `with_attribute_values`, and `where`.
 
-    *   Other modules using Type::Tiny in interesting ways: Type::Tie,
-        Test::Mocha, Scalar::Does, Set::Equivalence...
+    *   Type::Tiny::Manual::UsingWithMoo3
 
-    *   Optimization - squeeze the most out of your CPU.
+        There's more than one way to do it! Alternative ways of using
+        Type::Tiny, including type registries, exported functions, and
+        `dwim_type`.
 
-    *   Type::Tiny maintenance policies - the stability policy.
+    *   Type::Tiny::Manual::Libraries
 
-DEPENDENCIES
-    Type::Tiny requires at least Perl 5.6.1, though certain Unicode-related
-    features (e.g. non-ASCII type constraint names) may work better in newer
-    versions of Perl.
+        Defining your own type libraries, including extending existing
+        libraries, defining new types, adding coercions, defining
+        parameterizable types, and the declarative style.
 
-    Type::Tiny requires Exporter::Tiny, a module that was previously bundled
-    in this distribution, but has since been spun off as a separate
-    distribution. Don't worry - it's quick and easy to install.
+    *   Type::Tiny::Manual::UsingWithMoose
 
-    At run-time, Type::Tiny also requires the following modules: B,
-    B::Deparse, Carp, Data::Dumper, Scalar::Util, Text::Balanced, overload,
-    strict and warnings. All of these come bundled with Perl itself. Prior to
-    Perl 5.8, Scalar::Util and Text::Balanced do not come bundled with Perl
-    and will need installing separately from the CPAN.
+        How to use Type::Tiny with Moose, including the advantages of
+        Type::Tiny over built-in type constraints, and Moose-specific
+        features.
 
-    Certain features require additional modules. Tying a variable to a type
-    constraint (e.g. `tie my $count, Int`) requires Type::Tie; stack traces on
-    exceptions require Devel::StackTrace. The Reply::Plugin::TypeTiny plugin
-    for Reply requires Reply (obviously). Devel::LexAlias may *slightly*
-    increase the speed of some of Type::Tiny's compiled coderefs.
+    *   Type::Tiny::Manual::UsingWithMouse
 
-    Type::Tiny::XS is not required, but if available provides a speed boost
-    for some type checks. (Setting the environment variable
-    `PERL_TYPE_TINY_XS` to false, or setting `PERL_ONLY` to true will suppress
-    the use of Type::Tiny::XS, even if it is available.)
+        How to use Type::Tiny with Mouse, including the advantages of
+        Type::Tiny over built-in type constraints, and Mouse-specific
+        features.
 
-    The test suite additionally requires Test::More, Test::Fatal and
-    Test::Requires. Test::More comes bundled with Perl, but if you are using a
-    version of Perl older than 5.14, you will need to upgrade to at least
-    Test::More version 0.96. Test::Requires and Test::Fatal (plus Try::Tiny
-    which Test::Fatal depends on) are bundled with Type::Tiny in the `inc`
-    directory, so you do not need to install them separately.
+    *   Type::Tiny::Manual::UsingWithClassTiny
 
-    If using Type::Tiny in conjunction with Moo, then at least Moo 1.000000 is
-    recommended. If using Type::Tiny with Moose, then at least Moose 2.0000 is
-    recommended. If using Type::Tiny with Mouse, then at least Mouse 1.00 is
-    recommended. Type::Tiny is mostly untested against older versions of these
-    packages.
+        Including how to Type::Tiny in your object's `BUILD` method, and
+        third-party shims between Type::Tiny and Class::Tiny.
 
-TYPE::TINY VERSUS X
-  Specio
-    Type::Tiny is similar in aim to Specio. The major differences are
+    *   Type::Tiny::Manual::UsingWithOther
 
-    *   Type::Tiny is "tiny" (Specio will eventually have fewer dependencies
-        than it currently does, but is unlikely to ever have as few as
-        Type::Tiny);
+        Using Type::Tiny with Class::InsideOut, Params::Check, and
+        Object::Accessor.
 
-    *   Specio has a somewhat nicer API (better method names; less
-        duplication), and its API is likely to improve further. Type::Tiny's
-        aims at complete compatibility with current versions of Moose and
-        Mouse, so there is a limit to how much I can deviate from the existing
-        APIs of (Moose|Mouse)::Meta::TypeConstraint.
+    *   Type::Tiny::Manual::UsingWithTestMore
 
-  MooseX::Types
-    Type::Tiny libraries expose a similar interface to MooseX::Types
-    libraries. In most cases you should be able to rewrite a MooseX::Types
-    library to use Type::Tiny pretty easily.
+        Type::Tiny for test suites.
 
-  MooX::Types::MooseLike
-    Type::Tiny is faster and supports coercions.
+    *   Type::Tiny::Manual::Params
 
-  Scalar::Does
-    Scalar::Does is somewhat of a precursor to Type::Tiny, but has now been
-    rewritten to use Type::Tiny internally.
+        Advanced information on Type::Params, and using Type::Tiny with other
+        signature modules like Function::Parameters and Kavorka.
 
-    It gives you a `does($value, $type)` function that is roughly equivalent
-    to `$type->check($value)` except that $type may be one of a list of
-    pre-defined strings (instead of a Type::Tiny type constraint); or may be a
-    package name in which case it will be assumed to be a role and checked
-    with `$value->DOES($type)`.
+    *   Type::Tiny::Manual::NonOO
+
+        Type::Tiny in non-object-oriented code.
+
+    *   Type::Tiny::Manual::Optimization
+
+        Squeeze the most out of your CPU.
+
+    *   Type::Tiny::Manual::Coercions
+
+        Advanced information on coercions.
+
+    *   Type::Tiny::Manual::AllTypes
+
+        An alphabetical list of all type constraints bundled with Type::Tiny.
+
+    *   Type::Tiny::Manual::Policies
+
+        Policies related to Type::Tiny development.
+
+    *   Type::Tiny::Manual::Contributing
+
+        Contributing to Type::Tiny development.
 
 BUGS
     Please report any bugs to
     <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
-SUPPORT
-    IRC: support is available through in the *#moops* channel on irc.perl.org
-    <http://www.irc.perl.org/channels.html>.
+SEE ALSO
+    The Type::Tiny homepage <http://typetiny.toby.ink/>.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.

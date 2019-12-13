@@ -48,15 +48,9 @@ sub to_filter {
         push @values, "$operator $arg";
     }
 
-    if( $self->{operator} eq 'LENGTH' ) {
-        return '(' . join( ' ', $self->{operator},
-                                $self->{property}->to_filter,
-                                join( ', ', @values ) ) . ')';
-    } else {
-        return '(' . join( ' ', $self->{property}->to_filter,
-                                $self->{operator},
-                                join( ', ', @values ) ) . ')';
-    }
+    return '(' . join( ' ', $self->{property}->to_filter,
+                            $self->{operator},
+                            join( ', ', @values ) ) . ')';
 }
 
 sub to_SQL

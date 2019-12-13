@@ -1,4 +1,4 @@
-use Test::More tests => 60;
+use Test::More tests => 63;
 use PDL::LiteF;
 use Config;
 kill INT,$$ if $ENV{UNDER_DEBUGGER}; # Useful for debugging.
@@ -242,4 +242,19 @@ SKIP:
   cmp_ok longlong(1000000000000000001) - longlong(1000000000000000000),  '==', 1, "longlong precision/4";
   cmp_ok longlong(9223372036854775807) - longlong(9223372036854775806),  '==', 1, "longlong precision/5";
   cmp_ok longlong(9223372036854775807) + longlong(-9223372036854775808), '==',-1, "longlong precision/6";
+}
+
+is(~pdl(1,2,3)              ."", '[-2 -3 -4]', 'bitwise negation');
+is((pdl(1,2,3) ^ pdl(4,5,6))."", '[5 7 5]'   , 'bitwise xor'     );
+
+SKIP: {
+skip 'No BADVAL', 1 if !$PDL::Config{WITH_BADVAL};
+# Check badflag propagation with .= (Ops::assgn) sf.net bug 3543056
+$a = sequence(10);
+$b = sequence(5);
+$b->inplace->setvaltobad(3);
+$a->slice('0:4') .= $b;
+$a->badflag(1);
+$a->check_badflag();
+ok($a->badflag == 1 && $a->nbad == 1, 'badflag propagation with .=');
 }

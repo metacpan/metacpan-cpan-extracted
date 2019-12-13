@@ -10,6 +10,8 @@ README.md
 bin/mcp
 bin/mcp-dump
 dist.ini
+examples/config/config_last.yml
+examples/config/language.yml
 examples/questions/binary_choice.yml
 examples/questions/mixed_choice.yml
 examples/questions/multiple_choice.yml

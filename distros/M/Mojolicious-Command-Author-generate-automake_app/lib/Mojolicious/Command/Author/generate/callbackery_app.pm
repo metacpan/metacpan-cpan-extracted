@@ -8,7 +8,7 @@ use Mojo::File;
 use POSIX qw(strftime);
 use Cwd 'getcwd';
 use File::Spec::Functions qw(catdir catfile);
-our $VERSION = '0.1.5';
+our $VERSION = '0.2.1';
 has description => 'Generate Callbackery web application with Automake';
 has usage => sub { shift->extract_usage };
 

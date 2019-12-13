@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::Most;
 
 BEGIN {
 	if($ENV{RELEASE_TESTING}) {

@@ -1,0 +1,204 @@
+#!/usr/bin/env perl
+# ABSTRACT: Little Restart Runner (Really)
+# PODNAME: lrrr
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     lrrr [--watch|-w <dir>]... <command>
+#pod     lrrr --help|-h
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This program will watch one or more directories and re-run the given
+#pod command when the contents of the files in those directories changes.
+#pod
+#pod This program was heavily copied and only slightly modified from
+#pod L<Mojo::Server::Morbo>. This program is useful when working in an
+#pod environment that can't use C<morbo> (a non-Mojolicious program, or a
+#pod PSGI Mojolicious server).
+#pod
+#pod =head2 Backends
+#pod
+#pod This program uses L<Mojo::Server::Morbo::Backend> classes to do the
+#pod heavy lifting. The default is L<Mojo::Server::Morbo::Backend::Poll>.
+#pod Choose a specific one by setting C<MOJO_MORBO_BACKEND>.
+#pod
+#pod =head1 OPTIONS
+#pod
+#pod =head2 C<-w>, C<--watch>
+#pod
+#pod A directory or directories to watch. Defaults to the first argument (if
+#pod it's a path to a file) and the C<lib> and C<templates> directories in
+#pod the current directory.
+#pod
+#pod =head1 ENVIRONMENT
+#pod
+#pod =over
+#pod
+#pod =item C<MOJO_MORBO_BACKEND>
+#pod
+#pod Choose a specific backend for watching file changes. The default is
+#pod C<Poll> (L<Mojo::Server::Morbo::Backend::Poll>).
+#pod
+#pod =item C<MORBO_VERBOSE>
+#pod
+#pod If true, will write which files were changed to STDOUT when restarting.
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<Mojo::Server::Morbo>
+#pod
+#pod =head1 AUTHOR
+#pod
+#pod (E<0xa9> 2019) Sebastian Riedel and the Mojolicious developers
+#pod (E<0xa9>) Grant Street Group
+#pod
+#pod =cut
+
+use v5.16;
+use Mojo::Base -strict;
+use Mojo::Loader qw( load_class );
+use Pod::Usage qw( pod2usage );
+use Getopt::Long qw( GetOptions );
+use POSIX 'WNOHANG';
+
+my %opt;
+GetOptions( \%opt,
+    'watch|w=s@',
+    'help|h' => sub { pod2usage(1) },
+);
+
+if ( !$opt{ watch } ) {
+    $opt{ watch } = \[ qw( lib templates ) ];
+    if ( -f $ARGV[0] ) {
+        push @${$opt{watch}}, $ARGV[0];
+    }
+}
+
+my $backend_class = 'Mojo::Server::Morbo::Backend::' . ( $ENV{MOJO_MORBO_BACKEND} // 'Poll' );
+if ( my $e = load_class $backend_class ) {
+    die $e if ref $e;
+    die "Could not find class $backend_class in \@INC (\@INC includes @INC)\n";
+}
+
+my $backend = $backend_class->new( watch => ${ $opt{watch} } );
+my $finished = 0;
+my $worker_pid = 0;
+my $modified = 1;
+
+# Clean manager environment
+local $SIG{INT} = local $SIG{TERM} = sub {
+    $finished = 1;
+    kill 'TERM', $worker_pid if $worker_pid;
+};
+
+_manage( $backend ) until $finished && !$worker_pid;
+
+sub _manage {
+    my ( $backend ) = @_;
+    if (my @files = @{$backend->modified_files}) {
+        say @files == 1
+            ? qq{File "@{[$files[0]]}" changed, restarting.}
+            : qq{@{[scalar @files]} files changed, restarting.}
+                if $ENV{MORBO_VERBOSE};
+        kill 'TERM', $worker_pid if $worker_pid;
+        $modified = 1;
+    }
+
+    if ($worker_pid && waitpid( $worker_pid, WNOHANG ) == $worker_pid ) {
+        $worker_pid = 0;
+    }
+
+    if ( !$worker_pid && $modified ) {
+        $modified = 0;
+        _spawn();
+    }
+}
+
+sub _spawn {
+    # Manager
+    my $manager = $$;
+    die "Can't fork: $!" unless defined(my $pid = $worker_pid = fork);
+    return if $pid;
+    # Worker
+    exec @ARGV;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+lrrr - Little Restart Runner (Really)
+
+=head1 VERSION
+
+version v0.0.2
+
+=head1 SYNOPSIS
+
+    lrrr [--watch|-w <dir>]... <command>
+    lrrr --help|-h
+
+=head1 DESCRIPTION
+
+This program will watch one or more directories and re-run the given
+command when the contents of the files in those directories changes.
+
+This program was heavily copied and only slightly modified from
+L<Mojo::Server::Morbo>. This program is useful when working in an
+environment that can't use C<morbo> (a non-Mojolicious program, or a
+PSGI Mojolicious server).
+
+=head2 Backends
+
+This program uses L<Mojo::Server::Morbo::Backend> classes to do the
+heavy lifting. The default is L<Mojo::Server::Morbo::Backend::Poll>.
+Choose a specific one by setting C<MOJO_MORBO_BACKEND>.
+
+=head1 OPTIONS
+
+=head2 C<-w>, C<--watch>
+
+A directory or directories to watch. Defaults to the first argument (if
+it's a path to a file) and the C<lib> and C<templates> directories in
+the current directory.
+
+=head1 ENVIRONMENT
+
+=over
+
+=item C<MOJO_MORBO_BACKEND>
+
+Choose a specific backend for watching file changes. The default is
+C<Poll> (L<Mojo::Server::Morbo::Backend::Poll>).
+
+=item C<MORBO_VERBOSE>
+
+If true, will write which files were changed to STDOUT when restarting.
+
+=head1 SEE ALSO
+
+L<Mojo::Server::Morbo>
+
+=head1 AUTHOR
+
+(E<0xa9> 2019) Sebastian Riedel and the Mojolicious developers
+(E<0xa9>) Grant Street Group
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

@@ -70,7 +70,7 @@
    "provides" : {
       "Sweat" : {
          "file" : "lib/Sweat.pm",
-         "version" : "201909240"
+         "version" : "201912110"
       },
       "Sweat::Article" : {
          "file" : "lib/Sweat/Article.pm"
@@ -93,10 +93,11 @@
          "web" : "https://github.com/jmacdotorg/sweat"
       }
    },
-   "version" : "201909240",
+   "version" : "201912110",
    "x_authority" : "cpan:JMAC",
    "x_contributors" : [
-      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Tim Vroom <vroom@ziprecruiter.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1

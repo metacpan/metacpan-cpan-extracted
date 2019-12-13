@@ -2,10 +2,11 @@ package Text::Markup::Trac;
 
 use 5.8.1;
 use strict;
+use warnings;
 use File::BOM qw(open_bom);
 use Text::Trac '0.10';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
@@ -15,7 +16,9 @@ sub parser {
     my $html = $trac->parse(<$fh>);
     return unless $html =~ /\S/;
     utf8::encode($html);
+    return $html if $opts->{raw};
     return qq{<html>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
@@ -36,6 +39,7 @@ Text::Markup::Trac - Trac wiki syntax parser for Text::Markup
 =head1 Synopsis
 
   my $html = Text::Markup->new->parse(file => 'README.trac');
+  my $raw  = Text::Markup->new->parse(file => 'README.trac', raw => 1);
 
 =head1 Description
 
@@ -57,13 +61,17 @@ It recognizes files with the following extensions as Trac:
 
 =back
 
+Normally this module returns the output wrapped in a minimal HTML document
+skeleton. If you would like the raw output without the skeleton, you can pass
+the C<raw> option to C<parse>.
+
 =head1 Author
 
 David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2014 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2019 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

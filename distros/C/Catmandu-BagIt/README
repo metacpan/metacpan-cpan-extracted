@@ -231,13 +231,16 @@ METHODS
 
     Get a Catmandu::BagIt::Payload object for the file $filename.
 
- add_file($filename, $string)
+ add_file($filename, $string, %opts)
 
- add_file($filename, IO::File->new(...))
+ add_file($filename, IO::File->new(...), %opts)
 
- add_file($filaname, sub { my $io = shift; .... })
+ add_file($filaname, sub { my $io = shift; .... }, %opts)
 
-    Add a new file to the BagIt.
+    Add a new file to the BagIt. Possible options:
+
+        overwrite => 1    - remove the old file
+        md5  => ""        - supply an MD5 (don't recalculate it)
 
  remove_file($filename)
 
@@ -271,6 +274,10 @@ SEE ALSO
 AUTHOR
 
     Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>
+
+CONTRIBUTORS
+
+    Nicolas Franck, nicolas.franck at ugent.be
 
 COPYRIGHT AND LICENSE
 

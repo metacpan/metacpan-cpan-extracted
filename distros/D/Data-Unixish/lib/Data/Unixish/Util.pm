@@ -1,7 +1,7 @@
 package Data::Unixish::Util;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '1.570'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '1.572'; # VERSION
 
 use strict;
 use warnings;
@@ -44,7 +44,7 @@ Data::Unixish::Util - Utility routines
 
 =head1 VERSION
 
-This document describes version 1.570 of Data::Unixish::Util (from Perl distribution Data-Unixish), released on 2019-01-06.
+This document describes version 1.572 of Data::Unixish::Util (from Perl distribution Data-Unixish), released on 2019-10-26.
 
 =head1 EXPORTS
 

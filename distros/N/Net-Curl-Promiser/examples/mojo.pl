@@ -30,12 +30,10 @@ for my $url (@urls) {
     $handle->setopt( CURLOPT_URL() => $url );
     $handle->setopt( CURLOPT_FOLLOWLOCATION() => 1 );
 
-    push @promises, $promiser->add_handle($handle)->then(
+    push @promises, $promiser->add_handle_p($handle)->then(
         sub { print "$url completed.$/" },
         sub { warn "$url failed: " . shift },
     );
 }
 
-Promise::ES6->all(\@promises)->finally( sub { Mojo::IOLoop->stop() } );
-
-Mojo::IOLoop->start();
+Mojo::Promise->all(@promises)->wait();

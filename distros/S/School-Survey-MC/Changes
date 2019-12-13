@@ -1,5 +1,11 @@
 Revision history for School-Survey-MC
  
+0.004     2019-12-10 22:53:56+01:00 Europe/Zurich
+ - add config (lang) to input file format
+ - allow multiple filenames as arguments (greedy)
+ - make some more sence of the regex in the tests
+ - added some tests and examples
+
 0.003     2019-05-06 21:04:10+02:00 Europe/Zurich
  - fix buggy 'say' replacement
  - add tests which run with example input

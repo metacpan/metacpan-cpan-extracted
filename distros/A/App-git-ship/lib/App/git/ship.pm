@@ -12,7 +12,7 @@ use Mojo::Util qw(decode encode);
 use constant DEBUG  => $ENV{GIT_SHIP_DEBUG}  || 0;
 use constant SILENT => $ENV{GIT_SHIP_SILENT} || 0;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 # Need to be overridden in subclass
 sub build { $_[0]->abort('build() is not available for %s', ref $_[0]) }
@@ -113,7 +113,7 @@ sub run_hook {
 
 sub ship {
   my $self     = shift;
-  my ($branch) = qx(git branch) =~ /\* (.+)$/m;
+  my ($branch) = qx(git branch --no-color) =~ /\* (.+)$/m;
   my ($remote) = qx(git remote -v) =~ /^origin\s+(.+)\s+\(push\)$/m;
 
   $self->abort("Cannot ship without a current branch") unless $branch;
@@ -260,7 +260,7 @@ App::git::ship - Git command for shipping your project
 
 =head1 VERSION
 
-0.33
+0.34
 
 =head1 SYNOPSIS
 
@@ -497,7 +497,7 @@ Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 mohawk2 - C<mohawk2@users.noreply.github.com>
 
-Rolf Stöckli - C<tekki@cpan.org>.
+Rolf Stöckli - C<tekki@cpan.org>
 
 Shoichi Kaji - C<skaji@cpan.org>
 

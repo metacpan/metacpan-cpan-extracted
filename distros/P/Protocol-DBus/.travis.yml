@@ -3,6 +3,7 @@ os:
   - linux
 #  - osx    #doesn’t install the correct perl
 perl:
+  - "5.30"
   - "5.28"
   - "5.26"
   - "5.24"

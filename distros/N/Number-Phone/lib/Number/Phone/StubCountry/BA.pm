@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215423;
+our $VERSION = 1.20191211212259;
 
 my $formatters = [
                 {
@@ -34,7 +34,7 @@ my $formatters = [
                 {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
-            6[1-356]|
+            6[1-3]|
             [7-9]
           ',
                   'national_rule' => '0$1',
@@ -42,7 +42,10 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2-$3',
-                  'leading_digits' => '[3-5]',
+                  'leading_digits' => '
+            [3-5]|
+            6[56]
+          ',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 },
@@ -98,15 +101,13 @@ my $validators = {
           )\\d{5}
         ',
                 'mobile' => '
+          6040[0-4]\\d{4}|
           6(?:
-            0(?:
-              3\\d|
-              40
-            )|
-            [1-356]\\d|
-            44[0-6]|
-            71[137]
-          )\\d{5}
+            03|
+            [1-356]|
+            44|
+            7\\d
+          )\\d{6}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -150,6 +151,8 @@ $areanames{bs}->{38737} = "Unsko\-sanski\ kanton";
 $areanames{bs}->{38738} = "Bosansko\-podrinjski\ kanton\ Goražde";
 $areanames{bs}->{38739} = "Zapadnohercegovački\ kanton";
 $areanames{bs}->{3874} = "Brčko\ Distrikt";
+$areanames{bs}->{38750} = "Mrkonjić\ Grad";
+$areanames{bs}->{38751} = "Banja\ Luka";
 $areanames{bs}->{38752} = "Prijedor";
 $areanames{bs}->{38753} = "Doboj";
 $areanames{bs}->{38754} = "Šamac";

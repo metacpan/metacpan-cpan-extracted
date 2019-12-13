@@ -2,16 +2,18 @@
 
 use ExtUtils::testlib;
 use Test::More ;
-use Test::Warn 0.11;
+use Test::Log::Log4perl;
 use Tk;
 use Config::Model::TkUI;
-use Config::Model ;
+use Config::Model 2.137;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 
 use strict;
 use warnings;
 
 use lib 't/lib';
+
+$::_use_log4perl_to_warn = 1;
 
 sub test_all {
     my ($mw, $delay,$test_ref) = @_ ;
@@ -107,107 +109,134 @@ SKIP: {
 	 sub { $cmu->reload ; ok(1,"forced test: reload") } ,
 	) ;
 
-    push @test,
-     sub { $cmu->{elt_filter_value} = 'aa2'; $cmu->reload ;},
-     sub { $cmu->{elt_filter_value} = 'bb2'; $cmu->reload ;},
-     sub { $cmu->{elt_filter_value} = '[ab]+2'; $cmu->reload ;},
-     sub { $cmu->{elt_filter_value} = ''; $cmu->reload ;},
-     sub { $cmu->create_element_widget('edit','test1'); ok(1,"test ".$idx++)},
-     sub { $inst->show_message("Hello World")},
-	 sub { $cmu->force_element_display($root->grab('std_id:dd DX')) ; ok(1,"test ".$idx++)},
-	 sub { $cmu->edit_copy('test1.std_id'); ok(1,"test ".$idx++)},
-	 sub { $cmu->force_element_display($root->grab('hash_a:titi')) ; ok(1,"test grab 'hash_a:titi' ".$idx++)},
-	 sub { $cmu->edit_copy('test1.hash_a.titi'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('view','test1'); ok(1,"test ".$idx++)},
-	 sub { $tktree->open('test1.lista') ; ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('edit','test1.std_id');; ok(1,"test ".$idx++)},
-	 sub { $cmu->{editor}->add_entry('e'); ok(1,"test ".$idx++)},
-	 sub { $tktree->open('test1.std_id') ; ok(1,"test ".$idx++)},
-	 sub { $cmu->reload; ok(1,"test reload ".$idx++)} ,
-	 sub { $cmu->create_element_widget('view','test1.std_id'); ok(1,"test ".$idx++)},
-     sub { $inst->show_message("Hello again World")},
-	 sub { $cmu->create_element_widget('edit','test1.std_id'); ok(1,"test ".$idx++)},
-	 sub { $tktree->open('test1.std_id.ab') ; ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('view','test1.std_id.ab.Z'); ok(1,"test ".$idx++)},
-	 sub { $root->load(step => "std_id:ab Z=Cv") ; $cmu->reload ;; ok(1,"test load ".$idx++)},
-	 sub { $tktree->open('test1.std_id.ab') ; ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('edit','test1.std_id.ab.DX'); ok(1,"test ".$idx++)},
-	 sub { $root->load(step => "std_id:ab3") ; $cmu->reload ;; ok(1,"test load ".$idx++)} ,
-	 sub { $cmu->create_element_widget('view','test1.a_very_long_string'); ok(1,"test diff view ".$idx++)},
-	 sub { $cmu->create_element_widget('view','test1.string_with_def'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('edit','test1.string_with_def'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('view','test1.a_long_string'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('edit','test1.a_long_string'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('view','test1.int_v'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('edit','test1.int_v'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('view','test1.my_plain_check_list'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('edit','test1.my_plain_check_list'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('view','test1.my_ref_check_list'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('edit','test1.my_ref_check_list'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('view','test1.my_reference'); ok(1,"test ".$idx++)},
-	 sub { $cmu->create_element_widget('edit','test1.my_reference'); ok(1,"test ".$idx++)},
+    if (not $args->{show}) {
+        my $log_tester = Test::Log::Log4perl->get_logger("User");
 
-     sub { my $name = "check_list_with_upstream_default";
-           my $clwud = $root->grab(step => $name) ;
-           $cmu->force_element_display($clwud);
-           ok(1,"show check list with upstream value ".$idx++)} ,
-     sub { my $name = "check_list_with_upstream_default";
-           my $clwud = $root->grab(step => $name) ;
-           my @set = $clwud->get_choice; $clwud->check(@set);
-           $cmu->force_element_display($clwud);
-           ok(1,"test check list with upstream data ".$idx++)} ,
+        push @test,
+            sub { $cmu->{elt_filter_value} = 'aa2'; $cmu->reload ;},
+            sub { $cmu->{elt_filter_value} = 'bb2'; $cmu->reload ;},
+            sub { $cmu->{elt_filter_value} = '[ab]+2'; $cmu->reload ;},
+            sub { $cmu->{elt_filter_value} = ''; $cmu->reload ;},
+            sub { $cmu->create_element_widget('edit','test1'); ok(1,"test ".$idx++)},
+            sub { $inst->show_message("Hello World")},
+            sub { $cmu->force_element_display($root->grab('std_id:dd DX')) ; ok(1,"test ".$idx++)},
+            sub { $cmu->edit_copy('test1.std_id'); ok(1,"test ".$idx++)},
+            sub { $cmu->force_element_display($root->grab('hash_a:titi')) ; ok(1,"test grab 'hash_a:titi' ".$idx++)},
+            sub { $cmu->edit_copy('test1.hash_a.titi'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('view','test1'); ok(1,"test ".$idx++)},
+            sub { $tktree->open('test1.lista') ; ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('edit','test1.std_id');; ok(1,"test ".$idx++)},
+            sub { $cmu->{editor}->add_entry('e'); ok(1,"test ".$idx++)},
+            sub { $tktree->open('test1.std_id') ; ok(1,"test ".$idx++)},
+            sub { $cmu->reload; ok(1,"test reload ".$idx++)} ,
+            sub { $cmu->create_element_widget('view','test1.std_id'); ok(1,"test ".$idx++)},
+            sub { $inst->show_message("Hello again World")},
+            sub { $cmu->create_element_widget('edit','test1.std_id'); ok(1,"test ".$idx++)},
+            sub { $tktree->open('test1.std_id.ab') ; ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('view','test1.std_id.ab.Z'); ok(1,"test ".$idx++)},
+            sub { $root->load(step => "std_id:ab Z=Cv") ; $cmu->reload ;; ok(1,"test load ".$idx++)},
+            sub { $tktree->open('test1.std_id.ab') ; ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('edit','test1.std_id.ab.DX'); ok(1,"test ".$idx++)},
+            sub { $root->load(step => "std_id:ab3") ; $cmu->reload ;; ok(1,"test load ".$idx++)} ,
+            sub { $cmu->create_element_widget('view','test1.a_very_long_string'); ok(1,"test diff view ".$idx++)},
+            sub { $cmu->create_element_widget('view','test1.string_with_def'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('edit','test1.string_with_def'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('view','test1.a_long_string'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('edit','test1.a_long_string'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('view','test1.int_v'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('edit','test1.int_v'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('view','test1.my_plain_check_list'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('edit','test1.my_plain_check_list'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('view','test1.my_ref_check_list'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('edit','test1.my_ref_check_list'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('view','test1.my_reference'); ok(1,"test ".$idx++)},
+            sub { $cmu->create_element_widget('edit','test1.my_reference'); ok(1,"test ".$idx++)};
 
-	 sub { $root->load(step => "ordered_checklist=A,Z,G") ; $cmu->reload ;; ok(1,"test load ".$idx++)} ,
-	 sub { $widget = $cmu->create_element_widget('edit','test1.ordered_checklist'); ok(1,"test ".$idx++)},
-	 sub { $widget->Subwidget('notebook')->raise('order') ;; ok(1,"test notebook raise 1 ".$idx++)},
-	 sub { $widget->Subwidget('notebook')->raise('order') ;; ok(1,"test notebook raise 2 ".$idx++)},
-	 sub { $widget->{order_list}->selectionSet(1,1) ;; ok(1,"test selectionSet ".$idx++)}, # Z
-	 sub { $widget->move_selected_down ; ok(1,"test move_selected_down ".$idx++)},
-	 # cannot save with pending errors sub { $cmu->save(); ok(1,"test save 1 ".$idx++)},
-	 sub {
-	     #for ($cmu->children) { $_->destroy if $_->name =~ /dialog/i; } ;
-	     $root->load($load_fix);; ok(1,"test load_fix ".$idx++)},
-	 sub { $cmu->save(); ok(1,"test save 2 ".$idx++)},
-	 sub { $cmu->create_element_widget('edit','test1.always_warn');
-		$cmu -> force_element_display($root->grab('always_warn')) ; 
-	    ; ok(1,"test always_warn ".$idx++)},
+        push @test, sub {
+            my $name = "check_list_with_upstream_default";
+            my $clwud = $root->grab(step => $name) ;
+            $cmu->force_element_display($clwud);
+            ok(1,"show check list with upstream value ".$idx++)
+        };
+        push @test, sub {
+            my $name = "check_list_with_upstream_default";
+            my $clwud = $root->grab(step => $name) ;
+            my @set = $clwud->get_choice; $clwud->check(@set);
+            $cmu->force_element_display($clwud);
+            ok(1,"test check list with upstream data ".$idx++)
+        };
 
-	 # warn test, 3 warnings: load, fetch for hlist, fetch for editor
-	 sub { warnings_like { $root->load("always_warn=foo") ; $cmu->reload ;}
-	       [ ( qr/always/ ) x 2 ] ,"warn test always_warn 2 ".$idx++ ;
-	     },
-	 sub { $root->load('always_warn~') ; $cmu->reload ;; ok(1,"test remove always_warn ".$idx++)},
+        push @test,
+            sub { $root->load(step => "ordered_checklist=A,Z,G") ; $cmu->reload ;; ok(1,"test load ".$idx++)} ,
+            sub { $widget = $cmu->create_element_widget('edit','test1.ordered_checklist'); ok(1,"test ".$idx++)},
+            sub { $widget->Subwidget('notebook')->raise('order') ;; ok(1,"test notebook raise 1 ".$idx++)},
+            sub { $widget->Subwidget('notebook')->raise('order') ;; ok(1,"test notebook raise 2 ".$idx++)},
+            sub { $widget->{order_list}->selectionSet(1,1) ;; ok(1,"test selectionSet ".$idx++)}, # Z
+            sub { $widget->move_selected_down ; ok(1,"test move_selected_down ".$idx++)},
+            # cannot save with pending errors sub { $cmu->save(); ok(1,"test save 1 ".$idx++)},
+            sub {
+                #for ($cmu->children) { $_->destroy if $_->name =~ /dialog/i; } ;
+                $root->load($load_fix);; ok(1,"test load_fix ".$idx++)
+            },
+            sub { $cmu->save(); ok(1,"test save 2 ".$idx++)},
+            sub {
+                $cmu->create_element_widget('edit','test1.always_warn');
+                $cmu -> force_element_display($root->grab('always_warn')) ;
+                ok(1,"test always_warn ".$idx++);
+            };
 
-	 sub { $cmu->create_element_widget('edit','test1.warn_unless');
-	       $cmu -> force_element_display($root->grab('warn_unless')) ; 
-	       ok(1,"test warn_unless ".$idx++);
-	     },
+        # warn test, 3 warnings: load, fetch for hlist, fetch for editor
+        push @test, sub {
+            Test::Log::Log4perl->start(ignore_priority => "info");
+            $log_tester->warn(qr/always/);
+            $root->load("always_warn=foo") ;
+            $cmu->reload ;
+            Test::Log::Log4perl->end("always_warn logged a warning".$idx++) ;
+        };
 
-	 sub { warnings_like { $root->load("warn_unless=bar") ; $cmu->reload ;}
-	       [ ( qr/warn_unless/ ) x 2 ] ,"warn test warn_unless ".$idx++ ;
-	     },
-	 sub { $root->load('warn_unless=foo2') ; $cmu->reload ;; ok(1,"test fix warn_unless ".$idx++)},
-     sub { $cmu ->show_changes ; ok(1,"test show_changes ".$idx++)} ,
+        push @test, sub {
+            $root->load('always_warn~') ;
+            $cmu->reload ;
+            ok(1,"test remove always_warn ".$idx++)
+        };
 
-     (
-         # test behavior when pasting data in tktree
-         # the 3 first items show an error message in TkUI message widget (bottom of widget)
-         map { ## no critic (ProhibitComplexMappings)
-             my $elt = $_;
-             sub {
-                 $cmu->on_cut_buffer_dump("test1.$elt", "test cut buffer dump string");
-                 ok(1,"test cut_buffer_dump on element $elt ".$idx++)
-             };
-         } qw/a_uniline olist ordered_checklist a_uniline lista/
-     ),
+        push @test, sub {
+            $cmu->create_element_widget('edit','test1.warn_unless');
+            $cmu -> force_element_display($root->grab('warn_unless')) ;
+            ok(1,"test warn_unless ".$idx++);
+        };
 
-     sub { $cmu->{hide_empty_values} = 1 ; ok(1,"test hide empty value ".$idx++); },
-     sub { $cmu->{show_only_custom}  = 1 ; ok(1,"test show only custom and hide empty value ".$idx++); },
-     sub { $cmu->{hide_empty_values} = 0 ; ok(1,"show empty value ".$idx++); },
-     sub { $cmu->{show_only_custom}  = 0 ; ok(1,"disable show only custom values ".$idx++); },
+        push @test, sub {
+            Test::Log::Log4perl->start(ignore_priority => "info");
+            $log_tester->warn(qr/warn_unless/);
+            $root->load("warn_unless=bar") ;
+            $cmu->reload ;
+            Test::Log::Log4perl->end("warn_unless logged a warning".$idx++) ;
+        };
 
-	 sub { $mw->destroy; },
-        unless $args->{show};
+        push @test,
+            sub { $root->load('warn_unless=foo2') ; $cmu->reload ;; ok(1,"test fix warn_unless ".$idx++)},
+            sub { $cmu ->show_changes ; ok(1,"test show_changes ".$idx++)} ;
+
+        push @test,
+            # test behavior when pasting data in tktree
+            # the 3 first items show an error message in TkUI message widget (bottom of widget)
+            map {               ## no critic (ProhibitComplexMappings)
+                my $elt = $_;
+                sub {
+                    $cmu->on_cut_buffer_dump("test1.$elt", "test cut buffer dump string");
+                    ok(1,"test cut_buffer_dump on element $elt ".$idx++)
+                };
+            } qw/a_uniline olist ordered_checklist a_uniline lista/ ;
+
+        push @test,
+            sub { $cmu->{hide_empty_values} = 1 ; ok(1,"test hide empty value ".$idx++); },
+            sub { $cmu->{show_only_custom}  = 1 ; ok(1,"test show only custom and hide empty value ".$idx++); },
+            sub { $cmu->{hide_empty_values} = 0 ; ok(1,"show empty value ".$idx++); },
+            sub { $cmu->{show_only_custom}  = 0 ; ok(1,"disable show only custom values ".$idx++); },
+
+            sub { $mw->destroy; };
+    }
 
     test_all($mw , $delay, \@test) ; 
 

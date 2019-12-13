@@ -1,5 +1,8 @@
 Revision history for WG-API
 
+v0.13 2019-12-11T11:15:09Z
+  - remove dependency from LWP
+
 v0.12 2019-11-14T14:58:13Z
   - migrate to github (again!)
   - remove deprecated method

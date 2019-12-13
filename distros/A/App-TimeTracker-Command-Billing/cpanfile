@@ -1,0 +1,13 @@
+requires "DateTime" => "0";
+requires "Moose::Role" => "0";
+requires "perl" => "5.010";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'build' => sub {
+  requires "Module::Build" => "0.28";
+};
+
+on 'configure' => sub {
+  requires "Module::Build" => "0.28";
+};

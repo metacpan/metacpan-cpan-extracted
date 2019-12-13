@@ -13,12 +13,16 @@ dev-bin/try-htmlextract.pl
 lib/NewsExtractor.pm
 lib/NewsExtractor/Article.pm
 lib/NewsExtractor/CSSExtractor.pm
+lib/NewsExtractor/CSSRuleSet.pm
 lib/NewsExtractor/Constants.pm
 lib/NewsExtractor/Download.pm
 lib/NewsExtractor/Error.pm
-lib/NewsExtractor/ExtractableWithCSS.pm
 lib/NewsExtractor/Extractor.pm
 lib/NewsExtractor/GenericExtractor.pm
+lib/NewsExtractor/JSONLDExtractor.pm
+lib/NewsExtractor/SiteSpecificExtractor.pm
+lib/NewsExtractor/SiteSpecificExtractor/www_rvn_com_tw.pm
+lib/NewsExtractor/TXExtractor.pm
 lib/NewsExtractor/TextUtil.pm
 lib/NewsExtractor/Types.pm
 metamerge.json

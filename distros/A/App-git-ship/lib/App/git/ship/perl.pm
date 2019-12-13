@@ -231,6 +231,18 @@ sub _changes_to_commit_message {
   return "@message";
 }
 
+sub _c_objects {
+  my $self = shift;
+  my @files;
+
+  for my $d (qw(.)) {
+    push @files,
+      path($d)->list->grep(sub {/\.c|\.xs/})->map(sub { $_->basename('.c', '.xs') . '.o' })->each;
+  }
+
+  return @files;
+}
+
 sub _dist_files {
   my $self = shift;
   my $name = $self->config('project_name') =~ s!::!-!gr;
@@ -425,11 +437,11 @@ Note that the C<cpanfile> is optional and C<Makefile.PL> will be kept untouched
 unless C<cpanfile> exists.
 
 "NAME" and "LICENSE" will have values from L</GIT_SHIP_PROJECT_NAME> and
-L</GIT_SHIP_LICENSE>.  "AUTHOR" will have the name and email from
-L</GIT_SHIP_AUTHOR> or the last git committer.  "ABSTRACT_FROM" and
+L<App::git::ship/GIT_SHIP_LICENSE>.  "AUTHOR" will have the name and email from
+L<App::git::ship/GIT_SHIP_AUTHOR> or the last git committer.  "ABSTRACT_FROM" and
 "VERSION_FROM" are fetched from the L<App::git::ship::perl/main_module_path>.
 "EXE_FILES" will be the files in C<bin/> and C<script/> which are executable.
-"META_MERGE" will use data from L</GIT_SHIP_BUGTRACKER>, L</GIT_SHIP_HOMEPAGE>,
+"META_MERGE" will use data from L<App::git::ship/GIT_SHIP_BUGTRACKER>, L<App::git::ship/GIT_SHIP_HOMEPAGE>,
 and L</repository>.
 
 =item * my-app/Changes or my-app/CHANGELOG.md
@@ -639,6 +651,7 @@ __DATA__
 @@ .gitignore
 ~$
 *.bak
+*.o
 *.old
 *.swp
 /*.tar.gz
@@ -704,6 +717,7 @@ my %WriteMakefileArgs = (
   ABSTRACT_FROM  => '<%= $ship->config('main_module_path') %>',
   VERSION_FROM   => '<%= $ship->config('main_module_path') %>',
   EXE_FILES      => [qw(<%= join ' ', $ship->_exe_files %>)],
+  OBJECT         => '<%= join ' ', $ship->_c_objects %>',
   BUILD_REQUIRES => <%= $ship->dump($BUILD_REQUIRES) %>,
   TEST_REQUIRES  => <%= $ship->dump($TEST_REQUIRES) %>,
   PREREQ_PM      => <%= $ship->dump($PREREQ_PM) %>,
@@ -740,6 +754,11 @@ WriteMakefile(%WriteMakefileArgs);
 ^\.perltidyrc
 ^\.travis.yml
 @@ t/00-basic.t
+use strict;
+use warnings;
+use utf8;
+## no critic (StringyEval)
+
 use Test::More;
 use File::Find;
 
@@ -756,6 +775,7 @@ if(!eval 'use Test::CPAN::Changes; 1') {
   *Test::CPAN::Changes::changes_file_ok = sub { SKIP: { skip "changes_ok(@_) (Test::CPAN::Changes is required)", 4 } };
 }
 
+my @files;
 find(
   {
     wanted => sub { /\.pm$/ and push @files, $File::Find::name },

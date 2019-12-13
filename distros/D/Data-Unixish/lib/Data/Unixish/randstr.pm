@@ -7,7 +7,7 @@ use warnings;
 #use Log::Any '$log';
 
 use Data::Unixish::Util qw(%common_args);
-our $VERSION = '1.570'; # VERSION
+our $VERSION = '1.572'; # VERSION
 
 our %SPEC;
 
@@ -107,7 +107,7 @@ Data::Unixish::randstr - Generate a stream of random strings
 
 =head1 VERSION
 
-This document describes version 1.570 of Data::Unixish::randstr (from Perl distribution Data-Unixish), released on 2019-01-06.
+This document describes version 1.572 of Data::Unixish::randstr (from Perl distribution Data-Unixish), released on 2019-10-26.
 
 =head1 SYNOPSIS
 

@@ -1,8 +1,13 @@
-0.020   2017-09-08 (PERLANCAR)
+0.021   2019-12-12  Released-By: PERLANCAR; Urgency: medium
+
+        - Update data (up to RHEL 8.1).
+
+
+0.020   2017-09-08  Released-By: PERLANCAR
 
         - Update data (up to RHEL 7.4).
 
 
-0.01    2015-10-06 (PERLANCAR)
+0.01    2015-10-06  Released-By: PERLANCAR
 
         - First version.

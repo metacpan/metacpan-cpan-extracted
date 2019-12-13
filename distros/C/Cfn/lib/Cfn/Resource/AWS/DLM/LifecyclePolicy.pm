@@ -1,4 +1,4 @@
-# AWS::DLM::LifecyclePolicy generated from spec 3.4.0
+# AWS::DLM::LifecyclePolicy generated from spec 9.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy',
@@ -38,6 +38,28 @@ package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::RetainRuleValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has Count => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::FastRestoreRule',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::FastRestoreRule',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::FastRestoreRuleValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::FastRestoreRuleValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AvailabilityZones => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Count => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -106,6 +128,7 @@ package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::ScheduleValue {
   
   has CopyTags => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has CreateRule => (isa => 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CreateRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FastRestoreRule => (isa => 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::FastRestoreRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RetainRule => (isa => 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::RetainRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TagsToAdd => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

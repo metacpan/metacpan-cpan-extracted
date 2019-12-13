@@ -1,0 +1,43 @@
+---
+abstract: 'run a system command and explain the result'
+author:
+  - 'Paul Johnson <pjcj@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.999, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: System-Explain
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  System::Explain:
+    file: lib/System/Explain.pm
+    version: '0.02'
+requires:
+  Exporter: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/cxw42/System-Explain/issues
+  homepage: https://github.com/cxw42/System-Explain
+  repository: git://github.com/cxw42/System-Explain.git
+version: '0.02'
+x_authority: cpan:CXW
+x_contributors:
+  - 'Christopher White <cxw@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

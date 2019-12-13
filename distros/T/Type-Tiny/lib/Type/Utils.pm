@@ -6,8 +6,10 @@ use warnings;
 
 BEGIN {
 	$Type::Utils::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Utils::VERSION   = '1.006000';
+	$Type::Utils::VERSION   = '1.008000';
 }
+
+$Type::Utils::VERSION =~ tr/_//d;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
@@ -59,8 +61,9 @@ sub extends
 			{
 				my $moose = Moose::Util::TypeConstraints::find_type_constraint($types->{$name});
 				my $tt    = Types::TypeTiny::to_TypeTiny($moose);
+				my $c     = $moose->has_coercion && @{ $moose->coercion->type_coercion_map || [] };
 				$caller->add_type(
-					$tt->create_child_type(library => $caller, name => $name, coercion => $moose->has_coercion ? 1 : 0)
+					$tt->create_child_type(library => $caller, name => $name, coercion => $c ? 1 : 0)
 				);
 			}
 		}
@@ -74,6 +77,18 @@ sub extends
 				my $tt    = Types::TypeTiny::to_TypeTiny($mouse);
 				$caller->add_type(
 					$tt->create_child_type(library => $caller, name => $name, coercion => $mouse->has_coercion ? 1 : 0)
+				);
+			}
+		}
+		elsif ($lib->isa('Specio::Exporter'))
+		{
+			my $types = $lib->Specio::Registry::exportable_types_for_package;
+			for my $name (sort keys %$types)
+			{
+				my $specio = $types->{$name};
+				my $tt     = Types::TypeTiny::to_TypeTiny($specio);
+				$caller->add_type(
+					$tt->create_child_type(library => $caller, name => $name)
 				);
 			}
 		}
@@ -665,7 +680,7 @@ specify the parent type (if any) and (possibly) refine its definition.
 
    my $EvenInt = declare as Int, where { $_ % 2 == 0 };
 
-B<< NOTE: >>
+I<< NOTE: >>
 If the caller package inherits from L<Type::Library> then any non-anonymous
 types declared in the package will be automatically installed into the
 library.
@@ -747,7 +762,7 @@ significant performance improvements.
    
    warn EvenInt->inline_check('$xxx');  # demonstration
 
-B<Experimental:> your C<inline_as> block can return a list, in which case
+Your C<inline_as> block can return a list, in which case
 these will be smushed together with "&&". The first item on the list may
 be undef, in which case the undef will be replaced by the inlined parent
 type constraint. (And will throw an exception if there is no parent.)
@@ -758,10 +773,6 @@ type constraint. (And will throw an exception if there is no parent.)
       inline_as {
          return (undef, "($_ % 2 == 0)");
       };
-
-Returning a list like this is considered experimental, is not tested very
-much, and I offer no guarantees that it will necessarily work with
-Moose/Mouse/Moo.
 
 =item C<< class_type $name, { class => $package, %options } >>
 

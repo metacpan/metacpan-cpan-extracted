@@ -14,11 +14,11 @@ CGI::Untaint::CountyStateProvince::GB - Add British counties to CGI::Untaint::Co
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 our %counties = (
 	'aberdeenshire' => 1,
@@ -115,6 +115,7 @@ our %counties = (
 
 our %abbreviations = (
 	'beds' => 'bedfordshire',
+	'bucks' => 'buckinghamshire',
 	'cambs' => 'cambridgeshire',
 	'cleveland' => 'teesside',
 	'co durham' => 'county durham',
@@ -122,10 +123,13 @@ our %abbreviations = (
 	'east yorks' => 'east yorkshire',
 	'glasgow' => 'west lothian',
 	'gloucester' => 'gloucestershire',
+	'great london' => 'london',
 	'greater london' => 'london',
 	'hants' => 'hampshire',
 	'herts' => 'hertfordshire',
 	'lancs' => 'lancashire',
+	'lancs.' => 'lancashire',
+	'Lancs.' => 'lancashire',
 	'middx' => 'middlesex',
 	'n yorkshire' => 'north yorkshire',
 	'northants' => 'northamptonshire',
@@ -133,6 +137,9 @@ our %abbreviations = (
 	'oxon' => 'oxfordshire',
 	'greater manchester' => 'manchester',
 	's yorkshire' => 'south yorkshire',
+	's glos' => 'gloucestershire',
+	'south gloster' => 'gloucestershire',
+	'vale of glamorgan' => 'glamorgan',
 	'westmidlands' => 'west midlands',
 	'west mids' => 'west midlands',
 	'west yorks' => 'west yorkshire',
@@ -171,7 +178,7 @@ sub is_valid {
 
 	my $value = lc($self->value);
 
-	if($value =~ /([a-z\s]+)/) {
+	if($value =~ /([a-z][a-z\s]+)/) {
 		$value = $1;
 	} else {
 		return 0;
@@ -190,10 +197,10 @@ sub is_valid {
 		}
 	}
 
-	my $county = $self->{_validator}->code($value);
-	if($county && ($county ne 'unknown')) {
-		return $value;
-	}
+	# my $county = $self->{_validator}->code($value);
+	# if($county && ($county ne 'unknown')) {
+		# return $value;
+	# }
 
 	return exists($counties{$value}) ? $value : 0;
 }
@@ -242,7 +249,6 @@ You can find documentation for this module with the perldoc command.
 
 	perldoc CGI::Untaint::CountyStateProvince::GB
 
-
 You can also look for information at:
 
 =over 4
@@ -250,10 +256,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-CountyStateProvince-GB>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/CGI-Untaint-CountyStateProvince-GB>
 
 =item * CPAN Ratings
 
@@ -271,10 +273,9 @@ L<http://search.cpan.org/dist/CGI-Untaint-CountyStateProvince-GB>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Nigel Horne.
+Copyright 2012-19 Nigel Horne.
 
-This program is released under the following licence: GPL
-
+This program is released under the following licence: GPL2
 
 =cut
 

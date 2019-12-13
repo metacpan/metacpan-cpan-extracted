@@ -21,6 +21,6 @@ isa_ok( $wg->wowp, 'WG::API::WoWp' );
 isa_ok( $wg->wows, 'WG::API::WoWs' );
 isa_ok( $wg->auth, 'WG::API::Auth' );
 
-isa_ok( $wg->net->ua, 'LWP::UserAgent' );
+isa_ok( $wg->net->ua, 'HTTP::Tiny' );
 
 done_testing();

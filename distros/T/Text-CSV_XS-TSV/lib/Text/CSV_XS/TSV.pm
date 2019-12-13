@@ -1,9 +1,10 @@
 package Text::CSV_XS::TSV;
 
-our $DATE = '2019-05-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-12'; # DATE
+our $DIST = 'Text-CSV_XS-TSV'; # DIST
+our $VERSION = '0.003'; # VERSION
 
-use 5.010001;
 use strict;
 use warnings;
 
@@ -35,11 +36,15 @@ Text::CSV_XS::TSV - Set Text::CSV_XS default options to parse TSV
 
 =head1 VERSION
 
-This document describes version 0.001 of Text::CSV_XS::TSV (from Perl distribution Text-CSV_XS-TSV), released on 2019-05-12.
+This document describes version 0.003 of Text::CSV_XS::TSV (from Perl distribution Text-CSV_XS-TSV), released on 2019-12-12.
 
 =head1 SYNOPSIS
 
- use Text::CSV_XS::XS;
+Use like you would use L<Text::CSV_XS> with the object interface:
+
+ use Text::CSV_XS::TSV;
+ my $csv = Text::CSV_XS::TSV->new({binary=>1});
+ # ...
 
 =head1 DESCRIPTION
 

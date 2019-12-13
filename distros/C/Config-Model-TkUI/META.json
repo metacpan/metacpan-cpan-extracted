@@ -1,5 +1,5 @@
 {
-   "abstract" : "Tk GUI to edit config data through Config::Model",
+   "abstract" : "a GUI to edit configuration data with Config::Model framework",
    "author" : [
       "Dominique Dumont"
    ],
@@ -32,7 +32,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Config::Model" : "2.134",
+            "Config::Model" : "2.137",
             "Config::Model::ObjTreeScanner" : "0",
             "File::HomeDir" : "0",
             "List::MoreUtils" : "0",
@@ -70,12 +70,13 @@
       },
       "test" : {
          "requires" : {
+            "Config::Model" : "2.137",
             "Config::Model::Tester::Setup" : "0",
             "Config::Model::Value" : "0",
+            "Test::Log::Log4perl" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0",
-            "Test::Pod" : "1.00",
-            "Test::Warn" : "0.11"
+            "Test::Pod" : "1.00"
          }
       }
    },
@@ -92,8 +93,8 @@
          "web" : "https://github.com/dod38fr/config-model-tk-ui"
       }
    },
-   "version" : "1.370",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+   "version" : "1.371",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }
 

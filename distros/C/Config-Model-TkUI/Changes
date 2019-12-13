@@ -1,3 +1,13 @@
+1.371 2019-12-11
+
+  This releases fixes the tests broken by Config::Model 2.137.  The
+  broken tests are related to some changes in the way warnings are
+  emitted in Config::Model
+
+  Other changes:
+  * dist.ini: remove email from copyright holder name
+  * tests require Config::Model 2.137
+
 1.370 2019-05-19
 
   UI improvements:

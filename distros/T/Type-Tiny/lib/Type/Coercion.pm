@@ -6,8 +6,10 @@ use warnings;
 
 BEGIN {
 	$Type::Coercion::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::VERSION   = '1.006000';
+	$Type::Coercion::VERSION   = '1.008000';
 }
+
+$Type::Coercion::VERSION =~ tr/_//d;
 
 use Eval::TypeTiny qw<>;
 use Scalar::Util qw< blessed >;
@@ -879,7 +881,7 @@ to call C<add>. Support for this was dropped after 0.040.
 
 =over
 
-=item B<< Attempt to add coercion code to a Type::Coercion which has been frozen >>
+=item I<< Attempt to add coercion code to a Type::Coercion which has been frozen >>
 
 Type::Tiny type constraints are designed as immutable objects. Once you've
 created a constraint, rather than modifying it you generally create child

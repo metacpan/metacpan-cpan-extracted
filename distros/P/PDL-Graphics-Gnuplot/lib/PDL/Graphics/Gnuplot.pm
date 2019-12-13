@@ -962,7 +962,7 @@ extended text formatting if it is available.
 
 =item * rangelimited - set to 1 to limit tics to the range of values actually present in the plot
 
-=item * textcolor - set the color of the ticks (see "color specs" below)
+=item * textcolor - set the color of the tick labels (see L</"Color specification">)
 
 =back
 
@@ -1640,13 +1640,14 @@ terminal.
 
 =item linecolor (abbrev 'lc')
 
-This is a color specifier for the color of the line.  You can feed in
-a standard color name (they're listed in the package-global variable
-C<@PDL::Graphics::Gnuplot::colornames>), a small integer to index the
-standard linetype colors, the word "variable" to indicate that the
-line color is a standard linetype color to be drawn from an additional
-column of data, C<< [rgbcolor=><num>] >> to specify an RGB color as a
-24-bit packed integer, C<< [rgbcolor=>'variable'] >> to specify an
+This is a color specifier for the color of the line.  See L</"Color specification">.
+You can feed in a standard color name (they're listed in the
+package-global variable C<@PDL::Graphics::Gnuplot::colornames>), a
+small integer to index the standard linetype colors, the word
+"variable" to indicate that the line color is a standard linetype
+color to be drawn from an additional column of data, a string of the
+form #RRGGBB, where the # is literal and the RR, GG, and BB are
+hexadecimal bytes, the words "rgbcolor variable" to specify an
 additional column of data containing 24-bit packed integers with RGB
 color values, C<< [palette=>'frac',<val>] >> to specify a single
 fractional position (scaled 0-1) in the current palette, or C<<
@@ -2018,7 +2019,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.012';
+our $VERSION = '2.013';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;   # eventually gets the extracted gnuplot(1) version number.
@@ -4962,13 +4963,14 @@ our $pOptionsTable =
 			  my $grey = xvals(2049)/2048;
 			  my $rgb = $grey->apply($t);
 
-			  my @s = map {
+			  {
 			      no warnings;			      
-			      sprintf(" %d '#%2.2X%2.2X%2.2X'", $_, $rgb->slice('x',[$_,,0])->list);
-			      use warnings;
-			  } (0..$grey->dim(0)-1);
+			      my @s = map {
+				  sprintf(" %d '#%2.2X%2.2X%2.2X'", $_, $rgb->slice('x',[$_,,0])->list);
+			      } (0..$grey->dim(0)-1);
 
-			  $s .= "set palette defined ( ".join(",", @s)." )\n";
+			      $s .= "set palette defined ( ".join(",", @s)." )\n";
+			  }
 			  $s;
 		    },
 		    ['clut'],undef,

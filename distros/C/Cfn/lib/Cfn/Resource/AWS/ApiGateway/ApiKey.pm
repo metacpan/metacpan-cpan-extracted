@@ -1,4 +1,4 @@
-# AWS::ApiGateway::ApiKey generated from spec 5.3.0
+# AWS::ApiGateway::ApiKey generated from spec 7.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ApiGateway::ApiKey',
@@ -75,6 +75,7 @@ package Cfn::Resource::Properties::AWS::ApiGateway::ApiKey {
   has GenerateDistinctId => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has StageKeys => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ApiGateway::ApiKey::StageKey', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Value => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 

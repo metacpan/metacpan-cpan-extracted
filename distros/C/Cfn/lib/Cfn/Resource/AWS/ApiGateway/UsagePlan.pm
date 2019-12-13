@@ -1,4 +1,4 @@
-# AWS::ApiGateway::UsagePlan generated from spec 5.3.0
+# AWS::ApiGateway::UsagePlan generated from spec 7.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ApiGateway::UsagePlan',
@@ -136,6 +136,7 @@ package Cfn::Resource::Properties::AWS::ApiGateway::UsagePlan {
   has ApiStages => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ApiGateway::UsagePlan::ApiStage', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Quota => (isa => 'Cfn::Resource::Properties::AWS::ApiGateway::UsagePlan::QuotaSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Throttle => (isa => 'Cfn::Resource::Properties::AWS::ApiGateway::UsagePlan::ThrottleSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has UsagePlanName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }

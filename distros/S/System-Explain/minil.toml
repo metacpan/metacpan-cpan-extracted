@@ -1,0 +1,9 @@
+name = "System-Explain"
+# badges = ["travis-ci.com"]
+authority="cpan:CXW"
+license="perl_5"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+
+tag_format="v%v"

@@ -83,7 +83,7 @@ I<any> dimension.
 
 =for usage
 
- $b = prodover($a);
+ $y = prodover($x);
 
 =for example
 
@@ -131,7 +131,7 @@ I<any> dimension.
 
 =for usage
 
- $b = dprodover($a);
+ $y = dprodover($x);
 
 =for example
 
@@ -183,7 +183,7 @@ is the first element of the parameter.
 
 =for usage
 
- $b = cumuprodover($a);
+ $y = cumuprodover($x);
 
 =for example
 
@@ -234,7 +234,7 @@ is the first element of the parameter.
 
 =for usage
 
- $b = cumuprodover($a);
+ $y = cumuprodover($x);
 
 =for example
 
@@ -283,7 +283,7 @@ I<any> dimension.
 
 =for usage
 
- $b = sumover($a);
+ $y = sumover($x);
 
 =for example
 
@@ -331,7 +331,7 @@ I<any> dimension.
 
 =for usage
 
- $b = dsumover($a);
+ $y = dsumover($x);
 
 =for example
 
@@ -383,7 +383,7 @@ is the first element of the parameter.
 
 =for usage
 
- $b = cumusumover($a);
+ $y = cumusumover($x);
 
 =for example
 
@@ -434,7 +434,7 @@ is the first element of the parameter.
 
 =for usage
 
- $b = cumusumover($a);
+ $y = cumusumover($x);
 
 =for example
 
@@ -483,7 +483,7 @@ I<any> dimension.
 
 =for usage
 
- $b = andover($a);
+ $y = andover($x);
 
 =for example
 
@@ -531,7 +531,7 @@ I<any> dimension.
 
 =for usage
 
- $b = bandover($a);
+ $y = bandover($x);
 
 =for example
 
@@ -579,7 +579,7 @@ I<any> dimension.
 
 =for usage
 
- $b = borover($a);
+ $y = borover($x);
 
 =for example
 
@@ -627,7 +627,7 @@ I<any> dimension.
 
 =for usage
 
- $b = orover($a);
+ $y = orover($x);
 
 =for example
 
@@ -675,7 +675,7 @@ I<any> dimension.
 
 =for usage
 
- $b = zcover($a);
+ $y = zcover($x);
 
 =for example
 
@@ -723,7 +723,7 @@ I<any> dimension.
 
 =for usage
 
- $b = intover($a);
+ $y = intover($x);
 
 =for example
 
@@ -780,7 +780,7 @@ I<any> dimension.
 
 =for usage
 
- $b = average($a);
+ $y = average($x);
 
 =for example
 
@@ -844,7 +844,7 @@ I<any> dimension.
 
 =for usage
 
- $b = daverage($a);
+ $y = daverage($x);
 
 =for example
 
@@ -909,7 +909,7 @@ I<any> dimension.
 
 =for usage
 
- $b = medover($a);
+ $y = medover($x);
 
 =for example
 
@@ -957,7 +957,7 @@ I<any> dimension.
 
 =for usage
 
- $b = oddmedover($a);
+ $y = oddmedover($x);
 
 =for example
 
@@ -1013,7 +1013,7 @@ I<any> dimension.
 
 =for usage
 
- $b = modeover($a);
+ $y = modeover($x);
 
 =for example
 
@@ -1079,7 +1079,7 @@ I<any> dimension.
 
 =for usage
 
- $b = pctover($a, $p);
+ $y = pctover($x, $p);
 
 =for example
 
@@ -1128,7 +1128,7 @@ I<any> dimension.
 
 =for usage
 
- $b = oddpctover($a, $p);
+ $y = oddpctover($x, $p);
 
 =for example
 
@@ -1760,7 +1760,7 @@ Useful in conditional expressions:
 
 =for example
 
- if (any $a>15) { print "some values are greater than 15\n" }
+ if (any $x>15) { print "some values are greater than 15\n" }
 
 =cut
 
@@ -1788,7 +1788,7 @@ Useful in conditional expressions:
 
 =for example
 
- if (all $a>15) { print "all values are greater than 15\n" }
+ if (all $x>15) { print "all values are greater than 15\n" }
 
 =cut
 
@@ -1866,9 +1866,9 @@ Quicksort a vector into ascending order.
 
 Bad values are moved to the end of the array:
 
- pdl> p $b
+ pdl> p $y
  [42 47 98 BAD 22 96 74 41 79 76 96 BAD 32 76 25 59 BAD 96 32 BAD]
- pdl> p qsort($b)
+ pdl> p qsort($y)
  [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 
 
@@ -1898,8 +1898,8 @@ Quicksort a vector and return index of elements in ascending order.
 
 =for example
 
- $ix = qsorti $a;
- print $a->index($ix); # Sorted list
+ $ix = qsorti $x;
+ print $x->index($ix); # Sorted list
 
 
 
@@ -1907,9 +1907,9 @@ Quicksort a vector and return index of elements in ascending order.
 
 Bad elements are moved to the end of the array:
 
- pdl> p $b
+ pdl> p $y
  [42 47 98 BAD 22 96 74 41 79 76 96 BAD 32 76 25 59 BAD 96 32 BAD]
- pdl> p $b->index( qsorti($b) )
+ pdl> p $y->index( qsorti($y) )
  [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 
 
@@ -2034,7 +2034,7 @@ I<any> dimension.
 
 =for usage
 
- $b = minimum($a);
+ $y = minimum($x);
 
 =for example
 
@@ -2141,7 +2141,7 @@ I<any> dimension.
 
 =for usage
 
- $b = maximum($a);
+ $y = maximum($x);
 
 =for example
 
@@ -2338,8 +2338,8 @@ Find minimum and maximum and their indices for a given piddle;
 
 =for usage
 
- pdl> $a=pdl [[-2,3,4],[1,0,3]]
- pdl> ($min, $max, $min_ind, $max_ind)=minmaximum($a)
+ pdl> $x=pdl [[-2,3,4],[1,0,3]]
+ pdl> ($min, $max, $min_ind, $max_ind)=minmaximum($x)
  pdl> p $min, $max, $min_ind, $max_ind
  [-2 0] [4 3] [0 1] [2 2]
 

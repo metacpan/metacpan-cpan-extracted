@@ -16,7 +16,7 @@ waits for their responses, then ends:
 
     use experimental 'signatures';
 
-    my $dbus = Protocol::DBus::Client::AnyEvent::system()
+    my $dbus = Protocol::DBus::Client::AnyEvent::system();
 
     my $cv = AnyEvent->condvar();
 

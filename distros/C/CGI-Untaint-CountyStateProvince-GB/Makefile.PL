@@ -12,16 +12,29 @@ WriteMakefile(
       ? ('LICENSE'=> 'GPL')
       : ()),
     PL_FILES            => {},
+    BUILD_REQUIRES => {
+	'Test::Most' => 0,
+	'Test::NoWarnings' => 0,
+	# 'Test::Kwalitee' => 0,
+    },
     PREREQ_PM => {
-        'Test::More' => 0.82,	# Need new_ok()
 	'CGI::Untaint' => 0,
 	'CGI::Untaint::CountyStateProvince' => 0.04,
-	'Test::NoWarnings' => 0,
-	'Locale::SubCountry' => 0,
+	'Locale::SubCountry' => 1.63,
 	'Carp' => 0,
-	# 'Test::Kwalitee' => 0,
 	'Test::Requires' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'CGI-Untaint-CountyStateProvince-GB*' },
+    META_MERGE		=> {
+    	'meta-spec' => { version => 2 },
+    	resources => {
+    		repository => {
+			type => 'git',
+			url => 'git://github.com/nigelhorne/CGI-Untaint-CountyStateProvince-GB.git',
+			web => 'https://github.com/nigelhorne/CGI-Untaint-CountyStateProvince-GB',
+    		},
+	},
+    },
+    MIN_PERL_VERSION	=> 5.6.2	# Probably would work, but never tested on earlier versions than this
 );

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215428;
+our $VERSION = 1.20191211212303;
 
 my $formatters = [
                 {
@@ -76,22 +76,16 @@ my $validators = {
           )\\d{6}
         ',
                 'mobile' => '
-          6(?:
-            5(?:
-              1\\d|
-              55|
-              [67]0
-            )|
-            9(?:
-              10|
-              [69]\\d
-            )
+          65(?:
+            1\\d|
+            55|
+            [67]0
           )\\d{4}|
           (?:
             [37][01]|
             4[0139]|
             51|
-            6[48]
+            6[489]
           )\\d{6}
         ',
                 'pager' => '',
@@ -119,15 +113,45 @@ my $validators = {
           )\\d{4}
         '
               };
+my %areanames = ();
+$areanames{en}->{3861} = "Ljubljana";
+$areanames{en}->{3862} = "Maribor\/Ravne\ na\ Koroškem\/Murska\ Sobota";
+$areanames{en}->{38632} = "Celje\/Trbovlje";
+$areanames{en}->{38633} = "Celje\/Trbovlje";
+$areanames{en}->{38634} = "Celje\/Trbovlje";
+$areanames{en}->{38635} = "Celje\/Trbovlje";
+$areanames{en}->{38636} = "Celje\/Trbovlje";
+$areanames{en}->{38637} = "Celje\/Trbovlje";
+$areanames{en}->{38638} = "Celje\/Trbovlje";
+$areanames{en}->{38642} = "Kranj";
+$areanames{en}->{38644} = "Kranj";
+$areanames{en}->{38645} = "Kranj";
+$areanames{en}->{38646} = "Kranj";
+$areanames{en}->{38647} = "Kranj";
+$areanames{en}->{38648} = "Kranj";
+$areanames{en}->{38652} = "Gorica\/Koper\/Postojna";
+$areanames{en}->{38653} = "Gorica\/Koper\/Postojna";
+$areanames{en}->{38654} = "Gorica\/Koper\/Postojna";
+$areanames{en}->{38655} = "Gorica\/Koper\/Postojna";
+$areanames{en}->{38656} = "Gorica\/Koper\/Postojna";
+$areanames{en}->{38657} = "Gorica\/Koper\/Postojna";
+$areanames{en}->{38658} = "Gorica\/Koper\/Postojna";
+$areanames{en}->{38672} = "Novo\ Mesto\/Krško";
+$areanames{en}->{38673} = "Novo\ Mesto\/Krško";
+$areanames{en}->{38674} = "Novo\ Mesto\/Krško";
+$areanames{en}->{38675} = "Novo\ Mesto\/Krško";
+$areanames{en}->{38676} = "Novo\ Mesto\/Krško";
+$areanames{en}->{38677} = "Novo\ Mesto\/Krško";
+$areanames{en}->{38678} = "Novo\ Mesto\/Krško";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+386|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

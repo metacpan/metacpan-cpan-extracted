@@ -73,11 +73,11 @@ add two piddles
 
 =for example
 
-   $c = plus $a, $b, 0;     # explicit call with trailing 0
-   $c = $a + $b;           # overloaded call
-   $a->inplace->plus($b,0);  # modify $a inplace
+   $c = plus $x, $y, 0;     # explicit call with trailing 0
+   $c = $x + $y;           # overloaded call
+   $x->inplace->plus($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<+> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -116,11 +116,11 @@ multiply two piddles
 
 =for example
 
-   $c = mult $a, $b, 0;     # explicit call with trailing 0
-   $c = $a * $b;           # overloaded call
-   $a->inplace->mult($b,0);  # modify $a inplace
+   $c = mult $x, $y, 0;     # explicit call with trailing 0
+   $c = $x * $y;           # overloaded call
+   $x->inplace->mult($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<*> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -159,11 +159,11 @@ subtract two piddles
 
 =for example
 
-   $c = minus $a, $b, 0;     # explicit call with trailing 0
-   $c = $a - $b;           # overloaded call
-   $a->inplace->minus($b,0);  # modify $a inplace
+   $c = minus $x, $y, 0;     # explicit call with trailing 0
+   $c = $x - $y;           # overloaded call
+   $x->inplace->minus($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<-> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -202,11 +202,11 @@ divide two piddles
 
 =for example
 
-   $c = divide $a, $b, 0;     # explicit call with trailing 0
-   $c = $a / $b;           # overloaded call
-   $a->inplace->divide($b,0);  # modify $a inplace
+   $c = divide $x, $y, 0;     # explicit call with trailing 0
+   $c = $x / $y;           # overloaded call
+   $x->inplace->divide($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C</> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -245,11 +245,11 @@ the binary E<gt> (greater than) operation
 
 =for example
 
-   $c = gt $a, $b, 0;     # explicit call with trailing 0
-   $c = $a > $b;           # overloaded call
-   $a->inplace->gt($b,0);  # modify $a inplace
+   $c = gt $x, $y, 0;     # explicit call with trailing 0
+   $c = $x > $y;           # overloaded call
+   $x->inplace->gt($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<E<gt>> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -288,11 +288,11 @@ the binary E<lt> (less than) operation
 
 =for example
 
-   $c = lt $a, $b, 0;     # explicit call with trailing 0
-   $c = $a < $b;           # overloaded call
-   $a->inplace->lt($b,0);  # modify $a inplace
+   $c = lt $x, $y, 0;     # explicit call with trailing 0
+   $c = $x < $y;           # overloaded call
+   $x->inplace->lt($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<E<lt>> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -331,11 +331,11 @@ the binary E<lt>= (less equal) operation
 
 =for example
 
-   $c = le $a, $b, 0;     # explicit call with trailing 0
-   $c = $a <= $b;           # overloaded call
-   $a->inplace->le($b,0);  # modify $a inplace
+   $c = le $x, $y, 0;     # explicit call with trailing 0
+   $c = $x <= $y;           # overloaded call
+   $x->inplace->le($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<E<lt>=> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -374,11 +374,11 @@ the binary E<gt>= (greater equal) operation
 
 =for example
 
-   $c = ge $a, $b, 0;     # explicit call with trailing 0
-   $c = $a >= $b;           # overloaded call
-   $a->inplace->ge($b,0);  # modify $a inplace
+   $c = ge $x, $y, 0;     # explicit call with trailing 0
+   $c = $x >= $y;           # overloaded call
+   $x->inplace->ge($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<E<gt>=> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -417,11 +417,11 @@ binary I<equal to> operation (C<==>)
 
 =for example
 
-   $c = eq $a, $b, 0;     # explicit call with trailing 0
-   $c = $a == $b;           # overloaded call
-   $a->inplace->eq($b,0);  # modify $a inplace
+   $c = eq $x, $y, 0;     # explicit call with trailing 0
+   $c = $x == $y;           # overloaded call
+   $x->inplace->eq($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<==> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -460,11 +460,11 @@ binary I<not equal to> operation (C<!=>)
 
 =for example
 
-   $c = ne $a, $b, 0;     # explicit call with trailing 0
-   $c = $a != $b;           # overloaded call
-   $a->inplace->ne($b,0);  # modify $a inplace
+   $c = ne $x, $y, 0;     # explicit call with trailing 0
+   $c = $x != $y;           # overloaded call
+   $x->inplace->ne($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<!=> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -503,11 +503,11 @@ leftshift C<$a> by C<$b>
 
 =for example
 
-   $c = shiftleft $a, $b, 0;     # explicit call with trailing 0
-   $c = $a << $b;           # overloaded call
-   $a->inplace->shiftleft($b,0);  # modify $a inplace
+   $c = shiftleft $x, $y, 0;     # explicit call with trailing 0
+   $c = $x << $y;           # overloaded call
+   $x->inplace->shiftleft($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<E<lt>E<lt>> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -546,11 +546,11 @@ rightshift C<$a> by C<$b>
 
 =for example
 
-   $c = shiftright $a, $b, 0;     # explicit call with trailing 0
-   $c = $a >> $b;           # overloaded call
-   $a->inplace->shiftright($b,0);  # modify $a inplace
+   $c = shiftright $x, $y, 0;     # explicit call with trailing 0
+   $c = $x >> $y;           # overloaded call
+   $x->inplace->shiftright($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<E<gt>E<gt>> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -589,11 +589,11 @@ binary I<or> of two piddles
 
 =for example
 
-   $c = or2 $a, $b, 0;     # explicit call with trailing 0
-   $c = $a | $b;           # overloaded call
-   $a->inplace->or2($b,0);  # modify $a inplace
+   $c = or2 $x, $y, 0;     # explicit call with trailing 0
+   $c = $x | $y;           # overloaded call
+   $x->inplace->or2($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<|> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -632,11 +632,11 @@ binary I<and> of two piddles
 
 =for example
 
-   $c = and2 $a, $b, 0;     # explicit call with trailing 0
-   $c = $a & $b;           # overloaded call
-   $a->inplace->and2($b,0);  # modify $a inplace
+   $c = and2 $x, $y, 0;     # explicit call with trailing 0
+   $c = $x & $y;           # overloaded call
+   $x->inplace->and2($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<&> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -675,11 +675,11 @@ binary I<exclusive or> of two piddles
 
 =for example
 
-   $c = xor $a, $b, 0;     # explicit call with trailing 0
-   $c = $a ^ $b;           # overloaded call
-   $a->inplace->xor($b,0);  # modify $a inplace
+   $c = xor $x, $y, 0;     # explicit call with trailing 0
+   $c = $x ^ $y;           # overloaded call
+   $x->inplace->xor($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<^> operator.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -718,10 +718,10 @@ unary bit negation
 
 =for example
 
-   $b = ~ $a;
-   $a->inplace->bitnot;  # modify $a inplace
+   $y = ~ $x;
+   $x->inplace->bitnot;  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<~> operator/function.
 
 
@@ -757,11 +757,11 @@ raise piddle C<$a> to the power C<$b>
 
 =for example
 
-   $c = $a->power($b,0); # explicit function call
+   $c = $x->power($y,0); # explicit function call
    $c = $a ** $b;    # overloaded use
-   $a->inplace->power($b,0);     # modify $a inplace
+   $x->inplace->power($y,0);     # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<**> function.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -800,11 +800,11 @@ elementwise C<atan2> of two piddles
 
 =for example
 
-   $c = $a->atan2($b,0); # explicit function call
+   $c = $x->atan2($y,0); # explicit function call
    $c = atan2 $a, $b;    # overloaded use
-   $a->inplace->atan2($b,0);     # modify $a inplace
+   $x->inplace->atan2($y,0);     # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<atan2> function.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -843,11 +843,11 @@ elementwise C<modulo> operation
 
 =for example
 
-   $c = $a->modulo($b,0); # explicit function call
+   $c = $x->modulo($y,0); # explicit function call
    $c = $a % $b;    # overloaded use
-   $a->inplace->modulo($b,0);     # modify $a inplace
+   $x->inplace->modulo($y,0);     # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<%> function.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -886,11 +886,11 @@ elementwise "<=>" operation
 
 =for example
 
-   $c = $a->spaceship($b,0); # explicit function call
+   $c = $x->spaceship($y,0); # explicit function call
    $c = $a <=> $b;    # overloaded use
-   $a->inplace->spaceship($b,0);     # modify $a inplace
+   $x->inplace->spaceship($y,0);     # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the binary C<E<lt>=E<gt>> function.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
@@ -929,10 +929,10 @@ elementwise square root
 
 =for example
 
-   $b = sqrt $a;
-   $a->inplace->sqrt;  # modify $a inplace
+   $y = sqrt $x;
+   $x->inplace->sqrt;  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<sqrt> operator/function.
 
 
@@ -968,10 +968,10 @@ elementwise absolute value
 
 =for example
 
-   $b = abs $a;
-   $a->inplace->abs;  # modify $a inplace
+   $y = abs $x;
+   $x->inplace->abs;  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<abs> operator/function.
 
 
@@ -1007,10 +1007,10 @@ the sin function
 
 =for example
 
-   $b = sin $a;
-   $a->inplace->sin;  # modify $a inplace
+   $y = sin $x;
+   $x->inplace->sin;  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<sin> operator/function.
 
 
@@ -1046,10 +1046,10 @@ the cos function
 
 =for example
 
-   $b = cos $a;
-   $a->inplace->cos;  # modify $a inplace
+   $y = cos $x;
+   $x->inplace->cos;  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<cos> operator/function.
 
 
@@ -1085,10 +1085,10 @@ the elementwise I<not> operation
 
 =for example
 
-   $b = ! $a;
-   $a->inplace->not;  # modify $a inplace
+   $y = ! $x;
+   $x->inplace->not;  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<!> operator/function.
 
 
@@ -1124,10 +1124,10 @@ the exponential function
 
 =for example
 
-   $b = exp $a;
-   $a->inplace->exp;  # modify $a inplace
+   $y = exp $x;
+   $x->inplace->exp;  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<exp> operator/function.
 
 
@@ -1163,10 +1163,10 @@ the natural logarithm
 
 =for example
 
-   $b = log $a;
-   $a->inplace->log;  # modify $a inplace
+   $y = log $x;
+   $x->inplace->log;  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<log> operator/function.
 
 
@@ -1202,10 +1202,10 @@ the base 10 logarithm
 
 =for example
 
-   $b = log10 $a;
-   $a->inplace->log10;  # modify $a inplace
+   $y = log10 $x;
+   $x->inplace->log10;  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 This function is used to overload the unary C<log10> operator/function.
 
 
@@ -1258,9 +1258,17 @@ Plain numerical assignment. This is used to implement the ".=" operator
 
 =for bad
 
-assgn does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+If C<a> is a child piddle (e.g., the result of a slice) and bad values are generated in C<b>,
+the bad value flag is set in C<b>, but it is B<NOT> automatically propagated back to the parent of C<a>.
+The following idiom ensures that the badflag is propagated back to the parent of C<a>:
 
+ $pdl->slice(":,(1)") .= PDL::Bad_aware_func();
+ $pdl->badflag(1);
+ $pdl->check_badflag();
+
+This is unnecessary if $pdl->badflag is known to be 1 before the slice is performed.
+
+See http://pdl.perl.org/PDLdocs/BadValues.html#dataflow_of_the_badflag for details.
 
 =cut
 
@@ -1288,11 +1296,11 @@ raise piddle C<$a> to integer power C<$b>
 
 =for example
 
-   $c = $a->ipow($b,0);     # explicit function call
-   $c = ipow $a, $b;
-   $a->inplace->ipow($b,0);  # modify $a inplace
+   $c = $x->ipow($y,0);     # explicit function call
+   $c = ipow $x, $y;
+   $x->inplace->ipow($y,0);  # modify $x inplace
 
-It can be made to work inplace with the C<$a-E<gt>inplace> syntax.
+It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
 Note that when calling this function explicitly you need to supply
 a third argument that should generally be zero (see first example).
 This restriction is expected to go away in future releases.

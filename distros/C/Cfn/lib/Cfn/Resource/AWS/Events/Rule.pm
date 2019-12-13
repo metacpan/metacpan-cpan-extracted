@@ -1,4 +1,4 @@
-# AWS::Events::Rule generated from spec 6.0.0
+# AWS::Events::Rule generated from spec 7.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Events::Rule',
@@ -106,6 +106,48 @@ package Cfn::Resource::Properties::AWS::Events::Rule::NetworkConfigurationValue 
   extends 'Cfn::Value::TypedValue';
   
   has AwsVpcConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Events::Rule::AwsVpcConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Events::Rule::BatchRetryStrategy',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Events::Rule::BatchRetryStrategy',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Events::Rule::BatchRetryStrategyValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Events::Rule::BatchRetryStrategyValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Attempts => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Events::Rule::BatchArrayProperties',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Events::Rule::BatchArrayProperties',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Events::Rule::BatchArrayPropertiesValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Events::Rule::BatchArrayPropertiesValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Size => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Events::Rule::SqsParameters',
@@ -218,6 +260,30 @@ package Cfn::Resource::Properties::AWS::Events::Rule::EcsParametersValue {
   has TaskCount => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TaskDefinitionArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
+
+subtype 'Cfn::Resource::Properties::AWS::Events::Rule::BatchParameters',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Events::Rule::BatchParameters',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Events::Rule::BatchParametersValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Events::Rule::BatchParametersValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ArrayProperties => (isa => 'Cfn::Resource::Properties::AWS::Events::Rule::BatchArrayProperties', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has JobDefinition => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has JobName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has RetryStrategy => (isa => 'Cfn::Resource::Properties::AWS::Events::Rule::BatchRetryStrategy', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 subtype 'ArrayOfCfn::Resource::Properties::AWS::Events::Rule::Target',
      as 'Cfn::Value',
   where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
@@ -260,6 +326,7 @@ package Cfn::Resource::Properties::AWS::Events::Rule::TargetValue {
   extends 'Cfn::Value::TypedValue';
   
   has Arn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has BatchParameters => (isa => 'Cfn::Resource::Properties::AWS::Events::Rule::BatchParameters', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EcsParameters => (isa => 'Cfn::Resource::Properties::AWS::Events::Rule::EcsParameters', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Id => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Input => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -277,6 +344,7 @@ package Cfn::Resource::Properties::AWS::Events::Rule {
   extends 'Cfn::Resource::Properties';
   
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has EventBusName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has EventPattern => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has RoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

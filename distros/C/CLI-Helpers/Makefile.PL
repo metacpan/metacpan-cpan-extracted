@@ -18,11 +18,11 @@ my %WriteMakefileArgs = (
   "NAME" => "CLI::Helpers",
   "PREREQ_PM" => {
     "Capture::Tiny" => 0,
+    "Exporter" => 0,
     "File::Basename" => 0,
     "Getopt::Long" => 0,
     "Module::Load" => 0,
     "Ref::Util" => 0,
-    "Sub::Exporter" => 0,
     "Sys::Syslog" => 0,
     "Term::ANSIColor" => "2.01",
     "Term::ReadKey" => 0,
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "1.6",
+  "VERSION" => "1.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +48,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
+  "Exporter" => 0,
   "File::Basename" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => 0,
@@ -56,7 +57,6 @@ my %FallbackPrereqs = (
   "Module::Load" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Ref::Util" => 0,
-  "Sub::Exporter" => 0,
   "Sys::Syslog" => 0,
   "Term::ANSIColor" => "2.01",
   "Term::ReadKey" => 0,

@@ -18,7 +18,7 @@ Sub::Sort - Dummy module to catch Sort::Sub typo
 
 =head1 VERSION
 
-This document describes version 0.110 of Sub::Sort (from Perl distribution Sort-Sub), released on 2018-01-15.
+This document describes version 0.111 of Sub::Sort (from Perl distribution Sort-Sub), released on 2019-10-26.
 
 =head1 HOMEPAGE
 
@@ -42,7 +42,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@ BEGIN {
     our @ISA = qw(Exporter);
     our @EXPORT_OK = qw($BY_INDEX $SPARSE $CONWAY);
     our %EXPORT_TAGS = ( all => \@EXPORT_OK );
-    our $VERSION = '0.002';
+    our $VERSION = '0.004';
 }
 
 sub cmp { $_[0]->(@_[1, 2])      }
@@ -158,7 +158,7 @@ Math::Polynomial::ModInt::Order - order relations on ModInt polynomials
 
 =head1 VERSION
 
-This documentation refers to version 0.002 of
+This documentation refers to version 0.004 of
 Math::Polynomial::ModInt::Order.
 
 =head1 SYNOPSIS
@@ -307,12 +307,12 @@ but it operates on Math::Polynomial::ModInt objects.
 =head1 BUGS AND LIMITATIONS
 
 The singleton variables this module provides must be treated as read-only.
-Sume future release will enforce this if we find a portable way to do that.
+Some future release will enforce this if we find a portable way to do that.
 Meanwhile, just don't mess with them.
 
 Other bug reports and suggestions are always welcome E<8212>
 please submit them as lined out in the distribution's main module,
-L<Math::Polynomial::ModInt|Math::Polynomial::ModInt>.
+L<Math::Polynomial::ModInt>.
 
 =head1 SEE ALSO
 

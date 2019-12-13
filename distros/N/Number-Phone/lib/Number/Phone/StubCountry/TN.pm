@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215428;
+our $VERSION = 1.20191211212303;
 
 my $formatters = [
                 {
@@ -80,6 +80,7 @@ $areanames{en}->{21675} = "Gabes\/Kebili\/Medenine\/Tataouine";
 $areanames{en}->{21676} = "Gafsa\/Sidi\ Bouzid\/Tozeur";
 $areanames{en}->{21677} = "Haffouz\/Kairouan\/Kasserine";
 $areanames{en}->{21678} = "Beja\/Jendouba\/Kef\/La\ Kef\/Siliana\/Tabarka";
+$areanames{en}->{21679} = "Ariana\/Ben\ Arous\/Manouba\/Tunis";
 
     sub new {
       my $class = shift;

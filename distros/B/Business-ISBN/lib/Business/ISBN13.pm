@@ -5,16 +5,11 @@ use base qw(Business::ISBN);
 use Business::ISBN qw(:all);
 use Data::Dumper;
 
-use vars qw(
-	$VERSION
-	$debug
-	);
-
 use Carp qw(carp croak cluck);
 
 my $debug = 0;
 
-$VERSION   = '3.004';
+our $VERSION   = '3.005';
 
 sub _max_length { 13 }
 

@@ -17,13 +17,14 @@ meta-spec:
   version: '1.4'
 name: App-CalendarDatesUtils
 requires:
-  Data::Sah::Coerce::perl::str::str_normalize_perl_modname: '0'
+  Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::hash: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
-  PERLANCAR::Module::List: '0'
+  List::Util: '1.45'
+  Module::List::Tiny: '0'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Base: '1.820'
   Perinci::CmdLine::Classic: '1.770'
@@ -31,16 +32,18 @@ requires:
   Perinci::Sub::XCompletion::perl_modname: '0'
   Sah::Schema::perl::modname: '0'
   Sah::Schema::true: '0'
+  Scalar::Util::Numeric: '0'
+  perl: '5.010001'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CalendarDatesUtils
   homepage: https://metacpan.org/release/App-CalendarDatesUtils
   repository: git://github.com/perlancar/perl-App-CalendarDatesUtils.git
-version: '0.010'
+version: '0.011'
 x_Dist_Zilla:
   perl:
-    version: '5.028002'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -119,13 +122,17 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::FileFinder::ByName
+      name: '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+      version: '6.012'
+    -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.596'
+      version: '0.599'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -157,7 +164,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
@@ -192,7 +199,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: '@Author::PERLANCAR/OurPkgVersion'
-      version: '0.15'
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -322,11 +329,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
-      version: '0.01'
+      version: '0.020'
     -
-      class: Dist::Zilla::Plugin::Rinci::Validate
-      name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.24'
+      class: Dist::Zilla::Plugin::Rinci::EmbedValidator
+      name: '@Author::PERLANCAR/Rinci::EmbedValidator'
+      version: '0.250'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -350,9 +357,13 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/Test::Compile'
       version: '2.058'
     -
-      class: Dist::Zilla::Plugin::Test::Perl::Critic
-      name: '@Author::PERLANCAR/Test::Perl::Critic'
-      version: '3.001'
+      class: Dist::Zilla::Plugin::Test::Perl::Critic::Subset
+      config:
+        Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
+          finder:
+            - '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+      name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
+      version: 3.001.003
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
@@ -447,6 +458,6 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.012'
 x_authority: cpan:PERLANCAR
-x_generated_by_perl: v5.28.2
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

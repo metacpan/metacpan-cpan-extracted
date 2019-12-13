@@ -4,7 +4,7 @@
       "Ichinose Shogo <shogo82148@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.4",
+   "generated_by" : "Minilla/v3.1.7",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
             "Test::Kwalitee" : "0",
             "Test::Kwalitee::Extra" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -65,7 +65,7 @@
    "provides" : {
       "Redis::Namespace" : {
          "file" : "lib/Redis/Namespace.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/shogo82148/Redis-Namespace"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_contributors" : [
       "Dan Book <grinnz@gmail.com>",
       "Mihyaeru <mihyaeru21@gmail.com>",

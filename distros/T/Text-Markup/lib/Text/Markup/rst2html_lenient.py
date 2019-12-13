@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Parse a reST file into HTML in a very forgiving way.
 
@@ -37,12 +37,12 @@ class AnyDirective(Directive):
         children = []
 
         if self.name not in self.state.document.settings.dir_notitle:
-            children.append(nodes.strong(self.name, u"%s: " % self.name))
+            children.append(nodes.strong(self.name, "%s: " % self.name))
             # keep the arguments, drop the options
             for a in self.arguments:
                 if a.startswith(':') and a.endswith(':'):
                     break
-                children.append(nodes.emphasis(a, u"%s " % a))
+                children.append(nodes.emphasis(a, "%s " % a))
 
         if self.name in self.state.document.settings.dir_nested:
             if self.content:
@@ -51,7 +51,7 @@ class AnyDirective(Directive):
                                         container)
                 children.extend(container.children)
         else:
-            content = u'\n'.join(self.content)
+            content = '\n'.join(self.content)
             children.append(nodes.literal_block(content, content))
 
         node = any_directive(self.block_text, '', *children, dir_name=self.name)
@@ -122,7 +122,7 @@ def patch_docutils():
     """Change the docutils parser behaviour."""
     # Patch the constructs dispatch table
     for i, (f, p) in enumerate(Body.explicit.constructs):
-        if f is Body.directive.im_func is f:
+        if f is Body.directive is f:
             Body.explicit.constructs[i] = (catchall_directive, p)
             break
     else:
@@ -229,14 +229,15 @@ Hello `role`:norole:
     try:
         try:
             patch_docutils()
-        except Exception, exc:
+        except Exception as exc:
             problems.append("error during library patching")
             raise
 
         try:
             out = publish_string(TEST_SOURCE,
-                writer=writer, settings_spec=LenientSettingsSpecs)
-        except Exception, exc:
+                writer=writer, settings_spec=LenientSettingsSpecs,
+                settings_overrides={'output_encoding': 'unicode'})
+        except Exception as exc:
             problems.append("error while running patched docutils")
             raise
 
@@ -257,23 +258,22 @@ Hello `role`:norole:
     # report problems if any
     if problems:
         rv = 1
-        print >> sys.stderr, "Patching docutils failed!"
+        print("Patching docutils failed!", file=sys.stderr)
         for problem in problems:
-            print >> sys.stderr, "-", problem
+            print("-", problem, file=sys.stderr)
 
     if rv:
-        print >> sys.stderr, "\nVersions:", \
+        print("\nVersions:", \
             'docutils:', docutils.__version__, docutils.__version_details__, \
-            '\nPython:', sys.version
+            '\nPython:', sys.version, file=sys.stderr)
 
     if exc:
         if '--traceback' in sys.argv:
-            print >> sys.stderr
+            print(file=sys.stderr)
             import traceback
             traceback.print_exc()
         else:
-            print >> sys.stderr, \
-                "\nUse --traceback to display the error stack trace."
+            print("\nUse --traceback to display the error stack trace.", file=sys.stderr)
 
     return rv
 

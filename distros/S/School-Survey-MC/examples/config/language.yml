@@ -1,0 +1,18 @@
+---
+# Configuration for different language
+config: true
+lang:
+    dunno: "weiss nicht"
+    answer: 'Antwort'
+    claim: 'Aussage'
+    yes: 'wahr'
+    no: 'falsch'
+---
+- q: 'The color red is blue'
+  difficulty: 4
+  chapter: 'colors'
+  answer: false
+- q: 'The color red is blue'
+  difficulty: 4
+  chapter: 'colors'
+  answer: false

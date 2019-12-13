@@ -36,9 +36,11 @@ Example:
 
     my $loop = IO::Async::Loop->new();
 
-    Protcol::DBus::Client::IOAsync::login_session($loop)->then(
+    my $dbus = Protcol::DBus::Client::IOAsync::login_session($loop);
+
+    $dbus->initialize()->then(
         sub ($dbus) {
-            $dbus->send_call( … );  # same arguments as above
+            return $dbus->send_call( … );  # same arguments as above
         },
     )->finally( sub { $loop->stop() } );
 

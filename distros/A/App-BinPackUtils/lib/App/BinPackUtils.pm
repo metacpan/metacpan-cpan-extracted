@@ -1,7 +1,9 @@
 package App::BinPackUtils;
 
-our $DATE = '2019-01-28'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-11'; # DATE
+our $DIST = 'App-BinPackUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -262,7 +264,7 @@ App::BinPackUtils - Collection of CLI utilities related to packing items into bi
 
 =head1 VERSION
 
-This document describes version 0.005 of App::BinPackUtils (from Perl distribution App-BinPackUtils), released on 2019-01-28.
+This document describes version 0.006 of App::BinPackUtils (from Perl distribution App-BinPackUtils), released on 2019-12-11.
 
 =head1 DESCRIPTION
 
@@ -332,6 +334,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 bin_files_into_dvds
 
 Usage:
@@ -374,6 +377,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 count_number_of_dvds_required
@@ -422,6 +426,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 pack_bins

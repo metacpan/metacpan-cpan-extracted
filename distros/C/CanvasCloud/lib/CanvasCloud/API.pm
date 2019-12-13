@@ -1,5 +1,5 @@
 package CanvasCloud::API;
-$CanvasCloud::API::VERSION = '0.006';
+$CanvasCloud::API::VERSION = '0.007';
 # ABSTRACT: Base Class for talking Canvas LMS API
 
 use Moose;
@@ -106,7 +106,7 @@ CanvasCloud::API - Base Class for talking Canvas LMS API
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 
@@ -165,7 +165,7 @@ Ted Katseres
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ted Katseres.
+This software is copyright (c) 2019 by Ted Katseres.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

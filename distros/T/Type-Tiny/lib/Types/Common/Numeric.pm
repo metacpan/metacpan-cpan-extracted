@@ -10,8 +10,10 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::Numeric::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::Numeric::VERSION   = '1.006000';
+	$Types::Common::Numeric::VERSION   = '1.008000';
 }
+
+$Types::Common::Numeric::VERSION =~ tr/_//d;
 
 use Type::Library -base, -declare => qw(
 	PositiveNum PositiveOrZeroNum
@@ -59,7 +61,7 @@ $meta->add_type(
 	inlined    => sub {
 		if ($pos_int) {
 			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
-			return "$xsub($_[1])" if $xsub;
+			return "$xsub($_[1])" if $xsub && !$Type::Tiny::AvoidCallbacks;
 		}
 		undef, qq($_ > 0);
 	},
@@ -74,7 +76,7 @@ $meta->add_type(
 	inlined    => sub {
 		if ($posz_int) {
 			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
-			return "$xsub($_[1])" if $xsub;
+			return "$xsub($_[1])" if $xsub && !$Type::Tiny::AvoidCallbacks;
 		}
 		undef, qq($_ >= 0);
 	},
@@ -129,11 +131,11 @@ for my $base (qw/Num Int/) {
 		constraint_generator => sub {
 			return $meta->get_type("${base}Range") unless @_;
 			
-			my $base = Types::Standard->get_type($base);
+			my $base_obj = Types::Standard->get_type($base);
 			
 			my ($min, $max, $min_excl, $max_excl) = @_;
-			!defined($min) or $base->check($min) or _croak("${base}Range min must be a %s; got %s", lc($base), $min);
-			!defined($max) or $base->check($max) or _croak("${base}Range max must be a %s; got %s", lc($base), $max);
+			!defined($min) or $base_obj->check($min) or _croak("${base}Range min must be a %s; got %s", lc($base), $min);
+			!defined($max) or $base_obj->check($max) or _croak("${base}Range max must be a %s; got %s", lc($base), $max);
 			!defined($min_excl) or Bool->check($min_excl) or _croak("${base}Range minexcl must be a boolean; got $min_excl");
 			!defined($max_excl) or Bool->check($max_excl) or _croak("${base}Range maxexcl must be a boolean; got $max_excl");
 			
@@ -223,23 +225,41 @@ L<MooseX::Types::Common::Numeric>.
 
 =over
 
-=item C<PositiveNum>
+=item *
 
-=item C<PositiveOrZeroNum>
+B<PositiveNum>
 
-=item C<PositiveInt>
+=item *
 
-=item C<PositiveOrZeroInt>
+B<PositiveOrZeroNum>
 
-=item C<NegativeNum>
+=item *
 
-=item C<NegativeOrZeroNum>
+B<PositiveInt>
 
-=item C<NegativeInt>
+=item *
 
-=item C<NegativeOrZeroInt>
+B<PositiveOrZeroInt>
 
-=item C<SingleDigit>
+=item *
+
+B<NegativeNum>
+
+=item *
+
+B<NegativeOrZeroNum>
+
+=item *
+
+B<NegativeInt>
+
+=item *
+
+B<NegativeOrZeroInt>
+
+=item *
+
+B<SingleDigit>
 
 C<SingleDigit> interestingly accepts the numbers -9 to -1; not
 just 0 to 9. 
@@ -251,7 +271,9 @@ L<MooseX::Types::Common::Numeric>.
 
 =over
 
-=item C<< IntRange[`min, `max] >>
+=item *
+
+B<< IntRange[`min, `max] >>
 
 Type constraint for an integer between min and max. For example:
 
@@ -263,7 +285,9 @@ The maximum can be omitted.
 
 The minimum and maximum are inclusive.
 
-=item C<< NumRange[`min, `max] >>
+=item *
+
+B<< NumRange[`min, `max] >>
 
 Type constraint for a number between min and max. For example:
 

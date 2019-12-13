@@ -105,16 +105,11 @@ expression_clause: expression_phrase
                  ;
 
 expression_phrase: comparison
-                 | predicate_comparison
                  | openingbrace expression closingbrace
                     {
                         return $_[2];
                     }
                  | NOT comparison
-                    {
-                        return OPTiMaDe::Filter::Negation->new( $_[2] );
-                    }
-                 | NOT predicate_comparison
                     {
                         return OPTiMaDe::Filter::Negation->new( $_[2] );
                     }
@@ -125,6 +120,13 @@ expression_phrase: comparison
                  ;
 
 comparison: constant_first_comparison | property_first_comparison ;
+
+constant_first_comparison: constant value_op_rhs
+                            {
+                                $_[2]->unshift_operand( $_[1] );
+                                return $_[2];
+                            }
+                         ;
 
 property_first_comparison: property value_op_rhs
                                 {
@@ -151,16 +153,12 @@ property_first_comparison: property value_op_rhs
                                     $_[2]->unshift_property( $_[1] );
                                     return $_[2];
                                 }
+                           | property length_op_rhs
+                                {
+                                    $_[2]->property( $_[1] );
+                                    return $_[2];
+                                }
                            ;
-
-constant_first_comparison: constant value_op_rhs
-                            {
-                                $_[2]->unshift_operand( $_[1] );
-                                return $_[2];
-                            }
-                         ;
-
-predicate_comparison: length_comparison ;
 
 value_op_rhs: operator value
                 {
@@ -180,39 +178,37 @@ known_op_rhs: IS KNOWN
                 }
             ;
 
-string_property: string | property ;
-
-fuzzy_string_op_rhs: CONTAINS string_property
+fuzzy_string_op_rhs: CONTAINS value
                         {
                             my $cmp = OPTiMaDe::Filter::Comparison->new( $_[1] );
                             $cmp->push_operand( $_[2] );
                             return $cmp;
                         }
-                   | STARTS string_property
+                   | STARTS value
                         {
                             my $cmp = OPTiMaDe::Filter::Comparison->new( $_[1] );
                             $cmp->push_operand( $_[2] );
                             return $cmp;
                         }
-                   | STARTS WITH string_property
+                   | STARTS WITH value
                         {
                             my $cmp = OPTiMaDe::Filter::Comparison->new( "$_[1] $_[2]" );
                             $cmp->push_operand( $_[3] );
                             return $cmp;
                         }
-                   | ENDS string_property
+                   | ENDS value
                         {
                             my $cmp = OPTiMaDe::Filter::Comparison->new( $_[1] );
                             $cmp->push_operand( $_[2] );
                             return $cmp;
                         }
-                   | ENDS WITH string_property
+                   | ENDS WITH value
                         {
                             my $cmp = OPTiMaDe::Filter::Comparison->new( "$_[1] $_[2]" );
                             $cmp->push_operand( $_[3] );
                             return $cmp;
                         }
-                   | LIKE string_property
+                   | LIKE value
                         {
                             my $cmp = OPTiMaDe::Filter::Comparison->new( $_[1] );
                             $cmp->push_operand( $_[2] );
@@ -278,27 +274,32 @@ set_zip_op_rhs: property_zip_addon HAS value_zip
                 }
               ;
 
-length_comparison: LENGTH property operator value
-                    {
-                        my $cmp = OPTiMaDe::Filter::ListComparison->new( $_[1] );
-                        $cmp->property( $_[2] );
-                        $cmp->values( [ [ $_[3], $_[4] ] ] );
-                        return $cmp;
-                    }
-                 ;
-
 property_zip_addon: colon property
                         {
                             my $zip = OPTiMaDe::Filter::Zip->new;
                             $zip->push_property( $_[2] );
                             return $zip;
                         }
-                    | property_zip_addon colon property
+                  | property_zip_addon colon property
                         {
                             $_[1]->push_property( $_[3] );
                             return $_[1];
                         }
-                    ;
+                  ;
+
+length_op_rhs: LENGTH value
+                {
+                    my $cmp = OPTiMaDe::Filter::ListComparison->new( $_[1] );
+                    $cmp->values( [ [ '=', $_[2] ] ] );
+                    return $cmp;
+                }
+             | LENGTH operator value
+                {
+                    my $cmp = OPTiMaDe::Filter::ListComparison->new( $_[1] );
+                    $cmp->values( [ [ $_[2], $_[3] ] ] );
+                    return $cmp;
+                }
+             ;
 
 # Property
 

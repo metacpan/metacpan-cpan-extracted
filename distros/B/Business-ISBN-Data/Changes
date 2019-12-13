@@ -1,5 +1,8 @@
 Revision history for Perl module 
 
+20191107 2019-12-11T20:04:42Z
+	* Peter Williams fixed the 978/979 distinction (GitHub #5)
+
 20140910.003 2015-12-15T12:25:58Z
 	* Hide the Business::ISBN namespace
 

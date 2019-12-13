@@ -2,17 +2,18 @@ package Text::Markup::Rest;
 
 use 5.8.1;
 use strict;
+use warnings;
 use File::Spec;
 use File::Basename ();
 use constant WIN32  => $^O eq 'MSWin32';
 use Symbol 'gensym';
 use IPC::Open3;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 # Find Python (process stolen from App::Info).
 my ($PYTHON, $RST2HTML);
-for my $exe (WIN32 ? 'python.exe' : 'python') {
+for my $exe (WIN32 ? 'python3.exe' : 'python3') {
     my @path = (
         File::Spec->path,
         WIN32 ? (map { "C:\\Python$_" } '', 27, 26, 25) : ()
@@ -178,7 +179,7 @@ Daniele Varrazzo <daniele.varrazzo@gmail.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2014 Daniele Varrazzo. Some Rights Reserved.
+Copyright (c) 2011-2019 Daniele Varrazzo. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

@@ -1,5 +1,19 @@
 Revision history for Perl extension Sweat
 
+201912110 2019-12-11T19:38:38Z
+
+    - Changes to Wikipedia mode:
+    
+        - Avoiding repeating any article during a single workout
+        
+        - Avoiding articles with certain keywords in the title that suggest primarily non-prose content (e.g. "List of" or "Comparison of")
+
+        - Dropping parentheticals (e.g. birth and death dates, original-language spellings, and IPA pronunciations) from Wikipedia articles' summaries, because they often do not read out loud well.
+
+    - Fixing a bug that would ignore "no-news" in a config file.
+    
+    - Fixed incorrect docs and sample-config info (Thanks to Tim Vroom)
+
 201909240 2019-09-24T20:55:34Z
 
     - Adding a "language" config option for setting Wikipedia localization.

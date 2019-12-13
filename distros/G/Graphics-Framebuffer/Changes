@@ -1563,3 +1563,15 @@ Revision history for Graphics-Framebuffer
 
       Apparently the CentOS/Redhat issue was not quite fixed.  This update
       addresses that.
+
+6.43  Dec 3, 2019
+
+      Made some documentation updates and fixed some examples
+
+6.45  Dec 9, 2019
+
+      More documentation updates and improved the installation instructions.
+
+6.46  Dec 10, 2019
+
+      Fixed the prerequisite installation scripts.

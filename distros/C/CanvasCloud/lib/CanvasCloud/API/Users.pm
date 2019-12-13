@@ -1,5 +1,5 @@
 package CanvasCloud::API::Users;
-$CanvasCloud::API::Users::VERSION = '0.006';
+$CanvasCloud::API::Users::VERSION = '0.007';
 # ABSTRACT: extends L<CanvasCloud::API>
 
 use Moose;
@@ -34,7 +34,7 @@ CanvasCloud::API::Users - extends L<CanvasCloud::API>
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 ATTRIBUTES
 
@@ -52,7 +52,7 @@ Ted Katseres
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ted Katseres.
+This software is copyright (c) 2019 by Ted Katseres.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

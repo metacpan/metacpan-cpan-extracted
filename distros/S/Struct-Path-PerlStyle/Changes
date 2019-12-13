@@ -1,5 +1,9 @@
 Revision history for Struct-Path-PerlStyle
 
+0.93    2019-12-11
+        - hooks: default val substitution corrected
+        - str2path: bare zero as a key parsing fixed
+
 0.92    2019-03-03
         - back() renamed to BACK()
         - return undef when not an int passed to BACK()

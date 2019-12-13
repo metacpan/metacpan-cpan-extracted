@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  Applify: '0.06'
+  Applify: '0.20'
   CPAN::Uploader: '0.10'
   ExtUtils::MakeMaker: '6.00'
   IPC::Run3: '0.04'
@@ -28,14 +28,16 @@ requires:
   Pod::Markdown: '3.00'
   Test::Pod: '0'
   Test::Pod::Coverage: '0'
+  perl: '5.014004'
 resources:
   bugtracker: https://github.com/jhthorsen/app-git-ship/issues
   homepage: https://github.com/jhthorsen/app-git-ship
   repository: https://github.com/jhthorsen/app-git-ship.git
-version: '0.33'
+version: '0.34'
 x_contributors:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
   - 'mohawk2 <mohawk2@users.noreply.github.com>'
+  - 'Rolf Stöckli <tekki@cpan.org>'
   - 'Shoichi Kaji <skaji@cpan.org>'
   - __DATA__
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

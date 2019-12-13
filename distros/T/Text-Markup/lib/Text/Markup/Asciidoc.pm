@@ -2,13 +2,14 @@ package Text::Markup::Asciidoc;
 
 use 5.8.1;
 use strict;
+use warnings;
 use File::Spec;
 use constant WIN32  => $^O eq 'MSWin32';
 use Symbol 'gensym';
 use IPC::Open3;
 use utf8;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 # Find Asciidoc.
 my $ASCIIDOC;
@@ -76,7 +77,9 @@ sub parser {
     # Make sure we have something.
     return unless $html =~ /\S/;
     utf8::encode $html;
+    return $html if $opts->{raw};
     return qq{<html>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
@@ -119,6 +122,7 @@ Text::Markup::Asciidoc - Asciidoc parser for Text::Markup
 
   use Text::Markup;
   my $html = Text::Markup->new->parse(file => 'hello.adoc');
+  my $raw_asciidoc = Text::Markup->new->parse(file => 'hello.adoc', raw => 1 );
 
 =head1 Description
 
@@ -138,13 +142,17 @@ recognizes files with the following extensions as Asciidoc:
 
 =back
 
+Normally this parser returns the output of C<asciidoc> wrapped in a minimal
+HTML page skeleton. If you would prefer to just get the exact output returned
+by C<asciidoc>, you can pass in a true value for the C<raw> option.
+
 =head1 Author
 
 David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2012-2014 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2012-2019 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

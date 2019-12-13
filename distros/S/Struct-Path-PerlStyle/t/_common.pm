@@ -7,7 +7,7 @@ use parent 'Exporter';
 use Clone qw(clone);
 use Data::Dumper qw();
 use Struct::Path::PerlStyle qw(str2path path2str);
-use Test::More;
+use Test::More 0.94;
 
 our @EXPORT_OK = qw(
     roundtrip

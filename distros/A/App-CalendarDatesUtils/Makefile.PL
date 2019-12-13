@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -18,15 +18,17 @@ my %WriteMakefileArgs = (
     "script/list-calendar-dates-modules"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CalendarDatesUtils",
   "PREREQ_PM" => {
-    "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
+    "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::hash" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
-    "PERLANCAR::Module::List" => 0,
+    "List::Util" => "1.45",
+    "Module::List::Tiny" => 0,
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Base" => "1.820",
     "Perinci::CmdLine::Classic" => "1.770",
@@ -34,6 +36,7 @@ my %WriteMakefileArgs = (
     "Perinci::Sub::XCompletion::perl_modname" => 0,
     "Sah::Schema::perl::modname" => 0,
     "Sah::Schema::true" => 0,
+    "Scalar::Util::Numeric" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -43,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +54,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
+  "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::hash" => 0,
@@ -60,7 +63,8 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "PERLANCAR::Module::List" => 0,
+  "List::Util" => "1.45",
+  "Module::List::Tiny" => 0,
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Base" => "1.820",
   "Perinci::CmdLine::Classic" => "1.770",
@@ -68,6 +72,7 @@ my %FallbackPrereqs = (
   "Perinci::Sub::XCompletion::perl_modname" => 0,
   "Sah::Schema::perl::modname" => 0,
   "Sah::Schema::true" => 0,
+  "Scalar::Util::Numeric" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

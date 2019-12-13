@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojo-File-Role-Digest
 
+0.03 2019-12-12T06:32:45+0100
+ - Set required Mojolicious version to 8.18
+   Error reported by Slaven Rezić (#3)
+
 0.02 2019-12-10T06:17:16+0100
  - Improved pod
    Contributor: Mohammad S Anwar (#1)

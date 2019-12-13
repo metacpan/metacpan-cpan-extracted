@@ -32,8 +32,8 @@ requires:
   Time::HiRes: 0
   Time::Local: 0
 resources:
-  homepage: http://spamassassin.apache.org/
+  homepage: https://spamassassin.apache.org/
   license: http://www.apache.org/licenses/LICENSE-2.0.html
   repository: http://svn.apache.org/repos/asf/spamassassin/
   x_MailingList: http://wiki.apache.org/spamassassin/MailingLists
-version: 3.004002
+version: 3.004003

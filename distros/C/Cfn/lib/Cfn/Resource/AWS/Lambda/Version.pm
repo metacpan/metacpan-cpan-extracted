@@ -1,4 +1,4 @@
-# AWS::Lambda::Version generated from spec 5.3.0
+# AWS::Lambda::Version generated from spec 9.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Lambda::Version',
@@ -20,6 +20,27 @@ package Cfn::Resource::AWS::Lambda::Version {
 
 
 
+subtype 'Cfn::Resource::Properties::AWS::Lambda::Version::ProvisionedConcurrencyConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Lambda::Version::ProvisionedConcurrencyConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Lambda::Version::ProvisionedConcurrencyConfigurationValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Lambda::Version::ProvisionedConcurrencyConfigurationValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ProvisionedConcurrentExecutions => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 package Cfn::Resource::Properties::AWS::Lambda::Version {
   use Moose;
   use MooseX::StrictConstructor;
@@ -28,6 +49,7 @@ package Cfn::Resource::Properties::AWS::Lambda::Version {
   has CodeSha256 => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FunctionName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has ProvisionedConcurrencyConfig => (isa => 'Cfn::Resource::Properties::AWS::Lambda::Version::ProvisionedConcurrencyConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

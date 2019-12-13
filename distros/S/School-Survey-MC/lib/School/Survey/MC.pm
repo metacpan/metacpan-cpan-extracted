@@ -1,5 +1,5 @@
 package School::Survey::MC;
-$School::Survey::MC::VERSION = '0.003';
+$School::Survey::MC::VERSION = '0.004';
 use strict;
 use warnings;
 # Autor: Boris Däppen, 2018
@@ -26,7 +26,7 @@ School::Survey::MC - pick multiple choice questions randomly
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Boris Däppen.
+This software is copyright (c) 2019 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

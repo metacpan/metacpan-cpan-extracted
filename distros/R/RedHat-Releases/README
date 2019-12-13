@@ -2,8 +2,8 @@ NAME
     RedHat::Releases - List RedHat releases
 
 VERSION
-    This document describes version 0.020 of RedHat::Releases (from Perl
-    distribution RedHat-Releases), released on 2017-09-08.
+    This document describes version 0.021 of RedHat::Releases (from Perl
+    distribution RedHat-Releases), released on 2019-12-12.
 
 SYNOPSIS
      use RedHat::Releases qw(list_redhat_release);
@@ -13,7 +13,7 @@ SYNOPSIS
 DESCRIPTION
     This module contains list of RedHat Enterprise Linux releases. Data
     source is currently at:
-    <https://github.com/perlancar/gudangdata-distrowatch>
+    <https://github.com/sharyanto/gudangdata-distrowatch>
     (table/redhat_release) which in turn is retrieved from
     <http://distrowatch.com>.
 
@@ -21,7 +21,7 @@ FUNCTIONS
   list_redhat_releases
     Usage:
 
-     list_redhat_releases(%args) -> [status, msg, result, meta]
+     list_redhat_releases(%args) -> [status, msg, payload, meta]
 
     RedHat releases.
 
@@ -883,7 +883,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -917,7 +917,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017, 2015 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

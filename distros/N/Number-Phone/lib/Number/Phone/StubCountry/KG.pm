@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215426;
+our $VERSION = 1.20191211212302;
 
 my $formatters = [
                 {
@@ -55,12 +55,20 @@ my $formatters = [
 
 my $validators = {
                 'fixed_line' => '
+          312(?:
+            5[0-79]\\d|
+            9(?:
+              [0-689]\\d|
+              7[0-24-9]
+            )
+          )\\d{3}|
           (?:
             3(?:
               1(?:
-                [256]\\d|
+                2[0-46-8]|
                 3[1-9]|
-                47
+                47|
+                [56]\\d
               )|
               2(?:
                 22|
@@ -104,12 +112,20 @@ my $validators = {
           )\\d{5}
         ',
                 'geographic' => '
+          312(?:
+            5[0-79]\\d|
+            9(?:
+              [0-689]\\d|
+              7[0-24-9]
+            )
+          )\\d{3}|
           (?:
             3(?:
               1(?:
-                [256]\\d|
+                2[0-46-8]|
                 3[1-9]|
-                47
+                47|
+                [56]\\d
               )|
               2(?:
                 22|
@@ -153,16 +169,19 @@ my $validators = {
           )\\d{5}
         ',
                 'mobile' => '
-          8801\\d{5}|
+          (?:
+            312(?:
+              58\\d|
+              973
+            )|
+            8801\\d\\d
+          )\\d{3}|
           (?:
             2(?:
               0[0-35]|
               2\\d
             )|
-            5(?:
-              0[0-57-9]|
-              [124-7]\\d
-            )|
+            5[0-24-7]\\d|
             7(?:
               [07]\\d|
               55
@@ -177,7 +196,41 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{996312} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{9963120} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{9963121} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{9963122} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{9963123} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{9963124} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631250} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631251} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631252} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631253} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631254} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631255} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631256} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631257} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631259} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{9963126} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{9963127} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{9963128} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631290} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631291} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631292} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631293} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631294} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631295} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631296} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{996312970} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{996312971} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{996312972} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{996312974} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{996312975} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{996312976} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{996312977} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{996312978} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{996312979} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631298} = "Bishkek\,\ Chuy\ region";
+$areanames{en}->{99631299} = "Bishkek\,\ Chuy\ region";
 $areanames{en}->{9963131} = "Belovodskoe\,\ Chuy\ region";
 $areanames{en}->{9963132} = "Kant\,\ Chuy\ region";
 $areanames{en}->{9963133} = "Kara\-Balta\,\ Chuy\ region";

@@ -6,8 +6,10 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Union::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Union::VERSION   = '1.006000';
+	$Type::Tiny::Union::VERSION   = '1.008000';
 }
+
+$Type::Tiny::Union::VERSION =~ tr/_//d;
 
 use Scalar::Util qw< blessed >;
 use Types::TypeTiny ();
@@ -189,6 +191,31 @@ sub validate_explain
 			map("    $_", @{ $_->validate_explain($value) || []}),
 		} @$self
 	];
+}
+
+my $_delegate = sub {
+	my ($self, $method) = (shift, shift);
+	my @types = @{ $self->type_constraints };
+	
+	my @unsupported = grep !$_->can($method), @types;
+	_croak('Could not apply method %s to all types within the union', $method) if @unsupported;
+	
+	ref($self)->new(type_constraints => [ map $_->$method(@_), @types ]);
+};
+
+sub stringifies_to {
+	my $self = shift;
+	$self->$_delegate(stringifies_to => @_);
+}
+
+sub numifies_to {
+	my $self = shift;
+	$self->$_delegate(numifies_to => @_);
+}
+
+sub with_attribute_values {
+	my $self = shift;
+	$self->$_delegate(with_attribute_values => @_);
 }
 
 push @Type::Tiny::CMP, sub {
@@ -376,6 +403,18 @@ The auto-generated default will be a L<Type::Coercion::Union> object.
 
 Returns the first individual type constraint in the union which
 C<< $value >> passes.
+
+=item C<< stringifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< numifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< with_attribute_values($attr1 => $constraint1, ...) >>
+
+See L<Type::Tiny::ConstrainedObject>.
 
 =back
 

@@ -1,16 +1,15 @@
 =pod
 
-=for stopwords smush smushed enums
-
 =encoding utf-8
 
 =head1 NAME
 
 Type::Tiny::Manual::Optimization - squeeze the most out of your CPU
 
-=head1 DESCRIPTION
+=head1 MANUAL
 
-Various tips to help you squeeze the most out of your CPU.
+Type::Tiny is written with efficiency in mind, but there are techniques
+you can use to get the best performance out of it.
 
 =head2 XS
 
@@ -20,8 +19,11 @@ set of ultra-fast type constraint checks implemented in C.
 
 L<Type::Tiny> will attempt to load L<Type::Tiny::XS> and use its
 type checks. If L<Type::Tiny::XS> is not available, it will then
-try to use L<Mouse> B<< if it is already loaded >>, but Type::Tiny
+try to use L<Mouse> I<< if it is already loaded >>, but Type::Tiny
 won't attempt to load Mouse for you.
+
+Certain type constraints can also be accelerated if you have
+L<Ref::Util::XS> installed.
 
 =head3 Types that can be accelerated by Type::Tiny::XS
 
@@ -30,7 +32,7 @@ be accelerated by Type::Tiny::XS: C<Any>, C<ArrayRef>, C<Bool>,
 C<ClassName>, C<CodeRef>, C<Defined>, C<FileHandle>, C<GlobRef>,
 C<HashRef>, C<Int>, C<Item>, C<Object>, C<Map>, C<Ref>, C<ScalarRef>,
 C<Str>, C<Tuple>, C<Undef>, and C<Value>. (Note that C<Num> and
-C<RegexpRef> are B<not> on that list.)
+C<RegexpRef> are I<not> on that list.)
 
 The parameterized form of C<Ref> cannot be accelerated.
 
@@ -66,7 +68,7 @@ be accelerated by Type::Tiny::XS: C<Any>, C<ArrayRef>, C<Bool>,
 C<ClassName>, C<CodeRef>, C<Defined>, C<FileHandle>, C<GlobRef>,
 C<HashRef>, C<Ref>, C<ScalarRef>, C<Str>, C<Undef>, and C<Value>.
 (Note that C<Item>, C<Num>, C<Int>, C<Object>, and C<RegexpRef>
-are B<not> on that list.)
+are I<not> on that list.)
 
 The parameterized form of C<Ref> cannot be accelerated.
 
@@ -81,6 +83,108 @@ The parameterized C<InstanceOf> and C<HasMethods> type constraints
 will be accelerated. So will L<Type::Tiny::Class> and
 L<Type::Tiny::Duck> objects.
 
+=head2 Inlining Type Constraints
+
+In the case of a type constraint like this:
+
+ my $type = Int->where(sub { $_ >= 0 });
+
+Type::Tiny will need to call one sub to verify a value meets the B<Int>
+type constraint, and your coderef to check that the value is above zero.
+
+Sub calls in Perl are relatively expensive in terms of memory and CPU
+usage, so it would be good if it could be done all in one sub call.
+
+The B<Int> type constraint knows how to create a string of Perl code
+that checks an integer. It's something like the following. (It's actually
+more complicated, but this is close enough as an example.)
+
+ $_ =~ /^-?[0-9]+$/
+
+If you provide your check as a string instead of a coderef, like this:
+
+ my $type = Int->where(q{ $_ >= 0 });
+
+Then Type::Tiny will be able to combine them into one string:
+
+ ( $_ =~ /^-?[0-9]+$/ ) && ( $_ >= 0 )
+
+So Type::Tiny will be able to check values in one sub call. Providing
+constraints as strings is a really simple and easy way of optimizing
+type checks.
+
+But it can be made even more efficient. Type::Tiny needs to localize
+C<< $_ >> and copy the value into it for the above check. If you're
+checking B<< ArrayRef[$type] >> this will be done for each element of
+the array. Things could be made more efficient if Type::Tiny were able
+to directly check:
+
+ ( $arrayref->[$i] =~ /^-?[0-9]+$/ ) && ( $arrayref->[$i] >= 0 )
+
+This can be done by providing an inlining sub. The sub is given a
+variable name and can use that in the string of code it generates.
+
+ my $type = Type::Tiny->new(
+   parent  => Int,
+   inlined => sub {
+     my ($self, $varname) = @_;
+     return sprintf(
+       '(%s) && ( %s >= 0 )',
+       $self->parent->inline_check($varname),
+       $varname,
+     );
+   }
+ );
+
+Because it's pretty common to want to call your parent's inline check and
+C<< && >> your own string with it, Type::Tiny provides a shortcut for this.
+Just return a list of strings to smush together with C<< && >>, and if the
+first one is C<undef>, Type::Tiny will fill in the blank with the parent
+type check.
+
+ my $type = Type::Tiny->new(
+   parent  => Int,
+   inlined => sub {
+     my ($self, $varname) = @_;
+     return (
+       undef,
+       sprintf('%s >= 0', $varname),
+     );
+   }
+ );
+
+There is one further optimization which can be applied to this particular
+case. You'll note that we're checking the string matches C<< /^-?[0-9+]$/ >>
+and then checking it's greater than or equal to zero. But a non-negative
+integer won't ever start with a minus sign, so we could inline the check to
+something like:
+
+ $_ =~ /^[0-9]+$/
+
+While an inlined check I<can> call its parent type check, it is not required
+to.
+
+ my $type = Type::Tiny->new(
+   parent  => Int,
+   inlined => sub {
+     my ($self, $varname) = @_;
+     return sprintf('%s =~ /^[0-9]+$/', $varname);
+   }
+ );
+
+If you opt not to call the parent type check, then you need to ensure your
+own check is at least as rigorous.
+
+=head2 Inlining Coercions
+
+Moo is the only object-oriented programming toolkit that fully supports
+coercions being inlined, but even for Moose and Mouse, providing coercions
+as strings can help Type::Tiny optimize its coercion features.
+
+For Moo, if you want your coercion to be inlinable, all the types you're
+coercing from and to need to be inlinable, plus the coercion needs to be
+given as a string of Perl code.
+
 =head2 Common Sense
 
 The C<< HashRef[ArrayRef] >> type constraint can probably be checked
@@ -93,103 +197,66 @@ little more trust in your caller to not supply you with bad data.)
 restrictive than C<Num>, in most circumstances C<Int> checks will run
 faster.)
 
-=head2 Inlining Type Constraints
+=head2 Devel::StrictMode
 
-If your type constraint can be inlined, this can not only speed up
-Type::Tiny's own checks and coercions, it may also allow your type constraint
-to be inlined into generated methods such as Moose attribute accessors.
+One possibility is to use strict type checks when you're running your
+release tests, and faster, more permissive type checks at other times.
+Devel::StrictMode can make this easier.
 
-All of the constraints from C<Types::Standard> can be inlined, as can enum,
-class_type, role_type and duck_type constraints. Union and intersection
-constraints can be inlined if their sub-constraints can be. So if you can
-define your own types purely in terms of these types, you automatically
-get inlining:
+This provides a C<STRICT> constant that indicates whether your code is
+operating in "strict mode" based on certain environment variables.
 
-   declare HashLike, as union [
-      Ref["HASH"],
-      Overload["&{}"],
-   ];
+=head3 Attributes
 
-However, sometimes these base types are not powerful enough and you'll need
-to write a constraint coderef:
+ use Types::Standard qw( ArrayRef Num );
+ use Devel::StrictMode qw( STRICT );
+ 
+ has numbers => (
+   is      => 'ro',
+   isa     => STRICT ? ArrayRef[Num] : ArrayRef,
+   default => sub { [] },
+ );
 
-   declare NonEmptyHash, as HashLike,
-      where     { scalar values %$_ };
+It is inadvisible to do this on attributes that have coercions because
+it can lead to inconsistent and unpredictable behaviour.
 
-... and you've suddenly sacrificed a lot of speed.
+=head3 Type::Params
 
-Inlining to the rescue! You can define an inlining coderef which will be
-passed two parameters: the constraint itself and a variable name as a string.
-For example, the variable name might be C<< '$_' >> or C<< '$_[0]' >>.
-Your coderef should return a Perl expression string, interpolating that
-variable name.
+ use Types::Standard qw( Num Object );
+ use Type::Params qw( compile );
+ use Devel::StrictMode qw( STRICT );
+ 
+ sub add_number {
+   state $check;
+   $check = compile(Object, Num) if STRICT;
+   
+   my ($self, $num) = STRICT ? $check->(@_) : @_;
+   push @{ $self->numbers }, $num;
+   return $self;
+ }
 
-   declare NonEmptyHash, as HashLike,
-      where     { scalar values %$_ },
-      inline_as {
-         my ($constraint, $varname) = @_;
-         return sprintf(
-            '%s and scalar values %%{%s}',
-            $constraint->parent->inline_check($varname),
-            $varname,
-         );
-      };
+Again, you need to be careful to ensure consistent behaviour if you're
+using coercions, defaults, slurpies, etc.
 
-The Perl expression could be inlined within a function or a C<if> clause or
-potentially anywhere, so it really must be an expression, not a statement.
-It should not C<return> or C<exit> and probably shouldn't C<die>. (If you
-need loops and so on, you can output a C<do> block.)
+=head3 Ad-Hoc Type Checks
 
-Note that if you're subtyping an existing type constraint, your C<inline_as>
-block is also responsible for checking the parent type's constraint. This
-can be done quite easily, as shown in the example above.
+ ...;
+ my $x = get_some_number();
+ assert_Int($x) if STRICT;
+ return $x + 1;
+ ...;
 
-Note that defining a type constraint in terms of a constraint coderef and an
-inlining coderef can be a little repetitive. L<Sub::Quote> provides an
-alternative that reduces repetition (though the inlined code might not be as
-compact/good/fast).
+=head1 NEXT STEPS
 
-   declare NonEmptyHash, as HashLike,
-      constraint => quote_sub q{ scalar values %$_ };
+Here's your next step:
 
-Aside: it's been pointed out that "might not be as fast" above is a bit
-hand-wavy. When Type::Tiny does inlining from Sub::Quote coderefs, it needs
-to inline all the ancestor type constraints, and smush them together with
-C<< && >>. This may result in duplicate checks. For example, if 'MyArray'
-inherits from 'MyRef' which inherits from 'MyDef', the inlined code might
-end up as:
+=over
 
-   defined($_)              # check MyDef
-   && ref($_)               # check MyRef
-   && ref($_) eq 'ARRAY'    # check MyArray
+=item * L<Type::Tiny::Manual::Coercions>
 
-When just the last check would have been sufficient. A custom C<inline_as>
-allows you finer control over how the type constraint is inlined.
+Advanced information on coercions.
 
-=head2 Optimizing Coercions
-
-Coercions are often defined using coderefs:
-
-   PathTiny->plus_coercions(
-      Str,   sub { "Path::Tiny"->new($_) },
-      Undef, sub { "Path::Tiny"->new("/etc/myapp/default.conf") },
-   );
-
-But you can instead define them as strings of Perl code operating on
-C<< $_ >>:
-
-   PathTiny->plus_coercions(
-      Str,   q{ "Path::Tiny"->new($_) },
-      Undef, q{ "Path::Tiny"->new("/etc/myapp/default.conf") },
-   );
-
-The latter will run faster, so is preferable at least for simple
-coercions.
-
-This makes the most difference when used with L<Moo>, which supports
-inlining of coercions. L<Moose> does not inline coercions, but
-providing coercions as strings still allows Type::Tiny to optimize the
-coercion coderef it provides to Moose.
+=back
 
 =head1 AUTHOR
 
@@ -209,3 +276,4 @@ WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
+

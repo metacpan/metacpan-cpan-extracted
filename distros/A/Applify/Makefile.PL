@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   'Cwd' => '0',
   'File::Basename' => '0',
   'Getopt::Long' => '0',
-  'perl' => '5.010001'
+  'perl' => '5.014004'
 }
 ,
   META_MERGE     => {

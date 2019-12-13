@@ -41,11 +41,12 @@ implementation.)
 =cut
 
 use Call::Context;
-use Promise::ES6;
 
 use Protocol::DBus::Message;
 use Protocol::DBus::Parser;
 use Protocol::DBus::WriteMsg;
+
+use constant _PROMISE_CLASS => 'Promise::ES6';
 
 #----------------------------------------------------------------------
 
@@ -116,6 +117,20 @@ your input is invalid or if there’s a socket I/O error.
 
 use constant _METHOD_RETURN_NUM => Protocol::DBus::Message::Header::MESSAGE_TYPE()->{'METHOD_RETURN'};
 
+sub _get_promise_class {
+    my ($self) = @_;
+
+    $self->{'_loaded_promise'} ||= do {
+        local ($!, $@);
+        my $path = $self->_PROMISE_CLASS() . '.pm';
+        $path =~ s[::][/]g;
+
+        require $path;
+    };
+
+    return $self->_PROMISE_CLASS();
+}
+
 sub send_call {
     my ($self, %opts) = @_;
 
@@ -132,7 +147,7 @@ sub send_call {
         # in order to avoid memory leaks.
         my $on_return_hr = $self->{'_on_return'} ||= {};
 
-        return Promise::ES6->new( sub {
+        return $self->_get_promise_class()->new( sub {
             my ($resolve, $reject) = @_;
 
             $on_return_hr->{$serial} = sub {
@@ -232,7 +247,7 @@ have little need for this function.
 sub big_endian {
     my ($self) = @_;
 
-    if (@_ > 0) {
+    if (@_ > 1) {
         my $old = $self->{'_big_endian'};
         $self->{'_big_endian'} = !!$_[1];
 

@@ -1,4 +1,4 @@
-# AWS::ApiGateway::ClientCertificate generated from spec 5.3.0
+# AWS::ApiGateway::ClientCertificate generated from spec 7.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ApiGateway::ClientCertificate',
@@ -26,6 +26,7 @@ package Cfn::Resource::Properties::AWS::ApiGateway::ClientCertificate {
   extends 'Cfn::Resource::Properties';
   
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

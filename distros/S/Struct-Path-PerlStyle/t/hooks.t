@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Struct::Path::PerlStyle qw(str2path);
-use Test::More tests => 25;
+use Test::More tests => 26;
 
 eval { str2path('(lonesome_bareword_treated_as_string)')->[0]->() };
 like($@, qr/^Failed to eval hook /, "lonesome_bareword_treated_as_string");
@@ -32,6 +32,9 @@ like($@, qr/^Failed to eval hook 'print 'Hi there!'': 'print' trapped by operati
 
 eval { str2path('(warn "aaaa")')->[0]->() };
 like($@, qr/^Failed to eval hook 'warn "aaaa"': 'warn' trapped by operation mask/);
+
+eval { str2path("(=> 0)")->[0]->() };
+like($@, qr/^Failed to eval hook '=> 0': syntax error/, 'unsupported implicit operator');
 
 my $ret = eval { str2path('(die "aaaa"; return "wooo")')->[0]->() };
 is($ret, undef, "die()'s message ignored");

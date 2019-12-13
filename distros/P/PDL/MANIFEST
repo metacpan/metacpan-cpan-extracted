@@ -357,7 +357,6 @@ IO/Pnm/Pic.pm
 IO/Pnm/pnm.pd
 IO/Storable/Makefile.PL
 IO/Storable/storable.pd
-Known_problems
 Lib/CallExt/CallExt.pm
 Lib/CallExt/CallExt.xs
 Lib/CallExt/Makefile.PL
@@ -661,8 +660,6 @@ debian/rules
 debian/source/format
 debian/write_config_debian.pl
 inc/Alien/Proj4.pm
-inc/Carp.pm
-inc/Carp/Heavy.pm
 m51.fits
 macosx/README
 pdl.c
@@ -757,6 +754,7 @@ t/nsdatahandle.t
 t/ones.t
 t/op-eq-warn-for-non-numeric.t
 t/opengl.t
+t/ops-bitwise.t
 t/ops.t
 t/pdl-from-string-bad-values.t
 t/pdl_from_string.t

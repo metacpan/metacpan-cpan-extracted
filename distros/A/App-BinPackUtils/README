@@ -3,8 +3,8 @@ NAME
     into bins
 
 VERSION
-    This document describes version 0.005 of App::BinPackUtils (from Perl
-    distribution App-BinPackUtils), released on 2019-01-28.
+    This document describes version 0.006 of App::BinPackUtils (from Perl
+    distribution App-BinPackUtils), released on 2019-12-11.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:

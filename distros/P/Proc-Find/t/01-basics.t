@@ -46,7 +46,7 @@ my $table = [
     uid      => 0,
     utime    => 90000,
     wchan    => -1,
-  },
+  }, #0
   {
     cmajflt  => 0,
     cminflt  => 0,
@@ -85,7 +85,7 @@ my $table = [
     uid      => 1000,
     utime    => 0,
     wchan    => 0,
-  },
+  }, #1
   {
     cmajflt  => 0,
     cminflt  => 18639,
@@ -124,7 +124,7 @@ my $table = [
     uid      => 1000,
     utime    => 20000,
     wchan    => 0,
-  },
+  }, #2
   {
     cmajflt  => 0,
     cminflt  => 0,
@@ -163,10 +163,14 @@ my $table = [
     uid      => 1000,
     utime    => 20000,
     wchan    => 0,
-  },
+  }, #3
 ];
 
 subtest find_proc => sub {
+    # filter
+    is(~~@{ find_proc(table=>$table, filter=>sub { $_[0]{pid} > 10000 }) }, 3);
+    is(~~@{ find_proc(table=>$table, filter=>sub { $_->{pid} <= 10000 }) }, 1);
+
     # detail
     ok(!ref(find_proc(table=>$table)->[0]), "detail=0");
     is( ref(find_proc(table=>$table, detail=>1)->[0]), "HASH", "detail=1");
@@ -194,6 +198,7 @@ subtest find_proc => sub {
     # user
     is(~~@{ find_proc(table=>$table, user=>1000) }, 3);
     is(~~@{ find_proc(table=>$table, user=>9999) }, 0);
+    is(~~@{ find_proc(table=>$table, user=>[0,1000]) }, 4);
 
     # uid
     is(~~@{ find_proc(table=>$table, uid=>1000) }, 3);

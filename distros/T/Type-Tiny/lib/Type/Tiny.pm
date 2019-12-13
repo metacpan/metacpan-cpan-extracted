@@ -11,9 +11,12 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY   = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION     = '1.006000';
-	$Type::Tiny::XS_VERSION  = '0.011';
+	$Type::Tiny::VERSION     = '1.008000';
+	$Type::Tiny::XS_VERSION  = '0.016';
 }
+
+$Type::Tiny::VERSION    =~ tr/_//d;
+$Type::Tiny::XS_VERSION =~ tr/_//d;
 
 use Scalar::Util qw( blessed );
 use Types::TypeTiny ();
@@ -22,20 +25,20 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 sub _swap { $_[2] ? @_[1,0] : @_[0,1] }
 
-BEGIN {
-	($] < 5.010001)
-		? eval q{ sub SUPPORT_SMARTMATCH () { !!0 } }
-		: eval q{ sub SUPPORT_SMARTMATCH () { !!1 } };
-	($] >= 5.014)
-		? eval q{ sub _FIXED_PRECEDENCE () { !!1 } }
-		: eval q{ sub _FIXED_PRECEDENCE () { !!0 } };
-};
+BEGIN {                                              # uncoverable statement
+	($] < 5.010001)                                   # uncoverable statement
+		? eval q{ sub SUPPORT_SMARTMATCH () { !!0 } }  # uncoverable statement
+		: eval q{ sub SUPPORT_SMARTMATCH () { !!1 } }; # uncoverable statement
+	($] >= 5.014)                                     # uncoverable statement
+		? eval q{ sub _FIXED_PRECEDENCE () { !!1 } }   # uncoverable statement
+		: eval q{ sub _FIXED_PRECEDENCE () { !!0 } };  # uncoverable statement
+};                                                   # uncoverable statement
 
 BEGIN {
-	my $try_xs =
-		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
-		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
-		1;
+	my $try_xs =                                                         # uncoverable statement
+		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :     # uncoverable statement
+		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :             # uncoverable statement
+		1;                                                                # uncoverable statement
 	
 	my $use_xs = 0;
 	$try_xs and eval {
@@ -59,11 +62,12 @@ BEGIN {
 	{
 		no strict 'refs';
 		no warnings 'redefine', 'once';
-		if ($] < 5.010) {              # Coverage is checked on Perl 5.26
+		# Coverage is checked on Perl 5.26
+		if ($] < 5.010) {              # uncoverable statement
 			require overload;           # uncoverable statement
 			push @_, fallback => 1;     # uncoverable statement
 			goto \&overload::OVERLOAD;  # uncoverable statement
-		};
+		};                             # uncoverable statement
 		my $class = shift;
 		*{$class . '::(('} = sub {};
 		*{$class . '::()'} = sub {};
@@ -194,8 +198,7 @@ sub new
 		};
 	}
 	
-	if (exists $params{parent})
-	{
+	if (exists $params{parent}) {
 		$params{parent} = ref($params{parent}) =~ /^Type::Tiny\b/
 			? $params{parent}
 			: Types::TypeTiny::to_TypeTiny($params{parent});
@@ -203,8 +206,7 @@ sub new
 		_croak "Parent must be an instance of %s", __PACKAGE__
 			unless blessed($params{parent}) && $params{parent}->isa(__PACKAGE__);
 		
-		if ($params{parent}->deprecated and not exists $params{deprecated})
-		{
+		if ($params{parent}->deprecated and not exists $params{deprecated}) {
 			$params{deprecated} = 1;
 		}
 	}
@@ -215,16 +217,14 @@ sub new
 	$params{name} = "__ANON__" unless exists $params{name};
 	$params{uniq} = $uniq++;
 	
-	if ($params{name} ne "__ANON__")
-	{
+	if ($params{name} ne "__ANON__") {
 		# First try a fast ASCII-only expression, but fall back to Unicode
 		$params{name} =~ /^_{0,2}[A-Z][A-Za-z0-9_]+$/sm
 			or eval q( use 5.008; $params{name} =~ /^_{0,2}\p{Lu}[\p{L}0-9_]+$/sm )
 			or _croak '"%s" is not a valid type name', $params{name};
 	}
 	
-	if (exists $params{coercion} and !ref $params{coercion} and $params{coercion})
-	{
+	if (exists $params{coercion} and !ref $params{coercion} and $params{coercion}) {
 		$params{parent}->has_coercion
 			or _croak "coercion => 1 requires type to have a direct parent with a coercion";
 		
@@ -234,8 +234,7 @@ sub new
 	if (!exists $params{inlined}
 	and exists $params{constraint}
 	and ( !exists $params{parent} or $params{parent}->can_be_inlined )
-	and $QFS ||= "Sub::Quote"->can("quoted_from_sub"))
-	{
+	and $QFS ||= "Sub::Quote"->can("quoted_from_sub")) {
 		my (undef, $perlstring, $captures) = @{ $QFS->($params{constraint}) || [] };
 		
 		$params{inlined} = sub {
@@ -253,8 +252,7 @@ sub new
 	
 	my $self = bless \%params, $class;
 	
-	unless ($params{tmp})
-	{
+	unless ($params{tmp}) {
 		my $uniq = $self->{uniq};
 		
 		$ALL_TYPES{$uniq} = $self;
@@ -265,15 +263,13 @@ sub new
 		$Moo::HandleMoose::TYPE_MAP{$self->_stringify_no_magic} = sub { $tmp };
 	}
 	
-	if (ref($params{coercion}) eq q(CODE))
-	{
+	if (ref($params{coercion}) eq q(CODE)) {
 		require Types::Standard;
 		my $code = delete($params{coercion});
 		$self->{coercion} = $self->_build_coercion;
 		$self->coercion->add_type_coercions(Types::Standard::Any(), $code);
 	}
-	elsif (ref($params{coercion}) eq q(ARRAY))
-	{
+	elsif (ref($params{coercion}) eq q(ARRAY)) {
 		my $arr = delete($params{coercion});
 		$self->{coercion} = $self->_build_coercion;
 		$self->coercion->add_type_coercions(@$arr);
@@ -287,15 +283,13 @@ sub new
 	# Types::TypeTiny to allow it to build a coercion for the TypeTiny
 	# type constraint without needing to load Type::Coercion yet.
 
-	if ($params{my_methods})
-	{
+	if ($params{my_methods}) {
 		$subname =
 			eval { require Sub::Util } ? \&Sub::Util::set_subname :
 			eval { require Sub::Name } ? \&Sub::Name::subname :
 			0
 			if not defined $subname;
-		if ($subname)
-		{
+		if ($subname) {
 			(Scalar::Util::reftype($params{my_methods}{$_}) eq 'CODE') && $subname->(
 				sprintf("%s::my_%s", $self->qualified_name, $_),
 				$params{my_methods}{$_},
@@ -306,16 +300,14 @@ sub new
 	return $self;
 }
 
-sub DESTROY
-{
+sub DESTROY {
 	my $self = shift;
 	delete( $ALL_TYPES{$self->{uniq}} );
 	delete( $Moo::HandleMoose::TYPE_MAP{$self->_stringify_no_magic} );
 	return;
 }
 
-sub _clone
-{
+sub _clone {
 	my $self = shift;
 	my %opts;
 	$opts{$_} = $self->{$_} for qw< name display_name message >;
@@ -353,8 +345,7 @@ sub _dd
 	}
 }
 
-sub _loose_to_TypeTiny
-{
+sub _loose_to_TypeTiny {
 	map +(
 		ref($_)
 			? Types::TypeTiny::to_TypeTiny($_)
@@ -440,6 +431,7 @@ sub _build_coercion
 sub _build_default_message
 {
 	my $self = shift;
+	$self->{is_using_default_message} = 1;
 	return sub { sprintf '%s did not pass type constraint', _dd($_[0]) } if "$self" eq "__ANON__";
 	my $name = "$self";
 	return sub { sprintf '%s did not pass type constraint "%s"', _dd($_[0]), $name };
@@ -457,6 +449,8 @@ sub _build_name_generator
 sub _build_compiled_check
 {
 	my $self = shift;
+	
+	local our $AvoidCallbacks = 0;
 	
 	if ($self->_is_null_constraint and $self->has_parent)
 	{
@@ -758,6 +752,7 @@ sub _perlcode
 {
 	my $self = shift;
 	
+	local our $AvoidCallbacks = 1;
 	return $self->inline_check('$_')
 		if $self->can_be_inlined;
 	
@@ -830,29 +825,52 @@ sub inline_assert
 {
 	require B;
 	my $self = shift;
-	my $varname = $_[0];
-	my $code = sprintf(
-		q[do { no warnings "void"; %s ? %s : Type::Tiny::_failed_check(%d, %s, %s) };],
-		$self->inline_check(@_),
-		$varname,
-		$self->{uniq},
-		B::perlstring("$self"),
-		$varname,
-	);
-	return $code;
+	my ($varname, $typevarname, @extras) = @_;
+	
+	my $inline_check;
+	if ($self->can_be_inlined) {
+		$inline_check = sprintf('(%s)', $self->inline_check($varname));
+	}
+	elsif ($typevarname) {
+		$inline_check = sprintf('%s->check(%s)', $typevarname, $varname);
+	}
+	else {
+		_croak 'Cannot inline type constraint check for "%s"', $self;
+	}
+	
+	my $inline_throw;
+	if ($typevarname) {
+		require B;
+		$inline_throw = sprintf(
+			'Type::Tiny::_failed_check(%s, %s, %s, %s)',
+			$typevarname,
+			B::perlstring("$self"),
+			$varname,
+			join(',', map B::perlstring($_), @extras),
+		);
+	}
+	else {
+		$inline_throw = sprintf(
+			'Type::Tiny::_failed_check(%s, %s, %s, %s)',
+			$self->{uniq},
+			B::perlstring("$self"),
+			$varname,
+			join(',', map B::perlstring($_), @extras),
+		);
+	}
+	
+	qq[do { no warnings "void"; $inline_check or $inline_throw };]
 }
 
-sub _failed_check
-{
+sub _failed_check {
 	require Error::TypeTiny::Assertion;
 	
 	my ($self, $name, $value, %attrs) = @_;
-	$self = $ALL_TYPES{$self} unless ref $self;
+	$self = $ALL_TYPES{$self} if defined $self && !ref $self;
 	
 	my $exception_class = delete($attrs{exception_class}) || "Error::TypeTiny::Assertion";
 	
-	if ($self)
-	{
+	if ($self) {
 		$exception_class->throw(
 			message => $self->get_message($value),
 			type    => $self,
@@ -860,8 +878,7 @@ sub _failed_check
 			%attrs,
 		);
 	}
-	else
-	{
+	else {
 		$exception_class->throw(
 			message => sprintf('%s did not pass type constraint "%s"', _dd($value), $name),
 			value   => $value,
@@ -892,69 +909,79 @@ sub is_parameterized
 	shift->has_parameters;
 }
 
-my %param_cache;
-sub parameterize
 {
-	my $self = shift;
-	
-	$self->is_parameterizable
-		or @_ ? _croak("Type '%s' does not accept parameters", "$self") : return($self);
-	
-	@_ = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my %seen;
+	sub ____make_key {
+		join ',', map {
+			Types::TypeTiny::TypeTiny->check($_) ? sprintf('$Type::Tiny::ALL_TYPES{%d}', $_->{uniq}) :
+			ref() eq 'ARRAY'                     ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('[%s]', ____make_key(@$_)) } :
+			ref() eq 'HASH'                      ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('{%s}', ____make_key(%$_)) } :
+			ref() eq 'SCALAR' || ref() eq 'REF'  ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('do { my $x = %s; \\$x }', ____make_key($$_)) } :
+			!defined()                           ? 'undef' :
+			!ref()                               ? do { require B; B::perlstring($_) } :
+			'____CANNOT_KEY____';
+		} @_;
+	}
+	my %param_cache;
+	sub parameterize
+	{
+		my $self = shift;
+		
+		$self->is_parameterizable
+			or @_ ? _croak("Type '%s' does not accept parameters", "$self") : return($self);
+		
+		@_ = map Types::TypeTiny::to_TypeTiny($_), @_;
 
-	# Generate a key for caching parameterized type constraints,
-	# but only if all the parameters are strings or type constraints.
-	my $key;
-	if ( not grep(ref($_) && !Types::TypeTiny::TypeTiny->check($_), @_) )
-	{
-		require B;
-		$key = join ":", map(Types::TypeTiny::TypeTiny->check($_) ? $_->{uniq} : B::perlstring($_), $self, @_);
-	}
-	
-	return $param_cache{$key} if defined $key && defined $param_cache{$key};
-	
-	local $Type::Tiny::parameterize_type = $self;
-	local $_ = $_[0];
-	my $P;
-	
-	my ($constraint, $compiled) = $self->constraint_generator->(@_);
-	
-	if (Types::TypeTiny::TypeTiny->check($constraint))
-	{
-		$P = $constraint;
-	}
-	else
-	{
-		my %options = (
-			constraint   => $constraint,
-			display_name => $self->name_generator->($self, @_),
-			parameters   => [@_],
-		);
-		$options{compiled_type_constraint} = $compiled
-			if $compiled;
-		$options{inlined} = $self->inline_generator->(@_)
-			if $self->has_inline_generator;
-		exists $options{$_} && !defined $options{$_} && delete $options{$_}
-			for keys %options;
+		# Generate a key for caching parameterized type constraints,
+		# but only if all the parameters are strings or type constraints.
+		%seen = ();
+		my $key = $self->____make_key(@_);
+		undef($key) if $key =~ /____CANNOT_KEY____/;
+		return $param_cache{$key} if defined $key && defined $param_cache{$key};
 		
-		$P = $self->create_child_type(%options);
+		local $Type::Tiny::parameterize_type = $self;
+		local $_ = $_[0];
+		my $P;
 		
-		my $coercion;
-		$coercion = $self->coercion_generator->($self, $P, @_)
-			if $self->has_coercion_generator;
-		$P->coercion->add_type_coercions( @{$coercion->type_coercion_map} )
-			if $coercion;
+		my ($constraint, $compiled) = $self->constraint_generator->(@_);
+		
+		if (Types::TypeTiny::TypeTiny->check($constraint))
+		{
+			$P = $constraint;
+		}
+		else
+		{
+			my %options = (
+				constraint   => $constraint,
+				display_name => $self->name_generator->($self, @_),
+				parameters   => [@_],
+			);
+			$options{compiled_type_constraint} = $compiled
+				if $compiled;
+			$options{inlined} = $self->inline_generator->(@_)
+				if $self->has_inline_generator;
+			exists $options{$_} && !defined $options{$_} && delete $options{$_}
+				for keys %options;
+			
+			$P = $self->create_child_type(%options);
+			
+			my $coercion;
+			$coercion = $self->coercion_generator->($self, $P, @_)
+				if $self->has_coercion_generator;
+			$P->coercion->add_type_coercions( @{$coercion->type_coercion_map} )
+				if $coercion;
+		}
+		
+		if (defined $key)
+		{
+			$param_cache{$key} = $P;
+			Scalar::Util::weaken($param_cache{$key});
+		}
+		
+		$P->coercion->freeze;
+		
+		return $P;
 	}
-	
-	if (defined $key)
-	{
-		$param_cache{$key} = $P;
-		Scalar::Util::weaken($param_cache{$key});
-	}
-	
-	$P->coercion->freeze;
-	
-	return $P;
 }
 
 sub child_type_class
@@ -965,7 +992,9 @@ sub child_type_class
 sub create_child_type
 {
 	my $self = shift;
-	return $self->child_type_class->new(parent => $self, @_);
+	my %moreopts;
+	$moreopts{is_object} = 1 if $self->{is_object};
+	return $self->child_type_class->new(parent => $self, %moreopts, @_);
 }
 
 sub complementary_type
@@ -986,6 +1015,8 @@ sub _build_complementary_type
 	$opts{display_name} =~ s/^\~{2}//;
 	$opts{inlined} = sub { shift; "not(".$self->inline_check(@_).")" }
 		if $self->can_be_inlined;
+	$opts{display_name} = $opts{name} = $self->{complement_name}
+		if $self->{complement_name};
 	return "Type::Tiny"->new(%opts);
 }
 
@@ -1011,6 +1042,11 @@ sub _build_moose_type
 	}
 	else
 	{
+		# Type::Tiny is more flexible than Moose, allowing
+		# inlined to return a list. So we need to wrap the
+		# inlined coderef to make sure Moose gets a single
+		# string.
+		#
 		my $wrapped_inlined = sub {
 			shift;
 			$self->inline_check(@_);
@@ -1204,6 +1240,8 @@ sub _lookup_my_method
 	return;
 }
 
+my %object_methods = (with_attribute_values => 1, stringifies_to => 1, numifies_to => 1);
+
 sub can
 {
 	my $self = shift;
@@ -1225,6 +1263,11 @@ sub can
 			my $method = $self->_lookup_my_method($1);
 			return $method if $method;
 		}
+	}
+
+	if ($self->{is_object} && $object_methods{$_[0]}) {
+		require Type::Tiny::ConstrainedObject;
+		return Type::Tiny::ConstrainedObject->can($_[0]);
 	}
 	
 	return;
@@ -1250,6 +1293,13 @@ sub AUTOLOAD
 		}
 	}
 	
+	if ($self->{is_object} && $object_methods{$m}) {
+		require Type::Tiny::ConstrainedObject;
+		unshift @_, $self;
+		no strict 'refs';
+		goto \&{"Type::Tiny::ConstrainedObject::$m"};
+	}
+	
 	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;
 }
 
@@ -1272,68 +1322,6 @@ sub _has_xsub
 sub of                         { shift->parameterize(@_) }
 sub where                      { shift->create_child_type(constraint => @_) }
 
-{
-	my $i = 0;
-	my $_where_expressions = sub {
-		my $self = shift;
-		my $name = shift;
-		$name ||= "where expression check";
-		my (%env, @codes);
-		while (@_) {
-			my $expr       = shift;
-			my $constraint = shift;
-			if (!ref $constraint) {
-				push @codes, sprintf('do { local $_ = %s; %s }', $expr, $constraint);
-			}
-			else {
-				my $type = Types::TypeTiny::to_TypeTiny($constraint);
-				if ($type->can_be_inlined) {
-					push @codes, sprintf('do { my $tmp = %s; %s }', $expr, $type->inline_check('$tmp'));
-				}
-				else {
-					++$i;
-					$env{'$chk'.$i} = do { my $chk = $type->compiled_check; \$chk };
-					push @codes, sprintf('$chk%d->(%s)', $i, $expr);
-				}
-			}
-		}
-		
-		if (keys %env) {
-			# cannot inline
-			my $sub = Eval::TypeTiny::eval_closure(
-				source      => sprintf('sub ($) { local $_ = shift; %s }', join(q( and ), @codes)),
-				description => sprintf('%s for %s', $name, $self->name),
-				environment => \%env,
-			);
-			return $self->where($sub);
-		}
-		else {
-			return $self->where(join(q( and ), @codes));
-		}
-	};
-	
-	sub stringifies_as {
-		my $self         = shift;
-		my ($constraint) = @_;
-		$self->$_where_expressions("stringification check", q{"$_"}, $constraint);
-	}
-	
-	sub numifies_as {
-		my $self         = shift;
-		my ($constraint) = @_;
-		$self->$_where_expressions("numification check", q{0+$_}, $constraint);
-	}
-	
-	sub attributes_as {
-		my $self         = shift;
-		my ($constraint) = @_;
-		$self->$_where_expressions(
-			"attributes check",
-			map { my $attr = $_; qq{\$_->$attr} => $constraint->{$attr} } sort keys %$constraint
-		);
-	}
-}
-
 # fill out Moose-compatible API
 sub inline_environment         { +{} }
 sub _inline_check              { shift->inline_check(@_) }
@@ -1344,6 +1332,8 @@ sub _actually_compile_type_constraint   { shift->_build_compiled_check }
 sub hand_optimized_type_constraint      { shift->{hand_optimized_type_constraint} }
 sub has_hand_optimized_type_constraint  { exists(shift->{hand_optimized_type_constraint}) }
 sub type_parameter             { (shift->parameters || [])->[0] }
+sub parameterized_from         { $_[0]->is_parameterized ? shift->parent : _croak("Not a parameterized type") }
+sub has_parameterized_from     { $_[0]->is_parameterized }
 
 # some stuff for Mouse-compatible API
 sub __is_parameterized         { shift->is_parameterized(@_) }
@@ -1374,6 +1364,74 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
 
 =head1 SYNOPSIS
 
+ use v5.12;
+ use strict;
+ use warnings;
+ 
+ package Horse {
+   use Moo;
+   use Types::Standard qw( Str Int Enum ArrayRef Object );
+   use Type::Params qw( compile );
+   use namespace::autoclean;
+   
+   has name => (
+     is       => 'ro',
+     isa      => Str,
+     required => 1,
+   );
+   has gender => (
+     is       => 'ro',
+     isa      => Enum[qw( f m )],
+   );
+   has age => (
+     is       => 'rw',
+     isa      => Int->where( '$_ >= 0' ),
+   );
+   has children => (
+     is       => 'ro',
+     isa      => ArrayRef[Object],
+     default  => sub { return [] },
+   );
+   
+   sub add_child {
+     state $check = compile( Object, Object );  # method signature
+     
+     my ($self, $child) = $check->(@_);         # unpack @_
+     push @{ $self->children }, $child;
+     
+     return $self;
+   }
+ }
+ 
+ package main;
+ 
+ my $boldruler = Horse->new(
+   name    => "Bold Ruler",
+   gender  => 'm',
+   age     => 16,
+ );
+ 
+ my $secretariat = Horse->new(
+   name    => "Secretariat",
+   gender  => 'm',
+   age     => 0,
+ );
+ 
+ $boldruler->add_child( $secretariat );
+
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+This documents the internals of the L<Type::Tiny> class. L<Type::Tiny::Manual>
+is a better starting place if you're new.
+
+L<Type::Tiny> is a small class for creating Moose-like type constraint
+objects which are compatible with Moo, Moose and Mouse.
+
    use Scalar::Util qw(looks_like_number);
    use Type::Tiny;
    
@@ -1398,21 +1456,8 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
       has favourite_number => (is => "ro", isa => $NUM);
    }
 
-=head1 STATUS
-
-This module is covered by the
-L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
-
-=head1 DESCRIPTION
-
-L<Type::Tiny> is a tiny class for creating Moose-like type constraint
-objects which are compatible with Moo, Moose and Mouse.
-
 Maybe now we won't need to have separate MooseX, MouseX and MooX versions
 of everything? We can but hope...
-
-This documents the internals of L<Type::Tiny>. L<Type::Tiny::Manual> is
-a better starting place if you're new.
 
 =head2 Constructor
 
@@ -1462,6 +1507,11 @@ If provided, must be a Type::Tiny object.
 
 A coderef which returns a string of Perl code suitable for inlining this
 type. Optional.
+
+(The coderef will be called in list context and can actually return
+a list of strings which will be joined with C<< && >>. If the first item
+on the list is undef, it will be substituted with the type's parent's
+inline check.)
 
 If C<constraint> (above) is a coderef generated via L<Sub::Quote>, then
 Type::Tiny I<may> be able to automatically generate C<inlined> for you.
@@ -1654,6 +1704,10 @@ Returns true iff the type constraint does not have a C<name>.
 Indicates whether a type has been parameterized (e.g. C<< ArrayRef[Int] >>)
 or could potentially be (e.g. C<< ArrayRef >>).
 
+=item C<< has_parameterized_from >>
+
+Useless alias for C<is_parameterized>.
+
 =back
 
 =head3 Validation and coercion
@@ -1806,7 +1860,7 @@ Returns a list of all this type constraint's ancestor constraints. For
 example, if called on the C<Str> type constraint would return the list
 C<< (Value, Defined, Item, Any) >>.
 
-B<< Due to a historical misunderstanding, this differs from the Moose
+I<< Due to a historical misunderstanding, this differs from the Moose
 implementation of the C<parents> method. In Moose, C<parents> only returns the
 immediate parent type constraints, and because type constraints only have
 one immediate parent, this is effectively an alias for C<parent>. The
@@ -1855,9 +1909,14 @@ L</"Attributes related to parameterizable and parameterized types">
 documents the C<parameters> attribute, which returns an arrayref of all
 the parameters.
 
+=item C<< parameterized_from >>
+
+Harder to spell alias for C<parent> that only works for parameterized
+types.
+
 =back
 
-B<< Hint for people subclassing Type::Tiny: >>
+I<< Hint for people subclassing Type::Tiny: >>
 Since version 1.006000, the methods for determining subtype, supertype, and
 type equality should I<not> be overridden in subclasses of Type::Tiny. This
 is because of the problem of diamond inheritance. If X and Y are both
@@ -1924,10 +1983,15 @@ For Moose-compat, there is an alias C<< _inline_check >> for this method.
 
 Much like C<inline_check> but outputs a statement of the form:
 
-   die ... unless ...;
+   ... or die ...;
 
-Note that if this type has a custom error message, the inlined code will
-I<ignore> this custom message!!
+Can also be called line C<< inline_assert($varname, $typevarname, %extras) >>.
+In this case, it will generate a string of code that may include
+C<< $typevarname >> which is supposed to be the name of a variable holding
+the type itself. (This is kinda complicated, but it allows a useful string
+to still be produced if the type is not inlineable.) The C<< %extras >> are
+additional options to be passed to L<Error::TypeTiny::Assertion>'s constructor
+and must be key-value pairs of strings only, no references or undefs.
 
 =back
 
@@ -2060,6 +2124,28 @@ dumps. (Default limit is 72.)
 This is a package variable (rather than get/set class methods) to allow
 for easy localization.
 
+=item C<< $Type::Tiny::AvoidCallbacks >>
+
+If this variable is set to true (you should usually do it in a
+C<local> scope), it acts as a hint for type constraints, when
+generating inlined code, to avoid making any callbacks to
+variables and functions defined outside the inlined code itself.
+
+This should have the effect that C<< $type->inline_check('$foo') >>
+will return a string of code capable of checking the type on
+Perl installations that don't have Type::Tiny installed. This
+is intended to allow Type::Tiny to be used with things like
+L<Mite>.
+
+The variable works on the honour system. Types need to explicitly
+check it and decide to generate different code based on its
+truth value. The bundled types in L<Types::Standard>,
+L<Types::Common::Numeric>, and L<Types::Common::String> all do.
+(B<StrMatch> is sometimes unable to, and will issue a warning
+if it needs to rely on callbacks when asked not to.)
+
+Most normal users can ignore this.
+
 =back
 
 =head2 Environment
@@ -2079,12 +2165,9 @@ of parts of Type::Tiny.
 Please report any bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
-=head1 SUPPORT
-
-B<< IRC: >> support is available through in the I<< #moops >> channel
-on L<irc.perl.org|http://www.irc.perl.org/channels.html>.
-
 =head1 SEE ALSO
+
+L<The Type::Tiny homepage|http://typetiny.toby.ink/>.
 
 L<Type::Tiny::Manual>, L<Type::API>.
 
@@ -2101,6 +2184,7 @@ L<Type::Params>.
 L<Type::Tiny on GitHub|https://github.com/tobyink/p5-type-tiny>,
 L<Type::Tiny on Travis-CI|https://travis-ci.org/tobyink/p5-type-tiny>,
 L<Type::Tiny on AppVeyor|https://ci.appveyor.com/project/tobyink/p5-type-tiny>,
+L<Type::Tiny on Codecov|https://codecov.io/gh/tobyink/p5-type-tiny>,
 L<Type::Tiny on Coveralls|https://coveralls.io/github/tobyink/p5-type-tiny>.
 
 =head1 AUTHOR

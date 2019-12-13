@@ -1,0 +1,47 @@
+package NewsExtractor::JSONLDExtractor;
+use Moo;
+extends 'NewsExtractor::TXExtractor';
+
+use Mojo::Transaction::HTTP;
+use Types::Standard qw(InstanceOf HashRef);
+use Mojo::JSON qw(from_json);
+use Importer 'NewsExtractor::TextUtil' => qw(u);
+
+has tx => (
+    required => 1, is => 'ro',
+    isa => InstanceOf['Mojo::Transaction::HTTP'] );
+
+has schema_ld => (
+    required => 0,
+    is => 'lazy',
+    isa => HashRef,
+    builder => 1,
+);
+
+sub _build_schema_ld {
+    my ($self) = @_;
+    my $el = $self->dom->at('head script[type="application/ld+json"]');
+    return from_json( $el->text );
+}
+
+sub journalist {
+    my ($self) = @_;
+    return u($self->schema_ld->{author}{name});
+}
+
+sub headline {
+    my ($self) = @_;
+    return u($self->schema_ld->{headline});
+}
+
+sub dateline {
+    my ($self) = @_;
+    return u($self->schema_ld->{datePublished});
+}
+
+sub content_text {
+    my ($self) = @_;
+    return u($self->schema_ld->{description});
+}
+
+1;

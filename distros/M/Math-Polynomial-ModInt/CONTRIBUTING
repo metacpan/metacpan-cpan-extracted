@@ -31,15 +31,21 @@ integrate correctly and efficiently with other software.
 Topics of interest
 ------------------
 
-Possible improvements may support interoperability with related, or
-more general, or application software.  An XS implementation could
+The ROADMAP section in the main documentation should give some hints
+about what already is planned for further development.  Note also that
+this package is intended to be only one part of a collection of packages
+covering computer algebra topics.  Some rules about what functionality
+should go where are also mentioned in the roadmap.
+
+Possible improvements here may support interoperability with related,
+or more general, or application software.  An XS implementation could
 increase performance with large spaces.  The data model, on the other
 hand, does not seem performance-critical, as applications can always
 store and restore objects via their index numbers.
 
 Other improvements could help the documentation to be clearer, or more
 complete, or better formatted.  We might create POD, TEX, HTML, and PDF
-from a common source.  And, of course, there is always room for cool
+from a common source.  And, of course, there is always room for good
 examples and references to application modules.
 
 Author's Note
@@ -48,4 +54,4 @@ Author's Note
 Thanks again for your interest.
 I am looking forward to your report or e-mail.
 
-Martin Becker, September 18, 2019
+Martin Becker, December 6, 2019

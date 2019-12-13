@@ -1,7 +1,9 @@
 package RedHat::Releases;
 
-our $DATE = '2017-09-08'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-12'; # DATE
+our $DIST = 'RedHat-Releases'; # DIST
+our $VERSION = '0.021'; # VERSION
 
 use 5.010001;
 use strict;
@@ -357,17 +359,34 @@ our $data = do {
      bash_version         => 4.2,
      code_name            => undef,
      eoldate              => "2024-06",
-     linux_version        => "3.10",
-     mariadb_version      => "5.5.56",
+     linux_version        => "3.10.0",
+     mariadb_version      => "5.5.64",
      mysql_version        => "--",
      nginx_version        => undef,
      perl_version         => "5.16.3",
      php_version          => "5.4.16",
-     postgresql_version   => "9.2.21",
+     postgresql_version   => "9.2.24",
      python_version       => "2.7.5",
-     reldate              => "2017-08-01",
+     reldate              => "2019-08-06",
      ruby_version         => undef,
-     version              => "RHEL-7.4",
+     version              => "RHEL-7.7",
+   },
+   {
+     apache_httpd_version => "2.4.37",
+     bash_version         => 4.4,
+     code_name            => undef,
+     eoldate              => undef,
+     linux_version        => "4.18.0",
+     mariadb_version      => "10.3.17",
+     mysql_version        => "8.0.17",
+     nginx_version        => undef,
+     perl_version         => "5.26.3",
+     php_version          => "7.3.5",
+     postgresql_version   => 10.6,
+     python_version       => "3.6.8",
+     reldate              => "2019-11-05",
+     ruby_version         => undef,
+     version              => "RHEL-8.1",
    },
  ]
 
@@ -396,7 +415,7 @@ RedHat::Releases - List RedHat releases
 
 =head1 VERSION
 
-This document describes version 0.020 of RedHat::Releases (from Perl distribution RedHat-Releases), released on 2017-09-08.
+This document describes version 0.021 of RedHat::Releases (from Perl distribution RedHat-Releases), released on 2019-12-12.
 
 =head1 SYNOPSIS
 
@@ -407,7 +426,7 @@ This document describes version 0.020 of RedHat::Releases (from Perl distributio
 =head1 DESCRIPTION
 
 This module contains list of RedHat Enterprise Linux releases. Data source is
-currently at: L<https://github.com/perlancar/gudangdata-distrowatch>
+currently at: L<https://github.com/sharyanto/gudangdata-distrowatch>
 (table/redhat_release) which in turn is retrieved from
 L<http://distrowatch.com>.
 
@@ -418,7 +437,7 @@ L<http://distrowatch.com>.
 
 Usage:
 
- list_redhat_releases(%args) -> [status, msg, result, meta]
+ list_redhat_releases(%args) -> [status, msg, payload, meta]
 
 RedHat releases.
 
@@ -1122,7 +1141,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1160,7 +1179,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

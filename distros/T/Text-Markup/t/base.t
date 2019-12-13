@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 25;
+use Test::More tests => 38;
 #use Test::More 'no_plan';
 use File::Spec::Functions qw(catdir);
 use HTML::Entities;
@@ -29,7 +29,13 @@ while (my $f = readdir $dh) {
 }
 
 is_deeply [Text::Markup->formats], [sort @core_parsers],
-    'Should have core parsers';
+    'Should have core formats';
+
+ok my %matchers = Text::Markup->format_matchers,
+    'Get format matchers';
+is_deeply [sort keys %matchers], [sort @core_parsers],
+    'Should have core format matchers';
+isa_ok $_, 'Regexp', $_ for values %matchers;
 
 # Register one.
 PARSER: {
@@ -142,6 +148,7 @@ my $output = do {
     my $html = encode_entities(<$fh>, '<>&"');
     utf8::encode($html);
     qq{<html>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>

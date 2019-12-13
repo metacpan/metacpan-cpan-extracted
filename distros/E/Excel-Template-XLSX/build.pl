@@ -21,23 +21,18 @@ END_TS
 sub ACTION_all {
 	print `perl build.pl`;
 # SET RELEASE_TESTING=1 & build test
-	print map {`build $_`} qw(test distcheck dist git);
-
+	print map {`build $_`} qw(test distcheck dist git cpan);
   print 'git push (using GitGui)';
-  print 'cpan upload (pause.perl.org)';
 }
 
-sub ACTION_CPAN {
-   my $mod = 'Excel::Template::XLSX';
-   (my $path = $mod) =~ s|::|/|g;
-   my $ver = eval qq{require 'lib/${path}.pm'; \$${mod}::VERSION};
-   (my $tar = $mod) =~ s|::|\-|g;
-   $tar = "${tar}-${ver}.tar.gz"; 
-#   use CPAN::Uploader;
-#   my $config = CPAN::Uploader->read_config_file();
-#   $config->{debug} = 1;
-#   CPAN::Uploader->upload_file($tar, $config);
-#   # Does not work - gets 401 auth required
+sub ACTION_cpan {
+  my $mod = 'Excel::Template::XLSX';
+  (my $path = $mod) =~ s|::|/|g;
+  my $ver = eval qq{use $mod; \$${mod}::VERSION};
+  (my $tgz = $mod) =~ s|::|\-|g;
+  $tgz = "${tgz}-${ver}.tar.gz";
+  print STDOUT `cpan-upload $tgz`; # add --dry-run option if needed
+  # `mojo cpanify -u sri -p secr3t $tgz`;
 }
 
 sub ACTION_git {
@@ -69,16 +64,19 @@ content can be appended using Excel::Writer::XLSX. ],
       'Template::Tiny'      => 0,
    },
 
-   configure_requires => { 'Module::Build' => 0.4, },
+   configure_requires => { 
+    'Module::Build'  => 0.4,
+    'CPAN::Uploader' => 0.1,
+},
 
    requires => {
       'perl'                 => '5.12.0',
-      'Excel::Writer::XLSX'  => 0.90,
-      'Archive::Zip'         => 0,
-      'Graphics::ColorUtils' => 0,
-      'Scalar::Util'         => 0,
-      'XML::Twig'            => 0,
-   },
+      'Excel::Writer::XLSX'  =>     1.01,
+      'Archive::Zip'         =>        0,
+      'Graphics::ColorUtils' =>        0,
+      'Scalar::Util'         =>        0,
+      'XML::Twig'            =>        0,
+   },   
    add_to_cleanup => [qw(Excel-Template-XLSX-* *.zip *.pui *.prj make.bat)],
    create_makefile_pl => 'traditional',
 

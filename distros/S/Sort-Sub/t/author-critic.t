@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.003
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/Sort/Sub.pm','lib/Sort/Sub/by_ascii_then_num.pm','lib/Sort/Sub/by_count.pm','lib/Sort/Sub/by_first_num_in_text.pm','lib/Sort/Sub/by_last_num_in_text.pm','lib/Sort/Sub/by_num_in_text.pm','lib/Sort/Sub/by_num_then_ascii.pm','lib/Sort/Sub/naturally.pm','lib/Sub/Sort.pm','lib/Test/Sort/Sub.pm'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

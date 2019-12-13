@@ -2,7 +2,7 @@ package Redis::Namespace;
 
 use strict;
 use warnings;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Redis;
 use Carp qw(carp croak);
@@ -464,9 +464,11 @@ our %COMMANDS = (
     info             => [],
     keys             => [ 'keys', 'all' ],
     lastsave         => [],
+    latency          => [],
     lindex           => [ 'first' ],
     linsert          => [ 'first' ],
     llen             => [ 'first' ],
+    lolwut           => [],
     lpop             => [ 'first' ],
     lpush            => [ 'first' ],
     lpushx           => [ 'first' ],
@@ -477,6 +479,11 @@ our %COMMANDS = (
     memory           => [],
     mget             => [ 'all' ],
     migrate          => [ 'migrate' ],
+    module => {
+        list   => [],
+        load   => [],
+        unload => [],
+    },
     monitor          => [],
     move             => [ 'first' ],
     mscan            => [ 'first' ],
@@ -492,6 +499,7 @@ our %COMMANDS = (
     ping             => [],
     psetex           => [ 'first' ],
     psubscribe       => [ 'all' ],
+    psync            => [],
     pttl             => [ 'first' ],
     publish          => [ 'first' ],
     punsubscribe     => [ 'all' ],

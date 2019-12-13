@@ -11,15 +11,48 @@ Protocol::DBus::Client::Mojo - D-Bus with L<Mojolicious>
 
 =head1 SYNOPSIS
 
-See L<Protocol::DBus::Client::AnyEvent>.
+    use experimental 'signatures';
+
+    my $dbus = Protocol::DBus::Client::Mojo::system();
+
+    $dbus->initialize_p()->then(
+        sub ($msgr) {
+            my $a = $msgr->send_call_p( .. )->then( sub ($resp) {
+                # ..
+            } );
+
+            my $b = $msgr->send_call_p( .. )->then( sub ($resp) {
+                # ..
+            } );
+
+            return Mojo::Promise->all( $a, $b );
+        },
+    )->wait();
 
 =head1 DESCRIPTION
 
 This module provides an interface between L<Mojo::IOLoop> and
 L<Protocol::DBus::Client>. It subclasses L<Protocol::DBus::Client::EventBase>.
 
-L<Mojolicious>-based applications can use this module to interface with
-D-Bus.
+L<Mojolicious>-based applications can use this module to interface easily
+with D-Bus.
+
+=head1 INTERFACE NOTES
+
+This module exposes mostly the same interface as
+L<Protocol::DBus::Client::AnyEvent>, except for a bit of
+“Mojo-specific” behavior:
+
+=over
+
+=item * Returned promises, both from C<initialize()> and
+the messenger object’s C<send_call()>, are instances of L<Mojo::Promise>
+rather than L<Promise::ES6>.
+
+=item * C<initialize_p()> and C<send_call_p()> exist as aliases for
+C<initialize()> and C<send_call()>, respectively.
+
+=back
 
 =cut
 
@@ -30,6 +63,8 @@ our @ISA;
 use parent qw( Protocol::DBus::Client::EventBase );
 
 use Mojo::IOLoop ();
+
+use constant _PROMISE_CLASS => 'Mojo::Promise';
 
 #----------------------------------------------------------------------
 
@@ -46,6 +81,20 @@ sub system {
 
 sub login_session {
     return __PACKAGE__->_create_login_session();
+}
+
+sub initialize {
+    return _to_mojo( shift()->SUPER::initialize(@_) );
+}
+
+*initialize_p = *initialize;
+
+sub _to_mojo {
+    my ($p_es6) = @_;
+
+    return Mojo::Promise->new( sub { $p_es6->then(@_) } )->then( sub {
+        return bless $_[0], 'Protocol::DBus::Client::Mojo::Messenger';
+    } );
 }
 
 sub _initialize {
@@ -140,5 +189,19 @@ sub DESTROY {
 
     return;
 }
+
+#----------------------------------------------------------------------
+
+package Protocol::DBus::Client::Mojo::Messenger;
+
+use parent 'Protocol::DBus::Client::EventMessenger';
+
+sub send_call {
+    my $p = $_[0]->SUPER::send_call( @_[ 1 .. $#_ ] );
+
+    return Mojo::Promise->new( sub { $p->then(@_) } );
+}
+
+*send_call_p = *send_call;
 
 1;

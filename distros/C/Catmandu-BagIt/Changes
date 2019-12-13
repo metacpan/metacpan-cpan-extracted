@@ -1,8 +1,11 @@
 Revision history for Catmandu-BagIt
 
+0.239  2019-12-12 14:26:57 CET
+    - Adding support for use supplied MD5 checksums [njfranck]
+
 0.238  2019-10-11 07:48:24 CEST
     - Fixing test dependencies [manwar]
-    
+
 0.237  2019-10-08 10:14:09 CEST
     - Fixing dependencies [manwar]
 

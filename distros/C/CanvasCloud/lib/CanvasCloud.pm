@@ -1,5 +1,5 @@
 package CanvasCloud;
-$CanvasCloud::VERSION = '0.006';
+$CanvasCloud::VERSION = '0.007';
 # ABSTRACT: Perl access for Canvas LMS API
 
 use Moose;
@@ -10,6 +10,7 @@ my %LOADER = (
                  'CanvasCloud::API::Account::Report'    => { small => 'reports',    short => 'Account::Report'    },
                  'CanvasCloud::API::Account::Term'      => { small => 'terms',      short => 'Account::Term'      },
                  'CanvasCloud::API::Account::SISImport' => { small => 'sisimports', short => 'Account::SISImport' },
+                 'CanvasCloud::API::Account::OutcomeImport' => { small => 'outcomeimport', short => 'Account::OutcomeImport' },
                  'CanvasCloud::API::Account::Users'     => { small => 'a_users',    short => 'Account::Users'     },
              );
 
@@ -57,7 +58,7 @@ CanvasCloud - Perl access for Canvas LMS API
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -98,6 +99,7 @@ Factory method that creates Canvas::API object based on 'api type' passed.
   'reports'    or 'Account::Report'    CanvasCloud::API::Account::Report
   'terms'      or 'Account::Term'      CanvasCloud::API::Account::Term
   'sisimports' or 'Account::SISImport' CanvasCloud::API::Account::SISImport
+  'outcomeimport' or 'Account::OutcomeImport' CanvasCloud::API::Account::OutcomeImport
 
 =head1 SEE ALSO
 
@@ -109,7 +111,7 @@ Ted Katseres
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ted Katseres.
+This software is copyright (c) 2019 by Ted Katseres.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

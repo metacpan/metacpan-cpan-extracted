@@ -1,4 +1,4 @@
-# AWS::Elasticsearch::Domain generated from spec 6.0.0
+# AWS::Elasticsearch::Domain generated from spec 9.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain',
@@ -105,6 +105,46 @@ package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::NodeToNodeEncrypt
   has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
+subtype 'MapOfCfn::Resource::Properties::AWS::Elasticsearch::Domain::LogPublishingOption',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Hash') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'MapOfCfn::Resource::Properties::AWS::Elasticsearch::Domain::LogPublishingOption',
+  from 'HashRef',
+   via {
+     my $arg = $_;
+     if (my $f = Cfn::TypeLibrary::try_function($arg)) {
+       return $f
+     } else {
+       Cfn::Value::Hash->new(Value => {
+         map { $_ => Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Elasticsearch::Domain::LogPublishingOption')->coerce($arg->{$_}) } keys %$arg
+       });
+     }
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::LogPublishingOption',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::LogPublishingOption',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::LogPublishingOptionValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::LogPublishingOptionValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has CloudWatchLogsLogGroupArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EncryptionAtRestOptions',
      as 'Cfn::Value';
 
@@ -178,6 +218,30 @@ package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EBSOptionsValue {
   has VolumeType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::CognitoOptions',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::CognitoOptions',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::CognitoOptionsValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::CognitoOptionsValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IdentityPoolId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has RoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has UserPoolId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 package Cfn::Resource::Properties::AWS::Elasticsearch::Domain {
   use Moose;
   use MooseX::StrictConstructor;
@@ -185,11 +249,13 @@ package Cfn::Resource::Properties::AWS::Elasticsearch::Domain {
   
   has AccessPolicies => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AdvancedOptions => (isa => 'Cfn::Value::Hash|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CognitoOptions => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::CognitoOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DomainName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has EBSOptions => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EBSOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ElasticsearchClusterConfig => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ElasticsearchClusterConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has ElasticsearchVersion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has ElasticsearchVersion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Conditional');
   has EncryptionAtRestOptions => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EncryptionAtRestOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has LogPublishingOptions => (isa => 'MapOfCfn::Resource::Properties::AWS::Elasticsearch::Domain::LogPublishingOption', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has NodeToNodeEncryptionOptions => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::NodeToNodeEncryptionOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has SnapshotOptions => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::SnapshotOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

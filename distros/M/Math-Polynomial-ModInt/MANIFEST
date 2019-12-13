@@ -4,10 +4,12 @@ LICENSE
 MANIFEST
 Makefile.PL
 README
+examples/irred_poly.pl
 lib/Math/Polynomial/ModInt.pm
 lib/Math/Polynomial/ModInt/Order.pm
 t/01_basics.t
 t/02_order.t
+t/03_algebra.t
 t/90_pod.t
 t/91_pod_cover_cp.t
 t/99_signature.t

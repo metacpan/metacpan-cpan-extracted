@@ -1,10 +1,52 @@
 ==================================================
-Changes from 2017-10-24 00:00:00 +0000 to present.
+Changes from 2018-12-10 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.006 at 2018-10-24 17:54:07 +0000
+version 0.007 at 2019-12-10 16:14:57 +0000
 ------------------------------------------
+
+  Change: 0b5489fd3eb6403e7ca6b03c8d35290fb9428c38
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2019-12-10 09:37:53 +0000
+
+    make semi fault tolerant 
+
+  Change: dc01a1f7d3d2dd35167040158b92adab0c7a692a
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2019-10-11 11:10:58 +0000
+
+    Report: added report processing state and Assert message 
+
+  Change: 23263767c61896c4f7a348b316b71b30b3a9346b
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2019-09-23 14:19:03 +0000
+
+    Added OutcomeImort 
+
+  Change: 6ad9a24c477f3edd1a322fdeb9794700816d1fc7
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2019-08-04 16:25:38 +0000
+
+    Report API change (unoffical) 
+
+  Change: ece204225af16acdde3f1950153b887b6ad4fa35
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-10-31 09:15:35 +0000
+
+    add ignore 
+
+  Change: 159c5efa061a9d94e508fef8ce3aa5add148991d
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-10-31 09:14:16 +0000
+
+    Added Course API 
+
+  Change: bae27c9b8b69891db19c16fe8cfe4845c8cb4d68
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-10-24 12:56:24 +0000
+
+    release .006 
 
   Change: 98de530b13b81bcca356c93034c548450b328e29
   Author: tedkat <tedkat@cpan.org>

@@ -24,13 +24,14 @@
       },
       "configure" : {
          "requires" : {
+            "CPAN::Uploader" : "0.1",
             "Module::Build" : "0.4"
          }
       },
       "runtime" : {
          "requires" : {
             "Archive::Zip" : "0",
-            "Excel::Writer::XLSX" : "0.9",
+            "Excel::Writer::XLSX" : "1.01",
             "Graphics::ColorUtils" : "0",
             "Scalar::Util" : "0",
             "XML::Twig" : "0",
@@ -41,7 +42,7 @@
    "provides" : {
       "Excel::Template::XLSX" : {
          "file" : "lib/Excel/Template/XLSX.pm",
-         "version" : "v1.0.9"
+         "version" : "v1.1.1"
       }
    },
    "release_status" : "stable",
@@ -50,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v1.0.9",
+   "version" : "v1.1.1",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

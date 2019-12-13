@@ -29,10 +29,10 @@ PDL::GSL::INTEG - PDL interface to numerical integration routines in GSL
 
 =head1 DESCRIPTION
 
-This is an interface to the numerical integration package present in the 
+This is an interface to the numerical integration package present in the
 GNU Scientific Library, which is an implementation of QUADPACK.
 
-Functions are named B<gslinteg_{algorithm}> where {algorithm}  
+Functions are named B<gslinteg_{algorithm}> where {algorithm}
 is the QUADPACK naming convention. The available functions are:
 
 =over 3
@@ -47,9 +47,9 @@ is the QUADPACK naming convention. The available functions are:
 
 =item gslinteg_qagi: Adaptive integration on infinite interval of the form (-\infty,\infty)
 
-=item gslinteg_qagiu: Adaptive integration on infinite interval of the form (a,\infty)
+=item gslinteg_qagiu: Adaptive integration on infinite interval of the form (la,\infty)
 
-=item gslinteg_qagil: Adaptive integration on infinite interval of the form (-\infty,b)
+=item gslinteg_qagil: Adaptive integration on infinite interval of the form (-\infty,lb)
 
 =item gslinteg_qawc: Adaptive integration for Cauchy principal values
 
@@ -61,8 +61,8 @@ is the QUADPACK naming convention. The available functions are:
 
 =back
 
-Each algorithm computes an approximation to the integral, I, 
-of the function f(x)w(x), where w(x) is a weight function 
+Each algorithm computes an approximation to the integral, I,
+of the function f(x)w(x), where w(x) is a weight function
 (for general integrands w(x)=1). The user provides absolute
 and relative error bounds (epsabs,epsrel) which specify
 the following accuracy requirement:
@@ -70,20 +70,30 @@ the following accuracy requirement:
 |RESULT - I|  <= max(epsabs, epsrel |I|)
 
 
-The routines will fail to converge if the 
-error bounds are too stringent, but always return the best 
+The routines will fail to converge if the
+error bounds are too stringent, but always return the best
 approximation obtained up to that stage
 
 All functions return the result, and estimate of the absolute
-error and an error flag (which is zero if there were no problems). 
+error and an error flag (which is zero if there were no problems).
 You are responsible for checking for any errors, no warnings are issued
 unless the option {Warn => 'y'} is specified in which case
 the reason of failure will be printed.
 
 You can nest integrals up to 20 levels. If you find yourself in
 the unlikely situation that you need more, you can change the value
-of 'max_nested_integrals' in the first line of the file 'FUNC.c' 
+of 'max_nested_integrals' in the first line of the file 'FUNC.c'
 and recompile.
+
+=head1 NOMENCLATURE
+
+Throughout this documentation we strive to use the same variables that
+are present in the original GSL documentation (see L<See
+Also|"SEE-ALSO">). Oftentimes those variables are called C<a> and
+C<b>. Since good Perl coding practices discourage the use of Perl
+variables C<$a> and C<$b>, here we refer to Parameters C<a> and C<b>
+as C<$pa> and C<$pb>, respectively, and Limits (of domain or
+integration) as C<$la> and C<$lb>.
 
 =for ref
 
@@ -94,20 +104,20 @@ Please check the GSL documentation for more information.
    use PDL;
    use PDL::GSL::INTEG;
 
-   my $a = 1.2;
-   my $b = 3.7;
+   my $la = 1.2;
+   my $lb = 3.7;
    my $epsrel = 0;
    my $epsabs = 1e-6;
 
    # Non adaptive integration
-   my ($res,$abserr,$ierr,$neval) = gslinteg_qng(\&myf,$a,$b,$epsrel,$epsabs);
+   my ($res,$abserr,$ierr,$neval) = gslinteg_qng(\&myf,$la,$lb,$epsrel,$epsabs);
    # Warnings on
-   my ($res,$abserr,$ierr,$neval) = gslinteg_qng(\&myf,$a,$b,$epsrel,$epsabs,{Warn=>'y'});
+   my ($res,$abserr,$ierr,$neval) = gslinteg_qng(\&myf,$la,$lb,$epsrel,$epsabs,{Warn=>'y'});
 
    # Adaptive integration with warnings on
    my $limit = 1000;
    my $key = 5;
-   my ($res,$abserr,$ierr) = gslinteg_qag(\&myf,$a,$b,$epsrel,
+   my ($res,$abserr,$ierr) = gslinteg_qag(\&myf,$la,$lb,$epsrel,
                                      $epsabs,$limit,$key,{Warn=>'y'});
 
    sub myf{
@@ -136,11 +146,11 @@ sub gslinteg_qng{
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
   else{ $opt = {Warn => 'n'}; }
   if($$opt{Warn}=~/y/i) { $warn = 1;}
-  else {$warn = 0;} 
-  my ($f,$a,$b,$epsabs,$epsrel) = @_;
-  barf 'Usage: gslinteg_qng($function_ref,$a,$b,$epsabs,$epsrel,[opt]) ' 
+  else {$warn = 0;}
+  my ($f,$la,$lb,$epsabs,$epsrel) = @_;
+  barf 'Usage: gslinteg_qng($function_ref,$la,$lb,$epsabs,$epsrel,[opt]) '
 	unless ($#_ == 4);
-  my ($res,$abserr,$neval,$ierr) = qng_meat($a,$b,$epsabs,$epsrel,$warn,$f);
+  my ($res,$abserr,$neval,$ierr) = qng_meat($la,$lb,$epsabs,$epsrel,$warn,$f);
   return ($res,$abserr,$ierr,$neval);
 }
 
@@ -152,7 +162,7 @@ sub gslinteg_qng{
 =for sig
 
   Signature: (double a(); double b(); double epsabs();
-                   double epsrel(); double [o] result(); double [o] abserr(); 
+                   double epsrel(); double [o] result(); double [o] abserr();
                    int [o] neval(); int [o] ierr(); int gslwarn(); SV* function)
 
 
@@ -184,11 +194,11 @@ sub gslinteg_qag{
    if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
    else{ $opt = {Warn => 'n'}; }
    if($$opt{Warn}=~/y/i) { $warn = 1;}
-   else {$warn = 0;} 
-   my ($f,$a,$b,$epsabs,$epsrel,$limit,$key) = @_;
-   barf 'Usage: gslinteg_qag($function_ref,$a,$b,$epsabs,$epsrel,$limit,$key,[opt]) ' 
+   else {$warn = 0;}
+   my ($f,$la,$lb,$epsabs,$epsrel,$limit,$key) = @_;
+   barf 'Usage: gslinteg_qag($function_ref,$la,$lb,$epsabs,$epsrel,$limit,$key,[opt]) '
 	unless ($#_ == 6);
-   my ($res,$abserr,$ierr) = qag_meat($a,$b,$epsabs,$epsrel,$limit,$key,$limit,$warn,$f);
+   my ($res,$abserr,$ierr) = qag_meat($la,$lb,$epsabs,$epsrel,$limit,$key,$limit,$warn,$f);
    return ($res,$abserr,$ierr);
 }
 
@@ -231,11 +241,11 @@ sub gslinteg_qags{
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
   else{ $opt = {Warn => 'n'}; }
   if($$opt{Warn}=~/y/i) { $warn = 1;}
-  else {$warn = 0;} 
-  my ($f,$a,$b,$epsabs,$epsrel,$limit) = @_;
-  barf 'Usage: gslinteg_qags($function_ref,$a,$b,$epsabs,$epsrel,$limit,[opt]) ' 
+  else {$warn = 0;}
+  my ($f,$la,$lb,$epsabs,$epsrel,$limit) = @_;
+  barf 'Usage: gslinteg_qags($function_ref,$la,$lb,$epsabs,$epsrel,$limit,[opt]) '
 	unless ($#_ == 5);
-  my ($res,$abserr,$ierr) = qags_meat($a,$b,$epsabs,$epsrel,$limit,$limit,$warn,$f);
+  my ($res,$abserr,$ierr) = qags_meat($la,$lb,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
 
@@ -278,9 +288,9 @@ sub gslinteg_qagp{
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
   else{ $opt = {Warn => 'n'}; }
   if($$opt{Warn}=~/y/i) { $warn = 1;}
-  else {$warn = 0;} 
+  else {$warn = 0;}
   my ($f,$points,$epsabs,$epsrel,$limit) = @_;
-  barf 'Usage: gslinteg_qagp($function_ref,$points,$epsabs,$epsrel,$limit,[opt]) ' 
+  barf 'Usage: gslinteg_qagp($function_ref,$points,$epsabs,$epsrel,$limit,[opt]) '
 	unless ($#_ == 4);
   my ($res,$abserr,$ierr) = qagp_meat($points,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
@@ -325,9 +335,9 @@ sub gslinteg_qagi{
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
   else{ $opt = {Warn => 'n'}; }
   if($$opt{Warn}=~/y/i) { $warn = 1;}
-  else {$warn = 0;} 
+  else {$warn = 0;}
   my ($f,$epsabs,$epsrel,$limit) = @_;
-  barf 'Usage: gslinteg_qagi($function_ref,$epsabs,$epsrel,$limit,[opt]) ' 
+  barf 'Usage: gslinteg_qagi($function_ref,$epsabs,$epsrel,$limit,[opt]) '
 	unless ($#_ == 3);
   my ($res,$abserr,$ierr) = qagi_meat($epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
@@ -372,11 +382,11 @@ sub gslinteg_qagiu{
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
   else{ $opt = {Warn => 'n'}; }
   if($$opt{Warn}=~/y/i) { $warn = 1;}
-  else {$warn = 0;} 
-  my ($f,$a,$epsabs,$epsrel,$limit) = @_;
-  barf 'Usage: gslinteg_qagiu($function_ref,$a,$epsabs,$epsrel,$limit,[opt]) ' 
+  else {$warn = 0;}
+  my ($f,$la,$epsabs,$epsrel,$limit) = @_;
+  barf 'Usage: gslinteg_qagiu($function_ref,$la,$epsabs,$epsrel,$limit,[opt]) '
 	unless ($#_ == 4);
-  my ($res,$abserr,$ierr) = qagiu_meat($a,$epsabs,$epsrel,$limit,$limit,$warn,$f);
+  my ($res,$abserr,$ierr) = qagiu_meat($la,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
 
@@ -419,11 +429,11 @@ sub gslinteg_qagil{
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
   else{ $opt = {Warn => 'n'}; }
   if($$opt{Warn}=~/y/i) { $warn = 1;}
-  else {$warn = 0;} 
-  my ($f,$b,$epsabs,$epsrel,$limit) = @_;
-  barf 'Usage: gslinteg_qagil($function_ref,$b,$epsabs,$epsrel,$limit,[opt]) ' 
+  else {$warn = 0;}
+  my ($f,$lb,$epsabs,$epsrel,$limit) = @_;
+  barf 'Usage: gslinteg_qagil($function_ref,$lb,$epsabs,$epsrel,$limit,[opt]) '
 	unless ($#_ == 4);
-  my ($res,$abserr,$ierr) = qagil_meat($b,$epsabs,$epsrel,$limit,$limit,$warn,$f);
+  my ($res,$abserr,$ierr) = qagil_meat($lb,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
 
@@ -466,11 +476,11 @@ sub gslinteg_qawc{
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
   else{ $opt = {Warn => 'n'}; }
   if($$opt{Warn}=~/y/i) { $warn = 1;}
-  else {$warn = 0;} 
-  my ($f,$a,$b,$c,$epsabs,$epsrel,$limit) = @_;
-  barf 'Usage: gslinteg_qawc($function_ref,$a,$b,$c,$epsabs,$epsrel,$limit,[opt]) ' 
+  else {$warn = 0;}
+  my ($f,$la,$lb,$c,$epsabs,$epsrel,$limit) = @_;
+  barf 'Usage: gslinteg_qawc($function_ref,$la,$lb,$c,$epsabs,$epsrel,$limit,[opt]) '
 	unless ($#_ == 6);
-  my ($res,$abserr,$ierr) = qawc_meat($a,$b,$c,$epsabs,$epsrel,$limit,$limit,$warn,$f);
+  my ($res,$abserr,$ierr) = qawc_meat($la,$lb,$c,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
 
@@ -513,11 +523,11 @@ sub gslinteg_qaws{
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
   else{ $opt = {Warn => 'n'}; }
   if($$opt{Warn}=~/y/i) { $warn = 1;}
-  else {$warn = 0;} 
-  my ($f,$alpha,$beta,$mu,$nu,$a,$b,$epsabs,$epsrel,$limit) = @_;
-  barf 'Usage: gslinteg_qaws($function_ref,$alpha,$beta,$mu,$nu,$a,$b,$epsabs,$epsrel,$limit,[opt]) ' 
+  else {$warn = 0;}
+  my ($f,$alpha,$beta,$mu,$nu,$la,$lb,$epsabs,$epsrel,$limit) = @_;
+  barf 'Usage: gslinteg_qaws($function_ref,$alpha,$beta,$mu,$nu,$la,$lb,$epsabs,$epsrel,$limit,[opt]) '
 	unless ($#_ == 9);
-  my ($res,$abserr,$ierr) = qaws_meat($a,$b,$epsabs,$epsrel,$limit,$limit,$alpha,$beta,$mu,$nu,$warn,$f);
+  my ($res,$abserr,$ierr) = qaws_meat($la,$lb,$epsabs,$epsrel,$limit,$limit,$alpha,$beta,$mu,$nu,$warn,$f);
   return ($res,$abserr,$ierr);
 }
 
@@ -561,18 +571,18 @@ sub gslinteg_qawo{
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
   else{ $opt = {Warn => 'n'}; }
   if($$opt{Warn}=~/y/i) { $warn = 1;}
-  else {$warn = 0;} 
-  my ($f,$omega,$sincosopt,$a,$b,$epsabs,$epsrel,$limit) = @_;
-  barf 'Usage: gslinteg_qawo($function_ref,$omega,$sin_or_cos,$a,$b,$epsabs,$epsrel,$limit,[opt]) ' 
+  else {$warn = 0;}
+  my ($f,$omega,$sincosopt,$la,$lb,$epsabs,$epsrel,$limit) = @_;
+  barf 'Usage: gslinteg_qawo($function_ref,$omega,$sin_or_cos,$la,$lb,$epsabs,$epsrel,$limit,[opt]) '
 	unless ($#_ == 7);
   my $OPTION_SIN_COS;
   if($sincosopt=~/cos/i){ $OPTION_SIN_COS = 0;}
   elsif($sincosopt=~/sin/i){ $OPTION_SIN_COS = 1;}
   else { barf("Error in argument 3 of function gslinteg_qawo: specify 'cos' or 'sin'\n");}
 
-  my $L = $b - $a;
+  my $L = $lb - $la;
   my $nlevels = $limit;
-  my ($res,$abserr,$ierr) = qawo_meat($a,$b,$epsabs,$epsrel,$limit,$limit,$OPTION_SIN_COS,$omega,$L,$nlevels,$warn,$f);
+  my ($res,$abserr,$ierr) = qawo_meat($la,$lb,$epsabs,$epsrel,$limit,$limit,$OPTION_SIN_COS,$omega,$L,$nlevels,$warn,$f);
   return ($res,$abserr,$ierr);
 }
 
@@ -616,16 +626,16 @@ sub gslinteg_qawf{
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
   else{ $opt = {Warn => 'n'}; }
   if($$opt{Warn}=~/y/i) { $warn = 1;}
-  else {$warn = 0;} 
-  my ($f,$omega,$sincosopt,$a,$epsabs,$limit) = @_;
-  barf 'Usage: gslinteg_qawf($function_ref,$omega,$sin_or_cos,$a,$epsabs,$limit,[opt]) ' 
+  else {$warn = 0;}
+  my ($f,$omega,$sincosopt,$la,$epsabs,$limit) = @_;
+  barf 'Usage: gslinteg_qawf($function_ref,$omega,$sin_or_cos,$la,$epsabs,$limit,[opt]) '
 	unless ($#_ == 5);
   my $OPTION_SIN_COS;
   if($sincosopt=~/cos/i){ $OPTION_SIN_COS = 0;}
   elsif($sincosopt=~/sin/i){ $OPTION_SIN_COS = 1;}
   else { barf("Error in argument 3 of function gslinteg_qawf: specify 'cos' or 'sin'\n");}
   my $nlevels = $limit;
-  my ($res,$abserr,$ierr) = qawf_meat($a,$epsabs,$limit,$limit,$OPTION_SIN_COS,$omega,$nlevels,$warn,$f);
+  my ($res,$abserr,$ierr) = qawf_meat($la,$epsabs,$limit,$limit,$OPTION_SIN_COS,$omega,$nlevels,$warn,$f);
   return ($res,$abserr,$ierr);
 }
 
@@ -669,10 +679,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Non-adaptive Gauss-Kronrod integration
 
-This function applies the Gauss-Kronrod 10-point, 21-point, 43-point and 87-point 
-integration rules in succession until an estimate of the integral of f over ($a,$b) 
+This function applies the Gauss-Kronrod 10-point, 21-point, 43-point and 87-point
+integration rules in succession until an estimate of the integral of f over ($la,$lb)
 is achieved within the desired absolute and relative error limits, $epsabs and $epsrel.
-It is meant for fast integration of smooth functions. It returns an array with the 
+It is meant for fast integration of smooth functions. It returns an array with the
 result, an estimate of the absolute error, an error flag and the number of function
 evaluations performed.
 
@@ -680,7 +690,7 @@ evaluations performed.
 
 Usage:
 
-  ($res,$abserr,$ierr,$neval) = gslinteg_qng($function_ref,$a,$b,
+  ($res,$abserr,$ierr,$neval) = gslinteg_qng($function_ref,$la,$lb,
                                              $epsrel,$epsabs,[{Warn => $warn}]);
 
 =for example
@@ -701,15 +711,15 @@ Example:
 
 Adaptive integration
 
-This function applies an integration rule adaptively until an estimate of 
-the integral of f over ($a,$b) is achieved within the desired absolute and 
-relative error limits, $epsabs and $epsrel. On each iteration the adaptive 
-integration strategy bisects the interval with the largest error estimate; 
+This function applies an integration rule adaptively until an estimate of
+the integral of f over ($la,$lb) is achieved within the desired absolute and
+relative error limits, $epsabs and $epsrel. On each iteration the adaptive
+integration strategy bisects the interval with the largest error estimate;
 the maximum number of allowed subdivisions is given by the parameter $limit.
-The integration rule is determined by the 
-value of $key, which has to be one of (1,2,3,4,5,6) and correspond to 
+The integration rule is determined by the
+value of $key, which has to be one of (1,2,3,4,5,6) and correspond to
 the 15, 21, 31, 41, 51 and 61  point Gauss-Kronrod rules respectively.
-It returns an array with the result, an estimate of the absolute error 
+It returns an array with the result, an estimate of the absolute error
 and an error flag.
 
 =for ref
@@ -720,13 +730,13 @@ Please check the GSL documentation for more information.
 
 Usage:
 
-  ($res,$abserr,$ierr) = gslinteg_qag($function_ref,$a,$b,$epsrel,
+  ($res,$abserr,$ierr) = gslinteg_qag($function_ref,$la,$lb,$epsrel,
                                       $epsabs,$limit,$key,[{Warn => $warn}]);
 
 =for example
 
 Example:
-  
+
   my ($res,$abserr,$ierr) = gslinteg_qag(\&f,0,1,0,1e-10,1000,1);
   # with warnings on
   my ($res,$abserr,$ierr) = gslinteg_qag(\&f,0,1,0,1e-10,1000,1,{Warn => 'y'});
@@ -740,12 +750,12 @@ Example:
 
 Adaptive integration with singularities
 
-This function applies the Gauss-Kronrod 21-point integration rule 
-adaptively until an estimate of the integral of f over ($a,$b) is 
-achieved within the desired absolute and relative error limits, 
+This function applies the Gauss-Kronrod 21-point integration rule
+adaptively until an estimate of the integral of f over ($la,$lb) is
+achieved within the desired absolute and relative error limits,
 $epsabs and $epsrel. The algorithm is such that it
-accelerates the convergence of the integral in the presence of 
-discontinuities and integrable singularities. 
+accelerates the convergence of the integral in the presence of
+discontinuities and integrable singularities.
 The maximum number of allowed subdivisions done by the adaptive
 algorithm must be supplied in the parameter $limit.
 
@@ -757,7 +767,7 @@ Please check the GSL documentation for more information.
 
 Usage:
 
-  ($res,$abserr,$ierr) = gslinteg_qags($function_ref,$a,$b,$epsrel,
+  ($res,$abserr,$ierr) = gslinteg_qags($function_ref,$la,$lb,$epsrel,
                                        $epsabs,$limit,[{Warn => $warn}]);
 
 =for example
@@ -765,7 +775,7 @@ Usage:
 Example:
 
   my ($res,$abserr,$ierr) = gslinteg_qags(\&f,0,1,0,1e-10,1000);
-  # with warnings on 
+  # with warnings on
   ($res,$abserr,$ierr) = gslinteg_qags(\&f,0,1,0,1e-10,1000,{Warn => 'y'});
 
   sub f{
@@ -777,14 +787,14 @@ Example:
 
 Adaptive integration with known singular points
 
-This function applies the adaptive integration algorithm used by 
+This function applies the adaptive integration algorithm used by
 gslinteg_qags taking into account the location of singular points
-until an estimate of 
-the integral of f over ($a,$b) is achieved within the desired absolute and 
+until an estimate of
+the integral of f over ($la,$lb) is achieved within the desired absolute and
 relative error limits, $epsabs and $epsrel.
-Singular points are supplied in the piddle $points, whose endpoints 
+Singular points are supplied in the piddle $points, whose endpoints
 determine the integration range.
-So, for example, if the function has singular points at x_1 and x_2 and the 
+So, for example, if the function has singular points at x_1 and x_2 and the
 integral is desired from a to b (a < x_1 < x_2 < b), $points = pdl(a,x_1,x_2,b).
 The maximum number of allowed subdivisions done by the adaptive
 algorithm must be supplied in the parameter $limit.
@@ -821,7 +831,7 @@ Example:
 Adaptive integration on infinite interval
 
 This function estimates the integral of the function f over the
-infinite interval (-\infty,+\infty) within the desired absolute and 
+infinite interval (-\infty,+\infty) within the desired absolute and
 relative error limits, $epsabs and $epsrel.
 After a transformation, the algorithm
 of gslinteg_qags with a 15-point Gauss-Kronrod rule is used.
@@ -847,7 +857,7 @@ Example:
   # with warnings on
   ($res,$abserr,$ierr) = gslinteg_qagi(\&myfn,1e-7,0,1000,{Warn => 'y'});
 
-  sub myfn{    
+  sub myfn{
     my ($x) = @_;
     return exp(-$x - $x*$x) ;
   }
@@ -858,7 +868,7 @@ Example:
 Adaptive integration on infinite interval
 
 This function estimates the integral of the function f over the
-infinite interval (a,+\infty) within the desired absolute and 
+infinite interval (la,+\infty) within the desired absolute and
 relative error limits, $epsabs and $epsrel.
 After a transformation, the algorithm
 of gslinteg_qags with a 15-point Gauss-Kronrod rule is used.
@@ -873,7 +883,7 @@ Please check the GSL documentation for more information.
 
 Usage:
 
-  ($res,$abserr,$ierr) = gslinteg_qagiu($function_ref,$a,$epsabs,
+  ($res,$abserr,$ierr) = gslinteg_qagiu($function_ref,$la,$epsabs,
                                         $epsrel,$limit,[{Warn => $warn}]);
 
 =for example
@@ -897,7 +907,7 @@ Example:
 Adaptive integration on infinite interval
 
 This function estimates the integral of the function f over the
-infinite interval (-\infty,b) within the desired absolute and 
+infinite interval (-\infty,lb) within the desired absolute and
 relative error limits, $epsabs and $epsrel.
 After a transformation, the algorithm
 of gslinteg_qags with a 15-point Gauss-Kronrod rule is used.
@@ -912,7 +922,7 @@ Please check the GSL documentation for more information.
 
 Usage:
 
-  ($res,$abserr,$ierr) = gslinteg_qagl($function_ref,$b,$epsabs,
+  ($res,$abserr,$ierr) = gslinteg_qagl($function_ref,$lb,$epsabs,
                                        $epsrel,$limit,[{Warn => $warn}]);
 
 =for example
@@ -932,8 +942,8 @@ Example:
 
 Adaptive integration for Cauchy principal values
 
-This function computes the Cauchy principal value of the integral of f over (a,b), 
-with a singularity at c, I = \int_a^b dx f(x)/(x - c). The integral is
+This function computes the Cauchy principal value of the integral of f over (la,lb),
+with a singularity at c, I = \int_{la}^{lb} dx f(x)/(x - c). The integral is
 estimated within the desired absolute and relative error limits, $epsabs and $epsrel.
 The maximum number of allowed subdivisions done by the adaptive
 algorithm must be supplied in the parameter $limit.
@@ -946,7 +956,7 @@ Please check the GSL documentation for more information.
 
 Usage:
 
-  ($res,$abserr,$ierr) = gslinteg_qawc($function_ref,$a,$b,$c,$epsabs,$epsrel,$limit)
+  ($res,$abserr,$ierr) = gslinteg_qawc($function_ref,$la,$lb,$c,$epsabs,$epsrel,$limit)
 
 =for example
 
@@ -965,10 +975,10 @@ Example:
 
 Adaptive integration for singular functions
 
-The algorithm in gslinteg_qaws is designed for integrands with algebraic-logarithmic 
-singularities at the end-points of an integration region. 
+The algorithm in gslinteg_qaws is designed for integrands with algebraic-logarithmic
+singularities at the end-points of an integration region.
 Specifically, this function computes the integral given by
-I = \int_a^b dx f(x) (x-a)^alpha (b-x)^beta log^mu (x-a) log^nu (b-x).
+I = \int_{la}^{lb} dx f(x) (x-la)^alpha (lb-x)^beta log^mu (x-la) log^nu (lb-x).
 The integral is
 estimated within the desired absolute and relative error limits, $epsabs and $epsrel.
 The maximum number of allowed subdivisions done by the adaptive
@@ -980,10 +990,10 @@ Please check the GSL documentation for more information.
 
 =for usage
 
-Usage: 
+Usage:
 
-  ($res,$abserr,$ierr) = 
-      gslinteg_qawc($function_ref,$alpha,$beta,$mu,$nu,$a,$b,
+  ($res,$abserr,$ierr) =
+      gslinteg_qawc($function_ref,$alpha,$beta,$mu,$nu,$la,$lb,
                     $epsabs,$epsrel,$limit,[{Warn => $warn}]);
 
 =for example
@@ -1008,8 +1018,8 @@ Example:
 
 Adaptive integration for oscillatory functions
 
-This function uses an adaptive algorithm to compute the integral of f over 
-(a,b) with the weight function sin(omega*x) or cos(omega*x) -- which of 
+This function uses an adaptive algorithm to compute the integral of f over
+(la,lb) with the weight function sin(omega*x) or cos(omega*x) -- which of
 sine or cosine is used is determined by the parameter $opt ('cos' or 'sin').
 The integral is
 estimated within the desired absolute and relative error limits, $epsabs and $epsrel.
@@ -1025,7 +1035,7 @@ Please check the GSL documentation for more information.
 Usage:
 
   ($res,$abserr,$ierr) = gslinteg_qawo($function_ref,$omega,$sin_or_cos,
-                                $a,$b,$epsabs,$epsrel,$limit,[opt])
+                                $la,$lb,$epsabs,$epsrel,$limit,[opt])
 
 =for example
 
@@ -1039,7 +1049,7 @@ Example:
   sub f{
     my ($x) = @_;
     if($x==0){return 0;}
-    else{ return log($x);} 
+    else{ return log($x);}
   }
 
 
@@ -1047,10 +1057,10 @@ Example:
 
 Adaptive integration for Fourier integrals
 
-This function attempts to compute a Fourier integral of the function 
-f over the semi-infinite interval [a,+\infty). Specifically, it attempts
-tp compute I = \int_a^{+\infty} dx f(x)w(x), where w(x) is sin(omega*x)
-or cos(omega*x) -- which of sine or cosine is used is determined by 
+This function attempts to compute a Fourier integral of the function
+f over the semi-infinite interval [la,+\infty). Specifically, it attempts
+tp compute I = \int_{la}^{+\infty} dx f(x)w(x), where w(x) is sin(omega*x)
+or cos(omega*x) -- which of sine or cosine is used is determined by
 the parameter $opt ('cos' or 'sin').
 The integral is
 estimated within the desired absolute error limit $epsabs.
@@ -1065,7 +1075,7 @@ Please check the GSL documentation for more information.
 
 Usage:
 
-  gslinteg_qawf($function_ref,$omega,$sin_or_cos,$a,$epsabs,$limit,[opt])
+  gslinteg_qawf($function_ref,$omega,$sin_or_cos,$la,$epsabs,$limit,[opt])
 
 =for example
 
@@ -1078,7 +1088,7 @@ Example:
   sub f{
     my ($x) = @_;
     if ($x == 0){return 0;}
-    return 1.0/sqrt($x)    
+    return 1.0/sqrt($x)
   }
 
 
@@ -1091,14 +1101,13 @@ database is always linked from L<http://pdl.perl.org>).
 
 L<PDL>
 
-The GSL documentation is online at
-
-  http://www.gnu.org/software/gsl/manual/
+The GSL documentation for numerical integration is online at
+L<https://www.gnu.org/software/gsl/doc/html/integration.html>
 
 =head1 AUTHOR
 
 This file copyright (C) 2003,2005 Andres Jordan <ajordan@eso.org>
-All rights reserved. There is no warranty. You are allowed to redistribute 
+All rights reserved. There is no warranty. You are allowed to redistribute
 this software documentation under certain conditions. For details, see the file
 COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.

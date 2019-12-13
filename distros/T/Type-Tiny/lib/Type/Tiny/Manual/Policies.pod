@@ -2,13 +2,11 @@
 
 =encoding utf-8
 
-=for stopwords versioning
-
 =head1 NAME
 
 Type::Tiny::Manual::Policies - Type::Tiny policies
 
-=head1 STABILITY
+=head1 MANUAL
 
 =head2 Type::Tiny Stability Policy
 
@@ -52,9 +50,32 @@ The following list is currently non-exhaustive.
 
 =item *
 
-L<Type::Tiny> inlining subs (i.e. C<inline_as>) may return a list of
-strings (with C<undef> being allowed as the first item on the list).
-This is experimental. See L<Type::Utils>.
+The following type checks result may vary based on your version of
+Perl and whether Type::Tiny::XS is installed. Their outcome is currently
+considered undefined, and may change in future versions.
+
+=over
+
+=item *
+
+Using B<Object> and similar type checks on unblessed regular expression
+references, the outcome is undefined.
+
+=item *
+
+On all current versions of Perl, false (C<< !!0 >>) stringifies to the
+empty string (but using Devel::Peek you can tell the difference between
+this value and a normal empty string), so B<Int> and subtypes of B<Int>
+do not consider it to be an integer. If Perl's behaviour ever changes,
+you might not be able to rely on this outcome. True (C<< !!1 >>)
+stringifies as "1", so is considered an integer.
+
+=item *
+
+A glob (not a globref but an actual glob) currently passes the
+B<StringLike> type constraint but not the B<Str> type constraint.
+
+=back
 
 =item *
 
@@ -69,16 +90,11 @@ The L<parameterizable coercion API|Type::Coercion> is subject to change.
 
 The interaction of deep coercions and mutable coercions currently results
 in ill-defined behaviour. This could change at any time.
-(See L<Type::Tiny::Manual::Coercions/"Deep Caveat">.)
 
 =item *
 
 L<Type::Registry>'s ability to import L<MooseX::Types> and L<MouseX::Types>
 type libraries is experimental.
-
-=item *
-
-Integration with L<Type::Tiny::XS>.
 
 =item *
 
@@ -117,10 +133,17 @@ Additionally, releases where the second component is an odd number will
 be considered unstable/trial releases. (These will also include an
 underscore in the version number as per the usual CPAN convention.)
 
-=head1 BUGS
+=head1 NEXT STEPS
 
-Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::Contributing>
+
+Contributing to Type::Tiny development.
+
+=back
 
 =head1 AUTHOR
 
@@ -140,3 +163,4 @@ WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
+

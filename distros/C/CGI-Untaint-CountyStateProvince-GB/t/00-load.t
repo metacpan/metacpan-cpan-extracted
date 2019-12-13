@@ -1,7 +1,7 @@
 #!perl -T
 
 use strict;
-use Test::More tests => 3;
+use Test::Most tests => 3;
 
 BEGIN {
 	use_ok('CGI::Untaint');

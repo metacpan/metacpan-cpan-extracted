@@ -1,4 +1,4 @@
-# AWS::Neptune::DBClusterParameterGroup generated from spec 2.25.0
+# AWS::Neptune::DBClusterParameterGroup generated from spec 7.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Neptune::DBClusterParameterGroup',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Neptune::DBClusterParameterGroup {
     [  ]
   }
   sub supported_regions {
-    [ 'eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
+    [ 'ca-central-1','eu-central-1','eu-west-1','eu-west-2','me-south-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

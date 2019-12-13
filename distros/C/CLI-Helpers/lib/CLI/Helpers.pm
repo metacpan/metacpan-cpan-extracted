@@ -7,7 +7,7 @@ use warnings;
 
 use Capture::Tiny qw(capture);
 use File::Basename;
-use Getopt::Long qw(:config pass_through);
+use Getopt::Long qw(GetOptionsFromArray :config pass_through);
 use Module::Load qw(load);
 use Ref::Util qw(is_ref is_arrayref is_hashref);
 use Sys::Syslog qw(:standard);
@@ -16,10 +16,13 @@ use Term::ReadKey;
 use Term::ReadLine;
 use YAML;
 
-our $VERSION = '1.6'; # VERSION
+our $VERSION = '1.7'; # VERSION
 
-our $_OPTIONS_PARSED;
-my  @ORIG_ARGS = @ARGV;
+# Capture ARGV at Load
+my @ORIG_ARGS;
+BEGIN {
+    @ORIG_ARGS = @ARGV;
+}
 
 { # Work-around for CPAN Smoke Test Failure
     # Details: http://perldoc.perl.org/5.8.9/Term/ReadLine.html#CAVEATS
@@ -30,97 +33,188 @@ my  @ORIG_ARGS = @ARGV;
 } # End Work-around
 
 
-use Sub::Exporter -setup => {
-    exports => [qw(
-        output verbose debug debug_var override
-        prompt confirm text_input menu pwprompt
-    )],
-    groups => {
-        input  => [qw(prompt menu text_input confirm pwprompt)],
-        output => [qw(output verbose debug debug_var)],
+require Exporter;
+our @ISA = qw(Exporter);
+
+my @output_tags = qw(output verbose debug debug_var cli_helpers_initialize);
+my @input_tags  = qw(prompt menu text_input confirm pwprompt);
+
+our @EXPORT_OK = ( @output_tags, @input_tags );
+our %EXPORT_TAGS = (
+    all    => [@output_tags,@input_tags],
+    input  => \@input_tags,
+    output => \@output_tags,
+);
+
+my $ARGV_AT_INIT    = 1;
+my $COPY_ARGV       = 0;
+our $_init_complete = 0;
+
+sub import {
+    my (@args) = @_;
+
+    my $explicit_argv = 0;
+    my @import = ();
+    # We need to process the config options
+    foreach my $arg ( @args ) {
+        if( $arg eq 'delay_argv' ) {
+            $ARGV_AT_INIT = 0;
+            $explicit_argv = 1;
+        }
+        elsif( $arg eq 'preprocess_argv' ) {
+            $ARGV_AT_INIT = 1;
+            $explicit_argv = 1;
+        }
+        elsif( $arg eq 'copy_argv' ) {
+            $COPY_ARGV = 1;
+        }
+        # Not a config option, pass through
+        else {
+            push @import, $arg;
+        }
     }
-};
+    if( !$explicit_argv ) {
+        my ($package) = caller();
+        $ARGV_AT_INIT = $package eq 'main';
+    }
 
-
-my %opt = ();
-if( !defined $_OPTIONS_PARSED ) {
-    GetOptions(\%opt,
-        'color!',
-        'verbose|v+',
-        'debug',
-        'debug-class:s',
-        'quiet',
-        'data-file:s',
-        'syslog!',
-        'syslog-facility:s',
-        'syslog-tag:s',
-        'syslog-debug!',
-        'tags:s',
-        'nopaste',
-        'nopaste-public',
-        'nopaste-service:s',
-    );
-    $_OPTIONS_PARSED = 1;
+    CLI::Helpers->export_to_level( 1, @import );
 }
 
-my $data_fh = undef;
-if( exists $opt{'data-file'} ) {
+{
+    ## no critic (ProhibitNoWarnings)
+    no warnings;
+    INIT {
+        return if $_init_complete++;
+        cli_helpers_initialize() if $ARGV_AT_INIT;
+    }
+    ## use critic
+}
+
+
+{
+    my @argv_original = ();
+    my $parsed_argv = 0;
+    sub _parse_options {
+        my ($opt_ref) = @_;
+        my @opt_spec = qw(
+            color!
+            verbose|v+
+            debug
+            debug-class:s
+            quiet
+            data-file:s
+            syslog!
+            syslog-facility:s
+            syslog-tag:s
+            syslog-debug!
+            tags:s
+            nopaste
+            nopaste-public
+            nopaste-service:s
+        );
+
+        my $argv;
+        my %opt;
+        if( defined $opt_ref && is_arrayref($opt_ref) ) {
+            # If passed an argv array, use that
+            $argv = $COPY_ARGV ? [ @{ $opt_ref } ] : $opt_ref;
+        }
+        else {
+            # Ensure multiple calls to cli_helpers_initialize() yield the same results
+            if ( $parsed_argv ) {
+                ## no critic
+                @ARGV = @argv_original;
+                ## use critic
+            }
+            else {
+                @argv_original = @ARGV;
+                $parsed_argv++;
+            }
+            # Operate on @ARGV
+            $argv = $COPY_ARGV ? [ @ARGV ] : \@ARGV;
+        }
+        GetOptionsFromArray($argv, \%opt, @opt_spec );
+        return \%opt;
+    }
+}
+
+my $DATA_HANDLE = undef;
+sub _open_data_file {
+    my $data_file = shift;
     eval {
-        open($data_fh, '>', $opt{'data-file'}) or die "data file unwritable: $!";
+        open($DATA_HANDLE, '>', $data_file) or die "data file unwritable: $!";
+        1;
+    } or do {
+        my $error = $@;
+        output({color=>'red',stderr=>1}, "Attempted to write to $data_file failed: $!");
     };
-    if( my $error = $@ ) {
-        output({color=>'red',stderr=>1}, "Attempted to write to $opt{'data-file'} failed: $!");
-    }
 }
+
 
 # Set defaults
-my %DEF = (
-    DEBUG           => $opt{debug}   || 0,
-    DEBUG_CLASS     => $opt{'debug-class'} || 'main',
-    VERBOSE         => $opt{verbose} || 0,
-    COLOR           => $opt{color}   // git_color_check(),
-    KV_FORMAT       => ': ',
-    QUIET           => $opt{quiet}   || 0,
-    SYSLOG          => $opt{syslog}  || 0,
-    SYSLOG_TAG      => exists $opt{'syslog-tag'}      && length $opt{'syslog-tag'}      ? $opt{'syslog-tag'} : basename($0),
-    SYSLOG_FACILITY => exists $opt{'syslog-facility'} && length $opt{'syslog-facility'} ? $opt{'syslog-facility'} : 'local0',
-    SYSLOG_DEBUG    => $opt{'syslog-debug'}  || 0,
-    TAGS            => $opt{tags} ? { map { $_ => 1 } split /,/, $opt{tags} } : undef,
-    NOPASTE         => $opt{nopaste} || 0,
-    NOPASTE_SERVICE => $opt{'nopaste-service'},
-);
-debug({color=>'magenta'}, "CLI::Helpers Definitions");
-debug_var(\%DEF);
-
-# Setup the Syslog Subsystem
-if( $DEF{SYSLOG} ) {
-    my $syslog_ok = eval {
-        openlog($DEF{SYSLOG_TAG}, 'ndelay,pid', $DEF{SYSLOG_FACILITY});
-        1;
-    };
-    my $error = $@;
-    if( !$syslog_ok ) {
-        output({stderr=>1,color=>'red'}, "CLI::Helpers could not open syslog: $error");
-        $DEF{SYSLOG}=0;
-    }
-}
-
-my $TERM = undef;
-my @STICKY = ();
+my %DEF     = ();
+my $TERM    = undef;
+my @STICKY  = ();
 my @NOPASTE = ();
 my %TAGS    = ();
 
-if( $DEF{NOPASTE} ) {
-    eval {
-        load 'App::Nopaste';
-        1;
-    } or do {
-        $DEF{NOPASTE} = 0;
-        output({stderr=>1,color=>'red',sticky=>1},
-            'App::Nopaste is not installed, please cpanm App::Nopaste for --nopaste support',
-        );
-    };
+
+sub cli_helpers_initialize {
+    my ($argv) = @_;
+
+    my $opts = _parse_options($argv);
+    _open_data_file($opts->{'data-file'}) if $opts->{'data-file'};
+
+    # Initialize Global Definitions
+    %DEF = (
+        DEBUG           => $opts->{debug}   || 0,
+        DEBUG_CLASS     => $opts->{'debug-class'} || 'main',
+        VERBOSE         => $opts->{verbose} || 0,
+        KV_FORMAT       => ': ',
+        QUIET           => $opts->{quiet}   || 0,
+        SYSLOG          => $opts->{syslog}  || 0,
+        SYSLOG_TAG      => exists $opts->{'syslog-tag'}      && length $opts->{'syslog-tag'}      ? $opts->{'syslog-tag'} : basename($0),
+        SYSLOG_FACILITY => exists $opts->{'syslog-facility'} && length $opts->{'syslog-facility'} ? $opts->{'syslog-facility'} : 'local0',
+        SYSLOG_DEBUG    => $opts->{'syslog-debug'}  || 0,
+        TAGS            => $opts->{tags} ? { map { $_ => 1 } split /,/, $opts->{tags} } : undef,
+        NOPASTE         => $opts->{nopaste} || 0,
+        NOPASTE_SERVICE => $opts->{'nopaste-service'},
+        NOPASTE_PUBLIC  => $opts->{'nopaste-public'},
+    );
+    $DEF{COLOR} = $opts->{color} // git_color_check();
+
+    debug("DEFINITIONS");
+    debug_var(\%DEF);
+
+    # Setup the Syslog Subsystem
+    if( $DEF{SYSLOG} ) {
+        eval {
+            openlog($DEF{SYSLOG_TAG}, 'ndelay,pid', $DEF{SYSLOG_FACILITY});
+            1;
+        } or do {
+            my $error = $@;
+            $DEF{SYSLOG}=0;
+            output({stderr=>1,color=>'red'}, "CLI::Helpers could not open syslog: $error");
+        };
+    }
+
+    # Optionally Attempt Loading App::NoPaste
+    if( $DEF{NOPASTE} ) {
+        eval {
+            load 'App::Nopaste';
+            1;
+        } or do {
+            $DEF{NOPASTE} = 0;
+            output({stderr=>1,color=>'red',sticky=>1},
+                'App::Nopaste is not installed, please cpanm App::Nopaste for --nopaste support',
+            );
+        };
+    }
+
+    return 1;
 }
+
 
 # Allow some messages to be fired at the end the of program
 END {
@@ -150,7 +244,7 @@ END {
             summary  => $command_string,
             desc     => $command_string,
             # Default to a Private Paste
-            private  => $opt{'nopaste-public'} ? 0 : 1,
+            private  => $DEF{NOPASTE_PUBLIC} ? 0 : 1,
         );
         debug_var(\%paste);
         if( $services ) {
@@ -205,6 +299,9 @@ sub output {
     # Return unless we have something to work with;
     return unless @_;
 
+    # Ensure we're all setup
+    cli_helpers_initialize() unless keys %DEF;
+
     # Input/output Arrays
     my @input = map { my $x=$_; chomp($x) if defined $x; $x; } @_;
     my @output = ();
@@ -240,8 +337,8 @@ sub output {
     }
 
     # Out to the console
-    if( !$DEF{QUIET} || (exists $opts->{IMPORTANT} && $opts->{IMPORTANT})) {
-        my $out_handle = exists $opts->{stderr} && $opts->{stderr} ? \*STDERR : \*STDOUT;
+    if( !$DEF{QUIET} || $opts->{IMPORTANT} ) {
+        my $out_handle = $opts->{stderr} ? \*STDERR : \*STDOUT;
         # Do clearing
         print $out_handle "\n"x$opts->{clear} if exists $opts->{clear};
         # Print output
@@ -249,30 +346,30 @@ sub output {
     }
 
     # Handle data, which is raw
-    if(defined $data_fh && exists $opts->{data} && $opts->{data}) {
-        print $data_fh "$_\n" for @input;
+    if(defined $DATA_HANDLE && $opts->{data}) {
+        print $DATA_HANDLE "$_\n" for @input;
     }
-    elsif( $DEF{SYSLOG} && !(exists $opts->{no_syslog} && $opts->{no_syslog})) {
+    elsif( $DEF{SYSLOG} && !$opts->{no_syslog}) {
         my $level = exists $opts->{syslog_level} ? $opts->{syslog_level} :
                     exists $opts->{stderr}       ? 'err' :
                     'notice';
 
         # Warning for syslogging data file
         unshift @output, "CLI::Helpers logging a data section, use --data-file to suppress this in syslog."
-            if exists $opts->{data} && $opts->{data};
+            if $opts->{data};
 
         # Now syslog the message
         debug({no_syslog=>1,color=>'magenta'}, sprintf "[%s] Syslogging %d messages, with: %s", $level, scalar(@output), join(",", map { $_=>$opts->{$_} } keys %{ $opts }));
         for( @output ) {
             # One bad message means no more syslogging
-            my $rc = $DEF{SYSLOG} = eval {
+            eval {
                 syslog($level, colorstrip($_));
                 1;
-            };
-            my $error = $@;
-            if($rc != 1 ) {
+            } or do {
+                my $error = $@;
+                $DEF{SYSLOG} = 0;
                 output({stderr=>1,color=>'red',no_syslog=>1}, "syslog() failed: $error");
-            }
+            };
         }
     }
 
@@ -296,6 +393,9 @@ sub verbose {
     $opts->{syslog_level} = $opts->{level} > 1 ? 'debug' : 'info';
     my @msgs=@_;
 
+    # Ensure we're all configured
+    cli_helpers_initialize() unless keys %DEF;
+
     if( !$DEF{DEBUG} ) {
         return unless $DEF{VERBOSE} >= $opts->{level};
     }
@@ -306,6 +406,9 @@ sub verbose {
 sub debug {
     my $opts = is_hashref($_[0]) ? shift @_ : {};
     my @msgs=@_;
+
+    # Ensure we're all configured
+    cli_helpers_initialize() unless keys %DEF;
 
     # Smarter handling of debug output
     return unless $DEF{DEBUG};
@@ -485,7 +588,7 @@ sub prompt {
     my ($prompt) = shift;
     my %args = @_;
 
-    return confirm($prompt) if exists $args{yn};
+    return confirm($prompt)           if exists $args{yn};
     return menu($prompt, $args{menu}) if exists $args{menu};
     # Check for a password prompt
     if( lc($prompt) =~ /passw(or)?d/ ) {
@@ -513,7 +616,7 @@ CLI::Helpers - Subroutines for making simple command line scripts
 
 =head1 VERSION
 
-version 1.6
+version 1.7
 
 =head1 SYNOPSIS
 
@@ -590,6 +693,51 @@ enables pass-through, so you can still use your own argument parsing routines or
 Getopt::Long in your script.
 
 =head1 FUNCTIONS
+
+=head2 cli_helpers_initialize
+
+This is called automatically when C<preprocess_argv> is set. By default, it'll
+be run the first time a definition is needed, usually the first call to
+C<output()>.  If called automatically, it will operate on C<@ARGV>.  You can
+optionally pass an array reference to this function and it'll operate that
+instead.
+
+In most cases, you don't need to call this function directly.  It must be
+explicitly requested in the import.
+
+    use CLI::Helpers qw( :output );
+
+    ...
+    # I want access to ARGV before CLI::Helpers;
+    my %opts = get_important_things_from(\@ARGV);
+
+    # Now, let CLI::Helpers take the rest, implicit
+    #   call to cli_helpers_initialize()
+    output("ready");
+
+Alternatively, you could:
+
+    use CLI::Helpers qw( :output preprocess_argv );
+
+    ...
+    # Since CLI::Helpers opts are stripped from @ARGV,
+    #  Getopt::Long::Descriptive won't complain about extra args
+    my ($opt,$usage) = describe_option( ... );
+
+    # Now, let CLI::Helpers take the rest, implicit
+    #   call to cli_helpers_initialize()
+    output("ready");
+
+Or if you'd prefer not to touch C<@ARGV> at all, you pass in an array ref:
+
+    use CLI::Helpers qw( :output );
+
+    my ($opt,$usage) = describe_option( ... );
+
+    cli_helpers_initialize([ qw( --verbose ) ]);
+
+    output("ready?");
+    verbose("you bet I am");
 
 =head2 def
 
@@ -718,6 +866,37 @@ This module uses L<Sub::Exporter> for flexible imports, the defaults provided by
 
     prompt()    Wrapper which mimics IO::Prompt a bit
     pwprompt()  Wrapper to get sensitive data
+
+=head2 Import Time Configurations
+
+It's possible to change the behavior of the import process.
+
+=over 2
+
+=item B<copy_argv>
+
+Instead of messing with C<@ARGV>, operate on a copy of C<@ARGV>.
+
+    use CLI::Helpers qw( :output copy_argv );
+
+=item B<preprocess_argv>
+
+This causes the C<@ARGV> processing to happen during the C<INIT> phase, after
+import but before runtime. This is the default when being imported from the
+C<main> package. This is usually OK for scripts, but for use in libraries, it may
+be undesirable.
+
+    use CLI::Helpers qw( :output preprocess_argv );
+
+=item B<delay_argv>
+
+This causes the C<@ARGV> processing to happen when the first call to a function
+needing it run, usually an C<output()> call. This is the default anytime
+L<CLI::Helpers> is imported from namespace that isn't C<main>.
+
+    use CLI::Helpers qw( :output delay_argv );
+
+=back
 
 =head1 ARGS
 

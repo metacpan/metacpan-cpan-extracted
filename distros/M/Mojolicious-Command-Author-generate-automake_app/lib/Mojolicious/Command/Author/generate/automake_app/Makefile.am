@@ -13,7 +13,7 @@ SHARE := $(shell test -d share && find share -type d -name ".??*" -prune -o -not
 PERLTESTS := $(shell find t -name "*.t")
 PM := $(shell find lib -name "*.pm")
 
-EXTRA_DIST = VERSION PERL_MODULES COPYRIGHT LICENSE CHANGES AUTHORS bootstrap $(PUB) $(wildcard t/*.t) $(BIN) $(POD) $(TEMPL) $(PERLTESTS) $(SHARE)
+EXTRA_DIST = VERSION cpanfile COPYRIGHT LICENSE CHANGES AUTHORS bootstrap $(PUB) $(wildcard t/*.t) $(BIN) $(POD) $(TEMPL) $(PERLTESTS) $(SHARE)
 
 YEAR := $(shell date +%Y)
 DATE := $(shell date +%Y-%m-%d)

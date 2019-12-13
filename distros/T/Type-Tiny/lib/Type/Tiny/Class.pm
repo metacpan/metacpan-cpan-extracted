@@ -10,24 +10,24 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::Class::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Class::VERSION   = '1.006000';
+	$Type::Tiny::Class::VERSION   = '1.008000';
 }
+
+$Type::Tiny::Class::VERSION =~ tr/_//d;
 
 use Scalar::Util qw< blessed >;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-use Type::Tiny ();
-our @ISA = 'Type::Tiny';
+require Type::Tiny::ConstrainedObject;
+our @ISA = 'Type::Tiny::ConstrainedObject';
+sub _short_name { 'Class' }
 
 sub new {
 	my $proto = shift;
 	return $proto->class->new(@_) if blessed $proto; # DWIM
 	
 	my %opts = (@_==1) ? %{$_[0]} : @_;
-	_croak "Class type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
-	_croak "Class type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
-	_croak "Class type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
 	_croak "Need to supply class name" unless exists $opts{class};
 	
 	if (Type::Tiny::_USE_XS)
@@ -127,11 +127,6 @@ sub plus_constructors
 	}
 	
 	return $self->plus_coercions(\@r);
-}
-
-sub has_parent
-{
-	!!1;
 }
 
 sub parent
@@ -324,10 +319,22 @@ Because coercing C<HashRef> via constructor is a common desire, if
 you call C<plus_constructors> with no arguments at all, this is the
 default.
 
-   $classtype->plus_constructors(Types::Standard::HashRef, "new")
+   $classtype->plus_constructors(HashRef, "new")
    $classtype->plus_constructors()  ## identical to above
 
 This is handy for Moose/Mouse/Moo-based classes.
+
+=item C<< stringifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< numifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< with_attribute_values($attr1 => $constraint1, ...) >>
+
+See L<Type::Tiny::ConstrainedObject>.
 
 =back
 

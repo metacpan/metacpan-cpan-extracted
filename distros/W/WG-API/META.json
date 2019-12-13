@@ -58,8 +58,6 @@
          "requires" : {
             "Const::Fast" : "0",
             "JSON" : "2.61",
-            "LWP" : "6.08",
-            "LWP::Protocol::https" : "6.07",
             "Log::Any" : "1.049",
             "Modern::Perl" : "1.20170117",
             "Moo" : "2.00",
@@ -76,35 +74,35 @@
    "provides" : {
       "WG::API" : {
          "file" : "lib/WG/API.pm",
-         "version" : "v0.12.0"
+         "version" : "v0.13.0"
       },
       "WG::API::Auth" : {
          "file" : "lib/WG/API/Auth.pm",
-         "version" : "v0.12.0"
+         "version" : "v0.13.0"
       },
       "WG::API::Base" : {
          "file" : "lib/WG/API/Base.pm",
-         "version" : "v0.12.0"
+         "version" : "v0.13.0"
       },
       "WG::API::Error" : {
          "file" : "lib/WG/API/Error.pm",
-         "version" : "v0.12.0"
+         "version" : "v0.13.0"
       },
       "WG::API::NET" : {
          "file" : "lib/WG/API/NET.pm",
-         "version" : "v0.12.0"
+         "version" : "v0.13.0"
       },
       "WG::API::WoT" : {
          "file" : "lib/WG/API/WoT.pm",
-         "version" : "v0.12.0"
+         "version" : "v0.13.0"
       },
       "WG::API::WoWp" : {
          "file" : "lib/WG/API/WoWp.pm",
-         "version" : "v0.12.0"
+         "version" : "v0.13.0"
       },
       "WG::API::WoWs" : {
          "file" : "lib/WG/API/WoWs.pm",
-         "version" : "v0.12.0"
+         "version" : "v0.13.0"
       }
    },
    "release_status" : "stable",
@@ -118,7 +116,7 @@
          "web" : "https://github.com/cynovg/p5-WG-API"
       }
    },
-   "version" : "v0.12",
+   "version" : "v0.13",
    "x_authority" : "cpan:CYNOVG",
    "x_contributors" : [
       "Cyrill Novgorodcev <cynovg@cpan.org>"

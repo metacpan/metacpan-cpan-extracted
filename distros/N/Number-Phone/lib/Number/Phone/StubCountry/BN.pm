@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215423;
+our $VERSION = 1.20191211212259;
 
 my $formatters = [
                 {
@@ -37,14 +37,16 @@ my $validators = {
           22[0-7]\\d{4}|
           (?:
             2[013-9]|
-            [3-5]\\d
+            [34]\\d|
+            5[0-25-9]
           )\\d{5}
         ',
                 'geographic' => '
           22[0-7]\\d{4}|
           (?:
             2[013-9]|
-            [3-5]\\d
+            [34]\\d|
+            5[0-25-9]
           )\\d{5}
         ',
                 'mobile' => '
@@ -57,14 +59,42 @@ my $validators = {
                 'personal_number' => '',
                 'specialrate' => '',
                 'toll_free' => '',
-                'voip' => ''
+                'voip' => '5[34]\\d{5}'
               };
+my %areanames = ();
+$areanames{en}->{67320} = "Brunei\ Muara";
+$areanames{en}->{67321} = "Brunei\ Muara";
+$areanames{en}->{673220} = "Brunei\ Muara";
+$areanames{en}->{673221} = "Brunei\ Muara";
+$areanames{en}->{673222} = "Brunei\ Muara";
+$areanames{en}->{673223} = "Brunei\ Muara";
+$areanames{en}->{673224} = "Brunei\ Muara";
+$areanames{en}->{673225} = "Brunei\ Muara";
+$areanames{en}->{673226} = "Brunei\ Muara";
+$areanames{en}->{673227} = "Brunei\ Muara";
+$areanames{en}->{67323} = "Brunei\ Muara";
+$areanames{en}->{67324} = "Brunei\ Muara";
+$areanames{en}->{67325} = "Brunei\ Muara";
+$areanames{en}->{67326} = "Brunei\ Muara";
+$areanames{en}->{67327} = "Brunei\ Muara";
+$areanames{en}->{67328} = "Brunei\ Muara";
+$areanames{en}->{67329} = "Brunei\ Muara";
+$areanames{en}->{6733} = "Beliat";
+$areanames{en}->{6734} = "Tutong";
+$areanames{en}->{67350} = "Temburong";
+$areanames{en}->{67351} = "Temburong";
+$areanames{en}->{67352} = "Temburong";
+$areanames{en}->{67355} = "Temburong";
+$areanames{en}->{67356} = "Temburong";
+$areanames{en}->{67357} = "Temburong";
+$areanames{en}->{67358} = "Temburong";
+$areanames{en}->{67359} = "Temburong";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+673|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

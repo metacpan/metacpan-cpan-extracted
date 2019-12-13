@@ -34,11 +34,11 @@ Struct::Path::PerlStyle - Perl-style syntax frontend for L<Struct::Path|Struct::
 
 =head1 VERSION
 
-Version 0.92
+Version 0.93
 
 =cut
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 =head1 SYNOPSIS
 
@@ -153,8 +153,23 @@ my $INTP = join('|', map { "\Q$_\E" } sort keys %INTP);
 
 # $_ will be substituted (if omitted) as first arg if placed on start of
 # hook expression
-my $COMPL_OPS = join('|', map { "\Q$_\E" }
-    qw(< > <= => lt gt le ge == != eq ne ~~ =~));
+my $COMPL_OPS = join('|', (
+    '==',
+    '!=',
+    '=~',
+    '!~',
+    'eq',
+    'ne',
+    '<',
+    '>',
+    '<=',
+    '>=',
+    'lt',
+    'gt',
+    'le',
+    'ge',
+    '~~',
+));
 
 my $HASH_KEY_CHARS = qr/[\p{Alnum}_\.\-\+]/;
 
@@ -197,6 +212,9 @@ Convert perl-style string to L<Struct::Path|Struct::Path> path structure
 sub _push_hash {
     my ($steps, $text) = @_;
     my ($body, $delim, $mods, %step, $token, $type);
+
+    # extract_quotelike fails to parse bare zero as a string
+    push @{$step{K}}, $text if $text eq '0';
 
     while ($text) {
         ($token, $text, $type, $delim, $body, $mods) =
@@ -244,8 +262,7 @@ sub _push_hook {
     my ($steps, $text) = @_;
 
     # substitute default value if omitted
-    $text =~ s/^\s*/\$_ /
-        if ($text =~ /^\s*(!\s*|not\s+)*($COMPL_OPS)/);
+    $text =~ s/^\s*($COMPL_OPS)/\$_ $1/;
 
     my $hook = 'sub {' .
         '$^W = 0; ' .

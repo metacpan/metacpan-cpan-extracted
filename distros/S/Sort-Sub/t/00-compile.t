@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Sort/Sub.pm',
     'Sort/Sub/by_ascii_then_num.pm',
+    'Sort/Sub/by_count.pm',
     'Sort/Sub/by_first_num_in_text.pm',
     'Sort/Sub/by_last_num_in_text.pm',
     'Sort/Sub/by_num_in_text.pm',

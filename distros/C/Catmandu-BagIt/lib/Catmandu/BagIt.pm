@@ -1,6 +1,6 @@
 package Catmandu::BagIt;
 
-our $VERSION = '0.238';
+our $VERSION = '0.239';
 
 use Catmandu::Sane;
 use Catmandu;
@@ -18,6 +18,7 @@ use Catmandu::BagIt::Fetch;
 use POSIX qw(strftime);
 use LWP::UserAgent;
 use utf8;
+use Catmandu::Util qw(is_string);
 use namespace::clean;
 
 # Flags indicating which operations are needed to create a valid bag
@@ -461,15 +462,33 @@ sub add_file {
     my $payload = Catmandu::BagIt::Payload->from_any($filename,$data);
     $payload->flag(FLAG_DIRTY);
 
+    my $sum;
+
+    if( is_string( $opts{md5} ) && $opts{md5} !~ /^[0-9a-f]{32}$/ ){
+
+        $self->log->error("supplied md5 sum for $filename does not look like an md5 sum");
+        $self->_push_error("supplied md5 sum for $filename does not look like an md5 sum");
+        return;
+
+    }
+    elsif( is_string( $opts{md5} ) ){
+
+        $sum = $opts{md5};
+
+    }
+    else {
+
+        my $fh = $payload->open;
+
+        binmode($fh,":raw");
+
+        $sum = $self->_md5_sum($fh);
+
+        close($fh);
+
+    }
+
     push @{ $self->_files }, $payload;
-
-    my $fh = $payload->open;
-
-    binmode($fh,":raw");
-
-    my $sum = $self->_md5_sum($fh);
-
-    close($fh);
 
     $self->_sums->{"$filename"} = $sum;
 
@@ -1572,13 +1591,16 @@ Return an ARRAY of real payload files found on disk as Catmandu::BagIt::Payload.
 
 Get a Catmandu::BagIt::Payload object for the file $filename.
 
-=head2 add_file($filename, $string)
+=head2 add_file($filename, $string, %opts)
 
-=head2 add_file($filename, IO::File->new(...))
+=head2 add_file($filename, IO::File->new(...), %opts)
 
-=head2 add_file($filaname, sub { my $io = shift; .... })
+=head2 add_file($filaname, sub { my $io = shift; .... }, %opts)
 
-Add a new file to the BagIt.
+Add a new file to the BagIt. Possible options:
+
+    overwrite => 1    - remove the old file
+    md5  => ""        - supply an MD5 (don't recalculate it)
 
 =head2 remove_file($filename)
 
@@ -1611,6 +1633,10 @@ L<Catmandu::Importer::BagIt> , L<Catmandu::Exporter::BagIt> , L<Catmandu::Store:
 =head1 AUTHOR
 
 Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>
+
+=head1 CONTRIBUTORS
+
+Nicolas Franck, C<< nicolas.franck at ugent.be >>
 
 =head1 COPYRIGHT AND LICENSE
 

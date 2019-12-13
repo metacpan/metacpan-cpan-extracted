@@ -67,16 +67,26 @@ use subs qw(
 	BAD_ISBN
 	ARTICLE_CODE_OUT_OF_RANGE
 	);
-use vars qw( $VERSION @ISA @EXPORT_OK %EXPORT_TAGS $debug %group_data
-	$MAX_GROUP_CODE_LENGTH %ERROR_TEXT );
+use vars qw(
+	@EXPORT_OK
+	%EXPORT_TAGS
+	%group_data
+	$MAX_GROUP_CODE_LENGTH
+	);
 
 use Carp qw(carp croak cluck);
-use base qw(Exporter);
+use Exporter qw(import);
 
-use Business::ISBN::Data 20140910.002; # now a separate module
+use Business::ISBN::Data 20191107; # now a separate module
 # ugh, hack
 *group_data = *Business::ISBN::country_data;
-sub _group_data { $group_data{ $_[1] } }
+sub _group_data {
+  my $isbn_prefix
+    = ref $_[0] eq 'Business::ISBN13'
+    ? $_[0]->prefix
+    : "978";
+  return $group_data{ $isbn_prefix }->{ $_[1] };
+}
 
 sub _max_group_code_length  { $Business::ISBN::MAX_COUNTRY_CODE_LENGTH };
 sub _max_publisher_code_length  {
@@ -110,7 +120,7 @@ BEGIN {
 		);
 	};
 
-$VERSION   = '3.004';
+our $VERSION   = '3.005';
 
 sub ARTICLE_CODE_OUT_OF_RANGE () { -5 }
 sub INVALID_PREFIX            () { -4 };
@@ -120,7 +130,7 @@ sub BAD_CHECKSUM              () { -1 };
 sub GOOD_ISBN                 () {  1 };
 sub BAD_ISBN                  () {  0 };
 
-%ERROR_TEXT = (
+our %ERROR_TEXT = (
 	 0 => "Bad ISBN",
 	 1 => "Good ISBN",
 	-1 => "Bad ISBN checksum",

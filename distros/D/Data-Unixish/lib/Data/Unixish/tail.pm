@@ -6,7 +6,7 @@ use syntax 'each_on_array'; # to support perl < 5.12
 use warnings;
 #use Log::Any '$log';
 
-our $VERSION = '1.570'; # VERSION
+our $VERSION = '1.572'; # VERSION
 
 use Data::Unixish::Util qw(%common_args);
 
@@ -60,7 +60,7 @@ Data::Unixish::tail - Output the last items of data
 
 =head1 VERSION
 
-This document describes version 1.570 of Data::Unixish::tail (from Perl distribution Data-Unixish), released on 2019-01-06.
+This document describes version 1.572 of Data::Unixish::tail (from Perl distribution Data-Unixish), released on 2019-10-26.
 
 =head1 SYNOPSIS
 

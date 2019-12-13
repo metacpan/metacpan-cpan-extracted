@@ -1,6 +1,6 @@
 package Sweat;
 
-our $VERSION = 201909240;
+our $VERSION = 201912110;
 
 use v5.10;
 
@@ -217,7 +217,7 @@ sub BUILD {
         $self->group_config( $group_data );
     }
 
-    if ( $args->{no_news} ) {
+    if ( $config->{no_news} ) {
         $self->newsapi_key( undef );
     }
 

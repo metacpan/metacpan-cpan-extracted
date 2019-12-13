@@ -1,15 +1,16 @@
 ---
-abstract: 'Tk GUI to edit config data through Config::Model'
+abstract: 'a GUI to edit configuration data with Config::Model framework'
 author:
   - 'Dominique Dumont'
 build_requires:
+  Config::Model: '2.137'
   Config::Model::Tester::Setup: '0'
   Config::Model::Value: '0'
   Module::Build: '0.34'
+  Test::Log::Log4perl: '0'
   Test::Memory::Cycle: '0'
   Test::More: '0'
   Test::Pod: '1.00'
-  Test::Warn: '0.11'
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
@@ -21,7 +22,7 @@ meta-spec:
 name: Config-Model-TkUI
 requires:
   Carp: '0'
-  Config::Model: '2.134'
+  Config::Model: '2.137'
   Config::Model::ObjTreeScanner: '0'
   File::HomeDir: '0'
   List::MoreUtils: '0'
@@ -59,6 +60,6 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-tk-ui/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-tk-ui.git
-version: '1.370'
-x_generated_by_perl: v5.28.1
+version: '1.371'
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

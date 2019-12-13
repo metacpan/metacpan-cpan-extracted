@@ -530,6 +530,33 @@ note("pipe");
   }
 }
 
+note("supply md5");
+{
+
+    my $t_bag_dir = $bag_dir . "-supply-md5";
+
+    my $bag = Catmandu::BagIt->new();
+
+    ok( !($bag->add_file("hello_world.txt","hello world",md5 => "abc")), "no valid md5 sum supplied" );
+
+    is( ($bag->errors())[0] , "supplied md5 sum for hello_world.txt does not look like an md5 sum" );
+
+    is( scalar( $bag->list_files() ), 0, "no payload added" );
+
+    ok( $bag->add_file("hello_world.txt","hello world", md5 => "5eb63bbbe01eeed093cb22bb8f5acdc3"), "valid md5 sum supplied" );
+
+    is( scalar( $bag->errors() ), 0 );
+
+    is( scalar( $bag->list_files() ), 1, "payload added" );
+
+    ok $bag->write( $t_bag_dir );
+
+    ok( $bag->valid );
+    ok( $bag->complete );
+
+    remove_path( $t_bag_dir ) if -d $t_bag_dir;
+}
+
 done_testing;
 
 sub remove_path {

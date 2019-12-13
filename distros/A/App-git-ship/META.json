@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Applify" : "0.06",
+            "Applify" : "0.20",
             "CPAN::Uploader" : "0.10",
             "ExtUtils::MakeMaker" : "6.00",
             "IPC::Run3" : "0.04",
@@ -39,7 +39,8 @@
             "Mojolicious" : "8.00",
             "Pod::Markdown" : "3.00",
             "Test::Pod" : "0",
-            "Test::Pod::Coverage" : "0"
+            "Test::Pod::Coverage" : "0",
+            "perl" : "5.014004"
          }
       },
       "test" : {
@@ -60,12 +61,13 @@
          "web" : "https://github.com/jhthorsen/app-git-ship"
       }
    },
-   "version" : "0.33",
+   "version" : "0.34",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
       "mohawk2 <mohawk2@users.noreply.github.com>",
+      "Rolf Stöckli <tekki@cpan.org>",
       "Shoichi Kaji <skaji@cpan.org>",
       "__DATA__"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

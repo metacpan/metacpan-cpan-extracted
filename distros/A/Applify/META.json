@@ -33,7 +33,7 @@
             "Cwd" : "0",
             "File::Basename" : "0",
             "Getopt::Long" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.014004"
          }
       },
       "test" : {
@@ -54,7 +54,7 @@
          "web" : "https://github.com/jhthorsen/applify"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
       "Roy Storey <kiwiroy@cpan.org>"

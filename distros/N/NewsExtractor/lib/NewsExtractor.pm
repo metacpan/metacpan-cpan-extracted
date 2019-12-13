@@ -1,5 +1,5 @@
 package NewsExtractor;
-our $VERSION = v0.0.3;
+our $VERSION = v0.0.4;
 use Moo;
 
 use Mojo::UserAgent;
@@ -54,7 +54,7 @@ __END__
 
 =head1 NAME
 
-NewsExtractor -- download and extract news articles from Internet.
+NewsExtractor - download and extract news articles from Internet.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for Perl module DateTime::Format::JSON::MicrosoftDateFormat
 
+0.05 2019-12-11
+  - Updated documentation
+  - Added missing tests per cpancover.com
+
 0.04 2018-12-01
   - Updated to removed use of DateTime->_stringify as it no longer apears to be supported
 

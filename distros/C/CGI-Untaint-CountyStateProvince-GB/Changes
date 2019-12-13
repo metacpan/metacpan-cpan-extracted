@@ -1,5 +1,10 @@
 Revision history for CGI-Untaint-CountyStateProvince-GB
 
+0.12	Tue Dec 10 21:16:53 EST 2019
+	Don't allow 'west berkshire'
+	Added some Gloucestershire abbreviations
+	Added extra Lancashire abbreviation
+
 0.11	Sun Dec 30 17:01:14 EST 2012
 	Added t/strict.t
 	Handle westmidlands without a space, mapping to West Midlands

@@ -16,7 +16,7 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Clone'        => 0,
-        'Test::More'   => 0,
+        'Test::More'   => 0.94,  # subtest support
     },
     META_MERGE => {
         resources => {

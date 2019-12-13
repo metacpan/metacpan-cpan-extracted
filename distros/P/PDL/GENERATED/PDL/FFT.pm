@@ -262,13 +262,13 @@ the array.
 
 sub PDL::realfft {
     barf("Usage: realfft(real(*)") if $#_ != 0;
-    my ($a) = @_;
-    todecimal($a);
-# FIX: could eliminate $b
-    my ($b) = 0*$a;
-    fft($a,$b);
-    my ($n) = int((($a->dims)[0]-1)/2); my($t);
-    ($t=$a->slice("-$n:-1")) .= $b->slice("1:$n");
+    my ($x) = @_;
+    todecimal($x);
+# FIX: could eliminate $y
+    my ($y) = 0*$x;
+    fft($x,$y);
+    my ($n) = int((($x->dims)[0]-1)/2); my($t);
+    ($t=$x->slice("-$n:-1")) .= $y->slice("1:$n");
     undef;
 }
 
@@ -289,17 +289,17 @@ Inverse of one-dimensional realfft routine [inplace].
 sub PDL::realifft {
     use PDL::Ufunc 'max';
     barf("Usage: realifft(xfm(*)") if $#_ != 0;
-    my ($a) = @_;
-    todecimal($a);
-    my ($n) = int((($a->dims)[0]-1)/2); my($t);
-# FIX: could eliminate $b
-    my ($b) = 0*$a;
-    ($t=$b->slice("1:$n")) .= $a->slice("-$n:-1");
-    ($t=$a->slice("-$n:-1")) .= $a->slice("$n:1");
-    ($t=$b->slice("-$n:-1")) .= -$b->slice("$n:1");
-    ifft($a,$b);
+    my ($x) = @_;
+    todecimal($x);
+    my ($n) = int((($x->dims)[0]-1)/2); my($t);
+# FIX: could eliminate $y
+    my ($y) = 0*$x;
+    ($t=$y->slice("1:$n")) .= $x->slice("-$n:-1");
+    ($t=$x->slice("-$n:-1")) .= $x->slice("$n:1");
+    ($t=$y->slice("-$n:-1")) .= -$y->slice("$n:1");
+    ifft($x,$y);
 # Sanity check -- shouldn't happen
-    carp "Bad inverse transform in realifft" if max(abs($b)) > 1e-6*max(abs($a));
+    carp "Bad inverse transform in realifft" if max(abs($y)) > 1e-6*max(abs($x));
     undef;
 }
 
@@ -405,21 +405,21 @@ these fft routines is for kernel sizes roughly 7x7.
 
 sub PDL::fftconvolve {
     barf "Must have image & kernel for fftconvolve" if $#_ != 1;
-    my ($a, $k) = @_;
+    my ($im, $k) = @_;
 
     my ($ar,$ai,$kr,$ki,$cr,$ci);
 
-    $ar = $a->copy;
-    $ai = $ar->zeros;
-    fftnd($ar, $ai);
+    $imr = $im->copy;
+    $imi = $imr->zeros;
+    fftnd($imr, $imi);
 
     $kr = $k->copy;
     $ki = $kr->zeroes;
     fftnd($kr,$ki);
 
-    $cr = $ar->zeroes;
-    $ci = $ai->zeroes;
-    cmul($ar,$ai,$kr,$ki,$cr,$ci);
+    $cr = $imr->zeroes;
+    $ci = $imi->zeroes;
+    cmul($imr,$imi,$kr,$ki,$cr,$ci);
 
     ifftnd($cr,$ci);
     $_[0] = $cr;

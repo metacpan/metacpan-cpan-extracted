@@ -59,9 +59,9 @@ roundtrip (
 );
 
 roundtrip (
-    [{K => [""]},{K => [" "]}],
-    '{""}{" "}',
-    "Empty string and space as hash keys"
+    [{K => [""]},{K => [" "]},{K => ["0"]}],
+    '{""}{" "}{0}',
+    "Empty string, space and bare zero as single hash key"
 );
 
 is_deeply(

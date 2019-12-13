@@ -29,6 +29,7 @@ t::Util->test_file(
   qr/homepage${fat_re}'https:/,
   qr/repository\W+type${fat_re}'git'\W+url${fat_re}'https:/s,
   qr/x_contributors\W+${fat_re}\[.*\]/m,
+  qr/OBJECT${fat_re}''/m,
   qr/TEST_REQUIRES${fat_re}.*?\bTest::More\b/s,
   qr/PREREQ_PM${fat_re}.*?\bperl\b/s,
 );

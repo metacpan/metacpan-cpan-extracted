@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
 
 use Test::More;
 
-plan tests => 44 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 48 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Unixish.pm',
@@ -19,10 +19,12 @@ my @module_files = (
     'Data/Unixish/centerpad.pm',
     'Data/Unixish/chain.pm',
     'Data/Unixish/cond.pm',
+    'Data/Unixish/count.pm',
     'Data/Unixish/date.pm',
     'Data/Unixish/grep.pm',
     'Data/Unixish/head.pm',
     'Data/Unixish/indent.pm',
+    'Data/Unixish/join.pm',
     'Data/Unixish/lc.pm',
     'Data/Unixish/lcfirst.pm',
     'Data/Unixish/lins.pm',
@@ -40,6 +42,8 @@ my @module_files = (
     'Data/Unixish/rtrim.pm',
     'Data/Unixish/shuf.pm',
     'Data/Unixish/sort.pm',
+    'Data/Unixish/splice.pm',
+    'Data/Unixish/split.pm',
     'Data/Unixish/sprintf.pm',
     'Data/Unixish/sprintfn.pm',
     'Data/Unixish/subsort.pm',
@@ -59,9 +63,7 @@ my @module_files = (
 
 # no fake home requested
 
-my @switches = (
-    -d 'blib' ? '-Mblib' : '-Ilib',
-);
+my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
 
 use File::Spec;
 use IPC::Open3;
@@ -75,18 +77,14 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
-            $^X, @switches, '-e', "require q[$lib]"))
-        if $ENV{PERL_COMPILE_TEST_DEBUG};
-
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { +require blib; blib->VERSION('1.01') };
+        and not eval { require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

@@ -25,7 +25,7 @@ no_index:
 provides:
   Sweat:
     file: lib/Sweat.pm
-    version: '201909240'
+    version: '201912110'
   Sweat::Article:
     file: lib/Sweat/Article.pm
   Sweat::Drill:
@@ -59,9 +59,10 @@ resources:
   bugtracker: https://github.com/jmacdotorg/sweat/issues
   homepage: https://github.com/jmacdotorg/sweat
   repository: git://github.com/jmacdotorg/sweat.git
-version: '201909240'
+version: '201912110'
 x_authority: cpan:JMAC
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Tim Vroom <vroom@ziprecruiter.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

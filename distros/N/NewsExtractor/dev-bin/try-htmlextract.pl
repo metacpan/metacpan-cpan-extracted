@@ -12,11 +12,19 @@ my %opts;
 GetOptions(
     \%opts,
 );
-@ARGV or die;
+
+my @urls;
+
+if (-p STDIN) {
+    @urls = <STDIN>;
+} else {
+    @urls = @ARGV;
+}
+@urls or die "No URLs to process";
 
 my $json = JSON->new->pretty->canonical->utf8->allow_blessed->convert_blessed;
 
-for my $url (@ARGV) {
+for my $url (@urls) {
     my $x = NewsExtractor->new( url => $url );
     my ($err, $y) = $x->download;
 

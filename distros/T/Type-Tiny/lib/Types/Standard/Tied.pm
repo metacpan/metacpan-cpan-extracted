@@ -6,8 +6,10 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Tied::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Tied::VERSION   = '1.006000';
+	$Types::Standard::Tied::VERSION   = '1.008000';
 }
+
+$Types::Standard::Tied::VERSION =~ tr/_//d;
 
 use Type::Tiny ();
 use Types::Standard ();
@@ -32,7 +34,7 @@ sub __constraint_generator
 	
 	my $check = $param->compiled_check;
 	sub {
-		$check->(tied(Scalar::Util::reftype($_) eq 'HASH' ?  %{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ?  @{$_} :  ${$_}));
+		$check->(tied(Scalar::Util::reftype($_) eq 'HASH' ?  %{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ?  @{$_} :  Scalar::Util::reftype($_) =~ /^(SCALAR|REF)$/ ?  ${$_} : undef));
 	};
 }
 
@@ -52,7 +54,7 @@ sub __inline_generator
 		require B;
 		my $var = $_[1];
 		sprintf(
-			"%s and do { my \$TIED = tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : \${$var}); %s }",
+			"%s and do { my \$TIED = tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : Scalar::Util::reftype($var) =~ /^(SCALAR|REF)\$/ ? \${$var} : undef); %s }",
 			Types::Standard::Ref()->inline_check($var),
 			$param->inline_check('$TIED')
 		);

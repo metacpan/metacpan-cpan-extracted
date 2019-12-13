@@ -2,10 +2,11 @@ package Text::Markup;
 
 use 5.8.1;
 use strict;
+use warnings;
 use Text::Markup::None;
 use Carp;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 my %_PARSER_FOR;
 my %REGEX_FOR = (
@@ -43,6 +44,8 @@ sub _parser_for {
 sub formats {
     sort keys %REGEX_FOR;
 }
+
+sub format_matchers { %REGEX_FOR }
 
 sub new {
     my $class = shift;
@@ -185,13 +188,20 @@ Registers a markup parser. You likely won't need to use this method unless
 you're creating a new markup parser and not contributing it back to the
 Text::Markup project. See L</Add a Parser> for details.
 
-=head3 formats
+=head3 C<formats>
 
   my @formats = Text::Markup->formats;
 
 Returns a list of all of the formats currently recognized by Text::Markup.
 This will include all core parsers (except for "None") and any that have been
 loaded elsewhere and that call C<register> to register themselves.
+
+=head3 C<format_matchers>
+
+  my %matchers = Text::Markup->format_matchers;
+
+Returns a list of key/value pairs mapping all the formats returned by
+C<formats> to the regular expressions used to match them.
 
 =head2 Instance Methods
 
@@ -463,7 +473,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2014 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2019 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

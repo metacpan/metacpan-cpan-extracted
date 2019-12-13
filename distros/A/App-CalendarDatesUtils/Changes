@@ -1,3 +1,8 @@
+0.011   2019-12-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild to update Sah coercion rule modules dependency.
+
+
 0.010   2019-06-28  Released-By: PERLANCAR
 
 	- No functional changes.
@@ -38,23 +43,26 @@
         - Fix clash (two releases with version 0.003 were done).
 
 
-0.006   2019-06-26  Released-By: PERLANCAR
+0.006   2019-06-26  Released-By: PERLANCAR; Status: broken
 
-	- UPDATE 2019-06-26: this release should not be used.
+	- UPDATE 2019-06-26: this release should not be used as it misses some
+          commits from previous release.
 
         - Tweak Rinci metadata.
 
 
-0.005   2019-05-28  Released-By: PERLANCAR
+0.005   2019-05-28  Released-By: PERLANCAR; Status: broken
 
-	- UPDATE 2019-06-26: this release should not be used.
+	- UPDATE 2019-06-26: this release should not be used as it misses some
+          commits from previous release.
 
 	- list-calendar-dates: Add option: --(no-)past.
 
 
-0.004   2019-05-25  Released-By: PERLANCAR
+0.004   2019-05-25  Released-By: PERLANCAR; Status: broken
 
-	- UPDATE 2019-06-26: this release should not be used.
+	- UPDATE 2019-06-26: this release should not be used as it misses some
+          commits from previous release.
 
 	- list-calendar-dates: Add --param option.
 

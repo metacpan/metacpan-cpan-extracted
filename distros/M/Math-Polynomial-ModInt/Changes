@@ -1,5 +1,13 @@
 Revision history for Math-Polynomial-ModInt
 
+0.004   2019-12-10
+        - added lambda_reduce, first_root, and is_irreducible
+
+0.003   2019-09-29
+        - fixed prereqs in Makefile.PL
+        - fixed doc typos
+        - cleaned up POD
+
 0.002   2019-09-28
         - extracted to separate distribution
 

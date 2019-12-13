@@ -69,7 +69,7 @@ Drill options:
 
 Entertainment options:
 --fortune-program  Path to your fortune program
---newsapi_key      Your NewsAPI application key
+--newsapi-key      Your NewsAPI application key
 --country          Two-letter code of country to fetch articles from
 --language         Two-letter code of language for Wikipedia articles
 --no-news          Use Wikipedia as article source even if NewsAPI is available
@@ -260,7 +260,7 @@ C<--no-shuffle>. To set them in a configuration file, set them to 0 or 1 with YA
 syntax: C<shuffle: 1>.
 
 B<For other options>, set them on the command line with an equals sign
-(--newsapi_key=MySecretKey), or in a config file with YAML syntax
+(--newsapi-key=MySecretKey), or in a config file with YAML syntax
 (C<newsapi_key: MySecretKey>).
 
 Note that you can try running Sweat without any options at all; most settings have

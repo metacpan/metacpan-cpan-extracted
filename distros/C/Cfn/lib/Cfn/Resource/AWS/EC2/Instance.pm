@@ -1,4 +1,4 @@
-# AWS::EC2::Instance generated from spec 6.0.0
+# AWS::EC2::Instance generated from spec 9.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EC2::Instance',
@@ -446,6 +446,7 @@ package Cfn::Resource::Properties::AWS::EC2::Instance::ElasticInferenceAccelerat
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has Count => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::EC2::Instance::ElasticGpuSpecification',

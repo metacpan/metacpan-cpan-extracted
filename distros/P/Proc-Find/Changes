@@ -1,19 +1,27 @@
-Revision history for Proc-Find
+0.051   2019-11-23  Released-By: PERLANCAR; Urgency: medium
 
-0.04    2015-01-03 (PERLANCAR)
+	- Support array in condition arguments.
+
+
+0.050   2019-11-23  Released-By: PERLANCAR; Urgency: medium
+
+	- find_proc(): Add argument 'filter'.
+
+
+0.04    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.03    2014-12-27 (PERLANCAR)
+0.03    2014-12-27  Released-By: PERLANCAR
 
 	- Add our extra field: name (created from cmndline: take first word
 	  and strip path).
 
 
-0.02    2014-11-23 (PERLANCAR)
+0.02    2014-11-23  Released-By: PERLANCAR
 
         - Add configuration variable $CACHE.
 
@@ -21,6 +29,6 @@ Revision history for Proc-Find
           find_proc().
 
 
-0.01    2014-11-23 (PERLANCAR)
+0.01    2014-11-23  Released-By: PERLANCAR
 
         - First release.

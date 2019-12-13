@@ -1,15 +1,20 @@
-0.005   2019-01-28 (PERLANCAR)
+0.006   2019-12-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild to update coerce rule modules dependency.
+
+
+0.005   2019-01-28  Released-By: PERLANCAR
 
 	- Add option --dereference-files (-D), like in du.
 
 
-0.004   2019-01-27 (PERLANCAR)
+0.004   2019-01-27  Released-By: PERLANCAR
 
 	- bin-files-into-dvds: [ux] Use a more conservative DVD size default
           (4494MB -> 4470MB) so they fit more.
 
 
-0.003   2019-01-17 (PERLANCAR)
+0.003   2019-01-17  Released-By: PERLANCAR
 
 	- Add utility: count-number-of-dvs-required.
 
@@ -21,12 +26,12 @@
 	- [doc] Add more keywords.
 
 
-0.002   2019-01-16 (PERLANCAR)
+0.002   2019-01-16  Released-By: PERLANCAR
 
 	- bin-files-into-dvds: allow overriding --bin-size (-s) which
 	  defaults to 4493M.
 
 
-0.001   2019-01-16 (PERLANCAR)
+0.001   2019-01-16  Released-By: PERLANCAR
 
         - First release.

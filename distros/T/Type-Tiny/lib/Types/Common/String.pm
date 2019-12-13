@@ -11,8 +11,10 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::String::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::String::VERSION   = '1.006000';
+	$Types::Common::String::VERSION   = '1.008000';
 }
+
+$Types::Common::String::VERSION =~ tr/_//d;
 
 use Type::Library -base, -declare => qw(
 	SimpleStr
@@ -92,7 +94,7 @@ $meta->add_type(
 	inlined    => sub {
 		if ($nestr) {
 			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
-			return "$xsub($_[1])" if $xsub;
+			return "$xsub($_[1])" if $xsub && !$Type::Tiny::AvoidCallbacks;
 		}
 		undef, qq(length($_) > 0);
 	},
@@ -237,25 +239,45 @@ L<MooseX::Types::Common::String>.
 
 =over
 
-=item C<SimpleStr>
+=item *
 
-=item C<NonEmptySimpleStr>
+B<SimpleStr>
 
-=item C<NumericCode>
+=item *
 
-=item C<LowerCaseSimpleStr>
+B<NonEmptySimpleStr>
 
-=item C<UpperCaseSimpleStr>
+=item *
 
-=item C<Password>
+B<NumericCode>
 
-=item C<StrongPassword>
+=item *
 
-=item C<NonEmptyStr>
+B<LowerCaseSimpleStr>
 
-=item C<LowerCaseStr>
+=item *
 
-=item C<UpperCaseStr>
+B<UpperCaseSimpleStr>
+
+=item *
+
+B<Password>
+
+=item *
+
+B<StrongPassword>
+
+=item *
+
+B<NonEmptyStr>
+
+=item *
+
+B<LowerCaseStr>
+
+=item *
+
+B<UpperCaseStr>
 
 =back
 
@@ -264,7 +286,9 @@ L<MooseX::Types::Common::String>.
 
 =over
 
-=item C<< StrLength[`min, `max] >>
+=item *
+
+B<< StrLength[`min, `max] >>
 
 Type constraint for a string between min and max characters long. For
 example:

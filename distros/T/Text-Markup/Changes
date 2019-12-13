@@ -1,5 +1,18 @@
 Revision history for Perl extension Text-Markup.
 
+0.24  2019-12-12T00:53:25Z
+     - Added missing `<head>` tag to all output. Thanks to Axel Beckert for
+       the pull request (#16, #18)!
+     - Added the `format_matchers` class method, which returns a list of
+       formats and the regular expressions that match them.
+     - Added `use warnings;` to all modules, thanks to a patch from John SJ
+       Anderson (#22).
+     - Added support for a `--raw` option to the markup modules for which it
+       makes sense. This option allows markup to be output without wrapping it
+       in a minimal HTML skeleton. Thanks to John SJ Anderson for the patch
+       (#2, #24)!
+     - Ported reST to Python 3. Thanks to gregor herrmann for the PR (#26).
+
 0.23  2015-05-21T06:23:35Z
      - Added BBcode and Creole to the module description.
      - Fixed a failing test for the Mediawiki format due to a change in CGI

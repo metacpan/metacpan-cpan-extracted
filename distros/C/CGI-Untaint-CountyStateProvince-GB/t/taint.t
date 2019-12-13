@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More;
+use Test::Most;
 
 eval 'use Test::Taint';
 if($@) {

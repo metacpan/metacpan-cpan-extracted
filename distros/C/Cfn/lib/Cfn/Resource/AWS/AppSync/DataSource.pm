@@ -1,4 +1,4 @@
-# AWS::AppSync::DataSource generated from spec 2.25.0
+# AWS::AppSync::DataSource generated from spec 9.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppSync::DataSource',
@@ -65,6 +65,29 @@ package Cfn::Resource::Properties::AWS::AppSync::DataSource::RdsHttpEndpointConf
   has DatabaseName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DbClusterIdentifier => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Schema => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppSync::DataSource::DeltaSyncConfig',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppSync::DataSource::DeltaSyncConfig',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::AppSync::DataSource::DeltaSyncConfigValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::AppSync::DataSource::DeltaSyncConfigValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has BaseTableTTL => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DeltaSyncTableName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DeltaSyncTableTTL => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppSync::DataSource::AuthorizationConfig',
@@ -195,8 +218,10 @@ package Cfn::Resource::Properties::AWS::AppSync::DataSource::DynamoDBConfigValue
   extends 'Cfn::Value::TypedValue';
   
   has AwsRegion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DeltaSyncConfig => (isa => 'Cfn::Resource::Properties::AWS::AppSync::DataSource::DeltaSyncConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TableName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has UseCallerCredentials => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Versioned => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::AppSync::DataSource {

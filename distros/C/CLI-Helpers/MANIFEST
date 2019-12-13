@@ -11,9 +11,13 @@ examples/01-simple-output.pl
 examples/02-sticky-output.pl
 examples/03-default-prompt.pl
 examples/04-tags.pl
+examples/05-copy-of-argv.pl
+examples/06-delay-argv.pl
+examples/07-preprocess-argv.pl
 lib/CLI/Helpers.pm
 perlcritic.rc
 t/00-compile.t
+t/01-basic.t
 weaver.ini
 xt/author/critic.t
 xt/author/eol.t

@@ -1,0 +1,48 @@
+==================================================
+Changes from 2018-12-10 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v0.0.2 at 2019-12-10 18:34:43 +0000
+-------------------------------------------
+
+  Change: c9be7c9fe98a45c84a0efd92029edb787572c1f0
+  Author: Doug Bell <doug.bell@grantstreet.com>
+  Date : 2019-12-04 10:34:40 +0000
+
+    add build artifacts 
+
+-------------------------------------------
+version v0.0.1 at 2019-11-20 02:02:51 +0000
+-------------------------------------------
+
+  Change: e0cf94fbe219ee8db63f8c757ed91c20d2b17075
+  Author: Doug Bell <doug.bell@grantstreet.com>
+  Date : 2019-11-19 21:02:51 +0000
+
+    fix default watch directories
+
+    Morbo doesn't watch the current directory. It watches the 'lib' and
+    'templates' directories and the Mojolicious app script. We guess at
+    the app script if we can, and pick the 'lib' and 'templates'
+    directories.
+
+    Watching the current directory by default also ensures that anything
+    written to the `MOJO_HOME` will cause a restart. Since it's common
+    for things to be written here, this is a bad default. 
+
+  Change: 7ccc0926bf80484a939e7c72015034a13b523786
+  Author: Doug Bell <doug.bell@grantstreet.com>
+  Date : 2019-11-19 12:43:22 +0000
+
+    add gsg dzil profile 
+
+  Change: c6f2faadfb325b96e91651d9411ae8ad6b7759bd
+  Author: Doug Bell <doug.bell@grantstreet.com>
+  Date : 2019-11-19 11:46:50 +0000
+
+    initial implementation 
+
+================
+End of releases.
+================

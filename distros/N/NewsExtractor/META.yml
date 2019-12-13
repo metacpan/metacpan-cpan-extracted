@@ -1,5 +1,5 @@
 ---
-abstract: '- download and extract news articles from Internet.'
+abstract: 'download and extract news articles from Internet.'
 author:
   - 'Kang-min Liu <gugod@gugod.org>'
 build_requires: {}
@@ -15,23 +15,31 @@ name: NewsExtractor
 provides:
   NewsExtractor:
     file: lib/NewsExtractor.pm
-    version: v0.0.3
+    version: v0.0.4
   NewsExtractor::Article:
     file: lib/NewsExtractor/Article.pm
   NewsExtractor::CSSExtractor:
     file: lib/NewsExtractor/CSSExtractor.pm
+  NewsExtractor::CSSRuleSet:
+    file: lib/NewsExtractor/CSSRuleSet.pm
   NewsExtractor::Constants:
     file: lib/NewsExtractor/Constants.pm
   NewsExtractor::Download:
     file: lib/NewsExtractor/Download.pm
   NewsExtractor::Error:
     file: lib/NewsExtractor/Error.pm
-  NewsExtractor::ExtractableWithCSS:
-    file: lib/NewsExtractor/ExtractableWithCSS.pm
   NewsExtractor::Extractor:
     file: lib/NewsExtractor/Extractor.pm
   NewsExtractor::GenericExtractor:
     file: lib/NewsExtractor/GenericExtractor.pm
+  NewsExtractor::JSONLDExtractor:
+    file: lib/NewsExtractor/JSONLDExtractor.pm
+  NewsExtractor::SiteSpecificExtractor:
+    file: lib/NewsExtractor/SiteSpecificExtractor.pm
+  NewsExtractor::SiteSpecificExtractor::www_rvn_com_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_rvn_com_tw.pm
+  NewsExtractor::TXExtractor:
+    file: lib/NewsExtractor/TXExtractor.pm
   NewsExtractor::TextUtil:
     file: lib/NewsExtractor/TextUtil.pm
   NewsExtractor::Types:
@@ -51,7 +59,7 @@ requires:
   Type::Tiny: '0'
   Types::URI: '0'
   YAML: '0'
-version: v0.0.3
+version: v0.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: CC0-1.0
 x_static_install: '1'

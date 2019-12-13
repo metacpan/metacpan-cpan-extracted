@@ -770,10 +770,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Clears all C<infs> and C<nans> in C<$a> to the corresponding value in C<$b>.
 
-badmask can be run with C<$a> inplace:
+badmask can be run with C<$x> inplace:
 
-  badmask($a->inplace,0);
-  $a->inplace->badmask(0);
+  badmask($x->inplace,0);
+  $x->inplace->badmask(0);
 
 
 

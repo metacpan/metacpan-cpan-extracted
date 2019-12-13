@@ -14,10 +14,7 @@ lib/Text/Markup/Rest.pm
 lib/Text/Markup/rst2html_lenient.py
 lib/Text/Markup/Textile.pm
 lib/Text/Markup/Trac.pm
-Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
 README.md
 t/base.t
 t/empty.txt
@@ -44,3 +41,6 @@ t/markups/pod.txt
 t/markups/rest.txt
 t/markups/textile.txt
 t/markups/trac.txt
+Makefile.PL
+META.yml
+META.json

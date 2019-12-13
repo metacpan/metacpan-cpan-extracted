@@ -8,167 +8,201 @@ Type::Tiny::Manual - an overview of Type::Tiny
 
 =head1 SYNOPSIS
 
-L<Type::Tiny> is a small class for writing type constraints, inspired by
-L<Moose>'s type constraint API. It has only one non-core dependency (and even
-that is simply a module that was previously distributed as part of Type::Tiny
-but has since been spun off), and can be used with L<Moose>, L<Mouse> and
-L<Moo> (or none of the above).
+L<Type::Tiny> is a small L<Perl|http://www.perl.org/> class for writing
+type constraints, inspired by L<Moose>'s type constraint API and
+L<MooseX::Types>. It has only one non-core dependency (and even that is
+simply a module that was previously distributed as part of Type::Tiny
+but has since been spun off), and can be used with L<Moose>, L<Mouse>,
+or L<Moo> (or none of the above).
+
+Type::Tiny is used by over 800 Perl distributions on the CPAN (Comprehensive
+Perl Archive Network) and can be considered a stable and mature framework for
+efficiently and reliably enforcing data types.
 
 Type::Tiny is bundled with L<Type::Library> a framework for organizing type
-constraints into collections.
+constraints into collections. Also bundled is L<Types::Standard>, a
+Moose-inspired library of useful type constraints. L<Type::Params> is also
+provided, to allow very fast checking and coercion of function and method
+parameters.
 
-Also bundled is L<Types::Standard>, a Moose-inspired library of useful type
-constraints.
+The following example gives you an idea of some of the features of these
+modules. If you don't understand it all, that's fine; that's what the rest
+of the manual is for. Although the example uses Moo, the C<use Moo> could
+be changed to C<use Moose> or C<use Mouse> and it would still work.
 
-L<Type::Params> is also provided, to allow very fast checking and coercion
-of function and method parameters.
+ use v5.12;
+ use strict;
+ use warnings;
+ 
+ package Horse {
+   use Moo;
+   use Types::Standard qw( Str Int Enum ArrayRef InstanceOf );
+   use Type::Params qw( compile );
+   use namespace::autoclean;
+   
+   has name => (
+     is       => 'ro',
+     isa      => Str,
+     required => 1,
+   );
+   has gender => (
+     is       => 'ro',
+     isa      => Enum[qw( f m )],
+   );
+   has age => (
+     is       => 'rw',
+     isa      => Int->where( '$_ >= 0' ),
+   );
+   has children => (
+     is       => 'ro',
+     isa      => ArrayRef[ InstanceOf['Horse'] ],
+     default  => sub { return [] },
+   );
+   
+   sub add_child {
+     # method signature
+     state $check = compile( InstanceOf['Horse'], InstanceOf['Horse'] );
+     
+     my ($self, $child) = $check->(@_);   # unpack @_
+     push @{ $self->children }, $child;
+     
+     return $self;
+   }
+ }
+ 
+ package main;
+ 
+ my $boldruler = Horse->new(
+   name    => "Bold Ruler",
+   gender  => 'm',
+   age     => 16,
+ );
+ 
+ my $secretariat = Horse->new(
+   name    => "Secretariat",
+   gender  => 'm',
+   age     => 0,
+ );
+ 
+ $boldruler->add_child( $secretariat );
+ 
+ use Types::Standard qw( is_Object assert_Object );
+ 
+ # is_Object will return a boolean
+ #
+ if ( is_Object($boldruler) ) {
+   say $boldruler->name;
+ }
+ 
+ # assert_Object will return $secretariat or die
+ #
+ say assert_Object($secretariat)->name;
 
-=head1 SEE ALSO
+=head1 MANUAL
 
-=over
+Even if you are using Type::Tiny with other object-oriented programming
+toolkits (such as Moose or Mouse), you should start with the Moo sections
+of the manual. Most of the information is directly transferrable and the
+Moose and Mouse sections of the manual list the minor differences between
+using Type::Tiny with Moo and with them.
 
-=item *
-
-L<Libraries|Type::Tiny::Manual::Libraries> - how to build a type library with Type::Tiny, Type::Library and Type::Utils
-
-=item *
-
-L<Coercions|Type::Tiny::Manual::Coercions> - adding coercions to type constraints
-
-=item *
-
-L<Using with Moose|Type::Tiny::Manual::UsingWithMoose> - how to use Type::Tiny and Type::Library with Moose
-
-=item *
-
-L<Using with Mouse|Type::Tiny::Manual::UsingWithMouse> - how to use Type::Tiny and Type::Library with Mouse
-
-=item *
-
-L<Using with Moo|Type::Tiny::Manual::UsingWithMoo> - how to use Type::Tiny and Type::Library with Moo
-
-=item *
-
-L<Using with Other OO Frameworks|Type::Tiny::Manual::UsingWithOther> - how to use Type::Tiny and Type::Library with other OO frameworks
-
-=item *
-
-Type::Tiny and friends don't need to be used within an OO framework. See L<FreeMind::Node> for an example that does not.
-
-=item *
-
-L<Processing arguments to subs|Type::Tiny::Manual::Params> - coerce and validate arguments to functions and methods.
-
-=item *
-
-Other modules using Type::Tiny in interesting ways: L<Type::Tie>, L<Test::Mocha>, L<Scalar::Does>, L<Set::Equivalence>...
-
-=item *
-
-L<Optimization|Type::Tiny::Manual::Optimization> - squeeze the most out of your CPU.
-
-=item *
-
-L<Type::Tiny maintenance policies|Type::Tiny::Manual::Policies> - the stability policy.
-
-=back
-
-=head1 DEPENDENCIES
-
-Type::Tiny requires at least Perl 5.6.1, though certain Unicode-related
-features (e.g. non-ASCII type constraint names) may work better in newer
-versions of Perl.
-
-Type::Tiny requires L<Exporter::Tiny>, a module that was previously
-bundled in this distribution, but has since been spun off as a separate
-distribution. Don't worry - it's quick and easy to install.
-
-At run-time, Type::Tiny also requires the following modules: L<B>,
-L<B::Deparse>, L<Carp>, L<Data::Dumper>, L<Scalar::Util>, L<Text::Balanced>,
-L<overload>, L<strict> and L<warnings>. All of these come bundled with
-Perl itself. Prior to Perl 5.8, L<Scalar::Util> and L<Text::Balanced>
-do not come bundled with Perl and will need installing separately from
-the CPAN.
-
-Certain features require additional modules. Tying a variable to a
-type constraint (e.g. C<< tie my $count, Int >>) requires L<Type::Tie>;
-stack traces on exceptions require L<Devel::StackTrace>. The
-L<Reply::Plugin::TypeTiny> plugin for L<Reply> requires L<Reply>
-(obviously). L<Devel::LexAlias> may I<slightly> increase the speed
-of some of Type::Tiny's compiled coderefs.
-
-L<Type::Tiny::XS> is not required, but if available provides a speed
-boost for some type checks. (Setting the environment variable
-C<PERL_TYPE_TINY_XS> to false, or setting C<PERL_ONLY> to true will
-suppress the use of Type::Tiny::XS, even if it is available.)
-
-The test suite additionally requires L<Test::More>, L<Test::Fatal>
-and L<Test::Requires>. Test::More comes bundled with Perl, but if
-you are using a version of Perl older than 5.14, you will need to
-upgrade to at least Test::More version 0.96. Test::Requires and
-Test::Fatal (plus Try::Tiny which Test::Fatal depends on) are bundled
-with Type::Tiny in the C<inc> directory, so you do not need to
-install them separately.
-
-If using Type::Tiny in conjunction with L<Moo>, then at least Moo
-1.000000 is recommended. If using Type::Tiny with L<Moose>, then at
-least Moose 2.0000 is recommended. If using Type::Tiny with L<Mouse>,
-then at least Mouse 1.00 is recommended. Type::Tiny is mostly
-untested against older versions of these packages.
-
-=head1 TYPE::TINY VERSUS X
-
-=head2 Specio 
-
-Type::Tiny is similar in aim to L<Specio>. The major differences are
+In general, this manual assumes you use Perl 5.12 or above and may use
+examples that do not work on older versions of Perl. Type::Tiny does work
+on earlier versions of Perl, but not all the examples and features in
+the manual will run without adjustment. (For instance, you may need to
+replace C<state> variables with lexical variables, avoid the
+C<< package NAME { BLOCK } >> syntax, etc.)
 
 =over
 
-=item *
+=item * L<Type::Tiny::Manual::Installation>
 
-Type::Tiny is "tiny" (Specio will eventually have fewer dependencies
-than it currently does, but is unlikely to ever have as few as Type::Tiny);
+How to install Type::Tiny. If Type::Tiny is already installed, you can
+skip this. 
 
-=item *
+=item * L<Type::Tiny::Manual::UsingWithMoo>
 
-Specio has a somewhat nicer API (better method names; less duplication),
-and its API is likely to improve further. Type::Tiny's aims at complete
-compatibility with current versions of Moose and Mouse, so there is a
-limit to how much I can deviate from the existing APIs of
-(Moose|Mouse)::Meta::TypeConstraint.
+Basic use of Type::Tiny with Moo, including attribute type constraints,
+parameterized type constraints, coercions, and method parameter checking.
+
+=item * L<Type::Tiny::Manual::UsingWithMoo2>
+
+Advanced use of Type::Tiny with Moo, including unions and intersections,
+C<stringifies_to>, C<numifies_to>, C<with_attribute_values>, and C<where>.
+
+=item * L<Type::Tiny::Manual::UsingWithMoo3>
+
+There's more than one way to do it! Alternative ways of using Type::Tiny,
+including type registries, exported functions, and C<dwim_type>.
+
+=item * L<Type::Tiny::Manual::Libraries>
+
+Defining your own type libraries, including extending existing libraries,
+defining new types, adding coercions, defining parameterizable types,
+and the declarative style.
+
+=item * L<Type::Tiny::Manual::UsingWithMoose>
+
+How to use Type::Tiny with Moose, including the advantages of Type::Tiny
+over built-in type constraints, and Moose-specific features.
+
+=item * L<Type::Tiny::Manual::UsingWithMouse>
+
+How to use Type::Tiny with Mouse, including the advantages of Type::Tiny
+over built-in type constraints, and Mouse-specific features.
+
+=item * L<Type::Tiny::Manual::UsingWithClassTiny>
+
+Including how to Type::Tiny in your object's C<BUILD> method, and
+third-party shims between Type::Tiny and Class::Tiny.
+
+=item * L<Type::Tiny::Manual::UsingWithOther>
+
+Using Type::Tiny with Class::InsideOut, Params::Check, and Object::Accessor.
+
+=item * L<Type::Tiny::Manual::UsingWithTestMore>
+
+Type::Tiny for test suites.
+
+=item * L<Type::Tiny::Manual::Params>
+
+Advanced information on Type::Params, and using Type::Tiny with other
+signature modules like Function::Parameters and Kavorka.
+
+=item * L<Type::Tiny::Manual::NonOO>
+
+Type::Tiny in non-object-oriented code.
+
+=item * L<Type::Tiny::Manual::Optimization>
+
+Squeeze the most out of your CPU.
+
+=item * L<Type::Tiny::Manual::Coercions>
+
+Advanced information on coercions.
+
+=item * L<Type::Tiny::Manual::AllTypes>
+
+An alphabetical list of all type constraints bundled with Type::Tiny.
+
+=item * L<Type::Tiny::Manual::Policies>
+
+Policies related to Type::Tiny development.
+
+=item * L<Type::Tiny::Manual::Contributing>
+
+Contributing to Type::Tiny development.
 
 =back
-
-=head2 MooseX::Types
-
-Type::Tiny libraries expose a similar interface to L<MooseX::Types> libraries.
-In most cases you should be able to rewrite a L<MooseX::Types> library to
-use Type::Tiny pretty easily.
-
-=head2 MooX::Types::MooseLike
-
-Type::Tiny is faster and supports coercions.
-
-=head2 Scalar::Does
-
-L<Scalar::Does> is somewhat of a precursor to Type::Tiny, but has now been
-rewritten to use Type::Tiny internally.
-
-It gives you a C<< does($value, $type) >> function that is roughly equivalent
-to C<< $type->check($value) >> except that C<< $type >> may be one of a list
-of pre-defined strings (instead of a Type::Tiny type constraint); or may be
-a package name in which case it will be assumed to be a role and checked with
-C<< $value->DOES($type) >>.
 
 =head1 BUGS
 
 Please report any bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
-=head1 SUPPORT
+=head1 SEE ALSO
 
-B<< IRC: >> support is available through in the I<< #moops >> channel
-on L<irc.perl.org|http://www.irc.perl.org/channels.html>.
+L<The Type::Tiny homepage|http://typetiny.toby.ink/>.
 
 =head1 AUTHOR
 
@@ -188,3 +222,4 @@ WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
+

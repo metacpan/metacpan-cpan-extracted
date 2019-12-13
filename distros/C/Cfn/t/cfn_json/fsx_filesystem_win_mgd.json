@@ -1,0 +1,44 @@
+{
+    "Resources": {
+        "WindowsMadFileSystemWithAllConfigs": {
+            "Type": "AWS::FSx::FileSystem",
+            "Properties": {
+                "FileSystemType": "WINDOWS",
+                "StorageCapacity": 300,
+                "SubnetIds": [
+                    {
+                        "Fn::ImportValue": "CfnFsxMadSubnet01"
+                    }
+                ],
+                "SecurityGroupIds": [
+                    {
+                        "Fn::ImportValue": "WindowsIngressSecurityGroupId"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "windows"
+                    }
+                ],
+                "WindowsConfiguration": {
+                    "ActiveDirectoryId": {
+                        "Fn::ImportValue": "CfnFsxMadDirectoryServiceId"
+                    },
+                    "ThroughputCapacity": 8,
+                    "WeeklyMaintenanceStartTime": "4:16:30",
+                    "DailyAutomaticBackupStartTime": "01:00",
+                    "AutomaticBackupRetentionDays": 2,
+                    "CopyTagsToBackups": false
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "FileSystemId": {
+            "Value": {
+                "Ref": "WindowsMadFileSystemWithAllConfigs"
+            }
+        }
+    }
+}

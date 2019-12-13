@@ -1,0 +1,59 @@
+{
+    "Resources": {
+        "BasicS3LinkedLustreFileSystem": {
+            "Type": "AWS::FSx::FileSystem",
+            "Properties": {
+                "FileSystemType": "LUSTRE",
+                "StorageCapacity": 3600,
+                "SubnetIds": [
+                    {
+                        "Fn::ImportValue": "MySubnet01"
+                    }
+                ],
+                "SecurityGroupIds": [
+                    {
+                        "Fn::ImportValue": "LustreIngressSecurityGroupId"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "CFNs3linkedLustre"
+                    }
+                ],
+                "LustreConfiguration": {
+                    "ImportPath": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "s3://",
+                                {
+                                    "Fn::ImportValue": "LustreCFNS3ImportBucketName"
+                                }
+                            ]
+                        ]
+                    },
+                    "ExportPath": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "s3://",
+                                {
+                                    "Fn::ImportValue": "LustreCFNS3ImportBucketName"
+                                }
+                            ]
+                        ]
+                    },
+                    "WeeklyMaintenanceStartTime": "2:20:30"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "FileSystemId": {
+            "Value": {
+                "Ref": "BasicS3LinkedLustreFileSystem"
+            }
+        }
+    }
+}

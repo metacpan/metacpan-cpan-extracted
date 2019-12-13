@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,41 +12,45 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 14f1a419b024a2f0028656f7fbafa9a4e7f2c0ed .perlall
-SHA1 a4dac410e1f638fab9159e362ce570f52a8cb3ba Changes
-SHA1 f9a303bd5a40f5485cd5dbbc925e3a4ce4b028d5 INSTALL
-SHA1 012fe1ce01fb53ea10dfac7145ee7217b8b3ae85 LICENSE
-SHA1 35a5c11cea4b9f35d409ce95a7f921e0f71afc19 MANIFEST
-SHA1 9f82afd16fafbe8263ac7c58f12e8476bde731e7 META.json
-SHA1 841855ff19ca1acf458e4a9ba48e8c04f11e734d META.yml
-SHA1 cdb4770535f45a11a9b6584de7c3141cb9211261 Makefile.PL
-SHA1 c5f7fa8121e5949e0af2de73cd559a3586b8fca5 README
-SHA1 fc062c56309e099c792055db5e80dd0dc83948ed lib/App/perlall.pm
-SHA1 e2a5f9464fc2bde07e9a3646113cd72cccd11926 lib/Devel/PatchPerl/Plugin/Asan.pm
-SHA1 2e4c7b7601c0aba54182aa805ae351c07ca51713 lib/Devel/PatchPerl/Plugin/Compiler.pm
-SHA1 b35a83e395949946008801c8ecb09453adfe664a lib/Devel/PatchPerl/Plugin/General.pm
-SHA1 28f5f6d947bc96954450579439fbcda8a1efd726 perlall.ppt
-SHA1 5548d91cfff2b294741507c0c3607d8bb39a0982 perlall.txt
-SHA1 fbe92a2753e5288040952c4db49dcda47d4157c2 script/perlall
-SHA1 d90d4c1194ca8fd04915b2a2180078b57f945007 t/00-compile.t
-SHA1 1bffbbb6335975580195dbf0949f108808050f21 t/01-build.t
-SHA1 f31e2ebf44e7ffc20066d7415f6a80172ee3c511 t/01-linked.t
-SHA1 2c53d3c4ece0f4efefa7f4fb41b72e239a8b9a83 t/01-options.t
-SHA1 200e3665ea03435632cdbe0c9e8cb4dca74302d3 t/02-init.t
-SHA1 1dafec967f50f4001302446a04e48509ff68de4c t/03-do.t
-SHA1 bcf4aaf1304a8c8eb717daaff5d056bd69b84dec t/04-make.t
-SHA1 a6e1722e63f4051ad3a15e16e0d940d070b82664 t/05-maketest.t
-SHA1 cd8fefff3f9d6a46743793ccf471f91aedb7683e t/06-makeinstall.t
-SHA1 e09d3448467d28d246fda81d0d2daf29d27b4ed4 t/07-help.t
-SHA1 bce5c6553353702031ecbfe3d3823e630ef595e9 t/08-version.t
-SHA1 7b8fce3eab9aadb9a6b86178246fb31da070f1d5 t/release-pod-coverage.t
-SHA1 a140e259b4b7e888f2cc0ad72c718507f96d2db2 t/release-pod-syntax.t
+SHA256 2edf835ff41d22b1c7948b833f2c4a8768ff7a6af2b65da3a05703298f5cdeaa .perlall
+SHA256 d9fcad7d8eb005e4ae49450c74304ea7672aa32b638ee6136063be5d86c689d7 Changes
+SHA256 6bc691dd2d5fd2c799669e0a8b02f1a68b02177730aba51e4a958a11c5f8cf55 INSTALL
+SHA256 3b0b2c04cb1487ebeeac24d9f20e198ec6bd434c315d3e6bfd8f385b38ba3ad5 LICENSE
+SHA256 e462dd01a18fce4eaa3201b9470fc402c93ba2fd8ad07048ee2e8519009bb238 MANIFEST
+SHA256 e52e8c5a081d5532ad14ca7ee9810db7c091e51def2669a9c63e3036357e652a META.json
+SHA256 fa2e59bf4e71d5cf780a1d4fc250e7f1d9b09714205b1171bf116dd48c46806d META.yml
+SHA256 e3c540fb5a551ad304c02397068e0f79ecd6006398423c6e30876f44794ec597 Makefile.PL
+SHA256 6fb482b76603fea3792dd6eac78eaeb64c59c439b1cc70aaca4ff0bcd501676c README
+SHA256 a5a8f001541a53cc60c0d0746c567168b5a399c62827a9572e9b1d976fb867e7 lib/App/perlall.pm
+SHA256 d04e5206f66c4ac9b2cf68571bcff286d2975e9a2ca3b8a48f365ca48f8f0af6 lib/Devel/PatchPerl/Plugin/Asan.pm
+SHA256 33129e07642ac12855de07f36932d1e8bd83c3c4c91d392753840128f272dde9 lib/Devel/PatchPerl/Plugin/Compiler.pm
+SHA256 1c97184efc4b07c97734ac87e82a5a7d21f57faedb98e957a3cfa494ff234c06 lib/Devel/PatchPerl/Plugin/General.pm
+SHA256 6c95b3335c1aee370ec067998dfce1bd5762852f25e166f5e0ca3e5e90879caf perlall.ppt
+SHA256 3948a1441687a7f68d696d6c27b8cf4b7217c9bfb2a384dcb49bd2fd44da4511 perlall.txt
+SHA256 d13ca75f9cf3166a89fbc513f319fc8ce9a201e8ae293da13b5b0d57276d7475 script/perlall
+SHA256 51c7689a53f77ab723053c059736de368743458d3e135eb50dff4b89563c3511 t/00-compile.t
+SHA256 a7c502645bcea614296119f025ebf693704936b975ed54a5bb133c1c047df0a0 t/01-build.t
+SHA256 9b846f3e4cb458583d0fee6ae9f9c9714970955833ce599ec3a915ead4b7d5f5 t/01-linked.t
+SHA256 08ecbebdd3e202508eb67ba3147ad9c82f55b59e5280cf7baa9e2662de586b62 t/01-options.t
+SHA256 9769e9454d70631118c615c04162bcfaeaa6454d0760e221cbdc9799c778b8c2 t/02-init.t
+SHA256 9d5d2bd354a4488b7222f9a439043f1c817ce7f71b3c63d1c044ce7491e87b34 t/03-do.t
+SHA256 5b1a5f3ceac47776034fd7c90510df2ce777e7aa1464b274ab8abb25f0746926 t/04-make.t
+SHA256 0d7b16d9dc9aa75da8e8832a53485cb543e0c9362679c5564357d04726d4f43d t/05-maketest.t
+SHA256 6287f8ea588891ffa8d5ee88761e2523c6c510c0bb349eb33812bc268b0a916b t/06-makeinstall.t
+SHA256 a4cc63dd7b125b8fa404bdf0e493db20f24ee75530d832b8ce8c481744cd25cc t/07-help.t
+SHA256 f12ce5995a57d01b229effe1a03ace1f77e6256fcbb252b284eafc17c4e0d7cd t/08-version.t
+SHA256 c12cbc03e25b720c16a663f6dfaa7ce598eb8130f8c5eb5f97dc2259aa1d3545 t/release-pod-coverage.t
+SHA256 7513f8331e48d85f0e8df4a8b175a47b8279b007a5e66d57346a3eadbec79530 t/release-pod-syntax.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlddWhQACgkQmm2SYo/9yUK7uQCfVP+Xlu7HqRQ4i8tXt6Fp53YN
-o4QAnRL8TLmO+yYP9GD4fyHQtlsPnEZt
-=VIQB
+iQEzBAEBCAAdFiEEKJWogdNCcPq/6PdHtPYzOeZdZBQFAl3v+VYACgkQtPYzOeZd
+ZBSp6AgAm3RHM01791TgdJo7/7Av2ARBrt99ZztPiuILXZVBhFtHwxiG5UGxmLcW
+W8oP/FlxK6HPMlZpyBxCjmKdllh3dZFMyaijBp9ZMPYafFoLvAZUWxji9nrwJEwX
+LnGzhpsN5l8NNXNSbmFqNItbgjIA+dwSrqkAKodoTZgpQLwT0gEeRDNjAr/Vr/ut
+FClzfWkGbU+KXa7dRXGyujTEcQjxJ9sQJZpTtj0sPd6bKMI7PA0KuMwoiMHsB/dB
+C3eiz9lf9RyMa0LJnb24qxxnQ8UFjxCYCzlXpHxFpyop4apV8vJgtTcSfc923dIx
+sUdx7itt736usz7OyMicxzONM5DtHw==
+=JGml
 -----END PGP SIGNATURE-----

@@ -14,6 +14,7 @@ t/config.t
 t/data/with-comments.conf
 t/perl-basic.t
 t/perl-build.t
+t/perl-buildxs.t
 t/perl-ship-changelog-md.t
 t/perl-ship.t
 t/perl-start.t

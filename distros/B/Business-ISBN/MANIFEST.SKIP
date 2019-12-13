@@ -59,9 +59,10 @@
 
 
 \.travis\.yml
-\.appveyor.yml
+\.?appveyor.yml
 \.releaserc
 \.lwpcookies
+
 Business-.*
 
 objtest.pl

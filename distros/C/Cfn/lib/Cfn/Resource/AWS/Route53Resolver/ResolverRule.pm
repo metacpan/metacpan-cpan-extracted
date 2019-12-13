@@ -1,4 +1,4 @@
-# AWS::Route53Resolver::ResolverRule generated from spec 4.1.0
+# AWS::Route53Resolver::ResolverRule generated from spec 7.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Route53Resolver::ResolverRule',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Route53Resolver::ResolverRule {
     [ 'Arn','DomainName','Name','ResolverEndpointId','ResolverRuleId','TargetIps' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-southeast-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-southeast-1','eu-west-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-2' ]
   }
 }
 

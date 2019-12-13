@@ -16,12 +16,10 @@ Net::Curl::Promiser::Mojo - support for L<Mojolicious>
     my $handle = Net::Curl::Easy->new();
     $handle->setopt( CURLOPT_URL() => $url );
 
-    $promiser->add_handle($handle)->then(
+    $promiser->add_handle_p($handle)->then(
         sub { print "$url completed.$/" },
         sub { warn "$url failed: " . shift },
-    )->finally( sub { Mojo::IOLoop->stop() } );
-
-    Mojo::IOLoop->start()();
+    )->wait();
 
 =head1 DESCRIPTION
 
@@ -30,13 +28,22 @@ L<Net::Curl::Promiser>.
 
 See F</examples> in the distribution for a fleshed-out demonstration.
 
-B<NOTE:> The actual interface is that provided by
-L<Net::Curl::Promiser::LoopBase>.
+=head1 MOJOLICIOUS SPECIALTIES
 
-=head1 PROMISE INTERFACE
+This module’s interface is that provided by
+L<Net::Curl::Promiser::LoopBase>, with the following tweaks to make it
+more Mojo-friendly:
 
-This module uses L<Mojo::Promise> rather than L<Promise::ES6>
+=over
+
+=item * This module uses L<Mojo::Promise> rather than L<Promise::ES6>
 as its promise implementation.
+
+=item * C<add_handle_p()> is an alias for the base class’s C<add_handle()>.
+This alias conforms to Mojo’s convention of postfixing C<_p> onto the end
+of promise-returning functions.
+
+=back
 
 =cut
 
@@ -50,6 +57,10 @@ use Mojo::IOLoop ();
 use Mojo::Promise ();
 
 use constant PROMISE_CLASS => 'Mojo::Promise';
+
+#----------------------------------------------------------------------
+
+*add_handle_p = __PACKAGE__->can('add_handle');
 
 #----------------------------------------------------------------------
 

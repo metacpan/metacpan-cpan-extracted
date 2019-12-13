@@ -25,20 +25,14 @@ sudo yum upgrade gcc \
 
 # Only needed if using the Yum installed Perl
 
-while true do
-    read -p "Do you wish to install the packaged/system Perl prerequisites?" yn
-    case $yn in
-        [Yy]* )
-            sudo yum upgrade perl-math-gradient \
-                             perl-math-bezier \
-                             perl-file-map \
-                             perl-imager \
-                             perl-inline-c \
-                             perl-sys-cpu \
-                             perl-test-most;;
-
-        [Nn]* ) exit;;
-
-        * ) echo "Please answer yes or no.";;
-    esac
-done
+read -p "Do you wish to install the packaged/system Perl prerequisites?" yn
+case $yn in
+    [Yy]* )
+        sudo yum upgrade perl-math-gradient \
+                         perl-math-bezier \
+                         perl-file-map \
+                         perl-imager \
+                         perl-inline-c \
+                         perl-sys-cpu \
+                         perl-test-most;;
+esac

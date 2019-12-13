@@ -1,4 +1,4 @@
-# AWS::EKS::Cluster generated from spec 5.3.0
+# AWS::EKS::Cluster generated from spec 9.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EKS::Cluster',
@@ -11,10 +11,10 @@ package Cfn::Resource::AWS::EKS::Cluster {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::EKS::Cluster', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [ 'Arn','CertificateAuthorityData','Endpoint' ]
+    [ 'Arn','CertificateAuthorityData','ClusterSecurityGroupId','Endpoint' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-west-1','us-west-2' ]
   }
 }
 

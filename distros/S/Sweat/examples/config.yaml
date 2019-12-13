@@ -13,12 +13,12 @@
 # PREFERENCES
 #################
 #
-# shuffle_mode:
+# shuffle:
 # 0 to have Sweat always run through its drills in the same order.
 # 1 to shuffle up the drills within each group (but still run through all
 #   groups in the same order.
 # default: 0
-shuffle_mode: 1
+shuffle: 1
 
 # no_chair:
 # 0 to have Sweat deal out chair-requiring drills as usual.
@@ -34,12 +34,12 @@ no_chair: 0
 # default: 0
 no_jumping: 0
 
-# entertainment_mode:
+# entertainment:
 # 0 to have Sweat just call out drills, and not say much else.
 # 1 to have it instead punch things up a bit with news, weather, and weird
 #   old internet jokes. See also ENTERTAINMENT OPTIONS, below.
 # default: 0
-entertainment_mode: 1
+entertainment: 1
 
 #################
 # SPEECH SETUP

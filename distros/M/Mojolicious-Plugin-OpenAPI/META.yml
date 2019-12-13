@@ -20,11 +20,12 @@ no_index:
 requires:
   JSON::Validator: '3.16'
   Mojolicious: '8.00'
+  YAML::XS: '0.80'
 resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-openapi/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-openapi
   repository: https://github.com/jhthorsen/mojolicious-plugin-openapi.git
-version: '2.19'
+version: '2.20'
 x_contributors:
   - 'Henrik Andersen'
   - 'Ilya Rassadin'

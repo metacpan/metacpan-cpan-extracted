@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215426;
+our $VERSION = 1.20191211212302;
 
 my $formatters = [
                 {
@@ -59,7 +59,7 @@ my $validators = {
               8[0-35-9]|
               9[013-689]
             )|
-            87[23]
+            872
           )\\d{4}
         ',
                 'geographic' => '
@@ -83,7 +83,7 @@ my $validators = {
               8[0-35-9]|
               9[013-689]
             )|
-            87[23]
+            872
           )\\d{4}
         ',
                 'mobile' => '
@@ -102,30 +102,38 @@ my $validators = {
             )|
             7(?:
               5[057]|
-              [6-8]\\d|
-              9[0-3]
+              [6-9]\\d
             )|
             8(?:
               2[0-59]|
-              [3469]\\d|
-              5[1-9]|
+              [3-69]\\d|
               8[28]
             )
           )\\d{4}
         ',
                 'pager' => '',
                 'personal_number' => '',
-                'specialrate' => '(90\\d{5})|(809\\d{4})',
-                'toll_free' => '800\\d{4}',
-                'voip' => '49\\d{5}'
+                'specialrate' => '(
+          90(?:
+            0\\d|
+            1[5-79]|
+            2[015-79]|
+            3[135-79]|
+            4[125-7]|
+            5[25-79]|
+            7[1-37]|
+            8[0-35-7]
+          )\\d{3}
+        )|(809\\d{4})',
+                'toll_free' => '80[08]\\d{4}',
+                'voip' => '49[0-24-79]\\d{4}'
               };
 my %areanames = ();
-$areanames{en}->{354421} = "Keflavík";
-$areanames{en}->{354462} = "Akureyri";
-$areanames{en}->{354551} = "Reykjavík\/Vesturbær\/Miðbærinn";
-$areanames{en}->{354552} = "Reykjavík\/Vesturbær\/Miðbærinn";
-$areanames{en}->{354561} = "Reykjavík\/Vesturbær\/Miðbærinn";
-$areanames{en}->{354562} = "Reykjavík\/Vesturbær\/Miðbærinn";
+$areanames{en}->{35442} = "Keflavík";
+$areanames{en}->{35446} = "Akureyri";
+$areanames{en}->{3545} = "Reykjavík";
+$areanames{en}->{35455} = "Reykjavík\/Vesturbær\/Miðbærinn";
+$areanames{en}->{35456} = "Reykjavík\/Vesturbær\/Miðbærinn";
 
     sub new {
       my $class = shift;

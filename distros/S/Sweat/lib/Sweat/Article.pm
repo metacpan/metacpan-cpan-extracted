@@ -11,6 +11,7 @@ use Types::Standard qw( Str Maybe );
 use Scalar::Util qw( blessed );
 use HTML::Strip;
 use List::Util qw( shuffle );
+use MediaWiki::API;
 
 has 'text' => (
     is => 'ro',
@@ -35,6 +36,8 @@ our $mw = MediaWiki::API->new;
 $mw->{config}->{max_lag} = 2;
 $mw->{config}->{max_lag_delay} = 1;
 our $language;
+
+our %seen_titles;
 
 sub new_from_newsapi_article {
     my ( $class, $newsapi_article ) = @_;
@@ -114,6 +117,15 @@ sub _get_summary_for_title {
 
     if (defined $summary) {
         $summary = $stripper->parse( $summary );
+        # Eliminate all parentheticals (birth/death dates, alternate-language
+        # representations, and so on) because they don't read out loud well.
+        my $found_some;
+        until ( defined($found_some) && not($found_some) ) {
+            $found_some = $summary =~ s/\([^\(]*?\)//g;
+        }
+        # Clean up redundant whitespace, and whitespace before punctuation.
+        $summary =~ s/\s+([,.!?;:])/$1/g;
+        $summary =~ s/ {2,}/ /g;
     }
     if ( $summary && $summary =~ /\S/ ) {
         return $summary;
@@ -122,6 +134,17 @@ sub _get_summary_for_title {
         return undef;
     }
 }
+
+sub _erase_parentheticals {
+    my ( $summary, $opener, $closer ) = @_;
+    my $found_some;
+    until ( defined($found_some) && not($found_some) ) {
+        $found_some = $summary =~ s/\([^\(]*?\)//g;
+        warn "Found some: $found_some\n";
+    }
+    return $summary;
+}
+
 
 sub _get_random_title_linked_from_title {
     my ($title) = @_;
@@ -143,10 +166,18 @@ sub _get_random_title_linked_from_title {
     until ($linked_title || (@links == 0 )) {
         if (defined $links[0]) {
             my $proposed_title = $links[0]->{title};
-            # Skip any title with a numeral in it (to stay away from annual-
-            # statistics gravity wells)
-            unless ($proposed_title =~ /\d/) {
+            # Skip:
+            # * Any title we've already seen
+            # * Any title with a numeral in it (to stay away from annual-
+            #   statistics gravity wells)
+            # * Any title with a word suggesting it's a just a list or table
+            unless (
+                $seen_titles{$proposed_title}
+                ||
+                $proposed_title =~ /\d|^list of\s|^comparison of\s|^table of\s/i
+            ) {
                 $linked_title = $proposed_title;
+                $seen_titles{$proposed_title} = 1;
             }
         }
         shift @links;

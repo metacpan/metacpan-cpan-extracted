@@ -6,23 +6,23 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Duck::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Duck::VERSION   = '1.006000';
+	$Type::Tiny::Duck::VERSION   = '1.008000';
 }
+
+$Type::Tiny::Duck::VERSION =~ tr/_//d;
 
 use Scalar::Util qw< blessed >;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-use Type::Tiny ();
-our @ISA = 'Type::Tiny';
+require Type::Tiny::ConstrainedObject;
+our @ISA = 'Type::Tiny::ConstrainedObject';
+sub _short_name { 'Duck' }
 
 sub new {
 	my $proto = shift;
 	
 	my %opts = (@_==1) ? %{$_[0]} : @_;
-	_croak "Duck type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
-	_croak "Duck type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
-	_croak "Duck type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
 	_croak "Need to supply list of methods" unless exists $opts{methods};
 	
 	$opts{methods} = [$opts{methods}] unless ref $opts{methods};
@@ -91,17 +91,6 @@ sub _instantiate_moose_type
 	
 	require Moose::Meta::TypeConstraint::DuckType;
 	return "Moose::Meta::TypeConstraint::DuckType"->new(%opts, methods => $self->methods);
-}
-
-sub has_parent
-{
-	!!1;
-}
-
-sub parent
-{
-	require Types::Standard;
-	Types::Standard::Object();
 }
 
 sub validate_explain
@@ -197,8 +186,26 @@ Instead rely on the default.
 
 =item C<parent>
 
-Parent is always Types::Standard::Object, and cannot be passed to the
+Parent is always B<Types::Standard::Object>, and cannot be passed to the
 constructor.
+
+=back
+
+=head2 Methods
+
+=over
+
+=item C<< stringifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< numifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< with_attribute_values($attr1 => $constraint1, ...) >>
+
+See L<Type::Tiny::ConstrainedObject>.
 
 =back
 

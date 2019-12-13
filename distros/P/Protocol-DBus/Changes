@@ -1,5 +1,9 @@
 Revision history for Perl module Protocol::DBus
 
+0.13
+- Mojo connector now uses Mojo::Promise rather than Promise::ES6 and
+  exposes “*_p” aliases for initialize() and send_call().
+
 0.12 Tue 20 Nov 2019
 - Fix POD typo that misidentifies Mojo connector.
 

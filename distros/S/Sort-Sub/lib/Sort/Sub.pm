@@ -1,7 +1,7 @@
 package Sort::Sub;
 
-our $DATE = '2018-01-15'; # DATE
-our $VERSION = '0.110'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '0.111'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -11,7 +11,11 @@ sub import {
     my $class = shift;
     my $caller = caller;
 
-    for my $import (@_) {
+    my $i = -1;
+    while (1) {
+        $i++;
+        last if $i >= @_;
+        my $import = $_[$i];
         my ($is_var, $name, $opts) = $import =~ /\A(\$)?(\w+)(?:<(\w*)>)?\z/
             or die "Invalid import request '$import', please use: ".
             '[$]NAME [ <OPTS> ]';
@@ -19,8 +23,13 @@ sub import {
         $opts //= "";
         my $is_reverse = $opts =~ /r/;
         my $is_ci      = $opts =~ /i/;
+        my $args       = {};
+        if (ref $_[$i+1] eq 'HASH') {
+            $args = $_[$i+1];
+            $i++;
+        }
         my $gen_sorter = \&{"Sort::Sub::$name\::gen_sorter"};
-        my $sorter = $gen_sorter->($is_reverse, $is_ci);
+        my $sorter = $gen_sorter->($is_reverse, $is_ci, $args);
         if ($is_var) {
             ${"$caller\::$name"} = \&$sorter;
         } else {
@@ -45,7 +54,7 @@ Sort::Sub - Collection of sort subroutines
 
 =head1 VERSION
 
-This document describes version 0.110 of Sort::Sub (from Perl distribution Sort-Sub), released on 2018-01-15.
+This document describes version 0.111 of Sort::Sub (from Perl distribution Sort-Sub), released on 2019-10-26.
 
 =head1 SYNOPSIS
 
@@ -80,7 +89,12 @@ Request a case-insensitive, reverse sort:
  my @sorted = sort $naturally ('track2.mp3', 'Track1.mp3', 'Track10.mp3');
  => ('Track10.mp3', 'track2.mp3', 'Track1.mp3')
 
-Use with
+Pass arguments to sort generator routine:
+
+ use Sort::Sub '$by_num_of_colons', {pattern=>':'};
+
+ my @sorted = sort $by_num_of_colons ('a::','b:','c::::','d:::');
+ => ('b:','a::','d:::','c::::')
 
 =head1 DESCRIPTION
 
@@ -117,10 +131,11 @@ C<by> (e.g. C<by_num_and_non_num_parts>).
 
 The module must contain a C<gen_sorter> subroutine. It will be called with:
 
- ($is_reverse, $is_ci)
+ ($is_reverse, $is_ci, $args)
 
-Where C<$is_reserve> will be set to true if user requests a reverse sort, and
-C<$is_ci> will be set to true if user requests a case-insensitive sort. The
+Where C<$is_reserve> will be set to true if user requests a reverse sort,
+C<$is_ci> will be set to true if user requests a case-insensitive sort. C<$args>
+is hashref to pass additional arguments to the C<gen_sorter()> routine. The
 subroutine should return a code reference.
 
 =head1 HOMEPAGE
@@ -145,7 +160,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

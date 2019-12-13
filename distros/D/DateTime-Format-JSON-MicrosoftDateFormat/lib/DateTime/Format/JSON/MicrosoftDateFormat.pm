@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use DateTime;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -15,10 +15,10 @@ DateTime::Format::JSON::MicrosoftDateFormat - Parse and format JSON MicrosoftDat
   use DateTime::Format::JSON::MicrosoftDateFormat;
 
   my $formatter = DateTime::Format::JSON::MicrosoftDateFormat->new;
-  my $dt = $formatter->parse_datetime("/Date(1392089278000-0600)/"); #2014-02-10T21:27:58Z
-  my $dt = $formatter->parse_datetime("/Date(1392067678000)/");      #2014-02-10T21:27:58Z
+  my $dt        = $formatter->parse_datetime("/Date(1392089278000-0600)/"); #2014-02-10T21:27:58Z
+  my $dt        = $formatter->parse_datetime("/Date(1392067678000)/");      #2014-02-10T21:27:58Z
 
-  say $formatter->format_datetime($dt);                              #/Date(1392067678000)/
+  say $formatter->format_datetime($dt);                                     #/Date(1392067678000)/
 
 =head2 The Perl One Liner
 
@@ -54,10 +54,10 @@ Use the imported DateTime::TO_JSON method and the JSON->convert_blessed options 
   use JSON;
   use DateTime;
   use DateTime::Format::JSON::MicrosoftDateFormat (to_json=>1);
-  my $formatter=DateTime::Format::JSON::MicrosoftDateFormat->new;
-  my $json=JSON->new->convert_blessed->pretty;
+  my $formatter = DateTime::Format::JSON::MicrosoftDateFormat->new;
+  my $json      = JSON->new->convert_blessed->pretty;
 
-  my $dt=DateTime->now(formatter=>$formatter);
+  my $dt        = DateTime->now(formatter=>$formatter);
   print $json->encode({now=>$dt}); #prints {"now" : "/Date(1392747671000)/"}
 
 =cut
@@ -89,8 +89,8 @@ sub new {
 Returns a DateTime object from the given string
 
   use DateTime::Format::JSON::MicrosoftDateFormat;
-  my $parser=DateTime::Format::JSON::MicrosoftDateFormat->new;
-  my $dt=$parser->parse_datetime("/Date(1392606509000)/");
+  my $parser = DateTime::Format::JSON::MicrosoftDateFormat->new;
+  my $dt     = $parser->parse_datetime("/Date(1392606509000)/");
   print "$dt\n";
 
 =cut
@@ -118,17 +118,17 @@ sub parse_datetime {
 
 Returns a JSON formatted date string for the passed DateTime object
 
-  my $dt=DateTime->now;
-  my $formatter=DateTime::Format::JSON::MicrosoftDateFormat->new;
+  my $dt        = DateTime->now;
+  my $formatter = DateTime::Format::JSON::MicrosoftDateFormat->new;
   print $formatter->format_datetime($dt), "\n";
 
 However, format_datetime is typically used like this...
 
   use DateTime;
   use DateTime::Format::JSON::MicrosoftDateFormat;
-  my $formatter=DateTime::Format::JSON::MicrosoftDateFormat->new;
+  my $formatter = DateTime::Format::JSON::MicrosoftDateFormat->new;
 
-  my $dt=DateTime->now;
+  my $dt        = DateTime->now;
   $dt->set_formatter($formatter);
   print "$dt\n"; #prints /Date(1392747078000)/
 

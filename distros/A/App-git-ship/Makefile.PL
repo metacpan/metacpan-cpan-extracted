@@ -7,7 +7,7 @@ my %WriteMakefileArgs = (
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/App/git/ship.pm',
   VERSION_FROM   => 'lib/App/git/ship.pm',
-  EXE_FILES      => [qw(script/git-ship)],
+  EXE_FILES      => [qw(script/git-ship script/git-ship.bak)],
   BUILD_REQUIRES => {}
 ,
   TEST_REQUIRES  => {
@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'Applify' => '0.06',
+  'Applify' => '0.20',
   'CPAN::Uploader' => '0.10',
   'ExtUtils::MakeMaker' => '6.00',
   'IPC::Run3' => '0.04',
@@ -24,7 +24,8 @@ my %WriteMakefileArgs = (
   'Mojolicious' => '8.00',
   'Pod::Markdown' => '3.00',
   'Test::Pod' => '0',
-  'Test::Pod::Coverage' => '0'
+  'Test::Pod::Coverage' => '0',
+  'perl' => '5.014004'
 }
 ,
   META_MERGE     => {
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
     'x_contributors' => [
   'Jan Henning Thorsen <jhthorsen@cpan.org>',
   'mohawk2 <mohawk2@users.noreply.github.com>',
+  "Rolf St\x{f6}ckli <tekki\@cpan.org>",
   'Shoichi Kaji <skaji@cpan.org>',
   '__DATA__'
 ]

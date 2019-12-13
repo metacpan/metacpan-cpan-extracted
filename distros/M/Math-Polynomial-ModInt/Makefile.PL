@@ -24,7 +24,7 @@ my %versions = map {
 
 WriteMakefile(
     NAME             => 'Math::Polynomial::ModInt',
-    AUTHOR           => q{Martin Becker <becker-cpan-mp (at) cozap.com>},
+    AUTHOR           => 'Martin Becker <becker-cpan-mp (at) cozap.com>',
     VERSION_FROM     => 'lib/Math/Polynomial/ModInt.pm',
     ABSTRACT_FROM    => 'lib/Math/Polynomial/ModInt.pm',
     LICENSE          => 'artistic_2',
@@ -40,7 +40,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Carp'              => '0',
         'Math::BigInt'      => '0',
-        'Math::ModInt'      => '0.011',
+        'Math::ModInt'      => '0.012',
         'Math::Polynomial'  => '1.015',
     },
     SIGN => 1,
@@ -60,11 +60,11 @@ WriteMakefile(
                 web  => "https://github.com/mhasch/perl-$DN",
                 type => 'git',
             },
-            prereqs => {
-                runtime => {
-                    recommends => {
-                        'Math::BigInt::GMP' => 0,
-                    },
+        },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Math::BigInt::GMP' => 0,
                 },
             },
         },

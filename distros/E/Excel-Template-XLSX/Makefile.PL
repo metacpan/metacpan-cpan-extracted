@@ -7,7 +7,7 @@ WriteMakefile
   'VERSION_FROM' => 'lib/Excel/Template/XLSX.pm',
   'PREREQ_PM' => {
                    'Archive::Zip' => 0,
-                   'Excel::Writer::XLSX' => '0.9',
+                   'Excel::Writer::XLSX' => '1.01',
                    'Graphics::ColorUtils' => 0,
                    'Scalar::Util' => 0,
                    'Template::Tiny' => 0,

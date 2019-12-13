@@ -59,13 +59,13 @@ Packaging
 Before releasing, make sure to update `CHANGES`, `VERSION` and run
 `./bootstrap`.
 
-You can also package the application as a nice tar.gz file, it will contain
-a mini copy of CPAN, so that all perl modules can be rebuilt at the
-destination.  If you want to make sure that your project builds with perl
+You can also package the application as a nice tar.gz file, it uses carton to
+install dependent module. If you want to make sure that your project builds with perl
 5.22, make sure to set the `PERL` environment variable to a perl 5.22
 interpreter, make sure to delete any `PERL5LIB` environment variable, and run
-`make clean && make`. Now all modules to build your
-project with any perl from 5.22 on upward will be included in the distribution.
+`make clean && make`. This will cause a `cpanfile-5.22.1.snapshot` file to be included
+with your tar ball, when building the app this snapshot will be used to make sure
+all the right versions of the dependent modules get installed.
 
 ```console
 make dist

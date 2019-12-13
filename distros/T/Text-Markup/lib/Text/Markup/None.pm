@@ -2,10 +2,11 @@ package Text::Markup::None;
 
 use 5.8.1;
 use strict;
+use warnings;
 use HTML::Entities;
 use File::BOM qw(open_bom);
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
@@ -13,7 +14,9 @@ sub parser {
     local $/;
     my $html = encode_entities(<$fh>, '<>&"');
     utf8::encode($html);
+    return $html if $opts->{raw};
     return qq{<html>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
@@ -34,6 +37,7 @@ Text::Markup::None - Turn a file with no known markup into HTML
 
   use Text::Markup;
   my $html = Text::Markup->new->parse(file => 'README');
+  my $raw  = Text::Markup->new->parse(file => 'README', raw => 1);
 
 =head1 Description
 
@@ -44,13 +48,17 @@ entities, and then returns an HTML string with the file in a C<< <pre> >>
 element. This will be handy for files that really are nothing but plain text,
 like F<README> files.
 
+Normally this module returns the output wrapped in a minimal HTML document
+skeleton. If you would like the raw output without the skeleton, you can pass
+the C<raw> option to C<parse>.
+
 =head1 Author
 
 David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2014 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2019 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

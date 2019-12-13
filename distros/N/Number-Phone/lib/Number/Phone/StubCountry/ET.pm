@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215425;
+our $VERSION = 1.20191211212301;
 
 my $formatters = [
                 {
@@ -117,6 +117,7 @@ my $validators = {
             )|
             4(?:
               6(?:
+                119|
                 22[0-24-7]|
                 33[1-5]|
                 44[13-69]|
@@ -238,6 +239,7 @@ my $validators = {
             )|
             4(?:
               6(?:
+                119|
                 22[0-24-7]|
                 33[1-5]|
                 44[13-69]|
@@ -511,6 +513,7 @@ $areanames{en}->{25134772} = "Inticho\,\ North\ Region";
 $areanames{en}->{25134773} = "Edaga\-Hamus\,\ North\ Region";
 $areanames{en}->{25134774} = "Alemata\,\ North\ Region";
 $areanames{en}->{25134775} = "Axum\,\ North\ Region";
+$areanames{en}->{251461} = "Shasemene";
 $areanames{en}->{25146220} = "Awassa\ I\,\ South\ Region";
 $areanames{en}->{25146221} = "Awassa\ II\,\ South\ Region";
 $areanames{en}->{25146222} = "Wonda\ Basha\,\ South\ Region";
@@ -633,12 +636,6 @@ $areanames{en}->{25158776} = "Dejen\,\ North\-West\ Region";
 $areanames{en}->{25158777} = "Amanuel\,\ North\-West\ Region";
 $areanames{en}->{25158778} = "Debre\ Markos\ II\,\ North\-West\ Region";
 $areanames{en}->{25158779} = "Jiga\,\ North\-West\ Region";
-$areanames{en}->{251911} = "Addis\ Ababa\ Region";
-$areanames{en}->{251914} = "North\ Region";
-$areanames{en}->{251915} = "East\ Region";
-$areanames{en}->{251916} = "South\ Region";
-$areanames{en}->{251917} = "West\ Region";
-$areanames{en}->{251918} = "North\-West\ Region";
 
     sub new {
       my $class = shift;

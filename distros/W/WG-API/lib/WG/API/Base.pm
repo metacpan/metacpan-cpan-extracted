@@ -4,7 +4,7 @@ use Modern::Perl '2015';
 use Moo::Role;
 
 use WG::API::Error;
-use LWP::UserAgent;
+use HTTP::Tiny;
 use JSON;
 use Data::Dumper;
 use Log::Any qw($log);
@@ -15,11 +15,11 @@ use URI::QueryParam;
 
 =head1 VERSION
 
-Version v0.12
+Version v0.13
 
 =cut
 
-our $VERSION = 'v0.12';
+our $VERSION = 'v0.13';
 
 =head1 SYNOPSIS
 
@@ -101,10 +101,14 @@ Returns a user agent instance
 
 =cut
 
-#@returns LWP::UserAgent
+#@returns HTTP::Tiny
 has ua => (
     is      => 'ro',
-    default => sub { LWP::UserAgent->new() },
+    default => sub {
+        require HTTP::Tiny;
+        require IO::Socket::SSL;
+        HTTP::Tiny->new;
+    },
 );
 
 =item B<error>
@@ -185,7 +189,7 @@ sub _get {
     #@type HTTP::Response
     my $response = $self->_raw_get( $self->_build_url($uri) . $self->_build_get_params( $params, %passed_params ) );
 
-    return $self->_parse( $response->is_success ? decode_json $response->decoded_content : undef );
+    return $self->_parse( $response->{'status'} eq '200' ? decode_json $response->{'content'} : undef );
 }
 
 sub _post {
@@ -194,7 +198,7 @@ sub _post {
     #@type HTTP::Response
     my $response = $self->_raw_post( $self->_build_url($uri), $self->_build_post_params( $params, %passed_params ) );
 
-    return $self->_parse( $response->is_success ? decode_json $response->decoded_content : undef );
+    return $self->_parse( $response->{'status'} eq '200' ? decode_json $response->{'content'} : undef );
 }
 
 sub _parse {
@@ -292,7 +296,7 @@ sub _raw_post {
 
     $self->log( sprintf "METHOD POST, URL %s, %s\n", $url, Dumper $params );
 
-    return $self->ua->post( $url, $params );
+    return $self->ua->post_form( $url, $params );
 }
 
 =head1 BUGS

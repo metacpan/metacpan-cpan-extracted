@@ -1,3 +1,8 @@
+0.6.0 2019-12-12
+
+    - Changing the syntax of 'LENGTH' comparison as per
+      Materials-Consortia/OPTiMaDe#221.
+
 0.5.0 2019-12-09
 
     - Renaming package from OPTiMaDe::FilterParser to OPTiMaDe::Filter.

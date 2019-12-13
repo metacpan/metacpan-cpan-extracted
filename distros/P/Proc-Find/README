@@ -1,39 +1,40 @@
-SYNOPSIS
+NAME
+    Proc::Find - Find processes by name, PID, or some other attributes
 
+VERSION
+    This document describes version 0.051 of Proc::Find (from Perl
+    distribution Proc-Find), released on 2019-11-23.
+
+SYNOPSIS
      use Proc::Find qw(find_proc proc_exists);
-    
+
      # list all of a user's processes
      my $procs = find_proc(user=>'ujang', detail=>1);
-    
+
      # check if a program is running
      die "Sorry, xscreensaver is not running"
          unless proc_exists(name=>'xscreensaver').
 
 DESCRIPTION
-
-    This module provides a simple routine, proc_exists(), to check a
+    This module provides a simple routine, "proc_exists()", to check a
     process' existence by name, something that is commonly done in shell
     scripts using:
 
      ps ax | grep name
      pgrep name
 
-    and also some routines, find_*(), to list processes matching some
+    and also some routines, "find_*()", to list processes matching some
     criteria.
 
 VARIABLES
-
- $Proc::Find::CACHE => bool (default: 0)
-
-    If set to true, will cache the call to Proc::ProcessTable's table() so
-    subsequent invocation to find_proc() or proc_exists doesn't have to
-    call the method again. But this also means that the process
+  $Proc::Find::CACHE => bool (default: 0)
+    If set to true, will cache the call to "Proc::ProcessTable"'s "table()"
+    so subsequent invocation to "find_proc()" or "proc_exists" doesn't have
+    to call the method again. But this also means that the process
     check/listing will be done on a past/stale process table.
 
 FUNCTIONS
-
- find_proc(%args) => \@pids (or \@procs)
-
+  find_proc(%args) => \@pids (or \@procs)
     Find process by name, PID, or some other attributes. Return an arrayref
     of PID's, or an empty arrayref if none match the criteria.
 
@@ -41,110 +42,134 @@ FUNCTIONS
 
     Arguments:
 
-      * pid => int
+    *   filter => code
 
-      Find by PID. Note that if you only want to check whether a PID
-      exists, there are cheaper methods (see "SEE ALSO").
+        Filter by a coderef. The coderef will receive the process record
+        (hashref).
 
-      * name => str|regex
+    *   pid => int|array[int]|regex
 
-      Match against process' "name". Name is taken from the first word of
-      the cmndline, with path stripped.
+        Find by PID. Note that if you only want to check whether a PID
+        exists, there are cheaper methods (see "SEE ALSO").
 
-      If value is regex, will do a regex match instead of exact string
-      comparison.
+    *   name => str|array[str]|regex
 
-      Example:
+        Match against process' "name". Name is taken from the first word of
+        the cmndline, with path stripped.
 
-       find_proc(name => "bash")
-       find_proc(name => qr/^(Thunar|dolphin|konqueror)$/)
+        If value is regex, will do a regex match instead of exact string
+        comparison.
 
-      * cmndline => str|regex
+        Example:
 
-      Match against full cmndline.
+         find_proc(name => "bash")
+         find_proc(name => qr/^(Thunar|dolphin|konqueror)$/)
 
-      If value is regex, will do a regex match instead of exact string
-      comparison.
+    *   cmndline => str|array[str]|regex
 
-      * exec => str
+        Match against full cmndline.
 
-      Match against program (executable/binary)'s path. If value does not
-      contain a path separator character, will be matched against program's
-      name.
+        If value is regex, will do a regex match instead of exact string
+        comparison.
 
-      Example:
+    *   exec => str|array[str]|regex
 
-       find_proc(exec => "perl")          # find any perl
-       find_proc(exec => "/usr/bin/perl") # find only a specific perl
+        Match against program (executable/binary)'s path. If value does not
+        contain a path separator character, will be matched against
+        program's name.
 
-      * user => int|str
+        Example:
 
-      List processes owned by specified user/UID.
+         find_proc(exec => "perl")          # find any perl
+         find_proc(exec => "/usr/bin/perl") # find only a specific perl
 
-      If given a username which does not exist, will simply not match.
+    *   user => int|str|array[int|str]|regex
 
-      * uid => int|str
+        List processes owned by specified user/UID.
 
-      Same as user.
+        If given a username which does not exist, will simply not match.
 
-      * euser => int|str
+    *   uid => int|str|array[int|str]|regex
 
-      List processes running as certain effective user/UID (will look
-      against euid).
+        Same as "user".
 
-      If given a username which does not exist, will simply not match.
+    *   euser => int|str|array[int|str]|regex
 
-      * euid => int|str
+        List processes running as certain effective user/UID (will look
+        against "euid").
 
-      Same as euser.
+        If given a username which does not exist, will simply not match.
 
-      * inverse => bool
+    *   euid => int|str|array[int|str]|regex
 
-      If set to true, then will return all processes not matching the
-      criteria.
+        Same as "euser".
 
-      * table => obj
+    *   inverse => bool
 
-      Supply result from Proc::ProcessTable object's table(). This can be
-      used to reuse the table() cached result instead of repeatedly call
-      table() on every invocation.
+        If set to true, then will return all processes *not* matching the
+        criteria.
 
-      See also $Proc::Find::CACHE.
+    *   table => obj
 
-      * detail => bool (default: 0)
+        Supply result from "Proc::ProcessTable" object's "table()". This can
+        be used to reuse the "table()" cached result instead of repeatedly
+        call "table()" on every invocation.
 
-      Instead of returning just the PID for each result, return a hash
-      (record) of process information instead. Currently this is just the
-      entry from Proc::ProcTable object's table() result.
+        See also $Proc::Find::CACHE.
 
- proc_exists(%args) => bool
+    *   detail => bool (default: 0)
 
+        Instead of returning just the PID for each result, return a hash
+        (record) of process information instead. Currently this is just the
+        entry from "Proc::ProcTable" object's "table()" result.
+
+  proc_exists(%args) => bool
     Shortcut for:
 
      @{ find_proc(%args) } > 0
 
- find_all_proc(\%args, \%args2, ...) => \@pids (or \@procs)
-
+  find_all_proc(\%args, \%args2, ...) => \@pids (or \@procs)
     Given multiple criteria, perform an AND search. Will only call
-    Proc::ProcessTable's table() method once.
+    "Proc::ProcessTable"'s "table()" method once.
 
      # find all processes matching mutiple criteria (although the same thing can
      # also be accomplished by find_proc() and combining the criteria)
      find_all_proc([{name=>'mplayer'}, {cmndline=>qr/mp3/}]);
 
- find_any_proc(\%args, \%args2, ...) => \@pids (or \@procs)
-
+  find_any_proc(\%args, \%args2, ...) => \@pids (or \@procs)
     Given multiple criteria, perform an OR search. Will only call
-    Proc::ProcessTable's table() method once.
+    "Proc::ProcessTable"'s "table()" method once.
 
      # find all processes belonging to either user
      find_any_proc([{user=>'ujang'}, {user=>'titin'}]);
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Proc-Find>.
 
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Proc-Find>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Proc-Find>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Proc::Exists can be used to check if one or more PIDs exist. If you are
-    only concerned with POSIX systems, you can just do kill 0, $pid to
+    only concerned with POSIX systems, you can just do "kill 0, $pid" to
     accomplish the same.
 
     pgrep Unix command.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

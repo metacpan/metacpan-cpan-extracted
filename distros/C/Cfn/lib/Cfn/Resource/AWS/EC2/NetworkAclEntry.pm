@@ -1,4 +1,4 @@
-# AWS::EC2::NetworkAclEntry generated from spec 5.3.0
+# AWS::EC2::NetworkAclEntry generated from spec 9.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EC2::NetworkAclEntry',
@@ -69,7 +69,7 @@ package Cfn::Resource::Properties::AWS::EC2::NetworkAclEntry {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has CidrBlock => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CidrBlock => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Egress => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Icmp => (isa => 'Cfn::Resource::Properties::AWS::EC2::NetworkAclEntry::Icmp', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Ipv6CidrBlock => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

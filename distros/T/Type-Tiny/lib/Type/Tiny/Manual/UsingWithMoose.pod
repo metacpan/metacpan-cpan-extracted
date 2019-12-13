@@ -4,104 +4,197 @@
 
 =head1 NAME
 
-Type::Tiny::Manual::UsingWithMoose - how to use Type::Tiny and Type::Library with Moose
+Type::Tiny::Manual::UsingWithMoose - how to use Type::Tiny with Moose
 
-=head1 SYNOPSIS
+=head1 MANUAL
 
-   {
-      package Person;
-      
-      use Moose;
-      use Types::Standard qw( Str Int );
-      
-      has name => (
-         is      => "ro",
-         isa     => Str,
-      );
-      
-      my $PositiveInt = Int
-         -> where( sub { $_ > 0 } )
-         -> plus_coercions( Int, sub { abs $_ } );
-      
-      has age => (
-         is      => "ro",
-         isa     => $PositiveInt,
-         coerce  => 1,
-         writer  => "_set_age",
-      );
-      
-      sub get_older {
-         my $self = shift;
-         my ($years) = @_;
-         $PositiveInt->assert_valid($years);
-         $self->_set_age($self->age + $years);
-      }
-   }
+First read L<Type::Tiny::Manual::Moo>, L<Type::Tiny::Manual::Moo2>, and
+L<Type::Tiny::Manual::Moo3>. Everything in those parts of the manual
+should work exactly the same in Moose.
 
-=head1 DESCRIPTION
+This part of the manual will focus on Moose-specifics.
 
-Type::Tiny is tested with L<Moose> 2.0007 and above.
+=head2 Why Use Type::Tiny At All?
 
-L<Type::Tiny> type constraints have an API almost identical to that of
-L<Moose::Meta::TypeConstraint>. It is also able to build a
-Moose::Meta::TypeConstraint constraint from a Type::Tiny constraint, and
-will do so automatically when needed. When Moose.pm is loaded, Type::Tiny
-will use Perl's C<AUTOLOAD> feature to proxy method calls through to the
-Moose::Meta::TypeConstraint object. In short, you can use a Type::Tiny
-object pretty much anywhere you'd use a Moose::Meta::TypeConstraint and
-you are unlikely to notice the difference.
+Moose does have a built-in type constraint system which is fairly
+convenient to use, but there are several reasons you should consider
+using Type::Tiny instead.
 
-=head2 Per-Attribute Coercions
+=over
 
-Type::Tiny offers convenience methods to alter the list of coercions
-associated with a type constraint. Let's imagine we wish to allow our
-C<name> attribute to be coerced from an arrayref of strings.
+=item *
 
-      has name => (
-         is      => "ro",
-         isa     => Str->plus_coercions(
-            ArrayRef[Str], sub { join " ", @{$_} },
-         ),
-         coerce  => 1,
-      );
+Type::Tiny type constraints will usually be faster than Moose built-ins.
+Even without Type::Tiny::XS installed, Type::Tiny usually produces more
+efficient inline code than Moose. Coercions will usually be a lot faster.
 
-This coercion will apply to the C<name> attribute only; other attributes
-using the C<Str> type constraint will be unaffected.
+=item *
 
-See the documentation for C<plus_coercions>, C<minus_coercions> and
-C<no_coercions> in L<Type::Tiny>.
+Type::Tiny provides helpful methods like C<where> and C<plus_coercions>
+that allow type constraints and coercions to be easily tweaked on a
+per-attribute basis.
 
-=head2 Optimization
+Something like this is much harder to do with plain Moose types:
 
-The usual advice for optimizing type constraints applies: use type constraints
-which can be inlined whenever possible.
+  has name => (
+    is      => "ro",
+    isa     => Str->plus_coercions(
+      ArrayRef[Str], sub { join " ", @$_ },
+    ),
+    coerce  => 1,
+  );
 
-Defining coercions as strings rather than coderefs won't give you as much of
-a boost with Moose as it does with Moo, because Moose doesn't inline coercion
-code. However, it should still improve performance somewhat because it allows
-L<Type::Coercion> to do some internal inlining.
+Moose tends to encourage defining coercions globally, so if you wanted
+one B<Str> attribute to be able to coerce from B<< ArrayRef[Str] >>, then
+I<all> B<Str> attributes would coerce from B<< ArrayRef[Str] >>, and they'd
+all do that coercion in the same way. (Even if it might make sense to
+join by a space in some places, a comma in others, and a line break in
+others!)
 
-See also L<Type::Tiny::Manual::Optimization>.
+=item *
 
-=head2 Interactions with MooseX-Types
+Type::Tiny provides automatic deep coercions, so if type B<Xyz> has a coercion,
+the following should "just work":
 
-Type::Tiny and MooseX::Types type constraints should "play nice". If, for
-example, C<ArrayRef> is taken from L<Types::Standard> (i.e. a Type::Tiny-based
-type library), and C<PositiveInt> is taken from L<MooseX::Types::Common::Numeric>,
-then the following should "just work":
+  isa xyzlist => ( is => 'ro', isa => ArrayRef[Xyz], coerce => 1 );
 
-   isa => ArrayRef[ PositiveInt ]
+=item *
 
-   isa => PositiveInt | ArrayRef
+Type::Tiny offers a wider selection of built-in types.
 
-=head1 SEE ALSO
+=item *
 
-For examples using Type::Tiny with L<Moose> see the SYNOPSIS sections of
-L<Type::Tiny> and L<Type::Library>, and the
-L<Moose integration tests|https://github.com/tobyink/p5-type-tiny/tree/master/t/30-integration/Moose>,
-and
-L<MooseX-Types integration tests|https://github.com/tobyink/p5-type-tiny/tree/master/t/30-integration/MooseX-Types>
-in the test suite.
+By using Type::Tiny, you can use the same type constraints and coercions
+for attributes and method parameters, in Moose and non-Moose code.
+
+=back
+
+=head2 Type::Utils
+
+If you've used L<Moose::Util::TypeConstraints>, you may be accustomed to
+using a DSL for declaring type constraints:
+
+  use Moose::Util::TypeConstraints;
+  
+  subtype 'Natural',
+    as 'Int',
+    where { $_ > 0 };
+
+There's a module called L<Type::Utils> that provides a very similar DSL for
+declaring types in Type::Library-based type libraries.
+
+  package My::Types {
+    use Type::Library -base;
+    use Type::Utils;
+    use Types::Standard qw( Int );
+    
+    declare 'Natural',
+      as Int,
+      where { $_ > 0 };
+  }
+
+Personally I prefer the more object-oriented way to declare types though.
+
+In Moose you might also declare types like this within classes and roles too.
+Unlike Moose, Type::Tiny doesn't keep types in a single global flat namespace,
+so this doesn't work quite the same with Type::Utils. It still creates the
+type, but it doesn't store it in any type library; the type is returned.
+
+  package My::Class {
+    use Moose;
+    use Type::Utils;
+    use Types::Standard qw( Int );
+    
+    my $Natural =          # store type in a variable
+      declare 'Natural',
+      as Int,
+      where { $_ > 0 };
+    
+    has number => ( is => 'ro', isa => $Natural );
+  }
+
+But really, isn't the object-oriented way cleaner?
+
+  package My::Class {
+    use Moose;
+    use Types::Standard qw( Int );
+    
+    has number => (
+      is   => 'ro',
+      isa  => Int->where('$_ > 0'),
+    );
+  }
+
+=head2 Type::Tiny and MooseX::Types
+
+L<Types::Standard> should be a drop-in replacement for L<MooseX::Types>.
+And L<Types::Common::Numeric> and L<Types::Common::String> should easily
+replace L<MooseX::Types::Common::Numeric> and L<MooseX::Types::Common::String>.
+
+That said, if you do with to use a mixture of Type::Tiny and MooseX::Types,
+they should fit together pretty seamlessly.
+
+  use Types::Standard qw( ArrayRef );
+  use MooseX::Types::Common::Numeric qw( PositiveInt );
+  
+  # this should just work
+  my $list_of_nums = ArrayRef[PositiveInt];
+  
+  # and this
+  my $list_or_num = ArrayRef | PositiveInt;
+
+=head2 C<< -moose >> Import Parameter
+
+If you have read this far in the manual, you will know that this is the
+usual way to import type constraints:
+
+  use Types::Standard qw( Int );
+
+And the C<Int> which is imported is a function that takes no arguments and
+returns the B<Int> type constraint, which is a blessed object in the
+L<Type::Tiny> class.
+
+Type::Tiny mocks the L<Moose::Meta::TypeConstraint> API so well that most
+Moose and MooseX code will not be able to tell the difference.
+
+But what if you need a real Moose::Meta::TypeConstraint object?
+
+  use Types::Standard -moose, qw( Int );
+
+Now the C<Int> function imported will return a genuine native Moose type
+constraint.
+
+This flag is mostly a throwback from when Type::Tiny native objects
+I<< didn't >> directly work in Moose. In 99.9% of cases, there is no
+reason to use it and plenty of reasons not to. (Moose native type
+constraints don't offer helpful methods like C<plus_coercions> and
+C<where>.)
+
+=head2 C<< moose_type >> Method
+
+Another quick way to get a native Moose type constraint object from a
+Type::Tiny object is to call the C<moose_type> method:
+
+  use Types::Standard qw( Int );
+  
+  my $tiny_type   = Int;
+  my $moose_type  = $tiny_type->moose_type;
+
+Internally, this is what the C<< -moose >> flag makes imported functions
+do.
+
+=head1 NEXT STEPS
+
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::UsingWithMouse>
+
+How to use Type::Tiny with Mouse, including the advantages of Type::Tiny
+over built-in type constraints, and Mouse-specific features.
+
+=back
 
 =head1 AUTHOR
 
@@ -121,3 +214,4 @@ WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
+

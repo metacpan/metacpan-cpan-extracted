@@ -4,13 +4,13 @@
       "David E. Wheeler <david@justatheory.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4212",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-Markup",
    "prereqs" : {
@@ -52,55 +52,55 @@
    "provides" : {
       "Text::Markup" : {
          "file" : "lib/Text/Markup.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::Asciidoc" : {
          "file" : "lib/Text/Markup/Asciidoc.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::Bbcode" : {
          "file" : "lib/Text/Markup/Bbcode.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::Creole" : {
          "file" : "lib/Text/Markup/Creole.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::HTML" : {
          "file" : "lib/Text/Markup/HTML.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::Markdown" : {
          "file" : "lib/Text/Markup/Markdown.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::Mediawiki" : {
          "file" : "lib/Text/Markup/Mediawiki.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::Multimarkdown" : {
          "file" : "lib/Text/Markup/Multimarkdown.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::None" : {
          "file" : "lib/Text/Markup/None.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::Pod" : {
          "file" : "lib/Text/Markup/Pod.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::Rest" : {
          "file" : "lib/Text/Markup/Rest.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::Textile" : {
          "file" : "lib/Text/Markup/Textile.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Text::Markup::Trac" : {
          "file" : "lib/Text/Markup/Trac.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       }
    },
    "release_status" : "stable",
@@ -116,5 +116,6 @@
          "url" : "http://github.com/theory/text-markup"
       }
    },
-   "version" : "0.23"
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

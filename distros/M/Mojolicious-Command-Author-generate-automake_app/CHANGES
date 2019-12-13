@@ -1,3 +1,11 @@
+0.2.1 2019-12-12 13:35:16 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - do not include mini cpan anymore
+
+0.2.0 2019-12-11 15:18:32 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - switch to carton for building dependencies
+
 0.1.5 2019-11-07 12:07:01 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - add UTF-8 charset to messages.pot

@@ -53,7 +53,7 @@ this one, is what you’ll use to send and receive messages.
 sub initialize {
     my ($self) = @_;
 
-    return $self->{'_initialize_promise'} ||= Promise::ES6->new( sub {
+    return $self->{'_initialize_promise'} ||= $self->{'db'}->_get_promise_class()->new( sub {
         $self->_initialize(@_);
     } )->then( sub {
         my $post_send_cr = $self->_set_watches_and_create_messenger();

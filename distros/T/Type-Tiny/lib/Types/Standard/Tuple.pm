@@ -6,8 +6,10 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Tuple::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Tuple::VERSION   = '1.006000';
+	$Types::Standard::Tuple::VERSION   = '1.008000';
 }
+
+$Types::Standard::Tuple::VERSION =~ tr/_//d;
 
 use Type::Tiny ();
 use Types::Standard ();
@@ -104,10 +106,11 @@ sub __inline_generator
 	{
 		$slurpy = pop(@constraints)->{slurpy};
 	}
-
+	
 	return if grep { not $_->can_be_inlined } @constraints;
 	return if defined $slurpy && !$slurpy->can_be_inlined;
-
+	
+	my $xsubname;
 	if (Type::Tiny::_USE_XS and !$slurpy)
 	{
 		my @known = map {
@@ -119,10 +122,9 @@ sub __inline_generator
 		
 		if (@known == @constraints)
 		{
-			my $xsub = Type::Tiny::XS::get_subname_for(
+			$xsubname = Type::Tiny::XS::get_subname_for(
 				sprintf "Tuple[%s]", join(',', @known)
 			);
-			return sub { my $var = $_[1]; "$xsub\($var\)" } if $xsub;
 		}
 	}
 	
@@ -131,7 +133,7 @@ sub __inline_generator
 	if (defined $slurpy)
 	{
 		$tmpl = 'do { my ($orig, $from, $to) = (%s, %d, $#{%s});'
-			.    '($to-$from % 2) and do { my $tmp = +{@{$orig}[$from..$to]}; %s }'
+			.    '($to-$from %% 2) and do { my $tmp = +{@{$orig}[$from..$to]}; %s }'
 			.    '}'
 			if $slurpy->is_a_type_of(Types::Standard::HashRef);
 		$slurpy_any = 1
@@ -144,16 +146,17 @@ sub __inline_generator
 	return sub
 	{
 		my $v = $_[1];
+		return "$xsubname\($v\)" if $xsubname && !$Type::Tiny::AvoidCallbacks;
 		join " and ",
 			Types::Standard::ArrayRef->inline_check($v),
 			(
 				(scalar @constraints == $min and not $slurpy)
 					? "\@{$v} == $min"
-					: (
-						"\@{$v} >= $min",
+					: sprintf(
+						"(\@{$v} == $min or (\@{$v} > $min and \@{$v} <= ${\(1+$#constraints)}) or (\@{$v} > ${\(1+$#constraints)} and %s))",
 						(
 							$slurpy_any
-								? ()
+								? '!!1'
 								: (
 									$slurpy
 										? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
@@ -249,6 +252,8 @@ sub __coercion_generator
 	return unless $child_coercions_exist;
 	my $C = "Type::Coercion"->new(type_constraint => $child);
 
+	my $slurpy_is_hashref = $slurpy && $slurpy->is_a_type_of(Types::Standard::HashRef);
+
 	if ($all_inlinable)
 	{
 		$C->add_type_coercions($parent => Types::Standard::Stringable {
@@ -278,13 +283,19 @@ sub __coercion_generator
 			{
 				my $size = @tuple;
 				push @code, sprintf('if (@$orig > %d) {', $size);
-				push @code, sprintf('my $tail = [ @{$orig}[%d .. $#$orig] ];', $size);
+				push @code, sprintf(
+					($slurpy_is_hashref
+						? 'my $tail = do { no warnings; +{ @{$orig}[%d .. $#$orig]} };'
+						: 'my $tail = [ @{$orig}[%d .. $#$orig] ];'),
+					$size,
+				);
 				push @code, $slurpy->has_coercion
 					? sprintf('$tail = %s;', $slurpy->coercion->inline_coercion('$tail'))
 					: q();
 				push @code, sprintf(
-					'(%s) ? push(@new, @$tail) : ($return_orig++);',
+					'(%s) ? push(@new, %s$tail) : ($return_orig++);',
 					$slurpy->inline_check('$tail'),
+					($slurpy_is_hashref ? '%' : '@'),
 				);
 				push @code, '}';
 			}
@@ -323,10 +334,12 @@ sub __coercion_generator
 				
 				if ($slurpy and @$value > @tuple)
 				{
-					my $tmp = $slurpy->has_coercion
-						? $slurpy->coerce([ @{$value}[@tuple .. $#$value] ])
+					no warnings;
+					my $tmp = $slurpy_is_hashref
+						? { @{$value}[@tuple .. $#$value] }
 						: [ @{$value}[@tuple .. $#$value] ];
-					$slurpy->check($tmp) ? push(@new, @$tmp) : return($value);
+					$tmp = $slurpy->coerce($tmp) if  $slurpy->has_coercion;
+					$slurpy->check($tmp) ? push(@new, $slurpy_is_hashref ? %$tmp : @$tmp) : return($value);
 				}
 				
 				return \@new;

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215427;
+our $VERSION = 1.20191211212302;
 
 my $formatters = [
                 {
@@ -1024,7 +1024,7 @@ $areanames{en}->{52861} = "Nueva\ Rosita\/Sabinas\,\ COAH";
 $areanames{en}->{52862} = "Coahuila";
 $areanames{en}->{52864} = "Coahuila";
 $areanames{en}->{52866} = "Castanos\/Monclova\,\ COAH";
-$areanames{en}->{52867} = "Nuevo\ Leon\/Tamaulipas";
+$areanames{en}->{52867} = "Nuevo\ Laredo\/Tamaulipas";
 $areanames{en}->{52868} = "Tamaulipas";
 $areanames{en}->{52869} = "Cuatro\ Cienegas\/San\ Buenaventura\,\ COAH";
 $areanames{en}->{52871} = "Coahuila";

@@ -46,8 +46,8 @@ $self->parse_template();
 
 my $sheet = $twbk->get_worksheet_by_name('Sheet1');
 
-is( $sheet->{_row_sizes}{0},        20, 'Row Height' );
-is( int( $sheet->{_col_sizes}{3} ), 25, 'Column Width' );
+is( int( $sheet->{_row_sizes}{0}[0] ), 20, 'Row Height' );
+is( int( $sheet->{_col_sizes}{3}[0] ), 25, 'Column Width' );
 
 # Test that expected workbook was parsed correctly as a template
 for (qw[A1 A2]) {

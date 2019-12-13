@@ -2,8 +2,8 @@ NAME
     Sort::Sub - Collection of sort subroutines
 
 VERSION
-    This document describes version 0.110 of Sort::Sub (from Perl
-    distribution Sort-Sub), released on 2018-01-15.
+    This document describes version 0.111 of Sort::Sub (from Perl
+    distribution Sort-Sub), released on 2019-10-26.
 
 SYNOPSIS
      use Sort::Sub qw($naturally);
@@ -37,7 +37,12 @@ SYNOPSIS
      my @sorted = sort $naturally ('track2.mp3', 'Track1.mp3', 'Track10.mp3');
      => ('Track10.mp3', 'track2.mp3', 'Track1.mp3')
 
-    Use with
+    Pass arguments to sort generator routine:
+
+     use Sort::Sub '$by_num_of_colons', {pattern=>':'};
+
+     my @sorted = sort $by_num_of_colons ('a::','b:','c::::','d:::');
+     => ('b:','a::','d:::','c::::')
 
 DESCRIPTION
     Sort::Sub and "Sort::Sub::*" are a convenient packaging of any kind of
@@ -74,11 +79,12 @@ GUIDELINES FOR WRITING A SORT::SUB::* MODULE
     The module must contain a "gen_sorter" subroutine. It will be called
     with:
 
-     ($is_reverse, $is_ci)
+     ($is_reverse, $is_ci, $args)
 
     Where $is_reserve will be set to true if user requests a reverse sort,
-    and $is_ci will be set to true if user requests a case-insensitive sort.
-    The subroutine should return a code reference.
+    $is_ci will be set to true if user requests a case-insensitive sort.
+    $args is hashref to pass additional arguments to the "gen_sorter()"
+    routine. The subroutine should return a code reference.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -98,7 +104,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

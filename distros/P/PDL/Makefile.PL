@@ -404,7 +404,7 @@ my @prereq = (
 	   'File::Temp'          => 0,
 	   'Filter::Util::Call'  => 0,         # for PDL::NiceSlice
 	   'Filter::Simple'      => 0.88,      # for new PDL::NiceSlice
-	   'Inline'              => 0.68,
+	   'Inline'              => 0.83,      # fixed ILSM-finding
 	   'Inline::C'           => 0.62,
            'List::MoreUtils'     => 0,         # for PDL::IO::GD
 	   'Module::Compile'     => 0.23,      # for new PDL::NiceSlice
@@ -439,6 +439,8 @@ if($Config{archname}=~m/x86_64/) {
 # create GENERATED subdir with *.pm files during 'make dist' (to make metacpan.org happy)
 my $preop = '$(PERL) -I$(INST_ARCHLIB) -I$(INST_LIB) -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)';
 
+my @optimize = (OPTIMIZE => $PDL::Config{OPTIMIZE}) if $PDL::Config{OPTIMIZE};
+
 my %makefile_hash = (
 	      'PREREQ_PM' => { @prereq },
               'LICENSE' => 'perl',
@@ -469,7 +471,7 @@ my %makefile_hash = (
                  "meta-spec" => { version => 2 },
                  resources => {
                     homepage => 'http://pdl.perl.org/',
-                    bugtracker  => 'https://github.com/PDLPorters/pdl/issues',
+                    bugtracker  => {web=>'https://github.com/PDLPorters/pdl/issues'},
                     repository  => {
                        url => 'git://github.com/PDLPorters/pdl.git',
                        type => 'git',
@@ -483,7 +485,7 @@ my %makefile_hash = (
                               'perldl' => '$(INST_MAN1DIR)/perldl.$(MAN1EXT)',
                               'pdldoc' => '$(INST_MAN1DIR)/pdldoc.$(MAN1EXT)' },
 	      'MAN3PODS' => {}, # don't pick up the script pods again
-	      'OPTIMIZE'  => $PDL::Config{OPTIMIZE} || $Config{optimize},
+	      @optimize,
 	      'CCFLAGS' => $ccflags,
 	      'dist'     => { COMPRESS => 'gzip',
                               SUFFIX   => 'gz',
@@ -492,7 +494,7 @@ my %makefile_hash = (
 		'FILES' => join ' ', @cleanup, qw(
                   tbyte.tif tmp0 tmp0.hdr tushort.tif
                   MANIFEST.bak tmp1* tmpraw* t/tmpraw* t/tmp1*
-                  _Inline/ .inlinepdlpp/ .inlinewith/ *.xfig
+                  _Inline/ .inlinepdlpp/ .inline-ct/ .inlinewith/ *.xfig
                 ),
               },
 	      'realclean' => {'FILES' => 'Basic/Core/Config.pm'},
@@ -586,7 +588,7 @@ EOPS
 # support the `$<` variable in explicit rules
 $text .= <<EOT if $^O !~ /MSWin/;
 pdl$Config::Config{exe_ext} : pdl.c
-	\$(CC) \$(CFLAGS) \$(CPPFLAGS) pdl.c -o \$\@
+	\$(CC) \$(CFLAGS) \$(LDFLAGS) \$(CPPFLAGS) pdl.c -o \$\@
 EOT
 
 $text .= << 'EOT' if $^O =~ /MSWin/;

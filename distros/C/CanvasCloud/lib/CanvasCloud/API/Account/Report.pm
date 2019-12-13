@@ -1,5 +1,5 @@
 package CanvasCloud::API::Account::Report;
-$CanvasCloud::API::Account::Report::VERSION = '0.006';
+$CanvasCloud::API::Account::Report::VERSION = '0.007';
 # ABSTRACT: extends L<CanvasCloud::API::Account>
 
 use Moose;
@@ -43,16 +43,28 @@ sub get {
 
     my $result = $self->run( $report, $args );
     
-    while ( $result->{status} eq 'running' ) {
+    while ( $result->{status} =~ m/(running|created|compiling)/ ) {
         sleep 10; 
         $result = $self->check( $report, $result->{id} );
+        #warn $result->{status};
     }
 
     if ( exists $result->{attachment} && exists $result->{attachment}{url} ) {
-        my $resp = $self->ua->get( $result->{attachment}{url} ); ## Download report without using class specific headers
+        my $resp;
+        my $attempts = 3;
+        while ( $attempts > 0 ) {
+           $resp = $self->ua->get( $result->{attachment}{url} ); ## Download report without using class specific headers
+           if ( $resp->is_success ) {
+               $attempts = 0;
+           } else {
+               sleep 20; ## sleep 20 seconds and try again
+               $attempts--;
+           }
+        }
         die $resp->status_line unless ( $resp->is_success );
         return $resp->decoded_content( charset => 'none' );
     }
+    warn sprintf('Report->get ASSERT: id(%s) returned last status (%s)', $result->{id}, $result->{status} );
     return undef; ## never should but nothing would be retured
 }
 
@@ -72,7 +84,7 @@ CanvasCloud::API::Account::Report - extends L<CanvasCloud::API::Account>
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 ATTRIBUTES
 
@@ -108,7 +120,7 @@ Ted Katseres
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ted Katseres.
+This software is copyright (c) 2019 by Ted Katseres.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

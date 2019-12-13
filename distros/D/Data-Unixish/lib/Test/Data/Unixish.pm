@@ -2,8 +2,8 @@
 
 package Test::Data::Unixish;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '1.570'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '1.572'; # VERSION
 
 use 5.010001;
 use strict;
@@ -87,7 +87,7 @@ sub test_dux_func {
                                 if ($t->{test_out}) {
                                     $t->{test_out}->($rout);
                                 } else {
-                                    is_deeply($rout, $out, "out")
+                                    is_deeply($rout, $out, "out (itemfunc)")
                                         or diag explain $rout;
                                 }
                             }
@@ -158,7 +158,7 @@ Test::Data::Unixish - Routines to test Data::Unixish
 
 =head1 VERSION
 
-This document describes version 1.570 of Test::Data::Unixish (from Perl distribution Data-Unixish), released on 2019-01-06.
+This document describes version 1.572 of Test::Data::Unixish (from Perl distribution Data-Unixish), released on 2019-10-26.
 
 =for Pod::Coverage .+
 

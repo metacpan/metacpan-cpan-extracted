@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215422;
+our $VERSION = 1.20191211212258;
 
 my $formatters = [
                 {
@@ -68,15 +68,46 @@ my $validators = {
         ',
                 'voip' => ''
               };
+my %areanames = ();
+$areanames{en}->{9712} = "Abu\ dhabi";
+$areanames{en}->{9713} = "Al\ Ain";
+$areanames{en}->{97142} = "Dubai";
+$areanames{en}->{97143} = "Dubai";
+$areanames{en}->{97144} = "Dubai";
+$areanames{en}->{97145} = "Dubai";
+$areanames{en}->{97146} = "Dubai";
+$areanames{en}->{97147} = "Dubai";
+$areanames{en}->{97148} = "Dubai";
+$areanames{en}->{97162} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
+$areanames{en}->{97163} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
+$areanames{en}->{97164} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
+$areanames{en}->{97165} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
+$areanames{en}->{97166} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
+$areanames{en}->{97167} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
+$areanames{en}->{97168} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
+$areanames{en}->{97172} = "Ras\ Alkhaimah";
+$areanames{en}->{97173} = "Ras\ Alkhaimah";
+$areanames{en}->{97174} = "Ras\ Alkhaimah";
+$areanames{en}->{97175} = "Ras\ Alkhaimah";
+$areanames{en}->{97176} = "Ras\ Alkhaimah";
+$areanames{en}->{97177} = "Ras\ Alkhaimah";
+$areanames{en}->{97178} = "Ras\ Alkhaimah";
+$areanames{en}->{97192} = "Fujairah";
+$areanames{en}->{97193} = "Fujairah";
+$areanames{en}->{97194} = "Fujairah";
+$areanames{en}->{97195} = "Fujairah";
+$areanames{en}->{97196} = "Fujairah";
+$areanames{en}->{97197} = "Fujairah";
+$areanames{en}->{97198} = "Fujairah";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+971|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

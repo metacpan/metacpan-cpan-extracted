@@ -9,6 +9,7 @@ README
 dist.ini
 lib/Sort/Sub.pm
 lib/Sort/Sub/by_ascii_then_num.pm
+lib/Sort/Sub/by_count.pm
 lib/Sort/Sub/by_first_num_in_text.pm
 lib/Sort/Sub/by_last_num_in_text.pm
 lib/Sort/Sub/by_num_in_text.pm
@@ -22,6 +23,7 @@ t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/by_ascii_then_num.t
+t/by_count.t
 t/by_first_num_in_text.t
 t/by_last_num_in_text.t
 t/by_num_in_text.t

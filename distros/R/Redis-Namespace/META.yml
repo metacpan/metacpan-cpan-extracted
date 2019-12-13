@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ no_index:
 provides:
   Redis::Namespace:
     file: lib/Redis/Namespace.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   Redis: '0'
   perl: '5.010001'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/shogo82148/Redis-Namespace/issues
   homepage: https://github.com/shogo82148/Redis-Namespace
   repository: git://github.com/shogo82148/Redis-Namespace.git
-version: '0.12'
+version: '0.13'
 x_contributors:
   - 'Dan Book <grinnz@gmail.com>'
   - 'Mihyaeru <mihyaeru21@gmail.com>'

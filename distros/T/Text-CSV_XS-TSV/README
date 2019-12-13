@@ -2,11 +2,15 @@ NAME
     Text::CSV_XS::TSV - Set Text::CSV_XS default options to parse TSV
 
 VERSION
-    This document describes version 0.001 of Text::CSV_XS::TSV (from Perl
-    distribution Text-CSV_XS-TSV), released on 2019-05-12.
+    This document describes version 0.003 of Text::CSV_XS::TSV (from Perl
+    distribution Text-CSV_XS-TSV), released on 2019-12-12.
 
 SYNOPSIS
-     use Text::CSV_XS::XS;
+    Use like you would use Text::CSV_XS with the object interface:
+
+     use Text::CSV_XS::TSV;
+     my $csv = Text::CSV_XS::TSV->new({binary=>1});
+     # ...
 
 DESCRIPTION
     This class is a simple subclass of Text::CSV_XS to set the default of

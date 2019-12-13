@@ -2,8 +2,9 @@ package Text::Markup::HTML;
 
 use 5.8.1;
 use strict;
+use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
@@ -52,7 +53,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2014 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2019 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

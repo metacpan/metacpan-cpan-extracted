@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.30'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,43 +18,43 @@ name: Text-Markup
 provides:
   Text::Markup:
     file: lib/Text/Markup.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::Asciidoc:
     file: lib/Text/Markup/Asciidoc.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::Bbcode:
     file: lib/Text/Markup/Bbcode.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::Creole:
     file: lib/Text/Markup/Creole.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::HTML:
     file: lib/Text/Markup/HTML.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::Markdown:
     file: lib/Text/Markup/Markdown.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::Mediawiki:
     file: lib/Text/Markup/Mediawiki.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::Multimarkdown:
     file: lib/Text/Markup/Multimarkdown.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::None:
     file: lib/Text/Markup/None.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::Pod:
     file: lib/Text/Markup/Pod.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::Rest:
     file: lib/Text/Markup/Rest.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::Textile:
     file: lib/Text/Markup/Textile.pm
-    version: '0.23'
+    version: '0.24'
   Text::Markup::Trac:
     file: lib/Text/Markup/Trac.pm
-    version: '0.23'
+    version: '0.24'
 recommends:
   Test::Pod: '1.41'
   Test::Pod::Coverage: '1.06'
@@ -78,4 +78,5 @@ resources:
   homepage: http://search.cpan.org/dist/Text-Markup/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/theory/text-markup
-version: '0.23'
+version: '0.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

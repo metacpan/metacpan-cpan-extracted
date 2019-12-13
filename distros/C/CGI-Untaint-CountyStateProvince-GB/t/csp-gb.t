@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use diagnostics;
 use Test::NoWarnings;
+use Test::More tests => 16;
 
-use Test::More tests => 12;
 BEGIN {
 	use_ok('CGI::Untaint');
 	use_ok('CGI::Untaint::CountyStateProvince::GB');
@@ -21,6 +21,10 @@ my $vars = {
     state7 => '*&^',
     state8 => 'durham',
     state9 => 'cleveland',
+    state10 => 'Lancashire/Manchester',
+    state11 => 'South Gloucesterhire',
+    state12 => 'Berkshire',
+    state13 => 'West Berkshire',
 };
 
 my $untainter = CGI::Untaint->new($vars);
@@ -50,3 +54,15 @@ ok($c eq 'county durham', 'Durham');
 
 $c = $untainter->extract(-as_CountyStateProvince => 'state9');
 ok($c eq 'teesside', 'Cleveland');
+
+$c = $untainter->extract(-as_CountyStateProvince => 'state10');
+ok(!defined($c), 'Lancashire/Manchester');
+
+$c = $untainter->extract(-as_CountyStateProvince => 'state11');
+ok(!defined($c), 'South Gloucesterhire');
+
+$c = $untainter->extract(-as_CountyStateProvince => 'state12');
+ok($c eq 'berkshire', 'Berkshire');
+
+$c = $untainter->extract(-as_CountyStateProvince => 'state13');
+ok(!defined($c), 'West Berkshire');

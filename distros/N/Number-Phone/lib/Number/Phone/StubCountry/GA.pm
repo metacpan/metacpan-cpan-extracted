@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215426;
+our $VERSION = 1.20191211212301;
 
 my $formatters = [
                 {
@@ -33,18 +33,29 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '
+            11|
+            [67]
+          ',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
+                },
+                {
+                  'format' => '$1 $2 $3 $4',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '01\\d{6}',
-                'geographic' => '01\\d{6}',
+                'fixed_line' => '[01]1\\d{6}',
+                'geographic' => '[01]1\\d{6}',
                 'mobile' => '
           (?:
             0[2-7]|
-            [2-7]
-          )\\d{6}
+            6[256]|
+            7[47]
+          )\\d{6}|
+          [2-7]\\d{6}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -83,12 +94,53 @@ $areanames{en}->{2410192} = "Mékambo";
 $areanames{en}->{2410193} = "Booué";
 $areanames{en}->{2410196} = "Bitam";
 $areanames{en}->{2410198} = "Oyem";
+$areanames{en}->{2411140} = "Kango";
+$areanames{en}->{24111420} = "Ntoum";
+$areanames{en}->{24111424} = "Cocobeach";
+$areanames{en}->{2411144} = "Libreville";
+$areanames{en}->{2411145} = "Libreville";
+$areanames{en}->{2411146} = "Libreville";
+$areanames{en}->{2411147} = "Libreville";
+$areanames{en}->{2411148} = "Libreville";
+$areanames{en}->{2411150} = "Gamba";
+$areanames{en}->{2411154} = "Omboué";
+$areanames{en}->{2411155} = "Port\-Gentil";
+$areanames{en}->{2411156} = "Port\-Gentil";
+$areanames{en}->{2411158} = "Lambaréné";
+$areanames{en}->{2411159} = "Ndjolé";
+$areanames{en}->{2411160} = "Ngouoni";
+$areanames{en}->{2411162} = "Mounana";
+$areanames{en}->{2411164} = "Lastoursville";
+$areanames{en}->{2411165} = "Koulamoutou";
+$areanames{en}->{2411166} = "Moanda";
+$areanames{en}->{2411167} = "Franceville";
+$areanames{en}->{2411169} = "Léconi\/Akiéni\/Okondja";
+$areanames{en}->{241117} = "Libreville";
+$areanames{en}->{2411182} = "Tchibanga";
+$areanames{en}->{2411183} = "Mayumba";
+$areanames{en}->{2411186} = "Mouila";
+$areanames{en}->{2411190} = "Makokou";
+$areanames{en}->{2411192} = "Mékambo";
+$areanames{en}->{2411193} = "Booué";
+$areanames{en}->{2411196} = "Bitam";
+$areanames{en}->{2411198} = "Oyem";
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+241|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-        return $self->is_valid() ? $self : undef;
+      return $self if ($self->is_valid());
+      my $prefix = qr/^(?:0(11\d{6}|6[256]\d{6}|7[47]\d{6}))/;
+      my @matches = $number =~ /$prefix/;
+      if (defined $matches[-1]) {
+        no warnings 'uninitialized';
+        $number =~ s/$prefix/$1/;
+      }
+      else {
+        $number =~ s/$prefix//;
+      }
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      return $self->is_valid() ? $self : undef;
     }
 1;

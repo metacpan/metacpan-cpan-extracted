@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2019 by Dominique Dumont <ddumont@cpan.org>.
+# This software is Copyright (c) 2008-2019 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,7 +9,7 @@
 #
 # copyright at the end of the file in the pod section
 
-package Config::Model::TkUI 1.370;
+package Config::Model::TkUI 1.371;
 
 use 5.10.1;
 use strict;
@@ -1563,6 +1563,8 @@ sub find_item {
     }
 }
 1;
+
+# ABSTRACT: a GUI to edit configuration data with Config::Model framework
 
 __END__
 

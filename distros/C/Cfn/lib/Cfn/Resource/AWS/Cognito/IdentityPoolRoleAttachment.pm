@@ -1,4 +1,4 @@
-# AWS::Cognito::IdentityPoolRoleAttachment generated from spec 2.25.0
+# AWS::Cognito::IdentityPoolRoleAttachment generated from spec 7.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cognito::IdentityPoolRoleAttachment',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Cognito::IdentityPoolRoleAttachment {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-southeast-2','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
   }
 }
 
@@ -106,6 +106,7 @@ package Cfn::Resource::Properties::AWS::Cognito::IdentityPoolRoleAttachment::Rol
   extends 'Cfn::Value::TypedValue';
   
   has AmbiguousRoleResolution => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IdentityProvider => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RulesConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Cognito::IdentityPoolRoleAttachment::RulesConfigurationType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }

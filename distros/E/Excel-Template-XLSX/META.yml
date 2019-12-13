@@ -8,6 +8,7 @@ build_requires:
   Test::Differences: '0'
   Test::More: '0'
 configure_requires:
+  CPAN::Uploader: '0.1'
   Module::Build: '0.4'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
@@ -19,15 +20,15 @@ name: Excel-Template-XLSX
 provides:
   Excel::Template::XLSX:
     file: lib/Excel/Template/XLSX.pm
-    version: v1.0.9
+    version: v1.1.1
 requires:
   Archive::Zip: '0'
-  Excel::Writer::XLSX: '0.9'
+  Excel::Writer::XLSX: '1.01'
   Graphics::ColorUtils: '0'
   Scalar::Util: '0'
   XML::Twig: '0'
   perl: v5.12.0
 resources:
   license: http://dev.perl.org/licenses/
-version: v1.0.9
+version: v1.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

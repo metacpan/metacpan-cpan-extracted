@@ -4,7 +4,7 @@ App::git::ship - Git command for shipping your project
 
 # VERSION
 
-0.33
+0.34
 
 # SYNOPSIS
 
@@ -237,6 +237,6 @@ Jan Henning Thorsen - `jhthorsen@cpan.org`
 
 mohawk2 - `mohawk2@users.noreply.github.com`
 
-Rolf Stöckli - `tekki@cpan.org`.
+Rolf Stöckli - `tekki@cpan.org`
 
 Shoichi Kaji - `skaji@cpan.org`

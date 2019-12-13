@@ -5,7 +5,7 @@ use warnings;
 use base 'Excel::Writer::XLSX';
 use Excel::Writer::XLSX::Utility;
 
-use version; our $VERSION = version->declare("v1.0.9");
+use version; our $VERSION = version->declare("v1.1.1");
 
 use Archive::Zip;
 use Graphics::ColorUtils 'rgb2hls', 'hls2rgb';
@@ -560,7 +560,8 @@ sub _parse_borders {
 
 =head2 _parse_borders
 
-Parses cell borders and diagonal borders.
+Parses cell border and diagonal border styles.  Called from _parse_styles.
+Returns an array of border styles, each one as a hash.
 
 =cut
 
@@ -614,6 +615,10 @@ Parses cell borders and diagonal borders.
       $diag{'diag_color'} = $self->_color($dcolor) if $dcolor;
 
       my $border_ref = { %colors, %types, %diag };
+#      use Mojo::Util qw(dumper);
+# warn dumper ($border_ref);
+#    $border_ref;
+
    } $styles->find_nodes('//borders/border');
    return $borders;
 }
@@ -1072,22 +1077,24 @@ font, and number formats.
          my ( $twig, $row_elt ) = @_;
          my $sheet_idx = $sheet->{_index};
          for my $cell ( $row_elt->children('c') ) {
+         
             my $string_index = 0;
             my $a1           = $cell->att('r');           # Cell Address
             my $t            = $cell->att('t') || 'n';    # Cell Type
-            my $s            = $cell->att('s');           # Cell String Index
+            my $s            = $cell->att('s');           # Cell Format Index
             my $val_xml
                 = $t eq 'inlineStr'
                 ? $cell->first_child('is')->first_child('t')
                 : $cell->first_child('v');
             my $val = $val_xml ? $val_xml->text() : undef;
 
+
             my $format_idx = $s // 0;
             my $format = $self->{FORMATS}[$format_idx];
 
             # Formatted cell, no contents
             if ( !defined($val) ) {
-               $sheet->write_blank($a1, $val, $format);
+               $sheet->write_blank($a1, $format);
                next;
             }
 
@@ -1098,9 +1105,9 @@ font, and number formats.
                my $is_array = ref($val) eq 'ARRAY';
                my @aval = $is_array ? @$val : ($val);
                if ( my $ref = $self->{MERGED_RANGES}{$sheet_idx}{$a1} ) {
-                   my $type = $is_array ? 'rich_string' : 'string';
-                 $sheet->merge_range_type($type, $ref, @aval, $format );
-                 next;
+                  my $type = $is_array ? 'rich_string' : 'string';
+                  $sheet->merge_range_type($type, $ref, @aval, $format );
+                  next;
                }
 
                # Special case for multiple formats in a cell
@@ -1136,8 +1143,7 @@ font, and number formats.
                      if ( my $ref = $self->{MERGED_RANGES}{$sheet_idx}{$a1} ) {
                        $sheet->merge_range_type('formula', $ref, "=${formula}", $format, $val);
                      } else {
-                        $sheet->write_formula( $a1, "=${formula}", $format,
-                           $val );
+                        $sheet->write_formula( $a1, "=${formula}", $format, $val );
                      }
                   }
                   next;
@@ -1201,7 +1207,6 @@ in a FORMAT array within the object.
       my %hfont  = %{ $fonts->[ $_->att('fontId') // 0 ] };
 
       my $numFmtId = $_->att('numFmtId') // 0;
-
       # Use custom format, or built-in if custom not found
       my $ref = $numfmt->{$numFmtId} // { num_format => $numFmtId };
       my %hnumfmt = %$ref;

@@ -22,14 +22,20 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20190912215428;
+our $VERSION = 1.20191211212303;
 
 my $formatters = [
                 {
                   'format' => '$1',
                   'intl_format' => 'NA',
                   'leading_digits' => '
-            1[0135-7]|
+            1(?:
+              [013-8]|
+              9(?:
+                0[1-9]|
+                [1-9]
+              )
+            )|
             77
           ',
                   'pattern' => '(\\d{4,5})'
@@ -60,14 +66,34 @@ my $formatters = [
               ];
 
 my $validators = {
-                'fixed_line' => '6[1-9]\\d{6}',
-                'geographic' => '6[1-9]\\d{6}',
+                'fixed_line' => '
+          662[0-24-9]\\d{4}|
+          6(?:
+            [1-578]\\d|
+            6[013-57-9]|
+            9[0-35-9]
+          )\\d{5}
+        ',
+                'geographic' => '
+          662[0-24-9]\\d{4}|
+          6(?:
+            [1-578]\\d|
+            6[013-57-9]|
+            9[0-35-9]
+          )\\d{5}
+        ',
                 'mobile' => '
-          89[01]\\d{5}|
           (?:
-            8[1-8]|
-            9[0-8]
-          )\\d{6}
+            8(?:
+              [1-8]\\d\\d|
+              9(?:
+                [01]\\d|
+                2[4-8]|
+                3[0-4]
+              )
+            )|
+            9[0-8]\\d\\d
+          )\\d{4}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -78,7 +104,12 @@ my $validators = {
             8
           )00\\d{7}
         ',
-                'voip' => '3[12]\\d{6}'
+                'voip' => '
+          (?:
+            3[12]\\d\\d|
+            6666
+          )\\d{4}
+        '
               };
 
     sub new {

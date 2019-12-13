@@ -1,9 +1,89 @@
 ==================================================
-Changes from 2017-06-25 00:00:00 +0000 to present.
+Changes from 2017-12-12 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 1.6 at 2019-06-25 02:26:28 +0000
+version 1.7 at 2019-12-12 22:00:13 +0000
+----------------------------------------
+
+  Change: 0b5fe2c5ebcb16d8115db6e4e714567f4e7adb5a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-12-12 12:09:23 +0000
+
+    Remove Sub::Exporter and handle import locally
+
+    Sub::Exporter is awesome, but I needed to provide a custom `import()`
+    function to be able to detect the importing package and change the default
+    behavior. I had attempted this with `Hook::LexWrap`, but that caused
+    unexpected issues with the `import()` routine in certain situations. This
+    code is cleaner, has fewer deps, but lacks the extended functionality of
+    `Sub::Exporter`. 
+
+  Change: f8cbb98a7c2445eff7b69a88f962e9cdc5b8a02a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-12-05 13:15:02 +0000
+
+    Add basic testing to the distribution 
+
+  Change: 54e693928bcc50fb8212e21a9072ab84dee350e2
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-12-03 13:55:24 +0000
+
+    Change default behavior if importing outside of main
+
+    It doesn't make much sense for a module you're including to mess with
+    `@ARGV` by default. This patch uses `Hook::LexWrap` to wrap `import` and
+    check the calling package. If the calling package is `main`, we'll do the
+    `@ARGV` parsing by default. If it's not, we'll skip the initialization
+    until it's used. You can override this behavior if you specify:
+
+    package YOLO;
+
+    use CLI::Helpers qw(:output at_import);
+
+    In the module. 
+
+  Change: 63c285e75f3c34aa0700b9252fe8b2f8e5d0a398
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-12-03 08:35:27 +0000
+
+    Alternative initialization with an array
+
+    * Instead of initiliazing solely on `@ARGV`,
+
+    `cli_helpers_initialization` may now be called with an array
+
+    reference. If so, it'll process that array instead of messing with
+
+    the global `@ARGV`. * Add an `at_import` import time configuration. This is
+    the default,
+
+    but if the default behavior changes, this configuration will ensure
+
+    it's always handled correctly. 
+
+  Change: 771ed53929d0670e276616b874bead399954862d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-12-02 21:50:13 +0000
+
+    Handle @ARGV Smarter
+
+    This release adds the ability to delay `@ARGV` processing until it's
+    necessary through the `delay_argv` import option.
+
+    Alternatively, a user can import with `copy_argv` flag to make
+    `CLI::Helpers` operate on a copy of `@ARGV`.
+
+    A `global_argv` import option has been added as well. This is a flag to
+    enable what is now the current behavior, operating on the global `@ARGV` at
+    import time, unless `delay_argv` is specified.
+
+    Migrate all the argument processing into it's own
+    `cli_helpers_initialize()` function. This is called during import unless
+    `delay_argv` is passed as an import flag. 
+
+----------------------------------------
+version 1.6 at 2019-06-25 02:24:08 +0000
 ----------------------------------------
 
   Change: ebc44e2e79fd7fc99fc1c810ea2ebfa630e97db7
@@ -83,25 +163,6 @@ version 1.4 at 2019-06-22 04:16:30 +0000
 
     More fixes for dist.ini 
 
-----------------------------------------
-version 1.3 at 2017-07-22 04:20:36 +0000
-----------------------------------------
-
-  Change: 410b1ab053cbe0a14fdb505686e994868009c069
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-07-21 21:20:36 +0000
-
-    Fix the tag checking. 
-
-  Change: 304137f655cf410d43ba453255d09a27f85669d0
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-11-20 07:11:24 +0000
-
-    Perl Critic
-
-    Added Perl Critic to the test suite. Replaced 'ref' calls with their
-    Ref::Util counterparts. 
-
 =================================================
-Plus 12 releases after 2017-06-25 00:00:00 +0000.
+Plus 13 releases after 2017-12-12 00:00:00 +0000.
 =================================================

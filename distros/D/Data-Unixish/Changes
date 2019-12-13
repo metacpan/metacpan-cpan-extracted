@@ -1,46 +1,59 @@
-1.570   2019-01-06 (PERLANCAR)
+1.572   2019-10-26  Released-By: PERLANCAR; Urgency: medium
+
+	- subsort: Adjust to Sort::Sub 0.111 (allow passing arguments to
+          sorter).
+
+
+1.571   2019-10-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add dux functions: count, split, join, splice.
+
+	- sort: Add --key-element option.
+
+
+1.570   2019-01-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace the use of Package::MoreUtil with Package::Util::Lite.
 
 
-1.56    2017-07-10 (PERLANCAR)
+1.56    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Remove unused dependency: Log::Any::IfLOG.
 
 
-1.55    2016-03-16 (PERLANCAR)
+1.55    2016-03-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace JSON with JSON::MaybeXS.
 
 
-1.54    2016-03-11 (PERLANCAR)
+1.54    2016-03-11  Released-By: PERLANCAR
 
 	- Adjust to Text::ANSI::Util 0.22.
 
 
-1.53    2016-03-02 (PERLANCAR)
+1.53    2016-03-02  Released-By: PERLANCAR
 
 	- [Bugfix] Fix subsort (avoid importing directly into
           Data::Unixish::subsort package).
 
 
-1.52    2015-11-22 (PERLANCAR)
+1.52    2015-11-22  Released-By: PERLANCAR
 
 	- [Bugfix] pick: fix algorithm.
 
 
-1.51    2015-10-07 (PERLANCAR)
+1.51    2015-10-07  Released-By: PERLANCAR
 
 	- Add dux function: subsort.
 
 
-1.50    2015-09-03 (PERLANCAR)
+1.50    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -49,14 +62,14 @@
 	  requirement.
 
 
-1.49    2015-01-03 (PERLANCAR)
+1.49    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-1.48    2014-12-10 (PERLANCAR)
+1.48    2014-12-10  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -66,7 +79,7 @@
           SHARYANTO::String::Util -> String::Pad.
 
 
-1.47    2014-06-12 (SHARYANTO)
+1.47    2014-06-12  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -75,7 +88,7 @@
         - Skip/adjust some tests to pass on Windows again.
 
 
-1.46    2014-05-05 (SHARYANTO)
+1.46    2014-05-05  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -83,12 +96,12 @@
           run_forked()).
 
 
-1.45    2014-05-02 (SHARYANTO)
+1.45    2014-05-02  Released-By: SHARYANTO
 
         - Add dux func: chain.
 
 
-1.44    2014-04-24 (SHARYANTO)
+1.44    2014-04-24  Released-By: SHARYANTO
 
         [SECURITY]
 
@@ -103,7 +116,7 @@
         - Remove deprecated module Data::Unixish::List.
 
 
-1.43    2014-04-18 (SHARYANTO)
+1.43    2014-04-18  Released-By: SHARYANTO
 
         - Add dux functions: rand, randstr, cond.
 
@@ -117,23 +130,23 @@
           code and evals code. Examples: map, grep, cond.
 
 
-1.42    2013-11-11 (SHARYANTO)
+1.42    2013-11-11  Released-By: SHARYANTO
 
         - No functional changes. Add FAQ entry about 'Use of uninitialized value
           in push' warnings.
 
 
-1.41    2013-10-04 (SHARYANTO)
+1.41    2013-10-04  Released-By: SHARYANTO
 
         - Add dux function: indent.
 
 
-1.40    2013-09-30 (SHARYANTO)
+1.40    2013-09-30  Released-By: SHARYANTO
 
         - Add dux function: linum.
 
 
-1.39    2013-09-29 (SHARYANTO)
+1.39    2013-09-29  Released-By: SHARYANTO
 
         - Add dux functions: lins, rins.
 
@@ -144,56 +157,56 @@
         - ltrim & rtrim didn't respect strip_newline argument (used alias name).
 
 
-1.38    2013-06-28 (SHARYANTO)
+1.38    2013-06-28  Released-By: SHARYANTO
 
         - Add dux functions: grep, map (thanks Toby Inkster).
 
 
-1.37    2013-06-26 (SHARYANTO)
+1.37    2013-06-26  Released-By: SHARYANTO
 
         - Add cdux* functions which accept callback.
 
 
-1.36    2013-06-25 (SHARYANTO)
+1.36    2013-06-25  Released-By: SHARYANTO
 
         - Add export tag :all.
 
 
-1.35    2013-06-25 (SHARYANTO)
+1.35    2013-06-25  Released-By: SHARYANTO
 
         - No functional changes. Force LANG=C in t/sprintf.t so test passes in
           other LANG environments (RT#86306).
 
 
-1.34    2013-05-21 (SHARYANTO)
+1.34    2013-05-21  Released-By: SHARYANTO
 
         - Add functions: {a,f,l}dux{a,c,f,l}.
 
         - Deprecate Data::Unixish::List.
 
 
-1.33    2013-05-02 (SHARYANTO)
+1.33    2013-05-02  Released-By: SHARYANTO
 
         - num: Add style: percent.
 
 
-1.32    2013-04-18 (SHARYANTO)
+1.32    2013-04-18  Released-By: SHARYANTO
 
         - No functional changes. A couple of fixes for Data::Unixish::List and
           reenable t/wrap.t.
 
 
-1.31    2013-04-14 (SHARYANTO)
+1.31    2013-04-14  Released-By: SHARYANTO
 
         - Add dux function: yes (test output streaming, App::dux 1.32+).
 
 
-1.30    2013-04-12 (SHARYANTO)
+1.30    2013-04-12  Released-By: SHARYANTO
 
         - Add dux function: wc.
 
 
-1.29    2013-04-11 (SHARYANTO)
+1.29    2013-04-11  Released-By: SHARYANTO
 
         - Add Data::Unixish::List to simplify using dux function in Perl for
           lists.
@@ -205,27 +218,27 @@
         - wrap: Add 'mb' and 'ansi' options.
 
 
-1.28    2013-04-10 (SHARYANTO)
+1.28    2013-04-10  Released-By: SHARYANTO
 
         - Add dux function: num.
 
 
-1.27    2013-04-10 (SHARYANTO)
+1.27    2013-04-10  Released-By: SHARYANTO
 
         - Add dux functions: trunc, rpad, lpad, centerpad.
 
 
-1.26    2013-04-05 (SHARYANTO)
+1.26    2013-04-05  Released-By: SHARYANTO
 
         - Add dux functions: uc, lc, ucfirst, lcfirst, bool, sprintf, sprintfn.
 
 
-1.25    2013-03-10 (SHARYANTO)
+1.25    2013-03-10  Released-By: SHARYANTO
 
         - Add dux functions: wrap, ltrim, rtrim, trim.
 
 
-1.24    2012-09-06 (SHARYANTO)
+1.24    2012-09-06  Released-By: SHARYANTO
 
         - pick: Change inserting to random element from using push + switch to
           using splice.
@@ -233,32 +246,32 @@
         - Add examples in Synopsis for each function.
 
 
-1.23    2012-08-07 (SHARYANTO)
+1.23    2012-08-07  Released-By: SHARYANTO
 
         - No functional changes. Split bin/dux to its own dist App-dux to avoid
           circular dependency problem (dfpc -> dux -> pericmd -> dfpc), reported
           by Dagfinn Ilmari Mannsåker.
 
 
-1.22    2012-07-27 (SHARYANTO)
+1.22    2012-07-27  Released-By: SHARYANTO
 
         - No functional changes. Bump version number. 1.21.1 = 1.021000 < 1.20.
 
 
-1.21.1  2012-07-27 (SHARYANTO)
+1.21.1  2012-07-27  Released-By: SHARYANTO
 
         - No functional changes. Replace dep feature::each_on_array with
           Syntax::Feature::EachOnArray (module renamed).
 
 
-1.21.0  2012-07-27 (SHARYANTO)
+1.21.0  2012-07-27  Released-By: SHARYANTO
 
         - Add dux functions: pick, rev, shuf.
 
         - Use feature::each_on_array to make the modules work in Perl < 5.12.
 
 
-1.20    2012-07-21 (SHARYANTO)
+1.20    2012-07-21  Released-By: SHARYANTO
 
         - No functional changes. Rename distribution from
           Data-Unixish-Implementation to Data-Unixish, since the specification
@@ -266,7 +279,7 @@
           restriction.
 
 
-0.03    2012-07-18 (SHARYANTO)
+0.03    2012-07-18  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -278,7 +291,7 @@
         - Add tests
 
 
-0.02    2012-07-16 (SHARYANTO)
+0.02    2012-07-16  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -298,6 +311,6 @@
         - 'dux FUNC --help' didn't work.
 
 
-0.01    2012-07-13 (SHARYANTO)
+0.01    2012-07-13  Released-By: SHARYANTO
 
         - First version.

@@ -12,11 +12,11 @@ WG::API::NET - Module to work with Wargaming.net Public API
 
 =head1 VERSION
 
-Version v0.12
+Version v0.13
 
 =cut
 
-our $VERSION = 'v0.12';
+our $VERSION = 'v0.13';
 
 const my $api_uri => '//api.worldoftanks.ru/';
 
