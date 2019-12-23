@@ -28,13 +28,24 @@ sub EXISTS ($$) {
 }
 
 sub FIRSTKEY ($) {
-        my ($self) = shift;
-        y_next @$self, "";
+        my ($self, $key) = (shift, "");
+        do {
+                $key = y_next @$self, $key;
+        } while (defined $key && !(1 & y_data @$self, $key));
+        $key;
 }
 
 sub NEXTKEY ($$) {
         my ($self, $key) = @_;
-        y_next @$self, $key;
+        do {
+                $key = y_next @$self, $key;
+        } while (defined $key && !(1 & y_data @$self, $key)); 
+        $key;
+}
+
+sub CLEAR ($) {
+        my ($self, $x) = (shift, "");
+        y_kill_node (@$self, $x) while (defined ($x = y_next @$self, $x));
 }
 
 sub UNTIE ($) {

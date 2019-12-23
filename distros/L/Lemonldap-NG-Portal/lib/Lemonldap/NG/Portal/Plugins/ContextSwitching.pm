@@ -5,14 +5,16 @@ use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_ERROR
+  PE_NOTOKEN
   PE_REDIRECT
+  PE_TOKENEXPIRED
   PE_MALFORMEDUSER
   PE_BADCREDENTIALS
   PE_SESSIONEXPIRED
   PE_IMPERSONATION_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -32,7 +34,7 @@ has ott => (
         return $ott;
     }
 );
-has rule   => ( is => 'rw', default => sub { 1 } );
+has rule   => ( is => 'rw', default => sub { 0 } );
 has idRule => ( is => 'rw', default => sub { 1 } );
 
 sub init {
@@ -94,7 +96,7 @@ sub display {
         $self->logger->debug('Request to stop ContextSwitching');
         if ( $self->conf->{contextSwitchingStopWithLogout} ) {
             $self->userLogger->notice("Stop ContextSwitching for $req->{user}");
-            $self->userLogger->info("Remove real session $realSession");
+            $self->userLogger->info("Remove real session $realSessionId");
             $realSession->remove;
             return $self->p->do( $req,
                 [ @{ $self->p->beforeLogout }, 'authLogout', 'deleteSession' ]
@@ -134,6 +136,19 @@ sub run {
     my $statut  = PE_OK;
     my $realId  = $req->{user};
     my $spoofId = $req->param('spoofId') || '';    # ContextSwitching required ?
+
+    # Check token
+    if ( $self->ottRule->( $req, {} ) ) {
+        my $token = $req->param('token');
+        unless ($token) {
+            $self->userLogger->warn('ContextSwitching called without token');
+            return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
+        }
+        unless ( $self->ott->getToken($token) ) {
+            $self->userLogger->warn('ContextSwitching called with an expired/bad token');
+            return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
+        }
+    }
 
     # Check activation rule
     unless ( $self->rule->( $req, $req->userData ) ) {

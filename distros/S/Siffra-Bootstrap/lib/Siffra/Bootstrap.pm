@@ -29,7 +29,7 @@ BEGIN
     require Siffra::Tools;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.08';
+    $VERSION = '0.09';
     @ISA     = qw(Siffra::Tools Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -37,6 +37,18 @@ BEGIN
     @EXPORT_OK   = qw();
     %EXPORT_TAGS = ();
 } ## end BEGIN
+
+UNITCHECK
+{
+    eval { use Fcntl qw(:flock); };
+    $log->info( "Tentando lockar o programa [ $0 ]..." );
+    unless ( flock( DATA, LOCK_EX | LOCK_NB ) )
+    {
+        $log->warn( "O programa [ $0 ] já está sendo executado. Saindo." );
+        exit( 1 );
+    }
+    $log->info( "Programa [ $0 ] lockado com sucesso..." );
+} ## end UNITCHECK
 
 #################### subroutine header begin ####################
 
@@ -253,7 +265,7 @@ sub getExecutionInfo()
 
 sub END
 {
-    $log->debug( "END", { package => __PACKAGE__ } );
+    $log->debug( "END", { package => __PACKAGE__, line => __LINE__ } );
     my ( $self, %parameters ) = @_;
     eval { $log->{ adapter }->{ dispatcher }->{ outputs }->{ Email }->flush; };
 }

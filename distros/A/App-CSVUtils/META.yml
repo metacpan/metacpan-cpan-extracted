@@ -20,7 +20,7 @@ meta-spec:
   version: '1.4'
 name: App-CSVUtils
 requires:
-  Complete::Util: '0.603'
+  Complete::Util: '0.606'
   Data::Sah::Compiler::perl::TH::any: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
@@ -29,6 +29,7 @@ requires:
   Data::Sah::Compiler::perl::TH::re: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Getopt::Long: '2.50'
+  Hash::Subset: '0.005'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
   Sah::Schema::filename: '0'
@@ -45,7 +46,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils
   homepage: https://metacpan.org/release/App-CSVUtils
   repository: git://github.com/perlancar/perl-App-CSVUtils.git
-version: '0.025'
+version: '0.027'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -260,7 +261,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -400,7 +401,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Converter;
 use Quiq::Hash;
@@ -281,86 +281,6 @@ Die nachfolgenden Methoden sind auf Basis der Methode extract()
 implementiert. Sie realsieren Vereinfachungen für bestimmte
 Anwendungsfälle.
 
-=head3 extractPropertiesToVariables() - Extrahiere Properties und weise sie an Variablen zu
-
-=head4 Synopsis
-
-  $class->extractPropertiesToVariables(\@params,@optRef);
-
-=head4 Arguments
-
-=over 4
-
-=item @params
-
-Parameterliste, z.B. @_.
-
-=item @optRef
-
-Liste der Properties (und Optionen) und ihrer Variablenreferenzen.
-
-=back
-
-=head4 Returns
-
-Nichts.
-
-=head4 Description
-
-Extrahiere Properties (und Optionen) aus der Parameterliste @params.
-Enthält die Parameterliste unbekannte Properties (oder Optionen),
-wird eine Exception geworfen. Die Methode wird typischerweise
-zur Verarbeitung von Methodenparametern genutzt.
-
-=head4 Example
-
-Methode, die eine WikiMedia-Tabelle generiert. Die Tabelleneigenschaften
-werden als Property/Wert-Paare übergeben:
-
-  sub table {
-      my $self = shift;
-      # @_: @keyVal
-  
-      my $alignA = [];
-      my $bodyBackground = '#ffffff';
-      my $caption = undef;
-      my $rowA = [];
-      my $titleBackground = '#e8e8e8';
-      my $titleA = [];
-      my $valueCb = undef;
-  
-      Quiq::Parameters->extractPropertiesToVariables(\@_,
-          alignments => \$alignA,
-          bodyBackground => \$bodyBackground,
-          caption => \$caption,
-          rows => \$rowA,
-          titleBackground => \$titleBackground,
-          titles => \$titleA,
-          valueCallback => \$valueCb,
-      );
-      ...
-  }
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub extractPropertiesToVariables {
-    my ($class,$paramA) = splice @_,0,2;
-
-    $class->extract(1,1,undef,$paramA,0,@_);
-    if (@$paramA) {
-        $class->throw(
-            'PARAM-00099: Unexpected parameter(s)',
-            Parameters => "@$paramA",
-        );
-    }
-
-    return;
-}
-
-# -----------------------------------------------------------------------------
-
 =head3 extractPropertiesToObject() - Extrahiere Properties und weise sie an Hash-Objekt zu
 
 =head4 Synopsis
@@ -429,95 +349,6 @@ sub extractPropertiesToObject {
     }
 
     return $opt;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 extractToVariables() - Extrahiere Parameter und weise Optionen Variablen zu
-
-=head4 Synopsis
-
-  @args | $argA = $class->extractToVariables(\@params,$minArgs,$maxArgs,@optRef);
-
-=head4 Arguments
-
-=over 4
-
-=item @params
-
-Parameterliste, z.B. @_.
-
-=item $minArgs
-
-Mindestanzahl an Argumenten.
-
-=item $maxArgs
-
-Maximale Anzahl an Argumenten, C<undef> bedeutet beliebig viele.
-
-=item @optRef
-
-Liste der Optionen und ihrer Variablenreferenzen.
-
-=back
-
-=head4 Returns
-
-=over 4
-
-=item $argA
-
-Referenz auf die Liste der extrahierten Argumente.
-
-=back
-
-=head4 Description
-
-Extrahiere Argumente und Optionen aus der Parameterliste @params.
-Enthält die Parameterliste unbekannte Optionen oder zu wenige
-oder zu viele Argumente, wird eine Exception geworfen.
-
-=head4 Example
-
-Konstruktor mit einer variablen Anzahl an Argumenten und zwei Optionen:
-
-  sub new {
-      my $class = shift;
-      # @_: $url,@opt -or- $url,$user,$passw,@opt
-  
-  
-      my $color = 1;
-      my $debug = 0;
-  
-      my $argA = Quiq::Parameters->extractToVariables(\@_,1,3,
-          -color => \$color,
-          -debug => \$debug,
-      );
-      my ($url,$user,$password) = @$argA;
-      ...
-  }
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub extractToVariables {
-    my ($class,$paramA,$minArgs,$maxArgs) = splice @_,0,4;
-
-    my $argA = $class->extract(1,0,undef,$paramA,$maxArgs,@_);
-    if (@$argA < $minArgs) {
-        $class->throw(
-            'PARAM-00099: not enough arguments',
-        );
-    }
-    elsif (@$paramA) {
-        $class->throw(
-            'PARAM-00099: Unexpected parameter(s)',
-            Parameters => "@_",
-        );
-    }
-
-    return wantarray? @$argA: $argA;
 }
 
 # -----------------------------------------------------------------------------
@@ -597,7 +428,7 @@ sub extractToObject {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

@@ -16,7 +16,7 @@ TEST_NO_INTROSPECT: {
     my ($bus, $object, $robject, $myobject, $otherobject) = &setup;
 
     $object->seed_action("org.freedesktop.DBus.Introspectable", "Introspect", 
-			 error => { name => "org.freedesktop.DBus.Error.Failed",
+			 error => { name => "org.freedesktop.DBus.Error.UnknownMethod",
 				    description => "No such method" });
 
     &test_method_fail("raw, no introspect", $robject, "Test");

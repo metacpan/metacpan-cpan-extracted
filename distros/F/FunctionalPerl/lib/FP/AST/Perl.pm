@@ -14,33 +14,36 @@ FP::AST::Perl -- abstract syntax tree for representing Perl code
 =head1 SYNOPSIS
 
     use FP::AST::Perl ":all";
-    use FP::List; use FP::Equal ":all";
+    use FP::List; use FP::Equal ":all"; use FP::Ops qw(regex_substitute);
 
-    is Get(LexVar('foo'))->string, '$foo';
-    is Get(PackVarScalar "foo")->string, '$foo';
-    is Get(PackVarArray "foo")->string, '@foo';
-    is Get(PackVarHash "foo::bar")->string, '%foo::bar';
+    is Get(ScalarVar "foo")->string, '$foo';
+    is Get(ArrayVar "foo")->string, '@foo';
+    is Get(HashVar "foo::bar")->string, '%foo::bar';
+    is Ref(HashVar "foo::bar")->string, '\%foo::bar';
 
-    my $codefoo= PackVarCode("foo");
-    my $arrayfoo= PackVarArray("foo");
-    my $lexfoo= LexVar("foo");
+    my $codefoo= CodeVar("foo");
+    my $arrayfoo= ArrayVar("foo");
+    my $lexfoo= ScalarVar("foo");
     is App(Get($codefoo), list())->string,
        '&foo()';
-    is AppProto(Get($codefoo), list())->string,
+    is AppP(Get($codefoo), list())->string,
        'foo()';
-    is AppProto(Get($lexfoo), list(Ref($codefoo)))->string,
+    is AppP(Get($lexfoo), list(Ref($codefoo)))->string,
        '$foo->(\&foo)';
-    is AppProto(Get($lexfoo), list(Get($lexfoo), Get($arrayfoo), Ref($arrayfoo)))->string,
+    is eval { App(Get(HashVar "foo"), list())->string } ||
+            regex_substitute(sub{s/ at .*//s}, $@),
+       'HASH var can\'t be called';
+    is AppP(Get($lexfoo), list(Get($lexfoo), Get($arrayfoo), Ref($arrayfoo)))->string,
        '$foo->($foo, @foo, \@foo)';
-    is AppProto(Get($codefoo), list(Get(LexVar 'foo'), Literal(Number 123)))->string,
+    is AppP(Get($codefoo), list(Get(ScalarVar 'foo'), Literal(Number 123)))->string,
        'foo($foo, 123)';
-    is AppProto(Get($codefoo), list(Get($lexfoo), Literal(String 123)))->string,
+    is AppP(Get($codefoo), list(Get($lexfoo), Literal(String 123)))->string,
        'foo($foo, \'123\')';
 
     # Semicolons are like a compile time (AST level) operator:
-    is Semicolon(Get(LexVar "a"), Get(LexVar "b"))->string, '$a; $b';
+    is Semicolon(Get(ScalarVar "a"), Get(ScalarVar "b"))->string, '$a; $b';
     # to end with a semicolon you could use:
-    is Semicolon(Get(LexVar "a"), Noop)->string, '$a; ';
+    is Semicolon(Get(ScalarVar "a"), Noop)->string, '$a; ';
 
     # The n-ary `semicolons` function builds a Semicolon chain for
     # you (right-associated):
@@ -48,19 +51,22 @@ FP::AST::Perl -- abstract syntax tree for representing Perl code
     is_equal semicolons("x"), "x";
         # ^ no `Semicolon` instantiation thus no type failure because
         #   of the string
-    my $sems= semicolons(map {Get LexVar $_} qw(a b c));
+    my $sems= semicolons(map {Get ScalarVar $_} qw(a b c));
     is_equal $sems,
-             Semicolon(Get(LexVar('a')),
-                       Semicolon(Get(LexVar('b')),
-                                 Get(LexVar('c'))));
+             Semicolon(Get(ScalarVar('a')),
+                       Semicolon(Get(ScalarVar('b')),
+                                 Get(ScalarVar('c'))));
     is $sems->string, '$a; $b; $c';
 
-    is Let(list(LexVar("foo"), LexVar("bar")),
-           Get(PackVarArray "baz"),
+    is commas(map {Get ScalarVar $_} qw(a b c))->string,
+       '$a, $b, $c';
+
+    is Let(list(ScalarVar("foo"), ScalarVar("bar")),
+           Get(ArrayVar "baz"),
            semicolons(
-               AppProto(Get(PackVarCode "print"),
+               AppP(Get(CodeVar "print"),
                         list Literal String "Hello"),
-               Get(LexVar("bar"))))->string,
+               Get(ScalarVar("bar"))))->string,
        'my ($foo, $bar) = @baz; print(\'Hello\'); $bar';
     # Yes, how should print, map etc. be handled?
 
@@ -90,25 +96,24 @@ package FP::AST::Perl;
 @ISA="Exporter"; require Exporter;
 @EXPORT=qw();
 my @classes=qw(
-    LexVar PackVarScalar PackVarCode PackVarHash PackVarArray PackVarGlob
-    App AppProto Get Ref
+    ScalarVar CodeVar HashVar ArrayVar Glob
+    App AppP Get Ref
     Number String
     Literal
-    Semicolon Noop Let);
+    Semicolon Comma Noop Let);
 @EXPORT_OK=(
     @classes, qw(
     is_packvar_type
     is_var
-    is_lexvar is_packvar
     is_expr is_nonnoop_expr is_noop
-    semicolons));
+    semicolons commas));
 
 %EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 use Function::Parameters qw(:strict);
 use FP::Predicates ":all";
-use Chj::TEST;
+#use Chj::TEST;
 use FP::List;
 use FP::Combinators2 qw(right_associate_);
 
@@ -127,7 +132,7 @@ package FP::AST::_::Perl {
         "FP::Struct::Show";
 
     method string_proto () {
-        __  "stringification when used as the callee in AppProto";
+        __  "stringification when used as the callee in AppP";
         $self->string
     }
 
@@ -141,11 +146,16 @@ package FP::AST::Perl::Var {
     use FP::Predicates ":all";
     
     use FP::Struct [
+        [*is_string, 'name'],
+        # ^ XX is_package_name ? But isn't everything allowed? But
+        # then todo proper printing.
+        #FUTURE: [*is_bool, 'is_lexical'] ?
         ]=> "FP::AST::_::Perl";
 
     method string () {
         $self->sigil . $self->name
     }
+    method callderef () { die $self->type_name." var can't be called" }
 
     _END_
 }
@@ -159,45 +169,15 @@ sub is_lexvar_string ($) {
     $str=~ /^\w+\z/
 }
 
-package FP::AST::Perl::LexVar {
-    use FP::Predicates ":all";
-    
-    use FP::Struct [
-        [*FP::AST::Perl::is_lexvar_string, 'name']
-        ] => "FP::AST::Perl::Var";
-
-    method sigil () { '$' }
-    method callderef () { '->' }
-
-    _END_
-}
-
-*is_lexvar= instance_of "FP::AST::Perl::LexVar";
-
-
-package FP::AST::Perl::PackVar {
-    use FP::Predicates ":all";
-    
-    use FP::Struct [
-        [*is_string, 'name'],
-        # ^ XX is_package_name ? But isn't everything allowed? But
-        # then todo proper printing
-        ] => "FP::AST::Perl::Var";
-    method callderef () { die $self->type_name." can't be called" }
-    _END_
-}
-
-*is_packvar= instance_of "FP::AST::Perl::PackVar";
-
-package FP::AST::Perl::PackVarScalar {
-    use FP::Struct [] => "FP::AST::Perl::PackVar";
+package FP::AST::Perl::ScalarVar {
+    use FP::Struct [] => "FP::AST::Perl::Var";
     method type_name () { "SCALAR" }
     method sigil () { '$' }
     method callderef () { '->' }
     _END_
 }
-package FP::AST::Perl::PackVarCode {
-    use FP::Struct [] => "FP::AST::Perl::PackVar";
+package FP::AST::Perl::CodeVar {
+    use FP::Struct [] => "FP::AST::Perl::Var";
     method type_name () { "CODE" }
     method sigil () { '&' }
     method callderef () { '' }
@@ -205,20 +185,20 @@ package FP::AST::Perl::PackVarCode {
     method string_proto () { $self->name }
     _END_
 }
-package FP::AST::Perl::PackVarHash {
-    use FP::Struct [] => "FP::AST::Perl::PackVar";
+package FP::AST::Perl::HashVar {
+    use FP::Struct [] => "FP::AST::Perl::Var";
     method type_name () { "HASH" }
     method sigil () { '%' }
     _END_
 }
-package FP::AST::Perl::PackVarArray {
-    use FP::Struct [] => "FP::AST::Perl::PackVar";
+package FP::AST::Perl::ArrayVar {
+    use FP::Struct [] => "FP::AST::Perl::Var";
     method type_name () { "ARRAY" }
     method sigil () { '@' }
     _END_
 }
-package FP::AST::Perl::PackVarGlob { # XX *?*
-    use FP::Struct [] => "FP::AST::Perl::PackVar";
+package FP::AST::Perl::Glob {
+    use FP::Struct [] => "FP::AST::Perl::Var";  # XX *?*
     method type_name () { "GLOB" }
     method sigil () { '*' }
     _END_
@@ -311,7 +291,7 @@ package FP::AST::Perl::App {
         # ^ yes, proc is also an expr, but only yielding one (usable)
         # value, as opposed to argexprs which may yield more used
         # values than there are exprs (at least here; not
-        # (necessarily) in AppProto).
+        # (necessarily) in AppP).
         ] => "FP::AST::Perl::Expr";
 
     method string () {
@@ -326,7 +306,7 @@ package FP::AST::Perl::App {
     _END_
 }
 
-package FP::AST::Perl::AppProto {
+package FP::AST::Perl::AppP {
     # App with exposure to prototypes
     use FP::Struct [
         ] => "FP::AST::Perl::App";
@@ -414,6 +394,19 @@ package FP::AST::Perl::Semicolon {
     _END_
 }
 
+# mostly-copy-paste of above
+package FP::AST::Perl::Comma {
+    use FP::Struct [
+        [*FP::AST::Perl::is_expr, 'a'],
+        [*FP::AST::Perl::is_expr, 'b'],
+        ] => "FP::AST::Perl::Expr";
+
+    method string () {
+        $self->a->string . ", " . $self->b->string
+    }
+    _END_
+}
+
 package FP::AST::Perl::Noop {
     use FP::Struct [
         ] => "FP::AST::Perl::Expr";
@@ -428,6 +421,7 @@ package FP::AST::Perl::Noop {
 
 
 *semicolons= right_associate_ *Semicolon, Noop();
+*commas= right_associate_ *Comma, Noop();
 
 
 package FP::AST::Perl::Let {
@@ -456,15 +450,8 @@ package FP::AST::Perl::Let {
     _END_
 }
 
-
-TEST_EXCEPTION {
-    LexVar('foo::bar')
-} 'unacceptable value for field \'name\': \'foo::bar\'';
-
 sub String;
 sub Literal;
-sub PackVarArray;
-sub PackVarCode;
 
 sub t{
 }

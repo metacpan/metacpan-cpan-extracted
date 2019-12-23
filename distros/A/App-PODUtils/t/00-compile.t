@@ -6,15 +6,18 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/PODUtils.pm'
 );
 
 my @scripts = (
+    'script/dump-pod-structure',
     'script/elide-pod',
-    'script/podless'
+    'script/poddump',
+    'script/podless',
+    'script/sort-pod-headings'
 );
 
 # no fake home requested

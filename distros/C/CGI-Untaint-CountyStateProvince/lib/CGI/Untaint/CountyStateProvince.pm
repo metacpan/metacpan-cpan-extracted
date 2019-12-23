@@ -8,15 +8,16 @@ use base 'CGI::Untaint::object';
 
 =head1 NAME
 
-CGI::Untaint::CountyStateProvince - Validate a state, county or province
+CGI::Untaint::CountyStateProvince - Validate a state, county or province in a
+CGI script.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our @countries;
 
@@ -27,14 +28,29 @@ validate if the given user data is a valid county/state/province.
 
 This class is not to be instantiated, instead a subclass must be
 instantiated. For example L<CGI::Untaint::CountyStateProvince::GB> would
-validate against a British county, CGI::Untaint::CountyStateProvince::US would
-validate against a US state, and so on.
+validate against a British county, L<CGI::Untaint::CountyStateProvince::US>
+would validate against a US state, and so on.
 
     use CGI::Info;
     use CGI::Untaint;
-    use CGI::Untaint::CountyStateProvince::GB;
+    use CGI::Untaint::CountyStateProvince;
+    # ...
     my $info = CGI::Info->new();
-    my $u = CGI::Untaint->new($info->params());
+    my $params = $info->params();
+    # ...
+    # Country table(s) must be loaded after CGI::Untaint::CountyStateProvince
+    if($params->{'country'} == 44) {
+	require CGI::Untaint::CountyStateProvince::GB;
+
+	CGI::Untaint::CountyStateProvince::GB->import();
+    } elsif($params->{'country'} == 1) {
+	require CGI::Untaint::CountyStateProvince::US;
+
+	CGI::Untaint::CountyStateProvince::US->import();
+    } else {
+	die 'Unsupported country ' . $params->{'country'};
+    }
+    my $u = CGI::Untaint->new($params);
     my $csp = $u->extract(-as_CountyStateProvince => 'state');
     # $csp will be lower case
 
@@ -82,7 +98,7 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-cgi-untaint-csp at rt.cpan.org>, or through
+Please report any bugs or feature requests to C<bug-cgi-untaint-countystateprovince at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Untaint-CountyStateProvince>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
@@ -107,10 +123,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-CountyStateProvince>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/CGI-Untaint-CountyStateProvince>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Untaint-CountyStateProvince>
@@ -127,10 +139,9 @@ L<http://search.cpan.org/dist/CGI-Untaint-CountyStateProvince>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Nigel Horne.
+Copyright 2012-2019 Nigel Horne.
 
-This program is released under the following licence: GPL
-
+This program is released under the following licence: GPL2
 
 =cut
 

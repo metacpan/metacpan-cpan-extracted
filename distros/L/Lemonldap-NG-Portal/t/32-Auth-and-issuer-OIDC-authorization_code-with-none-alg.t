@@ -163,28 +163,23 @@ ok(
     ),
     'Get userinfo'
 );
-ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-  or print STDERR $@;
+$res = expectJSON($res);
 ok( $res->{name} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'name => Frédéric Accents' );
-count(3);
+count(2);
 
 ok( $res = $op->_get("/sessions/global/$spId"), 'Get UTF-8' );
-expectOK($res);
-ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-  or print STDERR $@;
+$res = expectJSON($res);
 ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'cn => Frédéric Accents' );
-count(3);
+count(2);
 
 switch ('rp');
 ok( $res = $rp->_get("/sessions/global/$spId"), 'Get UTF-8' );
-expectOK($res);
-ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-  or print STDERR $@;
+$res = expectJSON($res);
 ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'cn => Frédéric Accents' );
-count(3);
+count(2);
 
 # Logout initiated by RP
 ok(
@@ -261,8 +256,7 @@ ok(
     $res = $rp->_get(
         '/',
         accept => 'text/html',
-        cookie =>
-          "lemonldapidp=http://auth.idp.com/saml/metadata; lemonldap=$spId"
+        cookie => "lemonldap=$spId"
     ),
     'Test if user is reject on SP'
 );
@@ -327,7 +321,6 @@ sub op {
                         name        => "cn"
                     }
                 },
-                oidcServiceMetaDataIssuer             => "http://auth.op.com/",
                 oidcServiceMetaDataAuthorizeURI       => "authorize",
                 oidcServiceMetaDataCheckSessionURI    => "checksession.html",
                 oidcServiceMetaDataJWKSURI            => "jwks",

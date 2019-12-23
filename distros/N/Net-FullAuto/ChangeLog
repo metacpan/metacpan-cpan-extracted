@@ -20,6 +20,90 @@
 #######################################################################
 
 
+2019-12-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000495 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+
+2019-12-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000494 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+
+2019-12-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000493 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+
+2019-12-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000492 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+
+2019-12-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000491 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+
+2019-12-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000490 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+
+2019-12-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000489 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+
+2019-12-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000488 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+
+2019-12-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000487 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+
+2019-12-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000486 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+
+2019-12-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000485 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+
+2019-12-13  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000484 released
+
+        * Moved $LOG initialization later in startup.
+
+
 2019-12-08  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000483 released

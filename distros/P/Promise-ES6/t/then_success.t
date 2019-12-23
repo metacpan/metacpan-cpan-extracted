@@ -33,7 +33,6 @@ my $test_value = 'first';
             }
         };
     });
-$p->{'_which'} = '1';
 
     my $p2 = $p->then(sub {
         my ($value) = @_;
@@ -42,7 +41,6 @@ $p->{'_which'} = '1';
         $test_value = 'third';
         return 'second resolve';
     });
-$p2->{'_which'} = '2';
 
     my $p3 = $p2->then(sub {
         my ($value) = @_;
@@ -63,11 +61,9 @@ $p2->{'_which'} = '2';
                 }
             };
         });
-$p4->{'_which'} = '4';
 
         return $p4;
     });
-$p3->{'_which'} = '3';
 
     my $pid = fork or do {
         Time::HiRes::sleep(0.2);

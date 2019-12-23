@@ -6,7 +6,7 @@ use JSON;
 use Lemonldap::NG::Common::PSGI::Constants;
 use Lemonldap::NG::Common::PSGI::Request;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 our $_json = JSON->new->allow_nonref;
 
@@ -48,7 +48,15 @@ sub init {
             $logger = $ENV{LLNG_USERLOGGER} || $args->{userLogger} || $logger;
             eval "require $logger";
             die $@ if ($@);
-            $self->userLogger( $logger->new( $self, user => 1 ) );
+            require Lemonldap::NG::Common::Logger::_Duplicate;
+            $self->userLogger(
+                Lemonldap::NG::Common::Logger::_Duplicate->new(
+                    $self,
+                    user   => 1,
+                    logger => $logger,
+                    dup    => $self->logger
+                )
+            );
         }
     }
     return 1;
@@ -112,8 +120,8 @@ sub userError {
 # Responses methods
 sub sendJSONresponse {
     my ( $self, $req, $j, %args ) = @_;
-    $args{code} ||= 200;
-    $args{headers} ||= $req->respHeaders || [];
+    $args{code}    ||= 200;
+    $args{headers} ||= [ $req->spliceHdrs ];
     my $type = 'application/json; charset=utf-8';
     if ( ref $j ) {
         eval { $j = $_json->encode($j); };
@@ -143,9 +151,9 @@ sub sendError {
         return [
             $code,
             [
-                'Content-Type' => 'application/xml; charset=utf-8',
-                @{ $req->respHeaders || [] },
-                'Content-Length' => length($s)
+                'Content-Type'   => 'application/xml; charset=utf-8',
+                'Content-Length' => length($s),
+                $req->spliceHdrs,
             ],
             [$s]
         ];
@@ -180,8 +188,9 @@ body{background:#000;color:#fff;padding:10px 50px;font-family:sans-serif;}a{text
         return [
             $code,
             [
-                'Content-Type' => 'text/html; charset=utf-8',
-                @{ $req->respHeaders || [] }, 'Content-Length' => length($s)
+                'Content-Type'   => 'text/html; charset=utf-8',
+                'Content-Length' => length($s),
+                $req->spliceHdrs,
             ],
             [$s]
         ];
@@ -201,7 +210,7 @@ sub _mustBeDefined {
     my $name = ( caller(1) )[3];
     $name =~ s/^.*:://;
     my $call = ( caller(1) )[0];
-    my $ref = ref( $_[0] ) || $call;
+    my $ref  = ref( $_[0] ) || $call;
     die "$name() method must be implemented (probably in $ref)";
 }
 
@@ -238,8 +247,8 @@ sub sendHtml {
     my $sc = $req->script_name;
     $sc = '.' unless ($sc);
     $sc =~ s#/*$#/#;
-    $args{code} ||= 200;
-    $args{headers} ||= $req->respHeaders || [];
+    $args{code}    ||= 200;
+    $args{headers} ||= [ $req->spliceHdrs ];
     my $htpl;
     $template = ( $args{templateDir} // $self->templateDir ) . "/$template.tpl";
     return $self->sendError( $req, "Unable to read $template", 500 )

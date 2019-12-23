@@ -1,5 +1,5 @@
 package App::CSE::Command::Search;
-$App::CSE::Command::Search::VERSION = '0.014';
+$App::CSE::Command::Search::VERSION = '0.015';
 use Moose;
 extends qw/App::CSE::Command/;
 
@@ -278,6 +278,10 @@ sub execute{
         # Mark the file as dirty.
         $self->cse()->dirty_files()->{$hit->{'path.raw'}} = 1;
       }
+    }else{
+        # No stat. File is gone (consider dirty)
+        $star = &$colored('-' , 'red bold');
+        $self->cse()->dirty_files()->{$hit->{'path.raw'}} = 1;
     }
 
     $LOGGER->trace("Score: ".$hit->get_score());

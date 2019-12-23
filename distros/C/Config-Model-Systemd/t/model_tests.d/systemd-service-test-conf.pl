@@ -8,9 +8,11 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 # systemd tests for user
+use strict;
+use warnings;
 
-# list of tests. This modules looks for @tests global variable
-@tests = (
+# list of tests.
+my @tests = (
     {
         name => 'basic-service',
         config_file => 'gmail-imap-tunnel@.service',
@@ -33,4 +35,4 @@
     }
 );
 
-1; # to keep Perl happy
+return { tests => \@tests } ;

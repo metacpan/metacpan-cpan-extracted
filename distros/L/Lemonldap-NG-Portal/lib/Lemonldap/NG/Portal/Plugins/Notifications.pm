@@ -133,7 +133,10 @@ sub checkNotifDuringAuth {
         # Cipher id
         $req->id( $self->p->HANDLER->tsv->{cipher}->encrypt( $req->id ) );
         $self->p->rebuildCookies($req);
-        if ( not $req->data->{_url} and $req->env->{PATH_INFO} ne '/' ) {
+        if (    not $req->pdata->{_url}
+            and not $req->data->{_url}
+            and $req->env->{PATH_INFO} ne '/' )
+        {
             $req->data->{_url} =
               encode_base64( $self->conf->{portal} . $req->env->{PATH_INFO},
                 '' );

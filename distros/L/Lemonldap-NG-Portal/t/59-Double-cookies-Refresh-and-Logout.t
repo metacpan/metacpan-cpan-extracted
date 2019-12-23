@@ -122,8 +122,8 @@ ok( $attributes{'_updateTime'} =~ /^\d{14}$/, 'Timestamp found' )
   or print STDERR Dumper( \%attributes );
 count(3);
 
-diag 'Waiting';
-sleep 3;
+# Waiting
+Time::Fake->offset("+3s");
 
 # Refresh rights
 # ------------------------

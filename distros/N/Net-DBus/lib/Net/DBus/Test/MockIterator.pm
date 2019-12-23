@@ -33,7 +33,7 @@ Creating a new message
   $iterator->append_byte(123);
 
 
-Reading from a mesage
+Reading from a message
 
   my $msg = ...get it from somewhere...
   my $iter = $msg->iterator();
@@ -677,6 +677,8 @@ sub guess_type {
 			$subtype = [ $self->guess_type(($value->value())[0]->[0]) ];
 		    } elsif ($maintype == &Net::DBus::Binding::Message::TYPE_STRUCT) {
 			$subtype = [ map { $self->guess_type($_) } @{($value->value())[0]} ];
+		    } elsif ($maintype == &Net::DBus::Binding::Message::TYPE_VARIANT) {
+			$subtype = $self->guess_type($value->value);
 		    } else {
 			die "Unguessable compound type '$maintype' ('", chr($maintype), "')\n";
 		    }

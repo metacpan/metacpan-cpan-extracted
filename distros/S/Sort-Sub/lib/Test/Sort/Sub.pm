@@ -2,8 +2,8 @@ package Test::Sort::Sub;
 
 ## no critic: Modules::ProhibitAutomaticExportation
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '0.111'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.116'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -63,7 +63,7 @@ Test::Sort::Sub - Test Sort::Sub::* subroutine
 
 =head1 VERSION
 
-This document describes version 0.111 of Test::Sort::Sub (from Perl distribution Sort-Sub), released on 2019-10-26.
+This document describes version 0.116 of Test::Sort::Sub (from Perl distribution Sort-Sub), released on 2019-12-15.
 
 =head1 FUNCTIONS
 

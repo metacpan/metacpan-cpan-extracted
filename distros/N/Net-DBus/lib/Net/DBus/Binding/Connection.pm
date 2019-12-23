@@ -57,7 +57,7 @@ Hooking up to an event loop:
 
 An outgoing connection to a server, or an incoming connection
 from a client. The methods defined on this module have a close
-correspondance to the dbus_connection_XXX methods in the C API,
+correspondence to the dbus_connection_XXX methods in the C API,
 so for further details on their behaviour, the C API documentation
 may be of use.
 
@@ -474,7 +474,7 @@ sub get_max_message_size {
 =item $con->set_max_received_size($bytes)
 
 Sets the maximum size of the incoming message queue.
-Once this threashold is exceeded, no more messages will
+Once this threshold is exceeded, no more messages will
 be read from wire before one or more of the existing
 messages are dispatched to their registered handlers.
 The implication is that the message queue can exceed

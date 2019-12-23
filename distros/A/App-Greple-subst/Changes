@@ -1,5 +1,19 @@
 Revision history for Perl extension App-Greple-subst
 
+2.06 2019-12-17T05:34:48Z
+
+    - Fix bug of --check=none was not handled.
+    - Document update.
+
+2.05 2019-12-16T03:45:23Z
+
+    - Detect overlapped patterns and ignore them.
+    - Add --[no-]warn-{overlap,include} options.
+
+2.04 2019-12-13T06:22:21Z
+
+    - Upgrade statistics strategy.
+
 2.03 2019-11-28T11:57:35Z
 
     - Change to use --no-regioncolor option.

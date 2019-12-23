@@ -90,3 +90,6 @@ Revision history for Perl extension B::Keywords.
   - our was added with 5.005_61
 1.20 2019-02-15 11:03:00 rurban
   - extern was added with 5.29.0c
+1.21 2019-12-17 17:38:00 rurban
+  - isa was added with 5.31.7
+  - improved t/z_kwalitee.t

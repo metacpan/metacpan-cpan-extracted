@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Densitymapbox::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Densitymapbox::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Densitymapbox::Colorbar::Title;
 
-our $VERSION = '0.034';    # VERSION
+our $VERSION = '0.035';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace densitymapbox.
 
@@ -281,7 +281,7 @@ Chart::Plotly::Trace::Densitymapbox::Colorbar - This attribute is one of the pos
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 

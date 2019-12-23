@@ -36,7 +36,7 @@ Net::DBus::Binding::Message::Error - a message encoding a method call error
 =head1 DESCRIPTION
 
 This module is part of the low-level DBus binding APIs, and
-should not be used by application code. No guarentees are made
+should not be used by application code. No guarantees are made
 about APIs under the C<Net::DBus::Binding::> namespace being
 stable across releases.
 

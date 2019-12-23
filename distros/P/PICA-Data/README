@@ -21,6 +21,7 @@ SYNOPSIS
             
             # function accessors
             my $ppn      = pica_value($record, '003@0');
+            my $ppn      = pica_match($record, '045Ue', split => 1, nested_array => 1);
             my $holdings = pica_holdings($record);
             my $items    = pica_items($record);
             ...
@@ -28,6 +29,7 @@ SYNOPSIS
             # object accessors (if parser option 'bless' enabled)
             my $ppn      = $record->{_id};
             my $ppn      = $record->value('003@0');
+            my $ddc      = $record->match('045Ue', split => 1, nested_array => 1);
             my $holdings = $record->holdings;
             my $items    = $record->items;
             ...
@@ -142,6 +144,14 @@ FUNCTIONS
 
     Equivalent to PICA::Path->new($path).
 
+ pica_match( $record, $path, %options )
+
+    Equivalent to PICA::Path->match_record($path, %options).
+
+    Extract the subfield values from a PICA record based on a PICA path
+    expression and options (see PICA::Path). Also available as accessor
+    match($path, %options).
+
  pica_value( $record, $path )
 
     Extract the first subfield values from a PICA record based on a PICA
@@ -180,6 +190,11 @@ ACCESSORS
 
     All accessors of PICA::Data are also available as "FUNCTIONS", prefixed
     with pica_ (see "SYNOPSIS").
+
+ match( $path, %options )
+
+    Extract a list of subfield values from a PICA record based on a
+    PICA::Path expression and options.
 
  values( $path )
 

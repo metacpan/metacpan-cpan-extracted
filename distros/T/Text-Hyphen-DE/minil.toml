@@ -1,0 +1,5 @@
+license="gpl_3"
+tag_format="v%v"
+
+[ReleaseTest]
+MinimumVersion = false

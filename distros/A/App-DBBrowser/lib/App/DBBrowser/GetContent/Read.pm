@@ -137,9 +137,9 @@ sub from_copy_and_paste {
     print clear_screen();
     print show_cursor();
     print "Paste multi-row:  (then press Ctrl-D)\n";
-    my $file_ec = $sf->{i}{f_copy_paste};
+    my $file_fs = $sf->{i}{f_copy_paste};
     if ( ! eval {
-        open my $fh_in, '>', $file_ec or die $!;
+        open my $fh_in, '>', $file_fs or die $!;
         # STDIN
         while ( my $row = <STDIN> ) {
             print $fh_in $row;
@@ -149,14 +149,14 @@ sub from_copy_and_paste {
     ) {
         print hide_cursor();
         $ax->print_error_message( $@, join ', ', @{$sf->{i}{stmt_types}}, 'copy & paste' );
-        unlink $file_ec or warn $!;
+        unlink $file_fs or warn $!;
         return;
     }
     print hide_cursor();
-    if ( ! -s $file_ec ) {
+    if ( ! -s $file_fs ) {
         return;
     }
-    return 1, $file_ec;
+    return 1, $file_fs;
 }
 
 
@@ -174,26 +174,26 @@ sub from_file {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
 
     DIR: while ( 1 ) {
-        my $dir_ec = $sf->__directory();
-        if ( ! defined $dir_ec ) {
+        my $dir_fs = $sf->__directory();
+        if ( ! defined $dir_fs ) {
             return;
         }
         my @tmp_files;
         if ( length $sf->{o}{insert}{file_filter} ) {
-            @tmp_files = map { basename $_} grep { -e $_ } glob( catfile( $dir_ec, $sf->{o}{insert}{file_filter} ) );
+            @tmp_files = map { basename $_} grep { -e $_ } glob( catfile( $dir_fs, $sf->{o}{insert}{file_filter} ) );
         }
         else {
-            opendir( my $dh, $dir_ec ) or die $!;
+            opendir( my $dh, $dir_fs ) or die $!;
             @tmp_files = readdir $dh;
             closedir $dh;
         }
-        my @files_ec;
+        my @files_fs;
         for my $file ( sort @tmp_files ) {
             next if $file =~ /^\./ && ! $sf->{o}{insert}{show_hidden_files};
-            next if -d catdir $dir_ec, $file;
-            push @files_ec, catfile( $dir_ec, $file );
+            next if -d catdir $dir_fs, $file;
+            push @files_fs, catfile( $dir_fs, $file );
         }
-        my @files = map { '  ' . decode( 'locale_fs', basename $_ ) } @files_ec;
+        my @files = map { '  ' . decode( 'locale_fs', basename $_ ) } @files_fs;
         my $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
         $sf->{i}{gc}{old_file_idx} //= 1;
 
@@ -224,8 +224,8 @@ sub from_file {
                 $opt_set->set_options( $sf->__file_setting_menu_entries() );
                 next DIR;
             }
-            my $file_ec = $files_ec[$idx-@pre];
-            return 1, $file_ec;
+            my $file_fs = $files_fs[$idx-@pre];
+            return 1, $file_fs;
         }
     }
 }
@@ -268,7 +268,7 @@ sub __directory {
             }
             $sf->{i}{gc}{old_dir_idx} = $idx;
         }
-        my $dir_ec;
+        my $dir_fs;
         if ( $choices->[$idx] eq $hidden ) {
             require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
@@ -277,17 +277,17 @@ sub __directory {
             next DIR;
         }
         elsif ( $choices->[$idx] eq $new_search ) {
-            $dir_ec = $sf->__new_dir_search();
+            $dir_fs = $sf->__new_dir_search();
             # Choose
-            if ( ! defined $dir_ec || ! length $dir_ec ) {
+            if ( ! defined $dir_fs || ! length $dir_fs ) {
                 next DIR;
             }
         }
         else {
-            $dir_ec = realpath encode 'locale_fs', $dirs[$idx-@pre];
+            $dir_fs = realpath encode 'locale_fs', $dirs[$idx-@pre];
         }
-        $sf->__add_to_history( $dir_ec );
-        return $dir_ec;
+        $sf->__add_to_history( $dir_fs );
+        return $dir_fs;
     }
 }
 
@@ -297,27 +297,27 @@ sub __new_dir_search {
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $default_dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
     # Choose
-    my $dir_ec = $tu->choose_a_directory(
+    my $dir_fs = $tu->choose_a_directory(
         { init_dir => $default_dir, decoded => 0, clear_screen => 1 }
     );
-    if ( $dir_ec ) {
-        $sf->{i}{tmp_files_dir} = decode 'locale_fs', $dir_ec;
+    if ( $dir_fs ) {
+        $sf->{i}{tmp_files_dir} = decode 'locale_fs', $dir_fs;
     }
-    return $dir_ec;
+    return $dir_fs;
 }
 
 
 sub __add_to_history {
-    my ( $sf, $dir_ec ) = @_;
+    my ( $sf, $dir_fs ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} );
-    my $dirs_ec = [ map { realpath encode( 'locale_fs', $_ ) } @{$h_ref->{dirs}||[]} ];
-    unshift @$dirs_ec, $dir_ec;
-    @$dirs_ec = uniq @$dirs_ec;
-    if ( @$dirs_ec > $sf->{o}{insert}{history_dirs} ) {
-        $#{$dirs_ec} = $sf->{o}{insert}{history_dirs} - 1;
+    my $dirs_fs = [ map { realpath encode( 'locale_fs', $_ ) } @{$h_ref->{dirs}||[]} ];
+    unshift @$dirs_fs, $dir_fs;
+    @$dirs_fs = uniq @$dirs_fs;
+    if ( @$dirs_fs > $sf->{o}{insert}{history_dirs} ) {
+        $#{$dirs_fs} = $sf->{o}{insert}{history_dirs} - 1;
     }
-    $h_ref->{dirs} = [ map { decode( 'locale_fs', $_ ) } @$dirs_ec ];
+    $h_ref->{dirs} = [ map { decode( 'locale_fs', $_ ) } @$dirs_fs ];
     $ax->write_json( $sf->{i}{f_dir_history}, $h_ref );
 }
 

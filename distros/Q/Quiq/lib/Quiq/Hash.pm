@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -1442,7 +1442,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

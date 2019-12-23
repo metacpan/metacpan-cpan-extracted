@@ -251,19 +251,19 @@ sub __parse_with_template {
 
 
 sub __parse_with_Spreadsheet_Read {
-    my ( $sf, $sql, $file_ec ) = @_;
+    my ( $sf, $sql, $file_fs ) = @_;
     my $tc = Term::Choose->new( { %{$sf->{i}{tc_default}}, clear_screen => 1 } );
     my $waiting = 'Parsing file ... ';
     say $waiting . "\r";
     require Spreadsheet::Read;
     my $book = $sf->{i}{gc}{book};
     if ( ! defined $book ) {
-        $book = Spreadsheet::Read::ReadData( $file_ec, cells => 0, attr => 0, rc => 1, strip => 0 );
+        $book = Spreadsheet::Read::ReadData( $file_fs, cells => 0, attr => 0, rc => 1, strip => 0 );
         $sf->{i}{gc}{book} = $book;
         if ( ! defined $book ) {
             $tc->choose(
                 [ 'Press ENTER' ],
-                { prompt => 'No Book in ' . decode( 'locale_fs', $file_ec ) . '!' }
+                { prompt => 'No Book in ' . decode( 'locale_fs', $file_fs ) . '!' }
             );
             return;
         }
@@ -272,7 +272,7 @@ sub __parse_with_Spreadsheet_Read {
     if ( $sheet_count == 0 ) {
         $tc->choose(
             [ 'Press ENTER' ],
-            { prompt => 'No Sheets in ' . decode( 'locale_fs', $file_ec ) . '!' }
+            { prompt => 'No Sheets in ' . decode( 'locale_fs', $file_fs ) . '!' }
         );
         return;
     }
@@ -312,7 +312,7 @@ sub __parse_with_Spreadsheet_Read {
         return $sheet_count;
     }
     $sql->{insert_into_args} = [ Spreadsheet::Read::rows( $book->[$sheet_idx] ) ];
-    if ( ! -T $file_ec && length $book->[$sheet_idx]{label} ) {
+    if ( ! -T $file_fs && length $book->[$sheet_idx]{label} ) {
         $sf->{i}{gc}{sheet_name} = $book->[$sheet_idx]{label};
     }
     return $sheet_count;

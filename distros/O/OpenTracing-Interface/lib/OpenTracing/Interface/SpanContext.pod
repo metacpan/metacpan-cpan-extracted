@@ -1,0 +1,93 @@
+=head1 NAME
+
+OpenTracing::Interface::SpanContext - A role that defines the SpanContext interface
+
+
+
+=head1 SYNOPSIS
+
+    package OpenTracing::Implementation::MyBackendService::SpanContext;
+    
+    sub get_baggage_item {
+        ...
+    }
+    
+    sub with_baggage_item {
+        ...
+    }
+    
+    BEGIN {
+        use Role::Tiny::With;
+        with 'OpenTracing::Interface::SpanContext'
+            if $ENV{OPENTRACING_INTERFACE};
+    } # check at compile time, perl -c will work
+    
+    1;
+
+
+
+=head1 DESCRIPTION
+
+This 'role' describes the interface for any OpenTracing SpanContext
+implementation.
+
+This description is using C<around> method modifiers that basically wraps them
+around the real implementation. These method modifiers provide a 'readable' and
+reusable interface, describing the inputs and outputs, using type constraints.
+
+Consumers of this role, or implementors of the interface are MUST implement each
+method mentioned below. Not doing so will result in compilation errors.
+
+Since this role does nothing else than checking input and output, it is useful
+during development. Most likely it can be switched off safely in production
+environments.
+
+
+
+=head1 METHODS
+
+=cut
+
+
+
+=head2 get_baggage_item
+
+This will return the value of a baggage item, based on its key.
+
+It will return C<undef> if there is no value for the given key.
+
+=head3 Parameters
+
+none
+
+=head3 Returns
+
+A value, as C<Str>.
+
+C<undef> if no matching key value is found.
+
+
+
+=head2 with_baggage_item
+
+Creates a cloned L<SpanContext> object with the new key => value pair.
+
+=head3 Required Positional Parameters
+
+=over
+
+=item key
+
+must be a string
+
+=item value
+
+must be a string
+
+=back
+
+=head3 Returns
+
+A cloned object that MUST implement this interface.
+
+=cut

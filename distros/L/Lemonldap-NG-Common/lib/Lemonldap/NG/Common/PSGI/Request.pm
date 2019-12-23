@@ -7,7 +7,7 @@ use JSON;
 use Plack::Request;
 use URI::Escape;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 our @ISA = ('Plack::Request');
 
@@ -27,9 +27,9 @@ sub new {
       if ( $self->env->{X_ORIGINAL_URI} );
     $self->env->{PATH_INFO} =~ s|//+|/|g;
 
-    if ( my $tmp = $self->script_name ) {
-        $self->env->{PATH_INFO} =~ s|^$tmp|/|;
-    }
+    #if ( my $tmp = $self->script_name ) {
+    #    $self->env->{PATH_INFO} =~ s|^$tmp|/|;
+    #}
     $self->env->{PATH_INFO} ||= '/';
     $self->env->{REQUEST_URI} =~ s|^//+|/|g;
     $self->{uri}         = uri_unescape( $self->env->{REQUEST_URI} );
@@ -46,13 +46,21 @@ sub uri { $_[0]->{uri} }
 sub userData {
     my ( $self, $v ) = @_;
     return $self->{userData} = $v if ($v);
-    return $self->{userData} || { _whatToTrace => $self->{user}, };
+    return $self->{userData}
+      || {
+        ( $Lemonldap::NG::Handler::Main::tsv->{whatToTrace}
+              || '_whatToTrace' ) => $self->{user}, };
 }
 
 sub respHeaders {
     my ( $self, $respHeaders ) = @_;
     $self->{respHeaders} = $respHeaders if ($respHeaders);
     return $self->{respHeaders};
+}
+
+sub spliceHdrs {
+    my ($self) = @_;
+    return splice @{ $self->{respHeaders} };
 }
 
 sub accept        { $_[0]->env->{HTTP_ACCEPT} }
@@ -188,6 +196,10 @@ Example:
   $req->respHeaders( "Location" => "http://x.y.z/", Etag => "XYZ", );
   # Add header
   $req->respHeaders->{"X-Key"} = "Value";
+
+=head2 spliceHdrs
+
+Returns headers array and flush it.
 
 =head2 set_param( $key, $value )
 

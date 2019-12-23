@@ -1,5 +1,5 @@
 package Spreadsheet::GenerateXLSX;
-$Spreadsheet::GenerateXLSX::VERSION = '0.04';
+$Spreadsheet::GenerateXLSX::VERSION = '0.05';
 use 5.008;
 use strict;
 use warnings;
@@ -91,7 +91,7 @@ my $generate_sheet = sub {
 
         foreach my $cell (@$row) {
             $sheet->write($row_num, $col_num, $cell, $formats->{$celltype});
-            if (!defined($widths[$col_num]) || length($cell) > $widths[$col_num]) {
+            if (!defined($widths[$col_num]) || (defined($cell) && length($cell) > $widths[$col_num])) {
                 $widths[$col_num] = length($cell);
             }
             $col_num++;

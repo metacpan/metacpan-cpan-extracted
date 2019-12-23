@@ -24,13 +24,13 @@ no_index:
     - xt
 requires:
   Catmandu: '0.9103'
-  JSON::Validator: '0.64'
+  JSON::Validator: '3.15'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Validator-JSONSchema/issues
   homepage: https://github.com/LibreCat/Catmandu-Validator-JSONSchema
   repository: https://github.com/LibreCat/Catmandu-Validator-JSONSchema.git
-version: '0.12'
+version: '0.13'
 x_contributors:
   - 'Jakob Voß <jakob.voss@gbv.de>'
   - 'Nicolas Franck <njfranck@cpan.org>'

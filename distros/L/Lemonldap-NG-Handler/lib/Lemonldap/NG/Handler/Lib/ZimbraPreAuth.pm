@@ -11,12 +11,12 @@ package Lemonldap::NG::Handler::Lib::ZimbraPreAuth;
 use strict;
 use Digest::HMAC_SHA1 qw(hmac_sha1_hex);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 # Overload main run method
 sub run {
-    my ( $class, $req ) = @_;
-    my $ret = $class->Lemonldap::NG::Handler::Main::run($req);
+    my ( $class, $req )     = @_;
+    my ( $ret,   $session ) = $class->Lemonldap::NG::Handler::Main::run($req);
 
     # Continue only if user is authorized
     return $ret unless ( $ret == $class->OK );
@@ -57,9 +57,8 @@ sub run {
         $zimbraBy, $timeout );
 
     # Header location
-    Lemonldap::NG::Handler::API->set_header_out( 'Location' => $zimbra_url );
+    $class->set_header_out( $req, 'Location' => $zimbra_url );
 
-    # Return $class->REDIRECT
     return $class->REDIRECT;
 }
 

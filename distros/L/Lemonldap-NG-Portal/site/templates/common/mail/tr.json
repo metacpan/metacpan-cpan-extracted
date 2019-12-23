@@ -1,0 +1,18 @@
+{
+"accountCreated":"Hesabınız oluşturuldu, geçici parolanız e-posta adresinize gönderildi.",
+"autoMail":"Bu e-posta otomatik olarak gönderilmiştir",
+"click2Register":"Hesap açma işleminizi onaylamak için buraya tıklayın",
+"click2Reset":"Parolanızı sıfırlamak için buraya tıklayın",
+"hello":"Merhaba",
+"mail2fSubject":"[LemonLDAP::NG] Giriş kodunuz",
+"mailConfirmSubject":"[LemonLDAP::NG] Parola sıfırlama onayı",
+"mailSubject":"[LemonLDAP::NG] Yeni parolanız",
+"newPwdIs":"Yeni parolanız",
+"pwdChanged":"Parolanız değiştirildi.",
+"pwdIs":"Parolanız",
+"registerConfirmSubject":"[LemonLDAP::NG] Hesap açma onayı",
+"registerDoneSubject":"[LemonLDAP::NG] Yeni hesabınız",
+"requestIssuedFromIP":"İstek IP'den gönderildi",
+"yourLoginCodeIs":"Giriş kodunuz",
+"yourLoginIs":"Giriş bilgileriniz"
+}

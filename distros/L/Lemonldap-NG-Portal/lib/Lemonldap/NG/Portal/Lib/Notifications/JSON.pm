@@ -3,8 +3,9 @@ package Lemonldap::NG::Portal::Lib::Notifications::JSON;
 use strict;
 use Mouse;
 use JSON qw(from_json);
+use POSIX qw(strftime);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 no warnings 'redefine';
 
@@ -34,18 +35,22 @@ sub checkForNotifications {
     return 0 unless ($notifs);
 
     # Transform notifications
-    my $i = 0;    #Files count
+    my $i = 0;    # Files count
     my @res;
+    my $now = strftime "%Y-%m-%d", localtime;
+
     foreach my $file ( values %$notifs ) {
-        my $json = from_json( $file, { allow_nonref => 1 } );
-        my $j = 0;    #Notifications count
+        my $json = eval { from_json( $file, { allow_nonref => 1 } ) };
+        $self->userLogger->warn(
+            "Bad JSON file: a notification for $uid was not done ($@)")
+          if ($@);
+        my $j = 0;    # Notifications count
         $json = [$json] unless ( ref $json eq 'ARRAY' );
       LOOP: foreach my $notif ( @{$json} ) {
 
             # Get the reference
             my $reference = $notif->{reference};
-
-            $self->logger->debug("Get reference $reference");
+            $self->logger->debug("Get reference: $reference");
 
             # Check it in session
             if ( exists $req->{sessionInfo}->{"notification_$reference"} ) {
@@ -54,6 +59,35 @@ sub checkForNotifications {
                 $self->logger->debug(
                     "Notification $reference was already accepted");
                 next LOOP;
+            }
+
+            # Check date
+            my $date = $notif->{date};
+            $self->logger->debug("Get date: $date");
+            unless ( $date and $date =~ /\b\d{4}-\d{2}-\d{2}\b/ ) {
+                $self->logger->error('Malformed date');
+                next LOOP;
+            }
+            unless ( $date le $now ) {
+                $self->logger->debug('Notification date not reached');
+                next LOOP;
+            }
+
+            # Check condition if any
+            if ( my $condition = $notif->{condition} ) {
+                $self->logger->debug("Get condition $condition");
+                $condition = $self->p->HANDLER->substitute($condition);
+                unless ( $condition = $self->p->HANDLER->buildSub($condition) )
+                {
+                    $self->logger->error( 'Notification condition error: '
+                          . $self->p->HANDLER->tsv->{jail}->error );
+                    next LOOP;
+                }
+                unless ( $condition->( $req, $req->sessionInfo ) ) {
+                    $self->logger->debug(
+                        'Notification condition not authorized');
+                    next LOOP;
+                }
             }
             push @res, $notif;
             $j++;
@@ -70,6 +104,7 @@ sub checkForNotifications {
 
     # Stop here if nothing to display
     return 0 unless $i;
+    $self->userLogger->info("$i pending notification(s) found for $uid");
 
     # Returns HTML fragment
     return $form;
@@ -114,8 +149,9 @@ sub getNotifBack {
     $self->p->importHandlerData($req);
     my $uid = $req->sessionInfo->{ $self->notifObject->notifField };
 
-    my ( $notifs, $forUser );
-    eval { ( $notifs, $forUser ) = $self->notifObject->getNotifications($uid) };
+    # ALL notifications are returned here => Need to check active ones only
+    my ( $notifs, $forUser ) =
+      eval { $self->notifObject->getNotifications($uid) };
     return $self->p->sendError( $req, $@, 500 ) if ($@);
 
     if ($notifs) {
@@ -134,6 +170,7 @@ sub getNotifBack {
         }
 
         my $result = 1;
+        my $now    = strftime "%Y-%m-%d", localtime;
         foreach my $fileName ( keys %$notifs ) {
             my $file       = $notifs->{$fileName};
             my $fileResult = 1;
@@ -141,14 +178,48 @@ sub getNotifBack {
             $json = [$json] unless ( ref $json eq 'ARRAY' );
 
             # Get pending notifications and verify that they have been accepted
-            foreach my $notif (@$json) {
+          LOOP: foreach my $notif (@$json) {
                 my $reference = $notif->{reference};
+
+                # Check date
+                my $date = $notif->{date};
+                $self->logger->debug("Get date: $date");
+                unless ( $date and $date =~ /\b\d{4}-\d{2}-\d{2}\b/ ) {
+                    $self->logger->error('Malformed date');
+                    next LOOP;
+                }
+                unless ( $date le $now ) {
+                    $self->logger->debug('Notification date not reached');
+                    $fileResult = 0;    # Do not delete notification
+                    next LOOP;
+                }
+
+                # Check condition if any
+                if ( my $condition = $notif->{condition} ) {
+                    $self->logger->debug("Get condition $condition");
+                    $condition = $self->p->HANDLER->substitute($condition);
+                    unless ( $condition =
+                        $self->p->HANDLER->buildSub($condition) )
+                    {
+                        $self->logger->error( 'Notification condition error: '
+                              . $self->p->HANDLER->tsv->{jail}->error );
+                        next LOOP;
+                    }
+                    unless ( $condition->( $req, $req->sessionInfo ) ) {
+                        $self->logger->debug(
+                            'Notification condition not authorized');
+                        $fileResult = 0;    # Do not delete notification
+                        next LOOP;
+                    }
+                }
 
                 # Check if this pending notification has been seen
                 if ( my $refId = $refs->{$reference} ) {
 
                     # Verity that checkboxes have been checked
                     if ( $notif->{check} ) {
+                        $notif->{check} = [ $notif->{check} ]
+                          unless ( ref( $notif->{check} ) eq 'ARRAY' );
                         if ( my $toCheckCount = @{ $notif->{check} } ) {
                             unless ($checks->{$refId}
                                 and $toCheckCount == @{ $checks->{$refId} } )
@@ -157,7 +228,7 @@ sub getNotifBack {
 "$uid has not accepted notification $reference"
                                 );
                                 $result = $fileResult = 0;
-                                next;
+                                next LOOP;
                             }
                         }
                     }
@@ -165,10 +236,10 @@ sub getNotifBack {
                 else {
                     # Current pending notification has not been found in
                     # request
-                    $result = $fileResult = 0;
                     $self->logger->debug(
                         'Current pending notification has not been found');
-                    next;
+                    $result = $fileResult = 0;
+                    next LOOP;
                 }
 
                 # Register acceptation
@@ -217,6 +288,8 @@ sub toForm {
     @notifs = map {
         $i++;
         if ( $_->{check} ) {
+            $_->{check} = [ $_->{check} ]
+              unless ( ref( $_->{check} ) eq 'ARRAY' );
             my $j = 0;
             $_->{check} =
               [ map { $j++; { id => '1x' . $i . 'x' . $j, value => $_ } }
@@ -238,8 +311,10 @@ sub notificationServer {
     my ( $res, $err );
     if ( $req->method =~ /^POST$/i ) {
         $self->p->logger->debug("POST request");
-        ( $res, $err ) =
-          eval { $self->notifObject->newNotification( $req->content ) };
+        ( $res, $err ) = eval {
+            $self->notifObject->newNotification( $req->content,
+                $self->conf->{notificationDefaultCond} );
+        };
         return $self->p->sendError( $req, $@, 500 ) if ($@);
     }
     elsif ( $req->method =~ /^GET$/i ) {
@@ -252,10 +327,8 @@ sub notificationServer {
         $res = [];
         foreach my $notif ( keys %$notifs ) {
             $self->p->logger->debug("Found notification $notif");
-            my $json;
-            eval {
-                $json = from_json( $notifs->{$notif}, { allow_nonref => 1 } );
-            };
+            my $json =
+              eval { from_json( $notifs->{$notif}, { allow_nonref => 1 } ) };
             return $self->p->sendError( $req, "Unable to decode JSON file: $@",
                 400 )
               if ($@);
@@ -270,7 +343,10 @@ sub notificationServer {
             }
             else {
                 push @$res,
-                  { "uid" => $json->{uid}, "reference" => $json->{reference} };
+                  {
+                    "uid"       => $json->{uid},
+                    "reference" => ( $json->{reference} || $json->{ref} )
+                  };
             }
         }
     }

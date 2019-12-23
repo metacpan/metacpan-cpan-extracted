@@ -15,7 +15,7 @@ my $dir = dirname( abs_path($0) );
 
 print $ini "[all]
 logger = Lemonldap::NG::Common::Logger::Std
-logLeval = error
+logLevel = error
 [configuration]
 type=File
 dirName=$dir
@@ -32,7 +32,6 @@ open STDERR, '>/dev/null';
 
 # Insert your test code below, the Test::More module is used here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
-
 SKIP: {
     eval { require Cache::Memcached };
     skip

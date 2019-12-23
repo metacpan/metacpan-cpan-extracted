@@ -7,7 +7,10 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
     'element' => [
       'service',

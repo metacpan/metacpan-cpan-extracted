@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 17;
+my $maintests = 16;
 my $debug     = 'error';
 my ( $issuer, $proxy, $sp, $res );
 my %handlerOR = ( issuer => [], proxy => [], sp => [] );
@@ -88,11 +88,6 @@ SKIP: {
         ),
         'Unauth SP request'
     );
-    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.proxy.com/saml/metadata; domain=.sp.com; path=/'
-      );
 
     my ( $host, $url, $query ) =
       expectAutoPost( $res, 'auth.proxy.com', '/saml/singleSignOn',
@@ -189,7 +184,6 @@ qr'^http://auth.idp.com/cas/login\?(service=http%3A%2F%2Fauth.proxy.com%2F.*)$'
             $url, IO::String->new($query),
             accept => 'text/html',
             length => length($query),
-            cookie => 'lemonldapidp=http://auth.proxy.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );

@@ -17,7 +17,7 @@ use Plack::Util::Accessor qw/ client sample_rate /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.3.9';
+our $VERSION = 'v0.3.10';
 
 sub call {
     my ( $self, $env ) = @_;
@@ -93,6 +93,8 @@ sub call {
                 $set_count, 'psgi.request.remote_addr', $env->{REMOTE_ADDR}
             ) if $env->{REMOTE_ADDR};
 
+            $measure->( $set_count, 'psgi.worker.pid', $$ );
+
             my $h = Plack::Util::headers( $res->[1] );
 
             my $xsendfile =
@@ -155,7 +157,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.3.9
+version v0.3.10
 
 =head1 SYNOPSIS
 
@@ -299,6 +301,10 @@ key, otherwise the C<HTTP_X_SENDFILE_TYPE> environment variable.
 
 See L<Plack::Middleware::XSendfile> for more information.
 
+=item C<psgi.worker.pid>
+
+The worker PID is added to the set.
+
 =item C<psgix.harakiri>
 
 This counter is incremented when the harakiri flag is set.
@@ -366,7 +372,7 @@ Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

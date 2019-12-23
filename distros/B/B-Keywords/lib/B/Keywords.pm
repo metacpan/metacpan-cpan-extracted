@@ -14,7 +14,7 @@ use vars qw( @EXPORT_OK %EXPORT_TAGS );
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use vars '$VERSION';
-$VERSION = '1.20';
+$VERSION = '1.21';
 my $CPERL = $^V =~ /c$/ ? 1 : 0;
 
 use vars '@Scalars';
@@ -238,7 +238,10 @@ use vars '@Functions';
     index
     int
     import
-    ioctl
+    ioctl ),
+  ($] >= 5.031007 ? qw(
+    isa
+  ) : ()), qw(
     join
     keys
     kill

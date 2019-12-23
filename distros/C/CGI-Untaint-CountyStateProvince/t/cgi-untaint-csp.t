@@ -5,23 +5,24 @@
 
 #########################
 
-use Test::More tests => 8;
+use Test::Most tests => 9;
 BEGIN { use_ok('CGI::Untaint::CountyStateProvince') };
 
 #########################
 
 # Check regular expression checker
 my $regex = CGI::Untaint::CountyStateProvince::_untaint_re();
-ok( 'MD' =~ $regex, 'valid state' );
-ok( 'Kent' =~ $regex, 'valid state' );
-ok( '12' !~ $regex, 'invalid state' );
+like('MD', $regex, 'valid state');
+like('Kent', $regex, 'valid state');
+unlike('12', $regex, 'invalid state');
 
 use_ok('CGI::Untaint');
 
 my $vars = {
-    state1 => 'MD',
-    state2 => 'Kent',
-    state3 => ' ',
+	state1 => 'MD',
+	state2 => 'Kent',
+	state3 => ' ',
+	state4 => undef,
 };
 
 # None should work because we've not given any countries
@@ -36,4 +37,8 @@ is($c, undef, 'Kent');
 
 # and what about empty fields?
 $c = $untainter->extract(-as_CountyStateProvince => 'state3');
+is($c, undef, 'Empty');
+
+# and what about undefined fields?
+$c = $untainter->extract(-as_CountyStateProvince => 'state4');
 is($c, undef, 'Empty');

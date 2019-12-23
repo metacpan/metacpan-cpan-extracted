@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd::Unit ;
-$Config::Model::Backend::Systemd::Unit::VERSION = '0.240.1';
+$Config::Model::Backend::Systemd::Unit::VERSION = '0.244.1';
 use strict;
 use warnings;
 use 5.010;
@@ -51,17 +51,19 @@ sub read {
     my $unit_name = $self->node->index_value;
 
     $self->node->instance->layered_start;
-    my $root = $args{root} || path('.');
+    my $root = $args{root} || path('/');
+    my $cwd = $args{root} || path('.');
 
     # load layers for this service
     foreach my $layer ($self->default_directories) {
-        my $layer_dir = $root->child($layer);
+        my $local_root = $layer =~ m!^/! ? $root : $cwd;
+        my $layer_dir = $local_root->child($layer);
         next unless $layer_dir->is_dir;
 
         my $layer_file = $layer_dir->child($unit_name.'.'.$unit_type);
         next unless $layer_file->exists;
 
-        $logger->debug("reading default layer from unit $unit_type name $unit_name from $layer_file");
+        $logger->warn("reading default layer from unit $unit_type name $unit_name from $layer_file");
         $self->load_ini_file(%args, file_path => $layer_file);
 
         # TODO: may also need to read files in
@@ -242,7 +244,7 @@ Config::Model::Backend::Systemd::Unit - R/W backend for systemd unit files
 
 =head1 VERSION
 
-version 0.240.1
+version 0.244.1
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,20 @@
 package Sort::Sub::by_last_num_in_text;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '0.111'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'Sort-Sub'; # DIST
+our $VERSION = '0.116'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+sub meta {
+    return {
+        v => 1,
+        summary => 'Sort by last number found in text or (if no number is found) ascibetically',
+    };
+}
 
 sub gen_sorter {
     my ($is_reverse, $is_ci) = @_;
@@ -61,7 +70,7 @@ Sort::Sub::by_last_num_in_text - Sort by last number found in text or (if no num
 
 =head1 VERSION
 
-This document describes version 0.111 of Sort::Sub::by_last_num_in_text (from Perl distribution Sort-Sub), released on 2019-10-26.
+This document describes version 0.116 of Sort::Sub::by_last_num_in_text (from Perl distribution Sort-Sub), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -109,7 +118,7 @@ This is nifty for something like (L<sortsub> is CLI front-end for L<Sort::Sub>):
  christophe willem - prismophonic (2011)/
  christophe willem - parait-il (2014)/
 
-=for Pod::Coverage ^(gen_sorter)$
+=for Pod::Coverage ^(gen_sorter|meta)$
 
 =head1 HOMEPAGE
 

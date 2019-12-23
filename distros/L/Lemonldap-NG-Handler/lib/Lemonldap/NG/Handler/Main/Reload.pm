@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -13,6 +13,7 @@ use Scalar::Util qw(weaken);
 
 use constant UNPROTECT => 1;
 use constant SKIP      => 2;
+use constant MAYSKIP   => 3;
 
 our @_onReload;
 
@@ -179,8 +180,9 @@ sub jailInit {
     my ( $class, $conf ) = @_;
 
     $class->tsv->{jail} = Lemonldap::NG::Handler::Main::Jail->new( {
-            useSafeJail     => $conf->{useSafeJail},
-            customFunctions => $conf->{customFunctions},
+            useSafeJail          => $conf->{useSafeJail},
+            customFunctions      => $conf->{customFunctions},
+            multiValuesSeparator => $conf->{multiValuesSeparator},
         }
     );
     $class->tsv->{jail}->build_jail( $class, $conf->{require} );
@@ -231,6 +233,8 @@ sub defaultValuesInit {
               $conf->{vhostOptions}->{$vhost}->{vhostType};
             $class->tsv->{authnLevel}->{$vhost} =
               $conf->{vhostOptions}->{$vhost}->{vhostAuthnLevel};
+            $class->tsv->{serviceTokenTTL}->{$vhost} =
+              $conf->{vhostOptions}->{$vhost}->{vhostServiceTokenTTL};
         }
     }
     return 1;
@@ -274,7 +278,13 @@ sub locationRulesInit {
 
     foreach my $vhost ( keys %$orules ) {
         my $rules = $orules->{$vhost};
-        $class->tsv->{locationCount}->{$vhost} = 0;
+        $class->tsv->{locationCount}->{$vhost}         = 0;
+        $class->tsv->{locationCondition}->{$vhost}     = [];
+        $class->tsv->{locationProtection}->{$vhost}    = [];
+        $class->tsv->{locationRegexp}->{$vhost}        = [];
+        $class->tsv->{locationConditionText}->{$vhost} = [];
+        $class->tsv->{locationAuthnLevel}->{$vhost}    = [];
+
         foreach my $url ( sort keys %{$rules} ) {
             my ( $cond, $prot ) = $class->conditionSub( $rules->{$url} );
             unless ($cond) {
@@ -293,10 +303,14 @@ sub locationRulesInit {
                 push @{ $class->tsv->{locationCondition}->{$vhost} },  $cond;
                 push @{ $class->tsv->{locationProtection}->{$vhost} }, $prot;
                 push @{ $class->tsv->{locationRegexp}->{$vhost} },     qr/$url/;
+                push @{ $class->tsv->{locationAuthnLevel}->{$vhost} },
+                  $url =~ /\(\?#AuthnLevel=(-?\d+)\)/
+                  ? $1
+                  : undef;
                 push @{ $class->tsv->{locationConditionText}->{$vhost} },
-                    $cond =~ /^\(\?#(.*?)\)/ ? $1
-                  : $cond =~ /^(.*?)##(.+)$/ ? $2
-                  :                            $url;
+                    $url =~ /^\(\?#(.*?)\)/ ? $1
+                  : $url =~ /^(.*?)##(.+)$/ ? $2
+                  :                           $url;
                 $class->tsv->{locationCount}->{$vhost}++;
             }
         }
@@ -360,7 +374,7 @@ sub sessionStorageInit {
             $class->tsv->{statusPipe}->print("RELOADCACHE $params\n");
         }
     }
-return 1;
+    return 1;
 }
 
 ## @imethod void headersInit(hashRef args)
@@ -444,6 +458,7 @@ sub postUrlInit {
 # @return array (ref(sub), int)
 sub conditionSub {
     my ( $class, $cond ) = @_;
+    $cond =~ s/\(\?#(\d+)\)$//;
     my ( $OK, $NOK ) = ( sub { 1 }, sub { 0 } );
 
     # Simple cases : accept and deny
@@ -532,6 +547,9 @@ sub conditionSub {
         );
     }
 
+    my $mayskip = 0;
+    $mayskip = MAYSKIP if $cond =~ /\bskip\b/;
+
     # Replace some strings in condition
     $cond = $class->substitute($cond);
     my $sub;
@@ -541,7 +559,7 @@ sub conditionSub {
     }
 
     # Return sub and protected flag
-    return ( $sub, 0 );
+    return ( $sub, $mayskip );
 }
 
 ## @method arrayref aliasInit
@@ -575,6 +593,7 @@ sub substitute {
     $expr =~ s/\$(?!(?:ENV|env)\b)(_\w+|[a-zA-Z]\w*)/\$s->{$1}/sg;
     $expr =~ s/\$ENV\{/\$r->{env}->\{/g;
     $expr =~ s/\$env->\{/\$r->{env}->\{/g;
+    $expr =~ s/\bskip\b/q\{999_SKIP\}/g;
 
     return $expr;
 }

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-03'; # DATE
-our $VERSION = '0.041'; # VERSION
+our $DATE = '2019-12-14'; # DATE
+our $VERSION = '0.044'; # VERSION
 
 use 5.010;
 use strict;
@@ -55,7 +55,7 @@ podless - Show Perl POD source code with `less`
 
 =head1 VERSION
 
-This document describes version 0.041 of podless (from Perl distribution App-PODUtils), released on 2019-06-03.
+This document describes version 0.044 of podless (from Perl distribution App-PODUtils), released on 2019-12-14.
 
 =head1 SYNOPSIS
 
@@ -79,7 +79,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

@@ -1,6 +1,6 @@
 package Catmandu::Importer::EuropePMC;
 
-our $VERSION = '1.01';
+our $VERSION = '1.011';
 
 use Catmandu::Sane;
 use Catmandu::Importer::XML;
@@ -112,6 +112,10 @@ sub generator {
 =head1 NAME
 
   Catmandu::Importer::EuropePMC - Package that imports EuropePMC data.
+
+=head1 DESCRIPTION
+
+    For alternatives see e.g. L<Catmandu::Importer::getJSON>.
 
 =head1 API Documentation
 

@@ -55,7 +55,11 @@ t/agent_mod.t
 t/lib/Neo4p/Connect.pm
 t/lib/Neo4p/Test.pm
 t/lib/Neo4p/TestAgent.pm
+t/id_roundtrip.t
 t/issue_5.t
+t/jparse_json_v4.t
+t/json_utf8.t
+t/relationship_new.t
 t/rt_80150.t
 t/rt_80196.t
 t/rt_80471.t

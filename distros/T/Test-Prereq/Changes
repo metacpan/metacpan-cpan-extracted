@@ -1,5 +1,9 @@
 Revision history for Perl module Test::Prereq
 
+2.003 2019-12-20T06:43:31Z
+	* Uniq the list of modules this extracts. Module::Extract::Use 1.045
+	changed slightly to return a bit more than it used to.
+
 2.002 2016-11-23T22:03:31Z
 	* Support test_requires in Module::Build (Sam Brightman, GitHub #15)
 

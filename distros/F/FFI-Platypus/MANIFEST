@@ -182,6 +182,7 @@ maint/run-before_build.pl
 maint/tt/accessor.tt
 maint/tt/accessor_wrapper.tt
 perlcriticrc
+pod2htmd.tmp
 t/00_diag.t
 t/01_use.t
 t/ffi/align.c

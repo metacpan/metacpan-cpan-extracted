@@ -62,7 +62,7 @@
          "web" : "https://github.com/srchulo/Mojolicious-Plugin-CanonicalURL"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Adam Hopkins <violapiratejunky@gmail.com>"
    ],

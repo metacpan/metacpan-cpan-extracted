@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -83,7 +83,6 @@ sub display {
               && $req->data->{login},
             ASK_LOGINS => $req->param('checkLogins') || 0,
             CONFIRMKEY => $self->stamp(),
-            REMEMBER   => $req->data->{confirmRemember},
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -113,7 +112,6 @@ sub display {
             ASK_LOGINS => $req->param('checkLogins') || 0,
             CONFIRMKEY => $self->stamp(),
             LIST       => $req->data->{list} || [],
-            REMEMBER   => $req->data->{confirmRemember},
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -265,7 +263,9 @@ sub display {
         # Avoid issue 1867
         or (    $self->conf->{authentication} eq 'Combination'
             and $req->{error} > PE_OK
-            and $req->{error} != PE_FIRSTACCESS )
+            and $req->{error} != PE_FIRSTACCESS
+            and $req->{error} != PE_BADCREDENTIALS
+            and $req->{error} != PE_PP_PASSWORD_EXPIRED )
 
        # and ( $req->{error} == PE_TOKENEXPIRED or $req->{error} == PE_NOTOKEN )
       )
@@ -306,6 +306,8 @@ sub display {
             ASK_LOGINS            => $req->param('checkLogins') || 0,
             DISPLAY_RESETPASSWORD => $self->conf->{portalDisplayResetPassword},
             DISPLAY_REGISTER      => $self->conf->{portalDisplayRegister},
+            DISPLAY_UPDATECERTIF  => $self->conf->{portalDisplayCertificateResetByMail},
+            MAILCERTIF_URL        => $self->conf->{certificateResetByMailURL},
             MAIL_URL              => $self->conf->{mailUrl},
             REGISTER_URL          => $self->conf->{registerUrl},
             HIDDEN_INPUTS         => $self->buildHiddenForm($req),

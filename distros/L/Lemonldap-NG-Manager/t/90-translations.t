@@ -35,7 +35,7 @@ foreach my $lang (@langs) {
     my @l1 = sort keys %$keys;
     my @l2 = sort keys %$l;
     ok( $#l1 == $#l2,
-        "'$lang' and 'en' have the same count (" . @l1 . '/' . @l2 . ")" );
+        "'$lang' and 'en' have the same count (" . @l2 . '/' . @l1 . ")" );
 
     my @unTr;
     while (@l1) {

@@ -111,24 +111,6 @@ subtest 'multiple statements as array' => sub {
 };
 
 
-subtest 'die_on_error = 0' => sub {
-	# die_on_error currently only affects upstream errors.
-	# If this option is ever officially supported, one would expect
-	# it to also affect all croaks this driver issues by itself.
-	# The latter are not yet covered by these tests.
-	plan tests => 3;
-	my $t = $driver->session->begin_transaction;
-	$t->{transport}->{die_on_error} = 0;
-	lives_and { is $t->run('RETURN 42, "live on error"')->single->get(0), 42 } 'no error';
-	lives_and { warnings { is $t->run('iced manifolds.')->size, 0 } } 'cypher syntax error';
-	lives_ok { warnings {
-		my $d = Neo4j::Test->driver_no_host;
-		$d->{die_on_error} = 0;
-		$d->session->run;
-	} } 'no connection';
-};
-
-
 subtest 'result stream interface: attachment' => sub {
 	plan tests => 5;
 	$r = $s->run('RETURN 42');
@@ -295,6 +277,27 @@ END
 	lives_and {
 		ok grep {$_->{properties}->{name} eq $r->get('c')->get('name')} @$n;
 	} 'node c found';
+};
+
+
+subtest 'custom cypher types' => sub {
+	plan tests => 4;
+	my $e_exact = exp(1);
+	my $d = Neo4j::Test->driver_maybe;
+	lives_ok {
+		$d->config(cypher_types => {
+			node => 'Local::Node',
+			init => sub { my $self = shift; $self->{e_approx} = $e_exact },
+		});
+	} 'cypher types config';
+	$r = 0;
+	lives_ok {
+		my $t = $d->session->begin_transaction;
+		$r = $t->run('CREATE (a {e_approx:3}) RETURN a')->single->get('a');
+	} 'cypher types query';
+	is ref($r), 'Local::Node', 'cypher type ref';
+	is $r->{e_approx}, $e_exact, 'cypher type init';  # ->{} property access is deprecated
+	# TODO: test coverage for other types
 };
 
 

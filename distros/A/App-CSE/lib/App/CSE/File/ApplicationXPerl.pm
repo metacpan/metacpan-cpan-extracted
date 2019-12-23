@@ -1,5 +1,5 @@
 package App::CSE::File::ApplicationXPerl;
-$App::CSE::File::ApplicationXPerl::VERSION = '0.014';
+$App::CSE::File::ApplicationXPerl::VERSION = '0.015';
 use Moose;
 extends qw/App::CSE::File/;
 

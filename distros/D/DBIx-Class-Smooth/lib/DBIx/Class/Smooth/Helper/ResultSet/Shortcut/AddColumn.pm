@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Helper::ResultSet::Shortcut::AddColumn;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0101';
+our $VERSION = '0.0102';
 
 use parent 'DBIx::Class::Helper::ResultSet::Shortcut::AddColumns';
 use Carp qw/confess/;
@@ -27,10 +27,6 @@ sub add_column($self, @args) {
         confess "add_column given an un-even number of arguments"
     }
     my %args = @args;
-    use Data::Dumper::Concise;
-    say '((((';
-    say Dumper \%args;
-    say ')))';
 
     my %plus_select_args = ();
     my @plus_as_args = ();
@@ -67,7 +63,7 @@ DBIx::Class::Smooth::Helper::ResultSet::Shortcut::AddColumn - Short intro
 
 =head1 VERSION
 
-Version 0.0101, released 2018-11-29.
+Version 0.0102, released 2019-12-22.
 
 =head1 SOURCE
 

@@ -3,7 +3,6 @@ requires 'HTML::ExtractContent';
 requires 'IO::Socket::SSL', '2.009';
 requires 'Importer';
 requires 'JSON';
-requires 'Module::Functions';
 requires 'Mojolicious', '8.25';
 requires 'Moo';
 requires 'SemanticWeb::Schema';

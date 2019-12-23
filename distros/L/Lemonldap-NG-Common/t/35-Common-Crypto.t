@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 22;
+use Test::More tests => 21;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 use strict;
 
@@ -31,10 +31,7 @@ foreach my $i ( 1 .. 17 ) {
     $s = join( '', map { chr( int( rand(94) ) + 33 ) } ( 1 .. $i ) );
     ok( $c->decrypt( $c->encrypt($s) ) eq $s,
         "Test of base64 encrypting with $i characters string" )
-      or diag "Source: $s\nCypher: "
-      . $c->encrypt($s)
-      . "\nUncipher:"
-      . $c->decrypt( $c->encrypt($s) );
+      or diagErr( $s, $c->decrypt( $c->encrypt($s) ), $c->encrypt($s) );
 }
 
 my $data      = md5_hex(rand);
@@ -42,13 +39,23 @@ my $secondKey = md5(rand);
 ok(
     $c->decryptHex( $c->encryptHex( $data, $secondKey ), $secondKey ) eq $data,
     "Test of hexadecimal encrypting"
-);
+  )
+  or diagErr(
+    $data,
+    $c->decryptHex( $c->encryptHex( $data, $secondKey ), $secondKey ),
+    $c->encryptHex( $data, $secondKey )
+  );
 
 # Test a long value, and replace carriage return by %0A
-my $long = "f5a1f72e7ab2f7712855a068af0066f36bfcf2c87e6feb9cf4200da1868e1dfe";
+my $long = Lemonldap::NG::Common::Crypto::srandom()->randpattern( "s" x 1000 );
 ok( $c->decrypt( $c->encrypt($long) ) eq $long,
-    "Test of long value encrypting" );
-ok(
-    $c->decryptHex( $c->encryptHex($long) ) eq $long,
-    "Test of long value encrypting (hex)"
-);
+    "Test of long value encrypting" )
+  or diagErr(
+    $long,
+    $c->decryptHex( $c->encryptHex($long) ),
+    $c->encryptHex($long)
+  );
+
+sub diagErr {
+    diag "Expect: $_[0]\nGet   : $_[1]\nCipher: $_[2]";
+}

@@ -33,7 +33,7 @@ Creating a new message
   $iterator->append_byte(123);
 
 
-Reading from a mesage
+Reading from a message
 
   my $msg = ...get it from somewhere...
   my $iter = $msg->iterator();
@@ -462,6 +462,8 @@ sub append {
 	    $self->append_object_path($value);
 	} elsif ($type == &Net::DBus::Binding::Message::TYPE_SIGNATURE) {
 	    $self->append_signature($value);
+	} elsif ($type == &Net::DBus::Binding::Message::TYPE_UNIX_FD) {
+	    $self->append_unix_fd($value);
 	} else {
 	    die "Unsupported scalar type ", $type, " ('", chr($type), "')";
 	}

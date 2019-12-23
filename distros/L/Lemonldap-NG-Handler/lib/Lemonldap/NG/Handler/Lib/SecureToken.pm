@@ -14,7 +14,7 @@ use strict;
 use Cache::Memcached;
 use Apache::Session::Generate::MD5;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 # Shared variables
 our $secureTokenMemcachedConnection;
@@ -32,7 +32,7 @@ BEGIN {
 # @return Apache2::Const value ($class->OK, $class->FORBIDDEN, $class->REDIRECT or $class->SERVER_ERROR)
 sub run {
     my $class = shift;
-    my $r     = $_[0];
+    my $r     = shift;
     my ( $ret, $session ) = $class->Lemonldap::NG::Handler::Main::run($r);
 
     # Continue only if user is authorized
@@ -43,11 +43,11 @@ sub run {
 
     # Catch Secure Token parameters
     my $localConfig = $class->localConfig;
-    my $secureTokenMemcachedServers =
+    our $secureTokenMemcachedServers =
       $localConfig->{secureTokenMemcachedServers} || ['127.0.0.1:11211'];
     my $secureTokenExpiration = $localConfig->{secureTokenExpiration} || 60;
     my $secureTokenAttribute  = $localConfig->{secureTokenAttribute}  || 'uid';
-    my $secureTokenUrls       = $localConfig->{'secureTokenUrls'}     || ['.*'];
+    our $secureTokenUrls = $localConfig->{'secureTokenUrls'} || ['.*'];
     my $secureTokenHeader = $localConfig->{secureTokenHeader} || 'Auth-Token';
     my $secureTokenAllowOnError = $localConfig->{'secureTokenAllowOnError'}
       // 1;
@@ -106,7 +106,7 @@ sub run {
     # Remove token
     eval 'use Apache2::Filter' unless ( $INC{"Apache2/Filter.pm"} );
 
-    if ( $INC{"Apache2/Filter.pm"} ) {
+    if ( $INC{"Apache2/Filter.pm"} and defined $r->{env}->{'psgi.r'} ) {
         $r->{env}->{'psgi.r'}->add_output_filter(
             sub {
                 my $f = shift;
@@ -121,7 +121,6 @@ sub run {
         );
     }
 
-    # Return $class->OK
     return $class->OK;
 }
 
@@ -150,9 +149,7 @@ sub _createMemcachedConnection {
 # @return Token key
 sub _setToken {
     my ( $class, $value, $secureTokenExpiration ) = @_;
-
     my $key = Apache::Session::Generate::MD5::generate();
-
     my $res =
       $secureTokenMemcachedConnection->set( $key, $value,
         $secureTokenExpiration );
@@ -173,7 +170,6 @@ sub _setToken {
 # @return result
 sub _deleteToken {
     my ( $class, $key ) = @_;
-
     my $res = $secureTokenMemcachedConnection->delete($key);
 
     unless ($res) {
@@ -192,16 +188,13 @@ sub _deleteToken {
 # @return result
 sub _isAlive {
     my ($class) = @_;
-
     return 0 unless defined $secureTokenMemcachedConnection;
-
     my $stats = $secureTokenMemcachedConnection->stats();
 
     if ( $stats and defined $stats->{'total'} ) {
         my $total_c = $stats->{'total'}->{'connection_structures'};
         my $total_i = $stats->{'total'}->{'total_items'};
-
-        $class->logger->debug->(
+        $class->logger->debug(
 "Memcached connection is alive ($total_c connections / $total_i items)"
         );
 

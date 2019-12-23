@@ -47,7 +47,7 @@ s/^.*token=([^&]+).*$/token=$1&firstname=who&lastname=doctor&mail=dwho%40badwolf
     );
     my $token;
     ok( $token = $1, ' Token value is defined' );
-    ok( $res->[2]->[0] =~ m#<img src="data:image/png;base64#,
+    ok( $res->[2]->[0] =~ m#<img id="captcha" src="data:image/png;base64#,
         ' Captcha image inserted' )
       or print STDERR Dumper( $res->[2]->[0] );
 
@@ -101,7 +101,7 @@ s/^.*token=([^&]+).*$/token=$1&firstname=foo&lastname=bar&mail=foobar%40badwolf.
         'Token found'
     );
     ok( $token = $1, ' Token value is defined' );
-    ok( $res->[2]->[0] =~ m#<img src="data:image/png;base64#,
+    ok( $res->[2]->[0] =~ m#<img id="captcha" src="data:image/png;base64#,
         ' Captcha image inserted' )
       or print STDERR Dumper( $res->[2]->[0] );
 

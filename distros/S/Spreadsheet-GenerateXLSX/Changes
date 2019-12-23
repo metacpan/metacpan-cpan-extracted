@@ -1,5 +1,9 @@
 Revision history for Perl module Spreadsheet::GenerateXLSX
 
+0.05 2019-12-17 NEILB
+    - passing a value of undef would result in a warning when you generate
+      the spreadsheet. Thanks to Johann Rolschewski for PR with fix.
+
 0.04 2017-01-05 NEILB
     - Optional testsuite that checks whether generated spreadsheet reads ok.
       Uses Spreadsheet::ParseXLSX, or skips if that's not installed.

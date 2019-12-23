@@ -5,7 +5,7 @@ use File::ShareDir::Install;
 
 install_share dist => 'share';
 
-my $is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && $^O =~ /bsd/i && -f "../../perl.release.mk";
+my $is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && ($^O =~ /bsd/i || $ENV{PERL_RELEASE_READY}) && -f "../../perl.release.mk";
 
 WriteMakefile(
     NAME               => 'Map::Metro::Plugin::Map::Berlin',

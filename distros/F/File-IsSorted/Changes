@@ -1,0 +1,13 @@
+Revision history for File-IsSorted
+
+0.0.4       2019-12-15
+    - Add a link to App:sorted in the SEE ALSO.
+
+0.0.3       2019-12-15
+    - Correct the docs' formatting.
+
+0.0.2       2019-12-15
+    - Add DESCRIPTIONs to the POD.
+
+0.0.1       2019-12-14
+    - First version, released on an unsuspecting world

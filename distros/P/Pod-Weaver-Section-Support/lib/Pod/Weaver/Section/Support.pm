@@ -1,5 +1,5 @@
 package Pod::Weaver::Section::Support;
-$Pod::Weaver::Section::Support::VERSION = '1.010';
+$Pod::Weaver::Section::Support::VERSION = '1.011';
 # ABSTRACT: Add a SUPPORT section to your POD
 
 use Moose 1.03;
@@ -158,7 +158,7 @@ sub weave_section {
 			content => '',
 			children => [
 				Pod::Elemental::Element::Pod5::Ordinary->new( {
-					content => join( " ", qw( cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan ) ),
+					content => join( " ", qw( cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan ) ),
 				} ),
 			],
 	} ),
@@ -482,14 +482,14 @@ sub _add_websites {
 
 	# sanity check
 	foreach my $type ( @{ $self->websites } ) {
-		if ( $type !~ /^(?:metacpan|search|rt|anno|ratings|kwalitee|testers|testmatrix|deps|all)$/i ) {
+		if ( $type !~ /^(?:metacpan|search|rt|ratings|kwalitee|testers|testmatrix|deps|all)$/i ) {
 			$self->log_fatal( "Unknown website type: $type" );
 		}
 	}
 
 	# Set the default ordering for "all"
 	if ( grep { $_ eq 'all' } @{ $self->websites } ) { ## no critic ( BuiltinFunctions::ProhibitBooleanGrep )
-		@{ $self->websites } = qw( metacpan search rt anno ratings kwalitee testers testmatrix deps );
+		@{ $self->websites } = qw( metacpan search rt ratings kwalitee testers testmatrix deps );
 	}
 
 	# Make the website links!
@@ -557,16 +557,6 @@ sub _add_websites_rt {
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=$dist>
-EOF
-}
-
-sub _add_websites_anno {
-	my $dist = shift;
-
-	return _make_item( 'AnnoCPAN', <<"EOF" );
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/$dist>
 EOF
 }
 
@@ -655,7 +645,7 @@ Pod::Weaver::Section::Support - Add a SUPPORT section to your POD
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 DESCRIPTION
 
@@ -712,7 +702,7 @@ Specify what website links you want to see. This is an array, and you can pick a
 specify it as a comma-delimited string. The ordering of the options are important, as they are reflected in
 the final POD.
 
-Valid options are: "none", "metacpan", "search", "rt", "anno", "ratings", "kwalitee", "testers", "testmatrix", "deps" and "all".
+Valid options are: "none", "metacpan", "search", "rt", "ratings", "kwalitee", "testers", "testmatrix", "deps" and "all".
 
 The default is "all".
 
@@ -720,7 +710,6 @@ The default is "all".
 	metacpan	- https://metacpan.org/release/$dist
 	search		- http://search.cpan.org/dist/$dist
 	rt		- https://rt.cpan.org/Public/Dist/Display.html?Name=$dist
-	anno		- http://annocpan.org/dist/$dist
 	ratings		- http://cpanratings.perl.org/d/$dist
 	kwalitee	- http://cpants.perl.org/dist/$dist
 	testers		- http://cpantesters.org/distro/$first_char/$dist
@@ -808,10 +797,6 @@ Specify the content for the email section.
 Please put the "{EMAIL}" placeholder somewhere!
 
 The default is a sufficient explanation ( see L</SUPPORT>).
-
-=head1 VERSION
-
-version 1.010
 
 =for stopwords dist dzil repo
 

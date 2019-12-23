@@ -1,6 +1,7 @@
 use Test::More;
 use strict;
 use IO::String;
+use JSON;
 
 BEGIN {
     require 't/test-lib.pm';
@@ -316,9 +317,72 @@ m%<div class="alert alert-danger"><div class="text-center"><b><span trspan="forb
 ) or explain( $res->[2]->[0], 'trspan="forbidden"' );
 count(2);
 
-# Request with good VH & user
+# Request with forbidden URL proteced by extended function
 $query =~
-s#url=http%3A%2F%2Fauth.example.com%2Fcheckuser#url=hTTp%3A%2F%2FTest1.exAmple.cOm/UriTesT#;
+s#url=http%3A%2F%2Fauth.example.com%2Fcheckuser#url=http%3A%2F%2Ftest1.example.com/test-restricted_uri/rtyler#;
+ok(
+    $res = $client->_post(
+        '/checkuser',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        accept => 'text/html',
+    ),
+    'POST checkuser'
+);
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/checkuser', 'user', 'url' );
+ok(
+    $res->[2]->[0] =~
+m%<div class="alert alert-danger"><div class="text-center"><b><span trspan="forbidden"></span></b></div></div>%,
+    'Found trspan="forbidden"'
+) or explain( $res->[2]->[0], 'trspan="forbidden"' );
+count(2);
+
+# Request with allowed URL proteced by extended function
+$query =~
+s#url=http%3A%2F%2Ftest1.example.com%2Ftest-restricted_uri%2Frtyler#url=http%3A%2F%2Ftest1.example.com/test-restricted_uri/rtyler/#;
+ok(
+    $res = $client->_post(
+        '/checkuser',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        #accept => 'text/html',
+    ),
+    'POST checkuser'
+);
+my $json;
+ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
+  or print STDERR "$@\n" . Dumper($res);
+ok(
+    $json->{URL} eq 'http://test1.example.com/test-restricted_uri/rtyler/',
+    'Find well formated URL'
+) or explain( $json, "Find expected URL" );
+ok(
+    $json->{ALLOWED} eq 'allowed',
+    'Find "allowed"'
+) or explain( $json, 'Find "allowed"' );
+ok(
+    $json->{ALERTE} eq 'alert-info',
+    'Find "alert-info"'
+) or explain( $json, "Find alert-info" );
+ok(
+    $json->{ALERTE_AUTH} eq 'alert-success',
+    'Find "alert-success"'
+) or explain( $json, 'Find "alert-success"' );
+ok(
+    $json->{LOGIN} eq 'rtyler',
+    'Find "rtyler"'
+) or explain( $json, 'Find login "rtyler"' );
+ok(
+    $json->{MSG} eq 'checkUser',
+    'Find "checkUser"'
+) or explain( $json, 'Find message "checkUser"' );
+count(8);
+
+# Request with good VH & user
+$query = 'url=hTTp%3A%2F%2FTest1.exAmple.cOm/UriTesT&user=rtyler';
 ok(
     $res = $client->_post(
         '/checkuser',
@@ -444,7 +508,7 @@ ok(
 );
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-positive alert"><span trspan="PE5"></span></div>%,
+m%<div class="alert alert-warning alert"><div class="text-center"><span trspan="PE5"></span></div></div>%,
     ' PE5 found'
 ) or explain( $res->[2]->[0], 'PE5 - Forbidden identity' );
 count(2);
@@ -463,7 +527,7 @@ ok(
 );
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-positive alert"><span trspan="PE5"></span></div>%,
+m%<div class="alert alert-warning alert"><div class="text-center"><span trspan="PE5"></span></div></div>%,
     ' PE5 found'
 ) or explain( $res->[2]->[0], 'PE5 - Unknown identity' );
 count(2);
@@ -482,10 +546,19 @@ ok(
 );
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-positive alert"><span trspan="PE5"></span></div>%,
+m%<div class="alert alert-warning alert"><div class="text-center"><span trspan="PE5"></span></div></div>%,
     ' PE5 found'
 ) or explain( $res->[2]->[0], 'PE5 - Unvalid identity' );
 count(2);
+
+
+
+
+
+
+
+
+
 
 $client->logout($id);
 clean_sessions();

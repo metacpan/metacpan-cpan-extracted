@@ -56,7 +56,7 @@ Managing the server and new connections in an event loop
 
 A server for receiving connection from client programs.
 The methods defined on this module have a close
-correspondance to the dbus_server_XXX methods in the C API,
+correspondence to the dbus_server_XXX methods in the C API,
 so for further details on their behaviour, the C API documentation
 may be of use.
 

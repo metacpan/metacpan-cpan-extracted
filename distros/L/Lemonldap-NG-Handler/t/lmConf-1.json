@@ -41,11 +41,18 @@
       "default": "$uid eq \"dwho\""
     },
     "test1.example.com": {
+      "^/AuthStrong(?#AuthnLevel=5)": "accept",
+      "^/AuthWeak(?#AuthnLevel=1)": "accept",
+      "^/test-uri1": "varIsInUri($ENV{REQUEST_URI}, '/test-uri1/', $uid, 1)",
+      "^/test-uri2": "varIsInUri($ENV{REQUEST_URI}, '/test-uri2/', $uid)",
+      "^/test-restricted_uri": "varIsInUri($ENV{REQUEST_URI}, '/test-restricted_uri/', \"$uid/\", 1)",
+      "^/skipif": "$ENV{REQUEST_URI} =~ /zz/ ? skip : 1",
       "^/logout": "logout_sso",
       "^/deny": "deny",
       "default": "accept"
     },
     "test2.example.com": {
+      "^/AuthWeak(?#AuthnLevel=1)": "accept",
       "^/logout": "logout_sso",
       "default": "accept"
     },
@@ -60,5 +67,10 @@
   "portal": "http://auth.example.com/",
   "reloadUrls": {},
   "userDB": "Demo",
+  "vhostOptions": {
+    "test2.example.com": {
+        "vhostAuthnLevel": 5
+      }
+  },
   "whatToTrace": "_whatToTrace"
 }

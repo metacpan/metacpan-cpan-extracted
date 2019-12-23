@@ -37,6 +37,12 @@ my %builder = (
     },
     psgi => sub {
         return sub {
+
+            # Fix PATH_INFO when using Nginx with default uwsgi_params
+            # See #2031
+            ( $_[0]->{PATH_INFO} ) =
+              $_[0]->{REQUEST_URI} =~ /^(?:\Q$_[0]->{SCRIPT_NAME}\E)?([^?]*)/;
+
             my $script = $_[0]->{SCRIPT_FILENAME};
             return $_apps{$script}->(@_) if ( $_apps{$script} );
             $_apps{$script} = do $script;
@@ -44,7 +50,7 @@ my %builder = (
                 die "Unable to load $_[0]->{SCRIPT_FILENAME}";
             }
             return $_apps{$script}->(@_);
-          }
+        }
     },
 );
 

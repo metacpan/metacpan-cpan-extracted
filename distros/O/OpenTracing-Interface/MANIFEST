@@ -1,0 +1,30 @@
+cpanfile
+examples/lib/App/Foo.pm
+examples/lib/App/Foo/interface.pm
+examples/lib/App/Foo/types.pm
+examples/lib/App/Interface.pm
+lib/OpenTracing/Interface.pm
+lib/OpenTracing/Interface.pod
+lib/OpenTracing/Interface/Scope.pm
+lib/OpenTracing/Interface/Scope.pod
+lib/OpenTracing/Interface/ScopeManager.pm
+lib/OpenTracing/Interface/Span.pm
+lib/OpenTracing/Interface/Span.pod
+lib/OpenTracing/Interface/SpanContext.pm
+lib/OpenTracing/Interface/SpanContext.pod
+lib/OpenTracing/Interface/Tracer.pm
+lib/OpenTracing/Interface/Tracer.pod
+LICENSE.md
+Makefile.PL
+MANIFEST
+examples/MyTracer/Check.pm
+examples/MyTracer/Scope.pm
+examples/MyTracer/ScopeManager.pm
+examples/MyTracer/Span.pm
+examples/MyTracer/SpanContext.pm
+examples/MyTracer/Tracer.pm
+examples/README.txt
+README.md
+t/00_use_ok.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -40,5 +40,15 @@ if ($have_duplicates) {
 	say "Please remove duplicate entries before opening a pull request.";
 }
 
+for my $station (@{$stations}) {
+	$station->{eva} = 0+$station->{eva};
+	if ($station->{latlong} and $station->{latlong}[0] == 0 and $station->{latlong}[1] == 0) {
+		$station->{latlong} = undef;
+	}
+	elsif (not exists $station->{latlong}) {
+		$station->{latlong} = undef;
+	}
+}
+
 my $json_out = JSON->new->utf8->canonical->pretty->encode($stations);
 write_file( 'stations.json', $json_out );

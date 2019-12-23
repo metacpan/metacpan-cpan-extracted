@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Steenlant C<< <nicolas.steenlant at ugent.be> >>"
   ],
   "dist_name" => "Catmandu-BibTeX",
-  "dist_version" => "0.14",
+  "dist_version" => "0.15",
   "license" => "perl",
   "module_name" => "Catmandu::BibTeX",
   "recursive_test_files" => 1,
@@ -26,6 +26,7 @@ my %module_build_args = (
     "BibTeX::Parser" => "1.02",
     "Catmandu" => "1.2002",
     "Clone" => 0,
+    "LaTeX::Decode" => "0.05",
     "Moo" => 0,
     "perl" => "v5.10.1"
   },

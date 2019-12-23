@@ -1,0 +1,174 @@
+=head1 NAME
+
+Role::MethodReturns - around Method Modifiers with Parameter & Return Type Check
+
+
+
+=head1 SYNOPSIS
+
+    package My::Class::interface;
+    
+    use Role::MethodReturns;
+    use Types::Standard qw/:all/;
+    
+    around create_object => class_method ( Str $name, Int $age ) {
+        returns( InstanceOf['My::Class'] ,
+            $original->( $class => ( $name, $age )
+        )
+    };
+
+In the Interface consuming Class:
+
+    package My::Class;
+    
+    use Role::Tiny::With;
+    
+    with My::Class::interface unless $ENV{ROLE_METHOD_RETURN}
+    
+    sub create_object {
+        ...
+    }
+
+
+
+=head1 DESCRIPTION
+
+Some languages have beautiful ways to describe a 'interface', explicitly showing
+what methods are available, what arguments need to be passed in and what it will
+return.
+
+Perl does not.
+
+But we have CPAN... L<Role::MethodReturns> will bring some of this, by
+providing a few 'imports'.
+
+
+
+=head1 EXPORTS
+
+The following are exported into the callers namespace:
+
+
+
+=head2 around
+
+This is the C<around> method modifier, imported from L<Role::Tiny>. Basically,
+the interface being described, is nothing else than a role.
+
+
+
+=head2 parameters
+
+    around $method => parameters ( $Type $foo, $Type $bar ) { ... }
+
+After this keyword, it expects a list of parameters, that can have type
+constraints, like those from L<Type::Tiny>. C<parameters> is a specific import
+using L<Function::Parameters> and C<shift>s off C<$orig> and C<$self>.
+
+So, inside the around method modifier CODEBLOCK, one can do:
+
+    $orig->( $self => ( ... ) );
+
+
+
+=head2 instance_method
+
+    around $method => instance_method ( $Type $foo, $Type $bar ) { ... }
+
+Like L<parameters>, but instead of C<$self> generates a C<$instance> variable,
+which must be of the type C<Object>, from L<Types::Standard>.
+
+And inside the CODEBLOCK:
+
+    $original->( $instance => ( ... ) );
+
+
+
+=head2 class_method
+
+    around $method => class_method ( $Type $foo, $Type $bar ) { ... }
+
+Like L<parameters>, but instead of C<$self> generates a C<$class> variable,
+which must be of the type C<ClassName>, from L<Types::Standard>.
+
+And inside the CODEBLOCK:
+
+    $original->( $class => ( ... ) );
+
+
+
+=head2 method_parameters
+
+    around $method => method_parameters ( $Type $foo, $Type $bar ) { ... }
+
+Like L<parameters>, but instead of C<$self> generates a C<$invocant> variable,
+which must be of the type C<Invocant>, from L<Type::Params>. Which is the union
+of C<Object> type and <Class> type. Incase it is not sure which is being used.
+
+And inside the CODEBLOCK:
+
+    $original->( $invocant => ( ... ) );
+
+
+
+=head2 returns
+
+    returns ( $Type , $return_value )
+
+Checks that the C<$return_value> is of type C<$Type> and returns that value, or
+dies otherwise.
+
+This is borrowed from C<assert_return>, found in L<Type::Tiny> and friends.
+
+
+
+=head2 maybe_returns
+
+    maybe_returns ( $Type , $return_value )
+
+Just like L<returns>, however will accept C<undef> as well.
+
+
+=head2 returns_self
+
+    returns ( $self , $return_value )
+
+Checks that the the C<$return_value>, is the same as C<$self>. That is just for
+convenience when your method allows chaining and returns the same object.
+
+
+=head2 maybe_returns_self
+
+    returns ( $self , $return_value )
+
+Same as L<returns_self> except that it allows for C<undef> to be returned. This
+could be nice for interfaces that do not want to throw exceptions and use
+C<undef> as a return value, to indicate that 'something' went wrong and therfore
+do not return $self.
+
+Be warned, allowing C<undef> to be returned, this will break the moment one will
+try to chain methods. This causes "Can't call method $foo on undef" errors.
+Which, of course, can be caught using C<try> blocks.
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'Role::MethodReturns' is Copyright (C) 2019, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+=cut

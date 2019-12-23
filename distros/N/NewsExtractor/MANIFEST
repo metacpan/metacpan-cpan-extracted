@@ -30,4 +30,5 @@ t/data/strs.txt
 t/data/urls-fails
 t/data/urls-success
 t/live-extract-1.t
+t/util-normalize-whitespace.t
 t/util-u.t

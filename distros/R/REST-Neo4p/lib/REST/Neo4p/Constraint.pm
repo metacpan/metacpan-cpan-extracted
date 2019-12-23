@@ -19,7 +19,7 @@ our %EXPORT_TAGS = (
   all => [@EXPORT,@EXPORT_OK]
 );
 
-our $jobj = JSON->new();
+our $jobj = JSON->new->utf8;
 $jobj->allow_blessed(1);
 $jobj->convert_blessed(1);
 my $regex_to_json = sub {
@@ -31,7 +31,7 @@ my $regex_to_json = sub {
 };
 
 BEGIN {
-  $REST::Neo4p::Constraint::VERSION = '0.3020';
+  $REST::Neo4p::Constraint::VERSION = '0.3030';
 }
 
 # valid constraint types

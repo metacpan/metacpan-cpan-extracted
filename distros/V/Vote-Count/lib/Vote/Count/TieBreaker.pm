@@ -9,15 +9,23 @@ use Moose::Role;
 
 no warnings 'experimental';
 use List::Util qw( min max sum );
-use Data::Printer;
+use Path::Tiny;
+#use Data::Printer;
 
-our $VERSION='1.00';
+our $VERSION='1.01';
 
 =head1 NAME
 
 Vote::Count::TieBreaker
 
-=head1 VERSION 1.00
+=head1 VERSION 1.01
+
+=head1 Synopsis
+
+  my $Election = Vote::Count->new(
+    BallotSet      => $ballotsirvtie2,
+    TieBreakMethod => 'approval'
+  );
 
 =cut
 
@@ -25,7 +33,19 @@ Vote::Count::TieBreaker
 
 =head1 Tie Breakers
 
-The most important thing for a Tie Breaker to do is it should use some reproducable difference in the Ballots to pick a winner from a Tie. The next thing it should do is make sense. Finally, the ideal Tie Breaker will resolve when there is any difference to be found. Arguably the best use of Borda Count is as a Tie Breaker, First Choice votes and Approval are also other great choices.
+The most important thing for a Tie Breaker to do is it should use some reproducible difference in the Ballots to pick a winner from a Tie. The next thing it should do is make sense. Finally, the ideal Tie Breaker will resolve when there is any difference to be found. Arguably the best use of Borda Count is as a Tie Breaker, First Choice votes and Approval are also other great choices.
+
+TieBreakMethod is specified as an argument to Vote::Count->new(). The TieBreaker is called internally from the resolution method via the TieBreaker function, which requires the caller to pass its TieBreakMethod.
+
+=head2 TieBreakMethod argument to Vote::Count->new
+
+  'approval'
+  'all'
+  'borda' [ applies Borda Count to current Active set ]
+  'barda_all' [ applies Borda Count to all of the choices ]
+  'grandjunction'
+  'precedencefile' [ requires also setting PrecedenceFile]
+
 
 =head1 Grand Junction
 
@@ -125,7 +145,7 @@ This method is superficially similar to Borda. However, it only scores the best 
 
   Currently unimplemented ...
 
-=head1 TieBreaker
+=head1 Method TieBreaker
 
 Implements some basic methods for resolving ties. The default value for IRV is 'all', and the default value for Matrix is 'none'. 'all' is inappropriate for Matrix, and 'none' is inappropriate for IRV.
 
@@ -133,7 +153,34 @@ Implements some basic methods for resolving ties. The default value for IRV is '
 
 TieBreaker returns a list containing the winner, if the method is 'none' the list is empty, if 'all' the original @choices list is returned. If the TieBreaker is a tie there will be multiple elements.
 
+=head1 Precedence
+
+Since many existing Elections Rules call for Random, and Vote::Count does not accept Random as the result can be different across runs, Precedence allows the Administrators of an election to randomly or arbitrarily determine who will win ties before running Vote::Count.
+
+The Precedence list takes the choices of the election one per line. Choices defeat any choice lower than them in the list. When Precedence is used an additional attribute must be specified for the Precedence List.
+
+ my $Election = Vote::Count->new(
+   BallotSet => read_ballots('somefile'),
+   TieBreakMethod => 'precedence',
+   PrecedenceFile => 'precedencefile');
+
 =cut
+
+sub TieBreakerPrecedence ( $I, @choices ) {
+  my %ordered = ();
+  my $start = 0;
+  for ( split /\n/, path( $I->PrecedenceFile() )->slurp() ) {
+    $_ =~ s/\s//g; #strip out any accidental whitespace
+    $ordered{ $_ } = $start++ ;
+  }
+  my $ballots = $I->BallotSet()->{'ballots'};
+  my $winner = $choices[0];
+  for my $c ( @choices ) {
+    unless( defined $ordered{$c} ) { die "Choice $c missing from precedence file\n" }
+    if ( $ordered{$c} < $ordered{$winner } ) { $winner = $c }
+  }
+  return { 'winner' => $winner, 'tie' => 0, 'tied' => [] };
+}
 
 sub TieBreaker ( $I, $tiebreaker, $active, @choices ) {
   if ( $tiebreaker eq 'all' )  { return @choices }
@@ -156,6 +203,10 @@ sub TieBreaker ( $I, $tiebreaker, $active, @choices ) {
     if    ( $GJ->{'winner'} ) { return ( $GJ->{'winner'} ) }
     elsif ( $GJ->{'tie'} )    { return $GJ->{'tied'}->@* }
     else { die "unexpected (or no) result from $tiebreaker!\n" }
+  }
+  elsif ( $tiebreaker eq 'precedence' ) {
+    # The one nice thing about precedence is that there is always a winner.
+    return $I->TieBreakerPrecedence( @choices )->{'winner'};
   }
   else { die "undefined tiebreak method $tiebreaker!\n" }
   my @highchoice = ();

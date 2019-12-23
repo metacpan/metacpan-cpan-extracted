@@ -113,7 +113,15 @@ sub init {
 
 sub getUser {
     my ( $self, $req, %args ) = @_;
-    return PE_LDAPCONNECTFAILED unless $self->ldap and $self->bind();
+
+    $self->validateLdap;
+
+    unless ( $self->ldap ) {
+        return PE_LDAPCONNECTFAILED;
+    }
+
+    $self->bind();
+
     my $mesg = $self->ldap->search(
         base   => $self->conf->{ldapBase},
         scope  => 'sub',
@@ -126,7 +134,8 @@ sub getUser {
         attrs => $self->attrs,
     );
     if ( $mesg->code() != 0 ) {
-        $self->logger->error( 'LDAP Search error: ' . $mesg->error );
+        $self->logger->error(
+            'LDAP Search error ' . $mesg->code . ": " . $mesg->error );
         return PE_LDAPERROR;
     }
     if ( $mesg->count() > 1 ) {
@@ -143,15 +152,23 @@ sub getUser {
     PE_OK;
 }
 
-# Test LDAP connection before trying to bind
-sub bind {
-    my $self = shift;
+# Validate LDAP connection before use
+sub validateLdap {
+    my ($self) = @_;
     unless ($self->ldap
         and $self->ldap->root_dse( attrs => ['supportedLDAPVersion'] ) )
     {
         $self->ldap->DESTROY if ( $self->ldap );
         $self->ldap( $self->newLdap );
     }
+}
+
+# Bind
+sub bind {
+    my $self = shift;
+
+    $self->validateLdap;
+
     return undef unless ( $self->ldap );
     my $msg = $self->ldap->bind(@_);
     if ( $msg->code ) {

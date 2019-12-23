@@ -1,3 +1,9 @@
+0.104		2019-12-23	T. R. Wyant
+    Add Boolean configuration item allow_state_in_expression, which
+    allows an otherwise-unused state variable if the policy thinks the
+    computed value is also used in an expression. This item is false by
+    default.
+
 0.103		2019-08-17	T. R. Wyant
     Test POD links.
 

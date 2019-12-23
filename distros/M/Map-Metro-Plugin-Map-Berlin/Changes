@@ -1,5 +1,8 @@
 Revision history for Perl extension Map::Metro::Plugin::Map::Berlin
 
+2019.1215
+	- data changes
+
 2018.1209
 	- data changes
 	- switch to new version scheme (YYYY.MMDD)

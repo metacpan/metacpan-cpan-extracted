@@ -10,6 +10,10 @@ See also [[ideas]], [[htmlgen/TODO]], [[functional_XML/TODO]] and the
 
 ## Work on the code
 
+* In bin/perlrepl and bin/fperl, use the proper perl version in the
+  shebang line; yet, still allow them to be run locally (project not
+  installed). How?
+
 * rename "hidden" methods like `FP_Equal_equal` to all-uppercase like
   `FP_EQUAL__EQUAL` as that seems to be preferred (`TO_JSON` was given
   as an example)
@@ -192,9 +196,7 @@ See also [[ideas]], [[htmlgen/TODO]], [[functional_XML/TODO]] and the
   anymore? But I'm setting an env var and define the ordering there,
   how?
 
-* Perhaps do not use all-lowercase namings like `FP::uncurry` (rename
-  to `FP::Uncurry` while still exporting `uncurry` and other
-  functions.)
+* Perhaps do not use all-lowercase module namings
 
 * `Test::Needs` has been recommended over `Test::Requires` "for reasons specified in its documentation", look into it.
 

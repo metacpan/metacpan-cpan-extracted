@@ -3,7 +3,7 @@ package Lemonldap::NG::Portal::2F::Radius;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADCREDENTIALS
+  PE_BADOTP
   PE_ERROR
   PE_MALFORMEDUSER
   PE_OK
@@ -107,7 +107,7 @@ sub verify {
               . $session->{ $self->conf->{whatToTrace} } );
         $self->logger->warn(
             "Radius server replied: " . $self->radius->get_error );
-        return PE_BADCREDENTIALS;
+        return PE_BADOTP;
     }
     $self->logger->debug("Radius server accepted 2F credentials");
     PE_OK;

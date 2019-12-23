@@ -2,8 +2,9 @@ package Lemonldap::NG::Common::Notifications;
 
 use strict;
 use Mouse;
+use JSON qw(to_json);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.7';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -32,8 +33,14 @@ has notifField => (
 
 sub getNotifications {
     my ( $self, $uid ) = @_;
+    my $forAll = $self->get( $self->conf->{notificationWildcard} );
+    if ( $uid and $uid =~ /^_all(Pending|Existing)_$/ ) {
+        $self->logger->info("Retrieve all $1 notifications");
+        my $all = ( $1 eq 'Pending' ? $self->getAll() : $self->getExisting() );
+        $all = { map { $_ => to_json( $all->{$_} ) } keys %$all };
+        return ( $forAll ? { %$all, %$forAll } : $all );
+    }
     my $forUser = $self->get($uid);
-    my $forAll  = $self->get( $self->conf->{notificationWildcard} );
     if ( $forUser and $forAll ) {
         return { %$forUser, %$forAll };
     }

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Parameters;
 use Net::SSH::Perl ();
@@ -215,7 +215,7 @@ sub exec {
     my $loginShell = $self->get('loginShell');
     my $sloppy = 0;
 
-    my $argA = Quiq::Parameters->extractToVariables(\@_,1,1,
+    my $argA = $self->parameters(1,1,\@_,
         -loginShell => \$loginShell,
         -sloppy => \$sloppy,
     );
@@ -244,7 +244,7 @@ sub exec {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

@@ -39,17 +39,15 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw($select_wordpress_setup);
 
 use Net::FullAuto::Cloud::fa_amazon;
-use Net::FullAuto::FA_Core qw[$localhost];
+use Net::FullAuto::FA_Core qw[$localhost cleanup fetch];
 use File::HomeDir;
 use URI::Escape::XS qw/uri_escape/;
 use JSON::XS;
 use Sys::Hostname;
 
-my $url='https://get-wisdom.com';
-$url=uri_escape($url);
 my $tit='Get-Wisdom.com';
 my $adu='Administrator';
-my $ade='Brian.Kelly@get-wisdom.com';
+my $ade='Brian.Kelly@fullauto.com';
 my $the='memberlite';
 my $avail_port='';
 
@@ -95,29 +93,32 @@ my $builddir='';my @ls_tmp=();
 my $configure_wordpress=sub {
 
    my $selection=$_[0]||'';
-   my $service_and_cert_password=$_[1]||'';
-   my $stripe_publish_key=$_[2]||'pk_live_rRhtVk5Vj8sKyLwKI1zqCGeA';
-   my $stripe_secret_key=$_[3]||'sk_live_n3Vgr2ELkRxOR75ME4NRI4Fs';
-   my $recaptcha_publish_key=$_[4]||'6LfelToUAAAAADcI6ys632o074uL2_HtT_8zpGyi';
-   my $recpatcha_secret_key=$_[5]||'6LfelToUAAAAABZ8_QHWq0_AFPPk0kYP31aOyGZH';
+   my $domain_url=$_[1]||'';
+   $domain_url=~s/^\s*https?:\/\/w?w?w?\.?//;
+   my $url='https://www.'.$domain_url;
+   $url=uri_escape($url);
+   my $service_and_cert_password=$_[2]||'';
+   my $stripe_publish_key=$_[3]||'';
+   my $stripe_secret_key=$_[4]||'';
+   my $recaptcha_publish_key=$_[5]||'';
+   my $recpatcha_secret_key=$_[6]||'';
    my ($stdout,$stderr)=('','');
    my $handle=$localhost;my $connect_error='';
    my $sudo=($^O eq 'cygwin')?'':'sudo ';
    ($stdout,$stderr)=$handle->cmd($sudo.'groupadd www-data');
    ($stdout,$stderr)=$handle->cmd($sudo.'adduser -r -m -g www-data www-data');
-   $handle->{_cmd_handle}->print($sudo.'passwd www-data');
-   my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
-   $prompt=~s/\$$//;
+   $handle->print($sudo.'passwd www-data');
+   my $prompt=substr($handle->prompt(),1,-1);
    while (1) {
-      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+      my $output.=fetch($handle);
       last if $output=~/$prompt/;
       print $output;
       if (-1<index $output,'New password:') {
-         $handle->{_cmd_handle}->print($service_and_cert_password);
+	 $handle->print($service_and_cert_password);
          $output='';
          next;
       } elsif (-1<index $output,'Retype new password:') {
-         $handle->{_cmd_handle}->print($service_and_cert_password);
+         $handle->print($service_and_cert_password);
          $output='';
          next;
       }
@@ -137,6 +138,7 @@ my $configure_wordpress=sub {
       $ip=~s/^.*?(\d+.\d+.\d+.\d+).*$/$1/s;
    }
    my $userhome=$handle->cmd('pwd');
+   my $nginx_path='/etc';
    ($stdout,$stderr)=$handle->cmd($sudo.
       "perl -e \'use CPAN;".
       "CPAN::HandleConfig-\>load;print \$CPAN::Config-\>{build_dir}\'");
@@ -149,8 +151,9 @@ my $configure_wordpress=sub {
       unshift @ls_tmp, $line if $line!~/\.yml$/;
    }
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'ls -1 /var/www/html/','__display__');
-   if ($stdout=~/wordpress/s) {
+      'if [ -f /var/www/html/wordpress/wp-config.php ]; '.
+      'then echo EXISTS;else echo NONE; fi');
+   if ($stdout=~/EXISTS/) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cat /var/www/html/wordpress/wp-config.php');
       my $curpass=$stdout;
@@ -165,39 +168,69 @@ my $configure_wordpress=sub {
          'tar zcvf /home/www-data/gw_backup.tar '.
          '/var/www/html/wordpress','__display__');
    }
-#&Net::FullAuto::FA_Core::cleanup;
-$do=0;
-if ($do==1) {
    unless ($^O eq 'cygwin') {
+      ($stdout,$stderr)=$handle->cmd($sudo.'ps -ef');
+      if ($stdout=~/nginx: master process/s) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "service nginx stop");
+         if ($stderr) {
+            ($stdout,$stderr)=$handle->cmd("ps -ef",'__display__');
+            if ($stdout=~/nginx/) {
+               my @psinfo=();
+               foreach my $line (split /\n/, $stdout) {
+                  next unless -1<index $line, 'nginx';
+                  @psinfo=split /\s+/, $line;
+                  my $psinfo=$psinfo[2];
+                  $psinfo=$psinfo[1] if $psinfo[1]=~/^\d+$/;
+                  ($stdout,$stderr)=$handle->cmd(
+                     $sudo."kill -9 $psinfo");
+               }
+            }
+	 } else { print $stdout."\n" }
+         if ($stdout=~/php-fpm: master process/s) {
+            ($stdout,$stderr)=$handle->cmd($sudo.
+               "service php-fpm stop",'__display__');
+         }
+         if ($stdout=~/mysqld/s) {
+            ($stdout,$stderr)=$handle->cmd($sudo.
+               "service mysqld stop",'__display__');
+         }
+      }
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "service nginx stop",'__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "service mysqld stop",'__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "service php-fpm stop",'__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "rm -rvf /opt/source ~/fa\* /var/www/html/wordpress",
+         "rm -rvf /opt/source/* ~/fa\* /var/www/html/wordpress",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "mkdir -vp /var/www/html",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo."chmod 755 ~");
-      ($stdout,$stderr)=$handle->cmd("sudo yum clean all");
-      ($stdout,$stderr)=$handle->cmd("sudo yum grouplist hidden");
-      ($stdout,$stderr)=$handle->cmd("sudo yum groups mark convert");
+      ($stdout,$stderr)=$handle->cmd($sudo."yum clean all");
+      ($stdout,$stderr)=$handle->cmd($sudo."yum grouplist hidden");
+      ($stdout,$stderr)=$handle->cmd($sudo."yum groups mark convert");
       ($stdout,$stderr)=$handle->cmd(
-         "sudo yum -y groupinstall 'Development tools'",'__display__');
+         $sudo."yum -y groupinstall 'Development tools'",'__display__');
       ($stdout,$stderr)=$handle->cmd(
-         'sudo yum -y install openssl-devel icu cyrus-sasl libicu-devel'.
-         ' libicu cyrus-sasl-devel libtool-ltdl-devel libxml2-devel'.
+         'sudo yum -y install openssl-devel icu cyrus-sasl '.
+         ' cyrus-sasl-devel libtool-ltdl-devel libjpeg-turbo-devel'.
          ' freetype-devel libpng-devel java-1.7.0-openjdk-devel'.
          ' unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel'.
-         ' ncurses-devel xmlto git-all autoconf libmcrypt'.
-         ' libmcrypt-devel libcurl-devel bzip2-devel.x86_64'.
-         ' libjpeg-turbo-devel libpng-devel.x86_64'.
-         ' freetype-devel.x86_64',
+         ' ncurses-devel xmlto autoconf libmcrypt libmcrypt-devel'.
+         ' libcurl libcurl-devel libicu libicu-devel re2c'.
+         ' libpng-devel.x86_64 freetype-devel.x86_64 '.
+         ' oniguruma oniguruma-devel tcl tcl-devel git-all',
          '__display__');
       ($stdout,$stderr)=$handle->cmd(
          'yum -y install yum-utils --enablerepo=extras','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "if [ -d $nginx_path/nginx ]; ".
+         'then echo EXISTS;else echo NONE; fi');
+      if ($stdout=~/EXISTS/) {
+         ($stdout,$stderr)=$handle->cmd($sudo."rm -rvf $nginx_path/nginx",
+             '__display__');
+      }
+   }
+#&Net::FullAuto::FA_Core::cleanup;
+my $do=1;
+if ($do==1) {
+   unless ($^O eq 'cygwin') {
    } else {
       # https://www.digitalocean.com/community/questions/how-to-change-port-80-into-8080-on-my-wordpress
       # https://opensource.com/article/18/9/linux-iptables-firewalld
@@ -340,22 +373,6 @@ if ($do==1) {
          }
       }
    }
-   my $z=1;
-   while ($z==1) {
-      ($stdout,$stderr)=$handle->cmd("ps -ef",'__display__');
-      if ($stdout=~/nginx/) {
-         my @psinfo=();
-         foreach my $line (split /\n/, $stdout) {
-            next unless -1<index $line, 'nginx';
-            @psinfo=split /\s+/, $line;
-            my $psinfo=$psinfo[2];
-            $psinfo=$psinfo[1] if $psinfo[1]=~/^\d+$/;
-            ($stdout,$stderr)=$handle->cmd($sudo."kill -9 $psinfo");
-         }
-      } else { last }
-   }
-   ($stdout,$stderr)=$handle->cmd($sudo."rm -rvf /usr/local/nginx",
-      '__display__');
    ($stdout,$stderr)=$handle->cmd("wget -qO- http://icanhazip.com");
    $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
    unless ($public_ip) {
@@ -379,7 +396,7 @@ if ($do==1) {
          "chown -v $username:$username epel-release-6-8.noarch.rpm",
          '__display__') if $^O ne 'cygwin';
       ($stdout,$stderr)=$handle->cmd(
-         "sudo rpm -ivh epel-release-6-8.noarch.rpm",
+         $sudo."rpm -ivh epel-release-6-8.noarch.rpm",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'rm -rvf epel-release-6-8.noarch.rpm',
@@ -389,7 +406,45 @@ if ($do==1) {
    }
    ($stdout,$stderr)=$handle->cmd($sudo.'mkdir -vp /opt/source',
       '__display__');
-   ($stdout,$stderr)=$handle->cwd("/opt/source");
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone git://sourceware.org/git/bzip2.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('bzip2');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone https://gitlab.gnome.org/GNOME/libxml2.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('libxml2');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './autogen.sh','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v libxml-2.0.pc /usr/lib64/pkgconfig','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      'https://www.sqlite.org/src/tarball/sqlite.tar.gz',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'tar zxvf sqlite.tar.gz','__display__');
+   ($stdout,$stderr)=$handle->cwd('sqlite');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make','3600','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v sqlite3.pc /usr/lib64/pkgconfig','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "wget --random-wait --progress=dot ".
       "http://ftp.gnu.org/gnu/autoconf/autoconf-latest.tar.gz",
@@ -411,11 +466,11 @@ if ($do==1) {
    if ($stdout<18 && !(-e '/usr/local/bin/wget')) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          "wget --random-wait --progress=dot ".
-         "https://ftp.gnu.org/gnu/wget/wget-1.19.2.tar.gz",
+         "https://ftp.gnu.org/gnu/wget/wget-latest.tar.gz",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "tar zxvf wget-1.19.2.tar.gz",'__display__');
-      ($stdout,$stderr)=$handle->cwd("wget-1.19.2");
+         "tar zxvf wget-latest.tar.gz",'__display__');
+      ($stdout,$stderr)=$handle->cwd("wget-*");
       ($stdout,$stderr)=$handle->cmd($sudo.
          "./configure --prefix=/usr/local ".
          "--sysconfdir=/etc --with-ssl=openssl",
@@ -432,15 +487,16 @@ if ($do==1) {
       $stderr=~s/^Python\s+(\d.\d).*$/$1/s;
       $stderr=~s/[.]//g;
    }
+   #&Net::FullAuto::FA_Core::cleanup;
    if ($stderr && $stderr<27) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          "wget --random-wait --progress=dot ".
-         "http://python.org/ftp/python/2.7.14/Python-2.7.14.tar.xz",
+	 "http://python.org/ftp/python/2.7.17/Python-2.7.17.tar.xz",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "tar xvf Python-2.7.14.tar.xz",
+	 "tar xvf Python-2.7.17.tar.xz",
          '__display__');
-      ($stdout,$stderr)=$handle->cwd("Python-2.7.14");
+      ($stdout,$stderr)=$handle->cwd("Python-2.7.17");
       ($stdout,$stderr)=$handle->cmd($sudo.
          "./configure --prefix=/usr/local --enable-unicode=ucs4 ".
          "--enable-shared LDFLAGS=\"-Wl,-rpath /usr/local/lib\"",
@@ -463,7 +519,7 @@ if ($do==1) {
       'python setup.py install',
       '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   if ($^O ne 'cygwin' && $hostname ne 'jp-01ld.get-wisdom.com') {
+   if ($^O ne 'cygwin') {
       ($stdout,$stderr)=$handle->cmd($sudo.'pip install httplib2',
          '__display__');
       my $siteloc='/usr/local/lib/python2.7';
@@ -488,7 +544,7 @@ if ($do==1) {
       ($stdout,$stderr)=$handle->cmd('pip install awscli','__display__');
    }
 }
-$do=0;
+$do=1;
 if ($do==1) { # NGINX
 print "DOING NGINX\n";
    # https://nealpoole.com/blog/2011/04/setting-up-php-fastcgi-and-nginx
@@ -507,37 +563,42 @@ print "DOING NGINX\n";
    # https://karp.id.au/social/index.html
    # http://jeffreifman.com/how-to-install-your-own-private-e-mail-server-in-the-amazon-cloud-aws/
    # https://www.wpwhitesecurity.com/creating-mysql-wordpress-database/
+   ($stdout,$stderr)=$handle->cwd("/opt/source");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'rm -rvf /usr/local/nginx','__display__');
-   my $nginx='nginx-1.14.0'; # updated from 1.10.0
+      'rm -rvf /etc/nginx','__display__');
+   my $nginx='nginx-1.17.6'; # updated from 1.14.0
    $nginx='nginx-1.9.13' if $^O eq 'cygwin';
-   ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
+   ($stdout,$stderr)=$handle->cmd($sudo."wget --random-wait --progress=dot ".
       "http://nginx.org/download/$nginx.tar.gz",300,'__display__');
-   ($stdout,$stderr)=$handle->cmd("sudo tar xvf $nginx.tar.gz",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo."tar xvf $nginx.tar.gz",'__display__');
    ($stdout,$stderr)=$handle->cwd($nginx);
-   ($stdout,$stderr)=$handle->cmd("sudo mkdir -vp objs/lib",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo."mkdir -vp objs/lib",'__display__');
    ($stdout,$stderr)=$handle->cwd("objs/lib");
-   my $pcre='pcre-8.40';
+   my $pcre='pcre-8.43';
    my $checksum='';
    foreach my $cnt (1..3) {
-      ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
-         "ftp://ftp.csx.cam.ac.uk/pub/software/".
-         "programming/pcre/$pcre.tar.gz",'__display__');
-      ($stdout,$stderr)=$handle->cmd("sudo tar xvf $pcre.tar.gz",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "wget --random-wait --progress=dot ".
+         "https://ftp.pcre.org/pub/pcre/$pcre.tar.gz",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "tar xvf $pcre.tar.gz",'__display__');
       last unless $stderr;
-      ($stdout,$stderr)=$handle->cmd("sudo rm -rfv $pcre.tar.gz",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "rm -rfv $pcre.tar.gz",'__display__');
    }
-   ($stdout,$stderr)=$handle->cmd("sudo wget -qO- http://zlib.net/index.html");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget -qO- http://zlib.net/index.html");
    my $zlib_ver=$stdout;
    my $sha__256=$stdout;
    $zlib_ver=~s/^.*? source code, version (\d+\.\d+\.\d+).*$/$1/s;
    $sha__256=~s/^.*?SHA-256 hash [<]tt[>](.*?)[<][\/]tt[>].*$/$1/s;
    foreach my $count (1..3) {
-      ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
+      ($stdout,$stderr)=$handle->cmd($sudo.
+	 "wget --random-wait --progress=dot ".
          "http://zlib.net/zlib-$zlib_ver.tar.gz",'__display__');
       $checksum=$sha__256;
-      ($stdout,$stderr)=$handle->cmd(
-         "sudo sha256sum -c - <<<\"$checksum zlib-$zlib_ver.tar.gz\"",
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sha256sum -c - <<<\"$checksum zlib-$zlib_ver.tar.gz\"",
          '__display__');
       unless ($stderr) {
          print(qq{ + CHECKSUM Test for zlib-$zlib_ver *PASSED* \n});
@@ -548,19 +609,20 @@ print "DOING NGINX\n";
                "after $count attempts\n";
          &Net::FullAuto::FA_Core::cleanup;
       }
-      ($stdout,$stderr)=$handle->cmd("sudo rm -rvf zlib-$zlib_ver.tar.gz",
-         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "rm -rvf zlib-$zlib_ver.tar.gz",'__display__');
    }
-   ($stdout,$stderr)=$handle->cmd("sudo tar xvf zlib-$zlib_ver.tar.gz",
+   ($stdout,$stderr)=$handle->cmd($sudo."tar xvf zlib-$zlib_ver.tar.gz",
       '__display__');
-   my $ossl='openssl-1.0.2h';
+   my $ossl='openssl-1.1.1c';
    foreach my $count (1..3) {
-      $checksum='577585f5f5d299c44dd3c993d3c0ac7a219e4949';
-      ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
+      $checksum='71b830a077276cbeccc994369538617a21bee808';
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "wget --random-wait --progress=dot ".
          "https://www.openssl.org/source/$ossl.tar.gz",
          '__display__');
-      ($stdout,$stderr)=$handle->cmd(
-         "sudo sha1sum -c - <<<\"$checksum $ossl.tar.gz\"",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sha1sum -c - <<<\"$checksum $ossl.tar.gz\"",'__display__');
       unless ($stderr) {
          print(qq{ + CHECKSUM Test for $ossl *PASSED* \n});
          last
@@ -569,9 +631,10 @@ print "DOING NGINX\n";
                "after $count attempts\n";
          &Net::FullAuto::FA_Core::cleanup;
       }
-      ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $ossl.tar.gz",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "rm -rvf $ossl.tar.gz",'__display__');
    }
-   ($stdout,$stderr)=$handle->cmd("sudo tar xvf $ossl.tar.gz",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo."tar xvf $ossl.tar.gz",'__display__');
    ($stdout,$stderr)=$handle->cwd("/opt/source");
    # https://www.liberiangeek.net/2015/10/
    # how-to-install-self-signed-certificates-on-nginx-webserver/
@@ -698,28 +761,29 @@ case \\x22\\x241\\x22 in
 esac
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$inet_d_script\" > ".
-      "/etc/init.d/nginx");
-   ($stdout,$stderr)=$handle->cmd("chmod -v +x /etc/init.d/nginx",
+      "~/nginx");
+   ($stdout,$stderr)=$handle->cmd($sudo.'mv -fv ~/nginx /etc/init.d',
       '__display__');
-   ($stdout,$stderr)=$handle->cmd("chkconfig --add nginx");
-   ($stdout,$stderr)=$handle->cmd("chkconfig --level 345 nginx on");
+   ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v +x /etc/init.d/nginx',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo."chkconfig --add nginx");
+   ($stdout,$stderr)=$handle->cmd($sudo."chkconfig --level 345 nginx on");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'yum -y install certbot-nginx'.'__display__');
+      'yum -y install certbot-nginx','__display__');
    # https://www.digitalocean.com/community/tutorials/
    # how-to-secure-nginx-with-let-s-encrypt-on-centos-7
-   my $nginx_path='/usr/local';
-   my $make_nginx='./configure --sbin-path=/usr/local/nginx/nginx '.
-                  '--conf-path=/usr/local/nginx/nginx.conf '.
-                  '--pid-path=/usr/local/nginx/nginx.pid '.
+   my $make_nginx="./configure --sbin-path=$nginx_path/nginx/nginx ".
+                  "--conf-path=$nginx_path/nginx/nginx.conf ".
+                  "--pid-path=$nginx_path/nginx/nginx.pid ".
                   "--with-http_ssl_module --with-pcre=objs/lib/$pcre ".
                   "--with-zlib=objs/lib/zlib-$zlib_ver";
-   if ($hostname eq 'jp-01ld.get-wisdom.com') {
-      $nginx_path='/etc';
+   #if ($hostname eq 'jp-01ld.get-wisdom.com') {
+   if ($hostname ne 'jp-01ld.get-wisdom.com') {
       $make_nginx='./configure --user=www-data '.
                   '--group=www-data '.
-                  '--prefix=/etc/nginx '.
+                  "--prefix=$nginx_path/nginx ".
                   '--sbin-path=/usr/sbin/nginx '.
-                  '--conf-path=/etc/nginx/nginx.conf '.
+                  "--conf-path=$nginx_path/nginx/nginx.conf ".
                   '--pid-path=/var/run/nginx.pid '.
                   '--lock-path=/var/run/nginx.lock '.
                   '--error-log-path=/var/log/nginx/error.log '.
@@ -735,34 +799,33 @@ END
                   '--with-http_v2_module';
                   #'--without-http_fastcgi_module';
    }
-   ($stdout,$stderr)=$handle->cmd($make_nginx,'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.$make_nginx,'__display__');
    ($stdout,$stderr)=$handle->cmd(
       $sudo."sed -i 's/-Werror //' ./objs/Makefile");
    ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    # https://www.liberiangeek.net/2015/10/
    # how-to-install-self-signed-certificates-on-nginx-webserver/
-   if ($hostname ne 'jp-01ld.get-wisdom.com') {
+   if ($hostname eq 'jp-01ld.get-wisdom.com') {
       ($stdout,$stderr)=$handle->cmd(
-         $sudo.'mkdir -vp /etc/nginx/ssl.key');
+         $sudo."mkdir -vp $nginx_path/nginx/ssl.key");
       ($stdout,$stderr)=$handle->cmd(
          $sudo.'mkdir -vp /etc/nginx/ssl.crt');
       ($stdout,$stderr)=$handle->cmd(
          $sudo.'mkdir -vp /etc/nginx/ssl.csr');
-      $handle->{_cmd_handle}->print(
+      $handle->print(
          $sudo.'openssl genrsa -des3 -out '.
-         "/etc/nginx/ssl.key/$public_ip.key 2048");
-      $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
-      $prompt=~s/\$$//;
+         "/etc/nginx/ssl.key/$domain_url.key 2048");
+      $prompt=$handle->prompt();
       while (1) {
-         my $output.=Net::FullAuto::FA_Core::fetch($handle);
+         my $output.=fetch($handle);
          last if $output=~/$prompt/;
          print $output;
          if (-1<index $output,'pass phrase for') {
-            $handle->{_cmd_handle}->print($service_and_cert_password);
+            $handle->print($service_and_cert_password);
             $output='';
             next;
          } elsif (-1<index $output,'Verifying - Enter') {
-            $handle->{_cmd_handle}->print($service_and_cert_password);
+            $handle->print($service_and_cert_password);
             $output='';
             next;
          }
@@ -772,94 +835,94 @@ END
          my $ereturn=eval {
             local $SIG{ALRM} = sub { die "alarm\n" }; # \n required
             alarm 7;
-            $handle->{_cmd_handle}->print($sudo.
-               "openssl req -new -key /etc/nginx/ssl.key/$public_ip.key ".
-               "-out /etc/nginx/ssl.csr/$public_ip.csr");
+            $handle->print($sudo.
+               "openssl req -new -key /etc/nginx/ssl.key/$domain_url.key ".
+               "-out /etc/nginx/ssl.csr/$domain_url.csr");
             my $test='';my $output='';
             while (1) {
-               $output.=Net::FullAuto::FA_Core::fetch($handle);
+               $output.=fetch($handle);
                $test.=$output;
                $test=~tr/\0-\11\14-\37\177-\377//d;
                return 'DONE' if $output=~/$prompt/;
                print $output;
                $test=~s/\n//gs;
                if ($test=~/Enter pass phrase.*key:/s) {
-                  $handle->{_cmd_handle}->print($service_and_cert_password);
+                  $handle->print($service_and_cert_password);
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,'[AU]:') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,'[Some-State]:') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,'city) []:') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,'Pty Ltd]:') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,'section) []:') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,'YOUR name) []:') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,'Address []:') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,'challenge password []:') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,'company name []:') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,'Country Name (2 letter code) [XX]') {
-                  $handle->{_cmd_handle}->print('.');
+                  $handle->print('.');
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,
                      'State or Province Name (full name) []') {
-                  $handle->{_cmd_handle}->print('.');
+                  $handle->print('.');
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,
                      'Locality Name (eg, city) [Default City]:') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,
                     'Organization Name (eg, company) [Default Company Ltd]:') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
                } elsif (-1<index $test,
                     'Common Name (eg, your name or your '.
                     'server\'s hostname) []') {
-                  $handle->{_cmd_handle}->print();
+                  $handle->print();
                   $output='';
                   $test='';
                   next;
@@ -870,30 +933,30 @@ END
          alarm(0);
          last if $ereturn eq 'DONE' || $trys++>3;
       }
-      $handle->{_cmd_handle}->print($sudo.
+      $handle->print($sudo.
          'openssl x509 -req -days 365 -in '.
-         "/etc/nginx/ssl.csr/$public_ip.csr -signkey ".
-         "/etc/nginx/ssl.key/$public_ip.key -out ".
-         "/etc/nginx/ssl.crt/$public_ip.crt");
+         "/etc/nginx/ssl.csr/$domain_url.csr -signkey ".
+         "/etc/nginx/ssl.key/$domain_url.key -out ".
+         "/etc/nginx/ssl.crt/$domain_url.crt");
       while (1) {
-         my $output.=Net::FullAuto::FA_Core::fetch($handle);
+         my $output.=fetch($handle);
          last if $output=~/$prompt/;
          print $output;
          if (-1<index $output,'Enter pass phrase') {
-            $handle->{_cmd_handle}->print($service_and_cert_password);
+            $handle->print($service_and_cert_password);
             $output='';
             next;
          } 
       }
    }
-   unless ($hostname eq 'jp-01ld.get-wisdom.com') { 
+   #unless ($hostname eq 'jp-01ld.get-wisdom.com') { 
       ($stdout,$stderr)=$handle->cmd($sudo."sed -i 's/1024/64/' ".
          "$nginx_path/nginx/nginx.conf");
-   } else {
+ #} else {
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "sed -i 's/worker_processes  1;/worker_processes  8;/' ".
+         "sed -i 's/worker_processes  1;/worker_processes  2;/' ".
          "$nginx_path/nginx/nginx.conf");
-   }
+ #}
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i '0,/root   html/{//d;}' $nginx_path/nginx/nginx.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -907,7 +970,7 @@ $ad
 }' $nginx_path/nginx/nginx.conf
 END
    $handle->cmd_raw($sudo.$ad);
-   if ($hostname ne 'jp-01ld.get-wisdom.com') {
+   if ($hostname eq 'jp-01ld.get-wisdom.com') {
       $ad='%NL%        location ~ .php$ {'.
           "%NL%            root /var/www/html/wordpress;".
           "%NL%            fastcgi_pass 127.0.0.1:9000;".
@@ -917,8 +980,8 @@ END
           "%NL%            include fastcgi_params;".
           '%NL%        }%NL%'.
           '%NL%        ssl on;'.
-          "%NL%        ssl_certificate /etc/nginx/ssl.crt/$public_ip.crt;".
-          "%NL%        ssl_certificate_key /etc/nginx/ssl.key/$public_ip.key;".
+          "%NL%        ssl_certificate /etc/nginx/ssl.crt/$domain_url.crt;".
+          "%NL%        ssl_certificate_key /etc/nginx/ssl.key/$domain_url.key;".
           '%NL%        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;'.
           '%NL%        ssl_ciphers '.
           '"HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";';
@@ -956,12 +1019,13 @@ END
    my $ngx="$nginx_path/nginx/nginx.conf";
    $handle->cmd_raw(
        "sed -i 's/\\(^client_max_body_size 10M;$\\\)/    \\1/' $ngx");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \'s/^        listen       80/        listen       ".
-       "\*:$avail_port ssl http2 default_server/\' $nginx_path/nginx/nginx.conf");
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #    "sed -i \'s/^        listen       80/        listen       ".
+   #    "\*:$avail_port ssl http2 default_server/\' ".
+   #    $nginx_path."/nginx/nginx.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i 's/SCRIPT_NAME/PATH_INFO/' ".
-      "$nginx_path/local/nginx/fastcgi_params");
+       $nginx_path."/local/nginx/fastcgi_params");
    $ad='# Catalyst requires setting PATH_INFO (instead of SCRIPT_NAME)'.
        ' to \$fastcgi_script_name';
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -987,24 +1051,24 @@ END
 use Net::FullAuto;
 \\x24Net::FullAuto::FA_Core::debug=1;
 my \\x24handle=connect_shell();
-\\x24handle->{_cmd_handle}->print('$nginx_path/nginx/nginx -g \\x22daemon on;\\x22');
-\\x24prompt=substr(\\x24handle->{_cmd_handle}->prompt(),1,-1);
+\\x24handle->print('$nginx_path/nginx/nginx -g \\x22daemon on;\\x22');
+\\x24prompt=\\x24handle->prompt();
 my \\x24output='';my \\x24password_not_submitted=1;
 while (1) {
    eval {
       local \\x24SIG{ALRM} = sub { die \\x22alarm\\x5Cn\\x22 };# \\x5Cn required
       alarm 10;
-      my \\x24output=Net::FullAuto::FA_Core::fetch(\\x24handle);
+      my \\x24output=fetch(\\x24handle);
       last if \\x24output=~/\\x24prompt/;
       print \\x24output;
       if ((-1<index \\x24output,'Enter PEM pass phrase:') &&
             \\x24password_not_submitted) {
-         \\x24handle->{_cmd_handle}->print(\\x24ARGV[0]);
+         \\x24handle->print(\\x24ARGV[0]);
          \\x24password_not_submitted=0;
       }
    };
    if (\\x24\@) {
-      \\x24handle->{_cmd_handle}->print();
+      \\x24handle->print();
       next;
    }
 }
@@ -1035,13 +1099,16 @@ END
          '__display__');
       ($stdout,$stderr)=$handle->cmd("touch script/first_time_start.flag");
    } else {
-      if ($hostname eq 'jp-01ld.get-wisdom.com') {
+      #if ($hostname eq 'jp-01ld.get-wisdom.com') {
+      if ($hostname ne 'jp-01ld.get-wisdom.com') {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "mkdir -vp /etc/letsencrypt",'__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
             'openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 2048',
             '__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
             "sed -i 's/server_name  localhost/".
-            "server_name get-wisdom.com www.get-wisdom.com/' ".
+            "server_name $domain_url www.$domain_url/' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd($sudo.
             "sed -i 's/#user  nobody;/user  www-data;/' ".
@@ -1050,51 +1117,50 @@ END
             "sed -i 's/#error_page  404              /404.html;/".
             "error_page  404              /404.html;/' ".
             "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd("service nginx start",
+         ($stdout,$stderr)=$handle->cmd($sudo.'service nginx start',
             '__display__');
-         ($stdout,$stderr)=$handle->cwd("/usr/local/nginx");
+         ($stdout,$stderr)=$handle->cwd("$nginx_path/nginx");
          sleep 3;
          ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
-         $handle->{_cmd_handle}->print($sudo.
-            'certbot --nginx -d get-wisdom.com '.
-            '-d www.get-wisdom.com');
-         $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
-         $prompt=~s/\$$//;
+         $handle->print($sudo.
+            "certbot --nginx -d $domain_url ".
+            "-d www.$domain_url");
+         $prompt=$handle->prompt();
          my $test='';
          my $output='';
          while (1) {
-            $output.=Net::FullAuto::FA_Core::fetch($handle);
+            $output.=fetch($handle);
             last if $output=~/$prompt/;
             print $output;
             if (-1<index $output,'Attempt to reinstall') {
-               $handle->{_cmd_handle}->print('1');
+               $handle->print('1');
                $output='';
                $test='';
                next;
             } elsif (-1<index $output,'No redirect') {
-               $handle->{_cmd_handle}->print('2');
+               $handle->print('2');
                $output='';
                $test='';
                next;
             } elsif (-1<index $output,'Enter email address') {
-               $handle->{_cmd_handle}->print('brian.kelly@get-wisdom.com');
+               $handle->print('brian.kelly@fullauto.com');
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'Terms of Service') {
-               $handle->{_cmd_handle}->print('A');
+               $handle->print('A');
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'Would you be willing') {
-               $handle->{_cmd_handle}->print('Y');
+               $handle->print('Y');
                $output='';
                $test='';
                next;
             }
          }
          # https://ssldecoder.org
-$do=1;
+$do=0;
 if ($do==1) {
 
 #resolver_timeout 5s;
@@ -1148,7 +1214,7 @@ if ($do==1) {
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/Strict-Transport-Security/aadd_header ".
-            "X-Frame-Options \"ALLOW-FROM https://video.get-wisdom.com\";' ".
+            "X-Frame-Options \"ALLOW-FROM https://video.$domain_url\";' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/X-Frame-Options/aadd_header X-Content-Type-Options nosniff;' ".
@@ -1163,23 +1229,23 @@ if ($do==1) {
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/X-Robots-Tag/aadd_header Content-Security-Policy ".
             "\"default-src \'self\' \'unsafe-inline\' \'unsafe-eval\' ".
-            "http: https: \*.get-wisdom.com gmpg.org; img-src http: ".
+            "http: https: \*.$domain_url gmpg.org; img-src http: ".
             "https: data: ws.sharethis.com s.w.org \*.gravatar.com ".
             "themes.googleusercontent.com wordpress.org; font-src ".
             "\'self\' \'unsafe-inline\' http: https: data: ".
             "fonts.googleapis.com fonts.gstatic.com\";");
 }
-         ($stdout,$stderr)=$handle->cmd("service nginx restart",
+         ($stdout,$stderr)=$handle->cmd($sudo."service nginx restart",
             '__display__');
       } else {
-         $handle->{_cmd_handle}->print($sudo."$nginx_path/nginx/nginx");
-         $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+         $handle->print($sudo."$nginx_path/nginx/nginx");
+         $prompt=substr($handle->prompt(),1,-1);
          while (1) {
-            my $output.=Net::FullAuto::FA_Core::fetch($handle);
+            my $output.=fetch($handle);
             last if $output=~/$prompt/;
             print $output;
             if (-1<index $output,'PEM pass phrase') {
-               $handle->{_cmd_handle}->print($service_and_cert_password);
+               $handle->print($service_and_cert_password);
                $output='';
                next;
             }
@@ -1774,8 +1840,8 @@ END
          '__display__');
       ($stdout,$stderr)=$handle->cwd('php-src');
       # https://clipbucket.com/cb-install-requirements/
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'git checkout php-7.0.27','__display__');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   'git checkout php-7.0.27','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './buildconf --force','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1936,18 +2002,19 @@ END
    if ($hostname eq 'jp-01ld.get-wisdom.com') {
       $urll='www.get-wisdom.com';
    } else {
-      $urll=$ip.":".$avail_port;
+      #$urll=$ip.":".$avail_port;
+      $urll='www'.$domain_url.':'.$avail_port;
    }
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/bin/wp core install '.
-      '--title=getwisdom.com '.
+      "--title=$domain_url ".
       "--url=http://$urll ".
       "--admin_user=$adu ".
       "--admin_email=$ade ".
       "--admin_password=$service_and_cert_password ".
       '--allow-root --path=/var/www/html/wordpress',
       '__display__');
-   #my $cmd="sudo wget -d -qO- --random-wait --wait=3 ".
+   #my $cmd=$sudo."wget -d -qO- --random-wait --wait=3 ".
    #      "--no-check-certificate --post-data='weblog_title=".
    #      $tit."&user_name=".$adu."&admin_password=".
    #      $wppass."&pass1-text=".
@@ -1995,10 +2062,10 @@ END
    my $oc_style=<<END;
 /*
  Theme Name:   Memberlite Child
- Theme URI:    http://get-wisdom.com/$the-child/
+ Theme URI:    http://$domain_url/$the-child/
  Description:  My first child theme, based on Memberlite
  Author:       Brian Kelly
- Author URI:   http://get-wisdom.com
+ Author URI:   http://$domain_url
  Template:     $the
  Version:      1.0.0
  Tags: one-column, two-columns, left-sidebar, right-sidebar, flexible-header, custom-background, custom-colors, custom-header, custom-menu, custom-logo, editor-style, featured-images, footer-widgets, full-width-template, post-formats, theme-options, threaded-comments, translation-ready, e-commerce
@@ -2070,7 +2137,7 @@ END
 }
 
 .site-header {
-    background-image: url(https://www.get-wisdom.com/wp-content/uploads/2019/12/gw_header.png);
+    background-image: url(https://www.$domain_url/wp-content/uploads/2019/12/gw_header.png);
 }
 
 .site-branding .site-title a {
@@ -2574,7 +2641,7 @@ print "STDOUT=$stdout<==CUSTOM LOGO\n";sleep 5;
       "-H 'Accept-Language: en-US,en;q=0.5' ".
       "-H 'Accept-Encoding: gzip, deflate, br' ".
       "-H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' ".
-      "-H 'Referer: https://".$urll."/wp-admin/customize.php?url=https%3A%2F%2Fwww.get-wisdom.com%2F' ".
+      "-H 'Referer: https://".$urll."/wp-admin/customize.php?url=https%3A%2F%2Fwww.$domain_url%2F' ".
       "-H 'Upgrade-Insecure-Requests: 1' ".
       "--data 'nonce=".$nonce_hash->{preview}."&id=".$post_id."&context=site-icon&cropDetails%5Bx1%5D=5&cropDetails%5By1%5D=0&cropDetails%5Bx2%5D=80&cropDetails%5By2%5D=75&cropDetails%5Bwidth%5D=75&cropDetails%5Bheight%5D=75&cropDetails%5Bdst_width%5D=512&cropDetails%5Bdst_height%5D=512&action=crop-image'");
 
@@ -2735,7 +2802,7 @@ print "WC-SETUPOUT=$stdout<==WC-SETUP-SENT\n";
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
           "AppleWebKit/537.36 (KHTML, like Gecko) ".
           "Chrome/62.0.3202.94 Safari/537.36' ".
-      "--data 'stripe_email=Brian.Kelly%40get-wisdom.com&wc-wizard-service-stripe-enabled=yes&wc-wizard-service-braintree_paypal-enabled=yes&paypal_email=Brian.Kelly%40get-wisdom.com&wc-wizard-service-paypal-enabled=yes&save_step=Continue&_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dpayment'");
+      "--data 'stripe_email=Brian.Kelly%40$domain_url&wc-wizard-service-stripe-enabled=yes&wc-wizard-service-braintree_paypal-enabled=yes&paypal_email=Brian.Kelly%40$domain_url&wc-wizard-service-paypal-enabled=yes&save_step=Continue&_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dpayment'");
    ($stdout,$stderr)=$handle->cmd(
       "curl -k -L -b ~/cookies.txt 'https://".$urll.
           "/wp-admin/admin.php?page=wc-setup&step=shipping' ".
@@ -3335,7 +3402,7 @@ Content-Disposition: form-data; name="_wp_http_referer"
 ------WebKitFormBoundary$word
 Content-Disposition: form-data; name="from_email"
 
-support\@get-wisdom.com
+support\@$domain_url
 ------WebKitFormBoundary$word
 Content-Disposition: form-data; name="from_name"
 
@@ -3459,8 +3526,9 @@ my $standup_wordpress=sub {
    my $stripe_sec="]I[{'stripe_keys',2}";
    my $recaptcha_pub="]I[{'recaptcha_keys',1}";
    my $recaptcha_sec="]I[{'recaptcha_keys',2}";
+   my $domain_url="]I[{'domain_url',1}";
    my $cnt=0;
-   $configure_wordpress->($catalyst,$password,$stripe_pub,$stripe_sec,
+   $configure_wordpress->($catalyst,$domain_url,$password,$stripe_pub,$stripe_sec,
                           $recaptcha_pub,$recaptcha_sec);
    return '{choose_demo_setup}<';
 
@@ -3712,6 +3780,44 @@ END
 
 };
 
+our $domain_url=sub {
+
+   package domain_url;
+   my $domain_url_banner=<<'END';
+
+    ___                 _        _   _ ___ _
+   |   \ ___ _ __  __ _(_)_ _   | | | | _ \ |
+   | |) / _ \ '  \/ _` | | ' \  | |_| |   / |__
+   |___/\___/_|_|_\__,_|_|_||_|  \___/|_|_\____|
+
+
+END
+   $domain_url_banner.=<<END;
+   Type or paste the domain url for the site:
+
+   *** A properly registered domain url is necessary! ***
+
+
+
+   Domain URL
+                ]I[{1,'fullauto.com',46}
+
+END
+
+   my $domain_url={
+
+      Name => 'domain_url',
+      Input => 1,
+      Result => $choose_strong_password,
+      #Result =>
+   #$Net::FullAuto::ISets::Local::WordPress_is::select_wordpress_setup,
+      Banner => $domain_url_banner,
+
+   };
+   return $domain_url;
+
+};
+
 our $select_wordpress_setup=sub {
 
    my @options=('WordPress on This Host');
@@ -3736,7 +3842,8 @@ END
          Text => ']C[',
          Convey => \@options,
          #Result => $standup_wordpress,
-         Result => $choose_strong_password,
+	 #Result => $choose_strong_password,
+	 Result => $domain_url,
 
       },
       Scroll => 1,

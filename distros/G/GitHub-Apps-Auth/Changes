@@ -1,5 +1,10 @@
 Revision history for Perl extension GitHub-Apps-Auth
 
+0.04 2019-12-16T02:51:39Z
+
+    - fix an ambiguous compare (from @shogo82148)
+        - remove overloading at `eq` operator
+
 0.03 2019-12-04T08:59:42Z
 
     - auto detecting installation_id by login name

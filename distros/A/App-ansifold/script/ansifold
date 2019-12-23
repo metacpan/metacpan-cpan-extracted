@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use v5.14;
 use utf8;
 
 use App::ansifold qw($VERSION);
@@ -16,14 +17,18 @@ ansifold - fold command handling ANSI terminal sequences
 
 ansifold [ options ]
 
-    -w#, --width=#                Folding width
-    -s,  --boundary=word          Fold on word boundary
+    -w#, --width=#                Folding width (default 70)
+         --boundary=word          Fold on word boundary
          --padding                Padding to margin space
          --padchar=_              Padding character
          --ambiguous=narrow|wide  Unicode ambiguous character handling
     -p,  --paragraph              Print extra newline
          --separate=string        Set separator string (default newline)
     -n                            Short cut for --separate ''
+         --linebreak=mode         Line-break adjustment rule (default all)
+         --runin                  Run-in width (default 4)
+         --runout                 Run-out width (default 4)
+    -s,  --smart                  Short cut for --boundary=word --linebreak=all
 
 =head1 DESCRIPTION
 
@@ -31,10 +36,20 @@ B<ansifold> is almost B<fold> compatible command utilizing
 L<Text::ANSI::Fold> module, which enables to handle ANSI terminal
 sequences and Unicode multibyte characters properly.
 
-Opiton B<-w> takes width number to fold.  Unlike original fold(1)
-command, multiple numbers can be specified like:
+It folds lines in 70 column by default.  Use option B<-w> to change
+the folding width.
 
-    ansifold -w 3,1,3,1,2
+    $ ansifold -w132
+
+Unlike original fold(1) command, multiple numbers can be specified
+like:
+
+    $ LANG=C date | ansifold -w 3,1,3,1,2 | cat -n
+         1  Wed
+         2   
+         3  Dec
+         4   
+         5  19
 
 Negative number fields are discarded.
 
@@ -43,8 +58,14 @@ Negative number fields are discarded.
     Dec
     19
 
+Option B<-n> (or B<--separate> '') eliminates newlines between
+columns.
+
+    $ LANG=C date | ansifold -w 3,-1,3,-1,2 -n
+    WedDec19
+
 Single field is used repeatedly for the same line, but multiple fields
-are not.  Put comma at the end to discard the rest:
+are not.  Put comma at the end of single field to discard the rest:
 
     ansifold -w 80,
 
@@ -52,9 +73,13 @@ Number description is handled by L<Getopt::EX::Numbers> module, and
 consists of C<start>, C<end>, C<step> and C<length> elements.  For
 example,
 
-    ansifold -w 2:10:2
+    $ echo AABBBBCCCCCCDDDDDDDDEEEEEEEEEE | ansifold -w 2:10:2
 
-produces output like this:
+is equivalent to:
+
+    $ echo AABBBBCCCCCCDDDDDDDDEEEEEEEEEE | ansifold -w 2,4,6,8,10
+
+and produces output like this:
 
     AA
     BBBB
@@ -62,8 +87,29 @@ produces output like this:
     DDDDDDDD
     EEEEEEEEEE
 
-Each folded strings are separated by newline.  Use C<--separate>
-option to set the separator string, and use C<-n> to set it empty.
+=head1 LINE BREAKING
+
+Option B<--boundary=word> prohibit to break line within alphanumeric
+word.  This version supports line break adjustment, mainly to perform
+Japanese ``KINSOKU'' processing.  Use B<--linebreak=all> to enable it.
+
+When B<--linebreak> option is enabled, if the cut-off text start with
+space or prohibited characters (e.g. closing parenthesis), they are
+ran-in at the end of current line as much as possible.
+
+If the trimmed text end with prohibited characters (e.g. opening
+parenthesis), they are ran-out to the head of next line, provided it
+fits to maximum width.
+
+Option B<--linebreak> takes a value of I<all>, I<runin>, I<runout> or
+I<none>.  Default value is I<none>.
+
+Maximum width of run-in/run-out characters are defined by B<--runin>
+and B<--runout> option.  Default values are 4.
+
+Option B<--smart> (or simply B<-s>) is shortcut for
+"B<--boundary=word> B<--linebreak=all>" and enables all smart text
+formatting capability.
 
 =head1 SEE ALSO
 
@@ -72,6 +118,10 @@ L<github|https://github.com/kaz-utashiro/ansifold>
 L<github|https://github.com/kaz-utashiro/Text-ANSI-Fold>
 
 L<Getopt::EX::Numbers>
+
+L<https://www.w3.org/TR/2009/NOTE-jlreq-20090604/>,
+Requirements for Japanese Text Layout,
+W3C Working Group Note 4 June 2009
 
 =head1 LICENSE
 
@@ -86,31 +136,51 @@ Kazumasa Utashiro
 
 =cut
 
-use open IO => 'utf8';
-binmode STDIN,  ":encoding(utf8)";
-binmode STDOUT, ":encoding(utf8)";
-binmode STDERR, ":encoding(utf8)";
+use open IO => 'utf8', ':std';
 
 use Pod::Usage;
 use List::Util qw(min);
-use Text::ANSI::Fold;
+use Text::ANSI::Fold qw(:constants);
 use Data::Dumper;
 
 my %opt = (
     width => [],
     separate => "\n",
+    boundary => "none",
+    linebreak => LINEBREAK_NONE,
+    runin => 4,
+    runout => 4,
     );
+
 my @optargs = (
-    "width|w=s"   =>  $opt{width},
-    "boundary=s"  => \$opt{boundary},
-    "padding!"    => \$opt{padding},
-    "padchar=s"   => \$opt{padchar},
-    "ambiguous=s" => \$opt{ambiguous},
-    "paragraph|p" => \$opt{paragraph},
-    "separate=s"  => \$opt{separate},
-    "n"           => sub { $opt{separate} = "" },
-    "s" => sub {
-	$opt{boundary} = 'word';
+    "width|w=s"      =>  $opt{width},
+    "boundary=s"     => \$opt{boundary},
+    "padding!"       => \$opt{padding},
+    "padchar=s"      => \$opt{padchar},
+    "ambiguous=s"    => \$opt{ambiguous},
+    "paragraph|p"    => \$opt{paragraph},
+    "separate=s"     => \$opt{separate},
+    "linebreak|lb=s" => sub {
+	$opt{linebreak} = sub {
+	    local $_ = shift;
+	    my $v = LINEBREAK_NONE;
+	    $v |= LINEBREAK_ALL    if /all/i;
+	    $v |= LINEBREAK_RUNIN  if /runin/i;
+	    $v |= LINEBREAK_RUNOUT if /runout/i;
+	    $v;
+	}->($_[1]);
+    },
+    "runin=i"  => \$opt{runin},
+    "runout=i" => \$opt{runout},
+    "n" => sub { $opt{separate} = "" },
+    "compose|s!" => sub {
+	($opt{boundary}, $opt{linebreak}) = do {
+	    if ($_[1]) {
+		('word', LINEBREAK_ALL);
+	    } else {
+		('none', LINEBREAK_NONE);
+	    }
+	};
     },
     "version|v" => sub {
 	print "Version: $VERSION\n";
@@ -118,10 +188,11 @@ my @optargs = (
     },
     );
 
-use Getopt::Long;
+use Getopt::EX::Long;
 Getopt::Long::Configure("bundling");
 GetOptions(@optargs) || pod2usage();
 
+my $DEFAULT_WIDTH = 70;
 my @width_map;
 my @width_index;
 
@@ -151,7 +222,7 @@ if (@{$opt{width}} > 1 and grep { not $_ } @width_map) {
 }
 
 if (@{$opt{width}} == 0) {
-    $opt{width} = 80;
+    $opt{width} = $DEFAULT_WIDTH;
 }
 elsif (@{$opt{width}} == 1) {
     $opt{width} = $opt{width}->[0];
@@ -163,7 +234,7 @@ else {
 my $fold = new Text::ANSI::Fold do {
     map  { $_ => $opt{$_} }
     grep { defined $opt{$_} }
-    qw(width boundary padding padchar ambiguous);
+    qw(width boundary padding padchar ambiguous linebreak runin runout);
 };
 
 my $separator = do {

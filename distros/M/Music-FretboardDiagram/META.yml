@@ -23,16 +23,16 @@ meta-spec:
 name: Music-FretboardDiagram
 requires:
   Imager: '0'
-  List::MoreUtils: '0'
+  List::SomeUtils: '0'
   Moo: '2'
   Music::Chord::Namer: '0'
   namespace::clean: '0'
   perl: '5.006'
   strictures: '2'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-FretboardDiagram
-  repository: https://github.com/ology/Music-FretboardDiagram
-version: '0.1203'
+  homepage: https://github.com/ology/Music-FretboardDiagram
+  repository: https://github.com/ology/Music-FretboardDiagram.git
+version: '0.1204'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -189,9 +189,9 @@ x_Dist_Zilla:
       name: MetaJSON
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.012'
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -228,7 +228,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
-          exclude_match: []
+          exclude_match:
+            - \.png
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''

@@ -77,7 +77,7 @@ sub _new {
 =item $asyncreply->discard_result;
 
 Indicates that the caller is no longer interested in
-recieving the reply & that it should be discarded. After
+receiving the reply & that it should be discarded. After
 calling this method, this object should not be used again.
 
 =cut

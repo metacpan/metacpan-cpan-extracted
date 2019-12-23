@@ -19,7 +19,7 @@ package MongoDB::BSON::Regexp;
 # ABSTRACT: (DEPRECATED) Regular expression type
 
 use version;
-our $VERSION = 'v2.2.0';
+our $VERSION = 'v2.2.1';
 
 use Moo;
 extends 'BSON::Regex';
@@ -45,7 +45,7 @@ MongoDB::BSON::Regexp - (DEPRECATED) Regular expression type
 
 =head1 VERSION
 
-version v2.2.0
+version v2.2.1
 
 =head1 DESCRIPTION
 

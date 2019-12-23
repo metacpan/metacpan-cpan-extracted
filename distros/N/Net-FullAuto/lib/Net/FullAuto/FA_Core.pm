@@ -8493,13 +8493,19 @@ sub getpasswd
    if (exists $Hosts{$hostlabel}{'cyberark'}) {
       my $capath=$Net::FullAuto::FA_Core::gbp->('clipasswordsdk');
       my $app_id=$Hosts{$hostlabel}{'ca_appid'}||'';
-      my $ca_das=$Hosts{$hostlabel}{'ca_das'}||'Active';
+      my $ca_das=$Hosts{$hostlabel}{'ca_das'}||'';
       my $ca_host=$Hosts{$hostlabel}{'ca_host'}||'localhost';
       my $ca_user=$Hosts{$hostlabel}{'loginid'}||$username;
       my $cmd="${capath}clipasswordsdk GetPassword -p "
              ."AppDescs.AppID=$app_id -p Query=\"Address="
              ."$hostname;Username=$ca_user;DualAccountStatus="
              ."$ca_das\" -p RequiredProps=* -o Password";
+      unless ($ca_das) {
+         my $cmd="${capath}clipasswordsdk GetPassword -p "
+             ."AppDescs.AppID=$app_id -p Query=\"Address="
+             ."$hostname;Username=$ca_user"
+             ."\" -p RequiredProps=* -o Password";
+      }
       if ($ca_host=~/localhost/i or !$ca_host) {
          ($stdout,$stderr)=$localhost->cmd($cmd);
       } else {
@@ -14226,9 +14232,6 @@ END
              # handled by the "if ($@)" block at the bottom
              # of this routine.
          my $logdir='';
-         if (!$LOG) {
-            Net::FullAuto::FA_Core::log();
-         }
          if (-r "/tmp/fa_aws_home.txt") {
             open(RD,"/tmp/fa_aws_home.txt");
             my $credentials_csv_path=<RD>;
@@ -14267,6 +14270,9 @@ END
             $Net::FullAuto::FA_Core::skip_host_hash=1;
             &new_user_experience($Term::Menus::new_user_flag,
                $welcome,$newuser);
+         }
+         if (!$LOG) {
+            Net::FullAuto::FA_Core::log();
          }
          if (defined $default || (defined $facode && !$facode)
                               || (defined $faconf && !$faconf)

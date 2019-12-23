@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+
+@ScripActions = (
+    {  Name        => '[GenerateTickets] Generate Multiple Tickets', # loc
+       Description => 'Generate tickets defined by the custom fields' , # loc
+       ExecModule => 'GenerateTickets',
+    },
+);
+
+
+@Templates = ( 
+    { 
+        Queue       => '0', 
+        Name        => '[GenerateTicket] base',  # loc 
+        Description => 'A base template for ticket creation. It is mandatory for the extension to work',  # loc 
+        Content     => '===Create-Ticket: incomingbid
+Due: {time + 172800}
+Starts: {time + 57600}
+Content: 
+ENDOFCONTENT', 
+    },
+);
+
+@CustomFields = (
+	{
+		Name => 'Destination Queue',
+		Description => 'Que for creating the tickets',
+		Type => 'FreeformSingle',
+		LookupType => 'RT::Queue',
+		EntryHint => undef,
+		MaxValues => 0,
+	},
+	{
+		Name => 'Parent Owner',
+		Description => 'Default owner for the generated tickets',
+		Type => 'FreeformSingle',
+		LookupType => 'RT::Queue',
+		EntryHint => undef,
+		MaxValues => 0,
+	},
+	{
+		Name => 'Sub owners',
+		Description => 'Default owner for the generated tickets',
+		Type => 'FreeformMultiple',
+		LookupType => 'RT::Queue',
+		EntryHint => undef,
+		MaxValues => 0,
+	},
+	{
+		Name => 'Subject',
+		Description => 'Subject of the main ticket',
+		Type => 'FreeformSingle',
+		LookupType => 'RT::Queue',
+		EntryHint => undef,
+		MaxValues => 0,
+	},
+	{
+		Name => 'Subticket subjects',
+		Description => 'The subjects of the generated tickets',
+		Type => 'FreeformMultiple',
+		LookupType => 'RT::Queue',
+		EntryHint => undef,
+		MaxValues => 0,
+	},
+	{
+		Name => 'Ticket Texts (Divided by semicolons)',
+		Description => 'Ticket Texts (Divided by semicolons)',
+		Type => 'Text',
+		LookupType => 'RT::Queue',
+		EntryHint => undef,
+		MaxValues => 0,
+	},
+);

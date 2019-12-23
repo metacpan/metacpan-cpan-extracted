@@ -21,6 +21,7 @@ $hash = \&Digest::SHA::sha256;
 use constant HMAC_LENGTH => 32;
 use constant IV_LENGTH   => 16;
 
+# Build initialization vector subroutine
 BEGIN {
     eval { require Crypt::URandom; Crypt::URandom::urandom(IV_LENGTH) };
     if ($@) {
@@ -79,6 +80,7 @@ sub encrypt {
     my ( $self, $data, $low ) = @_;
 
     # pad $data so that its length be multiple of 16 bytes
+    $data //= '';
     my $l = bytes::length($data) % 16;
     $data .= "\0" x ( 16 - $l ) unless ( $l == 0 );
 
@@ -93,6 +95,7 @@ sub encrypt {
             $iv . $self->_getCipher->set_iv($iv)->encrypt( $hmac . $data ),
             '' );
     };
+
     if ($@) {
         $msg = "Crypt::Rijndael error : $@";
         return undef;
@@ -116,7 +119,7 @@ sub decrypt {
     $data =~ s/%0A/\n/ig;
     $data = decode_base64($data);
     my $iv;
-    $iv = bytes::substr( $data, 0, IV_LENGTH );
+    $iv   = bytes::substr( $data, 0, IV_LENGTH );
     $data = bytes::substr( $data, IV_LENGTH );
     eval { $data = $self->_getCipher->set_iv($iv)->decrypt($data); };
 
@@ -191,7 +194,7 @@ sub _cryptHex {
     }
     $data = pack "H*", $data;
     if ( $sub eq 'decrypt' ) {
-        $iv = bytes::substr( $data, 0, IV_LENGTH );
+        $iv   = bytes::substr( $data, 0, IV_LENGTH );
         $data = bytes::substr( $data, IV_LENGTH );
     }
     eval { $data = $self->_getCipher($key)->set_iv($iv)->$sub($data); };
@@ -202,7 +205,7 @@ sub _cryptHex {
     if ( $sub eq 'encrypt' ) {
         $data = $iv . $data;
     }
-    $msg = "";
+    $msg  = "";
     $data = unpack "H*", $data;
     return $data;
 }

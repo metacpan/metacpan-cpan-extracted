@@ -1,7 +1,9 @@
 package App::EscapeUtils;
 
-our $DATE = '2017-11-26'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'App-EscapeUtils'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -287,6 +289,93 @@ sub shell_escape {
     return [200, "OK", $cb];
 }
 
+$SPEC{pod_escape} = {
+    v => 1.1,
+    summary => 'Quote POD special characters in input (in stdin or arguments)',
+    args => {
+        %arg_strings,
+    },
+    result => {
+        schema => 'str*',
+        stream => 1,
+    },
+};
+sub pod_escape {
+    require String::PodQuote;
+
+    my %args = @_;
+
+    my $strings = $args{strings};
+    my $cb = sub {
+        my $str = $strings->();
+        if (defined $str) {
+            return String::PodQuote::pod_quote($str);
+        } else {
+            return undef;
+        }
+    };
+
+    return [200, "OK", $cb];
+}
+
+$SPEC{perl_dquote_escape} = {
+    v => 1.1,
+    summary => 'Encode lines of input (in stdin or arguments) inside Perl double-quoted strings',
+    args => {
+        %arg_strings,
+    },
+    result => {
+        schema => 'str*',
+        stream => 1,
+    },
+};
+sub perl_dquote_escape {
+    require String::PerlQuote;
+
+    my %args = @_;
+
+    my $strings = $args{strings};
+    my $cb = sub {
+        my $str = $strings->();
+        if (defined $str) {
+            return String::PerlQuote::double_quote($str);
+        } else {
+            return undef;
+        }
+    };
+
+    return [200, "OK", $cb];
+}
+
+$SPEC{perl_squote_escape} = {
+    v => 1.1,
+    summary => 'Encode lines of input (in stdin or arguments) inside Perl single-quoted strings',
+    args => {
+        %arg_strings,
+    },
+    result => {
+        schema => 'str*',
+        stream => 1,
+    },
+};
+sub perl_squote_escape {
+    require String::PerlQuote;
+
+    my %args = @_;
+
+    my $strings = $args{strings};
+    my $cb = sub {
+        my $str = $strings->();
+        if (defined $str) {
+            return String::PerlQuote::single_quote($str);
+        } else {
+            return undef;
+        }
+    };
+
+    return [200, "OK", $cb];
+}
+
 1;
 # ABSTRACT: Various string escaping/unescaping utilities
 
@@ -302,7 +391,7 @@ App::EscapeUtils - Various string escaping/unescaping utilities
 
 =head1 VERSION
 
-This document describes version 0.001 of App::EscapeUtils (from Perl distribution App-EscapeUtils), released on 2017-11-26.
+This document describes version 0.002 of App::EscapeUtils (from Perl distribution App-EscapeUtils), released on 2019-12-15.
 
 =head1 DESCRIPTION
 
@@ -322,6 +411,12 @@ This distributions provides the following command-line utilities:
 
 =item * L<js-unescape>
 
+=item * L<perl-dquote-escape>
+
+=item * L<perl-squote-escape>
+
+=item * L<pod-escape>
+
 =item * L<shell-escape>
 
 =item * L<uri-escape>
@@ -337,7 +432,7 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- backslash_escape(%args) -> [status, msg, result, meta]
+ backslash_escape(%args) -> [status, msg, payload, meta]
 
 Escape lines of input using backslash octal sequence (or \r, \n, \t).
 
@@ -356,18 +451,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (str)
 
 
+
 =head2 backslash_unescape
 
 Usage:
 
- backslash_unescape(%args) -> [status, msg, result, meta]
+ backslash_unescape(%args) -> [status, msg, payload, meta]
 
 Restore backslash octal sequence (or \r, \n, \t) to original characters in lines of input (in stdin or arguments).
 
@@ -386,18 +482,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (str)
 
 
+
 =head2 html_escape
 
 Usage:
 
- html_escape(%args) -> [status, msg, result, meta]
+ html_escape(%args) -> [status, msg, payload, meta]
 
 HTML-escape lines of input (in stdin or arguments).
 
@@ -416,18 +513,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (str)
 
 
+
 =head2 html_unescape
 
 Usage:
 
- html_unescape(%args) -> [status, msg, result, meta]
+ html_unescape(%args) -> [status, msg, payload, meta]
 
 HTML-unescape lines of input (in stdin or arguments).
 
@@ -446,18 +544,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (str)
 
 
+
 =head2 js_escape
 
 Usage:
 
- js_escape(%args) -> [status, msg, result, meta]
+ js_escape(%args) -> [status, msg, payload, meta]
 
 Encode lines of input (in standard input or arguments) as JSON strings.
 
@@ -476,18 +575,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (str)
 
 
+
 =head2 js_unescape
 
 Usage:
 
- js_unescape(%args) -> [status, msg, result, meta]
+ js_unescape(%args) -> [status, msg, payload, meta]
 
 Interpret lines of input (in standard input or arguments) as JSON strings and return the decoded value.
 
@@ -506,18 +606,112 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (str)
 
 
+
+=head2 perl_dquote_escape
+
+Usage:
+
+ perl_dquote_escape(%args) -> [status, msg, payload, meta]
+
+Encode lines of input (in stdin or arguments) inside Perl double-quoted strings.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<strings>* => I<array[str]>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (str)
+
+
+
+=head2 perl_squote_escape
+
+Usage:
+
+ perl_squote_escape(%args) -> [status, msg, payload, meta]
+
+Encode lines of input (in stdin or arguments) inside Perl single-quoted strings.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<strings>* => I<array[str]>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (str)
+
+
+
+=head2 pod_escape
+
+Usage:
+
+ pod_escape(%args) -> [status, msg, payload, meta]
+
+Quote POD special characters in input (in stdin or arguments).
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<strings>* => I<array[str]>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (str)
+
+
+
 =head2 shell_escape
 
 Usage:
 
- shell_escape(%args) -> [status, msg, result, meta]
+ shell_escape(%args) -> [status, msg, payload, meta]
 
 Shell-escape lines of input (in stdin or arguments).
 
@@ -536,18 +730,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (str)
 
 
+
 =head2 uri_escape
 
 Usage:
 
- uri_escape(%args) -> [status, msg, result, meta]
+ uri_escape(%args) -> [status, msg, payload, meta]
 
 URI-escape lines of input (in standard input or arguments).
 
@@ -566,18 +761,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (str)
 
 
+
 =head2 uri_unescape
 
 Usage:
 
- uri_unescape(%args) -> [status, msg, result, meta]
+ uri_unescape(%args) -> [status, msg, payload, meta]
 
 URI-unescape lines of input (in standard input or arguments).
 
@@ -596,7 +792,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -626,13 +822,21 @@ L<String::JS>
 
 L<String::Escape>
 
+L<HTML::Entities>
+
+L<String::ShellQuote> and L<ShellQuote::Any::Tiny>
+
+L<String::xcPodQuote>
+
+L<String::PerlQuote>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

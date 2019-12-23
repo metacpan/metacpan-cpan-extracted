@@ -43,11 +43,11 @@ resources:
   bugtracker: https://github.com/gbv/PICA-Data/issues
   homepage: https://github.com/gbv/PICA-Data
   repository: https://github.com/gbv/PICA-Data.git
-version: '1.00'
+version: '1.01'
 x_contributors:
   - 'Carsten Klee <klee@cpan.org>'
   - 'Jakob Voß <jakob.voss@gbv.de>'
   - 'Johann Rolschewski <jorol@cpan.org>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

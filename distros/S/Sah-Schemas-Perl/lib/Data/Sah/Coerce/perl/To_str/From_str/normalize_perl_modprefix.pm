@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modprefix;
 
 # AUTHOR
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2019-12-15'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.025'; # VERSION
+our $VERSION = '0.026'; # VERSION
 
 use 5.010001;
 use strict;
@@ -48,7 +48,7 @@ Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modprefix
 
 =head1 VERSION
 
-This document describes version 0.025 of Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modprefix (from Perl distribution Sah-Schemas-Perl), released on 2019-11-29.
+This document describes version 0.026 of Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modprefix (from Perl distribution Sah-Schemas-Perl), released on 2019-12-15.
 
 =head1 DESCRIPTION
 

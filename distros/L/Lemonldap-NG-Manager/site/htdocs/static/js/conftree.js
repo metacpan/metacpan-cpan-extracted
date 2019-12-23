@@ -57,6 +57,14 @@ function templates(tpl,key) {
       "id" : "casAppMetaDataOptions",
       "title" : "casAppMetaDataOptions",
       "type" : "simpleInputContainer"
+   },
+   {
+      "cnodes" : tpl+"s/"+key+"/"+"casAppMetaDataMacros",
+      "default" : [],
+      "help" : "exportedvars.html#extend_variables_using_macros_and_groups",
+      "id" : tpl+"s/"+key+"/"+"casAppMetaDataMacros",
+      "title" : "casAppMetaDataMacros",
+      "type" : "keyTextContainer"
    }
 ]
 ;
@@ -473,17 +481,47 @@ function templates(tpl,key) {
             "type" : "select"
          },
          {
-            "default" : 3600,
             "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenExpiration",
             "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenExpiration",
             "title" : "oidcRPMetaDataOptionsIDTokenExpiration",
             "type" : "int"
          },
          {
-            "default" : 3600,
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenForceClaims",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIDTokenForceClaims",
+            "title" : "oidcRPMetaDataOptionsIDTokenForceClaims",
+            "type" : "bool"
+         },
+         {
             "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenExpiration",
             "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAccessTokenExpiration",
             "title" : "oidcRPMetaDataOptionsAccessTokenExpiration",
+            "type" : "int"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthorizationCodeExpiration",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthorizationCodeExpiration",
+            "title" : "oidcRPMetaDataOptionsAuthorizationCodeExpiration",
+            "type" : "int"
+         },
+         {
+            "default" : 0,
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowOffline",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowOffline",
+            "title" : "oidcRPMetaDataOptionsAllowOffline",
+            "type" : "bool"
+         },
+         {
+            "default" : 0,
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRefreshToken",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRefreshToken",
+            "title" : "oidcRPMetaDataOptionsRefreshToken",
+            "type" : "bool"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsOfflineSessionExpiration",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsOfflineSessionExpiration",
+            "title" : "oidcRPMetaDataOptionsOfflineSessionExpiration",
             "type" : "int"
          },
          {
@@ -548,6 +586,14 @@ function templates(tpl,key) {
       ],
       "id" : "oidcRPMetaDataOptions",
       "title" : "oidcRPMetaDataOptions"
+   },
+   {
+      "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataMacros",
+      "default" : [],
+      "help" : "exportedvars.html#extend_variables_using_macros_and_groups",
+      "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataMacros",
+      "title" : "oidcRPMetaDataMacros",
+      "type" : "keyTextContainer"
    },
    {
       "_nodes" : [
@@ -1090,6 +1136,14 @@ function templates(tpl,key) {
       "help" : "idpsaml.html#options",
       "id" : "samlSPMetaDataOptions",
       "title" : "samlSPMetaDataOptions"
+   },
+   {
+      "cnodes" : tpl+"s/"+key+"/"+"samlSPMetaDataMacros",
+      "default" : [],
+      "help" : "exportedvars.html#extend_variables_using_macros_and_groups",
+      "id" : tpl+"s/"+key+"/"+"samlSPMetaDataMacros",
+      "title" : "samlSPMetaDataMacros",
+      "type" : "keyTextContainer"
    }
 ]
 ;
@@ -1192,7 +1246,7 @@ function templates(tpl,key) {
                   "v" : "ServiceToken"
                },
                {
-                  "k" : "Zimbra",
+                  "k" : "ZimbraPreAuth",
                   "v" : "ZimbraPreAuth"
                }
             ],

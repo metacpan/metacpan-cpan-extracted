@@ -21,6 +21,7 @@
           </ul>
         </div>
       </div>
+      <div ng-show="data.length!=0" class="text-center"><p class="badge">{{total}} <span trspan="notification_s"></span></p></div>
       <div class="region region-sidebar-first">
         <section id="block-superfish-1" class="block block-superfish clearfix">
           <div ui-tree data-drag-enabled="false" id="tree-root">

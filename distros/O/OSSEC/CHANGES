@@ -1,0 +1,82 @@
+==================================================
+Changes from 2018-12-20 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.1 at 2019-12-20 11:50:05 +0000
+----------------------------------------
+
+  Change: dd5db00d969ac51e7766006d70e31a5995491b2b
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-12-20 12:44:09 +0000
+
+    ADD: updated README.md 
+
+  Change: 05ed5692c8e3ad59021e1bf361a93ad91984aa00
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-12-20 12:43:34 +0000
+
+    ADD: script to update agent table in ossec database 
+
+  Change: 07bc45ec8d4ef0338efa4dd29b1d7e0b1c6c686f
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-12-20 12:43:22 +0000
+
+    ADD: script to update signature table in ossec database 
+
+  Change: f36b0ffabb71e96f0927a513271f0db6f6d07936
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-12-20 12:42:35 +0000
+
+    ADD: ignore some files 
+
+  Change: 09bf15a4b02982cd7f8e8b96ea5924d85c300f78
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-12-20 12:41:53 +0000
+
+    ADD: LICENSE.txt
+
+    Just a LICENSE file visible within the git repository. 
+
+  Change: 69eb60f4612a885584b94057822298cc8aba2804
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-12-20 12:40:29 +0000
+
+    RM: removed logging test
+
+    Its hard to create a logging test for different systems and evaluate
+    their output. Therefore we remove it at the moment. 
+
+  Change: 36f2b8d6653663f6d487469cbe803abbcdc9667b
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-12-20 12:39:38 +0000
+
+    ADD: module documentation and mysql support of OSSEC.pm 
+
+  Change: 4cd869be642b262b53017c81413b5d2b3086c1b1
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-12-20 12:38:55 +0000
+
+    ADD: class for managing mysql database of ossec 
+
+  Change: 08b0e407bb0edebebab03132a64d2b58de3b7ec8
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-12-20 12:31:40 +0000
+
+    ADD: module documentation 
+
+  Change: d57f1e182eddaf25bfc7bd12dbe06d51c3b761f2
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-12-19 13:44:31 +0000
+
+    ADD: basic logging infrastructure 
+
+  Change: 78e9535705f9b1905b7c14f9d79324c100afe9c9
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-12-19 13:06:17 +0000
+
+    ADD: initial commit 
+
+================
+End of releases.
+================

@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 13;
+my $maintests = 11;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -52,8 +52,9 @@ SKIP: {
     );
     expectOK($res);
     my $idpId = expectCookie($res);
-    pass('Waiting timeout');
-    sleep 3;
+
+    # Skipping time
+    Time::Fake->offset("+30s");
 
     # Simple SP access
     my $res;
@@ -63,11 +64,6 @@ SKIP: {
         ),
         'Unauth SP request'
     );
-    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     my ( $host, $url, $query ) =
       expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
         'SAMLRequest' );
@@ -80,8 +76,7 @@ SKIP: {
             IO::String->new($query),
             accept => 'text/html',
             length => length($query),
-            cookie =>
-              "lemonldap=$idpId;lemonldapidp=http://auth.idp.com/saml/metadata",
+            cookie => "lemonldap=$idpId",
         ),
         'Post SAML request to IdP'
     );
@@ -96,8 +91,7 @@ SKIP: {
             IO::String->new($query),
             accept => 'text/html',
             length => length($query),
-            cookie =>
-"lemonldap=$idpId;lemonldapidp=http://auth.idp.com/saml/metadata;$pdata",
+            cookie => "lemonldap=$idpId;$pdata",
         ),
         'Ask to renew'
     );
@@ -115,8 +109,7 @@ SKIP: {
             IO::String->new($query),
             accept => 'text/html',
             length => length($query),
-            cookie =>
-"lemonldap=$idpId;lemonldapidp=http://auth.idp.com/saml/metadata;$pdata",
+            cookie => "lemonldap=$idpId;$pdata",
         ),
         'Re auth'
     );
@@ -131,8 +124,7 @@ SKIP: {
             $url,
             query  => $query,
             accept => 'text/html',
-            cookie =>
-"lemonldap=$idpId;lemonldapidp=http://auth.idp.com/saml/metadata;$pdata",
+            cookie => "lemonldap=$idpId;$pdata",
         ),
         'Follow redirection'
     );
@@ -147,7 +139,6 @@ SKIP: {
             $url, IO::String->new($query),
             accept => 'text/html',
             length => length($query),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -178,7 +169,7 @@ sub issuer {
                 portal                   => 'http://auth.idp.com',
                 authentication           => 'Demo',
                 userDB                   => 'Same',
-                portalForceAuthnInterval => 2,
+                portalForceAuthnInterval => 5,
                 issuerDBSAMLActivation   => 1,
                 samlSPMetaDataOptions    => {
                     'sp.com' => {

@@ -11,7 +11,7 @@
     <li><span trspan="passwordPolicyMinUpper">Minimal upper characters:</span> <TMPL_VAR NAME="PPOLICY_MINUPPER"></li>
     </TMPL_IF>
     <TMPL_IF NAME="PPOLICY_MINDIGIT">
-    <li><span trspan="passwordPolicyMinDigit">Minimal digit characters:</span> <TMPL_VAR NAME="PPOLICY_MINUPPER"></li>
+    <li><span trspan="passwordPolicyMinDigit">Minimal digit characters:</span> <TMPL_VAR NAME="PPOLICY_MINDIGIT"></li>
     </TMPL_IF>
   </ul>
 </div>

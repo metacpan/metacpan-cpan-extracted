@@ -1,0 +1,20 @@
+0.02
+    - Make proper release.
+
+0.01_05
+    - Expect CGI.pm to be missing from core.
+
+0.01_04
+    - More test tweaks.
+
+0.01_03
+    - Test tweaks.
+
+0.01_02
+    - Declare encoding of pod.
+
+0.01_01
+    - Skip test failing due to B::Debug removal.
+
+0.01
+    - Iniiial release.

@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Helper::Row::Creation;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0101';
+our $VERSION = '0.0102';
 
 use parent 'DBIx::Class::Row';
 use String::CamelCase;
@@ -136,7 +136,7 @@ DBIx::Class::Smooth::Helper::Row::Creation - Short intro
 
 =head1 VERSION
 
-Version 0.0101, released 2018-11-29.
+Version 0.0102, released 2019-12-22.
 
 =head1 SOURCE
 

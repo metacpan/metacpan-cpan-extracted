@@ -1,7 +1,5 @@
 package Acme::CPANAuthors::Taiwanese;
-{
-  $Acme::CPANAuthors::Taiwanese::VERSION = '0.08';
-}
+$Acme::CPANAuthors::Taiwanese::VERSION = '0.09';
 # ABSTRACT: We are Taiwanese CPAN Authors!
 use 5.008;
 use strict;
@@ -17,6 +15,7 @@ use Acme::CPANAuthors::Register (
     CORNELIUS => "林佑安",
     DRBEAN    => "高來圭",
     DRYMAN    => "陳仁乾",
+    GASOLWU   => "Gasol Wu",
     GSLIN     => "林嘉軒",
     GUGOD     => "劉康民",
     HCCHIEN   => "簡信昌",
@@ -43,11 +42,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANAuthors::Taiwanese
+Acme::CPANAuthors::Taiwanese - We are Taiwanese CPAN Authors!
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

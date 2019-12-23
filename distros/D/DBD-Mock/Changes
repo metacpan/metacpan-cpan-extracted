@@ -1,5 +1,17 @@
 Revision history for Perl extension DBD::Mock.
 
+1.54 2019-12-23T12:44:22Z
+    - Added Bernhard Graf's 'Feature: one shot failure' merge request.
+    - Fixed description of the failure attribute of mock_add_resultset. It
+      no longer claims to support a hash ref (as it doesn't). Thanks to
+      Bernhard Graf for both the bug report and a merge request that fixes it.
+    - Fixed bug where it wasn't possible to replace a regular expression 
+      mock resultset. Thanks to Bernhard Graf for both the bug report and
+      a merge request that fixes it.
+    - Fixed bug where the failure attribute wasn't working with regular
+      expression mock resultsets. Thanks to Bernhard Graf for both the bug
+      report and a merge request that fixes it.
+
 1.53 2019-12-03T10:50:57Z
     - Error handling in mock_add_resultset is no longer experimental
     - Attribute Aliasing is no longer experimental

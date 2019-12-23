@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.80   2019-12-18
+       - Text::Hogan 2.03 or higher
+       - cleanup of the dist.ini file
+
 1.79   2019-07-29
        - Clone 0.43 or higher
 

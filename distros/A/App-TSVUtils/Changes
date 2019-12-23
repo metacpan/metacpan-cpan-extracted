@@ -1,4 +1,11 @@
-0.002   2019-05-21 (PERLANCAR)
+0.003   2019-12-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Update release note style in Changes.
+
+
+0.002   2019-05-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,6 +13,6 @@
 	  csv2tsv, tsv2csv are now in App-CSVUtils.
 
 
-0.001   2019-04-23 (PERLANCAR)
+0.001   2019-04-23  Released-By: PERLANCAR
 
          - First release.

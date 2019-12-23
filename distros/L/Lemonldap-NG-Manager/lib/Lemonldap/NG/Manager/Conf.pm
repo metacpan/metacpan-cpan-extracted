@@ -19,7 +19,7 @@ use feature 'state';
 
 extends 'Lemonldap::NG::Common::Conf::RESTServer';
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -252,7 +252,7 @@ sub newConf {
 
     if ( $cfgNum ne $req->params('cfgNum') ) { $parser->confChanged(1); }
 
-    my $res = { result => $parser->check };
+    my $res = { result => $parser->check($self) };
 
     # "message" fields: note that words enclosed by "__" (__word__) will be
     # translated

@@ -1,4 +1,5 @@
 use alienfile;
+use Config;
 
 configure { requires 'Alien::Build' => '1.60' };
 
@@ -132,15 +133,38 @@ share {
   );
 
   plugin Extract => 'tar.gz';
-  plugin 'Build::Autoconf' => ();
 
-  build [
-    '%{configure} --prefix=%{.install.autoconf_prefix} --without-python --disable-shared --enable-static',
-    '%{make}',
-    '%{make} install',
-  ];
+  if($^O eq 'MSWin32' && $Config{ccname} eq 'cl')
+  {
+    build [
+      sub { shift->install_prop->{prefix} =~ s/\//\\/g;},
+      'cd win32',
+      'cscript configure.js prefix=%{.install.prefix} iconv=no compiler=msvc static=yes',
+      'nmake -f Makefile.msvc',
+      'nmake -f Makefile.msvc install',
+    ];
 
-  plugin 'PkgConfig::MakeStatic' => ();
+    plugin 'Gather::IsolateDynamic';
+
+    gather sub {
+      my($build) = @_;
+      my $prefix = $build->runtime_prop->{prefix};
+      $build->runtime_prop->{cflags} = "-I$prefix/include/libxml2";
+      $build->runtime_prop->{libs}   = "-L$prefix/lib libxml2_a.lib";
+    };
+  }
+  else
+  {
+    plugin 'Build::Autoconf' => ();
+
+    build [
+      '%{configure} --prefix=%{.install.autoconf_prefix} --without-python --disable-shared --enable-static',
+      '%{make}',
+      '%{make} install',
+    ];
+
+    plugin 'PkgConfig::MakeStatic' => ();
+  }
 
 };
 

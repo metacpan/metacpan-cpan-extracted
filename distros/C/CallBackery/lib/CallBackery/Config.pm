@@ -377,7 +377,7 @@ sub postProcessCfg {
     return $cfg;
 }
 
-=head2 instantiatePlugin(pluginName,userObj)
+=head2 instantiatePlugin(pluginName,userObj,args)
 
 create a new instance of this plugin prototype
 

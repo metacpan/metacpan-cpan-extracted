@@ -7,7 +7,10 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
     'accept' => [
       '.*',
@@ -34,8 +37,7 @@ In addition, options which control resources through Linux Control Groups (cgrou
 L<systemd.resource-control(5)>.
 Those options complement options listed here.
 
-The following service exit codes are defined by the LSB specification
-.
+The following service exit codes are defined by the LSB specification.
 
 
 
@@ -89,27 +91,28 @@ partition table, or a file system within an MBR/MS-DOS or GPT partition table wi
 Linux-compatible partition, or a set of file systems within a GPT partition table that follows the Discoverable Partitions
 Specification.
 
-When C<DevicePolicy> is set to C<closed> or C<strict>,
-or set to C<auto> and C<DeviceAllow> is set, then this setting adds
-/dev/loop-control with C<rw> mode, C<block-loop> and
-C<block-blkext> with C<rwm> mode to C<DeviceAllow>. See
+When C<DevicePolicy> is set to C<closed> or
+C<strict>, or set to C<auto> and C<DeviceAllow> is
+set, then this setting adds C</dev/loop-control> with C<rw> mode,
+C<block-loop> and C<block-blkext> with C<rwm> mode
+to C<DeviceAllow>. See
 L<systemd.resource-control(5)>
 for the details about C<DevicePolicy> or C<DeviceAllow>. Also, see
-C<PrivateDevices> below, as it may change the setting of C<DevicePolicy>.
-',
+C<PrivateDevices> below, as it may change the setting of
+C<DevicePolicy>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'MountAPIVFS',
       {
         'description' => 'Takes a boolean argument. If on, a private mount namespace for the unit\'s processes is created
-and the API file systems /proc, /sys, and /dev
+and the API file systems C</proc>, C</sys>, and C</dev>
 are mounted inside of it, unless they are already mounted. Note that this option has no effect unless used in
 conjunction with C<RootDirectory>/C<RootImage> as these three mounts are
 generally mounted in the host anyway, and unless the root directory is changed, the private mount namespace
-will be a 1:1 copy of the host\'s, and include these three mounts. Note that the /dev file
+will be a 1:1 copy of the host\'s, and include these three mounts. Note that the C</dev> file
 system of the host is bind mounted if this option is used without C<PrivateDevices>. To run
-the service with a private, minimal version of /dev/, combine this option with
+the service with a private, minimal version of C</dev/>, combine this option with
 C<PrivateDevices>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
@@ -144,7 +147,14 @@ used.
 
 This option is particularly useful when C<RootDirectory>/C<RootImage>
 is used. In this case the source path refers to a path on the host file system, while the destination path
-refers to a path below the root directory of the unit.',
+refers to a path below the root directory of the unit.
+
+Note that the destination directory must exist or systemd must be able to create it.  Thus, it
+is not possible to use those options for mount points nested underneath paths specified in
+C<InaccessiblePaths>, or under C</home/> and other protected
+directories if C<ProtectHome=yes> is
+specified. C<TemporaryFileSystem> with C<:ro> or
+C<ProtectHome=tmpfs> should be used instead.',
         'type' => 'list'
       },
       'BindReadOnlyPaths',
@@ -173,7 +183,14 @@ used.
 
 This option is particularly useful when C<RootDirectory>/C<RootImage>
 is used. In this case the source path refers to a path on the host file system, while the destination path
-refers to a path below the root directory of the unit.',
+refers to a path below the root directory of the unit.
+
+Note that the destination directory must exist or systemd must be able to create it.  Thus, it
+is not possible to use those options for mount points nested underneath paths specified in
+C<InaccessiblePaths>, or under C</home/> and other protected
+directories if C<ProtectHome=yes> is
+specified. C<TemporaryFileSystem> with C<:ro> or
+C<ProtectHome=tmpfs> should be used instead.',
         'type' => 'list'
       },
       'User',
@@ -200,7 +217,12 @@ unless it is already allocated statically (see below). If C<DynamicUser> is not 
 specified user and group must have been created statically in the user database no later than the moment the
 service is started, for example using the
 L<sysusers.d(5)> facility, which
-is applied at boot or package install time.",
+is applied at boot or package install time.
+
+If the C<User> setting is used the supplementary group list is initialized
+from the specified user's default group list, as defined in the system's user and group
+database. Additional groups may be configured through the C<SupplementaryGroups>
+setting (see below).",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -228,46 +250,63 @@ unless it is already allocated statically (see below). If C<DynamicUser> is not 
 specified user and group must have been created statically in the user database no later than the moment the
 service is started, for example using the
 L<sysusers.d(5)> facility, which
-is applied at boot or package install time.",
+is applied at boot or package install time.
+
+If the C<User> setting is used the supplementary group list is initialized
+from the specified user's default group list, as defined in the system's user and group
+database. Additional groups may be configured through the C<SupplementaryGroups>
+setting (see below).",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'DynamicUser',
       {
-        'description' => "Takes a boolean parameter. If set, a UNIX user and group pair is allocated dynamically when the
-unit is started, and released as soon as it is stopped. The user and group will not be added to
-/etc/passwd or /etc/group, but are managed transiently during
-runtime. The L<nss-systemd(8)>
-glibc NSS module provides integration of these dynamic users/groups into the system's user and group
+        'description' => "Takes a boolean parameter. If set, a UNIX user and group pair is allocated
+dynamically when the unit is started, and released as soon as it is stopped. The user and group will
+not be added to C</etc/passwd> or C</etc/group>, but are managed
+transiently during runtime. The
+L<nss-systemd(8)> glibc
+NSS module provides integration of these dynamic users/groups into the system's user and group
 databases. The user and group name to use may be configured via C<User> and
-C<Group> (see above). If these options are not used and dynamic user/group allocation is
-enabled for a unit, the name of the dynamic user/group is implicitly derived from the unit name. If the unit
-name without the type suffix qualifies as valid user name it is used directly, otherwise a name incorporating a
-hash of it is used. If a statically allocated user or group of the configured name already exists, it is used
-and no dynamic user/group is allocated. Note that if C<User> is specified and the static group
-with the name exists, then it is required that the static user with the name already exists. Similarly, if
-C<Group> is specified and the static user with the name exists, then it is required that the
-static group with the name already exists. Dynamic users/groups are allocated from the UID/GID range
-61184\x{2026}65519. It is recommended to avoid this range for regular system or login users.  At any point in time
-each UID/GID from this range is only assigned to zero or one dynamically allocated users/groups in
-use. However, UID/GIDs are recycled after a unit is terminated. Care should be taken that any processes running
-as part of a unit for which dynamic users/groups are enabled do not leave files or directories owned by these
-users/groups around, as a different unit might get the same UID/GID assigned later on, and thus gain access to
-these files or directories. If C<DynamicUser> is enabled, C<RemoveIPC>,
-C<PrivateTmp> are implied. This ensures that the lifetime of IPC objects and temporary files
-created by the executed processes is bound to the runtime of the service, and hence the lifetime of the dynamic
-user/group. Since /tmp and /var/tmp are usually the only
-world-writable directories on a system this ensures that a unit making use of dynamic user/group allocation
-cannot leave files around after unit termination. Moreover C<ProtectSystem=strict> and
-C<ProtectHome=read-only> are implied, thus prohibiting the service to write to arbitrary file
-system locations. In order to allow the service to write to certain directories, they have to be whitelisted
-using C<ReadWritePaths>, but care must be taken so that UID/GID recycling doesn't create
-security issues involving files created by the service. Use C<RuntimeDirectory> (see below) in
-order to assign a writable runtime directory to a service, owned by the dynamic user/group and removed
-automatically when the unit is terminated. Use C<StateDirectory>,
-C<CacheDirectory> and C<LogsDirectory> in order to assign a set of writable
-directories for specific purposes to the service in a way that they are protected from vulnerabilities due to
-UID reuse (see below). Defaults to off.",
+C<Group> (see above). If these options are not used and dynamic user/group
+allocation is enabled for a unit, the name of the dynamic user/group is implicitly derived from the
+unit name. If the unit name without the type suffix qualifies as valid user name it is used directly,
+otherwise a name incorporating a hash of it is used. If a statically allocated user or group of the
+configured name already exists, it is used and no dynamic user/group is allocated. Note that if
+C<User> is specified and the static group with the name exists, then it is required
+that the static user with the name already exists. Similarly, if C<Group> is
+specified and the static user with the name exists, then it is required that the static group with
+the name already exists. Dynamic users/groups are allocated from the UID/GID range 61184\x{2026}65519. It is
+recommended to avoid this range for regular system or login users.  At any point in time each UID/GID
+from this range is only assigned to zero or one dynamically allocated users/groups in use. However,
+UID/GIDs are recycled after a unit is terminated. Care should be taken that any processes running as
+part of a unit for which dynamic users/groups are enabled do not leave files or directories owned by
+these users/groups around, as a different unit might get the same UID/GID assigned later on, and thus
+gain access to these files or directories. If C<DynamicUser> is enabled,
+C<RemoveIPC> and C<PrivateTmp> are implied (and cannot be turned
+off). This ensures that the lifetime of IPC objects and temporary files created by the executed
+processes is bound to the runtime of the service, and hence the lifetime of the dynamic
+user/group. Since C</tmp/> and C</var/tmp/> are usually the only
+world-writable directories on a system this ensures that a unit making use of dynamic user/group
+allocation cannot leave files around after unit termination. Furthermore
+C<NoNewPrivileges> and C<RestrictSUIDSGID> are implicitly enabled
+(and cannot be disabled), to ensure that processes invoked cannot take benefit or create SUID/SGID
+files or directories. Moreover C<ProtectSystem=strict> and
+C<ProtectHome=read-only> are implied, thus prohibiting the service to write to
+arbitrary file system locations. In order to allow the service to write to certain directories, they
+have to be whitelisted using C<ReadWritePaths>, but care must be taken so that
+UID/GID recycling doesn't create security issues involving files created by the service. Use
+C<RuntimeDirectory> (see below) in order to assign a writable runtime directory to a
+service, owned by the dynamic user/group and removed automatically when the unit is terminated. Use
+C<StateDirectory>, C<CacheDirectory> and
+C<LogsDirectory> in order to assign a set of writable directories for specific
+purposes to the service in a way that they are protected from vulnerabilities due to UID reuse (see
+below). If this option is enabled, care should be taken that the unit's processes do not get access
+to directories outside of these explicitly configured and managed ones. Specifically, do not use
+C<BindPaths> and be careful with C<AF_UNIX> file descriptor
+passing for directory file descriptors, as this would permit processes to create files or directories
+owned by the dynamic user/group that are not subject to the lifecycle and access guarantees of the
+service. Defaults to off.",
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -337,8 +376,9 @@ Example: if a unit has the following,
     CapabilityBoundingSet=CAP_A CAP_B
     CapabilityBoundingSet=CAP_B CAP_C
 
-then C<CAP_A>, C<CAP_B>, and C<CAP_C> are set.
-If the second line is prefixed with C<~>, e.g.,
+then C<CAP_A>, C<CAP_B>, and
+C<CAP_C> are set.  If the second line is prefixed with
+C<~>, e.g.,
 
     CapabilityBoundingSet=CAP_A CAP_B
     CapabilityBoundingSet=~CAP_B CAP_C
@@ -358,7 +398,7 @@ all but the listed capabilities will be included, the effect of the assignment i
 assigned to this option, the ambient capability set is reset to the empty capability set, and all prior
 settings have no effect.  If set to C<~> (without any further argument), the ambient capability
 set is reset to the full set of available capabilities, also undoing any previous settings. Note that adding
-capabilities to ambient capability set adds them to the process\'s inherited capability set.  
+capabilities to ambient capability set adds them to the process\'s inherited capability set.
 
 Ambient capability sets are useful if you want to execute a process as a non-privileged user but still want to
 give it some capabilities.  Note that in this case option C<keep-caps> is automatically added
@@ -370,19 +410,20 @@ C<+>.',
       },
       'NoNewPrivileges',
       {
-        'description' => 'Takes a boolean argument. If true, ensures that the service process and all its children can
-never gain new privileges through execve() (e.g. via setuid or setgid bits, or filesystem
-capabilities). This is the simplest and most effective way to ensure that a process and its children can never
-elevate privileges again. Defaults to false, but certain settings override this and ignore the value of this
-setting.  This is the case when C<SystemCallFilter>,
-C<SystemCallArchitectures>, C<RestrictAddressFamilies>,
-C<RestrictNamespaces>, C<PrivateDevices>,
-C<ProtectKernelTunables>, C<ProtectKernelModules>,
-C<MemoryDenyWriteExecute>, C<RestrictRealtime>, or
-C<LockPersonality> are specified. Note that even if this setting is overridden by them,
-systemctl show shows the original value of this setting. Also see
-No New Privileges
-Flag.  ',
+        'description' => 'Takes a boolean argument. If true, ensures that the service process and all its
+children can never gain new privileges through execve() (e.g. via setuid or
+setgid bits, or filesystem capabilities). This is the simplest and most effective way to ensure that
+a process and its children can never elevate privileges again. Defaults to false, but certain
+settings override this and ignore the value of this setting.  This is the case when
+C<SystemCallFilter>, C<SystemCallArchitectures>,
+C<RestrictAddressFamilies>, C<RestrictNamespaces>,
+C<PrivateDevices>, C<ProtectKernelTunables>,
+C<ProtectKernelModules>, C<ProtectKernelLogs>,
+C<MemoryDenyWriteExecute>, C<RestrictRealtime>,
+C<RestrictSUIDSGID>, C<DynamicUser> or C<LockPersonality>
+are specified. Note that even if this setting is overridden by them, systemctl show shows the
+original value of this setting. Also see No New Privileges
+Flag.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -1142,10 +1183,16 @@ non-service units and for services of the user service manager.',
       },
       'OOMScoreAdjust',
       {
-        'description' => 'Sets the adjustment level for the Out-Of-Memory killer for executed processes. Takes an integer
-between -1000 (to disable OOM killing for this process) and 1000 (to make killing of this process under memory
-pressure very likely). See proc.txt for
-details.',
+        'description' => 'Sets the adjustment value for the Linux kernel\'s Out-Of-Memory (OOM) killer score for
+executed processes. Takes an integer between -1000 (to disable OOM killing of processes of this unit)
+and 1000 (to make killing of processes of this unit under memory pressure very likely). See proc.txt for details. If
+not specified defaults to the OOM score adjustment level of the service manager itself, which is
+normally at 0.
+
+Use the C<OOMPolicy> setting of service units to configure how the service
+manager shall react to the kernel OOM killer terminating a process of the service.  See
+L<systemd.service(5)>
+for details.',
         'max' => '1000',
         'min' => '-1000',
         'type' => 'leaf',
@@ -1231,7 +1278,7 @@ details.',
 on the selected CPU scheduling policy (see above). For real-time scheduling policies an integer between 1
 (lowest priority) and 99 (highest priority) can be used. See
 L<sched_setscheduler(2)> for
-details. ',
+details.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1256,12 +1303,33 @@ details. Defaults to false.',
         },
         'description' => 'Controls the CPU affinity of the executed processes. Takes a list of CPU indices or ranges
 separated by either whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated
-by a dash.  This option may be specified more than once, in which case the specified CPU affinity masks are
+by a dash. This option may be specified more than once, in which case the specified CPU affinity masks are
 merged. If the empty string is assigned, the mask is reset, all assignments prior to this will have no
 effect. See
 L<sched_setaffinity(2)> for
 details.',
         'type' => 'list'
+      },
+      'NUMAPolicy',
+      {
+        'description' => 'Controls the NUMA memory policy of the executed processes. Takes a policy type, one of:
+C<default>, C<preferred>, C<bind>, C<interleave> and
+C<local>. A list of NUMA nodes that should be associated with the policy must be specified
+in C<NUMAMask>. For more details on each policy please see,
+L<set_mempolicy(2)>. For overall
+overview of NUMA support in Linux see,
+L<numa(7)>',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'NUMAMask',
+      {
+        'description' => 'Controls the NUMA node list which will be applied alongside with selected NUMA policy.
+Takes a list of NUMA nodes and has the same syntax as a list of CPUs for C<CPUAffinity>
+option. Note that the list of NUMA nodes is not required for C<default> and C<local>
+policies and for C<preferred> policy we expect a single NUMA node.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       },
       'IOSchedulingClass',
       {
@@ -1306,11 +1374,11 @@ details.',
           'strict'
         ],
         'description' => 'Takes a boolean argument or the special values C<full> or
-C<strict>. If true, mounts the /usr and /boot
+C<strict>. If true, mounts the C</usr> and C</boot>
 directories read-only for processes invoked by this unit. If set to C<full>, the
-/etc directory is mounted read-only, too. If set to C<strict> the entire
-file system hierarchy is mounted read-only, except for the API file system subtrees /dev,
-/proc and /sys (protect these directories using
+C</etc> directory is mounted read-only, too. If set to C<strict> the entire
+file system hierarchy is mounted read-only, except for the API file system subtrees C</dev>,
+C</proc> and C</sys> (protect these directories using
 C<PrivateDevices>, C<ProtectKernelTunables>,
 C<ProtectControlGroups>). This setting ensures that any modification of the vendor-supplied
 operating system (and optionally its configuration, and local mounts) is prohibited for the service.  It is
@@ -1338,23 +1406,25 @@ off.',
           'tmpfs'
         ],
         'description' => 'Takes a boolean argument or the special values C<read-only> or
-C<tmpfs>. If true, the directories /home, /root and
-/run/user are made inaccessible and empty for processes invoked by this unit. If set to
-C<read-only>, the three directories are made read-only instead. If set to C<tmpfs>,
-temporary file systems are mounted on the three directories in read-only mode. The value C<tmpfs>
-is useful to hide home directories not relevant to the processes invoked by the unit, while necessary directories
-are still visible by combining with C<BindPaths> or C<BindReadOnlyPaths>.
+C<tmpfs>. If true, the directories C</home>,
+C</root>, and C</run/user> are made inaccessible and empty for
+processes invoked by this unit. If set to C<read-only>, the three directories are
+made read-only instead. If set to C<tmpfs>, temporary file systems are mounted on the
+three directories in read-only mode. The value C<tmpfs> is useful to hide home
+directories not relevant to the processes invoked by the unit, while still allowing necessary
+directories to be made visible when listed in C<BindPaths> or
+C<BindReadOnlyPaths>.
 
 Setting this to C<yes> is mostly equivalent to set the three directories in
 C<InaccessiblePaths>. Similarly, C<read-only> is mostly equivalent to
 C<ReadOnlyPaths>, and C<tmpfs> is mostly equivalent to
-C<TemporaryFileSystem>.
+C<TemporaryFileSystem> with C<:ro>.
 
- It is recommended to enable this setting for all long-running services (in particular network-facing
-ones), to ensure they cannot get access to private user data, unless the services actually require access to
-the user\'s private data. This setting is implied if C<DynamicUser> is set. This setting cannot
-ensure protection in all cases. In general it has the same limitations as C<ReadOnlyPaths>,
-see below.',
+It is recommended to enable this setting for all long-running services (in particular
+network-facing ones), to ensure they cannot get access to private user data, unless the services
+actually require access to the user\'s private data. This setting is implied if
+C<DynamicUser> is set. This setting cannot ensure protection in all cases. In
+general it has the same limitations as C<ReadOnlyPaths>, see below.',
         'replace' => {
           '0' => 'no',
           '1' => 'yes',
@@ -1366,17 +1436,17 @@ see below.',
       },
       'RuntimeDirectory',
       {
-        'description' => 'These options take a whitespace-separated list of directory names. The specified directory
+        'description' => "These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
 defined in the following table, when the unit is started. Also, the corresponding environment variable
-is defined with the full path of directories. If multiple directories are set, then int the environment variable
+is defined with the full path of directories. If multiple directories are set, then in the environment variable
 the paths are concatenated with colon (C<:>).
 
-In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
-stopped. It is possible to preserve the specified directories in this case if
-C<RuntimeDirectoryPreserve> is configured to C<restart> or C<yes>
-(see below). The directories specified with C<StateDirectory>,
+In case of C<RuntimeDirectory> the innermost subdirectories are removed when
+the unit is stopped. It is possible to preserve the specified directories in this case if
+C<RuntimeDirectoryPreserve> is configured to C<restart> or
+C<yes> (see below). The directories specified with C<StateDirectory>,
 C<CacheDirectory>, C<LogsDirectory>,
 C<ConfigurationDirectory> are not removed when the unit is stopped.
 
@@ -1393,31 +1463,46 @@ C<ConfigurationDirectoryMode>.
 
 These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
-are mounted from there into the unit\'s file system namespace.
+are mounted from there into the unit's file system namespace.
 
 If C<DynamicUser> is used in conjunction with C<StateDirectory>,
 C<CacheDirectory> and C<LogsDirectory> is slightly altered: the directories
-are created below /var/lib/private, /var/cache/private and
-/var/log/private, respectively, which are host directories made inaccessible to
+are created below C</var/lib/private>, C</var/cache/private> and
+C</var/log/private>, respectively, which are host directories made inaccessible to
 unprivileged users, which ensures that access to these directories cannot be gained through dynamic user ID
 recycling. Symbolic links are created to hide this difference in behaviour. Both from perspective of the host
 and from inside the unit, the relevant directories hence always appear directly below
-/var/lib, /var/cache and /var/log.
+C</var/lib>, C</var/cache> and C</var/log>.
 
 Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
 their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
-runtime directories in /run due to lack of privileges, and to make sure the runtime
+runtime directories in C</run> due to lack of privileges, and to make sure the runtime
 directory is cleaned up automatically after use. For runtime directories that require more complex or different
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
+
+The directories defined by these options are always created under the standard paths used by systemd
+(C</var>, C</run>, C</etc>, \x{2026}). If the service needs
+directories in a different location, a different mechanism has to be used to create them.
+
+L<tmpfiles.d(5)> provides
+functionality that overlaps with these options. Using these options is recommended, because the lifetime of
+the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
+C<tmpfiles.d> configuration is executed before the unit is started.
+
+To remove any of the directories created by these settings, use the systemctl clean
+\x{2026} command on the relevant units, see
+L<systemctl(1)> for
+details.
 
 Example: if a system service unit has the following,
 
     RuntimeDirectory=foo/bar baz
 
-the service manager creates /run/foo (if it does not exist),
-/run/foo/bar, and /run/baz. The directories
-/run/foo/bar and /run/baz except /run/foo are
+the service manager creates C</run/foo> (if it does not exist),
+C</run/foo/bar>, and C</run/baz>. The
+directories C</run/foo/bar> and
+C</run/baz> except C</run/foo> are
 owned by the user and group specified in C<User> and C<Group>, and removed
 when the service is stopped.
 
@@ -1427,23 +1512,23 @@ Example: if a system service unit has the following,
     StateDirectory=aaa/bbb ccc
 
 then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.',
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'StateDirectory',
       {
-        'description' => 'These options take a whitespace-separated list of directory names. The specified directory
+        'description' => "These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
 defined in the following table, when the unit is started. Also, the corresponding environment variable
-is defined with the full path of directories. If multiple directories are set, then int the environment variable
+is defined with the full path of directories. If multiple directories are set, then in the environment variable
 the paths are concatenated with colon (C<:>).
 
-In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
-stopped. It is possible to preserve the specified directories in this case if
-C<RuntimeDirectoryPreserve> is configured to C<restart> or C<yes>
-(see below). The directories specified with C<StateDirectory>,
+In case of C<RuntimeDirectory> the innermost subdirectories are removed when
+the unit is stopped. It is possible to preserve the specified directories in this case if
+C<RuntimeDirectoryPreserve> is configured to C<restart> or
+C<yes> (see below). The directories specified with C<StateDirectory>,
 C<CacheDirectory>, C<LogsDirectory>,
 C<ConfigurationDirectory> are not removed when the unit is stopped.
 
@@ -1460,31 +1545,46 @@ C<ConfigurationDirectoryMode>.
 
 These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
-are mounted from there into the unit\'s file system namespace.
+are mounted from there into the unit's file system namespace.
 
 If C<DynamicUser> is used in conjunction with C<StateDirectory>,
 C<CacheDirectory> and C<LogsDirectory> is slightly altered: the directories
-are created below /var/lib/private, /var/cache/private and
-/var/log/private, respectively, which are host directories made inaccessible to
+are created below C</var/lib/private>, C</var/cache/private> and
+C</var/log/private>, respectively, which are host directories made inaccessible to
 unprivileged users, which ensures that access to these directories cannot be gained through dynamic user ID
 recycling. Symbolic links are created to hide this difference in behaviour. Both from perspective of the host
 and from inside the unit, the relevant directories hence always appear directly below
-/var/lib, /var/cache and /var/log.
+C</var/lib>, C</var/cache> and C</var/log>.
 
 Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
 their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
-runtime directories in /run due to lack of privileges, and to make sure the runtime
+runtime directories in C</run> due to lack of privileges, and to make sure the runtime
 directory is cleaned up automatically after use. For runtime directories that require more complex or different
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
+
+The directories defined by these options are always created under the standard paths used by systemd
+(C</var>, C</run>, C</etc>, \x{2026}). If the service needs
+directories in a different location, a different mechanism has to be used to create them.
+
+L<tmpfiles.d(5)> provides
+functionality that overlaps with these options. Using these options is recommended, because the lifetime of
+the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
+C<tmpfiles.d> configuration is executed before the unit is started.
+
+To remove any of the directories created by these settings, use the systemctl clean
+\x{2026} command on the relevant units, see
+L<systemctl(1)> for
+details.
 
 Example: if a system service unit has the following,
 
     RuntimeDirectory=foo/bar baz
 
-the service manager creates /run/foo (if it does not exist),
-/run/foo/bar, and /run/baz. The directories
-/run/foo/bar and /run/baz except /run/foo are
+the service manager creates C</run/foo> (if it does not exist),
+C</run/foo/bar>, and C</run/baz>. The
+directories C</run/foo/bar> and
+C</run/baz> except C</run/foo> are
 owned by the user and group specified in C<User> and C<Group>, and removed
 when the service is stopped.
 
@@ -1494,23 +1594,23 @@ Example: if a system service unit has the following,
     StateDirectory=aaa/bbb ccc
 
 then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.',
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'CacheDirectory',
       {
-        'description' => 'These options take a whitespace-separated list of directory names. The specified directory
+        'description' => "These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
 defined in the following table, when the unit is started. Also, the corresponding environment variable
-is defined with the full path of directories. If multiple directories are set, then int the environment variable
+is defined with the full path of directories. If multiple directories are set, then in the environment variable
 the paths are concatenated with colon (C<:>).
 
-In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
-stopped. It is possible to preserve the specified directories in this case if
-C<RuntimeDirectoryPreserve> is configured to C<restart> or C<yes>
-(see below). The directories specified with C<StateDirectory>,
+In case of C<RuntimeDirectory> the innermost subdirectories are removed when
+the unit is stopped. It is possible to preserve the specified directories in this case if
+C<RuntimeDirectoryPreserve> is configured to C<restart> or
+C<yes> (see below). The directories specified with C<StateDirectory>,
 C<CacheDirectory>, C<LogsDirectory>,
 C<ConfigurationDirectory> are not removed when the unit is stopped.
 
@@ -1527,31 +1627,46 @@ C<ConfigurationDirectoryMode>.
 
 These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
-are mounted from there into the unit\'s file system namespace.
+are mounted from there into the unit's file system namespace.
 
 If C<DynamicUser> is used in conjunction with C<StateDirectory>,
 C<CacheDirectory> and C<LogsDirectory> is slightly altered: the directories
-are created below /var/lib/private, /var/cache/private and
-/var/log/private, respectively, which are host directories made inaccessible to
+are created below C</var/lib/private>, C</var/cache/private> and
+C</var/log/private>, respectively, which are host directories made inaccessible to
 unprivileged users, which ensures that access to these directories cannot be gained through dynamic user ID
 recycling. Symbolic links are created to hide this difference in behaviour. Both from perspective of the host
 and from inside the unit, the relevant directories hence always appear directly below
-/var/lib, /var/cache and /var/log.
+C</var/lib>, C</var/cache> and C</var/log>.
 
 Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
 their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
-runtime directories in /run due to lack of privileges, and to make sure the runtime
+runtime directories in C</run> due to lack of privileges, and to make sure the runtime
 directory is cleaned up automatically after use. For runtime directories that require more complex or different
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
+
+The directories defined by these options are always created under the standard paths used by systemd
+(C</var>, C</run>, C</etc>, \x{2026}). If the service needs
+directories in a different location, a different mechanism has to be used to create them.
+
+L<tmpfiles.d(5)> provides
+functionality that overlaps with these options. Using these options is recommended, because the lifetime of
+the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
+C<tmpfiles.d> configuration is executed before the unit is started.
+
+To remove any of the directories created by these settings, use the systemctl clean
+\x{2026} command on the relevant units, see
+L<systemctl(1)> for
+details.
 
 Example: if a system service unit has the following,
 
     RuntimeDirectory=foo/bar baz
 
-the service manager creates /run/foo (if it does not exist),
-/run/foo/bar, and /run/baz. The directories
-/run/foo/bar and /run/baz except /run/foo are
+the service manager creates C</run/foo> (if it does not exist),
+C</run/foo/bar>, and C</run/baz>. The
+directories C</run/foo/bar> and
+C</run/baz> except C</run/foo> are
 owned by the user and group specified in C<User> and C<Group>, and removed
 when the service is stopped.
 
@@ -1561,23 +1676,23 @@ Example: if a system service unit has the following,
     StateDirectory=aaa/bbb ccc
 
 then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.',
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'LogsDirectory',
       {
-        'description' => 'These options take a whitespace-separated list of directory names. The specified directory
+        'description' => "These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
 defined in the following table, when the unit is started. Also, the corresponding environment variable
-is defined with the full path of directories. If multiple directories are set, then int the environment variable
+is defined with the full path of directories. If multiple directories are set, then in the environment variable
 the paths are concatenated with colon (C<:>).
 
-In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
-stopped. It is possible to preserve the specified directories in this case if
-C<RuntimeDirectoryPreserve> is configured to C<restart> or C<yes>
-(see below). The directories specified with C<StateDirectory>,
+In case of C<RuntimeDirectory> the innermost subdirectories are removed when
+the unit is stopped. It is possible to preserve the specified directories in this case if
+C<RuntimeDirectoryPreserve> is configured to C<restart> or
+C<yes> (see below). The directories specified with C<StateDirectory>,
 C<CacheDirectory>, C<LogsDirectory>,
 C<ConfigurationDirectory> are not removed when the unit is stopped.
 
@@ -1594,31 +1709,46 @@ C<ConfigurationDirectoryMode>.
 
 These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
-are mounted from there into the unit\'s file system namespace.
+are mounted from there into the unit's file system namespace.
 
 If C<DynamicUser> is used in conjunction with C<StateDirectory>,
 C<CacheDirectory> and C<LogsDirectory> is slightly altered: the directories
-are created below /var/lib/private, /var/cache/private and
-/var/log/private, respectively, which are host directories made inaccessible to
+are created below C</var/lib/private>, C</var/cache/private> and
+C</var/log/private>, respectively, which are host directories made inaccessible to
 unprivileged users, which ensures that access to these directories cannot be gained through dynamic user ID
 recycling. Symbolic links are created to hide this difference in behaviour. Both from perspective of the host
 and from inside the unit, the relevant directories hence always appear directly below
-/var/lib, /var/cache and /var/log.
+C</var/lib>, C</var/cache> and C</var/log>.
 
 Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
 their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
-runtime directories in /run due to lack of privileges, and to make sure the runtime
+runtime directories in C</run> due to lack of privileges, and to make sure the runtime
 directory is cleaned up automatically after use. For runtime directories that require more complex or different
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
+
+The directories defined by these options are always created under the standard paths used by systemd
+(C</var>, C</run>, C</etc>, \x{2026}). If the service needs
+directories in a different location, a different mechanism has to be used to create them.
+
+L<tmpfiles.d(5)> provides
+functionality that overlaps with these options. Using these options is recommended, because the lifetime of
+the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
+C<tmpfiles.d> configuration is executed before the unit is started.
+
+To remove any of the directories created by these settings, use the systemctl clean
+\x{2026} command on the relevant units, see
+L<systemctl(1)> for
+details.
 
 Example: if a system service unit has the following,
 
     RuntimeDirectory=foo/bar baz
 
-the service manager creates /run/foo (if it does not exist),
-/run/foo/bar, and /run/baz. The directories
-/run/foo/bar and /run/baz except /run/foo are
+the service manager creates C</run/foo> (if it does not exist),
+C</run/foo/bar>, and C</run/baz>. The
+directories C</run/foo/bar> and
+C</run/baz> except C</run/foo> are
 owned by the user and group specified in C<User> and C<Group>, and removed
 when the service is stopped.
 
@@ -1628,23 +1758,23 @@ Example: if a system service unit has the following,
     StateDirectory=aaa/bbb ccc
 
 then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.',
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'ConfigurationDirectory',
       {
-        'description' => 'These options take a whitespace-separated list of directory names. The specified directory
+        'description' => "These options take a whitespace-separated list of directory names. The specified directory
 names must be relative, and may not include C<..>. If set, one or more
 directories by the specified names will be created (including their parents) below the locations
 defined in the following table, when the unit is started. Also, the corresponding environment variable
-is defined with the full path of directories. If multiple directories are set, then int the environment variable
+is defined with the full path of directories. If multiple directories are set, then in the environment variable
 the paths are concatenated with colon (C<:>).
 
-In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
-stopped. It is possible to preserve the specified directories in this case if
-C<RuntimeDirectoryPreserve> is configured to C<restart> or C<yes>
-(see below). The directories specified with C<StateDirectory>,
+In case of C<RuntimeDirectory> the innermost subdirectories are removed when
+the unit is stopped. It is possible to preserve the specified directories in this case if
+C<RuntimeDirectoryPreserve> is configured to C<restart> or
+C<yes> (see below). The directories specified with C<StateDirectory>,
 C<CacheDirectory>, C<LogsDirectory>,
 C<ConfigurationDirectory> are not removed when the unit is stopped.
 
@@ -1661,31 +1791,46 @@ C<ConfigurationDirectoryMode>.
 
 These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
-are mounted from there into the unit\'s file system namespace.
+are mounted from there into the unit's file system namespace.
 
 If C<DynamicUser> is used in conjunction with C<StateDirectory>,
 C<CacheDirectory> and C<LogsDirectory> is slightly altered: the directories
-are created below /var/lib/private, /var/cache/private and
-/var/log/private, respectively, which are host directories made inaccessible to
+are created below C</var/lib/private>, C</var/cache/private> and
+C</var/log/private>, respectively, which are host directories made inaccessible to
 unprivileged users, which ensures that access to these directories cannot be gained through dynamic user ID
 recycling. Symbolic links are created to hide this difference in behaviour. Both from perspective of the host
 and from inside the unit, the relevant directories hence always appear directly below
-/var/lib, /var/cache and /var/log.
+C</var/lib>, C</var/cache> and C</var/log>.
 
 Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
 their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
-runtime directories in /run due to lack of privileges, and to make sure the runtime
+runtime directories in C</run> due to lack of privileges, and to make sure the runtime
 directory is cleaned up automatically after use. For runtime directories that require more complex or different
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
+
+The directories defined by these options are always created under the standard paths used by systemd
+(C</var>, C</run>, C</etc>, \x{2026}). If the service needs
+directories in a different location, a different mechanism has to be used to create them.
+
+L<tmpfiles.d(5)> provides
+functionality that overlaps with these options. Using these options is recommended, because the lifetime of
+the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
+C<tmpfiles.d> configuration is executed before the unit is started.
+
+To remove any of the directories created by these settings, use the systemctl clean
+\x{2026} command on the relevant units, see
+L<systemctl(1)> for
+details.
 
 Example: if a system service unit has the following,
 
     RuntimeDirectory=foo/bar baz
 
-the service manager creates /run/foo (if it does not exist),
-/run/foo/bar, and /run/baz. The directories
-/run/foo/bar and /run/baz except /run/foo are
+the service manager creates C</run/foo> (if it does not exist),
+C</run/foo/bar>, and C</run/baz>. The
+directories C</run/foo/bar> and
+C</run/baz> except C</run/foo> are
 owned by the user and group specified in C<User> and C<Group>, and removed
 when the service is stopped.
 
@@ -1695,7 +1840,7 @@ Example: if a system service unit has the following,
     StateDirectory=aaa/bbb ccc
 
 then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.',
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1762,7 +1907,7 @@ stops. If set to C<restart> the directories are preserved when the service is bo
 and manually restarted. Here, the automatic restart means the operation specified in
 C<Restart>, and manual restart means the one triggered by systemctl restart
 foo.service. If set to C<yes>, then the directories are not removed when the service is
-stopped. Note that since the runtime directory /run is a mount point of
+stopped. Note that since the runtime directory C</run> is a mount point of
 C<tmpfs>, then for system services the directories specified in
 C<RuntimeDirectory> are removed when the system is rebooted.',
         'replace' => {
@@ -1773,6 +1918,17 @@ C<RuntimeDirectory> are removed when the system is rebooted.',
         },
         'type' => 'leaf',
         'value_type' => 'enum'
+      },
+      'TimeoutCleanSec',
+      {
+        'description' => "Configures a timeout on the clean-up operation requested through systemctl
+clean \x{2026}, see
+L<systemctl(1)> for
+details. Takes the usual time values and defaults to C<infinity>, i.e. by default
+no time-out is applied. If a time-out is configured the clean operation will be aborted forcibly when
+the time-out is reached, potentially leaving resources on disk.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       },
       'ReadWritePaths',
       {
@@ -1820,7 +1976,7 @@ mount propagation from host to unit will result in unmodified mounts to be creat
 i.e. writable mounts appearing on the host will be writable in the unit\'s namespace too, even when propagated
 below a path marked with C<ReadOnlyPaths>! Restricting access with these options hence does
 not extend to submounts of a directory that are created later on. This means the lock-down offered by that
-setting is not complete, and does not offer full protection. 
+setting is not complete, and does not offer full protection.
 
 Note that the effect of these settings may be undone by privileged processes. In order to set up an
 effective sandboxed environment for a unit it is thus recommended to combine these settings with either
@@ -1874,7 +2030,7 @@ mount propagation from host to unit will result in unmodified mounts to be creat
 i.e. writable mounts appearing on the host will be writable in the unit\'s namespace too, even when propagated
 below a path marked with C<ReadOnlyPaths>! Restricting access with these options hence does
 not extend to submounts of a directory that are created later on. This means the lock-down offered by that
-setting is not complete, and does not offer full protection. 
+setting is not complete, and does not offer full protection.
 
 Note that the effect of these settings may be undone by privileged processes. In order to set up an
 effective sandboxed environment for a unit it is thus recommended to combine these settings with either
@@ -1928,7 +2084,7 @@ mount propagation from host to unit will result in unmodified mounts to be creat
 i.e. writable mounts appearing on the host will be writable in the unit\'s namespace too, even when propagated
 below a path marked with C<ReadOnlyPaths>! Restricting access with these options hence does
 not extend to submounts of a directory that are created later on. This means the lock-down offered by that
-setting is not complete, and does not offer full protection. 
+setting is not complete, and does not offer full protection.
 
 Note that the effect of these settings may be undone by privileged processes. In order to set up an
 effective sandboxed environment for a unit it is thus recommended to combine these settings with either
@@ -1953,33 +2109,33 @@ mount options, e.g., C<dev> or C<nostrictatime>.
 
 This is useful to hide files or directories not relevant to the processes invoked by the unit, while necessary
 files or directories can be still accessed by combining with C<BindPaths> or
-C<BindReadOnlyPaths>. See the example below.
+C<BindReadOnlyPaths>:
 
 Example: if a unit has the following,
 
     TemporaryFileSystem=/var:ro
     BindReadOnlyPaths=/var/lib/systemd
 
-then the invoked processes by the unit cannot see any files or directories under /var except for
-/var/lib/systemd or its contents.',
+then the invoked processes by the unit cannot see any files or directories under C</var> except for
+C</var/lib/systemd> or its contents.',
         'type' => 'list'
       },
       'PrivateTmp',
       {
         'description' => 'Takes a boolean argument. If true, sets up a new file system namespace for the executed
-processes and mounts private /tmp and /var/tmp directories inside it
+processes and mounts private C</tmp> and C</var/tmp> directories inside it
 that is not shared by processes outside of the namespace. This is useful to secure access to temporary files of
-the process, but makes sharing between processes via /tmp or /var/tmp
+the process, but makes sharing between processes via C</tmp> or C</var/tmp>
 impossible. If this is enabled, all temporary files created by a service in these directories will be removed
 after the service is stopped.  Defaults to false. It is possible to run two or more units within the same
-private /tmp and /var/tmp namespace by using the
+private C</tmp> and C</var/tmp> namespace by using the
 C<JoinsNamespaceOf> directive, see
 L<systemd.unit(5)> for
 details. This setting is implied if C<DynamicUser> is set. For this setting the same
 restrictions regarding mount propagation and privileges apply as for C<ReadOnlyPaths> and
 related calls, see above. Enabling this setting has the side effect of adding C<Requires> and
-C<After> dependencies on all mount units necessary to access /tmp and
-/var/tmp. Moreover an implicitly C<After> ordering on
+C<After> dependencies on all mount units necessary to access C</tmp> and
+C</var/tmp>. Moreover an implicitly C<After> ordering on
 L<systemd-tmpfiles-setup.service(8)>
 is added.
 
@@ -1995,11 +2151,11 @@ security.',
       },
       'PrivateDevices',
       {
-        'description' => 'Takes a boolean argument. If true, sets up a new /dev mount for the
-executed processes and only adds API pseudo devices such as /dev/null,
-/dev/zero or /dev/random (as well as the pseudo TTY subsystem) to it,
-but no physical devices such as /dev/sda, system memory /dev/mem,
-system ports /dev/port and others. This is useful to securely turn off physical device
+        'description' => 'Takes a boolean argument. If true, sets up a new C</dev> mount for the
+executed processes and only adds API pseudo devices such as C</dev/null>,
+C</dev/zero> or C</dev/random> (as well as the pseudo TTY subsystem) to it,
+but no physical devices such as C</dev/sda>, system memory C</dev/mem>,
+system ports C</dev/port> and others. This is useful to securely turn off physical device
 access by the executed process. Defaults to false. Enabling this option will install a system call filter to
 block low-level I/O system calls that are grouped in the C<@raw-io> set, will also remove
 C<CAP_MKNOD> and C<CAP_SYS_RAWIO> from the capability bounding set for the
@@ -2008,10 +2164,10 @@ L<systemd.resource-control(5)>
 for details). Note that using this setting will disconnect propagation of mounts from the service to the host
 (propagation in the opposite direction continues to work).  This means that this setting may not be used for
 services which shall be able to install mount points in the main mount namespace. The new
-/dev will be mounted read-only and \'noexec\'. The latter may break old programs which try
+C</dev> will be mounted read-only and \'noexec\'. The latter may break old programs which try
 to set up executable memory by using
 L<mmap(2)> of
-/dev/zero instead of using C<MAP_ANON>. For this setting the same
+C</dev/zero> instead of using C<MAP_ANON>. For this setting the same
 restrictions regarding mount propagation and privileges apply as for C<ReadOnlyPaths> and
 related calls, see above.  If turned on and if running in user mode, or in system mode, but without the
 C<CAP_SYS_ADMIN> capability (e.g. setting C<User>),
@@ -2045,13 +2201,35 @@ the unit\'s processes (however, those located in the file system will continue t
 
 Note that the implementation of this setting might be impossible (for example if network namespaces are
 not available), and the unit should be written in a way that does not solely rely on this setting for
-security.',
+security.
+
+When this option is used on a socket unit any sockets bound on behalf of this unit will be
+bound within a private network namespace. This may be combined with
+C<JoinsNamespaceOf> to listen on sockets inside of network namespaces of other
+services.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
           'yes'
         ]
+      },
+      'NetworkNamespacePath',
+      {
+        'description' => 'Takes an absolute file system path refererring to a Linux network namespace
+pseudo-file (i.e. a file like C</proc/$PID/ns/net> or a bind mount or symlink to
+one). When set the invoked processes are added to the network namespace referenced by that path. The
+path has to point to a valid namespace file at the moment the processes are forked off. If this
+option is used C<PrivateNetwork> has no effect. If this option is used together with
+C<JoinsNamespaceOf> then it only has an effect if this unit is started before any of
+the listed units that have C<PrivateNetwork> or
+C<NetworkNamespacePath> configured, as otherwise the network namespace of those
+units is reused.
+
+When this option is used on a socket unit any sockets bound on behalf of this unit will be
+bound within the specified network namespace.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       },
       'PrivateUsers',
       {
@@ -2083,12 +2261,31 @@ security.',
           'yes'
         ]
       },
+      'ProtectHostname',
+      {
+        'description' => 'Takes a boolean argument. When set, sets up a new UTS namespace for the executed
+processes. In addition, changing hostname or domainname is prevented. Defaults to off.
+
+Note that the implementation of this setting might be impossible (for example if UTS namespaces
+are not available), and the unit should be written in a way that does not solely rely on this setting
+for security.
+
+Note that when this option is enabled for a service hostname changes no longer propagate from
+the system into the service, it is hence not suitable for services that need to take notice of system
+hostname changes dynamically.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
       'ProtectKernelTunables',
       {
         'description' => 'Takes a boolean argument. If true, kernel variables accessible through
-/proc/sys, /sys, /proc/sysrq-trigger,
-/proc/latency_stats, /proc/acpi,
-/proc/timer_stats, /proc/fs and /proc/irq will
+C</proc/sys>, C</sys>, C</proc/sysrq-trigger>,
+C</proc/latency_stats>, C</proc/acpi>,
+C</proc/timer_stats>, C</proc/fs> and C</proc/irq> will
 be made read-only to all processes of the unit. Usually, tunable kernel variables should be initialized only at
 boot-time, for example with the
 L<sysctl.d(5)> mechanism. Few
@@ -2114,15 +2311,33 @@ implied.',
 module load and unload operations to be turned off on modular kernels. It is recommended to turn this on for most services
 that do not need special file systems or extra kernel modules to work. Defaults to off. Enabling this option
 removes C<CAP_SYS_MODULE> from the capability bounding set for the unit, and installs a
-system call filter to block module system calls, also /usr/lib/modules is made
+system call filter to block module system calls, also C</usr/lib/modules> is made
 inaccessible. For this setting the same restrictions regarding mount propagation and privileges apply as for
 C<ReadOnlyPaths> and related calls, see above.  Note that limited automatic module loading due
 to user configuration or kernel mapping tables might still happen as side effect of requested user operations,
 both privileged and unprivileged. To disable module auto-load feature please see
 L<sysctl.d(5)>C<kernel.modules_disabled> mechanism and
-/proc/sys/kernel/modules_disabled documentation.  If turned on and if running in user
+C</proc/sys/kernel/modules_disabled> documentation.  If turned on and if running in user
 mode, or in system mode, but without the C<CAP_SYS_ADMIN> capability (e.g. setting
 C<User>), C<NoNewPrivileges=yes> is implied.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'ProtectKernelLogs',
+      {
+        'description' => 'Takes a boolean argument. If true, access to the kernel log ring buffer will be denied. It is
+recommended to turn this on for most services that do not need to read from or write to the kernel log ring
+buffer. Enabling this option removes C<CAP_SYSLOG> from the capability bounding set for this
+unit, and installs a system call filter to block the
+L<syslog(2)>
+system call (not to be confused with the libc API
+L<syslog(3)>
+for userspace logging). The kernel exposes its log buffer to userspace via C</dev/kmsg> and
+C</proc/kmsg>. If enabled, these are made inaccessible to all the processes in the unit.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -2133,7 +2348,7 @@ C<User>), C<NoNewPrivileges=yes> is implied.',
       'ProtectControlGroups',
       {
         'description' => 'Takes a boolean argument. If true, the Linux Control Groups (L<cgroups(7)>) hierarchies
-accessible through /sys/fs/cgroup will be made read-only to all processes of the
+accessible through C</sys/fs/cgroup> will be made read-only to all processes of the
 unit. Except for container managers no services should require write access to the control groups hierarchies;
 it is hence recommended to turn this on for most services. For this setting the same restrictions regarding
 mount propagation and privileges apply as for C<ReadOnlyPaths> and related calls, see
@@ -2164,7 +2379,7 @@ recommended to combine this option with C<SystemCallArchitectures=native> or sim
 running in user mode, or in system mode, but without the C<CAP_SYS_ADMIN> capability
 (e.g. setting C<User=nobody>), C<NoNewPrivileges=yes> is implied. By default,
 no restrictions apply, all address families are accessible to processes. If assigned the empty string, any
-previous address familiy restriction changes are undone. This setting does not affect commands prefixed with
+previous address family restriction changes are undone. This setting does not affect commands prefixed with
 C<+>.
 
 Use this option to limit exposure of processes to remote access, in particular via exotic and sensitive
@@ -2247,13 +2462,19 @@ L<shmat(2)> system calls with
 C<SHM_EXEC> set. Note that this option is incompatible with programs and libraries that
 generate program code dynamically at runtime, including JIT execution engines, executable stacks, and code
 "trampoline" feature of various C compilers. This option improves service security, as it makes harder for
-software exploits to change running code dynamically. Note that this feature is fully available on x86-64, and
-partially on x86. Specifically, the shmat() protection is not available on x86. Note that
-on systems supporting multiple ABIs (such as x86/x86-64) it is recommended to turn off alternative ABIs for
-services, so that they cannot be used to circumvent the restrictions of this option. Specifically, it is
-recommended to combine this option with C<SystemCallArchitectures=native> or similar. If
-running in user mode, or in system mode, but without the C<CAP_SYS_ADMIN> capability
-(e.g. setting C<User>), C<NoNewPrivileges=yes> is implied.',
+software exploits to change running code dynamically. However, the protection can be circumvented, if
+the service can write to a filesystem, which is not mounted with C<noexec> (such as
+C</dev/shm>), or it can use memfd_create().  This can be
+prevented by making such file systems inaccessible to the service
+(e.g. C<InaccessiblePaths=/dev/shm>) and installing further system call filters
+(C<SystemCallFilter=~memfd_create>). Note that this feature is fully available on
+x86-64, and partially on x86. Specifically, the shmat() protection is not
+available on x86. Note that on systems supporting multiple ABIs (such as x86/x86-64) it is
+recommended to turn off alternative ABIs for services, so that they cannot be used to circumvent the
+restrictions of this option. Specifically, it is recommended to combine this option with
+C<SystemCallArchitectures=native> or similar. If running in user mode, or in system
+mode, but without the C<CAP_SYS_ADMIN> capability (e.g. setting
+C<User>), C<NoNewPrivileges=yes> is implied.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -2273,6 +2494,26 @@ C<NoNewPrivileges=yes> is implied. Realtime scheduling policies may be used to m
 time for longer periods of time, and may hence be used to lock up or otherwise trigger Denial-of-Service
 situations on the system. It is hence recommended to restrict access to realtime scheduling to the few programs
 that actually require them. Defaults to off.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'RestrictSUIDSGID',
+      {
+        'description' => 'Takes a boolean argument. If set, any attempts to set the set-user-ID (SUID) or
+set-group-ID (SGID) bits on files or directories will be denied (for details on these bits see
+L<inode(7)>). If
+running in user mode, or in system mode, but without the C<CAP_SYS_ADMIN>
+capability (e.g. setting C<User>), C<NoNewPrivileges=yes> is
+implied. As the SUID/SGID bits are mechanisms to elevate privileges, and allows users to acquire the
+identity of other users, it is recommended to restrict creation of SUID/SGID files to the few
+programs that actually require them. Note that this restricts marking of any type of file system
+object with these bits, including both regular files and directories (where the SGID is a different
+meaning than for files, see documentation). This option is implied if C<DynamicUser>
+is enabled. Defaults to off.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -2316,7 +2557,7 @@ established in the namespace of the process created by C<ExecStartPre> will henc
 up automatically as soon as that process exits and will not be available to subsequent processes forked off for
 C<ExecStart> (and similar applies to the various other commands configured for
 units). Similarly, C<JoinsNamespaceOf> does not permit sharing kernel mount namespaces between
-units, it only enables sharing of the /tmp/ and /var/tmp/
+units, it only enables sharing of the C</tmp/> and C</var/tmp/>
 directories.
 
 Other file system namespace unit settings \x{2014} C<PrivateMounts>,
@@ -2366,24 +2607,28 @@ options instead, in particular C<PrivateMounts>, see above.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Takes a space-separated list of system call names. If this setting is used, all system calls
-executed by the unit processes except for the listed ones will result in immediate process termination with the
-C<SIGSYS> signal (whitelisting). If the first character of the list is C<~>,
-the effect is inverted: only the listed system calls will result in immediate process termination
-(blacklisting). Blacklisted system calls and system call groups may optionally be suffixed with a colon
-(C<:>) and C<errno> error number (between 0 and 4095) or errno name such as
-C<EPERM>, C<EACCES> or C<EUCLEAN>. This value will be
-returned when a blacklisted system call is triggered, instead of terminating the processes immediately.  This
-value takes precedence over the one given in C<SystemCallErrorNumber>.  If running in user
-mode, or in system mode, but without the C<CAP_SYS_ADMIN> capability (e.g. setting
-C<User=nobody>), C<NoNewPrivileges=yes> is implied. This feature makes use of
-the Secure Computing Mode 2 interfaces of the kernel ('seccomp filtering') and is useful for enforcing a
-minimal sandboxing environment. Note that the execve, exit,
-exit_group, getrlimit, rt_sigreturn,
-sigreturn system calls and the system calls for querying time and sleeping are implicitly
-whitelisted and do not need to be listed explicitly. This option may be specified more than once, in which case
-the filter masks are merged. If the empty string is assigned, the filter is reset, all prior assignments will
-have no effect. This does not affect commands prefixed with C<+>.
+        'description' => "Takes a space-separated list of system call names. If this setting is used, all
+system calls executed by the unit processes except for the listed ones will result in immediate
+process termination with the C<SIGSYS> signal (whitelisting). (See
+C<SystemCallErrorNumber> below for changing the default action). If the first
+character of the list is C<~>, the effect is inverted: only the listed system calls
+will result in immediate process termination (blacklisting). Blacklisted system calls and system call
+groups may optionally be suffixed with a colon (C<:>) and C<errno>
+error number (between 0 and 4095) or errno name such as C<EPERM>,
+C<EACCES> or C<EUCLEAN> (see L<errno(3)> for a
+full list). This value will be returned when a blacklisted system call is triggered, instead of
+terminating the processes immediately.  This value takes precedence over the one given in
+C<SystemCallErrorNumber>, see below.  If running in user mode, or in system mode,
+but without the C<CAP_SYS_ADMIN> capability (e.g. setting
+C<User=nobody>), C<NoNewPrivileges=yes> is implied. This feature
+makes use of the Secure Computing Mode 2 interfaces of the kernel ('seccomp filtering') and is useful
+for enforcing a minimal sandboxing environment. Note that the execve,
+exit, exit_group, getrlimit,
+rt_sigreturn, sigreturn system calls and the system calls
+for querying time and sleeping are implicitly whitelisted and do not need to be listed
+explicitly. This option may be specified more than once, in which case the filter masks are
+merged. If the empty string is assigned, the filter is reset, all prior assignments will have no
+effect. This does not affect commands prefixed with C<+>.
 
 Note that on systems supporting multiple ABIs (such as x86/x86-64) it is recommended to turn off
 alternative ABIs for services, so that they cannot be used to circumvent the restrictions of this
@@ -2418,22 +2663,39 @@ Generally, whitelisting system calls (rather than blacklisting) is the safer mod
 recommended to enforce system call whitelists for all long-running system services. Specifically, the
 following lines are a relatively safe basic choice for the majority of system services:
 
+Note that various kernel system calls are defined redundantly: there are multiple system calls
+for executing the same operation. For example, the pidfd_send_signal() system
+call may be used to execute operations similar to what can be done with the older
+kill() system call, hence blocking the latter without the former only provides
+weak protection. Since new system calls are added regularly to the kernel as development progresses,
+keeping system call blacklists comprehensive requires constant work. It is thus recommended to use
+whitelisting instead, which offers the benefit that new system calls are by default implicitly
+blocked until the whitelist is updated.
+
+Also note that a number of system calls are required to be accessible for the dynamic linker to
+work. The dynamic linker is required for running most regular programs (specifically: all dynamic ELF
+binaries, which is how most distributions build packaged programs). This means that blocking these
+system calls (which include open(), openat() or
+mmap()) will make most programs typically shipped with generic distributions
+unusable.
+
 It is recommended to combine the file system namespacing related options with
 C<SystemCallFilter=~\@mount>, in order to prohibit the unit's processes to undo the
 mappings. Specifically these are the options C<PrivateTmp>,
 C<PrivateDevices>, C<ProtectSystem>, C<ProtectHome>,
 C<ProtectKernelTunables>, C<ProtectControlGroups>,
-C<ReadOnlyPaths>, C<InaccessiblePaths> and
-C<ReadWritePaths>.",
+C<ProtectKernelLogs>, C<ReadOnlyPaths>,
+C<InaccessiblePaths> and C<ReadWritePaths>.",
         'type' => 'list'
       },
       'SystemCallErrorNumber',
       {
-        'description' => 'Takes an C<errno> error number (between 1 and 4095) or errno name such as
-C<EPERM>, C<EACCES> or C<EUCLEAN>, to return when the
-system call filter configured with C<SystemCallFilter> is triggered, instead of terminating
-the process immediately. When this setting is not used, or when the empty string is assigned, the process will
-be terminated immediately when the filter is triggered.',
+        'description' => 'Takes an C<errno> error number (between 1 and 4095) or errno name
+such as C<EPERM>, C<EACCES> or C<EUCLEAN>, to
+return when the system call filter configured with C<SystemCallFilter> is triggered,
+instead of terminating the process immediately. See L<errno(3)> for a
+full list of error codes. When this setting is not used, or when the empty string is assigned, the
+process will be terminated immediately when the filter is triggered.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -2515,6 +2777,12 @@ commenting. A line ending with a backslash will be concatenated with the followi
 variable definitions. The parser strips leading and trailing whitespace from the values of assignments, unless
 you use double quotes (").
 
+C escapes
+are supported, but not
+most control characters.
+C<\\t> and C<\\n> can be used to insert tabs and newlines within
+C<EnvironmentFile>.
+
 The argument passed should be an absolute filename or wildcard expression, optionally prefixed with
 C<->, which indicates that if the file does not exist, it will not be read and no error or
 warning message is logged. This option may be specified more than once in which case all specified files are
@@ -2547,6 +2815,12 @@ to the executed processes anyway, hence this option is without effect for the us
 
 Variables set for invoked processes due to this setting are subject to being overridden by those
 configured with C<Environment> or C<EnvironmentFile>.
+
+C escapes
+are supported, but not
+most control characters.
+C<\\t> and C<\\n> can be used to insert tabs and newlines within
+C<EnvironmentFile>.
 
 Example:
 
@@ -2600,7 +2874,7 @@ of C<null>, C<tty>, C<tty-force>, C<tty-fail>,
 C<data>, C<file:path>, C<socket> or
 C<fd:name>.
 
-If C<null> is selected, standard input will be connected to /dev/null,
+If C<null> is selected, standard input will be connected to C</dev/null>,
 i.e. all read attempts by the process will result in immediate EOF.
 
 If C<tty> is selected, standard input is connected to a TTY (as configured by
@@ -2651,7 +2925,7 @@ This setting defaults to C<null>.
 Note that services which specify C<DefaultDependencies=no> and use
 C<StandardInput> or C<StandardOutput> with
 C<tty>/C<tty-force>/C<tty-fail>, should specify
-C<After=systemd-vconsole-setup.service>, to make sure that the tty intialization is
+C<After=systemd-vconsole-setup.service>, to make sure that the tty initialization is
 finished before they start.",
         'type' => 'leaf',
         'value_type' => 'enum'
@@ -2663,45 +2937,41 @@ finished before they start.",
           'null',
           'tty',
           'journal',
-          'syslog',
           'kmsg',
           'journal+console',
-          'syslog+console',
           'kmsg+console',
           'socket'
         ],
-        'description' => 'Controls where file descriptor 1 (STDOUT) of the executed processes is connected to. Takes one
-of C<inherit>, C<null>, C<tty>, C<journal>,
-C<syslog>, C<kmsg>, C<journal+console>,
-C<syslog+console>, C<kmsg+console>,
-C<file:path>, C<append:path>,
-C<socket> orC<fd:name>.
+        'description' => 'Controls where file descriptor 1 (stdout) of the executed processes is connected
+to. Takes one of C<inherit>, C<null>, C<tty>,
+C<journal>, C<kmsg>, C<journal+console>,
+C<kmsg+console>, C<file:path>,
+C<append:path>, C<socket> or
+C<fd:name>.
 
 C<inherit> duplicates the file descriptor of standard input for standard output.
 
-C<null> connects standard output to /dev/null, i.e. everything written
+C<null> connects standard output to C</dev/null>, i.e. everything written
 to it will be lost.
 
 C<tty> connects standard output to a tty (as configured via C<TTYPath>,
 see below). If the TTY is used for output only, the executed process will not become the controlling process of
 the terminal, and will not fail or wait for other processes to release the terminal.
 
-C<journal> connects standard output with the journal which is accessible via
-L<journalctl(1)>.  Note that
-everything that is written to syslog or kmsg (see below) is implicitly stored in the journal as well, the
-specific two options listed below are hence supersets of this one.
-
-C<syslog> connects standard output to the L<syslog(3)> system syslog
-service, in addition to the journal. Note that the journal daemon is usually configured to forward everything
-it receives to syslog anyway, in which case this option is no different from C<journal>.
+C<journal> connects standard output with the journal, which is accessible via
+L<journalctl(1)>. Note
+that everything that is written to kmsg (see below) is implicitly stored in the journal as well, the
+specific option listed below is hence a superset of this one. (Also note that any external,
+additional syslog daemons receive their log data from the journal, too, hence this is the option to
+use when logging shall be processed with such a daemon.)
 
 C<kmsg> connects standard output with the kernel log buffer which is accessible via
 L<dmesg(1)>,
 in addition to the journal. The journal daemon might be configured to send all logs to kmsg anyway, in which
 case this option is no different from C<journal>.
 
-C<journal+console>, C<syslog+console> and C<kmsg+console> work
-in a similar way as the three options above but copy the output to the system console as well.
+C<journal+console> and C<kmsg+console> work in a similar way as the
+two options above but copy the output to the system console as well.
 
 The C<file:path> option may be used to connect a specific file
 system object to standard output. The semantics are similar to the same option of
@@ -2730,13 +3000,14 @@ C<FileDescriptorName> in
 L<systemd.socket(5)> for more
 details about named descriptors and their ordering.
 
-If the standard output (or error output, see below) of a unit is connected to the journal, syslog or the
-kernel log buffer, the unit will implicitly gain a dependency of type C<After> on
-systemd-journald.socket (also see the "Implicit Dependencies" section above). Also note
-that in this case stdout (or stderr, see below) will be an C<AF_UNIX> stream socket, and not
-a pipe or FIFO that can be re-opened. This means when executing shell scripts the construct echo
-"hello" > /dev/stderr for writing text to stderr will not work. To mitigate this use the construct
-echo "hello" >&2 instead, which is mostly equivalent and avoids this pitfall.
+If the standard output (or error output, see below) of a unit is connected to the journal or
+the kernel log buffer, the unit will implicitly gain a dependency of type C<After>
+on C<systemd-journald.socket> (also see the "Implicit Dependencies" section
+above). Also note that in this case stdout (or stderr, see below) will be an
+C<AF_UNIX> stream socket, and not a pipe or FIFO that can be re-opened. This means
+when executing shell scripts the construct echo "hello" > /dev/stderr for
+writing text to stderr will not work. To mitigate this use the construct echo "hello"
+>&2 instead, which is mostly equivalent and avoids this pitfall.
 
 This setting defaults to the value set with C<DefaultStandardOutput> in
 L<systemd-system.conf(5)>, which
@@ -2747,7 +3018,7 @@ to be added to the unit (see above).',
       },
       'StandardError',
       {
-        'description' => 'Controls where file descriptor 2 (STDERR) of the executed processes is connected to. The
+        'description' => 'Controls where file descriptor 2 (stderr) of the executed processes is connected to. The
 available options are identical to those of C<StandardOutput>, with some exceptions: if set to
 C<inherit> the file descriptor used for standard output is duplicated for standard error, while
 C<fd:name> will use a default file descriptor name of
@@ -2839,16 +3110,17 @@ C<LogLevelMax> permitted it to be processed.',
       },
       'LogExtraFields',
       {
-        'description' => 'Configures additional log metadata fields to include in all log records generated by processes
-associated with this unit. This setting takes one or more journal field assignments in the format
-C<FIELD=VALUE> separated by whitespace. See
-L<systemd.journal-fields(7)> for
-details on the journal field concept. Even though the underlying journal implementation permits binary field
-values, this setting accepts only valid UTF-8 values. To include space characters in a journal field value,
-enclose the assignment in double quotes ("). The usual specifiers are expanded in all assignments (see
-below). Note that this setting is not only useful for attaching additional metadata to log records of a unit,
-but given that all fields and values are indexed may also be used to implement cross-unit log record
-matching. Assign an empty string to reset the list.',
+        'description' => 'Configures additional log metadata fields to include in all log records generated by
+processes associated with this unit. This setting takes one or more journal field assignments in the
+format C<FIELD=VALUE> separated by whitespace. See
+L<systemd.journal-fields(7)>
+for details on the journal field concept. Even though the underlying journal implementation permits
+binary field values, this setting accepts only valid UTF-8 values. To include space characters in a
+journal field value, enclose the assignment in double quotes (").
+The usual specifiers are expanded in all assignments (see below). Note that this setting is not only
+useful for attaching additional metadata to log records of a unit, but given that all fields and
+values are indexed may also be used to implement cross-unit log record matching. Assign an empty
+string to reset the list.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -2884,12 +3156,12 @@ configured in L<journald.conf(5)>.
       },
       'SyslogIdentifier',
       {
-        'description' => 'Sets the process name ("syslog tag") to prefix log lines sent to the logging
-system or the kernel log buffer with. If not set, defaults to the process name of the executed process.  This
-option is only useful when C<StandardOutput> or C<StandardError> are set to
-C<journal>, C<syslog> or C<kmsg> (or to the same settings in
-combination with C<+console>) and only applies to log messages written to stdout or
-stderr.',
+        'description' => 'Sets the process name ("syslog tag") to prefix log lines sent to
+the logging system or the kernel log buffer with. If not set, defaults to the process name of the
+executed process.  This option is only useful when C<StandardOutput> or
+C<StandardError> are set to C<journal> or C<kmsg> (or to
+the same settings in combination with C<+console>) and only applies to log messages
+written to stdout or stderr.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -2900,12 +3172,12 @@ C<kern>, C<user>, C<mail>, C<daemon>,
 C<auth>, C<syslog>, C<lpr>, C<news>,
 C<uucp>, C<cron>, C<authpriv>, C<ftp>,
 C<local0>, C<local1>, C<local2>, C<local3>,
-C<local4>, C<local5>, C<local6> or C<local7>. See
-L<syslog(3)>
-for details. This option is only useful when C<StandardOutput> or
-C<StandardError> are set to C<journal>, C<syslog> or
-C<kmsg> (or to the same settings in combination with C<+console>), and only applies
-to log messages written to stdout or stderr. Defaults to C<daemon>.',
+C<local4>, C<local5>, C<local6> or
+C<local7>. See L<syslog(3)> for
+details. This option is only useful when C<StandardOutput> or
+C<StandardError> are set to C<journal> or C<kmsg> (or to
+the same settings in combination with C<+console>), and only applies to log messages
+written to stdout or stderr. Defaults to C<daemon>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -2916,7 +3188,7 @@ the kernel log buffer. One of C<emerg>, C<alert>, C<crit>,
 C<err>, C<warning>, C<notice>, C<info>,
 C<debug>. See L<syslog(3)> for
 details. This option is only useful when C<StandardOutput> or
-C<StandardError> are set to C<journal>, C<syslog> or
+C<StandardError> are set to C<journal> or
 C<kmsg> (or to the same settings in combination with C<+console>), and only applies
 to log messages written to stdout or stderr. Note that individual lines output by executed processes may be
 prefixed with a different log level which can be used to override the default log level specified here. The
@@ -2929,12 +3201,13 @@ Defaults to C<info>.',
       'SyslogLevelPrefix',
       {
         'description' => 'Takes a boolean argument. If true and C<StandardOutput> or
-C<StandardError> are set to C<journal>, C<syslog> or
-C<kmsg> (or to the same settings in combination with C<+console>), log lines
-written by the executed process that are prefixed with a log level will be processed with this log level set
-but the prefix removed. If set to false, the interpretation of these prefixes is disabled and the logged lines
-are passed on as-is. This only applies to log messages written to stdout or stderr. For details about this
-prefixing see L<sd-daemon(3)>.
+C<StandardError> are set to C<journal> or C<kmsg> (or to
+the same settings in combination with C<+console>), log lines written by the executed
+process that are prefixed with a log level will be processed with this log level set but the prefix
+removed. If set to false, the interpretation of these prefixes is disabled and the logged lines are
+passed on as-is. This only applies to log messages written to stdout or stderr. For details about
+this prefixing see
+L<sd-daemon(3)>.
 Defaults to true.',
         'type' => 'leaf',
         'value_type' => 'boolean',
@@ -2946,7 +3219,7 @@ Defaults to true.',
       'TTYPath',
       {
         'description' => 'Sets the terminal device node to use if standard input, output, or error are connected to a TTY
-(see above). Defaults to /dev/console.',
+(see above). Defaults to C</dev/console>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -3008,7 +3281,7 @@ leader. Defaults to C<init>.',
         'value_type' => 'enum'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd doc',
+    'generated_by' => 'parse-man.pl from systemd 244 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Exec'
   }

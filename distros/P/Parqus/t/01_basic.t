@@ -9,6 +9,8 @@ BEGIN { use_ok('Parqus'); }
 {
     my $parser = Parqus->new();
     ok( $parser, 'got a Parqus instance without passing keywords.' );
+    my $res = $parser->process('foo');
+    ok(!exists $res->{errors}, 'no error');
 }
 
 my $parser = Parqus->new( keywords => [qw/ title name /] );
@@ -23,6 +25,18 @@ ok( $parser, 'got a Parqus instance with passing keywords.' );
     my $res = $parser->process('foo');
     ok(!exists $res->{errors}, 'no error');
     is_deeply( $res, { words => ['foo'] }, 'parse single word.' );
+}
+{
+    my $res = $parser->process('fo=o');
+    ok(exists $res->{errors}, 'invalid keyword.');
+    is( $res->{errors}[0], 'Parse Error: Invalid search query.', 'found parse error.' );
+}
+{
+    my $parser = Parqus->new( value_regex => qr/[\w=-]+/ );
+    ok( $parser, 'got a Parqus instance with custom value_regex.' );
+    my $res = $parser->process('fo=o');
+    ok(!exists $res->{errors}, 'no error');
+    is_deeply( $res, { words => ['fo=o'] }, 'parse unquoted word with special character.' );
 }
 {
     my $res = $parser->process(' foo ');

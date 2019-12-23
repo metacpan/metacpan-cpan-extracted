@@ -1,3 +1,24 @@
+0.006   2019-12-15  Released-By: PERLANCAR; Urgency: medium
+
+	[UX tweaks]
+
+        - Add -t as alias for --transform.
+
+        - Add Pod::Elemental::Element::Pod5 to class prefixes.
+
+        - [doc] Update examples.
+
+
+0.005   2019-12-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak/fix nesting with Pod::Elemental::Transformer::Nester.
+
+
+0.004   2019-12-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: --transform.
+
+
 0.003   2019-08-08  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

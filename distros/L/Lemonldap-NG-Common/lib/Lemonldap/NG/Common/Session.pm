@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Common::Session;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 use Lemonldap::NG::Common::Apache::Session;
 
@@ -82,6 +82,8 @@ has 'error' => (
 
 has info => ( is => 'rw' );
 
+has timeout => ( is => 'rw', default => 5 );
+
 sub BUILD {
     my ($self) = @_;
 
@@ -93,6 +95,8 @@ sub BUILD {
 
     # Register options for common Apache::Session module
     my $moduleOptions = $self->storageModuleOptions || {};
+    $self->timeout( delete $moduleOptions->{timeout} )
+      if $moduleOptions->{timeout};
     my %options = (
         %$moduleOptions,
         backend             => $self->storageModule,
@@ -156,24 +160,31 @@ sub BUILD {
 }
 
 sub _tie_session {
-    my $self = $_[0];
+    my $self    = $_[0];
     my $options = $_[1] || {};
-
     my %h;
 
     eval {
-        # SOAP/REST session module must be directly tied
-        if ( $self->storageModule =~ /^Lemonldap::NG::Common::Apache::Session/ )
-        {
-            tie %h, $self->storageModule, $self->id,
-              { %{ $self->options }, %$options, kind => $self->kind };
-        }
-        else {
-            tie %h, 'Lemonldap::NG::Common::Apache::Session', $self->id,
-              { %{ $self->options }, %$options };
-        }
-    };
+        local $SIG{ALRM} = sub { die "TIMEOUT\n" };
+        eval {
+            alarm $self->timeout;
 
+            # SOAP/REST session module must be directly tied
+            if ( $self->storageModule =~
+                /^Lemonldap::NG::Common::Apache::Session/ )
+            {
+                tie %h, $self->storageModule, $self->id,
+                  { %{ $self->options }, %$options, kind => $self->kind };
+            }
+            else {
+                tie %h, 'Lemonldap::NG::Common::Apache::Session', $self->id,
+                  { %{ $self->options }, %$options };
+            }
+        };
+        alarm 0;
+        die $@ if $@;
+
+    };
     if ( $@ or not tied(%h) ) {
         my $msg = "Session cannot be tied";
         $msg .= ": $@" if $@;

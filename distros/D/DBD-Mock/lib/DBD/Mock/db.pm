@@ -110,19 +110,22 @@ sub prepare {
     else {
         # If we have available resultsets seed the tracker with one
 
-        my $rs;
-        my $callback;
+        my ($rs, $callback, $failure);
+
         if ( my $all_rs = $dbh->{mock_rs} ) {
             if ( my $by_name = defined $all_rs->{named}{$statement} ? $all_rs->{named}{$statement} : first { $statement =~ m/$_->{regexp}/ } @{ $all_rs->{matching} } ) {
                 # We want to copy this, because it is meant to be reusable
                 $rs = [ @{ $by_name->{results} } ];
                 $callback = $by_name->{callback};
-                if ( exists $by_name->{failure} ) {
-                    $track_params{failure} = [ @{ $by_name->{failure} } ];
-                }
+                $failure = $by_name->{failure};
             }
             else {
                 $rs = shift @{ $all_rs->{ordered} };
+                if (ref($rs) eq 'HASH') {
+                    $callback = $rs->{callback};
+                    $failure = $rs->{failure};
+                    $rs = [ @{ $rs->{results} } ];
+                }
             }
         }
 
@@ -131,6 +134,7 @@ sub prepare {
             $track_params{return_data} = $rs;
             $track_params{fields}      = $fields;
             $track_params{callback}    = $callback;
+            $track_params{failure}     = $failure;
 
             if( $fields ) {
                 $sth->STORE( NAME          => $fields );
@@ -344,45 +348,55 @@ sub STORE {
         return $value;
     }
     elsif ( $attrib eq 'mock_add_resultset' ) {
+        my @copied_values;
+
         $dbh->{mock_rs} ||= {
             named   => {},
             ordered => [],
             matching => [],
         };
+
         if ( ref $value eq 'ARRAY' ) {
-            my @copied_values = @{$value};
+            @copied_values = @{$value};
             push @{ $dbh->{mock_rs}{ordered} }, \@copied_values;
-            return \@copied_values;
         }
         elsif ( ref $value eq 'HASH' ) {
             my $name = $value->{sql};
-            unless ($name) {
-                die "Indexing resultset by name requires passing in 'sql' ",
-                  "as hashref key to 'mock_add_resultset'.\n";
+
+            @copied_values = @{ $value->{results} ? $value->{results} : [] };
+
+            if (not defined $name) {
+                push @{ $dbh->{mock_rs}{ordered} }, {
+                    results => \@copied_values,
+                    callback => $value->{callback},
+                    failure => ref($value->{failure}) ? [ @{ $value->{failure} } ] : undef,
+                };
             }
-
-            my @copied_values = @{ $value->{results} ? $value->{results} : [] };
-
-            if ( ref $name eq "Regexp" ) {
-                push @{ $dbh->{mock_rs}{matching} }, {
+            elsif ( ref $name eq "Regexp" ) {
+                my $matching = {
                     regexp => $name,
                     results => \@copied_values,
                     callback => $value->{callback},
+                    failure => ref($value->{failure}) ? [ @{ $value->{failure} } ] : undef,
                 };
-            } else {
-                $dbh->{mock_rs}{named}{$name} = { results => \@copied_values, callback => $value->{callback} };
+                # either replace existing match or push
+                grep { $_->{regexp} eq $name && ($_ = $matching) } @{ $dbh->{mock_rs}{matching} }
+                  or push @{ $dbh->{mock_rs}{matching} }, $matching;
             }
-
-            if ( exists $value->{failure} ) {
-                $dbh->{mock_rs}{named}{$name}{failure} =
-                  [ @{ $value->{failure} }, ];
+            else {
+                $dbh->{mock_rs}{named}{$name} = {
+                    results => \@copied_values,
+                    callback => $value->{callback},
+                    failure => ref($value->{failure}) ? [ @{ $value->{failure} } ] : undef,
+                };
             }
-            return \@copied_values;
         }
         else {
             die "Must provide an arrayref or hashref when adding ",
               "resultset via 'mock_add_resultset'.\n";
         }
+
+        return \@copied_values;
     }
     elsif ( $attrib eq 'mock_start_insert_id' ) {
         if ( ref $value eq 'ARRAY' ) {

@@ -21,10 +21,11 @@ BEGIN {
     }
 }
 
-has customFunctions => ( is => 'rw', isa => 'Maybe[Str]' );
-has useSafeJail     => ( is => 'rw', isa => 'Maybe[Int]' );
-has jail            => ( is => 'rw' );
-has error           => ( is => 'rw' );
+has customFunctions      => ( is => 'rw', isa => 'Maybe[Str]' );
+has useSafeJail          => ( is => 'rw', isa => 'Maybe[Int]' );
+has multiValuesSeparator => ( is => 'rw', isa => 'Maybe[Str]' );
+has jail                 => ( is => 'rw' );
+has error                => ( is => 'rw' );
 
 our $VERSION = '2.0.6';
 our @builtCustomFunctions;
@@ -88,7 +89,18 @@ sub build_jail {
     $self->jail->share_from( 'Lemonldap::NG::Common::Safelib',
         $Lemonldap::NG::Common::Safelib::functions );
 
-    $self->jail->share_from( __PACKAGE__, [ @builtCustomFunctions, '&encrypt', '&token' ] );
+    # Closure for listMatch
+    {
+        no warnings 'redefine';
+        *listMatch = sub {
+            return Lemonldap::NG::Common::Safelib::listMatch(
+                $self->multiValuesSeparator, @_ );
+        };
+    }
+
+    $self->jail->share_from( __PACKAGE__,
+        [ @builtCustomFunctions, '&encrypt', '&token', '&listMatch' ] );
+
     $self->jail->share_from( 'MIME::Base64', ['&encode_base64'] );
 
     #$self->jail->share_from( 'Lemonldap::NG::Handler::Main', ['$_v'] );

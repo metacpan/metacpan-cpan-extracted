@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-use Config::Model::Tester 3.006;
+use Config::Model::Tester 4.005;
 use ExtUtils::testlib;
 
 run_tests() ;

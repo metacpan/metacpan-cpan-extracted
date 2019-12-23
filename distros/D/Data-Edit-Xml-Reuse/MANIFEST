@@ -1,0 +1,9 @@
+Build.PL
+CONTRIBUTING.md
+HambledonHill.jpg
+lib/Data/Edit/Xml/.directory
+lib/Data/Edit/Xml/Reuse.pm
+MANIFEST			This list of files
+test.pl
+META.yml
+META.json

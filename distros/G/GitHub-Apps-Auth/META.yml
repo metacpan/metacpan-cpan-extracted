@@ -28,7 +28,7 @@ no_index:
 provides:
   GitHub::Apps::Auth:
     file: lib/GitHub/Apps/Auth.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Class::Accessor::Lite: '0.08'
   Crypt::JWT: '0.025'
@@ -42,7 +42,9 @@ resources:
   bugtracker: https://github.com/mackee/GitHub-Apps-Auth/issues
   homepage: https://github.com/mackee/GitHub-Apps-Auth
   repository: git://github.com/mackee/GitHub-Apps-Auth.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:MACOPY
+x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

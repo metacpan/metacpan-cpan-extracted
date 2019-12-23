@@ -18,7 +18,7 @@ SKIP: {
                 logLevel                   => 'error',
                 totp2fSelfRegistration     => 1,
                 totp2fActivation           => 1,
-                totp2fTTL                  => 2,
+                totp2fTTL                  => 120,
                 sfRemovedMsgRule           => '$uid eq "dwho"',
                 sfRemovedUseNotif          => 1,
                 portalMainLogo             => 'common/logos/logo_llng_old.png',
@@ -130,8 +130,8 @@ SKIP: {
     $id = expectCookie($res);
     $client->logout($id);
 
-    diag 'Waiting';
-    sleep 3;
+    # Skipping time until TOTP token expiration
+    Time::Fake->offset("+5m");
 
     # Try to sign-in
     ok(

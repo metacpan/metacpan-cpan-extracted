@@ -1,5 +1,8 @@
 Revision history for Perl module NetRabbitMQPerl
 
+0.10 2019-12-18
+    - [add] pass through frame_max connection options (GH #14, thanks to pm426)
+
 0.09 2019-07-17
     - [add] pass through SSL connection options (GH #13, thanks to pm426)
 

@@ -1,5 +1,8 @@
 Revision history for Catmandu-Validator-JSONSchema
 
+0.13  2019-12-20 13:17:05 CET
+    - add key details to error object. Requires JSON::Validator 3.25 or higher
+
 0.12  2019-11-03 22:14:06 CET
     - use methods path and message of JSON::Validator::Error instead of hash keys directly
 

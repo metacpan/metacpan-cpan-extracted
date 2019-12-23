@@ -11,7 +11,7 @@ use Test::Git::Workflow::Command;
 our $name = 'test';
 
 my $git_dir = "t/data/git-recent/";
-if ( ( -e $git_dir && -w $git_dir ) || -w "$git_dir/.." ) {
+if ( !( -e $git_dir && -w $git_dir ) || !-w "$git_dir/.." ) {
     plan( skip_all => "This test requires write access to run" );
 }
 

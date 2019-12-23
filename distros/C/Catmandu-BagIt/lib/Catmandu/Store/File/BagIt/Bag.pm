@@ -2,7 +2,7 @@ package Catmandu::Store::File::BagIt::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.239';
+our $VERSION = '0.240';
 
 use Moo;
 use Carp;
@@ -91,48 +91,7 @@ sub get {
         created      => $created,
         modified     => $modified,
         _stream      => sub {
-            my $out   = $_[0];
-            my $bytes = 0;
-            my $data  = $file->open;
-
-            Catmandu::Error->throw("no io defined or not writable")
-                unless defined($out);
-
-            Catmandu::Error->throw("$out doesn't support syswrite!")
-                    unless $out->can('syswrite');
-
-            while (!$data->eof) {
-                my $buffer;
-                $data->read($buffer, 1024);
-
-                my $n = $out->syswrite($buffer);
-
-                if ($!{EAGAIN}) {
-                    # no data read, try later
-                    next;
-                }
-                elsif ($!) {
-                    $self->log->error("filesystem error for $file : $!");
-                    Catmandu::Error->throw("filesystem error for $file : $!");
-                }
-                elsif (!defined($n)) {
-        		    $n = 0;
-        		}
-        		elsif ($n != length $buffer) {
-        		    $self->log->error("incomplete write to $file");
-                    Catmandu::Error->throw("incomplete write to $file");
-        		}
-        		else {
-        		    # all is ok
-        		}
-
-                $bytes += $n;
-            }
-
-            $out->close();
-            $data->close();
-
-            $bytes;
+            $self->file_streamer($file->path,shift);
         }
     };
 }

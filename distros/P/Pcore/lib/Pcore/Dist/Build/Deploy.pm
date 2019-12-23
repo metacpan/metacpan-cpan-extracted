@@ -128,7 +128,7 @@ sub _install ($self) {
 
     my $canon_bin_dir = "$canon_dist_root/bin";
 
-    my $pcore_lib_dir_canon = P->path("$canon_dist_root/../")->to_abs;
+    my $workspace_dir_canon = P->path("$canon_dist_root/../")->to_abs;
 
     if ($MSWIN) {
         if ( $self->{dist}->is_pcore ) {
@@ -138,10 +138,10 @@ sub _install ($self) {
 
             say qq[%PERL5LIB% updated];
 
-            # set $ENV{PCORE_LIB}
-            P->sys->run_proc(qq[setx.exe /M PCORE_LIB "$pcore_lib_dir_canon"]) or return;
+            # set $ENV{WORKSPACE}
+            P->sys->run_proc(qq[setx.exe /M WORKSPACE "$workspace_dir_canon"]) or return;
 
-            say qq[%PCORE_LIB% updated];
+            say qq[%WORKSPACE% updated];
         }
 
         # update $ENV{PATH}
@@ -173,7 +173,7 @@ sub _install ($self) {
         if ( $self->{dist}->is_pcore ) {
             $data .= <<"SH";
 if ! echo \$PERL5LIB | grep -Eq "(^|$Config{path_sep})$canon_dist_root/lib/?(\$|$Config{path_sep})" ; then export PERL5LIB="$canon_dist_root/lib$Config{path_sep}\$PERL5LIB" ; fi
-export PCORE_LIB="$pcore_lib_dir_canon"
+export WORKSPACE="$workspace_dir_canon"
 SH
         }
 

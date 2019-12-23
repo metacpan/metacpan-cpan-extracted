@@ -168,8 +168,8 @@ ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
     'Rejected -> Protection enabled' );
 count(1);
 
-diag 'Waiting';
-sleep 1;
+# Waiting
+Time::Fake->offset("+1s");
 
 ## Sixth failed connection -> Rejected
 ok(
@@ -187,8 +187,8 @@ ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
     'Rejected -> Protection enabled' );
 count(1);
 
-diag 'Waiting';
-sleep 2;
+# Waiting
+Time::Fake->offset("+3s");
 
 ## Sixth successful connection -> Rejected
 ok(
@@ -206,8 +206,8 @@ ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
     'Rejected -> Protection enabled' );
 count(1);
 
-diag 'Waiting';
-sleep 3;
+# Waiting
+Time::Fake->offset("+6s");
 
 ## Seventh successful connection -> Accepted
 ok(

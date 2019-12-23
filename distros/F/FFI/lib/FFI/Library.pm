@@ -6,7 +6,7 @@ use Carp ();
 use constant _is_win => $^O =~ /^(MSWin32|cygwin|msys2?)$/;
 
 # ABSTRACT: Perl Access to Dynamically Loaded Libraries
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 sub new
 {
@@ -133,7 +133,7 @@ FFI::Library - Perl Access to Dynamically Loaded Libraries
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 
@@ -151,12 +151,14 @@ version 1.14
 
 =head1 DESCRIPTION
 
+B<NOTE>: Newer and better maintained FFI modules such as L<FFI::Platypus>
+provide more functionality and so it is strongly recommend that you use
+one of them for new projects and even consider migrating to one of
+them for existing projects.
+
 This module provides access from Perl to functions exported from dynamically
 linked libraries. Functions are described by C<signatures>, for details of
 which see the L<FFI> module's documentation.
-
-Newer and better maintained FFI modules such as L<FFI::Platypus> provide more
-functionality and should probably be considered for new projects.
 
 =head1 CONSTRUCTOR
 

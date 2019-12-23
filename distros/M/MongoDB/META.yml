@@ -41,166 +41,166 @@ no_index:
 provides:
   MongoDB:
     file: lib/MongoDB.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::AuthError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::BSON::Binary:
     file: lib/MongoDB/BSON/Binary.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::BSON::Regexp:
     file: lib/MongoDB/BSON/Regexp.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::BulkWrite:
     file: lib/MongoDB/BulkWrite.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::BulkWriteResult:
     file: lib/MongoDB/BulkWriteResult.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::BulkWriteView:
     file: lib/MongoDB/BulkWriteView.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::ChangeStream:
     file: lib/MongoDB/ChangeStream.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::ClientSession:
     file: lib/MongoDB/ClientSession.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::Code:
     file: lib/MongoDB/Code.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::Collection:
     file: lib/MongoDB/Collection.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::CommandResult:
     file: lib/MongoDB/CommandResult.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::ConfigurationError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::ConnectionError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::Cursor:
     file: lib/MongoDB/Cursor.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::CursorNotFoundError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::DBRef:
     file: lib/MongoDB/DBRef.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::Database:
     file: lib/MongoDB/Database.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::DatabaseError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::DecodingError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::DeleteResult:
     file: lib/MongoDB/DeleteResult.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::DocumentError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::DuplicateKeyError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::Error:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::ExecutionTimeout:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::GridFSBucket:
     file: lib/MongoDB/GridFSBucket.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::GridFSBucket::DownloadStream:
     file: lib/MongoDB/GridFSBucket/DownloadStream.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::GridFSBucket::UploadStream:
     file: lib/MongoDB/GridFSBucket/UploadStream.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::GridFSError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::HandshakeError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::IndexView:
     file: lib/MongoDB/IndexView.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::InsertManyResult:
     file: lib/MongoDB/InsertManyResult.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::InsertOneResult:
     file: lib/MongoDB/InsertOneResult.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::InternalError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::InvalidOperationError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::MongoClient:
     file: lib/MongoDB/MongoClient.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::NetworkError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::NetworkTimeout:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::NotMasterError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::OID:
     file: lib/MongoDB/OID.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::ProtocolError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::QueryResult:
     file: lib/MongoDB/QueryResult.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::QueryResult::Filtered:
     file: lib/MongoDB/QueryResult/Filtered.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::ReadConcern:
     file: lib/MongoDB/ReadConcern.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::ReadPreference:
     file: lib/MongoDB/ReadPreference.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::SelectionError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::TimeoutError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::Timestamp:
     file: lib/MongoDB/Timestamp.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::UnacknowledgedResult:
     file: lib/MongoDB/UnacknowledgedResult.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::UpdateResult:
     file: lib/MongoDB/UpdateResult.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::UsageError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::WriteConcern:
     file: lib/MongoDB/WriteConcern.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::WriteConcernError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
   MongoDB::WriteError:
     file: lib/MongoDB/Error.pm
-    version: v2.2.0
+    version: v2.2.1
 recommends:
   IO::Socket::IP: '0.32'
   IO::Socket::SSL: '1.42'
@@ -257,7 +257,7 @@ resources:
   bugtracker: https://jira.mongodb.org/browse/PERL
   homepage: https://github.com/mongodb/mongo-perl-driver
   repository: https://github.com/mongodb/mongo-perl-driver.git
-version: v2.2.0
+version: v2.2.1
 x_contributors:
   - 'Andrew Page <andrew@infosiftr.com>'
   - 'Andrey Khozov <avkhozov@gmail.com>'
@@ -329,5 +329,5 @@ x_contributors:
   - 'Xavier Guimard <x.guimard@free.fr>'
   - 'Xtreak <tirkarthi@users.noreply.github.com>'
   - 'Zhihong Zhang <zzh_621@yahoo.com>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

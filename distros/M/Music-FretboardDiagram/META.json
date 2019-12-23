@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Imager" : "0",
-            "List::MoreUtils" : "0",
+            "List::SomeUtils" : "0",
             "Moo" : "2",
             "Music::Chord::Namer" : "0",
             "namespace::clean" : "0",
@@ -57,16 +57,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "mailto" : "bug-Music-FretboardDiagram@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Music-FretboardDiagram"
-      },
+      "homepage" : "https://github.com/ology/Music-FretboardDiagram",
       "repository" : {
          "type" : "git",
+         "url" : "https://github.com/ology/Music-FretboardDiagram.git",
          "web" : "https://github.com/ology/Music-FretboardDiagram"
       }
    },
-   "version" : "0.1203",
+   "version" : "0.1204",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -266,9 +264,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MetaResources",
-            "name" : "MetaResources",
-            "version" : "6.012"
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "GithubMeta",
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::PodSpelling",
@@ -314,7 +312,9 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
-                  "exclude_match" : [],
+                  "exclude_match" : [
+                     "\\.png"
+                  ],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",
@@ -456,6 +456,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }
 

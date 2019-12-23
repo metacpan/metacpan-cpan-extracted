@@ -2,8 +2,8 @@ NAME
     App::INIUtils - INI utilities
 
 VERSION
-    This document describes version 0.033 of App::INIUtils (from Perl
-    distribution App-INIUtils), released on 2019-04-23.
+    This document describes version 0.034 of App::INIUtils (from Perl
+    distribution App-INIUtils), released on 2019-12-15.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:
@@ -30,7 +30,37 @@ SYNOPSIS
 
     *   parse-ini
 
+    *   sort-ini-sections
+
     The main feature of these utilities is tab completion.
+
+FUNCTIONS
+  sort_ini_sections
+    Usage:
+
+     sort_ini_sections(%args) -> any
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_duplicate_key => *bool* (default: 1)
+
+    *   default_section => *str* (default: "GLOBAL")
+
+    *   ini* => *str*
+
+        INI file.
+
+    *   sort_args => *hash*
+
+        Arguments to pass to the Sort::Sub::* routine.
+
+    *   sort_sub => *sortsub::spec*
+
+        Name of a Sort::Sub::* module (without the prefix).
+
+    Return value: (any)
 
 HOMEPAGE
     Please visit the project's homepage at

@@ -4,7 +4,7 @@
       "Timm Murray <tmurray@wumpus-cave.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -36,15 +36,15 @@
    "provides" : {
       "Game::Collisions" : {
          "file" : "lib/Game/Collisions.pm",
-         "version" : "0.3"
+         "version" : "0.5"
       },
       "Game::Collisions::AABB" : {
          "file" : "lib/Game/Collisions/AABB.pm",
-         "version" : "0.3"
+         "version" : "0.5"
       },
       "Game::Collisions::UserData" : {
          "file" : "lib/Game/Collisions/UserData.pm",
-         "version" : "0.3"
+         "version" : "0.5"
       }
    },
    "release_status" : "stable",
@@ -55,7 +55,8 @@
          "web" : "https://github.com/frezik/Game-Collisions"
       }
    },
-   "version" : "0.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "version" : "0.5",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18"
 }
 

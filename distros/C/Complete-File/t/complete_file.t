@@ -39,69 +39,69 @@ mkfiles(qw(dir1/sub1/ext/foo.tmp));
 
 test_complete(
     word      => '',
-    result    => [qw(.h1 Food/ a ab abc ac bb d dir1/ dir2/ foo/)],
+    result    => {path_sep=>'/', words=>[qw(.h1 Food/ a ab abc ac bb d dir1/ dir2/ foo/)]},
 );
 test_complete(
     word      => 'a',
-    result    => [qw(a ab abc ac)],
+    result    => {path_sep=>'/', words=>[qw(a ab abc ac)]},
 );
 test_complete(
     name      => 'dir + file',
     word      => 'd',
-    result    => [qw(d dir1/ dir2/)],
+    result    => {path_sep=>'/', words=>[qw(d dir1/ dir2/)]},
 );
 test_complete(
     name       => 'opt:filter (string, file only)',
     word       => 'd',
     other_args => [filter=>'-d'],
-    result     => [qw(d)],
+    result     => {path_sep=>'/', words=>[qw(d)]},
 );
 test_complete(
     name       => 'opt:filter (string, dir only, use |, not very meaningful test',
     word       => 'd',
     other_args => [filter=>'d|-f'],
-    result     => [qw(dir1/ dir2/)],
+    result     => {path_sep=>'/', words=>[qw(dir1/ dir2/)]},
 );
 test_complete(
     name       => 'opt:filter (code)',
     word       => '',
     other_args => [filter=>sub {my $res=(-d $_[0]) && $_[0] =~ m!\./f!}],
-    result     => [qw(foo/)],
+    result     => {path_sep=>'/', words=>[qw(foo/)]},
 );
 test_complete(
     name       => 'opt:exclude_dir',
     word       => 'd',
     other_args => [exclude_dir=>1],
-    result     => [qw(d)],
+    result     => {path_sep=>'/', words=>[qw(d)]},
 );
 test_complete(
     name       => 'opt:file_regex_filter',
     word       => '',
     other_args => [file_regex_filter=>qr/ab/],
-    result     => [qw(Food/ ab abc dir1/ dir2/ foo/)],
+    result     => {path_sep=>'/', words=>[qw(Food/ ab abc dir1/ dir2/ foo/)]},
 );
 test_complete(
     name       => 'opt:file_ext_filter (re)',
     word       => 'dir1/sub1/ext/',
     other_args => [file_ext_filter=>qr/^t/],
-    result     => [qw(dir1/sub1/ext/foo.tmp dir1/sub1/ext/foo.txt)],
+    result     => {path_sep=>'/', words=>[qw(dir1/sub1/ext/foo.tmp dir1/sub1/ext/foo.txt)]},
 );
 test_complete(
     name       => 'opt:file_ext_filter (array)',
     word       => 'dir1/sub1/ext/',
     other_args => [file_ext_filter=>[qw/txt tmp/]],
-    result     => [qw(dir1/sub1/ext/foo.tmp dir1/sub1/ext/foo.txt)],
+    result     => {path_sep=>'/', words=>[qw(dir1/sub1/ext/foo.tmp dir1/sub1/ext/foo.txt)]},
 );
 
 test_complete(
     name      => 'subdir 1',
     word      => 'foo/',
-    result    => ["foo/f1", "foo/f2", "foo/g"],
+    result    => {path_sep=>'/', words=>["foo/f1", "foo/f2", "foo/g"]},
 );
 test_complete(
     name      => 'subdir 2',
     word      => 'foo/f',
-    result    => ["foo/f1", "foo/f2"],
+    result    => {path_sep=>'/', words=>["foo/f1", "foo/f2"]},
 );
 
 # XXX test ../blah
@@ -114,7 +114,7 @@ test_complete(
 
 DONE_TESTING:
 $CWD = "/";
-done_testing();
+done_testing;
 
 sub test_complete {
     my (%args) = @_;

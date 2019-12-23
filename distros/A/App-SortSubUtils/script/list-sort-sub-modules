@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/SortSubUtils/list_sort_sub_modules
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-05-24'; # DATE
+our $DATE = '2019-12-14'; # DATE
 our $DIST = 'App-SortSubUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ list-sort-sub-modules - list-sort-sub-modules
 
 =head1 VERSION
 
-This document describes version 0.001 of list-sort-sub-modules (from Perl distribution App-SortSubUtils), released on 2019-05-24.
+This document describes version 0.002 of list-sort-sub-modules (from Perl distribution App-SortSubUtils), released on 2019-12-14.
 
 =head1 SYNOPSIS
 

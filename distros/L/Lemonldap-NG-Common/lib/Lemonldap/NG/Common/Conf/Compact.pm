@@ -4,10 +4,12 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.7';
 
 sub compactConf {
     my ( $self, $conf ) = @_;
+
+    return $conf if ( $conf->{'dontCompactConf'} );
 
     # Remove unused auth parameters
     my %keep;
@@ -48,10 +50,12 @@ sub compactConf {
 
     # Disabled for now:
 
-    # Remove unused issuerDB parameters
+    # Remove unused issuerDB parameters except options
     foreach my $k ( keys %$issuerParameters ) {
         unless ( $conf->{ $k . "Activation" } ) {
-            delete $conf->{$_} foreach ( @{ $issuerParameters->{$k} } );
+            foreach ( @{ $issuerParameters->{$k} } ) {
+                delete $conf->{$_} unless ( $_ =~ /^issuers/ );
+            }
         }
     }
 

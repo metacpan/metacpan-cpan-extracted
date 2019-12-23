@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -97,10 +97,10 @@ sub checkType {
 
 ## @rmethod int run
 # Check configuration and launch Lemonldap::NG::Handler::Main::run().
-# Each $checkTime, the Apache child verify if its configuration is the same
+# Each $checkTime, server child verifies if its configuration is the same
 # as the configuration stored in the local storage.
 # @param $rule optional Perl expression to grant access
-# @return Apache constant
+# @return constant
 
 sub run {
     my ( $class, $req, $rule, $protection ) = @_;
@@ -121,11 +121,10 @@ sub run {
         }
     }
 
-    # Cross domain authentication
+    # Authentication process
     my $uri = $req->{env}->{REQUEST_URI};
-
-    $uri = $req->{env}->{REQUEST_URI};
     my ($cond);
+
     ( $cond, $protection ) = $class->conditionSub($rule) if ($rule);
     $protection = $class->isUnprotected( $req, $uri ) || 0
       unless ( defined $protection );
@@ -191,6 +190,11 @@ sub run {
         $class->updateStatus( $req, 'UNPROTECT' );
         $class->hideCookie($req);
         $class->cleanHeaders($req);
+        return $class->OK;
+    }
+    elsif ( $protection == $class->MAYSKIP
+        and $class->grant( $req, $session, $uri, $cond ) eq '999_SKIP' )
+    {
         return $class->OK;
     }
 
@@ -268,11 +272,38 @@ sub checkMaintenanceMode {
 # @return True if the user is granted to access to the current URL
 sub grant {
     my ( $class, $req, $session, $uri, $cond, $vhost ) = @_;
+    my $level;
+
     return $cond->( $req, $session ) if ($cond);
 
     $vhost ||= $class->resolveAlias($req);
-    if ( my $level = $class->tsv->{authnLevel}->{$vhost} ) {
+
+    # Using URL authentification level if exists
+    for (
+        my $i = 0 ;
+        $i < ( $class->tsv->{locationCount}->{$vhost} || 0 ) ;
+        $i++
+      )
+    {
+        if ( $uri =~ $class->tsv->{locationRegexp}->{$vhost}->[$i] ) {
+            $level = $class->tsv->{locationAuthnLevel}->{$vhost}->[$i];
+            last;
+        }
+    }
+    $level
+      ? $class->logger->debug(
+        'Found AuthnLevel=' . $level . ' for "' . "$vhost$uri" . '"' )
+      : $class->logger->debug("No URL authentication level found...");
+
+    # Using VH authentification level if exists
+    if ( $level ||= $class->tsv->{authnLevel}->{$vhost} ) {
         if ( $session->{authenticationLevel} < $level ) {
+            $class->logger->debug(
+                "User authentication level = $session->{authenticationLevel}");
+            $class->logger->debug("Required authentication level = $level");
+            $class->logger->warn(
+"User rejected due to insufficient authentication level -> Session upgrade enabled"
+            );
             $session->{_upgrade} = 1;
             return 0;
         }

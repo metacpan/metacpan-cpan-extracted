@@ -9,6 +9,10 @@ use_ok('Lemonldap::NG::Common::PSGI::Cli::Lib');
 our $client;
 our $count = 1;
 
+BEGIN {
+    require 't/Time-Fake.pm';
+}
+
 no warnings 'redefine';
 
 my $module;

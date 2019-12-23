@@ -1,0 +1,109 @@
+NAME
+    App::sorted - Check if lines of a file are sorted
+
+VERSION
+    This document describes version 0.001 of App::sorted (from Perl
+    distribution App-sorted), released on 2019-12-15.
+
+SYNOPSIS
+    See sorted.
+
+FUNCTIONS
+  sorted
+    Usage:
+
+     sorted(%args) -> [status, msg, payload, meta]
+
+    Check if lines of a file are sorted.
+
+    Assuming "file.txt"'s content is:
+
+     1
+     2
+     3
+
+    These will return success:
+
+     % sorted file.txt
+     % sorted -S numerically file.txt
+
+    But these will not:
+
+     % sorted -S 'numerically<r>' file.txt
+     % sorted -S 'asciibetically<r>' file.txt
+
+    Another example, assuming "file.txt"'s content is:
+
+     1
+     zz
+     AAA
+     cccc
+
+    then this will return success:
+
+     % sorted -S by_length file.txt
+     % sorted -q -S by_length file.txt  ;# -q silences output, it just returns appropriate exit code
+
+    while these will not:
+
+     % sorted file.txt
+     % sorted -S 'asciibetically<i>' file.txt
+     % sorted -S 'by_length<r>' file.txt
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   file => *filename* (default: "-")
+
+    *   quiet => *bool*
+
+    *   sort_args => *hash*
+
+        Arguments to pass to the Sort::Sub::* routine.
+
+    *   sort_sub => *sortsub::spec*
+
+        Name of a Sort::Sub::* module (without the prefix).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-sorted>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-sorted>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-sorted>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    is-sorted. The sorted script is inspired by, and an alternative for,
+    is-sorted from File::IsSorted by SHLOMIF. "sorted" adds the ability to
+    use Sort::Sub routines.
+
+    Sort::Sub
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

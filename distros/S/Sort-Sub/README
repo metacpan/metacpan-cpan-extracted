@@ -2,8 +2,8 @@ NAME
     Sort::Sub - Collection of sort subroutines
 
 VERSION
-    This document describes version 0.111 of Sort::Sub (from Perl
-    distribution Sort-Sub), released on 2019-10-26.
+    This document describes version 0.116 of Sort::Sub (from Perl
+    distribution Sort-Sub), released on 2019-12-15.
 
 SYNOPSIS
      use Sort::Sub qw($naturally);
@@ -43,6 +43,14 @@ SYNOPSIS
 
      my @sorted = sort $by_num_of_colons ('a::','b:','c::::','d:::');
      => ('b:','a::','d:::','c::::')
+
+    Request a coderef directly, without using the import interface:
+
+     use Sort::Sub;
+
+     my $naturally = Sort::Sub::get_sorter('naturally');
+     my $naturally = Sort::Sub::get_sorter('$naturally');
+     my $rev_naturally = Sort::Sub::get_sorter('naturally<r>');
 
 DESCRIPTION
     Sort::Sub and "Sort::Sub::*" are a convenient packaging of any kind of
@@ -86,6 +94,23 @@ GUIDELINES FOR WRITING A SORT::SUB::* MODULE
     $args is hashref to pass additional arguments to the "gen_sorter()"
     routine. The subroutine should return a code reference.
 
+    The module should also contain a "meta" subroutine which returns a
+    metadata DefHash. Known properties (keys) include: "v" (currently at 1),
+    "summary". Other metadata properties will be added in the future.
+
+FUNCTIONS
+  get_sorter
+    Usage:
+
+     my $coderef = Sort::Sub::get_sorter('SPEC');
+
+    Example:
+
+     my $rev_naturally = Sort::Sub::get_sorter('naturally<r>');
+
+    This is an alternative to using the import interface. This function is
+    not imported.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Sort-Sub>.
@@ -99,6 +124,12 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Other additional "Sort::Sub::*" not bundled in this distribution.
+
+    Supporting CLI's: sortsub (from App::sortsub), sorted (from
+    App::sorted), CLI's from App::SortSubUtils.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

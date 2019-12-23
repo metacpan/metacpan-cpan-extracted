@@ -1,0 +1,54 @@
+NAME
+    Log::ger::Layout::ConvertCase - Example layout plugin to convert the
+    case of message
+
+VERSION
+    This document describes version 0.001 of Log::ger::Layout::ConvertCase
+    (from Perl distribution Log-ger-Layout-ConvertCase), released on
+    2019-10-27.
+
+SYNOPSIS
+     use Log::ger::Layout ConvertCase => (
+         case => 'upper',
+     );
+     use Log::ger;
+
+     log_warn "hello, world";
+
+    The final message will be:
+
+     HELLO, WORLD
+
+DESCRIPTION
+    This is an example layout plugin, mentioned in the Log::ger tutorial.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-Layout-ConvertCase>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-Layout-ConvertCase>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Layout-Conver
+    tCase>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Log::ger
+
+    Log::ger::Manual::Tutorial
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

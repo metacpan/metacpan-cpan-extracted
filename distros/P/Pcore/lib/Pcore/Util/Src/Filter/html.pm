@@ -10,7 +10,7 @@ with qw[Pcore::Util::Src::Filter];
 sub decompress ($self) {
     return $SRC_OK if $self->has_kolon;
 
-    my $res = $self->filter_prettier('--parser=html');
+    my $res = $self->filter_prettier( parser => 'html' );
 
     return $res;
 }

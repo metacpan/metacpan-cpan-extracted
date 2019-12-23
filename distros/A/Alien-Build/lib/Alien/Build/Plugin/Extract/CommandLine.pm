@@ -10,7 +10,7 @@ use File::Temp qw( tempdir );
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '1.93'; # VERSION
+our $VERSION = '1.94'; # VERSION
 
 
 has '+format' => 'tar';
@@ -36,6 +36,25 @@ sub xz_cmd
 }
 
 
+{
+  my $bsd_tar;
+
+  # Note: GNU tar can be iffy to very bad on windows, where absolute
+  # paths get confused with remote tars.  We used to assume that 'tar.exe'
+  # is borked on Windows, but recent versions of Windows 10 come bundled
+  # with bsdtar (libarchive) named 'tar.exe', and we should definitely
+  # prefer that to ptar.
+  sub _windows_tar_is_bsdtar
+  {
+    return 1 if $^O ne 'MSWin32';
+    return $bsd_tar if defined $bsd_tar;
+    my($out) = capture_merged {
+      system 'tar', '--version';
+    };
+    return $bsd_tar = $out =~ /bsdtar/ ? 1 : 0
+  }
+}
+
 sub tar_cmd
 {
   _which('bsdtar')
@@ -44,12 +63,8 @@ sub tar_cmd
     # but seems to have gtar in the path by default, which is okay with it
     : $^O eq 'solaris' && _which('gtar')
       ? 'gtar'
-      # TODO: GNU tar can be iffy on windows, where absolute
-      # paths get confused with remote tars.  *sigh* fix later
-      # if we can, for now just assume that 'tar.exe' is borked
-      # on windows to be on the safe side.  The Fetch::ArchiveTar
-      # is probably a better plugin to use on windows anyway.
-      : _which('tar') && $^O ne 'MSWin32'
+      # See note above for Windows logic.
+      : _which('tar') && _windows_tar_is_bsdtar()
         ? 'tar'
         : _which('ptar')
           ? 'ptar'
@@ -59,7 +74,14 @@ sub tar_cmd
 
 sub unzip_cmd
 {
-  _which('unzip') ? 'unzip' : undef;
+  if($^O eq 'MSWin32' && _which('tar') && _windows_tar_is_bsdtar())
+  {
+    (_which('tar'), 'xf');
+  }
+  else
+  {
+    _which('unzip') ? 'unzip' : undef;
+  }
 }
 
 sub _run
@@ -315,7 +337,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 1.93
+version 1.94
 
 =head1 SYNOPSIS
 

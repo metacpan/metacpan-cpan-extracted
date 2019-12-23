@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,73 +23,73 @@ name: REST-Neo4p
 provides:
   REST::Neo4p:
     file: lib/REST/Neo4p.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Agent:
     file: lib/REST/Neo4p/Agent.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Agent::HTTP::Thin:
     file: lib/REST/Neo4p/Agent/HTTP/Thin.pm
-    version: '0.302'
+    version: '0.3030'
   REST::Neo4p::Agent::LWP::UserAgent:
     file: lib/REST/Neo4p/Agent/LWP/UserAgent.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Agent::Mojo::UserAgent:
     file: lib/REST/Neo4p/Agent/Mojo/UserAgent.pm
-    version: '0.302'
+    version: '0.3030'
   REST::Neo4p::Batch:
     file: lib/REST/Neo4p/Batch.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Constrain:
     file: lib/REST/Neo4p/Constrain.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Constraint:
     file: lib/REST/Neo4p/Constraint.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Constraint::NodeProperty:
     file: lib/REST/Neo4p/Constraint/Property.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Constraint::Property:
     file: lib/REST/Neo4p/Constraint/Property.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Constraint::Relationship:
     file: lib/REST/Neo4p/Constraint/Relationship.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Constraint::RelationshipProperty:
     file: lib/REST/Neo4p/Constraint/Property.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Constraint::RelationshipType:
     file: lib/REST/Neo4p/Constraint/RelationshipType.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Entity:
     file: lib/REST/Neo4p/Entity.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Exceptions:
     file: lib/REST/Neo4p/Exceptions.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Index:
     file: lib/REST/Neo4p/Index.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Node:
     file: lib/REST/Neo4p/Node.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::ParseStream:
     file: lib/REST/Neo4p/ParseStream.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Path:
     file: lib/REST/Neo4p/Path.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Query:
     file: lib/REST/Neo4p/Query.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Relationship:
     file: lib/REST/Neo4p/Relationship.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Schema:
     file: lib/REST/Neo4p/Schema.pm
-    version: '0.3020'
+    version: '0.3030'
   REST::Neo4p::Simple:
     file: lib/REST/Neo4p/Entity.pm
-    version: '0.3020'
+    version: '0.3030'
 recommends:
   HTTP::Thin: '0'
   Mojo::UserAgent: '0'
@@ -108,5 +108,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=REST-Neo4p
   license: http://dev.perl.org/licenses/
   repository: http://github.com/majensen/rest-neo4p.git
-version: '0.3020'
+version: '0.3030'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

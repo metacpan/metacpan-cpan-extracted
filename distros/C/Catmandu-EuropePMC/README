@@ -3,13 +3,11 @@ NAME
     Catmandu::EuropePMC - A bundle of Catmandu modules for working with
     data from EuropePMC
 
-STATUS
+DESCRIPTION
 
-MODULES
+    DEPRECATED!
 
-      * Catmandu::Importer::EuropePMC
-
-      * Catmandu::Fix::epmc_dbLinks
+    For alternatives see e.g. Catmandu::Importer::getJSON.
 
 AUTHOR
 

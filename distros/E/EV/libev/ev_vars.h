@@ -228,6 +228,11 @@ VARx(ev_io, sigfd_w)
 VARx(sigset_t, sigfd_set)
 #endif
 
+#if EV_USE_TIMERFD || EV_GENWRAP
+VARx(int, timerfd) /* timerfd for time jump detection */
+VARx(ev_io, timerfd_w)
+#endif
+
 VARx(unsigned int, origflags) /* original loop flags */
 
 #if EV_FEATURE_API || EV_GENWRAP

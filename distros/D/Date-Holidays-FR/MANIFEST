@@ -1,7 +1,10 @@
 Changes
+LICENSE
 Makefile.PL
 MANIFEST
 README
 t/Date-Holidays-FR.t
+t/utf-8.t
 lib/Date/Holidays/FR.pm
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

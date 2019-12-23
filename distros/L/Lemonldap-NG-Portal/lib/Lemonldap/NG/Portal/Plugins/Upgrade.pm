@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -28,7 +28,8 @@ has ott => (
 sub init {
     my ($self) = @_;
     if ( $self->conf->{forceGlobalStorageUpgradeOTT} ) {
-        $self->logger->debug("Upgrade token will be stored into global storage");
+        $self->logger->debug(
+            "-> Upgrade tokens will be stored into global storage");
         $self->ott->cache(undef);
     }
     $self->addAuthRoute( upgradesession => 'ask',     ['GET'] );
@@ -41,7 +42,7 @@ sub ask {
     my ( $self, $req ) = @_;
 
     # Check if auth is already running
-    if ( $req->param('upgrading') ) {
+    if ( $req->param('upgrading') or $req->param('kerberos') ) {
 
         # verify token
         return $self->confirm($req);
@@ -52,6 +53,8 @@ sub ask {
         $req,
         'upgradesession',
         params => {
+            MAIN_LOGO  => $self->conf->{portalMainLogo},
+            LANGS      => $self->conf->{showLanguages},
             MSG        => 'askToUpgrade',
             CONFIRMKEY => $self->p->stamp,
             PORTAL     => $self->conf->{portal},
@@ -66,12 +69,18 @@ sub confirm {
     # Disabled due to #1821
     #$req->pdata->{keepPdata} = 1;
     my $upg;
-    if ( my $t = $req->param('upgrading') ) {
-        if ( $self->ott->getToken($t) ) {
-            $upg = 1;
-        }
-        else {
-            return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
+
+    if ( $req->param('kerberos') ) {
+        $upg = 1;
+    }
+    else {
+        if ( my $t = $req->param('upgrading') ) {
+            if ( $self->ott->getToken($t) ) {
+                $upg = 1;
+            }
+            else {
+                return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
+            }
         }
     }
     $req->steps( ['controlUrl'] );

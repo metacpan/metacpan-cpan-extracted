@@ -23,7 +23,7 @@ This file contains:
 
   llapp.controller('TreeCtrl', [
     '$scope', '$http', '$location', '$q', '$uibModal', '$translator', '$cookies', '$htmlParams', function($scope, $http, $location, $q, $uibModal, $translator, $cookies, $htmlParams) {
-      var _checkSaveResponse, _download, _getAll, _stoggle, c, id, pathEvent, readError, setDefault, setHelp;
+      var _checkSaveResponse, _download, _getAll, _stoggle, c, idinc, pathEvent, readError, setDefault, setHelp;
       $scope.links = window.links;
       $scope.menu = $htmlParams.menu;
       $scope.menulinks = window.menulinks;
@@ -251,7 +251,7 @@ This file contains:
         $scope.currentNode.data = null;
         return $scope.getKey($scope.currentNode);
       };
-      id = 1;
+      idinc = 1;
       $scope._findContainer = function() {
         return $scope._findScopeContainer().$modelValue;
       };
@@ -277,7 +277,7 @@ This file contains:
         l = node.nodes.length;
         n = l > 0 ? l - 1 : 0;
         return node.nodes.push({
-          id: node.id + "/n" + (id++),
+          id: node.id + "/n" + (idinc++),
           title: 'New rule',
           re: 'Message',
           comment: 'New rule',
@@ -291,7 +291,7 @@ This file contains:
         l = node.nodes.length;
         n = l > 0 ? l - 1 : 0;
         return node.nodes.splice(n, 0, {
-          id: node.id + "/n" + (id++),
+          id: node.id + "/n" + (idinc++),
           title: 'New rule',
           re: '^/new',
           comment: 'New rule',
@@ -303,7 +303,7 @@ This file contains:
         var node;
         node = $scope._findContainer();
         return node.nodes.push({
-          id: node.id + "/n" + (id++),
+          id: node.id + "/n" + (idinc++),
           title: "/absolute/path/to/form",
           data: {},
           type: "post"
@@ -319,7 +319,7 @@ This file contains:
         var node;
         node = $scope._findContainer();
         node.nodes.push({
-          id: node.id + "/n" + (id++),
+          id: node.id + "/n" + (idinc++),
           title: "1_Key",
           data: ['Null', 'Null', 'Null'],
           type: "authChoice"
@@ -330,7 +330,7 @@ This file contains:
         var node;
         node = $scope._findContainer();
         return node.nodes.push({
-          id: node.id + "/n" + (id++),
+          id: node.id + "/n" + (idinc++),
           title: 'new',
           data: '',
           type: "keyText"
@@ -343,7 +343,7 @@ This file contains:
           cs = cs.$parentNodeScope;
         }
         return cs.$modelValue.nodes.push({
-          id: cs.$modelValue.id + "/n" + (id++),
+          id: cs.$modelValue.id + "/n" + (idinc++),
           title: "New category",
           type: "menuCat",
           nodes: []
@@ -356,7 +356,7 @@ This file contains:
           cs = cs.$parentNodeScope;
         }
         return cs.$modelValue.nodes.push({
-          id: cs.$modelValue.id + "/n" + (id++),
+          id: cs.$modelValue.id + "/n" + (idinc++),
           title: "New application",
           type: "menuApp",
           data: {
@@ -371,7 +371,7 @@ This file contains:
         var node;
         node = $scope._findContainer();
         node.nodes.push({
-          id: node.id + "/n" + (id++),
+          id: node.id + "/n" + (idinc++),
           title: 'new',
           type: 'cmbModule',
           data: {
@@ -386,7 +386,7 @@ This file contains:
         var node;
         node = $scope._findContainer();
         return node.nodes.push({
-          id: node.id + "/n" + (id++),
+          id: node.id + "/n" + (idinc++),
           title: 'new',
           type: 'sfExtra',
           data: {
@@ -404,7 +404,7 @@ This file contains:
         if (!d.over) {
           d.over = [];
         }
-        return d.over.push(["new" + (id++), '']);
+        return d.over.push(["new" + (idinc++), '']);
       };
       $scope.newCmbOver = function() {
         var d;
@@ -412,7 +412,7 @@ This file contains:
         if (!d.over) {
           d.over = [];
         }
-        return d.over.push(["new" + (id++), '']);
+        return d.over.push(["new" + (idinc++), '']);
       };
       $scope.newChoiceOver = function() {
         var d;
@@ -421,7 +421,7 @@ This file contains:
         if (!d[5]) {
           d[5] = [];
         }
-        return d[5].push(["new" + (id++), '']);
+        return d[5].push(["new" + (idinc++), '']);
       };
       $scope.addHost = function() {
         var cn;
@@ -443,7 +443,7 @@ This file contains:
         var node;
         node = $scope._findContainer();
         return node.nodes.push({
-          id: node.id + "/n" + (id++),
+          id: node.id + "/n" + (idinc++),
           title: 'new',
           type: 'samlAttribute',
           data: ['0', 'New', '', '']
@@ -600,7 +600,7 @@ This file contains:
         return $scope.displayForm(p);
       };
       $scope.down = function() {
-        var i, ind, len, n, o, p, ref, tmp;
+        var i, id, ind, len, n, o, p, ref, tmp;
         id = $scope.currentNode.id;
         p = $scope.currentScope.$parentNodeScope.$modelValue;
         ind = p.nodes.length;
@@ -619,7 +619,7 @@ This file contains:
         return ind;
       };
       $scope.up = function() {
-        var i, ind, len, n, o, p, ref, tmp;
+        var i, id, ind, len, n, o, p, ref, tmp;
         id = $scope.currentNode.id;
         p = $scope.currentScope.$parentNodeScope.$modelValue;
         ind = -1;
@@ -739,6 +739,12 @@ This file contains:
                 a._nodes = templates(a.template, a.title);
               }
               node.nodes.push(a);
+              if (a.type.match(/^rule$/)) {
+                console.log("Parse rule AuthnLevel as integer");
+                if (a.level && typeof a.level === 'string') {
+                  a.level = parseInt(a.level, 10);
+                }
+              }
             }
             d.resolve('OK');
           }

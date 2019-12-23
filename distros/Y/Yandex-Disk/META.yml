@@ -20,7 +20,7 @@ no_index:
 requires:
   Digest::MD5: '2.53'
   Encode: '2.6'
-  File::Basename: '2.85'
+  File::Basename: '0'
   File::Path::Tiny: '0.8'
   File::Spec: '3.4801'
   IO::Socket::SSL: '2.002'
@@ -34,4 +34,4 @@ resources:
   bugtracker: https://github.com/vrag86/perl-yandex-disk-api/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/vrag86/perl-yandex-disk-api
-version: '0.06'
+version: '0.07'

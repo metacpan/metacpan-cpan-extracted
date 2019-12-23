@@ -15,3 +15,7 @@ CVS
 ^Makefile$
 ^cover_db/
 Net-DBus-.*.tar.gz
+.git/
+.gitignore
+MYMETA.json
+MYMETA.yml

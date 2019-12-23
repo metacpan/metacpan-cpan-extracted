@@ -147,8 +147,8 @@ my %pattern = (
     'script_ref'       =>
         qr{
             ^\s*\#[^\n]*\b
-            After\s+\`make\s+install\'\s+it\s+should\s+work\s+as\s+
-            \`perl\s+t/
+            After\s+['`]make\s+install\'\s+it\s+should\s+work\s+as\s+
+            ['`]perl\s+(?:t/)?
             ([\-\w]+\.t)
             \'
         }mx,

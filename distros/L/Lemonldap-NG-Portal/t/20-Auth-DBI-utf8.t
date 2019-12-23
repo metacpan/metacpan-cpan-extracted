@@ -5,7 +5,7 @@ use IO::String;
 require 't/test-lib.pm';
 
 my $res;
-my $maintests = 8;
+my $maintests = 7;
 
 my $userdb = tempdb();
 
@@ -58,8 +58,7 @@ SKIP: {
 
     ok( $res = $client->_get("/sessions/global/$id"), 'Get UTF-8' );
     expectOK($res);
-    ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
-      or print STDERR $@;
+    $res = expectJSON($res);
     ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
       or explain( $res, 'cn => Frédéric Accents' );
 

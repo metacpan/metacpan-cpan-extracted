@@ -1,6 +1,6 @@
 # Vote::Count
 
-## A Toolkit for determining the outcome of Ranked Choice and other Alternative Balloting Strategies.
+## A Toolkit for determining the outcome of Preferential Ballots.
 
 Provides a Toolkit for implementing multiple voting systems, allowing a wide range of method options. This library allows the creation of election resolution methods matching a set of Election Rules that are written in an organization's governing rules, and not requiring the bylaws to specify the rules of the software that will be used for the election, especially important given that many of the other libraries available do not provide a bylaws compatible explanation of their process.
 
@@ -273,7 +273,9 @@ Directory of Vote Counting Methods linking to the Vote::Count module for it.
 
 * [Catalog](https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/Catalog.pod)
 * [Hand Count](https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/Hand_Count.pod)
+* [Multi Member](https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/MultiMember.pod)
 * [Vote::Count::Start](https://metacpan.org/pod/Vote::Count::Start)
+
 
 # Call for Contributions
 

@@ -12,7 +12,6 @@ BEGIN {
 }
 
 use Test::Net::LDAP::Mock;
-use Test::Net::LDAP::Util qw(ldap_mockify);
 
 Test::Net::LDAP::Mock->mock_target('ldap://127.0.0.1:389');
 Test::Net::LDAP::Mock->mock_target(

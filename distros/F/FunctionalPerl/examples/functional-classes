@@ -36,13 +36,18 @@ package ImperativePerson {
 
 package FunctionalPerson {
 
-    use FP::List;
+    use FP::List; # for `cons`, `cons_`
 
     use FP::Struct ["name", "todo_items"];
 
     sub add_todo {
         my ($self, $item)= @_;
-        $self->todo_items_update(sub { cons $item, $_[0] })
+        # The sub receives the old todo_items list, and returns a new
+        # list with $item prepended:
+        #$self->todo_items_update(sub { cons $item, $_[0] })
+        # Or use `cons_` which returns a function that prepends
+        # cons_'s argument to its own argument:
+        $self->todo_items_update(cons_ $item)
     }
     
     _END_
@@ -59,10 +64,15 @@ sub testImperative {
 
 use FP::Equal qw(is_equal); # using FP::Equal's `equal` but still
                             # reporting via Test::More
-use FP::List;
+use FP::List; # for `list`
 
 sub testFunctional {
-    my $p= FunctionalPerson->new("Chris", null);
+    my $p= FunctionalPerson->new_(name=> "Chris", todo_items=> list());
+    # or, using positional arguments:
+    #my $p= FunctionalPerson->new("Chris", list());
+
+    # Each add_todo call returns a new version of the object, any
+    # pointer to the old version still sees the original value:
     my $p2= $p->add_todo ("buy bread");
     my $p3= $p2->add_todo ("walk dog");
     is_equal $p3->todo_items, list('walk dog', 'buy bread');

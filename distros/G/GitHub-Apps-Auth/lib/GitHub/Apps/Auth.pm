@@ -3,10 +3,10 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Class::Accessor::Lite (
-    rw => [qw/token expires _prefix _suffix installation_id/],
+    rw => [qw/token expires installation_id/],
     ro => [qw/_furl private_key app_id/],
 );
 
@@ -17,24 +17,18 @@ use Furl;
 use JSON qw/decode_json/;
 use Time::Moment;
 
+sub _lazy(&) {
+    return GitHub::Apps::Auth::Lazy->new($_[0]);
+}
+
 use overload
     "\"\"" => sub { shift->issued_token },
     "." => sub {
-        my $self = shift;
-        my $other = shift;
-        my $reverse = shift;
-
-        $other = "" unless defined $other;
-
-        my $new_self = bless {}, ref $self;
-        %$new_self = %$self;
-
-        $reverse ?
-            $new_self->_prefix($other . $new_self->_prefix) :
-            $new_self->_suffix($new_self->_suffix . $other);
-        return $new_self;
-    },
-    "eq" => sub { shift->issued_token eq shift };
+        my ($self, $other, $reverse) = @_;
+        return $reverse ?
+            _lazy { "$other" . "$self" } :
+            _lazy { "$self" . "$other" };
+    };
 
 sub new {
     my ($class, %args) = @_;
@@ -56,8 +50,6 @@ sub new {
         app_id => $args{app_id},
         expires => 0,
         _furl => Furl->new,
-        _prefix => "",
-        _suffix => "",
     };
     my $self = bless $klass, $class;
 
@@ -135,7 +127,7 @@ sub _fetch_access_token {
     my $tm = Time::Moment->from_string($expires);
     $self->expires($tm->epoch);
 
-    return $self->_prefix . $token . $self->_suffix;
+    return $token;
 }
 
 sub _post_to_access_token {
@@ -157,10 +149,32 @@ sub issued_token {
     my $self = shift;
 
     if ($self->_is_expired_token) {
-        return $self->_prefix . $self->_fetch_access_token . $self->_suffix;
+        return $self->_fetch_access_token;
     }
 
-    return $self->_prefix . $self->token . $self->_suffix;
+    return $self->token;
+}
+
+package
+    GitHub::Apps::Auth::Lazy;
+
+
+sub _lazy(&) {
+    return GitHub::Apps::Auth::Lazy->new($_[0]);
+}
+
+use overload
+    '""'   => sub { shift->{sub}->() . "" },
+    "." => sub {
+        my ($self, $other, $reverse) = @_;
+        return $reverse ?
+            _lazy { "$other" . "$self" } :
+            _lazy { "$self" . "$other" };
+    };
+
+sub new {
+    my ($class, $sub) = @_;
+    return bless { sub => $sub }, $class;
 }
 
 1;

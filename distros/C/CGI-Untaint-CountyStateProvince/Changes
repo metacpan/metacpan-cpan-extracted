@@ -1,5 +1,9 @@
 Revision history for CGI-Untaint-CountyStateProvince
 
+0.06	Sun Dec 15 13:14:52 EST 2019
+	Beef up the example in the documentation
+	We don't need Test::Kwalitee to build
+
 0.05
 	No need to pass value to is_valid() any more
 

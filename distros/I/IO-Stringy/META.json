@@ -1,0 +1,78 @@
+{
+   "abstract" : "I/O on in-core objects like strings and arrays",
+   "author" : [
+      "Erik Dorfman <eryq@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "IO-Stringy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "contrib",
+         "examples",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5.57",
+            "FileHandle" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "Symbol" : "0",
+            "overload" : "0",
+            "perl" : "5.006002",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FileHandle" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/genio/IO-Stringy.git"
+      },
+      "x_IRC" : "irc://irc.perl.org/#perl"
+   },
+   "version" : "2.112",
+   "x_contributors" : [
+      "Chase Whitener <capoeirab@cpan.org>",
+      "Dianne Skoll <dskoll@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

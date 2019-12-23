@@ -19,7 +19,7 @@ package MongoDB::BulkWriteView;
 # ABSTRACT: Bulk write operations against a query document
 
 use version;
-our $VERSION = 'v2.2.0';
+our $VERSION = 'v2.2.1';
 
 use Moo;
 
@@ -107,8 +107,8 @@ sub _update {
     my ( $self, $doc ) = @_;
 
     my $type = ref $doc;
-    unless ( @_ == 2 && grep { $type eq $_ } qw/HASH ARRAY Tie::IxHash/ ) {
-        MongoDB::UsageError->throw("argument to $method must be a single hashref, arrayref or Tie::IxHash");
+    unless ( @_ == 2 && grep { $type eq $_ } qw/HASH ARRAY Tie::IxHash BSON::Array/ ) {
+        MongoDB::UsageError->throw("argument to $method must be a single hashref, arrayref, Tie::IxHash or BSON::Array");
     }
 
     if ( ref $doc eq 'ARRAY' ) {
@@ -182,7 +182,7 @@ MongoDB::BulkWriteView - Bulk write operations against a query document
 
 =head1 VERSION
 
-version v2.2.0
+version v2.2.1
 
 =head1 SYNOPSIS
 

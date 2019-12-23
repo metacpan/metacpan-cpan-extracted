@@ -85,7 +85,6 @@ do { my $x = {
                                       'Plack::Middleware::FixMissingBodyInRedirect' => '0',
                                       'Plack::Middleware::RemoveRedundantBody' => '0',
                                       'Ref::Util' => '0',
-                                      'Return::MultiLevel' => '0',
                                       'Role::Tiny' => '2.000000',
                                       'Safe::Isa' => '0',
                                       'Sub::Quote' => '0',

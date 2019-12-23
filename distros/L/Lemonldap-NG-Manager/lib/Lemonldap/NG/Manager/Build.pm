@@ -184,11 +184,11 @@ our \@EXPORT      = ( \@{ \$EXPORT_TAGS{'all'} } );
 our \$specialNodeHash = {
     virtualHosts         => [qw(exportedHeaders locationRules post vhostOptions)],
     samlIDPMetaDataNodes => [qw(samlIDPMetaDataXML samlIDPMetaDataExportedAttributes samlIDPMetaDataOptions)],
-    samlSPMetaDataNodes  => [qw(samlSPMetaDataXML samlSPMetaDataExportedAttributes samlSPMetaDataOptions)],
+    samlSPMetaDataNodes  => [qw(samlSPMetaDataXML samlSPMetaDataExportedAttributes samlSPMetaDataOptions samlSPMetaDataMacros)],
     oidcOPMetaDataNodes  => [qw(oidcOPMetaDataJSON oidcOPMetaDataJWKS oidcOPMetaDataOptions oidcOPMetaDataExportedVars)],
-    oidcRPMetaDataNodes  => [qw(oidcRPMetaDataOptions oidcRPMetaDataExportedVars oidcRPMetaDataOptionsExtraClaims)],
+    oidcRPMetaDataNodes  => [qw(oidcRPMetaDataOptions oidcRPMetaDataExportedVars oidcRPMetaDataOptionsExtraClaims oidcRPMetaDataMacros)],
     casSrvMetaDataNodes  => [qw(casSrvMetaDataOptions casSrvMetaDataExportedVars)],
-    casAppMetaDataNodes  => [qw(casAppMetaDataOptions casAppMetaDataExportedVars)],
+    casAppMetaDataNodes  => [qw(casAppMetaDataOptions casAppMetaDataExportedVars casAppMetaDataMacros)],
 };
 
 EOF
@@ -277,11 +277,13 @@ $defaultAttr}
         exportedHeaders locationRules post vhostOptions
         samlIDPMetaDataXML samlIDPMetaDataExportedAttributes
         samlIDPMetaDataOptions samlSPMetaDataXML
-        samlSPMetaDataExportedAttributes samlSPMetaDataOptions
-        oidcOPMetaDataJSON oidcOPMetaDataJWKS oidcOPMetaDataOptions
+        samlSPMetaDataExportedAttributes samlSPMetaDataMacros
+        samlSPMetaDataOptions oidcOPMetaDataJSON
+        oidcOPMetaDataJWKS oidcOPMetaDataOptions
         oidcOPMetaDataExportedVars oidcRPMetaDataOptions
         oidcRPMetaDataExportedVars oidcRPMetaDataOptionsExtraClaims
-        casAppMetaDataExportedVars casAppMetaDataOptions
+        oidcRPMetaDataMacros casAppMetaDataExportedVars
+        casAppMetaDataOptions casAppMetaDataMacros
         casSrvMetaDataExportedVars casSrvMetaDataOptions
         )
       )
@@ -848,7 +850,7 @@ must contain an array of { k => <keyName>, v => <display name> } hashref
 
 =item documentation (recommended):
 
-some words for other developpers
+some words for other developers
 
 =item test (optional):
 

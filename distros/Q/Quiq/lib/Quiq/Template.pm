@@ -6,10 +6,11 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Path;
 use Quiq::Option;
+use Quiq::Unindent;
 use Scalar::Util ();
 use Quiq::Reference;
 
@@ -179,6 +180,74 @@ sub new {
     $self->set(@_);
 
     return $self;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Klassenmethoden
+
+=head3 combine() - Ersetze Platzhalter in Text
+
+=head4 Synopsis
+
+  $str = $class->combine(@argVal);
+
+=head4 Arguments
+
+=over 4
+
+=item placeholders => \@keyVal (Default: [])
+
+Liste von Platzhalter/Wert-Paaren.
+
+=item template => $text (Default: '')
+
+Text mit Platzhaltern.
+
+=back
+
+=head4 Description
+
+Ersetze in Template $text die Platzhalter durch die Werte aus
+@keyVal und liefere den resultierenden Text zurück. Die Methode
+ist eine Vereinfachung, sie instantiiert intern ein Template-Objekt,
+wendet darauf die Methode replace() an und liefert den
+resultierenden Text zurück.
+
+=head4 Example
+
+  $js = Quiq::Template->substitute(
+      placeholders => [
+          __NAME__ => $name,
+          __CONFIG__ => $config,
+      ],
+      template => q~
+          Chart.defaults.global.defaultFontSize = 12;
+          Chart.defaults.global.animation.duration = 1000;
+          var __NAME__ = new Chart('__NAME__',__CONFIG__);
+  ~);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub combine {
+    my $class = shift;
+    # @_: @keyVal
+
+    my $placeholderA = [];
+    my $template = '';
+
+    $class->parameters(\@_,
+        placeholders => \$placeholderA,
+        template => \$template,
+    );
+
+    $template = Quiq::Unindent->string($template);
+    my $tpl = $class->new('text',\$template);
+    $tpl->replace(@$placeholderA);
+
+    return $tpl->asStringNL;
 }
 
 # -----------------------------------------------------------------------------
@@ -805,7 +874,7 @@ sub asStringNL {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

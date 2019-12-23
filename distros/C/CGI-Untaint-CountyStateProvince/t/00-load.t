@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 1;
+use Test::Most tests => 1;
 
 BEGIN {
     use_ok( 'CGI::Untaint::CountyStateProvince' ) || print "Bail out!

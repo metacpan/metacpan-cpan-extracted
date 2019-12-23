@@ -98,6 +98,14 @@ Works with RT 4.2 or greater
 
 - Restart your webserver
 
+# CONFIGURATION
+
+Usually, groupings of custom fields, as defined in `$CustomFieldGroupings` configuration variable, is _not_ enabled in SelfService. This is the case if you  use RT Core. Anyway, some RT instances could have overridden this restriction to enable groupings of custom fields in SelfService.
+
+In this case, you should add to your configuration file (`/opt/rt4/etc/RT_SiteConfig.pm`) the following line, setting `$SelfServiceCustomFieldGroupings` configuration variable to a true value:
+
+    Set($SelfServiceCustomFieldGroupings, 1);
+
 # METHODS
 
 `ConditionalCustomFields` adds a `ConditionedBy` property, that is a condition [CustomField](https://docs.bestpractical.com/rt/4.4.4/RT/CustomField.html), an operator and one or more values, along with the following methods, to conditioned by [CustomField](https://docs.bestpractical.com/rt/4.4.4/RT/CustomField.html) objects:

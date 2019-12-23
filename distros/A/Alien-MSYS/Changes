@@ -1,5 +1,37 @@
 Revision history for Alien-MSYS
 
+0.11      2019-12-18 05:46:43 -0700
+
+0.10_07   2019-12-17 19:29:34 -0700
+  - Additional diagnostics
+
+0.10_06   2019-12-16 17:07:33 -0700
+  - Additional diagnostics
+
+0.10_05   2019-12-15 18:55:16 -0700
+  - All detecton logic has been moved from Alien/MSYS.pm into
+    the alienfile.  This is how most Alien::Build Aliens work,
+    so it makes more sense.
+  - Remove mingw-get cache, man pages and documentation which saves
+    about 35MB (1/3 of the total) on a share install.
+
+0.10_04   2019-12-15 07:02:23 -0700
+  - Bump EUMM requirements
+
+0.10_03   2019-12-11 16:11:24 -0700
+  - Prefer curl to HTTP::Tiny when Net::SSLeay and IO::Socket::SSL
+    are not installed.
+  - Fix tests to not rely on `touch` which is frequently not available
+    on Windows.
+
+0.10_02   2017-08-23 14:11:48 -0400
+  - Use MSYS2 if found, instead of downloading MSYS
+
+0.10_01   2017-08-18 17:46:48 -0400
+  - Use Alien::Build + alienfile for build
+  - Switch from Module::Build (MB) to ExtUtils::MakeMaker (EUMM)
+  - Remove dependency on File::ShareDir
+
 0.09      2017-07-23 00:04:49 -0400
   - Remove dependency on File::HomeDir
 

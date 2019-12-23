@@ -47,8 +47,11 @@ Available actions:
  - set    <key> <value>          : set parameter(s) value(s)
  - addKey <key> <subkey> <value> : add or set a subkey in a parameter
  - delKey <key> <subkey>         : delete subkey of a parameter
+ - save                          : export configuration to STDOUT
+ - restore -                     : import configuration from STDIN
+ - restore <file>                : import configuration from file
 
-See Lemonldap::NG::Common::Cli(3) or Lemonldap::NG::Manager::CLi(3) for more
+See Lemonldap::NG::Manager::Cli(3) for more
 };
 }
 __END__
@@ -93,7 +96,7 @@ Set some values
 
 lemonldap-ng-cli is a command line interface to interact with Lemonldap::NG
 configuration. Commands are described in L<Lemonldap::NG::Manager::Cli>
-and L<Lemonldap::NG::Common::CLi>
+and L<Lemonldap::NG::Common::Cli>
 
 =head2 Available commands
 
@@ -119,7 +122,7 @@ and L<Lemonldap::NG::Common::CLi>
 
 =head1 SEE ALSO
 
-L<Lemonldap::NG::Manager::Cli>, L<Lemonldap::NG::Common::CLi>
+L<Lemonldap::NG::Manager::Cli>, L<Lemonldap::NG::Common::Cli>
 L<http://lemonldap-ng.org/>
 
 =head1 AUTHORS

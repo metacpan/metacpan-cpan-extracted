@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-CanonicalURL
 
+0.06  2019-12-13 13:23:34 CST
+        - Use App::CISetup for .travis.yml.
+        - Include coveralls status.
+
 0.05  2019-10-28 11:32:01 CDT
         - Bump minimum Mojolicious version to 7.15 when Mojo::File was introduced.
 

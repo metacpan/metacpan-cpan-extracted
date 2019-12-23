@@ -1,13 +1,15 @@
 package App::CSVUtils;
 
 # AUTHOR
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2019-12-23'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.025'; # VERSION
+our $VERSION = '0.027'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+use Hash::Subset qw(hash_subset);
 
 our %SPEC;
 
@@ -25,7 +27,9 @@ sub _get_field_idx {
     my ($field, $field_idxs) = @_;
     defined($field) && length($field) or die "Please specify field (-F)\n";
     my $idx = $field_idxs->{$field};
-    die "Unknown field '$field'\n" unless defined $idx;
+    die "Unknown field '$field' (known fields include: ".
+        join(", ", map { "'$_'" } sort {$field_idxs->{$a} <=> $field_idxs->{$b}}
+             keys %$field_idxs).")\n" unless defined $idx;
     $idx;
 }
 
@@ -87,13 +91,22 @@ sub _complete_field_or_field_list {
     # user hasn't specified -f, bail
     return undef unless defined $args && $args->{filename};
 
+    # user wants to read CSV from stdin, bail
+    return undef if $args->{filename} eq '-';
+
     # can the file be opened?
     my $csv = _instantiate_parser(\%args);
-    open my($fh), "<:encoding(utf8)", $args->{filename} or
+    open my($fh), "<encoding(utf8)", $args->{filename} or do {
+        #warn "csvutils: Cannot open file '$args->{filename}': $!\n";
         return [];
+    };
 
     # can the header row be read?
     my $row = $csv->getline($fh) or return [];
+
+    if (defined $args->{header} && !$args->{header}) {
+        $row = [map {"field$_"} 1 .. @$row];
+    }
 
     require Complete::Util;
     if ($which eq 'field') {
@@ -103,6 +116,7 @@ sub _complete_field_or_field_list {
         );
     } else {
         # field_list
+        # XXX sort_field_list: add optional -/~/+ prefix to field name
         return Complete::Util::complete_comma_sep(
             word => $word,
             elems => $row,
@@ -117,6 +131,10 @@ sub _complete_field {
 
 sub _complete_field_list {
     _complete_field_or_field_list('field_list', @_);
+}
+
+sub _complete_sort_field_list {
+    _complete_field_or_field_list('sort_field_list', @_);
 }
 
 our %args_common = (
@@ -143,6 +161,11 @@ _
 our %arg_filename_1 = (
     filename => {
         summary => 'Input CSV file',
+        description => <<'_',
+
+Use `-` to read from stdin.
+
+_
         schema => 'filename*',
         req => 1,
         pos => 1,
@@ -153,6 +176,11 @@ our %arg_filename_1 = (
 our %arg_filename_0 = (
     filename => {
         summary => 'Input CSV file',
+        description => <<'_',
+
+Use `-` to read from stdin.
+
+_
         schema => 'filename*',
         req => 1,
         pos => 0,
@@ -164,6 +192,11 @@ our %arg_filenames_0 = (
     filenames => {
         'x.name.is_plural' => 1,
         summary => 'Input CSV files',
+        description => <<'_',
+
+Use `-` to read from stdin.
+
+_
         schema => ['array*', of=>'filename*'],
         req => 1,
         pos => 0,
@@ -251,7 +284,7 @@ ascibetically descending.
 
 _
         schema => ['str*'],
-        #completion => \&_complete_sort_field_list,
+        completion => \&_complete_sort_field_list,
     },
     by_code => {
         summary => 'Perl code to do sorting',
@@ -369,13 +402,20 @@ $SPEC{csvutil} = {
 };
 sub csvutil {
     my %args = @_;
+
     my $action = $args{action};
     my $has_header = $args{header} // 1;
     my $add_newline = $args{add_newline} // 1;
 
     my $csv = _instantiate_parser(\%args);
-    open my($fh), "<:encoding(utf8)", $args{filename} or
-        return [500, "Can't open input filename '$args{filename}': $!"];
+    my $fh;
+    if ($args{filename} eq '-') {
+        $fh = *STDIN;
+    } else {
+        open $fh, "<", $args{filename} or
+            return [500, "Can't open input filename '$args{filename}': $!"];
+    }
+    binmode $fh, ":encoding(utf8)";
 
     my $res = "";
     my $i = 0;
@@ -386,7 +426,7 @@ sub csvutil {
 
     my $code;
     my $field_idx;
-    my $field_idxs;
+    my $field_idxs_array;
     my $sorted_fields;
     my @summary_row;
     my $selected_row;
@@ -551,41 +591,41 @@ sub csvutil {
             }
             $res .= _get_csv_row($csv, $row, $i, $has_header);
         } elsif ($action eq 'delete-field') {
-            if (!defined($field_idxs)) {
-                $field_idxs = [];
+            if (!defined($field_idxs_array)) {
+                $field_idxs_array = [];
                 for my $f (@{ $args{_fields} }) {
-                    push @$field_idxs, _get_field_idx($f, \%field_idxs);
+                    push @$field_idxs_array, _get_field_idx($f, \%field_idxs);
                 }
-                $field_idxs = [sort {$b<=>$a} @$field_idxs];
-                for (@$field_idxs) {
+                $field_idxs_array = [sort {$b<=>$a} @$field_idxs_array];
+                for (@$field_idxs_array) {
                     splice @$row, $_, 1;
                     unless (@$row) {
                         return [412, "Can't delete field(s) because CSV will have zero fields"];
                     }
                 }
             } else {
-                for (@$field_idxs) {
+                for (@$field_idxs_array) {
                     splice @$row, $_, 1;
                 }
             }
             $res .= _get_csv_row($csv, $row, $i, $has_header);
         } elsif ($action eq 'select-fields') {
-            if (!defined($field_idxs)) {
-                $field_idxs = [];
+            if (!defined($field_idxs_array)) {
+                $field_idxs_array = [];
                 my %seen;
                 if ($args{_fields}) {
                     for my $f (@{ $args{_fields} }) {
                         return [400, "Duplicate field '$f'"] if $seen{$f}++;
-                        push @$field_idxs, _get_field_idx($f, \%field_idxs);
+                        push @$field_idxs_array, _get_field_idx($f, \%field_idxs);
                     }
                 } else {
                     for my $f (@$fields) {
                         next unless $f =~ $args{_field_pat};
-                        push @$field_idxs, $field_idxs{$f};
+                        push @$field_idxs_array, $field_idxs{$f};
                     }
                 }
             }
-            $row = [map { $row->[$_] } @$field_idxs];
+            $row = [map { $row->[$_] } @$field_idxs_array];
             $res .= _get_csv_row($csv, $row, $i, $has_header);
         } elsif ($action eq 'sort-fields') {
             unless ($i == 1) {
@@ -779,8 +819,9 @@ sub csvutil {
             for my $field_spec (split /,/, $args{sort_by_fields}) {
                 my ($prefix, $field) = $field_spec =~ /\A([+~-]?)(.+)/;
                 my $field_idx = $field_idxs{$field};
-                return [400, "Unknown field '$field'"]
-                    unless defined $field_idx;
+                return [400, "Unknown field '$field' (known fields include: ".
+                            join(", ", map { "'$_'" } sort {$field_idxs{$a} <=> $field_idxs{$b}}
+                                 keys %field_idxs).")"] unless defined $field_idx;
                 $prefix //= "";
                 if ($prefix eq '+') {
                     $code_str .= ($code_str ? " || " : "") .
@@ -853,10 +894,12 @@ _
         after => {
             summary => 'Put the new field after specified field',
             schema => 'str*',
+            completion => \&_complete_field,
         },
         before => {
             summary => 'Put the new field before specified field',
             schema => 'str*',
+            completion => \&_complete_field,
         },
         at => {
             summary => 'Put the new field at specific position '.
@@ -973,8 +1016,14 @@ sub csv_replace_newline {
     my $with = $args{with};
 
     my $csv = _instantiate_parser(\%args);
-    open my($fh), "<:encoding(utf8)", $args{filename} or
-        return [500, "Can't open input filename '$args{filename}': $!"];
+    my $fh;
+    if ($args{filename} eq '-') {
+        $fh = *STDIN;
+    } else {
+        open $fh, "<", $args{filename} or
+            return [500, "Can't open input filename '$args{filename}': $!"];
+    }
+    binmode $fh, ":encoding(utf8)";
 
     my $res = "";
     my $i = 0;
@@ -1069,6 +1118,7 @@ sub csv_sort_rows {
     my %args = @_;
 
     my %csvutil_args = (
+        hash_subset(\%args, \%args_common),
         filename => $args{filename},
         action => 'sort-rows',
         sort_by_fields => $args{by_fields},
@@ -1112,6 +1162,7 @@ sub csv_sort_fields {
     my %args = @_;
 
     my %csvutil_args = (
+        hash_subset(\%args, \%args_common),
         filename => $args{filename},
         action => 'sort-fields',
         (sort_example => $args{example}) x !!defined($args{example}),
@@ -1410,8 +1461,15 @@ sub csv_concat {
 
     for my $filename (@{ $args{filenames} }) {
         my $csv = _instantiate_parser(\%args);
-        open my($fh), "<:encoding(utf8)", $filename or
+        my $fh;
+        if ($filename eq '-') {
+            $fh = *STDIN;
+        } else {
+            open $fh, "<", $filename or
             return [500, "Can't open input filename '$filename': $!"];
+        }
+        binmode $fh, ":encoding(utf8)";
+
         my $i = 0;
         my $fields;
         while (my $row = $csv->getline($fh)) {
@@ -1616,8 +1674,14 @@ sub csv_setop {
     # read all csv
     for my $filename (@{ $args{filenames} }) {
         my $csv = _instantiate_parser(\%args);
-        open my($fh), "<:encoding(utf8)", $filename or
+        my $fh;
+        if ($filename eq '-') {
+            $fh = *STDIN;
+        } else {
+            open $fh, "<", $filename or
             return [500, "Can't open input filename '$filename': $!"];
+        }
+        binmode $fh, ":encoding(utf8)";
         my $i = 0;
         my @data_rows;
         my $field_idxs = {};
@@ -1920,8 +1984,15 @@ sub csv_lookup_fields {
     my @source_field_names;
     {
         my $csv = _instantiate_parser(\%args);
-        open my($fh), "<:encoding(utf8)", $args{source} or
-            return [500, "Can't open '$args{source}': $!"];
+        my $fh;
+        if ($args{source} eq '-') {
+            $fh = *STDIN;
+        } else {
+            open $fh, "<", $args{source} or
+            return [500, "Can't open source '$args{source}': $!"];
+        }
+        binmode $fh, ":encoding(utf8)";
+
         my $i = 0;
         while (my $row = $csv->getline($fh)) {
             $i++;
@@ -1968,8 +2039,15 @@ sub csv_lookup_fields {
     {
         my $csv_out = _instantiate_parser_default();
         my $csv = _instantiate_parser(\%args);
-        open my($fh), "<:encoding(utf8)", $args{target} or
-            return [500, "Can't open '$args{target}': $!"];
+        my $fh;
+        if ($args{target} eq '-') {
+            $fh = *STDIN;
+        } else {
+            open $fh, "<", $args{target} or
+                return [500, "Can't open target '$args{target}': $!"];
+        }
+        binmode $fh, ":encoding(utf8)";
+
         my $i = 0;
         while (my $row = $csv->getline($fh)) {
             $i++;
@@ -2045,7 +2123,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.025 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-11-29.
+This document describes version 0.027 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-12-23.
 
 =head1 DESCRIPTION
 
@@ -2158,6 +2236,8 @@ Field name.
 
 Input CSV file.
 
+Use C<-> to read from stdin.
+
 =item * B<header> => I<bool> (default: 1)
 
 Whether CSV has a header row.
@@ -2204,6 +2284,8 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -2286,6 +2368,8 @@ Arguments ('*' denotes required arguments):
 
 Input CSV files.
 
+Use C<-> to read from stdin.
+
 =item * B<header> => I<bool> (default: 1)
 
 Whether CSV has a header row.
@@ -2332,6 +2416,8 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -2388,6 +2474,8 @@ Field names.
 
 Input CSV file.
 
+Use C<-> to read from stdin.
+
 =item * B<header> => I<bool> (default: 1)
 
 Whether CSV has a header row.
@@ -2434,6 +2522,8 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<hash> => I<bool>
 
@@ -2483,7 +2573,7 @@ Examples:
 =item * Delete user data:
 
  csv_each_row(
-   filename => "users.csv",
+     filename => "users.csv",
    eval => "unlink qq(/home/data/\$_->{username}.dat)",
    hash => 1
  );
@@ -2505,6 +2595,8 @@ Perl code.
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<hash> => I<bool>
 
@@ -2558,7 +2650,7 @@ Examples:
 =item * Only show rows where date is a Wednesday:
 
  csv_grep(
-   filename => "file.csv",
+     filename => "file.csv",
    eval => "BEGIN { use DateTime::Format::Natural; \$parser = DateTime::Format::Natural->new } \$dt = \$parser->parse_datetime(\$_->{date}); \$dt->day_of_week == 3",
    hash => 1
  );
@@ -2588,6 +2680,8 @@ Perl code.
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<hash> => I<bool>
 
@@ -2640,6 +2734,8 @@ Arguments ('*' denotes required arguments):
 
 Input CSV file.
 
+Use C<-> to read from stdin.
+
 =item * B<header> => I<bool> (default: 1)
 
 Whether CSV has a header row.
@@ -2686,6 +2782,8 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -2818,7 +2916,7 @@ Examples:
 =item * Create SQL insert statements (escaping is left as an exercise for users):
 
  csv_map(
-   filename => "file.csv",
+     filename => "file.csv",
    eval => "INSERT INTO mytable (id,amount) VALUES (\$_->{id}, \$_->{amount});",
    hash => 1
  );
@@ -2852,6 +2950,8 @@ Perl code.
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<hash> => I<bool>
 
@@ -2918,6 +3018,8 @@ Field name.
 
 Input CSV file.
 
+Use C<-> to read from stdin.
+
 =item * B<header> => I<bool> (default: 1)
 
 Whether CSV has a header row.
@@ -2970,6 +3072,8 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -3028,6 +3132,8 @@ Field names.
 
 Input CSV file.
 
+Use C<-> to read from stdin.
+
 =item * B<header> => I<bool> (default: 1)
 
 Whether CSV has a header row.
@@ -3074,6 +3180,8 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -3199,6 +3307,8 @@ Arguments ('*' denotes required arguments):
 
 Input CSV files.
 
+Use C<-> to read from stdin.
+
 =item * B<header> => I<bool> (default: 1)
 
 Whether CSV has a header row.
@@ -3274,6 +3384,8 @@ A comma-separated list of field names.
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -3399,6 +3511,8 @@ ascibetically descending.
 
 Input CSV file.
 
+Use C<-> to read from stdin.
+
 =item * B<hash> => I<bool>
 
 Provide row in $_ as hashref instead of arrayref.
@@ -3462,6 +3576,8 @@ Arguments ('*' denotes required arguments):
 
 Input CSV file.
 
+Use C<-> to read from stdin.
+
 =item * B<header> => I<bool> (default: 1)
 
 Whether CSV has a header row.
@@ -3510,6 +3626,8 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -3587,11 +3705,11 @@ L<App::SerializeUtils>
 
 L<csvgrep>.
 
-L<csv-select-row>.
+L<csv-split>.
 
 L<setop>.
 
-L<csv-split>.
+L<csv-select-row>.
 
 =head1 AUTHOR
 

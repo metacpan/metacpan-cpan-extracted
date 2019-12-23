@@ -31,7 +31,7 @@ SKIP: {
     if ($@) {
         skip 'Lasso not found', $maintests;
     }
-    my $file = 't/20160530_dwho_dGVzdHJlZg==.json';
+    my $file = "$main::tmpDir/20160530_dwho_dGVzdHJlZg==.json";
 
     open F, "> $file" or die($!);
     print F '[
@@ -64,11 +64,6 @@ SKIP: {
         'Unauth SP request'
     );
     expectOK($res);
-    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     my ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
         'SAMLRequest' );
@@ -118,11 +113,11 @@ SKIP: {
     $file =~ s/json$/done/;
     ok( -e $file, 'Notification was deleted' );
     $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
-    expectRedirection( $res, 'http://auth.idp.com/saml/singleSignOn' );
+    expectRedirection( $res, 'http://auth.idp.com/saml' );
 
     ok(
         $res = $issuer->_get(
-            '/saml/singleSignOn',
+            '/saml',
             cookie => "lemonldap=$idpId; $pdata",
             accept => 'text/html',
         ),
@@ -144,7 +139,6 @@ SKIP: {
             $url, IO::String->new($s),
             accept => 'text/html',
             length => length($s),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -187,6 +181,9 @@ SKIP: {
       expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleLogoutReturn',
         'SAMLResponse' );
 
+    my $removedCookie = expectCookie($res);
+    is($removedCookie, 0, "SSO cookie removed");
+
     # Post SAML response to SP
     switch ('sp');
     ok(
@@ -194,7 +191,6 @@ SKIP: {
             $url, IO::String->new($s),
             accept => 'text/html',
             length => length($s),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -215,8 +211,7 @@ SKIP: {
         $res = $sp->_get(
             '/',
             accept => 'text/html',
-            cookie =>
-              "lemonldapidp=http://auth.idp.com/saml/metadata; lemonldap=$spId"
+            cookie => "lemonldap=$spId"
         ),
         'Test if user is reject on SP'
     );
@@ -247,7 +242,7 @@ sub issuer {
                 issuerDBSAMLActivation     => 1,
                 notification               => 1,
                 notificationStorage        => 'File',
-                notificationStorageOptions => { dirName => 't' },
+                notificationStorageOptions => { dirName => "$main::tmpDir" },
                 oldNotifFormat             => 0,
                 samlSPMetaDataOptions      => {
                     'sp.com' => {

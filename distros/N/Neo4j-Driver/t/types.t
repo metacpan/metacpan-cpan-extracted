@@ -133,7 +133,7 @@ subtest 'Structural types: node meta data and props' => sub {
 	plan tests => 10 if $r0;
 	ok my $n1 = $r0->get('n1'), 'get node 1';
 	ok my $n2 = $r0->get('n2'), 'get node 2';
-	ok $id = $r0->get('id(n1)'), 'get node 1 id';
+	ok defined($id = $r0->get('id(n1)')), 'get node 1 id';
 	is ref $n1, 'Neo4j::Driver::Type::Node', 'node 1 blessed';
 	is ref $n2, 'Neo4j::Driver::Type::Node', 'node 2 blessed';
 	is $n1->id, $id, 'node 1 id matches';

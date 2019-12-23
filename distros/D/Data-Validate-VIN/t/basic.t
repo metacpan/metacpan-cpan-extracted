@@ -22,12 +22,12 @@ my %goodpieces = (
     vds        => substr($goodvin,3,6),
     vis        => substr($goodvin,9,8),
     checkdigit => 5,
-    year       => [2005],
+    year       => [ 2005, 2035 ],
 );
 
 # check components of the VIN
 for ( keys(%goodpieces) ) {
-    if ($_ =~ /year/) {
+    if ($_ eq "year") {
         is_deeply($good->get($_), $goodpieces{$_}, uc($_) . ' get() check - valid VIN');
     }
     else {

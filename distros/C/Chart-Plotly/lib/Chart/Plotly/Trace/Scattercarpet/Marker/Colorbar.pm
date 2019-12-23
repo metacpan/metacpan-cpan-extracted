@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Scattercarpet::Marker::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Scattercarpet::Marker::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Scattercarpet::Marker::Colorbar::Title;
 
-our $VERSION = '0.034';    # VERSION
+our $VERSION = '0.035';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattercarpet.
 
@@ -283,7 +283,7 @@ Chart::Plotly::Trace::Scattercarpet::Marker::Colorbar - This attribute is one of
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.03
+    version 1.05
 
 SYNOPSIS
 
@@ -413,6 +413,47 @@ METHODS
     Change one or more metadata fields for a job. Setting a value to undef
     will remove the field.
 
+ purge
+
+      $backend->purge();
+      $backend->purge({states => ['inactive'], older => 3600});
+
+    Purge all jobs created older than...
+
+    These options are currently available:
+
+    older
+
+        older => 3600
+
+      Value in seconds to purge jobs older than this value.
+
+      Default: $minion->missing_after
+
+    queues
+
+        queues => ['important', 'unimportant']
+
+      Purge only jobs in these queues.
+
+    states
+
+        states => ['inactive', 'failed']
+
+      Purge only jobs in these states.
+
+    tasks
+
+        tasks => ['task1', 'task2']
+
+      Purge only jobs for these tasks.
+
+    queues
+
+        queues => ['q1', 'q2']
+
+      Purge only jobs for these queues.
+
  receive
 
       my $commands = $backend->receive($worker_id);
@@ -441,9 +482,23 @@ METHODS
 
  reset
 
-      $backend->reset;
+      $backend->reset({all => 1});
 
     Reset job queue.
+
+    These options are currently available:
+
+    all
+
+        all => 1
+
+      Reset everything.
+
+    locks
+
+        locks => 1
+
+      Reset only locks.
 
  retry_job
 

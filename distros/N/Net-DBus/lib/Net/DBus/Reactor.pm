@@ -124,7 +124,7 @@ use Time::HiRes qw(gettimeofday);
 =item my $reactor = Net::DBus::Reactor->new();
 
 Creates a new event loop ready for monitoring file handles, or
-generating timeouts. Except in very unsual circumstances (examples
+generating timeouts. Except in very unusual circumstances (examples
 of which I can't think up) it is not necessary or desriable to
 explicitly create new reactor instances. Instead call the L<main>
 method to get a handle to the singleton instance.
@@ -376,7 +376,7 @@ sub step {
     if ($n > 0) {
 	push @callbacks, $self->_dispatch_fd("read", $ro);
 	push @callbacks, $self->_dispatch_fd("write", $wo);
-	push @callbacks, $self->_dispatch_fd("error", $eo);
+	push @callbacks, $self->_dispatch_fd("exception", $eo);
     }
     push @callbacks, $self->_dispatch_timeout($self->_now);
     #push @callbacks, $self->_dispatch_hook();
@@ -417,9 +417,11 @@ sub _timeout {
 
     my $timeout;
     foreach (@{$self->{timeouts}}) {
-	next unless $_->{enabled};
+	next unless defined && $_->{enabled};
 
 	my $expired = $now - $_->{last_fired};
+	# In case the clock was moved we handle $expired being < 0 (see t/26-reactor-time-adjusted.t)
+	$expired = 0 if ($expired < 0);
 	my $interval = ($expired > $_->{interval} ? 0 : $_->{interval} - $expired);
 	$timeout = $interval if !(defined $timeout) ||
 	    ($interval < $timeout);
@@ -453,8 +455,11 @@ sub _dispatch_timeout {
 
     my @callbacks;
     foreach my $timeout (@{$self->{timeouts}}) {
-	next unless $timeout->{enabled};
+	next unless defined($timeout) && $timeout->{enabled};
 	my $expired = $now - $timeout->{last_fired};
+	# if system clock was adjusted last_fired can be in the future
+	# (see t/26-reactor-time-adjusted.t)
+	$expired = $timeout->{interval} if ($expired < 0);
 
 	# Select typically returns a little (0-10 ms) before we
 	# asked it for. (8 milliseconds seems reasonable balance
@@ -608,6 +613,9 @@ sub toggle_timeout {
     my $self = shift;
     my $key = shift;
     my $enabled = shift;
+
+    die "no timeout active with key '$key'"
+	unless defined $self->{timeouts}->[$key];
 
     $self->{timeouts}->[$key]->{enabled} = $enabled;
     $self->{timeouts}->[$key]->{interval} = shift if @_;

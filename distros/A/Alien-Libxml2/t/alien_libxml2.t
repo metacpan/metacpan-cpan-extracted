@@ -1,8 +1,24 @@
 use Test2::V0 -no_srand => 1;
 use Test::Alien;
+use Config;
 use Alien::Libxml2;
 
 alien_ok 'Alien::Libxml2';
+
+if($^O eq 'MSWin32' && $Config{ccname} eq 'cl')
+{
+  eval q{
+    package Alien::Libxml2;
+    sub libs_static
+    {
+      my($self) = @_;
+      my $str = $self->SUPER::libs_static;
+      $str =~ s/-L/-LIBPATH:/;
+      $str;
+    }
+  };
+  die $@ if $@;
+}
 
 my $xs = do { local $/; <DATA> };
 xs_ok $xs, with_subtest {

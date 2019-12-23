@@ -163,7 +163,7 @@ sub register {
     $access->apply_route($_) for $oauth->_routes;
   }
   
-  if ($self->conf->{admin}) {
+  if ($self->conf->{admin} && ref $self->conf->{admin} eq 'HASH' && keys %{$self->conf->{admin}}) {
     my $admin = $self->admin;
     $access->apply_route($_) for $admin->self_routes;
   }
@@ -360,7 +360,7 @@ sub model {
   
 };
 
-our $VERSION = '0.865';
+our $VERSION = '0.866';
 
 =pod
 
@@ -376,7 +376,7 @@ Plugin makes an auth operations throught the plugin L<Mojolicious::Plugin::Authe
 
 =head1 VERSION
 
-0.865
+0.866
 
 =head1 NAME
 

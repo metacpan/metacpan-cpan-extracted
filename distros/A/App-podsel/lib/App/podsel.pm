@@ -1,11 +1,12 @@
 package App::podsel;
 
-our $DATE = '2019-08-08'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use App::CSelUtils;
 use Module::Patch qw(patch_package);
@@ -39,9 +40,72 @@ $SPEC{podsel} = {
     summary => 'Select Pod::Elemental nodes using CSel syntax',
     args => {
         %App::CSelUtils::foosel_args_common,
+        transforms => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'transform',
+            summary => "Apply one or more Pod::Elemental::Transform's",
+            schema => [
+                'array*', {
+                    of=>['str*', in=>['Pod5','Nester']],
+                    #'x.perl.coerce_rules' => ['From_str::comma_sep'],
+                }],
+            cmdline_aliases => {t=>{}},
+            description => <<'_',
+
+By default, the "stock" Pod::Elemental parser will be generic and not very
+helpful in parsing your typical POD (Perl 5 variant) documents. You usually want
+to add:
+
+    -t Pod5 -t Nester
+
+The following are available transforms:
+
+* Pod5
+
+Equivalent to this:
+
+    Pod::Elemental::Transformer::Pod5->new->transform_node($tree);
+
+* Nester
+
+Equivalent to this:
+
+    my $nester;
+
+    $nester = Pod::Elemental::Transformer::Nester->new({
+        top_selector      => Pod::Elemental::Selectors::s_command('head3'),
+        content_selectors => [
+            Pod::Elemental::Selectors::s_command([ qw(head4) ]),
+            Pod::Elemental::Selectors::s_flat(),
+        ],
+    });
+    $nester->new->transform_node($tree);
+
+    $nester = Pod::Elemental::Transformer::Nester->new({
+        top_selector      => Pod::Elemental::Selectors::s_command('head2'),
+        content_selectors => [
+            Pod::Elemental::Selectors::s_command([ qw(head3 head4) ]),
+            Pod::Elemental::Selectors::s_flat(),
+        ],
+    });
+    $nester->new->transform_node($tree);
+
+    $nester = Pod::Elemental::Transformer::Nester->new({
+        top_selector      => Pod::Elemental::Selectors::s_command('head1'),
+        content_selectors => [
+            Pod::Elemental::Selectors::s_command([ qw(head2 head3 head4) ]),
+            Pod::Elemental::Selectors::s_flat(),
+        ],
+    });
+    $nester->new->transform_node($tree);
+
+_
+        },
     },
 };
 sub podsel {
+    my %podsel_args = @_;
+
     App::CSelUtils::foosel(
         @_,
         code_read_tree => sub {
@@ -58,6 +122,51 @@ sub podsel {
             require Pod::Elemental;
             my $doc = Pod::Elemental->read_string($src);
 
+            for my $transform (@{ $podsel_args{transforms} // [] }) {
+                if ($transform eq 'Pod5') {
+                    log_trace "Transforming POD with Pod5 ...";
+                    require Pod::Elemental::Transformer::Pod5;
+                    Pod::Elemental::Transformer::Pod5->new->transform_node($doc);
+                } elsif ($transform eq 'Nester') {
+                    log_trace "Transforming POD with Nester ...";
+                    require Pod::Elemental::Transformer::Nester;
+                    require Pod::Elemental::Selectors;
+                    my $t;
+
+                    $t = Pod::Elemental::Transformer::Nester->new({
+                        top_selector      => Pod::Elemental::Selectors::s_command('head3'),
+                        content_selectors => [
+                            Pod::Elemental::Selectors::s_command([ qw(head4) ]),
+                            Pod::Elemental::Selectors::s_flat(),
+                        ],
+                    });
+                    $t->transform_node($doc);
+
+                    $t = Pod::Elemental::Transformer::Nester->new({
+                        top_selector      => Pod::Elemental::Selectors::s_command('head2'),
+                        content_selectors => [
+                            Pod::Elemental::Selectors::s_command([ qw(head3 head4) ]),
+                            Pod::Elemental::Selectors::s_flat(),
+                        ],
+                    });
+                    $t->transform_node($doc);
+
+                    if (1) {
+                        $t = Pod::Elemental::Transformer::Nester->new({
+                            top_selector      => Pod::Elemental::Selectors::s_command('head1'),
+                            content_selectors => [
+                                Pod::Elemental::Selectors::s_command([ qw(head2 head3 head4) ]),
+                                Pod::Elemental::Selectors::s_flat(),
+                            ],
+                        });
+                        $t->transform_node($doc);
+                    }
+
+                } else {
+                    die "Unknown transform '$transform'";
+                }
+            }
+
           PATCH: {
                 last if @patch_handles;
                 _patch('Pod::Elemental::Document', 0);
@@ -72,6 +181,7 @@ sub podsel {
         csel_opts => {
             class_prefixes=>[
                 'Pod::Elemental::Element::Generic',
+                'Pod::Elemental::Element::Pod5',
                 'Pod::Elemental::Element',
                 'Pod::Elemental',
             ]},
@@ -105,7 +215,7 @@ App::podsel - Select Pod::Elemental nodes using CSel syntax
 
 =head1 VERSION
 
-This document describes version 0.003 of App::podsel (from Perl distribution App-podsel), released on 2019-08-08.
+This document describes version 0.006 of App::podsel (from Perl distribution App-podsel), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -152,15 +262,27 @@ attributes to use in a dot-separated syntax, e.g.:
 
 dump:tag.id.class
 
-=back
-
 which will result in a node printed like this:
 
- HTML::Element tag=p id=undef class=undef
+HTML::Element tag=p id=undef class=undef
+
+=back
 
 By default, if no attributes are specified, C<id> is used. If the node class does
 not support the attribute, or if the value of the attribute is undef, then
 C<undef> is shown.
+
+=over
+
+=item * C<eval> will execute Perl code for each matching node. The Perl code will be
+called with arguments: C<($node)>. For convenience, C<$_> is also locally set to
+the matching node. Example in L<htmlsel> you can add this action:
+
+eval:'print $_->tag'
+
+which will print the tag name for each matching L<HTML::Element> node.
+
+=back
 
 =item * B<select_action> => I<str> (default: "csel")
 
@@ -171,6 +293,65 @@ expression. Note that the root node itself is not included. For more details on
 CSel expression, refer to L<Data::CSel>.
 
 C<root> will return a single node which is the root node.
+
+=item * B<transforms> => I<array[str]>
+
+Apply one or more Pod::Elemental::Transform's.
+
+By default, the "stock" Pod::Elemental parser will be generic and not very
+helpful in parsing your typical POD (Perl 5 variant) documents. You usually want
+to add:
+
+ -t Pod5 -t Nester
+
+The following are available transforms:
+
+=over
+
+=item * Pod5
+
+=back
+
+Equivalent to this:
+
+ Pod::Elemental::Transformer::Pod5->new->transform_node($tree);
+
+=over
+
+=item * Nester
+
+=back
+
+Equivalent to this:
+
+ my $nester;
+ 
+ $nester = Pod::Elemental::Transformer::Nester->new({
+     top_selector      => Pod::Elemental::Selectors::s_command('head3'),
+     content_selectors => [
+         Pod::Elemental::Selectors::s_command([ qw(head4) ]),
+         Pod::Elemental::Selectors::s_flat(),
+     ],
+ });
+ $nester->new->transform_node($tree);
+ 
+ $nester = Pod::Elemental::Transformer::Nester->new({
+     top_selector      => Pod::Elemental::Selectors::s_command('head2'),
+     content_selectors => [
+         Pod::Elemental::Selectors::s_command([ qw(head3 head4) ]),
+         Pod::Elemental::Selectors::s_flat(),
+     ],
+ });
+ $nester->new->transform_node($tree);
+ 
+ $nester = Pod::Elemental::Transformer::Nester->new({
+     top_selector      => Pod::Elemental::Selectors::s_command('head1'),
+     content_selectors => [
+         Pod::Elemental::Selectors::s_command([ qw(head2 head3 head4) ]),
+         Pod::Elemental::Selectors::s_flat(),
+     ],
+ });
+ $nester->new->transform_node($tree);
 
 =back
 

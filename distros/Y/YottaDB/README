@@ -1,5 +1,5 @@
 NAME
-    YottaDB - Perl extension for accessing YottaDB
+    YottaDB - Perl extension for accessing YottaDB <https://yottadb.com>
 
 SYNOPSIS
       use YottaDB ":all";
@@ -27,14 +27,62 @@ SYNOPSIS
 
 DESCRIPTION
     This module gives you access to the YottaDB database engine using
-    YottaDB's simple API.
+    YottaDB's simple API. It requires that you install and setup YottaDB
+    <https://yottadb.com/product/get-started> first.
 
-    To reduce the risk of database damage, "make test" will not run tests
-    that access the database, use "make test TEST_DB=1" to run all tests.
+    After installing the database, setting up the environment is required
+    for "Mumps" and "Perl". Environment-variable "ydb_gbldir" is needed for
+    "Mumps" and "Perl". If incorrectly/not set you can't access globals or
+    use M-Style locking and every attempt to do so will throw an exception.
+    The installation process itself does not need "ydb_gbldir" by default;
+    but "make test TEST_DB=1" needs it.
+
+    I highly recommend using:
+
+      $ source "$(pkg-config --variable=prefix yottadb)"/ydb_env_set
+    and
+      $ source "$(pkg-config --variable=prefix yottadb)"/ydb_env_unset
+
+    for basic setup of environment and databases.
+
+    Rule of the thumb: If it fails in "Mumps" it will fail in "Perl", too.
+
+    Always try getting "Mumps" working first.
+
+    Here we try to access a global without "ydb_gbldir" set in "Mumps" and -
+    just for reference - "Perl":
+
+    "Mumps":
+
+     $ cd /tmp
+     $ echo 'I $o(^foo(""))'|"$(pkg-config --variable=prefix yottadb)"/mumps -dir
+
+     YDB>
+     %YDB-E-ZGBLDIRACC, Cannot access global directory /tmp/$ydb_gbldir.gld.  Cannot continue.
+     %SYSTEM-E-ENO2, No such file or directory
+
+     YDB>
+
+    "Perl":
+
+     $ cd /tmp
+     $ perl -MYottaDB=:all -e 'y_next ("^foo","")'
+     YottaDB-Error: -150374122 150374122,(SimpleAPI),%YDB-E-ZGBLDIRACC, Cannot access global directory /tmp/$ydb_gbldir.gld.  Cannot continue.,%SYSTEM-E-ENO2, No such file or directory at -e line 1.
+
+    Installing the YottaDB module from the git repository:
+
+     $ # sudo apt install make libextutils-pkgconfig-perl libjson-perl
+     $ git clone https://gitlab.com/oesiman/yottadb-perl.git
+     $ cd yottadb-perl
+     $ perl Makefile.PL
+     $ make
+     $ make test
+     $ make test TEST_DB=1 # optional, accesses database
+     $ sudo make install
 
     DO NOT USE THIS MODULE ON PRODUCTION SYSTEMS.
 
-FUNCTONS
+FUNCTIONS
     $data = y_data $var [, @subs]
         The y_data function returns in $data:
 
@@ -73,9 +121,7 @@ FUNCTONS
         "order-loop":
 
                 my $x = "";
-                while () {
-                    $x = y_next "^global","subscript", $x;
-                    last unless defined $x;
+                while (defined ($x = y_next "^global", "subscript", $x)) {
                     # ... do something with $x ...
                 }
 
@@ -119,15 +165,12 @@ FUNCTONS
         Run a transaction. :)
 
 SEE ALSO
-    This module depends on POSIX::AtFork for fork handling and on JSON for
-    "ydb_json_import". Install it on Debian:
+    This module depends on JSON for "ydb_json_import". Install it on Debian:
 
-            # apt-get install libposix-atfork-perl
             # apt-get install libjson-perl
 
     or via CPAN:
 
-            # cpan POSIX::AtFork
             # cpan JSON
 
     <https://yottadb.com>

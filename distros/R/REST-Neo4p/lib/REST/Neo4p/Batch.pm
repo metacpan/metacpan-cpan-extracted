@@ -13,7 +13,7 @@ use warnings;
 no warnings qw(once);
 
 BEGIN {
-  $REST::Neo4p::Batch::VERSION = '0.3020';
+  $REST::Neo4p::Batch::VERSION = '0.3030';
 }
 
 our @EXPORT = qw(batch);
@@ -30,7 +30,7 @@ sub batch (&@) {
   $agent->batch_mode(1);
   $coderef->();
   my $tmpfh = $agent->execute_batch_chunk;
-  my $jsonr = JSON::XS->new();
+  my $jsonr = JSON::XS->new->utf8;
   my $buf;
   $tmpfh->read($buf, $BUFSIZE);
   $jsonr->incr_parse($buf);

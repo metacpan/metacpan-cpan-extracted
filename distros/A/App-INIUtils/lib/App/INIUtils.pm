@@ -1,9 +1,15 @@
 package App::INIUtils;
 
-our $VERSION = '0.033'; # VERSION
-our $DATE = '2019-04-23'; # DATE
+our $VERSION = '0.034'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'App-INIUtils'; # DIST
 
 use 5.010001;
+
+use Sort::Sub;
+
+our %SPEC;
 
 our %args_common = (
     ini => {
@@ -133,6 +139,55 @@ sub _dump_str {
     $res;
 }
 
+$Sort::Sub::argsopt_sortsub{sort_sub}{cmdline_aliases} = {S=>{}};
+$Sort::Sub::argsopt_sortsub{sort_args}{cmdline_aliases} = {A=>{}};
+
+$SPEC{sort_ini_sections} = {
+    v => 1.1,
+    summary => '',
+    args => {
+        %App::INIUtils::args_common,
+        %Sort::Sub::argsopt_sortsub,
+    },
+    result_naked => 1,
+};
+sub sort_ini_sections {
+    my %args = @_;
+
+    my $parser = App::INIUtils::_get_cii_parser(\%args);
+
+    my $doc = $parser->read_string($args{ini});
+    my @raw_lines = split /^/, $args{ini};
+
+    my $sortsub_routine = $args{sort_sub} // 'asciibetically';
+    my $sortsub_args    = $args{sort_args} // {};
+    my $sorter = Sort::Sub::get_sorter($sortsub_routine, $sortsub_args);
+
+    my @sections;
+    $doc->each_section(
+        sub {
+            my ($self, %cargs) = @_;
+            push @sections, \%cargs;
+        });
+
+    @sections = sort { $sorter->($a->{section}, $b->{section}) } @sections;
+
+    my @res;
+    for my $section (@sections) {
+        my @section_lines = @raw_lines[ $section->{linum_start}-1 .. $section->{linum_end}-1 ];
+
+        # normalize number of blank lines to 1
+        while (1) {
+            last unless @section_lines;
+            last if $section_lines[-1] =~ /\S/;
+            pop @section_lines;
+        }
+        push @res, @section_lines, "\n";
+    }
+
+    join "", @res;
+}
+
 1;
 # ABSTRACT: INI utilities
 
@@ -148,7 +203,7 @@ App::INIUtils - INI utilities
 
 =head1 VERSION
 
-This document describes version 0.033 of App::INIUtils (from Perl distribution App-INIUtils), released on 2019-04-23.
+This document describes version 0.034 of App::INIUtils (from Perl distribution App-INIUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -178,9 +233,46 @@ This distribution provides the following command-line utilities:
 
 =item * L<parse-ini>
 
+=item * L<sort-ini-sections>
+
 =back
 
 The main feature of these utilities is tab completion.
+
+=head1 FUNCTIONS
+
+
+=head2 sort_ini_sections
+
+Usage:
+
+ sort_ini_sections(%args) -> any
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<allow_duplicate_key> => I<bool> (default: 1)
+
+=item * B<default_section> => I<str> (default: "GLOBAL")
+
+=item * B<ini>* => I<str>
+
+INI file.
+
+=item * B<sort_args> => I<hash>
+
+Arguments to pass to the Sort::Sub::* routine.
+
+=item * B<sort_sub> => I<sortsub::spec>
+
+Name of a Sort::Sub::* module (without the prefix).
+
+=back
+
+Return value:  (any)
 
 =head1 HOMEPAGE
 

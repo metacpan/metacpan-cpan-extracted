@@ -1,5 +1,12 @@
 Revision history for Net-Statsd-Lite
 
+v0.4.9    2019-12-21 10:22:05+00:00 Europe/London
+  [Documentation]
+  - Fixed typo, thanks @mrdvt92.
+
+  [Tests]
+  - Bumped minimum version prerequisite for Test::TCP.
+
 v0.4.8    2019-07-21 11:37:59+01:00 Europe/London
   [Tests]
   - Specify a minimum version of Test::TCP for Net::EmptyPort.

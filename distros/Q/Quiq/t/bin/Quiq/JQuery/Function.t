@@ -15,6 +15,19 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_ready : Test(1) {
+    my $self = shift;
+
+    my $handler = Quiq::JQuery::Function->ready("alert('hello');");
+    $self->isText("$handler\n",q~
+        $(function() {
+            alert('hello');
+        });
+    ~);
+}
+
+# -----------------------------------------------------------------------------
+
 package main;
 Quiq::JQuery::Function::Test->runTests;
 

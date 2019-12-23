@@ -59,8 +59,7 @@ sub setSessionInfo {
     );
 
     while ( my ( $k, $v ) = each %vars ) {
-        $req->{sessionInfo}->{$k} = $req->data->{OpenIDConnect_user_info}->{$v}
-          || "";
+        $req->{sessionInfo}->{$k} = $req->data->{OpenIDConnect_user_info}->{$v};
     }
 
     PE_OK;

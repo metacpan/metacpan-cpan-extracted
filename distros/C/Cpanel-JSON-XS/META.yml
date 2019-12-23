@@ -7,20 +7,22 @@ build_requires:
   Config: '0'
   Data::Dumper: '0'
   Devel::Peek: '0'
+  Encode: '1.9801'
   ExtUtils::MakeMaker: '0'
   POSIX: '0'
   Test: '0'
   Test::More: '0'
   Tie::Array: '0'
   Tie::Hash: '0'
+  Time::Piece: '0'
   charnames: '0'
   lib: '0'
   utf8: '0'
 configure_requires:
   Config: '0'
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 8.3508, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,6 +32,9 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Math::BigFloat: '1.16'
+  Math::BigInt: '0'
 requires:
   Carp: '0'
   Encode: '1.9801'
@@ -43,7 +48,7 @@ resources:
   bugtracker: https://github.com/rurban/Cpanel-JSON-XS/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rurban/Cpanel-JSON-XS
-version: '4.17'
+version: '4.18'
 x_contributors:
   - 'Ashley Willis <ashleyw@cpan.org>'
   - 'Chip Salzenberg <chip@pobox.com>'

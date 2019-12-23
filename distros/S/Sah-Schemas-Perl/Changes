@@ -1,3 +1,9 @@
+0.026   2019-12-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: perl::funcname, perl::qualified_funcname,
+	  perl::unqualified_funcname.
+
+
 0.025   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Upgrade dependency on Data::Sah::Coerce 0.034+ to TestRequires

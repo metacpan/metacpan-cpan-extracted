@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-01-20'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-12-19'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -112,7 +112,7 @@ demo-getopt-long-more - Script to demonstrate Getopt::Long::More
 
 =head1 VERSION
 
-This document describes version 0.005 of demo-getopt-long-more (from Perl distribution Getopt-Long-More), released on 2019-01-20.
+This document describes version 0.006 of demo-getopt-long-more (from Perl distribution Getopt-Long-More), released on 2019-12-19.
 
 =head1 SYNOPSIS
 

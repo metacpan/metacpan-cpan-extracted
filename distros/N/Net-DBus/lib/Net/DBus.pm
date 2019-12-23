@@ -87,7 +87,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    our $VERSION = '1.1.0';
+    our $VERSION = '1.2.0';
     require XSLoader;
     XSLoader::load('Net::DBus', $VERSION);
 }
@@ -106,12 +106,12 @@ use vars qw(@EXPORT_OK %EXPORT_TAGS);
 
 @EXPORT_OK = qw(dbus_int16 dbus_uint16 dbus_int32 dbus_uint32 dbus_int64 dbus_uint64
 		dbus_byte dbus_boolean dbus_string dbus_double
-		dbus_object_path dbus_signature
+		dbus_object_path dbus_signature dbus_unix_fd
 		dbus_struct dbus_array dbus_dict dbus_variant);
 
 %EXPORT_TAGS = (typing => [qw(dbus_int16 dbus_uint16 dbus_int32 dbus_uint32 dbus_int64 dbus_uint64
 			      dbus_byte dbus_boolean dbus_string dbus_double
-			      dbus_object_path dbus_signature
+			      dbus_object_path dbus_signature dbus_unix_fd
 			      dbus_struct dbus_array dbus_dict dbus_variant)]);
 
 =item my $bus = Net::DBus->find(%params);
@@ -150,7 +150,7 @@ sub find {
     } elsif (exists $ENV{DBUS_SESSION_BUS_ADDRESS}) {
 	return $class->session(@_);
     } else {
-	return $class->system;
+	return $class->system(@_);
     }
 }
 
@@ -352,6 +352,10 @@ sub get_service {
 Registers a service with the bus, returning a handle to
 the service. The returned object is an instance of the
 L<Net::DBus::Service> class.
+
+When C<$name> is not specified or is C<undef> then returned
+handle to the service is identified only by the unique name
+of client's connection to the bus.
 
 =cut
 
@@ -770,7 +774,7 @@ Mark a value as being a unix file descriptor
 =cut
 
 sub dbus_unix_fd {
-    return Net::DBus::Binding::Value->new([&Net::DBus::Binding::Message::TYPE_UNIX_FD],
+    return Net::DBus::Binding::Value->new(&Net::DBus::Binding::Message::TYPE_UNIX_FD,
                                           $_[0]);
 }
 

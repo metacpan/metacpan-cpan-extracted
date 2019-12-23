@@ -3,6 +3,7 @@
 # Usage:
 # http://$host/:chord/:position[?showname={0,Chord+Name}]
 # Examples:
+# http://localhost:5000
 # http://localhost/002220/1
 # http://localhost/012340/1?showname=0
 # http://localhost/012340/3?showname=Xb+dim

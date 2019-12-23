@@ -19,7 +19,7 @@ use Mouse;
 
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_REDIRECT);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 # OpenID Connect standard claims
 use constant PROFILE => [
@@ -37,6 +37,7 @@ has oidcOPList   => ( is => 'rw', default => sub { {} }, );
 has oidcRPList   => ( is => 'rw', default => sub { {} }, );
 has rpAttributes => ( is => 'rw', default => sub { {} }, );
 has spRules      => ( is => 'rw', default => sub { {} } );
+has spMacros     => ( is => 'rw', default => sub { {} } );
 
 # return LWP::UserAgent object
 has ua => (
@@ -131,6 +132,22 @@ sub loadRPs {
                 return 0;
             }
             $self->spRules->{$rp} = $rule;
+        }
+
+        # Load per-RP macros
+        my $macros = $self->conf->{oidcRPMetaDataMacros}->{$rp};
+        for my $macroAttr ( keys %{$macros} ) {
+            my $macroRule = $macros->{$macroAttr};
+            if ( length $macroRule ) {
+                $macroRule = $self->p->HANDLER->substitute($macroRule);
+                unless ( $macroRule = $self->p->HANDLER->buildSub($macroRule) )
+                {
+                    $self->error( 'OIDC RP macro error: '
+                          . $self->p->HANDLER->tsv->{jail}->error );
+                    return 0;
+                }
+                $self->spMacros->{$rp}->{$macroAttr} = $macroRule;
+            }
         }
     }
     return 1;
@@ -637,8 +654,15 @@ sub decodeJSON {
 sub newAuthorizationCode {
     my ( $self, $rp, $info ) = @_;
 
-    return $self->getOpenIDConnectSession( undef, "authorization_code", undef,
-        $info );
+    return $self->getOpenIDConnectSession(
+        undef,
+        "authorization_code",
+        $self->conf->{oidcRPMetaDataOptions}->{$rp}
+          ->{oidcRPMetaDataOptionsAuthorizationCodeExpiration}
+          || $self->conf->{oidcServiceAuthorizationCodeExpiration},
+        ,
+        $info
+    );
 }
 
 # Get existing Authorization Code
@@ -662,7 +686,8 @@ sub newAccessToken {
         undef,
         "access_token",
         $self->conf->{oidcRPMetaDataOptions}->{$rp}
-          ->{oidcRPMetaDataOptionsAccessTokenExpiration},
+          ->{oidcRPMetaDataOptionsAccessTokenExpiration}
+          || $self->conf->{oidcServiceAccessTokenExpiration},
         $info
     );
 }
@@ -675,6 +700,66 @@ sub getAccessToken {
     my ( $self, $id ) = @_;
 
     return $self->getOpenIDConnectSession( $id, "access_token" );
+}
+
+# Create a new Refresh Token
+# @param info hashref of session info
+# @return new Lemonldap::NG::Common::Session object
+
+sub newRefreshToken {
+    my ( $self, $rp, $info, $offline ) = @_;
+    my $ttl =
+      $offline
+      ? ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
+          ->{oidcRPMetaDataOptionsOfflineSessionExpiration}
+          || $self->conf->{oidcServiceOfflineSessionExpiration} )
+      : $self->conf->{timeout};
+
+    return $self->getOpenIDConnectSession( undef, "refresh_token", $ttl,
+        $info );
+}
+
+# Get existing Refresh Token
+# @param id
+# @return new Lemonldap::NG::Common::Session object
+
+sub getRefreshToken {
+    my ( $self, $id ) = @_;
+
+    return $self->getOpenIDConnectSession( $id, "refresh_token" );
+}
+
+sub updateRefreshToken {
+    my ( $self, $id, $infos ) = @_;
+
+    my %storage = (
+        storageModule        => $self->conf->{oidcStorage},
+        storageModuleOptions => $self->conf->{oidcStorageOptions},
+    );
+
+    unless ( $storage{storageModule} ) {
+        %storage = (
+            storageModule        => $self->conf->{globalStorage},
+            storageModuleOptions => $self->conf->{globalStorageOptions},
+        );
+    }
+
+    my $oidcSession = Lemonldap::NG::Common::Session->new( {
+            %storage,
+            cacheModule        => $self->conf->{localSessionStorage},
+            cacheModuleOptions => $self->conf->{localSessionStorageOptions},
+            id                 => $id,
+            info               => $infos,
+        }
+    );
+
+    if ( $oidcSession->error ) {
+        $self->userLogger->warn(
+            "OpenIDConnect session $id isn't yet available");
+        return undef;
+    }
+
+    return $oidcSession;
 }
 
 # Try to recover the OpenID Connect session corresponding to id and return session
@@ -737,6 +822,15 @@ sub getOpenIDConnectSession {
                   . $oidcSession->{data}->{_type}
                   . ". Expected: "
                   . $type );
+            return undef;
+        }
+
+        # Make sure the token is still valid, we already compensated for
+        # different TTLs when storing _utime
+        if (
+            time > ( $oidcSession->{data}->{_utime} + $self->conf->{timeout} ) )
+        {
+            $self->logger->error("Session $id has expired");
             return undef;
         }
     }
@@ -1221,22 +1315,28 @@ sub getAttributesListFromClaim {
 # @param rp Internal Relying Party identifier
 # @param user_session_id User session identifier
 # @return hashref UserInfo data
+sub buildUserInfoResponseFromId {
+    my ( $self, $req, $scope, $rp, $user_session_id ) = @_;
+    my $session = $self->p->getApacheSession($user_session_id);
+
+    return undef unless ($session);
+    return buildUserInfoResponse( $self, $req, $scope, $rp, $session );
+}
+
+# Return Hash of UserInfo data
+# @param scope OIDC scope
+# @param rp Internal Relying Party identifier
+# @param session SSO or offline session
+# @return hashref UserInfo data
 sub buildUserInfoResponse {
-    my ( $self, $scope, $rp, $user_session_id ) = @_;
+    my ( $self, $req, $scope, $rp, $session ) = @_;
     my $userinfo_response = {};
 
-    # Get user identifier
-    my $apacheSession = $self->p->getApacheSession($user_session_id);
-
-    unless ($apacheSession) {
-        $self->logger->error("Unable to find user session");
-        return undef;
-    }
     my $user_id_attribute =
       $self->conf->{oidcRPMetaDataOptions}->{$rp}
       ->{oidcRPMetaDataOptionsUserIDAttr}
       || $self->conf->{whatToTrace};
-    my $user_id = $apacheSession->data->{$user_id_attribute};
+    my $user_id = $session->data->{$user_id_attribute};
 
     $self->logger->debug("Found corresponding user: $user_id");
 
@@ -1252,7 +1352,19 @@ sub buildUserInfoResponse {
             my $session_key =
               $self->conf->{oidcRPMetaDataExportedVars}->{$rp}->{$attribute};
             if ($session_key) {
-                my $session_value = $apacheSession->data->{$session_key};
+
+                my $session_value;
+
+                # Lookup attribute in macros first
+                if ( $self->spMacros->{$rp}->{$session_key} ) {
+                    $session_value = $self->spMacros->{$rp}->{$session_key}
+                      ->( $req, $session->data );
+
+                    # If not found, search in session
+                }
+                else {
+                    $session_value = $session->data->{$session_key};
+                }
 
                 # Address is a JSON object
                 if ( $claim eq "address" ) {
@@ -1521,6 +1633,16 @@ sub decode_base64url {
     return decode_base64($s);
 }
 
+sub encodeBase64url {
+    my ( $self, $value ) = @_;
+    return encode_base64url($value);
+}
+
+sub decodeBase64url {
+    my ( $self, $value ) = @_;
+    return decode_base64url($value);
+}
+
 sub addRouteFromConf {
     my ( $self, $type, %subs ) = @_;
     my $adder = "add${type}Route";
@@ -1582,6 +1704,12 @@ sub validatePKCEChallenge {
     }
 
     return 0;
+}
+
+sub force_id_claims {
+    my ( $self, $rp ) = @_;
+    return $self->conf->{oidcRPMetaDataOptions}->{$rp}
+      ->{oidcRPMetaDataOptionsIDTokenForceClaims};
 }
 
 1;
@@ -1665,6 +1793,10 @@ Generate new Authorization Code session
 
 Generate new Access Token session
 
+=head2 newRefreshToken
+
+Generate new Refresh Token session
+
 =head2 getAuthorizationCode
 
 Get existing Authorization Code session
@@ -1672,6 +1804,10 @@ Get existing Authorization Code session
 =head2 getAccessToken
 
 Get existing Access Token session
+
+=head2 getRefreshToken
+
+Get existing Refresh Token session
 
 =head2 getOpenIDConnectSession
 
@@ -1717,9 +1853,13 @@ Get Access Token
 
 Return list of attributes authorized for a claim
 
+=head2 buildUserInfoResponseFromId
+
+Return Hash of UserInfo data from session ID
+
 =head2 buildUserInfoResponse
 
-Return Hash of UserInfo data
+Return Hash of UserInfo data from session object
 
 =head2 createJWT
 

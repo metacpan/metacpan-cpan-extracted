@@ -1,0 +1,72 @@
+NAME
+    Complete::Sah - Sah-related completion routines
+
+VERSION
+    This document describes version 0.001 of Complete::Sah (from Perl
+    distribution Complete-Sah), released on 2019-12-18.
+
+SYNOPSIS
+     use Complete::Sah qw(complete_from_schema);
+     my $res = complete_from_schema(word => 'a', schema=>[str => {in=>[qw/apple apricot banana/]}]);
+     # -> {words=>['apple', 'apricot'], static=>0}
+
+FUNCTIONS
+  complete_from_schema
+    Usage:
+
+     complete_from_schema(%args) -> [status, msg, payload, meta]
+
+    Complete a value from schema.
+
+    Employ some heuristics to complete a value from Sah schema. For example,
+    if schema is "[str => in => [qw/new open resolved rejected/]]", then we
+    can complete from the "in" clause. Or for something like "[int =>
+    between => [1, 20]]" we can complete using values from 1 to 20.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+        Must be normalized.
+
+    *   schema_is_normalized => *bool* (default: 0)
+
+    *   word* => *str* (default: "")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Sah>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Sah>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Sah>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

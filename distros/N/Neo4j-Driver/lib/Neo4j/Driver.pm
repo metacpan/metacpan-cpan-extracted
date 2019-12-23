@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Perl implementation of the Neo4j Driver API
-$Neo4j::Driver::VERSION = '0.13';
+$Neo4j::Driver::VERSION = '0.14';
 
 use Carp qw(croak);
 use Module::Load;
@@ -29,10 +29,22 @@ my %NEO4J_DEFAULT_PORT = (
 	https => 7473,
 );
 
+my %OPTIONS = (
+	ca_file => 'ca_file',
+	cypher_filter => 'cypher_filter',
+	cypher_types => 'cypher_types',
+	timeout => 'http_timeout',
+);
+
 my %DEFAULTS = (
+	cypher_types => {
+		node => 'Neo4j::Driver::Type::Node',
+		relationship => 'Neo4j::Driver::Type::Relationship',
+		path => 'Neo4j::Driver::Type::Path',
+		point => 'Neo4j::Driver::Type::Point',
+		temporal => 'Neo4j::Driver::Type::Temporal',
+	},
 	die_on_error => 1,
-	http_timeout => 6,  # seconds
-	ca_file => undef,
 );
 
 
@@ -41,6 +53,7 @@ sub new {
 	
 	if ($uri) {
 		$uri =~ s|^|http://| if $uri !~ m{:|/};
+		$uri =~ s|$|//localhost| if $uri =~ m{^[a-z]+:$};
 		$uri = URI->new($uri);
 		
 		if ($uri->scheme eq 'bolt') {
@@ -76,16 +89,37 @@ sub basic_auth {
 
 
 sub config {
-	my ($self, $key, $value) = @_;
+	my ($self, @options) = @_;
 	
-	croak "Config option '$key' unsupported" unless grep m/^$key$/, keys %DEFAULTS;
-	$self->{$key} = $value;
+	if (@options < 2) {
+		# get config option
+		my $key = $options[0] // '';
+		croak "Unsupported config option: $key" unless grep m/^$key$/, keys %OPTIONS;
+		return $self->{$OPTIONS{$key}};
+	}
+	
+	croak "Unsupported sequence: call config() before session()" if $self->{session};
+	croak "Odd number of elements in config hash" if @options & 1;
+	my %options = @options;
+	
+	my @unsupported = ();
+	foreach my $key (keys %options) {
+		push @unsupported, $key unless grep m/^$key$/, keys %OPTIONS;
+	}
+	croak "Unsupported config option: " . join ", ", sort @unsupported if @unsupported;
+	
+	# set config option
+	foreach my $key (keys %options) {
+		$self->{$OPTIONS{$key}} = $options{$key};
+	}
 	return $self;
 }
 
 
 sub session {
 	my ($self) = @_;
+	
+	warnings::warnif deprecated => __PACKAGE__ . "->{die_on_error} is deprecated" unless $self->{die_on_error};
 	
 	my $transport;
 	if ($self->{uri}->scheme eq 'bolt') {
@@ -95,12 +129,14 @@ sub session {
 	else {
 		$transport = Neo4j::Driver::Transport::HTTP->new($self);
 	}
+	$self->{session} = 1;
 	
 	return Neo4j::Driver::Session->new($transport);
 }
 
 
 sub close {
+	warnings::warnif deprecated => __PACKAGE__ . "->close() is deprecated";
 }
 
 
@@ -118,7 +154,7 @@ Neo4j::Driver - Perl implementation of the Neo4j Driver API
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -149,7 +185,7 @@ stated goal of the Neo4j Driver API, to Perl. The downside is that
 this driver doesn't offer fully-fledged object bindings like the
 existing L<REST::Neo4p> module does. Nor does it offer any L<DBI>
 integration. However, it avoids the legacy C<cypher> endpoint,
-assuring compatibility with future Neo4j versions.
+assuring compatibility with Neo4j versions 2.3, 3.x and 4.x.
 
 B<As of version 0.13, the interface of this software may be
 considered stable.>
@@ -179,6 +215,27 @@ chaining is possible.
 
  my $session = $driver->basic_auth('neo4j', 'password')->session;
 
+=head2 config
+
+ $driver->config( option1 => 'foo', option2 => 'bar' );
+
+Sets the specified configuration option or options on a
+L<Neo4j::Driver> object. The options are given in hash syntax.
+This method returns the modified object, so that method chaining
+is possible.
+
+ my $session = $driver->config(timeout => 60)->session;
+
+See below for an explanation of
+L<all supported configuration options|/"CONFIGURATION OPTIONS">.
+Setting configuration options on a driver is only allowed before
+creating the driver's first session.
+
+Calling this method with just a single parameter will return the
+current value of the config option named by the parameter.
+
+ my $timeout = $driver->config('timeout');
+
 =head2 new
 
  my $driver = Neo4j::Driver->new('http://localhost');
@@ -192,11 +249,12 @@ Only the C<http> URI scheme is currently supported.
 
 If a part of the URI or even the entire URI is missing, suitable
 default values will be substituted. In particular, the host name
-C<localhost> will be used as default, along with the default port
-of the selected protocol.
+C<localhost> and the protocol C<http> will be used as defaults;
+if no port is specified, the protocol's default port will be used.
 
  # all of these are semantically equal
  my $driver = Neo4j::Driver->new;
+ my $driver = Neo4j::Driver->new('http:');
  my $driver = Neo4j::Driver->new('localhost');
  my $driver = Neo4j::Driver->new('http://localhost');
  my $driver = Neo4j::Driver->new('http://localhost:7474');
@@ -226,6 +284,8 @@ The design goal is for this driver to eventually offer equal support
 for Bolt and HTTP. At this time, using Bolt with this driver is not
 recommended, although it sorta-kinda works. The biggest issues
 include: Unicode is not supported in L<Neo4j::Bolt>,
+the C<libneo4j-client> backend currently doesn't support Neo4j 4,
+setting a custom timeout is not supported in L<Neo4j::Bolt>,
 C<libneo4j-client> error reporting is unreliable, summary
 information reported by L<Neo4j::Bolt> is incomplete, and graph meta
 data supplied by L<Neo4j::Bolt> is unreliable and has a different
@@ -260,67 +320,72 @@ See also the
 L<Neo4j Operations Manual|https://neo4j.com/docs/operations-manual/current/security/>
 for details on Neo4j network security.
 
-=head2 Close method
+=head2 Parameter syntax conversion
 
- $driver->close;  # no-op
+ $driver->config(cypher_filter => 'params');
 
-All resources opened by this driver are closed automatically once
-they are no longer required. Explicit calls to C<close()> are neither
-required nor useful.
+When this option is set, the driver automatically uses a regular
+expression to convert the old Cypher parameter syntax C<{param}>
+supported by Neo4j S<versions 2 and 3> to the new syntax C<$param>
+supported by Neo4j S<versions 3 and 4>.
 
-=head2 HTTP Timeout
+=head2 Type system customisation
 
- $driver->{http_timeout} = 10;  # seconds
+ $driver->config(cypher_types => {
+   node => 'Local::Node',
+   relationship => 'Local::Relationship',
+   path => 'Local::Path',
+   point => 'Local::Point',
+   temporal => 'Local::Temporal',
+   init => sub { my $object = shift; ... },
+ });
 
-A timeout in seconds for making HTTP connections to the Neo4j server.
-If a connection cannot be established before timeout, a local error
-will be triggered by this client.
+The package names used for C<bless>ing objects in query results can be
+modified. This allows clients to add their own methods to such objects.
 
-The default timeout currently is 6 seconds.
+Clients must make sure their custom type packages are subtypes of the
+base type packages that this module provides (S<e. g.> using C<@ISA>):
 
-=head2 Mutability
+=over
 
- my $session1 = $driver->basic_auth('user1', 'password')->session;
- my $session2 = $driver->basic_auth('user2', 'password')->session;
- 
- my $session1 = $driver->session;
- $driver->{http_timeout} = 30;
- $driver->{die_on_error} = 0;
- my $session2 = $driver->session;
+=item * L<Neo4j::Driver::Type::Node>
 
-The official Neo4j drivers are explicitly designed to be immutable.
-As this driver currently has a much simpler design, it can afford
-mutability, but applications shouldn't depend upon it.
+=item * L<Neo4j::Driver::Type::Relationship>
 
-The modifications will not be picked up by existing sessions. Only
-sessions that are newly created after making the changes will be
-affected.
+=item * L<Neo4j::Driver::Type::Path>
 
-=head2 Suppress exceptions
+=item * L<Neo4j::Driver::Type::Point>
 
- my $driver = Neo4j::Driver->new;
- $driver->{die_on_error} = 0;
- my $result = $driver->session->run('...');
+=item * L<Neo4j::Driver::Type::Temporal>
 
-The default value of the C<die_on_error> attribute is C<1>. Setting
-this to C<0> causes the driver to no longer die on I<server> errors.
+=back
 
-This is much less useful than it sounds. Not only is the
-L<StatementResult|Neo4j::Driver::StatementResult> structure not
-well-defined for such situations, but also the internal state of the
-L<Transaction|Neo4j::Driver::Transaction> object may be corrupted.
-For example, when a minor server error occurs on the first request
-(which would normally establish the connection), the expected
-C<Location> header may be missing from the error message and the
-transaction may therefore be marked as closed, even though it still
-is open.
+Clients may only use the documented API to access the data in the base
+type. Direct data structure access might also work, but is unsupported
+and discouraged because it makes your code prone to fail when any
+internals change in the implementation of Neo4j::Driver. For those
+objects that are implemented as blessed hash refs, clients may use any
+hash keys that beginn with two underscores (C<__>) to store private
+data. All other hash keys are reserved for use by Neo4j::Driver.
 
-Additionally, I<client> errors (such as trying to call C<single()> on
-a result with multiple result records) currently still will cause the
-driver to die.
+=head1 CONFIGURATION OPTIONS
 
-This feature will likely be removed in a future version. Use C<eval>,
-L<Try::Tiny> or similar instead.
+L<Neo4j::Driver> implements the following configuration options.
+
+=head2 timeout
+
+ $driver->config(timeout => 60);  # seconds
+
+Specifies the connection timeout. The semantics of this config
+option vary by network library. Its default value is therefore
+not defined here and is subject to change.
+
+For details, see L<LWP::UserAgent/"timeout"> when using HTTP or
+L<select(2)> when using Bolt.
+
+The old C<< $driver->{http_timeout} >> syntax remains supported
+for the time being in order to ensure backwards compatibility,
+but its use is discouraged and it may be deprecated in future.
 
 =head1 ENVIRONMENT
 

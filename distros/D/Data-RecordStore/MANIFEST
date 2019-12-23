@@ -3,6 +3,12 @@ bin/recordstore_explorer
 Build.PL
 cgi-bin/record-store-endpoint
 CHANGELOG
+Data-RecordStore-6.01.tar.gz
+Data-RecordStore-6.02/Build.PL
+Data-RecordStore-6.02/CHANGELOG
+Data-RecordStore-6.02/Data-RecordStore-6.01.tar.gz
+Data-RecordStore-6.02/Data-RecordStore-6.02/Build.PL
+Data-RecordStore-6.02/Data-RecordStore-6.02/CHANGELOG
 debug.txt
 lib/Data/RecordStore.pm
 lib/Data/RecordStore/Converter.pm
@@ -27,11 +33,6 @@ oobtest.txt
 README
 t/lib/api.pm
 t/lib/forker.pm
-t/lib/NotAThing.pm
-t/lib/OtherThing.pm
-t/lib/SomeThing.pm
-t/lib/test/TestThing.pm
-t/lib2/SomeThing.pm
 t/make_upgrade_data_test.pl
 t/recordstore.t
 t/silo.t

@@ -1,5 +1,8 @@
 Revision history for perl module Text::Hogan
 
+2.03 2019-12-17
+    * Use Ref::Util, which will use Ref::Util::XS where available, thanks to Ed Freyfogle and opencagedata.com
+
 2.02 2019-03-10
     * Add Jerrad Pierce to the list of contributors. He inspired Ricky Morse's optimisation after a conversation they had at a Boston.pm meetup.
 

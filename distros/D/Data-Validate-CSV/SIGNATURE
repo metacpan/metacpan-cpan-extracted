@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 0e5d6658a3e8b7495830bb5dc45cf387f3a9246978112e019882e0df73278659 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 2d6f4aa9544d8fa2c2716a1817bca29af9ffc2fafd3bb835a5bfce25c8fd57e0 Changes
+SHA256 b6ecc2cf0bb609e9d3f5b5596d47211559a2b9f622aee4a3915adf60532f16bb INSTALL
+SHA256 5c791221f0dde289392a38a5921b66d4a1be8248cc64ee6de15f3c2426892673 LICENSE
+SHA256 537132553b01fc9774c07f90526785627c3fc2626b3c287f788bfa8ffaf67c01 MANIFEST
+SHA256 285a606aa4741b30bd426d9528ba19baa86a0b80e58636fa214cc17d80a6abb5 META.json
+SHA256 23818b1c8574ae1f67b3a8ccb0dc5a2eb9d144c8fe8baa3a1e7bf21bcedd5c59 META.yml
+SHA256 75a6b90519abbefe6e4ec82a73bea1e4818db01adf0d71a37b5835b6514f6ac2 Makefile.PL
+SHA256 62b5ab3108560ec9a0b74ddc5792e8b43e0c2c7b146b56fe294f671aa5baf48a README
+SHA256 9c0bcdc7d9ad8a96d33565bde99381bab713fc80f3a892d6c826bf1c2004f475 dist.ini
+SHA256 843be47b19db8b42cfaa2668c23156f026186ad2a8433dc5f010280b5c323f42 doap.ttl
+SHA256 aeaa4591efa8915723b8347908200ee557c33b650ffc4708e09bdc55e52ed5ca examples/csv-validation.pl
+SHA256 bf408adf3dadb3294eb226a07ceb029e53153cee87058a2363827961f29d577e lib/Data/Validate/CSV.pm
+SHA256 cdae2a47ec8f0332118cdfc6ba0076a2598c4c50aa0a2a2ba1757f92b140cf10 lib/Data/Validate/CSV/Cell.pm
+SHA256 c4697962ee8b2f2ca3e1de7adafcbba701ca17782c8af7bb80685b0852305b75 lib/Data/Validate/CSV/Column.pm
+SHA256 5a6114e839b1013ffe01ab8a89717fcd06f936094fa74688ed97da4e601db43a lib/Data/Validate/CSV/MultiValueCell.pm
+SHA256 97f1548b8e74b2e01bb5d78dbfc82383c8c550dd4315c9b96246f1df859916f6 lib/Data/Validate/CSV/Note.pm
+SHA256 096fc2c082b0acc9143106eb21deed9707c9e34dae2197ecbef8307ca75f0a1f lib/Data/Validate/CSV/Row.pm
+SHA256 9b07d0aefbaf7764ac35ba5b221c86d272b9f1627791f5319d2da87af8aa719e lib/Data/Validate/CSV/Schema.pm
+SHA256 eaf46bfda2c4e5a6f1f0b8cfc456eb041cedccace668a48dda33614b6cf3a49a lib/Data/Validate/CSV/SingleValueCell.pm
+SHA256 038956fd3575b753504f2af8bff30f859d5870abd59f5868b3c792fb5b9a4f37 lib/Data/Validate/CSV/Table.pm
+SHA256 5c1d48c394b95aec83c64fd06e8fe443daad1e71e8c47aea3af7d42f97c79e20 lib/Data/Validate/CSV/Types.pm
+SHA256 64882e98060c36427e6a3771b137e21d33ebea1df2d200c4a5bcbf7224dd1e9c t/01basic.t
+SHA256 04ae19ef981eaf0ac7eb90ad657f80f0eefaa50065a2ce1a02c363a1403c5adc t/02parsing.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCXfd4jAAKCRDOv4Eoaip9
+OSx3AJ9YMxBxKvMwnZeTfqL2U2FsCnWAJgCfYc7Mu0VakH5TfN/9HZWx85sRe8M=
+=Vc5I
+-----END PGP SIGNATURE-----

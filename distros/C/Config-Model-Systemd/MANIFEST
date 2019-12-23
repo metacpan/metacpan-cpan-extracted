@@ -55,6 +55,7 @@ t/model_tests.d/systemd-examples/remove-service/main-sshd
 t/model_tests.d/systemd-examples/remove-service/mpd.service
 t/model_tests.d/systemd-examples/remove-service/mpd.socket
 t/model_tests.d/systemd-examples/sshd-service/main-sshd
+t/model_tests.d/systemd-examples/sshd-service/ssh.service
 t/model_tests.d/systemd-service-examples/basic-service/gmail-imap-tunnel@.service
 t/model_tests.d/systemd-service-examples/delete-service/main-obex
 t/model_tests.d/systemd-service-examples/delete-service/user-obex

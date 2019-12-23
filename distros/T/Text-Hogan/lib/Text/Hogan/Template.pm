@@ -1,10 +1,11 @@
 package Text::Hogan::Template;
-$Text::Hogan::Template::VERSION = '2.02';
+$Text::Hogan::Template::VERSION = '2.03';
 use strict;
 use warnings;
 
-use Scalar::Util qw(looks_like_number);
 use Clone qw(clone);
+use Ref::Util qw( is_ref is_arrayref is_coderef is_hashref);
+use Scalar::Util qw(looks_like_number);
 
 sub new {
     my ($orig, $code_obj, $text, $compiler, $options) = @_;
@@ -12,7 +13,7 @@ sub new {
     $code_obj ||= {};
 
     return bless {
-        r   => $code_obj->{'code'} || (ref($orig) && $orig->{'r'}),
+        r   => $code_obj->{'code'} || (is_hashref($orig) && $orig->{'r'}),
         c   => $compiler,
         buf => "",
         options  => $options || {},
@@ -20,7 +21,7 @@ sub new {
         partials => $code_obj->{'partials'} || {},
         subs     => $code_obj->{'subs'} || {},
         numeric_string_as_string => !!$options->{'numeric_string_as_string'},
-    }, ref($orig)||$orig;
+    }, ref($orig) || $orig;
 }
 
 sub r {
@@ -41,13 +42,13 @@ my %mapping = (
     '"' => '&quot;',
 );
 
+# create regex once
+my $mapping_re = join('', '[', ( sort keys %mapping ), ']');
+
 sub v {
     my ($self, $str) = @_;
     $str //= "";
-
-    my $re = join('', '[', ( sort keys %mapping ), ']');
-
-    $str =~ s/($re)/$mapping{$1}/ge;
+    $str =~ s/($mapping_re)/$mapping{$1}/ge;
 
     return $str;
 }
@@ -77,7 +78,7 @@ sub ep {
         return $partial->{'instance'};
     }
 
-    if (!ref($template)) {
+    if (! is_ref($template) ) {
         die "No compiler available" unless $self->{'c'};
         
         $template = $self->{'c'}->compile($template, $self->{'options'});
@@ -119,7 +120,7 @@ sub rp {
 sub rs {
     my ($self, $context, $partials, $section) = @_;
     my $tail = $context->[-1];
-    if (ref $tail ne 'ARRAY') {
+    if (! is_arrayref($tail) ) {
         $section->($context, $partials, $self);
         return;
     }
@@ -136,16 +137,16 @@ sub s {
     my ($self, $val, $ctx, $partials, $inverted, $start, $end, $tags) = @_;
     my $pass;
 
-    return 0 if (ref($val) eq 'ARRAY') && !@$val;
+    return 0 if (is_arrayref($val)) && !@$val;
 
-    if (ref($val) eq 'CODE') {
+    if (is_coderef($val)) {
         $val = $self->ms($val, $ctx, $partials, $inverted, $start, $end, $tags);
     }
 
     $pass = !!$val;
 
     if (!$inverted && $pass && $ctx) {
-        push @$ctx, ((ref($val) eq 'ARRAY') || (ref($val) eq 'HASH')) ? $val : $ctx->[-1];
+        push @$ctx, (is_arrayref($val) || is_hashref($val)) ? $val : $ctx->[-1];
     }
 
     return $pass;
@@ -172,7 +173,7 @@ sub d {
 
     my $cx;
 
-    if ($key eq '.' && (ref($ctx->[-2]) eq 'ARRAY')) {
+    if ($key eq '.' && is_arrayref($ctx->[-2])) {
         $val = $ctx->[-1];
     }
     else {
@@ -190,7 +191,7 @@ sub d {
 
     return 0 if $return_found && !$val;
 
-    if (!$return_found && ref($val) eq 'CODE') {
+    if (!$return_found && is_coderef($val)) {
         push @$ctx, $cx;
         $val = $self->mv($val, $ctx, $partials);
         pop @$ctx;
@@ -230,7 +231,7 @@ sub f {
 
     return $return_found ? 0 : "" unless $found;
 
-    if (!$return_found && (ref($val) eq 'CODE')) {
+    if (!$return_found && is_coderef($val)) {
         $val = $self->mv($val, $ctx, $partials);
     }
 
@@ -365,7 +366,7 @@ Text::Hogan::Template - represent and render compiled templates
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 

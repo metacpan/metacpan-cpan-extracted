@@ -1,0 +1,60 @@
+{
+   "abstract" : "print, say, prompt with predefined colors",
+   "author" : [
+      "Rolf Stöckli <tekki@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Print-Colored",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Prompter" : "v0.4.15",
+            "Term::ANSIColor" : "4",
+            "perl" : "v5.24.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Output" : "1.031"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Tekki/print-colored/issues"
+      },
+      "homepage" : "https://github.com/Tekki/print-colored",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Tekki/print-colored.git",
+         "web" : "https://github.com/Tekki/print-colored"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

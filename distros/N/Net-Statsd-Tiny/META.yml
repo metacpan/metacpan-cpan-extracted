@@ -14,7 +14,7 @@ build_requires:
   Test::Roo: '0'
   Test::Roo::DataDriven: '0'
   Test::Roo::Role: '0'
-  Test::TCP: '2.19'
+  Test::TCP: '2.22'
   curry: '0'
   if: '0'
   lib: '0'
@@ -23,6 +23,11 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - client
+  - StatsD
+  - metrics
+  - monitoring
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +36,7 @@ name: Net-Statsd-Tiny
 provides:
   Net::Statsd::Tiny:
     file: lib/Net/Statsd/Tiny.pm
-    version: v0.3.4
+    version: v0.3.5
 requires:
   Class::Accessor::Fast: '0'
   IO::Socket: '1.18'
@@ -39,7 +44,9 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Net-Statsd-Tiny/issues
   repository: git://github.com/robrwo/Net-Statsd-Tiny.git
-version: v0.3.4
+version: v0.3.5
 x_authority: cpan:RRWO
+x_contributors:
+  - 'Michael R. Davis <mrdvt@cpan.org>'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,3 +1,16 @@
+0.027   2019-12-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak tab completion.
+
+
+0.026   2019-12-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add ability to read CSV from stdin.
+
+	- [bugfix] csv-sort-rows, csv-sort-fields: didn't observe common
+	  options --tsv and --no-header.
+
+
 0.025   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update coerce rule names in Sah schemas (Data::Sah::Coerce

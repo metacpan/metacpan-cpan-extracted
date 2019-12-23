@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Perl;
 use Encode ();
@@ -44,43 +44,15 @@ L<Quiq::Hash>
 
 Programm:
 
-  #!/usr/bin/env perl
-  
-  use Quiq::Program;
-  exit Quiq::Program->run('MyProg')->exitCode;
-  
-  # eof
+  Command failed: Blob/sdoc_reference/sdoc-highlight perl pod
 
 Programm-Klasse:
 
-  package MyProg;
-  use base 'Quiq::Program';
-  
-  sub main {
-      my $self = shift;
-      ...
-      return;
-  }
-  
-  # eof
+  Command failed: Blob/sdoc_reference/sdoc-highlight perl pod
 
 Optionen und Argumente:
 
-  my ($error,$opt,$argA) = $self->options(
-      ...
-      -help => 0,
-  );
-  if ($error) {
-      $self->help(10,"ERROR: $error");
-  }
-  elsif ($opt->help) {
-      $self->help;
-  }
-  elsif (@$argA != 1) {
-      $self->help(11,'ERROR: Falsche Anzahl Argumente');
-  }
-  my $myArg = shift @$argA;
-  ...
+  Command failed: Blob/sdoc_reference/sdoc-highlight perl pod
 
 =head1 METHODS
 
@@ -1014,7 +986,7 @@ sub new {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

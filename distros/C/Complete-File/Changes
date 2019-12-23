@@ -1,4 +1,9 @@
-0.43    2017-07-14 (PERLANCAR)
+0.440   2019-12-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Add workaround to force path mode in completion answer.
+
+
+0.43    2017-07-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,25 +11,25 @@
 	  removed in 5.30, switch to the recommended bsd_glob().
 
 
-0.42    2016-10-20 (PERLANCAR)
+0.42    2016-10-20  Released-By: PERLANCAR
 
 	- Fix Rinci metadata, forgot to shallow copy 'args' too.
 
 
-0.41    2016-10-19 (PERLANCAR)
+0.41    2016-10-19  Released-By: PERLANCAR
 
 	- Allow specifying more than one filter options.
 
         - complete_file(): Add filter option: exclude_dir, file_ext_filter.
 
 
-0.40    2016-05-09 (PERLANCAR)
+0.40    2016-05-09  Released-By: PERLANCAR
 
 	- Convert filenames to Unicode strings instead of just octets, to
 	  properly display Unicode filenames.
 
 
-0.39    2015-11-29 (PERLANCAR)
+0.39    2015-11-29  Released-By: PERLANCAR
 
 	- Adjust to Complete::Common 0.21
 
@@ -33,17 +38,17 @@
 	  set this behavior globally via Complete::Common.
 
 
-0.38    2015-11-06 (PERLANCAR)
+0.38    2015-11-06  Released-By: PERLANCAR
 
 	- Add complete_dir().
 
 
-0.37    2015-09-20 (PERLANCAR)
+0.37    2015-09-20  Released-By: PERLANCAR
 
 	- Add fuzzy matching.
 
 
-0.36    2015-09-16 (PERLANCAR)
+0.36    2015-09-16  Released-By: PERLANCAR
 
         - First release, split from Complete-Util to avoid circular dependencies
           (Complete-Path is adding fuzzy matching, which uses Complete::Util).

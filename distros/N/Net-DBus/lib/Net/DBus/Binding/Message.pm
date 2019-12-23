@@ -241,7 +241,7 @@ sub get_path {
 
 =item my $name = $msg->get_destination
 
-Retrieves the uniqe or well-known bus name for client intended to be
+Retrieves the unique or well-known bus name for client intended to be
 the recipient of the message. Possibly returns an empty string if
 the message is being broadcast to all clients.
 
@@ -268,7 +268,7 @@ sub get_sender {
 =item my $serial = $msg->get_serial
 
 Retrieves the unique serial number of this message. The number
-is guarenteed unique for as long as the connection over which
+is guaranteed unique for as long as the connection over which
 the message was sent remains open. May return zero, if the message
 is yet to be sent.
 

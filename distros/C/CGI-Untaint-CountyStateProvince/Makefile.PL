@@ -11,12 +11,29 @@ WriteMakefile(
       ? ('LICENSE'=> 'GPL')
       : ()),
     PL_FILES            => {},
-    PREREQ_PM => {
-        'Test::More' => 0.82,	# Need new_ok()
-	'CGI::Untaint' => 0,
+    BUILD_REQUIRES => {
+	'Test::Most' => 0,
+	'Test::More' => 0.82,      # Need new_ok()
 	'Test::NoWarnings' => 0,
-	'Test::Kwalitee' => 0,
+	# 'Test::Kwalitee' => 0,
+    },
+    PREREQ_PM => {
+	'CGI::Untaint' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'CGI-Untaint-CountyStateProvince-*' },
+    META_MERGE		=> {
+    	'meta-spec' => { version => 2 },
+    	resources => {
+    		repository => {
+			type => 'git',
+			url => 'git://github.com/nigelhorne/CGI-Untaint-CountyStateProvince.git',
+			web => 'https://github.com/nigelhorne/CGI-Untaint-CountyStateProvince',
+    		},
+		bugtracker => {
+			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Untaint-CountyStateProvince',
+			mailto => 'bug-CGI-Untaint-CountyStateProvince@rt.cpan.org'
+		}
+	},
+    },
 );

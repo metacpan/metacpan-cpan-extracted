@@ -1,3 +1,6 @@
+0.10
+    - Correct POD and metadata.
+
 0.09
     - Tweak to avoid upsetting CPAN indexer.
 

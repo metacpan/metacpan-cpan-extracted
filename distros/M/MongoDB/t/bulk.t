@@ -222,7 +222,7 @@ for my $method (qw/initialize_ordered_bulk_op initialize_unordered_bulk_op/) {
             for my $k ( sort keys %bad_args ) {
                 like(
                     exception { $bulk->find( {} )->$update( @{ $bad_args{$k} } ) },
-                    qr/argument to $update must be a single hashref, arrayref or Tie::IxHash/,
+                    qr/argument to $update must be a single hashref, arrayref, Tie::IxHash or BSON::Array/,
                     "$update( $k ) throws an error"
                 );
             }
@@ -381,7 +381,7 @@ for my $method (qw/initialize_ordered_bulk_op initialize_unordered_bulk_op/) {
         for my $k ( sort keys %bad_args ) {
             like(
                 exception { $bulk->find( {} )->replace_one( @{ $bad_args{$k} } ) },
-                qr/argument to replace_one must be a single hashref, arrayref or Tie::IxHash/,
+                qr/argument to replace_one must be a single hashref, arrayref, Tie::IxHash or BSON::Array/,
                 "replace_one( $k ) throws an error"
             );
         }
@@ -996,7 +996,7 @@ subtest "unordered batch with errors" => sub {
         is( $details->modified_count, ( $server_does_bulk ? 0 : undef ), "modified_count" );
         is( $details->count_write_errors, 3, "writeError count" )
           or diag _truncate explain $details;
-        cmp_deeply( $details->upserted, [ { index => 4, _id => obj_isa("BSON::OID") }, ],
+        cmp_deeply( $details->upserted, [ { index => 2, _id => obj_isa("BSON::OID") }, ],
             "upsert list" );
     }
     else {
@@ -1011,8 +1011,8 @@ subtest "unordered batch with errors" => sub {
         cmp_deeply(
             $details->upserted,
             [
-                { index => num(0), _id => obj_isa("BSON::OID") },
-                { index => num(1), _id => obj_isa("BSON::OID") },
+                { index => 1, _id => obj_isa("BSON::OID") },
+                { index => 2, _id => obj_isa("BSON::OID") },
             ],
             "upsert list"
         );
@@ -1062,7 +1062,7 @@ subtest "ordered batch with errors" => sub {
     cmp_deeply(
         $details->write_errors->[0]{op},
         {
-            q => methods(['FETCH','b'] => 2 ),
+            q => methods(['FETCH','b'] => 3 ),
             u => obj_isa( $server_does_bulk ? 'BSON::Raw' : 'Tie::IxHash' ),
             multi  => false,
             upsert => true,

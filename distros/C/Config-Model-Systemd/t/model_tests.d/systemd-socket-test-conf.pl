@@ -8,12 +8,11 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 # systemd tests for user
+use strict;
+use warnings;
 
-# can be removed once Config::model::tester 3.002 is out
-$model_to_test = "Systemd::Socket";
-
-# list of tests. This modules looks for @tests global variable
-@tests = (
+# list of tests.
+my @tests = (
     {
         name => 'basic-socket',
         config_file => 'gmail-imap-tunnel.socket',
@@ -29,4 +28,4 @@ $model_to_test = "Systemd::Socket";
     },
 );
 
-1; # to keep Perl happy
+return { tests => \@tests } ;

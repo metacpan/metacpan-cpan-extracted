@@ -3,6 +3,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use Getopt::Long;
 use Pod::Usage;
@@ -43,9 +44,11 @@ App::RetroPAN::make_minicpan($opt_dir, $dists_required, $dist_to_url);
 
 exit 0;
 
+=encoding utf8
+
 =head1 NAME
 
-retropan - Makes a historic minicpan E<9203>
+retropan - Makes a historic minicpan ⏳
 
 =head1 SYNOPSIS
 

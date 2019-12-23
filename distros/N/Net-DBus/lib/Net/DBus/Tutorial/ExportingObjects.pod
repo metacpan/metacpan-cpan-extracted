@@ -157,7 +157,7 @@ are both simple strings we could stop there. In some cases, however, one
 might want to be more specific about data types expected for parameters,
 for example signed vs unsigned integers. Adding explicit data typing also
 makes interaction with other programming languages more reliable. Providing
-explicit data type defintions for exported method is known in the DBus world
+explicit data type definitions for exported method is known in the DBus world
 as C<Introspection>, and it makes life much more reliable for users of one's
 service whom may be using a strongly typed language such as C.
 
@@ -183,7 +183,7 @@ C<dbus_method> for this purpose, which takes three parameter, the name of the
 method being exported, an array reference of parameter types, and an array
 reference of return types (the latter can be omitted if there are no return
 values). This can be called at any point in the module's code, but by convention
-it is preferrable to associate calls to C<dbus_method> with the actual method
+it is preferable to associate calls to C<dbus_method> with the actual method
 implementation, thus:
 
   dbus_method("register_backend", ["string", "string"]);
@@ -301,7 +301,7 @@ on the bus attempts to call a method, or register a signal
 handler against, a service not currently running, it will first
 try and start the service. Service's which wish to participate
 in this process merely need stick a simple service definition
-file into the directoy C</usr/share/dbus-1/services>. The file
+file into the directory C</usr/share/dbus-1/services>. The file
 should be named to match the service name, with the file extension
 C<.service> appended. eg, C</usr/share/dbus-1/services/org.cpan.music.player.service>
 The file contains two keys, first the name of the service, and

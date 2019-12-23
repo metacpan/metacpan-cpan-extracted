@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2014,2015,2017,2018 Slaven Rezic. All rights reserved.
+# Copyright (C) 2014,2015,2017,2018,2019 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -13,7 +13,7 @@
 
 package Map::Metro::Plugin::Map::Berlin {
 
-    our $VERSION = '2018.1209';
+    our $VERSION = '2019.1215';
 
     use Moose;
     use File::ShareDir 'dist_dir';

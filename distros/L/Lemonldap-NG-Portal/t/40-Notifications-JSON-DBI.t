@@ -3,9 +3,9 @@ use strict;
 use IO::String;
 
 my $res;
-my $maintests = 9;
+my $maintests = 10;
 require 't/test-lib.pm';
-my $file      = tempdb();
+my $file = tempdb();
 
 SKIP: {
     eval { require DBI; require DBD::SQLite; };
@@ -28,7 +28,7 @@ q{INSERT INTO notifications VALUES ('dwho','testref','2016-05-30 00:00:00',?,nul
   "title": "Test title",
   "subtitle": "Test subtitle",
   "text": "This is a test text",
-  "check": ["Accept test"]
+  "check": "Accept test"
 }
 ]'
     );
@@ -40,9 +40,57 @@ q{INSERT INTO notifications VALUES ('dwho','testref2','2016-05-30 00:00:00',?,nu
   "uid": "dwho",
   "date": "2016-05-29",
   "reference": "testref2",
+  "condition": "$env->{REMOTE_ADDR} =~ /127.0.0.1/",
   "title": "Test2 title",
   "subtitle": "Test2 subtitle",
   "text": "This is a second test text",
+  "check": ["Accept test","I am sure"]
+}
+]'
+    );
+    $dbh->prepare(
+q{INSERT INTO notifications VALUES ('dwho','testref3','2050-05-30 00:00:00',?,null,null)}
+    )->execute(
+        '[
+{
+  "uid": "dwho",
+  "date": "2050-05-30",
+  "reference": "testref3",
+  "condition": "\'0\'",
+  "title": "Test title",
+  "subtitle": "Test subtitle",
+  "text": "This is a test text",
+  "check": ["Accept test"]
+}
+]'
+    );
+    $dbh->prepare(
+q{INSERT INTO notifications VALUES ('rtyler','testref','2016-05-30 00:00:00',?,null,null)}
+    )->execute(
+        '[
+{
+  "uid": "rtyler",
+  "date": "2016-05-29",
+  "reference": "testref",
+  "condition": "$env->{REMOTE_ADDR} =~ /127.1.1.1/",
+  "title": "Test title",
+  "subtitle": "Test subtitle",
+  "text": "This is a test text",
+  "check": ["Accept test"]
+}
+]'
+    );
+    $dbh->prepare(
+q{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00',?,null,null)}
+    )->execute(
+        '[
+{
+  "uid": "rtyler",
+  "date": "2050-05-16",
+  "reference": "testref2",
+  "title": "Test title",
+  "subtitle": "Test subtitle",
+  "text": "This is a test text",
   "check": ["Accept test"]
 }
 ]'
@@ -114,7 +162,7 @@ q{INSERT INTO notifications VALUES ('dwho','testref2','2016-05-30 00:00:00',?,nu
 
     # Try to validate notifications
     $str =
-'reference1x1=testref&check1x1x1=accepted&reference1x2=testref2&check1x2x1=accepted&url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==';
+'reference1x1=testref&check1x1x1=accepted&reference1x2=testref2&check1x2x1=accepted&check1x2x2=accepted&url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==';
     ok(
         $res = $client->_post(
             '/notifback',
@@ -131,6 +179,7 @@ q{INSERT INTO notifications VALUES ('dwho','testref2','2016-05-30 00:00:00',?,nu
         !defined( $cookies->{lemonldappdata} ),
         " Make sure no pdata is returned"
     );
+    $client->logout($id);
 
     # Verify that notification was tagged as 'done'
     my $sth =
@@ -140,10 +189,25 @@ q{INSERT INTO notifications VALUES ('dwho','testref2','2016-05-30 00:00:00',?,nu
     while ( $sth->fetchrow_hashref ) { $i++ }
     ok( $i == 2, 'Notification was deleted' );
 
+    # Try to authenticate
+    # -------------------
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new(
+'user=rtyler&password=rtyler&url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw=='
+            ),
+            accept => 'text/html',
+            length => 68,
+        ),
+        'Auth query'
+    );
+    expectRedirection( $res, 'http://test1.example.com/' );
+    $id = expectCookie($res);
+    $client->logout($id);
+
     clean_sessions();
-
     eval { unlink $file };
-
 }
 
 count($maintests);

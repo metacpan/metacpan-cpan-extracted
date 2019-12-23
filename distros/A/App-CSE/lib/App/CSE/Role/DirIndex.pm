@@ -1,5 +1,5 @@
 package App::CSE::Role::DirIndex;
-$App::CSE::Role::DirIndex::VERSION = '0.014';
+$App::CSE::Role::DirIndex::VERSION = '0.015';
 use Moose::Role;
 # Factorizing dir_index command property.
 #

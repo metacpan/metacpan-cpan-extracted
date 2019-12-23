@@ -1,0 +1,74 @@
+NAME
+    Acme::CPANModules::EscapingAndQuoting - Various modules that
+    escape/quote data to make it safe
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::EscapingAndQuoting (from Perl distribution
+    Acme-CPANModules-EscapingAndQuoting), released on 2019-12-23.
+
+DESCRIPTION
+    Various modules that escape/quote data to make it safe.
+
+INCLUDED MODULES
+    *   HTML::Entities
+
+    *   URI::Escape
+
+        Alternate modules: URI::Escape::XS
+
+    *   String::PodQuote
+
+    *   String::ShellQuote
+
+        Alternate modules: Win32::ShellQuote, ShellQuote::Any,
+        ShellQuote::Any::Tiny
+
+    *   String::ShellQuote
+
+    *   String::Escape
+
+    *   String::JS
+
+    *   Unicode::Escape
+
+    *   TeX::Encode
+
+    *   String::PerlQuote
+
+    *   MIME::Base64
+
+    *   Data::Clean
+
+    *   Data::Clean::ForJSON
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-EscapingAndQuoting>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-EscapingAndQuoting>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Esca
+    pingAndQuoting>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

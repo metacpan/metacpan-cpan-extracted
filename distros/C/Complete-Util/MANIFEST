@@ -16,5 +16,6 @@ t/combine_answers.t
 t/complete_array_elem.t
 t/complete_comma_sep.t
 t/complete_hash_key.t
+t/modify_answer.t
 t/release-rinci.t
 weaver.ini

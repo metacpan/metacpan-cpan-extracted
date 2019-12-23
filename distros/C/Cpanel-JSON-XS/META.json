@@ -3,8 +3,8 @@
    "author" : [
       "Reini Urban <rurban@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 8.3508, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,6 +32,10 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Math::BigFloat" : "1.16",
+            "Math::BigInt" : "0"
+         },
          "requires" : {
             "Carp" : "0",
             "Encode" : "1.9801",
@@ -49,14 +53,37 @@
             "Config" : "0",
             "Data::Dumper" : "0",
             "Devel::Peek" : "0",
+            "Encode" : "1.9801",
             "POSIX" : "0",
             "Test" : "0",
             "Test::More" : "0",
             "Tie::Array" : "0",
             "Tie::Hash" : "0",
+            "Time::Piece" : "0",
             "charnames" : "0",
             "lib" : "0",
             "utf8" : "0"
+         },
+         "suggests" : {
+            "Class::XSAccessor" : "0",
+            "JSON" : "0",
+            "JSON::PP" : "0",
+            "JSON::XS" : "0",
+            "List::MoreUtils" : "0",
+            "Mojo::JSON" : "6.11",
+            "Perl::MinimumVersion" : "1.20",
+            "Pod::Spell::CommonMistakes" : "0",
+            "Test::CPAN::Changes" : "0.40",
+            "Test::CPAN::Meta" : "0.12",
+            "Test::CheckChanges" : "1.14",
+            "Test::Kwalitee" : "0",
+            "Test::LeakTrace" : "0",
+            "Test::MinimumVersion" : "0.008",
+            "Test::Pod" : "1.00",
+            "Test::Pod::Coverage" : "1.04",
+            "Test::Spelling" : "0",
+            "Text::CSV_XS" : "0",
+            "common::sense" : "3.5"
          }
       }
    },
@@ -69,10 +96,11 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
+         "type" : "git",
          "url" : "https://github.com/rurban/Cpanel-JSON-XS"
       }
    },
-   "version" : "4.17",
+   "version" : "4.18",
    "x_contributors" : [
       "Ashley Willis <ashleyw@cpan.org>",
       "Chip Salzenberg <chip@pobox.com>",
@@ -99,5 +127,5 @@
       "Syohei Yoshida <syohex@gmail.com>",
       "tevfik1903 <tevfik1903@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001_04"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

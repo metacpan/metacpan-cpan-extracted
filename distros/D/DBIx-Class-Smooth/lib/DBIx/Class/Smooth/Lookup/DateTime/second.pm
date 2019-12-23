@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Lookup::DateTime::second;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0101';
+our $VERSION = '0.0102';
 
 use parent 'DBIx::Class::Smooth::Lookup::DateTime::datepart';
 use experimental qw/signatures postderef/;
@@ -29,7 +29,7 @@ DBIx::Class::Smooth::Lookup::DateTime::second - Short intro
 
 =head1 VERSION
 
-Version 0.0101, released 2018-11-29.
+Version 0.0102, released 2019-12-22.
 
 =head1 SOURCE
 

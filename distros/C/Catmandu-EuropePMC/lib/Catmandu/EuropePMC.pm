@@ -1,7 +1,7 @@
 package Catmandu::EuropePMC;
 
 
-our $VERSION = '1.01';
+our $VERSION = '1.011';
 
 1;
 __END__
@@ -12,29 +12,11 @@ __END__
 
 Catmandu::EuropePMC - A bundle of Catmandu modules for working with data from EuropePMC
 
-=head1 STATUS
+=head1 DESCRIPTION
 
-=begin markdown
+DEPRECATED!
 
-[![Build Status](https://travis-ci.org/LibreCat/Catmandu-EuropePMC.svg?branch=master)](https://travis-ci.org/LibreCat/Catmandu-EuropePMC)
-[![Test Coverage](https://coveralls.io/repos/LibreCat/Catmandu-EuropePMC/badge.png?branch=master)](https://coveralls.io/r/LibreCat/Catmandu-EuropePMC)
-[![CPANTS](http://cpants.cpanauthors.org/dist/Catmandu-EuropePMC.png)](http://cpants.cpanauthors.org/dist/Catmandu-EuropePMC)
-
-=end markdown
-
-=head1 MODULES
-
-=over
-
-=item *
-
-L<Catmandu::Importer::EuropePMC>
-
-=item *
-
-L<Catmandu::Fix::epmc_dbLinks>
-
-=back
+For alternatives see e.g. L<Catmandu::Importer::getJSON>.
 
 =head1 AUTHOR
 

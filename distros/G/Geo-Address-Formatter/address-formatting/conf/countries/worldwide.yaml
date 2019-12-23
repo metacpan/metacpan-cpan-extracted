@@ -247,7 +247,7 @@ AE:
         {{#first}} {{{state_district}}} || {{{state}}} {{/first}}
         {{{country}}}
 
-# Afghanistan 
+# Afghanistan
 AF:
     address_template: *generic21
 
@@ -530,7 +530,7 @@ CN:
         {{{house_number}}} {{{road}}} 
         {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
         {{{county}}}
-        {{#first}} {{{city}}} || {{{town}}} || {{{state_district}}} || {{{village}}} {{/first}} {{#first}} {{{state_code}}} || {{{state}}} {{/first}} {{{postcode}}} 
+        {{{postcode}}} {{#first}} {{{state_code}}} || {{{state}}} || {{{city}}} || {{{town}}} || {{{state_district}}} || {{{village}}} {{/first}}         
         {{{country}}}
 
 # China - English
@@ -541,7 +541,7 @@ CN_en:
         {{{house_number}}} {{{road}}} 
         {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
         {{{county}}}
-        {{#first}} {{{city}}} || {{{town}}} || {{{state_district}}} || {{{village}}} {{/first}} {{#first}} {{{state_code}}} || {{{state}}} {{/first}} {{{postcode}}} 
+        {{{postcode}}} {{#first}} {{{state_code}}} || {{{state}}} || {{{city}}} || {{{town}}} || {{{state_district}}} || {{{village}}} {{/first}} 
         {{{country}}}
 
 # China - Chinese
@@ -669,6 +669,8 @@ DO:
     postformat_replace:
         - [", Distrito Nacional",", DN"]
 
+
+
 # Algeria
 DZ:
     address_template: *generic3
@@ -726,8 +728,7 @@ FJ:
 # Falkland Islands
 FK: 
     use_country: GB
-    change_country: United Kingdom
-    add_component: county=Falkland Islands
+    change_country: Falkland Islands, United Kingdom
 
 # Federated States of Micronesia
 FM: 
@@ -980,8 +981,8 @@ IQ:
     address_template: |
         {{{attention}}}
         {{{house}}}
-        {{{city_district}}} 
-        {{{house_number}}} {{{road}}}
+        {{{house_number}}} {{#first}} {{{neighbourhood}}} || {{{city_district}}} || {{{suburb}}} {{/first}}
+        {{{road}}}         
         {{#first}} {{{city}}} || {{{town}}} || {{{state}}} || {{{village}}} {{/first}}
         {{{postcode}}}
         {{{country}}}
@@ -1287,7 +1288,7 @@ MG:
         {{{postcode}}} {{#first}} {{{city}}} || {{{town}}} || {{{village}}} {{/first}} 
         {{{country}}}
 
-# Macedonia
+# North Macedonia
 MK:
     address_template: *generic1
 

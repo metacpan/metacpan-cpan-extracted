@@ -9,7 +9,7 @@ winja is a module which works only on Win32-Japanese-Edition
 This module works to deal with file path which contains
 multibytes letter including 0x5C byte correctly.
 
-See `winja::JP`(described in Japanese) for details.
+See [winja::JP](https://metacpan.org/pod/winja%3A%3AJP)(described in Japanese) for details.
 
 This module is unnecessary for users besides Win32-Japanese-Edition.
 
@@ -19,7 +19,7 @@ Even if you forcibly install this module on non-MSWin32 OS or MSWin32 which is n
 
 # AUTHOR
 
-kpee  `<kpee.cpanx@gmail.com>`
+KPEE <kpee.cpanx@gmail.com>
 
 # LICENCE AND COPYRIGHT
 

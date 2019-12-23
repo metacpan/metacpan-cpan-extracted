@@ -1,5 +1,5 @@
 ---
-abstract: 'Require that keys exist when getting cached values or throw'
+abstract: 'Limit get to keys that exist and prevent calls to set'
 author:
   - 'Adam Hopkins <srchulo@cpan.org>'
 build_requires:
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/srchulo/Mojo-Cache-Role-Strict/issues
   homepage: https://github.com/srchulo/Mojo-Cache-Role-Strict
   repository: https://github.com/srchulo/Mojo-Cache-Role-Strict.git
-version: '0.02'
+version: '0.04'
 x_contributors:
   - 'Adam Hopkins <violapiratejunky@gmail.com>'
 x_generated_by_perl: v5.30.0

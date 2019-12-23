@@ -277,7 +277,7 @@ sub ansi_pair {
 		EL . RESET;
 	    }
 	} else {
-	    RESET . EL;
+	    RESET;
 	}
     };
     ($start, $end);
@@ -439,7 +439,7 @@ This is an example of labeled list:
 Each color definitions are separated by comma (C<,>) and label is
 specified by I<LABEL=> style precedence.  Multiple labels can be set
 for same value by connecting them together.  Label name can be
-specified with C<*> and C<?> wild characters.
+specified with C<*> and C<?> wildcard characters.
 
 If the color spec start with plus (C<+>) mark with labeled list
 format, it is appended to the current value with reset mark (C<^>).

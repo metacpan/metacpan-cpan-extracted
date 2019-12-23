@@ -83,6 +83,7 @@ t/22_get_room_member_profile.t
 t/41_event.t
 t/42_create_events_by_api.t
 t/51_issue_link_token.t
+t/52_download_rich_menu_image.t
 t/52_rich_menu.t
 t/52_rich_menu_response.t
 t/52_upload_rich_menu_image.t

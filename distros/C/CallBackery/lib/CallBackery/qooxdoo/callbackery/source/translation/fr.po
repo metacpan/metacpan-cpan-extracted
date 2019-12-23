@@ -105,14 +105,3 @@ msgstr ""
 #: callbackery/ui/plugin/Html.js:54
 msgid "Loading HTML Data"
 msgstr ""
-
-#~ msgid "%1 (Error Code %2)%3"
-#~ msgstr ""
-
-#~ msgid "Created by OETIKER+PARTNER AG, #VERSION#, #DATE#"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "release %1, %2<br/>created by <a href=\"http://www.oetiker.ch/\" "
-#~ "style=\"color: #444;\" target=\"o+p\">OETIKER+PARTNER AG</a>"
-#~ msgstr ""

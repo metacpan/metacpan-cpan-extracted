@@ -3,19 +3,7 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
-
-use constant _has_current_sub => $^V ge v5.16.0;
-
-use if _has_current_sub(), feature => 'current_sub';
-
-use constant {
-
-    # These aren’t actually defined.
-    _RESOLUTION_CLASS => 'Promise::ES6::_RESOLUTION',
-    _REJECTION_CLASS => 'Promise::ES6::_REJECTION',
-    _PENDING_CLASS => 'Promise::ES6::_PENDING',
-};
+our $VERSION = '0.15';
 
 =encoding utf-8
 
@@ -24,8 +12,6 @@ use constant {
 Promise::ES6 - ES6-style promises in Perl
 
 =head1 SYNOPSIS
-
-    $Promise::ES6::DETECT_MEMORY_LEAKS = 1;
 
     my $promise = Promise::ES6->new( sub {
         my ($resolve_cr, $reject_cr) = @_;
@@ -53,8 +39,9 @@ for coordinating asynchronous tasks.
 
 Unlike most other promise implementations on CPAN, this module
 mimics ECMAScript 6’s L<Promise|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise>
-class. As the SYNOPSIS above shows, you can thus use patterns from JavaScript
-in Perl with only minimal changes needed to accommodate language syntax.
+interface. As the SYNOPSIS above shows, you can thus use patterns from
+JavaScript in Perl with only minimal changes needed to accommodate language
+syntax.
 
 This is a rewrite of an earlier module, L<Promise::Tiny>. It fixes several
 bugs and superfluous dependencies in the original.
@@ -68,6 +55,18 @@ not a list.
 
 =item * Unhandled rejections are reported via C<warn()>. (See below
 for details.)
+
+=item * The Promises/A+ test suite avoids testing the case where an “executor”
+function’s resolve callback itself receives another promise, e.g.:
+
+    my $p = Promise::ES6->new( sub ($res) {
+        $res->( Promise::ES6->resolve(123) );
+    } );
+
+What will $p’s resolution value be? 123, or the promise that wraps it?
+
+This module favors conformity with the ES6 standard, which
+L<indicates intent|https://www.ecma-international.org/ecma-262/6.0/#sec-promise-executor> that $p’s resolution value be 123.
 
 =back
 
@@ -131,12 +130,13 @@ have to implement it yourself. Two ways of doing this are:
 
 =over
 
-=item * Subclass Promise::ES6 and provide cancellation logic in your
+=item * Subclass Promise::ES6 and provide cancellation logic in that
 subclass. See L<DNS::Unbound::AsyncQuery>’s implementation for an
 example of this.
 
-=item * Implement the cancellation on the object that creates your promises.
-This is probably the more straightforward approach but requires that there
+=item * Implement the cancellation on a request object that your
+“promise-creator” also consumes. This is probably the more straightforward
+approach but requires that there
 be some object or ID besides the promise that uniquely identifies the action
 to be canceled. See L<Net::Curl::Promiser> for an example of this approach.
 
@@ -160,8 +160,22 @@ process’s global destruction, a warning is triggered.
 
 =item * If your application needs recursive promises (e.g., to poll
 iteratively for completion of a task), the C<current_sub> feature (i.e.,
-C<__SUB__>) may help you avoid memory leaks. (See this module’s source code
-for a substitute that works with pre-5.16 perls.)
+C<__SUB__>) may help you avoid memory leaks. In Perl versions that don’t
+support this feature you can imitate it thus:
+
+    use constant _has_current_sub => $^V ge v5.16.0;
+
+    use if _has_current_sub(), feature => 'current_sub';
+
+    my $cb;
+    $cb = sub {
+        my $current_sub = do {
+            no strict 'subs';
+            _has_current_sub() ? __SUB__ : eval '$cb';
+        };
+    }
+
+Of course, it’s better if you can avoid doing that. :)
 
 =item * Garbage collection before Perl 5.18 seems to have been buggy.
 If you work with such versions and end up chasing leaks,
@@ -206,315 +220,139 @@ This library is licensed under the same terms as Perl itself.
 
 =cut
 
-our $DETECT_MEMORY_LEAKS;
-
-# "$value_sr" => $value_sr
-our %_UNHANDLED_REJECTIONS;
-
-sub new {
-    my ($class, $cr) = @_;
-
-    die 'Need callback!' if !$cr;
-
-    my $value;
-    my $value_sr = bless \$value, _PENDING_CLASS();
-
-    my @children;
-
-    my $self = bless {
-        _pid => $$,
-        _children => \@children,
-        _value_sr => $value_sr,
-        _detect_leak => $DETECT_MEMORY_LEAKS,
-    }, $class;
-
-    my $suppress_unhandled_rejection_warning = 1;
-
-    # NB: These MUST NOT refer to $self, or else we can get memory leaks
-    # depending on how $resolver and $rejector are used.
-    my $resolver = sub {
-        $$value_sr = $_[0];
-        bless $value_sr, _RESOLUTION_CLASS();
-        _propagate_if_needed( $value_sr, \@children );
-    };
-
-    my $rejecter = sub {
-        $$value_sr = $_[0];
-        bless $value_sr, _REJECTION_CLASS();
-
-        if (!$suppress_unhandled_rejection_warning) {
-            $_UNHANDLED_REJECTIONS{$value_sr} = $value_sr;
-        }
-
-        _propagate_if_needed( $value_sr, \@children );
-    };
-
-    local $@;
-    if ( !eval { $cr->( $resolver, $rejecter ); 1 } ) {
-        $$value_sr = $@;
-        bless $value_sr, _REJECTION_CLASS();
-
-        $_UNHANDLED_REJECTIONS{$value_sr} = $value_sr;
-    }
-
-    $suppress_unhandled_rejection_warning = 0;
-
-    return $self;
-}
-
-sub _propagate_if_needed {
-    my ($value_sr, $children_ar) = @_;
-
-    # Avoid creating the closure if we can:
-    if (@$children_ar || _is_promise($$value_sr)) {
-
-        my $cb;
-        $cb = sub {
-            my ($repromise_value_sr) = @_;
-
-            if ( _is_promise($$repromise_value_sr) ) {
-
-                # Accommodate Perl versions whose $@ handling is buggy
-                # by forgoing local():
-                my $old_err = $@;
-
-                my $current_sub = do {
-                    no strict 'subs';
-
-                    # The eval here mimics the “current_sub” feature:
-                    # a reference to the current subroutine
-                    # without actually closing on that reference.
-                    # This helps to prevent memory leaks.
-                    _has_current_sub() ? __SUB__ : eval '$cb';
-                };
-
-                $@ = $old_err;
-
-                my $in_reprom = $$repromise_value_sr->then(
-                    sub { $current_sub->( bless \do {my $v = $_[0]}, _RESOLUTION_CLASS ) },
-                    sub { $current_sub->( bless \do {my $v = $_[0]}, _REJECTION_CLASS ) },
-                );
-            }
-            else {
-                $$value_sr = $$repromise_value_sr;
-                bless $value_sr, ref($repromise_value_sr);
-
-                # It may not be necessary to empty out @$children_ar, but
-                # let’s do so anyway so Perl will delete references ASAP.
-                # It’s safe to do so because from here on $value_sr is
-                # no longer a pending value.
-                for my $subpromise (splice @$children_ar) {
-                    $subpromise->_finish($value_sr);
-                }
-            }
-        };
-
-        $cb->($value_sr);
-    }
-
-    return;
-}
-
-sub then {
-    my ($self, $on_resolve, $on_reject) = @_;
-
-    my $value_sr = bless( \do{ my $v }, _PENDING_CLASS() );
-
-    my $new = {
-        _pid => $$,
-
-        _value_sr => $value_sr,
-        _children => [],
-
-        _on_finish => [ $on_resolve, $on_reject ],
-
-        _detect_leak => $DETECT_MEMORY_LEAKS,
-    };
-
-    bless $new, (ref $self);
-
-    if ($self->_is_completed()) {
-        $new->_finish( $self->{'_value_sr'} );
-    }
-    else {
-        push @{ $self->{'_children'} }, $new;
-    }
-
-    return $new;
-}
-
-sub catch { return $_[0]->then( undef, $_[1] ) }
-
-sub finally {
-    my ($self, $todo_cr) = @_;
-
-    return $self->then( $todo_cr, $todo_cr );
-}
-
-sub _is_completed {
-    return !$_[0]{'_value_sr'}->isa( _PENDING_CLASS() );
-}
-
-sub _finish {
-    my ($self, $value_sr) = @_;
-
-    die "$self already finished!" if $self->_is_completed();
-
-    local $@;
-
-    # A promise that new() created won’t have on-finish callbacks,
-    # but a promise that came from then/catch/finally will.
-    # It’s a good idea to delete _on_finish in order to trigger garbage
-    # collection as soon and as reliably as possible. It’s safe to do so
-    # because _finish() is only called once.
-    my $callback = delete $self->{'_on_finish'};
-
-    $callback &&= $callback->[ $value_sr->isa( _REJECTION_CLASS() ) ? 1 : 0 ];
-
-    # Only needed when catching, but the check would be more expensive
-    # than just always deleting. So, hey.
-    delete $_UNHANDLED_REJECTIONS{$value_sr};
-
-    if ($callback) {
-        my ($new_value);
-
-        if ( eval { $new_value = $callback->($$value_sr); 1 } ) {
-            # bless $self->{'_value_sr'}, _RESOLUTION_CLASS();
-            bless $self->{'_value_sr'}, _RESOLUTION_CLASS() if !_is_promise($new_value);
-        }
-        else {
-            bless $self->{'_value_sr'}, _REJECTION_CLASS();
-            $_UNHANDLED_REJECTIONS{ $self->{'_value_sr'} } = $self->{'_value_sr'};
-            $new_value = $@;
-        }
-
-        ${ $self->{'_value_sr'} } = $new_value;
-    }
-    else {
-        bless $self->{'_value_sr'}, ref($value_sr);
-        ${ $self->{'_value_sr'} } = $$value_sr;
-
-        if ($value_sr->isa( _REJECTION_CLASS())) {
-            $_UNHANDLED_REJECTIONS{ $self->{'_value_sr'} } = $self->{'_value_sr'};
-        }
-    }
-
-    _propagate_if_needed(
-        @{$self}{ qw( _value_sr  _children ) },
-    );
-
-    return;
-}
-
 #----------------------------------------------------------------------
 
-sub resolve {
-    my ($class, $value) = @_;
+our $DETECT_MEMORY_LEAKS;
 
-    return $class->new(sub {
-        my ($resolve, undef) = @_;
-        $resolve->($value);
-    });
+sub catch { $_[0]->then( undef, $_[1] ) }
+
+sub finally { $_[0]->then( $_[1], $_[1] ) }
+
+sub resolve {
+    my ( $class, $value ) = @_;
+
+    $class->new( sub { $_[0]->($value) } );
 }
 
 sub reject {
-    my ($class, $reason) = @_;
+    my ( $class, $reason ) = @_;
 
-    return $class->new(sub {
-        my (undef, $reject) = @_;
-        $reject->($reason);
-    });
+    $class->new( sub { $_[1]->($reason) } );
 }
 
 sub all {
-    my ($class, $iterable) = @_;
-    my @promises = map { _is_promise($_) ? $_ : $class->resolve($_) } @$iterable;
+    my ( $class, $iterable ) = @_;
+    my @promises = map { UNIVERSAL::isa( $_, __PACKAGE__ ) ? $_ : $class->resolve($_) } @$iterable;
 
-    my @value_srs = map { $_->{_value_sr} } @promises;
+    my @values;
 
-    return $class->new(sub {
-        my ($resolve, $reject) = @_;
-        my $unresolved_size = scalar(@promises);
+    return $class->new(
+        sub {
+            my ( $resolve, $reject ) = @_;
+            my $unresolved_size = scalar(@promises);
 
-        if ($unresolved_size) {
-            for my $promise (@promises) {
-                my $new = $promise->then(
-                    sub {
-                        $unresolved_size--;
-                        if ($unresolved_size <= 0) {
-                            $resolve->([ map { $$_ } @value_srs ]);
-                        }
-                    },
-                    $reject,
-                );
+            my $settled;
+
+            if ($unresolved_size) {
+                my $p = 0;
+
+                for my $promise (@promises) {
+                    my $p = $p++;
+
+                    my $new = $promise->then(
+                        sub {
+                            return if $settled;
+
+                            $values[$p] = $_[0];
+
+                            $unresolved_size--;
+                            return if $unresolved_size > 0;
+
+                            $settled = 1;
+                            $resolve->( \@values );
+                        },
+                        sub {
+
+                            # Needed because we might get multiple failures:
+                            return if $settled;
+
+                            $settled = 1;
+                            $reject->(@_);
+                        },
+                    );
+                }
+            }
+            else {
+                $resolve->( [] );
             }
         }
-        else {
-            $resolve->([]);
-        }
-    });
+    );
 }
 
 sub race {
-    my ($class, $iterable) = @_;
-    my @promises = map { _is_promise($_) ? $_ : $class->resolve($_) } @$iterable;
+    my ( $class, $iterable ) = @_;
+    my @promises = map { UNIVERSAL::isa( $_, __PACKAGE__ ) ? $_ : $class->resolve($_) } @$iterable;
 
-    my ($resolve, $reject);
+    my ( $resolve, $reject );
 
     # Perl 5.16 and earlier leak memory when the callbacks are handled
     # inside the closure here.
-    my $new = $class->new(sub {
-        ($resolve, $reject) = @_;
-    } );
+    my $new = $class->new(
+        sub {
+            ( $resolve, $reject ) = @_;
+        }
+    );
 
     my $is_done;
 
     for my $promise (@promises) {
         last if $is_done;
 
-        $promise->then(sub {
-            return if $is_done;
-            $is_done = 1;
+        $promise->then(
+            sub {
+                return if $is_done;
+                $is_done = 1;
 
-            $resolve->($_[0]);
+                $resolve->( $_[0] );
 
-            # Proactively eliminate references:
-            $resolve = $reject = undef;
-        }, sub {
-            return if $is_done;
-            $is_done = 1;
+                # Proactively eliminate references:
+                $resolve = $reject = undef;
+            },
+            sub {
+                return if $is_done;
+                $is_done = 1;
 
-            $reject->($_[0]);
+                $reject->( $_[0] );
 
-            # Proactively eliminate references:
-            $resolve = $reject = undef;
-        });
+                # Proactively eliminate references:
+                $resolve = $reject = undef;
+            }
+        );
     }
 
     return $new;
 }
 
-sub _is_promise {
-    local $@;
-    return eval { $_[0]->isa(__PACKAGE__) };
-}
+#----------------------------------------------------------------------
 
-sub DESTROY {
-    return if $$ != $_[0]{'_pid'};
+my $loaded_backend;
 
-    if ($_[0]{'_detect_leak'} && ${^GLOBAL_PHASE} && ${^GLOBAL_PHASE} eq 'DESTRUCT') {
-        warn(
-            ('=' x 70) . "\n"
-            . 'XXXXXX - ' . ref($_[0]) . " survived until global destruction; memory leak likely!\n"
-            . ("=" x 70) . "\n"
-        );
+BEGIN {
+    # Put this block at the end so that the backend module
+    # can override any of the above.
+
+    return if $loaded_backend;
+
+    $loaded_backend = 1;
+
+    # These don’t exist yet but will:
+    if (0 && !$ENV{'PROMISE_ES6_PP'} && eval { require Promise::ES6::XS }) {
+        require Promise::ES6::Backend::XS;
     }
 
-    if ($_[0]{'_value_sr'}) {
-        if (my $value_sr = delete $_UNHANDLED_REJECTIONS{ $_[0]{'_value_sr'} }) {
-            my $ref = ref $_[0];
-            warn "$ref: Unhandled rejection: $$value_sr";
-        }
+    # Fall back to pure Perl:
+    else {
+        require Promise::ES6::Backend::PP;
     }
 }
 

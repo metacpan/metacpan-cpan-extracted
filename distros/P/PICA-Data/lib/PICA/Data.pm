@@ -2,11 +2,12 @@ package PICA::Data;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
-    pica_values pica_value pica_fields pica_holdings pica_items pica_guess);
+    pica_match pica_values pica_value pica_fields pica_holdings pica_items 
+    pica_guess);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]); 
 
 our $ILN_PATH = PICA::Path->new('101@a');
@@ -17,6 +18,16 @@ use Scalar::Util qw(reftype blessed);
 use List::Util qw(first);
 use IO::Handle;
 use PICA::Path;
+
+sub pica_match {
+    my ($record, $path, %args) = @_;
+
+    $path = eval { PICA::Path->new($path) } unless ref $path;
+    return unless ref $path;
+
+    return $path->match_record($record, %args);
+}
+
 
 sub pica_values {
     my ($record, $path) = @_;
@@ -128,11 +139,12 @@ sub pica_holdings {
     return \@holdings;
 }
 
-*values   = *pica_values;
-*value    = *pica_value;
 *fields   = *pica_fields;
 *holdings = *pica_holdings;
 *items    = *pica_items;
+*match    = *pica_match;
+*value    = *pica_value;
+*values   = *pica_values;
 
 use PICA::Parser::XML;
 use PICA::Parser::Plus;
@@ -267,6 +279,7 @@ PICA::Data - PICA record processing
         
         # function accessors
         my $ppn      = pica_value($record, '003@0');
+        my $ppn      = pica_match($record, '045Ue', split => 1, nested_array => 1);
         my $holdings = pica_holdings($record);
         my $items    = pica_items($record);
         ...
@@ -274,6 +287,7 @@ PICA::Data - PICA record processing
         # object accessors (if parser option 'bless' enabled)
         my $ppn      = $record->{_id};
         my $ppn      = $record->value('003@0');
+        my $ddc      = $record->match('045Ue', split => 1, nested_array => 1);
         my $holdings = $record->holdings;
         my $items    = $record->items;
         ...
@@ -413,6 +427,14 @@ L<PICA::Writer::PPXML> for type C<ppxml> (PicaPlus-XML)
 
 Equivalent to L<PICA::Path>-E<gt>new($path).
 
+=head2 pica_match( $record, $path, %options )
+
+Equivalent to L<PICA::Path>-E<gt>match_record($path, %options).
+
+Extract the subfield values from a PICA record based on a PICA path
+expression and options (see L<PICA::Path>). Also available as accessor 
+C<match($path, %options)>.
+
 =head2 pica_value( $record, $path )
 
 Extract the first subfield values from a PICA record based on a PICA path
@@ -450,6 +472,11 @@ accessor C<items>.
 
 All accessors of C<PICA::Data> are also available as L</FUNCTIONS>, prefixed
 with C<pica_> (see L</SYNOPSIS>).
+
+=head2 match( $path, %options )
+
+Extract a list of subfield values from a PICA record based on a L<PICA::Path>
+expression and options.
 
 =head2 values( $path )
 

@@ -479,10 +479,11 @@ foreach my $foo ( qw{ bar baz } ) {
 #-----------------------------------------------------------------------------
 
 ## name unused state variables
-## failures 1
+## failures 2
 ## cut
 
 state $foo = 'bar';
+state $baz = compute_baz() or do_something_else();
 
 #-----------------------------------------------------------------------------
 
@@ -492,6 +493,16 @@ state $foo = 'bar';
 
 state $bar = 'baz';
 say $bar;
+
+#-----------------------------------------------------------------------------
+
+## name state variable in expression
+## parms { allow_state_in_expression => '1' }
+## failures 0
+## cut
+
+( state $foo = compute_foo() ) || do_something();
+state $baz = compute_baz() or do_something_else();
 
 #-----------------------------------------------------------------------------
 

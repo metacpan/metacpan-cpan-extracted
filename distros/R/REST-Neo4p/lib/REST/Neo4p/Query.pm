@@ -14,7 +14,7 @@ use strict;
 use warnings;
 no warnings qw(once);
 BEGIN {
-  $REST::Neo4p::Query::VERSION = '0.3020';
+  $REST::Neo4p::Query::VERSION = '0.3030';
 }
 
 our $BUFSIZE = 50000;
@@ -116,7 +116,7 @@ sub execute {
   elsif ( $e = Exception::Class->caught) {
     (ref $e && $e->can("rethrow")) ? $e->rethrow : die $e;
   }
-  my $jsonr = JSON::XS->new;
+  my $jsonr = JSON::XS->new->utf8;
   my ($buf,$res,$str,$rowstr,$obj);
   my $row_count;
   use experimental 'smartmatch';
@@ -204,7 +204,6 @@ sub execute {
 	  eval {
 	    if ($item->[0] eq 'columns') {
 	      $self->{NAME} = $item->[1];
-	      $DB::single=1;
 	      $self->{NUM_OF_FIELDS} = scalar @{$item->[1]};
 	      $item = drop($res_str); # move to data
 	      die 'j_parse: data key not present' unless $item->[0] eq 'data';

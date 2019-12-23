@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-RecordStore",
    "prereqs" : {
@@ -22,12 +22,13 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "requires" : {
             "File::Copy::Recursive" : "0.44",
+            "YAML" : "0",
             "perl" : "v5.9.4"
          }
       }
@@ -35,7 +36,7 @@
    "provides" : {
       "Data::RecordStore" : {
          "file" : "lib/Data/RecordStore.pm",
-         "version" : "6.00"
+         "version" : "6.02"
       },
       "Data::RecordStore::Converter" : {
          "file" : "lib/Data/RecordStore/Converter.pm"
@@ -105,5 +106,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "6.00"
+   "version" : "6.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

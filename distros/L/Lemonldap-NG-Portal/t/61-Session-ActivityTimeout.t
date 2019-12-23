@@ -14,8 +14,8 @@ my $client = LLNG::Manager::Test->new( {
             logLevel                => 'error',
             authentication          => 'Demo',
             userdb                  => 'Same',
-            timeoutActivity         => 4,
-            timeoutActivityInterval => 2,
+            timeoutActivity         => 7200,
+            timeoutActivityInterval => 60,
             handlerInternalCache    => 1,
         }
     }
@@ -33,8 +33,8 @@ expectOK($res);
 my $id1 = expectCookie($res);
 count(1);
 
-diag 'Waiting';
-sleep 3;
+# Skip ahead in time before activity timeout
+Time::Fake->offset("+20m");
 
 ok(
     $res = $client->_get(
@@ -49,8 +49,8 @@ ok( $res->[2]->[0] =~ qr%<span trspan="yourApps">Your applications</span>%,
   or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 
-diag 'Waiting';
-sleep 5;
+# Skip ahead in time after activity timeout
+Time::Fake->offset("+3h");
 
 ok(
     $res = $client->_get(

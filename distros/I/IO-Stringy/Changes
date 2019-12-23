@@ -1,0 +1,169 @@
+Revision history IO::Stringy
+
+2.112    2019-12-13
+  - Added the change log from any prior source that could be found. Formatted
+    the log to fit metacpan.org loose standards.
+  - Added .mailmap to correctly attribute all commits to Dianne Skoll when
+    using: git shortlog -s -e
+  - Added .gitattributes and .gitignore to assist with keeping the repo clean
+  - Change use vars qw() to our $whatever instead. 'our'
+  - Hide IO::WrapTie subclasses from PAUSE
+  - Rebuild Makefile.PL to contain all of the prerequisites. Make use of the
+    stub from Dist::Zilla
+  - Convert README to README.md
+  - Fix the documentation in the main module, IO::Stringy to better indicate
+    where to get info and how to use the module
+  - Fix the dist's META information to indicate the original author and license
+  - Add a LICENSE file
+  - Get rid of the set-version.pl file as it's no longer needed
+  - Add AppVeyor CI testing
+  - Add Travis CI testing
+  - update t/IO_InnerFile.t to use Test::More and a proper TEMP file (RT #103895)
+
+2.111    2015-04-22
+  - Update maintainer's name, which is now Dianne Skoll.
+
+2.110    2005-02-10
+  - Maintainership taken over by DSKOLL <dfs@roaringpenguin.com>
+  - RT 2208 IO::ScalarArray->getline does not return undef for EOF if
+    undef($/)
+  - RT 7132 IO-stringy/Makefile.PL bug - name should be module name
+  - RT 11249 IO::Scalar flush shouldn't return undef
+  - RT 2172 $\ (output record separator) not respected
+  - RT 8605 IO::InnerFile::seek() should return 1 on success
+  - RT 4798 *.html in lib/
+
+2.109    2003-12-21
+  - IO::Scalar::getline now works with ref to int. *Dominique Quatravaux*
+  - RT 4369 Improvement: handling of fixed-size reads in IO::Scalar
+
+2.108    2001-08-20
+  - The terms-of-use have been placed in the distribution file
+    "COPYING". Also, small documentation tweaks were made.
+
+2.105    2001-08-09
+  - Added support for various seek() whences to IO::ScalarArray.
+  - Added support for consulting $/ in IO::Scalar and IO::ScalarArray.
+  - The old "use_RS()" is not even an option. Unsupported record
+    separators will cause a croak().
+  - Added a lot of regression tests to supoprt the above.
+  - Better on-line docs (hyperlinks to individual functions).
+
+2.103    2001-08-08
+  - After sober consideration I have reimplemented IO::Scalar::print()
+    so that it once again always seeks to the end of the string.
+    Benchmarks show the new implementation to be just as fast as
+    Juergen's contributed patch; until someone can convince me
+    otherwise, the current, safer implementation stays.
+  - I thought more about giving IO::Scalar two separate handles, one for
+    reading and one for writing, as suggested by Binkley. His points
+    about what tell() and eof() return are, I think, show-stoppers for
+    this feature. Even the manpages for stdio's fseek() seem to imply a
+    *single* file position indicator, not two. So I think I will take
+    this off the TO DO list. Remedy: you can always have two handles
+    open on the same scalar, one which you only write to, and one which
+    you only read from. That should give the same effect.
+
+2.101    2001-08-07
+  - Alpha release. This is the initial release of the "IO::Scalar and
+    friends are now subclasses of IO::Handle". I'm flinging it against
+    the wall. Please tell me if the banana sticks. When it does, the
+    banana will be called 2.2x.
+  - First off, *many many thanks to Doug Wilson*, who has provided an
+    *invaluable* service by patching IO::Scalar and friends so that they
+    (1) inherit from IO::Handle, (2) automatically tie themselves so
+    that the "new()" objects can be used in native i/o constructs, and
+    (3) doing it so that the whole damn thing passes its regression
+    tests. As Doug knows, my globref Kung-Fu was not up to the task; he
+    graciously provided the patches. This has earned him a seat at the
+    Co-Authors table, and the right to have me address him as *sensei*.
+  - Performance of IO::Scalar::print() has been improved by as much as
+    2x for lots of little prints, with the cost of forcing those who
+    print-then-seek-then-print to explicitly seek to end-of-string
+    before printing again. *Thanks to Juergen Zeller for this patch.*
+  - Added the COPYING file, which had been missing from prior versions.
+    *Thanks to Albert Chin-A-Young for pointing this out.*
+  - IO::Scalar consults $/ by default (1.x ignored it by default). Yes,
+    I still need to support IO::ScalarArray.
+
+1.221    2001-08-07
+  - Add missing information to "INSTALLATION"  -- David Beroff
+
+1.220    2001-04-03
+  - Added untested SEEK, TELL, and EOF methods to IO::Scalar and IO::ScalarArray
+    to support corresponding functions for tied filehandles: untested, because
+    I'm still running 5.00556 and Perl is complaining about "tell() on unopened
+    file". *Thanks to Graham Barr*
+  - Removed not-fully-blank lines from modules; these were causing lots
+    of POD-related warnings. *Thanks to Nicolas Joly*
+
+1.219    2001-02-23
+  - IO::Scalar objects can now be made sensitive to $/ . Pains were
+    taken to keep the fast code fast while adding this feature. *Cheers
+    to Graham Barr for submitting his patch; jeers to me for losing his
+    email for 6 months.*
+
+1.218    2001-02-23
+  - IO::Scalar has a new sysseek() method. (Richard Jones)
+  - New "TO DO" section, because people who submit patches/ideas should
+    at least know that they're in the system... and that I won't lose
+    their stuff. Please read it.
+  - New entries in "AUTHOR". Please read those too.
+
+1.216    2000-09-28
+  - IO::Scalar and IO::ScalarArray now inherit from IO::Handle. (B. K. Oxley)
+  - Nasty bug fixed in IO::Scalar::write(). Apparently, the offset and
+    the number-of-bytes arguments were, for all practical purposes,
+    *reversed.* You were okay if you did all your writing with print(),
+    but boy was *this* a stupid bug! *Thanks to Richard Jones*
+  - New sysread and syswrite methods for IO::Scalar. *Thanks again to
+    Richard Jones for this.*
+
+1.215    2000-09-05
+  - Added 'bool' overload to '""' overload, so object always evaluates to true.
+
+1.214    2000-09-03
+  - Evaluating an IO::Scalar in a string context now yields the underlying
+    string. *Thanks to B. K. Oxley (binkley) for this.*
+
+1.213    2000-08-16
+  - Minor documentation fixes.
+
+1.212    2000-06-02
+  - Fixed IO::InnerFile incompatibility with Perl5.004. *Thanks to many folks
+    for reporting this.*
+
+1.210    2000-04-17
+  - Added flush() and other no-op methods. -- Doru Petrescu
+
+1.209    2000-03-17
+  - Small bug fixes.
+
+1.208    2000-03-14
+  - Incorporated a number of contributed patches and extensions, mostly related
+    to speed hacks, support for "offset", and WRITE/CLOSE methods. *Thanks to
+    Richard Jones, Doru Petrescu, and many others.*
+
+1.206    1999-04-18
+  - Added creation of ./testout when Makefile.PL is run.
+
+1.205    1999-01-15
+  - Verified for Perl5.005.
+
+1.202    1998-04-18
+  - New IO::WrapTie and IO::AtomicFile added.
+
+1.110    1998-03-27
+  - Added IO::WrapTie.
+
+1.109    1998-03-23
+
+1.107
+  - Added IO::Lines, and made some bug fixes to IO::ScalarArray.
+  - Also, added getc().
+
+1.105    1997-12-15
+  - No real changes; just upgraded IO::Wrap to have a $VERSION string.
+
+1.104    1997-11-05
+  - Earliest release found

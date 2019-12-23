@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Warnings; # git description: v0.026-14-g4e3ad06
+package Test::Warnings; # git description: v0.027-4-g76bf83a
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Test for warnings and the lack of them
 # KEYWORDS: testing tests warnings
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 use parent 'Exporter';
 use Test::Builder;
@@ -77,8 +77,14 @@ $SIG{__WARN__} = sub {
     }
 };
 
-sub warnings(&)
+sub warnings(;&)
 {
+    # if someone manually does warnings->import in the same namespace this is
+    # imported into, this sub will be called.  in that case, just return the
+    # string "warnings" so it calls the correct method.
+    if (!@_) {
+        return 'warnings';
+    }
     my $code = shift;
     my @warnings;
     local $SIG{__WARN__} = sub {
@@ -161,7 +167,7 @@ Test::Warnings - Test for warnings and the lack of them
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
@@ -453,17 +459,17 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords A. Sinan Unur Graham Knop Leon Timmermans
+=for stopwords Graham Knop A. Sinan Unur Leon Timmermans
 
 =over 4
 
 =item *
 
-A. Sinan Unur <nanis@cpan.org>
+Graham Knop <haarg@haarg.org>
 
 =item *
 
-Graham Knop <haarg@haarg.org>
+A. Sinan Unur <nanis@cpan.org>
 
 =item *
 

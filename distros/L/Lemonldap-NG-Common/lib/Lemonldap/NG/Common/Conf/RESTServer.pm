@@ -6,7 +6,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.7';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib';
 
@@ -195,9 +195,11 @@ sub virtualHosts {
                 type  => 'keyText',
             };
 
-            # If rule contains a comment, split it
+            # If rule contains a comment or an AuthLevel, split them
             if ( $query eq 'locationRules' ) {
                 $res->{comment} = '';
+                $res->{level} = '';
+                $res->{level} = $1 if ( $r =~ s/\(\?#AuthnLevel=(-?\d+)\)// );
                 if ( $r =~ s/\(\?#(.*?)\)// ) {
                     $res->{title} = $res->{comment} = $1;
                 }
@@ -267,7 +269,9 @@ sub _samlMetaDataNodes {
     my ( $id, $resp ) = ( 1, [] );
 
     # Return all exported attributes if asked
-    if ( $query =~ /^saml${type}MetaDataExportedAttributes$/ ) {
+    if ( $query =~
+        /^saml${type}MetaDataExportedAttributes|samlSPMetaDataMacros$/ )
+    {
         my $pk =
           eval { $self->getConfKey( $req, $query )->{$partner} } // {};
         return $self->sendError( $req, undef, 400 ) if ( $req->error );
@@ -378,7 +382,7 @@ sub _oidcMetaDataNodes {
 
     # Return all exported attributes if asked
     if ( $query =~
-        /^(?:oidc${type}MetaDataExportedVars|oidcRPMetaDataOptionsExtraClaims)$/
+/^(?:oidc${type}MetaDataExportedVars|oidcRPMetaDataOptionsExtraClaims|oidcRPMetaDataMacros)$/
       )
     {
         my $pk = eval { $self->getConfKey( $req, $query )->{$partner} } // {};
@@ -476,7 +480,7 @@ sub _casMetaDataNodes {
 
     # Return all exported attributes if asked
     if ( $query =~
-/^(?:cas${type}MetaDataExportedVars|casSrvMetaDataOptionsProxiedServices)$/
+/^(?:cas${type}MetaDataExportedVars|casSrvMetaDataOptionsProxiedServices|casAppMetaDataMacros)$/
       )
     {
         my $pk = eval { $self->getConfKey( $req, $query )->{$partner} } // {};
@@ -541,10 +545,16 @@ sub authChoiceModules {
         my @res;
         foreach my $k ( sort keys %$value ) {
             my $data = [ split /;/, $value->{$k} ];
-            eval { $data->[5] = from_json( $data->[5] ) if $data->[5] };
-            if ($@) {
-                $self->logger->error(
-                    "Bad value in choice over parameters, deleted ($@)");
+            if ( $data->[5] ) {
+                my $over;
+                eval { $over = from_json( $data->[5] ) };
+                if ($@) {
+                    $self->logger->error(
+                        "Bad value in choice over parameters, deleted ($@)");
+                }
+                else {
+                    $data->[5] = [ map { [ $_, $over->{$_} ] } keys %{$over} ];
+                }
             }
             push @res,
               {
@@ -662,7 +672,7 @@ sub _scanCatsAndApps {
         }
         else {
             $item->{title} = $apps->{$cat}->{options}->{name};
-            $item->{type} = $apps->{$cat}->{type} = 'menuApp';
+            $item->{type}  = $apps->{$cat}->{type} = 'menuApp';
             foreach my $o (
                 grep { not /^name$/ }
                 keys %{ $apps->{$cat}->{options} }
@@ -691,6 +701,26 @@ sub combModules {
         $tmp->{id}    = "combModules/$mod";
         $tmp->{type}  = 'cmbModule';
         $tmp->{data}->{$_} = $val->{$mod}->{$_} foreach (qw(type for));
+        my $over = $val->{$mod}->{over} // {};
+        $tmp->{data}->{over} = [ map { [ $_, $over->{$_} ] } keys %$over ];
+        push @$res, $tmp;
+    }
+    return $self->sendJSONresponse( $req, $res );
+}
+
+sub sfExtra {
+    my ( $self, $req, $key ) = @_;
+    return $self->sendError( $req, 'Subkeys forbidden for sfExtra', 400 )
+      if ($key);
+    my $val = $self->getConfKey( $req, 'sfExtra' ) // {};
+    my $res = [];
+    foreach my $mod ( keys %$val ) {
+        my $tmp;
+        $tmp->{title}      = $mod;
+        $tmp->{id}         = "sfExtra/$mod";
+        $tmp->{type}       = 'sfExtra';
+        $tmp->{data}->{$_} = $val->{$mod}->{$_}
+          foreach (qw(type rule logo label));
         my $over = $val->{$mod}->{over} // {};
         $tmp->{data}->{over} = [ map { [ $_, $over->{$_} ] } keys %$over ];
         push @$res, $tmp;
@@ -780,8 +810,13 @@ sub getKey {
     unless ($key) {
         return $self->metadata($req);
     }
-    $self->userLogger->info(
-        'User ' . $self->userId($req) . " asks for key $key" );
+    if ( $self->can('userId') ) {
+        $self->userLogger->info(
+            'User ' . $self->userId($req) . " asks for key $key" );
+    }
+    else {
+        $self->logger->info("REST request to get configuration key $key");
+    }
     my $value = $self->getConfKey( $req, $key );
     return $self->sendError( $req, undef, 400 ) if ( $req->error );
 

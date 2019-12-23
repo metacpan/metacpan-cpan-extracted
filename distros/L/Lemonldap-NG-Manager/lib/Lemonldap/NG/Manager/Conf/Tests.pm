@@ -4,7 +4,7 @@ use utf8;
 use Lemonldap::NG::Common::Regexp;
 use Lemonldap::NG::Handler::Main;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -453,7 +453,6 @@ sub tests {
 
         # Warn if 2F dependencies seem missing
         sfaDependencies => sub {
-
             my $ok = 0;
             foreach (qw(u totp utotp yubikey)) {
                 $ok ||= $conf->{ $_ . '2fActivation' };
@@ -628,6 +627,19 @@ sub tests {
             return 1;
         },
 
+        # Warn if ldapPpolicyControl is used with AD (#2007)
+
+        ppolicyAd => sub {
+            if (    $conf->{ldapPpolicyControl}
+                and $conf->{authentication} eq "AD" )
+            {
+                return ( 1,
+"LDAP password policy control should be disabled when using AD authentication"
+                );
+            }
+            return 1;
+        },
+
         # Warn if bruteForceProtection enabled without History
         bruteForceProtection => sub {
             return 1 unless ( $conf->{bruteForceProtection} );
@@ -684,11 +696,47 @@ sub tests {
                 "Notifications enabled WITHOUT persistent session storage" )
               if ( $conf->{notification} );
             return ( 1,
-                "BruteForceProtection plugin enabled WITHOUT persistent session storage" )
-              if ( $conf->{bruteForceProtection} );
+"BruteForceProtection plugin enabled WITHOUT persistent session storage"
+            ) if ( $conf->{bruteForceProtection} );
 
             # Return
             return 1;
+        },
+
+        # Warn if XML dependencies seem missing
+        xmlDependencies => sub {
+            return 1 unless ( $conf->{oldNotifFormat} );
+            eval "use XML::LibXML";
+            return ( 1,
+"XML::LibXML module is required to enable old format notifications"
+            ) if ($@);
+            eval "use XML::LibXSLT";
+            return ( 1,
+"XML::LibXSLT module is required to enable old format notifications"
+            ) if ($@);
+
+            # Return
+            return 1;
+        },
+
+        # OIDC redirect URI must not be empty
+        oidcRPRedirectURINotEmpty => sub {
+            return 1
+              unless ( $conf->{oidcRPMetaDataOptions}
+                and %{ $conf->{oidcRPMetaDataOptions} } );
+            my @msg;
+            my $res = 1;
+            foreach my $oidcRpId ( keys %{ $conf->{oidcRPMetaDataOptions} } ) {
+                unless ( $conf->{oidcRPMetaDataOptions}->{$oidcRpId}
+                    ->{oidcRPMetaDataOptionsRedirectUris} )
+                {
+                    push @msg,
+                      "$oidcRpId OpenID Connect RP has no redirect URI defined";
+                    $res = 0;
+                    next;
+                }
+            }
+            return ( $res, join( ', ', @msg ) );
         },
 
     };

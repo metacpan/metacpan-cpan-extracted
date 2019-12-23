@@ -41,7 +41,7 @@ my $fixer = Catmandu::Fix->new(fixes => [
 my $importer = Catmandu::Importer::PICA->new(file => "./t/files/plain.pica", type=> "plain");
 my $records = $fixer->fix($importer)->to_array;
 
-is_deeply $records->[0]->{'ids'}, [ ['1234', '4321'], ['5678'] ], '003@a added';
+is_deeply $records->[0]->{'ids'}, ['1234', '4321', '5678'], '003@a added';
 is $records->[0]->{'encoding'}, 'utf16', '201U0 added';
 is $records->[0]->{'what'}, 'bar', '101U$0 set';
 is $records->[0]->{'multi'}, 'barbaz', 'added multiple subfields to 001@';

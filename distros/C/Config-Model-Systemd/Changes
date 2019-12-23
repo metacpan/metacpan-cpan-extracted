@@ -1,3 +1,21 @@
+0.244.1 2019-12-15
+
+  Model update:
+    * update parameters from systemd 244 source
+  
+  Model generator (parse-man.pl) changes:
+    * parse-man: put C<> around XML filename
+    * parse-man: store systemd version
+
+  Other Changes:
+    * use new style of model test
+    * log at warn level when reading a sub layer file
+    * don't mention migration in deprecation warnings
+    * improve message when no info is found for a unit
+    * use warn log to show user which resource is read
+    * Fix to find service like Foo.service
+    * Build requires Config::Model::Tester 4.005
+
 0.240.1 2019-01-17
 
   Model update:

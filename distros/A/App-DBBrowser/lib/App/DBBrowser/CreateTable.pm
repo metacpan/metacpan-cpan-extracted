@@ -223,7 +223,7 @@ sub __set_table_name {
     while ( 1 ) {
         my $info;
         if ( $sf->{i}{gc}{source_type} =~ /file/i ) {
-            my $file_name = basename decode( 'locale_fs', $sf->{i}{gc}{file_ec} );
+            my $file_name = basename decode( 'locale_fs', $sf->{i}{gc}{file_fs} );
             $info = sprintf "File: '%s'", $file_name;
             ( $sf->{i}{ct}{default_table_name} = $file_name ) =~ s/\.[^.]{1,4}\z//;
             if ( defined $sf->{i}{gc}{sheet_name} && length $sf->{i}{gc}{sheet_name} ) {

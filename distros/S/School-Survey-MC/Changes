@@ -1,5 +1,10 @@
 Revision history for School-Survey-MC
  
+0.005     2019-12-13 21:31:43+01:00 Europe/Zurich
+ - sort chapter count in output
+ - add some minor documentation to script
+ - remove mcp-dump script
+
 0.004     2019-12-10 22:53:56+01:00 Europe/Zurich
  - add config (lang) to input file format
  - allow multiple filenames as arguments (greedy)

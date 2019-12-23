@@ -11,7 +11,7 @@ use Capture::Tiny qw( capture_merged capture );
 use FFI::Temp;
 
 # ABSTRACT: System detection and probing for FFI extensions.
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 
 sub new
@@ -174,6 +174,7 @@ sub check_eval
     alien   => $self->{alien},
     cflags  => $self->{cflags},
     libs    => $self->{libs},
+    export  => ['dlmain'],
   );
   $build->source(
     FFI::Build::File::C->new(
@@ -511,7 +512,7 @@ FFI::Probe - System detection and probing for FFI extensions.
 
 =head1 VERSION
 
-version 1.02
+version 1.06
 
 =head1 SYNOPSIS
 

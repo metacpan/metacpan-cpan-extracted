@@ -27,7 +27,7 @@ use Config::IniFiles;
 #inherits Lemonldap::NG::Common::Conf::Backends::SOAP
 #inherits Lemonldap::NG::Common::Conf::Backends::LDAP
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 our $msg     = '';
 our $iniObj;
 
@@ -57,7 +57,7 @@ BEGIN {
 # @return New Lemonldap::NG::Common::Conf object
 sub new {
     my $class = shift;
-    my $self = bless {}, $class;
+    my $self  = bless {}, $class;
     if ( ref( $_[0] ) ) {
         %$self = %{ $_[0] };
     }
@@ -397,47 +397,63 @@ sub getDBConf {
     return $conf;
 }
 
+sub _launch {
+    my $self = shift;
+    my $sub  = shift;
+    my @res;
+    eval {
+        local $SIG{ALRM} = sub { die "TIMEOUT\n" };
+        eval {
+            alarm( $self->{confTimeout} || 10 );
+            @res = &{ $self->{type} . "::$sub" }( $self, @_ );
+        };
+        alarm 0;
+        die $@ if $@;
+    };
+    $msg .= $@ if $@;
+    return wantarray ? (@res) : $res[0];
+}
+
 ## @method boolean prereq()
 # Call prereq() from the $self->{type} package.
 # @return True if succeed
 sub prereq {
-    return &{ $_[0]->{type} . '::prereq' }(@_);
+    return shift->_launch( 'prereq', @_ );
 }
 
 ## @method @ available()
 # Call available() from the $self->{type} package.
 # @return list of available configuration numbers
 sub available {
-    return &{ $_[0]->{type} . '::available' }(@_);
+    return shift->_launch( 'available', @_ );
 }
 
 ## @method int lastCfg()
 # Call lastCfg() from the $self->{type} package.
 # @return Number of the last configuration available
 sub lastCfg {
-    my $result = &{ $_[0]->{type} . '::lastCfg' }(@_) || "0";
-    return $result;
+    return shift->_launch( 'lastCfg', @_ ) || 0;
 }
 
 ## @method boolean lock()
 # Call lock() from the $self->{type} package.
 # @return True if succeed
 sub lock {
-    return &{ $_[0]->{type} . '::lock' }(@_);
+    return shift->_launch( 'lock', @_ );
 }
 
 ## @method boolean isLocked()
 # Call isLocked() from the $self->{type} package.
 # @return True if database is locked
 sub isLocked {
-    return &{ $_[0]->{type} . '::isLocked' }(@_);
+    return shift->_launch( 'isLocked', @_ );
 }
 
 ## @method boolean unlock()
 # Call unlock() from the $self->{type} package.
 # @return True if succeed
 sub unlock {
-    return &{ $_[0]->{type} . '::unlock' }(@_);
+    return shift->_launch( 'unlock', @_ );
 }
 
 ## @method int store(hashRef conf)
@@ -445,14 +461,14 @@ sub unlock {
 # @param $conf Lemondlap configuration serialized
 # @return Number of new configuration stored if succeed, 0 else.
 sub store {
-    return &{ $_[0]->{type} . '::store' }(@_);
+    return shift->_launch( 'store', @_ );
 }
 
 ## @method load(int cfgNum, arrayRef fields)
 # Call load() from the $self->{type} package.
 # @return Lemonldap::NG Configuration hashRef if succeed, 0 else.
 sub load {
-    return &{ $_[0]->{type} . '::load' }(@_);
+    return shift->_launch( 'load', @_ );
 }
 
 ## @method boolean delete(int cfgNum)
@@ -463,7 +479,7 @@ sub delete {
     my ( $self, $c ) = @_;
     my @a = $self->available();
     if ( grep( /^$c$/, @a ) ) {
-        return &{ $self->{type} . '::delete' }( $self, $c );
+        return $self->_launch( 'delete', $self, $c );
     }
     else {
         return 0;
@@ -471,7 +487,7 @@ sub delete {
 }
 
 sub logError {
-    return &{ $_[0]->{type} . '::logError' }(@_);
+    return shift->_launch( 'logError', @_ );
 }
 
 1;

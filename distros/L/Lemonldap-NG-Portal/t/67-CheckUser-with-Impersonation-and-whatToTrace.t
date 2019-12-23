@@ -18,6 +18,7 @@ my $client = LLNG::Manager::Test->new( {
             portalMainLogo                 => 'common/logos/logo_llng_old.png',
             requireToken                   => 0,
             checkUser                      => 1,
+            checkUserSearchAttributes      => 'employee_nbr  test1 mail ',
             impersonationRule              => 1,
             checkUserDisplayPersistentInfo => 0,
             checkUserDisplayEmptyValues    => 0,

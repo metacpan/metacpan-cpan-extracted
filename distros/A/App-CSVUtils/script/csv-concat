@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_concat
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2019-12-23'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.025'; # VERSION
+our $VERSION = '0.027'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ csv-concat - Concatenate several CSV files together, collecting all the fields
 
 =head1 VERSION
 
-This document describes version 0.025 of csv-concat (from Perl distribution App-CSVUtils), released on 2019-11-29.
+This document describes version 0.027 of csv-concat (from Perl distribution App-CSVUtils), released on 2019-12-23.
 
 =head1 SYNOPSIS
 
@@ -88,6 +88,9 @@ C<*> marks required options.
 =item B<--filename>=I<s@>*, B<-f>
 
 Input CSV files.
+
+Use `-` to read from stdin.
+
 
 Can be specified multiple times.
 

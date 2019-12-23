@@ -21,11 +21,12 @@ meta-spec:
 name: Text-Hogan
 requires:
   Clone: '0.37'
+  Ref::Util: '0.204'
   Scalar::Util: '1.41'
   Text::Trim: '1.02'
   perl: v5.10.0
 resources:
   bugtracker: https://github.com/kaoru/Text-Hogan/issues
   repository: git://github.com/kaoru/Text-Hogan
-version: '2.02'
+version: '2.03'
 x_serialization_backend: 'YAML::Tiny version 1.69'

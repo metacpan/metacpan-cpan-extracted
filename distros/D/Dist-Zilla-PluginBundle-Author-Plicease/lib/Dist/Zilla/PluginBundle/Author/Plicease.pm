@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.38 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.39 {
 
   use 5.014;
   use Moose;
@@ -31,7 +31,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.38 {
 
   my %plugin_versions = qw(
     Alien                0.023
-    Author::Plicease.*   2.38
+    Author::Plicease.*   2.39
     OurPkgVersion        0.21
     MinimumPerl          1.006
     InstallGuide         1.200006
@@ -221,7 +221,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.38 {
     
       $self->_my_add_plugin([
         'ReadmeAnyFromPod' => ReadMePodInRoot => {
-          type                  => 'markdown',
+          type                  => 'gfm',
           filename              => 'README.md',
           location              => 'root',
           maybe source_filename => $self->payload->{readme_from},
@@ -334,7 +334,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.38
+version 2.39
 
 =head1 SYNOPSIS
 
@@ -451,7 +451,7 @@ This plugin bundle is mostly equivalent to
  [ReadmeAnyFromPod / ReadMePodInRoot]
  filename = README.md
  location = root
- type = markdown
+ type = gfm
  
  [Author::Plicease::MarkDownCleanup]
  travis_status = 0

@@ -33,9 +33,14 @@ Install Carton ( https://metacpan.org/pod/Carton  ), then dependencies:
 	cpanm Carton
 	perl dev/dev.pl
 Do something with code and test:
-	carton exec dzil (test/build/clean)
-Clean dependencies:
-	perl dev/clean-dev.pl
+	carton exec dzil test
+	(don't forget change release in dist.init)
+	carton exec dzil build
+	(git commit/push)
+	carton exec dzil release
+Clean:
+	carton exec dzil clean (build)
+	perl dev/clean-dev.pl (dependencies)
 
 
 SUPPORT AND DOCUMENTATION

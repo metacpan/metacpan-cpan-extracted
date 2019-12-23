@@ -37,7 +37,7 @@ SKIP: {
     $query =~ s/.*\btoken=([^&]+).*/token=$1/;
     my $token;
     ok( $token = $1, ' Token value is defined' );
-    ok( $res->[2]->[0] =~ m#<img src="data:image/png;base64#,
+    ok( $res->[2]->[0] =~ m#<img id="captcha" src="data:image/png;base64#,
         ' Captcha image inserted' );
 
     my @form = ( $res->[2]->[0] =~ m#<form.*?</form>#sg );
@@ -72,7 +72,7 @@ SKIP: {
     # -------------------
     $query =~ s/.*\btoken=([^&]+).*/token=$1/;
     ok( $token = $1, ' Token value is defined' );
-    ok( $res->[2]->[0] =~ m#<img src="data:image/png;base64#,
+    ok( $res->[2]->[0] =~ m#<img id="captcha" src="data:image/png;base64#,
         ' Captcha image inserted' );
 
     @form = ( $res->[2]->[0] =~ m#<form.*?</form>#sg );

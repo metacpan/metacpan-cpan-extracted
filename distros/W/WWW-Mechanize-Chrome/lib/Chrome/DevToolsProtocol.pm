@@ -15,7 +15,7 @@ use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 our @CARP_NOT;
 
 =head1 NAME
@@ -345,7 +345,15 @@ sub connect( $self, %args ) {
         $self->{transport} = $transport->new;
         $transport = $self->{transport};
     };
-    return $transport->connect( $self, $got_endpoint, sub { $s->log( @_ ) } )
+    return $transport->connect( $self, $got_endpoint, sub {
+        if( $s ) {
+            $s->log( @_ )
+        }
+        #else {
+        #    # We are in cleanup somewhere?!
+        #    warn "@_";
+        #}
+    } )
     #->on_ready(sub {
     #    use Data::Dumper;
     #    warn Dumper \@_;
@@ -439,9 +447,13 @@ sub on_response( $self, $connection, $message ) {
         if( my $listeners = $self->listener->{ $response->{method} } ) {
             @$listeners = grep { defined $_ } @$listeners;
             if( $self->_log->is_trace ) {
-                $self->log( 'trace', "Notifying listeners", $response );
+                if( $response->{method} ne 'Target.receivedMessageFromTarget' ) {
+                    $self->log( 'trace', "Notifying listeners", $response );
+                };
             } else {
-                $self->log( 'debug', sprintf "Notifying listeners for '%s'", $response->{method} );
+                if( $response->{method} ne 'Target.receivedMessageFromTarget' ) {
+                    $self->log( 'debug', sprintf "Notifying listeners for '%s'", $response->{method} );
+                };
             };
             for my $listener (@$listeners) {
                 eval {
@@ -452,9 +464,12 @@ sub on_response( $self, $connection, $message ) {
             };
             # re-weaken our references
             for (0..$#$listeners) {
-                weaken $listeners->[$_];
+                weaken $listeners->[$_]
+                    if not isweak $listeners->[$_];
             };
-            $self->log('trace', "Message handled", $response);
+            if( $response->{method} ne 'Target.receivedMessageFromTarget' ) {
+                $self->log('trace', "Message handled", $response);
+            };
 
             $handled++;
         };
@@ -603,9 +618,7 @@ sub send_message( $self, $method, %params ) {
     # We add our response listener before we've even sent our request to
     # Chrome. This ensures that no amount of buffering etc. will make us
     # miss a reply from Chrome to a request
-    my $f;
-    $f = $self->_send_packet( $response, $method, %params );
-    $f->on_ready( sub { undef $f });
+    $self->_send_packet( $response, $method, %params )->retain;
     $response
 }
 
@@ -848,7 +861,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 has 'protocol' => (
     is => 'ro',

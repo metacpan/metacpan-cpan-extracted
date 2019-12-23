@@ -1,4 +1,5 @@
 Revision history for Vote::Count
+1.01  Dec  16, 2019 precedence file tiebreaker for use where rules require random
 1.00  Dec   2, 2019 Stable Release
                     added cutoff for approval of range ballots
                     added tests to improve coverage stats

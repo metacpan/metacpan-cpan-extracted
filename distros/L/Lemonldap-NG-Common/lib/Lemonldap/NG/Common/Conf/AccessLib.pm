@@ -6,10 +6,10 @@ use Mouse;
 
 use Lemonldap::NG::Common::Conf;
 
-has '_confAcc' => ( is => 'rw', isa => 'Lemonldap::NG::Common::Conf' );
+has '_confAcc'      => ( is => 'rw', isa => 'Lemonldap::NG::Common::Conf' );
 has 'configStorage' => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
 has 'currentConf' => ( is => 'rw', required => 1, default => sub { {} } );
-has 'protection' => ( is => 'rw', isa => 'Str', default => 'manager' );
+has 'protection'  => ( is => 'rw', isa      => 'Str', default => 'manager' );
 
 our $VERSION = '2.0.0';
 

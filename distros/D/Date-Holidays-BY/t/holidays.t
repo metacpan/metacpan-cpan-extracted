@@ -1,7 +1,7 @@
 #!perl -T
 
 use utf8;
-use Test::More tests => 8;
+use Test::More tests => 12;
 
 BEGIN {
 	use_ok( 'Date::Holidays::BY', qw( holidays ) );
@@ -14,7 +14,13 @@ ok $ref->{ '0308' }, 'women day';
 ok $ref->{ '0509' }, 'women day afterparty';
 is $ref->{ '0310' }, undef, 'bad luck';
 
+my $ref = holidays( 2019 );
+ok $ref->{ '0101' }, 'ny';
+is $ref->{ '0102' }, undef, 'not ny before 2020';
+
 my $ref = holidays( 9001 );
+ok $ref->{ '0101' }, 'ny';
+ok $ref->{ '0102' }, 'ny';
 ok $ref->{ '0308' }, 'women day';
 ok $ref->{ '0101' }, 'new year';
 is $ref->{ '0310' }, undef, 'bad luck';

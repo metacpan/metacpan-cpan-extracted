@@ -65,11 +65,6 @@ SKIP: {
         ),
         'Unauth SP request'
     );
-    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     my ( $url, $query ) = expectRedirection( $res,
         qr#^http://auth.idp.com(/saml/singleSignOnArtifact)\?(SAMLart=.+)# );
 
@@ -121,7 +116,6 @@ SKIP: {
             query  => $query,
             accept => 'text/html',
             length => length($s),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Push artifact to SP'
     );
@@ -159,6 +153,9 @@ SKIP: {
 #switch('issuer');
 #ok($res=$issuer->_get($url,query=>$query,accept=>'text/html',cookie=>"lemonldap=$idpId"),'Follow redirection');
 
+    my $removedCookie = expectCookie($res);
+    is($removedCookie, 0, "SSO cookie removed");
+
     # Test if logout is done
     switch ('issuer');
     ok(
@@ -174,8 +171,7 @@ SKIP: {
         $res = $sp->_get(
             '/',
             accept => 'text/html',
-            cookie =>
-              "lemonldapidp=http://auth.idp.com/saml/metadata; lemonldap=$spId"
+            cookie => "lemonldap=$spId"
         ),
         'Test if user is reject on SP'
     );

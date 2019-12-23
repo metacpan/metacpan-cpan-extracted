@@ -10,4 +10,6 @@ cpanfile
 dist.ini
 lib/Mojo/Cache/Role/Strict.pm
 t/author-pod-syntax.t
-t/get.t
+t/default.t
+t/strict_get.t
+t/strict_set.t

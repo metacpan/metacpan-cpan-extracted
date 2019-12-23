@@ -1,12 +1,20 @@
 package Sort::Sub::by_num_in_text;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '0.111'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'Sort-Sub'; # DIST
+our $VERSION = '0.116'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
+sub meta {
+    return {
+        v => 1,
+        summary => 'Sort by first number found in text or (if no number is found) ascibetically',
+    };
+}
 sub gen_sorter {
     my ($is_reverse, $is_ci) = @_;
 
@@ -60,7 +68,7 @@ Sort::Sub::by_num_in_text - Sort by first number found in text or (if no number 
 
 =head1 VERSION
 
-This document describes version 0.111 of Sort::Sub::by_num_in_text (from Perl distribution Sort-Sub), released on 2019-10-26.
+This document describes version 0.116 of Sort::Sub::by_num_in_text (from Perl distribution Sort-Sub), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -94,7 +102,7 @@ The generated sort routine will sort by first number (sequence of [0-9]) found
 in text or (f no number is found in text) ascibetically. Items that have a
 number will sort before items that do not.
 
-=for Pod::Coverage ^(gen_sorter)$
+=for Pod::Coverage ^(gen_sorter|meta)$
 
 =head1 HOMEPAGE
 

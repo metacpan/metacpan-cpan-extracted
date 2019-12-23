@@ -8,9 +8,10 @@ use warnings;
 use File::Spec;
 use Getopt::Long 2.33;
 use Perl::Critic::Command;
+use Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter;
 use Pod::Usage;
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 my %opt;
 

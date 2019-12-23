@@ -16,7 +16,7 @@ my $client = LLNG::Manager::Test->new( {
             loginHistoryEnabled            => 0,
             brutForceProtection            => 0,
             portalMainLogo                 => 'common/logos/logo_llng_old.png',
-            requireToken                   => 0,
+            requireToken                   => 1,
             checkUser                      => 1,
             impersonationPrefix            => 'testPrefix_',
             securedCookie                  => 0,
@@ -30,13 +30,19 @@ my $client = LLNG::Manager::Test->new( {
     }
 );
 
-##
 ## Try to authenticate
+ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+count(1);
+my ( $host, $url, $query ) =
+  expectForm( $res, '#', undef, 'user', 'password', 'token' );
+
+$query =~ s/user=/user=rtyler/;
+$query =~ s/password=/password=rtyler/;
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new('user=rtyler&password=rtyler'),
-        length => 27,
+        IO::String->new($query),
+        length => length($query),
         accept => 'text/html',
     ),
     'Auth query'
@@ -69,7 +75,7 @@ ok(
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 
-# ContextSwitching form -> PE_OK
+# ContextSwitching form
 # ------------------------
 ok(
     $res = $client->_get(
@@ -81,11 +87,50 @@ ok(
 );
 count(1);
 
-my ( $host, $url, $query ) =
-  expectForm( $res, undef, '/switchcontext', 'spoofId' );
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/switchcontext', 'spoofId', 'token' );
 ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_ON">%,
     'Found trspan="contextSwitching_ON"' )
   or explain( $res->[2]->[0], 'trspan="contextSwitching_ON"' );
+$query =~ s/spoofId=/spoofId=dwho/;
+
+## POST form with an expired token
+# Waiting
+Time::Fake->offset("+125s");
+ok(
+    $res = $client->_post(
+        '/switchcontext',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        accept => 'text/html',
+    ),
+    'POST expired switchcontext'
+);
+ok( $res->[2]->[0] =~ m%<div class="message message-negative alert"><span trmsg="82"></span></div>%,
+    'Found "<span trmsg="82">"' )
+  or explain( $res->[2]->[0], '<span trmsg="82">' );
+count(3);
+
+# ContextSwitching form
+# ------------------------
+ok(
+    $res = $client->_get(
+        '/switchcontext',
+        cookie => "lemonldap=$id",
+        accept => 'text/html'
+    ),
+    'ContextSwitching form',
+);
+count(1);
+
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/switchcontext', 'spoofId', 'token' );
+ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_ON">%,
+    'Found trspan="contextSwitching_ON"' )
+  or explain( $res->[2]->[0], 'trspan="contextSwitching_ON"' );
+
+## POST form with a valid token
 $query =~ s/spoofId=/spoofId=dwho/;
 ok(
     $res = $client->_post(
@@ -97,7 +142,11 @@ ok(
     ),
     'POST switchcontext'
 );
+ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_OFF">%,
+    'Found trspan="contextSwitching_OFF"' )
+  or explain( $res->[2]->[0], 'trspan="contextSwitching_OFF"' );
 $id = expectCookie($res);
+
 ok(
     $res = $client->_get(
         '/',
@@ -106,7 +155,7 @@ ok(
     ),
     'Get Menu',
 );
-count(3);
+count(4);
 expectAuthenticatedAs( $res, 'dwho' );
 ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_OFF">%,
     'Found trspan="contextSwitching_OFF"' )
@@ -122,7 +171,7 @@ ok(
 count(2);
 
 ( $host, $url, $query ) =
-  expectForm( $res, undef, '/checkuser', 'user', 'url' );
+  expectForm( $res, undef, '/checkuser', 'user', 'url', 'token' );
 ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%, 'Found trspan="checkUser"' )
   or explain( $res->[2]->[0], 'trspan="checkUser"' );
 ok( $res->[2]->[0] =~ m%<td scope="row">_user</td>%, 'Found attribute _user' )

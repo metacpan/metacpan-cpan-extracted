@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::StatementResult;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::StatementResult::VERSION = '0.13';
+$Neo4j::Driver::StatementResult::VERSION = '0.14';
 
 use Carp qw(croak);
 
@@ -31,6 +31,7 @@ sub new {
 		columns => undef,
 		summary => undef,
 		deep_bless => $params->{deep_bless},
+		cypher_types => $params->{cypher_types},
 		notifications => $params->{notifications},
 		statement => $params->{statement},
 		cxn => $params->{bolt_connection},  # important to avoid dereferencing the connection
@@ -42,7 +43,7 @@ sub new {
 		$self->{buffer} = $self->{result}->{data};
 		$self->{columns} = Neo4j::Driver::ResultColumns->new($self->{result});
 		foreach my $record (@{ $self->{buffer} }) {
-			Neo4j::Driver::Record->new($record, $self->{columns}, $self->{deep_bless});
+			Neo4j::Driver::Record->new($record, $self->{columns}, $self->{deep_bless}, $self->{cypher_types});
 		}
 		$self->{attached} = 0;
 	}
@@ -140,7 +141,7 @@ sub _fetch_next {
 		$record = $self->{result}->{data}->[ $self->{json_cursor}++ ];
 	}
 	return undef unless $record;  ##no critic (ProhibitExplicitReturnUndef)
-	return Neo4j::Driver::Record->new($record, $self->{columns}, $self->{deep_bless});
+	return Neo4j::Driver::Record->new($record, $self->{columns}, $self->{deep_bless}, $self->{cypher_types});
 }
 
 
@@ -230,7 +231,7 @@ Neo4j::Driver::StatementResult - Result of running a Cypher statement (a stream 
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

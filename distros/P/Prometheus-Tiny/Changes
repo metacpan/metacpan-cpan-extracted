@@ -1,5 +1,12 @@
 Revision history for Prometheus-Tiny
 
+0.004     2019-12-22 12:17:34+11:00 Australia/Melbourne
+- Fix bug where metrics named "help" or "type" with timestamps would break
+
+0.003     2019-12-22 11:17:22+11:00 Australia/Melbourne
+- Add histogram support
+- Add timestamp support (ben hengst)
+
 0.002     2018-08-09 12:58:34+10:00 Australia/Melbourne
 - Add simple PSGI app generator
 

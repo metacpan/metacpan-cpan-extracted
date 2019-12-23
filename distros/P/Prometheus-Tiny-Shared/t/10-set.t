@@ -39,4 +39,31 @@ some_metric 8
 EOF
 }
 
+{
+  my $p = Prometheus::Tiny::Shared->new;
+  $p->set('some_metric', 5, {}, 1234);
+  is $p->format, <<EOF, 'single metric with timestamp formatted correctly';
+some_metric 5 1234
+EOF
+}
+
+{
+  my $p = Prometheus::Tiny::Shared->new;
+  $p->set('some_metric', 5, {}, 2345);
+  $p->set('other_metric', 10, {}, 1234);
+  is $p->format, <<EOF, 'multiple metrics with timestamp formatted correctly';
+other_metric 10 1234
+some_metric 5 2345
+EOF
+}
+
+{
+  my $p = Prometheus::Tiny::Shared->new;
+  $p->set('some_metric', 3, {}, 1234);
+  $p->set('some_metric', 8, {}, 2345);
+  is $p->format, <<EOF, 'single metric with timestamp is overwritten correctly';
+some_metric 8 2345
+EOF
+}
+
 done_testing;

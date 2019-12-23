@@ -1,10 +1,9 @@
 package Mojo::Cache::Role::Exists;
+use Mojo::Base -role;
 
-use Role::Tiny;
+our $VERSION = '0.02';
 
-our $VERSION = '0.01';
-
-sub exists { exists $_[0]->{cache} && exists $_[0]->{cache}{$_[1]} }
+sub exists { CORE::exists $_[0]->{cache} && CORE::exists $_[0]->{cache}{$_[1]} }
 
 1;
 __END__

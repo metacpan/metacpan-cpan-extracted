@@ -1,10 +1,10 @@
 {
    "abstract" : "Lists of reserved barewords and symbol names",
    "author" : [
-      "Joshua ben Jore <jjore@cpan.org>"
+      "Reini Urban <rurban@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 8.3506, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -45,6 +45,6 @@
          "url" : "http://github.com/rurban/b-keywords"
       }
    },
-   "version" : "1.20",
-   "x_serialization_backend" : "JSON::PP version 2.97001_04"
+   "version" : "1.21",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -67,6 +67,10 @@ qualified service name. It is not usually necessary to
 use this constructor, since services can be created via
 the C<export_service> method on the L<Net::DBus> object.
 
+When C<$name> is not specified or is C<undef> then returned
+handle to the service is identified only by the unique name
+of client's connection to the bus.
+
 =cut
 
 sub new {
@@ -78,6 +82,11 @@ sub new {
     $self->{objects} = {};
 
     bless $self, $class;
+
+    if (not defined $self->get_service_name) {
+        $self->{service_name} = $self->get_bus->get_unique_name;
+        return $self;
+    }
 
     $self->get_bus->get_connection->request_name($self->get_service_name);
 

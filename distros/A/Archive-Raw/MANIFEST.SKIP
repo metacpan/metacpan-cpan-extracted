@@ -1,0 +1,13 @@
+Raw.bs
+Raw.c
+Raw.o
+Raw.def
+MYMETA.json.lock
+const-c-constants.inc
+const-xs-constants.inc
+.*\.o
+.*\.a
+.*\.pc$
+cover_db/
+.*\.gcda
+.*\.gcno

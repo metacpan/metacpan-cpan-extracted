@@ -8,8 +8,6 @@ use strict;
 use warnings;
 use utf8;
 
-use Quiq::Unindent;
-
 # -----------------------------------------------------------------------------
 
 sub test_loadClass : Init(1) {
@@ -44,12 +42,12 @@ sub test_unitTest : Test(5) {
     # 3.
 
     $code = $p->tag('descr',"Dies ist\nein Test\n");
-    $self->is($code,Quiq::Unindent->trimNl(q~
+    $self->isText($code,q~
         <descr>
           Dies ist
           ein Test
         </descr>
-    ~));
+    ~);
 
     # 4.
 
@@ -57,12 +55,12 @@ sub test_unitTest : Test(5) {
         $p->tag('firstname','Lieschen'),
         $p->tag('lastname','Müller'),
     );
-    $self->is($code,Quiq::Unindent->trimNl(q~
+    $self->isText($code,q~
         <person>
           <firstname>Lieschen</firstname>
           <lastname>Müller</lastname>
         </person>
-    ~));
+    ~);
 }
 
 # -----------------------------------------------------------------------------

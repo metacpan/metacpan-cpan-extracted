@@ -1,7 +1,7 @@
 package Log::ger::Format::Flogger;
 
-our $DATE = '2017-08-01'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-10-27'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -13,9 +13,13 @@ sub get_hooks {
 
     return {
         create_formatter => [
-            __PACKAGE__, 50,
-            sub {
-                [sub { flog(@_) }];
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_;
+
+                my $formatter = \&flog;
+                [$formatter];
             }],
     };
 }
@@ -35,7 +39,7 @@ Log::ger::Format::Flogger - Use String::Flogger for formatting instead of sprint
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -68,7 +72,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

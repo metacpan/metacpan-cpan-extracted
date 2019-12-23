@@ -341,6 +341,23 @@ print <<EOF;
 *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
 
 
+Linux kernels can notify userspace about realtime clock timejumps
+using timerfd. Libev by default will try to take advantage of this if
+possible. You can completely disable the detection and use of timerfd for
+this purpose by answering 'n' here. Support for timerfd will otherwise be
+autodetected at both compile- and runtime.
+
+EOF
+
+unless (prompt ("Enable optional support for timerfd to detect timejumps (y/n)?", "y") =~ /[yY]/) {
+   $DEFINE .= " -DEV_USE_TIMERFD=0";
+}
+
+print <<EOF;
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+
+
 Libev contains numerous internal assert() invocations to check for
 consistency and user errors. These are normally enabled, but most
 perl builds disable this error reporting mechanism by default. You

@@ -1,5 +1,8 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+1.04 2019-12-19
+ - Add SelfServiceCustomFieldGroupings configuration variable to allow cfs groupings in SelfService
+
 1.03 2019-12-03
  - huggyb: When edit ignore cf grouping in selfservice
  - Fix #8 mandatory ConditionalCF: in creation, object is null Ticket, not Queue

@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.37';
+our $VERSION = '1.39';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -820,7 +820,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.37
+version 1.39
 
 =head1 DESCRIPTION
 
@@ -1013,7 +1013,7 @@ see also B<is_transfer>.
 =item $result->old_train_no
 
 Number of the pre-tarnsfer train, unique per day. E.g. C<< 2225 >> for
-C<< IC 2225 >>. See also B<is_transfer>. Only defined if a transfer took
+C<< IC 2225 >>. Only defined if a transfer took
 place, see also B<is_transfer>.
 
 =item $result->origin

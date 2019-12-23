@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 # TODO: Missing:
 #  * activeTimer
@@ -65,7 +65,8 @@ sub tree {
                                         'portalCheckLogins',
                                         'portalDisplayResetPassword',
                                         'passwordResetAllowedRetries',
-                                        'portalDisplayRegister'
+                                        'portalDisplayRegister',
+                                        'portalDisplayCertificateResetByMail'
                                     ]
                                 },
                                 {
@@ -615,6 +616,7 @@ sub tree {
                                     help  => 'notifications.html#server',
                                     nodes => [
                                         'notificationServer',
+                                        'notificationDefaultCond',
                                         'notificationServerSentAttributes',
                                         {
                                             title =>
@@ -654,6 +656,34 @@ sub tree {
                                     ]
                                 }
                             ]
+                         },
+                          {
+                            title => 'certificateResetByMailManagement',
+                             form  => 'simpleInputContainer',
+                             nodes => [ {
+                                     title => 'certificateMailContent',
+                                     form  => 'simpleInputContainer',
+                                     nodes => [ 
+                                         'certificateResetByMailSender',
+                                         'certificateResetByMailReplyTo',
+                                         'certificateResetByMailStep1Subject',
+                                         'certificateResetByMailStep1Body',
+                                         'certificateResetByMailStep2Subject',
+                                         'certificateResetByMailStep2Body'
+                                      ]
+                                  },
+  
+                                  {
+                                      title => 'mailOther',
+                                      form  => 'simpleInputContainer',
+                                      nodes => [
+                                          'certificateResetByMailURL',
+                                          'certificateResetByMailCeaAttribute',
+                                          'certificateResetByMailCertificateAttribute',
+                                          'certificateResetByMailValidityDelay'
+                                    ]
+                                 } 
+                             ]
                         },
                         {
                             title => 'register',
@@ -670,6 +700,13 @@ sub tree {
                             title => 'autoSignin',
                             help  => 'autosignin.html',
                             nodes => ['autoSigninRules'],
+                        },
+                        {
+                            title => 'globalLogout',
+                            help  => 'globallogout.html',
+                            form  => 'simpleInputContainer',
+                            nodes =>
+                              [ 'globalLogoutRule', 'globalLogoutTimer', ],
                         },
                         {
                             title => 'stateCheck',
@@ -712,6 +749,19 @@ sub tree {
                                 'contextSwitchingStopWithLogout',
                             ]
                         },
+                        {
+                            title => 'decryptValue',
+                            help  => 'decryptvalue.html',
+                            form  => 'simpleInputContainer',
+                            nodes =>
+                              [ 'decryptValueRule', 'decryptValueFunctions', ]
+                        },
+                        {
+                            title => 'customPluginsNode',
+                            help  => 'plugincustom.html',
+                            nodes => [ 'customPlugins', 'customPluginsParams' ]
+                        },
+                        'refreshSessions',
                     ]
                 },
                 {
@@ -1088,7 +1138,6 @@ sub tree {
                     title => 'samlAdvanced',
                     help  => 'samlservice.html#advanced',
                     nodes => [
-                        'samlIdPResolveCookie',
                         'samlMetadataForceUTF8',
                         'samlStorage',
                         'samlStorageOptions',
@@ -1158,12 +1207,18 @@ sub tree {
                         'oidcServiceAllowAuthorizationCodeFlow',
                         'oidcServiceAllowImplicitFlow',
                         'oidcServiceAllowHybridFlow',
+                        'oidcServiceAuthorizationCodeExpiration',
+                        'oidcServiceAccessTokenExpiration',
+                        'oidcServiceIDTokenExpiration',
+                        'oidcServiceOfflineSessionExpiration',
                     ],
                 },
                 {
                     title => "oidcServiceMetaDataSessions",
                     nodes => [ 'oidcStorage', 'oidcStorageOptions', ],
                 },
+		'oidcServiceDynamicRegistrationExportedVars',
+		'oidcServiceDynamicRegistrationExtraClaims',
             ]
         },
         'oidcOPMetaDataNodes',

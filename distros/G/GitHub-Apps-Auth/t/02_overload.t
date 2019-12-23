@@ -29,16 +29,14 @@ my $g = mock_guard "GitHub::Apps::Auth" => {
     },
 };
 
-my $hash = { token => $auth };
-
-is $auth, "1234567890";
+is "$auth", "1234567890";
 sleep 1;
-is $auth, "1234567890";
+is "$auth", "1234567890";
 sleep 59;
-is $auth, "1234567890";
+is "$auth", "1234567890";
 sleep 1;
-is $auth, "1234567891";
+is "$auth", "1234567891";
 sleep 1;
-is $auth, "1234567891";
+is "$auth", "1234567891";
 
 done_testing;

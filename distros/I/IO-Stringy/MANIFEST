@@ -1,0 +1,28 @@
+Changes
+contrib/Clever.pm
+COPYING
+examples/IO_Scalar_synopsis
+lib/IO/AtomicFile.pm
+lib/IO/InnerFile.pm
+lib/IO/Lines.pm
+lib/IO/Scalar.pm
+lib/IO/ScalarArray.pm
+lib/IO/Stringy.pm
+lib/IO/Wrap.pm
+lib/IO/WrapTie.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-report-prereqs.t
+t/Common.pm
+t/ExtUtils/TBone.pm
+t/IO_InnerFile.t
+t/IO_Lines.t
+t/IO_Scalar.t
+t/IO_ScalarArray.t
+t/IO_WrapTie.t
+t/simple.t
+t/two.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -248,7 +248,7 @@ package Coro::Multicore;
 use Coro ();
 
 BEGIN {
-   our $VERSION = '1.05';
+   our $VERSION = '1.06';
 
    use XSLoader;
    XSLoader::load __PACKAGE__, $VERSION;

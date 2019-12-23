@@ -44,8 +44,12 @@
 /* Tables */
 
 .panel .table th {
-  width: 10%;
   vertical-align: middle;
+  width: 10%;
+}
+
+.th_rulesAuthnLevel {
+    width: 2% !important;
 }
 
 /* Category tree */

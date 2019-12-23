@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-10-17'; # DATE
-our $VERSION = '0.728'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.729'; # VERSION
 
 use 5.010;
 use strict;
@@ -100,7 +100,7 @@ pmversion - Get Perl module version
 
 =head1 VERSION
 
-This document describes version 0.728 of pmversion (from Perl distribution App-PMUtils), released on 2019-10-17.
+This document describes version 0.729 of pmversion (from Perl distribution App-PMUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -132,7 +132,13 @@ simple regex over the module's source code and does not require you to actually
 execute the source code.
 
 
-=item B<--module>=I<s>*
+=item B<--module-json>=I<s>
+
+See C<--module>.
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
 
 =back
 

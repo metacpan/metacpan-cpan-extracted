@@ -9,5 +9,7 @@ lib/Package/New/Dump.pm
 t/001_load.t
 t/002_base.t
 t/003_dump.t
+t/004_dump.t
 perl-Package-New.spec
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

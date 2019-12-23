@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl extension for accessing YottaDB",
+   "abstract" : "Perl extension for accessing L<YottaDB|https://yottadb.com>",
    "author" : [
       "Stefan Traby <stefan@hello-penguin.com>"
    ],
@@ -27,17 +27,16 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::PkgConfig" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "JSON" : "2.9",
-            "POSIX::AtFork" : "0.02"
+            "JSON" : "2.9"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.24",
+   "version" : "0.31",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

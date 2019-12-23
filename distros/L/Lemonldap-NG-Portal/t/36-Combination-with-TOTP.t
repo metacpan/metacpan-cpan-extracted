@@ -20,7 +20,7 @@ SKIP: {
                 totp2fSelfRegistration => 1,
                 totp2fActivation       => 1,
                 requireToken           => 1,
-                formTimeout            => 2,
+                formTimeout            => 120,
                 loginHistoryEnabled    => 0,
                 authentication         => 'Combination',
                 userDB                 => 'Same',
@@ -153,9 +153,8 @@ SKIP: {
         'Code' );
     $query =~ s/code=/code=$code/;
 
-    # Expired token
-    diag 'Waiting';
-    sleep 3;
+    # Skip ahead in time until the form token has expired
+    Time::Fake->offset("+5m");
 
     ok(
         $res = $client->_post(

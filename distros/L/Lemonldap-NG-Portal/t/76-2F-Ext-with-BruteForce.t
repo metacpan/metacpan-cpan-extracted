@@ -76,8 +76,8 @@ count(1);
 ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/, 'Protection enabled' );
 count(1);
 
-diag 'Waiting';
-sleep 2;
+# Cool down
+Time::Fake->offset("+2s");
 
 # Try to authenticate
 # -------------------
@@ -97,7 +97,7 @@ my ( $host, $url, $query ) =
 
 ok(
     $res->[2]->[0] =~
-qr%<input name="code" value="" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
+qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);
@@ -117,8 +117,8 @@ count(1);
 ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/, 'Protection enabled' );
 count(1);
 
-diag 'Waiting';
-sleep 4;
+# Cool down
+Time::Fake->offset("+6s");
 
 # Try to authenticate again
 # -------------------------
@@ -138,7 +138,7 @@ count(1);
 
 ok(
     $res->[2]->[0] =~
-qr%<input name="code" value="" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
+qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);

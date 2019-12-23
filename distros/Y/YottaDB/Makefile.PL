@@ -5,6 +5,11 @@ use ExtUtils::PkgConfig;
 
 my $cflags = cflags ExtUtils::PkgConfig ("yottadb");
 my $libs = libs ExtUtils::PkgConfig ("yottadb");
+my $ver  = modversion ExtUtils::PkgConfig ("yottadb");
+
+$ver =~ s/^r//;
+$cflags = "$cflags -DNO_CHILD_INIT" if $ver >= 1.24;
+
 
 open my $out, ">", "gen-switch.h" or die "opening gen-switch.h: $!";
 
@@ -25,7 +30,8 @@ WriteMakefile(
                     },
     NAME              => 'YottaDB',
     VERSION_FROM      => 'YottaDB.pm',
-    PREREQ_PM         => {'POSIX::AtFork' => 0.02, JSON => 2.90},
+    CONFIGURE_REQUIRES => { 'ExtUtils::PkgConfig' => 0 },
+    PREREQ_PM         => {JSON => 2.90},
     ABSTRACT_FROM     => 'YottaDB.pm',
     AUTHOR            => 'Stefan Traby <stefan@hello-penguin.com>',
     LIBS              => [$libs],

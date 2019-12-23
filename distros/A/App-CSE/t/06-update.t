@@ -24,6 +24,8 @@ my $content_dir = Path::Class::Dir->new( $c_dir );
 
 my $bonjour_file = $content_dir->file('bonjour_file.txt');
 File::Slurp::write_file($bonjour_file.'', 'bonjour' );
+my $soon_gone = $content_dir->file('soon_gone.txt');
+File::Slurp::write_file($soon_gone.'', 'soonGone');
 
 {
   ## Index and search the content dir
@@ -45,12 +47,24 @@ File::Slurp::write_file($bonjour_file.'', 'bonjour' );
 }
 
 {
+    # Remove the soon_gone file and search for it to check it is marked as dirty.
+    unlink $soon_gone;
+    local @ARGV = (  '--idx='.$idx_dir, 'soonGone', '--dir='.$content_dir.'');
+    my $cse = App::CSE->new();
+    is( $cse->command()->execute(), 0 , "Ok execute has terminated just fine");
+    is( $cse->command()->hits->total_hits() , 1 , "Ok got one hit for bonjour, even if the file now says bonsoir");
+    ok( $cse->dirty_files()->{$soon_gone.''} , "Ok this file is now dirty");
+}
+
+
+{
   # Update and check the dirt is gone.
   local @ARGV = ( 'update', '--idx='.$idx_dir, '--dir='.$content_dir.'');
   my $cse = App::CSE->new();
   ok( $cse->command()->isa('App::CSE::Command::Update') , "Ok good command class");
   is( $cse->command()->execute(), 0 , "Ok execute has terminated just fine");
   ok( ! $cse->dirty_files()->{$bonjour_file.''} , "Ok dirt is gone");
+  ok( ! $cse->dirty_files()->{$soon_gone.''} , "Ok gone file is gone");
 }
 
 {

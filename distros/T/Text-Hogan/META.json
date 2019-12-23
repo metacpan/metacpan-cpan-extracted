@@ -29,6 +29,7 @@
       "runtime" : {
          "requires" : {
             "Clone" : "0.37",
+            "Ref::Util" : "0.204",
             "Scalar::Util" : "1.41",
             "Text::Trim" : "1.02",
             "perl" : "v5.10.0"
@@ -56,7 +57,7 @@
          "web" : "http://github.com/kaoru/Text-Hogan"
       }
    },
-   "version" : "2.02",
+   "version" : "2.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0214"
 }
 

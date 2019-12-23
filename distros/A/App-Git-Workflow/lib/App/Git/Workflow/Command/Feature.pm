@@ -13,7 +13,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow::Pom;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = version->new(1.1.11);
+our $VERSION  = version->new(1.1.12);
 our $workflow = App::Git::Workflow::Pom->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -113,7 +113,7 @@ git-feature - Create a feature branch from the "current release"
 
 =head1 VERSION
 
-This documentation refers to git-feature version 1.1.11
+This documentation refers to git-feature version 1.1.12
 
 =head1 SYNOPSIS
 

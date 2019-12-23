@@ -1,6 +1,6 @@
 package Perl::Critic::TooMuchCode;
 use strict;
-our $VERSION='0.12';
+our $VERSION='0.13';
 
 # Well, we need a place for this monkey-patching business.
 sub __get_terop_usage {

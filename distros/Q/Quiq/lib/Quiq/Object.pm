@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -178,8 +178,8 @@ wie bereits gesagt, sofort zurück. Beispiel:
       my $opt2 = 2;
   
       $this->parameters(\@_,
-          opt1 => \$opt1,
-          opt2 => \$opt2,
+          -opt1 => \$opt1,
+          -opt2 => \$opt2,
       );
   
       # ...
@@ -192,8 +192,8 @@ an eine andere Methode weiterleitet. Der Aufruf von parameters() ändert
 sich zu:
 
   $this->parameters(1,\@_,
-      opt1 => \$opt1,
-      opt2 => \$opt2,
+      -opt1 => \$opt1,
+      -opt2 => \$opt2,
   );
 
 [3], [4] Wie [1] bzw. [2], nur dass parameters() zusätzlich die
@@ -211,8 +211,8 @@ Referenz auf diese Liste zurückgegeben. Beispiel:
       my $opt2 = 2;
   
       $argA = $this->parameters(0,\@_,
-          opt1 => \$opt1,
-          opt2 => \$opt2,
+          -opt1 => \$opt1,
+          -opt2 => \$opt2,
       );
       my ($arg1,$arg2,$arg3,$arg4) = @$argA;
   
@@ -257,7 +257,12 @@ sub parameters {
 
     # Parameterliste verarbeiten
 
-    my $argA = Quiq::Parameters->extract(1,0,undef,$paramA,$maxArgs,@_);
+    my $p = 0;
+    if (@_ && substr($_[0],0,1) ne '-') {
+        $p = 1; # Namensparameter/Properties
+    }
+
+    my $argA = Quiq::Parameters->extract(1,$p,undef,$paramA,$maxArgs,@_);
     if (@$argA < $minArgs) {
         $this->throw(
             'PARAM-00099: Missing arguments',
@@ -587,7 +592,7 @@ sub this {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

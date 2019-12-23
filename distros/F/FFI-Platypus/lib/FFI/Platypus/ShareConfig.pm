@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use File::Spec;
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 sub dist_dir ($)
 {
@@ -63,7 +63,7 @@ FFI::Platypus::ShareConfig
 
 =head1 VERSION
 
-version 1.02
+version 1.06
 
 =head1 AUTHOR
 

@@ -9,8 +9,7 @@ BEGIN {
     require 't/test-lib.pm';
 }
 
-my $maintests = 4;
-my $debug     = 'error';
+my $maintests = 12;
 my $client;
 
 # Redefine LWP methods for tests
@@ -44,18 +43,48 @@ LWP::Protocol::PSGI->register(
 );
 
 my $xml = '<?xml version="1.0" encoding="UTF-8"?>
-<root><notification uid="dwho" date="2016-05-30" reference="testref">
+<root><notification uid="dwho" date="2016-05-30 15:35:10" reference="testref">
 <title>Test title</title>
 <subtitle>Test subtitle</subtitle>
 <text>This is a test text</text>
 </notification></root>';
 
-my $xml2 = '<?xml version="1.0" encoding="UTF-8"?>
+my $xmlbis = '<?xml version="1.0" encoding="UTF-8"?>
 <root><notification uid="dwho" date="2016-05-31" reference="testref">
 <title>Test title</title>
 <subtitle>Test subtitle</subtitle>
 <text>This is a test text</text>
 </notification></root>';
+
+my $combined = '<?xml version="1.0" encoding="UTF-8"?>
+<root><notification uid="dwho" date="2016-05-31 15:35:10" reference="ABC1">
+<title>Test title</title>
+<subtitle>Test subtitle</subtitle>
+<text>This is a test text</text>
+<check>I agree</check>
+</notification>
+<notification uid="rtyler" date="2016-05-31" reference="ABC2">
+<title>Test title</title>
+<subtitle>Test subtitle</subtitle>
+<text>This is a test text</text>
+<check>I agree</check>
+<check>I am sure</check>
+</notification>
+<notification uid="rtyler" date="2016-05-31" reference="ABC3" condition="\$env->{REMOTE_ADDR} =~ /127\.1\.1\.1/">
+<title>Test title</title>
+<subtitle>Test subtitle</subtitle>
+<text>This is a test text</text>
+<check>I agree</check>
+<check>I am sure</check>
+</notification>
+<notification uid="rtyler" date="2050-05-31" reference="ABC4">
+<title>Test title</title>
+<subtitle>Test subtitle</subtitle>
+<text>This is a test text</text>
+<check>I agree</check>
+<check>I am sure</check>
+</notification>
+</root>';
 
 SKIP: {
     eval "use SOAP::Lite; use  XML::LibXML; use XML::LibXSLT;";
@@ -69,6 +98,7 @@ SKIP: {
                 useSafeJail                => 1,
                 notification               => 1,
                 notificationServer         => 1,
+                #notificationDefaultCond    => '$env->{REMOTE_ADDR} =~ /127.0.0.1/',
                 notificationStorage        => 'File',
                 notificationStorageOptions => {
                     dirName => $main::tmpDir
@@ -90,7 +120,7 @@ SKIP: {
     );
     $soap->default_ns('urn:Lemonldap/NG/Common/PSGI/SOAPService');
     ok(
-        $soap->call( 'newNotification', $xml2 )->result() == 0,
+        $soap->call( 'newNotification', $xmlbis )->result() == 0,
         ' Append the same notification twice -> SOAP call returns 0'
     );
 
@@ -111,6 +141,82 @@ SKIP: {
     expectOK($res);
     my $id = expectCookie($res);
     expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
+
+    # Insert combined notifications
+    $soap->default_ns('urn:Lemonldap/NG/Common/PSGI/SOAPService');
+    ok(
+        $soap->call( 'newNotification', $combined )->result() == 4,
+        ' Append a notification -> SOAP call returns 4'
+    );
+
+    # Try to authenticate with "dwho"
+    # -------------------------------
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new(
+                'user=dwho&password=dwho'),
+            accept => 'text/html',
+            length => 23,
+        ),
+        'Auth query'
+    );
+    expectOK($res);
+    $id = expectCookie($res);
+    expectForm( $res, undef, '/notifback', 'reference1x1', 'reference2x1' );
+    my @c = ( $res->[2]->[0] =~ m%<input type="checkbox"%gs );
+
+    ## One entry found
+    ok( @c == 1, ' -> One checkbox found' )
+      or
+      explain( $res->[2]->[0], "Number of checkbox(es) found = " . scalar @c );
+
+    # Try to validate notification
+    my $str = 'reference1x1=ABC1&check1x1x1=accepted';
+    ok(
+        $res = $client->_post(
+            '/notifback',
+            IO::String->new($str),
+            cookie => "lemonldap=$id",
+            accept => 'text/html',
+            length => length($str),
+        ),
+        "Accept notification"
+    );
+    expectOK($res);
+    $client->logout($id);
+
+    # Try to authenticate with "rtyler"
+    # -------------------------------
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new(
+                'user=rtyler&password=rtyler'),
+            accept => 'text/html',
+            length => 27,
+        ),
+        'Auth query'
+    );
+    expectOK($res);
+    $id = expectCookie($res);
+    expectForm( $res, undef, '/notifback', 'reference1x1' );
+    ok(
+        $res->[2]->[0] =~
+m%<input type="checkbox" name="check1x1x1" id="check1x1x1" value="accepted">I agree</label>%,
+        'Checkbox is displayed'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    ok(
+        $res->[2]->[0] =~
+m%<input type="checkbox" name="check1x1x2" id="check1x1x2" value="accepted">I am sure</label>%,
+        'Checkbox is displayed'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    @c = ( $res->[2]->[0] =~ m%<input type="checkbox"%gs );
+
+    ## Two entries found
+    ok( @c == 2, ' -> Two checkboxes found' )
+      or
+      explain( $res->[2]->[0], "Number of checkbox(es) found = " . scalar @c );
 
 }
 

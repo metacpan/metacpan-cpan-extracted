@@ -33,7 +33,7 @@ t/bitbucket.t
 t/fpaste.t
 t/gist.t
 t/github.t
-t/google-maps.t
+t/google.t
 t/greatcirclemapper.t
 t/imgur.t
 t/instagram.t

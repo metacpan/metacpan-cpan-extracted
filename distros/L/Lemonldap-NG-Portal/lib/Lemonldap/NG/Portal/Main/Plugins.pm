@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -12,6 +12,7 @@ use Mouse;
 # Plugins enabled by a simple boolean value (ordered list)
 #
 # Developers: 2FA must be loaded before Notifications
+# Developers: GlobalLogout must be the last loaded plugin
 our @pList = (
     portalDisplayResetPassword => '::Plugins::MailPasswordReset',
     portalStatus               => '::Plugins::Status',
@@ -28,6 +29,9 @@ our @pList = (
     checkUser                  => '::Plugins::CheckUser',
     impersonationRule          => '::Plugins::Impersonation',
     contextSwitchingRule       => '::Plugins::ContextSwitching',
+    decryptValueRule           => '::Plugins::DecryptValue',
+    globalLogoutRule           => '::Plugins::GlobalLogout',
+    refreshSessions            => '::Plugins::Refresh',
 );
 
 ##@method list enabledPlugins
@@ -73,6 +77,8 @@ sub enabledPlugins {
     # Check if register is enabled
     push @res, '::Plugins::Register'
       if ( $conf->{registerDB} and $conf->{registerDB} ne 'Null' );
+    push @res, '::Plugins::CertificateResetByMail'
+      if ( $conf->{portalDisplayCertificateResetByMail});
 
     # Check if custom plugins are required
     # TODO: change this name

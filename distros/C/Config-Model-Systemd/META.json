@@ -43,10 +43,11 @@
       },
       "test" : {
          "requires" : {
-            "Config::Model::Tester" : "3.006",
+            "Config::Model::Tester" : "4.005",
             "Config::Model::Tester::Setup" : "0",
             "Test::File::Contents" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Pod" : "1.00"
          }
       }
    },
@@ -63,8 +64,8 @@
          "web" : "http://github.com/dod38fr/config-model-systemd"
       }
    },
-   "version" : "0.240.1",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "version" : "0.244.1",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }
 

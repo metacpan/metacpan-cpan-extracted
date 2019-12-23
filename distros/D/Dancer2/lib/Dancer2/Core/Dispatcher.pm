@@ -1,6 +1,6 @@
 package Dancer2::Core::Dispatcher;
 # ABSTRACT: Class for dispatching request to the appropriate route handler
-$Dancer2::Core::Dispatcher::VERSION = '0.208001';
+$Dancer2::Core::Dispatcher::VERSION = '0.208002';
 use Moo;
 
 use Dancer2::Core::Types;
@@ -73,7 +73,7 @@ Dancer2::Core::Dispatcher - Class for dispatching request to the appropriate rou
 
 =head1 VERSION
 
-version 0.208001
+version 0.208002
 
 =head1 SYNOPSIS
 
@@ -112,10 +112,9 @@ object and an env as input arguments.
 
 C<dispatch> returns a response object of L<Dancer2::Core::Response>.
 
-Any before hook and matched route code is wrapped using L<Return::MultiLevel>
-to allow DSL keywords such as forward and redirect to short-circuit remaining code
-without having to throw an exception. L<Return::MultiLevel> will use L<Scope::Upper>
-(an XS module) if it is available.
+Any before hook and matched route code is wrapped to allow DSL keywords such
+as forward and redirect to short-circuit remaining code, returning across
+multiple stack frames without having to throw an exception.
 
 =head2 response_internal_error
 

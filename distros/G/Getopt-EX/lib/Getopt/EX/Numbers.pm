@@ -41,6 +41,10 @@ last 10 numbers.
     :+9		top 10 numbers
     -9:		last 10 numbers
 
+C<{n}> operator can be used to repeat preceeding expression.  C<3{5}>
+means C<3,3,3,3,3>.  C<2:6:2{3}> means C<2,4,6,2,4,6,2,4,6>.
+
+
 =head1 METHOD
 
 =over 4
@@ -60,7 +64,7 @@ Return number range list:
 
     ( [ n0, m0 ], [ n1, m1 ], ... )
 
-=item sequence
+=item B<sequence>
 
 Return number sequence:
 

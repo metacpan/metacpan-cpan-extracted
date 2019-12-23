@@ -65,7 +65,7 @@ be tested without actually starting a real bus.
 !!!!! WARNING !!!
 
 This object & its APIs should be considered very experimental at
-this point in time, and no guarentees about future API compatibility
+this point in time, and no guarantees about future API compatibility
 are provided what-so-ever. Comments & suggestions on how to evolve
 this framework are, however, welcome & encouraged.
 

@@ -62,9 +62,9 @@ print <<EOF;
 *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
 
 Coro::Multicore can do some simple checks to make sure perlinterp_release
-is called only with a valid perl context, and perlinterp_acquire without,
+is called only with a valid perl context, and perlinterp_acquire without
 ensuring that they are always called in proper pairs. This is very useful
-for development of your XS module.
+while developing XS modules using perlmulticore.h.
 
 This costs a bit of performance though, so it is disabled by default.
 

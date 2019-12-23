@@ -1,0 +1,66 @@
+NAME
+    Types::DualVar - type constraint for dualvars
+
+SYNOPSIS
+       package MyClass {
+          use Moo;
+          use Types::Common::Numeric qw( PositiveInt );
+          use Types::DualVar qw( DualVar );
+      
+          has attr => (
+             is        => 'ro',
+             isa       => DualVar->numifies_to(PositiveInt),
+             required  => 1,
+          );
+       }
+   
+       use Scalar::Util qw( dualvar );
+   
+       # This is okay.
+       #
+       my $obj1 = MyClass->new(
+          attr => dualvar(2, "-1"),
+       );
+   
+       # This is not okay.
+       #
+       my $obj2 = MyClass->new(
+          attr => dualvar(0, "666"),
+       );
+   
+       # This is not okay.
+       #
+       my $obj3 = MyClass->new(
+          attr => 42,
+       );
+
+DESCRIPTION
+    Types::DualVar is a type library for Moo, Moose, Mouse, or none of the
+    above which offers just one type: DualVar.
+
+    DualVar corresponds to the `isdual()` function from Scalar::Util.
+
+    The DualVar type is extended with the `stringifies_to` and `numifies_to`
+    methods as documented in Type::Tiny::ConstrainedObject.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Types-DualVar>.
+
+SEE ALSO
+    Type::Tiny::Manual, Scalar::Util.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2019 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

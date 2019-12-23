@@ -196,7 +196,13 @@ start_thread (void)
       X_UNLOCK (release_m);
       {
         dTHX;
+        dSP;
+
+        PUSHSTACKi (PERLSI_REQUIRE);
+
         eval_pv ("Coro::Multicore::init", 1);
+
+        POPSTACK;
       }
       X_LOCK (release_m);
     }

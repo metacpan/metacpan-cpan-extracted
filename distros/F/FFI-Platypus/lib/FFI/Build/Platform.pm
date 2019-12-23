@@ -12,7 +12,7 @@ use File::Spec;
 use FFI::Platypus::ShareConfig;
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 
 sub new
@@ -148,7 +148,8 @@ sub cxx
   }
   elsif($self->osname eq 'MSWin32' && $self->{config}->{ccname} eq 'cl')
   {
-    return \@cc;
+    # TODO: see https://github.com/Perl5-FFI/FFI-Platypus/issues/203
+    #return \@cc;
   }
 
   Carp::croak("unable to detect corresponding C++ compiler");
@@ -237,8 +238,8 @@ sub ldflags
   }
   elsif($self->osname eq 'MSWin32' && $self->{config}->{ccname} eq 'cl')
   {
-    # TODO: test.
-    push @ldflags, qw( -link -dll );
+    push @ldflags, qw( -dll );
+    @ldflags = grep !/^-nodefaultlib$/, @ldflags;
   }
   elsif($self->osname eq 'MSWin32')
   {
@@ -341,6 +342,30 @@ sub flag_library_output
 }
 
 
+sub flag_exe_output
+{
+  my $self = _self(shift);
+  my $file = shift;
+  if($self->osname eq 'MSWin32' && $self->{config}->{ccname} eq 'cl')
+  {
+    my $file = File::Spec->rel2abs($file);
+    return ("/Fe:$file");
+  }
+  else
+  {
+    return ('-o' => $file);
+  }
+}
+
+
+sub flag_export
+{
+  my $self = _self(shift);
+  return () unless $self->osname eq 'MSWin32' && $self->{config}->{ccname} eq 'cl';
+  return map { "/EXPORT:$_" } @_;
+}
+
+
 sub which
 {
   my(undef, $command) = @_;
@@ -397,7 +422,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 1.02
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -510,21 +535,33 @@ the linker to generate a dynamic library.  On Linux, for example, this is usuall
 
 =head2 cc_mm_works
 
- my $flags = $platform->cc_mm_works;
+ my $bool = $platform->cc_mm_works;
 
 Returns the flags that can be passed into the C compiler to compute dependencies.
 
 =head2 flag_object_output
 
- my $flag = $platform->flag_object_output($object_filename);
+ my @flags = $platform->flag_object_output($object_filename);
 
 Returns the flags that the compiler recognizes as being used to write out to a specific object filename.
 
 =head2 flag_library_output
 
- my $flag = $platform->flag_library_output($library_filename);
+ my @flags = $platform->flag_library_output($library_filename);
 
 Returns the flags that the compiler recognizes as being used to write out to a specific library filename.
+
+=head2 flag_exe_output
+
+ my @flags = $platform->flag_exe_output($library_filename);
+
+Returns the flags that the compiler recognizes as being used to write out to a specific exe filename.
+
+=head2 flag_export
+
+ my @flags = $platform->flag_export(@symbols);
+
+Returns the flags that the linker recognizes for exporting functions.
 
 =head2 which
 

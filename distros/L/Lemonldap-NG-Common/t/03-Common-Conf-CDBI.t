@@ -19,7 +19,7 @@ BEGIN {
 
 my $h;
 @ARGV = ("help=groups");
-unlink 't/lmConf.sql';
+unlink 't/cdbiConf.sql';
 
 SKIP: {
     eval { require DBI; };
@@ -29,7 +29,7 @@ SKIP: {
     ok(
         $h = new Lemonldap::NG::Common::Conf( {
                 type        => 'CDBI',
-                dbiChain    => "DBI:SQLite:dbname=t/lmConf.sql",
+                dbiChain    => "DBI:SQLite:dbname=t/cdbiConf.sql",
                 dbiUser     => '',
                 dbiPassword => '',
             }
@@ -69,6 +69,6 @@ SKIP: {
         ok( $cfg->{test} eq $test[$i]->{test}, "Test $i is restored" );
     }
 
-    unlink 't/lmConf.sql';
+    unlink 't/cdbiConf.sql';
 }
 

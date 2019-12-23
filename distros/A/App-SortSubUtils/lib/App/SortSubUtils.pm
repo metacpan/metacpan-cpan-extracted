@@ -1,7 +1,9 @@
 package App::SortSubUtils;
 
-our $DATE = '2019-05-24'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-14'; # DATE
+our $DIST = 'App-SortSubUtils'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,11 +15,11 @@ $SPEC{list_sort_sub_modules} = {
     v => 1.1,
 };
 sub list_sort_sub_modules {
-    require PERLANCAR::Module::List;
+    require Module::List::Tiny;
 
     my %args = @_;
 
-    my $res = PERLANCAR::Module::List::list_modules(
+    my $res = Module::List::Tiny::list_modules(
         "Sort::Sub::", {list_modules=>1, recurse=>1});
     my @rows;
     for (sort keys %$res) {
@@ -42,7 +44,7 @@ App::SortSubUtils - CLIs related to Sort::Sub
 
 =head1 VERSION
 
-This document describes version 0.001 of App::SortSubUtils (from Perl distribution App-SortSubUtils), released on 2019-05-24.
+This document describes version 0.002 of App::SortSubUtils (from Perl distribution App-SortSubUtils), released on 2019-12-14.
 
 =head1 SYNOPSIS
 
@@ -50,7 +52,11 @@ This document describes version 0.001 of App::SortSubUtils (from Perl distributi
 
 This distribution contains the following CLIs related to L<Sort::Sub>:
 
-# INSERT_EXECS_LIST
+=over
+
+=item * L<list-sort-sub-modules>
+
+=back
 
 =head1 FUNCTIONS
 

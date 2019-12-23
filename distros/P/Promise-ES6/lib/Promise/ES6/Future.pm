@@ -37,7 +37,11 @@ sub from_future {
 =head1 $future = to_future( $PROMISE )
 
 Returns a L<Future> instance from the given $PROMISE.
-(If $PROMISE is a L<Future> instance, $PROMISE is returned.)
+(If $PROMISE is a Future instance, $PROMISE is returned.)
+
+Note that this function can work with promise objects that aren’t
+L<Promise::ES6> instances. In fact, anything that I<isn’t> a Future
+instance will cause this function to create a new Future.
 
 =cut
 

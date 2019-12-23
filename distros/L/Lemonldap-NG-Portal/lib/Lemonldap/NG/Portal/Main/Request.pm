@@ -57,7 +57,8 @@ has continue => ( is => 'rw' );
 has checkLogins => ( is => 'rw' );
 
 # Boolean to indicate that url isn't Base64 encoded
-has urlNotBase64 => ( is => 'rw' );
+has urlNotBase64   => ( is => 'rw' );
+has maybeNotBase64 => ( is => 'rw' );
 
 # Menu error
 has menuError => ( is => 'rw' );
@@ -91,6 +92,7 @@ sub error_type {
                 PE_MAILOK,          PE_LOGOUT_OK,
                 PE_MAILFIRSTACCESS, PE_PASSWORDFIRSTACCESS,
                 PE_MAILCONFIRMOK,   PE_REGISTERFIRSTACCESS,
+                PE_RESETCERTIFICATE_FIRSTACCESS,
             )
         )
       );
@@ -107,7 +109,7 @@ sub error_type {
                 PE_CONFIRM,                       PE_MAILFORMEMPTY,
                 PE_MAILCONFIRMATION_ALREADY_SENT, PE_PASSWORDFORMEMPTY,
                 PE_CAPTCHAEMPTY,                  PE_REGISTERFORMEMPTY,
-                PE_PP_CHANGE_AFTER_RESET
+                PE_PP_CHANGE_AFTER_RESET,         PE_RESETCERTIFICATE_FOREMPTY,
             )
         )
       );

@@ -1,0 +1,18 @@
+{
+"accountCreated":"Akaun anda telah dicipta, kata laluan sementara anda telah dihantar ke alamat emel anda.",
+"autoMail":"Emel ini telah dihantar secara automatik",
+"click2Register":"Klik di sini untuk mengesahkan akaun anda",
+"click2Reset":"Kilik disini untuk menetapkan semula kata laluan anda",
+"hello":"Hello",
+"mail2fSubject":"[LemonLDAP::NG] Kod login anda",
+"mailConfirmSubject":"[LemonLDAP::NG] Pengesahan penetapan semula kata laluan",
+"mailSubject":"[LemonLDAP::NG] Kata laluan baru anda",
+"newPwdIs":"Kata laluan baru anda ialah",
+"pwdChanged":"Kata laluan anda telah ditukar",
+"pwdIs":"Kata laluan anda ialah",
+"registerConfirmSubject":"[LemonLDAP::NG]  Pengesahan pendaftaran akaun",
+"registerDoneSubject":"[LemonLDAP::NG] Akaun baru anda",
+"requestIssuedFromIP":"Permintaan itu dari alamat IP",
+"yourLoginCodeIs":"Kod login anda ialah",
+"yourLoginIs":"Login anda ialah"
+}

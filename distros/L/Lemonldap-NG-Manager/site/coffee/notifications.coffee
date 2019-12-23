@@ -2,6 +2,9 @@
 # LemonLDAP::NG Notifications Explorer client
 ###
 
+# Max number of notifications to display (see overScheme)
+max = 25
+
 scheme = [
 	(v) ->
 		"groupBy=substr(uid,1)"
@@ -10,6 +13,19 @@ scheme = [
 	(v) ->
 		"uid=#{v}"
 ]
+
+# When number of children nodes exceeds "max" value
+# and does not return "null", a level is added. See
+# "$scope.updateTree" method
+overScheme =
+	(v,level,over) ->
+		# "v.length > over" avoids a loop if one user opened more than "max"
+		# notifications
+		console.log 'overScheme => level', level, 'over', over
+		if level == 1 and v.length > over
+			"uid=#{v}*&groupBy=substr(uid,#{(level+over+1)})"
+		else
+			null
 
 # Session menu
 menu =
@@ -109,11 +125,12 @@ llapp.controller 'NotificationsExplorerCtrl', [ '$scope', '$translator', '$locat
 			$scope.waiting = false
 			$scope.init()
 
+	# Open node
 	$scope.stoggle = (scope) ->
 		node = scope.$modelValue
 		if node.nodes.length == 0
-			$scope.updateTree node.value, node.nodes, node.level, node.query
-			scope.toggle()
+			$scope.updateTree node.value, node.nodes, node.level, node.over, node.query, node.count
+		scope.toggle()
 
 	$scope.notifDate = (s) ->
 		if s?
@@ -139,20 +156,35 @@ llapp.controller 'NotificationsExplorerCtrl', [ '$scope', '$translator', '$locat
 			$scope.init()
 
 	autoId = 0
-	$scope.updateTree = (value, node, level, currentQuery) ->
+	$scope.updateTree = (value, node, level, over, currentQuery, count) ->
 		$scope.waiting = true
 		query = scheme[level] value, currentQuery
+
+		# If number of notifications exceeds "max", call it
+		if count > max
+			if tmp = overScheme value, level, over
+				over++
+				query = tmp
+				level = level - 1
+			else
+				over = 0
+		else
+			over = 0
+
+		# Launch HTTP query
 		$http.get("#{scriptname}notifications/#{$scope.type}?#{query}").then (response) ->
 			data = response.data
 			if data.result
 				for n in data.values
 					autoId++
 					n.id = "node#{autoId}"
-					if level <scheme.length - 1
+					if level < scheme.length - 1
 						n.nodes = []
 						n.level = level + 1
 						n.query = query
+						n.over  = over
 					node.push n
+				$scope.total = data.total if value == ''	
 			$scope.waiting = false
 		, (resp) ->
 			$scope.waiting = false
@@ -246,7 +278,7 @@ llapp.controller 'NotificationsExplorerCtrl', [ '$scope', '$translator', '$locat
 		$scope.currentNotification = null
 		$q.all [
 			$translator.init $scope.lang
-			$scope.updateTree '', $scope.data, 0
+			$scope.updateTree '', $scope.data, 0, 0
 		]
 		.then ->
 			$scope.waiting = false

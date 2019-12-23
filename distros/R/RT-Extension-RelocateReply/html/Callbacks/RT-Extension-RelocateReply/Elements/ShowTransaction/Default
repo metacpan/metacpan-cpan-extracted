@@ -1,0 +1,69 @@
+<%init>
+return if defined $ARGS{'ShowActions'} && ! $ARGS{'ShowActions'};
+my $txn_type = $Transaction->Type;
+return if ( $txn_type =~ /EmailRecord$/ );
+if ( $txn_type =~ /^Relocate/ ) {
+    my $desc = $$Description;
+    my @data = split(';', $Transaction->Data);
+    my $relocate_date = $data[1]||'??';
+    my $relocated_transaction_date = $data[2]||'??';
+    my $message_type = $data[3]||'';
+    foreach my $DATE ( \$relocate_date, \$relocated_transaction_date ) {
+    if ( $$DATE ne '??' ) {
+        my $DateObj = RT::Date->new( $session{CurrentUser} );
+        $DateObj->Set(
+            Format => 'ISO',
+            Value  => $$DATE,
+        );
+        $$DATE = $DateObj->AsString;
+        $$DATE = $m->interp->apply_escapes( $$DATE, 'h' );
+        $$DATE =~ s/\s/&nbsp;/g;
+    }
+    }
+    if ( $Object->id eq $Transaction->OldValue ) {
+        if ( $message_type eq 'past' ) {
+            $desc = loc("Transaction #[_1] from this place was relocated to ticket #[_2] at [_3]",
+             $data[0]||'??' ,$Transaction->NewValue ,$relocate_date );
+        } else {
+            $desc = loc("Transaction #[_1] from this ticket was relocated to ticket #[_2]",
+             $data[0]||'??' ,$Transaction->NewValue );
+        }
+    } else {
+        $desc = loc("Transaction #[_1] ([_2]) from ticket #[_3] was relocated to this ticket",
+         $data[0]||'??' ,$relocated_transaction_date ,$Transaction->OldValue );
+    }
+    $$Description = $desc;
+    return;
+}
+return if ( $txn_type !~ /Correspond|Comment$/ );
+
+my $required_right_name = 'RelocateReply';
+my $has_right_RelocateReply = RT::ACE->CanonicalizeRightName($required_right_name);
+if ( ! defined $has_right_RelocateReply ) {
+    RT->Logger->error("No right with name [$required_right_name] found!" );
+    return;
+}
+if ( $txn_type =~ /Correspond|Comment$/ ) {
+    RT->Logger->info("TrID: ".$Transaction->id." Object->CurrentUserHasRight  ". ($Object->CurrentUserHasRight( $has_right_RelocateReply)||'no' ) );
+}
+if ( $txn_type =~ /Correspond|Comment$/ && $RelocatePath && $has_right_RelocateReply &&
+     $Object->CurrentUserHasRight( $has_right_RelocateReply ) ) {
+    my @actions = @$Actions;
+    push @actions, {
+        class  => "relocate-link",
+        title  => loc('Relocate'),
+        path   => $RelocatePath
+            .'?id='. $Object->id
+            .'&TransactionId='. $Transaction->id
+        ,
+    };
+    @$Actions = @actions;
+}
+</%init>
+<%ARGS>
+$Transaction
+$Object
+$RelocatePath => ($ARGS{PathPrefix}||'').'Relocate.html'
+$Actions
+$Description
+</%ARGS>

@@ -82,7 +82,7 @@ objects which implement more than one interface it is possible to specify an opt
 name of an interface as the third parameter. This is only really required, however, if
 two interfaces in the object provide methods with the same name, since introspection
 data can be used to automatically resolve the correct interface to call cases where
-method names are unique. Rather than using this constructor directly, it is preferrable
+method names are unique. Rather than using this constructor directly, it is preferable
 to use the C<get_object> method on L<Net::DBus::RemoteService>, since this caches handles
 to remote objects, eliminating unnecessary introspection data lookups.
 

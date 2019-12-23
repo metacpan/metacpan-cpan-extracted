@@ -36,9 +36,6 @@ ok(
 count(1);
 expectReject($res);
 
-diag 'Waiting';
-sleep 1;
-
 ## Try to authenticate
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
 count(1);
@@ -73,9 +70,6 @@ count(1);
 expectOK($res);
 expectAuthenticatedAs( $res, 'rtyler' );
 $client->logout($id);
-
-diag 'Waiting';
-sleep 1;
 
 ## Try to Impersonate
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );

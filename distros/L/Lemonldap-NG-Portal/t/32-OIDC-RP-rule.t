@@ -145,7 +145,6 @@ sub op {
                         name        => "cn"
                     }
                 },
-                oidcServiceMetaDataIssuer             => "http://auth.op.com",
                 oidcServiceMetaDataAuthorizeURI       => "authorize",
                 oidcServiceMetaDataCheckSessionURI    => "checksession.html",
                 oidcServiceMetaDataJWKSURI            => "jwks",

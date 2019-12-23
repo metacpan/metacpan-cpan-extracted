@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::modnames;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.025'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.026'; # VERSION
 
 our $rschema = ["array",[{description=>"\nArray of Perl module names, where each element is of `perl::modname` schema,\ne.g. `Foo`, `Foo::Bar`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Module::P*\n\nand it will be expanded to e.g.:\n\n    [\"Module::Patch\", \"Module::Path\", \"Module::Pluggable\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`).\n\n",of=>["perl::modname",{req=>1},{}],summary=>"Perl module names","x.element_completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str_or_array::expand_perl_modname_wildcard"]}],["array"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::modnames - Perl module names
 
 =head1 VERSION
 
-This document describes version 0.025 of Sah::SchemaR::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2019-11-29.
+This document describes version 0.026 of Sah::SchemaR::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2019-12-15.
 
 =head1 DESCRIPTION
 

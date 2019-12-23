@@ -166,7 +166,7 @@ say '</p>';
 say '<p>';
 say 'Occurence of Chapters<br />';
 
-for my $chap (keys %{$themen_count}) {
+for my $chap (sort keys %{$themen_count}) {
     say "Chapter $chap";
     say ':&nbsp;';
     say $themen_count->{$chap};
@@ -189,15 +189,24 @@ mcp - pick multiple choice questions randomly
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
-THIS IS AN EARLY RELEASE. YOU PROBABLY SHOULD NOT USE IT, UNLESS YOU KNOW WHY.
+Store your multiple choice questions as yaml format.
+Generate an exam, by randomly picking questions from the yaml file.
+
+=head2 EXAMPLES
 
 Pick 20 entries from yaml and print them to html:
 
   mcp 20 myfile.yml > yourfile.html
+
+Pick 5 questions from multiple files:
+
+  mcp 5 *.yml > survey.html
+
+See in the L<examples> folder, for how to store multiple choice questions.
 
 =head1 AUTHOR
 

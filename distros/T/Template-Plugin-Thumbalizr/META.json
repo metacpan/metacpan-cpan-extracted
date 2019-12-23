@@ -1,0 +1,50 @@
+{
+   "abstract" : "A Thumbalizr (https://thumbalizr.com) plugin for Template::Toolkit. This allows you to easily embed live screenshots into your website.",
+   "author" : [
+      "Julien Sobrier <jsobrier@localdomain>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Plugin-Thumbalizr",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Template::Plugin" : "0",
+            "WebService::Thumbalizr" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/juliensobrier/Template-Plugin-Thumbalizr.git",
+         "web" : "https://github.com/juliensobrier/Template-Plugin-Thumbalizr"
+      }
+   },
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

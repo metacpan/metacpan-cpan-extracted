@@ -1,0 +1,96 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Data-Validate-CSV/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:configure-requirement [
+		doap-deps:on "ExtUtils::HasCompiler 0.014"^^doap-deps:CpanId;
+	];
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "Text::CSV_XS"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.012000"^^doap-deps:CpanId ], [ doap-deps:on "JSON::PP"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::autoclean"^^doap-deps:CpanId;
+	], [ doap-deps:on "PerlX::Maybe"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Types::XSD"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Types::Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "DateTime"^^doap-deps:CpanId ], [ doap-deps:on "DateTime::Duration"^^doap-deps:CpanId ], [
+		doap-deps:on "DateTime::Format::CLDR"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "DateTime::Incomplete"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Data-Validate-CSV>;
+	doap:created         "2019-12-15"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Data-Validate-CSV>;
+	doap:homepage        <https://metacpan.org/release/Data-Validate-CSV>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Data-Validate-CSV";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Data-Validate-CSV/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Data-Validate-CSV/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Data-Validate-CSV/v_0-003>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-data-validate-csv>;
+	];
+	doap:shortdesc       "read and validate CSV".
+
+<http://purl.org/NET/cpan-uri/dist/Data-Validate-CSV/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Data-Validate-CSV-0.001"^^xsd:string;
+	dc:issued            "2019-12-15"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-Validate-CSV-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Data-Validate-CSV/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Data-Validate-CSV-0.002"^^xsd:string;
+	dc:issued            "2019-12-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add missing dependency on Types::Path::Tiny.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-Validate-CSV-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Data-Validate-CSV/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Data-Validate-CSV-0.003"^^xsd:string;
+	dc:issued            "2019-12-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Include some proper tests.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Add a test dependency on Text::CSV or Text::CSV_XS and a runtime recommendation on Text::CSV_XS.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix for XSD types which are not lowercase names.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "When one row has additional columns, that was causing issues on subsequent rows. This has now been addressed.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-Validate-CSV-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

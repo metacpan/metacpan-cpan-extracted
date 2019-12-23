@@ -1,15 +1,37 @@
-Revision history for App-subsort
+0.043   2019-12-18  Released-By: PERLANCAR; Urgency: medium
 
-0.03    2016-12-16 (PERLANCAR)
+	- [ux] Allow NAME<opt> syntax in first argument.
+
+	- [doc] Add some examples in Synopsis.
+
+
+0.042   2019-12-18  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix getting --arg's value.
+
+
+0.041   2019-12-18  Released-By: PERLANCAR; Urgency: high
+
+	- Derp, typo.
+
+
+0.040   2019-12-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Add --arg (-A).
+
+        - Tweak tab completion.
+
+
+0.03    2016-12-16  Released-By: PERLANCAR
 
 	- Add alias: sortsub.
 
 
-0.02    2016-12-16 (PERLANCAR)
+0.02    2016-12-16  Released-By: PERLANCAR
 
 	- [ux] Add tab completion for routine.
 
 
-0.01    2015-10-07 (PERLANCAR)
+0.01    2015-10-07  Released-By: PERLANCAR
 
         - First release.

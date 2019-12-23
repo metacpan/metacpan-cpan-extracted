@@ -1,5 +1,8 @@
 Revision history for FFI
 
+1.15      2019-12-13 08:21:50 -0700
+  - Fixes for Visual C++
+
 1.14      2019-02-10 11:46:43 -0500
   - New FFI::Platypus / libffi based implementation
     (battle tested as Alt-FFI-Libffi)

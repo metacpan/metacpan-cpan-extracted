@@ -1,0 +1,55 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Data-Validate-CSV
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Data-Validate-CSV
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/Data/Validate/CSV/Cell.pm
+ lib/Data/Validate/CSV/Column.pm
+ lib/Data/Validate/CSV/MultiValueCell.pm
+ lib/Data/Validate/CSV/Note.pm
+ lib/Data/Validate/CSV/Row.pm
+ lib/Data/Validate/CSV/Schema.pm
+ lib/Data/Validate/CSV/SingleValueCell.pm
+ lib/Data/Validate/CSV/Table.pm
+ lib/Data/Validate/CSV/Types.pm
+Copyright: Copyright 2019 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+ examples/csv-validation.pl
+Copyright: Unknown
+License: Unknown
+
+Files: README
+ lib/Data/Validate/CSV.pm
+ t/01basic.t
+ t/02parsing.t
+Copyright: This software is copyright (c) 2019 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+License: Artistic-1.0
+ This software is Copyright (c) 2019 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2019 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

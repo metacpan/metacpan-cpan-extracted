@@ -4,7 +4,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 # VERSION
 
-version v0.3.4
+version v0.3.5
 
 # SYNOPSIS
 
@@ -86,7 +86,7 @@ packet.
 
 ## `max_buffer_size`
 
-The specifies the maximum buffer size. It defaults to `512`.
+Specifies the maximum buffer size. It defaults to `512`.
 
 # METHODS
 
@@ -230,6 +230,10 @@ Robert Rothenberg <rrwo@cpan.org>
 
 The initial development of this module was sponsored by Science Photo
 Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
+
+# CONTRIBUTOR
+
+Michael R. Davis <mrdvt@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

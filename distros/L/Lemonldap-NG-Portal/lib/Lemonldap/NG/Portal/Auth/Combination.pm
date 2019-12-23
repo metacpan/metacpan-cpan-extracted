@@ -6,7 +6,7 @@ use Lemonldap::NG::Common::Combination::Parser;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_FIRSTACCESS);
 use Scalar::Util 'weaken';
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 # TODO: See Lib::Wrapper
 extends 'Lemonldap::NG::Portal::Main::Auth';
@@ -150,6 +150,18 @@ sub authFinish {
 
 sub authForce {
     return 0;
+}
+
+sub setSecurity {
+    my $self = shift;
+    my ($req) = @_;
+    $self->getStack( $req, 'extractFormInfo' ) or return;
+    eval {
+        $req->data->{combinationStack}
+          ->[ $req->data->{dataKeep}->{combinationTry} ]->[0]
+          ->( 'setSecurity', @_ );
+    };
+    $self->logger->debug($@) if ($@);
 }
 
 ## UserDB steps

@@ -5,7 +5,7 @@ steps:
   - name: Critic
     depends_on:
       - clone
-    image: gugod/perlcritic-reviewdog:20190204
+    image: gugod/perlcritic-reviewdog:latest
     commands:
       - perlcritic --quiet lib t dev-bin
 
@@ -21,9 +21,19 @@ steps:
   - name: Build
     image: perl:5.28.0
     depends_on:
+      - Critic
       - Test
     commands:
-      - cpanm -q --notest --no-man-pages App::ModuleBuildTiny
+      - cpanm -q --notest --no-man-pages App::ModuleBuildTiny Dist::Zilla Dist::Zilla::PluginBundle::RJBS
+      - wget https://github.com/gugod/Software-License/archive/improve-cc0-detection.zip
+      - unzip improve-cc0-detection.zip
+      - cd Software-License-improve-cc0-detection
+      - git init
+      - git add .
+      - git commit -m 'no comment'
+      - git tag 0.103013
+      - dzil install
+      - cd ..
       - git clean -xdf
       - mbtiny dist
       - ls -l

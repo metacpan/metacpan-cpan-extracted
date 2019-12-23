@@ -17,14 +17,14 @@ use Storable 3.15 'dclone';
 
 no warnings 'experimental';
 
-our $VERSION='1.00';
+our $VERSION='1.01';
 
 =head1 NAME
 
 Vote::Count
 
 
-=head1 VERSION 1.00
+=head1 VERSION 1.01
 
 =cut
 
@@ -58,6 +58,13 @@ sub GetActive ( $self ) {
 }
 
 has TieBreakMethod => (
+  is       => 'rw',
+  isa      => 'Str',
+  required => 0,
+);
+
+# This is only used for the precedence tiebreaker!
+has PrecedenceFile => (
   is       => 'rw',
   isa      => 'Str',
   required => 0,
@@ -108,7 +115,6 @@ with 'Vote::Count::Approval',
   'Vote::Count::Floor',
   'Vote::Count::IRV',
   'Vote::Count::Log',
-  'Vote::Count::Range',
   'Vote::Count::Score',
   'Vote::Count::TieBreaker',
   'Vote::Count::TopCount',
@@ -140,7 +146,7 @@ __PACKAGE__->meta->make_immutable;
 =head1 Vote::Count
 
 
-=head2 A Toolkit for determining the outcome of Ranked Choice and other Alternative Balloting Strategies.
+=head2 A Toolkit for determining the outcome of Preferential Ballots.
 
 Provides a Toolkit for implementing multiple voting systems, allowing a wide range of method options. This library allows the creation of election resolution methods matching a set of Election Rules that are written in an organization's governing rules, and not requiring the bylaws to specify the rules of the software that will be used for the election, especially important given that many of the other libraries available do not provide a bylaws compatible explanation of their process.
 
@@ -635,6 +641,11 @@ L<Catalog|https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/Catalog.pod>
 =item *
 
 L<Hand Count|https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/Hand_Count.pod>
+
+
+=item *
+
+L<Multi Member|https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/MultiMember.pod>
 
 
 =item *

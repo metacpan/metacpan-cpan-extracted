@@ -1,20 +1,25 @@
-0.033   2019-04-23 (PERLANCAR)
+0.034   2019-12-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: sort-ini-sections.
+
+
+0.033   2019-04-23  Released-By: PERLANCAR
 
 	- Config::IniFiles doesn't need to parse from file; dump-ini:
 	  return proper dump for Config::IniFiles.
 
 
-0.032   2019-01-17 (PERLANCAR)
+0.032   2019-01-17  Released-By: PERLANCAR
 
 	- Add utilities: grep-ini, map-ini.
 
 
-0.031   2019-01-17 (PERLANCAR)
+0.031   2019-01-17  Released-By: PERLANCAR
 
 	- [ux] Tweak CLIs: disable config/env reading.
 
 
-0.030   2019-01-17 (PERLANCAR)
+0.030   2019-01-17  Released-By: PERLANCAR
 
 	- Add utilities: delete-ini-{key,section}, get-ini-{key,section},
 	  insert-ini-{key,section}, list-ini-sections.
@@ -25,13 +30,13 @@
 	- parse-ini: Add Config::IOD::INI::Reader as an alternative parser.
 
 
-0.02    2015-12-10 (PERLANCAR)
+0.02    2015-12-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix summary.
 
 
-0.01    2015-12-10 (PERLANCAR)
+0.01    2015-12-10  Released-By: PERLANCAR
 
         - First release.

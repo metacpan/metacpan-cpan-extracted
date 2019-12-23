@@ -1,0 +1,136 @@
+NAME
+    Complete::Sequence - Complete string from a sequence of choices
+
+VERSION
+    This document describes version 0.002 of Complete::Sequence (from Perl
+    distribution Complete-Sequence), released on 2019-12-17.
+
+FUNCTIONS
+  complete_sequence
+    Usage:
+
+     complete_sequence(%args) -> array
+
+    Complete string from a sequence of choices.
+
+    Sometime you want to complete a string where its parts (sequence items)
+    are formed from various pieces. For example, suppose your program
+    "delete-user-data" accepts an argument that is in the form of:
+
+     USERNAME
+     UID "(" "current" ")"
+     UID "(" "historical" ")"
+ 
+     "EVERYONE"
+
+    Supposed existing users include "budi", "ujang", and "wati" with UID
+    101, 102, 103.
+
+    This can be written as:
+
+     [
+         {
+             alternative => [
+                 [qw/budi ujang wati/],
+                 {sequence => [
+                     [qw/101 102 103/],
+                     ["(current)", "(historical)"],
+                 ]},
+                 "EVERYONE",
+             ],
+         }
+     ]
+
+    When word is empty (''), the offered completion is:
+
+     budi
+     ujang
+     wati
+ 
+     101
+     102
+     103
+ 
+     EVERYONE
+
+    When word is 101, the offered completion is:
+
+     101
+     101(current)
+     101(historical)
+
+    When word is "101(h", the offered completion is:
+
+     101(historical)
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   sequence* => *array*
+
+        A sequence structure is an array of items. An item can be:
+
+        *   a scalar/string (a single string to choose from)
+
+        *   an array of strings (multiple strings to choose from)
+
+        *   a coderef (will be called to extract an item)
+
+            Coderef will be called with $stash argument which contains
+            various information, e.g. the index of the sequence item
+            ("item_index"), the completed parts ("completed_item_words"),
+            the current word ("cur_word"), etc.
+
+        *   a hash (another sequence or alternative of items)
+
+        If you want to specify another sub-sequence of items:
+
+         {sequence => [ ... ]}   # put items in here
+
+        If you want to specify an alternative of sub-sequences or
+        sub-alternative:
+
+         {alternative => [ ... ]}    # put items in here
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+ENVIRONMENT
+  COMPLETE_SEQUENCE_TRACE
+    Bool. If set to true, will display more log statements for debugging.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Sequence>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Sequence>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Sequence>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Complete::Path. Conceptually, "complete_sequence" is similar to
+    "complete_path" from Complete::Path. Except unlike a path, a sequence
+    does not (necessarily) have path separator.
+
+    Complete
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

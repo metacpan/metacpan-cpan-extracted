@@ -11,13 +11,13 @@ no warnings 'experimental';
 use Data::Printer;
 use Carp;
 
-our $VERSION='1.00';
+our $VERSION='1.01';
 
 =head1 NAME
 
 Vote::Count::Approval
 
-=head1 VERSION 1.00
+=head1 VERSION 1.01
 
 =cut
 

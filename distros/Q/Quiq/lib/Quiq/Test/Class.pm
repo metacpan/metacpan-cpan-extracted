@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Test::Builder ();
 use Quiq::Option;
@@ -16,6 +16,7 @@ use Quiq::Converter;
 use Test::More ();
 use Quiq::System;
 use Quiq::Assert;
+use Quiq::Unindent;
 use Quiq::Test::Class::Method;
 
 # -----------------------------------------------------------------------------
@@ -923,12 +924,41 @@ sub isnt {
     $text = Quiq::Converter->umlautToAscii($text);
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    return Test::More::isnt($got,$expected,$text);    
+    return Test::More::isnt($got,$expected,$text);
 }
 
 {
     no warnings 'once';
     *isntTest = \&isnt;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 isText() - Prüfe, ob Wert dem erwarteten Wert entspricht
+
+=head4 Synopsis
+
+  $bool = $test->isText($got,$expected);
+  $bool = $test->isText($got,$expected,$text);
+
+=head4 Description
+
+Im Unterschied zur Methode is(), wird auf das Argument $expected
+die Methode Quiq::Unindent->trimNl() angewendet. Dies ermöglicht
+den einfachen Vergleich im Falle eines mehrzeiligen Textes.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub isText {
+    my ($self,$got,$expected,$text) = @_;
+
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Quiq::Converter->umlautToAscii($text);
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return Test::More::is($got,Quiq::Unindent->trimNl($expected),$text);
 }
 
 # -----------------------------------------------------------------------------
@@ -1198,7 +1228,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

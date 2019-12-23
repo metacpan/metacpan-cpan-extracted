@@ -1,13 +1,14 @@
 package Complete::File;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.43'; # VERSION
+our $DATE = '2019-12-18'; # DATE
+our $VERSION = '0.440'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Complete::Common qw(:all);
+use Complete::Util qw(hashify_answer);
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -253,7 +254,7 @@ sub complete_file {
         1;
     };
 
-    Complete::Path::complete_path(
+    my $compres = Complete::Path::complete_path(
         word => $word,
         list_func => $list,
         is_dir_func => sub { -d $_[0] },
@@ -261,6 +262,10 @@ sub complete_file {
         starting_path => $starting_path,
         result_prefix => $result_prefix,
     );
+
+    # XXX why doesn't Complete::Path return hash answer with path_sep? we add
+    # workaround here to enable path mode.
+    hashify_answer($compres, {path_sep=>'/'});
 }
 
 $SPEC{complete_dir} = do {
@@ -296,7 +301,7 @@ Complete::File - Completion routines related to files
 
 =head1 VERSION
 
-This document describes version 0.43 of Complete::File (from Perl distribution Complete-File), released on 2017-07-14.
+This document describes version 0.440 of Complete::File (from Perl distribution Complete-File), released on 2019-12-18.
 
 =head1 DESCRIPTION
 
@@ -352,6 +357,7 @@ Word to complete.
 =back
 
 Return value:  (array)
+
 
 
 =head2 complete_file
@@ -453,7 +459,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

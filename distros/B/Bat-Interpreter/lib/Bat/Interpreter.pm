@@ -10,9 +10,10 @@ use Carp;
 use Data::Dumper;
 use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
+use Bat::Interpreter::Delegate::LineLogger::Silent;
 use namespace::autoclean;
 
-our $VERSION = '0.018';    # VERSION
+our $VERSION = '0.019';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -32,13 +33,18 @@ has 'executor' => (
     }
 );
 
+has 'linelogger' => (
+    is      => 'rw',
+    isa     => ConsumerOf ['Bat::Interpreter::Role::LineLogger'],
+    default => sub {
+        Bat::Interpreter::Delegate::LineLogger::Silent->new;
+    }
+);
+
 sub run {
     my $self         = shift();
     my $filename     = shift();
     my $external_env = shift() // \%ENV;
-
-    #$filename = $self->batfilestore->TraducirNombreArchivo($filename);
-    #$filename = Path::Tiny::path($filename);
 
     my $parser = App::BatParser->new;
 
@@ -67,15 +73,19 @@ sub run {
         }
         $line_from_label{'EOF'} = scalar @$lines;
         $line_from_label{'eof'} = scalar @$lines;
-        my $context = { 'ENV' => \%environment, 'IP' => 0, 'LABEL_INDEX' => \%line_from_label };
+        my $context = { 'ENV' => \%environment, 'IP' => 0, 'LABEL_INDEX' => \%line_from_label, 'current_line' => '' };
 
         # Execute lines in a nonlinear fashion
-        for ( my $instruction_pointer = 0; $instruction_pointer < scalar @$lines; $instruction_pointer++ ) {
+        for ( my $instruction_pointer = 0; $instruction_pointer < scalar @$lines; ) {
             my $current_instruction = $lines->[$instruction_pointer];
             $context->{'IP'} = $instruction_pointer;
+            my $old_ip = $instruction_pointer;
             $self->_handle_instruction( $current_instruction, $context );
             $instruction_pointer = $context->{'IP'};
-
+            if ( $old_ip == $instruction_pointer ) {
+                $instruction_pointer++;
+            }
+            $self->_log_line_from_context($context);
         }
         return $context->{'STDOUT'};
     } else {
@@ -91,13 +101,11 @@ sub _handle_instruction {
     my ($type) = keys %$current_instruction;
 
     if ( $type eq 'Comment' ) {
-
-        #print "Comment \n";
+        $context->{'current_line'} = ":: " . $current_instruction->{'Comment'}{'Text'};
     }
 
     if ( $type eq 'Label' ) {
-
-        #print "Label \n";
+        $context->{'current_line'} = ":" . $current_instruction->{'Label'}{'Identifier'};
     }
 
     if ( $type eq 'Statement' ) {
@@ -136,8 +144,8 @@ sub _handle_command {
             # Path adjustment
             $command_line = $self->_adjust_path($command_line);
 
-            # Dispatch all commands throug supervisor
-            # $command_line = "supervisor.pl " . $command_line;
+            $context->{'current_line'} .= $command_line;
+
             $self->_execute_command( $command_line, $context );
         }
         if ( $type eq 'SpecialCommand' ) {
@@ -146,7 +154,8 @@ sub _handle_command {
         }
     } else {
 
-        #print "Empty command\n";
+        # Empty command
+        $context->{'current_line'} .= '';
     }
 
 }
@@ -159,9 +168,11 @@ sub _handle_special_command {
     my ($type) = keys %$special_command_line;
 
     if ( $type eq 'If' ) {
+        $context->{'current_line'} .= 'IF ';
         my $condition;
         my $statement;
         if ( exists $special_command_line->{$type}->{'NegatedCondition'} ) {
+            $context->{'current_line'} .= 'NOT ';
             $condition = $special_command_line->{$type}->{'NegatedCondition'}->{'Condition'};
             $statement = $special_command_line->{$type}->{'Statement'};
             if ( not $self->_handle_condition( $condition, $context ) ) {
@@ -170,8 +181,6 @@ sub _handle_special_command {
         } else {
             ( $condition, $statement ) = @{ $special_command_line->{'If'} }{ 'Condition', 'Statement' };
             if ( $self->_handle_condition( $condition, $context ) ) {
-
-                #print "True: " . Dumper($statement);
                 $self->_handle_statement( $statement, $context );
             }
         }
@@ -180,6 +189,7 @@ sub _handle_special_command {
 
     if ( $type eq 'Goto' ) {
         my $label = $special_command_line->{'Goto'}{'Identifier'};
+        $context->{'current_line'} .= 'GOTO ' . $label;
         $self->_goto_label( $label, $context );
     }
 
@@ -187,6 +197,7 @@ sub _handle_special_command {
         my $token = $special_command_line->{'Call'}{'Token'};
         $token = $self->_variable_substitution( $token, $context );
         $token = $self->_adjust_path($token);
+        $context->{'current_line'} .= 'CALL ' . $token;
         if ( $token =~ /^:/ ) {
             $self->_goto_label( $token, $context );
         } else {
@@ -196,8 +207,7 @@ sub _handle_special_command {
                 if ( $extension eq '.exe' ) {
                     $self->_execute_command( $token, $context );
                 } elsif ( $extension eq '.bat' || $extension eq '.cmd' ) {
-
-                    #print "Calling file: $token\n";
+                    $self->_log_line_from_context($context);
                     my $stdout = $self->run( $token, $context->{ENV} );
                     if ( !defined $context->{STDOUT} ) {
                         $context->{STDOUT} = [];
@@ -212,12 +222,14 @@ sub _handle_special_command {
 
     if ( $type eq 'Set' ) {
         my ( $variable, $value ) = @{ $special_command_line->{'Set'} }{ 'Variable', 'Value' };
-        $value                     = $self->_variable_substitution( $value, $context );
-        $value                     = $self->_adjust_path($value);
+        $value = $self->_variable_substitution( $value, $context );
+        $value = $self->_adjust_path($value);
+        $context->{'current_line'} .= 'SET ' . $variable . '=' . $value;
         $context->{ENV}{$variable} = $value;
     }
 
     if ( $type eq 'For' ) {
+        $context->{'current_line'} .= 'FOR ';
         my $token = $special_command_line->{'For'}{'Token'};
 
         # Handle only simple cases
@@ -228,16 +240,13 @@ sub _handle_special_command {
             $comando = $self->_adjust_path($comando);
             $comando =~ s/%%/%/g;
 
-            #print "Comando $comando\n";
+            $context->{'current_line'} .= '/F "delims="' . $parameter_name . ' in ' . "'$comando' ";
             my $salida = $self->_for_command_evaluation($comando);
 
-            #print "Salida $salida";
             my $statement = $special_command_line->{'For'}{'Statement'};
 
-            # Inyectar el término de
             $context->{'PARAMETERS'}{$parameter_name} = $salida;
 
-            #print Dumper($context->{'PARAMETERS'});
             $self->_handle_statement( $statement, $context );
             delete $context->{'PARAMETERS'}{$parameter_name};
         } elsif ( $token =~ /\s*?%%(?<variable_bucle>[A-Z0-9]+?)\s*?in\s*?(\([\d]+(?:,[^,\s]+)+\))/i ) {
@@ -246,12 +255,28 @@ sub _handle_special_command {
             my $value_list     = $2;
             $value_list =~ s/(\(|\))//g;
             my @values = split( /,/, $value_list );
+            $context->{'current_line'} .= $token . ' do ';
             for my $value (@values) {
                 $context->{'PARAMETERS'}->{$parameter_name} = $value;
+                $context->{'current_line'} .= "\n\t";
                 $self->_handle_statement( $statement, $context );
                 delete $context->{'PARAMETERS'}{$parameter_name};
             }
 
+        } else {
+            Carp::confess('FOR functionality not implemented!');
+        }
+    }
+
+    if ( $type eq 'Echo' ) {
+        $context->{'current_line'} .= 'ECHO ';
+        my $echo = $special_command_line->{'Echo'};
+        if ( exists $echo->{'EchoModifier'} ) {
+            $context->{'current_line'} .= $echo->{'EchoModifier'};
+        } else {
+            my $message = $echo->{'Message'};
+            $message = $self->_variable_substitution( $message, $context );
+            $context->{'current_line'} .= $message;
         }
     }
 }
@@ -266,9 +291,10 @@ sub _handle_condition {
         my ( $left_operand, $operator, $right_operand ) =
           @{ $condition->{'Comparison'} }{qw(LeftOperand Operator RightOperand)};
 
-        # Variable sustitution
         $left_operand  = $self->_variable_substitution( $left_operand,  $context );
         $right_operand = $self->_variable_substitution( $right_operand, $context );
+
+        $context->{'current_line'} .= $left_operand . ' ' . $operator . ' ' . $right_operand . ' ';
 
         my $uppercase_operator = uc($operator);
         if ( $operator eq '==' || $uppercase_operator eq 'EQU' ) {
@@ -292,6 +318,7 @@ sub _handle_condition {
     } elsif ( $type eq 'Exists' ) {
         my $path = ${ $condition->{'Exists'} }{'Path'};
         $path = $self->_adjust_path($path);
+        $context->{'current_line'} .= 'EXIST ' . $path;
         return -e $path;
     } else {
         die "Condition type $type not implemented";
@@ -347,7 +374,7 @@ sub _variable_substitution {
                 }
                 return $result;
             } else {
-                print "Variable: $variable_name not defined\n";
+                Carp::cluck("Variable: $variable_name not defined");
             }
             return '';
         } else {
@@ -384,8 +411,6 @@ sub _goto_label {
     $label =~ s/ //g;
     if ( $context->{'LABEL_INDEX'}{$label} ) {
         $context->{'IP'} = $context->{'LABEL_INDEX'}{$label};
-
-        #print "Goto: " . $context->{'IP'} . " via $label\n";
     } else {
         die "Label: $label not indexed. Index contains: " . Dumper( $context->{'LABEL_INDEX'} );
     }
@@ -395,6 +420,16 @@ sub _for_command_evaluation {
     my $self    = shift();
     my $comando = shift();
     return $self->executor->execute_for_command($comando);
+}
+
+sub _log_line_from_context {
+    my $self    = shift();
+    my $context = shift();
+    my $line    = $context->{'current_line'};
+    if ( defined $line && $line ne '' ) {
+        $self->linelogger->log_line( $context->{'current_line'} );
+    }
+    $context->{'current_line'} = '';
 }
 
 1;
@@ -411,7 +446,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -429,6 +464,8 @@ version 0.018
 =head1 DESCRIPTION
 
 Pure perl interpreter for a small subset of bat/cmd files.
+
+=for markdown [![Build status](https://ci.appveyor.com/api/projects/status/xi8e6fjjxwfp77th/branch/master?svg=true)](https://ci.appveyor.com/project/pablrod/p5-bat-interpreter/branch/master)
 
 =head1 METHODS
 

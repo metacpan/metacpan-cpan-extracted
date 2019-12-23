@@ -1,4 +1,4 @@
-package Pcore v0.107.0;
+package Pcore v0.109.1;
 
 use v5.30;
 no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
@@ -452,7 +452,7 @@ Documentation will be provided later.
 
 =over
 
-=item * PCORE_LIB
+=item * WORKSPACE
 
 =back
 

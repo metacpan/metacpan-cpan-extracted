@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-10-17'; # DATE
-our $VERSION = '0.728'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.729'; # VERSION
 
 use 5.010;
 use strict;
@@ -52,7 +52,7 @@ module-dir - Get per-module shared files directory
 
 =head1 VERSION
 
-This document describes version 0.728 of module-dir (from Perl distribution App-PMUtils), released on 2019-10-17.
+This document describes version 0.729 of module-dir (from Perl distribution App-PMUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 

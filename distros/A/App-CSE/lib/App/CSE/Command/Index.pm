@@ -1,5 +1,5 @@
 package App::CSE::Command::Index;
-$App::CSE::Command::Index::VERSION = '0.014';
+$App::CSE::Command::Index::VERSION = '0.015';
 use Moose;
 extends qw/App::CSE::Command/;
 with qw/App::CSE::Role::DirIndex/;

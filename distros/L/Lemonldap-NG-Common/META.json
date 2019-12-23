@@ -4,13 +4,13 @@
       "Xavier Guimard <x.guimard@free.fr>, ClÃ©ment Oudot <clement@oodo.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lemonldap-NG-Common",
    "no_index" : {
@@ -72,6 +72,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.5",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v2.0.7",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,16 +1,16 @@
 {
-   "abstract" : "Validate a state, county or province",
+   "abstract" : "Validate a state, county or province in a CGI script.",
    "author" : [
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CGI-Untaint-CountyStateProvince",
    "no_index" : {
@@ -22,7 +22,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::More" : "0.82",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0"
          }
       },
       "configure" : {
@@ -32,13 +34,22 @@
       },
       "runtime" : {
          "requires" : {
-            "CGI::Untaint" : "0",
-            "Test::Kwalitee" : "0",
-            "Test::More" : "0.82",
-            "Test::NoWarnings" : "0"
+            "CGI::Untaint" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.05"
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-CGI-Untaint-CountyStateProvince@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Untaint-CountyStateProvince"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/CGI-Untaint-CountyStateProvince.git",
+         "web" : "https://github.com/nigelhorne/CGI-Untaint-CountyStateProvince"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -3,14 +3,14 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw fretboard chord diagrams
 
-our $VERSION = '0.1203';
+our $VERSION = '0.1204';
 
 use Moo;
 use strictures 2;
 use namespace::clean;
 
 use Imager;
-use List::MoreUtils 'first_index';
+use List::SomeUtils 'first_index';
 use Music::Chord::Namer 'chordname';
 
 
@@ -485,7 +485,7 @@ Music::FretboardDiagram - Draw fretboard chord diagrams
 
 =head1 VERSION
 
-version 0.1203
+version 0.1204
 
 =head1 SYNOPSIS
 
@@ -527,16 +527,11 @@ version 0.1203
 A C<Music::FretboardDiagram> object draws fretboard chord diagrams including
 neck position and chord name annotations for guitar, ukulele, banjo, etc.
 
-=begin html
-
-Here are examples of a vertical guitar diagram and a horizontal ukulele diagram:
-
+=for html Here are examples of a vertical guitar diagram and a horizontal ukulele diagram:
 <br>
 <img src="https://raw.githubusercontent.com/ology/Music-FretboardDiagram/master/chord-diagram.png">
 <img src="https://raw.githubusercontent.com/ology/Music-FretboardDiagram/master/ukulele.png">
 <br>
-
-=end html
 
 =head1 ATTRIBUTES
 
@@ -743,7 +738,7 @@ The F<eg/> files in this distribution
 
 L<Imager>
 
-L<List::MoreUtils>
+L<List::SomeUtils>
 
 L<Moo>
 

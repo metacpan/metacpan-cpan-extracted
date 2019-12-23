@@ -11,7 +11,7 @@ sub CLI ($self) {
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     my $dists;
 
-    for my $dir ( P->file->read_dir( $ENV{PCORE_LIB}, full_path => 1 )->@* ) {
+    for my $dir ( P->file->read_dir( $ENV{WORKSPACE}, full_path => 1 )->@* ) {
         if ( my $dist = Pcore::Dist->new($dir) ) {
             push $dists->@*, $dist;
         }

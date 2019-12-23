@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use File::Slurp qw(read_file write_file);
+use JSON;
+
+my $json_str = read_file('stations.json');
+my $stations = JSON->new->utf8->decode($json_str);
+
+my $stations_new = JSON->new->utf8->decode(scalar read_file('allStations.json'));
+
+for my $new_station (@{$stations_new}) {
+	my $found = 0;
+	for my $station (@{$stations}) {
+		if (($new_station->{ds100} and $new_station->{ds100} eq $station->{ds100})
+			or ($new_station->{id} and $new_station->{id} == $station->{eva})
+			or ($new_station->{title} and $new_station->{title} eq $station->{name})) {
+			$found = 1;
+			if (not $station->{latlong} and $new_station->{location} and $new_station->{location}{latitude}) {
+				$station->{latlong} = [$new_station->{location}{latitude}, $new_station->{location}{longitude}];
+			}
+			last;
+		}
+	}
+	if (not $found) {
+		push(@{$stations}, {
+			name => $new_station->{title},
+			ds100 => $new_station->{ds100},
+			eva => $new_station->{id},
+		});
+	}
+}
+
+@{$stations} = sort { $a->{name} cmp $b->{name} } @{$stations};
+my $have_duplicates = 0;
+my @names           = map { $_->{name} } @{$stations};
+my @ds100           = map { $_->{ds100} } sort { $a->{ds100} cmp $b->{ds100} } @{$stations};
+my @eva_ids         = map { $_->{eva} } sort { $a->{eva} <=> $b->{eva} } @{$stations};
+
+for my $i ( 1 .. $#names ) {
+	if ( $names[ $i - 1 ] eq $names[$i] ) {
+		say "Duplicate station name: $names[$i]";
+		$have_duplicates = 1;
+	}
+}
+for my $i ( 1 .. $#ds100 ) {
+	if ( $ds100[ $i - 1 ] eq $ds100[$i] ) {
+		say "Duplicate DS100 code: $ds100[$i]";
+		$have_duplicates = 1;
+	}
+}
+for my $i ( 1 .. $#eva_ids ) {
+	if ( $eva_ids[ $i - 1 ] == $eva_ids[$i] ) {
+		say "Duplicate EVA ID: $eva_ids[$i]";
+		$have_duplicates = 1;
+	}
+}
+
+if ($have_duplicates) {
+	say "Thank you for your contribution.";
+	say "Please remove duplicate entries before opening a pull request.";
+}
+
+my $json_out = JSON->new->utf8->canonical->pretty->encode($stations);
+write_file( 'stations.json', $json_out );

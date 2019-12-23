@@ -9,7 +9,7 @@ use Scalar::Util 'weaken';
 use Mojo::UserAgent;
 use Future::Mojo;
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 =head1 NAME
 
@@ -113,6 +113,15 @@ sub sleep( $self, $seconds ) {
 }
 
 1;
+
+=head1 REQUIRED ADDITIONAL MODULES
+
+This module needs additional modules that are not installed by the default
+installation of WWW::Mechanize::Chrome:
+
+L<Mojo::UserAgent>
+
+L<Future::Mojo>
 
 =head1 REPOSITORY
 

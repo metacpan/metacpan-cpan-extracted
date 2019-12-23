@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Choroplethmapbox::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Choroplethmapbox::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Choroplethmapbox::Colorbar::Title;
 
-our $VERSION = '0.034';    # VERSION
+our $VERSION = '0.035';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace choroplethmapbox.
 
@@ -282,7 +282,7 @@ Chart::Plotly::Trace::Choroplethmapbox::Colorbar - This attribute is one of the 
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 

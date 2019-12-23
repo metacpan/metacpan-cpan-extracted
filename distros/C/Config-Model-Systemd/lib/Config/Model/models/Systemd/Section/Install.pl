@@ -7,7 +7,10 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
     'accept' => [
       '.*',
@@ -40,8 +43,8 @@ aliasing.',
         },
         'description' => 'This option may be used more than once, or a
 space-separated list of unit names may be given. A symbolic
-link is created in the .wants/ or
-.requires/ directory of each of the
+link is created in the C<.wants/> or
+C<.requires/> directory of each of the
 listed units when this unit is installed by systemctl
 enable. This has the effect that a dependency of
 type C<Wants> or C<Requires>
@@ -52,19 +55,19 @@ C<Wants> and C<Requires> in
 the [Unit] section for details.
 
 WantedBy=foo.service in a service
-bar.service is mostly equivalent to
+C<bar.service> is mostly equivalent to
 Alias=foo.service.wants/bar.service in the
 same file. In case of template units, systemctl
 enable must be called with an instance name, and
 this instance will be added to the
-.wants/ or
-.requires/ list of the listed unit. E.g.
+C<.wants/> or
+C<.requires/> list of the listed unit. E.g.
 WantedBy=getty.target in a service
-getty@.service will result in
+C<getty@.service> will result in
 systemctl enable getty@tty2.service
 creating a
-getty.target.wants/getty@tty2.service
-link to getty@.service.
+C<getty.target.wants/getty@tty2.service>
+link to C<getty@.service>.
 ',
         'type' => 'list'
       },
@@ -76,8 +79,8 @@ link to getty@.service.
         },
         'description' => 'This option may be used more than once, or a
 space-separated list of unit names may be given. A symbolic
-link is created in the .wants/ or
-.requires/ directory of each of the
+link is created in the C<.wants/> or
+C<.requires/> directory of each of the
 listed units when this unit is installed by systemctl
 enable. This has the effect that a dependency of
 type C<Wants> or C<Requires>
@@ -88,19 +91,19 @@ C<Wants> and C<Requires> in
 the [Unit] section for details.
 
 WantedBy=foo.service in a service
-bar.service is mostly equivalent to
+C<bar.service> is mostly equivalent to
 Alias=foo.service.wants/bar.service in the
 same file. In case of template units, systemctl
 enable must be called with an instance name, and
 this instance will be added to the
-.wants/ or
-.requires/ list of the listed unit. E.g.
+C<.wants/> or
+C<.requires/> list of the listed unit. E.g.
 WantedBy=getty.target in a service
-getty@.service will result in
+C<getty@.service> will result in
 systemctl enable getty@tty2.service
 creating a
-getty.target.wants/getty@tty2.service
-link to getty@.service.
+C<getty.target.wants/getty@tty2.service>
+link to C<getty@.service>.
 ',
         'type' => 'list'
       },

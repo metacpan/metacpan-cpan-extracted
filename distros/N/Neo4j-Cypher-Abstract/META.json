@@ -4,7 +4,7 @@
       "Mark A. Jensen"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
    "provides" : {
       "Neo4j::Cypher::Abstract" : {
          "file" : "lib/Neo4j/Cypher/Abstract.pm",
-         "version" : "0.1002"
+         "version" : "0.1003"
       },
       "Neo4j::Cypher::Abstract::Peeler" : {
          "file" : "lib/Neo4j/Cypher/Abstract/Peeler.pm",
@@ -58,6 +58,6 @@
          "url" : "http://github.com/majensen/cypher-abstract.git"
       }
    },
-   "version" : "0.1002",
+   "version" : "0.1003",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

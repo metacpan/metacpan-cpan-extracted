@@ -82,6 +82,7 @@ subtest 'read full property list' => sub {
 	# This strategy depends on the implementation detail that Neo4j
 	# returns exactly the property map in JSON when a node is requested.
 	lives_ok {
+		$r = undef;
 		$r = $transaction->run('MATCH (n) WHERE id(n) = {id} RETURN n', @id);
 	} 'read props';
 	lives_ok {

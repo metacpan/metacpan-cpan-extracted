@@ -1,3 +1,13 @@
+0.25.1 2019-12-16 09:50:38 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - merge translations
+
+0.25.0 2019-12-16 09:44:32 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - pass the output of config.getUrlConfig under the key urlConfig to the getUserConfig backend call
+   and place this in the args key when building the plugin list, allowing plugins to only enable
+   themselves based on keys provided on the url when opening the app.
+
 0.24.1 2019-11-25 10:53:02 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - actually include the new functionality
@@ -5,6 +15,10 @@
 0.24.0 2019-11-25 10:44:35 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - added support for boolean cells (fritz)
+
+0.23.2 2019-11-22 16:06:25 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix handling of trigger fields when loading data into a form
 
 0.23.1 2019-11-19 09:20:20 +0100 Tobias Oetiker <tobi@oetiker.ch>
 

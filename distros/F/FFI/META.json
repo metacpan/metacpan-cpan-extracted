@@ -24,6 +24,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "7.24",
             "FFI::Build" : "0.80",
+            "FFI::Build::MM" : "0.83",
             "perl" : "5.006"
          }
       },
@@ -71,7 +72,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_contributors" : [
       "Paul Moore <gustav@morpheus.demon.co.uk>",
       "Graham Ollis <plicease@cpan.org>",
@@ -80,8 +81,8 @@
       "Mitchell Charity <mcharity@vendian.org>",
       "Reini Urban <<RURBAN@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
    "x_use_unsafe_inc" : 0
 }
 

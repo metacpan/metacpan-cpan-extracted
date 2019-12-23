@@ -2,8 +2,8 @@
 
 package Getopt::Long::More;
 
-our $DATE = '2019-01-20'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-12-19'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 
@@ -38,7 +38,7 @@ sub GetOptionsFromString(@) {
     my ($string) = shift;
     require Text::ParseWords;
     my $args = [ Text::ParseWords::shellwords($string) ];
-    my $caller ||= (caller)[0];	# current context
+    local $Getopt::Long::caller ||= (caller)[0];
     my $ret = GetOptionsFromArray($args, @_);
     return ( $ret, $args ) if wantarray;
     if ( @$args ) {
@@ -62,6 +62,8 @@ sub GetOptionsFromArray {
     require Getopt::Long;
 
     my $ary = shift;
+
+    local $Getopt::Long::caller ||= (caller)[0];  # grab and set this asap.
 
     my @go_opts_spec;
 
@@ -100,15 +102,24 @@ sub GetOptionsFromArray {
     my $prev;
     my $has_arg_handler;
     my $arg_handler_accessed;
+  MAPPING:  # Resulting in the complete EVAPORATION of OptSpec objects, replaced by their handler, if one exists.
       for my $e (@opts_spec) {
-        ref($e) ne 'Getopt::Long::More::OptSpec'  and do { push @go_opts_spec, $e; next            };
-        $prev   ne '<>'                           and do { push @go_opts_spec, $e->{handler}; next };
-      OTHERWISE:
-        $has_arg_handler++;
-        push @go_opts_spec, sub {
-          $arg_handler_accessed++;
-          $e->{handler}->(@_);
-        };
+        unless ( ref($e) eq 'Getopt::Long::More::OptSpec' ) {
+          push @go_opts_spec, $e;
+          next;
+        }
+
+        next unless exists $e->{handler};
+
+        if ( $prev  eq '<>' ) {
+          $has_arg_handler++;
+          push @go_opts_spec, sub {
+            $arg_handler_accessed++;
+            $e->{handler}->(@_);
+          };
+        } else {
+          push @go_opts_spec, $e->{handler};
+        }
     } continue {
       $prev = $e;
     }
@@ -185,7 +196,7 @@ sub GetOptionsFromArray {
             if ($shell eq 'bash') {
                 require Complete::Bash;
                 print Complete::Bash::format_completion(
-                    $compres, {word=>$words->[$cword]});
+                    $compres, {word=>$words->[$cword], workaround_with_wordbreaks=>0});
             } elsif ($shell eq 'fish') {
                 require Complete::Fish;
                 print Complete::Bash::format_completion(
@@ -224,7 +235,7 @@ sub GetOptionsFromArray {
                             die "Missing required command-line argument\n";
                         }
                     }
-                } else {
+                } elsif ( exists $_->{handler} ) {
                     if (ref($_->{handler}) eq 'SCALAR'
                             && !defined(${$_->{handler}})) {
                         die "Missing required option $osname\n";
@@ -237,13 +248,16 @@ sub GetOptionsFromArray {
                                  && !keys(%{$_->{handler}})) {
                         die "Missing required option $osname\n";
                     }
+                } else {
+                    die "Can't enforce 'required' status without also knowing the 'handler' for option '$osname'. "
+                        . "You need to provide a 'handler' to optspec() in order to benefit from that feature\n";
                 }
             }
             # supply default value
             if (defined $_->{default}) {
                 if ($osname eq '<>') {
                     # currently ignored
-                } else {
+                } elsif ( exists $_->{handler} ) {
                     if (ref($_->{handler}) eq 'SCALAR'
                             && !defined(${$_->{handler}})) {
                         ${$_->{handler}} = $_->{default};
@@ -256,6 +270,9 @@ sub GetOptionsFromArray {
                                  !keys(%{$_->{handler}})) {
                         $_->{handler} = { %{ $_->{default} } }; # shallow copy
                     }
+                } else {
+                    die "Can't assign 'default' without also knowing the 'handler' for option '$osname'. "
+                        . "You need to provide a 'handler' to optspec() in order to benefit from that feature\n";
                 }
             }
         }
@@ -379,7 +396,7 @@ Getopt::Long::More - Like Getopt::Long, but with more stuffs
 
 =head1 VERSION
 
-This document describes version 0.005 of Getopt::Long::More (from Perl distribution Getopt-Long-More), released on 2019-01-20.
+This document describes version 0.006 of Getopt::Long::More (from Perl distribution Getopt-Long-More), released on 2019-12-19.
 
 =head1 SYNOPSIS
 

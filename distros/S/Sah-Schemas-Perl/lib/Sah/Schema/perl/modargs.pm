@@ -1,7 +1,7 @@
 package Sah::Schema::perl::modargs;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.025'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.026'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module name with optional arguments',
@@ -43,7 +43,7 @@ Sah::Schema::perl::modargs - Perl module name with optional arguments
 
 =head1 VERSION
 
-This document describes version 0.025 of Sah::Schema::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2019-11-29.
+This document describes version 0.026 of Sah::Schema::perl::modargs (from Perl distribution Sah-Schemas-Perl), released on 2019-12-15.
 
 =head1 DESCRIPTION
 

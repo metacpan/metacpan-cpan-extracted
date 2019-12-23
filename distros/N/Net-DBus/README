@@ -2,20 +2,20 @@
                  =========
 
 Net::DBus provides a Perl XS API to the dbus inter-application
-messaging system. The Perl API covers the core base level 
+messaging system. The Perl API covers the core base level
 of the dbus APIs, not concerning itself yet with the GLib
-or QT wrappers. For more information on dbus visit the 
+or QT wrappers. For more information on dbus visit the
 project website at:
 
   http://www.freedesktop.org/software/dbus/
 
 The homepage for Net::DBus is
 
-  http://search.cpan.org/dist/Net-DBus/
+  https://metacpan.org/pod/Net::DBus
 
 Please report bugs at
 
-  https://rt.cpan.org/Public/Dist/Display.html?Name=Net-DBus
+  https://gitlab.com/berrange/perl-net-dbus/issues
 
 The primary GIT repository for Net::DBus is
 

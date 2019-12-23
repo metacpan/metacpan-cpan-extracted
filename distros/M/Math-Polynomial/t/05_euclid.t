@@ -16,7 +16,7 @@ use lib 't/lib';
 use Test::MyUtils;
 BEGIN {
     use_or_bail('Math::AnyNum');
-    plan tests => 22;
+    plan tests => 24;
 }
 use Math::Polynomial 1.000;
 ok(1);  # modules loaded
@@ -42,6 +42,7 @@ my $dd2 = $x->new(Math::AnyNum->new('32/5'), Math::AnyNum->new('-4/5'));
 my $mm1 = -5 * ($x + 4) / 108;
 my $mm2 =  4 * ($x + 1) * ($x - 5) / 108;
 my $qqi =  (-$x + 8) / 135;
+my $mmm = $x->new(Math::AnyNum->new('5/27')) * $x->new(40, 62, 1, -23, -1, 1);
 
 my ($d, $d1, $d2, $m1, $m2) = $p->xgcd($q);
 ok($dd  == $d);
@@ -56,6 +57,12 @@ ok($dd2 == $d1);
 ok($dd1 == $d2);
 ok($mm2 == $m1);
 ok($mm1 == $m2);
+
+my $lcm = $p->lcm($q);
+ok($mmm == $lcm);
+
+$lcm = $p->lcm($p);
+ok($p == $lcm);
 
 my $qi = $q->inv_mod($p);
 ok($qqi == $qi);

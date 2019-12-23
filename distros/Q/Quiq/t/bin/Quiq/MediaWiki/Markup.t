@@ -98,7 +98,7 @@ sub test_image : Test(2) {
     );
     $self->is($code,'[[File:Ein_testbild.png|1200x900px|alt=Ein Testbild'.
         '|link=http://fseitz.de/|page=2|border|center|frame|baseline'.
-        "|Ein Testbild]]\n\n");
+        "|Ein Testbild]]\n\n",'Image');
 }
 
 # -----------------------------------------------------------------------------
@@ -211,7 +211,7 @@ sub test_table_1 : Test(1) {
         | style="background-color: #ffffff; text-align: center" |P
         |}
 
-    ~));
+    ~),'Table');
 }
 
 # -----------------------------------------------------------------------------

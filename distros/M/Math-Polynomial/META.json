@@ -52,14 +52,14 @@
    "provides" : {
       "Math::Polynomial" : {
          "file" : "lib/Math/Polynomial.pm",
-         "version" : "1.016"
+         "version" : "1.017"
       },
       "Math::Polynomial::Generic" : {
          "file" : "lib/Math/Polynomial/Generic.pm",
-         "version" : "1.016"
+         "version" : "1.017"
       }
    },
    "release_status" : "stable",
-   "version" : "1.016",
+   "version" : "1.017",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

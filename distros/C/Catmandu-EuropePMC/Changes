@@ -1,5 +1,8 @@
 Revision history for Catmandu-EuropePMC
 
+1.011  2019-12-18 13:55:14 CET
+    - deprecate the use of this distro
+
 1.01  2018-02-23 09:13:14 CET
 	- test with network environment variable
 

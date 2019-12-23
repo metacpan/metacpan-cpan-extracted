@@ -1,0 +1,79 @@
+NAME
+    Sort::Sub::by_several - Sort by one or more sorters
+
+VERSION
+    This document describes version 0.001 of Sort::Sub::by_several (from
+    Perl distribution Sort-Sub-by_several), released on 2019-12-17.
+
+SYNOPSIS
+    Generate sorter (accessed as variable) via Sort::Sub import:
+
+     use Sort::Sub '$by_several'; # use '$by_several<i>' for case-insensitive sorting, '$by_several<r>' for reverse sorting
+     my @sorted = sort $by_several ('item', ...);
+
+    Generate sorter (accessed as subroutine):
+
+     use Sort::Sub 'by_several<ir>';
+     my @sorted = sort {by_several} ('item', ...);
+
+    Generate directly without Sort::Sub:
+
+     use Sort::Sub::by_several;
+     my $sorter = Sort::Sub::by_several::gen_sorter(
+         ci => 1,      # default 0, set 1 to sort case-insensitively
+         reverse => 1, # default 0, set 1 to sort in reverse order
+     );
+     my @sorted = sort $sorter ('item', ...);
+
+    Use in shell/CLI with sortsub (from App::sortsub):
+
+     % some-cmd | sortsub by_several
+     % some-cmd | sortsub by_several --ignore-case -r
+
+DESCRIPTION
+SORT ARGUMENTS
+    "*" marks required arguments.
+
+  fifth
+    sortsub::spec.
+
+  first*
+    sortsub::spec.
+
+  fourth
+    sortsub::spec.
+
+  second
+    sortsub::spec.
+
+  third
+    sortsub::spec.
+
+ENVIRONMENT
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sort-Sub-by_several>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sort-Sub-by_several>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub-by_several>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sort::Sub
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

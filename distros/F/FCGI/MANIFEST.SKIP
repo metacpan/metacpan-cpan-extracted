@@ -1,5 +1,5 @@
 
-#!start included /Volumes/amaretto/Users/ether/perl5/perlbrew/perls/23.8/lib/5.23.8/ExtUtils/MANIFEST.SKIP
+#!start included /Volumes/amaretto/Users/ether/perl5/perlbrew/perls/31.6/lib/5.31.6/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -63,7 +63,16 @@
 
 # Avoid MYMETA files
 ^MYMETA\.
-#!end included /Volumes/amaretto/Users/ether/perl5/perlbrew/perls/23.8/lib/5.23.8/ExtUtils/MANIFEST.SKIP
+
+# Temp files for new META
+^META_new\.(?:json|yml)
+
+# Avoid travis-ci.org file
+^\.travis\.yml
+
+# Avoid AppVeyor file
+^\.?appveyor.yml
+#!end included /Volumes/amaretto/Users/ether/perl5/perlbrew/perls/31.6/lib/5.31.6/ExtUtils/MANIFEST.SKIP
 
 ^\.
 \.bs$

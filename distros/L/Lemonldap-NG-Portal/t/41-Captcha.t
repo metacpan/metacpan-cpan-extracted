@@ -6,7 +6,7 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $maintests = 17;
+my $maintests = 24;
 SKIP: {
     eval 'use GD::SecurityImage;use Image::Magick;';
     if ($@) {
@@ -34,19 +34,19 @@ SKIP: {
     my ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
     ok(
         $res->[2]->[0] =~
-m%<input name="password" type="text" class="form-control key" trplaceholder="password" autocomplete="off" required aria-required="true" aria-hidden="true"/>%,
+m%<input name="password" type="text" class="form-control key" autocomplete="off" required aria-required="true" aria-hidden="true"/>%,
         'Password: Found text input'
     );
 
     $query =~ s/.*\btoken=([^&]+).*/token=$1/;
     my $token;
     ok( $token = $1, ' Token value is defined' );
-    ok( $res->[2]->[0] =~ m#<img src="data:image/png;base64#,
+    ok( $res->[2]->[0] =~ m#<img id="captcha" src="data:image/png;base64#,
         ' Captcha image inserted' )
-      or explain( $res->[2]->[0], '<img src="data:image/png;base64' );
+      or
+      explain( $res->[2]->[0], '<img id="captcha" src="data:image/png;base64' );
 
     # Try to get captcha value
-
     my ( $ts, $captcha );
     ok( $ts = getCache()->get($token), ' Found token session' );
     $ts = eval { JSON::from_json($ts) };
@@ -106,8 +106,54 @@ m%<input name="password" type="text" class="form-control key" trplaceholder="pas
         ),
         'Verify that there is a new captcha image'
     );
-    ok( $res->[2]->[0] =~ m#<img src="data:image/png;base64#,
+    ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
+    $query =~ s/.*\b(token=[^&]+).*/$1/;
+    my $newtoken = $1;
+    ok( $newtoken ne $token, ' Token is refreshed' );
+    ok( $res->[2]->[0] =~ m#<img id="captcha" src="data:image/png;base64#,
         ' New captcha image inserted' );
+
+    # Try to renew captcha
+    ok( $res = $client->_get( '/renewcaptcha', accept => 'text/html' ),
+        'Unauth request to renew Captcha' );
+    my $json = eval { JSON::from_json( $res->[2]->[0] ) };
+    ok( ( defined $json->{newtoken} and $json->{newtoken} =~ /^\d{10}_\d+$/ ),
+        'New token has been received' )
+      or explain( $json->{newtoken}, 'NO token received' );
+    ok( (
+            defined $json->{newimage}
+              and $json->{newimage} =~ m%^data:image/png;base64,.+%
+        ),
+        'New image has been received'
+    ) or explain( $json->{newimage}, 'NO image received' );
+
+    # Try to submit new captcha
+    ok( $ts = getCache()->get( $json->{newtoken} ),
+        ' Found new token session' );
+    $ts = eval { JSON::from_json($ts) };
+    $query =
+      "user=dwho&password=dwho&captcha=$ts->{captcha}&token=$json->{newtoken}";
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new($query),
+            length => length($query)
+        ),
+        'Try to auth with new captcha value'
+    );
+    expectOK($res);
+    $id = expectCookie($res);
+    ok(
+        $res = $client->_get(
+            '/',
+            query  => 'url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==',
+            cookie => "lemonldap=$id",
+            accept => 'text/html'
+        ),
+        'Auth request with redirection'
+    );
+    expectRedirection( $res, 'http://test1.example.com/' );
+    expectAuthenticatedAs( $res, 'dwho' );
 }
 count($maintests);
 

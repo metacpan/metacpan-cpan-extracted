@@ -56,7 +56,7 @@ my @notManagedAttributes = (
     'max2FDevices',              'max2FDevicesNameLength', 'checkTime',
     'mySessionAuthorizedRWKeys', 'handlerInternalCache',
     'handlerServiceTokenTTL',    'impersonationPrefix', 'pdataDomain',
-    'forceGlobalStorageUpgradeOTT'
+    'forceGlobalStorageUpgradeOTT', 'forceGlobalStorageIssuerOTT'
 );
 
 # Words used either as attribute name and node title

@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 5;
+use Test::More tests => 9;
 require 't/test.pm';
 BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
@@ -16,9 +16,10 @@ BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
 ok(
     my $jail = Lemonldap::NG::Handler::Main::Jail->new(
-        'jail'            => undef,
-        'useSafeJail'     => 0,
-        'customFunctions' => undef
+        'jail'                 => undef,
+        'useSafeJail'          => 0,
+        'customFunctions'      => undef,
+        'multiValuesSeparator' => '; ',
     ),
     'new fake jail object'
 );
@@ -41,3 +42,15 @@ my $sub3      = "sub { return(checkDate('20000000000000','21000000000000')) }";
 my $checkDate = $jail->jail_reval($sub3);
 ok( &$checkDate == "1",
     'checkDate extended function working without Safe Jail' );
+
+my $sub4      = "sub { return ( listMatch('ABC; DEF; GHI','abc', 1) ) }";
+my $listMatch = $jail->jail_reval($sub4);
+ok( ( defined($listMatch) and ref($listMatch) eq 'CODE' ),
+    'listMatch function is defined' );
+ok( &$listMatch eq '1', 'Get good result' );
+
+my $sub5      = "sub { return ( listMatch('ABC; DEF; GHI','ab', 1) ) }";
+my $listMatch = $jail->jail_reval($sub5);
+ok( ( defined($listMatch) and ref($listMatch) eq 'CODE' ),
+    'listMatch function is defined' );
+ok( &$listMatch eq '0', 'Get good result' );

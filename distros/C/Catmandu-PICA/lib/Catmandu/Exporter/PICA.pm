@@ -10,7 +10,7 @@ use PICA::Writer::XML;
 use PICA::Writer::PPXML;
 use Moo;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 with 'Catmandu::Exporter';
 

@@ -3,6 +3,7 @@ abstract: 'Sah schemas related to Perl'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
+  Data::Sah: '0.903'
   Data::Sah::Coerce: '0.038'
   File::Spec: '0'
   IO::Handle: '0'
@@ -34,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl
   homepage: https://metacpan.org/release/Sah-Schemas-Perl
   repository: git://github.com/perlancar/perl-Sah-Schemas-Perl.git
-version: '0.025'
+version: '0.026'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

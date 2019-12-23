@@ -117,7 +117,7 @@ sub run {
 
     # Update spoof session
     $self->logger->debug("Populating spoof session...");
-    foreach (qw (_auth _userDB)) {
+    foreach (qw (_auth _userDB authenticationLevel)) {
         $self->logger->debug("Processing $_...");
         $spoofSession->{$_} = $realSession->{"$self->{conf}->{impersonationPrefix}$_"};
     }

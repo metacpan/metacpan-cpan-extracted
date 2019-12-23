@@ -3,10 +3,12 @@ use v5.18;
 use utf8;
 use warnings;
 
-use Module::Functions;
-
 our %RE;
-our @EXPORT_OK = ('%RE', get_public_functions());
+our @EXPORT_OK = (
+    '%RE',
+    'NEWSPAPER_NAMES',
+    'CATEGORY_NAMES'
+);
 
 use constant {
     NEWSPAPER_NAMES => [
@@ -20,6 +22,7 @@ use constant {
         '台灣好新聞 TaiwanHot.net',
         '工商時報',
         '新頭殼 Newtalk',
+        '新頭殼',
         '旺報',
         '無綫新聞',
         '聯合新聞網',
@@ -37,9 +40,12 @@ use constant {
         '妞新聞 niusnews',
         '阿波羅網手機版',
         '數位台灣地方新聞',
+        'ETtoday新聞雲',
+        'ETtoday旅遊雲',
     ],
 
     CATEGORY_NAMES => [
+        '科技',
         '美股',
         '台股新聞',
         '生活',
@@ -49,6 +55,7 @@ use constant {
         '國際',
         '軍視界',
         '生活發現',
+        '重點新聞',
     ],
 };
 

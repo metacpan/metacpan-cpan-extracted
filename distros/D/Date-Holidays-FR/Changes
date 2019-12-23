@@ -1,8 +1,13 @@
 Revision history for Perl extension Date::Holidays::FR.
 
+0.03 2019-12-16
+        - clean up the distribution to improve kwalitee
+        - charset issues: replacing tabs by spaces, CRLF by LF, ISO-8859 by UTF-8
+        - fix RT ticket 122022: Easter monday when Easter sunday is 31st March.
+
 0.02 2004-04-25
-	- added 3 new functions : get_easter, get_ascension and get_pentecost
+        - added 3 new functions : get_easter, get_ascension and get_pentecost
 
 0.01  Sun Apr 18 20:20:38 2004
-	- original version; created by h2xs 1.23 with options
-		-X Date::Holidays::FR
+        - original version; created by h2xs 1.23 with options
+                -X Date::Holidays::FR

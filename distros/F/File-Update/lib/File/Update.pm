@@ -1,11 +1,13 @@
 package File::Update;
-$File::Update::VERSION = '0.0.3';
+$File::Update::VERSION = '0.2.0';
 use strict;
 use warnings;
 
 use parent 'Exporter';
 
-our @EXPORT_OK = (qw(modify_on_change write_on_change write_on_change_no_utf8));
+our @EXPORT_OK = (
+    qw(modify_on_change write_on_change write_on_change_raw write_on_change_no_utf8)
+);
 
 sub write_on_change
 {
@@ -45,19 +47,29 @@ sub write_on_change_no_utf8
     return;
 }
 
+sub write_on_change_raw
+{
+    my ( $io, $text_ref ) = @_;
+
+    if ( ( !-e $io ) or ( $io->slurp_raw() ne $$text_ref ) )
+    {
+        $io->spew_raw($$text_ref);
+    }
+
+    return;
+}
+
 1;
 
 __END__
 
 =pod
 
-=head1 NAME
-
-File::Update - update/modify/mutate a file only on change in contents.
+=encoding UTF-8
 
 =head1 VERSION
 
-version 0.0.3
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -83,9 +95,9 @@ version 0.0.3
         );
     }
 
-=head1 VERSION
+=head1 NAME
 
-version 0.0.3
+File::Update - update/modify/mutate a file only on change in contents.
 
 =head1 FUNCTIONS
 
@@ -105,36 +117,15 @@ to the file.
 
 Like write_on_change() but while using L<Path::Tiny>'s non-utf8 methods.
 
-=head1 AUTHOR
+=head2 write_on_change_raw($path, \"new contents")
 
-Shlomi Fish <shlomif@cpan.org>
+Like write_on_change() but while using L<Path::Tiny>'s C<*_raw> methods.
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/file-update/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Added in v0.2.0.
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc File::Update
 
 =head2 Websites
 
@@ -232,5 +223,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-File-Update>
 
   git clone https://github.com/shlomif/perl-File-Update.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/file-update/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

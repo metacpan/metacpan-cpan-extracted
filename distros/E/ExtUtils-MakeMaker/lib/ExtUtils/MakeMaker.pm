@@ -24,7 +24,7 @@ my %Recognized_Att_Keys;
 our %macro_fsentity; # whether a macro is a filesystem name
 our %macro_dep; # whether a macro is a dependency
 
-our $VERSION = '7.38';
+our $VERSION = '7.42';
 $VERSION =~ tr/_//d;
 
 # Emulate something resembling CVS $Revision$
@@ -1428,6 +1428,8 @@ All inputs to WriteMakefile are Unicode characters, not just octets. EUMM
 seeks to handle all of these correctly. It is currently still not possible
 to portably use Unicode characters in module names, because this requires
 Perl to handle Unicode filenames, which is not yet the case on Windows.
+
+See L<ExtUtils::MakeMaker::FAQ> for details of the design and usage.
 
 =head2 How To Write A Makefile.PL
 
@@ -3039,7 +3041,8 @@ be linked.
 
 =item postamble
 
-Anything put here will be passed to MY::postamble() if you have one.
+Anything put here will be passed to
+L<MY::postamble()|ExtUtils::MM_Any/postamble (o)> if you have one.
 
 =item realclean
 
@@ -3086,7 +3089,7 @@ or you can edit the default by saying something like:
 
 If you are running experiments with embedding perl as a library into
 other applications, you might find MakeMaker is not sufficient. You'd
-better have a look at ExtUtils::Embed which is a collection of utilities
+better have a look at L<ExtUtils::Embed> which is a collection of utilities
 for embedding.
 
 If you still need a different solution, try to develop another
@@ -3150,7 +3153,7 @@ override or create an attribute you would say something like
 =head2 Distribution Support
 
 For authors of extensions MakeMaker provides several Makefile
-targets. Most of the support comes from the ExtUtils::Manifest module,
+targets. Most of the support comes from the L<ExtUtils::Manifest> module,
 where additional documentation can be found.
 
 =over 4
@@ -3158,13 +3161,13 @@ where additional documentation can be found.
 =item    make distcheck
 
 reports which files are below the build directory but not in the
-MANIFEST file and vice versa. (See ExtUtils::Manifest::fullcheck() for
+MANIFEST file and vice versa. (See L<ExtUtils::Manifest/fullcheck> for
 details)
 
 =item    make skipcheck
 
 reports which files are skipped due to the entries in the
-C<MANIFEST.SKIP> file (See ExtUtils::Manifest::skipcheck() for
+C<MANIFEST.SKIP> file (See L<ExtUtils::Manifest/skipcheck> for
 details)
 
 =item    make distclean
@@ -3181,7 +3184,7 @@ C<*.bak>, C<*.old> and C<*.orig>
 =item    make manifest
 
 rewrites the MANIFEST file, adding all remaining files found (See
-ExtUtils::Manifest::mkmanifest() for details)
+L<ExtUtils::Manifest/mkmanifest> for details)
 
 =item    make distdir
 
@@ -3381,11 +3384,16 @@ Same as the PERL_CORE parameter.  The parameter overrides this.
 =head1 SEE ALSO
 
 L<Module::Build> is a pure-Perl alternative to MakeMaker which does
-not rely on make or any other external utility.  It is easier to
+not rely on make or any other external utility.  It may be easier to
 extend to suit your needs.
 
-L<Module::Install> is a wrapper around MakeMaker which adds features
-not normally available.
+L<Module::Build::Tiny> is a minimal pure-Perl alternative to MakeMaker
+that follows the Build.PL protocol of Module::Build but without its
+complexity and cruft, implementing only the installation of the module
+and leaving authoring to L<mbtiny> or other authoring tools.
+
+L<Module::Install> is a (now discouraged) wrapper around MakeMaker which
+adds features not normally available.
 
 L<ExtUtils::ModuleMaker> and L<Module::Starter> are both modules to
 help you setup your distribution.
@@ -3394,10 +3402,18 @@ L<CPAN::Meta> and L<CPAN::Meta::Spec> explain CPAN Meta files in detail.
 
 L<File::ShareDir::Install> makes it easy to install static, sometimes
 also referred to as 'shared' files. L<File::ShareDir> helps accessing
-the shared files after installation.
+the shared files after installation. L<Test::File::ShareDir> helps when
+writing tests to use the shared files both before and after installation.
 
-L<Dist::Zilla> makes it easy for the module author to create MakeMaker-based
-distributions with lots of bells and whistles.
+L<Dist::Zilla> is an authoring tool which allows great customization and
+extensibility of the author experience, relying on the existing install
+tools like ExtUtils::MakeMaker only for installation.
+
+L<Dist::Milla> is a Dist::Zilla bundle that greatly simplifies common
+usage.
+
+L<Minilla> is a minimal authoring tool that does the same things as
+Dist::Milla without the overhead of Dist::Zilla.
 
 =head1 AUTHORS
 

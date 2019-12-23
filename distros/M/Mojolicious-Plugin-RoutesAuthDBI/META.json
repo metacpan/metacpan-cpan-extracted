@@ -50,7 +50,7 @@
          "web" : "https://github.com/mche/Mojolicious-Plugin-RoutesAuthDBI"
       }
    },
-   "version" : "0.865",
+   "version" : "0.866",
    "x_homepage" : "https://github.com/mche",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

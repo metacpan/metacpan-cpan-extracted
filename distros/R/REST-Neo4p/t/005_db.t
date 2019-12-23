@@ -1,6 +1,6 @@
 #-*-perl-*-
 #$Id$
-use Test::More tests => 32;
+use Test::More tests => 33;
 use Test::Exception;
 use Module::Build;
 use lib '../lib';
@@ -20,7 +20,7 @@ eval {
     $pass = $build->notes('pass');
 };
 my $TEST_SERVER = $build ? $build->notes('test_server') : 'http://127.0.0.1:7474';
-my $num_live_tests = 31;
+my $num_live_tests = 32;
 
 use_ok('REST::Neo4p');
 
@@ -78,6 +78,7 @@ SKIP : {
   lives_ok { REST::Neo4p->agent->delete_node($$N) } 'delete node';
 #  ok $REST::Neo4p::AGENT->delete_relationship($$R);
   lives_ok { REST::Neo4p->agent->delete_node_index($$I) } 'delete node index';
+  lives_ok { $n2->remove } 'delete node 2';
 }
 
 END {

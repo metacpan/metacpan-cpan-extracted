@@ -124,28 +124,28 @@ my $xml_expect = <<EOF;
   </interface>
   <interface name="org.freedesktop.DBus.Introspectable">
     <method name="Introspect">
-      <arg type="s" direction="out"/>
+      <arg name="xml_data" type="s" direction="out"/>
     </method>
   </interface>
   <interface name="org.freedesktop.DBus.Properties">
     <method name="Get">
-      <arg type="s" direction="in"/>
-      <arg type="s" direction="in"/>
-      <arg type="v" direction="out"/>
+      <arg name="interface_name" type="s" direction="in"/>
+      <arg name="property_name" type="s" direction="in"/>
+      <arg name="value" type="v" direction="out"/>
     </method>
     <method name="GetAll">
-      <arg type="s" direction="in"/>
-      <arg type="a{sv}" direction="out"/>
+      <arg name="interface_name" type="s" direction="in"/>
+      <arg name="properties" type="a{sv}" direction="out"/>
     </method>
     <method name="Set">
-      <arg type="s" direction="in"/>
-      <arg type="s" direction="in"/>
-      <arg type="v" direction="in"/>
+      <arg name="interface_name" type="s" direction="in"/>
+      <arg name="property_name" type="s" direction="in"/>
+      <arg name="value" type="v" direction="in"/>
     </method>
   </interface>
-  <node name="/branch_1"/>
-  <node name="/branch_2"/>
-  <node name="/branch_3"/>
+  <node name="branch_1"/>
+  <node name="branch_2"/>
+  <node name="branch_3"/>
 </node>
 EOF
 
@@ -154,7 +154,7 @@ is($xml_got, $xml_expect, "xml data matches");
 my $ins2 = Net::DBus::Binding::Introspector->new(xml => $xml_got);
 
 my @children = $ins2->list_children();
-is_deeply(\@children, ["/branch_1", "/branch_2", "/branch_3"], "children match");
+is_deeply(\@children, ["branch_1", "branch_2", "branch_3"], "children match");
 
 
 $introspector = $c2->_introspector;
@@ -171,26 +171,26 @@ $xml_expect = <<EOF;
   </interface>
   <interface name="org.freedesktop.DBus.Introspectable">
     <method name="Introspect">
-      <arg type="s" direction="out"/>
+      <arg name="xml_data" type="s" direction="out"/>
     </method>
   </interface>
   <interface name="org.freedesktop.DBus.Properties">
     <method name="Get">
-      <arg type="s" direction="in"/>
-      <arg type="s" direction="in"/>
-      <arg type="v" direction="out"/>
+      <arg name="interface_name" type="s" direction="in"/>
+      <arg name="property_name" type="s" direction="in"/>
+      <arg name="value" type="v" direction="out"/>
     </method>
     <method name="GetAll">
-      <arg type="s" direction="in"/>
-      <arg type="a{sv}" direction="out"/>
+      <arg name="interface_name" type="s" direction="in"/>
+      <arg name="properties" type="a{sv}" direction="out"/>
     </method>
     <method name="Set">
-      <arg type="s" direction="in"/>
-      <arg type="s" direction="in"/>
-      <arg type="v" direction="in"/>
+      <arg name="interface_name" type="s" direction="in"/>
+      <arg name="property_name" type="s" direction="in"/>
+      <arg name="value" type="v" direction="in"/>
     </method>
   </interface>
-  <node name="/skip"/>
+  <node name="skip"/>
 </node>
 EOF
 is($xml_got, $xml_expect, "xml data matches");

@@ -99,6 +99,28 @@ subtest "optspec: invalid extra properties -> dies" => sub {
 {
     my $opts = {};
     test_getoptions(
+        name => 'optspec: default (set, but no handler) -> dies',
+        opts_spec => ['foo=s' => optspec(default => "bar")],
+        argv => [qw/--foo qux/],
+        opts => $opts,
+        dies => 1,
+    );
+}
+TODO: {
+    local $TODO = "currently dies, but we shouldn't require handler when in hash-storage mode";
+    my $opts = {};
+    test_getoptions(
+        name => 'optspec: default (set, but no handler) -> dies',
+        opts_spec => [$opts, 'foo=s' => optspec(default => "bar")],
+        argv => [qw/--foo qux/],
+        opts => $opts,
+        expected_opts => {foo => "qux"},
+        expected_argv => [qw//],
+    );
+}
+{
+    my $opts = {};
+    test_getoptions(
         name => 'optspec: default (on <> -> ignored)',
         opts_spec => ['<>' => optspec(handler => sub{}, default => ["a","b"])],
         argv => [qw//],
@@ -131,6 +153,28 @@ subtest "optspec: invalid extra properties -> dies" => sub {
 {
     my $opts = {};
     test_getoptions(
+        name => 'optspec: required (set, but no handler) -> dies',
+        opts_spec => ['foo=s' => optspec(required => 1)],
+        argv => [qw/--foo qux/],
+        opts => $opts,
+        dies => 1,
+    );
+}
+TODO: {
+    local $TODO = "currently dies, but we shouldn't require handler when in hash-storage mode";
+    my $opts = {};
+    test_getoptions(
+        name => 'optspec: required (set, but no handler) -> dies',
+        opts_spec => [$opts, 'foo=s' => optspec(required => 1)],
+        argv => [qw/--foo qux/],
+        opts => $opts,
+        expected_opts => {foo => "qux"},
+        expected_argv => [qw//],
+    );
+}
+{
+    my $opts = {};
+    test_getoptions(
         name => 'optspec: required (on <>, unset)',
         opts_spec => ['<>' => optspec(handler => sub{}, required => 1)],
         argv => [qw//],
@@ -140,12 +184,33 @@ subtest "optspec: invalid extra properties -> dies" => sub {
 {
     my $opts = {};
     test_getoptions(
-        name => 'optspec: required (set)',
+        name => 'optspec: required (on <>, set)',
         opts_spec => ['<>' => optspec(handler => sub{}, required => 1)],
         argv => [qw/a b/],
         opts => $opts,
         expected_opts => {},
         expected_argv => [qw//],
+    );
+}
+{
+    my $opts = {};
+    test_getoptions(
+        name => 'optspec: required (on <>, set, but no handler, no arguments) -> dies',
+        opts_spec => ['<>' => optspec(required => 1)],
+        argv => [qw//],
+        opts => $opts,
+        dies => 1,
+    );
+}
+{
+    my $opts = {};
+    test_getoptions(
+        name => 'optspec: required (on <>, set, but no handler, has arguments) -> ok',
+        opts_spec => ['<>' => optspec(required => 1)],
+        argv => [qw/a b/],
+        opts => $opts,
+        expected_opts => {},
+        expected_argv => [qw/a b/],
     );
 }
 
@@ -225,6 +290,77 @@ subtest "optspec: invalid extra properties -> dies" => sub {
         expected_opts => {foo => "boo", bar => "bur", baz => "boz", gaz => "gez" },
         expected_argv => [qw//],
     );
+}
+{
+    my $opts = {};
+    test_getoptions(
+        name => 'optspec: evaporates when it has no handler (in hash-storage mode)',
+        opts_spec => [
+          $opts,
+          'foo=s', optspec(),
+          'bar=s',
+          'baz=s', optspec(handler => \$opts->{baz} ),
+          'gaz=s', \$opts->{gaz},
+        ],
+        argv => [qw/--foo boo --bar bur --baz boz --gaz gez/],
+        opts => $opts,
+        expected_opts => {foo => "boo", bar => "bur", baz => "boz", gaz => "gez" },
+        expected_argv => [qw//],
+    );
+}
+{
+    our $opt_foo;
+    my $opts = {};
+    test_getoptions(
+        name => 'testsuite: can tolerate "default destinations"',  # OK.
+        opts_spec => [
+          'foo=s',
+          'baz=s', \$opts->{baz},
+        ],
+        argv => [qw/--foo boo --baz boz/],
+        opts => $opts,
+        expected_opts => {baz => "boz"},
+        expected_argv => [qw//],
+    );
+}
+{
+    our $opt_foo;      # ==> Expected default destination for option 'foo' (when using GoL's "legacy" call style, as below)
+    test_getoptions(
+        name => 'legacy: can tolerate "default destinations" [1]',  # OK.
+        opts_spec => [
+          'foo=s',
+          'baz=s',
+        ],
+        argv => [qw/--foo boo --baz boz/],
+        opts => {},
+        expected_opts => {},
+        expected_argv => [qw//],
+    );
+    {
+      # DONE: Now passes, suggesting #9 is resolved.
+      is($opt_foo // "[undef]" => 'boo', "legacy: default destinations' work as expected" );
+    }
+}
+{   our ($opt_foo, $opt_bar);
+    my $opts = {};
+    test_getoptions(
+        name => "optspec: evaporates when it has no handler in 'classic mode' with 'legacy default desinations'" ,
+        opts_spec => [
+          'foo=s', optspec(),
+          'bar=s',
+          'baz=s', optspec(handler => \$opts->{baz} ),
+          'gaz=s', \$opts->{gaz},
+        ],
+        argv => [qw/--foo boo --bar bur --baz boz --gaz gez/],
+        opts => $opts,
+        expected_opts => { baz => "boz", gaz => "gez" },
+        expected_argv => [qw//],
+    );
+    TODO: {
+      # DONE: Now passes, suggesting #9 is resolved.
+      is($opt_foo // "[undef]" => 'boo', "optspec: [evaporation][without a handler][in classic mode][legacy default destination][1]");
+      is($opt_bar // "[undef]" => 'bur', "optspec: [evaporation][without a handler][in classic mode][legacy default destination][2]");
+    }
 }
 
 # XXX test summary

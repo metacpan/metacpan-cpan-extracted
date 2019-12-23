@@ -15,7 +15,7 @@ use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 #-----------------------------------------------------------------------------
 
@@ -42,33 +42,7 @@ Readonly::Hash my %GLOBAL_DECLARATION => (
     our     => $TRUE,
 );
 
-# Contents of regular expression to find interpolations. It captures:
-# $1 = the sigil ( '$' or '@' ), with leading cast if any
-# $2 = the variable (\w+, since we are not worried about built-ins, but
-#      possibly with enclosing {})
-# $3 = the first character of the subscript ( '[' or '{' ), if any
-# The (*SKIP) prevents backtracking past that point, which causes the
-# expression to be really, really slow on very long strings such as the
-# 447776-character one in CPAN module Bhagavatgita.
-#Readonly::Scalar my $FIND_INTERPOLATION => qr/
-#    (?: \A | (?<! [\\] ) ) (?: \\\\ )* (*SKIP)
-#    ( [\$\@]{1,2} ) ( \w+ | [{] \w+ [}] ) ( [[{]? )
-#/smx;
-#
-# But it turned out to be slightly faster (0.8 seconds versus 1 second
-# to analyze module Bhagavatgita) to capture the back slashes (if any)
-# in front of a potential interpolation, and then weed out the ones that
-# turn out to be escaped. The following captures:
-# $1 = any leading back slashes
-# $2 = the sigil ( '$' or '@' ), with leading cast if any
-# $3 = the variable (\w+, since we are not worried about built-ins, but
-#      possibly with enclosing {})
-# $4 = the first character of the subscript ( '[' or '{' ), if any
-Readonly::Scalar my $FIND_INTERPOLATION => qr<
-    ( \\* ) ( [\$\@]{1,2} ) ( \w+ | [{] \w+ [}] ) ( [[{]? )
->smx;
-
-Readonly::Scalar my $LAST_CHARACTER => -1;
+Readonly::Hash my %LOW_PRECEDENCE_BOOLEAN => hashify( qw{ and or xor } );
 
 #-----------------------------------------------------------------------------
 
@@ -90,6 +64,12 @@ sub supported_parameters { return (
         },
         {   name        => 'allow_unused_subroutine_arguments',
             description => 'Allow unused subroutine arguments',
+            behavior    => 'boolean',
+            default_string  => '0',
+        },
+        {
+            name        => 'allow_state_in_expression',
+            description => 'Allow state variable with low-precedence Boolean',
             behavior    => 'boolean',
             default_string  => '0',
         },
@@ -121,6 +101,9 @@ sub violates {
                         #     Scope::Guard).
                         # {is_global} is true if the declaration is a
                         #     global (i.e. is 'our', not 'my');
+                        # {is_state_in_expression} is true if the
+                        #     variable is a 'state' variable and the
+                        #     assignment is part of an expression.
                         # {is_unpacking} is true if the declaration
                         #     occurs in an argument unpacking;
                         # {taking_reference} is true if the code takes a
@@ -180,21 +163,28 @@ sub _get_variable_declarations {
             $declaration->type() } )
             or next;
 
-        my ( $assign, $is_allowed_computation, $is_unpacking );
+        my ( $assign, $is_allowed_computation, $is_state_in_expression,
+            $is_unpacking );
 
         foreach my $operator ( @{ $declaration->find( 'PPI::Token::Operator' )
             || [] } ) {
             q<=> eq $operator->content()
                 or next;
             $assign = $operator;
+
             my $content = $declaration->content();
             $is_unpacking = $content =~ m<
                 = \s* (?: \@_ |
                     shift (?: \s* \@_ )? ) |
                     \$_ [[] .*? []]
                 \s* ;? \z >smx;
+
             $is_allowed_computation = $self->_is_allowed_computation(
                 $operator );
+
+            $is_state_in_expression = $self->_is_state_in_expression(
+                $declaration, $operator );
+
             last;
         }
 
@@ -244,6 +234,7 @@ sub _get_variable_declarations {
                 element     => $symbol,
                 is_allowed_computation => $is_allowed_computation,
                 is_global   => $is_global,
+                is_state_in_expression    => $is_state_in_expression,
                 is_unpacking => $is_unpacking,
                 taking_reference => scalar _taking_reference_of_variable(
                     $declaration ),
@@ -371,6 +362,58 @@ sub _is_allowed_computation {
     }
 
     return;
+}
+
+#-----------------------------------------------------------------------------
+
+# Find cases where the value of a state variable is used by the
+# statement that declares it, or an expression in which that statement
+# appears. The user may wish to accept such variables even if the
+# variable itself appears only in the statement that declares it.
+#
+# $declaration is assumed to be a PPI::Statement::Variable. We return
+# $FALSE unless it declares state variables.
+#
+# $operator is the first assignment operator in $declaration.
+#
+# NOTE that this will never be called for stuff like
+#   $foo and state $bar = 42
+# because PPI does not parse this as a PPI::Statement::Variable.
+sub _is_state_in_expression {
+    my ( $self, $declaration, $operator ) = @_;
+
+    # We're only interested in state declarations.
+    q<state> eq $declaration->type()
+        or return $FALSE;
+
+    # We accept things like
+    #   state $foo = bar() and ...
+    my $next_sib = $operator;
+    while ( $next_sib = $next_sib->snext_sibling() ) {
+        $next_sib->isa( 'PPI::Token::Operator' )
+            and $LOW_PRECEDENCE_BOOLEAN{ $next_sib->content() }
+            and return $TRUE;
+    }
+
+    # We accept things like
+    #     ... ( state $foo = bar() ) ...
+    # IF at least one of the ellipses has an operator adjacent to our
+    # declaration. 
+    my $elem = $declaration;
+    while ( $elem ) {
+        foreach my $method ( qw{ snext_sibling sprevious_sibling } ) {
+            my $sib = $elem->$method()
+                or next;
+            $sib->isa( 'PPI::Token::Operator' )
+                and return $TRUE;
+        }
+        $elem = $elem->parent();
+    }
+
+    # There are no other known cases where a state variable's value can
+    # be used without the variable name appearing anywhere other than
+    # its initialization.
+    return $FALSE;
 }
 
 #-----------------------------------------------------------------------------
@@ -601,6 +644,9 @@ sub _get_violations {
             $declaration->{used}
                 and next;
             $declaration->{is_allowed_computation}
+                and next;
+            $declaration->{is_state_in_expression}
+                and $self->{_allow_state_in_expression}
                 and next;
             $declaration->{taking_reference}
                 and not $self->{_prohibit_reference_only_variables}
@@ -858,7 +904,7 @@ Most of these are because the PPI parse of the original document does
 not include the declarations. The list assignment is missed because PPI
 does not parse it as containing a
 L<PPI::Statement::Variable|PPI::Statement::Variable>. However, variables
-B<used> inside such construction B<will> be detected.
+B<used> inside such constructions B<will> be detected.
 
 
 =head1 CONFIGURATION
@@ -896,8 +942,9 @@ F<.perlcriticrc> file:
 
 By default, this policy allows otherwise-unused variables if they are
 being returned from a subroutine, under the presumption that they are
-going to be used as lvalues. If you wish to declare a violation in this
-case, you can add a block like this to your F<.perlcriticrc> file:
+going to be used as lvalues by the caller. If you wish to declare a
+violation in this case, you can add a block like this to your
+F<.perlcriticrc> file:
 
     [Variables::ProhibitUnusedVarsStricter]
     prohibit_returned_lexicals = 1
@@ -917,6 +964,35 @@ these, you can add a block like this to your F<.perlcriticrc> file:
 This property takes as its value a whitespace-delimited list of class or
 subroutine names. Nothing complex is done to implement this -- the
 policy simply looks at the first word after the equals sign, if any.
+
+=head2 allow_state_in_expression
+
+By default, this policy handles C<state> variables as any other lexical,
+and a violation is declared if they appear only in the statement that
+declares them.
+
+One might, however, do something like
+
+    state $foo = compute_foo() or do_something_else();
+
+In this case, C<compute_foo()> is called only once, but if it returns a
+false value C<do_something_else()> will be executed every time this
+statement is encountered.
+
+If you wish to allow such code, you can add a block like this to your
+F<.perlcriticrc> file:
+
+    [Variables::ProhibitUnusedVarsStricter]
+    allow_state_in_expression = 1
+
+This allows an otherwise-unused state variable if its value appears to
+be used in an expression -- that is, if its declaration is followed by a
+low-precedence boolean, or one of its ancestors is preceded or followed
+by any operator. The latter means that something like
+
+ my $bar = ( state $foo = compute_foo() ) + 42;
+
+will be accepted.
 
 =head1 AUTHOR
 

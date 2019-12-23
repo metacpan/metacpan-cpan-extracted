@@ -2,8 +2,8 @@ NAME
     App::podsel - Select Pod::Elemental nodes using CSel syntax
 
 VERSION
-    This document describes version 0.003 of App::podsel (from Perl
-    distribution App-podsel), released on 2019-08-08.
+    This document describes version 0.006 of App::podsel (from Perl
+    distribution App-podsel), released on 2019-12-15.
 
 SYNOPSIS
 FUNCTIONS
@@ -43,13 +43,23 @@ FUNCTIONS
 
             dump:tag.id.class
 
-        which will result in a node printed like this:
+            which will result in a node printed like this:
 
-         HTML::Element tag=p id=undef class=undef
+            HTML::Element tag=p id=undef class=undef
 
         By default, if no attributes are specified, "id" is used. If the
         node class does not support the attribute, or if the value of the
         attribute is undef, then "undef" is shown.
+
+        *   "eval" will execute Perl code for each matching node. The Perl
+            code will be called with arguments: "($node)". For convenience,
+            $_ is also locally set to the matching node. Example in htmlsel
+            you can add this action:
+
+            eval:'print $_->tag'
+
+            which will print the tag name for each matching HTML::Element
+            node.
 
     *   select_action => *str* (default: "csel")
 
@@ -60,6 +70,57 @@ FUNCTIONS
         For more details on CSel expression, refer to Data::CSel.
 
         "root" will return a single node which is the root node.
+
+    *   transforms => *array[str]*
+
+        Apply one or more Pod::Elemental::Transform's.
+
+        By default, the "stock" Pod::Elemental parser will be generic and
+        not very helpful in parsing your typical POD (Perl 5 variant)
+        documents. You usually want to add:
+
+         -t Pod5 -t Nester
+
+        The following are available transforms:
+
+        *   Pod5
+
+        Equivalent to this:
+
+         Pod::Elemental::Transformer::Pod5->new->transform_node($tree);
+
+        *   Nester
+
+        Equivalent to this:
+
+         my $nester;
+ 
+         $nester = Pod::Elemental::Transformer::Nester->new({
+             top_selector      => Pod::Elemental::Selectors::s_command('head3'),
+             content_selectors => [
+                 Pod::Elemental::Selectors::s_command([ qw(head4) ]),
+                 Pod::Elemental::Selectors::s_flat(),
+             ],
+         });
+         $nester->new->transform_node($tree);
+ 
+         $nester = Pod::Elemental::Transformer::Nester->new({
+             top_selector      => Pod::Elemental::Selectors::s_command('head2'),
+             content_selectors => [
+                 Pod::Elemental::Selectors::s_command([ qw(head3 head4) ]),
+                 Pod::Elemental::Selectors::s_flat(),
+             ],
+         });
+         $nester->new->transform_node($tree);
+ 
+         $nester = Pod::Elemental::Transformer::Nester->new({
+             top_selector      => Pod::Elemental::Selectors::s_command('head1'),
+             content_selectors => [
+                 Pod::Elemental::Selectors::s_command([ qw(head2 head3 head4) ]),
+                 Pod::Elemental::Selectors::s_flat(),
+             ],
+         });
+         $nester->new->transform_node($tree);
 
     Returns an enveloped result (an array).
 

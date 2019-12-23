@@ -1,0 +1,269 @@
+%# BEGIN BPS TAGGED BLOCK {{{
+%#
+%# COPYRIGHT:
+%#
+%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%#                                          <sales@bestpractical.com>
+%#
+%# (Except where explicitly superseded by other copyright notices)
+%#
+%#
+%# LICENSE:
+%#
+%# This work is made available to you under the terms of Version 2 of
+%# the GNU General Public License. A copy of that license should have
+%# been provided with this software, but in any event can be snarfed
+%# from www.gnu.org.
+%#
+%# This work is distributed in the hope that it will be useful, but
+%# WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with this program; if not, write to the Free Software
+%# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+%# 02110-1301 or visit their web page on the internet at
+%# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html.
+%#
+%#
+%# CONTRIBUTION SUBMISSION POLICY:
+%#
+%# (The following paragraph is not intended to limit the rights granted
+%# to you to modify and distribute this software under the terms of
+%# the GNU General Public License and is only of importance to you if
+%# you choose to contribute your changes and enhancements to the
+%# community by submitting them to Best Practical Solutions, LLC.)
+%#
+%# By intentionally submitting any modifications, corrections or
+%# derivatives to this work, or any other work intended for use with
+%# Request Tracker, to Best Practical Solutions, LLC, you confirm that
+%# you are the copyright holder for those contributions and you grant
+%# Best Practical Solutions,  LLC a nonexclusive, worldwide, irrevocable,
+%# royalty-free, perpetual, license to use, copy, create derivative
+%# works based on those contributions, and sublicense and distribute
+%# those contributions and any derivatives thereof.
+%#
+%# END BPS TAGGED BLOCK }}}
+<& /Elements/Header, 
+    Title => $title,
+    LinkRel => \%link_rel &>
+<& /Elements/Tabs &>
+
+% $m->callback(CallbackName => 'BeforeActionList', %ARGS, Actions => \@Actions, ARGSRef => \%ARGS, Ticket => $TicketObj);
+
+<& /Elements/ListActions, actions => \@Actions &>
+<& Elements/ShowUpdateStatus, Ticket => $TicketObj &>
+<& Elements/ShowDependencyStatus, Ticket => $TicketObj &>
+
+<div class="<% join ' ', @classes %>">
+  <div class="metadata">
+% $m->callback( %ARGS, Transaction => $Transaction, CallbackName => 'AfterAnchor' );
+    <span class="date"><% $date |n %></span>
+    <span class="description">
+      <& /Elements/ShowUser, User => $Transaction->CreatorObj &> - <% $desc |n %>
+% $m->callback( %ARGS, Transaction => $Transaction, CallbackName => 'AfterDescription' );
+    </span>
+    <span class="time-taken"><% $time %></span>
+  </div>
+
+  <div class="content">
+<%PERL>
+$m->comp(
+    '/Elements/ShowTransactionAttachments',
+    %ARGS,
+    Transaction => $Transaction,
+    AttachmentPath => $AttachmentPath,
+    Parent => 0
+);
+</%PERL>
+  </div>
+% $m->callback( %ARGS, Transaction => $Transaction, CallbackName => 'AfterContent' );
+</div>
+<div class="relocate-transaction" style="width:500px;">
+<form action="Relocate.html" name="TicketUpdate"
+    method="post" enctype="multipart/form-data">
+<input type="hidden" class="hidden" name="id" value="<%$id%>" /><br />
+<input type="hidden" class="hidden" name="TransactionId" value="<% $ARGS{TransactionId}||'' %>" /><br />
+
+<table>
+  <tr>
+    <td class="label"><&|/l&>Relocate message to ticket</&>:</td>
+    <td class="entry"><input name="relocate-to" value="" data-autocomplete="Tickets" data-autocomplete-exclude="" /></td>
+  </tr>
+</table>
+
+
+<& /Elements/Submit, Label => loc('Relocate Ticket'), Name => 'Submit', id => 'Submit' &>
+</form>
+ 
+</div>
+
+<%ARGS>
+$id => undef
+$TransactionId => undef
+
+$Attachments => undef
+</%ARGS>
+
+<%INIT>
+RT->Logger->error("__1: Ticket id:[$id] Transaction Id:[$TransactionId]" );
+my (@Actions, $title);
+
+unless ($id && $TransactionId) {
+    Abort(loc('No ticket and/or transaction specified'));
+}
+
+my $T = RT::Transactions->new(RT->SystemUser);
+$T->Limit( FIELD => 'id',       VALUE => $TransactionId );
+$T->Limit( FIELD => 'ObjectId', VALUE => $id );
+my $Transaction = $T->Next; # there should be only one as we limit to TransactionId
+
+unless ($Transaction && $Transaction->id == $TransactionId) {
+    Abort(loc('Transaction not found'));
+}   
+#RT->Logger->error("__2: ". $Transaction->id);
+my $txn_type = $Transaction->Type;
+if ( $txn_type !~ /Correspond|Comment$/ ) {
+    Abort(loc('Transaction is not Correspond nor Comment'));
+}
+
+if ( $Transaction->ObjectId ne $ARGS{'id'} ) {
+    Abort(loc('Transaction #[_1] did not belongs to ticket #[_2]',$Transaction->id, $ARGS{'id'} ));
+}
+
+my $required_right_name = 'RelocateReply';
+my $has_right_RelocateReply = RT::ACE->CanonicalizeRightName($required_right_name);
+if ( ! defined $has_right_RelocateReply ) {
+    RT->Logger->error("No right with name [$required_right_name] found!" );
+    Abort(loc('No right with name [[_1]] found!', $required_right_name ));
+    return;
+}
+#RT->Logger->error("__3: ". $has_right_RelocateReply);
+my $STicket = RT::Ticket->new( $session{'CurrentUser'} );
+$STicket->Load( $ARGS{'id'} );
+unless ( $STicket ) {
+    Abort(loc('Source ticket not found'));
+}
+unless ( $STicket->CurrentUserHasRight( $has_right_RelocateReply ) ) {
+    Abort(loc('You have no permission to relocate reply from this ticket'));
+}
+
+# we need to set AttachmentPath here, because /Elements/ShowHistory didn't get called
+my $AttachmentPath = ($ARGS{PathPrefix}||'').'Attachment';
+
+while ( $ARGS{'Submit'} ) {
+    unless ( $ARGS{'relocate-to'} ) {
+        push @Actions, loc('Target ticket id is not specified');
+        last;
+    }
+    my $TargetTicket = RT::Ticket->new( $session{'CurrentUser'} );
+    $TargetTicket->Load( $ARGS{'relocate-to'} );
+    unless ( $TargetTicket && $TargetTicket->id == $ARGS{'relocate-to'} ) {
+        push @Actions, loc('Target ticket not found');
+        last;
+    }
+    unless ( $TargetTicket->CurrentUserHasRight( $has_right_RelocateReply ) ) {
+        push @Actions, loc('You have no permission to relocate reply to target ticket. (#[_1]: [_2])', $TargetTicket->id, $TargetTicket->Subject );
+        last;
+    }
+    $RT::Handle->BeginTransaction();
+    my $Now = RT::Date->new( $session{CurrentUser} );
+    $Now->SetToNow();
+    my $dbh = $RT::Handle->dbh;
+    ##########################
+    # create a new transaction preserving the original's ObjectType, ObjectId and created field 
+    # oldvalue: original ticket ID, newvalue: new ticket ID, data: old transaction id; date when relocate happens; message place (past/present)
+    my $query = "INSERT INTO transactions (objecttype, objectid, type, field, oldvalue, newvalue, data, creator, created )
+                            (SELECT objecttype, objectid, ?, ?, objectid, ?, ?, ?, created FROM transactions WHERE id = ?)";
+    my $sth = $dbh->prepare( $query );
+    unless (defined $sth) {
+      $RT::Logger->error( "couldn't prepare query: ". $dbh->errstr );
+      Abort(loc('There were an error in relocating the requested transaction'));
+    }
+    RT->Logger->info("copy values: 'Relocate'.$txn_type, 'Transaction.ObjectId', ".$TargetTicket->id.", $TransactionId;".$Now->ISO.$Transaction->Created.";past, ".$session{'CurrentUser'}->Id.", $TransactionId" );
+    my $result = $sth->execute( 'Relocate'.$txn_type, 'Transaction.ObjectId', $TargetTicket->id, "$TransactionId;".$Now->ISO.";".$Transaction->Created.";past", $session{'CurrentUser'}->Id, $TransactionId );
+    if ( ! defined $result) {
+        $RT::Logger->error( "couldn't execute query: ". $dbh->errstr );
+        $RT::Handle->Rollback();
+        Abort(loc('There were an error in relocating the requested transaction'));
+    }
+    $RT::Logger->error( "result#1: ". $result );
+    ##########################
+    # change the original transaction's ObjectId to the target ticket id
+    $query = "UPDATE Transactions SET ObjectId=? WHERE id=?";
+    $sth = $dbh->prepare( $query );
+    $result = $sth->execute( $TargetTicket->id, $TransactionId );
+    if ( ! defined $result) {
+        $RT::Logger->error( "couldn't execute query: ". $dbh->errstr );
+        $RT::Handle->Rollback();
+        Abort(loc('There were an error in relocating the requested transaction'));
+    }
+    $RT::Logger->error( "result#2: ". $result );
+    ##########################
+    # create a new 'Relocate' transaction in the original (source) ticket to inform about the relocated transaction
+    $query = "INSERT INTO transactions (objecttype, objectid, type, field, oldvalue, newvalue, data, creator, created )
+                                VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+    $sth = $dbh->prepare( $query );
+    unless (defined $sth) {
+      $RT::Logger->error( "couldn't prepare query: ". $dbh->errstr );
+      Abort(loc('There were an error in relocating the requested transaction'));
+    }
+    $result = $sth->execute( 'RT::Ticket', $STicket->id, 'Relocate'.$txn_type, 'Transaction.ObjectId', $STicket->id, $TargetTicket->id, "$TransactionId;".$Now->ISO.";".$Transaction->Created.";present", $session{'CurrentUser'}->Id, $Now->ISO );
+    if ( ! defined $result) {
+        $RT::Logger->error( "couldn't execute query: ". $dbh->errstr );
+        $RT::Handle->Rollback();
+        Abort(loc('There were an error in relocating the requested transaction'));
+    }
+    $RT::Logger->error( "result#3: ". $result );
+    ##########################
+    # create a new 'Relocate' transaction in the target (destination) ticket to inform about the relocated transaction
+    $query = "INSERT INTO transactions (objecttype, objectid, type, field, oldvalue, newvalue, data, creator, created )
+                                VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+    $sth = $dbh->prepare( $query );
+    unless (defined $sth) {
+      $RT::Logger->error( "couldn't prepare query: ". $dbh->errstr );
+      Abort(loc('There were an error in relocating the requested transaction'));
+    }
+    $result = $sth->execute( 'RT::Ticket', $TargetTicket->id, 'Relocate'.$txn_type, 'Transaction.ObjectId', $STicket->id, $TargetTicket->id, "$TransactionId;".$Now->ISO.";".$Transaction->Created.";present", $session{'CurrentUser'}->Id, $Now->ISO );
+    if ( ! defined $result) {
+        $RT::Logger->error( "couldn't execute query: ". $dbh->errstr );
+        $RT::Handle->Rollback();
+        Abort(loc('There were an error in relocating the requested transaction'));
+    }
+    $RT::Logger->error( "result#4: ". $result );
+#    $RT::Handle->Rollback();
+#    Abort(loc('EXIT EXIT EXIT'));
+    $RT::Handle->Commit();
+    RT::Interface::Web::Redirect(RT->Config->Get('WebURL').'Ticket/History.html?id='.$TargetTicket->id );
+    $m->abort;
+}
+
+my $desc = $Transaction->BriefDescriptionAsHTML;
+my $date = $Transaction->CreatedAsString;
+my $time = '';
+$time = loc('[quant,_1,minute,minutes]', $Transaction->TimeTaken) if $Transaction->TimeTaken;
+
+my @classes = ( "transaction", "Ticket-transaction", "message" );
+
+if ( !$Attachments ) {
+  $ARGS{'Attachments'} = $Attachments = {};
+
+  my $attachments = $Transaction->Attachments( WithHeaders => 1 );
+  push @{ $Attachments->{ $_->Parent || 0 } ||= [] }, $_
+    foreach @{ $attachments->ItemsArrayRef };
+}
+
+
+my $TicketObj ||= LoadTicket($ARGS{'id'});
+$title = loc("#[_1]: [_2]", $TicketObj->Id, $TicketObj->Subject || '');
+
+my %link_rel;
+if (defined $session{'tickets'} and ($ARGS{'Query'} or $session{'CurrentSearchHash'}->{'Query'})) {
+    my $item_map = $session{'tickets'}->ItemMap;
+    $link_rel{first} = "Ticket/Display.html?id=" . $item_map->{first}                if $item_map->{$TicketObj->Id}{prev};
+    $link_rel{prev}  = "Ticket/Display.html?id=" . $item_map->{$TicketObj->Id}{prev} if $item_map->{$TicketObj->Id}{prev};
+    $link_rel{next}  = "Ticket/Display.html?id=" . $item_map->{$TicketObj->Id}{next} if $item_map->{$TicketObj->Id}{next};
+    $link_rel{last}  = "Ticket/Display.html?id=" . $item_map->{last}                 if $item_map->{$TicketObj->Id}{next} && $item_map->{last};
+}
+</%INIT>

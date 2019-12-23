@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -450,9 +450,10 @@ sub attributes {
             flags         => 'p',
         },
         checkUserSearchAttributes => {
-            type          => 'text',
-            documentation => 'Attributes used for retrieving sessions in user DataBase',
-            flags         => 'p',
+            type => 'text',
+            documentation =>
+              'Attributes used for retrieving sessions in user DataBase',
+            flags => 'p',
         },
         checkUserDisplayPersistentInfo => {
             default       => 0,
@@ -464,6 +465,18 @@ sub attributes {
             default       => 0,
             type          => 'bool',
             documentation => 'Display session empty values',
+            flags         => 'p',
+        },
+        globalLogoutRule => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'Global logout activation rule',
+            flags         => 'p',
+        },
+        globalLogoutTimer => {
+            default       => 1,
+            type          => 'bool',
+            documentation => 'Global logout auto accept time',
             flags         => 'p',
         },
         impersonationMergeSSOgroups => {
@@ -522,11 +535,33 @@ sub attributes {
             documentation => 'Stop context switching by logout',
             flags         => 'p',
         },
+        decryptValueRule => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'Decrypt value activation rule',
+            flags         => 'p',
+        },
+        decryptValueFunctions => {
+            type          => 'text',
+            test          => qr/^(?:\w+(?:::\w+)*(?:\s+\w+(?:::\w+)*)*)?$/,
+            msgFail       => "__badCustomFuncName__",
+            documentation => 'Custom function used for decrypting values',
+            flags         => 'p',
+        },
         skipRenewConfirmation => {
             type    => 'bool',
             default => 0,
             documentation =>
               'Avoid asking confirmation when an Issuer asks to renew auth',
+        },
+        refreshSessions => {
+            type          => 'bool',
+            documentation => 'Refresh sessions plugin',
+        },
+        forceGlobalStorageIssuerOTT => {
+            type => 'bool',
+            documentation =>
+              'Force Issuer tokens to be stored into Global Storage',
         },
         handlerInternalCache => {
             type          => 'int',
@@ -800,7 +835,7 @@ sub attributes {
         },
         cspFormAction => {
             type    => 'text',
-            default => "'self'",
+            default => "*",
             documentation =>
               'Form action destination for Content-Security-Policy',
         },
@@ -956,6 +991,11 @@ sub attributes {
             type          => 'boolOrExpr',
             documentation => 'Display logout tab in portal',
         },
+        portalDisplayCertificateResetByMail => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'Display Certificate Reset by mail tab in portal',
+        },
         portalDisplayRegister => {
             default       => 1,
             type          => 'bool',
@@ -1074,6 +1114,11 @@ sub attributes {
             default       => 0,
             type          => 'bool',
             documentation => 'Notification server activation',
+        },
+        notificationDefaultCond => {
+            type          => 'text',
+            default       => '',
+            documentation => 'Notification default condition',
         },
         notificationServerGET => {
             default       => 0,
@@ -1413,6 +1458,52 @@ sub attributes {
             default       => 'http://auth.example.com/resetpwd',
             documentation => 'URL of password reset page',
         },
+                   # Certificate reset by mail
+        certificateResetByMailCeaAttribute => {
+            type          => 'text',
+            default       => 'description'
+        },
+        certificateResetByMailCertificateAttribute => {
+            type          => 'text',
+            default       => 'userCertificate;binary',
+        },
+        certificateResetByMailStep1Body => {
+            type          => 'longtext',
+            documentation => 'Custom Certificate reset mail body',
+        },
+
+        certificateResetByMailStep2Body => {
+            type          => 'longtext',
+            documentation => 'Custom confirm Certificate reset mail body',
+        },
+        certificateResetByMailStep2Subject => {
+            type          => 'text',
+            documentation => 'Mail subject for reset confirmation',
+        },
+        certificateResetByMailStep1Subject => {
+            type          => 'text',
+            documentation => 'Mail subject for certificate reset email',
+        },
+
+        certificateResetByMailURL => {
+            type          => 'url',
+            default       => 'http://auth.example.com/certificateReset',
+            documentation => 'URL of certificate reset page',
+        },
+        certificateResetByMailSender => {
+            type          => 'text',
+            default       => 'noreply@example.com',
+            documentation => 'URL of certificate reset page',
+        },
+        certificateResetByMailReplyTo => {
+            type          => 'text',
+            default       => 'noreply@example.com',
+            documentation => 'URL of certificate reset page',
+        },
+        certificateResetByMailValidityDelay => {
+            type          => 'int',
+            default       => 0
+        },
 
         # Registration
         registerConfirmSubject => {
@@ -1455,7 +1546,7 @@ sub attributes {
         forceGlobalStorageUpgradeOTT => {
             type => 'bool',
             documentation =>
-              'Force upgrade tokens be stored into Global Storage',
+              'Force Upgrade tokens be stored into Global Storage',
         },
 
         # 2F
@@ -1960,15 +2051,15 @@ sub attributes {
         vhostType    => {
             type   => 'select',
             select => [
-                { k => 'AuthBasic',    v => 'AuthBasic' },
-                { k => 'CDA',          v => 'CDA' },
-                { k => 'DevOps',       v => 'DevOps' },
-                { k => 'DevOpsST',     v => 'DevOpsST' },
-                { k => 'Main',         v => 'Main' },
-                { k => 'OAuth2',       v => 'OAuth2' },
-                { k => 'SecureToken',  v => 'SecureToken' },
-                { k => 'ServiceToken', v => 'ServiceToken' },
-                { k => 'Zimbra',       v => 'ZimbraPreAuth' },
+                { k => 'AuthBasic',     v => 'AuthBasic' },
+                { k => 'CDA',           v => 'CDA' },
+                { k => 'DevOps',        v => 'DevOps' },
+                { k => 'DevOpsST',      v => 'DevOpsST' },
+                { k => 'Main',          v => 'Main' },
+                { k => 'OAuth2',        v => 'OAuth2' },
+                { k => 'SecureToken',   v => 'SecureToken' },
+                { k => 'ServiceToken',  v => 'ServiceToken' },
+                { k => 'ZimbraPreAuth', v => 'ZimbraPreAuth' },
             ],
             default       => 'Main',
             documentation => 'Handler type',
@@ -2097,6 +2188,18 @@ sub attributes {
             type          => 'text',
             test          => sub { return perlExpr(@_) },
             documentation => 'CAS App rule',
+        },
+        casAppMetaDataMacros => {
+            type => 'keyTextContainer',
+            help =>
+              'exportedvars.html#extend_variables_using_macros_and_groups',
+            test => {
+                keyTest    => qr/^[_a-zA-Z][a-zA-Z0-9_]*$/,
+                keyMsgFail => '__badMacroName__',
+                test       => sub { return perlExpr(@_) },
+            },
+            default       => {},
+            documentation => 'Macros',
         },
 
         # Fake attribute: used by manager REST API to agglomerate all nodes
@@ -2241,11 +2344,6 @@ sub attributes {
             default => 0,
             documentation =>
               'Use certificate instead of public key in SAML responses',
-        },
-        samlIdPResolveCookie => {
-            type          => 'text',
-            default       => 'lemonldapidp',
-            documentation => 'SAML IDP resolution cookie',
         },
         samlMetadataForceUTF8 => {
             default       => 1,
@@ -2702,6 +2800,18 @@ sub attributes {
             test          => sub { return perlExpr(@_) },
             documentation => 'Rule to grant access to this SP',
         },
+        samlSPMetaDataMacros => {
+            type => 'keyTextContainer',
+            help =>
+              'exportedvars.html#extend_variables_using_macros_and_groups',
+            test => {
+                keyTest    => qr/^[_a-zA-Z][a-zA-Z0-9_]*$/,
+                keyMsgFail => '__badMacroName__',
+                test       => sub { return perlExpr(@_) },
+            },
+            default       => {},
+            documentation => 'Macros',
+        },
 
         # AUTH, USERDB and PASSWORD MODULES
         authentication => {
@@ -2848,7 +2958,7 @@ sub attributes {
         # LDAP
         managerDn => {
             type          => 'text',
-            test          => qr/^(?:\w+=.*)?$/,
+            test          => qr/^.*$/,
             msgFail       => '__badValue__',
             default       => '',
             documentation => 'LDAP manager DN',
@@ -3496,6 +3606,16 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'Custom additional parameters',
         },
 
+        # Custom plugins
+        customPlugins => {
+            type          => 'text',
+            documentation => 'Custom plugins',
+        },
+        customPluginsParams => {
+            type          => 'keyTextContainer',
+            documentation => 'Custom plugins parameters',
+        },
+
         # OpenID Connect auth params
         oidcAuthnLevel => {
             type          => 'int',
@@ -3606,6 +3726,36 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 0,
             documentation => 'OpenID Connect allow hybrid flow',
         },
+        oidcServiceAuthorizationCodeExpiration => {
+            type          => 'int',
+            default       => 60,
+            documentation => 'OpenID Connect global code TTL',
+        },
+        oidcServiceAccessTokenExpiration => {
+            type          => 'int',
+            default       => 3600,
+            documentation => 'OpenID Connect global access token TTL',
+        },
+        oidcServiceDynamicRegistrationExportedVars => {
+            type => 'keyTextContainer',
+            documentation =>
+              'OpenID Connect exported variables for dynamic registration',
+        },
+        oidcServiceDynamicRegistrationExtraClaims => {
+            type => 'keyTextContainer',
+            documentation =>
+              'OpenID Connect extra claims for dynamic registration',
+        },
+        oidcServiceIDTokenExpiration => {
+            type          => 'int',
+            default       => 3600,
+            documentation => 'OpenID Connect global ID token TTL',
+        },
+        oidcServiceOfflineSessionExpiration => {
+            type          => 'int',
+            default       => 2592000,
+            documentation => 'OpenID Connect global offline session TTL',
+        },
         oidcStorage => {
             type          => 'PerlModule',
             documentation => 'Apache::Session module to store OIDC user data',
@@ -3706,11 +3856,12 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             ],
             default => 'HS512',
         },
-        oidcRPMetaDataOptionsIDTokenExpiration =>
-          { type => 'int', default => 3600 },
-        oidcRPMetaDataOptionsAccessTokenExpiration =>
-          { type => 'int', default => 3600 },
-        oidcRPMetaDataOptionsRedirectUris => { type => 'text', },
+        oidcRPMetaDataOptionsIDTokenExpiration           => { type => 'int' },
+        oidcRPMetaDataOptionsIDTokenForceClaims          => { type => 'bool' },
+        oidcRPMetaDataOptionsAccessTokenExpiration       => { type => 'int' },
+        oidcRPMetaDataOptionsAuthorizationCodeExpiration => { type => 'int' },
+        oidcRPMetaDataOptionsOfflineSessionExpiration    => { type => 'int' },
+        oidcRPMetaDataOptionsRedirectUris                => { type => 'text', },
         oidcRPMetaDataOptionsExtraClaims =>
           { type => 'keyTextContainer', default => {} },
         oidcRPMetaDataOptionsBypassConsent => {
@@ -3747,10 +3898,32 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 0,
             documentation => 'Require PKCE',
         },
+        oidcRPMetaDataOptionsAllowOffline => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Allow offline access',
+        },
+        oidcRPMetaDataOptionsRefreshToken => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Issue refresh tokens',
+        },
         oidcRPMetaDataOptionsRule => {
             type          => 'text',
             test          => sub { return perlExpr(@_) },
             documentation => 'Rule to grant access to this RP',
+        },
+        oidcRPMetaDataMacros => {
+            type => 'keyTextContainer',
+            help =>
+              'exportedvars.html#extend_variables_using_macros_and_groups',
+            test => {
+                keyTest    => qr/^[_a-zA-Z][a-zA-Z0-9_]*$/,
+                keyMsgFail => '__badMacroName__',
+                test       => sub { return perlExpr(@_) },
+            },
+            default       => {},
+            documentation => 'Macros',
         },
     };
 }

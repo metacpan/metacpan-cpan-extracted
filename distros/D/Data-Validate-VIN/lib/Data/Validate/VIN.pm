@@ -5,7 +5,7 @@ use strict;
 use warnings;
 #use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
     my ( $class, $vin ) = @_;
@@ -281,35 +281,35 @@ sub _checkVIS {
 
         my %years = (
             A => [ 1980, 2010 ],
-            L => [1990],
-            Y => [2000],
+            L => [ 1990, 2020 ],
+            Y => [ 2000, 2030 ],
             B => [ 1981, 2011 ],
-            M => [1991],
-            1 => [2001],
+            M => [ 1991, 2021 ],
+            1 => [ 2001, 2031 ],
             C => [ 1982, 2012 ],
-            N => [1992],
-            2 => [2002],
+            N => [ 1992, 2022 ],
+            2 => [ 2002, 2032 ],
             D => [ 1983, 2013 ],
-            P => [1993],
-            3 => [2003],
+            P => [ 1993, 2023 ],
+            3 => [ 2003, 2033 ],
             E => [ 1984, 2014 ],
-            R => [1994],
-            4 => [2004],
+            R => [ 1994, 2024 ],
+            4 => [ 2004, 2034 ],
             F => [ 1985, 2015 ],
-            S => [1995],
-            5 => [2005],
+            S => [ 1995, 2025 ],
+            5 => [ 2005, 2035 ],
             G => [ 1986, 2016 ],
-            T => [1996],
-            6 => [2006],
+            T => [ 1996, 2026 ],
+            6 => [ 2006, 2036 ],
             H => [ 1987, 2017 ],
-            V => [1997],
-            7 => [2007],
+            V => [ 1997, 2027 ],
+            7 => [ 2007, 2037 ],
             J => [ 1988, 2018 ],
-            W => [1998],
-            8 => [2008],
+            W => [ 1998, 2028 ],
+            8 => [ 2008, 2038 ],
             K => [ 1989, 2019 ],
-            X => [1999],
-            9 => [2009],
+            X => [ 1999, 2029 ],
+            9 => [ 2009, 2039 ],
         );
 
         my $yearDigit = substr( $vis->{vis}, 0, 1 );
@@ -461,11 +461,11 @@ __END__
 =head1 NAME
 
 Data::Validate::VIN - Perl extension for basic validation of
-North American Vehicle Identification Numbers from 1980 and later
+North American Vehicle Identification Numbers (model years 1980 - 2039)
 
 =head1 VERSION
 
-0.04
+0.05
 
 =head1 SYNOPSIS
 
@@ -483,7 +483,7 @@ North American Vehicle Identification Numbers from 1980 and later
 =head1 DESCRIPTION
 
 Data::Validate::VIN provides a simple way to validate the very basics of North American VINs. The only information
-this module can glean from a valid VIN is the country of manufacture and the year it was produced.
+this module can glean from a valid VIN is the country of manufacture and the model year (where year is between 1980 and 2039).
 
 It cannot tell you if a VIN corresponds to an actual vehicle in the world, it just knows what most VINs look like.
 
@@ -496,9 +496,11 @@ The following checks are run:
 =head2 Legal Characters
 
 The following are allowed :
+
 A-H,J-N,P,R-Z,0-9
 
-Note that following are illegal in the 10th position:
+The following are illegal in the 10th position:
+
 U,Z,0
 
 =head2 Country of Manufacture
@@ -508,6 +510,8 @@ Identified through the first two characters in the WMI
 =head2 Year
 
 Identified by the 10th character in the VIN
+
+Model year between 1980 and 2039
 
 =head2 Check Digit
 

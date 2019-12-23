@@ -58,7 +58,7 @@
    "provides" : {
       "Telemetry::Any" : {
          "file" : "lib/Telemetry/Any.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,10 @@
          "web" : "https://github.com/ivanych/Telemetry-Any"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_authority" : "cpan:IVANYCH",
+   "x_contributors" : [
+      "Alexander Kazakov <infitpro@gmail.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

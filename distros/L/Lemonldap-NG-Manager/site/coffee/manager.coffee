@@ -217,7 +217,7 @@ llapp.controller 'TreeCtrl', [
 			$scope.getKey($scope.currentNode)
 
 		# NODES MANAGEMENT
-		id = 1
+		idinc = 1
 		$scope._findContainer = ->
 			return $scope._findScopeContainer().$modelValue
 		$scope._findScopeContainer = ->
@@ -237,7 +237,7 @@ llapp.controller 'TreeCtrl', [
 			l = node.nodes.length
 			n = if l > 0 then l - 1 else 0
 			node.nodes.push
-				id: "#{node.id}/n#{id++}"
+				id: "#{node.id}/n#{idinc++}"
 				title: 'New rule'
 				re: 'Message'
 				comment: 'New rule'
@@ -250,7 +250,7 @@ llapp.controller 'TreeCtrl', [
 			l = node.nodes.length
 			n = if l > 0 then l - 1 else 0
 			node.nodes.splice n, 0,
-				id: "#{node.id}/n#{id++}"
+				id: "#{node.id}/n#{idinc++}"
 				title: 'New rule'
 				re: '^/new'
 				comment: 'New rule'
@@ -261,7 +261,7 @@ llapp.controller 'TreeCtrl', [
 		$scope.newPost = ->
 			node = $scope._findContainer()
 			node.nodes.push
-				id: "#{node.id}/n#{id++}"
+				id: "#{node.id}/n#{idinc++}"
 				title: "/absolute/path/to/form"
 				data: {}
 				type: "post"
@@ -274,7 +274,7 @@ llapp.controller 'TreeCtrl', [
 		$scope.newAuthChoice = ->
 			node = $scope._findContainer()
 			node.nodes.push
-				id: "#{node.id}/n#{id++}"
+				id: "#{node.id}/n#{idinc++}"
 				title: "1_Key"
 				data: ['Null', 'Null', 'Null']
 				type: "authChoice"
@@ -284,7 +284,7 @@ llapp.controller 'TreeCtrl', [
 		$scope.newHashEntry = ->
 			node = $scope._findContainer()
 			node.nodes.push
-				id: "#{node.id}/n#{id++}"
+				id: "#{node.id}/n#{idinc++}"
 				title: 'new'
 				data: ''
 				type: "keyText"
@@ -295,7 +295,7 @@ llapp.controller 'TreeCtrl', [
 			if cs.$modelValue.type == 'menuApp'
 				cs = cs.$parentNodeScope
 			cs.$modelValue.nodes.push
-				id: "#{cs.$modelValue.id}/n#{id++}"
+				id: "#{cs.$modelValue.id}/n#{idinc++}"
 				title: "New category"
 				type: "menuCat"
 				nodes: []
@@ -306,7 +306,7 @@ llapp.controller 'TreeCtrl', [
 			if cs.$modelValue.type == 'menuApp'
 				cs = cs.$parentNodeScope
 			cs.$modelValue.nodes.push
-				id: "#{cs.$modelValue.id}/n#{id++}"
+				id: "#{cs.$modelValue.id}/n#{idinc++}"
 				title: "New application"
 				type: "menuApp"
 				data:
@@ -319,7 +319,7 @@ llapp.controller 'TreeCtrl', [
 		$scope.newCmbMod = ->
 			node = $scope._findContainer()
 			node.nodes.push
-				id: "#{node.id}/n#{id++}"
+				id: "#{node.id}/n#{idinc++}"
 				title: 'new'
 				type: 'cmbModule'
 				data:
@@ -331,7 +331,7 @@ llapp.controller 'TreeCtrl', [
 		$scope.newSfExtra = ->
 			node = $scope._findContainer()
 			node.nodes.push
-				id: "#{node.id}/n#{id++}"
+				id: "#{node.id}/n#{idinc++}"
 				title: 'new'
 				type: 'sfExtra'
 				data:
@@ -345,18 +345,18 @@ llapp.controller 'TreeCtrl', [
 		$scope.newSfOver = ->
 			d = $scope.currentNode.data
 			d.over = [] unless d.over
-			d.over.push ["new#{id++}", '']
+			d.over.push ["new#{idinc++}", '']
 
 		$scope.newCmbOver = ->
 			d = $scope.currentNode.data
 			d.over = [] unless d.over
-			d.over.push ["new#{id++}", '']
+			d.over.push ["new#{idinc++}", '']
 
 		$scope.newChoiceOver = ->
 			d = $scope.currentNode.data
 			console.log "data", d
 			d[5] = [] unless d[5]
-			d[5].push ["new#{id++}", '']
+			d[5].push ["new#{idinc++}", '']
 
 		# Add host
 		$scope.addHost = () ->
@@ -370,7 +370,7 @@ llapp.controller 'TreeCtrl', [
 		$scope.addSamlAttribute = ->
 			node = $scope._findContainer()
 			node.nodes.push
-				id: "#{node.id}/n#{id++}"
+				id: "#{node.id}/n#{idinc++}"
 				title: 'new'
 				type: 'samlAttribute'
 				data: ['0', 'New', '', '']
@@ -592,6 +592,10 @@ llapp.controller 'TreeCtrl', [
 						if a.template
 							a._nodes = templates a.template, a.title
 						node.nodes.push a
+						if a.type.match /^rule$/
+							console.log "Parse rule AuthnLevel as integer"
+							if a.level and typeof a.level == 'string'
+								a.level = parseInt(a.level, 10)
 					d.resolve 'OK'
 				$scope.waiting = false
 			, (response) ->

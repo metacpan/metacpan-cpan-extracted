@@ -41,8 +41,4 @@ is_deeply $pkg->new('identifier.*.isbn')
     },
     "isbn 13 and 10 versions with complex path";
 
-is_deeply $pkg->new('isbn_path')->fix({isbn_path => '9791090636071'}),
-    {isbn_path => ['979-1-09-063607-1', '9791090636071']},
-    "non-convertible isbn 13 versions";
-
 done_testing;

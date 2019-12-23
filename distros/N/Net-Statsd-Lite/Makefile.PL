@@ -36,13 +36,13 @@ my %WriteMakefileArgs = (
     "Test::Roo" => 0,
     "Test::Roo::DataDriven" => 0,
     "Test::Roo::Role" => 0,
-    "Test::TCP" => "2.19",
+    "Test::TCP" => "2.22",
     "curry" => 0,
     "if" => 0,
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.4.8",
+  "VERSION" => "v0.4.9",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,7 +65,7 @@ my %FallbackPrereqs = (
   "Test::Roo" => 0,
   "Test::Roo::DataDriven" => 0,
   "Test::Roo::Role" => 0,
-  "Test::TCP" => "2.19",
+  "Test::TCP" => "2.22",
   "Types::Standard" => 0,
   "curry" => 0,
   "if" => 0,

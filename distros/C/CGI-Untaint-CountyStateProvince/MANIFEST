@@ -1,9 +1,11 @@
 Changes
-MANIFEST
-Makefile.PL
-README
 ignore.txt
 lib/CGI/Untaint/CountyStateProvince.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
 t/00-load.t
 t/boiler.t
 t/cgi-untaint-csp.t
@@ -12,8 +14,10 @@ t/critic.t
 t/cv.t
 t/gv.t
 t/kwalitee.t
+t/links.t
 t/manifest.t
 t/metrics.t
+t/no404s.t
 t/noplan.t
 t/pod-cm.t
 t/pod.t
@@ -22,6 +26,5 @@ t/prereq.t
 t/snippets.t
 t/spelling.t
 t/vars.t
-META.yml                                 Module meta-data (added by MakeMaker)
-MYMETA.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

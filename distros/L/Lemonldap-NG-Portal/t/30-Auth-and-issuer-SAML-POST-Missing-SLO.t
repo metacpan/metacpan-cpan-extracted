@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 21;
+my $maintests = 20;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -50,11 +50,6 @@ SKIP: {
         'Unauth SP request'
     );
     expectOK($res);
-    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     my ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
         'SAMLRequest' );
@@ -96,11 +91,6 @@ SKIP: {
         'Unauth SP request'
     );
     expectOK($res);
-    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
         'SAMLRequest' );
@@ -142,7 +132,6 @@ SKIP: {
             $url, IO::String->new($s),
             accept => 'text/html',
             length => length($s),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -197,11 +186,15 @@ SKIP: {
 
     ok( $res->[2]->[0] =~ /trmsg="47"/, 'Found logout message' );
 
+    my $logoutCookie = expectCookie($res);
+    is($logoutCookie, 0, "IDP cookie removed");
+
+    # Test if logout is done
     ok(
         $res = $issuer->_get(
             '/', cookie => "lemonldap=$idpId",
         ),
-        'Test if user is reject on IdP'
+        'Test if old cookie is denied by IdP'
     );
     expectReject($res);
 
@@ -210,8 +203,7 @@ SKIP: {
         $res = $sp->_get(
             '/',
             accept => 'text/html',
-            cookie =>
-              "lemonldapidp=http://auth.idp.com/saml/metadata; lemonldap=$spId"
+            cookie => "lemonldap=$spId"
         ),
         'Test if user is reject on SP'
     );

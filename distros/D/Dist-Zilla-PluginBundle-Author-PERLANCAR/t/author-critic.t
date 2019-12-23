@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.003
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/Dist/Zilla/Plugin/PERLANCAR/BeforeBuild.pm','lib/Dist/Zilla/PluginBundle/Author/PERLANCAR.pm','lib/Dist/Zilla/PluginBundle/Author/PERLANCAR/NonCPAN.pm','lib/Dist/Zilla/PluginBundle/Author/PERLANCAR/NonCPAN/Task.pm','lib/Dist/Zilla/PluginBundle/Author/PERLANCAR/Task.pm'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

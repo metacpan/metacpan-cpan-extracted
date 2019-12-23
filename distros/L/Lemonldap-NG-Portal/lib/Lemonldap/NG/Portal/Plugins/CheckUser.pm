@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MALFORMEDUSER
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -60,6 +60,65 @@ sub init {
 }
 
 # RUNNING METHOD
+sub display {
+    my ( $self, $req ) = @_;
+    my ( $attrs, $array_attrs ) = ( {}, [] );
+
+    $self->logger->debug("Display current session data...");
+    $self->userLogger->info("Using spoofed SSO groups if exist")
+      if ( $self->conf->{impersonationRule} );
+    $attrs = $req->userData;
+
+    # Create an array of hashes for template loop
+    $self->logger->debug("Delete hidden or empty attributes");
+    if ( $self->conf->{checkUserDisplayEmptyValues} ) {
+        foreach my $k ( sort keys %$attrs ) {
+
+            # Ignore hidden attributes
+            push @$array_attrs, { key => $k, value => $attrs->{$k} }
+              unless ( $self->hAttr =~ /\b$k\b/ );
+        }
+    }
+    else {
+        foreach my $k ( sort keys %$attrs ) {
+
+            # Ignore hidden attributes and empty values
+            push @$array_attrs, { key => $k, value => $attrs->{$k} }
+              unless ( $self->hAttr =~ /\b$k\b/ or !$attrs->{$k} );
+        }
+    }
+
+    # ARRAY_REF = [ A_REF GROUPS, A_REF MACROS, A_REF OTHERS ]
+    $array_attrs = $self->_splitAttributes($array_attrs);
+
+    # Display form
+    my $params = {
+        PORTAL    => $self->conf->{portal},
+        MAIN_LOGO => $self->conf->{portalMainLogo},
+        SKIN      => $self->p->getSkin($req),
+        LANGS     => $self->conf->{showLanguages},
+        MSG       => (
+            $self->{conf}->{impersonationMergeSSOgroups} ? 'checkUserMerged'
+            : 'checkUser'
+        ),
+        ALERTE => (
+            $self->{conf}->{impersonationMergeSSOgroups} ? 'alert-warning'
+            : 'alert-info'
+        ),
+        LOGIN      => $req->{userData}->{ $self->conf->{whatToTrace} },
+        ATTRIBUTES => $array_attrs->[2],
+        MACROS     => $array_attrs->[1],
+        GROUPS     => $array_attrs->[0],
+        TOKEN      => (
+            $self->ottRule->( $req, {} ) ? $self->ott->createToken()
+            : ''
+        )
+    };
+    return $self->sendJSONresponse( $req, $params ) if ( $req->wantJSON );
+
+    # Display form
+    return $self->p->sendHtml( $req, 'checkuser', params => $params );
+}
 
 sub check {
     my ( $self, $req ) = @_;
@@ -72,13 +131,14 @@ sub check {
     if ( $self->ottRule->( $req, {} ) ) {
         my $token = $req->param('token');
         unless ($token) {
-            $self->userLogger->warn('checkUser try without token');
+            $self->userLogger->warn('CheckUser called without token');
             $msg   = PE_NOTOKEN;
             $token = $self->ott->createToken();
         }
 
         unless ( $self->ott->getToken($token) ) {
-            $self->userLogger->warn('checkUser try with expired/bad token');
+            $self->userLogger->warn(
+                'CheckUser called with an expired/bad token');
             $msg   = PE_TOKENEXPIRED;
             $token = $self->ott->createToken();
         }
@@ -95,7 +155,7 @@ sub check {
         };
         return $self->p->sendJSONresponse( $req, $params )
           if ( $req->wantJSON );
-        return $self->p->sendHtml( $req, 'checkuser', params => $params, )
+        return $self->p->sendHtml( $req, 'checkuser', params => $params )
           if $msg;
     }
 
@@ -144,14 +204,17 @@ sub check {
         my $moduleOptions = $self->conf->{globalStorageOptions} || {};
         $moduleOptions->{backend} = $self->conf->{globalStorage};
 
-        my $sessions    = {};
-        my $searchAttrs = $self->conf->{checkUserSearchAttributes}
-          || $self->conf->{whatToTrace};
+        my $sessions = {};
+        my $searchAttrs =
+            $self->conf->{checkUserSearchAttributes}
+          ? $self->conf->{whatToTrace} . ' '
+          . $self->conf->{checkUserSearchAttributes}
+          : $self->conf->{whatToTrace};
 
         foreach ( split /\s+/, $searchAttrs ) {
             $self->logger->debug("Searching with: $_ = $user");
             $sessions = $self->module->searchOn( $moduleOptions, $_, $user );
-            last if (keys %$sessions);
+            last if ( keys %$sessions );
         }
 
         my $age = '1';
@@ -276,65 +339,7 @@ sub check {
     return $self->p->sendJSONresponse( $req, $params ) if ( $req->wantJSON );
 
     # Display form
-    return $self->p->sendHtml( $req, 'checkuser', params => $params, );
-}
-
-sub display {
-    my ( $self, $req ) = @_;
-    my ( $attrs, $array_attrs ) = ( {}, [] );
-
-    $self->logger->debug("Display current session data...");
-    $self->userLogger->info("Using spoofed SSO groups if exist")
-      if ( $self->conf->{impersonationRule} );
-    $attrs = $req->userData;
-
-    # Create an array of hashes for template loop
-    $self->logger->debug("Delete hidden or empty attributes");
-    if ( $self->conf->{checkUserDisplayEmptyValues} ) {
-        foreach my $k ( sort keys %$attrs ) {
-
-            # Ignore hidden attributes
-            push @$array_attrs, { key => $k, value => $attrs->{$k} }
-              unless ( $self->hAttr =~ /\b$k\b/ );
-        }
-    }
-    else {
-        foreach my $k ( sort keys %$attrs ) {
-
-            # Ignore hidden attributes and empty values
-            push @$array_attrs, { key => $k, value => $attrs->{$k} }
-              unless ( $self->hAttr =~ /\b$k\b/ or !$attrs->{$k} );
-        }
-    }
-
-    # ARRAY_REF = [ A_REF GROUPS, A_REF MACROS, A_REF OTHERS ]
-    $array_attrs = $self->_splitAttributes($array_attrs);
-
-    # Display form
-    my $params = {
-        PORTAL    => $self->conf->{portal},
-        MAIN_LOGO => $self->conf->{portalMainLogo},
-        SKIN      => $self->p->getSkin($req),
-        LANGS     => $self->conf->{showLanguages},
-        MSG       => (
-            $self->{conf}->{impersonationMergeSSOgroups} ? 'checkUserMerged'
-            : 'checkUser'
-        ),
-        ALERTE => (
-            $self->{conf}->{impersonationMergeSSOgroups} ? 'alert-warning'
-            : 'alert-info'
-        ),
-        LOGIN      => $req->{userData}->{ $self->conf->{whatToTrace} },
-        ATTRIBUTES => $array_attrs->[2],
-        MACROS     => $array_attrs->[1],
-        GROUPS     => $array_attrs->[0],
-        TOKEN      => (
-            $self->ottRule->( $req, {} ) ? $self->ott->createToken()
-            : ''
-        )
-    };
-    return $self->sendJSONresponse( $req, $params ) if ( $req->wantJSON );
-    return $self->p->sendHtml( $req, 'checkuser', params => $params, );
+    return $self->p->sendHtml( $req, 'checkuser', params => $params );
 }
 
 sub _urlFormat {
@@ -400,6 +405,7 @@ sub _authorization {
         if ( $vh eq $vhost ) {
             $exist = 1;
             $self->logger->debug("VirtualHost: $vh found in Conf");
+            $req->env->{REQUEST_URI} = $appuri;
             last;
         }
     }

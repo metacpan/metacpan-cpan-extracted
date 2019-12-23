@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 19;
+my $maintests = 20;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -84,7 +84,6 @@ SKIP: {
             $url, IO::String->new($s),
             accept => 'text/html',
             length => length($s),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -131,6 +130,9 @@ m#iframe src="http://auth.sp.com(/saml/proxySingleLogout)\?(SAMLRequest=.*?)"#,
       or explain( $res->[1],
         'Content-Security-Policy => ...child-src auth.idp.com' );
 
+    my $removedCookie = expectCookie($res);
+    is($removedCookie, 0, "SSO cookie removed");
+
     switch ('sp');
     ok( $res = $sp->_get( $url, query => $query, accept => 'text/html' ),
         'Query SP for iframe' );
@@ -162,8 +164,7 @@ m#iframe src="http://auth.sp.com(/saml/proxySingleLogout)\?(SAMLRequest=.*?)"#,
         $res = $sp->_get(
             '/',
             accept => 'text/html',
-            cookie =>
-              "lemonldapidp=http://auth.idp.com/saml/metadata; lemonldap=$spId"
+            cookie => "lemonldap=$spId"
         ),
         'Test if user is reject on SP'
     );

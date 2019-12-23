@@ -118,7 +118,6 @@ sub _verify {
     $req->id( delete $req->sessionInfo->{_2fRealSession} );
     $req->urldc( delete $req->sessionInfo->{_2fUrldc} );
     $req->{sessionInfo}->{_utime} = delete $req->{sessionInfo}->{_2fUtime};
-    $self->p->rebuildCookies($req);
     $req->mustRedirect(1);
     $self->userLogger->notice( $self->prefix
           . '2F verification for '
@@ -133,6 +132,7 @@ sub _verify {
         [
             @{ $self->p->afterData },
             $self->p->validSession,
+            'rebuildCookies',
             @{ $self->p->endAuth },
             sub { PE_OK }
         ]

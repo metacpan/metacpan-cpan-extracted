@@ -6,7 +6,7 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =cut
 
-our $VERSION = '0.0505';
+our $VERSION = '0.0506';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(is_string is_array_ref);
@@ -487,10 +487,10 @@ TT
             else {
                 try {
                     my $token = _deserialize($params->{resumptionToken});
-                    $params->{set}            = $token->{_s};
-                    $params->{metadataPrefix} = $token->{_m};
-                    $params->{from}           = $token->{_f};
-                    $params->{until}          = $token->{_u};
+                    $params->{set}            = $token->{_s} if defined $token->{_s};
+                    $params->{metadataPrefix} = $token->{_m} if defined $token->{_m};
+                    $params->{from}           = $token->{_f} if defined $token->{_f};
+                    $params->{until}          = $token->{_u} if defined $token->{_u};
                     $vars->{token}            = $token;
                 }
                 catch {

@@ -129,7 +129,8 @@ has log => sub {
 
 =head2 args
 
-some meta information provided when instantiating the plugin
+some meta information provided when instantiating the plugin.
+for example when buidling the response to getUserConfig, args will contain the output of getUrlConfig from the frontend in the key urlConfig, which will allow to pass information from the url to calls like checkAccess.
 
 =cut
 

@@ -1,4 +1,6 @@
 Revision history for Perl module Neo4j::Cypher::Abstract
+0.1003 2019-12-15
+    - DWYM for ->set({key=>value, key=>value, ...})
 0.1002 2017-07-11
     - Improve (slightly) POD
 0.1001 2017-07-08

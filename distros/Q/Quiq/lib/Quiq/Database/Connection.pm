@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -22,7 +22,7 @@ use Quiq::Path;
 use Quiq::Digest;
 use Quiq::Database::Cursor;
 use Time::HiRes ();
-use Quiq::Parameters;
+use Quiq::AnsiColor;
 use Quiq::Database::ResultSet;
 
 # -----------------------------------------------------------------------------
@@ -261,7 +261,7 @@ sub newFromSbit {
     return $class->new($db->udlDbms,
         -handle => $db->dbh,
         -log => 0,
-        -logfile => '/tmp/tsplot.log',
+        # -logfile => '/tmp/tsplot.log',
     );
 }
 
@@ -1540,6 +1540,89 @@ sub sqlAtomic {
     $self->commit;
 
     return $cur;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 execute() - Führe SQL-Statement atomar aus und liefere Ergebnis
+
+=head4 Synopsis
+
+  $str = $db->execute($stmt,@opt);
+
+=head4 Arguments
+
+SQL-Statement.
+
+=head4 Options
+
+Alle Optionen der Methode $db->sql() plus
+
+=over 4
+
+=item -color => $bool (Default: 1)
+
+Zeige das Resultat der Statement-Ausführung farbig an.
+
+=item -limit => $n (Default: 10)
+
+Begrenze die Anzahl der gefetchten Datensätze auf $n.
+
+=back
+
+=head4 Returns
+
+Ausführungsergebnis (String)
+
+=head4 Description
+
+Führe DDL-Statement $stmt aus und liefere das Ergebnis der Ausführung
+in Form eines Textes zurück. Im Falle einer Selektion werden die
+selektierten Datensätze in einer ASCII-Tabelle dargestellt. Die maximale
+Anzahl der selektierten Datensätze ist per Default auf 10 begrenzt
+(siehe Option -limit).
+
+Die Methode ist nützlich für die Programmierung von einfachen
+Terminal-Clients für Ad-Hoc-Abfragen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub execute {
+    my $self = shift;
+    my $stmt = shift;
+    # @_: @opt
+
+    # Optionen
+
+    my $color = 1;
+    my $limit = 10;
+
+    $self->parameters(1,\@_,
+        -color => \$color,
+        -limit => \$limit,
+    );
+
+    my $cur = $self->sql($stmt,
+        @_,
+        -raw => 1,
+    );
+
+    my $str;
+    if ($cur->isSelect) {
+        $str = $cur->fetchAll(1,$limit)->asTable(
+            -color => $color,
+        );
+    }
+    else {
+        my $a = Quiq::AnsiColor->new($color);
+        $str = sprintf "%s\n\n",$a->str('dark green',$stmt);
+        my $tmp = sprintf '%s rows affected, %.2f',$cur->hits,$cur->elapsed;
+        $str .= $a->str('dark red',$tmp)."\n";
+    }
+
+    return $str;
 }
 
 # -----------------------------------------------------------------------------
@@ -2855,7 +2938,7 @@ sub schemas {
     my $cache = 1;
     my $hash = 0;
 
-    Quiq::Parameters->extractToVariables(\@_,0,0,
+    $self->parameters(0,0,\@_,
         -cache => \$cache,
         -hash => \$hash,
     );
@@ -3237,7 +3320,7 @@ sub tableDiff {
     my $limit = 10;
     my $sortColumns = undef;
 
-    my $argA = Quiq::Parameters->extractToVariables(\@_,2,2,
+    my $argA = $self->parameters(2,2,\@_,
         -columns => \$columns,
         -ignoreColumns => \$ignoreColumns,
         -limit => \$limit,
@@ -3451,7 +3534,7 @@ sub doublets {
     my $limit = 10;
     my $sortColumns = undef;
 
-    my $argA = Quiq::Parameters->extractToVariables(\@_,1,1,
+    my $argA = $self->parameters(1,1,\@_,
         -columns => \$columns,
         -ignoreColumns => \$ignoreColumns,
         -limit => \$limit,
@@ -4903,7 +4986,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

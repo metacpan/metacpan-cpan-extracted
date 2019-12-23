@@ -1,16 +1,38 @@
-0.005   2019-01-20 (PERLANCAR)
+0.006   2019-12-18  Released-By: PERLANCAR; Urgency: medium
+
+        [BUG FIXES]
+
+	- Avoid hijacking GoL legacy default dests [GH#9]
+
+	- Evaporate OptSpec if it has no handler; do not warn if unable to
+          fulfill validation. [GH#5]
+
+	- Try using Complete::Bash's format_completion() with
+	  workaround_with_wordbreaks=0 (my use case: 'subsort by_several -A
+	  first=asc^' completes to 'subsort by_several -A asciibetically _'
+	  without this option).
+
+        [TESTS]
+
+	- Add tests for the case of optspec has required=1 or has default
+	  but no handler is supplied (ref: PR#7).
+
+	- Add more test cases, mostly related to "missing handler".
+
+
+0.005   2019-01-20  Released-By: PERLANCAR
 
         - [Bugfix] Handle "hash storage mode" of Getopt::Long (where GetOptions
           is called with a hashref as its first argument). Also fix
-          compatibility of Getopt::Long which does not require explicit
+          compatibility with Getopt::Long which does not require explicit
           "linkage" (option handler), e.g. GetOptions('foo', 'bar', 'baz') is
-          allowed by Getopt::Long. (Thanks Tabulon!)
+          allowed by Getopt::Long. (Thanks Tabulon!) [GH#1] [GH#3]
 
         - Allow extra optspec properties x, x.*, _* to store comments or
-          whatever.
+          whatever [GH#2].
 
 
-0.004   2016-12-03 (PERLANCAR)
+0.004   2016-12-03  Released-By: PERLANCAR
 
         - [Bugfix] Fix checking required and setting default (ignore) for opt
           spec '<>'.
@@ -20,7 +42,7 @@
         - Add a test suite.
 
 
-0.003   2016-12-03 (PERLANCAR)
+0.003   2016-12-03  Released-By: PERLANCAR
 
 	- Tweak usage and POD message.
 
@@ -29,13 +51,13 @@
 	- [doc] Mention Getopt::Long::Modern.
 
 
-0.002   2016-12-03 (PERLANCAR)
+0.002   2016-12-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix POD section name.
 
 
-0.001   2016-12-04 (PERLANCAR)
+0.001   2016-12-03  Released-By: PERLANCAR
 
         - First release.

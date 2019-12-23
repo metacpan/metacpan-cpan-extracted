@@ -1,6 +1,6 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -95,12 +95,18 @@ sub controlUrl {
         }
         else {
             if ( $url =~ m#[^A-Za-z0-9\+/=]# ) {
-                $self->userLogger->error(
-                    "Value must be BASE64 encoded (param: url | value: $url)");
-                return PE_BADURL;
+                unless ( $req->maybeNotBase64 ) {
+                    $self->userLogger->error(
+"Value must be BASE64 encoded (param: url | value: $url)"
+                    );
+                    return PE_BADURL;
+                }
+                $req->{urldc} = $url;
             }
-            $req->{urldc} = decode_base64($url);
-            $req->{urldc} =~ s/[\r\n]//sg;
+            else {
+                $req->{urldc} = decode_base64($url);
+                $req->{urldc} =~ s/[\r\n]//sg;
+            }
         }
 
         # For logout request, test if Referer comes from an authorized site
@@ -153,10 +159,15 @@ sub checkLogout {
 sub authLogout {
     my ( $self, $req ) = @_;
     my $res = $self->_authentication->authLogout($req);
-    unless ( $res or $req->pdata->{keepPdata} ) {
-        $self->logger->debug('Cleaning pdata');
-        $req->pdata( {} );
+    $self->logger->debug('Cleaning pdata');
+    my $tmp =
+      ( ref( $req->pdata->{keepPdata} ) eq 'ARRAY' )
+      ? $req->pdata->{keepPdata}
+      : [];
+    foreach my $k ( keys %{ $req->pdata } ) {
+        delete $req->pdata->{$k} unless ( grep { $_ eq $k } @$tmp );
     }
+    $req->pdata->{keepPdata} = $tmp if @$tmp;
     return $res;
 }
 
@@ -509,8 +520,9 @@ sub buildCookie {
             );
         }
     }
+    my $user_log = $req->{userData}->{ $self->conf->{whatToTrace} };
     $self->userLogger->notice(
-"User $req->{user} successfully authenticated at level $req->{sessionInfo}->{authenticationLevel}"
+"User $user_log successfully authenticated at level $req->{userData}->{authenticationLevel}"
     );
     PE_OK;
 }

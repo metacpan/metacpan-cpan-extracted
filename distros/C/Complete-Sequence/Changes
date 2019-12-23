@@ -1,0 +1,11 @@
+0.002   2019-12-17  Released-By: PERLANCAR; Urgency: medium
+
+	- Pass information stash to coderef items.
+
+	- Add trace logging statements for debugging, enabled only when
+	  COMPLETE_SEQUENCE_TRACE is set to true.
+
+
+0.001   2016-12-15  Released-By: PERLANCR
+
+        - First, early release.

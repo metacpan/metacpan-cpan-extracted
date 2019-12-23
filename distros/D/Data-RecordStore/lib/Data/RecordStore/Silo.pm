@@ -34,7 +34,6 @@ use Fcntl qw( SEEK_SET );
 use File::Path qw(make_path);
 #use FileCache;
 use IO::Handle;
-use JSON;
 use YAML;
 
 use vars qw($VERSION);

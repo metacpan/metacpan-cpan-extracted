@@ -2255,11 +2255,6 @@
     "id": "samlAdvanced",
     "title": "samlAdvanced",
     "nodes": [{
-      "default": "lemonldapidp",
-      "id": "samlIdPResolveCookie",
-      "title": "samlIdPResolveCookie",
-      "data": "lemonldapidp"
-    }, {
       "default": 1,
       "id": "samlMetadataForceUTF8",
       "title": "samlMetadataForceUTF8",

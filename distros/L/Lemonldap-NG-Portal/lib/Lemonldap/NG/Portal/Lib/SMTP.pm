@@ -11,6 +11,7 @@ use JSON qw(from_json);
 use MIME::Entity;
 use Email::Sender::Simple qw(sendmail);
 use Email::Sender::Transport::SMTP qw();
+use Email::Date::Format qw(email_date);
 use MIME::Base64;
 use Encode;
 
@@ -186,6 +187,7 @@ sub send_mail {
                 ),
                 Subject => $subject,
                 Type    => 'multipart/related',
+                Date    => email_date,
             );
 
             # Attach HTML message
@@ -217,6 +219,7 @@ sub send_mail {
                 Data       => $body,
                 Type       => 'text/plain',
                 Charset    => $self->charset,
+                Date       => email_date,
             );
         }
 

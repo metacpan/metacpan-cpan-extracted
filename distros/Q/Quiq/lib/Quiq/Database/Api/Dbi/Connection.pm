@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Option;
 use DBI ();
@@ -247,7 +247,7 @@ sub new {
                 $dbh->{'odbc_utf8_on'} = 1;
             }
             $dbh->{LongTruncOk} = 0; # RuV Auftrags-DB
-            $dbh->{LongReadLen} = 32768; # RuV Auftrags-DB
+            $dbh->{LongReadLen} = 3*1024*1024; # 3MB / 32768; # RuV Auftrags-DB
         }
         else {
             $class->throw('Not implemented');
@@ -535,7 +535,7 @@ sub sql {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

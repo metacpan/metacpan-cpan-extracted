@@ -7,7 +7,10 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
     'accept' => [
       '.*',
@@ -124,6 +127,49 @@ Example: C<CPUQuota=20%> ensures that the executed processes will never get more
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'CPUQuotaPeriodSec',
+      {
+        'description' => 'Assign the duration over which the CPU time quota specified by C<CPUQuota> is measured.
+Takes a time duration value in seconds, with an optional suffix such as "ms" for milliseconds (or "s" for seconds.)
+The default setting is 100ms. The period is clamped to the range supported by the kernel, which is [1ms, 1000ms].
+Additionally, the period is adjusted up so that the quota interval is also at least 1ms.
+Setting C<CPUQuotaPeriodSec> to an empty value resets it to the default.
+
+This controls the second field of C<cpu.max> attribute on the unified control group hierarchy
+and C<cpu.cfs_period_us> on legacy. For details about these control group attributes, see
+cgroup-v2.txt and
+sched-design-CFS.txt.
+
+Example: C<CPUQuotaPeriodSec=10ms> to request that the CPU quota is measured in periods of 10ms.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'AllowedCPUs',
+      {
+        'description' => 'Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
+whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash.
+
+Setting C<AllowedCPUs> doesn\'t guarantee that all of the CPUs will be used by the processes
+as it may be limited by parent units. The effective configuration is reported as C<EffectiveCPUs>.
+
+This setting is supported only with the unified control group hierarchy.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'AllowedMemoryNodes',
+      {
+        'description' => 'Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
+or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
+CPU indices separated by a dash.
+
+Setting C<AllowedMemoryNodes> doesn\'t guarantee that all of the memory NUMA nodes will
+be used by the processes as it may be limited by parent units. The effective configuration is reported as
+C<EffectiveMemoryNodes>.
+
+This setting is supported only with the unified control group hierarchy.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'MemoryAccounting',
       {
         'description' => 'Turn on process and kernel memory accounting for this
@@ -149,11 +195,17 @@ this unit and all its ancestors are below their minimum boundaries, this unit\'s
 Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
 percentage value may be specified, which is taken relative to the installed physical memory on the
-system. This controls the C<memory.min> control group attribute. For details about this
+system. If assigned the special value C<infinity>, all available memory is protected, which may be
+useful in order to always inherit all of the protection afforded by ancestors.
+This controls the C<memory.min> control group attribute. For details about this
 control group attribute, see cgroup-v2.txt.
 
 This setting is supported only if the unified control group hierarchy is used and disables
-C<MemoryLimit>.',
+C<MemoryLimit>.
+
+Units may have their children use a default C<memory.min> value by specifying
+C<DefaultMemoryMin>, which has the same semantics as C<MemoryMin>. This setting
+does not affect C<memory.min> in the unit itself.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -166,17 +218,23 @@ reclaimed as long as memory can be reclaimed from unprotected units.
 Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
 percentage value may be specified, which is taken relative to the installed physical memory on the
-system. This controls the C<memory.low> control group attribute. For details about this
+system. If assigned the special value C<infinity>, all available memory is protected, which may be
+useful in order to always inherit all of the protection afforded by ancestors.
+This controls the C<memory.low> control group attribute. For details about this
 control group attribute, see cgroup-v2.txt.
 
 This setting is supported only if the unified control group hierarchy is used and disables
-C<MemoryLimit>.',
+C<MemoryLimit>.
+
+Units may have their children use a default C<memory.low> value by specifying
+C<DefaultMemoryLow>, which has the same semantics as C<MemoryLow>. This setting
+does not affect C<memory.low> in the unit itself.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'MemoryHigh',
       {
-        'description' => 'Specify the high limit on memory usage of the executed processes in this unit. Memory usage may go
+        'description' => 'Specify the throttling limit on memory usage of the executed processes in this unit. Memory usage may go
 above the limit if unavoidable, but the processes are heavily slowed down and memory is taken away
 aggressively in such cases. This is the main mechanism to control memory usage of a unit.
 
@@ -184,7 +242,7 @@ Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the sp
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
 percentage value may be specified, which is taken relative to the installed physical memory on the
 system. If assigned the
-special value C<infinity>, no memory limit is applied. This controls the
+special value C<infinity>, no memory throttling is applied. This controls the
 C<memory.high> control group attribute. For details about this control group attribute, see
 cgroup-v2.txt.
 
@@ -451,20 +509,25 @@ L<systemd-system.conf(5)>.",
       },
       'IPAddressAllow',
       {
-        'description' => "Turn on address range network traffic filtering for packets sent and received over AF_INET and AF_INET6
-sockets.  Both directives take a space separated list of IPv4 or IPv6 addresses, each optionally suffixed
-with an address prefix length (separated by a C</> character). If the latter is omitted, the
-address is considered a host address, i.e. the prefix covers the whole address (32 for IPv4, 128 for IPv6).
+        'description' => "Turn on address range network traffic filtering for IP packets sent and received over
+C<AF_INET> and C<AF_INET6> sockets.  Both directives take a
+space separated list of IPv4 or IPv6 addresses, each optionally suffixed with an address prefix
+length in bits (separated by a C</> character). If the latter is omitted, the
+address is considered a host address, i.e. the prefix covers the whole address (32 for IPv4, 128
+for IPv6).
 
-The access lists configured with this option are applied to all sockets created by processes of this
-unit (or in the case of socket units, associated with it). The lists are implicitly combined with any lists
-configured for any of the parent slice units this unit might be a member of. By default all access lists are
-empty. When configured the lists are enforced as follows:
+The access lists configured with this option are applied to all sockets created by processes
+of this unit (or in the case of socket units, associated with it). The lists are implicitly
+combined with any lists configured for any of the parent slice units this unit might be a member
+of. By default all access lists are empty. Both ingress and egress traffic is filtered by these
+settings. In case of ingress traffic the source IP address is checked against these access lists,
+in case of egress traffic the destination IP address is checked. When configured the lists are
+enforced as follows:
 
 In order to implement a whitelisting IP firewall, it is recommended to use a
 C<IPAddressDeny>C<any> setting on an upper-level slice unit (such as the
-root slice -.slice or the slice containing all system services
-system.slice \x{2013} see
+root slice C<-.slice> or the slice containing all system services
+C<system.slice> \x{2013} see
 L<systemd.special(7)> for
 details on these slice units), plus individual per-service C<IPAddressAllow> lines
 permitting network access to relevant services, and only them.
@@ -491,20 +554,25 @@ them for IP security.",
       },
       'IPAddressDeny',
       {
-        'description' => "Turn on address range network traffic filtering for packets sent and received over AF_INET and AF_INET6
-sockets.  Both directives take a space separated list of IPv4 or IPv6 addresses, each optionally suffixed
-with an address prefix length (separated by a C</> character). If the latter is omitted, the
-address is considered a host address, i.e. the prefix covers the whole address (32 for IPv4, 128 for IPv6).
+        'description' => "Turn on address range network traffic filtering for IP packets sent and received over
+C<AF_INET> and C<AF_INET6> sockets.  Both directives take a
+space separated list of IPv4 or IPv6 addresses, each optionally suffixed with an address prefix
+length in bits (separated by a C</> character). If the latter is omitted, the
+address is considered a host address, i.e. the prefix covers the whole address (32 for IPv4, 128
+for IPv6).
 
-The access lists configured with this option are applied to all sockets created by processes of this
-unit (or in the case of socket units, associated with it). The lists are implicitly combined with any lists
-configured for any of the parent slice units this unit might be a member of. By default all access lists are
-empty. When configured the lists are enforced as follows:
+The access lists configured with this option are applied to all sockets created by processes
+of this unit (or in the case of socket units, associated with it). The lists are implicitly
+combined with any lists configured for any of the parent slice units this unit might be a member
+of. By default all access lists are empty. Both ingress and egress traffic is filtered by these
+settings. In case of ingress traffic the source IP address is checked against these access lists,
+in case of egress traffic the destination IP address is checked. When configured the lists are
+enforced as follows:
 
 In order to implement a whitelisting IP firewall, it is recommended to use a
 C<IPAddressDeny>C<any> setting on an upper-level slice unit (such as the
-root slice -.slice or the slice containing all system services
-system.slice \x{2013} see
+root slice C<-.slice> or the slice containing all system services
+C<system.slice> \x{2013} see
 L<systemd.special(7)> for
 details on these slice units), plus individual per-service C<IPAddressAllow> lines
 permitting network access to relevant services, and only them.
@@ -529,42 +597,108 @@ them for IP security.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'IPIngressFilterPath',
+      {
+        'description' => 'Add custom network traffic filters implemented as BPF programs, applying to all IP packets
+sent and received over C<AF_INET> and C<AF_INET6> sockets.
+Takes an absolute path to a pinned BPF program in the BPF virtual filesystem (C</sys/fs/bpf/>).
+
+The filters configured with this option are applied to all sockets created by processes
+of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
+to filters any of the parent slice units this unit might be a member of as well as any
+C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
+By default there are no filters specified.
+
+If these settings are used multiple times in the same unit all the specified programs are attached. If an
+empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
+
+Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
+all sockets associated with it directly, but not to any sockets created by the ultimately activated services
+for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
+the service via socket activation. Thus, it is usually a good idea, to replicate the IP filter programs on both
+the socket and the service unit, however it often makes sense to maintain one configuration more open and the other
+one more restricted, depending on the usecase.
+
+Note that these settings might not be supported on some systems (for example if eBPF control group
+support is not enabled in the underlying kernel or container manager). These settings will fail the service in
+that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
+(requires C<Delegate>C<yes>) instead of using this setting.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'IPEgressFilterPath',
+      {
+        'description' => 'Add custom network traffic filters implemented as BPF programs, applying to all IP packets
+sent and received over C<AF_INET> and C<AF_INET6> sockets.
+Takes an absolute path to a pinned BPF program in the BPF virtual filesystem (C</sys/fs/bpf/>).
+
+The filters configured with this option are applied to all sockets created by processes
+of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
+to filters any of the parent slice units this unit might be a member of as well as any
+C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
+By default there are no filters specified.
+
+If these settings are used multiple times in the same unit all the specified programs are attached. If an
+empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
+
+Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
+all sockets associated with it directly, but not to any sockets created by the ultimately activated services
+for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
+the service via socket activation. Thus, it is usually a good idea, to replicate the IP filter programs on both
+the socket and the service unit, however it often makes sense to maintain one configuration more open and the other
+one more restricted, depending on the usecase.
+
+Note that these settings might not be supported on some systems (for example if eBPF control group
+support is not enabled in the underlying kernel or container manager). These settings will fail the service in
+that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
+(requires C<Delegate>C<yes>) instead of using this setting.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'DeviceAllow',
       {
         'cargo' => {
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Control access to specific device nodes by the
-executed processes. Takes two space-separated strings: a
-device node specifier followed by a combination of
-C<r>, C<w>,
-C<m> to control
-reading, writing,
-or creation of the specific device node(s) by the unit
-(mknod), respectively. This controls
-the C<devices.allow> and
-C<devices.deny> control group
-attributes. For details about these control group
-attributes, see devices.txt.
+        'description' => "Control access to specific device nodes by the executed processes. Takes two space-separated
+strings: a device node specifier followed by a combination of C<r>,
+C<w>, C<m> to control reading,
+writing, or creation of the specific device node(s) by the unit
+(mknod), respectively. On cgroup-v1 this controls the
+C<devices.allow> control group attribute. For details about this control group
+attribute, see devices.txt. On
+cgroup-v2 this functionality is implemented using eBPF filtering.
 
-The device node specifier is either a path to a device
-node in the file system, starting with
-/dev/, or a string starting with either
-C<char-> or C<block->
-followed by a device group name, as listed in
-/proc/devices. The latter is useful to
-whitelist all current and future devices belonging to a
-specific device group at once. The device group is matched
-according to filename globbing rules, you may hence use the
-C<*> and C<?>
-wildcards. Examples: /dev/sda5 is a
-path to a device node, referring to an ATA or SCSI block
-device. C<char-pts> and
-C<char-alsa> are specifiers for all pseudo
-TTYs and all ALSA sound devices,
-respectively. C<char-cpu/*> is a specifier
-matching all CPU related device groups.',
+The device node specifier is either a path to a device node in the file system, starting with
+C</dev/>, or a string starting with either C<char-> or
+C<block-> followed by a device group name, as listed in
+C</proc/devices>. The latter is useful to whitelist all current and future
+devices belonging to a specific device group at once. The device group is matched according to
+filename globbing rules, you may hence use the C<*> and C<?>
+wildcards. (Note that such globbing wildcards are not available for device node path
+specifications!) In order to match device nodes by numeric major/minor, use device node paths in
+the C</dev/char/> and C</dev/block/> directories. However,
+matching devices by major/minor is generally not recommended as assignments are neither stable nor
+portable between systems or different kernel versions.
+
+Examples: C</dev/sda5> is a path to a device node, referring to an ATA or
+SCSI block device. C<char-pts> and C<char-alsa> are specifiers for
+all pseudo TTYs and all ALSA sound devices, respectively. C<char-cpu/*> is a
+specifier matching all CPU related device groups.
+
+Note that whitelists defined this way should only reference device groups which are
+resolvable at the time the unit is started. Any device groups not resolvable then are not added to
+the device whitelist. In order to work around this limitation, consider extending service units
+with an ExecStartPre=/sbin/modprobe\x{2026} line that loads the necessary
+kernel module implementing the device group if missing. Example:
+    \x{2026}
+    [Service]
+    ExecStartPre=-/sbin/modprobe -abq loop
+    DeviceAllow=block-loop
+    DeviceAllow=/dev/loop-control
+    \x{2026}
+",
         'type' => 'list'
       },
       'DevicePolicy',
@@ -583,10 +717,10 @@ Control the policy for allowing device access:
       'Slice',
       {
         'description' => 'The name of the slice unit to place the unit
-in. Defaults to system.slice for all
+in. Defaults to C<system.slice> for all
 non-instantiated units of all unit types (except for slice
 units themselves see below). Instance units are by default
-placed in a subslice of system.slice
+placed in a subslice of C<system.slice>
 that is named after the template name.
 
 This option may be used to arrange systemd units in a
@@ -846,7 +980,7 @@ C<IOWriteBandwidthMax> instead.',
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd doc',
+    'generated_by' => 'parse-man.pl from systemd 244 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::ResourceControl'
   }

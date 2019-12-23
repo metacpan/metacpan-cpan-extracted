@@ -1,16 +1,19 @@
 package Sort::Sub::by_first_num_in_text;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '0.111'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'Sort-Sub'; # DIST
+our $VERSION = '0.116'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 require Sort::Sub::by_num_in_text;
 *gen_sorter = \&Sort::Sub::by_num_in_text::gen_sorter;
+*meta       = \&Sort::Sub::by_num_in_text::meta;
 
 1;
-# ABSTRACT: Alias for Sort::Sub::by_num_in_text
+# ABSTRACT: Sort by first number found in text or (if no number is found) ascibetically
 
 __END__
 
@@ -20,13 +23,13 @@ __END__
 
 =head1 NAME
 
-Sort::Sub::by_first_num_in_text - Alias for Sort::Sub::by_num_in_text
+Sort::Sub::by_first_num_in_text - Sort by first number found in text or (if no number is found) ascibetically
 
 =head1 VERSION
 
-This document describes version 0.111 of Sort::Sub::by_first_num_in_text (from Perl distribution Sort-Sub), released on 2019-10-26.
+This document describes version 0.116 of Sort::Sub::by_first_num_in_text (from Perl distribution Sort-Sub), released on 2019-12-15.
 
-=for Pod::Coverage ^(gen_sorter)$
+=for Pod::Coverage ^(gen_sorter|meta)$
 
 =head1 SYNOPSIS
 

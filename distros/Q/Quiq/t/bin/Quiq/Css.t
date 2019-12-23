@@ -111,11 +111,10 @@ sub test_rules : Test(1) {
         ],
     );
 
-    my $expect = Quiq::Unindent->trimNl(q~
+    $self->isText($rules,q~
         p.comment { color: #408080; font-style: italic; }
         p.abstract { font-style: italic; margin-left: 1cm; }
     ~);
-    $self->is($rules,$expect);
 }
 
 # -----------------------------------------------------------------------------
@@ -136,11 +135,10 @@ sub test_restrictedRules : Test(1) {
         ],
     );
 
-    my $expect = Quiq::Unindent->trimNl(q~
+    $self->isText($rules,q~
         #xxx p.comment { color: #408080; font-style: italic; }
         #xxx p.abstract { font-style: italic; margin-left: 1cm; }
     ~);
-    $self->is($rules,$expect);
 }
 
 # -----------------------------------------------------------------------------
@@ -165,12 +163,11 @@ sub test_rulesFromObject : Test(1) {
         cssTextProperties => [".$prefix-text"],
     );
 
-    my $expected = Quiq::Unindent->trimNl(q~
+    $self->isText($rules,q~
         .xxx-table { background-color: #f0f0f0; }
         .xxx-ln { color: black; }
         .xxx-margin { width: 0.6em; background-color: red; }
     ~);
-    $self->is($rules,$expected);
 }
 
 # -----------------------------------------------------------------------------
@@ -180,17 +177,17 @@ sub test_makeFlat : Test(1) {
 
     my $rules = Quiq::Css->makeFlat(Quiq::Unindent->trimNl(q~
         .sdoc-document h1 {
-        font-size: 230%;
-        margin-bottom: 10px;
+            font-size: 230%;
+            margin-bottom: 10px;
         }
         .sdoc-document p {
-        margin-top: 10px;
+            margin-top: 10px;
         }
     ~));
-    $self->is($rules,Quiq::Unindent->trimNl(q~
+    $self->isText($rules,q~
         .sdoc-document h1 { font-size: 230%; margin-bottom: 10px; }
         .sdoc-document p { margin-top: 10px; }
-    ~));
+    ~);
 }
 
 # -----------------------------------------------------------------------------

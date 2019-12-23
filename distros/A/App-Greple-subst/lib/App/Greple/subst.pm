@@ -4,7 +4,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.03
+Version 2.06
 
 =head1 SYNOPSIS
 
@@ -18,6 +18,8 @@ greple -Msubst --dict I<dictionary> [ options ]
   --diffcmd command
   --replace
   --create
+  --[no-]warn-overlap
+  --[no-]warn-include
 
 =head1 DESCRIPTION
 
@@ -85,6 +87,18 @@ strings in the specific area of the target files.
 
 =end comment
 
+=head2 Overlapped pattern
+
+When the matched string is same or shorter than previously matched
+string by another pattern, it is simply ignored (B<--no-warn-include>
+by default).  So, if you have to declare conflicted patterns, put the
+longer pattern in front.
+
+If the matched string overlaps with previously matched string, it is
+warned (B<--warn-overlap> by default) and ignored.
+
+=head1 OPTIONS
+
 =over 7
 
 =item B<--check>=I<ng>|I<ok>|I<any>|I<outstand>|I<all>|I<none>
@@ -93,13 +107,14 @@ Option B<--check> takes argument from I<ng>, I<ok>, I<any>,
 I<outstand>, I<all> and I<none>.
 
 With default value I<outstand>, command will show information about
-correct and incorrect words only when incorrect word was found.
+correct and incorrect words only when incorrect word was found in the
+same file.
 
 With value I<ng>, command will show information only about incorrect
 word.  If you want to get data for correct word, use I<ok> or I<any>.
 
-Value I<all> and I<none> makes sense only when used with B<--stat>
-option.
+Value I<all> and I<none> make sense only when used with B<--stat>
+option, and display information about never matched pattern.
 
 =item B<--select>=I<N>
 
@@ -116,8 +131,13 @@ confuses regex behavior somewhat, avoid to use if possible.
 
 =item B<--stat>
 
+=item B<--with-stat>
+
 Print statistical information.  By default, it only prints information
 about incorrect words.  Works with B<--check> option.
+
+Option B<--with-stat> print statistics after normal output, while
+B<--stat> print only statistics.
 
 =item B<--subst>
 
@@ -143,6 +163,16 @@ to backup name with ".bak" suffix.
 Create new file and write the result.  Suffix ".new" is appended to
 original filename.
 
+=item B<--[no-]warn-overlap>
+
+Warn overlapped pattern.
+Default on.
+
+=item B<--[no-]warn-include>
+
+Warn included pattern.
+Default off.
+
 =back
 
 =head1 LICENSE
@@ -167,7 +197,7 @@ Kazumasa Utashiro
 
 package App::Greple::subst;
 
-our $VERSION = '2.03';
+our $VERSION = '2.06';
 
 use v5.14;
 use strict;
@@ -180,8 +210,7 @@ our @EXPORT      = qw(
     &subst_begin
     &subst_diff
     &subst_create
-    &subst_stat
-    &subst_stat_show
+    &subst_show_stat
     &subst_search
     );
 our %EXPORT_TAGS = ( );
@@ -212,7 +241,7 @@ our @ISA = 'App::Greple::Pattern';
     }
 }
 
-package SmartString {
+package App::Greple::subst::SmartString {
     use List::Util qw(any);
     sub new {
 	my($class, $var) = @_;
@@ -238,6 +267,8 @@ our @opt_format;
 our @default_opt_format = ( '%s' );
 our $opt_subst_select;
 our $opt_linefold;
+our $opt_warn_overlap = 1;
+our $opt_warn_include = 0;
 
 my $initialized;
 my $current_file;
@@ -251,7 +282,7 @@ sub debug {
 
 sub subst_initialize {
 
-    $ss_check = bless \$opt_check, "SmartString";
+    $ss_check = bless \$opt_check, "App::Greple::subst::SmartString";
 
     @subst_diffcmd = shellwords $opt_subst_diffcmd;
 
@@ -294,6 +325,23 @@ sub subst_begin {
     subst_initialize if not $initialized;
 }
 
+{
+    my $diverted = 0;
+
+    sub divert_stdout {
+	$diverted = $diverted == 0 ? 1 : return;
+	open  SUBST_STDOUT, '>&', \*STDOUT or die "open: $!";
+	close STDOUT;
+	open  STDOUT, '>/dev/null' or die "open: $!";
+    }
+
+    sub recover_stdout {
+	$diverted = $diverted == 1 ? 0 : return;
+	close STDOUT;
+	open  STDOUT, '>&', \*SUBST_STDOUT or die "open: $!";
+    }
+}
+
 use Text::VisualWidth::PP;
 use Text::VisualPrintf qw(vprintf vsprintf);
 use List::Util qw(max);
@@ -307,29 +355,7 @@ sub vwidth {
 
 my @match_list;
 
-sub subst_stat {
-    my %arg = @_;
-    $current_file = delete $arg{&FILELABEL} or die;
-
-    for my $i (0 .. $#fromto) {
-	my $p = $fromto[$i] // next;
-	my($from_re, $to) = ($p->regex, $p->correct);
-
-	my @match;
-	while (/$from_re/gp) {
-	    push @match, ${^MATCH};
-	}
-	my $hash = $match_list[$i] //= {};
-	for my $match (@match) {
-	    $match =~ s/\R//g;
-	    $hash->{$match}++;
-	}
-    }
-
-    $_ = "";
-}
-
-sub subst_stat_show {
+sub subst_show_stat {
     my %arg = @_;
 
     my $from_max = max map { vwidth $_->string  } grep { defined } @fromto;
@@ -339,13 +365,14 @@ sub subst_stat_show {
 	my $p = $fromto[$i] // next;
 	my($from_re, $to) = ($p->string, $p->correct // '');
 
-	my $hash = $match_list[$i];
+	my $hash = $match_list[$i] // {};
 	my @keys = keys %{$hash};
 	my @ng = grep { $_ ne $to } @keys;
 	my @ok = grep { $_ eq $to } @keys;
 	if      (is $ss_check 'none') {
 	    next if @keys;
-	} elsif (is $ss_check 'any') {
+	}
+	elsif (is $ss_check 'any') {
 	    next unless @keys;
 	} elsif (is $ss_check 'ng', 'outstand') {
 	    next unless @ng;
@@ -389,7 +416,40 @@ sub read_dict {
     close DICT;
 }
 
-use App::Greple::Regions qw(match_regions merge_regions);
+sub mix_regions {
+    my $option = ref $_[0] eq 'HASH' ? shift : {};
+    my($old, $new) = @_;
+    return () if @$new == 0;
+    my @old = $option->{destructive} ? @_ : map { [ @$_ ] } @{$old};
+    my @new = $option->{destructive} ? @_ : map { [ @$_ ] } @{$new};
+    unless ($option->{nosort}) {
+	@new = sort({$a->[0] <=> $b->[0] || $b->[1] <=> $a->[1]
+			 ||  (@$a > 2 ? $a->[2] <=> $b->[2] : 0)
+		    } @new);
+    }
+    my @out;
+    my($include, $overlap) = @{$option}{qw(include overlap)};
+    while (@old and @new) {
+	while (@old and $old[0][1] <= $new[0][0]) {
+	    push @out, shift @old;
+	}
+	last if @old == 0;
+	while (@new and $new[0][1] <= $old[0][0]) {
+	    push @out, shift @new;
+	}
+	while (@new and $new[0][0] < $old[0][1]) {
+	    if ($old[0][0] <= $new[0][0] and $new[0][1] <= $old[0][1]) {
+		push @$include, [ $new[0], $old[0] ] if $include;
+	    } else {
+		push @$overlap, [ $new[0], $old[0] ] if $overlap;
+	    }
+	    shift @new;
+	}
+    }
+    @$old = ( @out, @old, @new );
+}
+
+use App::Greple::Regions qw(match_regions);
 
 sub subst_search {
     my $text = $_;
@@ -400,17 +460,19 @@ sub subst_search {
     for my $index (0 .. $#fromto) {
 	my $p = $fromto[$index] // next;
 	my($from_re, $to) = ($p->string, $p->correct // '');
-	my @r = match_regions(pattern => $p->regex);
-	next if @r == 0 and $opt_check ne 'all';
+	my @match = match_regions(pattern => $p->regex);
+	next if @match == 0 and $opt_check ne 'all';
 	my $callback = sub {
-	    my($ms, $me, $i, $s) = @_;
+	    my($ms, $me, $i, $matched) = @_;
+	    my $s = $matched =~ s/\R//rg;
+	    $match_list[$index]->{$s}++;
 	    my $format = @opt_format[ $i % @opt_format ];
 	    sprintf($format,
-		    ($opt_subst && $to ne '' && $s =~ s/\R//gr ne $to) ?
-		    $to : $s);
+		    ($opt_subst && $to ne '' && $s ne $to) ?
+		    $to : $matched);
 	};
 	my(@ok, @ng);
-	for (@r) {
+	for (@match) {
 	    my $matched = substr($text, $_->[0], $_->[1] - $_->[0]);
 	    if ($matched =~ s/\R//gr ne $to) {
 		$_->[2] = $index * 2;
@@ -421,17 +483,40 @@ sub subst_search {
 	    }
 	    $_->[3] = $callback;
 	}
-	if      (is $ss_check 'ng') {
-	    push @matched, @ng;
-	} elsif (is $ss_check 'ok') {
-	    push @matched, @ok;
-	} elsif (is $ss_check 'any', 'all') {
-	    push @matched, @r;
-	} elsif (is $ss_check 'outstand') {
-	    push @matched, @r if @ng;
+	my $mix =
+	    (is $ss_check qw(ng))           ? \@ng :
+	    (is $ss_check qw(ok))           ? \@ok :
+	    (is $ss_check qw(outstand))     ? ( @ng ? \@match : [] ) :
+	    (is $ss_check qw(any all none)) ? \@match :
+	    die "Invalid parameter: $opt_check\n";
+	mix_regions {
+	    overlap => ( my $overlap = [] ),
+	    include => ( my $include = [] ),
+	    nosort => 1
+	}, \@matched, $mix;
+	##
+	## Warning
+	##
+	for my $warn (
+	    [ "Overlap", $overlap, $opt_warn_overlap ],
+	    [ "Include", $include, $opt_warn_include ],
+	    ) {
+	    my($kind, $list, $show) = @$warn;
+	    next unless $show;
+	    for my $info (@$list) {
+		my($new, $old) = @$info;
+		warn sprintf("%s \"%s\" with \"%s\" by #%d /%s/ in %s at %d\n",
+			     $kind,
+			     substr($_, $new->[0], $new->[1] - $new->[0]),
+			     substr($_, $old->[0], $old->[1] - $old->[0]),
+			     $index + 1, $p->string,
+			     $current_file,
+			     $new->[0],
+		    );
+	    }
 	}
     }
-    merge_regions { nojoin => 1 }, @matched;
+    @matched;
 }
 
 sub subst_diff {
@@ -505,16 +590,24 @@ builtin U=i                $opt_U
 builtin check=s            $opt_check
 builtin select=s           $opt_subst_select
 builtin linefold!          $opt_linefold
+builtin remember!          $remember_data
+builtin warn-overlap!      $opt_warn_overlap
+builtin warn-include!      $opt_warn_include
 
 option default \
 	--begin subst_begin \
 	--le &subst_search --no-regioncolor \
 	--subst-color
-option --stat    --begin subst_stat --epilogue subst_stat_show
+
 expand ++dump    --all --need 0 -h --nocolor
 option --diff    --subst ++dump --of &subst_diff
 option --create  --subst ++dump --begin subst_create
 option --replace --subst ++dump --begin subst_create(replace,suffix=.bak)
+
+option --divert-stdout --prologue __PACKAGE__::divert_stdout \
+		       --epilogue __PACKAGE__::recover_stdout
+option --with-stat     --epilogue subst_show_stat
+option --stat          --divert-stdout --with-stat
 
 option  --subst-color \
         --cm 555D/100,K/433 \

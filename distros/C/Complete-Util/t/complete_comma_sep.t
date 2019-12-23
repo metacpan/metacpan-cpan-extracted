@@ -27,7 +27,7 @@ test_complete(
 test_complete(
     word      => 'aa',
     elems     => [qw(a aa b)],
-    result    => ['aa,'],
+    result    => ['aa,',  'aa, '],
 );
 test_complete(
     word      => 'aaa',
@@ -47,12 +47,12 @@ test_complete(
 test_complete(
     word      => 'aa,aa',
     elems     => [qw(a aa b)],
-    result    => ['aa,aa,'],
+    result    => ['aa,aa,',  'aa,aa, '],
 );
 test_complete(
     word      => 'aa,b',
     elems     => [qw(a aa b)],
-    result    => ['aa,b,'],
+    result    => ['aa,b,',  'aa,b, '],
 );
 test_complete(
     word      => 'aa,c',
@@ -88,7 +88,7 @@ subtest "arg:uniq" => sub {
         word      => 'aa,a',
         elems     => [qw(a aa b)],
         uniq      => 1,
-        result    => ['aa,a,'],
+        result    => ['aa,a,',  'aa,a, '],
     );
     test_complete(
         word      => 'aa,a,b',

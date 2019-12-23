@@ -1,4 +1,18 @@
 Revision history for overload::open
+0.31.0 Dec 18, 2019
+    - Fix XS related bugs. Make sure we only get the
+    correct number of items from the open call, and not
+    everything on the stack
+    - Minor changes to the POD
 
-0.1 Dec 7, 2019
+0.30.0 Dec 13, 2019
+    - Fix version format so it's actually larger than previous release
+
+0.02.1 Dec 13, 2019
+    - Fix SYNOPSIS not being updated to API 0.2
+
+0.02 Dec 11, 2019
+    - Changed API
+
+0.01 Dec 7, 2019
     - First release

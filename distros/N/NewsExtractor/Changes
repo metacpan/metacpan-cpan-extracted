@@ -1,5 +1,14 @@
+v0.0.7
+        Remove a bunch of wastes.
+
+v0.0.6
+        Handle "utf-8" charset correctly.
+
+v0.0.5
+	GenericExtractor can now extract directly from HTML file.
+
 v0.0.4
-	Introduce JSONLD-based extractor.
+        Introduce JSONLD-based extractor.
 
 v0.0.3
         Introduce CSS-based site-specific extractors.

@@ -1,0 +1,12 @@
+DiskWriter                        T_ARCHIVE_REF
+Entry                             T_ARCHIVE_REF
+Match                             T_ARCHIVE_REF
+Reader                            T_ARCHIVE_REF
+
+OUTPUT
+T_ARCHIVE_REF
+	ARCHIVE_NEW_OBJ ($arg, \"Archive::Raw::${(my $ntt = $ntype) =~ s/_/::/g;\$ntt}\", (void *) $var);
+
+INPUT
+T_ARCHIVE_REF
+	$var = ARCHIVE_SV_TO_PTR (${(my $ntt = $ntype) =~ s/_/::/g;\$ntt}, $arg);

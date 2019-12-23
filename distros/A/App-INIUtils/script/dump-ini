@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-04-23'; # DATE
-our $VERSION = '0.033'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.034'; # VERSION
 
 use 5.010;
 use strict;
@@ -50,7 +50,7 @@ dump-ini - Dump INI as hash of hashes structure
 
 =head1 VERSION
 
-This document describes version 0.033 of dump-ini (from Perl distribution App-INIUtils), released on 2019-04-23.
+This document describes version 0.034 of dump-ini (from Perl distribution App-INIUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 

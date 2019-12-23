@@ -2,8 +2,8 @@ NAME
     Complete::File - Completion routines related to files
 
 VERSION
-    This document describes version 0.43 of Complete::File (from Perl
-    distribution Complete-File), released on 2017-07-14.
+    This document describes version 0.440 of Complete::File (from Perl
+    distribution Complete-File), released on 2019-12-18.
 
 DESCRIPTION
 FUNCTIONS
@@ -147,7 +147,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

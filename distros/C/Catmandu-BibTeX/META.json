@@ -45,6 +45,7 @@
             "BibTeX::Parser" : "1.02",
             "Catmandu" : "1.2002",
             "Clone" : "0",
+            "LaTeX::Decode" : "0.05",
             "Moo" : "0",
             "perl" : "v5.10.1"
          }
@@ -67,7 +68,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-BibTeX"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_contributors" : [
       "Christian Pietsch <christian.pietsch@uni-bielefeld.de>",
       "Jakob Voss <voss@gbv.de>",

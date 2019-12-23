@@ -1,0 +1,54 @@
+{
+   "abstract" : "implementation of the \"adaptive throttling\" algorithm by Google",
+   "author" : [
+      "Tom van der Woerdt <info@tvdw.eu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Throttle-Adaptive",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Time::HiRes" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tvdw/perl-Throttle-Adaptive.git",
+         "web" : "https://github.com/tvdw/perl-Throttle-Adaptive"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:TVDW",
+   "x_generated_by_perl" : "v5.16.3",
+   "x_serialization_backend" : "JSON::XS version 4.0"
+}
+

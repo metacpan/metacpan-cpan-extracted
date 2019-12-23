@@ -291,7 +291,7 @@ sub read_eof ( $self, %args ) {
 # $args{timeout}
 # $args{read_size}
 # TODO on_read???
-sub read_line ( $self, $eol, %args ) {
+sub read_line ( $self, $eol = "\n", %args ) {
     $args{timeout} = $self->{timeout} if !exists $args{timeout};
 
     while () {

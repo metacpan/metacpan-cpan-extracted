@@ -2,8 +2,8 @@ NAME
     Complete::Util - General completion routine
 
 VERSION
-    This document describes version 0.603 of Complete::Util (from Perl
-    distribution Complete-Util), released on 2019-07-23.
+    This document describes version 0.607 of Complete::Util (from Perl
+    distribution Complete-Util), released on 2019-12-23.
 
 DESCRIPTION
     This package provides some generic completion routines that follow the
@@ -353,8 +353,9 @@ FAQ
      timethis 20:  1 wallclock secs ( 1.04 usr +  0.00 sys =  1.04 CPU) @ 19.23/s (n=20)
 
 ENVIRONMENT
-  COMPLETE_UTIL_TRACE => bool
-    If set to true, will display more log statements for debugging.
+  COMPLETE_UTIL_TRACE
+    Bool. If set to true, will generate more log statements for debugging
+    (at the trace level).
 
   COMPLETE_UTIL_LEVENSHTEIN => str ('pp'|'xs'|'flexible')
     Can be used to force which Levenshtein distance implementation to use.

@@ -4,36 +4,52 @@ use warnings;
 use Test::More;
 use Carp qw/ confess /;
 sub noop { undef };
-use overload::open 'noop';
+use File::Temp qw/ tempfile /;
+use Fcntl;
+my $temp_file = tempfile;
+use overload::open \&noop;
 my $fh;
 my $global;
-unlink 'filename.txt';
+unlink $temp_file;
 my $open_lives = 0;
 eval {
-	open $fh, '>', "filename.txt" || die $!;
-	$open_lives = 1;
-	1;
+    open $fh, '>', $temp_file || die $!;
+    $open_lives = 1;
+    1;
 } or do {
-	die $@;
+    die $@;
 };
 my $print_lives = 0;
 eval {
-	print $fh "words" || die $!;
-	$print_lives = 1;
-	1;
+    print $fh "words" || die $!;
+    $print_lives = 1;
+    1;
 } or do {
-	confess $@;
+    confess $@;
 };
 is $print_lives, 1, "Print does not die";
 is $open_lives, 1, "open does not die";
-is `cat filename.txt`, 'words', "file has correct content";
-unlink 'filename.txt';
+
 close $fh;
+my $sysopen_fh;
+die if ! -f $temp_file;
+sysopen($sysopen_fh, $temp_file, O_RDONLY);
+my $a;
+($a = <$sysopen_fh>) // warn $!;
+is $a, 'words', "file has correct content";
+
+unlink $temp_file;
+close $fh;
+no warnings 'redefine';
 sub noop {
-	$global = 99;
-	undef;
+    use warnings;
+    $global = 99;
+    undef;
 }
-open $fh, '>', 'filename.txt' || die $!;
+done_testing();
+exit;
+use warnings;
+open $fh, '>', $temp_file || die $!;
 is $global, 99, "sets global variable using overloaded sub";
-unlink 'filename.txt';
+unlink $temp_file;
 done_testing();

@@ -2,8 +2,12 @@ package Lemonldap::NG::Portal::Password::LDAP;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants
-  qw(PE_PASSWORD_OK PE_LDAPERROR PE_ERROR);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_PASSWORD_OK
+  PE_LDAPERROR
+  PE_LDAPCONNECTFAILED
+  PE_ERROR
+);
 
 extends 'Lemonldap::NG::Portal::Lib::LDAP',
   'Lemonldap::NG::Portal::Password::Base';
@@ -38,6 +42,10 @@ sub modifyPassword {
         return PE_ERROR;
     }
 
+    # Ensure connection is valid
+    $self->bind;
+    return PE_LDAPCONNECTFAILED unless $self->ldap;
+
     # Call the modify password method
     my $code =
       $self->ldap->userModifyPassword( $dn, $pwd, $req->data->{oldpassword} );
@@ -62,8 +70,9 @@ sub modifyPassword {
         unless ( $result->code == 0 ) {
             $self->logger->error( "LDAP modify "
                   . $self->conf->{ldapPasswordResetAttribute}
-                  . " error: "
-                  . $result->code );
+                  . " error "
+                  . $result->code . ": "
+                  . $result->error );
             return PE_LDAPERROR;
         }
 

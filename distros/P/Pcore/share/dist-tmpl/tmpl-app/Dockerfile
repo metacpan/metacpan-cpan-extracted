@@ -4,7 +4,7 @@ LABEL maintainer="<: $author | raw :>"
 
 USER root
 
-ENV DIST_PATH="$PCORE_LIB/<: $dist_path :>"
+ENV DIST_PATH="$WORKSPACE/<: $dist_path :>"
 
 ADD . $DIST_PATH
 
@@ -18,8 +18,8 @@ RUN \
     && dnf -y install nginx-mainline \
     \
     # deploy non-CPAN deps
-    # && mkdir "$PCORE_LIB/pcore-cdn-static-data" \
-    # && curl -fsSL https://bitbucket.org/softvisio/pcore-cdn-static-data/get/master.tar.gz | tar -C "$PCORE_LIB/pcore-cdn-static-data" --strip-components=1 -xzf - \
+    # && mkdir "$WORKSPACE/pcore-cdn-static-data" \
+    # && curl -fsSL https://bitbucket.org/softvisio/pcore-cdn-static-data/get/master.tar.gz | tar -C "$WORKSPACE/pcore-cdn-static-data" --strip-components=1 -xzf - \
     \
     # deploy and test distribution
     && pcore deploy --recommends --suggests \

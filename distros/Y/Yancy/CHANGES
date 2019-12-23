@@ -1,5 +1,13 @@
 Changelog for Yancy
 
+1.045     2019-12-16 22:36:47-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed a bug in the DBIx::Class foreign key detection: Yancy was
+      incorrectly using the table name, not the source name. Thanks
+      @mario-minati for the report! [Github #84]
+
 1.044     2019-12-05 21:49:40-06:00 America/Chicago
 
     [Added]

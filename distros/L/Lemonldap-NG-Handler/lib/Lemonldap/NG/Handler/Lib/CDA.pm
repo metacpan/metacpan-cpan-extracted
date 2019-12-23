@@ -2,13 +2,13 @@ package Lemonldap::NG::Handler::Lib::CDA;
 
 use strict;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 sub run {
     my ( $class, $req, $rule, $protection ) = @_;
     my $uri = $req->{env}->{REQUEST_URI};
     my $cn  = $class->tsv->{cookieName};
-    my ( $id, $session );
+    my ( $id, $ret, $session );
     if ( $uri =~ s/[\?&;]${cn}cda=(\w+)$//oi ) {
         if (    $id = $class->fetchId($req)
             and $session = $class->retrieveSession( $req, $id ) )
@@ -48,8 +48,10 @@ sub run {
             return $class->REDIRECT;
         }
     }
-    return $class->Lemonldap::NG::Handler::Main::run( $req, $rule,
-        $protection );
+    ( $ret, $session ) =
+      $class->Lemonldap::NG::Handler::Main::run( $req, $rule, $protection );
+
+    return $ret;
 }
 
 ## @rmethod protected hash getCDAInfos(id)

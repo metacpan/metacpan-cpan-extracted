@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.7';
 
 extends 'Lemonldap::NG::Portal::Main::Auth',
   'Lemonldap::NG::Portal::Lib::OpenIDConnect';
@@ -186,7 +186,7 @@ sub extractFormInfo {
         my $id_token_payload = $self->extractJWT($id_token)->[1];
 
         my $id_token_payload_hash =
-          $self->decodeJSON( decode_base64($id_token_payload) );
+          $self->decodeJSON( $self->decodeBase64url($id_token_payload) );
 
         # Check validity of Access Token (optional)
         my $at_hash = $id_token_payload_hash->{at_hash};
@@ -243,8 +243,7 @@ sub extractFormInfo {
             my $portalPath = $self->{conf}->{portal};
             $portalPath =~ s#^https?://[^/]+/?#/#;
 
-            $req->data->{list}            = $self->opList;
-            $req->data->{confirmRemember} = 0;
+            $req->data->{list} = $self->opList;
 
             $req->data->{login} = 1;
             return PE_IDPCHOICE;

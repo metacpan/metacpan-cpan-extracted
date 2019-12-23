@@ -16,11 +16,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "gpl",
   "NAME" => "Minion::Backend::MongoDB",
   "PREREQ_PM" => {
+    "BSON::OID" => 0,
+    "BSON::Types" => 0,
     "DateTime" => 0,
     "DateTime::Set" => 0,
     "DateTime::Span" => 0,
     "ExtUtils::MakeMaker" => "7.12",
-    "Minion" => "9.00",
+    "Minion" => "10.00",
     "Mojolicious" => "8.10",
     "MongoDB" => "2.0",
     "Tie::IxHash" => 0,
@@ -30,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::UseAllModules" => "0.15"
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,11 +40,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "BSON::OID" => 0,
+  "BSON::Types" => 0,
   "DateTime" => 0,
   "DateTime::Set" => 0,
   "DateTime::Span" => 0,
   "ExtUtils::MakeMaker" => "7.12",
-  "Minion" => "9.00",
+  "Minion" => "10.00",
   "Mojolicious" => "8.10",
   "MongoDB" => "2.0",
   "Test::More" => "0.98",

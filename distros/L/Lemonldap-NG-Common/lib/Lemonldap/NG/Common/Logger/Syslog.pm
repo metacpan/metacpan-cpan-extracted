@@ -8,7 +8,7 @@ our $VERSION = '2.0.5';
 sub new {
     my ( $class, $conf, %args ) = @_;
     my $level = $conf->{logLevel} || 'info';
-    my $self = bless {}, $class;
+    my $self  = bless {}, $class;
     if ( $args{user} ) {
         $self->{facility} = $conf->{userSyslogFacility} || 'auth';
     }

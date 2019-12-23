@@ -19,7 +19,7 @@ package MongoDB::QueryResult;
 # ABSTRACT: An iterator for Mongo query results
 
 use version;
-our $VERSION = 'v2.2.0';
+our $VERSION = 'v2.2.1';
 
 use Moo;
 use MongoDB::Error;
@@ -380,7 +380,7 @@ MongoDB::QueryResult - An iterator for Mongo query results
 
 =head1 VERSION
 
-version v2.2.0
+version v2.2.1
 
 =head1 SYNOPSIS
 

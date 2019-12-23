@@ -1,6 +1,4 @@
 #!/usr/bin/env perl
-use strict;
-use warnings;
 
 # Usage:
 # http://$host/:chord/:position[?showname={0,Chord+Name}]
@@ -11,7 +9,6 @@ use warnings;
 # http://localhost:5000/012340/3?showname=Xb+dim
 
 use Dancer2;
-use lib '/Users/gene/sandbox/Music-FretboardDiagram/lib';
 use Music::FretboardDiagram;
 use Imager;
 

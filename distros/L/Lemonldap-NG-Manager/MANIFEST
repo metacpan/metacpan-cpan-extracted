@@ -183,6 +183,7 @@ site/htdocs/static/languages/de.json
 site/htdocs/static/languages/en.json
 site/htdocs/static/languages/fr.json
 site/htdocs/static/languages/it.json
+site/htdocs/static/languages/tr.json
 site/htdocs/static/languages/vi.json
 site/htdocs/static/languages/zh.json
 site/htdocs/static/logos/ar.png
@@ -195,6 +196,7 @@ site/htdocs/static/logos/fr.png
 site/htdocs/static/logos/it.png
 site/htdocs/static/logos/llng-icon-32.png
 site/htdocs/static/logos/llng-logo-32.png
+site/htdocs/static/logos/tr.png
 site/htdocs/static/logos/vi.png
 site/htdocs/static/logos/zh.png
 site/htdocs/static/reverseTree.json

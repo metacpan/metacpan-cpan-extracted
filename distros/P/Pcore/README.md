@@ -12,4 +12,4 @@ Documentation will be provided later.
 
 # ENVIRONMENT
 
-- PCORE\_LIB
+- WORKSPACE

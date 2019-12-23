@@ -1,6 +1,6 @@
 package Catmandu::Fix::orcid_find;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Catmandu::Sane;
 use Moo;
@@ -19,7 +19,7 @@ sub emit_value {
 
 =head1 NAME
 
-Catmandu::Fix::orcid_find - find ORCID id for an query
+Catmandu::Fix::orcid_find - find an ORCID id for a query
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ Catmandu::Fix::orcid_find - find ORCID id for an query
    orcid_find(query)
 
    if exists(orcid.orcid-search-results.num-found)
-    copy_field(orcid.orcid-search-results.orcid-search-result.0.orcid-profile.orcid-identifier.path,id)
+       copy_field(orcid.orcid-search-results.orcid-search-result.0.orcid-profile.orcid-identifier.path,id)
    end
 
 =head1 SEE ALSO

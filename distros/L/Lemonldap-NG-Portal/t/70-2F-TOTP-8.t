@@ -23,7 +23,7 @@ SKIP: {
                 totp2fActivation       => 1,
                 totp2fDigits           => 8,
                 totp2fTTL              => -1,
-                formTimeout            => 2,
+                formTimeout            => 120,
                 requireToken           => 1,
             }
         }
@@ -174,8 +174,8 @@ SKIP: {
         'LLNG Code' );
     $query =~ s/code=/code=$code/;
 
-    diag 'Waiting';
-    sleep 3;
+    # Skipping time until form token expiration
+    Time::Fake->offset("+5m");
 
     ok(
         $res = $client->_post(

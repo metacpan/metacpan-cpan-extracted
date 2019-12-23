@@ -3,6 +3,7 @@ abstract: 'Namespace fixing around identifiers (for normalization, validation, e
 author:
   - 'Vitali Peil'
 build_requires:
+  HTTP::Response: '0'
   Log::Any::Test: '1.03'
   Test::Deep: '0.112'
   Test::Exception: '0.32'
@@ -27,7 +28,8 @@ no_index:
     - t
     - xt
 requires:
-  Business::ISBN: '2.010'
+  Business::ISBN: '3.005'
+  Business::ISBN::Data: '20191107'
   Business::ISSN: '0.91'
   Catmandu: '1.10'
   Data::UUID::MT: '1.001'
@@ -43,7 +45,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Identifier/issues
   homepage: https://github.com/LibreCat/Catmandu-Identifier
   repository: https://github.com/LibreCat/Catmandu-Identifier.git
-version: '0.13'
+version: '0.14'
 x_contributors:
   - 'brian d foy <brian.d.foy@gmail.com>'
   - 'Ere Maijala <ere.maijala@helsinki.fi>'

@@ -4,7 +4,7 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.03
+Version 2.06
 
 # SYNOPSIS
 
@@ -18,6 +18,8 @@ greple -Msubst --dict _dictionary_ \[ options \]
     --diffcmd command
     --replace
     --create
+    --[no-]warn-overlap
+    --[no-]warn-include
 
 # DESCRIPTION
 
@@ -48,19 +50,32 @@ You can use same file by **greple**'s **-f** option and string after
 
     greple -f DICT ...
 
+## Overlapped pattern
+
+When the matched string is same or shorter than previously matched
+string by another pattern, it is simply ignored (**--no-warn-include**
+by default).  So, if you have to declare conflicted patterns, put the
+longer pattern in front.
+
+If the matched string overlaps with previously matched string, it is
+warned (**--warn-overlap** by default) and ignored.
+
+# OPTIONS
+
 - **--check**=_ng_|_ok_|_any_|_outstand_|_all_|_none_
 
     Option **--check** takes argument from _ng_, _ok_, _any_,
     _outstand_, _all_ and _none_.
 
     With default value _outstand_, command will show information about
-    correct and incorrect words only when incorrect word was found.
+    correct and incorrect words only when incorrect word was found in the
+    same file.
 
     With value _ng_, command will show information only about incorrect
     word.  If you want to get data for correct word, use _ok_ or _any_.
 
-    Value _all_ and _none_ makes sense only when used with **--stat**
-    option.
+    Value _all_ and _none_ make sense only when used with **--stat**
+    option, and display information about never matched pattern.
 
 - **--select**=_N_
 
@@ -76,9 +91,13 @@ You can use same file by **greple**'s **-f** option and string after
     confuses regex behavior somewhat, avoid to use if possible.
 
 - **--stat**
+- **--with-stat**
 
     Print statistical information.  By default, it only prints information
     about incorrect words.  Works with **--check** option.
+
+    Option **--with-stat** print statistics after normal output, while
+    **--stat** print only statistics.
 
 - **--subst**
 
@@ -102,6 +121,16 @@ You can use same file by **greple**'s **-f** option and string after
 
     Create new file and write the result.  Suffix ".new" is appended to
     original filename.
+
+- **--\[no-\]warn-overlap**
+
+    Warn overlapped pattern.
+    Default on.
+
+- **--\[no-\]warn-include**
+
+    Warn included pattern.
+    Default off.
 
 # LICENSE
 

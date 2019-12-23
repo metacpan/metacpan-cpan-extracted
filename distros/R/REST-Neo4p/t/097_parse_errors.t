@@ -1,3 +1,4 @@
+use v5.10;
 use Test::More;
 use Test::Exception;
 use File::Spec;
@@ -6,6 +7,7 @@ use lib qw{t ../lib};
 use Data::Dumper;
 use REST::Neo4p;
 use ErrJ;
+use JSON;
 use strict;
 use warnings;
 no warnings qw/once/;
@@ -71,6 +73,7 @@ isa_ok($@, 'REST::Neo4p::StreamException');
 1;
 diag 'txn endpoint';
 # txn
+$DB::single=1;
 REST::Neo4p->begin_work;
 is (REST::Neo4p->_transaction, 24, 'mock txn');
 open $qfh,"<",\$ErrJ::txn_resp;
@@ -79,13 +82,17 @@ undef $q->{RaiseError};
 
 while (my $row = $q->fetch) {
   is(ref,'HASH') foreach @$row;
+  say encode_json($_) foreach @$row;
+  $DB::single=1 if $row->[-1]{short_name} eq "Mojo::Server::PSGI::_IO";
 }
+diag $q->errobj->message;
 isa_ok $q->errobj, 'REST::Neo4p::TxQueryException';
 open $qfh,"<",\$ErrJ::txn_long_err_resp;
 ok $q->execute;
 while (my $row = $q->fetch) {
   is(ref,'HASH') foreach @$row;
 }
+diag $q->errobj->message;
 isa_ok $q->errobj, 'REST::Neo4p::TxQueryException';
 
 open $qfh,"<",\$ErrJ::txn_no_err_resp;
@@ -95,6 +102,7 @@ while (my $row = $q->fetch) {
   is(ref,'HASH') foreach @$row;
   $DB::single=1 if $q->err;
 }
+diag $q->errobj->message if ($q->err);
 ok !$q->err, 'no txn error';
 
 open $qfh,"<",\$ErrJ::txn_baddata_resp;

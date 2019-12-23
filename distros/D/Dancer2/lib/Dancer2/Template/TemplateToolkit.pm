@@ -1,7 +1,7 @@
 # ABSTRACT: Template toolkit engine for Dancer2
 
 package Dancer2::Template::TemplateToolkit;
-$Dancer2::Template::TemplateToolkit::VERSION = '0.208001';
+$Dancer2::Template::TemplateToolkit::VERSION = '0.208002';
 use Moo;
 use Carp qw<croak>;
 use Dancer2::Core::Types;
@@ -59,7 +59,7 @@ sub render {
 #
 # TT2 will look in a its INCLUDE_PATH for templates.
 # Typically $self->views is an absolute path, and we set ABSOLUTE=> 1 above.
-# In that case TT2 does NOT itetare through what is set for INCLUDE_PATH
+# In that case TT2 does NOT iterate through what is set for INCLUDE_PATH
 # However, if its not absolute, we want to allow TT2 iterate through the
 # its INCLUDE_PATH, which we set to be $self->views.
 
@@ -101,7 +101,7 @@ Dancer2::Template::TemplateToolkit - Template toolkit engine for Dancer2
 
 =head1 VERSION
 
-version 0.208001
+version 0.208002
 
 =head1 SYNOPSIS
 
@@ -117,7 +117,7 @@ setting it manually with C<set>:
 
 Most configuration variables available when creating a new instance of a
 L<Template>::Toolkit object can be declared inside the template toolkit
-section on the engines configuration (see your config.yml file):
+section on the engines configuration in your config.yml file.  For example:
 
   engines:
     template:
@@ -125,8 +125,12 @@ section on the engines configuration (see your config.yml file):
         start_tag: '<%'
         end_tag:   '%>'
 
+(Note: C<start_tag> and C<end_tag> are regexes.  If you want to use PHP-style
+tags, you will need to list them as C<< <\? >> and C<< \?> >>.)
+See L<Template::Manual::Config> for the configuration variables.
+
 In addition to the standard configuration variables, the option C<show_private_variables>
-is also available. Template::Toolkit, by default, do not render private variables
+is also available. Template::Toolkit, by default, does not render private variables
 (the ones starting with an underscore). If in your project it gets easier to disable
 this feature than changing variable names, add this option to your configuration.
 
@@ -144,7 +148,7 @@ This template engine allows you to use L<Template>::Toolkit in L<Dancer2>.
 =head2 render($template, \%tokens)
 
 Renders the template.  The first arg is a filename for the template file
-or a reference to a string that contains the template.  The second arg
+or a reference to a string that contains the template. The second arg
 is a hashref for the tokens that you wish to pass to
 L<Template::Toolkit> for rendering.
 
@@ -207,10 +211,11 @@ template configuration settings:
 
     # in config.yml
     engines:
-      template_toolkit:
-        start_tag: '<%'
-        end_tag:   '%>'
-        COMPILE_EXT: '.tcc' # cached file extension
+      template:
+        template_toolkit:
+          start_tag: '<%'
+          end_tag:   '%>'
+          COMPILE_EXT: '.tcc' # cached file extension
 
 Template caching will avoid the need to re-parse template files or blocks each time they are
 used. Cached templates are automatically updated when you update the original template file.

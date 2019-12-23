@@ -1,5 +1,9 @@
 Revision history for Perl extension Telemetry-Any
 
+0.07 2019-12-22T02:06:04Z
+
+    - Added output of intervals between arbitrary labels (https://github.com/ivanych/Telemetry-Any/pull/1)
+
 0.06 2019-08-31T23:33:52Z
 
     - print() method is no longer used

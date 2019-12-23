@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/OpenCageData/perl-Geo-Address-Formatter.svg?branch=master)](https://travis-ci.org/OpenCageData/perl-Geo-Address-Formatter)
 [![Kritika Analysis Status](https://kritika.io/users/freyfogle/repos/4975169572151338/heads/master/status.svg)](https://kritika.io/users/freyfogle/repos/4975169572151338/heads/master/)
 [![CPAN](https://img.shields.io/cpan/v/Geo-Address-Formatter.svg?style=flat-square)](https://metacpan.org/pod/Geo::Address::Formatter)
+[![Coverage Status](https://coveralls.io/repos/github/OpenCageData/perl-Geo-Address-Formatter/badge.svg?branch=master)](https://coveralls.io/github/OpenCageData/perl-Geo-Address-Formatter?branch=master)
 
 # perl-Geo-Address-Formatter
 

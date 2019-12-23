@@ -1,0 +1,4 @@
+version 3.23
+	Space wasn't being reclaimed during transaction handling.
+	This version fixes that, and also moves the documentation to
+	underneath the __END__ marker and updates it.

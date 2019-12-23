@@ -1,0 +1,80 @@
+---
+abstract: 'read and validate CSV'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::HasCompiler: '0.014'
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 1
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Validate-CSV
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Data::Validate::CSV:
+    file: lib/Data/Validate/CSV.pm
+    version: '0.003'
+  Data::Validate::CSV::Cell:
+    file: lib/Data/Validate/CSV/Cell.pm
+    version: '0.003'
+  Data::Validate::CSV::Column:
+    file: lib/Data/Validate/CSV/Column.pm
+    version: '0.003'
+  Data::Validate::CSV::MultiValueCell:
+    file: lib/Data/Validate/CSV/MultiValueCell.pm
+    version: '0.003'
+  Data::Validate::CSV::Note:
+    file: lib/Data/Validate/CSV/Note.pm
+    version: '0.003'
+  Data::Validate::CSV::Row:
+    file: lib/Data/Validate/CSV/Row.pm
+    version: '0.003'
+  Data::Validate::CSV::Schema:
+    file: lib/Data/Validate/CSV/Schema.pm
+    version: '0.003'
+  Data::Validate::CSV::SingleValueCell:
+    file: lib/Data/Validate/CSV/SingleValueCell.pm
+    version: '0.003'
+  Data::Validate::CSV::Table:
+    file: lib/Data/Validate/CSV/Table.pm
+    version: '0.003'
+  Data::Validate::CSV::Types:
+    file: lib/Data/Validate/CSV/Types.pm
+    version: '0.003'
+recommends:
+  Text::CSV_XS: '0'
+requires:
+  DateTime: '0'
+  DateTime::Duration: '0'
+  DateTime::Format::CLDR: '0'
+  DateTime::Incomplete: '0'
+  JSON::PP: '0'
+  Moo: '0'
+  Path::Tiny: '0'
+  PerlX::Maybe: '0'
+  Types::Path::Tiny: '0'
+  Types::Standard: '0'
+  Types::XSD: '0'
+  namespace::autoclean: '0'
+  perl: '5.012000'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Data-Validate-CSV/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Data-Validate-CSV
+  homepage: https://metacpan.org/release/Data-Validate-CSV
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-data-validate-csv.git
+version: '0.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

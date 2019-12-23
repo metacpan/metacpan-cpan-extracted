@@ -1,9 +1,15 @@
 package App::RetroPAN;
 # vim:ts=4:shiftwidth=4:expandtab
 
+use strict;
+use warnings;
+use utf8;
+
+=encoding utf8
+
 =head1 NAME
 
-App::RetroPAN - Makes a historic minicpan E<9203>
+App::RetroPAN - Makes a historic minicpan ⏳
 
 =head1 SYNOPSIS
 
@@ -20,9 +26,13 @@ satisfy your modules' dependencies.
 
 =over
 
-=item L<retropan>
+=item *
 
-=item L<OrePAN2>
+L<retropan>
+
+=item *
+
+L<OrePAN2>
 
 =back
 
@@ -36,9 +46,6 @@ Dave Lambley <dlambley@cpan.org>
 
 =cut
 
-use strict;
-use warnings;
-
 use HTTP::Request;
 use LWP::UserAgent;
 use List::Util qw/ uniq /;
@@ -48,7 +55,7 @@ use OrePAN2::Indexer;
 
 use Cpanel::JSON::XS qw/ encode_json decode_json /;
 
-our $VERSION = 0.01;
+our $VERSION = '0.02';
 
 my $ua = LWP::UserAgent->new( keep_alive => 2, agent => "retropan/$VERSION" );
 
@@ -153,6 +160,7 @@ sub find_module_on_date {
     # We therefore iterate through all modules returned to find the newest
     # version.
     foreach my $hit (@{ $data->{hits}->{hits} }) {
+	next if $hit->{_source}->{distribution} eq 'perl';
         foreach my $mod (@{ $hit->{_source}->{module} }) {
             if (($authorized ? $mod->{authorized} : 1) && $mod->{name} eq $module && $mod->{version_numified} > $version) {
                 $author     = $hit->{_source}->{author};

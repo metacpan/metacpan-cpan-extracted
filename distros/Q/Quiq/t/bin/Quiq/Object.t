@@ -51,8 +51,8 @@ sub test_parameters_0 : Test(4) {
         my $opt2 = 2;
 
         $class->parameters(\@_,
-            opt1 => \$opt1,
-            opt2 => \$opt2,
+            -opt1 => \$opt1,
+            -opt2 => \$opt2,
         );
 
         return "$arg1,$arg2,$opt1,$opt2";
@@ -81,8 +81,8 @@ sub test_parameters_1 : Test(4) {
         my $opt2 = 2;
 
         $class->parameters(1,\@_,
-            opt1 => \$opt1,
-            opt2 => \$opt2,
+            -opt1 => \$opt1,
+            -opt2 => \$opt2,
         );
 
         return "$arg1,$arg2,$opt1,$opt2,@_";
@@ -111,8 +111,8 @@ sub test_parameters_2 : Test(6) {
         my $opt2 = 2;
 
         my $argA = $class->parameters(1,3,\@_,
-            opt1 => \$opt1,
-            opt2 => \$opt2,
+            -opt1 => \$opt1,
+            -opt2 => \$opt2,
         );
 
         return join ',',@$argA,$opt1,$opt2;

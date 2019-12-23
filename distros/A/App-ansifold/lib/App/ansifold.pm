@@ -6,7 +6,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw($VERSION);
 
-our $VERSION = "0.04";
+our $VERSION = "1.01";
 
 1;
 __END__

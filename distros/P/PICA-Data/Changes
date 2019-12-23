@@ -1,5 +1,8 @@
 Revision history for PICA::Data
 
+1.01  2019-12-18 09:20:11 CET
+    - add match function and documentation of matching rules
+
 1.00  2019-10-01 18:43:42 CEST
     - fix .travis.yml
     - gh#47 Drop usage of * for wildcard from PICA::PATH

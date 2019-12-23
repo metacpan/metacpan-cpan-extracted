@@ -99,11 +99,11 @@ BEGIN {
 
 use Net::DBus::Exporter "org.freedesktop.DBus.Introspectable";
 
-dbus_method("Introspect", [], ["string"]);
+dbus_method("Introspect", [], ["string"], {return_names => ["xml_data"]});
 
-dbus_method("Get", ["string", "string"], [["variant"]], "org.freedesktop.DBus.Properties");
-dbus_method("GetAll", ["string"], [["dict", "string", ["variant"]]], "org.freedesktop.DBus.Properties");
-dbus_method("Set", ["string", "string", ["variant"]], [], "org.freedesktop.DBus.Properties");
+dbus_method("Get", ["string", "string"], [["variant"]], "org.freedesktop.DBus.Properties", {return_names => ["value"], param_names => ["interface_name", "property_name"]});
+dbus_method("GetAll", ["string"], [["dict", "string", ["variant"]]], "org.freedesktop.DBus.Properties", {return_names => ["properties"], param_names => ["interface_name"]});
+dbus_method("Set", ["string", "string", ["variant"]], [], "org.freedesktop.DBus.Properties", {param_names => ["interface_name", "property_name", "value"]});
 
 =item my $object = Net::DBus::BaseObject->new($service, $path)
 
@@ -132,11 +132,17 @@ sub new {
     my $parent = shift;
     my $path = shift;
 
+    $path =~ s{/$}{} unless $path eq '/';
+
     $self->{parent} = $parent;
     if ($parent->isa(__PACKAGE__)) {
+	$path =~ s{^/}{};
 	$self->{service} = $parent->get_service;
-	$self->{object_path} = $parent->get_object_path . $path;
+	$self->{object_path} = $parent->get_object_path;
+	$self->{object_path} .= '/' unless $self->{object_path} =~ m{/$};
+	$self->{object_path} .= $path;
     } else {
+	$path = "/$path" unless $path =~ m{^/};
 	$self->{service} = $parent;
 	$self->{object_path} = $path;
     }
@@ -238,7 +244,8 @@ sub _get_sub_nodes {
     my $self = shift;
     my %uniq;
 
-    my $base = "$self->{object_path}/";
+    my $base = $self->{object_path};
+    $base .= '/' if $base ne '/';
     foreach ( keys( %{$self->{children}} ) ) {
       m/^$base([^\/]+)/;
       $uniq{$1} = 1;
@@ -440,10 +447,16 @@ sub _dispatch {
 	if ($method_name eq "Introspect" &&
 	    $self->_introspector &&
 	    $ENABLE_INTROSPECT) {
+	    if ($message->get_args_list) {
+		$reply = $connection->make_error_message($message,
+							 "org.freedesktop.DBus.Error.Failed",
+							 "too many parameters for method 'Introspect'");
+	    } else {
 	    my $xml = $self->_introspector->format($self);
 	    $reply = $connection->make_method_return_message($message);
 
 	    $self->_introspector->encode($reply, "methods", $method_name, "returns", $xml);
+	    }
 	}
     } elsif ((defined $interface) &&
 	     ($interface eq "org.freedesktop.DBus.Properties")) {
@@ -460,7 +473,7 @@ sub _dispatch {
 
     if (!$reply) {
 	$reply = $connection->make_error_message($message,
-						 "org.freedesktop.DBus.Error.Failed",
+						 "org.freedesktop.DBus.Error.UnknownMethod",
 						 "No such method " . ref($self) . "->" . $method_name);
     }
 
@@ -501,7 +514,7 @@ of property reads and writes. The C<$name> parameter is the name
 of the property being accessed. If C<$newvalue> is supplied then
 the property is to be updated, otherwise the current value is to
 be returned. The default implementation will simply raise an
-error, so must be overriden in subclasses.
+error, so must be overridden in subclasses.
 
 =cut
 
@@ -527,7 +540,27 @@ sub _dispatch_prop_read {
 					       "no introspection data exported for properties");
     }
 
-    my ($pinterface, $pname) = $ins->decode($message, "methods", "Get", "params");
+    my ($pinterface, $pname, @pargs) = eval { $ins->decode($message, "methods", "Get", "params") };
+    if ($@) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "$@");
+    }
+    if (@pargs) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "too many parameters for method 'Get'");
+    }
+    if (not defined $pinterface) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "no interface was specified");
+    }
+    if (not defined $pname) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "no property was specified for interface '$pinterface'");
+    }
 
     if (!$ins->has_property($pname, $pinterface)) {
 	return $connection->make_error_message($message,
@@ -569,7 +602,22 @@ sub _dispatch_all_prop_read {
 					       "no introspection data exported for properties");
     }
 
-    my ($pinterface) = $ins->decode($message, "methods", "Get", "params");
+    my ($pinterface, @pargs) = eval { $ins->decode($message, "methods", "GetAll", "params") };
+    if ($@) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "$@");
+    }
+    if (@pargs) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "too many parameters for method 'GetAll'");
+    }
+    if (not defined $pinterface) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "no interface was specified");
+    }
 
     my %values = ();
     foreach my $pname ($ins->list_properties($pinterface)) {
@@ -589,7 +637,7 @@ sub _dispatch_all_prop_read {
 
     my $reply = $connection->make_method_return_message($message);
 
-    $self->_introspector->encode($reply, "methods", "Get", "returns", \%values);
+    $self->_introspector->encode($reply, "methods", "GetAll", "returns", \%values);
     return $reply;
 }
 
@@ -606,7 +654,32 @@ sub _dispatch_prop_write {
 					       "no introspection data exported for properties");
     }
 
-    my ($pinterface, $pname, $pvalue) = $ins->decode($message, "methods", "Set", "params");
+    my ($pinterface, $pname, $pvalue, @pargs) = eval { $ins->decode($message, "methods", "Set", "params") };
+    if ($@) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "$@");
+    }
+    if (@pargs) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "too many parameters for method 'Set'");
+    }
+    if (not defined $pinterface) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "no interface was specified");
+    }
+    if (not defined $pname) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "no property was specified for interface '$pinterface'");
+    }
+    if (not defined $pvalue) {
+	return $connection->make_error_message($message,
+					       "org.freedesktop.DBus.Error.Failed",
+					       "no value was specified for property '$pname' in interface '$pinterface'");
+    }
 
     if (!$ins->has_property($pname, $pinterface)) {
 	return $connection->make_error_message($message,

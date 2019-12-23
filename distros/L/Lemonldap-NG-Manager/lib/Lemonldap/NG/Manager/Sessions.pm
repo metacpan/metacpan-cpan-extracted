@@ -99,6 +99,7 @@ sub sessions {
     my $params = $req->parameters();
     my $type   = delete $params->{sessionType};
     $type = $type eq 'global' ? 'SSO' : ucfirst($type);
+    $type = $type eq 'Offline' ? 'OIDCI' : ucfirst($type);
 
     my $res;
 

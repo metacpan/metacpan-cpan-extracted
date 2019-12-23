@@ -1727,10 +1727,6 @@
     "title": "samlAttributeAuthorityDescriptor"
   }, {
     "_nodes": [{
-      "default": "lemonldapidp",
-      "id": "samlIdPResolveCookie",
-      "title": "samlIdPResolveCookie"
-    }, {
       "default": 1,
       "id": "samlMetadataForceUTF8",
       "title": "samlMetadataForceUTF8",

@@ -286,6 +286,12 @@ int OS_CreateLocalIpcFd(const char *bindPath, int backlog)
     short   port = 0;
     char    host[MAXPATHLEN];
 
+    if (strlen(bindPath) >= MAXPATHLEN) {
+	    fprintf(stderr,
+            "Listening socket path is longer than %d bytes -- exiting!\n",
+            MAXPATHLEN);
+	    exit(1);
+    }
     strcpy(host, bindPath);
     if((tp = strchr(host, ':')) != 0) {
 	*tp++ = 0;
@@ -389,6 +395,10 @@ int OS_FcgiConnect(char *bindPath)
     short   port = 0;
     int	    tcp = FALSE;
 
+    if (strlen(bindPath) >= MAXPATHLEN) {
+	    fprintf(stderr, "Listening socket path is too long\n");
+	    exit(1000);
+    }
     strcpy(host, bindPath);
     if((tp = strchr(host, ':')) != 0) {
 	*tp++ = 0;

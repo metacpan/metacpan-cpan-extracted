@@ -1,5 +1,8 @@
 Revision history for File-Update
 
+0.2.0       2019-12-19
+    - Add write_on_change_raw().
+
 0.0.3       2018-10-07
     - Add a modify_on_change example.
 

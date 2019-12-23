@@ -17,7 +17,7 @@ use App::Git::Workflow::Repository qw//;
 use App::Git::Workflow;
 use base qw/App::Git::Workflow/;
 
-our $VERSION = version->new(1.1.11);
+our $VERSION = version->new(1.1.12);
 
 sub new {
     my $class = shift;
@@ -168,7 +168,7 @@ App::Git::Workflow::Pom - Tools for maven POM files with git
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow::Pom version 1.1.11
+This documentation refers to App::Git::Workflow::Pom version 1.1.12
 
 =head1 SYNOPSIS
 

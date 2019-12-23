@@ -11,7 +11,7 @@ use base qw/ Class::Accessor::Fast /;
 
 use IO::Socket 1.18 ();
 
-our $VERSION = 'v0.3.4';
+our $VERSION = 'v0.3.5';
 
 
 __PACKAGE__->mk_ro_accessors(
@@ -161,7 +161,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.3.4
+version v0.3.5
 
 =head1 SYNOPSIS
 
@@ -246,7 +246,7 @@ packet.
 
 =head2 C<max_buffer_size>
 
-The specifies the maximum buffer size. It defaults to C<512>.
+Specifies the maximum buffer size. It defaults to C<512>.
 
 =head1 METHODS
 
@@ -370,6 +370,12 @@ Robert Rothenberg <rrwo@cpan.org>
 
 The initial development of this module was sponsored by Science Photo
 Library L<https://www.sciencephoto.com>.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Michael R. Davis
+
+Michael R. Davis <mrdvt@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

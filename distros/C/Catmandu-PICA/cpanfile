@@ -7,7 +7,7 @@ on 'test', sub {
 };
 
 requires 'perl', '5.12.0';
-requires 'Catmandu', '1.0601';
-requires 'PICA::Data', '1.00';
+requires 'Catmandu', '1.20';
+requires 'PICA::Data', '1.01';
 requires 'Moo', '1.0';
 requires 'Catmandu::SRU', '0.427';

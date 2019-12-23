@@ -1,10 +1,10 @@
 {
    "abstract" : "dirty patch for handling pathname on MSWin32::Ja_JP.cp932",
    "author" : [
-      "kpee  C<< <kpee.cpanx@gmail.com> >>"
+      "KPEE <kpee.cpanx@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.15",
+   "generated_by" : "Minilla/v3.0.18",
    "license" : [
       "perl_5"
    ],
@@ -66,21 +66,17 @@
       }
    },
    "provides" : {
-      "CORE::GLOBAL" : {
-         "file" : "lib/winja.pm"
-      },
       "winja" : {
          "file" : "lib/winja.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.4"
       }
    },
    "release_status" : "stable",
-   "version" : "1.0.3",
+   "version" : "1.0.4",
    "x_authority" : "cpan:KPEE",
    "x_contributors" : [
       "KPEE <kpee.cpan@gmail.com>",
-      "KPEE <kpee.cpanx@gmail.com>",
       "kpee <kpee.jp@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

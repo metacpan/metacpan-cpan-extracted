@@ -9,7 +9,7 @@ use Alien::Build::Plugin::Extract::CommandLine;
 use Alien::Build::Plugin::Extract::Directory;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '1.93'; # VERSION
+our $VERSION = '1.94'; # VERSION
 
 
 has '+format' => 'tar';
@@ -87,7 +87,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 1.93
+version 1.94
 
 =head1 SYNOPSIS
 

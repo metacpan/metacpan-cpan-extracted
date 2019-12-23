@@ -49,7 +49,7 @@
     <div class="input-group-prepend">
       <span class="input-group-text"><i class="fa fa-lock"></i></span>
     </div>
-    <input name="code" value="" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />
+    <input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />
    </div>
   </div>
   <div class="buttons mb-3">

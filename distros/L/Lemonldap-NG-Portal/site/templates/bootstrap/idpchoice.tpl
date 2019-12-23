@@ -42,21 +42,6 @@
       </TMPL_LOOP>
       </div>
 
-      <TMPL_IF NAME="REMEMBER">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <div class="input-group-text">
-            <input type="checkbox" id="remember" name="cookie_type" value="1" aria-describedby="rememberlabel">
-          </div>
-        </div>
-        <p class="form-control">
-          <label id="rememberlabel" for="remember">
-            <span trspan="rememberChoice">Remember my choice</span>
-          </label>
-        </p>
-      </div>
-      </TMPL_IF>
-
       <!-- //if:jsminified
         <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/idpchoice.min.js"></script>
       //else -->

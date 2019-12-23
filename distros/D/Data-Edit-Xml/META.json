@@ -4,7 +4,7 @@
       "philiprbrenan@gmail.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -23,7 +23,7 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::Table::Text" : "20191110",
+            "Data::Table::Text" : "20191221",
             "Storable" : "0",
             "Test2::API" : "0",
             "Test::More" : "0",
@@ -35,7 +35,7 @@
    "provides" : {
       "Data::Edit::Xml" : {
          "file" : "lib/Data/Edit/Xml.pm",
-         "version" : "20191119"
+         "version" : "20191121"
       },
       "ditaSyntaxDiagramFromDocBookCmdSynopsis" : {
          "file" : "lib/Data/Edit/Xml.pm"
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20191119",
+   "version" : "20191121",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

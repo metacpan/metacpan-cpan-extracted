@@ -9,7 +9,7 @@ use Carp;
 
 use Exporter qw{ import };
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 our @EXPORT_OK = qw{
     meta_merge
@@ -148,7 +148,7 @@ This subroutine returns the version of Perl required by the module.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

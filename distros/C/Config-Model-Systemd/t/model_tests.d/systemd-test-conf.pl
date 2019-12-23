@@ -9,18 +9,27 @@
 #
 # systemd tests (system files)
 
-# can be removed once Config::model::tester 3.002 is out
-$model_to_test = "Systemd";
+use strict;
+use warnings;
 
-$conf_dir = '/etc/systemd/system/';
+my $conf_dir = '/etc/systemd/system/';
 
-# list of tests. This modules looks for @tests global variable
-@tests = (
+# list of tests.
+my @tests = (
     {
         name => 'sshd-service',
         backend_arg => 'sshd',
         setup => {
             'main-sshd' => $conf_dir.'sshd.service.d/override.conf',
+            # create symlink from array elements to target file (the last of the array)
+            # TODO: update C::M::Tester version require
+            'ssh.service' => [ $conf_dir.'/sshd.service', '/lib/systemd/system/ssh.service' ]
+        },
+        check => {
+            'service:sshd Service ExecStartPre:0' => { mode => 'layered', value => '/usr/sbin/sshd -t'},
+            'service:sshd Service ExecReload:0' => { mode => 'layered', value => '/usr/sbin/sshd -t'},
+            'service:sshd Service ExecReload:1' => { mode => 'layered', value => '/bin/kill -HUP $MAINPID'},
+            'service:sshd Unit Description' => "OpenBSD Secure Shell server - test override",
         }
     },
 
@@ -66,4 +75,7 @@ $conf_dir = '/etc/systemd/system/';
 
 );
 
-1; # to keep Perl happy
+return {
+    tests => \@tests,
+    conf_dir => $conf_dir,
+}

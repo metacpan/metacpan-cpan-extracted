@@ -1,0 +1,55 @@
+NAME
+    RT::Extension::RelocateReply - relocate missplaced messages to the right
+    ticket
+
+DESCRIPTION
+    This extension for RT gives the ability to those who have the
+    RelocateReply right to relocate / move messages (comments or
+    correspondences) from one ticket to another. The relocation action
+    appears in both ticket's history width the current date. There will be
+    message at the original place stating the transaction transition.
+
+RT VERSION
+    Works with RT 4.4.
+
+INSTALLATION
+            sudo perl Makefile.PL
+
+            make
+
+            make install    
+
+        Add this line:
+
+            Plugin('RT::Extension::RelocateReply');
+
+        enable Read/Write rights for the rt user in the destination directory /usr/local/share/request-tracker4/plugins/RT-Extension-RelocateReply
+
+        = Clear your mason cache
+
+            rm -rf /opt/rt4/var/mason_data/obj
+
+        = Restart your webserver
+
+            Fazekas Bálint, Mithrandir kft. fazekas.balint@mithrandir.hu
+
+            Attila Kadar, Mithrandir Ltd. E<lt>attila.kadar@mithrandir.huE<gt>
+    =head1 BUGS
+    All bugs should be reported to the above address.
+    =head1 LICENSE
+    This is free software, licensed under:
+      The GNU General Public License, Version 2, June 1991
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 49:
+        =back doesn't take any parameters, but you said =back =head1 AUTHOR
+
+        =back without =over
+
+    Around line 52:
+        Non-ASCII character seen before =encoding in 'Bálint,'. Assuming
+        UTF-8
+

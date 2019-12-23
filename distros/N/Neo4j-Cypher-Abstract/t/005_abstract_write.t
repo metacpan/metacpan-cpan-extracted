@@ -142,4 +142,8 @@ is cypher->match('n:Actor')->return('n.name AS name')
 "MATCH (n:Actor) RETURN n.name AS name UNION MATCH (n:Movie) RETURN n.title AS name",
   '3.3.19.2 (2)';
 
+is cypher->merge(ptn->N('n:Actor', { name => 'Goofy' }))
+  ->on_create->set( { species => 'C. familiaris', iq => 70 }),
+  "MERGE (n:Actor {name:'Goofy'}) ON CREATE SET iq = 70,species = 'C. familiaris'";
+
 done_testing;

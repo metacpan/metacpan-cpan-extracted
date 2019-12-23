@@ -21,6 +21,7 @@
 *.cryptonomic.net;*.cryptonomic.net
 *.customer-oci.com;*.customer-oci.com
 *.dapps.earth;*.dapps.earth
+*.dev.adobeaemcloud.com;*.dev.adobeaemcloud.com
 *.dweb.link;*.dweb.link
 *.elb.amazonaws.com;*.elb.amazonaws.com
 *.elb.amazonaws.com.cn;*.elb.amazonaws.com.cn
@@ -204,6 +205,8 @@ ad.jp;ad.jp
 adac;adac
 adachi.tokyo.jp;adachi.tokyo.jp
 adm.br;adm.br
+adobeaemcloud.com;adobeaemcloud.com
+adobeaemcloud.net;adobeaemcloud.net
 ads;ads
 adult;adult
 adult.ht;adult.ht
@@ -1849,6 +1852,7 @@ design.museum;design.museum
 detroit.museum;detroit.museum
 dev;dev
 dev-myqnapcloud.com;dev-myqnapcloud.com
+dev.adobeaemcloud.com;dev.adobeaemcloud.com
 dev.static.land;dev.static.land
 dev.thingdust.io;dev.thingdust.io
 development.run;development.run
@@ -5834,6 +5838,7 @@ obi;obi
 obihiro.hokkaido.jp;obihiro.hokkaido.jp
 obira.hokkaido.jp;obira.hokkaido.jp
 obninsk.su;obninsk.su
+observableusercontent.com;observableusercontent.com
 observer;observer
 obu.aichi.jp;obu.aichi.jp
 obuse.nagano.jp;obuse.nagano.jp
@@ -7432,6 +7437,7 @@ stateofdelaware.museum;stateofdelaware.museum
 stathelle.no;stathelle.no
 static-access.net;static-access.net
 static.land;static.land
+static.observableusercontent.com;static.observableusercontent.com
 statics.cloud;statics.cloud
 station.museum;station.museum
 stavanger.no;stavanger.no
@@ -8197,6 +8203,7 @@ uzhgorod.ua;uzhgorod.ua
 uzs.gov.pl;uzs.gov.pl
 v-info.info;v-info.info
 v.bg;v.bg
+v.ua;v.ua
 va;va
 va.it;va.it
 va.no;va.no

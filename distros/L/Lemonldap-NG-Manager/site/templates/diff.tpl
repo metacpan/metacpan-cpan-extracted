@@ -5,7 +5,7 @@
   <link rel="prefetch" href="<TMPL_VAR NAME="STATIC_PREFIX">struct.json" />
 </head>
 
-<body ng-app="llngConfDiff" ng-controller="DiffCtrl" ng-csp>
+<body ng-app="llngConfDiff" ng-strict-di ng-controller="DiffCtrl" ng-csp>
 
   <TMPL_INCLUDE NAME="menubar.tpl">
 
@@ -16,7 +16,7 @@
     <aside id="left" class="col-lg-4 col-md-4 col-sm-5 col-xs-12 scrollable " ng-class="{'hidden-xs':!showT}" role="complementary">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <p class="panel-title text-center" trspan="diffViewer"></p>
+          <p class="panel-title text-center"> {{translate('diffViewer')}} </p>
         </div>
         <div class="panel-body">
           <div class="input-group input-group-sm">

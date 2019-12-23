@@ -1,3 +1,15 @@
+0.474   2019-12-20  Released-By: PERLANCAR; Urgency: low
+
+	- (Re-)enable tracing log statements, now only enabled on
+	  COMPLETE_GETOPT_LONG_TRACE=1.
+
+
+0.473   2019-12-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Complete::File 0.440 which now returns hash answer with
+	  path_sep already set to /.
+
+
 0.472   2019-09-10  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

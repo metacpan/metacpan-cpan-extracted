@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-04-23'; # DATE
-our $VERSION = '0.033'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.034'; # VERSION
 
 use 5.010;
 use strict;
@@ -73,7 +73,7 @@ delete-ini-key - Delete a key from INI configuration file
 
 =head1 VERSION
 
-This document describes version 0.033 of delete-ini-key (from Perl distribution App-INIUtils), released on 2019-04-23.
+This document describes version 0.034 of delete-ini-key (from Perl distribution App-INIUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 

@@ -83,7 +83,7 @@
 
   overScheme = {
     _whatToTrace: function(t, v, level, over) {
-      console.log('overSchema => level', level, 'over', over);
+      console.log('overScheme => level', level, 'over', over);
       if (level === 1 && v.length > over) {
         return t + "=" + v + "*&groupBy=substr(" + t + "," + (level + over + 1) + ")";
       } else {
@@ -91,7 +91,7 @@
       }
     },
     ipAddr: function(t, v, level, over) {
-      console.log('overSchema => level', level, 'over', over);
+      console.log('overScheme => level', level, 'over', over);
       if (level > 0 && level < 4 && !v.match(/^\d+\.\d/) && over < 2) {
         return t + "=" + v + "*&groupBy=net(" + t + "," + (16 * level + 4 * (over + 1)) + "," + (1 + level + over) + ")";
       } else {
@@ -99,7 +99,7 @@
       }
     },
     _startTime: function(t, v, level, over) {
-      console.log('overSchema => level', level, 'over', over);
+      console.log('overScheme => level', level, 'over', over);
       if (level > 3) {
         return t + "=" + v + "*&groupBy=substr(" + t + "," + (10 + level + over) + ")";
       } else {
@@ -107,7 +107,7 @@
       }
     },
     _session_uid: function(t, v, level, over) {
-      console.log('overSchema => level', level, 'over', over);
+      console.log('overScheme => level', level, 'over', over);
       if (level === 1 && v.length > over) {
         return t + "=" + v + "*&groupBy=substr(" + t + "," + (level + over + 1) + ")";
       } else {
@@ -511,7 +511,7 @@
         sessionType = 'global';
         if (n === null) {
           $scope.type = '_whatToTrace';
-        } else if (n[1].match(/^(persistent)$/)) {
+        } else if (n[1].match(/^(persistent|offline)$/)) {
           sessionType = RegExp.$1;
           $scope.type = '_session_uid';
         } else {

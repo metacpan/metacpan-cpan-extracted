@@ -2,9 +2,9 @@
 
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Path::Tiny qw/ path /;
-use File::Update qw/ modify_on_change write_on_change /;
+use File::Update qw/ modify_on_change write_on_change write_on_change_raw /;
 
 {
     my $dir = Path::Tiny->tempdir;
@@ -33,4 +33,10 @@ use File::Update qw/ modify_on_change write_on_change /;
 
     # TEST
     is_deeply( [ $f->slurp_utf8 ], ["third text"], "modify_on_change" );
+
+    $f = $dir->child("test-write_on_change_raw-1.txt");
+    write_on_change_raw( $f, \"\0foo" );
+
+    # TEST
+    is_deeply( [ $f->slurp_raw ], ["\0foo"], "write_on_change_raw" );
 }

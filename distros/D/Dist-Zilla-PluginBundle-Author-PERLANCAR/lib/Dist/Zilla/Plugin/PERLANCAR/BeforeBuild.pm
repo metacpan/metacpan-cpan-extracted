@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::PERLANCAR::BeforeBuild;
 
-our $DATE = '2019-10-20'; # DATE
-our $VERSION = '0.598'; # VERSION
+our $DATE = '2019-10-29'; # DATE
+our $VERSION = '0.599'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,7 +46,7 @@ Dist::Zilla::Plugin::PERLANCAR::BeforeBuild - Do stuffs before building
 
 =head1 VERSION
 
-This document describes version 0.598 of Dist::Zilla::Plugin::PERLANCAR::BeforeBuild (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-10-20.
+This document describes version 0.599 of Dist::Zilla::Plugin::PERLANCAR::BeforeBuild (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-10-29.
 
 =head1 SYNOPSIS
 

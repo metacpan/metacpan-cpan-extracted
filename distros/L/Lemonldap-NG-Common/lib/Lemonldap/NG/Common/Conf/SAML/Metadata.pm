@@ -26,7 +26,7 @@ sub serviceToXML {
     my ( $self, $conf, $type ) = @_;
 
     seek DATA, $dataStart, 0;
-    my $s = join '', <DATA>;
+    my $s        = join '', <DATA>;
     my $template = HTML::Template->new(
         scalarref         => \$s,
         die_on_bad_params => 0,

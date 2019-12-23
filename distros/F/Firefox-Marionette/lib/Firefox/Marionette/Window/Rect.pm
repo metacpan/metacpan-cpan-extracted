@@ -3,7 +3,7 @@ package Firefox::Marionette::Window::Rect;
 use strict;
 use warnings;
 
-our $VERSION = '0.85';
+our $VERSION = '0.87';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -45,7 +45,7 @@ Firefox::Marionette::Window::Rect - Represents the browser window's shape and si
 
 =head1 VERSION
 
-Version 0.85
+Version 0.87
 
 =head1 SYNOPSIS
 

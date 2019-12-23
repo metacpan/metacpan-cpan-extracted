@@ -1,7 +1,15 @@
 Revision history for Perl module Package::New
 
+0.08 2019-12-14
+  - Updated t/001_load.t - Added test cases from cpancover.com
+  - Added t/004_dump.t - Added test cases from cpancover.com
+  - Updated lib/Package/New/Dump.pm - Slightly refactored dump method
+
 0.07 2011-12-01
   - Cleaned up for Fedora 16
+
+0.06 2011-08-01
+  - Abandoned Fork
 
 0.05_2 2011-02-24
   - Documentation

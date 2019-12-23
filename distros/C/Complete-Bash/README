@@ -2,8 +2,8 @@ NAME
     Complete::Bash - Completion routines for bash shell
 
 VERSION
-    This document describes version 0.330 of Complete::Bash (from Perl
-    distribution Complete-Bash), released on 2019-08-20.
+    This document describes version 0.332 of Complete::Bash (from Perl
+    distribution Complete-Bash), released on 2019-12-22.
 
 DESCRIPTION
     This module provides routines related to tab completion in bash shell.
@@ -166,6 +166,10 @@ FUNCTIONS
               --sort     -- Specify sort order
 
             which is quite helpful.
+
+        *   workaround_with_wordbreaks
+
+            Boolean. Default is true. See source code for more details.
 
     Return value: Formatted string (or array, if `as` is set to `array`)
     (str|array)
@@ -364,6 +368,9 @@ FUNCTIONS
     Return value: (any)
 
 ENVIRONMENT
+  COMPLETE_BASH_DEFAULT_ESC_MODE
+    Str.
+
   COMPLETE_BASH_FZF
     Bool. Whether to pass large completion answer to fzf instead of directly
     passing it to bash and letting bash page it with a simpler more-like

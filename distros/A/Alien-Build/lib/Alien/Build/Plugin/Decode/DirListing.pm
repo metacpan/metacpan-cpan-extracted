@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use File::Basename ();
 
 # ABSTRACT: Plugin to extract links from a directory listing
-our $VERSION = '1.93'; # VERSION
+our $VERSION = '1.94'; # VERSION
 
 
 sub init
@@ -58,7 +58,7 @@ Alien::Build::Plugin::Decode::DirListing - Plugin to extract links from a direct
 
 =head1 VERSION
 
-version 1.93
+version 1.94
 
 =head1 SYNOPSIS
 

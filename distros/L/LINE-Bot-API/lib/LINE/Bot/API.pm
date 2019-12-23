@@ -1,7 +1,7 @@
 package LINE::Bot::API;
 use strict;
 use warnings;
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use LINE::Bot::API::Builder::SendMessage;
 use LINE::Bot::API::Client;
@@ -19,6 +19,11 @@ use LINE::Bot::API::Response::TargetLimit;
 use LINE::Bot::API::Response::TotalUsage;
 use LINE::Bot::API::Response::Token;
 
+use constant {
+    DEFAULT_MESSAGING_API_ENDPOINT => 'https://api.line.me/v2/bot/',
+    DEFAULT_SOCIAL_API_ENDPOINT    => 'https://api.line.me/v2/oauth/',
+    DEFAULT_CONTENT_API_ENDPOINT   => 'https://api-data.line.me/',
+};
 use Furl;
 use Carp 'croak';
 
@@ -31,7 +36,9 @@ sub new {
         client               => $client,
         channel_secret       => $args{channel_secret},
         channel_access_token => $args{channel_access_token},
-        messaging_api_endpoint     => $args{messaging_api_endpoint} // 'https://api.line.me/v2/bot/',
+        messaging_api_endpoint => $args{messaging_api_endpoint} // DEFAULT_MESSAGING_API_ENDPOINT,
+        social_api_endpoint    => $args{social_api_endpoint} // DEFAULT_SOCIAL_API_ENDPOINT,
+        content_api_endpoint => $args{content_api_endpoint} // DEFAULT_CONTENT_API_ENDPOINT,
     }, $class;
 }
 
@@ -40,6 +47,15 @@ sub request {
 
     return $self->{client}->$method(
         $self->{messaging_api_endpoint} .  $path,
+        @payload,
+    );
+}
+
+sub request_content {
+    my ($self, $method, $path, @payload) = @_;
+
+    return $self->{client}->$method(
+        $self->{content_api_endpoint} .  $path,
         @payload,
     );
 }
@@ -98,7 +114,7 @@ sub broadcast {
 
 sub get_message_content {
     my($self, $message_id, %options) = @_;
-    my $res = $self->request(
+    my $res = $self->request_content(
         'contents_download' => "message/$message_id/content",
         %options
     );
@@ -265,18 +281,18 @@ sub unlink_rich_menu_from_multiple_users {
 }
 
 sub upload_rich_menu_image {
-    my ($self, $richMenuId, $contentType, $filePath) = @_;
+    my ($self, $rich_menu_id, $content_type, $file_path) = @_;
 
-    if (!$contentType) {
-        croak 'Need ContentType';
+    if (!$content_type) {
+        croak 'Need content_type';
     }
 
     my $res = $self->{client}->post_image(
-        "https://api.line.me/v2/bot/richmenu/$richMenuId/content",
+        $self->{content_api_endpoint} . "v2/bot/richmenu/$rich_menu_id/content",
         [
-            'Content-Type' => $contentType,
+            'Content-Type' => $content_type,
         ],
-        $filePath
+        $file_path
     );
 
     if ($res->{http_status} eq '200') {
@@ -287,11 +303,19 @@ sub upload_rich_menu_image {
 
 }
 
+sub download_rich_menu_image {
+    my ($self, $rich_menu_id) = @_;
+
+    return $self->{client}->get_content(
+        $self->{content_api_endpoint} . "v2/bot/richmenu/$rich_menu_id/content"
+    );
+}
+
 sub issue_channel_access_token {
     my ($self, $opts) = @_;
 
     my $res = $self->{client}->post_form(
-        'https://api.line.me/v2/oauth/accessToken',
+        $self->{social_api_endpoint} . 'accessToken',
         undef,
         [
             grant_type    => 'client_credentials',
@@ -309,8 +333,9 @@ sub issue_channel_access_token {
 
 sub revoke_channel_access_token {
     my ($self, $opts) = @_;
+
     my $res = $self->{client}->post_form(
-        'https://api.line.me/v2/oauth/revoke',
+        $self->{social_api_endpoint} . 'revoke',
         undef,
         [
             access_token => $opts->{access_token},

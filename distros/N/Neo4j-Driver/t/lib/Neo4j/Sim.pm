@@ -166,7 +166,7 @@ To do so, it replays canned copies of earlier real responses from a live Neo4j
 server that have been stored in a repository.
 
 To populate the repository of canned responses used by the simulator,
-insert these lines of code:
+create an empty directory t/simulator and insert these lines of code:
 
 	use lib qw(./t/lib);
 	use Neo4j::Sim;

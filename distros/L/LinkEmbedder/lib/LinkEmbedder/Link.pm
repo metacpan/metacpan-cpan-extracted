@@ -19,17 +19,14 @@ my @JSON_ATTRS = (
   'version',          'width'
 );
 
-has author_name  => undef;
-has author_url   => undef;
-has cache_age    => 0;
-has description  => '';
-has error        => undef;                                                # {message => "", code => ""}
-has force_secure => 0;
-has height       => sub { $_[0]->type =~ /^photo|video$/ ? 0 : undef };
-
-has placeholder_url => sub {
-  return sprintf 'https://placehold.it/200x200?text=%s', shift->provider_name;
-};
+has author_name     => undef;
+has author_url      => undef;
+has cache_age       => 0;
+has description     => '';
+has error           => undef;                                                # {message => "", code => ""}
+has force_secure    => 0;
+has height          => sub { $_[0]->type =~ /^photo|video$/ ? 0 : undef };
+has placeholder_url => '';
 
 has provider_name => sub {
   return undef unless my $name = shift->url->host;

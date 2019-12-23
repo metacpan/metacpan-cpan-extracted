@@ -1,0 +1,48 @@
+our $VERSION = '0.09';
+
+=head1 NAME
+
+OpenTracing::Interface - API definition for OpenTransport implementations
+
+=head1 DESCRIPTION
+
+=head2 Required Reading
+
+In order to understand the Perl platform API, one must first be familiar with
+L<the OpenTracing project|http://opentracing.io/>
+and
+L<terminology|http://opentracing.io/documentation/pages/spec>
+more generally.
+
+=head1 SYNOPSIS
+
+=head2 Singleton Initialization
+
+    use Package::Alias 'OpenTracing' => 'Perceptyx::OpenTracing';
+    
+    OpenTracing->set_global_tracer( Some::Tracer::Implementation->new( ... ) );
+    
+=cut
+
+=head1 ABOUT
+
+The interfaces are being defined as roles ( using L<Role::Tiny> ) and use
+C<around> method modifiers, instead of C<require>, we do want to wrap the method
+in type checking ( using L<Type::Tiny> and friends ).
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+

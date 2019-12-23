@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Funnel::Marker::Colorbar::Title::Font;
 
-our $VERSION = '0.034';    # VERSION
+our $VERSION = '0.035';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace funnel.
 
@@ -67,7 +67,7 @@ Chart::Plotly::Trace::Funnel::Marker::Colorbar::Title - This attribute is one of
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 

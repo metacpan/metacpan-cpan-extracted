@@ -7,7 +7,7 @@ my %WriteMakefileArgs = (
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/App/git/ship.pm',
   VERSION_FROM   => 'lib/App/git/ship.pm',
-  EXE_FILES      => [qw(script/git-ship script/git-ship.bak)],
+  EXE_FILES      => [qw(script/git-ship)],
   BUILD_REQUIRES => {}
 ,
   TEST_REQUIRES  => {

@@ -14,7 +14,7 @@ my $client = LLNG::Manager::Test->new( {
             authentication           => 'Demo',
             userdb                   => 'Same',
             portalForceAuthn         => 1,
-            portalForceAuthnInterval => 2,
+            portalForceAuthnInterval => 5,
         }
     }
 );
@@ -32,8 +32,8 @@ expectOK($res);
 my $id1 = expectCookie($res);
 count(1);
 
-diag 'Waiting';
-sleep 3;
+# Skip ahead in time
+Time::Fake->offset("+30s");
 
 ok(
     $res = $client->_get(

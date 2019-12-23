@@ -1,3 +1,0 @@
-package NotAThing;
-
-1;

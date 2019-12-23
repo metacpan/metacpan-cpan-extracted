@@ -1,5 +1,5 @@
 package NewsExtractor;
-our $VERSION = v0.0.4;
+our $VERSION = v0.0.7;
 use Moo;
 
 use Mojo::UserAgent;
@@ -18,7 +18,7 @@ sub download {
     my NewsExtractor $self = shift;
 
     my $ua = Mojo::UserAgent->new()->transactor(
-        Mojo::UserAgent::Transactor->new()->name('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:67.0) Gecko/20100101 Firefox/67.0')
+        Mojo::UserAgent::Transactor->new()->name('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:71.0) Gecko/20100101 Firefox/71.0')
     )->max_redirects(3);
 
     my ($error, $download);

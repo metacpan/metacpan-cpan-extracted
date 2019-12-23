@@ -22,12 +22,12 @@ mkdirs (qw(dir1 dir2 foo));
 
 test_complete(
     word      => '',
-    result    => [qw(dir1/ dir2/ foo/)],
+    result    => {path_sep=>'/', words=>[qw(dir1/ dir2/ foo/)]},
 );
 
 DONE_TESTING:
 $CWD = "/";
-done_testing();
+done_testing;
 
 sub test_complete {
     my (%args) = @_;

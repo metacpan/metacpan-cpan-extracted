@@ -1,4 +1,6 @@
 Revision history for Perl extension Log::Syslog::Fast.
+0.67   Mon Dec 16 13:10:06 PST 2019
+        - Fix missing manifest entry (RT#131175)
 0.66   Sun Dec  8 21:44:56 GMT 2019
         - Add LOG_RFC3164_LOCAL mode for logging without a hostname,
           courtesy of mikechris@github.

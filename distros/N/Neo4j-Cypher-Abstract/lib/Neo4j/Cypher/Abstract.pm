@@ -18,7 +18,7 @@ our $AUTOLOAD;
 sub puke(@);
 sub belch(@);
 
-our $VERSION='0.1002';
+our $VERSION='0.1003';
 
 # let an Abstract object keep its own stacks of clauses
 # rather than clearing an existing Abstract object, get
@@ -117,6 +117,17 @@ sub create {
   }
   else {
     $self->_add_clause('create',@_);
+  }
+}
+
+sub set {
+  my $self = shift;
+  # interpret a hashref argument as a set of key = value pairs
+  if (ref $_[0] eq 'HASH' && @_ == 1) {
+    $self->_add_clause('set', map { { $_ => $_[0]->{$_} } } sort keys %{$_[0]} )
+  }
+  else {
+    $self->_add_clause('set',@_);
   }
 }
 

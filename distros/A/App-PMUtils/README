@@ -2,8 +2,8 @@ NAME
     App::PMUtils - Command-line utilities related to Perl modules
 
 VERSION
-    This document describes version 0.728 of App::PMUtils (from Perl
-    distribution App-PMUtils), released on 2019-10-17.
+    This document describes version 0.729 of App::PMUtils (from Perl
+    distribution App-PMUtils), released on 2019-12-15.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -51,6 +51,8 @@ SYNOPSIS
 
     *   pmuninst
 
+    *   pmunlink
+
     *   pmversion
 
     *   pmxs
@@ -88,7 +90,7 @@ FUNCTIONS
 
         Absolutify each path.
 
-    *   module* => *perl::modnames*
+    *   module* => *array[perl::modname]*
 
     *   pm => *int* (default: 1)
 
@@ -124,7 +126,7 @@ FUNCTIONS
 
     *   all => *bool*
 
-        Return all found files for each module instead of the first one.
+        Get all found files for each module instead of the first one.
 
     *   dir => *bool*
 
@@ -137,7 +139,7 @@ FUNCTIONS
 
         and it won't change directory if the module doesn't exist.
 
-    *   module* => *perl::modnames*
+    *   module* => *array[perl::modname]*
 
     *   pm => *int* (default: 1)
 
@@ -146,6 +148,48 @@ FUNCTIONS
     *   pod => *int* (default: 0)
 
     *   prefix => *int* (default: 0)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pmunlink
+    Usage:
+
+     pmunlink(%args) -> [status, msg, payload, meta]
+
+    Unlink (remove) locally installed Perl module.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *bool*
+
+        Get all found files for each module instead of the first one.
+
+    *   module* => *array[perl::modname]*
+
+    *   pm => *int* (default: 1)
+
+    *   pmc => *int* (default: 0)
+
+    *   pod => *int* (default: 0)
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
 
     Returns an enveloped result (an array).
 

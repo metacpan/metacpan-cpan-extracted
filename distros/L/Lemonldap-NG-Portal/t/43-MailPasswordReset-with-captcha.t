@@ -54,7 +54,7 @@ m%<a class="btn btn-secondary" href="http://auth.example.com/resetpwd\?skin=boot
 
     # Check captcha
     my ($token) = ( $query =~ /token=([^&]+)/ );
-    ok( $res->[2]->[0] =~ m#<img src="data:image/png;base64#,
+    ok( $res->[2]->[0] =~ m#<img id="captcha" src="data:image/png;base64#,
         ' Captcha image inserted' );
 
     # Try to get captcha value

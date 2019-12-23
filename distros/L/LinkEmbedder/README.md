@@ -8,6 +8,10 @@ LinkEmbedder - Embed / expand oEmbed resources and other URL / links
 
     my $embedder = LinkEmbedder->new(force_secure => 1);
 
+    # In some cases, you have to set a proper user_agent to get complete
+    # pages. This is done automatically by $embedder->serve()
+    $embedder->ua->transactor->name("Mozilla...");
+
     $embedder->get_p("https://xkcd.com/927")->then(sub {
       my $link = shift;
       print $link->html;
@@ -111,7 +115,8 @@ about the URL.
     $self = $self->serve(Mojolicious::Controller->new, $url);
 
 Used as a helper for [Mojolicious](https://metacpan.org/pod/Mojolicious) web applications to reply to an oEmbed
-request.
+request. Will also set ["name" in Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo::UserAgent::Transactor#name) for ["ua"](#ua) if
+the incoming request contains a "User-Agent" header.
 
 # AUTHOR
 

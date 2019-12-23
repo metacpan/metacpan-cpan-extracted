@@ -6,7 +6,7 @@ use Carp qw(croak carp);
 use strict;
 use warnings;
 BEGIN {
-  $REST::Neo4p::Relationship::VERSION = '0.3020';
+  $REST::Neo4p::Relationship::VERSION = '0.3030';
 }
 
 sub new {
@@ -37,7 +37,7 @@ sub as_simple {
   my $self = shift;
   my $ret;
   my $props = $self->get_properties;
-  $ret->{_relationship} = $$self;
+  $ret->{_relationship} = $$self + 0;
   $ret->{_type} = $self->type;
   $ret->{_start} = ${$self->start_node};
   $ret->{_end} = ${$self->end_node};
@@ -90,6 +90,12 @@ Creates the relationship given by the scalar third argument between
 the first argument and second argument, both C<REST::Neo4p::Node>
 objects. An optional fourth argument is a hashref of I<relationship> 
 properties.
+
+=item remove()
+
+ $reln->remove()
+
+Removes the relationship from the database.
 
 =item get_property()
 

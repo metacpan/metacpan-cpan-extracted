@@ -60,10 +60,15 @@ ok(
     ),
     'Upgrade session query'
 );
-count(1);
 
 my ( $host, $url, $query ) =
   expectForm( $res, undef, '/upgradesession', 'confirm', 'url' );
+ok( $res->[2]->[0] =~ qq%<img src="/static/common/logos/logo_llng_400px.png"%,
+    'Found custom Main Logo' )
+  or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ m%<span id="languages"></span>%, ' Language icons found' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(3);
 
 # Accept session upgrade
 # ----------------------
@@ -109,7 +114,7 @@ $pdata = expectCookie( $res, 'lemonldappdata' );
 
 ok(
     $res->[2]->[0] =~
-qr%<input name="code" value="" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
+qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);

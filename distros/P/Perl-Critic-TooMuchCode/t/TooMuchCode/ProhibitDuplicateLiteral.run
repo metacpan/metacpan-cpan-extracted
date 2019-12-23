@@ -1,0 +1,20 @@
+## name trivial
+## failures 0
+## cut
+
+print 42;
+print 43;
+
+## name simple
+## failures 1
+## cut
+
+print "Forty two";
+print "Forty two";
+
+## name With different quote.
+## failures 1
+## cut
+
+say 'Forty two';
+say "Forty two";

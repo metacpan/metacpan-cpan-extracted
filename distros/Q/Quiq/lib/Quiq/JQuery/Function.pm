@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Unindent;
 
@@ -27,13 +27,43 @@ Diese Klasse erweitert das jQuery-Objekt um nützliche Funktionen.
 
 =head1 METHODS
 
+=head2 Konstruktor
+
+=head3 new() - Instantiiere Objekt
+
+=head4 Synopsis
+
+  $jq = $class->new;
+
+=head4 Returns
+
+Path-Objekt
+
+=head4 Description
+
+Instantiiere ein Objekt der Klasse und liefere eine Referenz auf
+dieses Objekt zurück. Da die Klasse nur Klassenmethoden enthält,
+hat das Objekt lediglich die Aufgabe, eine abkürzende
+Aufrufschreibweise zu ermöglichen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub new {
+    my $class = shift;
+    return bless \(my $dummy),$class;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Klassenmethoden
 
 =head3 formatDate() - JavaScript-Code der Funktion
 
 =head4 Synopsis
 
-  $javaScript = $class->formatDate;
+  $javaScript = $this->formatDate;
 
 =head4 Description
 
@@ -122,7 +152,7 @@ Buch L<jQuery in Action, Third Edition|https://www.manning.com/books/jquery-in-a
 # -----------------------------------------------------------------------------
 
 sub formatDate {
-    my $class = shift;
+    my $this = shift;
 
     return Quiq::Unindent->hereDoc(<<'    __JS__');
     (function($) {
@@ -229,9 +259,56 @@ sub formatDate {
 
 # -----------------------------------------------------------------------------
 
+=head3 ready() - Erzeuge JQuery Ready-Handler
+
+=head4 Synopsis
+
+  $handler = $this->ready($js);
+
+=head4 Arguments
+
+=over 4
+
+=item $js
+
+JavaScript-Code (String).
+
+=back
+
+=head4 Returns
+
+JQuery Ready-Handler (String)
+
+=head4 Description
+
+Fasse JavaScript-Code $js in einen JQuery Ready-Handler ein und liefere
+den resultierenden JavaScript-Code zurück. Der Ready-Handler hat
+den Aufbau
+
+  $(function() {
+      <JAVASCRIPT>
+  });
+
+=head4 See Also
+
+L<https://api.jquery.com/ready/>
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub ready {
+    my $this = shift;
+    my $body = Quiq::Unindent->trim(shift);
+    $body =~ s/^/    /mg;
+    return "\$(function() {\n$body\n});"
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

@@ -8,7 +8,7 @@ use Moo;
 with "Dancer2::Plugin::Auth::Extensible::Role::Provider";
 use namespace::clean;
 
-our $VERSION = '0.702';
+our $VERSION = '0.703';
 
 =head1 NAME 
 
@@ -68,28 +68,28 @@ has basedn => (
 This must be the distinguished name of a user capable of binding to
 and reading the directory (e.g. 'cn=admin,dc=example,dc=com').
 
-Required.
+Not required, as some LDAP setups allow for anonymous binding.
 
 =cut
 
 has binddn => (
     is       => 'ro',
     isa      => Str,
-    required => 1,
+    required => 0,
 );
 
 =head2 bindpw
 
 The password for L</binddn>.
 
-Required.
+Not required, as some LDAP setups allow for anonymous binding.
 
 =cut
 
 has bindpw => (
     is       => 'ro',
     isa      => Str,
-    required => 1,
+    required => 0,
 );
 
 =head2 username_attribute
@@ -179,6 +179,30 @@ has role_member_attribute => (
     default => 'member',
 );
 
+sub _bind_ldap {
+    my ( $self, $username, $dummy, $password ) = @_;
+
+    my $ldap = $self->ldap or return;
+
+    # If either username or password is defined, ensure we have both,
+    # otherwise we cannot bind to LDAP. Otherwise, assume we are going
+    # to anonymously bind.
+    my $mesg;
+    if( !defined $username && !defined $password ) {
+        $self->plugin->app->log( debug => "Binding to LDAP anonymously" );
+        $mesg = $ldap->bind;
+    }
+    else {
+        croak "username and password must be defined"
+            unless defined $username && defined $password;
+
+        $self->plugin->app->log( debug => "Binding to LDAP with credentials" );
+        $mesg = $ldap->bind( $username, password => $password );
+    }
+
+    return $mesg;
+}
+
 =head1 METHODS
 
 =head2 ldap
@@ -207,7 +231,7 @@ sub authenticate_user {
 
     my $ldap = $self->ldap or return;
 
-    my $mesg = $ldap->bind( $user->{dn}, password => $password );
+    my $mesg = $self->_bind_ldap( $user->{dn}, password => $password );
 
     $ldap->unbind;
     $ldap->disconnect;
@@ -227,7 +251,7 @@ sub get_user_details {
 
     my $ldap = $self->ldap or return;
 
-    my $mesg = $ldap->bind( $self->binddn, password => $self->bindpw );
+    my $mesg = $self->_bind_ldap( $self->binddn, password => $self->bindpw );
 
     if ( $mesg->is_error ) {
         croak "LDAP bind error: " . $mesg->error;

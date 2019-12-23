@@ -37,7 +37,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Business::ISBN" : "2.010",
+            "Business::ISBN" : "3.005",
+            "Business::ISBN::Data" : "20191107",
             "Business::ISSN" : "0.91",
             "Catmandu" : "1.10",
             "Data::UUID::MT" : "1.001",
@@ -53,6 +54,7 @@
       },
       "test" : {
          "requires" : {
+            "HTTP::Response" : "0",
             "Log::Any::Test" : "1.03",
             "Test::Deep" : "0.112",
             "Test::Exception" : "0.32",
@@ -74,7 +76,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-Identifier"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [
       "brian d foy <brian.d.foy@gmail.com>",
       "Ere Maijala <ere.maijala@helsinki.fi>",
@@ -83,7 +85,7 @@
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"
    ],
    "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
    "x_static_install" : 1
 }
 

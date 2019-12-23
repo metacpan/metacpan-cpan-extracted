@@ -9,38 +9,15 @@ This software has pre-release quality. The interface is not yet stable.
 
 =over
 
-=item * Write tests.
-
-=item * Remove C<close> method.
-
-=item * Consider if the 6 second timeout is too long. It should in fact be as
-short as reasonably possible.
-
-=item * The driver should accept a setting that specifies the expected server
-version. The driver could use this to work around server bugs or known
-differences between versions, such as the Cypher parameter syntax. If not used,
-the default should be to use the most recent version. Neo4j appears to use
-SemVer versioning, but in order to avoid a C<SemVer> dependency here, it's
-probably best to rely just on C<< version->declare >>. (The exact behaviour
-must be documented.) That could look like this:
-C<< $d = Neo4j::Driver->new; $d->{server} = 'v3.2.1'; >>
-
-=item * An C<option> method could be provided to supply rarely needed settings
-to the driver or session, such as the network timeout, the expected server
-version or whether or not to request graph results. So far, such settings are
-set using attributes. An C<option> method would be chainable by returning
-C<$self>. Using it could look like this:
-C<< $d = Neo4j::Driver->new->option(timeout => 10)->basic_auth('neo4j', 'neo4j') >>
+=item * A uri string only containing protocol should yield the default host and
+port. For example, C<< Neo4j::Driver->new('bolt:') >> should be enough to get
+a driver configured for C<bolt://localhost:7687>.
 
 =back
 
 =head2 L<Neo4j::Driver::Session>
 
 =over
-
-=item * Remove C<close> method. L<Neo4j::Bolt::Cxn> automatically closes the
-connection in the destructor, and HTTP transactions are rolled back on timeout,
-so an explicit C<close> method quite simply is superfluous.
 
 =item * Sessions of some of the official drivers can have at most one
 transaction running at a time. This restriction is not necessary for this Perl
@@ -88,14 +65,6 @@ C<< $client->getUseragent->add_handler(response_header => sub { $status_line = s
 However, this is probably slower and would likely need to be run for each and
 every POST including those with C<2xx> status codes, which might not be
 acceptable.
-
-=item * Disabling C<die_on_error> probably makes errors harder to find, but has
-no clear advantages. In particular, errors are often missing the proper header
-fields for the commit URL etc., so it's likely the failed request doesn't
-produce useful return values and the next request will fail anyway with a
-misleading error message due to the URLs being corrupted. This feature is not
-present in the official drivers anyway; it was inspired by Neo4p and should
-probably be removed completely.
 
 =item * Consider supporting re-using C<Record> objects for query parameters in
 C<run>. The Java and C# drivers do this.
@@ -191,6 +160,22 @@ provides stats, and different APIs for HTTP and Bolt seem like a bad idea.
 =over
 
 =item * C<use Class::Accessor::Fast 0.34;>
+
+=back
+
+=head2 L<Neo4j::Driver::Transport::HTTP>
+
+=over
+
+=item * Profile whether X-Stream has any performance impact. Remove if
+in doubt, as we don't implement streaming (and have no plans to in the
+future, considering that Bolt should be used when speed is important).
+
+=item * Add C<Accept-Charset: UTF-8> header, I guess.
+
+=item * Since all methods in this class are private, they should perhaps
+all have names beginning with C<_> to make this perfectly clear. This
+might also help to improve POD coverage.
 
 =back
 

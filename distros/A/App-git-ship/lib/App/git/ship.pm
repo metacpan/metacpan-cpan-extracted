@@ -12,7 +12,7 @@ use Mojo::Util qw(decode encode);
 use constant DEBUG  => $ENV{GIT_SHIP_DEBUG}  || 0;
 use constant SILENT => $ENV{GIT_SHIP_SILENT} || 0;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 # Need to be overridden in subclass
 sub build { $_[0]->abort('build() is not available for %s', ref $_[0]) }
@@ -260,7 +260,7 @@ App::git::ship - Git command for shipping your project
 
 =head1 VERSION
 
-0.34
+0.35
 
 =head1 SYNOPSIS
 

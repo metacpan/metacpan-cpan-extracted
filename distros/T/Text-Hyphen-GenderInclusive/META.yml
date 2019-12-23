@@ -1,0 +1,40 @@
+---
+abstract: 'get hyphenation positions with inclusive gender markers'
+author:
+  - 'Mario Domgoergen `<mario@domgoergen.com>`'
+build_requires:
+  Text::Hyphen::DE: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Hyphen-GenderInclusive
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Hyphen::GenderInclusive:
+    file: lib/Text/Hyphen/GenderInclusive.pm
+    version: '1.00'
+requires:
+  Text::Hyphen: '0'
+resources:
+  bugtracker: https://github.com/mdom/Text-Hyphen-GenderInclusive/issues
+  homepage: https://github.com/mdom/Text-Hyphen-GenderInclusive
+  repository: git://github.com/mdom/Text-Hyphen-GenderInclusive.git
+version: '1.00'
+x_contributors:
+  - 'Mario Domgoergen <mdom@taz.de>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -18,7 +18,7 @@ my $client = LLNG::Manager::Test->new( {
             checkUser                      => 1,
             requireToken                   => 1,
             tokenUseGlobalStorage          => 0,
-            formTimeout                    => 2,
+            formTimeout                    => 120,
             checkUserDisplayPersistentInfo => 1,
             checkUserDisplayEmptyValues    => 1,
         }
@@ -64,9 +64,9 @@ ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%, 'Found trspan="checkUser"' )
   or explain( $res->[2]->[0], 'trspan="checkUser"' );
 count(1);
 
-# Expired token
-diag 'Waiting';
-sleep 3;
+# Skipping time ahead until the form token has expired
+Time::Fake->offset("+5m");
+
 $query =~ s/user=/user=rtyler/;
 $query =~ s/url=/url=http%3A%2F%2Ftest1.example.com/;
 

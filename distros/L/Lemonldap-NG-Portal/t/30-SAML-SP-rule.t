@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 7;
+my $maintests = 6;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -51,15 +51,6 @@ SKIP: {
         ),
         'Unauth SP request'
     );
-    ok(
-        expectCookie( $res, 'lemonldapidp' ) eq
-          'http://auth.idp.com/saml/metadata',
-        'IDP cookie defined'
-      )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     my ( $url, $query ) = expectRedirection( $res,
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 

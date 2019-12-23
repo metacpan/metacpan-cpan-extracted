@@ -2,7 +2,7 @@ package Lemonldap::NG::Handler::Lib::ServiceToken;
 
 use strict;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 sub fetchId {
     my ( $class, $req ) = @_;
@@ -18,7 +18,7 @@ sub fetchId {
     my ( $t, $_session_id, @vhosts ) = split /:/, $s;
 
     # Looking for service headers
-    my $vh = $class->resolveAlias($req);
+    my $vhost = $class->resolveAlias($req);
     my %serviceHeaders;
     @vhosts = grep {
         if (/^([\w\-]+)=(.+)$/) {
@@ -32,30 +32,34 @@ sub fetchId {
     # $_session_id and at least one vhost
     unless ( @vhosts and $_session_id ) {
         $class->userLogger->error('Bad service token');
+        $class->logger->debug(
+            @vhosts ? 'No _session_id found' : 'No VH found' );
         return 0;
     }
 
     # Is vhost listed in token ?
-    unless ( grep { $_ eq $vh } @vhosts ) {
+    unless ( grep { $_ eq $vhost } @vhosts ) {
         $class->userLogger->error(
-            "$vh not authorized in token (" . join( ', ', @vhosts ) . ')' );
+            "$vhost not authorized in token (" . join( ', ', @vhosts ) . ')' );
         return 0;
     }
 
     # Is token in good interval ?
-    my $localConfig = $class->localConfig;
-    my $ttl =
-        $localConfig->{vhostOptions}->{$vh}->{vhostServiceTokenTTL} <= 0
-      ? $class->tsv->{handlerServiceTokenTTL}
-      : $localConfig->{vhostOptions}->{$vh}->{vhostServiceTokenTTL};
-    unless ( $t <= time and $t > time - $ttl ) {
+    my $ttl = $class->localConfig->{vhostOptions}->{$vhost}->{vhostServiceTokenTTL}
+      || $class->tsv->{serviceTokenTTL}->{$vhost};
+    $ttl = $class->tsv->{handlerServiceTokenTTL} unless ( $ttl and $ttl > 0 );
+    my $now = time;
+    unless ( $t <= $now and $t > $now - $ttl ) {
         $class->userLogger->warn('Expired service token');
+        $class->logger->debug("VH: $vhost with ServiceTokenTTL: $ttl");
+        $class->logger->debug("TokenTime: $t / Time: $now");
         return 0;
     }
 
+    # Send service headers to protected application if exist
     if (%serviceHeaders) {
-        $class->logger->debug("Append service header(s)...");
-        $class->set_header_out( $req, %serviceHeaders );
+        $class->logger->info("Append service header(s)...");
+        $class->set_header_in( $req, %serviceHeaders );
     }
 
     return $_session_id;

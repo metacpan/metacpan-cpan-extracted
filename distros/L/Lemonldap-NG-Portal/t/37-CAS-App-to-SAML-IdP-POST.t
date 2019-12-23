@@ -152,8 +152,7 @@ SKIP: {
             $url, IO::String->new($query),
             length => length($query),
             accept => 'text/html',
-            cookie =>
-              "lemonldapidp=http://auth.idp.com/saml/metadata;$proxyPdata",
+            cookie => "$proxyPdata",
         ),
         'POST SAML response'
     );
@@ -163,8 +162,7 @@ SKIP: {
         $res = $proxy->_get(
             $url,
             accept => 'text/html',
-            cookie =>
-"lemonldapidp=http://auth.idp.com/saml/metadata;lemonldap=$spId;$proxyPdata",
+            cookie => "lemonldap=$spId;$proxyPdata",
         ),
         'Follow internal redirection'
     );

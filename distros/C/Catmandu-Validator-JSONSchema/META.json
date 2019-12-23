@@ -38,7 +38,7 @@
       "runtime" : {
          "requires" : {
             "Catmandu" : "0.9103",
-            "JSON::Validator" : "0.64",
+            "JSON::Validator" : "3.15",
             "perl" : "v5.10.1"
          }
       },
@@ -61,7 +61,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-Validator-JSONSchema"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_contributors" : [
       "Jakob Vo\u00df <jakob.voss@gbv.de>",
       "Nicolas Franck <njfranck@cpan.org>"

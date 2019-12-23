@@ -47,6 +47,7 @@
     },
     "test1.example.com": {
       "^/logout": "logout_sso",
+      "^/test-restricted_uri": "varIsInUri($ENV{REQUEST_URI}, '/test-restricted_uri/', \"$uid/\", 1)",
       "^/deny": "deny",
       "default": "accept"
     },

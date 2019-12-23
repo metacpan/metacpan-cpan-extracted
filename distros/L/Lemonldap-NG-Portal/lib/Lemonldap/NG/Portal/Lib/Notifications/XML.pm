@@ -4,8 +4,9 @@ use strict;
 use Mouse;
 use XML::LibXML;
 use XML::LibXSLT;
+use POSIX qw(strftime);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 # Lemonldap::NG::Portal::Main::Plugin provides addAuthRoute() and
 # addUnauthRoute() methods in addition of Lemonldap::NG::Common::Module.
@@ -44,6 +45,10 @@ has stylesheet => (
 # Underlying notifications storage object (File, DBI, LDAP,...)
 has notifObject => ( is => 'rw' );
 
+# Notification server accessors
+has imported => ( is => 'rw', default => 0 );
+has server   => ( is => 'rw' );
+
 # INITIALIZATION
 
 sub init {
@@ -61,10 +66,12 @@ sub checkForNotifications {
     return 0 unless ($notifs);
 
     # Transform notifications
-    my $i = 0;    #Files count
+    my $i   = 0;                                # Files count
+    my $now = strftime "%Y-%m-%d", localtime;
+
     foreach my $file ( values %$notifs ) {
         my $xml = $self->parser->parse_string($file);
-        my $j   = 0;                                    #Notifications count
+        my $j   = 0;                                    # Notifications count
       LOOP: foreach my $notif (
             eval {
                 $xml->documentElement->getElementsByTagName('notification');
@@ -74,7 +81,6 @@ sub checkForNotifications {
 
             # Get the reference
             my $reference = $notif->getAttribute('reference');
-
             $self->logger->debug("Get reference $reference");
 
             # Check it in session
@@ -89,21 +95,35 @@ sub checkForNotifications {
                 next LOOP;
             }
 
+            # Check date
+            my $date = $notif->getAttribute('date');
+            $self->logger->debug("Get date: $date");
+            unless ( $date and $date =~ /\b\d{4}-\d{2}-\d{2}\b/ ) {
+                $self->logger->error('Malformed date');
+                $notif->unbindNode();
+                next LOOP;
+            }
+            unless ( $date le $now ) {
+                $self->logger->debug('Notification date not reached');
+
+                # Remove it from XML
+                $notif->unbindNode();
+                next LOOP;
+            }
+
             # Check condition if any
-            my $condition = $notif->getAttribute('condition');
-
-            if ($condition) {
-
+            if ( my $condition = $notif->getAttribute('condition') ) {
                 $self->logger->debug("Get condition $condition");
                 $condition = $self->p->HANDLER->substitute($condition);
                 unless ( $condition = $self->p->HANDLER->buildSub($condition) )
                 {
                     $self->logger->error( 'Notification condition error: '
                           . $self->p->HANDLER->tsv->{jail}->error );
+
+                    # Remove it from XML
                     $notif->unbindNode();
                     next LOOP;
                 }
-
                 unless ( $condition->( $req, $req->sessionInfo ) ) {
                     $self->logger->debug(
                         'Notification condition not authorized');
@@ -113,7 +133,6 @@ sub checkForNotifications {
                     next LOOP;
                 }
             }
-
             $j++;
         }
 
@@ -133,6 +152,7 @@ sub checkForNotifications {
 
     # Stop here if nothing to display
     return 0 unless $i;
+    $self->userLogger->info("$i pending notification(s) found for $uid");
 
     # Returns HTML fragment
     return $form;
@@ -177,7 +197,11 @@ sub getNotifBack {
     $self->p->importHandlerData($req);
     my $uid = $req->sessionInfo->{ $self->notifObject->notifField };
 
-    my ( $notifs, $forUser ) = $self->notifObject->getNotifications($uid);
+    # ALL notifications are returned here => Need to check active ones only
+    my ( $notifs, $forUser ) =
+      eval { $self->notifObject->getNotifications($uid) };
+    return $self->p->sendError( $req, $@, 500 ) if ($@);
+
     if ($notifs) {
 
         # Get accepted notifications
@@ -194,16 +218,50 @@ sub getNotifBack {
         }
 
         my $result = 1;
+        my $now    = strftime "%Y-%m-%d", localtime;
         foreach my $fileName ( keys %$notifs ) {
             my $file       = $notifs->{$fileName};
             my $fileResult = 1;
             my $xml        = $self->parser->parse_string($file);
 
             # Get pending notifications and verify that they have been accepted
+          LOOP:
             foreach my $notif (
                 $xml->documentElement->getElementsByTagName('notification') )
             {
                 my $reference = $notif->getAttribute('reference');
+
+                # Check date
+                my $date = $notif->getAttribute('date');
+                $self->logger->debug("Get date: $date");
+                unless ( $date and $date =~ /\b\d{4}-\d{2}-\d{2}\b/ ) {
+                    $self->logger->error('Malformed date');
+                    next LOOP;
+                }
+                unless ( $date le $now ) {
+                    $self->logger->debug('Notification date not reached');
+                    $fileResult = 0;    # Do not delete notification
+                    next LOOP;
+                }
+
+                # Check condition if any
+                if ( my $condition = $notif->getAttribute('condition') ) {
+                    $self->logger->debug("Get condition $condition");
+                    $condition = $self->p->HANDLER->substitute($condition);
+                    unless ( $condition =
+                        $self->p->HANDLER->buildSub($condition) )
+                    {
+                        $self->logger->error( 'Notification condition error: '
+                              . $self->p->HANDLER->tsv->{jail}->error );
+                        next LOOP;
+                    }
+                    unless ( $condition->( $req, $req->sessionInfo ) ) {
+                        $self->logger->debug(
+                            'Notification condition not authorized');
+                        $fileResult = 0;    # Do not delete notification
+                        next LOOP;
+                    }
+                }
 
                 # Check if this pending notification has been seen
                 if ( my $refId = $refs->{$reference} ) {
@@ -260,7 +318,7 @@ sub getNotifBack {
         # launch 'controlUrl' to restore "urldc" using do()
         $self->logger->debug('All pending notifications have been accepted');
         $self->p->rebuildCookies($req);
-        return $self->p->do( $req, ['controlUrl', @{ $self->p->endAuth }] );
+        return $self->p->do( $req, [ 'controlUrl', @{ $self->p->endAuth } ] );
     }
     else {
         # No notifications checked here, this entry point must not be called.
@@ -270,9 +328,6 @@ sub getNotifBack {
         return $self->p->do( $req, [] );
     }
 }
-
-has imported => ( is => 'rw', default => 0 );
-has server   => ( is => 'rw' );
 
 sub notificationServer {
     my ( $self, $req ) = @_;
@@ -299,7 +354,8 @@ sub notificationServer {
 
 sub newNotification {
     my ( $self, $req, $xml ) = @_;
-    return $self->notifObject->newNotification($xml);
+    return $self->notifObject->newNotification( $xml,
+        $self->conf->{notificationDefaultCond} );
 }
 
 1;

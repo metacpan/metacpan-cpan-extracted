@@ -47,12 +47,12 @@ sub getUser {
     my ( $self, $req, %args ) = @_;
 
     if ( $args{useMail} ) {
-        return PE_OK
-          if (
-            ( $req->{user} ) =
-            grep { $demoAccounts{$_}->{mail} eq $req->{user} }
-            keys %demoAccounts
-          );
+        my ($user) = grep { $demoAccounts{$_}->{mail} eq $req->{user} }
+          keys %demoAccounts;
+        if ($user) {
+            $req->{user} = $user;
+            return PE_OK;
+        }
     }
     else {
         return PE_OK
@@ -72,8 +72,7 @@ sub setSessionInfo {
     my %vars = ( %{ $self->conf->{exportedVars} },
         %{ $self->conf->{demoExportedVars} } );
     while ( my ( $k, $v ) = each %vars ) {
-        $req->{sessionInfo}->{$k} = $demoAccounts{ $req->{user} }->{$v}
-          || "";
+        $req->{sessionInfo}->{$k} = $demoAccounts{ $req->{user} }->{$v};
     }
 
     PE_OK;

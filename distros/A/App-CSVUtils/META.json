@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Complete::Util" : "0.603",
+            "Complete::Util" : "0.606",
             "Data::Sah::Compiler::perl::TH::any" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
@@ -42,6 +42,7 @@
             "Data::Sah::Compiler::perl::TH::re" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
             "Getopt::Long" : "2.50",
+            "Hash::Subset" : "0.005",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Lite" : "1.820",
             "Sah::Schema::filename" : "0",
@@ -80,7 +81,7 @@
          "web" : "https://github.com/perlancar/perl-App-CSVUtils"
       }
    },
-   "version" : "0.025",
+   "version" : "0.027",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -351,7 +352,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.003"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -525,7 +526,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.06"
+                        "version" : "0.07"
                      }
                   ]
                }

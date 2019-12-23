@@ -1,7 +1,6 @@
-use Test::Script 1.10 tests => 23;
+use Test::Script 1.10 tests => 22;
 
 script_compiles('bin/mcp');
-script_compiles('bin/mcp-dump');
 
 script_runs( [ 'bin/mcp', 1, 'examples/questions/binary_choice.yml' ],
                'run-with-binary');

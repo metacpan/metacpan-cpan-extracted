@@ -1,7 +1,7 @@
 # ABSTRACT: turn WGS84 coordinates into three word addresses and vice-versa using what3words.com HTTPS API
 
 package Geo::What3Words;
-$Geo::What3Words::VERSION = '2.1.6';
+$Geo::What3Words::VERSION = '3.0.0';
 use strict;
 use warnings;
 use Cpanel::JSON::XS;
@@ -23,7 +23,7 @@ sub new {
   my ($class, %params) = @_;
 
   my $self = {};
-  $self->{api_endpoint}     = $params{api_endpoint} || 'https://api.what3words.com/v2/';
+  $self->{api_endpoint}     = $params{api_endpoint} || 'https://api.what3words.com/v3/';
   $self->{key}              = $params{key}      || die "API key not set";
   $self->{language}         = $params{language};
   $self->{logging}          = $params{logging};
@@ -61,8 +61,8 @@ sub words2pos {
   my ($self, @params) = @_;
 
   my $res = $self->words_to_position(@params);
-  if ( $res && is_hashref($res) && exists($res->{geometry}) ){
-      return $res->{geometry}->{lat} . ',' . $res->{geometry}->{lng};
+  if ( $res && is_hashref($res) && exists($res->{coordinates}) ){
+      return $res->{coordinates}->{lat} . ',' . $res->{coordinates}->{lng};
   }
   return;
 }
@@ -96,25 +96,31 @@ sub valid_words_format {
 sub words_to_position {
   my $self = shift;
   my $words = shift;
-  my $language = shift || $self->{language};
 
-  return $self->_query_remote_api('forward', {addr => $words, lang => $language });
+  return $self->_query_remote_api('convert-to-coordinates', { 
+      words => $words
+  });
+  
 }
 
 
 sub position_to_words {
-  my $self = shift;
+  my $self     = shift;
   my $position = shift;
   my $language = shift || $self->{language};
 
-  return $self->_query_remote_api('reverse', {coords => $position, lang => $language });
+  # https://developer.what3words.com/public-api/docs#convert-to-3wa
+  return $self->_query_remote_api('convert-to-3wa', {
+      coordinates => $position, 
+      language => $language 
+  });
 }
 
 
 sub get_languages {
   my $self = shift;
   my $position = shift;
-  return $self->_query_remote_api('languages');
+  return $self->_query_remote_api('available-languages');
 }
 
 sub oneword_available {
@@ -128,7 +134,7 @@ sub _query_remote_api {
   my $rh_params   = shift || {};
 
   my $rh_fields = {
-      a      => 1,
+      #a      => 1,
       key    => $self->{key},
       format => 'json',
       %$rh_params
@@ -188,7 +194,7 @@ Geo::What3Words - turn WGS84 coordinates into three word addresses and vice-vers
 
 =head1 VERSION
 
-version 2.1.6
+version 3.0.0
 
 =head1 SYNOPSIS
 
@@ -209,14 +215,14 @@ what3words (http://what3words.com/) divides the world into 57 trillion squares
 of 3 metres x 3 metres. Each square has been given a 3 word address comprised
 of 3 words from the dictionary.
 
-This module calls API version 2 (https://docs.what3words.com/api/v2/) to convert
-coordinates into those 3 word addresses (forward) and 3 words into coordinates
-(reverse).
+This module calls API version 3 (https://docs.what3words.com/public-api/) 
+to convert coordinates into 3 word addresses (forward) and 3 
+words into coordinates (reverse).
 
-Version 1 is deprecated and no longer works
+Versions 1 and 2 are deprecated and are no longer supported.
 
-You need to sign up at http://what3words.com/login and then register for an API key
-at https://what3words.com/get-api-key/
+You need to sign up at http://what3words.com/login and then register for 
+an API key at https://developer.what3words.com
 
 =head1 METHODS
 
@@ -280,73 +286,54 @@ Returns a more verbose response than words2pos.
 
   $w3w->words_to_position('prom.cape.pump');
   # {
-  #   "crs": {
-  #     "type": "link",
-  #     "properties": {
-  #       "href": "http://spatialreference.org/ref/epsg/4326/ogcwkt/",
-  #       "type": "ogcwkt"
-  #     }
-  #   },
-  #   "words": "prom.cape.pump",
-  #   "bounds": {
-  #     "southwest": {
-  #       "lng": "-0.195426",
-  #       "lat":"51.484449"
-  #     },
-  #     "northeast": {
-  #       "lng": "-0.195383",
-  #       "lat": "51.484476"
-  #     }
-  #   },
-  #   "geometry": {
-  #     "lng": "-0.195405",
-  #     "lat": "51.484463"
-  #   },
-  #   "language": "en",
-  #   "map": "http://w3w.co/prom.cape.pump",
-  #   "status": {
-  #     "status": 200,
-  #     "reason": "OK"
-  #   },
-  #   "thanks": "Thanks from all of us at index.home.raft for using a what3words API"
-  # }
+  #        'coordinates' => {
+  #                           'lat' => '51.484463',
+  #                           'lng' => '-0.195405'
+  #                         },
+  #        'country' => 'GB',
+  #        'language' => 'en',
+  #        'map' => 'https://w3w.co/prom.cape.pump',
+  #        'nearestPlace' => 'Kensington, London',
+  #        'square' => {
+  #                      'northeast' => {
+  #                                       'lat' => '51.484476',
+  #                                       'lng' => '-0.195383'
+  #                                     },
+  #                      'southwest' => {
+  #                                       'lat' => '51.484449',
+  #                                       'lng' => '-0.195426'
+  #                                     }
+  #                    },
+  #        'words' => 'prom.cape.pump'
+  #      };
 
 =head2 position_to_words
 
 Returns a more verbose response than pos2words.
 
   $w3w->position_to_words('51.484463,-0.195405')
+
   # {
-  #   "crs": {
-  #     "type": "link",
-  #     "properties": {
-  #       "href": "http://spatialreference.org/ref/epsg/4326/ogcwkt/",
-  #       "type": "ogcwkt"
-  #     }
-  #   },
-  #   "words": "prom.cape.pump",
-  #   "bounds": {
-  #     "southwest": {
-  #       "lng": "-0.195426",
-  #       "lat": "51.484449"
-  #     },
-  #     "northeast": {
-  #       "lng": "-0.195383",
-  #       "lat": "51.484476"
-  #     }
-  #   },
-  #   "geometry": {
-  #     "lng": "-0.195405",
-  #     "lat": "51.484463"
-  #   },
-  #   "language": "en",
-  #   "map": "http://w3w.co/prom.cape.pump",
-  #   "status": {
-  #     "status": 200,
-  #     "reason": "OK"
-  #   },
-  #   "thanks": "Thanks from all of us at index.home.raft for using a what3words API"
-  # }
+  #        'coordinates' => {
+  #                           'lat' => '51.484463',
+  #                           'lng' => '-0.195405'
+  #                         },
+  #        'country' => 'GB',
+  #        'language' => 'en',
+  #        'map' => 'https://w3w.co/prom.cape.pump',
+  #        'nearestPlace' => 'Kensington, London',
+  #        'square' => {
+  #                      'northeast' => {
+  #                                       'lat' => '51.484476',
+  #                                       'lng' => '-0.195383'
+  #                                     },
+  #                      'southwest' => {
+  #                                       'lat' => '51.484449',
+  #                                       'lng' => '-0.195426'
+  #                                     }
+  #                    },
+  #        'words' => 'prom.cape.pump'
+  #      };
 
 =head2 get_languages
 
@@ -357,17 +344,17 @@ Retuns a list of language codes and names.
   #     'languages' => [
   #                      {
   #                        'name' => 'German',
-  #                        'name_native' => 'Deutsch',
+  #                        'nativeName' => 'Deutsch',
   #                        'code' => 'de'
   #                      },
   #                      {
   #                        'name' => 'English',
-  #                        'name_native' => 'English',
+  #                        'nativeName' => 'English',
   #                        'code' => 'en'
   #                      },
   #                      {
   #                        'name' => "Spanish",
-  #                        'name_native' => "Español",
+  #                        'nativeName' => "Español",
   #                        'code' => 'es'
   #                      },
   # ...

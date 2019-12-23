@@ -10,13 +10,13 @@ use Moose::Role;
 # use Storable 3.15 qw(dclone);
 # use Try::Tiny;
 
-our $VERSION='1.00';
+our $VERSION='1.01';
 
 =head1 NAME
 
 Vote::Count::Borda
 
-=head1 VERSION 1.00
+=head1 VERSION 1.01
 
 =cut
 

@@ -5,9 +5,8 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
-use Quiq::Parameters;
 use Quiq::AnsiColor;
 use LWP::UserAgent ();
 use Quiq::Option;
@@ -171,7 +170,7 @@ sub new {
     my $debug = 0;
     my $warnings = 0;
 
-    my $argA = Quiq::Parameters->extractToVariables(\@_,1,3,
+    my $argA = $class->parameters(1,3,\@_,
         -color => \$color,
         -debug => \$debug,
         -warnings => \$warnings,
@@ -815,7 +814,7 @@ sub uploadFile {
 
     my $force = 0;
 
-    my $argA = Quiq::Parameters->extractToVariables(\@_,1,1,
+    my $argA = $self->parameters(1,1,\@_,
         -force => \$force,
     );
     my $file = Quiq::Path->expandTilde(shift @$argA);
@@ -998,7 +997,7 @@ sub load {
 
     my $force = 1;
 
-    my $argA = Quiq::Parameters->extractToVariables(\@_,2,2,
+    my $argA = $self->parameters(2,2,\@_,
         -force => \$force,
     );
     my ($cacheDir,$file) = @$argA;
@@ -1387,7 +1386,7 @@ sub log {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

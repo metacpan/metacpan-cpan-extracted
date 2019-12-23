@@ -610,8 +610,17 @@ sub run {
                 # Name is required
                 next unless $name;
 
-                # Error if corresponding attribute is not in user session
-                my $value = $req->{sessionInfo}->{$_};
+                # Lookup attribute value in SP macros or session
+                my $value;
+                if ( $self->spMacros->{$sp}->{$_} ) {
+                    $value = $self->spMacros->{$sp}->{$_}
+                      ->( $req, $req->{sessionInfo} );
+                }
+                else {
+                    $value = $req->{sessionInfo}->{$_};
+                }
+
+                # Check whether the value is required or not
                 unless ( defined $value ) {
                     if ($mandatory) {
                         $self->logger->error(
@@ -1478,7 +1487,7 @@ sub sloRelayTerm {
     my $session = $logout->get_session();
 
     unless ($session) {
-        $self->logger->error( "Could not get session from logout" );
+        $self->logger->error("Could not get session from logout");
         return PE_SAML_SLO_ERROR;
     }
 
@@ -1717,7 +1726,8 @@ sub sloServer {
         $req->data->{samlSLOCalled} = 1;
 
         # Launch normal logout and ignore errors
-        $self->p->do( $req, [ @{ $self->p->beforeLogout }, 'deleteSession' ] );
+        $req->steps( [ @{ $self->p->beforeLogout }, 'deleteSession' ] );
+        $self->p->process($req);
 
         # Signature
         my $signSLOMessage = $self->conf->{samlSPMetaDataOptions}->{$spConfKey}

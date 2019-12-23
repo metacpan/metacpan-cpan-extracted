@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::What3Words.
 
+3.0.0   2019-12-18
+        - uses v3 of the what3words API
+          please note this
+          
 2.1.6   2019-12-03
         - fixes for HTTP::Tiny instead of LWP::UserAgent
         - no longer use Test::LWP::Recorder
@@ -31,7 +35,7 @@ Revision history for Perl module Geo::What3Words.
 
 1.0.6   2014-09-18
         - change test-suite to use recorded HTTP responses instead of
-           calling the W3W API live
+          calling the W3W API live
 
 1.0.5   2014-09-17
         - Remove default lang param

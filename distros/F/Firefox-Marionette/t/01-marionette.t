@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 403;
+use Test::More tests => 405;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -1597,7 +1597,7 @@ SKIP: {
 					||
 					(($major_version > $min_major)))
 			{
-				my $max_version = '70.0.0'; # known bad version
+				my $max_version = '71.0.0'; # known bad version
 				my ($max_major, $max_minor, $max_patch) = split /[.]/, $max_version;
 				if ((($major_version == $max_major)
 						&& (defined $minor_version)
@@ -2027,7 +2027,7 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 13);
+		skip($skip_message, 15);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with visible set to 1");
 	my $window_rect;
@@ -2098,10 +2098,19 @@ SKIP: {
 		ok($maximise, "\$firefox->maximise()");
 	}
 	if (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} ne 'localhost')) {
+		SKIP: {
+			skip("Not testing dead firefox processes with ssh", 2);	
+		}
 		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 	} elsif (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_PORT})) {
+		SKIP: {
+			skip("Not testing dead firefox processes with ssh", 2);	
+		}
 		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 	} elsif (($^O eq 'MSWin32') || (!grep /^moz_process_id$/, $capabilities->enumerate())) {
+		SKIP: {
+			skip("Not testing dead firefox processes for win32/early firefox versions", 2);	
+		}
 		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 	} else {
 		my @sig_nums  = split q[ ], $Config{sig_num};
@@ -2118,6 +2127,12 @@ SKIP: {
 			kill $signals_by_name{TERM}, $capabilities->moz_process_id();
 			sleep 1; 
 		}
+		eval { $firefox->go('https://metacpan.org') };
+		chomp $@;
+		ok($@ =~ /Firefox[ ]killed[ ]by[ ]a[ ]TERM[ ]signal/smx, "Exception is thrown when a command is issued to a dead firefox process:$@");
+		eval { $firefox->go('https://metacpan.org') };
+		chomp $@;
+		ok($@ =~ /Firefox[ ]killed[ ]by[ ]a[ ]TERM[ ]signal/smx, "Consistent exception is thrown when a command is issued to a dead firefox process:$@");
 		ok($firefox->quit() == $signals_by_name{TERM}, "Firefox has been killed by a signal with value of $signals_by_name{TERM}:" . $firefox->child_error() . ":" . $firefox->error_message());
 		diag("Error Message was " . $firefox->error_message());
 	}

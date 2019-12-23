@@ -1,0 +1,7 @@
+Revision history for HTML-Acronyms
+
+0.0.2       2019-12-23
+    - convert t/run.t to Test2::V0 .
+
+0.0.1       2019-12-16
+    - First version, released on an unsuspecting world

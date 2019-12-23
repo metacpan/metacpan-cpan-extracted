@@ -1,5 +1,10 @@
 Changelog for Catmandu-PICA
 
+1.01  2019-12-18 11:08:24 CET
+ - fix test to updated pica_map()
+ - requires Catmandu 1.20
+ - align pica_map with marc_map
+
 1.00  2019-10-01 19:57:50 CEST
  - fix SRU test (#67)
  - fix wildcard from * to . (#66)

@@ -7,7 +7,7 @@ use FFI::Platypus;
 use constant _is_win32 => $^O =~ /^(MSWin32|cygwin|msys2?)$/ && FFI::Platypus->abis->{stdcall};
 
 # ABSTRACT: Perl Foreign Function Interface based on libffi
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 our $ffi = FFI::Platypus->new;
 $ffi->lib(undef);
@@ -91,7 +91,7 @@ FFI - Perl Foreign Function Interface based on libffi
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

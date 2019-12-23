@@ -1,5 +1,18 @@
 Revision history for perl module Game::Collisions
 
+0.5 2019-12-20
+
+- Fix bug where you can't remove an AABB whoes parent only has one branch 
+
+0.4 2019-12-20
+
+- Fix bug where you can't remove the only AABB in the system
+
+0.3 2018-11-24
+
+- Add way to fetch root from an AABB
+- Add UserData role to get movement for AABB in the user_data
+
 0.2 2018-11-10
 
 - Documentation typo fixes

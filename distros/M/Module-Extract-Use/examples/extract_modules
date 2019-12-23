@@ -17,7 +17,7 @@ extract_modules - determine which Perl modules a given file uses
 
 our $VERSION = '1.101';
 
-getopts('jl0', \my %opts);
+getopts('cjl0', \my %opts);
 
 =head1 SYNOPSIS
 
@@ -59,6 +59,16 @@ with C<use> or C<require>.
 		"warnings"
 	]
 
+	# print the modules list as a basic cpanfile
+	# https://metacpan.org/pod/cpanfile
+	$ extract_modules -c filename [...]
+	requires 'Getopt::Std', '1.23';
+	requires 'Module::CoreList';
+	requires 'Pod::Usage';
+	requires 'open';
+	requires 'strict';
+	requires 'warnings';
+
 =head1 DESCRIPTION
 
 This script does not execute the code in the files it examines. It
@@ -75,17 +85,23 @@ unless( @ARGV ) {
 	exit;
 	}
 
-my( $object, $method );
+use Data::Dumper;
+my( $object, $method, $sub );
 my @classes = qw( Module::Extract::Use Module::ExtractUse );
-my %methods = qw(
-	Module::Extract::Use get_modules
-	Module::ExtractUse   extract_use
+my %methods = (
+	'Module::Extract::Use' => [ 'get_modules_with_details', sub {
+		[ $_[0]->module, $_[0]->version ];
+		} ],
+	'Module::ExtractUse' => [ 'extract_use', sub {
+		say Dumper( \@_ );
+		[ $_[0], undef ];
+		} ],
 	);
 
 foreach my $module ( @classes ) {
 	eval "require $module";
 	next if $@;
-	( $object, $method ) = ( $module->new, $methods{$module} );
+	( $object, $method, $sub ) = ( $module->new, @{ $methods{$module} } );
 	}
 
 die "No usable file scanner module found; exiting...\n" .
@@ -103,32 +119,54 @@ foreach my $file ( @ARGV ) {
 		}
 
 	my @modules = $object->$method( $file );
-	push @Grand_modules, @modules;
+	my $ref = ref $modules[0] ? $modules[0] : \@modules;
+	push @Grand_modules, map { $sub->( $_ ) } @$ref;
 
-	next if  $opts{j} || $opts{l} || $opts{0}; # do these after
+	next if $opts{j} || $opts{l} || $opts{0} || $opts{c}; # do these after
 
-	long_list( $file, @modules )
+	# Handle this here because we want the filename
+	long_list( $file, @Grand_modules )
 	}
 
 # Handle these options after going through all the files
    if( $opts{l} or $opts{0} ) { short_list( @Grand_modules ) }
-elsif( $opts{j} )             { json_list( @Grand_modules ) }
-
+elsif( $opts{j} )             { json_list(  @Grand_modules ) }
+elsif( $opts{c} )             { cpan_file(  @Grand_modules ) }
 
 sub short_list {
 	state $Seen = {};
 
 	my $glue = $opts{0} ? "\000" : "\n";
-	print join( $glue, grep( { ! $Seen->{$_}++ } sort @_), '' );
+	print join( $glue,
+		grep( { ! $Seen->{$_}++ } sort map { $_->[0] } @_ ),
+		''
+		);
 	}
 
 sub json_list {
 	state $Seen = {};
 
 	my $glue = $opts{0} ? "\000" : "\n";
-	print "[\n\t",
-	join( ",\n\t", map { qq("$_") } grep { ! $Seen->{$_}++ } sort @_ ),
-	"\n]\n";
+	print
+		"[\n\t",
+		join( ",\n\t",
+			map { qq("$_") }
+			grep { ! $Seen->{$_}++ }
+			sort
+			map { $_->[0] }
+			@_
+			),
+		"\n]\n";
+	}
+
+sub cpan_file {
+	state $Seen = {};
+
+	foreach my $module ( @_ ) {
+		printf "requires '%s'", $module->[0];
+		printf ", '%s'", $module->[1] if defined $module->[1];
+		print ";\n";
+		}
 	}
 
 BEGIN {
@@ -141,7 +179,8 @@ sub long_list {
 
 	my( $core, $extern ) = ( 0, 0 );
 
-	foreach my $module ( @modules ) {
+	foreach my $tuple ( @modules ) {
+		my( $module, $version ) = @$tuple;
 		printf " - $module%s\n",
 			$corelist
 				?

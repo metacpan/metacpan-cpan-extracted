@@ -244,7 +244,6 @@ script/pcore
 script/pcore-vim-rpc.pl
 script/src
 script/update-pcore-share.pl
-share/data/.eslintrc.yaml
 share/data/cacert.pem
 share/data/dhparam-2048.pem
 share/data/dhparam-4096.pem

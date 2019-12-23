@@ -34,7 +34,7 @@ sub ua {
     return $self->{ua} if ( $self->{ua} );
     my $ua = Lemonldap::NG::Common::UserAgent->new();
     if ( $self->{user} ) {
-        my $url = $self->{baseUrl};
+        my $url  = $self->{baseUrl};
         my $port = ( $url =~ /^https/ ? 443 : 80 );
         $url =~ s#https?://([^/]*).*$#$1#;
         $port = $1 if ( $url =~ s/:(\d+)$// );
@@ -79,7 +79,7 @@ sub available {
 
 sub lastCfg {
     my $self = shift;
-    my $res = $self->getJson('latest') or return;
+    my $res  = $self->getJson('latest') or return;
     return $res->{cfgNum};
 }
 

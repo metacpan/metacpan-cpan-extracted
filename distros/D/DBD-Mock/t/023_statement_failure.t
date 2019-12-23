@@ -13,25 +13,47 @@ BEGIN {
 # test misc. attributes
 
 {
-    my $dbh = DBI->connect('DBI:Mock:', 'user', 'pass');
+    my $dbh = DBI->connect('DBI:Mock:', '', '', {RaiseError => 1, PrintError => 0});
     isa_ok($dbh, 'DBI::db'); 
-    
+
+    $dbh->{mock_add_resultset} = {
+        results => DBD::Mock->NULL_RESULTSET,
+        failure => [ 3, 'Ohlala!' ],
+    };
+
+    my $sth = eval { $dbh->prepare('INSERT INTO bar (foo) VALUES (?)') };
+    ok(!$@, '$sth handle prepared correctly');
+    isa_ok($sth, 'DBI::st');
+
+    eval { $sth->execute('baz') };
+    ok( $@, '$sth handled executed and died' );
+
+    $dbh->{mock_add_resultset} = {
+        sql => qr/SELECT/,
+        results => DBD::Mock->NULL_RESULTSET,
+        failure => [ 5, 'Ooops!' ],
+    };
+
+    $sth = eval { $dbh->prepare('SELECT foo FROM bar') };
+    ok(!$@, '$sth handle prepared correctly');
+    isa_ok($sth, 'DBI::st');
+
+    eval { $sth->execute() };
+    ok( $@, '$sth handled executed and died' );
+
     $dbh->{mock_add_resultset} = {
         sql => 'SELECT foo FROM bar',
         results => DBD::Mock->NULL_RESULTSET,
         failure => [ 5, 'Ooops!' ],
     };
 
-    $dbh->{PrintError} = 0;
-    $dbh->{RaiseError} = 1;
-
-    my $sth = eval { $dbh->prepare('SELECT foo FROM bar') };
+    $sth = eval { $dbh->prepare('SELECT foo FROM bar') };
     ok(!$@, '$sth handle prepared correctly');
     isa_ok($sth, 'DBI::st');
 
     eval { $sth->execute() };
     ok( $@, '$sth handled executed and died' );
-    
+
     $dbh->{mock_add_resultset} = {
         sql     => 'SELECT bar FROM foo',
         results => [

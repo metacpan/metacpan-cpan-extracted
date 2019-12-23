@@ -1,11 +1,26 @@
-0.041   2019-06-03 (PERLANCAR)
+0.044   2019-12-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak/fix nesting with POD::Elemental::Transformer::Pod5.
+
+
+0.043   2019-12-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: sort-pod-headings.
+
+
+0.042   2019-12-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: dump-pod-structure (poddump).
+
+
+0.041   2019-06-03  Released-By: PERLANCAR
 
 	- Add utility: podless.
 
 	- [doc] Mention App::PMUtils & App::PlUtils.
 
 
-0.040   2018-09-11 (PERLANCAR)
+0.040   2018-09-11  Released-By: PERLANCAR
 
 	- [removed] Remove view-pod-in-browser (duplicate functionality
 	  with podtohtml).
@@ -13,16 +28,16 @@
 	- [doc] Mention pod2html and podtohtml.
 
 
-0.03    2017-01-29 (PERLANCAR)
+0.03    2017-01-29  Released-By: PERLANCAR
 
 	- [ux] view-pod-in-browser: Accept STDIN.
 
 
-0.02    2017-01-29 (PERLANCAR)
+0.02    2017-01-29  Released-By: PERLANCAR
 
         - Add utility: elide-pod.
 
 
-0.01    2016-02-20 (PERLANCAR)
+0.01    2016-02-20  Released-By: PERLANCAR
 
         - First release.

@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use XML::LibXML;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.7';
 
 # XML parser
 has parser => (
@@ -18,7 +18,8 @@ has parser => (
 # @param $xml XML string containing notification
 # @return number of notifications done
 sub newNotification {
-    my ( $self, $xml ) = @_;
+    my ( $self, $xml, $defaultCond ) = @_;
+    $defaultCond ||= '';
     eval { $xml = $self->parser->parse_string($xml) };
     if ( my $err = $@ ) {
         eval { $self->logger->error("Unable to read XML file : $err") };
@@ -38,6 +39,15 @@ sub newNotification {
                 $self->logger->error("Attribute $_ is missing");
                 return 0;
             }
+            if ( $self->get( $notif->{uid}, $notif->{reference} ) ) {
+                my $err = "A notification already exists with reference "
+                  . $notif->{reference};
+                $self->logger->error("$err");
+                return 0;
+            }
+            
+            # Prevent to store time. Keep date only
+            $tmp =~ s/^(\d{4}-\d{2}-\d{2}).*$/$1/;
             push @data, $tmp;
         }
 
@@ -47,11 +57,16 @@ sub newNotification {
             if ( $tmp = $notif->getAttribute($_) ) {
                 push @data, $tmp;
             }
-            else { push @data, ""; }
+            else {
+                $self->userLogger->info(
+                    "Set defaultCondition ($defaultCond) for notification " . $notif->{reference}
+                );
+                push @data, $defaultCond;
+            }
         }
 
         my $result = XML::LibXML::Document->new( $version, $encoding );
-        my $root = XML::LibXML::Element->new('root');
+        my $root   = XML::LibXML::Element->new('root');
         $root->appendChild($notif);
         $result->setDocumentElement($root);
         $result = $result->serialize;

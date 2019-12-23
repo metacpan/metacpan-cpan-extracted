@@ -46,7 +46,7 @@
          "web" : "https://gitlab.com/borisdaeppen/school-survey-mc.git"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_generated_by_perl" : "v5.22.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

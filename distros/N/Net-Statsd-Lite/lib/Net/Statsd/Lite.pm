@@ -16,7 +16,7 @@ use Net::Statsd::Lite::Types -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.8';
+our $VERSION = 'v0.4.9';
 
 
 has host => (
@@ -212,7 +212,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.4.8
+version v0.4.9
 
 =head1 SYNOPSIS
 
@@ -291,7 +291,7 @@ packet.
 
 =head2 C<max_buffer_size>
 
-The specifies the maximum buffer size. It defaults to C<512>.
+Specifies the maximum buffer size. It defaults to C<512>.
 
 =head1 METHODS
 
@@ -425,11 +425,21 @@ Robert Rothenberg <rrwo@cpan.org>
 The initial development of this module was sponsored by Science Photo
 Library L<https://www.sciencephoto.com>.
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Toby Inkster
+=for stopwords Michael R. Davis Toby Inkster
+
+=over 4
+
+=item *
+
+Michael R. Davis <mrdvt@cpan.org>
+
+=item *
 
 Toby Inkster <tobyink@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

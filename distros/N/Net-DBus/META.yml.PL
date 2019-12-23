@@ -43,7 +43,7 @@ build_requires:
 resources:
   license: http://dev.perl.org/licenses/
   homepage: http://www.freedesktop.org/wiki/Software/dbus
-  repository: https://gitorious.org/net-dbus/net-dbus
+  repository: https://gitlab.com/berrange/perl-net-dbus
   MailingList: http://lists.freedesktop.org/mailman/listinfo/dbus/
 
 distribution_type: module

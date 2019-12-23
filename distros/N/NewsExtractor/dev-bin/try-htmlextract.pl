@@ -3,48 +3,72 @@ use warnings;
 
 use Try::Tiny;
 use JSON;
+use File::Slurp qw(read_file);
 use Encode qw(encode);
 use Getopt::Long qw< GetOptions >;
+use Mojo::DOM;
 
 use NewsExtractor;
+use NewsExtractor::GenericExtractor;
 
 my %opts;
 GetOptions(
     \%opts,
+    "file=s",
 );
-
-my @urls;
-
-if (-p STDIN) {
-    @urls = <STDIN>;
-} else {
-    @urls = @ARGV;
-}
-@urls or die "No URLs to process";
-
 my $json = JSON->new->pretty->canonical->utf8->allow_blessed->convert_blessed;
 
-for my $url (@urls) {
-    my $x = NewsExtractor->new( url => $url );
-    my ($err, $y) = $x->download;
+if ($opts{file}) {
+    my $html = read_file( $opts{file} );
+    utf8::decode($html);
 
-    if ($err) {
-        print $json->encode({
-            url => $url,
-            DownloadFailure => { message => $err->message, debug => $err->debug }});
+    my $dom = Mojo::DOM->new($html);
+    my $x = NewsExtractor::GenericExtractor->new( dom => $dom );
+
+    print $json->encode({
+        file => $opts{file},
+        extracted => {
+            site_name => $x->site_name(),
+            headline => $x->headline(),
+            dateline => $x->dateline(),
+            journalist => $x->journalist(),
+            content_text => $x->content_text(),
+        }
+    });
+
+
+} else {
+    my @urls;
+
+    if (! -t STDIN) {
+        @urls = map { chomp; $_ } <STDIN>;
     } else {
-        my $article;
+        @urls = @ARGV;
+    }
+    @urls or die "No URLs to process";
 
-        try {
-            ($err, $article) = $y->parse;
-        } catch {
-            $err = $_;
-        };
+    for my $url (@urls) {
+        my $x = NewsExtractor->new( url => $url );
+        my ($err, $y) = $x->download;
 
-        if ($article) {
-            print $json->encode({ url => $url, Article => $article });
+        if ($err) {
+            print $json->encode({
+                url => $url,
+                DownloadFailure => { message => $err->message, debug => $err->debug }});
         } else {
-            print $json->encode({ url => $url, NoArticle => { message => $err->message, debug => $err->debug }});
+            my $article;
+
+            try {
+                ($err, $article) = $y->parse;
+            } catch {
+                $err = $_;
+            };
+
+            if ($article) {
+                print $json->encode({ url => $url, Article => $article });
+            } else {
+                print $json->encode({ url => $url, NoArticle => { message => $err->message, debug => $err->debug }});
+            }
         }
     }
 }

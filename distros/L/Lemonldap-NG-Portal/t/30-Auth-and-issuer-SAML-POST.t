@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 22;
+my $maintests = 21;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -50,11 +50,6 @@ SKIP: {
         'Unauth SP request'
     );
     expectOK($res);
-    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     my ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
         'SAMLRequest' );
@@ -96,11 +91,6 @@ SKIP: {
         'Unauth SP request'
     );
     expectOK($res);
-    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
         'SAMLRequest' );
@@ -134,7 +124,8 @@ SKIP: {
 
     # Expect pdata to be cleared
     $pdata = expectCookie( $res, 'lemonldappdata' );
-    ok( $pdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' );
+    ok( $pdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' )
+      or explain( $pdata, 'not issuerRequestsaml' );
 
     ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost',
@@ -147,7 +138,6 @@ SKIP: {
             $url, IO::String->new($s),
             accept => 'text/html',
             length => length($s),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -198,6 +188,9 @@ SKIP: {
       expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleLogoutReturn',
         'SAMLResponse' );
 
+    my $removedCookie = expectCookie($res);
+    is($removedCookie, 0, "IDP Cookie removed");
+
     # Post SAML response to SP
     switch ('sp');
     ok(
@@ -205,7 +198,6 @@ SKIP: {
             $url, IO::String->new($s),
             accept => 'text/html',
             length => length($s),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -226,8 +218,7 @@ SKIP: {
         $res = $sp->_get(
             '/',
             accept => 'text/html',
-            cookie =>
-              "lemonldapidp=http://auth.idp.com/saml/metadata; lemonldap=$spId"
+            cookie => "lemonldap=$spId"
         ),
         'Test if user is reject on SP'
     );

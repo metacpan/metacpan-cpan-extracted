@@ -13,13 +13,13 @@ with 'Vote::Count::TieBreaker';
 
 use Storable 3.15 'dclone';
 
-our $VERSION='1.00';
+our $VERSION='1.01';
 
 =head1 NAME
 
 Vote::Count::IRV
 
-=head1 VERSION 1.00
+=head1 VERSION 1.01
 
 =cut
 
@@ -117,7 +117,8 @@ Implements Instant Runoff Voting for Vote::Count.
   use Vote::Count::ReadBallots 'read_ballots';
 
   my $Election = Vote::Count::->new(
-    BallotSet => read_ballots('%path_to_my_ballots'), );
+    BallotSet => read_ballots('%path_to_my_ballots'),
+    TieBreakMethod => 'grandjunction');
 
   my $result = $Election->RunIRV();
   my $winner = $result->{'winner'};
@@ -160,7 +161,7 @@ Supports the Vote::Count logt, logv, and logd methods for providing details of t
 
 Uses TieBreaker from the TieBreaker Role. The default is 'all', which is to not break ties. 'none' the default for the Matrix (Condorcet) Object should not be used for IRV.
 
-All was chosen as the module default because it is Later Harm safe. Modified Grand Junction is the most resolveable and is the recommended option.
+All was chosen as the module default because it is Later Harm safe. Modified Grand Junction is the most resolvable and is the recommended option.
 
 In the event that the tie-breaker returns a tie eliminate all that remain tied is used, unless that would eliminate all choices, in which case the election returns a tie.
 

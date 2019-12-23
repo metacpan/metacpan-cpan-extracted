@@ -137,20 +137,6 @@ note("get");
 
         is $var , "钱唐湖春行\n", 'got the correct data';
     }
-
-    {
-        my $file  = $bag->get("test1.txt");
-
-        my $io    = IO::Callback->new('>', sub {
-            my $data = shift ;
-            $! = EIO;
-            return IO::Callback::Error;
-        });
-
-        throws_ok {  $bag->stream($io, $file); }  'Catmandu::Error' , 'expecting to die with IO error';
-
-        $io->close();
-    }
 }
 
 note("delete");

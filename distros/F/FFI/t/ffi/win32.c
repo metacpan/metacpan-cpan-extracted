@@ -4,6 +4,13 @@
 #define STDCALL
 #endif
 
+#ifdef _MSC_VER
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT
+#endif
+
+EXPORT
 unsigned int STDCALL
 fill_my_string(unsigned int size, char *buffer)
 {

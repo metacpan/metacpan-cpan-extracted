@@ -26,6 +26,7 @@ has ua => (
 has casSrvList => ( is => 'rw', default => sub { {} }, );
 has casAppList => ( is => 'rw', default => sub { {} }, );
 has spRules    => ( is => 'rw', default => sub { {} }, );
+has spMacros   => ( is => 'rw', default => sub { {} }, );
 
 # RUNNING METHODS
 
@@ -66,6 +67,22 @@ sub loadApp {
                 return 0;
             }
             $self->spRules->{$_} = $rule;
+        }
+
+        # Load per-application macros
+        my $macros = $self->conf->{casAppMetaDataMacros}->{$_};
+        for my $macroAttr ( keys %{$macros} ) {
+            my $macroRule = $macros->{$macroAttr};
+            if ( length $macroRule ) {
+                $macroRule = $self->p->HANDLER->substitute($macroRule);
+                unless ( $macroRule = $self->p->HANDLER->buildSub($macroRule) )
+                {
+                    $self->error( 'SAML SP macro error: '
+                          . $self->p->HANDLER->tsv->{jail}->error );
+                    return 0;
+                }
+                $self->spMacros->{$_}->{$macroAttr} = $macroRule;
+            }
         }
     }
     return 1;

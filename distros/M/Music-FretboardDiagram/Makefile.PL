@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Music::FretboardDiagram",
   "PREREQ_PM" => {
     "Imager" => 0,
-    "List::MoreUtils" => 0,
+    "List::SomeUtils" => 0,
     "Moo" => 2,
     "Music::Chord::Namer" => 0,
     "namespace::clean" => 0,
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.1203",
+  "VERSION" => "0.1204",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Imager" => 0,
-  "List::MoreUtils" => 0,
+  "List::SomeUtils" => 0,
   "Moo" => 2,
   "Music::Chord::Namer" => 0,
   "Test::Exception" => 0,

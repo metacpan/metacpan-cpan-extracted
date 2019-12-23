@@ -1,6 +1,6 @@
 package Memento::TimeTravel;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use strict;
 use Moo;

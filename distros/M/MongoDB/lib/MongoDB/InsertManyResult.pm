@@ -19,7 +19,7 @@ package MongoDB::InsertManyResult;
 # ABSTRACT: MongoDB single insert result object
 
 use version;
-our $VERSION = 'v2.2.0';
+our $VERSION = 'v2.2.1';
 
 use Moo;
 use MongoDB::_Constants;
@@ -100,7 +100,7 @@ MongoDB::InsertManyResult - MongoDB single insert result object
 
 =head1 VERSION
 
-version v2.2.0
+version v2.2.1
 
 =head1 SYNOPSIS
 

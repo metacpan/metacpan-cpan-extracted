@@ -4,7 +4,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 # VERSION
 
-version v0.4.8
+version v0.4.9
 
 # SYNOPSIS
 
@@ -80,7 +80,7 @@ packet.
 
 ## `max_buffer_size`
 
-The specifies the maximum buffer size. It defaults to `512`.
+Specifies the maximum buffer size. It defaults to `512`.
 
 # METHODS
 
@@ -234,9 +234,10 @@ Robert Rothenberg <rrwo@cpan.org>
 The initial development of this module was sponsored by Science Photo
 Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-Toby Inkster <tobyink@cpan.org>
+- Michael R. Davis <mrdvt@cpan.org>
+- Toby Inkster <tobyink@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

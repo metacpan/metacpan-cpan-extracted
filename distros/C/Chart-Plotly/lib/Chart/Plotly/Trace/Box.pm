@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Box::Stream;
 use Chart::Plotly::Trace::Box::Transform;
 use Chart::Plotly::Trace::Box::Unselected;
 
-our $VERSION = '0.034';    # VERSION
+our $VERSION = '0.035';    # VERSION
 
 # ABSTRACT: In vertical (horizontal) box plots, statistics are computed using `y` (`x`) values. By supplying an `x` (`y`) array, one box per distinct x (y) value is drawn If no `x` (`y`) {array} is provided, a single box is drawn. That box position is then positioned with with `name` or with `x0` (`y0`) if provided. Each box spans from quartile 1 (Q1) to quartile 3 (Q3). The second quartile (Q2) is marked by a line inside the box. By default, the whiskers correspond to the box' edges +/- 1.5 times the interquartile range (IQR: Q3-Q1), see *boxpoints* for other options.
 
@@ -181,9 +181,11 @@ has name => (
       "Sets the trace name. The trace name appear as the legend item and on hover. For box traces, the name will also be used for the position coordinate, if `x` and `x0` (`y` and `y0` if horizontal) are missing and the position axis is categorical",
 );
 
-has notched => ( is            => "rw",
-                 isa           => "Bool",
-                 documentation => "Determines whether or not notches should be drawn.",
+has notched => (
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Determines whether or not notches are drawn. Notches displays a confidence interval around the median. We compute the confidence interval as median +/- 1.57 / IQR * sqrt(N), where IQR is the interquartile range and N is the sample size. If two boxes' notches do not overlap there is 95% confidence their medians differ. See https://sites.google.com/site/davidsstatistics/home/notched-box-plots for more info.",
 );
 
 has notchwidth => (
@@ -365,7 +367,7 @@ Chart::Plotly::Trace::Box - In vertical (horizontal) box plots, statistics are c
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 
@@ -510,7 +512,7 @@ Sets the trace name. The trace name appear as the legend item and on hover. For 
 
 =item * notched
 
-Determines whether or not notches should be drawn.
+Determines whether or not notches are drawn. Notches displays a confidence interval around the median. We compute the confidence interval as median +/- 1.57 / IQR * sqrt(N), where IQR is the interquartile range and N is the sample size. If two boxes' notches do not overlap there is 95% confidence their medians differ. See https://sites.google.com/site/davidsstatistics/home/notched-box-plots for more info.
 
 =item * notchwidth
 

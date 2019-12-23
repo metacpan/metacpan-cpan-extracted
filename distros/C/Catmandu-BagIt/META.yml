@@ -32,7 +32,7 @@ recommends:
   Log::Log4perl: '1.44'
 requires:
   Catmandu: '1.07'
-  Catmandu::FileStore: '1.12'
+  Catmandu::FileStore: '1.16'
   File::Copy: '0'
   IO: '0'
   IO::String: '0'
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-BagIt/issues
   homepage: https://github.com/LibreCat/Catmandu-BagIt
   repository: https://github.com/LibreCat/Catmandu-BagIt.git
-version: '0.239'
+version: '0.240'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nicolas Franck <nicolas.franck@ugent.be>'

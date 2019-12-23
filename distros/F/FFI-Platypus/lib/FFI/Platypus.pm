@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -525,7 +525,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 1.02
+version 1.06
 
 =head1 SYNOPSIS
 

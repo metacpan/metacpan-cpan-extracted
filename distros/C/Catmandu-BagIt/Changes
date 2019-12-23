@@ -1,5 +1,8 @@
 Revision history for Catmandu-BagIt
 
+0.240  2019-12-16 16:31:15 CET
+    - Using the Catmandu::FileBag file_streamer instead of own code
+
 0.239  2019-12-12 14:26:57 CET
     - Adding support for use supplied MD5 checksums [njfranck]
 

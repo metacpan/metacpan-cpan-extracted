@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -164,9 +164,10 @@ sub refresh {
     my ( $self, $req ) = @_;
     $req->mustRedirect(1);
     my %data = %{ $req->userData };
-    $req->user( $data{ $self->conf->{whatToTrace} } );
+    $self->userLogger->notice(
+        'Refresh request for ' . $data{ $self->conf->{whatToTrace} } );
+    $req->user( $data{_user} || $data{ $self->conf->{whatToTrace} } );
     $req->id( $data{_session_id} );
-    $self->userLogger->notice( 'Refresh request for ' . $req->user );
     foreach ( keys %data ) {
         delete $data{$_} unless ( /^_/ or /^(?:startTime)$/ );
     }
@@ -237,7 +238,7 @@ sub do {
     }
 
     # Remove userData if authentication fails
-    if ( $err == PE_BADCREDENTIALS ) {
+    if ( $err == PE_BADCREDENTIALS or $err == PE_BADOTP ) {
         $req->userData( {} );
     }
 

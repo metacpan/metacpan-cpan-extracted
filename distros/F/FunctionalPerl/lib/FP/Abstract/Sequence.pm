@@ -82,7 +82,7 @@ sub FP_Interface__method_names {
      qw(
      is_proper_sequence
      flatten
-     join
+     intersperse
      extreme
      min
      max
@@ -94,6 +94,7 @@ sub FP_Interface__method_names {
      sum
      product
      none
+     join
      ),
      # virtual methods:
      grep {
@@ -129,7 +130,6 @@ sub FP_Interface__method_names {
      perhaps_one
      zip
      for_each
-     join
      strings_join
      length
      second
@@ -179,14 +179,10 @@ sub flatten {
 # XXX and on top of that, these return a lazy result even if the input
 # isn't; related to the above issue. Find solution for both.
 
-# unlike strings_join which returns a single string, this builds a new
-# sequence with the given value between all elements of the original
-# sequence
-
 # (XX only works computationally efficient for *some* sequences;
 # introduce an FP::Abstract::IterativeSequence or so and move it
 # there?)
-sub join {
+sub intersperse {
     @_==2 or die "wrong number of arguments";
     my ($self, $value)=@_;
     # (should we recurse locally like most sequence functions? Or is
@@ -199,7 +195,8 @@ sub join {
               my ($v,$rest)= $self->first_and_rest;
               $rest->is_null ? $self
                 : FP::List::cons($v,
-                                 FP::List::cons($value, $rest->join($value)))
+                                 FP::List::cons($value,
+                                                $rest->intersperse($value)))
           }
     }
 }
@@ -342,6 +339,23 @@ sub strictly_chunks_of {
     my ($s, $chunklen)=@_;
     # XXX weaken as all of them.
     $s->stream->strictly_chunks_of($chunklen)
+}
+
+
+# join in Haskell is doing "++" on the items, should probably choose a
+# protocol for this as well; for now, hard-code to strings_join:
+sub join {
+    my ($s)= @_;
+    # Tail-call, please, for 'weakening maintenance'.
+
+    # XX only AUTOLOAD is defined, not `can`! But $s was already
+    # forced by the AUTOLOAD thus nothing more is needed here. But
+    # this might change!
+    my $m= $s->can("strings_join")
+        # bug since it's requested by the interface
+        or die "bug: missing strings_join method on: $s";
+
+    goto $m
 }
 
 _END_

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.38
+    version 2.39
 
 SYNOPSIS
 
@@ -118,7 +118,7 @@ DESCRIPTION
      [ReadmeAnyFromPod / ReadMePodInRoot]
      filename = README.md
      location = root
-     type = markdown
+     type = gfm
      
      [Author::Plicease::MarkDownCleanup]
      travis_status = 0

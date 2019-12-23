@@ -3,13 +3,13 @@
 #
 #         FILE: Public.pm
 #
-#  DESCRIPTION: 
+#  DESCRIPTION:
 #
 #        FILES: ---
 #         BUGS: ---
 #        NOTES: ---
-#       AUTHOR: YOUR NAME (), 
-# ORGANIZATION: 
+#       AUTHOR: YOUR NAME (),
+# ORGANIZATION:
 #      VERSION: 1.0
 #      CREATED: 01.10.2017 12:34:59
 #     REVISION: ---
@@ -22,12 +22,12 @@ use warnings;
 use utf8;
 use URI::Escape;
 use Carp 'croak';
- 
+
 use base 'Yandex::Disk';
 
 #Class for Public actions under Yandex Disk files and folders
 
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 
 sub publicFile {
     my $self = shift;
@@ -115,7 +115,7 @@ B<Yandex::Disk::Public> - public and unpublic yandex disk resources(files and fo
 
 =head1 VERSION
 
-version 0.04
+version 0.07
 
 =head1 SYNOPSIS
     use Yandex::Disk;
@@ -143,7 +143,7 @@ Remove public access to resources
     Options:
         -path               => Path to resource on yandex disk, where need public
 
-=head2 listPublished(%opt) 
+=head2 listPublished(%opt)
 
 Return array hashref with published files
     my $list = $disk->listPublished();
@@ -151,7 +151,7 @@ Return array hashref with published files
         -limit              => Limit max files to output (default: unlimited)
         -offset             => Offset records from start (default: 0)
         -type               => dir/file (default: undef (display dirs and files)
-    
+
 =head2 publicUrl()
 
 Get public url from published file. Return undef if error

@@ -1,0 +1,94 @@
+=head1 NAME
+
+OpenTracing::GlobalTracer - Easy Access to the Tracer Singleton
+
+
+
+=head1 SYNOPSIS
+
+    use OpenTracing::GlobalTracer qw/$TRACER/;
+    
+    my $foo_tracer = OpenTracing::Implementation::Foo::Tracer->new( );
+    OpenTracing::GlobalTracer->set_global_trace( $foo_tracer );
+
+and in the various part of the code:
+
+    my $global_tracer = OpenTracing::GlobalTracer->get_global_tracer( );
+    my $span  = $global_tracer->get_active_span;
+
+    my $scope = $TRACER->start_active_span( $operation_name );
+
+
+
+=head1 DESCRIPTION
+
+This module give easy access to the OpenTracing singleton.
+
+During import, when `use`ing the module, it can take the name of a variable to
+use in the current scope.
+
+The modules provide two methods, `set_global_tracer` and `get_global_tracer`.
+
+If none is set (or cleared), per definition, it will give back a 'NoOp'
+implementation.
+
+
+
+=head1 CLASS METHODS
+
+
+
+=head2 set_global_tracer
+
+    OpenTracing::GlobalTracer->set_global_trace( $tracer );
+
+Sets the global tracer singleton.
+
+
+
+=head2 get_global_tracer
+
+    my $global_tracer = OpenTracing::GlobalTracer->get_global_tracer( );
+
+Returns a global tracer if some is set. If none is set, it will return the
+L<OpenTracing::Implementation::NoOp> implementation, compliant to the definition
+to prevent crashing.
+
+
+
+=head1 ENVIRONMENT VARIABLES
+
+
+
+=head2 OPENTRACING_GLOBALTRACER_DEFAULT
+
+This variable can be set to override the default NoOp implementation.
+
+
+
+=head1 CAVEATS
+
+When using the C<$TRACER> variable, one still needs to be careful, it could be
+C<undef> if no tracer wasn't initialised, or explicitly been erased. This may
+result in errors like "can't use method ... on undef".
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing GlobalTracer' is Copyright (C) 2019, Perceptyx Inc
+
+This package is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+

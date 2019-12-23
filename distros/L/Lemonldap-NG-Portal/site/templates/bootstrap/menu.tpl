@@ -69,8 +69,14 @@
             </TMPL_IF>
             <TMPL_IF NAME="contextSwitching">
               <li class="dropdown-item"><a href="/switchcontext" class="nav-link">
-                <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/switchcontext_<TMPL_VAR NAME="contextSwitching">.png" width="20" height="20" alt="refresh" />
+                <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/switchcontext_<TMPL_VAR NAME="contextSwitching">.png" width="20" height="20" alt="switchContext" />
                 <span trspan="contextSwitching_<TMPL_VAR NAME="contextSwitching">">contextSwitching_<TMPL_VAR NAME="contextSwitching"></span>
+              </a></li>
+            </TMPL_IF>
+            <TMPL_IF NAME="decryptValue">
+              <li class="dropdown-item"><a href="/decryptvalue" class="nav-link">
+                <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/decryptValue.png" width="20" height="20" alt="decryptValue" />
+                <span trspan="decryptCipheredValue">decryptCipheredValue</span>
               </a></li>
             </TMPL_IF>
             <li class="dropdown-item"><a href="/refresh" class="nav-link">

@@ -26,7 +26,6 @@ lib/Vote/Count/Method/CondorcetDropping.pm
 lib/Vote/Count/Method/CondorcetIRV.pm
 lib/Vote/Count/Method/CondorcetVsIRV.pm
 lib/Vote/Count/Method/STAR.pm
-lib/Vote/Count/Range.pm
 lib/Vote/Count/Range.pod
 lib/Vote/Count/RankCount.pm
 lib/Vote/Count/ReadBallots.pm
@@ -36,10 +35,12 @@ lib/Vote/Count/Start.pm
 lib/Vote/Count/TieBreaker.pm
 lib/Vote/Count/TopCount.pm
 lib/Vote/Hand_Count.pod
+lib/Vote/MultiMember.pod
 md/Catalog.md
 md/Count.md
 md/Hand_Count.md
 md/Matrix.md
+md/MultiMember.md
 md/README.md
 md/Range.md
 podhtml.scratch
@@ -74,6 +75,8 @@ t/data/range_tietop.range.json
 t/data/tennessee.range.json
 t/data/tennessee.range.yml
 t/data/tennessee.txt
+t/data/tiebreakerprecedence1.txt
+t/data/tiebreakerprecedence2.txt
 t/data/ties1.txt
 t/data/tweedles.txt
 t/data/uncompressed.txt
@@ -81,7 +84,6 @@ t/floor.t
 t/irv.t
 t/log.t
 t/matrix.t
-t/range.t
 t/rankcount.t
 t/readballots.t
 t/redact.t

@@ -1,5 +1,13 @@
 Changelog for Mojolicious-Plugin-Moai
 
+0.005     2019-12-16 22:35:06-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed Test::More dependency to 1.001005 (the first version to
+      support argument-passing to subtests). This will fix test failures
+      on older Perls.
+
 0.004     2019-12-08 13:24:11-06:00 America/Chicago
 
     [Added]

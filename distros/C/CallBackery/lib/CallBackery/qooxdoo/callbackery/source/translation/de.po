@@ -29,7 +29,7 @@ msgstr "Anmelden"
 
 #: callbackery/ui/Login.js:80
 msgid "User"
-msgstr ""
+msgstr "Benutzer"
 
 #: callbackery/ui/Login.js:96
 msgid "Password"
@@ -41,7 +41,7 @@ msgstr ""
 
 #: callbackery/ui/Login.js:137
 msgid "release %1, %2 by %3"
-msgstr ""
+msgstr "Version %1, %2 by %3"
 
 #: callbackery/ui/MsgBox.js:66
 msgid "Cancel"
@@ -108,7 +108,4 @@ msgstr "Daten werden geladen"
 
 #: callbackery/ui/plugin/Html.js:54
 msgid "Loading HTML Data"
-msgstr ""
-
-#~ msgid "Username"
-#~ msgstr "Benutzer"
+msgstr "HTML Daten werde geladen"

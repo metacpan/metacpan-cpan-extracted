@@ -39,8 +39,11 @@ sub setSessionInfo {
     my %vars = ( %{ $self->conf->{exportedVars} },
         %{ $self->conf->{ldapExportedVars} } );
     while ( my ( $k, $v ) = each %vars ) {
+
+        # getLdapValue returns an empty string for missing attribute
+        # but we really want to return undef so they don't get stored in session
         $req->sessionInfo->{$k} =
-          $self->ldap->getLdapValue( $req->data->{ldapentry}, $v ) || "";
+          $self->ldap->getLdapValue( $req->data->{ldapentry}, $v ) || undef;
     }
 
     PE_OK;

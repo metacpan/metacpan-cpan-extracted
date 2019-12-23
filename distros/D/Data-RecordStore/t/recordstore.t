@@ -66,12 +66,11 @@ sub test_init {
     is( $rs->[Data::RecordStore->MAX_SILO_ID], 31, "default max silo id" );
 
     my $silos = $rs->silos;
-    is( $#$silos,  $rs->[Data::RecordStore->MAX_SILO_ID], 'max silo id is how many silos' );
-    is( $#$silos - $rs->[Data::RecordStore->MIN_SILO_ID], 31 - 12, '19 silos' );
+    is( @$silos - $rs->[Data::RecordStore->MIN_SILO_ID], 1 + (31 - 12), '20 silos' );
 
     $rs = Data::RecordStore->reopen_store( $dir );
     ok( $rs, 'reopen store right stuff' );
-    is( $#$silos - $rs->[Data::RecordStore->MIN_SILO_ID], 31 - 12, 'still 19 silos' );
+    is( @$silos - $rs->[Data::RecordStore->MIN_SILO_ID], 1 + (31 - 12), 'still 20 silos' );
 
     $dir = tempdir( CLEANUP => 1 );
     $rs = Data::RecordStore->open_store( "$dir/NOODIR" );
@@ -88,12 +87,12 @@ sub test_init {
     $rs = Data::RecordStore->open_store( BASE_PATH => $dir, MAX_FILE_SIZE => 3_000_000_000, MIN_FILE_SIZE => 300 );
     ok( $rs, 'reinit store right stuff' );
     is( $rs->[Data::RecordStore->MIN_SILO_ID], 9, "min silo id for 300 min size" );
-    is( $#$silos - $rs->[Data::RecordStore->MIN_SILO_ID], 31 - 9, 'number of silos' );
+    is( @$silos - $rs->[Data::RecordStore->MIN_SILO_ID], 1 + (31 - 9), 'number of silos' );
 
     $rs = Data::RecordStore->reopen_store( $dir );
     ok( $rs, 'reinit store right stuff min' );
     is( $rs->[Data::RecordStore->MIN_SILO_ID], 9, "still min silo id for 300 min size" );
-    is( @$silos - $rs->[Data::RecordStore->MIN_SILO_ID], 31 - 8, 'still number of silos for 300-3B' );
+    is( @$silos - $rs->[Data::RecordStore->MIN_SILO_ID], 1 + ( 31 - 9), 'still number of silos for 300-3B' );
 
     my $size = 2 ** 12;
     $dir = tempdir( CLEANUP => 1 );

@@ -64,6 +64,7 @@ test_psgi
             [ 'timing_ms', 'psgi.response.content-length', 0, ],
             [ 'increment', 'psgi.response.content-type.text.plain', ],
             [ 'increment', 'psgi.response.status.200', ],
+            [ 'set_add',   'psgi.worker.pid', $$ ],
           ),
           'expected metrics'
           or note( explain \@metrics );
@@ -90,6 +91,7 @@ test_psgi
             [ 'timing_ms', 'psgi.response.content-length', 0, ],
             [ 'increment', 'psgi.response.content-type.text.plain', ],
             [ 'increment', 'psgi.response.status.200', ],
+            [ 'set_add',   'psgi.worker.pid', $$ ],
           ),
           'expected metrics'
           or note( explain \@metrics );
@@ -120,6 +122,7 @@ test_psgi
             [ 'timing_ms', 'psgi.response.content-length', 2, ],
             [ 'increment', 'psgi.response.content-type.text.plain', ],
             [ 'increment', 'psgi.response.status.200', ],
+            [ 'set_add',   'psgi.worker.pid', $$ ],
           ),
           'expected metrics'
           or note( explain \@metrics );
@@ -155,6 +158,7 @@ test_psgi
             [ 'timing_ms', 'psgi.response.content-length', 0, ],
             [ 'increment', 'psgi.response.content-type.image.vnd-microsoft-icon', ],
             [ 'increment', 'psgi.response.status.200', ],
+            [ 'set_add',   'psgi.worker.pid', $$ ],
           ),
           'expected metrics'
           or note( explain \@metrics );

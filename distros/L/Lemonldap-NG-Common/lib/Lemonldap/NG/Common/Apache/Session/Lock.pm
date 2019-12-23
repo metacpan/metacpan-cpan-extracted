@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::Apache::Session::Lock;
 
 use strict;
 
-my $VERSION = '1.4.4';
+our $VERSION = '2.0.0';
 
 sub new {
     my $class   = shift;

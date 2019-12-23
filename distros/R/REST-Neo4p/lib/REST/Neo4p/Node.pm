@@ -8,7 +8,7 @@ use Carp qw(croak carp);
 use strict;
 use warnings;
 BEGIN {
-  $REST::Neo4p::Node::VERSION = '0.3020';
+  $REST::Neo4p::Node::VERSION = '0.3030';
 }
 
 # creation, deletion and property manipulation are delegated
@@ -210,7 +210,7 @@ sub as_simple {
   my $self = shift;
   my $ret;
   my $props = $self->get_properties;
-  $ret->{_node} = $$self;
+  $ret->{_node} = $$self + 0;
   $ret->{$_} = $props->{$_} for keys %$props;
   return $ret;
 }

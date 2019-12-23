@@ -1,0 +1,26 @@
+---
+abstract: "implementation of the \"adaptive throttling\" algorithm by Google"
+author:
+  - 'Tom van der Woerdt <info@tvdw.eu>'
+build_requires:
+  Test::More: 0
+  perl: 5.010
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Throttle-Adaptive
+requires:
+  Time::HiRes: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/tvdw/perl-Throttle-Adaptive.git
+version: 0.001
+x_authority: cpan:TVDW
+x_generated_by_perl: v5.16.3
+x_serialization_backend: 'YAML::Tiny version 1.51'

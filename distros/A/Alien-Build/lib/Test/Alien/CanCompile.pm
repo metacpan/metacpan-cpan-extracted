@@ -5,7 +5,7 @@ use warnings;
 use Test2::API qw( context );
 
 # ABSTRACT: Skip a test file unless a C compiler is available
-our $VERSION = '1.93'; # VERSION
+our $VERSION = '1.94'; # VERSION
 
 
 sub skip
@@ -38,7 +38,7 @@ Test::Alien::CanCompile - Skip a test file unless a C compiler is available
 
 =head1 VERSION
 
-version 1.93
+version 1.94
 
 =head1 SYNOPSIS
 

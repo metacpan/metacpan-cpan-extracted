@@ -10,7 +10,7 @@ use Carp;
 use Module::Build;
 our @ISA = qw{ Module::Build };
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 sub ACTION_authortest {
     my ( $self, @args ) = @_;
@@ -87,7 +87,7 @@ L<Module::Build|Module::Build>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

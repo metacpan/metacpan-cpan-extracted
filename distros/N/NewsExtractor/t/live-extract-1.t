@@ -7,6 +7,8 @@ use NewsExtractor;
 
 use constant TEST_FULL => $ENV{TEST_FULL} // 0;
 
+skip_all 'Live tests: set env TEST_LIVE=1 to actually run tests.' unless $ENV{TEST_LIVE};
+
 my (@fails, @success);
 for (["urls-success", \&subtest], ["urls-fails", \&todo]) {
     my $fn = 't/data/' . $_->[0];

@@ -35,7 +35,6 @@ my $op = LLNG::Manager::Test->new( {
                     name        => "cn"
                 }
             },
-            oidcServiceMetaDataIssuer             => "http://auth.op.com",
             oidcServiceMetaDataAuthorizeURI       => "authorize",
             oidcServiceMetaDataCheckSessionURI    => "checksession.html",
             oidcServiceMetaDataJWKSURI            => "jwks",
@@ -55,7 +54,7 @@ my $op = LLNG::Manager::Test->new( {
                     oidcRPMetaDataOptionsIDTokenSignAlg        => "HS512",
                     oidcRPMetaDataOptionsClientSecret          => "rpsecret",
                     oidcRPMetaDataOptionsUserIDAttr            => "",
-                    oidcRPMetaDataOptionsAccessTokenExpiration => 1,
+                    oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                     oidcRPMetaDataOptionsBypassConsent         => 1,
                 },
                 oauth => {
@@ -187,7 +186,7 @@ ok( $json->{active}, "Token is valid" );
 is( $json->{sub}, "french", "Response contains the correct sub" );
 
 # Check status after expiration
-sleep(2);
+Time::Fake->offset("+2h");
 
 $query = "token=$token";
 ok(
@@ -203,9 +202,8 @@ ok(
     "Post introspection"
 );
 
-expectOK($res);
-$json = from_json( $res->[2]->[0] );
-ok( !$json->{active}, "Token is no longer valid" );
+$res = expectJSON($res);
+ok( !$res->{active}, "Token is no longer valid" );
 
 clean_sessions();
 done_testing();

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Option;
 
@@ -285,7 +285,7 @@ sub section {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

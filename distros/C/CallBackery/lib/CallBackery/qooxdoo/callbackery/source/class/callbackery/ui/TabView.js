@@ -25,6 +25,7 @@ qx.Class.define("callbackery.ui.TabView", {
             this.add(page);
         },this);
         var initialPlugin = tabMap[baseCfg.initial_plugin];
+        // #app=pluginKey
         if (urlCfg.app){
             initialPlugin = tabMap[urlCfg.app];
         }

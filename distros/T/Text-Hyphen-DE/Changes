@@ -1,0 +1,9 @@
+Revision history for Text::Hyphen::DE
+
+1.01 2019-12-19T08:55:26Z
+
+  - Add strict and warnings
+
+1.00 2019-12-19T08:42:45Z
+
+  - Initial release

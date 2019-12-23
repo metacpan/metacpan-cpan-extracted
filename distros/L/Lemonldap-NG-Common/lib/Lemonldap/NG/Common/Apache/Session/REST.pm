@@ -104,7 +104,7 @@ sub ua {
     my $ua = Lemonldap::NG::Common::UserAgent->new(
         { lwpOpts => $self->{lwpOpts}, lwpSslOpts => $self->{lwpSslOpts} } );
     if ( $self->{user} ) {
-        my $url = $self->{baseUrl};
+        my $url  = $self->{baseUrl};
         my $port = ( $url =~ /^https/ ? 443 : 80 );
         $url =~ s#https?://([^/]*).*$#$1#;
         $port = $1 if ( $url =~ s/:(\d+)$// );

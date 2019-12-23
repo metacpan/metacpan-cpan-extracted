@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-10-17'; # DATE
-our $VERSION = '0.728'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.729'; # VERSION
 
 use 5.010;
 use strict;
@@ -32,7 +32,7 @@ rel2mod - Convert release name (e.g. Foo-Bar-1.23.tar.gz) to module name (Foo::B
 
 =head1 VERSION
 
-This document describes version 0.728 of rel2mod (from Perl distribution App-PMUtils), released on 2019-10-17.
+This document describes version 0.729 of rel2mod (from Perl distribution App-PMUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 

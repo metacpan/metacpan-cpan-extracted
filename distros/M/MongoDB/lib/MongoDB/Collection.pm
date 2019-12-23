@@ -20,7 +20,7 @@ package MongoDB::Collection;
 # ABSTRACT: A MongoDB Collection
 
 use version;
-our $VERSION = 'v2.2.0';
+our $VERSION = 'v2.2.1';
 
 use MongoDB::ChangeStream;
 use MongoDB::Error;
@@ -1885,7 +1885,7 @@ MongoDB::Collection - A MongoDB Collection
 
 =head1 VERSION
 
-version v2.2.0
+version v2.2.1
 
 =head1 SYNOPSIS
 

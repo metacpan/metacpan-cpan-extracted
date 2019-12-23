@@ -8,4 +8,9 @@ Revision history for Data-Validate-VIN
 
 0.04    2014-07-28 11:45:00 America/Los_Angeles
         Fixed a bug where special characters would send validator into an infinite loop
-        Thanks to moltar for the patch and test updates.
+        Thanks to ROMANF for the patch and test updates.
+        (Contribution corrected to ROMANF's CPAN user name 2019-12-12.)
+
+0.05    2019-12-12 10:14:00 America/Los_Angeles
+        Expanded model year through 2039
+        Thanks to TOBYINK for reminding me of the shelf life of this thing.

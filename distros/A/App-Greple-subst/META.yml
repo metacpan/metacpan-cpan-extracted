@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.6, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,8 +26,8 @@ no_index:
 provides:
   App::Greple::subst:
     file: lib/App/Greple/subst.pm
-    version: '2.03'
-  SmartString:
+    version: '2.06'
+  App::Greple::subst::SmartString:
     file: lib/App/Greple/subst.pm
 requires:
   App::Greple: '8.3801'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple-subst/issues
   homepage: https://github.com/kaz-utashiro/greple-subst
   repository: git://github.com/kaz-utashiro/greple-subst.git
-version: '2.03'
+version: '2.06'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

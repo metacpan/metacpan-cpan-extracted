@@ -5,7 +5,7 @@ use warnings;
 use Net::Curl ();
 use Exporter 'import';
 
-our $VERSION = 0.41;
+our $VERSION = 0.42;
 
 our @EXPORT_OK = grep { /^CURL/x } keys %{Net::Curl::Share::};
 our %EXPORT_TAGS = ( constants => \@EXPORT_OK );
@@ -63,7 +63,7 @@ object.
 
  my $share = Net::Curl::Share->new( [qw(my very private data)] );
 
-Calls L<curl_share_init(3)>.
+Calls L<curl_share_init(3)|https://curl.haxx.se/libcurl/c/curl_share_init.html>.
 
 =back
 
@@ -78,7 +78,7 @@ VALUE depends on whatever that option expects.
 
  $share->setopt( CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE );
 
-Calls L<curl_share_setopt(3)>.
+Calls L<curl_share_setopt(3)|https://curl.haxx.se/libcurl/c/curl_share_setopt.html>.
 Throws L</Net::Curl::Share::Code> on error.
 
 =back
@@ -95,7 +95,7 @@ Return a string for error code CODE.
 
  my $message = Net::Curl::Share::strerror( CURLSHE_BAD_OPTION );
 
-See L<curl_share_strerror(3)> for more info.
+See L<curl_share_strerror(3)|https://curl.haxx.se/libcurl/c/curl_share_strerror.html> for more info.
 
 =back
 

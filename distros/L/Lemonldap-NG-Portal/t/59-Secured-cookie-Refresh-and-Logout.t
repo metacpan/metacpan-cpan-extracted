@@ -18,6 +18,7 @@ my $client = LLNG::Manager::Test->new( {
             requireToken        => 0,
             securedCookie       => 1,
             https               => 0,
+            whatToTrace         => 'mail'
         }
     }
 );

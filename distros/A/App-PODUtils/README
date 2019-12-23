@@ -2,16 +2,84 @@ NAME
     App::PODUtils - Command-line utilities related to POD
 
 VERSION
-    This document describes version 0.041 of App::PODUtils (from Perl
-    distribution App-PODUtils), released on 2019-06-03.
+    This document describes version 0.044 of App::PODUtils (from Perl
+    distribution App-PODUtils), released on 2019-12-14.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
     to Perl POD:
 
+    *   dump-pod-structure
+
     *   elide-pod
 
+    *   poddump
+
     *   podless
+
+    *   sort-pod-headings
+
+FUNCTIONS
+  dump_pod_structure
+    Usage:
+
+     dump_pod_structure(%args) -> [status, msg, payload, meta]
+
+    Dump POD structure using Pod::Elemental.
+
+    This is actually just a shortcut for:
+
+     % podsel FILENAME --root --dump --transform Pod5 --transform Nester
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   pod => *perl::pod_filename* (default: "-")
+
+        Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be
+        searched in @INC.
+
+        "-" means standard input.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  sort_pod_headings
+    Usage:
+
+     sort_pod_headings(%args) -> any
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   command => *str* (default: "head1")
+
+    *   pod => *perl::pod_filename* (default: "-")
+
+        Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be
+        searched in @INC.
+
+        "-" means standard input.
+
+    *   sort_args => *hash*
+
+        Arguments to pass to the Sort::Sub::* routine.
+
+    *   sort_sub => *str*
+
+        Name of a Sort::Sub::* module (without the prefix).
+
+    Return value: (any)
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -29,6 +97,11 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    pomdump. Similar script, but using Pod::POM as backend to parse POD
+    document into tree.
+
+    podsel.
+
     pod2html
 
     podtohtml from App::podtohtml

@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 has sessionTypes => ( is => 'rw' );
 
@@ -24,6 +24,13 @@ sub setTypes {
               ( $type eq 'global' ? 'SSO' : ucfirst($type) );
         }
     }
+
+    my $offlinebackend = $self->{sessionTypes}->{oidc} ? 'oidc' : 'global';
+    $self->{sessionTypes}->{offline}->{module} =
+      $self->{sessionTypes}->{$offlinebackend}->{module};
+    $self->{sessionTypes}->{offline}->{options} =
+      $self->{sessionTypes}->{$offlinebackend}->{options};
+    $self->{sessionTypes}->{offline}->{kind} = "OIDCI";
 }
 
 sub separator {
@@ -225,7 +232,7 @@ sub _session {
 
     if ($skey) {
         if ( $skey =~ s/^\[(.*)\]$/$1/ ) {
-            my @sk = split /,/, $skey;
+            my @sk  = split /,/, $skey;
             my $res = {};
             $res->{$_} = $session{$_} foreach (@sk);
             return $self->sendJSONresponse( $req, $res );
@@ -276,11 +283,11 @@ sub getMod {
     my ( $self, $req ) = @_;
     my ( $s, $m );
     unless ( $s = $req->params('sessionType') ) {
-        $self->error('Session type is required');
+        $self->error($req->error('Session type is required'));
         return ();
     }
     unless ( $m = $self->sessionTypes->{$s} ) {
-        $self->error('Unknown (or unconfigured) session type');
+        $self->error($req->error('Unknown (or unconfigured) session type'));
         return ();
     }
     if ( my $kind = $req->params('kind') ) {

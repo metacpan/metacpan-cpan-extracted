@@ -12,7 +12,7 @@ use Capture::Tiny ();
 use File::Path ();
 
 # ABSTRACT: Build shared libraries for use with FFI
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 
 sub _native_name
@@ -40,6 +40,7 @@ sub new
   my $file      = $self->{file}      = $args{file}      || FFI::Build::File::Library->new([$args{dir} || '.', $self->_native_name($name)], platform => $self->platform);
   my $buildname = $self->{buildname} = $args{buildname} || '_build';
   my $verbose   = $self->{verbose}   = $args{verbose}   || 0;
+  my $export    = $self->{export}    = $args{export}    || [];
 
   if(defined $args{cflags})
   {
@@ -81,6 +82,7 @@ sub new
 
 
 sub buildname { shift->{buildname} }
+sub export    { shift->{export}    }
 sub file      { shift->{file}      }
 sub platform  { shift->{platform}  }
 sub verbose   { shift->{verbose}   }
@@ -234,6 +236,7 @@ sub build
     $self->platform->ldflags,
     (map { "$_" } @objects),
     $self->libs,
+    $self->platform->flag_export(@{ $self->export }),
     $self->platform->flag_library_output($self->file->path),
   );
 
@@ -289,7 +292,7 @@ FFI::Build - Build shared libraries for use with FFI
 
 =head1 VERSION
 
-version 1.02
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -364,6 +367,10 @@ Extra compiler flags to use.  Things like C<-I/foo/include> or C<-DFOO=1>.
 
 The directory where the library will be written.  This is C<.> by default.
 
+=item export
+
+Functions that should be exported (Windows + Visual C++ only)
+
 =item file
 
 An instance of L<FFI::Build::File::Library> to which the library will be written.  Normally not needed.
@@ -419,6 +426,12 @@ Returns the directory where the library will be written.
 Returns the build name.  This is used in computing a directory to save intermediate files like objects.  For example,
 if you specify a file like C<ffi/foo.c>, then the object file will be stored in C<ffi/_build/foo.o> by default.
 C<_build> in this example (the default) is the build name.
+
+=head2 export
+
+ my $exports = $build->export;
+
+Returns a array reference of the exported functions (Windows + Visual C++ only)
 
 =head2 file
 

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::ParseStream::VERSION = '0.3020';
+  $REST::Neo4p::ParseStream::VERSION = '0.3030';
 }
 
 our @EXPORT = qw/j_parse/;# j_parse_object j_parse_array /;
@@ -70,9 +70,13 @@ sub j_parse_array {
     };
     if (defined $elt) {
       $last_text = $j->incr_text;
-      if ($j->incr_text =~ m/^\]}\],/) { # transaction kludge)
+      if ($j->incr_text =~ m/^\]}\],/) { # JSON::XS <=3.04 transaction kludge 
 	$j->incr_text =~ s/(\])(}\],)//;
 	$done=1;
+      }
+      elsif ($elt eq 'transaction') { # JSON::XS 4.02 transaction kludge
+	$j->incr_text = '"transaction"'.$j->incr_text;
+	return node(undef,undef);
       }
       else {
 	$j->incr_text =~ s/^(\s*,\s*)|(\s*\]\s*)//;

@@ -1,5 +1,10 @@
 Revision history for Pod::Weaver::Section::Support
 
+1.011 2019-12-20
+ - Remove AnnoCPAN:
+  - See https://github.com/shlomif/perl-pod-weaver-section-support/issues/2
+  - Thanks to @mjgardner !
+
 1.010 2018-03-31
  - Remove the perldoc section if it contains trailing whitespace.
 

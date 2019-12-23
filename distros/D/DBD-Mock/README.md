@@ -300,7 +300,7 @@ information as properties (accessed like a hash) rather than methods.
     to be set to `0` (or off), then both `Active` and `ping` would return false
     values (or `0`).
 
-- **`mock_add_resultset( \@resultset | \%sql_and_resultset )`**
+- **`mock_add_resultset( \@resultset | \%resultset_and_options )`**
 
     This stocks the database handle with a record set, allowing you to seed data
     for your application to see if it works properly. Each recordset is a simple
@@ -351,7 +351,21 @@ information as properties (accessed like a hash) rather than methods.
         # this will fetch rows from the second resultset...
         my $row = $sth->fetchrow_arrayref;
 
-    You can also associate a resultset with a particular SQL statement instead of
+    It is possible to assign a hashref where the resultset must be given as
+    value for the `results` key:
+
+        $dbh->{mock_add_resultset} = {
+            results => [
+                [ 'foo', 'bar' ],
+                [ 'this_one', 'that_one' ],
+                [ 'this_two', 'that_two' ],
+            ],
+        };
+
+    The reason for the hashref form is that you can add options as described
+    in the following.
+
+    You can associate a resultset with a particular SQL statement instead of
     adding them in the order they will be fetched:
 
         $dbh->{mock_add_resultset} = {
@@ -445,14 +459,18 @@ information as properties (accessed like a hash) rather than methods.
     patch ;) it will do for now.
 
     If you want a given statement to fail, you will have to use the hashref method
-    and add a `failure` key. That key can be handed an arrayref with the error
-    number and error string, in that order. It can also be handed a hashref with
-    two keys - `errornum` and `errorstring`. If the `failure` key has no useful
-    value associated with it, the `errornum` will be `1` and the `errorstring`
-    will be `Unknown error`.
+    and add a `failure` key. That key must be handed an arrayref with the error
+    number and error string, in that order.
 
         $dbh->{mock_add_resultset} = {
             sql => 'SELECT foo FROM bar',
+            results => DBD::Mock->NULL_RESULTSET,
+            failure => [ 5, 'Ooops!' ],
+        };
+
+    Without the `sql` attribute the next statement will fail in any case:
+
+        $dbh->{mock_add_resultset} = {
             results => DBD::Mock->NULL_RESULTSET,
             failure => [ 5, 'Ooops!' ],
         };
@@ -1233,6 +1251,8 @@ methods and tests.
 - Thanks to Chas Owens for patch and test for the `mock_can_prepare`,
 `mock_can_execute`, and `mock_can_fetch` features.
 - Thanks to Tomas Zemresfor the unit test in RT #71438.
+- Thanks to Bernhard Graf for multiple patches fixing a range of issues
+and adding a new _One Shot Failure_ feature to `mock_add_resultset`.
 
 # COPYRIGHT
 

@@ -1,4 +1,9 @@
-0.002   2017-08-01 (PERLANCAR)
+0.003   2019-10-27  Released-By: PERLANCAR; Urgency: medium
+
+	- [optimize] Reduce one subcall.
+
+
+0.002   2017-08-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,6 +11,6 @@
 	  importing package).
 
 
-0.001    2017-06-25 (PERLANCAR)
+0.001    2017-06-25  Released-By: PERLANCAR
 
          - First release.

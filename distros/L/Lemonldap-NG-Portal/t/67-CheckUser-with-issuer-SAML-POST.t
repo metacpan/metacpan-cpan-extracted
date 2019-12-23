@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 24;
+my $maintests = 22;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -50,11 +50,6 @@ SKIP: {
         'Unauth SP request'
     );
     expectOK($res);
-    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     my ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
         'SAMLRequest' );
@@ -96,11 +91,6 @@ SKIP: {
         'Unauth SP request'
     );
     expectOK($res);
-    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
         'SAMLRequest' );
@@ -147,7 +137,6 @@ SKIP: {
             $url, IO::String->new($s),
             accept => 'text/html',
             length => length($s),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -173,11 +162,6 @@ SKIP: {
         'Unauth SP request'
     );
     expectOK($res);
-    ok( expectCookie( $res, 'lemonldapidp' ), 'IDP cookie defined' )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
         'SAMLRequest' );
@@ -225,7 +209,6 @@ SKIP: {
             $url, IO::String->new($s),
             accept => 'text/html',
             length => length($s),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -287,7 +270,7 @@ SKIP: {
     );
     ok(
         $res->[2]->[0] =~
-m%<div class="message message-positive alert"><span trspan="PE5"></span></div>%,
+m%<div class="alert alert-warning alert"><div class="text-center"><span trspan="PE5"></span></div></div>%,
         ' PE5 found'
     ) or explain( $res->[2]->[0], 'PE5 - Unknown identity' );
     count(2);
@@ -349,6 +332,9 @@ m%<div class="message message-positive alert"><span trspan="PE5"></span></div>%,
       expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleLogoutReturn',
         'SAMLResponse' );
 
+    my $removedCookie = expectCookie($res);
+    is($removedCookie, 0, "SSO cookie removed");
+
     # Post SAML response to SP
     switch ('sp');
     ok(
@@ -356,7 +342,6 @@ m%<div class="message message-positive alert"><span trspan="PE5"></span></div>%,
             $url, IO::String->new($s),
             accept => 'text/html',
             length => length($s),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -377,8 +362,7 @@ m%<div class="message message-positive alert"><span trspan="PE5"></span></div>%,
         $res = $sp->_get(
             '/',
             accept => 'text/html',
-            cookie =>
-              "lemonldapidp=http://auth.idp.com/saml/metadata; lemonldap=$spId"
+            cookie => "lemonldap=$spId"
         ),
         'Test if user is reject on SP'
     );

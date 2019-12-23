@@ -113,10 +113,10 @@ sub get_content {
                     ( $ok, $aoa ) = $cr->from_col_by_col( $sql );
                 }
                 elsif ( $sf->{i}{gc}{source_type} eq $cu{from_copy} ) {
-                    ( $ok, $sf->{i}{gc}{file_ec} ) = $cr->from_copy_and_paste( $sql );
+                    ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_copy_and_paste( $sql );
                 }
                 elsif ( $sf->{i}{gc}{source_type} eq $cu{from_file} ) {
-                    ( $ok, $sf->{i}{gc}{file_ec} ) = $cr->from_file( $sql );
+                    ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_file( $sql );
                 }
                 if ( ! $ok ) {
                     next MENU;
@@ -140,8 +140,8 @@ sub get_content {
                     if ( $sf->{i}{gc}{source_type} eq $cu{from_plain} ) {
                         $sql->{insert_into_args} = $aoa;
                     }
-                    elsif ( $parse_mode_idx < 3 && -T $sf->{i}{gc}{file_ec} ) {
-                        open my $fh, $open_mode, $sf->{i}{gc}{file_ec} or die $!;
+                    elsif ( $parse_mode_idx < 3 && -T $sf->{i}{gc}{file_fs} ) {
+                        open my $fh, $open_mode, $sf->{i}{gc}{file_fs} or die $!;
                         my $parse_ok;
                         if ( $parse_mode_idx == 0 ) {
                             $parse_ok = $cp->__parse_with_Text_CSV( $sql, $fh );
@@ -169,7 +169,7 @@ sub get_content {
                     }
                     else {
                         SHEET: while ( 1 ) {
-                            $sf->{i}{gc}{sheet_count} = $cp->__parse_with_Spreadsheet_Read( $sql, $sf->{i}{gc}{file_ec} );
+                            $sf->{i}{gc}{sheet_count} = $cp->__parse_with_Spreadsheet_Read( $sql, $sf->{i}{gc}{file_fs} );
                             if ( ! $sf->{i}{gc}{sheet_count} ) {
                                 next GET_DATA;
                             }
@@ -194,7 +194,7 @@ sub get_content {
                         next GET_DATA;
                     }
                     elsif ( $ok == -1 ) {
-                        #if ( ! -T $sf->{i}{gc}{file_ec} ) {
+                        #if ( ! -T $sf->{i}{gc}{file_fs} ) {
                         #    $tc->choose(
                         #        [ 'Press ENTER' ],
                         #        { prompt => 'Not a text file: "Spreadsheet::Read" is used automatically' }

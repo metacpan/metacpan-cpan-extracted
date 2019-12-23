@@ -42,7 +42,7 @@
          },
          "requires" : {
             "Catmandu" : "1.07",
-            "Catmandu::FileStore" : "1.12",
+            "Catmandu::FileStore" : "1.16",
             "File::Copy" : "0",
             "IO" : "0",
             "IO::String" : "0",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-BagIt"
       }
    },
-   "version" : "0.239",
+   "version" : "0.240",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Franck <nicolas.franck@ugent.be>",

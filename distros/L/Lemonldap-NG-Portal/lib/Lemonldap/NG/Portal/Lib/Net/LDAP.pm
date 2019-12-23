@@ -183,7 +183,15 @@ sub userBind {
                 $self->{portal}->userLogger->warn("Bad password");
                 return PE_BADCREDENTIALS;
             }
-            return ( $mesg->code == 0 ? PE_OK : PE_LDAPERROR );
+            elsif ( $mesg->code == 0 ) {
+                return PE_OK;
+            }
+            else {
+                $self->{portal}->logger->error( "Bind failed with error "
+                      . $mesg->code . ": "
+                      . $mesg->error );
+                return PE_LDAPERROR;
+            }
         }
 
         # Check for ppolicy error
@@ -240,6 +248,9 @@ sub userBind {
         my $mesg = $self->bind(@_);
         if ( $mesg->code == 0 ) {
             return PE_OK;
+        }
+        else {
+            $req->data->{ldapError} = $mesg->error;
         }
     }
     $self->{portal}->userLogger->warn("Bad password for $req->{user}");
@@ -399,7 +410,13 @@ sub userModifyPassword {
         # Standard errors
         return PE_WRONGMANAGERACCOUNT
           if ( $mesg->code == 50 || $mesg->code == 8 );
-        return PE_LDAPERROR unless ( $mesg->code == 0 );
+        unless ( $mesg->code == 0 ) {
+            $self->{portal}
+              ->logger->error( "Password modification failed with LDAP error "
+                  . $mesg->code . ": "
+                  . $mesg->error );
+            return PE_LDAPERROR;
+        }
 
         $self->{portal}->userLogger->notice("Password changed for $dn");
 
@@ -562,6 +579,9 @@ sub userModifyPassword {
             }
         }
         else {
+            $self->{portal}->logger->error(
+                "Missing PPolicy control from server response. Code: "
+                  . $mesg->code );
             return PE_LDAPERROR;
         }
     }

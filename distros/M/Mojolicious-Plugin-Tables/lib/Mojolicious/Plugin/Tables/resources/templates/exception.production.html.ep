@@ -20,7 +20,7 @@
             </div>
         </td>
         <td style="width:50%;">
-            <img style="width:100%; height:300px;" src="/img/reliant-robin.jpg"/>
+            <img style="width:100%; height:300px;" src="<%=url_for('/img/reliant-robin.jpg')%>"/>
         </td>
     </tr>
 </table>

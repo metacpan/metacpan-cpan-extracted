@@ -1,0 +1,52 @@
+{
+   "abstract" : "parse a search query string",
+   "author" : [
+      "David Schmidt <davewood@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Parqus",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "Regexp::Grammars" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davewood/parqus/issues"
+      },
+      "homepage" : "https://github.com/davewood/parqus",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davewood/parqus.git",
+         "web" : "https://github.com/davewood/parqus"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.22.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+}
+

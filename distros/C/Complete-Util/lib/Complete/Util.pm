@@ -1,7 +1,9 @@
 package Complete::Util;
 
-our $DATE = '2019-07-23'; # DATE
-our $VERSION = '0.603'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-23'; # DATE
+our $DIST = 'Complete-Util'; # DIST
+our $VERSION = '0.607'; # VERSION
 
 use 5.010001;
 use strict;
@@ -663,6 +665,7 @@ sub complete_comma_sep {
         last unless @$cae_res == 1;
         last if @$remaining_elems <= 1;
         $cae_res->[0] .= $sep;
+        ununiquify_answer(answer => $cae_res);
     }
     $cae_res;
 }
@@ -794,12 +797,24 @@ sub modify_answer {
     my $words = ref($answer) eq 'HASH' ? $answer->{words} : $answer;
 
     if (defined(my $prefix = $args{prefix})) {
-        $_ = "$prefix$_" for @$words;
+        for (@$words) {
+            if (ref $_ eq 'HASH') {
+                $_->{word} = "$prefix$_->{word}";
+            } else {
+                $_ = "$prefix$_";
+            }
+        }
     }
     if (defined(my $suffix = $args{suffix})) {
-        $_ = "$_$suffix" for @$words;
+        for (@$words) {
+            if (ref $_ eq 'HASH') {
+                $_->{word} = "$_->{word}$suffix";
+            } else {
+                $_ = "$_$suffix";
+            }
+        }
     }
-    undef;
+    $answer;
 }
 
 $SPEC{ununiquify_answer} = {
@@ -850,7 +865,7 @@ Complete::Util - General completion routine
 
 =head1 VERSION
 
-This document describes version 0.603 of Complete::Util (from Perl distribution Complete-Util), released on 2019-07-23.
+This document describes version 0.607 of Complete::Util (from Perl distribution Complete-Util), released on 2019-12-23.
 
 =head1 DESCRIPTION
 
@@ -1251,9 +1266,10 @@ After Text::Levenshtein::Flexible is installed:
 
 =head1 ENVIRONMENT
 
-=head2 COMPLETE_UTIL_TRACE => bool
+=head2 COMPLETE_UTIL_TRACE
 
-If set to true, will display more log statements for debugging.
+Bool. If set to true, will generate more log statements for debugging (at the
+trace level).
 
 =head2 COMPLETE_UTIL_LEVENSHTEIN => str ('pp'|'xs'|'flexible')
 

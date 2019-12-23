@@ -1,7 +1,7 @@
 package winja;
 use 5.018000;
 use version;
-our $VERSION = '1.0.3';
+our $VERSION = '1.0.4';
 
 use utf8;
 
@@ -76,12 +76,6 @@ BEGIN {
         winja->import(qw/:FileSpec/);
         1;
 EOM
-    }
-    {
-
-        package CORE::GLOBAL;
-        no strict 'refs';
-        1;
     }
 }
 
@@ -367,7 +361,7 @@ winja is a module which works only on Win32-Japanese-Edition
 This module works to deal with file path which contains
 multibytes letter including 0x5C byte correctly.
 
-See C<winja::JP>(described in Japanese) for details.
+See L<winja::JP>(described in Japanese) for details.
 
 This module is unnecessary for users besides Win32-Japanese-Edition.
 
@@ -378,7 +372,7 @@ Even if you forcibly install this module on non-MSWin32 OS or MSWin32 which is n
 
 =head1 AUTHOR
 
-kpee  C<< <kpee.cpanx@gmail.com> >>
+KPEE E<lt>kpee.cpanx@gmail.comE<gt>
 
 
 =head1 LICENCE AND COPYRIGHT

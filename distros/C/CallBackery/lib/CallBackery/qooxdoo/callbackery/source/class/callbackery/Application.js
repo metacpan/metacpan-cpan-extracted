@@ -49,7 +49,8 @@ qx.Class.define("callbackery.Application", {
             this.__changeLanguage();
 
             rpc.callAsyncSmart(function(baseCfg){
-                callbackery.data.Config.getInstance().setBaseConfig(baseCfg);
+                var cfg = callbackery.data.Config.getInstance();
+                cfg.setBaseConfig(baseCfg);
                 if (baseCfg.TRANSLATIONS){
                     var t = baseCfg.TRANSLATIONS;
                     var lm = qx.locale.Manager.getInstance();
@@ -68,10 +69,9 @@ qx.Class.define("callbackery.Application", {
                     qx.theme.manager.Color.getInstance().setTheme(colorTheme);
                 }
                 rpc.callAsyncSmart(function(userCfg){
-                    callbackery.data.Config.getInstance().setUserConfig(userCfg);
-
+                    cfg.setUserConfig(userCfg);
                     desktopContainer.add(callbackery.ui.Desktop.getInstance(),{flex: 1});
-                }, 'getUserConfig');
+                }, 'getUserConfig',{urlConfig: cfg.getUrlConfig()});
             }, 'getBaseConfig');
 
         },

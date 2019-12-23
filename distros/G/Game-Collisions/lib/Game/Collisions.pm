@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Collisions;
-$Game::Collisions::VERSION = '0.3';
+$Game::Collisions::VERSION = '0.5';
 use v5.14;
 use warnings;
 use List::Util ();

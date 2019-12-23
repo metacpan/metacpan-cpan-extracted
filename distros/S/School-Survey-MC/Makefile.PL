@@ -14,8 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "School-Survey-MC",
   "EXE_FILES" => [
-    "bin/mcp",
-    "bin/mcp-dump"
+    "bin/mcp"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.006000",
@@ -32,7 +31,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Script" => "1.10"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }

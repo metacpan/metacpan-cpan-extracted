@@ -14,7 +14,7 @@ use Encode;
 use IO::Socket::SSL;
 use Term::Sk;
 
-our $VERSION    = '0.06';
+our $VERSION    = '0.07';
 
 my $WAIT_RETRY  = 20;
 my $BUFF_SIZE   = 8192;
@@ -82,7 +82,7 @@ sub uploadFile {
     else {
         croak "Cant uploadFile: " . $res->status_line;
     }
-    
+
     # Progress bar if need
     my $term;
     if ($show_progress_bar) {
@@ -280,7 +280,7 @@ sub __download {
 
     open my $FL, ">$fname" or croak "Cant open $fname to write $!";
     binmode $FL;
-    my $res = $ua->get($url, ':read_size_hint' => $BUFF_SIZE, ':content_cb' => 
+    my $res = $ua->get($url, ':read_size_hint' => $BUFF_SIZE, ':content_cb' =>
         sub {
             print $FL $_[0];
             $term->up($BUFF_SIZE) if $term;
@@ -355,7 +355,7 @@ sub __upload_file {
 
     $sock->print("0\r\n") or croak "Cant print to socket";
     $sock->print("\r\n") or croak "Cant print to socket";
-                       
+
     my @answer = $sock->getlines();
     $sock->close();
 
@@ -373,7 +373,7 @@ sub __request {
     my $ua = $self->{ua};
     my $req = HTTP::Request->new($type => $url);
     my $res = $ua->request($req);
-    
+
     return $res;
 }
 
@@ -401,7 +401,7 @@ sub __prepareProgressBar {
 sub errstr {
     return shift->{errstr};
 }
- 
+
 1;
 
 __END__
@@ -415,15 +415,15 @@ B<Yandex::Disk> - a simple API for Yandex Disk
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSYS
-    
+
     use Yandex::Disk;
 
     my $TOKEN = 'aaaabbbbccc'; #Auth token. You can get token from module L<Yandex::OAuth>
-    my $disk = Yandex::Disk->new( -token => $TOKEN ); 
-    
+    my $disk = Yandex::Disk->new( -token => $TOKEN );
+
     #Get info about disk and print
     my $diskinfo = $disk->getDiskInfo();
     p $diskinfo;
@@ -503,7 +503,7 @@ Upload file (-file) to Yandex Disk in folder (-remote_path). Return 1 if success
         -show_progress_bar  => Show progress bar upload file
 
 =head2 createFolder(%opt)
-    
+
 Create folder on disk
 
     $disk->createFolder(-path => 'Temp/test', -recursive => 1);
@@ -534,7 +534,7 @@ Download file from Yandex Disk to local file. Method overwrites local file if ex
 =head2 emptyTrash(%opt)
 
 Empty trash. If -path specified, delete -path resource, otherwise - empty all trash. Return 1 if success
-    
+
     $disk->emptyTrash(-path => 'Temp/test');        #Delete '/Temp/test' from trash
     Options:
         -path               => Path to resource on Yandex Disk to delete from trash
@@ -555,10 +555,10 @@ List files in folder. Return arrayref to hashref(keys: "path", "type", "name", "
 =head2 listAllFiles(%opt)
 
 List all files on YandexDisk. Return arrayref to hashref(keys: "path", "type", "name", "preview", "created", "modified", "md5", "mime_type", "size")
-    
+
     $disk->listAllFiles();
     Options:
-        -media_type         => Type of file to return. Afaible types listed below. Multiple types can be specified by using a comma. (default: all types) 
+        -media_type         => Type of file to return. Afaible types listed below. Multiple types can be specified by using a comma. (default: all types)
         -limit              => Limit max files to output (default: unlimited)
         -offset             => Offset records from start (default: 0)
 
@@ -568,10 +568,10 @@ audio, backup, book, compressed, data, development, diskimage, document, encoded
 =head2 lastUploadedFiles(%opt)
 
 List last uploaded files. Return arrayref to hashref(keys: "path", "type", "name", "preview", "created", "modified", "md5", "mime_type", "size")
-    
+
     $disk->lastUploadedFiles();
     Options:
-        -media_type         => Type of file to return. Afaible types same as listAllFiles. Multiple types can be specified by using a comma. (default: all types) 
+        -media_type         => Type of file to return. Afaible types same as listAllFiles. Multiple types can be specified by using a comma. (default: all types)
         -limit              => Limit max files to output (default: unlimited)
 
 

@@ -6,6 +6,11 @@ pod_spelling_system:
     - automake
     - msys
     - autoconf
+    - CMake
+    - MinGW
+    - alienizing
+    - autotools
+    - preinstall
 
 pod_coverage:
   # format is "Class#method" or "Class", regex allowed

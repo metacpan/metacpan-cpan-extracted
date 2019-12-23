@@ -5,7 +5,7 @@ use IO::String;
 require 't/test-lib.pm';
 
 my $res;
-my $maintests = 3;
+my $maintests = 4;
 
 SKIP: {
     skip 'LLNGTESTLDAP is not set', $maintests unless ( $ENV{LLNGTESTLDAP} );
@@ -32,8 +32,24 @@ SKIP: {
       . '&password='
       . ( $ENV{LDAPPWD} || 'dwho' );
 
-    # Try yo authenticate
-    # -------------------
+    # Try to authenticate with
+    # the server temporarily offline (#2018)
+    # --------------------------------------
+    tempStopLdapServer();
+    ok(
+        $res = $client->_post(
+            '/', IO::String->new($postString),
+            length => length($postString)
+        ),
+        'Auth query'
+    );
+
+    expectReject( $res, 401, 6 );
+
+    # Try to authenticate with the
+    # server back online
+    # ----------------------------
+    tempStartLdapServer();
     ok(
         $res = $client->_post(
             '/', IO::String->new($postString),

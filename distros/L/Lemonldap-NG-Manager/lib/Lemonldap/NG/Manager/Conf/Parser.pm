@@ -26,11 +26,11 @@ use JSON 'to_json';
 use Lemonldap::NG::Common::Conf::ReConstants;
 use Lemonldap::NG::Manager::Attributes;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 extends 'Lemonldap::NG::Common::Conf::Compact';
 
-# High debugging for developpers, set this to 1
+# High debugging for developers, set this to 1
 use constant HIGHDEBUG => 0;
 
 # Messages storage
@@ -94,12 +94,14 @@ sub hdebug {
 # Main method
 #@return result
 sub check {
-    my $self = shift;
+    my $self      = shift;
+    my $localConf = shift;
+
     hdebug("# check()");
     unless ( $self->newConf ) {
         return 0 unless ( $self->scanTree );
     }
-    unless ( $self->testNewConf ) {
+    unless ( $self->testNewConf($localConf) ) {
         hdebug("  testNewConf() failed");
         return 0;
     }
@@ -264,6 +266,7 @@ sub _scanNodes {
                               $leaf->{comment}
                               ? "(?#$leaf->{comment})$leaf->{re}"
                               : $leaf->{re};
+                            $k .= "(?#AuthnLevel=$leaf->{level})" if $leaf->{level};
                             $self->set( $target, $key, $k, $leaf->{data} );
                         }
                         else {
@@ -331,7 +334,7 @@ sub _scanNodes {
                     hdebug("  SAML data is an array, serializing");
                     $leaf->{data} = join ';', @{ $leaf->{data} };
                 }
-                if ( $target =~ /^saml(?:S|ID)PMetaDataExportedAttributes$/ ) {
+                if ( $target =~ /^saml(?:S|ID)PMetaData(?:ExportedAttributes|Macros)$/ ) {
                     if ( $leaf->{cnodes} ) {
                         hdebug("  $target: unopened node");
                         $self->newConf->{$target}->{$key} =
@@ -391,7 +394,7 @@ sub _scanNodes {
                     hdebug("  $target");
                     $self->set( $target, $key, $leaf->{data} );
                 }
-                elsif ( $target =~ /^oidc(?:O|R)PMetaDataExportedVars$/ ) {
+                elsif ( $target =~ /^oidc(?:O|R)PMetaData(?:ExportedVars|Macros)$/ ) {
                     hdebug("  $target");
                     if ( $leaf->{cnodes} ) {
                         hdebug('    unopened');
@@ -460,7 +463,7 @@ sub _scanNodes {
                     $self->_scanNodes($subNodes);
                     $self->set( $target, $key, $leaf->{title}, $leaf->{data} );
                 }
-                elsif ( $target =~ /^cas(?:App|Srv)MetaDataExportedVars$/ ) {
+                elsif ( $target =~ /^cas(?:App|Srv)MetaData(?:ExportedVars|Macros)$/ ) {
                     hdebug("  $target");
                     if ( $leaf->{cnodes} ) {
                         hdebug('    unopened');
@@ -846,9 +849,14 @@ sub _scanNodes {
 
                         # authChoiceModules
                         if ( $name eq 'authChoiceModules' ) {
-                            hdebug('     combModules');
-                            $n->{data}->[5] ||= {};
-                            $n->{data}->[5] = to_json( $n->{data}->[5] );
+                            hdebug('     authChoiceModules');
+                            if ( ref( $n->{data}->[5] ) eq 'ARRAY' ) {
+                                $n->{data}->[5] = to_json(
+                                    { map { @$_ } @{ $n->{data}->[5] } } );
+                            }
+                            else {
+                                $n->{data}->[5] = '{}';
+                            }
                         }
 
                         $n->{data} = join ';', @{ $n->{data} };
@@ -1078,9 +1086,12 @@ sub defaultValue {
 #
 #@return true if tests succeed
 sub testNewConf {
-    my $self = shift;
+    my $self      = shift;
+    my $localConf = shift;
+
     hdebug('# testNewConf()');
-    return $self->_unitTest( $self->newConf(), '' ) && $self->_globalTest();
+    return $self->_unitTest( $self->newConf(), $localConf )
+      && $self->_globalTest($localConf);
 }
 
 ##@method private boolean _unitTest()
@@ -1088,23 +1099,24 @@ sub testNewConf {
 #
 #@return true if tests succeed
 sub _unitTest {
-    my ( $self, $conf ) = @_;
+    my ( $self, $conf, $localConf ) = @_;
     hdebug('# _unitTest()');
     my $types = &Lemonldap::NG::Manager::Attributes::types();
     my $attrs = &Lemonldap::NG::Manager::Attributes::attributes();
     my $res   = 1;
+
     foreach my $key ( keys %$conf ) {
-        if (    $self->{skippedUnitTests}
-            and $self->{skippedUnitTests} =~ /\b$key\b/ )
+        if (    $localConf->{skippedUnitTests}
+            and $localConf->{skippedUnitTests} =~ /\b$key\b/ )
         {
-            $self->logger->debug("Ignore test for $key");
+            $localConf->logger->debug("-> Ignore test for $key\n");
             next;
         }
         hdebug("Testing $key");
         my $attr = $attrs->{$key};
         my $type = $types->{ $attr->{type} };
         unless ( $type or $attr->{test} ) {
-            print STDERR "Unknown attribute $key, deleting it\n";
+            $localConf->logger->debug("Unknown attribute $key, deleting it\n");
             delete $conf->{$key};
             next;
         }
@@ -1227,16 +1239,19 @@ sub _execTest {
 #
 #@return true if tests succeed
 sub _globalTest {
-    my $self = shift;
+    my $self      = shift;
+    my $localConf = shift;
+
     require Lemonldap::NG::Manager::Conf::Tests;
     hdebug('# _globalTest()');
     my $result = 1;
     my $tests  = &Lemonldap::NG::Manager::Conf::Tests::tests( $self->newConf );
+
     foreach my $name ( keys %$tests ) {
-        if (    $self->{skippedGlobalTests}
-            and $self->{skippedGlobalTests} =~ /\b$name\b/ )
+        if (    $localConf->{skippedGlobalTests}
+            and $localConf->{skippedGlobalTests} =~ /\b$name\b/ )
         {
-            $self->logger->debug("Ignore test for $name");
+            $localConf->logger->debug("-> Ignore test for $name\n");
             next;
         }
         my $sub = $tests->{$name};
@@ -1258,7 +1273,7 @@ sub _globalTest {
         };
         if ($@) {
             push @{ $self->warnings }, "Test $name failed: $@";
-            print STDERR "Test $name failed: $@\n";
+            $localConf->logger->debug("Test $name failed: $@\n");
         }
     }
     return $result;

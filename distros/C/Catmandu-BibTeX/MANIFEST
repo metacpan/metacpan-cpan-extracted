@@ -10,7 +10,9 @@ cpanfile
 dist.ini
 lib/Catmandu/BibTeX.pm
 lib/Catmandu/Exporter/BibTeX.pm
+lib/Catmandu/Fix/latex_decode.pm
 lib/Catmandu/Importer/BibTeX.pm
 t/Catmandu-Exporter-BibTeX.t
+t/Catmandu-Fix-latex_decode.t
 t/Catmandu-Importer-BibTeX.t
 t/author-pod-syntax.t

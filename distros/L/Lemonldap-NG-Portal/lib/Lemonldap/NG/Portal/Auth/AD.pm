@@ -6,7 +6,7 @@ package Lemonldap::NG::Portal::Auth::AD;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants
-  qw(PE_OK PE_PP_PASSWORD_EXPIRED PE_PP_CHANGE_AFTER_RESET);
+  qw(PE_OK PE_PP_PASSWORD_EXPIRED PE_PP_CHANGE_AFTER_RESET PE_BADCREDENTIALS);
 
 our $VERSION = '2.0.6';
 
@@ -66,7 +66,8 @@ sub authenticate {
     my ( $self, $req ) = @_;
     my $res = $self->SUPER::authenticate($req);
 
-    my $pls = $self->ldap->getLdapValue( $req->data->{ldapentry}, 'pwdLastSet' );
+    my $pls =
+      $self->ldap->getLdapValue( $req->data->{ldapentry}, 'pwdLastSet' );
     my $computed = $self->ldap->getLdapValue( $req->data->{ldapentry},
         'msDS-User-Account-Control-Computed' );
     my $_adUac =
@@ -74,6 +75,15 @@ sub authenticate {
       || 0;
 
     unless ( $res == PE_OK ) {
+
+        # Explicit bad credentials message
+        if (    $req->data->{ldapError}
+            and $req->data->{ldapError} =~ /LdapErr: .* data ([^,]+),.*/ )
+        {
+            if ( $1 eq '52e' ) {
+                return PE_BADCREDENTIALS;
+            }
+        }
 
         # Check specific AD attributes
         my $mask = 0xf00000;    # mask to get the 8 at 6th position

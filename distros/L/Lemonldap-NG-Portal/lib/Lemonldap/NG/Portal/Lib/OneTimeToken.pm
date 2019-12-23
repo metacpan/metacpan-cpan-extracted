@@ -65,7 +65,7 @@ sub createToken {
 
     if ( $self->cache ) {
         my $id =
-          $infos->{_utime} . '_' . unpack( 's', Crypt::URandom::urandom(2) );
+          $infos->{_utime} . '_' . unpack( 'S', Crypt::URandom::urandom(2) );
 
         # Dereference $infos
         my %h = %$infos;

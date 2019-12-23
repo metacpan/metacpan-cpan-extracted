@@ -1,11 +1,16 @@
-Revision history for Pod-Weaver-Plugin-Sort-Sub
+0.003   2019-12-15  Released-By: PERLANCAR; Urgency: low
 
-0.002   2016-12-17 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Mention DZP:Sort::Sub.
+
+
+0.002   2016-12-17  Released-By: PERLANCAR
 
 	- Generate Synopsis instruction on how to use the module via CLI
 	  with sortsub.
 
 
-0.001   2016-12-17 (PERLANCAR)
+0.001   2016-12-17  Released-By: PERLANCAR
 
         - First release.

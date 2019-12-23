@@ -1,6 +1,4 @@
 package Perl::Critic::Policy::TooMuchCode::ProhibitDuplicateSub;
-# ABSTRACT: When 2 subroutines are defined with the same name, report the first one.
-
 use strict;
 use warnings;
 use Perl::Critic::Utils;
@@ -43,20 +41,19 @@ sub violates {
 
 =head1 NAME
 
-TooMuchCode::ProhibitDuplicateSub
+TooMuchCode::ProhibitDuplicateSub - When 2 subroutines are defined with the same name, report the first one.
 
 =head1 DESCRIPTION
 
-This policy checks if there are subroutine definitions with idential
-names in the same document. If they exists, all except for the last
-one are marked as violation.
+This policy checks if there are subroutine definitions with identical names
+under the same namespace. If they exists, all but the last one are marked as
+violation.
 
-perl runtime allows a named subroutine to be redefined in the same
-source file and the latest definition wins. In the event that this is
-done by developers, preferrably unintentionally, perl runtime (when
-<C>warnings</C> pragma is in place) warns that a subroutine is
-redefined, but the position is for the one that wins. This policy does
-the opposite.
+perl runtime allows a named subroutine to be redefined in the same source file
+and the latest definition wins. In the event that this is done by developers,
+preferrably unintentionally, perl runtime warns about a subroutine is
+redefined with the position is for the one that wins. This policy does the
+opposite.
 
 Although the last one is not marked as a violation, it's position is
 reported together. Making it easier for developer to locate the subroutine.

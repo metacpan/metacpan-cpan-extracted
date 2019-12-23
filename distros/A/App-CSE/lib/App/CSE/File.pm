@@ -1,5 +1,5 @@
 package App::CSE::File;
-$App::CSE::File::VERSION = '0.014';
+$App::CSE::File::VERSION = '0.015';
 use Moose;
 
 use App::CSE;

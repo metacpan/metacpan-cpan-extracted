@@ -9,7 +9,7 @@ use strict;
 use Mouse;
 use MIME::Base64;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.7';
 
 extends 'Lemonldap::NG::Common::Notifications';
 
@@ -38,7 +38,7 @@ has fileNameSeparator => ( is => 'rw', default => '_' );
 sub get {
     my ( $self, $uid, $ref ) = @_;
     return () unless ($uid);
-    my $fns = $self->{fileNameSeparator};
+    my $fns        = $self->{fileNameSeparator};
     my $identifier = &getIdentifier( $self, $uid, $ref );
 
     opendir D, $self->{dirName};
@@ -47,7 +47,7 @@ sub get {
 
     my $files;
     foreach my $file (@notif) {
-        unless ( open F, $self->{dirName} . "/$file" ) {
+        unless ( open F, '<', $self->{dirName} . "/$file" ) {
             $self->logger->error(
                 "Unable to read notification $self->{dirName}/$file");
             next;
@@ -58,9 +58,9 @@ sub get {
 }
 
 ## @method hashref getAll()
-# Return all messages not notified.
+# Return all pending notifications.
 # @return hashref where keys are internal reference and values are hashref with
-# keys date, uid and ref.
+# keys date, uid, ref and condition.
 sub getAll {
     my $self = shift;
     opendir D, $self->{dirName};
@@ -69,6 +69,31 @@ sub getAll {
     @notif = grep /^\S*\.$ext$/, readdir(D);
     my %h = map {
 /^(\d{8})${fns}([^\s${fns}]+)${fns}([^\s${fns}]+)(?:${fns}([^\s${fns}]+))?\.$ext$/
+          ? (
+            $_ => {
+                date      => $1,
+                uid       => $2,
+                ref       => decode_base64($3),
+                condition => decode_base64( $4 // '' )
+            }
+          )
+          : ()
+    } @notif;
+    return \%h;
+}
+
+## @method hashref getExisting()
+# Return all notifications.
+# @return hashref where keys are internal reference and values are hashref with
+# keys date, uid, ref and condition.
+sub getExisting {
+    my $self = shift;
+    opendir D, $self->{dirName};
+    my @notif;
+    my $fns = $self->{fileNameSeparator};
+    @notif = grep /^\S*\.$ext$/, readdir(D);
+    my %h = map {
+/^(\d{8})${fns}([^\s${fns}]+)${fns}([^\s${fns}]+)(?:${fns}([^\s${fns}]+))?\.(?:$ext|done)$/
           ? (
             $_ => {
                 date      => $1,
@@ -116,7 +141,8 @@ sub newNotif {
     return ( 0, 'This notification still exists' ) if ( -e $filename );
     my $old = ( $filename =~ /(.*?)(?:\.$ext)$/ )[0] . '.done';
     return ( 0, 'This notification has been done' ) if ( -e $old );
-    open my $F, ">$filename" or return ( 0, "Unable to create $filename ($!)" );
+    open my $F, '>', $filename
+      or return ( 0, "Unable to create $filename ($!)" );
     binmode($F);
     print $F $content;
     return ( 0, "Unable to close $filename ($!)" ) unless ( close $F );

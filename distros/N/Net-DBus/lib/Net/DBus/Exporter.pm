@@ -169,7 +169,7 @@ to the C structure
       char *surname;
     } name;
 
-then, when calling the method one would provide an array refernce
+then, when calling the method one would provide an array reference
 with the values orded to match the structure
 
    $object->hello(["John", "Doe"]);

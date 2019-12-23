@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Text::Hogan",
   "PREREQ_PM" => {
     "Clone" => "0.37",
+    "Ref::Util" => "0.204",
     "Scalar::Util" => "1.41",
     "Text::Trim" => "1.02"
   },
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => "0.22",
     "YAML" => "1.13"
   },
-  "VERSION" => "2.02",
+  "VERSION" => "2.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,6 +40,7 @@ my %FallbackPrereqs = (
   "Clone" => "0.37",
   "Data::Visitor::Callback" => "0.30",
   "Path::Tiny" => "0.059",
+  "Ref::Util" => "0.204",
   "Scalar::Util" => "1.41",
   "Test::More" => "1.001008",
   "Text::Trim" => "1.02",

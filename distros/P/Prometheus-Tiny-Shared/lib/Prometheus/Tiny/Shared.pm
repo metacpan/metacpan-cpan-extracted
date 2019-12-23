@@ -1,10 +1,11 @@
 package Prometheus::Tiny::Shared;
-$Prometheus::Tiny::Shared::VERSION = '0.001';
+$Prometheus::Tiny::Shared::VERSION = '0.002';
 # ABSTRACT: A tiny Prometheus client backed by a shared memory region
 
 use warnings;
 use strict;
 
+use Prometheus::Tiny 0.004;
 use parent 'Prometheus::Tiny';
 use Cache::FastMmap;
 
@@ -17,14 +18,21 @@ sub new {
 }
 
 sub set {
-  my ($self, $name, $value, $labels) = @_;
-  $self->{cache}->set(join('-', 'k', $name, $self->_format_labels($labels)), $value);
+  my ($self, $name, $value, $labels, $timestamp) = @_;
+  $self->{cache}->set(
+    join('-', 'k', $name, $self->_format_labels($labels)),
+    [ $value, $timestamp ]
+  );
   return;
 }
 
 sub add {
   my ($self, $name, $value, $labels) = @_;
-  $self->{cache}->get_and_set(join('-', 'k', $name, $self->_format_labels($labels)), sub { $value + ($_[1] || 0) });
+  $self->{cache}->get_and_set(
+    join('-', 'k', $name, $self->_format_labels($labels)),
+    # backcompat, before 0.003 value was scalar, in 0.003 its a [value,timestamp] array
+    sub { [ $value + ((ref $_[1] ? $_[1][0] : $_[1]) || 0), undef ] }
+  );
   return;
 }
 
@@ -32,6 +40,15 @@ sub declare {
   my ($self, $name, %meta) = @_;
   $self->{cache}->get_and_set(join('-', 'm', $name), sub { \%meta });
   return;
+}
+
+sub histogram_observe {
+  my $self = shift;
+  my ($name) = @_;
+
+  $self->{meta}{$name} = $self->{cache}->get(join('-', 'm', $name));
+
+  return $self->SUPER::histogram_observe(@_);
 }
 
 sub format {

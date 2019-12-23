@@ -4,13 +4,13 @@
       "Slaven Rezic <srezic@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Map-Metro-Plugin-Map-Berlin",
    "no_index" : {
@@ -49,6 +49,6 @@
          "web" : "https://github.com/eserte/Map-Metro-Plugin-Map-Berlin"
       }
    },
-   "version" : "2018.1209",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2019.1215",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

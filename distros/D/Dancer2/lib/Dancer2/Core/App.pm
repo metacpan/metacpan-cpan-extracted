@@ -1,11 +1,10 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '0.208001';
+$Dancer2::Core::App::VERSION = '0.208002';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
 use Module::Runtime    'is_module_name';
-use Return::MultiLevel ();
 use Safe::Isa;
 use Sub::Quote;
 use File::Spec;
@@ -1467,14 +1466,23 @@ DISPATCH:
             }
 
             # calling the actual route
-            my $response = Return::MultiLevel::with_return {
-                my ($return) = @_;
+            my $response;
 
-                # stash the multilevel return coderef in the app
-                $self->has_with_return
-                    or $self->set_with_return($return);
-
-                return $self->_dispatch_route($route);
+            # this is very evil, but allows breaking out of multiple stack
+            # frames without throwing an exception.  Avoiding exceptions means
+            # a naive eval won't swallow our flow control mechanisms, and
+            # avoids __DIE__ handlers.  It also prevents some cleanup routines
+            # from working, since they are expecting control to return to them
+            # after an eval.
+            DANCER2_CORE_APP_ROUTE_RETURN: {
+                if (!$self->has_with_return) {
+                    $self->set_with_return(sub {
+                        $response = shift;
+                        no warnings 'exiting';
+                        last DANCER2_CORE_APP_ROUTE_RETURN;
+                    });
+                }
+                $response = $self->_dispatch_route($route);
             };
 
             # ensure we clear the with_return handler
@@ -1669,7 +1677,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 0.208001
+version 0.208002
 
 =head1 DESCRIPTION
 
@@ -1693,7 +1701,8 @@ that package, thanks to that encapsulation.
 
 =head2 with_return
 
-Used to cache the coderef from L<Return::MultiLevel> within the dispatcher.
+Used to cache the coderef that will return from back to the dispatcher, across
+an arbitrary number of stack frames.
 
 =head2 destroyed_session
 
@@ -1747,6 +1756,37 @@ Just like C<with_plugin>, but for a single plugin.
 
     my $plugin = $app->with_plugin('Foo');
 
+=head2 add_route
+
+Register a new route handler.
+
+    $app->add_route(
+        method  => 'get',
+        regexp  => '/somewhere',
+        code    => sub { ... },
+        options => $conditions,
+    );
+
+Returns a new L<< Dancer2::Core::Route >> object created with the passed
+arguments.
+
+=head2 route_exists
+
+Returns a true value if a route already exists, otherwise false.
+
+    my $route = Dancer2::Core::Route->new(...);
+    if ($app->route_exists($route)) {
+        ...
+    }
+
+=head2 routes_regexps_for
+
+Sugar for getting the ordered list of all registered route regexps by method.
+
+    my $regexps = $app->routes_regexps_for( 'get' );
+
+Returns an ArrayRef with the results.
+
 =head2 redirect($destination, $status)
 
 Sets a redirect in the response object.  If $destination is not an absolute URI, then it will
@@ -1781,45 +1821,6 @@ For example:
 
     forward '/login', { login_failed => 1 }, { method => 'GET' });
 
-=head2 lexical_prefix
-
-Allow for setting a lexical prefix
-
-    $app->lexical_prefix('/blog', sub {
-        ...
-    });
-
-All the route defined within the callback will have a prefix appended to the
-current one.
-
-=head2 add_route
-
-Register a new route handler.
-
-    $app->add_route(
-        method  => 'get',
-        regexp  => '/somewhere',
-        code    => sub { ... },
-        options => $conditions,
-    );
-
-=head2 route_exists
-
-Check if a route already exists.
-
-    my $route = Dancer2::Core::Route->new(...);
-    if ($app->route_exists($route)) {
-        ...
-    }
-
-=head2 routes_regexps_for
-
-Sugar for getting the ordered list of all registered route regexps by method.
-
-    my $regexps = $app->routes_regexps_for( 'get' );
-
-Returns an ArrayRef with the results.
-
 =head2 app
 
 Returns itself. This is simply available as a shim to help transition from
@@ -1845,6 +1846,17 @@ to make it work.
         my $WannaBeCtx = shift;
         my $app        = $WannaBeContext->app; # works
     };
+
+=head2 lexical_prefix
+
+Allow for setting a lexical prefix
+
+    $app->lexical_prefix('/blog', sub {
+        ...
+    });
+
+All the route defined within the callback will have a prefix appended to the
+current one.
 
 =head2 C< $SIG{__DIE__} > Compatibility via C< $Dancer2::Core::App::EVAL_SHIM >
 

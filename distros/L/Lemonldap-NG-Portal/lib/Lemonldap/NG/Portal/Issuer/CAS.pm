@@ -85,7 +85,11 @@ sub storeEnvAndCheckGateway {
         $self->logger->debug(
             "Gateway mode requested, redirect without authentication");
         $req->response( [ 302, [ Location => $service ], [] ] );
-        $req->pdata( {} );
+        for my $s ( $self->ipath, $self->ipath . 'Path' ) {
+            $self->logger->debug("Removing $s from pdata")
+              if delete $req->pdata->{$s};
+        }
+
         return PE_SENDRESPONSE;
     }
 
@@ -797,9 +801,21 @@ sub _validate2 {
     }
 
     foreach my $casAttribute ( keys %$ev ) {
-        my $localSessionValue = $localSession->data->{ $ev->{$casAttribute} };
-        $attributes->{$casAttribute} = $localSessionValue
-          if defined $localSessionValue;
+        my $sessionAttr = $ev->{$casAttribute};
+        my $value;
+
+        # Lookup per-service macros first, and then local sessions
+        #
+        if ( $app and $self->spMacros->{$app}->{$sessionAttr} ) {
+            $value = $self->spMacros->{$app}->{$sessionAttr}
+              ->( $req, $localSession->data );
+        }
+        else {
+            $value = $localSession->data->{$sessionAttr};
+        }
+
+        $attributes->{$casAttribute} = $value
+          if defined $value;
     }
 
     # Return success message

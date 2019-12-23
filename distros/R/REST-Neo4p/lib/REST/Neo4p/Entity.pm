@@ -10,7 +10,7 @@ use warnings;
 
 # base class for nodes, relationships, indexes...
 BEGIN {
-  $REST::Neo4p::Entity::VERSION = '0.3020';
+  $REST::Neo4p::Entity::VERSION = '0.3030';
 }
 
 our $ENTITY_TABLE = {};
@@ -291,7 +291,7 @@ sub simple_from_json_response {
   return;
 }
 
-sub id { ${$_[0]} }
+sub id { 0 + ${$_[0]} }
 sub is_batch { shift->_entry->{batch} }
 sub entity_type { shift->_entry->{entity_type} }
 
@@ -435,7 +435,7 @@ use strict;
 use warnings;
 no warnings qw/once/;
 BEGIN {
-  $REST::Neo4p::Simple::VERSION = '0.3020';
+  $REST::Neo4p::Simple::VERSION = '0.3030';
 }
 
 sub new { $_[1] }

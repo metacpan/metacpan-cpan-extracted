@@ -27,6 +27,7 @@ t/06-sru.t
 t/07-pica-each.t
 t/08-pica-add.t
 t/10-validator.t
+t/Catmandu-Fix-pica_map.t
 t/author-pod-syntax.t
 t/bugfix_pica_map.t
 t/files/dump.dat

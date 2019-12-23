@@ -3,6 +3,7 @@ corpus/PackageImports.pm
 corpus/PackageVersion.pm
 corpus/Repeated.pm
 corpus/RT79273.pm
+corpus/state_require.pm
 examples/extract_modules
 INSTALL.SKIP
 lib/Module/Extract/Use.pm

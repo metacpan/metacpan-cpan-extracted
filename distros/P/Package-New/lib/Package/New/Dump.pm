@@ -3,7 +3,7 @@ use base qw{Package::New};
 use strict;
 use warnings;
 
-our $VERSION='0.06';
+our $VERSION='0.08';
 
 =head1 NAME
 
@@ -39,13 +39,16 @@ Returns the object serialized by L<Data::Dumper>
 =cut
 
 sub dump {
-  my $self=shift();
+  my $self  = shift;
+  my $depth = shift;
+  $depth    = 2 unless defined $depth;
+  local $@;
   eval 'use Data::Dumper qw{}';
-  if ($@) {
+  my $error = $@;
+  if ($error) {
     return wantarray ? () : '';
   } else {
-    my $depth=shift; $depth=2 unless defined $depth;
-    my $d=Data::Dumper->new([$self]);
+    my $d = Data::Dumper->new([$self]);
     $d->Maxdepth($depth);
     return $d->Dump;
   }

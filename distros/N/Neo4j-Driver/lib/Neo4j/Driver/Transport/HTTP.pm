@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transport::HTTP;
 # ABSTRACT: Adapter for the Neo4j Transactional HTTP API
-$Neo4j::Driver::Transport::HTTP::VERSION = '0.13';
+$Neo4j::Driver::Transport::HTTP::VERSION = '0.14';
 
 use Carp qw(carp croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction);
@@ -40,6 +40,8 @@ sub new {
 	
 	my $self = bless {
 		die_on_error => $driver->{die_on_error},
+		cypher_types => $driver->{cypher_types},
+		cypher_filter => $driver->{cypher_filter},
 	}, $class;
 	
 	# If the Driver object knows how to create the REST client,
@@ -76,6 +78,14 @@ sub new {
 # preparing each statement individually.
 sub prepare {
 	my ($self, $tx, $query, $parameters) = @_;
+	
+	if ($self->{cypher_filter}) {
+		croak "Unimplemented cypher filter '$self->{cypher_filter}'" if $self->{cypher_filter} ne 'params';
+		if (defined $parameters) {
+			my $params = join '|', keys %$parameters;
+			$query =~ s/{($params)}/\$$1/g;
+		}
+	}
 	
 	my $json = { statement => '' . $query };
 	$json->{resultDataContents} = $RESULT_DATA_CONTENTS;
@@ -114,6 +124,7 @@ sub run {
 			statement => $statements[$i],
 			deep_bless => \&_deep_bless,
 			detach_stream => $detach_stream,
+			cypher_types => $self->{cypher_types},
 		});
 	}
 	return @results;
@@ -232,31 +243,35 @@ sub address {
 sub version {
 	my ($self) = @_;
 	
-	my $json = $self->{client}->GET( $SERVICE_ROOT_ENDPOINT )->responseContent();
-	my $neo4j_version = decode_json($json)->{neo4j_version};
-	return "Neo4j/$neo4j_version";
+	foreach my $endpoint ( '/', $SERVICE_ROOT_ENDPOINT ) {
+		my $json = $self->{client}->GET( $endpoint )->responseContent();
+		my $neo4j_version = decode_json($json)->{neo4j_version};
+		return "Neo4j/$neo4j_version" if $neo4j_version;
+	}
 }
 
 
 sub _deep_bless {
-	my ($data, $meta, $rest) = @_;
+	my ($cypher_types, $data, $meta, $rest) = @_;
 	
 	# "meta" is broken, so we primarily use "rest", see neo4j #12306
 	
 	if (ref $data eq 'HASH' && ref $rest eq 'HASH' && ref $rest->{metadata} eq 'HASH' && $rest->{self} && $rest->{self} =~ m|/db/data/node/|) {  # node
-		bless $data, 'Neo4j::Driver::Type::Node';
+		bless $data, $cypher_types->{node};
 		$data->{_meta} = $rest->{metadata};
 		$data->{_meta}->{deleted} = $meta->{deleted} if ref $meta eq 'HASH';
+		$cypher_types->{init}->($data) if $cypher_types->{init};
 		return $data;
 	}
 	if (ref $data eq 'HASH' && ref $rest eq 'HASH' && ref $rest->{metadata} eq 'HASH' && $rest->{self} && $rest->{self} =~ m|/db/data/relationship/|) {  # relationship
-		bless $data, 'Neo4j::Driver::Type::Relationship';
+		bless $data, $cypher_types->{relationship};
 		$data->{_meta} = $rest->{metadata};
 		$rest->{start} =~ m|/([0-9]+)$|;
 		$data->{_meta}->{start} = 0 + $1;
 		$rest->{end} =~ m|/([0-9]+)$|;
 		$data->{_meta}->{end} = 0 + $1;
 		$data->{_meta}->{deleted} = $meta->{deleted} if ref $meta eq 'HASH';
+		$cypher_types->{init}->($data) if $cypher_types->{init};
 		return $data;
 	}
 	
@@ -281,21 +296,27 @@ sub _deep_bless {
 			$data->[$i]->{_meta}->{deleted} = $meta->[$i]->{deleted} if ref $meta eq 'ARRAY';
 			$data->[$i] = bless $data->[$i], 'Neo4j::Driver::Type::Relationship';
 		}
-		return bless $data, 'Neo4j::Driver::Type::Path';
+		bless $data, $cypher_types->{path};
+		$cypher_types->{init}->($data) if $cypher_types->{init};
+		return $data;
 	}
 	
 	if (ref $data eq 'HASH' && ref $rest eq 'HASH' && ref $rest->{crs} eq 'HASH') {  # spatial
-		return bless $rest, 'Neo4j::Driver::Type::Point';
+		bless $rest, $cypher_types->{point};
+		$cypher_types->{init}->($data) if $cypher_types->{init};
+		return $rest;
 	}
 	if (ref $data eq '' && ref $rest eq '' && ref $meta eq 'HASH' && $meta->{type} && $meta->{type} =~ m/date|time|duration/) {  # temporal (depends on meta => doesn't always work)
-		return bless { data => $data, type => $meta->{type} }, 'Neo4j::Driver::Type::Temporal';
+		$data = bless { data => $data, type => $meta->{type} }, $cypher_types->{temporal};
+		$cypher_types->{init}->($data) if $cypher_types->{init};
+		return $data;
 	}
 	
 	if (ref $data eq 'ARRAY' && ref $rest eq 'ARRAY') {  # array
 		die "Assertion failed: array rest size mismatch" if @$data != @$rest;  # uncoverable branch true
 		$meta = [] if ref $meta ne 'ARRAY' || @$data != @$meta;  # handle neo4j #12306
 		foreach my $i ( 0 .. $#{$data} ) {
-			$data->[$i] = _deep_bless($data->[$i], $meta->[$i], $rest->[$i]);
+			$data->[$i] = _deep_bless($cypher_types, $data->[$i], $meta->[$i], $rest->[$i]);
 		}
 		return $data;
 	}
@@ -304,7 +325,7 @@ sub _deep_bless {
 		die "Assertion failed: map rest keys mismatch" if (join '', sort keys %$data) ne (join '', sort keys %$rest);  # uncoverable branch true
 		$meta = {} if ref $meta ne 'HASH' || (scalar keys %$data) != (scalar keys %$meta);  # handle neo4j #12306
 		foreach my $key ( keys %$data ) {
-			$data->{$key} = _deep_bless($data->{$key}, $meta->{$key}, $rest->{$key});
+			$data->{$key} = _deep_bless($cypher_types, $data->{$key}, $meta->{$key}, $rest->{$key});
 		}
 		return $data;
 	}
@@ -334,7 +355,7 @@ Neo4j::Driver::Transport::HTTP - Adapter for the Neo4j Transactional HTTP API
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 DESCRIPTION
 

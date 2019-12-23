@@ -35,7 +35,6 @@ my $op = LLNG::Manager::Test->new( {
                     name        => "cn"
                 }
             },
-            oidcServiceMetaDataIssuer             => "http://auth.op.com",
             oidcServiceMetaDataAuthorizeURI       => "authorize",
             oidcServiceMetaDataCheckSessionURI    => "checksession.html",
             oidcServiceMetaDataJWKSURI            => "jwks",
@@ -55,7 +54,7 @@ my $op = LLNG::Manager::Test->new( {
                     oidcRPMetaDataOptionsIDTokenSignAlg        => "HS512",
                     oidcRPMetaDataOptionsClientSecret          => "rpsecret",
                     oidcRPMetaDataOptionsUserIDAttr            => "",
-                    oidcRPMetaDataOptionsAccessTokenExpiration => 1,
+                    oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                     oidcRPMetaDataOptionsBypassConsent         => 1,
                 },
                 rp2 => {
@@ -65,7 +64,7 @@ my $op = LLNG::Manager::Test->new( {
                     oidcRPMetaDataOptionsIDTokenSignAlg        => "HS512",
                     oidcRPMetaDataOptionsClientSecret          => "rp2secret",
                     oidcRPMetaDataOptionsUserIDAttr            => "",
-                    oidcRPMetaDataOptionsAccessTokenExpiration => 1,
+                    oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                     oidcRPMetaDataOptionsBypassConsent         => 1,
                     oidcRPMetaDataOptionsRule => '$uid eq "dwho"',
                 }
@@ -148,7 +147,7 @@ ok(
         accept => 'text/html',
         cookie => "lemonldap=$idpId",
     ),
-    "Get authorization code"
+    "Get authorization code for rp1"
 );
 count(1);
 
@@ -168,17 +167,33 @@ ok(
             HTTP_AUTHORIZATION => "Basic " . encode_base64("rp2id:rp2secret"),
         },
     ),
-    "Post token"
+    "Post token on wrong RP"
 );
 count(1);
 
 # Expect an invalid request
-is( $res->[0], 400 );
+is( $res->[0], 400, "Got invalid request" );
 count(1);
+
+# Get new code for RP1
+my $query =
+"response_type=code&scope=openid%20profile%20email&client_id=rpid&state=af0ifjsldkj&redirect_uri=http%3A%2F%2Frp.com%2F";
+ok(
+    $res = $op->_get(
+        "/oauth2/authorize",
+        query  => "$query",
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId",
+    ),
+    "Get authorization code again"
+);
+count(1);
+
+my ($code) = expectRedirection( $res, qr#http://rp\.com/.*code=([^\&]*)# );
 
 # Play code on RP1
 $query =
-"grant_type=authorization_code&code=$code&redirect_uri=http%3A%2F%2Frp2.com%2F";
+"grant_type=authorization_code&code=$code&redirect_uri=http%3A%2F%2Frp.com%2F";
 
 ok(
     $res = $op->_post(
@@ -190,14 +205,15 @@ ok(
             HTTP_AUTHORIZATION => "Basic " . encode_base64("rpid:rpsecret"),
         },
     ),
-    "Post token"
+    "Post auth code on correct RP"
 );
 count(1);
-my $json  = from_json( $res->[2]->[0] );
-my $token = $json->{access_token};
+$res = expectJSON($res);
+my $token = $res->{access_token};
 ok( $token, 'Access token present' );
 count(1);
-sleep(2);
+Time::Fake->offset("+2h");
+
 
 ok(
     $res = $op->_post(
@@ -209,10 +225,10 @@ ok(
             HTTP_AUTHORIZATION => "Bearer " . $token,
         },
     ),
-    "Post userinfo"
+    "post to userinfo with expired access token"
 );
 count(1);
-is( $res->[0], 401, "Access denied with expired token" );
+ok( $res->[0] == 401, "Access denied with expired token" );
 count(1);
 
 clean_sessions();

@@ -5,7 +5,7 @@ use Lemonldap::NG::Common::Conf::Constants;    #inherits
 use JSON;
 use Encode;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 our $initDone;
 
 sub Lemonldap::NG::Common::Conf::_lock {
@@ -40,7 +40,7 @@ sub available {
     closedir D;
     @conf =
       sort { $a <=> $b }
-      map { /lmConf-(\d+)(?:\.js(?:on))?/ ? ( $1 + 0 ) : () } @conf;
+      map  { /lmConf-(\d+)(?:\.js(?:on))?/ ? ( $1 + 0 ) : () } @conf;
     return @conf;
 }
 
@@ -106,7 +106,7 @@ sub load {
     if ($filename) {
         local $/ = '';
         my $ret;
-        unless ( open FILE, $filename ) {
+        unless ( open FILE, '<', $filename ) {
             $Lemonldap::NG::Common::Conf::msg .= "Read error: $!$@";
             return undef;
         }
@@ -124,9 +124,9 @@ sub load {
 
     # Old format
     elsif ( -e "$self->{dirName}/lmConf-$cfgNum" ) {
-        open FILE, "$self->{dirName}/lmConf-$cfgNum" or die "$!$@";
+        open FILE, '<', "$self->{dirName}/lmConf-$cfgNum" or die "$!$@";
         local $/ = "";
-        unless ( open FILE, $self->{dirName} . "/lmConf-$cfgNum" ) {
+        unless ( open FILE, '<', $self->{dirName} . "/lmConf-$cfgNum" ) {
             $Lemonldap::NG::Common::Conf::msg .= "Open file failed: $! \n";
             return undef;
         }

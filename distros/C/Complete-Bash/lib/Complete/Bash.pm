@@ -1,7 +1,9 @@
 package Complete::Bash;
 
-our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.330'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-22'; # DATE
+our $DIST = 'Complete-Bash'; # DIST
+our $VERSION = '0.332'; # VERSION
 
 use 5.010001;
 use strict;
@@ -525,6 +527,10 @@ Known options:
 
   which is quite helpful.
 
+* workaround_with_wordbreaks
+
+  Boolean. Default is true. See source code for more details.
+
 _
 
         },
@@ -544,7 +550,7 @@ sub format_completion {
     my $words    = $hcomp->{words};
     my $as       = $hcomp->{as} // 'string';
     # 'escmode' key is deprecated (Complete 0.11-) and will be removed later
-    my $esc_mode = $hcomp->{esc_mode} // $hcomp->{escmode} // 'default';
+    my $esc_mode = $hcomp->{esc_mode} // $hcomp->{escmode} // $ENV{COMPLETE_BASH_DEFAULT_ESC_MODE} // 'default';
     my $path_sep = $hcomp->{path_sep};
 
     # we keep the original words (before formatted with summaries) when we want
@@ -602,7 +608,10 @@ sub format_completion {
     # case-insensitive matching, although this does not have the ability to
     # replace the current word (e.g. if we type 'text::an' then bash can only
     # replace the current word 'an' with 'ANSI).
-    if (defined($opts->{word})) {
+    {
+        last unless $opts->{workaround_with_wordbreaks} // 1;
+        last unless defined $opts->{word};
+
         if ($opts->{word} =~ s/(.+[\@><=;|&\(:])//) {
             my $prefix = $1;
             for (@$words) {
@@ -755,7 +764,7 @@ Complete::Bash - Completion routines for bash shell
 
 =head1 VERSION
 
-This document describes version 0.330 of Complete::Bash (from Perl distribution Complete-Bash), released on 2019-08-20.
+This document describes version 0.332 of Complete::Bash (from Perl distribution Complete-Bash), released on 2019-12-22.
 
 =head1 DESCRIPTION
 
@@ -923,6 +932,10 @@ But when summaries are shown, user will see:
   --sort     -- Specify sort order
 
 which is quite helpful.
+
+=item * workaround_with_wordbreaks
+
+Boolean. Default is true. See source code for more details.
 
 =back
 
@@ -1151,6 +1164,10 @@ Marker character.
 Return value:  (any)
 
 =head1 ENVIRONMENT
+
+=head2 COMPLETE_BASH_DEFAULT_ESC_MODE
+
+Str.
 
 =head2 COMPLETE_BASH_FZF
 

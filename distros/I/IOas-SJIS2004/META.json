@@ -1,6 +1,6 @@
 {
     "name" : "IOas-SJIS2004",
-    "version" : "0.09",
+    "version" : "0.10",
     "abstract" : "provides SJIS2004 I/O subroutines for UTF-8 script",
     "author" : [
         "ina <ina@cpan.org>"

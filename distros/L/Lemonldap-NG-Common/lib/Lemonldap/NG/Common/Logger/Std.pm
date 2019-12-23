@@ -7,7 +7,7 @@ our $VERSION = '2.0.5';
 sub new {
     no warnings 'redefine';
     my $level = $_[1]->{logLevel} || 'info';
-    my $show = 1;
+    my $show  = 1;
     foreach (qw(error warn notice info debug)) {
         if ($show) {
             eval

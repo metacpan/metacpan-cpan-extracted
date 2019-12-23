@@ -30,7 +30,7 @@ MongoDB::Monitoring - Internal event monitoring API for instrumentation
 
 =head1 VERSION
 
-version v2.2.0
+version v2.2.1
 
 =head1 DESCRIPTION
 

@@ -172,7 +172,7 @@ sub get_object {
 =item my $timeout = $service->timeout(60 * 1000);
 
 Sets or retrieves the timeout value which will be used for DBus
-requests belongs to this service. The value is in miliseconds.
+requests belongs to this service. The value is in milliseconds.
 If the timeout for a service is undefined, then the default
 timeout from the bus will apply.
 

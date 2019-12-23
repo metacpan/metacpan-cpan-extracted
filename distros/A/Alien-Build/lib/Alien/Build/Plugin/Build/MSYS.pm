@@ -7,7 +7,7 @@ use File::Which ();
 use Env qw( @PATH );
 
 # ABSTRACT: MSYS plugin for Alien::Build
-our $VERSION = '1.93'; # VERSION
+our $VERSION = '1.94'; # VERSION
 
 
 has msys_version   => '0.07';
@@ -80,7 +80,7 @@ Alien::Build::Plugin::Build::MSYS - MSYS plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.93
+version 1.94
 
 =head1 SYNOPSIS
 

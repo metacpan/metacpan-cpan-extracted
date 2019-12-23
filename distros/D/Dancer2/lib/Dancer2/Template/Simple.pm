@@ -1,6 +1,6 @@
 package Dancer2::Template::Simple;
 # ABSTRACT: Pure Perl 5 template engine for Dancer2
-$Dancer2::Template::Simple::VERSION = '0.208001';
+$Dancer2::Template::Simple::VERSION = '0.208002';
 use Moo;
 use Dancer2::FileUtils 'read_file_content';
 use Ref::Util qw<is_arrayref is_coderef is_plain_hashref>;
@@ -155,7 +155,7 @@ Dancer2::Template::Simple - Pure Perl 5 template engine for Dancer2
 
 =head1 VERSION
 
-version 0.208001
+version 0.208002
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,8 @@
 Revision history for Music-FretboardDiagram
 
+0.1204 2019-12-23 06:33:59
+    - Use List::SomeUtils, not List::More::Utils.
+
 0.1203 2019-04-30 22:16:26
     - My distribution went AWOL from metacpan. Hopefully re-uploading will fix it...
 

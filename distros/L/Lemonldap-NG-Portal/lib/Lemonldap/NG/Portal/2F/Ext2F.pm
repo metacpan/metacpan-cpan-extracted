@@ -3,7 +3,7 @@ package Lemonldap::NG::Portal::2F::Ext2F;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADCREDENTIALS
+  PE_BADOTP
   PE_ERROR
   PE_FORMEMPTY
   PE_OK
@@ -119,7 +119,7 @@ sub verify {
             $self->userLogger->warn( 'Second factor failed for '
                   . $session->{ $self->conf->{whatToTrace} } );
             $self->logger->error("External verify command failed (code $c)");
-            return PE_BADCREDENTIALS;
+            return PE_BADOTP;
         }
         return PE_OK;
     }
@@ -136,7 +136,7 @@ sub verify {
 
     $self->userLogger->warn( 'Second factor failed for '
           . $session->{ $self->conf->{whatToTrace} } );
-    return PE_BADCREDENTIALS;
+    return PE_BADOTP;
 }
 
 # system() is used with an array to avoid shell injection

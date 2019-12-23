@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2019-08-08'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'App-podsel'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,6 +15,7 @@ Perinci::CmdLine::Any->new(
     url => '/App/podsel/podsel',
     read_config => 0,
     read_env => 0,
+    log => 1,
 )->run;
 
 # ABSTRACT: Select Pod::Elemental nodes using CSel syntax
@@ -30,22 +33,18 @@ podsel - Select Pod::Elemental nodes using CSel syntax
 
 =head1 VERSION
 
-This document describes version 0.003 of podsel (from Perl distribution App-podsel), released on 2019-08-08.
+This document describes version 0.006 of podsel (from Perl distribution App-podsel), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
-To select the commands:
+To select the head1 sections:
 
- % podsel foo.pod '.Command'
-
-To print only the head* commands:
-
- % podsel foo.pod '.Command[command =~ "head"]'
+ % podsel foo.pod -t Pod5 -t Nested '.Nested[command=head1]'
 
 To dump Pod document tree (C<--root> select the root node, C<--dump> dumps the
 content):
 
- % podsel foo.pod --root --dump
+ % podsel foo.pod -t Pod5 -t Nested --root --dump
 
 =head1 DESCRIPTION
 
@@ -54,8 +53,9 @@ constructed from a Perl POD document.
 
 About the tree: the root node is Pod::Elemental::Document object. The other
 nodes are Pod::Elemental::Element::* nodes. This utility allows you to omit the
-C<Pod::Elemental::Element::Generic>, C<Pod::Elemental::Element> or
-C<Pod::Elemental::> prefix, so to select a command you can use:
+C<Pod::Elemental::Element::Generic>, C<Pod::Elemental::Element::Pod5>,
+C<Pod::Elemental::Element> or C<Pod::Elemental::> prefix, so to select a command
+you can use:
 
  .Element::Generic::Command
 
@@ -112,24 +112,32 @@ Each action can be one of the following:
 * `count` will print the number of matching nodes.
 
 * `print_method` will call on or more of the node object's methods and print the
-result. Example:
+  result. Example:
 
     print_method:as_string
 
 * `dump` will show a indented text representation of the node and its
-descendants. Each line will print information about a single node: its class,
-followed by the value of one or more attributes. You can specify which
-attributes to use in a dot-separated syntax, e.g.:
+  descendants. Each line will print information about a single node: its class,
+  followed by the value of one or more attributes. You can specify which
+  attributes to use in a dot-separated syntax, e.g.:
 
     dump:tag.id.class
 
-which will result in a node printed like this:
+  which will result in a node printed like this:
 
     HTML::Element tag=p id=undef class=undef
 
 By default, if no attributes are specified, `id` is used. If the node class does
 not support the attribute, or if the value of the attribute is undef, then
 `undef` is shown.
+
+* `eval` will execute Perl code for each matching node. The Perl code will be
+  called with arguments: `($node)`. For convenience, `$_` is also locally set to
+  the matching node. Example in <prog:htmlsel> you can add this action:
+
+    eval:'print $_->tag'
+
+  which will print the tag name for each matching <pm:HTML::Element> node.
 
 
 Can be specified multiple times.
@@ -178,6 +186,92 @@ CSel expression, refer to <pm:Data::CSel>.
 
 `root` will return a single node which is the root node.
 
+
+=item B<--transform>=I<s@>, B<-t>
+
+Apply one or more Pod::Elemental::Transform's.
+
+By default, the "stock" Pod::Elemental parser will be generic and not very
+helpful in parsing your typical POD (Perl 5 variant) documents. You usually want
+to add:
+
+    -t Pod5 -t Nester
+
+The following are available transforms:
+
+* Pod5
+
+Equivalent to this:
+
+    Pod::Elemental::Transformer::Pod5->new->transform_node($tree);
+
+* Nester
+
+Equivalent to this:
+
+    my $nester;
+
+    $nester = Pod::Elemental::Transformer::Nester->new({
+        top_selector      => Pod::Elemental::Selectors::s_command('head3'),
+        content_selectors => [
+            Pod::Elemental::Selectors::s_command([ qw(head4) ]),
+            Pod::Elemental::Selectors::s_flat(),
+        ],
+    });
+    $nester->new->transform_node($tree);
+
+    $nester = Pod::Elemental::Transformer::Nester->new({
+        top_selector      => Pod::Elemental::Selectors::s_command('head2'),
+        content_selectors => [
+            Pod::Elemental::Selectors::s_command([ qw(head3 head4) ]),
+            Pod::Elemental::Selectors::s_flat(),
+        ],
+    });
+    $nester->new->transform_node($tree);
+
+    $nester = Pod::Elemental::Transformer::Nester->new({
+        top_selector      => Pod::Elemental::Selectors::s_command('head1'),
+        content_selectors => [
+            Pod::Elemental::Selectors::s_command([ qw(head2 head3 head4) ]),
+            Pod::Elemental::Selectors::s_flat(),
+        ],
+    });
+    $nester->new->transform_node($tree);
+
+
+Can be specified multiple times.
+
+=item B<--transforms-json>=I<s>
+
+Apply one or more Pod::Elemental::Transform's (JSON-encoded).
+
+See C<--transform>.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Unindent;
 use Scalar::Util ();
@@ -68,11 +68,8 @@ bleibt die Reihenfolge der Schlüssel/Wert-Paare erhalten
 
 =item *
 
-jedes Schlüssel/Wert-Paar beginnt auf einer eigenen Zeile
-
-=item *
-
-die Schlüssel/Wert-Paare werden eingerückt
+jedes Schlüssel/Wert-Paar beginnt auf einer eigenen Zeile und
+wird eingerückt
 
 =back
 
@@ -100,12 +97,13 @@ Bei der Methode $j->L<encode|"encode() - Wandele Perl- in JavaScript-Datenstrukt
 
 =item *
 
-erscheinen die Schlüssel/Wert-Paare eines JSON-Objekte in
-alphanumerischer Reihenfolge
+werden die Schlüssel/Wert-Paare von JSON-Objekten
+alphanumerisch sortiert (bei {...} ist die Reihenfolge sonst
+undefiniert)
 
 =item *
 
-gibt es keine Einrückung oder anderen zusätzlichen Leerraum
+gibt es keine Einrückung oder Leerraum nach dem :
 
 =back
 
@@ -535,7 +533,7 @@ sub encode {
     }
     elsif ($refType eq 'ARRAY') {
         for (my $i = 0; $i < @$arg; $i++) {
-            if ($json) {
+            if ($json ne '') {
                 $json .= ',';
             }
             $json .= $self->encode($arg->[$i]);
@@ -732,7 +730,7 @@ sub key {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

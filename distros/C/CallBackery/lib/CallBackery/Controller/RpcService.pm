@@ -313,11 +313,12 @@ returns user specific configuration information
 
 sub getUserConfig {
     my $self = shift;
+    my $args = shift;
     my @plugins;
     my $ph = $self->pluginMap;
     for my $name (@{$ph->{list}}){
         my $obj = eval {
-            $self->instantiatePlugin($name);
+            $self->instantiatePlugin($name,$args);
         };
         warn "$@" if $@;
         next unless $obj;

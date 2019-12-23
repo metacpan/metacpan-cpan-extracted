@@ -159,7 +159,7 @@ Custom plugins can be inserted in portal by declaring them in
 C<lemonldap-ng.ini> file, section C<[portal]>, key C<customPlugins>:
 
   [portal]
-  customPlugins = My::Plugin1, My::Plugin2
+  customPlugins = ::My::Plugin1, ::My::Plugin2
 
 Plugins must be valid packages well found in C<@INC>.
 

@@ -6,5 +6,6 @@ WriteMakefile(
     ABSTRACT_FROM=> 'lib/Package/New.pm',
     PREREQ_PM    => {
                      'Test::Simple' => 0.44,
+                     'Devel::Hide'  => 0,
                     },
 );

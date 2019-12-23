@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.044';
+our $VERSION = '1.045';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -326,7 +326,7 @@ sub read_schema {
             }
             #; say "Looking for foreign class: $foreign_class";
             next unless $classes{ $foreign_class };
-            my $foreign_table = $classes{ $foreign_class }->name;
+            my $foreign_table = $classes{ $foreign_class }->source_name;
             my $foreign_id = $schema{ $foreign_table }{'x-id-field'} // 'id';
             if ( $foreign_cols[0] ne $foreign_id ) {
                 warn sprintf
@@ -397,7 +397,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.044
+version 1.045
 
 =head1 SYNOPSIS
 

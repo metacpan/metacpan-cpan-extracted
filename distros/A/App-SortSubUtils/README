@@ -2,14 +2,14 @@ NAME
     App::SortSubUtils - CLIs related to Sort::Sub
 
 VERSION
-    This document describes version 0.001 of App::SortSubUtils (from Perl
-    distribution App-SortSubUtils), released on 2019-05-24.
+    This document describes version 0.002 of App::SortSubUtils (from Perl
+    distribution App-SortSubUtils), released on 2019-12-14.
 
 SYNOPSIS
 DESCRIPTION
     This distribution contains the following CLIs related to Sort::Sub:
 
-    # INSERT_EXECS_LIST
+    *   list-sort-sub-modules
 
 FUNCTIONS
   list_sort_sub_modules

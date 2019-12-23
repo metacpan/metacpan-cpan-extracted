@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_munge_field
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2019-12-23'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.025'; # VERSION
+our $VERSION = '0.027'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ csv-munge-field - Munge a field in every row of CSV file
 
 =head1 VERSION
 
-This document describes version 0.025 of csv-munge-field (from Perl distribution App-CSVUtils), released on 2019-11-29.
+This document describes version 0.027 of csv-munge-field (from Perl distribution App-CSVUtils), released on 2019-12-23.
 
 =head1 SYNOPSIS
 
@@ -78,6 +78,9 @@ Field name.
 =item B<--filename>=I<s>*, B<-f>
 
 Input CSV file.
+
+Use `-` to read from stdin.
+
 
 =item B<--no-header>
 

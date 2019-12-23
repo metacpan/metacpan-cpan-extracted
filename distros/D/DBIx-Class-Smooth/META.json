@@ -107,7 +107,7 @@
          },
          "suggests" : {
             "Dist::Iller" : "0.1408",
-            "Dist::Iller::Config::Author::CSSON" : "0.0322"
+            "Dist::Iller::Config::Author::CSSON" : "0.0323"
          }
       },
       "runtime" : {
@@ -149,147 +149,147 @@
    "provides" : {
       "DBIx::Class::Smooth" : {
          "file" : "lib/DBIx/Class/Smooth.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Fields" : {
          "file" : "lib/DBIx/Class/Smooth/Fields.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::FilterItem" : {
          "file" : "lib/DBIx/Class/Smooth/FilterItem.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Flatten::DateTime" : {
          "file" : "lib/DBIx/Class/Smooth/Flatten/DateTime.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Helper::ResultSet::Shortcut::AddColumn" : {
          "file" : "lib/DBIx/Class/Smooth/Helper/ResultSet/Shortcut/AddColumn.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Helper::ResultSet::Shortcut::Join" : {
          "file" : "lib/DBIx/Class/Smooth/Helper/ResultSet/Shortcut/Join.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Helper::ResultSet::Shortcut::OrderByCollation" : {
          "file" : "lib/DBIx/Class/Smooth/Helper/ResultSet/Shortcut/OrderByCollation.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Helper::ResultSet::Shortcut::RemoveColumns" : {
          "file" : "lib/DBIx/Class/Smooth/Helper/ResultSet/Shortcut/RemoveColumns.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Helper::Row::Creation" : {
          "file" : "lib/DBIx/Class/Smooth/Helper/Row/Creation.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Helper::Row::JoinTable" : {
          "file" : "lib/DBIx/Class/Smooth/Helper/Row/JoinTable.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Helper::Util" : {
          "file" : "lib/DBIx/Class/Smooth/Helper/Util.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::DateTime" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/DateTime.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::DateTime::datepart" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/DateTime/datepart.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::DateTime::day" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/DateTime/day.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::DateTime::hour" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/DateTime/hour.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::DateTime::minute" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/DateTime/minute.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::DateTime::month" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/DateTime/month.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::DateTime::second" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/DateTime/second.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::DateTime::year" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/DateTime/year.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::Operators" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/Operators.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::Operators::gt" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/Operators/gt.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::Operators::gte" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/Operators/gte.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::Operators::in" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/Operators/in.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::Operators::like" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/Operators/like.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::Operators::lt" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/Operators/lt.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::Operators::lte" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/Operators/lte.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::Operators::not_in" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/Operators/not_in.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::Util" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/Util.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::ident" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/ident.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Lookup::substring" : {
          "file" : "lib/DBIx/Class/Smooth/Lookup/substring.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Q" : {
          "file" : "lib/DBIx/Class/Smooth/Q.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Result" : {
          "file" : "lib/DBIx/Class/Smooth/Result.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::ResultBase" : {
          "file" : "lib/DBIx/Class/Smooth/ResultBase.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::ResultSet" : {
          "file" : "lib/DBIx/Class/Smooth/ResultSet.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::ResultSetBase" : {
          "file" : "lib/DBIx/Class/Smooth/ResultSetBase.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       },
       "DBIx::Class::Smooth::Schema" : {
          "file" : "lib/DBIx/Class/Smooth/Schema.pm",
-         "version" : "0.0101"
+         "version" : "0.0102"
       }
    },
    "release_status" : "stable",
@@ -304,7 +304,7 @@
          "web" : "https://github.com/Csson/p5-DBIx-Class-Smooth"
       }
    },
-   "version" : "0.0101",
+   "version" : "0.0102",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"
@@ -332,7 +332,7 @@
                }
             },
             "name" : "Git::GatherDir",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
@@ -510,7 +510,7 @@
                }
             },
             "name" : "Git::Check",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -595,7 +595,7 @@
                }
             },
             "name" : "Git::Contributors",
-            "version" : "0.034"
+            "version" : "0.035"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee::Extra",
@@ -778,7 +778,7 @@
                }
             },
             "name" : "CommitBeforeTag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -787,7 +787,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.0101",
+                  "tag" : "0.0102",
                   "tag_format" : "%v",
                   "tag_message" : "Release %v%n%n%c"
                },
@@ -800,7 +800,7 @@
                }
             },
             "name" : "Git::Tag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallRelease",
@@ -849,7 +849,7 @@
                }
             },
             "name" : "CommitAfterRelease",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -866,7 +866,7 @@
                }
             },
             "name" : "Git::Push",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Clean",

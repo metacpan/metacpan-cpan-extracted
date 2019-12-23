@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Unindent;
 use Quiq::Parameters;
@@ -1134,7 +1134,7 @@ sub table {
     my $titleA = [];
     my $valueCb = undef;
 
-    Quiq::Parameters->extractPropertiesToVariables(\@_,
+    $self->parameters(\@_,
         alignments => \$alignA,
         bodyBackground => \$bodyBackground,
         caption => \$caption,
@@ -1823,7 +1823,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

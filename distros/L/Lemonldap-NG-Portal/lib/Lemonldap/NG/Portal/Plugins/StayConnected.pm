@@ -10,16 +10,14 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.7';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
 # INTERFACE
 
 use constant endAuth => 'newDevice';
-
 use constant beforeAuth => 'check';
-
 use constant beforeLogout => 'logout';
 
 # INITIALIZATION
@@ -47,7 +45,7 @@ has timeout => (
 sub init {
     my ($self) = @_;
     $self->addAuthRoute( registerbrowser => 'storeBrowser', ['POST'] );
-
+    return 1;
 }
 
 # RUNNING METHODS
@@ -121,11 +119,11 @@ sub storeBrowser {
             }
         }
         else {
-            $self->userLogger->error("StayConnected call with expired token");
+            $self->userLogger->error("StayConnected called with an expired token");
         }
     }
     else {
-        $self->userLogger->error('StayConnected call without token');
+        $self->userLogger->error('StayConnected called without token');
     }
 
     # Deliver cookie llngbrowser
@@ -206,7 +204,7 @@ sub logout {
             expires => 'Wed, 21 Oct 2015 00:00:00 GMT'
         )
     );
-    PE_OK;
+    return PE_OK;
 }
 
 1;

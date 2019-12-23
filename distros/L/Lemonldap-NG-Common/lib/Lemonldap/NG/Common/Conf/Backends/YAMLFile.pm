@@ -5,7 +5,7 @@ use Lemonldap::NG::Common::Conf::Constants;    #inherits
 use YAML qw();
 use Encode;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 our $initDone;
 $YAML::Numify = 1;
 
@@ -101,7 +101,7 @@ sub load {
     $filename = $self->_yamlFile($cfgNum);
     local $/ = '';
     my $ret;
-    unless ( open FILE, $filename ) {
+    unless ( open FILE, '<', $filename ) {
         $Lemonldap::NG::Common::Conf::msg .= "Read error: $!$@";
         return undef;
     }

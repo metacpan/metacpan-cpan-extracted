@@ -29,6 +29,7 @@ t/09-undef-strings.pl
 t/09-undef-strings-pp.t
 t/09-undef-strings.t
 t/lib/LSF.pm
+t/lib/Test/LogSyslogFast.pm
 lib/Log/Syslog/Fast.pm
 lib/Log/Syslog/Fast/Constants.pm
 lib/Log/Syslog/Fast/PP.pm

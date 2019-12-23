@@ -124,6 +124,8 @@
 #define sigfd_w ((loop)->sigfd_w)
 #define timeout_blocktime ((loop)->timeout_blocktime)
 #define timercnt ((loop)->timercnt)
+#define timerfd ((loop)->timerfd)
+#define timerfd_w ((loop)->timerfd_w)
 #define timermax ((loop)->timermax)
 #define timers ((loop)->timers)
 #define userdata ((loop)->userdata)
@@ -258,6 +260,8 @@
 #undef sigfd_w
 #undef timeout_blocktime
 #undef timercnt
+#undef timerfd
+#undef timerfd_w
 #undef timermax
 #undef timers
 #undef userdata

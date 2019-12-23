@@ -1,5 +1,9 @@
 Revision history for `ansifold' command.
 
+1.01 2019-12-13T06:19:01Z
+
+    - Implement --linebreak option.
+
 0.04 2019-09-19T12:25:31Z
 
     - Require newer Text::ANSI::Fold to make --padding option

@@ -6,6 +6,7 @@ MANIFEST
 META.json
 META.yml
 README
+appveyor.yml
 dist.ini
 examples/basic.cmd
 examples/basic.pl
@@ -14,8 +15,11 @@ lib/Bat/Interpreter/Delegate/Executor/DryRunner.pm
 lib/Bat/Interpreter/Delegate/Executor/PartialDryRunner.pm
 lib/Bat/Interpreter/Delegate/Executor/System.pm
 lib/Bat/Interpreter/Delegate/FileStore/LocalFileSystem.pm
+lib/Bat/Interpreter/Delegate/LineLogger/Silent.pm
+lib/Bat/Interpreter/Delegate/LineLogger/SilentSaveLines.pm
 lib/Bat/Interpreter/Role/Executor.pm
 lib/Bat/Interpreter/Role/FileStore.pm
+lib/Bat/Interpreter/Role/LineLogger.pm
 t/00-load.t
 t/01-basic.cmd
 t/01-basic.t
@@ -52,6 +56,8 @@ t/15-NEQ_mixedcase_operator.cmd
 t/15-NEQ_mixedcase_operator.t
 t/16-LEQ_mixedcase_operator.cmd
 t/16-LEQ_mixedcase_operator.t
+t/17-line_logger.cmd
+t/17-line_logger.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/author-synopsis.t

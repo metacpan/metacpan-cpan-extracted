@@ -2,8 +2,8 @@ NAME
     Getopt::Long::More - Like Getopt::Long, but with more stuffs
 
 VERSION
-    This document describes version 0.005 of Getopt::Long::More (from Perl
-    distribution Getopt-Long-More), released on 2019-01-20.
+    This document describes version 0.006 of Getopt::Long::More (from Perl
+    distribution Getopt-Long-More), released on 2019-12-19.
 
 SYNOPSIS
      use Getopt::Long::More; # imports GetOptions as well as optspec; you can also

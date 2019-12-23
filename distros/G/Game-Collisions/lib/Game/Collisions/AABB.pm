@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Collisions::AABB;
-$Game::Collisions::AABB::VERSION = '0.3';
+$Game::Collisions::AABB::VERSION = '0.5';
 use utf8;
 use v5.14;
 use warnings;
@@ -133,7 +133,7 @@ sub does_collide
 
     return $maxx1 >= $minx2
         && $minx1 <= $maxx2 
-        && $maxy1 >= $miny1 
+        && $maxy1 >= $miny2 
         && $miny1 <= $maxy2;
 }
 
@@ -338,7 +338,8 @@ sub remove
 
     my $parent = $self->parent;
     $self->set_parent( undef );
-    $parent->_prune;
+    # If there's only one node in the system, there will be no parent
+    $parent->_prune if defined $parent;
 
     return;
 }
@@ -354,14 +355,22 @@ sub _prune
     # The main setters do things to try to keep things consistently 
     # connected, which isn't what we want here. Access internal strucutre 
     # directly.
-    if( (! defined $self->[_LEFT_NODE]->parent)
-        || ($self->[_LEFT_NODE]->parent != $self)
+    if( 
+        (defined $self->[_LEFT_NODE])
+        && (
+            (! defined $self->[_LEFT_NODE]->parent)
+            || ($self->[_LEFT_NODE]->parent != $self)
+        )
     ){
         $self->[_LEFT_NODE][_PARENT_NODE] = undef;
         $self->[_LEFT_NODE] = undef;
     }
-    if( (! defined $self->[_RIGHT_NODE]->parent)
-        || ($self->[_RIGHT_NODE]->parent != $self)
+    if( 
+        (defined $self->[_RIGHT_NODE])
+        && (
+            (! defined $self->[_RIGHT_NODE]->parent)
+            || ($self->[_RIGHT_NODE]->parent != $self)
+        )
     ){
         $self->[_RIGHT_NODE][_PARENT_NODE] = undef;
         $self->[_RIGHT_NODE] = undef;

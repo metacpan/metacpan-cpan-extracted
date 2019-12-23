@@ -8,6 +8,13 @@
  * otherwise it will fallback on these implementations.
  */
 
+#ifdef _MSC_VER
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT
+#endif
+
+EXPORT
 char *
 ffi_platypus_memory__strdup(const char *olds)
 {
@@ -24,6 +31,7 @@ ffi_platypus_memory__strdup(const char *olds)
   return news;
 }
 
+EXPORT
 char *
 ffi_platypus_memory__strndup(const char *olds, size_t max)
 {

@@ -1,6 +1,11 @@
-Revision history for Complete-Tcsh
+0.030   2019-12-20  Released-By: PERLANCAR; Urgency: low
 
-0.02    2015-09-09 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Fix example in Synopsis (RT#131190).
+
+
+0.02    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -9,6 +14,6 @@ Revision history for Complete-Tcsh
 	  requirement.
 
 
-0.01    2014-11-23 (PERLANCAR)
+0.01    2014-11-23  Released-By: PERLANCAR
 
         - First release.

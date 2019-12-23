@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<playlist xmlns="http://xspf.org/ns/0/" xmlns:vlc="http://www.videolan.org/vlc/playlist/ns/0/" version="1">
+    <title>Playlist</title>
+    <trackList>
+        <track>
+            <location>file:///home/shlomif/Music/mp3s/Playlist%20-%20Summer%202015/006%20-%20David%20Amber%20-%20Gnarly%20_feat.%20Devyn%20Rush_.ogg</location>
+            <title>Gnarly (feat. Devyn Rush)</title>
+            <creator>David Amber</creator>
+            <album>David Amber and Friends, Vol. 1</album>
+            <trackNum>3</trackNum>
+            <annotation>http://www.jamendo.com,http://www.jamendo.com</annotation>
+            <duration>196000</duration>
+            <extension application="http://www.videolan.org/vlc/playlist/0">
+                <vlc:id>0</vlc:id>
+            </extension>
+        </track>
+        <track>
+            <location>file:///home/shlomif/Music/mp3s/Playlist%20-%20Girls%20On%20The%20Rise/003-1353450-Bohemian%20Hideaway-Brave%20Soul%20_ft.%20Juliet%20Lyons_.ogg</location>
+            <title>Brave Soul (ft. Juliet Lyons)</title>
+            <creator>Bohemian Hideaway</creator>
+            <trackNum>1</trackNum>
+            <annotation>http://www.jamendo.com</annotation>
+            <duration>191000</duration>
+            <extension application="http://www.videolan.org/vlc/playlist/0">
+                <vlc:id>1</vlc:id>
+            </extension>
+        </track>
+        <track>
+            <location>file:///home/shlomif/Music/mp3s/Melanie%20Ungar/What%20Is%20Love/01%20-%20Melanie%20Ungar%20-%20What%20Is%20Love.mp3</location>
+            <title>What Is Love</title>
+            <creator>melanieungar</creator>
+            <album>What Is Love</album>
+            <trackNum>1</trackNum>
+            <annotation>http://www.jamendo.com cc_standard</annotation>
+            <image>file:///home/shlomif/.cache/vlc/art/artistalbum/melanieungar/What%20Is%20Love/art</image>
+            <duration>212068</duration>
+            <extension application="http://www.videolan.org/vlc/playlist/0">
+                <vlc:id>2</vlc:id>
+            </extension>
+        </track>
+    </trackList>
+    <extension application="http://www.videolan.org/vlc/playlist/0">
+        <vlc:item tid="0"/>
+        <vlc:item tid="1"/>
+        <vlc:item tid="2"/>
+    </extension>
+</playlist>

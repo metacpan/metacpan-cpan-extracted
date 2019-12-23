@@ -17,16 +17,18 @@ my %WriteMakefileArgs = (
   "NAME" => "Prometheus::Tiny::Shared",
   "PREREQ_PM" => {
     "Cache::FastMmap" => 0,
-    "Prometheus::Tiny" => 0,
+    "Prometheus::Tiny" => "0.004",
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "File::Temp" => 0,
+    "HTTP::Request::Common" => 0,
+    "Plack::Test" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,7 +38,9 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Cache::FastMmap" => 0,
   "File::Temp" => 0,
-  "Prometheus::Tiny" => 0,
+  "HTTP::Request::Common" => 0,
+  "Plack::Test" => 0,
+  "Prometheus::Tiny" => "0.004",
   "Test::More" => 0,
   "parent" => 0,
   "strict" => 0,

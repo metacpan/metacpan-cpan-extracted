@@ -15,10 +15,9 @@ use feature 'state';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib';
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 has notifAccess => ( is => 'rw' );
-
 has notifFormat => ( is => 'rw' );
 
 #############################
@@ -75,7 +74,6 @@ sub addRoutes {
           { done => { ':notificationId' => 'deleteDoneNotification' } },
         ['DELETE']
       );
-
 }
 
 sub setNotifAccess {
@@ -158,6 +156,7 @@ sub notifications {
     my ( $notifs, $res );
 
     $notifs = $self->notifAccess->$sub();
+    my $total = ( keys %$notifs );
 
     # Restrict to wanted values
     if (
@@ -201,6 +200,7 @@ sub notifications {
                 result => 1,
                 count  => $count,
                 values => $res,
+                total  => $total
             }
         );
     }
@@ -220,8 +220,15 @@ sub notifications {
                 @r = sort { $a->{$f} cmp $b->{$f} } @r;
             }
         }
-        return $self->sendJSONresponse( $req,
-            { result => 1, count => scalar(@r), values => \@r } );
+        return $self->sendJSONresponse(
+            $req,
+            {
+                result => 1,
+                count  => scalar(@r),
+                values => \@r,
+                total  => $total
+            }
+        );
     }
 }
 
@@ -289,6 +296,7 @@ sub newNotification {
     $self->logger->debug("Notification Date = $json->{date}");
 
     unless ( $json->{date} =~ /^\d{4}-\d{2}-\d{2}$/ ) {
+        $self->logger->error("Malformed date");
         return $self->sendError( $req, "Malformed date", 200 );
     }
 
@@ -312,8 +320,8 @@ sub newNotification {
             delete $json->{xml};
         };
         if ($@) {
-            $self->logger->error("Notification malformed $@");
-            return $self->sendError( $req, "Notification malformed: $@", 200 );
+            $self->logger->error("Malformed notification $@");
+            return $self->sendError( $req, "Malformed notification: $@", 200 );
         }
         $newNotif = to_json($json);
     }

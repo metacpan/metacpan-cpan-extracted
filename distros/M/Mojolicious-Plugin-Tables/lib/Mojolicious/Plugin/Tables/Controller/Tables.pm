@@ -14,7 +14,6 @@ sub ok {
         my $model   = $c->app->config('model');
         $c->shipped( tablist => $model->{tablist},
                      bytable => $model->{bytable},
-                     urlbase => $c->req->url->base,
                      logourl => $logourl );
         $c->stash( schema=>$model->{schema} );
         return 1;

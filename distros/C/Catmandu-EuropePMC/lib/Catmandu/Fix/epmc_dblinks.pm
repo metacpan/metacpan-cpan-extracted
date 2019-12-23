@@ -1,6 +1,6 @@
 package Catmandu::Fix::epmc_dblinks;
 
-our $VERSION = '1.01';
+our $VERSION = '1.011';
 
 use Catmandu::Sane;
 use Moo;
@@ -102,6 +102,10 @@ sub fix {
 
     Catmandu::Fix::epmc_dbLinks - converts the nested hash from EuropePMC in a nice form
     and provides the url to the database entry
+
+=head1 DESCRIPTION
+
+DEPRECATED.
 
 =head1 SYNOPSIS
 

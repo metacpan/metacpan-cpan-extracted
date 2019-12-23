@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-06-03'; # DATE
-our $VERSION = '0.041'; # VERSION
+our $DATE = '2019-12-14'; # DATE
+our $VERSION = '0.044'; # VERSION
 
 use 5.010001;
 use strict;
@@ -81,7 +81,7 @@ elide-pod - Elide POD
 
 =head1 VERSION
 
-This document describes version 0.041 of elide-pod (from Perl distribution App-PODUtils), released on 2019-06-03.
+This document describes version 0.044 of elide-pod (from Perl distribution App-PODUtils), released on 2019-12-14.
 
 =head1 SYNOPSIS
 
@@ -127,7 +127,7 @@ Valid values:
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

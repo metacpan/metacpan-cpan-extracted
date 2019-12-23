@@ -11,7 +11,7 @@ use constant TLS => eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -25,6 +25,7 @@ has url_to_link => sub {
     'git.io'                  => 'LinkEmbedder::Link::Github',
     'github.com'              => 'LinkEmbedder::Link::Github',
     'google'                  => 'LinkEmbedder::Link::Google',
+    'goo.gl'                  => 'LinkEmbedder::Link::Google',
     'imgur.com'               => 'LinkEmbedder::Link::Imgur',
     'ix.io'                   => 'LinkEmbedder::Link::Ix',
     'instagram.com'           => 'LinkEmbedder::Link::oEmbed',
@@ -89,6 +90,10 @@ sub serve {
   $args ||= {url => $c->param('url')};
   $log_level = delete $args->{log_level} || 'debug';
 
+  # Some websites will not render complete pages without a proper User-Agent
+  my $user_agent = $c->req->headers->user_agent;
+  $self->ua->transactor->name($user_agent) if $user_agent;
+
   $c->render_later;
   $self->get_p($args)->then(sub {
     my $link = shift;
@@ -144,6 +149,10 @@ LinkEmbedder - Embed / expand oEmbed resources and other URL / links
   use LinkEmbedder;
 
   my $embedder = LinkEmbedder->new(force_secure => 1);
+
+  # In some cases, you have to set a proper user_agent to get complete
+  # pages. This is done automatically by $embedder->serve()
+  $embedder->ua->transactor->name("Mozilla...");
 
   $embedder->get_p("https://xkcd.com/927")->then(sub {
     my $link = shift;
@@ -269,7 +278,8 @@ about the URL.
   $self = $self->serve(Mojolicious::Controller->new, $url);
 
 Used as a helper for L<Mojolicious> web applications to reply to an oEmbed
-request.
+request. Will also set L<Mojo::UserAgent::Transactor/name> for L</ua> if
+the incoming request contains a "User-Agent" header.
 
 =head1 AUTHOR
 

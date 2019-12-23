@@ -9,7 +9,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
-  PE_BADCREDENTIALS
+  PE_BADOTP
   PE_FORMEMPTY
   PE_OK
   PE_SENDRESPONSE
@@ -96,7 +96,7 @@ sub run {
         $self->userLogger->warn( 'User '
               . $req->{sessionInfo}->{ $self->conf->{whatToTrace} }
               . ' has no Yubikey registered' );
-        return PE_BADCREDENTIALS;
+        return PE_BADOTP;
     }
     $self->logger->debug("Found Yubikey : $yubikey");
 
@@ -149,11 +149,11 @@ sub verify {
       )
     {
         $self->userLogger->warn('Yubikey not registered');
-        return PE_BADCREDENTIALS;
+        return PE_BADOTP;
     }
     if ( $self->yubi->otp($code) ne 'OK' ) {
         $self->userLogger->warn('Yubikey verification failed');
-        return PE_BADCREDENTIALS;
+        return PE_BADOTP;
     }
     PE_OK;
 }

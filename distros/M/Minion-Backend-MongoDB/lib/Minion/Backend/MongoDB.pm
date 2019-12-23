@@ -1,5 +1,5 @@
 package Minion::Backend::MongoDB;
-$Minion::Backend::MongoDB::VERSION = '1.03';
+$Minion::Backend::MongoDB::VERSION = '1.05';
 # ABSTRACT: MongoDB backend for Minion
 
 use Mojo::Base 'Minion::Backend';
@@ -293,6 +293,23 @@ sub note {
   return $self->jobs->find_one_and_update(@update) ? 1 : 0;
 }
 
+sub purge {
+    my ($s, $opts) = @_;
+
+    # options keys: queues, states, older, tasks
+    # defaults
+    $opts->{older} //= $s->minion->missing_after;
+
+    my %match;
+    $match{created} = {'$lt' => DateTime->now->add(seconds =>
+        -$opts->{older})};
+    foreach (qw/queue state task/) {
+        $match{$_}   = {'$in' => $opts->{$_.'s'}} if ($opts->{$_.'s'});
+    }
+
+    $s->jobs->delete_many(\%match);
+}
+
 sub receive {
   my ($self, $id) = @_;
   my $oldrec = $self->workers->find_one_and_update(
@@ -378,7 +395,16 @@ sub repair {
   }
 }
 
-sub reset { $_->drop for $_[0]->workers, $_[0]->jobs, $_[0]->locks }
+sub reset {
+    my ($s, $options) = (shift, shift // {});
+    if ($options->{all}) {
+        $_->drop for $s->workers, $s->jobs, $s->locks
+    } elsif ($options->{locks}) {
+        $_->drop for $s->{locks};
+    } else {
+        warn "Starting to v10.0 you must explicit what you want to reset";
+    }
+}
 
 sub retry_job {
   my ($self, $id, $retries, $options) = (shift, shift, shift, shift || {});
@@ -655,7 +681,7 @@ Minion::Backend::MongoDB - MongoDB backend for Minion
 
 =head1 VERSION
 
-version 1.03
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -1090,6 +1116,51 @@ every other attributes will be pass to L<MongoDB::MongoClient> costructor.
 Change one or more metadata fields for a job. Setting a value to C<undef> will
 remove the field.
 
+=head2 purge
+
+  $backend->purge();
+  $backend->purge({states => ['inactive'], older => 3600});
+
+Purge all jobs created older than...
+
+These options are currently available:
+
+=over 2
+
+=item older
+
+  older => 3600
+
+Value in seconds to purge jobs older than this value.
+
+Default: $minion->missing_after
+
+=item queues
+
+  queues => ['important', 'unimportant']
+
+Purge only jobs in these queues.
+
+=item states
+
+  states => ['inactive', 'failed']
+
+Purge only jobs in these states.
+
+=item tasks
+
+  tasks => ['task1', 'task2']
+
+Purge only jobs for these tasks.
+
+=item queues
+
+  queues => ['q1', 'q2']
+
+Purge only jobs for these queues.
+
+=back
+
 =head2 receive
 
   my $commands = $backend->receive($worker_id);
@@ -1117,9 +1188,27 @@ Repair worker registry and job queue if necessary.
 
 =head2 reset
 
-  $backend->reset;
+  $backend->reset({all => 1});
 
 Reset job queue.
+
+These options are currently available:
+
+=over 2
+
+=item all
+
+  all => 1
+
+Reset everything.
+
+=item locks
+
+  locks => 1
+
+Reset only locks.
+
+=back
 
 =head2 retry_job
 

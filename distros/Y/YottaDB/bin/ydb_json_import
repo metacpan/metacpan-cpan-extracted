@@ -14,10 +14,7 @@ F<ydb_json_import> parses the specified JSON-file completely before
 storing it to the database so only well-formed JSON-files get
 stored. In JSON-files the empty string is a valid key - you need
 to enable NULL_SUBSCRIPTS to handle such files or you may get
-
-  YottaDB returned error code: -150373498 YDB_ERR_NULSUBSC at /usr/local/bin/ydb_json_import line 72.
-
-errors.
+C<YDB_ERR_NULSUBSC> errors.
 
 =head1 OPTIONS
 
@@ -29,12 +26,12 @@ Be verbose
 
 =item -k
 
-Kill the global reference before inserting
+Kill the global reference before inserting.
 
 =item -t
 
-Perform import within a transaction. This may fail with YDB_ERR_TRANS2BIG on huge data-sets. -
-+carefully increasing the C<GLOBAL_BUFFER_COUNT> may help.
+Perform import within a transaction. This may fail with YDB_ERR_TRANS2BIG on
+huge data-sets. - carefully increasing the C<GLOBAL_BUFFER_COUNT> may help.
 
 =back
 
@@ -44,7 +41,7 @@ On success F<ydb_json_import> returns 0 and non-zero otherwise.
 
 =head1 AUTHOR
 
-Copyright (c) 2018 Stefan Traby <stefan@hello-penguin.com>
+Copyright (c) 2018,2019 Stefan Traby <stefan@hello-penguin.com>
 
 =cut
 
@@ -119,20 +116,20 @@ unless ($ARGV[0] =~ /^\^/) {
 
 push @stk, @ARGV;
 
-print "load\n" if $opts{v};
+print "-- load\n" if $opts{v};
 my $data = do {local $/; <$fh>};
 
 close $fh;
 
-print "decode_json\n" if $opts{v};
+print "-- decode_json\n" if $opts{v};
 my $json = decode_json $data;
 
 sub run () {
         if ($opts{k}) {
-                print "killing\n" if $opts{v};
+                print "-- killing\n" if $opts{v};
                 y_kill_tree (@stk);
         }
-        print "import\n" if $opts{v};
+        print "-- importing\n" if $opts{v};
         json_recurse $json;
         y_ok;
 }
@@ -141,5 +138,5 @@ if ($opts{t}) {
 } else {
         run;
 }
-
+        print "-- done\n" if $opts{v};
 exit 0;

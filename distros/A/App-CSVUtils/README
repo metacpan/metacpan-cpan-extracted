@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.025 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2019-11-29.
+    This document describes version 0.027 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2019-12-23.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -107,6 +107,8 @@ FUNCTIONS
 
         Input CSV file.
 
+        Use "-" to read from stdin.
+
     *   header => *bool* (default: 1)
 
         Whether CSV has a header row.
@@ -147,6 +149,8 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+        Use "-" to read from stdin.
 
     *   header => *bool* (default: 1)
 
@@ -223,6 +227,8 @@ FUNCTIONS
 
         Input CSV files.
 
+        Use "-" to read from stdin.
+
     *   header => *bool* (default: 1)
 
         Whether CSV has a header row.
@@ -263,6 +269,8 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+        Use "-" to read from stdin.
 
     *   header => *bool* (default: 1)
 
@@ -313,6 +321,8 @@ FUNCTIONS
 
         Input CSV file.
 
+        Use "-" to read from stdin.
+
     *   header => *bool* (default: 1)
 
         Whether CSV has a header row.
@@ -353,6 +363,8 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+        Use "-" to read from stdin.
 
     *   hash => *bool*
 
@@ -396,7 +408,7 @@ FUNCTIONS
     *   Delete user data:
 
          csv_each_row(
-           filename => "users.csv",
+             filename => "users.csv",
            eval => "unlink qq(/home/data/\$_->{username}.dat)",
            hash => 1
          );
@@ -414,6 +426,8 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+        Use "-" to read from stdin.
 
     *   hash => *bool*
 
@@ -461,7 +475,7 @@ FUNCTIONS
     *   Only show rows where date is a Wednesday:
 
          csv_grep(
-           filename => "file.csv",
+             filename => "file.csv",
            eval => "BEGIN { use DateTime::Format::Natural; \$parser = DateTime::Format::Natural->new } \$dt = \$parser->parse_datetime(\$_->{date}); \$dt->day_of_week == 3",
            hash => 1
          );
@@ -488,6 +502,8 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+        Use "-" to read from stdin.
 
     *   hash => *bool*
 
@@ -534,6 +550,8 @@ FUNCTIONS
 
         Input CSV file.
 
+        Use "-" to read from stdin.
+
     *   header => *bool* (default: 1)
 
         Whether CSV has a header row.
@@ -574,6 +592,8 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+        Use "-" to read from stdin.
 
     *   header => *bool* (default: 1)
 
@@ -696,7 +716,7 @@ FUNCTIONS
         users):
 
          csv_map(
-           filename => "file.csv",
+             filename => "file.csv",
            eval => "INSERT INTO mytable (id,amount) VALUES (\$_->{id}, \$_->{amount});",
            hash => 1
          );
@@ -727,6 +747,8 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+        Use "-" to read from stdin.
 
     *   hash => *bool*
 
@@ -788,6 +810,8 @@ FUNCTIONS
 
         Input CSV file.
 
+        Use "-" to read from stdin.
+
     *   header => *bool* (default: 1)
 
         Whether CSV has a header row.
@@ -835,6 +859,8 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+        Use "-" to read from stdin.
 
     *   header => *bool* (default: 1)
 
@@ -887,6 +913,8 @@ FUNCTIONS
 
         Input CSV file.
 
+        Use "-" to read from stdin.
+
     *   header => *bool* (default: 1)
 
         Whether CSV has a header row.
@@ -927,6 +955,8 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+        Use "-" to read from stdin.
 
     *   header => *bool* (default: 1)
 
@@ -1048,6 +1078,8 @@ FUNCTIONS
 
         Input CSV files.
 
+        Use "-" to read from stdin.
+
     *   header => *bool* (default: 1)
 
         Whether CSV has a header row.
@@ -1117,6 +1149,8 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+        Use "-" to read from stdin.
 
     *   header => *bool* (default: 1)
 
@@ -1237,6 +1271,8 @@ FUNCTIONS
 
         Input CSV file.
 
+        Use "-" to read from stdin.
+
     *   hash => *bool*
 
         Provide row in $_ as hashref instead of arrayref.
@@ -1294,6 +1330,8 @@ FUNCTIONS
 
         Input CSV file.
 
+        Use "-" to read from stdin.
+
     *   header => *bool* (default: 1)
 
         Whether CSV has a header row.
@@ -1336,6 +1374,8 @@ FUNCTIONS
     *   filename* => *filename*
 
         Input CSV file.
+
+        Use "-" to read from stdin.
 
     *   header => *bool* (default: 1)
 
@@ -1403,11 +1443,11 @@ SEE ALSO
 
     csvgrep.
 
-    csv-select-row.
+    csv-split.
 
     setop.
 
-    csv-split.
+    csv-select-row.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

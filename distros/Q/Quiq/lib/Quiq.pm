@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 =encoding utf8
 
@@ -596,6 +596,10 @@ L<Quiq::Perl> - Erweiterte und abgesicherte Perl-Operationen
 
 =item *
 
+L<Quiq::PlotlyJs::TimeSeries> - Erzeuge Zeitreihen-Plot auf Basis von Plotly.js
+
+=item *
+
 L<Quiq::Pod::Generator> - POD-Generator
 
 =item *
@@ -822,7 +826,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

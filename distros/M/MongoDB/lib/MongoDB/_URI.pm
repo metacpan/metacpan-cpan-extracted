@@ -17,7 +17,7 @@ use warnings;
 package MongoDB::_URI;
 
 use version;
-our $VERSION = 'v2.2.0';
+our $VERSION = 'v2.2.1';
 
 use Moo;
 use MongoDB::Error;
@@ -30,6 +30,7 @@ use Types::Standard qw(
     HashRef
     Str
     Int
+    Num
 );
 use namespace::clean -except => 'meta';
 use Scalar::Util qw/looks_like_number/;
@@ -95,7 +96,7 @@ has valid_options => (
 
 has expires => (
     is => 'ro',
-    isa => Int,
+    isa => Num,
     writer => '_set_expires',
 );
 
@@ -113,7 +114,6 @@ sub _build_valid_options {
             heartbeatFrequencyMS
             journal
             localThresholdMS
-            maxIdleTimeMS
             maxStalenessSeconds
             maxTimeMS
             readConcernLevel
@@ -124,11 +124,9 @@ sub _build_valid_options {
             serverSelectionTryOnce
             socketCheckIntervalMS
             socketTimeoutMS
-            ssl
             tlsCAFile
             tlsCertificateKeyFile
             tlsCertificateKeyFilePassword
-            tlsCertificateKeyPassword
             w
             wTimeoutMS
             zlibCompressionLevel
@@ -159,16 +157,15 @@ has _valid_str_to_bool_options => (
 sub _build_valid_str_to_bool_options {
     return {
         map { lc($_) => 1 } qw(
-            ssl
             journal
+            retryReads
+            retryWrites
             serverselectiontryonce
+            ssl
             tls
             tlsAllowInvalidCertificates
             tlsAllowInvalidHostnames
             tlsInsecure
-            retryWrites
-            retryReads
-            tlsAllowInsecure
         )
     };
 }
@@ -190,7 +187,6 @@ sub _build_extra_options_validation {
       localthresholdms => '_PositiveInt',
       serverselectiontimeoutms => '_PositiveInt',
       sockettimeoutms => '_PositiveInt',
-      maxidletimems => '_PositiveInt',
       w => sub {
           my $v = shift;
           if (looks_like_number($v)) {
@@ -318,13 +314,27 @@ sub _parse_options {
             $parsed{$lc_k} = $v;
         }
     }
-    if (exists $parsed{'tlsinsecure'} || exists $parsed{'tlsallowinsecure'}) {
-        if (exists $parsed{'tlsallowinvalidcertificates'} || exists $parsed{'tlsallowinvalidhostnames'}) {
-            MongoDB::Error->throw('tlsInsecure conflicts with other options');
-        }
+    if (
+        exists $parsed{tlsinsecure}
+        && (   exists $parsed{tlsallowinvalidcertificates}
+            || exists $parsed{tlsallowinvalidhostnames} )
+      )
+    {
+        MongoDB::Error->throw('tlsInsecure conflicts with other options');
     }
-    if ( exists ($parsed{'tls'}) && exists($parsed{'ssl'}) && $parsed{'tls'} != $parsed{'ssl'}) {
+    # If both exist, they must be identical.
+    if (   exists( $parsed{tls} )
+        && exists( $parsed{ssl} )
+        && $parsed{tls} != $parsed{ssl} )
+    {
         MongoDB::Error->throw('tls and ssl must have the same value');
+    }
+    # If either exists, set them both.
+    if ( exists $parsed{tls} ) {
+        $parsed{ssl} = $parsed{tls};
+    }
+    elsif ( exists $parsed{ssl} ) {
+        $parsed{tls} = $parsed{ssl};
     }
     return \%parsed;
 }
@@ -441,6 +451,14 @@ sub _parse_srv_uri {
       %$options,
       %{ $result{options} || {} },
     };
+
+    # Reset str to bool options to string value, as _parse_options changes it to 0/1 if it exists during parsing
+    # means we get the correct value when re-building the uri below.
+    for my $stb_key ( keys %{ $self->_valid_str_to_bool_options } ) {
+        # use exists just in case
+        next unless exists $options->{ $stb_key };
+        $options->{ $stb_key } = ($options->{ $stb_key } || $options->{ $stb_key } eq 'true') ? 'true' : 'false';
+    }
 
     my $auth = "";
     if ( defined $result{username} || defined $result{password} )  {
@@ -646,7 +664,7 @@ sub __userinfo_invalid_chars {
 # redact user credentials when stringifying
 use overload
     '""' => sub {
-        (my $s = $_[0]->uri) =~ s{^(\w+)://[^/]+\@}{$1://[**REDACTED**]\@};
+        (my $s = $_[0]->uri) =~ s{^([^:]+)://[^/]+\@}{$1://[**REDACTED**]\@};
         return $s
     },
     'fallback' => 1;

@@ -1,3 +1,5 @@
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
+
 use Module::Build;
 
 my $b = Module::Build->new(
@@ -11,7 +13,7 @@ my $b = Module::Build->new(
   requires             => {
      Carp              => 0,
     'Data::Dump'       => 0,
-    'Data::Table::Text'              => 20191110,
+    'Data::Table::Text'              => 20191221,
      Storable          => 0,
     'Test::More'       => 0,
     'Test2::API'       => 0,

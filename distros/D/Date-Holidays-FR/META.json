@@ -1,0 +1,61 @@
+{
+   "abstract" : "Determine French holidays",
+   "author" : [
+      "Fabien POTENCIER <fabpot@cpan.org>",
+      "Jean Forget <JFORGET@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Date-Holidays-FR",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.57_02",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Easter" : "0",
+            "Time::Local" : "0",
+            "perl" : "5.006000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Date::Holidays::FR" : {
+         "file" : "lib/Date/Holidays/FR.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jforget/Date-Holidays-FR.git",
+         "web" : "https://github.com/jforget/Date-Holidays-FR"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

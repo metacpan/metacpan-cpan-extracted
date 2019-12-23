@@ -98,6 +98,7 @@ Windows日本語版上のPerl以外に強制インストールしたとしても
 =over 2
 
 =item open(), opendir(), mkdir(), rmdir(), chdir()
+
 =item stat(), lstat()
 
 =back

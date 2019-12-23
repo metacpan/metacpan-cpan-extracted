@@ -13,7 +13,7 @@ Dancer2::Cookbook - Example-driven quick-start to the Dancer2 web framework
 
 =head1 VERSION
 
-version 0.208001
+version 0.208002
 
 =head1 DESCRIPTION
 

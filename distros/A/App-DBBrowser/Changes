@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.229    2019-12-18
+        - Renamed variables.
+
 2.228    2019-12-08
         - Bugfix in 'merge_rows'.
 

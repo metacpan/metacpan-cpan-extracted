@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transport::Bolt;
 # ABSTRACT: Adapter for Neo4j::Bolt
-$Neo4j::Driver::Transport::Bolt::VERSION = '0.13';
+$Neo4j::Driver::Transport::Bolt::VERSION = '0.14';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction);
@@ -33,6 +33,7 @@ sub new {
 	unless ($cxn && $cxn->connected) {
 		# libneo4j-client seems to not always report human-readable error messages, so we re-create the most important ones here
 		croak 'Bolt error -13: Unknown host' if ! $cxn->errmsg && $cxn->errnum == -13;
+		croak 'Bolt error -14: Could not agree on a protocol version' if ! $cxn->errmsg && $cxn->errnum == -14;
 		croak 'Bolt error -15: Username or password is invalid' if ! $cxn->errmsg && $cxn->errnum == -15;
 		croak 'Bolt error ' . $cxn->errnum . ' ' . $cxn->errmsg;
 	}
@@ -40,6 +41,7 @@ sub new {
 	return bless {
 		connection => $cxn,
 		uri => $driver->{uri},
+		cypher_types => $driver->{cypher_types},
 	}, $class;
 }
 
@@ -83,6 +85,7 @@ sub run {
 				json => $self->_gather_results($stream),
 				deep_bless => \&_deep_bless,
 				statement => $statement_json,
+				cypher_types => $self->{cypher_types},
 			});
 			return ($result);
 		}
@@ -94,6 +97,7 @@ sub run {
 			json => { columns => \@names },
 			deep_bless => \&_deep_bless,
 			statement => $statement_json,
+			cypher_types => $self->{cypher_types},
 		});
 	}
 	
@@ -185,24 +189,26 @@ sub version {
 
 
 sub _deep_bless {
-	my ($data) = @_;
+	my ($cypher_types, $data) = @_;
 	
 	if (ref $data eq 'HASH' && defined $data->{_node}) {  # node
-		bless $data, 'Neo4j::Driver::Type::Node';
+		bless $data, $cypher_types->{node};
 		$data->{_meta} = {
 			id => $data->{_node},
 			labels => $data->{_labels},
 		};
+		$cypher_types->{init}->($data) if $cypher_types->{init};
 		return $data;
 	}
 	if (ref $data eq 'HASH' && defined $data->{_relationship}) {  # relationship
-		bless $data, 'Neo4j::Driver::Type::Relationship';
+		bless $data, $cypher_types->{relationship};
 		$data->{_meta} = {
 			id => $data->{_relationship},
 			start => $data->{_start},
 			end => $data->{_end},
 			type => $data->{_type},
 		};
+		$cypher_types->{init}->($data) if $cypher_types->{init};
 		return $data;
 	}
 	
@@ -215,13 +221,13 @@ sub _deep_bless {
 	
 	if (ref $data eq 'ARRAY') {  # array
 		foreach my $i ( 0 .. $#{$data} ) {
-			$data->[$i] = _deep_bless($data->[$i]);
+			$data->[$i] = _deep_bless($cypher_types, $data->[$i]);
 		}
 		return $data;
 	}
 	if (ref $data eq 'HASH') {  # and neither node nor relationship ==> map
 		foreach my $key ( keys %$data ) {
-			$data->{$key} = _deep_bless($data->{$key});
+			$data->{$key} = _deep_bless($cypher_types, $data->{$key});
 		}
 		return $data;
 	}
@@ -248,7 +254,7 @@ Neo4j::Driver::Transport::Bolt - Adapter for Neo4j::Bolt
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 DESCRIPTION
 

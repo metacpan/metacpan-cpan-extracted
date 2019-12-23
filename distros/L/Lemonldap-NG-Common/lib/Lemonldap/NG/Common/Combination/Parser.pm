@@ -5,7 +5,7 @@ use Mouse;
 use Safe;
 use constant PE_OK => 0;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 # Handle "if then else" (used during init)
 # return a sub that can be called with ($req) to get a [array] of combination
@@ -134,15 +134,15 @@ sub parseMod {
     if ( @mods == 1 ) {
         my ($m) = @mods;
         return sub {
-            my ( $sub, $req ) = @_;
-            return ( $m->$sub($req), $expr );
+            my $sub = shift;
+            return ( $m->$sub(@_), $expr );
         };
     }
     return sub {
-        my ( $sub, $req ) = @_;
+        my $sub = shift;
         my %str;
         for ( my $i = 0 ; $i < @list ; $i++ ) {
-            my $res = $mods[$i]->$sub($req);
+            my $res = $mods[$i]->$sub(@_);
 
             # Case "string" (form type)
             if ( $res & ~$res ) {
@@ -169,7 +169,7 @@ sub findB {
         }
         if ( $c eq $char ) {
             my $rest = join( '', @chars );
-            $res =~ s/^\s*(.*?)\s*/$1/;
+            $res  =~ s/^\s*(.*?)\s*/$1/;
             $rest =~ s/^\s*(.*?)\s*/$1/;
             return ( $res, $rest );
         }

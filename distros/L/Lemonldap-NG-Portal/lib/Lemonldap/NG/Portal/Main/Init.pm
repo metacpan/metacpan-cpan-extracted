@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -356,11 +356,23 @@ sub reloadConf {
 
     # Clean $req->pdata after authentication
     push @{ $self->endAuth }, sub {
-        unless ( $_[0]->pdata->{keepPdata} ) {
-            $self->logger->debug('Cleaning pdata');
-            $_[0]->pdata( {} );
-            $self->userLogger->notice( $_[0]->user . ' connected' )
-              if $_[0]->user;
+
+        my $tmp =
+          ( ref( $_[0]->pdata->{keepPdata} ) eq 'ARRAY' )
+          ? $_[0]->pdata->{keepPdata}
+          : [];
+        foreach my $k ( keys %{ $_[0]->pdata } ) {
+            unless ( grep { $_ eq $k } @$tmp ) {
+                $self->logger->debug("Removing $k from pdata");
+                delete $_[0]->pdata->{$k};
+            }
+        }
+        my $user_log = $_[0]->{sessionInfo}->{ $self->conf->{whatToTrace} };
+        $self->userLogger->notice( $user_log . ' connected' ) if $user_log;
+        if (@$tmp) {
+            $self->logger->debug(
+                'Add ' . join( ',', @$tmp ) . ' in keepPdata' );
+            $_[0]->pdata->{keepPdata} = $tmp;
         }
         return PE_OK;
     };

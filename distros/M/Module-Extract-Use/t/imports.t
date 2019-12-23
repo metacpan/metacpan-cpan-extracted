@@ -31,94 +31,104 @@ is_deeply( $details, expected(), 'The data structures match' );
 sub expected {
 	return  [
           {
-            'pragma' => '',
+			'direct'  => 1,
+            'pragma'  => '',
             'version' => undef,
             'imports' => [],
-            'module' => 'URI',
+            'module'  => 'URI',
             'content' => 'use URI;',
           },
           {
+			'direct'  => 1,
             'content' => 'use CGI qw(:standard);',
-            'pragma' => '',
+            'pragma'  => '',
             'version' => undef,
             'imports' => [
                            ':standard'
                          ],
-            'module' => 'CGI'
+            'module'  => 'CGI'
           },
           {
+			'direct'  => 1,
             'content' => 'use LWP::Simple 1.23 qw(getstore);',
-            'pragma' => '',
+            'pragma'  => '',
             'version' => '1.23',
             'imports' => [
                            'getstore'
                          ],
-            'module' => 'LWP::Simple'
+            'module'  => 'LWP::Simple'
           },
           {
+			'direct'  => 1,
             'content' => 'use File::Basename (\'basename\', \'dirname\');',
-            'pragma' => '',
+            'pragma'  => '',
             'version' => undef,
             'imports' => [
                            'basename',
                            'dirname'
                          ],
-            'module' => 'File::Basename'
+            'module'  => 'File::Basename'
           },
           {
+			'direct'  => 1,
             'content' => 'use File::Spec::Functions qw(catfile rel2abs);',
-            'pragma' => '',
+            'pragma'  => '',
             'version' => undef,
             'imports' => [
                            'catfile',
                            'rel2abs'
                          ],
-            'module' => 'File::Spec::Functions'
+            'module'  => 'File::Spec::Functions'
           },
           {
+			'direct'  => 1,
             'content' => 'use autodie \':open\';',
-            'pragma' => 'autodie',
+            'pragma'  => 'autodie',
             'version' => undef,
             'imports' => [
                            ':open'
                          ],
-            'module' => 'autodie'
+            'module'  => 'autodie'
           },
           {
+			'direct'  => 1,
             'content' => 'use strict q\'refs\';',
-            'pragma' => 'strict',
+            'pragma'  => 'strict',
             'version' => undef,
             'imports' => [
                            'refs'
                          ],
-            'module' => 'strict'
+            'module'  => 'strict'
           },
           {
+			'direct'  => 1,
             'content' => 'use warnings q<redefine>;',
             'pragma'  => 'warnings',
             'version' => undef,
             'imports' => [
                            'redefine'
                          ],
-            'module' => 'warnings'
+            'module'  => 'warnings'
           },
           {
+			'direct'  => 1,
             'content' => 'use Buster "brush";',
             'pragma'  => '',
             'version' => undef,
             'imports' => [
                            'brush'
                          ],
-            'module' => 'Buster'
+            'module'  => 'Buster'
           },
           {
+			'direct'  => 1,
             'content' => 'use Mimi qq{string};',
             'pragma'  => '',
             'version' => undef,
             'imports' => [
                            'string'
                          ],
-            'module' => 'Mimi'
+            'module'  => 'Mimi'
           }
         ];
 

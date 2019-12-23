@@ -8,19 +8,19 @@ init(
     'Lemonldap::NG::Handler::Server',
     {
         logLevel               => 'error',
-        handlerServiceTokenTTL => 2,
+        handlerServiceTokenTTL => 120,
         vhostOptions           => {
             'test1.example.com' => {
                 vhostHttps           => 0,
                 vhostPort            => 80,
                 vhostMaintenance     => 0,
-                vhostServiceTokenTTL => 3,
+                vhostServiceTokenTTL => 180,
             },
             'test2.example.com' => {
                 vhostHttps           => 0,
                 vhostPort            => 80,
                 vhostMaintenance     => 0,
-                vhostServiceTokenTTL => 5,
+                vhostServiceTokenTTL => 300,
             }
         },
         exportedHeaders => {
@@ -38,7 +38,7 @@ my $crypt = Lemonldap::NG::Common::Crypto->new('qwertyui');
 my $token = $crypt->encrypt(
     join ':',                        time,
     $sessionId,                      'test1.example.com',
-    'XFromVH=app1-auth.example.com', "serviceHeader1=$sessionId",
+    'XFromVH=app1-auth.example.com', "serviceHeader1=$sessionId","serviceHeader2=$sessionId",
     'test2.example.com',             '*.example.com'
 );
 
@@ -48,21 +48,21 @@ ok(
         VHOSTTYPE           => 'ServiceToken',
         'HTTP_X_LLNG_TOKEN' => $token,
     ),
-    'Query with token'
+    'Query with token 1'
 );
 ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );
 count(2);
 
-my @headers = grep { /service|^XFromVH$/ } @{ $res->[1] };
+my @headers = grep { /^serviceHeader\d$|^XFromVH$/ } @{ $res->[1] };
 my @values  = grep { /\.example\.com|^$sessionId$/ } @{ $res->[1] };
-ok( @headers == 2, 'Found 2 service headers' )
+ok( @headers == 3, 'Found 3 service headers' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
-ok( @values == 2, 'Found 2 service header values' )
+ok( @values == 3, 'Found 3 service header values' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
 count(2);
 
-diag 'Waiting';
-sleep 1;
+# Waiting
+Time::Fake->offset("+90s");
 
 ok(
     $res = $client->_get(
@@ -70,21 +70,21 @@ ok(
         VHOSTTYPE           => 'ServiceToken',
         'HTTP_X_LLNG_TOKEN' => $token,
     ),
-    'Query with token'
+    'Query with token 2'
 );
 ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );
 count(2);
 
-@headers = grep { /service|^XFromVH$/ } @{ $res->[1] };
+@headers = grep { /^serviceHeader\d$|^XFromVH$/ } @{ $res->[1] };
 @values  = grep { /\.example\.com|^$sessionId$/ } @{ $res->[1] };
-ok( @headers == 2, 'Found 2 service headers' )
+ok( @headers == 3, 'Found 3 service headers' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
-ok( @values == 2, 'Found 2 service header values' )
+ok( @values == 3, 'Found 3 service header values' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
 count(2);
 
-diag 'Waiting';
-sleep 2;
+# Waiting
+Time::Fake->offset("+210s");
 
 ok(
     $res = $client->_get(
@@ -92,18 +92,18 @@ ok(
         VHOSTTYPE           => 'ServiceToken',
         'HTTP_X_LLNG_TOKEN' => $token,
     ),
-    'Query with token'
+    'Query with token 3'
 );
-ok( $res->[0] == 302, 'Code is 200' ) or explain( $res->[0], 302 );
+ok( $res->[0] == 302, 'Code is 302' ) or explain( $res->[0], 302 );
 count(2);
 
-@headers = grep { /service|^XFromVH$/ } @{ $res->[1] };
+@headers = grep { /^serviceHeader\d$|^XFromVH$/ } @{ $res->[1] };
 ok( @headers == 0, 'NONE service header found' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
 count(1);
 
-diag 'Waiting';
-sleep 1;
+# Waiting
+Time::Fake->offset("+270s");
 
 ok(
     $res = $client->_get(
@@ -111,7 +111,7 @@ ok(
         VHOSTTYPE           => 'ServiceToken',
         'HTTP_X_LLNG_TOKEN' => $token,
     ),
-    'Query with token'
+    'Query with token 4'
 );
 ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );
 count(2);
@@ -123,16 +123,16 @@ ok( $headers{'empty'} eq '', 'Found "empty" header without value' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
 count(2);
 
-@headers = grep { /service|^XFromVH$/ } @{ $res->[1] };
+@headers = grep { /^serviceHeader\d$|^XFromVH$/ } @{ $res->[1] };
 @values  = grep { /\.example\.com|^$sessionId$/ } @{ $res->[1] };
-ok( @headers == 2, 'Found 2 service headers' )
+ok( @headers == 3, 'Found 3 service headers' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
-ok( @values == 2, 'Found 2 service header values' )
+ok( @values == 3, 'Found 3 service header values' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
 count(2);
 
-diag 'Waiting';
-sleep 1;
+# Waiting
+Time::Fake->offset("+330s");
 
 ok(
     $res = $client->_get(
@@ -140,12 +140,12 @@ ok(
         VHOSTTYPE           => 'ServiceToken',
         'HTTP_X_LLNG_TOKEN' => $token,
     ),
-    'Query with token'
+    'Query with token 5'
 );
 ok( $res->[0] == 302, 'Code is 302' ) or explain( $res->[0], 302 );
 count(2);
 
-@headers = grep { /service|^XFromVH$/ } @{ $res->[1] };
+@headers = grep { /^serviceHeader\d$|^XFromVH$/ } @{ $res->[1] };
 ok( @headers == 0, 'NONE service header found' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
 count(1);
@@ -156,29 +156,29 @@ ok(
         VHOSTTYPE           => 'ServiceToken',
         'HTTP_X_LLNG_TOKEN' => $token,
     ),
-    'Query with token'
+    'Query with token 6'
 );
 ok( $res->[0] == 302, 'Code is 302' ) or explain( $res->[0], 302 );
 count(2);
 
-@headers = grep { /service|^XFromVH$/ } @{ $res->[1] };
+@headers = grep { /^serviceHeader\d$|^XFromVH$/ } @{ $res->[1] };
 ok( @headers == 0, 'NONE service header found' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
 count(1);
 
-$token = $crypt->encrypt( join ':', time, $sessionId, '' );
+$token = $crypt->encrypt( join ':', time, $sessionId );
 ok(
     $res = $client->_get(
         '/', undef, 'test2.example.com', undef,
         VHOSTTYPE           => 'ServiceToken',
         'HTTP_X_LLNG_TOKEN' => $token,
     ),
-    'Query with token'
+    'Query with token 7'
 );
 ok( $res->[0] == 302, 'Code is 302' ) or explain( $res->[0], 302 );
 count(2);
 
-@headers = grep { /service|^XFromVH$/ } @{ $res->[1] };
+@headers = grep { /^serviceHeader\d$|^XFromVH$/ } @{ $res->[1] };
 ok( @headers == 0, 'NONE service header found' )
   or print STDERR Data::Dumper::Dumper( $res->[1] );
 count(1);

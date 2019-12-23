@@ -1,25 +1,58 @@
-SYNOPSIS
+NAME
+    Pod::Weaver::Plugin::Sort::Sub - Plugin to use when building
+    Sort::Sub::* modules
 
+VERSION
+    This document describes version 0.003 of Pod::Weaver::Plugin::Sort::Sub
+    (from Perl distribution Pod-Weaver-Plugin-Sort-Sub), released on
+    2019-12-15.
+
+SYNOPSIS
     In your weaver.ini:
 
      [-Sort::Sub]
 
 DESCRIPTION
-
     This plugin is used when building distribution that contains
-    Sort::Sub::* routines (see Sort::Sub::naturally for an example of such
+    "Sort::Sub::*" routines (see Sort::Sub::naturally for an example of such
     module; see also Sort::Sub). It currently does the following to
     lib/Sort/Sub/* .pm files:
 
-      * Add Synopsis section if not already exists
+    *   Add Synopsis section if not already exists
 
-      * Add description about the module to Description section
+    *   Add description about the module to Description section
 
-      * Mention some modules in See Also section
+    *   Mention some modules in See Also section
 
-      e.g. Sort::Sub.
+        e.g. Sort::Sub.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Plugin-Sort-Sub>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-Sort-Sub>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Sor
+    t-Sub>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Sort::Sub
+
+    Dist::Zilla::Plugin::Sort::Sub
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

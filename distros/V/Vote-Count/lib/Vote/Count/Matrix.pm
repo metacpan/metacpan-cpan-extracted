@@ -25,13 +25,13 @@ use Sort::Hash;
 
 use YAML::XS;
 
-our $VERSION='1.00';
+our $VERSION='1.01';
 
 =head1 NAME
 
 Vote::Count::Matrix
 
-=head1 VERSION 1.00
+=head1 VERSION 1.01
 
 =cut
 

@@ -3,9 +3,7 @@ use strict;
 use IO::String;
 
 my $res;
-my $maintests = 8;
-
-#my $maintests = 9;
+my $maintests = 9;
 
 require 't/test-lib.pm';
 my $file = tempdb();
@@ -32,14 +30,42 @@ qq{INSERT INTO notifications VALUES ('dwho','testref','2016-05-30 00:00:00','<?x
 <subtitle>Test subtitle</subtitle>
 <text>This is a test text</text>
 <check>Accept test</check>
+<check>I am sure</check>
 </notification></root>',null,null)}
     );
     $dbh->do(
 qq{INSERT INTO notifications VALUES ('dwho','testref2','2016-05-30 00:00:00','<?xml version="1.0" encoding="UTF-8"?>
-<root><notification uid="dwho" date="2016-05-30" reference="testref2">
+<root><notification uid="dwho" date="2016-05-30" reference="testref2" condition="\$env->{REMOTE_ADDR} =~ /127\.0\.0\.1/">
 <title>Test2 title</title>
 <subtitle>Test2 subtitle</subtitle>
 <text>This is a second test text</text>
+<check>Accept test</check>
+</notification></root>',null,null)}
+    );
+    $dbh->do(
+qq{INSERT INTO notifications VALUES ('dwho','testref3','2050-05-30 00:00:00','<?xml version="1.0" encoding="UTF-8"?>
+<root><notification uid="dwho" date="2050-05-30" reference="testref3">
+<title>Test title</title>
+<subtitle>Test subtitle</subtitle>
+<text>This is a test text</text>
+<check>Accept test</check>
+</notification></root>',null,null)}
+    );
+    $dbh->do(
+qq{INSERT INTO notifications VALUES ('rtyler','testref','2016-05-30 00:00:00','<?xml version="1.0" encoding="UTF-8"?>
+<root><notification uid="rtyler" date="2016-05-30" reference="testref" condition="\$env->{REMOTE_ADDR} =~ /127\.1\.1\.1/">
+<title>Test title</title>
+<subtitle>Test subtitle</subtitle>
+<text>This is a test text</text>
+<check>Accept test</check>
+</notification></root>',null,null)}
+    );
+    $dbh->do(
+qq{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00','<?xml version="1.0" encoding="UTF-8"?>
+<root><notification uid="rtyler" date="2050-05-30" reference="testref2">
+<title>Test title</title>
+<subtitle>Test subtitle</subtitle>
+<text>This is a test text</text>
 <check>Accept test</check>
 </notification></root>',null,null)}
     );
@@ -77,13 +103,6 @@ qq{INSERT INTO notifications VALUES ('dwho','testref2','2016-05-30 00:00:00','<?
           /<input type="hidden" name="reference[\dx]+" value="(\w+?)">/gs );
     ok( @refs == 2, 'Two notification references found' )
       or print STDERR Dumper( $res->[2]->[0] );
-
-    ### TO BE FIXED
-    # ok( $refs[0] eq 'testref2', '1st reference found is "testref2"' )
-    #   or print STDERR Dumper( $res->[2]->[0] );
-    # ok( $refs[1] eq 'testref', '2nd reference found is "testref"' )
-    #   or print STDERR Dumper( $res->[2]->[0] );
-
     ok( $res->[2]->[0] =~ /1x1x1/, ' Found ref' );
     expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
 
@@ -114,7 +133,7 @@ qq{INSERT INTO notifications VALUES ('dwho','testref2','2016-05-30 00:00:00','<?
 
     # Try to validate notifications
     $str =
-'reference1x1=testref&check1x1x1=accepted&reference1x2=testref2&check1x2x1=accepted&url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==';
+'reference1x1=testref&check1x1x1=accepted&check1x1x2=accepted&reference1x2=testref2&check1x2x1=accepted&url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==';
     ok(
         $res = $client->_post(
             '/notifback',
@@ -131,6 +150,7 @@ qq{INSERT INTO notifications VALUES ('dwho','testref2','2016-05-30 00:00:00','<?
         !defined( $cookies->{lemonldappdata} ),
         " Make sure no pdata is returned"
     );
+    $client->logout($id);
 
     # Verify that notification was tagged as 'done'
     my $sth =
@@ -140,7 +160,25 @@ qq{INSERT INTO notifications VALUES ('dwho','testref2','2016-05-30 00:00:00','<?
     while ( $sth->fetchrow_hashref ) { $i++ }
     ok( $i == 2, 'Notification was deleted' );
 
+    # Try to authenticate
+    # -------------------
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new(
+'user=rtyler&password=rtyler&url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw=='
+            ),
+            accept => 'text/html',
+            length => 68,
+        ),
+        'Auth query'
+    );
+    expectRedirection( $res, 'http://test1.example.com/' );
+    $id = expectCookie($res);
+    $client->logout($id);
+
     clean_sessions();
+    eval { unlink $file };
 }
 
 count($maintests);

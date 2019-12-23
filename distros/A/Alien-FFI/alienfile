@@ -44,6 +44,7 @@ share {
         my $ret = $orig->(@_);
     
         $ret->{list} = [
+          grep { $_->{version} ne '3.3' }
           grep { $_->{version} ne '3.2' }
           grep { $_->{version} !~ /^3\.2\./ }
           @{ $ret->{list} }  

@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Role-MethodReturns
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Function::Parameters: '0'
+  Import::Into: '0'
+  Role::Tiny: '0'
+  Type::Params: '0'
+  Types::Interface: '0'
+  Types::Standard: '0'
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

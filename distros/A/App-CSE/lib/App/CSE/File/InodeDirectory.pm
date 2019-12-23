@@ -1,5 +1,5 @@
 package App::CSE::File::InodeDirectory;
-$App::CSE::File::InodeDirectory::VERSION = '0.014';
+$App::CSE::File::InodeDirectory::VERSION = '0.015';
 use Moose;
 extends qw/App::CSE::File/;
 

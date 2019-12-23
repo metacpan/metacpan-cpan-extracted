@@ -1,14 +1,15 @@
 Name:           perl-Package-New
-Version:        0.07
+Version:        0.08
 Release:        1%{?dist}
 Summary:        Simple base package from which to inherit
 License:        BSD
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Package-New/
-Source0:        http://www.cpan.org/modules/by-module/Package/Package-New-%{version}.tar.gz
+Source0:        http://search.cpan.org/CPAN/authors/id/M/MR/MRDVT/Package-New-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Devel::Hide)
 BuildRequires:  perl(Test::Simple) >= 0.44
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
@@ -46,6 +47,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
+*Thu Dec 03 2011 Michael R. Davis (mdavis@stopllc.com) 0.07-2
+-CPAN did not symlink the package into the by_module tree. 
+
 *Thu Dec 02 2011 Michael R. Davis (mdavis@stopllc.com) 0.07-1
 -Updated for version 0.07
 

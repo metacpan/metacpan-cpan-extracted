@@ -1,7 +1,7 @@
 {
-   "abstract" : "take structured address data and format it according to the various global/country rules",
+   "abstract" : "Geo::Address::Formatter - format structured address data according to various global/country rules",
    "author" : [
-      "edf <edf@opencagedata.com>"
+      "Ed Freyfogle"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
@@ -25,39 +25,44 @@
             "Data::Dumper" : "0",
             "File::Basename" : "0",
             "File::Find::Rule" : "0",
-            "File::Slurper" : "0",
-            "File::Spec" : "0",
             "List::Util" : "0",
             "Scalar::Util" : "0",
-            "Test::Exception" : "0",
-            "Test::LWP::Recorder" : "0",
-            "Test::More" : "0.88",
-            "Test::Warn" : "0",
-            "Text::Hogan" : "2.01",
-            "Text::Trim" : "1.02",
+            "Text::Hogan" : "2.03",
             "Try::Catch" : "0",
             "YAML::LibYAML" : "0.75",
             "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurper" : "0",
+            "File::Spec" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "Test::Warn" : "0",
+            "Text::Trim" : "1.02"
          }
       }
    },
    "provides" : {
       "Geo::Address::Formatter" : {
          "file" : "lib/Geo/Address/Formatter.pm",
-         "version" : "1.79"
+         "version" : "1.80"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/OpenCageData/perl-Geo-Address-Formatter",
+      "bugtracker" : {
+         "web" : "https://github.com/OpenCageData/perl-Geo-Address-Formatter/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/OpenCageData/perl-Geo-Address-Formatter.git",
+         "url" : "git://github.com/OpenCageData/perl-Geo-Address-Formatter",
          "web" : "https://github.com/OpenCageData/perl-Geo-Address-Formatter"
       }
    },
-   "version" : "1.79",
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.03"
+   "version" : "1.80",
+   "x_generated_by_perl" : "v5.26.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

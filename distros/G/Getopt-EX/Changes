@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.15.2 2019-12-21T00:58:41Z
+
+    - Do not produce ERASE LINE sequence in normal case.
+
 v1.15.1 2019-09-03T23:07:53Z
 
     - Function is executed under v5.14 context.

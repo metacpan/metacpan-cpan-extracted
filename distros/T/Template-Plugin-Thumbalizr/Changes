@@ -1,0 +1,8 @@
+Revision history for Perl extension Template::Plugin::Thumbalizr.
+
+1.0.0  Sat Dec  7 16:30:26 2019
+	- original version; created by h2xs 1.23 with options
+		-AX Template::Plugin::Thumbalizr
+
+1.0.1  Sat Dec  14 21:05:40 2019
+	- fix typos in the documentation

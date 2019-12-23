@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-10-17'; # DATE
-our $VERSION = '0.728'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.729'; # VERSION
 
 use 5.010;
 use strict;
@@ -56,7 +56,7 @@ pmman - Show manpage of Perl module
 
 =head1 VERSION
 
-This document describes version 0.728 of pmman (from Perl distribution App-PMUtils), released on 2019-10-17.
+This document describes version 0.729 of pmman (from Perl distribution App-PMUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 

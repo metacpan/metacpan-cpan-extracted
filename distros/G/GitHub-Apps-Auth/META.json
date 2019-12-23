@@ -63,7 +63,7 @@
    "provides" : {
       "GitHub::Apps::Auth" : {
          "file" : "lib/GitHub/Apps/Auth.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -77,8 +77,11 @@
          "web" : "https://github.com/mackee/GitHub-Apps-Auth"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:MACOPY",
+   "x_contributors" : [
+      "Ichinose Shogo <shogo82148@gmail.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

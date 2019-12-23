@@ -41,18 +41,10 @@
     </div>
 
     <TMPL_IF NAME=CAPTCHA_SRC>
-    <div class="form-group">
-      <img src="<TMPL_VAR NAME=CAPTCHA_SRC>" class="img-thumbnail" />
-    </div>
-    <div class="input-group mb-3">
-      <div class="input-group-prepend">
-        <span class="input-group-text"><i class="fa fa-eye"></i> </span>
-      </div>
-      <input type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" placeholder="Captcha" required aria-required="true" autocomplete="off" />
-    </div>
+      <TMPL_INCLUDE NAME="captcha.tpl">
     </TMPL_IF>
     <TMPL_IF NAME="TOKEN">
-      <input type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
+      <input id="token" type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
     </TMPL_IF>
 
     <button type="submit" class="btn btn-success" >

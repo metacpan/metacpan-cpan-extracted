@@ -30,7 +30,7 @@ sub import {
       if ( @_ && lc( $_[0] ) eq "pool" );
 }
 
-our $VERSION = '1.53';
+our $VERSION = '1.54';
 
 our $drh    = undef;    # will hold driver handle
 our $err    = 0;        # will hold any error codes
@@ -447,7 +447,7 @@ according to the value of C<mock_can_connect>. So if C<mock_can_connect> were
 to be set to C<0> (or off), then both C<Active> and C<ping> would return false
 values (or C<0>).
 
-=item B<C<mock_add_resultset( \@resultset | \%sql_and_resultset )>>
+=item B<C<mock_add_resultset( \@resultset | \%resultset_and_options )>>
 
 This stocks the database handle with a record set, allowing you to seed data
 for your application to see if it works properly. Each recordset is a simple
@@ -498,7 +498,21 @@ Here is a sample usage, partially from the test suite:
     # this will fetch rows from the second resultset...
     my $row = $sth->fetchrow_arrayref;
 
-You can also associate a resultset with a particular SQL statement instead of
+It is possible to assign a hashref where the resultset must be given as
+value for the C<results> key:
+
+    $dbh->{mock_add_resultset} = {
+        results => [
+            [ 'foo', 'bar' ],
+            [ 'this_one', 'that_one' ],
+            [ 'this_two', 'that_two' ],
+        ],
+    };
+
+The reason for the hashref form is that you can add options as described
+in the following.
+
+You can associate a resultset with a particular SQL statement instead of
 adding them in the order they will be fetched:
 
     $dbh->{mock_add_resultset} = {
@@ -592,11 +606,8 @@ me for now, and until I can come up with a better method, or someone sends me a
 patch ;) it will do for now.
 
 If you want a given statement to fail, you will have to use the hashref method
-and add a C<failure> key. That key can be handed an arrayref with the error
-number and error string, in that order. It can also be handed a hashref with
-two keys - C<errornum> and C<errorstring>. If the C<failure> key has no useful
-value associated with it, the C<errornum> will be C<1> and the C<errorstring>
-will be C<Unknown error>.
+and add a C<failure> key. That key must be handed an arrayref with the error
+number and error string, in that order.
 
     $dbh->{mock_add_resultset} = {
         sql => 'SELECT foo FROM bar',
@@ -604,6 +615,12 @@ will be C<Unknown error>.
         failure => [ 5, 'Ooops!' ],
     };
 
+Without the C<sql> attribute the next statement will fail in any case:
+
+    $dbh->{mock_add_resultset} = {
+        results => DBD::Mock->NULL_RESULTSET,
+        failure => [ 5, 'Ooops!' ],
+    };
 
 =item B<C<mock_get_info>>
 
@@ -1452,6 +1469,9 @@ methods and tests.
 C<mock_can_execute>, and C<mock_can_fetch> features.
 
 =item Thanks to Tomas Zemresfor the unit test in RT #71438.
+
+=item Thanks to Bernhard Graf for multiple patches fixing a range of issues
+and adding a new I<One Shot Failure> feature to C<mock_add_resultset>.
 
 =back
 

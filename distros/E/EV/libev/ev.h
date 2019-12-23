@@ -504,17 +504,18 @@ union ev_any_watcher
 /* flag bits for ev_default_loop and ev_loop_new */
 enum {
   /* the default */
-  EVFLAG_AUTO      = 0x00000000U, /* not quite a mask */
+  EVFLAG_AUTO       = 0x00000000U, /* not quite a mask */
   /* flag bits */
-  EVFLAG_NOENV     = 0x01000000U, /* do NOT consult environment */
-  EVFLAG_FORKCHECK = 0x02000000U, /* check for a fork in each iteration */
+  EVFLAG_NOENV      = 0x01000000U, /* do NOT consult environment */
+  EVFLAG_FORKCHECK  = 0x02000000U, /* check for a fork in each iteration */
   /* debugging/feature disable */
-  EVFLAG_NOINOTIFY = 0x00100000U, /* do not attempt to use inotify */
+  EVFLAG_NOINOTIFY  = 0x00100000U, /* do not attempt to use inotify */
 #if EV_COMPAT3
-  EVFLAG_NOSIGFD   = 0, /* compatibility to pre-3.9 */
+  EVFLAG_NOSIGFD    = 0, /* compatibility to pre-3.9 */
 #endif
-  EVFLAG_SIGNALFD  = 0x00200000U, /* attempt to use signalfd */
-  EVFLAG_NOSIGMASK = 0x00400000U  /* avoid modifying the signal mask */
+  EVFLAG_SIGNALFD   = 0x00200000U, /* attempt to use signalfd */
+  EVFLAG_NOSIGMASK  = 0x00400000U, /* avoid modifying the signal mask */
+  EVFLAG_NOTIMERFD  = 0x00800000U  /* avoid creating a timerfd */
 };
 
 /* method bits to be ored together */

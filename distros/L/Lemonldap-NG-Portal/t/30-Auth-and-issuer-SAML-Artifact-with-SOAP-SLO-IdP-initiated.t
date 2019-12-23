@@ -10,7 +10,7 @@ BEGIN {
     require 't/test-lib.pm';
 }
 
-my $maintests = 14;
+my $maintests = 15;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -117,6 +117,9 @@ SKIP: {
     );
     expectOK($res);
 
+    my $removedCookie = expectCookie($res);
+    is($removedCookie, 0, "SSO cookie removed");
+
     ok(
         $res->[2]->[0] =~
 m#img src="http://auth.idp.com(/saml/relaySingleLogoutSOAP)\?(relay=.*?)"#s,
@@ -127,7 +130,6 @@ m#img src="http://auth.idp.com(/saml/relaySingleLogoutSOAP)\?(relay=.*?)"#s,
         $res = $issuer->_get(
             $1,
             query  => $2,
-            cookie => "lemonldap=$idpId",
             accept => 'text/html'
         ),
         'Get image'
@@ -149,8 +151,7 @@ m#img src="http://auth.idp.com(/saml/relaySingleLogoutSOAP)\?(relay=.*?)"#s,
         $res = $sp->_get(
             '/',
             accept => 'text/html',
-            cookie =>
-              "lemonldapidp=http://auth.idp.com/saml/metadata; lemonldap=$spId"
+            cookie => "lemonldap=$spId"
         ),
         'Test if user is reject on SP'
     );

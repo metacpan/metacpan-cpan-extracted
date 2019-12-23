@@ -26,16 +26,16 @@ no_index:
 provides:
   App::ansifold:
     file: lib/App/ansifold.pm
-    version: '0.04'
+    version: '1.01'
 requires:
   Getopt::EX: v1.14.0
-  Text::ANSI::Fold: '0.07'
+  Text::ANSI::Fold: '1.02'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/kaz-utashiro/ansifold/issues
   homepage: https://github.com/kaz-utashiro/ansifold
   repository: git://github.com/kaz-utashiro/ansifold.git
-version: '0.04'
+version: '1.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

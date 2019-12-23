@@ -3,7 +3,7 @@ abstract: 'Complete command-line argument using Getopt::Long specification'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Complete::Bash: '0.322'
+  Complete::Bash: '0.331'
   File::Spec: '0'
   File::Temp: '0'
   File::chdir: '0'
@@ -23,8 +23,8 @@ recommends:
   Unix::Passwd::File: '0'
 requires:
   Complete::Env: '0'
-  Complete::File: '0'
-  Complete::Util: '0.603'
+  Complete::File: '0.440'
+  Complete::Util: '0.606'
   Exporter: '5.57'
   Getopt::Long::Util: '0.890'
   Log::ger: '0.027'
@@ -36,10 +36,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Getopt-Long
   homepage: https://metacpan.org/release/Complete-Getopt-Long
   repository: git://github.com/perlancar/perl-Complete-Getopt-Long.git
-version: '0.472'
+version: '0.474'
 x_Dist_Zilla:
   perl:
-    version: '5.028002'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -106,13 +106,17 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::FileFinder::ByName
+      name: '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+      version: '6.012'
+    -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.597'
+      version: '0.599'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -144,14 +148,14 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -179,7 +183,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: '@Author::PERLANCAR/OurPkgVersion'
-      version: '0.15'
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -291,7 +295,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -337,9 +341,13 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/Test::Compile'
       version: '2.058'
     -
-      class: Dist::Zilla::Plugin::Test::Perl::Critic
-      name: '@Author::PERLANCAR/Test::Perl::Critic'
-      version: '3.001'
+      class: Dist::Zilla::Plugin::Test::Perl::Critic::Subset
+      config:
+        Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
+          finder:
+            - '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+      name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
+      version: 3.001.003
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
@@ -450,6 +458,6 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.012'
 x_authority: cpan:PERLANCAR
-x_generated_by_perl: v5.28.2
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

@@ -38,7 +38,7 @@ use constant _NFIELDS  => 4;
 
 # ----- static data -----
 
-our $VERSION      = '1.016';
+our $VERSION      = '1.017';
 our $max_degree   = 10_000;    # limit for power operator
 
 # default values for as_string options
@@ -895,6 +895,15 @@ sub xgcd {
     return ($this, $d1, $d2, $m1, $m2);
 }
 
+sub lcm {
+    my $result = shift;
+    foreach my $that (@_) {
+        my $gcd  = $result->gcd($that);
+        $result *= $that->div($gcd) if !$that->is_equal($gcd);
+    }
+    return $result;
+}
+
 sub inv_mod {
     my ($this, $that) = @_;
     my ($d, $d2) = ($that->xgcd($this))[0, 2];
@@ -911,7 +920,7 @@ Math::Polynomial - Perl class for polynomials in one variable
 
 =head1 VERSION
 
-This documentation refers to version 1.016 of Math::Polynomial.
+This documentation refers to version 1.017 of Math::Polynomial.
 
 =head1 SYNOPSIS
 
@@ -1556,6 +1565,10 @@ multiplications and subtractions in the coefficient space.
 I<mmod> can have advantages over I<mod> in situations where division
 in the coefficient space is much more expensive than multiplication.
 
+Note that the coefficient space is treated as a field and thus no effort
+is made to find common divisors of coefficients once the degree of the
+result is determined.
+
 =item I<xgcd>
 
 C<($d, $d1, $d2, $m1, $m2) = $p1-E<gt>xgcd($p2)> calculates a
@@ -1567,6 +1580,19 @@ and I<n>, I<mE<gt>=n>, this takes at most I<n> polynomial divisions
 and I<2*n> polynomial multiplications and subtractions of decreasing
 degrees, or, in the coefficient space: I<O(m+n)> divisions and
 I<O(m*n)> multiplications and subtractions.
+
+=item I<lcm>
+
+C<$p1-E<gt>lcm($p2)> calculates a least common multiple of two
+polynomials, using the identity I<p1 * p2 = lcm(p1, p2) * gcd(p1, p2)>.
+This takes the same operations as I<gcd> plus two polynomial
+multiplications and one polynomial division.
+
+Optionally, I<lcm> may be called with an arbitrary number of other
+operands and will return a least common multiple of all given polynomials.
+
+Note that least means least degree here.
+With non-monic operands, the result may also be not monic.
 
 =item I<inv_mod>
 
@@ -2069,6 +2095,8 @@ type of object instances.
                                                #   deg r < deg p2,
                                                #   d is monic gcd of
                                                #   p1 and p2
+
+  $r = $p1->lcm($p2);                 # p1 * p2 == r * gcd(p1, p2)
 
   # calculus
   $q = $p->differentiate;             # q(x) == d/dx p(x)

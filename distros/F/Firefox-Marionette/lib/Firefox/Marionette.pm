@@ -41,7 +41,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.85';
+our $VERSION = '0.87';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -4600,7 +4600,10 @@ sub _send_request {
     if ( $self->_debug() ) {
         warn ">> $length:$json\n";
     }
-    my $result = syswrite $self->_socket(), "$length:$json";
+    my $result;
+    if ( $self->alive() ) {
+        $result = syswrite $self->_socket(), "$length:$json";
+    }
     if ( !defined $result ) {
         my $socket_error = $EXTENDED_OS_ERROR;
         if ( $self->alive() ) {
@@ -4780,7 +4783,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.85
+Version 0.87
 
 =head1 SYNOPSIS
 

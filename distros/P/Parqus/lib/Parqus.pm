@@ -1,5 +1,5 @@
 package Parqus;
-$Parqus::VERSION = '0.01';
+$Parqus::VERSION = '0.02';
 use Moo;
 use namespace::autoclean;
 use Regexp::Grammars;
@@ -18,8 +18,21 @@ has keywords => (
             my %hash = map { $_ => 1 } @{ $_[0] };
             return \%hash;
         }
+        else {
+            return $_[0];
+        }
     },
-    default => sub { {} },
+    default => sub { {} }
+);
+
+
+has value_regex => (
+    is  => 'lazy',
+    isa => sub {
+        "$_[0] is not a Regexp!"
+          unless ref $_[0] eq 'Regexp';
+    },
+    default => sub { qr![\w-]+!xms },
 );
 
 has parser => (
@@ -34,7 +47,8 @@ has parser => (
 sub _build_parser {
     my ($self) = @_;
 
-    my %keywords = %{ $self->keywords };
+    my %keywords    = %{ $self->keywords };
+    my $value_regex = $self->value_regex;
     return eval q{qr/
                     <timeout: 2>
                     ^
@@ -53,7 +67,7 @@ sub _build_parser {
                     <rule: delim>
                         ['"]
                     <rule: value>
-                        <MATCH= (\w+)>|<ldelim=delim><MATCH= (.*?)><rdelim=\_ldelim>
+                        <MATCH= ($value_regex)>|<ldelim=delim><MATCH= (.*?)><rdelim=\_ldelim>
                  /xms};
 }
 
@@ -109,13 +123,15 @@ Parqus - parse a search query string
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
     use Parqus;
     my $parser = Parqus->new( keywords => [ qw/name title/ ] );
-    my $res    = $parser->process('title:"bar baz" foo title: meh');
+    my $res;
+
+    $res = $parser->process('title:"bar baz" foo title: meh');
     # {
     #   words    => ['foo'],
     #   keywords => {
@@ -126,9 +142,47 @@ version 0.01
     #               },
     # }
 
+    $res = $parser->process('title:"bar baz" title: meh');
+    # {
+    #   keywords => {
+    #                 title => [
+    #                            'bar baz',
+    #                            'meh',
+    #                          ]
+    #               },
+    # }
+
+    $res = $parser->process('foo bar baz');
+    # {
+    #   words => ['foo', 'bar', 'baz'],
+    # }
+
+    $res = $parser->process('tag: inactive');
+    # {
+    #   errors => {
+    #               'Parse Error: Invalid search query.'
+    #             },
+    # }
+
 =head1 DESCRIPTION
 
 Parqus (PArse QUery String) parses a search-engine like string into a perl structure
+
+=head1 NEW
+
+    my $parser = Parqus->new( %options );
+
+=head1 OPTIONS
+
+=head2 keywords
+
+    keywords => [ qw/name title/ ]
+
+the list of keywords you want to recognise.
+
+=head2 value_regex
+
+regular expression to capture words. (default: C<[qr![\w-]+!xms]>)
 
 =head1 SEE ALSO
 

@@ -22,16 +22,16 @@ BEGIN {
 *HTTP_URI        = *Lemonldap::NG::Common::Regexp::HTTP_URI;
 *reDomainsToHost = *Lemonldap::NG::Common::Regexp::reDomainsToHost;
 
-ok( 'test.ex.com' =~ HOST() );
-ok( 'test.ex.com' =~ HOSTNAME() );
-ok( 'test..ex.com' !~ HOST() );
-ok( 'test..ex.com' !~ HOSTNAME() );
-ok( '10.1.1.1' =~ HOST() );
-ok( '10.1.1.1' !~ HOSTNAME() );
-ok( 'test.ex.com' !~ HTTP_URI() );
-ok( 'https://test.ex.com' =~ HTTP_URI() );
-ok( 'https://test.ex.com/' =~ HTTP_URI() );
-ok( 'https://test.ex.com/a' =~ HTTP_URI() );
+ok( 'test.ex.com'                   =~ HOST() );
+ok( 'test.ex.com'                   =~ HOSTNAME() );
+ok( 'test..ex.com'                  !~ HOST() );
+ok( 'test..ex.com'                  !~ HOSTNAME() );
+ok( '10.1.1.1'                      =~ HOST() );
+ok( '10.1.1.1'                      !~ HOSTNAME() );
+ok( 'test.ex.com'                   !~ HTTP_URI() );
+ok( 'https://test.ex.com'           =~ HTTP_URI() );
+ok( 'https://test.ex.com/'          =~ HTTP_URI() );
+ok( 'https://test.ex.com/a'         =~ HTTP_URI() );
 ok( 'https://test.ex.com/?<script>' !~ HTTP_URI() );
 
 my $re;
@@ -39,6 +39,6 @@ ok( $re = reDomainsToHost('a.com b.org c.net') );
 ok( 'test.d.fr' !~ $re );
 
 foreach (qw(a.com b.org c.net)) {
-    ok( "test.$_" =~ $re );
+    ok( "test.$_"  =~ $re );
     ok( "test..$_" !~ $re );
 }

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Moai;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Mojolicious UI components using modern UI libraries
 
 #pod =head1 SYNOPSIS
@@ -302,7 +302,7 @@ Mojolicious::Plugin::Moai - Mojolicious UI components using modern UI libraries
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -220,7 +220,7 @@
     <station id="S218" name="Osdorfer Str." line="S25,S26" link="S217,S219"/>
     <station id="S024" name="Oskar-Helene-Heim" line="U3" link="S023,S025"/>
     <station id="S154" name="Osloer Str." line="U8,U9" link="S153,S155,S162"/>
-    <station id="S239" name="Ostbahnhof" line="S3,S5,S7,S75,S9" link="S001,S147"/>
+    <station id="S239" name="Ostbahnhof" line="S3,S5,S7,S9" link="S001,S147"/>
     <station id="S206" name="Ostkreuz" line="S3,S41/S42,S5,S7,S75,S8,S85" link="S001,S062,S207,S238,S258"/>
     <station id="S102" name="Otisstr." line="U6" link="S101,S103"/>
     <station id="S027" name="Pankow" line="S2,S8,S85,U2" link="S028,S190,S280"/>

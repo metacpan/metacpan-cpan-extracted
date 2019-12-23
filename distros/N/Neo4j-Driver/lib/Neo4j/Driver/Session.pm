@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.13';
+$Neo4j::Driver::Session::VERSION = '0.14';
 
 use Cpanel::JSON::XS 3.0201 qw(decode_json);
 use URI 1.25;
@@ -43,6 +43,7 @@ sub run {
 
 
 sub close {
+	warnings::warnif deprecated => __PACKAGE__ . "->close() is deprecated";
 }
 
 
@@ -67,7 +68,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -139,14 +140,6 @@ these features.
 
 The C<run> method tries to Do What You Mean if called in list
 context.
-
-=head2 Close method
-
- $session->close;  # no-op
-
-All resources opened by this driver are closed automatically once
-they are no longer required. Explicit calls to C<close()> are neither
-required nor useful.
 
 =head2 ServerInfo
 

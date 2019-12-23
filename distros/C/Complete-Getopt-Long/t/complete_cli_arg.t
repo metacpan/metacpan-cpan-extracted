@@ -1,12 +1,12 @@
 #!perl
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
+use Test::More 0.98;
 
 use File::chdir;
 use File::Temp qw(tempdir);
-use Test::More 0.98;
 
 subtest basics => sub {
     my %gospec = (

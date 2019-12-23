@@ -5,6 +5,8 @@
 
 NAME=Net-DBus
 
+test -z "$AUTOBUILD_INSTALL_ROOT" && AUTOBUILD_INSTALL_ROOT=$HOME/builder
+
 set -e
 
 make -k realclean ||:

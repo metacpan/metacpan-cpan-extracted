@@ -8,7 +8,6 @@ use strict;
 use warnings;
 
 use Quiq::Html::Tag;
-use Quiq::Unindent;
 
 # -----------------------------------------------------------------------------
 
@@ -42,11 +41,11 @@ sub test_unitTest_nonempty : Test(1) {
         width => 100,
         height => 100,
     );
-    $self->is($html,Quiq::Unindent->trimNl(q~
+    $self->isText($html,q~
         <div>
           <img src="img/illusion.png" width="100" height="100" alt="">
         </div>
-    ~));
+    ~);
     
     return;
 }

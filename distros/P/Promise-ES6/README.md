@@ -4,8 +4,6 @@ Promise::ES6 - ES6-style promises in Perl
 
 # SYNOPSIS
 
-    $Promise::ES6::DETECT_MEMORY_LEAKS = 1;
-
     my $promise = Promise::ES6->new( sub {
         my ($resolve_cr, $reject_cr) = @_;
 
@@ -32,8 +30,9 @@ for coordinating asynchronous tasks.
 
 Unlike most other promise implementations on CPAN, this module
 mimics ECMAScript 6’s [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-class. As the SYNOPSIS above shows, you can thus use patterns from JavaScript
-in Perl with only minimal changes needed to accommodate language syntax.
+interface. As the SYNOPSIS above shows, you can thus use patterns from
+JavaScript in Perl with only minimal changes needed to accommodate language
+syntax.
 
 This is a rewrite of an earlier module, [Promise::Tiny](https://metacpan.org/pod/Promise::Tiny). It fixes several
 bugs and superfluous dependencies in the original.
@@ -44,6 +43,17 @@ bugs and superfluous dependencies in the original.
 not a list.
 - Unhandled rejections are reported via `warn()`. (See below
 for details.)
+- The Promises/A+ test suite avoids testing the case where an “executor”
+function’s resolve callback itself receives another promise, e.g.:
+
+        my $p = Promise::ES6->new( sub ($res) {
+            $res->( Promise::ES6->resolve(123) );
+        } );
+
+    What will $p’s resolution value be? 123, or the promise that wraps it?
+
+    This module favors conformity with the ES6 standard, which
+    [indicates intent](https://www.ecma-international.org/ecma-262/6.0/#sec-promise-executor) that $p’s resolution value be 123.
 
 # COMPATIBILITY
 
@@ -98,11 +108,12 @@ Promises have never provided a standardized solution for cancellation—i.e.,
 aborting an in-process operation. So, if you need this functionality, you’ll
 have to implement it yourself. Two ways of doing this are:
 
-- Subclass Promise::ES6 and provide cancellation logic in your
+- Subclass Promise::ES6 and provide cancellation logic in that
 subclass. See [DNS::Unbound::AsyncQuery](https://metacpan.org/pod/DNS::Unbound::AsyncQuery)’s implementation for an
 example of this.
-- Implement the cancellation on the object that creates your promises.
-This is probably the more straightforward approach but requires that there
+- Implement the cancellation on a request object that your
+“promise-creator” also consumes. This is probably the more straightforward
+approach but requires that there
 be some object or ID besides the promise that uniquely identifies the action
 to be canceled. See [Net::Curl::Promiser](https://metacpan.org/pod/Net::Curl::Promiser) for an example of this approach.
 
@@ -121,8 +132,23 @@ Here are a few “pointers” (heh) to bear in mind:
 process’s global destruction, a warning is triggered.
 - If your application needs recursive promises (e.g., to poll
 iteratively for completion of a task), the `current_sub` feature (i.e.,
-`__SUB__`) may help you avoid memory leaks. (See this module’s source code
-for a substitute that works with pre-5.16 perls.)
+`__SUB__`) may help you avoid memory leaks. In Perl versions that don’t
+support this feature you can imitate it thus:
+
+        use constant _has_current_sub => $^V ge v5.16.0;
+
+        use if _has_current_sub(), feature => 'current_sub';
+
+        my $cb;
+        $cb = sub {
+            my $current_sub = do {
+                no strict 'subs';
+                _has_current_sub() ? __SUB__ : eval '$cb';
+            };
+        }
+
+    Of course, it’s better if you can avoid doing that. :)
+
 - Garbage collection before Perl 5.18 seems to have been buggy.
 If you work with such versions and end up chasing leaks,
 try manually deleting as many references/closures as possible. See

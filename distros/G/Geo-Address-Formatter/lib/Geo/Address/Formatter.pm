@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.79';
+$Geo::Address::Formatter::VERSION = '1.80';
 use strict;
 use warnings;
 use feature qw(say);
@@ -691,7 +691,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.79
+version 1.80
 
 =head1 SYNOPSIS
 
@@ -770,7 +770,7 @@ Together we can address the world!
 
 =head1 AUTHOR
 
-edf <edf@opencagedata.com>
+Ed Freyfogle
 
 =head1 COPYRIGHT AND LICENSE
 

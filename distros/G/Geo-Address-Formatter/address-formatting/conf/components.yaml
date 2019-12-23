@@ -17,7 +17,9 @@ aliases:
     - path
     - pedestrian
     - road_reference
-    - road_reference_intl    
+    - road_reference_intl
+    - square
+    - place
 ---
 name: village
 aliases:
@@ -31,10 +33,10 @@ aliases:
     - city_district
     - district
     - quarter
+    - residential
+    - industrial
     - houses
     - subdivision
----
-name: postcode
 ---
 name: city
 aliases:
@@ -47,6 +49,8 @@ aliases:
     - county_code
 ---
 name: state_district
+---
+name: postcode
 ---
 name: state
 aliases:

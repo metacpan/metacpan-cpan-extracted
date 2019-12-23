@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.10  2019-12-17 00:00:00
+  - _io_input() supports undef input
+  - created by INABA Hitoshi
+
 0.09  2019-12-05 00:00:00
   - add scalar() in sub readline()
   - created by INABA Hitoshi

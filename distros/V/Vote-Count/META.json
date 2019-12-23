@@ -39,6 +39,7 @@
             "Storable" : "3.15",
             "Time::Piece" : "0",
             "Try::Tiny" : "0",
+            "Vote::Count::Range" : "0",
             "YAML::XS" : "0",
             "feature" : "0",
             "namespace::autoclean" : "0",
@@ -72,7 +73,7 @@
          "web" : "https://github.com/brainbuz/Vote-Count"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

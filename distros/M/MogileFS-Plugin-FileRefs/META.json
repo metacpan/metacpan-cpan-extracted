@@ -1,0 +1,51 @@
+{
+   "abstract" : "MogileFS extension",
+   "author" : [
+      "Dave Lambley <dlambley@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MogileFS-Plugin-FileRefs",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MogileFS::Store" : "0",
+            "MogileFS::Worker::Query" : "0",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "MogileFS::Server" : "0",
+            "MogileFS::Test" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/davel/MogileFS-Plugin-FileRefs",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davel/MogileFS-Plugin-FileRefs.git",
+         "web" : "https://github.com/davel/MogileFS-Plugin-FileRefs"
+      }
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

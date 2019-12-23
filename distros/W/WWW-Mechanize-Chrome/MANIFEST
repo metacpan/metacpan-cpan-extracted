@@ -56,6 +56,8 @@ t/49-pipe.t
 t/49-port.t
 t/50-click.html
 t/50-follow-link.t
+t/50-form-with-fields-gh48.html
+t/50-form-with-fields-gh48.t
 t/50-form-with-fields.t
 t/50-form2.html
 t/50-form2.t
@@ -100,6 +102,7 @@ t/61-mech-download.t
 t/61-screencast.t
 t/62-networkstatus.t
 t/62-viewport-size.t
+t/65-is_visible-2.t
 t/65-is_visible.t
 t/65-is_visible_class.html
 t/65-is_visible_hidden.html

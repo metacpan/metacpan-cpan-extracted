@@ -7,12 +7,12 @@ package Lemonldap::NG::Common::PSGI::SOAPService;
 
 require SOAP::Lite;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 ## @cmethod Lemonldap::NG::Common::PSGI::SOAPService new(object obj,string @func)
 # Constructor
-# @param $obj object which will be called for SOAP authorizated methods
-# @param @func authorizated methods
+# @param $obj object which will be called for SOAP authorized methods
+# @param @func authorized methods
 # @return Lemonldap::NG::Common::PSGI::SOAPService object
 sub new {
     my ( $class, $obj, $req, @func ) = @_;
@@ -24,7 +24,7 @@ sub new {
 # Call the wanted function with the object given to the constructor.
 # AUTOLOAD() is a magic method called by Perl interpreter fon non existent
 # functions. Here, we use it to call the wanted function (given by $AUTOLOAD)
-# if it is authorizated
+# if it is authorized
 # @return data provided by the exported function
 sub AUTOLOAD {
     my $self = shift;
@@ -37,7 +37,7 @@ sub AUTOLOAD {
         return $tmp;
     }
     elsif ( $AUTOLOAD ne 'DESTROY' ) {
-        die "$AUTOLOAD is not an authorizated function";
+        die "$AUTOLOAD is not an authorized function";
     }
     1;
 }

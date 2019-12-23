@@ -5,11 +5,10 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::TXExtractor';
 
-use Encode qw(decode);
 use List::Util qw(max);
 use HTML::ExtractContent;
 use Mojo::DOM;
-use Types::Standard qw(Str InstanceOf Maybe);
+use Types::Standard qw(Str Maybe);
 
 use Importer 'NewsExtractor::TextUtil'  => qw( normalize_whitespace );
 use Importer 'NewsExtractor::Constants' => qw( %RE );

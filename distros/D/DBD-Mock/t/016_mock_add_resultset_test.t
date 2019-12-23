@@ -114,6 +114,26 @@ $dbh->{mock_add_resultset} = {
     $sth->finish();
 }
 
+## overwrite regular expression matching
+$dbh->{mock_add_resultset} = {
+    sql => qr/^SELECT foo/,
+    results => [ [ 'foo' ], [ 400 ] ],
+};
+
+{
+    my $sth = $dbh->prepare('SELECT foo FROM oof');
+    isa_ok($sth, 'DBI::st');
+
+    my $rows = $sth->execute();
+    is($rows, '0E0', '... got back 0E0 for rows with a SELECT statement');
+
+    my ($result) = $sth->fetchrow_array();
+
+    is($result, 400, '... got the result we expected');
+
+    $sth->finish();
+}
+
 # check that statically assigned queries take precedence over regex matched ones
 {
     my $sth = $dbh->prepare('SELECT foo FROM bar');

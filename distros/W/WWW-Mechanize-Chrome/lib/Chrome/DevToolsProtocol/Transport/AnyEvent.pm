@@ -12,7 +12,7 @@ use AnyEvent;
 use AnyEvent::WebSocket::Client;
 use AnyEvent::Future qw(as_future_cb);
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 our @CARP_NOT = ();
 
 =head1 NAME
@@ -119,6 +119,18 @@ sub sleep( $self, $seconds ) {
 }
 
 1;
+
+=head1 REQUIRED ADDITIONAL MODULES
+
+This module needs additional modules that are not installed by the default
+installation of WWW::Mechanize::Chrome:
+
+L<AnyEvent>
+
+L<AnyEvent::WebSocket::Client>
+
+L<AnyEvent::Future>
+
 
 =head1 REPOSITORY
 

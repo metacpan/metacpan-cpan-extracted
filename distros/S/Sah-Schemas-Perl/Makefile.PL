@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Sah" => "0.903",
     "Data::Sah::Coerce" => "0.038",
     "File::Spec" => 0,
     "IO::Handle" => 0,
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.025",
+  "VERSION" => "0.026",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "Complete::File" => 0,
   "Complete::Module" => 0,
   "Complete::Util" => "0.603",
+  "Data::Sah" => "0.903",
   "Data::Sah::Coerce" => "0.038",
   "File::Spec" => 0,
   "IO::Handle" => 0,

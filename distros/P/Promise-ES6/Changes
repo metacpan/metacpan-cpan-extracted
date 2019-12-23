@@ -1,5 +1,15 @@
 Revision history for Perl module Promise::ES6
 
+0.15 Thu 19 Dec 2019
+- BUG FIX: Make all() ignore rejections after the first one.
+- Promise::ES6’s internal representation has changed to reduce memory usage.
+  Any code that may depend on the former internals will likely be broken.
+- Speed up implementation.
+- Clarify intent when an executor function $resolve_cr is passed a promise.
+- Make Mojo subclass require a sufficiently modern Mojo::IOLoop.
+- Update Future.pm docs a bit.
+- Refactor implementation to prepare for XS backend.
+
 0.14 Wed 27 Nov 2019
 - Fix test by requiring a reasonably recent Test::More.
 

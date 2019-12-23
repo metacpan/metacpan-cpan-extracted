@@ -58,113 +58,53 @@ sub obfuscate ($self) { return $SRC_OK }
 
 sub update_log ( $self, $log = undef ) {return}
 
-sub filter_prettier ( $self, @options ) {
-    my $dist_options = $self->dist_cfg->{prettier} || $self->src_cfg->{prettier};
+sub _get_node ($self) {
+    state( $proc, $conn );
 
-    my $temp = P->file1->tempfile;
-    P->file->write_bin( $temp, $self->{data} );
+    if ( !$conn ) {
+        if ( !P->net->check_port( '127.0.0.1', 55556, 0.1 ) ) {
+            $proc //= P->sys->run_proc( [ 'softvisio-cli', '--vim' ] );
 
-    my $proc = P->sys->run_proc(
-        [ 'prettier', $temp, $dist_options->@*, @options, '--no-color', '--no-config', '--loglevel=error' ],
-        stdout => $PROC_REDIRECT_FH,
-        stderr => $PROC_REDIRECT_FH,
-    )->capture;
-
-    # ran without errors
-    if ($proc) {
-        $self->{data} = $proc->{stdout}->$*;
-
-        $self->update_log;
-
-        return $SRC_OK;
-    }
-
-    # run with errors
-    else {
-
-        my ( @log, $has_errors, $has_warnings );
-
-        my $temp_filename = $temp->{filename};
-
-        # parse stderr
-        if ( $proc->{stderr}->$* ) {
-            for my $line ( split /\n/sm, $proc->{stderr}->$* ) {
-                if ( $line =~ s/\A\[(.+?)\]\s//sm ) {
-                    if    ( $1 eq 'error' ) { $has_errors++ }
-                    elsif ( $1 eq 'warn' )  { $has_warnings++ }
-                }
-
-                # remove temp filename from log
-                $line =~ s[\A.+$temp_filename:\s][]sm;
-
-                push @log, $line;
-            }
-
+            return res [ $SRC_FATAL, $proc->{reason} ] if !$proc->is_active && !$proc;
         }
 
-        # unable to run prettier
-        return res [ $SRC_FATAL, $log[0] || $proc->{reason} ] if $proc->{exit_code} == 1;
+        $conn = P->handle( 'tcp://127.0.0.1:55556', connection_timeout => 3 );
 
-        # prettier found errors in content
-        $self->update_log( join "\n", @log );
-
-        return $has_errors ? $SRC_ERROR : $SRC_WARN;
+        return res [ $SRC_FATAL, $conn->{reason} ] if !$conn;
     }
+
+    return $conn;
 }
 
 sub filter_eslint ( $self, @options ) {
-    my $root;
+    my $node = $self->_get_node;
 
-    if ( $self->{path} ) {
-        my $path = P->path( $self->{path} );
+    return $node if !$node;
 
-        while ( $path = $path->parent ) {
-            if ( -f "$path/package.json" ) {
-                $root = $path;
+    my $msg = {
+        command => 'eslint',
+        options => {
+            useEslintrc                   => \1,
+            fix                           => \1,
+            allowInlineConfig             => \1,
+            reportUnusedDisableDirectives => \1,
+        },
+        path => "$self->{path}",
+        data => $self->{data},
+    };
 
-                last;
-            }
-        }
-    }
+    $node->write( P->data->to_json($msg) . "\n" );
 
-    my $proc;
+    my $res = $node->read_line;
 
-    # node project was found
-    if ($root) {
-        $proc = P->sys->run_proc(
-            [ 'npx', 'eslint', '--fix-dry-run', @options, '--format=json', '--report-unused-disable-directives', '--stdin', "--stdin-filename=$self->{path}", '--fix-dry-run' ],
-            stdin  => \$self->{data},
-            stdout => $PROC_REDIRECT_FH,
-            stderr => $PROC_REDIRECT_FH,
-        )->capture;
-    }
-
-    # node project was not found, use default settings
-    else {
-        state $config = $ENV->{share}->get('/Pcore/data/.eslintrc.yaml');
-
-        $proc = P->sys->run_proc(
-            [ 'eslint', '--fix-dry-run', @options, '--format=json', '--report-unused-disable-directives', '--stdin', "--stdin-filename=$self->{path}", "--config=$config", '--no-eslintrc' ],
-            stdin  => \$self->{data},
-            stdout => $PROC_REDIRECT_FH,
-            stderr => $PROC_REDIRECT_FH,
-        )->capture;
-    }
+    $res = P->data->from_json($res);
 
     # unable to run elsint
-    if ( !$proc && !$proc->{stdout}->$* ) {
-        my $reason;
-
-        if ( $proc->{stderr}->$* ) {
-            my @log = split /\n/sm, $proc->{stderr}->$*;
-
-            $reason = $log[0];
-        }
-
-        return res [ $SRC_FATAL, $reason || $proc->{reason} ];
+    if ( !$res->{status} ) {
+        return res [ $SRC_FATAL, $res->{reason} ];
     }
 
-    my $eslint_log = P->data->from_json( $proc->{stdout} );
+    my $eslint_log = $res->{result};
 
     $self->{data} = $eslint_log->[0]->{output} if $eslint_log->[0]->{output};
 
@@ -216,7 +156,7 @@ sub filter_eslint ( $self, @options ) {
 
     my @items;
 
-    for my $msg ( sort { $a->{severity} <=> $b->{severity} || $a->{line} <=> $b->{line} || $a->{column} <=> $b->{column} } $eslint_log->[0]->{messages}->@* ) {
+    for my $msg ( sort { $b->{severity} <=> $a->{severity} || $a->{line} <=> $b->{line} || $a->{column} <=> $b->{column} } $eslint_log->[0]->{messages}->@* ) {
         my $severity_text;
 
         if ( $msg->{severity} == 1 ) {
@@ -246,7 +186,97 @@ sub filter_eslint ( $self, @options ) {
     else                  { return $SRC_OK }
 }
 
+sub filter_prettier ( $self, %options ) {
+    my $node = $self->_get_node;
+
+    return $node if !$node;
+
+    # my $dist_options = $self->dist_cfg->{prettier} || $self->src_cfg->{prettier};
+
+    my $msg = {
+        command => 'prettier',
+        options => {
+            %options,
+            "printWidth"              => 99999999,
+            "tabWidth"                => 4,
+            "semi"                    => \1,
+            "singleQuote"             => \1,
+            "trailingComma"           => "es5",
+            "bracketSpacing"          => \1,
+            "jsxBracketSameLine"      => \0,
+            "arrowParens"             => "always",
+            "vueIndentScriptAndStyle" => \1,
+            "endOfLine"               => "lf",
+            filepath                  => "$self->{path}",
+        },
+        data => $self->{data},
+    };
+
+    $node->write( P->data->to_json($msg) . "\n" );
+
+    my $res = $node->read_line;
+
+    $res = P->data->from_json($res);
+
+    # unable to run elsint
+    if ( !$res->{status} ) {
+        $self->update_log( $res->{reason} );
+
+        return $SRC_ERROR;
+    }
+    else {
+        $self->{data} = $res->{result};
+
+        $self->update_log;
+
+        return $SRC_OK;
+    }
+}
+
+sub filter_terser ( $self, %options ) {
+    my $node = $self->_get_node;
+
+    return $node if !$node;
+
+    my $msg = {
+        command => 'terser',
+        options => \%options,
+        data    => $self->{data},
+    };
+
+    $node->write( P->data->to_json($msg) . "\n" );
+
+    my $res = $node->read_line;
+
+    $res = P->data->from_json($res);
+
+    if ( !$res->{status} ) {
+        return res [ $SRC_ERROR, $res->{reason} ];
+    }
+    else {
+        $self->{data} = $res->{result};
+
+        return $SRC_OK;
+    }
+}
+
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 200, 201, 202, 203,  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |      | 204, 205, 206, 207,  |                                                                                                                |
+## |      | 208, 209             |                                                                                                                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 65, 200              | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 159                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

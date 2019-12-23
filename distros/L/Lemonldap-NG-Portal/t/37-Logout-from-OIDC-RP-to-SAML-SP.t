@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 25;
+my $maintests = 26;
 my $debug     = 'error';
 my ( $op, $rp, $sp, $res );
 my %handlerOR = ( op => [], rp => [], sp => [] );
@@ -167,7 +167,6 @@ SKIP: {
         $res = $sp->_get(
             '/',
             accept => 'text/html',
-            cookie => 'lemonldapidp=http://auth.op.com/saml/metadata'
         ),
         'Try SAML SP'
     );
@@ -197,7 +196,6 @@ SKIP: {
             $url, IO::String->new($query),
             accept => 'text/html',
             length => length($query),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -244,6 +242,9 @@ SKIP: {
     );
     expectOK($res);
 
+    my $removedCookie = expectCookie($res);
+    is($removedCookie, 0, "SSO cookie removed");
+
     ok(
         $res->[2]->[0] =~
 m#iframe src="http://auth.op.com(/saml/relaySingleLogoutPOST)\?(relay=.*?)"#s,
@@ -255,7 +256,6 @@ m#iframe src="http://auth.op.com(/saml/relaySingleLogoutPOST)\?(relay=.*?)"#s,
         $res = $op->_get(
             $url,
             query  => $query,
-            cookie => "lemonldap=$idpId",
             accept => 'text/html'
         ),
         'Get iframe'
@@ -305,8 +305,7 @@ m#iframe src="http://auth.op.com(/saml/relaySingleLogoutPOST)\?(relay=.*?)"#s,
         $res = $rp->_get(
             '/',
             accept => 'text/html',
-            cookie =>
-              "lemonldapidp=http://auth.op.com/saml/metadata; lemonldap=$rpId"
+            cookie => "lemonldap=$rpId"
         ),
         'Test if user is reject on SP'
     );
@@ -317,8 +316,7 @@ m#iframe src="http://auth.op.com(/saml/relaySingleLogoutPOST)\?(relay=.*?)"#s,
         $res = $sp->_get(
             '/',
             accept => 'text/html',
-            cookie =>
-              "lemonldapidp=http://auth.op.com/saml/metadata; lemonldap=$spId"
+            cookie => "lemonldap=$spId"
         ),
         'Test if user is reject on SP'
     );
@@ -355,7 +353,6 @@ sub op {
                         name        => "cn"
                     }
                 },
-                oidcServiceMetaDataIssuer             => "http://auth.op.com",
                 oidcServiceMetaDataAuthorizeURI       => "authorize",
                 oidcServiceMetaDataCheckSessionURI    => "checksession.html",
                 oidcServiceMetaDataJWKSURI            => "jwks",

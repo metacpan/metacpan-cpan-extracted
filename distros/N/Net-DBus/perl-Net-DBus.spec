@@ -1,6 +1,6 @@
 
 Name:           perl-Net-DBus
-Version:        1.1.0
+Version:        1.2.0
 Release:        1%{?dist}
 Summary:        Use and provide DBus services
 License:        GPLv2+ or Artistic
@@ -12,7 +12,6 @@ BuildRequires:  dbus-devel  >= 1.00, pkgconfig
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Time::HiRes)
-BuildRequires:  perl(XML::Grove)
 BuildRequires:  perl(XML::Parser)
 BuildRequires:  perl(XML::Twig)
 BuildRequires:  perl(XSLoader)
@@ -21,6 +20,7 @@ BuildRequires:  perl(Carp)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
+BuildRequires:  perl(Test::CPAN::Changes)
 Requires:       perl(XSLoader)
 
 %{?perl_default_filter}

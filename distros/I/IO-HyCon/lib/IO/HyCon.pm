@@ -32,6 +32,13 @@
 # 12-SEP-2019   B. Ulmann   Added requirements to Makefile.PL which were 
 #                           missing.
 # 15-SEP-2019   B. Ulmann   Fixed some typos in the POD.
+# 21-SEP-2019   B. Ulmann   set_ro_group expected decimal addresses instead
+#                           of hexadecimal ones
+# 29-SEP-2019   B. Ulmann   new() now takes care of determining the
+#                           configuration file name
+# 28-OCT-2019   B. Ulmann   Typos in documentation corrected.
+# 14-DEC-2019   B. Ulmann   Adapted to new firmware, added XBAR command, added 
+#                           DPT-query, set_address entfernt
 #
 
 package IO::HyCon;
@@ -68,7 +75,7 @@ This document refers to version 0.1 of HyCon
 
 =head1 DESCRIPTION
 
-This module implements a simple object oriented interface to the Arduino based 
+This module implements a simple object oriented interface to the Arduino\textregistered~ based 
 Analog Paradigm hybrid controller which interfaces an analog computer to a 
 digital computer and thus allows true hybrid computation.
 
@@ -78,18 +85,19 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-our $VERSION = '0.2';
+our $VERSION = '1.0';
 
 use YAML qw(LoadFile);
 use Carp qw(confess cluck carp);
 use Device::SerialPort;
 use Time::HiRes qw(usleep);
+use File::Basename;
 
 use constant {
     DIGITAL_OUTPUT_PORTS   => 8,
     DIGITAL_INPUT_PORTS    => 8,
-    BUILTIN_DPT            => 8,
-    BUILTIN_DPT_RESOLUTION => 10, 
+    DPT_RESOLUTION => 10, 
+    XBAR_CONFIG_BYTES => 10,
 };
 
 my $instance;
@@ -100,8 +108,10 @@ my $instance;
 
 This function generates a HyCon-object. Currently there is only one hybrid 
 controller supported, so this is, in fact, a singleton and every subsequent 
-invocation will cause a fatal error. This function expects a path to a YAML 
-configuration file of the following structure:
+invocation will cause a fatal error. If no configuration file path is supplied
+as parameter, new() tries to open a YAML-file with the name of the currently
+running program but with the extension '.yml' instead of '.pl'. This file is
+assumed to have the following structure:
 
     config.yml:
         serial:
@@ -112,8 +122,6 @@ configuration file of the following structure:
             stopbits: 1
             poll_interval: 1000
             poll_attempts: 200
-    builtin_dpt:
-        values: .1, .2, .3, .4, .5, .6, .7, .8
     types:
         0: PS
         1: SUM8
@@ -145,14 +153,6 @@ and 'poll_attempts' control how often this interface will poll the hybrid
 controller to get a response to a command issued before. The values shown above 
 are overly pessimistic but this won't matter during normal operation.
 
-The section labeled 'builtin_dpt' contains data to setup and control the 
-built-in digital potentiometers of the hybrid controller (currently only eight
-such potentiometers are supported by the hardware). The initial values of 
-these potentiometers can be specified by a list containing eight entries 
-following the key 'values'. If this part is missing, initial values of 0 are 
-assumed. The new() function will set all digitally controlled potentiometers of 
-the hybrid computer according to these values upon invocation.
-
 If the number of values specified in the array 'values' does not match the 
 number of configured potentiometers, the function will abort.
 
@@ -170,7 +170,7 @@ is to be minimized, a readout-group should be defined instead, see below.)
 
 Ideally, all manual potentiometers are listed under
 'manual_potentiometers' which is used for automatic readout of the settings 
-of these potentiometers by calling read_mpts(). This is useful if a 
+of these potentiometers by calling read_mpts(). This is useful, if a 
 simulation has been parameterized manually and these parameters are required 
 for documentation purposes or the like. Caution: All potentiometers to be read 
 out by read_mpts() must be defined in the elements-section.
@@ -187,6 +187,9 @@ sub new {
 
     confess "Only one instance of a HyCon-object at a time is supported!" 
         if $instance++;
+
+    ($config_filename = basename($0)) =~ s/\.pl$/\.yml/
+        unless defined($config_filename);
 
     my $config = LoadFile($config_filename) or 
         confess "Could not read configuration YAML-file: $!";
@@ -226,12 +229,6 @@ sub new {
 #        }
 #    }
 
-    #  Create array of initial potentiometer values - if there is nothing 
-    # specified assume zero:
-    my $pv = defined($config->{builtin_dpt}{values})
-           ? [ split(/\s*,\s*/, $config->{builtin_dpt}{values}) ]
-           : [ map{0}(1 .. BUILTIN_DPT) ];
-
     # Create the actual object
     my $object;
     {
@@ -240,11 +237,6 @@ sub new {
             port => $port, 
             poll_interval => $config->{serial}{poll_interval},
             poll_attempts => $config->{serial}{poll_attempts},
-            builtin_dpt => {
-                number => BUILTIN_DPT,
-                resolution => BUILTIN_DPT_RESOLUTION,
-                values => $pv,
-            },
             elements => $config->{elements},
             types    => $config->{types},
             times    => {
@@ -255,9 +247,6 @@ sub new {
                 [ split(/\s*,\s*/, $config->{manual_potentiometers}) ],
         }, $class);
     }
-
-    # Initial potentiometer setup
-    set_pt($object, $_, $pv->[$_]) for (0 .. BUILTIN_DPT - 1); 
 
     return $object;
 }
@@ -368,21 +357,21 @@ set ports etc.
 
 This function behaves quite like single_run() but waits for the termination 
 of the single run, thus blocking any further program execution. This method 
-returns true if the single-run mode was terminated by an external halt 
+returns true, if the single-run mode was terminated by an external halt 
 condition. undef is returned otherwise.
 
 =head2 repetitive_run()
 
 This initiates repetitive operation, i.e. the analog computer is commanded 
 to perform an IC-OP-IC-OP-... sequence. The hybrid controller will not block 
-during this sequence. To terminate a repetitive run, either ic() or halt() 
+during this sequence. To terminate a repetitive run either ic() or halt() 
 may be called. Note that these methods act immediately and will interrupt any 
 ongoing IC- or OP-period of the analog computer.
 
 =head2 pot_set()
 
-This function switches the analog computer to POTSET-mode i.e. the 
-integrators are set implicitly to HALT, while all (manual) potentiometers 
+This function switches the analog computer to POTSET-mode, i.e. the 
+integrators are set implicitly to HALT while all (manual) potentiometers 
 are connected to +1 on their respective input side. This mode can be used 
 to read the current settings of the potentiometers.
 
@@ -509,7 +498,7 @@ sub read_element {
 
 =head2 read_element_by_address($address)
 
-This function expects the 16 bit address address of a computing element as
+This function expects the 16 bit address of a computing element as
 parameter and returns a data structure identically to that returned by 
 read_element. This routine should not be used in general as computing elements
 are better addressed by their name. It is mainly provided for completeness.
@@ -541,8 +530,7 @@ way to readout groups of elements is by means of a readout-group (see below).
 sub read_all_elements {
     my ($self) = @_;
     my %result;
-    for my $key (sort(keys(%{$self->{elements}})))
-    {
+    for my $key (sort(keys(%{$self->{elements}}))) {
         my $result = $self->read_element($key);
         $result{$key} = { value => $result->{value}, id => $result->{id} };
     }
@@ -554,7 +542,7 @@ sub read_all_elements {
 This function defines a readout group, i.e. a group of computing elements 
 specified by their respective names as defined in the configuration file. All
 elements of such a readout group can be read by issuing a single call to 
-read_ro_group() thus reducing the communications overhead between the HC and
+read_ro_group(), thus reducing the communications overhead between the HC and
 digital computer substantially. A typical call would look like this (provided
 the names are defined in the configuration file):
 
@@ -569,7 +557,7 @@ sub set_ro_group {
     for my $name (@names) {
         confess "Computing element $name not configured!\n" 
             unless defined($self->{elements}{$name});
-        push(@addresses, hex($self->{elements}{$name}));
+        push(@addresses, $self->{elements}{$name});
     }
     $self->{'RO-GROUP'} = \@names;
     my $command = 'G' . join(';', @addresses) . '.';
@@ -635,6 +623,28 @@ sub digital_output {
     $self->{'RO-GROUP'} = [];
 }
 
+=head2 set_xbar()
+
+set_xbar sends a configuration bitstream to an XBAR-module specified by its 
+name in the elements section of the configuration file. The routine expects
+two parameters: The name of the XBAR-module and a HEX-number, 
+XBAR_CONFIG_BYTES * 2  nibbles in length.
+
+=cut
+
+sub set_xbar {
+    my ($self, $name, $config) = @_;
+    confess "XBAR-module >>$name<< not defined!" unless defined($self->{elements}{$name});
+    confess 'Exactly ', XBAR_CONFIG_BYTES * 2, ' HEX-nibbles are required as config data! Only ',
+        length($config), ' were found!' if length($config) != XBAR_CONFIG_BYTES * 2;
+    my $address = sprintf('%04X', hex($self->{elements}{$name}));
+    my $command = "X$address$config";
+    $self->{port}->write($command);
+    my $response = get_response($self); # Get response
+    confess 'No response from hybrid controller!' unless $response;
+    confess "Configuring XBAR failed: >>$response<<." unless $response eq 'XBAR READY';
+}
+
 =head2 read_mpts()
 
 Calling read_mpts() returns a reference to a hash containing the current 
@@ -660,20 +670,22 @@ sub read_mpts {
     return \%result;
 }
 
-=head2 set_pt($address, $value)
+=head2 set_pt($name, $value)
 
 To set a digital potentiometer, set_pt() is called. The first argument is the 
-address of the potentiometer to be set (0 <= number < number-of-potentiometers 
-as specified in the potentiometers section in the configuration YML-file), the 
-second argument is a floatingpoint value 0 <= v <= 1. If either the address or 
-the value is out of bounds, the function will die.
+name of the the digital potentiometer to be set as specified in the elements 
+section in the configuration YML-file (an entry like 'DPT24-2: 0060/2'). The 
+second argument is a floating point value 0 <= v <= 1. If the potentiometer to
+be set can not be found in the configuration data or if the value is out of 
+bounds, the function will die.
 
 =cut
 
 sub set_pt {
-    my ($self, $address, $value) = @_;
-    confess "Addr must be >= 0 and < $self->{builtin_dpt}{number}, it is $address"
-        if $address < 0 or $address >= $self->{builtin_dpt}{number};
+    my ($self, $pot, $value) = @_;
+    confess "Potentiometer >>$pot<< not defined!" unless defined($self->{elements}{$pot});
+    my ($address, $number) = split('/', $self->{elements}{$pot});
+
     if ($value < 0 or $value > 1) {
         carp "$value must be >= 0 and <= 1, has been limited\n";
         $value = 1  if $value > 1;
@@ -683,15 +695,42 @@ sub set_pt {
     #  Convert value to an integer suitable to setting the potentiometer and 
     # generate fixed length strings for the parameters address (single digit)
     # and value (three digits, 0000 <= value <= 1023):
-    $value = sprintf('%04d', 
-        int($value * (2 ** $self->{builtin_dpt}{resolution} - 1)));
-    $address = sprintf('%d', $address);
-    $self->{port}->write("P$address$value"); # Send command
+    $value = sprintf('%04d', int($value * (2 ** DPT_RESOLUTION - 1)));
+
+    $address = sprintf('%04X', hex($address)); # Make sure we have a four digit hex value
+    $number  = sprintf('%02d', $number);       # Make sure we have a two digital pot number
+
+    $self->{port}->write("P$address$number$value");
+
     my $response = get_response($self);      # Get response
     confess 'No response from hybrid controller!' unless $response;
-    my ($raddress, $rvalue) = $response =~ /^P(\d+)=(\d+)$/;
-    confess "set_pt failed! $address vs. $raddress, $value vs. $rvalue" 
-        if $address != $raddress; #or $value != $rvalue;
+    my ($raddress, $rnumber, $rvalue) = $response =~ /^P(\d+)\.(\d+)=(\d+)$/;
+    confess "set_pt failed! $address vs. $raddress, $rnumber vs. $number, $value vs. $rvalue" 
+        if ($address != $raddress) or ($number != $rnumber) or ($value != $rvalue);
+}
+
+=head2 read_dpts()
+
+Read the current setting of all digital potentiometers. Caution: This does
+not query the actual potentiometers as there is not readout capability 
+on the modules containing DPTs, instead this function will query the hybrid
+controller to return the values it has stored when DPTs were set.
+
+=cut
+
+sub read_dpts {
+    my ($self) = @_;
+    $self->{port}->write('q');
+    my $response = get_response($self);
+    confess 'No response from hybrid controller!' unless $response;
+    my %result;
+    for my $entry (split(';', $response)) {
+        my ($address, $data) = split(':', $entry);
+        my @values;
+        push(@values, $_) for split(',', $data);
+        $result{$address} = \@values;
+    }
+    return \%result;
 }
 
 =head2 get_status()
@@ -707,11 +746,12 @@ returned may look like this:
           'STATE' => 'NORM',
           'OVLH' => 'DIS',
           'EXTH' => 'DIS',
-          'RO_GROUP' => [..., ..., ...]
+          'RO_GROUP' => [..., ..., ...],
+          'DPTADDR' => [60 => 9, 80 => 8, ], # hex address and module id
         };
 
 In this case the IC-time has been set to 500 ms while the OP-time is set to 
-one second. The analog computer is currently in HALT-mode, and the hybrid 
+one second. The analog computer is currently in HALT-mode and the hybrid 
 controller is in its normal state, i.e. it is not currently performing a 
 single- or repetitive-run. HALT on overload and external HALT are both 
 disabled. A readout-group has been defined, too.
@@ -728,8 +768,17 @@ sub get_status {
         my ($parameter, $value) = split(/\s*=\s*/, $entry);
         $state{$parameter} = $value;
     }
+
     my @addresses = split(/\s*;\s*/, $state{'RO-GROUP'});
     $state{'RO-GROUP'} = \@addresses;
+
+    my %mapping;
+    for my $entry (split(';', $state{DPTADDR})) {
+        my ($address, $module_id) = split('/', $entry);
+        $mapping{$address} = $module_id;
+    }
+    $state{DPTADDR} = \%mapping;
+
     return \%state;
 }
 
@@ -782,34 +831,6 @@ sub reset {
         if $response ne 'RESET';
 }
 
-=head2 set_address(address)
-
-set_address() is used to set the hybrid controller to a different address than 
-its default address of 0x0090. The hybrid controller requires its own address 
-on the backplane in order to set the builtin digital potentiometers. If the 
-controller is placed into another slot than the last one of the main backplane 
-(something which is not recommended), then this method has to be called before 
-any changes to the builtin digitally controlled potentiometer setting are made. 
-If the hybrid controller's address is not set correctly setting the digital
-potentiometers will fail silently! The address has to be specified in 
-hexadecimal notation with four digits (padded on the left with zeros if 
-necessary).
-
-=cut
-
-sub set_address() {
-    my ($self, $address) = @_;
-    $self->{port}->write("m$address");
-    my $response = get_response($self);
-    confess 'No response from hybrid controller!' unless $response;
-    my ($value) = $response =~ /^MY_ADDR=(.+)$/;
-    confess "Unexpected response: '$response', expected: 'MY_ADDR=...'"
-        unless defined($value);
-    $_ =~ s/^0+// for $address, $value;
-    confess "Address returned ($value) differs from address sent ($address)!" 
-        unless $address == $value;
-}
-
 =head1 Examples
 
 The following example initates a repetitive run of the analog computer with 20 
@@ -821,8 +842,7 @@ ms of operating time and 10 ms IC time:
     use File::Basename;
     use HyCon;
 
-    (my $config_filename = basename($0)) =~ s/\.pl$//;
-    my $ac = HyCon->new("$config_filename.yml");
+    my $ac = HyCon->new();
 
     $ac->set_op_time(20);
     $ac->set_ic_time(10);

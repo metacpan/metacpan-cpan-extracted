@@ -64,7 +64,7 @@ use Data::RecordStore::Transaction;
 
 use vars qw($VERSION);
 
-$VERSION = '6.00';
+$VERSION = '6.02';
 my $SILO_VERSION = '6.00';
 
 use constant {

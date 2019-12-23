@@ -1,0 +1,28 @@
+Data-Validate-CSV
+=================
+
+Created:      2019-12-15
+Home page:    <https://metacpan.org/release/Data-Validate-CSV>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Data-Validate-CSV>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2019-12-16
+
+ [ Bug Fixes ]
+ - Fix for XSD types which are not lowercase names.
+ - When one row has additional columns, that was causing issues on
+   subsequent rows. This has now been addressed.
+
+ [ Test Suite ]
+ - Include some proper tests.
+
+ [ Packaging ]
+ - Add a test dependency on Text::CSV or Text::CSV_XS and a runtime
+   recommendation on Text::CSV_XS.
+
+0.002	2019-12-16
+
+ [ Packaging ]
+ - Add missing dependency on Types::Path::Tiny.
+
+0.001	2019-12-15	Initial release

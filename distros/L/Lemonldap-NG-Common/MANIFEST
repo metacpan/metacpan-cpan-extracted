@@ -36,6 +36,7 @@ lib/Lemonldap/NG/Common/Conf/Wrapper.pm
 lib/Lemonldap/NG/Common/Crypto.pm
 lib/Lemonldap/NG/Common/FormEncode.pm
 lib/Lemonldap/NG/Common/IPv6.pm
+lib/Lemonldap/NG/Common/Logger/_Duplicate.pm
 lib/Lemonldap/NG/Common/Logger/Apache2.pm
 lib/Lemonldap/NG/Common/Logger/Dispatch.pm
 lib/Lemonldap/NG/Common/Logger/Log4perl.pm
@@ -69,6 +70,7 @@ META.json
 META.yml
 README
 scripts/convertConfig
+scripts/convertSessions
 scripts/importMetadata
 scripts/lemonldap-ng-cli
 scripts/lmMigrateConfFiles2ini

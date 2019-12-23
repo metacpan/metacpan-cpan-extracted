@@ -14,10 +14,8 @@ for (my $i = 2; defined $i; $i = y_next Primes => $i) {
 	}
 }
 
-my $cnt = 0;
-for (my $i = 2; defined $i; $i = y_next Primes => $i) {
-   $cnt++;
-}
+my ($cnt, $i) = (0, "");
+$cnt++ while (defined ($i = y_next Primes => $i));
 
 ok ($cnt == 1229);
 

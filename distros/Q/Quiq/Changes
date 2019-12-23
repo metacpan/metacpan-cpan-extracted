@@ -1,3 +1,67 @@
+1.168 2019-12-22
+================
+
+[Quiq::ChartJs::TimeSeries]
+* Aufteilung der Generierung auf die Methoden js() und html()
+
+[Quiq::Database::Api::Dbi::Connection]
+* MS SQL: LongReadLen vergrößert
+
+[Quiq::Database::Connection]
+* execute() - Methode hinzugefügt
+
+[Quiq::Database::ResultSet]
+* asTable() - Farbdarstellung überarbeitet
+
+[Quiq::Html::Page]
+* JQuery readyHandler verbessert
+
+[Quiq::JQuery::Function]
+* new() - hinzugefügt
+* ready() - hinzugefügt
+
+[Quiq::MediaWiki::Client]
+* Optionsverarbeitung parameters() umgestellt
+
+[Quiq::MediaWiki::Markup]
+* Optionsverarbeitung parameters() umgestellt
+
+[Quiq::PlotlyJs::TimeSeries]
+* Klasse hinzugefügt
+
+[Quiq::Test::Class]
+* isText() - hinzugefügt
+
+[Quiq::Assert]
+* Doku bearbeitet
+
+[Quiq::Json]
+* Doku bearbeitet
+* Array-Verarbeitung korrigiert
+
+[Quiq::Object]
+* Doku bearbeitet
+* parameters() - Behandlung von Namensparametern hinzugefügt
+
+[Quiq::Parallel]
+* extractToVariables() auf parameters() umgestellt
+
+[Quiq::Parameters]
+* extractPropertiesToVariables() - entfernt
+* extractToVariables() - entfernt
+
+[Quiq::Path]
+* extractToVariables() auf parameters() umgestellt
+
+[Quiq::Properties]
+* extractToVariables() auf parameters() umgestellt
+
+[Quiq::Ssh]
+* extractToVariables() auf parameters() umgestellt
+
+[Quiq::Template]
+* combine() - hinzugefügt
+
 1.167 2019-12-08
 ================
 

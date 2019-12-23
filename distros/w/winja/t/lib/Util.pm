@@ -11,7 +11,7 @@ our @EXPORT = qw(
     x5cs_cp932 x5cs_utf8
     to_cp932 to_utf8
     cleanup_dir
-    ls pwd touch
+    ls pwd pwd_win touch
     );
 
 my @asciis = ( "foo",       "foo bar", );
@@ -72,7 +72,7 @@ sub cleanup_dir {
         $path = to_cp932($path);
         return !system(qw{cmd.exe /C rmdir /S /Q}, $path);
     }
-    return 0;
+    return 1;
 }
 
 sub ls {
@@ -85,6 +85,11 @@ sub pwd {
     ( my $cwd = qx/cd/ ) =~ s/\x0D?\x0A//;
     ( $cwd = to_utf8( $cwd ) ) =~ s:\\:/:g;
     return to_cp932( $cwd );
+}
+
+sub pwd_win {
+    ( my $cwd = qx/cd/ ) =~ s/\x0D?\x0A//;
+    $cwd;
 }
 
 sub touch {

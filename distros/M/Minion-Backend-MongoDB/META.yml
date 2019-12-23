@@ -15,11 +15,13 @@ meta-spec:
   version: '1.4'
 name: Minion-Backend-MongoDB
 requires:
+  BSON::OID: '0'
+  BSON::Types: '0'
   DateTime: '0'
   DateTime::Set: '0'
   DateTime::Span: '0'
   ExtUtils::MakeMaker: '7.12'
-  Minion: '9.00'
+  Minion: '10.00'
   Mojolicious: '8.10'
   MongoDB: '2.0'
   Tie::IxHash: '0'
@@ -27,6 +29,6 @@ requires:
 resources:
   homepage: https://github.com/avkhozov/Minion-Backend-MongoDB
   repository: https://github.com/avkhozov/Minion-Backend-MongoDB.git
-version: '1.03'
+version: '1.05'
 x_generated_by_perl: v5.24.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

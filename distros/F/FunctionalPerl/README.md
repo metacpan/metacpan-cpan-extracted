@@ -21,6 +21,16 @@ produce failures) or be calculating different values when re-run,
 which prevents its use in an interactive way, like from a read-eval
 print loop or debugger, and makes writing tests more difficult.
 
+Functional programming is often associated with strong static typing
+(as in Haskell or Scala). Those two complement each other because the
+side-effect free model simplifies the description of what a piece of
+code does via its types, and types can guarantee that a particular
+piece of code is pure. But the same advantages that functional
+programs have for machines to reason about are also valid for
+humans. Thus you can still benefit from functional programming in a
+dynamically typed language like Perl--and you get some additional
+interactivity benefits on top.
+
 <with_toc>
 
 ## Examples
@@ -304,11 +314,12 @@ in London, Berlin or Switzerland to get an introduction in person.
 
 ## Dependencies
 
-* to use `bin/repl` or the repl in the intro and examples scripts
-  interactively, `Term::ReadLine::Gnu` and `PadWalker` (and optionally
-  `Eval::WithLexicals` if you want to use the :m/:M modes, and
-  `Capture::Tiny` to see code definition location information and
-  `Sub::Util` to see function names when displaying code refs.)
+* to use `bin/perlrepl`, `bin/fperl` or the repl in the intro and
+  examples scripts interactively, `Term::ReadLine::Gnu` and
+  `PadWalker` (and optionally `Eval::WithLexicals` if you want to use
+  the :m/:M modes, and `Capture::Tiny` to see code definition location
+  information and `Sub::Util` to see function names when displaying
+  code refs.)
 
 * to run the test suite: `Test::Requires`
 
@@ -327,7 +338,15 @@ in London, Berlin or Switzerland to get an introduction in person.
 
 ### From CPAN
 
-Use your preferred CPAN installer, for example: `cpan FunctionalPerl`
+Use your preferred CPAN installer, for example: `cpan
+FunctionalPerl`. Note that this one installs the "runtime recommends"
+dependencies as well, which is a lot (like e.g. DBI), so you may want
+to look through the `Makefile.PL` or the list below and install what
+you can from your Linux distribution or other binary package
+repository first. Or if you don't want the recommends, set
+`recommends_policy` in `$ENV{HOME}/.cpan/CPAN/MyConfig.pm` to 0, or
+install the cpanminus tool and run `cpanm FunctionalPerl` which skips
+recommends unless you pass the `--with-recommends` option.
 
 ### From the Git repository
 
@@ -364,7 +383,7 @@ right now.)
     * the [Github project](https://github.com/pflanze/functional-perl)
 
     * the "Issues" link on the the distribution's
-      [CPAN page](https://metacpan.org/pod/FunctionalPerl).
+      [metacpan page](https://metacpan.org/pod/FunctionalPerl).
 
 * Find IRC and contact details on the [[mailing_list]] and [[contact]]
   pages. Check the [[design]] page to get an idea about the design

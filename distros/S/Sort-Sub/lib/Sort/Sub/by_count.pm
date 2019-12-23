@@ -1,12 +1,20 @@
 package Sort::Sub::by_count;
 
-our $DATE = '2019-10-26'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
 our $DIST = 'Sort-Sub'; # DIST
-our $VERSION = '0.111'; # VERSION
+our $VERSION = '0.116'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+sub meta {
+    return {
+        v => 1,
+        summary => 'Sort by number of occurrences of pattern in string',
+    };
+}
 
 sub _pattern_to_re {
     my $args = shift;
@@ -62,9 +70,9 @@ Sort::Sub::by_count - Sort by number of occurrences of pattern in string
 
 =head1 VERSION
 
-This document describes version 0.111 of Sort::Sub::by_count (from Perl distribution Sort-Sub), released on 2019-10-26.
+This document describes version 0.116 of Sort::Sub::by_count (from Perl distribution Sort-Sub), released on 2019-12-15.
 
-=for Pod::Coverage ^(gen_sorter)$
+=for Pod::Coverage ^(gen_sorter|meta)$
 
 =head1 SYNOPSIS
 

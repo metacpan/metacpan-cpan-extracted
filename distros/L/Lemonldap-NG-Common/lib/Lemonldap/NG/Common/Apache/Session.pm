@@ -15,7 +15,7 @@ use Lemonldap::NG::Common::Apache::Session::Serialize::JSON;
 use Lemonldap::NG::Common::Apache::Session::Store;
 use Lemonldap::NG::Common::Apache::Session::Lock;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 sub _load {
     my ( $backend, $func ) = @_;
@@ -219,18 +219,24 @@ sub _dbiGKFAS {
     $sth->execute;
     my %res;
     while ( my @row = $sth->fetchrow_array ) {
-        if ( ref($data) eq 'CODE' ) {
-            my $tmp =
-              &$data( $args->{unserialize}->( $row[1], $next ), $row[0] );
-            $res{ $row[0] } = $tmp if ( defined($tmp) );
-        }
-        elsif ($data) {
-            $data = [$data] unless ( ref($data) );
-            my $tmp = $args->{unserialize}->( $row[1], $next );
-            $res{ $row[0] }->{$_} = $tmp->{$_} foreach (@$data);
-        }
-        else {
-            $res{ $row[0] } = $args->{unserialize}->( $row[1], $next );
+        eval {
+            if ( ref($data) eq 'CODE' ) {
+                my $tmp =
+                  &$data( $args->{unserialize}->( $row[1], $next ), $row[0] );
+                $res{ $row[0] } = $tmp if ( defined($tmp) );
+            }
+            elsif ($data) {
+                $data = [$data] unless ( ref($data) );
+                my $tmp = $args->{unserialize}->( $row[1], $next );
+                $res{ $row[0] }->{$_} = $tmp->{$_} foreach (@$data);
+            }
+            else {
+                $res{ $row[0] } = $args->{unserialize}->( $row[1], $next );
+            }
+        };
+        if ($@) {
+            print STDERR "Error in session $row[0]\n";
+            delete $res{ $row[0] };
         }
     }
     return \%res;
@@ -248,27 +254,33 @@ sub _FileGKFAS {
     closedir DIR;
     my %res;
     for my $f (@t) {
-        open F, "$args->{Directory}/$f";
-        my $row = join '', <F>;
-        if ( ref($data) eq 'CODE' ) {
-            eval { $res{$f} = &$data( $args->{unserialize}->($row), $f ); };
-            if ($@) {
-                $res{$f} = &$data( undef, $f );
+        open F, '<', "$args->{Directory}/$f";
+        eval {
+            my $row = join '', <F>;
+            if ( ref($data) eq 'CODE' ) {
+                eval { $res{$f} = &$data( $args->{unserialize}->($row), $f ); };
+                if ($@) {
+                    $res{$f} = &$data( undef, $f );
+                }
             }
-        }
-        elsif ($data) {
-            $data = [$data] unless ( ref($data) );
-            my $tmp;
-            eval { $tmp = $args->{unserialize}->($row); };
-            if ($@) {
-                $res{$f}->{$_} = undef foreach (@$data);
+            elsif ($data) {
+                $data = [$data] unless ( ref($data) );
+                my $tmp;
+                eval { $tmp = $args->{unserialize}->($row); };
+                if ($@) {
+                    $res{$f}->{$_} = undef foreach (@$data);
+                }
+                else {
+                    $res{$f}->{$_} = $tmp->{$_} foreach (@$data);
+                }
             }
             else {
-                $res{$f}->{$_} = $tmp->{$_} foreach (@$data);
+                eval { $res{$f} = $args->{unserialize}->($row); };
             }
-        }
-        else {
-            eval { $res{$f} = $args->{unserialize}->($row); };
+        };
+        if ($@) {
+            print STDERR "Error in session $f\n";
+            delete $res{$f};
         }
     }
     return \%res;
@@ -288,7 +300,7 @@ sub _PHPGKFAS {
     closedir DIR;
     my %res;
     for my $f (@t) {
-        open F, "$args->{SavePath}/$f";
+        open F, '<', "$args->{SavePath}/$f";
         my $row = join '', <F>;
         if ( ref($data) eq 'CODE' ) {
             $res{$f} =
@@ -318,17 +330,23 @@ sub _DBFileGKFAS {
 
     my %res;
     foreach my $k ( keys %{ $class->{dbm} } ) {
-        if ( ref($data) eq 'CODE' ) {
-            $res{$k} =
-              &$data( $args->{unserialize}->( $class->{dbm}->{$k} ), $k );
-        }
-        elsif ($data) {
-            $data = [$data] unless ( ref($data) );
-            my $tmp = $args->{unserialize}->( $class->{dbm}->{$k} );
-            $res{$k}->{$_} = $tmp->{$_} foreach (@$data);
-        }
-        else {
-            $res{$k} = $args->{unserialize}->( $class->{dbm}->{$k} );
+        eval {
+            if ( ref($data) eq 'CODE' ) {
+                $res{$k} =
+                  &$data( $args->{unserialize}->( $class->{dbm}->{$k} ), $k );
+            }
+            elsif ($data) {
+                $data = [$data] unless ( ref($data) );
+                my $tmp = $args->{unserialize}->( $class->{dbm}->{$k} );
+                $res{$k}->{$_} = $tmp->{$_} foreach (@$data);
+            }
+            else {
+                $res{$k} = $args->{unserialize}->( $class->{dbm}->{$k} );
+            }
+        };
+        if ($@) {
+            print STDERR "Error in session $k\n";
+            delete $res{$k};
         }
     }
     return \%res;
@@ -341,7 +359,7 @@ sub _LDAPGKFAS {
     $args->{ldapAttributeContent} ||= 'description';
 
     my $ldap = Apache::Session::Store::LDAP::ldap( { args => $args } );
-    my $msg = $ldap->search(
+    my $msg  = $ldap->search(
         base   => $args->{ldapConfBase},
         filter => '(objectClass=' . $args->{ldapObjectClass} . ')',
         attrs  => [ $args->{ldapAttributeId}, $args->{ldapAttributeContent} ],

@@ -1,7 +1,7 @@
 package Complete::Tcsh;
 
-our $DATE = '2015-09-09'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2019-12-20'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
@@ -114,7 +114,7 @@ Complete::Tcsh - Completion module for tcsh shell
 
 =head1 VERSION
 
-This document describes version 0.02 of Complete::Tcsh (from Perl distribution Complete-Tcsh), released on 2015-09-09.
+This document describes version 0.030 of Complete::Tcsh (from Perl distribution Complete-Tcsh), released on 2019-12-20.
 
 =head1 DESCRIPTION
 
@@ -132,15 +132,15 @@ command-line). Unlike bash, tcsh does not (yet) provide something akin to
 C<COMP_POINT> in bash. Command is expected to print completion entries, one line
 at a time.
 
- % cat mycompleter
+ % cat foo-complete
  #!/usr/bin/perl
  use Complete::Tcsh qw(parse_cmdline format_completion);
  use Complete::Util qw(complete_array_elem);
- my ($words, $cword) = parse_cmdline();
+ my ($words, $cword) = @{ parse_cmdline() };
  my $res = complete_array_elem(array=>[qw/--help --verbose --version/], word=>$words->[$cword]);
  print format_completion($res);
 
- % complete -C foo-complete foo
+ % complete foo 'p/*/`foo-complete`/'
  % foo --v<Tab>
  --verbose --version
 
@@ -152,7 +152,11 @@ shell function.
 =head1 FUNCTIONS
 
 
-=head2 format_completion($completion) -> str|array
+=head2 format_completion
+
+Usage:
+
+ format_completion($completion) -> str|array
 
 Format completion for output (for shell).
 
@@ -160,11 +164,13 @@ tcsh accepts completion reply in the form of one entry per line to STDOUT.
 Currently the formatting is done using C<Complete::Bash>'s C<format_completion>
 because escaping rule and so on are not yet well defined in tcsh.
 
+This function is not exported by default, but exportable.
+
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<completion>* => I<hash|array>
+=item * B<$completion>* => I<hash|array>
 
 Completion answer structure.
 
@@ -175,7 +181,12 @@ Either an array or hash, as described in C<Complete>.
 Return value: Formatted string (or array, if `as` is set to `array`) (str|array)
 
 
-=head2 parse_cmdline($cmdline) -> array
+
+=head2 parse_cmdline
+
+Usage:
+
+ parse_cmdline($cmdline) -> array
 
 Parse shell command-line for processing by completion routines.
 
@@ -183,11 +194,13 @@ This function converts COMMAND_LINE (str) given by tcsh to become something like
 COMP_WORDS (array) and COMP_CWORD (int), like what bash supplies to shell
 functions. Currently implemented using C<Complete::Bash>'s C<parse_cmdline>.
 
+This function is not exported by default, but exportable.
+
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<cmdline> => I<str>
+=item * B<$cmdline> => I<str>
 
 Command-line, defaults to COMMAND_LINE environment.
 
@@ -205,14 +218,6 @@ Note that COMP_LINE includes the command name. If you want the command-line
 arguments only (like in C<@ARGV>), you need to strip the first element from
 C<$words> and reduce C<$cword> by 1.
 
-=head1 SEE ALSO
-
-L<Complete>
-
-L<Complete::Bash>
-
-tcsh manual.
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Complete-Tcsh>.
@@ -229,13 +234,21 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Complete>
+
+L<Complete::Bash>
+
+tcsh manual.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

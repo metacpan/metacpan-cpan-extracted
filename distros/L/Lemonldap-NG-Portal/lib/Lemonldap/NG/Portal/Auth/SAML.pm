@@ -859,7 +859,7 @@ sub extractFormInfo {
     # 2. IDP resolution
 
     # Search a selected IdP
-    my ( $idp, $idp_cookie ) = $self->getIDP($req);
+    my $idp = $self->getIDP($req);
 
     # Use Common Domain Cookie
     if (   !$idp
@@ -973,45 +973,10 @@ sub extractFormInfo {
               or $a->{val} cmp $b->{val}
           } @list;
         $req->data->{list}            = \@list;
-        $req->data->{confirmRemember} = 1;
-
-        # Delete existing IDP resolution cookie
-        $req->addCookie(
-            $self->p->cookie(
-                name    => $self->conf->{samlIdPResolveCookie},
-                value   => 0,
-                domain  => $self->conf->{domain},
-                secure  => 0,
-                expires => 'Wed, 21 Oct 2015 00:00:00 GMT',
-            )
-        );
 
         #TODO: check this
         $req->data->{login} = 1;
         return PE_IDPCHOICE;
-    }
-
-    # Store choosen IDP in cookie
-    unless ( $idp_cookie and $idp eq $idp_cookie ) {
-        $self->logger->debug("Build cookie to remember $idp as IDP choice");
-
-        # Control url parameter
-        my $urlcheck = $self->p->controlUrl($req);
-        return $urlcheck unless ( $urlcheck == PE_OK );
-
-        # User can choose temporary (0) or persistent cookie (1)
-        my $cookie_type = $req->param("cookie_type") || "0";
-
-        # Cookie available 1 year
-        $req->addCookie(
-            $self->p->cookie(
-                name   => $self->conf->{samlIdPResolveCookie},
-                value  => $idp,
-                domain => $self->conf->{domain},
-                secure => $self->conf->{securedCookie},
-                ( $cookie_type ? ( max_age => 31557600 ) : () ),
-            )
-        );
     }
 
     # 3. Build authentication request
@@ -1487,7 +1452,6 @@ sub getDisplayType {
 
 # Try to find an IdP using :
 # * HTTP parameter
-# * "samlIdPResolveCookie" cookie
 # * Rules
 #
 # @return Array containing :
@@ -1497,8 +1461,6 @@ sub getIDP {
     my ( $self, $req ) = @_;
     my $idp;
     my $idpName;
-
-    my $idp_cookie = $req->cookies->{ $self->{conf}->{samlIdPResolveCookie} };
 
     # Case 1: Recover IDP from idp URL Parameter
     unless ( $idp = $req->param("idp") ) {
@@ -1510,35 +1472,30 @@ sub getIDP {
                 if ( $idpName eq $idpConfKey ) {
                     $idp = $_;
                     $self->logger->debug(
-                        "IDP $idp found from idpName URL Parameter ($idpName)");
+                        "IDP $idp selected from idpName URL Parameter ($idpName)");
                     last;
                 }
             }
         }
 
-        # Case 3: Recover IDP from cookie
-        if ( !$idp and $idp = $idp_cookie ) {
-            $self->logger->debug("IDP $idp found in IDP resolution cookie");
-        }
-
-        # Case 4: check all IDP resolution rules
+        # Case 3: check all IDP resolution rules
         # The first match win
         else {
             foreach ( keys %{ $self->idpList } ) {
                 my $idpConfKey = $self->idpList->{$_}->{confKey};
-                my $cond       = $self->idpRules->{$idpConfKey} or next;
+                my $cond       = $self->idpRules->{$_} or next;
                 if ( $cond->( $req, $req->sessionInfo ) ) {
                     $self->logger->debug(
-                        "IDP $idpConfKey resolution rule match");
+                        "IDP $idpConfKey selected from resolution rule");
                     $idp = $_;
                     last;
                 }
             }
         }
-        $self->logger->debug('No IDP found') unless ($idp);
+        $self->logger->debug('No IDP selected') unless ($idp);
     }
     else {
-        $self->logger->debug("IDP $idp found from idp URL Parameter");
+        $self->logger->debug("IDP $idp selected from idp URL Parameter");
     }
 
     # Case 6: auto select IDP if only one IDP defined
@@ -1553,7 +1510,7 @@ sub getIDP {
         $idp = undef;
     }
 
-    return ( $idp, $idp_cookie );
+    return  $idp;
 }
 
 1;

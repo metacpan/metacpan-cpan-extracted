@@ -2,7 +2,7 @@ package LinkEmbedder::Link::Google;
 use Mojo::Base 'LinkEmbedder::Link';
 
 has provider_name => 'Google';
-has provider_url => sub { Mojo::URL->new('https://google.com') };
+has provider_url  => sub { Mojo::URL->new('https://google.com') };
 
 sub learn_p {
   my $self = shift;
@@ -26,7 +26,8 @@ sub learn_p {
     }
   }
 
-  return $self->SUPER::learn_p unless @query;
+  # Not a google maps link
+  return $self->SUPER::learn_p if @query < 2;
 
   $iframe_src = Mojo::URL->new('https://www.google.com/maps');
   $iframe_src->query->param(q => join ' ', @query);
@@ -35,6 +36,16 @@ sub learn_p {
   $self->type('rich');
 
   return Mojo::Promise->new->resolve($self);
+}
+
+sub _learn {
+  my ($self, $tx) = @_;
+  my $js_redirect = $tx->res->dom->at('div[data-destination^="http"]');
+
+  return $self->_get_p(Mojo::URL->new($js_redirect->{'data-destination'}))->then(sub { $self->_learn(shift) })
+    if $js_redirect and !$self->{js_redirect}++;
+
+  return $self->SUPER::_learn($tx);
 }
 
 1;

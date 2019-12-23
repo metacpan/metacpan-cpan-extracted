@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd::Layers;
-$Config::Model::Backend::Systemd::Layers::VERSION = '0.240.1';
+$Config::Model::Backend::Systemd::Layers::VERSION = '0.244.1';
 use Mouse::Role;
 
 
@@ -33,6 +33,8 @@ sub default_directories {
             '/etc/systemd/system.conf.d/',
             '/run/systemd/system.conf.d/',
             '/lib/systemd/system.conf.d/',
+            # not documented but used to symlink to real files
+            '/etc/systemd/system/',
             # path found on Debian
             '/lib/systemd/system/',
         );
@@ -57,7 +59,7 @@ Config::Model::Backend::Systemd::Layers - Role that provides Systemd default dir
 
 =head1 VERSION
 
-version 0.240.1
+version 0.244.1
 
 =head1 SYNOPSIS
 

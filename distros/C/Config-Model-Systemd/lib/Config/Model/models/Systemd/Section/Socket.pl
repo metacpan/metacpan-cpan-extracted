@@ -7,7 +7,10 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
     'accept' => [
       '.*',
@@ -26,9 +29,9 @@ This man page lists the configuration options specific to
 this unit type. See
 L<systemd.unit(5)>
 for the common options of all unit configuration files. The common
-configuration items are configured in the generic [Unit] and
-[Install] sections. The socket specific configuration options are
-configured in the [Socket] section.
+configuration items are configured in the generic C<[Unit]> and
+C<[Install]> sections. The socket specific configuration options are
+configured in the C<[Socket]> section.
 
 Additional options are listed in
 L<systemd.exec(5)>,
@@ -42,11 +45,11 @@ L<systemd.resource-control(5)>,
 which configure resource control settings for the processes of the
 socket.
 
-For each socket file, a matching service file must exist,
+For each socket unit, a matching service unit must exist,
 describing the service to start on incoming traffic on the socket
 (see
 L<systemd.service(5)>
-for more information about .service files). The name of the
+for more information about .service units). The name of the
 .service unit is by default the same as the name of the .socket
 unit, but can be altered with the C<Service> option
 described below. Depending on the setting of the
@@ -54,11 +57,11 @@ C<Accept> option described below, this .service
 unit must either be named like the .socket unit, but with the
 suffix replaced, unless overridden with C<Service>;
 or it must be a template unit named the same way. Example: a
-socket file foo.socket needs a matching
-service foo.service if
+socket file C<foo.socket> needs a matching
+service C<foo.service> if
 C<Accept=no> is set. If
-C<Accept=yes> is set, a service template file
-foo@.service must exist from which services
+C<Accept=yes> is set, a service template
+C<foo@.service> must exist from which services
 are instantiated for each incoming connection.
 
 No implicit C<WantedBy> or
@@ -83,7 +86,7 @@ socket passing (i.e. sockets passed in via standard input and
 output, using C<StandardInput=socket> in the
 service file).
 
-All network sockets allocated through .socket units are allocated in the host\'s network
+All network sockets allocated through C<.socket> units are allocated in the host\'s network
 namespace (see L<network_namespaces(7)>). This
 does not mean however that the service activated by a configured socket unit has to be part of the host\'s network
 namespace as well.  It is supported and even good practice to run services in their own network namespace (for
@@ -362,8 +365,8 @@ listen on. This expects an absolute file system path as
 argument. Behavior otherwise is very similar to the
 C<ListenFIFO> directive above. Use this to
 open character device nodes as well as special files in
-/proc and
-/sys.',
+C</proc> and
+C</sys>.',
         'type' => 'list'
       },
       'ListenNetlink',
@@ -408,7 +411,7 @@ implementation of USB gadget functions. This expects an
 absolute file system path of functionfs mount point as the argument.
 Behavior otherwise is very similar to the C<ListenFIFO>
 directive above. Use this to open the FunctionFS endpoint
-ep0. When using this option, the
+C<ep0>. When using this option, the
 activated service has to have the
 C<USBFunctionDescriptors> and
 C<USBFunctionStrings> options set.
@@ -424,7 +427,7 @@ C<USBFunctionStrings> options set.
         'description' => 'Takes one of C<udplite>
 or C<sctp>. Specifies a socket protocol
 (C<IPPROTO_UDPLITE>) UDP-Lite
-(C<IPPROTO_SCTP>) SCTP socket respectively. ',
+(C<IPPROTO_SCTP>) SCTP socket respectively.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
@@ -445,7 +448,7 @@ C<ipv6-only>, they will be accessible via IPv6
 only. If C<default> (which is the default,
 surprise!), the system wide default setting is used, as
 controlled by
-/proc/sys/net/ipv6/bindv6only, which in
+C</proc/sys/net/ipv6/bindv6only>, which in
 turn defaults to the equivalent of
 C<both>.',
         'type' => 'leaf',
@@ -598,7 +601,7 @@ above. Disabled by default.',
         'description' => 'Takes a boolean argument. If true, the TCP/IP
 stack will send a keep alive message after 2h (depending on
 the configuration of
-/proc/sys/net/ipv4/tcp_keepalive_time)
+C</proc/sys/net/ipv4/tcp_keepalive_time>)
 for all TCP streams accepted on this socket. This controls the
 SO_KEEPALIVE socket option (see
 L<socket(7)>
@@ -833,7 +836,7 @@ This configuration option only affects sockets with
 C<Accept> mode set to
 C<true>. Also note that this option is useful
 only when MLS/MCS SELinux policy is deployed. Defaults to
-C<false>. ',
+C<false>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -1082,7 +1085,7 @@ descriptors. Names may contain any ASCII character, but must
 exclude control characters and C<:>, and must
 be at most 255 characters in length. If this setting is not
 used, the file descriptor name defaults to the name of the
-socket unit, including its .socket
+socket unit, including its C<.socket>
 suffix.',
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -1120,7 +1123,7 @@ limit is enforced before the service activation is enqueued.",
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd doc',
+    'generated_by' => 'parse-man.pl from systemd 244 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Socket'
   }

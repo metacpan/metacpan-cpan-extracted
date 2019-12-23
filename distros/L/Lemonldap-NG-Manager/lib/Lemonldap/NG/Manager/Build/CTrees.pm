@@ -138,7 +138,8 @@ sub cTrees {
                         ]
                     }
                 ]
-            }
+            },
+            "samlSPMetaDataMacros",
         ],
         oidcOPMetaDataNode => [
             'oidcOPMetaDataJSON',
@@ -203,7 +204,12 @@ sub cTrees {
                     'oidcRPMetaDataOptionsUserIDAttr',
                     'oidcRPMetaDataOptionsIDTokenSignAlg',
                     'oidcRPMetaDataOptionsIDTokenExpiration',
+                    'oidcRPMetaDataOptionsIDTokenForceClaims',
                     'oidcRPMetaDataOptionsAccessTokenExpiration',
+                    'oidcRPMetaDataOptionsAuthorizationCodeExpiration',
+                    'oidcRPMetaDataOptionsAllowOffline',
+                    'oidcRPMetaDataOptionsRefreshToken',
+                    'oidcRPMetaDataOptionsOfflineSessionExpiration',
                     'oidcRPMetaDataOptionsRedirectUris',
                     'oidcRPMetaDataOptionsBypassConsent',
                     {
@@ -219,6 +225,7 @@ sub cTrees {
                     'oidcRPMetaDataOptionsRule',
                 ]
             },
+            'oidcRPMetaDataMacros',
             {
                 title => 'oidcRPMetaDataOptionsDisplay',
                 form  => 'simpleInputContainer',
@@ -261,6 +268,7 @@ sub cTrees {
                     'casAppMetaDataOptionsRule'
                 ]
             },
+            'casAppMetaDataMacros',
         ],
     };
 }

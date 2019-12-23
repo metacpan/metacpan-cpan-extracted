@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CSVUtils",
   "PREREQ_PM" => {
-    "Complete::Util" => "0.603",
+    "Complete::Util" => "0.606",
     "Data::Sah::Compiler::perl::TH::any" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
@@ -54,6 +54,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::re" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Getopt::Long" => "2.50",
+    "Hash::Subset" => "0.005",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.820",
     "Sah::Schema::filename" => 0,
@@ -75,7 +76,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.025",
+  "VERSION" => "0.027",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -83,7 +84,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Complete::Util" => "0.603",
+  "Complete::Util" => "0.606",
   "Data::Sah::Compiler::perl::TH::any" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
@@ -95,6 +96,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Temp" => 0,
   "Getopt::Long" => "2.50",
+  "Hash::Subset" => "0.005",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => 0,

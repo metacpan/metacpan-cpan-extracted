@@ -1,6 +1,6 @@
 package Catmandu::Fix::orcid_bio;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Catmandu::Sane;
 use Moo;
@@ -24,7 +24,7 @@ Catmandu::Fix::orcid_bio - find an ORCID bio for an identifier
 =head1 SYNOPSIS
 
    # Find an ORCID bio for an identifier
-   # orid: '0000-0001-8390-6171'
+   # orcid: '0000-0001-8390-6171'
    orcid_bio(orcid)
 
 =head1 SEE ALSO

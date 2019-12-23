@@ -181,7 +181,7 @@
    "provides" : {
       "Test::Warnings" : {
          "file" : "lib/Test/Warnings.pm",
-         "version" : "0.027"
+         "version" : "0.028"
       }
    },
    "release_status" : "stable",
@@ -199,10 +199,10 @@
       "x_IRC" : "irc://irc.perl.org/#perl-qa",
       "x_MailingList" : "http://lists.perl.org/list/perl-qa.html"
    },
-   "version" : "0.027",
+   "version" : "0.028",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.031004"
+         "version" : "5.031006"
       },
       "plugins" : [
          {
@@ -853,7 +853,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20190920"
+                  "Module::CoreList" : "5.20191120"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1070,7 +1070,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.027",
+                  "tag" : "v0.028",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1382,12 +1382,12 @@
       "File::pushd" : "< 1.004"
    },
    "x_contributors" : [
-      "A. Sinan Unur <nanis@cpan.org>",
       "Graham Knop <haarg@haarg.org>",
+      "A. Sinan Unur <nanis@cpan.org>",
       "Leon Timmermans <fawaka@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.31.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "x_generated_by_perl" : "v5.31.6",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1,
    "x_use_unsafe_inc" : 0

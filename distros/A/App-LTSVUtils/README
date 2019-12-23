@@ -1,0 +1,137 @@
+NAME
+    App::LTSVUtils - CLI utilities related to LTSV
+
+VERSION
+    This document describes version 0.001 of App::LTSVUtils (from Perl
+    distribution App-LTSVUtils), released on 2019-12-19.
+
+DESCRIPTION
+    This distribution contains the following CLI utilities:
+
+    *   dump-ltsv
+
+    *   ltsv-dump
+
+    *   ltsv2csv
+
+    *   ltsv2tsv
+
+FUNCTIONS
+  ltsv2csv
+    Usage:
+
+     ltsv2csv(%args) -> [status, msg, payload, meta]
+
+    Convert LTSV to CSV.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input LTSV file.
+
+        Use "-" to read from stdin.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  ltsv2tsv
+    Usage:
+
+     ltsv2tsv(%args) -> [status, msg, payload, meta]
+
+    Convert LTSV to TSV.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input LTSV file.
+
+        Use "-" to read from stdin.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  ltsv_dump
+    Usage:
+
+     ltsv_dump(%args) -> [status, msg, payload, meta]
+
+    Dump LTSV as data structure (array of hashes).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+        Input LTSV file.
+
+        Use "-" to read from stdin.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-LTSVUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-LTSVUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-LTSVUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    <https://ltsv.org>
+
+    App::TSVUtils
+
+    App::CSVUtils
+
+    App::SerializeUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

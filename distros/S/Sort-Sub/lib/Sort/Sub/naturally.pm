@@ -1,11 +1,20 @@
 package Sort::Sub::naturally;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '0.111'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'Sort-Sub'; # DIST
+our $VERSION = '0.116'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
+
+sub meta {
+    return {
+        v => 1,
+        summary => 'Sort naturally (by number or string parts)',
+    };
+}
 
 sub gen_sorter {
     require Sort::Naturally;
@@ -28,7 +37,7 @@ sub gen_sorter {
 }
 
 1;
-# ABSTRACT: Sort naturally
+# ABSTRACT: Sort naturally (by number or string parts)
 
 __END__
 
@@ -38,13 +47,13 @@ __END__
 
 =head1 NAME
 
-Sort::Sub::naturally - Sort naturally
+Sort::Sub::naturally - Sort naturally (by number or string parts)
 
 =head1 VERSION
 
-This document describes version 0.111 of Sort::Sub::naturally (from Perl distribution Sort-Sub), released on 2019-10-26.
+This document describes version 0.116 of Sort::Sub::naturally (from Perl distribution Sort-Sub), released on 2019-12-15.
 
-=for Pod::Coverage ^(gen_sorter)$
+=for Pod::Coverage ^(gen_sorter|meta)$
 
 =head1 SYNOPSIS
 

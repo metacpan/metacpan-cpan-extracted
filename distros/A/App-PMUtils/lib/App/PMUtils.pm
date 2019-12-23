@@ -1,14 +1,18 @@
 package App::PMUtils;
 
-our $DATE = '2019-10-17'; # DATE
-our $VERSION = '0.728'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.729'; # VERSION
 
 use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
 
 our %SPEC;
 
 our $arg_module_multiple = {
-    schema => ['perl::modnames*', min_len=>1],
+    #schema => ['perl::modnames*', min_len=>1], # XXX Perinci::Sub::GetArgs::Argv can't yet handle case for greedy=1 and when 'array' is not specified explicitly
+    schema => ['array*', of=>['perl::modname*'], min_len=>1],
     req    => 1,
     pos    => 0,
     greedy => 1,
@@ -30,32 +34,40 @@ our $arg_module_single = {
     },
 };
 
+our %argopts_pmpath_all = (
+    all => {
+        summary => 'Get all found files for each module instead of the first one',
+        schema => 'bool',
+        cmdline_aliases => {a=>{}},
+    },
+);
+
+our %argopts_pmpath_types = (
+    pm => {
+        schema => ['int*', min=>0],
+        default => 1,
+    },
+    pmc => {
+        schema => ['int*', min=>0],
+        default => 0,
+    },
+    pod => {
+        schema => ['int*', min=>0],
+        default => 0,
+    },
+);
+
 $SPEC{pmpath} = {
     v => 1.1,
     summary => 'Get path to locally installed Perl module',
     args => {
         module => $App::PMUtils::arg_module_multiple,
-        all => {
-            summary => 'Return all found files for each module instead of the first one',
-            schema => 'bool',
-            cmdline_aliases => {a=>{}},
-        },
+        %argopts_pmpath_all,
+        %argopts_pmpath_types,
         abs => {
             summary => 'Absolutify each path',
             schema => 'bool',
             cmdline_aliases => {P=>{}},
-        },
-        pm => {
-            schema => ['int*', min=>0],
-            default => 1,
-        },
-        pmc => {
-            schema => ['int*', min=>0],
-            default => 0,
-        },
-        pod => {
-            schema => ['int*', min=>0],
-            default => 0,
         },
         prefix => {
             schema => ['int*', min=>0],
@@ -173,6 +185,53 @@ sub rel2mod {
     \@res;
 }
 
+$SPEC{pmunlink} = {
+    v => 1.1,
+    summary => 'Unlink (remove) locally installed Perl module',
+    args => {
+        module => $App::PMUtils::arg_module_multiple,
+        %argopts_pmpath_all,
+        %argopts_pmpath_types,
+    },
+    features => {
+        dry_run => 1,
+    },
+};
+sub pmunlink {
+    my %args = @_;
+
+    my $res = pmpath(%args);
+    return $res unless $res->[0] == 200;
+
+    return [304, "No module files to delete"] unless @{ $res->[2] };
+
+    my $num_success = 0;
+    my $num_fail    = 0;
+    for my $item (@{ $res->[2] }) {
+        my $path = ref $item eq 'HASH' ? $item->{path} : $item;
+        my $success;
+
+        if ($args{-dry_run}) {
+            log_trace "[DRY_RUN] Unlinking $path ...";
+            $num_success++;
+            next;
+        }
+        log_trace "Unlinking $path ...";
+        if (unlink $path) {
+            $num_success++;
+        } else {
+            warn "Can't unlink $path: $!\n";
+            $num_fail++;
+        }
+    }
+
+    [$num_success ? 200:500,
+     $num_success ? "OK" : "All files failed",
+     undef,
+     {'cmdline.exit_code' => $num_fail ? 1:0}];
+}
+
+
 1;
 # ABSTRACT: Command-line utilities related to Perl modules
 
@@ -188,7 +247,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.728 of App::PMUtils (from Perl distribution App-PMUtils), released on 2019-10-17.
+This document describes version 0.729 of App::PMUtils (from Perl distribution App-PMUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -239,6 +298,8 @@ modules:
 
 =item * L<pmuninst>
 
+=item * L<pmunlink>
+
 =item * L<pmversion>
 
 =item * L<pmxs>
@@ -283,7 +344,7 @@ Arguments ('*' denotes required arguments):
 
 Absolutify each path.
 
-=item * B<module>* => I<perl::modnames>
+=item * B<module>* => I<array[perl::modname]>
 
 =item * B<pm> => I<int> (default: 1)
 
@@ -326,7 +387,7 @@ Absolutify each path.
 
 =item * B<all> => I<bool>
 
-Return all found files for each module instead of the first one.
+Get all found files for each module instead of the first one.
 
 =item * B<dir> => I<bool>
 
@@ -339,7 +400,7 @@ shell:
 
 and it won't change directory if the module doesn't exist.
 
-=item * B<module>* => I<perl::modnames>
+=item * B<module>* => I<array[perl::modname]>
 
 =item * B<pm> => I<int> (default: 1)
 
@@ -348,6 +409,60 @@ and it won't change directory if the module doesn't exist.
 =item * B<pod> => I<int> (default: 0)
 
 =item * B<prefix> => I<int> (default: 0)
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 pmunlink
+
+Usage:
+
+ pmunlink(%args) -> [status, msg, payload, meta]
+
+Unlink (remove) locally installed Perl module.
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<all> => I<bool>
+
+Get all found files for each module instead of the first one.
+
+=item * B<module>* => I<array[perl::modname]>
+
+=item * B<pm> => I<int> (default: 1)
+
+=item * B<pmc> => I<int> (default: 0)
+
+=item * B<pod> => I<int> (default: 0)
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=>1 to enable simulation mode.
 
 =back
 

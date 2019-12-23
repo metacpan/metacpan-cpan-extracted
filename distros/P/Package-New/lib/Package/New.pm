@@ -2,7 +2,7 @@ package Package::New;
 use strict;
 use warnings;
 
-our $VERSION='0.07';
+our $VERSION='0.08';
 
 =head1 NAME
 
@@ -113,11 +113,11 @@ L<base>, L<parent>
 
 =head2 Other Light Weight Base Objects Similar to Package::New
 
-L<Package::Base>, L<Class::Base>, L<Class::Easy>, L<Object::Tiny>
+L<Package::Base>, L<Class::Base>, L<Class::Easy>, L<Object::Tiny>, L<Badger::Base>
 
 =head2 Heavy Base Objects - Drink the Kool-Aid
 
-L<Moose>, (as well as Moose-alikes L<Moo>, L<Mouse>), L<Class::Accessor>, L<Class::Accessor::Fast>, L<Class::MethodMaker>, L<Class::Meta>
+L<VSO>, L<Class::Accessor::Fast>, L<Class::Accessor>, L<Moose>, (as well as Moose-alikes L<Moo>, L<Mouse>), L<Class::MethodMaker>, L<Class::Meta>
 
 =head2 Even more
 

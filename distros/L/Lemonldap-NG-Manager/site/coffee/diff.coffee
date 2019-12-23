@@ -2,7 +2,7 @@
 diff.html script
 ###
 
-llapp = angular.module 'llngConfDiff', ['ui.tree', 'ui.bootstrap', 'llApp', 'ngCookies'] , ($rootScopeProvider) -> $rootScopeProvider.digestTtl(15)
+llapp = angular.module 'llngConfDiff', ['ui.tree', 'ui.bootstrap', 'llApp', 'ngCookies'] , ['$rootScopeProvider', ($rootScopeProvider) -> $rootScopeProvider.digestTtl(15)]
 llapp.controller 'DiffCtrl', [ '$scope', '$http', '$q', '$translator', '$location', ($scope, $http, $q, $translator, $location) ->
 	$scope.links = links
 	$scope.menulinks = menulinks
@@ -47,7 +47,7 @@ llapp.controller 'DiffCtrl', [ '$scope', '$http', '$q', '$translator', '$locatio
 	# Function to change interface language
 	$scope.getLanguage = (lang) ->
 		$scope.lang = lang
-		$scope.init()
+		init()
 		$scope.showM = false
 
 	# function `getCfg(b,n)`:
@@ -80,15 +80,25 @@ llapp.controller 'DiffCtrl', [ '$scope', '$http', '$q', '$translator', '$locatio
 	init = ->
 		$scope.message = null
 		$scope.currentNode = null
-		d = $q.defer()
-		$http.get("#{scriptname}diff/#{$scope.cfg[0].cfgNum}/#{$scope.cfg[1].cfgNum}").then (response) ->
-			data = []
-			data = readDiff(response.data[0],response.data[1])
-			$scope.data = buildTree(data)
-			$scope.message = ''
-			$scope.waiting = false
-		, (response) ->
-			$scope.message = "#{$scope.translate('error')} : #{response.statusLine}"
+		$q.all [
+			$translator.init $scope.lang
+			$http.get("#{staticPrefix}reverseTree.json").then (response) ->
+				reverseTree = response.data
+				console.log "Structure loaded"
+		]
+		.then ->
+			d = $q.defer()
+			$http.get("#{scriptname}diff/#{$scope.cfg[0].cfgNum}/#{$scope.cfg[1].cfgNum}").then (response) ->
+				data = []
+				data = readDiff(response.data[0],response.data[1])
+				$scope.data = buildTree(data)
+				$scope.message = ''
+				$scope.waiting = false
+			, (response) ->
+				$scope.message = "#{$scope.translate('error')} : #{response.statusLine}"
+		# Colorized link
+		$scope.activeModule = "conf"
+		$scope.myStyle = {color: '#ffb84d'}
 
 	readDiff = (c1,c2,tr=true) ->
 		res = []

@@ -9,5 +9,6 @@ README.pod
 t/00-use.t
 t/01-callback.t
 t/02-record-opened.t
+t/03-disable-xs-functions.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

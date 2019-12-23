@@ -482,7 +482,16 @@ unblocking the signals.
 It's also required by POSIX in a threaded program, as libev calls
 C<sigprocmask>, whose behaviour is officially unspecified.
 
-This flag's behaviour will become the default in future versions of libev.
+=item C<EVFLAG_NOTIMERFD>
+
+When this flag is specified, the libev will avoid using a C<timerfd> to
+detect time jumps. It will still be able to detect time jumps, but takes
+longer and has a lower accuracy in doing so, but saves a file descriptor
+per loop.
+
+The current implementation only tries to use a C<timerfd> when the first
+C<ev_periodic> watcher is started and falls back on other methods if it
+cannot be created, but this behaviour might change in the future.
 
 =item C<EVBACKEND_SELECT>  (value 1, portable select backend)
 
@@ -4608,6 +4617,30 @@ higher, as it simplifies linking (no need for C<-lrt>).
 
 If defined to be C<1>, libev will assume that C<nanosleep ()> is available
 and will use it for delays. Otherwise it will use C<select ()>.
+
+=item EV_USE_EVENTFD
+
+If defined to be C<1>, then libev will assume that C<eventfd ()> is
+available and will probe for kernel support at runtime. This will improve
+C<ev_signal> and C<ev_async> performance and reduce resource consumption.
+If undefined, it will be enabled if the headers indicate GNU/Linux + Glibc
+2.7 or newer, otherwise disabled.
+
+=item EV_USE_SIGNALFD
+
+If defined to be C<1>, then libev will assume that C<signalfd ()> is
+available and will probe for kernel support at runtime. This enables
+the use of EVFLAG_SIGNALFD for faster and simpler signal handling. If
+undefined, it will be enabled if the headers indicate GNU/Linux + Glibc
+2.7 or newer, otherwise disabled.
+
+=item EV_USE_TIMERFD
+
+If defined to be C<1>, then libev will assume that C<timerfd ()> is
+available and will probe for kernel support at runtime. This allows
+libev to detect time jumps accurately. If undefined, it will be enabled
+if the headers indicate GNU/Linux + Glibc 2.8 or newer and define
+C<TFD_TIMER_CANCEL_ON_SET>, otherwise disabled.
 
 =item EV_USE_EVENTFD
 

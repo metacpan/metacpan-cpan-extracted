@@ -6,7 +6,7 @@ use Pcore::Util::Src qw[:FILTER_STATUS];
 with qw[Pcore::Util::Src::Filter];
 
 sub decompress ($self) {
-    my $res = $self->filter_prettier('--parser=css');
+    my $res = $self->filter_prettier( parser => 'css' );
 
     return $res;
 }

@@ -7,7 +7,10 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
     'accept' => [
       '.*',
@@ -66,44 +69,43 @@ main process while the subsequent C<SIGKILL>
 signal (see below) is sent to all remaining processes of the
 unit\'s control group. If set to C<none>, no
 process is killed. In this case, only the stop command will be
-executed on unit stop, but no process be killed otherwise.
+executed on unit stop, but no process will be killed otherwise.
 Processes remaining alive after stop are left in their control
 group and the control group continues to exist after stop
 unless it is empty.
 
-Processes will first be terminated via
-C<SIGTERM> (unless the signal to send is
-changed via C<KillSignal>). Optionally, this
-is immediately followed by a C<SIGHUP> (if
-enabled with C<SendSIGHUP>). If then, after a
-delay (configured via the C<TimeoutStopSec>
-option), processes still remain, the termination request is
-repeated with the C<SIGKILL> signal or the
-signal specified via C<FinalKillSignal> (unless
-this is disabled via the C<SendSIGKILL>
-option). See
-L<kill(2)>
+Processes will first be terminated via C<SIGTERM> (unless the signal to send
+is changed via C<KillSignal> or C<RestartKillSignal>). Optionally,
+this is immediately followed by a C<SIGHUP> (if enabled with
+C<SendSIGHUP>). If processes still remain after the main process of a unit has
+exited or the delay configured via the C<TimeoutStopSec> has passed, the termination
+request is repeated with the C<SIGKILL> signal or the signal specified via
+C<FinalKillSignal> (unless this is disabled via the C<SendSIGKILL>
+option). See L<kill(2)>
 for more information.
 
-Defaults to
-C<control-group>.',
+Defaults to C<control-group>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'KillSignal',
       {
-        'description' => 'Specifies which signal to use when killing a
-service. This controls the signal that is sent as first step
-of shutting down a unit (see above), and is usually followed
-by C<SIGKILL> (see above and below). For a
-list of valid signals, see
+        'description' => 'Specifies which signal to use when stopping a service. This controls the signal that
+is sent as first step of shutting down a unit (see above), and is usually followed by
+C<SIGKILL> (see above and below). For a list of valid signals, see
 L<signal(7)>.
-Defaults to C<SIGTERM>. 
+Defaults to C<SIGTERM>.
 
-Note that, right after sending the signal specified in
-this setting, systemd will always send
-C<SIGCONT>, to ensure that even suspended
-tasks can be terminated cleanly.',
+Note that, right after sending the signal specified in this setting, systemd will always send
+C<SIGCONT>, to ensure that even suspended tasks can be terminated cleanly.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'RestartKillSignal',
+      {
+        'description' => 'Specifies which signal to use when restarting a service. The same as
+C<KillSignal> described above, with the exception that this setting is used in a
+restart job. Not set by default, and the value of C<KillSignal> is used.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -129,8 +131,11 @@ severed. Takes a boolean value. Defaults to "no".
 C<SIGKILL> (or the signal specified by
 C<FinalKillSignal>) to remaining processes
 after a timeout, if the normal shutdown procedure left
-processes of the service around. Takes a boolean value.
-Defaults to "yes".
+processes of the service around. When disabled, a
+C<KillMode> of C<control-group>
+or C<mixed> service will not restart if
+processes from prior services exist within the control group.
+Takes a boolean value. Defaults to "yes".
 ',
         'type' => 'leaf',
         'value_type' => 'boolean',
@@ -166,7 +171,7 @@ C<WatchdogSec>). Defaults to C<SIGABRT>.
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd doc',
+    'generated_by' => 'parse-man.pl from systemd 244 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Kill'
   }

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -795,15 +795,14 @@ sub asTable {
     my $msg = '';
     my $info = 3;
 
-    if (@_) {
-        Quiq::Option->extract(\@_,
-            -color => \$color,
-            -msg => \$msg,
-            -info => \$info,
-        );
-        if ($msg) {
-            $msg = $info? " - $msg": $msg;
-        }
+    Quiq::Option->extract(\@_,
+        -color => \$color,
+        -msg => \$msg,
+        -info => \$info,
+    );
+
+    if ($msg) {
+        $msg = $info? " - $msg": $msg;
     }
 
     my $a = Quiq::AnsiColor->new($color);
@@ -813,7 +812,7 @@ sub asTable {
     # Statement
 
     if ($info >= 3 && (my $stmt = $self->stmt)) {
-        $str .= $a->str('dark red',$stmt)."\n\n";
+        $str .= $a->str('dark green',$stmt)."\n\n";
     }
     my @titles = $self->titles;
     if ($info >= 2) {
@@ -821,7 +820,8 @@ sub asTable {
 
         my $l = length scalar @titles;
         for (my $i = 0; $i < @titles; $i++) {
-            $str .= $a->str('bold',sprintf '%*d %s',$l,$i+1,$titles[$i])."\n";
+            $str .= $a->str('dark red',sprintf '%*d %s',
+                $l,$i+1,$titles[$i])."\n";
         }
     }
 
@@ -845,7 +845,7 @@ sub asTable {
             for (my $i = 0; $i < @fmt; $i++) {
                 my $numWidth = length $i+1;
                 my $width = abs($fmt[$i]->width)+3;
-                $str .= $a->str('bold',sprintf '%d%s',$i+1,
+                $str .= $a->str('dark red',sprintf '%d%s',$i+1,
                     (' ' x ($width-$numWidth)));
             }
             $str .= "\n";
@@ -875,10 +875,10 @@ sub asTable {
                 -precision => 3,
             );
         }
-        $tmp = $a->str('bold',$tmp);
+        $tmp = $a->str('dark red',$tmp);
 
         if ($self->moreRowsExist) {
-            $tmp .= ' - *'.$a->str('red','MORE ROWS EXIST').'*';
+            $tmp .= ' - *'.$a->str('dark red','MORE ROWS EXIST').'*';
         }
         $str .= $tmp;
     }
@@ -967,7 +967,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

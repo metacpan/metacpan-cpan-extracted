@@ -3,17 +3,17 @@ package Firefox::Marionette::Cookie;
 use strict;
 use warnings;
 
-our $VERSION = '0.85';
+our $VERSION = '0.87';
 
 sub new {
     my ( $class, %parameters ) = @_;
     my $cookie = bless {
-        http_only => $parameters{http_only}    ? 1                 : 0,
-        secure    => $parameters{secure}       ? 1                 : 0,
+        http_only => $parameters{http_only} ? 1 : 0,
+        secure    => $parameters{secure}    ? 1 : 0,
         domain    => $parameters{domain},
-        path      => defined $parameters{path} ? $parameters{path} : q[/],
-        value     => $parameters{value},
-        name      => $parameters{name},
+        path  => defined $parameters{path} ? $parameters{path} : q[/],
+        value => $parameters{value},
+        name  => $parameters{name},
     }, $class;
     if ( defined $parameters{expiry} ) {
         $cookie->{expiry} = $parameters{expiry};
@@ -65,7 +65,7 @@ Firefox::Marionette::Cookie - Represents a Firefox cookie retrieved using the Ma
 
 =head1 VERSION
 
-Version 0.85
+Version 0.87
 
 =head1 SYNOPSIS
 

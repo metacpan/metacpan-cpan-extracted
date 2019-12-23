@@ -1209,7 +1209,9 @@
       "data": 1
     }, {
       "id": "cookieExpiration",
-      "title": "cookieExpiration"
+      "title": "cookieExpiration",
+      "type": "int",
+      "data": "a"
     }]
   }, {
     "id": "sessionParams",
@@ -2266,11 +2268,6 @@
     "id": "samlAdvanced",
     "title": "samlAdvanced",
     "nodes": [{
-      "default": "lemonldapidp",
-      "id": "samlIdPResolveCookie",
-      "title": "samlIdPResolveCookie",
-      "data": "lemonldapidp"
-    }, {
       "default": 1,
       "id": "samlMetadataForceUTF8",
       "title": "samlMetadataForceUTF8",

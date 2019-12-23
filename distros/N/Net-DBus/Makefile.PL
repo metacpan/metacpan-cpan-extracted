@@ -46,6 +46,19 @@ WriteMakefile(
 	      'realclean' => {
 		  FILES => 'perl-Net-DBus.spec',
 	      },
+	      'META_MERGE' => {
+		  'meta-spec' => { version => 2 },
+		  'resources' => {
+		      repository => {
+			  type => 'git',
+			  url => 'https://gitlab.com/berrange/perl-net-dbus.git',
+			  web => 'https://gitlab.com/berrange/perl-net-dbus',
+		      },
+		      bugtracker => {
+			  web => 'https://gitlab.com/berrange/perl-net-dbus/issues',
+		      },
+		  },
+	      },
 );
 
 package MY;

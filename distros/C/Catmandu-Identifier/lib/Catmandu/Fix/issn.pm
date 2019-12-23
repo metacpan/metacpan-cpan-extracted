@@ -1,6 +1,6 @@
 package Catmandu::Fix::issn;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Catmandu::Sane;
 use Business::ISSN;

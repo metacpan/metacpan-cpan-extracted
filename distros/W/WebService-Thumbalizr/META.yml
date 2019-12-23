@@ -1,0 +1,28 @@
+---
+abstract: 'Perl extension for Thumbalizr  (L<https://thumbalizr.com/>), a web service to create screenshots of web pages.'
+author:
+  - 'Julien Sobrier <jsobrier@thumbalizr.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Thumbalizr
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::MD5: '0'
+  IO::Socket::SSL: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Text::Trim: '0'
+  URI::Escape: '0'
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

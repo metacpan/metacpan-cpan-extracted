@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.39      2019-12-18 05:34:26 -0700
+  - Null release to match [@Author:Plicease]
+
 2.38      2019-08-15 19:06:22 -0400
   - Tweaks for CI
 

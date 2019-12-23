@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   omnitool::installer:
     file: lib/omnitool/installer.pm
-    version: v1.0.12
+    version: v1.0.13
 requires:
   Archive::Zip: '1.58'
   Benchmark: '1.20'
@@ -80,9 +80,10 @@ resources:
   bugtracker: https://github.com/ericschernoff/omnitool-installer/issues
   homepage: https://github.com/ericschernoff/omnitool-installer
   repository: git://github.com/ericschernoff/omnitool-installer.git
-version: 1.0.12
+version: 1.0.13
 x_contributors:
   - 'Eric Chernoff <echernof@cisco.com>'
+  - 'Eric Chernoff <eric@omnitool.org>'
   - 'Eric Chernoff <eric@vps200921.vps.ovh.ca>'
   - 'Eric Chernoff <ericschernoff@gmail.com>'
   - 'root <root@www.omnitool.org>'

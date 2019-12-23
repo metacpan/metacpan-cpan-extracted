@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 12;
+my $maintests = 13;
 my $debug     = 'error';
 my ( $op, $proxy, $sp, $res );
 my %handlerOR = ( op => [], proxy => [], sp => [] );
@@ -107,7 +107,6 @@ SKIP: {
         $res = $sp->_get(
             '/',
             accept => 'text/html',
-            cookie => 'lemonldapidp=http://auth.proxy.com/saml/metadata'
         ),
         'Try SAML SP'
     );
@@ -205,7 +204,6 @@ SKIP: {
             $url, IO::String->new($query),
             length => length($query),
             accept => 'text/html',
-            cookie => 'lemonldapidp=http://auth.proxy.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -239,6 +237,9 @@ SKIP: {
     ( $host, $url, $query ) =
       expectForm( $res, 'auth.sp.com', '/saml/proxySingleLogoutReturn',
         'SAMLResponse' );
+
+    my $removedCookie = expectCookie($res);
+    is($removedCookie, 0, "SSO cookie removed");
 
     # Forward logout to SP
     switch ('sp');
@@ -290,7 +291,6 @@ sub op {
                         email => 'email',
                     },
                 },
-                oidcServiceMetaDataIssuer             => "http://auth.op.com",
                 oidcServiceMetaDataAuthorizeURI       => "authorize",
                 oidcServiceMetaDataCheckSessionURI    => "checksession.html",
                 oidcServiceMetaDataJWKSURI            => "jwks",

@@ -1,3 +1,14 @@
+0.729   2019-12-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: pmunlink.
+
+	- [bugfix] Workaround Perinci::Sub::GetArgs::Argv's limitation of
+	  handling case for greedy=1 and schema type is not explicitly/directly
+	  'array'. This caused 'pmpath Module' and 'pmpath Module::*' to
+	  work/expand correctly, but 'pmpath Module1 Module2' to become 'pmpath
+	  "Module1 Module2"'.
+
+
 0.728   2019-10-17  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Simplify CLI scripts by turning off config/env reading.

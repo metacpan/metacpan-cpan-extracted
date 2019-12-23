@@ -1,5 +1,6 @@
 requires "MogileFS::Store" => "0";
 requires "MogileFS::Worker::Query" => "0";
+requires "perl" => "v5.10.1";
 
 on 'test' => sub {
   requires "MogileFS::Server" => "0";

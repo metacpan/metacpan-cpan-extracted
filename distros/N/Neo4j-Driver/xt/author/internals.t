@@ -46,10 +46,8 @@ END
 
 
 subtest 'experimental: die_on_error = 0 for REST 404' => sub {
-	# die_on_error currently only affects upstream errors.
-	# If this option is ever officially supported, one would expect
-	# it to also affect all croaks this driver issues by itself.
-	# The latter are not yet covered by these tests.
+	# die_on_error only ever affected upstream errors via HTTP, 
+	# never any errors issued via Bolt or by this driver itself.
 	plan skip_all => "(test requires live REST)" if $Neo4j::Test::sim || $Neo4j::Test::bolt;
 	plan tests => 1;
 	my $t = $driver->session->begin_transaction;

@@ -6,7 +6,7 @@ use Pcore::Util::Src qw[:FILTER_STATUS];
 with qw[Pcore::Util::Src::Filter];
 
 sub decompress ($self) {
-    my $res = $self->filter_prettier('--parser=markdown');
+    my $res = $self->filter_prettier( parser => 'markdown' );
 
     return $res;
 }

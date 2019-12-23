@@ -7,7 +7,10 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
     'accept' => [
       '.*',
@@ -43,12 +46,16 @@ service.
 
 If a service is requested under a certain name but no unit
 configuration file is found, systemd looks for a SysV init script
-by the same name (with the .service suffix
+by the same name (with the C<.service> suffix
 removed) and dynamically creates a service unit from that script.
 This is useful for compatibility with SysV. Note that this
 compatibility is quite comprehensive but not 100%. For details
 about the incompatibilities, see the Incompatibilities
 with SysV document.
+
+The L<systemd-run(1)>
+command allows creating C<.service> and C<.scope> units dynamically
+and transiently from the command line.
 This configuration class was generated from systemd documentation.
 by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>
 ',
@@ -121,8 +128,8 @@ Defaults to C<yes>.',
       {
         'description' => 'Takes a path referring to the PID file of the service. Usage of this option is recommended for
 services where C<Type> is set to C<forking>. The path specified typically points
-to a file below /run/. If a relative path is specified it is hence prefixed with
-/run/. The service manager will read the PID of the main process of the service from this
+to a file below C</run/>. If a relative path is specified it is hence prefixed with
+C</run/>. The service manager will read the PID of the main process of the service from this
 file after start-up of the service. The service manager will not write to the file configured here, although it
 will remove the file after the service has shut down if it still exists. The PID file does not need to be owned
 by a privileged user, but if it is owned by an unprivileged user additional safety restrictions are enforced:
@@ -164,7 +171,7 @@ For each of the specified commands, the first argument must be either an absolut
 or a simple file name without any slashes. Optionally, this filename may be prefixed with a number of special
 characters:
 
-C<@>, C<->, and one of
+C<@>, C<->, C<:>, and one of
 C<+>/C<!>/C<!!> may be used together and they can appear in any
 order. However, only one of C<+>, C<!>, C<!!> may be used at a
 time. Note that these prefixes are also supported for the other command line settings,
@@ -262,6 +269,29 @@ C<->, see above) or time out before the service is fully up, execution continues
 specified in C<ExecStopPost>, the commands in C<ExecStop> are skipped.',
         'type' => 'list'
       },
+      'ExecCondition',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Optional commands that are executed before the command(s) in C<ExecStartPre>.
+Syntax is the same as for C<ExecStart>, except that multiple command lines are allowed and the
+commands are executed one after the other, serially.
+
+The behavior is like an C<ExecStartPre> and condition check hybrid: when an
+C<ExecCondition> command exits with exit code 1 through 254 (inclusive), the remaining
+commands are skipped and the unit is not marked as failed. However, if an
+C<ExecCondition> command exits with 255 or abnormally (e.g. timeout, killed by a
+signal, etc.), the unit will be considered failed (and remaining commands will be skipped). Exit code of 0 or
+those matching C<SuccessExitStatus> will continue execution to the next command(s).
+
+The same recommendations about not running long-running processes in C<ExecStartPre>
+also applies to C<ExecCondition>. C<ExecCondition> will also run the commands
+in C<ExecStopPost>, as part of stopping the service, in the case of any non-zero or abnormal
+exits, like the ones described above.',
+        'type' => 'list'
+      },
       'ExecReload',
       {
         'cargo' => {
@@ -297,40 +327,42 @@ synchronously waits for it to complete.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Commands to execute to stop the service
-started via C<ExecStart>. This argument takes
-multiple command lines, following the same scheme as described
-for C<ExecStart> above. Use of this setting
-is optional. After the commands configured in this option are
-run, it is implied that the service is stopped, and any processes
-remaining for it are terminated
-according to the C<KillMode> setting (see
+        'description' => 'Commands to execute to stop the service started via
+C<ExecStart>. This argument takes multiple command lines, following the same scheme
+as described for C<ExecStart> above. Use of this setting is optional. After the
+commands configured in this option are run, it is implied that the service is stopped, and any
+processes remaining for it are terminated according to the C<KillMode> setting (see
 L<systemd.kill(5)>).
-If this option is not specified, the process is terminated by
-sending the signal specified in C<KillSignal>
-when service stop is requested. Specifier and environment
-variable substitution is supported (including
+If this option is not specified, the process is terminated by sending the signal specified in
+C<KillSignal> or C<RestartKillSignal> when service stop is
+requested. Specifier and environment variable substitution is supported (including
 C<$MAINPID>, see above).
 
-Note that it is usually not sufficient to specify a command for this setting that only asks the service
-to terminate (for example, by queuing some form of termination signal for it), but does not wait for it to do
-so. Since the remaining processes of the services are killed according to C<KillMode> and
-C<KillSignal> as described above immediately after the command exited, this may not result in
-a clean stop. The specified command should hence be a synchronous operation, not an asynchronous one.
+Note that it is usually not sufficient to specify a command for this setting that only asks the
+service to terminate (for example, by sending some form of termination signal to it), but does not
+wait for it to do so. Since the remaining processes of the services are killed according to
+C<KillMode> and C<KillSignal> or
+C<RestartKillSignal> as described above immediately after the command exited, this
+may not result in a clean stop. The specified command should hence be a synchronous operation, not an
+asynchronous one.
 
 Note that the commands specified in C<ExecStop> are only executed when the service
 started successfully first. They are not invoked if the service was never started at all, or in case its
 start-up failed, for example because any of the commands specified in C<ExecStart>,
 C<ExecStartPre> or C<ExecStartPost> failed (and weren\'t prefixed with
 C<->, see above) or timed out. Use C<ExecStopPost> to invoke commands when a
-service failed to start up correctly and is shut down again. Also note that, service restart requests are
-implemented as stop operations followed by start operations. This means that C<ExecStop> and
-C<ExecStopPost> are executed during a service restart operation.
+service failed to start up correctly and is shut down again. Also note that the stop operation is always
+performed if the service started successfully, even if the processes in the service terminated on their
+own or were killed. The stop commands must be prepared to deal with that case. C<$MAINPID>
+will be unset if systemd knows that the main process exited by the time the stop commands are called.
 
-It is recommended to use this setting for commands that communicate with the service requesting clean
-termination. When the commands specified with this option are executed it should be assumed that the service is
-still fully up and is able to react correctly to all commands. For post-mortem clean-up steps use
-C<ExecStopPost> instead.',
+Service restart requests are implemented as stop operations followed by start operations. This
+means that C<ExecStop> and C<ExecStopPost> are executed during a
+service restart operation.
+
+It is recommended to use this setting for commands that communicate with the service requesting
+clean termination. For post-mortem clean-up steps use C<ExecStopPost> instead.
+',
         'type' => 'list'
       },
       'ExecStopPost',
@@ -414,6 +446,34 @@ If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may c
 the stop time to be extended beyond C<TimeoutStopSec>. The first receipt of this message
 must occur before C<TimeoutStopSec> is exceeded, and once the stop time has exended beyond
 C<TimeoutStopSec>, the service manager will allow the service to continue to stop, provided
+the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified, or terminates itself
+(see L<sd_notify(3)>).
+",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'TimeoutAbortSec',
+      {
+        'description' => "This option configures the time to wait for the service to terminate when it was aborted due to a
+watchdog timeout (see C<WatchdogSec>). If the service has a short C<TimeoutStopSec>
+this option can be used to give the system more time to write a core dump of the service. Upon expiration the service
+will be forcibly terminated by C<SIGKILL> (see C<KillMode> in
+L<systemd.kill(5)>). The core file will
+be truncated in this case. Use C<TimeoutAbortSec> to set a sensible timeout for the core dumping per
+service that is large enough to write all expected data while also being short enough to handle the service failure
+in due time.
+
+Takes a unit-less value in seconds, or a time span value such as \"5min 20s\". Pass an empty value to skip
+the dedicated watchdog abort timeout handling and fall back C<TimeoutStopSec>. Pass
+C<infinity> to disable the timeout logic. Defaults to C<DefaultTimeoutAbortSec> from
+the manager configuration file (see
+L<systemd-system.conf(5)>).
+
+If a service of C<Type=notify> handles C<SIGABRT> itself (instead of relying
+on the kernel to write a core dump) it can send C<EXTEND_TIMEOUT_USEC=\x{2026}> to
+extended the abort time beyond C<TimeoutAbortSec>. The first receipt of this message
+must occur before C<TimeoutAbortSec> is exceeded, and once the abort time has exended beyond
+C<TimeoutAbortSec>, the service manager will allow the service to continue to abort, provided
 the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified, or terminates itself
 (see L<sd_notify(3)>).
 ",
@@ -572,49 +632,50 @@ C<on-abnormal> is an alternative choice.',
       },
       'SuccessExitStatus',
       {
-        'description' => 'Takes a list of exit status definitions that,
-when returned by the main service process, will be considered
-successful termination, in addition to the normal successful
-exit code 0 and the signals C<SIGHUP>,
-C<SIGINT>, C<SIGTERM>, and
-C<SIGPIPE>. Exit status definitions can
-either be numeric exit codes or termination signal names,
-separated by spaces. For example:
-
-    SuccessExitStatus=1 2 8 SIGKILL
-
-ensures that exit codes 1, 2, 8 and
-the termination signal C<SIGKILL> are
-considered clean service terminations.
+        'description' => 'Takes a list of exit status definitions that, when returned by the main service
+process, will be considered successful termination, in addition to the normal successful exit code 0
+and the signals C<SIGHUP>, C<SIGINT>,
+C<SIGTERM>, and C<SIGPIPE>. Exit status definitions can be
+numeric exit codes, termination code names, or termination signal names, separated by spaces. See the
+Process Exit Codes section in
+L<systemd.exec(5)> for
+a list of termination codes names (for this setting only the part without the
+C<EXIT_> or C<EX_> prefix should be used). See
+L<signal(7)> for
+a list of signal names.
 
 This option may appear more than once, in which case the
 list of successful exit statuses is merged. If the empty
 string is assigned to this option, the list is reset, all
 prior assignments of this option will have no
-effect.',
+effect.
+
+Note: systemd-analyze exit-codes may be used to list exit
+codes and translate between numerical code values and names.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'RestartPreventExitStatus',
       {
-        'description' => 'Takes a list of exit status definitions that,
-when returned by the main service process, will prevent
-automatic service restarts, regardless of the restart setting
-configured with C<Restart>. Exit status
-definitions can either be numeric exit codes or termination
-signal names, and are separated by spaces. Defaults to the
-empty list, so that, by default, no exit status is excluded
-from the configured restart logic. For example:
+        'description' => "Takes a list of exit status definitions that, when returned by the main service
+process, will prevent automatic service restarts, regardless of the restart setting configured with
+C<Restart>. Exit status definitions can either be numeric exit codes or termination
+signal names, and are separated by spaces. Defaults to the empty list, so that, by default, no exit
+status is excluded from the configured restart logic. For example:
 
     RestartPreventExitStatus=1 6 SIGABRT
 
-ensures that exit codes 1 and 6 and the termination signal
-C<SIGABRT> will not result in automatic
-service restarting. This option may appear more than once, in
-which case the list of restart-preventing statuses is
-merged. If the empty string is assigned to this option, the
-list is reset and all prior assignments of this option will
-have no effect.',
+ensures that exit codes 1 and 6 and the termination signal C<SIGABRT> will not
+result in automatic service restarting. This option may appear more than once, in which case the list
+of restart-preventing statuses is merged. If the empty string is assigned to this option, the list is
+reset and all prior assignments of this option will have no effect.
+
+Note that this setting has no effect on processes configured via
+C<ExecStartPre>, C<ExecStartPost>, C<ExecStop>,
+C<ExecStopPost> or C<ExecReload>, but only on the main service
+process, i.e. either the one invoked by C<ExecStart> or (depending on
+C<Type>, C<PIDFile>, \x{2026}) the otherwise configured main
+process.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -710,15 +771,13 @@ different service may be activated on incoming socket traffic
 than the one which is ultimately configured to inherit the
 socket file descriptors. Or, in other words: the
 C<Service> setting of
-.socket units does not have to match the
+C<.socket> units does not have to match the
 inverse of the C<Sockets> setting of the
-.service it refers to.
+C<.service> it refers to.
 
-This option may appear more than once, in which case the
-list of socket units is merged. If the empty string is
-assigned to this option, the list of sockets is reset, and all
-prior uses of this setting will have no
-effect.',
+This option may appear more than once, in which case the list of socket units is merged. Note
+that once set, clearing the list of sockets again (for example, by assigning the empty string to this
+option) is not supported.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -729,7 +788,7 @@ L<sd_pid_notify_with_fds(3)>\'s
 C<FDSTORE=1> messages. This is useful for implementing services that can restart after an
 explicit request or a crash without losing state. Any open sockets and other file descriptors which should not
 be closed during the restart may be stored this way. Application state can either be serialized to a file in
-/run, or better, stored in a
+C</run>, or better, stored in a
 L<memfd_create(2)> memory file
 descriptor. Defaults to 0, i.e. no file descriptors may be stored in the service manager. All file descriptors
 passed to the service manager from a specific service are passed back to the service\'s main process on the next
@@ -750,7 +809,7 @@ FunctionFS descriptors, for implementation of USB
 gadget functions. This is used only in conjunction with a
 socket unit with C<ListenUSBFunction>
 configured. The contents of this file are written to the
-ep0 file after it is
+C<ep0> file after it is
 opened.',
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -764,40 +823,63 @@ above.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'OOMPolicy',
+      {
+        'description' => 'Configure the Out-Of-Memory (OOM) killer policy. On Linux, when memory becomes scarce
+the kernel might decide to kill a running process in order to free up memory and reduce memory
+pressure. This setting takes one of C<continue>, C<stop> or
+C<kill>. If set to C<continue> and a process of the service is
+killed by the kernel\'s OOM killer this is logged but the service continues running. If set to
+C<stop> the event is logged but the service is terminated cleanly by the service
+manager. If set to C<kill> and one of the service\'s processes is killed by the OOM
+killer the kernel is instructed to kill all remaining processes of the service, too. Defaults to the
+setting C<DefaultOOMPolicy> in
+L<system.conf(5)> is
+set to, except for services where C<Delegate> is turned on, where it defaults to
+C<continue>.
+
+Use the C<OOMScoreAdjust> setting to configure whether processes of the unit
+shall be considered preferred or less preferred candidates for process termination by the Linux OOM
+killer logic. See
+L<systemd.exec(5)> for
+details.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'FailureAction',
       {
         'status' => 'deprecated',
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'FailureAction is now part of Unit. Migrating...'
+        'warn' => 'FailureAction is now part of Unit.'
       },
       'SuccessAction',
       {
         'status' => 'deprecated',
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'SuccessAction is now part of Unit. Migrating...'
+        'warn' => 'SuccessAction is now part of Unit.'
       },
       'StartLimitBurst',
       {
         'status' => 'deprecated',
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'StartLimitBurst is now part of Unit. Migrating...'
+        'warn' => 'StartLimitBurst is now part of Unit.'
       },
       'StartLimitInterval',
       {
         'status' => 'deprecated',
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'service/StartLimitInterval is now Unit/StartLimitIntervalSec. Migrating...'
+        'warn' => 'service/StartLimitInterval is now Unit/StartLimitIntervalSec.'
       },
       'RebootArgument',
       {
         'status' => 'deprecated',
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'RebootArgument is now part of Unit. Migrating...'
+        'warn' => 'RebootArgument is now part of Unit.'
       }
     ],
     'generated_by' => 'parse-man.pl from systemd doc',

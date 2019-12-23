@@ -35,9 +35,6 @@ has authnLevel => (
 
 sub authenticate {
     my ( $self, $req ) = @_;
-    unless ( $self->ldap ) {
-        return PE_LDAPCONNECTFAILED;
-    }
 
     # Set the dn unless done before
     unless ( $req->data->{dn} ) {
@@ -68,8 +65,15 @@ sub authenticate {
         # Security: never create session here
         return $res || PE_DONE;
     }
+
+    $self->validateLdap;
+
+    unless ( $self->ldap ) {
+        return PE_LDAPCONNECTFAILED;
+    }
+
     my $res =
-      $self->userBind( $req, $req->data->{dn},
+      $self->ldap->userBind( $req, $req->data->{dn},
         password => $req->data->{password} );
     $self->setSecurity($req) if ( $res > PE_OK );
 
@@ -91,17 +95,6 @@ sub authenticate {
 
 sub authLogout {
     PE_OK;
-}
-
-# Test LDAP connection before trying to bind
-sub userBind {
-    my $self = shift;
-    unless ($self->ldap
-        and $self->ldap->root_dse( attrs => ['supportedLDAPVersion'] ) )
-    {
-        $self->ldap( $self->newLdap );
-    }
-    return $self->ldap ? $self->ldap->userBind(@_) : undef;
 }
 
 1;

@@ -12,13 +12,13 @@ use Lemonldap::NG::Common::IPv6;
 
 #use AutoLoader qw(AUTOLOAD);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.7';
 
 # Set here all the names of functions that must be available in Safe objects.
 # Not that only functions, not methods, can be written here
 our $functions =
   [
-    qw(&checkLogonHours &date &checkDate &basic &unicode2iso &iso2unicode &groupMatch &isInNet6)
+    qw(&checkLogonHours &date &checkDate &basic &unicode2iso &iso2unicode &groupMatch &isInNet6 &varIsInUri)
   ];
 
 ## @function boolean checkLogonHours(string logon_hours, string syntax, string time_correction, boolean default_access)
@@ -70,6 +70,36 @@ sub checkLogonHours {
 
     # Get the corresponding byte
     return substr( $base2_logon_hours, $hourpos, 1 );
+}
+
+## @function integer listMatch
+# Test if a value is found in a collection
+# @param $list Can be a hash, array or string including the separator
+# @param $value string The value to search for
+# @param $ignorecase boolean Be case insensitive
+# @return 1 if the value was found, 0 else
+# NOTE: this function is not exported directly in this module because we don't
+# want the usr to have to worry about separator. Is is wrapped in a closure in
+# Jail.pm
+sub listMatch {
+    my ( $sep, $list, $value, $ignorecase ) = @_;
+    my $flags = $ignorecase ? 'i' : '';
+    my @a;
+    if ( ref($list) eq "ARRAY" ) {
+        @a = @{$list};
+    }
+    elsif ( ref($list) eq "HASH" ) {
+        @a = keys %{$list};
+    }
+    else {
+        @a = split $sep, $list;
+    }
+    if ( grep /(?$flags)^\Q$value\E$/, @a ) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 ## @function integer date
@@ -185,6 +215,13 @@ sub isInNet6 {
     $net =~ s#/(\d+)##;
     my $bits = $1;
     return net6( $ip, $bits ) eq net6( $net, $bits ) ? 1 : 0;
+}
+
+sub varIsInUri {
+    my ( $uri, $wanteduri, $attribute, $restricted ) = @_;
+    return $restricted
+      ? $uri =~ /$wanteduri$attribute$/o
+      : $uri =~ /$wanteduri$attribute/o;
 }
 
 1;

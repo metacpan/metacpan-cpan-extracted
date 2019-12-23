@@ -97,7 +97,7 @@ sub new {
 
 Send a message over the mock connection. If the message is
 a method call, it will be dispatched straight to any corresponding
-mock object registered. If the mesage is an error or method return
+mock object registered. If the message is an error or method return
 it will be made available as a return value for the C<send_with_reply_and_block>
 method. If the message is a signal it will be queued up for processing
 by the C<dispatch> method.

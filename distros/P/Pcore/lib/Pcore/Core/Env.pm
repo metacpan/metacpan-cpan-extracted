@@ -101,8 +101,8 @@ sub _configure_inc {
     if ( !$ENV->{is_par} ) {
         my $is_module_build_test = 0;    # $ENV->dist && exists $inc_index->{ $ENV->dist->{root} . '/blib/lib' } ? 1 : 0;
 
-        # add dist lib and PCORE_LIB to @INC only if we are int on the PAR archive and not in the Module::Build testing environment
-        # under Module::Build dist lib is already added and PCORE_LIB is not added to emulate clean CPAN installation
+        # add dist lib and WORKSPACE to @INC only if we are int on the PAR archive and not in the Module::Build testing environment
+        # under Module::Build dist lib is already added and WORKSPACE is not added to emulate clean CPAN installation
         if ( !$is_module_build_test ) {
             my $dist_lib_path;
 
@@ -114,8 +114,8 @@ sub _configure_inc {
             }
 
             # find and add other dist libs to @INC
-            if ( $ENV{PCORE_LIB} && -d $ENV{PCORE_LIB} ) {
-                for my $dir ( reverse sort { $a cmp $b } P->file->read_dir( $ENV{PCORE_LIB}, full_path => 1 )->@* ) {
+            if ( $ENV{WORKSPACE} && -d $ENV{WORKSPACE} ) {
+                for my $dir ( reverse sort { $a cmp $b } P->file->read_dir( $ENV{WORKSPACE}, full_path => 1 )->@* ) {
                     if ( !exists $inc_index->{qq[$dir/lib]} && -d qq[$dir/lib/] && Pcore::Dist->dir_is_dist_root($dir) ) {
                         $inc_index->{qq[$dir/lib]} = 1;
 

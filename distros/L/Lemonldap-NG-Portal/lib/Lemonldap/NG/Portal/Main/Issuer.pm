@@ -20,23 +20,21 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.7';
 
 # PROPERTIES
 
-has type => ( is => 'rw' );
-
-has path => ( is => 'rw' );
-
+has type  => ( is => 'rw' );
+has path  => ( is => 'rw' );
 has ipath => ( is => 'rw' );
-
-has _ott => (
+has _ott  => (
     is      => 'rw',
     lazy    => 1,
     default => sub {
-        my $ott = $_[0]->{p}->loadModule('::Lib::OneTimeToken');
-        my $timeout = $_[0]->{conf}->{issuersTimeout} // $_[0]->{conf}->{formTimeout};
-        $ott->timeout( $timeout );
+        my $ott     = $_[0]->{p}->loadModule('::Lib::OneTimeToken');
+        my $timeout = $_[0]->{conf}->{issuersTimeout}
+          // $_[0]->{conf}->{formTimeout};
+        $ott->timeout($timeout);
         return $ott;
     }
 );
@@ -51,6 +49,12 @@ sub beforeLogout { 'logout' }
 
 sub init {
     my ($self) = @_;
+    if ( $self->conf->{forceGlobalStorageIssuerOTT} ) {
+        $self->logger->debug(
+            "-> Issuer tokens will be stored into global storage");
+        $self->_ott->cache(undef);
+    }
+
     my $type = ref( $_[0] );
     $type =~ s/.*:://;
     $self->type($type);
@@ -86,8 +90,11 @@ sub _redirect {
         $self->logger->debug('Processing _redirect');
         $ir = $req->pdata->{ $self->ipath } ||= $self->storeRequest($req);
         $req->pdata->{ $self->ipath . 'Path' } = \@path;
-        $req->pdata->{keepPdata} = 1;
+        $self->logger->debug(
+            'Add ' . $self->ipath . ', ' . $self->ipath . 'Path in keepPdata' );
+        push @{ $req->pdata->{keepPdata} }, $self->ipath, $self->ipath . 'Path';
         $req->{urldc} = $self->conf->{portal} . '/' . $self->path;
+        $req->pdata->{_url} = encode_base64( $req->urldc, '' );
     }
     else {
         $self->logger->debug('Not seen as Issuer request, skipping');
@@ -111,8 +118,7 @@ sub _redirect {
 
                     # Restore urldc if auth doesn't need to dial with browser
                     $self->restoreRequest( $req, $ir );
-                    delete $req->pdata->{ $self->ipath };
-                    delete $req->pdata->{ $self->ipath . 'Path' };
+                    $self->cleanPdata($req);
                     return $self->run( @_, @path );
                 }
                 : ()
@@ -135,8 +141,9 @@ sub _forAuthUser {
 
     # Clean pdata: keepPdata has been set, so pdata must be cleaned here
     $self->logger->debug('Cleaning pdata');
-    $req->pdata( {} );
-    $req->urlNotBase64(1) if ( ref($self) =~ /::CAS$/ );
+    $self->cleanPdata($req);
+
+    $req->maybeNotBase64(1) if ( ref($self) =~ /::CAS$/ );
     $req->mustRedirect(1);
     return $self->p->do(
         $req,
@@ -149,6 +156,27 @@ sub _forAuthUser {
             },
         ]
     );
+}
+
+sub cleanPdata {
+    my ( $self, $req ) = @_;
+    for my $s ( $self->ipath, $self->ipath . 'Path' ) {
+        if ( $req->pdata->{$s} ) {
+            $self->logger->debug("Removing $s key from pdata");
+            delete $req->pdata->{$s};
+        }
+    }
+    if ( $req->pdata->{keepPdata} and ref $req->pdata->{keepPdata} ) {
+        @{ $req->pdata->{keepPdata} } =
+          grep {
+                  $_ ne $self->ipath
+              and $_ ne $self->ipath . 'Path'
+              ? 1
+              : ( $self->logger->debug("Removing $_ from keepPdata") and 0 )
+          } @{ $req->pdata->{keepPdata} };
+        delete $req->pdata->{keepPdata}
+          unless ( @{ $req->pdata->{keepPdata} } );
+    }
 }
 
 sub storeRequest {
@@ -191,7 +219,7 @@ qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/auto
     $req->data->{_url} =
       encode_base64( $self->conf->{portal} . $req->path_info, '' );
     $req->pdata->{ $self->ipath } = $self->storeRequest($req);
-    $req->pdata->{keepPdata} = 1;
+    push @{ $req->pdata->{keepPdata} }, $self->ipath, $self->ipath . 'Path';
     return PE_RENEWSESSION;
 }
 

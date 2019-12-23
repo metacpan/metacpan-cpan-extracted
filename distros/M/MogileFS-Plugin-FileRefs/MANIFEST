@@ -4,6 +4,7 @@ Dockerfile
 INSTALL
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README

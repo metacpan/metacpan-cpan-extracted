@@ -470,6 +470,7 @@ END
       'a52dec-devel libmpeg2-devel','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'export PATH=/usr/local/bin/:$PATH;which ffmpeg');
+   # https://trac.ffmpeg.org/wiki/CompilationGuide/Centos
    if ($stdout!~/\/ffmpeg/) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -pv /opt/source/ffmpeg','__display__');

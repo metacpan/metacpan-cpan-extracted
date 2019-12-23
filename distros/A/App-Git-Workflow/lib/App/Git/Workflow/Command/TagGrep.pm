@@ -14,7 +14,7 @@ use Term::ANSIColor qw/colored/;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = version->new(1.1.11);
+our $VERSION  = version->new(1.1.12);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option = (
@@ -110,7 +110,7 @@ git-tag-grep - grep tags (and optionally files with them)
 
 =head1 VERSION
 
-This documentation refers to git-tag-grep version 1.1.11
+This documentation refers to git-tag-grep version 1.1.12
 
 =head1 SYNOPSIS
 

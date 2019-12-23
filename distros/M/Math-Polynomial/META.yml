@@ -22,10 +22,10 @@ no_index:
 provides:
   Math::Polynomial:
     file: lib/Math/Polynomial.pm
-    version: '1.016'
+    version: '1.017'
   Math::Polynomial::Generic:
     file: lib/Math/Polynomial/Generic.pm
-    version: '1.016'
+    version: '1.017'
 recommends:
   Math::AnyNum: '0'
   Math::Complex: '0'
@@ -34,5 +34,5 @@ requires:
   Carp: '0'
   overload: '0'
   perl: '5.006'
-version: '1.016'
+version: '1.017'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

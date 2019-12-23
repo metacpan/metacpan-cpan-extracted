@@ -15,10 +15,11 @@ use Time::HiRes;
 use Test::Fatal qw(exception);
 use Test::FailWarnings;
 use Test::More;
+use Test::Deep;
 
 use Promise::ES6;
 
-sub all : Tests {
+sub test_all : Tests {
     my $self = shift;
 
     my $p1 = Promise::ES6->new(sub {
@@ -58,6 +59,46 @@ sub all_fail : Tests {
     is_deeply(
         exception { PromiseTest::await($all) },
         { message => 'oh my god' },
+    );
+}
+
+sub all_fail_then_succeed : Tests {
+    my ($self) = @_;
+
+    my $p1 = Promise::ES6->new(sub {
+        my ($resolve, $reject) = @_;
+        $reject->({ message => 'oh my god' });
+    });
+    my $p2 = Promise::ES6->new(sub {
+        my ($resolve, $reject) = @_;
+        $resolve->(1);
+    });
+
+    my $all = Promise::ES6->all([$p1, $p2]);
+
+    is_deeply(
+        exception { PromiseTest::await($all) },
+        { message => 'oh my god' },
+    );
+}
+
+sub all_multiple_fails : Tests {
+    my ($self) = @_;
+
+    my $p1 = Promise::ES6->new(sub {
+        my ($resolve, $reject) = @_;
+        $reject->(42);
+    });
+    my $p2 = Promise::ES6->new(sub {
+        my ($resolve, $reject) = @_;
+        $reject->({ message => 'oh my god' });
+    });
+
+    my $all = Promise::ES6->all([$p1, $p2]);
+
+    cmp_deeply(
+        exception { PromiseTest::await($all) },
+        re( qr<\A42 > ),
     );
 }
 

@@ -306,7 +306,7 @@ sub has_property {
 
 Register the object as providing a method called C<$name> accepting parameters
 whose types are declared by C<$params> and returning values whose type
-are declared by C<$returns>. The method will be scoped to the inteface
+are declared by C<$returns>. The method will be scoped to the interface
 named by C<$interface>. The C<$attributes> parameter is a hash reference
 for annotating the method. The C<$paramnames> and C<$returnames> parameters
 are a list of argument and return value names.
@@ -338,7 +338,7 @@ sub add_method {
 =item $ins->add_signal($name, $params, $interface, $attributes);
 
 Register the object as providing a signal called C<$name> with parameters
-whose types are declared by C<$params>. The signal will be scoped to the inteface
+whose types are declared by C<$params>. The signal will be scoped to the interface
 named by C<$interface>. The C<$attributes> parameter is a hash reference
 for annotating the signal.
 
@@ -364,7 +364,7 @@ sub add_signal {
 
 Register the object as providing a property called C<$name> with a type
 of C<$type>. The C<$access> parameter can be one of C<read>, C<write>,
-or C<readwrite>. The property will be scoped to the inteface
+or C<readwrite>. The property will be scoped to the interface
 named by C<$interface>. The C<$attributes> parameter is a hash reference
 for annotating the signal.
 
@@ -472,8 +472,8 @@ sub method_has_strict_exceptions {
     my $name = shift;
     my $interface = shift;
 
-    die "no interface $interface" unless exists $self->{interfaces}->{$interface};
-    die "no method $name in interface $interface" unless exists $self->{interfaces}->{$interface}->{methods}->{$name};
+    return 0 unless exists $self->{interfaces}->{$interface};
+    return 0 unless exists $self->{interfaces}->{$interface}->{methods}->{$name};
     return 1 if $self->{interfaces}->{$interface}->{methods}->{$name}->{strict_exceptions};
     return 0;
 }
@@ -686,7 +686,7 @@ sub _parse {
     my $self = shift;
     my $xml = shift;
 
-    my $twig = XML::Twig->new();
+    my $twig = XML::Twig->new(no_xxe => 1);
     $twig->parse($xml);
 
     $self->_parse_node($twig->root);
@@ -1004,7 +1004,7 @@ sub to_xml {
     #
     if ($obj) {
 	foreach ( $obj->_get_sub_nodes ) {
-	    $xml .= $indent . '  <node name="/' . $_ . '"/>' . "\n";
+	    $xml .= $indent . '  <node name="' . $_ . '"/>' . "\n";
 	}
     } else {
 	foreach my $child (@{$self->{children}}) {
@@ -1225,7 +1225,7 @@ sub decode {
 
     my $iter = $message->iterator;
 
-    my $hasnext = 1;
+    my $hasnext = $iter->get_arg_type() != &Net::DBus::Binding::Message::TYPE_INVALID;
     my @rawtypes = $self->_convert(@types);
     my @ret;
     while (@types) {
@@ -1238,6 +1238,10 @@ sub decode {
 	    push @ret, $iter->get($rawtype);
 	    $hasnext = $iter->next;
 	}
+    }
+    while ($hasnext) {
+	push @ret, $iter->get();
+	$hasnext = $iter->next;
     }
     return @ret;
 }

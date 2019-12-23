@@ -8,7 +8,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADCREDENTIALS
+  PE_BADOTP
   PE_ERROR
   PE_FORMEMPTY
   PE_OK
@@ -99,7 +99,7 @@ sub verify {
 
     unless ($secret) {
         $self->logger->debug("No TOTP secret found");
-        return PE_BADCREDENTIALS;
+        return PE_BADOTP;
     }
 
     my $r = $self->verifyCode(
@@ -117,7 +117,7 @@ sub verify {
         $self->userLogger->notice( 'Invalid TOTP for '
               . $session->{ $self->conf->{whatToTrace} }
               . ')' );
-        return PE_BADCREDENTIALS;
+        return PE_BADOTP;
     }
 }
 

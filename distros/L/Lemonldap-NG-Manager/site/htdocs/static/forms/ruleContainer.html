@@ -5,10 +5,11 @@
   <table class="table table-striped">
     <thead>
       <tr>
-        <th width="20%" trspan="comments"></th>
-        <th width="30%" trspan="regexps"></th>
-        <th width="50%" trspan="rules"></th>
-        <th />
+        <th trspan="comments"></th>
+        <th trspan="regexps"></th>
+        <th trspan="rules"></th>
+        <th class="th_rulesAuthnLevel" trspan="rulesAuthnLevel"></th>
+        <th class="th_rulesAuthnLevel" />
       </tr>
     </thead>
     <tbody>
@@ -27,6 +28,12 @@
         </td>
         <td>
           <input class="form-control" ng-model="s.data"/>
+        </td>
+        <td ng-if="s.re!='default'">
+          <input type="number" class="form-control" ng-model="s.level"/>
+        </td>
+        <td ng-if="s.re=='default'">
+          <input class="form-control" placeholder="default" readonly/>
         </td>
         <td>
           <span ng-if="s.re!='default'" class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"/>

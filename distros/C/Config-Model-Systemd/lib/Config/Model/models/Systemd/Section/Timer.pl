@@ -7,7 +7,10 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
     'accept' => [
       '.*',
@@ -26,16 +29,16 @@ This man page lists the configuration options specific to
 this unit type. See
 L<systemd.unit(5)>
 for the common options of all unit configuration files. The common
-configuration items are configured in the generic [Unit] and
-[Install] sections. The timer specific configuration options are
-configured in the [Timer] section.
+configuration items are configured in the generic C<[Unit]> and
+C<[Install]> sections. The timer specific configuration options are
+configured in the C<[Timer]> section.
 
 For each timer file, a matching unit file must exist,
 describing the unit to activate when the timer elapses. By
 default, a service by the same name as the timer (except for the
 suffix) is activated. Example: a timer file
-foo.timer activates a matching service
-foo.service. The unit to activate may be
+C<foo.timer> activates a matching service
+C<foo.service>. The unit to activate may be
 controlled by C<Unit> (see below).
 
 Note that in case the unit to activate is already active at the time the timer elapses it is not restarted,
@@ -54,23 +57,14 @@ by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-
       'OnActiveSec',
       {
         'description' => 'Defines monotonic timers relative to different
-starting points: C<OnActiveSec> defines a
-timer relative to the moment the timer itself is activated.
-C<OnBootSec> defines a timer relative to when
-the machine was booted up. C<OnStartupSec>
-defines a timer relative to when systemd was first started.
-C<OnUnitActiveSec> defines a timer relative
-to when the unit the timer is activating was last activated.
-C<OnUnitInactiveSec> defines a timer relative
-to when the unit the timer is activating was last
-deactivated.
+starting points:
 
-Multiple directives may be combined of the same and of
-different types. For example, by combining
-C<OnBootSec> and
-C<OnUnitActiveSec>, it is possible to define
-a timer that elapses in regular intervals and activates a
-specific service each time.
+Multiple directives may be combined of the same and of different types, in which case the timer
+unit will trigger whenever any of the specified timer expressions elapse. For example, by combining
+C<OnBootSec> and C<OnUnitActiveSec>, it is possible to define a
+timer that elapses in regular intervals and activates a specific service each time. Moreover, both
+monotonic time expressions and C<OnCalendar> calendar expressions may be combined in
+the same timer unit.
 
 The arguments to the directives are time spans
 configured in seconds. Example: "OnBootSec=50" means 50s after
@@ -85,13 +79,12 @@ when the timer unit is activated, it will immediately elapse
 and the configured unit is started. This is not the case for
 timers defined in the other directives.
 
-These are monotonic timers, independent of wall-clock
-time and timezones. If the computer is temporarily suspended,
-the monotonic clock stops too.
+These are monotonic timers, independent of wall-clock time and timezones. If the computer is
+temporarily suspended, the monotonic clock pauses, too.
 
-If the empty string is assigned to any of these options,
-the list of timers is reset, and all prior assignments will
-have no effect.
+If the empty string is assigned to any of these options, the list of timers is reset (both
+monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
+will have no effect.
 
 Note that timers do not necessarily expire at the
 precise time configured with these settings, as they are
@@ -103,23 +96,14 @@ below.',
       'OnBootSec',
       {
         'description' => 'Defines monotonic timers relative to different
-starting points: C<OnActiveSec> defines a
-timer relative to the moment the timer itself is activated.
-C<OnBootSec> defines a timer relative to when
-the machine was booted up. C<OnStartupSec>
-defines a timer relative to when systemd was first started.
-C<OnUnitActiveSec> defines a timer relative
-to when the unit the timer is activating was last activated.
-C<OnUnitInactiveSec> defines a timer relative
-to when the unit the timer is activating was last
-deactivated.
+starting points:
 
-Multiple directives may be combined of the same and of
-different types. For example, by combining
-C<OnBootSec> and
-C<OnUnitActiveSec>, it is possible to define
-a timer that elapses in regular intervals and activates a
-specific service each time.
+Multiple directives may be combined of the same and of different types, in which case the timer
+unit will trigger whenever any of the specified timer expressions elapse. For example, by combining
+C<OnBootSec> and C<OnUnitActiveSec>, it is possible to define a
+timer that elapses in regular intervals and activates a specific service each time. Moreover, both
+monotonic time expressions and C<OnCalendar> calendar expressions may be combined in
+the same timer unit.
 
 The arguments to the directives are time spans
 configured in seconds. Example: "OnBootSec=50" means 50s after
@@ -134,13 +118,12 @@ when the timer unit is activated, it will immediately elapse
 and the configured unit is started. This is not the case for
 timers defined in the other directives.
 
-These are monotonic timers, independent of wall-clock
-time and timezones. If the computer is temporarily suspended,
-the monotonic clock stops too.
+These are monotonic timers, independent of wall-clock time and timezones. If the computer is
+temporarily suspended, the monotonic clock pauses, too.
 
-If the empty string is assigned to any of these options,
-the list of timers is reset, and all prior assignments will
-have no effect.
+If the empty string is assigned to any of these options, the list of timers is reset (both
+monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
+will have no effect.
 
 Note that timers do not necessarily expire at the
 precise time configured with these settings, as they are
@@ -152,23 +135,14 @@ below.',
       'OnStartupSec',
       {
         'description' => 'Defines monotonic timers relative to different
-starting points: C<OnActiveSec> defines a
-timer relative to the moment the timer itself is activated.
-C<OnBootSec> defines a timer relative to when
-the machine was booted up. C<OnStartupSec>
-defines a timer relative to when systemd was first started.
-C<OnUnitActiveSec> defines a timer relative
-to when the unit the timer is activating was last activated.
-C<OnUnitInactiveSec> defines a timer relative
-to when the unit the timer is activating was last
-deactivated.
+starting points:
 
-Multiple directives may be combined of the same and of
-different types. For example, by combining
-C<OnBootSec> and
-C<OnUnitActiveSec>, it is possible to define
-a timer that elapses in regular intervals and activates a
-specific service each time.
+Multiple directives may be combined of the same and of different types, in which case the timer
+unit will trigger whenever any of the specified timer expressions elapse. For example, by combining
+C<OnBootSec> and C<OnUnitActiveSec>, it is possible to define a
+timer that elapses in regular intervals and activates a specific service each time. Moreover, both
+monotonic time expressions and C<OnCalendar> calendar expressions may be combined in
+the same timer unit.
 
 The arguments to the directives are time spans
 configured in seconds. Example: "OnBootSec=50" means 50s after
@@ -183,13 +157,12 @@ when the timer unit is activated, it will immediately elapse
 and the configured unit is started. This is not the case for
 timers defined in the other directives.
 
-These are monotonic timers, independent of wall-clock
-time and timezones. If the computer is temporarily suspended,
-the monotonic clock stops too.
+These are monotonic timers, independent of wall-clock time and timezones. If the computer is
+temporarily suspended, the monotonic clock pauses, too.
 
-If the empty string is assigned to any of these options,
-the list of timers is reset, and all prior assignments will
-have no effect.
+If the empty string is assigned to any of these options, the list of timers is reset (both
+monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
+will have no effect.
 
 Note that timers do not necessarily expire at the
 precise time configured with these settings, as they are
@@ -201,23 +174,14 @@ below.',
       'OnUnitActiveSec',
       {
         'description' => 'Defines monotonic timers relative to different
-starting points: C<OnActiveSec> defines a
-timer relative to the moment the timer itself is activated.
-C<OnBootSec> defines a timer relative to when
-the machine was booted up. C<OnStartupSec>
-defines a timer relative to when systemd was first started.
-C<OnUnitActiveSec> defines a timer relative
-to when the unit the timer is activating was last activated.
-C<OnUnitInactiveSec> defines a timer relative
-to when the unit the timer is activating was last
-deactivated.
+starting points:
 
-Multiple directives may be combined of the same and of
-different types. For example, by combining
-C<OnBootSec> and
-C<OnUnitActiveSec>, it is possible to define
-a timer that elapses in regular intervals and activates a
-specific service each time.
+Multiple directives may be combined of the same and of different types, in which case the timer
+unit will trigger whenever any of the specified timer expressions elapse. For example, by combining
+C<OnBootSec> and C<OnUnitActiveSec>, it is possible to define a
+timer that elapses in regular intervals and activates a specific service each time. Moreover, both
+monotonic time expressions and C<OnCalendar> calendar expressions may be combined in
+the same timer unit.
 
 The arguments to the directives are time spans
 configured in seconds. Example: "OnBootSec=50" means 50s after
@@ -232,13 +196,12 @@ when the timer unit is activated, it will immediately elapse
 and the configured unit is started. This is not the case for
 timers defined in the other directives.
 
-These are monotonic timers, independent of wall-clock
-time and timezones. If the computer is temporarily suspended,
-the monotonic clock stops too.
+These are monotonic timers, independent of wall-clock time and timezones. If the computer is
+temporarily suspended, the monotonic clock pauses, too.
 
-If the empty string is assigned to any of these options,
-the list of timers is reset, and all prior assignments will
-have no effect.
+If the empty string is assigned to any of these options, the list of timers is reset (both
+monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
+will have no effect.
 
 Note that timers do not necessarily expire at the
 precise time configured with these settings, as they are
@@ -250,23 +213,14 @@ below.',
       'OnUnitInactiveSec',
       {
         'description' => 'Defines monotonic timers relative to different
-starting points: C<OnActiveSec> defines a
-timer relative to the moment the timer itself is activated.
-C<OnBootSec> defines a timer relative to when
-the machine was booted up. C<OnStartupSec>
-defines a timer relative to when systemd was first started.
-C<OnUnitActiveSec> defines a timer relative
-to when the unit the timer is activating was last activated.
-C<OnUnitInactiveSec> defines a timer relative
-to when the unit the timer is activating was last
-deactivated.
+starting points:
 
-Multiple directives may be combined of the same and of
-different types. For example, by combining
-C<OnBootSec> and
-C<OnUnitActiveSec>, it is possible to define
-a timer that elapses in regular intervals and activates a
-specific service each time.
+Multiple directives may be combined of the same and of different types, in which case the timer
+unit will trigger whenever any of the specified timer expressions elapse. For example, by combining
+C<OnBootSec> and C<OnUnitActiveSec>, it is possible to define a
+timer that elapses in regular intervals and activates a specific service each time. Moreover, both
+monotonic time expressions and C<OnCalendar> calendar expressions may be combined in
+the same timer unit.
 
 The arguments to the directives are time spans
 configured in seconds. Example: "OnBootSec=50" means 50s after
@@ -281,13 +235,12 @@ when the timer unit is activated, it will immediately elapse
 and the configured unit is started. This is not the case for
 timers defined in the other directives.
 
-These are monotonic timers, independent of wall-clock
-time and timezones. If the computer is temporarily suspended,
-the monotonic clock stops too.
+These are monotonic timers, independent of wall-clock time and timezones. If the computer is
+temporarily suspended, the monotonic clock pauses, too.
 
-If the empty string is assigned to any of these options,
-the list of timers is reset, and all prior assignments will
-have no effect.
+If the empty string is assigned to any of these options, the list of timers is reset (both
+monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
+will have no effect.
 
 Note that timers do not necessarily expire at the
 precise time configured with these settings, as they are
@@ -314,7 +267,13 @@ precise time configured with this setting, as it is subject to
 the C<AccuracySec> setting
 below.
 
-May be specified more than once.',
+May be specified more than once, in which case the timer unit will trigger whenever any of the
+specified expressions elapse. Moreover calendar timers and monotonic timers (see above) may be
+combined within the same timer unit.
+
+If the empty string is assigned to any of these options, the list of timers is reset (both
+C<OnCalendar> timers and monotonic timers, see above), and all prior assignments
+will have no effect.',
         'type' => 'list'
       },
       'AccuracySec',
@@ -376,6 +335,26 @@ C<AccuracySec=1us>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'OnClockChange',
+      {
+        'description' => 'These options take boolean arguments. When true, the service unit will be triggered
+when the system clock (C<CLOCK_REALTIME>) jumps relative to the monotonic clock
+(C<CLOCK_MONOTONIC>), or when the local system timezone is modified. These options
+can be used alone or in combination with other timer expressions (see above) within the same timer
+unit. These options default to false.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'OnTimezoneChange',
+      {
+        'description' => 'These options take boolean arguments. When true, the service unit will be triggered
+when the system clock (C<CLOCK_REALTIME>) jumps relative to the monotonic clock
+(C<CLOCK_MONOTONIC>), or when the local system timezone is modified. These options
+can be used alone or in combination with other timer expressions (see above) within the same timer
+unit. These options default to false.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'Unit',
       {
         'description' => 'The unit to activate when this timer elapses.
@@ -391,16 +370,18 @@ suffix.',
       },
       'Persistent',
       {
-        'description' => 'Takes a boolean argument. If true, the time
-when the service unit was last triggered is stored on disk.
-When the timer is activated, the service unit is triggered
-immediately if it would have been triggered at least once
-during the time when the timer was inactive. This is useful to
-catch up on missed runs of the service when the machine was
-off. Note that this setting only has an effect on timers
-configured with C<OnCalendar>. Defaults
-to C<false>.
-',
+        'description' => "Takes a boolean argument. If true, the time when the service unit was last triggered
+is stored on disk.  When the timer is activated, the service unit is triggered immediately if it
+would have been triggered at least once during the time when the timer was inactive. This is useful
+to catch up on missed runs of the service when the system was powered down. Note that this setting
+only has an effect on timers configured with C<OnCalendar>. Defaults to
+C<false>.
+
+Use systemctl clean --what=state \x{2026} on the timer unit to remove the timestamp
+file maintained by this option from disk. In particular, use this command before uninstalling a timer
+unit. See
+L<systemctl(1)> for
+details.",
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -410,13 +391,14 @@ to C<false>.
       },
       'WakeSystem',
       {
-        'description' => 'Takes a boolean argument. If true, an elapsing
-timer will cause the system to resume from suspend, should it
-be suspended and if the system supports this. Note that this
-option will only make sure the system resumes on the
-appropriate times, it will not take care of suspending it
-again after any work that is to be done is finished. Defaults
-to C<false>.',
+        'description' => 'Takes a boolean argument. If true, an elapsing timer will cause the system to resume
+from suspend, should it be suspended and if the system supports this. Note that this option will only
+make sure the system resumes on the appropriate times, it will not take care of suspending it again
+after any work that is to be done is finished. Defaults to
+C<false>.
+
+Note that this functionality requires privileges and is thus generally only available in the
+system service manager.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -427,7 +409,7 @@ to C<false>.',
       'RemainAfterElapse',
       {
         'description' => 'Takes a boolean argument. If true, an elapsed
-timer will stay loaded, and its state remains queriable. If
+timer will stay loaded, and its state remains queryable. If
 false, an elapsed timer unit that cannot elapse anymore is
 unloaded. Turning this off is particularly useful for
 transient timer units that shall disappear after they first
@@ -447,7 +429,7 @@ C<yes>.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd doc',
+    'generated_by' => 'parse-man.pl from systemd 244 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Timer'
   }

@@ -39,4 +39,22 @@ subtest 'Score Range Ballots' => sub {
     'From hashbyrank see that Knoxville is 2nd' );
 };
 
+subtest 'RangeBallotPair' => sub {
+  my $VC1 = Vote::Count->new(
+    BallotSet => read_range_ballots('t/data/fastfood.range.json')
+  );
+  subtest 'RangeBallotPair' => sub {
+    is( $VC1->BallotSetType(),
+      'range', 'BallotSetType option is set to range' );
+    my ( $votesKFC, $votesTACOBELL ) =
+      $VC1->RangeBallotPair( 'KFC', 'TACOBELL' );
+    is( $votesKFC,      0, 'check one of the choices' );
+    is( $votesTACOBELL, 1, 'check the other one' );
+    my ( $votesINNOUT, $votesMcD ) =
+      $VC1->RangeBallotPair( 'INNOUT', 'MCDONALDS' );
+    is( $votesINNOUT, 10, 'check one of the choices' );
+    is( $votesMcD,    3,  'check the other one' );
+  };
+};
+
 done_testing();

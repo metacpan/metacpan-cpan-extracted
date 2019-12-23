@@ -1,0 +1,80 @@
+NAME
+    Sort::SubList - Sort only certain elements in a list, while maintaining
+    the order of the rest
+
+VERSION
+    This document describes version 0.001 of Sort::SubList (from Perl
+    distribution Sort-SubList), released on 2019-12-14.
+
+SYNOPSIS
+     use Sort::SubList qw(sort_sublist);
+
+     my @sorted = sort_sublist
+         sub { length($_[0]) <=> length($_[1]) },  # comparison routine
+         sub { /\D/ },                             # element selection routine
+         "quux", 12, 1, "us", 400, 3, "a", "foo";
+
+     # => ("a", 12, 1, "us", 400, 3, "foo", "quux")
+
+DESCRIPTION
+    This module provides "sort_sublist" routine to sort only certain
+    elements in a list, while keeping the order of the rest of the elements
+    intact (in the original position). So basically what this routine does
+    is to grep the elements to be sorted, record their positions, sort these
+    elements, and put them back to the recorded positions.
+
+FUNCTIONS
+  sort_sublist
+    Usage:
+
+     my @sorted = sort_sublist $comparison_sub, $filter_sub, @list;
+
+FAQ
+  How about adding prototype to "sort_sublist" so it's more convenient to use like the builtin "sort"?
+    The builtin "sort"'s behavior is hard to emulate with subroutine
+    prototypes. For more discussion:
+    <https://www.perlmonks.org/index.pl/www.mrtg.org?node_id=1207981>. For
+    simplicity, I do away with prototypes altogether.
+
+  How to use $a and $b in comparison sub, just like when we use builtin "sort"?
+    Something like this will do:
+
+        sub {
+            no strict 'refs';
+
+            my $caller = caller();
+            my $a = @_ ? $_[0] : ${"$caller\::a"};
+            my $b = @_ ? $_[1] : ${"$caller\::b"};
+
+            # compare $a and $b ...
+        }
+
+    Or, you can just use $_[0] (instead of $a) and $_[1] (instead of $b)
+    like the example in Synopsis shows. Again, this is where the specialness
+    of the sort subroutine is not easy or straightforward to emulate.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sort-SubList>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sort-SubList>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-SubList>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

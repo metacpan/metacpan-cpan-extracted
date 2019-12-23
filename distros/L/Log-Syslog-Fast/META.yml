@@ -22,5 +22,5 @@ requires:
   Log::Syslog::Constants: '1.01'
 resources:
   repository: https://github.com/athomason/Log-Syslog-Fast.git
-version: '0.66'
+version: '0.67'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

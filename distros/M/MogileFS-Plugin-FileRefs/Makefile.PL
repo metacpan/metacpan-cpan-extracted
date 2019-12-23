@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "MogileFS-Plugin-FileRefs",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "MogileFS::Plugin::FileRefs",
   "PREREQ_PM" => {
     "MogileFS::Store" => 0,
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }

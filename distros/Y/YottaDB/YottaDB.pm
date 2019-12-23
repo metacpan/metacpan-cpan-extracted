@@ -45,7 +45,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw( );
 
-our $VERSION = '0.24';
+our $VERSION = '0.31';
 
 sub AUTOLOAD {
 
@@ -79,42 +79,12 @@ XSLoader::load('YottaDB', $VERSION);
 
 END { YottaDB::fixup_for_putenv_crash (); }
 
-use POSIX::AtFork;
-
-sub fork_setup () {
-        # YottaDB requires a call to ydb_child_init () after
-        # fork within the child. The parent must not exit
-        # before ydb_child_init returns.
-        # I'm not sure if this solution is generic - thinking of
-        # childs that do not care about YottaDB at all calling _exit(2)
-        # or execve(2) after the implicit ydb_child_init.
-        # Maybe we should not use fork-handlers and letting it up
-        # to the user to call ydb_child_init manually which is pain.
-        # for now we keep the fork-handler and tell the users to use
-        # y_exit before calling _exit(2) or execve(2). This fails
-        # if you can't acces the child (for example: fork/execve
-        # in "|-" or "-|" form of open).
-        my ($RD, $WD);
-        POSIX::AtFork::pthread_atfork (
-                sub { pipe $RD, $WD or die "pipe"; },
-                sub { close $WD; sysread $RD, my $x, 1; close $RD; },
-                sub { close $RD;
-                      my $rc = y_child_init ();
-                      syswrite $WD, "X";
-                      close $WD;
-                      die "ydb_child_init returned: $rc" if $rc;
-                    }
-        );
-}
-
-BEGIN { YottaDB::fork_setup (); }
-
 1;
 __END__
 
 =head1 NAME
 
-YottaDB - Perl extension for accessing YottaDB
+YottaDB - Perl extension for accessing L<YottaDB|https://yottadb.com>
 
 =head1 SYNOPSIS
 
@@ -146,14 +116,63 @@ YottaDB - Perl extension for accessing YottaDB
 
 This module gives you access to the YottaDB database engine
 using YottaDB's simple API.
+It requires that you install and setup
+L<YottaDB|https://yottadb.com/product/get-started> first.
 
-To reduce the risk of database damage, C<"make test"> will not
-run tests that access the database, use C<"make test TEST_DB=1">
-to run all tests.
+After installing the database, setting up the environment
+is required for C<Mumps> and C<Perl>.
+Environment-variable C<ydb_gbldir> is needed for C<Mumps> and C<Perl>.
+If incorrectly/not set you can't access globals or use M-Style
+locking and every attempt to do so will throw an exception.
+The installation process itself does not need C<ydb_gbldir> by default;
+but C<"make test TEST_DB=1"> needs it.
+
+I highly recommend using:
+
+  $ source "$(pkg-config --variable=prefix yottadb)"/ydb_env_set
+and
+  $ source "$(pkg-config --variable=prefix yottadb)"/ydb_env_unset
+
+for basic setup of environment and databases.
+
+Rule of the thumb: If it fails in C<Mumps> it will fail in C<Perl>, too.
+
+Always try getting C<Mumps> working first.
+
+Here we try to access a global without C<ydb_gbldir> set in C<Mumps> and -
+just for reference - C<Perl>:
+
+C<Mumps>:
+
+ $ cd /tmp
+ $ echo 'I $o(^foo(""))'|"$(pkg-config --variable=prefix yottadb)"/mumps -dir
+
+ YDB>
+ %YDB-E-ZGBLDIRACC, Cannot access global directory /tmp/$ydb_gbldir.gld.  Cannot continue.
+ %SYSTEM-E-ENO2, No such file or directory
+
+ YDB>
+
+C<Perl>:
+
+ $ cd /tmp
+ $ perl -MYottaDB=:all -e 'y_next ("^foo","")'
+ YottaDB-Error: -150374122 150374122,(SimpleAPI),%YDB-E-ZGBLDIRACC, Cannot access global directory /tmp/$ydb_gbldir.gld.  Cannot continue.,%SYSTEM-E-ENO2, No such file or directory at -e line 1.
+
+Installing the YottaDB module from the git repository:
+
+ $ # sudo apt install make libextutils-pkgconfig-perl libjson-perl
+ $ git clone https://gitlab.com/oesiman/yottadb-perl.git
+ $ cd yottadb-perl
+ $ perl Makefile.PL
+ $ make
+ $ make test
+ $ make test TEST_DB=1 # optional, accesses database
+ $ sudo make install
 
 DO NOT USE THIS MODULE ON PRODUCTION SYSTEMS.
 
-=head1 FUNCTONS
+=head1 FUNCTIONS
 
 =over 4
 
@@ -190,7 +209,7 @@ Sets the variable to C<$value>
 =item   $value = y_get $var [, @subs]
 
 Sets C<$value> to the value of $var [, @subs].
-Returns F<undef> if not defined. 
+Returns F<undef> if not defined.
 
 =item   $value = y_get_croak $var [, @subs]
 
@@ -204,9 +223,7 @@ if there is none.
 Here a sample "order-loop":
 
         my $x = "";
-        while () {
-            $x = y_next "^global","subscript", $x;
-            last unless defined $x;
+        while (defined ($x = y_next "^global", "subscript", $x)) {
             # ... do something with $x ...
         }
 
@@ -248,8 +265,6 @@ Example:
         y_lock 0, ["^temp", 1, "two"],
                   ["^temp", 3] or die "can't lock";
 
-
-
 =item   $status = y_lock_incr $timeout, $var [, @subs]
 
 Try to gain lock on $var [, @subs] for C<$timeout> seconds
@@ -270,18 +285,15 @@ Run a transaction. :)
 
 =head1 SEE ALSO
 
-This module depends on L<POSIX::AtFork> for fork handling
-and on L<JSON> for C<ydb_json_import>.
+This module depends on 
+L<JSON> for C<ydb_json_import>.
 Install it on Debian:
 
-        # apt-get install libposix-atfork-perl
         # apt-get install libjson-perl
 
 or via CPAN:
 
-        # cpan POSIX::AtFork
         # cpan JSON
-
 
 L<https://yottadb.com>
 

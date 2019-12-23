@@ -27,7 +27,7 @@
 /* Deprecation added 2010-10-05.  The deprecated functionality should not be
  * removed for at least a year after that. */
 #define WIDE_CHAR_DEPRECATION_MSG "Use of wide characters in %s is deprecated" \
-  " and will stop wprking in a future version of FCGI"
+  " and will stop working in a future version of FCGI"
 
 #if defined(USE_ITHREADS)
 static perl_mutex accept_mutex;

@@ -8,6 +8,9 @@
 #include "libyottadb.h"
 #include "libydberrors.h"
 
+#ifndef NO_CHILD_INIT
+#include <pthread.h>
+#endif
 
 #if 0
 #define MYDEBUG(s,r) do { fprintf(stderr, "%s: rc=%d\n", (s), (r)); fflush (stderr); } while (0)
@@ -70,14 +73,69 @@ static int my_transaction (void *addr)
         return ret;
 }
 
+#ifndef NO_CHILD_INIT
+
+static int filedes[2];
+
+static void paf_prepare (void)
+{
+	int rc;
+	rc = pipe (filedes);
+	if (rc < 0) {
+		croak ("paf_prepare: pipe error: %m\n");
+	}
+}
+
+static void paf_parent (void)
+{
+        char buf[1];
+        int rc;
+        close (filedes[1]);
+        rc = read (filedes[0], buf, 1);
+        close (filedes[0]);
+        if (rc != 1) {
+            croak ("paf_parent: read returned %d\n", rc);
+        }
+}
+
+static void paf_child (void)
+{
+        char buf[1];
+        int rc;
+
+        buf[0] = 0;
+        close (filedes[0]);
+        ydb_child_init (0);
+        rc = write (filedes[1], buf, 1);
+        close (filedes[1]);
+        if (rc != 1) {
+            croak ("paf_child: write returned %d\n", rc);
+        }
+}
+
+#endif
 
 MODULE = YottaDB                PACKAGE = YottaDB
 
 PROTOTYPES: DISABLE
 
+BOOT:
+{
+#ifndef NO_CHILD_INIT
+  int rc;
+  rc = pthread_atfork (paf_prepare, paf_parent, paf_child);
+  if (rc) {
+      croak ("pthread_atfork failure, rc=%d", rc);
+  }
+#endif
+}
+
 void
 fixup_for_putenv_crash ()
 CODE:
+        /* this may require -Accflags=-DPERL_USE_SAFE_PUTENV
+         * on perl's Configure...
+         */
         putenv ("ydb_callin_start");
         putenv ("GTM_CALLIN_START");
 OUTPUT:

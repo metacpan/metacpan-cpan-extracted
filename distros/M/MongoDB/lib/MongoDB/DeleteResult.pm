@@ -19,7 +19,7 @@ package MongoDB::DeleteResult;
 # ABSTRACT: MongoDB deletion result object
 
 use version;
-our $VERSION = 'v2.2.0';
+our $VERSION = 'v2.2.1';
 
 use Moo;
 use MongoDB::_Constants;
@@ -59,7 +59,7 @@ MongoDB::DeleteResult - MongoDB deletion result object
 
 =head1 VERSION
 
-version v2.2.0
+version v2.2.1
 
 =head1 SYNOPSIS
 

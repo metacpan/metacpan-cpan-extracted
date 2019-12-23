@@ -1,0 +1,40 @@
+Template-Plugin-Thumbalizr version 1.0.0
+========================================
+
+Thumbalizr plugin for Template::Toolkit. This allows Thumbalizr users
+to embed screenshtos in any Template::Toolkit page:
+
+	[% USE thumbalizr = Thumbalizr('api_key', 'secret') %]
+	<img src="[% thumbalizr.url('https://www.google.com/') %]" />
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  WebService::Thumbalizr
+  Template::Plugin
+  
+SOURCE
+
+The source code is available on github at https://github.com/juliensobrier/Template-Plugin-Thumbalizr
+
+CPAN
+
+The library is available on CPAN at https://metacpan.org/pod/Template::Plugin::Thumbalizr
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2019 by Julien Sobrier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

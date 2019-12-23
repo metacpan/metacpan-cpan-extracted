@@ -1,5 +1,11 @@
 Revision history for Firefox-Marionette
 
+0.87  Sat Dec 14 16:16:00 2019
+       Removing PIPE handler.
+
+0.86  Sat Dec 14 14:04:00 2019
+       Stopping a crash due to a PIPE signal.  Thanks to John Denker for the bug report in RT#131173.
+
 0.85  Wed Nov 12 18:40:00 2019
        Fixing session cookie support.  Thanks to BOKUTIN in RT#130955.
 

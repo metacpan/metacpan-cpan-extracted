@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.13';
+$Neo4j::Driver::Record::VERSION = '0.14';
 
 use Carp qw(croak);
 use JSON::PP;
@@ -14,10 +14,10 @@ use Neo4j::Driver::ResultSummary;
 
 
 sub new {
-	my ($class, $record, $columns, $deep_bless) = @_;
+	my ($class, $record, $columns, $deep_bless, $cypher_types) = @_;
 	
 	$record->{column_keys} = $columns;
-	$deep_bless->( $record->{row}, $record->{meta}, $record->{rest} );
+	$deep_bless->( $cypher_types, $record->{row}, $record->{meta}, $record->{rest} );
 	return bless $record, $class;
 }
 
@@ -95,7 +95,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

@@ -4,11 +4,12 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.7';
 
 sub newNotification {
-    my ( $self, $jsonString ) = @_;
+    my ( $self, $jsonString, $defaultCond ) = @_;
     my $json;
+    $defaultCond ||= '';
     eval { $json = from_json( $jsonString, { allow_nonref => 1 } ) };
     if ( my $err = $@ ) {
         eval { $self->logger->error("Unable to decode JSON file: $err") };
@@ -23,13 +24,32 @@ sub newNotification {
         foreach (qw(date uid reference)) {
             my $tmp;
             unless ( $tmp = $notif->{$_} ) {
-                $self->logger->error("Attribute $_ is missing");
-                return 0;
+                my $err = "Attribute $_ is missing";
+                $self->logger->error("$err");
+                return ( 0, "$err" );
             }
+            if ( $self->get( $notif->{uid}, $notif->{reference} ) ) {
+                my $err = "A notification already exists with reference "
+                  . $notif->{reference};
+                $self->logger->error("$err");
+                return ( 0, "$err" );
+            }
+
+            # Prevent to store time. Keep date only
+            $tmp =~ s/^(\d{4}-\d{2}-\d{2}).*$/$1/;
             push @data, $tmp;
         }
-        push @data, ( $notif->{condition} // '' );
-        push @notifs, [ @data, $jsonString ];
+
+        unless ( exists $notif->{condition} ) {
+            $self->userLogger->info(
+                "Set defaultCondition ($defaultCond) for notification $notif->{reference}");
+            $notif->{condition} = $defaultCond;
+        }
+        
+        push @data, ( $notif->{condition} );
+        $notif->{date} =~ s/^(\d{4}-\d{2}-\d{2}).*$/$1/;
+        my $body = to_json($notif);
+        push @notifs, [ @data, $body ];
     }
     my $count;
     foreach (@notifs) {
@@ -50,7 +70,6 @@ sub deleteNotification {
             'REST service "delete notification" called without all parameters');
         return 0;
     }
-
     $self->logger->debug(
 "REST service deleteNotification called for uid $uid and reference $myref"
     );
@@ -66,6 +85,7 @@ sub deleteNotification {
 
     foreach my $ref ( keys %$user ) {
         my $json = from_json( $user->{$ref}, { allow_nonref => 1 } );
+        $json = [$json] unless ( ref($json) eq 'ARRAY' );
 
         # Browse notification in file
         foreach my $notif (@$json) {

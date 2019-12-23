@@ -1,13 +1,22 @@
 package NewsExtractor::TXExtractor;
 use Moo;
 use Types::Standard qw( InstanceOf );
-use Encode 'decode';
+use Encode 'find_encoding';
 
 has tx => (
-    required => 1, is => 'ro',
-    isa => InstanceOf['Mojo::Transaction::HTTP'] );
+    required => 0,
+    is => 'ro',
+    isa => InstanceOf['Mojo::Transaction::HTTP']
+);
 
-sub dom {
+has dom => (
+    required => 0,
+    isa => InstanceOf['Mojo::DOM'],
+    is => 'lazy',
+    builder => 1,
+);
+
+sub _build_dom {
     my $tx = $_[0]->tx;
     my $dom = $tx->result->dom;
 
@@ -21,8 +30,11 @@ sub dom {
     }
 
     if ($charset) {
-        my $body = decode($charset, $tx->result->body);
-        $dom = Mojo::DOM->new($body);
+        my $enc = find_encoding( $charset );
+        if ($enc) {
+            my $body = $enc->decode($tx->result->body);
+            $dom = Mojo::DOM->new($body);
+        }
     }
 
     return $dom;

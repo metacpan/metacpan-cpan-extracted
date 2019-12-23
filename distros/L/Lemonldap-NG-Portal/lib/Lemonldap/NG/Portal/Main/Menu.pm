@@ -124,6 +124,15 @@ sub params {
     $self->logger->debug("Display SwitchContext link -> $res{contextSwitching}")
       if $res{contextSwitching};
 
+    # Display DecryptValue link if allowed
+    my $dvPlugin =
+      $self->p->loadedModules->{'Lemonldap::NG::Portal::Plugins::DecryptValue'};
+    $res{decryptValue} =
+        $dvPlugin
+      ? $dvPlugin->displayLink( $req, $req->userData )
+      : '';
+    $self->logger->debug("Display DecryptValue link") if $res{decryptValue};
+
     return %res;
 }
 

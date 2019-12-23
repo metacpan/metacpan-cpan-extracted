@@ -65,6 +65,7 @@ use Lemonldap::NG::Common::FormEncode;
 no warnings 'redefine';
 
 BEGIN {
+    require 't/Time-Fake.pm';
     use_ok('Lemonldap::NG::Portal::Main');
 }
 
@@ -324,6 +325,26 @@ sub expectOK {
     count(1);
 }
 
+=head4 expectJSON($res)
+
+Verify that the HTTP response contains valid JSON and returns the corresponding object
+
+=cut
+
+sub expectJSON {
+    my ($res) = @_;
+    is( $res->[0], 200, ' HTTP code is 200' ) or explain( $res, 200 );
+    my %hdr = @{ $res->[1] };
+    like( $hdr{'Content-Type'}, qr,^application/json,i,
+        ' Content-Type is JSON' )
+      or explain($res);
+    my $json;
+    eval { $json = JSON::from_json( $res->[2]->[0] ) };
+    ok( not($@), 'Content is valid JSON' );
+    count(3);
+    return $json;
+}
+
 =head4 expectBadRequest($res)
 
 Verify that returned code is 400. Note that it works only for Ajax request
@@ -396,7 +417,8 @@ sub exceptCspFormOK {
     }
     if (   $csp =~ /\s\*(?:\s.*)?\s*$/
         or ( $host eq '#' and $csp =~ /'self'/ )
-        or $csp =~ m#\bhttps?://$host\b# )
+        or $csp =~ m#\bhttps?://$host\b#
+        or $csp =~ m#\*# )
     {
         pass(" CSP header authorize POST request to $host");
     }
@@ -578,7 +600,7 @@ has ini => (
         main::ok( $self->{p} = $self->class->new(), 'Portal object' );
         main::count(1);
         unless ( $self->confFailure ) {
-            main::ok( $self->{p}->init($ini),           'Init' );
+            main::ok( $self->{p}->init($ini), 'Init' );
             main::ok( $self->{app} = $self->{p}->run(), 'Portal app' );
             main::count(2);
             no warnings 'redefine';
@@ -690,7 +712,7 @@ sub _get {
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             'HTTP_CACHE_CONTROL'   => 'max-age=0',
             ( $args{cookie} ? ( HTTP_COOKIE => $args{cookie} ) : () ),
-            'HTTP_HOST' => 'auth.example.com',
+            'HTTP_HOST' => ( $args{host} ? $args{host} : 'auth.example.com' ),
             'HTTP_USER_AGENT' =>
               'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
             'PATH_INFO' => $path,
@@ -743,7 +765,7 @@ sub _post {
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             'HTTP_CACHE_CONTROL'   => 'max-age=0',
             ( $args{cookie} ? ( HTTP_COOKIE => $args{cookie} ) : () ),
-            'HTTP_HOST' => 'auth.example.com',
+            'HTTP_HOST' => ( $args{host} ? $args{host} : 'auth.example.com' ),
             'HTTP_USER_AGENT' =>
               'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
             'PATH_INFO' => $path,

@@ -27,7 +27,7 @@ Net::DBus::Callback - a callback for receiving reactor events
   use Net::DBus::Callback;
 
   # Assume we have a 'terminal' object and its got a method
-  # to be invoked everytime there is input on its terminal.
+  # to be invoked every time there is input on its terminal.
   #
   # To create a callback to invoke this method one might use
   my $cb = Net::DBus::Callback->new(object => $terminal,

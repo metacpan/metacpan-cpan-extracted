@@ -4,7 +4,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.3.9
+version v0.3.10
 
 # SYNOPSIS
 
@@ -136,6 +136,10 @@ The following metrics are logged:
 
     See [Plack::Middleware::XSendfile](https://metacpan.org/pod/Plack::Middleware::XSendfile) for more information.
 
+- `psgi.worker.pid`
+
+    The worker PID is added to the set.
+
 - `psgix.harakiri`
 
     This counter is incremented when the harakiri flag is set.
@@ -203,7 +207,7 @@ Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

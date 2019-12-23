@@ -12,7 +12,7 @@ use FFI::Platypus::Buffer qw( scalar_to_buffer );
 use FFI::Platypus::Buffer qw( buffer_to_scalar );
 
 # ABSTRACT: Convert string scalar to a buffer as a pointer / size_t combination
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 
 my @stack;
@@ -60,7 +60,7 @@ FFI::Platypus::Type::PointerSizeBuffer - Convert string scalar to a buffer as a 
 
 =head1 VERSION
 
-version 1.02
+version 1.06
 
 =head1 SYNOPSIS
 

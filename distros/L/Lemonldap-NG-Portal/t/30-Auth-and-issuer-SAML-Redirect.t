@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 17;
+my $maintests = 21;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -52,15 +52,6 @@ SKIP: {
         'Unauth SP request'
     );
     my ( $host, $url, $query );
-    ok(
-        expectCookie( $res, 'lemonldapidp' ) eq
-          'http://auth.idp.com/saml/metadata',
-        'IDP cookie defined'
-      )
-      or explain(
-        $res->[1],
-'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
-      );
     ( $url, $query ) = expectRedirection( $res,
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
@@ -77,7 +68,10 @@ SKIP: {
     expectOK($res);
     my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
-    # Try to authenticate to IdP
+    # Try to authenticate with an expired OTT to IdP
+    # Waiting
+    Time::Fake->offset("+150s");
+
     my $body = $res->[2]->[0];
     $body =~ s/^.*?<form.*?>//s;
     $body =~ s#</form>.*$##s;
@@ -95,10 +89,66 @@ SKIP: {
             cookie => $pdata,
             length => length($query),
         ),
-        'Post authentication'
+        'Post delayed authentication request'
+    );
+    expectRedirection( $res, 'http://auth.idp.com/saml' );
+    my $idpId = expectCookie($res);
+
+    # Expect pdata to be cleared
+    $pdata = expectCookie( $res, 'lemonldappdata' );
+    ok( $pdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' );
+
+    # Simple SP access
+    ok(
+        $res = $sp->_get(
+            '/',
+            accept => 'text/html',
+            query  => 'url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw=='
+        ),
+        'Unauth SP request'
+    );
+    ( $host, $url, $query );
+    ( $url, $query ) = expectRedirection( $res,
+        qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
+
+    # Push SAML request to IdP
+    Time::Fake->reset;
+    ok(
+        $res = $issuer->_get(
+            $url,
+            query  => $query,
+            accept => 'text/html',
+        ),
+        'Launch SAML request to IdP'
     );
     expectOK($res);
-    my $idpId = expectCookie($res);
+    $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+
+    # Try to authenticate with a valid OTT to IdP
+    # Waiting
+    Time::Fake->offset("+100s");
+
+    $body = $res->[2]->[0];
+    $body =~ s/^.*?<form.*?>//s;
+    $body =~ s#</form>.*$##s;
+    %fields =
+      ( $body =~ /<input type="hidden".+?name="(.+?)".+?value="(.*?)"/sg );
+    $fields{user} = $fields{password} = 'french';
+    use URI::Escape;
+    $query =
+      join( '&', map { "$_=" . uri_escape( $fields{$_} ) } keys %fields );
+    ok(
+        $res = $issuer->_post(
+            $url,
+            IO::String->new($query),
+            accept => 'text/html',
+            cookie => $pdata,
+            length => length($query),
+        ),
+        'Post authentication request'
+    );
+    expectOK($res);
+    $idpId = expectCookie($res);
 
     # Expect pdata to be cleared
     $pdata = expectCookie( $res, 'lemonldappdata' );
@@ -115,7 +165,6 @@ SKIP: {
             $url, IO::String->new($query),
             accept => 'text/html',
             length => length($query),
-            cookie => 'lemonldapidp=http://auth.idp.com/saml/metadata',
         ),
         'Post SAML response to SP'
     );
@@ -162,6 +211,9 @@ SKIP: {
 qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     );
 
+    my $removedCookie = expectCookie($res);
+    is($removedCookie, 0, "IDP Cookie removed");
+
     # Send SAML response to SP
     switch ('sp');
     ok(
@@ -189,8 +241,7 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
         $res = $sp->_get(
             '/',
             accept => 'text/html',
-            cookie =>
-              "lemonldapidp=http://auth.idp.com/saml/metadata; lemonldap=$spId"
+            cookie => "lemonldap=$spId"
         ),
         'Test if user is reject on SP'
     );
@@ -217,6 +268,7 @@ sub issuer {
                 portal                 => 'http://auth.idp.com',
                 authentication         => 'Demo',
                 userDB                 => 'Same',
+                issuersTimeout         => 120,
                 issuerDBSAMLActivation => 1,
                 samlSPMetaDataOptions  => {
                     'sp.com' => {

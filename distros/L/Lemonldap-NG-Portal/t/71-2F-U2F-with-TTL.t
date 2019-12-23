@@ -18,8 +18,8 @@ SKIP: {
                 u2fSelfRegistration => 1,
                 u2fActivation       => 1,
                 portalMainLogo      => 'common/logos/logo_llng_old.png',
-                totp2fTTL           => 2,
-                u2fTTL              => 2,
+                totp2fTTL           => 120,
+                u2fTTL              => 120,
             }
         }
     );
@@ -198,8 +198,8 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         );
     }
 
-    diag 'Waiting';
-    sleep 3;
+    # Skipping time until second factor registration has expired
+    Time::Fake->offset("+5m");
 
     # Try to sign-in
     ok(

@@ -13,6 +13,7 @@ use strict;
 use warnings;
 use 5.22.0;
 use utf8;
+use open      qw(:std :encoding(UTF-8)); # undeclared streams in UTF-8
 
 use lib 'lib';
 
@@ -39,6 +40,11 @@ my %opt;
 GetOptions (\%opt, "from=s") or die("Error in command line arguments\n");
 
 die "Missing '-from' option " unless $opt{from};
+
+my ($systemd_version) = (`systemctl --version` =~ m/(\d+)/) ;
+die "Cannot find systemd version" unless $systemd_version;
+
+say "Parsing man pages of systemd $systemd_version";
 
 # make sure that Systemd model is created from scratch
 path('lib/Config/Model/models')->remove_tree;
@@ -91,7 +97,9 @@ sub parse_xml ($list, $map) {
     };
 
     my $variable = sub  ($t, $elt) {
-        return $condition_variable->($t, $elt) if $elt->first_child_text('term') =~ /^C<Condition/;
+        if ($systemd_version < 244 and $elt->first_child_text('term') =~ /^C<Condition/) {
+            return $condition_variable->($t, $elt);
+        }
 
         my @para_text = map {$_->text} $elt->first_child('listitem')->children('para');
         my $desc = join("\n\n", @para_text);
@@ -141,9 +149,13 @@ sub parse_xml ($list, $map) {
         twig_handlers => {
             'refsect1/title' => $parse_sub_title,
             'refsect1[string(title)=~ /Description/]/para' => $desc,
+            'refsect2/title' => $parse_sub_title,
+            # only found in systemd.unit (so far)
+            'refsect2[string(title)=~ /Conditions/]/para' => $desc,
             'citerefentry' => $manpage,
             'literal' => $turn_to_pod_c,
             'option' => $turn_to_pod_c,
+            'filename' => $turn_to_pod_c,
             'constant' => $turn_to_pod_c,
             # this also remove the indentation of programlisting
             # element,
@@ -156,6 +168,7 @@ sub parse_xml ($list, $map) {
             # below
             'varname' => $turn_to_pod_c,
             'refsect1/variablelist/varlistentry' => $variable,
+            'refsect2/variablelist/varlistentry' => $variable,
         }
     );
 
@@ -268,7 +281,7 @@ sub setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $sup
             @choices = extract_choices($choices);
         }
 
-        die "Error in $config_class: cannot find the values of $element enum type\n"
+        die "Error in $config_class: cannot find the values of $element enum type from «$desc»\n"
             unless @choices;
         push @log, "enum choices are '".join("', '", @choices)."'";
         push @load_extra, 'choice='.join(',',@choices);
@@ -300,14 +313,18 @@ sub setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $sup
 }
 
 sub extract_choices($choices) {
-    return $choices =~ /C<([\w\-+]+)>/g;
+    my @choices = ($choices =~ m!C<([/\w\-+]+)>!g );
+    if ($choices =~ m{possibly prefixed with (?:a )?C<([!\w]+)>} ) {
+        push @choices, map { "$1$_"} @choices;
+    }
+    return @choices;
 }
 
 sub move_deprecated_element ($meta_root, $from, $to) {
     say "Handling move of service/$from to unit/$to...";
     # create deprecated moved element in Service for backward compat
-    my $warn = $from eq $to ? "$from is now part of Unit. Migrating..."
-        : "service/$from is now Unit/$to. Migrating...";
+    my $warn = $from eq $to ? "$from is now part of Unit."
+        : "service/$from is now Unit/$to.";
     $meta_root->load( steps => [
         'class:Systemd::Section::Service',
         qq!element:$from type=leaf value_type=uniline status=deprecated!,
@@ -381,7 +398,7 @@ foreach my $config_class (keys $data->{class}->%*) {
     my $desc_ref = $data->{class}{$config_class};
 
     # cleanup leading white space and add formatting
-    my $desc_text = join("\n\n", map { s/\n[\t ]+/\n/g; s/C<([A-Z]\w+)=>/C<$1>/g; $_;} $desc_ref->@*);
+    my $desc_text = join("\n\n", map { s/\n[\t ]+/\n/gr =~ s/C<([A-Z]\w+)=>/C<$1>/gr;} $desc_ref->@*);
 
     $desc_text.="\nThis configuration class was generated from systemd documentation.\n"
         ."by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>\n";
@@ -389,9 +406,8 @@ foreach my $config_class (keys $data->{class}->%*) {
     my $steps = "class:$config_class class_description";
     $meta_root->grab(step => $steps, autoadd => 1)->store($desc_text);
 
-    # TODO: indicates systemd version
     $meta_root->load( steps => [
-        qq!class:$config_class generated_by="parse-man.pl from systemd doc"!,
+        qq!class:$config_class generated_by="parse-man.pl from systemd $systemd_version doc"!,
         qq!copyright:0="2010-2016 Lennart Poettering and others"!,
         qq!copyright:1="2016 Dominique Dumont"!,
         qq!license="LGPLv2.1+"!,
@@ -404,6 +420,7 @@ foreach my $cdata ($data->{element}->@*) {
 
     my $obj = setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $supersedes);
 
+    $desc =~ s/ +$//gm;
     $obj->fetch_element("description")->store($desc);
 }
 
@@ -500,7 +517,7 @@ say "Handling move of StartLimitInterval to StartLimitIntervalSec in unit";
 $meta_root->load( steps => [
     'class:Systemd::Section::Unit',
     qq!element:StartLimitInterval type=leaf value_type=uniline status=deprecated!,
-    qq!warn="StartLimitInterval is now StartLimitIntervalSec. Migrating..."!
+    qq!warn="StartLimitInterval is now StartLimitIntervalSec."!
 ]);
 
 # handle migration from both service and unit
@@ -516,7 +533,7 @@ say "Handling move of OnFailureIsolate to OnFailureJobMode in unit";
 $meta_root->load( steps => [
     'class:Systemd::Section::Unit',
     q!element:OnFailureIsolate type=leaf value_type=uniline status=deprecated!,
-    q!warn="OnFailureIsolate is now OnFailureJobMode. Migrating..." -!,
+    q!warn="OnFailureIsolate is now OnFailureJobMode." -!,
     q!element:OnFailureJobMode!,
     q!migrate_from variables:unit="- OnFailureIsolate"!,
     q!formula="$unit"!

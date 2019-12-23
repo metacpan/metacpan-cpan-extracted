@@ -4,7 +4,7 @@ use 5.022001;
 use strict;
 use warnings;
 
-our $VERSION = "1.0.12";
+our $VERSION = "1.0.13";
 
 # for reading in configs
 use File::Slurp;
@@ -528,6 +528,12 @@ __END__
 omnitool::installer - Install the OmniTool Web Application Framework
 
 Provides the 'omnitool_installer' script to install OmniTool on your system.
+
+=head1 END-OF-LIFE / DEPRECATION
+
+This system is no longer under active development. OmniTool should not be used for any new projects.
+
+This repo contains some interesting ideas and perhaps a few solutions, so this repo will remain online for archive purposes. If you are interested in taking over this project, please let me know.
 
 =head1 SYNOPSIS
 

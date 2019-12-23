@@ -3,7 +3,7 @@ package Lemonldap::NG::Portal::2F::Mail2F;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADCREDENTIALS
+  PE_BADOTP
   PE_ERROR
   PE_FORMEMPTY
   PE_OK
@@ -147,7 +147,7 @@ sub verify {
 
     $self->userLogger->warn( 'Second factor failed for '
           . $session->{ $self->conf->{whatToTrace} } );
-    return PE_BADCREDENTIALS;
+    return PE_BADOTP;
 }
 
 1;

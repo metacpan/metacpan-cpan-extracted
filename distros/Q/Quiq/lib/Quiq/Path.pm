@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -23,7 +23,6 @@ use Quiq::Unindent;
 use Fcntl qw/:DEFAULT/;
 use Quiq::Perl;
 use Quiq::DirHandle;
-use Quiq::Parameters;
 use File::Find ();
 use Quiq::TempDir;
 use Cwd ();
@@ -1290,7 +1289,7 @@ sub entries {
 
     my $encoding = 'utf-8';
 
-    my $argA = Quiq::Parameters->extractToVariables(\@_,1,1,
+    my $argA = $this->parameters(1,1,\@_,
         -encoding => \$encoding,
     );
     my $dir = shift @$argA;
@@ -3198,7 +3197,7 @@ sub uid {
 
 =head1 VERSION
 
-1.167
+1.168
 
 =head1 AUTHOR
 

@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN;
 
-our $DATE = '2019-10-20'; # DATE
-our $VERSION = '0.598'; # VERSION
+our $DATE = '2019-10-29'; # DATE
+our $VERSION = '0.599'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -34,7 +34,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN - Dist::Zilla like PERLANC
 
 =head1 VERSION
 
-This document describes version 0.598 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-10-20.
+This document describes version 0.599 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-10-29.
 
 =head1 SYNOPSIS
 

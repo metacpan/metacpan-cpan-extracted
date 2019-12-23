@@ -1,0 +1,13 @@
+1.0002 2019-12-15
+
+- FEATURE: Create greedy proxy URLs for Lambda functions
+
+1.0001 (internal release)
+
+- BUGFIX: Fix accidental line deletion (oops)
+- BUGFIX: Use the correct prebuilt public lambda layer in me-south-1
+- FEATURE: Add support for extra layers
+
+1.0000   2019-12-14
+
+- Initial release

@@ -81,23 +81,23 @@ my $xml_expect = <<EOF;
   </interface>
   <interface name="org.freedesktop.DBus.Introspectable">
     <method name="Introspect">
-      <arg type="s" direction="out"/>
+      <arg name="xml_data" type="s" direction="out"/>
     </method>
   </interface>
   <interface name="org.freedesktop.DBus.Properties">
     <method name="Get">
-      <arg type="s" direction="in"/>
-      <arg type="s" direction="in"/>
-      <arg type="v" direction="out"/>
+      <arg name="interface_name" type="s" direction="in"/>
+      <arg name="property_name" type="s" direction="in"/>
+      <arg name="value" type="v" direction="out"/>
     </method>
     <method name="GetAll">
-      <arg type="s" direction="in"/>
-      <arg type="a{sv}" direction="out"/>
+      <arg name="interface_name" type="s" direction="in"/>
+      <arg name="properties" type="a{sv}" direction="out"/>
     </method>
     <method name="Set">
-      <arg type="s" direction="in"/>
-      <arg type="s" direction="in"/>
-      <arg type="v" direction="in"/>
+      <arg name="interface_name" type="s" direction="in"/>
+      <arg name="property_name" type="s" direction="in"/>
+      <arg name="value" type="v" direction="in"/>
     </method>
   </interface>
 </node>

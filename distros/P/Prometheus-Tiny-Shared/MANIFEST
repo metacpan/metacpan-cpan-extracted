@@ -16,3 +16,6 @@ t/12-inc-dec.t
 t/15-labels.t
 t/16-labels-add.t
 t/20-declare.t
+t/30-psgi.t
+t/40-histogram.t
+t/900-regression.t

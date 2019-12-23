@@ -11,7 +11,7 @@ package IOas::CP932NEC;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 $VERSION = $VERSION;
 
 use strict;
@@ -43,7 +43,9 @@ my $io_encoding = lc((split /::/, $__package__)[-1]);
 
 sub _io_input ($) {
     my($s) = @_;
-    Jacode4e::RoundTrip::convert(\$s, 'utf8.1', $io_encoding);
+    if (defined $s) {
+        Jacode4e::RoundTrip::convert(\$s, 'utf8.1', $io_encoding);
+    }
     return $s;
 };
 

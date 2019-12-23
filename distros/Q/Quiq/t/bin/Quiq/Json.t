@@ -98,12 +98,12 @@ sub test_object : Test(6) {
         a => 1,
         b => 'xyz',
     );
-    $self->is($json,Quiq::Unindent->trim(q~
+    $self->isText("$json\n",q~
         {
             a: 1,
             b: 'xyz',
         }
-    ~));
+    ~);
 
     # Objekt (ohne Einrückung)
 
@@ -122,14 +122,14 @@ sub test_object : Test(6) {
             c => 2,
         ),
     );
-    $self->is($json,Quiq::Unindent->trim(q~
+    $self->isText("$json\n",q~
         {
             a: 1,
             b: {
                 c: 2,
             },
         }
-    ~));
+    ~);
 
     # Kompliziertere Struktur
 
@@ -144,7 +144,7 @@ sub test_object : Test(6) {
         ),
         min => undef,
     );
-    $self->is($json,Quiq::Unindent->trim(q~
+    $self->isText("$json\n",q~
         {
             pi: 3.14159,
             str: 'Hello world!',
@@ -156,7 +156,7 @@ sub test_object : Test(6) {
             },
             min: undefined,
         }
-    ~));
+    ~);
 
     my @dataSets;
     my $name = 'Windspeed';
@@ -238,7 +238,7 @@ sub test_object : Test(6) {
             ),
         ),
     );
-    $self->is($json,Quiq::Unindent->trim(q~
+    $self->isText("$json\n",q~
         {
             type: 'line',
             data: {
@@ -308,7 +308,7 @@ sub test_object : Test(6) {
                 },
             },
         }
-    ~));
+    ~);
 
     # Zusammenspiel ausprobieren
     #

@@ -7,7 +7,10 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-[
+use strict;
+use warnings;
+
+return [
   {
     'accept' => [
       '.*',
@@ -46,16 +49,24 @@ L<systemd.slice(5)>,
 L<systemd.scope(5)>.
 
 
-Unit files are loaded from a set of paths determined during
-compilation, described in the next section.
+Unit files are loaded from a set of paths determined during compilation, described in the next
+section.
 
-Unit files can be parameterized by a single argument called the \"instance name\". The unit
-is then constructed based on a \"template file\" which serves as the definition of multiple
-services or other units. A template unit must have a single C<\@> at the end of
-the name (right before the type suffix). The name of the full unit is formed by inserting the
-instance name between C<\@> and the unit type suffix. In the unit file itself,
-the instance parameter may be referred to using C<%i> and other specifiers, see
-below.
+Valid unit names consist of a \"name prefix\" and a dot and a suffix specifying the unit type. The
+\"unit prefix\" must consist of one or more valid characters (ASCII letters, digits, C<:>,
+C<->, C<_>, C<.>, and C<\\>). The total
+length of the unit name including the suffix must not exceed 256 characters. The type suffix must be one
+of C<.service>, C<.socket>, C<.device>,
+C<.mount>, C<.automount>, C<.swap>,
+C<.target>, C<.path>, C<.timer>,
+C<.slice>, or C<.scope>.
+
+Units names can be parameterized by a single argument called the \"instance name\". The unit is then
+constructed based on a \"template file\" which serves as the definition of multiple services or other
+units. A template unit must have a single C<\@> at the end of the name (right before the
+type suffix). The name of the full unit is formed by inserting the instance name between
+C<\@> and the unit type suffix. In the unit file itself, the instance parameter may be
+referred to using C<%i> and other specifiers, see below.
 
 Unit files may contain additional options on top of those
 listed here. If systemd encounters an unknown option, it will
@@ -65,37 +76,43 @@ ignored completely by systemd. Options within an ignored section
 do not need the prefix. Applications may use this to include
 additional information in the unit files.
 
-Units can be aliased (have an alternative name), by creating a symlink from the new name
-to the existing name in one of the unit search paths. For example,
-systemd-networkd.service has the alias
-dbus-org.freedesktop.network1.service, created during installation as the
-symlink /usr/lib/systemd/system/dbus-org.freedesktop.network1.service. In
-addition, unit files may specify aliases through the C<Alias> directive in the
-[Install] section; those aliases are only effective when the unit is enabled. When the unit is
-enabled, symlinks will be created for those names, and removed when the unit is disabled. For
-example, reboot.target specifies
-C<Alias=ctrl-alt-del.target>, so when enabled it will be invoked whenever
-CTRL+ALT+DEL is pressed. Alias names may be used in commands like enable,
-disable, start, stop,
-status, \x{2026}, and in unit dependency directives C<Wants>,
-C<Requires>, C<Before>, C<After>, \x{2026}, with the
-limitation that aliases specified through C<Alias> are only effective when the
-unit is enabled. Aliases cannot be used with the preset command.
+Units can be aliased (have an alternative name), by creating a symlink from the new name to the
+existing name in one of the unit search paths. For example, C<systemd-networkd.service>
+has the alias C<dbus-org.freedesktop.network1.service>, created during installation as
+a symlink, so when systemd is asked through D-Bus to load
+C<dbus-org.freedesktop.network1.service>, it'll load
+C<systemd-networkd.service>. Alias names may be used in commands like
+disable, start, stop, status,
+and similar, and in all unit dependency directives, including C<Wants>,
+C<Requires>, C<Before>, C<After>. Aliases cannot be
+used with the preset command.
 
-Along with a unit file foo.service, the directory
-foo.service.wants/ may exist. All unit files symlinked from such a
-directory are implicitly added as dependencies of type C<Wants> to the unit.
-This is useful to hook units into the start-up of other units, without having to modify their
-unit files. For details about the semantics of C<Wants>, see below. The
-preferred way to create symlinks in the .wants/ directory of a unit file is
-with the enable command of the
-L<systemctl(1)>
-tool which reads information from the [Install] section of unit files (see below). A similar
-functionality exists for C<Requires> type dependencies as well, the directory
-suffix is .requires/ in this case.
+Unit files may specify aliases through the C<Alias> directive in the [Install]
+section. When the unit is enabled, symlinks will be created for those names, and removed when the unit is
+disabled. For example, C<reboot.target> specifies
+C<Alias=ctrl-alt-del.target>, so when enabled, the symlink
+C</etc/systemd/systemd/ctrl-alt-del.service> pointing to the
+C<reboot.target> file will be created, and when
+CtrlAltDel is invoked,
+systemd will look for the C<ctrl-alt-del.service> and execute
+C<reboot.service>. systemd does not look at the [Install] section at
+all during normal operation, so any directives in that section only have an effect through the symlinks
+created during enablement.
 
-Along with a unit file foo.service, a \"drop-in\" directory
-foo.service.d/ may exist. All files with the suffix C<.conf> from this
+Along with a unit file C<foo.service>, the directory
+C<foo.service.wants/> may exist. All unit files symlinked from such a directory are
+implicitly added as dependencies of type C<Wants> to the unit. Similar functionality
+exists for C<Requires> type dependencies as well, the directory suffix is
+C<.requires/> in this case. This functionality is useful to hook units into the
+start-up of other units, without having to modify their unit files. For details about the semantics of
+C<Wants>, see below. The preferred way to create symlinks in the
+C<.wants/> or C<.requires/> directory of a unit file is by embedding
+the dependency in [Install] section of the target unit, and creating the symlink in the file system with
+the enable or preset commands of
+L<systemctl(1)>.
+
+Along with a unit file C<foo.service>, a \"drop-in\" directory
+C<foo.service.d/> may exist. All files with the suffix C<.conf> from this
 directory will be parsed after the unit file itself is parsed. This is useful to alter or add configuration
 settings for a unit, without having to modify unit files. Drop-in files must contain appropriate section
 headers. For instantiated units, this logic will first look for the instance C<.d/> subdirectory
@@ -103,22 +120,31 @@ headers. For instantiated units, this logic will first look for the instance C<.
 C<.d/> subdirectory (e.g. C<foo\@.service.d/>) and the C<.conf>
 files there. Moreover for units names containing dashes (C<->), the set of directories generated by
 truncating the unit name after all dashes is searched too. Specifically, for a unit name
-foo-bar-baz.service not only the regular drop-in directory
-foo-bar-baz.service.d/ is searched but also both foo-bar-.service.d/ and
-foo-.service.d/. This is useful for defining common drop-ins for a set of related units, whose
+C<foo-bar-baz.service> not only the regular drop-in directory
+C<foo-bar-baz.service.d/> is searched but also both C<foo-bar-.service.d/> and
+C<foo-.service.d/>. This is useful for defining common drop-ins for a set of related units, whose
 names begin with a common prefix. This scheme is particularly useful for mount, automount and slice units, whose
 systematic naming structure is built around dashes as component separators. Note that equally named drop-in files
 further down the prefix hierarchy override those further up,
-i.e. foo-bar-.service.d/10-override.conf overrides
-foo-.service.d/10-override.conf.
+i.e. C<foo-bar-.service.d/10-override.conf> overrides
+C<foo-.service.d/10-override.conf>.
 
-In addition to /etc/systemd/system, the drop-in C<.d/>
-directories for system services can be placed in /usr/lib/systemd/system or
-/run/systemd/system directories. Drop-in files in /etc
-take precedence over those in /run which in turn take precedence over those
-in /usr/lib. Drop-in files under any of these directories take precedence
+In addition to C</etc/systemd/system>, the drop-in C<.d/>
+directories for system services can be placed in C</usr/lib/systemd/system> or
+C</run/systemd/system> directories. Drop-in files in C</etc>
+take precedence over those in C</run> which in turn take precedence over those
+in C</usr/lib>. Drop-in files under any of these directories take precedence
 over unit files wherever located. Multiple drop-in files with different names are applied in
 lexicographic order, regardless of which of the directories they reside in.
+
+Units also support a top-level drop-in with C<type.d/>,
+where type may be e.g. C<service> or C<socket>,
+that allows altering or adding to the settings of all corresponding unit files on the system.
+The formatting and precedence of applying drop-in configurations follow what is defined above.
+Configurations in C<type.d/> have the lowest precedence
+compared to settings in the name specific override directories. So the contents of
+C<foo-.service.d/10-override.conf> would override
+C<service.d/10-override.conf>.
 
 Note that while systemd offers a flexible dependency system
 between units it is recommended to use this functionality only
@@ -132,8 +158,8 @@ file, it will first search for the literal unit name in the file system. If that
 success and the unit name contains an C<\@> character, systemd will look for a
 unit template that shares the same name but with the instance string (i.e. the part between the
 C<\@> character and the suffix) removed. Example: if a service
-getty\@tty3.service is requested and no file by that name is found, systemd
-will look for getty\@.service and instantiate a service from that
+C<getty\@tty3.service> is requested and no file by that name is found, systemd
+will look for C<getty\@.service> and instantiate a service from that
 configuration file if it is found.
 
 To refer to the instance string from within the
@@ -142,7 +168,7 @@ specifier in many of the configuration options. See below for
 details.
 
 If a unit file is empty (i.e. has the file size 0) or is
-symlinked to /dev/null, its configuration
+symlinked to C</dev/null>, its configuration
 will not be loaded and it appears with a load state of
 C<masked>, and cannot be activated. Use this as an
 effective way to fully disable a unit, making it impossible to
@@ -172,6 +198,42 @@ directories not on the unit load path. See the link command
 for
 L<systemctl(1)>.
 
+
+Unit files may also include a number of C<Condition\x{2026}=> and
+C<Assert\x{2026}=> settings. Before the unit is started, systemd will verify
+that the specified conditions are true. If not, the starting of the unit will be (mostly silently)
+skipped. Failing conditions will not result in the unit being moved into the C<failed>
+state. The conditions are checked at the time the queued start job is to be executed. The ordering
+dependencies are still respected, so other units are still pulled in and ordered as if this unit was
+successfully activated. Use condition expressions in order to skip units that do not apply to the local
+system, for example because the kernel or runtime environment doesn't require their functionality.
+
+
+If multiple conditions are specified, the unit will be executed if all of them apply (i.e. a
+logical AND is applied). Condition checks can use a pipe symbol (C<|>) after the equals
+sign (C<Condition\x{2026}=|\x{2026}>), which causes the condition becomes a triggering condition. If
+at least one triggering condition is defined for a unit, then the unit will be executed if at least one
+of the triggering conditions apply and all of the non-triggering conditions. If you prefix an argument
+with the pipe symbol and an exclamation mark, the pipe symbol must be passed first, the exclamation
+second. If any of these options is assigned the empty string, the list of conditions is reset
+completely, all previous condition settings (of any kind) will have no effect.
+
+The C<AssertArchitecture>, C<AssertVirtualization>, \x{2026} options
+provide a similar mechanism that causes the job to fail (instead of being skipped). The failed check is
+logged. Units with failed conditions are considered to be in a clean state and will be garbage
+collected if they are not referenced. This means that when queried, the condition failure may or may
+not show up in the state of the unit.
+
+Note that neither assertion nor condition expressions result in unit state changes. Also note
+that both are checked at the time the job is to be executed, i.e. long after depending jobs and it
+itself were queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing
+unit dependencies.
+
+The condition verb of
+L<systemd-analyze(1)> can
+be used to test condition and assert expressions.
+
+Except for C<ConditionPathIsSymbolicLink>, all path checks follow symlinks.
 This configuration class was generated from systemd documentation.
 by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>
 ",
@@ -193,7 +255,7 @@ description...>, C<Started
 description.>, C<Reached target
 description.>, C<Failed to start
 description.>), so it should be capitalized, and should
-not be a full sentence or a phrase with a continous verb. Bad examples include
+not be a full sentence or a phrase with a continuous verb. Bad examples include
 C<exiting the container> or C<updating the database once per
 day.>.',
         'type' => 'leaf',
@@ -222,25 +284,50 @@ and all prior assignments will have no
 effect.',
         'type' => 'list'
       },
+      'Wants',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Configures requirement dependencies on other units. This option may be specified more
+than once or multiple space-separated units may be specified in one option in which case dependencies
+for all listed names will be created. Dependencies of this type may also be configured outside of the
+unit configuration file by adding a symlink to a C<.wants/> directory accompanying
+the unit file. For details, see above.
+
+Units listed in this option will be started if the configuring unit is. However, if the listed
+units fail to start or cannot be added to the transaction, this has no impact on the validity of the
+transaction as a whole, and this unit will still be started. This is the recommended way to hook
+start-up of one unit to the start-up of another unit.
+
+Note that requirement dependencies do not influence the order in which services are started or
+stopped. This has to be configured independently with the C<After> or
+C<Before> options. If unit C<foo.service> pulls in unit
+C<bar.service> as configured with C<Wants> and no ordering is
+configured with C<After> or C<Before>, then both units will be
+started simultaneously and without any delay between them if C<foo.service> is
+activated.',
+        'type' => 'list'
+      },
       'Requires',
       {
         'cargo' => {
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Configures requirement dependencies on other units. If this unit gets activated, the units
-listed here will be activated as well. If one of the other units fails to activate, and an ordering dependency
-C<After> on the failing unit is set, this unit will not be started. Besides, with or without
-specifying C<After>, this unit will be stopped if one of the other units is explicitly
-stopped. This option may be specified more than once or multiple space-separated units may be
-specified in one option in which case requirement dependencies for all listed names will be created. Note that
-requirement dependencies do not influence the order in which services are started or stopped.  This has to be
-configured independently with the C<After> or C<Before> options. If a unit
-foo.service requires a unit bar.service as configured with
-C<Requires> and no ordering is configured with C<After> or
-C<Before>, then both units will be started simultaneously and without any delay between them
-if foo.service is activated. Often, it is a better choice to use C<Wants>
-instead of C<Requires> in order to achieve a system that is more robust when dealing with
+        'description' => "Similar to C<Wants>, but declares a stronger
+dependency. Dependencies of this type may also be configured by adding a symlink to a
+C<.requires/> directory accompanying the unit file.
+
+If this unit gets activated, the units listed will be activated as well. If one of
+the other units fails to activate, and an ordering dependency C<After> on the
+failing unit is set, this unit will not be started. Besides, with or without specifying
+C<After>, this unit will be stopped if one of the other units is explicitly
+stopped.
+
+Often, it is a better choice to use C<Wants> instead of
+C<Requires> in order to achieve a system that is more robust when dealing with
 failing services.
 
 Note that this dependency type does not imply that the other unit always has to be in active state when
@@ -250,11 +337,7 @@ C<Requires> dependency on it to fail. Also, some unit types may deactivate on th
 example, a service process may decide to exit cleanly, or a device may be unplugged by the user), which is not
 propagated to units having a C<Requires> dependency. Use the C<BindsTo>
 dependency type together with C<After> to ensure that a unit may never be in active state
-without a specific other unit also in active state (see below).
-
-Note that dependencies of this type may also be configured outside of the unit configuration file by
-adding a symlink to a .requires/ directory accompanying the unit file. For details, see
-above.",
+without a specific other unit also in active state (see below).",
         'type' => 'list'
       },
       'Requisite',
@@ -271,31 +354,10 @@ combined with C<After>, to ensure this unit is not started before the other
 unit.
 
 When C<Requisite=b.service> is used on
-a.service, this dependency will show as
+C<a.service>, this dependency will show as
 C<RequisiteOf=a.service> in property listing of
-b.service. C<RequisiteOf>
+C<b.service>. C<RequisiteOf>
 dependency cannot be specified directly.',
-        'type' => 'list'
-      },
-      'Wants',
-      {
-        'cargo' => {
-          'type' => 'leaf',
-          'value_type' => 'uniline'
-        },
-        'description' => 'A weaker version of
-C<Requires>. Units listed in this option will
-be started if the configuring unit is. However, if the listed
-units fail to start or cannot be added to the transaction,
-this has no impact on the validity of the transaction as a
-whole. This is the recommended way to hook start-up of one
-unit to the start-up of another unit.
-
-Note that dependencies of this type may also be
-configured outside of the unit configuration file by adding
-symlinks to a .wants/ directory
-accompanying the unit file. For details, see
-above.',
         'type' => 'list'
       },
       'BindsTo',
@@ -321,9 +383,9 @@ see below) will be stopped, should it be running. Hence, in many cases it is bes
 C<BindsTo> with C<After>.
 
 When C<BindsTo=b.service> is used on
-a.service, this dependency will show as
+C<a.service>, this dependency will show as
 C<BoundBy=a.service> in property listing of
-b.service. C<BoundBy>
+C<b.service>. C<BoundBy>
 dependency cannot be specified directly.",
         'type' => 'list'
       },
@@ -341,9 +403,9 @@ this is a one-way dependency\x{a0}\x{2014} changes to this unit do not
 affect the listed units.
 
 When C<PartOf=b.service> is used on
-a.service, this dependency will show as
+C<a.service>, this dependency will show as
 C<ConsistsOf=a.service> in property listing of
-b.service. C<ConsistsOf>
+C<b.service>. C<ConsistsOf>
 dependency cannot be specified directly.",
         'type' => 'list'
       },
@@ -353,15 +415,18 @@ dependency cannot be specified directly.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'A space-separated list of unit names.
-Configures negative requirement dependencies. If a unit has a
-C<Conflicts> setting on another unit,
-starting the former will stop the latter and vice versa. Note
-that this setting is independent of and orthogonal to the
-C<After> and C<Before>
-ordering dependencies.
+        'description' => 'A space-separated list of unit names. Configures negative requirement
+dependencies. If a unit has a C<Conflicts> setting on another unit, starting the
+former will stop the latter and vice versa.
 
-If a unit A that conflicts with a unit B is scheduled to
+Note that this setting does not imply an ordering dependency, similarly to the
+C<Wants> and C<Requires> dependencies described above. This means
+that to ensure that the conflicting unit is stopped before the other unit is started, an
+C<After> or C<Before> dependency must be declared. It doesn\'t
+matter which of the two ordering dependencies is used, because stop jobs are always ordered before
+start jobs, see the discussion in C<Before>/C<After> below.
+
+If unit A that conflicts with unit B is scheduled to
 be started at the same time as B, the transaction will either
 fail (in case both are required parts of the transaction) or be
 modified to be fixed (in case one or both jobs are not a
@@ -377,29 +442,36 @@ unit that is conflicted is stopped.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'These two settings expect a space-separated list of unit names. They configure ordering
-dependencies between units. If a unit foo.service contains a setting
-C<Before=bar.service> and both units are being started, bar.service\'s
-start-up is delayed until foo.service has finished starting up.  Note that this setting is
-independent of and orthogonal to the requirement dependencies as configured by C<Requires>,
-C<Wants> or C<BindsTo>. It is a common pattern to include a unit name in both
-the C<After> and C<Requires> options, in which case the unit listed will be
-started before the unit that is configured with these options. This option may be specified more than once, in
-which case ordering dependencies for all listed names are created. C<After> is the inverse of
-C<Before>, i.e. while C<After> ensures that the configured unit is started
-after the listed unit finished starting up, C<Before> ensures the opposite, that the
-configured unit is fully started up before the listed unit is started. Note that when two units with an
-ordering dependency between them are shut down, the inverse of the start-up order is applied. i.e. if a unit is
-configured with C<After> on another unit, the former is stopped before the latter if both are
-shut down. Given two units with any ordering dependency between them, if one unit is shut down and the other is
-started up, the shutdown is ordered before the start-up. It doesn\'t matter if the ordering dependency is
-C<After> or C<Before>, in this case. It also doesn\'t matter which of the two
-is shut down, as long as one is shut down and the other is started up. The shutdown is ordered before the
-start-up in all cases. If two units have no ordering dependencies between them, they are shut down or started
-up simultaneously, and no ordering takes place. It depends on the unit type when precisely a unit has finished
-starting up. Most importantly, for service units start-up is considered completed for the purpose of
-C<Before>/C<After> when all its configured start-up commands have been
-invoked and they either failed or reported start-up success.',
+        'description' => 'These two settings expect a space-separated list of unit names. They may be specified
+more than once, in which case dependencies for all listed names are created.
+
+Those two setttings configure ordering dependencies between units. If unit
+C<foo.service> contains the setting C<Before=bar.service> and both
+units are being started, C<bar.service>\'s start-up is delayed until
+C<foo.service> has finished starting up. C<After> is the inverse
+of C<Before>, i.e. while C<Before> ensures that the configured unit
+is started before the listed unit begins starting up, C<After> ensures the opposite,
+that the listed unit is fully started up before the configured unit is started.
+
+When two units with an ordering dependency between them are shut down, the inverse of the
+start-up order is applied. i.e. if a unit is configured with C<After> on another
+unit, the former is stopped before the latter if both are shut down. Given two units with any
+ordering dependency between them, if one unit is shut down and the other is started up, the shutdown
+is ordered before the start-up. It doesn\'t matter if the ordering dependency is
+C<After> or C<Before>, in this case. It also doesn\'t matter which
+of the two is shut down, as long as one is shut down and the other is started up; the shutdown is
+ordered before the start-up in all cases. If two units have no ordering dependencies between them,
+they are shut down or started up simultaneously, and no ordering takes place. It depends on the unit
+type when precisely a unit has finished starting up. Most importantly, for service units start-up is
+considered completed for the purpose of C<Before>/C<After> when all
+its configured start-up commands have been invoked and they either failed or reported start-up
+success.
+
+Note that those settings are independent of and orthogonal to the requirement dependencies as
+configured by C<Requires>, C<Wants>, C<Requisite>,
+or C<BindsTo>. It is a common pattern to include a unit name in both the
+C<After> and C<Wants> options, in which case the unit listed will
+be started before the unit that is configured with these options.',
         'type' => 'list'
       },
       'After',
@@ -408,29 +480,36 @@ invoked and they either failed or reported start-up success.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'These two settings expect a space-separated list of unit names. They configure ordering
-dependencies between units. If a unit foo.service contains a setting
-C<Before=bar.service> and both units are being started, bar.service\'s
-start-up is delayed until foo.service has finished starting up.  Note that this setting is
-independent of and orthogonal to the requirement dependencies as configured by C<Requires>,
-C<Wants> or C<BindsTo>. It is a common pattern to include a unit name in both
-the C<After> and C<Requires> options, in which case the unit listed will be
-started before the unit that is configured with these options. This option may be specified more than once, in
-which case ordering dependencies for all listed names are created. C<After> is the inverse of
-C<Before>, i.e. while C<After> ensures that the configured unit is started
-after the listed unit finished starting up, C<Before> ensures the opposite, that the
-configured unit is fully started up before the listed unit is started. Note that when two units with an
-ordering dependency between them are shut down, the inverse of the start-up order is applied. i.e. if a unit is
-configured with C<After> on another unit, the former is stopped before the latter if both are
-shut down. Given two units with any ordering dependency between them, if one unit is shut down and the other is
-started up, the shutdown is ordered before the start-up. It doesn\'t matter if the ordering dependency is
-C<After> or C<Before>, in this case. It also doesn\'t matter which of the two
-is shut down, as long as one is shut down and the other is started up. The shutdown is ordered before the
-start-up in all cases. If two units have no ordering dependencies between them, they are shut down or started
-up simultaneously, and no ordering takes place. It depends on the unit type when precisely a unit has finished
-starting up. Most importantly, for service units start-up is considered completed for the purpose of
-C<Before>/C<After> when all its configured start-up commands have been
-invoked and they either failed or reported start-up success.',
+        'description' => 'These two settings expect a space-separated list of unit names. They may be specified
+more than once, in which case dependencies for all listed names are created.
+
+Those two setttings configure ordering dependencies between units. If unit
+C<foo.service> contains the setting C<Before=bar.service> and both
+units are being started, C<bar.service>\'s start-up is delayed until
+C<foo.service> has finished starting up. C<After> is the inverse
+of C<Before>, i.e. while C<Before> ensures that the configured unit
+is started before the listed unit begins starting up, C<After> ensures the opposite,
+that the listed unit is fully started up before the configured unit is started.
+
+When two units with an ordering dependency between them are shut down, the inverse of the
+start-up order is applied. i.e. if a unit is configured with C<After> on another
+unit, the former is stopped before the latter if both are shut down. Given two units with any
+ordering dependency between them, if one unit is shut down and the other is started up, the shutdown
+is ordered before the start-up. It doesn\'t matter if the ordering dependency is
+C<After> or C<Before>, in this case. It also doesn\'t matter which
+of the two is shut down, as long as one is shut down and the other is started up; the shutdown is
+ordered before the start-up in all cases. If two units have no ordering dependencies between them,
+they are shut down or started up simultaneously, and no ordering takes place. It depends on the unit
+type when precisely a unit has finished starting up. Most importantly, for service units start-up is
+considered completed for the purpose of C<Before>/C<After> when all
+its configured start-up commands have been invoked and they either failed or reported start-up
+success.
+
+Note that those settings are independent of and orthogonal to the requirement dependencies as
+configured by C<Requires>, C<Wants>, C<Requisite>,
+or C<BindsTo>. It is a common pattern to include a unit name in both the
+C<After> and C<Wants> options, in which case the unit listed will
+be started before the unit that is configured with these options.',
         'type' => 'list'
       },
       'OnFailure',
@@ -469,23 +548,18 @@ settings.',
       },
       'JoinsNamespaceOf',
       {
-        'description' => 'For units that start processes (such as
-service units), lists one or more other units whose network
-and/or temporary file namespace to join. This only applies to
-unit types which support the
-C<PrivateNetwork> and
+        'description' => 'For units that start processes (such as service units), lists one or more other units
+whose network and/or temporary file namespace to join. This only applies to unit types which support
+the C<PrivateNetwork>, C<NetworkNamespacePath> and
 C<PrivateTmp> directives (see
-L<systemd.exec(5)>
-for details). If a unit that has this setting set is started,
-its processes will see the same /tmp,
-/var/tmp and network namespace as one
-listed unit that is started. If multiple listed units are
-already started, it is not defined which namespace is joined.
-Note that this setting only has an effect if
-C<PrivateNetwork> and/or
-C<PrivateTmp> is enabled for both the unit
-that joins the namespace and the unit whose namespace is
-joined.',
+L<systemd.exec(5)> for
+details). If a unit that has this setting set is started, its processes will see the same
+C</tmp>, C</var/tmp> and network namespace as one listed unit
+that is started. If multiple listed units are already started, it is not defined which namespace is
+joined.  Note that this setting only has an effect if
+C<PrivateNetwork>/C<NetworkNamespacePath> and/or
+C<PrivateTmp> is enabled for both the unit that joins the namespace and the unit
+whose namespace is joined.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -497,7 +571,7 @@ C<Requires> and C<After> for
 all mount units required to access the specified path.
 
 Mount points marked with C<noauto> are not
-mounted automatically through local-fs.target,
+mounted automatically through C<local-fs.target>,
 but are still honored for the purposes of this option, i.e. they
 will be pulled in by this unit.',
         'type' => 'leaf',
@@ -620,7 +694,7 @@ C<false>.',
       'DefaultDependencies',
       {
         'description' => 'Takes a boolean argument. If
-C<true>, (the default), a few default
+C<yes>, (the default), a few default
 dependencies will implicitly be created for the unit. The
 actual dependencies created depend on the unit type. For
 example, for service units, these dependencies ensure that the
@@ -628,9 +702,9 @@ service is started only after basic system initialization is
 completed and is properly terminated on system shutdown. See
 the respective man pages for details. Generally, only services
 involved with early boot or late shutdown should set this
-option to C<false>. It is highly recommended to
+option to C<no>. It is highly recommended to
 leave this option enabled for the majority of common units. If
-set to C<false>, this option does not disable
+set to C<no>, this option does not disable
 all implicit dependencies, just non-essential
 ones.',
         'type' => 'leaf',
@@ -757,6 +831,17 @@ the start will not be permitted. Defaults to C<none>.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
+      'SourcePath',
+      {
+        'description' => 'A path to a configuration file this unit has
+been generated from. This is primarily useful for
+implementation of generator tools that convert configuration
+from an external configuration file format into native unit
+files. This functionality should not be used in normal
+units.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'ConditionArchitecture',
       {
         'cargo' => {
@@ -789,24 +874,13 @@ the start will not be permitted. Defaults to C<none>.',
             'tilegx',
             'cris',
             'arc',
-            'arc-be'
+            'arc-be',
+            'native'
           ],
           'type' => 'leaf',
           'value_type' => 'enum'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionArchitecture=> may be used to
-check whether the system is running on a specific
-architecture. Takes one of
+        'description' => 'Check whether the system is running on a specific architecture. Takes one of
 C<x86>,
 C<x86-64>,
 C<ppc>,
@@ -835,33 +909,17 @@ C<m68k>,
 C<tilegx>,
 C<cris>,
 C<arc>,
-C<arc-be> to test
-against a specific architecture. The architecture is
-determined from the information returned by
+C<arc-be>, or
+C<native>.
+
+The architecture is determined from the information returned by
 L<uname(2)>
 and is thus subject to
 L<personality(2)>.
-Note that a C<Personality=> setting in the
-same unit file has no effect on this condition. A special
-architecture name C<native> is mapped to the
-architecture the system manager itself is compiled for. The
-test may be negated by prepending an exclamation mark.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+Note that a C<Personality> setting in the same unit file has no effect on this
+condition. A special architecture name C<native> is mapped to the architecture the
+system manager itself is compiled for. The test may be negated by prepending an exclamation
+mark.',
         'type' => 'list'
       },
       'ConditionVirtualization',
@@ -870,24 +928,11 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionVirtualization=> may be used
-to check whether the system is executed in a virtualized
-environment and optionally test whether it is a specific
-implementation. Takes either boolean value to check if being
-executed in any virtualized environment, or one of
+        'description' => 'Check whether the system is executed in a virtualized environment and optionally
+test whether it is a specific implementation. Takes either boolean value to check if being executed
+in any virtualized environment, or one of
 C<vm> and
-C<container> to test against a generic type of
-virtualization solution, or one of
+C<container> to test against a generic type of virtualization solution, or one of
 C<qemu>,
 C<kvm>,
 C<zvm>,
@@ -904,30 +949,16 @@ C<lxc>,
 C<lxc-libvirt>,
 C<systemd-nspawn>,
 C<docker>,
-C<rkt> to test
+C<podman>,
+C<rkt>,
+C<wsl>,
+C<acrn> to test
 against a specific implementation, or
 C<private-users> to check whether we are running in a user namespace. See
 L<systemd-detect-virt(1)>
-for a full list of known virtualization technologies and their
-identifiers. If multiple virtualization technologies are
-nested, only the innermost is considered. The test may be
-negated by prepending an exclamation mark.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+for a full list of known virtualization technologies and their identifiers. If multiple
+virtualization technologies are nested, only the innermost is considered. The test may be negated
+by prepending an exclamation mark.',
         'type' => 'list'
       },
       'ConditionHost',
@@ -936,42 +967,13 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionHost=> may be used to match
-against the hostname or machine ID of the host. This either
-takes a hostname string (optionally with shell style globs)
-which is tested against the locally set hostname as returned
-by
-L<gethostname(2)>,
-or a machine ID formatted as string (see
+        'description' => 'C<ConditionHost> may be used to match against the hostname or
+machine ID of the host. This either takes a hostname string (optionally with shell style globs)
+which is tested against the locally set hostname as returned by
+L<gethostname(2)>, or
+a machine ID formatted as string (see
 L<machine-id(5)>).
-The test may be negated by prepending an exclamation
-mark.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+The test may be negated by prepending an exclamation mark.',
         'type' => 'list'
       },
       'ConditionKernelCommandLine',
@@ -980,41 +982,12 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionKernelCommandLine=> may be
-used to check whether a specific kernel command line option is
-set (or if prefixed with the exclamation mark unset). The
-argument must either be a single word, or an assignment (i.e.
-two words, separated C<=>). In the former case
-the kernel command line is searched for the word appearing as
-is, or as left hand side of an assignment. In the latter case,
-the exact assignment is looked for with right and left hand
-side matching.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => "C<ConditionKernelCommandLine> may be used to check whether a
+specific kernel command line option is set (or if prefixed with the exclamation mark \x{2014} unset). The
+argument must either be a single word, or an assignment (i.e. two words, separated by
+C<=>). In the former case the kernel command line is searched for the word
+appearing as is, or as left hand side of an assignment. In the latter case, the exact assignment is
+looked for with right and left hand side matching.",
         'type' => 'list'
       },
       'ConditionKernelVersion',
@@ -1023,37 +996,19 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
+        'description' => 'C<ConditionKernelVersion> may be used to check whether the kernel
+version (as reported by uname -r) matches a certain expression (or if prefixed
+with the exclamation mark does not match it). The argument must be a list of (potentially quoted)
+expressions.  For each of the expressions, if it starts with one of C<<>,
+C<<=>, C<=>, C<!=>, C<>=>,
+C<>> a relative version comparison is done, otherwise the specified string is
+matched with shell-style globs.
 
-C<ConditionKernelVersion=> may be used to check whether the kernel version (as reported
-by uname -r) matches a certain expression (or if prefixed with the exclamation mark does not
-match it). The argument must be a single string. If the string starts with one of C<<>,
-C<<=>, C<=>, C<>=>, C<>> a relative
-version comparison is done, otherwise the specified string is matched with shell-style globs.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+Note that using the kernel version string is an unreliable way to determine which features
+are supported by a kernel, because of the widespread practice of backporting drivers, features, and
+fixes from newer upstream kernels into older versions provided by distributions. Hence, this check
+is inherently unportable and should not be used for units which may be used on different
+distributions.',
         'type' => 'list'
       },
       'ConditionSecurity',
@@ -1062,40 +1017,12 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionSecurity=> may be used to check
-whether the given security technology is enabled on the
-system. Currently, the recognized values are
-C<selinux>, C<apparmor>,
-C<tomoyo>, C<ima>,
-C<smack>, C<audit> and
-C<uefi-secureboot>. The test may be negated by
-prepending an exclamation mark.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'C<ConditionSecurity> may be used to check whether the given
+security technology is enabled on the system. Currently, the recognized values are
+C<selinux>, C<apparmor>, C<tomoyo>,
+C<ima>, C<smack>, C<audit> and
+C<uefi-secureboot>. The test may be negated by prepending an exclamation
+mark.',
         'type' => 'list'
       },
       'ConditionCapability',
@@ -1104,41 +1031,12 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionCapability=> may be used to
-check whether the given capability exists in the capability
-bounding set of the service manager (i.e. this does not check
-whether capability is actually available in the permitted or
-effective sets, see
+        'description' => 'Check whether the given capability exists in the capability bounding set of the
+service manager (i.e. this does not check whether capability is actually available in the permitted
+or effective sets, see
 L<capabilities(7)>
-for details). Pass a capability name such as
-C<CAP_MKNOD>, possibly prefixed with an
-exclamation mark to negate the check.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+for details). Pass a capability name such as C<CAP_MKNOD>, possibly prefixed with
+an exclamation mark to negate the check.',
         'type' => 'list'
       },
       'ConditionACPower',
@@ -1147,131 +1045,54 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionACPower=> may be used to
-check whether the system has AC power, or is exclusively
-battery powered at the time of activation of the unit. This
-takes a boolean argument. If set to C<true>,
-the condition will hold only if at least one AC connector of
-the system is connected to a power source, or if no AC
-connectors are known. Conversely, if set to
-C<false>, the condition will hold only if
-there is at least one AC connector known and all AC connectors
-are disconnected from a power source.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'Check whether the system has AC power, or is exclusively battery powered at the
+time of activation of the unit. This takes a boolean argument. If set to C<true>,
+the condition will hold only if at least one AC connector of the system is connected to a power
+source, or if no AC connectors are known. Conversely, if set to C<false>, the
+condition will hold only if there is at least one AC connector known and all AC connectors are
+disconnected from a power source.',
         'type' => 'list'
       },
       'ConditionNeedsUpdate',
       {
         'cargo' => {
+          'choice' => [
+            '/var',
+            '/etc',
+            '!/var',
+            '!/etc'
+          ],
           'type' => 'leaf',
-          'value_type' => 'uniline'
+          'value_type' => 'enum'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionNeedsUpdate=> takes one of
-/var or /etc as
-argument, possibly prefixed with a C<!> (for
-inverting the condition). This condition may be used to
-conditionalize units on whether the specified directory
-requires an update because /usr's
-modification time is newer than the stamp file
-.updated in the specified directory. This
-is useful to implement offline updates of the vendor operating
-system resources in /usr that require
-updating of /etc or
-/var on the next following boot. Units
-making use of this condition should order themselves before
+        'description' => 'Takes one of C</var> or C</etc> as argument,
+possibly prefixed with a C<!> (to inverting the condition). This condition may be
+used to conditionalize units on whether the specified directory requires an update because
+C</usr>\'s modification time is newer than the stamp file
+C<.updated> in the specified directory. This is useful to implement offline
+updates of the vendor operating system resources in C</usr> that require updating
+of C</etc> or C</var> on the next following boot. Units making
+use of this condition should order themselves before
 L<systemd-update-done.service(8)>,
-to make sure they run before the stamp file's modification
-time gets reset indicating a completed update.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+to make sure they run before the stamp file\'s modification time gets reset indicating a completed
+update.',
         'type' => 'list'
       },
       'ConditionFirstBoot',
       {
         'cargo' => {
           'type' => 'leaf',
-          'value_type' => 'uniline'
+          'value_type' => 'boolean',
+          'write_as' => [
+            'no',
+            'yes'
+          ]
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionFirstBoot=> takes a boolean argument. This condition may be used to
-conditionalize units on whether the system is booting up with an unpopulated /etc
-directory (specifically: an /etc with no /etc/machine-id). This may
-be used to populate /etc on the first boot after factory reset, or when a new system
-instance boots up for the first time.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'Takes a boolean argument. This condition may be used to conditionalize units on
+whether the system is booting up with an unpopulated C</etc> directory
+(specifically: an C</etc> with no C</etc/machine-id>). This may
+be used to populate C</etc> on the first boot after factory reset, or when a new
+system instance boots up for the first time.',
         'type' => 'list'
       },
       'ConditionPathExists',
@@ -1280,40 +1101,11 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-With C<ConditionPathExists=> a file
-existence condition is checked before a unit is started. If
-the specified absolute path name does not exist, the condition
-will fail. If the absolute path name passed to
-C<ConditionPathExists=> is prefixed with an
-exclamation mark (C<!>), the test is negated,
-and the unit is only started if the path does not
-exist.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'Check for the exists of a file. If the specified absolute path name does not exist,
+the condition will fail. If the absolute path name passed to
+C<ConditionPathExists> is prefixed with an exclamation mark
+(C<!>), the test is negated, and the unit is only started if the path does not
+exist.',
         'type' => 'list'
       },
       'ConditionPathExistsGlob',
@@ -1322,36 +1114,9 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionPathExistsGlob=> is similar
-to C<ConditionPathExists=>, but checks for the
-existence of at least one file or directory matching the
-specified globbing pattern.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'C<ConditionPathExistsGlob> is similar to
+C<ConditionPathExists>, but checks for the existence of at least one file or
+directory matching the specified globbing pattern.',
         'type' => 'list'
       },
       'ConditionPathIsDirectory',
@@ -1360,35 +1125,9 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionPathIsDirectory=> is similar
-to C<ConditionPathExists=> but verifies
-whether a certain path exists and is a directory.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'C<ConditionPathIsDirectory> is similar to
+C<ConditionPathExists> but verifies that a certain path exists and is a
+directory.',
         'type' => 'list'
       },
       'ConditionPathIsSymbolicLink',
@@ -1397,36 +1136,9 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionPathIsSymbolicLink=> is
-similar to C<ConditionPathExists=> but
-verifies whether a certain path exists and is a symbolic
-link.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'C<ConditionPathIsSymbolicLink> is similar to
+C<ConditionPathExists> but verifies that a certain path exists and is a symbolic
+link.',
         'type' => 'list'
       },
       'ConditionPathIsMountPoint',
@@ -1435,35 +1147,9 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionPathIsMountPoint=> is similar
-to C<ConditionPathExists=> but verifies
-whether a certain path exists and is a mount point.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'C<ConditionPathIsMountPoint> is similar to
+C<ConditionPathExists> but verifies that a certain path exists and is a mount
+point.',
         'type' => 'list'
       },
       'ConditionPathIsReadWrite',
@@ -1472,36 +1158,9 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionPathIsReadWrite=> is similar
-to C<ConditionPathExists=> but verifies
-whether the underlying file system is readable and writable
-(i.e. not mounted read-only).
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'C<ConditionPathIsReadWrite> is similar to
+C<ConditionPathExists> but verifies that the underlying file system is readable
+and writable (i.e. not mounted read-only).',
         'type' => 'list'
       },
       'ConditionDirectoryNotEmpty',
@@ -1510,36 +1169,9 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionDirectoryNotEmpty=> is
-similar to C<ConditionPathExists=> but
-verifies whether a certain path exists and is a non-empty
-directory.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'C<ConditionDirectoryNotEmpty> is similar to
+C<ConditionPathExists> but verifies that a certain path exists and is a non-empty
+directory.',
         'type' => 'list'
       },
       'ConditionFileNotEmpty',
@@ -1548,36 +1180,9 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionFileNotEmpty=> is similar to
-C<ConditionPathExists=> but verifies whether a
-certain path exists and refers to a regular file with a
-non-zero size.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'C<ConditionFileNotEmpty> is similar to
+C<ConditionPathExists> but verifies that a certain path exists and refers to a
+regular file with a non-zero size.',
         'type' => 'list'
       },
       'ConditionFileIsExecutable',
@@ -1586,36 +1191,9 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionFileIsExecutable=> is similar
-to C<ConditionPathExists=> but verifies
-whether a certain path exists, is a regular file and marked
-executable.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'C<ConditionFileIsExecutable> is similar to
+C<ConditionPathExists> but verifies that a certain path exists, is a regular file,
+and marked executable.',
         'type' => 'list'
       },
       'ConditionUser',
@@ -1624,40 +1202,12 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionUser=> takes a numeric
-C<UID>, a UNIX user name, or the special value
-C<\@system>. This condition may be used to check
-whether the service manager is running as the given user. The
-special value C<\@system> can be used to check
-if the user id is within the system user range. This option is not
-useful for system services, as the system manager exclusively
-runs as the root user, and thus the test result is constant.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'C<ConditionUser> takes a numeric C<UID>, a UNIX
+user name, or the special value C<@system>. This condition may be used to check
+whether the service manager is running as the given user. The special value
+C<@system> can be used to check if the user id is within the system user
+range. This option is not useful for system services, as the system manager exclusively runs as the
+root user, and thus the test result is constant.',
         'type' => 'list'
       },
       'ConditionGroup',
@@ -1666,37 +1216,10 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionGroup=> is similar
-to C<ConditionUser=> but verifies that the
-service manager's real or effective group, or any of its
-auxiliary groups match the specified group or GID. This setting
-does not have a special value C<\@system>.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'C<ConditionGroup> is similar to C<ConditionUser>
+but verifies that the service manager\'s real or effective group, or any of its auxiliary groups,
+match the specified group or GID. This setting does not support the special value
+C<@system>.',
         'type' => 'list'
       },
       'ConditionControlGroupController',
@@ -1705,449 +1228,352 @@ effect.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Before starting a unit, verify that the specified condition is true. If it is not true, the
-starting of the unit will be (mostly silently) skipped, however all ordering dependencies of it are still
-respected. A failing condition will not result in the unit being moved into the C<failed>
-state. The condition is checked at the time the queued start job is to be executed. Use condition expressions
-in order to silently skip units that do not apply to the local running system, for example because the kernel
-or runtime environment doesn't require their functionality. Use the various
-C<AssertArchitecture=>, C<AssertVirtualization=>, \x{2026} options for a similar
-mechanism that causes the job to fail (instead of being skipped) and results in logging about the failed check
-(instead of being silently processed). For details about assertion conditions see below.
-
-C<ConditionControlGroupController=> takes a
-cgroup controller name (eg. C<cpu>), verifying that it is
-available for use on the system. For example, a particular controller
-may not be available if it was disabled on the kernel command line with
-C<cgroup_disable=controller>. Multiple controllers may
-be passed with a space separating them; in this case the condition will
-only pass if all listed controllers are available for use. Controllers
-unknown to systemd are ignored. Valid controllers are
-C<cpu>, C<cpuacct>, C<io>,
-C<blkio>, C<memory>,
-C<devices>, and C<pids>.
-
-If multiple conditions are specified, the unit will be
-executed if all of them apply (i.e. a logical AND is applied).
-Condition checks can be prefixed with a pipe symbol (|) in
-which case a condition becomes a triggering condition. If at
-least one triggering condition is defined for a unit, then the
-unit will be executed if at least one of the triggering
-conditions apply and all of the non-triggering conditions. If
-you prefix an argument with the pipe symbol and an exclamation
-mark, the pipe symbol must be passed first, the exclamation
-second. Except for
-C<ConditionPathIsSymbolicLink=>, all path
-checks follow symlinks. If any of these options is assigned
-the empty string, the list of conditions is reset completely,
-all previous condition settings (of any kind) will have no
-effect.",
+        'description' => 'Verify that the given cgroup controller (eg. C<cpu>) is available
+for use on the system. For example, a particular controller may not be available if it was disabled
+on the kernel command line with C<cgroup_disable=controller>. Multiple controllers
+may be passed with a space separating them; in this case the condition will only pass if all listed
+controllers are available for use. Controllers unknown to systemd are ignored. Valid controllers
+are C<cpu>, C<cpuacct>, C<io>,
+C<blkio>, C<memory>, C<devices>, and
+C<pids>.',
+        'type' => 'list'
+      },
+      'ConditionMemory',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Verify that the specified amount of system memory is available to the current
+system. Takes a memory size in bytes as argument, optionally prefixed with a comparison operator
+C<<>, C<<=>, C<=>, C<!=>,
+C<>=>, C<>>. On bare-metal systems compares the amount of
+physical memory in the system with the specified size, adhering to the specified comparison
+operator. In containers compares the amount of memory assigned to the container instead.',
+        'type' => 'list'
+      },
+      'ConditionCPUs',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Verify that the specified number of CPUs is available to the current system. Takes
+a number of CPUs as argument, optionally prefixed with a comparison operator
+C<<>, C<<=>, C<=>, C<!=>,
+C<>=>, C<>>. Compares the number of CPUs in the CPU affinity
+mask configured of the service manager itself with the specified number, adhering to the specified
+comparison operator. On physical systems the number of CPUs in the affinity mask of the service
+manager usually matches the number of physical CPUs, but in special and virtual environments might
+differ. In particular, in containers the affinity mask usually matches the number of CPUs assigned
+to the container and not the physically available ones.',
         'type' => 'list'
       },
       'AssertArchitecture',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertVirtualization',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertHost',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertKernelCommandLine',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertKernelVersion',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertSecurity',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertCapability',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertACPower',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertNeedsUpdate',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertFirstBoot',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertPathExists',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertPathExistsGlob',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertPathIsDirectory',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertPathIsSymbolicLink',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertPathIsMountPoint',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertPathIsReadWrite',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertDirectoryNotEmpty',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertFileNotEmpty',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertFileIsExecutable',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertUser',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertGroup',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'AssertControlGroupController',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
-C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings add
-assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
-that is not met results in failure of the start job (which means this is logged loudly). Note that hitting a
-configured assertion does not cause the unit to enter the C<failed> state (or in fact result in
-any state change of the unit), it affects only the job queued for it. Use assertion expressions for units that
-cannot operate when specific requirements are not met, and when this is something the administrator or user
-should look into.
-
-Note that neither assertion nor condition expressions result in unit state changes. Also note that both
-are checked at the time the job is to be executed, i.e. long after depending jobs and it itself were
-queued. Thus, neither condition nor assertion expressions are suitable for conditionalizing unit
-dependencies.",
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'SourcePath',
-      {
-        'description' => 'A path to a configuration file this unit has
-been generated from. This is primarily useful for
-implementation of generator tools that convert configuration
-from an external configuration file format into native unit
-files. This functionality should not be used in normal
-units.',
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -2156,17 +1582,17 @@ units.',
         'status' => 'deprecated',
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'StartLimitInterval is now StartLimitIntervalSec. Migrating...'
+        'warn' => 'StartLimitInterval is now StartLimitIntervalSec.'
       },
       'OnFailureIsolate',
       {
         'status' => 'deprecated',
         'type' => 'leaf',
         'value_type' => 'uniline',
-        'warn' => 'OnFailureIsolate is now OnFailureJobMode. Migrating...'
+        'warn' => 'OnFailureIsolate is now OnFailureJobMode.'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd doc',
+    'generated_by' => 'parse-man.pl from systemd 244 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Unit'
   }

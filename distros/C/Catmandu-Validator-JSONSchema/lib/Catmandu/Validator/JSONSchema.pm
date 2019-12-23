@@ -4,7 +4,7 @@ use Moo;
 use Catmandu::Util qw(:is :check);
 use JSON::Validator;
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 with qw(Catmandu::Validator);
 
@@ -35,7 +35,8 @@ sub validate_data {
             map {
                 +{
                     property => $_->path(),
-                    message => $_->message()
+                    message => $_->message(),
+                    details => $_->details()
                 };
             } @result
         ];

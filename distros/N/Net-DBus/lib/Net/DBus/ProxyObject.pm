@@ -197,7 +197,16 @@ sub _dispatch_object {
 	my @ret = eval {
 	    my @args;
 	    if ($ins) {
+		if (defined $interface and not $ins->has_interface($interface)) {
+		    die Net::DBus::Error->new(name => 'org.freedesktop.DBus.Error.UnknownMethod',
+			message => "object does not provide interface '$interface'");
+		}
 		@args = $ins->decode($message, "methods", $method_name, "params");
+		($interface) = $ins->has_method($method_name) unless defined $interface;
+		if (defined $interface && scalar @args != scalar $ins->get_method_params($interface, $method_name)) {
+		    die Net::DBus::Error->new(name => 'org.freedesktop.DBus.Error.Failed',
+			message => "incorrect number of parameters for method '$method_name' in interface '$interface'");
+		}
 	    } else {
 		@args = $message->get_args_list;
 	    }

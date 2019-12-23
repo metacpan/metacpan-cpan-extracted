@@ -1,7 +1,13 @@
-DESCRIPTION
+NAME
+    Complete::Tcsh - Completion module for tcsh shell
 
-    tcsh allows completion to come from various sources. One of the
-    simplest is from a list of words:
+VERSION
+    This document describes version 0.030 of Complete::Tcsh (from Perl
+    distribution Complete-Tcsh), released on 2019-12-20.
+
+DESCRIPTION
+    tcsh allows completion to come from various sources. One of the simplest
+    is from a list of words:
 
      % complete CMDNAME 'p/*/(one two three)/'
 
@@ -9,20 +15,20 @@ DESCRIPTION
 
      % complete CMDNAME 'p/*/`mycompleter --somearg`/'
 
-    The command receives one environment variables COMMAND_LINE (string,
+    The command receives one environment variables "COMMAND_LINE" (string,
     raw command-line). Unlike bash, tcsh does not (yet) provide something
-    akin to COMP_POINT in bash. Command is expected to print completion
+    akin to "COMP_POINT" in bash. Command is expected to print completion
     entries, one line at a time.
 
-     % cat mycompleter
+     % cat foo-complete
      #!/usr/bin/perl
      use Complete::Tcsh qw(parse_cmdline format_completion);
      use Complete::Util qw(complete_array_elem);
-     my ($words, $cword) = parse_cmdline();
+     my ($words, $cword) = @{ parse_cmdline() };
      my $res = complete_array_elem(array=>[qw/--help --verbose --version/], word=>$words->[$cword]);
      print format_completion($res);
-    
-     % complete -C foo-complete foo
+
+     % complete foo 'p/*/`foo-complete`/'
      % foo --v<Tab>
      --verbose --version
 
@@ -31,11 +37,91 @@ DESCRIPTION
     Also, unlike bash, currently tcsh does not allow delegating completion
     to a shell function.
 
-SEE ALSO
+FUNCTIONS
+  format_completion
+    Usage:
 
+     format_completion($completion) -> str|array
+
+    Format completion for output (for shell).
+
+    tcsh accepts completion reply in the form of one entry per line to
+    STDOUT. Currently the formatting is done using "Complete::Bash"'s
+    "format_completion" because escaping rule and so on are not yet well
+    defined in tcsh.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $completion* => *hash|array*
+
+        Completion answer structure.
+
+        Either an array or hash, as described in "Complete".
+
+    Return value: Formatted string (or array, if `as` is set to `array`)
+    (str|array)
+
+  parse_cmdline
+    Usage:
+
+     parse_cmdline($cmdline) -> array
+
+    Parse shell command-line for processing by completion routines.
+
+    This function converts COMMAND_LINE (str) given by tcsh to become
+    something like COMP_WORDS (array) and COMP_CWORD (int), like what bash
+    supplies to shell functions. Currently implemented using
+    "Complete::Bash"'s "parse_cmdline".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $cmdline => *str*
+
+        Command-line, defaults to COMMAND_LINE environment.
+
+    Return value: (array)
+
+    Return a 2-element array: "[$words, $cword]". $words is array of str,
+    equivalent to "COMP_WORDS" provided by bash to shell functions. $cword
+    is an integer, equivalent to "COMP_CWORD" provided by bash to shell
+    functions. The word to be completed is at "$words->[$cword]".
+
+    Note that COMP_LINE includes the command name. If you want the
+    command-line arguments only (like in @ARGV), you need to strip the first
+    element from $words and reduce $cword by 1.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Tcsh>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Tcsh>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Tcsh>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Complete
 
     Complete::Bash
 
     tcsh manual.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

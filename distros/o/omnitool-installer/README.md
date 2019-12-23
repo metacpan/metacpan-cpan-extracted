@@ -4,6 +4,12 @@ omnitool::installer - Install the OmniTool Web Application Framework
 
 Provides the 'omnitool\_installer' script to install OmniTool on your system.
 
+# END-OF-LIFE / DEPRECATION
+
+This system is no longer under active development. OmniTool should not be used for any new projects.
+
+This repo contains some interesting ideas and perhaps a few solutions, so this repo will remain online for archive purposes. If you are interested in taking over this project, please let me know.
+
 # SYNOPSIS
 
     # To provide installation details interactively then install:

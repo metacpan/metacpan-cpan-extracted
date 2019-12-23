@@ -63,7 +63,7 @@
          "url" : "https://github.com/Humanstate/net-amqp-rabbitmq"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_repository" : {
       "type" : "git",
       "url" : "https://github.com/Humanstate/net-amqp-rabbitmq.git",

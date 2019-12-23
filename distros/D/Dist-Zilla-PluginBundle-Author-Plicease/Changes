@@ -1,6 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.39      2019-12-18 05:39:21 -0700
+  - Switch to gfm for README.md since the readme is only
+    intended for use from GitHub.  Also the regular Markdown
+    module is now escaping URIs which I don't want for the
+    README.md files.
+
 2.38      2019-08-15 19:08:36 -0400
+  - Require plicease plugin 2.38
 
 2.37      2019-07-18 11:59:10 -0400
   - Require plicease plugin 2.37

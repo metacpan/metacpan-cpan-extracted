@@ -4,7 +4,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 =head1 NAME
 
@@ -74,6 +74,7 @@ sub best_implementation( $class, @candidates ) {
     };
 
     # This will crash and burn, but that's how it is
+    eval "require $default; 1";
     return $default;
 };
 
