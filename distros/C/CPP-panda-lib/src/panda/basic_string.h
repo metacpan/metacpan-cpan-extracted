@@ -262,17 +262,24 @@ public:
         using iterator_category = std::random_access_iterator_tag;
         using const_iterator    = typename basic_string::const_iterator;
 
-        iterator (basic_string& string, size_type pos): _string(string), _pos(pos) {}
+        iterator (basic_string& string, size_type pos): _string(&string), _pos(pos) {}
+
+        iterator () = default;
+        iterator (const iterator&) = default;
+        iterator (iterator&&) = default;
+
+        iterator& operator=(const iterator&) = default;
+        iterator& operator=(iterator&&) = default;
 
         iterator& operator++ ()            { ++_pos; return *this; }
-        iterator  operator++ (int)         { iterator copy{_string, _pos }; ++_pos; return copy; }
+        iterator  operator++ (int)         { iterator copy{*_string, _pos }; ++_pos; return copy; }
         iterator& operator-- ()            { --_pos; return *this; }
-        iterator  operator-- (int)         { iterator copy{_string, _pos }; --_pos; return copy; }
+        iterator  operator-- (int)         { iterator copy{*_string, _pos }; --_pos; return copy; }
         iterator& operator+= (int delta)   { _pos += delta; return *this; }
         iterator& operator-= (int delta)   { _pos -= delta; return *this; }
-        reference operator*  ()            { return reference{_string, _pos}; }
-        reference operator-> ()            { return reference{_string, _pos}; }
-        reference operator[] (size_type i) { return reference{_string, i + _pos}; }
+        reference operator*  ()            { return reference{*_string, _pos}; }
+        reference operator-> ()            { return reference{*_string, _pos}; }
+        reference operator[] (size_type i) { return reference{*_string, i + _pos}; }
 
         difference_type operator- (const iterator& rhs) const { return static_cast<difference_type>(_pos - rhs._pos); }
 
@@ -283,15 +290,15 @@ public:
         bool operator<= (const iterator& rhs) const { return rhs._pos - _pos >= 0; }
         bool operator>= (const iterator& rhs) const { return _pos - rhs._pos >= 0; }
 
-        operator const_iterator () { return _string.data() + _pos; }
+        operator const_iterator () { return _string->data() + _pos; }
 
-        friend inline iterator operator+ (int delta, const iterator& it) { return iterator{it._string, it._pos + delta}; }
-        friend inline iterator operator+ (const iterator& it, int delta) { return iterator{it._string, it._pos + delta}; }
-        friend inline iterator operator- (int delta, const iterator& it) { return iterator{it._string, it._pos - delta}; }
-        friend inline iterator operator- (const iterator& it, int delta) { return iterator{it._string, it._pos - delta}; }
+        friend inline iterator operator+ (int delta, const iterator& it) { return iterator{*it._string, it._pos + delta}; }
+        friend inline iterator operator+ (const iterator& it, int delta) { return iterator{*it._string, it._pos + delta}; }
+        friend inline iterator operator- (int delta, const iterator& it) { return iterator{*it._string, it._pos - delta}; }
+        friend inline iterator operator- (const iterator& it, int delta) { return iterator{*it._string, it._pos - delta}; }
 
     private:
-        basic_string& _string;
+        basic_string* _string;
         size_type _pos;
     };
 
@@ -1223,9 +1230,7 @@ private:
                 _str_literal = oth._str_literal + offset;
                 break;
             case State::SSO:
-                ((void**)__fill)[0] = ((void**)oth.__fill)[0];
-                ((void**)__fill)[1] = ((void**)oth.__fill)[1];
-                ((void**)__fill)[2] = ((void**)oth.__fill)[2]; // also sets _state to SSO
+                memcpy(__fill, oth.__fill, 24); // also sets _state to SSO
                 _str = _sso + (oth._str - oth._sso) + offset;
                 break;
         }
@@ -1241,13 +1246,8 @@ private:
     template <class Alloc2>
     void _move_from (basic_string<CharT, Traits, Alloc2>&& oth) {
         _length = oth._length;
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wuninitialized"
-        #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-        ((void**)__fill)[0] = ((void**)oth.__fill)[0];
-        ((void**)__fill)[1] = ((void**)oth.__fill)[1];
-        ((void**)__fill)[2] = ((void**)oth.__fill)[2]; // also sets _state to SSO
-        #pragma GCC diagnostic pop
+        memcpy(__fill, oth.__fill, 24); // also sets _state
+        //#pragma GCC diagnostic pop
         if (oth._state == State::SSO) _str = _sso + (oth._str - oth._sso);
         else _str = oth._str;
         oth._state       = State::LITERAL;

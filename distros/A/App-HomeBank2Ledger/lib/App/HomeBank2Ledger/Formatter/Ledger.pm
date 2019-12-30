@@ -10,7 +10,7 @@ use App::HomeBank2Ledger::Util qw(commify rtrim);
 
 use parent 'App::HomeBank2Ledger::Formatter';
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 my %STATUS_SYMBOLS = (
     cleared => '*',
@@ -242,8 +242,12 @@ sub _format_amount {
 
     my $format = "\% .$commodity->{frac}f";
     my ($whole, $fraction) = split(/\./, sprintf($format, $amount));
+    $fraction ||= 0;
 
-    my $num = join($commodity->{dchar}, commify($whole, $commodity->{gchar}), $fraction);
+    my $num = commify($whole, $commodity->{gchar});
+    if ($commodity->{frac}) {
+        $num .= $commodity->{dchar} . $fraction;
+    }
 
     my $symbol = $commodity->{symbol};
     $symbol = $self->_quote_string($symbol) if $symbol =~ /[0-9\s]/;
@@ -267,7 +271,7 @@ App::HomeBank2Ledger::Formatter::Ledger - Ledger formatter
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

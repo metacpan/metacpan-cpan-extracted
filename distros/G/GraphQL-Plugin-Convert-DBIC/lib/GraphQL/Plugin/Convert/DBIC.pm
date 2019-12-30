@@ -6,7 +6,7 @@ use GraphQL::Debug qw(_debug);
 use Lingua::EN::Inflect::Number qw(to_S to_PL);
 use Carp qw(confess);
 
-our $VERSION = "0.16";
+our $VERSION = "0.17";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %GRAPHQL_TYPE2SQLS = (
@@ -301,6 +301,10 @@ sub _make_input_field {
   };
 }
 
+use constant MUTATE_IDPROCESS => {
+  update => sub { $_[0]->{id} },
+  delete => sub { $_[0] },
+};
 use constant MUTATE_ARGSPROCESS => {
   update => sub { $_[0]->{payload} },
   delete => sub { },
@@ -316,17 +320,17 @@ sub _mutation_resolver {
     unless $name =~ s/^(create|update|delete)//;
   my $method = $1;
   my $find_first = $method ne 'create';
-  my ($args_process, $result_process) = map $_->{$method},
-    MUTATE_ARGSPROCESS, MUTATE_POSTPROCESS;
+  my ($id_process, $args_process, $result_process) = map $_->{$method},
+    MUTATE_IDPROCESS, MUTATE_ARGSPROCESS, MUTATE_POSTPROCESS;
   $args = $args->{input} if $args->{input};
   my $is_list = ref $args eq 'ARRAY';
   $args = [ $args ] if !$is_list; # so can just deal as list below
-  DEBUG and _debug("DBIC.root_value", $args);
+  DEBUG and _debug("DBIC._mutation_resolver", $info->{field_name}, [ $id_process ? map $id_process->($_), @$args : () ], $args);
   my $rs = $dbic_schema->resultset($name);
   my $all_result = [
     map {
       my $operand = $rs;
-      $operand = $operand->find($_->{id}) if $find_first;
+      $operand = $operand->find($id_process->($_)) if $find_first;
       my $result = $operand
         ? $operand->$method($args_process ? $args_process->($_) : $_)
         : GraphQL::Error->coerce("$name not found");

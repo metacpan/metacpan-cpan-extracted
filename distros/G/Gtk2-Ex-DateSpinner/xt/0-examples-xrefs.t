@@ -60,7 +60,7 @@ sub raw_contains_example {
   my ($filename, $example) = @_;
   $example =~ s{^examples/}{};
   open FH, "< $filename" or die "Cannot open $filename: $!";
-  my $ret = scalar (grep /\b$example\E\b/, <FH>);
+  my $ret = scalar (grep /\b\Q$example\E\b/, <FH>);
   close FH or die "Error closing $filename: $!";
   return $ret > 0;
 }

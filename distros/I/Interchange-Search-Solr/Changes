@@ -1,5 +1,16 @@
 Revision history for Interchange-Search-Solr
 
+0.20 Wed Dec 25 13:45:38 2019 CET
+
+     All changes done by Stefan Hornburg (Racke).
+
+     [ENHANCEMENTS]
+
+     * Rewrite maintainer_update method to get rid of streaming.
+     * Add methods for index handlers (add, delete, commit).
+     * Add num_docs method.
+     * Add success, as_string and exception_message methods to Response class.
+
 0.14 Fri Sep 21 13:21:50 2018 CEST
 
      [BUG FIXES]

@@ -25,11 +25,11 @@ Interchange::Search::Solr -- Solr query encapsulation
 
 =head1 VERSION
 
-Version 0.14
+Version 0.20
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.20';
 
 =head1 DESCRIPTION
 
@@ -47,6 +47,20 @@ Perhaps a little code snippet.
     $solr->start(0);
     $solr->search('shirts');
     $results = $solr->results;
+
+=head2 INDEX HANDLERS
+
+    # Clear the index
+    $solr->delete( ['*:*'] );
+
+    # Add a document
+    $solr->add( [
+        { sku => 'foo', title => 'My Foo' },
+        { sku => 'bar', title => 'My Bar' },
+    ] )
+
+    # Commit (only needed if autocommit is disabled)
+    $solr->commit;
 
 =head1 ACCESSORS
 
@@ -647,6 +661,76 @@ sub has_more {
     }
 }
 
+=head2 num_docs
+
+Returns the number of documents in the index.
+
+=cut
+
+sub num_docs {
+    my $self = shift;
+    my $response;
+
+    $self->permit_empty_search(1);
+    $response = $self->search('*:*');
+
+    return $self->num_found;
+}
+
+=head2 add $data
+
+Adds the documents in $data to the index. $data is a reference to an array
+of hash references, e.g.:
+
+    [ { sku => 'foo', title => 'My Foo' }, { sku => 'bar', title => 'My Bar' } ]
+
+=cut
+
+sub add {
+    my ($self, $data) = @_;
+    my ($res, $our_res, $xml);
+
+    $xml = $self->_build_xml_add_op($data);
+    $res = $self->solr_object->_send_update($xml);
+    $our_res = Interchange::Search::Solr::Response->new($res->raw_response);
+
+    return $our_res;
+}
+
+=head2 delete $data
+
+Deletes documents by queries in $data.
+
+=cut
+
+sub delete {
+    my ($self, $data) = @_;
+    my ($res, $our_res, $xml);
+
+    $xml = $self->_build_xml_del_op($data);
+    $res = $self->solr_object->_send_update($xml);
+    $our_res = Interchange::Search::Solr::Response->new($res->raw_response);
+
+    return $our_res;
+}
+
+=head2 commit
+
+Commits recently indexed content. This is necessary to make these changes visible
+for searches unless autocommit is enabled in the configuration.
+
+=cut
+
+sub commit {
+    my $self = shift;
+    my ($res, $our_res);
+    my $xml = '<commit/>';
+
+    $res = $self->solr_object->_send_update($xml);
+    $our_res = Interchange::Search::Solr::Response->new($res->raw_response);
+
+    return $our_res;
+}
 
 =head2 maintainer_update($mode)
 
@@ -658,24 +742,13 @@ object.
 sub maintainer_update {
     my ($self, $mode, $data) = @_;
     die "Missing argument" unless $mode;
-    my (@query, %params);
+    my (@query, %params, $xml, $wss_res, $res);
 
     if ($mode eq 'add') {
-        my $xml = $self->_build_xml_add_op($data);
-
-        %params = (
-            'stream.body' => $xml,
-            commit => 'true',
-        );
-
-        @query = ('update', \%params);
+        $res = $self->add($data);
     }
     elsif ($mode eq 'clear') {
-        %params = (
-                      'stream.body' => '<delete><query>*:*</query></delete>',
-                      commit        => 'true',
-                     );
-        @query = ('update', \%params);
+        $res = $self->delete(['*:*']);
     }
     elsif ($mode eq 'full') {
         @query = ('dataimport', { command => 'full-import' });
@@ -686,10 +759,21 @@ sub maintainer_update {
     else {
         die "Unrecognized mode $mode!";
     }
-    return $self->solr_object->generic_solr_request(@query);
+
+    unless ( $res ) {
+        $wss_res = $self->solr_object->generic_solr_request(@query);
+        $res = Interchange::Search::Solr::Response->new($wss_res->raw_response);
+    }
+
+    if ( $res->success ) {
+        # commit the changes
+        $res = $self->commit;
+    }
+
+    return $res;
 }
 
-# builds XML for add maintainer option
+# builds XML for add index handler
 
 sub _build_xml_add_op {
     my ($self, $input) = @_;
@@ -728,7 +812,32 @@ sub _build_xml_add_op {
             }
         }
     }
-    return $doc->toString;
+    return $doc->firstChild->toString;
+}
+
+# builds XML for delete index handler
+
+sub _build_xml_del_op {
+    my ($self, $input) = @_;
+    my $doc = XML::LibXML::Document->new;
+    my $el_del = $doc->createElement('delete');
+    my $list;
+    $doc->addChild($el_del);
+
+    if (ref($input) eq 'ARRAY') {
+        $list = $input;
+    }
+    else {
+        die "Bad usage: input should be an arrayref";
+    }
+
+    foreach my $query (@$list) {
+        my $el_q = $doc->createElement('query');
+        $el_q->appendText($query);
+        $el_del->addChild($el_q);
+    }
+
+    return $doc->firstChild->toString;
 }
 
 =head2 reset_object
@@ -1261,9 +1370,11 @@ sub _SWITCH_refkind {
 }
 
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Marco Pessotto, C<< <melmothx at gmail.com> >>
+
+Stefan Hornburg (Racke), C<< <racke at linuxia.de> >>
 
 =head1 BUGS
 
@@ -1306,7 +1417,7 @@ Mohammad S Anwar (GH #14).
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2016 Marco Pessotto.
+Copyright 2014-2019 Marco Pessotto, Stefan Hornburg (Racke).
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

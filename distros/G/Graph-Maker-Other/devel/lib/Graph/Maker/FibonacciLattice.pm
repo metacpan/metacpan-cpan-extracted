@@ -25,7 +25,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -47,7 +47,6 @@ sub init {
   ### FibonacciLattice init ...
 
   my $N = delete($params{'N'}) || 0;
-
   my $graph = _make_graph(\%params);
   $graph->set_graph_attribute (name => "Fibonacci Lattice N=$N");
 
@@ -108,8 +107,8 @@ L<http://fq.math.ca/Scanned/13-3/stanley.pdf>
 =back
 
 Vertex names are strings of 1s and 2s like 1122121, with sum E<lt>= N.
-Edges are by increasing one 1 to 2, or by appending 1, thus increasing the
-sum by 1.  The start is an empty string.
+Edges are by increasing a 1 to 2, or by appending a 1, thus increasing the
+sum by +1.  The start is an empty string.
 
     [empty] ---> 1 ---> 2 ---> 21            
                   \          ^             N => 3
@@ -123,8 +122,8 @@ with given sum are finite).  The graph here is vertices with sums 0 to N
 inclusive.
 
 The number of vertices with sum = k is Fibonacci number F(k+1).  That
-follows by making k from k-1 sum append 1 or k-2 append 2.  (Or equivalently
-per Stanley, sum over binomials choosing where 1s.)
+follows by making k from k-1 append 1 or k-2 append 2.  (Or equivalently per
+Stanley, sum over binomials choosing where 1s.)
 
     VK(k) = VK(k-1) + VK(k-2)                  num vertices sum k
               starting VK(0)=1, VK(1)=1
@@ -280,6 +279,7 @@ L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  etc
     1310     N=0, singleton
     19655    N=1, path-2
     500      N=2, star-4 claw
+    33640    N=6 (Stanley's example)
 
 =head1 OEIS
 

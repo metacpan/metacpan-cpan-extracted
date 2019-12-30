@@ -1,5 +1,3 @@
-// $Id: x02c.c 12288 2013-01-30 04:40:35Z airwin $
-//
 //      Multiple window and color map 0 demo.
 //
 
@@ -17,7 +15,7 @@ void demo2( void );
 void draw_windows( int nw, int cmap0_offset );
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
 // Parse and process command line arguments
     (void) plparseopts( &argc, argv, PL_PARSE_FULL );

@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Set/get tester.
 #
 # Window positioning demo.
@@ -23,6 +21,8 @@
 # along with PLplot; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 
@@ -117,11 +117,11 @@ if ($xmin != 0.01 || $xmax != 0.99 || $ymin != 0.02 || $ymax != 0.49) {
     printf STDERR ("plgvpd test failed\n");
     $status = 1;
 }
-$xmid = 0.5*($xmin+$xmax);
-$ymid = 0.5*($ymin+$ymax);
+my $xmid = 0.5*($xmin+$xmax);
+my $ymid = 0.5*($ymin+$ymax);
 
 plwind (0.2, 0.3, 0.4, 0.5);
-my ($xmin, $xmax, $ymin, $ymax) = plgvpw ();
+($xmin, $xmax, $ymin, $ymax) = plgvpw ();
 printf("plwind: xmin, xmax, ymin, ymax = %f %f %f %f\n", $xmin, $xmax, $ymin, $ymax);
 if ($xmin != 0.2 || $xmax != 0.3 || $ymin != 0.4 || $ymax != 0.5) {
     printf STDERR ("plgvpw test failed\n");
@@ -157,7 +157,7 @@ if ($digmax != 3) {
 }
 
 plsyax(4,0);
-my ($digmax, $digits) = plgyax();
+($digmax, $digits) = plgyax();
 printf ("y axis parameters: digmax, digits = %d %d\n", $digmax, $digits);
 if ($digmax != 4) {
     printf STDERR ("plgyax test failed\n");
@@ -165,7 +165,7 @@ if ($digmax != 4) {
 }
 
 plszax(5,0);
-my ($digmax, $digits) = plgzax();
+($digmax, $digits) = plgzax();
 printf ("z axis parameters: digmax, digits = %d %d\n", $digmax, $digits);
 if ($digmax != 5) {
     printf STDERR ("plgzax test failed\n");
@@ -189,7 +189,7 @@ $status = 1;
 }
 
 plsdiplt(0.1, 0.2, 0.9, 0.8);
-my ($xmin, $ymin, $xmax, $ymax) = (PDL->new(0), PDL->new(0), PDL->new(0), PDL->new(0));
+($xmin, $ymin, $xmax, $ymax) = (PDL->new(0), PDL->new(0), PDL->new(0), PDL->new(0));
 plgdiplt($xmin, $ymin, $xmax, $ymax);
 printf ("plot-space window parameters: xmin, ymin, xmax, ymax = %f %f %f %f\n",  $xmin, $ymin, $xmax, $ymax);
 if ($xmin != 0.1 || $xmax != 0.9 || $ymin != 0.2 || $ymax != 0.8) {
@@ -214,7 +214,7 @@ if ($r != 10 || $g != 20 || $b != 30) {
 }
 
 plscolbga (20, 30, 40, 0.5);
-my ($r, $g, $b, $a) = plgcolbga();
+($r, $g, $b, my $a) = plgcolbga();
 printf ("background/transparency colour parameters: r, g, b, a = %d %d %d %f\n", $r, $g, $b, $a);
 if ($r != 20 || $g != 30 || $b != 40 || $a != 0.5) {
     printf STDERR ("plgcolbga test failed\n");

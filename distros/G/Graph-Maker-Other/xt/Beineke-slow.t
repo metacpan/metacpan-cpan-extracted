@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -31,8 +31,9 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Graph::Maker::Beineke;
 
-use lib 'devel/lib';
-use MyGraphs 'Graph_is_isomorphic','Graph_is_subgraph';
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
+use MyGraphs;
 
 plan tests => 25;
 
@@ -189,9 +190,9 @@ sub Graph_is_subgraph_exactly {
     $prev->add_edges(@edges);
 
     my $G = Graph::Maker->new('Beineke', G=>$g, undirected=>1);
-    ok (Graph_is_isomorphic($prev,$G), 1, "G$g");
+    ok (MyGraphs::Graph_is_isomorphic($prev,$G), 1, "G$g");
 
-    # if (! Graph_is_isomorphic($prev,$G)) {
+    # if (! MyGraphs::Graph_is_isomorphic($prev,$G)) {
     #   print "$g\n";
     #   MyGraphs::Graph_view($prev);
     #   MyGraphs::Graph_view($G);

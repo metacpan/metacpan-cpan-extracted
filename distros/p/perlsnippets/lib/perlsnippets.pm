@@ -1,7 +1,7 @@
 package perlsnippets;
 
-our $DATE = '2019-09-11'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-12-25'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: A collection of Perl idioms or short pieces of Perl code
@@ -18,7 +18,7 @@ perlsnippets - A collection of Perl idioms or short pieces of Perl code
 
 =head1 VERSION
 
-This document describes version 0.005 of perlsnippets (from Perl distribution perlsnippets), released on 2019-09-11.
+This document describes version 0.006 of perlsnippets (from Perl distribution perlsnippets), released on 2019-12-25.
 
 =head1 HOMEPAGE
 

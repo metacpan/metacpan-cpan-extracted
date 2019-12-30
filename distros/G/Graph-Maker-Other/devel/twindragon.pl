@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -30,7 +30,7 @@ use Graph::Maker::Twindragon;
 
 
 {
-  # twindragon searches
+  # twindragon
   #   k=1 two squares F?df_ hog not
   #   k=2 four squares https://hog.grinvin.org/GraphAdded.action?id=22744
   #   k=3 https://hog.grinvin.org/ViewGraphInfo.action?id=25145
@@ -39,7 +39,7 @@ use Graph::Maker::Twindragon;
   #   k=4 not
 
   my @graphs;
-  for (my $k = 0; @graphs < 11; $k++) {
+  for (my $k = 0; @graphs <= 6; $k++) {
     my $graph = Graph::Maker->new('twindragon', level=>$k, arms=>1,
                                   undirected=>1);
 
@@ -50,7 +50,7 @@ use Graph::Maker::Twindragon;
 
     push @graphs, $graph;
   }
-  hog_searches_html(@graphs);
+  MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
 {

@@ -6,6 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Encode' => '0',
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41'
                                     }
@@ -18,6 +19,7 @@ do { my $x = {
                                       'Params::Util' => '0',
                                       'Scalar::Util' => '0',
                                       'Test::Deep' => '1.126',
+                                      'Test::Deep::Cmp' => '0',
                                       'overload' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
@@ -30,7 +32,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0.96'
+                                   'Test::More' => '0.96',
+                                   'Test::Tester' => '0'
                                  }
                  }
      };

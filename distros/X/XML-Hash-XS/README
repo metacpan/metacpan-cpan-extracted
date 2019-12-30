@@ -151,12 +151,13 @@ OPTIONS
 
     force_array => [ = undef ] *# xml2hash*
         This option is similar to "ForceArray" from XMl::Simple module:
-        <https://metacpan.org/pod/XML::Simple#ForceArray-1-in---important>.
+        <https://metacpan.org/pod/XML::Simple#ForceArray-=%3E-1-%23-in-impor
+        tant>.
 
     force_content => [ = 0 ] *# xml2hash*
         This option is similar to "ForceContent" from XMl::Simple module:
-        <https://metacpan.org/pod/XML::Simple#ForceContent-1-in---seldom-use
-        d>.
+        <https://metacpan.org/pod/XML::Simple#ForceContent-=%3E-1-%23-in-sel
+        dom-used>.
 
     merge_text [ = 0 ] *# xml2hash*
         Setting this option to "1" will cause merge adjacent text nodes.
@@ -169,6 +170,11 @@ OPTIONS
 
     trim [ = 0 ] *# hash2xml+xml2hash*
         Trim leading and trailing whitespace from text nodes.
+
+    suppress_empty => [ = 0 ] *# xml2hash*
+        This option is similar to "SuppressEmpty" from XMl::Simple module:
+        <https://metacpan.org/pod/XML::Simple#SuppressEmpty-=%3E-1-%7C-''-%7
+        C-undef-%23-in+out-handy>.
 
     utf8 [ = 1 ] *# hash2xml+xml2hash*
         Turn on utf8 flag for strings if enabled.

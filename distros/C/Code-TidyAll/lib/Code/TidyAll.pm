@@ -29,7 +29,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -275,7 +275,7 @@ sub _build_plugin_objects {
     # alphabetical
     # TODO: These should probably sort in a consistent way independent of locale
     return [
-        sort { ( $a->weight <=> $b->weight ) || ( $a->name cmp $b->name ) }
+        sort    { ( $a->weight <=> $b->weight ) || ( $a->name cmp $b->name ) }
             map { $self->_load_plugin( $_, $self->_plugins_to_run->{$_} ) }
             keys %{ $self->_plugins_to_run }
     ];
@@ -330,8 +330,8 @@ sub BUILD {
 }
 
 sub _purge_backups_periodically {
-    my ($self) = @_;
-    my $cache = $self->cache;
+    my ($self)             = @_;
+    my $cache              = $self->cache;
     my $last_purge_backups = $cache->get('last_purge_backups') || 0;
     if ( time > $last_purge_backups + $self->_backup_ttl_secs ) {
         $self->_purge_backups();
@@ -850,7 +850,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.74
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -1117,10 +1117,6 @@ Martin Gruner <martin.gruner@otrs.com>
 =item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
-
-=item *
-
-Nick Tonkin <1nickt@users.noreply.github.com>
 
 =item *
 

@@ -28,7 +28,7 @@ use Graph::Maker::Catalans;
 *_balanced_next = \&Graph::Maker::Catalans::_balanced_next;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 
@@ -43,7 +43,7 @@ use constant _rel_type_name_below => 'Below';
 sub _rel_type_below {
   my ($aref) = @_;
   my @ret;
-  foreach my $i (1 .. scalar(@$aref)) {
+  foreach my $i (0 .. scalar(@$aref)) {
     unless ($aref->[$i]) { 
       my @to = @$aref;
       splice @to, $i,0, 1,0;    # (0 or end) -> 10 (0 or end)
@@ -59,72 +59,135 @@ sub _rel_type_below {
 use constant _rel_type_name_insert => 'Insert';
 sub _rel_type_insert {
   my ($aref) = @_;
+  ### _rel_type_insert(): join(',',@$aref)
   unless (@$aref) {
     return [1,0];
   }
   my @ret;
   foreach my $i (0 .. $#$aref-1) {
     if ($aref->[$i]) {
-      #      *             *        *
-      #     /     ->      /        /
-      #    A             *        *
-      #                 /          \
-      #                A            A
+      #      *             *         *            *             *
+      #     / \   ->      / \       / \          / \           / \
+      #    A   B         *   B     *   B        A   *         A   *
+      #                 /           \              /               \
+      #                A             A            B                 B
+      #                   LL        LR           RL             RR
       #
+      #   1 A 0 1bb0   11 A 00 B   110 A 0 B    1A0 1B0     1A0 10 B
+      #   i   j      k
       #
-      #   1 A 0       11 A 00   110 A 0
-      #   i   j
+      #   1 10 0       11 10 00    110 10 0                 1100 10
+      #   i    j
+      #
+      #   1 10 0                                            1 10 10 0 = LR
+      #     ij
+      #
+      # ENHANCE-ME: Conditions for when some inserts are same as others.
+      # A-empty and B-empty is LL=LR and RL=RR.  
+      # A-empty can RR at the last 10 of the run of rights.
+      # B-empty can LL at just one of the nested 111 10 1..0 000 run of lefts
+      # LR = RR insert at different places in 1100.
+
       my $j = Graph::Maker::Catalans::_balanced_end($aref,$i);
-      if ($j==$i+1
-          || Graph::Maker::Catalans::_balanced_end($aref,$i+1) != $j-1) {
-        my @to = @$aref;
-        splice @to, $j,0, 0;        # A left child
-        splice @to, $i,0, 1;
-        push @ret, \@to;
-      }
+      my $k = _balanced_multi_end($aref,$j+1);
+      ### $i
+      ### $j
+      ### $k
+
+      # if ($j==$i+1
+      #     || Graph::Maker::Catalans::_balanced_end($aref,$i+1) != $j-1)
       {
         my @to = @$aref;
-        splice @to, $i+1,0, 1,0;    # A right child
-        push @ret, \@to;
-      }
-    } else {
-      #    *               *             *
-      #   / \       ->    / \             \
-      #      A               *             *
-      #     / \             /               \
-      #                    A                 A
-      #                   / \               / \
-      #
-      #   0 1a0 1a0      0 1 1a0 1a0 0   0 10 1a0 1a0
-      #   i       j        ^         ^
-      unless ($aref->[$i] && !$aref->[$i+1]) {
-        my $j = _balanced_multi_end($aref,$i+1);
-        my @to = @$aref;
-        splice @to, $j,0, 0;        # left child
+        splice @to, $j,0, 0;
         splice @to, $i,0, 1;
         push @ret, \@to;
+        ### LL: join(',',@to)
       }
-      unless ($aref->[$i-1]) {
+
+      # LR, when A not empty so not same as LL
+      # if ($j!=$i+1)
+      {
         my @to = @$aref;
-        splice @to, $i+1,0, 1,0;    # right child
+        splice @to, $i+1,0, 1,0;
+        push @ret, \@to;
+        ### LR: join(',',@to)
+      }
+
+      # RL
+      {
+        my @to = @$aref;
+        splice @to, $k,0, 0;
+        splice @to, $j+1,0, 1;
+        push @ret, \@to;
+      }
+
+      # unless ($aref->[$j+1] && !$aref->[$j+2])
+      {
+        ### RR ...
+        my @to = @$aref;
+        splice @to, $j+1,0, 1,0;
+        ### RR: join(',',@to)
         push @ret, \@to;
       }
     }
 
+    #   {
+    #     my @to = @$aref;
+    #     splice @to, $i+1,0, 1,0;    # A right child
+    #     push @ret, \@to;
+    #   }
+    # } else {
+    #   #    *               *             *
+    #   #   / \       ->    / \             \
+    #   #  A   A               *             *
+    #   #     / \             /               \
+    #   #                    A                 A
+    #   #                   / \               / \
+    #   #
+    #   #   0 1a0 1a0      0 1 1a0 1a0 0   0 10 1a0 1a0
+    #   #   i       j        ^         ^
+    #   unless ($aref->[$i] && !$aref->[$i+1]) {
+    #     my $j = _balanced_multi_end($aref,$i+1);
+    #     my @to = @$aref;
+    #     splice @to, $j,0, 0;        # left child
+    #     splice @to, $i,0, 1;
+    #     push @ret, \@to;
+    #   }
+    #   unless ($aref->[$i-1]) {
+    #   }
+    # }
+
   }
-  push @ret, [@$aref,1,0];
-  return @ret;
+  my %seen;
+  return grep {!$seen{join('',@$_)}++} @ret;
 }
 
 my @pm_one = (-1, 1);
 
+# $aref is an arrayref to balanced binary 0s and 1s.
+# $i is index into $aref, or possibly past the end.
+# Return the position after any balanced substrings at and after $i.
+#
+#   1 10 10 10 0       10 10       10 10   
+#        ^     ^        ^                ^      
+#        i    ret       i = ret          i = ret
+#
+# If $aref->[$i] == 1 then that is a balanced substring and the return is
+# after all such, meaning the first descent below that i level, or 1 past
+# end of $aref.
+#
+# If $aref->[$i] == 0 then there are no balanced substrings and the return
+# is $i unchanged.  Likewise if $i is past the end of string already.
+#
 sub _balanced_multi_end {
   my ($aref, $i) = @_;
-  ### assert: $aref->[$i] == 1
-  for (my $d=0; $i <= $#$aref; $i++) {
+  ### _balanced_multi_end(): $i
+  my $d = 0;
+  while ($i <= $#$aref) {
     if (($d += $pm_one[$aref->[$i]]) < 0) {
-      return $i;
+      last;
     }
+    $i++;
   }
   return $i;
 }
@@ -145,9 +208,10 @@ sub _rel_type_insert_right {
 
 # =head2 Insert
 # 
-# Option C<rel_type =E<gt> 'subdivide_left'> or C<'subdivide_right'> is
-# graph edge inserting a vertex into an edge, with the subtree below
-# becoming the left or right child of the new vertex.
+# Option C<rel_type =E<gt> 'insert'> is graph edge where a vertex is added
+# at an empty position like C<below>, or also inserted into an edge.  For
+# the latter, the existing subtree below becomes either left or right child
+# of the new vertex.
 #
 # In balanced binary, C<subdivide_right> is insert a 10 anywhere, including
 # start or end of string.  Some such insertions give the same same

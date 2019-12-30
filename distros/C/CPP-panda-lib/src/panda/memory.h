@@ -191,6 +191,8 @@ private:
 
 template <class TARGET, bool THREAD_SAFE = true>
 struct AllocatedObject {
+    static void* operator new (size_t, void* p) { return p; }
+
     static void* operator new (size_t size) {
         if (size == sizeof(TARGET)) return StaticMemoryPool<sizeof(TARGET)>::allocate();
         else                        return DynamicMemoryPool::instance()->allocate(size);
@@ -204,6 +206,8 @@ struct AllocatedObject {
 
 template <class TARGET>
 struct AllocatedObject<TARGET, false> {
+    static void* operator new (size_t, void* p) { return p; }
+
     static void* operator new (size_t size) {
         if (size == sizeof(TARGET)) return StaticMemoryPool<sizeof(TARGET)>::global_instance()->allocate();
         else                        return DynamicMemoryPool::global_instance()->allocate(size);

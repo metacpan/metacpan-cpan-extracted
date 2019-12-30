@@ -11,11 +11,13 @@ my %params = (
     CCFLAGS          => '-Wall -Wextra',
     MIN_PERL_VERSION => '5.12.0',
     test             => { SRC => 't', BIN_DEPS => 'Test::Catch' },
+    LIBS             => ['-lexecinfo', ''],
 );
 
-if ($ENV{TEST_FULL}) {
-    ($params{CCFLAGS}||='') .= ' -fsanitize=undefined';
-    push @{$params{LIBS}||=[]}, '-lubsan'; #sanitizer
+if ($ENV{SANITIZE}) {
+    ($params{CCFLAGS}||='') .= ' -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer';
+    $params{LIBS}[1] .= ' -lubsan -lasan'; #sanitizer
+    $params{LIBS}[0] .= ' -lubsan -lasan'; #sanitizer
 }
 
 write_makefile(%params);

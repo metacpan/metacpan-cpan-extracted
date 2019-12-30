@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x25 for the PLplot PDL binding
 #
 # Copyright (C) 2006 Andrew Ross
@@ -22,6 +20,8 @@
 
 # SYNC: x25c.c 1.3
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Math::Trig qw [pi];
@@ -44,7 +44,7 @@ my $xextreme = pdl( [-120, -120, -120, -80, -220, -20, -20, -80, 20], [120, 120,
 my $yextreme = pdl( [-120, 20, -20, -20, -120, -120, -20, -80, -120], [120, 120, 120, 120, 120, 120, 20, 80, 120]);
 my ($x0, $y0);
 
-for ( $k = 0; $k < 2; $k++ ) {
+for ( my $k = 0; $k < 2; $k++ ) {
     for ( $j = 0; $j < 4; $j ++ ) {
 	if ( $j == 0 ) {
 # Polygon 1: a diamond 

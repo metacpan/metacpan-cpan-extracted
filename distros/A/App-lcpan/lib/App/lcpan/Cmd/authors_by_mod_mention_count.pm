@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::authors_by_mod_mention_count;
 
-our $DATE = '2019-10-05'; # DATE
-our $VERSION = '1.041'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 use 5.010;
 use strict;
@@ -99,7 +99,7 @@ App::lcpan::Cmd::authors_by_mod_mention_count - List authors ranked by number of
 
 =head1 VERSION
 
-This document describes version 1.041 of App::lcpan::Cmd::authors_by_mod_mention_count (from Perl distribution App-lcpan), released on 2019-10-05.
+This document describes version 1.043 of App::lcpan::Cmd::authors_by_mod_mention_count (from Perl distribution App-lcpan), released on 2019-11-29.
 
 =head1 FUNCTIONS
 

@@ -16,10 +16,12 @@ use DataTest;
 
 ok((-e $pmc), ".pmc exists");
 
-local $/;
-my $data = <DataTest::DATA>;
-is $data, "\none\ntwo\n\nthree\n\n",
-    "DATA section is correct";
+{
+    local $/;
+    my $data = <DataTest::DATA>;
+    is $data, "\none\ntwo\n\nthree\n\n",
+        "DATA section is correct";
+}
 
 my ($out, $err, $exit) = capture {
   my $app = App::Prove->new;

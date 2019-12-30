@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.137;
+package Config::Model::Value 2.138;
 
 use 5.10.1;
 
@@ -724,7 +724,7 @@ sub get_choice {
 
     # just in case the reference_object has been changed
     if ( defined $self->{refer_to} or defined $self->{computed_refer_to} ) {
-        $self->{ref_object}->get_choice_from_refered_to;
+        $self->{ref_object}->get_choice_from_referred_to;
     }
 
     return @{ $self->{choice} || [] };
@@ -764,8 +764,8 @@ sub enum_error {
     push @error,
         "$self->{value_type} type does not know '$value'. Expected " . join( " or ", @choice );
     push @error,
-        "Expected list is given by '" . join( "', '", @{ $self->{refered_to_path} } ) . "'"
-        if $var eq 'reference' && defined $self->{refered_to_path};
+        "Expected list is given by '" . join( "', '", @{ $self->{referred_to_path} } ) . "'"
+        if $var eq 'reference' && defined $self->{referred_to_path};
     push @error, $self->warp_error if $self->{warp};
 
     return @error;
@@ -837,7 +837,7 @@ sub _check_value {
 
         # just in case the reference_object has been changed
         if ( defined $self->{refer_to} or defined $self->{computed_refer_to} ) {
-            $self->{ref_object}->get_choice_from_refered_to;
+            $self->{ref_object}->get_choice_from_referred_to;
         }
 
         if (    length($value)
@@ -1429,7 +1429,7 @@ sub transform_value {
     }
 
     if ( defined $self->{refer_to} or defined $self->{computed_refer_to} ) {
-        $self->{ref_object}->get_choice_from_refered_to;
+        $self->{ref_object}->get_choice_from_referred_to;
     }
 
     $value = $self->{convert_sub}($value)
@@ -1554,7 +1554,7 @@ sub _init {
 
     if ( defined $self->{refer_to} or defined $self->{computed_refer_to} ) {
         $self->submit_to_refer_to;
-        $self->{ref_object}->get_choice_from_refered_to;
+        $self->{ref_object}->get_choice_from_referred_to;
     }
 }
 
@@ -1947,7 +1947,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.137
+version 2.138
 
 =head1 SYNOPSIS
 
@@ -2774,8 +2774,9 @@ feature is useful to reduce data to write in configuration file.
 
 =item allow_undef
 
-With this mode, C<fetch()> returns undef for mandatory values. Normally,
-trying to fetch an undefined mandatory value leads to an exception.
+With this mode, C<fetch()> behaves like in C<user> mode, but returns
+C<undef> for mandatory values. Normally, trying to fetch an undefined
+mandatory value leads to an exception.
 
 =back
 

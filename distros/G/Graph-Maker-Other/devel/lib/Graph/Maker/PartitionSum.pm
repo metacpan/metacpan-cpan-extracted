@@ -25,7 +25,7 @@ use List::Util 'sum';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 use Graph::Maker::BulgarianSolitaire;

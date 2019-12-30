@@ -1,0 +1,115 @@
+NAME
+    Acme::CPANModules::CPANModules - Modules related to Acme::CPANModules
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::CPANModules
+    (from Perl distribution Acme-CPANModules-CPANModules), released on
+    2019-11-19.
+
+DESCRIPTION
+    Modules related to Acme::CPANModules.
+
+  Specification
+    Acme::CPANModules is the specification.
+
+  CLIs
+    App::cpanmodules distribution contains the "cpanmodules" CLI to view
+    lists and entries from the command-line.
+
+    App::lcpan::CmdBundle::cpanmodules distribution provides "cpanmodules-*"
+    subcommands for App::lcpan which, like "cpanmodules" CLI, lets you view
+    lists and entries from the command-line.
+
+    App::CPANModulesUtils distribution contains more CLI utilities related
+    to Acme::CPANModules, e.g. "acme-cpanmodules-for" to find whether a
+    module is mentioned in some Acme::CPANModules::* modules.
+
+    App::CreateAcmeCPANModulesImportModules
+
+    App::CreateAcmeCPANModulesImportCPANRatingsModules
+
+  Dist::Zilla (and Pod::Weaver)
+    If you develop CPAN modules with Dist::Zilla, you can use
+    Dist::Zilla::Plugin::Acme::CPANModules and
+    Pod::Weaver::Plugin::Acme::CPANModules. There is also
+    Dist::Zilla::Plugin::Acme::CPANModules::Blacklist to prevent adding
+    blacklisted dependencies into your distribution.
+
+  Other modules
+    Acme::CPANLists is an older, deprecated specification.
+
+    Pod::From::Acme::CPANModules
+
+  Snippets
+    Acme::CPANModules::CPANModules contains this snippet to create entries
+    by extracting "<pm:...>" in the description:
+
+     $LIST->{entries} = [
+         map { +{module=>$_} }
+             ($LIST->{description} =~ /<pm:(.+?)>/g)
+     ];
+
+    This does not prevent duplicates. To do so:
+
+     $LIST->{entries} = [
+         map { +{module=>$_} }
+             do { my %seen; grep { !$seen{$_}++ }
+                  ($LIST->{description} =~ /<pm:(.+?)>/g)
+              }
+     ];
+
+INCLUDED MODULES
+    *   Acme::CPANModules
+
+    *   App::cpanmodules
+
+    *   App::lcpan::CmdBundle::cpanmodules
+
+    *   App::lcpan
+
+    *   App::CPANModulesUtils
+
+    *   App::CreateAcmeCPANModulesImportModules
+
+    *   App::CreateAcmeCPANModulesImportCPANRatingsModules
+
+    *   Dist::Zilla::Plugin::Acme::CPANModules
+
+    *   Pod::Weaver::Plugin::Acme::CPANModules
+
+    *   Dist::Zilla::Plugin::Acme::CPANModules::Blacklist
+
+    *   Acme::CPANLists
+
+    *   Pod::From::Acme::CPANModules
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-CPANModules>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-CPANModules>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-CPAN
+    Modules>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

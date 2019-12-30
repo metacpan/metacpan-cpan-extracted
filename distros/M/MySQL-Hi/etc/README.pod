@@ -1,0 +1,38 @@
+=pod
+
+=head1 NAME mysqlhi
+
+Easy way to connect to MySQL/MariaDB via command line.
+
+=head1 Installation
+
+2B added...
+
+=head1 Usage
+
+=over
+
+=item 1. Create a config file
+
+Create a file in your home directory named F<$HOME/mysqlhi.conf>:
+
+    [dbname]
+    host=hostname
+    password=y0Urp@s$
+    port=3306
+
+=item 2. From command line
+
+    $ mysqlhi dbname
+
+=item 3. From your Perl code
+
+    use MySQL::Hi;
+    use DBI;
+
+    my $hi = MySQL::Hi->new();
+    my $dbh = DBI->connect( $hi->get_dsn( 'dbname' ), \%attr);
+
+=back
+
+=cut

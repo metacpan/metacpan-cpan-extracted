@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -82,7 +82,7 @@ sub init {
   }
 
   my $straight = ($vertex_names =~ /straight/);
-  my $directed = $graph->is_directed;
+  my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
   my $recurse;
   $recurse = sub {
     my ($x,$y, $dir, $k) = @_;
@@ -94,8 +94,7 @@ sub init {
       $x += $dx;
       $y += $dy;
       my $to = "$x,$y";
-      $graph->add_edge($from,$to);
-      if ($directed) { $graph->add_edge($to,$from); }
+      $graph->$add_edge($from,$to);
     } else {
       $k--;
       my $dx = $ex[$k];
@@ -200,15 +199,14 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item level=0, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>, path-2
-
-=item level=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=496>, E tree
-
-=item level=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=30345>
-
-=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=30347>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655> (etc)
 
 =back
+
+    19655   level=0, path-2
+    496     level=1, E tree
+    30345   level=2
+    30347   level=3
 
 =head1 SEE ALSO
 

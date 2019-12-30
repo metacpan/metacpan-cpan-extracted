@@ -17,10 +17,16 @@ DESCRIPTION
 
 `bookmarks` is a tool to export bookmarks from files supplied as arguments, or
 from browsers default locations (without arguments). The following browsers
-and platform are supported : Safari (Mac), Firefox (Mac/Linux/Windows) and
-Internet Explorer (Windows). Files with .plist and .sqlite extensions are
-processed as Safari and Firefox bookmarks, respectively, and directories
-named "Favorites" are processed as Internet Explorer favorites.
+and platform are supported :
+
+- Safari (Mac)
+- Firefox (Mac/Linux/Windows)
+- Chrome (Mac/Linux/Windows)
+- Internet Explorer (Windows)
+
+Files named *.plist, *.sqlite and *Bookmarks are processed as Safari and Firefox
+and Chrome bookmarks, respectively. Directories named *Favorites" are processed
+as Internet Explorer favorites.
 
 The fields `<title>`, `<url>` and `<description>` are retrieved (when existing) and
 are available for exporting (in the desired format), by default :

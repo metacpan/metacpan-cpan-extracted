@@ -1,3 +1,17 @@
+1.043   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- deps: Add --{include,exclude}-{,un}registered options.
+
+	- Add subcommand: dist-rdeps.
+
+	- [bugfix] related-mods: connect as ro, not rw.
+
+
+1.042   2019-11-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add subcommands: author, dist, mod/module, rel/release, script.
+
+
 1.041   2019-10-05  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Typo in variable package name, causing shown total

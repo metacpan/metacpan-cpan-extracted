@@ -102,20 +102,42 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
     LEAVE;
 }
 
-#define NEW_STRING(s, l)                                                \
-    newSVpvn_utf8((const char *) (s), (l), ctx->opts.utf8)
+#define NEW_STRING(s, l, f)                                             \
+    (                                                                   \
+        !(f & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_UNDEF\
+            ? newSV(0)                                                  \
+            : !(f & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_STRING\
+                ? newSVpvn_utf8("", 0, ctx->opts.utf8)                  \
+                : newSVpvn_utf8((const char *) (s), (l), ctx->opts.utf8)\
+    )
 
-#define SET_STRING(v, s, l)                                             \
-    sv_setpvn((v), (const char *) (s), (l));                            \
-    if (ctx->opts.utf8) SvUTF8_on(v);
+#define SET_STRING(v, s, l, f)                                             \
+    if (!(f & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_UNDEF) {\
+        sv_setsv((v), &PL_sv_undef);                                    \
+    }                                                                   \
+    else if (!(f & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_STRING) {\
+        sv_setpvn((v), "", 0);                                          \
+        if (ctx->opts.utf8) SvUTF8_on(v);                               \
+    }                                                                   \
+    else {                                                              \
+        sv_setpvn((v), (const char *) (s), (l));                        \
+        if (ctx->opts.utf8) SvUTF8_on(v);                               \
+    }
 
-#define CAT_STRING(v, s, l)                                             \
-    sv_catpvn((v), (const char *) (s), (l));                            \
-    if (ctx->opts.utf8) SvUTF8_on(v);
+#define CAT_STRING(v, s, l, f)                                          \
+    if ((f & XH_X2H_IS_NOT_BLANK) || ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_NONE) {\
+        if ( SvOK(v) ) {                                                \
+            sv_catpvn((v), (const char *) (s), (l));                    \
+        }                                                               \
+        else {                                                          \
+            sv_setpvn((v), (const char *) (s), (l));                    \
+        }                                                               \
+        if (ctx->opts.utf8) SvUTF8_on(v);                               \
+    }
 
-#define SAVE_VALUE(lv, v , s, l)                                        \
+#define SAVE_VALUE(lv, v , s, l, f)                                     \
     xh_log_trace2("save value: [%.*s]", l, s);                          \
-    if ( SvOK(v) ) {                                                    \
+    if ( ((f) & XH_X2H_TAG_EXISTS) || SvOK(v) ) {                       \
         xh_log_trace0("add to array");                                  \
         /* get array if value is reference to array */                  \
         if ( SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVAV) {                 \
@@ -129,11 +151,11 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
             (v) = *(lv);                                                \
         }                                                               \
         /* add value to array */                                        \
-        (lv) = av_store(av, av_len(av) + 1, NEW_STRING((s), (l)));      \
+        (lv) = av_store(av, av_len(av) + 1, NEW_STRING((s), (l), f));   \
     }                                                                   \
     else {                                                              \
         xh_log_trace0("set string");                                    \
-        SET_STRING((v), (s), (l));                                      \
+        SET_STRING((v), (s), (l), f);                                   \
     }                                                                   \
 
 #define _OPEN_TAG(s, l)                                                 \
@@ -149,11 +171,16 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
         }                                                               \
         val = *lval;                                                    \
     }                                                                   \
+    extra_flags = 0;                                                    \
+    if (ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_UNDEF &&       \
+        hv_exists((HV *) SvRV(val), (const char *) (s), ctx->opts.utf8 ? -(l) : (l))) {\
+        extra_flags = XH_X2H_TAG_EXISTS;                                \
+    }                                                                   \
     /* fetch existen or create empty hash entry */                      \
     lval = hv_fetch((HV *) SvRV(val), (const char *) (s), ctx->opts.utf8 ? -(l) : (l), 1);\
     /* save as empty string */                                          \
     val = *lval;                                                        \
-    SAVE_VALUE(lval, val, "", 0)                                        \
+    SAVE_VALUE(lval, val, "", 0, extra_flags)                           \
     if (++depth >= ctx->opts.max_depth) goto MAX_DEPTH_EXCEEDED;        \
     nodes[depth].lval = lval;                                           \
     nodes[depth].flags = XH_X2H_NODE_FLAG_NONE;                         \
@@ -252,7 +279,7 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
     }                                                                   \
     /* save key/value */                                                \
     (void) hv_store((HV *) SvRV(*lval), (const char *) (k), ctx->opts.utf8 ? -(kl) : (kl),\
-        NEW_STRING(v, vl), 0);                                          \
+        NEW_STRING(v, vl, flags), 0);                                          \
     (k) = (v) = NULL;
 
 #define NEW_XML_DECL_ATTRIBUTE(k, kl, v, vl)                            \
@@ -273,18 +300,23 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
         /* add content to array*/                                       \
         if (SvTYPE(SvRV(val)) == SVt_PVAV) {                            \
             av = (AV *) SvRV(val);                                      \
-            av_store(av, av_len(av) + 1, NEW_STRING(s, l));             \
+            av_store(av, av_len(av) + 1, NEW_STRING(s, l, flags));      \
         }                                                               \
         /* save content to hash with "content" key */                   \
         else {                                                          \
+            extra_flags = 0;                                            \
+            if (ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_UNDEF &&\
+                hv_exists((HV *) SvRV(val), (const char *) content_key, (I32) content_key_len)) {\
+                extra_flags = XH_X2H_TAG_EXISTS;                        \
+            }                                                           \
             xh_log_trace0("save to hash");                              \
             lval = hv_fetch((HV *) SvRV(val), (const char *) content_key, (I32) content_key_len, 1);\
             val = *lval;                                                \
-            SAVE_VALUE(lval, val, s, l)                                 \
+            SAVE_VALUE(lval, val, s, l, flags | extra_flags)            \
             lval = nodes[depth].lval;                                   \
         }                                                               \
     }                                                                   \
-    else if (SvCUR(val) && !ctx->opts.merge_text) {                                              \
+    else if (SvOK(val) && SvCUR(val) && !ctx->opts.merge_text) {        \
         xh_log_trace0("create a new array");                            \
         xh_log_trace1("create a new array val: %s", SvPV_nolen(val));   \
         xh_log_trace3("create a new array svrok: %d type: %d rtype: %d", SvROK(val), SvTYPE(val), SvTYPE(SvRV(val)));\
@@ -293,12 +325,12 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
         av = newAV();                                                   \
         *lval = newRV_noinc((SV *) av);                                 \
         av_store(av, 0, val);                                           \
-        av_store(av, av_len(av) + 1, NEW_STRING(s, l));                 \
+        av_store(av, av_len(av) + 1, NEW_STRING(s, l, flags));          \
     }                                                                   \
     else {                                                              \
         xh_log_trace0("concat");                                        \
         /* concatenate with previous string */                          \
-        CAT_STRING(val, s, l)                                           \
+        CAT_STRING(val, s, l, flags)                                    \
     }                                                                   \
 
 #define NEW_TEXT(s, l)                                                  \
@@ -429,24 +461,40 @@ PPCAT(loop, _FINISH):
 
 #define SEARCH_NODE_ATTRIBUTE_VALUE(loop, top_loop, quot)               \
     EXPECT_CHAR("start attr value", quot)                               \
-        content = cur;                                                  \
-        flags &= ~XH_X2H_NEED_NORMALIZE;                                \
+        content = NULL;                                                 \
+        flags &= ~(XH_X2H_NEED_NORMALIZE | XH_X2H_IS_NOT_BLANK);        \
         DO(PPCAT(loop, _END_ATTR_VALUE))                                \
             EXPECT_CHAR("attr value end", quot)                         \
                 if (flags & XH_X2H_NEED_NORMALIZE) {                    \
-                    NORMALIZE_TEXT(loop, content, cur - content - 1)    \
+                    NORMALIZE_TEXT(loop, content, end_of_attr_value - content)\
                     NEW_ATTRIBUTE(node, end - node, enc, enc_len)       \
                 }                                                       \
+                else if (content != NULL) {                             \
+                    NEW_ATTRIBUTE(node, end - node, content, end_of_attr_value - content)\
+                }                                                       \
                 else {                                                  \
-                    NEW_ATTRIBUTE(node, end - node, content, cur - content - 1)\
+                    NEW_ATTRIBUTE(node, end - node, "", 0)              \
                 }                                                       \
                 goto top_loop;                                          \
+            EXPECT_BLANK_WO_CR("blank")                                 \
+                if (!ctx->opts.trim)                                    \
+                    goto PPCAT(loop, _START_ATTR_VALUE);                \
+                break;                                                  \
             EXPECT_CHAR("CR", '\r')                                     \
-                flags |= XH_X2H_NORMALIZE_LINE_FEED;                    \
+                if (content != NULL) {                                  \
+                    flags |= XH_X2H_NORMALIZE_LINE_FEED;                \
+                }                                                       \
+                if (!ctx->opts.trim)                                    \
+                    goto PPCAT(loop, _START_ATTR_VALUE);                \
                 break;                                                  \
             EXPECT_CHAR("reference", '&')                               \
-                flags |= XH_X2H_NORMALIZE_REF;                          \
-                break;                                                  \
+                flags |= (XH_X2H_NORMALIZE_REF | XH_X2H_IS_NOT_BLANK);  \
+                goto PPCAT(loop, _START_ATTR_VALUE);                    \
+            EXPECT_ANY("any char")                                      \
+                flags |= XH_X2H_IS_NOT_BLANK;                           \
+                PPCAT(loop, _START_ATTR_VALUE):                         \
+                if (content == NULL) content = cur - 1;                 \
+                end_of_attr_value = cur;                                \
         END(PPCAT(loop, _END_ATTR_VALUE))                               \
         goto INVALID_XML;
 
@@ -879,8 +927,9 @@ static void
 xh_x2h_parse_chunk(xh_x2h_ctx_t *ctx, xh_char_t **buf, size_t *bytesleft, xh_bool_t terminate)
 {
     xh_char_t          c, *cur, *node, *end, *content, *eof, *enc,
-                      *enc_cur, *old_cur, *old_eof, *content_key;
-    unsigned int       depth, real_depth, code, flags;
+                      *enc_cur, *old_cur, *old_eof, *content_key,
+                      *end_of_attr_value;
+    unsigned int       depth, real_depth, code, flags, extra_flags;
     int                bits;
     SV               **lval, *val;
     xh_x2h_node_t     *nodes;

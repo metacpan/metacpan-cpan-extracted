@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Shortcut::ResultsExist;
-$DBIx::Class::Helper::ResultSet::Shortcut::ResultsExist::VERSION = '2.034001';
+$DBIx::Class::Helper::ResultSet::Shortcut::ResultsExist::VERSION = '2.034002';
 use strict;
 use warnings;
 
@@ -24,11 +24,14 @@ sub results_exist_as_query {
 sub results_exist {
    my $self = shift;
 
+   my $query = $self->results_exist_as_query;
+   $$query->[0] .= ' AS _existence_subq';
+
    my( undef, $sth ) = $self->result_source
                              ->schema
                               ->storage
                                ->_select(
-                                  $self->results_exist_as_query,
+                                 $query,
                                   \'*',
                                   {},
                                   {},

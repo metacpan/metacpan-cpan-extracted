@@ -1,7 +1,6 @@
 use Test::More tests => 13;
 use Module::Build;
-use lib 'lib';
-use lib 't/lib';
+use lib qw(lib t/lib);
 use REST::Neo4p;
 use Neo4p::Test;
 #$SIG{__DIE__} = sub { $DB::single=1; $_[0] !~ /malformed j/i && print $_[0] };

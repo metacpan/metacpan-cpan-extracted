@@ -3,7 +3,7 @@ package BigIP::LTM::ParseConfig;
 use strict;
 use warnings;
 #no warnings qw 'uninitialized';
-our $VERSION = '0.8.3';
+our $VERSION = '0.8.4';
 
 # CURRENTLY UNDER DEVELOMENT BY WENWU YAN <careline@126.com>
 #----------------------------------------------------------------------------
@@ -734,6 +734,7 @@ B<Example>
   $bip->write( '/config/bigip.conf.new' );
   
 =back
+
 =head1 AUTHOR
 
 WENWU YAN, C<< <careline at 126.com> >>

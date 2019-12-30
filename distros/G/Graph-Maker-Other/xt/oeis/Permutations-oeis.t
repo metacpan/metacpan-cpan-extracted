@@ -28,8 +28,13 @@ use MyOEIS;
 use MyTestHelpers;
 MyTestHelpers::nowarnings();
 
-use lib 'devel/lib';
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
+use MyGraphs;
 use Graph::Maker::Permutations;
+
+# uncomment this to run the ### lines
+# use Smart::Comments;
 
 plan tests => 9;
 
@@ -77,7 +82,7 @@ MyOEIS::compare_values
 #      for (my $N = 1; @got < $count; $N++) {
 #        my $graph = Graph::Maker->new('permutations', N => $N,
 #                                      rel_type => 'transpose_cover');
-#        push @got, num_intervals($graph);
+#        push @got, MyGraphs::Graph_num_intervals($graph);
 #      }
 #      return \@got;
 #    });
@@ -92,7 +97,7 @@ MyOEIS::compare_values
      for (my $N = 1; @got < $count; $N++) {
        my $graph = Graph::Maker->new('permutations', N => $N,
                                      rel_type => 'transpose_cover');
-       push @got, num_maximal_paths($graph);
+       push @got, MyGraphs::Graph_num_maximal_paths($graph);
      }
      return \@got;
    });
@@ -127,7 +132,7 @@ MyOEIS::compare_values
 #      for (my $N = 1; @got < $count; $N++) {
 #        my $graph = Graph::Maker->new('permutations', N => $N,
 #                                      rel_type => 'transpose');
-#        push @got, num_intervals($graph);
+#        push @got, MyGraphs::Graph_num_intervals($graph);
 #      }
 #      return \@got;
 #    });
@@ -142,7 +147,7 @@ MyOEIS::compare_values
      for (my $N = 1; @got < $count; $N++) {
        my $graph = Graph::Maker->new('permutations', N => $N,
                                      rel_type => 'transpose');
-       push @got, num_maximal_paths($graph);
+       push @got, MyGraphs::Graph_num_maximal_paths($graph);
      }
      return \@got;
    });
@@ -177,7 +182,7 @@ MyOEIS::compare_values
      for (my $N = 0; @got < $count; $N++) {
        my $graph = Graph::Maker->new('permutations', N => $N,
                                      rel_type => 'transpose_adjacent');
-       push @got, num_intervals($graph);
+       push @got, MyGraphs::Graph_num_intervals($graph);
      }
      return \@got;
    });
@@ -193,7 +198,7 @@ MyOEIS::compare_values
      for (my $N = 0; @got < $count; $N++) {
        my $graph = Graph::Maker->new('permutations', N => $N,
                                      rel_type => 'transpose_adjacent');
-       push @got, num_maximal_paths($graph);
+       push @got, MyGraphs::Graph_num_maximal_paths($graph);
      }
      return \@got;
    });
@@ -227,7 +232,7 @@ MyOEIS::compare_values
 #      for (my $N = 1; @got < $count; $N++) {
 #        my $graph = Graph::Maker->new('permutations', N => $N,
 #                                      rel_type => 'transpose_cyclic');
-#        push @got, num_intervals($graph);
+#        push @got, MyGraphs::Graph_num_intervals($graph);
 #      }
 #      return \@got;
 #    });
@@ -242,7 +247,7 @@ MyOEIS::compare_values
 #      for (my $N = 1; @got < $count; $N++) {
 #        my $graph = Graph::Maker->new('permutations', N => $N,
 #                                      rel_type => 'transpose_cyclic');
-#        push @got, num_maximal_paths($graph);
+#        push @got, MyGraphs::Graph_num_maximal_paths($graph);
 #      }
 #      return \@got;
 #    });
@@ -264,62 +269,6 @@ MyOEIS::compare_values
      }
      return \@got;
    });
-
-
-#------------------------------------------------------------------------------
-
-# $graph is a directed Graph.pm.
-# Return the number of pairs of comparable elements $u,$v, meaning pairs
-# where there is a path from $u to $v.  The count includes $u,$u empty path.
-# For a lattice graph, this is the number of "intervals" in the lattice.
-#
-sub num_intervals {
-  my ($graph) = @_;
-  my $ret = 0;
-  foreach my $v ($graph->vertices) {
-    $ret += 1 + $graph->all_successors($v);
-  }
-  return $ret;
-}
-
-sub num_maximal_paths {
-  my ($graph) = @_;
-  ### num_maximal_chains() ...
-  my @start = $graph->predecessorless_vertices;
-  @start==1 or die "no unique start";
-  my %ways = ($start[0] => 1);
-  my %pending;
-  my %indegree;
-  foreach my $v ($graph->vertices) {
-    $pending{$v} = 1;
-    $indegree{$v} = 0;
-  }
-  while (%pending) {
-    ### at pending: scalar(keys %pending)
-    my $progress;
-    foreach my $v (keys %pending) {
-      if ($indegree{$v} != $graph->in_degree($v)) {
-        ### not ready: "$v  indegree = $indegree{$v}"
-        ### assert: $indegree{$v} < $graph->in_degree($v)
-        next;
-      }
-      delete $pending{$v};
-      foreach my $to ($graph->successors($v)) {
-        ### edge: "$v to $to"
-        $pending{$to} or die "oops, to=$to not pending";
-        $ways{$to} += $ways{$v};
-        $indegree{$to}++;
-        $progress = 1;
-      }
-    }
-
-    if (%pending && !$progress) {
-      die "num_maximal_chains() oops, no progress";
-    }
-  }
-  ### return: $ways{$end[0]}
-  return sum(@ways{$graph->successorless_vertices});
-}
 
 
 #------------------------------------------------------------------------------

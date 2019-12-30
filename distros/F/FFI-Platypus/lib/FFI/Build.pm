@@ -12,7 +12,7 @@ use Capture::Tiny ();
 use File::Path ();
 
 # ABSTRACT: Build shared libraries for use with FFI
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 
 sub _native_name
@@ -292,7 +292,7 @@ FFI::Build - Build shared libraries for use with FFI
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 

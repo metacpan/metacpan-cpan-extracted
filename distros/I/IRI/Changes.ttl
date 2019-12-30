@@ -15,6 +15,20 @@
 	.
 
 
+<http://kasei.us/code/files/IRI-0.010.tar.gz>
+	dcterms:isVersionOf my:project ;
+	dcterms:replaces    <http://kasei.us/code/files/IRI-0.009.tar.gz> ;
+	
+	doap:Version [
+		doap:revision	"0.010" ;
+		doap:created	"2019-12-26" ;
+	] ;
+	asc:changes [
+		asc:update		"Fix component resolution to remove dots when base resolution occurs without a scheme but with a user/port/host." ;
+	] ;
+	.
+
+
 <http://kasei.us/code/files/IRI-0.009.tar.gz>
 	dcterms:isVersionOf my:project ;
 	dcterms:replaces    <http://kasei.us/code/files/IRI-0.008.tar.gz> ;

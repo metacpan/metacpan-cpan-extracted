@@ -1,10 +1,14 @@
 package Locale::TextDomain::UTF8;
 
-use 5.010001;
-use strict;
-use warnings;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-26'; # DATE
+our $DIST = 'Locale-TextDomain-UTF8'; # DIST
+our $VERSION = '0.020'; # VERSION
 
-our $VERSION = '0.01'; # VERSION
+# IFUNBUILT
+# use strict;
+# use warnings;
+# END IFUNBUILT
 
 use Encode             ();
 use Locale::Messages   ();
@@ -16,7 +20,7 @@ sub import {
     my $pkg = caller;
 
     eval qq[package $pkg; use Locale::TextDomain \$textdomain, \@search_dirs;];
-    die $@ if $@;
+    die if $@;
     Locale::Messages::bind_textdomain_filter(
         $textdomain, \&Encode::decode_utf8);
 }
@@ -36,7 +40,7 @@ Locale::TextDomain::UTF8 - Shortcut to use Locale::TextDomain and decoding to UT
 
 =head1 VERSION
 
-version 0.01
+This document describes version 0.020 of Locale::TextDomain::UTF8 (from Perl distribution Locale-TextDomain-UTF8), released on 2019-12-26.
 
 =head1 SYNOPSIS
 
@@ -69,21 +73,13 @@ functions are UTF8-encoded Perl strings. For example, if you want to pass the
 strings to L<Unicode::GCString>. For more details, see the Perl Advent article
 mentioned in the SEE ALSO section.
 
-=head1 SEE ALSO
-
-L<Locale::TextDomain>
-
-L<Locale::Messages>
-
-L<http://www.perladvent.org/2013/2013-12-09.html>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Locale-TextDomain-UTF8>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Locale-TextDomain-UTF8>.
+Source repository is at L<https://github.com/perlancar/perl-Locale-TextDomain-UTF8>.
 
 =head1 BUGS
 
@@ -93,13 +89,23 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Locale::TextDomain::UTF8::IfEnv>
+
+L<Locale::TextDomain>
+
+L<Locale::Messages>
+
+L<http://www.perladvent.org/2013/2013-12-09.html>
+
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Steven Haryanto.
+This software is copyright (c) 2019, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

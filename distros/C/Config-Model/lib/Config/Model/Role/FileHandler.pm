@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::FileHandler 2.137;
+package Config::Model::Role::FileHandler 2.138;
 
 # ABSTRACT: role to read or write configuration files
 
@@ -68,7 +68,7 @@ Config::Model::Role::FileHandler - role to read or write configuration files
 
 =head1 VERSION
 
-version 2.137
+version 2.138
 
 =head1 SYNOPSIS
 

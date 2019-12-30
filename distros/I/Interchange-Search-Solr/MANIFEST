@@ -20,6 +20,7 @@ t/empty-search.t
 t/encoding.t
 t/facet-as-word-bug.t
 t/filters.t
+t/index-handlers.t
 t/manifest.t
 t/mouse.t
 t/pod-coverage.t

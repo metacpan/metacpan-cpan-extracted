@@ -1,0 +1,11 @@
+Revision history for Mail-Qmail-Filter
+
+1.10    2019-12-28 07:25
+        compare all addresses case-insensitively
+
+1.01    2019-12-28 06:33
+        bugfix for Mail::Qmail::Filter::CheckDeliverability
+        when no .qmail file is found
+
+1.0     2019-12-22 18:18
+        prepared first release for CPAN

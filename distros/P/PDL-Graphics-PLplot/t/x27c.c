@@ -1,5 +1,3 @@
-// $Id: x27c.c 11992 2011-10-20 22:54:16Z andrewross $
-//
 //      Drawing "spirograph" curves - epitrochoids, cycolids, roulettes
 //
 // Copyright (C) 2007  Arjen Markus
@@ -40,7 +38,7 @@ void arcs( void );
 //--------------------------------------------------------------------------
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
     // R, r, p, N
     // R and r should be integers to give correct termination of the

@@ -47,11 +47,11 @@ sub ttl {
     my $self = shift;
 
     if (@_) {
-	$self->{finish_time} = ( $_[1] || Time::HiRes::time ) + $_[0];
-	return $self;
+        $self->{finish_time} = ( $_[1] || Time::HiRes::time ) + $_[0];
+        return $self;
     }
     else {
-	return exists $self->{finish_time} && $self->{finish_time} ? $self->{finish_time} - Time::HiRes::time : undef;
+        return exists $self->{finish_time} && $self->{finish_time} ? $self->{finish_time} - Time::HiRes::time : undef;
     }
 }
 
@@ -60,25 +60,25 @@ sub expires {
     my $expires = $_[0];
 
     if (@_) {
-	return $expires
-	  if $expires eq 'never' || $expires eq 'now';
+        return $expires
+          if $expires eq 'never' || $expires eq 'now';
 
-	$self->{expires_finish_time} = Time::HiRes::time + parse_duration( $expires );
-	return $expires;
+        $self->{expires_finish_time} = Time::HiRes::time + parse_duration( $expires );
+        return $expires;
     }
     else {
-	return
-	    exists $self->{expires_finish_time} && $self->{expires_finish_time}
-	    ?
-		(
-		    $self->{expires_finish_time} > Time::HiRes::time
-		    ?
-			int( $self->{expires_finish_time} - Time::HiRes::time + 0.5 ) || 'now'
-		    :
-			'now'
-		)
-	    :
-		undef;
+        return
+            exists $self->{expires_finish_time} && $self->{expires_finish_time}
+            ?
+                (
+                    $self->{expires_finish_time} > Time::HiRes::time
+                    ?
+                        int( $self->{expires_finish_time} - Time::HiRes::time + 0.5 ) || 'now'
+                    :
+                        'now'
+                )
+            :
+                undef;
     }
 }
 

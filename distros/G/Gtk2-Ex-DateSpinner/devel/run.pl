@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-DateSpinner.
 #
@@ -21,28 +21,44 @@
 use strict;
 use warnings;
 use Gtk2 '-init';
+$|=1;
 
 use FindBin;
 my $progname = $FindBin::Script;
 
-BEGIN {
-  $ENV{'LANG'} = 'ja_JP.utf8';
-  $ENV{'LC_ALL'} = 'ja_JP.utf8';
-  delete $ENV{'LANGUAGE'};
-
-  $ENV{'LANG'} = 'de_DE';
-  $ENV{'LC_ALL'} = 'de_DE';
-  $ENV{'LANGUAGE'} = 'de';
-
-  require POSIX;
-  print "setlocale to ",POSIX::setlocale(POSIX::LC_ALL(),""),"\n";
-}
+# BEGIN {
+#   $ENV{'LANG'} = 'ja_JP.utf8';
+#   $ENV{'LC_ALL'} = 'ja_JP.utf8';
+#   delete $ENV{'LANGUAGE'};
+# 
+#   $ENV{'LANG'} = 'de_DE';
+#   $ENV{'LC_ALL'} = 'de_DE';
+#   $ENV{'LANGUAGE'} = 'de';
+# 
+#   require POSIX;
+#   print "setlocale to ",POSIX::setlocale(POSIX::LC_ALL(),""),"\n";
+# }
 
 use Gtk2::Ex::DateSpinner;
 # {
 #   print Locale::Messages::dgettext ('gtk20-properties','Day');
 #   exit 0;
 # }
+
+{
+  require I18N::Langinfo::Wide;
+  print "today ", POSIX::strftime(' %a ',localtime(time())),"\n";
+
+  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time());
+  $wday = 1;
+
+  foreach my $i (1..7) {
+    print "day: ",Gtk2::Ex::DateSpinner::_ymd_to_wday_str(2019,12,$i),"\n";
+    $wday = $i;
+    # print "mangled ", POSIX::strftime(' %a ', $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst),"\n";
+    # print "langinfo ", I18N::Langinfo::Wide::langinfo(I18N::Langinfo::ABDAY_1() + ($i%7)),"\n";
+  }
+}
 
 my $toplevel = Gtk2::Window->new('toplevel');
 $toplevel->signal_connect (destroy => sub {

@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -43,14 +43,13 @@ sub init {
   my $graph = $graph_maker->(%params);
   $graph->set_graph_attribute(name => "Twindragon Area Tree $level");
   $graph->add_vertex(0);
-  my $directed = $graph->is_directed;
+  my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
 
  V: foreach my $v (0 .. 2**$level-1) {
     # ...1 edge to ...0
     if ($v & 1) {
       my $to = $v ^ 1;
-      $graph->add_edge($v, $to);
-      if ($directed) { $graph->add_edge($to, $v); }
+      $graph->$add_edge($v, $to);
     }
 
     #  ...10 11...11
@@ -67,8 +66,7 @@ sub init {
     $bit <<= 1;
     if ($v & $bit) {
       my $to = $v-$bit+1;
-      $graph->add_edge($v, $to);
-      if ($directed) { $graph->add_edge($to, $v); }
+      $graph->$add_edge($v, $to);
     }
   }
   return $graph;

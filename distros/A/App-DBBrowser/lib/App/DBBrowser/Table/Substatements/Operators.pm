@@ -217,7 +217,7 @@ sub __col_op {
             $sql->{$stmt} .= ' ' . $qt_arg;
             1 }
         ) {
-            $ax->print_error_message( $@, $op . ' ' . $arg );
+            $ax->print_error_message( $@ );
             return;
         }
     }
@@ -238,7 +238,7 @@ sub __regex_op {
         $regex_op = $plui->regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
         1 }
     ) {
-        $ax->print_error_message( $@, $op );
+        $ax->print_error_message( $@ );
         return;
     }
     #if ( $ext_col ) {                       #

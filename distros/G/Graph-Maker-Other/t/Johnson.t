@@ -32,7 +32,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 16;
+plan tests => 51;
 
 require Graph::Maker::Johnson;
 
@@ -52,7 +52,7 @@ sub stringize_sorted {
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::Johnson::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Johnson->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Johnson->VERSION($want_version); 1 }, 1,
@@ -103,11 +103,27 @@ sub stringize_sorted {
 
 require Graph::Maker::Complete;
 foreach my $N (2 .. 6) {
-  my $johnson  = Graph::Maker->new('Johnson', N=>$N, K=>1);
-  my $complete = Graph::Maker->new('complete', N=>$N);
-  ok ($johnson eq $complete, 1);
+  foreach my $undirected (0, 1) {
+    foreach my $multiedged (0, 1) {
+      my $johnson  = Graph::Maker->new('Johnson', N=>$N, K=>1,
+                                       undirected => $undirected,
+                                       multiedged => $multiedged);
+      my $complete = Graph::Maker->new('complete', N=>$N,
+                                       undirected => $undirected,
+                                       multiedged => $multiedged);
+      ok ($johnson eq $complete, 1);
+
+      my $num_edges = $johnson->edges;
+      ok ($num_edges, T($N) * ($undirected ? 1 : 2));
+    }
+  }
 }
 
+# triangular numbers
+sub T {
+  my ($n) = @_;
+  return $n*($n-1)/2;
+}
 
 #------------------------------------------------------------------------------
 exit 0;

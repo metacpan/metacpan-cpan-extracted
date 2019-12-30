@@ -1,5 +1,3 @@
-# Makefile.PL for a package defined by PP code.
-
 use ExtUtils::MakeMaker;
 use Config;
 use File::Spec;
@@ -57,6 +55,7 @@ foreach ('plplot', 'plplotd') {
   print "Searching for ${libname} library.\n";
 
   foreach my $libdir (
+              split(' ', $Config{libpth}), # not perl-in-space friendly
               $ENV{PLPLOT_LIBDIR},
               $PDL::Config{WHERE_PLPLOT_LIBS},
               '/usr/local/plplot/lib64',
@@ -181,16 +180,14 @@ $plversion{'c_pllegend'}  = test_func_exists('c_pllegend', 'Plot legends',
                                                          0,   0,   0,   NULL,0.0, 0.0, 0.0, 0.0, NULL,NULL,
                                                          NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);');
 $plversion{'c_plwidth'}   = test_func_exists('c_plwidth',   '5.9.10 width function', 'c_plwidth (0. );');
-$plversion{'C_COMPILE'}   = "$Config{cc} $Config{ccflags} $plplot_include_path $libs";
+$plversion{'C_COMPILE'}   = "$Config{cc} $Config{ccflags} $plplot_include_path";
+$plversion{'C_COMPILE_SUFFIX'} = $libs;
 $plversion{'PLPLOT_LIB'}  = $plplot_lib_path;
 
 # Write these options to a file--used by plplot.pd during the 'make' step
 open my $fh, '>', 'OPTIONS!' or die "Cannot write to OPTIONS! file";
 print  {$fh} Dumper(\%plversion);
 close   $fh;
-
-$PDL::Config{WITH_PLPLOT} = 1;
-
 
 #
 ## new way to get writemakefile args...
@@ -200,11 +197,9 @@ $PDL::Config{WITH_PLPLOT} = 1;
 #%hash = pdlpp_stdargs_int(@::pack);  # use this for module inside PDL source
 %hash = pdlpp_stdargs(@::pack);          # use this for separate module
 
-# $hash{'PREREQ_PM'} = { PDL => 0 };
-$hash{'OPTIMIZE'}  = '-g'; # If you want to debug, uncomment this.
+$hash{'PREREQ_PM'} = { PDL => 0 };
+# $hash{'OPTIMIZE'}  = '-g'; # If you want to debug, uncomment this.
 $hash{'VERSION_FROM'}   = 'plplot.pd';
-$hash{'META_MERGE'}   = {provides => {PDL::Graphics::PLplot => {file => 'plplot.pd', version => 0.71}}};
-
 $hash{'LIBS'}      = [$libs];
 # add this to allow one to use the /ops/tools/lib plplot libs even when
 # another plplot is installed in /usr/local/lib. D. Hunt 6/4/2004
@@ -212,6 +207,18 @@ $hash{'LDDLFLAGS'} = " -shared -L$plplot_lib_path -L/usr/local/lib ";
 $hash{'INC'}      .= " $plplot_include_path";
 $hash{'clean'}     = {'FILES'  =>
                         'PLplot.pm PLplot.xs PLplot.o PLplot.c PLplot.bs *svg.* *.xfig temp* OPTIONS! Makefile.old'};
+$hash{META_MERGE} = {
+  "meta-spec" => { version => 2 },
+  resources => {
+    bugtracker  => {web=>'https://github.com/PDLPorters/pdl-graphics-plplot/issues'},
+    repository  => {
+       url => 'git://github.com/PDLPorters/pdl-graphics-plplot.git',
+       type => 'git',
+       web => 'https://github.com/PDLPorters/pdl-graphics-plplot',
+    },
+  },
+ x_IRC => 'irc://irc.perl.org/#pdl',
+};
 
 my $postamble = pdlpp_postamble(@::pack); # use for external module
 #my $postamble = pdlpp_postamble_int(@::pack); # use for install inside PDL distro

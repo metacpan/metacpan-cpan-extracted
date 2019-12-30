@@ -1,6 +1,3 @@
-#! /usr/bin/env perl
-#
-#
 # Demo x23 for the PLplot PDL binding
 #
 # Displays Greek letters and mathematically interesting Unicode ranges
@@ -28,6 +25,8 @@
 
 $|++; # set output to immediate flush
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 
@@ -243,11 +242,11 @@ for (my $page = 0; $page < 11; $page++) {
   plbox ($deltax, 0, $deltay, 0, "bcg", "bcg");
   plcol0 (15);
   my $length = $hi [$page] - $lo [$page];
-  $slice = 0;
+  my $slice = 0;
   for (my $j = $nycells [$page] - 1; $j >= -1; $j--) {
     my $y = (0.5 + $j) * $deltay;
     for (my $i = 0; $i < $nxcells [$page]; $i++) {
-      $x  = (0.5 + $i) * $deltax;
+      my $x  = (0.5 + $i) * $deltax;
       if ($slice < $length) {
 	my $cmdString;
         if ($page == 0) {

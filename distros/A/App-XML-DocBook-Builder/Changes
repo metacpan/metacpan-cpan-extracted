@@ -1,3 +1,6 @@
+0.0800  2019-12-26
+        - Enable doing "cpanm App::Docmake" for installation.
+
 0.0700  2019-02-06
         - Pass --nonet to xsltproc.
             - See https://news.ycombinator.com/item?id=18318771

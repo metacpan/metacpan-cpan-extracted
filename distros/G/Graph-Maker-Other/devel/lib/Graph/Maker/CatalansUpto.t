@@ -30,7 +30,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 49;
+plan tests => 969;
 
 use FindBin;
 use lib "$FindBin::Bin/../..";
@@ -43,7 +43,7 @@ require Graph::Maker::CatalansUpto;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::CatalansUpto::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::CatalansUpto->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::CatalansUpto->VERSION($want_version); 1 }, 1,
@@ -64,59 +64,6 @@ my @Catalan_number     = (1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862, 16796,
 # A014137             n = 0  1  2  3   4   5    6    7     8
 my @Catalan_cumulative = (1, 2, 4, 9, 23, 65, 197, 626, 2056, 6918, 23714,
                           82500, 290512, 208012);
-
-# $graph is a directed Graph.pm.
-# Return the number of pairs of comparable elements $u,$v, meaning pairs
-# where there is a path from $u to $v.  The count includes $u,$u empty path.
-# For a lattice graph, this is the number of "intervals" in the lattice.
-#
-sub num_intervals {
-  my ($graph) = @_;
-  my $ret = 0;
-  foreach my $v ($graph->vertices) {
-    $ret += 1 + $graph->all_successors($v);
-  }
-  return $ret;
-}
-
-sub num_maximal_paths {
-  my ($graph) = @_;
-  ### num_maximal_chains() ...
-  my @start = $graph->predecessorless_vertices;
-  @start==1 or die "no unique start";
-  my %ways = ($start[0] => 1);
-  my %pending;
-  my %indegree;
-  foreach my $v ($graph->vertices) {
-    $pending{$v} = 1;
-    $indegree{$v} = 0;
-  }
-  while (%pending) {
-    ### at pending: scalar(keys %pending)
-    my $progress;
-    foreach my $v (keys %pending) {
-      if ($indegree{$v} != $graph->in_degree($v)) {
-        ### not ready: "$v  indegree = $indegree{$v}"
-        ### assert: $indegree{$v} < $graph->in_degree($v)
-        next;
-      }
-      delete $pending{$v};
-      foreach my $to ($graph->successors($v)) {
-        ### edge: "$v to $to"
-        $pending{$to} or die "oops, to=$to not pending";
-        $ways{$to} += $ways{$v};
-        $indegree{$to}++;
-        $progress = 1;
-      }
-    }
-
-    if (%pending && !$progress) {
-      die "num_maximal_chains() oops, no progress";
-    }
-  }
-  ### return: $ways{$end[0]}
-  return sum(@ways{$graph->successorless_vertices});
-}
 
 sub factorial {
   my ($n) = @_;
@@ -148,19 +95,36 @@ ok (binomial(-1,-1), 0);
 
 
 #------------------------------------------------------------------------------
+# insert
+
+# {
+#   my @ret = Graph::Maker::CatalansUpto::_rel_type_insert([1,1,0,0]);
+#   ### @ret
+#   exit;
+# }
+
+
+#------------------------------------------------------------------------------
 # below
 
 {
+  my @ret = Graph::Maker::CatalansUpto::_rel_type_below([]);
+  ok (scalar(@ret), 1);
+}
+{
   # directed
   foreach my $N (0 .. 7) {
-    my $graph = Graph::Maker->new('Catalans_upto', N => $N, rel_type => 'below');
+    my $graph = Graph::Maker->new('Catalans_upto', N => $N,
+                                  rel_type => 'below');
     ok (scalar($graph->vertices), $Catalan_cumulative[$N]);
 
-    # ok (num_intervals($graph), rotate_num_intervals($N),
+    # ok (MyGraphs::Graph_num_intervals($graph), rotate_num_intervals($N),
     #     "rotate num_intervals N=$N");
 
-    ok (num_maximal_paths($graph), factorial($N),
-        "rotate num_maximal_paths N=$N");
+    foreach my $v ($graph->vertices) {
+      my $k = length($v)/2;
+      ok ($graph->out_degree($v),  $k==$N ? 0 : $k+1);
+    }
   }
 }
 

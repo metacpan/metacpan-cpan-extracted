@@ -1,5 +1,13 @@
 Revision history for Ryu
 
+1.010     2019-12-25 20:55:38+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - ->take_until and ->skip_until may complete before the condition, handle that correctly
+    - fully-qualify calls to Scalar::Util::refaddr to avoid runtime errors
+
 1.009     2019-11-17 23:53:21+08:00 Asia/Kuala_Lumpur
     No new features.
 

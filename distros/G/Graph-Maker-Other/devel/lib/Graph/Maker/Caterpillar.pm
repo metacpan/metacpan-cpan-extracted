@@ -27,13 +27,18 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 
 sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
+}
+sub _make_graph {
+  my ($params) = @_;
+  my $graph_maker = delete($params->{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%$params);
 }
 
 sub init {
@@ -50,10 +55,9 @@ sub init {
 
     return $graph;
   }
-  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
 
-  my $graph = $graph_maker->(%params);
-  $graph->set_graph_attribute (name => "Star Chain ".join(',',@N_list));
+  my $graph = _make_graph(\%params);
+  $graph->set_graph_attribute (name => "Catterpillar ".join(',',@N_list));
 
   my $directed = $graph->is_directed;
   $graph->add_path(1 .. scalar(@N_list));

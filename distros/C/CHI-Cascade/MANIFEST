@@ -27,6 +27,8 @@ t/06_fast_mmap_depends_catch.t
 t/07_fast_mmap_recompute.t
 t/08_fast_mmap_expires.t
 t/09_fast_mmap_ttl.t
+t/10_fast_mmap_deprecated_stash.t
+t/10_fast_mmap_nested_run_methods.t
 t/10_fast_mmap_stash.t
 t/11_fast_mmap_actual_term_expires.t
 t/12_fast_mmap_expires_cb.t
@@ -36,7 +38,9 @@ t/lib/test_03_depends_catch.pm
 t/lib/test_04_recompute.pm
 t/lib/test_05_expires.pm
 t/lib/test_06_ttl.pm
+t/lib/test_07_deprecated_stash.pm
 t/lib/test_07_stash.pm
 t/lib/test_08_actual_term_expires.pm
 t/lib/test_09_expires_cb.pm
+t/lib/test_10_nested_run_methods.pm
 TODO.txt

@@ -31,7 +31,8 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Graph::Maker::Johnson;
 
-use lib 'devel/lib';
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
 use MyGraphs 'Graph_is_isomorphic','Graph_is_subgraph';
 
 plan tests => 23;

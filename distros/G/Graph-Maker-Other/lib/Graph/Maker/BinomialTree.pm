@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -59,13 +59,12 @@ sub init {
   ### $limit
   if ($limit >= 0) {
     $graph->add_vertex(0);
-    my $directed = $graph->is_directed;
+    my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
 
     foreach my $i (1 .. $limit) {
       my $parent = $i & ~($i ^ ($i-1));  # clear lowest 1-bit
       ### edge: "$parent down to $i"
-      $graph->add_edge($parent, $i);
-      if ($directed) { $graph->add_edge($i, $parent); }
+      $graph->$add_edge($parent, $i);
     }
   }
   return $graph;
@@ -91,25 +90,26 @@ Graph::Maker::BinomialTree - create binomial tree graph
 
 =head1 DESCRIPTION
 
-C<Graph::Maker::BinomialTree> creates a C<Graph.pm> graph of a binomial tree
-with N vertices.  Vertices are numbered from 0 at the root through to N-1.
+C<Graph::Maker::BinomialTree> creates a C<Graph.pm> graph of the binomial
+tree with N vertices.  Vertices are numbered from 0 at the root through to
+N-1.
 
-          __0___
-         /  |   \        N => 8
-        1   2    4
-            |   / \
-            3  5   6
-                   |
-                   7
+      __0___
+     /  |   \        N => 8
+    1   2    4
+        |   / \
+        3  5   6
+               |
+               7
 
-The parent of vertex n is that n with its lowest 1-bit cleared to 0.
-Conversely, the children of a vertex n=xx1000 are xx1001, xx1010, xx1100,
-each low 0 bit changed to a 1, provided doing so does not exceed the maximum
-vertex number N-1.  At the root, the children are single bit powers 2^p up
-to high bit of the limit N-1.
+The parent of vertex n is n with its lowest 1-bit cleared to 0.  Conversely,
+the children of a vertex are each change each of its low 0s to a 1, provided
+the result is < N.  For example n=1000 has children 1001, 1010, 1100.  At
+the root, the children are single bit powers 2^j up to the high bit of the
+vertex limit N-1.
 
-By construction, the tree is labelled in pre-order since a vertex xx1000 has
-below it all xx1yyy.
+By construction, the tree is labelled in pre-order since a vertex ...1000 has
+below it all ...1xxx.
 
 =head2 Order
 
@@ -130,16 +130,24 @@ The N=8 example above is order=3 and the number of vertices at each depth is
 =for GP-Test  binomial(3,3) == 1
 
 A top-down definition is order k tree as two copies of k-1, one at the root
-and the other a child of that root.  In the N=8 order=3 example above, 0-3
-is an order=2 and 4-7 is another order=2, with 4 starting as a child of the
-root 0.
+and the other a child of that root.
+
+     k-1___
+    /...\  \           order k as two order k-1
+            k-1
+           /...\
+
+In the N=8 order=3 example above, 0-3 is an order=2 and 4-7 is another
+order=2, with 4 starting as a child of the root 0.
 
 A bottom-up definition is order k tree as order k-1 with a new leaf vertex
-added to each existing vertex.  The vertices of k-1 with extra low 0-bit
-become the even vertices of k.  An extra low 1-bit is the new leaves.
+added as a new first child of each existing vertex.  The vertices of k-1
+with extra low 0-bit become the even vertices of k.  An extra low 1-bit is
+the new leaves.
 
-Binomial tree order=5 appears on the cover of Knuth "The Art of Computer
-Programming", volume 1, "Fundamental Algorithms", second edition.
+Binomial tree order=5 appears as the frontispiece (and the paperback cover)
+in Knuth "The Art of Computer Programming", volume 1, "Fundamental
+Algorithms", second and subsequent editions.  Vertex labels are binary dots.
 
 =head1 FUNCTIONS
 
@@ -170,7 +178,7 @@ single edge from parent to child.
 
 =head2 Wiener Index
 
-The Wiener index of the binomial tree is calculated in
+The Wiener index of a binomial tree of order k is calculated in
 
 =over
 
@@ -179,8 +187,6 @@ Binomial Trees and Fibonacci Trees", Intl J Math Engg with Comp, 2009,
 L<https://arxiv.org/abs/0910.4432>
 
 =back
-
-Order k is
 
                 (k-1)*4^k + 2^k
     Wiener(k) = ---------------  = 0, 1, 10, 68, 392, ... (A192021)
@@ -207,7 +213,7 @@ The Wiener index is total distance between pairs of vertices, so the mean
 distance is, with binomial to choose 2 of the 2^k vertices,
 
                      Wiener(k)                k
-   MeanDist(k) = ---------------- =  k-1 + -------      for k>=1
+   MeanDist(k) = ----------------  = k-1 + -------      for k>=1
                  binomial(2^k, 2)          2^k - 1
 
 =cut
@@ -217,13 +223,13 @@ distance is, with binomial to choose 2 of the 2^k vertices,
 # GP-Test  num_vertices(2) == 4
 #
 # GP-DEFINE  MeanDist(k) = Wiener(k) / binomial(num_vertices(k),2);
-# GP-DEFINE  MeanDist_simplified(k) = k-1 + k / (2^k-1);
-# GP-Test  vector(100,k, MeanDist_simplified(k)) == vector(100,k, MeanDist(k))
+# GP-Test  vector(100,k, MeanDist(k)) == \
+# GP-Test  vector(100,k, k-1 + k / (2^k-1))  /* k>=1 */
 
 =pod
 
 The tree for kE<gt>=1 has diameter 2*k-1 between ends of the deepest and
-second-deepest subtrees of the root.  The mean distance as fraction of the
+second-deepest subtrees of the root.  The mean distance as a fraction of the
 diameter is then
 
     MeanDist(k)    1       1              1
@@ -241,7 +247,8 @@ diameter is then
 # GP-DEFINE  MeanDist_over_diameter(k) = MeanDist(k) / diameter(k);
 # GP-DEFINE  MeanDist_over_diameter_simplified(k) = \
 # GP-DEFINE    1/2 - 1/(4*k - 2) + 1 /( (2 - 1/k) * (2^k-1) );
-# GP-Test  vector(100,k, MeanDist_over_diameter_simplified(k)) == vector(100,k, MeanDist_over_diameter(k))
+# GP-Test  vector(100,k, MeanDist_over_diameter_simplified(k)) == \
+# GP-Test  vector(100,k, MeanDist_over_diameter(k))
 # GP-Test  my(k=100000); abs(MeanDist_over_diameter(k) - 1/2) < 1e-5
 # binomial_mean -> 1/2
 #
@@ -320,29 +327,22 @@ House of Graphs entries for the trees here include
 
 =over
 
-=item n=1 (order=0), L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310> single vertex
-
-=item n=2 (order=1), L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655> path-2
-
-=item n=4 (order=2), L<https://hog.grinvin.org/ViewGraphInfo.action?id=594> path-4
-
-=item n=5 L<https://hog.grinvin.org/ViewGraphInfo.action?id=30> fork
-
-=item n=6 L<https://hog.grinvin.org/ViewGraphInfo.action?id=496> E graph
-
-=item n=7 L<https://hog.grinvin.org/ViewGraphInfo.action?id=714>
-
-=item n=8 (order=3), L<https://hog.grinvin.org/ViewGraphInfo.action?id=700>
-
-=item n=16 (order=4), L<https://hog.grinvin.org/ViewGraphInfo.action?id=28507>
-
-=item n=32 (order=5), L<https://hog.grinvin.org/ViewGraphInfo.action?id=21088>
-
-=item n=64 (order=6), L<https://hog.grinvin.org/ViewGraphInfo.action?id=33543>
-
-=item n=128 (order=6), L<https://hog.grinvin.org/ViewGraphInfo.action?id=33545>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310> (etc)
 
 =back
+
+    1310      N=1 (order=0),  single vertex
+    19655     N=2 (order=1),  path-2
+    32234     N=3,            path-3
+    594       N=4 (order=2),  path-4
+    30        N=5,            fork
+    496       N=6,            E graph
+    714       N=7      
+    700       N=8 (order=3)
+    28507     N=16 (order=4)
+    21088     N=32 (order=5)
+    33543     N=64 (order=6)
+    33545     N=128 (order=7)
 
 =head1 OEIS
 
@@ -355,10 +355,16 @@ L<http://oeis.org/A192021> (etc)
 
 =back
 
-    A192021   Wiener index
-    A092124   pre-order balanced binary coding, decimal
-    A210995     binary
-    A079559     binary sequence of 0s and 1s
+    by N vertices
+      A129760   parent vertex number, clear lowest 1-bit
+      A000523   height, floor(log2(N))
+      A090996   number of vertices at height, num high 1-bits
+
+    by order
+      A192021   Wiener index
+      A092124   pre-order balanced binary coding, decimal
+      A210995     binary
+      A079559     binary sequence of 0s and 1s
 
 =for GP-Test  vector(7,k,k--; Wiener(k)) == [0, 1, 10, 68, 392, 2064, 10272]
 

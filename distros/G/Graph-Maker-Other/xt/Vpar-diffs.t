@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2018 Kevin Ryde
+# Copyright 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -31,7 +31,8 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Graph::Maker::KnightGrid;
 
-use lib 'devel/lib';
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
 use MyGraphs;
 
 plan tests => 62;

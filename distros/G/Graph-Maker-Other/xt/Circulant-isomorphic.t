@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2018 Kevin Ryde
+# Copyright 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -20,6 +20,9 @@
 
 use strict;
 use 5.004;
+use File::Spec;
+use File::Slurp;
+use FindBin;
 use Test;
 # before warnings checking since Graph.pm 0.96 is not safe to non-numeric
 # version number from Storable.pm
@@ -29,12 +32,12 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-use lib 'devel/lib';
+use lib File::Spec->catdir('devel','lib');
 use MyGraphs;
 
 use Graph::Maker::Circulant;
 
-plan tests => 61;
+plan tests => 67;
 
 
 sub make_Mobius_ladder {
@@ -45,6 +48,112 @@ sub make_Mobius_ladder {
   $ladder->add_edge(1,2*$rungs);
   $ladder->add_edge($rungs,$rungs+1);
   return $ladder;
+}
+
+#------------------------------------------------------------------------------
+# Circulant N=7 1,2,3 = Fano plane = 7,3 Symmetric Configurations
+
+{
+  #              5
+  #           /  |  \
+  #          /   |   \
+  #         6 _  |  _ 4
+  #        /    _7_    \
+  #       / __-- | --__ \
+  #      1 ----- 2 ----- 3
+  #
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=19174
+  #   Fano plane with middle cycle
+  #   Unique triangulation with 7 vertices.
+  #   3 separating triangles and minimal Hamiltonian cycles.
+  #
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=58
+  #   Cycles.
+  #   Circulant N=7 1,2,3
+
+  my @graphs;
+  my @lines = ([1,2,3],
+               [3,4,5],
+               [5,6,1],
+
+               [1,7,4],
+               [3,7,6],
+               [5,7,2],
+               [2,4,6]);
+  foreach my $method ('add_path','add_cycle') {
+    my $graph = Graph->new (undirected => 1);
+    $graph->set_vertex_attribute(1, x => 0);
+    $graph->set_vertex_attribute(1, y => 0);
+    $graph->set_vertex_attribute(2, x => 2);
+    $graph->set_vertex_attribute(2, y => .1);
+    $graph->set_vertex_attribute(3, x => 4);
+    $graph->set_vertex_attribute(3, y => 0);
+    $graph->set_vertex_attribute(4, x => 2.9);
+    $graph->set_vertex_attribute(4, y => .9);
+    $graph->set_vertex_attribute(5, x => 2);
+    $graph->set_vertex_attribute(5, y => 2);
+    $graph->set_vertex_attribute(6, x => 1.1);
+    $graph->set_vertex_attribute(6, y => .9);
+    $graph->set_vertex_attribute(7, x => 2.1);
+    $graph->set_vertex_attribute(7, y => .53);
+
+    $graph->set_graph_attribute (name => "Fano 7,3 Configuration $method");
+    foreach my $line (@lines) {
+      $graph->$method (@$line);
+    }
+    push @graphs, $graph;
+
+    my @vertices = sort $graph->vertices;
+    my @degrees = map {$graph->degree($_)} @vertices;
+    print '# ', join(',',@degrees), "\n";
+  }
+
+  # This path form with geometric sides and crosses.
+  # Omitting different combinations of 1 edge each cycle gives 16 different.
+  my $paths  = $graphs[0];
+  # MyGraphs::Graph_view($paths);
+  # MyGraphs::Graph_run_dreadnaut($paths);
+
+  my $cycles = $graphs[1];
+  # MyGraphs::Graph_view($cycles);
+  {
+    my $circulant = Graph::Maker->new('circulant', undirected => 1,
+                                  N => 7, offset_list => [1,2,3]);
+    ok (MyGraphs::Graph_is_isomorphic($cycles, $circulant), 1,
+        'Fano plane cycles = circulant N=7 1,2,3');
+  }
+  my $cycles_g6 = MyGraphs::graph6_str_to_canonical
+    (MyGraphs::Graph_to_graph6_str($cycles));
+  ok (MyGraphs::hog_grep($cycles_g6), 58);
+
+  # middle cycle
+  my $middle = $paths->copy;
+  $middle->set_graph_attribute (name => "Fano Plane middle cycle");
+  ok (! $middle->has_edge(2,6));
+  $middle->add_edge(2,6);
+  my $middle_g6 = MyGraphs::graph6_str_to_canonical
+    (MyGraphs::Graph_to_graph6_str($middle));
+  ok (MyGraphs::hog_grep($middle_g6), 19174);
+
+  # No, 7 as paths is not transitive this way.
+  # foreach my $line (@lines) {
+  #   my $other = $paths->copy;
+  #   $other->add_cycle(@$line);
+  #   ok (MyGraphs::Graph_is_isomorphic($middle, $other),
+  #       'Fano plane any one line as cycle is the same');
+  # }
+
+  # {
+  #   my $graph = Graph->new (undirected => 1);
+  #   $graph->set_graph_attribute (name => "Fano 7,3 Symmetric Incidence");
+  #   foreach my $i (0 .. $#lines) {
+  #     foreach my $v (@{$lines[$i]}) {
+  #       $graph->add_edge ($v, "L$i");
+  #     }
+  #   }
+  #   print "incidence ",MyGraphs::Graph_is_configuration_incidence($graph),"\n";
+  #   push @graphs, $graph;
+  # }
 }
 
 #------------------------------------------------------------------------------
@@ -177,53 +286,68 @@ sub make_Mobius_ladder {
 # POD HOG Shown
 
 {
-  my %shown = ('N=6 1,2' => 226,
-               'N=6 1,3' => 84,
-               'N=6 2,3' => 746,
-               'N=7 1,2' => 710,
-               'N=8 1,2' => 160,
-               'N=8 1,3' => 570,
-               'N=8 1,2,3' => 176,
-               'N=8 1,4' => 640,
-               'N=8 2,4' => 116,
-               'N=9 1,3' => 328,
-               'N=9 1,2,4' => 370,
-               'N=10 1,2' => 21063,
-               'N=10 2,4' => 138,
-               'N=10 1,2,4' => 21117,
-               'N=10 1,2,3,4' => 148,
-               'N=10 1,2,5' => 20611,
-               'N=10 1,3,5' => 252,
-               'N=10 1,2,3,5' => 142,
-              );
+  my %shown;
+  {
+    my $content = File::Slurp::read_file
+      (File::Spec->catfile($FindBin::Bin,
+                           File::Spec->updir,
+                           'lib','Graph','Maker','Circulant.pm'));
+    $content =~ /=head1 HOUSE OF GRAPHS.*?=head1/s or die;
+    $content = $&;
+    my $rel_type;
+    my $count = 0;
+    while ($content =~ /^ +(?<id>\d+) +N=(?<N>\d+) +(?<list>[0-9,]+)/mg) {
+      $count++;
+      my $id   = $+{'id'};
+      my $N    = $+{'N'};
+      my $list = $+{'list'};
+      $shown{"N=$N $list"} = $+{'id'};
+    }
+    ok ($count, 30, 'HOG ID number lines');
+  }
+  ok (scalar(keys %shown), 30);
+  ### %shown
+
+  #     1           2,3 but not all of
+  #  5     2
+  #   4   3
+  
+  #     1           2,3 but not all of
+  #  4     2
+  #     3
+  
+  require Algorithm::ChooseSubsets;
   my $extras = 0;
   my %seen;
-  foreach my $N (3 .. 11) {
-    my $half = int($N/2);
-    foreach my $offset_flags (0 .. (1<<$half)-1) {
-      my @offset_list;
-      foreach my $o (1 .. $half) {
-        if ($offset_flags & (1<<($o-1))) {
-          push @offset_list, $o;
-        }
-      }
-      next if @offset_list < 2;
-      next if @offset_list == $half;
 
+  # FIXME: Many N=12 not yet shown in the POD ...
+  foreach my $N (3 .. 11, 13 .. 19) {
+    my $half = int($N/2);
+    my @possible_offsets = (1 .. $half);
+    my $it = Algorithm::ChooseSubsets->new(\@possible_offsets);
+    while (my $offset_list = $it->next) {
+      # if ($N==7) {
+      #   printf "half=%d offset_list %s\n", $half, join(',',@$offset_list);
+      # }
+      next if @$offset_list <= 1; # not cycle
       my $graph = Graph::Maker->new('circulant', undirected => 1,
-                                    N => $N, offset_list => \@offset_list);
+                                    N => $N,
+                                    offset_list => $offset_list);
+      my $max_edges = $N*($N-1)/2;
+      next if $graph->edges == $max_edges;  # not complete
+
       my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
       $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
       next if $seen{$g6_str}++;
-      my $key = "N=$N ".join(',',@offset_list);
+      my $key = "N=$N ".join(',',@$offset_list);
       if (my $id = $shown{$key}) {
         MyGraphs::hog_compare($id, $g6_str);
       } else {
         if (MyGraphs::hog_grep($g6_str)) {
           my $num_edges = $graph->edges;
-          MyTestHelpers::diag ("HOG $key not shown in POD, num edges $num_edges");
+          MyTestHelpers::diag ("HOG $key not shown in POD, num edges $num_edges (out of $max_edges)");
           MyTestHelpers::diag ($g6_str);
-#          MyGraphs::Graph_view($graph);
+          #          MyGraphs::Graph_view($graph);
           $extras++
         }
       }

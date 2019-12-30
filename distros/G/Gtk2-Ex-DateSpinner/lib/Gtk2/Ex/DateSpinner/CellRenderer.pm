@@ -21,7 +21,7 @@ use strict;
 use warnings;
 use Gtk2;
 
-our $VERSION = 9;
+our $VERSION = 10;
 
 use Glib::Object::Subclass
   'Gtk2::CellRendererText';

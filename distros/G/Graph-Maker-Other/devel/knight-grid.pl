@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -64,11 +64,11 @@ use MyGraphs;
 
   my @graphs;
   my @values;
-  foreach my $w (2 .. 4) {
-    foreach my $h ($w .. 4) {
+  foreach my $w (2) {
+    foreach my $h (2) {
       require Graph::Maker::KnightGrid;
       my $graph = Graph::Maker->new('knight_grid',
-                                    dims => [$w,$h,2,2],
+                                    dims => [$w,$h,3],
                                     undirected => 1,
                                     cyclic => 1,
                                    );

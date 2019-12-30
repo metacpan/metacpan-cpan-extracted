@@ -85,14 +85,15 @@ sub mangle {
 	}
     }
 
-    if (my @source = $self->get(qw(core source))) {
-	$self->unset(qw(core source));
-	foreach my $s (@source) {
+    if (my $source_node = $self->getnode(qw(core source))) {
+	$self->unset(qw(core source));	
+	foreach my $s ($source_node->value) {
 	    my ($name, @args) = quotewords('\s+', 0, $s);
 	    my $pack = 'App::Acmeman::Source::' . ucfirst($name);
 	    my $obj = eval "use $pack; new $pack(\@args);";
 	    if ($@) {
-		$self->error($@);
+		$self->error("error loading source module $name: $@",
+			     locus => $source_node->locus);
 	        ++$err;
 	        next;
 	    }
@@ -122,7 +123,7 @@ __DATA__
     rootdir = STRING :default=/var/www/acme
     files = STRING
     time-delta = NUMBER :default=86400
-    source = STRING :default=apache :array
+    source = STRING :default=default :array
     check-alt-names = BOOL :default=0
     check-dns = BOOL :default=1
     my-ip = STRING :array

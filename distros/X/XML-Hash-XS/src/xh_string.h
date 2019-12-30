@@ -17,13 +17,13 @@
     (xh_str_equal4(p, c0, c1, c2, c3) && (p)[4] == c4)
 
 #define xh_str_equal6(p, c0, c1, c2, c3, c4, c5)                        \
-    (xh_str_equal4(p, c0, c1, c2, c3) && xh_str_equal2(&p[4], c4, c5))
+    (xh_str_equal4(p, c0, c1, c2, c3) && xh_str_equal2(&(p)[4], c4, c5))
 
 #define xh_str_equal7(p, c0, c1, c2, c3, c4, c5, c6)                    \
-    (xh_str_equal4(p, c0, c1, c2, c3) && xh_str_equal3(&p[4], c4, c5, c6))
+    (xh_str_equal4(p, c0, c1, c2, c3) && xh_str_equal3(&(p)[4], c4, c5, c6))
 
 #define xh_str_equal8(p, c0, c1, c2, c3, c4, c5, c6, c7)                \
-    (xh_str_equal4(p, c0, c1, c2, c3) && xh_str_equal4(&p[4], c4, c5, c6, c7))
+    (xh_str_equal4(p, c0, c1, c2, c3) && xh_str_equal4(&(p)[4], c4, c5, c6, c7))
 
 #define xh_str_equal9(p, c0, c1, c2, c3, c4, c5, c6, c7, c8)            \
     (xh_str_equal8(p, c0, c1, c2, c3, c4, c5, c6, c7) && (p)[8] == c8)
@@ -35,10 +35,13 @@
     (xh_str_equal8(p, c0, c1, c2, c3, c4, c5, c6, c7) && xh_str_equal3(&p[8], c8, c9, c10))
 
 #define xh_str_equal12(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11)\
-    (xh_str_equal8(p, c0, c1, c2, c3, c4, c5, c6, c7) && xh_str_equal4(&p[8], c8, c9, c10, c11))
+    (xh_str_equal8(p, c0, c1, c2, c3, c4, c5, c6, c7) && xh_str_equal4(&(p)[8], c8, c9, c10, c11))
 
 #define xh_str_equal13(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12)\
-    (xh_str_equal8(p, c0, c1, c2, c3, c4, c5, c6, c7) && xh_str_equal5(&p[8], c8, c9, c10, c11, c12))
+    (xh_str_equal8(p, c0, c1, c2, c3, c4, c5, c6, c7) && xh_str_equal5(&(p)[8], c8, c9, c10, c11, c12))
+
+#define xh_str_equal14(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13)\
+    (xh_str_equal8(p, c0, c1, c2, c3, c4, c5, c6, c7) && xh_str_equal6(&(p)[8], c8, c9, c10, c11, c12, c13))
 
 
 #define xh_strcmp(s1, s2)       strcmp((const char *) (s1), (const char *) (s2))

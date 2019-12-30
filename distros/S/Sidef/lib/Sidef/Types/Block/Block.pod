@@ -62,6 +62,16 @@ Aliases: I<map>
 
 =cut
 
+=head2 ∘
+
+I<Obj> B<∘> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<compose>
+
+=cut
+
 =head2 array_identity
 
 Block.array_identity() -> I<Obj>
@@ -199,6 +209,22 @@ Return the
 =head2 null_identity
 
 Block.null_identity() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prod
+
+Block.prod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum
+
+Block.sum() -> I<Obj>
 
 Return the
 

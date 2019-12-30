@@ -1,5 +1,9 @@
 Revision history for JSON-Typist
 
+0.006     2019-12-26 14:21:11-05:00 America/New_York
+        - jcmp_deeply(undef, "") will no longer pass; this was a bug! (thanks,
+          Matthew Horsfall!)
+
 0.005     2017-01-01 11:56:23-05:00 America/New_York
         - update minimum required Test:Deep
 

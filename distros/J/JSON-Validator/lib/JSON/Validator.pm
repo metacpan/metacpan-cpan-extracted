@@ -23,7 +23,7 @@ use constant REPORT            => $ENV{JSON_VALIDATOR_REPORT} // DEBUG >= 2;
 use constant RECURSION_LIMIT   => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 
-our $VERSION = '3.16';
+our $VERSION = '3.17';
 our $YAML_LOADER = eval q[use YAML::XS 0.67; YAML::XS->can('Load')];  # internal
 our @EXPORT_OK   = qw(joi validate_json);
 
@@ -320,7 +320,8 @@ sub _load_schema {
     @modules = _stack() unless $modules[0];
     for my $module (@modules) {
       warn "[JSON::Validator] Looking for $file in $module\n" if DEBUG;
-      my $text = Mojo::Loader::data_section($module, $file);
+      my $text = Mojo::Util::encode('UTF-8',
+        Mojo::Loader::data_section($module, $file) // '');
       return $self->_load_schema_from_text(\$text), "$url" if $text;
     }
     confess "$file could not be found in __DATA__ section of @modules.";
@@ -547,7 +548,8 @@ sub _location_to_abs {
   # definitely relative now
   if ($base->isa('Mojo::File')) {
     return $base if !length $location;
-    return $base->sibling(split '/', $location)->realpath;
+    my $path = $base->sibling(split '/', $location)->realpath;
+    return CASE_TOLERANT ? lc($path) : $path;
   }
   return $location_as_url->to_abs($base);
 }

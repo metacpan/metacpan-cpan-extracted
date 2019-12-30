@@ -1,7 +1,7 @@
 package Bencher;
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '1.041'; # VERSION
+our $DATE = '2019-12-24'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 1;
 # ABSTRACT: A benchmark framework
@@ -18,7 +18,7 @@ Bencher - A benchmark framework
 
 =head1 VERSION
 
-This document describes version 1.041 of Bencher (from Perl distribution Bencher), released on 2018-04-03.
+This document describes version 1.043 of Bencher (from Perl distribution Bencher), released on 2019-12-24.
 
 =head1 SYNOPSIS
 
@@ -649,7 +649,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

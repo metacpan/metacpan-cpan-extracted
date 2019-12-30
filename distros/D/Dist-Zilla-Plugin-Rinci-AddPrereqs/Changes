@@ -1,25 +1,31 @@
-0.142   2018-06-11 (PERLANCAR)
+0.143   2019-12-28  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] x.completion and x.element_completion do not need to be
+	  array; it can also be coderef or scalar.
+
+
+0.142   2018-06-11  Released-By: PERLANCAR
 
 	- Really avoid perl undef warning.
 
 
-0.141   2018-06-11 (PERLANCAR)
+0.141   2018-06-11  Released-By: PERLANCAR
 
 	- Avoid perl undef warning.
 
 
-0.140   2018-06-10 (PERLANCAR)
+0.140   2018-06-10  Released-By: PERLANCAR
 
 	- Use minimum prereq version from pmversions.ini.
 
 
-0.13    2016-10-09 (PERLANCAR)
+0.13    2016-10-09  Released-By: PERLANCAR
 
 	- [Bugfix] We should be skipping non-ondisk modules only, we can
 	  already process non-ondisk scripts.
 
 
-0.12    2016-09-29 (PERLANCAR)
+0.12    2016-09-29  Released-By: PERLANCAR
 
 	- [Bugfix] No need to add prereqs from Sah schema unless for CLI
 	  scripts.
@@ -28,7 +34,7 @@
 	  modules to Perinci::Sub::Util::DepModule.
 
 
-0.11    2016-08-31 (PERLANCAR)
+0.11    2016-08-31  Released-By: PERLANCAR
 
 	- Get CLI's function meta from dump result, which still works when
 	  Riap URL package is main.
@@ -36,12 +42,12 @@
 	- Add prereq to Sah::Schema::* even though not from CLI.
 
 
-0.10    2016-07-22 (PERLANCAR)
+0.10    2016-07-22  Released-By: PERLANCAR
 
 	- Handle (skip) non-OnDisk files.
 
 
-0.09    2016-06-02 (PERLANCAR)
+0.09    2016-06-02  Released-By: PERLANCAR
 
         - Fix/update to Data::Sah 0.79 which provides more complete information
           about required modules, so we can add prereqs correctly (e.g.
@@ -50,28 +56,28 @@
           Perinci::CmdLine::Inline-based).
 
 
-0.08    2016-05-20 (PERLANCAR)
+0.08    2016-05-20  Released-By: PERLANCAR
 
 	- Add prereq to Sah coercion rule modules
 	  (Data::Sah::Coerce::perl::*) specified in argument schema.
 
 
-0.07    2015-12-25 (PERLANCAR)
+0.07    2015-12-25  Released-By: PERLANCAR
 
 	- Add prereq to required Perinci::Sub::Property::* modules.
 
 
-0.06    2015-04-02 (PERLANCAR)
+0.06    2015-04-02  Released-By: PERLANCAR
 
 	- Add prereq to Perinci::Sub::XCompletion::*.
 
 
-0.05    2015-03-18 (PERLANCAR)
+0.05    2015-03-18  Released-By: PERLANCAR
 
 	- Skip if script refers to Riap URL '/main/*'.
 
 
-0.04    2015-03-17 (PERLANCAR)
+0.04    2015-03-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -79,7 +85,7 @@
 	  PWR:DumpPerinciCmdLineScript to be more proper.
 
 
-0.03    2015-03-13 (PERLANCAR)
+0.03    2015-03-13  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -87,12 +93,12 @@
 	  even when not verbose.
 
 
-0.02    2015-03-13 (PERLANCAR)
+0.02    2015-03-13  Released-By: PERLANCAR
 
 	- Support Perinci::CmdLine-based CLI scripts, only add prereq to
 	  Perinci::Sub::ArgEntity::* modules for CLI scripts.
 
 
-0.01     2015-03-08 (PERLANCAR)
+0.01     2015-03-08  Released-By: PERLANCAR
 
          - First release.

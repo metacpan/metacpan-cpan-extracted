@@ -13,7 +13,7 @@ Dancer2::Manual::Deployment - common ways to put your Dancer app into use
 
 =head1 VERSION
 
-version 0.208002
+version 0.300000
 
 =head1 DESCRIPTION
 

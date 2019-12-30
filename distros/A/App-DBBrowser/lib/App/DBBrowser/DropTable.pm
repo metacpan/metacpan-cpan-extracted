@@ -94,7 +94,7 @@ sub __drop {
         $prompt = sprintf 'DROP %s %s  (%s %s)', uc $type, $sql->{table}, insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
         1; }
     ) {
-        $ax->print_error_message( $@, "Drop $type info output" );
+        $ax->print_error_message( $@ );
         $prompt = sprintf 'DROP %s %s', uc $type, $sql->{table};
     }
     $prompt .= "\n\nCONFIRM:";

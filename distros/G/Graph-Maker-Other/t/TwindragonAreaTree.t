@@ -29,7 +29,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 16;
+plan tests => 80;
 
 
 require Graph::Maker::TwindragonAreaTree;
@@ -37,7 +37,7 @@ require Graph::Maker::TwindragonAreaTree;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::TwindragonAreaTree::VERSION, $want_version,
       'VERSION variable');
   ok (Graph::Maker::TwindragonAreaTree->VERSION,  $want_version,
@@ -80,6 +80,22 @@ require Graph::Maker::TwindragonAreaTree;
   ok ($graph->vertex_degree(3), 1);
 }
 
+foreach my $level (0 .. 7) {
+  foreach my $undirected (0, 1) {
+    foreach my $multiedged (0, 1) {
+      my $graph = Graph::Maker->new('twindragon_area_tree',
+                                    level => $level,
+                                    undirected => $undirected,
+                                    multiedged => $multiedged);
+      my $num_vertices = $graph->vertices;
+      ok ($num_vertices, 2**$level);
+
+      my $num_edges = $graph->edges;
+      ok ($num_edges,
+          ($num_vertices==0 ? 0 : $num_vertices-1) * ($undirected ? 1 : 2));
+    }
+  }
+}
 
 #------------------------------------------------------------------------------
 exit 0;

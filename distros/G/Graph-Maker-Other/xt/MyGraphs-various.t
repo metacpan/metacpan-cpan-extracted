@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,7 +29,8 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-use lib 'devel/lib';
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
 use MyGraphs 'make_tree_iterator_edge_aref','edge_aref_to_Graph',
   'Graph_tree_domnum',
   'Graph_is_domset',         'Graph_tree_domsets_count',
@@ -38,7 +39,46 @@ use MyGraphs 'make_tree_iterator_edge_aref','edge_aref_to_Graph',
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 58;
+plan tests => 102;
+
+
+#------------------------------------------------------------------------------
+# Graph_num_maximal_paths()
+
+{
+  my $graph = Graph->new;
+  $graph->add_edges([1,2],
+                    [3,4]);
+  ok (MyGraphs::Graph_num_maximal_paths($graph), 2);
+}
+
+
+#------------------------------------------------------------------------------
+# Lattices
+
+{
+  my $graph = Graph->new;
+  $graph->add_edges(['L', 'A'],
+                    ['L', 'B'],
+                    ['A', 'H'],
+                    ['B', 'H']);
+  my $href = MyGraphs::Graph_lattice_minmax_hash($graph);
+  foreach my $x ($graph->vertices) {
+    ok ($href->{'max'}->{$x}->{$x}, $x);
+    ok ($href->{'min'}->{$x}->{$x}, $x);
+
+    foreach my $y ($graph->vertices) {
+      ok (defined $href->{'max'}->{$x}->{$y}, 1);
+      ok (defined $href->{'min'}->{$x}->{$y}, 1);
+    }
+  }
+  ok ($href->{'max'}->{'A'}->{'B'}, 'H');
+  ok ($href->{'min'}->{'A'}->{'B'}, 'L');
+  ok ($href->{'min'}->{'B'}->{'A'}, 'L');
+
+  ### $href
+  MyGraphs::Graph_lattice_minmax_validate($graph,$href);
+}
 
 
 #------------------------------------------------------------------------------

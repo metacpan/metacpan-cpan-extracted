@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 e292077d17cf88098b80edefd5ca21ecebc739f98ece587a14114c139dc4dc9f CONTRIBUTING
+SHA256 087e35962431dd3a32ef3cb123b97f8960eb3bdb3a933a00e854ce4495b82830 Changes
+SHA256 c53c6b96081b0a5b9b2fb4d0133d55c20e5e00e4c127ade62f03434ee7b3d2de LICENSE
+SHA256 a1938adf340353c39429d1e79225eda01d2d3f69696b0baf649966cb776ed767 MANIFEST
+SHA256 2bd33b2bd575c596747130c386bdc9d1e0dc6d8288ff57a513c52822ed88d3f3 META.json
+SHA256 520b8e8203965410ca865b158765d6a1921c45e7c13770824e009eda43ac488f META.yml
+SHA256 c5cc28c93367313ecc8f81be0637fe1fd612730ff4b1942d3e3659ad19c78878 Makefile.PL
+SHA256 490b3da9a3102f39fb60cfa5534a04625aabddab2daede18edf88eeb541f0b2d README
+SHA256 ed910e0b64347c21b108d7d45e468483e46185c40ce17168ffb1ff62b4dec5bb examples/cyclo_poly
+SHA256 c59e899efe3582988f83f0c971991cae4922f008e3726c89c5d0260d3a697bf9 lib/Math/Polynomial/Cyclotomic.pm
+SHA256 e19d39b503324c5c0e583245d468ca6a09be0c9aa1a46acfae4e4faae42031f0 t/01_basics.t
+SHA256 6197a71b87dee6f231f6d02de388f1bf4f0d147a66fb1104aaee28450c149caa t/90_pod.t
+SHA256 0a2daec475d225706dad85cb5c74c973b95042b7d97d8d7f51ce15ea6ee02084 t/91_pod_cover_cp.t
+SHA256 2490c49d025e0621e81eb8081f5f945415c1a25627ed4f0bc282d5c59757aa67 t/92_consistency.t
+SHA256 b5822260d3e27950461540c335f236791eb59087588e0a11ce189a1674c9a667 t/99_signature.t
+SHA256 b4cb87c87368800758e1408832ff5d4ebde403661cd0ae9d6b068dac55be9aa3 t/lib/Test/MyUtils.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEjUydDHaxELVSK+hYp13NmW8fHSUFAl4FOQYACgkQp13NmW8f
+HSWGhAf7BtDJxSMa3ByUR+evQoS3uBJ2aH9RiySgf7ZFezhFnuG8M05EU7yastWE
+Fk11S5W7cRTdWrweYwDgl79It3w9LkWoUAyTYjXbl132QX/zLF1ONOn0XnJfJlbB
+CuRRfZkPr/8K+wlddtJaKRJ2klos1eqGdgjB8tu4pZk60HxZ0mBhZyZI25d96X0c
+2XZqOPjHmmBscqGOJPwITOW9ZIHlNaHouVsbneXI5iMlovVvgeDf35SsXlqkz3RN
+1ZwZ7rShTZk2vDOVTGsdrRDXKqGgtmckRyre6KUIe1A5Yy7zcVRGeRvW1JScpm5O
+IbajkzqTtSLF3py/vgwVaWSkY7onwQ==
+=Mz5Z
+-----END PGP SIGNATURE-----

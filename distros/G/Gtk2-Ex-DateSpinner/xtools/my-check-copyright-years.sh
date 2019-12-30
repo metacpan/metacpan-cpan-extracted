@@ -2,7 +2,7 @@
 
 # my-check-copyright-years.sh -- check copyright years in dist
 
-# Copyright 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018 Kevin Ryde
 
 # my-check-copyright-years.sh is shared by several distributions.
 #
@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License along
 # with this file.  If not, see <http://www.gnu.org/licenses/>.
 
-set -e
-#set -x
+set -e   # die on error
+set -x   # echo
 
 # find files in the dist with mod times this year, but without this year in
 # the copyright line
@@ -28,10 +28,21 @@ set -e
 if test -z "$DISTVNAME"; then
   DISTVNAME=`sed -n 's/^DISTVNAME = \(.*\)/\1/p' Makefile`
 fi
+case $DISTVNAME in
+  *\$*) DISTVNAME=`make echo-DISTVNAME` ;;
+esac
 if test -z "$DISTVNAME"; then
-  echo "DISTVNAME not found"
+  echo "DISTVNAME not set and not in Makefile"
   exit 1
 fi
+TARGZ="$DISTVNAME.tar.gz"
+if test -e "$TARGZ"; then :;
+else
+  pwd
+  echo "TARGZ $TARGZ not found"
+  exit 1
+fi
+
 
 MY_HIDE=
 year=`date +%Y`
@@ -39,7 +50,7 @@ year=`date +%Y`
 result=0
 
 # files with dates $year
-tar tvfz $DISTVNAME.tar.gz \
+tar tvfz $TARGZ \
 | egrep "$year-|debian/copyright" \
 | sed "s:^.*$DISTVNAME/::" \
 | {
@@ -50,15 +61,23 @@ do
   case $i in \
     '' | */ \
     | ppport.h \
-    | debian/changelog | debian/compat | debian/doc-base \
-    | debian/patches/*.diff | debian/source/format \
-    | COPYING | MANIFEST* | SIGNATURE | META.yml \
+    | debian/changelog | debian/doc-base \
+    | debian/compat | debian/emacsen-compat | debian/source/format \
+    | debian/patches/*.diff \
+    | COPYING | MANIFEST* | SIGNATURE | META.yml | META.json \
     | version.texi | */version.texi \
     | *utf16* | examples/rs''s2lea''fnode.conf \
     | */MathI''mage/ln2.gz | */MathI''mage/pi.gz \
     | *.mo | *.locatedb* | t/samp.* \
     | t/empty.dat | t/*.xpm | t/*.xbm | t/*.jpg | t/*.gif \
-    | t/*.g${MY_HIDE}d)
+    | t/*.g${MY_HIDE}d \
+    | tools/*-oeis-samples.gp \
+    | test-oeis-samples.gp \
+    | tools/configurations-gfs-generated.gp \
+    | devel/configurations-t-generated.gp \
+    | test-symbols.txt | test-funcs.txt \
+    | devel/minimal-domsets-max-even2.c \
+    | */_whizzy*)
       continue ;;
     *.gz)
       GREP=zgrep

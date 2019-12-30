@@ -1,0 +1,25 @@
+.gitignore
+.travis.yml
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+XS.xs
+lib/Promise/XS.pm
+lib/Promise/XS/Deferred.pm
+lib/Promise/XS/Loader.pm
+lib/Promise/XS/Promise.pm
+ppport.h
+t/XSPromises.t
+t/alias.t
+t/anyevent.t
+t/aplus.t
+t/detect_memory_leaks.t
+t/ioasync.t
+t/mojo.t
+t/subclass.t
+t/sync.t
+t/unhandled_rejection.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -70,6 +70,7 @@ t/query_spacetrack.t
 t/spacetrack_request.t
 tools/all_iridium_classic
 tools/capture
+tools/modeldef
 tools/README
 xt/author/celestrak_datasets.t
 xt/author/changes.t

@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '1.009'; # VERSION
+our $VERSION = '1.010'; # VERSION
 
 =head1 NAME
 
@@ -758,7 +758,7 @@ sub buffer {
         my ($f) = @_;
         return if @pending;
         my $addr = Scalar::Util::refaddr($code);
-        my $count = List::UtilsBy::extract_by { $addr == refaddr($_) } @{$self->{on_item}};
+        my $count = List::UtilsBy::extract_by { $addr == Scalar::Util::refaddr($_) } @{$self->{on_item}};
         $f->on_ready($src->completed) unless $src->is_ready;
         $log->tracef("->each_while_source completed on %s for refaddr 0x%x, removed %d on_item handlers", $self->describe, Scalar::Util::refaddr($self), $count);
     });
@@ -1304,7 +1304,12 @@ sub skip_until {
             my $reached = 0;
             sub { return $src->emit($_) if $reached ||= $condition->($_); }
         } elsif(Scalar::Util::blessed($condition) && $condition->isa('Future')) {
-            $condition->on_fail($src->completed)->on_cancel($src->completed);
+            $condition->on_ready($src->$curry::weak(sub {
+                my ($src, $cond) = @_;
+                return if $src->is_ready;
+                $src->fail($cond->failure) if $cond->is_failed;
+                $src->cancel if $cond->is_cancelled
+            }));
             sub { $src->emit($_) if $condition->is_done; }
         } else {
             die 'unknown type for condition: ' . $condition;
@@ -1351,7 +1356,12 @@ sub take_until {
                 my $reached = 0;
                 sub { return $src->emit($_) unless $reached ||= $condition->($_); }
             } elsif(Scalar::Util::blessed($condition) && $condition->isa('Future')) {
-                $condition->on_fail($src->completed)->on_cancel($src->completed);
+                $condition->on_ready($src->$curry::weak(sub {
+                    my ($src, $cond) = @_;
+                    return if $src->is_ready;
+                    $src->fail($cond->failure) if $cond->is_failed;
+                    $src->cancel if $cond->is_cancelled
+                }));
                 sub { $src->emit($_) unless $condition->is_done; }
             } else {
                 die 'unknown type for condition: ' . $condition;
@@ -1817,7 +1827,7 @@ sub notify_child_completion {
     }
 
     $log->warnf("Child %s (addr 0x%x) not found in list for %s", $child->describe, $self->describe);
-    $log->tracef("* %s (addr 0x%x)", $_->describe, refaddr($_)) for @{$self->{children}};
+    $log->tracef("* %s (addr 0x%x)", $_->describe, Scalar::Util::refaddr($_)) for @{$self->{children}};
     $self
 }
 
@@ -1944,7 +1954,7 @@ sub each_while_source {
         my ($f) = @_;
         $args{cleanup}->($f, $src) if exists $args{cleanup};
         my $addr = Scalar::Util::refaddr($code);
-        my $count = List::UtilsBy::extract_by { $addr == refaddr($_) } @{$self->{on_item}};
+        my $count = List::UtilsBy::extract_by { $addr == Scalar::Util::refaddr($_) } @{$self->{on_item}};
         $f->on_ready($src->completed) unless $src->is_ready;
         $log->tracef("->each_while_source completed on %s for refaddr 0x%x, removed %d on_item handlers", $self->describe, Scalar::Util::refaddr($self), $count);
     });

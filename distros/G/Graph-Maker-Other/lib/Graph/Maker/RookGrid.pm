@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -33,6 +33,11 @@ $VERSION = 13;
 sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
+}
+sub _make_graph {
+  my ($self, %params) = @_;
+  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%params);
 }
 
 # last $dim runs fastest, per Graph::Maker::Grid
@@ -50,15 +55,11 @@ sub _coordinates_to_vertex {
 
 sub init {
   my ($self, %params) = @_;
+  ### RookGrid ...
 
   my $dims   = delete($params{'dims'}) || [];
-  my $cyclic = delete($params{'cyclic'});
-  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
-
-  ### RookGrid ...
   ### $dims
-
-  my $graph = $graph_maker->(%params);
+  my $graph = $self->_make_graph(%params);
 
   $graph->set_graph_attribute(name => "Rook Grid "
                               . (@$dims ? join('x',@$dims) : 'empty'));
@@ -67,22 +68,21 @@ sub init {
     return $graph;
   }
 
+  my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
   my @c = (0) x scalar(@$dims);
   for (;;) {
     my $v = _coordinates_to_vertex(\@c, $dims);
     $graph->add_vertex($v);
     ### at: join(',',@c)."=[$v]"
 
+    # each coordinate i, each greater value in that coordinate
     foreach my $i (0 .. $#c) {
       foreach my $i_to ($c[$i]+1 .. $dims->[$i]-1) {
         my @c2 = @c;
         $c2[$i] = $i_to;
-        if ($cyclic) {
-          $c2[$i] %= $dims->[$i];
-        }
         my $v2 = _coordinates_to_vertex(\@c2, $dims);
         ### edge: join(',',@c)."=[$v] to ".join(',',@c2)."=[$v2]"
-        $graph->add_edge($v,$v2);
+        $graph->$add_edge($v,$v2);
       }
     }
 
@@ -190,37 +190,30 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item 1x1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>, single vertex
-
-=item 1x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>, path-2
-
-=item 1x3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1374>, 3-cycle
-
-=item 1x4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=74>, complete-4
-
-=item 1x5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=462>, complete-5
-
-=item 1x6, L<https://hog.grinvin.org/ViewGraphInfo.action?id=232>, complete-6
-
-=item 1x7, L<https://hog.grinvin.org/ViewGraphInfo.action?id=58>, complete-7
-
-=item 1x8, L<https://hog.grinvin.org/ViewGraphInfo.action?id=180>, complete-8
-
-=item 2x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=674>, 4-cycle
-
-=item 2x3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=746>, circular ladder 3 rungs
-
-=item 3x3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=6607>, Paley
-
-=item 4x4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=30317>, Paley
-
-=item 2x2x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1022>, cube
-
-=item 2x2x2x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1340>, tesseract
-
-=item 2x2x2x2x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=28533>, 5-hypercube
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310> (etc)
 
 =back
+
+    1310    1,1        single vertex
+    19655   1,2        path-2
+    1374    1,3        3-cycle
+    74      1,4        complete-4
+    462     1,5        complete-5
+    232     1,6        complete-6
+    58      1,7        complete-7
+    180     1,8        complete-8
+    674     2,2        4-cycle
+    746     2,3        circular ladder 3 rungs
+    33461   2,4        cross-connected complete-4s
+    32441   2,5        cross-connected complete-5s
+    32796   2,6        cross-connected complete-6s
+    6607    3,3        Paley
+    32804   3,4
+    30317   4,4        Paley
+    1022    2,2,2      cube
+    32808   2,2,3
+    1340    2,2,2,2    tesseract
+    28533   2,2,2,2,2  5-hypercube
 
 =head1 OEIS
 

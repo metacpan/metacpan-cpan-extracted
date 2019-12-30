@@ -9,9 +9,9 @@ build_requires:
   Test::Simple: '0.96'
 configure_requires:
   CPP::catch: v1.0.8
-  XS::Install: v1.2.9
+  XS::Install: v1.2.12
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,6 +25,6 @@ requires:
   CPP::catch: v1.0.8
   Test::More: '1.302015'
   Test::Simple: '1.302096'
-  XS::Install: v1.2.9
-version: v1.0.8
+  XS::Install: v1.2.12
+version: v1.0.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -31,7 +31,7 @@ my %WriteMakefile_args = (
   PREREQ_PM => {
     'XSLoader' => 0,
     'XS::Object::Magic' => 0,
-    'Protocol::Redis' => '0.9001',
+    'Protocol::Redis' => '1.0011',
     'parent' => 0,
   },
 

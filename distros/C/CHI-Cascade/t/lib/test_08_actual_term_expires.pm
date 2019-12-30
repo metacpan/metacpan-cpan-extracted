@@ -16,35 +16,35 @@ sub test_cascade {
     isa_ok( $cascade, 'CHI::Cascade');
 
     $cascade->rule(
-	target		=> 'big_array',
-	code		=> sub {
-	    return [ 1 .. 1000 ];
-	},
-	recomputed	=> sub { $recomputed++ }
+        target          => 'big_array',
+        code            => sub {
+            return [ 1 .. 1000 ];
+        },
+        recomputed      => sub { $recomputed++ }
     );
 
     $cascade->rule(
-	target		=> qr/^one_page_(\d+)$/,
-	depends		=> 'big_array',
-	code		=> sub {
-	    my ($rule) = @_;
+        target          => qr/^one_page_(\d+)$/,
+        depends         => 'big_array',
+        code            => sub {
+            my ($rule) = @_;
 
-	    my ($page) = $rule->target =~ /^one_page_(\d+)$/;
+            my ($page) = $rule->target =~ /^one_page_(\d+)$/;
 
-	    my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
-	    $ret;
-	},
-	recomputed	=> sub { $recomputed++ }
+            my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
+            $ret;
+        },
+        recomputed      => sub { $recomputed++ }
     );
 
     $cascade->rule(
-	target		=> 'actual_test',
-	actual_term	=> 2.0,
-	value_expires	=> '3s',
-	depends		=> 'one_page_0',
-	code		=> sub {
-	    $_[2]->{one_page_0}
-	}
+        target          => 'actual_test',
+        actual_term     => 2.0,
+        value_expires   => '4s',
+        depends         => 'one_page_0',
+        code            => sub {
+            $_[2]->{one_page_0}
+        }
     );
 
     ok( $cascade->{stats}{recompute} == 0, 'recompute stats - 1');
@@ -96,13 +96,13 @@ sub test_cascade {
 
     ok( $cascade->{stats}{dependencies_lookup} > $dependencies_lookup );
 
-    select( undef, undef, undef, 1.0 );
+    select( undef, undef, undef, 2.0 );
 
     # Here the 'value_expires' happened
-    # Before there was bug - the expires has been updated by actual_cash checking
+    # Before there was bug - the expires has been updated by actual_test checking
     is_deeply( $cascade->run( 'actual_test', state => \$state ), [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ], 'actual_test');
     ok( $cascade->{stats}{dependencies_lookup} > $dependencies_lookup );
-    ok( $cascade->{stats}{recompute} == 7 );	# Here were recomputed 'actual_test' & 'one_page_0'
+    ok( $cascade->{stats}{recompute} == 7 );    # Here were recomputed 'actual_test' & 'one_page_0'
 
     # Here target's value has expired before the actual term finished
     ok( not $state & CASCADE_ACTUAL_TERM );

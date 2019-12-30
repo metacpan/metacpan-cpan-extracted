@@ -10,7 +10,6 @@ namespace panda {
 
 namespace panda {
 
-// see catch_option.hpp from Catch2 
 template <typename T> struct optional {
     ~optional() { reset(); }
 
@@ -59,14 +58,52 @@ private:
 
 template <typename T> struct optional_tools {
     using type = optional<T>;
-    static type default_value() { return type{}; }
-  };
+    static type default_value () { return type{}; }
+};
 
-  template <>
-  struct optional_tools<void> {
-      static void default_value(){}
-      using type = void;
-  };
+template <> struct optional_tools<void> {
+    using type = void;
+    static void default_value () {}
+};
+
+template <class T, class U> inline constexpr bool operator== (const optional<T>& lhs, const optional<U>& rhs) {
+    return (lhs && rhs) ? (*lhs == *rhs) : (lhs || rhs ? false : true);
+}
+template <class T, class U> inline constexpr bool operator!= (const optional<T>& lhs, const optional<U>& rhs) { return !operator==(lhs, rhs); }
+
+template <class T, class U>
+inline constexpr bool operator< (const optional<T>& lhs, const optional<U>& rhs) {
+    return (lhs && rhs) ? (*lhs < *rhs) : (rhs ? true : false);
+}
+
+template <class T, class U>
+constexpr bool operator<= (const optional<T>& lhs, const optional<U>& rhs) {
+    return (lhs && rhs) ? (*lhs < *rhs) : (lhs ? false : true);
+}
+
+template <class T, class U>
+constexpr bool operator> (const optional<T>& lhs, const optional<U>& rhs) {
+    return (lhs && rhs) ? (*lhs < *rhs) : (lhs ? true : false);
+}
+
+template <class T, class U>
+constexpr bool operator>= (const optional<T>& lhs, const optional<U>& rhs) {
+    return (lhs && rhs) ? (*lhs < *rhs) : (rhs ? false : true);
+}
+
+template <class T, class U> constexpr bool operator== (const optional<T>& opt, const U& value) { return opt && *opt == value; }
+template <class T, class U> constexpr bool operator== (const T& value, const optional<U>& opt) { return opt && value == *opt; }
+template <class T, class U> constexpr bool operator!= (const optional<T>& opt, const U& value) { return !operator==(opt, value); }
+template <class T, class U> constexpr bool operator!= (const T& value, const optional<U>& opt) { return !operator==(value, opt); }
+template <class T, class U> constexpr bool operator<  (const optional<T>& opt, const U& value) { return opt ? *opt < value : true; }
+template <class T, class U> constexpr bool operator<  (const T& value, const optional<U>& opt) { return opt && value < *opt; }
+template <class T, class U> constexpr bool operator<= (const optional<T>& opt, const U& value) { return opt ? *opt <= value : true; }
+template <class T, class U> constexpr bool operator<= (const T& value, const optional<U>& opt) { return opt && value <= *opt; }
+template <class T, class U> constexpr bool operator>  (const optional<T>& opt, const U& value) { return opt && *opt > value; }
+template <class T, class U> constexpr bool operator>  (const T& value, const optional<U>& opt) { return opt ? value > *opt : true; }
+template <class T, class U> constexpr bool operator>= (const optional<T>& opt, const U& value) { return opt && *opt >= value; }
+template <class T, class U> constexpr bool operator>= (const T& value, const optional<U>& opt) { return opt ? value >= *opt : true; }
+
 }
 
 #endif

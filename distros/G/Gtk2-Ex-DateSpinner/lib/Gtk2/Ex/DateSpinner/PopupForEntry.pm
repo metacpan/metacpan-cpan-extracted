@@ -22,7 +22,7 @@ use warnings;
 use Gtk2;
 use List::Util qw(min max);
 
-our $VERSION = 9;
+our $VERSION = 10;
 
 use Glib::Object::Subclass
   'Gtk2::Window',

@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-XML-DocBook-Builder",
-  "dist_version" => "0.0700",
+  "dist_version" => "0.0800",
   "license" => "mit",
   "module_name" => "App::XML::DocBook::Builder",
   "recursive_test_files" => 1,
@@ -30,7 +30,7 @@ my %module_build_args = (
     "Pod::Usage" => 0,
     "base" => 0,
     "parent" => 0,
-    "perl" => "5.008",
+    "perl" => "5.014",
     "strict" => 0,
     "warnings" => 0
   },

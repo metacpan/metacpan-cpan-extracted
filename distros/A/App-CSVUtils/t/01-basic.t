@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use Test::Exception;
 use Test::More 0.98;
+use Test::Needs;
 
 use App::CSVUtils;
 use File::Temp qw(tempdir);
@@ -144,6 +145,22 @@ subtest csv_sort_rows => sub {
     # by code, hash
     $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_code=>'$a->{f1} cmp $b->{f1}', hash=>1);
     is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n10,Chuck\n2,andy\n),{'cmdline.skip_format'=>1}]);
+    # by code, key
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_code=>'$a cmp $b', key=>'$_->[0]');
+    is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n10,Chuck\n2,andy\n),{'cmdline.skip_format'=>1}]);
+    # by code, hash, key
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_code=>'$a cmp $b', hash=>1, key=>'$_->{f1}');
+    is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n10,Chuck\n2,andy\n),{'cmdline.skip_format'=>1}]);
+
+    subtest by_sortsub => sub {
+        test_needs 'Sort::Sub', 'Sort::Sub::numerically';
+        # numeric
+        $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_sortsub=>"numerically", key=>'$_->[0]');
+        is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n2,andy\n10,Chuck\n),{'cmdline.skip_format'=>1}]);
+        # reverse numeric. hash
+        $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_sortsub=>"numerically<r>", hash=>1, key=>'$_->{f1}');
+        is_deeply($res, [200,"OK",qq(f1,f2\n10,Chuck\n2,andy\n1,Andy\n),{'cmdline.skip_format'=>1}]);
+    };
 };
 
 subtest csv_sum => sub {

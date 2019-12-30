@@ -24,7 +24,7 @@ use Math::PlanePath::ComplexPlus;
 use Math::PlanePath::DragonCurve 117; # v.117 for level_to_n_range()
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -35,14 +35,19 @@ sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
 }
+sub _make_graph {
+  my ($params) = @_;
+  my $graph_maker = delete($params->{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%$params);
+}
+
 sub init {
   my ($self, %params) = @_;
 
   my $level = delete($params{level}) || 0;
-  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
   ### $level
 
-  my $graph = $graph_maker->(%params);
+  my $graph = _make_graph(\%params);
   $graph->set_graph_attribute(name => "Twindragon Area Tree $level by Path");
 
   my $path = Math::PlanePath::DragonCurve->new;

@@ -1,6 +1,3 @@
-// -*- coding: utf-8; -*-
-// $Id: x18c.c 11354 2010-11-28 20:53:56Z airwin $
-//
 //      3-d line and point plot demo.  Adapted from x08c.c.
 //
 
@@ -22,7 +19,7 @@ void test_poly( int k );
 #define NPTS    1000
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
     int   i, k;
     PLFLT *x, *y, *z;

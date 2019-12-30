@@ -31,7 +31,7 @@ use Scalar::Util qw(blessed);
 use constant ODD  => 'odd';
 use constant EVEN => 'even';
 
-our $VERSION = 2.68;
+our $VERSION = '3.003';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $AUTOLOAD;
 
@@ -115,29 +115,35 @@ sub get_first {
 #------------------------------------------------------------------------
 
 sub get_next {
-    my $self = shift;
-    my ($max, $index) = @$self{ qw( MAX INDEX ) };
-    my $data = $self->{ _DATASET };
+    my ( $max, $index ) = @{ $_[0] }{qw( MAX INDEX )};
 
     # warn about incorrect usage
-    unless (defined $index) {
-        my ($pack, $file, $line) = caller();
+    if ( !defined $index ) {
+        my ( $pack, $file, $line ) = caller();
         warn("iterator get_next() called before get_first() at $file line $line\n");
-        return (undef, Template::Constants::STATUS_DONE);   ## RETURN ##
+        return ( undef, Template::Constants::STATUS_DONE );    ## RETURN ##
     }
 
     # if there's still some data to go...
-    if ($index < $max) {
-        # update counters and flags
-        $index++;
-        @$self{ qw( INDEX COUNT FIRST LAST ) }
-        = ( $index, $index + 1, 0, $index == $max ? 1 : 0 );
-        @$self{ qw( PREV NEXT ) } = @$data[ $index - 1, $index + 1 ];
-        return $data->[ $index ];                           ## RETURN ##
+    elsif ( $index >= $max ) {
+        return ( undef, Template::Constants::STATUS_DONE );    ## RETURN ##
     }
-    else {
-        return (undef, Template::Constants::STATUS_DONE);   ## RETURN ##
-    }
+
+    my $self = shift;
+    my $dataset = $self->{_DATASET};
+    
+    $index++;
+
+    # update counters and flags
+    @$self{qw( INDEX COUNT FIRST LAST PREV NEXT )} = (
+        $index,                                            # INDEX
+        $index + 1,                                        # COUNT
+        0,                                                 # FIRST
+        $index == $max ? 1 : 0,                            # LAST
+        @$dataset[ $index - 1, $index + 1 ]                # PREV, NEXT
+    );
+
+    return $dataset->[ $index ];                           ## RETURN ##
 }
 
 
@@ -204,11 +210,34 @@ sub parity {
     shift->{ COUNT } % 2 ? ODD : EVEN;
 }
 
+sub index {
+    return $_[0]->{INDEX};
+}
+
+sub count {
+    return $_[0]->{COUNT};
+}
+
+sub number { # This is here for backward compatibility per sub AUTOLOAD
+    return $_[0]->{COUNT};
+}
+
+sub first {
+    return $_[0]->{FIRST};
+}
+
+sub last {
+    return $_[0]->{LAST};
+}
+
+sub size {
+    return $_[0]->{SIZE};
+}
 
 #------------------------------------------------------------------------
 # AUTOLOAD
 #
-# Provides access to internal fields (e.g. size, first, last, max, etc)
+# Provides access to internal fields (e.g. prev, next, etc)
 #------------------------------------------------------------------------
 
 sub AUTOLOAD {
@@ -218,7 +247,7 @@ sub AUTOLOAD {
     return if $item eq 'DESTROY';
 
     # alias NUMBER to COUNT for backwards compatibility
-    $item = 'COUNT' if $item =~ /NUMBER/i;
+    $item = 'COUNT' if CORE::index(uc $item,'NUMBER') > -1;
 
     return $self->{ uc $item };
 }
@@ -414,6 +443,11 @@ on the first item.
 
 Returns the next item in the data set or C<undef> if the iterator is on the 
 last item.
+
+=head2 number()
+
+This is an alias to 'count' to provide backward compatibility.
+View L<count>.
 
 =head2 parity()
 

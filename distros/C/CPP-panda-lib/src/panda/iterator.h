@@ -2,16 +2,21 @@
 
 namespace panda {
 
-template <typename It>
+template <typename Begin, typename End = Begin>
 class IteratorPair {
-    It _begin;
-    It _end;
+    Begin _begin;
+    End _end;
 public:
-    IteratorPair (It begin, It end) : _begin(begin), _end(end) {}
+    IteratorPair (Begin begin, End end) : _begin(begin), _end(end) {}
 
-    It begin () const { return _begin; }
-    It end   () const { return _end; }
+    Begin begin () const { return _begin; }
+    End end   () const { return _end; }
 
 };
+
+template <typename Begin, typename End = Begin>
+IteratorPair<Begin, End> make_iterator_pair(Begin begin, End end) {
+    return IteratorPair<Begin, End>(begin, end);
+}
 
 }

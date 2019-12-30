@@ -32,12 +32,16 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Sort::Sub" : "0.112"
+         },
          "requires" : {
             "Complete::Util" : "0.606",
             "Data::Sah::Compiler::perl::TH::any" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
             "Data::Sah::Compiler::perl::TH::code" : "0",
+            "Data::Sah::Compiler::perl::TH::hash" : "0",
             "Data::Sah::Compiler::perl::TH::int" : "0",
             "Data::Sah::Compiler::perl::TH::re" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
@@ -45,6 +49,7 @@
             "Hash::Subset" : "0.005",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Lite" : "1.820",
+            "Perinci::Sub::XCompletion::sortsub_spec" : "0",
             "Sah::Schema::filename" : "0",
             "Sah::Schema::uint" : "0",
             "Scalar::Util" : "0",
@@ -65,7 +70,8 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Test::Needs" : "0"
          }
       }
    },
@@ -81,7 +87,7 @@
          "web" : "https://github.com/perlancar/perl-App-CSVUtils"
       }
    },
-   "version" : "0.027",
+   "version" : "0.028",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -660,6 +666,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "recommends"
+               }
+            },
+            "name" : "RuntimeRecommends",
             "version" : "6.012"
          },
          {

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "bin/docmake"
   ],
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "App::XML::DocBook::Builder",
   "PREREQ_PM" => {
     "Class::Accessor" => 0,
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "Test::Trap" => 0,
     "vars" => 0
   },
-  "VERSION" => "0.0700",
+  "VERSION" => "0.0800",
   "test" => {
     "TESTS" => "t/*.t"
   }

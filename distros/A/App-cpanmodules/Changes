@@ -1,10 +1,17 @@
-0.002   2019-01-15 (PERLANCAR)
+0.003   2019-11-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe x.app.cpanmodules.show_entries
+
+        - [internal] Replace PERLANCAR::Module::List with Module::List::Tiny.
+
+
+0.002   2019-01-15  Released-By: PERLANCAR
 
 	- [Incompatible change] No longer list each related/alternate
 	  module as separate entry, add --with-attr option to add other
 	  keys of entry to result.
 
 
-0.001   2018-01-09 (PERLANCAR)
+0.001   2018-01-09  Released-By: PERLANCAR
 
         - First release.

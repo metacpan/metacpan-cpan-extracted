@@ -1,7 +1,7 @@
 package App::cpanmodules;
 
-our $DATE = '2019-01-15'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-19'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -79,11 +79,11 @@ $SPEC{list_acmemods} = {
     },
 };
 sub list_acmemods {
-    require PERLANCAR::Module::List;
+    require Module::List::Tiny;
 
     my %args = @_;
 
-    my $res = PERLANCAR::Module::List::list_modules(
+    my $res = Module::List::Tiny::list_modules(
         'Acme::CPANModules::', {list_modules=>1, recurse=>1});
 
     my @res;
@@ -154,13 +154,17 @@ sub view_acmemod {
 
     my $res = get_acmemod(%args);
     return $res unless $res->[0] == 200;
+    my $list = $res->[2];
 
     my %podargs;
-    $podargs{list} = $res->[2];
+    $podargs{list} = $list;
     my $podres = Pod::From::Acme::CPANModules::gen_pod_from_acme_cpanmodules(
         %podargs);
 
-    my $pod = $podres->{pod}{DESCRIPTION} . $podres->{pod}{'INCLUDED MODULES'};
+    my $pod = $podres->{pod}{DESCRIPTION};
+    if ($list->{'x.app.cpanmodules.show_entries'} // 1) {
+        $pod .= $podres->{pod}{'INCLUDED MODULES'};
+    }
     [200, "OK", $pod, {
         "cmdline.page_result"=>1,
         "cmdline.pager"=>"pod2man | man -l -"}];
@@ -228,11 +232,18 @@ App::cpanmodules - The Acme::CPANModules CLI
 
 =head1 VERSION
 
-This document describes version 0.002 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2019-01-15.
+This document describes version 0.003 of App::cpanmodules (from Perl distribution App-cpanmodules), released on 2019-11-19.
 
 =head1 SYNOPSIS
 
 Use the included script L<cpanmodules>.
+
+=head1 OBSERVED CPANMODULES PROPERTIES/ATTRIBUTES
+
+=head2 x.app.cpanmodules.show_entries
+
+Boolean. Default is true. If set to false, will not show entries in the
+generated POD's Description.
 
 =head1 FUNCTIONS
 
@@ -265,6 +276,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 list_acmemods
@@ -301,6 +313,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 list_entries
 
 Usage:
@@ -335,6 +348,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 view_acmemod

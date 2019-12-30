@@ -1,6 +1,6 @@
 -- 
 -- Created by SQL::Translator::Producer::SQLite
--- Created on Sat Nov  2 07:45:23 2019
+-- Created on Sun Dec 29 06:57:57 2019
 -- 
 
 BEGIN TRANSACTION;
@@ -73,7 +73,7 @@ CREATE TABLE "Station" (
 CREATE TABLE "Bar" (
   "id" INTEGER PRIMARY KEY NOT NULL,
   "foo_id" integer NOT NULL,
-  "test_flag" ,
+  "test_flag" integer,
   FOREIGN KEY ("foo_id") REFERENCES "Foo"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 

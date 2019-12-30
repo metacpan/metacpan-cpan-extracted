@@ -18,8 +18,8 @@ package Sidef::Object::Lazy {
 
         my $iter = $self->{obj}->iter;
 
-      ITEM: while (defined(my $item = $iter->run())) {
-            my @arg = ($item);
+      ITEM: for (; ;) {
+            my @arg = ($iter->run() // last);
             foreach my $call (@{$self->{calls}}) {
                 @arg = $call->(@arg);
                 @arg || next ITEM;
@@ -117,24 +117,38 @@ package Sidef::Object::Lazy {
 
     sub grep {
         my ($self, $block) = @_;
-        push @{$self->{calls}}, sub {
-            $block->run($_[0]) ? $_[0] : ();
-        };
-        $self;
+        __PACKAGE__->new(
+            obj   => $self->{obj},
+            calls => [
+                @{$self->{calls}},
+                sub {
+                    $block->run($_[0]) ? $_[0] : ();
+                },
+            ],
+        );
     }
 
     *select = \&grep;
 
     sub map {
         my ($self, $block) = @_;
-        push @{$self->{calls}}, sub {
-            $block->run($_[0]);
-        };
-        $self;
+        __PACKAGE__->new(
+            obj   => $self->{obj},
+            calls => [
+                @{$self->{calls}},
+                sub {
+                    $block->run($_[0]);
+                }
+            ],
+        );
     }
 
     *collect = \&map;
 
+    sub lazy {
+        my ($self) = @_;
+        $self;
+    }
 }
 
 1;

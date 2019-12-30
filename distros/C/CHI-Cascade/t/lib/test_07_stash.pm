@@ -4,7 +4,7 @@ use strict;
 use Test::More;
 
 use parent 'Exporter';
-use Time::HiRes	qw(time);
+use Time::HiRes qw(time);
 
 our @EXPORT = qw(test_cascade);
 
@@ -16,32 +16,32 @@ sub test_cascade {
     plan tests => 6;
 
     $cascade->rule(
-	target		=> 'big_array',
-	code		=> sub {
-	    my $rule = shift;
+        target          => 'big_array',
+        code            => sub {
+            my $rule = shift;
 
-	    ok( $rule->cascade->stash && $rule->cascade->stash->{key1} == 1 );
-	    return [ 1 .. 1000 ];
-	}
+            ok( $rule->stash && $rule->stash->{key1} == 1 );
+            return [ 1 .. 1000 ];
+        }
     );
 
     $cascade->rule(
-	target		=> qr/^one_page_(\d+)$/,
-	depends		=> 'big_array',
-	code		=> sub {
-	    my ( $rule, $target ) = @_;
+        target          => qr/^one_page_(\d+)$/,
+        depends         => 'big_array',
+        code            => sub {
+            my ( $rule, $target ) = @_;
 
-	    ok( $target eq 'one_page_0'
-		?
-		    $rule->cascade->stash && $rule->cascade->stash->{key2} == 2
-		:
-		    ref $rule->cascade->stash eq 'HASH' && ! exists $rule->cascade->stash->{key2}
-	    );
-	    my ($page) = $rule->target =~ /^one_page_(\d+)$/;
+            ok( $target eq 'one_page_0'
+                ?
+                    $rule->stash && $rule->stash->{key2} == 2
+                :
+                    ref $rule->stash eq 'HASH' && ! exists $rule->stash->{key2}
+            );
+            my ($page) = $rule->target =~ /^one_page_(\d+)$/;
 
-	    my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
-	    $ret;
-	}
+            my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
+            $ret;
+        }
     );
 
     my $res;

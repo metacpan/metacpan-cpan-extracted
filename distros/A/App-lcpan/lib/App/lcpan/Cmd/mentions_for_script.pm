@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::mentions_for_script;
 
-our $DATE = '2019-10-05'; # DATE
-our $VERSION = '1.041'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 use 5.010;
 use strict;
@@ -61,7 +61,7 @@ App::lcpan::Cmd::mentions_for_script - List POD mentions for script(s)
 
 =head1 VERSION
 
-This document describes version 1.041 of App::lcpan::Cmd::mentions_for_script (from Perl distribution App-lcpan), released on 2019-10-05.
+This document describes version 1.043 of App::lcpan::Cmd::mentions_for_script (from Perl distribution App-lcpan), released on 2019-11-29.
 
 =head1 FUNCTIONS
 

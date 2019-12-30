@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::PlainFile 2.137;
+package Config::Model::Backend::PlainFile 2.138;
 
 use 5.10.1;
 use Carp;
@@ -212,7 +212,7 @@ Config::Model::Backend::PlainFile - Read and write config as plain file
 
 =head1 VERSION
 
-version 2.137
+version 2.138
 
 =head1 SYNOPSIS
 

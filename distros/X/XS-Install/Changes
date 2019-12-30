@@ -1,3 +1,6 @@
+1.2.12   30.12.2019
+           - continue if optional data write failed
+           - omit fill paths for .so-file dependencies during linking (*nix)
 1.2.11   13.09.2019
            - use unique shared library names on windows
 1.2.10   14.08.2019

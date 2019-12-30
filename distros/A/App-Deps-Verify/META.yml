@@ -20,16 +20,19 @@ name: App-Deps-Verify
 provides:
   App::Deps::Verify:
     file: lib/App/Deps/Verify.pm
-    version: v0.8.3
+    version: v0.10.0
   App::Deps::Verify::App::VerifyDeps:
     file: lib/App/Deps/Verify/App/VerifyDeps.pm
-    version: v0.8.3
+    version: v0.10.0
   App::Deps::Verify::App::VerifyDeps::Command::plinst:
     file: lib/App/Deps/Verify/App/VerifyDeps/Command/plinst.pm
-    version: v0.8.3
+    version: v0.10.0
+  App::Deps::Verify::App::VerifyDeps::Command::plupdatetask:
+    file: lib/App/Deps/Verify/App/VerifyDeps/Command/plupdatetask.pm
+    version: v0.10.0
   App::Deps::Verify::App::VerifyDeps::Command::verify:
     file: lib/App/Deps/Verify/App/VerifyDeps/Command/verify.pm
-    version: v0.8.3
+    version: v0.10.0
 requires:
   App::Cmd::Setup: '0'
   File::Which: '0'
@@ -44,10 +47,10 @@ resources:
   bugtracker: https://github.com/shlomif/app-deps-verify/issues
   homepage: http://metacpan.org/release/App-Deps-Verify
   repository: https://github.com/shlomif/perl-App-Deps-Verify.git
-version: 0.8.3
+version: 0.10.0
 x_Dist_Zilla:
   perl:
-    version: '5.028002'
+    version: '5.030001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -145,7 +148,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Filter/MetaProvides::Package'
       version: '2.004003'
@@ -171,10 +174,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/PodSyntaxTests'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::PodVersion
-      name: '@Filter/PodVersion'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::Compile
@@ -257,10 +256,6 @@ x_Dist_Zilla:
               name: '@CorePrep/H1Nester'
               version: '4.015'
             -
-              class: Pod::Weaver::Section::Name
-              name: '@SHLOMIF/Name'
-              version: '4.015'
-            -
               class: Pod::Weaver::Section::Version
               name: '@SHLOMIF/Version'
               version: '4.015'
@@ -319,7 +314,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: '@SHLOMIF/Support'
-              version: '1.010'
+              version: '1.012'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SHLOMIF/Authors'
@@ -399,5 +394,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.2
+x_generated_by_perl: v5.30.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

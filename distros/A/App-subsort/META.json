@@ -29,11 +29,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Complete::File" : "0",
+            "Complete::File" : "0.440",
             "Complete::Module" : "0",
             "Complete::Sah" : "0",
             "Complete::Sequence" : "0.002",
-            "Complete::Util" : "0.603",
+            "Complete::Util" : "0.606",
             "Getopt::Long::More" : "0.006",
             "Module::List::Tiny" : "0",
             "Sort::Sub" : "0.112",
@@ -63,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-App-subsort"
       }
    },
-   "version" : "0.043",
+   "version" : "0.044",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

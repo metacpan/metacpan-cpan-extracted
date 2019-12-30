@@ -1,4 +1,11 @@
-0.006    2018-12-06 (PERLANCAR)
+0.007   2019-11-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix examples and statements in the rules description.
+
+
+0.006    2018-12-06  Released-By: PERLANCAR
 
          - No functional changes.
 
@@ -9,28 +16,28 @@
          - [doc] Mention Scalar::Cmp.
 
 
-0.005    2018-08-13 (PERLANCAR)
+0.005    2018-08-13  Released-By: PERLANCAR
 
          - No functional changes.
 
          - Documentation and optimization.
 
 
-0.004    2018-08-11 (PERLANCAR)
+0.004    2018-08-11  Released-By: PERLANCAR
 
          - New modules: Data::Cmp::Numeric, Data::Cmp::StrOrNumeric.
 
          - Some optimizations.
 
 
-0.003    2018-08-11 (PERLANCAR)
+0.003    2018-08-11  Released-By: PERLANCAR
 
          - No functional changes.
 
          - [doc] Some wording and formatting fixes, example tweak.
 
 
-0.002    2018-08-11 (PERLANCAR)
+0.002    2018-08-11  Released-By: PERLANCAR
 
          - [REMOVED] Remove all options and make Data::Cmp minimalist. Separate
            comparison routine that has options to another module/distribution
@@ -39,6 +46,6 @@
          - [doc] Document comparison rules.
 
 
-0.001    2018-08-10 (PERLANCAR)
+0.001    2018-08-10  Released-By: PERLANCAR
 
          - First release.

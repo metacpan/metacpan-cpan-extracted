@@ -1,3 +1,17 @@
+2.020 2019-12-29
+
+  Dependencies:
+    * requires perl 5.014
+
+2.019 2019-12-27
+
+  Test fixes:
+    * Fix tests when using system libraries (Debian #935453)
+    * fix tests broken by Config::Model 2.137 (Debian #946730)
+
+  Dependencies:
+    * Tests now require Config::Model 2.138
+
 2.018 2019-05-27
 
   Bug fix:

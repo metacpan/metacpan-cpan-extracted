@@ -48,14 +48,14 @@ Dave Lambley <dlambley@cpan.org>
 
 use HTTP::Request;
 use LWP::UserAgent;
-use List::Util qw/ uniq /;
+use List::MoreUtils qw/ uniq /;
 use Module::CoreList;
 use OrePAN2::Injector;
 use OrePAN2::Indexer;
 
 use Cpanel::JSON::XS qw/ encode_json decode_json /;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $ua = LWP::UserAgent->new( keep_alive => 2, agent => "retropan/$VERSION" );
 

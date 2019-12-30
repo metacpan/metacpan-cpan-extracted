@@ -6,6 +6,11 @@ Home page:    <http://search.cpan.org/dist/IRI/>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=IRI>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.010  2019-12-26
+
+ - (Update) Fix component resolution to remove dots when base resolution
+   occurs without a scheme but with a user/port/host.
+
 0.009  2018-10-30
 
  - (Update) Reduce Minimum Perl Version to 5.10 (#12 from @tehmoth).

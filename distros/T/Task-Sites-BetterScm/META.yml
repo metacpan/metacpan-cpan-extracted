@@ -1,0 +1,371 @@
+---
+abstract: 'Specifications for modules needed by the better scm site.'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Sites-BetterScm
+provides:
+  Task::Sites::BetterScm:
+    file: lib/Task/Sites/BetterScm.pm
+    version: v0.0.2
+requires:
+  App::Deps::Verify: '0'
+  App::Gezer: '0'
+  App::XML::DocBook::Builder: '0'
+  Bit::Vector: '0'
+  CGI: '0'
+  Carp: '0'
+  Carp::Always: '0'
+  Class::XSAccessor: '0'
+  Code::TidyAll::Plugin::TestCount: '0'
+  Config::IniFiles: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  Data::Munge: '0'
+  Encode: '0'
+  English: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Find::Object: '0'
+  File::Find::Object::Rule: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  File::Update: '0'
+  File::Which: '0'
+  GD: '0'
+  Getopt::Long: '0'
+  HTML::Latemp::GenMakeHelpers: '0'
+  HTML::Latemp::NavLinks::GenHtml::ArrowImages: '0'
+  HTML::Latemp::News: '0'
+  HTML::Links::Localize: '0'
+  HTML::Parser: '0'
+  HTML::Spelling::Site: '0'
+  HTML::T5: '0'
+  HTML::TokeParser::Simple: '0'
+  HTML::TreeBuilder::LibXML: '0'
+  HTML::Widgets::NavMenu: '0'
+  HTML::Widgets::NavMenu::EscapeHtml: '0'
+  HTML::Widgets::NavMenu::ToJSON: '0'
+  HTML::Widgets::NavMenu::ToJSON::Data_Persistence::YAML: '0'
+  IO::All: '0'
+  IO::Handle: '0'
+  Image::Size: '0'
+  JSON::MaybeXS: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  POSIX: '0'
+  Parallel::ForkManager::Segmented: '0'
+  Path::Tiny: '0'
+  Perl::Tidy: '0'
+  Pod::Xhtml: '0'
+  Task::Latemp: '0'
+  Template: '0'
+  Template::Preprocessor::TTML: '0'
+  Term::ReadKey: '0'
+  Test::Code::TidyAll: '0'
+  Test::File::Find::CaseCollide: '0'
+  Test::HTML::Recursive::DeprecatedTags: '0'
+  Test::HTML::Tidy::Recursive: '0'
+  Test::HTML::Tidy::Recursive::Strict: '0'
+  Test::More: '0.88'
+  Test::Perl::Critic: '0'
+  Test::TrailingSpace: '0'
+  Text::Hunspell: '0'
+  Text::VimColor: '0'
+  Text::WrapAsUtf8: '0'
+  XML::CompareML::HTML: '0'
+  XML::LibXML: '0'
+  XML::LibXML::Reader: '0'
+  XML::LibXML::XPathContext: '0'
+  XML::LibXSLT: '0'
+  XML::Parser: '0'
+  XML::Writer: '0'
+  autodie: '0'
+  base: '0'
+  constant: '0'
+  lib: '0'
+  parent: '0'
+  perl: '5.014'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/shlomif/better-scm/issues
+  homepage: http://metacpan.org/release/Task-Sites-BetterScm
+  repository: git://github.com/shlomif/better-scm.git
+version: 0.0.2
+x_Dist_Zilla:
+  perl:
+    version: '5.030001'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@Filter/TestMoreDoneTesting'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Filter/AutoPrereqs'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/ExecDir'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: '@Filter/GatherDir'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Filter/License'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Filter/ManifestSkip'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Filter/MetaYAML'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Filter/PruneCruft'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Filter/Readme'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/RunExtraTests'
+      version: '0.029'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Filter/ShareDir'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@Filter/CheckChangesHasContent'
+      version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Filter/ConfirmRelease'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Filter/Manifest'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Filter/MetaConfig'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Filter/MetaJSON'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.012'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000036'
+          version: '0.006'
+      name: '@Filter/MetaProvides::Package'
+      version: '2.004003'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@Filter/MetaResources'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/ModuleBuild'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Filter/PkgVersion'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@Filter/PodCoverageTests'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Filter/PodSyntaxTests'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: 0
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: test
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+          switch: []
+      name: '@Filter/Test::Compile'
+      version: '2.058'
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      config:
+        Dist::Zilla::Plugin::Test::CPAN::Changes:
+          changelog: Changes
+      name: '@Filter/Test::CPAN::Changes'
+      version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/author/eol.t
+          finder:
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
+          trailing_whitespace: 1
+      name: '@Filter/Test::EOL'
+      version: '0.19'
+    -
+      class: Dist::Zilla::Plugin::Test::NoTabs
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          filename: xt/author/no-tabs.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+      name: '@Filter/Test::NoTabs'
+      version: '0.15'
+    -
+      class: Dist::Zilla::Plugin::Test::TrailingSpace
+      name: '@Filter/Test::TrailingSpace'
+      version: 0.2.0
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Filter/TestRelease'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::TaskWeaver
+      name: '@Filter/TaskWeaver'
+      version: '0.101628'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Filter/UploadToCPAN'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: PruneCruft
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: RunExtraTests
+      version: '0.029'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.012'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '6.012'
+x_generated_by_perl: v5.30.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

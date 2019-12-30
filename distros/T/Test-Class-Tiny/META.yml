@@ -1,0 +1,31 @@
+---
+abstract: 'xUnit in Perl, simplified'
+author:
+  - 'Felipe Gasper (FELIPE)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+  Test::Deep: '0'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Class-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test2::API: '0'
+  mro: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/FGasper/p5-Test-Class-Tiny/issues
+  repository: git://github.com/FGasper/p5-Test-Class-Tiny.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

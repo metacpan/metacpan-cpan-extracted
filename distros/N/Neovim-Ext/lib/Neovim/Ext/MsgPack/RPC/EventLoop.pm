@@ -1,10 +1,11 @@
 package Neovim::Ext::MsgPack::RPC::EventLoop;
-$Neovim::Ext::MsgPack::RPC::EventLoop::VERSION = '0.01';
+$Neovim::Ext::MsgPack::RPC::EventLoop::VERSION = '0.02';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
 use Scalar::Util qw/weaken/;
 use IPC::Open3 qw/open3/;
+use IO::Handle;
 use IO::Async::Loop;
 use IO::Async::Signal;
 use IO::Async::Stream;
@@ -74,6 +75,9 @@ sub connect_stdio
 	binmode STDIN;
 	binmode STDOUT;
 
+	STDIN->blocking (0);
+	STDOUT->blocking (0);
+
 	$this->_create_stream (read_handle  => \*STDIN, write_handle => \*STDOUT);
 }
 
@@ -107,6 +111,8 @@ AGAIN:
 		goto AGAIN;
 	}
 
+	$socket->blocking (0);
+
 	$this->_create_stream (handle => $socket);
 	$this->_can_close (1);
 }
@@ -139,6 +145,8 @@ AGAIN:
 		goto AGAIN;
 	}
 
+	$socket->blocking (0);
+
 	$this->_create_stream (handle => $socket);
 	$this->_can_close (1);
 }
@@ -155,6 +163,10 @@ sub connect_child
 	}
 
 	$this->_pid (open3 (\*CHILD_IN, \*CHILD_OUT, \*ERR, @$argv));
+
+	CHILD_IN->blocking (0);
+	CHILD_OUT->blocking (0);
+
 	$this->_create_stream (read_handle => \*CHILD_OUT, write_handle => \*CHILD_IN);
 	$this->_can_close (1);
 }
@@ -168,6 +180,9 @@ sub _create_stream
 	$this->stream (IO::Async::Stream->new
 		(
 			%options,
+			read_all => 1,
+			autoflush => 1,
+			close_on_read_eof => 1,
 			on_read => $this->_on_read(),
 			on_read_error => $this->_on_read_error(),
 			on_read_eof => $this->_on_read_eof(),
@@ -211,8 +226,9 @@ sub _on_read_error
 
 	return sub
 	{
+		my ($error) = @_;
 		$loop->stop();
-		die "read error\n";
+		die "handle read error: $error\n";
 	};
 }
 
@@ -228,7 +244,7 @@ sub _on_read_eof
 	return sub
 	{
 		$loop->stop();
-		die "read eof\n";
+		die "handle read eof\n";
 	};
 }
 
@@ -358,7 +374,7 @@ Neovim::Ext::MsgPack::RPC::EventLoop - Neovim::Ext::MsgPack::RPC::EventLoop clas
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

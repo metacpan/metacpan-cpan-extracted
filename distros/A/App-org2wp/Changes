@@ -1,11 +1,16 @@
-0.007   2017-07-03 (PERLANCAR)
+0.008   2019-12-26  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild to update Sah coercion rule module names.
+
+
+0.007   2017-07-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::ger.
 
 
-0.006   2017-06-17 (PERLANCAR)
+0.006   2017-06-17  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -13,28 +18,28 @@
           in the POD.
 
 
-0.005   2017-06-16 (PERLANCAR)
+0.005   2017-06-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention po2wp, html2wp, wp-xmlrpc.
 
 
-0.004   2016-12-22 (PERLANCAR)
+0.004   2016-12-22  Released-By: PERLANCAR
 
         - Add option: --schedule.
 
 
-0.003   2016-12-14 (PERLANCAR)
+0.003   2016-12-14  Released-By: PERLANCAR
 
 	- Adjust example to use hash-style option (Perinci::CmdLine 1.65+).
 
 
-0.002   2016-12-02 (PERLANCAR)
+0.002   2016-12-02  Released-By: PERLANCAR
 
 	- Add options: --comment-status, --extra-attrs.
 
 
-0.001   2016-11-14 (PERLANCAR)
+0.001   2016-11-14  Released-By: PERLANCAR
 
         - First release.

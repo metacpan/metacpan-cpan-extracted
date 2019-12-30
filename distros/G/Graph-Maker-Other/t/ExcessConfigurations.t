@@ -36,7 +36,7 @@ plan tests => 25;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::ExcessConfigurations::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::ExcessConfigurations->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::ExcessConfigurations->VERSION($want_version); 1 }, 1,

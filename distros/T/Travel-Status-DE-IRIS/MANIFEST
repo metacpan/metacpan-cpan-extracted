@@ -12,15 +12,13 @@ README.md
 scripts/acronyms.pl
 scripts/acronyms.sh
 scripts/debug
-'share/all location 0 & ds100'
-share/allStations.json
 share/csv2json
 share/enhance
 share/json2csv
 share/json2json
-share/marudor2json
 share/stations.csv
 share/stations.json
+share/xml2json
 t/20-iris-class.t
 t/21-iris-stations.t
 t/30-iris-const.t

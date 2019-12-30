@@ -29,14 +29,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 20;
+plan tests => 252;
 
 require Graph::Maker::BiStar;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::BiStar::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::BiStar->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::BiStar->VERSION($want_version); 1 }, 1,
@@ -53,24 +53,46 @@ require Graph::Maker::BiStar;
 require Graph::Maker::Star;
 foreach my $N (2 .. 5) {
   foreach my $undirected (0, 1) {
-    my $star = Graph::Maker->new('star',
-                                 N => $N,
-                                 undirected => $undirected);
-    my $bistar = Graph::Maker->new('bi_star',
-                                   N => $N, M => 0,
-                                   undirected => $undirected);
-    ok ("$bistar","$star");
+    foreach my $multiedged (0, 1) {
+      foreach my $NM (0, 1) {
+        my $param_N = $NM ? $N : 0;
+        my $param_M = $NM ? 0 : $N;
+        my $star = Graph::Maker->new('star',
+                                     N => $N,
+                                     undirected => $undirected,
+                                     multiedged => $multiedged);
+        my $bistar = Graph::Maker->new('bi_star',
+                                       N => $param_N,
+                                       M => $param_M,
+                                       undirected => $undirected,
+                                       multiedged => $multiedged);
+        ok ("$bistar","$star");
+      }
+    }
   }
 }
-foreach my $N (2 .. 5) {
-  foreach my $undirected (0, 1) {
-    my $star = Graph::Maker->new('star',
-                                 N => $N,
-                                 undirected => $undirected);
-    my $bistar = Graph::Maker->new('bi_star',
-                                   N => 0, M => $N,
-                                   undirected => $undirected);
-    ok ("$bistar","$star");
+
+#------------------------------------------------------------------------------
+
+foreach my $N (0 .. 5) {
+  foreach my $M (0 .. 5) {
+    foreach my $undirected (0, 1) {
+      foreach my $multiedged (0, 1) {
+        my $graph = Graph::Maker->new('bi_star',
+                                      N => $N, M => $M,
+                                      undirected => $undirected,
+                                      multiedged => $multiedged);
+        if ($undirected) {
+          ok ($graph->is_connected ? 1 : 0,
+              $N||$M ? 1 : 0,            # empty graph is not connected
+              "connected N=$N M=$M");
+        }
+        my $num_vertices = scalar($graph->vertices);
+        my $num_edges = $graph->edges;
+        ok ($num_edges,
+            ($num_vertices==0 ? 0 : $num_vertices-1) * ($undirected ? 1 : 2));
+      }
+    }
   }
 }
 

@@ -23,7 +23,7 @@ return [
 	   type => 'hash',
 	   index_type =>'string',
 	   cargo => { type => 'leaf', value_type => 'uniline' } ,
-	   description => 'Specify with the pathof the configuration element that drives '
+	   description => 'Specify with the path of the configuration element that drives '
            .'the warp, i.e .the elements that control the property change. '
            .'These are specified using a variable name (used in the "rules" formula)'
            .'and a path to fetch the actual value. Example $country => " ! country"',

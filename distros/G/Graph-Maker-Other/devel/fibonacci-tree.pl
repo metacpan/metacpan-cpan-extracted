@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -28,6 +28,22 @@ use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
+
+{
+  # FibonacciTree
+  require Graph::Maker::FibonacciTree;
+  my @graphs;
+  foreach my $k (4) {
+    my $graph = Graph::Maker->new('fibonacci_tree', undirected => 1,
+                                  height => $k,
+                                  series_reduced => 1,
+                                  leaf_reduced => 1,
+                                 );
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
 
 {
   # FibonacciTree not 5,6

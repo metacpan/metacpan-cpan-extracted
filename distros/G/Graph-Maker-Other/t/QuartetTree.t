@@ -29,13 +29,13 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 4;
+plan tests => 36;
 
 require Graph::Maker::QuartetTree;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::QuartetTree::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::QuartetTree->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::QuartetTree->VERSION($want_version); 1 }, 1,
@@ -43,6 +43,26 @@ require Graph::Maker::QuartetTree;
   my $check_version = $want_version + 1000;
   ok (! eval { Graph::Maker::QuartetTree->VERSION($check_version); 1 }, 1,
       "VERSION class check $check_version");
+}
+
+
+#------------------------------------------------------------------------------
+
+foreach my $level (0 .. 3) {
+  foreach my $undirected (0, 1) {
+    foreach my $multiedged (0, 1) {
+      my $graph = Graph::Maker->new('quartet_tree',
+                                    level => $level,
+                                    undirected => $undirected,
+                                    multiedged => $multiedged);
+      my $num_vertices = scalar($graph->vertices);
+      ok ($num_vertices, 5**$level + 1);
+
+      my $num_edges = $graph->edges;
+      ok ($num_edges,
+          ($num_vertices==0 ? 0 : $num_vertices-1) * ($undirected ? 1 : 2));
+    }
+  }
 }
 
 #------------------------------------------------------------------------------

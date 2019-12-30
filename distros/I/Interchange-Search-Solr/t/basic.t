@@ -58,7 +58,7 @@ like $solr->search_string, qr/\(desc\* AND hat\*\)/,
 is_deeply ($solr->search_terms, [qw/desc hat/], "Search terms saved");
 
 diag "Calling response->docs\n";
-ok ($solr->response->ok, "Rersponse is ok");
+ok ($solr->response->ok, "Response is ok");
 my @results = @{$solr->results};
 # print Dumper(\@results);
 is (scalar(@results), 2, "Found 2 results");

@@ -228,6 +228,21 @@ Aliases: I<cmp>
 
 =cut
 
+=head2 approx_cmp
+
+    approx_cmp(a, b)
+    approx_cmp(a, b, k)
+
+Approximate comparison of C<a> and C<b>.
+
+Equivalent with:
+
+    a.round(k) <=> b.round(k)
+
+When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
+
+=cut
+
 =head2 ==
 
     a == b
@@ -281,6 +296,187 @@ Equivalent with:
     RangeNum(a-1, b, -1)
 
 Aliases: I<xdownto>
+
+=cut
+
+=head2 C
+
+    Num.C
+    Num.catalan_G
+
+Returns the Catalan constant: 0.915965594177...
+
+Aliases: I<catalan_G>
+
+=cut
+
+=head2 Y
+
+Number.Y() -> I<Obj>
+
+Return the
+
+Aliases: I<γ>, I<euler_gamma>
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
+
+=cut
+
+=head2 ~
+
+I<Obj> B<~> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<not>
+
+=cut
+
+=head2 Γ
+
+Number.Γ() -> I<Obj>
+
+Return the
+
+Aliases: I<gamma>
+
+=cut
+
+=head2 δ
+
+Number.δ() -> I<Obj>
+
+Return the
+
+Aliases: I<kronecker_delta>
+
+=cut
+
+=head2 ζ
+
+Number.ζ() -> I<Obj>
+
+Return the
+
+Aliases: I<zeta>
+
+=cut
+
+=head2 η
+
+Number.η() -> I<Obj>
+
+Return the
+
+Aliases: I<eta>
+
+=cut
+
+=head2 μ
+
+Number.μ() -> I<Obj>
+
+Return the
+
+Aliases: I<mobius>, I<möbius>, I<moebius>
+
+=cut
+
+=head2 σ
+
+Number.σ() -> I<Obj>
+
+Return the
+
+Aliases: I<sigma>
+
+=cut
+
+=head2 ϕ
+
+Number.ϕ() -> I<Obj>
+
+Return the
+
+Aliases: I<totient>, I<euler_phi>, I<eulerphi>, I<euler_totient>
+
+=cut
+
+=head2 Ψ
+
+Number.Ψ() -> I<Obj>
+
+Return the
+
+Aliases: I<digamma>
+
+=cut
+
+=head2 Ω
+
+Number.Ω() -> I<Obj>
+
+Return the
+
+Aliases: I<big_omega>, I<bigomega>, I<prime_power_sigma0>
+
+=cut
+
+=head2 ω
+
+Number.ω() -> I<Obj>
+
+Return the
+
+Aliases: I<omega>, I<prime_sigma0>, I<prime_power_usigma0>
+
+=cut
+
+=head2 ≅
+
+I<Obj> B<≅> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<=~=>, I<approx_eq>
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
@@ -367,18 +563,19 @@ Aliases: I<airy>
 
 =cut
 
-=head2 approx_cmp
+=head2 all_composite
 
-    approx_cmp(a, b)
-    approx_cmp(a, b, k)
+Number.all_composite() -> I<Obj>
 
-Approximate comparison of C<a> and C<b>.
+Return the
 
-Equivalent with:
+=cut
 
-    a.round(k) <=> b.round(k)
+=head2 all_prime
 
-When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
+Number.all_prime() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -786,26 +983,23 @@ This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<n
 
 =cut
 
-=head2 C
+=head2 bsearch_solve
 
-    Num.C
-    Num.catalan_G
+Number.bsearch_solve() -> I<Obj>
 
-Returns the Catalan constant: 0.915965594177...
+Return the
 
-Aliases: I<catalan_G>
+Aliases: I<bsearch_inverse>
 
 =cut
 
-=head2 carmichael_lambda
+=head2 by
 
-    carmichael_lambda(n)
+Number.by() -> I<Obj>
 
-Carmichael lambda function: C<λ(n)>, defined as the smallest positive integer C<m> such that:
+Return the
 
-    aᵐ ≡ 1 (mod n)
-
-for every integer C<a> between C<1> and C<n> that is coprime to C<n>.
+Aliases: I<first>
 
 =cut
 
@@ -960,6 +1154,24 @@ Return the
 
 =cut
 
+=head2 composite
+
+Number.composite() -> I<Obj>
+
+Return the
+
+Aliases: I<nth_composite>
+
+=cut
+
+=head2 composite_count
+
+Number.composite_count() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 conj
 
 Number.conj() -> I<Obj>
@@ -1063,14 +1275,6 @@ Number.de() -> I<Obj>
 Return the
 
 Aliases: I<denominator>
-
-=cut
-
-=head2 dedekind_psi
-
-Number.dedekind_psi() -> I<Obj>
-
-Return the
 
 =cut
 
@@ -1434,6 +1638,16 @@ Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
 =cut
 
+=head2 flip
+
+Number.flip() -> I<Obj>
+
+Return the
+
+Aliases: I<reverse>
+
+=cut
+
 =head2 flipbit
 
 Number.flipbit() -> I<Obj>
@@ -1672,6 +1886,14 @@ Aliases: I<polygonal_inverse>
 
 =cut
 
+=head2 inverse_sigma
+
+Number.inverse_sigma() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 inverse_totient
 
 Number.inverse_totient() -> I<Obj>
@@ -1774,6 +1996,14 @@ Return the
 
 =cut
 
+=head2 is_abundant
+
+Number.is_abundant() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_aks_prime
 
 Number.is_aks_prime() -> I<Obj>
@@ -1798,9 +2028,25 @@ Return the
 
 =cut
 
+=head2 is_bruckman_lucas_pseudoprime
+
+Number.is_bruckman_lucas_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_carmichael
 
 Number.is_carmichael() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_chebyshev_pseudoprime
+
+Number.is_chebyshev_pseudoprime() -> I<Obj>
 
 Return the
 
@@ -1878,14 +2124,6 @@ Return the
 
 =cut
 
-=head2 is_fermat_pseudoprime
-
-Number.is_fermat_pseudoprime() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 is_fibonacci_pseudoprime
 
 Number.is_fibonacci_pseudoprime() -> I<Obj>
@@ -1944,6 +2182,14 @@ Aliases: I<is_frobenius_khashin_pseudoprime>
 
 =cut
 
+=head2 is_lucas_carmichael
+
+Number.is_lucas_carmichael() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_lucas_pseudoprime
 
 Number.is_lucas_pseudoprime() -> I<Obj>
@@ -1994,19 +2240,23 @@ Return the
 
 =cut
 
-=head2 is_nminus1_prime
+=head2 is_nm1_prime
 
-Number.is_nminus1_prime() -> I<Obj>
+Number.is_nm1_prime() -> I<Obj>
 
 Return the
+
+Aliases: I<is_nminus1_prime>
 
 =cut
 
-=head2 is_nplus1_prime
+=head2 is_np1_prime
 
-Number.is_nplus1_prime() -> I<Obj>
+Number.is_np1_prime() -> I<Obj>
 
 Return the
+
+Aliases: I<is_nplus1_prime>
 
 =cut
 
@@ -2021,6 +2271,32 @@ Return the
 =head2 is_one
 
 Number.is_one() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_palindrome
+
+Number.is_palindrome() -> I<Obj>
+
+Return the
+
+Aliases: I<is_palindromic>
+
+=cut
+
+=head2 is_pell_lucas_pseudoprime
+
+Number.is_pell_lucas_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_pell_pseudoprime
+
+Number.is_pell_pseudoprime() -> I<Obj>
 
 Return the
 
@@ -2146,6 +2422,16 @@ Aliases: I<is_provable_prime>
 
 =cut
 
+=head2 is_pseudoprime
+
+Number.is_pseudoprime() -> I<Obj>
+
+Return the
+
+Aliases: I<is_fermat_pseudoprime>
+
+=cut
+
 =head2 isqrt
 
 Number.isqrt() -> I<Obj>
@@ -2232,6 +2518,14 @@ Aliases: I<is_extra_strong_lucas_pseudoprime>
 
 =cut
 
+=head2 is_strong_fibonacci_pseudoprime
+
+Number.is_strong_fibonacci_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_strongish_lucas_pseudoprime
 
 Number.is_strongish_lucas_pseudoprime() -> I<Obj>
@@ -2251,6 +2545,16 @@ Return the
 =head2 is_strong_pseudoprime
 
 Number.is_strong_pseudoprime() -> I<Obj>
+
+Return the
+
+Aliases: I<is_strong_fermat_pseudoprime>
+
+=cut
+
+=head2 is_super_pseudoprime
+
+Number.is_super_pseudoprime() -> I<Obj>
 
 Return the
 
@@ -2321,6 +2625,20 @@ Number.laguerre() -> I<Obj>
 Return the
 
 Aliases: I<laguerreL>, I<laguerre_polynomial>
+
+=cut
+
+=head2 lambda
+
+    lambda(n)
+
+Carmichael lambda function: C<λ(n)>, defined as the smallest positive integer C<m> such that:
+
+    aᵐ ≡ 1 (mod n)
+
+for every integer C<a> between C<1> and C<n> that is coprime to C<n>.
+
+Alias: I<carmichael_lambda>.
 
 =cut
 
@@ -2405,6 +2723,14 @@ Return the
 =head2 liouville
 
 Number.liouville() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 liouville_sum
+
+Number.liouville_sum() -> I<Obj>
 
 Return the
 
@@ -2638,6 +2964,14 @@ Return the
 
 =cut
 
+=head2 motzkin
+
+Number.motzkin() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 msb
 
 Number.msb() -> I<Obj>
@@ -2687,6 +3021,14 @@ Number.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
+
+=cut
+
+=head2 next_composite
+
+Number.next_composite() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -2852,11 +3194,13 @@ Return the
 
 =cut
 
-=head2 pminus1_factor
+=head2 pm1_factor
 
-Number.pminus1_factor() -> I<Obj>
+Number.pm1_factor() -> I<Obj>
 
 Return the
+
+Aliases: I<pminus1_factor>
 
 =cut
 
@@ -2918,11 +3262,13 @@ Aliases: I<hammingweight>
 
 =cut
 
-=head2 pplus1_factor
+=head2 pp1_factor
 
-Number.pplus1_factor() -> I<Obj>
+Number.pp1_factor() -> I<Obj>
 
 Return the
+
+Aliases: I<pplus1_factor>
 
 =cut
 
@@ -3137,6 +3483,16 @@ Return the
 Number.prod() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 psi
+
+Number.psi() -> I<Obj>
+
+Return the
+
+Aliases: I<dedekind_psi>
 
 =cut
 
@@ -3371,6 +3727,24 @@ Return the
 =head2 seed
 
 Number.seed() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 semiprime
+
+Number.semiprime() -> I<Obj>
+
+Return the
+
+Aliases: I<nth_semiprime>
+
+=cut
+
+=head2 semiprime_count
+
+Number.semiprime_count() -> I<Obj>
 
 Return the
 
@@ -3798,16 +4172,6 @@ Return the
 
 =cut
 
-=head2 Y
-
-Number.Y() -> I<Obj>
-
-Return the
-
-Aliases: I<γ>, I<euler_gamma>
-
-=cut
-
 =head2 zero
 
 Number.zero() -> I<Obj>
@@ -3829,165 +4193,5 @@ Return the
 Number.znprimroot() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 |
-
-I<Obj> B<|> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<or>
-
-=cut
-
-=head2 ~
-
-I<Obj> B<~> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<not>
-
-=cut
-
-=head2 Γ
-
-Number.Γ() -> I<Obj>
-
-Return the
-
-Aliases: I<gamma>
-
-=cut
-
-=head2 δ
-
-Number.δ() -> I<Obj>
-
-Return the
-
-Aliases: I<kronecker_delta>
-
-=cut
-
-=head2 ζ
-
-Number.ζ() -> I<Obj>
-
-Return the
-
-Aliases: I<zeta>
-
-=cut
-
-=head2 η
-
-Number.η() -> I<Obj>
-
-Return the
-
-Aliases: I<eta>
-
-=cut
-
-=head2 μ
-
-Number.μ() -> I<Obj>
-
-Return the
-
-Aliases: I<mobius>, I<möbius>, I<moebius>
-
-=cut
-
-=head2 σ
-
-Number.σ() -> I<Obj>
-
-Return the
-
-Aliases: I<sigma>
-
-=cut
-
-=head2 Ψ
-
-Number.Ψ() -> I<Obj>
-
-Return the
-
-Aliases: I<digamma>
-
-=cut
-
-=head2 Ω
-
-Number.Ω() -> I<Obj>
-
-Return the
-
-Aliases: I<big_omega>, I<bigomega>, I<prime_power_sigma0>
-
-=cut
-
-=head2 ω
-
-Number.ω() -> I<Obj>
-
-Return the
-
-Aliases: I<omega>, I<prime_sigma0>, I<prime_power_usigma0>
-
-=cut
-
-=head2 ϕ
-
-Number.ϕ() -> I<Obj>
-
-Return the
-
-Aliases: I<totient>, I<euler_phi>, I<eulerphi>, I<euler_totient>
-
-=cut
-
-=head2 ≅
-
-I<Obj> B<≅> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<=~=>, I<approx_eq>
-
-=cut
-
-=head2 ≠
-
-I<Obj> B<≠> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<!=>, I<ne>
-
-=cut
-
-=head2 ≤
-
-I<Obj> B<≤> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<lt>=>, I<le>
-
-=cut
-
-=head2 ≥
-
-I<Obj> B<≥> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<gt>=>, I<ge>
 
 =cut

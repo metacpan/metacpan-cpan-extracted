@@ -2,7 +2,7 @@
 
 use ExtUtils::testlib;
 use Test::More ;
-use Config::Model;
+use Config::Model 2.138;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use Data::Dumper ;
 use Path::Tiny;
@@ -55,7 +55,7 @@ $root1->load("a_string=toto lot_of_checklist macro=AD - "
             ."! assert_leaf=foo leaf_with_warn_unless=bar") ;
 ok($inst1,"loaded some data in master_model instance") ;
 
-my $dump1 = $root1->dump_tree(mode => 'full') ;
+my $dump1 = $root1->dump_tree(mode => 'backend') ;
 ok($dump1,"dumped master instance") ;
 
 # ok now we can load test model in Itself
@@ -135,7 +135,7 @@ $meta_root->load("class:Master::Created element:created1 type=leaf value_type=nu
                      ." - element:created2 type=leaf value_type=uniline") ;
 ok(1,"added new class Master::Created") ;
 
-my $cds = $meta_root->dump_tree (full_dump => 1) ;
+my $cds = $meta_root->dump_tree (mode => 'backend') ;
 my @cds_orig = split /\n/,$cds ;
 
 print $cds if $trace ;
@@ -155,7 +155,7 @@ my $meta_root2 = $meta_inst2 -> config_root ;
 $meta_root2 -> load ($cds) ;
 ok(1,"Created and loaded 2nd instance") ;
 
-my $cds2 = $meta_root2 ->dump_tree (full_dump => 1) ;
+my $cds2 = $meta_root2 ->dump_tree (mode => 'backend') ;
 $wr_conf1->child("inst2.cds")->spew($cds2);
 
 is_deeply([split /\n/,$cds2],\@cds_orig,"Compared the 2 full dumps") ; 
@@ -185,7 +185,7 @@ my $meta_root3 = $meta_inst3 -> config_root ;
 $meta_root3 -> load_data ($pdata2) ;
 ok(1,"Created and loaded 3nd instance with perl data") ;
 
-my $cds3 = $meta_root3 ->dump_tree (full_dump => 1) ;
+my $cds3 = $meta_root3 ->dump_tree (mode => 'backend') ;
 $wr_conf1->child("inst3.cds")->spew($cds3);
 
 is_deeply([split /\n/,$cds3],\@cds_orig,"Compared the 3rd full dump with first one") ; 

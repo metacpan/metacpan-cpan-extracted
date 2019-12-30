@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Shortcut::Search::NotLike;
-$DBIx::Class::Helper::ResultSet::Shortcut::Search::NotLike::VERSION = '2.034001';
+$DBIx::Class::Helper::ResultSet::Shortcut::Search::NotLike::VERSION = '2.034002';
 use strict;
 use warnings;
 

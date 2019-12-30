@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Row::OnColumnChange;
-$DBIx::Class::Helper::Row::OnColumnChange::VERSION = '2.034001';
+$DBIx::Class::Helper::Row::OnColumnChange::VERSION = '2.034002';
 # ABSTRACT: Do things when the values of a column change
 
 use strict;

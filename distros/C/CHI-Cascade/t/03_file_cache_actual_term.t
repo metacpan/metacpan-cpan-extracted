@@ -22,8 +22,8 @@ $SIG{__DIE__} = sub {
 
 my $cascade = CHI::Cascade->new(
     chi => CHI->new(
-	driver		=> 'File',
-	root_dir	=> 't/file_cache'
+        driver          => 'File',
+        root_dir        => 't/file_cache'
     )
 );
 

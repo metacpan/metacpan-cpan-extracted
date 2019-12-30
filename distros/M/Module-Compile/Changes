@@ -1,3 +1,7 @@
+0.38 Tue Dec 24 17:24:48 PST 2019
+ - Apply PR/11 xenu++
+ - App::Prove breaks on Windows when $/ is undefined
+
 0.37 Sun Apr 29 19:31:11 PDT 2018
  - Apply PR/10 @mohawk2++
 

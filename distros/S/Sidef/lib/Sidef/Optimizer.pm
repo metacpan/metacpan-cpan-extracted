@@ -933,6 +933,16 @@ package Sidef::Optimizer {
         elsif ($ref eq 'Sidef::Meta::Module') {
             $obj->{block}{code} = {$self->optimize($obj->{block}{code})};
         }
+        elsif ($ref eq 'Sidef::Meta::Included') {
+            foreach my $info (@{$obj->{included}}) {
+                $info->{ast} = {$self->optimize($info->{ast})};
+            }
+        }
+        elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
+            $obj->{cond}  = {$self->optimize($obj->{cond})};
+            $obj->{true}  = {$self->optimize($obj->{true})};
+            $obj->{false} = {$self->optimize($obj->{false})};
+        }
 
         if (not exists($expr->{ind}) and not exists($expr->{call})) {
             return (ref($obj) eq 'HASH' ? {self => $obj} : $obj);

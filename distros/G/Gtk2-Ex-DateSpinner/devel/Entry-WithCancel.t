@@ -35,7 +35,7 @@ Gtk2->init_check
 
 plan tests => 20;
 
-my $want_version = 9;
+my $want_version = 10;
 {
   is ($Gtk2::Ex::Entry::WithCancel::VERSION, $want_version,
       'VERSION variable');

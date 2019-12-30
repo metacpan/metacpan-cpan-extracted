@@ -183,7 +183,7 @@ sub __create {
     my $stmt = $ax->get_stmt( $sql, 'Create_' . $type, 'prepare' );
     $sql->{create_table_cols} = [];
     if ( ! eval { $sf->{d}{dbh}->do( $stmt ); 1 } ) {
-        $ax->print_error_message( $@, "Create $type" );
+        $ax->print_error_message( $@ );
         return;
     };
     return 1;

@@ -29,7 +29,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 44;
+plan tests => 54;
 
 
 require Graph::Maker::Hanoi;
@@ -48,7 +48,7 @@ sub stringize_sorted {
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::Hanoi::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Hanoi->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Hanoi->VERSION($want_version); 1 }, 1,
@@ -138,13 +138,16 @@ sub stringize_sorted {
 
 {
   # spindles=2
-  foreach my $discs (1 .. 5) {
-    my $graph = Graph::Maker->new('hanoi', discs => $discs, spindles => 2,
-                                  undirected => 1, countedged => 1);
-    my $num_vertices = $graph->vertices;
-    my $num_edges = $graph->edges;
-    ok ($num_vertices, 2**$discs);
-    ok ($num_edges, 2**($discs-1));
+  foreach my $undirected (0, 1) {
+    foreach my $discs (1 .. 5) {
+      my $graph = Graph::Maker->new('hanoi', discs => $discs, spindles => 2,
+                                    undirected => $undirected,
+                                    countedged => 1);
+      my $num_vertices = $graph->vertices;
+      my $num_edges = $graph->edges;
+      ok ($num_vertices, 2**$discs);
+      ok ($num_edges, 2**($discs-1) * ($undirected ? 1 : 2));
+    }
   }
 }
 

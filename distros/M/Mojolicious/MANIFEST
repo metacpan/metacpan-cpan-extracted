@@ -216,6 +216,7 @@ t/mojo/parameters.t
 t/mojo/path.t
 t/mojo/prefork.t
 t/mojo/promise.t
+t/mojo/promise_async_await.t
 t/mojo/proxy.t
 t/mojo/psgi.t
 t/mojo/reactor_detect.t

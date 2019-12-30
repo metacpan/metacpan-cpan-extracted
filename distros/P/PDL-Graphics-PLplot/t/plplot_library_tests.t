@@ -6,6 +6,7 @@ use PDL::Config;
 use PDL::Graphics::PLplot;
 use Test::More;
 use File::Spec;
+use File::Temp qw(tempdir);
 
 # These tests are taken from the plplot distribution.  The reference results
 # are also from the plplot distribution--they are the results of running
@@ -30,56 +31,47 @@ if ($plversion->{'c_plwidth'}) {
   plan skip_all => 'plwidth not found--plplot version needs to be 5.9.10 or greater to run library tests';
 }
 
+my $tmpdir = tempdir( CLEANUP => 1 );
+
 foreach my $plplot_test_script (@scripts) {
   my ($num) = ($plplot_test_script =~ /x(\d\d)\.pl/);
   (my $c_code = $plplot_test_script) =~ s/\.pl/c\.c/;
 
   # Compile C version
-  unlink ("a.out");
-  if($^O =~ /MSWin32/i) { # A Windows system
-    my $cmd = $plversion->{'C_COMPILE'};
-    my $cc = $Config::Config{'cc'};
-    $cmd =~ s/\\/\//g; # Convert all backslashes to forward slashes
-    $cmd =~ s/\Q$cc\E/\Q$cc $c_code\E/; # Insert source file into the command
-    $cmd =~ s/\\//g;   # Remove all backskashes
-    system("$cmd -o a.out");
-  } else { # A UNIX system
-    system "LD_RUN_PATH=\"$plversion->{'PLPLOT_LIB'}\" $plversion->{'C_COMPILE'} $c_code -lm -o a.out";
-  }
-  ok ((($? == 0) && -s "a.out"), "$c_code compiled successfully");
+  my $cmd_line = "$plversion->{'C_COMPILE'} $c_code -o $tmpdir/a.out -lm $plversion->{'C_COMPILE_SUFFIX'}";
+  $cmd_line = "LD_RUN_PATH=\"$plversion->{'PLPLOT_LIB'}\" $cmd_line" if $^O !~ /MSWin32/i;
+  system $cmd_line;
+  ok ((($? == 0) && -s "$tmpdir/a.out"), "$c_code compiled successfully");
 
   # Run C version
   my $devnull = File::Spec->devnull();
-  my $dot_slash = $^O =~ /MSWin32/i ? '' : './';
-  if ($num == 14) {
-    system "echo foo.svg | ${dot_slash}a.out -dev svg -o x${num}c.svg -fam > $devnull 2>&1";
-  } else {
-    system "${dot_slash}a.out -dev svg -o x${num}c.svg -fam > $devnull 2>&1";
-  }
+  my $c_output = "$tmpdir/x${num}c.svg";
+  $cmd_line = "$tmpdir/a.out -dev svg -o $c_output -fam";
+  $cmd_line = "echo $tmpdir/foo.svg | " . $cmd_line if $num == 14;
+  system $cmd_line;
   ok ($? == 0, "C code $c_code ran successfully");
 
   # Run perl version
-  my $perlrun = 'perl -Mblib';
-  if ($num == 14) {
-    system "echo foo.svg | $perlrun $plplot_test_script -dev svg -o x${num}p.svg -fam > $devnull 2>&1";
-  } else {
-    system "$perlrun $plplot_test_script -dev svg -o x${num}p.svg -fam > $devnull 2>&1";
-  }
+  my $perlrun = qq{"$^X" -Mblib};
+  my $p_output = "$tmpdir/x${num}p.svg";
+  $cmd_line = "$perlrun $plplot_test_script -dev svg -o $p_output -fam";
+  $cmd_line = "echo $tmpdir/foo.svg | " . $cmd_line if $num == 14;
+  system $cmd_line;
   ok ($? == 0, "Script $plplot_test_script ran successfully");
-  my @output = glob ("x${num}p.svg*");
-  foreach my $outfile (@output) {
-    (my $reffile = $outfile) =~ s/x(\d\d)p/x${1}c/;
-    my $perldata = do { local( @ARGV, $/ ) = $outfile; <> } ; # slurp!
-    my $refdata  = do { local( @ARGV, $/ ) = $reffile; <> } ; # slurp!
-    ok ($perldata eq $refdata, "Output file $outfile matches C output");
+  my @output = glob ("$tmpdir/x${num}p.svg*");
+  foreach my $perlfile (@output) {
+    (my $reffile = $perlfile) =~ s/x(\d\d)p/x${1}c/;
+    cmp_files($perlfile, $reffile);
   }
 }
 
-
-# comment this out for testing!!!
-unlink glob ("$cwd/x???.svg.*");
-unlink glob ("$cwd/foo.svg.*");
-unlink "$cwd/a.out";
+sub cmp_files {
+  my ($perlfile, $reffile) = @_;
+  my $perldata = do { local( @ARGV, $/ ) = $perlfile; <> } ; # slurp!
+  my $refdata  = do { local( @ARGV, $/ ) = $reffile; <> } ; # slurp!
+  ok $perldata eq $refdata, "Output file $perlfile matches C output"
+    or diag "$perlfile: " . length($perldata) . ", $reffile: " . length($refdata);
+}
 
 # Local Variables:
 # mode: cperl

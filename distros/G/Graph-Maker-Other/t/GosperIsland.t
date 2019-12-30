@@ -39,7 +39,7 @@ plan tests => 15;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::GosperIsland::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::GosperIsland->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::GosperIsland->VERSION($want_version); 1 }, 1,

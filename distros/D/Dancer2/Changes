@@ -1,3 +1,15 @@
+0.300000  2019-12-23 23:55:09-06:00 America/Chicago
+
+    [ BUG FIXES ]
+    * None
+
+    [ ENHANCEMENTS ]
+    * GH #1127, GH #1476: Route parameters with types (Peter Mottram - 
+      SysPete)
+
+    [ DOCUMENTATION ]
+    * None 
+
 0.208002  2019-12-14 16:08:46-05:00 America/New_York
 
     [ BUG FIXES ]

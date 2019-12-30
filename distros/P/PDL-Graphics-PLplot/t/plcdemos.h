@@ -1,5 +1,3 @@
-// $Id: plcdemos.h 11289 2010-10-29 20:44:17Z airwin $
-//
 //      Everything needed by the C demo programs.
 //      Created to avoid junking up plplot.h with this stuff.
 //

@@ -1,5 +1,8 @@
 Revision history for App-HomeBank2Ledger.
 
+0.007     2019-12-29 14:27:52-07:00 MST7MDT
+  * Fix problem when formatting non-fraction amounts.
+
 0.006     2019-09-02 20:02:53-06:00 MST7MDT
   * Add fatpack release.
 

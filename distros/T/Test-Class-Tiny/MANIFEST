@@ -1,0 +1,13 @@
+.gitignore
+.travis.yml
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+lib/Test/Class/Tiny.pm
+t/basic.t
+t/dynamic_count.t
+t/inheritance.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

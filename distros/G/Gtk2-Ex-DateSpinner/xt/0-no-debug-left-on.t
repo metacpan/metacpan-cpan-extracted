@@ -2,7 +2,7 @@
 
 # 0-no-debug-left-on.t -- check no Smart::Comments left on
 
-# Copyright 2011, 2012 Kevin Ryde
+# Copyright 2011, 2012, 2017, 2019 Kevin Ryde
 
 # 0-no-debug-left-on.t is shared by several distributions.
 #
@@ -80,10 +80,17 @@ sub check {
       # debug from another package
       if (/(DEBUG\s*=>\s*[1-9][0-9]*)/
           || /^[ \t]*((use|no) (Smart|Devel)::Comments)/
-          || /^[ \t]*(use lib\b.*devel.*)/
          ) {
         print STDERR "\n$filename:$.: leftover: $_\n";
         $good = 0;
+      }
+
+      # no "use lib ... devel", except in xt/*.t
+      unless ($filename =~ /\bxt\b/) {
+        if (/^[ \t]*(use lib\b.*devel.*)/) {
+          print STDERR "\n$filename:$.: leftover: $_\n";
+          $good = 0;
+        }
       }
     }
     if (! close FH) {
@@ -109,7 +116,9 @@ sub check {
       next;
     }
     while (<FH>) {
-      if (/^#\s*define\s+DEBUG\s+[1-9]/
+      #  #define DEBUG     1
+      #  #define MY_DEBUG  1
+      if (/^#\s*define\s+(MY_)DEBUG\s+[1-9]/
          ) {
         print STDERR "\n$filename:$.: leftover: $_\n";
         $good = 0;

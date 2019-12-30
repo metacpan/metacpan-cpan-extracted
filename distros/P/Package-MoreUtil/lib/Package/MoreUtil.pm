@@ -1,7 +1,7 @@
 package Package::MoreUtil;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.591'; # VERSION
+our $DATE = '2019-12-25'; # DATE
+our $VERSION = '0.592'; # VERSION
 
 use 5.010001;
 use strict;
@@ -86,8 +86,9 @@ sub list_package_subs {
 
     my @res;
     while (my ($k, $v) = each %$symtbl) {
-        next if $k =~ /::$/; # subpackage
-        if (defined *$v{CODE}) {
+        if (
+            ref $v eq 'CODE' || # perl >= 5.22
+                defined *$v{CODE}) {
             push @res, $k;
         }
     }
@@ -135,7 +136,7 @@ Package::MoreUtil - Package-related utilities
 
 =head1 VERSION
 
-This document describes version 0.591 of Package::MoreUtil (from Perl distribution Package-MoreUtil), released on 2019-01-06.
+This document describes version 0.592 of Package::MoreUtil (from Perl distribution Package-MoreUtil), released on 2019-12-25.
 
 =head1 SYNOPSIS
 

@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 
@@ -56,8 +56,7 @@ sub init {
   my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
 
   my $graph = $graph_maker->(%params);
-
-  my $directed = $graph->is_directed;
+  my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
 
   if ($subgraph) {
     $graph->set_graph_attribute (name => "Keller Subgraph $N");
@@ -74,8 +73,7 @@ sub init {
       foreach my $j ($i+1 .. $#vertices) {
         my $to = $vertices[$j];
         if (_is_edge($from,$to)) {
-          if ($directed) { $graph->add_edge($to, $from); }
-          $graph->add_edge($from, $to);
+          $graph->$add_edge($from, $to);
         }
       }
     }
@@ -89,8 +87,7 @@ sub init {
 
       for my $to ($from+1 .. $max_vertex) {
         if (_is_edge($from,$to)) {
-          $graph->add_edge($from, $to);
-          if ($directed) { $graph->add_edge($to, $from); }
+          $graph->$add_edge($from, $to);
         }
       }
     }
@@ -155,10 +152,10 @@ more digit positions, at least one of which is difference = 2 mod 4.
     degree    0, 0,  5,   34,   171,    776, ...  4^N - 3^N - N
     edges     0, 0, 40, 1088, 21888, 397312, ... (4^N-3^N-N)*4^N / 2
 
-Each vertex has the same degree (is regular) since digit differences can all
-be taken mod 4.  Each vertex degree is 4^N - 3^N - N.  This is edges to 4^N
-vertices (including self) except no edge to those differing by only 0,1,3 in
-any or all digit positions, which is 3^N combinations (including no
+Each vertex has the same degree (so a regular graph) since digit differences
+can all be taken mod 4.  Each vertex degree is 4^N - 3^N - N.  This is edges
+to 4^N vertices (including self) except no edge to those differing by only
+0,1,3 in any or all digit positions, which is 3^N combinations (including no
 differences at all for vertex itself), and also no edge to vertices
 differing by 2 mod 4 at a single digit, which is N possible digit positions.
 
@@ -229,13 +226,20 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item N=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=975> (Clebsch)
-
-=item N=3 subgraph, L<https://hog.grinvin.org/ViewGraphInfo.action?id=22730>
-
-=item N=4 subgraph, L<https://hog.grinvin.org/ViewGraphInfo.action?id=22732>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310> (etc)
 
 =back
+
+    1310     N=0  (singleton)
+    52       N=1  (4 singletons)
+    975      N=2  (Clebsch, 16-cyclotomic)
+    34165    N=3
+
+And C<subgraph> option
+
+    62       N=2  (5 singletons)
+    22730    N=3
+    22732    N=4
 
 =head1 OEIS
 
@@ -260,7 +264,7 @@ volume 163, 1930, pages 231-248.
 
 The second DIMACS challenge 1993 included the N=4 subgraph among its
 benchmarks for comparing clique-finding algorithms,
-L<http://dimacs.rutgers.edu/Challenges/> =over
+L<http://dimacs.rutgers.edu/Challenges/>
 
 =cut
 

@@ -148,7 +148,7 @@ sub from_copy_and_paste {
         1 }
     ) {
         print hide_cursor();
-        $ax->print_error_message( $@, join ', ', @{$sf->{i}{stmt_types}}, 'copy & paste' );
+        $ax->print_error_message( $@ );
         unlink $file_fs or warn $!;
         return;
     }

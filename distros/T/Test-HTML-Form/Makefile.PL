@@ -6,6 +6,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Test/HTML/Form.pm', # finds $VERSION
     PREREQ_PM         => {
 			 HTML::TreeBuilder => 0,
+			 Digest::MD5 => 0,
 			 }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
        (AUTHOR         => 'Aaron J Trevena <teejay@cpan.org>') : ()),

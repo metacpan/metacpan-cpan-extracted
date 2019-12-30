@@ -9,12 +9,12 @@ my $int_ptr_type = ($ptrsize == 4) ? 'I32' : 'long';
 $PDL::Graphics::PLplot::standard_order = 0;
 
 # Read in options determined by Makefile.PL and written to the OPTIONS! file
-my $plversion = do 'OPTIONS!';
+my $plversion = do './OPTIONS!';
 pp_addpm({At => Top}, <<'EOD');
 
 our $VERSION;
 BEGIN {
-$VERSION = '0.71'
+$VERSION = '0.73'
 };
 
 =head1 NAME
@@ -2384,6 +2384,10 @@ PL_PARSE_NOPROGRAM
 PL_PARSE_NODASH
 PL_PARSE_SKIP
 
+# Macro used (in some cases) to ignore value of argument
+
+PL_NOTSET
+
 # Definitions for plmesh and plsurf3d
 
 DRAW_LINEX
@@ -2450,6 +2454,7 @@ PL_COLORBAR_SHADE
 PL_COLORBAR_SHADE_LABEL
 PL_COLORBAR_IMAGE
 PL_COLORBAR_GRADIENT
+PL_COLORBAR_CAP_NONE
 PL_COLORBAR_CAP_LOW
 PL_COLORBAR_CAP_HIGH
 PL_COLORBAR_LABEL_LEFT
@@ -2575,7 +2580,7 @@ C:
 
 perl:
 
-  my ($legend_width, $legend_height) = 
+  my ($legend_width, $legend_height) =
     pllegend ($position, $opt, $x, $y, $plot_width, $bg_color, $nlegend,
     \@opt_array,
     $text_offset, $text_scale, $text_spacing, $test_justification,
@@ -3478,6 +3483,15 @@ pp_def ('plline',
 	Doc => $doc,
        );
 
+pp_def ('plpath',
+        NoPthread => 1,
+	Pars => 'int n(); x1(); x2(); y1(); y2()',
+	GenericTypes => [D],
+	HandleBad => 0,
+	NoBadifNaN => 1,
+	Code => 'c_plpath($n(), $x1(), $x2(), $y1(), $y2());',
+       );
+
 =head2 plcolorpoints
 =cut
 
@@ -3767,6 +3781,28 @@ pp_def ('plsurf3d',
                        $P(clevel), $SIZE(nlevel));
            plFree2dGrid (zz, size_x, size_y);'
         );
+
+# Plot shaded 3-d surface plot with limits
+pp_def('plsurf3dl',
+        NoPthread => 1,
+        Pars => 'x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel); int indexxmin(); int indexxmax(); int indexymin(nx); int indexymax(nx);',
+        GenericTypes => [D],
+        Code => '
+          int i, j, size_x, size_y;
+          PLFLT** zz;
+          size_x =  $SIZE(nx);
+          size_y =  $SIZE(ny);
+          plAlloc2dGrid (&zz, size_x, size_y);
+          for (i = 0; i < size_x; i++)
+            for (j = 0; j < size_y; j++)
+              zz[i][j] = $z(nx => i, ny => j);
+          c_plsurf3dl(
+            $P(x), $P(y), (const PLFLT **) zz, size_x, size_y, $opt(),
+            $P(clevel), $SIZE(nlevel),
+            $indexxmin(), $indexxmax(), $P(indexymin), $P(indexymax)
+          );
+          plFree2dGrid (zz, size_x, size_y);'
+);
 
 # Set line style
 
@@ -4101,6 +4137,7 @@ xform_callback ( PLFLT x, PLFLT y, PLFLT *xt, PLFLT *yt, PLPointer data )
   PUSHMARK (SP);
   XPUSHs (x_sv);
   XPUSHs (y_sv);
+  XPUSHs (data);
   PUTBACK;
 
   count = call_sv (xform_subroutine, G_ARRAY);
@@ -4240,7 +4277,13 @@ pp_def ('plmeridians_pp',
 
 # Shade regions on the basis of value
 
-pp_addpm ('sub plshades { plshades_pp ($standard_order ? reorder ("plshades", @_) : @_) }'); pp_add_exported('plshades');
+pp_addpm(<<'EOD'
+  sub plshades {
+    plshades_pp ($standard_order ? reorder ("plshades", @_) : @_)
+  }
+EOD
+);
+pp_add_exported('plshades');
 pp_def ('plshades_pp',
         NoPthread => 1,
          Pars => 'z(x,y); xmin(); xmax(); ymin(); ymax();
@@ -4917,14 +4960,14 @@ pp_addpm (<<'EOPM');
 
 =for sig
 
-  plstransform ($subroutine_reference);
+  plstransform ($subroutine_reference, $data);
 
 =for ref
 
 Sets the default transformation routine for plotting.
 
   sub mapform {
-    my ($x, $y) = @_;
+    my ($x, $y, $data) = @_;
 
     my $radius = 90.0 - $y;
     my $xp = $radius * cos ($x * pi / 180);
@@ -4932,7 +4975,7 @@ Sets the default transformation routine for plotting.
 
     return ($xp, $yp);
   }
-  plstransform (\&mapform);
+  plstransform (\&mapform, undef);
 
 See the PLplot manual for more details.
 
@@ -4941,12 +4984,13 @@ EOPM
 
 pp_addxs (<<"EOC");
 int
-plstransform (xform)
+plstransform (xform, data)
  SV* xform
+ SV* data
 CODE:
   check_sub_pointer (xform_subroutine, "plstransform: xform must be either 0 or a subroutine pointer");
   if (SvTRUE(xform)) xform_subroutine = SvRV(xform);
-  plstransform (SvTRUE(xform) ? xform_callback : NULL, NULL);
+  plstransform (SvTRUE(xform) ? xform_callback : NULL, data);
 EOC
 pp_add_exported ('plstransform');
 
@@ -5008,7 +5052,7 @@ pp_addpm (<<'EOPM');
 
 =for sig
 
-my ($legend_width, $legend_height) = 
+my ($legend_width, $legend_height) =
     pllegend ($position, $opt, $x, $y, $plot_width, $bg_color, $nlegend,
     \@opt_array,
     $text_offset, $text_scale, $text_spacing, $test_justification,
@@ -5085,35 +5129,35 @@ PPCODE:
     elem = av_fetch((AV *)SvRV(text_rv),            i, 0); text[i]            = (char *)SvPV_nolen(*elem);
     box_colors[i] = 0;
     if (SvROK(box_colors_rv)) {
-      elem = av_fetch((AV *)SvRV(box_colors_rv),    i, 0); 
+      elem = av_fetch((AV *)SvRV(box_colors_rv),    i, 0);
       if (elem && SvOK(*elem)) {
         box_colors[i] = (int)SvIV(*elem);
       }
     }
     box_patterns[i] = 0;
     if (SvROK(box_patterns_rv)) {
-      elem = av_fetch((AV *)SvRV(box_patterns_rv),  i, 0); 
+      elem = av_fetch((AV *)SvRV(box_patterns_rv),  i, 0);
       if (elem && SvOK(*elem)) {
         box_patterns[i] = (int)SvIV(*elem);
       }
     }
     box_scales[i] = 0.0;
     if (SvROK(box_scales_rv)) {
-      elem = av_fetch((AV *)SvRV(box_scales_rv),    i, 0); 
+      elem = av_fetch((AV *)SvRV(box_scales_rv),    i, 0);
       if (elem && SvOK(*elem)) {
         box_scales[i] = (double)SvNV(*elem);
       }
     }
     box_line_widths[i] = 0.0;
     if (SvROK(box_line_widths_rv)) {
-      elem = av_fetch((AV *)SvRV(box_line_widths_rv), i, 0); 
+      elem = av_fetch((AV *)SvRV(box_line_widths_rv), i, 0);
       if (elem && SvOK(*elem)) {
         box_line_widths[i] = (double)SvIV(*elem);
       }
     }
     line_colors[i] = 0;
     if (SvROK(line_colors_rv)) {
-      elem = av_fetch((AV *)SvRV(line_colors_rv), i, 0); 
+      elem = av_fetch((AV *)SvRV(line_colors_rv), i, 0);
       if (elem && SvOK(*elem)) {
         line_colors[i] = (int)SvIV(*elem);
       }
@@ -5121,7 +5165,7 @@ PPCODE:
 
     line_styles[i] = 0;
     if (SvROK(line_styles_rv)) {
-      elem = av_fetch((AV *)SvRV(line_styles_rv), i, 0); 
+      elem = av_fetch((AV *)SvRV(line_styles_rv), i, 0);
       if (elem && SvOK(*elem)) {
         line_styles[i] = (int)SvIV(*elem);
       }
@@ -5129,7 +5173,7 @@ PPCODE:
 
     line_widths[i] = 0.0;
     if (SvROK(line_widths_rv)) {
-      elem = av_fetch((AV *)SvRV(line_widths_rv), i, 0); 
+      elem = av_fetch((AV *)SvRV(line_widths_rv), i, 0);
       if (elem && SvOK(*elem)) {
         line_widths[i] = (double)SvIV(*elem);
       }
@@ -5137,7 +5181,7 @@ PPCODE:
 
     symbol_colors[i] = 0;
     if (SvROK(symbol_colors_rv)) {
-      elem = av_fetch((AV *)SvRV(symbol_colors_rv), i, 0); 
+      elem = av_fetch((AV *)SvRV(symbol_colors_rv), i, 0);
       if (elem && SvOK(*elem)) {
         symbol_colors[i] = (int)SvIV(*elem);
       }
@@ -5145,7 +5189,7 @@ PPCODE:
 
     symbol_scales[i] = 0.0;
     if (SvROK(symbol_scales_rv)) {
-      elem = av_fetch((AV *)SvRV(symbol_scales_rv), i, 0); 
+      elem = av_fetch((AV *)SvRV(symbol_scales_rv), i, 0);
       if (elem && SvOK(*elem)) {
         symbol_scales[i] = (double)SvNV(*elem);
       }
@@ -5153,7 +5197,7 @@ PPCODE:
 
     symbol_numbers[i] = 0;
     if (SvROK(symbol_numbers_rv)) {
-      elem = av_fetch((AV *)SvRV(symbol_numbers_rv), i, 0); 
+      elem = av_fetch((AV *)SvRV(symbol_numbers_rv), i, 0);
       if (elem && SvOK(*elem)) {
         symbol_numbers[i] = (int)SvIV(*elem);
       }
@@ -5161,7 +5205,7 @@ PPCODE:
 
     symbols[i] = "0";
     if (SvROK(symbols_rv)) {
-      elem = av_fetch((AV *)SvRV(symbols_rv), i, 0); 
+      elem = av_fetch((AV *)SvRV(symbols_rv), i, 0);
       if (elem && SvOK(*elem)) {
         symbols[i] = (char *)SvPV_nolen(*elem);
       }
@@ -5255,13 +5299,13 @@ EOPM
 pp_addxs (<<"EOC");
 void
 plbtime (ctime)
-  double ctime 
+  double ctime
 PPCODE:
   PLINT year;
   PLINT month;
   PLINT day;
   PLINT hour;
-  PLINT min; 
+  PLINT min;
   PLFLT sec;
   c_plbtime(&year, &month, &day, &hour, &min, &sec, ctime);
   EXTEND (SP, 6);
@@ -5285,7 +5329,7 @@ pp_addpm (<<'EOPM');
 
 =for ref
 
-Configure transformation between continuous and broken-down time (and                                                           
+Configure transformation between continuous and broken-down time (and
 vice versa) for current stream.
 
 =cut
@@ -5306,8 +5350,8 @@ plconfigtime(scale, offset1, offset2, ccontrol, ifbtime_offset, year, month, day
   int min
   double sec
 PPCODE:
-  c_plconfigtime((PLFLT) scale, (PLFLT) offset1, (PLFLT) offset2, 
-                 (PLINT) ccontrol, (PLBOOL) ifbtime_offset, (PLINT) year, 
+  c_plconfigtime((PLFLT) scale, (PLFLT) offset1, (PLFLT) offset2,
+                 (PLINT) ccontrol, (PLBOOL) ifbtime_offset, (PLINT) year,
                  (PLINT) month, (PLINT) day, (PLINT) hour, (PLINT) min, (PLFLT) sec);
 EOC
 pp_add_exported ('plconfigtime');
@@ -5448,7 +5492,14 @@ if ($plversion->{'plsvect'}) {
           NoPthread => 1,
 	  Pars => 'arrowx(npts); arrowy(npts); int fill()',
 	  GenericTypes => [D],
-	  Code => 'c_plsvect ($P(arrowx), $P(arrowy), $SIZE(npts), $fill());'
+	  Doc => 'Give zero-length PDLs for arrowx and arrowy to pass NULL to PLplot func.',
+	  Code => '
+	    c_plsvect (
+              ($SIZE(npts) != 0) ? $P(arrowx) : NULL,
+              ($SIZE(npts) != 0) ? $P(arrowy) : NULL,
+              $SIZE(npts), $fill()
+            );
+	  '
 	 );
   }
 

@@ -1,5 +1,9 @@
 Revision history for Neovim-Ext
 
+0.02      2019-12-24 17:35:26+00:00 Europe/London
+
+ - Portability improvements
+
 0.01      2019-12-22 19:43:46+00:00 Europe/London
 
  - Initial version

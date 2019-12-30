@@ -31,7 +31,8 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-use lib 'devel/lib';
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
 use MyGraphs;
 
 plan tests => 96;

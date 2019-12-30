@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -31,6 +31,11 @@ $VERSION = 13;
 sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
+}
+sub _make_graph {
+  my ($self, %params) = @_;
+  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%params);
 }
 
 # require Math::NumSeq::FibonacciWord;
@@ -42,18 +47,19 @@ sub init {
   my $height         = delete($params{'height'}) || 0;
   my $series_reduced = delete($params{'series_reduced'}) ? 1 : 0;
   my $leaf_reduced   = delete $params{'leaf_reduced'};
-  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
 
   ### FibonacciTree ...
   ### $height
+  ### %params
 
-  my $graph = $graph_maker->(%params);
+  my $graph = $self->_make_graph(%params);
 
   $graph->set_graph_attribute
     (name => "Fibonacci Tree height $height"
-     . ($series_reduced && $leaf_reduced ? ', series and leaf reduced' : '')
-     . ($series_reduced ? ', series reduced' : '')
-     . ($leaf_reduced ? ', leaf reduced' : ''));
+     . ($series_reduced && $leaf_reduced ? ', series and leaf reduced'
+        : $series_reduced ? ', series reduced'
+        : $leaf_reduced ? ', leaf reduced'
+        : ''));
 
   if ($height > 0) {
     $graph->add_vertex(1);
@@ -62,13 +68,12 @@ sub init {
     my @pending_depth = (1);
     my @pending_type  = (0);  # left
     my $upto = 1;
-    my $directed = $graph->is_directed;
+    my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
 
     my $add = sub {
       my ($parent) = @_;
       my $n = ++$upto;
-      $graph->add_edge($parent, $n);
-      if ($directed) { $graph->add_edge($n, $parent); }
+      $graph->$add_edge($parent, $n);
       return $n;
     };
 
@@ -509,7 +514,7 @@ is also height k), those root distances total
 =pod
 
 A recurrence for the Wiener index is then as follows.  (Not the same as the
-WTb formula in their preprint.  Is there a typo there?)
+WTb formula in their preprint.  Is there a typo?)
 
     WTb(k) = WTb(k-1) + WTb(k-2) + F(k+1)*DTb(k-2) + F(k)*DTb(k-1)
              + 2*F(k+1)*F(k) - F(k+2)
@@ -554,11 +559,12 @@ distinct vertices is
 The tree diameter is 2*k-3 which is attained between the deepest vertices of
 the left and right sub-trees.  A limit for MeanDist as a fraction of that
 diameter is found by noticing the diameter cancels 2*k in WTb and using
-F(k+n)/F(k) -E<gt> phi^n, where phi=(1+sqrt5)/2, the Golden ratio.
+F(k+n)/F(k) -E<gt> phi^n, where phi=(1+sqrt5)/2, the X<Golden ratio>Golden
+ratio.
 
-    MeanDist(k)           1 + phi^2      2 + phi      1
-    ----------- ->  MTb = ---------    = ------- = -------
-    Diameter(k)              5              5      3 - phi
+    MeanDist(k)           1 + phi^2      2 + phi       1
+    ----------- ->  MTb = ---------    = -------  = -------
+    Diameter(k)              5              5       3 - phi
 
                 = 0.723606...   (A242671)
 
@@ -602,9 +608,9 @@ With vertices 2*F(k+1)-1 and diameter 2*k-3 again (for kE<gt>=2) the limit
 for mean distance between vertices as a fraction of the diameter is the same
 as above.
 
-                   WS(k)                       
-   --------------------------------------  ->  MTb  same
-   Diameter(k) * binomial(2*F(k+1)-1), 2)      
+                    WS(k)                       
+    --------------------------------------  ->  MTb  same
+    Diameter(k) * binomial(2*F(k+1)-1), 2)      
 
 =cut
 
@@ -646,9 +652,9 @@ With number of vertices F(k+3)-2 and diameter 2*k-2 (for kE<gt>=1) the limit
 for mean distance between vertices as a fraction of the diameter is
 simply 1.  (The only term in k*F^2 is the (2*k-1)*F(k+3)^2.)
 
-                  Wfull(k)                       
-   ------------------------------------  ->  1
-   Diameter(k) * binomial(F(k+3)-2), 2)      
+                   Wfull(k)                       
+    ------------------------------------  ->  1
+    Diameter(k) * binomial(F(k+3)-2), 2)      
 
 =cut
 
@@ -664,17 +670,32 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item height=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (single vertex)
-
-=item height=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=288>
-
-=item height=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21059>
-
-=item height=4, series reduced, L<https://hog.grinvin.org/ViewGraphInfo.action?id=25131>
-
-=item height=6, series reduced, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21048>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  etc
 
 =back
+
+    all
+      1310    height=1, singleton
+
+    default
+      32234   height=2, path-3
+      288     height=3
+      21059   height=5
+
+    series_reduced=1
+      32234   height=2, path-3
+      30      height=3
+      25131   height=4
+      21048   height=6
+
+    leaf_reduced=1
+      19655   height=2, path-2
+      286     height=3, path-5
+
+    series_reduced=1, leaf_reduced=1
+      19655   height=2, path-2
+      594     height=3, path-4
+      934     height=4
 
 =head1 OEIS
 

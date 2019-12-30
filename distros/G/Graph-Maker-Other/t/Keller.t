@@ -29,14 +29,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 28;
+plan tests => 30;
 
 require Graph::Maker::Keller;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::Keller::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Keller->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Keller->VERSION($want_version); 1 }, 1,
@@ -88,13 +88,14 @@ require Graph::Maker::Keller;
   ok ($num_vertices, 64);
   ok ($num_edges, 2*1088);
 }
-{
+foreach my $undirected (0, 1) {
   # N=3, undirected
-  my $graph = Graph::Maker->new('Keller', N=>3, undirected => 1);
+  my $graph = Graph::Maker->new('Keller', N=>3,
+                                undirected => $undirected);
   my $num_vertices = $graph->vertices;
-  my $num_edges = $graph->edges;
   ok ($num_vertices, 64);
-  ok ($num_edges, 1088);
+  my $num_edges = $graph->edges;
+  ok ($num_edges, 1088 * ($undirected ? 1 : 2));
 }
 
 #------------------------------------------------------------------------------

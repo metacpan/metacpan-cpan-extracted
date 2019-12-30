@@ -22,13 +22,18 @@ handler when site is initialized.
 
 ###############################################################################
 package XAO::DO::Web::Config;
+use warnings;
+use strict;
 use CGI::Cookie;
-use XAO::Utils;
-use XAO::Cache;
 use POSIX qw(mktime);
+use XAO::Cache;
 use XAO::Errors qw(XAO::DO::Web::Config);
+use XAO::Objects;
+use XAO::Utils;
 
-our $VERSION='2.004';
+use base XAO::Objects->load(objname => 'Embeddable');
+
+our $VERSION='2.004';   # Obsolete, but needed by CPAN
 
 # Prototypes
 #
@@ -41,13 +46,13 @@ sub disable_special_access ($);
 sub embeddable_methods ($);
 sub enable_special_access ($);
 sub force_byte_output ($;$);
+sub get_cookie ($$;$);
 sub header ($@);
 sub header_args ($@);
 sub header_array ($);
 sub header_normalize ($$);
 sub header_printed ($);
 sub header_remove ($@);
-sub get_cookie ($$;$);
 sub new ($@);
 
 ###############################################################################
@@ -134,6 +139,31 @@ sub add_cookie ($@) {
         }
 
         $cookie=\%chash;
+    }
+
+    if(!$cookie->{'-name'}) {
+        eprint "No cookie name given to ".ref($self)."::add_cookie()";
+        return;
+    }
+
+    # Applying configuration values, if any.
+    #
+    my $base_config=$self->base_config;
+    if($base_config && $base_config->can('get')) {
+        if(my $cookie_config=$base_config->get('/xao/cookie')) {
+            my %defaults;
+
+            foreach my $cf ($cookie_config->{'common'}, $cookie_config->{$cookie->{'-name'}}) {
+                next unless $cf;
+
+                foreach my $n (keys %$cf) {
+                    my $nn=$n =~ /^-/ ? $n : '-'.lc($n);
+                    $defaults{$nn}=$cf->{$n};
+                }
+            }
+
+            $cookie=merge_refs(\%defaults,$cookie);
+        }
     }
 
     # Recursively expanding if multiple domains are given.

@@ -23,12 +23,418 @@ use List::Util 'min';
 use Math::BaseCnv 'cnv';
 
 use FindBin;
-use lib "$FindBin::Bin/../devel/lib";
+use File::Spec;
+use lib File::Spec->catdir($FindBin::Bin, File::Spec->updir, 'devel', 'lib');
 use MyGraphs;
 $|=1;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
+
+
+{
+  require Graph;
+  my $graph = Graph->new (undirected => 1, countedged=>1);
+  $graph->add_cycle(1,2);
+  my $num_edges = $graph->edges;
+  print "num edges $num_edges\n";
+  my @edges = $graph->edges;
+  ### @edges
+  exit 0;
+}
+
+
+{
+  # Lawder Hilbert 3D
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=1024
+  require Graph;
+  my $graph = Graph->new (undirected => 1);
+  $graph->add_cycle(0,5,4);
+  $graph->add_cycle(9,8,10, 2,1,7);
+  $graph->add_path(0,1,6,3,8,5);
+  $graph->add_path(0,2,11,3,9,4);
+  $graph->add_path(5,10,11,6,7,4);
+
+  MyGraphs::Graph_set_xy_points($graph,
+                                3 => [0,-1],
+                                6 => [-1,1],
+                                11 => [ 1,1],
+
+                                1 => [-1,2], 2 => [ 1,2],
+                                10 => [2,0], 8 => [2,-1.5],
+                                7 => [-2,0], 9 => [-2,-1.5],
+
+                                0 => [0,5],
+                                5 => [ 5,-4],
+                                4 => [-5,-4],
+                               );
+
+  MyGraphs::hog_searches_html($graph);
+  MyGraphs::Graph_view($graph);
+  exit 0;
+}
+{
+  # Cubefree Substring Relations
+
+  # 11,19,31,49,77,117
+  # v = apply(n->2*n+1,[11,19,31,49,77,117])
+  # vector(#v-1,i,v[i+1]-v[i]) \\ A028445 cubefrees
+
+  my $max_len = 8;
+  my $delta1 = 1;
+  my $prefix = 1;
+
+  my @cubefrees = ('');
+  {
+    my @pending = ('');
+    foreach my $len (1 .. $max_len) {
+      my @new_pending;
+      foreach my $str (@pending) {
+        foreach my $ext ('0','1') {
+          my $new_str = $str.$ext;
+          if (is_cubefree($new_str)) {
+            push @new_pending, $new_str;
+          }
+        }
+      }
+      @pending = @new_pending;
+      push @cubefrees, @pending;
+    }
+  }
+  my $num_vertices = scalar(@cubefrees);
+  print "num_vertices = $num_vertices\n";
+
+  require Graph;
+  my $graph = Graph->new (undirected => 1);
+  $graph->set_graph_attribute
+    (name => "Cubefree Substring Relations, Max Length $max_len");
+  $graph->set_graph_attribute (root => "!");
+  foreach my $from_i (0 .. $#cubefrees) {
+    my $from_str = $cubefrees[$from_i];
+    foreach my $to_i (0 .. $from_i-1) {
+      my $to_str = $cubefrees[$to_i];
+      if ($delta1) {
+        next unless length($from_str) - length($to_str) == 1;
+      }
+      my $pos = index($from_str,$to_str);
+      if ($prefix) {
+        next unless $pos==0;
+      }
+      if ($pos >= 0) {
+        my $from_str = (length($from_str) ? $from_str : '!');
+        my $to_str = (length($to_str) ? $to_str : '!');
+        $graph->add_edge($from_str, $to_str);
+      }
+    }
+  }
+
+  MyGraphs::Graph_view($graph);
+  print "tree\n";
+  MyGraphs::Graph_tree_print($graph, cmp => \&MyGraphs::cmp_alphabetic);
+  # Graph_print_tikz($graph);
+  # MyGraphs::hog_searches_html($graph);
+  exit 0;
+
+  sub find_cube {
+    my ($str) = @_;
+    foreach my $c (1 .. int(length($str)/3)) {
+      my $re = '('.('.' x $c).')\\1\\1';
+      ### $re
+      if ($str =~ $re) {
+        ### $str
+        ### cube: $1
+        return $1;
+      }
+    }
+    return undef;
+  }
+  sub is_cubefree {
+    my ($str) = @_;
+    return ! defined find_cube($str);
+  }
+}
+{
+  # isomorphic halves connected at different
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=33776
+  #
+  # *---*---*---*---B --- A---*---*---*---*
+  #         |   |   |         |   |
+  #         *   A   *         B   *
+  #                           |
+  #                           *
+  my $vpar = [undef, 0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 10, 11, 12, 11, 10, 15];
+  my $graph = MyGraphs::Graph_from_vpar ($vpar, undirected => 1);
+  MyGraphs::Graph_set_xy_points($graph,
+                                6 => [0,-1],
+                                5 => [1,-1],
+                                4 => [2,-1], 7 => [2,-2],
+                                3 => [3,-1], 8 => [3,-2],
+                                2 => [4,-1], 9 => [5,-1],
+                                16 => [5,1],
+                                15 => [4,1],
+                                10 => [3,1], 1 => [3,0],
+                                11 => [2,1], 14 => [2,0],
+                                12 => [1,1],
+                                13 => [0,1],
+                               );
+
+  MyGraphs::hog_searches_html($graph);
+  MyGraphs::hog_upload_html($graph);
+  MyGraphs::Graph_view($graph);
+  exit 0;
+}
+
+
+{
+  require Graph;
+  my @graphs;
+  foreach my $N (2 .. 7) {
+    print "N=$N\n";
+    my $count_even = 0;
+    my $count_odd = 0;
+    my $iterator_func = MyGraphs::make_graph_iterator_edge_aref
+      (num_vertices_min => $N,
+       num_vertices_max => $N,
+       connected => 1,
+      );
+  G: while (my $edge_aref = $iterator_func->()) {
+      my $graph = MyGraphs::Graph_from_edge_aref($edge_aref);
+      foreach my $v ($graph->vertices) {
+        if ($graph->degree($v) % 2) {
+          $count_odd++;
+          next G;
+        }
+      }
+      $count_even++;
+      if ($N <= 6) { push @graphs, $graph; }
+      if (my @path = MyGraphs::Graph_Euler_cycle($graph)) {
+        print "yes ",join(' ',@path),"\n";
+      } else {
+        print "no\n";
+      }
+    }
+    print "even $count_even and odd $count_odd\n";
+  }
+
+  # A003049 num connected Eulerian
+  # 1,1,4,8,37
+
+  # A158007 num connected non-Eulerian
+  # 1,5,17,104
+
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+{
+  # Eulerian
+  require Graph;
+  my @graphs;
+
+  {
+    #    1-----2
+    #    |   / | \
+    #    | /   |   \
+    #    6     |     3
+    #    | \   |   /
+    #    |   \ | /
+    #    5-----4
+    my $graph = Graph->new (undirected => 1);
+    $graph->add_cycle(1,2,3,4,5,6);
+    $graph->add_cycle(2,4,6);
+    push @graphs, $graph;
+    # MyGraphs::Graph_view($graph);
+  }
+  {
+    #    1-----2-----3
+    #    |   /   \   |
+    #    | /       \ |
+    #    8           4
+    #    | \       / |
+    #    |   \   /   |
+    #    7-----6-----5
+    my $graph = Graph->new (undirected => 1);
+    $graph->add_cycle(1,2,3,4,5,6,7,8);
+    $graph->add_cycle(2,4,6,8);
+    push @graphs, $graph;
+    # MyGraphs::Graph_view($graph);
+  }
+  {
+    #      2
+    #     /  \     not Eulerian
+    #    1----3
+    #    | \/ |
+    #    | / \|
+    #    5----4
+    my $graph = Graph->new (undirected => 1);
+    $graph->add_cycle(1,2,3,4,5);
+    $graph->add_edges([1,4],[3,5]);
+    push @graphs, $graph;
+    MyGraphs::Graph_view($graph);
+  }
+  MyGraphs::hog_searches_html(@graphs);
+
+  foreach my $graph (@graphs) {
+    my @path = MyGraphs::Graph_Euler_cycle($graph);
+    if (@path) {
+      print "yes ",join(' ',@path),"\n";
+    } else {
+      print "no\n";
+    }
+
+    # my $linegraph = MyGraphs::Graph_line_graph($graph);
+    # print MyGraphs::Graph_is_Hamiltonian($linegraph,
+    #                                      type=>'cycle',
+    #                                      verbose=>1)
+    #   ? "yes" : "no", "\n";
+  }
+  exit 0;
+}
+
+{
+  # Knuth 4A 7.2.1.6 example
+
+  require Graph;
+  my $graph = Graph->new;
+  $graph->set_graph_attribute (flow => 'south');
+  $graph->add_path ('12','21');
+  $graph->add_path ('3f','44','53');
+  $graph->add_path ('3f','6a','78','85');
+  $graph->add_path ('78','97','a6');
+  $graph->add_path ('6a','b9');
+  $graph->add_path ('3f','ce','db');
+  $graph->add_path ('ce','ed','fc');
+
+  $graph->set_vertex_attribute('3f', x => 0);
+  $graph->set_vertex_attribute('3f', y=> 0);
+  $graph->set_vertex_attribute('44', x => -2);
+  $graph->set_vertex_attribute('44', y => -1);
+  $graph->set_vertex_attribute('6a', x => 0);
+  $graph->set_vertex_attribute('6a', y=> -1);
+  $graph->set_vertex_attribute('ce', x => 2);
+  $graph->set_vertex_attribute('ce', y=> -1);
+
+  {
+    # vpar_from_balanced_binary(fromdigits([1,1,0,0, 1,1,1,0,0,1,1,1,0,1,1,0,0,0,1,0,0,1,1,0,1,1,0,0,0,0],2))
+    my $vpar = [undef, 0, 1, 0, 3, 4, 3, 6, 7, 7, 9, 6, 3, 12, 12, 14];
+    my $vpar_graph = MyGraphs::Graph_from_vpar ($vpar);
+    # MyGraphs::Graph_view($vpar_graph);
+    MyGraphs::Graph_is_isomorphic($graph,$vpar_graph) or die "different";
+    die if $graph eq $vpar_graph;
+  }
+
+  # MyGraphs::Graph_view($graph);
+  MyGraphs::hog_searches_html($graph);
+  exit 0;
+}
+
+{
+  # Gratzer, "General Lattice Theory", pages 16-17 exercise 15.
+
+  require Graph;
+  my @graphs;
+  {
+    # HOG not
+    my $graph = Graph->new;
+    $graph->set_graph_attribute (flow => 'south');
+
+    $graph->set_vertex_attribute(1, x => 0);
+    $graph->set_vertex_attribute(1, y => 0);
+    $graph->set_vertex_attribute(3, x => 0);
+    $graph->set_vertex_attribute(3, y => 1);
+    $graph->set_vertex_attribute(7, x => 0);
+    $graph->set_vertex_attribute(7, y => 2);
+    $graph->set_vertex_attribute(10, x => 0);
+    $graph->set_vertex_attribute(10, y => 3);
+    $graph->set_vertex_attribute(12, x => 0);
+    $graph->set_vertex_attribute(12, y => 4);
+
+    $graph->set_vertex_attribute(5, x => -2);
+    $graph->set_vertex_attribute(5, y => 2);
+    $graph->set_vertex_attribute(8, x => 2);
+    $graph->set_vertex_attribute(8, y => 2);
+
+    $graph->set_vertex_attribute(6, x => -1);
+    $graph->set_vertex_attribute(6, y => 2);
+
+    $graph->set_vertex_attribute(9, x => -1);
+    $graph->set_vertex_attribute(9, y => 3);
+    $graph->set_vertex_attribute(11, x => 1);
+    $graph->set_vertex_attribute(11, y => 3);
+
+    $graph->add_path (1,2,5,9,12);
+    $graph->add_path (1,3,7,10,12);
+    $graph->add_path (1,4,8,11,12);
+    $graph->add_path (4,7,9);
+    $graph->add_path (2,7,11);
+    $graph->add_path (3,6,10);
+    push @graphs, $graph;
+
+    my @deg3s = grep {$graph->in_degree($_)+$graph->out_degree($_)==3}
+      $graph->vertices;
+    print "deg3s  ",join(',',@deg3s),"\n";
+    foreach my $u (@deg3s) {
+      foreach my $v (@deg3s) {
+        my $distance = $graph->path_length($u,$v) // next;
+        if ($distance == 4) {
+          print "distance=4  $u to $v\n";
+        }
+      }
+    }
+  }
+  {
+    # https://hog.grinvin.org/ViewGraphInfo.action?id=30360
+    #         8
+    #      /     \
+    #    6         7
+    #    |  \   /  |
+    #    4    X    5
+    #    |  /   \  |
+    #    2         3
+    #      \     /
+    #         1
+    my $graph = Graph->new;
+    $graph->set_graph_attribute (flow => 'north');
+    $graph->set_vertex_attribute(1, x => 0);
+    $graph->set_vertex_attribute(1, y => 0);
+    $graph->set_vertex_attribute(8, x => 0);
+    $graph->set_vertex_attribute(8, y => 4);
+
+    $graph->set_vertex_attribute(4, x => -1);
+    $graph->set_vertex_attribute(4, y => 2);
+    $graph->set_vertex_attribute(5, x => 1);
+    $graph->set_vertex_attribute(5, y => 2);
+
+    $graph->add_path (1,2,4,6,8);
+    $graph->add_path (1,3,5,7,8);
+    $graph->add_edge (2,7);
+    $graph->add_edge (3,6);
+    push @graphs, $graph;
+  }
+  foreach my $graph (@graphs) {
+    my $num_vertices = $graph->vertices;
+    my $num_edges = $graph->edges;
+    print "$num_vertices $num_edges\n";
+    MyGraphs::Graph_view($graph);
+    my $href = MyGraphs::Graph_lattice_minmax_hash($graph);
+    print MyGraphs::Graph_lattice_minmax_reason($graph,$href),"\n";
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+
+
+{
+  # Self-Loop Degree
+  require Graph;
+  my $graph = Graph->new (undirected => 1);
+  $graph->add_edge('x','x');
+  # $graph->add_edge('x','y');
+  print "in  ",$graph->in_degree('x'),"\n";
+  print "out ",$graph->out_degree('x'),"\n";
+  print "net ",$graph->degree('x'),"\n";
+  exit 0;
+}
 
 {
   # Seidel Cospectrals
@@ -3401,85 +3807,7 @@ use Smart::Comments;
   exit 0;
 }
 
-{
-  # cubefree substring relations
-  # 11,19,31,49,77,117
-  # v = apply(n->2*n+1,[11,19,31,49,77,117])
-  # vector(#v-1,i,v[i+1]-v[i]) \\ A028445 cubefrees
 
-  my $max_len = 3;
-  my $delta1 = 1;
-  my $prefix = 1;
-
-  my @cubefrees = ('');
-  {
-    my @pending = ('');
-    foreach my $len (1 .. $max_len) {
-      my @new_pending;
-      foreach my $str (@pending) {
-        foreach my $ext ('0','1') {
-          my $new_str = $str.$ext;
-          if (is_cubefree($new_str)) {
-            push @new_pending, $new_str;
-          }
-        }
-      }
-      @pending = @new_pending;
-      push @cubefrees, @pending;
-    }
-  }
-  my $num_vertices = scalar(@cubefrees);
-  print "num_vertices = $num_vertices\n";
-
-  require Graph;
-  my $graph = Graph->new (undirected => 1);
-  $graph->set_graph_attribute
-    (name => "Cubefree Substring Relations, Max Length $max_len");
-  $graph->set_graph_attribute (root => "!");
-  foreach my $from_i (0 .. $#cubefrees) {
-    my $from_str = $cubefrees[$from_i];
-    foreach my $to_i (0 .. $from_i-1) {
-      my $to_str = $cubefrees[$to_i];
-      if ($delta1) {
-        next unless length($from_str) - length($to_str) == 1;
-      }
-      my $pos = index($from_str,$to_str);
-      if ($prefix) {
-        next unless $pos==0;
-      }
-      if ($pos >= 0) {
-        my $from_str = (length($from_str) ? $from_str : '!');
-        my $to_str = (length($to_str) ? $to_str : '!');
-        $graph->add_edge($from_str, $to_str);
-      }
-    }
-  }
-
-  MyGraphs::Graph_view($graph);
-  print "tree\n";
-  MyGraphs::Graph_tree_print($graph, cmp => \&MyGraphs::cmp_alphabetic);
-  # Graph_print_tikz($graph);
-  # MyGraphs::hog_searches_html($graph);
-  exit 0;
-
-  sub find_cube {
-    my ($str) = @_;
-    foreach my $c (1 .. int(length($str)/3)) {
-      my $re = '('.('.' x $c).')\\1\\1';
-      ### $re
-      if ($str =~ $re) {
-        ### $str
-        ### cube: $1
-        return $1;
-      }
-    }
-    return undef;
-  }
-  sub is_cubefree {
-    my ($str) = @_;
-    return ! defined find_cube($str);
-  }
-}
 
 {
   # subgraph relations among all graphs to N vertices -- graph drawing

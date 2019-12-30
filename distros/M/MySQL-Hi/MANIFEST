@@ -1,0 +1,11 @@
+bin/myhi
+bin/mysqlhi
+etc/mysqlhi.conf
+etc/README.pod
+lib/MySQL/Hi.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

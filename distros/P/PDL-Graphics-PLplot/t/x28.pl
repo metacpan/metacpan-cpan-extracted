@@ -1,6 +1,3 @@
-#! /usr/bin/env perl
-
-#
 #	plmtex3, plptex3 demo.
 #
 #   Copyright (C) 2007 Alan W. Irwin
@@ -25,6 +22,8 @@
 
 # Choose these values to correspond to tick marks.
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 
@@ -147,7 +146,7 @@ $x_shear = 0;
 $omega = 2*PI*(sequence(NROTATION)/NROTATION);
 $y_shear = 0.5*$yrange*sin($omega);
 $z_shear = 0.5*$zrange*cos($omega);
-$zs = $zsmax - $dzsrot * sequence(NROTATION);
+my $zs = $zsmax - $dzsrot * sequence(NROTATION);
 plptex3(
     $xmid, $ymax, $zs,
     $x_inclination, $y_inclination, $z_inclination,
@@ -265,8 +264,8 @@ plschr(0, 1.2);
 # domega controls the spacing between the various characters of the
 # string and also the maximum value of omega for the given number
 # of characters in *pstring.
-my $domega = 2*PI/length($pstring);
-my $omega  = 0;
+$domega = 2*PI/length($pstring);
+$omega  = 0;
 
 # 3D function is a helix of the given radius and pitch 
 
@@ -276,9 +275,9 @@ my $pitch  = 1/(2*PI);
 # The shear vector should be perpendicular to the 3D line with Z
 # component maximized, but for low pitch a good approximation is
 # a constant vector that is parallel to the Z axis.
-my $x_shear = 0;
-my $y_shear = 0;
-my $z_shear = 1;
+$x_shear = 0;
+$y_shear = 0;
+$z_shear = 1;
 
 foreach my $c (split '', $pstring) {
     my $sin_omega = sin($omega);

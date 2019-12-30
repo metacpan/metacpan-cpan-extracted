@@ -14,6 +14,7 @@
 #define XH_X2H_IS_NOT_BLANK         32
 #define XH_X2H_DOCTYPE_FOUND        64
 #define XH_X2H_TEXT_NODE            128
+#define XH_X2H_TAG_EXISTS           256
 
 #define XH_X2H_NEED_NORMALIZE       (XH_X2H_NORMALIZE_REF |             \
                                      XH_X2H_NORMALIZE_LINE_FEED)

@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x02 for the PLplot PDL binding
 #
 # Multiple window and color map 0 demo
@@ -24,6 +22,8 @@
 # along with PLplot; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 

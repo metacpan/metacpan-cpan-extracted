@@ -8,12 +8,11 @@ my $build = Module::Build->new(
   'dist_version_from' => 'lib/DBD/Neo4p.pm',
   'dist_author' => 'Mark A. Jensen',
   license => 'perl',
-  perl => '5.010',
   'configure_requires' => {
     'Module::Build' => 0
    },
   'build_requires' => {
-    'REST::Neo4p' => '0.3010',
+    'REST::Neo4p' => '0.3030',
     'Test::More' => 0,
     'Test::Exception' => 0,
     'Module::Build' => 0,
@@ -21,7 +20,7 @@ my $build = Module::Build->new(
     'experimental' => 0
    },
   'requires' => {
-    'REST::Neo4p' => '0.3010',
+    'REST::Neo4p' => '0.3030',
     'DBI' => '1.632',
     'JSON' => 0
    },

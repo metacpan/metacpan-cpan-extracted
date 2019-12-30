@@ -1,0 +1,35 @@
+NAME
+    "Future::AsyncAwait::Frozen" - deferred subroutine syntax for futures
+
+SYNOPSIS
+       use Future::AsyncAwait::Frozen;
+
+       async sub do_a_thing
+       {
+          my $first = await do_first_thing();
+
+          my $second = await do_second_thing();
+
+          return combine_things( $first, $second );
+       }
+
+       do_a_thing()->get;
+
+DESCRIPTION
+    This module is merely a frozen release of Future::AsyncAwait to test
+    experimental async/await support in Mojolicious. Just the namespace has
+    been changed. All code belongs to the original authors.
+
+ACKNOWLEDGEMENTS
+    With thanks to "Zefram", "ilmari" and others from "irc.perl.org/#p5p"
+    for assisting with trickier bits of XS logic.
+
+    Thanks to "genio" for project management and actually reminding me to
+    write some code.
+
+    Thanks to The Perl Foundation for sponsoring me to continue working on
+    the implementation.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

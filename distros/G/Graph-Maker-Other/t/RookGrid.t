@@ -32,14 +32,14 @@ BEGIN { MyTestHelpers::nowarnings() }
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 22;
+plan tests => 50;
 
 require Graph::Maker::RookGrid;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::RookGrid::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::RookGrid->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::RookGrid->VERSION($want_version); 1 }, 1,
@@ -99,15 +99,33 @@ foreach my $N (2..4) {
 #
 require Graph::Maker::Complete;
 foreach my $N (2 .. 5) {
-  # 1xN same as Complete
-  my $rook = Graph::Maker->new('rook_grid', dims => [1,$N], undirected => 1);
-  my $comp = Graph::Maker->new('complete', N => $N, undirected => 1);
-  ok ("$rook", "$comp", "Rook = Complete $N");
+  foreach my $undirected (0, 1) {
+    foreach my $multiedged (0, 1) {
+      # 1xN same as Complete
+      my $rook = Graph::Maker->new('rook_grid', dims => [1,$N],
+                                      undirected => $undirected,
+                                      multiedged => $multiedged);
+      my $comp = Graph::Maker->new('complete', N => $N,
+                                      undirected => $undirected,
+                                      multiedged => $multiedged);
+      ok ("$rook", "$comp", "Rook = Complete $N  undirected=$undirected multiedged=$multiedged");
 
-  # require MyGraphs;
-  # MyGraphs::Graph_view($rook);
-  # MyGraphs::Graph_view($comp);
+      my $num_edges = $rook->edges;
+      ok ($num_edges, T($N) * ($undirected ? 1 : 2));
+
+      # require MyGraphs;
+      # MyGraphs::Graph_view($rook);
+      # MyGraphs::Graph_view($comp);
+    }
+  }
 }
+
+# triangular numbers
+sub T {
+  my ($n) = @_;
+  return $n*($n-1)/2;
+}
+
 
 # Not N=1 since Graph::Maker::Complete version 0.01 gives an empty graph for
 # that.

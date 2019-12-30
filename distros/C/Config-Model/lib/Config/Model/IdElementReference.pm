@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::IdElementReference 2.137;
+package Config::Model::IdElementReference 2.138;
 
 use Mouse;
 
@@ -69,7 +69,7 @@ sub BUILD {
 # internal
 
 # FIXME: do not call back value object -> may recurse
-sub get_choice_from_refered_to {
+sub get_choice_from_referred_to {
     my $self = shift;
 
     my $config_elt  = $self->{config_elt};
@@ -84,7 +84,7 @@ sub get_choice_from_refered_to {
 
         $logger->trace("path: @path");
 
-        my $refered_to = eval { $config_elt->grab("@path"); };
+        my $referred_to = eval { $config_elt->grab("@path"); };
 
         if (ref $@) {
             my $e = $@;
@@ -96,7 +96,7 @@ sub get_choice_from_refered_to {
         }
 
         my $element = pop @path;
-        my $obj     = $refered_to->parent;
+        my $obj     = $referred_to->parent;
         my $type    = $obj->element_type($element);
 
         my @choice;
@@ -190,7 +190,7 @@ Config::Model::IdElementReference - Refer to id element(s) and extract keys
 
 =head1 VERSION
 
-version 2.137
+version 2.138
 
 =head1 SYNOPSIS
 
@@ -328,33 +328,35 @@ is a hash with 2 mandatory elements: C<formula> and C<variables>.
 =back
 
 The available choice of this (computed or not) reference value is made
-from the available keys of the refered_to hash element or the values
-of the refered_to array element.
+from the available keys of the C<referred_to> hash element or the values
+of the C<referred_to> array element.
 
 The example means the the value must correspond to an existing host:
 
  value_type => 'reference',
- refer_to => '! host' 
+ refer_to => '! host'
 
 This example means the the value must correspond to an existing lan
 within the host whose Id is specified by hostname:
 
  value_type => 'reference',
- computed_refer_to => { formula => '! host:$a lan', 
-                        variables => { a => '- hostname' }
-                      }
+ computed_refer_to => {
+      formula => '! host:$a lan',
+      variables => { a => '- hostname' }
+ }
 
 If you need to combine possibilities from several hash, use the "C<+>"
 token to separate 2 paths:
 
  value_type => 'reference',
- computed_refer_to => { formula => '! host:$a lan + ! host:foobar lan', 
-                        variables => { a => '- hostname' }
-                      }
+ computed_refer_to => {
+     formula => '! host:$a lan + ! host:foobar lan',
+     variables => { a => '- hostname' }
+ }
 
 You can specify C<refer_to> or C<computed_refer_to> with a C<choice>
 argument so the possible enum value will be the combination of the
-specified choice and the refered_to values.
+specified choice and the referred_to values.
 
 =head1 Methods
 

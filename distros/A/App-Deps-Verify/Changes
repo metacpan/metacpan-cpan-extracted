@@ -1,5 +1,8 @@
 Revision history for App-Deps-Verify
 
+0.10.0       2019-12-30
+    - Add the plupdatetask sub command
+
 0.8.3       2019-05-30
     - Fix doc issues.
 

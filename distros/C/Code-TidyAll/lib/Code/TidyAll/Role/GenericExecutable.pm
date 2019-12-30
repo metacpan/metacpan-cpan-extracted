@@ -13,7 +13,7 @@ use Moo::Role;
 
 with 'Code::TidyAll::Role::RunsCommand';
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 has '+cmd' => (
     is       => 'ro',
@@ -54,7 +54,7 @@ use any executable as a transformer or validator
 
 =head1 VERSION
 
-version 0.74
+version 0.75
 
 =head1 SYNOPSIS
 

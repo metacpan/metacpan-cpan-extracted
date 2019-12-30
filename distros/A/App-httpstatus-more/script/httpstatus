@@ -1,0 +1,250 @@
+#!perl
+use strict;
+use warnings;
+
+# taken from https://metacpan.org/source/GAAS/HTTP-Message-6.06/lib/HTTP/Status.pm
+my %StatusCode = (
+    100 => 'Continue',
+    101 => 'Switching Protocols',
+    102 => 'Processing',                      # RFC 2518 (WebDAV)
+    103 => [
+        'Early Hints',                        # RFC 8297
+        'Checkpoint (unofficial)',            # unofficial
+    ],
+    200 => 'OK',
+    201 => 'Created',
+    202 => 'Accepted',
+    203 => 'Non-Authoritative Information',
+    204 => 'No Content',
+    205 => 'Reset Content',
+    206 => 'Partial Content',
+    207 => 'Multi-Status',                    # RFC 2518 (WebDAV)
+    208 => 'Already Reported',                # RFC 5842
+    218 => 'This is fine (Apache Web Server)',# unofficial
+    226 => 'IM Used',                         # RFC 3229 (Delta encoding)
+    300 => 'Multiple Choices',
+    301 => 'Moved Permanently',
+    302 => 'Found',
+    303 => 'See Other',
+    304 => 'Not Modified',
+    305 => 'Use Proxy',
+    306 => 'Switch Proxy',                    # no longer used.
+    307 => 'Temporary Redirect',
+    308 => 'Permanent Redirect',              # RFC 7538
+    400 => 'Bad Request',
+    401 => 'Unauthorized',
+    402 => 'Payment Required',
+    403 => 'Forbidden',
+    404 => 'Not Found',
+    405 => 'Method Not Allowed',
+    406 => 'Not Acceptable',
+    407 => 'Proxy Authentication Required',
+    408 => 'Request Timeout',
+    409 => 'Conflict',
+    410 => 'Gone',
+    411 => 'Length Required',
+    412 => 'Precondition Failed',
+    413 => 'Request Entity Too Large',
+    414 => 'Request-URI Too Large',
+    415 => 'Unsupported Media Type',
+    416 => 'Request Range Not Satisfiable',
+    417 => 'Expectation Failed',
+    418 => 'I\'m a teapot',                   # RFC 2324
+    419 => 'Page Expired (Laravel Framework)',# unofficial
+    420 => [
+        'Enhance Your Calm (Twitter)',        # unofficial
+        'Method Failure (Spring Framework)',  # unofficial
+    ],
+    421 => 'Misdirected Request',             # RFC 7540
+    422 => 'Unprocessable Entity',            # RFC 2518 (WebDAV)
+    423 => 'Locked',                          # RFC 2518 (WebDAV)
+    424 => 'Failed Dependency',               # RFC 2518 (WebDAV)
+    425 => 'No code',                         # WebDAV Advanced Collections
+    426 => 'Upgrade Required',                # RFC 2817
+    428 => 'Precondition Required',
+    429 => 'Too Many Requests',
+    430 => 'Request Header Fields Too Large (Shopify)', # unofficial
+    431 => 'Request Header Fields Too Large',
+    440 => 'Login Time-out (IIS)',            # unofficial
+    444 => 'No Response (nginx)',             # unofficial
+    449 => 'Retry with (IIS)',                # unofficial
+    450 => 'Blocked by Windows Parental Controls (Microsoft)', # unofficial
+    451 => [
+        'Unavailable For Legal Reasons',      # RFC 7725
+        'Redirect (IIS)',                     # unofficial
+    ],
+    460 => '(AWS Elastic Load Balancer)',     # unofficial
+    463 => '(AWS Elastic Load Balancer)',     # unofficial
+    494 => 'Request header too large (nginx)',# unofficial
+    495 => 'SSL Certificate Error (nginx)',   # unofficial
+    496 => 'SSL Certificate Required (nginx)',# unofficial
+    497 => 'HTTP Request Sent to HTTPS Port (nginx)', # unofficial
+    498 => 'Invalid Token (ArcGIS)',          # unofficial
+    499 => [
+        'Token Required (ArcGIS)',            # unofficial
+        'Client Closed Request (nginx)',      # unofficial
+    ],
+    500 => 'Internal Server Error',
+    501 => 'Not Implemented',
+    502 => 'Bad Gateway',
+    503 => 'Service Unavailable',
+    504 => 'Gateway Timeout',
+    505 => 'HTTP Version Not Supported',
+    506 => 'Variant Also Negotiates',         # RFC 2295
+    507 => 'Insufficient Storage',            # RFC 2518 (WebDAV)
+    508 => 'Loop Detected',                   # RFC 5842 (WebDAV)
+    509 => 'Bandwidth Limit Exceeded (Apache Web Server/cPanel)', # unofficial
+    510 => 'Not Extended',                    # RFC 2774
+    511 => 'Network Authentication Required', # RFC 6585
+    520 => 'Unknown Error (Cloudfare)',       # unofficial
+    521 => 'Web Server Is Down (Cloudfare)',  # unofficial
+    522 => 'Connection Timed Out (Cloudfare)',# unofficial
+    523 => 'Origin Is Unreachable (Cloudfare)', # unofficial
+    524 => 'A Timeout Occurred (Cloudfare)',  # unofficial
+    525 => 'SSL Handshake Failed (Cloudfare)',# unofficial
+    526 => 'Invalid SSL Certificate (Cloudfare)', # unofficial
+    527 => 'Railgun Error (Cloudfare)',       # unofficial
+    530 => [
+        'Site is frozen (Pantheon)',          # unofficial
+        'Origin DNS Error (Cloudfare)',       # unofficial
+    ],
+    598 => 'Network read timeout error (unofficial)', # unofficial
+);
+
+if (@ARGV==1) {
+    my $key = shift @ARGV;
+    if (my $msg = $StatusCode{$key}) {
+        # httpstatus 403
+        # httpstatus 500
+        printf "%s\n", (ref $msg ? join("; ", @$msg) : $msg);
+    } elsif ($key =~ /^[12345]/) {
+        # httpstatus 4
+        # httpstatus 40
+        for (sort keys %StatusCode) {
+            next unless /^$key/;
+            my $msg = $StatusCode{$_};
+            print "$_ ", (ref $msg ? join("; ", @$msg) : $msg), "\n";
+        }
+    } else {
+        # httpstatus Bad
+        # httpstatus Forbidden
+        for (sort keys %StatusCode) {
+            my $msg = $StatusCode{$_};
+            my $msg_str = (ref $msg ? join("; ", @$msg) : $msg);
+            next unless $msg_str =~ /$key/i;
+            print "$_ $msg_str\n";
+        }
+    }
+} else {
+    # List all http status
+    for (sort keys %StatusCode) {
+        my $msg = $StatusCode{$_};
+        print "$_ ", (ref $msg ? join("; ", @$msg) : $msg), "\n";
+    }
+}
+
+# ABSTRACT: Display HTTP status code information
+# PODNAME: httpstatus
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+httpstatus - Display HTTP status code information
+
+=head1 VERSION
+
+version 2.0.0.1
+
+=head1 SYNOPSIS
+
+    # List 4xx status
+    % httpstatus 4
+    400 Bad Request
+    401 Unauthorized
+    402 Payment Required
+    403 Forbidden
+    404 Not Found
+    405 Method Not Allowed
+    406 Not Acceptable
+    407 Proxy Authentication Required
+    408 Request Timeout
+    409 Conflict
+    410 Gone
+    411 Length Required
+    412 Precondition Failed
+    413 Request Entity Too Large
+    414 Request-URI Too Large
+    415 Unsupported Media Type
+    416 Request Range Not Satisfiable
+    417 Expectation Failed
+    418 I'm a teapot
+    422 Unprocessable Entity
+    423 Locked
+    424 Failed Dependency
+    425 No code
+    426 Upgrade Required
+    428 Precondition Required
+    429 Too Many Requests
+    431 Request Header Fields Too Large
+    449 Retry with
+
+    # List 40x status
+    % httpstatus 40
+    400 Bad Request
+    401 Unauthorized
+    402 Payment Required
+    403 Forbidden
+    404 Not Found
+    405 Method Not Allowed
+    406 Not Acceptable
+    407 Proxy Authentication Required
+    408 Request Timeout
+    409 Conflict
+
+    % httpstatus 500
+    Internal Server Error
+
+    % httpstatus 403
+    Forbidden
+
+    # grep status messages
+    % httpstatus Bad
+    400 Bad Request
+    502 Bad Gateway
+
+    # And, display all messages
+    % httpstatus
+    ...
+
+=head1 DESCRIPTION
+
+App::httpstatus is a simple application to display information about HTTP status code.
+
+=head1 ORIGINAL AUTHOR
+
+Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>
+
+=head1 ORIGINAL LICENSE
+
+Copyright (C) Tokuhiro Matsuno
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

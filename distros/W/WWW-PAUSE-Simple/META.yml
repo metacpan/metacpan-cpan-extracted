@@ -36,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-PAUSE-Simple
   homepage: https://metacpan.org/release/WWW-PAUSE-Simple
   repository: git://github.com/perlancar/perl-WWW-PAUSE-Simple.git
-version: '0.445'
+version: '0.446'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

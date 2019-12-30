@@ -8,7 +8,7 @@ use IPC::System::Simple qw(capturex);
 
 use Exporter qw(import);
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 our @EXPORT_OK = qw(svn_uncommitted_files);
 
@@ -38,7 +38,7 @@ Code::TidyAll::SVN::Util - Utility functions for SVN hooks
 
 =head1 VERSION
 
-version 0.74
+version 0.75
 
 =head1 SUPPORT
 

@@ -15,7 +15,10 @@ sub cmd_sync_bin_deps {
         $info->{BIN_DEPENDENT} = [sort keys %tmp];
         delete $info->{BIN_DEPENDENT} unless @{$info->{BIN_DEPENDENT}};
         my $file = XS::Install::Payload::binary_module_info_file($module);
-        module_info_write($file, $info);
+        my $ok  = eval { module_info_write($file, $info); 1 };
+        unless ($ok) {
+            warn("Reverse dependency write failed: $@");
+        }
     }
 }
 

@@ -1477,8 +1477,8 @@ http {
             }
 
             # Beautiful URL Rewriting
-               rewrite ^/play/ssid/(\w+)/type/(\w+)/oid/([0-9]+)/uid/([0-9]+)/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&name=\\x245 last;
-               rewrite ^/play/ssid/(\w+)/type/(\w+)/oid/([0-9]+)/uid/([0-9]+)/client/(.\\x2A)/noscrobble/([0-1])/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&client=\\x245&noscrobble=\\x246&name=\\x247 last;
+               rewrite ^/play/ssid/(\\w+)/type/(\\w+)/oid/([0-9]+)/uid/([0-9]+)/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&name=\\x245 last;
+               rewrite ^/play/ssid/(\\w+)/type/(\\w+)/oid/([0-9]+)/uid/([0-9]+)/client/(.\\x2A)/noscrobble/([0-1])/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&client=\\x245&noscrobble=\\x246&name=\\x247 last;
                rewrite ^/play/ssid/(.\\x2A)/type/(.\\x2A)/oid/([0-9]+)/uid/([0-9]+)/client/(.\\x2A)/noscrobble/([0-1])/player/(.\\x2A)/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&client=\\x245&noscrobble=\\x246&player=\\x247&name=\\x248 last;
                rewrite ^/play/ssid/(.\\x2A)/type/(.\\x2A)/oid/([0-9]+)/uid/([0-9]+)/client/(.\\x2A)/noscrobble/([0-1])/bitrate/([0-9]+)/player/(.\\x2A)/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&client=\\x245&noscrobble=\\x246&bitrate=\\x247player=\\x248&name=\\x249 last;
                rewrite ^/play/ssid/(.\\x2A)/type/(.\\x2A)/oid/([0-9]+)/uid/([0-9]+)/client/(.\\x2A)/noscrobble/([0-1])/transcode_to/(w+)/bitrate/([0-9]+)/player/(.\\x2A)/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&client=\\x245&noscrobble=\\x246&transcode_to=\\x247&bitrate=\\x248&player=\\x249&name=\\x2410 last;

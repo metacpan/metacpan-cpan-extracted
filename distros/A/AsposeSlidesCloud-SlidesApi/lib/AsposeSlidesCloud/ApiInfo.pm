@@ -30,26 +30,6 @@ use strict;
 use warnings;
 use utf8;
 
-use constant VERSION => '19.11.1';
-
-our $VERSION = "19.11.1";
-
-=head1 NAME
-
-AsposeSlidesCloud
-
-=head1 DESCRIPTION
-
-This library allows you to work with Aspose.Slides Cloud REST APIs in your Perl applications.
-
-=head1 AUTHOR
-
-Victor Putrov
-
-=head1 LICENSE
-
-MIT
-
-=cut
+use constant VERSION => '19.12.0';
 
 1;

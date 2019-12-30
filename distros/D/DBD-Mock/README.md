@@ -1081,9 +1081,11 @@ great caution (if at all).
 
 - table\_info
 
-    This feature adds support for DBI's `table_info` method. To mock the table
-    info for a search of the `testSchema` database schema you would use the
-    following:
+    This feature adds support for DBI's `table_info` method (
+    _Note this functionality is unstable when used with DBI version 1.634 and below_).
+
+    To mock the table info for a search of the `testSchema` database schema you
+    would use the following:
 
         $dbh->{mock_add_table_info} = {
             cataloge   => undef,

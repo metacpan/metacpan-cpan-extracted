@@ -4,7 +4,7 @@
       "L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -24,18 +24,19 @@
             "Carp" : "0",
             "Cwd" : "0",
             "Data::Dump" : "0",
-            "Data::Edit::Xml" : "20190810",
-            "Data::Table::Text" : "20190811",
+            "Data::Edit::Xml" : "20191121",
+            "Data::Table::Text" : "20191221",
             "Exporter" : "0",
             "Test2::API" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "v5.26.1"
          }
       }
    },
    "provides" : {
       "Dita::PCD" : {
          "file" : "lib/Dita/PCD.pm",
-         "version" : "20190811"
+         "version" : "20191230"
       }
    },
    "release_status" : "stable",
@@ -44,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20190811",
+   "version" : "20191230",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

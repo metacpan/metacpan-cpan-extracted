@@ -1,0 +1,29 @@
+bin/qmail-dmarc
+Changes
+lib/Mail/Qmail/Filter/CheckDeliverability.pm
+lib/Mail/Qmail/Filter/DMARC.pm
+lib/Mail/Qmail/Filter/Dump.pm
+lib/Mail/Qmail/Filter/LogEnvelope.pm
+lib/Mail/Qmail/Filter.pm
+lib/Mail/Qmail/Filter/Queue.pm
+lib/Mail/Qmail/Filter/RequireFrom.pm
+lib/Mail/Qmail/Filter/RewriteFrom.pm
+lib/Mail/Qmail/Filter/RewriteSender.pm
+lib/Mail/Qmail/Filter/SkipQueue.pm
+lib/Mail/Qmail/Filter/SpamAssassin.pm
+lib/Mail/Qmail/Filter/Util.pm
+lib/Mail/Qmail/Filter/ValidateFrom.pm
+lib/Mail/Qmail/Filter/ValidateSender.pm
+lib/MailX/Qmail/Queue/Message.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/util.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

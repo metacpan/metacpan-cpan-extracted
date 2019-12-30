@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x03 for the PLplot PDL binding
 #
 # Polar plot demo
@@ -25,6 +23,8 @@
 
 # SYNC: x03c.c 1.18
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Math::Trig qw [pi];
@@ -74,6 +74,7 @@ for my $i (0 .. 11) {
 
   pljoin (0, 0, $dx, $dy);
 
+  my $offset = 0.45;
   if ($theta < 9.99) {
       $offset = 0.45;
   } elsif ($theta < 99.9) {

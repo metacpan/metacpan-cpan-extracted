@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultClass::Tee;
-$DBIx::Class::Helper::ResultClass::Tee::VERSION = '2.034001';
+$DBIx::Class::Helper::ResultClass::Tee::VERSION = '2.034002';
 # ABSTRACT: Inflate to multiple result classes at the same time
 
 use utf8;

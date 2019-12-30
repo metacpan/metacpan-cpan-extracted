@@ -2257,6 +2257,24 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               break;
             }
+            case SPVM_OP_C_ID_PRINT: {
+              SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
+              
+              if (SPVM_TYPE_is_numeric_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_OP_CHECKER_apply_numeric_to_string_convertion(compiler, op_cur->first);
+                if (compiler->error_count > 0) {
+                  return;
+                }
+              }
+              
+              first_type = SPVM_OP_get_type(compiler, op_cur->first);
+              
+              if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "print argument must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
+                return;
+              }
+              break;
+            }
             // End of scope
             case SPVM_OP_C_ID_BLOCK: {
               // Pop block my variable base
@@ -3748,6 +3766,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         case SPVM_OP_C_ID_CASE:
                         case SPVM_OP_C_ID_DIE:
                         case SPVM_OP_C_ID_WARN:
+                        case SPVM_OP_C_ID_PRINT:
                         case SPVM_OP_C_ID_LAST:
                         case SPVM_OP_C_ID_NEXT:
                         case SPVM_OP_C_ID_BREAK:
@@ -4887,22 +4906,6 @@ void SPVM_OP_CHECKER_resolve_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_call_
               }
             }
           }
-        }
-      }
-      
-      // Search core functions
-      if (!found_sub) {
-        SPVM_PACKAGE* core_package = SPVM_HASH_fetch(compiler->package_symtable, "SPVM::CORE", strlen("SPVM::CORE"));
-        found_package = core_package;
-        if (core_package) {
-          found_sub = SPVM_HASH_fetch(
-            core_package->sub_symtable,
-            sub_name,
-            strlen(sub_name)
-          );
-        }
-        else {
-          found_sub = NULL;
         }
       }
     }

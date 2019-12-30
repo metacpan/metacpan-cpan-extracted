@@ -16,6 +16,10 @@ package Sidef::Types::Range::RangeNumber {
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 
+    my $MPZ = bless(\Math::GMPz::Rmpz_init(), 'Sidef::Types::Number::Number');
+
+    require Devel::Peek;
+
     sub new {
         my (undef, $from, $to, $step) = @_;
 
@@ -43,6 +47,8 @@ package Sidef::Types::Range::RangeNumber {
 
     *call = \&new;
 
+    my @cache;
+
     sub iter {
         my ($self) = @_;
 
@@ -50,7 +56,6 @@ package Sidef::Types::Range::RangeNumber {
         my $from = $self->{from};
         my $to   = $self->{to};
 
-        my $tmp;
         my $times = ($self->{_times} //= $to->sub($from)->add($step)->div($step));
 
         if (ref($times) eq 'Sidef::Types::Number::Number') {
@@ -80,9 +85,23 @@ package Sidef::Types::Range::RangeNumber {
                     return Sidef::Types::Block::Block->new(
                         code => sub {
                             --$repetitions >= 0 or return undef;
-                            $tmp = bless(\Math::GMPz::Rmpz_init_set_si($from), 'Sidef::Types::Number::Number');
+
+                            if ($from <= 8192 and $from >= 0) {
+                                my $obj = ($cache[$from] //=
+                                           bless(\Math::GMPz::Rmpz_init_set_ui($from), 'Sidef::Types::Number::Number'));
+                                $from += $step;
+                                return $obj;
+                            }
+
+                            if (Devel::Peek::SvREFCNT($$MPZ) > 1) {
+                                $MPZ = bless(\Math::GMPz::Rmpz_init_set_si($from), 'Sidef::Types::Number::Number');
+                            }
+                            else {
+                                Math::GMPz::Rmpz_set_si($$MPZ, $from);
+                            }
+
                             $from += $step;
-                            $tmp;
+                            $MPZ;
                         },
                     );
                 }
@@ -92,9 +111,15 @@ package Sidef::Types::Range::RangeNumber {
                 return Sidef::Types::Block::Block->new(
                     code => sub {
                         --$repetitions >= 0 or return undef;
-                        $tmp = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
+                        if (Devel::Peek::SvREFCNT($$MPZ) > 1) {
+                            $MPZ = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
+                        }
+                        else {
+                            Math::GMPz::Rmpz_set($$MPZ, $counter_mpz);
+                        }
+
                         Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step);
-                        $tmp;
+                        $MPZ;
                     },
                 );
             }
@@ -102,6 +127,7 @@ package Sidef::Types::Range::RangeNumber {
 
         my $asc = ($self->{_asc} //= !!($step->is_pos // return Sidef::Types::Block::Block->new(code => sub { undef; })));
 
+        my $tmp;
         Sidef::Types::Block::Block->new(
             code => sub {
                 ($asc ? $from->le($to) : $from->ge($to)) || return undef;
@@ -112,7 +138,7 @@ package Sidef::Types::Range::RangeNumber {
         );
     }
 
-    sub _sum_prod_by {
+    sub _reduce_by {
         my ($self, $method, $result, $callback) = @_;
 
         my @list;
@@ -139,7 +165,7 @@ package Sidef::Types::Range::RangeNumber {
     sub sum_by {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_sum_prod_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[0]) });
+        $self->_reduce_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[0]) });
     }
 
     sub sum {
@@ -184,7 +210,7 @@ package Sidef::Types::Range::RangeNumber {
     sub prod_by {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_sum_prod_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[0]) });
+        $self->_reduce_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[0]) });
     }
 
     sub prod {
@@ -197,11 +223,48 @@ package Sidef::Types::Range::RangeNumber {
         if (    $self->{step}->is_one
             and $self->{from}->is_one
             and $self->{to}->is_pos) {
-            $self->{_asc} //= 1;
             return $self->{to}->factorial;
         }
 
         Sidef::Types::Number::Number::prod($self->to_list);
+    }
+
+    sub lcm_by {
+        my ($self, $block) = @_;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $self->_reduce_by('lcm', Sidef::Types::Number::Number::ONE, sub { $block->run($_[0]) });
+    }
+
+    sub lcm {
+        my ($self, $arg) = @_;
+
+        if (defined($arg)) {
+            goto &lcm_by;
+        }
+
+        if (    $self->{step}->is_one
+            and $self->{from}->is_one
+            and $self->{to}->is_pos) {
+            return $self->{to}->consecutive_lcm;
+        }
+
+        Sidef::Types::Number::Number::lcm($self->to_list);
+    }
+
+    sub gcd_by {
+        my ($self, $block) = @_;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $self->_reduce_by('gcd', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[0]) });
+    }
+
+    sub gcd {
+        my ($self, $arg) = @_;
+
+        if (defined($arg)) {
+            goto &gcd_by;
+        }
+
+        Sidef::Types::Number::Number::gcd($self->to_list);
     }
 
     sub bsearch {

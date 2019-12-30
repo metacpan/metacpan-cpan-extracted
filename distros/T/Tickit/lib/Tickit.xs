@@ -10,6 +10,7 @@
 #include "XSUB.h"
 
 #include <tickit.h>
+#include <tickit-evloop.h>
 #include <tickit-termdrv.h>
 #include <tickit-mockterm.h>
 
@@ -651,6 +652,285 @@ static int window_userevent_fn(TickitWindow *win, TickitEventFlags flags, void *
 
 typedef Tickit *Tickit___Tickit;
 
+typedef struct {
+#ifdef tTHX
+  tTHX myperl;
+#endif
+  CV *cb_init;
+  CV *cb_destroy;
+  CV *cb_run;
+  CV *cb_stop;
+  CV *cb_io_read;
+  CV *cb_cancel_io;
+  CV *cb_timer;
+  CV *cb_cancel_timer;
+  CV *cb_idle;
+  CV *cb_cancel_idle;
+} EventLoopData;
+
+#define newSVio_rdonly(fd)  S_newSVio_rdonly(aTHX_ fd)
+static SV *S_newSVio_rdonly(pTHX_ int fd)
+{
+  /* inspired by
+   *   https://metacpan.org/source/LEONT/Linux-Epoll-0.016/lib/Linux/Epoll.xs#L192
+   */
+  PerlIO *pio = PerlIO_fdopen(fd, "r");
+  GV *gv = newGVgen("Tickit::Async");
+  SV *ret = newRV_noinc((SV *)gv);
+  IO *io = GvIOn(gv);
+  IoTYPE(io) = '<';
+  IoIFP(io) = pio;
+  sv_bless(ret, gv_stashpv("IO::Handle", TRUE));
+  return ret;
+}
+
+static XS(invoke_watch);
+static XS(invoke_watch)
+{
+  dXSARGS;
+  TickitWatch *watch = XSANY.any_ptr;
+
+  tickit_evloop_invoke_watch(watch, TICKIT_EV_FIRE);
+
+  XSRETURN(0);
+}
+
+#define newSVcallback_tickit_invoke(watch)  S_newSVcallback_tickit_invoke(aTHX_ watch)
+static SV *S_newSVcallback_tickit_invoke(pTHX_ TickitWatch *watch)
+{
+  CV *cv = newXS(NULL, invoke_watch, __FILE__);
+  CvXSUBANY(cv).any_ptr = watch;
+  return newRV_noinc((SV *)cv);
+}
+
+static XS(invoke_sigwinch);
+static XS(invoke_sigwinch)
+{
+  Tickit *t = XSANY.any_ptr;
+  tickit_evloop_sigwinch(t);
+}
+
+static void *evloop_init(Tickit *t, void *initdata)
+{
+  EventLoopData *evdata = initdata;
+  dTHXa(evdata->myperl);
+
+  CV *invoke_sigwinch_cv = newXS(NULL, invoke_sigwinch, __FILE__);
+  CvXSUBANY(invoke_sigwinch_cv).any_ptr = t;
+
+  dSP;
+  SAVETMPS;
+
+  EXTEND(SP, 1);
+  PUSHMARK(SP);
+  mPUSHs(newRV_noinc((SV *)invoke_sigwinch_cv));
+
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_init, G_VOID);
+
+  FREETMPS;
+
+  return initdata;
+}
+
+static void evloop_destroy(void *data)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+
+  SvREFCNT_dec(evdata->cb_init);
+  SvREFCNT_dec(evdata->cb_destroy);
+  SvREFCNT_dec(evdata->cb_run);
+  SvREFCNT_dec(evdata->cb_stop);
+  SvREFCNT_dec(evdata->cb_io_read);
+  SvREFCNT_dec(evdata->cb_cancel_io);
+  SvREFCNT_dec(evdata->cb_timer);
+  SvREFCNT_dec(evdata->cb_cancel_timer);
+  SvREFCNT_dec(evdata->cb_idle);
+  SvREFCNT_dec(evdata->cb_cancel_idle);
+}
+
+static void evloop_run(void *data, TickitRunFlags flags)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+
+  dSP;
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_run, G_VOID);
+
+  FREETMPS;
+}
+
+static void evloop_stop(void *data)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+
+  dSP;
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_stop, G_VOID);
+
+  FREETMPS;
+}
+
+static bool evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+
+  SV *fh = newSVio_rdonly(fd);
+
+  dSP;
+  SAVETMPS;
+
+  EXTEND(SP, 2);
+  PUSHMARK(SP);
+
+  PUSHs(fh);
+  mPUSHs(newSVcallback_tickit_invoke(watch));
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_io_read, G_VOID);
+
+  FREETMPS;
+
+  tickit_evloop_set_watch_data(watch, fh);
+
+  return true;
+}
+
+static void evloop_cancel_io(void *data, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+
+  SV *fh = tickit_evloop_get_watch_data(watch);
+
+  /* Don't bother during global destruction, as the perl object we're about to
+   * call methods on might not be in a good state any more
+   */
+  if(PL_phase == PERL_PHASE_DESTRUCT)
+    return;
+
+  dSP;
+  SAVETMPS;
+
+  EXTEND(SP, 1);
+  PUSHMARK(SP);
+
+  PUSHs(fh);
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_cancel_io, G_VOID);
+
+  FREETMPS;
+
+  SvREFCNT_dec(fh);
+  tickit_evloop_set_watch_data(watch, NULL);
+}
+
+static bool evloop_timer(void *data, const struct timeval *at, TickitBindFlags flags, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+
+  NV at_time = at->tv_sec + ((NV)at->tv_usec / 1E6);
+
+  dSP;
+  SAVETMPS;
+
+  EXTEND(SP, 2);
+  PUSHMARK(SP);
+
+  mPUSHn(at_time);
+  mPUSHs(newSVcallback_tickit_invoke(watch));
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_timer, G_SCALAR);
+
+  SPAGAIN;
+
+  SV *timerid = SvREFCNT_inc(POPs);
+
+  FREETMPS;
+
+  tickit_evloop_set_watch_data(watch, timerid);
+
+  return true;
+}
+
+static void evloop_cancel_timer(void *data, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+
+  SV *timerid = tickit_evloop_get_watch_data(watch);
+
+  /* Don't bother during global destruction, as the perl object we're about to
+   * call methods on might not be in a good state any more
+   */
+  if(PL_phase == PERL_PHASE_DESTRUCT)
+    return;
+
+  dSP;
+  SAVETMPS;
+
+  EXTEND(SP, 1);
+  PUSHMARK(SP);
+
+  PUSHs(timerid);
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_cancel_timer, G_VOID);
+
+  FREETMPS;
+
+  SvREFCNT_dec(timerid);
+  tickit_evloop_set_watch_data(watch, NULL);
+}
+
+static bool evloop_later(void *data, TickitBindFlags flags, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+
+  dSP;
+  SAVETMPS;
+
+  EXTEND(SP, 1);
+  PUSHMARK(SP);
+
+  mPUSHs(newSVcallback_tickit_invoke(watch));
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_idle, G_VOID);
+
+  FREETMPS;
+
+  return true;
+}
+
+static void evloop_cancel_later(void *data, TickitWatch *watch)
+{
+  /* Don't bother during global destruction, as the perl object we're about to
+   * call methods on might not be in a good state any more
+   */
+  if(PL_phase == PERL_PHASE_DESTRUCT)
+    return;
+
+  fprintf(stderr, "Should cancel later here\n");
+}
+
 static int invoke_callback(Tickit *t, TickitEventFlags flags, void *info, void *user)
 {
   dSP;
@@ -673,6 +953,20 @@ static int invoke_callback(Tickit *t, TickitEventFlags flags, void *info, void *
   if(flags & TICKIT_EV_UNBIND)
     SvREFCNT_dec((SV*)code);
 }
+
+static TickitEventHooks evhooks = {
+  .init         = evloop_init,
+  .destroy      = evloop_destroy,
+  .run          = evloop_run,
+  .stop         = evloop_stop,
+  .io_read      = evloop_io_read,
+  .cancel_io    = evloop_cancel_io,
+  .timer        = evloop_timer,
+  .cancel_timer = evloop_cancel_timer,
+  .later        = evloop_later,
+  .cancel_later = evloop_cancel_later,
+
+};
 
 static void setup_constants(void)
 {
@@ -806,7 +1100,7 @@ _new(package,type,win)
     if(SvPOK(type)) {
       info->type = tickit_name2focusev(SvPV_nolen(type));
       if(info->type == -1)
-        croak("Unrecognised focus event type '%s'", type);
+        croak("Unrecognised focus event type '%s'", SvPV_nolen(type));
     }
     else
       info->type = SvTRUE(type) ? TICKIT_FOCUSEV_IN : TICKIT_FOCUSEV_OUT;
@@ -3176,6 +3470,63 @@ new(package,term)
       t = tickit_new_stdio();
     if(!t)
       XSRETURN_UNDEF;
+    RETVAL = newSV(0);
+    sv_setref_pv(RETVAL, package, t);
+  OUTPUT:
+    RETVAL
+
+SV *
+_new_with_evloop(package, term, init, destroy, run, stop, io_read, cancel_io, timer, cancel_timer, idle, cancel_idle)
+  char *package
+  SV   *term
+  CV   *init
+  CV   *destroy
+  CV   *run
+  CV   *stop
+  CV   *io_read
+  CV   *cancel_io
+  CV   *timer
+  CV   *cancel_timer
+  CV   *idle
+  CV   *cancel_idle
+  INIT:
+    TickitTerm *tt = NULL;
+    Tickit *t;
+    EventLoopData *evdata;
+  CODE:
+    /* A not-actually-documented API to wrap the event hook binding function
+     *   tickit_new_with_evloop(3)
+     * This is for use by Tickit::Async, POEx::Tickit, and maybe others
+     */
+    if(!term || !SvOK(term))
+      tt = NULL;
+    else if(SvROK(term) && sv_derived_from(term, "Tickit::Term"))
+      tt = INT2PTR(TickitTerm *, SvIV((SV*)SvRV(term)));
+    else
+      Perl_croak(aTHX_ "term is not of type Tickit::Term");
+
+    if(tt)
+      tickit_term_ref(tt);
+
+    Newx(evdata, 1, EventLoopData);
+#ifdef tTHX
+    evdata->myperl = aTHX;
+#endif
+    evdata->cb_init         = (CV *)SvREFCNT_inc((SV *)init);
+    evdata->cb_destroy      = (CV *)SvREFCNT_inc((SV *)destroy);
+    evdata->cb_run          = (CV *)SvREFCNT_inc((SV *)run);
+    evdata->cb_stop         = (CV *)SvREFCNT_inc((SV *)stop);
+    evdata->cb_io_read      = (CV *)SvREFCNT_inc((SV *)io_read);
+    evdata->cb_cancel_io    = (CV *)SvREFCNT_inc((SV *)cancel_io);
+    evdata->cb_timer        = (CV *)SvREFCNT_inc((SV *)timer);
+    evdata->cb_cancel_timer = (CV *)SvREFCNT_inc((SV *)cancel_timer);
+    evdata->cb_idle         = (CV *)SvREFCNT_inc((SV *)idle);
+    evdata->cb_cancel_idle  = (CV *)SvREFCNT_inc((SV *)cancel_idle);
+
+    t = tickit_new_with_evloop(tt, &evhooks, evdata);
+    if(!t)
+      XSRETURN_UNDEF;
+
     RETVAL = newSV(0);
     sv_setref_pv(RETVAL, package, t);
   OUTPUT:

@@ -29,7 +29,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 33156;
+plan tests => 691;
 
 use FindBin;
 use lib "$FindBin::Bin/../..";
@@ -39,7 +39,7 @@ require Graph::Maker::Permutations;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::Permutations::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Permutations->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Permutations->VERSION($want_version); 1 }, 1,
@@ -102,6 +102,68 @@ ok (factorial(4), 24);
   ok (scalar($graph->edges), 0);
 }
 
+
+#------------------------------------------------------------------------------
+# transpose_cover
+
+sub str_num_inversions {
+  my ($str) = @_;
+  return num_inversions([split /,/, $str]);
+}
+sub num_inversions {
+  my ($aref) = @_;
+  my $ret = 0;
+  foreach my $i (0 .. $#$aref-1) {
+    foreach my $j ($i+1 .. $#$aref) {
+      $ret += ($aref->[$i] > $aref->[$j]);
+    }
+  }
+  return $ret;
+}
+ok (num_inversions([1,2]), 0);
+ok (num_inversions([2,1]), 1);
+
+{
+  # directed
+  foreach my $N (0 .. 5) {
+    my $graph = Graph::Maker->new ('permutations', N=>$N,
+                                   rel_type => 'transpose_cover');
+    ok (scalar($graph->vertices), factorial($N));
+    # ok (scalar($graph->edges), 0);
+
+    my $all_transpose = Graph::Maker->new ('permutations', N=>$N,
+                                           rel_type => 'transpose');
+
+    my %inversions = (map {$_ => str_num_inversions($_)} $graph->vertices);
+    foreach my $from ($graph->vertices) {
+      my @successors = $graph->successors($from);
+      foreach my $to (@successors) {
+        ok ($inversions{$to}, $inversions{$from}+1);
+      }
+
+      my @by_all = $all_transpose->successors($from);
+      @by_all = grep {$inversions{$_} == $inversions{$from}+1} @by_all;
+      ok (join(' ',sort @successors),
+          join(' ',sort @by_all));
+    }
+
+  }
+}
+{
+  ok (scalar(Graph::Maker->new('permutations',
+                               N=>3, rel_type=>'transpose_cover')->edges),
+      8);
+}
+{
+  ok (scalar(Graph::Maker->new('permutations',
+                               N=>4, rel_type=>'transpose_cover')->edges),
+      58);
+}
+{
+  ok (scalar(Graph::Maker->new('permutations',
+                               N=>5, rel_type=>'transpose_cover')->edges),
+      444);
+};
 
 #------------------------------------------------------------------------------
 exit 0;

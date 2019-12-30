@@ -23,7 +23,7 @@
 %token <opval> NAME VAR_NAME CONSTANT EXCEPTION_VAR
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT
 %token <opval> DOT3 FATCAMMA RW RO WO BEGIN NEW
-%token <opval> RETURN WEAKEN DIE WARN CURRENT_PACKAGE UNWEAKEN '[' '{' '('
+%token <opval> RETURN WEAKEN DIE WARN PRINT CURRENT_PACKAGE UNWEAKEN '[' '{' '('
 
 %type <opval> grammar
 %type <opval> opt_packages packages package package_block refcnt
@@ -109,6 +109,14 @@ package
   | PACKAGE basic_type ':' opt_descriptors package_block
     {
       $$ = SPVM_OP_build_package(compiler, $1, $2, $5, $4);
+    }
+  | PACKAGE basic_type ';'
+    {
+      $$ = SPVM_OP_build_package(compiler, $1, $2, NULL, NULL);
+    }
+  | PACKAGE basic_type ':' opt_descriptors ';'
+    {
+      $$ = SPVM_OP_build_package(compiler, $1, $2, NULL, $4);
     }
 
 package_block
@@ -241,9 +249,6 @@ enumeration_values
       $$ = op_list;
     }
   | enumeration_values ','
-    {
-      $$ = $1;
-    }
   | enumeration_value
   
 enumeration_value
@@ -362,6 +367,7 @@ args
       
       $$ = op_list;
     }
+  | args ','
   | arg
 
 arg
@@ -495,6 +501,10 @@ statement
   | WARN expression ';'
     {
       $$ = SPVM_OP_build_warn(compiler, $1, $2);
+    }
+  | PRINT expression ';'
+    {
+      $$ = SPVM_OP_build_print(compiler, $1, $2);
     }
   | weaken_field ';'
   | unweaken_field ';'
@@ -1215,6 +1225,7 @@ sub_names
       
       $$ = op_list;
     }
+  | sub_names ','
   | sub_name
 
 %%

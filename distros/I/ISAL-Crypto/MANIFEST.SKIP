@@ -1,0 +1,81 @@
+# Avoid version control files.
+\B\.git\b
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid isa_l-crypto/ generataid files
+\BMakefile
+\bMakefile.in
+\baclocal.m4
+\bautom4te.cache
+\bbuild-aux
+\B.deps/\b
+\B.dirstamp\b
+\b.libs/\b
+\blibtool
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\.Po$
+\.Plo$
+\#$
+\b\.#
+\.bak$
+_bak$
+Crypto\.c
+Crypto\.o
+Crypto\.bs
+^ISAL\b
+
+# Avoid Devel::Cover files.
+\bcover_db\b
+
+# Avoid local testing/dist files
+^MYMETA\.
+^lib/.+\.pl$
+^dist/
+^makeall\.sh$
+^tmp/
+^ISAL-Crypto-*
+
+# Custom
+\.gitignore
+\.gitmodules
+\.gdb_history
+build.sh
+\.travis.yml
+Vagrantfile
+^provision/
+^temp/
+^bench/
+^packpack
+^build
+^rpm
+
+.swp$
+.swo$
+.swn$
+^t/.+/01_.+t$
+^t/.+/02_.+t$
+tags
+
+^core
+
+/isa_l-crypto/isa-l_crypto.h
+/isa_l-crypto/libisal_crypto.la
+/isa_l-crypto/libisal_crypto.pc
+^isa-l_crypto/config.log$
+^isa-l_crypto/config.status$
+^isa-l_crypto/configure$

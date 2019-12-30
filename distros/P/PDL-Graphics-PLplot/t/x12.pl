@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x12 for the PLplot PDL binding
 #
 # Bar chart demo
@@ -24,6 +22,8 @@
 
 # SYNC: x12c.c 1.14
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 

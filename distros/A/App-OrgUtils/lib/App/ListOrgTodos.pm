@@ -1,7 +1,7 @@
 package App::ListOrgTodos;
 
-our $DATE = '2018-06-30'; # DATE
-our $VERSION = '0.470'; # VERSION
+our $DATE = '2019-12-30'; # DATE
+our $VERSION = '0.471'; # VERSION
 
 use 5.010;
 use strict;
@@ -55,7 +55,7 @@ App::ListOrgTodos - List all todo items in all Org files
 
 =head1 VERSION
 
-This document describes version 0.470 of App::ListOrgTodos (from Perl distribution App-OrgUtils), released on 2018-06-30.
+This document describes version 0.471 of App::ListOrgTodos (from Perl distribution App-OrgUtils), released on 2020-12-30.
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ This document describes version 0.470 of App::ListOrgTodos (from Perl distributi
 
 Usage:
 
- list_org_todos(%args) -> [status, msg, result, meta]
+ list_org_todos(%args) -> [status, msg, payload, meta]
 
 List all todo items in all Org files.
 
@@ -203,7 +203,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -231,7 +231,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

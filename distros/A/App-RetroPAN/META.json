@@ -27,7 +27,7 @@
             "Getopt::Long" : "0",
             "HTTP::Request" : "0",
             "LWP::UserAgent" : "0",
-            "List::Util" : "0",
+            "List::MoreUtils" : "0",
             "Module::CoreList" : "2.99",
             "OrePAN2" : "0",
             "Pod::Usage" : "0",
@@ -49,7 +49,7 @@
          "web" : "https://repo.or.cz/perl-App-RetroPAN.git"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

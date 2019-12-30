@@ -1085,6 +1085,7 @@ sub AssembleContent {
 
       my $ContentFile = $X->{'ContentDir'}.'/'.$Item->{'href'};
       $ContentFile = uri_unescape($ContentFile);
+      $ContentFile = Encode::decode_utf8($ContentFile);
 
       $X->Msg("Fix strange text\n");
       $X->_bs('Strange', 'Зачистка странностей');
@@ -1455,6 +1456,13 @@ sub TransformH2Title {
   return $NewNode;
 }
 
+sub TdBrFix {
+  my $Attr=shift;
+  my $Str = shift;
+  $Str =~ s/<br\/>/<p><\/p>/g;
+  return "<td".$Attr.">".$Str."</td>";
+}
+
 sub FB3Creator {
 	my $self = shift;
 	my $X = shift;
@@ -1568,7 +1576,13 @@ sub FB3Creator {
   $BodyString =~ s/<p_br>\s*<\/p>//g;
   $BodyString =~ s/p_br>/p>/g;
   $BodyString =~ s/<br\/>/ /g;
+  $BodyString =~ s/(<\/title>)\s+(<\/section>)/$1<br\/>$2/g; #пробелы на концах section после разделения на секции
   $BodyString =~ s/<p>\s+<\/p>/<br\/>/g; #мы уже все причесали, но пробельные <p> </p> пусть будут <br/> в корне
+  $BodyString =~ s/(<td[^>]*?>)\s*<br\/>/$1/g; #вложенные таблицы, съедаясь изнутри, порождают нам порой ненужные пробелы
+  $BodyString =~ s/<title>\s+<\/title>/<title><p\/><\/title>/g; #иногда редакторы расставляют <br/> в <h>, получаем черти что на выходе
+  $BodyString =~ s/(<section[^>]*?>)\s*(<br\/>)?\s*<\/section>/$1<br\/><\/section>/g; #Пробелы и переносы иногда залетают в отдельную секцию
+  $BodyString =~ s/<td([^>]*)>((.|\n)*?)<\/td>/TdBrFix($1,$2)/ge;
+  $BodyString =~ s/<ol\/>//g;
 
   print FHbody $BodyString;
   close FHbody;

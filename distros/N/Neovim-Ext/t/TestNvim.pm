@@ -57,7 +57,12 @@ sub new
 sub is_available
 {
 	my $bits = $Config{ptrsize} == 8 ? 64 : 32;
-	my $config = $available{$^O.'-'.$bits};
+	my $key = $^O.'-'.$bits;
+	my $config = $available{$key};
+	if (!$config)
+	{
+		warn "no nvim package available for '$key'\n";
+	}
 
 	return !!$config->{url};
 }

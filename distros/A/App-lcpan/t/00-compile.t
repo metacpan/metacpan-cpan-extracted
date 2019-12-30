@@ -2,14 +2,15 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 79 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 87 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/lcpan.pm',
+    'App/lcpan/Cmd/author.pm',
     'App/lcpan/Cmd/author_deps.pm',
     'App/lcpan/Cmd/author_deps_by_dependent_count.pm',
     'App/lcpan/Cmd/author_dists.pm',
@@ -33,11 +34,13 @@ my @module_files = (
     'App/lcpan/Cmd/delete_rel.pm',
     'App/lcpan/Cmd/deps.pm',
     'App/lcpan/Cmd/deps_by_dependent_count.pm',
+    'App/lcpan/Cmd/dist.pm',
     'App/lcpan/Cmd/dist2author.pm',
     'App/lcpan/Cmd/dist2rel.pm',
     'App/lcpan/Cmd/dist_contents.pm',
     'App/lcpan/Cmd/dist_meta.pm',
     'App/lcpan/Cmd/dist_mods.pm',
+    'App/lcpan/Cmd/dist_rdeps.pm',
     'App/lcpan/Cmd/dist_scripts.pm',
     'App/lcpan/Cmd/dists.pm',
     'App/lcpan/Cmd/dists_by_dep_count.pm',
@@ -53,6 +56,7 @@ my @module_files = (
     'App/lcpan/Cmd/mentions_for_all_mods.pm',
     'App/lcpan/Cmd/mentions_for_mod.pm',
     'App/lcpan/Cmd/mentions_for_script.pm',
+    'App/lcpan/Cmd/mod.pm',
     'App/lcpan/Cmd/mod2author.pm',
     'App/lcpan/Cmd/mod2dist.pm',
     'App/lcpan/Cmd/mod2rel.pm',
@@ -61,13 +65,17 @@ my @module_files = (
     'App/lcpan/Cmd/mods_by_mention_count.pm',
     'App/lcpan/Cmd/mods_by_rdep_count.pm',
     'App/lcpan/Cmd/mods_from_same_dist.pm',
+    'App/lcpan/Cmd/module.pm',
     'App/lcpan/Cmd/modules.pm',
     'App/lcpan/Cmd/namespaces.pm',
     'App/lcpan/Cmd/rdeps.pm',
+    'App/lcpan/Cmd/rel.pm',
     'App/lcpan/Cmd/related_mods.pm',
+    'App/lcpan/Cmd/release.pm',
     'App/lcpan/Cmd/releases.pm',
     'App/lcpan/Cmd/rels.pm',
     'App/lcpan/Cmd/reset.pm',
+    'App/lcpan/Cmd/script.pm',
     'App/lcpan/Cmd/script2author.pm',
     'App/lcpan/Cmd/script2dist.pm',
     'App/lcpan/Cmd/script2mod.pm',
@@ -95,7 +103,9 @@ my @scripts = (
 
 # no fake home requested
 
-my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
+my @switches = (
+    -d 'blib' ? '-Mblib' : '-Ilib',
+);
 
 use File::Spec;
 use IPC::Open3;
@@ -109,14 +119,18 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-e', "require q[$lib]"))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {
@@ -131,18 +145,25 @@ foreach my $file (@scripts)
     my $line = <$fh>;
 
     close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
-    my @flags = $1 ? split(' ', $1) : ();
+    @switches = (@switches, split(' ', $1)) if $1;
+
+    close $fh and skip("$file uses -T; not testable with PERL5LIB", 1)
+        if grep { $_ eq '-T' } @switches and $ENV{PERL5LIB};
 
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, @flags, '-c', $file);
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-c', $file))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-c', $file);
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$file compiled ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     # in older perls, -c output is simply the file portion of the path being tested
     if (@_warnings = grep { !/\bsyntax OK$/ }

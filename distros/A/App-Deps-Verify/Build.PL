@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-Deps-Verify",
-  "dist_version" => "0.8.3",
+  "dist_version" => "0.10.0",
   "license" => "mit",
   "module_name" => "App::Deps::Verify",
   "recursive_test_files" => 1,

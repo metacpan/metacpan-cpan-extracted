@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,6 +29,64 @@ $|=1;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
+
+{
+  # Petersen HOG
+  
+  # N=3 K=1 https://hog.grinvin.org/ViewGraphInfo.action?id=746
+  #         triangles cross connected
+  #         circular ladder 3 rungs
+  # N=4 K=1 https://hog.grinvin.org/ViewGraphInfo.action?id=1022
+  #         squares cross connected = cube
+  # N=4 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=588
+  #         squares with cross connected pairs
+  # N=5 K=1 hog not
+  # N=5 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=660
+  #         Petersen
+  # N=6 K=1 https://hog.grinvin.org/ViewGraphInfo.action?id=32798
+  # N=6 K=2 hog not
+  # N=6 K=3 hog not
+  # N=7 K=1 hog not
+  # N=7 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=28482
+  # N=7 K=3 hog not
+  # N=8 K=1 hog not
+  # N=8 K=2 hog not
+  # N=8 K=3 https://hog.grinvin.org/ViewGraphInfo.action?id=1229
+  #         Moebius Kantor Graph
+  # N=8 K=4 hog not
+  # N=9 K=1 hog not
+  # N=9 K=2 hog not
+  # N=9 K=3 https://hog.grinvin.org/ViewGraphInfo.action?id=6700
+  # N=10 K=1
+  # N=10 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=1043
+  #          Dodecahedral Graph
+  # N=10 K=3 https://hog.grinvin.org/ViewGraphInfo.action?id=1036
+  #          Desargues Graph
+  # N=10 K=4
+  # N=10 K=5
+  # N=11 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=24052
+  # N=12 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=27325
+  # N=12 K=5 https://hog.grinvin.org/ViewGraphInfo.action?id=1234
+  #          Nauru
+  #    http://11011110.livejournal.com/124705.html (gone)
+  #    http://web.archive.org/web/1id_/http://11011110.livejournal.com/124705.html
+
+  my @graphs;
+  my %seen;
+  foreach my $N (6) {
+    foreach my $K (1 .. $N-1) {
+      my $graph = Graph::Maker->new('Petersen', undirected => 1,
+                                    N => $N, K => $K);
+      my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
+      $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
+      next if $seen{$g6_str}++;
+
+      push @graphs, $graph;
+    }
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
 {
   # Petersen triangle replaced
   # = cubic vertex-transitive graph "Ct66"
@@ -68,63 +126,6 @@ $|=1;
     }
     $new_graph;
   }
-}
-{
-  # Petersen HOG
-  
-  # N=3 K=1 https://hog.grinvin.org/ViewGraphInfo.action?id=746
-  #         triangles cross connected
-  #         circular ladder 3 rungs
-  # N=4 K=1 https://hog.grinvin.org/ViewGraphInfo.action?id=1022
-  #         squares cross connected = cube
-  # N=4 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=588
-  #         squares with cross connected pairs
-  # N=5 K=1 hog not
-  # N=5 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=660
-  #         Petersen
-  # N=6 K=1 hog not
-  # N=6 K=2 hog not
-  # N=6 K=3 hog not
-  # N=7 K=1 hog not
-  # N=7 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=28482
-  # N=7 K=3 hog not
-  # N=8 K=1 hog not
-  # N=8 K=2 hog not
-  # N=8 K=3 https://hog.grinvin.org/ViewGraphInfo.action?id=1229
-  #         Moebius Kantor Graph
-  # N=8 K=4 hog not
-  # N=9 K=1 hog not
-  # N=9 K=2 hog not
-  # N=9 K=3 https://hog.grinvin.org/ViewGraphInfo.action?id=6700
-  # N=10 K=1
-  # N=10 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=1043
-  #          Dodecahedral Graph
-  # N=10 K=3 https://hog.grinvin.org/ViewGraphInfo.action?id=1036
-  #          Desargues Graph
-  # N=10 K=4
-  # N=10 K=5
-  # N=11 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=24052
-  # N=12 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=27325
-  # N=12 K=5 https://hog.grinvin.org/ViewGraphInfo.action?id=1234
-  #          Nauru
-  #    http://11011110.livejournal.com/124705.html (gone)
-  #    http://web.archive.org/web/1id_/http://11011110.livejournal.com/124705.html
-
-  my @graphs;
-  my %seen;
-  foreach my $N (8 .. 9) {
-    foreach my $K (1 .. $N-1) {
-      my $graph = Graph::Maker->new('Petersen', undirected => 1,
-                                    N => $N, K => $K);
-      my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
-      $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
-      next if $seen{$g6_str}++;
-
-      push @graphs, $graph;
-    }
-  }
-  MyGraphs::hog_searches_html(@graphs);
-  exit 0;
 }
 
 

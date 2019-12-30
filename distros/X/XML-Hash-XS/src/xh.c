@@ -52,6 +52,24 @@ xh_init_opts(xh_opts_t *opts)
     /* output, NULL - to string */
     XH_PARAM_READ_REF    (opts->output,        "XML::Hash::XS::output",        XH_DEF_OUTPUT);
 
+    /* suppress empty */
+    if ( (sv = get_sv("XML::Hash::XS::suppress_empty", 0)) != NULL ) {
+        if ( SvOK(sv) ) {
+            if (SvTYPE(sv) == SVt_IV) {
+                opts->suppress_empty = SvIV(sv);
+            }
+            else {
+                opts->suppress_empty = XH_SUPPRESS_EMPTY_TO_STRING;
+            }
+        }
+        else {
+            opts->suppress_empty = XH_SUPPRESS_EMPTY_TO_UNDEF;
+        }
+    }
+    else {
+        opts->suppress_empty = XH_DEF_SUPPRESS_EMPTY;
+    }
+
     return TRUE;
 }
 
@@ -269,6 +287,21 @@ xh_parse_param(xh_opts_t *opts, xh_int_t first, I32 ax, I32 items)
             case 13:
                 if (xh_str_equal13(p, 'f', 'o', 'r', 'c', 'e', '_', 'c', 'o', 'n', 't', 'e', 'n', 't')) {
                     opts->force_content = xh_param_assign_bool(v);
+                    break;
+                }
+            case 14:
+                if (xh_str_equal14(p, 's', 'u', 'p', 'p', 'r', 'e', 's', 's', '_', 'e', 'm', 'p', 't', 'y')) {
+                    if (SvOK(v)) {
+                        if (SvTYPE(v) == SVt_IV) {
+                            opts->suppress_empty = SvIV(v);
+                        }
+                        else {
+                            opts->suppress_empty = XH_SUPPRESS_EMPTY_TO_STRING;
+                        }
+                    }
+                    else {
+                        opts->suppress_empty = XH_SUPPRESS_EMPTY_TO_UNDEF;
+                    }
                     break;
                 }
             default:

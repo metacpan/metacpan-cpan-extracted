@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # shortcuts
 #  os and distros
@@ -227,6 +227,15 @@ sub mapping {
        [package => 'rar'], # available in jessie/non-free
       ]],
 
+     [cpanmod => 'Archive::Raw',
+      [os_freebsd,
+       [package => []]], # FreeBSD has archive.h in the base system, and works for freebsd 11 .. 13
+      [like_debian,
+       [package => 'libarchive-dev']], # but seems to work only with bullseye, not with wheezy .. buster
+      [like_fedora,
+       [package => 'libarchive-devel']], # but seems to work only with fedora28, not with CentOS6+7+8
+     ],
+      
      [cpanmod => 'Archive::SevenZip',
       [os_freebsd,
        [package => 'p7zip']],
@@ -821,8 +830,7 @@ sub mapping {
        [linuxdistro => 'centos',
 	linuxdistroversion => qr{^6\.},
 	package => 'db4-devel'],
-       [linuxdistro => 'centos',
-	linuxdistroversion => qr{^7\.},
+       [linuxdistro => 'centos', # CentOS 7 and 8
 	package => 'libdb-devel'],
        [linuxdistro => 'fedora',
 	linuxdistroversion => '28',
@@ -1106,7 +1114,7 @@ sub mapping {
       [os_openbsd,
        [package => [ 'firefox' ]]],
       [like_debian,
-       [linuxdistrocodename => [qw(trusty xenial bionic)],
+       [linuxdistrocodename => [qw(trusty xenial bionic eoan)],
 	[package => [qw(firefox xvfb xauth)]]], # there's no firefox-esr for Ubuntu
        [package => [ 'firefox-esr', 'xvfb', 'xauth' ]]],
       [like_fedora,
@@ -1253,6 +1261,8 @@ sub mapping {
      [cpanmod => 'Glib',
       [like_fedora,
        [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
+	[package => []]],
+       [linuxdistro => 'centos', linuxdistroversion => {'>=', 8},
 	[package => []]],
        [package => 'gobject-introspection-devel']],
       [os_darwin,
@@ -1949,7 +1959,9 @@ sub mapping {
       [os_freebsd,
        [package => 'v8']],
       [like_debian,
-       [package => 'libv8-dev']], # but not anymore in buster, see https://tracker.debian.org/news/876959/libv8-314-removed-from-testing/
+       [before_debian_buster,
+	[package => 'libv8-dev']], # but not anymore in buster, see https://tracker.debian.org/news/876959/libv8-314-removed-from-testing/
+       [package => 'libnode-dev']], # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=934734 (but perl module does not pick v8.h from the installed location)
       [like_fedora,
        [package => 'v8-devel']], # but problems with Devel-CheckLib and compilation errors
       [os_darwin,
@@ -2565,7 +2577,10 @@ sub mapping {
      [cpanmod => 'NewRelic::Agent',
       # freebsd does not work, bundled .so files are linux-only
       [like_debian,
-       [package => ['g++', 'libcurl3']]]],
+       [before_debian_buster,
+	[package => ['g++', 'libcurl3']]],
+       [package => ['g++', 'libcurl4']]],
+     ],
 
      [cpanmod => 'Ogg::LibOgg',
       [os_freebsd,

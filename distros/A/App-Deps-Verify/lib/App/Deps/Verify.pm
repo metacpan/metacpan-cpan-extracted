@@ -1,5 +1,5 @@
 package App::Deps::Verify;
-$App::Deps::Verify::VERSION = '0.8.3';
+$App::Deps::Verify::VERSION = '0.10.0';
 # ABSTRACT: An app and API to verify the presence of dependencies (Perl 5 modules, python3 modules, executables, etc.
 
 use strict;
@@ -254,9 +254,10 @@ sub write_rpm_spec_text_from_yaml_file_to_fh
 }
 
 my %EXES_TRANSLATIONS = (
-    convert => 'imagemagick',
-    gm      => 'graphicsmagick',
-    node    => 'nodejs',
+    cookiecutter => 'python3-cookiecutter',
+    convert      => 'imagemagick',
+    gm           => 'graphicsmagick',
+    node         => 'nodejs',
 );
 
 sub write_rpm_spec_text_to_fh
@@ -350,13 +351,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-App::Deps::Verify - An app and API to verify the presence of dependencies (Perl 5 modules, python3 modules, executables, etc.
-
 =head1 VERSION
 
-version 0.8.3
+version 0.10.0
 
 =head1 SYNOPSIS
 
@@ -411,7 +408,7 @@ Added in version 0.2.0.
 
 Added in version 0.2.0.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -445,14 +442,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Deps-Verify>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Deps-Verify>
 
 =item *
 

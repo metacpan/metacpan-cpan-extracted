@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
 use utf8;
-use 5.010;
+use 5.016;
 use strict;
 use autodie;
 use warnings;
+
+use feature 'fc';
 
 use lib qw(.);
 use open IO => ':encoding(UTF-8)';
@@ -100,6 +102,32 @@ sub parse_pod_file {
     return \%data;
 }
 
+sub transform_method_names {
+    map { [$_->[0], ($_->[1] =~ /[a-z]/) ? ('B_' . $_->[1]) : ('A_' . $_->[1])] } @_;
+}
+
+sub sort_methods_by_length {
+#<<<
+      map  { $_->[0] }
+      sort {
+             (length($a->[1] =~ tr/_//dr) <=> length($b->[1] =~ tr/_//dr))
+          || (fc($a->[1]) cmp fc($b->[1]))
+          || ($b->[1] cmp $a->[1])
+      } transform_method_names(@_);
+#>>>
+}
+
+sub sort_methods_by_name {
+#<<<
+      map  { $_->[0] }
+      sort {
+             (fc($a->[1] =~ tr/_//dr) cmp fc($b->[1] =~ tr/_//dr))
+          || (fc($a->[1]) cmp fc($b->[1]))
+          || ($a->[1] cmp $b->[1])
+      } transform_method_names(@_);
+#>>>
+}
+
 sub process_file {
     my ($file) = @_;
 
@@ -146,8 +174,7 @@ sub process_file {
 
     while (my ($key, $value) = each %subs) {
 
-        my @sorted =
-          sort { length($a =~ tr/_//dr) <=> length($b =~ tr/_//dr) or lc($a) cmp lc($b) or $b cmp $a } @{$value->{aliases}};
+        my @sorted = sort_methods_by_length(map { [$_, $_] } @{$value->{aliases}});
 
         $value->{name} = shift @sorted;
         @{$value->{aliases}} = @sorted;
@@ -181,7 +208,7 @@ __POD2__
                     my $sub = $_;
                     $sub =~ s{([<>])}{E<$esc{$1}>}g;
                     "I<$sub>";
-                  } @{$value->{aliases}}
+                } @{$value->{aliases}}
               )
               . "\n";
         }
@@ -272,13 +299,7 @@ HEADER
     print {$fh} $header;
 
     # Print the methods
-    foreach my $method (
-        sort {
-                 (lc($a->{name} =~ tr/_//dr) cmp lc($b->{name} =~ tr/_//dr))
-              || (lc($a->{name}) cmp lc($b->{name}))
-              || ($a->{name} cmp $b->{name})
-        } values %subs
-      ) {
+    foreach my $method (sort_methods_by_name(map { [$_, $_->{name}] } values %subs)) {
         print {$fh} $method->{doc};
     }
 }

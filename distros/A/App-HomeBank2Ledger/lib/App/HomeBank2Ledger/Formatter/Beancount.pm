@@ -11,7 +11,7 @@ use Scalar::Util qw(looks_like_number);
 
 use parent 'App::HomeBank2Ledger::Formatter';
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 my %STATUS_SYMBOLS = (
     cleared => '*',
@@ -223,9 +223,13 @@ sub _format_amount {
 
     my $format = "\% .$commodity->{frac}f";
     my ($whole, $fraction) = split(/\./, sprintf($format, $amount));
+    $fraction ||= 0;
 
     # beancount doesn't support different notations
-    my $num = join('.', commify($whole), $fraction);
+    my $num = commify($whole);
+    if ($commodity->{frac}) {
+        $num .= ".$fraction";
+    }
 
     $num = "$num $commodity->{iso}";
 
@@ -297,7 +301,7 @@ App::HomeBank2Ledger::Formatter::Beancount - Beancount formatter
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

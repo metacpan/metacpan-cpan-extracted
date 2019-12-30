@@ -35,7 +35,7 @@ use Smart::Comments;
 {
   my @graphs;
   foreach my $N (
-                  3
+                  4,5
                 ) {
     print "N=$N\n";
     my $graph = Graph::Maker->new
@@ -51,10 +51,11 @@ use Smart::Comments;
        rel_type => 'transpose_cyclic',
        rel_type => 'transpose',
        rel_type => 'transpose_cover',
+       # vertex_name_inverse => 1,
        # vertex_name_type => 'perm',
        # vertex_name_type => 'cycles',
-       vertex_name_inverse => 0,
-       comma => '',
+       vertex_name_type => 'inversions',
+       # comma => '',
       );
     push @graphs, $graph;
     print "directed ",$graph->is_directed,"\n";

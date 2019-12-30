@@ -22,8 +22,8 @@ $SIG{TERM} = $SIG{INT} = $SIG{HUP} = sub { die "Terminated by signal " . shift }
 
 my $cascade = CHI::Cascade->new(
     chi => CHI->new(
-	driver		=> 'FastMmap',
-	root_dir	=> 't/fast_mmap'
+        driver          => 'FastMmap',
+        root_dir        => 't/fast_mmap'
     )
 );
 

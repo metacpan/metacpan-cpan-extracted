@@ -1,0 +1,60 @@
+NAME
+    App::lcpan::CmdBundle::cpanauthors - lcpan subcommands related to
+    Acme::CPANAuthors
+
+VERSION
+    This document describes version 0.001 of
+    App::lcpan::CmdBundle::cpanauthors (from Perl distribution
+    App-lcpan-CmdBundle-cpanauthors), released on 2019-12-26.
+
+SYNOPSIS
+    Install this distribution. Afterwards, the lcpan subcommands below will
+    be available:
+
+     # List Acme::CPANModules modules available on CPAN
+     % lcpan cpanauthors-mods
+
+DESCRIPTION
+    This bundle provides the following lcpan subcommands:
+
+    *   lcpan cpanauthors-mods
+
+    This distribution packages several lcpan subcommands related to
+    Acme::CPANAuthors. More subcommands will be added in future releases.
+
+    Some ideas:
+
+    cpanauthors-stats. Number of modules/authors. We might also want to know
+    the average number of authors per module, total number of included
+    authors, the most include authors, and so on.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-lcpan-CmdBundle-cpanauthors>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-lcpan-CmdBundle-cpanauthors>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-c
+    panauthors>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    lcpan
+
+    Acme::CPANAuthors
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

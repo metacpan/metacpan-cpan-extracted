@@ -24,7 +24,7 @@ use Text::ParseWords;
 use App::Acmeman::Log qw(:all :sysexits);
 use feature 'state';
 
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 
 my $progdescr = "manages ACME certificates";
 
@@ -307,20 +307,31 @@ sub renew {
     }
     $self->coalesce;
 
-    my $renewed = 0;
+    my @renewed;
     foreach my $vhost ($self->selected_domains) {
 	if ($self->force_option || $self->domain_cert_expires($vhost)) {
 	    if ($self->register_domain_certificate($vhost)) {
 		if (my $cmd = $vhost->postrenew) {
-		    $self->runcmd($cmd);
+		    local $ENV{ACMEMAN_CERTIFICATE_FILE} =
+			$vhost->certificate_file;
+		    local $ENV{ACMEMAN_DOMAIN_NAME} = $vhost;
+		    local $ENV{ACMEMAN_ALT_NAMES} = join(' ', $vhost->alt);
+		    $self->runcmd($cmd, $vhost);
 		} else {
-		    $renewed++;
+		    push @renewed, $vhost;
 		}
 	    }
 	}
     }
 
-    if ($renewed) {
+    if (@renewed) {
+	local $ENV{ACMEMAN_CERTIFICATE_COUNT} = @renewed;
+	local $ENV{ACMEMAN_CERTIFICATE_FILE} =
+	    join(' ', map { $_->certificate_file } @renewed);
+	local $ENV{ACMEMAN_DOMAIN_NAME} =
+	    join(' ', map { "$_" } @renewed);
+	local $ENV{ACMEMAN_ALT_NAMES} =
+	    join(' ', map { ($_->alt) } @renewed);
 	if ($self->cf->is_set(qw(core postrenew))) {
 	    foreach my $cmd ($self->cf->get(qw(core postrenew))) {
 		$self->runcmd($cmd);
@@ -396,6 +407,19 @@ sub debug_to_loglevel {
     return $lev[$v > $#lev ? $#lev : $v];
 }
 
+my @challenge_files;
+
+END {
+    if (@challenge_files) {
+	debug(3, "removing challenge files");
+	my $n = unlink @challenge_files;
+	unless ($n == @challenge_files) {
+	    error("some challenge files were not removed",
+		  prefix => 'warning');
+	}
+    }
+}
+
 sub save_challenge {
     my ($self,$challenge) = @_;
     my $file = File::Spec->catfile($self->cf->get(qw(core rootdir)), $challenge->get_path);
@@ -403,6 +427,7 @@ sub save_challenge {
 	print $fh $self->acme->make_key_authorization($challenge);
 	close $fh;
 	debug(3, "wrote challenge file $file");
+	push @challenge_files, $file;
     } else {
 	error("can't open $file for writing: $!");
 	die;
@@ -614,8 +639,8 @@ sub save_crt {
 }
 
 sub runcmd {
-    my ($self,$cmd) = @_;
-    debug(3, "running $cmd");
+    my ($self,$cmd,$domain) = @_;
+    debug(3, "running $cmd".($domain ? " for $domain" : ""));
     unless ($self->dry_run_option) {
 	system($cmd);
 	if ($? == -1) {

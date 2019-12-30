@@ -1,5 +1,10 @@
 Revision history for Pod::Weaver::Section::Support
 
+1.012 2019-12-28
+    - Exclude files using MANIFEST.SKIP.
+        - https://github.com/shlomif/perl-pod-weaver-section-support/issues/3
+        - Thanks to @did38fr .
+
 1.011 2019-12-20
  - Remove AnnoCPAN:
   - See https://github.com/shlomif/perl-pod-weaver-section-support/issues/2

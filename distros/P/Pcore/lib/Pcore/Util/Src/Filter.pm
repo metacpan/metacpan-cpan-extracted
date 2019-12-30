@@ -216,6 +216,8 @@ sub filter_prettier ( $self, %options ) {
 
     my $res = $node->read_line;
 
+    P->text->decode_utf8( $res->$* );
+
     $res = P->data->from_json($res);
 
     # unable to run elsint
@@ -247,6 +249,8 @@ sub filter_terser ( $self, %options ) {
     $node->write( P->data->to_json($msg) . "\n" );
 
     my $res = $node->read_line;
+
+    P->text->decode_utf8( $res->$* );
 
     $res = P->data->from_json($res);
 

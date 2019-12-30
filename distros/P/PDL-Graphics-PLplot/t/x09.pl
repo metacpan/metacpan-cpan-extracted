@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x09 for the PLplot PDL binding
 #
 # Contour plot demo
@@ -24,6 +22,8 @@
 
 # SYNC: x09c.c 1.27
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Math::Trig qw [pi];
@@ -99,7 +99,7 @@ sub polar {
 # Returns min & max of input 2d array
 
 sub f2mnmx {
-  $f = shift;
+  my $f = shift;
   my $fmin = min ($f);
   my $fmax = max ($f);
   return ($fmin, $fmax)
@@ -155,10 +155,10 @@ sub potential {
   my $q2i = - $q2 * $rmax / $d2;
   my $d2i = ($rmax ** 2) / $d2;
 
-  $div1 = sqrt (($xg - $d1) ** 2 + ($yg - $d1) ** 2 + $eps ** 2);
-  $div1i = sqrt (($xg - $d1i) ** 2 + ($yg - $d1i) ** 2 + $eps ** 2);
-  $div2 = sqrt (($xg - $d2) ** 2 + ($yg + $d2) ** 2 + $eps** 2);
-  $div2i = sqrt (($xg - $d2i) ** 2 + ($yg + $d2i) ** 2 + $eps ** 2);
+  my $div1 = sqrt (($xg - $d1) ** 2 + ($yg - $d1) ** 2 + $eps ** 2);
+  my $div1i = sqrt (($xg - $d1i) ** 2 + ($yg - $d1i) ** 2 + $eps ** 2);
+  my $div2 = sqrt (($xg - $d2) ** 2 + ($yg + $d2) ** 2 + $eps** 2);
+  my $div2i = sqrt (($xg - $d2i) ** 2 + ($yg + $d2i) ** 2 + $eps ** 2);
   my $z = $q1 / $div1 + $q1i / $div1i + $q2 / $div2 + $q2i / $div2i;
 
   my ($zmin, $zmax) = f2mnmx ($z);
@@ -242,17 +242,17 @@ plinit ();
 
 # Set up function arrays
 
-$xx = ((sequence (XPTS) - int(XPTS / 2)) / int(XPTS / 2))->dummy (1, YPTS);
-$yy = ((sequence (YPTS) - int(YPTS / 2)) / int(YPTS / 2) - 1.0)->dummy (0, XPTS);
+my $xx = ((sequence (XPTS) - int(XPTS / 2)) / int(XPTS / 2))->dummy (1, YPTS);
+my $yy = ((sequence (YPTS) - int(YPTS / 2)) / int(YPTS / 2) - 1.0)->dummy (0, XPTS);
 my $z = $xx * $xx - $yy * $yy;
 my $w = 2 * $xx * $yy;
 
 # Set up grids
 
-$distort = 0.4;
+my $distort = 0.4;
 
-my $xx = zeroes (XPTS);
-my $yy = zeroes (YPTS);
+$xx = zeroes (XPTS);
+$yy = zeroes (YPTS);
 
 for (my $i = 0; $i < XPTS; $i++) {
   for (my $j = 0; $j < YPTS; $j++) {

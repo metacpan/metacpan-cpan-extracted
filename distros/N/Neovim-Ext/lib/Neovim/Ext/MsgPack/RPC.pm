@@ -1,5 +1,5 @@
 package Neovim::Ext::MsgPack::RPC;
-$Neovim::Ext::MsgPack::RPC::VERSION = '0.01';
+$Neovim::Ext::MsgPack::RPC::VERSION = '0.02';
 use strict;
 use warnings;
 use Neovim::Ext::MsgPack::RPC::EventLoop;
@@ -62,7 +62,7 @@ Neovim::Ext::MsgPack::RPC - Neovim MessagePack RPC class
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

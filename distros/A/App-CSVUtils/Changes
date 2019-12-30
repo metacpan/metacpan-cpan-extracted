@@ -1,3 +1,8 @@
+0.028   2019-12-27  Released-By: PERLANCAR; Urgency: medium
+
+	- [csv-sort-rows] Add options --key (-k), --by-sortsub.
+
+
 0.027   2019-12-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Tweak tab completion.

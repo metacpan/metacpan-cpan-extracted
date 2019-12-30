@@ -105,22 +105,22 @@ METHODS
             arrayref
                 An each item of list can be scalar value (exactly matched
                 target) or code reference. If item is coderef it will be
-                executed as $coderef->( $rule, $rule->qr_params ) and should
-                return a scalar value as current dependence for this target
-                at runtime (the API for coderef parameters was changed since
-                v0.16)
+                executed once as $coderef->( $rule, $rule->qr_params ) and
+                should return a scalar value as current dependence for this
+                target at runtime (the API for coderef parameters was
+                changed since v0.16)
 
             coderef
-                This subroutine will be executed every time inside *run*
-                method if necessary and with parameters as: $coderef->(
-                $rule, $rule->qr_params ) (API was changed since v0.16). It
-                should return scalar or arrayref. The returned value is
-                *scalar* it will be considered as single dependence of this
-                target and the behavior will be exactly as described for
-                *scalar* in this paragraph. If the returned value is
-                *arrayref* it will be considered as list of dependencies for
-                this target and the behavior will be exactly as described
-                for *arrayref* in this paragraph.
+                This subroutine will be executed once inside *run* method if
+                necessary with parameters as: $coderef->( $rule,
+                <$rule-qr_params|CHI::Cascade::Rule/qr_params >> ) (API was
+                changed since v0.16). It should return scalar or arrayref.
+                The returned value is *scalar* it will be considered as
+                single dependence of this target and the behavior will be
+                exactly as described for *scalar* in this paragraph. If the
+                returned value is *arrayref* it will be considered as list
+                of dependencies for this target and the behavior will be
+                exactly as described for *arrayref* in this paragraph.
 
         depends_catch
             Optional. This is coderef for dependence exceptions. If any
@@ -262,6 +262,13 @@ METHODS
         target If any dependence of this target of any dependencies of
         dependencies were (re)computed this target will be (re)computed too.
 
+        The run method of instance of cascade can be called from other run
+        method of same instance and from "callref" function inside "depends"
+        rule's option. This was made possible by creating a separate data
+        instance for each root call of run method. This can come in handy
+        when you compute dependencies on the go, which are computed by the
+        same object (instance) of "cascade".
+
         $target
             Required. Plain text string of target.
 
@@ -348,16 +355,20 @@ METHODS
         recomputed. In a during recomputing of course cascade will return an
         old value if one exists in cache.
 
-    stash ()
-        It returns *hashref* to a stash. A stash is hash for temporary data
-        between rule's codes. It can be used only from inside "run".
-        Example:
+    stash()
+        Deprecated! It returns *hashref* to a stash. A stash is hash for
+        temporary data between rule's codes. It can be used only from inside
+        "run". Example:
 
             $cascade->run( 'target', stash => { key1 => value1 } )
 
         and into rule's code:
 
+            # DEPRECATED - OLD METHOD! It's supported and works but please don't use it
             $rule->cascade->stash->{key1}
+
+            # NEW METHOD:
+            $rule->stash->{key1}
 
         If a "run" method didn't get stash hashref the default stash will be
         as empty hash. You can pass a data between rule's codes but it's

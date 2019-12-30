@@ -11,15 +11,13 @@ Makefile.PL
 README
 bin/docmake
 dist.ini
-inc/Test/Run/Builder.pm
+lib/App/Docmake.pm
 lib/App/XML/DocBook/Builder.pm
 lib/App/XML/DocBook/Docmake.pm
 script/bump-version-number.pl
 script/tag-release.pl
 t/00-compile.t
-t/00-load.t
 t/01-use.t
-t/boilerplate.t
 weaver.ini
 xt/author/eol.t
 xt/author/no-tabs.t

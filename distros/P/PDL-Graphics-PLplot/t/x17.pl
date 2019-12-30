@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x17 for the PLplot PDL binding
 #
 # Plots a simple stripchart with four pens
@@ -24,6 +22,8 @@
 
 # SYNC: x17c.c 1.16
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Math::Trig qw [pi];
@@ -123,7 +123,7 @@ my $dt = 0.1;
 for (my $n = 0; $n < $nsteps; $n++) {
   usleep (10000);    # wait a little (10 ms) to simulate time elapsing
   my $t = $n * $dt;
-  $noise = plrandd () - 0.5;
+  my $noise = plrandd () - 0.5;
   $y1 = $y1 + $noise;
   $y2 = sin ($t * pi / 18);
   $y3 = $y2 * $noise;

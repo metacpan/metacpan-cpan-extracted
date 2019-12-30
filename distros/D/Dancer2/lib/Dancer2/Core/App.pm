@@ -1,6 +1,6 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '0.208002';
+$Dancer2::Core::App::VERSION = '0.300000';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
@@ -1222,8 +1222,11 @@ sub add_route {
     my $self        = shift;
     my %route_attrs = @_;
 
-    my $route =
-      Dancer2::Core::Route->new( %route_attrs, prefix => $self->prefix );
+    my $route = Dancer2::Core::Route->new(
+        type_library => $self->config->{type_library},
+        %route_attrs,
+        prefix => $self->prefix,
+    );
 
     my $method = $route->method;
 
@@ -1677,7 +1680,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 0.208002
+version 0.300000
 
 =head1 DESCRIPTION
 

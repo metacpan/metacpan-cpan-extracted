@@ -43,6 +43,8 @@ sub new ($%) {
         $cgi=CGI->new();
     }
 
+    $cgi || die "Cannot create proxied CGI instance";
+
     my $self={
         cgi => $cgi,
     };
@@ -56,6 +58,7 @@ our $AUTOLOAD;
 
 sub AUTOLOAD {
     my $self=shift;
+    return undef if !$self->{'cgi'};
     my @mpath=split('::',$AUTOLOAD);
     my $method=$mpath[$#mpath];
     my $code=$self->{'cgi'}->can($method);

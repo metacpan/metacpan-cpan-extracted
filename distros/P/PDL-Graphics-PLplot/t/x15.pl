@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x15 for the PLplot PDL binding
 #
 # Shade plot demo
@@ -24,14 +22,16 @@
 
 # SYNC: x15c.c 1.16
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 
 use constant XPTS => 35;    # Data points in x
 use constant YPTS => 46;    # Data points in y
 
-$z = zeroes (XPTS, YPTS);
-my $zmin, $zmax;
+my $z = zeroes (XPTS, YPTS);
+my ($zmin, $zmax);
 
 # Function prototypes
 
@@ -181,10 +181,10 @@ sub plot1 () {
     my $shade_max = $zmin + ($zmax - $zmin) * 0.6;
     my $sh_color = 7;
     my $sh_width = 2;
-    my $min_color = 9;
-    my $max_color = 2;
-    my $min_width = 2;
-    my $max_width = 2;
+    $min_color = 9;
+    $max_color = 2;
+    $min_width = 2;
+    $max_width = 2;
 
     plpsty (8);
     plshade1 ($z, -1, 1, -1, 1,

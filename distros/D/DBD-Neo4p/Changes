@@ -1,4 +1,10 @@
 Revision history for Perl module DBD::Neo4p
+0.2001 2019-12-24
+    - support new style ($parm) cypher parameters
+0.2000 2019-12-24
+    - connect() finally works for all examples
+    - auto-disconnect on destroy / eliminate DBI warning
+    - updated REST::Neo4p req (v0.3030)
 0.1004 2017-07-21
     - Updated test queries for Neo4j 3.2
     - Simplify ping query

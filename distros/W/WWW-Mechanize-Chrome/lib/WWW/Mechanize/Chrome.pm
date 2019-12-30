@@ -25,7 +25,7 @@ use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -1122,7 +1122,22 @@ sub chrome_version_from_executable_win32( $class, $options={} ) {
     croak $error if $error;
 
     my $info = Win32::File::VersionInfo::GetFileVersionInfo( $program );
-    return "Chrome/$info->{ProductVersion}";
+
+    # Find whether we are Chrome* or MS Edge:
+    (my $l) = sort (keys %{$info->{Lang}});
+    my $name = $info->{Lang}->{ $l }->{"ProductName"};
+    if( $name eq 'Microsoft Edge' ) {
+        # Fudge the version to the equivalent Chrome API version
+        my $v = $info->{ProductVersion};
+        if( $v =~ /^11\./ ) {
+            $v = "72.0.0.0"; # random guess
+        } else {
+            $v = "78.0.0.0"; # even more random guess
+        };
+        return "Chrome/$v";
+    } else {
+        return "Chrome/$info->{ProductVersion}";
+    };
 }
 
 sub chrome_version( $self, %options ) {
@@ -2892,7 +2907,7 @@ sub text {
 
     # Waugh - this is highly inefficient but conveniently short to write
     # Maybe this should skip SCRIPT nodes...
-    join '', map { $_->get_text() } $self->xpath('//*/text()');
+    join '', map { $_->get_attribute('textContent') } $self->xpath('//body', single => 1 );
 }
 
 =head2 C<< $mech->content_encoding() >>

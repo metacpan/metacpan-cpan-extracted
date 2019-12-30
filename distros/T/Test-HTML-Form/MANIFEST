@@ -7,5 +7,6 @@ t/00-load.t
 t/form_with_errors.html
 t/html.t
 t/failures.t
+t/lib/fake_response.pm
 lib/Test/HTML/Form.pm
 META.json                                Module JSON meta-data (added by MakeMaker)

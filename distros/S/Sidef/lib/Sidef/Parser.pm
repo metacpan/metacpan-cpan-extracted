@@ -304,6 +304,7 @@ package Sidef::Parser {
 
                   %% ≅
                   ~~ !~
+                  <~>
                   <=> =~=
                   <<= >>=
                   << >>
@@ -1085,7 +1086,7 @@ package Sidef::Parser {
                 my $obj = (
                     $double_quoted
                     ? do {
-                        state $str = Sidef::Types::String::String->new;    # load the string module
+                        state $str = Sidef::Types::String::String->new;                                # load the string module
                         Sidef::Types::String::String::apply_escapes($package->$method($string), $self);
                       }
                     : $package->$method($string =~ s{\\\\}{\\}gr)
@@ -1880,6 +1881,9 @@ package Sidef::Parser {
                 if (/\Gcatch\h*(?=\{)/gc) {
                     $obj->{catch} = $self->parse_block(code => $opt{code}, with_vars => 1);
                 }
+                else {
+                    $self->backtrack_whitespace();
+                }
 
                 return $obj;
             }
@@ -2551,8 +2555,8 @@ package Sidef::Parser {
                     ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
                     and defined(
                         my $var = (
-                            first { $_->{name} eq $name }
-                            (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}})
+                                 first { $_->{name} eq $name }
+                                 (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}})
                                   )
                                )
                   ) {
@@ -2861,7 +2865,7 @@ package Sidef::Parser {
                     my $has_arg;
                     if (/\G\h*(?=[({])/gc || $req_arg) {
                         my $arg = (
-                                     $req_arg ? $self->parse_obj(code => $opt{code}, multiline => 1)
+                                     $req_arg   ? $self->parse_obj(code => $opt{code}, multiline => 1)
                                    : /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
                                    : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
                                    :              die "[PARSER ERROR] Something is wrong in the if condition"
@@ -3345,17 +3349,13 @@ package Sidef::Parser {
                     $self->parse_suffixes(code => $opt{code}, struct => \%struct) && redo;
                 }
 
-                # Tight-binded operator
+                # Tightly-binded operator
                 if (
-                    /\G(?!\h*[=-]>)/
+                    /\G(?![=-]>)/    # not '=>' or '->'
                     && (
-                        /\G(?=$self->{operators_re})/o
-                        || (
-                            /\G\h*\.(?!\.)/gc
-                            ? do { $self->parse_whitespace(code => $opt{code}); 1 }
-                            : 0
-                           )
-                        || /\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/
+                        /\G(?=$self->{operators_re})/o                         # operator
+                        || /\G\h*\.\h*(?!\.\.)(?=$self->{operators_re})/gco    # dot followed by operator
+                        || /\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/                                # unicode superscript
                        )
                   ) {
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::HTML::Form.
 
+1.01 December 28 2019
+        Add reset of parsed_html cache on changed content
+
 1.00 March 22 2018
         Fix Data::Dumper maxdepth bug
         Fix handling of undefined tags

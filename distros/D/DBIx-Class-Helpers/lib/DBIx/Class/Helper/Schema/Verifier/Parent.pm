@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Schema::Verifier::Parent;
-$DBIx::Class::Helper::Schema::Verifier::Parent::VERSION = '2.034001';
+$DBIx::Class::Helper::Schema::Verifier::Parent::VERSION = '2.034002';
 # ABSTRACT: Verify that the Results and ResultSets have the correct base class
 
 use strict;

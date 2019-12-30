@@ -41,7 +41,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.87';
+our $VERSION = '0.89';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -4734,6 +4734,7 @@ sub _signal_number {
 
 sub DESTROY {
     my ($self) = @_;
+    local $CHILD_ERROR = 0;
     if ( $self->{survive} ) {
     }
     elsif ( $self->{creation_pid} == $PROCESS_ID ) {
@@ -4783,7 +4784,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.87
+Version 0.89
 
 =head1 SYNOPSIS
 

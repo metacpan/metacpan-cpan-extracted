@@ -29,14 +29,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 20;
+plan tests => 24;
 
 use Graph::Maker::Petersen;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::Petersen::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Petersen->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Petersen->VERSION($want_version); 1 }, 1,
@@ -79,12 +79,14 @@ foreach my $multiedged (0, 1) {
                                   N=>4, K=>2,
                                   multiedged => $multiedged,
                                   undirected => $undirected);
+    ok ($graph->is_multiedged ? 1 : 0, $multiedged);
 
     my $num_vertices = $graph->vertices;
-    my $num_edges = $graph->edges;
     ok ($num_vertices, 8);
+
+    my $num_edges = $graph->edges;
     my $want_num_edges = 4+4+2;
-    if (!$undirected) { $want_num_edges *= 2; }
+    unless ($undirected) { $want_num_edges *= 2; }
     ok ($num_edges, $want_num_edges);
   }
 }

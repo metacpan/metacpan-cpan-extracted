@@ -23,7 +23,7 @@ use Graph::Maker;
 use List::Util 'min';
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -60,7 +60,7 @@ sub init {
     $graph->add_edge($i,$i+$N);    # outer to inner
   }
   foreach my $i (0 .. ($K==$N/2 ? $N/2 : $N)-1) {
-    $graph->add_edges($N+1+$i, $N+1+(($i+$K)%$N));  # inner circulant
+    $graph->add_edge($N+1+$i, $N+1+(($i+$K)%$N));  # inner circulant
   }
   if ($graph->is_directed) {
     $graph->add_edges(map {[reverse @$_]} $graph->edges);
@@ -153,31 +153,23 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item N=3, K=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=746>, circular ladder 3 rungs
-
-=item N=4, K=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1022> (cube)
-
-=item N=4, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=588>
-
-=item N=5, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=660> (Petersen)
-
-=item N=7, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=28482>
-
-=item N=8, K=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1229> (Mobius Kantor)
-
-=item N=9, K=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=6700>
-
-=item N=10, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1043> (Dodecahedral)
-
-=item N=10, K=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1036> (Desargues)
-
-=item N=11, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=24052>
-
-=item N=12, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27325>
-
-=item N=12, K=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1234> (Nauru)
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=746> (etc)
 
 =back
+
+    746     N=3, K=1    circular ladder 3 rungs
+    1022    N=4, K=1    cube
+    588     N=4, K=2    
+    660     N=5, K=2    Petersen
+    32798   N=6, K=1    cross-connected 5-cycles
+    28482   N=7, K=2    
+    1229    N=8, K=3    Mobius Kantor
+    6700    N=9, K=3    
+    1043    N=10, K=2   Dodecahedral
+    1036    N=10, K=3   Desargues
+    24052   N=11, K=2   
+    27325   N=12, K=2   
+    1234    N=12, K=5   Nauru
 
 =head1 OEIS
 

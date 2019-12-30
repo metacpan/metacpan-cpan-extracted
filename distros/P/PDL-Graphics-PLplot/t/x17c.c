@@ -1,10 +1,11 @@
-// $Id: x17c.c 11289 2010-10-29 20:44:17Z airwin $
-//
 // Plots a simple stripchart with four pens.
 //
 
 #include "plcdemos.h"
 #include <stdlib.h>
+#ifdef PL_HAVE_NANOSLEEP
+# include <time.h>
+#endif
 #ifdef PL_HAVE_UNISTD_H
 # include <unistd.h>
 #else
@@ -25,13 +26,16 @@ static char  errmsg[160];
 //--------------------------------------------------------------------------
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
-    PLINT      id1, n, autoy, acc, nsteps = 1000;
-    PLFLT      y1, y2, y3, y4, ymin, ymax, xlab, ylab;
-    PLFLT      t, tmin, tmax, tjump, dt, noise;
-    PLINT      colbox, collab, colline[4], styline[4];
-    const char *legline[4];
+    PLINT           id1, n, autoy, acc, nsteps = 1000;
+    PLFLT           y1, y2, y3, y4, ymin, ymax, xlab, ylab;
+    PLFLT           t, tmin, tmax, tjump, dt, noise;
+    PLINT           colbox, collab, colline[4], styline[4];
+    PLCHAR_VECTOR   legline[4];
+#ifdef PL_HAVE_NANOSLEEP
+    struct timespec ts;
+#endif
 
 // plplot initialization
 // Parse and process command line arguments
@@ -127,10 +131,14 @@ main( int argc, const char *argv[] )
     y1 = y2 = y3 = y4 = 0.0;
     dt = 0.1;
 
+#ifdef PL_HAVE_NANOSLEEP
+    ts.tv_sec  = 0;
+    ts.tv_nsec = 10000000;
+#endif
     for ( n = 0; n < nsteps; n++ )
     {
-#ifdef PL_HAVE_USLEEP
-        usleep( 10000 );  // wait a little (10 ms) to simulate time elapsing
+#ifdef PL_HAVE_NANOSLEEP
+        nanosleep( &ts, NULL );  // wait a little (10 ms) to simulate time elapsing
 #else
 # ifdef PL_HAVE_POLL
         poll( 0, 0, 10 );
@@ -140,7 +148,7 @@ main( int argc, const char *argv[] )
         }
 # endif
 #endif
-        t     = (double) n * dt;
+        t     = (PLFLT) n * dt;
         noise = plrandd() - 0.5;
         y1    = y1 + noise;
         y2    = sin( t * M_PI / 18. );

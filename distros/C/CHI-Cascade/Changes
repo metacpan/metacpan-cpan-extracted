@@ -1,5 +1,22 @@
 Revision history for perl module CHI::Cascade
 
+0.3.2 (0.300002)
+    - [improved] If 'depends' in rule is code then this code will be executed only once (previously it could be executed twice). Same rule is for any item of depends array too.
+    - [improved] All code was reformated without tabs
+
+0.3.1 (0.300001)
+    - Improved docs about stash method
+    - The "nested run methods" test was written andit works as expected.
+    - META.yml file was fixed
+
+0.3
+    - The run method can be called from other run method and from depends callref.
+      This was made possible by creating a separate data instance for each root call of run method.
+      Existed tests are passed but a test dedicated for this feature is not written yet.
+    - Improved the test 11_fast_mmap_actual_term_expires.t
+      (test_08_actual_term_expires.pm). It was fail in some high-load test CPAN computers
+      because time intervals there were larger than I expected in the tests.
+
 0.284 2014-07-20
     - Fix bug with ttl, when one target with ttl's rule had dependencies which had other ttl'd rules
     - few code optimizations

@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "The great new BigIP::LTM::ParseConfig!",
    "author" : [
       "WENWU YAN <careline@126.com>"
    ],
@@ -42,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.83",
+   "version" : "0.84",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

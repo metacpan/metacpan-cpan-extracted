@@ -2,8 +2,8 @@ NAME
     App::subsort - Sort lines of text using Sort::Sub routine
 
 VERSION
-    This document describes version 0.043 of App::subsort (from Perl
-    distribution App-subsort), released on 2019-12-18.
+    This document describes version 0.044 of App::subsort (from Perl
+    distribution App-subsort), released on 2019-12-27.
 
 SYNOPSIS
     This distribution provides the subsort command-line utility.

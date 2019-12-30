@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 405;
+use Test::More tests => 407;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -2136,6 +2136,20 @@ SKIP: {
 		ok($firefox->quit() == $signals_by_name{TERM}, "Firefox has been killed by a signal with value of $signals_by_name{TERM}:" . $firefox->child_error() . ":" . $firefox->error_message());
 		diag("Error Message was " . $firefox->error_message());
 	}
+}
+SKIP: {
+	if (($^O eq 'cygwin') ||
+		($^O eq 'darwin') ||
+		($^O eq 'MSWin32'))
+	{
+		skip("Skipping exit status tests on $^O", 2);
+	} elsif (out_of_time()) {
+		skip("Skipping exit status b/c out of time", 2);
+	}
+	my $exit_status = system { $^X } $^X, (map { "-I$_" } @INC), '-MFirefox::Marionette', '-e', 'my $f = Firefox::Marionette->new(); exit 0';
+	ok($exit_status == 0, "Firefox::Marionette doesn't alter the exit code of the parent process if it isn't closed cleanly");
+	$exit_status = system { $^X } $^X, (map { "-I$_" } @INC), '-MFirefox::Marionette', '-e', 'my $f = Firefox::Marionette->new(); $f = undef; exit 0';
+	ok($exit_status == 0, "Firefox::Marionette doesn't alter the exit code of the parent process if it is 'undefed'");
 }
 ok($at_least_one_success, "At least one firefox start worked");
 eval "no warnings; sub File::Temp::newdir { \$! = POSIX::EACCES(); return; } use warnings;";

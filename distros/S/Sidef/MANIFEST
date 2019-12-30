@@ -294,6 +294,7 @@ scripts/RosettaCode/bitwise_operations.sf
 scripts/RosettaCode/boolean_values.sf
 scripts/RosettaCode/boolean_values_1.sf
 scripts/RosettaCode/brace_expansion.sf
+scripts/RosettaCode/brazilian_numbers.sf
 scripts/RosettaCode/burrows_wheeler_transform.sf
 scripts/RosettaCode/cantor_set.sf
 scripts/RosettaCode/case-sensitivity_of_identifiers.sf
@@ -305,6 +306,7 @@ scripts/RosettaCode/character_codes.sf
 scripts/RosettaCode/check_machin_like_formulas.sf
 scripts/RosettaCode/check_that_file_exists.sf
 scripts/RosettaCode/cheryl_s_birthday.sf
+scripts/RosettaCode/chi_squared_test.sf
 scripts/RosettaCode/cholesky_decomposition.sf
 scripts/RosettaCode/cipolla_algorithm.sf
 scripts/RosettaCode/classes.sf
@@ -354,6 +356,7 @@ scripts/RosettaCode/euler_method.sf
 scripts/RosettaCode/extract_file_extension.sf
 scripts/RosettaCode/extreme_floating_point_values.sf
 scripts/RosettaCode/factorial.sf
+scripts/RosettaCode/factorions.sf
 scripts/RosettaCode/factors_of_a_mersenne_number.sf
 scripts/RosettaCode/factors_of_an_integers.sf
 scripts/RosettaCode/faulhaber_s_formula_2.sf
@@ -486,6 +489,7 @@ scripts/RosettaCode/pascal_s_triangle_puzzle.sf
 scripts/RosettaCode/perfect_shuffle.sf
 scripts/RosettaCode/perlin_noise.sf
 scripts/RosettaCode/permutations_by_swapping.sf
+scripts/RosettaCode/permutations_with_some_identical_elements.sf
 scripts/RosettaCode/pernicious_numbers.sf
 scripts/RosettaCode/phrase_reversals.sf
 scripts/RosettaCode/pick_random_element.sf
@@ -681,6 +685,7 @@ scripts/Tests/chebyshev_coefficients_test.sf
 scripts/Tests/class_attr_inheritance.sf
 scripts/Tests/class_attributes.sf
 scripts/Tests/class_field_inheritance.sf
+scripts/Tests/class_global_variables.sf
 scripts/Tests/class_inheritance.sf
 scripts/Tests/class_inside_module.sf
 scripts/Tests/class_redefinition.sf
@@ -856,6 +861,7 @@ scripts/Tests/named_parameters.sf
 scripts/Tests/names_to_numbers.sf
 scripts/Tests/nested_classes.sf
 scripts/Tests/nested_evals.sf
+scripts/Tests/next_composite.sf
 scripts/Tests/non_continuous_seq.sf
 scripts/Tests/nth_prime.sf
 scripts/Tests/number_binary_search.sf

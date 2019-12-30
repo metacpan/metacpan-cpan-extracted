@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_find_identical_rows
-# and generated automatically using Perinci::CmdLine::Gen version 0.490
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-04-26'; # DATE
+our $DATE = '2019-12-24'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ mysql-find-identical-rows - List rows on one table that are identical on another
 
 =head1 VERSION
 
-This document describes version 0.018 of mysql-find-identical-rows (from Perl distribution App-MysqlUtils), released on 2019-04-26.
+This document describes version 0.019 of mysql-find-identical-rows (from Perl distribution App-MysqlUtils), released on 2019-12-24.
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,7 @@ Name of the second table.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

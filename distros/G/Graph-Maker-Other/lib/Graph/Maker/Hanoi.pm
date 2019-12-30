@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -91,6 +91,7 @@ sub init {
 
   my @t = (0) x $discs;
   $graph->add_vertex($vertex_name_func->(\@t, $spindles)); # in case discs=0
+  my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
 
  T: for (;;) {
     my $v = $vertex_name_func->(\@t, $spindles);
@@ -115,8 +116,7 @@ sub init {
         my @t2 = @t;
         $t2[$pos] = $to_digit;
         my $v2 = $vertex_name_func->(\@t2, $spindles);
-        $graph->add_edge($v, $v2);
-        if ($directed) { $graph->add_edge($v2, $v); }
+        $graph->$add_edge($v, $v2);
         ### edge: "pos=$pos @t to @t2"
       }
     }

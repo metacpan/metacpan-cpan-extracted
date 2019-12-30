@@ -8,7 +8,7 @@ WriteMakefile(
     AUTHOR           => q{Adam Hopkins <srchulo@cpan.org>},
     VERSION_FROM     => 'lib/Image/Imlib2/Thumbnail/Scaled.pm',
     ABSTRACT_FROM    => 'lib/Image/Imlib2/Thumbnail/Scaled.pm',
-    LICENSE          => 'Artistic_2_0',
+    LICENSE          => 'artistic_2',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.006,
     CONFIGURE_REQUIRES => {

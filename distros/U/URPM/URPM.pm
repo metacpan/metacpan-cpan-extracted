@@ -11,7 +11,7 @@ use URPM::Resolve;
 use URPM::Signature;
 
 our @ISA = qw(DynaLoader);
-our $VERSION = '5.22';
+our $VERSION = 'v5.23.2';
 
 URPM->bootstrap($VERSION);
 
@@ -1043,6 +1043,8 @@ B<transaction_state>: $state object
 =head1 SEE ALSO
 
 The L<URPM::Resolve> implements the resolving bits.
+
+The L<URPM::Signature> implements the pubkey bits.
 
 The L<urpm> package is a higher level module used by the urpmi command line tool,
 the rpmdrake GUI and the drakx installer.

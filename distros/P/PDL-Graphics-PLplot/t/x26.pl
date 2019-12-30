@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # $Id: x26.pl 11730 2011-04-29 22:16:08Z huntd $
 #
 # -*- coding: utf-8; -*-
@@ -64,38 +62,40 @@
 
 # SYNC: x26c.c 1.1
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Math::Trig qw [pi];
 
 use Getopt::Long;
 
-@x_label = (
+my @x_label = (
   "Frequency",
   "Частота"
 );
 
-@y_label = (
+my @y_label = (
   "Amplitude (dB)",
   "Амплитуда (dB)"
 );
 
-@alty_label = (
+my @alty_label = (
   "Phase shift (degrees)",
   "Фазовый сдвиг (градусы)"
 );
 
-@legend_text = (
+my @legend_text = (
     [ "Amplitude", "Phase shift"   ],
     [ "Амплитуда", "Фазовый сдвиг" ],
 );
 
-@title_label = (
+my @title_label = (
   "Single Pole Low-Pass Filter",
   "Однополюсный Низко-Частотный Фильтр"
 );
 
-@line_label = (
+my @line_label = (
   "-20 dB/decade",
   "-20 dB/десяток"
 );
@@ -172,7 +172,7 @@ sub plot1 {
 	plbox(0.0, 0, 30.0, 3, "", "cmstv");
 	plcol0(3);
 	plline($freql, $phase);
-        plstring($freql, $phase, "*");
+        plstring($freql, $phase, "#(728)");
 	plcol0(3);
 	plmtex(5.0, 0.5, 0.5, "r", $alty_label);
     }
@@ -187,14 +187,14 @@ sub plot1 {
   my @symbol_colors = (3, 3); # ???
   my @symbol_scales = (1, 1); # ???
   my @symbol_numbers = (4, 4);# ???
-  my @symbols        = ('*', '*'); # ???
+  my @symbols        = ('#(728)', '#(728)'); # ???
   
   plscol0a(15, 32, 32, 32, 0.70);
   my ($legend_width, $legend_height) = pllegend(
       PL_LEGEND_BACKGROUND | PL_LEGEND_BOUNDING_BOX, 0,
       0.0, 0.0, 0.1, 15,
       1, 1, 0, 0,
-      $nlegend = 2, \@opt_array,
+      my $nlegend = 2, \@opt_array,
       1.0, 1.0, 2.0,
       1., \@text_colors, $legend_text,
       0, 0, 0, 0,

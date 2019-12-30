@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -32,6 +32,11 @@ $VERSION = 13;
 sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
+}
+sub _make_graph {
+  my ($params) = @_;
+  my $graph_maker = delete($params->{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%$params);
 }
 
 # GP-Test  (1+I)*('x+I*'y) == ('x-'y) + I*('x+'y)
@@ -78,9 +83,12 @@ sub init {
   my $part = delete($params{'part'}) || 'dragon';
   my $n_lo = delete($params{'n_lo'});
   my $n_hi = delete($params{'n_hi'});
-  my $graph_maker = delete($params{graph_maker}) || \&_default_graph_maker;
 
-  my $graph = $graph_maker->(%params);
+  my $graph = _make_graph(\%params);
+  $graph->set_graph_attribute (vertex_name_type_xy => 1);
+  $graph->set_graph_attribute (name => "Dragon "
+                               . ($part eq 'blob' ? 'Blob' : 'Curve')
+                               . " Level $level");
 
   if (! defined $n_lo) {
     if ($part eq 'blob') {

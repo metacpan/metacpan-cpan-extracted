@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2019-10-05'; # DATE
-our $VERSION = '1.041'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 use 5.010001;
 use strict;
@@ -211,6 +211,29 @@ our %finclude_noncore_args = (
         'summary.alt.bool.not' => 'Exclude non-core modules',
         schema  => 'bool',
         default => 1,
+        tags => ['category:filtering'],
+    },
+);
+
+our %finclude_registered_args = (
+    include_registered => {
+        summary => 'Include modules that are registered (listed in 02packages.details.txt.gz)',
+        'summary.alt.bool.not' => 'Exclude modules that are registered (listed in 02packages.details.txt.gz)',
+        schema  => 'bool',
+        default => 1,
+        tags => ['category:filtering'],
+    },
+);
+
+our %finclude_unregistered_args = (
+    include_unregistered => {
+        summary => 'Include modules that are not registered (not listed in 02packages.details.txt.gz)',
+        'summary.alt.bool.not' => 'Exclude modules that are not registered (not listed in 02packages.details.txt.gz)',
+        schema  => 'bool',
+        default => 1,
+        cmdline_aliases => {
+            broken => {is_flag=>1, summary => 'Alias for --exclude-registered --include-unregistered', code => sub { $_[0]{include_unregistered}=1; $_[0]{include_registered}=0 }},
+        },
         tags => ['category:filtering'],
     },
 );
@@ -3594,6 +3617,9 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
             }
         }
 
+        next if !$filters->{include_registered}   &&  defined $row->{author};
+        next if !$filters->{include_unregistered} && !defined $row->{author};
+
         $row->{is_core} = $row->{module} eq 'perl' ||
             Module::CoreList::More->is_still_core($row->{module}, undef, version->parse($plver)->numify);
         next if !$filters->{include_core}    &&  $row->{is_core};
@@ -3853,6 +3879,8 @@ _
         schema  => ['bool*', is=>1],
         tags => ['category:filtering'],
     },
+    %finclude_registered_args,
+    %finclude_unregistered_args,
 );
 
 our $deps_args_rels = {
@@ -3899,10 +3927,14 @@ sub deps {
     my $include_core    = $args{include_core} // 1;
     my $include_noncore = $args{include_noncore} // 1;
     my $with_xs_or_pp = $args{with_xs_or_pp};
+    my $include_registered = $args{include_registered} // 1;
+    my $include_unregistered = $args{include_unregistered} // 1;
 
     my $filters = {
         include_core => $include_core,
         include_noncore => $include_noncore,
+        include_registered => $include_registered,
+        include_unregistered => $include_unregistered,
         authors => $args{authors},
         authors_arent => $args{authors_arent},
     };
@@ -4141,7 +4173,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.041 of App::lcpan (from Perl distribution App-lcpan), released on 2019-10-05.
+This document describes version 1.043 of App::lcpan (from Perl distribution App-lcpan), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -4305,6 +4337,14 @@ Include core modules.
 
 Include non-core modules.
 
+=item * B<include_registered> => I<bool> (default: 1)
+
+Include modules that are registered (listed in 02packages.details.txt.gz).
+
+=item * B<include_unregistered> => I<bool> (default: 1)
+
+Include modules that are not registered (not listed in 02packages.details.txt.gz).
+
 =item * B<index_name> => I<filename> (default: "index.db")
 
 Filename of index.
@@ -4320,7 +4360,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.30.0")
 
 Set base Perl version for determining core modules.
 
@@ -4518,7 +4558,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.30.0")
 
 Set base Perl version for determining core modules.
 
@@ -4686,7 +4726,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.30.0")
 
 Set base Perl version for determining core modules.
 

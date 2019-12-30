@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2019 by Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
+
+# Example code for Math::Polynomial::Cyclotomic: command line interface
+
+use strict;
+use warnings;
+use Math::Polynomial::Cyclotomic qw(cyclo_poly_iterate cyclo_factors_iterate);
+
+local $Math::Polynomial::max_degree;
+
+my $USAGE = "usage: cyclo_poly [-f] {n|min max}\n";
+my $factorize = 0;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last if $opt eq '-';
+    $factorize = 1, next if $opt eq 'f';
+    die $USAGE;
+}
+die $USAGE if !@ARGV || @ARGV > 2 || grep {!/^[1-9][0-9]*\z/} @ARGV;
+
+my ($min, $max) = sort { $a <=> $b } @ARGV;
+$max ||= $min;
+if ($factorize) {
+    my $it = cyclo_factors_iterate($min);
+    for (my $n = $min; $n <= $max; ++$n) {
+        my @factors = $it->();
+        print "(x^$n - 1) = ", join(q[ * ], @factors), "\n";
+    }
+}
+else {
+    my $it = cyclo_poly_iterate($min);
+    for (my $n = $min; $n <= $max; ++$n) {
+        my $poly = $it->();
+        print "Phi_$n(x) = $poly\n";
+    }
+}
+
+__END__

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.008;
 use lib qw( ./lib );
 use Config;
 use File::Spec::Functions qw( catfile );
@@ -15,9 +15,10 @@ select STDERR;
 $| = 1;
 select STDOUT;
 
-use vars qw( $TT_VERSION $TT_PREFIX
-             $TT_XS_ENABLE $TT_XS_DEFAULT
-             $TT_QUIET $TT_ACCEPT $TT_YES );
+our ( $TT_VERSION, $TT_PREFIX,
+      $TT_XS_ENABLE, $TT_XS_DEFAULT,
+      $TT_QUIET, $TT_ACCEPT, $TT_YES
+);
 
 # check O/S to set sensible defaults
 
@@ -123,7 +124,6 @@ my $TT_FILE_TEMP_VERSION = '0.12';
 #========================================================================
 
 welcome_message();
-version_check();
 mandatory_modules();
 optional_stash_xs();
 write_defaults();
@@ -232,40 +232,6 @@ EOF
     print "Messages suppressed (TT_QUIET).  " if $TT_QUIET;
     print "Accepting defaults automatically (TT_ACCEPT)." if $TT_ACCEPT;
 }
-
-
-
-#------------------------------------------------------------------------
-# version_check()
-#
-# Check for pre-version 2.00 installation and issue warning
-#------------------------------------------------------------------------
-
-sub version_check {
-    eval "use Template";
-    unless ($@ or $Template::VERSION =~ /^2/) {
-        warn(<<EOF) unless $TT_QUIET;
-
-IMPORTANT NOTE:
-
-    You have version $Template::VERSION of the Template Toolkit installed.
-
-    There are some minor incompatabilities between version 1 and 2
-    of the Template Toolkit which you should be aware of.  Installing
-    this version will overwrite your version $Template::VERSION files
-    unless you take measures to install one or the other version in a
-    different location (i.e. perl Makefile.PL PREFIX=/other/path).
-
-    Please consult the README and Changes file for further details.
-    Most of the changes are in the more obscure features and
-    directives so hopefully you will find the upgrade process fairly
-    painless.  If you're feeling brave, then answer 'y', otherwise 'n'.
-
-EOF
-        exit unless ttprompt("Do you want to continue?", 'y') =~ /y/i;
-    }
-}
-
 
 #------------------------------------------------------------------------
 # mandatory_modules()

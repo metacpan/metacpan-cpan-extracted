@@ -41,7 +41,7 @@ public:
     template <typename ORet, typename... OArgs,
               typename = typename std::enable_if<std::is_convertible<function<ORet, OArgs...>, function>::value>::type>
     bool operator ==(const function<ORet, OArgs...>& oth) const {
-        return (func && func->equals(oth.func.get())) || (!func && !oth.func);
+        return (!func && !oth.func) || (func && oth && func->equals(oth.func.get()));
     }
 
     template <typename ORet, typename... OArgs,

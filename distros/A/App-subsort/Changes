@@ -1,3 +1,8 @@
+0.044   2019-12-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option --key (-k).
+
+
 0.043   2019-12-18  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Allow NAME<opt> syntax in first argument.

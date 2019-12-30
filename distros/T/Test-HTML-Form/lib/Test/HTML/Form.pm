@@ -9,7 +9,7 @@ Test::HTML::Form - HTML Testing and Value Extracting
 
 =head1 VERSION
 
-1.00
+1.01
 
 =head1 SYNOPSIS
 
@@ -71,6 +71,8 @@ All test functions will take either a filename or an HTTP::Response compatible o
 =cut
 
 use Data::Dumper;
+use Digest::MD5;
+
 use HTML::TreeBuilder;
 
 use base qw( Exporter Test::Builder::Module);
@@ -84,14 +86,15 @@ our @EXPORT = qw(
   form_field_value_matches
   form_select_field_matches
   form_checkbox_field_matches
+  clear_test_html_form_cache
   );
 
 my $Test = Test::Builder->new;
 my $CLASS = __PACKAGE__;
-my %parsed_files = ();
-my %parsed_file_forms = ();
+our %parsed_files = ();
+our %parsed_file_forms = ();
 
-our $VERSION = 1.00;
+our $VERSION = 1.01;
 
 =head1 FUNCTIONS
 
@@ -110,7 +113,7 @@ Takes a list of arguments filename/response, string or quoted-regexp to match, a
 sub image_matches {
   my ($filename,$link,$name) = (@_);
   local $Test::Builder::Level = 2;
-  return tag_matches($filename,'img',{ src => $link },$name);
+  return tag_matches($filename,'img',{ src => $link }, $name);
 };
 
 
@@ -524,44 +527,46 @@ Returns a hashref of form fields, with name as key, and arrayref of XML elements
 =cut
 
 sub get_form_values {
-  my $class = shift;
-  my $args = shift;
-  no warnings 'uninitialized';
-  my $form_name = $args->{form_name};
-  my $internal_form_name = $form_name . ' form';
-  if ($parsed_file_forms{$args->{filename}}{$internal_form_name}) {
-    return $parsed_file_forms{$args->{filename}}{$internal_form_name};
-  } else {
+    my $class = shift;
+    my $args = shift;
+    no warnings 'uninitialized';
+    my $form_name = $args->{form_name};
+    my $internal_form_name = $form_name . ' form';
+    if ($parsed_file_forms{$args->{filename}}{$internal_form_name}) {
+        if ($parsed_files{$args->{filename}}{md5} eq _get_md5_sum($args->{filename})) {
+            return $parsed_file_forms{$args->{filename}}{$internal_form_name};
+        }
+    }
+
     my $tree = _get_tree($args->{filename});
     my $form_fields = { };
     my ($form) = $tree->look_down('_tag', 'form',
-                  sub {
-                    my $form = shift;
-                    if ($form_name) {
-                      return 1 if $form->attr('name') eq $form_name;
-                      return 1 if $form->attr('id') eq $form_name;
-                    } else {
-                      return 1;
-                    }
-                  }
-                 );
+                                  sub {
+                                      my $form = shift;
+                                      if ($form_name) {
+                                          return 1 if $form->attr('name') eq $form_name;
+                                          return 1 if $form->attr('id') eq $form_name;
+                                      } else {
+                                          return 1;
+                                      }
+                                  }
+                              );
     if (ref $form) {
-      my @form_nodes = $form->descendants();
-      foreach my $node (@form_nodes) {
-    next unless (ref($node));
-    if (lc($node->tag) =~ /^(input|select|textarea|button)$/i)  {
-      if (lc $node->attr('type')  =~ /(radio|checkbox)/)  {
-        push (@{$form_fields->{$node->attr('name')}},$node);
-      } else {
-        $form_fields->{$node->attr('name')} = [ $node ];
-      }
-    }
-      }
+        my @form_nodes = $form->descendants();
+        foreach my $node (@form_nodes) {
+            next unless (ref($node));
+            if (lc($node->tag) =~ /^(input|select|textarea|button)$/i) {
+                if (lc $node->attr('type')  =~ /(radio|checkbox)/) {
+                    push (@{$form_fields->{$node->attr('name')}},$node);
+                } else {
+                    $form_fields->{$node->attr('name')} = [ $node ];
+                }
+            }
+        }
     }
     $parsed_file_forms{$args->{filename}}{$internal_form_name} = $form_fields;
 
     return $form_fields;
-  }
 }
 
 =head2 extract_text
@@ -585,7 +590,10 @@ sub extract_text {
   return $match;
 }
 
-
+sub _clear_test_html_form_cache {
+    %parsed_files = ();
+    %parsed_file_forms = ();
+}
 
 #
 ##########################################
@@ -653,20 +661,51 @@ sub _count_text {
 
 sub _get_tree {
   my $filename = shift;
+
   unless ($parsed_files{$filename}) {
-      my $tree = HTML::TreeBuilder->new;
-      $tree->store_comments(1);
-      if (ref $filename && $filename->can('content')) {
-      $tree->parse_content($filename->decoded_content);
-      } else {
-      die "can't find file $filename" unless (-f $filename);
-      $tree->parse_file($filename);
-      }
-    $parsed_files{$filename} = $tree;
+      return _parse_tree($filename);
   }
+
+  if ($parsed_files{$filename}{md5} eq _get_md5_sum($filename)) {
+      return $parsed_files{$filename}{tree};
+  } else {
+      $parsed_file_forms{$filename} = ();
+      return _parse_tree($filename);
+  }
+
   return $parsed_files{$filename};
 }
 
+sub _parse_tree {
+    my $filename = shift;
+    my $tree = HTML::TreeBuilder->new;
+    $tree->store_comments(1);
+    if (ref $filename && $filename->can('content')) {
+        $tree->parse_content($filename->content);
+    } else {
+        die "can't find file $filename" unless (-f $filename);
+        $tree->parse_file($filename);
+    }
+    $parsed_files{$filename}{md5} = _get_md5_sum($filename);
+    $parsed_files{$filename}{tree} = $tree;
+    return $tree;
+}
+
+sub _get_md5_sum {
+    my $filename = shift;
+    my $digester = Digest::MD5->new;
+    if (ref $filename && $filename->can('content')) {
+        $digester->add($filename->content);
+    } else {
+        die "can't find file $filename" unless (-f $filename);
+        open (my $fh, '<', $filename) or die "Can't open '$filename': $!";
+        binmode ($fh);
+        $digester->addfile($fh);
+        close $fh;
+    }
+    my $md5 = $digester->digest;
+    return $md5;
+}
 
 =head1 SEE ALSO
 

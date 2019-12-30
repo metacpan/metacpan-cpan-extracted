@@ -1,5 +1,3 @@
-// $Id: x12c.c 11289 2010-10-29 20:44:17Z airwin $
-//
 //      Bar chart demo.
 //
 
@@ -16,7 +14,7 @@ plfbox( PLFLT x0, PLFLT y0 );
 //--------------------------------------------------------------------------
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
     int          i;
     char         string[20];

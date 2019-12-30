@@ -1,0 +1,52 @@
+Math-Polynomial-Cyclotomic
+==========================
+
+Math::Polynomial::Cyclotomic is an extension of Math::Polynomial
+generating cyclotomic polynomials and factoring rational polynomials of
+the form x^n-1.  Cyclotomic polynomials are monic irreducible polynomials
+with integer coefficients that are a divisor of some binomial x^n-1 but
+not of any other binomial x^k-1 with k < n.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This library requires these other modules and libraries at run-time:
+
+    Math::Polynomial
+    Math::Prime::Util
+
+To build, test, and install, it also needs:
+
+    ExtUtils::MakeMaker
+    File::Spec
+    Test::More
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Polynomial::Cyclotomic
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Polynomial-Cyclotomic
+
+    Search CPAN
+        https://metacpan.org/release/Math-Polynomial-Cyclotomic
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Martin Becker.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).

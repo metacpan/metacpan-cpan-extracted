@@ -1,9 +1,20 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
-commit d281a48cc6ff4500b9fb29dee0122bd36b56d740
+commit 26cc745be6b38599874aedccef25e961f37b7ef8
 Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Nov 20 12:42:08 2019 -0800
+Date:   Mon Dec 23 18:22:30 2019 -0800
+
+    1.79 Default parameters configuration for cookies
+    
+    Allows to easily set 'httpOnly' or 'secure' site-wide in the
+    configuration instead of setting on individual cookies. Then can be
+    overrided as needed for specific cookies in the config or when calling
+    add_cookie().
+
+commit 85732ce2e933246e6ed58f69401d0be1f3fd5e7c
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Nov 20 12:50:27 2019 -0800
 
     1.78 Allowed for removing of headers set earlier
 
@@ -79,13 +90,4 @@ Date:   Thu Oct 25 12:11:09 2018 -0700
     
     Also fixed benchmark stats sort stability in testing for
     https://rt.cpan.org/Public/Bug/Display.html?id=127440
-
-commit 08fb7c8ab74e830bf8e26c5fb0b1d17d01cff036
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Tue Oct 23 16:36:28 2018 -0700
-
-    Removed EUMM upgrade compat WriteMakefile1
-    
-    There is already a requirement for version 6.64 of MakeMaker, so it
-    seems unnecessary.
 

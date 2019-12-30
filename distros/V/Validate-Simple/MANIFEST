@@ -1,0 +1,11 @@
+lib/Validate/Simple.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+README.pod
+t/010_validate.t
+t/011_validate_spec.t
+t/012_validate_against_spec.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -2,8 +2,8 @@ package App::MysqlUtils;
 
 ## no critic (InputOutput::RequireBriefOpen)
 
-our $DATE = '2019-04-26'; # DATE
-our $VERSION = '0.018'; # VERSION
+our $DATE = '2019-12-24'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1122,7 +1122,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.018 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2019-04-26.
+This document describes version 0.019 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2019-12-24.
 
 =head1 SYNOPSIS
 
@@ -1537,8 +1537,11 @@ Input CSV file.
 
 Whether CSV has a header row.
 
-When you declare that CSV does not have header row (C<--no-header>), the fields
-will be named C<field1>, C<field2>, and so on.
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
 
 =item * B<host> => I<str> (default: "localhost")
 

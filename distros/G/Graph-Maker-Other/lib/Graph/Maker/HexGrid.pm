@@ -29,7 +29,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -61,17 +61,18 @@ my @hexagon = ([0,0], [2,0], [3,1], [2,2], [0,2], [-1,1]);
 
 sub init {
   my ($self, %params) = @_;
+  ### HexGrid new: %params
 
-  my $dims = delete($params{'dims'}) || 0;
-  my @dims = ($dims->[0] || 1,
-              $dims->[1] || 1,
-              $dims->[2] || 1);
+  my $dims = delete($params{'dims'}) || [];
+  my @dims = (defined $dims->[0] ? $dims->[0] : 1,
+              defined $dims->[1] ? $dims->[1] : 1,
+              defined $dims->[2] ? $dims->[2] : 1);
 
   my $graph = _make_graph(\%params);
   $graph->set_graph_attribute (name => "Hex Grid ".join(',',@dims));
   $graph->set_graph_attribute (vertex_name_type_xy => 1);
   $graph->set_graph_attribute (vertex_name_type_xy_triangular => 1);
-  my $multiedged = $graph->is_countedged || $graph->is_multiedged;
+  my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
 
   my $seg_dx = 2;
   my $seg_dy = 0;
@@ -94,7 +95,7 @@ sub init {
         my $from = "$x,$y";
         my $to = ($x+$seg_dx).','.($y+$seg_dy);
         ### edge: "$from to $to"
-        $graph->add_edge($from, $to);
+        $graph->$add_edge($from, $to);
       }
       if ($i == $dims[0]) {
         ($step_dx,$step_dy) = _rotate_plus60($step_dx,$step_dy);
@@ -115,10 +116,6 @@ sub init {
     # $y += $step_dy;
     # $x += $seg_dx;
     # $y += $seg_dy;
-  }
-
-  if ($graph->is_directed) {
-    $graph->add_edges(map {[reverse @$_]} $graph->edges);
   }
   return $graph;
 }
@@ -235,13 +232,13 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item 1,1,1 L<https://hog.grinvin.org/ViewGraphInfo.action?id=670> 6-cycle
-
-=item 2,2,2 L<https://hog.grinvin.org/ViewGraphInfo.action?id=28529>
-
-=item 3,3,3 L<https://hog.grinvin.org/ViewGraphInfo.action?id=28500>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=670> etc
 
 =back
+
+    670      1,1,1  6-cycle
+    28529    2,2,2 
+    28500    3,3,3 
 
 =head1 OEIS
 

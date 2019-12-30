@@ -1,0 +1,37 @@
+---
+abstract: 'cyclotomic polynomials generator'
+author:
+  - 'Martin Becker <becker-cpan-mp (at) cozap.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Polynomial-Cyclotomic
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Math::Polynomial::Cyclotomic:
+    file: lib/Math/Polynomial/Cyclotomic.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Math::Polynomial: '1.001'
+  Math::Prime::Util: '0.36'
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Polynomial-Cyclotomic
+  license: https://www.perlfoundation.org/artistic-license-20.html
+  repository: git://github.com/mhasch/perl-Math-Polynomial-Cyclotomic.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

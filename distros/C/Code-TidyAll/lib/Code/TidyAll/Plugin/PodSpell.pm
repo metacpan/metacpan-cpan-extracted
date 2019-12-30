@@ -14,7 +14,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 has ispell_argv => (
     is      => 'ro',
@@ -79,7 +79,7 @@ Code::TidyAll::Plugin::PodSpell - Use Pod::Spell + ispell with tidyall
 
 =head1 VERSION
 
-version 0.74
+version 0.75
 
 =head1 SYNOPSIS
 

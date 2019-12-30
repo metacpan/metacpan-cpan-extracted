@@ -150,10 +150,10 @@ lib/AsposeSlidesCloud/Object/UpdateShape.pm
 lib/AsposeSlidesCloud/Object/VideoFrame.pm
 lib/AsposeSlidesCloud/Object/XpsExportOptions.pm
 lib/AsposeSlidesCloud/SlidesApi.pm
-lib/AsposeSlidesCloud/TestUtils.pm
 LICENSE
 MakeFile.pl
 MANIFEST			This list of files
+prove.pl
 README.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

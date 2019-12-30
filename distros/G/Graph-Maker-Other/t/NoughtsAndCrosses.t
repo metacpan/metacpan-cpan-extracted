@@ -29,7 +29,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 72;
+plan tests => 76;
 
 require Graph::Maker::NoughtsAndCrosses;
 
@@ -40,7 +40,7 @@ sub num_children {
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::NoughtsAndCrosses::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::NoughtsAndCrosses->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::NoughtsAndCrosses->VERSION($want_version); 1 }, 1,
@@ -75,6 +75,7 @@ foreach my $multiedged (0, 1) {
                                   N => 2,
                                   multiedged => $multiedged,
                                   undirected => $undirected);
+    ok ($graph->is_multiedged ? 1 : 0, $multiedged);
 
     my $num_vertices = $graph->vertices;
     my $num_edges = $graph->edges;

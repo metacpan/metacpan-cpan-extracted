@@ -30,109 +30,109 @@ no_index:
 provides:
   Code::TidyAll:
     file: lib/Code/TidyAll.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Cache:
     file: lib/Code/TidyAll/Cache.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::CacheModel:
     file: lib/Code/TidyAll/CacheModel.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::CacheModel::Shared:
     file: lib/Code/TidyAll/CacheModel/Shared.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Config::INI::Reader:
     file: lib/Code/TidyAll/Config/INI/Reader.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Git::Precommit:
     file: lib/Code/TidyAll/Git/Precommit.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Git::Prereceive:
     file: lib/Code/TidyAll/Git/Prereceive.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Git::Util:
     file: lib/Code/TidyAll/Git/Util.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin:
     file: lib/Code/TidyAll/Plugin.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::CSSUnminifier:
     file: lib/Code/TidyAll/Plugin/CSSUnminifier.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::GenericTransformer:
     file: lib/Code/TidyAll/Plugin/GenericTransformer.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::GenericValidator:
     file: lib/Code/TidyAll/Plugin/GenericValidator.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::JSBeautify:
     file: lib/Code/TidyAll/Plugin/JSBeautify.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::JSHint:
     file: lib/Code/TidyAll/Plugin/JSHint.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::JSLint:
     file: lib/Code/TidyAll/Plugin/JSLint.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::JSON:
     file: lib/Code/TidyAll/Plugin/JSON.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::MasonTidy:
     file: lib/Code/TidyAll/Plugin/MasonTidy.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::PHPCodeSniffer:
     file: lib/Code/TidyAll/Plugin/PHPCodeSniffer.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::PerlCritic:
     file: lib/Code/TidyAll/Plugin/PerlCritic.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::PerlTidy:
     file: lib/Code/TidyAll/Plugin/PerlTidy.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::PerlTidySweet:
     file: lib/Code/TidyAll/Plugin/PerlTidySweet.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::PodChecker:
     file: lib/Code/TidyAll/Plugin/PodChecker.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::PodSpell:
     file: lib/Code/TidyAll/Plugin/PodSpell.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::PodTidy:
     file: lib/Code/TidyAll/Plugin/PodTidy.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Plugin::SortLines:
     file: lib/Code/TidyAll/Plugin/SortLines.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Result:
     file: lib/Code/TidyAll/Result.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Role::GenericExecutable:
     file: lib/Code/TidyAll/Role/GenericExecutable.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Role::HasIgnore:
     file: lib/Code/TidyAll/Role/HasIgnore.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Role::RunsCommand:
     file: lib/Code/TidyAll/Role/RunsCommand.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Role::Tempdir:
     file: lib/Code/TidyAll/Role/Tempdir.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::SVN::Precommit:
     file: lib/Code/TidyAll/SVN/Precommit.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::SVN::Util:
     file: lib/Code/TidyAll/SVN/Util.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Util::Zglob:
     file: lib/Code/TidyAll/Util/Zglob.pm
-    version: '0.74'
+    version: '0.75'
   Code::TidyAll::Zglob:
     file: lib/Code/TidyAll/Zglob.pm
-    version: '0.74'
+    version: '0.75'
   Test::Code::TidyAll:
     file: lib/Test/Code/TidyAll.pm
-    version: '0.74'
+    version: '0.75'
 recommends:
   Parallel::ForkManager: '0'
 requires:
@@ -181,10 +181,10 @@ resources:
   bugtracker: https://github.com/houseabsolute/perl-code-tidyall/issues
   homepage: http://metacpan.org/release/Code-TidyAll
   repository: git://github.com/houseabsolute/perl-code-tidyall.git
-version: '0.74'
+version: '0.75'
 x_Dist_Zilla:
   perl:
-    version: '5.026002'
+    version: '5.030001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -249,7 +249,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::VersionFromMainModule
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/VersionFromMainModule'
       version: '0.04'
@@ -296,7 +296,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/MetaProvides::Package'
       version: '2.004003'
@@ -470,9 +470,9 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 24
+          default_jobs: 16
       name: '@DROLSKY/DROLSKY::RunExtraTests'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
       name: '@DROLSKY/MojibakeTests'
@@ -510,12 +510,12 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::Contributors
       name: '@DROLSKY/DROLSKY::Contributors'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.20.1
+          git_version: 2.24.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -637,7 +637,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::WeaverConfig
       name: '@DROLSKY/DROLSKY::WeaverConfig'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -681,7 +681,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/InstallGuide'
       version: '1.200013'
@@ -692,7 +692,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@DROLSKY/CheckStrictVersion'
@@ -704,7 +704,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/CheckSelfDependency'
       version: '0.011'
@@ -716,10 +716,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.24.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::EnsureChangesHasContent
       name: '@DROLSKY/EnsureChangesHasContent'
@@ -742,7 +742,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.24.1
           repo_root: .
       name: '@DROLSKY/Git::Check'
       version: '2.046'
@@ -765,7 +765,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.24.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -778,11 +778,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.74
+          tag: v0.75
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.24.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -796,7 +796,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.24.1
           repo_root: .
       name: '@DROLSKY/Git::Push'
       version: '2.046'
@@ -825,7 +825,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.24.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -839,7 +839,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.24.1
           repo_root: .
       name: '@DROLSKY/Push version bump'
       version: '2.046'
@@ -850,12 +850,12 @@ x_Dist_Zilla:
           make_path: make
           version: '6.012'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.42'
+          version: '0.48'
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 24
+          default_jobs: 16
           version: '6.012'
       name: '@DROLSKY/DROLSKY::MakeMaker'
-      version: '1.01'
+      version: '1.05'
     -
       class: Dist::Zilla::Plugin::Prereqs::Soften
       config:
@@ -945,7 +945,6 @@ x_contributors:
   - 'Mark Grimes <mgrimes@cpan.org>'
   - 'Martin Gruner <martin.gruner@otrs.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-  - 'Nick Tonkin <1nickt@users.noreply.github.com>'
   - 'Nick Tonkin <ntonkin@bur-ntonkin-m1.corp.endurance.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Pedro Melo <melo@simplicidade.org>'
@@ -953,5 +952,5 @@ x_contributors:
   - 'Sergey Romanov <sromanov-dev@yandex.ru>'
   - 'Shlomi Fish <shlomif@shlomifish.org>'
   - 'timgimyee <tim.gim.yee@gmail.com>'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.30.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

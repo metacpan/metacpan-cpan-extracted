@@ -1,5 +1,3 @@
-// $Id: x07c.c 11289 2010-10-29 20:44:17Z airwin $
-//
 //      Font demo.
 //
 
@@ -8,6 +6,30 @@
 #endif
 
 #include "plcdemos.h"
+
+static int           plptex_mode;
+
+static PLOptionTable options[] = {
+    {
+        "plptex_mode",
+        NULL,
+        NULL,
+        &plptex_mode,
+        PL_OPT_BOOL,
+        "-plptex_mode",
+        "Replace normal plsym call by the largely equivalent plptex call for this example"
+    },
+    {
+        NULL,               // option
+        NULL,               // handler
+        NULL,               // client data
+        NULL,               // address of variable to set
+        0,                  // mode flag
+        NULL,               // short syntax
+        NULL                // long syntax
+    }
+};
+
 
 static int base[20] =
 { 0,     100,    0,  100,  200,  500,  600,  700,  800, 900,
@@ -20,7 +42,7 @@ static int base[20] =
 //--------------------------------------------------------------------------
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
     char  text[10];
     int   i, j, k, l;
@@ -28,7 +50,8 @@ main( int argc, const char *argv[] )
 
 // Parse and process command line arguments
 
-    (void) plparseopts( &argc, argv, PL_PARSE_FULL );
+    plMergeOpts( options, "x07c options", NULL );
+    plparseopts( &argc, argv, PL_PARSE_FULL );
 
 // Initialize plplot
 
@@ -73,8 +96,15 @@ main( int argc, const char *argv[] )
                 y = 0.95 - 0.1 * i;
 
                 // Display the symbols
-
-                plsym( 1, &x, &y, base[l] + k );
+                if ( plptex_mode )
+                {
+                    sprintf( text, "#(%1d)", base[l] + k );
+                    plptex( x, y, 1.0, 0.0, 0.5, text );
+                }
+                else
+                {
+                    plsym( 1, &x, &y, base[l] + k );
+                }
                 k = k + 1;
             }
         }

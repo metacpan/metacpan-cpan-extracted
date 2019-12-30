@@ -1,0 +1,8 @@
+Revision history for Perl extension Promise::XS:
+
+0.02 Mon Dec 30 2019
+    - Make then(), catch(), and finally() create objects in the same class
+      as the context object. Add documentation about subclassing.
+
+0.01 Sun Dec 29 2019
+    - Initial release

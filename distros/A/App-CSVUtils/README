@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.027 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2019-12-23.
+    This document describes version 0.028 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2019-12-28.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -1239,12 +1239,33 @@ FUNCTIONS
      Jerry,30
      Ben,30
 
-    You can also reverse the sort order ("-r"), sort case-insensitively
-    ("-i"), or provides the code ("--by-code", for example "--by-code
-    '$a->[1] <=> $b->[1] || $b->[0] cmp $a->[0]'" which is equivalent to
-    "--by-fields +age,~name"). If you use "--hash", your code will receive
-    the rows to be compared as hashref, e.g. `--hash --by-code '$a->{age}
-    <=> $b->{age} || $b->{name} cmp $a->{name}'.
+    You can also reverse the sort order ("-r") or sort case-insensitively
+    ("-i").
+
+    For more flexibility, instead of "--by-fields" you can use "--by-code":
+
+    Example output "--by-code '$a->[1] <=> $b->[1] || $b->[0] cmp $a->[0]'"
+    (which is equivalent to "--by-fields +age,~name"):
+
+     name,age
+     Dennis,15
+     Andy,20
+     Jerry,30
+     Ben,30
+
+    If you use "--hash", your code will receive the rows to be compared as
+    hashref, e.g. `--hash --by-code '$a->{age} <=> $b->{age} || $b->{name}
+    cmp $a->{name}'.
+
+    A third alternative is to sort using Sort::Sub routines. Example output
+    (using "--by-sortsub 'by_length<r>' --key '$_->[0]'", which is to say to
+    sort by descending length of name):
+
+     name,age
+     Dennis,15
+     Jerry,30
+     Andy,20
+     Ben,30
 
     This function is not exported.
 
@@ -1252,18 +1273,27 @@ FUNCTIONS
 
     *   by_code => *str|code*
 
-        Perl code to do sorting.
+        Sort using Perl code.
 
         $a and $b (or the first and second argument) will contain the two
-        rows to be compared.
+        rows to be compared. Which are arrayrefs; or if "--hash" ("-H") is
+        specified, hashrefs; or if "--key" is specified, whatever the code
+        in "--key" returns.
 
     *   by_fields => *str*
 
-        A comma-separated list of field sort specification.
+        Sort by a comma-separated list of field specification.
 
         "+FIELD" to mean sort numerically ascending, "-FIELD" to sort
         numerically descending, "FIELD" to mean sort ascibetically
         ascending, "~FIELD" to mean sort ascibetically descending.
+
+    *   by_sortsub => *str*
+
+        Sort using a Sort::Sub routine.
+
+        Usually combined with "--key" because most Sort::Sub routine expects
+        a string to be compared against.
 
     *   ci => *bool*
 
@@ -1287,7 +1317,22 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   key => *str|code*
+
+        Generate sort keys with this Perl code.
+
+        If specified, then will compute sort keys using Perl code and sort
+        using the keys. Relevant when sorting using "--by-code" or
+        "--by-sortsub". If specified, then instead of rows the
+        code/Sort::Sub routine will receive these sort keys to sort against.
+
+        The code will receive the row as the argument.
+
     *   reverse => *bool*
+
+    *   sortsub_args => *hash*
+
+        Arguments to pass to Sort::Sub routine.
 
     *   tsv => *bool*
 
@@ -1441,13 +1486,13 @@ SEE ALSO
 
     App::SerializeUtils
 
-    csvgrep.
-
-    csv-split.
-
     setop.
 
     csv-select-row.
+
+    csvgrep.
+
+    csv-split.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

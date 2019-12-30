@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet;
-$DBIx::Class::Helper::ResultSet::VERSION = '2.034001';
+$DBIx::Class::Helper::ResultSet::VERSION = '2.034002';
 # ABSTRACT: All the ResultSet Helpers in one place
 
 use parent qw{

@@ -1,0 +1,456 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/ScriptXUtils/list_scriptx_plugins
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
+
+our $DATE = '2019-12-25'; # DATE
+our $DIST = 'App-ScriptXUtils'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/ScriptXUtils/list_scriptx_plugins",
+    program_name => "list-scriptx-plugins",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: List locally installed ScriptX plugins
+# PODNAME: list-scriptx-plugins
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-scriptx-plugins - List locally installed ScriptX plugins
+
+=head1 VERSION
+
+This document describes version 0.001 of list-scriptx-plugins (from Perl distribution App-ScriptXUtils), released on 2019-12-25.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % list-scriptx-plugins [options] [query]
+
+=head1 DESCRIPTION
+
+REPLACE ME
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for dist options
+
+=over
+
+=item B<--dist-contains>=I<s>
+
+Only return records where the 'dist' field contains specified text.
+
+=item B<--dist-in-json>=I<s>
+
+Only return records where the 'dist' field is in the specified values (JSON-encoded).
+
+See C<--dist-in>.
+
+=item B<--dist-in>=I<s@>
+
+Only return records where the 'dist' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--dist-is>=I<s>
+
+Only return records where the 'dist' field equals specified value.
+
+=item B<--dist-isnt>=I<s>
+
+Only return records where the 'dist' field does not equal specified value.
+
+=item B<--dist-max>=I<s>
+
+Only return records where the 'dist' field is less than or equal to specified value.
+
+=item B<--dist-min>=I<s>
+
+Only return records where the 'dist' field is greater than or equal to specified value.
+
+=item B<--dist-not-contains>=I<s>
+
+Only return records where the 'dist' field does not contain specified text.
+
+=item B<--dist-not-in-json>=I<s>
+
+Only return records where the 'dist' field is not in the specified values (JSON-encoded).
+
+See C<--dist-not-in>.
+
+=item B<--dist-not-in>=I<s@>
+
+Only return records where the 'dist' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--dist-xmax>=I<s>
+
+Only return records where the 'dist' field is less than specified value.
+
+=item B<--dist-xmin>=I<s>
+
+Only return records where the 'dist' field is greater than specified value.
+
+=item B<--dist>=I<s>
+
+Only return records where the 'dist' field equals specified value.
+
+=back
+
+=head2 Filtering for plugin options
+
+=over
+
+=item B<--plugin-contains>=I<s>
+
+Only return records where the 'plugin' field contains specified text.
+
+=item B<--plugin-in-json>=I<s>
+
+Only return records where the 'plugin' field is in the specified values (JSON-encoded).
+
+See C<--plugin-in>.
+
+=item B<--plugin-in>=I<s@>
+
+Only return records where the 'plugin' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--plugin-is>=I<s>
+
+Only return records where the 'plugin' field equals specified value.
+
+=item B<--plugin-isnt>=I<s>
+
+Only return records where the 'plugin' field does not equal specified value.
+
+=item B<--plugin-max>=I<s>
+
+Only return records where the 'plugin' field is less than or equal to specified value.
+
+=item B<--plugin-min>=I<s>
+
+Only return records where the 'plugin' field is greater than or equal to specified value.
+
+=item B<--plugin-not-contains>=I<s>
+
+Only return records where the 'plugin' field does not contain specified text.
+
+=item B<--plugin-not-in-json>=I<s>
+
+Only return records where the 'plugin' field is not in the specified values (JSON-encoded).
+
+See C<--plugin-not-in>.
+
+=item B<--plugin-not-in>=I<s@>
+
+Only return records where the 'plugin' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--plugin-xmax>=I<s>
+
+Only return records where the 'plugin' field is less than specified value.
+
+=item B<--plugin-xmin>=I<s>
+
+Only return records where the 'plugin' field is greater than specified value.
+
+=item B<--plugin>=I<s>
+
+Only return records where the 'plugin' field equals specified value.
+
+=back
+
+=head2 Filtering for summary options
+
+=over
+
+=item B<--summary-contains>=I<s>
+
+Only return records where the 'summary' field contains specified text.
+
+=item B<--summary-in-json>=I<s>
+
+Only return records where the 'summary' field is in the specified values (JSON-encoded).
+
+See C<--summary-in>.
+
+=item B<--summary-in>=I<s@>
+
+Only return records where the 'summary' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-is>=I<s>
+
+Only return records where the 'summary' field equals specified value.
+
+=item B<--summary-isnt>=I<s>
+
+Only return records where the 'summary' field does not equal specified value.
+
+=item B<--summary-max>=I<s>
+
+Only return records where the 'summary' field is less than or equal to specified value.
+
+=item B<--summary-min>=I<s>
+
+Only return records where the 'summary' field is greater than or equal to specified value.
+
+=item B<--summary-not-contains>=I<s>
+
+Only return records where the 'summary' field does not contain specified text.
+
+=item B<--summary-not-in-json>=I<s>
+
+Only return records where the 'summary' field is not in the specified values (JSON-encoded).
+
+See C<--summary-not-in>.
+
+=item B<--summary-not-in>=I<s@>
+
+Only return records where the 'summary' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-xmax>=I<s>
+
+Only return records where the 'summary' field is less than specified value.
+
+=item B<--summary-xmin>=I<s>
+
+Only return records where the 'summary' field is greater than specified value.
+
+=item B<--summary>=I<s>
+
+Only return records where the 'summary' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-scriptx-plugins list-scriptx-plugins
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-scriptx-plugins 'p/*/`list-scriptx-plugins`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ScriptXUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ScriptXUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ScriptXUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

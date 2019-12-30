@@ -49,5 +49,5 @@ xtools/my-check-file-part-of.sh
 xtools/my-check-spelling.sh
 xtools/my-deb.sh
 xtools/my-manifest.sh
-xtools/my-pc.sh
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

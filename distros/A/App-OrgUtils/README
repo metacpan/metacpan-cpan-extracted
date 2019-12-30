@@ -2,8 +2,8 @@ NAME
     App::OrgUtils - Some utilities for Org documents
 
 VERSION
-    This document describes version 0.470 of App::OrgUtils (from Perl
-    distribution App-OrgUtils), released on 2018-06-30.
+    This document describes version 0.471 of App::OrgUtils (from Perl
+    distribution App-OrgUtils), released on 2020-12-30.
 
 DESCRIPTION
     This distribution includes a few modules (scripts) for dealing with Org
@@ -19,6 +19,8 @@ DESCRIPTION
     *   count-undone-org-todos
 
     *   dump-org-structure
+
+    *   dump-org-structure-tiny
 
     *   list-org-anniversaries
 
@@ -64,8 +66,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012,
-    2011 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013,
+    2012, 2011 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

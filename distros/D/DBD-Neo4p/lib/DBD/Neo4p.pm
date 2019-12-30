@@ -2,13 +2,13 @@ use v5.10.1;
 package DBD::Neo4p;
 use strict;
 use warnings;
-use REST::Neo4p 0.3010;
+use REST::Neo4p 0.3030;
 use JSON;
 require DBI;
 no warnings qw/once/;
 
 BEGIN {
- $DBD::Neo4p::VERSION = '0.1004';
+ $DBD::Neo4p::VERSION = '0.2001';
 }
 
 our $err = 0;               # holds error code   for DBI::err
@@ -64,12 +64,12 @@ sub connect($$;$$$) {
       $key = "${prefix}_$key" unless $key =~ /^${prefix}_/;
       $dbh->STORE($key, $value);
     }
-    my $db = delete $rhAttr->{"${prefix}_database"} || delete $rhAttr->{"${prefix}_db"};
+  my $db = delete $rhAttr->{"${prefix}_database"} || delete $rhAttr->{"${prefix}_db"} || $dbh->{neo_db};
     my $host = $dbh->FETCH("${prefix}_host") || 'localhost';
     my $port = $dbh->FETCH("${prefix}_port") || 7474;
     my $protocol = $dbh->FETCH("${prefix}_protocol") || 'http';
-    my $user =  delete $rhAttr->{Username} || $sUsr;
-    my $pass = delete $rhAttr->{Password} || $sAuth;
+    my $user =  delete $rhAttr->{Username} || $dbh->FETCH("${prefix}_user") || $sUsr;
+    my $pass = delete $rhAttr->{Password} || $dbh->FETCH("${prefix}_pass") || $sAuth;
     if (my $ssl_opts = delete $rhAttr->{SSL_OPTS}) {
       if (REST::Neo4p->agent->isa('LWP::UserAgent')) {
 	while (my ($k,$v) = each %$ssl_opts) {
@@ -89,7 +89,7 @@ sub connect($$;$$$) {
     # real connect...
 
     $db = "$protocol://$host:$port";
-    eval {
+  eval {
       REST::Neo4p->connect($db,$user,$pass);
     };
     if (my $e = Exception::Class->caught()) {
@@ -127,7 +127,8 @@ sub prepare {
 
 # cypher query parameters are given as tokens surrounded by curly braces:
 # crude count:
-    my @parms = $sStmt =~ /\{\s*([^}[:space:]]*)\s*\}/g;
+    my @parms = $sStmt =~ m/(?:{\s*([^}:[:space:]]*)\s*})|(?:[\$]([[:alnum:]_]+))/g;
+    @parms = map { $_ ? $_ : () } @parms; # squish undefs
     $sth->STORE('NUM_OF_PARAMS', scalar @parms);
     $sth->{"${prefix}_param_names"} = \@parms;
     $sth->{"${prefix}_param_values"} = [];
@@ -210,7 +211,7 @@ sub rollback ($) {
 
 sub ping {
   my $dbh = shift;
-  my $s = ($dbh->neo_neo4j_version =~ /^3\.0/ ? 'match (a) return a limit 1' :
+  my $s = ($dbh->neo_neo4j_version =~ /^[3-9]\.0/ ? 'match (a) return a limit 1' :
 	     'return 1');
   my $sth = $dbh->prepare($s) or return 0;
   $sth->execute or return 0;
@@ -260,10 +261,12 @@ sub type_info_all ($) {
 }
 
 sub disconnect ($) {
-    my ($dbh) = @_;
+  my ($dbh) = @_;
+  eval {
     REST::Neo4p->disconnect_handle($dbh->{"${prefix}_Handle"});
-    $dbh->STORE(Active => 0);
-    1;
+  };
+  $dbh->STORE(Active => 0);
+  1;
 }
 
 sub FETCH ($$) {
@@ -304,6 +307,7 @@ sub STORE ($$$) {
 
 sub DESTROY($) {
   my($dbh) = @_;
+  $dbh->disconnect;
   # deal with the REST::Neo4p object
 }
 
@@ -530,12 +534,11 @@ DBD::Neo4p - A DBI driver for Neo4j via REST::Neo4p
 =head1 SYNOPSIS
 
  use DBI;
- my $dbh = DBI->connect("dbi:Neo4p:http://127.0.0.1:7474;user=foo;pass=bar");
+ my $dbh = DBI->connect("dbi:Neo4p:db=http://127.0.0.1:7474;user=foo;pass=bar");
  my $q =<<CYPHER;
- START x = node:node_auto_index(name= { startName })
- MATCH path =(x-[r]-friend)
- WHERE friend.name = { name }
- RETURN TYPE(r)
+   MATCH path = (x)-[r]-(friend)
+   WHERE x.name = \$name1 and friend.name = \$name2
+   RETURN TYPE(r)
  CYPHER
  my $sth = $dbh->prepare($q);
  $sth->execute("I", "you"); # startName => 'I', name => 'you'
@@ -549,7 +552,7 @@ L<DBD::Neo4p> is a L<DBI>-compliant wrapper for L<REST::Neo4p::Query>
 that allows for the execution of Neo4j Cypher language queries against
 a L<Neo4j|http://neo4j.org> graph database.
 
-L<DBD::Neo4p> requires L<REST::Neo4p> v0.2220 or greater.
+L<DBD::Neo4p> requires L<REST::Neo4p> v0.3030 or greater.
 
 =head1 Functions
 
@@ -562,8 +565,6 @@ L<DBD::Neo4p> requires L<REST::Neo4p> v0.2220 or greater.
  my $dbh = DBI->connect("dbi:Neo4p:db=http://127.0.0.1:7474");
  $dbh = DBI->connect("dbi:Neo4p:host=127.0.0.1;port=7474");
  $dbh = DBI->connect("dbi:Neo4p:db=http://127.0.0.1:7474",$user,$pass);
- $dbh = DBI->connect("dbi:Neo4p:db=http://127.0.0.1:7474",
-                      { Username => 'me', Password => 's3kr1t'};
 
 =back
 
@@ -573,12 +574,13 @@ L<DBD::Neo4p> requires L<REST::Neo4p> v0.2220 or greater.
 
 =item prepare, prepare_cached
 
- $sth = $dbh->prepare("START n = node(0) RETURN n");
- $sth = $dbh->prepare("START n = node(0) MATCH n-()->m".
-                      "WHERE m.name = { name } RETURN m");
+ $sth = $dbh->prepare("MATCH (a {id:0}) RETURN n");
+ $sth = $dbh->prepare("MATCH (n)-->(m)".
+                      "WHERE m.name = \$name RETURN m");
 
 Prepare a Cypher language statement. In Cypher, parameters are named
-and surrounded by curly brackets.
+and begin with the dollar sign.
+
 
 The driver captures the parameters and treats them as numbered in the
 order they appear in the statement (per L<DBI> spec). An array of
@@ -605,9 +607,8 @@ can't handle transactions (per L<DBI> spec).
 =item type_info
 
 Not currently implemented. Neo4j is basically typeless, and does not
-have tables. In Neo4j version 2.0 servers, node labels and indexes
-allow a schema-like constraint system (see
-L<http://docs.neo4j.org/chunked/2.0.0-RC1/cypher-schema.html>).
+have tables. Node labels and indexes allow a schema-like constraint system (see
+L<https://neo4j.com/docs/cypher-manual/current/schema/>)
 
 =item neo_neo4j_version
 
@@ -712,12 +713,11 @@ L<REST::Neo4p>, L<REST::Neo4p::Query>, L<DBI>, L<DBI::DBD>
 
 =head1 COPYRIGHT
 
- (c) 2013-2015 by Mark A. Jensen
+ (c) 2013-2019 by Mark A. Jensen
 
 =head1 LICENSE
 
-Copyright (c) 2013-2015 Mark A. Jensen. This program is free software;
-you can redistribute it and/or modify it under the same terms as Perl
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl
 itself.
 
 =cut

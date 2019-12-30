@@ -13,6 +13,7 @@ in Makefile.PL
         test => {
             SRC => 't', # make all C files compile in 't' folder into separate SO file when 'make test'
                         # it's an XS::Install feature
+            NAME => 'MyTestMod', # name of second (test) module
         },
         ...
     );
@@ -25,9 +26,10 @@ in your C test files
 Run tests from perl .t file:
     
     use MyModule;
-    XS::Loader::load_tests(); # XS::Install's feature - loads second SO which contains code of C tests (not installed)
+    use Test::Catch; # should be loaded before you load your test SO
     
-    use Test::Catch;
+    XS::Loader::load_noboot('MyTestMod'); # or load() if you have and XS in test SO also
+    
     catch_run(); # or Test::Catch::run()
     catch_run("[tag]");
     done_testing();

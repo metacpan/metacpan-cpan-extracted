@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 
@@ -44,19 +44,18 @@ sub init {
 
   my $graph = _make_graph(\%params);
   $graph->set_graph_attribute (name => "Bi-Star $N,$M");
-  my $directed = $graph->is_directed;
+  my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
   my $from = 1;
   foreach my $size ($N, $M) {
     next unless $size;
     $graph->add_vertex($from);
     foreach my $add (1 .. $size-1) {
-      $graph->add_edges($from, $from+$add,
-                        ($directed ? ($from+$add, $from) : ()));
+      $graph->$add_edge($from, $from+$add);
     }
     $from += $size;
   }
   if ($N && $M) {
-    $graph->add_edge (1, 1+$N);
+    $graph->$add_edge (1, 1+$N);
   }
   return $graph;
 }

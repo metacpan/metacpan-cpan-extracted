@@ -1,11 +1,9 @@
-// $Id: x13c.c 11968 2011-10-14 07:12:16Z andrewross $
-//
 //      Pie chart demo.
 //
 
 #include "plcdemos.h"
 
-static const char *text[] =
+static PLCHAR_VECTOR text[] =
 {
     "Maurice",
     "Geoffrey",
@@ -21,7 +19,7 @@ static const char *text[] =
 //--------------------------------------------------------------------------
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
     int          i, j, dthet, theta0, theta1, theta;
     PLFLT        just, dx, dy;

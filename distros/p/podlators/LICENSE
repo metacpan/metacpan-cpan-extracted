@@ -9,6 +9,7 @@ Comment: This file documents the copyright statements and licenses for
 Files: *
 Copyright: 1999-2010, 2012-2019 Russ Allbery <rra@cpan.org>
   2000 Joe Smith <Joe.Smith@inwap.com>
+  2015-2017, 2019 Russ Allbery <eagle@eyrie.org>
   2016 Niko Tyni <ntyni@iki.fi>
 License: Perl
  This program is free software; you may redistribute it and/or modify it
@@ -29,12 +30,12 @@ License: all-permissive
  warranty.
 
 Files: t/docs/pod-spelling.t t/docs/pod.t t/docs/spdx-license.t
- t/docs/synopsis.t t/docs/urls.t t/lib/Test/RRA.pm t/lib/Test/RRA/Config.pm
+ t/docs/synopsis.t t/lib/Test/RRA.pm t/lib/Test/RRA/Config.pm
  t/lib/Test/RRA/ModuleVersion.pm t/style/minimum-version.t
- t/style/module-version.t t/style/strict.t
+ t/style/module-version.t t/style/obsolete-strings.t t/style/strict.t
 Copyright: 2012-2014
     The Board of Trustees of the Leland Stanford Junior University
-  2014-2016, 2018 Russ Allbery <eagle@eyrie.org>
+  2014-2016, 2018-2019 Russ Allbery <eagle@eyrie.org>
 License: Expat
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the

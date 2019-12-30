@@ -1,0 +1,59 @@
+{
+   "abstract" : "deferred subroutine syntax for futures",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4229",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Future-AsyncAwait-Frozen",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Refcount" : "0.09"
+         }
+      }
+   },
+   "provides" : {
+      "Future::AsyncAwait::Frozen" : {
+         "file" : "lib/Future/AsyncAwait/Frozen.pm",
+         "version" : "0.36"
+      },
+      "Future::AsyncAwait::Frozen::Awaitable" : {
+         "file" : "lib/Future/AsyncAwait/Frozen/Awaitable.pm",
+         "version" : "0.36"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_IRC" : "irc://irc.perl.org/#io-async"
+   },
+   "version" : "0.36",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

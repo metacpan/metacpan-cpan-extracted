@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x08 for the PLplot PDL binding
 #
 # 3-d plot demo
@@ -24,6 +22,8 @@
 
 # SYNC: x08c.c 1.45
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Math::Trig qw [pi];
@@ -31,16 +31,16 @@ use Math::Trig qw [pi];
 use Getopt::Long;
 
 use constant XPTS => 35;    # Data points in x
-use constant YPTS => 46;    # Data points in y
+use constant YPTS => 45;    # Data points in y
 
 use constant LEVELS => 10;
 
-@alt = (60.0, 20.0);
-@az = (30.0, 60.0);
+my @alt = (60.0, 40.0);
+my @az = (30.0, -30.0);
 
-@title = (
+my @title = (
   "#frPLplot Example 8 - Alt=60, Az=30",
-  "#frPLplot Example 8 - Alt=20, Az=60"
+  "#frPLplot Example 8 - Alt=40, Az=-30"
 );
 
 sub cmap1_init {
@@ -76,14 +76,20 @@ my $LEVELS = 10;
 
 # Parse and process command line arguments
 
+my $rosen;
 plParseOpts (\@ARGV, PL_PARSE_SKIP | PL_PARSE_NOPROGRAM);
-GetOptions ("sombrero" => \$sombrero);
+GetOptions ("rosen" => \$rosen);
 
 my $nlevel = LEVELS;
-my $rosen = 1;
-
-$rosen = 0
-  if $sombrero;
+my $indexxmin = 0;
+my $indexxmax = XPTS;
+# parameters of ellipse (in x, y index coordinates) that limits the data.
+# x0, y0 correspond to the exact floating point centre of the index range.
+my $x0 = 0.5 * ( XPTS - 1 );
+my $a  = 0.9 * $x0;
+my $y0 = 0.5 * ( YPTS - 1 );
+my $b  = 0.7 * $y0;
+my $sombrero = !$rosen;
 
 # Initialize plplot
 
@@ -114,12 +120,32 @@ for ($i = 0; $i < XPTS; $i++) {
       }
     }
     else {
-      $r = sqrt ($xx * $xx + $yy * $yy);
+      my $r = sqrt ($xx * $xx + $yy * $yy);
       $zz = exp (-$r * $r) * cos (2.0 * pi * $r);
     }
     $z->index ($i)->index ($j) .= $zz;
   }
 }
+
+sub mymin { $_[0] < $_[1] ? $_[0] : $_[1] }
+sub mymax { $_[0] > $_[1] ? $_[0] : $_[1] }
+
+my $zlimited = zeroes (XPTS, YPTS);
+my (@indexymin, @indexymax, @zlimited);
+for my $i ( $indexxmin..$indexxmax-1 ) {
+  my $square_root = sqrt( 1. - mymin( 1, ( ( $i - $x0 ) / $a ) ** 2 ) );
+  # Add 0.5 to find nearest integer and therefore preserve symmetry
+  # with regard to lower and upper bound of y range.
+  $indexymin[$i] = mymax( 0, ( 0.5 + $y0 - $b * $square_root ) );
+  # indexymax calculated with the convention that it is 1
+  # greater than highest valid index.
+  $indexymax[$i] = mymin( YPTS, 1 + ( 0.5 + $y0 + $b * $square_root ) );
+  for my $j ($indexymin[$i]..$indexymax[$i]-1) {
+    $zlimited->index($i)->index($j) .= $z->index($i)->index($j);
+  }
+}
+my $indexymin = pdl \@indexymin;
+my $indexymax = pdl \@indexymax;
 
 my $zmin = min ($z);
 my $zmax = max ($z);
@@ -129,7 +155,7 @@ my $clevel = $zmin + $step + $step * sequence ($nlevel);
 pllightsource (1., 1., 1.);
 
 for (my $k = 0; $k < 2; $k++) {
-  for (my $ifshade = 0; $ifshade < 4; $ifshade++) {
+  for (my $ifshade = 0; $ifshade < 5; $ifshade++) {
     pladv (0);
     plvpor (0.0, 1.0, 0.0, 0.9);
     plwind (-1.0, 1.0, -0.9, 1.1);
@@ -158,13 +184,17 @@ for (my $k = 0; $k < 2; $k++) {
     elsif ($ifshade == 2) {     # magnitude colored plot with faceted squares
       cmap1_init (0);
       plsurf3d ($x, $y, $z, MAG_COLOR | FACETED, pdl []);
-    } else {                  # magnitude colored plot with contours
+    } elsif ($ifshade == 3) {   # magnitude colored plot with contours
       cmap1_init (0);
       plsurf3d ($x, $y, $z, MAG_COLOR | SURF_CONT | BASE_CONT, $clevel);
+    } else {                  # magnitude colored plot with contours and index limits.
+      cmap1_init (0);
+      plsurf3dl(
+        $x, $y, $zlimited, MAG_COLOR | SURF_CONT | BASE_CONT, $clevel,
+        $indexxmin, $indexxmax, $indexymin, $indexymax,
+      );
     }
   }
 }
 
-
 plend ();
-

@@ -1,3 +1,26 @@
+(Current SPVM is on beta release)
+
+0.0444 2019-12-25
+  - remove SPVM::Errno for portability
+  - allow last camma in sub names, sub routine arguments definition
+  - remove no needed SPVM::IO::File::EOF
+  - rename SPVM::FileHandle to SPVM::IO::FileHandle
+  - rename chompr to chomp_lf
+  - add chomp_crlf
+  - add SPVM::IO::Stdout
+  - add SPVM::IO::Stderr
+  - rename native and exchange api new_barray to new_byte_array
+  - rename native and exchange api new_sarray to new_short_array
+  - rename native and exchange api new_iarray to new_int_array
+  - rename native and exchange api new_larray to new_long_array
+  - rename native and exchange api new_farray to new_float_array
+  - rename native and exchange api new_darray to new_double_array
+  - rename native and exchange api new_oarray to new_object_array
+  - rename native and exchange api new_marray to new_muldim_array
+  - rename native and exchange api new_varray to new_mulnum_array
+  - allow Foo contains use Foo.
+  - print become stateiment instead of function
+  - rename SPVM::IO::Select to SPVM::HTTP::Select, SPVM::IO::ClientSocketTCP to SPVM::HTTP::ClientSocketTCP
 0.0443 2019-11-08
   - warn become keyword and add file and line number to the last of the message.
   - rename many Native APIs

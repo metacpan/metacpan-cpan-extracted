@@ -8,12 +8,11 @@ use Test::EOL;
 
 my @files = (
     'bin/docmake',
+    'lib/App/Docmake.pm',
     'lib/App/XML/DocBook/Builder.pm',
     'lib/App/XML/DocBook/Docmake.pm',
     't/00-compile.t',
-    't/00-load.t',
-    't/01-use.t',
-    't/boilerplate.t'
+    't/01-use.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

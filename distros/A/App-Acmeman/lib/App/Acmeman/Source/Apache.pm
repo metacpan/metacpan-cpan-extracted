@@ -168,15 +168,21 @@ sub setup {
     my $www_root = $self->get(qw(core rootdir));
     debug(2, "writing $filename");
     unless ($args{dry_run}) {
-	unless ($self->mkpath($self->layout->incdir())) {
-	    return 0;
+	my $challenge_dir = "$www_root/.well-known/acme-challenge";
+	my $acme_dir = "/etc/ssl/acme";
+
+	foreach my $dir ($self->layout->incdir(), $challenge_dir, $acme_dir) {
+	    unless ($self->mkpath($dir)) {
+		return 0;
+	    }
 	}
+	
 	open(my $fd, '>', $filename)
 	    or croak "can't open \"$filename\" for writing: $!";
 	print $fd <<EOT;
 <Macro LetsEncryptChallenge>
-    Alias /.well-known/acme-challenge $www_root/.well-known/acme-challenge
-    <Directory $www_root/.well-known/acme-challenge>
+    Alias /.well-known/acme-challenge $challenge_dir
+    <Directory $challenge_dir>
         Options None
         Require all granted
     </Directory>
@@ -196,9 +202,9 @@ sub setup {
     SSLProtocol all -SSLv2 -SSLv3
     SSLHonorCipherOrder on
     SSLCipherSuite ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:!DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA
-    SSLCertificateFile /etc/ssl/acme/\$domain/cert.pem
-    SSLCertificateKeyFile /etc/ssl/acme/\$domain/privkey.pem
-    SSLCACertificateFile /etc/ssl/acme/lets-encrypt-x3-cross-signed.pem
+    SSLCertificateFile $acme_dir/\$domain/cert.pem
+    SSLCertificateKeyFile $acme_dir/\$domain/privkey.pem
+    SSLCACertificateFile $acme_dir/lets-encrypt-x3-cross-signed.pem
 </Macro>
 
 <Macro LetsEncryptServer \$domain>

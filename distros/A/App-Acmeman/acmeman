@@ -384,6 +384,30 @@ server (or whatever server is using the certificates). If more than one
 B<postrenew> statements are defined, they will be run in sequence, in the
 same order as they appeared in the configuration file.
 
+I<COMMAND> inherits the environment from the B<acmeman> process, with the
+following additional variables:
+
+=over 8
+
+=item ACMEMAN_CERTIFICATE_COUNT
+
+Total count of renewed certificate files.
+
+=item ACMEMAN_CERTIFICATE_FILE
+
+Whitespace-delimited list of renewed certificate files
+
+=item ACMEMAN_DOMAIN_NAME
+
+Whitespace-delimited list of renewed domain names (CNs).
+
+=item ACMEMAN_ALT_NAMES
+
+Whitespace-delimited list of alternative DNS names from the renewed
+certificate files.
+
+=back
+
 =item B<source=>I<NAME> [I<ARG>...]
 
 Defines the source of domain names. The I<NAME> parameter identifies the
@@ -506,6 +530,26 @@ setting is used.
 
 Run I<CMD> after successful update. If not given, the B<core.postrenew>
 commands will be run.
+
+I<CMD> is run in the environment inherited from the calling B<acmeman>
+process with the following additional variables defined:
+
+=over 8
+
+=item ACMEMAN_CERTIFICATE_FILE
+
+Name of the certificate file that was renewed.
+
+=item ACMEMAN_DOMAIN_NAME
+
+Domain name (CN) from the renewed certificate.
+
+=item ACMEMAN_ALT_NAMES
+
+Whitespace-delimited list of the alternative DNS names extracted from the
+certificate.
+
+=back
 
 =back
 

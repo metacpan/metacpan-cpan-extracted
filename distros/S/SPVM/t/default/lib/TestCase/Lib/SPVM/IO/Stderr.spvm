@@ -1,0 +1,9 @@
+package TestCase::Lib::SPVM::IO::Stderr {
+  use SPVM::IO::Stderr;
+
+  sub test_print : int () {
+    SPVM::IO::Stderr->print("Hello\n");
+    
+    return 1;
+  }
+}

@@ -30,62 +30,26 @@ MyTestHelpers::nowarnings();
 
 use Graph::Maker::ExcessConfigurations;
 
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
+use MyGraphs;
+
 plan tests => 2;
 
 
 #------------------------------------------------------------------------------
 
-
-sub num_maximal_paths {
-  my ($graph) = @_;
-  ### num_maximal_chains() ...
-  my @start = $graph->predecessorless_vertices;
-  @start==1 or die "no unique start";
-  my %ways = ($start[0] => 1);
-  my %pending;
-  my %indegree;
-  foreach my $v ($graph->vertices) {
-    $pending{$v} = 1;
-    $indegree{$v} = 0;
-  }
-  while (%pending) {
-    ### at pending: scalar(keys %pending)
-    my $progress;
-    foreach my $v (keys %pending) {
-      if ($indegree{$v} != $graph->in_degree($v)) {
-        ### not ready: "$v  indegree = $indegree{$v}"
-        ### assert: $indegree{$v} < $graph->in_degree($v)
-        next;
-      }
-      delete $pending{$v};
-      foreach my $to ($graph->successors($v)) {
-        ### edge: "$v to $to"
-        $pending{$to} or die "oops, to=$to not pending";
-        $ways{$to} += $ways{$v};
-        $indegree{$to}++;
-        $progress = 1;
-      }
-    }
-
-    if (%pending && !$progress) {
-      die "num_maximal_chains() oops, no progress";
-    }
-  }
-  ### return: $ways{$end[0]}
-  return sum(@ways{$graph->successorless_vertices});
-}
-
 # not in OEIS: 1,1,2,5,15,52,203,867,4026,20050
 #
 # MyOEIS::compare_values
-#   (anum => 'A??????',
+#   (anum => 'A000000',
 #    max_count => 10,
 #    func => sub {
 #      my ($count) = @_;
 #      my @got;
 #      for (my $N = 0; @got < $count; $N++) {
 #        my $graph = Graph::Maker->new('excess_configurations', N => $N);
-#        push @got, num_maximal_paths($graph);
+#        push @got, MyGraphs::Graph_num_maximal_paths($graph);
 #      }
 #      return \@got;
 #    });

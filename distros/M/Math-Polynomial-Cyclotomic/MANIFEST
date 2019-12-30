@@ -1,0 +1,17 @@
+CONTRIBUTING
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+examples/cyclo_poly
+lib/Math/Polynomial/Cyclotomic.pm
+t/01_basics.t
+t/90_pod.t
+t/91_pod_cover_cp.t
+t/92_consistency.t
+t/99_signature.t
+t/lib/Test/MyUtils.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

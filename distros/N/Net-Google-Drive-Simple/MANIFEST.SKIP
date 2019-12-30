@@ -9,3 +9,8 @@ adm/release
 .gz$
 MYMETA.json
 MYMETA.yml
+^samples/
+.DS_Store
+.travis.yml
+cpanfile
+README.md

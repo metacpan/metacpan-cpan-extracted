@@ -1,20 +1,29 @@
-0.018   2019-04-26 (PERLANCAR)
+0.019   2019-12-24  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Perinci::Sub::To::CLIDocData which shows
+          the more helpful --no-dry-run in help/POD for scripts that run in
+          dry-run mode by default (e.g. mysql-drop-all-tables).
+
+
+0.018   2019-04-26  Released-By: PERLANCAR
 
 	- mysql-fill-csv-columns-from-query: Add option --count (-c).
 
 
-0.017   2019-04-23 (PERLANCAR)
+0.017   2019-04-23  Released-By: PERLANCAR
 
 	- mysql-fill-csv-columns-from-query: Add option --header and --tsv
 	  (from App::CSVUtils).
 
 
-0.016   2019-04-15 (PERLANCAR)
+0.016   2019-04-15  Released-By: PERLANCAR
 
 	- Add utility: mysql-fill-csv-columns-from-query.
 
 
-0.015   2019-02-28 (PERLANCAR)
+0.015   2019-02-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -22,30 +31,30 @@
 	  not be shown in POD.
 
 
-0.014   2018-12-27 (PERLANCAR)
+0.014   2018-12-27  Released-By: PERLANCAR
 
 	- Add utility: mysql-drop-dbs.
 
 
-0.013   2018-12-05 (PERLANCAR)
+0.013   2018-12-05  Released-By: PERLANCAR
 
 	- Add utilities: mysql-find-identical-rows, mysql-copy-rows-adjust-pk.
 
 
-0.012   2018-11-06 (PERLANCAR)
+0.012   2018-11-06  Released-By: PERLANCAR
 
 	- [ux] mysql-sql-dump-extract-tables: add short option alias -I for
 	  --include-table, -X for --exclude-table, --pat for
 	  --include-table-pattern, --xpat for --exclude-table-pattern.
 
 
-0.011   2018-11-06 (PERLANCAR)
+0.011   2018-11-06  Released-By: PERLANCAR
 
 	- mysql-run-{sql,pl}-files: Add options --directory (-d) and
 	  --mkdir (-p).
 
 
-0.010   2017-10-25 (PERLANCAR)
+0.010   2017-10-25  Released-By: PERLANCAR
 
 	- mysql-sql-dump-extract-tables: Add option --dir, by default do not
 	  overwrite existing files, add option --overwrite.
@@ -53,19 +62,19 @@
 	- [Bugfix] Don't close(undef).
 
 
-0.009   2017-08-17 (PERLANCAR)
+0.009   2017-08-17  Released-By: PERLANCAR
 
 	- Add utility: mysql-run-pl-files.
 
 
-0.008   2017-07-03 (PERLANCAR)
+0.008   2017-07-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::ger.
 
 
-0.007   2017-06-17 (PERLANCAR)
+0.007   2017-06-17  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -73,7 +82,7 @@
           in the POD.
 
 
-0.006   2017-06-15 (PERLANCAR)
+0.006   2017-06-15  Released-By: PERLANCAR
 
 	- [Incompatible change] Rename script:
 	  mysql-split-sql-dump-per-table to mysql-sql-dump-extract-tables.
@@ -85,7 +94,7 @@
 	  -o, -O).
 
 
-0.005   2017-06-15 (PERLANCAR)
+0.005   2017-06-15  Released-By: PERLANCAR
 
 	- Add utility: mysql-run-sql-files.
 
@@ -93,21 +102,21 @@
 	  ~/.my.cnf.
 
 
-0.004   2017-06-14 (PERLANCAR)
+0.004   2017-06-14  Released-By: PERLANCAR
 
 	- Add utility: mysql-split-sql-dump-per-table.
 
 
-0.003   2016-12-23 (PERLANCAR)
+0.003   2016-12-23  Released-By: PERLANCAR
 
 	- Add utility: mysql-query.
 
 
-0.002   2016-12-15 (PERLANCAR)
+0.002   2016-12-15  Released-By: PERLANCAR
 
 	- Add utility: mysql-drop-tables.
 
 
-0.001   2016-12-15 (PERLANCAR)
+0.001   2016-12-15  Released-By: PERLANCAR
 
         - First release.

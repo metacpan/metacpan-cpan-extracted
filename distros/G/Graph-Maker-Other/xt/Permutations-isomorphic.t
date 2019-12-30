@@ -36,7 +36,8 @@ use Math::BaseCnv 'cnv';
 use Math::NumSeq::Catalan;
 use Math::NumSeq::BalancedBinary;
 
-use lib 'devel/lib';
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
 use Graph::Maker::Permutations;
 use MyGraphs;
 
@@ -54,15 +55,16 @@ my @rel_types
      'transpose_cyclic',
      'transpose_plus1',
      'onepos',
-     'cycle_append'
+     # 'cycle_append'
     );
-ok (scalar(@rel_types), 7);
+ok (scalar(@rel_types), 6);
 
 my @vertex_name_types
-  = ('perm', 'perm_inverse',
+  = ('perm',
+     # 'perm_inverse',
      'cycles',
     );
-ok (scalar(@vertex_name_types), 3);
+ok (scalar(@vertex_name_types), 2);
 
 
 #------------------------------------------------------------------------------
@@ -84,14 +86,13 @@ foreach my $N (4,5) {
     }
 
     # 10 different, per POD
-    ok (scalar(@rel_types),             7);
-    ok (scalar(keys %str_to_rel_types), 7);
-    ok (scalar(keys %g6_to_rel_types),  6);
+    ok (scalar(@rel_types),             6);
+    ok (scalar(keys %str_to_rel_types), 6);
+    ok (scalar(keys %g6_to_rel_types),  5);
 
     my @sames = sort map {join(' = ',@$_)} values %g6_to_rel_types;
     ok (join("\n",@sames),
-        "cycle_append
-onepos
+        "onepos
 transpose
 transpose_adjacent = transpose_plus1
 transpose_cover
@@ -136,9 +137,9 @@ transpose_cyclic");
         }
       }
     }
-    ok ($count, 11, 'HOG ID number lines');
+    ok ($count, 12, 'HOG ID number lines');
   }
-  ok (scalar(keys %shown), 32);
+  ok (scalar(keys %shown), 30);
   ### %shown
 
   my $extras = 0;

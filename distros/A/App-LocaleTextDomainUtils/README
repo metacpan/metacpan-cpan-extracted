@@ -1,0 +1,89 @@
+NAME
+    App::LocaleTextDomainUtils - Utilities related to Locale::TextDomain
+
+VERSION
+    This document describes version 0.001 of App::LocaleTextDomainUtils
+    (from Perl distribution App-LocaleTextDomainUtils), released on
+    2019-12-26.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   list-localedata-dirs
+
+    *   list-mo-files
+
+FUNCTIONS
+  list_localedata_dirs
+    Usage:
+
+     list_localedata_dirs(%args) -> any
+
+    Print list of LocaleData directories to be used to search for *.mo
+    files.
+
+    If search_dirs is specified, then will use search_dirs.
+
+    Otherwise, will use:
+
+     dist_dir($textdomain) + ("/locale", "/LocaleData")
+     @INC + "/LocaleData"
+     default ("/usr/share/locale" OR "/usr/local/share/locale") + "/LocaleData"
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   search_dirs => *array[str]*
+
+    *   textdomain => *str*
+
+    Return value: (any)
+
+  list_mo_files
+    Usage:
+
+     list_mo_files(%args) -> any
+
+    List .mo files.
+
+    Will look for inside each localedata dirs.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   search_dirs => *array[str]*
+
+    *   textdomain => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-LocaleTextDomainUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-LocaleTextDomainUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-LocaleTextDomainU
+    tils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Locale::TextDomain
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

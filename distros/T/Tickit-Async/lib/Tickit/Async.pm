@@ -8,16 +8,13 @@ package Tickit::Async;
 use strict;
 use warnings;
 use base qw( Tickit IO::Async::Notifier );
-Tickit->VERSION( '0.67' );
+Tickit->VERSION( '0.69' ); # Tickit::_Tickit->_new_with_evloop
 IO::Async::Notifier->VERSION( '0.43' ); # Need support for being a nonprinciple mixin
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use IO::Async::Loop 0.47; # ->run and ->stop methods
 use IO::Async::Stream;
-
-require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
 
 =head1 NAME
 
@@ -94,7 +91,26 @@ sub _make_tickit
    my $self = shift;
    my ( $term ) = @_;
 
-   return Tickit::Async::_new_tickit( $term, $self->get_loop );
+   my $loop = $self->get_loop;
+
+   my $signalid;
+
+   return Tickit::_Tickit->_new_with_evloop( $term,
+      sub { # init
+         $signalid = $loop->attach_signal( WINCH => $_[0] );
+      },
+      sub { # destroy
+         warn "TODO: destroy\n";
+      },
+      sub { $loop->run },
+      sub { $loop->stop },
+      sub { $loop->watch_io  ( handle => $_[0], on_read_ready => $_[1] ) },
+      sub { $loop->unwatch_io( handle => $_[0], on_read_ready => 1     ) },
+      sub { return $loop->watch_time( at => $_[0], code => $_[1] ) },
+      sub { $loop->unwatch_time( $_[0] ) },
+      sub { $loop->watch_idle( when => "later", code => $_[0] ) },
+      sub { warn "TODO: cancel idle" },
+   );
 }
 
 =head1 AUTHOR

@@ -1,0 +1,197 @@
+NAME
+    Org::Parser::Tiny - Parse Org documents with as little code (and no
+    non-core deps) as possible
+
+VERSION
+    This document describes version 0.001 of Org::Parser::Tiny (from Perl
+    distribution Org-Parser-Tiny), released on 2020-12-30.
+
+SYNOPSIS
+     use Org::Parser::Tiny;
+     my $orgp = Org::Parser::Tiny->new();
+
+     # parse a file
+     my $doc = $orgp->parse_file("$ENV{HOME}/todo.org");
+
+     # parse a string
+     $doc = $orgp->parse(<<EOF);
+     * this is a headline
+     * this is another headline
+     ** this is yet another headline
+     EOF
+
+    Dump document structure using Tree::Dump:
+
+     use Tree::Dump;
+     td($doc);
+
+    Select document nodes using Data::CSel:
+
+     use Data::CSel qw(csel);
+
+     # select headlines with "foo" in their title
+     my @nodes = csel(
+         {class_prefixes => ["Org::Parser::Tiny::Node"]},
+         "Headline[title =~ /foo/]"
+     );
+
+    Manipulate tree nodes with path-like semantic using Tree::FSLike:
+
+     use Tree::FSLike;
+     my $fs = Tree::FSLike->new(
+         tree => $doc,
+         gen_filename_method => sub { $_[0]->can("title") ? $_[0]->title : "$_[0]" },
+     );
+
+     # list nodes right above the root node
+     my @nodes = $fs->ls;
+
+     # use wildcard to list nodes
+     my @nodes = $fs->ls("*foo*");
+
+     # remove top-level headlines which have "foo" in their title
+     $fs->rm($doc, "/*foo*");
+
+DESCRIPTION
+    This module is a more lightweight alternative to <Org:Parser>. Currently
+    it is very simple and only parses headlines; thus it is several times
+    faster than Org::Parser. I use this to write utilities like
+    sort-org-headlines-tiny or to use it with Tree::FSLike.
+
+NODE CLASSES
+  Org::Parser::Tiny::Node
+    Base class.
+
+    Methods:
+
+    *   parent
+
+    *   children
+
+    *   as_string
+
+  Org::Parser::Tiny::Node::Document
+    Root node.
+
+    Methods:
+
+  Org::Parser::Tiny::Node::Headline
+    Root node.
+
+    Methods:
+
+    *   level
+
+        Integer.
+
+    *   title
+
+        Str.
+
+    *   is_todo
+
+        Whether headline has a done or undone todo state. For example, the
+        following headlines will have their is_todo() return true:
+
+         * TODO foo
+         * DONE bar
+
+    *   is_done
+
+        Whether headline has a done todo state. For example, the following
+        headlines will have their is_done() return true:
+
+         * DONE bar
+
+    *   todo_state
+
+        Todo state or empty string. For example, this headline:
+
+         * TODO foo
+
+        will have "TODO" as the todo_state, while:
+
+         * foo
+
+        will have "".
+
+    *   tags
+
+        Array of strings. For example, this headline:
+
+         * foo    :tag1:tag2:
+
+        will have its "tags()" return "["tag1","tag2"]", while this
+        headline:
+
+         * foo
+
+        will have its "tags()" return "[]".
+
+ATTRIBUTES
+METHODS
+  new
+    Usage:
+
+     my $orgp = Org::Parser::Tiny->new;
+
+    Constructor. Create a new parser instance.
+
+  parse
+    Usage:
+
+     my $doc = $orgp->parse($str | $arrayref | $coderef | $filehandle, \%opts);
+
+    Parse document (which can be contained in a $str, an array of lines
+    $arrayref, a $coderef which will be called for chunks until it returns
+    undef, or a $filehandle.
+
+    Returns a tree of node objects (of class "Org::Parser::Tiny::Node" and
+    its subclasses "Org::Parser::Tiny::Node::Document" and
+    "Org::Parser::Tiny::Node::Headline"). The tree node complies to
+    Role::TinyCommons::Tree::Node role, so these tools are available:
+    Data::CSel, Tree::Dump, Tree::FSLike, etc.
+
+    Will die if there are syntax errors in documents.
+
+    Known options:
+
+  parse_file
+    Usage:
+
+     my $doc = $orgp->parse_file($filename, \%opts);
+
+    Just like "parse", but will load document from file instead.
+
+    Known options (aside from those known by parse()):
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Org-Parser-Tiny>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Org-Parser-Tiny>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Org-Parser-Tiny>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Org::Parser, the more fully featured Org parser.
+
+    <https://orgmode.org>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

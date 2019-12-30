@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2018 Kevin Ryde
+# Copyright 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -20,6 +20,9 @@
 
 use strict;
 use 5.004;
+use File::Spec;
+use File::Slurp;
+use FindBin;
 use Test;
 # before warnings checking since Graph.pm 0.96 is not safe to non-numeric
 # version number from Storable.pm
@@ -31,10 +34,11 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Graph::Maker::Petersen;
 
-use lib 'devel/lib';
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
 use MyGraphs;
 
-plan tests => 7;
+plan tests => 9;
 
 
 #------------------------------------------------------------------------------
@@ -102,16 +106,27 @@ plan tests => 7;
 # POD HOG Shown
 
 {
-  my %shown = ('3,1' => 746,
-               '4,1' => 1022,  '4,2' => 588,
-               '5,2' => 660,
-               '7,2' => 28482,
-               '8,3' => 1229,
-               '9,3' => 6700,
-               '10,2' => 1043, '10,3' => 1036,
-               '11,2' => 24052,
-               '12,2' => 27325, '12,5' => 1234,
-              );
+  my %shown;
+  {
+    my $content = File::Slurp::read_file
+      (File::Spec->catfile($FindBin::Bin,
+                           File::Spec->updir,
+                           'lib','Graph','Maker','Petersen.pm'));
+    $content =~ /=head1 HOUSE OF GRAPHS.*?=head1/s or die;
+    $content = $&;
+    my $count = 0;
+    while ($content =~ /^ +(?<id>\d+) +N=(?<N>\d+), K=(?<K>\d+)/mg) {
+      $count++;
+      my $id = $+{'id'};
+      my $N  = $+{'N'};
+      my $K  = $+{'K'};
+      $shown{"N=$N,K=$K"} = $+{'id'};
+    }
+    ok ($count, 13, 'HOG ID number of lines');
+  }
+  ok (scalar(keys %shown), 13);
+  ### %shown
+
   my $extras = 0;
   my %seen;
   foreach my $N (3 .. 25) {
@@ -121,7 +136,7 @@ plan tests => 7;
       my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
       $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
       next if $seen{$g6_str}++;
-      my $key = "$N,$K";
+      my $key = "N=$N,K=$K";
       if (my $id = $shown{$key}) {
         MyGraphs::hog_compare($id, $g6_str);
       } else {

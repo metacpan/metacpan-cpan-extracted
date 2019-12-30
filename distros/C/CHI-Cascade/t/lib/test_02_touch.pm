@@ -13,36 +13,36 @@ sub test_cascade {
     isa_ok( $cascade, 'CHI::Cascade');
 
     $cascade->rule(
-	target		=> 'big_array',
-	code		=> sub {
-	    return [ 1 .. 1000 ];
-	}
+        target          => 'big_array',
+        code            => sub {
+            return [ 1 .. 1000 ];
+        }
     );
 
     $cascade->rule(
-	target		=> qr/^one_page_(\d+)$/,
-	depends		=> sub { isa_ok( $_[0], 'CHI::Cascade::Rule' ); ok( $_[1] =~ /^\d+$/o); [ 'big_array' ] },
-	code		=> sub {
-	    my ($rule) = @_;
+        target          => qr/^one_page_(\d+)$/,
+        depends         => sub { isa_ok( $_[0], 'CHI::Cascade::Rule' ); ok( $_[1] =~ /^\d+$/o); [ 'big_array' ] },
+        code            => sub {
+            my ($rule) = @_;
 
-	    my ($page) = $rule->target =~ /^one_page_(\d+)$/;
+            my ($page) = $rule->target =~ /^one_page_(\d+)$/;
 
-	    my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
-	    $ret;
-	}
+            my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
+            $ret;
+        }
     );
 
     $cascade->rule(
-	target		=> 'one_page_1',
-	depends		=> [ sub { isa_ok( $_[0], 'CHI::Cascade::Rule' ); 'big_array' } ],
-	code		=> sub {
-	    my ($rule) = @_;
+        target          => 'one_page_1',
+        depends         => [ sub { isa_ok( $_[0], 'CHI::Cascade::Rule' ); 'big_array' } ],
+        code            => sub {
+            my ($rule) = @_;
 
-	    my $page = 1;
+            my $page = 1;
 
-	    my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
-	    $ret;
-	}
+            my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
+            $ret;
+        }
     );
 
     ok( $cascade->{stats}{recompute} == 0, 'recompute stats - 1');

@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use Template::Constants;
 
-our $VERSION = 2.78;
+our $VERSION = '3.003';
 
 
 #------------------------------------------------------------------------
@@ -115,7 +115,7 @@ sub debug {
     my $msg  = join('', @_);
     my ($pkg, $file, $line) = caller();
 
-    unless ($msg =~ /\n$/) {
+    unless (substr($msg,-1) eq "\n") {
         $msg .= ($self->{ DEBUG } & Template::Constants::DEBUG_CALLER)
             ? " at $file line $line\n"
             : "\n";
@@ -138,6 +138,7 @@ sub module_version {
     return ${"${class}::VERSION"};
 }
 
+sub DESTROY { 1 } # noop
 
 1;
 

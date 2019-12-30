@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -30,6 +30,35 @@ use MyGraphs;
 # use Smart::Comments;
 
 
+{
+  # HOG searches
+  # 1,1,1 https://hog.grinvin.org/ViewGraphInfo.action?id=670  6-cycle
+  # 1,1,2 not
+  # 1,1,3 not
+  # 1,2,2 not
+  # 1,2,3 not
+  # 1,3,3 not
+  # 2,2,2 https://hog.grinvin.org/ViewGraphInfo.action?id=28529
+  # 2,2,3 not
+  # 2,3,3 not
+  # 3,3,3 https://hog.grinvin.org/ViewGraphInfo.action?id=28500
+
+  my @graphs;
+  foreach my $x (1 .. 6) {
+    foreach my $y ($x .. 6) {
+      foreach my $z ($y .. 6) {
+        my $graph = Graph::Maker->new('hex_grid', dims=>[$x,$y,$z],
+                                      undirected=>1);
+        my $num_vertices = $graph->vertices;
+        my $num_edges    = $graph->edges;
+        print "$x,$y,$z  $num_vertices $num_edges\n";
+        push @graphs, $graph;
+      }
+    }
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
 {
   my $graph = Graph::Maker->new('hex_grid', dims => [3,3,3],
                                 undirected => 1);
@@ -77,35 +106,7 @@ use MyGraphs;
 
   exit 0;
 }
-{
-  # HOG searches
-  # 1,1,1 https://hog.grinvin.org/ViewGraphInfo.action?id=670  6-cycle
-  # 1,1,2 not
-  # 1,1,3 not
-  # 1,2,2 not
-  # 1,2,3 not
-  # 1,3,3 not
-  # 2,2,2 not (Gosper island)
-  # 2,2,3 not
-  # 2,3,3 not
-  # 3,3,3 https://hog.grinvin.org/ViewGraphInfo.action?id=28500
 
-  my @graphs;
-  foreach my $x (1 .. 3) {
-    foreach my $y ($x .. 3) {
-      foreach my $z ($y .. 3) {
-        my $graph = Graph::Maker->new('hex_grid', dims=>[$x,$y,$z],
-                                      undirected=>1);
-        my $num_vertices = $graph->vertices;
-        my $num_edges    = $graph->edges;
-        print "$x,$y,$z  $num_vertices $num_edges\n";
-        push @graphs, $graph;
-      }
-    }
-  }
-  MyGraphs::hog_searches_html(@graphs);
-  exit 0;
-}
 
 
 {

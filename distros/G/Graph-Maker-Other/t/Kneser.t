@@ -29,7 +29,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 50;
+plan tests => 85;
 
 require Graph::Maker::Kneser;
 
@@ -58,7 +58,7 @@ ok (binomial(4,4), 1);
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::Kneser::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Kneser->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Kneser->VERSION($want_version); 1 }, 1,
@@ -86,11 +86,28 @@ foreach my $N (1 .. 7) {
 #------------------------------------------------------------------------------
 # Kneser N,1 is complete-N, same vertex numbers too
 
+# triangular numbers
+sub T {
+  my ($n) = @_;
+  return $n*($n-1)/2;
+}
+
 require Graph::Maker::Complete;
 foreach my $N (2 .. 6) {
-  my $Kneser  = Graph::Maker->new('Kneser', N=>$N, K=>1);
-  my $complete = Graph::Maker->new('complete', N=>$N);
-  ok ($Kneser eq $complete, 1);
+  foreach my $undirected (0, 1) {
+    foreach my $multiedged (0, 1) {
+      my $Kneser  = Graph::Maker->new('Kneser', N=>$N, K=>1,
+                                      undirected => $undirected,
+                                      multiedged => $multiedged);
+      my $complete = Graph::Maker->new('complete', N=>$N,
+                                       undirected => $undirected,
+                                       multiedged => $multiedged);
+      ok ($Kneser eq $complete, 1);
+
+      my $num_edges = $Kneser->edges;
+      ok ($num_edges, T($N) * ($undirected ? 1 : 2));
+    }
+  }
 }
 
 

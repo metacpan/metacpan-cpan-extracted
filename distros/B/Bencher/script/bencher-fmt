@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '1.041'; # VERSION
+our $DATE = '2019-12-24'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,7 +54,7 @@ bencher-fmt - Format bencher result
 
 =head1 VERSION
 
-This document describes version 1.041 of bencher-fmt (from Perl distribution Bencher), released on 2018-04-03.
+This document describes version 1.043 of bencher-fmt (from Perl distribution Bencher), released on 2019-12-24.
 
 =head1 SYNOPSIS
 
@@ -88,17 +88,15 @@ See C<--options>.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -260,7 +258,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

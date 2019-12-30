@@ -1,5 +1,40 @@
                       User-Visible podlators Changes
 
+podlators 4.13 (2019-12-25)
+
+    Drop support for Perl 5.6.  The minimum supported version is now Perl
+    5.8.  Perl 5.6 had not been tested even by CPAN Testers in some time
+    and isn't supported by Travis-CI, so true support is dubious.
+    Dropping that version allows cleaning up some old compatibility code.
+
+    Fix a warning when outputing to something without a PerlIO layer, such
+    as when output_string is used.
+
+    [Pod::Text] Fix behavior of S<> with Unicode input to be consistent
+    with behavior with a default encoding, namely treat all whitespace
+    inside S<> as non-space characters and do not collapse it with
+    adjacent whitespace.
+
+    [Pod::Text::Termcap] Remove an ancient workaround that set the
+    TERMPATH environment variable whenever a Pod::Text::Termcap object was
+    created in order to add /usr/share/lib/termcap, necessary on some
+    ancient Solaris systems.  Setting environment variables is bad
+    behavior for a module, and the Solaris systems requiring this
+    workaround are long obsolete.
+
+    [Pod::Text::Termcap] Remove the fallback to VT100 escape sequences if
+    Term::Cap was not able to find sequences for bold, underline, or
+    normal text, and instead skip that part of the formatting.  This will
+    produce more correct behavior on dumb terminals at the possible cost
+    of losing formatting on systems with malfunctioning terminal
+    databases, which seems like an improvement.  Thanks, Zenin.  (#131124)
+
+    Further improve the man/no-encode.t test to not care whether Encode
+    was already loaded or not.  Thanks, Martin Becker.
+
+    Improve logic for showing large test failures to avoid spurious
+    failures on systems without diff.
+
 podlators 4.12 (2019-05-31)
 
     Skip the man/no-encode.t test if Encode is already loaded while

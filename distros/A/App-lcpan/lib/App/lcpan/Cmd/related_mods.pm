@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::related_mods;
 
-our $DATE = '2019-10-05'; # DATE
-our $VERSION = '1.041'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 use 5.010;
 use strict;
@@ -51,7 +51,7 @@ _
 sub handle_cmd {
     my %args = @_;
 
-    my $state = App::lcpan::_init(\%args, 'rw');
+    my $state = App::lcpan::_init(\%args, 'ro');
     my $dbh = $state->{dbh};
 
     my $modules = $args{modules};
@@ -141,7 +141,7 @@ App::lcpan::Cmd::related_mods - List other modules related to module(s)
 
 =head1 VERSION
 
-This document describes version 1.041 of App::lcpan::Cmd::related_mods (from Perl distribution App-lcpan), released on 2019-10-05.
+This document describes version 1.043 of App::lcpan::Cmd::related_mods (from Perl distribution App-lcpan), released on 2019-11-29.
 
 =head1 FUNCTIONS
 

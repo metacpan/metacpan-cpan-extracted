@@ -57,6 +57,9 @@ public:
         }
     };
 
+    template<typename T>
+    using add_const_ref_t = typename std::conditional<std::is_reference<T>::value, T, const T&>::type;
+
     using CallbackList = owning_list<Wrapper>;
 
     struct Event {
@@ -65,9 +68,8 @@ public:
 
         Event (const Event& oth) = delete;
 
-        template <typename... RealArgs>
-        OptionalRet next (RealArgs&&... args) {
-            return dispatcher.next(*this, std::forward<RealArgs>(args)...);
+        OptionalRet next (add_const_ref_t<Args>... args) {
+            return dispatcher.next(*this, args...);
         }
     };
 
@@ -97,13 +99,12 @@ public:
 
     template <class T> void add_back (T&& callback) { add(std::forward<T>(callback), true); }
 
-    template <typename... RealArgs >
-    auto operator() (RealArgs&&... args) -> decltype(std::declval<Wrapper>()(std::declval<Event&>(), args...)) {
+    auto operator() (add_const_ref_t<Args>... args) -> decltype(std::declval<Wrapper>()(std::declval<Event&>(), args...)) {
         auto iter = listeners.begin();
         if (iter == listeners.end()) return optional_type<Ret>::default_value();
 
         Event e{*this, iter};
-        return (*iter)(e, std::forward<RealArgs>(args)...);
+        return (*iter)(e, args...);
     }
 
     template <typename SmthComparable>

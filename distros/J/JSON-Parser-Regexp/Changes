@@ -1,0 +1,6 @@
+Revision history for Perl extension JSON::Parser::Regexp.
+
+0.01  Thu Dec 19 19:42:39 2019
+	- original version; created by h2xs 1.23 with options
+		-Xn JSON::Parser::Regexp
+

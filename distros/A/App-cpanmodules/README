@@ -2,11 +2,16 @@ NAME
     App::cpanmodules - The Acme::CPANModules CLI
 
 VERSION
-    This document describes version 0.002 of App::cpanmodules (from Perl
-    distribution App-cpanmodules), released on 2019-01-15.
+    This document describes version 0.003 of App::cpanmodules (from Perl
+    distribution App-cpanmodules), released on 2019-11-19.
 
 SYNOPSIS
     Use the included script cpanmodules.
+
+OBSERVED CPANMODULES PROPERTIES/ATTRIBUTES
+  x.app.cpanmodules.show_entries
+    Boolean. Default is true. If set to false, will not show entries in the
+    generated POD's Description.
 
 FUNCTIONS
   get_acmemod

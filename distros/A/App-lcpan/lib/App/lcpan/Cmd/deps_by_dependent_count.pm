@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::deps_by_dependent_count;
 
-our $DATE = '2019-10-05'; # DATE
-our $VERSION = '1.041'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 use 5.010;
 use strict;
@@ -148,7 +148,7 @@ App::lcpan::Cmd::deps_by_dependent_count - List dependencies, sorted by number o
 
 =head1 VERSION
 
-This document describes version 1.041 of App::lcpan::Cmd::deps_by_dependent_count (from Perl distribution App-lcpan), released on 2019-10-05.
+This document describes version 1.043 of App::lcpan::Cmd::deps_by_dependent_count (from Perl distribution App-lcpan), released on 2019-11-29.
 
 =head1 FUNCTIONS
 
@@ -203,7 +203,7 @@ using the C<index_name>.
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.30.0")
 
 Set base Perl version for determining core modules.
 

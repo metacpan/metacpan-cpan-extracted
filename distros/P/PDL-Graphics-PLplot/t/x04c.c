@@ -1,5 +1,3 @@
-// $Id: x04c.c 12319 2013-05-01 21:51:24Z airwin $
-//
 //      Log plot demo.
 //
 
@@ -14,7 +12,7 @@ void plot1( int type );
 //--------------------------------------------------------------------------
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
 // Parse and process command line arguments
 
@@ -43,19 +41,19 @@ main( int argc, const char *argv[] )
 void
 plot1( int type )
 {
-    int          i;
-    static PLFLT freql[101], ampl[101], phase[101];
-    PLFLT        f0, freq;
-    PLINT        nlegend;
-    const char   *text[2], *symbols[2];
-    PLINT        opt_array[2];
-    PLINT        text_colors[2];
-    PLINT        line_colors[2];
-    PLINT        line_styles[2];
-    PLFLT        line_widths[2];
-    PLINT        symbol_numbers[2], symbol_colors[2];
-    PLFLT        symbol_scales[2];
-    PLFLT        legend_width, legend_height;
+    int           i;
+    static PLFLT  freql[101], ampl[101], phase[101];
+    PLFLT         f0, freq;
+    PLINT         nlegend;
+    PLCHAR_VECTOR text[2], symbols[2];
+    PLINT         opt_array[2];
+    PLINT         text_colors[2];
+    PLINT         line_colors[2];
+    PLINT         line_styles[2];
+    PLFLT         line_widths[2];
+    PLINT         symbol_numbers[2], symbol_colors[2];
+    PLFLT         symbol_scales[2];
+    PLFLT         legend_width, legend_height;
 
     pladv( 0 );
 
@@ -111,7 +109,7 @@ plot1( int type )
         plbox( "", 0.0, 0, "cmstv", 30.0, 3 );
         plcol0( 3 );
         plline( 101, freql, phase );
-        plstring( 101, freql, phase, "*" );
+        plstring( 101, freql, phase, "#(728)" );
         plcol0( 3 );
         plmtex( "r", 5.0, 0.5, 0.5, "Phase shift (degrees)" );
         nlegend = 2;
@@ -125,7 +123,10 @@ plot1( int type )
     line_styles[0] = 1;
     line_widths[0] = 1.;
     // note from the above opt_array the first symbol (and box) indices
-    // do not have to be specified
+    // do not have to be specified, at least in C. For Fortran we need
+    // to set the symbols to be something, since the string is always
+    // copied as part of the bindings.
+    symbols[0] = "";
 
     // Second legend entry.
     opt_array[1]      = PL_LEGEND_LINE | PL_LEGEND_SYMBOL;
@@ -137,7 +138,7 @@ plot1( int type )
     symbol_colors[1]  = 3;
     symbol_scales[1]  = 1.;
     symbol_numbers[1] = 4;
-    symbols[1]        = "*";
+    symbols[1]        = "#(728)";
     // from the above opt_arrays we can completely ignore everything
     // to do with boxes.
 

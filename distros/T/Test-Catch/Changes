@@ -1,3 +1,7 @@
+1.0.10  30.12.2019
+         - docs update
+1.0.9   30.12.2019
+         - do not remove \n in log expressions, instead replace \n and \r with printable sequence
 1.0.8   31.07.2019
          - fix requirements: we need at least 1.302096 Test::Simple
 1.0.7   15.07.2019

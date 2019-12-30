@@ -3,7 +3,7 @@ package Ryu::Node;
 use strict;
 use warnings;
 
-our $VERSION = '1.009'; # VERSION
+our $VERSION = '1.010'; # VERSION
 
 =head1 NAME
 

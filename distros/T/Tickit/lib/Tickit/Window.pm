@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010; # //
 
-our $VERSION = '0.68';
+our $VERSION = '0.69';
 
 use Carp;
 

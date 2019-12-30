@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-01-15'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-11-19'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,7 @@ cpanmodules - The Acme::CPANModules CLI
 
 =head1 VERSION
 
-This document describes version 0.002 of cpanmodules (from Perl distribution App-cpanmodules), released on 2019-01-15.
+This document describes version 0.003 of cpanmodules (from Perl distribution App-cpanmodules), released on 2019-11-19.
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

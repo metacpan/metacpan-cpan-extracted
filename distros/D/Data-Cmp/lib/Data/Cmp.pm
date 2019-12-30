@@ -1,7 +1,7 @@
 package Data::Cmp;
 
-our $DATE = '2018-12-06'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-11-18'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -104,7 +104,7 @@ Data::Cmp - Compare two data structures, return -1/0/1 like cmp
 
 =head1 VERSION
 
-This document describes version 0.006 of Data::Cmp (from Perl distribution Data-Cmp), released on 2018-12-06.
+This document describes version 0.007 of Data::Cmp (from Perl distribution Data-Cmp), released on 2019-11-18.
 
 =head1 SYNOPSIS
 
@@ -167,7 +167,7 @@ The following are the rules of comparison used by C<cmp_data()>:
  cmp_data(bless([], "foo"), bless([], "bar")); # 2
  cmp_data(bless([], "foo"), bless([], "foo")); # 0
 
-=item * Two array references are compared element by element (unless an array has been seen, see last rule)
+=item * Two array references are compared element by element (unless at least one of the arrayref has been seen, in which case see last rule)
 
  cmp_data(["a","b","c"], ["a","b","c"]); #  0
  cmp_data(["a","b","c"], ["a","b","d"]); # -1
@@ -177,10 +177,10 @@ The following are the rules of comparison used by C<cmp_data()>:
 
  cmp_data(["a","b"], ["a"]); # 1
 
-=item * Two hash references are compared key by key (unless an array has been seen, see last rule)
+=item * Two hash references are compared key by key (unless at least one of the hashref has been seen, in which case see last rule)
 
- cmp_data({k1=>"a", k2=>"b", k3=>"c"}, {k1=>"a", k2=>"b", k3=>"d"}); # 0
- cmp_data({k1=>"a", k2=>"b", k3=>"c"}, {k1=>"a", k2=>"b", k3=>"c"}); # 1
+ cmp_data({k1=>"a", k2=>"b", k3=>"c"}, {k1=>"a", k2=>"b", k3=>"c"}); # 0
+ cmp_data({k1=>"a", k2=>"b", k3=>"c"}, {k1=>"a", k2=>"b", k3=>"d"}); # 1
 
 =item * When two hash references share a common subset of pairs but have non-common pairs, the greater hashref is the one that has more non-common pairs
 
@@ -190,7 +190,7 @@ If the number of non-common pairs are the same, they are just different.
  cmp_data({k1=>"", k2=>"", k3=>""}, {k1=>"", k5=>"", k6=>"});         #  2
  cmp_data({k1=>"", k2=>"", k3=>""}, {k1=>"", k5=>"", k6=>", k7=>""}); # -1
 
-=item * All other types of references (i.e. non-hash, non-array) are the same only if their address is
+=item * All other types of references (i.e. non-hash, non-array) are the same only if their address is the same
 
  cmp_data(\1, \1); # 2
  my $ref = \1; cmp_data($ref, $ref); # 0
@@ -200,7 +200,7 @@ If the number of non-common pairs are the same, they are just different.
  my $ary1 = [1]; push @$ary1, $ary1;
  my $ary2 = [1]; push @$ary2, $ary2;
  my $ary3 = [1]; push @$ary3, $ary1;
- cmp_data($ary1, $ary2); # 1
+ cmp_data($ary1, $ary2); # 2
  cmp_data($ary1, $ary3); # 0
 
 =back
@@ -264,7 +264,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

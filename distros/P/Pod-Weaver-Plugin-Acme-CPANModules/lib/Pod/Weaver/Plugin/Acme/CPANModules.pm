@@ -1,7 +1,9 @@
 package Pod::Weaver::Plugin::Acme::CPANModules;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-24'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-Acme-CPANModules'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -28,6 +30,18 @@ sub _process_module {
         require $package_pm;
     }
 
+    my $list = ${"$package\::LIST"};
+    my $has_benchmark = 0;
+  L1:
+    for my $entry (@{ $list->{entries} }) {
+        if (grep {/^bench_/} keys %$entry) {
+            $has_benchmark = 1;
+            last L1;
+        }
+    }
+
+    (my $ac_name = $package) =~ s/\AAcme::CPANModules:://;
+
     my $res = gen_pod_from_acme_cpanmodules(
         module => $package,
         _raw=>1,
@@ -52,6 +66,48 @@ sub _process_module {
         {after_section => ['DESCRIPTION']
      },
     );
+
+    # add FAQ section
+    {
+        my @pod;
+        push @pod,
+q(=head2 What are ways to use this module?
+
+Aside from reading it, you can install all the listed modules using
+L<cpanmodules>:
+
+    % cpanmodules ls-entries ).$ac_name.q( | cpanm -n
+
+or L<Acme::CM::Get>:
+
+    % perl -MAcme::CM::Get=).$ac_name.q( -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+);
+        if ($has_benchmark) {
+            push @pod,
+q(This module contains benchmark instructions. You can run a benchmark
+for some/all the modules listed in this Acme::CPANModules module using
+L<bencher>:
+
+    % bencher --cpanmodules-module ).$ac_name.q(
+
+);
+        }
+
+        push @pod,
+q(This module also helps L<lcpan> produce a more meaningful result for C<lcpan
+related-mods> when it comes to finding related modules for the modules listed
+in this Acme::CPANModules module.
+
+);
+        $self->add_text_to_section(
+            $document, join("", @pod), 'FAQ',
+            {
+                after_section => ['COMPLETION', 'DESCRIPTION'],
+                before_section => ['CONFIGURATION FILE', 'CONFIGURATION FILES'],
+                ignore => 1,
+            });
+    }
 
     $self->log(["Generated POD for '%s'", $filename]);
 }
@@ -83,7 +139,7 @@ Pod::Weaver::Plugin::Acme::CPANModules - Plugin to use when building Acme::CPANM
 
 =head1 VERSION
 
-This document describes version 0.002 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2018-01-09.
+This document describes version 0.003 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2019-12-24.
 
 =head1 SYNOPSIS
 
@@ -137,7 +193,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

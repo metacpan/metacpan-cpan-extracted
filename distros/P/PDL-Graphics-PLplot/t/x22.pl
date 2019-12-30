@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x22 for the PLplot PDL binding
 #
 # Simple vector plot example
@@ -24,6 +22,8 @@
 
 # SYNC: x22c.c 1.8
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Math::Trig qw [pi];
@@ -79,6 +79,7 @@ sub circulation {
 # Vector plot of flow through a constricted pipe
 #
 sub constriction {
+    my ($astyle) = @_;
 
     my $nx = nx;
     my $ny = ny;
@@ -95,28 +96,75 @@ sub constriction {
     my $y = ((sequence($ny)-int($ny/2)+0.5)*$dy)->dummy(0,$nx);
     my $cgrid2 = plAlloc2dGrid($x, $y);
 
-    my $u;
-    my $v;
-    
     my $Q = 2.0;
     my $b = $ymax/4.0*(3-cos(pi*$x/$xmax));
-    my $dbdx = $ymax/4.0*sin(pi*$x/$xmax)*$y/$b;
-    $u = $Q*4*$ymax/$b;
-    $v = $dbdx*$u;
+    my $dbdx = $ymax/4.0*sin(pi*$x/$xmax)*pi/$xmax*$y/$b;
+    my $u = $Q*4*$ymax/$b;
+    my $v = $dbdx*$u;
     $u->where(abs($y)>=$b) .= 0;
     $v->where(abs($y)>=$b) .= 0;
 
     plenv($xmin, $xmax, $ymin, $ymax, 0, 0);
-    pllab("(x)", "(y)", "#frPLplot Example 22 - constriction");
+    pllab("(x)", "(y)", "#frPLplot Example 22 - constriction (arrow style $astyle)");
     plcol0(2);
-    plvect($u,$v,-0.5,\&pltr2,$cgrid2);
+    plvect($u,$v,-1.0,\&pltr2,$cgrid2);
     plcol0(1);
-
 }
 
+# Global transform function for a constriction using data passed in
+# This is the same transformation used in constriction.
+sub transform {
+    my ($x, $y, $xmax) = @_;
+    return ($x, $y / 4.0 * ( 3 - cos( pi * $x / $xmax ) ));
+}
+
+# Vector plot of flow through a constricted pipe
+# with a coordinate transform
+sub constriction2 {
+    my $nx = nx;
+    my $ny = ny;
+    my $nc   = 11;
+    my $nseg = 20;
+
+    my $dx = 1.0;
+    my $dy = 1.0;
+
+    my $xmin = -$nx / 2 * $dx;
+    my $xmax = $nx / 2 * $dx;
+    my $ymin = -$ny / 2 * $dy;
+    my $ymax = $ny / 2 * $dy;
+
+    plstransform( \&transform, $xmax );
+
+    my $x = ((sequence($nx)-int($nx/2)+0.5)*$dx)->dummy(1,$ny);
+    my $y = ((sequence($ny)-int($ny/2)+0.5)*$dy)->dummy(0,$nx);
+    my $cgrid2 = plAlloc2dGrid($x, $y);
+
+    my $Q = 2.0;
+    my $b = $ymax/4.0*(3-cos(pi*$x/$xmax));
+    my $dbdx = $ymax/4.0*sin(pi*$x/$xmax)*pi/$xmax*$y/$b;
+    my $u = $Q*$ymax/$b;
+    my $v = zeroes($nx, $ny);
+
+    my $clev = (sequence($nc) * $Q / ($nc - 1)) + $Q;
+
+    plenv($xmin, $xmax, $ymin, $ymax, 0, 0);
+    pllab( "(x)", "(y)", "#frPLplot Example 22 - constriction with plstransform" );
+    plcol0( 2 );
+    plshades( $u,
+        $xmin + $dx / 2, $xmax - $dx / 2, $ymin + $dy / 2, $ymax - $dy / 2,
+        $clev, 0.0, 1, 1.0, 0, 0, 0, 0 );
+    plvect($u,$v,-1.0,\&pltr2,$cgrid2);
+    # Plot edges using plpath (which accounts for coordinate transformation) rather than plline
+    plpath( $nseg, $xmin, $ymax, $xmax, $ymax );
+    plpath( $nseg, $xmin, $ymin, $xmax, $ymin );
+    plcol0( 1 );
+
+    plstransform( undef, undef );
+}
 
 sub f2mnmx {
-  $f = shift;
+  my $f = shift;
   my $fmin = min ($f);
   my $fmax = max ($f);
   return ($fmin, $fmax);
@@ -213,13 +261,19 @@ circulation();
 # plot using these arrows.
 my $fill = 0;
 plsvect($arrow_x, $arrow_y, $fill);
-constriction();
+constriction(1);
 
 # Set arrow style using arrow2_x and arrow2_y then
 # plot using these filled arrows.
-my $fill = 1;
+$fill = 1;
 plsvect($arrow2_x, $arrow2_y, $fill);
-constriction();
+constriction(2);
+
+constriction2();
+
+# Reset arrow style to the default by passing two
+# NULL arrays
+plsvect(null, null, 0);
 
 # Example of polar plot
 

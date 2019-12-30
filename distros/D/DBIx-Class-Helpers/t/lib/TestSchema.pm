@@ -57,7 +57,16 @@ sub generate_ddl {
           ($_ ne 'SQLite'
             ? (
                 add_drop_table => 1,
-                parser_args => { sources => ['HasDateOps', 'Gnarly'] })
+                filters => [
+                  sub { 
+                    #remove circular dependency. Not used for
+                    #non-sqlite tests
+                    my $foo = shift->get_table('Foo');
+                    my @constraints = map { $_->name } $foo->get_constraints;
+                    $foo->drop_constraint($_) for grep { /bar/ } @constraints;
+                  }
+                ]
+              )
             : ( add_drop_table => 0 )
          )
       },

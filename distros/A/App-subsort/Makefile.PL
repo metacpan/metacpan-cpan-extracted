@@ -21,11 +21,11 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::subsort",
   "PREREQ_PM" => {
-    "Complete::File" => 0,
+    "Complete::File" => "0.440",
     "Complete::Module" => 0,
     "Complete::Sah" => 0,
     "Complete::Sequence" => "0.002",
-    "Complete::Util" => "0.603",
+    "Complete::Util" => "0.606",
     "Getopt::Long::More" => "0.006",
     "Module::List::Tiny" => 0,
     "Sort::Sub" => "0.112",
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.043",
+  "VERSION" => "0.044",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,11 +46,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Complete::File" => 0,
+  "Complete::File" => "0.440",
   "Complete::Module" => 0,
   "Complete::Sah" => 0,
   "Complete::Sequence" => "0.002",
-  "Complete::Util" => "0.603",
+  "Complete::Util" => "0.606",
   "File::Spec" => 0,
   "Getopt::Long::More" => "0.006",
   "IO::Handle" => 0,

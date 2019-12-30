@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-04-03'; # DATE
-our $VERSION = '1.041'; # VERSION
+our $DATE = '2019-12-24'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +32,7 @@ bencher - A benchmark framework (CLI)
 
 =head1 VERSION
 
-This document describes version 1.041 of bencher (from Perl distribution Bencher), released on 2018-04-03.
+This document describes version 1.043 of bencher (from Perl distribution Bencher), released on 2019-12-24.
 
 =head1 SYNOPSIS
 
@@ -155,6 +155,14 @@ Trap output to stderr.
 =item B<--capture-stdout>
 
 Trap output to stdout.
+
+=item B<--cpanmodules-module>=I<s>
+
+Load a scenario from an Acme::CPANModules:: Perl module.
+
+An <pm:Acme::CPANModules> module can also contain benchmarking information, e.g.
+<pm:Acme::CPANModules::TextTable>.
+
 
 =item B<--dataset>=I<s>
 
@@ -548,17 +556,15 @@ See C<--action>.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -578,87 +584,199 @@ Do not read environment for default options.
 
 =over
 
-=item B<--exclude-dataset-names>=I<s>
+=item B<--exclude-dataset-name>=I<s@>
 
-Exclude datasets whose name matches this.
+Add dataset (by name) to exclude list.
+
+Can be specified multiple times.
+
+=item B<--exclude-dataset-names-json>=I<s>
+
+Exclude datasets whose name matches this (JSON-encoded).
+
+See C<--exclude-dataset-name>.
 
 =item B<--exclude-dataset-pattern>=I<s>
 
 Exclude datasets matching this regex pattern.
 
-=item B<--exclude-dataset-seqs>=I<s>
+=item B<--exclude-dataset-seq>=I<s@>
 
-Exclude datasets whose sequence number matches this.
+Add dataset (by sequence number) to exclude list.
 
-=item B<--exclude-dataset-tags>=I<s>
+Can be specified multiple times.
 
-Exclude datasets whose tag matches this.
+=item B<--exclude-dataset-seqs-json>=I<s>
+
+Exclude datasets whose sequence number matches this (JSON-encoded).
+
+See C<--exclude-dataset-seq>.
+
+=item B<--exclude-dataset-tag>=I<s@>
+
+Add a tag to dataset exclude tag list.
 
 You can specify `A & B` to exclude datasets that have _both_ tags A and B.
 
 
-=item B<--exclude-datasets>=I<s>
+Can be specified multiple times.
 
-Exclude datasets whose seq/name matches this.
+=item B<--exclude-dataset-tags-json>=I<s>
+
+Exclude datasets whose tag matches this (JSON-encoded).
+
+See C<--exclude-dataset-tag>.
+
+=item B<--exclude-dataset>=I<s@>
+
+Add dataset (by name/seq) to exclude list.
+
+Can be specified multiple times.
+
+=item B<--exclude-datasets-json>=I<s>
+
+Exclude datasets whose seq/name matches this (JSON-encoded).
+
+See C<--exclude-dataset>.
 
 =item B<--exclude-function-pattern>=I<s>
 
 Exclude function(s) matching this regex pattern.
 
-=item B<--exclude-functions>=I<s>
+=item B<--exclude-function>=I<s@>
 
-Exclude functions specified in this list.
+Add function to exclude list.
 
-=item B<--exclude-item-names>=I<s>
+Can be specified multiple times.
 
-Exclude items whose name matches this.
+=item B<--exclude-functions-json>=I<s>
+
+Exclude functions specified in this list (JSON-encoded).
+
+See C<--exclude-function>.
+
+=item B<--exclude-item-name>=I<s@>
+
+Add item (by name) to exclude list.
+
+Can be specified multiple times.
+
+=item B<--exclude-item-names-json>=I<s>
+
+Exclude items whose name matches this (JSON-encoded).
+
+See C<--exclude-item-name>.
 
 =item B<--exclude-item-pattern>=I<s>
 
 Exclude items matching this regex pattern.
 
-=item B<--exclude-item-seqs>=I<s>
+=item B<--exclude-item-seq>=I<s@>
 
-Exclude items whose sequence number matches this.
+Add item (by sequence number) to exclude list.
 
-=item B<--exclude-items>=I<s>
+Can be specified multiple times.
 
-Exclude items whose seq/name matches this.
+=item B<--exclude-item-seqs-json>=I<s>
+
+Exclude items whose sequence number matches this (JSON-encoded).
+
+See C<--exclude-item-seq>.
+
+=item B<--exclude-item>=I<s@>
+
+Add item (by name/seq) to exclude list.
+
+Can be specified multiple times.
+
+=item B<--exclude-items-json>=I<s>
+
+Exclude items whose seq/name matches this (JSON-encoded).
+
+See C<--exclude-item>.
 
 =item B<--exclude-module-pattern>=I<s>
 
 Exclude module(s) matching this regex pattern.
 
-=item B<--exclude-modules>=I<s>
+=item B<--exclude-module>=I<s@>
 
-Exclude modules specified in this list.
+Add module to exclude list.
 
-=item B<--exclude-participant-names>=I<s>
+Can be specified multiple times.
 
-Exclude participants whose name matches this.
+=item B<--exclude-modules-json>=I<s>
+
+Exclude modules specified in this list (JSON-encoded).
+
+See C<--exclude-module>.
+
+=item B<--exclude-participant-name>=I<s@>
+
+Add participant (by name) to exclude list.
+
+Can be specified multiple times.
+
+=item B<--exclude-participant-names-json>=I<s>
+
+Exclude participants whose name matches this (JSON-encoded).
+
+See C<--exclude-participant-name>.
 
 =item B<--exclude-participant-pattern>=I<s>
 
 Exclude participants matching this regex pattern.
 
-=item B<--exclude-participant-seqs>=I<s>
+=item B<--exclude-participant-seq>=I<s@>
 
-Exclude participants whose sequence number matches this.
+Add participant (by sequence number) to exclude list.
 
-=item B<--exclude-participant-tags>=I<s>
+Can be specified multiple times.
 
-Exclude participants whose tag matches this.
+=item B<--exclude-participant-seqs-json>=I<s>
+
+Exclude participants whose sequence number matches this (JSON-encoded).
+
+See C<--exclude-participant-seq>.
+
+=item B<--exclude-participant-tag>=I<s@>
+
+Add a tag to participants exclude tag list.
 
 You can specify `A & B` to exclude participants that have _both_ tags A and B.
 
 
-=item B<--exclude-participants>=I<s>
+Can be specified multiple times.
 
-Exclude participants whose seq/name matches this.
+=item B<--exclude-participant-tags-json>=I<s>
 
-=item B<--exclude-perls>=I<s>
+Exclude participants whose tag matches this (JSON-encoded).
 
-Exclude some perls.
+See C<--exclude-participant-tag>.
+
+=item B<--exclude-participant>=I<s@>
+
+Add participant (by name/seq) to exclude list.
+
+Can be specified multiple times.
+
+=item B<--exclude-participants-json>=I<s>
+
+Exclude participants whose seq/name matches this (JSON-encoded).
+
+See C<--exclude-participant>.
+
+=item B<--exclude-perl>=I<s@>
+
+Add specified perl to exclude list.
+
+Can be specified multiple times.
+
+=item B<--exclude-perls-json>=I<s>
+
+Exclude some perls (JSON-encoded).
+
+See C<--exclude-perl>.
 
 =item B<--exclude-pp-modules>, B<--nopp>
 
@@ -668,87 +786,199 @@ Exclude PP (pure-Perl) modules.
 
 Exclude XS modules.
 
-=item B<--include-dataset-names>=I<s>
+=item B<--include-dataset-name>=I<s@>
 
-Only include datasets whose name matches this.
+Add dataset (by name) to include list.
+
+Can be specified multiple times.
+
+=item B<--include-dataset-names-json>=I<s>
+
+Only include datasets whose name matches this (JSON-encoded).
+
+See C<--include-dataset-name>.
 
 =item B<--include-dataset-pattern>=I<s>
 
 Only include datasets matching this regex pattern.
 
-=item B<--include-dataset-seqs>=I<s>
+=item B<--include-dataset-seq>=I<s@>
 
-Only include datasets whose sequence number matches this.
+Add dataset (by sequence number) to include list.
 
-=item B<--include-dataset-tags>=I<s>
+Can be specified multiple times.
 
-Only include datasets whose tag matches this.
+=item B<--include-dataset-seqs-json>=I<s>
+
+Only include datasets whose sequence number matches this (JSON-encoded).
+
+See C<--include-dataset-seq>.
+
+=item B<--include-dataset-tag>=I<s@>
+
+Add a tag to dataset include tag list.
 
 You can specify `A & B` to include datasets that have _both_ tags A and B.
 
 
-=item B<--include-datasets>=I<s>
+Can be specified multiple times.
 
-Only include datasets whose seq/name matches this.
+=item B<--include-dataset-tags-json>=I<s>
+
+Only include datasets whose tag matches this (JSON-encoded).
+
+See C<--include-dataset-tag>.
+
+=item B<--include-dataset>=I<s@>
+
+Add dataset (by name/seq) to include list.
+
+Can be specified multiple times.
+
+=item B<--include-datasets-json>=I<s>
+
+Only include datasets whose seq/name matches this (JSON-encoded).
+
+See C<--include-dataset>.
 
 =item B<--include-function-pattern>=I<s>
 
 Only include functions matching this regex pattern.
 
-=item B<--include-functions>=I<s>
+=item B<--include-function>=I<s@>
 
-Only include functions specified in this list.
+Add function to include list.
 
-=item B<--include-item-names>=I<s>
+Can be specified multiple times.
 
-Only include items whose name matches this.
+=item B<--include-functions-json>=I<s>
+
+Only include functions specified in this list (JSON-encoded).
+
+See C<--include-function>.
+
+=item B<--include-item-name>=I<s@>
+
+Add item (by name) to include list.
+
+Can be specified multiple times.
+
+=item B<--include-item-names-json>=I<s>
+
+Only include items whose name matches this (JSON-encoded).
+
+See C<--include-item-name>.
 
 =item B<--include-item-pattern>=I<s>
 
 Only include items matching this regex pattern.
 
-=item B<--include-item-seqs>=I<s>
+=item B<--include-item-seq>=I<s@>
 
-Only include items whose sequence number matches this.
+Add item (by sequence number) to include list.
 
-=item B<--include-items>=I<s>
+Can be specified multiple times.
 
-Only include items whose seq/name matches this.
+=item B<--include-item-seqs-json>=I<s>
+
+Only include items whose sequence number matches this (JSON-encoded).
+
+See C<--include-item-seq>.
+
+=item B<--include-item>=I<s@>
+
+Add item (by name/seq) to include list.
+
+Can be specified multiple times.
+
+=item B<--include-items-json>=I<s>
+
+Only include items whose seq/name matches this (JSON-encoded).
+
+See C<--include-item>.
 
 =item B<--include-module-pattern>=I<s>
 
 Only include modules matching this regex pattern.
 
-=item B<--include-modules>=I<s>
+=item B<--include-module>=I<s@>
 
-Only include modules specified in this list.
+Add module to include list.
 
-=item B<--include-participant-names>=I<s>
+Can be specified multiple times.
 
-Only include participants whose name matches this.
+=item B<--include-modules-json>=I<s>
+
+Only include modules specified in this list (JSON-encoded).
+
+See C<--include-module>.
+
+=item B<--include-participant-name>=I<s@>
+
+Add participant (by name) to include list.
+
+Can be specified multiple times.
+
+=item B<--include-participant-names-json>=I<s>
+
+Only include participants whose name matches this (JSON-encoded).
+
+See C<--include-participant-name>.
 
 =item B<--include-participant-pattern>=I<s>
 
 Only include participants matching this regex pattern.
 
-=item B<--include-participant-seqs>=I<s>
+=item B<--include-participant-seq>=I<s@>
 
-Only include participants whose sequence number matches this.
+Add participant (by sequence number) to include list.
 
-=item B<--include-participant-tags>=I<s>
+Can be specified multiple times.
 
-Only include participants whose tag matches this.
+=item B<--include-participant-seqs-json>=I<s>
+
+Only include participants whose sequence number matches this (JSON-encoded).
+
+See C<--include-participant-seq>.
+
+=item B<--include-participant-tag>=I<s@>
+
+Add a tag to participants include tag list.
 
 You can specify `A & B` to include participants that have _both_ tags A and B.
 
 
-=item B<--include-participants>=I<s>
+Can be specified multiple times.
 
-Only include participants whose seq/name matches this.
+=item B<--include-participant-tags-json>=I<s>
 
-=item B<--include-perls>=I<s>
+Only include participants whose tag matches this (JSON-encoded).
 
-Only include some perls.
+See C<--include-participant-tag>.
+
+=item B<--include-participant>=I<s@>
+
+Add participant (by name/seq) to include list.
+
+Can be specified multiple times.
+
+=item B<--include-participants-json>=I<s>
+
+Only include participants whose seq/name matches this (JSON-encoded).
+
+See C<--include-participant>.
+
+=item B<--include-perl>=I<s@>
+
+Add specified perl to include list.
+
+Can be specified multiple times.
+
+=item B<--include-perls-json>=I<s>
+
+Only include some perls (JSON-encoded).
+
+See C<--include-perl>.
 
 =back
 
@@ -758,11 +988,17 @@ Only include some perls.
 
 =item B<--scientific-notation>
 
-=item B<--sorts>=I<s>
+=item B<--sort>=I<s@>
 
 Default value:
 
  ["-time"]
+
+Can be specified multiple times.
+
+=item B<--sorts-json>=I<s>
+
+See C<--sort>.
 
 =back
 
@@ -952,51 +1188,52 @@ List of available configuration parameters:
  capture_stderr (see --capture-stderr)
  capture_stdout (see --capture-stdout)
  code_startup (see --code-startup)
+ cpanmodules_module (see --cpanmodules-module)
  datasets (see --datasets)
  detail (see --detail)
  env_hashes (see --env-hashes)
- exclude_dataset_names (see --exclude-dataset-names)
+ exclude_dataset_names (see --exclude-dataset-name)
  exclude_dataset_pattern (see --exclude-dataset-pattern)
- exclude_dataset_seqs (see --exclude-dataset-seqs)
- exclude_dataset_tags (see --exclude-dataset-tags)
- exclude_datasets (see --exclude-datasets)
+ exclude_dataset_seqs (see --exclude-dataset-seq)
+ exclude_dataset_tags (see --exclude-dataset-tag)
+ exclude_datasets (see --exclude-dataset)
  exclude_function_pattern (see --exclude-function-pattern)
- exclude_functions (see --exclude-functions)
- exclude_item_names (see --exclude-item-names)
+ exclude_functions (see --exclude-function)
+ exclude_item_names (see --exclude-item-name)
  exclude_item_pattern (see --exclude-item-pattern)
- exclude_item_seqs (see --exclude-item-seqs)
- exclude_items (see --exclude-items)
+ exclude_item_seqs (see --exclude-item-seq)
+ exclude_items (see --exclude-item)
  exclude_module_pattern (see --exclude-module-pattern)
- exclude_modules (see --exclude-modules)
- exclude_participant_names (see --exclude-participant-names)
+ exclude_modules (see --exclude-module)
+ exclude_participant_names (see --exclude-participant-name)
  exclude_participant_pattern (see --exclude-participant-pattern)
- exclude_participant_seqs (see --exclude-participant-seqs)
- exclude_participant_tags (see --exclude-participant-tags)
- exclude_participants (see --exclude-participants)
- exclude_perls (see --exclude-perls)
+ exclude_participant_seqs (see --exclude-participant-seq)
+ exclude_participant_tags (see --exclude-participant-tag)
+ exclude_participants (see --exclude-participant)
+ exclude_perls (see --exclude-perl)
  exclude_pp_modules (see --exclude-pp-modules)
  exclude_xs_modules (see --exclude-xs-modules)
  format (see --format)
- include_dataset_names (see --include-dataset-names)
+ include_dataset_names (see --include-dataset-name)
  include_dataset_pattern (see --include-dataset-pattern)
- include_dataset_seqs (see --include-dataset-seqs)
- include_dataset_tags (see --include-dataset-tags)
- include_datasets (see --include-datasets)
+ include_dataset_seqs (see --include-dataset-seq)
+ include_dataset_tags (see --include-dataset-tag)
+ include_datasets (see --include-dataset)
  include_function_pattern (see --include-function-pattern)
- include_functions (see --include-functions)
- include_item_names (see --include-item-names)
+ include_functions (see --include-function)
+ include_item_names (see --include-item-name)
  include_item_pattern (see --include-item-pattern)
- include_item_seqs (see --include-item-seqs)
- include_items (see --include-items)
+ include_item_seqs (see --include-item-seq)
+ include_items (see --include-item)
  include_module_pattern (see --include-module-pattern)
- include_modules (see --include-modules)
- include_participant_names (see --include-participant-names)
+ include_modules (see --include-module)
+ include_participant_names (see --include-participant-name)
  include_participant_pattern (see --include-participant-pattern)
- include_participant_seqs (see --include-participant-seqs)
- include_participant_tags (see --include-participant-tags)
- include_participants (see --include-participants)
+ include_participant_seqs (see --include-participant-seq)
+ include_participant_tags (see --include-participant-tag)
+ include_participants (see --include-participant)
  include_path (see --include-path)
- include_perls (see --include-perls)
+ include_perls (see --include-perl)
  log_level (see --log-level)
  module_startup (see --module-startup)
  multimodver (see --multimodver)
@@ -1017,7 +1254,7 @@ List of available configuration parameters:
  scenario_file (see --scenario-file)
  scenario_module (see --scenario-module)
  scientific_notation (see --scientific-notation)
- sorts (see --sorts)
+ sorts (see --sort)
  test (see --test)
  with_args_size (see --with-args-size)
  with_process_size (see --with-process-size)
@@ -1073,7 +1310,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

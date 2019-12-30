@@ -71,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-WWW-PAUSE-Simple"
       }
    },
-   "version" : "0.445",
+   "version" : "0.446",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

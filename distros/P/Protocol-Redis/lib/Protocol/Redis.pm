@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008_001;
 
-our $VERSION = '1.0010';
+our $VERSION = '1.0011';
 
 require Carp;
 
@@ -275,15 +275,15 @@ In alphabetical order
 
 =over 2
 
+Dan Book (Grinnz)
+
 David Leadbeater (dgl)
+
+Jan Henning Thorsen (jhthorsen)
 
 Viacheslav Tykhanovskyi (vti)
 
 Yaroslav Korshak (yko)
-
-Dan Book (Grinnz)
-
-Jan Henning Thorsen (jhthorsen)
 
 =back
 

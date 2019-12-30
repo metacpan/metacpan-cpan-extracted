@@ -27,7 +27,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -37,6 +37,11 @@ $VERSION = 13;
 sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
+}
+sub _make_graph {
+  my ($params) = @_;
+  my $graph_maker = delete($params->{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%$params);
 }
 
 # sub _vertex_names_digits {
@@ -62,7 +67,6 @@ sub init {
   if (! defined $balls) { $balls = 3; }
   my $spindles  = delete($params{'spindles'})  || 3;
   my $adjacency = delete($params{'adjacency'}) || 'any';
-  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
 
   # this not documented yet ...
 #   my $vertex_names = delete($params{'vertex_names'}) || 'integer';
@@ -73,7 +77,7 @@ sub init {
     return join('|', map {join(',', reverse @$_)} @$state);
   };
 
-  my $graph = $graph_maker->(%params);
+  my $graph = _make_graph(\%params);
 
   {
     my $name = "Tower of London $balls";

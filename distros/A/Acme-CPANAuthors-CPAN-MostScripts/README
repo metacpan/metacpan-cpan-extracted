@@ -1,10 +1,18 @@
-SYNOPSIS
+NAME
+    Acme::CPANAuthors::CPAN::MostScripts - Authors with the most scripts on
+    CPAN
 
+VERSION
+    This document describes version 0.002 of
+    Acme::CPANAuthors::CPAN::MostScripts (from Perl distribution
+    Acme-CPANAuthors-CPAN-MostScripts), released on 2019-12-23.
+
+SYNOPSIS
        use Acme::CPANAuthors;
        use Acme::CPANAuthors::CPAN::MostScripts;
-    
+
        my $authors = Acme::CPANAuthors->new('CPAN::MostScripts');
-    
+
        my $number   = $authors->count;
        my @ids      = $authors->id;
        my @distros  = $authors->distributions('RJBS');
@@ -12,7 +20,6 @@ SYNOPSIS
        my $kwalitee = $authors->kwalitee('RJBS');
 
 DESCRIPTION
-
     This module lists 50 CPAN authors with the most scripts on CPAN. This
     list is produced by querying a local mini CPAN mirror using this
     command:
@@ -21,14 +28,97 @@ DESCRIPTION
 
     Statistics of the CPAN mirror:
 
-    # COMMAND: lcpan stats-last-index-time --format text-pretty
+     +---------------------+--------------------------------+
+     | key                 | value                          |
+     +---------------------+--------------------------------+
+     | cpan                | /home/s1/cpan                  |
+     | index_name          | /media/minicpan-index/index.db |
+     | last_index_time     | 2019-12-22T12:19:08Z           |
+     | raw_last_index_time | 1577017148                     |
+     +---------------------+--------------------------------+
 
     Current ranking:
 
-    # CODE: require Perinci::Result::Format::Lite; print
-    Perinci::Result::Format::Lite::format($main::res, 'text-pretty');
+     +------+-----------+--------------+
+     | rank | id        | script_count |
+     +------+-----------+--------------+
+     | 1    | PERLANCAR | 1115         |
+     | 2    | RSAVAGE   | 375          |
+     | 3    | BDFOY     | 174          |
+     | 4    | JWB       | 166          |
+     | 5    | SANTEX    | 140          |
+     | 6    | MRDVT     | 139          |
+     | 7    | VVELOX    | 134          |
+     | 8    | CWEST     | 120          |
+     | 9    | SHLOMIF   | 112          |
+     | 10   | LDS       | 101          |
+     | 11   | TSIBLEY   | 95           |
+     | 12   | TULAMILI  | 95           |
+     | 13   | SDAGUE    | 91           |
+     | 14   | OLIVER    | 90           |
+     | 15   | LEOCHARRE | 88           |
+     | 16   | CMUNGALL  | 87           |
+     | 17   | RDO       | 75           |
+     | 18   | EASR      | 72           |
+     | 19   | GSG       | 69           |
+     | 20   | AMBS      | 68           |
+     | 21   | BPOSTLE   | 63           |
+     | 22   | INGY      | 60           |
+     | 23   | IVANWILLS | 58           |
+     | 24   | TBONE     | 57           |
+     | 25   | GROUSSE   | 56           |
+     | 26   | BRYCE     | 53           |
+     | 27   | MOOCOW    | 51           |
+     | 28   | KESTEB    | 50           |
+     | 29   | NKH       | 50           |
+     | 30   | WOLDRICH  | 50           |
+     | 31   | TIEDEMANN | 49           |
+     | 32   | DHARD     | 46           |
+     | 33   | PERRAD    | 46           |
+     | 34   | BEATNIK   | 44           |
+     | 35   | YSAS      | 44           |
+     | 36   | AJPAGE    | 43           |
+     | 37   | MSIMERSON | 43           |
+     | 38   | MTW       | 43           |
+     | 39   | CORION    | 41           |
+     | 40   | JLMARTIN  | 41           |
+     | 41   | ADAMK     | 40           |
+     | 42   | JILLROWE  | 40           |
+     | 43   | PLICEASE  | 40           |
+     | 44   | GETTY     | 39           |
+     | 45   | JASONS    | 39           |
+     | 46   | TAPPER    | 39           |
+     | 47   | CDOLAN    | 38           |
+     | 48   | JMACFARLA | 38           |
+     | 49   | PEVANS    | 38           |
+     | 50   | GWILLIAMS | 37           |
+     +------+-----------+--------------+
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANAuthors-CPAN-MostScripts>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANAuthors-CPAN-MostScripts>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-CPAN
+    -MostScripts>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Acme::CPANAuthors
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

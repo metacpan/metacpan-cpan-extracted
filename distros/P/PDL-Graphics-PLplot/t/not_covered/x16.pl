@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x16 for the PLplot PDL binding
 #
 # plshade demo, using color fill

@@ -37,13 +37,15 @@ use Math::NumSeq::Catalan;
 use Math::NumSeq::BalancedBinary;
 
 use Graph::Maker::Catalans;
-use lib 'devel/lib';
+
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
 use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 365;
+plan tests => 2420;
 
 my $seq = Math::NumSeq::BalancedBinary->new;
 
@@ -63,8 +65,111 @@ my @vertex_name_types
      'Ldepths_inorder', 'Rdepths_inorder', 'Bdepths_inorder',
      'Rdepths_postorder',
      'Lweights','Rweights',
+     'run1s','run0s',
      'vpar', 'vpar_postorder');
-ok (scalar(@vertex_name_types), 11);
+ok (scalar(@vertex_name_types), 13);
+
+
+#------------------------------------------------------------------------------
+# Knuth fasc4a section 7.2.1.6 exercise 30(d), result of lakser on
+# complementary pairs in the Tamari lattice.
+
+# $vpar is an arrayref of vertex parents, for vertices numbered 1..N (but
+# entries in the array 0..N-1).
+# Return a list of N flags for the "footprint",
+# being each vertex 1 when childful, 0 when childless.
+# Childless is simply that vertex number not appearing in $vpar.
+#
+sub vpar_to_footprint {
+  my ($vpar) = @_;
+  my @has_child;
+  foreach my $p (@$vpar) {
+    $has_child[$p] = 1;
+  }
+  return map{$_?1:0} @has_child[1..scalar(@$vpar)];
+}
+ok (join('', vpar_to_footprint([0,0])), '00');
+ok (join('', vpar_to_footprint([0,1])), '10');
+
+{
+  #
+  #
+  #                   *      021
+  #                  / \     PLL
+  #                 *   *    LPL
+  #  111       -------> 110010 -------_        003  run0s
+  #  LLL      /                        v       PPL  preorder leaf
+  #  LLL  101010                      111000   LLP  postorder leaf
+  #           \                        ^
+  #            --> 101100 --> 110100 -/
+  #
+  #                  *          *
+  #            102    \        /   012
+  #            LPL     *      *    PLL
+  #            LLP    /        \   LLP
+  #                  *          *
+  #
+  # complementary = two points in a lattice have min(x,y) = lowest
+  #                                              max(x,y) = highest
+  # footprint = sequence 1=nonleaf, 0=leaf
+  #
+  # Tamari lattice points complementary if and only if their postorder
+  # footprints are complementary, meaning opposite leaf/nonleaf,
+  # excluding first vertex which is always leaf.
+  #
+  # Knuth takes the definition of rotate on preorder subtree sizes vector,
+  # whereas here per rotate is per Pallo Lweights which is postorder subtree
+  # sizes vector.  Hence applying the "footprint" to postorder instead of
+  # preorder.
+  #
+  # Knuth's answer notes that a rotates increase, so two points with a leaf
+  # in common can leave it alone and increase rest to a max < highest.
+  # Similarly unrotate decreases to nonleaf in common can leave alone and
+  # decrease rest to min > lowest.
+  #
+  # Exercise 30(c) is that the leaf-ness is per run0s.  Here that name type
+  # is preorder, so does not suit here.
+  #
+  foreach my $N (2 .. 5) {
+    my $graph = Graph::Maker->new('Catalans', N => $N,
+                                  vertex_name_type => 'vpar_postorder');
+    # require MyGraphs; MyGraphs::Graph_view($graph);
+
+    ok ($graph->vertices >= 2,  1);
+    my $lowest = MyGraphs::Graph_lattice_lowest($graph);
+    my $highest = MyGraphs::Graph_lattice_highest($graph);
+    my $href = MyGraphs::Graph_lattice_minmax_hash($graph);
+    MyGraphs::Graph_lattice_minmax_validate($graph,$href);
+
+    # Knuth fasc4a section 7.2.1.6 exercise 32, Tamari lattice is
+    # semidistributive.
+    MyGraphs::lattice_minmax_is_semidistributive($graph,$href);
+
+    my $count_complementary = 0;
+    foreach my $u ($graph->vertices) {
+      my @u_vpar = split /,/,$u;
+      my @u_footprint = vpar_to_footprint(\@u_vpar);
+      shift @u_footprint;  # f[1]..f[n-1] for compare
+      my $u_footprint = join('',@u_footprint);
+
+      foreach my $v ($graph->vertices) {
+        my @v_vpar = split /,/,$v;
+        my @v_footprint = vpar_to_footprint(\@v_vpar);
+        shift @v_footprint;  # f[1]..f[n-1] for compare
+        my $v_footprint = join('', @v_footprint);
+        my @v_complement = map {1-$_} @v_footprint;
+        my $v_complement = join('', @v_complement);
+
+        my $min = $href->{'min'}->{$u}->{$v};
+        my $max = $href->{'max'}->{$u}->{$v};
+        my $is_complementary = ($min eq $lowest && $max eq $highest);
+        # print "$u  $v  min $min max $max comp '$is_complementary'  footprints $u_footprint $v_footprint $v_complement\n";
+        ok ($is_complementary, $u_footprint eq $v_complement);
+        $count_complementary += $is_complementary;
+      }
+    }
+  }
+}
 
 
 #------------------------------------------------------------------------------
@@ -248,9 +353,14 @@ ok (scalar(@vertex_name_types), 11);
   ok (scalar(@rel_types),            12);
   ok (scalar(keys %g6_to_rel_types), 10);
 
-  $content =~ /(\d+)\s+vertex\s+name\s+types/s or die;
-  ok (scalar(@vertex_name_types), $1);
-  ok (scalar(@vertex_name_types), 11);
+  {
+    # POD intro text "... and 13 vertex name types"
+    $content =~ /(\d+)\s+vertex\s+name\s+types/s or die;
+    my $pod_count = $1;
+    ok (scalar(@vertex_name_types), $pod_count,
+        "POD intro text showing number of vertex name types");
+    ok (scalar(@vertex_name_types), 13);
+  }
 
   my @sames = sort map {join(' = ',@$_)} values %g6_to_rel_types;
   ok (join("\n",@sames),

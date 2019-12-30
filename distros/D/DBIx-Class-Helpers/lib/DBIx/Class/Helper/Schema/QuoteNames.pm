@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Schema::QuoteNames;
-$DBIx::Class::Helper::Schema::QuoteNames::VERSION = '2.034001';
+$DBIx::Class::Helper::Schema::QuoteNames::VERSION = '2.034002';
 # ABSTRACT: force C<quote_names> on
 
 use strict;

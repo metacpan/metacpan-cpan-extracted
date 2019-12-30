@@ -142,7 +142,7 @@ is_deeply \@errors, ['hello world'], 'promise rejected';
 $promise = Mojo::Promise->new;
 @results = ();
 $promise->finally(sub { push @results, 'finally1' })
-  ->finally(sub       { push @results, 'finally2' });
+  ->finally(sub { push @results, 'finally2' });
 $promise->resolve('pass');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, ['finally1', 'finally2'], 'promise not resolved';
@@ -197,7 +197,7 @@ $promise2->resolve('second');
 $promise3->resolve('third');
 $promise->resolve('first');
 Mojo::IOLoop->one_tick;
-is_deeply \@results, ['second'], 'promises resolved';
+is_deeply \@results, ['second'], 'promise resolved';
 
 # Rejected race
 $promise  = Mojo::Promise->new->then(sub {@_});
@@ -212,6 +212,32 @@ $promise->resolve('first');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, [], 'promises not resolved';
 is_deeply \@errors, ['second'], 'promise rejected';
+
+# Any
+$promise  = Mojo::Promise->new->then(sub {@_});
+$promise2 = Mojo::Promise->new->then(sub {@_});
+$promise3 = Mojo::Promise->new->then(sub {@_});
+@results  = ();
+Mojo::Promise->any($promise2, $promise, $promise3)->then(sub { @results = @_ });
+$promise2->reject('second');
+$promise3->resolve('third');
+$promise->resolve('first');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['third'], 'promise resolved';
+
+# Any (all rejections)
+$promise  = Mojo::Promise->new->then(sub {@_});
+$promise2 = Mojo::Promise->new->then(sub {@_});
+$promise3 = Mojo::Promise->new->then(sub {@_});
+(@results, @errors) = ();
+Mojo::Promise->any($promise, $promise2, $promise3)
+  ->then(sub { @results = @_ }, sub { @errors = @_ });
+$promise2->reject('second');
+$promise3->reject('third');
+$promise->reject('first');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, [], 'promises not resolved';
+is_deeply \@errors, [['first'], ['second'], ['third']], 'promises rejected';
 
 # Timeout
 (@errors, @results) = @_;
@@ -264,6 +290,43 @@ $promise->resolve('first');
 Mojo::IOLoop->one_tick;
 is_deeply \@results, [], 'promises not resolved';
 is_deeply \@errors, ['third'], 'promise rejected';
+
+# All settled
+$promise  = Mojo::Promise->new->then(sub {@_});
+$promise2 = Mojo::Promise->new->then(sub {@_});
+$promise3 = Mojo::Promise->new->then(sub {@_});
+@results  = ();
+Mojo::Promise->all_settled($promise, $promise2, $promise3)
+  ->then(sub { @results = @_ });
+$promise2->resolve('second');
+$promise3->resolve('third');
+$promise->resolve('first');
+Mojo::IOLoop->one_tick;
+my $result = [
+  {status => 'fulfilled', value => ['first']},
+  {status => 'fulfilled', value => ['second']},
+  {status => 'fulfilled', value => ['third']}
+];
+is_deeply \@results, $result, 'promise resolved';
+
+# All settled (with rejection)
+$promise  = Mojo::Promise->new->then(sub {@_});
+$promise2 = Mojo::Promise->new->then(sub {@_});
+$promise3 = Mojo::Promise->new->then(sub {@_});
+(@results, @errors) = ();
+Mojo::Promise->all_settled($promise, $promise2, $promise3)
+  ->then(sub { @results = @_ }, sub { @errors = @_ });
+$promise2->resolve('second');
+$promise3->reject('third');
+$promise->resolve('first');
+Mojo::IOLoop->one_tick;
+is_deeply \@errors, [], 'promise not rejected';
+$result = [
+  {status => 'fulfilled', value  => ['first']},
+  {status => 'fulfilled', value  => ['second']},
+  {status => 'rejected',  reason => ['third']}
+];
+is_deeply \@results, $result, 'promise resolved';
 
 # Settle with promise
 $promise  = Mojo::Promise->new->resolve('works');

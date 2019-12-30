@@ -1,5 +1,5 @@
 package Neovim::Ext::Buffer;
-$Neovim::Ext::Buffer::VERSION = '0.01';
+$Neovim::Ext::Buffer::VERSION = '0.02';
 use strict;
 use warnings;
 use Tie::Array;
@@ -124,7 +124,7 @@ Neovim::Ext::Buffer - Neovim Buffer class
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNPOSIS
 

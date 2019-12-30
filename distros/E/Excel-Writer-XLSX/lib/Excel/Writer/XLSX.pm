@@ -17,7 +17,7 @@ use Exporter;
 use Excel::Writer::XLSX::Workbook;
 
 our @ISA     = qw(Excel::Writer::XLSX::Workbook Exporter);
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 
 ###############################################################################
@@ -6104,6 +6104,11 @@ The C<style> parameter can be used to set the style of the table. Standard Excel
     );
 
 The default table style is 'Table Style Medium 9'.
+
+You can also turn the table style off by setting it to 'None':
+
+    $worksheet11->add_table( 'B3:F7', { style => 'None' } );
+
 
 
 =head2 name

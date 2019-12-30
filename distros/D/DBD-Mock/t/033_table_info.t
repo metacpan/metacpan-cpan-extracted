@@ -5,8 +5,10 @@ use warnings;
 
 use Test::More;
 
-BEGIN {
-    use_ok('DBI');
+use DBI;
+
+if ($DBI::VERSION < 1.635) {
+    plan skip_all => "Functionality requires DBI version 1.64 or higher";
 }
 
 my $dbh = DBI->connect( 'dbi:Mock:', '', '' );

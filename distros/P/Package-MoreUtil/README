@@ -2,8 +2,8 @@ NAME
     Package::MoreUtil - Package-related utilities
 
 VERSION
-    This document describes version 0.591 of Package::MoreUtil (from Perl
-    distribution Package-MoreUtil), released on 2019-01-06.
+    This document describes version 0.592 of Package::MoreUtil (from Perl
+    distribution Package-MoreUtil), released on 2019-12-25.
 
 SYNOPSIS
      use Package::MoreUtil qw(

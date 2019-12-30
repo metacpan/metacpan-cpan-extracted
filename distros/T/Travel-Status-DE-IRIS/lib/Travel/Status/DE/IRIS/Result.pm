@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.39';
+our $VERSION = '1.41';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -118,7 +118,7 @@ Travel::Status::DE::IRIS::Result->mk_ro_accessors(
 	  sched_route_end start
 	  station station_uic
 	  stop_no time train_id train_no transfer type
-	  unknown_t unknown_o wing_id)
+	  unknown_t unknown_o wing_id wing_of)
 );
 
 sub is_additional {
@@ -400,8 +400,12 @@ sub set_unscheduled {
 sub add_arrival_wingref {
 	my ( $self, $ref ) = @_;
 
-	$ref->{is_wing} = 1;
+	my $backref = $self;
+
 	weaken($ref);
+	weaken($backref);
+	$ref->{is_wing} = 1;
+	$ref->{wing_of} = $self;
 	push( @{ $self->{arrival_wings} }, $ref );
 	return $self;
 }
@@ -409,8 +413,12 @@ sub add_arrival_wingref {
 sub add_departure_wingref {
 	my ( $self, $ref ) = @_;
 
-	$ref->{is_wing} = 1;
+	my $backref = $self;
+
 	weaken($ref);
+	weaken($backref);
+	$ref->{is_wing} = 1;
+	$ref->{wing_of} = $self;
 	push( @{ $self->{departure_wings} }, $ref );
 	return $self;
 }
@@ -820,7 +828,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.39
+version 1.41
 
 =head1 DESCRIPTION
 
@@ -862,9 +870,9 @@ True if the arrival at this stop has been cancelled.
 
 =item $result->arrival_wings
 
-Returns a list of references to Travel::Status::DE::IRIS::Result(3pm) objects
-which are coupled to this train on arrival. Returns nothing (false / empty list)
-otherwise.
+Returns a list of weakened references to Travel::Status::DE::IRIS::Result(3pm)
+objects which are coupled to this train on arrival. Returns nothing (false /
+empty list) otherwise.
 
 =item $result->canceled_stops
 
@@ -932,9 +940,9 @@ terminates here and does not continue its scheduled journey.
 
 =item $result->departure_wings
 
-Returns a list of references to Travel::Status::DE::IRIS::Result(3pm) objects
-which are coupled to this train on departure. Returns nothing (false / empty
-list) otherwise.
+Returns a list of weakened references to Travel::Status::DE::IRIS::Result(3pm)
+objects which are coupled to this train on departure. Returns nothing (false /
+empty list) otherwise.
 
 =item $result->destination
 
@@ -1173,6 +1181,13 @@ Number of this train, unique per day. E.g. C<< 2225 >> for C<< IC 2225 >>.
 
 Type of this train, e.g. C<< S >> for S-Bahn, C<< RE >> for Regional-Express,
 C<< ICE >> for InterCity-Express.
+
+=item $result->wing_of
+
+If B<is_wing> is true, returns a weakened reference to the
+Travel::Status::DE::IRIS::Result(3pm) object which this train is a wing of. So
+far, it seems that a train is either not a wing or a wing of exactly one other
+train. Returns undef if B<is_wing> is false.
 
 =back
 

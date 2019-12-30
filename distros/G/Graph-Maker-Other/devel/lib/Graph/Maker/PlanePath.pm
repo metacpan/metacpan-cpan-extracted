@@ -24,7 +24,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -33,6 +33,11 @@ $VERSION = 13;
 sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
+}
+sub _make_graph {
+  my ($params) = @_;
+  my $graph_maker = delete($params->{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%$params);
 }
 
 my @dir6_to_dx = (2, 1,-1,-2, -1, 1);
@@ -101,12 +106,13 @@ sub init {
     return "$x,$y";
   };
 
-  my $graph_maker = delete($params{graph_maker}) || \&_default_graph_maker;
-
-  my $graph = $graph_maker->(%params);
+  my $graph = _make_graph(\%params);
 
   if ($vertex_name_type eq 'xy') {
-    $graph->set_graph_attribute(vertex_name_type => 'xy');
+    $graph->set_graph_attribute(vertex_name_type_xy => 1);
+    if ($path->dx_maximum && $path->dx_maximum == 2) {
+      $graph->set_graph_attribute(vertex_name_type_xy_triangular => 1);
+    }
   }
 
   if ($type eq 'tree') {

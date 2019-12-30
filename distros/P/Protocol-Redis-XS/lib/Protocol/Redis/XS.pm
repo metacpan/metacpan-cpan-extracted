@@ -6,7 +6,7 @@ use parent "Protocol::Redis";
 use XS::Object::Magic;
 use XSLoader;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 XSLoader::load "Protocol::Redis::XS", $VERSION;
 
@@ -47,7 +47,7 @@ Protocol::Redis::XS - hiredis based parser compatible with Protocol::Redis
 =head1 SYNOPSIS
 
   use Protocol::Redis::XS;
-  my $redis = Protocol::Redis::XS->new;
+  my $redis = Protocol::Redis::XS->new(api => 1);
   $redis->parse("+OK\r\n");
   $redis->get_message;
 
@@ -65,7 +65,7 @@ L</SEE ALSO> first.)
 
 As per L<Protocol::Redis>, API version 1.
 
-=head2 parse($string)
+=head2 parse
 
 Parse a chunk of data (calls L</on_message> callback if defined and a complete
 message is received).

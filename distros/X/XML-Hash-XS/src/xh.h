@@ -6,34 +6,40 @@
 
 #define XH_INTERNAL_ENCODING "utf-8"
 
+#define XH_SUPPRESS_EMPTY_NONE      0
+#define XH_SUPPRESS_EMPTY_TO_DELETE 1
+#define XH_SUPPRESS_EMPTY_TO_STRING 2
+#define XH_SUPPRESS_EMPTY_TO_UNDEF  3
+
 /* Default opts */
-#define XH_DEF_OUTPUT        NULL
-#define XH_DEF_METHOD        "NATIVE"
-#define XH_DEF_ROOT          "root"
-#define XH_DEF_VERSION       "1.0"
-#define XH_DEF_ENCODING      ""
-#define XH_DEF_UTF8          TRUE
-#define XH_DEF_INDENT        0
-#define XH_DEF_CANONICAL     FALSE
-#define XH_DEF_USE_ATTR      FALSE
-#define XH_DEF_CONTENT       ""
-#define XH_DEF_XML_DECL      TRUE
-#define XH_DEF_KEEP_ROOT     FALSE
+#define XH_DEF_OUTPUT         NULL
+#define XH_DEF_METHOD         "NATIVE"
+#define XH_DEF_ROOT           "root"
+#define XH_DEF_VERSION        "1.0"
+#define XH_DEF_ENCODING       ""
+#define XH_DEF_UTF8           TRUE
+#define XH_DEF_INDENT         0
+#define XH_DEF_CANONICAL      FALSE
+#define XH_DEF_USE_ATTR       FALSE
+#define XH_DEF_CONTENT        ""
+#define XH_DEF_XML_DECL       TRUE
+#define XH_DEF_KEEP_ROOT      FALSE
 #ifdef XH_HAVE_DOM
-#define XH_DEF_DOC           FALSE
+#define XH_DEF_DOC            FALSE
 #endif
-#define XH_DEF_FORCE_ARRAY   &PL_sv_undef
-#define XH_DEF_FORCE_CONTENT FALSE
-#define XH_DEF_MERGE_TEXT    FALSE
+#define XH_DEF_FORCE_ARRAY    &PL_sv_undef
+#define XH_DEF_FORCE_CONTENT  FALSE
+#define XH_DEF_MERGE_TEXT     FALSE
+#define XH_DEF_SUPPRESS_EMPTY XH_SUPPRESS_EMPTY_NONE
 
-#define XH_DEF_ATTR          "-"
-#define XH_DEF_TEXT          "#text"
-#define XH_DEF_TRIM          FALSE
-#define XH_DEF_CDATA         ""
-#define XH_DEF_COMM          ""
+#define XH_DEF_ATTR           "-"
+#define XH_DEF_TEXT           "#text"
+#define XH_DEF_TRIM           FALSE
+#define XH_DEF_CDATA          ""
+#define XH_DEF_COMM           ""
 
-#define XH_DEF_MAX_DEPTH     1024
-#define XH_DEF_BUF_SIZE      4096
+#define XH_DEF_MAX_DEPTH      1024
+#define XH_DEF_BUF_SIZE       4096
 
 typedef enum {
     XH_METHOD_NATIVE = 0,
@@ -63,6 +69,7 @@ typedef struct {
     xh_pattern_t           force_array;
     xh_bool_t              force_content;
     xh_bool_t              merge_text;
+    xh_int_t               suppress_empty;
     xh_pattern_t           filter;
     SV                    *cb;
 

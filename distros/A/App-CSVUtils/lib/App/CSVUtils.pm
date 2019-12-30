@@ -1,9 +1,9 @@
 package App::CSVUtils;
 
 # AUTHOR
-our $DATE = '2019-12-23'; # DATE
+our $DATE = '2019-12-28'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.028'; # VERSION
 
 use 5.010001;
 use strict;
@@ -275,7 +275,7 @@ our %args_sort_rows_short = (
         cmdline_aliases => {i=>{}},
     },
     by_fields => {
-        summary => 'A comma-separated list of field sort specification',
+        summary => 'Sort by a comma-separated list of field specification',
         description => <<'_',
 
 `+FIELD` to mean sort numerically ascending, `-FIELD` to sort numerically
@@ -286,15 +286,46 @@ _
         schema => ['str*'],
         completion => \&_complete_sort_field_list,
     },
-    by_code => {
-        summary => 'Perl code to do sorting',
+    key => {
+        summary => 'Generate sort keys with this Perl code',
         description => <<'_',
 
-`$a` and `$b` (or the first and second argument) will contain the two rows to be
-compared.
+If specified, then will compute sort keys using Perl code and sort using the
+keys. Relevant when sorting using `--by-code` or `--by-sortsub`. If specified,
+then instead of rows the code/Sort::Sub routine will receive these sort keys to
+sort against.
+
+The code will receive the row as the argument.
 
 _
         schema => ['any*', of=>['str*', 'code*']],
+        cmdline_aliases => {k=>{}},
+    },
+    by_sortsub => {
+        schema => 'str*',
+        description => <<'_',
+
+Usually combined with `--key` because most Sort::Sub routine expects a string to
+be compared against.
+
+_
+        summary => 'Sort using a Sort::Sub routine',
+        'x.completion' => ['sortsub_spec'],
+    },
+    sortsub_args => {
+        summary => 'Arguments to pass to Sort::Sub routine',
+        schema => ['hash*', of=>'str*'],
+    },
+    by_code => {
+        summary => 'Sort using Perl code',
+        schema => ['any*', of=>['str*', 'code*']],
+        description => <<'_',
+
+`$a` and `$b` (or the first and second argument) will contain the two rows to be
+compared. Which are arrayrefs; or if `--hash` (`-H`) is specified, hashrefs; or
+if `--key` is specified, whatever the code in `--key` returns.
+
+_
     },
 );
 
@@ -350,6 +381,15 @@ our %arg_hash = (
         cmdline_aliases => {H=>{}},
     },
 );
+
+sub _array2hash {
+    my ($row, $fields) = @_;
+    my $rowhash = {};
+    for my $i (0..$#{$fields}) {
+        $rowhash->{ $fields->[$i] } = $row->[$i];
+    }
+    $rowhash;
+}
 
 $SPEC{csvutil} = {
     v => 1.1,
@@ -690,14 +730,7 @@ sub csvutil {
                 $code = _compile($args{eval});
             }
             if ($i == 1 || do {
-                my $rowhash;
-                if ($args{hash}) {
-                    $rowhash = {};
-                    for (0..$#{$fields}) {
-                        $rowhash->{ $fields->[$_] } = $row->[$_];
-                    }
-                }
-                local $_ = $args{hash} ? $rowhash : $row;
+                local $_ = $args{hash} ? _array2hash($row, $fields) : $row;
                 local $main::row = $row;
                 local $main::rownum = $i;
                 local $main::csv = $csv;
@@ -712,14 +745,7 @@ sub csvutil {
             }
             if ($i > 1) {
                 my $rowres = do {
-                    my $rowhash;
-                    if ($args{hash}) {
-                        $rowhash = {};
-                        for (0..$#{$fields}) {
-                            $rowhash->{ $fields->[$_] } = $row->[$_];
-                        }
-                    }
-                    local $_ = $args{hash} ? $rowhash : $row;
+                    local $_ = $args{hash} ? _array2hash($row, $fields) : $row;
                     local $main::row = $row;
                     local $main::rownum = $i;
                     local $main::csv = $csv;
@@ -740,13 +766,8 @@ sub csvutil {
                 $selected_row = $row;
             }
         } elsif ($action eq 'dump') {
-            my $rowhash;
             if ($args{hash}) {
-                $rowhash = {};
-                for (0..$#{$fields}) {
-                    $rowhash->{ $fields->[$_] } = $row->[$_];
-                }
-                push @$rows, $rowhash unless $i == 1;
+                push @$rows, _array2hash($row, $fields) unless $i == 1;
             } else {
                 push @$rows, $row;
             }
@@ -796,22 +817,53 @@ sub csvutil {
     }
 
     if ($action eq 'sort-rows') {
-        if ($args{sort_by_code}) {
-            my $code0 = _compile($args{sort_by_code});
-            if ($args{hash}) {
+
+        # whether we should compute keys
+        my @keys;
+        if ($args{sort_key}) {
+            my $code_gen_key = _compile($args{sort_key});
+            for my $row (@$rows) {
+                local $_ = $args{hash} ? _array2hash($row, $fields) : $row;
+                push @keys, $code_gen_key->($_);
+            }
+        }
+
+        if ($args{sort_by_code} || $args{sort_by_sortsub}) {
+            my $code0;
+            if ($args{sort_by_code}) {
+                $code0 = _compile($args{sort_by_code});
+            } elsif (defined $args{sort_by_sortsub}) {
+                require Sort::Sub;
+                $code0 = Sort::Sub::get_sorter(
+                    $args{sort_by_sortsub}, $args{sort_sortsub_args});
+            }
+
+            if (@keys) {
+                # compare two sort keys ($a & $b) are indices
                 $code = sub {
-                    my $rowhash_a = {};
-                    my $rowhash_b = {};
-                    for (0..$#{$fields}) {
-                        $rowhash_a->{ $fields->[$_] } = $a->[$_];
-                        $rowhash_b->{ $fields->[$_] } = $b->[$_];
-                    }
-                    local $main::a = $rowhash_a;
-                    local $main::b = $rowhash_b;
-                    $code0->($a, $b);
+                    local $main::a = $keys[$a];
+                    local $main::b = $keys[$b];
+                    $code0->($main::a, $main::b);
+                };
+            } elsif ($args{hash}) {
+                # compare two rowhashes
+                $code = sub {
+                    local $main::a = _array2hash($a, $fields);
+                    local $main::b = _array2hash($b, $fields);
+                    $code0->($main::a, $main::b);
                 };
             } else {
+                # compare two arrayref rows
                 $code = $code0;
+            }
+
+            if (@keys) {
+                # sort indices according to keys first, then return sorted rows
+                # according to indices
+                my @sorted_indices = sort { local $main::a=$a; local $main::b=$b; $code->($main::a,$main::b) } 0..$#{$rows};
+                $rows = [map {$rows->[$_]} @sorted_indices];
+            } else {
+                $rows = [sort { local $main::a=$a; local $main::b=$b; $code->($main::a,$main::b) } @$rows];
             }
         } elsif ($args{sort_by_fields}) {
             my @fields;
@@ -848,15 +900,10 @@ sub csvutil {
                 }
             }
             $code = _compile($code_str);
+            $rows = [sort { local $main::a = $a; local $main::b = $b; $code->($main::a, $main::b) } @$rows];
         } else {
-            return [400, "Please specify by_fields or by_code"];
+            return [400, "Please specify by_fields or by_sortsub or by_code"];
         }
-
-        @$rows = sort {
-            local $main::a = $a;
-            local $main::b = $b;
-            $code->($a, $b);
-        } @$rows;
 
         if ($has_header) {
             $csv->combine(@$fields);
@@ -1097,11 +1144,31 @@ Example output CSV (using `--by-fields +age,~name`):
     Jerry,30
     Ben,30
 
-You can also reverse the sort order (`-r`), sort case-insensitively (`-i`), or
-provides the code (`--by-code`, for example `--by-code '$a->[1] <=> $b->[1] ||
-$b->[0] cmp $a->[0]'` which is equivalent to `--by-fields +age,~name`). If you
-use `--hash`, your code will receive the rows to be compared as hashref, e.g.
-`--hash --by-code '$a->{age} <=> $b->{age} || $b->{name} cmp $a->{name}'.
+You can also reverse the sort order (`-r`) or sort case-insensitively (`-i`).
+
+For more flexibility, instead of `--by-fields` you can use `--by-code`:
+
+Example output `--by-code '$a->[1] <=> $b->[1] || $b->[0] cmp $a->[0]'` (which
+is equivalent to `--by-fields +age,~name`):
+
+    name,age
+    Dennis,15
+    Andy,20
+    Jerry,30
+    Ben,30
+
+If you use `--hash`, your code will receive the rows to be compared as hashref,
+e.g. `--hash --by-code '$a->{age} <=> $b->{age} || $b->{name} cmp $a->{name}'.
+
+A third alternative is to sort using <pm:Sort::Sub> routines. Example output
+(using `--by-sortsub 'by_length<r>' --key '$_->[0]'`, which is to say to sort by
+descending length of name):
+
+    name,age
+    Dennis,15
+    Jerry,30
+    Andy,20
+    Ben,30
 
 _
     args => {
@@ -1111,7 +1178,7 @@ _
         %arg_hash,
     },
     args_rels => {
-        req_one => ['by_fields', 'by_code'],
+        req_one => ['by_fields', 'by_code', 'by_sortsub'],
     },
 };
 sub csv_sort_rows {
@@ -1121,10 +1188,13 @@ sub csv_sort_rows {
         hash_subset(\%args, \%args_common),
         filename => $args{filename},
         action => 'sort-rows',
-        sort_by_fields => $args{by_fields},
-        sort_by_code   => $args{by_code},
         sort_reverse => $args{reverse},
         sort_ci => $args{ci},
+        sort_key => $args{key},
+        sort_by_fields => $args{by_fields},
+        sort_by_code   => $args{by_code},
+        sort_by_sortsub => $args{by_sortsub},
+        sort_sortsub_args => $args{sortsub_args},
         hash => $args{hash},
     );
 
@@ -2123,7 +2193,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.027 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-12-23.
+This document describes version 0.028 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2019-12-28.
 
 =head1 DESCRIPTION
 
@@ -3478,11 +3548,31 @@ Example output CSV (using C<--by-fields +age,~name>):
  Jerry,30
  Ben,30
 
-You can also reverse the sort order (C<-r>), sort case-insensitively (C<-i>), or
-provides the code (C<--by-code>, for example C<< --by-code '$a-E<gt>[1] E<lt>=E<gt> $b-E<gt>[1] ||
-$b-E<gt>[0] cmp $a-E<gt>[0]' >> which is equivalent to C<--by-fields +age,~name>). If you
-use C<--hash>, your code will receive the rows to be compared as hashref, e.g.
-`--hash --by-code '$a->{age} <=> $b->{age} || $b->{name} cmp $a->{name}'.
+You can also reverse the sort order (C<-r>) or sort case-insensitively (C<-i>).
+
+For more flexibility, instead of C<--by-fields> you can use C<--by-code>:
+
+Example output C<< --by-code '$a-E<gt>[1] E<lt>=E<gt> $b-E<gt>[1] || $b-E<gt>[0] cmp $a-E<gt>[0]' >> (which
+is equivalent to C<--by-fields +age,~name>):
+
+ name,age
+ Dennis,15
+ Andy,20
+ Jerry,30
+ Ben,30
+
+If you use C<--hash>, your code will receive the rows to be compared as hashref,
+e.g. `--hash --by-code '$a->{age} <=> $b->{age} || $b->{name} cmp $a->{name}'.
+
+A third alternative is to sort using L<Sort::Sub> routines. Example output
+(using C<< --by-sortsub 'by_lengthE<lt>rE<gt>' --key '$_-E<gt>[0]' >>, which is to say to sort by
+descending length of name):
+
+ name,age
+ Dennis,15
+ Jerry,30
+ Andy,20
+ Ben,30
 
 This function is not exported.
 
@@ -3492,18 +3582,26 @@ Arguments ('*' denotes required arguments):
 
 =item * B<by_code> => I<str|code>
 
-Perl code to do sorting.
+Sort using Perl code.
 
 C<$a> and C<$b> (or the first and second argument) will contain the two rows to be
-compared.
+compared. Which are arrayrefs; or if C<--hash> (C<-H>) is specified, hashrefs; or
+if C<--key> is specified, whatever the code in C<--key> returns.
 
 =item * B<by_fields> => I<str>
 
-A comma-separated list of field sort specification.
+Sort by a comma-separated list of field specification.
 
 C<+FIELD> to mean sort numerically ascending, C<-FIELD> to sort numerically
 descending, C<FIELD> to mean sort ascibetically ascending, C<~FIELD> to mean sort
 ascibetically descending.
+
+=item * B<by_sortsub> => I<str>
+
+Sort using a Sort::Sub routine.
+
+Usually combined with C<--key> because most Sort::Sub routine expects a string to
+be compared against.
 
 =item * B<ci> => I<bool>
 
@@ -3527,7 +3625,22 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<key> => I<str|code>
+
+Generate sort keys with this Perl code.
+
+If specified, then will compute sort keys using Perl code and sort using the
+keys. Relevant when sorting using C<--by-code> or C<--by-sortsub>. If specified,
+then instead of rows the code/Sort::Sub routine will receive these sort keys to
+sort against.
+
+The code will receive the row as the argument.
+
 =item * B<reverse> => I<bool>
+
+=item * B<sortsub_args> => I<hash>
+
+Arguments to pass to Sort::Sub routine.
 
 =item * B<tsv> => I<bool>
 
@@ -3703,13 +3816,13 @@ L<App::LTSVUtils>
 L<App::SerializeUtils>
 
 
-L<csvgrep>.
-
-L<csv-split>.
-
 L<setop>.
 
 L<csv-select-row>.
+
+L<csvgrep>.
+
+L<csv-split>.
 
 =head1 AUTHOR
 

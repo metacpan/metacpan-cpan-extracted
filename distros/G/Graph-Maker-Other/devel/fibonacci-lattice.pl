@@ -35,11 +35,11 @@ use Smart::Comments;
 {
   require Graph;
   my @graphs;
-  foreach my $N (0..6) {
+  foreach my $N (6) {
     my $graph = Graph::Maker->new ('Fibonacci_lattice', N => $N);
     $graph->set_graph_attribute (flow => 'north');
     $graph->set_graph_attribute (flow => 'east');
-#    MyGraphs::Graph_view($graph);
+    MyGraphs::Graph_view($graph);
     push @graphs, $graph;
 
     my $num_vertices = $graph->vertices;

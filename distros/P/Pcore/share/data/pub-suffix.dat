@@ -341,6 +341,7 @@ ama.shimane.jp;ama.shimane.jp
 amagasaki.hyogo.jp;amagasaki.hyogo.jp
 amakusa.kumamoto.jp;amakusa.kumamoto.jp
 amami.kagoshima.jp;amami.kagoshima.jp
+amazon;amazon
 amazonaws.com;amazonaws.com
 amazonaws.com.cn;amazonaws.com.cn
 amber.museum;amber.museum
@@ -2248,7 +2249,6 @@ environment.museum;environment.museum
 environmentalconservation.museum;environmentalconservation.museum
 epilepsy.museum;epilepsy.museum
 epson;epson
-eq.edu.au;eq.edu.au
 equipment;equipment
 equipment.aero;equipment.aero
 er;er
@@ -5126,7 +5126,6 @@ motoyama.kochi.jp;motoyama.kochi.jp
 mov;mov
 movie;movie
 movimiento.bo;movimiento.bo
-movistar;movistar
 mozilla-iot.org;mozilla-iot.org
 moåreke.no;xn--moreke-jua.no
 mp;mp
@@ -7708,7 +7707,6 @@ tele.amune.org;tele.amune.org
 telebit.app;telebit.app
 telebit.io;telebit.io
 telebit.xyz;telebit.xyz
-telefonica;telefonica
 telekommunikation.museum;telekommunikation.museum
 telemark.no;telemark.no
 television.museum;television.museum
@@ -8822,6 +8820,7 @@ zw;zw
 ไทย;xn--o3cw4h
 გე;xn--node
 みんな;xn--q9jyb4c
+アマゾン;xn--cckwcxetd
 クラウド;xn--gckr3f0f
 グーグル;xn--qcka1pmc
 コム;xn--tckwe
@@ -8836,6 +8835,7 @@ zw;zw
 中国;xn--fiqs8s
 中國;xn--fiqz9s
 中文网;xn--fiq228c5hs
+亚马逊;xn--jlq480n2rg
 京都.jp;xn--1lqs03n.jp
 企业;xn--vhquv
 佐賀.jp;xn--qqqt11m.jp

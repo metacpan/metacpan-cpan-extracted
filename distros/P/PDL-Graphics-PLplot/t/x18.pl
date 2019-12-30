@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x18 for the PLplot PDL binding
 #
 # 3-d line and point plot demo.
@@ -24,6 +22,8 @@
 
 # SYNC: x18c.c 1.21
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Math::Trig qw [pi];
@@ -57,7 +57,7 @@ sub test_poly {
 #  z = r cos(phi)
 #  r = 1 :=)
 
-print $draw[0];
+#print $draw[0];
 
   for (my $i = 0; $i < 20; $i++ ) {
     my $theta = $two_pi * ($i + pdl [0, 0, 1, 1, 0]) / 20.;
@@ -109,7 +109,7 @@ my $r = $z;
 my $x = $r * cos (2 * pi * 6 * $i / NPTS);
 my $y = $r * sin (2 * pi * 6 * $i / NPTS );
 
-for ($k = 0; $k < 4; $k++) {
+for (my $k = 0; $k < 4; $k++) {
   pladv (0);
   plvpor (0.0, 1.0, 0.0, 0.9);
   plwind (-1.0, 1.0, -0.9, 1.1);
@@ -132,7 +132,7 @@ for ($k = 0; $k < 4; $k++) {
   }
 
   plcol0 (3);
-  $title = sprintf ("#frPLplot Example 18 - Alt=%.0f, Az=%.0f",
+  my $title = sprintf ("#frPLplot Example 18 - Alt=%.0f, Az=%.0f",
                     $alt[$k], $az[$k]);
   plmtex (1.0, 0.5, 0.5, "t", $title);
 }

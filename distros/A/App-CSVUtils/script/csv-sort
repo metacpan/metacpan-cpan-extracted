@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_sort_rows
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-12-23'; # DATE
+our $DATE = '2019-12-28'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.028'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ csv-sort - Sort CSV rows
 
 =head1 VERSION
 
-This document describes version 0.027 of csv-sort (from Perl distribution App-CSVUtils), released on 2019-12-23.
+This document describes version 0.028 of csv-sort (from Perl distribution App-CSVUtils), released on 2019-12-28.
 
 =head1 SYNOPSIS
 
@@ -99,11 +99,31 @@ Example output CSV (using C<--by-fields +age,~name>):
  Jerry,30
  Ben,30
 
-You can also reverse the sort order (C<-r>), sort case-insensitively (C<-i>), or
-provides the code (C<--by-code>, for example C<< --by-code '$a-E<gt>[1] E<lt>=E<gt> $b-E<gt>[1] ||
-$b-E<gt>[0] cmp $a-E<gt>[0]' >> which is equivalent to C<--by-fields +age,~name>). If you
-use C<--hash>, your code will receive the rows to be compared as hashref, e.g.
-`--hash --by-code '$a->{age} <=> $b->{age} || $b->{name} cmp $a->{name}'.
+You can also reverse the sort order (C<-r>) or sort case-insensitively (C<-i>).
+
+For more flexibility, instead of C<--by-fields> you can use C<--by-code>:
+
+Example output C<< --by-code '$a-E<gt>[1] E<lt>=E<gt> $b-E<gt>[1] || $b-E<gt>[0] cmp $a-E<gt>[0]' >> (which
+is equivalent to C<--by-fields +age,~name>):
+
+ name,age
+ Dennis,15
+ Andy,20
+ Jerry,30
+ Ben,30
+
+If you use C<--hash>, your code will receive the rows to be compared as hashref,
+e.g. `--hash --by-code '$a->{age} <=> $b->{age} || $b->{name} cmp $a->{name}'.
+
+A third alternative is to sort using L<Sort::Sub> routines. Example output
+(using C<< --by-sortsub 'by_lengthE<lt>rE<gt>' --key '$_-E<gt>[0]' >>, which is to say to sort by
+descending length of name):
+
+ name,age
+ Dennis,15
+ Jerry,30
+ Andy,20
+ Ben,30
 
 =head1 OPTIONS
 
@@ -115,25 +135,34 @@ C<*> marks required options.
 
 =item B<--by-code-json>=I<s>
 
-Perl code to do sorting (JSON-encoded).
+Sort using Perl code (JSON-encoded).
 
 See C<--by-code>.
 
 =item B<--by-code>=I<s>
 
-Perl code to do sorting.
+Sort using Perl code.
 
 `$a` and `$b` (or the first and second argument) will contain the two rows to be
-compared.
+compared. Which are arrayrefs; or if `--hash` (`-H`) is specified, hashrefs; or
+if `--key` is specified, whatever the code in `--key` returns.
 
 
 =item B<--by-fields>=I<s>
 
-A comma-separated list of field sort specification.
+Sort by a comma-separated list of field specification.
 
 `+FIELD` to mean sort numerically ascending, `-FIELD` to sort numerically
 descending, `FIELD` to mean sort ascibetically ascending, `~FIELD` to mean sort
 ascibetically descending.
+
+
+=item B<--by-sortsub>=I<s>
+
+Sort using a Sort::Sub routine.
+
+Usually combined with `--key` because most Sort::Sub routine expects a string to
+be compared against.
 
 
 =item B<--ci>, B<-i>
@@ -149,6 +178,24 @@ Use `-` to read from stdin.
 
 Provide row in $_ as hashref instead of arrayref.
 
+=item B<--key-json>=I<s>, B<-k>
+
+Generate sort keys with this Perl code (JSON-encoded).
+
+See C<--key>.
+
+=item B<--key>=I<s>
+
+Generate sort keys with this Perl code.
+
+If specified, then will compute sort keys using Perl code and sort using the
+keys. Relevant when sorting using `--by-code` or `--by-sortsub`. If specified,
+then instead of rows the code/Sort::Sub routine will receive these sort keys to
+sort against.
+
+The code will receive the row as the argument.
+
+
 =item B<--no-header>
 
 By default (`--header`), the first row of the CSV will be assumed to contain
@@ -159,6 +206,18 @@ and so on.
 
 
 =item B<--reverse>, B<-r>
+
+=item B<--sortsub-args-json>=I<s>
+
+Arguments to pass to Sort::Sub routine (JSON-encoded).
+
+See C<--sortsub-args>.
+
+=item B<--sortsub-args>=I<s>%
+
+Arguments to pass to Sort::Sub routine.
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
 
 =item B<--tsv>
 

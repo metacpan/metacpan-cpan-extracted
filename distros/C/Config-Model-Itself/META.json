@@ -1,5 +1,5 @@
 {
-   "abstract" : "Model editor for Config::Model",
+   "abstract" : "Model (or schema) editor for Config::Model",
    "author" : [
       "Dominique Dumont"
    ],
@@ -35,7 +35,7 @@
             "App::Cme" : "1.002",
             "App::Cme::Common" : "0",
             "Carp" : "0",
-            "Config::Model" : "2.134",
+            "Config::Model" : "2.138",
             "Config::Model::TkUI" : "1.370",
             "Config::Model::Value" : "0",
             "Data::Compare" : "0",
@@ -54,7 +54,7 @@
             "YAML::XS" : "0",
             "base" : "0",
             "lib" : "0",
-            "perl" : "5.012",
+            "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -62,6 +62,7 @@
       "test" : {
          "requires" : {
             "App::Cmd::Tester" : "0",
+            "Config::Model" : "2.138",
             "Config::Model::Tester::Setup" : "0",
             "File::Copy::Recursive" : "0",
             "Getopt::Long" : "0",
@@ -70,7 +71,8 @@
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.00",
-            "Text::Diff" : "0"
+            "Text::Diff" : "0",
+            "perl" : "5.014"
          }
       }
    },
@@ -87,8 +89,8 @@
          "web" : "http://github.com/dod38fr/config-model-itself"
       }
    },
-   "version" : "2.018",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+   "version" : "2.020",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }
 

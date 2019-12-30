@@ -15,11 +15,11 @@ Image::Imlib2::Thumbnail::Scaled - Create scaled thumbnails while keeping the as
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 

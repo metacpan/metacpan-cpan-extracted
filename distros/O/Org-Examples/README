@@ -1,0 +1,38 @@
+NAME
+    Org::Examples - Example Org documents
+
+VERSION
+    This document describes version 0.001 of Org::Examples (from Perl
+    distribution Org-Examples), released on 2020-12-30.
+
+DESCRIPTION
+    This distribution contains various examples of Org documents in its
+    per-dist share directory. It is also used to test Org::Parser.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Org-Examples>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Org-Examples>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Org-Examples>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Org::Parser
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

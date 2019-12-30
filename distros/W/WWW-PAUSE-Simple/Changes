@@ -1,3 +1,10 @@
+0.446   2019-11-14  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- Fix regression typo in argument summary.
+
+
 0.445   2019-11-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Remove options: retry_delay, retry_max_delay; tune down default

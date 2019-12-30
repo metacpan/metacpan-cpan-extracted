@@ -467,7 +467,7 @@ bind_sub_precompile(...)
 MODULE = SPVM::ExchangeAPI		PACKAGE = SPVM::ExchangeAPI
 
 SV*
-new_barray(...)
+new_byte_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -478,7 +478,7 @@ new_barray(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("Argument of SPVM::ExchangeAPI::new_barray() must be array reference at %s line %d\n", MFILE, __LINE__);
+      croak("Argument of SPVM::ExchangeAPI::new_byte_array() must be array reference at %s line %d\n", MFILE, __LINE__);
     }
     
     AV* av_elems = (AV*)SvRV(sv_elems);
@@ -489,7 +489,7 @@ new_barray(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_barray_raw(env, length);
+    void* array = env->new_byte_array_raw(env, length);
 
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -516,7 +516,7 @@ new_barray(...)
 }
 
 SV*
-new_barray_from_bin(...)
+new_byte_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -534,7 +534,7 @@ new_barray_from_bin(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_barray_raw(env, array_length);
+    void* array = env->new_byte_array_raw(env, array_length);
 
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -554,7 +554,7 @@ new_barray_from_bin(...)
 }
 
 SV*
-new_sarray(...)
+new_short_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -565,7 +565,7 @@ new_sarray(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("Argument of SPVM::ExchangeAPI::new_sarray() must be array reference at %s line %d\n", MFILE, __LINE__);
+      croak("Argument of SPVM::ExchangeAPI::new_short_array() must be array reference at %s line %d\n", MFILE, __LINE__);
     }
   
     AV* av_elems = (AV*)SvRV(sv_elems);
@@ -576,7 +576,7 @@ new_sarray(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_sarray_raw(env, length);
+    void* array = env->new_short_array_raw(env, length);
 
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -603,7 +603,7 @@ new_sarray(...)
 }
 
 SV*
-new_sarray_from_bin(...)
+new_short_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -621,7 +621,7 @@ new_sarray_from_bin(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_sarray_raw(env, array_length);
+    void* array = env->new_short_array_raw(env, array_length);
 
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -641,7 +641,7 @@ new_sarray_from_bin(...)
 }
 
 SV*
-new_iarray(...)
+new_int_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -652,7 +652,7 @@ new_iarray(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("Argument of SPVM::ExchangeAPI::new_iarray() must be array reference at %s line %d\n", MFILE, __LINE__);
+      croak("Argument of SPVM::ExchangeAPI::new_int_array() must be array reference at %s line %d\n", MFILE, __LINE__);
     }
     
     AV* av_elems = (AV*)SvRV(sv_elems);
@@ -663,7 +663,7 @@ new_iarray(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_iarray_raw(env, length);
+    void* array = env->new_int_array_raw(env, length);
     
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -689,7 +689,7 @@ new_iarray(...)
 }
 
 SV*
-new_iarray_from_bin(...)
+new_int_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -707,7 +707,7 @@ new_iarray_from_bin(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_iarray_raw(env, array_length);
+    void* array = env->new_int_array_raw(env, array_length);
 
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -727,7 +727,7 @@ new_iarray_from_bin(...)
 }
 
 SV*
-new_larray(...)
+new_long_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -738,7 +738,7 @@ new_larray(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("Argument of SPVM::ExchangeAPI::new_larray() must be array reference at %s line %d\n", MFILE, __LINE__);
+      croak("Argument of SPVM::ExchangeAPI::new_long_array() must be array reference at %s line %d\n", MFILE, __LINE__);
     }
     
     AV* av_elems = (AV*)SvRV(sv_elems);
@@ -749,7 +749,7 @@ new_larray(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_larray_raw(env, length);
+    void* array = env->new_long_array_raw(env, length);
 
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -776,7 +776,7 @@ new_larray(...)
 }
 
 SV*
-new_larray_from_bin(...)
+new_long_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -794,7 +794,7 @@ new_larray_from_bin(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_larray_raw(env, array_length);
+    void* array = env->new_long_array_raw(env, array_length);
 
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -814,7 +814,7 @@ new_larray_from_bin(...)
 }
 
 SV*
-new_farray(...)
+new_float_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -825,7 +825,7 @@ new_farray(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("Argument of SPVM::ExchangeAPI::new_farray() must be array reference at %s line %d\n", MFILE, __LINE__);
+      croak("Argument of SPVM::ExchangeAPI::new_float_array() must be array reference at %s line %d\n", MFILE, __LINE__);
     }
     
     AV* av_elems = (AV*)SvRV(sv_elems);
@@ -836,7 +836,7 @@ new_farray(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_farray_raw(env, length);
+    void* array = env->new_float_array_raw(env, length);
 
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -863,7 +863,7 @@ new_farray(...)
 }
 
 SV*
-new_farray_from_bin(...)
+new_float_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -881,7 +881,7 @@ new_farray_from_bin(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_farray_raw(env, array_length);
+    void* array = env->new_float_array_raw(env, array_length);
 
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -901,7 +901,7 @@ new_farray_from_bin(...)
 }
 
 SV*
-new_darray(...)
+new_double_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -912,7 +912,7 @@ new_darray(...)
   SV* sv_array;
   if (SvOK(sv_elems)) {
     if (!sv_derived_from(sv_elems, "ARRAY")) {
-      croak("Argument of SPVM::ExchangeAPI::new_darray() must be array reference at %s line %d\n", MFILE, __LINE__);
+      croak("Argument of SPVM::ExchangeAPI::new_double_array() must be array reference at %s line %d\n", MFILE, __LINE__);
     }
     
     AV* av_elems = (AV*)SvRV(sv_elems);
@@ -923,7 +923,7 @@ new_darray(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_darray_raw(env, length);
+    void* array = env->new_double_array_raw(env, length);
 
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -949,7 +949,7 @@ new_darray(...)
 }
 
 SV*
-new_darray_from_bin(...)
+new_double_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -967,7 +967,7 @@ new_darray_from_bin(...)
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
     
     // New array
-    void* array = env->new_darray_raw(env, array_length);
+    void* array = env->new_double_array_raw(env, array_length);
 
     // Increment reference count
     env->inc_ref_count(env, array);
@@ -987,7 +987,7 @@ new_darray_from_bin(...)
 }
 
 SV*
-_new_oarray(...)
+_new_object_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -997,7 +997,7 @@ _new_oarray(...)
   SV* sv_elems = ST(2);
   
   if (!sv_derived_from(sv_elems, "ARRAY")) {
-    croak("Second argument of SPVM::new_oarray must be array reference at %s line %d\n", MFILE, __LINE__);
+    croak("Second argument of SPVM::new_object_array must be array reference at %s line %d\n", MFILE, __LINE__);
   }
   
   const char* basic_type_name = SvPV_nolen(sv_basic_type_name);
@@ -1016,7 +1016,7 @@ _new_oarray(...)
   assert(basic_type);
   
   // New array
-  SPVM_OBJECT* array = env->new_oarray_raw(env, basic_type->id, length);
+  SPVM_OBJECT* array = env->new_object_array_raw(env, basic_type->id, length);
   
   // Increment reference count
   env->inc_ref_count(env, array);
@@ -1055,7 +1055,7 @@ _new_oarray(...)
 }
 
 SV*
-_new_marray(...)
+_new_muldim_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -1088,7 +1088,7 @@ _new_marray(...)
   assert(basic_type);
   
   // New array
-  SPVM_OBJECT* array = env->new_marray_raw(env, basic_type->id, element_type_dimension, length);
+  SPVM_OBJECT* array = env->new_muldim_array_raw(env, basic_type->id, element_type_dimension, length);
   
   int32_t array_basic_type_id = array->basic_type_id;
 
@@ -1125,7 +1125,7 @@ _new_marray(...)
 }
 
 SV*
-_new_varray(...)
+_new_mulnum_array(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -1157,7 +1157,7 @@ _new_varray(...)
   }
   
   // New array
-  void* array = env->new_varray_raw(env, basic_type->id, length);
+  void* array = env->new_mulnum_array_raw(env, basic_type->id, length);
   
   // Increment reference count
   env->inc_ref_count(env, array);
@@ -1243,7 +1243,7 @@ _new_varray(...)
 }
 
 SV*
-_new_varray_from_bin(...)
+_new_mulnum_array_from_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -1322,7 +1322,7 @@ _new_varray_from_bin(...)
   
   array_length = binary_length / field_length / field_width;
 
-  SPVM_OBJECT* array = env->new_varray_raw(env, basic_type->id, array_length);
+  SPVM_OBJECT* array = env->new_mulnum_array_raw(env, basic_type->id, array_length);
 
   int32_t basic_type_id = array->basic_type_id;
   int32_t dimension = array->type_dimension;
@@ -1560,7 +1560,7 @@ call_sub(...)
           arg_var_id++;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_BYTE: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_BYTE: {
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
@@ -1605,7 +1605,7 @@ call_sub(...)
           }
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_SHORT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_SHORT: {
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
@@ -1650,7 +1650,7 @@ call_sub(...)
           }
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_INT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_INT: {
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
@@ -1695,7 +1695,7 @@ call_sub(...)
           }
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_LONG: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_LONG: {
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
@@ -1740,7 +1740,7 @@ call_sub(...)
           }
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_FLOAT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_FLOAT: {
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
@@ -1785,7 +1785,7 @@ call_sub(...)
           }
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_DOUBLE: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_DOUBLE: {
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
@@ -1834,7 +1834,7 @@ call_sub(...)
         case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
         case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
         case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY:
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY:
         case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
         {
           // undef
@@ -1886,7 +1886,7 @@ call_sub(...)
               // If arument type is byte[][] and first value of array reference is no-ref-scalar, the value is convert to byte[][]
               if (arg->basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE && arg->type_dimension == 2 && first_arg_is_no_ref_scalar) {
                 // New array
-                SPVM_OBJECT* array = env->new_marray_raw(env, SPVM_BASIC_TYPE_C_ID_BYTE, 1, length);
+                SPVM_OBJECT* array = env->new_muldim_array_raw(env, SPVM_BASIC_TYPE_C_ID_BYTE, 1, length);
 
                 // Increment reference count
                 env->inc_ref_count(env, array);
@@ -1921,7 +1921,7 @@ call_sub(...)
                 switch (arg->basic_type_id) {
                   case SPVM_BASIC_TYPE_C_ID_BYTE: {
                     // New array
-                    void* array = env->new_barray_raw(env, length);
+                    void* array = env->new_byte_array_raw(env, length);
 
                     // Increment reference count
                     env->inc_ref_count(env, array);
@@ -1943,7 +1943,7 @@ call_sub(...)
                   }
                   case SPVM_BASIC_TYPE_C_ID_SHORT: {
                     // New array
-                    void* array = env->new_sarray_raw(env, length);
+                    void* array = env->new_short_array_raw(env, length);
 
                     // Increment reference count
                     env->inc_ref_count(env, array);
@@ -1966,7 +1966,7 @@ call_sub(...)
                   case SPVM_BASIC_TYPE_C_ID_INT: {
                     
                     // New array
-                    void* array = env->new_iarray_raw(env, length);
+                    void* array = env->new_int_array_raw(env, length);
                     
                     // Increment reference count
                     env->inc_ref_count(env, array);
@@ -1989,7 +1989,7 @@ call_sub(...)
                   }
                   case SPVM_BASIC_TYPE_C_ID_LONG: {
                     // New array
-                    void* array = env->new_larray_raw(env, length);
+                    void* array = env->new_long_array_raw(env, length);
 
                     // Increment reference count
                     env->inc_ref_count(env, array);
@@ -2011,7 +2011,7 @@ call_sub(...)
                   }
                   case SPVM_BASIC_TYPE_C_ID_FLOAT: {
                     // New array
-                    void* array = env->new_farray_raw(env, length);
+                    void* array = env->new_float_array_raw(env, length);
 
                     // Increment reference count
                     env->inc_ref_count(env, array);
@@ -2033,7 +2033,7 @@ call_sub(...)
                   }
                   case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
                     // New array
-                    void* array = env->new_darray_raw(env, length);
+                    void* array = env->new_double_array_raw(env, length);
 
                     // Increment reference count
                     env->inc_ref_count(env, array);
@@ -2055,7 +2055,7 @@ call_sub(...)
                   }
                   case SPVM_BASIC_TYPE_C_ID_ANY_OBJECT: {
                     // New array
-                    void* array = env->new_oarray_raw(env, SPVM_BASIC_TYPE_C_ID_ANY_OBJECT, length);
+                    void* array = env->new_object_array_raw(env, SPVM_BASIC_TYPE_C_ID_ANY_OBJECT, length);
 
                     // Increment reference count
                     env->inc_ref_count(env, array);
@@ -2220,7 +2220,7 @@ call_sub(...)
           arg_var_id++;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_BYTE: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_BYTE: {
           args_contain_ref = 1;
           int32_t is_hash_ref_ref;
           HV* hv_value;
@@ -2287,7 +2287,7 @@ call_sub(...)
           
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_SHORT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_SHORT: {
           args_contain_ref = 1;
           int32_t is_hash_ref_ref;
           HV* hv_value;
@@ -2353,7 +2353,7 @@ call_sub(...)
           arg_var_id++;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_INT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_INT: {
           args_contain_ref = 1;
           int32_t is_hash_ref_ref;
           HV* hv_value;
@@ -2419,7 +2419,7 @@ call_sub(...)
           arg_var_id++;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_LONG: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_LONG: {
           args_contain_ref = 1;
           int32_t is_hash_ref_ref;
           HV* hv_value;
@@ -2485,7 +2485,7 @@ call_sub(...)
           arg_var_id++;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_FLOAT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_FLOAT: {
           args_contain_ref = 1;
           int32_t is_hash_ref_ref;
           HV* hv_value;
@@ -2551,7 +2551,7 @@ call_sub(...)
           arg_var_id++;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_DOUBLE: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_DOUBLE: {
           args_contain_ref = 1;
           int32_t is_hash_ref_ref;
           HV* hv_value;
@@ -2627,12 +2627,12 @@ call_sub(...)
   SV* sv_return_value = NULL;
   int32_t excetpion_flag;
   switch (sub->return_runtime_type_category) {
-    case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_BYTE:
-    case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_SHORT:
-    case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_INT:
-    case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_LONG:
-    case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_FLOAT:
-    case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_DOUBLE:
+    case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_BYTE:
+    case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_SHORT:
+    case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_INT:
+    case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_LONG:
+    case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_FLOAT:
+    case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_DOUBLE:
     {
       int32_t sub_return_basic_type_id = sub->return_basic_type_id;
       int32_t sub_return_type_dimension = sub->return_type_dimension;
@@ -2690,7 +2690,7 @@ call_sub(...)
     case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
     case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
     case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
-    case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY:
+    case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY:
     case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
     {
       excetpion_flag = env->call_sub(env, sub_id, stack);
@@ -2809,7 +2809,7 @@ call_sub(...)
           sv_setnv(sv_value_deref, ref_stack[ref_stack_id].dval);
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_BYTE: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_BYTE: {
           SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
           SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
@@ -2824,7 +2824,7 @@ call_sub(...)
           }
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_SHORT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_SHORT: {
           SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
           SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
@@ -2839,7 +2839,7 @@ call_sub(...)
           }
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_INT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_INT: {
           SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
           SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
@@ -2854,7 +2854,7 @@ call_sub(...)
           }
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_LONG: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_LONG: {
           SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
           SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
@@ -2869,7 +2869,7 @@ call_sub(...)
           }
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_FLOAT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_FLOAT: {
           SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
           SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
@@ -2884,7 +2884,7 @@ call_sub(...)
           }
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_DOUBLE: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_DOUBLE: {
           SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
           SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
@@ -2960,7 +2960,7 @@ to_elems(...)
     SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
     int32_t element_type_dimension = dimension - 1;
 
-    if (array->runtime_type_category == SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY) {
+    if (array->runtime_type_category == SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY) {
       
       for (int32_t index = 0; index < length; index++) {
         SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[array->basic_type_id];
@@ -3164,7 +3164,7 @@ to_bin(...)
     SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
     int32_t element_type_dimension = dimension - 1;
 
-    if (array->runtime_type_category == SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY) {
+    if (array->runtime_type_category == SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY) {
       SPVM_RUNTIME_PACKAGE* package = &runtime->packages[basic_type->package_id];
       assert(package);
       

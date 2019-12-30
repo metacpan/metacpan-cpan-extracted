@@ -30,7 +30,11 @@ MyTestHelpers::nowarnings();
 
 use Graph::Maker::Catalans;
 
-plan tests => 24;
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
+use MyGraphs;
+
+plan tests => 30;
 
 sub binomial {
   my ($n,$k) = @_;
@@ -46,7 +50,134 @@ sub binomial {
 
 
 #------------------------------------------------------------------------------
-# rotate
+# flip = Stanley
+
+sub flip_num_maximal_chains {
+  my ($n) = @_;
+
+  # Richard P. Stanley, "The Fibonacci Lattice", Fibonacci Quarterly, volume
+  # 13, number 3, October 1975, pages 215-232.
+  # https://fq.math.ca/13-3.html
+  # https://fq.math.ca/Scanned/13-3/stanley.pdf
+  # Page 222, left as an exercise for the reader.
+  #
+  # Hook length formula Frame, Robinson, Thrall as given by Luke Nelson.
+  # h(n) = binomial(n,2)! / prod(i=1,n-1, (2*i-1)^(n-i));
+  # vector(8,n,n--; h(n))
+  # A005118
+  # h(4)
+
+  # This code began counting powers so as to stay in 32 or 64 bits, but now
+  # gone to bignum.
+
+  my @powers;
+  foreach my $i (1 .. binomial($n,2)) {
+    $powers[$i]++;
+  }
+  foreach my $i (1 .. $n-1) {
+    my $b = 2*$i - 1;   # 1 to 2n-3
+    my $p = $n - $i;    # n-1 to 1
+    $powers[$b] -= $p;
+  }
+  for (my $i = 4; $i <= $#powers; $i+=2) {
+    my $t = $i;
+    until ($t % 2) {
+      $t /= 2;
+      $powers[2] += $powers[$i];
+    }
+    $powers[$t] += $powers[$i];
+    $powers[$i] = 0;
+  }
+  ### @powers
+  my $ret = Math::BigInt->new(1);
+  foreach my $i (0 .. $#powers) {
+    $powers[$i] ||= 0;
+    if ($powers[$i] > 0) { $ret *= Math::BigInt->new($i)**$powers[$i]; }
+  }
+  foreach my $i (0 .. $#powers) {
+    if ($powers[$i] < 0) { $ret /= Math::BigInt->new($i)**-$powers[$i]; }
+  }
+  return $ret;
+}
+MyOEIS::compare_values
+  (anum => 'A005118',
+   max_count => 8,
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $N = 0; @got < $count; $N++) {
+       my $graph = Graph::Maker->new('Catalans', N => $N, rel_type => 'flip');
+       push @got, MyGraphs::Graph_num_maximal_paths($graph);
+     }
+     return \@got;
+   });
+MyOEIS::compare_values
+  (anum => 'A005118',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $N = 0; @got < $count; $N++) {
+       push @got, flip_num_maximal_chains($N);
+     }
+     return \@got;
+   });
+
+
+# M. De Sainte-Catherine and G. Viennot, "Enumeration of Certain Young
+# Tableaux With Bounded Height", Lecture Notes in Mathematics 1234, pages
+# 58-67, 1986.  As given in Bernardi and Bonichon.
+# A005700
+#
+sub flip_num_intervals {
+  my ($n) = @_;
+  return 6 * Math::BigInt->bfac(2*$n) * Math::BigInt->bfac(2*$n+2)
+    / Math::BigInt->bfac($n) / Math::BigInt->bfac($n+1)
+    / Math::BigInt->bfac($n+2) / Math::BigInt->bfac($n+3);
+}
+# foreach my $n (2..10) { print flip_num_intervals($n),","; }
+# print "\n";
+MyOEIS::compare_values
+  (anum => 'A005700',
+   max_count => 8,
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $N = 0; @got < $count; $N++) {
+       my $graph = Graph::Maker->new('Catalans', N => $N, rel_type => 'flip');
+       push @got, MyGraphs::Graph_num_intervals($graph);
+     }
+     return \@got;
+   });
+MyOEIS::compare_values
+  (anum => 'A005700',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $N = 0; @got < $count; $N++) {
+       push @got, flip_num_intervals($N);
+     }
+     return \@got;
+   });
+
+
+
+#------------------------------------------------------------------------------
+# rotate = Tamari
+
+# A027686 num maximal chains
+# 1, 1, 1, 2, 9, 98, 2981
+MyOEIS::compare_values
+  (anum => 'A027686',
+   max_count => 8,
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $N = 0; @got < $count; $N++) {
+       my $graph = Graph::Maker->new('Catalans', N => $N);
+       push @got, MyGraphs::Graph_num_maximal_paths($graph);
+     }
+     return \@got;
+   });
 
 # A002054 (n-1)/2*Catalan = num edges
 MyOEIS::compare_values
@@ -197,7 +328,24 @@ MyOEIS::compare_values
 # split = Kreweras
 
 # A000272 n^(n-2) = split, maximal chains
-# checked against the graph in t/Catalans.t
+# Kreweras page 348 corollary 5.2 maximal chains m^(m-2).
+# And ref to the same from Y. Poupard, "Codage et Denombrement
+# Diverse Structures Apparentees a Celle d'Arbre", Cahiers BURO, volume
+# 16, 1970, pages 71-80.
+#
+MyOEIS::compare_values
+  (anum => 'A000272',
+   max_count => 9,
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $N = 0; @got < $count; $N++) {
+       my $graph = Graph::Maker->new('Catalans', N => $N,
+                                     rel_type => 'split');
+       push @got, MyGraphs::Graph_num_maximal_paths($graph);
+     }
+     return \@got;
+   });
 MyOEIS::compare_values
   (anum => 'A000272',
    max_count => 9,

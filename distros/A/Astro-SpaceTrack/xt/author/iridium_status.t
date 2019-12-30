@@ -74,8 +74,9 @@ my %known_inconsistent = (
 				# Sladen: Failure 08-Mar-2019
 				# Kelso: Failed 21-Mar-2019
 				# Decay: 25-Mar-2019
-    27450 => { sladen => 1 },	# 10-Mar-2018: Sladen failed.
+#   27450 => { sladen => 1 },	# 10-Mar-2018: Sladen failed.
 				# Kelso: Backup 30-May-2018
+				# Kelso: Failed 19-Dec-2019
 );
 
 my $st = Astro::SpaceTrack->new();
@@ -155,7 +156,7 @@ foreach (
  25467   Iridium 82     [-]      Tumbling
  25527   Iridium 2      [-]      Tumbling
  27376   Iridium 96     [-]      Tumbling
- 27450   Iridium 97     [B]      
+ 27450   Iridium 97     [-]      Tumbling
 KELSO
 	["Rod Sladen's Iridium Constellation Status",
 	sladen => <<'SLADEN'],
@@ -191,7 +192,7 @@ KELSO
  25467   Iridium 82     [-]      Plane 6 - Failed on station?
  25527   Iridium 2      [-]      Plane 5
  27376   Iridium 96     [-]      Plane 4 - Failed on station?
- 27450   Iridium 97     [-]      Plane 4
+ 27450   Iridium 97     [-]      Plane 4 - Failed on station?
 SLADEN
         $space_track_skip ? () :
 	[ "Space Track Iridium status",

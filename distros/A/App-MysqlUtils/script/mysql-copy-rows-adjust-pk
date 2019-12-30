@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_copy_rows_adjust_pk
-# and generated automatically using Perinci::CmdLine::Gen version 0.490
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-04-26'; # DATE
+our $DATE = '2019-12-24'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ mysql-copy-rows-adjust-pk - Copy rows from one table to another, adjust PK colum
 
 =head1 VERSION
 
-This document describes version 0.018 of mysql-copy-rows-adjust-pk (from Perl distribution App-MysqlUtils), released on 2019-04-26.
+This document describes version 0.019 of mysql-copy-rows-adjust-pk (from Perl distribution App-MysqlUtils), released on 2019-12-24.
 
 =head1 SYNOPSIS
 
@@ -132,7 +132,7 @@ Name of target table.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -256,6 +256,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--dry-run>
 
 Run in simulation mode (also via DRY_RUN=1).
+
+Default value:
+
+ ""
 
 =item B<--help>, B<-h>, B<-?>
 

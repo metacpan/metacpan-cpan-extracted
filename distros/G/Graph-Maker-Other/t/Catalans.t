@@ -29,7 +29,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 41852;
+plan tests => 39825;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -39,7 +39,7 @@ require Graph::Maker::Catalans;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::Catalans::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Catalans->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Catalans->VERSION($want_version); 1 }, 1,
@@ -75,52 +75,6 @@ sub num_intervals {
   return $ret;
 }
 
-# $graph is a directed Graph.pm which is directed and has a unique
-# predecessorless start and unique successorless end.
-# Return the number of different paths from start to end.
-# This is the number of maximal chains in the graph as a lattice.
-#
-sub num_maximal_chains {
-  my ($graph) = @_;
-  ### num_maximal_chains() ...
-  my @end = $graph->successorless_vertices;
-  @end==1 or die "no unique end";
-  my @start = $graph->predecessorless_vertices;
-  @start==1 or die "no unique start";
-  my %ways     = ($start[0] => 1);
-  my %pending;
-  my %indegree;
-  foreach my $v ($graph->vertices) {
-    $pending{$v} = 1;
-    $indegree{$v} = 0;
-  }
-  while (%pending) {
-    ### at pending: scalar(keys %pending)
-    my $progress;
-    foreach my $v (keys %pending) {
-      if ($indegree{$v} != $graph->in_degree($v)) {
-        ### not ready: "$v  indegree = $indegree{$v}"
-        ### assert: $indegree{$v} < $graph->in_degree($v)
-        next;
-      }
-      delete $pending{$v};
-      foreach my $to ($graph->successors($v)) {
-        ### edge: "$v to $to"
-        $pending{$to} or die "oops, to=$to not pending";
-        $ways{$to} += $ways{$v};
-        $indegree{$to}++;
-        $progress = 1;
-      }
-    }
-
-    if (%pending && !$progress) {
-      die "num_maximal_chains() oops, no progress";
-    }
-  }
-  ### return: $ways{$end[0]}
-  return $ways{$end[0]};
-}
-
 sub factorial {
   my ($n) = @_;
   my $ret = 1;
@@ -149,6 +103,8 @@ foreach my $n (0 .. 6) {
 }
 ok (binomial(-1,-1), 0);
 
+# Return a list of arrayrefs which are all balanced binary arrays of length
+# 2*$n, so all in graph N = $n.
 sub balanced_list {
   my ($n) = @_;
   my @ret;
@@ -159,6 +115,8 @@ sub balanced_list {
   return @ret;
 }
 
+# $aref is an arrayref of integers 0 or 1.
+# Return the number of occurrences of 1,1 in the array.
 sub array_count_11 {
   my ($aref) = @_;
   my $ret = 0;
@@ -190,305 +148,6 @@ sub vpar_siblings_setsizes {
 ok(join(',',vpar_siblings_setsizes([0,0])), '2');
 ok(join(',',vpar_siblings_setsizes([0,1])), '1,1');
 ok(join(',',vpar_siblings_setsizes([0,1,1])), '1,2');
-
-sub graph_following_set_hashref {
-  my ($graph, $method, $href) = @_;
-  my %ret;
-  foreach my $v (keys %$href) {
-    @ret{$graph->$method($v)} = ();  # hash slice
-  }
-  return \%ret;
-}
-
-# sub lattice_min {
-#   my ($graph, $u, $v) = @_;
-#   return lattice_min_or_max($graph,$u,$v, 'predecessors', 'all_predecessors');
-# }
-# sub lattice_max {
-#   my ($graph, $u, $v) = @_;
-#   return lattice_min_or_max($graph,$u,$v, 'successors', 'all_successors');
-# }
-# sub lattice_min_or_max {
-#   my ($graph, $u, $v, $immediate, $all) = @_;
-#
-#   die "WRONG";
-#
-#   my @verts = ($u,$v);
-#   my @verts_descendants;
-#   foreach my $i (0,1) {
-#     $verts_descendants[$i]->[0]->{$verts[$i]} = 1;
-#   }
-#   for (my $distance = 0; ; $distance++) {
-#     foreach my $i (0,1) {
-#       foreach my $from (keys %{$verts_descendants[$i]->[$distance]}) {
-#         foreach my $to_distance (0 .. $distance) {
-#           if ($verts_descendants[!$i]->[$to_distance]->{$from}) {
-#             return $from;
-#           }
-#         }
-#       }
-#     }
-#     foreach my $i (0,1) {
-#       $verts_descendants[$i]->[$distance+1]
-#         = graph_following_set_hashref($graph,$immediate,
-#                                       $verts_descendants[$i]->[$distance]);
-#     }
-#     if (! $verts_descendants[0]->[$distance+1]
-#         && ! $verts_descendants[1]->[$distance+1]) {
-#       die "lattice_min_or_max() not found";
-#     }
-#   }
-#
-#   # my %v_successors; @v_successors{$v, $graph->$all($v)} = ();  # hash slice
-#   # my %t = ($u => 1);
-#   # while (%t) {
-#   #   foreach my $t (keys %t) {
-#   #     if (exists $v_successors{$t}) {
-#   #       return $t;
-#   #     }
-#   #   }
-#   #   my %new_t;
-#   #   foreach my $t (keys %t) {
-#   #     @new_t{$graph->$immediate($t)} = ();  # hash slice
-#   #   }
-#   #   %t = %new_t;
-#   # }
-#   # die "lattice_min_or_max() not found";
-# }
-
-sub lattice_lowest {
-  my ($graph) = @_;
-  my @predecessorless = $graph->predecessorless_vertices;
-  @predecessorless==1
-    or die "lattice_lowest() oops, expected one predecessorless";
-  return $predecessorless[0];
-}
-sub lattice_highest {
-  my ($graph) = @_;
-  my @successorless = $graph->successorless_vertices;
-  @successorless==1
-    or die "lattice_highest() oops, expected one successorless";
-  return $successorless[0];
-}
-
-sub lattice_minmax_hash {
-  my ($graph) = @_;
-  my $verbose = 1;
-  my %hash;
-  my @vertices = $graph->vertices;
-  foreach my $elem (['all_successors','max'],
-                    ['all_predecessors','min']) {
-    my ($all_method, $key) = @$elem;
-
-    # $all_successors{$x}->{$y} = boolean, true x has y after it, false if not.
-    # x is a successor of itself ($graph->all_successors doesn't include x
-    # itself).
-    my %all_successors;
-    foreach my $x (@vertices) {
-      $all_successors{$x}->{$x} = 1;
-      foreach my $s ($graph->$all_method($x)) {
-        $all_successors{$x}->{$s} = 1;
-      }
-    }
-
-    # For each pair x,y look at the common successors and choose the smallest.
-    # Smallest in the sense the smaller has bigger among its successors.
-    foreach my $x (@vertices) {
-      my $xs_href = $all_successors{$x};
-      foreach my $y (@vertices) {
-        my $ys_href = $all_successors{$y};
-        my $m;
-        foreach my $xs (keys %$xs_href) {
-          if ($ys_href->{$xs}) {  # common successor
-            if (!defined $m || $all_successors{$xs}->{$m}) {
-              $m = $xs;           # which is before best $m so far
-            }
-          }
-        }
-        $hash{$key}->{$x}->{$y} = $m;
-      }
-    }
-  }
-  return \%hash;
-
-
-  # foreach my $v (@vertices) {
-  #   $hash{'max'}->{$v}->{$v}
-  #     = $hash{'min'}->{$v}->{$v} = $v;
-  # }
-  # foreach my $x (@vertices) {
-  #   foreach my $y ($graph->all_successors($x)) {
-  #     $hash{'max'}->{$x}->{$y}
-  #       = $hash{'max'}->{$y}->{$x}  = $y;
-  #     if ($verbose) { print "successor  $x max $y = $y\n"; }
-  #   }
-  #   foreach my $y ($graph->all_predecessors($x)) {
-  #     $hash{'min'}->{$x}->{$y}
-  #       = $hash{'min'}->{$y}->{$x}  = $y;
-  #     if ($verbose) { print "predecessor  $x min $y = $y\n"; }
-  #   }
-  # }
-
-  # my $more = 1;
-  # while ($more) {
-  #   $more = 0;
-  #   foreach my $M ('min','max') {
-  #     foreach my $x (@vertices) {
-  #       foreach my $y (@vertices) {
-  #         if (defined(my $m $hash{$M}->{$x}->{$y})) {
-  #           foreach my $z (@vertices) {
-  #
-  #             if (defined(my $m = $hash{'max'}->{$y}->{$z})) {
-  #             $more = 1;
-  #             $hash{'max'}->{$x}->{$y}
-  #               = $hash{'max'}->{$y}->{$x}
-  #               = $m;
-  #             if ($verbose) { print "chain  $x max $y = $m  from $z\n"; }
-  #           }
-  #         }
-  #       }
-  #       if (! defined $hash{'min'}->{$x}->{$y}) {
-  #         foreach my $z ($graph->predecessors($y)) {
-  #           if (defined(my $m = $hash{'min'}->{$x}->{$z})) {
-  #             $more = 1;
-  #             $hash{'min'}->{$x}->{$y}
-  #               = $hash{'min'}->{$y}->{$x}
-  #               = $m;
-  #             if ($verbose) { print "chain  $x min $y = $m  from $z\n"; }
-  #           }
-  #         }
-  #       }
-  #     }
-  #   }
-  # }
-
-  # my $more = 1;
-  # while ($more) {
-  #   $more = 0;
-  #   foreach my $x (@vertices) {
-  #     foreach my $y (@vertices) {
-  #       if (! defined $hash{'max'}->{$x}->{$y}) {
-  #         foreach my $z ($graph->successors($y)) {
-  #           if (defined(my $m = $hash{'max'}->{$x}->{$z})) {
-  #             $more = 1;
-  #             $hash{'max'}->{$x}->{$y}
-  #               = $hash{'max'}->{$y}->{$x}
-  #               = $m;
-  #             if ($verbose) { print "chain  $x max $y = $m  from $z\n"; }
-  #           }
-  #         }
-  #       }
-  #       if (! defined $hash{'min'}->{$x}->{$y}) {
-  #         foreach my $z ($graph->predecessors($y)) {
-  #           if (defined(my $m = $hash{'min'}->{$x}->{$z})) {
-  #             $more = 1;
-  #             $hash{'min'}->{$x}->{$y}
-  #               = $hash{'min'}->{$y}->{$x}
-  #               = $m;
-  #             if ($verbose) { print "chain  $x min $y = $m  from $z\n"; }
-  #           }
-  #         }
-  #       }
-  #     }
-  #   }
-  # }
-  #
-  # return \%hash;
-}
-
-# # Return true if $u and $v are complementary, meaning their min is the
-# # bottom element and max is the top element.
-# sub lattice_is_complementary {
-#   my ($graph, $u,$v) = @_;
-#   return lattice_min($graph, $u,$v) eq lattice_lowest($graph)
-#     &&   lattice_max($graph, $u,$v) eq lattice_highest($graph);
-# }
-
-{
-  my $graph = Graph->new;
-  $graph->add_edges(['L', 'A'],
-                    ['L', 'B'],
-                    ['A', 'H'],
-                    ['B', 'H']);
-  my $href = lattice_minmax_hash($graph);
-  foreach my $x ($graph->vertices) {
-    ok ($href->{'max'}->{$x}->{$x}, $x);
-    ok ($href->{'min'}->{$x}->{$x}, $x);
-
-    foreach my $y ($graph->vertices) {
-      ok (defined $href->{'max'}->{$x}->{$y}, 1);
-      ok (defined $href->{'min'}->{$x}->{$y}, 1);
-    }
-  }
-  ok ($href->{'max'}->{'A'}->{'B'}, 'H');
-  ok ($href->{'min'}->{'A'}->{'B'}, 'L');
-  ok ($href->{'min'}->{'B'}->{'A'}, 'L');
-
-  ### $href
-  lattice_minmax_validate($graph,$href);
-}
-sub lattice_minmax_validate {
-  my ($graph, $href) = @_;
-
-  # defined
-  foreach my $x ($graph->vertices) {
-    foreach my $y ($graph->vertices) {
-      foreach my $M ('min','max') {
-        defined $href->{$M}->{$x}->{$y}
-          or die "lattice_minmax_validate() missing $x $M $y";
-      }
-    }
-  }
-
-  # commutative
-  foreach my $x ($graph->vertices) {
-    foreach my $y ($graph->vertices) {
-      foreach my $M ('min','max') {
-        $href->{$M}->{$x}->{$y}  eq $href->{$M}->{$y}->{$x}
-          or die "lattice_minmax_validate() not commutative $x $M $y";
-      }
-    }
-  }
-
-  # idempotent
-  foreach my $x ($graph->vertices) {
-    foreach my $y ($graph->vertices) {
-      foreach my $M ('min','max') {
-        my $m = $href->{$M}->{$x}->{$y};
-        $href->{$M}->{$x}->{$m} eq $m
-          or die "lattice_minmax_validate() not idempotent $x $M $y";
-      }
-    }
-  }
-
-  # absorptive a ^ (a v b) = a v (a ^ b) = a
-  #                   L             H
-  foreach my $x ($graph->vertices) {
-    foreach my $y ($graph->vertices) {
-      my $min = $href->{'min'}->{$x}->{$y};
-      my $max = $href->{'max'}->{$x}->{$y};
-      my $a = $href->{'max'}->{$x}->{$min};
-      my $b = $href->{'min'}->{$x}->{$max};
-      ($a eq $x && $b eq $x)
-        or die "lattice_minmax_validate() not absorptive $x and $y min $min max $max got $a and $b";
-    }
-  }
-
-  # associative  (xy)z = x(yz)
-  foreach my $x ($graph->vertices) {
-    foreach my $y ($graph->vertices) {
-      foreach my $z ($graph->vertices) {
-        foreach my $M ('min','max') {
-          my $a = $href->{$M}->{$href->{$M}->{$x}->{$y}}->{$z};
-          my $b = $href->{$M}->{$x}->{$href->{$M}->{$y}->{$z}};
-          $a eq $b
-            or die "lattice_minmax_validate() not associative $x $M $y $M $z got $a and $b";
-        }
-      }
-    }
-  }
-
-}
 
 
 #------------------------------------------------------------------------------
@@ -687,7 +346,7 @@ sub binary_tree_to_heights {
     foreach my $order ('pre','in','post') {
       foreach my $LR ('L','R') {
         my $str = join(',',binary_tree_to_heights($binary_tree,$order,$LR));
-        print "$str\n";
+        # print "$str\n";
         $seen{$order}->{$LR}->{$str}++;
       }
     }
@@ -718,6 +377,43 @@ sub binary_tree_sizes {
             + 1);
   } else {
     return 0;
+  }
+}
+
+
+#------------------------------------------------------------------------------
+# Canopy
+
+sub binary_tree_to_canopy {
+  my ($binary_tree) = @_;
+  return (($binary_tree->{left} ? binary_tree_to_canopy($binary_tree->{left})
+           : 'L'),
+          ($binary_tree->{right} ? binary_tree_to_canopy($binary_tree->{right})
+           : 'R'));
+}
+{
+  # Canopy vectors 2^(N-1) distinct.
+  #
+  foreach my $N (0 .. 6) {
+    my @arrays = balanced_list($N);
+    my %seen;
+    my $any_duplicate = 0;
+    foreach my $i (0 .. $#arrays) {
+      my $aref = $arrays[$i];
+      my $binary_tree = balanced_to_binary_tree($aref);
+      my @canopy = binary_tree_to_canopy($binary_tree);
+      my $canopy = join('',@canopy);
+      if ($seen{$canopy}++) {
+        $any_duplicate = 1;
+        # print join('',@$aref)," canopy $canopy\n";
+      }
+    }
+    ok ($any_duplicate,
+        ($N>=3 ? 1 : 0),
+        "N=$N canopy duplicates when N>=3");
+    # print scalar(keys %seen),"\n";
+    ok (scalar(keys %seen),
+        $N==0 ? 1 : 2**($N-1));
   }
 }
 
@@ -796,7 +492,8 @@ sub dexter_predecessors {
   # directed
   foreach my $N (0 .. 7) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
-                                  rel_type => 'dexter');
+                                  rel_type => 'dexter',
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
 
     # A002054
@@ -874,13 +571,14 @@ sub dexter_predecessors {
 
 {
   foreach my $N (0 .. 8) {
-    my $i = 0;
     my @arrays = balanced_list($N);
     foreach my $i (0 .. $#arrays) {
       my $aref = $arrays[$i];
       my @run0s = Graph::Maker::Catalans::_vertex_name_type_run0s($aref);
 
       {
+        # Shown in the POD:
+        #   run0s[i] = Ldepths[i] + 1 - Ldepths[i+1]
         my @Ldepths = (Graph::Maker::Catalans::_vertex_name_type_Ldepths($aref),
                        0);
         my @diffs = map {$Ldepths[$_]+1 - $Ldepths[$_+1]}
@@ -1172,7 +870,8 @@ sub binary_tree_to_left_edges_above {
   foreach my $N (0 .. 6) {
     my $graph = Graph::Maker->new('Catalans',
                                   N => $N,
-                                  rel_type => 'rotate_Bempty');
+                                  rel_type => 'rotate_Bempty',
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
 
     # edge reversal mirror image
@@ -1188,7 +887,8 @@ sub binary_tree_to_left_edges_above {
     my $graph = Graph::Maker->new('Catalans',
                                   N => $N,
                                   rel_type => 'rotate_Bempty',
-                                  vertex_name_type=>'Lweights');
+                                  vertex_name_type=>'Lweights',
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
 
     # num edges 0, 0, 1, 4, 15, 56, 210 = A001791
@@ -1573,7 +1273,8 @@ sub rotate_num_edges {
 {
   # directed
   foreach my $N (0 .. 7) {
-    my $graph = Graph::Maker->new('Catalans', N => $N);
+    my $graph = Graph::Maker->new('Catalans', N => $N,
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
 
     # A002054
@@ -1586,14 +1287,6 @@ sub rotate_num_edges {
         "rotate_num_intervals_by_binomial N=$N");
     ok (rotate_num_intervals_by_binomial2($N), rotate_num_intervals($N),
         "rotate_num_intervals_by_binomial2 N=$N");
-
-    # A027686
-    # 1, 1, 1, 2, 9, 98, 2981
-    my @A027686_samples  # OFFSET=0
-      = (1, 1, 1, 2, 9, 98, 2981, 340549, 216569887);
-    ok (num_maximal_chains($graph),
-        $A027686_samples[$N],
-        "rotate num_maximal_chains N=$N");
 
     my $first = '10'x$N;
     my $last  = ('1'x$N) . ('0'x$N);
@@ -1655,7 +1348,8 @@ sub rotate_num_edges {
   # by adding its preceding
   foreach my $N (0 .. 6) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
-                                  vertex_name_type=>'Lweights');
+                                  vertex_name_type=>'Lweights',
+                                  countedged => 1);
 
     my $num_edges = 0;
     foreach my $from ($graph->vertices) {
@@ -1679,120 +1373,6 @@ sub rotate_num_edges {
       }
     }
     ok ($num_edges, scalar($graph->edges));
-  }
-}
-
-
-# 1 when nonleaf, 0 when a leaf.
-sub vpar_to_footprint {
-  my ($vpar) = @_;
-  my @has_child;
-  foreach my $p (@$vpar) {
-    $has_child[$p] = 1;
-  }
-  return map{$_?1:0} @has_child[1..scalar(@$vpar)];
-}
-ok (join('', vpar_to_footprint([0,0])), '00');
-ok (join('', vpar_to_footprint([0,1])), '10');
-
-sub lattice_minmax_is_semidistributive {
-  my ($graph, $href) = @_;
-  foreach my $x ($graph->vertices) {
-    foreach my $y ($graph->vertices) {
-      my $m = $href->{'min'}->{$x}->{$y};
-      my $M = $href->{'max'}->{$x}->{$y};
-      foreach my $z ($graph->vertices) {
-        if ($m eq $href->{'min'}->{$x}->{$z}) {
-          $href->{'min'}->{$x}->{$href->{'max'}->{$y}->{$z}} eq $m
-            or return 0;
-        }
-        if ($M eq $href->{'max'}->{$x}->{$z}) {
-          $href->{'max'}->{$x}->{$href->{'min'}->{$y}->{$z}} eq $M
-            or return 0;
-        }
-      }
-    }
-  }
-}
-
-{
-  # Knuth fasc4a section 7.2.1.6 exercise 30(d)..
-  #
-  #
-  #                   *      021
-  #                  / \     PLL
-  #                 *   *    LPL
-  #  111       -------> 110010 -------_        003  run0s
-  #  LLL      /                        v       PPL  preorder leaf
-  #  LLL  101010                      111000   LLP  postorder leaf
-  #           \                        ^
-  #            --> 101100 --> 110100 -/
-  #
-  #                  *          *
-  #            102    \        /   012
-  #            LPL     *      *    PLL
-  #            LLP    /        \   LLP
-  #                  *          *
-  #
-  # complementary = two points in a lattice have min(x,y) = lowest
-  #                                              max(x,y) = highest
-  # footprint = sequence 1=nonleaf, 0=leaf
-  #
-  # Tamari lattice points complementary if and only if their postorder
-  # footprints are complementary, meaning opposite leaf/nonleaf,
-  # excluding first vertex which is always leaf.
-  #
-  # Knuth takes the definition of rotate on preorder subtree sizes vector,
-  # whereas here per rotate is per Pallo Lweights which is postorder subtree
-  # sizes vector.  Hence applying the "footprint" to postorder instead of
-  # preorder.
-  #
-  # Knuth's answer notes that a rotates increase, so two points with a leaf
-  # in common can leave it alone and increase rest to a max < highest.
-  # Similarly unrotate decreases to nonleaf in common can leave alone and
-  # decrease rest to min > lowest.
-  #
-  # Exercise 30(c) is that the leaf-ness is per run0s.  Here that name type
-  # is preorder, so does not suit here.
-  #
-  foreach my $N (2 .. 5) {
-    my $graph = Graph::Maker->new('Catalans', N => $N,
-                                  vertex_name_type => 'vpar_postorder');
-    # require MyGraphs; MyGraphs::Graph_view($graph);
-
-    ok ($graph->vertices >= 2,  1);
-    my $lowest = lattice_lowest($graph);
-    my $highest = lattice_highest($graph);
-    my $href = lattice_minmax_hash($graph);
-    lattice_minmax_validate($graph,$href);
-
-    # Knuth fasc4a section 7.2.1.6 exercise 32, Tamari lattice is
-    # semidistributive.
-    lattice_minmax_is_semidistributive($graph,$href);
-
-    my $count_complementary = 0;
-    foreach my $u ($graph->vertices) {
-      my @u_vpar = split /,/,$u;
-      my @u_footprint = vpar_to_footprint(\@u_vpar);
-      shift @u_footprint;  # f[1]..f[n-1] for compare
-      my $u_footprint = join('',@u_footprint);
-
-      foreach my $v ($graph->vertices) {
-        my @v_vpar = split /,/,$v;
-        my @v_footprint = vpar_to_footprint(\@v_vpar);
-        shift @v_footprint;  # f[1]..f[n-1] for compare
-        my $v_footprint = join('', @v_footprint);
-        my @v_complement = map {1-$_} @v_footprint;
-        my $v_complement = join('', @v_complement);
-
-        my $min = $href->{'min'}->{$u}->{$v};
-        my $max = $href->{'max'}->{$u}->{$v};
-        my $is_complementary = ($min eq $lowest && $max eq $highest);
-        # print "$u  $v  min $min max $max comp '$is_complementary'  footprints $u_footprint $v_footprint $v_complement\n";
-        ok ($is_complementary, $u_footprint eq $v_complement);
-        $count_complementary += $is_complementary;
-      }
-    }
   }
 }
 
@@ -1848,7 +1428,8 @@ sub split_num_intervals {
   # directed
   foreach my $N (0 .. 7) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
-                                  rel_type => 'split');
+                                  rel_type => 'split',
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
 
     # A002694 binomial(2n,n-2)
@@ -1858,14 +1439,6 @@ sub split_num_intervals {
 
     ok (num_intervals($graph), split_num_intervals($N),
         "split num_intervals N=$N");
-
-    # Kreweras page 348 corollary 5.2 maximal chains m^(m-2).
-    # And referring to the same from Y. Poupard, "Codage et Denombrement
-    # Diverse Structures Apparentees a Celle d'Arbre", Cahiers BURO, volume
-    # 16, 1970, pages 71-80.
-    ok (num_maximal_chains($graph),
-        $N<2 ? 1 : $N**($N-2),              # A000272
-        "split num_maximal_chains N=$N");
 
     my $first = '10'x$N;
     my $last  = ('1'x$N) . ('0'x$N);
@@ -1899,7 +1472,8 @@ ok (setsizes_to_num_noncrossing_splits([2,3]), 1+3);
   foreach my $N (0 .. 7) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
                                   rel_type => 'split',
-                                  vertex_name_type => 'vpar');
+                                  vertex_name_type => 'vpar',
+                                  countedged => 1);
     foreach my $v ($graph->vertices) {
       my @vpar = split /,/, $v;
       my @setsizes = vpar_siblings_setsizes(\@vpar);
@@ -1912,7 +1486,7 @@ ok (setsizes_to_num_noncrossing_splits([2,3]), 1+3);
       #     print " from $p\n";
       #   }
       #   print vpar_num_siblings_sets(\@vpar)-1," ",scalar($graph->predecessors($v)),"\n";
-      #   print "top ",lattice_highest($graph),"\n";
+      #   print "top ",Graph_lattice_highest($graph),"\n";
       #   exit;
       # }
     }
@@ -2014,7 +1588,8 @@ ok (sets_is_noncrossing([[1,8],[2,7],[3,6],[4,5]]), 1);
   # directed
   foreach my $N (0 .. 4) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
-                                  rel_type => 'rotate_leftarm');
+                                  rel_type => 'rotate_leftarm',
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
     ok (scalar($graph->edges), rotate_rightarm_num_edges($N),
         "rotate_leftarm num edges N=$N");
@@ -2066,7 +1641,8 @@ sub rotate_rightarm_num_edges {
 
   foreach my $N (0 .. 7) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
-                                  rel_type => 'rotate_rightarm');
+                                  rel_type => 'rotate_rightarm',
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
 
     # 0,0,1,4,14,48,165,572
@@ -2096,11 +1672,12 @@ sub rotate_rightarm_num_edges {
   }
 }
 {
-  # directed
+  # undirected
   foreach my $N (0 .. 7) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
                                   rel_type => 'rotate_rightarm',
-                                  undirected => 1);
+                                  undirected => 1,
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
     ok (!!$graph->is_cyclic,  $N>=4);
   }
@@ -2501,88 +2078,24 @@ sub diff_one_entry_by_one {
   foreach my $N (0 .. 7) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
                                   rel_type => 'flip',
-                                  undirected => 1);
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
     ok (scalar($graph->edges), $want_edges[$N]);
   }
-}
-
-# M. De Sainte-Catherine and G. Viennot, "Enumeration of Certain Young
-# Tableaux With Bounded Height", Lecture Notes in Mathematics 1234, pages
-# 58-67, 1986.  As given in Bernardi and Bonichon.
-# A005700
-#
-sub flip_num_intervals {
-  my ($n) = @_;
-  return 6 * factorial(2*$n) * factorial(2*$n+2)
-    / factorial($n) / factorial($n+1) / factorial($n+2) / factorial($n+3);
-}
-# foreach my $n (2..10) { print flip_num_intervals($n),","; }
-# print "\n";
-
-sub flip_num_maximal_chains {
-  my ($n) = @_;
-
-  # Richard P. Stanley, "The Fibonacci Lattice", Fibonacci Quarterly, volume
-  # 13, number 3, October 1975, pages 215-232.
-  # https://fq.math.ca/13-3.html
-  # https://fq.math.ca/Scanned/13-3/stanley.pdf
-  # Page 222, left as an exercise for the reader.
-  #
-  # Hook length formula Frame, Robinson, Thrall as given by Luke Nelson.
-  # h(n) = binomial(n,2)! / prod(i=1,n-1, (2*i-1)^(n-i));
-  # vector(8,n,n--; h(n))
-  # A005118
-  # h(4)
-
-  my @powers;
-  foreach my $i (1 .. binomial($n,2)) {
-    $powers[$i]++;
-  }
-  foreach my $i (1 .. $n-1) {
-    my $b = 2*$i - 1;   # 1 to 2n-3
-    my $p = $n - $i;    # n-1 to 1
-    $powers[$b] -= $p;
-  }
-  for (my $i = 4; $i <= $#powers; $i+=2) {
-    my $t = $i;
-    until ($t % 2) {
-      $t /= 2;
-      $powers[2] += $powers[$i];
-    }
-    $powers[$t] += $powers[$i];
-    $powers[$i] = 0;
-  }
-  ### @powers
-  my $ret = 1;
-  foreach my $i (0 .. $#powers) {
-    $powers[$i] ||= 0;
-    if ($powers[$i] > 0) { $ret *= $i**$powers[$i]; }
-  }
-  foreach my $i (0 .. $#powers) {
-    if ($powers[$i] < 0) { $ret /= $i**-$powers[$i]; }
-  }
-  return $ret;
 }
 
 {
   # directed
   foreach my $N (0 .. 7) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
-                                  rel_type => 'flip');
+                                  rel_type => 'flip',
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
 
     # A002054
     ok (scalar($graph->edges), binomial(2*$N-1,$N-2));
 
     ok (scalar($graph->predecessorless_vertices), 1);
-
-    ok (num_intervals($graph), flip_num_intervals($N),
-        "flip num_intervals N=$N");
-
-    ok (num_maximal_chains($graph),
-        flip_num_maximal_chains($N),
-        "flip num_maximal_chains N=$N");
 
     my $start = '10'x$N;
     my $end   = ('1'x$N) . ('0'x$N);
@@ -2600,7 +2113,8 @@ sub flip_num_maximal_chains {
   foreach my $N (0 .. 7) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
                                   rel_type => 'flip',
-                                  vertex_name_type => 'Ldepths');
+                                  vertex_name_type => 'Ldepths',
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
 
     foreach my $from ($graph->vertices) {
@@ -2681,7 +2195,8 @@ sub flip_num_maximal_chains {
   # directed
   foreach my $N (0 .. 7) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
-                                  rel_type => 'rotate_last');
+                                  rel_type => 'rotate_last',
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
     ok (scalar($graph->edges),    $Catalan_number[$N] - 1);
 
@@ -2734,7 +2249,8 @@ sub set_intersection {
 
   foreach my $N (0 .. 7) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
-                                  rel_type => 'rotate_Aempty');
+                                  rel_type => 'rotate_Aempty',
+                                  countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
 
     my @predecessorless_vertices = $graph->predecessorless_vertices;
@@ -2821,6 +2337,23 @@ ok (join(',',Graph::Maker::Catalans::_vertex_name_type_Rdepths_postorder([1,0,1,
 ok (join(',',Graph::Maker::Catalans::_vertex_name_type_Rdepths_postorder([1,0,1,0])), '1,0');
 ok (join(',',Graph::Maker::Catalans::_vertex_name_type_Rdepths_postorder([1,1,0,0])), '0,0');
 
+# Same as _vertex_name_type_Ldepths() but calculated from positions of 1s.
+sub Ldepths_by_pos1s {
+  my ($aref) = @_;
+
+  # $i position of 1-bit
+  # scalar(@ret) many preceding 1s
+  # $i - scalar(@ret) many preceding 0s
+  # net depth = scalar(@ret) - ($i - scalar(@ret))
+  my @ret;
+  foreach my $i (0 .. $#$aref) {
+    if ($aref->[$i]) {
+      push @ret, 2*scalar(@ret) - $i;
+    }
+  }
+  return @ret;
+}
+
 {
   foreach my $N (0 .. 4) {
     my @arrays = balanced_list($N);
@@ -2829,9 +2362,14 @@ ok (join(',',Graph::Maker::Catalans::_vertex_name_type_Rdepths_postorder([1,1,0,
       my $binary_tree = balanced_to_binary_tree($aref);
       {
         my @by_binary_tree = binary_tree_to_depths($binary_tree,'pre','L');
+        my @by_pos1s = Ldepths_by_pos1s($aref);
         my @by_func = Graph::Maker::Catalans::_vertex_name_type_Ldepths($aref);
-        ok (join(',',@by_func),join(',',@by_binary_tree),
+        ok (join(',',@by_func),
+            join(',',@by_binary_tree),
             '_vertex_name_type_Ldepths() vs binary_tree_to_depths()');
+        ok (join(',',@by_func),
+            join(',',@by_pos1s),
+            '_vertex_name_type_Ldepths() vs Ldepths_by_pos1s()');
       }
 
       {
@@ -2901,6 +2439,8 @@ ok (join(',',Graph::Maker::Catalans::_vertex_name_type_Rdepths_postorder([1,1,0,
 
 
 #------------------------------------------------------------------------------
+# filling
+
 # A. Sapounakis, I. Tasoulas, P. Tsikouras, "On the Dominance Partial
 # Ordering of Dyck Paths", Journal of Integer Sequences, volume 9, 2006,
 # article 06.2.5.
@@ -2964,12 +2504,16 @@ sub filling_num_predecessorful {
 
 
 {
+  # directed
   # Sapounakis, Tasoulas, Tsikouras, proposition 4.2 balanced str is a
   # filling (has a predecessor) if and only if str is indecomposable and
   # does not contain 0011.
   foreach my $N (2 .. 7) {
     my $graph = Graph::Maker->new('Catalans', N => $N,
-                                  rel_type => 'filling');
+                                  rel_type => 'filling',
+                                  countedged => 1);
+    ok (scalar($graph->edges), $Catalan_number[$N] - 1);
+
     ok (scalar($graph->predecessorful_vertices),
         filling_num_predecessorful($N));
 

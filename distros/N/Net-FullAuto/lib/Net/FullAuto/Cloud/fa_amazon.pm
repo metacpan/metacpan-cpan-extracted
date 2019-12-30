@@ -38,7 +38,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(new_user_amazon run_aws_cmd get_aws_security_id
                  launch_server $configure_aws1 $pem_file $credpath
                  $aws_configure $aws connect_shell cmd_raw
-		 fullauto_builddir);
+		 fullauto_builddir setup_aws_security is_host_aws);
 our $pem_file='';
 our $credpath='.';
 our $aws={};
@@ -132,6 +132,74 @@ END
    }
    return $hash,$json,$@;
 
+}
+
+sub is_host_aws {
+
+   my $test_aws='wget --timeout=5 --tries=1 -qO- '.
+                'http://169.254.169.254/latest/dynamic/instance-identity/';
+   $test_aws=`$test_aws`;
+   if (-1<index $test_aws,'signature') {
+      return 1;
+   } return 0;
+
+}
+
+sub setup_aws_security {
+
+   my $security_group=$_[0];
+   my $group_description=$_[1]||'';
+   if (is_host_aws) {
+      my ($hash,$output,$error)=('','','');
+      my $fullauto_inst=
+            Net::FullAuto::Cloud::fa_amazon::get_fullauto_instance();
+      my $i=$fullauto_inst->{InstanceId};
+      my $c="aws ec2 describe-instances --instance-ids $i";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      my $sg=$hash->{Reservations}->[0]->{Instances}->[0]
+                  ->{SecurityGroups}->[0]->{GroupName};
+      if ($security_group eq $sg) {
+         return "$security_group already set for this host",'';
+      }
+      my $n=$main::aws->{fullauto}->
+            {SecurityGroups}->[0]->{GroupName}||'';
+      $c='aws ec2 describe-security-groups '.
+            "--group-names $n";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      return '',$error if $error;
+      my $cidr=$hash->{SecurityGroups}->[0]->{IpPermissions}
+              ->[0]->{IpRanges}->[0]->{CidrIp};
+      $c='aws ec2 create-security-group --group-name '.
+         "$security_group --description ".
+         "\"$group_description\" 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      return '',$error if $error;
+      $c='aws ec2 authorize-security-group-ingress '.
+         "--group-name $security_group --protocol ".
+         'tcp --port 22 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      return '',$error if $error;
+      $c='aws ec2 authorize-security-group-ingress '.
+         "--group-name $security_group --protocol ".
+         'tcp --port 80 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      return '',$error if $error;
+      $c='aws ec2 authorize-security-group-ingress '.
+         "--group-name $security_group --protocol ".
+         'tcp --port 443 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      return '',$error if $error;
+      my $g=get_aws_security_id($security_group);
+      $c="aws ec2 modify-instance-attribute --instance-id $i ".
+         "--groups $g";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      $c="aws ec2 describe-instances --instance-ids $i";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      $sg=$hash->{Reservations}->[0]->{Instances}->[0]
+                  ->{SecurityGroups}->[0]->{GroupName};
+      print "\n   NEW SECURITY GROUP -> $sg\n\n";
+      return "$sg assigned to this host",'';
+   } else { return '','NOT AN AWS HOST' }
 }
 
 sub get_aws_security_id {

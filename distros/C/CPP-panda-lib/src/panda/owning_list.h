@@ -87,6 +87,9 @@ struct owning_list {
     using iterator = base_iterator<next_strategy>;
 
     owning_list() : _size(0), first(nullptr), last(nullptr) {}
+    ~owning_list() {
+        clear(); // do not remove! we must invalidate all elements to make ++ on any iterator correct
+    }
 
     iterator begin() {
         return first;

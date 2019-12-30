@@ -1,4 +1,7 @@
 Revision history for App-bookmarks
 
+0.19    2019.12.29 
+        added chrome support, require, bugfixes
+
 0.17    2019.10.22 
         created module

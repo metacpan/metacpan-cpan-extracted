@@ -115,7 +115,6 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "CONDITION",
   "CONDITION_NOT",
   "DIE",
-  "WARN",
   "SWITCH",
   "CASE",
   "DEFAULT",
@@ -178,6 +177,7 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "ALLOW",
   "BREAK",
   "WARN",
+  "PRINT",
 };
 
 int32_t SPVM_OP_is_allowed(SPVM_COMPILER* compiler, SPVM_OP* op_package_current, SPVM_OP* op_package_dist) {
@@ -1221,6 +1221,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_BREAK:
     case SPVM_OP_C_ID_DIE:
     case SPVM_OP_C_ID_WARN:
+    case SPVM_OP_C_ID_PRINT:
     {
       // Dummy int variable
       SPVM_OP* op_type = SPVM_OP_new_op_int_type(compiler, op->file, op->line);
@@ -1682,7 +1683,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
             
             const char* found_sub_name = SPVM_HASH_fetch(package->sub_name_symtable, sub_name, strlen(sub_name));
             if (found_sub_name) {
-              SPVM_COMPILER_error(compiler, "Redeclaration of sub \"%s\" at %s line %d\n", sub_name, op_decl->file, op_decl->line);
+              SPVM_COMPILER_error(compiler, "Redeclaration of sub in use statement \"%s\" at %s line %d\n", sub_name, op_decl->file, op_decl->line);
             }
             // Unknown sub
             else {
@@ -2214,6 +2215,12 @@ SPVM_OP* SPVM_OP_build_allow(SPVM_COMPILER* compiler, SPVM_OP* op_allow, SPVM_OP
   SPVM_ALLOW* allow = SPVM_ALLOW_new(compiler);
   allow->op_type = op_type;
   op_allow->uv.allow = allow;
+  
+  // add use stack
+  SPVM_TYPE* type_use = SPVM_TYPE_clone_type(compiler, op_type->uv.type);
+  SPVM_OP* op_type_use = SPVM_OP_new_op_type(compiler, type_use, op_type->file, op_type->line);
+  SPVM_OP* op_use = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, op_type->file, op_type->line);
+  SPVM_OP_build_use(compiler, op_use, op_type_use, NULL, 0);
   
   return op_allow;
 }
@@ -3023,6 +3030,13 @@ SPVM_OP* SPVM_OP_build_warn(SPVM_COMPILER* compiler, SPVM_OP* op_warn, SPVM_OP* 
   SPVM_OP_insert_child(compiler, op_warn, op_warn->last, op_term);
   
   return op_warn;
+}
+
+SPVM_OP* SPVM_OP_build_print(SPVM_COMPILER* compiler, SPVM_OP* op_print, SPVM_OP* op_term) {
+  
+  SPVM_OP_insert_child(compiler, op_print, op_print->last, op_term);
+  
+  return op_print;
 }
 
 SPVM_OP* SPVM_OP_build_basic_type(SPVM_COMPILER* compiler, SPVM_OP* op_name) {

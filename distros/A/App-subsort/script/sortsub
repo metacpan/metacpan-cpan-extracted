@@ -3,9 +3,9 @@
 ## no critic: (InputOutput::ProhibitReadlineInForLoop)
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-18'; # DATE
+our $DATE = '2019-12-27'; # DATE
 our $DIST = 'App-subsort'; # DIST
-our $VERSION = '0.043'; # VERSION
+our $VERSION = '0.044'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -18,6 +18,7 @@ use Sort::Sub ();
 my %opts = (
     ignore_case => 0,
     reverse => 0,
+    key => undef,
 );
 my $routine;
 my $routine_args = {};
@@ -25,6 +26,7 @@ my @files;
 my $res = GetOptions(
     'ignore_case|f' => sub { $opts{ignore_case} = 1 },
     'reverse|r'     => sub { $opts{reverse} = 1 },
+    'key|k=s'       => \$opts{key},
     'help|h'        => sub {
         print <<'_';
 sortsub - Sort lines of text using Sort::Sub routines
@@ -35,6 +37,12 @@ Usage:
   % subsort --list (or -l)
   % subsort --version (or -v)
 
+Examples:
+
+ # sort by length, in descending order
+ % subsort by_length -r < data
+ % subsort 'by_length<r>' < data
+
 Options:
   --help, -h         Show this help message and exit.
   --version, -v      Show version and exit.
@@ -43,6 +51,8 @@ Options:
   --reverse, -r      Do a reverse sort.
   --arg=s, -A        Argument to pass to sorter. In the form of name=val. Can
                        be specified multiple times.
+  --key=s, -k        Perl code to generate sort key to sort against.
+
 _
         exit 0;
     },
@@ -160,8 +170,21 @@ $routine = Sort::Sub::get_sorter(
     $routine_args,
 );
 @ARGV = @files;
-for (sort {&{$routine}} map {chomp;$_} <>) {
-    say $_;
+if (defined $opts{key}) {
+    my $code_gen_key = eval "sub { $opts{key} }";
+    die "Can't compile code in --key: $@" if $@;
+    my @lines = map {chomp;$_} <>;
+    my @keys; for (@lines) { push @keys, $code_gen_key->($_) }
+    my @sorted_indices = sort {
+        local $main::a = $keys[$a];
+        local $main::b = $keys[$b];
+        $routine->($main::a, $main::b);
+    } 0..$#lines;
+    say $lines[$_] for @sorted_indices;
+} else {
+    for (sort {&{$routine}} map {chomp;$_} <>) {
+        say $_;
+    }
 }
 
 # ABSTRACT: Sort lines of text using Sort::Sub routines
@@ -179,7 +202,7 @@ sortsub - Sort lines of text using Sort::Sub routines
 
 =head1 VERSION
 
-This document describes version 0.043 of sortsub (from Perl distribution App-subsort), released on 2019-12-18.
+This document describes version 0.044 of sortsub (from Perl distribution App-subsort), released on 2019-12-27.
 
 =head1 SYNOPSIS
 

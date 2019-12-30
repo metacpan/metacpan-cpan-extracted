@@ -10,7 +10,7 @@ my $build = Module::Build::Using::PkgConfig->new(
       'IO::Async::Notifier' => '0.43',
       'IO::Async::Stream' => '0.34',
       'IO::Async::Test' => 0,
-      'Tickit' => '0.67_001', # _make_tickit
+      'Tickit' => '0.69', # Tickit::_Tickit->_new_with_evloop
    },
    test_requires => {
       'Test::HexString' => 0,

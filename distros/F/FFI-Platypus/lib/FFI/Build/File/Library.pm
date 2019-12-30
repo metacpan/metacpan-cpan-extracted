@@ -7,7 +7,7 @@ use base qw( FFI::Build::File::Base );
 use constant default_encoding => ':raw';
 
 # ABSTRACT: Class to track object file in FFI::Build
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 
 sub default_suffix
@@ -29,7 +29,7 @@ FFI::Build::File::Library - Class to track object file in FFI::Build
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 

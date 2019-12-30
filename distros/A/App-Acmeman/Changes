@@ -1,3 +1,19 @@
+3.03 2019-12-23
+
+	- The following environment variables are set when running
+	postrenew commands defined in the [core] section:
+	ACMEMAN_CERTIFICATE_COUNT, ACMEMAN_CERTIFICATE_FILE,
+	ACMEMAN_DOMAIN_NAME, ACMEMAN_ALT_NAMES.
+	- The following environment variables are set when running
+	postrenew commands defined in [domain] sections:
+	ACMEMAN_CERTIFICATE_FILE, ACMEMAN_DOMAIN_NAME,
+	ACMEMAN_ALT_NAMES.  See the manpage for a detailed discussion.
+	- Challenge files are removed before exiting.
+	- By default, a special domain source is used, which invokes
+	"apache" and, if unable to do so, outputs on standard error
+	a detailed description of the problem with a suggestion on
+	how to fix it.
+
 3.02 2019-10-23
 	- Take into account ServerName if LetsEncryptReference is given.
 

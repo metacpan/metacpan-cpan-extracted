@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2013 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2013, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-DateSpinner.
 #
@@ -22,10 +22,12 @@ use warnings;
 use Date::Calc;
 use Gtk2;
 use Glib::Ex::ObjectBits 'set_property_maybe';
-# 1.16 for turn_utf_8_on()
-use Locale::Messages 1.16 'dgettext', 'turn_utf_8_on';
+use POSIX::Wide;
+use Locale::Messages 1.16   # 1.16 for turn_utf_8_on()
+  'dgettext', 'turn_utf_8_on';
 
-our $VERSION = 9;
+
+our $VERSION = 10;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -166,23 +168,38 @@ sub _spin_value_changed {
 # Return a wide-char string which is the short name of the day of the week
 # to show, such as " Fri ".
 #
-# Prefer strftime over Date::Calc's localized names, on the basis that
-# strftime will probably know more languages, and setlocale() is done
+# Prefer strftime() over Date::Calc's localized names, on the basis that
+# strftime() will probably know more languages, and setlocale() is done
 # automatically when perl starts.
 #
-# These modules are required for the initial value when a DateSpinner is
-# created.  Deferring them until this time (rather than BEGIN time) might
-# let you load DateSpinner without yet dragging in the other big stuff.
+# In the past (circa 2013) strftime() had looked only at wday to make "%a"
+# day-of-week.  Now (circa 2019) it seems to look at mday,month,year and
+# ignore the wday field.  Is that right?  In any case, the code below makes
+# a set of consistent fields based on midday Mon 1 Jan 1990.
+#
+# Don't want to put in the actual $year,$month,$day, since the idea of
+# Date::Calc is to avoid limitations like Unix epoch 1970..2038 on a 32-bit
+# system.
+#
+# I18N::Langinfo langinfo() interface to nl_langinfo() is another
+# possibility and should get the same as strftime().  Recent versions of
+# I18N::Langinfo apparently implement most of it even on systems like MS-DOS
+# where the C library probably doesn't have a native nl_langinfo().  For now
+# think strftime() is ok.
 #
 sub _ymd_to_wday_str {
   my ($year,$month,$day) = @_;
-  require POSIX;
-  require I18N::Langinfo;
-  require Encode;
-  my $wday = Date::Calc::Day_of_Week ($year, $month, $day); # 1=Mon,7=Sun,...
-  my $str = POSIX::strftime (' %a ', 0,0,0, 1,1,100, $wday%7);# 0=Sun,1=Mon,..
-  my $charset = I18N::Langinfo::langinfo (I18N::Langinfo::CODESET());
-  return Encode::decode ($charset, $str);
+
+  # 1=Monday .. 7=Sunday
+  my $wday = Date::Calc::Day_of_Week ($year, $month, $day);
+  ### $wday
+
+  return POSIX::Wide::strftime(' %a ',
+                               12,0,0,     # hour,minute,second
+                               $wday,0,90, # mday, month-1, year-1900
+                               $wday%7,    # wday 0=Sun, 1=Mon, ...
+                               $wday-1,    # yday 0 for 1Jan
+                               0);         # isdst
 }
 
 sub get_value {
@@ -246,10 +263,11 @@ of a paste is ignored.
 
 Day of the week and date normalization calculations use C<Date::Calc> so
 they're not limited to the system C<time_t> (which may be as little as 1970
-to 2038 on a 32-bit system).  The day of the week uses L<POSIX/strftime> and
-so gets the usual C<LC_TIME> localizations which are established at Perl
-startup or Gtk initialization.  The year/month/day tooltips use Gtk message
-translations.
+to 2038 on a 32-bit system).  Day of the week display uses L<strftime()>
+(via L<POSIX::Wide> to allow non-ASCII) so gets the usual C<LC_TIME>
+localizations which are established by C<setlocale()> at Perl startup or Gtk
+initialization.  The year/month/day tooltips (identifying the fields as
+year/month/day) use Gtk message translations.
 
 See F<examples/simple.pl> for a complete program creating a DateSpinner.
 See F<examples/builder.pl> for similar using C<Gtk2::Builder>.
@@ -292,7 +310,8 @@ garbage.
 =head1 SEE ALSO
 
 L<Gtk2::Ex::DateSpinner::CellRenderer>,
-L<Date::Calc>
+L<Date::Calc>,
+L<POSIX::Wide>
 
 L<Gtk2::SpinButton>,
 L<Gtk2::Calendar>,
@@ -305,7 +324,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-datespinner/index.html>
 
 =head1 LICENSE
 
-Gtk2-Ex-DateSpinner is Copyright 2008, 2009, 2010, 2013 Kevin Ryde
+Gtk2-Ex-DateSpinner is Copyright 2008, 2009, 2010, 2013, 2019 Kevin Ryde
 
 Gtk2-Ex-DateSpinner is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

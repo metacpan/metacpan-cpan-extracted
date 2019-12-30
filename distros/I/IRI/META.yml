@@ -33,4 +33,4 @@ resources:
   homepage: http://search.cpan.org/dist/IRI/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perl-iri/
-version: '0.009'
+version: '0.010'

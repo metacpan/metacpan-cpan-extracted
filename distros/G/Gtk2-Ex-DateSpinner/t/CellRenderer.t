@@ -29,7 +29,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 require Gtk2::Ex::DateSpinner::CellRenderer;
 
-my $want_version = 9;
+my $want_version = 10;
 {
   is ($Gtk2::Ex::DateSpinner::CellRenderer::VERSION, $want_version,
       'VERSION variable');

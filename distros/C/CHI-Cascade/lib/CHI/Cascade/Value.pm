@@ -4,32 +4,32 @@ use strict;
 use warnings;
 
 my %states = (
-    # value = undef			-> no in cache
-    CASCADE_NO_CACHE			=> 1 << 0,
+    # value = undef                     -> no in cache
+    CASCADE_NO_CACHE                    => 1 << 0,
 
-    # value = undef | old_value		-> other process is computing this target or its any dependencies
-    CASCADE_COMPUTING			=> 1 << 1,
+    # value = undef | old_value         -> other process is computing this target or its any dependencies
+    CASCADE_COMPUTING                   => 1 << 1,
 
-    # value = undef | old_value		-> recomputing is deferred
-    CASCADE_DEFERRED			=> 1 << 2,
+    # value = undef | old_value         -> recomputing is deferred
+    CASCADE_DEFERRED                    => 1 << 2,
 
-    # value = old_value | actual_value	-> the value from cache (not computed now)
-    CASCADE_FROM_CACHE			=> 1 << 3,
+    # value = old_value | actual_value  -> the value from cache (not computed now)
+    CASCADE_FROM_CACHE                  => 1 << 3,
 
-    # value = actual_value		-> this value is actual
-    CASCADE_ACTUAL_VALUE		=> 1 << 4,
+    # value = actual_value              -> this value is actual
+    CASCADE_ACTUAL_VALUE                => 1 << 4,
 
-    # value = actual_value & recomuted now	-> this value is recomputed right now
-    CASCADE_RECOMPUTED			=> 1 << 5,
+    # value = actual_value & recomuted now      -> this value is recomputed right now
+    CASCADE_RECOMPUTED                  => 1 << 5,
 
     # value = undef | old_value | value passed by exception -> code of target or code of any dependencies has raised an exception
-    CASCADE_CODE_EXCEPTION		=> 1 << 6,
+    CASCADE_CODE_EXCEPTION              => 1 << 6,
 
     # value = old_value | actual_value - value may be actual or not but actual term isn valid (only if 'run' is run with 'actual_term' option)
-    CASCADE_ACTUAL_TERM			=> 1 << 7,
+    CASCADE_ACTUAL_TERM                 => 1 << 7,
 
     # Some dependencies are affected for recomputing, but no recomputing now - only TTL period and value from cache
-    CASCADE_TTL_INVOLVED		=> 1 << 8
+    CASCADE_TTL_INVOLVED                => 1 << 8
 );
 
 for ( keys %states ) {
@@ -48,7 +48,7 @@ use parent 'Exporter';
     no strict 'refs';
 
     our %EXPORT_TAGS = (
-	state		=> [ map { "$_" } grep { /^CASCADE_/ && *{$_}{CODE} } keys %{ __PACKAGE__ . "::" } ]
+        state           => [ map { "$_" } grep { /^CASCADE_/ && *{$_}{CODE} } keys %{ __PACKAGE__ . "::" } ]
     );
     Exporter::export_ok_tags( keys %EXPORT_TAGS );
 }
@@ -71,8 +71,8 @@ sub state {
     my $self = shift;
 
     if (@_) {
-	$self->{state} |= $_[0];
-	return $self;
+        $self->{state} |= $_[0];
+        return $self;
     }
     $self->{state};
 }
@@ -85,8 +85,8 @@ sub state_as_str {
     my @names;
 
     for ( keys %states ) {
-	push @names, $_
-	  if ( $state & $states{$_} );
+        push @names, $_
+          if ( $state & $states{$_} );
     }
 
     join( " | ", sort @names );
@@ -96,9 +96,9 @@ sub value {
     my $self = shift;
 
     if (@_) {
-	$self->{is_value} = 1;
-	$self->{value} = $_[0];
-	return $self;
+        $self->{is_value} = 1;
+        $self->{value} = $_[0];
+        return $self;
     }
     $self->{value};
 }
@@ -107,8 +107,8 @@ sub thrown_from_code {
     my $self = shift;
 
     if (@_) {
-	$self->{thrown_from_code} = $_[0];
-	return $self;
+        $self->{thrown_from_code} = $_[0];
+        return $self;
     }
     $self->{thrown_from_code};
 }
@@ -267,9 +267,11 @@ CHI::Cascade::Value->new->value(undef) >>) for example.
 
 =item CASCADE_ACTUAL_TERM
 
-The method L<CHI::Cascade/run> was run with
-L<actual_term|CHI::Cascade/actual_term> option and C<actual term> is actual for
-this value (a value can be old - the CASCADE_ACTUAL_VALUE bit will not be set).
+The method L<CHI::Cascade/run> was run with or rule for this target has an
+L<actual_term|CHI::Cascade/actual_term> option and the C<actual term> period has
+not passed from last time of a dependencies checking (a value returned by C<run>
+can be old and if it's true then the CASCADE_ACTUAL_VALUE will not be
+set).
 
 =item CASCADE_TTL_INVOLVED
 

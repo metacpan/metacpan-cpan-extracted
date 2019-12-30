@@ -1,0 +1,10 @@
+0.002   2019-12-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Split mock functions to its own module: Locale::TextDomain::Mock.
+
+	- [doc] Fix typo in mention.
+
+
+0.001    2019-12-26  Released-By: PERLANCAR
+
+         - First release.

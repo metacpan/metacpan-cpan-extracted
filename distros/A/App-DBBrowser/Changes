@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.230    2019-12-25
+        - Modfied error messages.
+
 2.229    2019-12-18
         - Renamed variables.
 

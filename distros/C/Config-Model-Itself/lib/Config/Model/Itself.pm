@@ -7,11 +7,11 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.018;
+package Config::Model::Itself 2.020;
 
 use Mouse ;
 use Config::Model 2.134;
-use 5.010;
+use 5.014; # for the /r modifier
 
 use IO::File ;
 use Log::Log4perl 1.11;
@@ -268,8 +268,6 @@ sub read_all {
                            ) ;
     } ;
     $read_dir->visit($wanted, { recurse => 1} ) ;
-
-    my $i = $self->meta_instance ;
 
     my %read_models ;
     my %class_file_map ;
@@ -820,7 +818,7 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 
-# ABSTRACT: Model editor for Config::Model
+# ABSTRACT: Model (or schema) editor for Config::Model
 
 __END__
 
@@ -830,11 +828,11 @@ __END__
 
 =head1 NAME
 
-Config::Model::Itself - Model editor for Config::Model
+Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.018
+version 2.020
 
 =head1 SYNOPSIS
 
@@ -986,7 +984,7 @@ This is free software, licensed under:
 
   The GNU Lesser General Public License, Version 2.1, February 1999
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -1004,14 +1002,6 @@ Search CPAN
 The default CPAN search engine, useful to view POD in HTML format.
 
 L<http://search.cpan.org/dist/Config-Model-Itself>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Config-Model-Itself>
 
 =item *
 

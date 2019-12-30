@@ -38,12 +38,12 @@ $|=1;
   # N=5 3-cycle and tree
   #   https://hog.grinvin.org/ViewGraphInfo.action?id=820
   # and more ...
-  #
+  # stop at N=16 as next N=17 > 255 vertices
   my @graphs;
   foreach my $N (
                  # 3,4,5,6,7,8,9,10
                  # 3..20,
-                 13,14,16
+                 13,14,16,17
                 ) {
     foreach my $compositions (
                               0,
@@ -59,9 +59,11 @@ $|=1;
       # $graph = MyGraphs::Graph_subdivide($graph);
       # $graph = $graph->undirected_copy;
       push @graphs, $graph;
-      print "directed ",$graph->is_directed,"\n";
-      $graph->set_graph_attribute (flow => 'north');
+      my $num_vertices = $graph->vertices;
+      my $directed     = $graph->is_directed ? 1 : 0;
       print $graph->get_graph_attribute('name'),"\n";
+      print "  num vertices $num_vertices directed $directed\n";
+      $graph->set_graph_attribute (flow => 'north');
 
       if (0) {
         my $i = 1;
@@ -74,8 +76,8 @@ $|=1;
         }
       }
 
-      MyGraphs::Graph_run_dreadnaut($graph->undirected_copy,
-                                    verbose=>0, base=>1);
+      # MyGraphs::Graph_run_dreadnaut($graph->undirected_copy,
+      #                               verbose=>0, base=>1);
       # print "vertices: ",join('  ',$graph->vertices),"\n";
       if ($graph->vertices < 100) {
         # MyGraphs::Graph_view($graph, synchronous=>0);

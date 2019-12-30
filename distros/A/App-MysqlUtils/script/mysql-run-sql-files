@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_run_sql_files
-# and generated automatically using Perinci::CmdLine::Gen version 0.490
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-04-26'; # DATE
+our $DATE = '2019-12-24'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ mysql-run-sql-files - Feed each .sql file to `mysql` command and write result to
 
 =head1 VERSION
 
-This document describes version 0.018 of mysql-run-sql-files (from Perl distribution App-MysqlUtils), released on 2019-04-26.
+This document describes version 0.019 of mysql-run-sql-files (from Perl distribution App-MysqlUtils), released on 2019-12-24.
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,9 @@ Default value:
 
  "."
 
-=item B<--no-mkdir>, B<-p>
+=item B<--mkdir>, B<-p>
+
+Create output directory if not exists.
 
 Default value:
 
@@ -97,15 +99,15 @@ See C<--sql-files>.
 
 Can be specified multiple times.
 
-=item B<-O>
-
-Shortcut for --overwrite_when=always.
-
-See C<--overwrite-when>.
-
 =item B<-o>
 
 Shortcut for --overwrite_when=older.
+
+See C<--overwrite-when>.
+
+=item B<-O>
+
+Shortcut for --overwrite_when=always.
 
 See C<--overwrite-when>.
 
@@ -115,7 +117,7 @@ See C<--overwrite-when>.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -274,7 +276,7 @@ List of available configuration parameters:
  directory (see --directory)
  format (see --format)
  log_level (see --log-level)
- mkdir (see --no-mkdir)
+ mkdir (see --mkdir)
  naked_res (see --naked-res)
  overwrite_when (see --overwrite-when)
  sql_files (see --sql-files)

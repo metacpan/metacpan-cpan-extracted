@@ -1,5 +1,3 @@
-// $Id: x22c.c 12176 2012-02-24 20:33:39Z andrewross $
-//
 //  Simple vector plot example
 //  Copyright (C) 2004 Andrew Ross
 //  Copyright (C) 2004  Rafael Laboissiere
@@ -26,11 +24,13 @@
 #include "plcdemos.h"
 
 void circulation( void );
-void constriction( void );
+void constriction( int astyle );
+void transform( PLFLT x, PLFLT y, PLFLT *xt, PLFLT *yt, PLPointer data );
+void constriction2( void );
 void potential( void );
 void f2mnmx( PLFLT **f, PLINT nx, PLINT ny, PLFLT *fnmin, PLFLT *fnmax );
 
-// Pairs of points making the line segments used to plot the user defined arrow
+// Pairs of points making the line segments used to plot the user defined arroW
 static PLFLT arrow_x[6] = { -0.5, 0.5, 0.3, 0.5, 0.3, 0.5 };
 static PLFLT arrow_y[6] = { 0.0, 0.0, 0.2, 0.0, -0.2, 0.0 };
 static PLFLT arrow2_x[6] = { -0.5, 0.3, 0.3, 0.5, 0.3, 0.3 };
@@ -90,7 +90,7 @@ circulation( void )
     plenv( xmin, xmax, ymin, ymax, 0, 0 );
     pllab( "(x)", "(y)", "#frPLplot Example 22 - circulation" );
     plcol0( 2 );
-    plvect( (const PLFLT * const *) u, (const PLFLT * const *) v, nx, ny, 0.0, pltr2, (void *) &cgrid2 );
+    plvect( (PLFLT_MATRIX) u, (PLFLT_MATRIX) v, nx, ny, 0.0, pltr2, (void *) &cgrid2 );
     plcol0( 1 );
 
     plFree2dGrid( cgrid2.xg, nx, ny );
@@ -103,7 +103,7 @@ circulation( void )
 // Vector plot of flow through a constricted pipe
 //
 void
-constriction( void )
+constriction( int astyle )
 {
     int       i, j;
     PLFLT     dx, dy, x, y;
@@ -113,6 +113,7 @@ constriction( void )
     PLFLT     **u, **v;
     const int nx = 20;
     const int ny = 20;
+    char      title[80];
 
     dx = 1.0;
     dy = 1.0;
@@ -143,7 +144,7 @@ constriction( void )
             if ( fabs( y ) < b )
             {
                 dbdx = ymax / 4.0 * sin( M_PI * x / xmax ) *
-                       y / b;
+                       M_PI / xmax * y / b;
                 u[i][j] = Q * ymax / b;
                 v[i][j] = dbdx * u[i][j];
             }
@@ -156,9 +157,10 @@ constriction( void )
     }
 
     plenv( xmin, xmax, ymin, ymax, 0, 0 );
-    pllab( "(x)", "(y)", "#frPLplot Example 22 - constriction" );
+    sprintf( title, "#frPLplot Example 22 - constriction (arrow style %d)", astyle );
+    pllab( "(x)", "(y)", title );
     plcol0( 2 );
-    plvect( (const PLFLT * const *) u, (const PLFLT * const *) v, nx, ny, -0.5, pltr2, (void *) &cgrid2 );
+    plvect( (PLFLT_MATRIX) u, (PLFLT_MATRIX) v, nx, ny, -1.0, pltr2, (void *) &cgrid2 );
     plcol0( 1 );
 
     plFree2dGrid( cgrid2.xg, nx, ny );
@@ -167,6 +169,102 @@ constriction( void )
     plFree2dGrid( v, nx, ny );
 }
 
+
+//
+// Global transform function for a constriction using data passed in
+// This is the same transformation used in constriction.
+//
+void
+transform( PLFLT x, PLFLT y, PLFLT *xt, PLFLT *yt, PLPointer data )
+{
+    PLFLT *trdata;
+    PLFLT xmax;
+
+    trdata = (PLFLT *) data;
+    xmax   = *trdata;
+
+    *xt = x;
+    *yt = y / 4.0 * ( 3 - cos( M_PI * x / xmax ) );
+}
+
+//
+// Vector plot of flow through a constricted pipe
+// with a coordinate transform
+//
+void
+constriction2( void )
+{
+    int       i, j;
+    PLFLT     dx, dy, x, y;
+    PLFLT     xmin, xmax, ymin, ymax;
+    PLFLT     Q, b;
+    PLcGrid2  cgrid2;
+    PLFLT     **u, **v;
+    const int nx = 20;
+    const int ny = 20;
+#define NC    11
+    const int nc   = NC;
+    const int nseg = 20;
+    PLFLT     clev[NC];
+
+    dx = 1.0;
+    dy = 1.0;
+
+    xmin = -nx / 2 * dx;
+    xmax = nx / 2 * dx;
+    ymin = -ny / 2 * dy;
+    ymax = ny / 2 * dy;
+
+    plstransform( transform, ( PLPointer ) & xmax );
+
+    plAlloc2dGrid( &cgrid2.xg, nx, ny );
+    plAlloc2dGrid( &cgrid2.yg, nx, ny );
+    plAlloc2dGrid( &u, nx, ny );
+    plAlloc2dGrid( &v, nx, ny );
+
+    cgrid2.nx = nx;
+    cgrid2.ny = ny;
+
+    Q = 2.0;
+    for ( i = 0; i < nx; i++ )
+    {
+        x = ( i - nx / 2 + 0.5 ) * dx;
+        for ( j = 0; j < ny; j++ )
+        {
+            y = ( j - ny / 2 + 0.5 ) * dy;
+            cgrid2.xg[i][j] = x;
+            cgrid2.yg[i][j] = y;
+            b       = ymax / 4.0 * ( 3 - cos( M_PI * x / xmax ) );
+            u[i][j] = Q * ymax / b;
+            v[i][j] = 0.0;
+        }
+    }
+
+    for ( i = 0; i < nc; i++ )
+    {
+        clev[i] = Q + i * Q / ( nc - 1 );
+    }
+
+    plenv( xmin, xmax, ymin, ymax, 0, 0 );
+    pllab( "(x)", "(y)", "#frPLplot Example 22 - constriction with plstransform" );
+    plcol0( 2 );
+    plshades( (PLFLT_MATRIX) u, nx, ny, NULL,
+        xmin + dx / 2, xmax - dx / 2, ymin + dy / 2, ymax - dy / 2,
+        clev, nc, 0.0, 1, 1.0, plfill, 0, NULL, NULL );
+    plvect( (PLFLT_MATRIX) u, (PLFLT_MATRIX) v, nx, ny,
+        -1.0, pltr2, (void *) &cgrid2 );
+    // Plot edges using plpath (which accounts for coordinate transformation) rather than plline
+    plpath( nseg, xmin, ymax, xmax, ymax );
+    plpath( nseg, xmin, ymin, xmax, ymin );
+    plcol0( 1 );
+
+    plFree2dGrid( cgrid2.xg, nx, ny );
+    plFree2dGrid( cgrid2.yg, nx, ny );
+    plFree2dGrid( u, nx, ny );
+    plFree2dGrid( v, nx, ny );
+
+    plstransform( NULL, NULL );
+}
 
 
 void
@@ -230,7 +328,7 @@ potential( void )
     // Also put in smoothing term at small distances.
     //
 
-    rmax = (double) nr;
+    rmax = (PLFLT) nr;
 
     eps = 2.;
 
@@ -248,10 +346,10 @@ potential( void )
 
     for ( i = 0; i < nr; i++ )
     {
-        r = 0.5 + (double) i;
+        r = 0.5 + (PLFLT) i;
         for ( j = 0; j < ntheta; j++ )
         {
-            theta           = 2. * M_PI / ( ntheta - 1 ) * ( 0.5 + (double) j );
+            theta           = 2. * M_PI / ( ntheta - 1 ) * ( 0.5 + (PLFLT) j );
             x               = r * cos( theta );
             y               = r * sin( theta );
             cgrid2.xg[i][j] = x;
@@ -275,26 +373,26 @@ potential( void )
     plenv( xmin, xmax, ymin, ymax, 0, 0 );
     pllab( "(x)", "(y)", "#frPLplot Example 22 - potential gradient vector plot" );
     // Plot contours of the potential
-    dz = ( zmax - zmin ) / (double) nlevel;
+    dz = ( zmax - zmin ) / (PLFLT) nlevel;
     for ( i = 0; i < nlevel; i++ )
     {
-        clevel[i] = zmin + ( (double) i + 0.5 ) * dz;
+        clevel[i] = zmin + ( (PLFLT) i + 0.5 ) * dz;
     }
     plcol0( 3 );
     pllsty( 2 );
-    plcont( (const PLFLT * const *) z, nr, ntheta, 1, nr, 1, ntheta, clevel, nlevel, pltr2, (void *) &cgrid2 );
+    plcont( (PLFLT_MATRIX) z, nr, ntheta, 1, nr, 1, ntheta, clevel, nlevel, pltr2, (void *) &cgrid2 );
     pllsty( 1 );
     plcol0( 1 );
 
     // Plot the vectors of the gradient of the potential
     plcol0( 2 );
-    plvect( (const PLFLT * const *) u, (const PLFLT * const *) v, nr, ntheta, 25.0, pltr2, (void *) &cgrid2 );
+    plvect( (PLFLT_MATRIX) u, (PLFLT_MATRIX) v, nr, ntheta, 25.0, pltr2, (void *) &cgrid2 );
     plcol0( 1 );
 
     // Plot the perimeter of the cylinder
     for ( i = 0; i < nper; i++ )
     {
-        theta = ( 2. * M_PI / ( nper - 1 ) ) * (double) i;
+        theta = ( 2. * M_PI / ( nper - 1 ) ) * (PLFLT) i;
         px[i] = rmax * cos( theta );
         py[i] = rmax * sin( theta );
     }
@@ -308,7 +406,7 @@ potential( void )
 }
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
     PLINT narr, fill;
 
@@ -328,13 +426,19 @@ main( int argc, const char *argv[] )
     // Set arrow style using arrow_x and arrow_y then
     // plot using these arrows.
     plsvect( arrow_x, arrow_y, narr, fill );
-    constriction();
+    constriction( 1 );
 
     // Set arrow style using arrow2_x and arrow2_y then
     // plot using these filled arrows.
     fill = 1;
     plsvect( arrow2_x, arrow2_y, narr, fill );
-    constriction();
+    constriction( 2 );
+
+    constriction2();
+
+    // Reset arrow style to the default by passing two
+    // NULL arrays
+    plsvect( NULL, NULL, 0, 0 );
 
     potential();
 

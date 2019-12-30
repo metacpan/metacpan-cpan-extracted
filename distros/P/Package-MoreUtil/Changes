@@ -1,4 +1,9 @@
-0.591   2019-01-06 (PERLANCAR)
+0.592   2019-12-25  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Avoid failure in perl >= 5.22.
+
+
+0.591   2019-01-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,24 +11,24 @@
 	  Package::Util::Lite.
 
 
-0.590   2018-10-07 (PERLANCAR)
+0.590   2018-10-07  Released-By: PERLANCAR
 
 	- Add list_package_subs.
 
 	- [optimize] Remove regex check in package_exists() to make it faster.
 
 
-0.58    2014-12-05 (PERLANCAR)
+0.58    2014-12-05  Released-By: PERLANCAR
 
 	- Rename module/dist SHARYANTO-Package-Util -> Package-MoreUtil.
 
 
-0.57    2014-12-05 (PERLANCAR) (unreleased)
+0.57    2014-12-05 (PERLANCAR)  Released-By: unreleased
 
         - Rename dist/module from SHARYANTO-Package-Util to Package-MoreUtil.
 
 
-0.56    2013-09-10 (SHARYANTO)
+0.56    2013-09-10  Released-By: SHARYANTO
 
         - No functional changes. Split from SHARYANTO-Utils to minimize
           dependencies (I'm trying to make Text::ANSITable work under Windows).

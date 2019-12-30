@@ -22,7 +22,7 @@ use warnings;
 # version 1.180 for perl subclass overriding GInterfaces from superclass
 use Gtk2 1.180;
 
-our $VERSION = 9;
+our $VERSION = 10;
 
 use Glib::Object::Subclass
   'Gtk2::Entry',

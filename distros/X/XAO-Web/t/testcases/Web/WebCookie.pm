@@ -259,6 +259,63 @@ sub test_cookie {
                 },
             },
         },
+        t13 => {                            # Checking if config defaults get applied
+            path    => '/cookie1.html',
+            run     => sub {
+                $self->siteconfig->put('/xao/cookie' => {
+                    common  => {
+                        httponly    => 1,
+                        expires     => '+120s',
+                        path        => '/',
+                    },
+                    $cookie_name.'-t13b' => {
+                        httponly    => 0,
+                    },
+                    $cookie_name.'-t13c' => {
+                        -expires    => 'now',
+                    },
+                });
+
+                $self->siteconfig->add_cookie(
+                    -name       => $cookie_name.'-t13a',
+                    -value      => $cookie_value.'-t13a',
+                );
+                $self->siteconfig->add_cookie(
+                    -name       => $cookie_name.'-t13b',
+                    -value      => $cookie_value.'-t13b',
+                );
+                $self->siteconfig->add_cookie(
+                    -name       => $cookie_name.'-t13c',
+                    -value      => $cookie_value.'-t13c',
+                );
+                $self->siteconfig->add_cookie(
+                    -name       => $cookie_name.'-t13d',
+                    -value      => $cookie_value.'-t13d',
+                    -expires    => 'now',
+                );
+                $self->siteconfig->add_cookie(
+                    -name       => $cookie_name.'-t13e',
+                    -value      => $cookie_value.'-t13e',
+                    -expires    => 'now',
+                );
+            },
+            expect  => {
+                config => {
+                    $cookie_name.'-t13a' => $cookie_value.'-t13a',
+                    $cookie_name.'-t13b' => $cookie_value.'-t13b',
+                    $cookie_name.'-t13c' => undef,
+                    $cookie_name.'-t13d' => undef,
+                    $cookie_name.'-t13e' => undef,
+                },
+                stored => {
+                    $cookie_name.'-t13a' => $cookie_value.'-t13a',
+                    $cookie_name.'-t13b' => $cookie_value.'-t13b',
+                    $cookie_name.'-t13c' => undef,
+                    $cookie_name.'-t13d' => undef,
+                    $cookie_name.'-t13e' => undef,
+                },
+            },
+        },
     );
 
     my $config=$self->siteconfig;
@@ -321,7 +378,7 @@ sub test_cookie {
         foreach my $cd (@{$config->cookies}) {
             next unless defined $cd;
 
-            my $expires_text=$cd->expires;
+            my $expires_text=$cd->expires // '';
 
             $self->assert($expires_text =~ /(\d{2})\W+([a-z]{3})\W+(\d{4})\W+(\d{2})\W+(\d{2})\W+(\d{2})/i,
                 "Invalid cookie expiration '".$expires_text." for name '".$cd->name."' value '".$cd->value."'");
@@ -388,7 +445,7 @@ sub test_cookie {
 
                 if(defined $ev) {
                     $self->assert(defined($cv) && $ev eq $cv,
-                        "Expected to have cookie '$n' set to '",($ev || 'UNDEF'),"', got '".($cv || 'UNDEF')."' for test $tname ($kind)");
+                        "Expected to have cookie '$n' set to '".($ev || 'UNDEF')."', got '".($cv || 'UNDEF')."' for test $tname ($kind)");
                 }
                 else {
                     $self->assert(!defined($cv),

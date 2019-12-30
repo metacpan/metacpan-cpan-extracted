@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x06 for the PLplot PDL binding
 #
 # Font demo
@@ -24,6 +22,8 @@
 
 # SYNC: x06c.c 1.16
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 

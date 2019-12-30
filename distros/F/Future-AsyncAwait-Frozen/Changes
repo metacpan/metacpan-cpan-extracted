@@ -1,0 +1,5 @@
+Revision history for Future-AsyncAwait
+
+0.35 2019-12-18
+        This is merely a frozen release of Future::AsyncAwait to test
+        experimental async/await support in Mojolicious.

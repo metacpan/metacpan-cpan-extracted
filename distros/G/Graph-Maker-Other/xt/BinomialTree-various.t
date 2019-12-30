@@ -20,6 +20,8 @@
 
 use strict;
 use 5.004;
+use FindBin;
+use File::Slurp;
 use POSIX 'ceil';
 use Test;
 
@@ -33,29 +35,80 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-use lib 'devel/lib';
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
 use MyGraphs;
 
-plan tests => 75;
+plan tests => 110;
+
+
+#------------------------------------------------------------------------------
+# independence and domination
+
+foreach my $N (0 .. 32) {
+  my $graph = Graph::Maker->new('binomial_tree',
+                                N => $N,
+                                undirected => 1);
+  ok (MyGraphs::Graph_tree_indnum($graph),
+      ceil($N/2),
+      "indnum N=$N");
+  ok (MyGraphs::Graph_tree_domnum($graph),
+      $N==1 ? 1 : int($N/2),
+      "domnum N=$N");
+
+  ok ($graph->has_vertex(0) ? 1 : 0,  $N>=1 ? 1 : 0,
+      "have vertex 0 in N=$N");
+  # my $total_depths = 0;
+  # foreach my $v ($graph->vertices) {
+  #   $total_depths += $graph->path_length(0,$v);
+  # }
+  # ok ($total_depths, 0,
+  #     "total depths N=$N");
+}
 
 
 #------------------------------------------------------------------------------
 # POD HOG Shown
 
 {
-  my %shown = ('N=1' => 1310,   'order=0' => 1310,
-               'N=2' => 19655,  'order=1' => 19655,
-               'N=3' => 32234,
-               'N=4' => 594,    'order=2' => 594,
-               'N=5' => 30,
-               'N=6' => 496,
-               'N=7' => 714,
-               'N=8' => 700,    'order=3' => 700,
-               'N=16'  => 28507, 'order=4' => 28507,
-               'N=32'  => 21088, 'order=5' => 21088,
-               'N=64'  => 33543, 'order=6' => 33543,
-               'N=128' => 33545, 'order=7' => 33545,
-              );
+  # my %shown = ('N=1' => 1310,   'order=0' => 1310,
+  #              'N=2' => 19655,  'order=1' => 19655,
+  #              'N=3' => 32234,
+  #              'N=4' => 594,    'order=2' => 594,
+  #              'N=5' => 30,
+  #              'N=6' => 496,
+  #              'N=7' => 714,
+  #              'N=8' => 700,    'order=3' => 700,
+  #              'N=16'  => 28507, 'order=4' => 28507,
+  #              'N=32'  => 21088, 'order=5' => 21088,
+  #              'N=64'  => 33543, 'order=6' => 33543,
+  #              'N=128' => 33545, 'order=7' => 33545,
+  #             );
+
+  my %shown;
+  {
+    my $content = File::Slurp::read_file
+      (File::Spec->catfile($FindBin::Bin,
+                           File::Spec->updir,
+                           'lib','Graph','Maker','BinomialTree.pm'));
+    $content =~ /=head1 HOUSE OF GRAPHS.*?=head1/s or die;
+    $content = $&;
+    my $count = 0;
+    while ($content =~ /^ +(?<id>\d+) +N=(?<N>\d+)( +\(order=(?<order>\d+)\))?/mg) {
+      $count++;
+      my $id    = $+{'id'};
+      my $N     = $+{'N'};
+      my $order = $+{'order'};
+      $shown{"N=$N"} = $+{'id'};
+      if (defined $order) {
+        $shown{"order=$order"} = $+{'id'};
+      }
+    }
+    ok ($count, 12, 'HOG ID number lines');
+  }
+  ok (scalar(keys %shown), 20);
+  ### %shown
+
   my $extras = 0;
   my $compared = 0;
   my $others = 0;
@@ -88,22 +141,6 @@ plan tests => 75;
   }
   MyTestHelpers::diag ("POD HOG $compared compares, $others others");
   ok ($extras, 0);
-}
-
-
-#------------------------------------------------------------------------------
-# independence and domination
-
-foreach my $N (0 .. 32) {
-  my $graph = Graph::Maker->new('binomial_tree',
-                                N => $N,
-                                undirected => 1);
-  ok (MyGraphs::Graph_tree_indnum($graph),
-      ceil($N/2),
-      "indnum N=$N");
-  ok (MyGraphs::Graph_tree_domnum($graph),
-      $N==1 ? 1 : int($N/2),
-      "domnum N=$N");
 }
 
 

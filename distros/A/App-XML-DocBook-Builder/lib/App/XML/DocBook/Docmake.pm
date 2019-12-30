@@ -1,5 +1,5 @@
 package App::XML::DocBook::Docmake;
-$App::XML::DocBook::Docmake::VERSION = '0.0700';
+$App::XML::DocBook::Docmake::VERSION = '0.0800';
 use strict;
 use warnings;
 
@@ -535,7 +535,7 @@ sub _output_cmd_comp
 }
 
 package App::XML::DocBook::Docmake::CmdComponent;
-$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0700';
+$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0800';
 use base 'Class::Accessor';
 
 __PACKAGE__->mk_accessors(
@@ -556,13 +556,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-App::XML::DocBook::Docmake
-
 =head1 VERSION
 
-version 0.0700
+version 0.0800
 
 =head1 SYNOPSIS
 
@@ -575,10 +571,6 @@ version 0.0700
 =head1 NAME
 
 App::XML::DocBook::Docmake - translate DocBook/XML to other formats
-
-=head1 VERSION
-
-version 0.0700
 
 =head1 FUNCTIONS
 
@@ -639,7 +631,7 @@ Copyright 2008 Shlomi Fish.
 This program is released under the following license: MIT/X11 License.
 ( L<http://www.opensource.org/licenses/mit-license.php> ).
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -673,14 +665,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-XML-DocBook-Builder>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-XML-DocBook-Builder>
 
 =item *
 

@@ -1,7 +1,7 @@
 package WWW::PAUSE::Simple;
 
 our $DATE = '2019-11-14'; # DATE
-our $VERSION = '0.445'; # VERSION
+our $VERSION = '0.446'; # VERSION
 
 use 5.010001;
 use strict;
@@ -59,7 +59,7 @@ _
     #              for a little over a day
     # 2019-11-14 - PAUSE is now ok, tune down retries to 5
     retries => {
-        summary => 'Number of retries when received [45]xx HTTP error from server',
+        summary => 'Number of retries when received 5xx HTTP error from server',
         description => <<'_',
 
 The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
@@ -918,7 +918,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.445 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2019-11-14.
+This document describes version 0.446 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2019-11-14.
 
 =head1 SYNOPSIS
 
@@ -968,7 +968,7 @@ Protect some files/wildcard patterns from delete/cleanup.
 
 =item * B<retries> => I<int> (default: 5)
 
-Number of retries when received [45]xx HTTP error from server.
+Number of retries when received 5xx HTTP error from server.
 
 The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
 3600, 3600, ... seconds.
@@ -1054,7 +1054,7 @@ Protect some files/wildcard patterns from delete/cleanup.
 
 =item * B<retries> => I<int> (default: 5)
 
-Number of retries when received [45]xx HTTP error from server.
+Number of retries when received 5xx HTTP error from server.
 
 The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
 3600, 3600, ... seconds.
@@ -1134,7 +1134,7 @@ not yet supported.
 
 =item * B<retries> => I<int> (default: 5)
 
-Number of retries when received [45]xx HTTP error from server.
+Number of retries when received 5xx HTTP error from server.
 
 The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
 3600, 3600, ... seconds.
@@ -1200,7 +1200,7 @@ not yet supported.
 
 =item * B<retries> => I<int> (default: 5)
 
-Number of retries when received [45]xx HTTP error from server.
+Number of retries when received 5xx HTTP error from server.
 
 The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
 3600, 3600, ... seconds.
@@ -1262,7 +1262,7 @@ not yet supported.
 
 =item * B<retries> => I<int> (default: 5)
 
-Number of retries when received [45]xx HTTP error from server.
+Number of retries when received 5xx HTTP error from server.
 
 The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
 3600, 3600, ... seconds.
@@ -1323,7 +1323,7 @@ not yet supported.
 
 =item * B<retries> => I<int> (default: 5)
 
-Number of retries when received [45]xx HTTP error from server.
+Number of retries when received 5xx HTTP error from server.
 
 The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
 3600, 3600, ... seconds.
@@ -1394,7 +1394,7 @@ not yet supported.
 
 =item * B<retries> => I<int> (default: 5)
 
-Number of retries when received [45]xx HTTP error from server.
+Number of retries when received 5xx HTTP error from server.
 
 The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
 3600, 3600, ... seconds.
@@ -1470,7 +1470,7 @@ not yet supported.
 
 =item * B<retries> => I<int> (default: 5)
 
-Number of retries when received [45]xx HTTP error from server.
+Number of retries when received 5xx HTTP error from server.
 
 The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
 3600, 3600, ... seconds.

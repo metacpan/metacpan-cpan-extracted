@@ -48,4 +48,6 @@ $vbox->add( Tickit::Widget::Static->new( text => "blink", blink => 1 ) );
 
 $vbox->add( Tickit::Widget::Static->new( text => "alternate font", af => 1 ) );
 
-Tickit->new( root => $vbox )->run;
+my $t = Tickit->new( root => $vbox );
+$t->bind_key( q => sub { $t->stop } );
+$t->run;

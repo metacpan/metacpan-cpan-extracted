@@ -17,7 +17,7 @@ Warp functionality enable a Value object to change its properties (i.e. default 
 
 =head2 follow
 
-Specify with the pathof the configuration element that drives the warp, i.e .the elements that control the property change. These are specified using a variable name (used in the "rules" formula)and a path to fetch the actual value. Example $country => " ! country" I< Optional. Type hash of uniline.  > 
+Specify with the path of the configuration element that drives the warp, i.e .the elements that control the property change. These are specified using a variable name (used in the "rules" formula)and a path to fetch the actual value. Example $country => " ! country" I< Optional. Type hash of uniline.  > 
 
 =head2 rules
 

@@ -30,7 +30,7 @@ sub import {
       if ( @_ && lc( $_[0] ) eq "pool" );
 }
 
-our $VERSION = '1.54';
+our $VERSION = '1.55';
 
 our $drh    = undef;    # will hold driver handle
 our $err    = 0;        # will hold any error codes
@@ -1276,9 +1276,11 @@ C<DBD::Mock::dr::add_connect_callbacks> function
 
 =item table_info
 
-This feature adds support for DBI's C<table_info> method. To mock the table
-info for a search of the C<testSchema> database schema you would use the
-following:
+This feature adds support for DBI's C<table_info> method (
+I<Note this functionality is unstable when used with DBI version 1.634 and below>).
+
+To mock the table info for a search of the C<testSchema> database schema you
+would use the following:
 
     $dbh->{mock_add_table_info} = {
         cataloge   => undef,

@@ -1,6 +1,7 @@
 use warnings;
 use strict;
 use Test::More;
+use Test::Warn;
 use Path::Class::Dir;
 use Path::Class::File;
 use URI;
@@ -117,23 +118,26 @@ is (-e $tag_detail_file, 1, 'Tag detail file created.');
 
 is ($plerd->has_tags, 1, 'The blog knows that it has tags.');
 
-my $foo_tag_file =
-    Path::Class::File->new( $docroot_dir, 'tags', 'Foo.html' );
-my $tag_detail_content = $foo_tag_file->slurp;
-like(
-    $tag_detail_content,
-    qr{<h1>Tag: Foo.*<li>.*<li>.*</ul>.*sidebar"}s,
-    "The 'foo' tag page links to two posts, even though they capitalized "
-    . "it differently.",
-);
-
 my $tag_index_content = $tag_index_file->slurp;
 like(
     $tag_index_content,
     qr{<h1>All Tags.*<li>.*<li>.*</ul>.*sidebar"}s,
     "The tag-index page links to two tags.",
 );
+}
 
+### Test warns when tags have case conflicts.
+{
+my $naughty_file = Path::Class::File->new( $source_dir, 'bad_case.md' );
+$naughty_file->spew(qq{title: Naughty tag!
+tags: FOO
+
+Oh no, this post has a tag whose case conflicts with an existing one.
+});
+$plerd->publish_all;
+warning_like {$plerd->publish_all} qr/conflicts/,
+    'Tag case-conflicts generate a warning';
+unlink $naughty_file;
 }
 
 ### Make sure re-titling posts works as expected

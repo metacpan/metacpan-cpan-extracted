@@ -350,15 +350,13 @@ sub reset_sql {
 
 
 sub print_error_message {
-    my ( $sf, $message, $title ) = @_;
-    my $info;
-    $info = "$title:" if $title; #
+    my ( $sf, $message ) = @_;
     utf8::decode( $message );
     chomp( $message );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $tc->choose(
         [ 'Press ENTER to continue' ],
-        { prompt => $message, info => $info }
+        { prompt => $message }
     );
 }
 
@@ -374,7 +372,7 @@ sub column_names_and_types { # db
             $col_types->{$table} ||= $sth->{TYPE};
             1 }
         ) {
-            $sf->print_error_message( $@, 'Column names and types' );
+            $sf->print_error_message( $@ );
         }
     }
     return $col_names, $col_types;

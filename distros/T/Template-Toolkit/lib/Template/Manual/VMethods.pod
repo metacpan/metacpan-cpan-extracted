@@ -555,6 +555,15 @@ current list.
        one.join(', ');     # 1, 2, 3, 4, 5, 6, 7, 8, 9
     %]
 
+Import also allows chaining. The below syntax is equivalent.
+
+    [% one   = [ 1 2 3 ];
+       two   = [ 4 5 6 ];
+       three = [ 7 8 9 ];
+       one.import(two, three).join(', ');        # 1, 2, 3, 4, 5, 6, 7, 8, 9
+# or:  one.import(two).import(three).join(', '); # 1, 2, 3, 4, 5, 6, 7, 8, 9
+    %]
+
 =head2 merge
 
 Returns a list composed of zero or more other lists:

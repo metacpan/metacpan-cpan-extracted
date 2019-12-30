@@ -116,7 +116,7 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         my $args = shift;
         push @should_update,
             [
-            map { $_ => $args->{$_} }
+            map      { $_ => $args->{$_} }
                 sort { $a cmp $b }
                 keys(%$args)
             ];
@@ -171,7 +171,7 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         my $args = shift;
         push @should_update,
             [
-            map { $_ => $args->{$_} }
+            map      { $_ => $args->{$_} }
                 sort { $a cmp $b }
                 keys(%$args)
             ];

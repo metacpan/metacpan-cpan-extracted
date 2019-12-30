@@ -9,6 +9,7 @@ t/001_load.t
 t/002_stmt.t
 t/003_txns.t
 t/004_sth_func.t
+t/005_connect.t
 t/998_pod.t
 t/999_cpan_changes.t
 t/lib/Neo4p/Test.pm

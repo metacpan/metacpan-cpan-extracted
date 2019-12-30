@@ -27,6 +27,7 @@ use List::Util 'min','max','sum','minstr';
 use Scalar::Util 'blessed';
 use File::Spec;
 use File::HomeDir;
+use Math::Trig ();
 use POSIX 'ceil';
 my @ipc;
 
@@ -83,6 +84,7 @@ use vars '@EXPORT_OK';
               'Graph_is_domset','Graph_is_minimal_domset',
               'Graph_domset_is_minimal',
               'Graph_minimal_domsets_count_by_pred',
+              'Graph_is_total_domset',
 
               'edge_aref_num_vertices',
               'edge_aref_is_subgraph',
@@ -233,14 +235,16 @@ sub Graph_Easy_print_adjacency_matrix {
 #------------------------------------------------------------------------------
 # Graph.pm extras
 
+sub Graph_sorted_vertices {
+  my ($graph) = @_;
+  my @vertices = $graph->vertices;
+  my $func = cmp_func(@vertices);
+  return sort $func @vertices;
+}
+
 sub Graph_print_adjacency_matrix {
   my ($graph) = @_;
-  my @vertices = sort {$a <=> $b} $graph->vertices;
-  if (grep {! /^\d+$/} @vertices) {
-    @vertices = sort {$a <=> $b} @vertices;
-  } else {
-    @vertices = sort {$a <=> $b} @vertices;
-  }
+  my @vertices = Graph_sorted_vertices($graph);
   print "[";
   foreach my $from (0 .. $#vertices) {
     foreach my $to (0 .. $#vertices) {
@@ -374,34 +378,20 @@ sub Graph_tree_root {
   croak "No tree root found";
 }
 
+# Note: This depends on the Graph_vertex_children() vertex numbering.
 sub Graph_tree_height {
   my ($graph, $root) = @_;
   $root //= Graph_tree_root($graph);
   ### $root
   my $height = 0;
-  my @pending = ([$root, $root]);
-  my $pos = 0;
-  while ($pos >= 0) {
-    ### at: "pos=$pos ".join(',',map {$pending[$_]->[0]} 0 .. $pos)
-    if ($pos > $height) {
-      $height = $pos;
-      ### $height
-    }
-    my $aref = $pending[$pos];
-    if (@$aref < 2) {
-      $pos--;
-      next;
-    }
-    my $v = pop @$aref;
-    my @neighbours = $graph->neighbours($v);
-    my $parent = $pending[$pos]->[0];
-    @neighbours = grep {$_ ne $parent} @neighbours;
-    ### @neighbours
-    if (@neighbours) {
-      @{$pending[++$pos]} = ($v, @neighbours);
-    }
+  my @pending = ($root);
+  my $depth = 0;
+  for (;;) {
+    @pending = map {Graph_vertex_children($graph,$_)} @pending;
+    last unless @pending;
+    $depth++;
   }
-  return $height;
+  return $depth;
 }
 
 # Return a list of arrayrefs [$v,$v,...] which are the vertices at
@@ -446,7 +436,7 @@ sub cmp_alphabetic ($$) {
 }
 sub cmp_func {
   return (all_looks_like_number(@_) ? \&cmp_numeric : \&cmp_alphabetic);
-}  
+}
 
 sub Graph_tree_print {
   my ($graph, %options) = @_;
@@ -488,7 +478,7 @@ sub Graph_tree_print {
       return $p1 eq $p2;
     };
 
-  OUTER: for (my $limit; $limit < 50; $limit++) {
+  OUTER: for (my $limit = 0; $limit < 50; $limit++) {
       # avoid overlaps within row
       foreach my $depth (0 .. $#vertices_by_depth) {
         my $aref = $vertices_by_depth[$depth];
@@ -645,6 +635,41 @@ sub Graph_tree_print {
     return;
   }
 }
+# use Smart::Comments;
+sub Graph_tree_layout {
+  my ($graph, %options) = @_;
+  my $v = $options{'v'} // Graph_tree_root($graph);
+  my $x = $options{'x'} || 0;
+  my $y = $options{'y'} || 0;
+  my $filled = $options{'filled'} // [];
+
+  my @children = Graph_vertex_children($graph,$v);
+  my @heights = map {Graph_tree_height($graph,$_)} @children;
+  my @order = sort {$heights[$b] <=> $heights[$a]} 0 .. $#children;
+
+  my $h = (@children ? $heights[$order[0]]+1 : 0);
+  ### $h
+ Y: for (;;) {
+    foreach my $i (0 .. $h) {
+      if ($filled->[$x+$i]->[$y]) {
+        $filled->[$x]->[$y] = 1;
+        $y++;
+        next Y;
+      }
+    }
+    last;
+  }
+  ### place: "$v at $x,$y"
+  Graph_set_xy_points($graph, $v => [$x,-$y]);
+  $filled->[$x]->[$y] = 1;
+
+  foreach my $i (@order) {
+    Graph_tree_layout($graph, v=>$children[$i],
+                      x=>$x+1, y=>$y++,
+                      filled=>$filled);
+  }
+}
+# no Smart::Comments;
 
 #------------------------------------------------------------------------------
 
@@ -712,11 +737,11 @@ sub Graph_xy_print_triangular {
     foreach my $x ($x_min .. $x_max) {
       my $from = "$x,$y";
       # horizontal edge to next
-      print $graph->has_vertex($from) ? "*" 
+      print $graph->has_vertex($from) ? "*"
         : $graph->has_edge(($x-1).",".$y, ($x+1).",".$y) ? "-"
         : " ";
       print $graph->has_edge(($x-1).",".$y, ($x+1).",".$y)
-        || $graph->has_edge($from, ($x+1).",".$y) 
+        || $graph->has_edge($from, ($x+1).",".$y)
         || $graph->has_edge($from, ($x+2).",".$y) ? "-" : " ";
     }
     print "\n";
@@ -1075,17 +1100,30 @@ sub hog_id_to_url {
 }
 
 # hog_searches_html($graph,$graph,...)
-# Create a /tmp/hog-searches.html of forms to search hog for each $graph.
-# Each $graph is either Graph.pm or Graph::Easy.
+# Create a /tmp/USERNAME/hog-searches.html of forms to search hog for each
+# $graph.  Each $graph can be either Graph.pm or Graph::Easy.
+#
+# The hog-searches.html is a bit rough, and requires you select the 0.g6,
+# 1.g6, etc file to search for.  The HOG server expects a file upload, and
+# don't think can induce a browser to do a file-like POST other than by
+# selecting a file.  Some Perl code POST could do it easily, but the idea is
+# to present a range of searches and you might only do a few.
 #
 sub hog_searches_html {
   my @graphs = @_;
   ### hog_searches_html() ...
 
   require HTML::Entities;
-  my $html_filename = '/tmp/hog-searches.html';
+  require File::Spec;
+  require File::Temp;
+  require POSIX;
+  my $dir = File::Spec->catdir('/tmp', POSIX::cuserid());
+  mkdir $dir;
+  my $html_filename = File::Spec->catfile($dir, 'hog-searches.html');
+
   my $hog_url = 'https://hog.grinvin.org';
-  # $hog_url = 'http://localhost:10000';
+  # $hog_url = 'http://localhost:10000';    # for testing
+  my @names;
 
   open my $h, '>', $html_filename or die;
   print $h <<'HERE';
@@ -1094,6 +1132,7 @@ sub hog_searches_html {
 <body>
 HERE
 
+  my %seen_canonical;
   foreach my $i (0 .. $#graphs) {
     my $graph = $graphs[$i];
     ### graph: "$graph"
@@ -1108,8 +1147,9 @@ HERE
         $graph = Graph_from_graph6_str($graph);
       }
     }
-    my $graph6_filename = "/tmp/$i.g6";
-    my $png_filename = "/tmp/$i.png";
+    my $graph6_filename = File::Spec->catfile($dir, "$i.g6");
+    my $png_fh          = File::Temp->new;
+    my $png_filename    = $png_fh->filename;
     ### $graph6_filename
 
     if ($graph->isa('Graph::Easy')) {
@@ -1141,6 +1181,7 @@ HERE
     }
     $vertex_name_type //= '';
     $name //= '';
+    $names[$i] = $name;
 
     my $graph6_canonical = graph6_str_to_canonical($graph6_str);
     my $canonical = $graph6_canonical;
@@ -1151,13 +1192,24 @@ HERE
         . HTML::Entities::encode_entities($canonical);
     }
 
+    if (defined(my $prev = $seen_canonical{$graph6_canonical})) {
+      print "g$i $name\n  REPEAT  g$prev $names[$prev]\n";
+      print $h "<br> repeat of $seen_canonical{$graph6_canonical} ",
+        HTML::Entities::encode_entities($names[$prev]),
+          "\n";
+    } else {
+      $seen_canonical{$graph6_canonical} = $i;
+    }
+
     my $got = '';
     if (my $num = hog_grep($graph6_canonical)) {
       my $str = $graph6_canonical;
       $str =~ s/\n+$//;
       print "g$i HOG got $str  n=$num_vertices",
-        ($num eq -1 ? '' : " id=$num"), "\n";
-      if ($num eq -1) {
+        ($num eq '-1' ? '' : " id=$num"),
+        "    $name\n";
+
+      if ($num eq '-1') {
         my $filename = HTML::Entities::encode_entities(hog_all_filename());
         $got = "<br> got in $filename\n";
       } else {
@@ -1202,12 +1254,13 @@ HERE
             || do {
               my ($v) = $graph->vertices;
               defined $v && defined($graph->get_vertex_attribute($v,'x')) });
-      if ($is_xy) {
+      if ($is_xy || 1) {
         ### write with graphviz2 neato ...
         my $graphviz2 = Graph_to_GraphViz2($graphs[$i]);
         $graphviz2->run(format => 'png',
                         output_file=>$png_filename,
                         driver => 'neato');
+        ### dot_input: $graphviz2->dot_input
       } elsif (1) {
         ### write with graphviz2 dot ...
         my $graphviz2 = Graph_to_GraphViz2($graphs[$i]);
@@ -1243,7 +1296,17 @@ HERE
         # IPC::Run::run(['fdp','-Tpng'], '<',\$graphviz, '>',$png_filename);
         # print $easy->as_ascii;
       }
-      print $h qq{<img src="$png_filename">\n};
+
+      require File::Slurp;
+      my $png = File::Slurp::read_file($png_filename);
+
+      require URI::data;
+      my $png_uri = URI->new("data:");
+      $png_uri->data($png);
+      $png_uri->media_type('image/png');
+      # my  = URI::data->new($png,'image/png');
+
+      print $h qq{<img src="$png_uri">\n};
     }
   }
 
@@ -1253,6 +1316,7 @@ HERE
 HERE
   close $h or die;
 
+  print scalar(@graphs)," graphs\n";
   print "mozilla file://$html_filename >/dev/null 2>&1 &\n";
 }
 
@@ -1290,6 +1354,179 @@ sub edge_aref_string {
   return join(',', map{join('-',@$_)} @$edge_aref)
     . ' ['.scalar(@$edge_aref).' edges]';
 }
+
+# Create a file /tmp/USERNAME/hog-upload.html which is an upload of $graph.
+# This uses the HOG add-a-graph by drawing.  Log-in first, then click Upload
+# in hog-upload.html.
+#
+# The upload is an adjacency matrix and vertex locations.  These are the
+# text fields in the HTML, but are likely to be too big to see anything
+# useful.
+# Vertex locations are from Graph_vertex_xy($graph, ...).
+# The server draws straight-line edges between locations.
+
+# hog-upload.html includes a simple png image so you can preview how it
+# ought to come out.  The Upload click goes to the usual HOG page to enter a
+# name and comment.  You don't see the image in HOG until after that, but if
+# it goes badly wrong you can always delete the graph.
+#
+sub hog_upload_html {
+  my ($graph, %options) = @_;
+  require POSIX;
+  require File::Spec;
+  require File::Temp;
+  my $dir = File::Spec->catdir('/tmp', POSIX::cuserid());
+  mkdir $dir;
+  my $html_filename   = File::Spec->catfile($dir, 'hog-upload.html');
+  # my $png_filename  = File::Spec->catfile($dir, 'hog-upload.png');
+  my $png_fh          = File::Temp->new;
+  my $png_filename    = $png_fh->filename;
+  my $hog_url = 'https://hog.grinvin.org';
+  # $hog_url = 'http://localhost';  # for testing
+
+  my @vertices = MyGraphs::Graph_sorted_vertices($graph);
+  my $name = $graph->get_graph_attribute('name') // '';
+  my $num_vertices = scalar(@vertices);
+  my $num_edges = $graph->edges;
+  print "graph $name\n";
+  print "$num_vertices vertices, $num_edges edges\n";
+
+  my @points = map { my ($x,$y) = MyGraphs::Graph_vertex_xy($graph,$_)
+                       or croak("no X,Y coordinates for vertex ",$_);
+                     [$x,$y]
+                   } @vertices;
+  ### @points
+
+  if (my $a = $options{'rotate_degrees'}) {
+    $a = Math::Trig::deg2rad($a);
+    my $s = sin($a);
+    my $c = cos($a);
+    @points = map {
+      [ $_->[0] * $c - $_->[1] * $s,
+        $_->[0] * $s + $_->[1] * $c ]
+    } @points;
+  }
+
+  my @x = map {$_->[0]} @points;
+  my @y = map {$_->[1]} @points;
+  my $size = max( max(@x)-min(@x), max(@y)-min(@y) );
+
+  require Geometry::AffineTransform;
+  my $affine = Geometry::AffineTransform->new;
+  $affine->translate( -(max(@x)+min(@x))/2, -(max(@y)+min(@y))/2 );
+  $affine->scale(1/$size, -1/$size);  # Y down the page
+  $affine->scale(380, 380);
+  $affine->translate(200, 200);
+  @points = map {[$affine->transform(@$_)]} @points;
+  @points = map {[map {POSIX::round($_)} @$_]} @points;
+  @x = map {$_->[0]} @points;
+  @y = map {$_->[1]} @points;
+  print "transformed x ",min(@x)," to ",max(@x),
+    "  y ",min(@y)," to ",max(@y),"\n";
+
+  require Image::Base::GD;
+  my $image = Image::Base::GD->new (-width => 400, -height => 400);
+  $image->rectangle(0,0, 400,400, 'white', 1);
+  $image->rectangle(0,0, 399,399, 'blue');
+
+  foreach my $from (0 .. $#vertices) {
+    foreach my $to (0 .. $#vertices) {
+      if ($graph->has_edge($vertices[$from], $vertices[$to])) {
+        $image->line(@{$points[$from]}, @{$points[$to]}, 'red');
+      }
+    }
+  }
+  foreach my $from (0 .. $#vertices) {
+    my ($x,$y) = @{$points[$from]};
+    $image->ellipse($x-1,$y-1, $x+1,$y+1, 'black');
+  }
+  $image->save($png_filename);
+  require File::Slurp;
+  my $png = File::Slurp::read_file($png_filename);
+
+  require URI::data;
+  my $png_uri = URI->new("data:");
+  $png_uri->data($png);
+  $png_uri->media_type('image/png');
+  # my  = URI::data->new($png,'image/png');
+
+  # stringize the points
+  @points = map {join('-',@$_).';'} @points;
+  ### @points
+  unless (list_is_all_distinct_eq(@points)) {
+    die "oops, some point coordinates have rounded together";
+  }
+
+  my $coordinateString = join('',@points);
+  ### $coordinateString
+
+  # 0100000000000000%0D%0A
+  # 1010000000000000%0D%0A
+  # 0101000000000000%0D%0A
+  # 0010100000000000%0D%0A
+  # 0001010000000000%0D%0A
+  # 0000101010001000%0D%0A
+  # 0000010100000000%0D%0A
+  # 0000001010000000%0D%0A
+  # 0000010100000000%0D%0A
+  # 0000000000101000%0D%0A
+  # 0000000001010000%0D%0A
+  # 0000000000100001%0D%0A
+  # 0000010001000000%0D%0A
+  # 0000000000000010%0D%0A
+  # 0000000000000101%0D%0A
+  # 0000000000010010
+  my @adjacencies = map {
+    my $from = $_;
+    join('', map {$graph->has_edge($from,$_) ? 1 : 0} @vertices)
+  } @vertices;
+  ### @adjacencies
+
+  my $adjacencyString = join("\r\n",@adjacencies);
+
+  require HTML::Entities;
+  my @names;
+  $name = HTML::Entities::encode_entities($name);
+  my $upsize = length($adjacencyString) + length($coordinateString) + 20;
+  print "upload size $upsize bytes\n";
+
+  open my $h, '>', $html_filename or die;
+  print $h <<"HERE";
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<body>
+Upload $name
+<br>
+$num_vertices vertices, $num_edges edges, size $upsize bytes
+<br>
+<form action="$hog_url/DoUploadGraph.action" method="POST">
+<textarea name="adjacencyString" value="">$adjacencyString</textarea>
+<br>
+<input name="coordinateString" value="$coordinateString">
+<br>
+<input type=submit value="Upload">
+</form>
+<p>
+<img width=400 height=400 src="$png_uri">
+</body>
+</html>
+HERE
+  close $h or die;
+
+  print "mozilla file://$html_filename >/dev/null 2>&1 &\n";
+}
+
+# Return true of all arguments are different, as compared by "eq".
+sub list_is_all_distinct_eq {
+  my %seen;
+  foreach (@_) {
+    if ($seen{$_}++) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
 
 #------------------------------------------------------------------------------
 # nauty bits
@@ -1487,7 +1724,7 @@ sub vpar_name {
     $str .= $vpar->[$i];
     $sep = ',';
   }
-  return $str;  
+  return $str;
 }
 sub vpar_to_GraphViz2 {
   my ($vpar, %options) = @_;
@@ -1575,7 +1812,7 @@ sub Graph_triangle_is_even {
 # permutations like b,a,c.  It's unspecified exactly which vertices are the
 # $a,$b,$c in the callback (though the current code has then in ascending
 # alphabetical order).
-# 
+#
 sub Graph_triangle_search {
   my ($graph, $callback) = @_;
   foreach my $a ($graph->vertices) {
@@ -2255,6 +2492,32 @@ sub Graph_is_line_graph_by_Beineke {
 }
 
 #------------------------------------------------------------------------------
+# Graph Doubles
+
+# $graph is a Graph.pm.
+# Return a new graph which is the bipartite double of $graph.
+# The new graph is two copies of the original vertices "$v.A" and $v.B".
+# An edge $u to $v in $graph becomes edges $u.A to $v.B
+#                                     and  $u.B to $v.A
+#
+sub Graph_bipartite_double {
+  my ($graph) = @_;
+  my $double = $graph->new;  # same directed, countedged, etc
+  foreach my $v ($graph->vertices) {
+    $double->add_vertex("$v.A");
+    $double->add_vertex("$v.B");
+  }
+  foreach my $edge ($graph->edges) {
+    my ($from,$to) = @$edge;
+    ### edge: "$from to $to"
+    $double->add_edge("$from.A","$to.B");
+    $double->add_edge("$from.B","$to.A");
+  }
+  return $double;
+}
+
+
+#------------------------------------------------------------------------------
 # GraphViz2 conversions
 
 # file:///usr/share/doc/graphviz/html/info/attrs.html
@@ -2290,7 +2553,7 @@ sub Graph_to_GraphViz2 {
 
   foreach my $v ($graph->vertices) {
     my @attrs;
-    
+
     if (defined (my $xy = $graph->get_vertex_attribute($v,'xy'))) {
       push @attrs, pin=>1, pos=>$xy;
     } elsif ($is_xy) {
@@ -2317,6 +2580,36 @@ sub Graph_to_GraphViz2 {
     $graphviz2->add_edge(from => $from, to => $to);
   }
   return $graphviz2;
+}
+
+sub Graph_vertex_xy {
+  my ($graph, $v) = @_;
+  if (defined (my $xy = $graph->get_vertex_attribute($v,'xy'))) {
+    return split /,/, $xy;
+  }
+  if ($graph->get_graph_attribute('vertex_name_type_xy_triangular')) {
+    my ($x,$y) = split /,/, $v;
+    return ($x*.5, $y*(sqrt(3)/2));
+  }
+  if ($graph->get_graph_attribute('vertex_name_type_xy')) {
+    return split /,/, $v;
+  }
+  if (defined(my $x = $graph->get_vertex_attribute($v,'x'))
+      && defined(my $y = $graph->get_vertex_attribute($v,'y'))) {
+    return ($x,$y);
+  }
+  return ();
+}
+sub Graph_set_xy_points {
+  my $graph = shift;
+  while (@_) {
+    my $v = shift;
+    my $point = shift;
+    ### $v
+    ### $point
+    $graph->set_vertex_attribute($v, x => $point->[0]);
+    $graph->set_vertex_attribute($v, y => $point->[1]);
+  }
 }
 
 # $graphviz2 is a GraphViz2 object.
@@ -2417,8 +2710,8 @@ sub all_looks_like_consecutive_number {
 }
 sub all_looks_like_number {
   foreach (@_) {
-    Scalar::Util::looks_like_number($_)
-        && $_ <= (1<<24)
+    (Scalar::Util::looks_like_number($_)
+     && $_ <= (1<<24))
         or return 0;
   }
   return 1;
@@ -3132,7 +3425,7 @@ sub Graph_make_most_indomsets {
   my $graph = Graph->new (undirected=>1);
   my $v = 0;
   while ($n > 0) {
-    if ($v) { $graph->add_edge(0,$v) };  # to x
+    if ($v) { $graph->add_edge(0,$v) }  # to x
     my $u = $v;
     my $size = 3 + (($n%3)!=0);
     foreach my $i (0 .. $size-1) { # triangle or complete-4
@@ -3473,6 +3766,20 @@ sub Graph_minimal_domsets_count_by_pred {
   return $count;
 }
 
+# $graph is a Graph.pm.
+# $aref is an arrayref of vertex names.
+# Return true if these vertices are a total dominating set in $graph.
+# Every vertex must have one of $aref as a neighbour.
+# Unlike a plain dominating set, $aref vertices to not dominate themselves,
+# they must have a neighbour in the set.
+#
+sub Graph_is_total_domset {
+  my ($graph, $aref) = @_;
+  my %vertices = map {$_=>1} $graph->vertices;
+  delete @vertices{map {$graph->neighbours($_)} @$aref};
+  return keys(%vertices) == 0;
+}
+
 
 #------------------------------------------------------------------------------
 # Domination Number
@@ -3638,7 +3945,7 @@ sub Graph_has_bicyclic_component {
   return 0;
 }
 
-  
+
 # length of the smallest cycle in $graph
 sub Graph_girth {
   my ($graph) = @_;
@@ -3671,7 +3978,7 @@ sub Graph_girth {
   }
   return $girth;
 }
-    
+
 
 # $graph is an undirected Graph.pm.
 # If $v is in a hanging cycle, other than the attachment point, then return
@@ -3817,6 +4124,96 @@ sub Graph_find_all_4cycles {
 
 
 #------------------------------------------------------------------------------
+# Euler Cycle
+
+# Return a list of vertices v1,v2,...,vn,v1 which is an Euler cycle, so
+# traverse each edge exactly once.
+#
+sub Graph_Euler_cycle {
+  my ($graph, %options) = @_;
+  my $type = $options{'type'} || 'cycle';
+  ### $type
+  my @vertices = $graph->vertices;
+  my $func = cmp_func(@vertices);
+  @vertices = sort $func @vertices;
+  my @edges = $graph->edges;
+  my $num_edges = scalar(@edges);
+  my @edge_keys = map {join(' to ',@$_)} @edges;
+  my %edge_keys = map { my $key = join(' to ',@$_);
+                        ($key => $key,
+                         join(' to ',reverse @$_) => $key)
+                      } @edges;
+  my %neighbours;
+  foreach my $v (@vertices) {
+    $neighbours{$v} = [ sort $func $graph->neighbours($v) ];
+  }
+
+  my @path = $vertices[0];
+  my $try;
+  $try = sub {
+    my ($visited) = @_;
+    if (scalar(keys %$visited) >= $num_edges) {
+      return 1;
+    }
+    my $v = $path[-1];
+    foreach my $to (@{$neighbours{$v}}) {
+      my $edge = $edge_keys{"$v to $to"};
+      next if $visited->{$edge};
+      push @path, $to;
+      if ($try->({ %$visited, $edge => 1 })) {
+        return 1;
+      }
+      pop @path;
+    }
+    return 0;
+  };
+  if ($try->({})) {
+    return @path;
+  } else {
+    return;
+  }
+
+  # my @path;
+  # my %visited;
+  # my $v = $vertices[0];
+  # my @nn = (-1);
+  # my $upto = 0;
+  # for (;;) {
+  #   my $v = $path[$upto];
+  #   my $n = ++$nn[$upto];
+  #   my $to = $neighbours{$v}->[$n];
+  #   ### at: join('--',@path) . " upto=$upto v=$v n=$n"
+  #   ### $to
+  #   ### assert: 0 <= $n && $n <= $#{$neighbours{$v}}+1
+  #   if (! defined $to) {
+  #     ### no more neighbours, backtrack ...
+  #     $visited{$v} = 0;
+  #     $upto--;
+  #     last if $upto < 0;
+  #     next;
+  #   }
+  #   if ($visited{$to}) {
+  #     ### to is visited ...
+  #     if ($upto == $num_vertices-1
+  #         && ($type eq 'path'
+  #             || $to eq $path[0])) {
+  #       ### found path or cycle ...
+  #       if ($options{'verbose'}) { print "found ",join(',',@path),"\n"; }
+  #       if ($options{'found_coderef'}) { $options{'found_coderef'}->(@path); }
+  #       if (! $options{'all'}) { return 1; }
+  #     }
+  #     next;
+  #   }
+  #
+  #   # extend path to $to
+  #   $upto++;
+  #   $path[$upto] = $to;
+  #   $visited{$to} = 1;
+  #   $nn[$upto] = -1;
+  # }
+}
+
+#------------------------------------------------------------------------------
 # Hamiltonian Cycle
 
 # $graph is a Graph.pm.
@@ -3890,6 +4287,66 @@ sub Graph_is_Hamiltonian {
 
 
 #------------------------------------------------------------------------------
+# Directed Graphs
+
+# $graph is a directed Graph.pm.
+# Return the number of maximal paths.
+# A maximal path is from a predecessorless to a successorless.
+# There might be multiple paths between a given predecessorless and
+# successorless.  All such paths are counted.
+#
+sub Graph_num_maximal_paths {
+  my ($graph) = @_;
+  ### Graph_num_maximal_paths() ...
+  $graph->expect_directed;
+
+  my %indegree_remaining;
+  my %ways;
+  my %pending;
+  foreach my $v ($graph->vertices) {
+    $pending{$v} = 1;
+    if ($indegree_remaining{$v} = $graph->in_degree($v)) {
+      $ways{$v} = 0;
+    } else {
+      $ways{$v} = 1;
+    }
+  }
+
+  my $ret = 0;
+  while (%pending) {
+    ### at pending: scalar(keys %pending)
+    my $progress;
+    foreach my $v (keys %pending) {
+      if ($indegree_remaining{$v}) {
+        ### not ready: "$v  indegree_remaining $indegree_remaining{$v}"
+        ### assert: $indegree_remaining{$v} >= 0
+        next;
+      }
+      delete $pending{$v};
+      my @successors = $graph->successors($v);
+      if (@successors) {
+        foreach my $to (@successors) {
+          ### edge: "$v to $to  countedge ".$graph->get_edge_count($v,$to)
+          $pending{$to} or die "oops, to=$to not pending";
+          $ways{$to} += $ways{$v} * $graph->get_edge_count($v,$to);
+          $indegree_remaining{$to}--;
+          $progress = 1;
+        }
+      } else {
+        # successorless
+        $ret += $ways{$v};
+      }
+    }
+    if (%pending && !$progress) {
+      die "Graph_num_maximal_paths() oops, no progress, circular graph";
+    }
+  }
+  return $ret;
+}
+
+
+#------------------------------------------------------------------------------
+# Lattices
 
 # $graph is a directed Graph.pm.
 # Return the number of pairs of comparable elements $u,$v, meaning pairs
@@ -3944,6 +4401,14 @@ sub Graph_reachable_matrix {
   return $ret;
 }
 
+# $graph is a directed Graph.pm which is a lattice.
+# Return its "intervals lattice".
+#
+# An interval is a pair [$x,$y] with $y reachable from $x.
+# Each vertex of the intervals lattice is such an interval, in the form of a
+# string "$x-$y".  Edges are from "$x-$y" to "$u-$v" where $x < $u and $y < $v,
+# where < means $u reachable from $x, and $v reachable from $y.
+#
 sub Graph_make_intervals_lattice {
   my ($graph, $covers) = @_;
   $graph->expect_directed;
@@ -3963,7 +4428,7 @@ sub Graph_make_intervals_lattice {
   foreach my $a (0 .. $#vertices) {
     foreach my $b (0 .. $#vertices) {
       next unless $graph_reachable->[$a]->[$b];
-      my $from = "$vertices[$a] -- $vertices[$b]";
+      my $from = "$vertices[$a]-$vertices[$b]";
       $intervals->add_vertex($from);
       $intervals{$from} = [$a,$b];
     }
@@ -3984,11 +4449,6 @@ sub Graph_make_intervals_lattice {
     }
   }
   return $covers ? Graph_covers($intervals) : $intervals;
-
-
-
-
-
 
 
   # $graph->expect_directed;
@@ -4015,24 +4475,31 @@ sub Graph_make_intervals_lattice {
   # return $covers ? Graph_covers($intervals) : $intervals;
 }
 
+# $graph is a directed Graph.pm which is expected to be acyclic.
+# Delete edges to leave just its cover relations.
+#
+# At some from->to, if there is also from->mid->to then edge from->to is not
+# a cover and is deleted.
+#
 sub Graph_covers {
   my ($graph) = @_;
 
+  $graph->expect_acyclic;
   my @vertices = $graph->vertices;
   my %vertex_to_index;
   @vertex_to_index{@vertices} = (0 .. $#vertices);
 
-  my $graph_reachable
+  my $reachable
     = Graph_reachable_matrix($graph, \@vertices, \%vertex_to_index);
 
   foreach my $from (0 .. $#vertices) {
     foreach my $mid (0 .. $#vertices) {
       next if $from == $mid;
-      next unless $graph_reachable->[$from]->[$mid];
+      next unless $reachable->[$from]->[$mid];
 
       foreach my $to (0 .. $#vertices) {
         next if $mid == $to;
-        next unless $graph_reachable->[$mid]->[$to];
+        next unless $reachable->[$mid]->[$to];
         $graph->delete_edge($vertices[$from],$vertices[$to]);
       }
     }
@@ -4040,9 +4507,367 @@ sub Graph_covers {
   return $graph;
 }
 
+# $graph is a directed Graph.pm which is expected to be a lattice.
+# Return its unique lowest element.
+sub Graph_lattice_lowest {
+  my ($graph) = @_;
+  my @predecessorless = $graph->predecessorless_vertices;
+  @predecessorless==1
+    or die "Graph_lattice_lowest() oops, expected one predecessorless";
+  return $predecessorless[0];
+}
+
+# $graph is a directed Graph.pm which is expected to be a lattice.
+# Return its unique highest element.
+sub Graph_lattice_highest {
+  my ($graph) = @_;
+  my @successorless = $graph->successorless_vertices;
+  @successorless==1
+    or die "Graph_lattice_highest() oops, expected one successorless";
+  return $successorless[0];
+}
+
+# $graph is a directed Graph.pm which is expected to be a lattice.
+# Return $href where
+#     $href->{'max'}->{$x}->{$y}  is the lattice max($x,y)
+#     $href->{'min'}->{$x}->{$y}  is the lattice min($x,y)
+#
+sub Graph_lattice_minmax_hash {
+  my ($graph) = @_;
+  my $verbose = 1;
+  my %hash;
+  my @vertices = $graph->vertices;
+  foreach my $elem (['all_successors','max'],
+                    ['all_predecessors','min']) {
+    my ($all_method, $key) = @$elem;
+
+    # $all_successors{$x}->{$y} = boolean, true x has y after it, false if not.
+    # x is a successor of itself ($graph->all_successors doesn't include x
+    # itself).
+    my %all_successors;
+    foreach my $x (@vertices) {
+      $all_successors{$x}->{$x} = 1;
+      foreach my $s ($graph->$all_method($x)) {
+        $all_successors{$x}->{$s} = 1;
+      }
+    }
+
+    # For each pair x,y look at the common successors and choose the smallest.
+    # Smallest in the sense the smaller has bigger among its successors.
+    foreach my $x (@vertices) {
+      my $xs_href = $all_successors{$x};
+      foreach my $y (@vertices) {
+        my $ys_href = $all_successors{$y};
+        my $m;
+        foreach my $xs (keys %$xs_href) {
+          if ($ys_href->{$xs}) {  # common successor
+            if (!defined $m || $all_successors{$xs}->{$m}) {
+              $m = $xs;           # which is before best $m so far
+            }
+          }
+        }
+        $hash{$key}->{$x}->{$y} = $m;
+      }
+    }
+  }
+  return \%hash;
 
 
+  # foreach my $v (@vertices) {
+  #   $hash{'max'}->{$v}->{$v}
+  #     = $hash{'min'}->{$v}->{$v} = $v;
+  # }
+  # foreach my $x (@vertices) {
+  #   foreach my $y ($graph->all_successors($x)) {
+  #     $hash{'max'}->{$x}->{$y}
+  #       = $hash{'max'}->{$y}->{$x}  = $y;
+  #     if ($verbose) { print "successor  $x max $y = $y\n"; }
+  #   }
+  #   foreach my $y ($graph->all_predecessors($x)) {
+  #     $hash{'min'}->{$x}->{$y}
+  #       = $hash{'min'}->{$y}->{$x}  = $y;
+  #     if ($verbose) { print "predecessor  $x min $y = $y\n"; }
+  #   }
+  # }
 
+  # my $more = 1;
+  # while ($more) {
+  #   $more = 0;
+  #   foreach my $M ('min','max') {
+  #     foreach my $x (@vertices) {
+  #       foreach my $y (@vertices) {
+  #         if (defined(my $m $hash{$M}->{$x}->{$y})) {
+  #           foreach my $z (@vertices) {
+  #
+  #             if (defined(my $m = $hash{'max'}->{$y}->{$z})) {
+  #             $more = 1;
+  #             $hash{'max'}->{$x}->{$y}
+  #               = $hash{'max'}->{$y}->{$x}
+  #               = $m;
+  #             if ($verbose) { print "chain  $x max $y = $m  from $z\n"; }
+  #           }
+  #         }
+  #       }
+  #       if (! defined $hash{'min'}->{$x}->{$y}) {
+  #         foreach my $z ($graph->predecessors($y)) {
+  #           if (defined(my $m = $hash{'min'}->{$x}->{$z})) {
+  #             $more = 1;
+  #             $hash{'min'}->{$x}->{$y}
+  #               = $hash{'min'}->{$y}->{$x}
+  #               = $m;
+  #             if ($verbose) { print "chain  $x min $y = $m  from $z\n"; }
+  #           }
+  #         }
+  #       }
+  #     }
+  #   }
+  # }
+
+  # my $more = 1;
+  # while ($more) {
+  #   $more = 0;
+  #   foreach my $x (@vertices) {
+  #     foreach my $y (@vertices) {
+  #       if (! defined $hash{'max'}->{$x}->{$y}) {
+  #         foreach my $z ($graph->successors($y)) {
+  #           if (defined(my $m = $hash{'max'}->{$x}->{$z})) {
+  #             $more = 1;
+  #             $hash{'max'}->{$x}->{$y}
+  #               = $hash{'max'}->{$y}->{$x}
+  #               = $m;
+  #             if ($verbose) { print "chain  $x max $y = $m  from $z\n"; }
+  #           }
+  #         }
+  #       }
+  #       if (! defined $hash{'min'}->{$x}->{$y}) {
+  #         foreach my $z ($graph->predecessors($y)) {
+  #           if (defined(my $m = $hash{'min'}->{$x}->{$z})) {
+  #             $more = 1;
+  #             $hash{'min'}->{$x}->{$y}
+  #               = $hash{'min'}->{$y}->{$x}
+  #               = $m;
+  #             if ($verbose) { print "chain  $x min $y = $m  from $z\n"; }
+  #           }
+  #         }
+  #       }
+  #     }
+  #   }
+  # }
+  #
+  # return \%hash;
+}
+
+# $graph is a directed Graph.pm which is expected to be a lattice.
+# $href is a hashref as returned by Graph_lattice_minmax_hash().
+# Check that the relations in $href follow the lattice rules.
+# die() if bad.
+#
+sub Graph_lattice_minmax_validate {
+  my ($graph, $href) = @_;
+  my $str = Graph_lattice_minmax_reason($graph,$href);
+  if ($str) {
+    die 'Graph_lattice_minmax_validate() ', $str;
+  }
+}
+
+# $graph is a directed Graph.pm which is expected to be a lattice.
+# $href is a hashref as returned by Graph_lattice_minmax_hash().
+# Check that the relations in $href follow the lattice rules.
+# If good then return empty string ''.
+# If bad then return a string describing the problem.
+#
+sub Graph_lattice_minmax_reason {
+  my ($graph, $href) = @_;
+
+  # defined
+  foreach my $x ($graph->vertices) {
+    foreach my $y ($graph->vertices) {
+      foreach my $M ('min','max') {
+        defined $href->{$M}->{$x}->{$y}
+          or return "missing $x $M $y";
+      }
+    }
+  }
+
+  # commutative
+  foreach my $x ($graph->vertices) {
+    foreach my $y ($graph->vertices) {
+      foreach my $M ('min','max') {
+        $href->{$M}->{$x}->{$y}  eq $href->{$M}->{$y}->{$x}
+          or return "not commutative $x $M $y";
+      }
+    }
+  }
+
+  # idempotent
+  foreach my $x ($graph->vertices) {
+    foreach my $y ($graph->vertices) {
+      foreach my $M ('min','max') {
+        my $m = $href->{$M}->{$x}->{$y};
+        $href->{$M}->{$x}->{$m} eq $m
+          or return "not idempotent $x $M $y";
+      }
+    }
+  }
+
+  # absorptive a ^ (a v b) = a v (a ^ b) = a
+  #                   L             H
+  foreach my $x ($graph->vertices) {
+    foreach my $y ($graph->vertices) {
+      my $min = $href->{'min'}->{$x}->{$y};
+      my $max = $href->{'max'}->{$x}->{$y};
+      my $a = $href->{'max'}->{$x}->{$min};
+      my $b = $href->{'min'}->{$x}->{$max};
+      ($a eq $x && $b eq $x)
+        or return "not absorptive $x and $y min $min max $max got $a and $b";
+    }
+  }
+
+  # associative  (xy)z = x(yz)
+  foreach my $x ($graph->vertices) {
+    foreach my $y ($graph->vertices) {
+      foreach my $z ($graph->vertices) {
+        foreach my $M ('min','max') {
+          my $a = $href->{$M}->{$href->{$M}->{$x}->{$y}}->{$z};
+          my $b = $href->{$M}->{$x}->{$href->{$M}->{$y}->{$z}};
+          $a eq $b
+            or return "not associative $x $M $y $M $z got $a and $b";
+        }
+      }
+    }
+  }
+  return '';
+}
+
+# $graph is a directed Graph.pm which is a lattice.
+# $href is a hashref as returned by Graph_lattice_minmax_hash().
+# Return true if $graph is semi-distributive.
+#
+sub lattice_minmax_is_semidistributive {
+  my ($graph, $href) = @_;
+  foreach my $x ($graph->vertices) {
+    foreach my $y ($graph->vertices) {
+      my $m = $href->{'min'}->{$x}->{$y};
+      my $M = $href->{'max'}->{$x}->{$y};
+      foreach my $z ($graph->vertices) {
+        if ($m eq $href->{'min'}->{$x}->{$z}) {
+          $href->{'min'}->{$x}->{$href->{'max'}->{$y}->{$z}} eq $m
+            or return 0;
+        }
+        if ($M eq $href->{'max'}->{$x}->{$z}) {
+          $href->{'max'}->{$x}->{$href->{'min'}->{$y}->{$z}} eq $M
+            or return 0;
+        }
+      }
+    }
+  }
+}
+
+# $graph is a directed Graph.pm which is a lattice.
+# $href is a hashref as returned by Graph_lattice_minmax_hash().
+# Return the number of complementary pairs in $graph.
+# A complementary pair is vertices u,v where
+#    min(u,v) = global min   and   max(u,v) = global max
+# so they neither meet nor join other than the global min,max.
+#
+# u = global min and v = global max is always a complementary pair.
+# If the lattice is just 1 vertex then this includes u=v as a pair.
+#
+sub lattice_minmax_num_complementary_pairs {
+  my ($graph, $href) = @_;
+  my $lowest = MyGraphs::Graph_lattice_lowest($graph);
+  my $highest = MyGraphs::Graph_lattice_highest($graph);
+  my @vertices = $graph->vertices;
+  my $count_complementary = 0;
+  foreach my $i (0 .. $#vertices) {
+    my $u = $vertices[$i];
+    foreach my $j ($i .. $#vertices) {
+      my $v = $vertices[$j];
+      my $min = $href->{'min'}->{$u}->{$v};
+      my $max = $href->{'max'}->{$u}->{$v};
+      $count_complementary += ($min eq $lowest && $max eq $highest);
+    }
+  }
+  return $count_complementary;
+}
+
+
+# Think not efficient to check pair-by-pair.
+#
+# # Return true if $u and $v are complementary, meaning their min is the
+# # bottom element and max is the top element.
+# sub lattice_is_complementary {
+#   my ($graph, $u,$v) = @_;
+#   return lattice_min($graph, $u,$v) eq Graph_lattice_lowest($graph)
+#     &&   lattice_max($graph, $u,$v) eq Graph_lattice_highest($graph);
+# }
+
+# Is it efficient to search lattice min(x,y) or max(x,y), or better always
+# build whole table?
+#
+# sub lattice_min {
+#   my ($graph, $u, $v) = @_;
+#   return lattice_min_or_max($graph,$u,$v, 'predecessors', 'all_predecessors');
+# }
+# sub lattice_max {
+#   my ($graph, $u, $v) = @_;
+#   return lattice_min_or_max($graph,$u,$v, 'successors', 'all_successors');
+# }
+# sub lattice_min_or_max {
+#   my ($graph, $u, $v, $immediate, $all) = @_;
+#
+#   die "WRONG";
+#
+#   my @verts = ($u,$v);
+#   my @verts_descendants;
+#   foreach my $i (0,1) {
+#     $verts_descendants[$i]->[0]->{$verts[$i]} = 1;
+#   }
+#   for (my $distance = 0; ; $distance++) {
+#     foreach my $i (0,1) {
+#       foreach my $from (keys %{$verts_descendants[$i]->[$distance]}) {
+#         foreach my $to_distance (0 .. $distance) {
+#           if ($verts_descendants[!$i]->[$to_distance]->{$from}) {
+#             return $from;
+#           }
+#         }
+#       }
+#     }
+#     foreach my $i (0,1) {
+#       $verts_descendants[$i]->[$distance+1]
+#         = graph_following_set_hashref($graph,$immediate,
+#                                       $verts_descendants[$i]->[$distance]);
+#     }
+#     if (! $verts_descendants[0]->[$distance+1]
+#         && ! $verts_descendants[1]->[$distance+1]) {
+#       die "lattice_min_or_max() not found";
+#     }
+#   }
+#
+#   # my %v_successors; @v_successors{$v, $graph->$all($v)} = ();  # hash slice
+#   # my %t = ($u => 1);
+#   # while (%t) {
+#   #   foreach my $t (keys %t) {
+#   #     if (exists $v_successors{$t}) {
+#   #       return $t;
+#   #     }
+#   #   }
+#   #   my %new_t;
+#   #   foreach my $t (keys %t) {
+#   #     @new_t{$graph->$immediate($t)} = ();  # hash slice
+#   #   }
+#   #   %t = %new_t;
+#   # }
+#   # die "lattice_min_or_max() not found";
+# }
+# sub graph_following_set_hashref {
+#   my ($graph, $method, $href) = @_;
+#   my %ret;
+#   foreach my $v (keys %$href) {
+#     @ret{$graph->$method($v)} = ();  # hash slice
+#   }
+#   return \%ret;
+# }
 
 
 #------------------------------------------------------------------------------

@@ -1,5 +1,10 @@
 Revision history for Changes
 
+0.69    2019-12-30 10:24:44
+        [CHANGES]
+         * Provide a wrapping of tickit_new_with_evloop(3) for modules like
+           Tickit::Async or POEx::Tickit to use
+
 0.68    2019-11-18 16:27:52
         [CHANGES]
          * Wrap toplevel Tickit objects from C library; use C library's event

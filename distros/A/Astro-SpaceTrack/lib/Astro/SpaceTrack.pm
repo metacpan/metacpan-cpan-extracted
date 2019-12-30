@@ -126,7 +126,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.133';
+our $VERSION = '0.134';
 our @EXPORT_OK = qw{
     shell
 
@@ -2349,6 +2349,10 @@ The BODY_STATUS constants are exportable using the :status tag.
 	return $resp;
     }
 
+    # FIXME in the last couple days this has started returning nothing.
+    # It looks like -exclude debris excludes everything, as does
+    # -exclude rocket.
+
     # Get Iridium status from Space Track. Unlike the other sources,
     # Space Track does not know whether satellites are in service or
     # not, but it does know about all of them, and whether or not they
@@ -2361,7 +2365,7 @@ The BODY_STATUS constants are exportable using the :status tag.
 	my ( $resp, $data ) = $self->search_name( {
 		tle	=> 0,
 		status	=> 'all',
-		exclude	=> [ qw{ rocket debris } ],
+		include	=> [ qw{ payload } ],
 		format	=> 'legacy',
 	    }, 'iridium' );
 	$resp->is_success()
@@ -2957,52 +2961,6 @@ sub retrieve {
 }
 
 {
-
-    my %status_query = (
-	onorbit	=> 'null-val',
-	decayed	=> '<>null-val',
-	all	=> '',
-    );
-
-    my %exclude_map = (
-	rocket	=> 1 << 0,
-	debris	=> 1 << 1,
-    );
-
-    my @exclude_query = (
-	undef,
-	'PAYLOAD,DEBRIS,UNKNOWN,TBA,OTHER',
-	'PAYLOAD,ROCKET BODY,UNKNOWN,TBA,OTHER',
-	'PAYLOAD,UNKNOWN,TBA,OTHER',
-    );
-
-    sub _convert_search_options_to_rest {
-	my ( undef, $opt ) = @_;	# Invocant unused
-	my %rest;
-
-	if ( defined $opt->{status} ) {
-	    defined ( my $query = $status_query{$opt->{status}} )
-		or croak "Unknown status '$opt->{status}'";
-	    $query
-		and $rest{DECAY} = $query;
-	}
-
-	{
-	    my $inx = 0;
-	    foreach my $excl ( @{ $opt->{exclude} || [] } ) {
-		defined $exclude_map{$excl}
-		    or croak "Unknown excludion '$excl'";
-		$inx |= $exclude_map{$excl};
-	    }
-	    defined $exclude_query[$inx]
-		and $rest{OBJECT_TYPE} = $exclude_query[$inx];
-	}
-
-	return \%rest;
-    }
-}
-
-{
     my @heading_info = (
 	[ undef,	OBJECT_NUMBER	=> 'Catalog Number' ],
 	[ undef,	OBJECT_NAME	=> 'Common Name' ],
@@ -3222,10 +3180,14 @@ options may be specified:
 
  -exclude
    specifies the types of bodies to exclude. The
-   value is one or more of 'debris' or 'rocket'.
-   If you specify both as command-style options,
-   you may either specify the option more than once,
-   or specify the values comma-separated.
+   value is one or more of 'payload', 'debris', 'rocket',
+   'unknown', 'tba', or 'other'. If you specify this as a
+   command-line option you may either specify this more
+   than once or specify the values comma-separated.
+ -include
+   specifies the types of bodies to include. The possible
+   values are the same as for -exclude. If you specify a
+   given body as both included and excluded it is included.
  -rcs
    used to specify that the radar cross-section returned
    by the search was to be appended to the name, in the form
@@ -6086,16 +6048,72 @@ EOD
 #	list. If the first argument is a hash reference, it validates
 #	that the hash contains only legal options.
 
+
 {
+
+    my %status_query = (
+	onorbit	=> 'null-val',
+	decayed	=> '<>null-val',
+	all	=> '',
+    );
+
+    my %include_map = (
+	payload	=> 'PAYLOAD',
+	rocket	=> 'ROCKET BODY',
+	debris	=> 'DEBRIS',
+	unknown	=> 'UNKNOWN',
+	tba	=> 'TBA',
+	other	=> 'OTHER',
+    );
+
+    sub _convert_search_options_to_rest {
+	my ( undef, $opt ) = @_;	# Invocant unused
+	my %rest;
+
+	if ( defined $opt->{status} ) {
+	    defined ( my $query = $status_query{$opt->{status}} )
+		or croak "Unknown status '$opt->{status}'";
+	    $query
+		and $rest{DECAY} = $query;
+	}
+
+	{
+	    my %incl;
+
+	    if ( $opt->{exclude} && @{ $opt->{exclude} } ) {
+		%incl = map { $_ => 1 } keys %include_map;
+		foreach ( @{ $opt->{exclude} } ) {
+		    $include_map{$_}
+			or croak "Unknown exclusion '$_'";
+		    delete $incl{$_};
+		}
+	    }
+
+	    if ( $opt->{include} && @{ $opt->{include} } ) {
+		foreach ( @{ $opt->{include} } ) {
+		    $include_map{$_}
+			or croak "Unknown inclusion '$_'";
+		    $incl{$_} = 1;
+		}
+	    }
+
+	    keys %incl
+		and $rest{OBJECT_TYPE} = join ',',
+		    map { $include_map{$_} } sort keys %incl;
+
+	}
+
+	return \%rest;
+    }
 
     my @legal_search_args = (
 	'rcs!' => '(ignored and deprecated)',
 	'tle!' => '(return TLE data from search (defaults true))',
 	'status=s' => q{('onorbit', 'decayed', or 'all')},
-	'exclude=s@' => q{('debris', 'rocket', or 'debris,rocket')},
+	'exclude=s@' => q{('payload', 'debris', 'rocket', ... )},
+	'include=s@' => q{('payload', 'debris', 'rocket', ... )},
 	'comment!' => '(include comment in satcat data)',
     );
-    my %legal_search_exclude = map {$_ => 1} qw{debris rocket};
     my %legal_search_status = map {$_ => 1} qw{onorbit decayed all};
 
     sub _parse_search_args {
@@ -6114,14 +6132,15 @@ Error - Illegal status '$opt->{status}'. You must specify one of
 	@{[join ', ', map {"'$_'"} sort keys %legal_search_status]}
 EOD
 
-	$opt->{exclude} ||= [];
-	$opt->{exclude} = [map {split ',', $_} @{$opt->{exclude}}];
-	foreach (@{$opt->{exclude}}) {
-	    $legal_search_exclude{$_} or croak <<"EOD";
-Error - Illegal exclusion '$_'. You must specify one or more of
-	@{[join ', ', map {"'$_'"} sort keys %legal_search_exclude]}
+	foreach my $key ( qw{ exclude include } ) {
+	    $opt->{$key} ||= [];
+	    $opt->{$key} = [ map { split ',', $_ } @{ $opt->{$key} } ];
+	    foreach ( @{ $opt->{$key} } ) {
+		$include_map{$_} or croak <<"EOD";
+Error - Illegal -$key value '$_'. You must specify one or more of
+	@{[join ', ', map {"'$_'"} sort keys %include_map]}
 EOD
-
+	    }
 	}
 
 	defined $opt->{tle}

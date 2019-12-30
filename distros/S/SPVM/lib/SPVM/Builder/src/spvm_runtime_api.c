@@ -125,24 +125,24 @@ SPVM_ENV* SPVM_RUNTIME_API_create_env(SPVM_RUNTIME* runtime) {
     SPVM_RUNTIME_API_method_sub_id,
     SPVM_RUNTIME_API_new_object_raw,
     SPVM_RUNTIME_API_new_object,
-    SPVM_RUNTIME_API_new_barray_raw,
-    SPVM_RUNTIME_API_new_barray,
-    SPVM_RUNTIME_API_new_sarray_raw,
-    SPVM_RUNTIME_API_new_sarray,
-    SPVM_RUNTIME_API_new_iarray_raw,
-    SPVM_RUNTIME_API_new_iarray,
-    SPVM_RUNTIME_API_new_larray_raw,
-    SPVM_RUNTIME_API_new_larray,
-    SPVM_RUNTIME_API_new_farray_raw,
-    SPVM_RUNTIME_API_new_farray,
-    SPVM_RUNTIME_API_new_darray_raw,
-    SPVM_RUNTIME_API_new_darray,
-    SPVM_RUNTIME_API_new_oarray_raw,
-    SPVM_RUNTIME_API_new_oarray,
-    SPVM_RUNTIME_API_new_marray_raw,
-    SPVM_RUNTIME_API_new_marray,
-    SPVM_RUNTIME_API_new_varray_raw,
-    SPVM_RUNTIME_API_new_varray,
+    SPVM_RUNTIME_API_new_byte_array_raw,
+    SPVM_RUNTIME_API_new_byte_array,
+    SPVM_RUNTIME_API_new_short_array_raw,
+    SPVM_RUNTIME_API_new_short_array,
+    SPVM_RUNTIME_API_new_int_array_raw,
+    SPVM_RUNTIME_API_new_int_array,
+    SPVM_RUNTIME_API_new_long_array_raw,
+    SPVM_RUNTIME_API_new_long_array,
+    SPVM_RUNTIME_API_new_float_array_raw,
+    SPVM_RUNTIME_API_new_float_array,
+    SPVM_RUNTIME_API_new_double_array_raw,
+    SPVM_RUNTIME_API_new_double_array,
+    SPVM_RUNTIME_API_new_object_array_raw,
+    SPVM_RUNTIME_API_new_object_array,
+    SPVM_RUNTIME_API_new_muldim_array_raw,
+    SPVM_RUNTIME_API_new_muldim_array,
+    SPVM_RUNTIME_API_new_mulnum_array_raw,
+    SPVM_RUNTIME_API_new_mulnum_array,
     SPVM_RUNTIME_API_new_string_raw,
     SPVM_RUNTIME_API_new_string,
     SPVM_RUNTIME_API_new_string_len_raw,
@@ -402,7 +402,7 @@ int32_t SPVM_RUNTIME_API_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* sta
         case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
         case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
         case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY:
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY:
         case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
         {
           if (*(void**)&stack[0] != NULL) {
@@ -421,7 +421,7 @@ int32_t SPVM_RUNTIME_API_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* sta
         case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
         case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
         case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY:
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY:
         case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
         {
           if (*(void**)&stack[0] != NULL) {
@@ -618,42 +618,42 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
           stack_index++;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_BYTE: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_BYTE: {
           for (int32_t field_index = 0; field_index < type_width; field_index++) {
             byte_vars[arg->mem_id + field_index] = *(SPVM_VALUE_byte*)&stack[stack_index + field_index];
           }
           stack_index += type_width;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_SHORT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_SHORT: {
           for (int32_t field_index = 0; field_index < type_width; field_index++) {
             short_vars[arg->mem_id + field_index] = *(SPVM_VALUE_short*)&stack[stack_index + field_index];
           }
           stack_index += type_width;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_INT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_INT: {
           for (int32_t field_index = 0; field_index < type_width; field_index++) {
             int_vars[arg->mem_id + field_index] = *(SPVM_VALUE_int*)&stack[stack_index + field_index];
           }
           stack_index += type_width;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_LONG: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_LONG: {
           for (int32_t field_index = 0; field_index < type_width; field_index++) {
             long_vars[arg->mem_id + field_index] = *(SPVM_VALUE_long*)&stack[stack_index + field_index];
           }
           stack_index += type_width;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_FLOAT: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_FLOAT: {
           for (int32_t field_index = 0; field_index < type_width; field_index++) {
             float_vars[arg->mem_id + field_index] = *(SPVM_VALUE_float*)&stack[stack_index + field_index];
           }
           stack_index += type_width;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_DOUBLE: {
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_DOUBLE: {
           for (int32_t field_index = 0; field_index < type_width; field_index++) {
             double_vars[arg->mem_id + field_index] = *(SPVM_VALUE_double*)&stack[stack_index + field_index];
           }
@@ -663,7 +663,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
         case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
         case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
-        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY:
+        case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY:
         case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
         {
           object_vars[arg->mem_id] = *(void**)&stack[stack_index];
@@ -682,12 +682,12 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_LONG:
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_FLOAT:
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_DOUBLE:
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_BYTE:
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_SHORT:
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_INT:
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_LONG:
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_FLOAT:
-        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_DOUBLE:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_BYTE:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_SHORT:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_INT:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_LONG:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_FLOAT:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_DOUBLE:
         {
           ref_vars[arg->mem_id] = *(void**)&stack[stack_index];
           stack_index++;
@@ -1305,42 +1305,42 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
       case SPVM_OPCODE_C_ID_INIT_UNDEF:
         SPVM_RUNTIME_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], NULL);
         break;
-      case SPVM_OPCODE_C_ID_INIT_VALUE_BYTE: {
+      case SPVM_OPCODE_C_ID_INIT_MULNUM_BYTE: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           byte_vars[opcode->operand0 + field_index] = 0;
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_INIT_VALUE_SHORT: {
+      case SPVM_OPCODE_C_ID_INIT_MULNUM_SHORT: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           short_vars[opcode->operand0 + field_index] = 0;
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_INIT_VALUE_INT: {
+      case SPVM_OPCODE_C_ID_INIT_MULNUM_INT: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           int_vars[opcode->operand0 + field_index] = 0;
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_INIT_VALUE_LONG: {
+      case SPVM_OPCODE_C_ID_INIT_MULNUM_LONG: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           long_vars[opcode->operand0 + field_index] = 0;
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_INIT_VALUE_FLOAT: {
+      case SPVM_OPCODE_C_ID_INIT_MULNUM_FLOAT: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           float_vars[opcode->operand0 + field_index] = 0;
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_INIT_VALUE_DOUBLE: {
+      case SPVM_OPCODE_C_ID_INIT_MULNUM_DOUBLE: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           double_vars[opcode->operand0 + field_index] = 0;
@@ -1731,7 +1731,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FETCH_BYTE: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FETCH_BYTE: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = opcode->operand3 + 1;
@@ -1756,7 +1756,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FETCH_SHORT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FETCH_SHORT: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = opcode->operand3 + 1;
@@ -1781,7 +1781,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FETCH_INT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FETCH_INT: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -1807,7 +1807,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FETCH_LONG: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FETCH_LONG: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -1833,7 +1833,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FETCH_FLOAT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FETCH_FLOAT: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -1859,7 +1859,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FETCH_DOUBLE: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FETCH_DOUBLE: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -1885,7 +1885,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_FETCH_BYTE: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_FETCH_BYTE: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -1908,7 +1908,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_FETCH_SHORT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_FETCH_SHORT: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -1931,7 +1931,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_FETCH_INT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_FETCH_INT: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -1954,7 +1954,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_FETCH_LONG: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_FETCH_LONG: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -1977,7 +1977,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_FETCH_FLOAT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_FETCH_FLOAT: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -2000,7 +2000,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_FETCH_DOUBLE: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_FETCH_DOUBLE: {
         void* array = *(void**)&object_vars[opcode->operand1];
         int32_t index = int_vars[opcode->operand2];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -2023,7 +2023,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_STORE_BYTE: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_STORE_BYTE: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
@@ -2047,7 +2047,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_STORE_SHORT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_STORE_SHORT: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
@@ -2071,7 +2071,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_STORE_INT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_STORE_INT: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
@@ -2095,7 +2095,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_STORE_LONG: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_STORE_LONG: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
@@ -2119,7 +2119,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_STORE_FLOAT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_STORE_FLOAT: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
@@ -2143,7 +2143,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_STORE_DOUBLE: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_STORE_DOUBLE: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
@@ -2167,7 +2167,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_STORE_BYTE: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_STORE_BYTE: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -2189,7 +2189,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_STORE_SHORT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_STORE_SHORT: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -2211,7 +2211,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_STORE_INT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_STORE_INT: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -2233,7 +2233,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_STORE_LONG: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_STORE_LONG: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -2255,7 +2255,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_STORE_FLOAT: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_STORE_FLOAT: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -2277,7 +2277,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_ARRAY_FIELD_STORE_DOUBLE: {
+      case SPVM_OPCODE_C_ID_MULNUM_ARRAY_FIELD_STORE_DOUBLE: {
         void* array = *(void**)&object_vars[opcode->operand0];
         int32_t index = int_vars[opcode->operand1];
         int32_t fields_length = (opcode->operand3 & 0xF) + 1;
@@ -2299,7 +2299,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_BYTE: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_BYTE: {
         SPVM_VALUE_byte* value_ref = *(SPVM_VALUE_byte**)&ref_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
         
@@ -2308,7 +2308,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_SHORT: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_SHORT: {
         SPVM_VALUE_short* value_ref = *(SPVM_VALUE_short**)&ref_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
         
@@ -2317,7 +2317,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_INT: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_INT: {
         SPVM_VALUE_int* value_ref = *(SPVM_VALUE_int**)&ref_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
         
@@ -2326,7 +2326,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_LONG: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_LONG: {
         SPVM_VALUE_long* value_ref = *(SPVM_VALUE_long**)&ref_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
         
@@ -2335,7 +2335,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_FLOAT: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_FLOAT: {
         SPVM_VALUE_float* value_ref = *(SPVM_VALUE_float**)&ref_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
         
@@ -2344,7 +2344,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_DOUBLE: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_DOUBLE: {
         SPVM_VALUE_double* value_ref = *(SPVM_VALUE_double**)&ref_vars[opcode->operand1];
         int32_t fields_length = opcode->operand3 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
@@ -2352,73 +2352,73 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_GET_FIELD_BYTE: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_GET_FIELD_BYTE: {
         SPVM_VALUE_byte* value_ref = *(SPVM_VALUE_byte**)&ref_vars[opcode->operand1];
         int32_t field_index = opcode->operand2;
         byte_vars[opcode->operand0] = value_ref[field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_GET_FIELD_SHORT: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_GET_FIELD_SHORT: {
         SPVM_VALUE_short* value_ref = *(SPVM_VALUE_short**)&ref_vars[opcode->operand1];
         int32_t field_index = opcode->operand2;
         short_vars[opcode->operand0] = value_ref[field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_GET_FIELD_INT: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_GET_FIELD_INT: {
         SPVM_VALUE_int* value_ref = *(SPVM_VALUE_int**)&ref_vars[opcode->operand1];
         int32_t field_index = opcode->operand2;
         int_vars[opcode->operand0] = value_ref[field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_GET_FIELD_LONG: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_GET_FIELD_LONG: {
         SPVM_VALUE_long* value_ref = *(SPVM_VALUE_long**)&ref_vars[opcode->operand1];
         int32_t field_index = opcode->operand2;
         long_vars[opcode->operand0] = value_ref[field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_GET_FIELD_FLOAT: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_GET_FIELD_FLOAT: {
         SPVM_VALUE_float* value_ref = *(SPVM_VALUE_float**)&ref_vars[opcode->operand1];
         int32_t field_index = opcode->operand2;
         float_vars[opcode->operand0] = value_ref[field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_GET_FIELD_DOUBLE: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_GET_FIELD_DOUBLE: {
         SPVM_VALUE_double* value_ref = *(SPVM_VALUE_double**)&ref_vars[opcode->operand1];
         int32_t field_index = opcode->operand2;
         double_vars[opcode->operand0] = value_ref[field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_SET_FIELD_BYTE: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_SET_FIELD_BYTE: {
         SPVM_VALUE_byte* value_ref = *(SPVM_VALUE_byte**)&ref_vars[opcode->operand0];
         int32_t field_index = opcode->operand2;
         value_ref[field_index] = byte_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_SET_FIELD_SHORT: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_SET_FIELD_SHORT: {
         SPVM_VALUE_short* value_ref = *(SPVM_VALUE_short**)&ref_vars[opcode->operand0];
         int32_t field_index = opcode->operand2;
         value_ref[field_index] = short_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_SET_FIELD_INT: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_SET_FIELD_INT: {
         SPVM_VALUE_int* value_ref = *(SPVM_VALUE_int**)&ref_vars[opcode->operand0];
         int32_t field_index = opcode->operand2;
         value_ref[field_index] = int_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_SET_FIELD_LONG: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_SET_FIELD_LONG: {
         SPVM_VALUE_long* value_ref = *(SPVM_VALUE_long**)&ref_vars[opcode->operand0];
         int32_t field_index = opcode->operand2;
         value_ref[field_index] = long_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_SET_FIELD_FLOAT: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_SET_FIELD_FLOAT: {
         SPVM_VALUE_float* value_ref = *(SPVM_VALUE_float**)&ref_vars[opcode->operand0];
         int32_t field_index = opcode->operand2;
         value_ref[field_index] = float_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_DEREF_SET_FIELD_DOUBLE: {
+      case SPVM_OPCODE_C_ID_MULNUM_DEREF_SET_FIELD_DOUBLE: {
         SPVM_VALUE_double* value_ref = *(SPVM_VALUE_double**)&ref_vars[opcode->operand0];
         int32_t field_index = opcode->operand2;
         value_ref[field_index] = double_vars[opcode->operand1];
@@ -2448,104 +2448,104 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
       case SPVM_OPCODE_C_ID_MOVE_REF:
         *(void**)&ref_vars[opcode->operand0] = *(void**)&ref_vars[opcode->operand1];
         break;
-      case SPVM_OPCODE_C_ID_VALUE_MOVE_BYTE: {
+      case SPVM_OPCODE_C_ID_MULNUM_MOVE_BYTE: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           byte_vars[opcode->operand0 + field_index] = byte_vars[opcode->operand1 + field_index];
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_MOVE_SHORT: {
+      case SPVM_OPCODE_C_ID_MULNUM_MOVE_SHORT: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           short_vars[opcode->operand0 + field_index] = short_vars[opcode->operand1 + field_index];
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_MOVE_INT: {
+      case SPVM_OPCODE_C_ID_MULNUM_MOVE_INT: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           int_vars[opcode->operand0 + field_index] = int_vars[opcode->operand1 + field_index];
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_MOVE_LONG: {
+      case SPVM_OPCODE_C_ID_MULNUM_MOVE_LONG: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           long_vars[opcode->operand0 + field_index] = long_vars[opcode->operand1 + field_index];
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_MOVE_FLOAT: {
+      case SPVM_OPCODE_C_ID_MULNUM_MOVE_FLOAT: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           float_vars[opcode->operand0 + field_index] = float_vars[opcode->operand1 + field_index];
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_MOVE_DOUBLE: {
+      case SPVM_OPCODE_C_ID_MULNUM_MOVE_DOUBLE: {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           double_vars[opcode->operand0 + field_index] = double_vars[opcode->operand1 + field_index];
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_GET_FIELD_BYTE: {
+      case SPVM_OPCODE_C_ID_MULNUM_GET_FIELD_BYTE: {
         int32_t field_index = opcode->operand2;
         byte_vars[opcode->operand0] = byte_vars[opcode->operand1 + field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_GET_FIELD_SHORT: {
+      case SPVM_OPCODE_C_ID_MULNUM_GET_FIELD_SHORT: {
         int32_t field_index = opcode->operand2;
         short_vars[opcode->operand0] = short_vars[opcode->operand1 + field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_GET_FIELD_INT: {
+      case SPVM_OPCODE_C_ID_MULNUM_GET_FIELD_INT: {
         int32_t field_index = opcode->operand2;
         int_vars[opcode->operand0] = int_vars[opcode->operand1 + field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_GET_FIELD_LONG: {
+      case SPVM_OPCODE_C_ID_MULNUM_GET_FIELD_LONG: {
         int32_t field_index = opcode->operand2;
         long_vars[opcode->operand0] = long_vars[opcode->operand1 + field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_GET_FIELD_FLOAT: {
+      case SPVM_OPCODE_C_ID_MULNUM_GET_FIELD_FLOAT: {
         int32_t field_index = opcode->operand2;
         float_vars[opcode->operand0] = float_vars[opcode->operand1 + field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_GET_FIELD_DOUBLE: {
+      case SPVM_OPCODE_C_ID_MULNUM_GET_FIELD_DOUBLE: {
         int32_t field_index = opcode->operand2;
         double_vars[opcode->operand0] = double_vars[opcode->operand1 + field_index];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_SET_FIELD_BYTE: {
+      case SPVM_OPCODE_C_ID_MULNUM_SET_FIELD_BYTE: {
         int32_t field_index = opcode->operand2;
         byte_vars[opcode->operand0 + field_index] = byte_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_SET_FIELD_SHORT: {
+      case SPVM_OPCODE_C_ID_MULNUM_SET_FIELD_SHORT: {
         int32_t field_index = opcode->operand2;
         short_vars[opcode->operand0 + field_index] = short_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_SET_FIELD_INT: {
+      case SPVM_OPCODE_C_ID_MULNUM_SET_FIELD_INT: {
         int32_t field_index = opcode->operand2;
         int_vars[opcode->operand0 + field_index] = int_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_SET_FIELD_LONG: {
+      case SPVM_OPCODE_C_ID_MULNUM_SET_FIELD_LONG: {
         int32_t field_index = opcode->operand2;
         long_vars[opcode->operand0 + field_index] = long_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_SET_FIELD_FLOAT: {
+      case SPVM_OPCODE_C_ID_MULNUM_SET_FIELD_FLOAT: {
         int32_t field_index = opcode->operand2;
         float_vars[opcode->operand0 + field_index] = float_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_VALUE_SET_FIELD_DOUBLE: {
+      case SPVM_OPCODE_C_ID_MULNUM_SET_FIELD_DOUBLE: {
         int32_t field_index = opcode->operand2;
         double_vars[opcode->operand0 + field_index] = double_vars[opcode->operand1];
         break;
@@ -2589,7 +2589,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
       case SPVM_OPCODE_C_ID_NEW_BYTE_ARRAY: {
         int32_t length = int_vars[opcode->operand1];
         if (length >= 0) {
-          void* object = env->new_barray_raw(env, length);
+          void* object = env->new_byte_array_raw(env, length);
           SPVM_RUNTIME_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
         }
         else {
@@ -2605,7 +2605,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         int32_t length = int_vars[opcode->operand1];
         
         if (length >= 0) {
-          void* object = env->new_sarray_raw(env, length);
+          void* object = env->new_short_array_raw(env, length);
           
           // Set array
           SPVM_RUNTIME_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
@@ -2623,7 +2623,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         int32_t length = int_vars[opcode->operand1];
         
         if (length >= 0) {
-          void* object = env->new_iarray_raw(env, length);
+          void* object = env->new_int_array_raw(env, length);
           
           // Set array
           SPVM_RUNTIME_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
@@ -2640,7 +2640,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         
         int32_t length = int_vars[opcode->operand1];
         if (length >= 0) {
-          void* object = env->new_larray_raw(env, length);
+          void* object = env->new_long_array_raw(env, length);
           SPVM_RUNTIME_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
         }
         else {
@@ -2654,7 +2654,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         
         int32_t length = int_vars[opcode->operand1];
         if (length >= 0) {
-          void* object = env->new_farray_raw(env, length);
+          void* object = env->new_float_array_raw(env, length);
           SPVM_RUNTIME_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
         }
         else {
@@ -2668,7 +2668,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         
         int32_t length = int_vars[opcode->operand1];
         if (length >= 0) {
-          void* object = env->new_darray_raw(env, length);
+          void* object = env->new_double_array_raw(env, length);
           SPVM_RUNTIME_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
         }
         else {
@@ -2684,7 +2684,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         
         int32_t length = int_vars[opcode->operand2];
         if (length >= 0) {
-          void* object = env->new_oarray_raw(env, basic_type_id, length);
+          void* object = env->new_object_array_raw(env, basic_type_id, length);
           SPVM_RUNTIME_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
         }
         else {
@@ -2701,7 +2701,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         
         int32_t length = int_vars[opcode->operand2];
         if (length >= 0) {
-          void* object = env->new_marray_raw(env, basic_type_id, element_dimension, length);
+          void* object = env->new_muldim_array_raw(env, basic_type_id, element_dimension, length);
           SPVM_RUNTIME_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
         }
         else {
@@ -2711,7 +2711,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_NEW_VALUE_ARRAY: {
+      case SPVM_OPCODE_C_ID_NEW_MULNUM_ARRAY: {
         int32_t constant_pool_id = opcode->operand1;
         int32_t basic_type_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
         
@@ -2719,7 +2719,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         int32_t length = int_vars[opcode->operand2];
         
         if (length >= 0) {
-          void* object = env->new_varray_raw(env, basic_type_id, length);
+          void* object = env->new_mulnum_array_raw(env, basic_type_id, length);
           
           // Set object
           SPVM_RUNTIME_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
@@ -2838,7 +2838,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         call_sub_arg_stack_top++;
         
         break;
-      case SPVM_OPCODE_C_ID_PUSH_ARG_VALUE_BYTE: {
+      case SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_BYTE: {
         int32_t fields_length = opcode->operand1 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           *(SPVM_VALUE_byte*)&stack[call_sub_arg_stack_top + field_index] = byte_vars[opcode->operand0 + field_index];
@@ -2846,7 +2846,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         call_sub_arg_stack_top += fields_length;
         break;
       }
-      case SPVM_OPCODE_C_ID_PUSH_ARG_VALUE_SHORT: {
+      case SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_SHORT: {
         int32_t fields_length = opcode->operand1 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           *(SPVM_VALUE_short*)&stack[call_sub_arg_stack_top + field_index] = short_vars[opcode->operand0 + field_index];
@@ -2854,7 +2854,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         call_sub_arg_stack_top += fields_length;
         break;
       }
-      case SPVM_OPCODE_C_ID_PUSH_ARG_VALUE_INT: {
+      case SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_INT: {
         int32_t fields_length = opcode->operand1 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           *(SPVM_VALUE_int*)&stack[call_sub_arg_stack_top + field_index] = int_vars[opcode->operand0 + field_index];
@@ -2862,7 +2862,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         call_sub_arg_stack_top += fields_length;
         break;
       }
-      case SPVM_OPCODE_C_ID_PUSH_ARG_VALUE_LONG: {
+      case SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_LONG: {
         int32_t fields_length = opcode->operand1 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           *(SPVM_VALUE_long*)&stack[call_sub_arg_stack_top + field_index] = long_vars[opcode->operand0 + field_index];
@@ -2870,7 +2870,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         call_sub_arg_stack_top += fields_length;
         break;
       }
-      case SPVM_OPCODE_C_ID_PUSH_ARG_VALUE_FLOAT: {
+      case SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_FLOAT: {
         int32_t fields_length = opcode->operand1 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           *(SPVM_VALUE_float*)&stack[call_sub_arg_stack_top + field_index] = float_vars[opcode->operand0 + field_index];
@@ -2878,7 +2878,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         call_sub_arg_stack_top += fields_length;
         break;
       }
-      case SPVM_OPCODE_C_ID_PUSH_ARG_VALUE_DOUBLE: {
+      case SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_DOUBLE: {
         int32_t fields_length = opcode->operand1 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           *(SPVM_VALUE_double*)&stack[call_sub_arg_stack_top + field_index] = double_vars[opcode->operand0 + field_index];
@@ -3027,7 +3027,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_SUB_VALUE_BYTE:
+      case SPVM_OPCODE_C_ID_CALL_SUB_MULNUM_BYTE:
       {
         int32_t constant_pool_id = opcode->operand1;
         int32_t call_sub_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3042,7 +3042,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_SUB_VALUE_SHORT:
+      case SPVM_OPCODE_C_ID_CALL_SUB_MULNUM_SHORT:
       {
         int32_t constant_pool_id = opcode->operand1;
         int32_t call_sub_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3057,7 +3057,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_SUB_VALUE_INT:
+      case SPVM_OPCODE_C_ID_CALL_SUB_MULNUM_INT:
       {
         int32_t constant_pool_id = opcode->operand1;
         int32_t call_sub_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3072,7 +3072,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_SUB_VALUE_LONG:
+      case SPVM_OPCODE_C_ID_CALL_SUB_MULNUM_LONG:
       {
         int32_t constant_pool_id = opcode->operand1;
         int32_t call_sub_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3087,7 +3087,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_SUB_VALUE_FLOAT:
+      case SPVM_OPCODE_C_ID_CALL_SUB_MULNUM_FLOAT:
       {
         int32_t constant_pool_id = opcode->operand1;
         int32_t call_sub_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3102,7 +3102,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_SUB_VALUE_DOUBLE:
+      case SPVM_OPCODE_C_ID_CALL_SUB_MULNUM_DOUBLE:
       {
         int32_t constant_pool_id = opcode->operand1;
         int32_t call_sub_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3242,7 +3242,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_METHOD_VALUE_BYTE:
+      case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_BYTE:
       {
         int32_t constant_pool_id = opcode->operand1;
         int32_t decl_sub_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3261,7 +3261,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_METHOD_VALUE_SHORT:
+      case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_SHORT:
       {
         int32_t constant_pool_id = opcode->operand1;
         int32_t decl_sub_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3280,7 +3280,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_METHOD_VALUE_INT:
+      case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_INT:
       {
         int32_t constant_pool_id = opcode->operand1;
         int32_t decl_sub_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3299,7 +3299,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_METHOD_VALUE_FLOAT:
+      case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_FLOAT:
       {
         int32_t constant_pool_id = opcode->operand1;
         int32_t decl_sub_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3318,7 +3318,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_METHOD_VALUE_DOUBLE:
+      case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_DOUBLE:
       {
         int32_t constant_pool_id = opcode->operand1;
         int32_t decl_sub_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
@@ -3408,6 +3408,18 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         
         break;
       }
+      case SPVM_OPCODE_C_ID_PRINT: {
+        void* object = object_vars[opcode->operand0];
+        
+        const char* bytes = (const char*)env->get_elems_byte(env, object);
+        int32_t string_length = env->length(env, object);
+        
+        for (int32_t i = 0; i < string_length; i++) {
+          putc(bytes[i], stdout);
+        }
+        
+        break;
+      }
       case SPVM_OPCODE_C_ID_RETURN_VOID:
       {
         opcode_rel_index = opcode->operand1;
@@ -3477,7 +3489,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         opcode_rel_index = opcode->operand1;
         continue;
       }
-      case SPVM_OPCODE_C_ID_RETURN_VALUE_BYTE:
+      case SPVM_OPCODE_C_ID_RETURN_MULNUM_BYTE:
       {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
@@ -3487,7 +3499,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         
         continue;
       }
-      case SPVM_OPCODE_C_ID_RETURN_VALUE_SHORT:
+      case SPVM_OPCODE_C_ID_RETURN_MULNUM_SHORT:
       {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
@@ -3496,7 +3508,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         opcode_rel_index = opcode->operand1;
         continue;
       }
-      case SPVM_OPCODE_C_ID_RETURN_VALUE_INT:
+      case SPVM_OPCODE_C_ID_RETURN_MULNUM_INT:
       {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
@@ -3505,7 +3517,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         opcode_rel_index = opcode->operand1;
         continue;
       }
-      case SPVM_OPCODE_C_ID_RETURN_VALUE_LONG:
+      case SPVM_OPCODE_C_ID_RETURN_MULNUM_LONG:
       {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
@@ -3514,7 +3526,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         opcode_rel_index = opcode->operand1;
         continue;
       }
-      case SPVM_OPCODE_C_ID_RETURN_VALUE_FLOAT:
+      case SPVM_OPCODE_C_ID_RETURN_MULNUM_FLOAT:
       {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
@@ -3523,7 +3535,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         opcode_rel_index = opcode->operand1;
         continue;
       }
-      case SPVM_OPCODE_C_ID_RETURN_VALUE_DOUBLE:
+      case SPVM_OPCODE_C_ID_RETURN_MULNUM_DOUBLE:
       {
         int32_t fields_length = opcode->operand2 + 1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
@@ -4352,7 +4364,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
       case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
       case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
       case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
-      case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY:
+      case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY:
       case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
       {
         if (*(void**)&stack[0] != NULL) {
@@ -4384,7 +4396,7 @@ int32_t SPVM_RUNTIME_API_call_entry_point_sub(SPVM_ENV* env, const char* package
   
   // new byte[][args_length] object
   int32_t arg_type_basic_id = env->get_basic_type_id(env, "byte");
-  void* cmd_args_obj = env->new_marray(env, arg_type_basic_id, 1, argc);
+  void* cmd_args_obj = env->new_muldim_array(env, arg_type_basic_id, 1, argc);
   
   // Set command line arguments
   for (int32_t arg_index = 0; arg_index < argc; arg_index++) {
@@ -4529,7 +4541,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_type_name_raw(SPVM_ENV* env, SPVM_OBJECT* object) 
   // []
   length += type_dimension * 2;
   
-  void* type_name_barray = env->new_barray_raw(env, length);
+  void* type_name_barray = env->new_byte_array_raw(env, length);
   
   char* cur = (char*)env->get_elems_byte(env, type_name_barray);
   
@@ -4664,7 +4676,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_concat_raw(SPVM_ENV* env, SPVM_OBJECT* string1, SP
   int32_t string2_length = SPVM_RUNTIME_API_length(env, string2);
   
   int32_t string3_length = string1_length + string2_length;
-  SPVM_OBJECT* string3 = SPVM_RUNTIME_API_new_barray_raw(env, string3_length);
+  SPVM_OBJECT* string3 = SPVM_RUNTIME_API_new_byte_array_raw(env, string3_length);
   
   int8_t* string1_bytes = SPVM_RUNTIME_API_get_elems_byte(env, string1);
   int8_t* string2_bytes = SPVM_RUNTIME_API_get_elems_byte(env, string2);
@@ -4826,90 +4838,90 @@ SPVM_OBJECT* SPVM_RUNTIME_API_exception(SPVM_ENV* env) {
   return env->exception_object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_barray(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_byte_array(SPVM_ENV* env, int32_t length) {
   (void)env;
   
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_barray_raw(env, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_byte_array_raw(env, length);
   
   SPVM_RUNTIME_API_push_mortal(env, object);
   
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_sarray(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_short_array(SPVM_ENV* env, int32_t length) {
   (void)env;
   
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_sarray_raw(env, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_short_array_raw(env, length);
   
   SPVM_RUNTIME_API_push_mortal(env, object);
   
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_iarray(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_int_array(SPVM_ENV* env, int32_t length) {
   (void)env;
   
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_iarray_raw(env, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_int_array_raw(env, length);
   
   SPVM_RUNTIME_API_push_mortal(env, object);
   
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_larray(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_long_array(SPVM_ENV* env, int32_t length) {
   (void)env;
   
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_larray_raw(env, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_long_array_raw(env, length);
   
   SPVM_RUNTIME_API_push_mortal(env, object);
   
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_farray(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_float_array(SPVM_ENV* env, int32_t length) {
   (void)env;
   
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_farray_raw(env, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_float_array_raw(env, length);
   
   SPVM_RUNTIME_API_push_mortal(env, object);
   
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_darray(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_double_array(SPVM_ENV* env, int32_t length) {
   (void)env;
   
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_darray_raw(env, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_double_array_raw(env, length);
   
   SPVM_RUNTIME_API_push_mortal(env, object);
   
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_oarray(SPVM_ENV* env, int32_t basic_type_id, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_object_array(SPVM_ENV* env, int32_t basic_type_id, int32_t length) {
   (void)env;
   
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_oarray_raw(env, basic_type_id, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_object_array_raw(env, basic_type_id, length);
   
   SPVM_RUNTIME_API_push_mortal(env, object);
   
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_marray(SPVM_ENV* env, int32_t basic_type_id, int32_t element_dimension, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_muldim_array(SPVM_ENV* env, int32_t basic_type_id, int32_t element_dimension, int32_t length) {
   (void)env;
   
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_marray_raw(env, basic_type_id, element_dimension, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_muldim_array_raw(env, basic_type_id, element_dimension, length);
   
   SPVM_RUNTIME_API_push_mortal(env, object);
   
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_varray(SPVM_ENV* env, int32_t basic_type_id, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_mulnum_array(SPVM_ENV* env, int32_t basic_type_id, int32_t length) {
   (void)env;
   
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_varray_raw(env, basic_type_id, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_mulnum_array_raw(env, basic_type_id, length);
   
   SPVM_RUNTIME_API_push_mortal(env, object);
   
@@ -4941,7 +4953,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_string_raw(SPVM_ENV* env, const char* bytes) {
   
   int32_t length = strlen((char*)bytes);
   
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_barray_raw(env, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_byte_array_raw(env, length);
   
   object->basic_type_id = SPVM_BASIC_TYPE_C_ID_BYTE;
   object->type_dimension = 1;
@@ -4967,7 +4979,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_string(SPVM_ENV* env, const char* bytes) {
 SPVM_OBJECT* SPVM_RUNTIME_API_new_string_len_raw(SPVM_ENV* env, const char* bytes, int32_t length) {
   (void)env;
 
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_barray_raw(env, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_byte_array_raw(env, length);
   
   object->basic_type_id = SPVM_BASIC_TYPE_C_ID_BYTE;
   object->type_dimension = 1;
@@ -4990,7 +5002,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_string_len(SPVM_ENV* env, const char* bytes, i
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_barray_raw(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_byte_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   
   // If lenght is less than 0, return NULL.
@@ -5014,7 +5026,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_barray_raw(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_sarray_raw(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_short_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_RUNTIME* runtime = env->runtime;
 
@@ -5034,7 +5046,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_sarray_raw(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_iarray_raw(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_int_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_RUNTIME* runtime = env->runtime;
   
@@ -5054,7 +5066,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_iarray_raw(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_larray_raw(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_long_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_RUNTIME* runtime = env->runtime;
   
@@ -5078,7 +5090,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_larray_raw(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_farray_raw(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_float_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_RUNTIME* runtime = env->runtime;
 
@@ -5098,7 +5110,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_farray_raw(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_darray_raw(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_double_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_RUNTIME* runtime = env->runtime;
   
@@ -5118,7 +5130,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_darray_raw(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_oarray_raw(SPVM_ENV* env, int32_t basic_type_id, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_object_array_raw(SPVM_ENV* env, int32_t basic_type_id, int32_t length) {
   (void)env;
   
   SPVM_RUNTIME* runtime = env->runtime;
@@ -5145,7 +5157,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_oarray_raw(SPVM_ENV* env, int32_t basic_type_i
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_marray_raw(SPVM_ENV* env, int32_t basic_type_id, int32_t element_dimension, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_muldim_array_raw(SPVM_ENV* env, int32_t basic_type_id, int32_t element_dimension, int32_t length) {
   (void)env;
   
   SPVM_RUNTIME* runtime = env->runtime;
@@ -5166,7 +5178,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_marray_raw(SPVM_ENV* env, int32_t basic_type_i
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_varray_raw(SPVM_ENV* env, int32_t basic_type_id, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_mulnum_array_raw(SPVM_ENV* env, int32_t basic_type_id, int32_t length) {
   (void)env;
 
   SPVM_RUNTIME* runtime = env->runtime;
@@ -5215,7 +5227,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_varray_raw(SPVM_ENV* env, int32_t basic_type_i
   // Set array length
   object->length = length;
 
-  object->runtime_type_category = SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY;
+  object->runtime_type_category = SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY;
 
   return object;
 }

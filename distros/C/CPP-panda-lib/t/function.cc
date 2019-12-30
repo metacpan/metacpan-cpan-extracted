@@ -175,6 +175,23 @@ TEST_CASE("mixed function comparations", "[function]") {
     REQUIRE(m != f);
 }
 
+TEST_CASE("null function comparations", "[function]") {
+    int a = 10;
+    function<int(void)> n;
+    function<int(void)> l = [&](){return a;};
+    function<int(void)> f = &foo2;
+    iptr<Test> t = new Test();
+    auto m = make_function(&Test::bar, t);
+
+    REQUIRE_FALSE(l == n);
+    REQUIRE_FALSE(f == n);
+    REQUIRE_FALSE(m == n);
+
+    REQUIRE_FALSE(n == l);
+    REQUIRE_FALSE(n == f);
+    REQUIRE_FALSE(n == m);
+}
+
 TEST_CASE("functors comparations", "[function]") {
     function<int(int)> f1 = Test(1);
     function<int(int)> f2 = Test(2);

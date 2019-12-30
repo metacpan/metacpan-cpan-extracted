@@ -13,7 +13,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 # Public
 has conf_name                => ( is => 'ro' );
@@ -183,7 +183,7 @@ to be tidyall'd
 
 =head1 VERSION
 
-version 0.74
+version 0.75
 
 =head1 SYNOPSIS
 

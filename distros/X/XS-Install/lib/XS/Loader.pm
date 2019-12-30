@@ -59,7 +59,10 @@ EOF
     }
 }
 
-sub load_noboot { load($_[0], $_[1], $_[2], 1) }
+sub load_noboot {
+    @_ = ($_[0], $_[1], $_[2], 1);
+    goto &load;
+}
 
 *bootstrap = *load;
 

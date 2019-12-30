@@ -24,7 +24,7 @@ use strict;
 use warnings;
 use base 'Template::Base';
 
-our $VERSION = 2.70;
+our $VERSION = '3.003';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $ERROR   = '';
 our $AUTOLOAD;
@@ -70,37 +70,6 @@ sub new {
     bless {
     }, $class;
 }
-
-sub old_new {
-    my ($class, $context, $delclass, @params) = @_;
-    my ($delegate, $delmod);
-
-    return $class->error("no context passed to $class constructor\n")
-        unless defined $context;
-
-    if (ref $delclass) {
-        # $delclass contains a reference to a delegate object
-        $delegate = $delclass;
-    }
-    else {
-        # delclass is the name of a module to load and instantiate
-        ($delmod = $delclass) =~ s|::|/|g;
-
-        eval {
-            require "$delmod.pm";
-            $delegate = $delclass->new(@params)
-                || die "failed to instantiate $delclass object\n";
-        };
-        return $class->error($@) if $@;
-    }
-
-    bless {
-        _CONTEXT  => $context, 
-        _DELEGATE => $delegate,
-        _PARAMS   => \@params,
-    }, $class;
-}
-
 
 #------------------------------------------------------------------------
 # fail($error)

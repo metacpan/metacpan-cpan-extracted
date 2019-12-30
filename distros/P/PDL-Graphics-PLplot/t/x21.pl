@@ -1,5 +1,3 @@
-#! /usr/bin/env perl 
-#
 # Demo x21 for the PLplot PDL binding
 #
 # Grid data demo
@@ -24,6 +22,8 @@
 
 # SYNC: x21c.c 1.12
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Math::Trig qw [pi];
@@ -63,6 +63,7 @@ sub main {
   my $threshold = 1.001;
   my $wmin = -1e3;
 
+  my $help;
   GetOptions ("npts=i"      => \$pts,
               "randn"       => \$randn,
               "rosen"       => \$rosen,
@@ -91,14 +92,14 @@ EOT
 
   unshift (@ARGV, $0);
 
-  @title = ("Cubic Spline Approximation",
+  my @title = ("Cubic Spline Approximation",
             "Delaunay Linear Interpolation",
             "Natural Neighbors Interpolation",
             "KNN Inv. Distance Weighted",
             "3NN Linear Interpolation",
             "4NN Around Inv. Dist. Weighted");
 
-  @opt = (0., 0., 0., 0., 0., 0.);
+  my @opt = (0., 0., 0., 0., 0., 0.);
 
   $xm = $ym = -0.2;
   $xM = $yM = 0.6;
@@ -144,7 +145,7 @@ EOT
     pladv (0);
     for (my $alg = 1; $alg < 7; $alg++) {
 
-      $zg = plgriddata ($x, $y, $z, $xg, $yg, $alg, $opt [$alg - 1]);
+      my $zg = plgriddata ($x, $y, $z, $xg, $yg, $alg, $opt [$alg - 1]);
 
       # - CSA can generate NaNs (only interpolates?!).
       # - DTLI and NNI can generate NaNs for points outside the convex hull
@@ -170,7 +171,7 @@ EOT
 		for (my $jj = $j - 1; $jj <= $j + 1 && $jj < $yp; $jj++) {
                   my $zgij = $zg->slice ("$ii,$jj");
 		  if ($ii >= 0 && $jj >= 0 && isfinite ($zgij)) {
-		    $d = (abs ($ii - $i) + abs ($jj - $j)) == 1 ? 1. : 1.4142;
+		    my $d = (abs ($ii - $i) + abs ($jj - $j)) == 1 ? 1. : 1.4142;
 		    $zg->slice ("$i,$j") .= $zg->slice ("$i,$j")
                       + $zgij / ($d * $d);
 		    $dist += $d;

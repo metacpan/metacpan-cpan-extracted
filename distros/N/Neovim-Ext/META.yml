@@ -36,67 +36,67 @@ name: Neovim-Ext
 provides:
   Neovim::Ext:
     file: lib/Neovim/Ext.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::Buffer:
     file: lib/Neovim/Ext/Buffer.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::Buffers:
     file: lib/Neovim/Ext/Buffers.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::Common:
     file: lib/Neovim/Ext/Common.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::Current:
     file: lib/Neovim/Ext/Current.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::Funcs:
     file: lib/Neovim/Ext/Funcs.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::LuaFuncs:
     file: lib/Neovim/Ext/LuaFuncs.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::MsgPack::RPC:
     file: lib/Neovim/Ext/MsgPack/RPC.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::MsgPack::RPC::AsyncSession:
     file: lib/Neovim/Ext/MsgPack/RPC/AsyncSession.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::MsgPack::RPC::EventLoop:
     file: lib/Neovim/Ext/MsgPack/RPC/EventLoop.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::MsgPack::RPC::Response:
     file: lib/Neovim/Ext/MsgPack/RPC/Response.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::MsgPack::RPC::Session:
     file: lib/Neovim/Ext/MsgPack/RPC/Session.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::MsgPack::RPC::Stream:
     file: lib/Neovim/Ext/MsgPack/RPC/Stream.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::Plugin:
     file: lib/Neovim/Ext/Plugin.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::Plugin::Host:
     file: lib/Neovim/Ext/Plugin/Host.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::Remote:
     file: lib/Neovim/Ext/Remote.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::RemoteApi:
     file: lib/Neovim/Ext/RemoteApi.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::RemoteMap:
     file: lib/Neovim/Ext/RemoteMap.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::RemoteSequence:
     file: lib/Neovim/Ext/RemoteSequence.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::Tabpage:
     file: lib/Neovim/Ext/Tabpage.pm
-    version: '0.01'
+    version: '0.02'
   Neovim::Ext::Window:
     file: lib/Neovim/Ext/Window.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Attribute::Handlers: '0'
   Carp: '0'
@@ -105,6 +105,7 @@ requires:
   IO::Async::Loop: '0'
   IO::Async::Signal: '0'
   IO::Async::Stream: '0'
+  IO::Handle: '0'
   IO::Socket::INET: '0'
   IO::Socket::UNIX: '0'
   IPC::Open3: '0'
@@ -122,7 +123,7 @@ requires:
 resources:
   bugtracker: https://github.com/jacquesg/p5-Neovim-Ext/issues
   repository: git://github.com/jacquesg/p5-Neovim-Ext.git
-version: 0.01
+version: '0.02'
 x_Dist_Zilla:
   perl:
     version: '5.026003'
@@ -287,7 +288,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.01
+          tag: v0.02
           tag_format: v%V
           tag_message: '%N %v'
         Dist::Zilla::Role::Git::Repo:

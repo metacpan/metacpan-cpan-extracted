@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -32,7 +32,8 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Graph::Maker::Hanoi;
 
-use lib 'devel/lib';
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
 use MyGraphs 'Graph_is_isomorphic','Graph_is_subgraph';
 
 plan tests => 62;

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.229';
+our $VERSION = '2.230';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -111,7 +111,7 @@ sub __options {
         1 }
     ) {
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, {}, {} );
-        $ax->print_error_message( $@, 'Configfile/Options' );
+        $ax->print_error_message( $@ );
         my $opt_get = App::DBBrowser::Opt::Get->new( $sf->{i}, {} );
         $sf->{o} = $opt_get->defaults();
         while ( $ARGV[0] && $ARGV[0] =~ /^-/ ) {
@@ -183,7 +183,7 @@ sub run {
             #die "No database driver!" if ! $driver;
             1 }
         ) {
-            $ax->print_error_message( $@, 'load plugin' );
+            $ax->print_error_message( $@ );
             next PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
             last PLUGIN;
         }
@@ -205,7 +205,7 @@ sub run {
             $sf->{i}{sqlite_search} = 0 if $sf->{i}{sqlite_search};
             1 }
         ) {
-            $ax->print_error_message( $@, 'Available databases' );
+            $ax->print_error_message( $@ );
             $sf->{i}{login_error} = 1;
             next PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
             last PLUGIN;
@@ -270,7 +270,7 @@ sub run {
                 $sf->{i}{sep_char}   = $dbh->get_info(41)  || '.'; # SQL_CATALOG_NAME_SEPARATOR # name
                 1 }
             ) {
-                $ax->print_error_message( $@, 'Get database handle' );
+                $ax->print_error_message( $@ );
                 # remove database from @databases
                 $sf->{i}{login_error} = 1;
                 $dbh->disconnect() if defined $dbh || $dbh->{Active};
@@ -315,7 +315,7 @@ sub run {
                 @schemas = ( map( "- $_", @$user_schemas ), $sf->{o}{G}{metadata} ? map( "  $_", @$sys_schemas ) : () );
                 1 }
             ) {
-                $ax->print_error_message( $@, 'Get schema names' );
+                $ax->print_error_message( $@ );
                 $dbh->disconnect();
                 next DATABASE if @databases              > 1;
                 next PLUGIN   if @{$sf->{o}{G}{plugins}} > 1;
@@ -386,7 +386,7 @@ sub run {
                     $tables_info = $plui->tables_data( $dbh, $sf->{db_attached} ? undef : $schema );
                     1 }
                 ) {
-                    $ax->print_error_message( $@, 'Get table names' );
+                    $ax->print_error_message( $@ );
                     next SCHEMA    if @schemas                > 1;
                     $dbh->disconnect();
                     next DATABASE  if @databases              > 1;
@@ -461,7 +461,7 @@ sub run {
                             $changed = $db_opt_set->database_setting( $db );
                             1 }
                         ) {
-                            $ax->print_error_message( $@, 'Database settings' );
+                            $ax->print_error_message( $@ );
                             next TABLE;
                         }
                         if ( $changed ) {
@@ -489,7 +489,7 @@ sub run {
                         my $new_j = App::DBBrowser::Join->new( $sf->{i}, $sf->{o}, $sf->{d} );
                         $sf->{i}{special_table} = 'join';
                         if ( ! eval { ( $qt_table, $qt_columns ) = $new_j->join_tables(); 1 } ) {
-                            $ax->print_error_message( $@, 'Join tables' );
+                            $ax->print_error_message( $@ );
                             next TABLE;
                         }
                         next TABLE if ! defined $qt_table;
@@ -499,7 +499,7 @@ sub run {
                         my $new_u = App::DBBrowser::Union->new( $sf->{i}, $sf->{o}, $sf->{d} );
                         $sf->{i}{special_table} = 'union';
                         if ( ! eval { ( $qt_table, $qt_columns ) = $new_u->union_tables(); 1 } ) {
-                            $ax->print_error_message( $@, 'Union tables' );
+                            $ax->print_error_message( $@ );
                             next TABLE;
                         }
                         next TABLE if ! defined $qt_table;
@@ -507,7 +507,7 @@ sub run {
                     elsif ( $table eq $from_subquery ) {
                         $sf->{i}{special_table} = 'subquery';
                         if ( ! eval { ( $qt_table, $qt_columns ) = $sf->__derived_table(); 1 } ) {
-                            $ax->print_error_message( $@, 'Derived table' );
+                            $ax->print_error_message( $@ );
                             next TABLE;
                         }
                         next TABLE if ! defined $qt_table;
@@ -525,7 +525,7 @@ sub run {
                             $qt_columns = $ax->quote_simple_many( $sf->{d}{cols} );
                             1 }
                         ) {
-                            $ax->print_error_message( $@, 'Ordinary table' );
+                            $ax->print_error_message( $@ );
                             next TABLE;
                         }
                     }
@@ -556,7 +556,7 @@ sub __browse_the_table {
             ( $all_arrayref, $sql ) = $tbl->on_table( $sql );
             1 }
         ) {
-            $ax->print_error_message( $@, 'Print table' );
+            $ax->print_error_message( $@ );
             last PRINT_TABLE;
         }
         if ( ! defined $all_arrayref ) {
@@ -615,12 +615,12 @@ sub __create_drop_or_attach {
             my $ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $create_table ) {
                 if ( ! eval { $ct->create_table(); 1 } ) {
-                    $ax->print_error_message( $@, 'Create Table' );
+                    $ax->print_error_message( $@ );
                 }
             }
             elsif ( $choice eq $create_view ) {
                 if ( ! eval { $ct->create_view(); 1 } ) {
-                    $ax->print_error_message( $@, 'Create View' );
+                    $ax->print_error_message( $@ );
                 }
             }
         }
@@ -629,12 +629,12 @@ sub __create_drop_or_attach {
             my $dt = App::DBBrowser::DropTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $drop_table ) {
                 if ( ! eval { $dt->drop_table(); 1 } ) {
-                    $ax->print_error_message( $@, 'Drop Table' );
+                    $ax->print_error_message( $@ );
                 }
             }
             elsif ( $choice eq $drop_view ) {
                 if ( ! eval { $dt->drop_view(); 1 } ) {
-                    $ax->print_error_message( $@, 'Drop View' );
+                    $ax->print_error_message( $@ );
                 }
             }
         }
@@ -644,13 +644,13 @@ sub __create_drop_or_attach {
             my $changed;
             if ( $choice eq $attach_databases ) {
                 if ( ! eval { $changed = $att->attach_db(); 1 } ) {
-                    $ax->print_error_message( $@, 'Attach DB' );
+                    $ax->print_error_message( $@ );
                     next HIDDEN;
                 }
             }
             elsif ( $choice eq $detach_databases ) {
                 if ( ! eval { $changed = $att->detach_db(); 1 } ) {
-                    $ax->print_error_message( $@, 'Detach DB' );
+                    $ax->print_error_message( $@ );
                     next HIDDEN;
                 }
             }
@@ -711,7 +711,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.229
+Version 2.230
 
 =head1 DESCRIPTION
 

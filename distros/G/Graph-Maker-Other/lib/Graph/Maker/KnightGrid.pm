@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -234,41 +234,27 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item 2x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=52>, 4 disconnected
-
-=item 2x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=674>, 4-cycle
-
-=item 3x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=896>
-
-=item 3x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=226>
-
-=item 3x3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=126>
-
-=item 3x3 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=6607>, Paley 9
-
-=item 4x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=684>
-
-=item 4x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1022>
-
-=item 4x3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21067>
-
-=item 4x4 cyclic or 2x2x2x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1340>, tesseract
-
-=item 5x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21063>
-
-=item 2x2x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=68>, 8 disconnected
-
-=item 2x2x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1022>, cube
-
-=item 4x2x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1082>, four 4-cycles
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=52> (etc)
 
 =back
 
-=cut
-
-# cf 2x2x2 is disconnected 8
-
-=pod
+    52      2x2               4 disconnected
+    674     2x2 cyclic        4-cycle
+    896     3x2
+    226     3x2 cyclic
+    126     3x3
+    6607    3x3 cyclic        Paley 9
+    684     4x2
+    1022    4x2 cyclic
+    21067   4x3
+    32802   4x3 cyclic        circulant N=12 1,2,5
+    1340    4x4 cyclic or 2x2x2x2 cyclic,   tesseract
+    21063   5x2 cyclic
+    32806   6x2 cyclic        circulant N=12 1,5
+    68      2x2x2             8 singletons
+    1022    2x2x2 cyclic      cube
+    32810   3x2x2 cyclic 
+    1082    4x2x2             four 4-cycles
 
 =head1 OEIS
 

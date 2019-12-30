@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '1.009'; # VERSION
+our $VERSION = '1.010'; # VERSION
 
 =head1 NAME
 

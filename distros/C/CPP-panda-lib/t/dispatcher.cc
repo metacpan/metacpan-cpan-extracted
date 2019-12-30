@@ -280,17 +280,19 @@ TEST_CASE("back order", "[callbackdispatcher]") {
 }
 
 TEST_CASE("dispatcher const ref arg move" , "[callbackdispatcher]") {
-    struct S : panda::Refcnt {
-        using Dispatcher = CallbackDispatcher<void(const iptr<S>&)>;
-        Dispatcher d;
+    Tracer::refresh();
+    CallbackDispatcher<void(const Tracer&)> d;
 
-        void call() {
-            d(this);
-        }
+    SECTION("many listenees") {
+        Tracer::refresh();
+        d.add([](auto&&...){});
+        d.add([](auto&&...){});
+        d.add([](auto&&...){});
+    }
+    SECTION("no listeners"){}
 
-    };
-    S s;
-    s.call();
+    d(Tracer());
+    CHECK(Tracer::ctor_total() == 1);
 }
 
 TEST_CASE("dispatcher lambda self reference auto...", "[callbackdispatcher]") {
@@ -315,5 +317,22 @@ TEST_CASE("dispatcher lambda self reference auto...", "[callbackdispatcher]") {
     d2.add_event_listener(l1a);
     d2.add_event_listener(l2a);
     d2.add_event_listener(l3a);
+}
+
+TEST_CASE("killing callback dispatcher" , "[callbackdispatcher]") {
+    Dispatcher* d = new Dispatcher;
+    function<void (int)> cb = [&](int) {
+        delete d;
+    };
+    d->add(cb);
+
+    bool called = false;
+    function<void (int)> check = [&](int) {
+        called = true;
+    };
+    d->add(check, true);
+
+    (*d)(10);
+    REQUIRE_FALSE(called);
 }
 

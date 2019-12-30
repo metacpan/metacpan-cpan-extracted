@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 187;
+use Test::More tests => 196;
 use lib 't';
 use Util;
 
@@ -73,6 +73,7 @@ are_mutually_exclusive('-o', '-C', ['-o', '-C', 1, $word, $file]);
 are_mutually_exclusive('-o', '--context', ['-o', '--context', 1, $word, $file]);
 are_mutually_exclusive('-o', '--context', ['-o', '--context=1', $word, $file]);
 are_mutually_exclusive('-o', '-f', ['-o', '-f', $word, $file]);
+are_mutually_exclusive('-o', '--passthru', ['-o', '--passthru', $word, $file]);
 
 # --passthru
 are_mutually_exclusive('--passthru', '--output', ['--passthru', '--output', '$&', $word, $file]);
@@ -95,6 +96,9 @@ are_mutually_exclusive('--passthru', '--context', ['--passthru', '--context=1', 
 are_mutually_exclusive('--passthru', '-f', ['--passthru', '-f', $word, $file]);
 are_mutually_exclusive('--passthru', '-g', ['--passthru', '-g', $word, $file]);
 are_mutually_exclusive('--passthru', '--column', ['--passthru', '--column', $word, $file]);
+are_mutually_exclusive('--passthru', '-v', ['--passthru', '-v', $word, $file]);
+are_mutually_exclusive('--passthru', '-o', ['--passthru', '-o', $word, $file]);
+are_mutually_exclusive('--passthru', '--output', ['--passthru', '--output', $word, $file]);
 
 # --output
 for my $opt ( qw( -f -g -c --count ) ) {
@@ -171,6 +175,13 @@ for my $opt ( qw( -f -g ) ) {
     are_mutually_exclusive( $opt, '--column',  [$opt, '--column', $word, $file] );
 }
 
+# -x
+are_mutually_exclusive( '-x', '--files-from', ['-x', '--files-from', $word, $file] );
+for my $opt ( qw( -f -g ) ) {
+    are_mutually_exclusive( $opt, '-x',   [$opt, '-x', $word, $file] );
+    are_mutually_exclusive( $opt, '--files-from', [$opt, '--files-from', $word, $file] );
+}
+
 subtest q{Verify that "options" that follow -- aren't factored into the mutual exclusivity} => sub {
     my ( $stdout, $stderr ) = run_ack_with_stderr('-A', 5, $word, $file, '--', '-l');
     ok(@{$stdout} > 0, 'Some lines should appear on standard output');
@@ -179,7 +190,7 @@ subtest q{Verify that "options" that follow -- aren't factored into the mutual e
     is(get_rc(), 0, 'The ack command should not fail');
 };
 
-subtest q{Verify that mutually exclusive options in different sources don't cause a problem} => sub {
+subtest q{Verify that mutex options in different sources don't cause a problem} => sub {
     my $ackrc = <<'HERE';
 --group
 HERE
@@ -218,13 +229,13 @@ sub are_mutually_exclusive {
             my $opt2_re = quotemeta($opt2);
 
             my $error = $stderr->[0] || ''; # avoid undef warnings
-            if ( $error =~ /Options '$opt1_re' and '$opt2_re' are mutually exclusive/ ||
-                $error =~ /Options '$opt2_re' and '$opt1_re' are mutually exclusive/ ) {
+            if ( $error =~ /Options '$opt1_re' and '$opt2_re' can't be used together/ ||
+                $error =~ /Options '$opt2_re' and '$opt1_re' can't be used together/ ) {
 
-                pass( qq{Error message resembles "Options '$opt1' and '$opt2' are mutually exclusive"} );
+                pass( qq{Error message resembles "Options '$opt1' and '$opt2' can't be used together"} );
             }
             else {
-                fail( qq{Error message does not resemble "Options '$opt1' and '$opt2' are mutually exclusive"} );
+                fail( qq{Error message does not resemble "Options '$opt1' and '$opt2' can't be used together"} );
                 diag("Error message: '$error'");
             }
         };

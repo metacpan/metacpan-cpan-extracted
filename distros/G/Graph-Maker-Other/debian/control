@@ -31,7 +31,7 @@ Architecture: all
 Depends: libgraph-perl, libgraph-maker-perl, perl (>= 5.004), ${perl:Depends}, ${misc:Depends}
 Description: Create Graph.pm graphs of various kinds
  Graph types include: Beineke, BinaryBeanstalk, BinomialTree, BiStar,
- BulgarianSolitaire, Catalans, Circulant, ExcessConfigurations,
+ BulgarianSolitaire, Catalans, Circulant, Crown, ExcessConfigurations,
  FibonacciTree, GosperIsland, Hanoi, HexGrid, Johnson, Keller, Kneser,
  KnightGrid, NoughtsAndCrosses, Petersen (and generalized),
  QuartetTree, RookGrid, TwinAlternateAreaTree, TwindragonAreaTree.

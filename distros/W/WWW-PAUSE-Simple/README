@@ -2,7 +2,7 @@ NAME
     WWW::PAUSE::Simple - An API for PAUSE
 
 VERSION
-    This document describes version 0.445 of WWW::PAUSE::Simple (from Perl
+    This document describes version 0.446 of WWW::PAUSE::Simple (from Perl
     distribution WWW-PAUSE-Simple), released on 2019-11-14.
 
 SYNOPSIS
@@ -46,7 +46,7 @@ FUNCTIONS
 
     *   retries => *int* (default: 5)
 
-        Number of retries when received [45]xx HTTP error from server.
+        Number of retries when received 5xx HTTP error from server.
 
         The retry uses an exponential backoff strategy of delaying 3, 6, 12,
         24, ..., 3600, 3600, ... seconds.
@@ -120,7 +120,7 @@ FUNCTIONS
 
     *   retries => *int* (default: 5)
 
-        Number of retries when received [45]xx HTTP error from server.
+        Number of retries when received 5xx HTTP error from server.
 
         The retry uses an exponential backoff strategy of delaying 3, 6, 12,
         24, ..., 3600, 3600, ... seconds.
@@ -189,7 +189,7 @@ FUNCTIONS
 
     *   retries => *int* (default: 5)
 
-        Number of retries when received [45]xx HTTP error from server.
+        Number of retries when received 5xx HTTP error from server.
 
         The retry uses an exponential backoff strategy of delaying 3, 6, 12,
         24, ..., 3600, 3600, ... seconds.
@@ -248,7 +248,7 @@ FUNCTIONS
 
     *   retries => *int* (default: 5)
 
-        Number of retries when received [45]xx HTTP error from server.
+        Number of retries when received 5xx HTTP error from server.
 
         The retry uses an exponential backoff strategy of delaying 3, 6, 12,
         24, ..., 3600, 3600, ... seconds.
@@ -303,7 +303,7 @@ FUNCTIONS
 
     *   retries => *int* (default: 5)
 
-        Number of retries when received [45]xx HTTP error from server.
+        Number of retries when received 5xx HTTP error from server.
 
         The retry uses an exponential backoff strategy of delaying 3, 6, 12,
         24, ..., 3600, 3600, ... seconds.
@@ -356,7 +356,7 @@ FUNCTIONS
 
     *   retries => *int* (default: 5)
 
-        Number of retries when received [45]xx HTTP error from server.
+        Number of retries when received 5xx HTTP error from server.
 
         The retry uses an exponential backoff strategy of delaying 3, 6, 12,
         24, ..., 3600, 3600, ... seconds.
@@ -415,7 +415,7 @@ FUNCTIONS
 
     *   retries => *int* (default: 5)
 
-        Number of retries when received [45]xx HTTP error from server.
+        Number of retries when received 5xx HTTP error from server.
 
         The retry uses an exponential backoff strategy of delaying 3, 6, 12,
         24, ..., 3600, 3600, ... seconds.
@@ -480,7 +480,7 @@ FUNCTIONS
 
     *   retries => *int* (default: 5)
 
-        Number of retries when received [45]xx HTTP error from server.
+        Number of retries when received 5xx HTTP error from server.
 
         The retry uses an exponential backoff strategy of delaying 3, 6, 12,
         24, ..., 3600, 3600, ... seconds.

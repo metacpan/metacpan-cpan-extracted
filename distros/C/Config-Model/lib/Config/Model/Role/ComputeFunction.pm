@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::ComputeFunction 2.137;
+package Config::Model::Role::ComputeFunction 2.138;
 
 # ABSTRACT: compute &index or &element functions
 
@@ -31,7 +31,7 @@ sub eval_function {
     my ($self, $function, $up, $check) = @_;
 
     if (defined $up) {
-        # get now the object refered
+        # get now the object referred
         $up =~ s/\s//g;
         $up =~ s/-(\d+)/'- ' x $1/e;        # change  -3 -> - - -
         $up =~ s/(-+)/'- ' x length($1)/e;  # change --- -> - - -
@@ -90,7 +90,7 @@ Config::Model::Role::ComputeFunction - compute &index or &element functions
 
 =head1 VERSION
 
-version 2.137
+version 2.138
 
 =head1 SYNOPSIS
 

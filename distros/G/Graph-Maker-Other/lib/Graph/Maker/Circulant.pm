@@ -23,7 +23,7 @@ use Graph::Maker;
 use List::Util 'min';
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 
@@ -141,61 +141,100 @@ include
 
 =over
 
-=item N=6 1,2 L<https://hog.grinvin.org/ViewGraphInfo.action?id=226>, octohedral
-
-=item N=6 1,3 L<https://hog.grinvin.org/ViewGraphInfo.action?id=84>, complete bipartite 3,3
-
-=item N=6 2,3 L<https://hog.grinvin.org/ViewGraphInfo.action?id=746>, circular ladder 3 rungs
-
-=item N=7 1,2 L<https://hog.grinvin.org/ViewGraphInfo.action?id=710>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=226>  etc
 
 =back
 
-Z<>
+    74      N=4 1,2     tetrahedral
 
-=over
+    226     N=6 1,2     octohedral
+    84      N=6 1,3     complete bipartite 3,3
+    746     N=6 2,3     circular ladder 3 rungs
 
-=item N=8 1,2 L<https://hog.grinvin.org/ViewGraphInfo.action?id=160>
+    710     N=7 1,2
+    58      N=7 1,2,3
 
-=item N=8 1,3 L<https://hog.grinvin.org/ViewGraphInfo.action?id=570>
+    160     N=8 1,2
+    570     N=8 1,3
+    176     N=8 1,2,3      sixteen cell
+    33454   N=8 1,3,4
+    180     N=8 1,2,3,4
+    640     N=8 1,4        Mobius ladder 4 rungs
+    116     N=8 2,4        two complete-4s
 
-=item N=8 1,2,3 L<https://hog.grinvin.org/ViewGraphInfo.action?id=176>, sixteen cell
+    328     N=9 1,3
+    33801   N=9 1,2,3      symmetric configuration
+    370     N=9 1,2,4
+    328     N=9 1,2,3,4
 
-=item N=8 1,4 L<https://hog.grinvin.org/ViewGraphInfo.action?id=640>, Mobius ladder 4 rungs
+    21063   N=10 1,2
+    32519   N=10 1,3
+    138     N=10 2,4       two complete-5
+    21117   N=10 1,2,4     cross-linked complete-5s
+    148     N=10 1,2,3,4
+    20611   N=10 1,2,5
+    252     N=10 1,3,5
+    142     N=10 1,2,3,5
+    32441   N=10 2,4,5  
 
-=item N=8 2,4 L<https://hog.grinvin.org/ViewGraphInfo.action?id=116>, two complete-4s
+    21065   N=13 1,5       cyclotomic
+    19514   N=13 1,2,5
 
-=back
+    20688   N=16 1,2,5,8
+    30395   N=17 1,2,4,8   a Ramsey 4,4
 
-Z<>
+=cut
 
-=over
+# More by grepping
+#
+# Many N=12 from integral graphs maybe
+#
+# HOG N=20 2,5,6 not shown in POD, num edges 60 (out of 190)
+# SsaCA_hHPEE?QFPJGUb??BpC[Gosa_lC_
+#
+# HOG N=20 1,3,8,10 not shown in POD, num edges 70 (out of 190)
+# SsaCC?G@GQ_tETHijIjLS]T@ugBu_Bn??
+#
+# HOG N=20 1,4,6,9 not shown in POD, num edges 80 (out of 190)
+# SsaCCA?]BoN?]?@~_~oN{@~`~_B~?B~??
+#
+# HOG N=21 1,4,6 not shown in POD, num edges 63 (out of 210)
+# TsaC?CCCWRAPBDGaGaIbEIXHT@@T@JcS@kS?
+#
+# HOG N=22 1,3,8,10 not shown in POD, num edges 88 (out of 231)
+# UsaCCA?WB?BBEEX`koorrE]XfeBNK?~o?^w?^w??
+#
+# HOG N=24 1,6,10 not shown in POD, num edges 72 (out of 276)
+# WsaC??@@OD@_C`IEIB?ooDGOJ?iHChEGoca_OpOJQS?ME_?
+#
+# HOG N=24 2,3,10 not shown in POD, num edges 72 (out of 276)
+# WsaC????oHEBQEQEEBAIGGgcQ`OTG@IACTAAOgGWY@WNK??
+#
+# HOG N=24 1,3,7,12 not shown in POD, num edges 84 (out of 276)
+# WsaCC?H@aOgIOgPGIEB@_F@ciD`WL?eQcTISGqY@qe?Et_?
+#
+# HOG N=24 1,4,7,9,12 not shown in POD, num edges 108 (out of 276)
+# WsaCCA?_B_M?[?Bb`po[[[[\pprbb_^{?N}?B~_B~_?N}??
+#
+# HOG N=26 2,10 not shown in POD, num edges 52 (out of 325)
+# Ys_?GGC@?C?B?Q?H_QOEA?MC@ca???O?C_?AC??YO?@K??AE??`K??Q?
+#
+# HOG N=26 1,5,8,12 not shown in POD, num edges 104 (out of 325)
+# YsaCCA?OI@?W?oBF`bp_{KF`o`b`BAXK@Ke?BoF_]?{EZ?KKu?W^w???
+#
+# HOG N=28 1,3,7,12 not shown in POD, num edges 112 (out of 378)
+# [saCCA?GIAAIAJAeAb?ooIB@OQ?F@wJAwJ?cDGQJHI`KWUAY`GS\?ogDt__AmcO?
+#
+# HOG N=28 2,6,7,10 not shown in POD, num edges 112 (out of 378)
+# [saCCA?S@OcaGcGSCE@_?Q@|CJqCZaA\`?nOW???^__bwCEFgOSFW_cB[_a?nOO_
+#
+# HOG N=29 1,3,7,12 not shown in POD, num edges 116 (out of 406)
+# \saCCA??gH?i?qPC@HH@EC`KWf@gdASWd`WKCWOQB?S@oAFH_HEMbOAJJA?R`L?GZCaC?
+#
+# HOG N=30 1,3,9,14 not shown in POD, num edges 120 (out of 435)
+# ]saCCA?P@CaQBBAcGOPGGDA?Goy@EpAJOPHo?{e?JZ??s?K@o@_MSG`LC`CQpOaC[Op@@w??]?
 
-=item N=9 1,3 L<https://hog.grinvin.org/ViewGraphInfo.action?id=328>
-
-=item N=9 1,2,4 L<https://hog.grinvin.org/ViewGraphInfo.action?id=370>
-
-=back
-
-Z<>
-
-=over
-
-=item N=10 1,2 L<https://hog.grinvin.org/ViewGraphInfo.action?id=21063>
-
-=item N=10 2,4 L<https://hog.grinvin.org/ViewGraphInfo.action?id=138>, two complete-5
-
-=item N=10 1,2,4 L<https://hog.grinvin.org/ViewGraphInfo.action?id=21117>, cross-linked complete-5s
-
-=item N=10 1,2,3,4 L<https://hog.grinvin.org/ViewGraphInfo.action?id=148>
-
-=item N=10 1,2,5 L<https://hog.grinvin.org/ViewGraphInfo.action?id=20611>
-
-=item N=10 1,3,5 L<https://hog.grinvin.org/ViewGraphInfo.action?id=252>
-
-=item N=10 1,2,3,5 L<https://hog.grinvin.org/ViewGraphInfo.action?id=142>
-
-=back
+=pod
 
 =head1 SEE ALSO
 

@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-
 #  Alpha color values demonstration.
 #
 #  Copyright (C) 2008 Hazen Babcock
@@ -25,6 +23,8 @@
 #  This example will only really be interesting when used with devices that 
 #  support or alpha (or transparency) values, such as the cairo device family.
 
+use strict;
+use warnings;
 use PDL;
 use PDL::NiceSlice;
 use PDL::Graphics::PLplot;
@@ -129,8 +129,8 @@ plscmap1la(1, $pos, $rcoord, $gcoord, $bcoord, $acoord, $rev);
 
 # Use that cmap1 to create a transparent red gradient for the whole
 # window.
-my $px = pdl(0,1,1,0);
-my $py = pdl(0,0,1,1);
+$px = pdl(0,1,1,0);
+$py = pdl(0,0,1,1);
 plgradient($px, $py, 90);
 
 plend();

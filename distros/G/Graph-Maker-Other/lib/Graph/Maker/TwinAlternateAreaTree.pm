@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -75,7 +75,7 @@ sub init {
   $graph->set_graph_attribute(name => "Twin Alternate Area Tree $level");
   $graph->set_graph_attribute(vertex_name_type => $vertex_name_type);
   $graph->add_vertex($vertex_names_func->(0));
-  my $directed = $graph->is_directed;
+  my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
 
  V: foreach my $v (0 .. 2**$level-1) {
     ### $v
@@ -84,10 +84,8 @@ sub init {
     if ($v & 1) {
       ### horizontal ...
       my $to = $v ^ 1;
-      my $v_name = $vertex_names_func->($v);
-      my $to_name = $vertex_names_func->($to);
-      $graph->add_edge($v_name, $to_name);
-      if ($directed) { $graph->add_edge($to_name, $v_name); }
+      $graph->$add_edge($vertex_names_func->($v),
+                        $vertex_names_func->($to));
     }
 
     #  ...00 11...11
@@ -101,11 +99,8 @@ sub init {
       next if $v & $bit;  # still all 1s
       unless ($v & ($bit<<1)) {  # 00 11..11
         my $to = $v+1+($bit<<1);
-
-        my $v_name = $vertex_names_func->($v);
-        my $to_name = $vertex_names_func->($to);
-        $graph->add_edge($v_name, $to_name);
-        if ($directed) { $graph->add_edge($to_name, $v_name); }
+        $graph->$add_edge($vertex_names_func->($v),
+                          $vertex_names_func->($to));
       }
       last;
     }

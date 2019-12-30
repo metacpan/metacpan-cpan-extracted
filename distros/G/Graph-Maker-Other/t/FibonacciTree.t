@@ -36,7 +36,10 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 357;
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
+plan tests => 405;
 
 
 require Graph::Maker::FibonacciTree;
@@ -79,7 +82,7 @@ sub stringize_sorted {
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::FibonacciTree::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::FibonacciTree->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::FibonacciTree->VERSION($want_version); 1 }, 1,
@@ -135,21 +138,29 @@ sub stringize_sorted {
       . "7=12,7=13,8=14,9=15,9=16,10=17,10=18,11=19");
 }
 
-# diameter 2*height
 foreach my $height (0 .. 5) {
-  my $graph = Graph::Maker->new('fibonacci_tree',
-                                height => $height,
-                                undirected => 1,
-                               );
-  {
-    my $got = $graph->diameter || 0;
-    my $want = ($height==0 ? 0 : 2*$height-2);
-    ok ($got, $want);
-  }
-  {
-    my $got = scalar($graph->vertices);
-    my $want = F($height+3)-2;
-    ok ($got, $want);
+  foreach my $undirected (0, 1) {
+    foreach my $multiedged (0, 1) {
+      ### $height
+      ### $undirected
+      ### $multiedged
+      my $graph = Graph::Maker->new('fibonacci_tree',
+                                    height => $height,
+                                    undirected => $undirected,
+                                    multiedged => $multiedged);
+      unless ($multiedged) {  # cannot diameter of multiedged
+        # diameter 2*height
+        my $got = $graph->diameter || 0;
+        my $want = ($height==0 ? 0 : 2*$height-2);
+        ok ($got, $want);
+      }
+      my $num_vertices = scalar($graph->vertices);
+      ok ($num_vertices, F($height+3)-2);
+
+      my $num_edges = $graph->edges;
+      ok ($num_edges,
+          ($num_vertices==0 ? 0 : $num_vertices-1) * ($undirected ? 1 : 2));
+    }
   }
 }
 

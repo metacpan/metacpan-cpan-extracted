@@ -1,5 +1,5 @@
 package App::Deps::Verify::App::VerifyDeps::Command::plinst;
-$App::Deps::Verify::App::VerifyDeps::Command::plinst::VERSION = '0.8.3';
+$App::Deps::Verify::App::VerifyDeps::Command::plinst::VERSION = '0.10.0';
 use App::Deps::Verify::App::VerifyDeps -command;
 
 use strict;
@@ -56,15 +56,11 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-App::Deps::Verify::App::VerifyDeps::Command::plinst
-
 =head1 VERSION
 
-version 0.8.3
+version 0.10.0
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -98,14 +94,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Deps-Verify>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Deps-Verify>
 
 =item *
 

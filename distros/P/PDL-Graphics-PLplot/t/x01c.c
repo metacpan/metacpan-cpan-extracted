@@ -1,5 +1,3 @@
-// $Id: x01c.c 12288 2013-01-30 04:40:35Z airwin $
-//
 //      Simple line plot and multiple windows demo.
 //
 // Copyright (C) 2004  Rafael Laboissiere
@@ -24,6 +22,9 @@
 
 #include "plcdemos.h"
 #include "plevent.h"
+#ifdef PL_HAVE_NANOSLEEP
+#include <time.h>
+#endif
 #ifdef PL_HAVE_UNISTD_H
 # include <unistd.h>
 #endif
@@ -89,7 +90,7 @@ static PLOptionTable options[] = {
     }                           // long syntax
 };
 
-const char           *notes[] = { "Make sure you get it right!", NULL };
+PLCHAR_VECTOR        notes[] = { "Make sure you get it right!", NULL };
 
 // Function prototypes
 
@@ -110,7 +111,7 @@ void plot3( void );
 //--------------------------------------------------------------------------
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
     PLINT digmax, cur_strm, new_strm;
     char  ver[80];
@@ -203,13 +204,10 @@ main( int argc, const char *argv[] )
                 break;
 
             pltext();
-            if ( gin.keysym < 0xFF && isprint( gin.keysym ) )
-                printf( "subwin = %d, wx = %f,  wy = %f, dx = %f,  dy = %f,  c = '%c' s = '%s'\n",
-                    gin.subwindow, gin.wX, gin.wY, gin.dX, gin.dY, gin.keysym, gin.string );
-            else
-                printf( "subwin = %d, wx = %f,  wy = %f, dx = %f,  dy = %f,  c = 0x%02x s - '%s'\n",
-                    gin.subwindow, gin.wX, gin.wY, gin.dX, gin.dY, gin.keysym, gin.string );
-
+            printf( "subwin = %d, wx = %f,  wy = %f, dx = %f,  dy = %f\n",
+                gin.subwindow, gin.wX, gin.wY, gin.dX, gin.dY );
+            printf( "keysym = 0x%02x, button = 0x%02x, string = '%s', type = 0x%02x, state = 0x%02x\n",
+                gin.keysym, gin.button, gin.string, gin.type, gin.state );
             plgra();
         }
     }
@@ -270,15 +268,18 @@ plot1( int do_test )
 
     if ( do_test && test_xor )
     {
-#ifdef PL_HAVE_USLEEP
-        PLINT st;
+#ifdef PL_HAVE_NANOSLEEP
+        PLINT           st;
+        struct timespec ts;
+        ts.tv_sec  = 0;
+        ts.tv_nsec = 50000000;
         plxormod( 1, &st ); // enter xor mode
         if ( st )
         {
             for ( i = 0; i < 60; i++ )
             {
                 plpoin( 1, x + i, y + i, 9 );   // draw a point
-                usleep( 50000 );                // wait a little
+                nanosleep( &ts, NULL );         // wait a little
                 plflush();                      // force an update of the tk driver
                 plpoin( 1, x + i, y + i, 9 );   // erase point
             }
@@ -286,7 +287,7 @@ plot1( int do_test )
         }
 #else
         printf( "The -xor command line option can only be exercised if your "
-            "system\nhas usleep(), which does not seem to happen.\n" );
+            "system\nhas nanosleep(), which does not seem to happen.\n" );
 #endif
     }
 }

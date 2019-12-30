@@ -13,7 +13,7 @@ Dancer2::Plugins - Recommended Dancer2 plugins
 
 =head1 VERSION
 
-version 0.208002
+version 0.300000
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x24 for the PLplot PDL binding
 #
 # Unicode Pace Flag
@@ -46,6 +44,8 @@
 
 # SYNC: x24c.c 1.6
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 

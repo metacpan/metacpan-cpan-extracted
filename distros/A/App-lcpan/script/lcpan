@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-10-05'; # DATE
-our $VERSION = '1.041'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.041 of lcpan (from Perl distribution App-lcpan), released on 2019-10-05.
+This document describes version 1.043 of lcpan (from Perl distribution App-lcpan), released on 2019-11-29.
 
 =head1 SYNOPSIS
 
@@ -310,6 +310,10 @@ See L<App::lcpan> for the database schema.
 
 =head1 SUBCOMMANDS
 
+=head2 B<author>
+
+Show a single author.
+
 =head2 B<author-deps>
 
 List dependencies for all of the dists of an author.
@@ -452,6 +456,10 @@ deps-by-dependent-count Foo Bar Baz> will return C<Mod2> (3 dependents), C<Mod3>
 (2 dependents), C<Mod1> (1 dependent).
 
 
+=head2 B<dist>
+
+Show a single distribution.
+
 =head2 B<dist-contents>
 
 List contents inside a distribution.
@@ -472,6 +480,15 @@ Get distribution metadata.
 =head2 B<dist-mods>
 
 List modules in a distribution.
+
+=head2 B<dist-rdeps>
+
+List which distributions depend on specified distribution.
+
+This subcommand lists all modules of your specified distribution, then run
+'deps' on all of those modules. So basically, this subcommand shows which
+distributions depend on your specified distribution.
+
 
 =head2 B<dist-scripts>
 
@@ -578,6 +595,10 @@ This subcommand is a shortcut for:
  % lcpan mentions --type script --mentioned-script SCRIPT
 
 
+=head2 B<mod>
+
+Alias for 'module'.
+
 =head2 B<mod-contents>
 
 List contents inside a module's distribution.
@@ -636,6 +657,10 @@ List modules ranked by number of reverse dependencies.
 
 Given a module, list all modules in the same distribution.
 
+=head2 B<module>
+
+Show a single module.
+
 =head2 B<modules>
 
 List modules/packages.
@@ -648,6 +673,10 @@ List namespaces.
 
 List reverse dependencies.
 
+=head2 B<rel>
+
+Alias for 'release'.
+
 =head2 B<related-mods>
 
 List other modules related to module(s).
@@ -658,6 +687,10 @@ documentation.
 
 The scoring/ranking still needs to be tuned.
 
+
+=head2 B<release>
+
+Show a single release.
 
 =head2 B<releases>
 
@@ -686,6 +719,10 @@ rar), C<err> means some other error in processing file.
 =head2 B<reset>
 
 Reset (empty) the database index.
+
+=head2 B<script>
+
+Show a single script.
 
 =head2 B<script2author>
 
@@ -909,6 +946,14 @@ Display program's version and exit.
 
 =back
 
+=head2 Options for subcommand author
+
+=over
+
+=item B<--author>=I<s>*
+
+=back
+
 =head2 Options for subcommand author-deps
 
 =over
@@ -921,6 +966,12 @@ See C<--phase>.
 
 =item B<--author>=I<s>*
 
+=item B<--broken>
+
+Alias for --exclude-registered --include-unregistered.
+
+See C<--exclude-unregistered>.
+
 =item B<--exclude-core>
 
 Exclude core modules.
@@ -928,6 +979,14 @@ Exclude core modules.
 =item B<--exclude-noncore>
 
 Exclude non-core modules.
+
+=item B<--exclude-registered>
+
+Exclude modules that are registered (listed in 02packages.details.txt.gz).
+
+=item B<--exclude-unregistered>
+
+Exclude modules that are not registered (not listed in 02packages.details.txt.gz).
 
 =item B<--flatten>
 
@@ -1002,7 +1061,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -1038,11 +1097,11 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
-=item B<--author-arg>=I<s>*
-
 =item B<--author-isnt>=I<s@>
 
 Can be specified multiple times.
+
+=item B<--author>=I<s>*
 
 =item B<--author>=I<s@>
 
@@ -1086,7 +1145,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -1404,6 +1463,12 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
+=item B<--broken>
+
+Alias for --exclude-registered --include-unregistered.
+
+See C<--exclude-unregistered>.
+
 =item B<--exclude-core>
 
 Exclude core modules.
@@ -1411,6 +1476,14 @@ Exclude core modules.
 =item B<--exclude-noncore>
 
 Exclude non-core modules.
+
+=item B<--exclude-registered>
+
+Exclude modules that are registered (listed in 02packages.details.txt.gz).
+
+=item B<--exclude-unregistered>
+
+Exclude modules that are not registered (not listed in 02packages.details.txt.gz).
 
 =item B<--flatten>
 
@@ -1469,7 +1542,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -1543,7 +1616,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -1556,6 +1629,14 @@ Default value:
 Default value:
 
  "requires"
+
+=back
+
+=head2 Options for subcommand dist
+
+=over
+
+=item B<--dist>=I<s>*
 
 =back
 
@@ -1594,6 +1675,46 @@ When there are more than one query, perform OR instead of AND logic.
 =item B<--detail>, B<-l>
 
 =item B<--dist>=I<s>*
+
+=back
+
+=head2 Options for subcommand dist-rdeps
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--dist>=I<s>*
+
+=item B<--level>=I<s>, B<-l>
+
+Recurse for a number of levels (-1 means unlimited).
+
+Default value:
+
+ 1
+
+=item B<--phase>=I<s>
+
+Default value:
+
+ "ALL"
+
+=item B<--rel>=I<s>
+
+Default value:
+
+ "ALL"
+
+=item B<-R>
+
+Recurse (alias for `--level 10`).
+
+See C<--level>.
 
 =back
 
@@ -2261,6 +2382,14 @@ See C<--script>.
 
 =back
 
+=head2 Options for subcommand mod
+
+=over
+
+=item B<--module>=I<s>*
+
+=back
+
 =head2 Options for subcommand mod-contents
 
 =over
@@ -2365,7 +2494,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2481,6 +2610,14 @@ See C<--module>.
 
 =back
 
+=head2 Options for subcommand module
+
+=over
+
+=item B<--module>=I<s>*
+
+=back
+
 =head2 Options for subcommand modules
 
 =over
@@ -2527,7 +2664,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.24.0"
+ "v5.30.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2733,6 +2870,14 @@ See C<--level>.
 
 =back
 
+=head2 Options for subcommand rel
+
+=over
+
+=item B<--release>=I<s>*
+
+=back
+
 =head2 Options for subcommand related-mods
 
 =over
@@ -2772,6 +2917,14 @@ Can be specified multiple times.
 =item B<--with-scores>
 
 Return score-related fields.
+
+=back
+
+=head2 Options for subcommand release
+
+=over
+
+=item B<--release>=I<s>*
 
 =back
 
@@ -2936,6 +3089,14 @@ See C<--query-type>.
 Shortcut for --query-type exact-name.
 
 See C<--query-type>.
+
+=back
+
+=head2 Options for subcommand script
+
+=over
+
+=item B<--script>=I<s>*
 
 =back
 
@@ -3410,12 +3571,18 @@ List of available configuration parameters:
  naked_res (see --naked-res)
  use_bootstrap (see --no-use-bootstrap)
 
+=head2 Configuration for subcommand author
+
+ author (see --author)
+
 =head2 Configuration for subcommand author-deps
 
  author (see --author)
  flatten (see --flatten)
  include_core (see --exclude-core)
  include_noncore (see --exclude-noncore)
+ include_registered (see --exclude-registered)
+ include_unregistered (see --exclude-unregistered)
  level (see --level)
  module_authors (see --module-author)
  module_authors_arent (see --module-author-isnt)
@@ -3426,7 +3593,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
 
- author (see --author-arg)
+ author (see --author)
  authors (see --author)
  authors_arent (see --author-isnt)
  include_core (see --exclude-core)
@@ -3542,6 +3709,8 @@ List of available configuration parameters:
  flatten (see --flatten)
  include_core (see --exclude-core)
  include_noncore (see --exclude-noncore)
+ include_registered (see --exclude-registered)
+ include_unregistered (see --exclude-unregistered)
  level (see --level)
  modules (see --module)
  perl_version (see --perl-version)
@@ -3560,6 +3729,10 @@ List of available configuration parameters:
  phase (see --phase)
  rel (see --rel)
 
+=head2 Configuration for subcommand dist
+
+ dist (see --dist)
+
 =head2 Configuration for subcommand dist-contents
 
  author (see --author)
@@ -3576,6 +3749,13 @@ List of available configuration parameters:
 
  detail (see --detail)
  dist (see --dist)
+
+=head2 Configuration for subcommand dist-rdeps
+
+ dist (see --dist)
+ level (see --level)
+ phase (see --phase)
+ rel (see --rel)
 
 =head2 Configuration for subcommand dist-scripts
 
@@ -3694,6 +3874,10 @@ List of available configuration parameters:
  mentioner_scripts (see --mentioner-script)
  scripts (see --script)
 
+=head2 Configuration for subcommand mod
+
+ module (see --module)
+
 =head2 Configuration for subcommand mod-contents
 
  author (see --author)
@@ -3747,6 +3931,10 @@ List of available configuration parameters:
  latest (see --latest)
  modules (see --module)
 
+=head2 Configuration for subcommand module
+
+ module (see --module)
+
 =head2 Configuration for subcommand modules
 
  author (see --author)
@@ -3782,6 +3970,10 @@ List of available configuration parameters:
  phase (see --phase)
  rel (see --rel)
 
+=head2 Configuration for subcommand rel
+
+ release (see --release)
+
 =head2 Configuration for subcommand related-mods
 
  limit (see --limit)
@@ -3789,6 +3981,10 @@ List of available configuration parameters:
  skip_same_dist (see --skip-same-dist)
  sort (see --sort)
  with_scores (see --with-scores)
+
+=head2 Configuration for subcommand release
+
+ release (see --release)
 
 =head2 Configuration for subcommand releases
 
@@ -3824,6 +4020,10 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand reset
 
+
+=head2 Configuration for subcommand script
+
+ script (see --script)
 
 =head2 Configuration for subcommand script2author
 

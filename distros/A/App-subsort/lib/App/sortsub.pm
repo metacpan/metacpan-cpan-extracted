@@ -1,9 +1,9 @@
 package App::sortsub;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-18'; # DATE
+our $DATE = '2019-12-27'; # DATE
 our $DIST = 'App-subsort'; # DIST
-our $VERSION = '0.043'; # VERSION
+our $VERSION = '0.044'; # VERSION
 
 1;
 # ABSTRACT: Alias for App::subsort
@@ -20,7 +20,7 @@ App::sortsub - Alias for App::subsort
 
 =head1 VERSION
 
-This document describes version 0.043 of App::sortsub (from Perl distribution App-subsort), released on 2019-12-18.
+This document describes version 0.044 of App::sortsub (from Perl distribution App-subsort), released on 2019-12-27.
 
 =head1 HOMEPAGE
 

@@ -5,11 +5,11 @@ use CHI;
 use CHI::Cascade;
 
 use IO::Handle;
-use Storable	qw(store_fd fd_retrieve);
-use Time::HiRes	qw(time);
+use Storable    qw(store_fd fd_retrieve);
+use Time::HiRes qw(time);
 
-use constant DELAY		=> 2.0;
-use constant QUICK_DELAY	=> 0.5;
+use constant DELAY              => 2.0;
+use constant QUICK_DELAY        => 0.5;
 
 plan skip_all => 'Not installed CHI::Driver::Memcached::Fast'
   unless eval "use CHI::Driver::Memcached::Fast; 1";
@@ -23,23 +23,23 @@ chomp($cwd = `pwd`);
 
 if ($< == 0) {
     # if root - other options
-    $pid_file 		= "/tmp/memcached.$$.pid";
-    $socket_file	= "/tmp/memcached.$$.socket";
-    $user_opt		= '-u nobody';
+    $pid_file           = "/tmp/memcached.$$.pid";
+    $socket_file        = "/tmp/memcached.$$.socket";
+    $user_opt           = '-u nobody';
 
 }
 else {
-    $pid_file 		= "$cwd/t/memcached.$$.pid";
-    $socket_file	= "$cwd/t/memcached.$$.socket";
-    $user_opt		= '';
+    $pid_file           = "$cwd/t/memcached.$$.pid";
+    $socket_file        = "$cwd/t/memcached.$$.socket";
+    $user_opt           = '';
 }
 
 my $out = `memcached $user_opt -d -s $socket_file -a 644 -m 64 -P $pid_file -t 2 2>&1`;
 
 $SIG{__DIE__} = sub {
     `{ kill \`cat $pid_file\`; } >/dev/null 2>&1`;
-    unlink $pid_file	unless -l $pid_file;
-    unlink $socket_file	unless -l $socket_file;
+    unlink $pid_file    unless -l $pid_file;
+    unlink $socket_file unless -l $socket_file;
     $SIG{__DIE__} = 'IGNORE';
 };
 
@@ -84,8 +84,8 @@ $SIG{__DIE__} = sub {
     kill 15, $pid_quick if $pid_quick;
     waitpid($pid_slow, 0);
     waitpid($pid_quick, 0);
-    unlink $pid_file	unless -l $pid_file;
-    unlink $socket_file	unless -l $socket_file;
+    unlink $pid_file    unless -l $pid_file;
+    unlink $socket_file unless -l $socket_file;
     $SIG{__DIE__} = 'IGNORE';
 };
 
@@ -98,46 +98,46 @@ sub start_parent_commanding {
 
     my $in;
 
-    print CHILD_SLOW_WTR "save1\n"		or die $!;
+    print CHILD_SLOW_WTR "save1\n"              or die $!;
 
     select( undef, undef, undef, QUICK_DELAY );
 
-    print CHILD_QUICK_WTR "read1\n"		or die $!;
-    $in = fd_retrieve(\*CHILD_QUICK_RDR)	or die "fd_retrieve";
+    print CHILD_QUICK_WTR "read1\n"             or die $!;
+    $in = fd_retrieve(\*CHILD_QUICK_RDR)        or die "fd_retrieve";
 
     ok( $in->{time2} - $in->{time1} < 0.1, 'time of read1' );
     ok( ! defined($in->{value}), 'value of read1' );
 
     $in = fd_retrieve(\*CHILD_SLOW_RDR);
 
-    ok(	abs( DELAY * 2 - $in->{time2} + $in->{time1} ) < 0.1, 'time of save1' );
-    ok(	defined($in->{value}), 'value of save1 defined' );
+    ok( abs( DELAY * 2 - $in->{time2} + $in->{time1} ) < 0.1, 'time of save1' );
+    ok( defined($in->{value}), 'value of save1 defined' );
     is_deeply( $in->{value}, [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ], 'value of save1' );
 
-    print CHILD_SLOW_WTR "save2\n"		or die $!;
+    print CHILD_SLOW_WTR "save2\n"              or die $!;
 
     select( undef, undef, undef, QUICK_DELAY );
 
-    print CHILD_QUICK_WTR "read1\n"		or die $!;
-    $in = fd_retrieve(\*CHILD_QUICK_RDR)	or die "fd_retrieve";
+    print CHILD_QUICK_WTR "read1\n"             or die $!;
+    $in = fd_retrieve(\*CHILD_QUICK_RDR)        or die "fd_retrieve";
 
     ok( $in->{time2} - $in->{time1} < 0.1, 'time of read1(2)' );
     is_deeply( $in->{value}, [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ], 'value of save2 before' );
 
     $in = fd_retrieve(\*CHILD_SLOW_RDR);
 
-    ok(	abs( DELAY * 2 - $in->{time2} + $in->{time1} ) < 0.1, 'time of save2' );
-    ok(	defined($in->{value}), 'value of save2 defined' );
+    ok( abs( DELAY * 2 - $in->{time2} + $in->{time1} ) < 0.1, 'time of save2' );
+    ok( defined($in->{value}), 'value of save2 defined' );
     is_deeply( $in->{value}, [ 101, 102, 103, 104, 105, 106, 107, 108, 109, 110 ], 'value of save2' );
 
-    print CHILD_QUICK_WTR "read1\n"		or die $!;
-    $in = fd_retrieve(\*CHILD_QUICK_RDR)	or die "fd_retrieve";
+    print CHILD_QUICK_WTR "read1\n"             or die $!;
+    $in = fd_retrieve(\*CHILD_QUICK_RDR)        or die "fd_retrieve";
 
     ok( $in->{time2} - $in->{time1} < 0.1, 'time of read1(3)' );
     is_deeply( $in->{value}, [ 101, 102, 103, 104, 105, 106, 107, 108, 109, 110 ], 'value of save2 after' );
 
-    print CHILD_SLOW_WTR "exit\n"		or die $!;
-    print CHILD_QUICK_WTR "exit\n"		or die $!;
+    print CHILD_SLOW_WTR "exit\n"               or die $!;
+    print CHILD_QUICK_WTR "exit\n"              or die $!;
 
     $SIG{__DIE__}->();
 }
@@ -146,11 +146,11 @@ sub run_slow_process {
     my $line;
 
     my $cascade = CHI::Cascade->new(
-	chi => CHI->new(
-	    driver		=> 'Memcached::Fast',
-	    servers		=> [$socket_file],
-	    namespace		=> 'CHI::Cascade::tests'
-	)
+        chi => CHI->new(
+            driver              => 'Memcached::Fast',
+            servers             => [$socket_file],
+            namespace           => 'CHI::Cascade::tests'
+        )
     );
 
     set_cascade_rules($cascade, DELAY);
@@ -158,30 +158,30 @@ sub run_slow_process {
     my $out;
 
     while ($line = <PARENT_SLOW_RDR>) {
-	chomp $line;
+        chomp $line;
 
-	if ($line eq 'save1') {
-	    $out = {};
+        if ($line eq 'save1') {
+            $out = {};
 
-	    $out->{time1} = time;
-	    $out->{value} = $cascade->run('one_page_0');
-	    $out->{time2} = time;
-	    store_fd $out, \*PARENT_SLOW_WTR;
-	}
-	elsif ($line eq 'save2') {
-	    $out = {};
+            $out->{time1} = time;
+            $out->{value} = $cascade->run('one_page_0');
+            $out->{time2} = time;
+            store_fd $out, \*PARENT_SLOW_WTR;
+        }
+        elsif ($line eq 'save2') {
+            $out = {};
 
-	    $big_array_type = 1;
-	    $cascade->touch('big_array_trigger');
+            $big_array_type = 1;
+            $cascade->touch('big_array_trigger');
 
-	    $out->{time1} = time;
-	    $out->{value} = $cascade->run('one_page_0');
-	    $out->{time2} = time;
-	    store_fd $out, \*PARENT_SLOW_WTR;
-	}
-	elsif ($line eq 'exit') {
-	    exit 0;
-	}
+            $out->{time1} = time;
+            $out->{value} = $cascade->run('one_page_0');
+            $out->{time2} = time;
+            store_fd $out, \*PARENT_SLOW_WTR;
+        }
+        elsif ($line eq 'exit') {
+            exit 0;
+        }
     }
 }
 
@@ -189,11 +189,11 @@ sub run_quick_process {
     my $line;
 
     my $cascade = CHI::Cascade->new(
-	chi => CHI->new(
-	    driver		=> 'Memcached::Fast',
-	    servers		=> [$socket_file],
-	    namespace		=> 'CHI::Cascade::tests'
-	)
+        chi => CHI->new(
+            driver              => 'Memcached::Fast',
+            servers             => [$socket_file],
+            namespace           => 'CHI::Cascade::tests'
+        )
     );
 
     set_cascade_rules($cascade, 0);
@@ -201,19 +201,19 @@ sub run_quick_process {
     my $out;
 
     while ($line = <PARENT_QUICK_RDR>) {
-	chomp $line;
+        chomp $line;
 
-	if ($line eq 'read1') {
-	    $out = {};
+        if ($line eq 'read1') {
+            $out = {};
 
-	    $out->{time1} = time;
-	    $out->{value} = $cascade->run('one_page_0');
-	    $out->{time2} = time;
-	    store_fd $out, \*PARENT_QUICK_WTR;
-	}
-	elsif ($line eq 'exit') {
-	    exit 0;
-	}
+            $out->{time1} = time;
+            $out->{value} = $cascade->run('one_page_0');
+            $out->{time2} = time;
+            store_fd $out, \*PARENT_QUICK_WTR;
+        }
+        elsif ($line eq 'exit') {
+            exit 0;
+        }
     }
 }
 
@@ -255,36 +255,36 @@ sub set_cascade_rules {
     my ($cascade, $delay) = @_;
 
     $cascade->rule(
-	target		=> 'big_array_trigger',
-	code		=> sub {
-	    return [];
-	}
+        target          => 'big_array_trigger',
+        code            => sub {
+            return [];
+        }
     );
 
     $cascade->rule(
-	target		=> 'big_array',
-	depends		=> 'big_array_trigger',
-	code		=> sub {
-	    select( undef, undef, undef, $delay )
-	      if ($delay);
+        target          => 'big_array',
+        depends         => 'big_array_trigger',
+        code            => sub {
+            select( undef, undef, undef, $delay )
+              if ($delay);
 
-	    return $big_array_type ? [ 101 .. 1000 ] : [ 1 .. 1000 ];
-	}
+            return $big_array_type ? [ 101 .. 1000 ] : [ 1 .. 1000 ];
+        }
     );
 
     $cascade->rule(
-	target		=> qr/^one_page_(\d+)$/,
-	depends		=> 'big_array',
-	code		=> sub {
-	    my ($rule, $target, $values) = @_;
+        target          => qr/^one_page_(\d+)$/,
+        depends         => 'big_array',
+        code            => sub {
+            my ($rule, $target, $values) = @_;
 
-	    my ($page) = $target =~ /^one_page_(\d+)$/;
+            my ($page) = $target =~ /^one_page_(\d+)$/;
 
-	    select( undef, undef, undef, $delay )
-	      if ($delay);
+            select( undef, undef, undef, $delay )
+              if ($delay);
 
-	    my $ret = [ @{$values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
-	    $ret;
-	}
+            my $ret = [ @{$values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
+            $ret;
+        }
     );
 }

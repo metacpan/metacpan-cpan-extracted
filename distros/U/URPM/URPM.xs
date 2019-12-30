@@ -999,6 +999,8 @@ open_archive(char *filename, int *empty_archive) {
            rfd = Fdopen(rfd, "r.bzip2");
       else if (strcmp(buf.uncompress, "xz") || strcmp(buf.uncompress, "lzma"))
            rfd = Fdopen(rfd, "r.xz");
+      else if (strcmp(buf.uncompress, "zstd"))
+           rfd = Fdopen(rfd, "r.zstd");
       else {
            free(rfd);
            rfd = NULL;
@@ -2896,6 +2898,10 @@ Urpm_parse_synthesis__XS(urpm, filename, ...)
       case COMPRESSED_LZMA:
       case COMPRESSED_XZ:
         t = "r.xz"; break;
+#ifdef RPM4_14_0
+      case COMPRESSED_ZSTD:
+        t = "r.zstd"; break;
+#endif
       case COMPRESSED_OTHER:
       default:
         t = "r.gzip"; break;

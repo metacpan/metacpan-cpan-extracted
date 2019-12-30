@@ -4,9 +4,24 @@ use strict;
 use warnings;
 # perl_checker: require URPM
 
-#- parse from rpmlib db.
-#-
-#- side-effects: $urpm
+=head1 NAME
+
+URPM::Signature - Pubkey routines for URPM/urpmi
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=over
+
+=cut
+
+=item parse_pubkeys($urpm, %options)
+
+Parse from rpmlib db ("gpg-pubkey")
+
+=cut
+
 sub parse_pubkeys {
     my ($urpm, %options) = @_;
 
@@ -64,7 +79,18 @@ sub import_needed_pubkeys() {
     return;
 }
 
-#- import pubkeys only if it is needed.
+=item import_needed_pubkeys_from_file($db, $pubkey_file, $o_callback)
+
+Import pubkeys from file, but only if it is needed.
+Returns the return value of the optionnal callback.
+
+The optional callback enables to handle success or error.
+
+The callback signature is callback($id, $imported), aka the ID of the key and
+whether it was imported or not.
+
+=cut
+
 sub import_needed_pubkeys_from_file {
     my ($db, $pubkey_file, $o_callback) = @_;
 
@@ -85,3 +111,7 @@ sub import_needed_pubkeys_from_file {
 }
 
 1;
+
+__END__
+
+=back

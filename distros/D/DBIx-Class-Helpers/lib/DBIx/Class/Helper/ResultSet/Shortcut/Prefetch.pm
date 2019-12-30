@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Shortcut::Prefetch;
-$DBIx::Class::Helper::ResultSet::Shortcut::Prefetch::VERSION = '2.034001';
+$DBIx::Class::Helper::ResultSet::Shortcut::Prefetch::VERSION = '2.034002';
 use strict;
 use warnings;
 

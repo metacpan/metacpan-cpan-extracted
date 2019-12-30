@@ -1,3 +1,7 @@
+0.03
+    - Switch to List::MoreUtils as uniq is only in recent versions of
+      List::Util.
+
 0.02
     - Make proper release.
 

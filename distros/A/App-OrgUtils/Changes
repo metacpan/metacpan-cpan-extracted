@@ -1,11 +1,18 @@
-0.470   2018-06-30 (PERLANCAR)
+0.471   2019-12-30  Released-By: PERLANCAR
+
+	- Add utility: dump-org-structure-tiny.
+
+        - Simplify many scripts by turning off config/env reading.
+
+
+0.470   2018-06-30  Released-By: PERLANCAR
 
 	- org2html: Add --browser option.
 
         - Add utility: browse-org.
 
 
-0.46    2017-07-10 (PERLANCAR)
+0.46    2017-07-10  Released-By: PERLANCAR
 
 	- Fix Rinci metadata: Used wrong attribute summary.alt.bool.neg
 	  instead of summary.alt.bool.not.
@@ -13,30 +20,30 @@
 	- Replace Log::Any with Log::ger.
 
 
-0.45    2016-12-24 (PERLANCAR)
+0.45    2016-12-24  Released-By: PERLANCAR
 
 	- Add scripts: org-to-html (moved from Org-To-HTML),
 	  org-to-html-wordpress (moved from Org-To-HTML-WordPress dists),
 	  org2html, org2html-wp.
 
 
-0.44    2016-11-06 (PERLANCAR)
+0.44    2016-11-06  Released-By: PERLANCAR
 
 	- dump-org-structure: Add option: --ignore-unknown-settings.
 
 
-0.43    2016-07-14 (PERLANCAR)
+0.43    2016-07-14  Released-By: PERLANCAR
 
 	- Add utility: move-done-todos.
 
 
-0.42    2016-04-30 (PERLANCAR)
+0.42    2016-04-30  Released-By: PERLANCAR
 
 	- ListOrgHeadlines: add option 'allow_duplicates' and default it to
 	  off.
 
 
-0.41    2016-04-01 (PERLANCAR)
+0.41    2016-04-01  Released-By: PERLANCAR
 
         - [Removed] select-org-elements is renamed to 'orgsel' and spun off to
           its own distro (App-orgsel).
@@ -48,7 +55,7 @@
           PERL_ORG_PARSER_CACHE=0.
 
 
-0.40    2016-03-24 (PERLANCAR)
+0.40    2016-03-24  Released-By: PERLANCAR
 
 	- stat-org-document: Report number of objects at each level, tree
 	  depth.
@@ -56,41 +63,41 @@
 	- Add logging (time select).
 
 
-0.39    2016-03-24 (PERLANCAR)
+0.39    2016-03-24  Released-By: PERLANCAR
 
         - select-org-elements: more tweaks (add --version, add shortcut options
           -c and -p for `--count` and `--print` respectively, fix newline
           behavior when printing matching elements).
 
 
-0.38    2016-03-24 (PERLANCAR)
+0.38    2016-03-24  Released-By: PERLANCAR
 
         - select-org-elements: add --count option, documentation, fixes.
 
 
-0.37    2016-03-23 (PERLANCAR)
+0.37    2016-03-23  Released-By: PERLANCAR
 
         - Add script: select-org-elements.
 
 
-0.36    2016-03-23 (PERLANCAR)
+0.36    2016-03-23  Released-By: PERLANCAR
 
         - Add script: stat-org-document.
 
 
-0.35    2016-01-18 (PERLANCAR)
+0.35    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.34    2015-12-25 (PERLANCAR)
+0.34    2015-12-25  Released-By: PERLANCAR
 
 	- Add option has_tags and lacks_tags for *-fast scripts.
 
 
-0.33    2015-09-03 (PERLANCAR)
+0.33    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -99,14 +106,14 @@
 	  requirement.
 
 
-0.32    2015-08-17 (PERLANCAR)
+0.32    2015-08-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.31    2015-05-02 (PERLANCAR)
+0.31    2015-05-02  Released-By: PERLANCAR
 
 	- Add utils: list-org-headlines-fast, list-org-todos-fast,
 	  count-org-headlines-fast, count-org-todos-fast.
@@ -116,12 +123,12 @@
 	- [doc] Include list of scripts in Description.
 
 
-0.30    2015-04-03 (PERLANCAR)
+0.30    2015-04-03  Released-By: PERLANCAR
 
 	- [ux] Add x.schema.entity hint for timezone argument.
 
 
-0.29    2015-04-02 (PERLANCAR)
+0.29    2015-04-02  Released-By: PERLANCAR
 
 	- [Incompatible change] Rename back 'file' argument to 'files' as
 	  they are more suitable as function argument, and anyway CLI
@@ -129,7 +136,7 @@
 	  Perinci::Sub::GetArgs::Argv.
 
 
-0.28    2015-04-01 (PERLANCAR)
+0.28    2015-04-01  Released-By: PERLANCAR
 
 	- Add scripts: list-org-priorities, list-org-tags,
 	  list-org-todo-states.
@@ -139,12 +146,12 @@
           --files another').
 
 
-0.27    2015-03-30 (PERLANCAR)
+0.27    2015-03-30  Released-By: PERLANCAR
 
 	- [ux] Add completion for tags, states, priorities.
 
 
-0.26    2015-03-28 (PERLANCAR)
+0.26    2015-03-28  Released-By: PERLANCAR
 
 	- [Bugfix] Fix calculating delta days, don't use manual epoch
 	  arithmetics because that will expose previous bug of timezone
@@ -155,24 +162,24 @@
 	  86400 even though date differs by 1 day.
 
 
-0.25    2015-03-15 (PERLANCAR)
+0.25    2015-03-15  Released-By: PERLANCAR
 
 	- Add options --minimum-priority, --maximum-priority,
 	  --with-unknown-priority to list-org-todos.
 
 
-0.24    2015-03-10 (PERLANCAR)
+0.24    2015-03-10  Released-By: PERLANCAR
 
 	- Change result metadata 'result_format_options' ->
 	  'cmdline.format_options'.
 
 
-0.23     2015-01-03 (PERLANCAR)
+0.23     2015-01-03  Released-By: PERLANCAR
 
          - Add utility: filter-org-by-headlines.
 
 
-0.22     2014-07-22 (SHARYANTO)
+0.22     2014-07-22  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -180,37 +187,37 @@
            Perinci::CmdLine::Any to reduce size of dependencies.
 
 
-0.21    2014-03-08 (SHARYANTO)
+0.21    2014-03-08  Released-By: SHARYANTO
 
 	- No functional changes. Rebuild with DZP::Rinci::Wrap to test embedding
           wrapper code.
 
 
-0.20    2013-11-20 (SHARYANTO)
+0.20    2013-11-20  Released-By: SHARYANTO
 
 	- No functional changes. Adjustment to newer perls (e.g. 'use
           experimental smartmatch', some warnings).
 
 
-0.19    2013-11-12 (SHARYANTO)
+0.19    2013-11-12  Released-By: SHARYANTO
 
 	- No functional changes. Rebuild to fix t/00-compile.t generated by
 	  older DZP::Test::Compile (2.019 < x < 2.033).
 
 
-0.18    2013-09-23 (SHARYANTO)
+0.18    2013-09-23  Released-By: SHARYANTO
 
         - Fix examples in Synopsis.
 
         - Show day of week name after X days ago/again.
 
 
-0.17    2013-05-09 (SHARYANTO)
+0.17    2013-05-09  Released-By: SHARYANTO
 
         - Add scripts: count-{org,undone-org,done-org}-todos
 
 
-0.16    2013-01-09 (SHARYANTO)
+0.16    2013-01-09  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -219,12 +226,12 @@
           example, won't show up too early.
 
 
-0.15    2012-07-25 (SHARYANTO)
+0.15    2012-07-25  Released-By: SHARYANTO
 
         - Fix outputing Unicode text when format=text [RT #78490].
 
 
-0.14    2012-07-22 (SHARYANTO)
+0.14    2012-07-22  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -235,12 +242,12 @@
           directory.
 
 
-0.13    2012-06-13 (SHARYANTO)
+0.13    2012-06-13  Released-By: SHARYANTO
 
         No functional changes. Properly name the POD of scripts [RT#77794].
 
 
-0.12    2012-05-30 (SHARYANTO)
+0.12    2012-05-30  Released-By: SHARYANTO
 
         [INCOMPATIBLE CHANGES]
 
@@ -252,20 +259,20 @@
         - Add 'group_by_tags' option.
 
 
-0.11    2012-03-02 (SHARYANTO)
+0.11    2012-03-02  Released-By: SHARYANTO
 
         - No functional changes. Replace Sub::Spec::CmdLine with
           Perinci::CmdLine.
 
 
-0.10    2012-02-14 (SHARYANTO)
+0.10    2012-02-14  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - Add 'sort' argument.
 
 
-0.09    2011-11-11 (SHARYANTO)
+0.09    2011-11-11  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -273,46 +280,46 @@
           a default (UTC) when $ENV{TZ} is not set.
 
 
-0.08    2011-11-10 (SHARYANTO)
+0.08    2011-11-10  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - By default don't show done todos.
 
 
-0.07    2011-09-23 (SHARYANTO)
+0.07    2011-09-23  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - Support time zones.
 
 
-0.06    2011-09-23 (SHARYANTO)
+0.06    2011-09-23  Released-By: SHARYANTO
 
         - Fix bug related to time zone.
 
 
-0.05    2011-06-30 (SHARYANTO)
+0.05    2011-06-30  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - list-org-todos: now obeys warning period in timestamps.
 
 
-0.04    2011-06-15 (SHARYANTO)
+0.04    2011-06-15  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - dump-org-structure: fix utf8 reading.
 
 
-0.03    2011-06-09 (SHARYANTO)
+0.03    2011-06-09  Released-By: SHARYANTO
 
         - No functional changes. Fixes in POD and packaging, add sample outputs
           in Synopsis.
 
 
-0.02    2011-06-09 (SHARYANTO)
+0.02    2011-06-09  Released-By: SHARYANTO
 
         - Rename distribution from App-ListOrgHeadlines to App-OrgUtils.
 
@@ -321,6 +328,6 @@
         - Add scripts: list-org-anniversaries.
 
 
-0.01    2011-06-06 (SHARYANTO)
+0.01    2011-06-06  Released-By: SHARYANTO
 
         - First release, spun off from Org::Parser's sample script.

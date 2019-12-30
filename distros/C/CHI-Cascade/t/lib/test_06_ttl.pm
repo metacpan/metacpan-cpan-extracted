@@ -5,7 +5,7 @@ use Test::More;
 use CHI::Cascade::Value ':state';
 
 use parent 'Exporter';
-use Time::HiRes	qw(time);
+use Time::HiRes qw(time);
 
 our @EXPORT = qw(test_cascade);
 
@@ -15,30 +15,30 @@ sub test_cascade {
     my $cascade = shift;
 
     $cascade->rule(
-	target		=> 'reset',
-	code		=> sub { 1 }
+        target          => 'reset',
+        code            => sub { 1 }
     );
 
     $cascade->rule(
-	target		=> 'big_array',
-	depends		=> 'reset',
-	ttl		=> [ 1, 2 ],
-	code		=> sub {
-	    return [ 1 .. 1000 ];
-	}
+        target          => 'big_array',
+        depends         => 'reset',
+        ttl             => [ 1, 2 ],
+        code            => sub {
+            return [ 1 .. 1000 ];
+        }
     );
 
     $cascade->rule(
-	target		=> qr/^one_page_(\d+)$/,
-	depends		=> 'big_array',
-	code		=> sub {
-	    my ($rule) = @_;
+        target          => qr/^one_page_(\d+)$/,
+        depends         => 'big_array',
+        code            => sub {
+            my ($rule) = @_;
 
-	    my ($page) = $rule->target =~ /^one_page_(\d+)$/;
+            my ($page) = $rule->target =~ /^one_page_(\d+)$/;
 
-	    my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
-	    $ret;
-	}
+            my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
+            $ret;
+        }
     );
 
     my ( $res, $state, $ttl );

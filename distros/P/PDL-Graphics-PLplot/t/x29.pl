@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-
 #  Sample plots using date / time formatting for axes
 #
 #  Copyright (C) 2007 Andrew Ross
@@ -36,6 +34,8 @@
 # 
 #--------------------------------------------------------------------------
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Time::Local;
@@ -155,7 +155,7 @@ sub plot2 {
 
 # Return a 1D PDL consisting of the minimum of each pairwise
 # element of the two input 1D PDLs
-sub minover { return cat($_[0], $_[1])->xchg(0,1)->minimum }
+sub my_minover { return cat($_[0], $_[1])->xchg(0,1)->minimum }
 
 sub plot3 {
 
@@ -172,7 +172,7 @@ sub plot3 {
     
     my $i = sequence($npts);
     my $x = $xmin + $i*60.0*60.0*24.0;
-    my $y = 1.0 + sin( 2*PI*$i / 7 ) + exp( (minover($i,$npts-$i)) / 31.0);
+    my $y = 1.0 + sin( 2*PI*$i / 7 ) + exp( (my_minover($i,$npts-$i)) / 31.0);
 
     pladv(0);
 
@@ -202,25 +202,52 @@ sub plot3 {
 sub plot4 {
 
     # TAI-UTC (seconds) as a function of time.
-    # Use Besselian epochs as the continuous time interval just to prove
-    # this does not introduce any issues.
 
-    # Use the definition given in http://en.wikipedia.org/wiki/Besselian_epoch
-    # B = 1900. + (JD -2415020.31352)/365.242198781
-    # ==> (as calculated with aid of "bc -l" command)
-    # B = (MJD + 678940.364163900)/365.242198781
-    # ==>
-    # MJD = B*365.24219878 - 678940.364163900
+    # Continuous time unit is Besselian years from whatever epoch is
+    # chosen below.  Could change to seconds (or days) from the
+    # epoch, but then would have to adjust xlabel_step below.
     my $scale   = 365.242198781;
-    my $offset1 = -678940.;
-    my $offset2 = -0.3641639;
-    plconfigtime($scale, $offset1, $offset2, 0x0, 0, 0, 0, 0, 0, 0, 0);
+    # MJD epoch (see <https://en.wikipedia.org/wiki/Julian_day>).
+    # This is only set for illustrative purposes, and is overwritten
+    # below for the time-representation reasons given in the
+    # discussion below.
+    my $epoch_year  = 1858;
+    my $epoch_month = 11;
+    my $epoch_day   = 17;
+    my $epoch_hour  = 0;
+    my $epoch_min   = 0;
+    my $epoch_sec   = 0.;
+    # To illustrate the time-representation issues of using the MJD
+    # epoch, in 1985, MJD was roughly 46000 days which corresponds to
+    # 4e9 seconds.  Thus, for the -DPL_DOUBLE=ON case where PLFLT is
+    # a double which can represent continuous time to roughly 16
+    # decimal digits of precision the time-representation error is
+    # roughly ~400 nanoseconds.  Therefore the MJD epoch would be
+    # acceptable for the plots below in the -DPL_DOUBLE=ON case.
+    # However, that epoch is obviously not acceptable for the
+    # -DPL_DOUBLE=OFF case where PLFLT is a float which can represent
+    # continuous time to only ~7 decimal digits of precision
+    # corresponding to a time representation error of 400 seconds (!)
+    # in 1985.  For this reason, we do not use the MJD epoch below
+    # and instead choose the best epoch for each case to minimize
+    # time-representation issues.
 
+    my $npts;
     my ($xmin, $xmax);
+    my ($ymin, $ymax, $time_format, $if_TAI_time_format, $title_suffix);
+    my ($xtitle, $xlabel_step);
     for ( my $kind = 0; $kind < 7; $kind++ )
     {
         if ( $kind == 0 )
         {
+            # Choose midpoint to maximize time-representation precision.
+            $epoch_year  = 1985;
+            $epoch_month = 0;
+            $epoch_day   = 2;
+            $epoch_hour  = 0;
+            $epoch_min   = 0;
+            $epoch_sec   = 0.;
+            plconfigtime( $scale, 0., 0., 0x0, 1, $epoch_year, $epoch_month, $epoch_day, $epoch_hour, $epoch_min, $epoch_sec );
             $xmin = plctime(1950, 0, 2, 0, 0, 0);
             $xmax = plctime(2020, 0, 2, 0, 0, 0);
             $npts = 70 * 12 + 1;
@@ -234,6 +261,14 @@ sub plot4 {
         }
         elsif ( $kind == 1 || $kind == 2 )
         {
+            # Choose midpoint to maximize time-representation precision.
+            $epoch_year  = 1961;
+            $epoch_month = 7;
+            $epoch_day   = 1;
+            $epoch_hour  = 0;
+            $epoch_min   = 0;
+            $epoch_sec   = 1.64757;
+            plconfigtime( $scale, 0., 0., 0x0, 1, $epoch_year, $epoch_month, $epoch_day, $epoch_hour, $epoch_min, $epoch_sec );
             $xmin = plctime(1961, 7, 1, 0, 0, 1.64757 - .20);
             $xmax = plctime( 1961, 7, 1, 0, 0, 1.64757 + .20);
             $npts = 1001;
@@ -255,6 +290,14 @@ sub plot4 {
         }
         elsif ( $kind == 3 || $kind == 4 )
         {
+            # Choose midpoint to maximize time-representation precision.
+            $epoch_year  = 1963;
+            $epoch_month = 10;
+            $epoch_day   = 1;
+            $epoch_hour  = 0;
+            $epoch_min   = 0;
+            $epoch_sec   = 2.6972788;
+            plconfigtime( $scale, 0., 0., 0x0, 1, $epoch_year, $epoch_month, $epoch_day, $epoch_hour, $epoch_min, $epoch_sec );
             $xmin = plctime(1963, 10, 1, 0, 0, 2.6972788 - .20);
             $xmax = plctime(1963, 10, 1, 0, 0, 2.6972788 + .20);
             $npts = 1001;
@@ -276,6 +319,14 @@ sub plot4 {
         }
         elsif ( $kind == 5 || $kind == 6 )
         {
+          # Choose midpoint to maximize time-representation precision.
+          $epoch_year  = 2009;
+          $epoch_month = 0;
+          $epoch_day   = 1;
+          $epoch_hour  = 0;
+          $epoch_min   = 0;
+          $epoch_sec   = 34.;
+          plconfigtime( $scale, 0., 0., 0x0, 1, $epoch_year, $epoch_month, $epoch_day, $epoch_hour, $epoch_min, $epoch_sec );
 	  $xmin = plctime(2009, 0, 1, 0, 0, 34. - 5);
           $xmax = plctime(2009, 0, 1, 0, 0, 34. + 5);
           $npts = 1001;
@@ -297,16 +348,23 @@ sub plot4 {
         }
 
         my (@x, @y);
-        for ( $i = 0; $i < $npts; $i++ )
+        for ( my $i = 0; $i < $npts; $i++ )
         {
 	  $x[$i] = $xmin + $i * ( $xmax - $xmin ) / ( $npts - 1 );
-          plconfigtime( $scale, $offset1, $offset2, 0x0, 0, 0, 0, 0, 0, 0, 0 );
-          $tai = $x[$i];
-          ($tai_year, $tai_month, $tai_day, $tai_hour, $tai_min, $tai_sec) = plbtime($tai);
-          plconfigtime( $scale, $offset1, $offset2, 0x2, 0, 0, 0, 0, 0, 0, 0 );
-          ($utc_year, $utc_month, $utc_day, $utc_hour, $utc_min, $utc_sec) = plbtime($tai);
-          plconfigtime( $scale, $offset1, $offset2, 0x0, 0, 0, 0, 0, 0, 0, 0 );
-          $utc = plctime($utc_year, $utc_month, $utc_day, $utc_hour, $utc_min, $utc_sec);
+          my $tai = $x[$i];
+          plconfigtime( $scale, 0., 0., 0x0, 1, $epoch_year, $epoch_month, $epoch_day, $epoch_hour, $epoch_min, $epoch_sec );
+          my ($tai_year, $tai_month, $tai_day, $tai_hour, $tai_min, $tai_sec) = plbtime($tai);
+          # Calculate residual using tai as the epoch to nearly maximize time-representation precision.
+          plconfigtime( $scale, 0., 0., 0x0, 1, $tai_year, $tai_month, $tai_day, $tai_hour, $tai_min, $tai_sec );
+          # Calculate continuous tai with new epoch.
+          $tai = plctime( $tai_year, $tai_month, $tai_day, $tai_hour, $tai_min, $tai_sec );
+          # Calculate broken-down utc (with leap seconds inserted) from continuous tai with new epoch.
+          plconfigtime( $scale, 0., 0., 0x2, 1, $tai_year, $tai_month, $tai_day, $tai_hour, $tai_min, $tai_sec );
+          my ($utc_year, $utc_month, $utc_day, $utc_hour, $utc_min, $utc_sec) = plbtime($tai);
+          # Calculate continuous utc from broken-down utc using same epoch as for the continuous tai.
+          plconfigtime( $scale, 0., 0., 0x0, 1, $tai_year, $tai_month, $tai_day, $tai_hour, $tai_min, $tai_sec );
+          my $utc = plctime($utc_year, $utc_month, $utc_day, $utc_hour, $utc_min, $utc_sec);
+          # Convert residuals to seconds.
           $y[$i] = ( $tai - $utc ) * $scale * 86400;
         }
 
@@ -315,14 +373,14 @@ sub plot4 {
         plwind( $xmin, $xmax, $ymin, $ymax );
         plcol0( 1 );
         if ( $if_TAI_time_format ) {
-            plconfigtime( $scale, $offset1, $offset2, 0x0, 0, 0, 0, 0, 0, 0, 0 );
+            plconfigtime( $scale, 0., 0., 0x0, 1, $epoch_year, $epoch_month, $epoch_day, $epoch_hour, $epoch_min, $epoch_sec );
         } else {
-            plconfigtime( $scale, $offset1, $offset2, 0x2, 0, 0, 0, 0, 0, 0, 0 );
+            plconfigtime( $scale, 0., 0., 0x2, 1, $epoch_year, $epoch_month, $epoch_day, $epoch_hour, $epoch_min, $epoch_sec );
         }
         pltimefmt( $time_format );
         plbox( $xlabel_step, 0, 0, 0, "bcnstd",  "bcnstv" );
         plcol0( 3 );
-        $title  = '@frPLplot Example 29 - TAI-UTC ';
+        my $title  = '@frPLplot Example 29 - TAI-UTC ';
         $title .= $title_suffix;
         pllab( $xtitle, "TAI-UTC (sec)", $title );
 

@@ -1,4 +1,12 @@
 
+8.29  2019-12-28
+  - Improved async/await support to work in many more cases, such as WebSocket
+    handlers.
+
+8.28  2019-12-26
+  - Added EXPERIMENTAL support for async/await (with -async Mojo::Base flag).
+  - Added EXPERIMENTAL all_settled and any methods to Mojo::Promise.
+
 8.27  2019-12-04
   - Added EXPERIMENTAL before_command hook.
   - Added EXPERIMENTAL scope_guard function to Mojo::Util.

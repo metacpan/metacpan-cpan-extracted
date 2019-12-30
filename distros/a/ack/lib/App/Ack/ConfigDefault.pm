@@ -128,6 +128,15 @@ sub _options_block {
 # https://www.haskell.org/cabal/users-guide/installing-packages.html
 --ignore-directory=is:.cabal-sandbox
 
+# Python caches
+# https://docs.python.org/3/tutorial/modules.html
+--ignore-directory=is:__pycache__
+--ignore-directory=is:.pytest_cache
+
+# macOS Finder remnants
+--ignore-directory=is:__MACOSX
+--ignore-file=is:.DS_Store
+
 ### Files to ignore
 
 # Backup files
@@ -137,11 +146,11 @@ sub _options_block {
 # Emacs swap files
 --ignore-file=match:/^#.+#$/
 
-# vi/vim swap files http://vim.org/
---ignore-file=match:/[._].*\.swp$/
+# vi/vim swap files https://www.vim.org/
+--ignore-file=match:/[._].*[.]swp$/
 
 # core dumps
---ignore-file=match:/core\.\d+$/
+--ignore-file=match:/core[.]\d+$/
 
 # minified Javascript
 --ignore-file=match:/[.-]min[.]js$/
@@ -164,6 +173,14 @@ sub _options_block {
 # Common archives, as an optimization
 --ignore-file=ext:gz,tar,tgz,zip
 
+# Python compiles modules
+--ignore-file=ext:pyc,pyd,pyo
+
+# C extensions
+--ignore-file=ext:so
+
+# Compiled gettext files
+--ignore-file=ext:mo
 
 ### Filetypes defined
 
@@ -276,7 +293,7 @@ sub _options_block {
 --type-add=gsp:ext:gsp
 
 # Haskell
-# http://www.haskell.org/
+# https://www.haskell.org/
 --type-add=haskell:ext:hs,lhs
 
 # HTML
@@ -340,7 +357,7 @@ sub _options_block {
 --type-add=ocaml:ext:ml,mli,mll,mly
 
 # Perl
-# http://perl.org/
+# https://perl.org/
 --type-add=perl:ext:pl,pm,pod,t,psgi
 --type-add=perl:firstlinematch:/^#!.*\bperl/
 
@@ -369,7 +386,7 @@ sub _options_block {
 --type-add=rr:ext:R
 
 # reStructured Text
-# http://docutils.sourceforge.net/rst.html
+# https://docutils.sourceforge.io/rst.html
 --type-add=rst:ext:rst
 
 # Ruby

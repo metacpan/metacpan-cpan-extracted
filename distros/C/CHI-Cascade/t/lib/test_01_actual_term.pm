@@ -16,34 +16,34 @@ sub test_cascade {
     isa_ok( $cascade, 'CHI::Cascade');
 
     $cascade->rule(
-	target		=> 'big_array',
-	code		=> sub {
-	    return [ 1 .. 1000 ];
-	},
-	recomputed	=> sub { $recomputed++ }
+        target          => 'big_array',
+        code            => sub {
+            return [ 1 .. 1000 ];
+        },
+        recomputed      => sub { $recomputed++ }
     );
 
     $cascade->rule(
-	target		=> qr/^one_page_(\d+)$/,
-	depends		=> 'big_array',
-	code		=> sub {
-	    my ($rule) = @_;
+        target          => qr/^one_page_(\d+)$/,
+        depends         => 'big_array',
+        code            => sub {
+            my ($rule) = @_;
 
-	    my ($page) = $rule->target =~ /^one_page_(\d+)$/;
+            my ($page) = $rule->target =~ /^one_page_(\d+)$/;
 
-	    my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
-	    $ret;
-	},
-	recomputed	=> sub { $recomputed++ }
+            my $ret = [ @{$rule->dep_values->{big_array}}[ ($page * 10) .. (( $page + 1 ) * 10 - 1) ] ];
+            $ret;
+        },
+        recomputed      => sub { $recomputed++ }
     );
 
     $cascade->rule(
-	target		=> 'actual_test',
-	actual_term	=> 2.0,
-	depends		=> 'one_page_0',
-	code		=> sub {
-	    $_[2]->{one_page_0}
-	}
+        target          => 'actual_test',
+        actual_term     => 2.0,
+        depends         => 'one_page_0',
+        code            => sub {
+            $_[2]->{one_page_0}
+        }
     );
 
     ok( $cascade->{stats}{recompute} == 0, 'recompute stats - 1');
@@ -57,7 +57,7 @@ sub test_cascade {
     is_deeply( $cascade->run('one_page_0'), [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ], '0th page from cache');
     cmp_ok( $cascade->{stats}{recompute}, '==', 3, 'recompute stats - 4');
 
-    sleep 1;
+    select( undef, undef, undef, 0.5 );
 
     # To force recalculate dependencied
     $cascade->touch('big_array');
@@ -95,7 +95,7 @@ sub test_cascade {
 
     ok( $cascade->{stats}{dependencies_lookup} == $dependencies_lookup );
 
-    select( undef, undef, undef, 2.2 );
+    select( undef, undef, undef, 2.5 );
 
     is_deeply( $cascade->run( 'one_page_0', state => \$state, actual_term => 2.0 ), [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ], '0th page from cache after touching');
     ok( $cascade->{stats}{recompute} == 7 );

@@ -33,7 +33,7 @@ package BigIP::GTM::ParseConfig;
 #----------------------------------------------------------------------------
 # Initialize the module
 #----------------------------------------------------------------------------
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 my $AUTOLOAD;
 
 use 5.012;
@@ -622,7 +622,7 @@ __END__
 Hide 9 lines of Pod
 =head1 NAME
  
-BigIP::LTM::ParseConfig - The great new BigIP::LTM::ParseConfig!
+BigIP::GTM::ParseConfig - The great new BigIP::LTM::ParseConfig!
  
 =head1 VERSION
  
@@ -632,10 +632,10 @@ Version 0.83
  
 Hide 218 lines of Pod
 =head1 SYNOPSIS
-  use BigIP::LTM::ParseConfig;
+  use BigIP::GTM::ParseConfig;
      
   # Module initialization
-  my $bip = new BigIP::LTM::ParseConfig( '/config/bigip.conf' );
+  my $bip = new BigIP::GTM::ParseConfig( '/config/bigip.conf' );
      
   # Iterate over pools
   foreach my $pool ( $bip->pools() ) {
@@ -662,8 +662,8 @@ Hide 218 lines of Pod
    
 =head1 DESCRIPTION
    
-BigIP::LTM::ParseConfig provides a Perl interface to reading, writing, and
-manipulating configuration files used on F5 (BigIP) LTM network devices.
+BigIP::GTM::ParseConfig provides a Perl interface to reading, writing, and
+manipulating configuration files used on F5 (BigIP) GTM network devices.
    
 This module is currently a work-in-progress.  Please e-mail with problems,
 bug fixes, comments and complaints.
@@ -674,14 +674,14 @@ bug fixes, comments and complaints.
    
 =item new ( FILE )
    
-Create a new B<BigIP::LTM::ParseConfig> object.
+Create a new B<BigIP::GTM::ParseConfig> object.
    
 C<FILE> refers to the bigip.conf configuration file, usually found at
 /config/bigip.conf.
    
 B<Example>
    
-  $bip = BigIP::LTM::ParseConfig->new( '/config/bigip.conf' );
+  $bip = BigIP::GTM::ParseConfig->new( '/config/bigip.conf' );
    
 =back
    
@@ -796,6 +796,7 @@ file, usually found at /config/bigip.conf.
 B<Example>
    
   $bip->write( '/config/bigip.conf.new' );
+=back
    
 =head1 AUTHOR
  
@@ -804,14 +805,14 @@ WENWU YAN, C<< <careline at 126.com> >>
 =head1 BUGS
  
 Please report any bugs or feature requests to C<bug-bigip-ltm-parseconfig at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=BigIP-LTM-ParseConfig>.  I will be notified, and then you'll
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=BigIP-GTM-ParseConfig>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
  
 =head1 SUPPORT
  
 You can find documentation for this module with the perldoc command.
  
-    perldoc BigIP::LTM::ParseConfig
+    perldoc BigIP::GTM::ParseConfig
  
 You can also look for information at:
  
@@ -819,19 +820,19 @@ You can also look for information at:
  
 =item * RT: CPAN's request tracker (report bugs here)
  
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=BigIP-LTM-ParseConfig>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=BigIP-GTM-ParseConfig>
  
 =item * AnnoCPAN: Annotated CPAN documentation
  
-L<http://annocpan.org/dist/BigIP-LTM-ParseConfig>
+L<http://annocpan.org/dist/BigIP-GTM-ParseConfig>
  
 =item * CPAN Ratings
  
-L<https://cpanratings.perl.org/d/BigIP-LTM-ParseConfig>
+L<https://cpanratings.perl.org/d/BigIP-GTM-ParseConfig>
  
 =item * Search CPAN
  
-L<https://metacpan.org/release/BigIP-LTM-ParseConfig>
+L<https://metacpan.org/release/BigIP-GTM-ParseConfig>
  
 =back
  

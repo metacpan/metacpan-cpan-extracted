@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 
@@ -30,14 +30,17 @@ sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
 }
+sub _make_graph {
+  my ($params) = @_;
+  my $graph_maker = delete($params->{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%$params);
+}
 
 sub init {
   my ($self, %params) = @_;
 
   my $N = delete($params{'N'}) || 0;
-  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
-
-  my $graph = $graph_maker->(%params);
+  my $graph = _make_graph(\%params);
   $graph->set_graph_attribute (name => "Olive Tree $N");
 
   my $directed = $graph->is_directed;

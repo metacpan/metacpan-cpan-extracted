@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.31'
   XS::Object::Magic: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,7 +24,7 @@ no_index:
     - t
     - inc
 requires:
-  Protocol::Redis: '0.9001'
+  Protocol::Redis: '1.0011'
   XS::Object::Magic: '0'
   XSLoader: '0'
   parent: '0'
@@ -33,7 +33,7 @@ resources:
   IRC: irc://irc.perl.org/#redis
   bugtracker: https://github.com/dgl/protocol-redis-xs/issues
   repository: https://github.com/dgl/protocol-redis-xs.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
   - 'Mike Magowan <mike@magowan.co.uk>'

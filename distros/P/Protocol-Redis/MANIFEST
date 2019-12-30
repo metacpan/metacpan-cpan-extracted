@@ -1,9 +1,9 @@
+benchmark.pl
 Changes
 lib/Protocol/Redis.pm
 lib/Protocol/Redis/Test.pm
 Makefile.PL
-MANIFEST			This list of files
-README
+MANIFEST
 t/redis.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

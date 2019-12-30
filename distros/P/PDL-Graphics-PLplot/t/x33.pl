@@ -1,4 +1,3 @@
-#! /usr/bin/env perl
 # -*- coding: utf-8; -*-
 #
 # $Id: x33.pl 11731 2011-04-30 02:53:48Z airwin $
@@ -32,6 +31,8 @@
 # course, you must have the appropriate TrueType fonts installed to
 # have access to all the required glyphs.
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Getopt::Long qw [:config pass_through];
@@ -124,6 +125,7 @@ my @colorbar_cap_option_labels = (
 
 my $colorbar = 0; # By default do not plot plcolorbar pages
                   # for now while we are working out the API.
+my $help;
 
 GetOptions ("colorbar" => \$colorbar,
             "help"   => \$help);
@@ -172,16 +174,16 @@ $line_styles[0]    = 1;
 $line_widths[0]    = 1;
 $symbol_scales[0]  = 1.;
 $symbol_numbers[0] = 4;
-$symbols[0]        = "*";
+$symbols[0]        = "#(728)";
 
 # Use monotype fonts so that all legends are the same size.
 plsfont( PL_FCI_MONO, -1, -1 );
 plscol0a( 15, 32, 32, 32, 0.70 );
 
-for ( $k = 0; $k < 16; $k++ )
+for ( my $k = 0; $k < 16; $k++ )
   {
-    $position = $position_options[$k];
-    $opt      = $opt_base;
+    my $position = $position_options[$k];
+    my $opt      = $opt_base;
     $text[0]  = sprintf( "%2.2d", $k );
     $text_colors[0]   = 1 + ( $k % 8 );
     $line_colors[0]   = 1 + ( $k % 8 );
@@ -210,7 +212,7 @@ $nlegend = 7;
 
 # Only specify legend data that are required according to the
 # value of opt_array for that entry.
-my $opt_base = PL_LEGEND_BACKGROUND | PL_LEGEND_BOUNDING_BOX;
+$opt_base = PL_LEGEND_BACKGROUND | PL_LEGEND_BOUNDING_BOX;
 for ( my $k = 0; $k < $nlegend; $k++ )
   {
     $opt_array[$k]    = PL_LEGEND_LINE | PL_LEGEND_SYMBOL;
@@ -218,7 +220,7 @@ for ( my $k = 0; $k < $nlegend; $k++ )
     $line_widths[$k]  = 1;
     $symbol_scales[$k] = 1.;
     $symbol_numbers[$k]= 2;
-    $symbols[$k]       = "*";
+    $symbols[$k]       = "#(728)";
     $text[$k] = sprintf("%2.2d", $k );
     $text_colors[$k]   = 1 + ( $k % 8 );
     $line_colors[$k]   = 1 + ( $k % 8 );
@@ -228,12 +230,12 @@ for ( my $k = 0; $k < $nlegend; $k++ )
 # Use monotype fonts so that all legends are the same size.
 plsfont( PL_FCI_MONO, -1, -1 );
 plscol0a( 15, 32, 32, 32, 0.70 );
-$position = PL_POSITION_TOP | PL_POSITION_OUTSIDE;
-$opt      = $opt_base;
-$x        = 0.;
-$y        = 0.1;
-$nrow     = 1;
-$ncolumn  = $nlegend;
+my $position = PL_POSITION_TOP | PL_POSITION_OUTSIDE;
+my $opt      = $opt_base;
+my $x        = 0.;
+my $y        = 0.1;
+my $nrow     = 1;
+my $ncolumn  = $nlegend;
 my ($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
                                               0.05, 15, 1, 1, $nrow, $ncolumn,
                                               $nlegend, \@opt_array, 1.0, 1.0, 2.0,
@@ -248,7 +250,7 @@ $x        = 0.;
 $y        = 0.1;
 $nrow     = 1;
 $ncolumn  = $nlegend;
-my ($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
                                               0.05, 15, 1, 1, $nrow, $ncolumn,
                                               $nlegend, \@opt_array, 1.0, 1.0, 2.0,
                                               1., \@text_colors, \@text,
@@ -262,7 +264,7 @@ $x        = 0.1;
 $y        = 0.;
 $nrow     = $nlegend;
 $ncolumn  = 1;
-my ($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
                                               0.05, 15, 1, 1, $nrow, $ncolumn,
                                               $nlegend, \@opt_array, 1.0, 1.0, 2.0,
                                               1., \@text_colors, \@text,
@@ -276,7 +278,7 @@ $x        = 0.1;
 $y        = 0.;
 $nrow     = $nlegend;
 $ncolumn  = 1;
-my ($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
                                               0.05, 15, 1, 1, $nrow, $ncolumn,
                                               $nlegend, \@opt_array, 1.0, 1.0, 2.0,
                                               1., \@text_colors, \@text,
@@ -290,7 +292,7 @@ $x        = 0.;
 $y        = 0.;
 $nrow     = 6;
 $ncolumn  = 2;
-my ($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
                                               0.05, 15, 1, 1, $nrow, $ncolumn,
                                               $nlegend, \@opt_array, 1.0, 1.0, 2.0,
                                               1., \@text_colors, \@text,
@@ -304,7 +306,7 @@ $x        = 0.;
 $y        = 0.;
 $nrow     = 6;
 $ncolumn  = 2;
-my ($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
                                               0.05, 15, 1, 1, $nrow, $ncolumn,
                                               $nlegend, \@opt_array, 1.0, 1.0, 2.0,
                                               1., \@text_colors, \@text,
@@ -318,7 +320,7 @@ $x        = 0.;
 $y        = 0.;
 $nrow     = 3;
 $ncolumn  = 3;
-my ($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend($opt, $position, $x, $y,
                                               0.05, 15, 1, 1, $nrow, $ncolumn,
                                               $nlegend, \@opt_array, 1.0, 1.0, 2.0,
                                               1., \@text_colors, \@text,
@@ -335,12 +337,12 @@ plsfont( PL_FCI_SANS, -1, -1 );
 plmtex( 2.0, 0.5, 0.5, "t", "Demonstrate legend alignment" );
 $x        = 0.1;
 $y        = 0.1;
-$nturn    = 4;
+my $nturn    = 4;
 $nlegend  = 0;
 $position = PL_POSITION_TOP | PL_POSITION_LEFT | PL_POSITION_SUBPAGE;
 $opt_base = PL_LEGEND_BACKGROUND | PL_LEGEND_BOUNDING_BOX;
 $opt      = $opt_base;
-for ( $i = 0; $i < 9; $i++ )
+for ( my $i = 0; $i < 9; $i++ )
   {
     # Set up legend arrays with the correct size, type.
     if ( $i <= $nturn ) {
@@ -351,14 +353,14 @@ for ( $i = 0; $i < 9; $i++ )
     $nlegend = pdl( 1, $nlegend )->max;
     # nly specify legend data that are required according to the
     #  value of opt_array for that entry.
-    for ( $k = 0; $k < $nlegend; $k++ )
+    for ( my $k = 0; $k < $nlegend; $k++ )
       {
         $opt_array[$k]      = PL_LEGEND_LINE | PL_LEGEND_SYMBOL;
         $line_styles[$k]    = 1;
         $line_widths[$k]    = 1;
         $symbol_scales[$k]  = 1.;
         $symbol_numbers[$k] = 2;
-        $symbols[$k]        = "*";
+        $symbols[$k]        = "#(728)";
         $text[$k] = sprintf ("%2.2d", $k );
         $text_colors[$k]   = 1 + ( $k % 8 );
         $line_colors[$k]   = 1 + ( $k % 8 );
@@ -394,17 +396,19 @@ for ( $i = 0; $i < 9; $i++ )
   }
 
 # Fourth page illustrating various kinds of legends
-$max_height = 0.;
-$xstart     = 0.0;
-$ystart     = 0.1;
+my $max_height = 0.;
+my $xstart     = 0.0;
+my $ystart     = 0.1;
 $x          = $xstart;
 $y          = $ystart;
-$text_scale = 0.90;
+my $text_scale = 0.90;
 pladv( 0 );
 plvpor( 0.0, 1., 0.0, 0.90 );
 plwind( 0.0, 1.0, 0.0, 1.0 );
 plsfont( PL_FCI_SANS, -1, -1 );
 plmtex( 2.0, 0.5, 0.5, "t", "Demonstrate Various Kinds of Legends" );
+
+my (@box_colors, @box_patterns, @box_scales, @box_line_widths);
 
 $nlegend = 5;
 
@@ -455,7 +459,7 @@ $symbols[4]        = $special_symbols[2];
 $opt = $opt_base;
 plscol0a( 15, 32, 32, 32, 0.70 );
 
-my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
     0.1, 15, 1, 1, 0, 0,
     $nlegend, \@opt_array, 1.0, $text_scale, 2.0,
     0., \@text_colors, \@text,
@@ -465,7 +469,7 @@ my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
     $max_height = pdl( $max_height, $legend_height )->max;
 
 # Set up symbol legend entries with various symbols.
-for ( $i = 0; $i < $nlegend; $i++ )
+for ( my $i = 0; $i < $nlegend; $i++ )
 {
   $opt_array[$i] = PL_LEGEND_SYMBOL;
   $text[$i]     = sprintf(  "%s%s", "Symbol ", $special_symbols[$i] );
@@ -480,7 +484,7 @@ $opt = $opt_base;
 $x  += $legend_width;
 plscol0a( 15, 32, 32, 32, 0.70 );
 
-my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
                                                 0.1, 15, 1, 1, 0, 0,
                                                 $nlegend, \@opt_array, 1.0, $text_scale, 2.0,
                                                 0., \@text_colors, \@text,
@@ -490,7 +494,7 @@ my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
 $max_height = pdl( $max_height, $legend_height )->max;
 
 # Set up symbol legend entries with various numbers of symbols.
-for ( $i = 0; $i < $nlegend; $i++ )
+for ( my $i = 0; $i < $nlegend; $i++ )
   {
     $opt_array[$i] = PL_LEGEND_SYMBOL;
     $text[$i]     = sprintf(  "%s %d", "Symbol Number", $i + 2 );
@@ -505,7 +509,7 @@ $opt = $opt_base;
 $x  += $legend_width;
 plscol0a( 15, 32, 32, 32, 0.70 );
 
-my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
                                                 0.1, 15, 1, 1, 0, 0,
                                                 $nlegend, \@opt_array, 1.0, $text_scale, 2.0,
                                                 0., \@text_colors, \@text,
@@ -515,7 +519,7 @@ my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
 $max_height = pdl( $max_height, $legend_height )->max;
 
 # Set up box legend entries with various colours.
-for ( $i = 0; $i < $nlegend; $i++ )
+for ( my $i = 0; $i < $nlegend; $i++ )
   {
     $opt_array[$i] = PL_LEGEND_COLOR_BOX;
     $text[$i]     = sprintf(  "%s %d", "Box Color", $i + 1 );
@@ -533,7 +537,7 @@ $y         += $max_height;
 $max_height = 0.;
 plscol0a( 15, 32, 32, 32, 0.70 );
 
-my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
                                                 0.1, 15, 1, 1, 0, 0,
                                                 $nlegend, \@opt_array, 1.0, $text_scale, 2.0,
                                                 0., \@text_colors, \@text,
@@ -543,7 +547,7 @@ my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
 $max_height = pdl( $max_height, $legend_height )->max;
 
 # Set up box legend entries with various patterns.
-for ( $i = 0; $i < $nlegend; $i++ )
+for ( my $i = 0; $i < $nlegend; $i++ )
   {
     $opt_array[$i] = PL_LEGEND_COLOR_BOX;
     $text[$i]     = sprintf(  "%s %d", "Box Pattern", $i );
@@ -558,7 +562,7 @@ $opt = $opt_base;
 $x  += $legend_width;
 plscol0a( 15, 32, 32, 32, 0.70 );
 
-my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
                                                 0.1, 15, 1, 1, 0, 0,
                                                 $nlegend, \@opt_array, 1.0, $text_scale, 2.0,
                                                 0., \@text_colors, \@text,
@@ -568,7 +572,7 @@ my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
 $max_height = pdl( $max_height, $legend_height )->max;
 
 # Set up box legend entries with various box pattern line widths.
-for ( $i = 0; $i < $nlegend; $i++ )
+for ( my $i = 0; $i < $nlegend; $i++ )
   {
     $opt_array[$i] = PL_LEGEND_COLOR_BOX;
     $text[$i]     = sprintf(  "%s %d", "Box Line Width", $i + 1 );
@@ -583,7 +587,7 @@ $opt = $opt_base;
 $x  += $legend_width;
 plscol0a( 15, 32, 32, 32, 0.70 );
 
-my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
                                                 0.1, 15, 1, 1, 0, 0,
                                                 $nlegend, \@opt_array, 1.0, $text_scale, 2.0,
                                                 0., \@text_colors, \@text,
@@ -593,7 +597,7 @@ my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
 $max_height = pdl( $max_height, $legend_height )->max;
 
 # Set up line legend entries with various colours.
-for ( $i = 0; $i < $nlegend; $i++ )
+for ( my $i = 0; $i < $nlegend; $i++ )
   {
     $opt_array[$i] = PL_LEGEND_LINE;
     $text[$i]     = sprintf(  "%s %d", "Line Color", $i + 1 );
@@ -610,7 +614,7 @@ $y         += $max_height;
 $max_height = 0.;
 plscol0a( 15, 32, 32, 32, 0.70 );
 
-my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
                                                 0.1, 15, 1, 1, 0, 0,
                                                 $nlegend, \@opt_array, 1.0, $text_scale, 2.0,
                                                 0., \@text_colors, \@text,
@@ -620,7 +624,7 @@ my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
 $max_height = pdl( $max_height, $legend_height )->max;
 
 # Set up line legend entries with various styles.
-for ( $i = 0; $i < $nlegend; $i++ )
+for ( my $i = 0; $i < $nlegend; $i++ )
   {
     $opt_array[$i] = PL_LEGEND_LINE;
     $text[$i]     = sprintf(  "%s %d", "Line Style", $i + 1 );
@@ -634,7 +638,7 @@ $opt = $opt_base;
 $x  += $legend_width;
 plscol0a( 15, 32, 32, 32, 0.70 );
 
-my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
                                                 0.1, 15, 1, 1, 0, 0,
                                                 $nlegend, \@opt_array, 1.0, $text_scale, 2.0,
                                                 0., \@text_colors, \@text,
@@ -644,7 +648,7 @@ my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
 $max_height = pdl( $max_height, $legend_height )->max;
 
 # Set up line legend entries with various widths.
-for ( $i = 0; $i < $nlegend; $i++ )
+for ( my $i = 0; $i < $nlegend; $i++ )
   {
     $opt_array[$i] = PL_LEGEND_LINE;
     $text[$i]     = sprintf(  "%s %d", "Line Width", $i + 1 );
@@ -658,7 +662,7 @@ $opt = $opt_base;
 $x  += $legend_width;
 plscol0a( 15, 32, 32, 32, 0.70 );
 
-my ($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
+($legend_width, $legend_height) = pllegend ( $opt, $position, $x, $y,
                                                 0.1, 15, 1, 1, 0, 0,
                                                 $nlegend, \@opt_array, 1.0, $text_scale, 2.0,
                                                 0., \@text_colors, \@text,

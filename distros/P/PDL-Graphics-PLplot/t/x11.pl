@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x11 for the PLplot PDL binding
 #
 # Mesh plot demo
@@ -24,6 +22,8 @@
 
 # SYNC: x11c.c 1.24
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 
@@ -31,12 +31,12 @@ use constant XPTS => 35;    # Data points in x
 use constant YPTS => 46;    # Data points in y
 use constant LEVELS => 10;
 
-@opt = (DRAW_LINEXY, DRAW_LINEXY);
+my @opt = (DRAW_LINEXY, DRAW_LINEXY);
 
-@alt = (33.0, 17.0);
-@az = (24.0, 115.0);
+my @alt = (33.0, 17.0);
+my @az = (24.0, 115.0);
 
-@title = (
+my @title = (
   "#frPLplot Example 11 - Alt=33, Az=24, Opt=3",
   "#frPLplot Example 11 - Alt=17, Az=115, Opt=3"
 );
@@ -72,7 +72,7 @@ plParseOpts (\@ARGV, PL_PARSE_SKIP | PL_PARSE_NOPROGRAM);
 
 plinit ();
 
-$z = zeroes (XPTS, YPTS);
+my $z = zeroes (XPTS, YPTS);
 
 my $x = 3 * (sequence (XPTS) - int(XPTS / 2)) / int(XPTS / 2);
 my $y = 3 * (sequence (YPTS) - int(YPTS / 2)) / int(YPTS / 2);
@@ -89,10 +89,10 @@ for (my $i = 0; $i < XPTS; $i++) {
   }
 }
 
-$zmax = max ($z);
-$zmin = min ($z);
-$step = ($zmax - $zmin) / ($nlevel + 1);
-$clevel = $zmin + $step + $step * sequence ($nlevel);
+my $zmax = max ($z);
+my $zmin = min ($z);
+my $step = ($zmax - $zmin) / ($nlevel + 1);
+my $clevel = $zmin + $step + $step * sequence ($nlevel);
 
 cmap1_init ();
 for (my $k = 0; $k < 2; $k++) {

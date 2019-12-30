@@ -36,12 +36,18 @@ SKIP : {
   $t = Neo4p::Test->new($TEST_SERVER,$user,$pass);
   ok $t->create_sample, 'create sample graph';
   my $idx = ${$t->nix};
-  my $q =<<CYPHER;
+  my $q1 =<<CYPHER;
    START x = node:$idx(name= { startName })
    MATCH path =(x)-[r]-(friend)
    WHERE friend.name = { name }
    RETURN TYPE(r)
 CYPHER
+  my $q2 =<<'CYPHER';
+   MATCH path =(x {name: $startName})-[r]-(friend)
+   WHERE friend.name = $name
+   RETURN TYPE(r)
+CYPHER
+  for my $q ($q1,$q2) {
   ok my $sth = $dbh->prepare($q), 'prepare synopsis query';
   # startName => 'I', name => 'you'
   ok $sth->execute("I", "you"), 'execute with params';
@@ -64,6 +70,7 @@ CYPHER
   my @status;
   my $tuples = $sth->execute_array( { ArrayTupleStatus => \@status } );
   is $tuples, 2, 'execute_array executed successfully';
+}
 }
 
 done_testing;

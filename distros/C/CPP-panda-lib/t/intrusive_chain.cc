@@ -261,9 +261,15 @@ struct Test {
 };
 
 TEST_CASE("pointer type", "[intrusive_chain]") {
+    std::vector<MyPtr*> objs;
     Test<MyPtr*>::test([&]() -> MyPtr* {
-        return new MyPtr();
+        MyPtr* obj = new MyPtr();
+        objs.push_back(obj);
+        return obj;
     });
+    for (auto o : objs) {
+        delete o;
+    }
 }
 
 TEST_CASE("iptr type", "[intrusive_chain]") {
@@ -279,7 +285,13 @@ TEST_CASE("shared_ptr type", "[intrusive_chain]") {
 }
 
 TEST_CASE("custom type", "[intrusive_chain]") {
+    std::vector<MyCustom*> objs;
     Test<MyCustom*>::test([&]() -> MyCustom* {
-        return new MyCustom();
+        MyCustom* obj = new MyCustom();
+        objs.push_back(obj);
+        return obj;
     });
+    for (auto o : objs) {
+        delete o;
+    }
 }

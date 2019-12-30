@@ -32,6 +32,73 @@ use Smart::Comments;
 
 
 {
+  # intervals lattice
+  # rotate intervals lattice num cover edges
+  # not in OEIS: 3,18,144,1140
+  # maybe 2* A006634 9,72,570
+  #
+  my @graphs;
+  foreach my $N (
+                 4,
+                ) {
+    print "N=$N\n";
+    my $base = Graph::Maker->new
+      ('Catalans',
+       N          => $N,
+       undirected => 0,
+       # rel_direction => 'down',
+       # rel_direction => 'up',
+       # rel_type => 'rotate_Cempty',
+       rel_type => 'split',
+       rel_type => 'rotate_first',
+       rel_type => 'rotate_last',
+       rel_type => 'flip',
+       rel_type => 'filling',
+       rel_type => 'rotate_Bempty',
+       rel_type => 'rotate_Aempty',
+       rel_type => 'rotate_leftarm',
+       rel_type => 'rotate_rightarm',
+       rel_type => 'dexter',
+       rel_type => 'rotate',
+       # vertex_name_type => 'vpar_postorder',
+       # vertex_name_type => 'run1s',
+       # vertex_name_type => 'bracketing',
+       # vertex_name_type => 'bracketing_reduced',
+       # vertex_name_type => 'Ldepths',
+       # vertex_name_type => 'Rdepths_inorder',
+       # vertex_name_type => 'Rdepths_postorder',
+       vertex_name_type => 'vpar',
+       vertex_name_type => 'balanced',
+       vertex_name_type => 'Lweights',
+       comma => '',
+      );
+    print "base num intervals ", MyGraphs::Graph_num_intervals($base),"\n";
+
+    my $graph = MyGraphs::Graph_make_intervals_lattice($base, 1);
+    $graph = MyGraphs::Graph_covers($graph);
+    push @graphs, $graph;
+    $graph->set_graph_attribute (flow => 'east');
+    my $num_vertices = $graph->vertices;
+    my $num_edges = $graph->edges;
+    my $diameter = $graph->diameter || 0;
+    my $canon_g6 = MyGraphs::graph6_str_to_canonical
+      (MyGraphs::Graph_to_graph6_str($graph));
+    my $hog = MyGraphs::hog_grep($canon_g6) || "not";
+    print "$num_vertices vertices, $num_edges edges diam=$diameter  $hog\n";
+
+    MyGraphs::Graph_run_dreadnaut($graph->is_directed ? $graph->undirected_copy : $graph,
+                                  verbose=>0, base=>1);
+    # print "vertices: ",join('  ',$graph->vertices),"\n";
+    if ($graph->vertices < 70) {
+      MyGraphs::Graph_view($graph, synchronous=>0);
+    }
+    MyGraphs::Graph_print_tikz($graph);
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+{
   # dexter vs rotate incoming
 
   # [1110110000]  3 3
@@ -96,72 +163,6 @@ use Smart::Comments;
         exists $d_preds{$r_preds[$i]} ? "  **" : "", "\n";
     }
   }
-  exit 0;
-}
-
-{
-  # intervals lattice
-  # rotate intervals lattice num cover edges
-  # not in OEIS: 3,18,144,1140
-  # maybe 2* A006634 9,72,570
-  #
-  my @graphs;
-  foreach my $N (
-                 6,
-                ) {
-    print "N=$N\n";
-    my $base = Graph::Maker->new
-      ('Catalans',
-       N          => $N,
-       undirected => 0,
-       # rel_direction => 'down',
-       # rel_direction => 'up',
-       # rel_type => 'rotate_Cempty',
-       rel_type => 'split',
-       rel_type => 'rotate_first',
-       rel_type => 'rotate_last',
-       rel_type => 'flip',
-       rel_type => 'filling',
-       rel_type => 'rotate_Bempty',
-       rel_type => 'rotate_Aempty',
-       rel_type => 'rotate_leftarm',
-       rel_type => 'rotate_rightarm',
-       rel_type => 'dexter',
-       rel_type => 'rotate',
-       # vertex_name_type => 'vpar_postorder',
-       # vertex_name_type => 'run1s',
-       # vertex_name_type => 'bracketing',
-       # vertex_name_type => 'bracketing_reduced',
-       # vertex_name_type => 'Ldepths',
-       # vertex_name_type => 'Rdepths_inorder',
-       # vertex_name_type => 'Rdepths_postorder',
-       vertex_name_type => 'vpar',
-       vertex_name_type => 'balanced',
-       vertex_name_type => 'Lweights',
-       comma => '',
-      );
-    print "base num intervals ", MyGraphs::Graph_num_intervals($base),"\n";
-
-    my $graph = MyGraphs::Graph_make_intervals_lattice($base, 1);
-    $graph = MyGraphs::Graph_covers($graph);
-    push @graphs, $graph;
-    $graph->set_graph_attribute (flow => 'east');
-    my $num_vertices = $graph->vertices;
-    my $num_edges = $graph->edges;
-    my $diameter = $graph->diameter || 0;
-    my $canon_g6 = MyGraphs::graph6_str_to_canonical
-      (MyGraphs::Graph_to_graph6_str($graph));
-    my $hog = MyGraphs::hog_grep($canon_g6) || "not";
-    print "$num_vertices vertices, $num_edges edges diam=$diameter  $hog\n";
-
-    MyGraphs::Graph_run_dreadnaut($graph->is_directed ? $graph->undirected_copy : $graph,
-                                  verbose=>0, base=>1);
-    # print "vertices: ",join('  ',$graph->vertices),"\n";
-    if ($graph->vertices < 70) {
-      MyGraphs::Graph_view($graph, synchronous=>0);
-    }
-  }
-  MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
 

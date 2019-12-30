@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     NAME             => 'XML::Hash::XS',
     VERSION_FROM     => 'lib/XML/Hash/XS.pm',
     ABSTRACT_FROM    => 'lib/XML/Hash/XS.pm',
-    AUTHOR           => 'Yuriy Ustushenko <yoreek@yahoo.com>',
+    AUTHOR           => 'Yuriy Ustushenko <yuriy.ustushenko@gmail.com>',
     test             => {
         TESTS => 't/*.t'. ($ENV{AUTHOR_TESTING} ? ' xt/*.t' : '')
     },

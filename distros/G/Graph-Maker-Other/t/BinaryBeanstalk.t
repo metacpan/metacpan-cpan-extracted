@@ -25,7 +25,7 @@ use 5.004;
 use Graph;
 
 use Test;
-plan tests => 53;
+plan tests => 200;
 
 use lib 't';
 use MyTestHelpers;
@@ -36,7 +36,7 @@ require Graph::Maker::BinaryBeanstalk;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::BinaryBeanstalk::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::BinaryBeanstalk->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::BinaryBeanstalk->VERSION($want_version); 1 }, 1,
@@ -112,11 +112,21 @@ sub Graph_height {
 # N num vertices
 
 foreach my $N (0 .. 20) {
-  my $graph = Graph::Maker->new('binary_beanstalk',
-                                N => $N,
-                                undirected => 1);
-  my $num_vertices = $graph->vertices;
-  ok ($num_vertices, $N);
+  foreach my $undirected (0, 1) {
+    foreach my $multiedged (0, 1) {
+      my $graph = Graph::Maker->new('binary_beanstalk',
+                                    N => $N,
+                                    undirected => $undirected,
+                                    multiedged => $multiedged);
+      my $num_vertices = $graph->vertices;
+      ok ($num_vertices, $N);
+
+      my $num_edges = $graph->edges;
+      ok ($num_edges,
+          ($N==0 ? 0 : $N-1) * ($undirected ? 1 : 2),
+          "num_edges N=$N");
+    }
+  }
 }
 
 

@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x13 for the PLplot PDL binding
 #
 # Does a simple pie chart
@@ -30,6 +28,8 @@
 # operations of PDL extensively, such that most of the "for" loops
 # disappeared. [R.L.]
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 use Math::Trig qw [pi];

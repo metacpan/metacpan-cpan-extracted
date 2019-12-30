@@ -32,7 +32,8 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-use lib 'devel/lib';
+use File::Spec;
+use lib File::Spec->catdir('devel','lib');
 use MyGraphs;
 
 use Graph::Maker::FibonacciLattice;
@@ -85,7 +86,7 @@ plan tests => 8;
   while ($content =~ /^    (\d+) +N=(\d+)/mg) {
     $shown{$2} = $1;
   }
-  ok (scalar(keys %shown), 3);
+  ok (scalar(keys %shown), 4);
 
   my $extras = 0;
   foreach my $N (0 .. 8) {

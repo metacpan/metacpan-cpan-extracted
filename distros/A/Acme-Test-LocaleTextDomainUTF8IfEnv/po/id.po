@@ -1,0 +1,22 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR perlancar@cpan.org
+# This file is distributed under the same license as the Acme-Test-LocaleTextDomainUTF8IfEnv package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Acme-Test-LocaleTextDomainUTF8IfEnv 0.001\n"
+"Report-Msgid-Bugs-To: perlancar@cpan.org\n"
+"POT-Creation-Date: 2019-12-26 11:40+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Acme/Test/LocaleTextDomainUTF8IfEnv.pm:17
+msgid "Hello, world\n"
+msgstr "Halo, dunia\n"

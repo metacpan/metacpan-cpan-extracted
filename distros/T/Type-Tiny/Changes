@@ -7,6 +7,14 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.008001	2019-12-28
+
+ - Types::TypeTiny honours $Type::Tiny::AvoidCallbacks.
+ - Types::TypeTiny now better mocks Type::Library, offering is_* and
+   assert_* functions for export.
+ - Use improved inline_assert when building the coderef for &{$type}
+   overloading.
+
 1.008000	2019-12-11
 
  [ Packaging ]

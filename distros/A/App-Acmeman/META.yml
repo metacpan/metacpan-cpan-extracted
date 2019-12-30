@@ -17,7 +17,7 @@ no_index:
 provides:
   App::Acmeman:
     file: lib/App/Acmeman.pm
-    version: 3.02
+    version: 3.03
   App::Acmeman::Apache::Layout:
     file: lib/App/Acmeman/Apache/Layout.pm
     version: 0
@@ -36,6 +36,9 @@ provides:
   App::Acmeman::Source::Apache:
     file: lib/App/Acmeman/Source/Apache.pm
     version: 0
+  App::Acmeman::Source::Default:
+    file: lib/App/Acmeman/Source/Default.pm
+    version: 0
   App::Acmeman::Source::File:
     file: lib/App/Acmeman/Source/File.pm
     version: 0
@@ -44,4 +47,4 @@ provides:
     version: 0
 resources:
   repository: git://git.gnu.org.ua/acmeman.git
-version: 3.02
+version: 3.03

@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 
@@ -46,8 +46,8 @@ sub init {
   if ((defined $height && $height > 0)
       || (defined $N && $N > 0)) {
     $graph->add_vertex(0);
-    my $directed = $graph->is_directed;
 
+    my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
     my $row_start = 0;
     my $v = 1;
     my $h = 1;
@@ -70,9 +70,7 @@ sub init {
         last;
       }
 
-      $graph->add_edge($parent, $v);
-      if ($directed) { $graph->add_edge($v, $parent); }
-
+      $graph->$add_edge($parent, $v);
       $v++;
     }
   } else {

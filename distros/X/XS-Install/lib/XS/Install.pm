@@ -10,7 +10,7 @@ use XS::Install::Deps;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.2.11';
+our $VERSION = '1.2.12';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -519,8 +519,10 @@ sub process_LD {
         my $str = join(' ', @{$params->{MODULE_INFO}{STATIC_LIBS}});
         $params->{LDFROM} .= ' '.$str if $str;
     }
-    
-    unless ($mac) { # MacOSX doesn't allow for linking with bundles :(
+
+    # MacOSX doesn't allow for linking with bundles :(
+    # Linux/Unix does not need them, as .so-files will be loaded by perl
+    if ($win32) {
         my %seen;
         my @shared_libs = grep {!$seen{$_}++} reverse @{$params->{MODULE_INFO}{SHARED_LIBS}};
         my $str = join(' ', @shared_libs);

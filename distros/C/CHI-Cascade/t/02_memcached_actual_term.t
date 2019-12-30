@@ -20,23 +20,23 @@ chomp($cwd = `pwd`);
 
 if ($< == 0) {
     # if root - other options
-    $pid_file 		= "/tmp/memcached.$$.pid";
-    $socket_file	= "/tmp/memcached.$$.socket";
-    $user_opt		= '-u nobody';
+    $pid_file           = "/tmp/memcached.$$.pid";
+    $socket_file        = "/tmp/memcached.$$.socket";
+    $user_opt           = '-u nobody';
 
 }
 else {
-    $pid_file 		= "$cwd/t/memcached.$$.pid";
-    $socket_file	= "$cwd/t/memcached.$$.socket";
-    $user_opt		= '';
+    $pid_file           = "$cwd/t/memcached.$$.pid";
+    $socket_file        = "$cwd/t/memcached.$$.socket";
+    $user_opt           = '';
 }
 
 my $out = `memcached $user_opt -d -s $socket_file -a 644 -m 64 -P $pid_file -t 2 2>&1`;
 
 $SIG{__DIE__} = sub {
     `{ kill \`cat $pid_file\`; } >/dev/null 2>&1`;
-    unlink $pid_file	unless -l $pid_file;
-    unlink $socket_file	unless -l $socket_file;
+    unlink $pid_file    unless -l $pid_file;
+    unlink $socket_file unless -l $socket_file;
     $SIG{__DIE__} = 'IGNORE';
 };
 
@@ -54,9 +54,9 @@ else {
 
 my $cascade = CHI::Cascade->new(
     chi => CHI->new(
-	driver		=> 'Memcached::Fast',
-	servers		=> [$socket_file],
-	namespace	=> 'CHI::Cascade::tests'
+        driver          => 'Memcached::Fast',
+        servers         => [$socket_file],
+        namespace       => 'CHI::Cascade::tests'
     )
 );
 

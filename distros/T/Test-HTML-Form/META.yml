@@ -18,6 +18,7 @@ no_index:
     - t
     - inc
 requires:
+  Digest::MD5: '0'
   HTML::TreeBuilder: '0'
-version: 1
+version: 1.01
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

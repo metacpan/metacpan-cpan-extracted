@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::IgnoreWantarray;
-$DBIx::Class::Helper::ResultSet::IgnoreWantarray::VERSION = '2.034001';
+$DBIx::Class::Helper::ResultSet::IgnoreWantarray::VERSION = '2.034002';
 # ABSTRACT: Get rid of search context issues
 
 use strict;

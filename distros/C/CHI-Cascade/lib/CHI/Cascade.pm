@@ -3,7 +3,7 @@ package CHI::Cascade;
 use strict;
 use warnings;
 
-our $VERSION = 0.284;
+our $VERSION = 0.300_002;
 
 use Carp;
 
@@ -19,13 +19,12 @@ sub new {
     my ($class, %opts) = @_;
 
     my $self = bless {
-	    %opts,
-	    plain_targets	=> {},
-	    qr_targets		=> [],
-	    target_locks	=> {},
-	    stats		=> { recompute => 0, run => 0, dependencies_lookup => 0 }
+            %opts,
+            plain_targets       => {},
+            qr_targets          => [],
+            stats               => { recompute => 0, run => 0, dependencies_lookup => 0 }
 
-	}, ref($class) || $class;
+        }, ref($class) || $class;
 
     $self->{target_chi} ||= $self->{chi};
 
@@ -38,13 +37,13 @@ sub rule {
     my $rule = CHI::Cascade::Rule->new( cascade => $self, %opts );
 
     if (ref($rule->{target}) eq 'Regexp') {
-	push @{ $self->{qr_targets} }, $rule;
+        push @{ $self->{qr_targets} }, $rule;
     }
     elsif (! ref($rule->{target})) {
-	$self->{plain_targets}{$rule->{target}} = $rule;
+        $self->{plain_targets}{$rule->{target}} = $rule;
     }
     else {
-	croak qq{The rule's target "$rule->{target}" is unknown type};
+        croak qq{The rule's target "$rule->{target}" is unknown type};
     }
 }
 
@@ -91,18 +90,20 @@ sub get_value {
 sub target_lock {
     my ( $self, $rule ) = @_;
 
-    my ( $trg_obj, $target );
+    my $target = $rule->target;
 
     # If target is already locked - a return
     return
-      if ( $self->target_locked( $target = $rule->target ) );
+      if ( $self->target_locked( $rule ) );
 
-    $trg_obj = CHI::Cascade::Target->new unless ( ( $trg_obj = $self->{target_chi}->get("t:$target") ) );
+    my $trg_obj;
+    $trg_obj = CHI::Cascade::Target->new
+      unless ( ( $trg_obj = $self->{target_chi}->get("t:$target") ) );
 
     $trg_obj->lock;
     $self->{target_chi}->set( "t:$target", $trg_obj, $rule->target_expires( $trg_obj ) );
 
-    $self->{target_locks}{$target} = 1;
+    $rule->{run_instance}{target_locks}{$target} = 1;
 }
 
 sub target_unlock {
@@ -111,18 +112,18 @@ sub target_unlock {
     my $target = $rule->target;
 
     if ( my $trg_obj = $self->{target_chi}->get( "t:$target" ) ) {
-	$trg_obj->unlock;
+        $trg_obj->unlock;
 
-	if ( $value && $value->state & CASCADE_RECOMPUTED ) {
-	    $trg_obj->touch;
-	    $trg_obj->actual_stamp
-	      if $self->{run_opts}{actual_term} && $self->{orig_target} eq $target;
-	}
+        if ( $value && $value->state & CASCADE_RECOMPUTED ) {
+            $trg_obj->touch;
+            $trg_obj->actual_stamp
+              if $rule->{run_instance}{run_opts}{actual_term} && $rule->{run_instance}{orig_target} eq $target;
+        }
 
-	$self->{target_chi}->set( "t:$target", $trg_obj, $rule->target_expires( $trg_obj ) );
+        $self->{target_chi}->set( "t:$target", $trg_obj, $rule->target_expires( $trg_obj ) );
     }
 
-    delete $self->{target_locks}{$target};
+    delete $rule->{run_instance}{target_locks}{$target};
 }
 
 sub target_actual_stamp {
@@ -131,8 +132,8 @@ sub target_actual_stamp {
     my $target = $rule->target;
 
     if ( $value && $value->state & CASCADE_ACTUAL_VALUE && ( my $trg_obj = $self->{target_chi}->get( "t:$target" ) ) ) {
-	$trg_obj->actual_stamp;
-	$self->{target_chi}->set( "t:$target", $trg_obj, $rule->target_expires( $trg_obj ) );
+        $trg_obj->actual_stamp;
+        $self->{target_chi}->set( "t:$target", $trg_obj, $rule->target_expires( $trg_obj ) );
     }
 }
 
@@ -142,8 +143,8 @@ sub target_start_ttl {
     my $target = $rule->target;
 
     if ( my $trg_obj = $self->{target_chi}->get( "t:$target" ) ) {
-	$trg_obj->ttl( $rule->ttl, $start_time );
-	$self->{target_chi}->set( "t:$target", $trg_obj, $rule->target_expires( $trg_obj ) );
+        $trg_obj->ttl( $rule->ttl, $start_time );
+        $self->{target_chi}->set( "t:$target", $trg_obj, $rule->target_expires( $trg_obj ) );
     }
 }
 
@@ -157,28 +158,30 @@ sub touch {
     my ( $self, $target ) = @_;
 
     if ( my $trg_obj = $self->{target_chi}->get("t:$target") ) {
-	$trg_obj->touch;
-	$self->{target_chi}->set( "t:$target", $trg_obj, $self->find( $target )->target_expires( $trg_obj ) );
+        $trg_obj->touch;
+        $self->{target_chi}->set( "t:$target", $trg_obj, $self->find( $target )->target_expires( $trg_obj ) );
     }
 }
 
 sub target_locked {
-    exists $_[0]->{target_locks}{$_[1]};
+    my ( $self, $rule ) = @_;
+
+    exists $rule->{run_instance}{target_locks}{ $rule->target };
 }
 
 sub recompute {
     my ( $self, $rule, $target, $dep_values) = @_;
 
     die CHI::Cascade::Value->new( state => CASCADE_DEFERRED )
-      if $self->{run_opts}{defer};
+      if $rule->{run_instance}{run_opts}{defer};
 
     my $ret = eval { $rule->{code}->( $rule, $target, $rule->{dep_values} = $dep_values ) };
 
     $self->{stats}{recompute}++;
 
     if ($@) {
-	my $error = $@;
-	die( ( eval { $error->isa('CHI::Cascade::Value') } ) ? $error->thrown_from_code(1) : "CHI::Cascade: the target $target - error in the code: $error" );
+        my $error = $@;
+        die( ( eval { $error->isa('CHI::Cascade::Value') } ) ? $error->thrown_from_code(1) : "CHI::Cascade: the target $target - error in the code: $error" );
     }
 
     my $value;
@@ -197,151 +200,154 @@ sub recompute {
 sub value_ref_if_recomputed {
     my ( $self, $rule, $target, $only_from_cache ) = @_;
 
-    return undef unless defined $rule;
+    return undef
+      unless defined $rule;
+
+    my $run_instance = $rule->{run_instance};
 
     my @qr_params = $rule->qr_params;
 
     my ( $ret_state, $ttl, $should_be_recomputed ) = ( CASCADE_ACTUAL_VALUE );
 
     if ( $self->target_computing( $target, \$ttl ) ) {
-	# If we have any target as a being computed (dependencie/original)
-	# there is no need to compute anything - trying to return original target value
-	die CHI::Cascade::Value->new->state( CASCADE_COMPUTING );
+        # If we have any target as a being computed (dependencie/original)
+        # there is no need to compute anything - trying to return original target value
+        die CHI::Cascade::Value->new->state( CASCADE_COMPUTING );
     }
 
     my ( %dep_values, $dep_name );
 
     if ( $only_from_cache ) {
 
-	# Trying to get value from cache
-	my $value = $self->get_value($target);
+        # Trying to get value from cache
+        my $value = $self->get_value($target);
 
-	return $value
-	  if $value->is_value;
+        return $value
+          if $value->is_value;
 
-	# If no in cache - we should recompute it again
-	$self->target_lock($rule);
+        # If no in cache - we should recompute it again
+        $self->target_lock($rule);
     }
 
-    push @{ $self->{target_stack} }, $target;
+    push @{ $run_instance->{target_stack} }, $target;
 
     my $ret = eval {
-	my $dep_target;
+        my $dep_target;
 
-	my $catcher =  sub {
-	    my $sub = shift;
+        my $catcher =  sub {
+            my $sub = shift;
 
-	    my $ret = eval { $sub->() };
+            my $ret = eval { $sub->() };
 
-	    if ($@) {
-		my $exception = $@;
+            if ($@) {
+                my $exception = $@;
 
-		$rule->{depends_catch}->( $rule, $exception, $dep_values{$dep_target}->[0], $dep_target )
-		  if (   exists $rule->{depends_catch}
-		      && ref $rule->{depends_catch} eq 'CODE'
-		      && eval { $exception->isa('CHI::Cascade::Value') }
-		      && $exception->thrown_from_code );
+                $rule->{depends_catch}->( $rule, $exception, $dep_values{$dep_target}->[0], $dep_target )
+                  if (   exists $rule->{depends_catch}
+                      && ref $rule->{depends_catch} eq 'CODE'
+                      && eval { $exception->isa('CHI::Cascade::Value') }
+                      && $exception->thrown_from_code );
 
-		die $exception;
-	    }
+                die $exception;
+            }
 
-	    return $ret;
-	};
+            return $ret;
+        };
 
-	$self->target_lock($rule)
-	  if ! $self->target_time($target);
+        $self->target_lock($rule)
+          if ! $self->target_time($target);
 
-	$should_be_recomputed = $self->target_locked($target);
+        $should_be_recomputed = $self->target_locked($rule);
 
-	if ( defined $ttl && $ttl > 0 && ! $should_be_recomputed ) {
-	    $ret_state = CASCADE_TTL_INVOLVED;
-	    $self->{ttl} = $ttl;
-	}
-	else {
-	    my (
-		$rule_ttl,
-		$circle_hash,
-		$start_time,
-		$min_start_time
-	    ) = (
-		$rule->ttl,
-		$only_from_cache ? 'only_cache_chain' : 'chain'
-	    );
+        if ( defined $ttl && $ttl > 0 && ! $should_be_recomputed ) {
+            $ret_state = CASCADE_TTL_INVOLVED;
+            $run_instance->{ttl} = $ttl;
+        }
+        else {
+            my (
+                $rule_ttl,
+                $circle_hash,
+                $start_time,
+                $min_start_time
+            ) = (
+                $rule->ttl,
+                $only_from_cache ? 'only_cache_chain' : 'chain'
+            );
 
-	    foreach my $depend (@{ $rule->depends }) {
-		$dep_target = ref($depend) eq 'CODE' ? $depend->( $rule, @qr_params ) : $depend;
+            foreach my $depend (@{ $rule->depends }) {
+                $dep_target = ref($depend) eq 'CODE' ? $depend->( $rule, @qr_params ) : $depend;
 
-		$dep_values{$dep_target}->[0] = $self->find($dep_target);
+                $dep_values{$dep_target}->[0] = $self->find( $dep_target, $rule->{run_instance} );
 
-		die "Found circle dependencies (trace: " . join( '->', @{ $self->{target_stack} }, $dep_target ) . ") - aborted!"
-		  if ( exists $self->{ $circle_hash }{$target}{$dep_target} );
+                die "Found circle dependencies (trace: " . join( '->', @{ $run_instance->{target_stack} }, $dep_target ) . ") - aborted!"
+                  if ( exists $run_instance->{ $circle_hash }{$target}{$dep_target} );
 
-		$self->{ $circle_hash }{$target}{$dep_target} = 1;
+                $run_instance->{ $circle_hash }{$target}{$dep_target} = 1;
 
-		$catcher->( sub {
-		    if (   ! $only_from_cache
-			&& ( $start_time = ( $self->{stats}{dependencies_lookup}++,
-			     ( $dep_values{$dep_target}->[1] = $self->value_ref_if_recomputed( $dep_values{$dep_target}->[0], $dep_target ) )->state & CASCADE_RECOMPUTED && Time::HiRes::time
-			|| ( $start_time = $self->target_time($dep_target) ) > $self->target_time($target) && $start_time ) ) )
-		    {
-			if (    ! $should_be_recomputed
-			     && ! defined $ttl
-			     && defined $rule_ttl
-			     && $rule_ttl > 0
-			     && ( $start_time + $rule_ttl ) > Time::HiRes::time )
-			{
-			    $min_start_time = defined $min_start_time ? min( $start_time, $min_start_time ) : $start_time;
-			}
-			else {
-			    $self->target_lock($rule);
-			}
-		    }
-		} );
+                $catcher->( sub {
+                    if (   ! $only_from_cache
+                        && ( $start_time = ( $self->{stats}{dependencies_lookup}++,
+                             ( $dep_values{$dep_target}->[1] = $self->value_ref_if_recomputed( $dep_values{$dep_target}->[0], $dep_target ) )->state & CASCADE_RECOMPUTED && Time::HiRes::time
+                        || ( $start_time = $self->target_time($dep_target) ) > $self->target_time($target) && $start_time ) ) )
+                    {
+                        if (    ! $should_be_recomputed
+                             && ! defined $ttl
+                             && defined $rule_ttl
+                             && $rule_ttl > 0
+                             && ( $start_time + $rule_ttl ) > Time::HiRes::time )
+                        {
+                            $min_start_time = defined $min_start_time ? min( $start_time, $min_start_time ) : $start_time;
+                        }
+                        else {
+                            $self->target_lock($rule);
+                        }
+                    }
+                } );
 
-		delete $self->{ $circle_hash }{$target}{$dep_target};
-	    }
+                delete $run_instance->{ $circle_hash }{$target}{$dep_target};
+            }
 
-	    if ( defined $min_start_time ) {
-		$ret_state = CASCADE_TTL_INVOLVED;
-		$self->target_start_ttl( $rule, $min_start_time );
-		$self->{ttl} = $min_start_time + $rule_ttl - Time::HiRes::time;
-	    }
-	}
+            if ( defined $min_start_time ) {
+                $ret_state = CASCADE_TTL_INVOLVED;
+                $self->target_start_ttl( $rule, $min_start_time );
+                $run_instance->{ttl} = $min_start_time + $rule_ttl - Time::HiRes::time;
+            }
+        }
 
-	if ( $self->target_locked($target) ) {
-	    # We should recompute this target
-	    # So we should recompute values for other dependencies
-	    foreach $dep_target (keys %dep_values) {
-		if (   ! defined $dep_values{$dep_target}->[1]
-		    || ! $dep_values{$dep_target}->[1]->is_value )
-		{
-		    $self->{stats}{dependencies_lookup}++;
-		    $catcher->( sub {
-			if ( ! ( $dep_values{$dep_target}->[1] = $self->value_ref_if_recomputed( $dep_values{$dep_target}->[0], $dep_target, 1 ) )->is_value ) {
-			    $self->target_remove($dep_target);
-			    return 1;
-			}
-			return 0;
-		    } ) == 1 && return undef;
-		}
-	    }
-	}
+        if ( $self->target_locked($rule) ) {
+            # We should recompute this target
+            # So we should recompute values for other dependencies
+            foreach $dep_target (keys %dep_values) {
+                if (   ! defined $dep_values{$dep_target}->[1]
+                    || ! $dep_values{$dep_target}->[1]->is_value )
+                {
+                    $self->{stats}{dependencies_lookup}++;
+                    $catcher->( sub {
+                        if ( ! ( $dep_values{$dep_target}->[1] = $self->value_ref_if_recomputed( $dep_values{$dep_target}->[0], $dep_target, 1 ) )->is_value ) {
+                            $self->target_remove($dep_target);
+                            return 1;
+                        }
+                        return 0;
+                    } ) == 1 && return undef;
+                }
+            }
+        }
 
-	return $self->recompute( $rule, $target, { map { $_ => $dep_values{$_}->[1]->value } keys %dep_values } )
-	  if $self->target_locked($target);
+        return $self->recompute( $rule, $target, { map { $_ => $dep_values{$_}->[1]->value } keys %dep_values } )
+          if $self->target_locked($rule);
 
-	return CHI::Cascade::Value->new( state => $ret_state );
+        return CHI::Cascade::Value->new( state => $ret_state );
     };
 
-    pop @{ $self->{target_stack} };
+    pop @{ $run_instance->{target_stack} };
 
     my $e = $@;
 
-    if ( $self->target_locked($target) ) {
-	$self->target_unlock( $rule, $ret );
+    if ( $self->target_locked($rule) ) {
+        $self->target_unlock( $rule, $ret );
     }
-    elsif ( $self->{run_opts}{actual_term} && ! $only_from_cache && $self->{orig_target} eq $target ) {
-	$self->target_actual_stamp( $rule, $ret );
+    elsif ( $run_instance->{run_opts}{actual_term} && ! $only_from_cache && $run_instance->{orig_target} eq $target ) {
+        $self->target_actual_stamp( $rule, $ret );
     }
 
     die $e if $e;
@@ -356,79 +362,86 @@ sub run {
 
     my $view_dependencies = 1;
 
-    $self->{run_opts}    = \%opts;
-    $self->{ttl}         = undef;
+    # The run's instance parameters. This instance to be needed to give ability to run the run method from deep inside run calls.
+    # It's for internal using.
+    my $run_instance = {};
+
+    $run_instance->{run_opts}     = \%opts;
+    $run_instance->{ttl}          = undef;
+    $run_instance->{target_locks} = {};
+
     $opts{actual_term} ||= $self->find($target)->{actual_term};
     $self->{stats}{run}++;
 
-    $self->{stash} = $opts{stash} && ref $opts{stash} eq 'HASH' && $opts{stash} || {};
+    $run_instance->{stash} = $opts{stash} && ref $opts{stash} eq 'HASH' && $opts{stash} || {};
+
+    # FIXME to delete in future. Now it's depricated
+    $self->{stash} = $run_instance->{stash};
 
     $view_dependencies = ! $self->target_is_actual( $target, $opts{actual_term} )
       if ( $opts{actual_term} );
 
-    my $res = $self->_run( ! $view_dependencies, $target );
+    my $res = $self->_run( ! $view_dependencies, $target, $run_instance );
 
     $res->state( CASCADE_ACTUAL_TERM )
       if ( $opts{actual_term} && ! $view_dependencies );
 
-    if ( defined $self->{ttl} && $self->{ttl} > 0 ) {
-	$res->state( CASCADE_TTL_INVOLVED );
+    if ( defined $run_instance->{ttl} && $run_instance->{ttl} > 0 ) {
+        $res->state( CASCADE_TTL_INVOLVED );
     }
 
-    ${ $opts{ttl} } = $self->{ttl}
+    ${ $opts{ttl} } = $run_instance->{ttl}
       if ( $opts{ttl} );
 
     ${ $opts{state} } = $res->state
       if ( $opts{state} );
 
-    delete $self->{stash};
-
     $res->value;
 }
 
 sub _run {
-    my ( $self, $only_from_cache, $target ) = @_;
+    my ( $self, $only_from_cache, $target, $run_instance ) = @_;
 
     croak qq{The target ($target) for run should be string} if ref($target);
     croak qq{The target for run is empty} if $target eq '';
 
-    $self->{chain}            = {};
-    $self->{only_cache_chain} = {};
-    $self->{target_stack}     = [];
+    $run_instance->{chain}            = {};
+    $run_instance->{only_cache_chain} = {};
+    $run_instance->{target_stack}     = [];
 
     my $ret = eval {
-	$self->{orig_target} = $target;
+        $run_instance->{orig_target} = $target;
 
-	return $self->value_ref_if_recomputed( $self->{orig_rule} = $self->find($target), $target, $only_from_cache );
+        return $self->value_ref_if_recomputed( $run_instance->{orig_rule} = $self->find( $target, $run_instance ), $target, $only_from_cache );
     };
 
     my $terminated;
 
     if ( $terminated = $@ ) {
-	$ret = $@;
+        $ret = $@;
 
-	die $ret
-	  unless eval { $ret->isa('CHI::Cascade::Value') };
+        die $ret
+          unless eval { $ret->isa('CHI::Cascade::Value') };
 
-	$ret->state( CASCADE_CODE_EXCEPTION )
-	  unless $ret->state;
+        $ret->state( CASCADE_CODE_EXCEPTION )
+          unless $ret->state;
     }
 
     if ( ! $ret->is_value ) {
         my $from_cache = $self->get_value( $target );
 
-	return $from_cache->state( $ret->state )
-	  if ( $terminated || $from_cache->is_value );
+        return $from_cache->state( $ret->state )
+          if ( $terminated || $from_cache->is_value );
 
-	return $self->_run( 1, $target )
-	  if ! $only_from_cache;
+        return $self->_run( 1, $target )
+          if ! $only_from_cache;
     }
 
     return $ret;
 }
 
 sub find {
-    my ($self, $plain_target) = @_;
+    my ($self, $plain_target, $run_instance) = @_;
 
     die "CHI::Cascade::find : got empty target\n" if $plain_target eq '';
 
@@ -436,19 +449,23 @@ sub find {
 
     # If target is flat text
     if (exists $self->{plain_targets}{$plain_target}) {
-	( $new_rule = $self->{plain_targets}{$plain_target}->new )->{matched_target} = $plain_target;
-	return $new_rule;
+        return $self->{plain_targets}{$plain_target}
+          unless $run_instance;
+        ( $new_rule = $self->{plain_targets}{$plain_target}->new( run_instance => $run_instance ) )->{matched_target} = $plain_target;
+        return $new_rule;
     }
 
     # If rule's target is Regexp type
     foreach my $rule (@{$self->{qr_targets}}) {
-	my @qr_params;
+        my @qr_params;
 
-	if (@qr_params = $plain_target =~ $rule->{target}) {
-	    ( $new_rule = $rule->new )->qr_params(@qr_params);
-	    $new_rule->{matched_target} = $plain_target;
-	    return $new_rule;
-	}
+        if (@qr_params = $plain_target =~ $rule->{target}) {
+            return $rule
+              unless $run_instance;
+            ( $new_rule = $rule->new( run_instance => $run_instance ) )->qr_params(@qr_params);
+            $new_rule->{matched_target} = $plain_target;
+            return $new_rule;
+        }
     }
 
     die "CHI::Cascade::find : cannot find the target $plain_target\n";
@@ -472,39 +489,39 @@ CHI::Cascade - a cache dependencies (cache and like 'make' utility concept)
     $cascade = CHI::Cascade->new(chi => CHI->new(...));
 
     $cascade->rule(
-	target	=> 'unique_name',
-	depends	=> ['unique_name_other1', 'unique_name_other2'],
-	code	=> sub {
-	    my ($rule, $target_name, $values_of_depends) = @_;
+        target  => 'unique_name',
+        depends => ['unique_name_other1', 'unique_name_other2'],
+        code    => sub {
+            my ($rule, $target_name, $values_of_depends) = @_;
 
-	    # $values_of_depends == {
-	    #     unique_name_other1 => $value_1,
-	    #     unique_name_other2 => $value_2
-	    # }
-	    # $rule->target	eq	$target_name
-	    # $rule->depends	===	['unique_name_other1', 'unique_name_other2']
-	    # $rule->dep_values	==	$values_of_depends
-	    # $rule->params	==	{ a => 1, b => 2 }
+            # $values_of_depends == {
+            #     unique_name_other1 => $value_1,
+            #     unique_name_other2 => $value_2
+            # }
+            # $rule->target     eq      $target_name
+            # $rule->depends    ===     ['unique_name_other1', 'unique_name_other2']
+            # $rule->dep_values ==      $values_of_depends
+            # $rule->params     ==      { a => 1, b => 2 }
 
-	    # Now we can calcualte $value
-	    return $value;
-	},
-	params	=> { a => 1, b => 2 }
+            # Now we can calcualte $value
+            return $value;
+        },
+        params  => { a => 1, b => 2 }
     );
 
     $cascade->rule(
-	target	=> 'unique_name_other1',
-	depends	=> 'unique_name_other3',
-	code	=> sub {
-	    my ($rule, $target_name, $values_of_depends) = @_;
+        target  => 'unique_name_other1',
+        depends => 'unique_name_other3',
+        code    => sub {
+            my ($rule, $target_name, $values_of_depends) = @_;
 
-	    # $values_of_depends == {
-	    #     unique_name_other3 => $value_3
-	    # }
+            # $values_of_depends == {
+            #     unique_name_other3 => $value_3
+            # }
 
-	    # computing here
-	    return $value;
-	}
+            # computing here
+            return $value;
+        }
     );
 
     $value_of_this_target = $cascade->run('unique_name');
@@ -585,22 +602,21 @@ It should be plain text of single dependence of this target.
 =item arrayref
 
 An each item of list can be scalar value (exactly matched target) or code
-reference. If item is coderef it will be executed as $coderef->( $rule,
+reference. If item is coderef it will be executed once as $coderef->( $rule,
 L<< $rule->qr_params|CHI::Cascade::Rule/qr_params >> ) and should return a
 scalar value as current dependence for this target at runtime (the API for
 coderef parameters was changed since v0.16)
 
 =item coderef
 
-This subroutine will be executed every time inside I<run> method if necessary
-and with parameters as: $coderef->( $rule,
-L<< $rule->qr_params|CHI::Cascade::Rule/qr_params >> ) (API was changed since
-v0.16). It should return B<scalar> or B<arrayref>. The returned value is
-I<scalar> it will be considered as single dependence of this target and the
-behavior will be exactly as described for I<scalar> in this paragraph. If the
-returned value is I<arrayref> it will be considered as list of dependencies for
-this target and the behavior will be exactly as described for I<arrayref> in
-this paragraph.
+This subroutine will be executed once inside I<run> method if necessary with
+parameters as: $coderef->( $rule, L<<$rule->qr_params|CHI::Cascade::Rule/qr_params >> )
+(API was changed since v0.16). It should return B<scalar> or B<arrayref>. The
+returned value is I<scalar> it will be considered as single dependence of this
+target and the behavior will be exactly as described for I<scalar> in this
+paragraph. If the returned value is I<arrayref> it will be considered as list of
+dependencies for this target and the behavior will be exactly as described for
+I<arrayref> in this paragraph.
 
 =back
 
@@ -757,6 +773,12 @@ cleaned value not L<CHI::Cascade::Value> object!) for this target If any
 dependence of this target of any dependencies of dependencies were
 (re)computed this target will be (re)computed too.
 
+The run method of instance of cascade can be called from other run method of
+same instance and from C<callref> function inside C<depends> rule's option. This
+was made possible by creating a separate data instance for each root call of run
+method. This can come in handy when you compute dependencies on the go, which
+are computed by the same object (instance) of C<cascade>.
+
 =over
 
 =item $target
@@ -859,16 +881,20 @@ by this method. It will remove target marker if one exists and once when cascade
 will need target value it will be recomputed. In a during recomputing of course
 cascade will return an old value if one exists in cache.
 
-=item stash ()
+=item stash()
 
-It returns I<hashref> to a stash. A stash is hash for temporary data between
+B<Deprecated!> It returns I<hashref> to a stash. A stash is hash for temporary data between
 rule's codes. It can be used only from inside L</run>. Example:
 
     $cascade->run( 'target', stash => { key1 => value1 } )
 
 and into rule's code:
 
+    # DEPRECATED - OLD METHOD! It's supported and works but please don't use it
     $rule->cascade->stash->{key1}
+
+    # NEW METHOD:
+    $rule->stash->{key1}
 
 If a L</run> method didn't get stash hashref the default stash will be as empty
 hash. You can pass a data between rule's codes but it's recommended only in
@@ -887,12 +913,12 @@ Please send me issues through L<https://github.com/Perlover/CHI-Cascade> page
 Here simple example how it works. Here is a direct analogy to Unix make
 utility:
 
-    In CHI::Cascade:		In make:
+    In CHI::Cascade:            In make:
 
-    rule			rule
-    depends			prerequisites
-    code			commands
-    run( rule_name )		make target_name
+    rule                        rule
+    depends                     prerequisites
+    code                        commands
+    run( rule_name )            make target_name
 
 =head1 FEATURES
 
@@ -938,25 +964,25 @@ recomputed.
 And even we can have a same rule:
 
     $cascade->rule(
-	target	=> qr/^unique_name_(.*)$/,
-	depends	=> sub { 'unique_name_other_' . $_[1] },
-	code	=> sub {
-	    my ($rule, $target_name, $values_of_depends) = @_;
+        target  => qr/^unique_name_(.*)$/,
+        depends => sub { 'unique_name_other_' . $_[1] },
+        code    => sub {
+            my ($rule, $target_name, $values_of_depends) = @_;
 
-	    # $rule->qr_params		=== ( 3 )
-	    # $target_name		== 'unique_name_3' if $cascade->run('unique_name_3') was
-	    # $values_of_depends	== {
-	    #     unique_name_other_3	=> $value_ref_3
-	    # }
-	}
+            # $rule->qr_params          === ( 3 )
+            # $target_name              == 'unique_name_3' if $cascade->run('unique_name_3') was
+            # $values_of_depends        == {
+            #     unique_name_other_3   => $value_ref_3
+            # }
+        }
     );
 
     $cascade->rule(
-	target	=> qr/unique_name_other_(.*)/,
-	code	=> sub {
-	    my ($rule, $target_name, $values_of_depends) = @_;
-	    ...
-	}
+        target  => qr/unique_name_other_(.*)/,
+        code    => sub {
+            my ($rule, $target_name, $values_of_depends) = @_;
+            ...
+        }
     );
 
 When we will do:

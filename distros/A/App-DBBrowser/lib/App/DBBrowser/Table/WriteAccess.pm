@@ -144,7 +144,7 @@ sub commit_sql {
             unshift @$all_arrayref, $col_names;
             1 }
         ) {
-            $ax->print_error_message( "$@Fetching info: affected records ...\n", $stmt_type );
+            $ax->print_error_message( $@ );
         }
         my $prompt = $ax->print_sql( $sql );
         $prompt .= "Affected records:";
@@ -213,7 +213,7 @@ sub __transaction {
         }
         1 }
     ) {
-        $ax->print_error_message( "$@Rolling back ...\n", 'Commit' );
+        $ax->print_error_message( $@ );
         $dbh->rollback;
         $rolled_back = 1;
     }
@@ -255,7 +255,7 @@ sub __auto_commit {
         }
         1 }
     ) {
-        $ax->print_error_message( $@, 'Auto Commit' );
+        $ax->print_error_message( $@ );
         return;
     }
     return 1;

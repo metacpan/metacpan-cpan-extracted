@@ -1,5 +1,5 @@
 package Neovim::Ext::RemoteMap;
-$Neovim::Ext::RemoteMap::VERSION = '0.01';
+$Neovim::Ext::RemoteMap::VERSION = '0.02';
 use strict;
 use warnings;
 use Carp qw/croak/;
@@ -93,7 +93,7 @@ Neovim::Ext::RemoteMap - Neovim RemoteMap class
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

@@ -22,7 +22,7 @@
    "provides" : {
       "App::Acmeman" : {
          "file" : "lib/App/Acmeman.pm",
-         "version" : "3.02"
+         "version" : "3.03"
       },
       "App::Acmeman::Apache::Layout" : {
          "file" : "lib/App/Acmeman/Apache/Layout.pm",
@@ -48,6 +48,10 @@
          "file" : "lib/App/Acmeman/Source/Apache.pm",
          "version" : 0
       },
+      "App::Acmeman::Source::Default" : {
+         "file" : "lib/App/Acmeman/Source/Default.pm",
+         "version" : 0
+      },
       "App::Acmeman::Source::File" : {
          "file" : "lib/App/Acmeman/Source/File.pm",
          "version" : 0
@@ -65,5 +69,5 @@
          "web" : "http://git.gnu.org.ua/cgit/acmeman.git/"
       }
    },
-   "version" : "3.02"
+   "version" : "3.03"
 }

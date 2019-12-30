@@ -29,14 +29,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 104;
+plan tests => 335;
 
 require Graph::Maker::BinomialTree;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::BinomialTree::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::BinomialTree->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::BinomialTree->VERSION($want_version); 1 }, 1,
@@ -136,16 +136,29 @@ sub Graph_height {
 # N num vertices
 
 foreach my $N (0 .. 20) {
-  my $graph = Graph::Maker->new('binomial_tree',
-                                N => $N,
-                                undirected => 1);
-  my $num_vertices = $graph->vertices;
-  ok ($num_vertices, $N);
+  foreach my $undirected (0, 1) {
+    foreach my $multiedged (0, 1) {
+      my $graph = Graph::Maker->new('binomial_tree',
+                                    N => $N,
+                                    undirected => $undirected,
+                                    multiedged => $multiedged);
+      my $num_vertices = $graph->vertices;
+      ok ($num_vertices, $N);
+      my @vertices = $graph->vertices;
+      ok (join(',',sort {$a<=>$b} @vertices),
+          join(',',0..$N-1));
+
+      my $num_edges = $graph->edges;
+      ok ($num_edges,
+          ($N==0 ? 0 : $N-1) * ($graph->is_directed ? 2 : 1),
+          "num_edges N=$N");
+    }
+  }
 }
 
 
 #------------------------------------------------------------------------------
-# widths are binomials
+# row widths are binomials
 
 sub binomial {
   my ($n, $m) = @_;

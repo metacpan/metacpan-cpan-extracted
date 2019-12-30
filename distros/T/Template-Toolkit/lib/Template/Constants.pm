@@ -22,15 +22,13 @@ require Exporter;
 use strict;
 use warnings;
 use Exporter;
-# Perl::MinimumVersion seems to think this is a Perl 5.008ism...
-# use base qw( Exporter );
-use vars qw( @EXPORT_OK %EXPORT_TAGS );
-use vars qw( $DEBUG_OPTIONS @STATUS @ERROR @CHOMP @DEBUG @ISA );
-# ... so we'll do it the Old Skool way just to keep it quiet
-@ISA = qw( Exporter );
 
-our $VERSION = 2.75;
+use base qw( Exporter );
 
+our ( @EXPORT_OK, %EXPORT_TAGS );
+our ( $DEBUG_OPTIONS, @STATUS, @ERROR, @CHOMP, @DEBUG, @ISA );
+
+our $VERSION = '3.003';
 
 #========================================================================
 #                         ----- EXPORTER -----
@@ -121,13 +119,12 @@ sub debug_flags {
     my (@flags, $flag, $value);
     $debug = $self unless defined($debug) || ref($self);
     
-    if ($debug =~ /^\d+$/) {
+    if ( $debug !~ tr{0-9}{}c) {
         foreach $flag (@DEBUG) {
-            next if $flag =~ /^DEBUG_(OFF|ALL|FLAGS)$/;
+            next if $flag eq 'DEBUG_OFF' || $flag eq 'DEBUG_ALL' || $flag eq 'DEBUG_FLAGS';
 
             # don't trash the original
-            my $copy = $flag;
-            $flag =~ s/^DEBUG_//;
+            substr($flag,0,6,'') if index($flag,'DEBUG_') == 0;
             $flag = lc $flag;
             return $self->error("no value for flag: $flag")
                 unless defined($value = $DEBUG_OPTIONS->{ $flag });

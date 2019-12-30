@@ -1,0 +1,15 @@
+1.0.7.4   30.12.2019
+    - Version bump to use XS::Install 1.2.12 features
+
+1.0.7.3   30.12.2019
+    - use HTTP::Tiny instead of File::Fetch to avoid warning on https
+
+1.0.7.2   26.12.2019
+    - add simple test
+    - require C compiler instead of C++
+
+1.0.7.1   26.12.2019
+    - add -fPIC when making libbrotli.so
+
+1.0.7.0   25.12.2019
+    - initial release with libbrotli version 1.0.7

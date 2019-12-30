@@ -79,16 +79,15 @@ subtest 'Front anchor' => sub {
     plan tests => 1;
 
     my @expected = qw(
-        t/file-iterator.t
-        t/file-permission.t
-        t/filetype-detection.t
-        t/filetypes.t
-        t/filter.t
+        t/swamp/c-header.h
+        t/swamp/c-source.c
+        t/swamp/constitution-100k.pl
+        t/swamp/crystallography-weenies.f
     );
-    my $regex = '^t.fil';
+    my $regex = '^t.swamp.c';
 
     my @args  = ( '-g', $regex );
-    my @files = qw( t );
+    my @files = qw( t/swamp );
 
     ack_sets_match( [ @args, @files ], \@expected, "Looking for $regex" );
 };
@@ -98,7 +97,6 @@ subtest 'Back anchor' => sub {
     plan tests => 1;
 
     my @expected = qw(
-        t/runtests.pl
         t/swamp/constitution-100k.pl
         t/swamp/options-crlf.pl
         t/swamp/options.pl
@@ -107,7 +105,7 @@ subtest 'Back anchor' => sub {
     my $regex = 'pl$';
 
     my @args  = ( '-g', $regex );
-    my @files = qw( t );
+    my @files = qw( t/swamp );
 
     ack_sets_match( [ @args, @files ], \@expected, "Looking for $regex" );
 };
@@ -199,15 +197,19 @@ subtest 'File on command line is always searched, even with wrong filetype' => s
 
 
 subtest '-Q works on -g' => sub {
-    plan tests => 1;
+    plan tests => 2;
 
-    my @expected = qw();
-    my $regex = 'ack-g.t$';
+    # Matches without the -Q
+    my @expected = qw( t/swamp/file.bar );
+    my $regex = 'file.bar$';
 
     my @files = qw( t );
-    my @args  = ( '-Q', '-g', $regex );
+    my @args  = ( '-g', $regex );
 
-    ack_sets_match( [ @args, @files ], \@expected, "Looking for $regex with quotemeta." );
+    ack_sets_match( [ @args, @files ], \@expected, "Looking for $regex without -Q." );
+
+    # Doesn't match with -Q.
+    ack_sets_match( [ @args, '-Q', @files ], [], "Looking for $regex with -Q." );
 };
 
 
@@ -285,7 +287,6 @@ subtest 'test -g on a path' => sub {
 
     my $file_regex = 'text';
     my @expected   = qw(
-        t/context.t
         t/text/amontillado.txt
         t/text/bill-of-rights.txt
         t/text/constitution.txt
@@ -295,7 +296,7 @@ subtest 'test -g on a path' => sub {
         t/text/ozymandias.txt
         t/text/raven.txt
     );
-    my @args = ( '--sort-files', '-g', $file_regex );
+    my @args = ( '--sort-files', '-g', $file_regex, 't/text' );
 
     ack_sets_match( [ @args ], \@expected, 'Make sure -g matches the whole path' );
 };
@@ -306,7 +307,6 @@ subtest 'test -g with --color' => sub {
 
     my $file_regex = 'text';
     my $expected_original = <<'HERE';
-t/con(text).t
 t/(text)/amontillado.txt
 t/(text)/bill-of-rights.txt
 t/(text)/constitution.txt
@@ -323,7 +323,7 @@ HERE
 
     my @args = ( '--sort-files', '-g', $file_regex );
 
-    my @results = run_ack(@args, '--color');
+    my @results = run_ack(@args, '--color', 't/text');
 
     is_deeply( \@results, \@expected, 'Colorizing -g output with --color should work');
 };
@@ -339,7 +339,6 @@ subtest q{test -g without --color; make sure colors don't show} => sub {
 
     my $file_regex = 'text';
     my $expected   = <<'HERE';
-t/context.t
 t/text/amontillado.txt
 t/text/bill-of-rights.txt
 t/text/constitution.txt
@@ -350,7 +349,7 @@ t/text/ozymandias.txt
 t/text/raven.txt
 HERE
 
-    my @args = ( '--sort-files', '-g', $file_regex );
+    my @args = ( '--sort-files', '-g', $file_regex, 't/text' );
 
     my $results = run_ack_interactive(@args);
 

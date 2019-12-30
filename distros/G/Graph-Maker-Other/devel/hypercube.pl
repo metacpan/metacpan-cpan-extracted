@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -18,11 +18,16 @@
 # with Graph-Maker-Other.  If not, see <http://www.gnu.org/licenses/>.
 
 use strict;
-use Graph;
-
 use FindBin;
-use lib "$FindBin::Bin/lib";
+use File::Spec;
+use Graph;
+use Math::Trig 'pi';
+
+use lib File::Spec->catdir($FindBin::Bin, File::Spec->updir, 'devel', 'lib');
 use MyGraphs;
+
+# uncomment this to run the ### lines
+# use Smart::Comments;
 
 {
   # Hypercube
@@ -30,13 +35,33 @@ use MyGraphs;
   # N=4 tesseract https://hog.grinvin.org/ViewGraphInfo.action?id=1340
   # N=5           https://hog.grinvin.org/ViewGraphInfo.action?id=28533
   #     32 vertices 80 edges
+  # N=6           https://hog.grinvin.org/ViewGraphInfo.action?id=33768
+  # N=7
   require Graph::Maker::Hypercube;
   my @graphs;
-  for (my $k = 0; @graphs <= 5; $k++) {
+  for (my $k = 6; @graphs < 2; $k++) {
     my $graph = Graph::Maker->new('hypercube', N => $k, undirected=>1);
+
+    my $a = pi/2/($k-1);
+    ### $a
+    my @basis = map { [sin($_*$a), cos($_*$a)] } 0 .. $k-1;
+    foreach my $n ($graph->vertices) {
+      my $x = 0;
+      my $y = 0;
+      foreach my $i (0 .. $k-1) {
+        if (($n-1) & (1<<$i)) {
+          ### add: "n=$n i=$i $basis[$i]->[0] $basis[$i]->[1]"
+          $x += $basis[$i]->[0];
+          $y += $basis[$i]->[1];
+        }
+      }
+      MyGraphs::Graph_set_xy_points($graph, $n => [$x,$y]);
+    }
     push @graphs, $graph;
   }
   MyGraphs::hog_searches_html(@graphs);
+  MyGraphs::hog_upload_html($graphs[1]);
+  # MyGraphs::Graph_view($graphs[-1]);
   exit 0;
 }
 

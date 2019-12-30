@@ -1,5 +1,11 @@
 Revision history for Firefox-Marionette
 
+0.89  Wed Dec 25 07:01:00 2019
+       Fixing test suite for Perl 5.8.
+
+0.88  Tue Dec 24 17:08:00 2019
+       Correcting exit status for parent process. Thanks to Tomohiro Hosaka for the bug report in RT#131227.
+
 0.87  Sat Dec 14 16:16:00 2019
        Removing PIPE handler.
 

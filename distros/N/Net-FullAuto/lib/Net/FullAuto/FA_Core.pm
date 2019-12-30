@@ -31302,8 +31302,34 @@ sub display
    my $line=$_[0];
    return '' if -1<index $line,'[sudo]';
    my $cmd_prompt=$_[1];
-   my $save=$_[2];
+   my $save=$_[2]||'';
    my $cmd=$_[3]||'';
+   if ((-1<index $line,'[K') &&
+         ($line eq '[K' ||
+         (substr($line,-2) eq '[K') ||
+         (-1<index $line,'Kre') ||
+         (-1<index $line,'KRe') ||
+         (-1<index $line,'KUp'))) {
+      if ($line=~/\[K?$/s) {
+         $save.=$line;
+         return $save;
+      }
+      $line=$save.$line;
+      $line=~s/\[K/\n/gs;
+      if (-1<index $line,'remote: T') {
+         $line="\n\n$line";
+      } elsif (-1<index $line,')remote') {
+         $line=~s/\)remote/\)\nremote/sg;
+      }
+   } elsif ($save eq '[K') {
+      $line=$save.$line;
+      $line=~s/\[K/\n/gs;
+      if (-1<index $line,'remote: T') {
+         $line="\n\n$line";
+      } elsif (-1<index $line,')remote') {
+         $line=~s/\)remote/\)\nremote/sg;
+      }
+   }
    $line=~s/^stdout: ?//mg;
    my $print_out=0;
    $print_out=1 if $Net::FullAuto::FA_Core::log &&
@@ -31351,8 +31377,8 @@ sub display
       return '';
    } else {
       $line=~s/\s+\d\s*$//s;
-      print $line."\n";
-      print $OUTPUT $line."\n" if $print_out;
+      print $line;
+      print $OUTPUT $line if $print_out;
       return '';
    }
 }

@@ -35,7 +35,7 @@ package TestCase::MyExe {
     
     # join
     {
-      ok(TestCase::Lib::SPVM::CORE->test_join);
+      ok(TestCase::Lib::SPVM::Util->test_join);
     }
     
     # Import sub
@@ -270,7 +270,7 @@ package TestCase::MyExe {
     }
     
     # Finish test
-    print("1.." . (string)$TEST_NUM . "\n");
+    print "1.." . (string)$TEST_NUM . "\n";
     
     return 0;
   }
@@ -279,10 +279,10 @@ package TestCase::MyExe {
     $TEST_NUM++;
 
     if ($ok) {
-      print("ok ");
+      print "ok ";
     }
     else {
-      print("not ok ");
+      print "not ok ";
     }
     print((string)$TEST_NUM . "\n");
   }

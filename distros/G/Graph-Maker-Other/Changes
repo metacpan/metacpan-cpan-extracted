@@ -17,6 +17,11 @@ along with Graph-Maker-Other.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 14, December 2019
+    - new Crown
+    - fix RookGrid edges both ways when directed
+    - Catalans vertex_name_type run1s,run0s
+
 Version 13, February 2019
     - new Catalans, ExcessConfigurations
 

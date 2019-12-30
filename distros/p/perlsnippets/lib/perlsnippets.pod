@@ -13,7 +13,7 @@ perlsnippets - A collection of Perl idioms or short pieces of Perl code
 
 =head1 VERSION
 
-This document describes version 0.005 of perlsnippets (from Perl distribution perlsnippets), released on 2019-09-11.
+This document describes version 0.006 of perlsnippets (from Perl distribution perlsnippets), released on 2019-12-25.
 
 =head1 DESCRIPTION
 
@@ -91,6 +91,38 @@ generate a key: C<length($_)> (to sort by string length), C<lc($_)> (to do
 case-insensitive sorting).
 
 Related documentation: L<https://en.wikipedia.org/wiki/Schwartzian_transform>
+
+=head1 ARY/UNIQ (Arrays / Removing duplicates from array)
+
+Of course, the obvious way is to use L<List::Util>'s C<uniq> (or C<uniqnum>):
+
+ use List::Util 'uniq';
+ my @uniq = uniq(@ary);
+
+But the snippets below might be useful in cases where you cannot or do not want
+use a module. Most (if not all) of the techniques described below will involve
+the use of a hash.
+
+=head1 ARY/UNIQ/1 (Removing duplicates from array, losing order)
+
+ my %hash = map {$_=>1} @ary;
+ my @uniq = keys %hash;
+
+Single statement variant:
+
+ my @uniq = do { my %hash = map {$_=>1} @ary; keys %hash };
+
+Using this snippet, you will lose the original order of array elements, which is
+often undesirable.
+
+=head1 ARY/UNIQ/2 (Removing duplicates from array, maintaining order)
+
+ my (%hash, @uniq);
+ for (@ary) { push @uniq, $_ unless $hash{$_}++ }
+
+Single statement variant:
+
+ my @uniq = do { my %seen; grep { !$seen{$_}++ } @ary };
 
 =head1 HASH (Hashes)
 
@@ -257,6 +289,35 @@ Another variant for L</"SUB/CODE/1"> is to (mis)use state variable:
 
 State variables require perl 5.10, which all systems should already have. But
 you still have to say C<use feature 'state';> or at least C<use 5.010;>.
+
+=head2 SUB/DEFINED/1 (Check if a function is defined)
+
+ say "Function foo is defined" if defined &foo;
+ say "Function MyPackage::foo is defined" if defined &MyPackage::foo;
+
+This includes routines imported from another package:
+
+ use Data::Dump; # exports dd()
+ say "Function dd is defined" if defined &dd; # prints that dd is defined
+
+=head2 SUB/LIST/1 (List functions defined in a package)
+
+The obvious choice is to use something like L<Package::Stash>
+(L<Package::Stash::XS> or L<Package::Stash::PP>), but when you cannot or do not
+want to use a module, there's some symbol table manipulation you can do
+yourself. But heed the warning in Package::Stash documentation: "Manipulating
+stashes (Perl's symbol tables) is occasionally necessary, but incredibly messy,
+and easy to get wrong. This module hides all of that behind a simple API."
+
+ my @subs;
+ my $symtbl = \%{"$pkg\::"};
+ for my $key (keys %$symbl) {
+     my $val = $symtbl->{$key};
+     push @subs, $key if ref $val eq 'CODE' || # perl >= 5.22
+         defined *$val{CODE};
+ }
+
+This will include routines imported from another package.
 
 =head1 HOMEPAGE
 

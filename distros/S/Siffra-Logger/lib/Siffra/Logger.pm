@@ -27,7 +27,7 @@ BEGIN
 {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.07';
+    $VERSION = '0.08';
     @ISA     = qw(Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -89,18 +89,6 @@ BEGIN
                 newline   => 1,
                 mode      => 'append',
                 binmode   => ':encoding(UTF-8)',
-            ],
-            [
-                'Email::Siffra',
-                name      => 'Email',
-                subject   => 'Subject',
-                to        => 'admin@siffra.com.br',
-                from      => 'bot@siffra.com.br',
-                min_level => 'error',
-                buffered  => 1,
-                smtp      => 'mail',
-                port      => 2525,
-                utf8      => 1,
             ],
         ],
         callbacks => [

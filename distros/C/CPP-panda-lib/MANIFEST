@@ -1,8 +1,10 @@
+.gitattributes
 Changes
 CMakeLists.txt
 lib.xs
 lib/CPP/panda/lib.pm
 lib/CPP/panda/lib.pod
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 misc/trun.plx
@@ -11,7 +13,11 @@ src/panda/basic_string_view.h
 src/panda/CallbackDispatcher.h
 src/panda/cast.h
 src/panda/endian.h
+src/panda/error.cc
+src/panda/error.h
 src/panda/excepted.h
+src/panda/exception.cc
+src/panda/exception.h
 src/panda/expected.h
 src/panda/from_chars.cc
 src/panda/from_chars.h
@@ -36,13 +42,18 @@ src/panda/string_view.h
 src/panda/traits.h
 src/panda/unordered_string_map.h
 src/panda/unordered_string_set.h
+src/panda/varint.h
 t/bench.cc
 t/dispatcher.cc
 t/dispatcher.t
 t/endian.cc
 t/endian.t
+t/error.cc
+t/error.t
 t/excepted.cc
 t/excepted.t
+t/exception.cc
+t/exception.t
 t/from_chars.cc
 t/from_chars.t
 t/function.cc
@@ -71,5 +82,7 @@ t/to_chars.cc
 t/to_chars.t
 t/traits.cc
 t/traits.t
+t/varint.cc
+t/varint.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

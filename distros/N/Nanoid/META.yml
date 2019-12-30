@@ -1,0 +1,39 @@
+---
+abstract: 'Perl implementation of L<nanoid|https://github.com/ai/nanoid>'
+author:
+  - 'tkzwtks <tkzwtks@gmail.com>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Nanoid
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Nanoid:
+    file: lib/Nanoid.pm
+    version: '0.02'
+requires:
+  Bytes::Random::Secure: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tkzwtks/Nanoid-perl/issues
+  homepage: https://github.com/tkzwtks/Nanoid-perl
+  repository: git://github.com/tkzwtks/Nanoid-perl.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

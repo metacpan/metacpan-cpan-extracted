@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "IO::Async::Loop" => 0,
     "IO::Async::Signal" => 0,
     "IO::Async::Stream" => 0,
+    "IO::Handle" => 0,
     "IO::Socket::INET" => 0,
     "IO::Socket::UNIX" => 0,
     "IPC::Open3" => 0,
@@ -62,7 +63,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "lib" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }

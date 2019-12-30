@@ -2,12 +2,13 @@
 
 use strict;
 use Test::Builder::Tester;
-use Test::More tests => 19;
+use Test::More tests => 21;
 
 use Data::Dumper;
 
-use lib qw(lib);
+use lib qw(lib t/lib);
 
+use fake_response;
 use Test::HTML::Form;
 
 my $filename = 't/form_with_errors.html';
@@ -59,3 +60,14 @@ is($word,'koncerty','extracted word from text matches');
 my $form_values = Test::HTML::Form->get_form_values({filename => $filename});
 
 ok ($form_values->{tit1e}[0], 'have a title field extracted ok');
+
+
+##
+
+my $fake_responses = fake_response->new;
+form_field_value_matches($fake_responses,'foo_hid','sneaky', undef, 'have hidden field');
+$fake_responses->next_response;
+
+form_select_field_matches($fake_responses,{ field_name => 'select_foo', selected => 'bbb', form_name => undef}, 'updated response matches new field');
+
+

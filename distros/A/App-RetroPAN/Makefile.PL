@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => 0,
     "HTTP::Request" => 0,
     "LWP::UserAgent" => 0,
-    "List::Util" => 0,
+    "List::MoreUtils" => 0,
     "Module::CoreList" => "2.99",
     "OrePAN2" => 0,
     "Pod::Usage" => 0
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +50,7 @@ my %FallbackPrereqs = (
   "Getopt::Long" => 0,
   "HTTP::Request" => 0,
   "LWP::UserAgent" => 0,
-  "List::Util" => 0,
+  "List::MoreUtils" => 0,
   "Module::CoreList" => "2.99",
   "OrePAN2" => 0,
   "Pod::Usage" => 0,

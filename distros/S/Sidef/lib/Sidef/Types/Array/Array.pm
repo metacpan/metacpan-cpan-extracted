@@ -404,7 +404,7 @@ package Sidef::Types::Array::Array {
 
     *partition = \&part;
 
-    sub split {
+    sub segment {
         my ($self, @indices) = @_;
 
         my @parts;
@@ -419,7 +419,74 @@ package Sidef::Types::Array::Array {
             $prev_i = $i + 1;
         }
 
+        if ($prev_i <= $end) {
+            CORE::push(@parts, bless [@{$self}[$prev_i .. $end]]);
+        }
+
         bless \@parts;
+    }
+
+    sub segment_by {
+        my ($self, $block) = @_;
+
+        my @indices;
+        foreach my $i (0 .. $#$self) {
+            if ($block->run($self->[$i])) {
+                CORE::push(@indices, $i);
+            }
+        }
+
+        $self->segment(@indices);
+    }
+
+    sub split_by {
+        my ($self, $block) = @_;
+
+        my @tmp;
+        my @array;
+
+        foreach my $item (@$self) {
+            if ($block->run($item)) {
+                CORE::push(@array, [CORE::splice(@tmp)]);
+            }
+            else {
+                CORE::push(@tmp, $item);
+            }
+        }
+
+        if (@tmp) {
+            CORE::push(@array, \@tmp);
+        }
+
+        @array = map { bless $_ } @array;
+        bless \@array;
+    }
+
+    sub split {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &split_by;
+        }
+
+        my @tmp;
+        my @array;
+
+        foreach my $item (@$self) {
+            if ($item eq $obj) {
+                CORE::push(@array, [CORE::splice(@tmp)]);
+            }
+            else {
+                CORE::push(@tmp, $item);
+            }
+        }
+
+        if (@tmp) {
+            CORE::push(@array, \@tmp);
+        }
+
+        @array = map { bless $_ } @array;
+        bless \@array;
     }
 
     sub or {
@@ -965,7 +1032,7 @@ package Sidef::Types::Array::Array {
         $self->reduce_operator('+', $initial);
     }
 
-    sub _sum_prod_by {
+    sub _reduce_by {
         my ($self, $method, $result, $callback) = @_;
 
         my @list;
@@ -990,14 +1057,14 @@ package Sidef::Types::Array::Array {
     sub sum_by {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_sum_prod_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
+        $self->_reduce_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
     }
 
     sub sum_kv {
         my ($self, $block) = @_;
-        $self->_sum_prod_by('sum',
-                            Sidef::Types::Number::Number::ZERO,
-                            sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
+        $self->_reduce_by('sum',
+                          Sidef::Types::Number::Number::ZERO,
+                          sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
     }
 
     sub sum_2d {
@@ -1038,14 +1105,14 @@ package Sidef::Types::Array::Array {
     sub prod_by {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_sum_prod_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
+        $self->_reduce_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
     }
 
     sub prod_kv {
         my ($self, $block) = @_;
-        $self->_sum_prod_by('prod',
-                            Sidef::Types::Number::Number::ONE,
-                            sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
+        $self->_reduce_by('prod',
+                          Sidef::Types::Number::Number::ONE,
+                          sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
     }
 
     sub prod {
@@ -1060,15 +1127,8 @@ package Sidef::Types::Array::Array {
 
     sub gcd_by {
         my ($self, $block) = @_;
-
         $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my @list;
-        foreach my $n (@$self) {
-            push @list, $block->run($n);
-        }
-
-        Sidef::Types::Number::Number::gcd(@list);
+        $self->_reduce_by('gcd', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
     }
 
     sub gcd {
@@ -1083,15 +1143,8 @@ package Sidef::Types::Array::Array {
 
     sub lcm_by {
         my ($self, $block) = @_;
-
         $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my @list;
-        foreach my $n (@$self) {
-            push @list, $block->run($n);
-        }
-
-        Sidef::Types::Number::Number::lcm(@list);
+        $self->_reduce_by('lcm', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
     }
 
     sub lcm {
@@ -1102,6 +1155,16 @@ package Sidef::Types::Array::Array {
         }
 
         Sidef::Types::Number::Number::lcm(@$self);
+    }
+
+    sub all_prime {
+        my ($self) = @_;
+        Sidef::Types::Number::Number::all_prime(@$self);
+    }
+
+    sub all_composite {
+        my ($self) = @_;
+        Sidef::Types::Number::Number::all_composite(@$self);
     }
 
     sub digits2num {    # Algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
@@ -1153,6 +1216,7 @@ package Sidef::Types::Array::Array {
         my $old_key = $block->run($minmax);
 
         foreach my $i (1 .. $#$self) {
+
             my $value   = $self->[$i];
             my $new_key = $block->run($value);
 
@@ -1648,6 +1712,39 @@ package Sidef::Types::Array::Array {
     }
 
     *stack_by = \&stack;
+
+    sub run_length {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        @$self || return bless [];
+
+        my @result     = bless [$self->[0], 1];
+        my $prev_value = $block->run($self->[0]);
+
+        foreach my $i (1 .. $#{$self}) {
+
+            my $item       = $self->[$i];
+            my $curr_value = $block->run($item);
+
+            if ($curr_value eq $prev_value) {
+                ++$result[-1][1];
+            }
+            else {
+                CORE::push(@result, bless [$item, 1]);
+            }
+
+            $prev_value = $curr_value;
+        }
+
+        foreach my $pair (@result) {
+            $pair->[1] = Sidef::Types::Number::Number->_set_uint($pair->[1]);
+        }
+
+        bless \@result;
+    }
+
+    *run_length_by = \&run_length;
 
     sub match {
         my ($self, $regex) = @_;
@@ -2989,9 +3086,9 @@ package Sidef::Types::Array::Array {
         Math::GMPz::Rmpz_fac_ui($f, scalar(@arr));    # f = factorial(len)
 
         while (my $len = scalar(@arr)) {
-            Math::GMPz::Rmpz_divexact_ui($f, $f, $len);    # f = f/len
-            Math::GMPz::Rmpz_divmod($q, $n, $n, $f);       # q = n//f ;; n = n%f
-            Math::GMPz::Rmpz_mod_ui($q, $q, $len);         # q = q%len
+            Math::GMPz::Rmpz_divexact_ui($f, $f, $len);                              # f = f/len
+            Math::GMPz::Rmpz_divmod($q, $n, $n, $f);                                 # q = n//f ;; n = n%f
+            Math::GMPz::Rmpz_mod_ui($q, $q, $len);                                   # q = q%len
             CORE::push(@perm, CORE::splice(@arr, Math::GMPz::Rmpz_get_ui($q), 1));
         }
 
@@ -2999,6 +3096,62 @@ package Sidef::Types::Array::Array {
     }
 
     *nth_perm = \&nth_permutation;
+
+    sub next_permutation {
+        my ($self) = @_;
+
+        my $k = $#$self;
+        return Sidef::Types::Bool::Bool::FALSE if ($k < 0);
+
+        my $i = $k - 1;
+        while ($i >= 0 and $self->[$i]->ge($self->[$i + 1])) {
+            --$i;
+        }
+
+        if ($i == -1) {
+            @$self = CORE::reverse(@$self);
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if ($self->[$i + 1]->gt($self->[$k])) {
+            @{$self}[$i + 1 .. $k] = CORE::reverse(@{$self}[$i + 1 .. $k]);
+        }
+
+        my $j = $i + 1;
+        while ($self->[$i]->ge($self->[$j])) {
+            ++$j;
+        }
+        @{$self}[$i, $j] = @{$self}[$j, $i];
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
+
+    sub unique_permutations {
+        my ($self, $block) = @_;
+        my $vals = bless([@$self]);
+
+        my $break = 1;
+        my @results;
+
+        foreach my $n (1, 2) {
+            if ($n == 1) {
+                defined($block)
+                  ? $block->run(@$vals)
+                  : CORE::push(@results, bless([@$vals]));
+            }
+            $break = 0;
+            last;
+        }
+
+        while (!$break and $vals->next_permutation) {
+            defined($block)
+              ? $block->run(@$vals)
+              : CORE::push(@results, bless([@$vals]));
+        }
+
+        defined($block) ? $block : bless(\@results);
+    }
+
+    *uniq_permutations = \&unique_permutations;
 
     sub perm2num {
         my ($self) = @_;
@@ -3323,6 +3476,18 @@ package Sidef::Types::Array::Array {
 
     *chrs   = \&join_bytes;
     *decode = \&join_bytes;
+
+    sub join_insert {
+        my ($self, $obj) = @_;
+
+        my @array;
+        foreach my $item (@$self) {
+            CORE::push(@array, $item, $obj);
+        }
+
+        CORE::pop(@array);
+        bless \@array;
+    }
 
     sub reverse {
         my ($self) = @_;

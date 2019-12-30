@@ -3,7 +3,8 @@ NAME
     decoding to UTF8
 
 VERSION
-    version 0.01
+    This document describes version 0.020 of Locale::TextDomain::UTF8 (from
+    Perl distribution Locale-TextDomain-UTF8), released on 2019-12-26.
 
 SYNOPSIS
     Instead of:
@@ -35,20 +36,13 @@ DESCRIPTION
     to pass the strings to Unicode::GCString. For more details, see the Perl
     Advent article mentioned in the SEE ALSO section.
 
-SEE ALSO
-    Locale::TextDomain
-
-    Locale::Messages
-
-    <http://www.perladvent.org/2013/2013-12-09.html>
-
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Locale-TextDomain-UTF8>.
 
 SOURCE
     Source repository is at
-    <https://github.com/sharyanto/perl-Locale-TextDomain-UTF8>.
+    <https://github.com/perlancar/perl-Locale-TextDomain-UTF8>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -58,11 +52,20 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
+SEE ALSO
+    Locale::TextDomain::UTF8::IfEnv
+
+    Locale::TextDomain
+
+    Locale::Messages
+
+    <http://www.perladvent.org/2013/2013-12-09.html>
+
 AUTHOR
-    Steven Haryanto <stevenharyanto@gmail.com>
+    perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2013 by Steven Haryanto.
+    This software is copyright (c) 2019, 2013 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

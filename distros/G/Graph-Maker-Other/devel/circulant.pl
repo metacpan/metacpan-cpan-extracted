@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2018 Kevin Ryde
+# Copyright 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -30,6 +30,45 @@ use Graph::Maker::Circulant;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
+{
+  # Circulant HOG
+  # N=7 1,2 https://hog.grinvin.org/ViewGraphInfo.action?id=710
+  # N=8 1,2 https://hog.grinvin.org/ViewGraphInfo.action?id=160
+  #         graphedron
+  # N=8 1,3 https://hog.grinvin.org/ViewGraphInfo.action?id=570
+  #         graphedron
+  #
+
+  require Algorithm::ChooseSubsets;
+  my @graphs;
+  my %seen;
+  foreach my $N (
+                 10
+                ) {
+    my $half = int($N/2);
+    my @possible_offsets = (1 .. $half);
+    my $it = Algorithm::ChooseSubsets->new(\@possible_offsets);
+    while (my $offset_list = $it->next) {
+      next if @$offset_list <= 1;                  # not cycle
+
+      my $graph = Graph::Maker->new('circulant', undirected => 1,
+                                    N => $N,
+                                    offset_list => $offset_list);
+      next if $graph->edges == $N*($N-1);  # not complete
+
+      my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
+      $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
+      print "N=$N ",join(',',@$offset_list)," $g6_str";
+      next if $seen{$g6_str}++;
+
+      if (MyGraphs::hog_grep($g6_str)) {
+        push @graphs, $graph;
+      }
+    }
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
 {
   # Circulant equivalence 4
   my $N = 17;
@@ -82,41 +121,4 @@ use Graph::Maker::Circulant;
 }
 
 
-{
-  # Circulant HOG
-  # N=7 1,2 https://hog.grinvin.org/ViewGraphInfo.action?id=710
-  # N=8 1,2 https://hog.grinvin.org/ViewGraphInfo.action?id=160
-  #         graphedron
-  # N=8 1,3 https://hog.grinvin.org/ViewGraphInfo.action?id=570
-  #         graphedron
-  #
 
-  my @graphs;
-  my %seen;
-  foreach my $N (9 .. 20) {
-    my $half = int($N/2);
-    foreach my $offset_flags (0 .. (1<<$half)-1) {
-      my @offset_list;
-      foreach my $o (1 .. $half) {
-        if ($offset_flags & (1<<($o-1))) {
-          push @offset_list, $o;
-        }
-      }
-      next if @offset_list < 2;
-      next if @offset_list == $half;
-
-      my $graph = Graph::Maker->new('circulant', undirected => 1,
-                                    N => $N, offset_list => \@offset_list);
-      my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
-      $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
-      next if $seen{$g6_str}++;
-
-      if (MyGraphs::hog_grep($g6_str)) {
-        print "N=$N ",join(',',@offset_list)," $g6_str";
-        push @graphs, $graph;
-      }
-    }
-  }
-  MyGraphs::hog_searches_html(@graphs);
-  exit 0;
-}

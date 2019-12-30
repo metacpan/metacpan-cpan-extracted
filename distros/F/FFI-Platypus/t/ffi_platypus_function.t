@@ -144,26 +144,51 @@ subtest 'variadic' => sub {
 
   subtest 'unattached' => sub {
 
-    is(
-      $ffi->function(variadic_return_arg => ['int'] => ['int','int','int','int','int','int','int'] => 'int')->call(4,10,20,30,40,50,60,70),
-      40,
-      'sans wrapper'
-    );
+    foreach my $i (1..7)
+    {
+      is(
+        $ffi->function(variadic_return_arg => ['int'] => ['int','int','int','int','int','int','int'] => 'int')->call($i,10,20,30,40,50,60,70),
+        $i*10,
+        'sans wrapper'
+      );
 
-    is(
-      $ffi->function(variadic_return_arg => ['int'] => ['int','int','int','int','int','int','int'] => 'int', $wrapper)->call(4,10,20,30,40,50,60,70),
-      80,
-      'with wrapper'
-    );
+      is(
+        $ffi->function(variadic_return_arg => ['int'] => ['int','int','int','int','int','int','int'] => 'int', $wrapper)->call($i,10,20,30,40,50,60,70),
+        $i*10*2,
+        'with wrapper'
+      );
+    }
   };
 
   subtest 'attached' => sub {
 
     $ffi->attach([variadic_return_arg => 'y1'] => ['int'] => ['int','int','int','int','int','int','int'] => 'int');
-    is(y1(4,10,20,30,40,50,60,70), 40, 'sans wrapper');
-
     $ffi->attach([variadic_return_arg => 'y2'] => ['int'] => ['int','int','int','int','int','int','int'] => 'int', $wrapper);
-    is(y2(4,10,20,30,40,50,60,70), 80, 'with wrapper');
+
+    foreach my $i (1..7)
+    {
+      is(y1($i,10,20,30,40,50,60,70), $i*10, 'sans wrapper');
+      is(y2($i,10,20,30,40,50,60,70), $i*10*2, 'with wrapper');
+    }
+
+  };
+
+  subtest 'examples' => sub {
+
+    is(
+      $ffi->function( xprintf => ['string'] => ['int'] => 'string' )->call("print integer %d\n", 42),
+      "print integer 42\n",
+    );
+
+    is(
+      $ffi->function( xprintf => ['string'] => ['string'] => 'string' )->call("print string %s\n", 'platypus'),
+      "print string platypus\n",
+    );
+
+    is(
+      $ffi->function( xprintf => ['string'] => ['int','string'] => 'string' )->call("print integer %d and string %s\n", 42, 'platypus'),
+      "print integer 42 and string platypus\n",
+    );
 
   };
 
@@ -188,4 +213,3 @@ subtest 'single void arg treated as no args' => sub {
 };
 
 done_testing;
-

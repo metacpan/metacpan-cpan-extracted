@@ -1,5 +1,8 @@
 Revision history for Perl extension DBD::Mock.
 
+1.55 2019-12-30T14:20:00Z
+    - Fixed bug rt131264 t/033_table_info.t fails (with older DBI)
+
 1.54 2019-12-23T12:44:22Z
     - Added Bernhard Graf's 'Feature: one shot failure' merge request.
     - Fixed description of the failure attribute of mock_add_resultset. It

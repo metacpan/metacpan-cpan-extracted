@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,7 +29,41 @@ use MyGraphs;
 # use Smart::Comments;
 
 
+{
+  # HOG
 
+  # 1xN various path
+  # 2x2 4-cycle
+  # 2x3 cross-linked triangles
+  # 3x3
+
+  # GP-DEFINE  rook_edges(w,h) = sum(x=1,w,sum(y=1,h, w-x + h-y));
+  # GP-Test  rook_edges(2,3) == 9
+  # GP-Test  rook_edges(8,8) == 448
+
+  my @graphs;
+  my @values;
+  foreach my $w (8) {
+    foreach my $h (8) {
+
+      my $graph = Graph::Maker->new('rook_grid',
+                                    dims => [$w,$h],
+                                    undirected => 1,
+                                   );
+      my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
+      $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
+      my $hog = (MyGraphs::hog_grep($g6_str) ? "   HOG" : "");
+
+      push @graphs, $graph;
+      my $num_vertices = $graph->vertices;
+      my $num_edges = $graph->edges;
+      print "$w x $h, $num_vertices vertices, $num_edges edges$hog\n";
+    }
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  MyGraphs::hog_upload_html($graphs[0]);
+  exit 0;
+}
 {
   # Rook 4,4 cospectral with Shrikhande
 
@@ -80,37 +114,7 @@ use MyGraphs;
     return $graph;
   }
 }
-{
-  # 1xN various path
-  # 2x2 4-cycle
-  # 2x3 cross-linked triangles
-  # 3x3
 
-  # GP-DEFINE  rook_edges(w,h) = sum(x=1,w,sum(y=1,h, w-x + h-y));
-  # GP-Test  rook_edges(2,3) == 9
-  # GP-Test  rook_edges(8,8) == 448
-
-  my @graphs;
-  my @values;
-  foreach my $w (4) {
-    foreach my $h ($w .. 4) {
-
-      my $graph = Graph::Maker->new('rook_grid',
-                                    dims => [$w,$h],
-                                    undirected => 1,
-                                   );
-    my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
-    $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
-      my $hog = (MyGraphs::hog_grep($g6_str) ? "   HOG" : "");
-
-      push @graphs, $graph;
-      my $num_edges = $graph->edges;
-      print "$w x $h edges $num_edges$hog\n";
-    }
-  }
-  MyGraphs::hog_searches_html(@graphs);
-  exit 0;
-}
 
 {
   # Rook 4,4 tikz

@@ -53,7 +53,7 @@
    "provides" : {
       "FB3::Convert" : {
          "file" : "lib/FB3/Convert.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "FB3::Convert::Epub" : {
          "file" : "lib/FB3/Convert/Epub.pm"
@@ -68,9 +68,8 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/lgpl-license.php"
+         "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
       ]
    },
-   "version" : "0.37",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.38"
 }

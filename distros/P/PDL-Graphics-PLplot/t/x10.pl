@@ -1,5 +1,3 @@
-#! /usr/bin/env perl
-#
 # Demo x10 for the PLplot PDL binding
 #
 # Window positioning demo.
@@ -24,6 +22,8 @@
 
 # SYNC: x10c.c 1.13
 
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::PLplot;
 

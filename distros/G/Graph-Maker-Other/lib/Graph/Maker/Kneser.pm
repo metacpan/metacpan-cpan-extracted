@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -47,6 +47,7 @@ sub init {
     $graph->add_vertex(join(',',@$v));
   }
 
+  my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
   foreach my $i_from (0 .. $#vertices-1) {
     my $from = $vertices[$i_from];
     foreach my $i_to ($i_from+1 .. $#vertices) {
@@ -59,8 +60,7 @@ sub init {
         my $v_from = join(',',@$from);
         my $v_to   = join(',',@$to);
         ### edge: "$v_from to $v_to"
-        $graph->add_edge($v_from, $v_to);
-        if ($directed) { $graph->add_edge($v_to, $v_from); }
+        $graph->$add_edge($v_from, $v_to);
       }
     }
   }

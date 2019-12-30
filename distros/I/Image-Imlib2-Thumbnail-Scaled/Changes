@@ -1,5 +1,8 @@
 Revision history for Image-Imlib2-Thumbnail-Scaled
 
+0.05		12/26/2019 23:00 CST
+                Fixed LICENSE meta name. (@manwar)
+
 0.05		07/12/2014 18:00 PST
 				Complete overhaul. Now uses Object::Tiny::RW::XS. Added move_original.
 
@@ -9,7 +12,7 @@ Revision history for Image-Imlib2-Thumbnail-Scaled
 0.03		07/10/2014 23:33 PST
 				Added delete_original method
 
-0.02		03/06/2013 00:40 CST 
+0.02		03/06/2013 00:40 CST
 				Added original_width and original_height methods
 
 0.01    03/05/2013 20:00 CST

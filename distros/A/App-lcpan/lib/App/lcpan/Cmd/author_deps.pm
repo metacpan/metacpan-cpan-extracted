@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::author_deps;
 
-our $DATE = '2019-10-05'; # DATE
-our $VERSION = '1.041'; # VERSION
+our $DATE = '2019-11-29'; # DATE
+our $VERSION = '1.043'; # VERSION
 
 use 5.010;
 use strict;
@@ -71,7 +71,7 @@ App::lcpan::Cmd::author_deps - List dependencies for all of the dists of an auth
 
 =head1 VERSION
 
-This document describes version 1.041 of App::lcpan::Cmd::author_deps (from Perl distribution App-lcpan), released on 2019-10-05.
+This document describes version 1.043 of App::lcpan::Cmd::author_deps (from Perl distribution App-lcpan), released on 2019-11-29.
 
 =head1 FUNCTIONS
 
@@ -140,6 +140,14 @@ Include core modules.
 
 Include non-core modules.
 
+=item * B<include_registered> => I<bool> (default: 1)
+
+Include modules that are registered (listed in 02packages.details.txt.gz).
+
+=item * B<include_unregistered> => I<bool> (default: 1)
+
+Include modules that are not registered (not listed in 02packages.details.txt.gz).
+
 =item * B<index_name> => I<filename> (default: "index.db")
 
 Filename of index.
@@ -161,7 +169,7 @@ Only list depended modules published by specified author(s).
 
 Do not list depended modules published by specified author(s).
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.30.0")
 
 Set base Perl version for determining core modules.
 

@@ -18,13 +18,21 @@
 \renewcommand\figureautorefname{figure}   % lower case
 \usepackage[all]{hypcap} % figure links to top of figure
 
+% breakurl must be after hyperref
+% whizzytex circa its version 1.3.3 does something hairy which upsets breakurl,
+% so skip when whizzytex previewing
+\usepackage{ifthen}
+\ifthenelse{\isundefined{\Whizzytex}}{
+\usepackage{breakurl} % for breaking long \url in DVI
+}
+
 \usepackage{mathtools}  % for \mathclap and showonlyrefs
-\mathtoolsset{showonlyrefs}
+\mathtoolsset{showonlyrefs=true,showmanualtags=true}
 
 \usepackage{amsthm}
 
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta}  % for arrow To[length etc
+\usetikzlibrary{arrows.meta}  % for Latex arrows To[length etc
 \usetikzlibrary{bending}      % for arrow [bend]
 \usetikzlibrary{calc}         % for ($(...)$) coordinate calculations
 \usetikzlibrary{decorations}  % for [decoration=]
@@ -81,6 +89,511 @@
 %------------------------------------------------------------------------------
 \begin{document}
 
+
+
+%------------------------------------------------------------------------------
+\section{9,3 Symmetric}
+
+9,3 symmetric.  9 points, 3 ``lines''.
+Pair of points at most 1 line.
+Each line 3 points, each point 3 lines.
+
+\subsection{Tri-Hex}
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.7,
+     my box/.style={draw,minimum size=1.3em,inner sep=.15em,outer sep=.1em},
+    ]
+
+  \node (1) at (90:2.5) [my box] {1};
+  \node (5) at (-150:2.5) [my box] {5};
+  \node (3) at (-30:2.5) [my box] {3};
+
+  \node (4) at (270:1.2) [my box] {4};
+  \node (2) at (30:1.2) [my box] {2};
+  \node (6) at (150:1.2) [my box] {6};
+
+  \node (7) at (90:.6) [my box] {7};
+  \node (8) at (-30:.6) [my box] {8};
+  \node (9) at (-150:.6) [my box] {9};
+
+  \draw [] (8) to (7);
+  \draw [] (4) to (5);
+  \draw [] (8) to (4);
+  \draw [] (1) to (2);
+  \draw [] (2) to (7);
+  \draw [] (6) to (5);
+  \draw [] (8) to (9);
+  \draw [] (7) to (5);
+  \draw [] (1) to (6);
+  \draw [] (6) to (9);
+  \draw [] (3) to (4);
+  \draw [] (1) to (8);
+  \draw [] (3) to (9);
+  \draw [] (7) to (9);
+  \draw [] (4) to (9);
+  \draw [] (2) to (3);
+  \draw [] (6) to (7);
+  \draw [] (2) to (8);
+
+\end{tikzpicture}
+\end{center}
+
+\subsection{Pappus}
+
+Geometric lines: \url{https://hog.grinvin.org/ViewGraphInfo.action?id=33731}
+
+Lines as cliques: \url{https://hog.grinvin.org/ViewGraphInfo.action?id=370}
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.7,
+     my box/.style={draw,minimum size=1.3em,inner sep=.15em,outer sep=.1em},
+    ]
+
+  \node (1) at (-2,-1) [my box] {1};
+  \node (2) at (0,-1) [my box] {2};
+  \node (3) at (2,-1) [my box] {3};
+  \node (4) at (1,0) [my box] {4};
+  \node (5) at (2,1) [my box] {5};
+  \node (6) at (0,1) [my box] {6};
+  \node (7) at (-2,1) [my box] {7};
+  \node (8) at (-1,0) [my box] {8};
+  \node (9) at (0,0) [my box] {9};
+
+  \draw [] (1) to (2);
+  \draw [] (2) to (4);
+  \draw [] (2) to (8);
+  \draw [] (9) to (7);
+  \draw [] (2) to (3);
+  \draw [] (4) to (6);
+  \draw [] (8) to (6);
+  \draw [] (5) to (6);
+  \draw [] (1) to (8);
+  \draw [] (3) to (4);
+  \draw [] (4) to (5);
+  \draw [] (9) to (3);
+  \draw [] (9) to (4);
+  \draw [] (1) to (9);
+  \draw [] (8) to (9);
+  \draw [] (6) to (7);
+  \draw [] (9) to (5);
+  \draw [] (8) to (7);
+
+\end{tikzpicture}
+\end{center}
+
+\subsection{Other}
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.8,
+     my box/.style={draw,circle,minimum size=1.1em,inner sep=.15em},
+    ]
+
+  \node (1) at (0,0) [my box] {1};
+  \node (2) at (1.5,0) [my box] {2};
+  \node (3) at (4,0) [my box] {3};
+  \node (4) at (3.2, .8) [my box] {4};
+  \node (5) at (2,2) [my box] {5};
+  \node (6) at (1.3, 1.3) [my box] {6};
+  \node (7) at (1.4, .6) [my box] {7};
+  \node (8) at (2.3, .4) [my box] {8};
+  \node (9) at (2.2, 1.1) [my box] {9};
+
+  \draw [] (7) to (8);
+  \draw [] (7) to (6);
+  \draw [] (9) to (8);
+  \draw [] (1) to (2);
+  \draw [] (6) to (5);
+  \draw [] (9) to (6);
+  \draw [] (3) to (8);
+  \draw [] (3) to (4);
+  \draw [] (1) to (7);
+  \draw [] (2) to (3);
+  \draw [] (7) to (9);
+  \draw [] (2) to (7);
+  \draw [] (2) to (8);
+  \draw [] (5) to (4);
+  \draw [] (9) to (5);
+  \draw [] (9) to (4);
+  \draw [] (1) to (6);
+  \draw [] (8) to (4);
+
+\end{tikzpicture}
+\end{center}
+
+
+\pagebreak 
+
+Circulant N=9 1,2
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.8,
+     my box/.style={draw,circle,minimum size=1.1em,inner sep=.15em},
+    ]
+
+  \node (1) at (0*40:1) [my box] {1};
+  \node (2) at (1*40:1) [my box] {2};
+  \node (3) at (2*40:1) [my box] {3};
+  \node (4) at (3*40:1) [my box] {4};
+  \node (5) at (4*40:1) [my box] {5};
+  \node (6) at (5*40:1) [my box] {6};
+  \node (7) at (6*40:1) [my box] {7};
+  \node (8) at (7*40:1) [my box] {8};
+  \node (9) at (8*40:1) [my box] {9};
+
+  \draw [] (2) to (3);
+  \draw [] (2) to (9);
+  \draw [] (3) to (4);
+  \draw [] (8) to (9);
+  \draw [] (5) to (7);
+  \draw [] (1) to (2);
+  \draw [] (7) to (8);
+  \draw [] (6) to (8);
+  \draw [] (7) to (9);
+  \draw [] (3) to (5);
+  \draw [] (4) to (6);
+  \draw [] (1) to (9);
+  \draw [] (6) to (7);
+  \draw [] (5) to (6);
+  \draw [] (1) to (8);
+  \draw [] (1) to (3);
+  \draw [] (2) to (4);
+  \draw [] (4) to (5);
+
+\end{tikzpicture}
+\end{center}
+\begin{center}
+\begin{tikzpicture}
+    [scale=3,
+     my box/.style={draw,circle,minimum size=1.1em,inner sep=.15em},
+    ]
+
+  \node (1) at (0,0) [my box] {1};
+  \node (2) at (.8, .4) [my box] {2};
+  \node (3) at (1, 0) [my box] {3};
+  \node (4) at (2,0) [my box] {4};
+  \node (5) at (1.3, .6) [my box] {5};
+  \node (6) at ($(2,0) + (120:1)$) [my box] {6};
+  \node (7) at (60:2) [my box] {7};
+  \node (8) at (.9, .87) [my box] {8};
+  \node (9) at (60:1) [my box] {9};
+
+  \draw [] (2) to (3);
+  \draw [] (2) to (9);
+  \draw [] (3) to (4);
+  \draw [] (8) to (9);
+  \draw [] (5) to (7);
+  \draw [] (1) to (2);
+  \draw [] (7) to (8);
+  \draw [] (6) to (8);
+  \draw [] (7) to (9);
+  \draw [] (3) to (5);
+  \draw [] (4) to (6);
+  \draw [] (1) to (9);
+  \draw [] (6) to (7);
+  \draw [] (5) to (6);
+  \draw [] (1) to (8);
+  \draw [] (1) to (3);
+  \draw [] (2) to (4);
+  \draw [] (4) to (5);
+
+\end{tikzpicture}
+\end{center}
+
+
+%------------------------------------------------------------------------------
+\section{Tamari Lattice Intervals Lattice N=3}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.7,yscale=.85,
+     my box/.style={draw,minimum size=1.3em,inner sep=.15em,outer sep=.1em},
+    ]
+
+  \node (111 111) at (0,0) [my box] {111 111};
+
+  \node (111 112) at (1,1) [my box] {111 112};
+  \node (111 121) at (2,-2) [my box] {111 121};
+
+  \node (112 112) at (2,2) [my box] {112 112};
+  \node (111 113) at (2,0) [my box] {111 113};
+  \node (121 121) at (3,-3) [my box] {121 121};
+
+  \node (112 113) at (3,1) [my box] {112 113};
+  \node (111 123) at (3,-1) [my box] {111 123};
+
+  \node (112 123) at (4,0) [my box] {112 123};
+  \node (113 113) at (4,2) [my box] {113 113};
+
+  \node (113 123) at (5,1) [my box] {113 123};
+  \node (121 123) at (4,-2) [my box] {121 123};
+  \node (123 123) at (6,0) [my box] {123 123};
+
+  \draw [->] (111 111) to (111 121);
+  \draw [->] (111 111) to (111 112);
+
+  \draw [->] (112 123) to (113 123);
+  \draw [->] (111 113) to (111 123);
+  \draw [->] (121 123) to (123 123);
+  \draw [->] (121 121) to (121 123);
+  \draw [->] (111 112) to (111 113);
+  \draw [->] (112 112) to (112 113);
+  \draw [->] (111 112) to (112 112);
+  \draw [->] (111 113) to (112 113);
+  \draw [->] (112 113) to (113 113);
+  \draw [->] (113 123) to (123 123);
+  \draw [->] (112 113) to (112 123);
+  \draw [->] (111 121) to (121 121);
+  \draw [->] (111 121) to (111 123);
+  \draw [->] (111 123) to (112 123);
+  \draw [->] (113 113) to (113 123);
+  \draw [->] (111 123) to (121 123);
+
+\end{tikzpicture}
+\end{center}
+
+\noindent
+\hspace{-5em}
+\begin{tikzpicture}
+    [scale=1.1,yscale=1,
+     my box/.style={draw,minimum size=1.3em,inner sep=.2em,outer sep=.1em,align=center,font=\footnotesize},
+    ]
+
+  \node (1111-1111) at (0,0) [my box] {1111 \\ 1111};
+
+  \node (1111-1112) at (1,1) [my box] {1111 \\ 1112};
+  \node (1111-1211) at (1,0) [my box] {1111 \\ 1211};
+  \node (1111-1121) at (1,-1) [my box] {1111 \\ 1121};
+
+  \node (1112-1112) at (2,2) [my box] {1112 \\ 1112};
+  \node (1111-1113) at (2,1) [my box] {1111 \\ 1113};
+  \node (1111-1212) at (2,0) [my box] {1111 \\ 1212};
+  \node (1111-1131) at (2,-1) [my box] {1111 \\ 1131};
+  \node (1121-1121) at (2,-2) [my box] {1121 \\ 1121};
+
+  \node (1112-1212) at (3,3) [my box] {1112 \\ 1212};
+  \node (1112-1113) at (3,2) [my box] {1112 \\ 1113};
+  \node (1111-1114) at (3,1) [my box] {1111 \\ 1114};
+  \node (1111-1123) at (3,0) [my box] {1111 \\ 1123};
+  \node (1111-1231) at (3,-1) [my box] {1111 \\ 1231};
+
+  \node (1112-1214) at (4,4) [my box] {1112 \\ 1214};
+  \node (1111-1124) at (4,1) [my box] {1111 \\ 1124};
+  \node (1121-1123) at (4,-1) [my box] {1121 \\ 1123};
+  \node (1121-1231) at (4,-2) [my box] {1121 \\ 1231};
+  \node (1211-1211) at (4,-3) [my box] {1211 \\ 1211};
+
+  \node (1112-1123) at (5,4) [my box] {1112 \\ 1123};
+  \node (1113-1113) at (5,3) [my box] {1113 \\ 1113};
+  \node (1111-1134) at (5,0) [my box] {1111 \\ 1134};
+
+  \node (1112-1124) at (6,4) [my box] {1112 \\ 1124};
+  \node (1111-1234) at (6,1) [my box] {1111 \\ 1234};
+  \node (1113-1123) at (6,2) [my box] {1113 \\ 1123};
+  \node (1112-1134) at (6,0) [my box] {1112 \\ 1134};
+  \node (1121-1134) at (6,-1) [my box] {1121 \\ 1134};
+
+  \node (1212-1214) at (5,6) [my box] {1212 \\ 1214};
+
+  \node (1111-1214) at (4,2) [my box] {1111 \\ 1214};
+  \node (1121-1131) at (3,-3) [my box] {1121 \\ 1131};
+
+  \node (1121-1124) at (5,-1) [my box] {1121 \\ 1124};
+
+  \node (1212-1234) at (7,6) [my box] {1212 \\ 1234};
+  \node (1113-1124) at (7,3) [my box] {1113 \\ 1124};
+  \node (1131-1134) at (7,-2) [my box] {1131 \\ 1134};
+
+  \node (1114-1114) at (8,7) [my box] {1114 \\ 1114};
+  \node (1114-1234) at (8,3) [my box] {1114 \\ 1234};
+  \node (1113-1134) at (8,2) [my box] {1113 \\ 1134};
+
+  \node (1114-1124) at (9,7) [my box] {1114 \\ 1124};
+  \node (1211-1234) at (9,-3) [my box] {1211 \\ 1234};
+
+
+  \node (1124-1124) at (10,7) [my box] {1124 \\ 1124};
+
+  \node (1212-1212) at (4,6) [my box] {1212 \\ 1212};
+
+  \node (1214-1214) at (7,7) [my box] {1214 \\ 1214};
+
+  \node (1112-1114) at (4+2,0) [my box] {1112 \\ 1114};
+  \node (1112-1234) at (4+2,6) [my box] {1112 \\ 1234};
+  \node (1113-1114) at (4+3,0) [my box] {1113 \\ 1114};
+  \node (1113-1214) at (4+3,4) [my box] {1113 \\ 1214};
+  \node (1113-1234) at (4+3,5) [my box] {1113 \\ 1234};
+  \node (1114-1134) at (4+4,0) [my box] {1114 \\ 1134};
+  \node (1114-1214) at (4+4,1) [my box] {1114 \\ 1214};
+  \node (1121-1234) at (4+5,1) [my box] {1121 \\ 1234};
+  \node (1123-1123) at (4+5,2) [my box] {1123 \\ 1123};
+  \node (1123-1124) at (4+5,3) [my box] {1123 \\ 1124};
+  \node (1123-1134) at (4+5,4) [my box] {1123 \\ 1134};
+  \node (1123-1234) at (9,5) [my box] {1123 \\ 1234};
+  \node (1124-1134) at (9,-1) [my box] {1124 \\ 1134};
+  \node (1124-1234) at (10,0) [my box] {1124 \\ 1234};
+  \node (1131-1131) at (4,-4) [my box] {1131 \\ 1131};
+  \node (1131-1231) at (10,3) [my box] {1131 \\ 1231};
+  \node (1131-1234) at (11,4) [my box] {1131 \\ 1234};
+  \node (1134-1134) at (11,3) [my box] {1134 \\ 1134};
+  \node (1134-1234) at (12,4) [my box] {1134 \\ 1234};
+  \node (1211-1212) at (11,0) [my box] {1211 \\ 1212};
+  \node (1211-1214) at (11,1) [my box] {1211 \\ 1214};
+  \node (1211-1231) at (5,-2) [my box] {1211 \\ 1231};
+  \node (1214-1234) at (11,-4) [my box] {1214 \\ 1234};
+
+  \node (1231-1231) at (11,-1) [my box] {1231 \\ 1231};
+
+  \node (1231-1234) at (12,-1) [my box] {1231 \\ 1234};
+
+  \node (1234-1234) at (13,-3) [my box] {1234 \\ 1234};
+
+  \draw [->] (1112-1114) to (1112-1124);
+  \draw [->] (1212-1214) to (1214-1214);
+  \draw [->] (1211-1214) to (1211-1234);
+  \draw [->] (1211-1214) to (1212-1214);
+  \draw [->] (1121-1121) to (1121-1123);
+  \draw [->] (1111-1113) to (1112-1113);
+  \draw [->] (1211-1234) to (1212-1234);
+  \draw [->] (1111-1214) to (1211-1214);
+  \draw [->] (1112-1234) to (1113-1234);
+  \draw [->] (1113-1214) to (1113-1234);
+  \draw [->] (1112-1212) to (1212-1212);
+  \draw [->] (1112-1114) to (1112-1214);
+  \draw [->] (1211-1212) to (1212-1212);
+  \draw [->] (1111-1111) to (1111-1211);
+  \draw [->] (1111-1111) to (1111-1112);
+  \draw [->] (1112-1123) to (1112-1124);
+  \draw [->] (1112-1114) to (1113-1114);
+  \draw [->] (1211-1231) to (1231-1231);
+  \draw [->] (1112-1212) to (1112-1214);
+  \draw [->] (1113-1123) to (1113-1124);
+  \draw [->] (1113-1124) to (1123-1124);
+  \draw [->] (1111-1114) to (1112-1114);
+  \draw [->] (1121-1124) to (1123-1124);
+  \draw [->] (1111-1113) to (1111-1114);
+  \draw [->] (1111-1212) to (1112-1212);
+  \draw [->] (1114-1124) to (1114-1134);
+  \draw [->] (1111-1112) to (1112-1112);
+  \draw [->] (1111-1134) to (1112-1134);
+  \draw [->] (1111-1121) to (1111-1131);
+  \draw [->] (1114-1124) to (1124-1124);
+  \draw [->] (1112-1134) to (1112-1234);
+  \draw [->] (1134-1234) to (1234-1234);
+  \draw [->] (1121-1231) to (1131-1231);
+  \draw [->] (1113-1114) to (1113-1214);
+  \draw [->] (1114-1114) to (1114-1124);
+  \draw [->] (1124-1134) to (1134-1134);
+  \draw [->] (1114-1214) to (1114-1234);
+  \draw [->] (1111-1211) to (1111-1231);
+  \draw [->] (1121-1131) to (1131-1131);
+  \draw [->] (1114-1234) to (1214-1234);
+  \draw [->] (1111-1112) to (1111-1113);
+  \draw [->] (1111-1214) to (1111-1234);
+  \draw [->] (1112-1112) to (1112-1113);
+  \draw [->] (1112-1113) to (1112-1114);
+  \draw [->] (1111-1234) to (1112-1234);
+  \draw [->] (1124-1124) to (1124-1134);
+  \draw [->] (1131-1231) to (1131-1234);
+  \draw [->] (1121-1123) to (1121-1124);
+  \draw [->] (1113-1114) to (1113-1124);
+  \draw [->] (1211-1212) to (1211-1214);
+  \draw [->] (1114-1234) to (1124-1234);
+  \draw [->] (1112-1123) to (1113-1123);
+  \draw [->] (1111-1121) to (1111-1123);
+  \draw [->] (1112-1113) to (1113-1113);
+  \draw [->] (1111-1231) to (1211-1231);
+  \draw [->] (1131-1134) to (1131-1234);
+  \draw [->] (1112-1234) to (1212-1234);
+  \draw [->] (1113-1134) to (1114-1134);
+  \draw [->] (1111-1131) to (1121-1131);
+  \draw [->] (1123-1123) to (1123-1124);
+  \draw [->] (1112-1214) to (1113-1214);
+  \draw [->] (1123-1124) to (1124-1124);
+  \draw [->] (1111-1114) to (1111-1214);
+  \draw [->] (1113-1123) to (1123-1123);
+  \draw [->] (1111-1211) to (1211-1211);
+  \draw [->] (1112-1113) to (1112-1123);
+  \draw [->] (1121-1124) to (1121-1134);
+  \draw [->] (1134-1134) to (1134-1234);
+  \draw [->] (1113-1134) to (1113-1234);
+  \draw [->] (1212-1212) to (1212-1214);
+  \draw [->] (1211-1234) to (1231-1234);
+  \draw [->] (1123-1234) to (1124-1234);
+  \draw [->] (1121-1234) to (1131-1234);
+  \draw [->] (1111-1211) to (1111-1212);
+  \draw [->] (1113-1134) to (1123-1134);
+  \draw [->] (1231-1234) to (1234-1234);
+  \draw [->] (1112-1214) to (1212-1214);
+  \draw [->] (1113-1234) to (1114-1234);
+  \draw [->] (1113-1124) to (1114-1124);
+  \draw [->] (1111-1212) to (1111-1214);
+  \draw [->] (1114-1114) to (1114-1214);
+  \draw [->] (1111-1214) to (1112-1214);
+  \draw [->] (1121-1134) to (1123-1134);
+  \draw [->] (1214-1234) to (1234-1234);
+  \draw [->] (1111-1134) to (1111-1234);
+  \draw [->] (1121-1131) to (1121-1134);
+  \draw [->] (1111-1111) to (1111-1121);
+  \draw [->] (1113-1234) to (1123-1234);
+  \draw [->] (1111-1124) to (1111-1134);
+  \draw [->] (1114-1214) to (1214-1214);
+  \draw [->] (1124-1234) to (1134-1234);
+  \draw [->] (1212-1214) to (1212-1234);
+  \draw [->] (1111-1234) to (1121-1234);
+  \draw [->] (1111-1114) to (1111-1124);
+  \draw [->] (1121-1234) to (1123-1234);
+  \draw [->] (1113-1114) to (1114-1114);
+  \draw [->] (1121-1231) to (1121-1234);
+  \draw [->] (1112-1124) to (1113-1124);
+  \draw [->] (1231-1231) to (1231-1234);
+  \draw [->] (1211-1231) to (1211-1234);
+  \draw [->] (1111-1121) to (1121-1121);
+  \draw [->] (1111-1212) to (1211-1212);
+  \draw [->] (1121-1123) to (1123-1123);
+  \draw [->] (1113-1124) to (1113-1134);
+  \draw [->] (1123-1134) to (1123-1234);
+  \draw [->] (1121-1134) to (1131-1134);
+  \draw [->] (1111-1231) to (1111-1234);
+  \draw [->] (1111-1131) to (1111-1231);
+  \draw [->] (1111-1134) to (1121-1134);
+  \draw [->] (1112-1134) to (1113-1134);
+  \draw [->] (1111-1123) to (1112-1123);
+  \draw [->] (1112-1112) to (1112-1212);
+  \draw [->] (1114-1134) to (1124-1134);
+  \draw [->] (1131-1131) to (1131-1134);
+  \draw [->] (1131-1234) to (1134-1234);
+  \draw [->] (1121-1121) to (1121-1131);
+  \draw [->] (1112-1214) to (1112-1234);
+  \draw [->] (1113-1214) to (1114-1214);
+  \draw [->] (1111-1123) to (1121-1123);
+  \draw [->] (1131-1134) to (1134-1134);
+  \draw [->] (1123-1124) to (1123-1134);
+  \draw [->] (1111-1113) to (1111-1123);
+  \draw [->] (1113-1113) to (1113-1123);
+  \draw [->] (1124-1134) to (1124-1234);
+  \draw [->] (1131-1131) to (1131-1231);
+  \draw [->] (1211-1211) to (1211-1212);
+  \draw [->] (1112-1124) to (1112-1134);
+  \draw [->] (1123-1134) to (1124-1134);
+  \draw [->] (1111-1124) to (1121-1124);
+  \draw [->] (1131-1234) to (1231-1234);
+  \draw [->] (1111-1124) to (1112-1124);
+  \draw [->] (1214-1214) to (1214-1234);
+  \draw [->] (1114-1134) to (1114-1234);
+  \draw [->] (1211-1211) to (1211-1231);
+  \draw [->] (1111-1112) to (1111-1212);
+  \draw [->] (1111-1123) to (1111-1124);
+  \draw [->] (1121-1134) to (1121-1234);
+  \draw [->] (1113-1113) to (1113-1114);
+  \draw [->] (1111-1131) to (1111-1134);
+  \draw [->] (1121-1131) to (1121-1231);
+  \draw [->] (1111-1234) to (1211-1234);
+  \draw [->] (1212-1234) to (1214-1234);
+  \draw [->] (1111-1231) to (1121-1231);
+  \draw [->] (1131-1231) to (1231-1231);
+
+\end{tikzpicture}
 
 
 %------------------------------------------------------------------------------
@@ -10145,9 +10658,15 @@ Stockmeyer gives a straightforward recursive solution for the general case n dis
 \end{tikzpicture}
 \end{center}
 
-Each vertex is a configuration of discs on spindles for a variation on the towers of Hanoi puzzle where discs can only move to an adjacent spindle around a cycle of 4 spindles.
+Each vertex is a configuration of discs on spindles for a variation on
+the towers of Hanoi puzzle where discs can only move to an adjacent
+spindle around a cycle of 4 spindles.
 
-The degree-2 vertices are where the 2 discs are on the same spindle so the only moves are the smaller disc back or forward.  The 4-cycle at each of those vertices is the small disc going successively around the 4 spindles.  The cross connections between those cycles are where the big disc moves (where permitted).
+The degree-2 vertices are where the 2 discs are on the same spindle so
+the only moves are the smaller disc back or forward.  The 4-cycle at
+each of those vertices is the small disc going successively around the
+4 spindles.  The cross connections between those cycles are where the
+big disc moves (where permitted).
 
 
 %------------------------------------------------------------------------------

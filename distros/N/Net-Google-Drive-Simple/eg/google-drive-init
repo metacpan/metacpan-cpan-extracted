@@ -1,16 +1,21 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/env perl -w
+
 ###########################################
 # google-drive-init
 # Mike Schilli, 2014 (m@perlmeister.com)
 ###########################################
 use strict;
 
+# abort earlier if requires deps are missing
+use Crypt::SSLeay;
+use LWP::Protocol::https;
+
 use OAuth::Cmdline::GoogleDrive;
 use OAuth::Cmdline::Mojo;
 
 my $oauth = OAuth::Cmdline::GoogleDrive->new(
-    client_id     => "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    client_secret => "YYYYYYYYYYYYYYYYYYYYYYYY",
+    client_id     => q[XXXXXXXX.apps.googleusercontent.com],
+    client_secret => q[YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY],
     login_uri     => "https://accounts.google.com/o/oauth2/auth",
     token_uri     => "https://accounts.google.com/o/oauth2/token",
     scope         => "https://www.googleapis.com/auth/drive",
@@ -22,3 +27,23 @@ my $app = OAuth::Cmdline::Mojo->new(
 );
 
 $app->start( 'daemon', '-l', $oauth->local_uri );
+
+__END__
+
+=pod
+
+=head1 Tweak for macOS users
+
+=head2 Installing Crypt::SSLeay
+
+When trying to install L<Crypt::SSLeay> if you are seeing this error
+
+    openssl-version.c:2:10: fatal error: 'openssl/opensslv.h' file not found
+    #include <openssl/opensslv.h>
+
+To install Crypt::SSLeay on macOS
+
+     brew upgrade openssl
+     perl Makefile.PL --libpath=/usr/local/opt/openssl/lib --incpath=/usr/local/opt/openssl/include
+
+=cut

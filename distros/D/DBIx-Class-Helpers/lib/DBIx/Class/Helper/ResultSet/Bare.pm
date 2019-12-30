@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Bare;
-$DBIx::Class::Helper::ResultSet::Bare::VERSION = '2.034001';
+$DBIx::Class::Helper::ResultSet::Bare::VERSION = '2.034002';
 # ABSTRACT: Get an unsearched ResultSet
 
 use strict;

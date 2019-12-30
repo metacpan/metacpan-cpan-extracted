@@ -4,11 +4,17 @@
 #
 # bookmarks is a tool to export bookmarks from files supplied as arguments, or
 # from browsers default locations (without arguments). The following browsers
-# and platform are supported : Safari (Mac), Firefox (Mac/Linux/Windows) and
-# Internet Explorer (Windows). Files with .plist and .sqlite extensions are
-# processed as Safari and Firefox bookmarks, respectively, and directories
-# named "Favorites" are processed as Internet Explorer favorites.
-
+# and platform are supported :
+#
+# - Safari (Mac)
+# - Firefox (Mac/Linux/Windows)
+# - Chrome (Mac/Linux/Windows)
+# - Internet Explorer (Windows)
+#
+# Files named *.plist, *.sqlite and *Bookmarks are processed as Safari and Firefox
+# and Chrome bookmarks, respectively. Directories named *Favorites" are processed
+# as Internet Explorer favorites.
+#
 # The fields <title>, <url> and <description> are retrieved (when existing) and
 # are available for exporting (in the desired format), by default :
 # <title> <url> <description>
@@ -21,9 +27,9 @@
 # - dirty plist parsing using external tool plutil
 # - export bookmarks from plain text files
 # - export bookmarks from markdown files
-# - support other os
-# - support other browsers
+# - exception handling
 #
+# 2019.12.22 v0.19 jul : added chrome support, require, bugfixes
 # 2019.10.22 v0.17 jul : created module
 # 2019.10.17 v0.16 jul : fixed firefox tags
 # 2019.09.27 v0.15 jul : added internet explorer support, fixed firefox tags
@@ -39,11 +45,8 @@ use warnings;
 use utf8;
 use Getopt::Std;
 use File::Basename;
-use DBI;
-use Config::Any;
-use File::Find;
 
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 my $program	 = basename($0);
 my $usage    = <<EOF;
 
@@ -66,9 +69,9 @@ my $version     = $options{V} // 0;
 my $debug       = $options{d} // 0;
 my $all         = $options{a} // 0;
 my $format      = $options{f} // "tud";
-my $quote       = $options{q} // " ";   # TODO
-my $fs          = $options{s} // " ";	# TODO
-my $rs          = $options{r} // "\n";	# TODO
+my $quote       = $options{q} // " ";   # TODO ?
+my $fs          = $options{s} // " ";   # TODO ?
+my $rs          = $options{r} // "\n";  # TODO ?
 
 die $usage if $help;
 die $VERSION . "\n" if $version;
@@ -80,33 +83,45 @@ if (!@ARGV or $all)
     {    
         push @ARGV, glob('~/Library/Safari/Bookmarks.plist');
         push @ARGV, glob('~/Library/Application\ Support/Firefox/Profiles/*.default/places.sqlite');
+        push @ARGV, glob('~/Library/Application\ Support/Google/Chrome/Default/Bookmarks');
     }
     elsif ($^O eq "linux")
     {
         push @ARGV, glob('~/.mozilla/firefox/*.default/places.sqlite');
+        push @ARGV, glob('~/.config/google-chrome/Default/Bookmarks');
     }
     elsif ($^O eq "MSWin32")
     {
         push @ARGV, $ENV{APPDATA} . '\Mozilla\Firefox\Profiles\*.default\places.sqlite';
+        push @ARGV, $ENV{APPDATA} . '\Google\Chrome\User Data\Default\Bookmarks';
         push @ARGV, $ENV{USERPROFILE} . '\Favorites';
-	}
+    }
     else
     {
         die "unknown os, unable to set default files";
     }
+    
+    # do they indeed exist?
+    @ARGV = grep { -e $_ } @ARGV;
 }
 
 # option -f
 my %dispatch = (
-'tu'	=> sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$fs$u$rs"; },
-'tud'	=> sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$fs$u$fs$d$rs"; },
-'tdu'	=> sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$fs$d$fs$u$rs"; },
-'ud'	=> sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$fs$d$rs"; },
-'u'		=> sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$rs"; },
-'ut'	=> sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$fs$t$rs"; },
-'dut'	=> sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$fs$u$fs$t$rs";  },
-'du'	=> sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$fs$u$rs";},
-'dtu'	=> sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$fs$t$fs$u$rs";}
+'t'     => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$rs";           },
+'tu'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$fs$u$rs";      },
+'tud'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$fs$u$fs$d$rs"; },
+'tdu'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$fs$d$fs$u$rs"; },
+'td'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$fs$d$rs";      },
+'u'     => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$rs";           },
+'ud'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$fs$d$rs";      },
+'udt'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$fs$d$fs$t$rs"; },
+'utd'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$fs$t$fs$d$rs"; },
+'ut'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$fs$t$rs";      },
+'d'     => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$rs";           },
+'du'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$fs$u$rs";      },
+'dut'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$fs$u$fs$t$rs"; },
+'dtu'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$fs$t$fs$u$rs"; },
+'dt'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$fs$t$rs";      },
 );
 
 # printer function
@@ -114,11 +129,11 @@ my $print_bookmark;
 
 if ($dispatch{$format})
 {
-	$print_bookmark = $dispatch{$format};
+    $print_bookmark = $dispatch{$format};
 }
 else
 {
-	die "unknown format";
+    die "unknown format";
 }
 
 
@@ -158,6 +173,8 @@ sub _safari {
 
 sub _firefox {
 
+    require DBI;
+
     my $dbfile = shift // "";
     warn "\$dbfile: $dbfile\n" if $debug;
     
@@ -165,7 +182,7 @@ sub _firefox {
                            "",                          # no user
                            "",                          # no password
                            { RaiseError => 1, PrintError => 0, AutoCommit => 0 },  # RaiseError=die() PrintError=warn()
-                           ) or die $DBI::errstr;
+                           ) or die DBI->errstr;
 
     # build sql statement
     my $sql =  "
@@ -196,7 +213,7 @@ sub _firefox {
         {
             while ($sth and my $hashref = $sth->fetchrow_hashref)
             {
-                $print_bookmark->($hashref->{'title'}, $hashref->{'url'}, $hashref->{'description'});
+                $print_bookmark->( $hashref->{'title'}, $hashref->{'url'}, $hashref->{'description'} );
             }
         }     
     };
@@ -204,52 +221,80 @@ sub _firefox {
     if ($@)
     {
         warn "transaction failed : $@";
-        die  "unable to process file : $dbfile\n";
+        die  "unable to process file : $dbfile";
     }
 
     $dbh->disconnect;
 }
 
+sub _chrome {
+
+    require File::Slurper;
+    require JSON;
+
+    my $file = shift // "";
+    warn "\$file: $file\n" if $debug;
+
+    # read plist as text
+    my $text = File::Slurper::read_binary($file);
+    
+    # decode utf8 json
+    my $hashref = JSON::decode_json($text);
+    
+    # print
+    foreach my $place ( ('bookmark_bar','other') )
+    {
+        my $arrayref = $hashref->{'roots'}->{$place}->{'children'};
+    
+        foreach my $i (@$arrayref)
+        {
+            $print_bookmark->( $i->{'name'}, $i->{'url'});
+        }
+    }
+}
+
 sub _iexplorer {
     
-	require Config::Tiny;	# for Config::Any::INI
-	require Win32;			# for windows rubbish
-	
-	my $favorites = shift // "";
+    require Config::Any;
+    require Config::Tiny;   # for Config::Any::INI
+    require Win32;          # for windows rubbish
+    require File::Find;
+    
+    my $favorites = shift // "";
     warn "\$favorites: $favorites\n" if $debug;
 
-	# search in favorites and subfolders
-	my @files;
-	find( { wanted => sub { push @files, $_ }, no_chdir => 1 }, $favorites );
+    # search in favorites and subfolders
+    my @files;
+    find( { wanted => sub { push @files, $_ }, no_chdir => 1 }, $favorites );
 
-	foreach my $file (@files)
-	{
-		my @filepaths = ($file);
+    foreach my $file (@files)
+    {
+        my @filepaths = ($file);
 
-		# force load internet shortcuts .url as INI files
-		my @plugins = ('Config::Any::INI');
-		my $cfg = Config::Any->load_files( {files => \@filepaths, force_plugins => \@plugins} );
+        # force load internet shortcuts .url as INI files
+        my @plugins = ('Config::Any::INI');
+        my $cfg = Config::Any->load_files( {files => \@filepaths, force_plugins => \@plugins} );
 
-		# workaround because system encoding != console encoding
-		my $win32_old_cp = Win32::GetConsoleOutputCP();
-		my $win32_new_cp = Win32::GetACP();
+        # workaround because system encoding != console encoding
+        my $win32_old_cp = Win32::GetConsoleOutputCP();
+        my $win32_new_cp = Win32::GetACP();
+        
+        # change console codepage
+        Win32::SetConsoleOutputCP($win32_new_cp);
 
-		# change console codepage
-		Win32::SetConsoleOutputCP($win32_new_cp);
+        for (@$cfg)
+        {
+            my ($filename, $config) = %$_;
 
-		for (@$cfg)
-		{
-			my ($filename, $config) = %$_;
-			
-			my $title	= substr(basename($filename), 0, -4); # chop ".url"
-			my $url 	= $config->{'InternetShortcut'}->{'URL'} // "";
+            my $title	= substr(basename($filename), 0, -4); # chop ".url"
+            my $url 	= $config->{'InternetShortcut'}->{'URL'} // "";
 
-			$print_bookmark->($title, $url);
-		}
-		
-		# restore console codepage
-		Win32::SetConsoleOutputCP($win32_old_cp);
-	}
+            $print_bookmark->($title, $url);
+        }
+
+        # restore console codepage
+        Win32::SetConsoleOutputCP($win32_old_cp);
+    }
 }
 
 
@@ -261,9 +306,11 @@ foreach my $file (@ARGV)
 {
     my $name = basename($file);
     
-	if    (-f $file and $name =~ /\.plist$/)   { _safari($file); }
-	elsif (-f $file and $name =~ /\.sqlite$/)  { _firefox($file); }
-	elsif (-d $file and $name =~ /Favorites$/) { _iexplorer($file); }
+    if    (-f $file and $name =~ /\.plist$/)   { _safari($file);    }
+    elsif (-f $file and $name =~ /\.sqlite$/)  { _firefox($file);   }
+    elsif (-f $file and $name =~ /Bookmarks$/) { _chrome($file);    }
+    elsif (-d $file and $name =~ /Favorites$/) { _iexplorer($file); }
+    else  { die "unable to process file : $file"; }
 }
 
 exit 1;
@@ -292,6 +339,14 @@ and platform are supported : Safari (Mac), Firefox (Mac/Linux/Windows) and
 Internet Explorer (Windows). Files with .plist and .sqlite extensions are
 processed as Safari and Firefox bookmarks, respectively, and directories
 named "Favorites" are processed as Internet Explorer favorites.
+
+bookmarks is a tool to export bookmarks from files supplied as arguments, or
+from browsers default locations (without arguments). The following browsers
+and platform are supported : Safari (Mac), Firefox (Mac/Linux/Windows),
+Chrome (Mac/Linux/Windows) and Internet Explorer (Windows). Files named *.plist,
+*.sqlite and *Bookmarks are processed as Safari and Firefox and Chrome bookmarks,
+respectively. Directories named *Favorites" are processed as Internet Explorer
+favorites.
 
 =head1 BUGS
 

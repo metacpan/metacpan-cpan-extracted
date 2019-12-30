@@ -1,5 +1,3 @@
-// $Id: x15c.c 12319 2013-05-01 21:51:24Z airwin $
-//
 //      Shade plot demo.
 //
 //      Maurice LeBrun
@@ -31,7 +29,7 @@ static void     cmap1_init2( void );
 //--------------------------------------------------------------------------
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
     int   i, j;
     PLFLT xx, yy;
@@ -56,10 +54,10 @@ main( int argc, const char *argv[] )
 
     for ( i = 0; i < XPTS; i++ )
     {
-        xx = (double) ( i - ( XPTS / 2 ) ) / (double) ( XPTS / 2 );
+        xx = (PLFLT) ( i - ( XPTS / 2 ) ) / (PLFLT) ( XPTS / 2 );
         for ( j = 0; j < YPTS; j++ )
         {
-            yy = (double) ( j - ( YPTS / 2 ) ) / (double) ( YPTS / 2 ) - 1.0;
+            yy = (PLFLT) ( j - ( YPTS / 2 ) ) / (PLFLT) ( YPTS / 2 ) - 1.0;
 
             z[i][j] = xx * xx - yy * yy + ( xx - yy ) / ( xx * xx + yy * yy + 0.1 );
         }

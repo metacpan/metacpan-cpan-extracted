@@ -248,6 +248,7 @@ my @files = (
     't/lib/SubApp2.pm',
     't/lib/TestApp.pm',
     't/lib/TestPod.pm',
+    't/lib/TestTypeLibrary.pm',
     't/lib/poc.pm',
     't/lib/poc2.pm',
     't/log_die_before_hook.t',

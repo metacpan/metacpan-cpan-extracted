@@ -24,12 +24,17 @@ use Graph::Maker;
 use Math::PlanePath::DragonCurve 117; # v.117 for level_to_n_range()
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
+}
+sub _make_graph {
+  my ($params) = @_;
+  my $graph_maker = delete($params->{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%$params);
 }
 
 my @_BlobN = (3, 6, 12, 9);
@@ -44,9 +49,7 @@ sub init {
   my $level = delete($params{'level'}) || 0;
   my $arms = delete($params{'arms'}) || 1;
   my $part = delete($params{'part'}) || 'dragon';
-  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
-
-  my $graph = $graph_maker->(%params);
+  my $graph = _make_graph(\%params);
   my $path = Math::PlanePath::DragonCurve->new (arms => $arms);
 
   my ($n_lo, $n_hi);

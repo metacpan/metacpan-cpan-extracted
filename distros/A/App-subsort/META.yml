@@ -17,11 +17,11 @@ meta-spec:
   version: '1.4'
 name: App-subsort
 requires:
-  Complete::File: '0'
+  Complete::File: '0.440'
   Complete::Module: '0'
   Complete::Sah: '0'
   Complete::Sequence: '0.002'
-  Complete::Util: '0.603'
+  Complete::Util: '0.606'
   Getopt::Long::More: '0.006'
   Module::List::Tiny: '0'
   Sort::Sub: '0.112'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-subsort
   homepage: https://metacpan.org/release/App-subsort
   repository: git://github.com/perlancar/perl-App-subsort.git
-version: '0.043'
+version: '0.044'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

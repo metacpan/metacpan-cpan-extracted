@@ -34,7 +34,7 @@ C<.pmc> file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006-2018. Ingy döt Net.
+Copyright 2006-2019. Ingy döt Net.
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

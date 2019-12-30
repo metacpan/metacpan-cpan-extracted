@@ -10,6 +10,7 @@ build_requires:
   IPC::Open3: '0'
   Test::Exception: '0'
   Test::More: '0.98'
+  Test::Needs: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -19,12 +20,15 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-CSVUtils
+recommends:
+  Sort::Sub: '0.112'
 requires:
   Complete::Util: '0.606'
   Data::Sah::Compiler::perl::TH::any: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::code: '0'
+  Data::Sah::Compiler::perl::TH::hash: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::re: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
@@ -32,6 +36,7 @@ requires:
   Hash::Subset: '0.005'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
+  Perinci::Sub::XCompletion::sortsub_spec: '0'
   Sah::Schema::filename: '0'
   Sah::Schema::uint: '0'
   Scalar::Util: '0'
@@ -46,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils
   homepage: https://metacpan.org/release/App-CSVUtils
   repository: git://github.com/perlancar/perl-App-CSVUtils.git
-version: '0.027'
+version: '0.028'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -501,6 +506,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: recommends
+      name: RuntimeRecommends
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs

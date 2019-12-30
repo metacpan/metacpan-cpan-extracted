@@ -1,0 +1,39 @@
+---
+abstract: unknown
+author:
+  - 'Martin Sluka <fany@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-Qmail-Filter
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0'
+  Email::Valid: '0'
+  Mail::Address: '0'
+  Mail::DKIM::Verifier: '0'
+  Mail::DMARC::PurePerl: '0'
+  Mail::Header: '0'
+  Mail::Qmail::Queue::Message: '0'
+  Mail::SPF: '0'
+  Mail::SpamAssassin: '0'
+  Mo: '0'
+  Path::Tiny: '0'
+  Qmail::Deliverable: '0'
+  namespace::clean: '0'
+  perl: '5.014'
+resources:
+  homepage: https://github.com/fany/Mail-Qmail-Filter
+  repository: https://github.com/fany/Mail-Qmail-Filter.git
+version: '1.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

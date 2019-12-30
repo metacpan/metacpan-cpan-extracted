@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
       use Protocol::Redis::XS;
-      my $redis = Protocol::Redis::XS->new;
+      my $redis = Protocol::Redis::XS->new(api => 1);
       $redis->parse("+OK\r\n");
       $redis->get_message;
 
@@ -20,7 +20,7 @@ DESCRIPTION
 METHODS
     As per Protocol::Redis, API version 1.
 
-  parse($string)
+  parse
     Parse a chunk of data (calls "on_message" callback if defined and a
     complete message is received).
 

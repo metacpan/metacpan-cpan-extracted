@@ -12,7 +12,7 @@ use Time::Piece;
 use XML::Entities;
 use XML::Parser::Lite;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our @EXPORT_OK = qw(parse_string parse_file);
 
@@ -418,8 +418,8 @@ sub parse_string {
                     push @categories, \%attr;
                 }
                 elsif ($node eq 'ope') {    # transaction
-                    $attr{paymode} = $TRANSACTION_PAYMODES{$attr{paymode} || ''} || 'unknown';
-                    $attr{status}  = $TRANSACTION_STATUSES{delete $attr{st}} || 'unknown';
+                    $attr{paymode} = $TRANSACTION_PAYMODES{$attr{paymode}   || ''} || 'unknown';
+                    $attr{status}  = $TRANSACTION_STATUSES{delete $attr{st} || ''} || 'unknown';
 
                     $attr{transfer_key}   = delete $attr{kxfer} if $attr{kxfer};
                     $attr{split_amount}   = delete $attr{samt}  if $attr{samt};
@@ -491,7 +491,7 @@ File::HomeBank - Parse HomeBank files
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

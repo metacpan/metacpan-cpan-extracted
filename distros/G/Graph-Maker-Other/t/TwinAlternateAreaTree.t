@@ -29,14 +29,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 43;
+plan tests => 99;
 
 require Graph::Maker::TwinAlternateAreaTree;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 13;
+  my $want_version = 14;
   ok ($Graph::Maker::TwinAlternateAreaTree::VERSION, $want_version,
       'VERSION variable');
   ok (Graph::Maker::TwinAlternateAreaTree->VERSION,  $want_version,
@@ -118,9 +118,20 @@ require Graph::Maker::TwinAlternateAreaTree;
 }
 
 foreach my $level (0 .. 7) {
-  my $graph = Graph::Maker->new('twin_alternate_area_tree', level => $level);
-  my $num_vertices = $graph->vertices;
-  ok ($num_vertices, 2**$level);
+  foreach my $undirected (0, 1) {
+    foreach my $multiedged (0, 1) {
+      my $graph = Graph::Maker->new('twin_alternate_area_tree',
+                                    level => $level,
+                                    undirected => $undirected,
+                                    multiedged => $multiedged);
+      my $num_vertices = $graph->vertices;
+      ok ($num_vertices, 2**$level);
+
+      my $num_edges = $graph->edges;
+      ok ($num_edges,
+          ($num_vertices==0 ? 0 : $num_vertices-1) * ($undirected ? 1 : 2));
+    }
+  }
 }
 
 

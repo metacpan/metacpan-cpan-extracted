@@ -25,7 +25,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 13;
+$VERSION = 14;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -59,6 +59,18 @@ sub _perm_inverse {
 }
 sub _noop {
   return @_;
+}
+
+sub _vertex_name_type_inversions {
+  my ($aref) = @_;
+  my @ret;
+  foreach my $i (0 .. $#$aref-1) {
+    push @ret, 
+      join('',
+           map {$aref->[$i] > $aref->[$_] ? 1 : 0}
+           $i+1 .. $#$aref);
+  }
+  return @ret;
 }
 
 sub _vertex_name_type_cycles {
@@ -222,6 +234,10 @@ sub _rel_type_onepos {
 # 
 # The number of cycles decreases by 1 each step, going from (1)(2)(3)(4) to
 # end at one of the single cycles (1234), (1324), etc.
+#
+    # cycle_append
+    #   872    N=3
+
 
 use constant _rel_type_name_cycle_append => 'Cycle Append';
 sub _rel_type_cycle_append {
@@ -285,7 +301,9 @@ sub init {
                       : \&_noop);
 
   my $comma = delete($params{'comma'});
-  if (! defined $comma) { $comma = ','; }
+  if (! defined $comma) {
+    $comma = ',';
+  }
 
   my $graph = _make_graph(\%params);
   $graph->set_graph_attribute
@@ -394,7 +412,8 @@ Option C<vertex_name_type =E<gt> 'cycles'> is list of cycles
     (1,4,2)(3)    cycles  
 
 In the usual way a cycle like (1,4,2) means permute 1-E<gt>4, 4-E<gt>2,
-2-E<gt>1.
+2-E<gt>1.  For vertex names the cycles have their smallest element first and
+in order of the smallest element.
 
 =head3 Comma
 
@@ -415,7 +434,7 @@ just in reach of a fast machine with plenty of memory.
 =head2 Transpose
 
 The default C<rel_type =E<gt> 'transpose'> is graph edges where swapping two
-elements in the permutation reaches a lexicographically bigger permutation.
+elements in the permutation gives a lexicographically bigger permutation.
 
     from  x ... y      transpose
      to   y ... x       values x<y                     
@@ -427,7 +446,7 @@ elements in the permutation reaches a lexicographically bigger permutation.
         --> 1,3,2 --> 3,1,2 --/
 
 Each permutation has binomial(N,2) element pairs, and across all
-permutations they are by symmetry half smaller-bigger and half
+permutations they are, by symmetry, half smaller-bigger and half
 bigger-smaller so
 
     num edges = N!*N*(N-1)/4
@@ -443,10 +462,12 @@ bigger-smaller so
 
 =pod
 
+=head2 Transpose Cover
+
 Option C<rel_type =E<gt> 'transpose_cover'> restricts to those transposes
-which are cover relations in the transposes (so the Hasse diagram).  This
+which are cover relations of the transposes (so the Hasse diagram).  This
 means if a path u -E<gt> z -E<gt> ... -E<gt> v exists then omit direct u
--E<gt> v.  For example in N=3 this means no edge 123 -E<gt> 321.
+-E<gt> v.  In N=3 this means no edge 123 -E<gt> 321.
 
         --> 2,1,3 --> 2,3,1 --\
        /         \   ^         v       N => 3
@@ -454,27 +475,53 @@ means if a path u -E<gt> z -E<gt> ... -E<gt> v exists then omit direct u
        \         /   v         ^
         --> 1,3,2 --> 3,1,2 --/
 
-A cover is when the x...y swapped have, between those positions, no values
-in between x and y.  If such an intermediate value t then could do the x,y
-swap by three positions x,t, t,y, x,t, which in case are lex increases.
-This is seen in N=3 above.  The intermediate can also be used y-first by
-t,y, x,t, t,y.
+A cover is when the x...y swap has, between those locations, no values
+between x and y.  If such an intermediate t then could do the x,y swap by
+three transposes x,t, t,y, x,t, which in each case are lex increases.  This
+is seen across the top of N=3 above.  Other combinations using t are
+possible too.  The number of covers is
+
+    num edges = sum 1<=i<j<N of N!/(j-i+1)
+              = 0,0,1,8,58,444,3708,...    (A002538)
+
+This sum is per David Callan in OEIS A002538.  Elements i and j are to be
+swapped.  Those and the i+1,i+2,...,j-1 values between them are ordered
+(j-i+1)! ways (within the whole permutation).  But cannot have intermediate
+values between i,j.  Perms of i..j with i,j adjacent are only (j-i)!, so
+fraction (j-i)!/(j-i+1)! = 1/(j-i+1) of all N! perms.
 
 =cut
 
 # GP-DEFINE  \\ formula per A002538 but starting N=2 at value=1
 # GP-DEFINE  transpose_cover_num_edges(N) = /* per A002538 */ \
 # GP-DEFINE    if(N<=1,0, (N+1)*transpose_cover_num_edges(N-1) + (N-1)*(N-1)!);
-# GP-Test  vector(6,N,N--; transpose_cover_num_edges(N)) == [0,0,1,8,58,444]
+# GP-Test  vector(7,N,N--; transpose_cover_num_edges(N)) == [0,0,1,8,58,444,3708]
 #
 # new element N at any of N positions
 # covers in N-1 still good so N*covers(N-1)
-# new N is the bigger of new transposes,
+# covers i to N has new N bigger
 # so x ... N with N at any position
+#
+# sum N* for i<j<N
+# then j=N
+# vector(10,N, sum(i=1,N-1, N!/(N-i+1)))
+# vector(10,N, sum(i=1,N-1, N!/(N-i+1)) + N*transpose_cover_num_edges(N-1))
+# A001705 gen Stirling 
+# vector(10,N, sum(i=1,N-1, N!/(N-i+1)) - transpose_cover_num_edges(N-1))
 
 =pod
 
-Option C<rel_type =E<gt> 'transpose_adjacent'> restricts to transposing an
+An "inversion" in a permutation is a pair of out-of-order elements, so x...y
+with xE<gt>y.  A cover transpose increases the number of inversions by +1.
+A transpose of x,y with xE<lt>y goes to yE<gt>x so +1 inversions.  If an
+element tE<gt>y is between them then +1 inversion for new t,x position but
+-1 for new y,t.  Similarly the other way for an element smaller E<lt>x.  An
+element t between x and y values would be +2 inversions.  So an equivalent
+definition is to take cover as step by +1 inversion.
+
+=head2 Transpose Adjacent
+
+Option C<rel_type =E<gt> 'transpose_adjacent'> restricts to swapping an
 adjacent pair of elements.  This is the weak Bruhat order.
 
     from  x y     transpose_adjacent
@@ -486,8 +533,8 @@ adjacent pair of elements.  This is the weak Bruhat order.
        \                       ^
         --> 1,3,2 --> 3,1,2 --/
 
-Each of the N-1 non-last elements has a next neighbour and again by symmetry
-they are half smaller-bigger and half bigger-smaller so
+Each of the N-1 non-last elements has a next neighbour and by symmetry they
+are half smaller-bigger and half bigger-smaller so
 
     num edges = N!*(N-1)/2, or 0 if N=0
               = 0,0,1,6,36,240,1800,...     (A001286)
@@ -500,17 +547,18 @@ they are half smaller-bigger and half bigger-smaller so
 
 =pod
 
+=head2 Transpose Cyclic
+
 Option C<rel_type =E<gt> 'transpose_cyclic'> restricts to transposing an
-adjacent pair of elements, with adjacent including wrapping around so last
-and first can swap.
+adjacent pair of elements, with adjacent including wraparound so first and
+last can swap.
 
     from  x y   or    [start] x ... y [end]    transpose_cyclic
      to   y x         [start] y ... x [end]     values x<y
 
 For N=3 this is the same as all C<transpose>, but in bigger N there are
 fewer edges.  Each of the N elements has a next neighbour wrapping around
-and again by symmetry they are half smaller-bigger and half bigger-smaller
-so
+and by symmetry they are half smaller-bigger and half bigger-smaller so
 
     num edges = N!*N/2, or 0 if N=1
               = 0,0,2,9,48,300,2160,...     (A074143)
@@ -583,6 +631,8 @@ L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  etc
 
     transpose_cover
       938    N=3
+      33636  N=4
+      33638  N=5
 
     transpose_adjacent
       670    N=3, 6-cycle
@@ -591,9 +641,6 @@ L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  etc
     transpose_cyclic
       84     N=3, same as all transposes
       1292   N=4
-
-    cycle_append
-      872    N=3
 
 =head1 OEIS
 

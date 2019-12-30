@@ -1,5 +1,3 @@
-// $Id: x10c.c 11289 2010-10-29 20:44:17Z airwin $
-//
 //      Window positioning demo.
 //
 
@@ -12,7 +10,7 @@
 //--------------------------------------------------------------------------
 
 int
-main( int argc, const char *argv[] )
+main( int argc, char *argv[] )
 {
 // Parse and process command line arguments
 

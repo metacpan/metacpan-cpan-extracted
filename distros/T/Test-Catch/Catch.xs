@@ -69,6 +69,14 @@ struct Printer {
     }
 
 private:
+    static inline void expr_replace (string& expr, char c, const string& subs) {
+        size_t pos = expr.find(c);
+        while (pos < expr.length()) {
+            expr.replace(pos, 1, subs);
+            pos = expr.find(c, pos + subs.length());
+        }
+    }
+    
     void printIssue (const string& issue) const {
         stream << " " << issue;
     }
@@ -82,12 +90,13 @@ private:
     void printOriginalExpression () const {
         if (result.hasExpression()) stream << " " << result.getExpression();
     }
-
+    
     void printReconstructedExpression () const {
         if (!result.hasExpandedExpression()) return;
         stream << " for: ";
         string expr = result.getExpandedExpression();
-        std::replace( expr.begin(), expr.end(), '\n', ' ');
+        expr_replace(expr, '\r', "\\r");
+        expr_replace(expr, '\n', "\\n");
         stream << expr;
     }
 

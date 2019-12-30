@@ -13,7 +13,7 @@ Dancer2::Config - Configure Dancer2 to suit your needs
 
 =head1 VERSION
 
-version 0.208002
+version 0.300000
 
 =head1 DESCRIPTION
 
@@ -55,7 +55,7 @@ is typically useful for deployment-specific configuration that should
 not be checked into source control. For instance, database credentials
 could be stored in this file.  Any settings in this file are merged into
 the existing configuration such that those with the same name in your
-global configuration file will take precedence over those settings in
+local configuration file will take precedence over those settings in
 the global file.
 
 Next, Dancer2 will look in the F<environments> directory for a configuration

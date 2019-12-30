@@ -30,7 +30,7 @@ use Config ();
 
 use constant HAS_SETLOCALE => $Config::Config{d_setlocale};
 
-our $VERSION = 2.78;
+our $VERSION = '3.003';
 our $FORMAT  = '%H:%M:%S %d-%b-%Y';    # default strftime() format
 our @LOCALE_SUFFIX = qw( .ISO8859-1 .ISO_8859-15 .US-ASCII .UTF-8 );
 
@@ -78,8 +78,10 @@ sub now {
 sub format {
     my $self   = shift;
     my $params = ref($_[$#_]) eq 'HASH' ? pop(@_) : { };
-    my $time   = shift(@_) || $params->{ time } || $self->{ time } 
-                           || $self->now();
+
+    my $time   = shift(@_);
+    $time = $params->{ time } || $self->{ time } || $self->now() if !defined $time;
+
     my $format = @_ ? shift(@_) 
                     : ($params->{ format } || $self->{ format } || $FORMAT);
     my $locale = @_ ? shift(@_)
@@ -176,7 +178,7 @@ sub throw {
 
 package Template::Plugin::Date::Calc;
 use base qw( Template::Plugin );
-use vars qw( $AUTOLOAD );
+our $AUTOLOAD;
 *throw = \&Template::Plugin::Date::throw;
 
 sub AUTOLOAD {
@@ -195,7 +197,7 @@ sub AUTOLOAD {
 
 package Template::Plugin::Date::Manip;
 use base qw( Template::Plugin );
-use vars qw( $AUTOLOAD );
+our $AUTOLOAD;
 *throw = \&Template::Plugin::Date::throw;
 
 sub AUTOLOAD {

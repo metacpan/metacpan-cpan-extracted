@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/Deps/Verify.pm',
     'App/Deps/Verify/App/VerifyDeps.pm',
     'App/Deps/Verify/App/VerifyDeps/Command/plinst.pm',
+    'App/Deps/Verify/App/VerifyDeps/Command/plupdatetask.pm',
     'App/Deps/Verify/App/VerifyDeps/Command/verify.pm'
 );
 
