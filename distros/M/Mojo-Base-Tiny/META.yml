@@ -24,7 +24,7 @@ resources:
   bugtracker: https://github.com/Tekki/mojo-base-tiny/issues
   homepage: https://github.com/Tekki/mojo-base-tiny
   repository: https://github.com/Tekki/mojo-base-tiny.git
-version: '0.03'
+version: '0.04'
 x_contributors:
   - 'Sebastian Riedel <sri@cpan.org>'
   - 'William Lindley <wlindley+remove+this@wlindley.com>'

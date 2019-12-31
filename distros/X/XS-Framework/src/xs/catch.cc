@@ -9,7 +9,8 @@ using panda::string_view;
 
 namespace xs {
 
-static std::vector<CatchHandler> catch_handlers;
+static std::vector<CatchHandler>       catch_handlers;
+static std::vector<ExceptionProcessor> exception_processors;
 
 static std::string get_type_name (const std::type_info& ti) {
     int status;
@@ -22,6 +23,21 @@ static std::string get_type_name (const std::type_info& ti) {
     else ret = "<unknown type>";
     ret += "]";
     return ret;
+}
+
+static panda::string get_reduced_backtrace (const panda::backtrace& bt) {
+    auto full_backtrace = bt.get_trace_string();
+    auto perl_backtrace = panda::backtrace().get_trace_string();
+    auto it_full = full_backtrace.rbegin();
+    auto it_perl = perl_backtrace.rbegin();
+    while(*it_full == *it_perl) {
+        it_full++;
+        it_perl++;
+    }
+    auto tail_size = std::distance(full_backtrace.rbegin(), it_full);
+    auto size = full_backtrace.size() - tail_size;
+    full_backtrace.resize(size);
+    return full_backtrace;
 }
 
 static Sv _exc2sv_default (const Sub&) {
@@ -69,7 +85,13 @@ static Sv _exc2sv_impl (const Sub& context, int i) {
     return _exc2sv_impl(context, i-1);
 }
 
-Sv _exc2sv (const Sub& context) { return _exc2sv_impl(context, catch_handlers.size() - 1); }
+Sv _exc2sv (const Sub& context) {
+    auto ex_sv = _exc2sv_impl(context, catch_handlers.size() - 1);
+    for (auto& processor: exception_processors) {
+        ex_sv = processor(ex_sv, context);
+    }
+    return ex_sv;
+}
 
 void add_catch_handler (CatchHandler h) {
     catch_handlers.push_back(h);
@@ -78,5 +100,14 @@ void add_catch_handler (CatchHandler h) {
 void add_catch_handler (CatchHandlerSimple h) {
     catch_handlers.push_back([h](const Sub&) -> Sv { return h(); });
 }
+
+void add_exception_processor(ExceptionProcessor f) {
+    exception_processors.push_back(f);
+}
+
+void add_exception_processor(ExceptionProcessorSimple f) {
+    exception_processors.push_back([f](Sv& ex, const Sub&) -> Sv { return f(ex); });
+}
+
 
 }

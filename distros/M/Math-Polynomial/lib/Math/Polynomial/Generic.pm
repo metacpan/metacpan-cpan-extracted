@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw(carp croak);
 
-our $VERSION = '1.017';
+our $VERSION = '1.018';
 
 sub import {
     croak(__PACKAGE__ . " is no longer available");

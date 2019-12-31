@@ -1,5 +1,13 @@
 Revision history for Dancer::Plugin::DataTransposeValidator
 
+0.201 Mon 30 Dec 18:44:36 CET 2019
+
+    * Fix compat with older Perls
+
+0.200 Mon 30 Dec 17:23:21 CET 2019
+
+    * 'validator' now returns an object instead of a hash reference.
+
 0.101 Mon 31 Oct 12:22:02 CET 2016
 
     * Fix various issues spotted by CI

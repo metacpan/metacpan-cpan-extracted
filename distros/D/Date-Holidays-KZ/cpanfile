@@ -6,7 +6,6 @@ requires "base" => "0";
 requires "perl" => "5.008";
 requires "strict" => "0";
 requires "utf8" => "0";
-requires "vars" => "0";
 requires "warnings" => "0";
 
 on 'build' => sub {

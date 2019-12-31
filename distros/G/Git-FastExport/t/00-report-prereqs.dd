@@ -38,10 +38,9 @@ do { my $x = {
                                    'File::Temp' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Test::More' => '0',
-                                   'Test::Requires::Git' => '0',
-                                   'Test::Script' => '1.05',
-                                   'blib' => '1.01',
+                                   'Test::More' => '0.88',
+                                   'Test::Requires::Git' => '1.005',
+                                   'lib' => '0',
                                    'perl' => '5.006'
                                  }
                  }

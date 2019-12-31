@@ -8,7 +8,11 @@ namespace xs {
 
 using panda::string;
 
-xs::my_perl_auto_t my_perl;
+#ifdef PERL_IMPLICIT_CONTEXT
+PerlInterpreter* my_perl_auto_t::main_interp = PERL_GET_THX;
+#endif
+
+my_perl_auto_t my_perl;
 
 static std::vector<panda::function<void()>> end_cbs;
 
@@ -21,6 +25,12 @@ void __call_at_perl_destroy () {
     Sv::__at_perl_destroy();
     Scalar::__at_perl_destroy();
     Simple::__at_perl_destroy();
+}
+
+void __call_at_thread_create () {
+#ifdef PERL_IMPLICIT_CONTEXT
+    my_perl_auto_t::main_interp = nullptr;
+#endif
 }
 
 void __boot_module (const char* rawmod, void (*bootfunc)(pTHX_ CV*), const char* version, const char* file) {

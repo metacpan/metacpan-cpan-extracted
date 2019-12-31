@@ -1,0 +1,26 @@
+version: "{build} ~ {branch}"
+
+environment:
+  PERL_CPANM_OPT: "--notest --force --skip-satisfied"
+
+skip_tags: true
+
+cache:
+  - C:\strawberry
+
+install:
+  - if not exist "C:\strawberry" cinst --allow-empty-checksums strawberryperl
+  - set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+  - cd C:\projects\%APPVEYOR_PROJECT_NAME%
+  - cpanm Pod::Weaver::Section::Contributors
+  - cpanm Dist::Zilla
+  - dzil authordeps --missing | cpanm
+  - dzil listdeps --author --missing | cpanm
+  - dzil listdeps --missing | cpanm
+
+build_script:
+  - "dzil build" 
+
+test_script:
+  - "dzil test"
+

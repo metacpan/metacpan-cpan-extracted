@@ -1,0 +1,16 @@
+{
+    "_js_dist": [
+        {
+            "relative_package_path": "dash_html_components.min.js",
+            "external_url": "https://unpkg.com/dash-html-components@1.0.2/dash_html_components/dash_html_components.min.js",
+            "namespace": "dash_html_components"
+        },
+        {
+            "relative_package_path": "dash_html_components.min.js.map",
+            "external_url": "https://unpkg.com/dash-html-components@1.0.2/dash_html_components/dash_html_components.min.js.map",
+            "namespace": "dash_html_components",
+            "dynamic": true
+        }
+    ],
+    "_css_dist": []
+}

@@ -1,5 +1,5 @@
 package Git::FastExport::Stitch;
-$Git::FastExport::Stitch::VERSION = '0.107';
+$Git::FastExport::Stitch::VERSION = '0.108';
 use strict;
 use warnings;
 use Cwd qw( cwd );
@@ -73,9 +73,9 @@ sub stitch {
     my $name = pop @parts;
     $name = pop @parts if $name eq '.git';
     $name =~ s/\.git$//;
+    $dir = $name if not defined $dir;
     $name =~ y/-A-Za-z0-9_/-/cs;
     $name =~ s/^-|-$//g;
-    $dir = $name if not defined $dir;
 
     # check if the name is not used already and pick a replacement if it is
     if ( exists $self->{name}{$name} ) {
@@ -305,6 +305,10 @@ __END__
 =head1 NAME
 
 Git::FastExport::Stitch - Stitch together multiple git fast-export streams
+
+=head1 VERSION
+
+version 0.108
 
 =head1 SYNOPSIS
 

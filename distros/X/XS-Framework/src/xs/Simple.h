@@ -160,8 +160,11 @@ struct Simple : Scalar {
         return T(buf, len);
     }
 
-    char  operator[] (size_t i) const { return SvPVX_const(sv)[i]; }
-    char& operator[] (size_t i)       { return SvPVX(sv)[i]; }
+    template <typename T, typename = panda::enable_if_arithmetic_t<T>>
+    char operator[] (T i) const { return SvPVX_const(sv)[i]; }
+    
+    template <typename T, typename = panda::enable_if_arithmetic_t<T>>
+    char& operator[] (T i) { return SvPVX(sv)[i]; }
 
     char at (size_t i) {
         if (!sv) throw std::out_of_range("at: no sv");

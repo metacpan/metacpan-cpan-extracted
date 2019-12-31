@@ -27,12 +27,15 @@ struct KeyProxy : Scalar {
     KeyProxy& operator= (const Sub&)   = delete;
     KeyProxy& operator= (const Io&)    = delete;
 
-    KeyProxy operator[] (size_t key);
+    template <typename T, typename = panda::enable_if_arithmetic_t<T>>
+    KeyProxy operator[] (T key) { return _geti(key); }
     KeyProxy operator[] (const panda::string_view& key);
 
 private:
     SV** ptr;
     bool nullok;
+    
+    KeyProxy _geti (size_t key);
 };
 
 }

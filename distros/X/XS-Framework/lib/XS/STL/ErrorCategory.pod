@@ -1,0 +1,39 @@
+=head1 NAME
+
+XS::STL::ErrorCategory - Perl binding for C++ STL's std::error_category.
+
+
+
+=head1 DESCRIPTION
+
+See L<XS::STL::ErrorCode> for details
+
+
+
+=head1 API
+
+=head4 name(), operator ""
+
+Returns category name
+
+=head4 message($code)
+
+Returns error message for error code value C<$code>
+
+=head4 operator ==, eq
+
+Compares two categories and returns true if they are the same
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut
+
+1;

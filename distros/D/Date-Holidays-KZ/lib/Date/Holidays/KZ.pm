@@ -1,5 +1,5 @@
 package Date::Holidays::KZ;
-our $VERSION = '0.2019.0'; # VERSION
+our $VERSION = '0.2020.0'; # VERSION
 
 =encoding utf8
 
@@ -50,7 +50,6 @@ our @EXPORT_OK = qw(
     is_business_day
     is_short_business_day
 );
-use vars qw($strict $HOLIDAYS_VALID_SINCE $INACCURATE_TIMES_SINCE);
 
 =head2 $Date::Holidays::KZ::HOLIDAYS_VALID_SINCE, $Date::Holidays::KZ::INACCURATE_TIMES_SINCE
 
@@ -59,8 +58,8 @@ INACCURATE_TIMES_SINCE after this year dates of holidays and working day shift a
 
 =cut
 
-$HOLIDAYS_VALID_SINCE = 2017; # TODO add all old
-$INACCURATE_TIMES_SINCE = 2020;
+our $HOLIDAYS_VALID_SINCE = 2017; # TODO add all old
+our $INACCURATE_TIMES_SINCE = 2021;
 
 
 =head2 $Date::Holidays::KZ::strict
@@ -70,7 +69,7 @@ Default is 0.
 
 =cut
 
-$strict = 0;
+our $strict = 0;
 
 use Carp;
 use Time::Piece;
@@ -129,6 +128,7 @@ my %HOLIDAYS_SPECIAL = (
     2017 => [ qw( 0103 0320 0508 0707 0901 1218 1219 ) ],
     2018 => [ qw( 0821 0309 0508 0430 0831 1203 1218 1231 ) ],
     2019 => [ qw( 0325 0510 0708 1202 0811 ) ],
+    2020 => [ qw( 0103 0309 0324 0325 0508 0831 1218 ) ],
 );
 
 
@@ -136,6 +136,7 @@ my %BUSINESS_DAYS_ON_WEEKENDS = (
     2017 => [ qw( 0318 0701 ) ],
     2018 => [ qw( 0303 0505 0825 1229 ) ],
     2019 => [ qw( 0504 ) ],
+    2020 => [ qw( 0105 1220 ) ],
 );
 
 my %SHORT_BUSINESS_DAYS = (

@@ -6,9 +6,8 @@ use Exporter qw(import);
 use Pegex::Grammar;
 use Pegex::Parser;
 use XML::Invisible::Receiver;
-use XML::LibXML;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our @EXPORT_OK = qw(make_parser ast2xml);
 
 use constant DEBUG => $ENV{XML_INVISIBLE_DEBUG};
@@ -23,12 +22,13 @@ sub make_parser {
   );
   sub {
     my ($ixml_text) = @_;
-    my $got = $parser->parse($ixml_text);
-    ast2xml($got);
+    $parser->parse($ixml_text);
   };
 }
 
+my $xml_loaded = 0;
 sub ast2xml {
+  do { require XML::LibXML; $xml_loaded = 1 } unless $xml_loaded;
   my ($ast) = @_;
   my $doc = XML::LibXML->createDocument("1.0", "UTF-8");
   $doc->addChild(_item2elt($ast));
@@ -74,7 +74,11 @@ XML::Invisible - transform "invisible XML" documents into XML using a grammar
 
   use XML::Invisible qw(make_parser);
   my $transformer = make_parser(from_file($ixmlspec));
-  my $xmldoc = $transformer->(from_file($ixml_input));
+  my $ast = $transformer->(from_file($ixml_input));
+
+  use XML::Invisible qw(make_parser ast2xml);
+  my $transformer = make_parser(from_file($ixmlspec));
+  my $xmldoc = ast2xml($transformer->(from_file($ixml_input)));
   to_file($outputfile, $xmldoc->toStringC14N(1));
 
   # or, with conventional pre-compiled Pegex grammar
@@ -86,8 +90,8 @@ XML::Invisible - transform "invisible XML" documents into XML using a grammar
 
   # from command line
   cpanm XML::Invisible XML::Twig
-  perl -MXML::Invisible=make_parser -e \
-    'print make_parser(join "", <>)->("(a+b)")->toStringC14N(1)' \
+  perl -MXML::Invisible=make_parser,ast2xml -e \
+    'print ast2xml(make_parser(join "", <>)->("(a+b)"))->toStringC14N(1)' \
     examples/arith-grammar.ixml | xml_pp
 
 =head1 DESCRIPTION
@@ -139,7 +143,21 @@ When given C<(a+b)> yields:
 =head2 make_parser
 
 Exportable. Returns a function that when called with an "invisible XML"
-document, it will return an object of class L<XML::LibXML::Document>.
+document, it will return an abstract syntax tree (AST), of the general form:
+
+  {
+    nodename => 'expr',
+    type => 'element',
+    attributes => { open => '(', sign => '+', close => ')' },
+    children => [
+      {
+        nodename => 'left',
+        type => 'element',
+        attributes => { name => 'a' },
+      },
+      { nodename => 'right', type => 'element', children => [ 'b' ] },
+    ],
+  }
 
 Arguments:
 
@@ -149,11 +167,14 @@ Arguments:
 
 =back
 
+See L<XML::Invisible::Receiver> for more.
+
 =head2 ast2xml
 
-Exportable. The function used by L</make_parser> to turn an
-AST from L<XML::Invisible::Receiver> into an object of class
-L<XML::LibXML::Document>.
+Exportable. Turns an AST, as output by L</make_parser>,
+from L<XML::Invisible::Receiver> into an object of class
+L<XML::LibXML::Document>. Needs L<XML::LibXML> installed, which as of
+version 0.05 of this module is only a suggested dependency, not required.
 
 Arguments:
 

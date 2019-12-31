@@ -38,7 +38,7 @@ use constant _NFIELDS  => 4;
 
 # ----- static data -----
 
-our $VERSION      = '1.017';
+our $VERSION      = '1.018';
 our $max_degree   = 10_000;    # limit for power operator
 
 # default values for as_string options
@@ -606,6 +606,20 @@ sub shift_down {
     return $this->new( map { $this->coeff($_) } $exp .. $this->degree );
 }
 
+sub inflate {
+    my ($this, $exp) = @_;
+    my $degree = $this->degree;
+    return $this if $degree <= 0;
+    _check_int($exp);
+    croak 'exponent too large' if
+        defined($max_degree) && $degree * $exp > $max_degree;
+    return $this->new($this->evaluate($this->coeff_one)) if !$exp;
+    my @zeroes = ($this->coeff_zero) x ($exp - 1);
+    return $this if !@zeroes;
+    my ($const, @coeff) = $this->coeff;
+    return $this->new($const, map {@zeroes, $_} @coeff);
+}
+
 sub slice {
     my ($this, $start, $count) = @_;
     _check_int($start, $count);
@@ -920,7 +934,7 @@ Math::Polynomial - Perl class for polynomials in one variable
 
 =head1 VERSION
 
-This documentation refers to version 1.017 of Math::Polynomial.
+This documentation refers to version 1.018 of Math::Polynomial.
 
 =head1 SYNOPSIS
 
@@ -1008,9 +1022,10 @@ is recommended because previous versions had a different API.
 
 =item I<$max_degree>
 
-C<$max_degree> limits the arguments for the I<pow> and I<shift_up>
-operators and the monomial constructor, see L</pow>.  Its default
-value is ten thousand.  It can be undefined to disable any size checks.
+C<$max_degree> limits the arguments for the I<pow>, I<shift_up>, and
+I<inflate> operators, and the I<monomial> constructor, see L</pow>.
+Its default value is ten thousand.  It can be undefined to disable any
+size checks.
 
 =back
 
@@ -1435,15 +1450,27 @@ as it does not take any operations in the coefficient space.
 
 C<$p-E<gt>slice($m, $n)> is equivalent to:
 
-  $xm = $p->make_monomial($m);
-  $xn = $p->make_monomial($n);
+  $xm = $p->monomial($m);
+  $xn = $p->monomial($n);
   ($p / $xm) % $xn
 
 I.e., it returns a polynomial built from a slice of the coefficients
 of the original polynomial starting with degree C<$m>, and at most
-C<$n> coefficients.   However, it is more efficient than division
+C<$n> coefficients.  However, it is more efficient than division
 and modulo as it does not perform any operations in the coefficient
 space.  The indexes C<$m> and C<$n> must be non-negative integers.
+
+=item I<inflate>
+
+C<$p-E<gt>inflate($n)> is equivalent to
+C<$p-E<gt>nest($p-E<gt>monomial($n))>, only more efficient, as it does
+not perform any operations in the coefficient space.  It returns the
+polynomial resulting from replacing the variable I<x> by the I<n>th
+power of I<x> in the original polynomial.
+
+The exponent C<$n> must be a non-negative integer.  To prevent accidential
+excessive memory consumption, the degree of the result must be at most
+C<$Math::Polynomial::max_degree> (if a maximal degreee is defined).
 
 =item I<mul_root>
 
@@ -2038,6 +2065,8 @@ type of object instances.
   $q = $p >> 3;        $q = $p->shift_down(3); # p == q * x**3 + r,
                                                #   deg r < 3
 
+  $r = $p->inflate(3);                         # r(x) == p(x ** 3)
+
   $r = $p->slice(0, 3);              # p ==  q * x**3 + r, deg r < 3
   $r = $p->slice(2, 3);              # p == (q * x**3 + r) * x**2 + s,
                                      #   deg r < 3, deg s < 2
@@ -2277,13 +2306,12 @@ zero polynomial is not defined.
 
 =item exponent too large
 
-One of the methods I<pow>, I<shift_up> or I<monomial> was called
-with arguments that would lead to a result with an excessively high
-degree.  You can tweak the class variable I<$max_degree> to change
-the actual limit or disable the check altogether.  Calculations
-involving large polynomials can consume a lot of memory and CPU
-time.  Exponent sanity checks help to avoid that from happening by
-accident.
+One of the methods I<pow>, I<shift_up>, I<inflate>, or I<monomial> was
+called with arguments that would lead to a result with an excessively
+high degree.  You can tweak the class variable I<$max_degree> to
+change the actual limit or disable the check altogether.  Calculations
+involving large polynomials can consume a lot of memory and CPU time.
+Exponent sanity checks help to avoid that from happening by accident.
 
 =item missing parameter: %s
 

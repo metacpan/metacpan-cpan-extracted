@@ -1,4 +1,5 @@
 #include <xs.h>
+#include <panda/exception.h>
 
 using namespace xs;
 
@@ -17,3 +18,16 @@ uint64_t bench_sv_payload_get (int count) {
         RETVAL += (uint64_t)typemap::object::TypemapMarker<Epta>::get();
     }
 }
+
+void throw_exception(Sv sv) {
+    throw sv;
+}
+
+void throw_logic_error() {
+    throw std::logic_error("my-logic-error");
+}
+
+void throw_backtrace() {
+    throw panda::exception("my-error");
+}
+

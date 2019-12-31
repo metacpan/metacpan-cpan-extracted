@@ -1,7 +1,7 @@
 {
    "abstract" : "class builder for hierarchical objects",
    "author" : [
-      "Sebastian Knapp <sknpp@cpan.org>"
+      "Mike WÃ¼rfel <sknpp@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4224",
@@ -35,9 +35,21 @@
       }
    },
    "provides" : {
+      "HO::abstract" : {
+         "file" : "lib/HO/abstract.pm",
+         "version" : "0.02"
+      },
+      "HO::accessor" : {
+         "file" : "lib/HO/accessor.pm",
+         "version" : "0.053"
+      },
+      "HO::class" : {
+         "file" : "lib/HO/class.pm",
+         "version" : "0.079"
+      },
       "HO::mixin" : {
          "file" : "lib/HO/mixin.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -48,6 +60,6 @@
          "url" : "git://github.com/p5-ho-develop/class.git"
       }
    },
-   "version" : "0.078",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.079",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

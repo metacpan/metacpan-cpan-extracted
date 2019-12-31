@@ -15,7 +15,7 @@ name: Dita-PCD
 provides:
   Dita::PCD:
     file: lib/Dita/PCD.pm
-    version: '20191230'
+    version: '20191231'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -28,5 +28,5 @@ requires:
   perl: v5.26.1
 resources:
   license: http://dev.perl.org/licenses/
-version: '20191230'
+version: '20191231'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

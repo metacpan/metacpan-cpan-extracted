@@ -204,10 +204,10 @@ my $configure_wordpress=sub {
       ($stdout,$stderr)=$handle->cmd($sudo."yum clean all");
       ($stdout,$stderr)=$handle->cmd($sudo."yum grouplist hidden");
       ($stdout,$stderr)=$handle->cmd($sudo."yum groups mark convert");
-      ($stdout,$stderr)=$handle->cmd(
-         $sudo."yum -y groupinstall 'Development tools'",'__display__');
-      ($stdout,$stderr)=$handle->cmd(
-         'sudo yum -y install openssl-devel icu cyrus-sasl '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "yum -y groupinstall 'Development tools'",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum -y install openssl-devel icu cyrus-sasl '.
          ' cyrus-sasl-devel libtool-ltdl-devel libjpeg-turbo-devel'.
          ' freetype-devel libpng-devel java-1.7.0-openjdk-devel'.
          ' unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel'.
@@ -216,8 +216,10 @@ my $configure_wordpress=sub {
          ' libpng-devel.x86_64 freetype-devel.x86_64 '.
          ' oniguruma oniguruma-devel tcl tcl-devel git-all',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd(
-         'yum -y install yum-utils --enablerepo=extras','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum -y update','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum -y install yum-utils','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "if [ -d $nginx_path/nginx ]; ".
          'then echo EXISTS;else echo NONE; fi');
@@ -291,7 +293,7 @@ if ($do==1) {
       ($stdout,$stderr)=$handle->cmd("unzip -o master.zip",'__display__');
       ($stdout,$stderr)=$handle->cmd("rm -rvf master.zip",'__display__');
       ($stdout,$stderr)=$handle->cmd("mv apt-cyg-master/apt-cyg /usr/bin");
-      ($stdout,$stderr)=$handle->cmd($sudo."chmod -v 755 /usr/bin/apt-cyg",
+      ($stdout,$stderr)=$handle->cmd("chmod -v 755 /usr/bin/apt-cyg",
          '__display__');
       ($stdout,$stderr)=$handle->cmd("rm -rvf apt-cyg-master",'__display__');
       my $packs='';$|=1;
@@ -387,15 +389,15 @@ if ($do==1) {
    
    unless ($^O eq 'cygwin') {
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "wget --random-wait --progress=dot ".
-         "http://download.fedoraproject.org".
-         "/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm",
+         'wget --random-wait --progress=dot '.
+         'http://download.fedoraproject.org'.
+         '/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "chown -v $username:$username epel-release-6-8.noarch.rpm",
          '__display__') if $^O ne 'cygwin';
-      ($stdout,$stderr)=$handle->cmd(
-         $sudo."rpm -ivh epel-release-6-8.noarch.rpm",
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rpm -ivh epel-release-6-8.noarch.rpm',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'rm -rvf epel-release-6-8.noarch.rpm',
@@ -449,8 +451,8 @@ if ($do==1) {
       'cp -v sqlite3.pc /usr/lib64/pkgconfig','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".
-      "http://ftp.gnu.org/gnu/autoconf/autoconf-latest.tar.gz",
+      'wget --random-wait --progress=dot '.
+      'http://ftp.gnu.org/gnu/autoconf/autoconf-latest.tar.gz',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "chown -v $username:$username autoconf-latest.tar.gz",'__display__')
@@ -460,32 +462,32 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd($sudo.'rm -rvf autoconf-latest.tar.gz',
       '__display__');
    ($stdout,$stderr)=$handle->cwd("autoconf-*");
-   ($stdout,$stderr)=$handle->cmd($sudo."./configure",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo."make",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo."make install",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'./configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd("wget --version");
+   ($stdout,$stderr)=$handle->cmd('wget --version');
    $stdout=~s/^.*?\d[.](\d+).*$/$1/s;
    if ($stdout<18 && !(-e '/usr/local/bin/wget')) {
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "wget --random-wait --progress=dot ".
-         "https://ftp.gnu.org/gnu/wget/wget-latest.tar.gz",
+         'wget --random-wait --progress=dot '.
+         'https://ftp.gnu.org/gnu/wget/wget-latest.tar.gz',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "tar zxvf wget-latest.tar.gz",'__display__');
+         'tar zxvf wget-latest.tar.gz','__display__');
       ($stdout,$stderr)=$handle->cwd("wget-*");
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "./configure --prefix=/usr/local ".
-         "--sysconfdir=/etc --with-ssl=openssl",
+         './configure --prefix=/usr/local '.
+         '--sysconfdir=/etc --with-ssl=openssl',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "make",'__display__');
+         'make','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "make install",'__display__');
+         'make install','__display__');
    }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "python --version",'__display__');
+      'python --version','__display__');
    if ($stderr=~/Python /) {
       $stderr=~s/^Python\s+(\d.\d).*$/$1/s;
       $stderr=~s/[.]//g;
@@ -493,13 +495,13 @@ if ($do==1) {
    #cleanup;
    if ($stderr && $stderr<27) {
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "wget --random-wait --progress=dot ".
-	 "http://python.org/ftp/python/2.7.17/Python-2.7.17.tar.xz",
+         'wget --random-wait --progress=dot '.
+	 'http://python.org/ftp/python/2.7.17/Python-2.7.17.tar.xz',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-	 "tar xvf Python-2.7.17.tar.xz",
+	 'tar xvf Python-2.7.17.tar.xz',
          '__display__');
-      ($stdout,$stderr)=$handle->cwd("Python-2.7.17");
+      ($stdout,$stderr)=$handle->cwd('Python-2.7.17');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "./configure --prefix=/usr/local --enable-unicode=ucs4 ".
          "--enable-shared LDFLAGS=\"-Wl,-rpath /usr/local/lib\"",
@@ -527,10 +529,10 @@ if ($do==1) {
          '__display__');
       my $siteloc='/usr/local/lib/python2.7';
       $siteloc='/usr/lib/python2.7' if -e '/usr/lib/python2.7';
-      ($stdout,$stderr)=$handle->cmd($sudo."ls -1 ".
+      ($stdout,$stderr)=$handle->cmd($sudo.'ls -1 '.
          "$siteloc/site-packages",'__display__');
       $stdout=~s/^.*(httplib2.*?egg).*$/$1/s;
-      ($stdout,$stderr)=$handle->cmd($sudo."chmod o+r -v -R ".
+      ($stdout,$stderr)=$handle->cmd($sudo.'chmod o+r -v -R '.
          "$siteloc/site-packages/$stdout",
          '__display__');
    }
@@ -544,7 +546,7 @@ if ($do==1) {
          'mv -v ~/local.conf /etc/ld.so.conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
    } else {
-      ($stdout,$stderr)=$handle->cmd('pip install awscli','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'pip install awscli','__display__');
    }
 }
 $do=1;
@@ -777,14 +779,7 @@ END
       'yum -y install certbot-nginx','__display__');
    # https://www.digitalocean.com/community/tutorials/
    # how-to-secure-nginx-with-let-s-encrypt-on-centos-7
-   my $make_nginx="./configure --sbin-path=$nginx_path/nginx/nginx ".
-                  "--conf-path=$nginx_path/nginx/nginx.conf ".
-                  "--pid-path=$nginx_path/nginx/nginx.pid ".
-                  "--with-http_ssl_module --with-pcre=objs/lib/$pcre ".
-                  "--with-zlib=objs/lib/zlib-$zlib_ver";
-   #if ($hostname eq 'jp-01ld.get-wisdom.com') {
-   if ($hostname ne 'jp-01ld.get-wisdom.com') {
-      $make_nginx='./configure --user=www-data '.
+   my $make_nginx='./configure --user=www-data '.
                   '--group=www-data '.
                   "--prefix=$nginx_path/nginx ".
                   '--sbin-path=/usr/sbin/nginx '.
@@ -803,165 +798,17 @@ END
                   '--without-http_uwsgi_module '.
                   '--with-http_v2_module';
                   #'--without-http_fastcgi_module';
-   }
    ($stdout,$stderr)=$handle->cmd($sudo.$make_nginx,'__display__');
-   ($stdout,$stderr)=$handle->cmd(
-      $sudo."sed -i 's/-Werror //' ./objs/Makefile");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i 's/-Werror //' ./objs/Makefile");
    ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    # https://www.liberiangeek.net/2015/10/
    # how-to-install-self-signed-certificates-on-nginx-webserver/
-   if ($hostname eq 'jp-01ld.get-wisdom.com') {
-      ($stdout,$stderr)=$handle->cmd(
-         $sudo."mkdir -vp $nginx_path/nginx/ssl.key");
-      ($stdout,$stderr)=$handle->cmd(
-         $sudo.'mkdir -vp /etc/nginx/ssl.crt');
-      ($stdout,$stderr)=$handle->cmd(
-         $sudo.'mkdir -vp /etc/nginx/ssl.csr');
-      $handle->print(
-         $sudo.'openssl genrsa -des3 -out '.
-         "/etc/nginx/ssl.key/$domain_url.key 2048");
-      $prompt=$handle->prompt();
-      while (1) {
-         my $output.=fetch($handle);
-         last if $output=~/$prompt/;
-         print $output;
-         if (-1<index $output,'pass phrase for') {
-            $handle->print($service_and_cert_password);
-            $output='';
-            next;
-         } elsif (-1<index $output,'Verifying - Enter') {
-            $handle->print($service_and_cert_password);
-            $output='';
-            next;
-         }
-      }
-      while (1) {
-         my $trys=0;
-         my $ereturn=eval {
-            local $SIG{ALRM} = sub { die "alarm\n" }; # \n required
-            alarm 7;
-            $handle->print($sudo.
-               "openssl req -new -key /etc/nginx/ssl.key/$domain_url.key ".
-               "-out /etc/nginx/ssl.csr/$domain_url.csr");
-            my $test='';my $output='';
-            while (1) {
-               $output.=fetch($handle);
-               $test.=$output;
-               $test=~tr/\0-\11\14-\37\177-\377//d;
-               return 'DONE' if $output=~/$prompt/;
-               print $output;
-               $test=~s/\n//gs;
-               if ($test=~/Enter pass phrase.*key:/s) {
-                  $handle->print($service_and_cert_password);
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,'[AU]:') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,'[Some-State]:') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,'city) []:') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,'Pty Ltd]:') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,'section) []:') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,'YOUR name) []:') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,'Address []:') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,'challenge password []:') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,'company name []:') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,'Country Name (2 letter code) [XX]') {
-                  $handle->print('.');
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,
-                     'State or Province Name (full name) []') {
-                  $handle->print('.');
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,
-                     'Locality Name (eg, city) [Default City]:') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,
-                    'Organization Name (eg, company) [Default Company Ltd]:') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               } elsif (-1<index $test,
-                    'Common Name (eg, your name or your '.
-                    'server\'s hostname) []') {
-                  $handle->print();
-                  $output='';
-                  $test='';
-                  next;
-               }
-            }
-            return 'DONE';
-         };
-         alarm(0);
-         last if $ereturn eq 'DONE' || $trys++>3;
-      }
-      $handle->print($sudo.
-         'openssl x509 -req -days 365 -in '.
-         "/etc/nginx/ssl.csr/$domain_url.csr -signkey ".
-         "/etc/nginx/ssl.key/$domain_url.key -out ".
-         "/etc/nginx/ssl.crt/$domain_url.crt");
-      while (1) {
-         my $output.=fetch($handle);
-         last if $output=~/$prompt/;
-         print $output;
-         if (-1<index $output,'Enter pass phrase') {
-            $handle->print($service_and_cert_password);
-            $output='';
-            next;
-         } 
-      }
-   }
-   #unless ($hostname eq 'jp-01ld.get-wisdom.com') { 
-      ($stdout,$stderr)=$handle->cmd($sudo."sed -i 's/1024/64/' ".
-         "$nginx_path/nginx/nginx.conf");
- #} else {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "sed -i 's/worker_processes  1;/worker_processes  2;/' ".
-         "$nginx_path/nginx/nginx.conf");
- #}
+   ($stdout,$stderr)=$handle->cmd($sudo."sed -i 's/1024/64/' ".
+      "$nginx_path/nginx/nginx.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i 's/worker_processes  1;/worker_processes  2;/' ".
+      "$nginx_path/nginx/nginx.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i '0,/root   html/{//d;}' $nginx_path/nginx/nginx.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -975,41 +822,19 @@ $ad
 }' $nginx_path/nginx/nginx.conf
 END
    $handle->cmd_raw($sudo.$ad);
-   if ($hostname eq 'jp-01ld.get-wisdom.com') {
-      $ad='%NL%        location ~ .php$ {'.
-          "%NL%            root /var/www/html/wordpress;".
-          "%NL%            fastcgi_pass 127.0.0.1:9000;".
-          "%NL%            fastcgi_index index.php;".
-          "%NL%            fastcgi_param SCRIPT_FILENAME ".
-          '$document_root$fastcgi_script_name;'.
-          "%NL%            include fastcgi_params;".
-          '%NL%        }%NL%'.
-          '%NL%        ssl on;'.
-          "%NL%        ssl_certificate /etc/nginx/ssl.crt/$domain_url.crt;".
-          "%NL%        ssl_certificate_key /etc/nginx/ssl.key/$domain_url.key;".
-          '%NL%        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;'.
-          '%NL%        ssl_ciphers '.
-          '"HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";';
-      ($stdout,$stderr)=$handle->cmd($sudo.
-          "sed -i \'/404/a$ad\' $nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd($sudo.
-          "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-          "$nginx_path/nginx/nginx.conf");
-   } else {
-      $ad='%NL%        location ~ .php$ {'.
-          "%NL%            root /var/www/html/wordpress;".
-          "%NL%            fastcgi_pass 127.0.0.1:9000;".
-          "%NL%            fastcgi_index index.php;".
-          "%NL%            fastcgi_param SCRIPT_FILENAME ".
-          '$document_root$fastcgi_script_name;'.
-          "%NL%            include fastcgi_params;".
-          '%NL%        }%NL%';
-      ($stdout,$stderr)=$handle->cmd($sudo.
-          "sed -i \'/404/a$ad\' $nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd($sudo.
-          "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-          "$nginx_path/nginx/nginx.conf");
-   }
+   $ad='%NL%        location ~ .php$ {'.
+       "%NL%            root /var/www/html/wordpress;".
+       "%NL%            fastcgi_pass 127.0.0.1:9000;".
+       "%NL%            fastcgi_index index.php;".
+       "%NL%            fastcgi_param SCRIPT_FILENAME ".
+       '$document_root$fastcgi_script_name;'.
+       "%NL%            include fastcgi_params;".
+       '%NL%        }%NL%';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'/404/a$ad\' $nginx_path/nginx/nginx.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
+       "$nginx_path/nginx/nginx.conf");
    foreach my $port (443,444,445,443) {
       $avail_port=
       `true &>/dev/null </dev/tcp/127.0.0.1/$port && echo open || echo closed`;
@@ -1104,61 +929,54 @@ END
          '__display__');
       ($stdout,$stderr)=$handle->cmd("touch script/first_time_start.flag");
    } else {
-      #if ($hostname eq 'jp-01ld.get-wisdom.com') {
-      if ($hostname ne 'jp-01ld.get-wisdom.com') {
-	      #($stdout,$stderr)=$handle->cmd($sudo.
-	      #"mkdir -vp /etc/letsencrypt",'__display__');
-	      #($stdout,$stderr)=$handle->cmd($sudo.
-	      #'openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 2048',
-	      #'__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "sed -i 's/server_name  localhost/".
-            "server_name $domain_url www.$domain_url/' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "sed -i 's/#user  nobody;/user  www-data;/' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "sed -i 's/#error_page  404              /404.html;/".
-            "error_page  404              /404.html;/' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd($sudo.'service nginx start',
-            '__display__');
-         ($stdout,$stderr)=$handle->cwd("$nginx_path/nginx");
-         sleep 3;
-         ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
-         $handle->print($sudo.
-            "certbot --nginx -d $domain_url ".
-            "-d www.$domain_url");
-         $prompt=$handle->prompt();
-         my $output='';
-         while (1) {
-            $output.=fetch($handle);
-            last if $output=~/$prompt/;
-            print $output;
-            if (-1<index $output,'Attempt to reinstall') {
-               $handle->print('1');
-               $output='';
-               next;
-            } elsif (-1<index $output,'No redirect') {
-               $handle->print('2');
-               $output='';
-               next;
-            } elsif (-1<index $output,'Enter email address') {
-               $handle->print('brian.kelly@fullauto.com');
-               $output='';
-               next;
-            } elsif (-1<index $output,'Terms of Service') {
-               $handle->print('A');
-               $output='';
-               next;
-            } elsif (-1<index $output,'Would you be willing') {
-               $handle->print('Y');
-               $output='';
-               next;
-            }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/server_name  localhost/".
+         "server_name $domain_url www.$domain_url/' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/#user  nobody;/user  www-data;/' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/#error_page  404              /404.html;/".
+         "error_page  404              /404.html;/' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd($sudo.'service nginx start',
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd("$nginx_path/nginx");
+      sleep 3;
+      ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+      $handle->print($sudo.
+         "certbot --nginx -d $domain_url ".
+         "-d www.$domain_url");
+      $prompt=$handle->prompt();
+      my $output='';
+      while (1) {
+         $output.=fetch($handle);
+         last if $output=~/$prompt/;
+         print $output;
+         if (-1<index $output,'Attempt to reinstall') {
+            $handle->print('1');
+            $output='';
+            next;
+         } elsif (-1<index $output,'No redirect') {
+            $handle->print('2');
+            $output='';
+            next;
+         } elsif (-1<index $output,'Enter email address') {
+            $handle->print('brian.kelly@fullauto.com');
+            $output='';
+            next;
+         } elsif (-1<index $output,'Terms of Service') {
+            $handle->print('A');
+            $output='';
+            next;
+         } elsif (-1<index $output,'Would you be willing') {
+            $handle->print('Y');
+            $output='';
+            next;
          }
-         # https://ssldecoder.org
+      }
+      # https://ssldecoder.org
 $do=0;
 if ($do==1) {
 
@@ -1167,92 +985,78 @@ if ($do==1) {
 #add_header Strict-Transport-Security "max-age=63072000; includeSubDomains;" always;
 #add_header X-Frame-Options https://video.get-wisdom.com;
 
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_certificate_key/assl_dhparam /etc/letsencrypt".
-            "/ssl-dhparams.pem;' $nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_dhparam/a# https://cipherli.st/' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/cipherli.st/assl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_protocols/assl_prefer_server_ciphers on;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_prefer_server_ciphers/assl_ciphers ".
-            "HIGH:!aNULL:!MD5;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_ciphers ECDHE/assl_ecdh_curve secp384r1;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_ecdh_curve/assl_session_timeout  180m;' ".
-            "$nginx_path/nginx/nginx.conf"); 
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_session_timeout/assl_session_cache shared:SSL:10m;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_session_cache/assl_session_tickets off;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_session_tickets/assl_stapling on;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_stapling/assl_stapling_verify on;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_stapling_verify/a#resolver 127.0.0.1 [::1]:5353 valid=300s;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/valid=/aresolver_timeout 5s;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/resolver_timeout/aadd_header Strict-Transport-Security ".
-            "\"max-age=63072000; includeSubDomains;\" always;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/Strict-Transport-Security/aadd_header ".
-            "X-Frame-Options \"ALLOW-FROM https://video.$domain_url\";' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/X-Frame-Options/aadd_header X-Content-Type-Options nosniff;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/X-Content-Type-Options/aadd_header X-XSS-Protection \"1; ".
-            "mode=block\" always;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/X-XSS-Protection/aadd_header X-Robots-Tag none;' ".
-            "$nginx_path/nginx/nginx.conf");
-         ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/X-Robots-Tag/aadd_header Content-Security-Policy ".
-            "\"default-src \'self\' \'unsafe-inline\' \'unsafe-eval\' ".
-            "http: https: \*.$domain_url gmpg.org; img-src http: ".
-            "https: data: ws.sharethis.com s.w.org \*.gravatar.com ".
-            "themes.googleusercontent.com wordpress.org; font-src ".
-            "\'self\' \'unsafe-inline\' http: https: data: ".
-            "fonts.googleapis.com fonts.gstatic.com\";");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/^ssl_certificate_key/assl_dhparam /etc/letsencrypt".
+         "/ssl-dhparams.pem;' $nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/^ssl_dhparam/a# https://cipherli.st/' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/cipherli.st/assl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/^ssl_protocols/assl_prefer_server_ciphers on;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/^ssl_prefer_server_ciphers/assl_ciphers ".
+         "HIGH:!aNULL:!MD5;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/^ssl_ciphers ECDHE/assl_ecdh_curve secp384r1;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/^ssl_ecdh_curve/assl_session_timeout  180m;' ".
+         "$nginx_path/nginx/nginx.conf"); 
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/^ssl_session_timeout/assl_session_cache shared:SSL:10m;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/^ssl_session_cache/assl_session_tickets off;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/^ssl_session_tickets/assl_stapling on;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/^ssl_stapling/assl_stapling_verify on;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/^ssl_stapling_verify/a#resolver 127.0.0.1 [::1]:5353 valid=300s;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/valid=/aresolver_timeout 5s;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/resolver_timeout/aadd_header Strict-Transport-Security ".
+         "\"max-age=63072000; includeSubDomains;\" always;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/Strict-Transport-Security/aadd_header ".
+         "X-Frame-Options \"ALLOW-FROM https://video.$domain_url\";' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/X-Frame-Options/aadd_header X-Content-Type-Options nosniff;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/X-Content-Type-Options/aadd_header X-XSS-Protection \"1; ".
+         "mode=block\" always;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/X-XSS-Protection/aadd_header X-Robots-Tag none;' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd(
+         "sed -i '/X-Robots-Tag/aadd_header Content-Security-Policy ".
+         "\"default-src \'self\' \'unsafe-inline\' \'unsafe-eval\' ".
+         "http: https: \*.$domain_url gmpg.org; img-src http: ".
+         "https: data: ws.sharethis.com s.w.org \*.gravatar.com ".
+         "themes.googleusercontent.com wordpress.org; font-src ".
+         "\'self\' \'unsafe-inline\' http: https: data: ".
+         "fonts.googleapis.com fonts.gstatic.com\";");
+
+      ($stdout,$stderr)=$handle->cmd($sudo."service nginx restart",
+         '__display__');
 }
-         ($stdout,$stderr)=$handle->cmd($sudo."service nginx restart",
-            '__display__');
-      } else {
-         $handle->print($sudo."$nginx_path/nginx/nginx");
-         $prompt=substr($handle->prompt(),1,-1);
-         while (1) {
-            my $output.=fetch($handle);
-            last if $output=~/$prompt/;
-            print $output;
-            if (-1<index $output,'PEM pass phrase') {
-               $handle->print($service_and_cert_password);
-               $output='';
-               next;
-            }
-         }
-      }
-      ($stdout,$stderr)=$handle->cwd("/opt/source")
+      ($stdout,$stderr)=$handle->cwd('/opt/source')
    }
-}
    my $install_wordpress=<<'END';
 
 
@@ -1280,7 +1084,7 @@ if ($do==1) {
 
 END
 
-   ($stdout,$stderr)=$handle->cwd("/opt/source");
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    print $install_wordpress;
    sleep 5;
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1370,9 +1174,9 @@ END
                         ____| |               \_\
                        |_____/                            DATABASE
 END
-   print "\n\n";
    print $install_mysql;sleep 10;
-   ($stdout,$stderr)=$handle->cwd("/opt/source");
+   print "\n\n";
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'ls -1 /opt/source/mariadb');
    if ($stdout=~/[Mm]aria[Dd][Bb].*rpm/) {
@@ -1384,17 +1188,15 @@ END
    }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.'which mysql');
-   my $msstatus='';my $msversion='';
+   my $mysql_status='';my $mysql_version='';
    if ($stdout=~/\/mysql/) {
-      ($msversion,$stderr)=$handle->cmd($sudo.
+      ($mysql_version,$stderr)=$handle->cmd($sudo.
          'mysql --version','__display__');
-      $msversion=~s/^mysql\s+Ver\s+(.*?)\s+Distrib.*$/$1/;
-      ($msstatus,$stderr)=$handle->cmd($sudo.
-         'sudo service mysql status','__display__');
+      $mysql_version=~s/^mysql\s+Ver\s+(.*?)\s+Distrib.*$/$1/;
+      ($mysql_status,$stderr)=$handle->cmd($sudo.
+         'service mysql status','__display__');
    }
-   if ($msversion<15.1 || $msstatus!~/SUCCESS/) {
-   #my $u=1;
-   #if ($u==1) {
+   if ($mysql_version<15.1 || $mysql_status!~/SUCCESS/) {
       # https://docs.couchbase.com/server/6.0/install/thp-disable.html
       my $do_thp=1;
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1676,7 +1478,7 @@ END
          next;
       }
    }
-   $handle->cmd("echo");
+   $handle->cmd('echo');
    $handle->print($sudo.'mysql -u root');
    $prompt=$handle->prompt();
    my $cmd_sent=0;
@@ -1804,6 +1606,9 @@ END
          'make','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v libzip.pc /usr/lib64/pkgconfig',
+         '__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git clone https://github.com/jedisct1/libsodium',
@@ -1868,7 +1673,7 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.'make -j2','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'ln -s /usr/local/php7/bin/php /usr/bin/php');
+         'ln -s /usr/local/php7/bin/php /usr/local/bin/php');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /usr/local/php7/etc/conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1977,6 +1782,11 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          '/usr/local/php7/bin/pecl install mailparse-3.0.4',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'bash -c "echo extension=mailparse.so > '.
+         '/usr/local/php7/etc/conf.d/mailparse.ini"');
+      ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm start',
+         '__display__');
    } elsif (-e '/opt/cpanel/ea-php70') {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v /opt/cpanel/ea-php70/root/etc/php-fpm.d/www.conf.default '.
@@ -2011,11 +1821,11 @@ END
       'wget --random-wait --progress=dot '.
       'https://memberlitetheme.com/wp-content/uploads/themes/'.
       $theme.'-child.zip','__display__');
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "/usr/local/bin/wp theme install $theme.zip --allow-root ".
       "--activate --path=/var/www/html/wordpress",
       '__display__');
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "/usr/local/bin/wp theme install ${theme}-child.zip --allow-root ".
       "--activate --path=/var/www/html/wordpress",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2295,7 +2105,7 @@ if ($do==1) {
 
    foreach my $plugin ($listt=~/^..([^-n].*?)\s+.*$/mg) {
       next if $plugin=~/^#/;
-      ($stdout,$stderr)=$handle->cmd(
+      ($stdout,$stderr)=$handle->cmd($sudo.
          "/usr/local/bin/wp plugin install $plugin --allow-root ".
          "--activate --path=/var/www/html/wordpress",
          '__display__');
@@ -2381,14 +2191,14 @@ $do=1;
 if ($do==1) {
 
    $service_and_cert_password=uri_escape($service_and_cert_password);
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "wget -d -qO- --no-check-certificate --random-wait --wait=3 ".
       "--cookies=on --keep-session-cookies --load-cookies ~/cookies.txt ".
       "--save-cookies ~/cookies.txt -d https://www.$domain_url/wp-login.php");
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'curl -k --cookie-jar ~/cookies.txt https://www.'.
       $domain_url.'/wp-login.php');
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'curl -v -k --cookie-jar ~/cookies.txt --max-redirs 0 '.
       '--data "log='.$adu.'&pwd='.$service_and_cert_password.
       '&wp-submit=Log+In&redirect_to=https://www.'.$domain_url.
@@ -2409,7 +2219,7 @@ if ($do==1) {
          "Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0'";
    my $one=1;
    foreach (1..5) {
-      $handle->print($nonce_cmd);
+      $handle->print($sudo.$nonce_cmd);
       $prompt=$handle->prompt();
       $handle->print($nonce_cmd);
       while (1) {
@@ -2421,7 +2231,7 @@ if ($do==1) {
       $stdout=~s/^.*_wpCustomizeSettings = (.*?)[}][}][}].*$/$1/s;
       last if -1<index $stdout,'"nonce":{';
       ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
-      ($stdout,$stderr)=$handle->cmd(
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'curl -v -k --cookie-jar ~/cookies.txt --max-redirs 0 '.
          '--data "log='.$adu.'&pwd='.$service_and_cert_password.
          '&wp-submit=Log+In&redirect_to=https://www.'.$domain_url.
@@ -2437,7 +2247,7 @@ print "NONCE=$nonce\n";sleep 5;
    my $nonce_hash=decode_json($nonce);
 #print "NONCE=$nonce<==NONCE and SAVE=$nonce_hash->{save} and PREVIEW=$nonce_hash->{preview}\n";<STDIN>;
    $uuid=~s/^.*uuid["]:["](.*?)["],.*$/$1/s;
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.'/wp-admin/'.
       "customize.php?url=https://www.".$domain_url."%2F&changeset_uuid=$uuid".
       "&customize_theme=memberlite-child&customize_messenger_channel=preview-0' ".
@@ -2451,7 +2261,7 @@ print "NONCE=$nonce\n";sleep 5;
       "-H 'Upgrade-Insecure-Requests: 1' ".
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; ".
       "Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0'");
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url."/?customize_changeset_uuid=".$uuid."' ".
       "-H 'Accept: */*' ".
       "-H 'Accept-Encoding: gzip, deflate, br' ".
@@ -2464,7 +2274,7 @@ print "NONCE=$nonce\n";sleep 5;
       "-H 'X-Requested-With: XMLHttpRequest' ".
       "--data 'wp_customize=on&nonce=".$nonce_hash->{preview}."&customize_theme=memberlite-child&customized=%7B%22blogdescription%22%3A%22Revealing+and+Healing+the+Number+One+Cause+of+Human+Difficulty%22%7D&customize_changeset_uuid=".$uuid."&partials=%7B%22blogdescription%22%3A%5B%7B%7D%5D%7D&wp_customize_render_partials=1&action=&customized=%7B%22blogdescription%22%3A%22Revealing+and+Healing+the+Number+One+Cause+of+Human+Difficulty%22%7D'");
 print "CUSTOMIZED STDOUT=$stdout<== and STDERR=$stderr<==\n";
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url."/wp-admin/admin-ajax.php' ".
       "-H 'Accept: */*' ".
       "-H 'Accept-Encoding: gzip, deflate, br' ".
@@ -2477,7 +2287,7 @@ print "CUSTOMIZED STDOUT=$stdout<== and STDERR=$stderr<==\n";
       "-H 'X-Requested-With: XMLHttpRequest' ".
       "--data 'wp_customize=on&customize_theme=memberlite-child&nonce=".$nonce_hash->{save}."&customize_changeset_uuid=".$uuid."&customize_changeset_data=%7B%22blogdescription%22%3A%7B%22value%22%3A%22Revealing+and+Healing+the+Number+One+Cause+of+Human+Difficulty%22%7D%7D&action=customize_save&customize_preview_nonce=".$nonce_hash->{preview}."'");
 print "CUSTOMIZE_SAVE STDOUT=$stdout<== and STDERR=$stderr<==\n";
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url."/wp-admin/admin-ajax.php' ".
       "-H 'Host: ".$domain_url."' ".
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0' ".
@@ -2494,7 +2304,7 @@ print "WHAT IS HEALING STDOUT=$stdout\n";
 ##############################################################
 
    #($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.'/wp-admin/'.
       "customize.php?url=https://www.".$domain_url."%2F' ".
       "-H 'Accept: text/html,".
@@ -2515,7 +2325,7 @@ print "WHAT IS STDOUT=$stdout<== and LOGO STDERR =$stderr<==\n";sleep 10;
    $nonce_hash=decode_json($nonce);
    $uuid=~s/^.*uuid["]:["](.*?)["],.*$/$1/s;
    sleep 5;
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.'/wp-admin/'.
       "customize.php?url=https://www.".$domain_url."%2F&changeset_uuid=$uuid".
       "&customize_theme=memberlite-child&customize_messenger_channel=preview-0' ".
@@ -2536,7 +2346,7 @@ print "WHAT IS STDOUT=$stdout<== and LOGO STDERR =$stderr<==\n";sleep 10;
 print "NONCE=$nonce<==\n";sleep 5;
    $nonce_hash=decode_json($nonce);
    $uuid=~s/^.*uuid["]:["](.*?)["],.*$/$1/s;
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url."/?customize_changeset_uuid=".$uuid."&customize_autosaved=on&customize_preview_nonce=".$nonce_hash->{preview}."' ".
       "-H 'Host: ".$domain_url."' ".
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0' ".
@@ -2549,7 +2359,7 @@ print "NONCE=$nonce<==\n";sleep 5;
       "--data 'wp_customize=on&nonce=".$nonce_hash->{preview}."&customize_theme=memberlite-child&customized=%7B%22custom_logo%22%3A".$post_id."%7D&customize_changeset_uuid=".$uuid."&partials=%7B%22custom_logo%22%3A%5B%7B%7D%5D%7D&wp_customize_render_partials=1&action=&customized=%7B%22custom_logo%22%3A".$post_id."%7D'");
 print "STDOUT=$stdout<==CUSTOM LOGO\n";sleep 5;
 
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url."/wp-admin/admin-ajax.php' ".
       "-H 'Host: ".$domain_url."' ".
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0' ".
@@ -2561,7 +2371,7 @@ print "STDOUT=$stdout<==CUSTOM LOGO\n";sleep 5;
       "-H 'Upgrade-Insecure-Requests: 1' ".
       "--data 'nonce=".$nonce_hash->{preview}."&id=".$post_id."&context=site-icon&cropDetails%5Bx1%5D=5&cropDetails%5By1%5D=0&cropDetails%5Bx2%5D=80&cropDetails%5By2%5D=75&cropDetails%5Bwidth%5D=75&cropDetails%5Bheight%5D=75&cropDetails%5Bdst_width%5D=512&cropDetails%5Bdst_height%5D=512&action=crop-image'");
 
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url."/wp-admin/admin-ajax.php' ".
       "-H 'Accept: */*' ".
       "-H 'Accept-Encoding: gzip, deflate, br' ".
@@ -2604,7 +2414,7 @@ if ($do==1) {
 
    foreach my $plugin (@wp_plugins) {
       next if $plugin=~/^#/;
-      ($stdout,$stderr)=$handle->cmd(
+      ($stdout,$stderr)=$handle->cmd($sudo.
          "/usr/local/bin/wp plugin install $plugin --allow-root ".
          "--activate --path=/var/www/html/wordpress",
          '__display__');
@@ -2621,12 +2431,12 @@ if ($do==1) {
 
    ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
 
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/bin/wp post list --post_type=page,post --allow-root '.
       '--path=/var/www/html/wordpress');
    $stdout=~s/^.*\n(\d+).*?register.*?\n.*$/$1/s;
    print "register page ID=$stdout<==REGISTERID\n";
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "/usr/local/bin/wp post delete $stdout --force --allow-root ".
       '--path=/var/www/html/wordpress','__display__');
 
@@ -2636,7 +2446,7 @@ if ($do==1) {
       "[theme-my-login default_action=\"register\" show_title=\"0\"]' ".
       "--path=/var/www/html/wordpress",'__display__');
 
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url."/wp-admin/admin.php?page=wc-setup' ".
       "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
           "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
@@ -2650,7 +2460,7 @@ if ($do==1) {
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
           "AppleWebKit/537.36 (KHTML, like Gecko) ".
           "Chrome/62.0.3202.94 Safari/537.36'");
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url."/wp-admin/admin.php?page=wc-setup' ".
       "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
           "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
@@ -2669,7 +2479,7 @@ print "STDOUT=$stdout<==WC-SETUP\n";
    $stdout=~s/^.*_wpnonce.*?value=["](.*?)["].*$/$1/s;
    my $nonce=$stdout;
 print "NONCE=$nonce<==NONCE\n";sleep 5;
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url."/wp-admin/admin.php?page=wc-setup' ".
       "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
           "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
@@ -2686,7 +2496,7 @@ print "NONCE=$nonce<==NONCE\n";sleep 5;
           "Chrome/62.0.3202.94 Safari/537.36' ".
       "--data '_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup&store_country_state=US%3AIL&store_address=714+E.+Diggins+St.&store_address_2=&store_city=Harvard&store_postcode=60033&currency_code=USD&product_type=both&save_step=Let%27s+go%21'");
 print "WC-SETUPOUT=$stdout<==WC-SETUP-SENT\n";
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url."/wp-admin/admin.php?page=wc-setup&step=payment' ".
       "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
           "q=0.9,image/webp,image/apng,*/*;q=0.8' ".
@@ -2701,7 +2511,7 @@ print "WC-SETUPOUT=$stdout<==WC-SETUP-SENT\n";
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
           "AppleWebKit/537.36 (KHTML, like Gecko) ".
           "Chrome/62.0.3202.94 Safari/537.36'");
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=wc-setup&step=payment' ".
       "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
@@ -2719,7 +2529,7 @@ print "WC-SETUPOUT=$stdout<==WC-SETUP-SENT\n";
           "AppleWebKit/537.36 (KHTML, like Gecko) ".
           "Chrome/62.0.3202.94 Safari/537.36' ".
       "--data 'stripe_email=Brian.Kelly%40$domain_url&wc-wizard-service-stripe-enabled=yes&wc-wizard-service-braintree_paypal-enabled=yes&paypal_email=Brian.Kelly%40$domain_url&wc-wizard-service-paypal-enabled=yes&save_step=Continue&_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dpayment'");
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=wc-setup&step=shipping' ".
       "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
@@ -2736,7 +2546,7 @@ print "WC-SETUPOUT=$stdout<==WC-SETUP-SENT\n";
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
           "AppleWebKit/537.36 (KHTML, like Gecko) ".
           "Chrome/62.0.3202.94 Safari/537.36'");
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=wc-setup&step=shipping' ".
       "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
@@ -2754,7 +2564,7 @@ print "WC-SETUPOUT=$stdout<==WC-SETUP-SENT\n";
           "AppleWebKit/537.36 (KHTML, like Gecko) ".
           "Chrome/62.0.3202.94 Safari/537.36' ".
       "--data 'shipping_zones%5Bdomestic%5D%5Bmethod%5D=live_rates&shipping_zones%5Bdomestic%5D%5Bflat_rate%5D%5Bcost%5D=&shipping_zones%5Bdomestic%5D%5Benabled%5D=yes&shipping_zones%5Bintl%5D%5Bmethod%5D=live_rates&shipping_zones%5Bintl%5D%5Bflat_rate%5D%5Bcost%5D=&shipping_zones%5Bintl%5D%5Benabled%5D=yes&weight_unit=oz&dimension_unit=in&save_step=Continue&_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dshipping'");
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=wc-setup&step=extras' ".
       "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
@@ -2771,7 +2581,7 @@ print "WC-SETUPOUT=$stdout<==WC-SETUP-SENT\n";
       "-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ".
           "AppleWebKit/537.36 (KHTML, like Gecko) ".
           "Chrome/62.0.3202.94 Safari/537.36'");
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=wc-setup&step=extras' ".
       "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
@@ -2790,7 +2600,7 @@ print "WC-SETUPOUT=$stdout<==WC-SETUP-SENT\n";
           "Chrome/62.0.3202.94 Safari/537.36' ".
       "--data 'save_step=Continue&_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dextras'");
 print "STDOUTEXTRAS=$stdout<==EXTRAS-SENT\n";
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=wc-setup&step=next_steps ' ".
       "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
@@ -2808,7 +2618,7 @@ print "STDOUTEXTRAS=$stdout<==EXTRAS-SENT\n";
           "AppleWebKit/537.36 (KHTML, like Gecko) ".
           "Chrome/62.0.3202.94 Safari/537.36'");
 print "STDOUTACTIVATE=$stdout<==ACTIVATE\n";
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=wc-setup&step=next_steps' ".
       "-H 'Accept: text/html,application/xhtml+xml,application/xml;".
@@ -2829,7 +2639,7 @@ print "STDOUTACTIVATE=$stdout<==ACTIVATE\n";
           "&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwc-setup%26step%3Dactivate'");
 print "ACTIVATE=$stdout<==ACTIVATE-SENT\n";
 
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=pmpro-pagesettings' ".
       "-H 'Host: ".$domain_url."' ".
@@ -2847,7 +2657,7 @@ print "ACTIVATE=$stdout<==ACTIVATE-SENT\n";
    $nonce=$stdout;
 print "NONCE=$nonce<==NONCE\n";
 
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=pmpro-pagesettings".
           "&createpages=1&pmpro_pagesettings_nonce=$nonce' ".
@@ -2863,7 +2673,7 @@ print "NONCE=$nonce<==NONCE\n";
       "-H 'Accept-Encoding: gzip, deflate, br' ".
       "-H 'Accept-Language: en-US,en;q=0.9'");
 
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=pmpro-pagesettings' ".
       "-H 'Host: ".$domain_url."' ".
@@ -2879,7 +2689,7 @@ print "NONCE=$nonce<==NONCE\n";
       "-H 'Accept-Encoding: gzip, deflate, br' ".
       "-H 'Accept-Language: en-US,en;q=0.9'");
 
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=wc-settings&tab=checkout&section=stripe' ".
       "-H 'Host: ".$domain_url."' ".
@@ -3000,7 +2810,7 @@ END
       "-H 'Accept-Language: en-US,en;q=0.9' ".
       "--data '".$stripe_info."'";
 
-   $handle->print($cmd);
+   $handle->print($sudo.$cmd);
    $prompt=$handle->prompt();
    while (1) {
       my $output.=fetch($handle);
@@ -3023,7 +2833,7 @@ print "DONE WITH CLEANING\n";
       "-H 'Referer: https://www.".$domain_url."/wp-admin/admin.php?page=wpcf7-integration' ".
       "-H 'Accept-Encoding: gzip, deflate, br' ".
       "-H 'Accept-Language: en-US,en;q=0.9'";
-   $handle->print($cmd);
+   $handle->print($sudo.$cmd);
    $prompt=$handle->prompt();
    $stdout='';
    while (1) {
@@ -3053,7 +2863,7 @@ print "NONCE=$nonce<==reCaptcha NONCE\n";
       "-H 'Accept-Language: en-US,en;q=0.9' ".
       "--data '_wpnonce=".$nonce."&_wp_http_referer=%2Fwp-admin%2Fadmin.php%3Fpage%3Dwpcf7-integration%26service%3Drecaptcha%26action%3Dsetup&sitekey=$recaptcha_publish_key&secret=$recpatcha_secret_key&submit=Save'";
 
-   $handle->print($cmd);
+   $handle->print($sudo.$cmd);
    $prompt=$handle->prompt();
    $stdout='';
    while (1) {
@@ -3063,7 +2873,7 @@ print "NONCE=$nonce<==reCaptcha NONCE\n";
    }
 print "STDOUT=$stdout<==RECAPTCHA PUBLISH\n";
 
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=pmpro-paymentsettings' ".
       "-H 'Host: ".$domain_url."' ".
@@ -3260,7 +3070,7 @@ END
       "-H 'Accept-Language: en-US,en;q=0.9' ".
       "--data '".$pp_info."'";
 
-   $handle->print($cmd);
+   $handle->print($sudo.$cmd);
    $prompt=$handle->prompt();
    while (1) {
       my $output.=fetch($handle);
@@ -3284,7 +3094,7 @@ print "GOING FOR NONCE!\n";
           "/wp-admin/admin.php?page=pmpro-paymentsettings' ".
       "-H 'Accept-Encoding: gzip, deflate, br' ".
       "-H 'Accept-Language: en-US,en;q=0.9'";
-   $handle->print($cmd);
+   $handle->print($sudo.$cmd);
    $prompt=$handle->prompt();
    $stdout='';
    while (1) {
@@ -3360,7 +3170,7 @@ END
       "-H 'Accept-Language: en-US,en;q=0.9' ".
       "--data '".$em_info."'";
 
-   $handle->print($cmd);
+   $handle->print($sudo.$cmd);
    $prompt=$handle->prompt();
    while (1) {
       my $output.=fetch($handle);

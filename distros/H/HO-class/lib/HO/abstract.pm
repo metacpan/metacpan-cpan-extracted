@@ -1,7 +1,8 @@
-  package HO::abstract
-# *********************
-; use strict; use warnings;
+package HO::abstract;
+# *******************
+use strict; use warnings;
 our $VERSION='0.02';
+# ******************
 
 ; use Package::Subroutine ()
 ; use Carp ()
@@ -10,10 +11,10 @@ our $VERSION='0.02';
     { my ($method) = @_
     ; return sub
         { my $pkg = $_[0];
-		; if(ref($_[0]))
+        ; if(ref($_[0]))
             { $pkg = ref($_[0])
-		    }
-		; Carp::croak("Class '$pkg' does not override ${method}()")
+            }
+        ; Carp::croak("Class '$pkg' does not override ${method}()")
         }
     }
 
@@ -35,8 +36,8 @@ our $VERSION='0.02';
   ; sub abstract_method
       { my @methods = @_
       ; unless(defined($target))
-	  { Carp::croak("No target class defined!")
-	  }
+      { Carp::croak("No target class defined!")
+      }
       ; foreach my $method (@methods)
           { install Package::Subroutine::
               $target => $method => $METHOD_DIE->($method)
@@ -102,7 +103,7 @@ HO::abstract does not matter.
 
    use Right;
    use HO::abstract;
-   use HO::class; 
+   use HO::class;
 
 Now C<Right-\>new> will die correctly.
 

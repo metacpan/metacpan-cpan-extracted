@@ -6,3 +6,4 @@
 #include "typemap/containers.h"
 #include "typemap/auto.h"
 #include "typemap/optional.h"
+#include "typemap/error.h"

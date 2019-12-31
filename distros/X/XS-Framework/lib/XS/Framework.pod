@@ -21,7 +21,7 @@ L<XS::Framework::Manual::Typemap> and L<XS::Framework::Manual::SVAPI> references
 
 =head1 AUTHOR
 
-Pronin Oleg <syber@crazypanda.ru>, Crazy Panda, CP Decision LTD
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
 
 =head1 LICENSE
 

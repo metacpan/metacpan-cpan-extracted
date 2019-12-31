@@ -1,0 +1,11 @@
+MODULE = MyTest::Typemap                PACKAGE = MyTest::Error
+PROTOTYPES: DISABLE
+
+std::error_code operation_canceled () {
+    RETVAL = make_error_code(std::errc::operation_canceled);
+}
+
+ErrorCode operation_chain_canceled () {
+    ErrorCode orig(make_error_code(std::errc::operation_canceled));
+    RETVAL = ErrorCode(make_error_code(std::errc::connection_aborted), orig);
+}

@@ -1,5 +1,5 @@
 package Git::FastExport;
-$Git::FastExport::VERSION = '0.107';
+$Git::FastExport::VERSION = '0.108';
 use strict;
 use warnings;
 use Carp;
@@ -102,6 +102,10 @@ __END__
 =head1 NAME
 
 Git::FastExport - A parser for git fast-export streams
+
+=head1 VERSION
+
+version 0.108
 
 =head1 SYNOPSIS
 

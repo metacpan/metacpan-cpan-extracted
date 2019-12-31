@@ -1,0 +1,103 @@
+=head1 NAME
+
+XS::ErrorCode - Perl binding for panda::ErrorCode (nested std::error_code)
+
+
+
+=head1 SYNOPSIS
+
+    my $err = SomeFramework->some_method();
+    if ($err) {
+        say $err;
+        say $err->value;
+        say $err->category->name;
+        say $err->message;
+    }
+
+
+
+=head1 DESCRIPTION
+
+This binding is intended for use from XS modules that returns errors as C<panda::ErrorCode> objects to perl.
+It provides them with typemap and Perl interface.
+
+See L<XS::STL::ErrorCode> for more info about error codes.
+
+
+=head1 API
+
+=head4 new($error_code, $next_error_code)
+
+Creates nested error code object from L<XS::STL::ErrorCode> and C<XS::ErrorCode>. Normally you should not create these objects from perl.
+  
+    
+=head4 value()
+
+Returns top error code value (integer)
+
+
+=head4 category()
+
+Returns top error code category as L<XS::STL::ErrorCategory> object
+
+
+=head4 message()
+
+Returns top error message
+
+
+=head4 code()
+
+Returns top error as L<XS::STL::ErrorCode> object
+
+
+=head4 next()
+
+Returns C<XS::ErrorCode> object with next error as top error or undef if it constains a single error.
+
+Example printing all errors in stack:
+
+    while ($err) {
+        say $err->value;
+        say $err->message;
+        $err = $err->next;
+    }
+
+
+=head4 operator bool
+
+Returns true if object contains errors
+
+
+=head4 operator ""
+
+Stringifies to whole stack of errors. Example output:
+
+    Connection timed out (110:generic), preceded by:
+    Permission denied (13:generic)
+
+
+=head4 operator ==, eq
+
+Compares with C<XS::ErrorCode> or L<XS::STL::ErrorCode> or number. Only top error is compared.
+
+    my $err = SomeFramework->some_method();
+    if ($err == SomeFramework::Error::unauthorized) {
+        
+    }
+    elsif ($err == XS::STL::errc::connection_refused) {
+    }
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut
+
+1;

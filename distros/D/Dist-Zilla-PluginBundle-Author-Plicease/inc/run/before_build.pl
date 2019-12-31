@@ -10,10 +10,9 @@ my($out ) = capture_stdout {
   system(
     $^X, 
       '-Ilib', 
-      '-MDevel::Hide=Dist::Zilla::Plugin::ACPS::RPM',
       'example/unbundle.pl', '--default',
     );
   die "failed" unless $? == 0;
 };
 
-path('example/default_dist.ini')->spew($out);
+path('example/default_dist.ini')->spew_raw($out);

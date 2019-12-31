@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000506';
+our $VERSION='1.0000507';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -2502,9 +2502,6 @@ if (exists $ENV{FA_BERKELEY} &&
       (-1<index $ENV{FA_BERKELEY},'Owner Group')) {
    $cygwin_berkeley_db_mode=770;
 }
-our $mozrepl_file='mozrepl-1.1-fx.xpi';
-our $install_firefox_without_asking=0;
-our $install_firefox=(exists $ENV{FA_MOZREPL})?$ENV{FA_MOZREPL}:0;
 our $install_webapi=(exists $ENV{FA_WEBAPI})?$ENV{FA_WEBAPI}:'';
 
 if (exists $Config{prefix} &&
@@ -2515,8 +2512,6 @@ if (exists $Config{prefix} &&
 foreach my $arg (@ARGV) {
    if ($arg=~/INSTALL_*CYGWIN\s*=\*1/i) {
       $install_cygwin_without_asking=1;
-   } elsif ($arg=~/INSTALL_*FIREFOX\s*=\*1/i) {
-      $install_firefox_without_asking=1;
    } elsif ($arg=~/-*-PREFIX=/i) {
       $PREFIX=$arg;
       $PREFIX=~s/^-*-[Pp][Rr][Ee][Ff][Ii][Xx]=//;
@@ -3190,10 +3185,6 @@ END
             exit if $selection eq ']quit[';
             $cygwin_berkeley_db_mode=$selection;
 
-            #&find_windows_firefox() if
-            #   (-1==index $install_firefox,'Install') &&
-            #   (-1==index $install_firefox,'NOT');
-
          }
 
          fa_system($setup_cmd);
@@ -3630,7 +3621,6 @@ END
                       'export FA_WEBAPI=\\"'.$install_webapi.'\\";'.
                       'export FA_BERKELEY=\\"'.
                          $cygwin_berkeley_db_mode.'\\";'.
-                      'export FA_MOZREPL=\\"'.$install_firefox.'\\";'.
                       'export PARdir=\\"'.$pardir.'\\";'.
                       '/usr/bin/echo y|/usr/bin/cpan -i REEDFISH/'.
                       "Net-FullAuto-$VERSION.tar.gz$post_install\"");
@@ -3740,15 +3730,12 @@ END
                       'export FA_WEBAPI=\\"'.$install_webapi.'\\";'.
                       'export FA_BERKELEY=\\"'.
                          $cygwin_berkeley_db_mode.'\\";'.
-                      'export FA_MOZREPL=\\"'.$install_firefox.'\\";'.
                       'export PARdir=\\"'.$pardir.'\\";'.
                       '/usr/bin/echo y|/usr/bin/cpan -i REEDFISH/'.
                       "Net-FullAuto-$VERSION.tar.gz$post_install\"");
             }
          }
          if ($selection!~/Install sshd only/) {
-            &install_firefox() if -1<index $install_firefox,
-               'Install';
             print "\n\n   FullAuto Installation has completed",
                   "\n\n   Thank you!",
                   "\n\n   Please report any bugs and send any",
@@ -3952,11 +3939,6 @@ unless (-e $Config{installsitelib}."/Net/FullAuto/Custom/fa_conf.pm") {
    chmod 0755, $Config{installsitelib}."/Net/FullAuto/ISets";
 }
 
-#&find_windows_firefox() if $^O eq 'cygwin' &&
-#   ((-1==index $install_firefox,'Install') &&
-#   (-1==index $install_firefox,'NOT'));
-
-#if ($^O eq 'cygwin' && !check_for_compiler()) {
 if ($^O eq 'cygwin' && !can_cc()) {
    my $uname=`/bin/uname`;
    my $stup='setup-x86.exe';
@@ -5161,299 +5143,6 @@ sub cpan_gunzip_and_untar {
 
 }
 
-sub find_windows_firefox {
-
-   # Let's look for Firefox
-   my $firefox='REG QUERY "HKEY_LOCAL_MACHINE\\SOFTWARE\\'.
-               'Mozilla\\Mozilla Firefox" 2>&1';
-   $firefox=`$firefox`;
-   $firefox=~tr/\0-\11\13-\37\177-\377//d;
-   chomp($firefox);
-   $firefox=~s/^.*CurrentVersion\s*REG_SZ\s*(.*?)\n.*$/$1/s;
-   $firefox='REG QUERY "HKEY_LOCAL_MACHINE\\SOFTWARE\\'.
-            "Mozilla\\Mozilla Firefox\\$firefox\\Main\" 2>&1";
-   fa_system($firefox);
-   $firefox=~tr/\0-\11\13-\37\177-\377//d;
-   chomp($firefox);
-   $firefox=~s/^.*Path(?:To)*Exe\s*REG_SZ\s*(.*\.exe).*$/$1/s;
-   $firefox=~s/\s*$//s;
-   my $fftest=substr($firefox,0,2) if 1<length $firefox;
-   $fftest||='';
-   my $selection='';
-   if ($fftest=~/\w:|\/\w/) {
-      $fftest=substr($firefox,0,(rindex $firefox,'\\'));
-   } else {
-      $fftest='';
-   }
-   if (-1<index $firefox,'unable to find') {
-      unless ($install_firefox_without_asking) {
-         # Ask if we should install
-         my $one="YES - Install Mozilla Firefox & MozRepl\n\n";
-         my %_askfirefox=(
-
-            Label => '_askfirefox',
-            Item_1 =>  {
-                           Text   => "]C[",
-                           Convey => [ $one,
-                                       'NO  - DO *NOT* INSTALL Firefox' ],
-                       },
-            Scroll => 2,
-            Banner=> "   *** THIS SCREEN WILL TIMEOUT IN 2 MINUTES ***\n\n".
-                     "   Mozilla Firefox has an available add-on called ".
-                     "MozRepl.\n\n   With Firefox equipped with MozRepl, ".
-                     "FullAuto can do\n   extremely powerful WEB ".
-                     "Automation!\n\n   Would you like the FullAuto ".
-                     "installer to install Firefox\n   and MozRepl?\n\n",
-         );
-         {
-            local $SIG{__DIE__}; # No sigdie handler
-            eval {
-               local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
-               alarm 120;
-               $selection=Term::Menus::Menu(\%_askfirefox);
-               alarm 0;
-            };
-            if ($@) {
-               $selection='DO_NOT_INSTALL';
-            } else {
-               chomp($selection);
-               $selection='Install_Mozilla_Firefox'
-                  if -1<index $selection,'Install Mozilla Firefox';
-               $selection='DO_NOT_INSTALL'
-                  if -1<index $selection,'*NOT* INSTALL';
-               exit if $selection eq ']quit[';
-            }
-         };
-      } else { $selection='Install_Mozilla_Firefox' }
-      $install_firefox=$selection;
-   } else { # Look for MozRepl
-      my $up=$ENV{'USERPROFILE'};
-      if (-1<index $up,'Documents') {
-         $up.="\\Application Data\\Mozilla\\Firefox\\Profiles\\";
-      } else {
-         $up.="\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\";
-      }
-      my @dirs=();
-      if (-e $up) {
-         opendir(DIR,$up);
-         @dirs = readdir(DIR);
-         closedir(DIR);
-      }
-      if (-1<$#dirs) {
-         foreach my $profile (@dirs) {
-            opendir(DIR,$up."\\$profile\\extensions");
-            my @files = readdir(DIR);
-            closedir(DIR);
-            foreach my $file (@files) {
-               if (-1<index $file,'mozrepl') {
-                  return 0;
-               }
-            }
-         }
-      }
-      unless ($install_firefox_without_asking) {
-         # Ask if we should install
-         my $one="YES - Install MozRepl Plugin for Firefox\n\n";
-         my %_askfirefox=(
-
-            Label => '_askfirefox',
-            Item_1 =>  {
-                           Text   => "]C[",
-                           Convey => [ $one,'NO  - DO *NOT* INSTALL MozRepl' ],
-                        },
-            Scroll => 2,
-            Banner=> "   Mozilla Firefox has an available add-on ".
-                     "called MozRepl.\n\n   With Firefox equipped ".
-                     "with MozRepl, FullAuto can do\n   extremely ".
-                     "powerful WEB Automation!\n\n   Would you ".
-                     "like the FullAuto installer to install ".
-                     "the\n   MozRepl plugin?\n\n",
-         );
-         $selection=Term::Menus::Menu(\%_askfirefox);
-         chomp($selection);
-         $selection='Install_MozRepl'
-            if -1<index $selection,'Install MozRepl Plugin';
-         $selection='DO_NOT_INSTALL'
-            if -1<index $selection,'*NOT* INSTALL';
-         exit if $selection eq ']quit[';
-      } else { $selection='Install_MozRepl' }
-      $install_firefox=$selection;
-   }
-}
-
-sub install_firefox {
-
-   my $Ua;
-   $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}=0;
-   if ($CPAN::META->has_usable('LWP')) {
-      FA::LWP::UserAgent->config;
-      eval {
-         local $SIG{__DIE__}; # No sigdie handler;
-         $Ua = FA::LWP::UserAgent->new(
-               timeout=>300,show_progress=>1)
-      };
-      if ($@) {
-         $CPAN::Frontend->mywarn(
-         "ERROR: FA::LWP::UserAgent->new dies with $@\n");
-      } else {
-         my($var);
-         $Ua->proxy('http', $var)
-            if $var = $CPAN::Config->{http_proxy} ||
-            $ENV{http_proxy};
-         $Ua->no_proxy($var)
-            if $var = $CPAN::Config->{no_proxy} || $ENV{no_proxy};
-      }
-      $Ua->ssl_opts( SSL_verify_mode => 'SSL_VERIFY_NONE' );
-   } else {
-      fa_die("Unable to install Firefox due to no LWP availability");
-   }
-   my $fftest='';
-   unless ($install_firefox eq 'Install_MozRepl') {
-      my $url='http://www.mozilla.org/en-US/firefox/all/';
-      print "Fetching with LWP:\n  $url\n";
-      my $req = HTTP::Request->new(GET => $url);
-      $req->header('Accept' => 'text/html');
-      my $res = $Ua->request($req);
-      my $href='';
-      if ($res->is_success) {
-         print " + request successful.\n"
-            if $CPAN::DEBUG;
-         my $count=0;
-         my $content = $res->decoded_content();
-         if (utf8::is_utf8($content)) {
-            binmode STDOUT,':utf8';
-         } else {
-            binmode STDOUT,':raw';
-         }
-         foreach my $line (split "\n", $content) {
-            if ((-1<index $line, 'english (us) english (us)') ||
-                  ((0<$count) && ($count<5))) {
-               if ($count==3) {
-                  $href=$line;
-                  last;
-               }
-               $count++;
-            }
-         }
-      }
-      $href=~s/^.*href=["](.*?)["].*$/$1/;
-      $href=~s/https/http/;
-      $href=~s/&amp;/&/g;
-      my $exe_name=substr($href,(rindex $href,'/'));
-      $exe_name=~s/^.*?product=(.*?)[&].*$/$1/;
-      $exe_name=~s/firefox-/Firefox Setup /;
-      $req = HTTP::Request->new(GET => $href);
-      $req->header('Accept' => 'text/html');
-      $res = $Ua->request($req);
-      if ($res->is_success) {
-         print " + request successful.\n"
-         if $CPAN::DEBUG;
-         mkpath($cygwin_root_dir,1) unless -d $cygwin_root_dir;
-         unless (-w $cygwin_root_dir) {
-            print "\n\n   FATAL ERROR! - The current Cygwin directory: ".
-                  "\n\n      ".$cygwin_root_dir."\n\n".
-                  "   is not writable. Please change the permissions\n".
-                  "   to writable before installing FullAuto.\n";
-            print "\n   PRESS ANY KEY TO EXIT SETUP\n\n";
-            <STDIN>;
-            exit 1;
-         }
-         open(CP,">$cygwin_root_dir/${exe_name}.exe") || fa_die($!);
-         binmode(CP);
-         print CP $res->content;
-         close CP;
-         if ($^O eq 'cygwin') {
-            `/usr/bin/chmod 777 \"$cygwin_root_dir/${exe_name}.exe\"`;
-         } else {
-            my $cygwin_loc=get_cygwin_location();
-            fa_system('SET CYGWIN=nodosfilewarning & '.
-                "cmd /c $cygwin_loc\\bin\\bash -lc ".
-                "/usr/bin/chmod 777 \"$cygwin_root_dir/${exe_name}.exe\"");
-         }
-         `"$cygwin_root_dir/${exe_name}.exe" -ms`;
-         # Let's look for Firefox
-         my $firefox='REG QUERY "HKEY_LOCAL_MACHINE\\SOFTWARE\\'.
-                     'Mozilla\\Mozilla Firefox" 2>&1';
-         $firefox=`$firefox`;
-         $firefox=~tr/\0-\11\13-\37\177-\377//d;
-         chomp($firefox);
-         $firefox=~s/^.*CurrentVersion\s*REG_SZ\s*(.*?)\n.*$/$1/s;
-         $firefox='REG QUERY "HKEY_LOCAL_MACHINE\\SOFTWARE\\'.
-                  "Mozilla\\Mozilla Firefox\\$firefox\\Main\" 2>&1";
-         fa_system($firefox);
-         $firefox=~tr/\0-\11\13-\37\177-\377//d;
-         chomp($firefox);
-         $firefox=~s/^.*Path(?:To)*Exe\s*REG_SZ\s*(.*\.exe).*$/$1/s;
-         $firefox=~s/\s*$//s;
-         $fftest=substr($firefox,0,2) if 1<length $firefox;
-         $fftest||='';
-         my $selection='';
-         if ($fftest=~/\w:|\/\w/) {
-            $fftest=substr($firefox,0,(rindex $firefox,'\\'));
-         } else {
-            $fftest='';
-         }
-      }
-   } else {
-      # Let's look for Firefox
-      my $firefox='REG QUERY "HKEY_LOCAL_MACHINE\\SOFTWARE\\'.
-                  'Mozilla\\Mozilla Firefox" 2>&1';
-      $firefox=`$firefox`;
-      $firefox=~tr/\0-\11\13-\37\177-\377//d;
-      chomp($firefox);
-      $firefox=~s/^.*CurrentVersion\s*REG_SZ\s*(.*?)\n.*$/$1/s;
-      $firefox='REG QUERY "HKEY_LOCAL_MACHINE\\SOFTWARE\\'.
-               "Mozilla\\Mozilla Firefox\\$firefox\\Main\" 2>&1";
-      fa_system($firefox);
-      $firefox=~tr/\0-\11\13-\37\177-\377//d; 
-      chomp($firefox);
-      $firefox=~s/^.*Path(?:To)*Exe\s*REG_SZ\s*(.*\.exe).*$/$1/s;
-      $firefox=~s/\s*$//s;
-      $fftest=substr($firefox,0,2) if 1<length $firefox;
-      $fftest||='';
-      my $selection='';
-      if ($fftest=~/\w:|\/\w/) {
-         $fftest=substr($firefox,0,(rindex $firefox,'\\'));
-      } else {
-         $fftest='';
-      }
-   }
-   my $url='https://addons.mozilla.org/firefox/downloads/file/'.
-        "138898/$mozrepl_file?src=dp-btn-primary";
-   my $req = HTTP::Request->new(GET => $url);
-   $req->header('Accept' => 'text/html');
-   my $res = $Ua->request($req);
-   my $href='';
-   my $cygwin_loc=get_cygwin_location();
-   my $clo=$cygwin_loc;
-   my $mz="$clo\\$mozrepl_file";
-   if ($res->is_success) {
-      print " + request successful.\n"
-         if $CPAN::DEBUG;
-      open(CP,">$mz") || fa_die($!);
-      binmode(CP);
-      print CP $res->content;
-      close CP;
-      my $ff=$fftest.'\\firefox';
-      my $mP=$PARdir;
-      if ($^O eq 'cygwin') {
-         $mz=~s/\\/\\\\/g;
-         my $chmod_out=
-               `chmod -v 777 \"$mP/bin/install_mozrepl_plugin\" 2>&1`;
-         print "CYGCHMOD=$chmod_out\n" if $chmod_out;
-         print "MOZREPL COMMAND=\"$mP/bin/install_mozrepl_plugin\" ".
-               "\"$ff\" \"$mz\" 2>&1\n";
-         my $output=
-               `\"$mP/bin/install_mozrepl_plugin\" \"$ff\" \"$mz\" 2>&1`;
-         print "CYGOUTPUT=$output\n" if $output;
-      } else {
-         my $output=
-               `\"$mP\\bin\\install_mozrepl_plugin\" \"$ff\" \"$mz\" 2>&1`;
-         print "WINOUTPUT=$output\n" if $output;
-      }
-   }
-}
-
 sub remove_sshd {
    my $sshd_account=$_[0];
    my $cygwin_loc=get_cygwin_location();
@@ -6007,9 +5696,7 @@ if ($^O eq 'cygwin') {
    print FH "\n";
    close FH;
    install_script('bin/fullauto.exe');
-   install_script('bin/install_mozrepl_plugin.exe');
    unlink "bin/fullauto.exe";
-   &install_firefox() if -1<index $install_firefox,'Install';
 } else {
    open(FH,">bin/fullauto");
    print FH "\n";
@@ -6632,12 +6319,6 @@ sub MY::makefile {
       unlink "lib/Net/FullAuto/Custom/fa_code.pm";
       unlink "blib/lib/Net/FullAuto/Custom/fa_code.pm";
    }
-   if (-1<index $install_firefox,'Install') {
-      my $cygwin_loc=get_cygwin_location(1);
-      $cygwin_loc=~s/\\/\//;
-      $inherited .= "$Config{installsitelib}/Net/FullAuto/$mozrepl_file:".
-                    "\n\t\$(CP) $cygwin_loc/$mozrepl_file \$@\n\n";
-   }
 
    $inherited; #
 
@@ -6783,21 +6464,9 @@ sub MY::install {
    } elsif ($permission eq 'Setgid') {
       $inherited =~ s/(install ::.*)$/$1 setgid_permissions/m;
    } elsif ($permission eq '770 Permissions') {
-      if (-1<index $install_firefox,'Install') {
-         my $mz="$Config{installsitelib}/Net/FullAuto/$mozrepl_file";
-         $inherited =~
-            s/(install ::.*)$/$1 owner_group_permissions $mz/m;
-      } else {
-         $inherited =~ s/(install ::.*)$/$1 owner_group_permissions/m;
-      }
+      $inherited =~ s/(install ::.*)$/$1 owner_group_permissions/m;
    } else {
-      if (-1<index $install_firefox,'Install') {
-         my $mz="$Config{installsitelib}/Net/FullAuto/$mozrepl_file";
-         $inherited =~
-            s/(install ::.*)$/$1 full_access_permissions $mz/m;
-      } else {
-         $inherited =~ s/(install ::.*)$/$1 full_access_permissions/m;
-      }
+      $inherited =~ s/(install ::.*)$/$1 full_access_permissions/m;
    }
 
    if (-e '/usr/share/figlet') {

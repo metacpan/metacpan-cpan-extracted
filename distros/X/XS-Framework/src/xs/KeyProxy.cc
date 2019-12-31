@@ -4,7 +4,7 @@
 
 namespace xs {
 
-KeyProxy KeyProxy::operator[] (size_t key) {
+KeyProxy KeyProxy::_geti (size_t key) {
     if (SvROK(sv)) {
         Array a(SvRV(sv));
         if (a) return a[key];

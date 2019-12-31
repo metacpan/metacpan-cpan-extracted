@@ -15,7 +15,7 @@ use Sub::Util    ();
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # Role support requires Role::Tiny 2.000001+
 use constant ROLES =>
@@ -119,6 +119,11 @@ sub import {
       Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
       _monkey_patch($caller, 'has', sub { attr($caller, @_) });
       eval "package $caller; use Role::Tiny; 1" or die $@;
+    }
+
+    # async/await
+    elsif ($flag eq '-async') {
+      Carp::croak 'async/await is only available in Mojo::Base';
     }
 
     # Signatures (Perl 5.20+)
@@ -273,6 +278,13 @@ enable support for L<subroutine signatures|perlsub/"Signatures">.
   use Mojo::Base::Tiny 'SomeBaseClass', -signatures;
   use Mojo::Base::Tiny -role, -signatures;
 
+If you want to activate the C<async> and C<await> keywords to deal much more
+efficiently with promises, it is finally time to move to a full L<Mojolicious>
+installation and to use L<Mojo::Base>.
+
+  # async/await not available
+  use Mojo::Base::Tiny -strict, -async;  # throws an error
+
 This will also disable experimental warnings on versions of Perl where this
 feature was still experimental.
 
@@ -280,7 +292,7 @@ feature was still experimental.
 
 Fluent interfaces are a way to design object-oriented APIs around method
 chaining to create domain-specific languages, with the goal of making the
-readablity of the source code close to written prose.
+readability of the source code close to written prose.
 
   package Duck;
   use Mojo::Base::Tiny -base;

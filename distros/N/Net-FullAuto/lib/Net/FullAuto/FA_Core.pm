@@ -288,7 +288,6 @@ our @EXPORT  = qw(%Hosts $localhost getpasswd
                   connect_host get_all_hosts die
                   $username connect_ftp $cron
                   connect_telnet connect_sftp log
-                  connect_mozrepl $passwd_file_loc
                   send_email $log connect_ssh $prod
                   connect_shell connect_secure
                   connect_insecure connect_reverse
@@ -6638,36 +6637,6 @@ sub connect_reverse
    }
 }
 
-sub connect_mozrepl
-{
-   unless (defined $_[0] && $_[0]) {
-
-   }
-   push @_, '__telnet__';
-   my ($handle,$stderr)=('','');
-   ($handle,$stderr)=connect_host(@_);
-   my $shell=$handle->{_shell};
-   if (defined $Net::FullAuto::FA_Core::ff_flag) { 
-      foreach my $n (1..30) {
-         my $loc=$handle->repl("$shell.whereAmI()");
-         last if -1<index $loc,'FullAuto Software';
-         if ($n==5 || $n==10 || $n==15) {
-            my $go_to='content.document.location.href='.
-               '"http://www.FullAuto.com"';
-            my ($out,$error)=$handle->repl($go_to);
-         }
-         sleep 1;
-      }
-   }
-   if (wantarray) {
-      return $handle,$stderr;
-   } elsif ($stderr) {
-      &handle_error($stderr,'-4','__cleanup__');
-   } else {
-      return $handle;
-   }
-}
-
 sub connect_cmd
 {
    my @topcaller=caller;
@@ -6727,24 +6696,12 @@ sub connect_host
          || (-1<index $caller,'connect_shell')
          || (-1<index $caller,'connect_telnet')
          || (-1<index $caller,'connect_insecure')
-         || (-1<index $caller,'connect_reverse')
-         || (-1<index $caller,'connect_mozrepl')) {
+         || (-1<index $caller,'connect_reverse')) {
       my $connect_caller=$caller;
       $_connect=(split '::', $caller)[2];
       ($caller,$sub)=split '::', (caller(2))[3];
       $caller.='.pm';
-      if ((-1<index $connect_caller,'connect_mozrepl') &&
-            (($_[0] eq '__telnet__') ||
-            (-1<index $_[0],'Moose::Meta::Class::__ANON__::SERIAL')
-            || (-1<index $_[0],'Cache::FileCache'))) {
-         $hostlabel='Firefox MozRepl';
-         $Hosts{$hostlabel}{'HostName'}='localhost';
-         $Hosts{$hostlabel}{'hostname'}='localhost';
-         $Hosts{$hostlabel}{'Label'}=$hostlabel;
-         $Hosts{$hostlabel}{'label'}=$hostlabel;
-         $Hosts{$hostlabel}{'telnetport'}=4242;
-         $_connect='connect_telnet';
-      } elsif (ref $_[0] eq 'HASH') {
+      if (ref $_[0] eq 'HASH') {
          $authorize_connect=1;
          foreach my $key (keys %{$_[0]}) {
             $_[0]->{lc($key)}=$_[0]->{$key};
@@ -26823,9 +26780,7 @@ print $Net::FullAuto::FA_Core::LOG "WE ARE BACK FROM LOOKUP<==\n"
       $login_passwd=$Hosts{$hostlabel}->{'password'};
    } elsif (exists $Hosts{$hostlabel} &&
          exists $Hosts{$hostlabel}->{'label'} &&
-         ((lc($Hosts{$hostlabel}->{'label'}) eq 'mozrepl' ||
-         $Hosts{$hostlabel}->{'label'} eq 'Firefox MozRepl') ||
-         $Hosts{$hostlabel}->{'label'} eq 'Localhost Shell')) {
+         ($Hosts{$hostlabel}->{'label'} eq 'Localhost Shell')) {
    } elsif ($hostlabel!~/__Master_${$}__/ && !$identityfile) {
       $determine_password->('',0,$hostlabel,$password);
       $login_passwd=&Net::FullAuto::FA_Core::getpasswd(
@@ -27070,171 +27025,6 @@ print $Net::FullAuto::FA_Core::LOG
                                  {'cmd_id_'.$Net::FullAuto::FA_Core::pcnt};
                            }
                            my $lchl=lc($hostlabel);
-                           $Net::FullAuto::FA_Core::firefox||='';
-                           if (($^O eq 'cygwin') && (-1<index $lchl,'mozrepl')
-                                 && !($Net::FullAuto::FA_Core::firefox)) {
-                              unshift @connect_method,'telnet';
-                              # Let's look for Firefox
-                              my $firefox=
-                                 'REG QUERY "HKEY_LOCAL_MACHINE\\SOFTWARE\\'.
-                                 'Mozilla\\Mozilla FireFox" 2>&1';
-                              ($firefox,$stderr)=
-                                 &Net::FullAuto::FA_Core::cmd($firefox);
-                              $firefox=~tr/\0-\11\13-\37\177-\377//d;
-                              chomp($firefox);
-                              $firefox=~s/^\s*//;
-                              if ($firefox=~/^Error:/) {
-                                 my $die="   Cannot Locate a "
-                                        ."Mozilla FireFox installation"
-                                        ."\n              "
-                                        ."needed for FullAuto repl() "
-                                        ."functionality:\n"
-                                        ."\n       ".$firefox;
-                                 &Net::FullAuto::FA_Core::handle_error($die);
-                              } 
-                              &Net::FullAuto::FA_Core::handle_error($stderr)
-                                 if $stderr;
-                              $firefox=~
-                                 s/^.*CurrentVersion\s*REG_SZ\s*(.*?)\n.*$/$1/s;
-                              $firefox=
-                                 'REG QUERY "HKEY_LOCAL_MACHINE\\SOFTWARE\\'.
-                                 "Mozilla\\Mozilla Firefox\\$firefox\\Main\"".
-                                 ' 2>&1';
-                              ($stdout,$stderr)=
-                                 &Net::FullAuto::FA_Core::cmd(
-                                 'ps -W | grep firefox');
-                              my $fireflag=0;
-                              if (-1<index $stdout,'firefox') {
-                                 $fireflag=1;
-                              }
-                              ($firefox,$stderr)=
-                                 &Net::FullAuto::FA_Core::cmd($firefox);
-                              if ($firefox=~/^Error:/) {
-                                 my $die="   Cannot Locate a "
-                                        ."Mozilla FireFox installation"
-                                        ."\n              "
-                                        ."needed for FullAuto repl() "
-                                        ."functionality:\n"
-                                        ."\n       ".$firefox;
-                                 &Net::FullAuto::FA_Core::handle_error($die);
-                              }
-                              &Net::FullAuto::FA_Core::handle_error($stderr)
-                                 if $stderr;
-                              $firefox=~tr/\0-\11\13-\37\177-\377//d;
-                              chomp($firefox);
-                              $firefox=~s/^.*PathToExe\s*REG_SZ\s*(.*)\s*$/$1/s;
-                              $firefox=~s/\s*$//s;
-                              my $winff=$firefox;
-                              ($firefox,$stderr)=&Net::FullAuto::FA_Core::cmd(
-                                 "cygpath \"$firefox\"");
-                              $Net::FullAuto::FA_Core::firefox=$firefox;
-                              &Net::FullAuto::FA_Core::handle_error($stderr)
-                                 if $stderr;
-                              # Let's look for MozRepl
-                              my $have_mozrepl=0;
-                              my $up=$ENV{'USERPROFILE'}||'';
-                              if (-1<index $up,'Documents') {
-                                 $up.="\\Application Data\\Mozilla\\".
-                                      "Firefox\\Profiles\\";
-                              } else {
-                                 $up.="\\AppData\\Roaming\\Mozilla\\".
-                                      "Firefox\\Profiles\\";
-                              }
-                              ($up,$stderr)=&Net::FullAuto::FA_Core::cmd(
-                                 "cygpath \"$up\"");
-                              &Net::FullAuto::FA_Core::handle_error($stderr)
-                                 if $stderr;
-                              my @dirs=();
-                              if (-e $up) {
-                                 opendir(DIR,$up);
-                                 @dirs = readdir(DIR);
-                                 closedir(DIR);
-                              }
-                              if (-1<$#dirs) {
-                                 HM: foreach my $profile (@dirs) {
-                                    next if $profile eq '.';
-                                    next if $profile eq '..';
-                                    if (-e $up."/$profile/extensions") {
-                                       opendir(DIR,$up."/$profile/extensions");
-                                       my @files = readdir(DIR);
-                                       closedir(DIR);
-                                       foreach my $file (@files) {
-                                          if (-1<index $file,'mozrepl') {
-                                             $have_mozrepl=1;
-                                             last HM;
-                                          }
-
-                                       }
-                                    }
-                                 }
-                              }
-                              unless ($have_mozrepl) {
-                                 eval {
-                                    die;
-                                 };
-                                 my $path=$@;
-                                 $path=~s/Died at (.*)FA_Core.pm.*$/$1/;
-                                 chomp($path);
-                                 my $cdr='';
-                                 ($cdr,$stderr)=&Net::FullAuto::FA_Core::cmd(
-                                    "cygpath -w \"$path\"");
-                                 &Net::FullAuto::FA_Core::handle_error($stderr)
-                                    if $stderr;
-                                 $cdr=~s/\\/\\\\/g;
-                                 $winff=~s/\\/\\\\/g;
-                                 my $progpath=substr($0,0,(rindex $0,'/')+1);
-                                 my $mc=$progpath.'install_mozrepl_plugin '.
-                                       "\"$winff\""." ${cdr}mozrepl-1.1-fx.xpi";
-                                 #my $mystdout='';
-                                 my ($stdout_capture,$stderr_capture)=('','');
-                                 ($stdout_capture,$stderr_capture)=
-                                       Capture::Tiny::capture {
-                                    system($mc);
-                                 };
-                              }
-                              my $fcmd="\"${firefox}\" -new-instance -repl ".
-                                    "http://www.FullAuto.com ".
-                                    "1>$localhost->{_work_dirs}->{_tmp}".
-                                    "repl_out.txt &";
-                              unless ($fireflag) {
-                                 my $ro=$localhost->{_work_dirs}->{_tmp}.
-                                       "repl_out.txt";
-                                 unlink $ro if -e $ro;
-                                 my ($stdout_capture,$stderr_capture)=('','');
-                                 ($stdout_capture,$stderr_capture)=
-                                       Capture::Tiny::capture {
-                                    system($fcmd);
-                                 };
-                                 my $cat_=$Net::FullAuto::FA_Core::gbp->('cat');
-                                 foreach (1..30) {
-                                    my $out=`${cat_}cat $ro`;
-                                    if (-1<index $out,'MOZREPL : Listening') {
-                                       unlink $ro;
-                                       $previous_method=0;
-                                       $Net::FullAuto::FA_Core::ff_flag=1;
-                                       next WH;
-                                    }
-                                    sleep 1;
-                                 }
-                                 $fcmd="\"${firefox}\" -new-instance -repl ".
-                                       "http://www.FullAuto.com".
-                                 eval {
-                                    local $SIG{ALRM} = 
-                                       sub { &Net::FullAuto::FA_Core::die(
-                                             "alarm\n") };
-                                    alarm(30);
-                                    ($stdout,$stderr)=$localhost->cmd($fcmd);
-                                 };alarm(0);
-                                 $stderr=$@ if $@;
-                                 &Net::FullAuto::FA_Core::handle_error($stderr);
-                              } else {
-                                 my ($stdout_capture,$stderr_capture)=('','');
-                                 ($stdout_capture,$stderr_capture)=
-                                       Capture::Tiny::capture {
-                                    system($fcmd);
-                                 };
-                              }
-                           }
                            if (1<=$#connect_method) {
                               $stderr=$line;
                               next CM3;
@@ -29393,81 +29183,6 @@ print $Net::FullAuto::FA_Core::LOG "FTP-STDERR-500-DETECTED=$stderr<==\n"
       } else { return $stdout }
    }
 
-}
-
-sub repl
-{
-   my @topcaller=caller;
-   print "\nINFO: Rem_Command::repl() (((((((CALLER))))))):\n       ",
-      (join ' ',@topcaller),"\n\n"
-      if !$Net::FullAuto::FA_Core::cron &&
-      $Net::FullAuto::FA_Core::debug;
-   print $Net::FullAuto::FA_Core::LOG
-      "\nRem_Command::repl() (((((((CALLER))))))):\n       ",
-      (join ' ',@topcaller),"\n\n"
-      if $Net::FullAuto::FA_Core::log &&
-      -1<index $Net::FullAuto::FA_Core::LOG,'*';
-   my $self=(defined $Net::FullAuto::FA_Core::newrepl)?
-            $Net::FullAuto::FA_Core::newrepl:$_[0];
-   my $command=$_[1];$command||='';my $output='';
-   while (1) {
-      $self->{_cmd_handle}->print(' '.$command);
-      eval {
-         while (my $line=$self->{_cmd_handle}->get(Timeout=>30)) {
-            print $Net::FullAuto::FA_Core::LOG
-                  "REPL LINE=>$line<=\n"
-                  if $Net::FullAuto::FA_Core::log &&
-                  -1<index $Net::FullAuto::FA_Core::LOG,'*';
-            $output.=$line;
-            last if $output=~s/\n*repl\d*>\s*$//;
-            last if $output=~/Host context unloading/s;
-            last if $output=~/Connection closed by/s;
-            if ($output=~/[.][.][.][.][>]/) {
-               $self->{_cmd_handle}->print(';');
-               sleep 2;
-               next;
-            }
-         }
-      };
-      if ($@ || $output=~/Connection closed by/s) {
-         $self->{_cmd_handle}->print("\004");
-         my $kill_arg=($^O eq 'cygwin')?'f':9;
-         my ($stdout,$stderr)=('','');
-         ($stdout,$stderr)=&Net::FullAuto::FA_Core::kill(
-               $self->{_cmd_pid},$kill_arg);
-         $self->{_cmd_handle}->close;
-         $Net::FullAuto::FA_Core::newrepl=
-            Net::FullAuto::FA_Core::connect_mozrepl();
-         $self=$Net::FullAuto::FA_Core::newrepl;
-         $output='';
-         undef $@;
-         next;
-      } else { last }
-   }
-   $output=~s/^\s*//s;
-   substr($output,0,(length $command))='';
-   $output=~s/^\s*//s;
-   $output=~tr/\0-\11\13-\37\177-\377//d;
-   chomp($output);
-   my $error=$output if $output=~/^[!][!][!]|back to creation context/;
-   $error=$output if -1<index $output,'!!! SyntaxError:';
-   $error=$output if $output=~/Connection closed by/s;
-   my $die='';
-   if ($error) {
-      $error="FATAL ERROR! - MozRepl returned the"
-            ."\n              Following Unrecoverable Error "
-            ."Condition\n              at ".(caller(0))[1]." "
-            ."line ".(caller(0))[2]." :\n\n       ".$error;
-   }
-   if (wantarray) {
-      $output='' if $error;
-      $error||='';
-      return $output,$error;
-   } elsif ($error) {
-      &Net::FullAuto::FA_Core::handle_error($error);
-   } else {
-      return $output;
-   }
 }
 
 sub cmd

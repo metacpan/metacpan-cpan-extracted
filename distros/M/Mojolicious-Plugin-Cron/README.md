@@ -24,13 +24,13 @@ Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::
     plugin Cron => (
     sched1 => {
       base    => 'utc', # not needed for local time
-      crontab => '*/10 15 * * *', # every 10 minutes starting at minute 15, every hour
+      crontab => '*/10 15 * * *', # at every 10th minute past hour 15
       code    => sub {
         # job 1 here
       }
     },
     sched2 => {
-      crontab => '*/15 15 * * *', # every 15 minutes starting at minute 15, every hour
+      crontab => '*/15 15 * * *', # at every 15th minute past hour 15
       code    => sub {
         # job 2 here
       }
@@ -41,12 +41,20 @@ Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::
 [Mojolicious::Plugin::Cron](https://metacpan.org/pod/Mojolicious::Plugin::Cron) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin that allows to schedule tasks
  directly from inside a Mojolicious application.
 
-You should not consider it as a \*nix cron replacement, but as a method to make a proof of
-concept of a project. It helps also in the deployment phase because in the end it
-could mean less and simpler installation/removing tasks.
+The plugin mimics \*nix "crontab" format to schedule tasks (see [cron](https://en.wikipedia.org/wiki/Cron)) .
 
 As an extension to regular cron, seconds are supported in the form of a sixth space
 separated field (For more information on cron syntax please see [Algorithm::Cron](https://metacpan.org/pod/Algorithm::Cron)).
+
+The plugin can help in development and testing phases, as it is very easy to configure and
+doesn't require a schedule utility with proper permissions at operating system level.
+
+For testing, it may be helpful to use Test::Mock::Time ability to "fast-forward"
+time calling all the timers in the interval. This way, you can actually test events programmed
+far away in the future.
+
+For deployment phase, it will help avoiding the installation steps normally asociated with
+schedulling periodic tasks.
 
 # BASICS
 
@@ -94,12 +102,14 @@ Each crontab line consists of a hash with the following keys:
     field is not specified.
 
     For more information on base, crontab and other time related keys,
-     please refer to [Algorithm::Cron](https://metacpan.org/pod/Algorithm::Cron) Contstructor Attributes. 
+     please refer to [Algorithm::Cron](https://metacpan.org/pod/Algorithm::Cron) Constructor Attributes. 
 
 - code => sub {...}
 
     Mandatory. Is the code that will be executed whenever the crontab rule fires.
-    Note that this code \*MUST\* be non-blocking.
+    Note that this code \*MUST\* be non-blocking. For tasks that are naturally
+    blocking, the recommended solution would be to enqueue tasks in a job 
+    queue (like the [Minion](https://metacpan.org/pod/Minion) queue, that will play nicelly with any Mojo project).
 
 # METHODS
 

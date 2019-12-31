@@ -1,6 +1,4 @@
 bin/fullauto.pl
-bin/install_mozrepl_plugin.exe
-install_mozrepl_plugin.ahk
 ChangeLog
 lbbroker_zmqv4.pl
 inc/Module/AutoInstall.pm

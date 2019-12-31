@@ -170,6 +170,12 @@ try manually deleting as many references/closures as possible. See
             # … etc.
         } );
 
+# TODO
+
+Currently rejections will defer until promises are resolved. This makes
+no real sense and ought to change. Do not build anything that depends on
+this behavior.
+
 # SEE ALSO
 
 If you’re not sure of what promises are, there are several good

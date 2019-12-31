@@ -87,6 +87,7 @@ TEST_CASE("Simple", "[Sv]") {
     perlvars vars;
     Simple my(vars.iv);
     Sv oth_valid(vars.ov), oth_invalid(vars.av);
+    int ivsize = Simple(eval_pv("use Config; $Config{ivsize}", 0));
 
     SECTION("ctor") {
         SECTION("empty") {
@@ -114,11 +115,11 @@ TEST_CASE("Simple", "[Sv]") {
             test_ctor((int8_t)-5);
             test_ctor((int16_t)-30000);
             test_ctor((int32_t)1000000000);
-            test_ctor(9223372036854775807L);
+            if (ivsize == 8) test_ctor(9223372036854775807L);
             test_ctor((uint8_t)255);
             test_ctor((uint16_t)65535);
             test_ctor((uint32_t)4000000000);
-            test_ctor(18446744073709551615LU);
+            if (ivsize == 8) test_ctor(18446744073709551615LU);
             test_ctor(5.5f);
             test_ctor(222222222.222222);
         }
@@ -169,11 +170,11 @@ TEST_CASE("Simple", "[Sv]") {
             test_assign((int8_t)-5);
             test_assign((int16_t)-30000);
             test_assign((int32_t)1000000000);
-            test_assign(9223372036854775807L);
+            if (ivsize == 8) test_assign(9223372036854775807L);
             test_assign((uint8_t)255);
             test_assign((uint16_t)65535);
             test_assign((uint32_t)4000000000);
-            test_assign(18446744073709551615LU);
+            if (ivsize == 8) test_assign(18446744073709551615LU);
             test_assign(5.5f);
             test_assign(222222222.222222);
         }
@@ -200,11 +201,11 @@ TEST_CASE("Simple", "[Sv]") {
             test_set((int8_t)-5);
             test_set((int16_t)-30000);
             test_set((int32_t)1000000000);
-            test_set(9223372036854775807L);
+            if (ivsize == 8) test_set(9223372036854775807L);
             test_set((uint8_t)255);
             test_set((uint16_t)65535);
             test_set((uint32_t)4000000000);
-            test_set(18446744073709551615LU);
+            if (ivsize == 8) test_set(18446744073709551615LU);
             test_set(5.5f);
             test_set(222222222.222222);
         }
@@ -227,11 +228,11 @@ TEST_CASE("Simple", "[Sv]") {
             test_cast((int8_t)-5);
             test_cast((int16_t)-30000);
             test_cast((int32_t)1000000000);
-            test_cast(9223372036854775807L);
+            if (ivsize == 8) test_cast(9223372036854775807L);
             test_cast((uint8_t)255);
             test_cast((uint16_t)65535);
             test_cast((uint32_t)4000000000);
-            test_cast(18446744073709551615LU);
+            if (ivsize == 8) test_cast(18446744073709551615LU);
             test_cast(5.5f);
             test_cast(222222222.222222);
         }
@@ -275,11 +276,11 @@ TEST_CASE("Simple", "[Sv]") {
             test_get((int8_t)-5);
             test_get((int16_t)-30000);
             test_get((int32_t)1000000000);
-            test_get(9223372036854775807L);
+            if (ivsize == 8) test_get(9223372036854775807L);
             test_get((uint8_t)255);
             test_get((uint16_t)65535);
             test_get((uint32_t)4000000000);
-            test_get(18446744073709551615LU);
+            if (ivsize == 8) test_get(18446744073709551615LU);
             test_get(5.5f);
             test_get(222222222.222222);
         }

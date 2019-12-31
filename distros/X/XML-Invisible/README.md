@@ -14,7 +14,11 @@ XML::Invisible - transform "invisible XML" documents into XML using a grammar
 
     use XML::Invisible qw(make_parser);
     my $transformer = make_parser(from_file($ixmlspec));
-    my $xmldoc = $transformer->(from_file($ixml_input));
+    my $ast = $transformer->(from_file($ixml_input));
+
+    use XML::Invisible qw(make_parser ast2xml);
+    my $transformer = make_parser(from_file($ixmlspec));
+    my $xmldoc = ast2xml($transformer->(from_file($ixml_input)));
     to_file($outputfile, $xmldoc->toStringC14N(1));
 
     # or, with conventional pre-compiled Pegex grammar
@@ -26,8 +30,8 @@ XML::Invisible - transform "invisible XML" documents into XML using a grammar
 
     # from command line
     cpanm XML::Invisible XML::Twig
-    perl -MXML::Invisible=make_parser -e \
-      'print make_parser(join "", <>)->("(a+b)")->toStringC14N(1)' \
+    perl -MXML::Invisible=make_parser,ast2xml -e \
+      'print ast2xml(make_parser(join "", <>)->("(a+b)"))->toStringC14N(1)' \
       examples/arith-grammar.ixml | xml_pp
 
 # DESCRIPTION
@@ -79,17 +83,34 @@ When given `(a+b)` yields:
 ## make\_parser
 
 Exportable. Returns a function that when called with an "invisible XML"
-document, it will return an object of class [XML::LibXML::Document](https://metacpan.org/pod/XML::LibXML::Document).
+document, it will return an abstract syntax tree (AST), of the general form:
+
+    {
+      nodename => 'expr',
+      type => 'element',
+      attributes => { open => '(', sign => '+', close => ')' },
+      children => [
+        {
+          nodename => 'left',
+          type => 'element',
+          attributes => { name => 'a' },
+        },
+        { nodename => 'right', type => 'element', children => [ 'b' ] },
+      ],
+    }
 
 Arguments:
 
 - an "invisible XML" grammar specification, in Pegex format
 
+See [XML::Invisible::Receiver](https://metacpan.org/pod/XML::Invisible::Receiver) for more.
+
 ## ast2xml
 
-Exportable. The function used by ["make\_parser"](#make_parser) to turn an
-AST from [XML::Invisible::Receiver](https://metacpan.org/pod/XML::Invisible::Receiver) into an object of class
-[XML::LibXML::Document](https://metacpan.org/pod/XML::LibXML::Document).
+Exportable. Turns an AST, as output by ["make\_parser"](#make_parser),
+from [XML::Invisible::Receiver](https://metacpan.org/pod/XML::Invisible::Receiver) into an object of class
+[XML::LibXML::Document](https://metacpan.org/pod/XML::LibXML::Document). Needs [XML::LibXML](https://metacpan.org/pod/XML::LibXML) installed, which as of
+version 0.05 of this module is only a suggested dependency, not required.
 
 Arguments:
 

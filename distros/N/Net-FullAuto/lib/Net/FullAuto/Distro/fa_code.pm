@@ -38,40 +38,7 @@ use Net::FullAuto::FA_Core;
 ##  SET CONFIGURATION PARAMETERS HERE:
 ##  -------------------------------------------------------------
 
-############  TEST TOGGLE  ###################
-
-$test=1; # comment-out this line for Production mode
-
-##############################################
-
-############  LOG  TOGGLE  ###################
-#$log=1; # comment-out this line to turn off Logging
-##############################################
-
-#----------  TEST PARAMETERS  ----------------
-
-our $build_type= $test ? 'test' : '';
-our $toggle_rootdir= $build_type ? 'tmp' : 'usr'; 
-our $toggle_staticdir= $build_type ? 'tmp' : 'webfs';
-
-#---------------------------------------------
-
-############  SET TIMEOUT  ###################
-$timeout=90;
-##############################################
-
-######## SET PASSWORD FILE LOCATION  #########
-if ($^O eq 'cygwin') {
-   $passwd_file_loc="/passwds_ms";
-} else {
-   $passwd_file_loc="/passwds_ux"
-}
-##############################################
-
 #####  SET EMAIL AUTOMATION SETTINGS  ########
-%email_addresses=(
-   'bkelly' => 'Brian.Kelly@fullauto.com',
-);
 my $email_to=[
                ']USERNAME[',
                'Brian.Kelly@fullauto.com',

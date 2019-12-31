@@ -23,6 +23,8 @@ use Plack::Test;
     use Dancer2;
     use Dancer2::Plugin::DataTransposeValidator;
 
+    set engines => { serializer => { JSON => { convert_blessed => 1 } } };
+
     get '/' => sub {
         return "home";
     };
@@ -30,30 +32,29 @@ use Plack::Test;
     post '/default' => sub {
         my $params = params;
         my $data = validator( $params, 'rules1' );
-        content_type('application/json');
-        return to_json($data);
+        send_as JSON => $data;
     };
 
     post '/coderef1' => sub {
         my $params = params;
-        my $data = validator( $params, 'coderef1', 'String' );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, 'coderef1', 'String' );
+        send_as JSON => $data;
     };
 
     post '/coderef2' => sub {
         my $params = params;
-        my $data = validator( $params, 'coderef1', 'EmailValid' );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, 'coderef1', 'EmailValid' );
+        send_as JSON => $data;
     };
 
 }
 
 {
+
     package TestAppClass;
 
     use Dancer2;
+
     BEGIN {
         set plugins => {
             DataTransposeValidator => {
@@ -62,11 +63,14 @@ use Plack::Test;
         };
     }
     use Dancer2::Plugin::DataTransposeValidator;
+    set engines => { serializer => { JSON => { convert_blessed => 1 } } };
 
     get '/rules/:name' => sub {
         my $name = route_parameters->get('name');
+
         # pass foo vaildator to avoid unitialized warnings
         validator( {}, $name, 'String' );
+
         # this time we pass Foo just so we see it working
         my $rules =
           app->with_plugin('DataTransposeValidator')->rules->{$name}->('Foo');
@@ -75,16 +79,14 @@ use Plack::Test;
 
     post '/foo_as_string' => sub {
         my $params = params;
-        my $data = validator( $params, 'login', 'String' );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, 'login', 'String' );
+        send_as JSON => $data;
     };
 
     post '/foo_as_email_valid' => sub {
         my $params = params;
-        my $data = validator( $params, 'login', 'EmailValid' );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, 'login', 'EmailValid' );
+        send_as JSON => $data;
     };
 
     my $hashref = +{
@@ -140,29 +142,26 @@ use Plack::Test;
                     },
                 },
             }
-          }
+        };
 
     };
 
     post '/hashref' => sub {
         my $params = params;
-        my $data = validator( $params, $hashref );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, $hashref );
+        send_as JSON => $data;
     };
 
     post '/coderef' => sub {
         my $params = params;
-        my $data = validator( $params, $coderef );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, $coderef );
+        send_as JSON => $data;
     };
 
     post '/arrayref' => sub {
         my $params = params;
-        my $data = validator( $params, [] );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, [] );
+        send_as JSON => $data;
     };
 }
 
@@ -171,6 +170,7 @@ use Plack::Test;
     package TestAppNoErrorsJoined;
 
     use Dancer2;
+
     BEGIN {
         set plugins => {
             DataTransposeValidator => {
@@ -179,12 +179,12 @@ use Plack::Test;
         };
     }
     use Dancer2::Plugin::DataTransposeValidator;
+    set engines => { serializer => { JSON => { convert_blessed => 1 } } };
 
     post '/joined' => sub {
         my $params = params;
-        my $data = validator( $params, 'rules1' );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, 'rules1' );
+        send_as JSON => $data;
     };
 }
 
@@ -193,6 +193,7 @@ use Plack::Test;
     package TestAppNoErrorsArrayRef;
 
     use Dancer2;
+
     BEGIN {
         set plugins => {
             DataTransposeValidator => {
@@ -201,12 +202,12 @@ use Plack::Test;
         };
     }
     use Dancer2::Plugin::DataTransposeValidator;
+    set engines => { serializer => { JSON => { convert_blessed => 1 } } };
 
     post '/arrayref' => sub {
         my $params = params;
-        my $data = validator( $params, 'rules1' );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, 'rules1' );
+        send_as JSON => $data;
     };
 }
 
@@ -215,6 +216,7 @@ use Plack::Test;
     package TestAppCssErrorClass;
 
     use Dancer2;
+
     BEGIN {
         set plugins => {
             DataTransposeValidator => {
@@ -223,12 +225,12 @@ use Plack::Test;
         };
     }
     use Dancer2::Plugin::DataTransposeValidator;
+    set engines => { serializer => { JSON => { convert_blessed => 1 } } };
 
     post '/css-foo' => sub {
         my $params = params;
-        my $data = validator( $params, 'rules1' );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, 'rules1' );
+        send_as JSON => $data;
     };
 }
 
@@ -237,6 +239,7 @@ use Plack::Test;
     package TestAppBadRulesDir;
 
     use Dancer2;
+
     BEGIN {
         set plugins => {
             DataTransposeValidator => {
@@ -245,12 +248,12 @@ use Plack::Test;
         };
     }
     use Dancer2::Plugin::DataTransposeValidator;
+    set engines => { serializer => { JSON => { convert_blessed => 1 } } };
 
     post '/bad_rules_dir' => sub {
         my $params = params;
-        my $data = validator( $params, 'rules1' );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, 'rules1' );
+        send_as JSON => $data;
     };
 }
 
@@ -259,6 +262,7 @@ use Plack::Test;
     package TestAppGoodRulesDir;
 
     use Dancer2;
+
     BEGIN {
         set plugins => {
             DataTransposeValidator => {
@@ -267,12 +271,12 @@ use Plack::Test;
         };
     }
     use Dancer2::Plugin::DataTransposeValidator;
+    set engines => { serializer => { JSON => { convert_blessed => 1 } } };
 
     post '/good_rules_dir' => sub {
         my $params = params;
-        my $data = validator( $params, 'rules1' );
-        content_type('application/json');
-        return to_json($data);
+        my $data   = validator( $params, 'rules1' );
+        send_as JSON => $data;
     };
 }
 
@@ -427,7 +431,7 @@ subtest 'Testing rules via rules_class setting' => sub {
     $res = $test->request($req);
     ok $res->is_success, "GET /rules/login is success";
 
-    cmp_deeply decode_json($res->content),
+    cmp_deeply decode_json( $res->content ),
       {
         options => {
             stripwhite          => 1,
@@ -455,7 +459,7 @@ subtest 'Testing rules via rules_class setting' => sub {
         }
       },
       "... and the returned rules are as expected"
-          or diag explain $res->content;
+      or diag explain $res->content;
 
     $req = POST "$uri/foo_as_string",
       [
@@ -566,7 +570,7 @@ subtest 'Testing rules via rules_class setting' => sub {
             }
         )
       ],
-      "... and we got error message showing bad ARRAY."
+      "... and we got error message showing bad ARRAY.";
 };
 
 $test = Plack::Test->create( TestAppNoErrorsJoined->to_app );

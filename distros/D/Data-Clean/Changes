@@ -1,3 +1,10 @@
+0.506   2019-11-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention that logging is done using Log::ger.
+
+
 0.505   2019-09-08  Released-By: PERLANCAR; Urgency: medium
 
 	- Re-add command: unbless_ffc_inlined.

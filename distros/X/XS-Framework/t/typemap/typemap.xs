@@ -2,8 +2,10 @@
 #include <vector>
 #include <map>
 #include "tmtest.h"
+#include <panda/error.h>
 
 using namespace xs;
+using panda::ErrorCode;
 
 DCnt dcnt;
 
@@ -36,3 +38,5 @@ INCLUDE: not_null.xsi
 INCLUDE: svapi.xsi
 
 INCLUDE: function.xsi
+
+INCLUDE: error.xsi

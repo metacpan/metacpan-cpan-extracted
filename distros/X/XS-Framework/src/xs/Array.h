@@ -83,7 +83,8 @@ struct Array : Sv {
         return ret;
     }
 
-    Scalar operator[] (size_t key) const {
+    template <typename T, typename = panda::enable_if_arithmetic_t<T>>
+    Scalar operator[] (T key) const {
         Scalar ret;
         ret.set(_svlist()[key]);
         return ret;
@@ -98,7 +99,8 @@ struct Array : Sv {
     void store (size_t key, const Sub&)     = delete;
     void store (size_t key, const Io&)      = delete;
 
-    KeyProxy operator[] (size_t key) { return KeyProxy(_svlist() + key, true); }
+    template <typename T, typename = panda::enable_if_arithmetic_t<T>>
+    KeyProxy operator[] (T key) { return KeyProxy(_svlist() + key, true); }
 
     bool exists (size_t key) const {
         if (key >= size()) return false;

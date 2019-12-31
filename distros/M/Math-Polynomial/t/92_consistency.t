@@ -191,14 +191,23 @@ else {
 if (open FILE, '<', $README) {
     my $readme = <FILE>;
     close FILE;
-    my $found = $readme =~ /^(\S+)\s+version\s+(\d+\.\d+)\n/i;
-    test $found, "$README contains distro name and version number";
+    my $found = $readme =~ /^(\S+)(?:\s+version\s+(\d+\.\d+))?\n/i;
+    test $found, "$README contains distro name and optional version number";
     if ($found) {
         my ($readme_distname, $readme_version) = ($1, $2);
-        print "# $README refers to $readme_distname version $readme_version\n";
+        my $qrv =
+            defined($readme_version)?
+                "version $readme_version":
+                'without version';
+        print "# $README refers to $readme_distname $qrv\n";
         test $readme_distname eq $distname || $readme_distname eq $modname,
             "distro name in $README matches";
-        test $readme_version eq $mod_version, "version in $README matches";
+        if (defined $readme_version) {
+            test $readme_version eq $mod_version, "version in $README matches";
+        }
+        else {
+            skip 1, "version number not specified in $README";
+        }
     }
     else {
         skip 2, "unknown $README version";

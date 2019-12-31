@@ -1,7 +1,7 @@
-  package HO::mixin;
+package HO::mixin;
 # ******************
-  our $VERSION = '0.01';
-# **********************
+our $VERSION = '0.02';
+# ********************
 ; use strict; use warnings
 
 ; use Carp ()
@@ -13,8 +13,23 @@
 ; sub import
     { my ($self, $mixin, @args) = @_
     ; my $class = $HO::mixin::class || CORE::caller
+    ; my ($without,$only)
+    ; while(@args)
+        { my $arg = shift @args
+        ; if( $arg eq 'without' )
+            { my %skip = map { $_ => 1 } @{shift(@args)}
+            ; $without = sub { !$skip{$_[0]} }
+            }
+        ; if( $arg eq 'only' )
+            { my %only = map { $_ => 1 } @{shift(@args)}
+            ; $only = sub { $only{$_[0]} }
+            }
+        }
     ; unless (defined $mixin)
         { Carp::croak("Which class do you want to mix into ${self}?")
+        }
+    ; if($only && $without)
+        { Carp::croak "Option 'without' and 'only' can't be used together in  mixin $class."
         }
     ; eval "require $mixin"
 
@@ -23,6 +38,7 @@
             defined $HO::class::mixin_classes{$class}
         ; push @{$HO::class::mixin_classes{$class}}, @{$HO::class::class_args{$mixin}}
         }
+    ; my $filter = $only || $without || sub { 1 }
 
     ; $HO::accessor::classes{$class} = [] unless
         defined $HO::accessor::classes{$class}
@@ -30,7 +46,9 @@
     ; $mix = [] unless ref $mix
     ; push @{$HO::accessor::classes{$class}}, @$mix
     ; my %acc = @$mix
-    ; my @methods = grep { !(/^new$/ || defined($acc{$_})) }
+    ; my @methods =
+        grep { $filter->($_) }
+        grep { !(/^(init|new)$/ || defined($acc{$_})) }
         grep { ! $HO::class::class_methods{$mixin}{$_} }
         Package::Subroutine->findsubs( $mixin )
     ; Package::Subroutine->export_to($class)->($mixin,@methods)
@@ -39,6 +57,8 @@
 ; 1
 
 __END__
+
+=encoding UTF-8
 
 =head1 NAME
 

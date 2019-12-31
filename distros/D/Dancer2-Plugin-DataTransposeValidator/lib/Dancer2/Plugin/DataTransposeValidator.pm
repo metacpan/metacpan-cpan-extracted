@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 use Carp 'croak';
-use Dancer2::Core::Types qw(HashRef Maybe Str);
-use Data::Transpose::Validator;
+use Dancer2::Core::Types qw(Enum HashRef Maybe Str);
+use Dancer2::Plugin::DataTransposeValidator::Validator;
 use Path::Tiny;
 use Module::Runtime qw/use_module/;
 
-use Dancer2::Plugin 0.200000;
+use Dancer2::Plugin 0.205000;
 
 =head1 NAME
 
@@ -17,11 +17,11 @@ Dancer2::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for 
 
 =head1 VERSION
 
-Version 0.101
+Version 0.201
 
 =cut
 
-our $VERSION = '0.101';
+our $VERSION = '0.201';
 
 has css_error_class => (
     is          => 'ro',
@@ -31,7 +31,7 @@ has css_error_class => (
 
 has errors_hash => (
     is          => 'ro',
-    isa         => Maybe [Str],
+    isa         => Maybe [ Enum [qw/arrayref joined/] ],
     from_config => sub { undef },
 );
 
@@ -43,7 +43,7 @@ has rules => (
 
 has rules_class => (
     is          => 'ro',
-    isa         => Maybe[Str],
+    isa         => Maybe [Str],
     from_config => sub { undef },
 );
 
@@ -59,7 +59,7 @@ has rules_dir => (
             $plugin->config->{rules_dir}
           ? $plugin->config->{rules_dir}
           : 'validation';
-        path($plugin->app->setting('appdir'))->child($dir)->stringify;
+        path( $plugin->app->setting('appdir') )->child($dir)->stringify;
     },
 );
 
@@ -72,7 +72,7 @@ sub BUILD {
       && exists $plugin->config->{rules_dir};
 
     if ( exists $plugin->config->{rules_class} ) {
-        use_module($plugin->config->{rules_class});
+        use_module( $plugin->config->{rules_class} );
     }
 }
 
@@ -97,7 +97,9 @@ sub validator {
                 my $path = path( $plugin->rules_dir )->child($name);
                 croak "rules_file does not exist" unless $path->is_file;
 
-                my $eval = do $path or croak "bad rules file: $path - $! $@";
+                my $eval = do $path->absolute
+                  or croak "bad rules file: $path - $! $@";
+
                 if ( ref($eval) eq 'CODE' ) {
                     $plugin->rules->{$name} = $eval;
                 }
@@ -108,10 +110,10 @@ sub validator {
         }
         $rules = $plugin->rules->{$name}->(@additional_args);
     }
-    elsif (ref($name) eq 'HASH') {
+    elsif ( ref($name) eq 'HASH' ) {
         $rules = $name;
     }
-    elsif (ref($name) eq 'CODE') {
+    elsif ( ref($name) eq 'CODE' ) {
         $rules = $name->(@additional_args);
     }
     else {
@@ -119,44 +121,15 @@ sub validator {
         croak "rules option reference type $ref not allowed";
     }
 
-    my $options = $rules->{options} || {};
-    my $prepare = $rules->{prepare} || {};
-
-    my $dtv = Data::Transpose::Validator->new(%$options);
-    $dtv->prepare(%$prepare);
-
-    my $clean = $dtv->transpose($params);
-    my $ret;
-
-    if ($clean) {
-        $ret->{valid}  = 1;
-        $ret->{values} = $clean;
-    }
-    else {
-        $ret->{valid}  = 0;
-        $ret->{values} = $dtv->transposed_data;
-
-        my $v_hash = $dtv->errors_hash;
-        while ( my ( $key, $value ) = each %$v_hash ) {
-
-            $ret->{css}->{$key} = $plugin->css_error_class;
-
-            my @errors = map { $_->{value} } @{$value};
-
-            if ( $plugin->errors_hash && $plugin->errors_hash eq 'joined' ) {
-                $ret->{errors}->{$key} = join( ". ", @errors );
-            }
-            elsif ( $plugin->errors_hash && $plugin->errors_hash eq 'arrayref' )
-            {
-                $ret->{errors}->{$key} = \@errors;
-            }
-            else {
-                $ret->{errors}->{$key} = $errors[0];
-            }
-        }
-    }
-    return $ret;
-
+    return Dancer2::Plugin::DataTransposeValidator::Validator->new(
+        params => $params,
+        rules  => {
+            options => $rules->{options} || {},
+            prepare => $rules->{prepare} || {},
+        },
+        css_error_class => $plugin->css_error_class,
+        errors_hash     => $plugin->errors_hash,
+    );
 }
 
 1;
@@ -169,7 +142,7 @@ __END__
     post '/' => sub {
         my $params = params;
         my $data = validator($params, 'myrule');
-        if ( $data->{valid} ) { ... }
+        if ( $data->valid ) { ... }
     }
 
 
@@ -204,7 +177,8 @@ C<$rules> is one of:
 Any optional C<@additional_args> are passed as arguments to code
 references/subs.
 
-A hash reference with the following keys is returned:
+A L<Dancer2::Plugin::DataTransposeValidator::Validator> object is returned
+with the following methods:
 
 =over 4
 
@@ -229,6 +203,20 @@ The value for each parameter is a css class. See L</css_error_class> in
 L</CONFIGURATION>.
 
 =back
+
+B<NOTE:> If you wish to return this object as JSON then you must ensure
+that you have configured the JSON serializer something like:
+
+
+    set engines => { serializer => { JSON => { convert_blessed => 1 } } };
+
+so you can do something like:
+
+    post '/default' => sub {
+        my $params = params;
+        my $data   = validator( $params, 'rules1' );
+        send_as JSON => $data;
+    };
 
 =head1 CONFIGURATION
 

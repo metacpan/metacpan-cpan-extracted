@@ -7,7 +7,7 @@ struct TestNN : panda::Refcnt {
 using TestNNi = panda::iptr<TestNN>;
 
 namespace xs {
-    template <> struct Typemap<TestNN*> : TypemapObject<TestNN*, TestNN*, ObjectTypePtr, ObjectStorageIV> {};
+    template <> struct Typemap<TestNN*> : TypemapObject<TestNN*, TestNN*, ObjectTypeRefcntPtr, ObjectStorageIV> {};
 }
 
 MODULE = MyTest::Typemap                PACKAGE = MyTest::NotNull
@@ -27,4 +27,7 @@ void TestNN::set_from (xs::nn<TestNN*> other) {
 
 void TestNN::set_from2 (xs::nn<TestNNi> other) {
     THIS->val = other->val;
+}
+
+void TestNN::DESTROY() {
 }

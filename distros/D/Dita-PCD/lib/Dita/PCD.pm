@@ -8,7 +8,7 @@
 # initial - 0.1296. checkout: 0.083, optimized: 0.064 with each command a sub
 
 package Dita::PCD;
-our $VERSION = 20191230;
+our $VERSION = 20191231;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess cluck);
@@ -976,7 +976,7 @@ block starts making changes to the parse tree.
 Implementation of the Please Change Dita Language.
 
 
-Version 20191228.
+Version 20191231.
 
 
 The following sections describe the methods in each functional area of this
@@ -998,7 +998,7 @@ Parse the url representation of a parse tree.
 B<Example:>
 
 
-  if (1)
+  if (1)                                                                          
    {my $testUrl =
      {q(001_action)    => q(),
       q(001_rowType1)  => q(comment),
@@ -1015,18 +1015,17 @@ B<Example:>
       q(003_context_1) => q(ph),
       q(003_context_2) => q(title),
       q(003_context_3) => q()};
-
+  
     my $parseTree = 𝗽𝗮𝗿𝘀𝗲𝗨𝗿𝗹𝗥𝗲𝗽𝗿𝗲𝘀𝗲𝗻𝘁𝗮𝘁𝗶𝗼𝗻𝗢𝗳𝗣𝗰𝗱($testUrl);
-
-  # owf(q(/home/phil/z/z/z/1.xml), representPcdParseTreeAsText($parseTree));
+  
     ok representPcdParseTreeAsText($parseTree) eq <<END;
   # Sample Pcd file
-
+  
   sf-111 unwrap ph under title
     unwrap ph title
   END
    }
-
+  
 
 This method can be imported via:
 
@@ -1043,20 +1042,20 @@ Compile the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives
 B<Example:>
 
 
-    if (1) {
-
-  if (1) {
+    if (1) {                                                                          
+  
+  if (1) {                                                                           
     my $in = temporaryFolder;
-
+  
     my $f = owf(fpe($in, qw(test pcd)), <<END);
   # Sample Pcd file
   sf-111 unwrap ph under title
     unwrap2 ph2 title
   END
-
+  
     my $p = parsePcdFile($f);
     delete $p->{inputFile};
-
+  
     is_deeply $p, bless({
     errors => [],
     rows   => [
@@ -1087,7 +1086,7 @@ B<Example:>
               ],
      }, "DitaPCDParseTree");
    }
-
+  
 
 This method can be imported via:
 
@@ -1104,20 +1103,20 @@ Locate and compile the L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2
 B<Example:>
 
 
-    if (1) {
-
-  if (1) {
+    if (1) {                                                                          
+  
+  if (1) {                                                                           
     my $in = temporaryFolder;
-
+  
     my $f = owf(fpe($in, qw(test pcd)), <<END);
   # Sample Pcd file
   sf-111 unwrap ph under title
     unwrap2 ph2 title
   END
-
+  
     my $p = parsePcdFile($f);
     delete $p->{inputFile};
-
+  
     is_deeply $p, bless({
     errors => [],
     rows   => [
@@ -1148,7 +1147,7 @@ B<Example:>
               ],
      }, "DitaPCDParseTree");
    }
-
+  
 
 This method can be imported via:
 
@@ -1167,20 +1166,20 @@ Transform the contents of file B<$if> represented as a parse tree B<$x> by apply
 B<Example:>
 
 
-    if (1) {
-
-  if (1) {
+    if (1) {                                                                          
+  
+  if (1) {                                                                           
     my $in = temporaryFolder;
-
+  
     my $f = owf(fpe($in, qw(test pcd)), <<END);
   # Sample Pcd file
   sf-111 unwrap ph under title
     unwrap2 ph2 title
   END
-
+  
     my $p = parsePcdFile($f);
     delete $p->{inputFile};
-
+  
     is_deeply $p, bless({
     errors => [],
     rows   => [
@@ -1211,7 +1210,7 @@ B<Example:>
               ],
      }, "DitaPCDParseTree");
    }
-
+  
 
 This method can be imported via:
 
@@ -1230,8 +1229,8 @@ Transform the specified parse tree B<$x> by applying the specified L<Dita::PCD|h
 B<Example:>
 
 
-    if (1) {
-
+    if (1) {                                                                          
+  
 
 This method can be imported via:
 
@@ -1248,20 +1247,20 @@ Transform L[dita] files as specified by the directives in L<Dita::PCD|https://me
 B<Example:>
 
 
-    if (1) {
-
-  if (1) {
+    if (1) {                                                                          
+  
+  if (1) {                                                                           
     my $in = temporaryFolder;
-
+  
     my $f = owf(fpe($in, qw(test pcd)), <<END);
   # Sample Pcd file
   sf-111 unwrap ph under title
     unwrap2 ph2 title
   END
-
+  
     my $p = parsePcdFile($f);
     delete $p->{inputFile};
-
+  
     is_deeply $p, bless({
     errors => [],
     rows   => [
@@ -1292,7 +1291,7 @@ B<Example:>
               ],
      }, "DitaPCDParseTree");
    }
-
+  
 
 This method can be imported via:
 
@@ -1312,8 +1311,8 @@ B<Example:>
 
 
   ok 𝗽𝗹𝗲𝗮𝘀𝗲𝗖𝗵𝗮𝗻𝗴𝗲𝗗𝗶𝘁𝗮𝗦𝘁𝗿𝗶𝗻𝗴(q(<a><b>C</b></a>), qq(Unwrap
-  unwrap b))->string eq qq(<a>C</a>);
-
+  unwrap b))->string eq qq(<a>C</a>);  
+  
 
 This method can be imported via:
 
@@ -1730,7 +1729,6 @@ if (1)                                                                          
 
   my $parseTree = parseUrlRepresentationOfPcd($testUrl);
 
-# owf(q(/home/phil/z/z/z/1.xml), representPcdParseTreeAsText($parseTree));
   ok representPcdParseTreeAsText($parseTree) eq <<END;
 # Sample Pcd file
 
@@ -1825,7 +1823,7 @@ END
 
 ok pleaseChangeDitaString(q(<a><b>C</b></a>), qq(Unwrap\n  unwrap b))->string eq qq(<a>C</a>);  #TpleaseChangeDitaString
 
-if (1)
+if (0)
  {my $f = q(/home/phil/r/www/html/help/);
   my $e = q(/home/phil/.config/help/Data::Edit::Xml.txt);
   if (-d $f and -f $e)
@@ -1839,7 +1837,7 @@ ok pleaseChangeDitaString(q(<a><b id="b"/><b id="c"/></a>), qq(Unwrap c\n  attrV
 latestTest:;
 
 if (1) {
-  my $in = q(/home/phil/perl/cpan/DitaPCD/lib/Dita/tests/); # temporaryFolder;
+  my $in = temporaryFolder;
   owf(my $source = fpe($in, qw(source xml)), <<END);
 <concept id="source">
   <title>

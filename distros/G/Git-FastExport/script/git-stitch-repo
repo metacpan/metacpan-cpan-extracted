@@ -42,6 +42,10 @@ __END__
 
 git-stitch-repo - Stitch several git repositories into a git fast-import stream
 
+=head1 VERSION
+
+version 0.108
+
 =head1 SYNOPSIS
 
 git-stitch-repo [ options ] repo1:dir1 repo2:dir2 ...
@@ -109,7 +113,7 @@ under the same terms as Perl itself.
 
 =head1 COPYRIGHT
 
-Copyright 2008-2016 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2008-2019 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 

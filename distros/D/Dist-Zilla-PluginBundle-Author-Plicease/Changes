@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.40      2019-12-30 18:17:21 -0700
+  - Handle line endings better on Windows
+  - No longer requires dos2unix on Windows
+
 2.39      2019-12-18 05:39:21 -0700
   - Switch to gfm for README.md since the readme is only
     intended for use from GitHub.  Also the regular Markdown

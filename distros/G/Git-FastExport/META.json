@@ -4,7 +4,14 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "git",
+      "fast-export",
+      "fast-import",
+      "repository",
+      "stich"
+   ],
    "license" : [
       "perl_5"
    ],
@@ -53,12 +60,25 @@
             "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0",
-            "Test::Requires::Git" : "0",
-            "Test::Script" : "1.05",
-            "blib" : "1.01",
+            "Test::More" : "0.88",
+            "Test::Requires::Git" : "1.005",
+            "lib" : "0",
             "perl" : "5.006"
          }
+      }
+   },
+   "provides" : {
+      "Git::FastExport" : {
+         "file" : "lib/Git/FastExport.pm",
+         "version" : "0.108"
+      },
+      "Git::FastExport::Block" : {
+         "file" : "lib/Git/FastExport/Block.pm",
+         "version" : "0.108"
+      },
+      "Git::FastExport::Stitch" : {
+         "file" : "lib/Git/FastExport/Stitch.pm",
+         "version" : "0.108"
       }
    },
    "release_status" : "stable",
@@ -73,7 +93,7 @@
          "web" : "http://github.com/book/Git-FastExport"
       }
    },
-   "version" : "0.107",
+   "version" : "0.108",
    "x_contributors" : [
       "Yves Orton <yves@cpan.org>",
       "Aristotle Pagaltzis <aristotle@cpan.org>",
@@ -81,6 +101,7 @@
       "Oliver Paukstadt <pstadt@cpan.org>",
       "Jean-Baptiste Mestelan <mestelan@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

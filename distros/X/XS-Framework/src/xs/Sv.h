@@ -4,6 +4,7 @@
 #include <panda/memory.h>
 #include <panda/traits.h>
 #include <panda/string_view.h>
+#include <panda/exception.h>
 
 namespace xs {
 

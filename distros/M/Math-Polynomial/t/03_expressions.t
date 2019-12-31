@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 217 };
+BEGIN { plan tests => 229 };
 use Math::Polynomial 1.000;
 ok(1);  # module loaded
 
@@ -398,6 +398,25 @@ ok(has_coeff($qq));                     # 0 >> 0
 $qq = $zp >> 0;
 ok(has_coeff($qq));                     # 0 >> 0
 
+$qq = $p->inflate(3);
+ok(has_coeff($qq, -0.25, 0, 0, 0, 0, 0, 1.25));  # p(x**3)
+$qq = $c->inflate(3);
+ok(has_coeff($qq, -0.5));               # c(x**3)
+$qq = $zp->inflate(3);
+ok(has_coeff($qq));                     # 0(x**3)
+$qq = $p->inflate(1);
+ok(has_coeff($qq, -0.25, 0, 1.25));     # p(x**1)
+$qq = $c->inflate(1);
+ok(has_coeff($qq, -0.5));               # c(x**1)
+$qq = $zp->inflate(1);
+ok(has_coeff($qq));                     # 0(x**1)
+$qq = $p->inflate(0);
+ok(has_coeff($qq, 1));                  # p(x**0)
+$qq = $c->inflate(0);
+ok(has_coeff($qq, -0.5));               # c(x**0)
+$qq = $zp->inflate(0);
+ok(has_coeff($qq));                     # 0(x**0)
+
 $pp = $p->new(11, 22, 33, 44, 55);
 my $ok = 1;
 foreach my $w (0..6) {
@@ -494,6 +513,17 @@ ok(!defined($qq) && $@ && $@ =~ /exponent too large/);
 $qq = eval {
     local $Math::Polynomial::max_degree;
     $pp << 5
+};
+ok(defined($qq) && $q->isa('Math::Polynomial'));
+
+$pp = $p->new(5, 4, 3, 2, 1);
+$qq = eval { $pp->inflate(2) };
+ok(has_coeff($qq, 5, 0, 4, 0, 3, 0, 2, 0, 1));
+$qq = eval { $pp->inflate(3) };
+ok(!defined($qq) && $@ && $@ =~ /exponent too large/);
+$qq = eval {
+    local $Math::Polynomial::max_degree;
+    $pp->inflate(3);
 };
 ok(defined($qq) && $q->isa('Math::Polynomial'));
 

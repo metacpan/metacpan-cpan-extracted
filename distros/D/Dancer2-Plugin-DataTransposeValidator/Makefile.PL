@@ -10,6 +10,7 @@ WriteMakefile(
         : () ),
     MIN_PERL_VERSION => '5.010000',
     BUILD_REQUIRES   => {
+        'aliased'               => 0,
         'Email::Valid'          => 0,
         'HTTP::Request::Common' => 0,
         'JSON::MaybeXS'         => 0,
@@ -20,7 +21,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Carp'                       => 0,
-        'Dancer2::Plugin'            => '0.200000',
+        'Dancer2::Plugin'            => '0.205000',
         'Dancer2::Core::Types'       => 0,
         'Data::Transpose'            => '0.0020',
         'Data::Transpose::Validator' => 0,

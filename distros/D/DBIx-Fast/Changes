@@ -1,5 +1,8 @@
 Revision history for DBIx-Fast
 
+0.08	26/01/16
+	- Force UTF8
+	
 0.07	24/01/16
 	
 0.06	23/03/15

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.40      2019-12-30 18:12:42 -0700
+  - Handle line endings better on Windows
+
 2.39      2019-12-18 05:34:26 -0700
   - Null release to match [@Author:Plicease]
 

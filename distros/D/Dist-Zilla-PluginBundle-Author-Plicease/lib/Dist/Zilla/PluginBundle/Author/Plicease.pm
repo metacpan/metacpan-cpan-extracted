@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.39 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.40 {
 
   use 5.014;
   use Moose;
@@ -31,7 +31,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.39 {
 
   my %plugin_versions = qw(
     Alien                0.023
-    Author::Plicease.*   2.39
+    Author::Plicease.*   2.40
     OurPkgVersion        0.21
     MinimumPerl          1.006
     InstallGuide         1.200006
@@ -270,15 +270,6 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.39 {
       { $self->_my_add_plugin(['ACPS::RPM']) }
     }
     
-    if($^O eq 'MSWin32')
-    {
-      $self->_my_add_plugin([
-        'Run::AfterBuild' => {
-          run => 'dos2unix README.md t/00_diag.*',
-        },
-      ]);
-    }
-    
     foreach my $test (map { path($_) } bsd_glob ('t/*.t'))
     {
       my @lines = grep !/-no_srand => 1/, grep /use Test2::V0/, $test->lines_utf8;
@@ -334,7 +325,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.39
+version 2.40
 
 =head1 SYNOPSIS
 

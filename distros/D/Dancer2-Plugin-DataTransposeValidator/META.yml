@@ -10,10 +10,11 @@ build_requires:
   Test::Deep: '0'
   Test::Fatal: '0'
   Test::More: '0'
+  aliased: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +27,7 @@ no_index:
 requires:
   Carp: '0'
   Dancer2::Core::Types: '0'
-  Dancer2::Plugin: '0.200000'
+  Dancer2::Plugin: '0.205000'
   Data::Transpose: '0.0020'
   Data::Transpose::Validator: '0'
   Module::Runtime: '0'
@@ -38,5 +39,5 @@ resources:
   IRC: irc://irc.freenode.net/#interchange
   bugtracker: https://github.com/interchange/Dancer2-Plugin-DataTransposeValidator/issues
   repository: https://github.com/interchange/Dancer2-Plugin-DataTransposeValidator.git
-version: '0.101'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.201'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

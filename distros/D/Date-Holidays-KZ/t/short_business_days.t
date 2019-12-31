@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use utf8;
 use Test::More tests => 1;

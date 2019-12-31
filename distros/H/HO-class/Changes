@@ -1,4 +1,8 @@
 Revision history for HO-class
+0.079 - 2019-12-17
+* skip also init method in mixins
+* implement "without" and "only" options for mixin methods
+* improve documentation
 
 0.078 - 2018-09-10
 * homepage update - ho development has it's own org

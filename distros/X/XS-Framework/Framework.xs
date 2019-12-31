@@ -2,6 +2,7 @@
 #include <xs/CallbackDispatcher.h>
 
 using namespace xs;
+using panda::ErrorCode;
 
 MODULE = XS::Framework                PACKAGE = XS::Framework
 PROTOTYPES: DISABLE
@@ -11,7 +12,11 @@ BOOT {
 }
 
 void __at_perl_destroy () {
-    __call_at_perl_destroy();
+    xs::__call_at_perl_destroy();
+}
+
+void __at_thread_create () {
+    xs::__call_at_thread_create();
 }
 
 void sv_payload_attach (Scalar sv, SV* payload) {
@@ -95,5 +100,7 @@ void obj2av (Ref rv) {
     if (SvOK(sv)) throw "only references to undefs can be upgraded";
     sv.upgrade(SVt_PVAV);
 }
+
+INCLUDE: Error.xsi
 
 INCLUDE: CallbackDispatcher.xsi

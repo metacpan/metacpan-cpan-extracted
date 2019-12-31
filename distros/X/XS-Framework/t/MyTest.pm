@@ -17,18 +17,21 @@ sub import {
         no strict 'refs';
         &{"require_$_"}() for @reqs;
     }
-    
+
     my $caller = caller();
-    foreach my $sym_name (qw/Config is cmp_deeply ok done_testing skip isnt Dumper noclass subtest bag dies_ok new_ok isa_ok pass dies_ok is_deeply ignore/) {
+    foreach my $sym_name (qw/
+        Config is cmp_deeply ok like done_testing skip isnt Dumper noclass subtest bag dies_ok new_ok isa_ok pass dies_ok
+        is_deeply ignore note cmp_ok
+    /) {
         no strict 'refs';
         *{"${caller}::$sym_name"} = *$sym_name;
     }
-    
+
     foreach my $sym_name (qw/dcnt/) {
         no strict 'refs';
         *{"${caller}::$sym_name"} = *{"MyTest::$sym_name"};
     }
-    
+
 }
 
 sub require_threads {
@@ -42,31 +45,31 @@ sub require_threads {
 
     our $call_cnt = 0;
     our $call_ret;
-    
+
     our $allgv = "scalar";
     our @allgv = ("array");
     our %allgv = (key => "hash");
     sub allgv {1}
-    
+
     our $gv2set;
     our $anon = sub { return time() };
-    
+
     sub class_method { my $class = shift; return "$class-hi" }
-    
+
     sub method { my $self = shift; return $$self + (shift()//0) + 10 }
-    
+
     sub meth { return "$_[0]-1"; }
     use overload '""' => sub { return ref(shift).'(OBJ)' };
-    
+
     sub check_args { $call_cnt++; return [@_] }
-    
+
     sub check_context {
         $call_cnt++;
         return @_ if wantarray();
         return $_[0] if defined wantarray();
         $call_ret = $_[0];
     }
-    
+
     sub dummy  {
         $call_cnt++;
         if (wantarray()) {
@@ -83,7 +86,7 @@ sub require_threads {
             return;
         }
     }
-    
+
     sub dummy2 { return shift; }
 }
 {
@@ -92,7 +95,7 @@ sub require_threads {
     sub child_method {}
     sub meth { return "$_[0]-2"; }
 }
-{    
+{
     package M3;
     our @ISA = 'M1';
     sub meth { return "$_[0]-3"; }
@@ -111,23 +114,23 @@ sub require_threads {
     our @ISA = qw/MyTest::MixPluginB MyTest::MixPluginA MyTest::MixBase/;
 }
 
-{    
+{
     package MyTest::BadMixin;
     use mro 'c3';
     our @ISA = qw/MyTest::MixPluginB MyTest::MixBase/;
 }
 
-{    
+{
     package MyTest::MyBRUnit;
     our @ISA = 'MyTest::BRUnit';
-    
+
     sub id { my $self = shift; return @_ ? $self->SUPER::id(@_) : ($self->SUPER::id() + 111) }
 }
 
 {
     package MyTest::MyBRUnitAdvanced;
     our @ISA = 'MyTest::MyBRUnit';
-    
+
     sub new {
         my $special = pop;
         my $self = shift->new_enabled(@_);
@@ -135,8 +138,8 @@ sub require_threads {
         $self->{special} = $special;
         return $self;
     }
-    
-    sub special { shift->{special} }    
+
+    sub special { shift->{special} }
 }
 
 1;

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.39 {
+package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.40 {
 
   use 5.014;
   use Path::Tiny qw( path );
@@ -56,7 +56,7 @@ package Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup 2.39 {
       my $content = $readme->slurp;
       $content =~ s{# NAME\s+(.*?) - (.*?#)}{# $1$status\n\n$2}s;
       $content =~ s{# VERSION\s+version (\d+\.|)\d+\.\d+(\\_\d+|)\s+#}{#};
-      $readme->spew($content);
+      $readme->spew_raw($content);
     }
     else
     {
@@ -81,7 +81,7 @@ Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup - add a travis status but
 
 =head1 VERSION
 
-version 2.39
+version 2.40
 
 =head1 SYNOPSIS
 

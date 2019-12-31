@@ -18,7 +18,6 @@ WriteMakefile(
   },
   PREREQ_PM => {
     'Pegex' => '0.64',
-    'XML::LibXML' => '0',
   },
   dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
   clean => { FILES => 'XML-Invisible-*' },
@@ -38,12 +37,17 @@ WriteMakefile(
       license => [ 'http://dev.perl.org/licenses/' ],
     },
     prereqs => {
+      runtime => {
+        suggests => {
+          'XML::LibXML' => '0',
+        },
+      },
       develop => {
         requires => {
-          'Test::CheckManifest' => '0.9',
           'Test::Pod::Coverage' => '1.08',
           'Test::Pod' => '1.22',
           'Pod::Markdown' => 0,
+          'XML::LibXML' => '0',
         },
       },
     },

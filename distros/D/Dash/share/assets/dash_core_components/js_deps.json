@@ -1,0 +1,106 @@
+{
+    "_js_dist": [
+        {
+            "relative_package_path": "async~datepicker.js",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~datepicker.js",
+            "namespace": "dash_core_components",
+            "async": true
+        },
+        {
+            "relative_package_path": "async~dropdown.js",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~dropdown.js",
+            "namespace": "dash_core_components",
+            "async": true
+        },
+        {
+            "relative_package_path": "async~graph.js",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~graph.js",
+            "namespace": "dash_core_components",
+            "async": true
+        },
+        {
+            "relative_package_path": "async~highlight.js",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~highlight.js",
+            "namespace": "dash_core_components",
+            "async": true
+        },
+        {
+            "relative_package_path": "async~markdown.js",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~markdown.js",
+            "namespace": "dash_core_components",
+            "async": true
+        },
+        {
+            "relative_package_path": "async~upload.js",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~upload.js",
+            "namespace": "dash_core_components",
+            "async": true
+        },
+        {
+            "relative_package_path": "async~datepicker.js.map",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~datepicker.js.map",
+            "namespace": "dash_core_components",
+            "dynamic": true
+        },
+        {
+            "relative_package_path": "async~dropdown.js.map",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~dropdown.js.map",
+            "namespace": "dash_core_components",
+            "dynamic": true
+        },
+        {
+            "relative_package_path": "async~graph.js.map",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~graph.js.map",
+            "namespace": "dash_core_components",
+            "dynamic": true
+        },
+        {
+            "relative_package_path": "async~highlight.js.map",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~highlight.js.map",
+            "namespace": "dash_core_components",
+            "dynamic": true
+        },
+        {
+            "relative_package_path": "async~markdown.js.map",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~markdown.js.map",
+            "namespace": "dash_core_components",
+            "dynamic": true
+        },
+        {
+            "relative_package_path": "async~upload.js.map",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~upload.js.map",
+            "namespace": "dash_core_components",
+            "dynamic": true
+        },
+        {
+            "relative_package_path": "dash_core_components.min.js",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/dash_core_components.min.js",
+            "namespace": "dash_core_components"
+        },
+        {
+            "relative_package_path": "dash_core_components.min.js.map",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/dash_core_components.min.js.map",
+            "namespace": "dash_core_components",
+            "dynamic": true
+        },
+        {
+            "relative_package_path": "plotly.min.js",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/plotly.min.js",
+            "namespace": "dash_core_components",
+            "async": "eager"
+        },
+        {
+            "relative_package_path": "async~plotlyjs.js",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~graph~plotlyjs.js",
+            "namespace": "dash_core_components",
+            "async": "lazy"
+        },
+        {
+            "relative_package_path": "async~plotlyjs.js.map",
+            "external_url": "https://unpkg.com/dash-core-components@1.6.0/dash_core_components/async~graph~plotlyjs.js.map",
+            "namespace": "dash_core_components",
+            "dynamic": true
+        }
+    ],
+    "_css_dist": []
+}

@@ -8,7 +8,7 @@ use Devel::Peek;
 use Data::Dumper 'Dumper';
 use POSIX ":sys_wait_h";
 
-timethis(-1, sub { MyTest::bench_sv_payload_get(1000000); });
+timethis(-1, sub { MyTest::bench_simple_get(1000000); });
 
 exit;
 

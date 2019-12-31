@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,12 +21,11 @@ no_index:
     - inc
 requires:
   Pegex: '0.64'
-  XML::LibXML: '0'
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#graphql-perl
   bugtracker: https://github.com/mohawk2/xml-invisible/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/mohawk2/xml-invisible
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

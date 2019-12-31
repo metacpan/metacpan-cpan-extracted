@@ -1,8 +1,8 @@
-  package HO::class
-# *****************
-; use strict; use warnings;
-  our $VERSION='0.078';
-# ********************
+package HO::class;
+# ****************
+use strict; use warnings;
+our $VERSION='0.079';
+# *******************
 
 ; require HO::accessor
 ; require Carp
@@ -281,6 +281,34 @@ base. This is not the default, because the extra space required.
 
 Currently the word behind the colon could be free choosen. Only the
 existence of a colon in the name is checked.
+
+=head2 Add your own types
+
+Your are able to register your own types. The API is low level.
+Given a simple type like a stack.
+
+  package Sample::Stack;
+
+  sub new { ... }
+
+  sub pop { ... }
+
+  sub push { ... }
+
+First the new type needs to be registered. This done by filling the type
+hasch with the name and a function, which will return an object of that type.
+
+  $HO::accessor::type{'stack'} = sub { Sample::Stack->new };
+
+The second step is to implement the accessors. It is implemented by an
+function, which returns an closure around the given index of the accessor.
+
+  $HO::accessor::rw_accessor{'stack'} = sub {
+      my ($n,$i) = @_;
+      return sub { my ($obj,$idx,$val) = @_;
+                   return $obj->[$i] if @_ == 1;
+                 }
+      }
 
 =head2 Motivation
 

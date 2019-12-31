@@ -1,14 +1,21 @@
 #pragma once
 #include <xs/Sub.h>
 #include <functional>
+#include <panda/exception.h>
 
 namespace xs {
 
 using CatchHandlerSimple = std::function<Sv()>;
 using CatchHandler       = std::function<Sv(const Sub&)>;
 
+using ExceptionProcessor       = std::function<Sv(Sv& ex, const Sub&)>;
+using ExceptionProcessorSimple = std::function<Sv(Sv& ex)>;
+
 void add_catch_handler (CatchHandlerSimple f);
 void add_catch_handler (CatchHandler       f);
+
+void add_exception_processor(ExceptionProcessor       f);
+void add_exception_processor(ExceptionProcessorSimple f);
 
 Sv _exc2sv (const Sub&);
 

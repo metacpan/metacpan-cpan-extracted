@@ -3,7 +3,7 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =encoding utf-8
 
@@ -200,6 +200,12 @@ You may also (counterintuitively, IMO) find that this:
 
 =back
 
+=head1 TODO
+
+Currently rejections will defer until promises are resolved. This makes
+no real sense and ought to change. Do not build anything that depends on
+this behavior.
+
 =head1 SEE ALSO
 
 If you’re not sure of what promises are, there are several good
@@ -256,10 +262,21 @@ sub all {
             if ($unresolved_size) {
                 my $p = 0;
 
+                my $on_reject_cr = sub {
+
+                    # Needed because we might get multiple failures:
+                    return if $settled;
+
+                    $settled = 1;
+                    $reject->(@_);
+                };
+
                 for my $promise (@promises) {
+                    last if $settled;
+
                     my $p = $p++;
 
-                    my $new = $promise->then(
+                    $promise->then(
                         sub {
                             return if $settled;
 
@@ -271,14 +288,7 @@ sub all {
                             $settled = 1;
                             $resolve->( \@values );
                         },
-                        sub {
-
-                            # Needed because we might get multiple failures:
-                            return if $settled;
-
-                            $settled = 1;
-                            $reject->(@_);
-                        },
+                        $on_reject_cr,
                     );
                 }
             }
@@ -305,29 +315,30 @@ sub race {
 
     my $is_done;
 
+    my $on_resolve_cr = sub {
+        return if $is_done;
+        $is_done = 1;
+
+        $resolve->( $_[0] );
+
+        # Proactively eliminate references:
+        $resolve = $reject = undef;
+    };
+
+    my $on_reject_cr = sub {
+        return if $is_done;
+        $is_done = 1;
+
+        $reject->( $_[0] );
+
+        # Proactively eliminate references:
+        $resolve = $reject = undef;
+    };
+
     for my $promise (@promises) {
         last if $is_done;
 
-        $promise->then(
-            sub {
-                return if $is_done;
-                $is_done = 1;
-
-                $resolve->( $_[0] );
-
-                # Proactively eliminate references:
-                $resolve = $reject = undef;
-            },
-            sub {
-                return if $is_done;
-                $is_done = 1;
-
-                $reject->( $_[0] );
-
-                # Proactively eliminate references:
-                $resolve = $reject = undef;
-            }
-        );
+        $promise->then( $on_resolve_cr, $on_reject_cr );
     }
 
     return $new;

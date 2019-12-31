@@ -1,6 +1,6 @@
 package Bundle::DadaMail;
 
-$VERSION = '0.0.9';
+$VERSION = '0.0.10';
 
 1;
 
@@ -61,6 +61,8 @@ HTML::Tree - used for Dada Mail's "Magic" templates, as well as manipulating HTM
 HTML::Element - same
 
 HTML::TreeBuilder - same
+
+HTTP::BrowserDetect - Makes reporting of user agents prettier
 
 Google::reCAPTCHA
 

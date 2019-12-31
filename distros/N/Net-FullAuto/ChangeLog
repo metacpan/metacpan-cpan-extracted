@@ -20,6 +20,15 @@
 #######################################################################
 
 
+2019-12-30  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000507 released
+
+        * Updated Instruction Set WordPress_is.pm.
+
+	* Removed mozrepl support in FA_Core.pm.
+
+
 2019-12-28  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000506 released

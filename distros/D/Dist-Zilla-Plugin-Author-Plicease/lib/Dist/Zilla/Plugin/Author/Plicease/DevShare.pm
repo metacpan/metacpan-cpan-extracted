@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::DevShare 2.39 {
+package Dist::Zilla::Plugin::Author::Plicease::DevShare 2.40 {
 
   use 5.014;
   use Moose;
@@ -38,7 +38,7 @@ package Dist::Zilla::Plugin::Author::Plicease::DevShare 2.39 {
     $self->log("DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED");
     $self->log("Please use File::ShareDir::Dist instead");
   
-    Path::Tiny->($filename)->spew($content);
+    Path::Tiny->($filename)->spew_raw($content);
   }
 
   __PACKAGE__->meta->make_immutable;
@@ -58,7 +58,7 @@ Dist::Zilla::Plugin::Author::Plicease::DevShare - Plugin to deal with dev/projec
 
 =head1 VERSION
 
-version 2.39
+version 2.40
 
 =head1 AUTHOR
 

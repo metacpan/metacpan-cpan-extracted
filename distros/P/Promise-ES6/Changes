@@ -1,5 +1,8 @@
 Revision history for Perl module Promise::ES6
 
+0.16 Tue 31 Dec 2019
+- Optimization: reuse coderefs in all() and race().
+
 0.15 Thu 19 Dec 2019
 - BUG FIX: Make all() ignore rejections after the first one.
 - Promise::ES6’s internal representation has changed to reduce memory usage.

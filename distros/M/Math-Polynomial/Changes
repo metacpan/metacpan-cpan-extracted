@@ -1,5 +1,8 @@
 Revision history for Perl extension Math::Polynomial.
 
+1.018   2019-12-30
+        - Added inflate.
+
 1.017   2019-12-17
         - Added lcm.
 

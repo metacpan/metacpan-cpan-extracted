@@ -4,6 +4,7 @@
 #include "../Array.h"
 #include "../Simple.h"
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 namespace xs {
@@ -56,6 +57,28 @@ template <typename K, typename V> struct Typemap<std::map<K,V>, std::map<K,V>> :
         }
         return out;
     }
+};
+
+template <typename K, typename V> struct Typemap<std::unordered_map<K, V>, std::unordered_map<K,V>> : TypemapBase<std::unordered_map<K,V>> {
+    static Sv out (const std::unordered_map<K,V>& data, const Sv& = {}) {
+        auto out = Hash::create(data.size());
+        for(const auto& i : data){
+            auto key = typemap::containers::to_key(i.first);
+            out.store(key, xs::out(i.second));
+        }
+        return Ref::create(out);
+    }
+
+    static std::unordered_map<K,V> in (Hash arg) {
+        std::unordered_map<K,V> out;
+        for (const auto& element : arg){
+            K key = xs::in<K>(Simple(element.key()));
+            V value = xs::in<V>(element.value());
+            out.emplace(key, value);
+        }
+        return out;
+    }
+
 };
 
 }

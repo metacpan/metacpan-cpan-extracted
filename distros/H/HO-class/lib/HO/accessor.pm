@@ -1,7 +1,8 @@
-  package HO::accessor
-# ++++++++++++++++++++
-; use strict; use warnings;
+package HO::accessor;
+# +++++++++++++++++++
+use strict; use warnings;
 our $VERSION='0.053';
+# +++++++++++++++++++
 
 ; use Class::ISA ()
 ; use Package::Subroutine ()
@@ -163,7 +164,7 @@ our $VERSION='0.053';
                                           : $typedefault
         }
     }
-; use Data::Dumper
+
 ; sub import
     { my ($package,$ac,$methods,$init,$new) = @_
     ; our %classes

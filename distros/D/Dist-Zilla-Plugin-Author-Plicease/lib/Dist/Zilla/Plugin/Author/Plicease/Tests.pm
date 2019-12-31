@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Tests 2.39 {
+package Dist::Zilla::Plugin::Author::Plicease::Tests 2.40 {
 
   use 5.014;
   use Moose;
@@ -158,7 +158,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Tests 2.39 {
       $self->add_file($file);
     }
   
-    $self->zilla->root->child(qw( t 00_diag.t ))->spew($content);
+    $self->zilla->root->child(qw( t 00_diag.t ))->spew_raw($content);
   }
   
   sub test
@@ -188,7 +188,7 @@ Dist::Zilla::Plugin::Author::Plicease::Tests - add author only release tests to 
 
 =head1 VERSION
 
-version 2.39
+version 2.40
 
 =head1 SYNOPSIS
 

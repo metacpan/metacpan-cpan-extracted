@@ -1,0 +1,121 @@
+=head1 NAME
+
+XS::STL::ErrorCode - Perl binding for C++ STL's std::error_code.
+
+
+
+=head1 SYNOPSIS
+
+    my $err = SomeFramework->some_method();
+    if ($err) {
+        say $err;
+        say $err->value;
+        say $err->category->name;
+        say $err->message;
+    }
+
+
+
+=head1 DESCRIPTION
+
+This binding is intended for use from XS modules that returns errors as C<std::error_code> objects to perl.
+It provides them with typemap for C<std::error_code> and Perl interface.
+
+This module comes with interface to all defined error codes and categories in STL.
+Usually XS modules make use of both STL's categories and custom categories, see certain module docs for details.
+
+
+
+=head1 API
+
+=head4 new($code, $category)
+
+Creates error code object from code and category. Normally you should not create these objects from perl.
+  
+    
+=head4 value()
+
+Returns error code value (integer)
+
+
+=head4 category()
+
+Returns error code category as L<XS::STL::ErrorCategory> object
+
+
+=head4 message()
+
+Returns error message
+
+
+=head4 operator bool
+
+Returns true if object contains error
+
+
+=head4 operator ""
+
+Stringifies to something like "<message>(<code>:<category>)", for example "Permission denied (13:generic)"
+
+
+=head4 operator ==, eq
+
+If second operand is a C<XS::STL::ErrorCode> object, compares code values and categories.
+
+If second operand is a number, then compares only code value with that number.
+
+If second operand is something else, return false
+
+
+
+=head1 List of STL's error codes and categories
+
+Categories (C<XS::STL::ErrorCategory> objects):
+
+=over
+
+=item XS::STL::generic_category
+
+=item XS::STL::system_category
+
+=item XS::STL::iostream_category
+
+=item XS::STL::future_category
+
+=back
+
+Error code constants are C<XS::STL::ErrorCode> objects, not just code values. So that
+
+    if ($err == XS::STL::errc::address_family_not_supported)
+    
+compares both code value and category.
+
+=over
+
+=item XS::STL::errc::*
+
+    XS::STL::errc::address_family_not_supported
+    XS::STL::errc::address_in_use
+    ...
+    
+See C++ C<std::errc> docs for full list and explanation
+
+=item XS::STL::io_errc::*
+
+=item XS::STL::future_errc::*
+
+=back
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut
+
+1;

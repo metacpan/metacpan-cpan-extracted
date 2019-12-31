@@ -1,7 +1,7 @@
 package Data::Clean;
 
-our $DATE = '2019-09-08'; # DATE
-our $VERSION = '0.505'; # VERSION
+our $DATE = '2019-11-18'; # DATE
+our $VERSION = '0.506'; # VERSION
 
 use 5.010001;
 use strict;
@@ -327,7 +327,7 @@ Data::Clean - Clean data structure
 
 =head1 VERSION
 
-This document describes version 0.505 of Data::Clean (from Perl distribution Data-Clean), released on 2019-09-08.
+This document describes version 0.506 of Data::Clean (from Perl distribution Data-Clean), released on 2019-11-18.
 
 =head1 SYNOPSIS
 
@@ -513,7 +513,7 @@ Clean $data. Clone $data first.
 =item * LOG_CLEANSER_CODE => BOOL (default: 0)
 
 Can be enabled if you want to see the generated cleanser code. It is logged at
-level C<trace>.
+level C<trace> using L<Log::ger>.
 
 =item * LINENUM => BOOL (default: 1)
 
@@ -547,7 +547,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

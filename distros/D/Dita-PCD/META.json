@@ -36,7 +36,7 @@
    "provides" : {
       "Dita::PCD" : {
          "file" : "lib/Dita/PCD.pm",
-         "version" : "20191230"
+         "version" : "20191231"
       }
    },
    "release_status" : "stable",
@@ -45,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20191230",
+   "version" : "20191231",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

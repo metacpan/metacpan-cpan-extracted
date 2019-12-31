@@ -1,0 +1,6 @@
+CREATE TABLE test (
+       	id INTEGER   PRIMARY KEY,
+	time	     DATETIME,
+       	status	     BOOLEAN,
+       	name	     VARCHAR(48)
+);

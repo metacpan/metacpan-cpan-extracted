@@ -4,6 +4,7 @@ MANIFEST
 MANIFEST.SKIP
 README
 lib/Dancer2/Plugin/DataTransposeValidator.pm
+lib/Dancer2/Plugin/DataTransposeValidator/Validator.pm
 t/appdir/validation/coderef1
 t/appdir/validation/rules1
 t/author/manifest.t
@@ -12,6 +13,7 @@ t/author/pod-coverage.t
 t/author/pod-spelling.t
 t/config.yml
 t/plugin.t
+t/validator.t
 t/lib/TestRules.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
