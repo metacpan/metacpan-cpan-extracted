@@ -1,4 +1,5 @@
 requires "Mojolicious" => "8";
+requires "Role::Tiny" => "2.000001";
 requires "perl" => "5.014";
 
 on 'test' => sub {

@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use File::Basename;
 
@@ -48,7 +48,8 @@ Valid %options are:
 
 I<-encode>
 ... changes the encoding of the font from its default.
-See I<perl's Encode> for the supported values.
+See I<perl's Encode> for the supported values. B<Warning:> only single byte 
+encodings are permitted. Multibyte encodings such as 'utf8' are forbidden.
 
 I<-pdfname> ... changes the reference-name of the font from its default.
 The reference-name is normally generated automatically and can be
@@ -217,6 +218,10 @@ sub new {
         $self->{'FontDescriptor'} = $self->descrByData();
     }
 
+    if ($opts{'-encode'} =~ m/^utf/i) {
+	die "Invalid multibyte encoding for corefont: $opts{'-encode'}\n";
+	# probably more encodings to check
+    }
     $self->encodeByData($opts{'-encode'});
 
     return $self;

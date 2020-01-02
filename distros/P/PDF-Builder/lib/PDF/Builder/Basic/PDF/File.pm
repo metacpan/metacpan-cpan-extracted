@@ -17,8 +17,8 @@ package PDF::Builder::Basic::PDF::File;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -522,7 +522,16 @@ sub readval {
             if      ($str =~ s|^/($reg_char+)||) {
                 my $key = PDF::Builder::Basic::PDF::Name::name_to_string($1, $self);
                 ($value, $str) = $self->readval($str, %opts);
-                $result->{$key} = $value;
+		# per Vadim Repin (RT 131147) CHG 1. His conclusion is that
+		# it is highly unlikely, but remotely possible, that there 
+		# could be legitimate use of Null objects that should NOT be
+		# prevented from bubbling up. If such a case is discovered, we
+		# might have to try Klaus Ethgen's more limited (in scope)
+		# patch in ./Pages.pm. See full discussion in RT 131147 for
+		# details on what's going on and how this fixes it.
+               #$result->{$key} = $value;  # original code
+                $result->{$key} = $value
+		   unless ref($value) eq 'PDF::Builder::Basic::PDF::Null';
             } elsif ($str =~ s|^/$ws_char+||) {
                 # fixes a broken key problem of acrobat. -- fredo
                 ($value, $str) = $self->readval($str, %opts);

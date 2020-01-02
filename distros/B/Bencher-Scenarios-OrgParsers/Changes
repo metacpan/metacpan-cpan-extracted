@@ -1,3 +1,8 @@
+0.002   2020-01-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [dist] Add dependency to Org::Examples distribution [RT#131305].
+
+
 0.001   2019-12-30  Released-By: PERLANCAR
 
         - First release.

@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 
@@ -96,17 +96,9 @@ is found in a different PDF file, not the current document.
 
 C<$page_number> is the physical page number, starting at 1: 1, 2,...
 
-The old name, I<pdfile>, is still available but is B<deprecated> and will be
-removed at some time in the future.
-
 =cut
 
-# to be removed no earlier than November 16, 2019
-sub pdfile {
-    my ($self, $url, $page_number, %options) = @_;
-    warn "use pdf_file() method instead of pdfile()";
-    return $self->pdf_file($url, $page_number, %options);
-}
+# Note: renamed from pdfile() to pdf_file().
 
 sub pdf_file {
     my ($self, $url, $page_number, %options) = @_;

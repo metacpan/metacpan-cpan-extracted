@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
+our $VERSION = '3.017'; # VERSION
 my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 # command line:
@@ -45,6 +45,8 @@ my @ignore_list = (
      "Symbols are exported by default", 
                               # it doesn't like something about our use of 
 			      # @EXPORT and @EXPORT_OK
+     "Pragma \"constant\" used at", # will have to investigate why "use constant"
+                                    # is flagged. TBD
   # common level 3 warnings to ignore for now
      '"die" used instead of "croak"',  # 
      '"warn" used instead of "carp"',  # 

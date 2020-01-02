@@ -1,9 +1,9 @@
 package Bencher::Scenario::OrgParsers::Parse;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-30'; # DATE
+our $DATE = '2020-01-02'; # DATE
 our $DIST = 'Bencher-Scenarios-OrgParsers'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ Bencher::Scenario::OrgParsers::Parse - Benchmark parsing
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::OrgParsers::Parse (from Perl distribution Bencher-Scenarios-OrgParsers), released on 2020-12-30.
+This document describes version 0.002 of Bencher::Scenario::OrgParsers::Parse (from Perl distribution Bencher-Scenarios-OrgParsers), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
@@ -100,19 +100,19 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.04 >>, OS kernel: I<< Linux version 5.0.0-37-generic >>.
 
 Benchmark with default options (C<< bencher -m OrgParsers::Parse >>):
 
  #table1#
- +-------------------+-------------------+-----------+-----------+------------+----------+---------+
- | participant       | dataset           | rate (/s) | time (ms) | vs_slowest |  errors  | samples |
- +-------------------+-------------------+-----------+-----------+------------+----------+---------+
- | Org::Parser       | 1000headlines.org |      11   |    89     |        1   |   0.0001 |      20 |
- | Org::Parser::Tiny | 1000headlines.org |      16.9 |    59.1   |        1.5 | 3.2e-05  |      20 |
- | Org::Parser       | various.org       |     589   |     1.7   |       52.2 | 1.3e-06  |      20 |
- | Org::Parser::Tiny | various.org       |   12000   |     0.083 |     1100   | 2.1e-07  |      21 |
- +-------------------+-------------------+-----------+-----------+------------+----------+---------+
+ +-------------------+-------------------+-----------+-----------+------------+---------+---------+
+ | participant       | dataset           | rate (/s) | time (ms) | vs_slowest |  errors | samples |
+ +-------------------+-------------------+-----------+-----------+------------+---------+---------+
+ | Org::Parser       | 1000headlines.org |      8.94 |     112   |       1    | 5.2e-05 |      20 |
+ | Org::Parser::Tiny | 1000headlines.org |     15.7  |      63.7 |       1.76 |   2e-05 |      21 |
+ | Org::Parser       | various.org       |    460    |       2.2 |      51    | 4.6e-06 |      20 |
+ | Org::Parser::Tiny | various.org       |   9700    |       0.1 |    1100    | 4.1e-07 |      22 |
+ +-------------------+-------------------+-----------+-----------+------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m OrgParsers::Parse --module-startup >>):
@@ -121,9 +121,9 @@ Benchmark module startup overhead (C<< bencher -m OrgParsers::Parse --module-sta
  +---------------------+-----------+------------------------+------------+---------+---------+
  | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------+-----------+------------------------+------------+---------+---------+
- | Org::Parser         |      31.1 |                     27 |        1   | 2.9e-05 |      20 |
- | Org::Parser::Tiny   |       6.1 |                      2 |        5.1 |   1e-05 |      20 |
- | perl -e1 (baseline) |       4.1 |                      0 |        7.5 | 8.1e-06 |      20 |
+ | Org::Parser         |      45.4 |                   36.5 |       1    |   2e-05 |      20 |
+ | Org::Parser::Tiny   |      11.4 |                    2.5 |       3.97 | 7.4e-06 |      21 |
+ | perl -e1 (baseline) |       8.9 |                    0   |       5.1  | 1.7e-05 |      20 |
  +---------------------+-----------+------------------------+------------+---------+---------+
 
 
@@ -153,7 +153,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

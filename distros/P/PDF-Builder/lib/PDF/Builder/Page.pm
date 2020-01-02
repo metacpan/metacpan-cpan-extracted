@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use POSIX qw(floor);
 use Scalar::Util qw(weaken);
@@ -365,6 +365,11 @@ sub get_artbox {
 =item $page->rotate($deg)
 
 Rotates the page by the given degrees, which must be a multiple of 90.
+An angle that is not a multiple of 90 will be rounded to the nearest 90 
+degrees, with a message.
+Note that the rotation angle is I<clockwise> for a positive amount!
+E.g., a rotation of +90 (or -270) will have the bottom edge of the paper at
+the left of the screen.
 
 (This allows you to auto-rotate to landscape without changing the mediabox!)
 
@@ -374,7 +379,12 @@ sub rotate {
     my ($self, $degrees) = @_;
 
     # Ignore rotation of 360 or more (in either direction)
-    $degrees = $degrees % 360;
+    $degrees = $degrees % 360; # range [0, 360)
+    if ($degrees % 90) {
+      my $deg = int(($degrees + 45)/90)*90;
+      warn "page rotate($degrees) invalid, not multiple of 90 degrees.\nChanged to $deg";
+      $degrees = $deg;
+    }
 
     $self->{'Rotate'} = PDFNum($degrees);
 

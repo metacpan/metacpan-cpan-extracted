@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use Log::ger;
+use Log::ger::App;
+
+use DateTime::Format::Flexible;
+use HTTP::Tiny::Cache;
+
+my $url = "https://www.un.org/en/sections/observances/international-days/";
+my $res  = HTTP::Tiny::Cache->new->get($url);
+die "Can't get $url: $res->{reason}" unless $res->{success};
+
+$res->{content} =~ s/\302\240/ /g or die;
+
+#log_trace "content=<<%s>>", $res->{content};
+
+my @matches;
+while ($res->{content} =~ m!<h4>(?:<a[^>]+>.*?</a>)?(.+?)</h4>\s*<p>(?:<a href="([^"]+)">)?([^<]+)!g) {
+    # XXX store URL
+    push @matches, [undef, $1, $2, $3];
+}
+
+for my $match (@matches) {
+    if ($match->[1] =~ s/((\d+)(-\d+)(.+))/$2$4/) {
+        $match->[3] .= " ($1)";
+    }
+
+    #my $dt = DateTime::Format::Natural->new->parse_datetime($match->[1])
+    my $dt;
+    eval { $dt = DateTime::Format::Flexible->parse_datetime($match->[1]) };
+    if ($@) {
+        log_warn "Skipping entry %s: can't parse date", $match;
+        next;
+    }
+    printf "--%02d-%02d;%s;anniversary\n", $dt->month, $dt->day, $match->[3];
+}
+
+#use DD; dd \@matches;

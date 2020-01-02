@@ -1,0 +1,56 @@
+<%
+    my $classes = stash 'classes';
+    my $navbar_class = $classes->{navbar};
+    # The default navbar is responsive at "large" screens. To disable
+    # responsiveness, add the 'navbar-expand' class.
+    if ( $classes->{navbar} !~ /^navbar-expand/ ) {
+        $navbar_class = join ' ', $navbar_class, 'navbar-expand-lg';
+    }
+    # The default navbar has a light background
+    #if ( $classes->{navbar} !~ /^navbar-light/ ) {
+    #    $navbar_class = join ' ', $navbar_class, 'navbar-light';
+    #}
+
+    my $position = stash( 'position' ) // '';
+    if ( $position =~ /^fixed(?:-(top|bottom))?$/ ) {
+        my $class = 'fixed-' . ( $1 || 'top' );
+        $navbar_class = join ' ', $navbar_class, $class;
+    }
+    elsif ( $position =~ /^sticky(?:-(top))?$/ ) {
+        my $class = 'sticky-' . ( $1 || 'top' );
+        $navbar_class = join ' ', $navbar_class, $class;
+    }
+
+    state $nav_number = 0;
+    $nav_number++;
+    my $collapse_id = stash( 'id' ) ? stash( 'id' ) . '-collapse'
+                    : 'moai-menu-navbar-' . $nav_number . '-collapse'
+                    ;
+=%>
+<nav class="navbar <%= $navbar_class %>" id="<%= stash( 'id' ) %>">
+    % if ( my $brand = stash 'brand' ) {
+    <a class="navbar-brand" href="<%= url_for $brand->[1] %>">
+        <%== $brand->[0] %>
+    </a>
+    % }
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+        data-target="#<%= $collapse_id %>" aria-controls="<%= $collapse_id %>"
+        aria-expanded="false" aria-label="Toggle navigation"
+    >
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="<%= $collapse_id %>">
+        <div class="navbar-nav">
+            % for my $menu_item ( @{ stash( 'menu' ) || [] } ) {
+                <a class="nav-item nav-link <%= current_route( $menu_item->[1] ) ? 'active' : '' %>"
+                    href="<%= url_for $menu_item->[1] %>"
+                >
+                    <%== $menu_item->[0] %>
+                    % if ( current_route( $menu_item->[1] ) ) {
+                    <span class="sr-only">(current)</span>
+                    % }
+                </a>
+            % }
+        </div>
+    </div>
+</nav>

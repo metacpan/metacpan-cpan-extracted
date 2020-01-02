@@ -1,0 +1,1901 @@
+NAME
+    Calendar::Dates::UnitedNations::InternationalDays - United Nations'
+    International Days
+
+VERSION
+    This document describes version 0.001 of
+    Calendar::Dates::UnitedNations::InternationalDays (from Perl
+    distribution Calendar-Dates-UnitedNations-InternationalDays), released
+    on 2020-01-01.
+
+SYNOPSIS
+  Using from Perl
+     use Calendar::Dates::UnitedNations::InternationalDays;
+     my $min_year = Calendar::Dates::UnitedNations::InternationalDays->get_min_year; # => 1582
+     my $max_year = Calendar::Dates::UnitedNations::InternationalDays->get_max_year; # => 9999
+     my $entries  = Calendar::Dates::UnitedNations::InternationalDays->get_entries(2020);
+
+    $entries result:
+
+     [
+       {
+         date    => "2020-01-04",
+         day     => 4,
+         month   => 1,
+         summary => "World Braille Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-01-24",
+         day     => 24,
+         month   => 1,
+         summary => "International Day of Education",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-01-27",
+         day     => 27,
+         month   => 1,
+         summary => "International Day of Commemoration in Memory of the Victims of the Holocaust",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-02-04",
+         day     => 4,
+         month   => 2,
+         summary => "World Cancer Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-02-06",
+         day     => 6,
+         month   => 2,
+         summary => "International Day of Zero Tolerance to Female Genital Mutilation",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-02-10",
+         day     => 10,
+         month   => 2,
+         summary => "World Pulses Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-02-11",
+         day     => 11,
+         month   => 2,
+         summary => "International Day of Women and Girls in Science",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-02-13",
+         day     => 13,
+         month   => 2,
+         summary => "World Radio Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-02-20",
+         day     => 20,
+         month   => 2,
+         summary => "World Day of Social Justice ",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-02-21",
+         day     => 21,
+         month   => 2,
+         summary => "International Mother Language Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-01",
+         day     => 1,
+         month   => 3,
+         summary => "Zero Discrimination Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-03",
+         day     => 3,
+         month   => 3,
+         summary => "World Wildlife Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-08",
+         day     => 8,
+         month   => 3,
+         summary => "International Women's Day ",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-20",
+         day     => 20,
+         month   => 3,
+         summary => "International Day of Happiness",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-20",
+         day     => 20,
+         month   => 3,
+         summary => "French Language Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-21",
+         day     => 21,
+         month   => 3,
+         summary => "International Day for the Elimination of Racial Discrimination",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-21",
+         day     => 21,
+         month   => 3,
+         summary => "World Poetry Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-21",
+         day     => 21,
+         month   => 3,
+         summary => "International Day of Nowruz",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-21",
+         day     => 21,
+         month   => 3,
+         summary => "World Down Syndrome Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-21",
+         day     => 21,
+         month   => 3,
+         summary => "International Day of Forests",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-22",
+         day     => 22,
+         month   => 3,
+         summary => "World Water Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-23",
+         day     => 23,
+         month   => 3,
+         summary => "World Meteorological Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-24",
+         day     => 24,
+         month   => 3,
+         summary => "World Tuberculosis Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-24",
+         day     => 24,
+         month   => 3,
+         summary => "International Day for the Right to the Truth concerning Gross Human Rights Violations and for the Dignity of Victims",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-25",
+         day     => 25,
+         month   => 3,
+         summary => "International Day of Remembrance of the Victims of Slavery and the Transatlantic Slave Trade",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-03-25",
+         day     => 25,
+         month   => 3,
+         summary => "International Day of Solidarity with Detained and Missing Staff Members",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-02",
+         day     => 2,
+         month   => 4,
+         summary => "World Autism Awareness Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-04",
+         day     => 4,
+         month   => 4,
+         summary => "International Day for Mine Awareness and Assistance in Mine Action",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-06",
+         day     => 6,
+         month   => 4,
+         summary => "International Day of Sport for Development and Peace",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-07",
+         day     => 7,
+         month   => 4,
+         summary => "International Day of Reflection on the 1994 Genocide against the Tutsi in Rwanda ",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-07",
+         day     => 7,
+         month   => 4,
+         summary => "World Health Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-12",
+         day     => 12,
+         month   => 4,
+         summary => "International Day of Human Space Flight",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-20",
+         day     => 20,
+         month   => 4,
+         summary => "Chinese Language Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-21",
+         day     => 21,
+         month   => 4,
+         summary => "World Creativity and Innovation Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-22",
+         day     => 22,
+         month   => 4,
+         summary => "International Mother Earth Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-23",
+         day     => 23,
+         month   => 4,
+         summary => "World Book and Copyright Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-23",
+         day     => 23,
+         month   => 4,
+         summary => "English Language Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-23",
+         day     => 23,
+         month   => 4,
+         summary => "Spanish Language Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-24",
+         day     => 24,
+         month   => 4,
+         summary => "International Day of Multilateralism and Diplomacy for Peace",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-25",
+         day     => 25,
+         month   => 4,
+         summary => "International Delegate\xE2\x80\x99s Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-25",
+         day     => 25,
+         month   => 4,
+         summary => "World Malaria Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-25",
+         day     => 25,
+         month   => 4,
+         summary => "International Girls in ICT Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-26",
+         day     => 26,
+         month   => 4,
+         summary => "International Chernobyl Disaster Remembrance Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-26",
+         day     => 26,
+         month   => 4,
+         summary => "World Intellectual Property Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-28",
+         day     => 28,
+         month   => 4,
+         summary => "World Day for Safety and Health at Work",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-04-30",
+         day     => 30,
+         month   => 4,
+         summary => "International Jazz Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-02",
+         day     => 2,
+         month   => 5,
+         summary => "World Tuna Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-03",
+         day     => 3,
+         month   => 5,
+         summary => "World Press Freedom Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-07",
+         day     => 7,
+         month   => 5,
+         summary => "\"Vesak\", the Day of the Full Moon",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-08",
+         day     => 8,
+         month   => 5,
+         summary => "Time of Remembrance and Reconciliation for Those Who Lost Their Lives During the Second World War (8-9 May)",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-15",
+         day     => 15,
+         month   => 5,
+         summary => "International Day of Families",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-16",
+         day     => 16,
+         month   => 5,
+         summary => "International Day of Living Together in Peace",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-16",
+         day     => 16,
+         month   => 5,
+         summary => "International Day of Light",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-17",
+         day     => 17,
+         month   => 5,
+         summary => "World Telecommunication and Information Society Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-20",
+         day     => 20,
+         month   => 5,
+         summary => "World Bee Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-21",
+         day     => 21,
+         month   => 5,
+         summary => "International Tea Day (A/RES/74/241) (",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-21",
+         day     => 21,
+         month   => 5,
+         summary => "World Day for Cultural Diversity for Dialogue and Development",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-22",
+         day     => 22,
+         month   => 5,
+         summary => "International Day for Biological Diversity",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-23",
+         day     => 23,
+         month   => 5,
+         summary => "International Day to End Obstetric Fistula",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-29",
+         day     => 29,
+         month   => 5,
+         summary => "International Day of UN Peacekeepers",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-05-31",
+         day     => 31,
+         month   => 5,
+         summary => "World No-Tobacco Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-01",
+         day     => 1,
+         month   => 6,
+         summary => "Global Day of Parents",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-03",
+         day     => 3,
+         month   => 6,
+         summary => "World Bicycle Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-04",
+         day     => 4,
+         month   => 6,
+         summary => "International Day of Innocent Children Victims of Aggression",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-05",
+         day     => 5,
+         month   => 6,
+         summary => "World Environment Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-05",
+         day     => 5,
+         month   => 6,
+         summary => "International Day for the Fight against Illegal, Unreported and Unregulated Fishing",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-06",
+         day     => 6,
+         month   => 6,
+         summary => "Russian Language Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-07",
+         day     => 7,
+         month   => 6,
+         summary => "World Food Safety Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-08",
+         day     => 8,
+         month   => 6,
+         summary => "World Oceans Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-12",
+         day     => 12,
+         month   => 6,
+         summary => "World Day Against Child Labour",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-13",
+         day     => 13,
+         month   => 6,
+         summary => "International Albinism Awareness Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-14",
+         day     => 14,
+         month   => 6,
+         summary => "World Blood Donor Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-15",
+         day     => 15,
+         month   => 6,
+         summary => "World Elder Abuse Awareness Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-16",
+         day     => 16,
+         month   => 6,
+         summary => "International Day of Family Remittances",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-17",
+         day     => 17,
+         month   => 6,
+         summary => "World Day to Combat Desertification and Drought",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-18",
+         day     => 18,
+         month   => 6,
+         summary => "Sustainable Gastronomy Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-19",
+         day     => 19,
+         month   => 6,
+         summary => "International Day for the Elimination of Sexual Violence in Conflict",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-20",
+         day     => 20,
+         month   => 6,
+         summary => "World Refugee Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-21",
+         day     => 21,
+         month   => 6,
+         summary => "International Day of Yoga",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-21",
+         day     => 21,
+         month   => 6,
+         summary => "International Day of the Celebration of the Solstice",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-23",
+         day     => 23,
+         month   => 6,
+         summary => "United Nations Public Service Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-23",
+         day     => 23,
+         month   => 6,
+         summary => "International Widows' Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-25",
+         day     => 25,
+         month   => 6,
+         summary => "Day of the Seafarer",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-26",
+         day     => 26,
+         month   => 6,
+         summary => "International Day against Drug Abuse and Illicit Trafficking",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-26",
+         day     => 26,
+         month   => 6,
+         summary => "United Nations International Day in Support of Victims of Torture",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-27",
+         day     => 27,
+         month   => 6,
+         summary => "Micro-, Small and Medium-sized Enterprises Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-29",
+         day     => 29,
+         month   => 6,
+         summary => "International Day of the Tropics",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-30",
+         day     => 30,
+         month   => 6,
+         summary => "International Asteroid Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-06-30",
+         day     => 30,
+         month   => 6,
+         summary => "International Day of Parliamentarism",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-07-11",
+         day     => 11,
+         month   => 7,
+         summary => "World Population Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-07-15",
+         day     => 15,
+         month   => 7,
+         summary => "World Youth Skills Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-07-18",
+         day     => 18,
+         month   => 7,
+         summary => "Nelson Mandela International Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-07-20",
+         day     => 20,
+         month   => 7,
+         summary => "World Chess Day (",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-07-28",
+         day     => 28,
+         month   => 7,
+         summary => "World Hepatitis Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-07-30",
+         day     => 30,
+         month   => 7,
+         summary => "International Day of Friendship",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-07-30",
+         day     => 30,
+         month   => 7,
+         summary => "World Day against Trafficking in Persons",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-08-09",
+         day     => 9,
+         month   => 8,
+         summary => "International Day of the World's Indigenous Peoples",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-08-12",
+         day     => 12,
+         month   => 8,
+         summary => "International Youth Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-08-19",
+         day     => 19,
+         month   => 8,
+         summary => "World Humanitarian Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-08-21",
+         day     => 21,
+         month   => 8,
+         summary => "International Day of Remembrance and Tribute to the Victims of Terrorism",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-08-22",
+         day     => 22,
+         month   => 8,
+         summary => "International Day Commemorating the Victims of Acts of Violence Based on Religion or Belief",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-08-23",
+         day     => 23,
+         month   => 8,
+         summary => "International Day for the Remembrance of the Slave Trade and Its Abolition",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-08-29",
+         day     => 29,
+         month   => 8,
+         summary => "International Day against Nuclear Tests",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-08-30",
+         day     => 30,
+         month   => 8,
+         summary => "International Day of the Victims of Enforced Disappearances",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-05",
+         day     => 5,
+         month   => 9,
+         summary => "International Day of Charity",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-07",
+         day     => 7,
+         month   => 9,
+         summary => "International Day of Clean Air for blue skies (A/RES/74/212) (",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-08",
+         day     => 8,
+         month   => 9,
+         summary => "International Literacy Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-10",
+         day     => 10,
+         month   => 9,
+         summary => "World Suicide Prevention Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-12",
+         day     => 12,
+         month   => 9,
+         summary => "United Nations Day for South-South Cooperation",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-15",
+         day     => 15,
+         month   => 9,
+         summary => "International Day of Democracy",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-16",
+         day     => 16,
+         month   => 9,
+         summary => "International Day for the Preservation of the Ozone Layer",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-18",
+         day     => 18,
+         month   => 9,
+         summary => "International Equal Pay Day (",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-21",
+         day     => 21,
+         month   => 9,
+         summary => "International Day of Peace",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-23",
+         day     => 23,
+         month   => 9,
+         summary => "International Day of Sign Languages",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-26",
+         day     => 26,
+         month   => 9,
+         summary => "International Day for the Total Elimination of Nuclear Weapons",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-27",
+         day     => 27,
+         month   => 9,
+         summary => "World Tourism Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-28",
+         day     => 28,
+         month   => 9,
+         summary => "International Day for Universal Access to Information",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-28",
+         day     => 28,
+         month   => 9,
+         summary => "World Rabies Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-29",
+         day     => 29,
+         month   => 9,
+         summary => "International Day of Awareness of Food Loss and Waste (A/RES/74/209) (",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-09-30",
+         day     => 30,
+         month   => 9,
+         summary => "International Translation Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-01",
+         day     => 1,
+         month   => 10,
+         summary => "International Day of Older Persons",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-02",
+         day     => 2,
+         month   => 10,
+         summary => "International Day of Non-Violence",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-05",
+         day     => 5,
+         month   => 10,
+         summary => "World Teachers\xE2\x80\x99 Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-09",
+         day     => 9,
+         month   => 10,
+         summary => "World Post Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-10",
+         day     => 10,
+         month   => 10,
+         summary => "World Mental Health Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-11",
+         day     => 11,
+         month   => 10,
+         summary => "International Day of the Girl Child",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-13",
+         day     => 13,
+         month   => 10,
+         summary => "International Day for Disaster Risk Reduction",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-15",
+         day     => 15,
+         month   => 10,
+         summary => "International Day of Rural Women",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-16",
+         day     => 16,
+         month   => 10,
+         summary => "World Food Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-17",
+         day     => 17,
+         month   => 10,
+         summary => "International Day for the Eradication of Poverty",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-24",
+         day     => 24,
+         month   => 10,
+         summary => "United Nations Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-24",
+         day     => 24,
+         month   => 10,
+         summary => "World Development Information Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-27",
+         day     => 27,
+         month   => 10,
+         summary => "World Day for Audiovisual Heritage",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-10-31",
+         day     => 31,
+         month   => 10,
+         summary => "World Cities Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-02",
+         day     => 2,
+         month   => 11,
+         summary => "International Day to End Impunity for Crimes against Journalists",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-05",
+         day     => 5,
+         month   => 11,
+         summary => "World Tsunami Awareness Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-06",
+         day     => 6,
+         month   => 11,
+         summary => "International Day for Preventing the Exploitation of the Environment in War and Armed Conflict ",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-10",
+         day     => 10,
+         month   => 11,
+         summary => "World Science Day for Peace and Development",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-14",
+         day     => 14,
+         month   => 11,
+         summary => "World Diabetes Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-16",
+         day     => 16,
+         month   => 11,
+         summary => "International Day for Tolerance",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-19",
+         day     => 19,
+         month   => 11,
+         summary => "World Toilet Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-20",
+         day     => 20,
+         month   => 11,
+         summary => "Africa Industrialization Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-20",
+         day     => 20,
+         month   => 11,
+         summary => "World Children's Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-21",
+         day     => 21,
+         month   => 11,
+         summary => "World Television Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-25",
+         day     => 25,
+         month   => 11,
+         summary => "International Day for the Elimination of Violence against Women",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-29",
+         day     => 29,
+         month   => 11,
+         summary => "International Day of Solidarity with the Palestinian People",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-11-30",
+         day     => 30,
+         month   => 11,
+         summary => "Day of Remembrance for all Victims of Chemical Warfare",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-01",
+         day     => 1,
+         month   => 12,
+         summary => "World AIDS Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-02",
+         day     => 2,
+         month   => 12,
+         summary => "International Day for the Abolition of Slavery",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-03",
+         day     => 3,
+         month   => 12,
+         summary => "International Day of Persons with Disabilities",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-04",
+         day     => 4,
+         month   => 12,
+         summary => "International Day of Banks (A/RES/74/245) (",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-05",
+         day     => 5,
+         month   => 12,
+         summary => "International Volunteer Day for Economic and Social Development",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-05",
+         day     => 5,
+         month   => 12,
+         summary => "World Soil Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-07",
+         day     => 7,
+         month   => 12,
+         summary => "International Civil Aviation Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-09",
+         day     => 9,
+         month   => 12,
+         summary => "International Day of Commemoration and Dignity of the Victims of the Crime of Genocide and of the Prevention of this Crime",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-09",
+         day     => 9,
+         month   => 12,
+         summary => "International Anti-Corruption Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-10",
+         day     => 10,
+         month   => 12,
+         summary => "Human Rights Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-11",
+         day     => 11,
+         month   => 12,
+         summary => "International Mountain Day ",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-12",
+         day     => 12,
+         month   => 12,
+         summary => "International Day of Neutrality",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-12",
+         day     => 12,
+         month   => 12,
+         summary => "International Universal Health Coverage Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-18",
+         day     => 18,
+         month   => 12,
+         summary => "International Migrants Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-18",
+         day     => 18,
+         month   => 12,
+         summary => "Arabic Language Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+       {
+         date    => "2020-12-20",
+         day     => 20,
+         month   => 12,
+         summary => "International Human Solidarity Day",
+         tags    => ["anniversary"],
+         year    => 2020,
+       },
+     ]
+
+  Using from CLI (requires list-calendar-dates and calx)
+     % list-calendar-dates -l -m UnitedNations::InternationalDays
+     % calx -c UnitedNations::InternationalDays
+
+DESCRIPTION
+    Currently only days with fixed date in Gregorian calendar are included.
+    These are not:
+
+     11 May (second Saturday of May)                   World Migratory Bird Day
+     6 July (first Saturday in July)                   International Day of Cooperatives
+     26 September (last Thursday of September          World Maritime Day
+     7 October (first Monday in October)               World Habitat Day
+     12 October (second Saturday of October)           World Migratory Bird Day
+     20 October (every five years, beginning in 2010)  World Statistics Day
+     17 November (third Sunday in November)            World Day of Remembrance for Road Traffic Victims
+     21 November (third Thursday in November)          World Philosophy Day
+
+DATES STATISTICS
+     +---------------+-------+
+     | key           | value |
+     +---------------+-------+
+     | Earliest year | 1582  |
+     | Latest year   | 9999  |
+     +---------------+-------+
+
+DATES SAMPLES
+    Entries for year 2019:
+
+     +------------+-----+-------+----------------------------------------------------------------------------------------------------------------------------+-------------+------+
+     | date       | day | month | summary                                                                                                                    | tags        | year |
+     +------------+-----+-------+----------------------------------------------------------------------------------------------------------------------------+-------------+------+
+     | 2019-01-04 | 4   | 1     | World Braille Day                                                                                                          | anniversary | 2019 |
+     | 2019-01-24 | 24  | 1     | International Day of Education                                                                                             | anniversary | 2019 |
+     | 2019-01-27 | 27  | 1     | International Day of Commemoration in Memory of the Victims of the Holocaust                                               | anniversary | 2019 |
+     | 2019-02-04 | 4   | 2     | World Cancer Day                                                                                                           | anniversary | 2019 |
+     | 2019-02-06 | 6   | 2     | International Day of Zero Tolerance to Female Genital Mutilation                                                           | anniversary | 2019 |
+     | 2019-02-10 | 10  | 2     | World Pulses Day                                                                                                           | anniversary | 2019 |
+     | 2019-02-11 | 11  | 2     | International Day of Women and Girls in Science                                                                            | anniversary | 2019 |
+     | 2019-02-13 | 13  | 2     | World Radio Day                                                                                                            | anniversary | 2019 |
+     | 2019-02-20 | 20  | 2     | World Day of Social Justice                                                                                                | anniversary | 2019 |
+     | 2019-02-21 | 21  | 2     | International Mother Language Day                                                                                          | anniversary | 2019 |
+     | 2019-03-01 | 1   | 3     | Zero Discrimination Day                                                                                                    | anniversary | 2019 |
+     | 2019-03-03 | 3   | 3     | World Wildlife Day                                                                                                         | anniversary | 2019 |
+     | 2019-03-08 | 8   | 3     | International Women's Day                                                                                                  | anniversary | 2019 |
+     | 2019-03-20 | 20  | 3     | International Day of Happiness                                                                                             | anniversary | 2019 |
+     | 2019-03-20 | 20  | 3     | French Language Day                                                                                                        | anniversary | 2019 |
+     | 2019-03-21 | 21  | 3     | International Day for the Elimination of Racial Discrimination                                                             | anniversary | 2019 |
+     | 2019-03-21 | 21  | 3     | World Poetry Day                                                                                                           | anniversary | 2019 |
+     | 2019-03-21 | 21  | 3     | International Day of Nowruz                                                                                                | anniversary | 2019 |
+     | 2019-03-21 | 21  | 3     | World Down Syndrome Day                                                                                                    | anniversary | 2019 |
+     | 2019-03-21 | 21  | 3     | International Day of Forests                                                                                               | anniversary | 2019 |
+     | 2019-03-22 | 22  | 3     | World Water Day                                                                                                            | anniversary | 2019 |
+     | 2019-03-23 | 23  | 3     | World Meteorological Day                                                                                                   | anniversary | 2019 |
+     | 2019-03-24 | 24  | 3     | World Tuberculosis Day                                                                                                     | anniversary | 2019 |
+     | 2019-03-24 | 24  | 3     | International Day for the Right to the Truth concerning Gross Human Rights Violations and for the Dignity of Victims       | anniversary | 2019 |
+     | 2019-03-25 | 25  | 3     | International Day of Remembrance of the Victims of Slavery and the Transatlantic Slave Trade                               | anniversary | 2019 |
+     | 2019-03-25 | 25  | 3     | International Day of Solidarity with Detained and Missing Staff Members                                                    | anniversary | 2019 |
+     | 2019-04-02 | 2   | 4     | World Autism Awareness Day                                                                                                 | anniversary | 2019 |
+     | 2019-04-04 | 4   | 4     | International Day for Mine Awareness and Assistance in Mine Action                                                         | anniversary | 2019 |
+     | 2019-04-06 | 6   | 4     | International Day of Sport for Development and Peace                                                                       | anniversary | 2019 |
+     | 2019-04-07 | 7   | 4     | International Day of Reflection on the 1994 Genocide against the Tutsi in Rwanda                                           | anniversary | 2019 |
+     | 2019-04-07 | 7   | 4     | World Health Day                                                                                                           | anniversary | 2019 |
+     | 2019-04-12 | 12  | 4     | International Day of Human Space Flight                                                                                    | anniversary | 2019 |
+     | 2019-04-20 | 20  | 4     | Chinese Language Day                                                                                                       | anniversary | 2019 |
+     | 2019-04-21 | 21  | 4     | World Creativity and Innovation Day                                                                                        | anniversary | 2019 |
+     | 2019-04-22 | 22  | 4     | International Mother Earth Day                                                                                             | anniversary | 2019 |
+     | 2019-04-23 | 23  | 4     | World Book and Copyright Day                                                                                               | anniversary | 2019 |
+     | 2019-04-23 | 23  | 4     | English Language Day                                                                                                       | anniversary | 2019 |
+     | 2019-04-23 | 23  | 4     | Spanish Language Day                                                                                                       | anniversary | 2019 |
+     | 2019-04-24 | 24  | 4     | International Day of Multilateralism and Diplomacy for Peace                                                               | anniversary | 2019 |
+     | 2019-04-25 | 25  | 4     | International Delegateâs Day                                                                                             | anniversary | 2019 |
+     | 2019-04-25 | 25  | 4     | World Malaria Day                                                                                                          | anniversary | 2019 |
+     | 2019-04-25 | 25  | 4     | International Girls in ICT Day                                                                                             | anniversary | 2019 |
+     | 2019-04-26 | 26  | 4     | International Chernobyl Disaster Remembrance Day                                                                           | anniversary | 2019 |
+     | 2019-04-26 | 26  | 4     | World Intellectual Property Day                                                                                            | anniversary | 2019 |
+     | 2019-04-28 | 28  | 4     | World Day for Safety and Health at Work                                                                                    | anniversary | 2019 |
+     | 2019-04-30 | 30  | 4     | International Jazz Day                                                                                                     | anniversary | 2019 |
+     | 2019-05-02 | 2   | 5     | World Tuna Day                                                                                                             | anniversary | 2019 |
+     | 2019-05-03 | 3   | 5     | World Press Freedom Day                                                                                                    | anniversary | 2019 |
+     | 2019-05-07 | 7   | 5     | "Vesak", the Day of the Full Moon                                                                                          | anniversary | 2019 |
+     | 2019-05-08 | 8   | 5     | Time of Remembrance and Reconciliation for Those Who Lost Their Lives During the Second World War (8-9 May)                | anniversary | 2019 |
+     | 2019-05-15 | 15  | 5     | International Day of Families                                                                                              | anniversary | 2019 |
+     | 2019-05-16 | 16  | 5     | International Day of Living Together in Peace                                                                              | anniversary | 2019 |
+     | 2019-05-16 | 16  | 5     | International Day of Light                                                                                                 | anniversary | 2019 |
+     | 2019-05-17 | 17  | 5     | World Telecommunication and Information Society Day                                                                        | anniversary | 2019 |
+     | 2019-05-20 | 20  | 5     | World Bee Day                                                                                                              | anniversary | 2019 |
+     | 2019-05-21 | 21  | 5     | International Tea Day (A/RES/74/241) (                                                                                     | anniversary | 2019 |
+     | 2019-05-21 | 21  | 5     | World Day for Cultural Diversity for Dialogue and Development                                                              | anniversary | 2019 |
+     | 2019-05-22 | 22  | 5     | International Day for Biological Diversity                                                                                 | anniversary | 2019 |
+     | 2019-05-23 | 23  | 5     | International Day to End Obstetric Fistula                                                                                 | anniversary | 2019 |
+     | 2019-05-29 | 29  | 5     | International Day of UN Peacekeepers                                                                                       | anniversary | 2019 |
+     | 2019-05-31 | 31  | 5     | World No-Tobacco Day                                                                                                       | anniversary | 2019 |
+     | 2019-06-01 | 1   | 6     | Global Day of Parents                                                                                                      | anniversary | 2019 |
+     | 2019-06-03 | 3   | 6     | World Bicycle Day                                                                                                          | anniversary | 2019 |
+     | 2019-06-04 | 4   | 6     | International Day of Innocent Children Victims of Aggression                                                               | anniversary | 2019 |
+     | 2019-06-05 | 5   | 6     | World Environment Day                                                                                                      | anniversary | 2019 |
+     | 2019-06-05 | 5   | 6     | International Day for the Fight against Illegal, Unreported and Unregulated Fishing                                        | anniversary | 2019 |
+     | 2019-06-06 | 6   | 6     | Russian Language Day                                                                                                       | anniversary | 2019 |
+     | 2019-06-07 | 7   | 6     | World Food Safety Day                                                                                                      | anniversary | 2019 |
+     | 2019-06-08 | 8   | 6     | World Oceans Day                                                                                                           | anniversary | 2019 |
+     | 2019-06-12 | 12  | 6     | World Day Against Child Labour                                                                                             | anniversary | 2019 |
+     | 2019-06-13 | 13  | 6     | International Albinism Awareness Day                                                                                       | anniversary | 2019 |
+     | 2019-06-14 | 14  | 6     | World Blood Donor Day                                                                                                      | anniversary | 2019 |
+     | 2019-06-15 | 15  | 6     | World Elder Abuse Awareness Day                                                                                            | anniversary | 2019 |
+     | 2019-06-16 | 16  | 6     | International Day of Family Remittances                                                                                    | anniversary | 2019 |
+     | 2019-06-17 | 17  | 6     | World Day to Combat Desertification and Drought                                                                            | anniversary | 2019 |
+     | 2019-06-18 | 18  | 6     | Sustainable Gastronomy Day                                                                                                 | anniversary | 2019 |
+     | 2019-06-19 | 19  | 6     | International Day for the Elimination of Sexual Violence in Conflict                                                       | anniversary | 2019 |
+     | 2019-06-20 | 20  | 6     | World Refugee Day                                                                                                          | anniversary | 2019 |
+     | 2019-06-21 | 21  | 6     | International Day of Yoga                                                                                                  | anniversary | 2019 |
+     | 2019-06-21 | 21  | 6     | International Day of the Celebration of the Solstice                                                                       | anniversary | 2019 |
+     | 2019-06-23 | 23  | 6     | United Nations Public Service Day                                                                                          | anniversary | 2019 |
+     | 2019-06-23 | 23  | 6     | International Widows' Day                                                                                                  | anniversary | 2019 |
+     | 2019-06-25 | 25  | 6     | Day of the Seafarer                                                                                                        | anniversary | 2019 |
+     | 2019-06-26 | 26  | 6     | International Day against Drug Abuse and Illicit Trafficking                                                               | anniversary | 2019 |
+     | 2019-06-26 | 26  | 6     | United Nations International Day in Support of Victims of Torture                                                          | anniversary | 2019 |
+     | 2019-06-27 | 27  | 6     | Micro-, Small and Medium-sized Enterprises Day                                                                             | anniversary | 2019 |
+     | 2019-06-29 | 29  | 6     | International Day of the Tropics                                                                                           | anniversary | 2019 |
+     | 2019-06-30 | 30  | 6     | International Asteroid Day                                                                                                 | anniversary | 2019 |
+     | 2019-06-30 | 30  | 6     | International Day of Parliamentarism                                                                                       | anniversary | 2019 |
+     | 2019-07-11 | 11  | 7     | World Population Day                                                                                                       | anniversary | 2019 |
+     | 2019-07-15 | 15  | 7     | World Youth Skills Day                                                                                                     | anniversary | 2019 |
+     | 2019-07-18 | 18  | 7     | Nelson Mandela International Day                                                                                           | anniversary | 2019 |
+     | 2019-07-20 | 20  | 7     | World Chess Day (                                                                                                          | anniversary | 2019 |
+     | 2019-07-28 | 28  | 7     | World Hepatitis Day                                                                                                        | anniversary | 2019 |
+     | 2019-07-30 | 30  | 7     | International Day of Friendship                                                                                            | anniversary | 2019 |
+     | 2019-07-30 | 30  | 7     | World Day against Trafficking in Persons                                                                                   | anniversary | 2019 |
+     | 2019-08-09 | 9   | 8     | International Day of the World's Indigenous Peoples                                                                        | anniversary | 2019 |
+     | 2019-08-12 | 12  | 8     | International Youth Day                                                                                                    | anniversary | 2019 |
+     | 2019-08-19 | 19  | 8     | World Humanitarian Day                                                                                                     | anniversary | 2019 |
+     | 2019-08-21 | 21  | 8     | International Day of Remembrance and Tribute to the Victims of Terrorism                                                   | anniversary | 2019 |
+     | 2019-08-22 | 22  | 8     | International Day Commemorating the Victims of Acts of Violence Based on Religion or Belief                                | anniversary | 2019 |
+     | 2019-08-23 | 23  | 8     | International Day for the Remembrance of the Slave Trade and Its Abolition                                                 | anniversary | 2019 |
+     | 2019-08-29 | 29  | 8     | International Day against Nuclear Tests                                                                                    | anniversary | 2019 |
+     | 2019-08-30 | 30  | 8     | International Day of the Victims of Enforced Disappearances                                                                | anniversary | 2019 |
+     | 2019-09-05 | 5   | 9     | International Day of Charity                                                                                               | anniversary | 2019 |
+     | 2019-09-07 | 7   | 9     | International Day of Clean Air for blue skies (A/RES/74/212) (                                                             | anniversary | 2019 |
+     | 2019-09-08 | 8   | 9     | International Literacy Day                                                                                                 | anniversary | 2019 |
+     | 2019-09-10 | 10  | 9     | World Suicide Prevention Day                                                                                               | anniversary | 2019 |
+     | 2019-09-12 | 12  | 9     | United Nations Day for South-South Cooperation                                                                             | anniversary | 2019 |
+     | 2019-09-15 | 15  | 9     | International Day of Democracy                                                                                             | anniversary | 2019 |
+     | 2019-09-16 | 16  | 9     | International Day for the Preservation of the Ozone Layer                                                                  | anniversary | 2019 |
+     | 2019-09-18 | 18  | 9     | International Equal Pay Day (                                                                                              | anniversary | 2019 |
+     | 2019-09-21 | 21  | 9     | International Day of Peace                                                                                                 | anniversary | 2019 |
+     | 2019-09-23 | 23  | 9     | International Day of Sign Languages                                                                                        | anniversary | 2019 |
+     | 2019-09-26 | 26  | 9     | International Day for the Total Elimination of Nuclear Weapons                                                             | anniversary | 2019 |
+     | 2019-09-27 | 27  | 9     | World Tourism Day                                                                                                          | anniversary | 2019 |
+     | 2019-09-28 | 28  | 9     | International Day for Universal Access to Information                                                                      | anniversary | 2019 |
+     | 2019-09-28 | 28  | 9     | World Rabies Day                                                                                                           | anniversary | 2019 |
+     | 2019-09-29 | 29  | 9     | International Day of Awareness of Food Loss and Waste (A/RES/74/209) (                                                     | anniversary | 2019 |
+     | 2019-09-30 | 30  | 9     | International Translation Day                                                                                              | anniversary | 2019 |
+     | 2019-10-01 | 1   | 10    | International Day of Older Persons                                                                                         | anniversary | 2019 |
+     | 2019-10-02 | 2   | 10    | International Day of Non-Violence                                                                                          | anniversary | 2019 |
+     | 2019-10-05 | 5   | 10    | World Teachersâ Day                                                                                                      | anniversary | 2019 |
+     | 2019-10-09 | 9   | 10    | World Post Day                                                                                                             | anniversary | 2019 |
+     | 2019-10-10 | 10  | 10    | World Mental Health Day                                                                                                    | anniversary | 2019 |
+     | 2019-10-11 | 11  | 10    | International Day of the Girl Child                                                                                        | anniversary | 2019 |
+     | 2019-10-13 | 13  | 10    | International Day for Disaster Risk Reduction                                                                              | anniversary | 2019 |
+     | 2019-10-15 | 15  | 10    | International Day of Rural Women                                                                                           | anniversary | 2019 |
+     | 2019-10-16 | 16  | 10    | World Food Day                                                                                                             | anniversary | 2019 |
+     | 2019-10-17 | 17  | 10    | International Day for the Eradication of Poverty                                                                           | anniversary | 2019 |
+     | 2019-10-24 | 24  | 10    | United Nations Day                                                                                                         | anniversary | 2019 |
+     | 2019-10-24 | 24  | 10    | World Development Information Day                                                                                          | anniversary | 2019 |
+     | 2019-10-27 | 27  | 10    | World Day for Audiovisual Heritage                                                                                         | anniversary | 2019 |
+     | 2019-10-31 | 31  | 10    | World Cities Day                                                                                                           | anniversary | 2019 |
+     | 2019-11-02 | 2   | 11    | International Day to End Impunity for Crimes against Journalists                                                           | anniversary | 2019 |
+     | 2019-11-05 | 5   | 11    | World Tsunami Awareness Day                                                                                                | anniversary | 2019 |
+     | 2019-11-06 | 6   | 11    | International Day for Preventing the Exploitation of the Environment in War and Armed Conflict                             | anniversary | 2019 |
+     | 2019-11-10 | 10  | 11    | World Science Day for Peace and Development                                                                                | anniversary | 2019 |
+     | 2019-11-14 | 14  | 11    | World Diabetes Day                                                                                                         | anniversary | 2019 |
+     | 2019-11-16 | 16  | 11    | International Day for Tolerance                                                                                            | anniversary | 2019 |
+     | 2019-11-19 | 19  | 11    | World Toilet Day                                                                                                           | anniversary | 2019 |
+     | 2019-11-20 | 20  | 11    | Africa Industrialization Day                                                                                               | anniversary | 2019 |
+     | 2019-11-20 | 20  | 11    | World Children's Day                                                                                                       | anniversary | 2019 |
+     | 2019-11-21 | 21  | 11    | World Television Day                                                                                                       | anniversary | 2019 |
+     | 2019-11-25 | 25  | 11    | International Day for the Elimination of Violence against Women                                                            | anniversary | 2019 |
+     | 2019-11-29 | 29  | 11    | International Day of Solidarity with the Palestinian People                                                                | anniversary | 2019 |
+     | 2019-11-30 | 30  | 11    | Day of Remembrance for all Victims of Chemical Warfare                                                                     | anniversary | 2019 |
+     | 2019-12-01 | 1   | 12    | World AIDS Day                                                                                                             | anniversary | 2019 |
+     | 2019-12-02 | 2   | 12    | International Day for the Abolition of Slavery                                                                             | anniversary | 2019 |
+     | 2019-12-03 | 3   | 12    | International Day of Persons with Disabilities                                                                             | anniversary | 2019 |
+     | 2019-12-04 | 4   | 12    | International Day of Banks (A/RES/74/245) (                                                                                | anniversary | 2019 |
+     | 2019-12-05 | 5   | 12    | International Volunteer Day for Economic and Social Development                                                            | anniversary | 2019 |
+     | 2019-12-05 | 5   | 12    | World Soil Day                                                                                                             | anniversary | 2019 |
+     | 2019-12-07 | 7   | 12    | International Civil Aviation Day                                                                                           | anniversary | 2019 |
+     | 2019-12-09 | 9   | 12    | International Day of Commemoration and Dignity of the Victims of the Crime of Genocide and of the Prevention of this Crime | anniversary | 2019 |
+     | 2019-12-09 | 9   | 12    | International Anti-Corruption Day                                                                                          | anniversary | 2019 |
+     | 2019-12-10 | 10  | 12    | Human Rights Day                                                                                                           | anniversary | 2019 |
+     | 2019-12-11 | 11  | 12    | International Mountain Day                                                                                                 | anniversary | 2019 |
+     | 2019-12-12 | 12  | 12    | International Day of Neutrality                                                                                            | anniversary | 2019 |
+     | 2019-12-12 | 12  | 12    | International Universal Health Coverage Day                                                                                | anniversary | 2019 |
+     | 2019-12-18 | 18  | 12    | International Migrants Day                                                                                                 | anniversary | 2019 |
+     | 2019-12-18 | 18  | 12    | Arabic Language Day                                                                                                        | anniversary | 2019 |
+     | 2019-12-20 | 20  | 12    | International Human Solidarity Day                                                                                         | anniversary | 2019 |
+     +------------+-----+-------+----------------------------------------------------------------------------------------------------------------------------+-------------+------+
+
+    Entries for year 2020:
+
+     +------------+-----+-------+----------------------------------------------------------------------------------------------------------------------------+-------------+------+
+     | date       | day | month | summary                                                                                                                    | tags        | year |
+     +------------+-----+-------+----------------------------------------------------------------------------------------------------------------------------+-------------+------+
+     | 2020-01-04 | 4   | 1     | World Braille Day                                                                                                          | anniversary | 2020 |
+     | 2020-01-24 | 24  | 1     | International Day of Education                                                                                             | anniversary | 2020 |
+     | 2020-01-27 | 27  | 1     | International Day of Commemoration in Memory of the Victims of the Holocaust                                               | anniversary | 2020 |
+     | 2020-02-04 | 4   | 2     | World Cancer Day                                                                                                           | anniversary | 2020 |
+     | 2020-02-06 | 6   | 2     | International Day of Zero Tolerance to Female Genital Mutilation                                                           | anniversary | 2020 |
+     | 2020-02-10 | 10  | 2     | World Pulses Day                                                                                                           | anniversary | 2020 |
+     | 2020-02-11 | 11  | 2     | International Day of Women and Girls in Science                                                                            | anniversary | 2020 |
+     | 2020-02-13 | 13  | 2     | World Radio Day                                                                                                            | anniversary | 2020 |
+     | 2020-02-20 | 20  | 2     | World Day of Social Justice                                                                                                | anniversary | 2020 |
+     | 2020-02-21 | 21  | 2     | International Mother Language Day                                                                                          | anniversary | 2020 |
+     | 2020-03-01 | 1   | 3     | Zero Discrimination Day                                                                                                    | anniversary | 2020 |
+     | 2020-03-03 | 3   | 3     | World Wildlife Day                                                                                                         | anniversary | 2020 |
+     | 2020-03-08 | 8   | 3     | International Women's Day                                                                                                  | anniversary | 2020 |
+     | 2020-03-20 | 20  | 3     | International Day of Happiness                                                                                             | anniversary | 2020 |
+     | 2020-03-20 | 20  | 3     | French Language Day                                                                                                        | anniversary | 2020 |
+     | 2020-03-21 | 21  | 3     | International Day for the Elimination of Racial Discrimination                                                             | anniversary | 2020 |
+     | 2020-03-21 | 21  | 3     | World Poetry Day                                                                                                           | anniversary | 2020 |
+     | 2020-03-21 | 21  | 3     | International Day of Nowruz                                                                                                | anniversary | 2020 |
+     | 2020-03-21 | 21  | 3     | World Down Syndrome Day                                                                                                    | anniversary | 2020 |
+     | 2020-03-21 | 21  | 3     | International Day of Forests                                                                                               | anniversary | 2020 |
+     | 2020-03-22 | 22  | 3     | World Water Day                                                                                                            | anniversary | 2020 |
+     | 2020-03-23 | 23  | 3     | World Meteorological Day                                                                                                   | anniversary | 2020 |
+     | 2020-03-24 | 24  | 3     | World Tuberculosis Day                                                                                                     | anniversary | 2020 |
+     | 2020-03-24 | 24  | 3     | International Day for the Right to the Truth concerning Gross Human Rights Violations and for the Dignity of Victims       | anniversary | 2020 |
+     | 2020-03-25 | 25  | 3     | International Day of Remembrance of the Victims of Slavery and the Transatlantic Slave Trade                               | anniversary | 2020 |
+     | 2020-03-25 | 25  | 3     | International Day of Solidarity with Detained and Missing Staff Members                                                    | anniversary | 2020 |
+     | 2020-04-02 | 2   | 4     | World Autism Awareness Day                                                                                                 | anniversary | 2020 |
+     | 2020-04-04 | 4   | 4     | International Day for Mine Awareness and Assistance in Mine Action                                                         | anniversary | 2020 |
+     | 2020-04-06 | 6   | 4     | International Day of Sport for Development and Peace                                                                       | anniversary | 2020 |
+     | 2020-04-07 | 7   | 4     | International Day of Reflection on the 1994 Genocide against the Tutsi in Rwanda                                           | anniversary | 2020 |
+     | 2020-04-07 | 7   | 4     | World Health Day                                                                                                           | anniversary | 2020 |
+     | 2020-04-12 | 12  | 4     | International Day of Human Space Flight                                                                                    | anniversary | 2020 |
+     | 2020-04-20 | 20  | 4     | Chinese Language Day                                                                                                       | anniversary | 2020 |
+     | 2020-04-21 | 21  | 4     | World Creativity and Innovation Day                                                                                        | anniversary | 2020 |
+     | 2020-04-22 | 22  | 4     | International Mother Earth Day                                                                                             | anniversary | 2020 |
+     | 2020-04-23 | 23  | 4     | World Book and Copyright Day                                                                                               | anniversary | 2020 |
+     | 2020-04-23 | 23  | 4     | English Language Day                                                                                                       | anniversary | 2020 |
+     | 2020-04-23 | 23  | 4     | Spanish Language Day                                                                                                       | anniversary | 2020 |
+     | 2020-04-24 | 24  | 4     | International Day of Multilateralism and Diplomacy for Peace                                                               | anniversary | 2020 |
+     | 2020-04-25 | 25  | 4     | International Delegateâs Day                                                                                             | anniversary | 2020 |
+     | 2020-04-25 | 25  | 4     | World Malaria Day                                                                                                          | anniversary | 2020 |
+     | 2020-04-25 | 25  | 4     | International Girls in ICT Day                                                                                             | anniversary | 2020 |
+     | 2020-04-26 | 26  | 4     | International Chernobyl Disaster Remembrance Day                                                                           | anniversary | 2020 |
+     | 2020-04-26 | 26  | 4     | World Intellectual Property Day                                                                                            | anniversary | 2020 |
+     | 2020-04-28 | 28  | 4     | World Day for Safety and Health at Work                                                                                    | anniversary | 2020 |
+     | 2020-04-30 | 30  | 4     | International Jazz Day                                                                                                     | anniversary | 2020 |
+     | 2020-05-02 | 2   | 5     | World Tuna Day                                                                                                             | anniversary | 2020 |
+     | 2020-05-03 | 3   | 5     | World Press Freedom Day                                                                                                    | anniversary | 2020 |
+     | 2020-05-07 | 7   | 5     | "Vesak", the Day of the Full Moon                                                                                          | anniversary | 2020 |
+     | 2020-05-08 | 8   | 5     | Time of Remembrance and Reconciliation for Those Who Lost Their Lives During the Second World War (8-9 May)                | anniversary | 2020 |
+     | 2020-05-15 | 15  | 5     | International Day of Families                                                                                              | anniversary | 2020 |
+     | 2020-05-16 | 16  | 5     | International Day of Living Together in Peace                                                                              | anniversary | 2020 |
+     | 2020-05-16 | 16  | 5     | International Day of Light                                                                                                 | anniversary | 2020 |
+     | 2020-05-17 | 17  | 5     | World Telecommunication and Information Society Day                                                                        | anniversary | 2020 |
+     | 2020-05-20 | 20  | 5     | World Bee Day                                                                                                              | anniversary | 2020 |
+     | 2020-05-21 | 21  | 5     | International Tea Day (A/RES/74/241) (                                                                                     | anniversary | 2020 |
+     | 2020-05-21 | 21  | 5     | World Day for Cultural Diversity for Dialogue and Development                                                              | anniversary | 2020 |
+     | 2020-05-22 | 22  | 5     | International Day for Biological Diversity                                                                                 | anniversary | 2020 |
+     | 2020-05-23 | 23  | 5     | International Day to End Obstetric Fistula                                                                                 | anniversary | 2020 |
+     | 2020-05-29 | 29  | 5     | International Day of UN Peacekeepers                                                                                       | anniversary | 2020 |
+     | 2020-05-31 | 31  | 5     | World No-Tobacco Day                                                                                                       | anniversary | 2020 |
+     | 2020-06-01 | 1   | 6     | Global Day of Parents                                                                                                      | anniversary | 2020 |
+     | 2020-06-03 | 3   | 6     | World Bicycle Day                                                                                                          | anniversary | 2020 |
+     | 2020-06-04 | 4   | 6     | International Day of Innocent Children Victims of Aggression                                                               | anniversary | 2020 |
+     | 2020-06-05 | 5   | 6     | World Environment Day                                                                                                      | anniversary | 2020 |
+     | 2020-06-05 | 5   | 6     | International Day for the Fight against Illegal, Unreported and Unregulated Fishing                                        | anniversary | 2020 |
+     | 2020-06-06 | 6   | 6     | Russian Language Day                                                                                                       | anniversary | 2020 |
+     | 2020-06-07 | 7   | 6     | World Food Safety Day                                                                                                      | anniversary | 2020 |
+     | 2020-06-08 | 8   | 6     | World Oceans Day                                                                                                           | anniversary | 2020 |
+     | 2020-06-12 | 12  | 6     | World Day Against Child Labour                                                                                             | anniversary | 2020 |
+     | 2020-06-13 | 13  | 6     | International Albinism Awareness Day                                                                                       | anniversary | 2020 |
+     | 2020-06-14 | 14  | 6     | World Blood Donor Day                                                                                                      | anniversary | 2020 |
+     | 2020-06-15 | 15  | 6     | World Elder Abuse Awareness Day                                                                                            | anniversary | 2020 |
+     | 2020-06-16 | 16  | 6     | International Day of Family Remittances                                                                                    | anniversary | 2020 |
+     | 2020-06-17 | 17  | 6     | World Day to Combat Desertification and Drought                                                                            | anniversary | 2020 |
+     | 2020-06-18 | 18  | 6     | Sustainable Gastronomy Day                                                                                                 | anniversary | 2020 |
+     | 2020-06-19 | 19  | 6     | International Day for the Elimination of Sexual Violence in Conflict                                                       | anniversary | 2020 |
+     | 2020-06-20 | 20  | 6     | World Refugee Day                                                                                                          | anniversary | 2020 |
+     | 2020-06-21 | 21  | 6     | International Day of Yoga                                                                                                  | anniversary | 2020 |
+     | 2020-06-21 | 21  | 6     | International Day of the Celebration of the Solstice                                                                       | anniversary | 2020 |
+     | 2020-06-23 | 23  | 6     | United Nations Public Service Day                                                                                          | anniversary | 2020 |
+     | 2020-06-23 | 23  | 6     | International Widows' Day                                                                                                  | anniversary | 2020 |
+     | 2020-06-25 | 25  | 6     | Day of the Seafarer                                                                                                        | anniversary | 2020 |
+     | 2020-06-26 | 26  | 6     | International Day against Drug Abuse and Illicit Trafficking                                                               | anniversary | 2020 |
+     | 2020-06-26 | 26  | 6     | United Nations International Day in Support of Victims of Torture                                                          | anniversary | 2020 |
+     | 2020-06-27 | 27  | 6     | Micro-, Small and Medium-sized Enterprises Day                                                                             | anniversary | 2020 |
+     | 2020-06-29 | 29  | 6     | International Day of the Tropics                                                                                           | anniversary | 2020 |
+     | 2020-06-30 | 30  | 6     | International Asteroid Day                                                                                                 | anniversary | 2020 |
+     | 2020-06-30 | 30  | 6     | International Day of Parliamentarism                                                                                       | anniversary | 2020 |
+     | 2020-07-11 | 11  | 7     | World Population Day                                                                                                       | anniversary | 2020 |
+     | 2020-07-15 | 15  | 7     | World Youth Skills Day                                                                                                     | anniversary | 2020 |
+     | 2020-07-18 | 18  | 7     | Nelson Mandela International Day                                                                                           | anniversary | 2020 |
+     | 2020-07-20 | 20  | 7     | World Chess Day (                                                                                                          | anniversary | 2020 |
+     | 2020-07-28 | 28  | 7     | World Hepatitis Day                                                                                                        | anniversary | 2020 |
+     | 2020-07-30 | 30  | 7     | International Day of Friendship                                                                                            | anniversary | 2020 |
+     | 2020-07-30 | 30  | 7     | World Day against Trafficking in Persons                                                                                   | anniversary | 2020 |
+     | 2020-08-09 | 9   | 8     | International Day of the World's Indigenous Peoples                                                                        | anniversary | 2020 |
+     | 2020-08-12 | 12  | 8     | International Youth Day                                                                                                    | anniversary | 2020 |
+     | 2020-08-19 | 19  | 8     | World Humanitarian Day                                                                                                     | anniversary | 2020 |
+     | 2020-08-21 | 21  | 8     | International Day of Remembrance and Tribute to the Victims of Terrorism                                                   | anniversary | 2020 |
+     | 2020-08-22 | 22  | 8     | International Day Commemorating the Victims of Acts of Violence Based on Religion or Belief                                | anniversary | 2020 |
+     | 2020-08-23 | 23  | 8     | International Day for the Remembrance of the Slave Trade and Its Abolition                                                 | anniversary | 2020 |
+     | 2020-08-29 | 29  | 8     | International Day against Nuclear Tests                                                                                    | anniversary | 2020 |
+     | 2020-08-30 | 30  | 8     | International Day of the Victims of Enforced Disappearances                                                                | anniversary | 2020 |
+     | 2020-09-05 | 5   | 9     | International Day of Charity                                                                                               | anniversary | 2020 |
+     | 2020-09-07 | 7   | 9     | International Day of Clean Air for blue skies (A/RES/74/212) (                                                             | anniversary | 2020 |
+     | 2020-09-08 | 8   | 9     | International Literacy Day                                                                                                 | anniversary | 2020 |
+     | 2020-09-10 | 10  | 9     | World Suicide Prevention Day                                                                                               | anniversary | 2020 |
+     | 2020-09-12 | 12  | 9     | United Nations Day for South-South Cooperation                                                                             | anniversary | 2020 |
+     | 2020-09-15 | 15  | 9     | International Day of Democracy                                                                                             | anniversary | 2020 |
+     | 2020-09-16 | 16  | 9     | International Day for the Preservation of the Ozone Layer                                                                  | anniversary | 2020 |
+     | 2020-09-18 | 18  | 9     | International Equal Pay Day (                                                                                              | anniversary | 2020 |
+     | 2020-09-21 | 21  | 9     | International Day of Peace                                                                                                 | anniversary | 2020 |
+     | 2020-09-23 | 23  | 9     | International Day of Sign Languages                                                                                        | anniversary | 2020 |
+     | 2020-09-26 | 26  | 9     | International Day for the Total Elimination of Nuclear Weapons                                                             | anniversary | 2020 |
+     | 2020-09-27 | 27  | 9     | World Tourism Day                                                                                                          | anniversary | 2020 |
+     | 2020-09-28 | 28  | 9     | International Day for Universal Access to Information                                                                      | anniversary | 2020 |
+     | 2020-09-28 | 28  | 9     | World Rabies Day                                                                                                           | anniversary | 2020 |
+     | 2020-09-29 | 29  | 9     | International Day of Awareness of Food Loss and Waste (A/RES/74/209) (                                                     | anniversary | 2020 |
+     | 2020-09-30 | 30  | 9     | International Translation Day                                                                                              | anniversary | 2020 |
+     | 2020-10-01 | 1   | 10    | International Day of Older Persons                                                                                         | anniversary | 2020 |
+     | 2020-10-02 | 2   | 10    | International Day of Non-Violence                                                                                          | anniversary | 2020 |
+     | 2020-10-05 | 5   | 10    | World Teachersâ Day                                                                                                      | anniversary | 2020 |
+     | 2020-10-09 | 9   | 10    | World Post Day                                                                                                             | anniversary | 2020 |
+     | 2020-10-10 | 10  | 10    | World Mental Health Day                                                                                                    | anniversary | 2020 |
+     | 2020-10-11 | 11  | 10    | International Day of the Girl Child                                                                                        | anniversary | 2020 |
+     | 2020-10-13 | 13  | 10    | International Day for Disaster Risk Reduction                                                                              | anniversary | 2020 |
+     | 2020-10-15 | 15  | 10    | International Day of Rural Women                                                                                           | anniversary | 2020 |
+     | 2020-10-16 | 16  | 10    | World Food Day                                                                                                             | anniversary | 2020 |
+     | 2020-10-17 | 17  | 10    | International Day for the Eradication of Poverty                                                                           | anniversary | 2020 |
+     | 2020-10-24 | 24  | 10    | United Nations Day                                                                                                         | anniversary | 2020 |
+     | 2020-10-24 | 24  | 10    | World Development Information Day                                                                                          | anniversary | 2020 |
+     | 2020-10-27 | 27  | 10    | World Day for Audiovisual Heritage                                                                                         | anniversary | 2020 |
+     | 2020-10-31 | 31  | 10    | World Cities Day                                                                                                           | anniversary | 2020 |
+     | 2020-11-02 | 2   | 11    | International Day to End Impunity for Crimes against Journalists                                                           | anniversary | 2020 |
+     | 2020-11-05 | 5   | 11    | World Tsunami Awareness Day                                                                                                | anniversary | 2020 |
+     | 2020-11-06 | 6   | 11    | International Day for Preventing the Exploitation of the Environment in War and Armed Conflict                             | anniversary | 2020 |
+     | 2020-11-10 | 10  | 11    | World Science Day for Peace and Development                                                                                | anniversary | 2020 |
+     | 2020-11-14 | 14  | 11    | World Diabetes Day                                                                                                         | anniversary | 2020 |
+     | 2020-11-16 | 16  | 11    | International Day for Tolerance                                                                                            | anniversary | 2020 |
+     | 2020-11-19 | 19  | 11    | World Toilet Day                                                                                                           | anniversary | 2020 |
+     | 2020-11-20 | 20  | 11    | Africa Industrialization Day                                                                                               | anniversary | 2020 |
+     | 2020-11-20 | 20  | 11    | World Children's Day                                                                                                       | anniversary | 2020 |
+     | 2020-11-21 | 21  | 11    | World Television Day                                                                                                       | anniversary | 2020 |
+     | 2020-11-25 | 25  | 11    | International Day for the Elimination of Violence against Women                                                            | anniversary | 2020 |
+     | 2020-11-29 | 29  | 11    | International Day of Solidarity with the Palestinian People                                                                | anniversary | 2020 |
+     | 2020-11-30 | 30  | 11    | Day of Remembrance for all Victims of Chemical Warfare                                                                     | anniversary | 2020 |
+     | 2020-12-01 | 1   | 12    | World AIDS Day                                                                                                             | anniversary | 2020 |
+     | 2020-12-02 | 2   | 12    | International Day for the Abolition of Slavery                                                                             | anniversary | 2020 |
+     | 2020-12-03 | 3   | 12    | International Day of Persons with Disabilities                                                                             | anniversary | 2020 |
+     | 2020-12-04 | 4   | 12    | International Day of Banks (A/RES/74/245) (                                                                                | anniversary | 2020 |
+     | 2020-12-05 | 5   | 12    | International Volunteer Day for Economic and Social Development                                                            | anniversary | 2020 |
+     | 2020-12-05 | 5   | 12    | World Soil Day                                                                                                             | anniversary | 2020 |
+     | 2020-12-07 | 7   | 12    | International Civil Aviation Day                                                                                           | anniversary | 2020 |
+     | 2020-12-09 | 9   | 12    | International Day of Commemoration and Dignity of the Victims of the Crime of Genocide and of the Prevention of this Crime | anniversary | 2020 |
+     | 2020-12-09 | 9   | 12    | International Anti-Corruption Day                                                                                          | anniversary | 2020 |
+     | 2020-12-10 | 10  | 12    | Human Rights Day                                                                                                           | anniversary | 2020 |
+     | 2020-12-11 | 11  | 12    | International Mountain Day                                                                                                 | anniversary | 2020 |
+     | 2020-12-12 | 12  | 12    | International Day of Neutrality                                                                                            | anniversary | 2020 |
+     | 2020-12-12 | 12  | 12    | International Universal Health Coverage Day                                                                                | anniversary | 2020 |
+     | 2020-12-18 | 18  | 12    | International Migrants Day                                                                                                 | anniversary | 2020 |
+     | 2020-12-18 | 18  | 12    | Arabic Language Day                                                                                                        | anniversary | 2020 |
+     | 2020-12-20 | 20  | 12    | International Human Solidarity Day                                                                                         | anniversary | 2020 |
+     +------------+-----+-------+----------------------------------------------------------------------------------------------------------------------------+-------------+------+
+
+    Entries for year 2021:
+
+     +------------+-----+-------+----------------------------------------------------------------------------------------------------------------------------+-------------+------+
+     | date       | day | month | summary                                                                                                                    | tags        | year |
+     +------------+-----+-------+----------------------------------------------------------------------------------------------------------------------------+-------------+------+
+     | 2021-01-04 | 4   | 1     | World Braille Day                                                                                                          | anniversary | 2021 |
+     | 2021-01-24 | 24  | 1     | International Day of Education                                                                                             | anniversary | 2021 |
+     | 2021-01-27 | 27  | 1     | International Day of Commemoration in Memory of the Victims of the Holocaust                                               | anniversary | 2021 |
+     | 2021-02-04 | 4   | 2     | World Cancer Day                                                                                                           | anniversary | 2021 |
+     | 2021-02-06 | 6   | 2     | International Day of Zero Tolerance to Female Genital Mutilation                                                           | anniversary | 2021 |
+     | 2021-02-10 | 10  | 2     | World Pulses Day                                                                                                           | anniversary | 2021 |
+     | 2021-02-11 | 11  | 2     | International Day of Women and Girls in Science                                                                            | anniversary | 2021 |
+     | 2021-02-13 | 13  | 2     | World Radio Day                                                                                                            | anniversary | 2021 |
+     | 2021-02-20 | 20  | 2     | World Day of Social Justice                                                                                                | anniversary | 2021 |
+     | 2021-02-21 | 21  | 2     | International Mother Language Day                                                                                          | anniversary | 2021 |
+     | 2021-03-01 | 1   | 3     | Zero Discrimination Day                                                                                                    | anniversary | 2021 |
+     | 2021-03-03 | 3   | 3     | World Wildlife Day                                                                                                         | anniversary | 2021 |
+     | 2021-03-08 | 8   | 3     | International Women's Day                                                                                                  | anniversary | 2021 |
+     | 2021-03-20 | 20  | 3     | International Day of Happiness                                                                                             | anniversary | 2021 |
+     | 2021-03-20 | 20  | 3     | French Language Day                                                                                                        | anniversary | 2021 |
+     | 2021-03-21 | 21  | 3     | International Day for the Elimination of Racial Discrimination                                                             | anniversary | 2021 |
+     | 2021-03-21 | 21  | 3     | World Poetry Day                                                                                                           | anniversary | 2021 |
+     | 2021-03-21 | 21  | 3     | International Day of Nowruz                                                                                                | anniversary | 2021 |
+     | 2021-03-21 | 21  | 3     | World Down Syndrome Day                                                                                                    | anniversary | 2021 |
+     | 2021-03-21 | 21  | 3     | International Day of Forests                                                                                               | anniversary | 2021 |
+     | 2021-03-22 | 22  | 3     | World Water Day                                                                                                            | anniversary | 2021 |
+     | 2021-03-23 | 23  | 3     | World Meteorological Day                                                                                                   | anniversary | 2021 |
+     | 2021-03-24 | 24  | 3     | World Tuberculosis Day                                                                                                     | anniversary | 2021 |
+     | 2021-03-24 | 24  | 3     | International Day for the Right to the Truth concerning Gross Human Rights Violations and for the Dignity of Victims       | anniversary | 2021 |
+     | 2021-03-25 | 25  | 3     | International Day of Remembrance of the Victims of Slavery and the Transatlantic Slave Trade                               | anniversary | 2021 |
+     | 2021-03-25 | 25  | 3     | International Day of Solidarity with Detained and Missing Staff Members                                                    | anniversary | 2021 |
+     | 2021-04-02 | 2   | 4     | World Autism Awareness Day                                                                                                 | anniversary | 2021 |
+     | 2021-04-04 | 4   | 4     | International Day for Mine Awareness and Assistance in Mine Action                                                         | anniversary | 2021 |
+     | 2021-04-06 | 6   | 4     | International Day of Sport for Development and Peace                                                                       | anniversary | 2021 |
+     | 2021-04-07 | 7   | 4     | International Day of Reflection on the 1994 Genocide against the Tutsi in Rwanda                                           | anniversary | 2021 |
+     | 2021-04-07 | 7   | 4     | World Health Day                                                                                                           | anniversary | 2021 |
+     | 2021-04-12 | 12  | 4     | International Day of Human Space Flight                                                                                    | anniversary | 2021 |
+     | 2021-04-20 | 20  | 4     | Chinese Language Day                                                                                                       | anniversary | 2021 |
+     | 2021-04-21 | 21  | 4     | World Creativity and Innovation Day                                                                                        | anniversary | 2021 |
+     | 2021-04-22 | 22  | 4     | International Mother Earth Day                                                                                             | anniversary | 2021 |
+     | 2021-04-23 | 23  | 4     | World Book and Copyright Day                                                                                               | anniversary | 2021 |
+     | 2021-04-23 | 23  | 4     | English Language Day                                                                                                       | anniversary | 2021 |
+     | 2021-04-23 | 23  | 4     | Spanish Language Day                                                                                                       | anniversary | 2021 |
+     | 2021-04-24 | 24  | 4     | International Day of Multilateralism and Diplomacy for Peace                                                               | anniversary | 2021 |
+     | 2021-04-25 | 25  | 4     | International Delegateâs Day                                                                                             | anniversary | 2021 |
+     | 2021-04-25 | 25  | 4     | World Malaria Day                                                                                                          | anniversary | 2021 |
+     | 2021-04-25 | 25  | 4     | International Girls in ICT Day                                                                                             | anniversary | 2021 |
+     | 2021-04-26 | 26  | 4     | International Chernobyl Disaster Remembrance Day                                                                           | anniversary | 2021 |
+     | 2021-04-26 | 26  | 4     | World Intellectual Property Day                                                                                            | anniversary | 2021 |
+     | 2021-04-28 | 28  | 4     | World Day for Safety and Health at Work                                                                                    | anniversary | 2021 |
+     | 2021-04-30 | 30  | 4     | International Jazz Day                                                                                                     | anniversary | 2021 |
+     | 2021-05-02 | 2   | 5     | World Tuna Day                                                                                                             | anniversary | 2021 |
+     | 2021-05-03 | 3   | 5     | World Press Freedom Day                                                                                                    | anniversary | 2021 |
+     | 2021-05-07 | 7   | 5     | "Vesak", the Day of the Full Moon                                                                                          | anniversary | 2021 |
+     | 2021-05-08 | 8   | 5     | Time of Remembrance and Reconciliation for Those Who Lost Their Lives During the Second World War (8-9 May)                | anniversary | 2021 |
+     | 2021-05-15 | 15  | 5     | International Day of Families                                                                                              | anniversary | 2021 |
+     | 2021-05-16 | 16  | 5     | International Day of Living Together in Peace                                                                              | anniversary | 2021 |
+     | 2021-05-16 | 16  | 5     | International Day of Light                                                                                                 | anniversary | 2021 |
+     | 2021-05-17 | 17  | 5     | World Telecommunication and Information Society Day                                                                        | anniversary | 2021 |
+     | 2021-05-20 | 20  | 5     | World Bee Day                                                                                                              | anniversary | 2021 |
+     | 2021-05-21 | 21  | 5     | International Tea Day (A/RES/74/241) (                                                                                     | anniversary | 2021 |
+     | 2021-05-21 | 21  | 5     | World Day for Cultural Diversity for Dialogue and Development                                                              | anniversary | 2021 |
+     | 2021-05-22 | 22  | 5     | International Day for Biological Diversity                                                                                 | anniversary | 2021 |
+     | 2021-05-23 | 23  | 5     | International Day to End Obstetric Fistula                                                                                 | anniversary | 2021 |
+     | 2021-05-29 | 29  | 5     | International Day of UN Peacekeepers                                                                                       | anniversary | 2021 |
+     | 2021-05-31 | 31  | 5     | World No-Tobacco Day                                                                                                       | anniversary | 2021 |
+     | 2021-06-01 | 1   | 6     | Global Day of Parents                                                                                                      | anniversary | 2021 |
+     | 2021-06-03 | 3   | 6     | World Bicycle Day                                                                                                          | anniversary | 2021 |
+     | 2021-06-04 | 4   | 6     | International Day of Innocent Children Victims of Aggression                                                               | anniversary | 2021 |
+     | 2021-06-05 | 5   | 6     | World Environment Day                                                                                                      | anniversary | 2021 |
+     | 2021-06-05 | 5   | 6     | International Day for the Fight against Illegal, Unreported and Unregulated Fishing                                        | anniversary | 2021 |
+     | 2021-06-06 | 6   | 6     | Russian Language Day                                                                                                       | anniversary | 2021 |
+     | 2021-06-07 | 7   | 6     | World Food Safety Day                                                                                                      | anniversary | 2021 |
+     | 2021-06-08 | 8   | 6     | World Oceans Day                                                                                                           | anniversary | 2021 |
+     | 2021-06-12 | 12  | 6     | World Day Against Child Labour                                                                                             | anniversary | 2021 |
+     | 2021-06-13 | 13  | 6     | International Albinism Awareness Day                                                                                       | anniversary | 2021 |
+     | 2021-06-14 | 14  | 6     | World Blood Donor Day                                                                                                      | anniversary | 2021 |
+     | 2021-06-15 | 15  | 6     | World Elder Abuse Awareness Day                                                                                            | anniversary | 2021 |
+     | 2021-06-16 | 16  | 6     | International Day of Family Remittances                                                                                    | anniversary | 2021 |
+     | 2021-06-17 | 17  | 6     | World Day to Combat Desertification and Drought                                                                            | anniversary | 2021 |
+     | 2021-06-18 | 18  | 6     | Sustainable Gastronomy Day                                                                                                 | anniversary | 2021 |
+     | 2021-06-19 | 19  | 6     | International Day for the Elimination of Sexual Violence in Conflict                                                       | anniversary | 2021 |
+     | 2021-06-20 | 20  | 6     | World Refugee Day                                                                                                          | anniversary | 2021 |
+     | 2021-06-21 | 21  | 6     | International Day of Yoga                                                                                                  | anniversary | 2021 |
+     | 2021-06-21 | 21  | 6     | International Day of the Celebration of the Solstice                                                                       | anniversary | 2021 |
+     | 2021-06-23 | 23  | 6     | United Nations Public Service Day                                                                                          | anniversary | 2021 |
+     | 2021-06-23 | 23  | 6     | International Widows' Day                                                                                                  | anniversary | 2021 |
+     | 2021-06-25 | 25  | 6     | Day of the Seafarer                                                                                                        | anniversary | 2021 |
+     | 2021-06-26 | 26  | 6     | International Day against Drug Abuse and Illicit Trafficking                                                               | anniversary | 2021 |
+     | 2021-06-26 | 26  | 6     | United Nations International Day in Support of Victims of Torture                                                          | anniversary | 2021 |
+     | 2021-06-27 | 27  | 6     | Micro-, Small and Medium-sized Enterprises Day                                                                             | anniversary | 2021 |
+     | 2021-06-29 | 29  | 6     | International Day of the Tropics                                                                                           | anniversary | 2021 |
+     | 2021-06-30 | 30  | 6     | International Asteroid Day                                                                                                 | anniversary | 2021 |
+     | 2021-06-30 | 30  | 6     | International Day of Parliamentarism                                                                                       | anniversary | 2021 |
+     | 2021-07-11 | 11  | 7     | World Population Day                                                                                                       | anniversary | 2021 |
+     | 2021-07-15 | 15  | 7     | World Youth Skills Day                                                                                                     | anniversary | 2021 |
+     | 2021-07-18 | 18  | 7     | Nelson Mandela International Day                                                                                           | anniversary | 2021 |
+     | 2021-07-20 | 20  | 7     | World Chess Day (                                                                                                          | anniversary | 2021 |
+     | 2021-07-28 | 28  | 7     | World Hepatitis Day                                                                                                        | anniversary | 2021 |
+     | 2021-07-30 | 30  | 7     | International Day of Friendship                                                                                            | anniversary | 2021 |
+     | 2021-07-30 | 30  | 7     | World Day against Trafficking in Persons                                                                                   | anniversary | 2021 |
+     | 2021-08-09 | 9   | 8     | International Day of the World's Indigenous Peoples                                                                        | anniversary | 2021 |
+     | 2021-08-12 | 12  | 8     | International Youth Day                                                                                                    | anniversary | 2021 |
+     | 2021-08-19 | 19  | 8     | World Humanitarian Day                                                                                                     | anniversary | 2021 |
+     | 2021-08-21 | 21  | 8     | International Day of Remembrance and Tribute to the Victims of Terrorism                                                   | anniversary | 2021 |
+     | 2021-08-22 | 22  | 8     | International Day Commemorating the Victims of Acts of Violence Based on Religion or Belief                                | anniversary | 2021 |
+     | 2021-08-23 | 23  | 8     | International Day for the Remembrance of the Slave Trade and Its Abolition                                                 | anniversary | 2021 |
+     | 2021-08-29 | 29  | 8     | International Day against Nuclear Tests                                                                                    | anniversary | 2021 |
+     | 2021-08-30 | 30  | 8     | International Day of the Victims of Enforced Disappearances                                                                | anniversary | 2021 |
+     | 2021-09-05 | 5   | 9     | International Day of Charity                                                                                               | anniversary | 2021 |
+     | 2021-09-07 | 7   | 9     | International Day of Clean Air for blue skies (A/RES/74/212) (                                                             | anniversary | 2021 |
+     | 2021-09-08 | 8   | 9     | International Literacy Day                                                                                                 | anniversary | 2021 |
+     | 2021-09-10 | 10  | 9     | World Suicide Prevention Day                                                                                               | anniversary | 2021 |
+     | 2021-09-12 | 12  | 9     | United Nations Day for South-South Cooperation                                                                             | anniversary | 2021 |
+     | 2021-09-15 | 15  | 9     | International Day of Democracy                                                                                             | anniversary | 2021 |
+     | 2021-09-16 | 16  | 9     | International Day for the Preservation of the Ozone Layer                                                                  | anniversary | 2021 |
+     | 2021-09-18 | 18  | 9     | International Equal Pay Day (                                                                                              | anniversary | 2021 |
+     | 2021-09-21 | 21  | 9     | International Day of Peace                                                                                                 | anniversary | 2021 |
+     | 2021-09-23 | 23  | 9     | International Day of Sign Languages                                                                                        | anniversary | 2021 |
+     | 2021-09-26 | 26  | 9     | International Day for the Total Elimination of Nuclear Weapons                                                             | anniversary | 2021 |
+     | 2021-09-27 | 27  | 9     | World Tourism Day                                                                                                          | anniversary | 2021 |
+     | 2021-09-28 | 28  | 9     | International Day for Universal Access to Information                                                                      | anniversary | 2021 |
+     | 2021-09-28 | 28  | 9     | World Rabies Day                                                                                                           | anniversary | 2021 |
+     | 2021-09-29 | 29  | 9     | International Day of Awareness of Food Loss and Waste (A/RES/74/209) (                                                     | anniversary | 2021 |
+     | 2021-09-30 | 30  | 9     | International Translation Day                                                                                              | anniversary | 2021 |
+     | 2021-10-01 | 1   | 10    | International Day of Older Persons                                                                                         | anniversary | 2021 |
+     | 2021-10-02 | 2   | 10    | International Day of Non-Violence                                                                                          | anniversary | 2021 |
+     | 2021-10-05 | 5   | 10    | World Teachersâ Day                                                                                                      | anniversary | 2021 |
+     | 2021-10-09 | 9   | 10    | World Post Day                                                                                                             | anniversary | 2021 |
+     | 2021-10-10 | 10  | 10    | World Mental Health Day                                                                                                    | anniversary | 2021 |
+     | 2021-10-11 | 11  | 10    | International Day of the Girl Child                                                                                        | anniversary | 2021 |
+     | 2021-10-13 | 13  | 10    | International Day for Disaster Risk Reduction                                                                              | anniversary | 2021 |
+     | 2021-10-15 | 15  | 10    | International Day of Rural Women                                                                                           | anniversary | 2021 |
+     | 2021-10-16 | 16  | 10    | World Food Day                                                                                                             | anniversary | 2021 |
+     | 2021-10-17 | 17  | 10    | International Day for the Eradication of Poverty                                                                           | anniversary | 2021 |
+     | 2021-10-24 | 24  | 10    | United Nations Day                                                                                                         | anniversary | 2021 |
+     | 2021-10-24 | 24  | 10    | World Development Information Day                                                                                          | anniversary | 2021 |
+     | 2021-10-27 | 27  | 10    | World Day for Audiovisual Heritage                                                                                         | anniversary | 2021 |
+     | 2021-10-31 | 31  | 10    | World Cities Day                                                                                                           | anniversary | 2021 |
+     | 2021-11-02 | 2   | 11    | International Day to End Impunity for Crimes against Journalists                                                           | anniversary | 2021 |
+     | 2021-11-05 | 5   | 11    | World Tsunami Awareness Day                                                                                                | anniversary | 2021 |
+     | 2021-11-06 | 6   | 11    | International Day for Preventing the Exploitation of the Environment in War and Armed Conflict                             | anniversary | 2021 |
+     | 2021-11-10 | 10  | 11    | World Science Day for Peace and Development                                                                                | anniversary | 2021 |
+     | 2021-11-14 | 14  | 11    | World Diabetes Day                                                                                                         | anniversary | 2021 |
+     | 2021-11-16 | 16  | 11    | International Day for Tolerance                                                                                            | anniversary | 2021 |
+     | 2021-11-19 | 19  | 11    | World Toilet Day                                                                                                           | anniversary | 2021 |
+     | 2021-11-20 | 20  | 11    | Africa Industrialization Day                                                                                               | anniversary | 2021 |
+     | 2021-11-20 | 20  | 11    | World Children's Day                                                                                                       | anniversary | 2021 |
+     | 2021-11-21 | 21  | 11    | World Television Day                                                                                                       | anniversary | 2021 |
+     | 2021-11-25 | 25  | 11    | International Day for the Elimination of Violence against Women                                                            | anniversary | 2021 |
+     | 2021-11-29 | 29  | 11    | International Day of Solidarity with the Palestinian People                                                                | anniversary | 2021 |
+     | 2021-11-30 | 30  | 11    | Day of Remembrance for all Victims of Chemical Warfare                                                                     | anniversary | 2021 |
+     | 2021-12-01 | 1   | 12    | World AIDS Day                                                                                                             | anniversary | 2021 |
+     | 2021-12-02 | 2   | 12    | International Day for the Abolition of Slavery                                                                             | anniversary | 2021 |
+     | 2021-12-03 | 3   | 12    | International Day of Persons with Disabilities                                                                             | anniversary | 2021 |
+     | 2021-12-04 | 4   | 12    | International Day of Banks (A/RES/74/245) (                                                                                | anniversary | 2021 |
+     | 2021-12-05 | 5   | 12    | International Volunteer Day for Economic and Social Development                                                            | anniversary | 2021 |
+     | 2021-12-05 | 5   | 12    | World Soil Day                                                                                                             | anniversary | 2021 |
+     | 2021-12-07 | 7   | 12    | International Civil Aviation Day                                                                                           | anniversary | 2021 |
+     | 2021-12-09 | 9   | 12    | International Day of Commemoration and Dignity of the Victims of the Crime of Genocide and of the Prevention of this Crime | anniversary | 2021 |
+     | 2021-12-09 | 9   | 12    | International Anti-Corruption Day                                                                                          | anniversary | 2021 |
+     | 2021-12-10 | 10  | 12    | Human Rights Day                                                                                                           | anniversary | 2021 |
+     | 2021-12-11 | 11  | 12    | International Mountain Day                                                                                                 | anniversary | 2021 |
+     | 2021-12-12 | 12  | 12    | International Day of Neutrality                                                                                            | anniversary | 2021 |
+     | 2021-12-12 | 12  | 12    | International Universal Health Coverage Day                                                                                | anniversary | 2021 |
+     | 2021-12-18 | 18  | 12    | International Migrants Day                                                                                                 | anniversary | 2021 |
+     | 2021-12-18 | 18  | 12    | Arabic Language Day                                                                                                        | anniversary | 2021 |
+     | 2021-12-20 | 20  | 12    | International Human Solidarity Day                                                                                         | anniversary | 2021 |
+     +------------+-----+-------+----------------------------------------------------------------------------------------------------------------------------+-------------+------+
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Calendar-Dates-UnitedNations-International
+    Days>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Calendar-Dates-UnitedNations-Internat
+    ionalDays>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Dates-United
+    Nations-InternationalDays>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Reference:
+    <https://www.un.org/en/sections/observances/international-days/>
+
+    Calendar::Dates
+
+    App::CalendarDatesUtils contains CLIs to list dates from this module,
+    etc.
+
+    calx from App::calx can display calendar and highlight dates from
+    Calendar::Dates::* modules
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

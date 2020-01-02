@@ -1,5 +1,13 @@
 Change log for PDF::API2 version 2.xxx (predecessor to PDF::Builder)
 
+2.037     2019-11-14
+
+    - Allow PDF 2.0 files to be opened. [already in PDF::Builder]
+
+2.036     2019-09-17
+
+    - Eliminate another uninitialized value warning in BaseFont.pm.
+
 2.035     2019-08-09
 
     - The bounding box methods (mediabox, cropbox, bleedbox, trimbox, and

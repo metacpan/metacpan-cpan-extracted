@@ -24,7 +24,7 @@ sub gotrule {
     type => 'element',
   );
   for (@$param) {
-    if (!ref $_ or $_->{type} eq 'element') {
+    if (!ref $_ or !$_->{type}) {
       push @{ $ret{children} }, $_;
     } elsif ($_->{type} eq 'attr') {
       $ret{attributes}{$_->{nodename}} = join '', _get_values($_);
@@ -33,6 +33,7 @@ sub gotrule {
     }
   }
   $ret{type} = 'attr' if $attr;
+  delete $ret{type} if $ret{type} eq 'element';
   \%ret;
 }
 
@@ -77,10 +78,6 @@ occur once on an element, and the ordering is semantically meaningless.
 
 An array-ref of child nodes. If the node is a simple scalar, it is a
 text node.
-
-=item type
-
-This will be C<element> at the top level.
 
 =back
 

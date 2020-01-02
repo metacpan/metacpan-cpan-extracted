@@ -6,8 +6,7 @@
           'children' => [
             'defs'
           ],
-          'nodename' => 'variableUser',
-          'type' => 'element'
+          'nodename' => 'variableUser'
         },
         {
           'children' => [
@@ -17,26 +16,21 @@
                   'children' => [
                     '/definitions'
                   ],
-                  'nodename' => 'jsonOtherNotDouble',
-                  'type' => 'element'
+                  'nodename' => 'jsonOtherNotDouble'
                 }
               ],
-              'nodename' => 'jsonPointer',
-              'type' => 'element'
+              'nodename' => 'jsonPointer'
             }
           ],
-          'nodename' => 'exprSingleValue',
-          'type' => 'element'
+          'nodename' => 'exprSingleValue'
         }
       ],
-      'nodename' => 'transformCopy',
-      'type' => 'element'
+      'nodename' => 'transformCopy'
     },
     {
       'children' => [
         {
-          'nodename' => 'jsonPointer',
-          'type' => 'element'
+          'nodename' => 'jsonPointer'
         },
         {
           'children' => [
@@ -44,18 +38,14 @@
               'children' => [
                 'defs'
               ],
-              'nodename' => 'variableUser',
-              'type' => 'element'
+              'nodename' => 'variableUser'
             }
           ],
-          'nodename' => 'exprSingleValue',
-          'type' => 'element'
+          'nodename' => 'exprSingleValue'
         }
       ],
-      'nodename' => 'transformCopy',
-      'type' => 'element'
+      'nodename' => 'transformCopy'
     }
   ],
-  'nodename' => 'transforms',
-  'type' => 'element'
+  'nodename' => 'transforms'
 }

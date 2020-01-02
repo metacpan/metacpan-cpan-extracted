@@ -21,6 +21,8 @@ subtest "coerce_to=float(epoch)" => sub {
     subtest "from DateTime object" => sub {
         test_needs "DateTime";
         is($c->(DateTime->new(year=>2016, month=>1, day=>1, time_zone=>"+0000")), 1451606400);
+        # test date before epoch 0
+        is($c->(DateTime->new(year=>1968, month=>1, day=>1, time_zone=>"+0000")), -63158400);
     };
     subtest "from Time::Moment object" => sub {
         test_needs "Time::Moment";
@@ -30,6 +32,9 @@ subtest "coerce_to=float(epoch)" => sub {
         test_needs "Time::Local";
         is($c->("2016-01-01T00:00:00Z"), 1451606400);
         is($c->("2016-01-01 00:00:00Z"), 1451606400);
+
+        # test date before epoch 0
+        is($c->("1968-01-01T00:00:00Z"), -63158400);
     };
 };
 
@@ -71,6 +76,11 @@ subtest "coerce_to=DateTime" => sub {
         $d = $c->("2016-01-01 00:00:00Z");
         is(ref($d), "DateTime");
         is($d->epoch, 1451606400);
+
+        # test date before epoch 0
+        $d = $c->("1938-02-14");
+        is(ref($d), "DateTime");
+        is($d->ymd, "1938-02-14");
     };
 };
 
@@ -102,7 +112,6 @@ subtest "coerce_to=Time::Moment" => sub {
         is($d->epoch, $d0->epoch);
     };
     subtest "from iso8601 string" => sub {
-        test_needs "Time::Local";
         my $d;
 
         $d = $c->("2016-01-01T00:00:00Z");
@@ -112,6 +121,11 @@ subtest "coerce_to=Time::Moment" => sub {
         $d = $c->("2016-01-01 00:00:00Z");
         is(ref($d), "Time::Moment");
         is($d->epoch, 1451606400);
+
+        # test date before epoch 0
+        $d = $c->("1938-02-14");
+        is(ref($d), "Time::Moment");
+        is($d->strftime("%Y-%m-%d"), "1938-02-14");
     };
 };
 

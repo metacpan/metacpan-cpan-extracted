@@ -1,6 +1,9 @@
 use lib 't/lib';
 use JTTest;
-use JSON::Transform::Parser qw(parse);
+use JSON::Transform::Grammar;
+use XML::Invisible qw(make_parser);
+
+*parse = make_parser(JSON::Transform::Grammar->new);
 
 is_deeply_snapshot parse(<<'EOF'), 'array to hashes';
   "" <@ { "/$K/id":$V#`id` }

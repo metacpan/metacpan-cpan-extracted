@@ -5,7 +5,7 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
+our $VERSION = '3.017'; # VERSION
 my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use Carp qw(croak);

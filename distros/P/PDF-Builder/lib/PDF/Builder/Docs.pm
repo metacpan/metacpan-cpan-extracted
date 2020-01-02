@@ -3,8 +3,8 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
 
@@ -76,12 +76,9 @@ will give you improved speed, the ability to use 16 bit samples, and the
 ability to read interlaced PNG files. See resolved bug report RT 124349, as well
 as C<image_png>, for more information.
 
-Note that the installation process I<may> attempt to install these libraries
-automatically. If it does, and fails, PDF::Builder will still be operable (just
-some advanced features may be missing). If any of these libraries are installed
-but you do not plan to use them, feel free to remove them to free up space. On
-the other hand, if they are not automatically installed and you wish to use
-them, you will have to manually initiate the installation of such modules.
+Note that the installation process will B<not> attempt to install these 
+libraries automatically. If you wish to use them, you will have to manually 
+initiate the installation of such modules (e.g., with "cpan install").
 
 =head2 Strings (Character Text)
 
@@ -1007,11 +1004,14 @@ paper is expected to actually be I<cut>. Some PDF Readers may reduce the
 visible "paper" background to the size of the crop box; others may simply omit 
 any content outside it. Either way, you would lose any trim or crop marks, 
 printer instructions, color alignment dots, or other content outside the Crop 
-Box. A good use of the Crop Box would be limit printing to the area where a 
+Box. I<A good use of the Crop Box> would be limit printing to the area where a 
 printer I<can> reliably put down ink, and leave white the edge areas where 
 paper-handling mechanisms prevent ink or toner from being applied. This would
 keep you from accidentally putting valuable content in an area where a printer
-will refuse to print.
+will refuse to print, yet permit you to include a bleed area and space for
+printer's marks and instructions. Needless to say, if your printer cannot print
+to the very edge of the paper, you will need to trim (cut) the printed sheets
+to get true bleeds.
 
 A global (PDF level) cropbox setting is inherited by each page, or can be 
 overridden by setting cropbox in the page.
@@ -1047,9 +1047,12 @@ size, to ensure that the cut paper I<bleeds> (the cut goes I<through> the ink),
 rather than accidentally leaving some white paper visible outside.  Allow 
 enough "bleed" over the expected trim line to account for minor variations in 
 paper handling, folding, and cutting; to avoid showing white paper at the edge. 
-The Bleed Box is where printing could actually extend to; The Trim Box is 
-normally within it, where the paper would actually be cut. The default value is 
-equal to the Crop Box, but is often a bit smaller.
+The Bleed Box is where I<printing> could actually extend to; the Trim Box is 
+normally within it, where the paper would actually be I<cut>. The default 
+value is equal to the Crop Box, but is often a bit smaller. The space between
+the Bleed Box and the Crop Box is available for printer instructions, color
+alignment dots, etc., while crop marks (trim guides) are at least partly within
+the bleed area (and should be printed after content is printed).
 
 If no arguments are given, the current Bleed Box (global or page) coordinates
 are returned instead. The former C<get_bleedbox> (page only) function is 
@@ -1136,7 +1139,9 @@ I<meaningful> content (including [margins])". It might exclude some content,
 such as Headlines or headings. Any binding or punched-holes margin would 
 typically be outside of the Art Box, as would be page numbers and running 
 headers and footers. The default value is equal to the Crop Box, although 
-normally it would be no larger than any Trim Box.
+normally it would be no larger than any Trim Box. The Art Box may often be
+used for defining "important" content (e.g., I<excluding> advertisements) that 
+may or may not be brought over to another page (e.g., N-up printing).
 
 If no arguments are given, the current Art Box (global or page) coordinates
 are returned instead. The former C<get_artbox> (page only) function is 
@@ -1159,6 +1164,58 @@ page's own Media Box or Crop Box, you should consider also explicitly setting
 the page Art Box (and other boxes).
 
 =back
+
+=head3 Suggested Box Usage
+
+See C<examples/Boxes.pl> for an example of using boxes.
+
+How you define your boxes (or let them default) is up to you, depending on 
+whether you're duplex printing US Letter or A4 on your laser printer, to be 
+spiral bound on the bind margin, or engaging a professional printer. In the 
+latter case, discuss in advance with the print firm what capabilities (and
+limitations) they have 
+and what information they need from a PDF file. For instance, they may not want 
+a Crop Box defined, and may call for very specific box sizes. For large press
+runs, they may print multiple pages (N-up) duplexed on large web roll 
+"signatures", which are then intricately folded and guillotined (trimmed) and 
+bound together into books or magazines. You would usually just supply a PDF
+with all the pages; they would take care of the signature layout (which 
+includes offsets and 180 degree rotations). 
+
+(As an aside, don't count on a printer having
+any particular font available, so be sure to ask. Usually they will want you
+to embed all fonts used, but ask first, and double-check before handing over
+the print job! TTF/OTF fonts (C<ttfont()>) are embedded by default, but other 
+fonts (core, ps, bdf, cjk) are not! A printer I<may> have a core font 
+collection, but they are free to substitute a "workalike" font for any given 
+core font, and the results may not match what you saw on your PC!)
+
+On the assumption that you're using a single sheet (US Letter or A4) laser or
+inkjet printer, are you planning to trim each sheet down to a smaller final 
+size? If so, you can do true bleeds by defining a Trim Box and a slightly 
+larger Bleed Box. You would print bleeds (all the way to the finished edge)
+out to the Bleed Box, but nothing is enforced about the Bleed Box. At the other 
+end of the spectrum, you would define the Media 
+Box to be the physical paper size being printed on. Most printers reserve a
+little space on the sides (and possibly top and bottom) for paper handling, so
+it is often good to define your Crop Box as the printable area. Remember that
+the Media Box sets the coordinate system used, so you still need to avoid 
+going outside the Crop Box with content (most readers and printers will not
+show any ink outside of the Crop Box). Whether or not you define a Crop Box,
+you're going to almost always end up with white paper on at least the sides.
+
+For small in-house jobs, you probably won't need color alignment dots and other 
+such professional instructions and information between the Bleed Box and the 
+Crop Box, but crop marks for trimming (if used) should go just outside the Trim 
+Box (partly or wholly within the Bleed Box), and
+be drawn I<after> all content. If you're I<not> trimming the paper, don't try 
+to do any bleed effects (including solid background color pages/covers), as 
+you will usually have a white edge around the 
+sheet anyway. Don't count on a PDF document I<never> being physically printed,
+and not just displayed (where you can do things like bleed all the way to the
+media edge). Finally, for single sheet printing, an Art Box is 
+probably unnecessary, but if you're combining pages into N-up prints, or doing 
+other manipulations, it may be useful.
 
 =head3 Box Inheritance
 

@@ -57,9 +57,12 @@ examples/050_pagelabels
 examples/055_outlines
 examples/060_transparency
 examples/BarCode.pl
+examples/Boxes.pl
 examples/Bspline.pl
 examples/Content.pl
 examples/ContentText.pl
+examples/RMtutorial.pl
+examples/Rotated.pl
 examples/examples.output
 examples/README
 examples/Windows/027_winfont

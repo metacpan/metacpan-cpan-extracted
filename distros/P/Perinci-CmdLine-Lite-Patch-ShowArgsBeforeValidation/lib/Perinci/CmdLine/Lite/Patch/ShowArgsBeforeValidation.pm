@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-01-01'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -50,7 +50,7 @@ Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation - Patch Perinci::CmdLine
 
 =head1 VERSION
 
-This document describes version 0.001 of Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation (from Perl distribution Perinci-CmdLine-Lite-Patch-ShowArgsBeforeValidation), released on 2018-11-29.
+This document describes version 0.002 of Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation (from Perl distribution Perinci-CmdLine-Lite-Patch-ShowArgsBeforeValidation), released on 2020-01-01.
 
 =head1 SYNOPSIS
 
@@ -78,13 +78,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Perinci::CmdLine::Lite::Patch::ShowArgsAfterValidation>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

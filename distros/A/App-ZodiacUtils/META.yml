@@ -19,6 +19,7 @@ name: App-ZodiacUtils
 requires:
   DateTime: '0'
   DateTime::Format::Alami::EN: '0.13'
+  DateTime::Format::Natural: '0'
   List::Util: '1.45'
   Scalar::Util: '0'
   Time::Local: '0'
@@ -31,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ZodiacUtils
   homepage: https://metacpan.org/release/App-ZodiacUtils
   repository: git://github.com/perlancar/perl-App-ZodiacUtils.git
-version: '0.110'
+version: '0.111'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -162,7 +163,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -302,7 +303,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -316,7 +317,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

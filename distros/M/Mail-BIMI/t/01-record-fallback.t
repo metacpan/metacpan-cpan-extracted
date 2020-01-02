@@ -4,47 +4,47 @@ use strict;
 use warnings FATAL => 'all';
 use lib 't';
 use Test::More;
-
 use Mail::BIMI;
 use Mail::BIMI::Record;
-
 use Mail::DMARC::PurePerl;
 
-plan tests => 4;
+my $test_domain = 'test.fastmail.com';
+my $test_org_domain = Mail::DMARC::PurePerl->new->get_organizational_domain($test_domain);
+is( $test_org_domain, 'fastmail.com', 'Mail::DMARC public suffix list correctly functioning' );
 
 {
-    my $BIMI = Mail::BIMI->new();
+  my $bimi = Mail::BIMI->new;
 
-    my $DMARC = Mail::DMARC::PurePerl->new();
-    $DMARC->result()->result( 'pass' );
-    $DMARC->result()->disposition( 'reject' );
-    $BIMI->set_dmarc_object( $DMARC->result() );
+  my $dmarc = Mail::DMARC::PurePerl->new;
+  $dmarc->result->result( 'pass' );
+  $dmarc->result->disposition( 'reject' );
+  $bimi->dmarc_object( $dmarc->result );
 
-    $BIMI->set_from_domain( 'gallifreyburning.com' );
-    $BIMI->set_selector( 'FAKEfoobar' );
-    $BIMI->validate();
+  $bimi->domain( 'gallifreyburning.com' );
+  $bimi->selector( 'FAKEfoobar' );
 
-    my $Record = $BIMI->record();
-
-    is_deeply( $Record->{'domain'}, 'gallifreyburning.com', 'Fallback domain' );
-    is_deeply( $Record->{'selector'}, 'default', 'Fallback selector' );
+  my $record = $bimi->record;
+  $record->record;
+  is_deeply( $record->domain, 'gallifreyburning.com', 'Fallback domain' );
+  is_deeply( $record->selector, 'default', 'Fallback selector' );
 }
 
 {
-    my $BIMI = Mail::BIMI->new();
+  my $bimi = Mail::BIMI->new;
 
-    my $DMARC = Mail::DMARC::PurePerl->new();
-    $DMARC->result()->result( 'pass' );
-    $DMARC->result()->disposition( 'reject' );
-    $BIMI->set_dmarc_object( $DMARC->result() );
+  my $dmarc = Mail::DMARC::PurePerl->new;
+  $dmarc->result->result( 'pass' );
+  $dmarc->result->disposition( 'reject' );
+  $bimi->dmarc_object( $dmarc->result );
 
-    $BIMI->set_from_domain( 'no.domain.gallifreyburning.com' );
-    $BIMI->set_selector( 'FAKEfoobar' );
-    $BIMI->validate();
+  $bimi->domain( 'no.domain.gallifreyburning.com' );
+  $bimi->selector( 'FAKEfoobar' );
 
-    my $Record = $BIMI->record();
+  my $record = $bimi->record;
+  $record->record;
 
-    is_deeply( $Record->{'domain'}, 'gallifreyburning.com', 'Fallback domain' );
-    is_deeply( $Record->{'selector'}, 'default', 'Fallback selector' );
+  is_deeply( $record->domain, 'gallifreyburning.com', 'Fallback domain' );
+  is_deeply( $record->selector, 'default', 'Fallback selector' );
 }
 
+done_testing;

@@ -1,3 +1,9 @@
-0.1.0   2018-01-09 (PERLANCAR)
+0.1.1   2019-11-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Show examples for entry_features property and entry's features &
+	  bench_* properties.
+
+
+0.1.0   2018-01-09  Released-By: PERLANCAR
 
         - First release. Created from simplification of Acme::CPANLists.

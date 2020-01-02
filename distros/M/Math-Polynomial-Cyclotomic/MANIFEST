@@ -7,6 +7,7 @@ README
 examples/cyclo_poly
 lib/Math/Polynomial/Cyclotomic.pm
 t/01_basics.t
+t/02_memoized.t
 t/90_pod.t
 t/91_pod_cover_cp.t
 t/92_consistency.t

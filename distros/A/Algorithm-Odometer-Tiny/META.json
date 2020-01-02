@@ -1,5 +1,5 @@
 {
-   "abstract" : "Generate \"base-N odometer\" permutations",
+   "abstract" : "Generate \"base-N odometer\" permutations (Cartesian product / product set)",
    "author" : [
       "Hauke D <haukex@zero-g.net>"
    ],
@@ -54,11 +54,11 @@
    "provides" : {
       "Algorithm::Odometer::Gray" : {
          "file" : "lib/Algorithm/Odometer/Gray.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Algorithm::Odometer::Tiny" : {
          "file" : "lib/Algorithm/Odometer/Tiny.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -73,6 +73,6 @@
          "web" : "https://github.com/haukex/Algorithm-Odometer-Tiny"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

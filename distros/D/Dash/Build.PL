@@ -22,7 +22,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Dash",
-  "dist_version" => "0.02",
+  "dist_version" => "0.04",
   "license" => "mit",
   "module_name" => "Dash",
   "recursive_test_files" => 1,
@@ -40,14 +40,18 @@ my %module_build_args = (
     "dist" => "share"
   },
   "test_requires" => {
-    "Test::Most" => 0
+    "Test::More" => 0,
+    "Test::Most" => 0,
+    "utf8" => 0
   }
 );
 
 
 my %fallback_build_requires = (
   "Module::Build" => "0.3601",
-  "Test::Most" => 0
+  "Test::More" => 0,
+  "Test::Most" => 0,
+  "utf8" => 0
 );
 
 

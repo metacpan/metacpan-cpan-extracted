@@ -3,7 +3,7 @@ package Validate::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp;
 
@@ -20,7 +20,7 @@ sub new {
     my ( $class, $specs ) = @_;
 
     if ( defined $specs && ref $specs ne 'HASH' ) {
-        croak "Speccification must be a hashref";
+        croak "Specification must be a hashref";
     }
 
     my $self = bless {
@@ -623,17 +623,21 @@ Validate::Simple - (Relatively) Simple way to validate input parameters
 
 =head1 DESCRIPTION
 
-The module validates parameters against specifications. It was designed
-to validate form parameters or JSON-like structures.
+The module validates parameters against specifications.
 
 =head1 LOGIC
 
-The main use case is the following: an application receives a from
-parameters, or a JSON-object, you transform it into a Perl structure,
-create a specification of an expected data and validate against this
-specification. A specification is just a hashref with the keys same as
-parameters names and values are hashrefs with rules for a specific
-parameter.
+The general use case is the like this.
+
+You have a from handler or a handler of an API endpoint. It receives a
+hashref as a parameter. You want to make sure that the input hashref
+has all the required keys, you do not have unknown keys, and all the
+values satisfy certain criterias: type, size and other constraints...
+
+C<Validate::Simple> allows you to specify criterias for each input
+parameter in a (relatively) simple form and validate user input against
+your specification as many times as you need. A specification is just a
+hashref. The keys repeat parameters names, the values define criterias.
 
 For example:
 
@@ -650,31 +654,36 @@ For example:
             min_length => 12,
         },
         subscriptions => {
-            type => 'array',
-            of   => {
+            type  => 'array',
+            empty => 0,
+            of    => {
                 type => 'positive_int',
             },
         }
     };
 
-This specification may be used to validate a sign up form, on which a
-user is expected to enter a non-empty username with length no longer
-than 255 character, a password no shorter than 12 characters and to
-choose a subscriptions, which are passed as a list of IDs, i.e. positive
-integers. The subscriptions may not be passed at all.
+This specification can be used to validate a sign up form. Validation
+passes only if user enters a non-empty username no longer than 255
+character, a password no shorter than 12 characters and chooses 0 or more
+subscriptions (which are supposed to be provided as a list of IDs, i.e.
+positive integers. The list of subscriptions may absent (no C<required>
+key in the rule), but if it exists, it cannot be empty (because of the
+value of the C<empty> key is set to C<0>).
+
+If input data contains a key C<'remember_me'>, validation fails, because
+specification does not define rules for this key.
 
 =head1 EXPORT
 
-This module does not export anything. It is supposed to be used to
-to create a validation objects, which can be reused as many times as
-necessry.
+This module does not export anything. It is supposed to be used in OOP
+approach only.
 
 =head1 SPECIFICATIONS (SPECS)
 
-Specifications are the rules that describe what parameter are expected,
+Specifications are the rules that describe which parameters are expected,
 their types and constraints (like lengths of strings or signs of
-numbers) Specification is just a hashref, the keys are parameters names,
-and values are descriptions of expected values.
+numbers). Specification is just a hashref, the keys are parameters names,
+and the values describe criterias.
 
 Every description B<must> have a C<type> key, and B<may> have the keys
 C<required>, C<undef> and C<callback>.
@@ -684,21 +693,21 @@ C<required>, C<undef> and C<callback>.
 =head3 C<type>
 
 The value of C<type> defines an expected type of a parameter. You can
-more about supported types in the L</"Types"> section.
+learn more about supported types in the L</"Types"> section.
 
 =head3 C<required>
 
-If set to a true value, the parameter is required, and if it is not in
-the form data, the form is considered invalid. If it set to a false
-value or does not exists, the parameter is optional.
+When it is set to a true value, the parameter is required, and, if it is
+not in the input data, the form is considered invalid. When it is set to
+a false value or does not exists, the parameter is optional.
 
 =head3 C<undef>
 
-By default neither parameter can be undefined. If you expect some values
-to be undefined, you need explicitly set to this key to true.
+By default none parameters can be undefined. If you expect some values
+to be undefined, you need to explicitly set this key to true.
 
 For example, if you allow the value of the param to be literally
-anything, you may do the following:
+anything, you can do the following:
 
     my $spec = {
         whatever => {
@@ -710,9 +719,9 @@ anything, you may do the following:
 =head3 C<callback>
 
 If you have some special constraints to a value that does not fit to any
-of supported L<types|/"Types">, you may specify your own function to
-validate the value. The C<callback> key expects a coderef as a value.
-The function should receive the value as a first parameter.
+of supported L<types|/"Types">, you can specify your own validation
+function and pass it to C<callback> key as a coderef. The function should
+receive the value as a first parameter and returns true or false.
 
 For example, if you need to check whether a value is an even positive
 integer, you can do the following:
@@ -727,7 +736,8 @@ integer, you can do the following:
 In case of the L</"enum"> type, the second parameter is the hashref with
 the keys of allowed enum values.
 
-The callback function is called B<after> checking type and constraints.
+The callback function is called B<after> checking the type and
+constraints.
 
 =head2 Types
 
@@ -737,7 +747,7 @@ The value can be of any type (including array or hash), except C<undef>.
 
 =head3 Number types
 
-All number types supposrt the following keys:
+All number types support the following keys:
 
 =over
 
@@ -759,7 +769,7 @@ Less than or equal to.
 
 =back
 
-For example, the follwong spec checks whether it's a valid month number:
+For example, the following spec checks whether it's a valid month number:
 
     my $spec = {
         month => {
@@ -770,25 +780,25 @@ For example, the follwong spec checks whether it's a valid month number:
 
 =head4 number
 
-The value is a valid number. On the bacstage it simply performs
+The value is a valid number. On the backstage it simply performs
 L<looks_like_number|Scalar::Util/looks_like_number> from
 L<Scalar::Util>.
 
 =head4 positive
 
-Same as L</number>, and checks whether it greater than 0.
+Same as L</number>, and checks whether it's greater than 0.
 
 =head4 non_negative
 
-Same as L</number>, and checks whether it greater than or equal to 0.
+Same as L</number>, and checks whether it's greater than or equal to 0.
 
 =head4 negative
 
-Same as L</number>, and checks whether it greater than 0.
+Same as L</number>, and checks whether it's greater than 0.
 
 =head4 non_positive
 
-Same as L</number>, and checks whether it less than or equal to 0.
+Same as L</number>, and checks whether it's less than or equal to 0.
 
 =head4 integer
 
@@ -802,7 +812,7 @@ L<is_count|Data::Types/is_count> from L<Data::Types>.
 
 =head4 non_negative_int
 
-The value is a non-negative positive integer. It performs
+The value is a non-negative integer. It performs
 L<is_whole|Data::Types/is_whole> from L<Data::Types>.
 
 =head4 negative_int
@@ -827,7 +837,7 @@ C<max_length> and C<min_length>. Either key must be a positive integer.
 
 =head3 List types
 
-The list types B<must> have the key C<of>, which contain a spec of all
+The list types B<must> have the key C<of>, which contains a spec of all
 list values. For example:
 
     my $spec = {
@@ -846,7 +856,7 @@ list values. For example:
     };
 
 As long as the C<of> key expects another specification, you can easily
-validate a complex structures, like array of arrays of strings, hash of
+validate complex structures, like array of arrays of strings, hash of
 arrays of hashes of enums, arrays of hashes of arrays of arrays of any,
 and so on.
 
@@ -859,7 +869,7 @@ The value is an arrayref.
 
 =head4 hash
 
-The value is a hashref;
+The value is a hashref.
 
 =head3 enum
 
@@ -897,21 +907,21 @@ provided in the C<values> key, which is B<required> for enums:
 =head3 code
 
 The value is a coderef. L<Validate::Simple> only checks the type, it
-B<does not> run the code and B<does not> check it's result.
+B<does not> run the code and B<does not> check its result.
 
 =head1 METHODS
 
 =head2 new( \%spec )
 
 Creates an object. The parameter is optional, though it's recomended to
-pass it, because in this case it checks scpecs syntax only once, not on
+pass it, because in this case it checks specs syntax only once, not on
 each call of C<validate> method.
 
 =head2 validate( \%params, \%specs )
 
 Does validation of the C<\%params> against C<\%specs>. If C<\%specs> is
-not provided, performs validation against the spec, given in the C<new>
-method.
+not provided, it performs validation against the spec, given in the
+C<new> method.
 
 =head2 errors
 
@@ -925,11 +935,11 @@ Not reported... Yet...
 
 =head1 AUTHOR
 
-Andrei Pratasavitski <andrei.protasovitski@gmail.com>
+Andrei Pratasavitski <andreip@cpan.org>
 
 =head1 LICENSE
 
-    This is free software; you can redistribute it and/or modify
-    it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
 
 =cut

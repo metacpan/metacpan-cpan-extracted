@@ -2,8 +2,8 @@
 
 package Test::Regexp::Pattern;
 
-our $DATE = '2018-09-12'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2020-01-02'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -50,12 +50,16 @@ sub _test_regexp_pattern {
                         $ok = 0;
                         return;
                     };
+
                     my %args;
                     if ($eg->{gen_args}) {
                         $args{$_} = $eg->{gen_args}{$_} for keys %{$eg->{gen_args}};
                     }
-
+                    if (defined $eg->{anchor}) {
+                        $args{-anchor} = $eg->{anchor};
+                    }
                     my $pat = re($fqname, %args);
+
                     my $actual_match = $eg->{str} =~ $pat ? 1:0;
                     if (ref $eg->{matches} eq 'ARRAY') {
                         my $len = @{ $eg->{matches} };
@@ -261,7 +265,7 @@ Test::Regexp::Pattern - Test Regexp::Pattern patterns
 
 =head1 VERSION
 
-This document describes version 0.004 of Test::Regexp::Pattern (from Perl distribution Test-Regexp-Pattern), released on 2018-09-12.
+This document describes version 0.005 of Test::Regexp::Pattern (from Perl distribution Test-Regexp-Pattern), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
@@ -348,7 +352,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

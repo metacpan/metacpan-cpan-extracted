@@ -1,32 +1,89 @@
-SYNOPSIS
+NAME
+    Text::sprintfn - Drop-in replacement for sprintf(), with named parameter
+    support
 
+VERSION
+    This document describes version 0.090 of Text::sprintfn (from Perl
+    distribution Text-sprintfn), released on 2019-11-19.
+
+SYNOPSIS
      use Text::sprintfn; # by default exports sprintfn() and printfn()
-    
+
      # with no hash, behaves just like printf
      printfn '<%04d>', 1, 2; # <0001>
-    
+
      # named parameter
      printfn '<%(v1)-4d>', {v1=>-2}; # <-2  >
-    
+
      # mixed named and positional
      printfn '<%d> <%(v1)d> <%d>', {v1=>1}, 2, 3; # <2> <1> <3>
-    
+
      # named width
      printfn "<%(v1)(v2).1f>", {v1=>3, v2=>4}; # <   3>
-    
+
      # named precision
      printfn "<%(v1)(v2).(v2)f>", {v1=>3, v2=>4}; # <3.0000>
 
 DESCRIPTION
-
     This module provides sprintfn() and printfn(), which are like sprintf()
-    and printf(), with the exception that they support named parameters
-    from a hash.
+    and printf(), with the exception that they support named parameters from
+    a hash.
+
+RATIONALE
+    There exist other CPAN modules for string formatting with named
+    parameter support. Two of such modules are String::Formatter and
+    Text::Sprintf::Named. This module is far simpler to use and retains all
+    of the features of Perl's sprintf() (which we like, or perhaps hate, but
+    nevertheless are familiar with).
+
+    String::Formatter requires you to create a new formatter function first.
+    Text::Sprintf::Named also accordingly requires you to instantiate an
+    object first. There is currently no way to mix named and positional
+    parameters. And you don't get the full features of sprintf().
+
+HOW IT WORKS
+    Text::sprintfn works by converting the format string into sprintf
+    format, i.e. replacing the named parameters like "%(foo)s" to something
+    like "%11$s".
+
+DOWNSIDES
+    Currently the main downside is speed. "sprintfn()" is about 2-3 orders
+    of magnitude slower than "sprintf()". See
+    Bencher::Scenario::Textsprintfn for benchmarks.
+
+TIPS AND TRICKS
+  Common mistake 1
+    Writing
+
+     %(var)
+
+    instead of
+
+     %(var)s
+
+  Common mistake 2 (a bit more newbish)
+    Writing
+
+     sprintfn $format, %hash, ...;
+
+    instead of
+
+     sprintfn $format, \%hash, ...;
+
+  Alternative hashes
+    You have several hashes (%h1, %h2, %h3) which should be consulted for
+    values. You can either merge the hash first:
+
+     %h = (%h1, %h2, %h3); # or use some hash merging module
+     printfn $format, \%h, ...;
+
+    or create a tied hash which can consult hashes for you:
+
+     tie %h, 'Your::Module', \%h1, \%h2, \%h3;
+     printfn $format, \%h, ...;
 
 FUNCTIONS
-
- sprintfn $fmt, \%hash, ...
-
+  sprintfn $fmt, \%hash, ...
     If first argument after format is not a hash, sprintfn() will behave
     exactly like sprintf().
 
@@ -64,77 +121,38 @@ FUNCTIONS
 
      %(var containing ))s
 
- printfn $fmt, ...
-
+  printfn $fmt, ...
     Equivalent to: print sprintfn($fmt, ...).
 
-RATIONALE
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-sprintfn>.
 
-    There exist other CPAN modules for string formatting with named
-    parameter support. Two of such modules are String::Formatter and
-    Text::Sprintf::Named. This module is far simpler to use and retains all
-    of the features of Perl's sprintf() (which we like, or perhaps hate,
-    but nevertheless are familiar with).
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-sprintfn>.
 
-    String::Formatter requires you to create a new formatter function
-    first. Text::Sprintf::Named also accordingly requires you to
-    instantiate an object first. There is currently no way to mix named and
-    positional parameters. And you don't get the full features of
-    sprintf().
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-sprintfn>
 
-HOW IT WORKS
-
-    Text::sprintfn works by converting the format string into sprintf
-    format, i.e. replacing the named parameters like %(foo)s to something
-    like %11$s.
-
-DOWNSIDES
-
-    Currently the main downside is speed. sprintfn() is about 2-3 orders of
-    magnitude slower than sprintf(). A sample benchmark:
-
-    # COMMAND: perl devscripts/bench
-
-TIPS AND TRICKS
-
- Common mistake 1
-
-    Writing
-
-     %(var)
-
-    instead of
-
-     %(var)s
-
- Common mistake 2 (a bit more newbish)
-
-    Writing
-
-     sprintfn $format, %hash, ...;
-
-    instead of
-
-     sprintfn $format, \%hash, ...;
-
- Alternative hashes
-
-    You have several hashes (%h1, %h2, %h3) which should be consulted for
-    values. You can either merge the hash first:
-
-     %h = (%h1, %h2, %h3); # or use some hash merging module
-     printfn $format, \%h, ...;
-
-    or create a tied hash which can consult hashes for you:
-
-     tie %h, 'Your::Module', \%h1, \%h2, \%h3;
-     printfn $format, \%h, ...;
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     sprintf() section on perlfunc
 
     String::Formatter
 
     Text::Sprintf::Named
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2012, 2011 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

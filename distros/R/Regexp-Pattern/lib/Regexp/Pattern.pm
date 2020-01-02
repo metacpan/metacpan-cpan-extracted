@@ -1,7 +1,7 @@
 package Regexp::Pattern;
 
-our $DATE = '2019-06-09'; # DATE
-our $VERSION = '0.2.9'; # VERSION
+our $DATE = '2020-01-02'; # DATE
+our $VERSION = '0.2.10'; # VERSION
 
 use strict 'subs', 'vars';
 #use warnings;
@@ -141,7 +141,7 @@ Regexp::Pattern - Convention/framework for modules that contain collection of re
 
 =head1 VERSION
 
-This document describes version 0.2.9 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2019-06-09.
+This document describes version 0.2.10 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
@@ -319,7 +319,7 @@ description, tags, and so on, for example (taken from L<Regexp::Pattern::CPAN>):
      HERE
      examples => [
          {str=>'PERLANCAR', matches=>1},
-         {str=>'BAD ID', matches=>0},
+         {str=>'BAD ID', anchor=>1, matches=>0},
      ],
  }
 
@@ -457,6 +457,27 @@ conveniently wraps the regex inside C<< qr/\A(?:...)\z/ >>.
 Die when pattern by name C<$name> cannot be found (either the module cannot be
 loaded or the pattern with that name is not found in the module).
 
+=head1 FAQ
+
+=head2 My pattern is not anchored, but what if I want to test the anchored version?
+
+You can add C<< anchor=>1 >> or C<< gen_args=>{-anchor=>1} >> in the example,
+for example:
+
+ {
+     summary     => 'PAUSE author ID, or PAUSE ID for short',
+     pat         => qr/[A-Z][A-Z0-9]{1,8}/,
+     description => <<~HERE,
+     I'm not sure whether PAUSE allows digit for the first letter. For safety
+     I'm assuming no.
+     HERE
+     examples => [
+         {str=>'PERLANCAR', matches=>1},
+         {str=>'BAD ID', anchor=>1, matches=>0, summary=>"Contains whitespace"},
+         {str=>'NAMETOOLONG', gen_args=>{-anchor=>1}, matches=>0, summary=>"Too long"},
+     ],
+ }
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Regexp-Pattern>.
@@ -502,7 +523,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

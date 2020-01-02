@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use Encode qw(:all);
 use IO::File qw();
@@ -25,6 +25,7 @@ sub new {
 
     my ($self,$encoding);
     my (@w,$data);
+    $opts{'-encode'} ||= 'asis';  # provide default encoding
 
     if (defined $opts{'-afmfile'}) {
         $data = $class->readAFM($opts{'-afmfile'});
@@ -68,6 +69,10 @@ sub new {
         $self->{'BaseFont'} = PDFName($self->fontname());
     }
 
+    if ($opts{'-encode'} =~ m/^utf/i) {
+	die "Invalid multibyte encoding for psfont: $opts{'-encode'}\n";
+	# probably more encodings to check
+    }
     $self->encodeByData($opts{'-encode'});
 
     $self->{'-nocomps'} = 1 if $opts{'-nocomps'};

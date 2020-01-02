@@ -1,8 +1,8 @@
 package Data::Sah::Coerce::perl::To_date::From_obj::time_moment;
 
-our $DATE = '2019-12-04'; # DATE
+our $DATE = '2020-01-02'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.040'; # VERSION
+our $VERSION = '0.043'; # VERSION
 
 use 5.010001;
 use strict;
@@ -62,7 +62,7 @@ Data::Sah::Coerce::perl::To_date::From_obj::time_moment - Coerce date from Time:
 
 =head1 VERSION
 
-This document describes version 0.040 of Data::Sah::Coerce::perl::To_date::From_obj::time_moment (from Perl distribution Data-Sah-Coerce), released on 2019-12-04.
+This document describes version 0.043 of Data::Sah::Coerce::perl::To_date::From_obj::time_moment (from Perl distribution Data-Sah-Coerce), released on 2020-01-02.
 
 =head1 DESCRIPTION
 
@@ -95,7 +95,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

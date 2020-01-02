@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Moai;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 # ABSTRACT: Mojolicious UI components using modern UI libraries
 
 #pod =head1 SYNOPSIS
@@ -20,6 +20,11 @@ our $VERSION = '0.005';
 #pod
 #pod These components are designed to integrate seamlessly with L<Yancy>,
 #pod L<Mojolicious::Plugin::DBIC>, and L<Mojolicious::Plugin::SQL>.
+#pod
+#pod =head2 Testing Components
+#pod
+#pod The L<Test::Mojo::Role::Moai> library is provided to help test the Moai
+#pod components. It also works without Moai, allowing you to test any website.
 #pod
 #pod =head1 SUPPORTED LIBRARIES
 #pod
@@ -149,6 +154,63 @@ our $VERSION = '0.005';
 #pod
 #pod =back
 #pod
+#pod =head2 moai/menu/navbar
+#pod
+#pod A horizontal navigation bar.
+#pod
+#pod =head3 Stash
+#pod
+#pod =over
+#pod
+#pod =item menu
+#pod
+#pod An arrayref of menu items. Menu items are arrayrefs with two elements:
+#pod label, and route name.
+#pod
+#pod     $app->routes->get( '/' )->name( 'index' );
+#pod     $app->routes->get( '/blog' )->name( 'blog' );
+#pod     $app->routes->get( '/about' )->name( 'about' );
+#pod
+#pod     <%= include 'moai/menu/navbar',
+#pod         menu => [
+#pod             [ Home => 'index' ],
+#pod             [ Blog => 'blog' ],
+#pod             [ 'About Us' => 'about' ],
+#pod         ],
+#pod     %>
+#pod
+#pod =item brand
+#pod
+#pod A menu item for the "brand" section. An arrayref with two elements:
+#pod a label, and a route name.
+#pod
+#pod     <%= include 'moai/menu/navbar',
+#pod         brand => [ 'Zooniverse' => 'main' ],
+#pod     %>
+#pod
+#pod =item position
+#pod
+#pod Position the navbar. Can be either C<fixed-top> to affix the navbar to
+#pod the top of the viewport or C<fixed-bottom> for the bottom of the
+#pod viewport. If not set, the navbar will be a static element at the current
+#pod location.
+#pod
+#pod =item id
+#pod
+#pod An ID to add to the table.
+#pod
+#pod =item class
+#pod
+#pod A hashref of additional classes to add to certain elements:
+#pod
+#pod =over
+#pod
+#pod =item * C<navbar> - Add these classes to the C<< <nav> >> element
+#pod
+#pod =back
+#pod
+#pod =back
+#pod
 #pod =head2 moai/lib
 #pod
 #pod     %= include 'moai/lib', version => '4.1.0';
@@ -191,7 +253,11 @@ our $VERSION = '0.005';
 #pod
 #pod =over
 #pod
-#pod =item * menus (vertical lists, horizontal navbars, dropdown buttons)
+#pod =item * other menus (vertical lists, dropdown buttons)
+#pod
+#pod =item * dropdown menus
+#pod
+#pod =item * forms and other items in the navbar (move the Form plugin from Yancy?)
 #pod
 #pod =item * switched panels (tabs, accordion, slider)
 #pod
@@ -274,7 +340,7 @@ our $VERSION = '0.005';
 #pod
 #pod =head1 SEE ALSO
 #pod
-#pod L<Mojolicious::Guides::Rendering>
+#pod L<Test::Mojo::Role::Moai>, L<Mojolicious::Guides::Rendering>
 #pod
 #pod =cut
 
@@ -302,7 +368,7 @@ Mojolicious::Plugin::Moai - Mojolicious UI components using modern UI libraries
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -322,6 +388,11 @@ popular UI libraries.
 
 These components are designed to integrate seamlessly with L<Yancy>,
 L<Mojolicious::Plugin::DBIC>, and L<Mojolicious::Plugin::SQL>.
+
+=head2 Testing Components
+
+The L<Test::Mojo::Role::Moai> library is provided to help test the Moai
+components. It also works without Moai, allowing you to test any website.
 
 =head1 SUPPORTED LIBRARIES
 
@@ -451,6 +522,63 @@ A hashref of additional classes to add to certain elements:
 
 =back
 
+=head2 moai/menu/navbar
+
+A horizontal navigation bar.
+
+=head3 Stash
+
+=over
+
+=item menu
+
+An arrayref of menu items. Menu items are arrayrefs with two elements:
+label, and route name.
+
+    $app->routes->get( '/' )->name( 'index' );
+    $app->routes->get( '/blog' )->name( 'blog' );
+    $app->routes->get( '/about' )->name( 'about' );
+
+    <%= include 'moai/menu/navbar',
+        menu => [
+            [ Home => 'index' ],
+            [ Blog => 'blog' ],
+            [ 'About Us' => 'about' ],
+        ],
+    %>
+
+=item brand
+
+A menu item for the "brand" section. An arrayref with two elements:
+a label, and a route name.
+
+    <%= include 'moai/menu/navbar',
+        brand => [ 'Zooniverse' => 'main' ],
+    %>
+
+=item position
+
+Position the navbar. Can be either C<fixed-top> to affix the navbar to
+the top of the viewport or C<fixed-bottom> for the bottom of the
+viewport. If not set, the navbar will be a static element at the current
+location.
+
+=item id
+
+An ID to add to the table.
+
+=item class
+
+A hashref of additional classes to add to certain elements:
+
+=over
+
+=item * C<navbar> - Add these classes to the C<< <nav> >> element
+
+=back
+
+=back
+
 =head2 moai/lib
 
     %= include 'moai/lib', version => '4.1.0';
@@ -493,7 +621,11 @@ There should be widgets for...
 
 =over
 
-=item * menus (vertical lists, horizontal navbars, dropdown buttons)
+=item * other menus (vertical lists, dropdown buttons)
+
+=item * dropdown menus
+
+=item * forms and other items in the navbar (move the Form plugin from Yancy?)
 
 =item * switched panels (tabs, accordion, slider)
 
@@ -576,7 +708,7 @@ customized using L<Mojolicious's template C<extends>|Mojolicious::Guides::Render
 
 =head1 SEE ALSO
 
-L<Mojolicious::Guides::Rendering>
+L<Test::Mojo::Role::Moai>, L<Mojolicious::Guides::Rendering>
 
 =head1 AUTHOR
 

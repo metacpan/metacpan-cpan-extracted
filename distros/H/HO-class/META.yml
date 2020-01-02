@@ -1,7 +1,7 @@
 ---
 abstract: 'class builder for hierarchical objects'
 author:
-  - 'Mike WÃ¼rfel <sknpp@cpan.org>'
+  - 'Sebastian Knapp <sknpp@cpan.org>'
 build_requires:
   Test::AbstractMethod: '0'
   Test::Exception: '0'
@@ -24,7 +24,7 @@ provides:
     version: '0.053'
   HO::class:
     file: lib/HO/class.pm
-    version: '0.079'
+    version: '0.080'
   HO::mixin:
     file: lib/HO/mixin.pm
     version: '0.02'
@@ -35,5 +35,5 @@ requires:
 resources:
   homepage: https://github.com/p5-ho-develop/class/tree/master
   repository: git://github.com/p5-ho-develop/class.git
-version: '0.079'
+version: '0.080'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

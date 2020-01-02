@@ -133,7 +133,9 @@ subtest "opt:return_type=status+err+val" => sub {
         is_deeply($res, [undef, undef, []]);
 
         $res = $c_pl->("2018-06-32");
-        is_deeply($res, [1, "Invalid date/time: Day '32' out of range 1..30", undef]);
+        is($res->[0], 1);
+        like($res->[1], qr/Invalid date/);
+        is_deeply($res->[2], undef);
     };
 
     subtest "js" => sub {

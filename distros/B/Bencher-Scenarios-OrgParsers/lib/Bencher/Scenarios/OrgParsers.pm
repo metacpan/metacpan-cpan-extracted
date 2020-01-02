@@ -1,7 +1,7 @@
 package Bencher::Scenarios::OrgParsers;
 
-our $DATE = '2019-12-30'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-01-02'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Benchmark various Org parsers
@@ -18,7 +18,7 @@ Bencher::Scenarios::OrgParsers - Benchmark various Org parsers
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenarios::OrgParsers (from Perl distribution Bencher-Scenarios-OrgParsers), released on 2020-12-30.
+This document describes version 0.002 of Bencher::Scenarios::OrgParsers (from Perl distribution Bencher-Scenarios-OrgParsers), released on 2020-01-02.
 
 =head1 DESCRIPTION
 
@@ -56,7 +56,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

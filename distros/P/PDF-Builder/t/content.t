@@ -262,14 +262,6 @@ $gfx = $pdf->page->gfx();
 $gfx->miterlimit(3);
 like($pdf->stringify, qr/3 M/, q{miterlimit(3)});
 
-# Miter Limit (deprecated typo)
-#
-#$pdf = PDF::Builder->new('-compress' => 'none');
-#$gfx = $pdf->page->gfx();
-#
-#$gfx->meterlimit(3);
-#like($pdf->stringify, qr/3 M/, q{meterlimit(3)});
-
 # Line Dash (no args)
 
 $pdf = PDF::Builder->new('-compress' => 'none');
@@ -535,14 +527,6 @@ $gfx = $pdf->page->gfx();
 
 $gfx->hscale(105);
 like($pdf->stringify, qr/105 Tz/, q{hscale(105)});
-
-# Horizontal Scale (deprecated)
-#
-#$pdf = PDF::Builder->new('-compress' => 'none');
-#$gfx = $pdf->page->gfx();
-#
-#$gfx->hspace(105);
-#like($pdf->stringify, qr/105 Tz/, q{hspace(105)});
 
 # Fill Path
 

@@ -1,7 +1,7 @@
 package Acme::CPANModules;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.1.0'; # VERSION
+our $DATE = '2019-11-20'; # DATE
+our $VERSION = '0.1.1'; # VERSION
 
 1;
 # ABSTRACT: CPAN modules
@@ -22,7 +22,7 @@ Acme::CPANModules - CPAN modules
 
 =head1 VERSION
 
-This document describes version 0.1.0 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2018-01-09.
+This document describes version 0.1.1 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2019-11-20.
 
 =head1 DESCRIPTION
 
@@ -69,10 +69,18 @@ structure is this:
 
  This is just a list of my favorite modules.
  _
+
+     # entry_features => { # optional
+     #     feature1 => 'Summary of feature1',
+     #     feature2 => 'Summary of feature2',
+     #     ...
+     # },
+
      entries => [
          {...},
          ...
      ],
+ }
 
 Each entry is another DefHash:
 
@@ -84,9 +92,26 @@ Each entry is another DefHash:
  Data::Dump is my favorite dumping module because it outputs Perl code that
  is pretty and readable.
  _
+
      # rating => 10, # optional, on a 1-10 scale
+
      # alternate_modules => [...], # if you are reviewing an undesirable module and want to suggest better alternative(s)
+
      # related_modules => ['Data::Dump::Color', 'Data::Dumper'], # if you want to specify related modules that are not listed on the other entries of the same list
+
+     # features => {
+     #     feature1 => 1,
+     #     feature2 => 0,
+     #     feature4 => {value=>0, summary=>'Irrelevant because foo bar'},
+     #     ...
+     # },
+
+     # specify Bencher scenario participant's properties; "bench_" prefix will
+     # be removed when creating participant record.
+     # bench_code => sub { ... }, # or
+     # bench_code_template => 'Data::Dump::dump(<data>)',
+     # ...
+
  }
 
 That's it. After you have completed your list, publish your Acme::CPANModules
@@ -139,7 +164,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

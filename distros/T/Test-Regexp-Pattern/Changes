@@ -1,4 +1,9 @@
-0.004   2018-09-12 (PERLANCAR)
+0.005   2020-01-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Generate anchored regex pattern if anchor=>1 in example.
+
+
+0.004   2018-09-12  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -7,20 +12,20 @@
 	  [CT].
 
 
-0.003   2018-09-10 (PERLANCAR)
+0.003   2018-09-10  Released-By: PERLANCAR
 
 	- Use re() to retrieve the patterns.
 
 	- [dist] Bump prereq to Regexp::Pattern 0.2.7.
 
 
-0.002   2018-09-10 (PERLANCAR)
+0.002   2018-09-10  Released-By: PERLANCAR
 
 	- Fix test-regexp-pattern.
 
 	- [bugfix] Forgot to require Test::More.
 
 
-0.001   2018-09-10 (PERLANCAR)
+0.001   2018-09-10  Released-By: PERLANCAR
 
         - First release.

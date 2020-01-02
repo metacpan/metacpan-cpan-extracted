@@ -2,6 +2,91 @@ See also INFO/Changes-ver_2 for changes released for PDF::API2, and
 incorporated into PDF::Builder.
 See also INFO/Changes_2018 for earlier version 3 release logs.
 
+3.017     2019-12-31 
+
+    examples/RMtutorial.pl, examples/Boxes.pl, examples/README,
+      examples/examples.output, MANIFEST, tools/3_examples.pl,
+      INFO/old/examples.bat
+     Rich Measham's tutorial on using PDF::API2, adapted for PDF::Builder. 
+      Also a demonstration of the interaction of PDF boxes (media, crop,
+      bleed, trim, art).
+
+    lib/PDF/Builder/Basic/PDF/File-Pages.pm [RT 131147] fix problem with
+      Null object bubbling up and forcing an improper method invocation. Fix
+      used (by Vadim Repin) is in File.pm, while a narrower scope (and 
+      presumably a bit safer) fix (by Klaus Ethgen) is on standby in Pages.pm.
+
+    examples/Rotated.pl, examples/ShowFont.pl minor cleanup
+
+    examples/Rotated.pl, examples/README, examples/examples.output,
+      examples/ContentText.pl, MANIFEST, tools/3_examples.pl, 
+      INFO/old/examples.bat
+     Demonstrate how to embed rotated pages within a document.
+
+    CONTRIBUTING, README minor updates
+
+    INFO/KNOWN_INCOMP general statement about large batch of removals
+    INFO/DEPRECATED, t/content.t, lib/PDF/Builder/Content.pm, 
+      lib/PDF/Builder/Resource/ExtGState.pm
+     Remove deprecated method meterlimit() (use correct spelling miterlimit).
+    INFO/DEPRECATED, t/content.t, lib/PDF/Builder/Content.pm 
+     Remove deprecated method hspace() (use corrected name hscale).
+    INFO/DEPRECATED, lib/PDF/Builder/Content.pm 
+     Remove deprecated dash pattern options -full and -clear (replaced by
+      -pattern option).
+    INFO/DEPRECATED, t/deprecations.t, lib/PDF/Builder/NamedDestination.pm,
+      lib/PDF/Builder/Resource.pm
+     Remove deprecated method new_api() (use new instead).
+    INFO/DEPRECATED, t/papersizes.t, lib/PDF/Builder/Resource/PaperSizes.pm
+     Remove deprecated non-standard paper sizes 4a, 2a, 4b, 2b 
+      (use 4a0, 2a0, 4b0, 2b0 standard sizes instead).
+    INFO/DEPRECATED, lib/PDF/Builder/Resource/XObject/Form/BarCode/code3of9.pm
+     Remove deprecated method encode_3of9_string_w_chk() (use 
+      encode_3of9_string(*, 1) instead).
+    INFO/DEPRECATED, lib/PDF/Builder/Resource/XObject/Form/BarCode/code3of9.pm
+     Remove deprecated method encode_3of9_w_chk() (use 
+      encode_3of9(*, 1, 0) instead).
+    INFO/DEPRECATED, lib/PDF/Builder/Resource/XObject/Form/BarCode/code3of9.pm
+     Remove deprecated method encode_3of9_ext() (use 
+      encode_3of9(*, 0, 1) instead).
+    INFO/DEPRECATED, lib/PDF/Builder/Resource/XObject/Form/BarCode/code3of9.pm
+     Remove deprecated method encode_3of9_ext_w_chk() (use 
+      encode_3of9(*, 1, 1) instead).
+    INFO/DEPRECATED, lib/PDF/Builder/Resource/XObject/Image.pm
+     Rename deprecated methods imask() to mask() and 
+      bpc() to bits_per_component().
+    INFO/DEPRECATED, lib/PDF/Builder.pm
+     Rename deprecated methods openScalar() to open_scalar() and 
+      importpage() to import_page().
+    INFO/DEPRECATED, lib/PDF/Builder/Annotation.pm
+     Rename deprecated method pdfile() to pdf_file().
+
+    lib/PDF/Builder/Resource/XObject/Image/JPEG.pm 
+      check for uninitialized var per API2 2.037
+
+    Makefile.PL, lib/PDF/Builder/Docs.pm, README
+      Remove "optional" libraries from attempt to install. It was not clear
+      whether they would actually be installed or how users would react to
+      failures to install them. Most of all, there was no information passed
+      to owners of these optional libraries that their efforts were bearing
+      fruit! Just leave them to be manually installed, if desired.
+
+    lib/PDF/Builder/Resource/Font/Corefont-Postscript-SynFont-BdFont.pm
+      Check -encode for (invalid) multibyte encodings such as UTF*. There are
+      probably more encoding names to be added later (East Asian alphabets,
+      in particular). Bitmapped distribution fonts (BdFont) doesn't appear to
+      support -encode, so remove it from the POD. TrueType fonts (alone)
+      /do/ support multibyte encodings (as do CJK). Ref PDF::API2 PR 20
+      https://github.com/ssimms/pdfapi2/pull/20.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Page.pm restrict rotate() method
+      to multiple of 90 degrees. Also swap 'Rotate' property test order so
+      that find_prop() not called unnecessariy (ref RT 130722). Clarify in
+      the POD that a positive rotation is clockwise.
+
+    lib/PDF/Builder/Resource/BaseFont.pm per PDF::API2, default value for
+      returned UniByCId value (when undef), preventing undefined errors.
+
 3.016     2019-08-16
 
     INFO/RoadMap, CONTRIBUTING, MANIFEST, README

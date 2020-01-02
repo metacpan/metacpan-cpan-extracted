@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use PDF::Builder::Util qw(pdfkey);
 use PDF::Builder::Basic::PDF::Utils; # PDFName
@@ -44,14 +44,8 @@ sub new {
     return $self;
 }
 
-# Deprecated (warning added in 2.031)
-sub new_api {
-    my ($class, $api2, @options) = @_;
-    warnings::warnif('deprecated', q{Call to deprecated method "new_api($api2, ...)".  Replace with "new($api2->{'pdf'}, ...)"});
-
-    my $resource = $class->new($api2->{'pdf'}, @options);
-    return $resource;
-}
+# Note: new_api() removed in favor of new():
+#   new_api($api, ...)  replace with new($api->{'pdf'}, ...)
 
 =item $name = $resource->name()
 

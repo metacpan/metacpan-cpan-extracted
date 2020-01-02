@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "DateTime" => 0,
     "DateTime::Format::Alami::EN" => "0.13",
+    "DateTime::Format::Natural" => 0,
     "List::Util" => "1.45",
     "Scalar::Util" => 0,
     "Time::Local" => 0,
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.110",
+  "VERSION" => "0.111",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "DateTime" => 0,
   "DateTime::Format::Alami::EN" => "0.13",
+  "DateTime::Format::Natural" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

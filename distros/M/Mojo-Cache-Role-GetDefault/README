@@ -1,0 +1,120 @@
+NAME
+
+    Mojo::Cache::Role::GetDefault - Default values in get
+
+STATUS
+
+SYNOPSIS
+
+      my $cache = Mojo::Cache->new->with_roles('+GetDefault');
+    
+      # set 'abc' for $key in the cache if $key does not exist in the cache.
+      # 'abc' will also be the return value
+      my $value = $cache->get($key, 'abc');
+    
+      # sub is called and passed $key if $key does not exist in the cache.
+      # Return value is set in cache for $key and returned by get.
+      # $key is also available as the first argument
+      my $value = $cache->get($key, sub { "default value for key $_" });
+    
+      # use get normally without any default value like in Mojo::Cache
+      my $value = $cache->get($key);
+    
+      # set a default for all gets.
+      # this default will be overridden by any default passed to get.
+      $cache = $cache->default('abc');
+      $cache = $cache->default(sub { ... });
+
+DESCRIPTION
+
+    Mojo::Cache::Role::GetDefault allows Mojo::Cache to set and return
+    default in "get" when a key does not exist.
+
+ATTRIBUTES
+
+ default
+
+      my $default = $cache->default;
+      $cache      = $cache->default('abc');
+    
+      # or use a sub that is passed the key as $_ and as the first argument
+      $cache = $cache->default(sub { "default value for key $_" });
+      $cache = $cache->default(sub { "default value for key $_[0]" });
+
+    The default value that is set and returned by "get" if a key does not
+    exist in the cache. "default" may be a static value or a subroutine
+    that returns a value. The key is available to the subroutine as $_ and
+    as the first argument.
+
+    You may clear "default" with "clear_default".
+
+    "default" will be overridden by any default passed to "get".
+
+METHODS
+
+ get
+
+    get($key, [$default])
+
+      # set 'abc' for $key in the cache if $key does not exist in the cache.
+      # 'abc' will also be the return value
+      my $value = $cache->get($key, 'abc');
+    
+      # sub is called and passed $key if $key does not exist in the cache.
+      # Return value is set in cache for $key and returned by get.
+      # $key is also available as the first argument
+      my $value = $cache->get($key, sub { "default value for $_" });
+    
+      # use get normally without any default value like in Mojo::Cache
+      my $value = $cache->get($key);
+
+    "get" works like "get" in Mojo::Cache, but allows an optional default
+    value to be set and returned if the key does not exist in the cache.
+    $default may be a static value or a subroutine that returns a value.
+    The key is available to the subroutine as $_ and as the first argument.
+
+    Any $default passed to "get" will override any default set in
+    "default".
+
+    Providing no $default makes "get" behave exactly like "get" in
+    Mojo::Cache.
+
+ clear_default
+
+      $cache = $cache->clear_default;
+
+    Clears any existing default set by "default".
+
+ exists
+
+      if ($cache->exists($key)) {
+        ...
+      }
+
+    Returns true if a cached value exists for the provided key, false
+    otherwise.
+
+    "exists" is composed from Mojo::Cache::Role::Exists. See that module
+    for more information.
+
+AUTHOR
+
+    Adam Hopkins <srchulo@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2019- Adam Hopkins
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+      * Mojo::Cache
+
+      * Mojo::Cache::Role::Exists
+
+      * Mojo::Base
+

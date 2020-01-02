@@ -1,9 +1,9 @@
 package App::ZodiacUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2020-01-01'; # DATE
 our $DIST = 'App-ZodiacUtils'; # DIST
-our $VERSION = '0.110'; # VERSION
+our $VERSION = '0.111'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,7 +14,7 @@ our %SPEC;
 my $sch_array_of_dates = ['array*', {
     of=>['date*', {
         'x.perl.coerce_to' => 'DateTime',
-        'x.perl.coerce_rules'=>['From_str::alami_en'],
+        'x.perl.coerce_rules'=>['From_str::natural'],
     }],
     min_len=>1,
 }];
@@ -141,7 +141,7 @@ App::ZodiacUtils - CLI utilities related to zodiac
 
 =head1 VERSION
 
-This document describes version 0.110 of App::ZodiacUtils (from Perl distribution App-ZodiacUtils), released on 2019-11-29.
+This document describes version 0.111 of App::ZodiacUtils (from Perl distribution App-ZodiacUtils), released on 2020-01-01.
 
 =head1 DESCRIPTION
 
@@ -270,7 +270,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

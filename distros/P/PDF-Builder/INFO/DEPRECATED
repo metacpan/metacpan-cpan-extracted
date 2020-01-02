@@ -4,87 +4,10 @@ although some are interfaces that have been removed. Rather than keeping the
 old names around forever, they will be sunset and removed in due time. Please 
 periodically check this list and make sure you have plans to change or remove 
 these deprecated usages before they disappear from PDF::Builder. Initially,
-the deprecated items may only be commented out (so they can be restored by a
+the deprecated items MAY only be commented out (so they can be restored by a
 user in an emergency), but eventually they WILL be removed.
 
 In order of scheduled removal date:
-
-meterlimit      method in Content.pm and Resource/ExtGState.pm
-   Misspelling, corrected to miterlimit. Use "miterlimit()" instead. A warning
-   message is currently given. Scheduled to be removed on or after August, 2019.
-
-hspace          method in Content.pm
-   Misnamed, as it not an amount of horizontal space, but is a horizontal
-   scaling factor. Use "hscale()" instead. A warning message is currently 
-   given. Scheduled to be removed on or after August, 2019.
-
-   It is POSSIBLE that after hspace() is removed, a NEW hspace() might appear
-   for the purpose of adding some amount of horizontal space to a line of text,
-   but there are no firm plans at this point. If such a method is added before
-   the old hspace() is cold and dead, it would have to get a different name.
-
-linedash -full and -clear options   method in Content.pm
-   The dash pattern setting hash options "-full" and "-clear" are deprecated in
-   favor of the "-pattern" array. A warning message is currently given. They 
-   are scheduled to be removed on or after August, 2019.
-
-new_api         method in modules NamedDestination.pm and Resource.pm
-   Also in t/deprecations.t
-
-   This method was dropped in favor of using "new(PDF_object, options)". A
-   warning message is currently given. new_api() is scheduled to be removed on
-   or after August, 2019.
-
-paper sizes 4a, 2a, 4b, 2b    in Resource/PaperSizes.pm
-   Non-standard paper size names. Use 4a0, 2a0, 4b0, and 2b0 instead. Scheduled
-   to be removed on or after August, 2019.
-
-encode_3of9_string_w_chk   method in Resource/XObject/Form/BarCode/code3of9.pm
-   This was rolled into encode_3of9_string() with a parameter some time ago.
-   Use encode_3of9_string(*, 1) instead. A warning message is currently given.
-   encode_3of9_string_w_chk is scheduled to be removed on or after August, 2019.
-
-encode_3of9_w_chk   method in Resource/XObject/Form/BarCode/code3of9.pm
-   This was rolled into encode_3of9() with a parameter some time ago.
-   Use encode_3of9(*, 1, 0) instead. A warning message is currently given.
-   encode_3of9_w_chk is scheduled to be removed on or after August, 2019.
-
-encode_3of9_ext method in Resource/XObject/Form/BarCode/code3of9.pm
-   This was rolled into encode_3of9() with a parameter some time ago.
-   Use encode_3of9(*, 0, 1) instead. A warning message is currently given.
-   encode_3of9_ext is scheduled to be removed on or after August, 2019.
-
-encode_3of9_ext_w_chk   method in Resource/XObject/Form/BarCode/code3of9.pm
-   This was rolled into encode_3of9() with a parameter some time ago.
-   Use encode_3of9(*, 1, 1) instead. A warning message is currently given.
-   encode_3of9_ext_w_chk is scheduled to be removed on or after August, 2019.
-
-imask           method in Resource/XObject/Image.pm
-   This functionality was rolled into mask() some time ago. Simply rename any
-   call to "imask" to "mask". A warning message is currently given. imask is 
-   scheduled to be removed on or after August, 2019.
-
-bpc             method in Resource/XObject/Image.pm
-   This functionality was renamed to bits_per_component() some time ago. Simply 
-   rename any call to "bpc" to "bits_per_component". A warning message is 
-   currently given. bpc is scheduled to be removed on or after August, 2019.
-
-openScalar      method in Builder.pm
-   This functionality was renamed to open_scalar() some time ago. Simply 
-   rename any call to "openScalar" to "open_scalar". A warning message is 
-   currently given. openScalar is scheduled to be removed on or after 
-   August, 2019.
-
-importpage      method in Builder.pm
-   This functionality was renamed to import_page() some time ago. Simply 
-   rename any call to "importpage" to "import_page". A warning message is 
-   currently given. importpage is scheduled to be removed on or after 
-   August, 2019.
-
-pdfile          method in Annotation.pm
-   This functionality was renamed to pdf_file(). Simply rename any call to
-   "pdfile" to "pdf_file". pdfile is scheduled to be removed on or after
-   November, 2019.
 
 spline          method in Content.pm
    This functionality was renamed to qbspline() [quadratic Bezier spline].
@@ -125,4 +48,89 @@ Blackls1        DecodeParms hash element in Resource/XObject/Image/TIFF.pm
    PDF::API2 bug RT 15730, but rejected. BlackIs1 has been added, and Blackls1 
    deprecated. Blackls1 will be removed (no longer set) on or after 
    August, 2018. [Removed September, 2018]
+
+meterlimit      method in Content.pm and Resource/ExtGState.pm
+   Misspelling, corrected to miterlimit. Use "miterlimit()" instead. A warning
+   message is currently given. Scheduled to be removed on or after August, 2019.
+   [Removed November, 2019]
+
+hspace          method in Content.pm
+   Misnamed, as it not an amount of horizontal space, but is a horizontal
+   scaling factor. Use "hscale()" instead. A warning message is currently 
+   given. Scheduled to be removed on or after August, 2019.
+
+   It is POSSIBLE that after hspace() is removed, a NEW hspace() might appear
+   for the purpose of adding some amount of horizontal space to a line of text,
+   but there are no firm plans at this point. If such a method is added before
+   the old hspace() is cold and dead, it would have to get a different name.
+   [Removed November, 2019]
+
+linedash -full and -clear options   method in Content.pm
+   The dash pattern setting hash options "-full" and "-clear" are deprecated in
+   favor of the "-pattern" array. A warning message is currently given. They 
+   are scheduled to be removed on or after August, 2019.
+   [Removed November, 2019]
+
+new_api         method in modules NamedDestination.pm and Resource.pm
+   Also in t/deprecations.t
+
+   This method was dropped in favor of using "new(PDF_object, options)". A
+   warning message is currently given. new_api() is scheduled to be removed on
+   or after August, 2019. [Removed November, 2019]
+
+paper sizes 4a, 2a, 4b, 2b    in Resource/PaperSizes.pm
+   Non-standard paper size names. Use 4a0, 2a0, 4b0, and 2b0 instead. Scheduled
+   to be removed on or after August, 2019. [Removed November, 2019]
+
+encode_3of9_string_w_chk   method in Resource/XObject/Form/BarCode/code3of9.pm
+   This was rolled into encode_3of9_string() with a parameter some time ago.
+   Use encode_3of9_string(*, 1) instead. A warning message is currently given.
+   encode_3of9_string_w_chk is scheduled to be removed on or after August, 2019.
+   [Removed November, 2019]
+
+encode_3of9_w_chk   method in Resource/XObject/Form/BarCode/code3of9.pm
+   This was rolled into encode_3of9() with a parameter some time ago.
+   Use encode_3of9(*, 1, 0) instead. A warning message is currently given.
+   encode_3of9_w_chk is scheduled to be removed on or after August, 2019.
+   [Removed November, 2019]
+
+encode_3of9_ext method in Resource/XObject/Form/BarCode/code3of9.pm
+   This was rolled into encode_3of9() with a parameter some time ago.
+   Use encode_3of9(*, 0, 1) instead. A warning message is currently given.
+   encode_3of9_ext is scheduled to be removed on or after August, 2019.
+   [Removed November, 2019]
+
+encode_3of9_ext_w_chk   method in Resource/XObject/Form/BarCode/code3of9.pm
+   This was rolled into encode_3of9() with a parameter some time ago.
+   Use encode_3of9(*, 1, 1) instead. A warning message is currently given.
+   encode_3of9_ext_w_chk is scheduled to be removed on or after August, 2019.
+   [Removed November, 2019]
+
+imask           method in Resource/XObject/Image.pm
+   This functionality was rolled into mask() some time ago. Simply rename any
+   call to "imask" to "mask". A warning message is currently given. imask is 
+   scheduled to be removed on or after August, 2019. [Removed November, 2019]
+
+bpc             method in Resource/XObject/Image.pm
+   This functionality was renamed to bits_per_component() some time ago. Simply 
+   rename any call to "bpc" to "bits_per_component". A warning message is 
+   currently given. bpc is scheduled to be removed on or after August, 2019.
+   [Removed November, 2019]
+
+openScalar      method in Builder.pm
+   This functionality was renamed to open_scalar() some time ago. Simply 
+   rename any call to "openScalar" to "open_scalar". A warning message is 
+   currently given. openScalar is scheduled to be removed on or after 
+   August, 2019. [Removed November, 2019]
+
+importpage      method in Builder.pm
+   This functionality was renamed to import_page() some time ago. Simply 
+   rename any call to "importpage" to "import_page". A warning message is 
+   currently given. importpage is scheduled to be removed on or after 
+   August, 2019. [Removed November, 2019]
+
+pdfile          method in Annotation.pm
+   This functionality was renamed to pdf_file(). Simply rename any call to
+   "pdfile" to "pdf_file". pdfile is scheduled to be removed on or after
+   November, 2019. [Removed November, 2019]
 

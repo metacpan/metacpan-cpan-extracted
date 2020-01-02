@@ -1,3 +1,5 @@
+## no critic: Modules::ProhibitAutomaticExportation
+
 package Text::sprintfn;
 
 use 5.010001;
@@ -8,7 +10,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT    = qw(sprintfn printfn);
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.090'; # VERSION
 
 our $distance  = 10;
 
@@ -137,7 +139,7 @@ Text::sprintfn - Drop-in replacement for sprintf(), with named parameter support
 
 =head1 VERSION
 
-This document describes version 0.08 of Text::sprintfn (from Perl distribution Text-sprintfn), released on 2015-09-15.
+This document describes version 0.090 of Text::sprintfn (from Perl distribution Text-sprintfn), released on 2019-11-19.
 
 =head1 SYNOPSIS
 
@@ -162,6 +164,65 @@ This document describes version 0.08 of Text::sprintfn (from Perl distribution T
 
 This module provides sprintfn() and printfn(), which are like sprintf() and
 printf(), with the exception that they support named parameters from a hash.
+
+=head1 RATIONALE
+
+There exist other CPAN modules for string formatting with named parameter
+support. Two of such modules are L<String::Formatter> and
+L<Text::Sprintf::Named>. This module is far simpler to use and retains all of
+the features of Perl's sprintf() (which we like, or perhaps hate, but
+nevertheless are familiar with).
+
+String::Formatter requires you to create a new formatter function first.
+Text::Sprintf::Named also accordingly requires you to instantiate an object
+first. There is currently no way to mix named and positional parameters. And you
+don't get the full features of sprintf().
+
+=head1 HOW IT WORKS
+
+Text::sprintfn works by converting the format string into sprintf format, i.e.
+replacing the named parameters like C<%(foo)s> to something like C<%11$s>.
+
+=head1 DOWNSIDES
+
+Currently the main downside is speed. C<sprintfn()> is about 2-3 orders of
+magnitude slower than C<sprintf()>. See L<Bencher::Scenario::Textsprintfn> for
+benchmarks.
+
+=head1 TIPS AND TRICKS
+
+=head2 Common mistake 1
+
+Writing
+
+ %(var)
+
+instead of
+
+ %(var)s
+
+=head2 Common mistake 2 (a bit more newbish)
+
+Writing
+
+ sprintfn $format, %hash, ...;
+
+instead of
+
+ sprintfn $format, \%hash, ...;
+
+=head2 Alternative hashes
+
+You have several hashes (%h1, %h2, %h3) which should be consulted for values.
+You can either merge the hash first:
+
+ %h = (%h1, %h2, %h3); # or use some hash merging module
+ printfn $format, \%h, ...;
+
+or create a tied hash which can consult hashes for you:
+
+ tie %h, 'Your::Module', \%h1, \%h2, \%h3;
+ printfn $format, \%h, ...;
 
 =head1 FUNCTIONS
 
@@ -206,79 +267,6 @@ There is currently no way to escape ")" in named parameter, e.g.:
 
 Equivalent to: print sprintfn($fmt, ...).
 
-=head1 RATIONALE
-
-There exist other CPAN modules for string formatting with named parameter
-support. Two of such modules are L<String::Formatter> and
-L<Text::Sprintf::Named>. This module is far simpler to use and retains all of
-the features of Perl's sprintf() (which we like, or perhaps hate, but
-nevertheless are familiar with).
-
-String::Formatter requires you to create a new formatter function first.
-Text::Sprintf::Named also accordingly requires you to instantiate an object
-first. There is currently no way to mix named and positional parameters. And you
-don't get the full features of sprintf().
-
-=head1 HOW IT WORKS
-
-Text::sprintfn works by converting the format string into sprintf format, i.e.
-replacing the named parameters like C<%(foo)s> to something like C<%11$s>.
-
-=head1 DOWNSIDES
-
-Currently the main downside is speed. C<sprintfn()> is about 2-3 orders of
-magnitude slower than C<sprintf()>. A sample benchmark:
-
-                                                Rate sprintfn("%(a)s%(b)d%(c)f",{..}) 1k sprintfn("%(a)s",{a=>1}) 1k sprintfn("%s",1) 1k sprintf ("%s%d%f",1,2,3) 1k sprintf ("%s",1) 1k
- sprintfn("%(a)s%(b)d%(c)f",{..}) 1k 45.354+-0.084/s                                  --                      -58.7%              -97.3%                      -99.9%              -99.9%
- sprintfn("%(a)s",{a=>1}) 1k          109.82+-0.14/s                       142.13+-0.54%                          --              -93.4%                      -99.7%              -99.7%
- sprintfn("%s",1) 1k                  1672.62+-0.6/s                          3587.9+-7%                  1423.1+-2%                  --                      -96.1%              -96.2%
- sprintf ("%s%d%f",1,2,3) 1k             42658+-12/s                         93950+-180%                  38744+-50%             2450.4%                          --               -2.2%
- sprintf ("%s",1) 1k                     43596+-48/s                         96020+-210%                  39599+-66%          2506.5+-3%                  2.2+-0.12%                  --
-
-=head1 TIPS AND TRICKS
-
-=head2 Common mistake 1
-
-Writing
-
- %(var)
-
-instead of
-
- %(var)s
-
-=head2 Common mistake 2 (a bit more newbish)
-
-Writing
-
- sprintfn $format, %hash, ...;
-
-instead of
-
- sprintfn $format, \%hash, ...;
-
-=head2 Alternative hashes
-
-You have several hashes (%h1, %h2, %h3) which should be consulted for values.
-You can either merge the hash first:
-
- %h = (%h1, %h2, %h3); # or use some hash merging module
- printfn $format, \%h, ...;
-
-or create a tied hash which can consult hashes for you:
-
- tie %h, 'Your::Module', \%h1, \%h2, \%h3;
- printfn $format, \%h, ...;
-
-=head1 SEE ALSO
-
-sprintf() section on L<perlfunc>
-
-L<String::Formatter>
-
-L<Text::Sprintf::Named>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Text-sprintfn>.
@@ -295,13 +283,21 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+sprintf() section on L<perlfunc>
+
+L<String::Formatter>
+
+L<Text::Sprintf::Named>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

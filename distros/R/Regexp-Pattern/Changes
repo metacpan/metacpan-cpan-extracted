@@ -1,4 +1,11 @@
-0.2.9   2019-06-09 (PERLANCAR)
+0.2.10  2020-01-02  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- [doc] Add FAQ section.
+
+
+0.2.9   2019-06-09  Released-By: PERLANCAR
 
         - No spec changes.
 
@@ -7,7 +14,7 @@
         - [doc] Fix typo.
 
 
-0.2.8   2018-09-12 (PERLANCAR)
+0.2.8   2018-09-12  Released-By: PERLANCAR
 
         - No spec changes.
 
@@ -17,7 +24,7 @@
 	  [CT].
 
 
-0.2.7   2018-09-10 (PERLANCAR)
+0.2.7   2018-09-10  Released-By: PERLANCAR
 
         - No spec changes.
 
@@ -25,7 +32,7 @@
 	  -anchor=>1 argument.
 
 
-0.2.6   2018-09-10 (PERLANCAR)
+0.2.6   2018-09-10  Released-By: PERLANCAR
 
 	- No spec changes.
 
@@ -35,7 +42,7 @@
           dynamic pattern (PWP:Regexp::Pattern 0.002-).
 
 
-0.2.5   2018-09-10 (PERLANCAR)
+0.2.5   2018-09-10  Released-By: PERLANCAR
 
 	- No spec changes.
 
@@ -52,12 +59,12 @@
           render matching example PODs.
 
 
-0.2.4   2018-09-10 (PERLANCAR)
+0.2.4   2018-09-10  Released-By: PERLANCAR
 
 	- Specify regexp examples.
 
 
-0.2.3   2018-04-03 (PERLANCAR)
+0.2.3   2018-04-03  Released-By: PERLANCAR
 
 	- No spec changes.
 
@@ -71,7 +78,7 @@
 	- Some fixes.
 
 
-0.2.2   2018-03-24 (PERLANCAR)
+0.2.2   2018-03-24  Released-By: PERLANCAR
 
 	- No spec changes.
 
@@ -79,14 +86,14 @@
 	  in 0.2.0.
 
 
-0.2.1   2018-03-24 (PERLANCAR)
+0.2.1   2018-03-24  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- [doc] Some wording/grammar fixes.
 
 
-0.2.0   2018-03-24 (PERLANCAR)
+0.2.0   2018-03-24  Released-By: PERLANCAR
 
         - Add hash interface.
 
@@ -96,14 +103,14 @@
         - [doc] Mention related Dist::Zilla plugins.
 
 
-0.1.4   2016-12-31 (PERLANCAR)
+0.1.4   2016-12-31  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- [doc] Mention Regexp::Pattern::RegexpCommon.
 
 
-0.1.3   2016-12-31 (PERLANCAR)
+0.1.3   2016-12-31  Released-By: PERLANCAR
 
 	- No spec changes.
 
@@ -113,14 +120,14 @@
 	  hash.
 
 
-0.1.2   2016-09-14 (PERLANCAR)
+0.1.2   2016-09-14  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- Avoid use of defined-or (perl5.10-ism) [CT].
 
 
-0.1.1   2016-09-13 (PERLANCAR)
+0.1.1   2016-09-13  Released-By: PERLANCAR
 
         - [Removed] To simplify interface, remove all helper functions except
           re(). The removed functionalities can now be found in
@@ -129,6 +136,6 @@
         - [optimize] Skip 'use warnings' to lower startup overhead.
 
 
-0.1.0   2016-09-12 (PERLANCAR)
+0.1.0   2016-09-12  Released-By: PERLANCAR
 
         - First early release.

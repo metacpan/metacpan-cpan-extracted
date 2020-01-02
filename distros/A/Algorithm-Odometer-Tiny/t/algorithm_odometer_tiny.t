@@ -33,8 +33,8 @@ BEGIN {
 	use_ok('Algorithm::Odometer::Tiny') or BAIL_OUT("failed to use Algorithm::Odometer::Tiny");
 	use_ok('Algorithm::Odometer::Gray') or BAIL_OUT("failed to use Algorithm::Odometer::Gray");
 }
-is $Algorithm::Odometer::Tiny::VERSION, '0.02', 'Algorithm::Odometer::Tiny version matches tests';
-is $Algorithm::Odometer::Gray::VERSION, '0.02', 'Algorithm::Odometer::Gray version matches tests';
+is $Algorithm::Odometer::Tiny::VERSION, '0.04', 'Algorithm::Odometer::Tiny version matches tests';
+is $Algorithm::Odometer::Gray::VERSION, '0.04', 'Algorithm::Odometer::Gray version matches tests';
 
 {
 	my $odo = Algorithm::Odometer::Tiny->new( ['foo','bar'], '-', [3..5] );

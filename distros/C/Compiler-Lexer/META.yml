@@ -8,10 +8,10 @@ build_requires:
   ExtUtils::ParseXS: '2.21'
   Test::More: '0.95'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build: '0.4005'
   Module::Build::XSUtil: '0.02'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Compiler::Lexer:
     file: lib/Compiler/Lexer.pm
-    version: '0.22'
+    version: '0.23'
   Compiler::Lexer::Kind:
     file: lib/Compiler/Lexer/Constants.pm
   Compiler::Lexer::SyntaxType:
@@ -42,15 +42,18 @@ resources:
   bugtracker: https://github.com/goccy/p5-Compiler-Lexer/issues
   homepage: https://github.com/goccy/p5-Compiler-Lexer
   repository: git://github.com/goccy/p5-Compiler-Lexer.git
-version: '0.22'
+version: '0.23'
 x_authority: cpan:GOCCY
 x_contributors:
-  - 'tokuhirom <tokuhirom@gmail.com>'
-  - 'Reini Urban <rurban@cpanel.net>'
   - 'Fumihiro Itoh <fmhrit@gmail.com>'
+  - 'K <x00.x7f@gmail.com>'
+  - 'Masaaki Goshima <goccy54@gmail.com>'
   - 'Masaaki Goshima <masaaki.goshima@mixi.co.jp>'
   - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Reini Urban <rurban@cpanel.net>'
   - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'brian d foy <brian.d.foy@gmail.com>'
   - 'moznion <moznion@gmail.com>'
-  - 'Masaaki Goshima <goccy54@gmail.com>'
+  - 'tokuhirom <tokuhirom@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

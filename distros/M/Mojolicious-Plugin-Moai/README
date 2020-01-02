@@ -6,6 +6,12 @@ popular UI libraries.
 These components are designed to integrate seamlessly with Yancy,
 Mojolicious::Plugin::DBIC, and Mojolicious::Plugin::SQL.
 
+  Testing Components
+
+The Test::Mojo::Role::Moai library is provided to help test the Moai
+components. It also works without Moai, allowing you to test any
+website.
+
 INSTALLATION
 
 This is a Perl module distribution. It should be installed with whichever

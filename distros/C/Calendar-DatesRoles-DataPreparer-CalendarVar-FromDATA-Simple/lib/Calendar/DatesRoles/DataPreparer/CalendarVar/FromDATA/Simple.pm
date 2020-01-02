@@ -1,7 +1,9 @@
 package Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple;
 
-our $DATE = '2019-07-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-01-01'; # DATE
+our $DIST = 'Calendar-DatesRoles-DataPreparer-CalendarVar-FromDATA-Simple'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,9 +39,9 @@ sub prepare_data {
         my @fields = split /;/, $line;
         my $e = {};
         $e->{date} = $fields[0];
-        $e->{date} =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?:T|\z)/
+        $e->{date} =~ /\A([0-9]{4}|-)-([0-9]{2})-([0-9]{2})(?:T|\z)/
             or die "BUG: $mod:data #$i: Invalid date syntax '$e->{date}'";
-        $e->{year}  = $1;
+        $e->{year}  = $1 unless $1 eq '-';
         $e->{month} = $2 + 0;
         $e->{day}   = $3 + 0;
         $e->{summary} = $fields[1];
@@ -67,7 +69,7 @@ Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple - Populate $CA
 
 =head1 VERSION
 
-This document describes version 0.004 of Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple (from Perl distribution Calendar-DatesRoles-DataPreparer-CalendarVar-FromDATA-Simple), released on 2019-07-08.
+This document describes version 0.005 of Calendar::DatesRoles::DataPreparer::CalendarVar::FromDATA::Simple (from Perl distribution Calendar-DatesRoles-DataPreparer-CalendarVar-FromDATA-Simple), released on 2020-01-01.
 
 =head1 DESCRIPTION
 
@@ -146,7 +148,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

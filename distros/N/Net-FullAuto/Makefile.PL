@@ -1,7 +1,7 @@
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2019  Brian M. Kelly
+#    Copyright © 2000-2020  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000507';
+our $VERSION='1.0000510';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -269,7 +269,7 @@ my $fa_banner=<<END;
 
 
 
-   Copyright $c 2000-2019  Brian M. Kelly  Brian.Kelly\@FullAuto.com
+   Copyright $c 2000-2020  Brian M. Kelly  Brian.Kelly\@FullAuto.com
 
 
 END
@@ -6146,7 +6146,7 @@ END
 
    *THANK YOU* For Trying FullAuto!   Net::FullAuto INSTALLATION PROGRAM
 
-   Copyright (C) 2000-2019   Brian M. Kelly   Brian.Kelly\@FullAuto.com
+   Copyright (C) 2000-2020   Brian M. Kelly   Brian.Kelly\@FullAuto.com
 
    This program comes with ABSOLUTELY NO WARRANTY; for details select 2.
    This is free software, and you are welcome to redistribute it under certain

@@ -15,7 +15,7 @@ our @EXPORT_OK   = qw(
     cyclo_poly cyclo_factors cyclo_poly_iterate cyclo_factors_iterate
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION     = '0.001';
+our $VERSION     = '0.002';
 
 # some polynomial with default coefficient type
 my $poly = Math::Polynomial->new;
@@ -24,8 +24,8 @@ $poly->string_config({fold_sign => 1, times => '*'});
 # ----- private subroutine -----
 
 sub _cyclo_poly {
-    my ($u, $factors, $n, $all) = @_;
-    my @d = divisors($n);
+    my ($u, $table, $n, $divisors) = @_;
+    my @d = $divisors? (grep { not $n % $_ } @{$divisors}): divisors($n);
     my $p = $u->monomial(pop @d)->sub_($u);
     if (@d) {
         my $m = $d[-1];
@@ -33,49 +33,54 @@ sub _cyclo_poly {
         for (my $i = 1; $i < $#d; ++$i) {
             my $r = $d[$i];
             if ($m % $r) {
-                $p /= $factors->{$r} || _cyclo_poly($u, $factors, $r);
+                $p /= $table->{$r} || _cyclo_poly($u, $table, $r, \@d);
             }
         }
     }
-    $factors->{$n} = $p;
-    return $p if !$all;
-    return map { $factors->{$_} || _cyclo_poly($u, $factors, $_) } @d, $n;
+    $table->{$n} = $p;
+    return $p;
+}
+
+sub _cyclo_factors {
+    my ($u, $table, $n) = @_;
+    my @d = divisors($n);
+    return map { $table->{$_} || _cyclo_poly($u, $table, $_, \@d) } @d;
 }
 
 # ----- Math::Polynomial extension -----
 
 sub Math::Polynomial::cyclotomic {
-    my ($this, $n) = @_;
+    my ($this, $n, $table) = @_;
     my $u = $this->monomial(0);
-    return _cyclo_poly($u, {}, $n);
+    return _cyclo_poly($u, {}, $n) if !$table;
+    return $table->{$n} || _cyclo_poly($u, $table, $n);
 }
 
 sub Math::Polynomial::cyclo_factors {
-    my ($this, $n) = @_;
+    my ($this, $n, $table) = @_;
     my $u = $this->monomial(0);
-    return _cyclo_poly($u, {}, $n, 1);
+    return _cyclo_factors($u, $table || {}, $n);
 }
 
 sub Math::Polynomial::cyclo_poly_iterate {
-    my ($this, $n) = @_;
+    my ($this, $n, $table) = @_;
     my $u = $this->monomial(0);
-    my %f = ();
     $n ||= 1;
+    --$n;
+    $table ||= {};
     return
         sub {
-            _cyclo_poly($u, \%f, $n++);
+            ++$n;
+            $table->{$n} || _cyclo_poly($u, $table, $n);
         };
 }
 
 sub Math::Polynomial::cyclo_factors_iterate {
-    my ($this, $n) = @_;
+    my ($this, $n, $table) = @_;
     my $u = $this->monomial(0);
-    my %f = ();
     $n ||= 1;
-    return
-        sub {
-            _cyclo_poly($u, \%f, $n++, 1);
-        };
+    $table ||= {};
+    return sub { _cyclo_factors($u, $table, $n++) };
 }
 
 # ----- public subroutines -----
@@ -97,7 +102,7 @@ Math::Polynomial::Cyclotomic - cyclotomic polynomials generator
 
 =head1 VERSION
 
-This documentation refers to Version 0.001 of Math::Polynomial::Cyclotomic.
+This documentation refers to Version 0.002 of Math::Polynomial::Cyclotomic.
 
 =head1 SYNOPSIS
 
@@ -128,6 +133,12 @@ This documentation refers to Version 0.001 of Math::Polynomial::Cyclotomic.
   $it = $poly->cyclo_poly_iterate(1);     # as above
   $it = $poly->cyclo_factors_iterate(3);  # as above
 
+  # optional argument: hashref of read-write polynomial index
+  %table = ();
+  @f6    = cyclo_factors(6, \%table);
+  $p3    = $table{3};                     # already done
+  $p18   = cyclo_poly(18, \%table);       # faster
+
 =head1 DESCRIPTION
 
 This small extension of Math::Polynomial adds a constructor for cyclotomic
@@ -143,12 +154,23 @@ but not of any other binomial I<x^k-1> with I<k> E<lt> I<n>.
 If C<$n> is a positive integer number, C<cyclo_poly($n)> calculates
 the I<n>th cyclotomic polynomial.
 
+If C<%table> is a dictionary mapping indexes to previously computed
+cyclotomic polynomials, C<cyclo_poly($n, \%table)> will do the same, but
+use the table to store and look up intermediate results that also happen
+to be cyclotomic polynomials.  The table must not contain other stuff,
+nor should it be used for more than one coefficient type.  To be safe,
+start with an empty hash but re-use it for similar calculations.
+
 =item I<Math::Polynomial::cyclotomic>
 
 If C<$poly> is a Math::Polynomial object and Math::Polynomial::Cyclotomic
 has been loaded, C<$poly-E<gt>cyclotomic($n)> is essentially equivalent
 to C<cyclo_poly($n)>, but returns a polynomial sharing the coefficient
 type of C<$poly>.
+
+With an optional hashref argument for memoization,
+C<$poly-E<gt>cyclotomic($n, \%table)> will work similar to
+C<cyclo_poly($n, \%table)>.
 
 =item I<cyclo_factors>
 
@@ -159,12 +181,21 @@ running through all positive integer divisors of I<n>.  The factors are
 ordered by increasing index, so that the I<n>th cyclotomic polynomial
 will be the last element of the list returned.
 
+Like L</cyclo_poly>, I<cyclo_factors> can be called with an optional
+hashref argument for memoization.  It will store individual cyclotomic
+polynomials, not complete factorizations, and can thus be used with
+I<cyclo_poly> and I<cyclo_factors> interchangeably.
+
 =item I<Math::Polynomial::cyclo_factors>
 
 If C<$poly> is a Math::Polynomial object and Math::Polynomial::Cyclotomic
 has been loaded, C<$poly-E<gt>cyclo_factors($n)> is essentially equivalent
 to C<cyclo_factors($n)>, but returns a list of polynomials sharing the
 coefficient type of C<$poly>.
+
+With an optional hashref argument for memoization,
+C<$poly-E<gt>cyclo_factors($n, \%table)> will work similar to
+C<cyclo_factors($n, \%table)>.
 
 =item I<cyclo_poly_iterate>
 
@@ -176,12 +207,19 @@ calls of I<cyclo_poly>, as intermediate results that would otherwise
 be re-calculated later are memoized in the state of the closure.
 Re-assigning or undefining the coderef will free the memory used for that.
 
+Alternatively, an external memoization table can be used, if supplied
+as optional hashref argument, as in C<cyclo_poly_iterate($n, \%table)>.
+
 =item I<Math::Polynomial::cyclo_poly_iterate>
 
 If C<$poly> is a Math::Polynomial object and Math::Polynomial::Cyclotomic
 has been loaded, C<$poly-E<gt>cyclo_poly_iterate($n)> is essentially
 equivalent to C<cyclo_poly_iterate($n)>, but the polynomials returned
 by the iterator will share the coefficient type of C<$poly>.
+
+With an optional hashref argument for memoization,
+C<$poly-E<gt>cyclo_poly_iterate($n, \%table)> will work similar to
+C<cyclo_poly_iterate($n, \%table)>.
 
 =item I<cyclo_factors_iterate>
 
@@ -193,12 +231,23 @@ repetitive calls of I<cyclo_factors>, as intermediate results that would
 otherwise be re-calculated later are memoized in the state of the closure.
 Re-assigning or undefining the coderef will free the memory used for that.
 
+Alternatively, an external memoization table can be used, if supplied as
+optional hashref argument, as in C<cyclo_factors_iterate($n, \%table)>.
+It will store individual cyclotomic polynomials, not complete
+factorizations, and can thus be used with I<cyclo_poly_iterate> and
+I<cyclo_factors_iterate>, as well as I<cyclo_poly> and I<cyclo_factors>,
+interchangeably.
+
 =item I<Math::Polynomial::cyclo_factors_iterate>
 
 If C<$poly> is a Math::Polynomial object and Math::Polynomial::Cyclotomic
 has been loaded, C<$poly-E<gt>cyclo_factors_iterate($n)> is essentially
 equivalent to C<cyclo_factors_iterate($n)>, but the polynomials returned
 by the iterator will share the coefficient type of C<$poly>.
+
+With an optional hashref argument for memoization,
+C<$poly-E<gt>cyclo_factors_iterate($n, \%table)> will work similar to
+C<cyclo_factors_iterate($n, \%table)>.
 
 =back
 
@@ -227,6 +276,20 @@ This library uses Math::Polynomial (version 1.001 and up) for polynomial
 arithmetic and Math::Prime::Util (version 0.36 and up) for factoring
 integers.  The minimal required perl version is 5.6.
 
+=head1 ROADMAP
+
+While cyclotomic polynomials are irreducible over the integers in general,
+they can be further factorized with algebraic methods when restricted to
+particular integer values.  We intend to add aurifeuillean factorization
+in an upcoming release.
+
+It will be not very hard to extend the interface to factor not just
+I<x^n-1> but, more generally, I<x^nE<177>y^n>, too.  We might add this
+feature just for that reason.
+
+Other improvements should address performance with large degrees,
+eventually.  This is, however, not a priority so far.
+
 =head1 BUGS AND LIMITATIONS
 
 This implementation is optimized for I<n> E<8804> 10000.  It assumes
@@ -241,8 +304,9 @@ although Math::BigInt is not in general a coefficient type suitable
 for polynomial division, in this case it would be sufficent, as all of
 our divisions in the coefficient space have integer results.
 
-Currently, our algorithm does not avoid factoring integer numbers more
-than once.  Doing so would speed up calculations for very large I<n>.
+Currently, our algorithms do not always avoid factoring integer numbers
+more than once.  Doing so more rigorously might speed up calculations
+for very large I<n>.
 
 Bug reports and suggestions are always welcome
 E<8212> please submit them through the CPAN RT,

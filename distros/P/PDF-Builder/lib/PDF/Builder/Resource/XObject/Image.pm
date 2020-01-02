@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject';
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 
@@ -94,11 +94,7 @@ sub mask {
     return $self;
 }
 
-# Deprecated (rolled into mask)
-sub imask { 
-    warn "Use of imask deprecated";
-    return mask(@_); 
-}
+# imask() functionality rolled into mask()
 
 =item $image->colorspace($name)
 
@@ -132,8 +128,6 @@ sub colorspace {
 
 Set the number of bits used to represent each color component.
 
-B<Note:> This method was originally named C<bpc>, which is now deprecated.
-
 =cut
 
 sub bits_per_component {
@@ -144,11 +138,7 @@ sub bits_per_component {
     return $self;
 }
 
-# Deprecated (renamed)
-sub bpc { 
-    warn "Use bits_per_component instead of bpc";
-    return bits_per_component(@_); 
-}
+# bpc() renamed to bits_per_component()
 
 =back
 

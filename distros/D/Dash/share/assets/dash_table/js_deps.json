@@ -1,0 +1,40 @@
+{
+    "_js_dist": [
+        {
+            "relative_package_path": "bundle.js",
+            "external_url": "https://unpkg.com/dash-table@4.5.1/dash_table/bundle.js",
+            "namespace": "dash_table"
+        },
+        {
+            "relative_package_path": "bundle.js.map",
+            "external_url": "https://unpkg.com/dash-table@4.5.1/dash_table/bundle.js.map",
+            "namespace": "dash_table",
+            "dynamic": true
+        },
+        {
+            "relative_package_path": "async~export.js",
+            "external_url": "https://unpkg.com/dash-table@4.5.1/dash_table/async~export.js",
+            "namespace": "dash_table",
+            "async": true
+        },
+        {
+            "relative_package_path": "async~export.js.map",
+            "external_url": "https://unpkg.com/dash-table@4.5.1/dash_table/async~export.js.map",
+            "namespace": "dash_table",
+            "dynamic": true
+        },
+        {
+            "relative_package_path": "async~table.js",
+            "external_url": "https://unpkg.com/dash-table@4.5.1/dash_table/async~table.js",
+            "namespace": "dash_table",
+            "async": true
+        },
+        {
+            "relative_package_path": "async~table.js.map",
+            "external_url": "https://unpkg.com/dash-table@4.5.1/dash_table/async~table.js.map",
+            "namespace": "dash_table",
+            "dynamic": true
+        }
+    ],
+    "_css_dist": []
+}

@@ -1,5 +1,8 @@
-Revision history for App-ZodiacUtils-Lite
+0.002   2020-01-01  Released-By: PERLANCAR
 
-0.001   2016-06-02 (PERLANCAR)
+        - [build] Rebuild to update Sah coerce rule modules.
+
+
+0.001   2016-06-02  Released-By: PERLANCAR
 
         - First release.

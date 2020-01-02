@@ -1,8 +1,6 @@
 use strict;
 use warnings;
 
-use Validate::Simple;
-
 use Test::More;
 
 my @tests = (
@@ -207,9 +205,14 @@ for my $f ( @tests ) {
     }
 }
 
-plan tests => $test_count + 2;
+plan tests =>
+    1              # Use Data::Types
+    + 1            # Use the class
+    + 1            # Create an object
+    + $test_count; # Tests
 
 use_ok('Data::Types');
+use_ok('Validate::Simple');
 my $validate = new_ok( 'Validate::Simple' );
 
 for my $test ( @tests ) {
@@ -217,11 +220,14 @@ for my $test ( @tests ) {
     for my $c ( @cases ) {
         my $expected_true = pop @$c;
         my $printable = join(',', map {
-            defined ? $_ : "[undef]";
+            defined( $_ ) ? $_ : "[undef]";
         } @$c );
-        $expected_true
-            ? ok( $validate->$meth( @$c ), "'$meth' with <$printable> returns true" )
-            : ok( !$validate->$meth( @$c ), "'$meth' with <$printable> returns false" );
+        if ( $expected_true ) {
+            ok( $validate->$meth( @$c ), "'$meth' with <$printable> returns true" );
+        }
+        else {
+            ok( !$validate->$meth( @$c ), "'$meth' with <$printable> returns false" );
+        }
     }
 }
 

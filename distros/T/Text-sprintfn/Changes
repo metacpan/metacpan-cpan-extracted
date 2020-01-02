@@ -1,6 +1,12 @@
-Revision history for Text-sprintfn
+0.090   2019-11-19  Released-By: PERLANCAR; Urgency: low
 
-0.08    2015-09-15 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Mention Bencher::Scenario::Textsprintfn for benchmarks,
+	  remove internal benchmark script.
+
+
+0.08    2015-09-15  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -11,20 +17,20 @@ Revision history for Text-sprintfn
         - Add benchmark devscript and include the result in the module's POD.
 
 
-0.07    2015-01-03 (PERLANCAR)
+0.07    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.06    2012-11-27 (SHARYANTO)
+0.06    2012-11-27  Released-By: SHARYANTO
 
         - No functional changes. Fix a few typos in POD and add sections How It
           Works, Downsides, Todos.
 
 
-0.05    2012-10-03 (SHARYANTO)
+0.05    2012-10-03  Released-By: SHARYANTO
 
         - No functional changes. Faster performance by avoiding using named
           capture in regex. Benchmark on a simple format: sprintfn("%(a)s%s%s",
@@ -32,23 +38,23 @@ Revision history for Text-sprintfn
           (150%).
 
 
-0.04    2011-11-01 (SHARYANTO)
+0.04    2011-11-01  Released-By: SHARYANTO
 
         - No functional changes. Add missing $VERSION.
 
 
-0.03    2011-10-23 (SHARYANTO)
+0.03    2011-10-23  Released-By: SHARYANTO
 
         - Rewrite implementation (third time's the charm), now everything works
           and only calls sprintf() once.
 
 
-0.02    2011-10-23 (SHARYANTO)
+0.02    2011-10-23  Released-By: SHARYANTO
 
         - Rewrite implementation, now works with * and \d+$, but still has
           trouble with vector flag combination.
 
 
-0.01    2011-10-22 (SHARYANTO)
+0.01    2011-10-22  Released-By: SHARYANTO
 
         - First release, still has problems with '*' in formats.

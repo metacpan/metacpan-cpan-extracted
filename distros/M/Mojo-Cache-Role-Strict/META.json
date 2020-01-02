@@ -39,6 +39,7 @@
          "requires" : {
             "Class::Method::Modifiers" : "1.05",
             "Mojo::Cache::Role::Exists" : "0",
+            "Mojolicious" : "0",
             "Role::Tiny" : "2.000001",
             "perl" : "5.010001"
          }
@@ -63,12 +64,12 @@
          "web" : "https://github.com/srchulo/Mojo-Cache-Role-Strict"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "Adam Hopkins <violapiratejunky@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.13",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
    "x_static_install" : 1
 }
 

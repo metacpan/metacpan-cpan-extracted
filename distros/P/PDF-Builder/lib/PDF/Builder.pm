@@ -5,8 +5,8 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -78,6 +78,10 @@ PDF::Builder - Facilitates the creation and modification of PDF files
     $pdf->saveas('/path/to/new.pdf');
 
 =head1 SOME SPECIAL NOTES
+
+See the file README (in downloadable package and on CPAN) for a summary of 
+prerequisites and tools needed to install PDF::Builder, both mandatory and 
+optional.
 
 =head2 SOFTWARE DEVELOPMENT KIT
 
@@ -442,16 +446,10 @@ B<Example:>
     ...
     $pdf->saveas('our/new.pdf');
 
-B<Note:> Old name C<openScalar> is B<deprecated!> Convert your code to
-use C<open_scalar> instead.
 
 =cut
 
-# Deprecated (renamed)
-sub openScalar { 
-    warn "Use open_scalar instead of openScalar";
-    return open_scalar(@_); 
-} ## no critic
+# Note: openScalar() renamed to open_scalar()
 
 sub open_scalar {
     my ($class, $content, %options) = @_;
@@ -1128,9 +1126,11 @@ sub end {
 
 =item $page = $pdf->page($page_number)
 
-Returns a new page object.  By default, the page is added to the end
-of the document.  If you include an existing page number, the new page
-will be inserted in that position, pushing existing pages back.
+Returns a I<new> page object.  By default, the page is added to the end
+of the document.  If you give an existing page number, the new page
+will be inserted in that position, pushing existing pages back by 1 (e.g., 
+C<page(5)> would insert an empty page 5, with the old page 5 now page 6,
+etc.
 
 If $page_number is -1, the new page is inserted as the second-last page;
 if $page_number is 0, the new page is inserted as the last page.
@@ -1181,6 +1181,8 @@ sub page {
 =item $page = $pdf->openpage($page_number)
 
 Returns the L<PDF::Builder::Page> object of page $page_number.
+This is similar to C<< $page = $pdf->page() >>, except that C<$page> is 
+I<not> a new, empty page; but contains the contents of that existing page.
 
 If $page_number is 0 or -1, it will return the last page in the
 document.
@@ -1216,7 +1218,8 @@ sub openpage {
         weaken $page->{' apipdf'};
         weaken $page->{' api'};
         $self->{'pdf'}->out_obj($page);
-        if (($rotate = $page->find_prop('Rotate')) and (not defined($page->{' fixed'}) or $page->{' fixed'} < 1)) {
+        if ((not defined($page->{' fixed'}) or $page->{' fixed'} < 1) and 
+            ($rotate = $page->find_prop('Rotate')) ) {
             $rotate = ($rotate->val() + 360) % 360;
 
             if ($rotate != 0 and not $self->default('nounrotate')) {
@@ -1337,7 +1340,8 @@ sub _walk_obj {
 
 =item $xoform = $pdf->importPageIntoForm($source_pdf, $source_page_number)
 
-Returns a Form XObject created by extracting the specified page from $source_pdf.
+Returns a Form XObject created by extracting the specified page from 
+$source_pdf.
 
 This is useful if you want to transpose the imported page somewhat
 differently onto a page (e.g. two-up, four-up, etc.).
@@ -1443,13 +1447,21 @@ sub importPageIntoForm {
     return $xo;
 } # end of importPageIntoForm()
 
+=item $page = $pdf->import_page($source_pdf)
+
+=item $page = $pdf->import_page($source_pdf, $source_page_number)
+
 =item $page = $pdf->import_page($source_pdf, $source_page_number, $target_page_number)
 
 Imports a page from $source_pdf and adds it to the specified position
 in $pdf.
 
-If C<$source_page_number> or C<$target_page_number> is 0 (the default) or -1, 
-the last page in the document is used.
+If the C<$source_page_number> is omitted, 0, or -1; the last page of the 
+source is imported.
+If the C<$target_page_number> is omitted, 0, or -1; the imported page will be
+placed as the new last page of the target (C<$pdf>).
+Otherwise, as with the C<page()> method, the page will be inserted before an 
+existing page of that number.
 
 B<Note:> If you pass a page I<object> instead of a page I<number> for
 C<$target_page_number>, the contents of the page will be B<merged> into the
@@ -1467,16 +1479,9 @@ B<Example:>
 
 B<Note:> You can only import a page from an existing PDF file.
 
-B<Note:> Old name C<importpage> is B<deprecated!> Convert your code to
-use C<import_page> instead.
-
 =cut
 
-# Deprecated (renamed)
-sub importpage { 
-    warn "Use import_page instead of importpage";
-    return import_page(@_); 
-} ## no critic
+# importpage() renamed to import_page()
 
 sub import_page {
     my ($self, $s_pdf, $s_idx, $t_idx) = @_;
@@ -1509,7 +1514,7 @@ sub import_page {
     $self->{'apiimportcache'}->{$s_pdf} = $self->{'apiimportcache'}->{$s_pdf} || {};
 
     # we now import into a form to keep
-    # all that nasty resources from polluting
+    # all those nasty resources from polluting
     # our very own resource naming space.
     my $xo = $self->importPageIntoForm($s_pdf, $s_page);
 

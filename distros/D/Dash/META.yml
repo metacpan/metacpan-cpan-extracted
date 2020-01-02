@@ -4,7 +4,9 @@ author:
   - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
 build_requires:
   Module::Build: '0.3601'
+  Test::More: '0'
   Test::Most: '0'
+  utf8: '0'
 configure_requires:
   Const::Fast: '0'
   Data::Dump: '0'
@@ -31,6 +33,6 @@ resources:
   bugtracker: https://github.com/pablrod/perl-Dash/issues
   homepage: https://github.com/pablrod/perl-Dash
   repository: https://github.com/pablrod/perl-Dash.git
-version: '0.02'
+version: '0.04'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

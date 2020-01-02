@@ -117,7 +117,8 @@ BarCode.pl       Demonstrate the bar code library, 1 page (11 one-dimensional
                  permit editing of the text, with the "open" annotation 
                  coming up already opened for editing, and the "closed"
                  annotation needing to be clicked on to allow editing. If you
-                 make a change to the open annotation, when you exit you will be                 prompted to save the changes (you don't have to, unless you
+                 make a change to the open annotation, when you exit you will 
+                 be prompted to save the changes (you don't have to, unless you
                  want to open the PDF again and see your entry still there).
 
  041_annot_fileattach  demonstrate file attachment annotations on a page. Two
@@ -137,14 +138,21 @@ BarCode.pl       Demonstrate the bar code library, 1 page (11 one-dimensional
 
 =========== other example material:
 
+Bspline.pl       show off splines which connect all given points.
+
 Content.pl       demonstrate Content.pm graphics and text calls, 5 pages.
 
 ContentText.pl   demonstrate Content-related text call, 10 pages.
 
+RMtutorial.pl    Rich Measham's basic tutorial on using PDF::API2, updated
+                 for PDF::Builder.
+
+Rotated.pl       demonstrates how to rotate selected pages
+
+Boxes.pl         demonstrates PDF "boxes".
+
 ShowFont.pl      list glyphs in a font. output varies by font, encoding(s),
                  and font type.
-
-Bspline.pl       show off splines which connect all given points.
 
 Windows/
   027_winfont  demo Windows registry access

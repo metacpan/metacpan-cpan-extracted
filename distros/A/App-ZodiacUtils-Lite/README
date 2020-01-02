@@ -1,17 +1,49 @@
-DESCRIPTION
+NAME
+    App::ZodiacUtils::Lite - CLI utilities related to zodiac
+    (Perinci::CmdLine::Lite version)
 
+VERSION
+    This document describes version 0.002 of App::ZodiacUtils::Lite (from
+    Perl distribution App-ZodiacUtils-Lite), released on 2020-01-01.
+
+DESCRIPTION
     This distribution is only for testing (originally, to test
     Dist::Zilla::Plugin::Rinci::AddPrereqs).
 
     This distribution includes the following CLI utilities:
 
-    #INSERT_EXECS_LIST
+    *   chinese-zodiac-of-lite
 
-    They are Perinci::CmdLine::Lite-based versions of the same CLI
-    utilities distributed in App::ZodiacUtils (which are
+    *   zodiac-of-lite
+
+    They are Perinci::CmdLine::Lite-based versions of the same CLI utilities
+    distributed in App::ZodiacUtils (which are
     Perinci::CmdLine::Inline-based).
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ZodiacUtils-Lite>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ZodiacUtils-Lite>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ZodiacUtils-Lite>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     App::ZodiacUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

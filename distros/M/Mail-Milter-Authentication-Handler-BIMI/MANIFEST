@@ -8,3 +8,5 @@ README
 README.md
 dist.ini
 lib/Mail/Milter/Authentication/Handler/BIMI.pm
+t/04-unit-handler-bimi.t
+t/zonefile

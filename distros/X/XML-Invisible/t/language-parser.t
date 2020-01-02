@@ -29,15 +29,10 @@ EOF
   '(a+b)',
   {
     nodename => 'expr',
-    type => 'element',
     attributes => { open => '(', sign => '+', close => ')' },
     children => [
-      {
-        nodename => 'left',
-        type => 'element',
-        attributes => { name => 'a' },
-      },
-      { nodename => 'right', type => 'element', children => [ 'b' ] },
+      { nodename => 'left', attributes => { name => 'a' } },
+      { nodename => 'right', children => [ 'b' ] },
     ],
   },
   '<expr close=")" open="(" sign="+"><left name="a"></left><right>b</right></expr>',
@@ -53,24 +48,17 @@ expr2: /(b)/
 EOF
   'ab',
   {
-    'children' => [
+    children => [
       {
-        'children' => [
-          { 'children' => [ 'a' ], 'nodename' => 'expr1', 'type' => 'element' }
-        ],
-        'nodename' => 'expr',
-        'type' => 'element'
+        children => [ { children => [ 'a' ], nodename => 'expr1' } ],
+        nodename => 'expr',
       },
       {
-        'children' => [
-          { 'children' => [ 'b' ], 'nodename' => 'expr2', 'type' => 'element' }
-        ],
-        'nodename' => 'expr',
-        'type' => 'element'
+        children => [ { children => [ 'b' ], nodename => 'expr2' } ],
+        nodename => 'expr',
       }
     ],
-    'nodename' => 'exprs',
-    'type' => 'element'
+    nodename => 'exprs',
   },
   '<exprs><expr><expr1>a</expr1></expr><expr><expr2>b</expr2></expr></exprs>',
   'pre-flatten',
@@ -85,12 +73,11 @@ expr2: /(b)/
 EOF
   'ab',
   {
-    'children' => [
-      { 'children' => [ 'a' ], 'nodename' => 'expr1', 'type' => 'element' },
-      { 'children' => [ 'b' ], 'nodename' => 'expr2', 'type' => 'element' }
+    children => [
+      { children => [ 'a' ], nodename => 'expr1' },
+      { children => [ 'b' ], nodename => 'expr2' },
     ],
-    'nodename' => 'exprs',
-    'type' => 'element'
+    nodename => 'exprs',
   },
   '<exprs><expr1>a</expr1><expr2>b</expr2></exprs>',
   'flatten',

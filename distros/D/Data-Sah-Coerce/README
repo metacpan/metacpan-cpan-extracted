@@ -2,8 +2,8 @@ NAME
     Data::Sah::Coerce - Coercion rules for Data::Sah
 
 VERSION
-    This document describes version 0.040 of Data::Sah::Coerce (from Perl
-    distribution Data-Sah-Coerce), released on 2019-12-04.
+    This document describes version 0.043 of Data::Sah::Coerce (from Perl
+    distribution Data-Sah-Coerce), released on 2020-01-02.
 
 SYNOPSIS
      use Data::Sah::Coerce qw(gen_coercer);
@@ -12,8 +12,8 @@ SYNOPSIS
      my $c = gen_coercer(
          type               => 'date',
          coerce_to          => 'DateTime',
-         coerce_rules       => ['str_alami'],  # explicitly enable a rule, etc
-         # return_type      => 'str+val',      # default is 'val'
+         coerce_rules       => ['From_str::natural'],  # explicitly enable a rule, etc
+         # return_type      => 'str+val',              # default is 'val'
      );
 
      my $val = $c->(123);          # unchanged, 123
@@ -91,21 +91,17 @@ DESCRIPTION
 
         List the other rules or rule patterns that are precluded by this
         rule. Rules that are mutually exclusive or pure alternatives to one
-        another (e.g. date coercien rules str_alami vs str_alami both parse
-        natural language date string; there is usually little to none of
-        usefulness in using both; besides, both rules match all string and
-        dies when failing to parse the string. So in "str_natural" rule,
-        you'll find this metadata:
+        another (e.g. date coercien rules From_str::natural vs
+        From_str::flexible both parse natural language date string; there is
+        usually little to none of usefulness in using both; besides, both
+        rules match all string and dies when failing to parse the string. So
+        in "From_str::natural" rule, you'll find this metadata:
 
-         precludes => [qr/\AFrom_str::Alami(_.+)?\z/]
+         precludes => [qr/\A(From_str::alami(_.+)?|From_str::natural)\z/]
 
-        and in "From_str::Alami" rule you'll find this metadata:
+        and in "From_str::flexible" rule you'll find this metadata:
 
-         precludes => [qr/\AFrom_str::Alami(_.+)?\z/, 'From_str::Natural']
-
-        Note that the "From_str::Alami" rule also precludes other
-        "From_str::Alami_*" rules (like "From_str::Alami_EN" and
-        "From_str::Alami_ID").
+         precludes => [qr/\A(From_str::alami(_.+)?|From_str::flexible)\z/]
 
         Also note that rules which are specifically requested to be used
         (e.g. using "x.perl.coerce_rules" attribute in Sah schema) will
@@ -225,7 +221,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

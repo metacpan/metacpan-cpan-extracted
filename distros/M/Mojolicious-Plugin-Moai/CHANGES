@@ -1,5 +1,14 @@
 Changelog for Mojolicious-Plugin-Moai
 
+0.006     2020-01-01 13:44:50-06:00 America/Chicago
+
+    [Added]
+
+    - Added navbar menu component. This is the first menu component.
+    - Added Test::Mojo::Role::Moai to test site components
+        - Added table_is test method to test table data, elements, and
+          attributes
+
 0.005     2019-12-16 22:35:06-06:00 America/Chicago
 
     [Fixed]

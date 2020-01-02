@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw( deprecated recursion uninitialized );
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use Carp;
 use Compress::Zlib qw();
@@ -588,10 +588,6 @@ The smaller the limit, the larger the cutoff angle.
 If no C<$ratio> is given, the current setting is B<returned>. If the ratio is
 being set, C<$self> is B<returned> so that calls may be chained.
 
-B<Note:> This was originally misnamed as I<meterlimit>. That name is deprecated
-and will be removed in the future, so you should change any usage in
-your code from C<meterlimit> to C<miterlimit>.
-
 =cut
 
 sub _miterlimit {
@@ -612,15 +608,7 @@ sub miterlimit {
     return $self;
 }
 
-# Deprecated: miterlimit was originally named incorrectly
-sub  meterlimit { 
-    warn "Use miterlimit instead of meterlimit";
-    return  miterlimit(@_);
-}
-sub _meterlimit { 
-    warn "Use _miterlimit instead of _meterlimit";
-    return _miterlimit(@_) 
-}
+# Note: miterlimit was originally named incorrectly to meterlimit, renamed
 
 =item $content->linedash()
 
@@ -644,9 +632,7 @@ If called with a hash of arguments, the I<-pattern> array may have one or
 more elements, specifying the dash and gap lengths. 
 A dash phase may be set (I<-shift>), which is a B<positive integer>
 specifying the distance into the pattern at which to start the dashed line.
-If you are using I<-full> or I<-clear> hash entries, please be aware that
-they have been B<deprecated> and will be removed. Use the I<-pattern> array
-instead. Note that if you wish to give a I<shift> amount, using C<-shift>,
+Note that if you wish to give a I<shift> amount, using C<-shift>,
 you need to use C<-pattern> instead of one or two elements.
 
 If an B<odd> number of dash array elements are given, the list is repeated by 
@@ -670,12 +656,7 @@ sub _linedash {
         if ($pat[0] =~ /^\-/) {
             my %pat = @pat;
 
-            # Deprecated: the -full and -clear options will be removed in a future release
-	    if (defined $pat{'-full'} || defined $pat{'-clear'}) {
-		warn "Use of -full and -clear in linedash is deprecated. Use -pattern.";
-	    }
-            $pat{'-pattern'} = [$pat{'-full'} || 0, $pat{'-clear'} || 0] unless exists $pat{'-pattern'};
-
+            # Note: use -pattern to replace the old -full and -clear options
             $self->{' linedash'} = [[@{$pat{'-pattern'}}],($pat{'-shift'} || 0)];
             return ('[', floats(@{$pat{'-pattern'}}), ']', ($pat{'-shift'} || 0), 'd');
         } else {
@@ -2801,11 +2782,6 @@ justify text, you will usually be better off using C<charspace> and C<wordspace>
 to expand (or slightly condense) a line to fill a desired width. Also see 
 the C<text_justify()> calls for this purpose.
 
-B<Note:> This was originally misnamed as I<hspace> (it is a horizontal 
-I<scaling factor>, not an amount of horizontal I<space>). That name is 
-deprecated and will be removed some time in the future, so you should change 
-any usage in your code from C<hspace> to C<hscale>.
-
 =cut
 
 sub _hscale {
@@ -2827,15 +2803,7 @@ sub hscale {
     }
 }
 
-# Deprecated: hscale was originally named incorrectly (as hspace)
-sub  hspace { 
-    warn "Use hscale instead of hspace";
-    return  hscale(@_); 
-}
-sub _hspace { 
-    warn "Use _hscale instead of _hspace";
-    return _hscale(@_); 
-}
+# Note: hscale was originally named incorrectly as hspace, renamed
 # note that the private class data ' hspace' is no longer supported
 
 =item $leading = $content->lead($leading)

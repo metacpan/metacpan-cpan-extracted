@@ -6,7 +6,7 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.016'; # VERSION
+our $VERSION = '3.017'; # VERSION
 my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 use Math::Trig;
@@ -952,7 +952,7 @@ drawCaption(['section() justified 2em para indent (3 calls)'], 'LC');
 $grfx->restore();
 
 # ----------------------------------------------------
-# 25. section() left aligned with 2em paragraph indent and 5pt gap
+# 25. section() justified with 2em paragraph indent and 5pt gap
 @cellLoc = makeCellLoc(5);  # new page
 @cellLoc = makeCellLoc(0, 2);  # full page, start at second row up
 $cell_height = 440;

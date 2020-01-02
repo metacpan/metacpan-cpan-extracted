@@ -1,7 +1,9 @@
 package Dist::Zilla::Plugin::Regexp::Pattern;
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-01-02'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-Regexp-Pattern'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,8 +14,9 @@ with 'Dist::Zilla::Role::AfterBuild';
 with 'Dist::Zilla::Role::FileGatherer';
 with 'Dist::Zilla::Role::PrereqSource';
 #with 'Dist::Zilla::Role::RegexpPattern::CheckDefinesPattern';
-
 use namespace::autoclean;
+
+use PMVersions::Util qw(version_from_pmversions);
 
 sub register_prereqs {
     my ($self) = @_;
@@ -25,7 +28,7 @@ sub register_prereqs {
             type  => 'requires',
             phase => 'develop',
         },
-        'Test::Regexp::Pattern' => '0.001',
+        'Test::Regexp::Pattern' => version_from_pmversions('Test::Regexp::Pattern') // '0.001',
     );
 }
 
@@ -88,7 +91,7 @@ Dist::Zilla::Plugin::Regexp::Pattern - Plugin to use when building Regexp::Patte
 
 =head1 VERSION
 
-This document describes version 0.004 of Dist::Zilla::Plugin::Regexp::Pattern (from Perl distribution Dist-Zilla-Plugin-Regexp-Pattern), released on 2018-09-10.
+This document describes version 0.005 of Dist::Zilla::Plugin::Regexp::Pattern (from Perl distribution Dist-Zilla-Plugin-Regexp-Pattern), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
@@ -142,7 +145,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

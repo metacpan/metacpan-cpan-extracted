@@ -1,5 +1,10 @@
-Revision history for Perl extension Algorithm::Odomter::Tiny.
+Revision history for Perl extension Algorithm::Odometer::Tiny.
 
-0.02	Sat, Oct  5 2019
+0.04	Wed, Jan  1 2020
+	- Reorganized module code a tiny bit
+	- Several doc updates, such as mentioning the Cartesian product and
+	  linking to other modules
+
+0.02	Sat, Oct  5 2019	commit 06ec85554be6ca9c23178ab51c8fc4bb4199eeb7
 	- first public release
 

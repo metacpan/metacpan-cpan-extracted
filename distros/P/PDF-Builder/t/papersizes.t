@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 116;
+use Test::More tests => 100;
 
 use PDF::Builder;
 
@@ -13,20 +13,6 @@ my @mediabox;
 
 # test named page sizes in Resource/PaperSizes.pm
 # add additional tests if more sizes uncommented or added in that file
-$page->mediabox('4a');
-@mediabox = $page->get_mediabox();
-is($mediabox[0], 0, 'PaperSizes LLX (4a)');
-is($mediabox[1], 0, 'PaperSizes LLY (4a)');
-is($mediabox[2], 4760, 'PaperSizes URX (4a)');
-is($mediabox[3], 6716, 'PaperSizes URY (4a)');
-
-$page->mediabox('2a');
-@mediabox = $page->get_mediabox();
-is($mediabox[0], 0, 'PaperSizes LLX (2a)');
-is($mediabox[1], 0, 'PaperSizes LLY (2a)');
-is($mediabox[2], 3368, 'PaperSizes URX (2a)');
-is($mediabox[3], 4760, 'PaperSizes URY (2a)');
-
 $page->mediabox('4a0');
 @mediabox = $page->get_mediabox();
 is($mediabox[0], 0, 'PaperSizes LLX (4a0)');
@@ -89,20 +75,6 @@ is($mediabox[0], 0, 'PaperSizes LLX (a6)');
 is($mediabox[1], 0, 'PaperSizes LLY (a6)');
 is($mediabox[2], 297, 'PaperSizes URX (a6)');
 is($mediabox[3], 421, 'PaperSizes URY (a6)');
-
-$page->mediabox('4b');
-@mediabox = $page->get_mediabox();
-is($mediabox[0], 0, 'PaperSizes LLX (4b)');
-is($mediabox[1], 0, 'PaperSizes LLY (4b)');
-is($mediabox[2], 5656, 'PaperSizes URX (4b)');
-is($mediabox[3], 8000, 'PaperSizes URY (4b)');
-
-$page->mediabox('2b');
-@mediabox = $page->get_mediabox();
-is($mediabox[0], 0, 'PaperSizes LLX (2b)');
-is($mediabox[1], 0, 'PaperSizes LLY (2b)');
-is($mediabox[2], 4000, 'PaperSizes URX (2b)');
-is($mediabox[3], 5656, 'PaperSizes URY (2b)');
 
 $page->mediabox('4b0');
 @mediabox = $page->get_mediabox();

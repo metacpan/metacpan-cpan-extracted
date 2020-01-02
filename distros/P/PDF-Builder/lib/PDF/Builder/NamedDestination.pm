@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 # TBD: do -rect and -border apply to Named Destinations (link, url, file)? 
 #      There is nothing to implement these options. Perhaps the code was copied 
@@ -51,14 +51,8 @@ sub new {
     return $self;
 }
 
-# Deprecated (warning added in 2.031)
-sub new_api {
-    my ($class, $api, @options) = @_;
-    warnings::warnif('deprecated', q{Call to deprecated method "new_api($api, ...)".  Replace with "new($api->{'pdf'}, ...)"});
-
-    my $destination = $class->new($api->{'pdf'}, @options);
-    return $destination;
-}
+# Note: new_api() removed in favor of new():
+#   new_api($api, ...)  replace with new($api->{'pdf'}, ...)
 
 =item $dest->link($page, %opts)
 

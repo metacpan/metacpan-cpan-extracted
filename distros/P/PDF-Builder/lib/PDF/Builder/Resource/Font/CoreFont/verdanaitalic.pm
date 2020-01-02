@@ -3,7 +3,7 @@ package PDF::Builder::Resource::Font::CoreFont::verdanaitalic;
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
+our $VERSION = '3.017'; # VERSION
 my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 =head1 NAME

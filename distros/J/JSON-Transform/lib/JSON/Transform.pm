@@ -3,12 +3,13 @@ package JSON::Transform;
 use strict;
 use warnings;
 use Exporter 'import';
-use JSON::Transform::Parser qw(parse);
 use Storable qw(dclone);
+use JSON::Transform::Grammar;
+use XML::Invisible qw(make_parser);
 
 use constant DEBUG => $ENV{JSON_TRANSFORM_DEBUG};
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(
   parse_transform
 );
@@ -32,9 +33,10 @@ my %IS_BACKSLASH_ENTITY = map {$_=>1} qw(
   jsonBackslashGrave
 );
 
+my $parser = make_parser(JSON::Transform::Grammar->new);
 sub parse_transform {
   my ($input_text) = @_;
-  my $transforms = parse $input_text;
+  my $transforms = $parser->($input_text);
   sub {
     my ($data) = @_;
     $data = dclone $data; # now can mutate away
@@ -123,7 +125,7 @@ sub _apply_mapping {
 
 sub _make_sysvals {
   my ($pair, $pairs) = @_;
-  my %vals = ();
+  my %vals = (E => \%ENV);
   $vals{C} = scalar @$pairs if $pairs;
   @vals{qw(K V)} = @$pair if $pair;
   return \%vals;
@@ -247,6 +249,9 @@ sub _pointer {
   return $contains ? 1 : $data;
 }
 
+1;
+
+__END__
 =head1 NAME
 
 JSON::Transform - arbitrary transformation of JSON-able data
@@ -280,7 +285,10 @@ means only strings, booleans, nulls (Perl C<undef>), numbers, array-refs,
 hash-refs, with no circular references.
 
 A transformation is made up of an output expression, which can be composed
-of sub-expressions.
+of sub-expressions. The general concept is of expressions, and
+operations. Operations are generally "applied" to expressions, with
+the new value coming "from" the operation. That is why the C<< < >>
+character is used for "applying" syntax.
 
 For instance, to transform an array of hashes that each have an C<id>
 key, to a hash mapping each C<id> to its hash:
@@ -521,6 +529,11 @@ Available in mapping expressions. For each data pair, set to the value.
 
 Available in mapping expressions. Set to the integer number of values.
 
+=head3 C<$E>
+
+Set to an object/hash which is the Perl C<%ENV>, i.e. the process
+environment.
+
 =head2 Comments
 
 Any C<--> sequence up to the end of that line will be a comment,
@@ -581,5 +594,3 @@ copy of the full license at:
 L<http://www.perlfoundation.org/artistic_license_2_0>
 
 =cut
-
-1;

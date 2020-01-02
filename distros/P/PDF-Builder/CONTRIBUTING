@@ -2,8 +2,9 @@ Contributing to the development of PDF::Builder
 
 We would appreciate the community around us chipping in with code, tests, 
 documentation, and even just bug reports and feature requests. It's better 
-knowing what users of PDF::Builder want and need, than to guess. It's not good 
-to spend a lot of time working on something that no one is interested in!
+knowing what users of PDF::Builder want and need, than for us to guess. It's 
+not good to spend a lot of time working on something that no one is interested 
+in!
 
 You can contribute to the discussion by posting bug reports, feature requests, 
 observations, etc. to either the GitHub issues area, https://github.com/
@@ -12,19 +13,23 @@ tag new threads accordingly ["Labels"]) or to the Forum on catskilltech.com,
 https:://www.catskilltech.com/forum/index.html#c5 (please place a new topic in 
 the appropriate area ["board"]). We will cross-post from one to the other as 
 necessary. If you don't have an account on either system, and want to 
-occasionally post something, there is a contact form on the Forum where you can 
+occasionally post something, there is a Contact form on the Forum where you can 
 send in something for us to post. Please do not abuse this system -- if you are 
-regularly posting, please take a minute to register on one or both systems.
+regularly posting via the Contact form, please take a minute to register on 
+one or both systems. We do not use CPAN's "RT" bug tracking system.
 
 Please also read INFO/RoadMap to get an idea of where we would like for 
 PDF::Builder to be heading, and may give you an idea of where you could
-usefully contribute.
+usefully contribute. Don't be afraid to discuss or propose taking PDF::Builder
+off in a direction not in the RoadMap -- the worst that could happen is that
+we say, "thanks, but no thanks."
 
 First of all, please read the section "Sofware Development Kit" under 
 PDF::Builder::Docs. This will be of interest if you want to do anything beyond 
 simply installing PDF::Builder as a prerequisite for some other package. You 
 can also get to this via "SOME SPECIAL NOTES" section of the root documentation 
-(PDF::Builder).
+(PDF::Builder). You should create all the HTML documentation by running 
+"docs/buildDoc.pl --all" and read it before starting any serious work.
 
 For code changes, a GitHub pull request, a formal patch file (e.g., "diff"), or 
 even a replacement file or manual patch will do, so long as it's clear where it 
@@ -48,4 +53,4 @@ PDF::API2::Ladder), under either our ownership or yours.
 
 Good luck, and best wishes using and helping with PDF::Builder!
 
-July, 2019
+December, 2019

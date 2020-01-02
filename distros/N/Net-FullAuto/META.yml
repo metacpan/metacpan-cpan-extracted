@@ -5,8 +5,8 @@ author:
 configure_requires:
 license: gpl-3.0
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v2.0.html
+  version: 2.0
 name: Net-FullAuto
 provides:
   Bad_Handle:
@@ -15,7 +15,7 @@ provides:
     file: lib/Net/FullAuto/FA_Core.pm
   Net::FullAuto:
     file: lib/Net/FullAuto.pm
-    version: 1.0000507
+    version: 1.0000510
   Net::FullAuto::FA_Core:
     file: lib/Net/FullAuto/FA_Core.pm
   Net::FullAuto::FA_DB:
@@ -36,4 +36,4 @@ provides:
     file: lib/Net/FullAuto/Distro/fa_menu.pm
 resources:
   license: http://www.gnu.org/licenses/agpl.html
-version: 1.0000507
+version: 1.0000510

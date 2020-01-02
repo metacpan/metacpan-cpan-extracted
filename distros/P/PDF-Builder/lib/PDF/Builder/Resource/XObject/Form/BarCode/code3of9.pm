@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Form::BarCode';
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -84,11 +84,7 @@ sub encode_3of9_string {
     return $bar;
 }
 
-# Deprecated (rolled into encode_3of9_string)
-sub encode_3of9_string_w_chk { 
-    warn "Use encode_3of9_string instead of encode_3of9_string_w_chk";
-    return encode_3of9_string(shift(), 1); 
-}
+# Note: encode_3of9_string_w_chk now encode_3of9_string(*, 1)
 
 sub encode_3of9 {
     my ($string, $is_mod43, $is_extended) = @_;
@@ -117,18 +113,8 @@ sub encode_3of9 {
     return @bars;
 }
 
-# Deprecated (rolled into encode_3of9)
-sub encode_3of9_w_chk     { 
-    warn "Use encode_3of9 instead of encode_3of9_w_chk";
-    return encode_3of9(shift(), 1, 0); 
-}
-sub encode_3of9_ext       { 
-    warn "Use encode_3of9 instead of encode_3of9_ext";
-    return encode_3of9(shift(), 0, 1); 
-}
-sub encode_3of9_ext_w_chk { 
-    warn "Use encode_3of9 instead of encode_3of9_ext_w_chk";
-    return encode_3of9(shift(), 1, 1); 
-}
+# Note: encode_3of9_w_chk now encode_3of9(*, 1, 0)
+# Note: encode_3of9_ext now encode_3of9(*, 0, 1)
+# Note: encode_3of9_ext_w_chk now encode_3of9(*, 1, 1)
 
 1;

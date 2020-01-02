@@ -4,10 +4,10 @@ NAME
     validation
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation (from Perl
     distribution Perinci-CmdLine-Lite-Patch-ShowArgsBeforeValidation),
-    released on 2018-11-29.
+    released on 2020-01-01.
 
 SYNOPSIS
      % PERL5OPT=-MPerinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation yourscript.pl ...
@@ -33,11 +33,14 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
+SEE ALSO
+    Perinci::CmdLine::Lite::Patch::ShowArgsAfterValidation
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

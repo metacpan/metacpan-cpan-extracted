@@ -1,3 +1,7 @@
+0.06 2020-01-01
+- stop putting element "type" in output
+- make_parser can take a Pegex::Grammar object
+
 0.05 2019-12-31
 - make XML::LibXML be only suggested, not required
 

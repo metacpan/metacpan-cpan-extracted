@@ -1,3 +1,9 @@
+0.111   2020-01-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Replace coerce rule From_str::alami.* with From_str::natural because
+          DateTime::Format::Alami is currently very broken.
+
+
 0.110   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update coerce rule names (Data::Sah::Coerce 0.034+).

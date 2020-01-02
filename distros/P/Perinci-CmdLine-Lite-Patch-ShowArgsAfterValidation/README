@@ -1,0 +1,47 @@
+NAME
+    Perinci::CmdLine::Lite::Patch::ShowArgsAfterValidation - Patch
+    Perinci::CmdLine::Lite's hook_before_action() to show arguments after
+    validation
+
+VERSION
+    This document describes version 0.001 of
+    Perinci::CmdLine::Lite::Patch::ShowArgsAfterValidation (from Perl
+    distribution Perinci-CmdLine-Lite-Patch-ShowArgsAfterValidation),
+    released on 2020-01-01.
+
+SYNOPSIS
+     % PERL5OPT=-MPerinci::CmdLine::Lite::Patch::ShowArgsAfterValidation yourscript.pl ...
+
+DESCRIPTION
+    This patch can be used for debugging.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-CmdLine-Lite-Patch-ShowArgsAfterVa
+    lidation>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-CmdLine-Lite-Patch-ShowArgsAf
+    terValidation>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite-
+    Patch-ShowArgsAfterValidation>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

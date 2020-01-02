@@ -17,8 +17,8 @@ use warnings;
 
 use base 'PDF::Builder::Basic::PDF::Dict';
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Array;
 use PDF::Builder::Basic::PDF::Dict;
@@ -336,7 +336,13 @@ sub find_prop {
         } else {
             return $self->{$key};
         }
+    # Per Klaus Ethgen (RT 131147), this is an alternative patch for the 
+    # problem of Null objects bubbling up. If Vadim Repin's patch in ./File.pm
+    # turns out to have too wide of scope, we might use this one instead.
+    # comment out 1, uncomment 2, and reverse change made in ./File.pm.
     } elsif (defined $self->{'Parent'}) {
+   #} elsif (defined $self->{'Parent'} and 
+   #         ref($self->('Parent'}) ne 'PDF::Builder::Basic::PDF::Null') {
         return $self->{'Parent'}->find_prop($key);
     }
 

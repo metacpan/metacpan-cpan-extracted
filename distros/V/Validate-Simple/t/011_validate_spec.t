@@ -1,8 +1,6 @@
 use strict;
 use warnings;
 
-use Validate::Simple;
-
 use Test::More;
 
 my @tests = (
@@ -42,26 +40,31 @@ for my $test ( @tests ) {
 }
 
 plan tests =>
-    1
-    + $test_count;
+    1              # Use the class
+    + 1            # Create an object
+    + $test_count; # Tests
 
+use_ok( 'Validate::Simple' );
 my $validate = new_ok( 'Validate::Simple' );
 
 for my $test ( @tests ) {
     my $name = $test->{name};
     for my $t ( @{ $test->{specs} } ) {
         my ( $spec, $expected_true ) = @$t;
-        $expected_true
-            ? ok( $validate->validate_specs( $spec ),
-                  "Validation $name: Passed as expected"
-                      . " - "
-                      . join(';', $validate->delete_errors())
-                  )
-            : ok( !$validate->validate_specs( $spec ),
-                  "Validation $name: Did not passed as expected"
-                      . " - "
-                      . join(';', $validate->delete_errors())
-                  );
+        if ( $expected_true ) {
+            ok( $validate->validate_specs( $spec ),
+                "Validation $name: Passed as expected"
+                    . " - "
+                    . join(';', $validate->delete_errors())
+                );
+        }
+        else {
+            ok( !$validate->validate_specs( $spec ),
+                "Validation $name: Did not passed as expected"
+                    . " - "
+                    . join(';', $validate->delete_errors())
+                );
+        }
     }
 }
 

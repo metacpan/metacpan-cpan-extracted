@@ -41,7 +41,7 @@ my %args = (
   my $dtx = DateTimeX::Web->new;
 
   my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
-  my $dt = $dtx->from_day_of_year( year => $year, day_of_year => $yday );
+  my $dt = $dtx->from_day_of_year( year => $year, day_of_year => $yday + 1);
   ok defined $dt;
   ok $dt->isa('DateTime');
 }

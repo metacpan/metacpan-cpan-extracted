@@ -1,10 +1,7 @@
 use strict;
 use warnings;
 
-use Validate::Simple;
-
 use Test::More;
-
 
 my @tests = (
     {
@@ -1030,10 +1027,12 @@ for my $test ( @tests ) {
 }
 
 plan tests =>
-    1              # Create an object
+    1              # Use the class
+    + 1            # Create an object
     + 4            # Validate with empty params
     + 3 * $test_count;  # Various validations
 
+use_ok( 'Validate::Simple' );
 my $validate = new_ok( 'Validate::Simple' );
 
 ok( !$validate->validate(),          "Empty params" );
@@ -1049,17 +1048,20 @@ for my $test ( @tests ) {
     for my $par ( @{ $test->{params} } ) {
         my ( $params, $expected_true ) = @$par;
         # Test pass specs to validate() method
-        $expected_true
-            ? ok( $validate->validate( $params, $specs ),
-                  "Validation '$name': Passed as expected"
-                      . " - "
-                      . join(';', $validate->delete_errors())
-              )
-            : ok( !$validate->validate( $params, $specs ),
-                  "Validation '$name': Did not pass as expected"
-                      . " - "
-                      . join(';', $validate->delete_errors())
-                  );
+        if ( $expected_true ) {
+            ok( $validate->validate( $params, $specs ),
+                "Validation '$name': Passed as expected"
+                    . " - "
+                    . join(';', $validate->delete_errors())
+                );
+        }
+        else {
+            ok( !$validate->validate( $params, $specs ),
+                "Validation '$name': Did not pass as expected"
+                    . " - "
+                    . join(';', $validate->delete_errors())
+                );
+        }
 
         # Create object with specs
         my $val = new_ok(
@@ -1067,17 +1069,20 @@ for my $test ( @tests ) {
             "Create object with specs '$name'" );
 
         # Validate against object specs
-        $expected_true
-            ? ok( $val->validate( $params ),
-                  "Validation again '$name': Passed as expected"
-                      . " - "
-                      . join(';', $val->errors() )
-              )
-            : ok( !$val->validate( $params ),
-                  "Validation again '$name': Did not passed as expected"
-                      . " - "
-                      . join(';', $val->errors() )
-              );
+        if ( $expected_true ) {
+            ok( $val->validate( $params ),
+                "Validation again '$name': Passed as expected"
+                    . " - "
+                    . join(';', $val->errors() )
+                );
+        }
+        else {
+            ok( !$val->validate( $params ),
+                "Validation again '$name': Did not passed as expected"
+                    . " - "
+                    . join(';', $val->errors() )
+                );
+        }
     }
 }
 

@@ -14,6 +14,7 @@ const my $dash_renderer_package_name => 'dash_renderer';
 const my $dash_component_packages => [ qw(
     dash-core-components
     dash-html-components
+    dash-table
     ) ];
 
 # TODO dash path from command line
@@ -41,14 +42,19 @@ $distro_python_patched_files->visit(sub {
 # Dash Renderer
 my $dash_venv_path = $dash_path->child('.venv')->child('dev')->child('bin')->child('activate');
 my $dash_renderer_path = $dash_path->child('dash-renderer');
+my $dash_renderer_assets = $dash_renderer_path->child('dash_renderer');
+$dash_renderer_assets->visit(sub {
+        $_->remove() if /\.js$/ || /\.map$/;
+    });
+#$dash_renderer_path->child('node_modules')->remove_tree(); # This usually fail with the folder .cache
+
 system("source $dash_venv_path; cd $dash_renderer_path; renderer build");
 
-# TODO uncomment this line when js_deps for Renderer is working
-#$dash_renderer_path->remove_tree();
-$dash_renderer_path->mkpath();
 my $dist_share_js_renderer = $dist_share_js->child('dash_renderer');
+$dist_share_js_renderer->remove_tree();
+$dist_share_js_renderer->mkpath();
 # TODO LICENSE files and source maps
-for my $js_file ($dash_renderer_path->child('dash_renderer')->children(qr/\.js$/)) {
+for my $js_file ($dash_renderer_assets->children(qr/\.js$/)) {
     $js_file->copy($dist_share_js_renderer);
 }
 
@@ -59,10 +65,15 @@ my $dash_renderer_deps_path = $dist_share_js_renderer->child('js_deps.json');
 system("source $dash_venv_path; python $python_script_extract_renderer_js_deps > $dash_renderer_deps_path");
 
 for my $component_suite (@$dash_component_packages) {
+    print "Building $component_suite <============================================================>\n";
     # TODO pull repo
 
     my $component_suite_path = path('..', $component_suite);
-    system("source $dash_venv_path; cd $component_suite_path; npm run build:py_and_r");
+    # Install js deps
+    system("cd $component_suite_path; npm ci");
+    #system("cd $component_suite_path; npm update");
+
+    system("source $dash_venv_path; cd $component_suite_path; npm run build");
 
     my $perl_base_path = $component_suite_path->child('Perl');
 

@@ -13,11 +13,11 @@ WriteMakefile(
 		provides     => {
 			'Algorithm::Odometer::Tiny' => {
 				file    => 'lib/Algorithm/Odometer/Tiny.pm',
-				version => '0.02',
+				version => '0.04',
 			},
 			'Algorithm::Odometer::Gray' => {
 				file    => 'lib/Algorithm/Odometer/Gray.pm',
-				version => '0.02',
+				version => '0.04',
 			},
 		},
 		no_index     => {

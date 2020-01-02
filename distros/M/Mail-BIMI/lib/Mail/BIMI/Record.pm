@@ -1,227 +1,153 @@
 package Mail::BIMI::Record;
+# ABSTRACT: Class to model a collection of egress pools
+our $VERSION = '1.20200102'; # VERSION
+use 5.20.0;
+use Moo;
+use Types::Standard qw{Str HashRef ArrayRef};
+use Type::Utils qw{class_type};
+use Mail::BIMI::Pragmas;
+use Mail::BIMI::Record::Authority;
+use Mail::BIMI::Record::Location;
+use Mail::DMARC::PurePerl;
+  with 'Mail::BIMI::Role::Constants';
+  with 'Mail::BIMI::Role::Error';
+  with 'Mail::BIMI::Role::Resolver';
+  has domain => ( is => 'rw', isa => Str, required => 1 );
+  has selector => ( is => 'rw', isa => Str );
+  has version => ( is => 'rw', isa => Str );
+  has authorities => ( is => 'rw', isa => class_type('Mail::BIMI::Record::Authority'), lazy => 1, builder => '_build_authorities' );
+  has locations => ( is => 'rw', isa => class_type('Mail::BIMI::Record::Location'), lazy => 1, builder => '_build_locations' );
+  has record => ( is => 'rw', isa => HashRef, lazy => 1, builder => '_build_record' );
+  has is_valid => ( is => 'rw', lazy => 1, builder => '_build_is_valid' );
 
-use strict;
-use warnings;
-
-our $VERSION = '1.20180122'; # VERSION
-
-use Carp;
-use English qw( -no_match_vars );
-
-sub new {
-    my ( $Class, $Args ) = @_;
-
-    my $Self = {};
-    bless $Self, ref($Class) || $Class;
-
-    $Self->{ 'record' } = $Args->{ 'record' };
-    $Self->{ 'domain' } = $Args->{ 'domain' } || q{};
-    $Self->{ 'selector' } = $Args->{ 'selector' } || q{};
-    $Self->{ 'url_list' } = [];
-    $Self->{ 'data' }     = {};
-    $Self->{ 'error' }    = [];
-
-    if ( my $Record = $Self->{ 'record' } ) {
-        $Self->parse_record();
-        $Self->validate_record();
-        $Self->construct_url_list();
-    }
-    else {
-        $Self->error( 'No record supplied' );
-    }
-
-    return $Self;
+sub _build_authorities($self) {
+  my $record = $self->record->{a} // '';
+  # TODO better parser here
+  my @authority = split( ',', $record );
+  return Mail::BIMI::Record::Authority->new( authority => \@authority );
 }
 
-sub error {
-    my ( $Self, $Error ) = @_;
-    if ( $Error ) {
-        push @{ $Self->{ 'error' } } , $Error;
-        return;
+sub _build_locations($self) {
+  my $record = '';
+  if ( ! exists $self->record->{l} ) {
+    $self->add_error( 'Missing l tag' );
+  }
+  else {
+    $record = $self->record->{l} // '';
+    if ( $record eq '' ) {
+      $self->add_error( 'Empty l tag' );
     }
-    else {
-        return join( ', ', @{ $Self->{ 'error' } } );
-    }
-}
+  }
 
-sub is_valid {
-    my ( $Self ) = @_;
-    if ( scalar @{ $Self->{ 'error' } } > 0 ) {
-        return 0;
-    }
-    return 1;
-}
-
-sub parse_record {
-    my ( $Self ) = @_;
-    my $Record = $Self->{ 'record' };
-
-    my $Data = {};
-    my @Parts = split ';', $Record;
-    foreach my $Part ( @Parts ) {
-        $Part =~ s/^ +//;
-        $Part =~ s/ +$//;
-        my ( $Key, $Value ) = split '=', $Part, 2;
-        $Key = lc $Key;
-        if ( exists $Data->{ $Key } ) {
-            $Self->error( 'Duplicate key in record' );
-        }
-        if ( $Key eq 'v' || $Key eq 'a' ) {
-            $Data->{ $Key } = $Value;
-        }
-        elsif ( $Key eq 'f' || $Key eq 'l' || $Key eq 'z' ) {
-            my @Values = split ',', $Value;
-            $Data->{ $Key } = \@Values;
-        }
-        else {
-            #$Self->error( 'Record has unknown tag' ); # This is to be ignored
-        }
-    }
-    $Self->{ 'data' } = $Data;
-    return;
-}
-
-sub data {
-    my ( $Self ) = @_;
-    return $Self->{ 'data' };
-}
-
-sub is_vector {
-    my ( $Self, $Type ) = @_;
-    return 1 if lc $Type eq 'svg';
-    return 0;
-}
-
-sub construct_url_list {
-    my ( $Self ) = @_;
-    my @UrlList;
+  # TODO better parser here
     # Need to decode , and ; as per spec
-    foreach my $Location ( @{ $Self->{ 'data' }->{ 'l' } } ) {
-        foreach my $Size ( @{ $Self->{ 'data' }->{ 'z' } } ) {
-            foreach my $Type ( @{ $Self->{ 'data' }->{ 'f' } } ) {
-                if ( $Self->is_vector( $Type ) ) {
-                    last unless (
-                        $Size eq @{ $Self->{ 'data' }->{ 'z' } }[0]
-                        ||
-                        $Size eq @{ $Self->{ 'data' }->{ 'z' } }[-1]
-                    );
-                }
-                my $Url = $Location . $Size . '.' . $Type;
-                push @UrlList, $Url;
-            }
-        }
-    }
-    $Self->{ 'url_list' } = \@UrlList;
-    return;
+    # TODO, should this have '.svg' appended?
+  my @location = split( ',', $record );
+  return Mail::BIMI::Record::Location->new( location => \@location );
 }
 
-sub url_list {
-    my ( $Self ) = @_;
-    return $Self->{ 'url_list' };
+sub _build_is_valid($self) {
+  return 0 if ! keys $self->record->%*;
+
+  if ( ! exists ( $self->record->{v} ) ) {
+    $self->add_error( 'Missing v tag' );
+  }
+  else {
+    $self->add_error( 'Empty v tag' )   if lc $self->record->{v} eq '';
+    $self->add_error( 'Invalid v tag' ) if lc $self->record->{v} ne 'bimi1';
+  }
+
+  return 0 if !$self->locations->is_valid;
+  return 0 if $self->error->@*;
+  return 1;
 }
 
-sub validate_record {
-    my ( $Self ) = @_;
-    my $Data = $Self->{ 'data' };
+sub _build_record($self) {
+  my $domain            = $self->domain;
+  my $selector          = $self->selector;
+  my $fallback_selector = 'default';
+  my $fallback_domain   = Mail::DMARC::PurePerl->new->get_organizational_domain($domain);
 
-    # Missing or invalid v
-    if ( ! exists ( $Data->{ 'v' } ) ) {
-        $Self->error( 'Missing v tag' );
+  my @records = grep { $_ =~ /^v=bimi1;/i } eval { $self->_get_dns_rr( 'TXT', $selector. '._bimi.' . $domain); };
+  if ( my $error = $@ ) {
+    $self->add_error( 'error querying DNS' );
+    return {};
+  }
+
+  if ( !@records ) {
+    if ( $domain eq $fallback_domain && $selector eq $fallback_selector ) {
+      # nothing to fall back to
+      $self->add_error( $self->NO_BIMI_RECORD );
+      return {};
+    }
+
+    @records = grep { $_ =~ /^v=bimi1;/i } eval { $self->_get_dns_rr( 'TXT', $fallback_selector. '._bimi.' . $fallback_domain); };
+    if ( my $error = $@ ) {
+      $self->add_error( 'error querying DNS' );
+      return {};
+    }
+    if ( !@records ) {
+      $self->add_error( $self->NO_BIMI_RECORD );
+      return {};
+    }
+    elsif ( scalar @records > 1 ) {
+      $self->add_error( $self->MULTI_BIMI_RECORD );
+      return {};
     }
     else {
-        $Self->error( 'Empty v tag' ) if lc $Data->{ 'v' } eq '';
-        $Self->error( 'Invalid v tag' ) if lc $Data->{ 'v' } ne 'bimi1';
+      # We have one record, let's use that.
+      $self->domain($fallback_domain);
+      $self->selector($fallback_selector);
+      return $self->_parse_record($records[0]);
     }
+  }
+  elsif ( scalar @records > 1 ) {
+    push $self->error->@*, $self->MULTI_BIMI_RECORD;
+    return {};
+  }
+  else {
+    # We have one record, let's use that.
+    return $self->_parse_record($records[0]);
+  }
+  return {};
+}
 
-    # Missing l
-    # Invalid l url
-    # l is hot https://
-    if ( ! exists ( $Data->{ 'l' } ) ) {
-        $Self->error( 'Missing l tag' );
-    }
-    else {
-        if ( scalar @{ $Data->{ 'l' } } == 0 ) {
-                $Self->error( 'Empty l tag' );
-        }
-        else {
-            foreach my $l ( @{ $Data->{ 'l' } } ) {
-                $Self->error( 'Empty l tag' ) if $l eq '';
-                if ( ! ( $l =~ /^https:\/\// ) ) {
-                    $Self->error( 'Invalid transport in l tag' );
-            }
-        }
-        }
-    }
+sub _get_dns_rr($self,$type,$domain) {
+  my @matches;
+  my $res     = $self->resolver;
+  my $query   = $res->query( $domain, $type ) or do {
+    return @matches;
+  };
+  for my $rr ( $query->answer ) {
+    next if $rr->type ne $type;
+    push @matches, $rr->type eq  'A'   ? $rr->address
+                 : $rr->type eq 'PTR'  ? $rr->ptrdname
+                 : $rr->type eq  'NS'  ? $rr->nsdname
+                 : $rr->type eq  'TXT' ? $rr->txtdata
+                 : $rr->type eq  'SPF' ? $rr->txtdata
+                 : $rr->type eq 'AAAA' ? $rr->address
+                 : $rr->type eq  'MX'  ? $rr->exchange
+                 : $rr->answer;
+  }
+  return @matches;
+}
 
-    # Missing z (indicates opt out)
-    # Validate a auth
-
-    # Missing f
-    if ( ! exists ( $Data->{ 'f' } ) ) {
-        # png is the default
-        $Data->{ 'f' } = [ 'png' ];
+sub _parse_record($self,$record) {
+  my $data = {};
+  my @parts = split ';', $record;
+  foreach my $part ( @parts ) {
+    $part =~ s/^ +//;
+    $part =~ s/ +$//;
+    my ( $key, $value ) = split '=', $part, 2;
+    $key = lc $key;
+    if ( exists $data->{ $key } ) {
+      push $self->error->@*, 'Duplicate key in record';
     }
-    elsif ( scalar @{ $Data->{ 'f' } } == 0 ) {
-        $Self->error( 'Empty f entry' );
+    if ( grep { $key eq $_ } ( qw{ v l a } ) ) {
+      $data->{$key} = $value;
     }
-    else {
-        # Unknown f png tiff tif jpg jpeg svg
-        foreach my $f ( @{ $Data->{ 'f' } } ) {
-            if ( $f eq '' ) {
-                $Self->error( 'Empty f entry' );
-                next;
-            }
-            next if ( $f eq 'png' );
-            next if ( $f eq 'tif' );
-            next if ( $f eq 'tiff' );
-            next if ( $f eq 'jpg' );
-            next if ( $f eq 'jpeg' );
-            next if ( $f eq 'svg' );
-            $Self->error( 'Unknown value in f tag' );
-        }
-    }
-
-    # Missing z
-    # Empty z indicates no image
-    # z is not a WxH size
-    # z is < minimum of 32
-    # z is > maximum of 1024
-    if ( ! exists ( $Data->{ 'z' } ) ) {
-        # Undefined result?
-        $Self->error( 'Missing z tag' );
-    }
-    else {
-        foreach my $z ( @{ $Data->{ 'z' } } ) {
-            if ( $z eq '' ) {
-                $Self->error( 'Empty z entry' );
-                ## ToDo this is not an error if the entire tag is empty
-                next;
-            }
-            my ( $x, $y ) = split 'x', $z, 2;
-            if ( ! $x ) {
-                $Self->error( 'Invalid z tag' );
-            }
-            elsif ( ! ( $x =~ /^\d+$/ ) ) {
-                $Self->error( 'Invalid z tag' );
-            }
-            else {
-                $Self->error( 'Invalid dimension in z tag' ) if $x < 32;
-                $Self->error( 'Invalid dimension in z tag' ) if $x > 1024;
-            }
-            if ( ! $y ) {
-                $Self->error( 'Invalid z tag' );
-            }
-            elsif ( ! ( $y =~ /^\d+$/ ) ) {
-                $Self->error( 'Invalid z tag' );
-            }
-            else {
-                $Self->error( 'Invalid dimension in z tag' ) if $y < 32;
-                $Self->error( 'Invalid dimension in z tag' ) if $y >1024;
-            }
-        }
-    }
-
-    return;
+  }
+  return $data;
 }
 
 1;

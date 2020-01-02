@@ -7,14 +7,14 @@ use Pegex::Grammar;
 use Pegex::Parser;
 use XML::Invisible::Receiver;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our @EXPORT_OK = qw(make_parser ast2xml);
 
 use constant DEBUG => $ENV{XML_INVISIBLE_DEBUG};
 
 sub make_parser {
-  my ($grammar_text) = @_;
-  my $grammar = Pegex::Grammar->new(text => $grammar_text);
+  my ($grammar) = @_;
+  $grammar = Pegex::Grammar->new(text => $grammar) if !ref $grammar;
   my $parser = Pegex::Parser->new(
     grammar => $grammar,
     receiver => XML::Invisible::Receiver->new,
@@ -147,15 +147,10 @@ document, it will return an abstract syntax tree (AST), of the general form:
 
   {
     nodename => 'expr',
-    type => 'element',
     attributes => { open => '(', sign => '+', close => ')' },
     children => [
-      {
-        nodename => 'left',
-        type => 'element',
-        attributes => { name => 'a' },
-      },
-      { nodename => 'right', type => 'element', children => [ 'b' ] },
+      { nodename => 'left', attributes => { name => 'a' } },
+      { nodename => 'right', children => [ 'b' ] },
     ],
   }
 
@@ -163,7 +158,7 @@ Arguments:
 
 =over
 
-=item an "invisible XML" grammar specification, in Pegex format
+=item an "invisible XML" Pegex grammar specification, OR a L<Pegex::Grammar> object
 
 =back
 

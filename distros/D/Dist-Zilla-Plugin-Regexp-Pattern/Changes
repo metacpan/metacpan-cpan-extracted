@@ -1,21 +1,26 @@
-0.004   2018-09-10 (PERLANCAR)
+0.005   2020-01-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Use minimum version of Test::Regexp::Pattern from pmversions.
+
+
+0.004   2018-09-10  Released-By: PERLANCAR
 
 	- Create release test file to test regexp patterns using
 	  Test::Regexp::Pattern.
 
 
-0.003   2018-03-24 (PERLANCAR)
+0.003   2018-03-24  Released-By: PERLANCAR
 
 	- Switch from (ab)using InstallTool phase to using AfterBuild phase
 	  to do our stuffs, to be compatible with DZP:StaticInstall.
 
 
-0.002   2016-12-31 (PERLANCAR)
+0.002   2016-12-31  Released-By: PERLANCAR
 
 	- Update checking spec prereq at phase=develop rel=x_spec (instead
 	  of rel=recommends).
 
 
-0.001   2016-09-13 (PERLANCAR)
+0.001   2016-09-13  Released-By: PERLANCAR
 
         - First release.

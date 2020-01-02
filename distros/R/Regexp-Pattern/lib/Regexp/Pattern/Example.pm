@@ -1,7 +1,7 @@
 package Regexp::Pattern::Example;
 
-our $DATE = '2019-06-09'; # DATE
-our $VERSION = '0.2.9'; # VERSION
+our $DATE = '2020-01-02'; # DATE
+our $VERSION = '0.2.10'; # VERSION
 
 use 5.010001;
 
@@ -130,7 +130,7 @@ Regexp::Pattern::Example - An example Regexp::Pattern::* module
 
 =head1 VERSION
 
-This document describes version 0.2.9 of Regexp::Pattern::Example (from Perl distribution Regexp-Pattern), released on 2019-06-09.
+This document describes version 0.2.10 of Regexp::Pattern::Example (from Perl distribution Regexp-Pattern), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
@@ -158,13 +158,16 @@ Examples:
 
  "123-456" =~ re("Example::re2");  # matches
 
- # Another example that matches
+Another example that matches.
+
  "123-456-78901" =~ re("Example::re2");  # matches
 
- # An example that does not match
+An example that does not match.
+
  123456 =~ re("Example::re2");  # doesn't match
 
- # An example that does not get tested
+An example that does not get tested.
+
  123456 =~ re("Example::re2");  # doesn't match
 
 =item * re3
@@ -190,10 +193,12 @@ Choose variant.
 
 Examples:
 
- # An example that matches
+An example that matches.
+
  "123-456" =~ re("Example::re3", {variant=>"A"});  # matches
 
- # An example that doesn't match
+An example that doesn't match.
+
  "123-456" =~ re("Example::re3", {variant=>"B"});  # doesn't match
 
 =item * re4
@@ -240,7 +245,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

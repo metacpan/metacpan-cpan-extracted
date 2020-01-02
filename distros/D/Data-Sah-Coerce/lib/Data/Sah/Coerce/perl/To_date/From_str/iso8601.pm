@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_date::From_str::iso8601;
 
-# AUTHOR
-our $DATE = '2019-12-04'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-01-02'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.040'; # VERSION
+our $VERSION = '0.043'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,17 +33,16 @@ sub coerce {
         "$dt =~ /\\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?:([T ])([0-9]{2}):([0-9]{2}):([0-9]{2})(Z?))?\\z/",
     );
 
-    $res->{modules}{"Time::Local"} //= 0;
-
-    my $code_epoch = '$4 ? ($8 ? Time::Local::timegm($7, $6, $5, $3, $2-1, $1-1900) : Time::Local::timelocal($7, $6, $5, $3, $2-1, $1-1900)) : Time::Local::timelocal(0, 0, 0, $3, $2-1, $1-1900)';
     if ($coerce_to eq 'float(epoch)') {
-        $res->{expr_coerce} = qq(do { my \$time; eval { \$time = $code_epoch }; my \$err = \$@; if (\$err) { \$err =~ s/ at .+//s; ["Invalid date/time: \$err"] } else { [undef, \$time] } });
+        $res->{modules}{"Time::Local"} //= 0;
+        $res->{expr_coerce} = qq(do { my \$time; eval { \$time = \$8 ? Time::Local::timegm_modern(\$7, \$6, \$5, \$3, \$2-1, \$1) : \$4 ? Time::Local::timelocal_modern(\$7, \$6, \$5, \$3, \$2-1, \$1) : Time::Local::timelocal_modern(0, 0, 0, \$3, \$2-1, \$1) }; my \$err = \$@; if (\$err) { \$err =~ s/ at .+//s; ["Invalid date/time: \$err"] } else { [undef, \$time] } });
     } elsif ($coerce_to eq 'DateTime') {
         $res->{modules}{"DateTime"} //= 0;
-        $res->{expr_coerce} = qq(do { my \$time; eval { \$time = $code_epoch }; my \$err = \$@; if (\$err) { \$err =~ s/ at .+//s; ["Invalid date/time: \$err"] } else { [undef, DateTime->from_epoch(epoch => \$time, time_zone => \$8 ? 'UTC' : 'local')] } });
+        $res->{expr_coerce} = qq(do { my \$time; eval { \$time = DateTime->new(year=>\$1, month=>\$2, day=>\$3, ((hour=>\$5, minute=>\$6, second=>\$7) x !!\$4), time_zone => \$8 ? 'UTC' : 'local') };                                                              my \$err = \$@; if (\$err) { \$err =~ s/ at .+//s; ["Invalid date/time: \$err"] } else { [undef, \$time] } });
     } elsif ($coerce_to eq 'Time::Moment') {
         $res->{modules}{"Time::Moment"} //= 0;
-        $res->{expr_coerce} = qq(do { my \$time; eval { \$time = $code_epoch }; my \$err = \$@; if (\$err) { \$err =~ s/ at .+//s; ["Invalid date/time: \$err"] } else { [undef, Time::Moment->from_epoch(\$time)] } });
+        # XXX set offset=>... when $8 is not Z?
+        $res->{expr_coerce} = qq(do { my \$time; eval { \$time = Time::Moment->new(year=>\$1, month=>\$2, day=>\$3, ((hour=>\$5, minute=>\$6, second=>\$7) x !!\$4), offset=>0) };                                                                                   my \$err = \$@; if (\$err) { \$err =~ s/ at .+//s; ["Invalid date/time: \$err"] } else { [undef, \$time] } });
     } else {
         die "BUG: Unknown coerce_to value '$coerce_to', ".
             "please use float(epoch), DateTime, or Time::Moment";
@@ -67,7 +66,7 @@ Data::Sah::Coerce::perl::To_date::From_str::iso8601 - Coerce date from (a subset
 
 =head1 VERSION
 
-This document describes version 0.040 of Data::Sah::Coerce::perl::To_date::From_str::iso8601 (from Perl distribution Data-Sah-Coerce), released on 2019-12-04.
+This document describes version 0.043 of Data::Sah::Coerce::perl::To_date::From_str::iso8601 (from Perl distribution Data-Sah-Coerce), released on 2020-01-02.
 
 =head1 DESCRIPTION
 
@@ -105,7 +104,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

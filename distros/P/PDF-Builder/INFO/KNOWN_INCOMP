@@ -7,6 +7,22 @@ Bug fixes to PDF::API2 (in PDF::Builder) are not mentioned if they correct
 an error (that produces an error message and/or incorrect output) and do not 
 affect the operation or results of otherwise correct code.
 
+3.017     2019-12-15
+
+   See INFO/DEPRECATED for a list of deprecated methods and other items that
+     have been removed from PDF::Builder (or will be, at some future date). 
+     Everything to be removed gets at least TWO years' notice in that file. If 
+     you are still using deprecated methods, you may experience errors in your 
+     code (even if they still work in PDF::API2), and need to change some 
+     calls. The fixes should be minor. 
+
+     There are a large number of deprecated items removed in this release, 
+     because many have been deprecated since PDF::API2's days.  A quick 
+     summary: meterlimit(), hspace(), linedash() -full and -clear options, 
+     new_api(), nonstandard paper sizes, encode_3of9_string_w_chk(), 
+     encode_3of9_w_chk(), encode_3of9_ext(), encode_3of9_ext_w_chk(), imask(), 
+     bpc(), openScalar(), importpage(), pdfile().
+
 3.016     2019-08-03
 
    RT #130039 PDF::API2 returns $self on 'set' operation, while PDF::Builder

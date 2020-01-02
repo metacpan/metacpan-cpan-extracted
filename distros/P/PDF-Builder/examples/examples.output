@@ -297,4 +297,11 @@ ContentText.pl
             camelCase, punctuation, letter runs, slashes
             same, but outdented to force splits at different points
 
+RMtutorial.pl  one page Lorem Ipsum, photo, simple graphics as a demo
+
+Rotated.pl  pp 1 and 4 portrait mode Lorem Ipsum text
+            pp 2 and 3 landscape mode two column Lorem Ipsum text
+
+Boxes.pl  demonstrate interactions of PDF "boxes"
+
 ShowFont.pl   run without command line arguments to get help

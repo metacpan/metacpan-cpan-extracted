@@ -28,15 +28,19 @@ no_index:
 provides:
   Mojolicious::Plugin::Moai:
     file: lib/Mojolicious/Plugin/Moai.pm
-    version: '0.005'
+    version: '0.006'
+  Test::Mojo::Role::Moai:
+    file: lib/Test/Mojo/Role/Moai.pm
+    version: '0.006'
 requires:
   Mojolicious: '8'
+  Role::Tiny: '2.000001'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/preaction/Mojolicious-Plugin-Moai/issues
   homepage: https://github.com/preaction/Mojolicious-Plugin-Moai
   repository: https://github.com/preaction/Mojolicious-Plugin-Moai.git
-version: '0.005'
+version: '0.006'
 x_authority: cpan:PREACTION
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

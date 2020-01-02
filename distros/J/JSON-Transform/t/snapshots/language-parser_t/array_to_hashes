@@ -3,8 +3,7 @@
     {
       'children' => [
         {
-          'nodename' => 'jsonPointer',
-          'type' => 'element'
+          'nodename' => 'jsonPointer'
         },
         {
           'attributes' => {
@@ -19,26 +18,22 @@
                       'children' => [
                         '/'
                       ],
-                      'nodename' => 'jsonOtherNotDouble',
-                      'type' => 'element'
+                      'nodename' => 'jsonOtherNotDouble'
                     },
                     {
                       'children' => [
                         'K'
                       ],
-                      'nodename' => 'variableSystem',
-                      'type' => 'element'
+                      'nodename' => 'variableSystem'
                     },
                     {
                       'children' => [
                         '/id'
                       ],
-                      'nodename' => 'jsonOtherNotDouble',
-                      'type' => 'element'
+                      'nodename' => 'jsonOtherNotDouble'
                     }
                   ],
-                  'nodename' => 'jsonPointer',
-                  'type' => 'element'
+                  'nodename' => 'jsonPointer'
                 },
                 {
                   'children' => [
@@ -46,8 +41,7 @@
                       'children' => [
                         'V'
                       ],
-                      'nodename' => 'variableSystem',
-                      'type' => 'element'
+                      'nodename' => 'variableSystem'
                     },
                     {
                       'children' => [
@@ -57,34 +51,26 @@
                               'children' => [
                                 'id'
                               ],
-                              'nodename' => 'jsonOtherNotGrave',
-                              'type' => 'element'
+                              'nodename' => 'jsonOtherNotGrave'
                             }
                           ],
-                          'nodename' => 'exprStringQuoted',
-                          'type' => 'element'
+                          'nodename' => 'exprStringQuoted'
                         }
                       ],
-                      'nodename' => 'exprKeyRemove',
-                      'type' => 'element'
+                      'nodename' => 'exprKeyRemove'
                     }
                   ],
-                  'nodename' => 'exprSingleValue',
-                  'type' => 'element'
+                  'nodename' => 'exprSingleValue'
                 }
               ],
-              'nodename' => 'exprObjectMapping',
-              'type' => 'element'
+              'nodename' => 'exprObjectMapping'
             }
           ],
-          'nodename' => 'exprMapping',
-          'type' => 'element'
+          'nodename' => 'exprMapping'
         }
       ],
-      'nodename' => 'transformImpliedDest',
-      'type' => 'element'
+      'nodename' => 'transformImpliedDest'
     }
   ],
-  'nodename' => 'transforms',
-  'type' => 'element'
+  'nodename' => 'transforms'
 }

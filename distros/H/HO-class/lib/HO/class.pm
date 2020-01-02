@@ -1,7 +1,7 @@
 package HO::class;
 # ****************
 use strict; use warnings;
-our $VERSION='0.079';
+our $VERSION='0.080';
 # *******************
 
 ; require HO::accessor
@@ -137,6 +137,9 @@ our $VERSION='0.079';
           }
       ; while(my ($new,$subname) = splice(@alias,0,2))
           { my $code = HO::accessor::_methods_code($class, $subname)
+          ; unless($code)
+              { Carp::croak("Alias method ${class}::${subname} is undefined.")
+              }
           ; *{join('::',$class,$new)} = $code
           ; $class_methods{$class}{$new} = "_alias"
           }

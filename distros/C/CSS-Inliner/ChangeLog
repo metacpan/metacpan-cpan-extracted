@@ -242,3 +242,7 @@
 	* Update description indicating that development is currently suspended due to the MailerMailer LLC sale
 	* Apply patch from Nigel Metheringham which silences warnings under Perl 5.26
 	* Apply patch from Father Chrysostomos which avoids install issues with Perl 5.10
+
+4014	2019-12-31	Kevin Kamel <kamelkev@underprint.com>
+	* Apply patch from Graham Ollis related to listing in module indexes
+	* Apply patch from Christian Walde related to tests passing

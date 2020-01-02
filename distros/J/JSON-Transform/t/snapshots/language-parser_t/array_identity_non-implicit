@@ -3,18 +3,15 @@
     {
       'children' => [
         {
-          'nodename' => 'jsonPointer',
-          'type' => 'element'
+          'nodename' => 'jsonPointer'
         },
         {
           'children' => [
             {
-              'nodename' => 'jsonPointer',
-              'type' => 'element'
+              'nodename' => 'jsonPointer'
             }
           ],
-          'nodename' => 'exprSingleValue',
-          'type' => 'element'
+          'nodename' => 'exprSingleValue'
         },
         {
           'attributes' => {
@@ -29,26 +26,20 @@
                       'children' => [
                         'V'
                       ],
-                      'nodename' => 'variableSystem',
-                      'type' => 'element'
+                      'nodename' => 'variableSystem'
                     }
                   ],
-                  'nodename' => 'exprSingleValue',
-                  'type' => 'element'
+                  'nodename' => 'exprSingleValue'
                 }
               ],
-              'nodename' => 'exprArrayMapping',
-              'type' => 'element'
+              'nodename' => 'exprArrayMapping'
             }
           ],
-          'nodename' => 'exprMapping',
-          'type' => 'element'
+          'nodename' => 'exprMapping'
         }
       ],
-      'nodename' => 'transformCopy',
-      'type' => 'element'
+      'nodename' => 'transformCopy'
     }
   ],
-  'nodename' => 'transforms',
-  'type' => 'element'
+  'nodename' => 'transforms'
 }

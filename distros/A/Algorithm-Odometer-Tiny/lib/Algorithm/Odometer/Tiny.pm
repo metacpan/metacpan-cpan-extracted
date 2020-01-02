@@ -5,7 +5,7 @@ use strict;
 # SEE THE END OF THIS FILE FOR AUTHOR, COPYRIGHT AND LICENSE INFORMATION
 
 { package Algorithm::Odometer::Tiny;
-	our $VERSION = "0.02";
+	our $VERSION = "0.04";
 	use Carp;
 	use overload '<>' => sub {
 		my $self = shift;
@@ -17,10 +17,13 @@ use strict;
 	};
 	sub new {  ## no critic (RequireArgUnpacking)
 		my $class = shift;
+		return bless odometer(@_), $class;
+	}
+	sub odometer {  ## no critic (RequireArgUnpacking)
 		croak "no wheels specified" unless @_;
 		my @w = map { [ 1, ref eq 'ARRAY' ? @$_ : $_ ] } @_;
 		my $done;
-		return bless sub {
+		return sub {
 			if ($done) { $done=0; return }
 			my @cur = map {$$_[$$_[0]]} @w;
 			for(my $i=$#w;$i>=0;$i--) {
@@ -29,7 +32,7 @@ use strict;
 				$done=1 unless $i;
 			}
 			return wantarray ? @cur : join '', map {defined()?$_:''} @cur;
-		}, $class;
+		};
 	}
 }
 
@@ -40,7 +43,7 @@ __END__
 
 =head1 Name
 
-Algorithm::Odometer::Tiny - Generate "base-N odometer" permutations
+Algorithm::Odometer::Tiny - Generate "base-N odometer" permutations (Cartesian product / product set)
 
 =head1 Synopsis
 
@@ -74,6 +77,11 @@ operator in list context will return all of the (remaining) values in
 the sequence as strings. In scalar context, the iterator will return
 C<undef> once, and then start the sequence from the beginning.
 
+This class is named C<::Tiny> because the code for the odometer fits
+on a single page, and if you look at the source, you'll see a
+C<sub odometer> that you can copy out of the source code if you wish
+(if you're not using L<Carp|Carp>, just replace C<croak> with C<die>).
+
 =head2 Example
 
 The following wheels:
@@ -100,6 +108,62 @@ produce this sequence:
 L<Algorithm::Odometer::Gray>
 
 =back
+
+Here are some other implementations of the Cartesian product,
+although they may not produce items in the same order as this module.
+Note that if you want speed, XS-based implementations such as
+L<Math::Prime::Util|Math::Prime::Util> or L<Set::Product::XS|Set::Product::XS>
+are probably going to be fastest.
+
+=over
+
+=item *
+
+Perl's L<glob|perlfunc/glob> can produce a Cartesian product, if
+non-empty braces are the only wildcard characters used in the pattern.
+
+=item *
+
+L<Algorithm::Loops|Algorithm::Loops>'s C<NestedLoops>
+
+=item *
+
+L<List::Gen|List::Gen>'s C<cartesian>
+
+=item *
+
+L<List::MapMulti|List::MapMulti>
+
+=item *
+
+L<Math::Cartesian::Product|Math::Cartesian::Product>
+
+=item *
+
+L<Math::Prime::Util|Math::Prime::Util>'s C<forsetproduct>
+
+=item *
+
+L<Set::CartesianProduct::Lazy|Set::CartesianProduct::Lazy>
+
+=item *
+
+L<Set::CrossProduct|Set::CrossProduct>
+
+=item *
+
+L<Set::Product|Set::Product> / L<Set::Product::XS|Set::Product::XS>
+
+=item *
+
+L<Set::Scalar|Set::Scalar>'s C<cartesian_product>
+
+=back
+
+=head1 Acknowledgements
+
+The motivation to release this module kindly provided by:
+L<Some Kiwi Novice @ PerlMonks|https://www.perlmonks.org/?node_id=11107116>
 
 =head1 References
 

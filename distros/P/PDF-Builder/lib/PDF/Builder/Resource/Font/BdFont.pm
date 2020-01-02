@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -52,13 +52,13 @@ Returns a BmpFont object.
 
 =cut
 
+#I<-encode>
+#... changes the encoding of the font from its default.
+#See I<Perl's Encode> for the supported values.
+#
 =pod
 
 Valid %options are:
-
-I<-encode>
-... changes the encoding of the font from its default.
-See I<Perl's Encode> for the supported values.
 
 I<-pdfname> ... changes the reference-name of the font from its default.
 The reference-name is normally generated automatically and can be

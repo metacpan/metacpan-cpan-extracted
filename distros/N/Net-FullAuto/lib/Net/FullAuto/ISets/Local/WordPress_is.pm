@@ -3,7 +3,7 @@ package Net::FullAuto::ISets::Local::WordPress_is;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Powerful Network Process Automation Software
-#    Copyright © 2000-2019  Brian M. Kelly
+#    Copyright © 2000-2020  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -546,7 +546,7 @@ if ($do==1) {
          'mv -v ~/local.conf /etc/ld.so.conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
    } else {
-      ($stdout,$stderr)=$handle->cmd($sudo.'pip install awscli','__display__');
+      ($stdout,$stderr)=$handle->cmd('pip install awscli','__display__');
    }
 }
 $do=1;
@@ -654,10 +654,11 @@ print "DOING NGINX\n";
    #          search and replace - and paste back results.
    #          use copy/paste or cat file and copy/paste results.):
    #
-   #          !  -   \\x21     `  -  \\x60
+   #          !  -   \\x21     `  -  \\x60   * - \\x2A
    #          "  -   \\x22     \  -  \\x5C
    #          $  -   \\x24     %  -  \\x25
    #
+   # https://www.lisenet.com/2014/ - bash approach to conversion
    my $inet_d_script=<<'END';
 #\\x21/bin/sh
 #
@@ -797,7 +798,6 @@ END
                   '--without-http_scgi_module '. 
                   '--without-http_uwsgi_module '.
                   '--with-http_v2_module';
-                  #'--without-http_fastcgi_module';
    ($stdout,$stderr)=$handle->cmd($sudo.$make_nginx,'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i 's/-Werror //' ./objs/Makefile");
@@ -873,10 +873,11 @@ END
    #          search and replace - and paste back results.
    #          use copy/paste or cat file and copy/paste results.):
    #
-   #          !  -   \\x21     `  -  \\x60
+   #          !  -   \\x21     `  -  \\x60   * - \\x2A
    #          "  -   \\x22     \  -  \\x5C
    #          $  -   \\x24     %  -  \\x25
    #
+   # https://www.lisenet.com/2014/ - bash approach to conversion
    my $script=<<END;
 use Net::FullAuto;
 \\x24Net::FullAuto::FA_Core::debug=1;
@@ -1051,12 +1052,12 @@ if ($do==1) {
          "themes.googleusercontent.com wordpress.org; font-src ".
          "\'self\' \'unsafe-inline\' http: https: data: ".
          "fonts.googleapis.com fonts.gstatic.com\";");
-
+}
       ($stdout,$stderr)=$handle->cmd($sudo."service nginx restart",
          '__display__');
-}
-      ($stdout,$stderr)=$handle->cwd('/opt/source')
    }
+}
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    my $install_wordpress=<<'END';
 
 
@@ -1092,7 +1093,7 @@ END
       "http://wordpress.org/latest.tar.gz",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "tar xzvf latest.tar.gz",'__display__');
-   ($stdout,$stderr)=$handle->cwd("wordpress");
+   ($stdout,$stderr)=$handle->cwd('wordpress');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v wp-config-sample.php wp-config.php",
       '__display__');
@@ -1103,27 +1104,54 @@ END
       "sed -i \"/get this/adefine('WP_MEMORY_LIMIT','64M');\" ".
       'wp-config.php');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i '/AUTH/,+6d' wp-config.php");
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -s https://api.wordpress.org/secret-key/1.1/salt/",
       '__display__');
    my $strs=$stdout;
+   #
+   # echo-ing/streaming files over ssh can be tricky. Use echo -e
+   #          and replace these characters with thier HEX
+   #          equivalents (use an external editor for quick
+   #          search and replace - and paste back results.
+   #          use copy/paste or cat file and copy/paste results.):
+   #
+   #          !  -   \\x21     `  -  \\x60   * - \\x2A
+   #          "  -   \\x22     \  -  \\x5C
+   #          $  -   \\x24     %  -  \\x25
+   #
+   # https://www.lisenet.com/2014/ - bash approach to conversion
+   $strs=~s/[\\]/\\\\x5c/sg;
+   $strs=~s/\$/\\\\x24/sg;
+   $strs=~s/["]/\\\\x22/sg;
+   $strs=~s/[!]/\\x21/sg;
+   $strs=~s/[`]/\\\\x60/sg;
+   $strs=~s/[%]/\\\\x25/sg;
+   $strs=~s/[*]/\\\\x2A/sg;
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i '/AUTH/,+6d' wp-config.php");
-   chdir '/root/WordPress/wordpress';
-   open(FH,"<wp-config.php");
-   my @lines=<FH>;
-   close FH;
-   open(NW,">wp-config.php_new");
-   foreach my $line (@lines) {
+      'cat /opt/source/wordpress/wp-config.php');
+   $stdout=~s/[\\]/\\\\x5c/sg;
+   $stdout=~s/\$/\\\\x24/sg;
+   $stdout=~s/["]/\\\\x22/sg;
+   $stdout=~s/[!]/\\\\x21/sg;
+   $stdout=~s/[`]/\\\\x60/sg;
+   $stdout=~s/[%]/\\\\x25/sg;
+   $stdout=~s/[*]/\\\\x2A/sg;
+   my $wcn='';my $n=0;
+   foreach my $line (split /\n/,$stdout) {
+      $line=~s/\r$//;
       if ($line=~/NONCE/) {
-         print NW $strs;
+         $wcn.=$strs;
       } else {
-         print NW $line;
+         $wcn.=$line."\n";
       }
    }
-   close NW;
-   chdir '/root';
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$wcn\" > /tmp/wp-config.php");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "mv -v wp-config.php_new wp-config.php");
+      'mv -fv /tmp/wp-config.php '.
+      '/opt/source/wordpress/wp-config.php',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i 's/database_name_here/wordpress/' wp-config.php");
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1675,6 +1703,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ln -s /usr/local/php7/bin/php /usr/local/bin/php');
       ($stdout,$stderr)=$handle->cmd($sudo.
+         'ln -s /usr/local/php7/bin/php /usr/bin/php');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /usr/local/php7/etc/conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v ./php.ini-production /usr/local/php7/lib/php.ini',
@@ -1701,8 +1731,7 @@ php_admin_flag[log_errors] = on
 END
       ($stdout,$stderr)=$handle->cmd(
          "echo -e \"$wcnf\" | ${sudo}tee -a ".
-         '/usr/local/php7/etc/php-fpm.d/www.conf',
-         '__display__');
+         '/usr/local/php7/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'touch /var/log/fpm-php.www.log');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1734,10 +1763,11 @@ END
       #          search and replace - and paste back results.
       #          use copy/paste or cat file and copy/paste results.):
       #
-      #          !  -   \\x21     `  -  \\x60
+      #          !  -   \\x21     `  -  \\x60   * - \\x2A
       #          "  -   \\x22     \  -  \\x5C
       #          $  -   \\x24     %  -  \\x25
       #
+      # https://www.lisenet.com/2014/ - bash approach to conversion
    my $fpmsrv=<<END;
 [Unit]
 Description=The PHP FastCGI Process Manager
@@ -1795,14 +1825,15 @@ END
          "/etc/init.d/ea-php70-php-fpm start",'__display__');
    }
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".
-      "https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/".
+      'wget --random-wait --progress=dot '.
+      'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/'.
       'wp-cli.phar','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "chmod -v +x wp-cli.phar",'__display__');
+      'chmod -v +x wp-cli.phar','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "mv -v wp-cli.phar /usr/local/bin/wp",'__display__');
+      'mv -v wp-cli.phar /usr/local/bin/wp','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
+   $sudo='sudo -u www-data ';
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/bin/wp core install '.
       "--title=$domain_url ".
@@ -1813,6 +1844,7 @@ END
       '--allow-root --path=/var/www/html/wordpress',
       '__display__');
    my $theme='memberlite';
+   $sudo='sudo ';
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget --random-wait --progress=dot '.
       "https://memberlitetheme.com/wp-content/uploads/themes/$theme.zip",
@@ -1821,6 +1853,7 @@ END
       'wget --random-wait --progress=dot '.
       'https://memberlitetheme.com/wp-content/uploads/themes/'.
       $theme.'-child.zip','__display__');
+   $sudo='sudo -u www-data ';
    ($stdout,$stderr)=$handle->cmd($sudo.
       "/usr/local/bin/wp theme install $theme.zip --allow-root ".
       "--activate --path=/var/www/html/wordpress",
@@ -1828,8 +1861,10 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "/usr/local/bin/wp theme install ${theme}-child.zip --allow-root ".
       "--activate --path=/var/www/html/wordpress",'__display__');
+   ($stdout,$stderr)=$handle->cwd('/var/www/html/wordpress');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "mkdir -vp wp-content/themes/${theme}-child/fonts",'__display__');
+   ($stdout,$stderr)=$handle->cwd('wp-content/themes');
    #
    # echo-ing/streaming files over ssh can be tricky. Use echo -e
    #          and replace these characters with thier HEX
@@ -1837,10 +1872,11 @@ END
    #          search and replace - and paste back results.
    #          use copy/paste or cat file and copy/paste results.):
    #
-   #          !  -   \\x21     `  -  \\x60
+   #          !  -   \\x21     `  -  \\x60   * - \\x2A
    #          "  -   \\x22     \  -  \\x5C
    #          $  -   \\x24     %  -  \\x25
    #
+   # https://www.lisenet.com/2014/ - bash approach to conversion
    my $oc_style=<<END;
 /*
  Theme Name:   Memberlite Child
@@ -1992,6 +2028,7 @@ function custom_add_google_fonts() {
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$googlefont\" >> ".
       "/var/www/html/wordpress/wp-content/themes/${theme}-child/functions.php");
+   $sudo='sudo -u www-data ';
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i '\$ d' ".
       "/var/www/html/wordpress/wp-content/themes/${theme}-child/functions.php");
@@ -1999,7 +2036,7 @@ END
    #($stdout,$stderr)=$handle->cmd(
    #   "/usr/local/bin/wp theme activate ${theme}-child --allow-root",
    #   '__display__');
-   ($stdout,$stderr)=$handle->cwd("../plugins");
+   ($stdout,$stderr)=$handle->cwd('../plugins');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget --random-wait --progress=dot '.
       'https://www.paidmembershipspro.com/wp-content/uploads/plugins/'.
@@ -2121,6 +2158,7 @@ if ($do==1) {
    #   '__display__');
 
 }
+   $sudo='sudo ';
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chown -R www-data:www-data /var/www','__display__');
    ($stdout,$stderr)=$handle->cmd(
@@ -2144,13 +2182,14 @@ my $hms=substr($tm,11,8);
 $hms=~s/^(\d\d):(\d\d):(\d\d)$/h${1}m${2}s${3}/;
 my $hr=$1;my $mn=$2;my $sc=$3;
 my $curyear=$thisyear + 1900;
+$sudo='sudo -u www-data ';
 ($stdout,$stderr)=$handle->cmd($sudo.
    "mkdir -vp /var/www/html/wordpress/wp-content/uploads/$curyear/$mo_",
    '__display__');
 ($stdout,$stderr)=$handle->cmd($sudo.
    "/usr/local/bin/wp media import $builddir/$ls_tmp[0]/dependencies/gw/* ".
-   "--path=/var/www/html/wordpress --allow-root",'__display__');
-($stdout,$stderr)=$handle->cmd($sudo."/usr/local/bin/".
+   '--path=/var/www/html/wordpress --allow-root','__display__');
+($stdout,$stderr)=$handle->cmd($sudo.'/usr/local/bin/'.
    "wp db query \"select post_id from wp_postmeta where meta_value like ".
    "'%angelwing75%'\" --path=/var/www/html/wordpress --allow-root");
 $stdout=~s/^.*(\d+)$/$1/s;
@@ -3221,7 +3260,7 @@ if ($do==1) {
           |_| \_|\___|\__|     |_|   \__,_|_|_/_/   \_\__,_|\__\___/ (C)
 
 
-   Copyright (C) 2000-2019  Brian M. Kelly  Brian.Kelly@FullAuto.com
+   Copyright (C) 2000-2020  Brian M. Kelly  Brian.Kelly@FullAuto.com
 
 END
    eval {

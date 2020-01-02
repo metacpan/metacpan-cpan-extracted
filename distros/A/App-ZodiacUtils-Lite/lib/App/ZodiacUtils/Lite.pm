@@ -1,7 +1,7 @@
 package App::ZodiacUtils::Lite;
 
-our $DATE = '2016-06-02'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-01-01'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to zodiac (Perinci::CmdLine::Lite version)
@@ -18,7 +18,7 @@ App::ZodiacUtils::Lite - CLI utilities related to zodiac (Perinci::CmdLine::Lite
 
 =head1 VERSION
 
-This document describes version 0.001 of App::ZodiacUtils::Lite (from Perl distribution App-ZodiacUtils-Lite), released on 2016-06-02.
+This document describes version 0.002 of App::ZodiacUtils::Lite (from Perl distribution App-ZodiacUtils-Lite), released on 2020-01-01.
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

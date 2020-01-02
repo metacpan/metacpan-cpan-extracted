@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.02';    # VERSION
+our $VERSION = '0.04';    # VERSION
 
 # ABSTRACT: Analytical Web Apps in Perl (Port of Plotly's Dash to Perl)
 
@@ -65,12 +65,15 @@ sub startup {
     my $dist_name = 'Dash';
     $r->get(
         '/_dash-component-suites/:namespace/*asset' => sub {
-            my $c = shift;
+
+            # TODO Component registry to find assets file in other dists
+            my $c    = shift;
+            my $file = $self->_filename_from_file_with_fingerprint( $c->stash('asset') );
+
             $c->reply->file(
-                   File::ShareDir::dist_file(
-                                     $dist_name,
-                                     Path::Tiny::path( 'assets', $c->stash('namespace'), $c->stash('asset') )->canonpath
-                   )
+                       File::ShareDir::dist_file( $dist_name,
+                                                  Path::Tiny::path( 'assets', $c->stash('namespace'), $file )->canonpath
+                       )
             );
         }
     );
@@ -245,9 +248,10 @@ sub _render_scripts {
     my $self = shift;
 
     # First dash_renderer dependencies
-    my $scripts_dependendencies = $self->_dash_renderer_js_dependencies;
+    my $scripts_dependencies = $self->_dash_renderer_js_dependencies;
 
     # Traverse layout and recover javascript dependencies
+    # TODO auto register dependencies on component creation to avoid traversing and filter too much dependencies
     my $layout = $self->layout;
 
     my $visitor;
@@ -271,7 +275,7 @@ sub _render_scripts {
             }
         } elsif ( $type ne '' ) {
             my $node_dependencies = $node->_js_dist();
-            push @$scripts_dependendencies, @$node_dependencies if defined $node_dependencies;
+            push @$scripts_dependencies, @$node_dependencies if defined $node_dependencies;
             if ( $node->can('children') ) {
                 $visitor->( $node->children, $stack_depth );
             }
@@ -282,18 +286,120 @@ sub _render_scripts {
 
     my $rendered_scripts = "";
     $rendered_scripts .= $self->_render_dash_config();
-    push @$scripts_dependendencies, @{ $self->_dash_renderer_js_deps() };
+    push @$scripts_dependencies, @{ $self->_dash_renderer_js_deps() };
 
-    # TODO Avoid duplicates
-    for my $dep (@$scripts_dependendencies) {
-        $rendered_scripts .=
-            '<script src="/'
-          . join( "/", '_dash-component-suites', $dep->{namespace}, $dep->{relative_package_path} )
-          . '"></script>' . "\n";
+    # TODO Avoid duplicates (Order?)
+    my $filtered_resources = $self->_filter_resources($scripts_dependencies);
+    for my $dep (@$filtered_resources) {
+        my $dynamic = $dep->{dynamic} // 0;
+        if ( !$dynamic ) {
+            $rendered_scripts .=
+                '<script src="/'
+              . join( "/", '_dash-component-suites', $dep->{namespace}, $dep->{relative_package_path} )
+              . '"></script>' . "\n";
+        }
     }
     $rendered_scripts .= $self->_render_dash_renderer_script();
 
     return $rendered_scripts;
+}
+
+sub _filter_resources {
+    my $self          = shift;
+    my $resources     = shift;
+    my %params        = @_;
+    my $dev_bundles   = $params{dev_bundles} // 0;
+    my $eager_loading = $params{eager_loading} // 0;
+    my $serve_locally = $params{serve_locally} // 1;
+
+    my $filtered_resources = [];
+    for my $resource (@$resources) {
+        my $filtered_resource = {};
+        my $dynamic           = $resource->{dynamic};
+        if ( defined $dynamic ) {
+            $filtered_resource->{dynamic} = $dynamic;
+        }
+        my $async = $resource->{async};
+        if ( defined $async ) {
+            if ( defined $dynamic ) {
+                die 'A resource can have both dynamic and async: ' + to_json($resource);
+            }
+            my $dynamic = 1;
+            if ( $async eq 'lazy' ) {
+                $dynamic = 1;
+            } else {
+                if ( $async eq 'eager' && !$eager_loading ) {
+                    $dynamic = 1;
+                } else {
+                    if ( $async && !$eager_loading ) {
+                        $dynamic = 1;
+                    } else {
+                        $dynamic = 0;
+                    }
+                }
+            }
+            $filtered_resource->{dynamic} = $dynamic;
+        }
+        my $namespace = $resource->{namespace};
+        if ( defined $namespace ) {
+            $filtered_resource->{namespace} = $namespace;
+        }
+        my $external_url = $resource->{external_url};
+        if ( defined $external_url && !$serve_locally ) {
+            $filtered_resource->{external_url} = $external_url;
+        } else {
+            my $dev_package_path = $resource->{dev_package_path};
+            if ( defined $dev_package_path && $dev_bundles ) {
+                $filtered_resource->{relative_package_path} = $dev_package_path;
+            } else {
+                my $relative_package_path = $resource->{relative_package_path};
+                if ( defined $relative_package_path ) {
+                    $filtered_resource->{relative_package_path} = $relative_package_path;
+                } else {
+                    my $absolute_path = $resource->{absolute_path};
+                    if ( defined $absolute_path ) {
+                        $filtered_resource->{absolute_path} = $absolute_path;
+                    } else {
+                        my $asset_path = $resource->{asset_path};
+                        if ( defined $asset_path ) {
+                            my $stat_info = path( $resource->{filepath} )->stat;
+                            $filtered_resource->{asset_path} = $asset_path;
+                            $filtered_resource->{ts}         = $stat_info->mtime;
+                        } else {
+                            if ($serve_locally) {
+                                warn
+                                  'There is no local version of this resource. Please consider using external_scripts or external_stylesheets : '
+                                  + to_json($resource);
+                                next;
+                            } else {
+                                die
+                                  'There is no relative_package-path, absolute_path or external_url for this resource : '
+                                  + to_json($resource);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        push @$filtered_resources, $filtered_resource;
+    }
+    return $filtered_resources;
+}
+
+sub _filename_from_file_with_fingerprint {
+    my $self       = shift;
+    my $file       = shift;
+    my @path_parts = split( /\//, $file );
+    my @name_parts = split( /\./, $path_parts[-1] );
+
+    # Check if the resource has a fingerprint
+    if ( ( scalar @name_parts ) > 2 && $name_parts[1] =~ /^v[\w-]+m[0-9a-fA-F]+$/ ) {
+        my $original_name = join( ".", $name_parts[0], @name_parts[ 2 .. ( scalar @name_parts - 1 ) ] );
+        $file = join( "/", @path_parts[ 0 .. ( scalar @path_parts - 2 ) ], $original_name );
+    }
+
+    return $file;
 }
 
 1;
@@ -308,7 +414,7 @@ Dash - Analytical Web Apps in Perl (Port of Plotly's Dash to Perl)
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -411,6 +517,22 @@ minor changes:
 
 In the SYNOPSIS you can get a taste of how this works and also in L<the examples folder of the distribution|https://metacpan.org/release/Dash> or directly in L<repository|https://github.com/pablrod/perl-Dash/tree/master/examples>
 
+=head2 Components
+
+This package ships the following component suites and are ready to use:
+
+=over 4
+
+=item L<Dash Core Components|https://dash.plot.ly/dash-core-components> as Dash::Core::Components
+
+=item L<Dash Html Components|https://dash.plot.ly/dash-html-components> as Dash::Html::Components
+
+=item L<Dash DataTable|https://dash.plot.ly/datatable> as Dash::Table
+
+=back
+
+The plan is to make the packages also for L<Dash-Bio|https://dash.plot.ly/dash-bio>, L<Dash-DAQ|https://dash.plot.ly/dash-daq>, L<Dash-Canvas|https://dash.plot.ly/canvas> and L<Dash-Cytoscape|https://dash.plot.ly/cytoscape>.
+
 =head1 STATUS
 
 At this moment this library is experimental and still under active
@@ -441,7 +563,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

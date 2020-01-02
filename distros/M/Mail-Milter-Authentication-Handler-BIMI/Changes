@@ -1,3 +1,7 @@
+2.20200102 2020-01-02 UTC
+        - Updated for new Mail::BIMI
+        - Trust ARC
+
 2.20180510 2018-05-10 Australia/Melbourne
         - Improve handling of timeouts
 

@@ -8,12 +8,10 @@
               'children' => [
                 '/destination'
               ],
-              'nodename' => 'jsonOtherNotDouble',
-              'type' => 'element'
+              'nodename' => 'jsonOtherNotDouble'
             }
           ],
-          'nodename' => 'jsonPointer',
-          'type' => 'element'
+          'nodename' => 'jsonPointer'
         },
         {
           'children' => [
@@ -23,16 +21,13 @@
                   'children' => [
                     '/source'
                   ],
-                  'nodename' => 'jsonOtherNotDouble',
-                  'type' => 'element'
+                  'nodename' => 'jsonOtherNotDouble'
                 }
               ],
-              'nodename' => 'jsonPointer',
-              'type' => 'element'
+              'nodename' => 'jsonPointer'
             }
           ],
-          'nodename' => 'exprSingleValue',
-          'type' => 'element'
+          'nodename' => 'exprSingleValue'
         },
         {
           'attributes' => {
@@ -47,8 +42,7 @@
                       'children' => [
                         'V'
                       ],
-                      'nodename' => 'variableSystem',
-                      'type' => 'element'
+                      'nodename' => 'variableSystem'
                     },
                     {
                       'children' => [
@@ -58,12 +52,10 @@
                               'children' => [
                                 'order'
                               ],
-                              'nodename' => 'jsonOtherNotGrave',
-                              'type' => 'element'
+                              'nodename' => 'jsonOtherNotGrave'
                             }
                           ],
-                          'nodename' => 'exprStringQuoted',
-                          'type' => 'element'
+                          'nodename' => 'exprStringQuoted'
                         },
                         {
                           'children' => [
@@ -71,34 +63,26 @@
                               'children' => [
                                 'K'
                               ],
-                              'nodename' => 'variableSystem',
-                              'type' => 'element'
+                              'nodename' => 'variableSystem'
                             }
                           ],
-                          'nodename' => 'exprSingleValue',
-                          'type' => 'element'
+                          'nodename' => 'exprSingleValue'
                         }
                       ],
-                      'nodename' => 'exprKeyAdd',
-                      'type' => 'element'
+                      'nodename' => 'exprKeyAdd'
                     }
                   ],
-                  'nodename' => 'exprSingleValue',
-                  'type' => 'element'
+                  'nodename' => 'exprSingleValue'
                 }
               ],
-              'nodename' => 'exprArrayMapping',
-              'type' => 'element'
+              'nodename' => 'exprArrayMapping'
             }
           ],
-          'nodename' => 'exprMapping',
-          'type' => 'element'
+          'nodename' => 'exprMapping'
         }
       ],
-      'nodename' => 'transformCopy',
-      'type' => 'element'
+      'nodename' => 'transformCopy'
     }
   ],
-  'nodename' => 'transforms',
-  'type' => 'element'
+  'nodename' => 'transforms'
 }

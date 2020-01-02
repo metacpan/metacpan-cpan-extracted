@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker 6.5503;
 my $PERL_version = '5.018000';  # can't use in "use" statement above! eval?
                                 # could read from .perl-version file otherwise
 my $MakeMaker_version = '6.5503';
-my $version = '3.016';          # PDFbuild.pl updates from 'version' file
+my $version = '3.017';          # PDFbuild.pl updates from 'version' file
 
 # EVERY RELEASE: check https://www.cpan.org/src/ "First release in each branch
 #   of Perl" (NOT "Latest releases in each branch of Perl"!) and subtract 
@@ -96,10 +96,10 @@ my %WriteMakefileArgs =
     #   user can remove any optional installed library if they don't need it
     #     and want to reclaim the space
     #   update t/00-all-usable.t to exclude modules using these libraries!
-    recommends => {
-        'Graphics::TIFF' => 0,     # TIFF image processing
-        'Image::PNG::Libpng' => 0, # advanced/fast PNG image processing
-    },
+##  recommends => {
+##      'Graphics::TIFF' => 0,     # TIFF image processing
+##      'Image::PNG::Libpng' => 0, # advanced/fast PNG image processing
+##  },
 
   },
 

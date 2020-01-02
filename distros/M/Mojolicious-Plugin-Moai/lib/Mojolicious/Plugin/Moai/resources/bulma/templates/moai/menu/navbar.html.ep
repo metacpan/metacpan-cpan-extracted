@@ -1,0 +1,55 @@
+<%
+    my $position = stash( 'position' ) // '';
+    my $style = '';
+    if ( $position =~ /^fixed(?:-(top|bottom))?$/ ) {
+        my $class = 'is-fixed-' . ( $1 || 'top' );
+        $classes->{navbar} = join ' ', $classes->{navbar}, $class;
+    }
+    # Bulma does not come with a sticky top, so we have our own
+    elsif ( $position =~ /^sticky(?:-(top))?$/ ) {
+        $style = 'position: sticky; top: 0;';
+    }
+
+    state $nav_number = 0;
+    $nav_number++;
+    my $collapse_id = stash( 'id' ) ? stash( 'id' ) . '-collapse'
+                    : 'moai-menu-navbar-' . $nav_number . '-collapse'
+                    ;
+=%>
+<nav class="navbar <%= $classes->{navbar} %>" id="<%= stash( 'id' ) %>"
+    style="<%= $style %>"
+>
+    <div class="navbar-brand">
+        % if ( my $brand = stash 'brand' ) {
+        <a class="navbar-item" href="<%= url_for $brand->[1] %>">
+            <%== $brand->[0] %>
+        </a>
+        % }
+        <a role="button" class="navbar-burger" aria-label="menu"
+            data-target="#<%= $collapse_id %>" aria-controls="<%= $collapse_id %>"
+            aria-expanded="false"
+        >
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+    <div class="navbar-menu" id="<%= $collapse_id %>">
+        <div class="navbar-start">
+            % for my $menu_item ( @{ stash( 'menu' ) || [] } ) {
+                <a class="navbar-item is-tab <%= current_route( $menu_item->[1] ) ? 'is-active' : '' %>"
+                    href="<%= url_for $menu_item->[1] %>"
+                >
+                    <%== $menu_item->[0] %>
+                </a>
+            % }
+        </div>
+    </div>
+</nav>
+% if ( !state $has_script++ ) {
+<script>
+    // Bulma does not come with JavaScript, so we provide this:
+    // XXX
+</script>
+% }
+

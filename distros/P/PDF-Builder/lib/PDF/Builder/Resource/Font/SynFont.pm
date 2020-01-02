@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use Math::Trig;    # CAUTION: deg2rad(0) = deg2rad(360) = 0!
 use Unicode::UCD 'charinfo';
@@ -50,7 +50,8 @@ Valid %options are:
 
 I<-encode>
 ... changes the encoding of the font from its default.
-See I<Perl's Encode> for the supported values.
+See I<Perl's Encode> for the supported values. B<Warning:> only single byte
+encodings are supported. Multibyte encodings such as UTF-8 are invalid.
 
 I<-pdfname>
 ... changes the reference-name of the font from its default.
@@ -107,7 +108,13 @@ sub new
    #$self->{' boldmove'} = 0.001;
    #$self->{' space'} = $space;
     # only available in TT fonts. besides, multibyte encodings not supported
-    $font->encodeByName($opts{'-encode'}) if $opts{'-encode'};
+    if (defined $opts{'-encode'}) {
+        if ($opts{'-encode'} =~ m/^utf/i) {
+	    die "Invalid multibyte encoding for synfont: $opts{'-encode'}\n";
+	    # probably more encodings to check
+        }
+        $font->encodeByName($opts{'-encode'});
+    }
 
     $class = ref $class if ref $class;
     $self = $class->SUPER::new($pdf,

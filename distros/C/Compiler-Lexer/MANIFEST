@@ -48,6 +48,7 @@ t/issue_44.t
 t/issue_45.t
 t/issue_48.t
 t/issue_53.t
+t/issue_69.t
 t/issue_reports.t
 t/package.t
 t/perl6.t

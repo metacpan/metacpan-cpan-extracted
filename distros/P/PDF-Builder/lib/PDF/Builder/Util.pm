@@ -3,7 +3,7 @@ package PDF::Builder::Util;
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.016'; # VERSION
+our $VERSION = '3.017'; # VERSION
 my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 # note: $a and $b are "Magic variables" according to perlcritic, and so it

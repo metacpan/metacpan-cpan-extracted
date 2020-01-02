@@ -31,7 +31,10 @@ integrate correctly and efficiently with other software.
 Topics of interest
 ------------------
 
-Possible improvements may support interoperability with related,
+Some topics already on the roadmap are mentioned in the main
+documentation.
+
+Other possible improvements may support interoperability with related,
 or more general, or application software.  An XS implementation could
 increase performance with large degrees.
 
@@ -46,4 +49,4 @@ Author's Note
 Thanks again for your interest.
 I am looking forward to your report or e-mail.
 
-Martin Becker, December 17, 2019
+Martin Becker, December 31, 2019

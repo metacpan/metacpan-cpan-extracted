@@ -8,12 +8,10 @@
               'children' => [
                 '/destination'
               ],
-              'nodename' => 'jsonOtherNotDouble',
-              'type' => 'element'
+              'nodename' => 'jsonOtherNotDouble'
             }
           ],
-          'nodename' => 'jsonPointer',
-          'type' => 'element'
+          'nodename' => 'jsonPointer'
         },
         {
           'children' => [
@@ -21,18 +19,14 @@
               'children' => [
                 '/source'
               ],
-              'nodename' => 'jsonOtherNotDouble',
-              'type' => 'element'
+              'nodename' => 'jsonOtherNotDouble'
             }
           ],
-          'nodename' => 'jsonPointer',
-          'type' => 'element'
+          'nodename' => 'jsonPointer'
         }
       ],
-      'nodename' => 'transformMove',
-      'type' => 'element'
+      'nodename' => 'transformMove'
     }
   ],
-  'nodename' => 'transforms',
-  'type' => 'element'
+  'nodename' => 'transforms'
 }

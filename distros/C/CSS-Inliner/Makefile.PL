@@ -20,6 +20,11 @@ WriteMakefile(
     AUTHOR => 'Kevin Kamel <kamelkev@mailermailer.com>',
     ABSTRACT => 'Library for converting CSS <style> blocks to inline styles',
     LICENSE => 'perl',
+    META_MERGE => {
+        resources => {
+            repository => 'http://github.com/kamelkev/CSS-Inliner',
+        },
+    },
 );
 
 sub MY::postamble {

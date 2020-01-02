@@ -3,8 +3,8 @@ package PDF::Builder::Resource::PaperSizes;
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
-my $LAST_UPDATE = '3.001'; # manually update whenever code is changed
+our $VERSION = '3.017'; # VERSION
+my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ sub get_paper_sizes {
     # dimensions are in Big Points
     return (
         # Metric sizes
-        '4a'         => [ 4760, 6716 ], # deprecated, non-standard name
-        '2a'         => [ 3368, 4760 ], # deprecated, non-standard name
+	# non-standard names 4a, 2a, 4b, 2b have been removed
+	# (use standard 4a0, 2a0, 4b0, 2b0 instead)
         '4a0'        => [ 4760, 6716 ],
         '2a0'        => [ 3368, 4760 ],
         'a0'         => [ 2380, 3368 ],
@@ -27,8 +27,6 @@ sub get_paper_sizes {
         'a4'         => [  595,  842 ],
         'a5'         => [  421,  595 ],
         'a6'         => [  297,  421 ],
-        '4b'         => [ 5656, 8000 ], # deprecated, non-standard name
-        '2b'         => [ 4000, 5656 ], # deprecated, non-standard name
         '4b0'        => [ 5656, 8000 ],
         '2b0'        => [ 4000, 5656 ],
         'b0'         => [ 2828, 4000 ],

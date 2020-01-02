@@ -1,3 +1,24 @@
+0.043   2020-01-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Update coerce rule names in examples.
+
+
+0.042   2020-01-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Also support dates before epoch 0 (year 1969); switch from
+	  Time::Local::time{gm,local} to time{gm,local}_modern.
+
+
+0.041   2020-01-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] To_{date,datenotime,datetime}::From_str::iso8601:
+	  Support dates before epoch (Jan 1, 1970) when
+	  coerce_to=DateTime/Time::Moment (previously the coercion rule
+	  always convert to epoch first).
+
+
 0.040   2019-12-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Add missing dependency: Time::Duration::Parse::AsHash

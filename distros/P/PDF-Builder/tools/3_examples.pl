@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.016'; # VERSION
+our $VERSION = '3.017'; # VERSION
 my $LAST_UPDATE = '3.014'; # manually update whenever code is changed
 
 # command line:
@@ -89,6 +89,9 @@ my (@example_list, @example_results);
   push @example_list, "BarCode.pl";
   push @example_results, "create examples/BarCode.pdf, showing 1 page with some bar code samples.\n It appears that the BarCodes need some more work.\n";
 
+  push @example_list, "Boxes.pl";
+  push @example_results, "create examples/Boxes.pdf, showing multiple pages on the effect\n of different PDF \"boxes\".\n";
+
   push @example_list, "Bspline.pl";
   push @example_results, "create examples/Bspline.pdf, showing 4 pages with some annotated examples of\n using (cubic) B-splines to draw smoothly-connected lines through all the\n given points.\n";
 
@@ -97,6 +100,12 @@ my (@example_list, @example_results);
 
   push @example_list, "ContentText.pl";
   push @example_results, "create examples/ContentText.pdf, showing multiple pages demonstrating the\n capabilities of the Content/Text.pm library advanced text methods.\n";
+
+  push @example_list, "RMtutorial.pl";
+  push @example_results, "create examples/RMtutorial.pdf, demonstrating very basic usage of\n PDF::Builder text and graphics.\n";
+
+  push @example_list, "Rotated.pl";
+  push @example_results, "create examples/Rotated.pdf, showing a way of embedding rotated pages\n within a document of unrotated pages.\n";
 
   # require provision of a core font in %args
   push @example_list, "ShowFont.pl";

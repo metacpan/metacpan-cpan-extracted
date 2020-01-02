@@ -13,8 +13,7 @@ perl:
   - "5.26"
   - "5.24"
   - "5.22"
-  - "5.20"
-  - "5.18"
+# according to PDF::API2, Travis doesn't work with 5.18 and 5.20
 
 before_install:
     - cpanm -n Dist::Zilla::App::Command::cover

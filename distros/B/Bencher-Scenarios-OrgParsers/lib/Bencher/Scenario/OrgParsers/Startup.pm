@@ -1,9 +1,9 @@
 package Bencher::Scenario::OrgParsers::Startup;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-30'; # DATE
+our $DATE = '2020-01-02'; # DATE
 our $DIST = 'Bencher-Scenarios-OrgParsers'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark startup overhead',
@@ -29,7 +29,7 @@ Bencher::Scenario::OrgParsers::Startup - Benchmark startup overhead
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::OrgParsers::Startup (from Perl distribution Bencher-Scenarios-OrgParsers), released on 2020-12-30.
+This document describes version 0.002 of Bencher::Scenario::OrgParsers::Startup (from Perl distribution Bencher-Scenarios-OrgParsers), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ L<Org::Parser::Tiny>
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.04 >>, OS kernel: I<< Linux version 5.0.0-37-generic >>.
 
 Benchmark with default options (C<< bencher -m OrgParsers::Startup >>):
 
@@ -79,9 +79,9 @@ Benchmark with default options (C<< bencher -m OrgParsers::Startup >>):
  +---------------------+-----------+------------------------+------------+---------+---------+
  | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------+-----------+------------------------+------------+---------+---------+
- | Org::Parser         |      31.4 |                   27.3 |        1   | 2.9e-05 |      20 |
- | Org::Parser::Tiny   |       6.1 |                    2   |        5.1 | 1.3e-05 |      20 |
- | perl -e1 (baseline) |       4.1 |                    0   |        7.6 |   6e-06 |      20 |
+ | Org::Parser         |      45.3 |                   36.4 |       1    | 3.1e-05 |      20 |
+ | Org::Parser::Tiny   |      11.5 |                    2.6 |       3.95 | 4.3e-06 |      20 |
+ | perl -e1 (baseline) |       8.9 |                    0   |       5.1  | 1.3e-05 |      20 |
  +---------------------+-----------+------------------------+------------+---------+---------+
 
 
@@ -109,7 +109,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
