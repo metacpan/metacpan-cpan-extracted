@@ -16,10 +16,10 @@ XML::Compile::Transport::SOAPHTTP_MojoUA - exchange XML via Mojo::UserAgent
  use XML::Compile::Transport::SOAPHTTP_MojoUA;
 
  my $http = XML::Compile::Transport::SOAPHTTP_MojoUA->new(
-   , ua_start_callback => \&code
+   , ua_start_callback => \&code,
+   , mojo_ua           => $t->ua,
    );
 
-@options);
  my $send = $http->compileClient(@options2);
 
  my $call = $wsdl->compileClient
@@ -74,6 +74,7 @@ Extends L<"Constructors" in XML::Compile::Transport|XML::Compile::Transport/"Con
  -Option           --Defined in             --Default
   address            XML::Compile::Transport  'http://localhost'
   charset            XML::Compile::Transport  'UTF-8'
+  mojo_ua                                     undef
   ua_start_callback                           undef
 
 =over 2
@@ -81,6 +82,26 @@ Extends L<"Constructors" in XML::Compile::Transport|XML::Compile::Transport/"Con
 =item address => URI|ARRAY-of-URI
 
 =item charset => STRING
+
+=item mojo_ua => Mojo::UserAgent-object
+
+With this option you can pass in the mojo user agent instead of having
+the module instantiate a new one. This is especially important when
+using this module from within L<Test::Mojo> to communicate with a mock
+soap server, you should take care of passing the user agent object of
+the mojo app under test, otherwise you tests will probably derail with
+an app object that has gone out of scope unexpectedly.
+
+  my $t = Test::Mojo->new('Mojolicious');
+
+  my $httpUa = XML::Compile::Transport::SOAPHTTP_MojoUA->new(
+      mojo_ua => $t->ua
+  );
+
+Note that when you are using the C<ua_start_callback> option in
+connection with an shared ua instance, this might cause problem for
+later uses of this ua as the callback: it will get called at every
+start of the ua, even outside of the SOAP use.
 
 =item ua_start_callback => CODE
 
@@ -262,12 +283,12 @@ Inherited, see L<XML::Compile::Transport/"Helpers">
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile-SOAP-Mojolicious distribution version 0.04,
-built on November 01, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile-SOAP-Mojolicious distribution version 0.05,
+built on January 03, 2020. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 
-Copyrights 2016-2019 by [Mark Overmeer <markov@overmeer.net>]. For other contributors see ChangeLog.
+Copyrights 2016-2020 by [Mark Overmeer <markov@overmeer.net>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

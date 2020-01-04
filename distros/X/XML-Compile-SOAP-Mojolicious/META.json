@@ -34,7 +34,7 @@
          "requires" : {
             "HTTP::Message" : "6.06",
             "Log::Report" : "1.05",
-            "Mojolicious" : "6.00",
+            "Mojolicious" : "8.25",
             "Time::HiRes" : "0",
             "XML::Compile::SOAP" : "3.16"
          }
@@ -52,6 +52,6 @@
          "web" : "https://github.com/markov2/perl5-XML-Compile-SOAP-Mojolicious"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -1,0 +1,72 @@
+{
+   "abstract" : "Machine Learning Algorithms & Applications in Perl",
+   "author" : [
+      "Will Braswell <wbraswell@cpan.org>"
+   ],
+   "description" : "MLPerl is Machine Learning Algorithms in the Perl 5 programming language, optimized via the RPerl compiler.",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "mlperl",
+      "machinelearning",
+      "learning",
+      "rperl",
+      "perl5"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MLPerl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "namespace" : [
+         "MLPerl::Test"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta" : "2.150_005",
+            "ExtUtils::MakeMaker" : "7.04",
+            "PPI" : "1.242",
+            "RPerl" : "5.002_000",
+            "Test::Exception" : "0.32",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=MLPerl"
+      },
+      "homepage" : "http://www.rperl.org",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/scienceperl/mlperl.git",
+         "web" : "https://gitlab.com/scienceperl/mlperl"
+      }
+   },
+   "version" : "0.101000",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

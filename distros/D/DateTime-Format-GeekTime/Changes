@@ -1,0 +1,8 @@
+2020-01-02 v1.001
+  fix tests on leap years
+
+2017-06-21 v1.000_002
+  [bugfix] never output surrogate codepoints
+
+2010-03-08 v1.000_001
+  first release

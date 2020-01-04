@@ -9,6 +9,8 @@ use Test::EOL;
 my @files = (
     'bin/csv2chart',
     'lib/App/CSV2Chart.pm',
+    'lib/App/CSV2Chart/API/ToXLSX.pm',
+    'lib/App/CSV2Chart/Command/svg.pm',
     'lib/App/CSV2Chart/Command/xlsx.pm',
     't/00-compile.t'
 );

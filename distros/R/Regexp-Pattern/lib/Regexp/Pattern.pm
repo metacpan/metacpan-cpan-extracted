@@ -1,7 +1,7 @@
 package Regexp::Pattern;
 
-our $DATE = '2020-01-02'; # DATE
-our $VERSION = '0.2.10'; # VERSION
+our $DATE = '2020-01-03'; # DATE
+our $VERSION = '0.2.11'; # VERSION
 
 use strict 'subs', 'vars';
 #use warnings;
@@ -141,7 +141,7 @@ Regexp::Pattern - Convention/framework for modules that contain collection of re
 
 =head1 VERSION
 
-This document describes version 0.2.10 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2020-01-02.
+This document describes version 0.2.11 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2020-01-03.
 
 =head1 SYNOPSIS
 
@@ -194,15 +194,19 @@ your program.
  
      # more complete spec
      re2 => {
-         summary => 'This is regexp for blah',
+         summary => 'This is regexp for blah', # plaintext
          description => <<'_',
  
- A longer description.
+ A longer description in *Markdown* format.
  
  _
          pat => qr/\d{3}-\d{3}(?:-\d{5})?/,
          tags => ['A','B'],
          examples => [
+             # examples can be tested using 'test-regexp-pattern' script
+             # (distributed in Test-Regexp-Pattern distribution). examples can
+             # also be rendered in your POD using
+             # Pod::Weaver::Plugin::Regexp::Pattern.
              {
                  str => '123-456',
                  matches => 1,
@@ -275,6 +279,9 @@ your program.
  
      re4 => {
          summary => 'This is a regexp that does capturing',
+         # it is recommended that your pattern does not capture, unless
+         # necessary. capturing pattern should tag with 'capturing' to let
+         # users/tools know.
          tags => ['capturing'],
          pat => qr/(\d{3})-(\d{3})/,
          examples => [
@@ -284,7 +291,10 @@ your program.
      },
  
      re5 => {
-         summary => 'This is another regexp that does (named) capturing and anchoring',
+         summary => 'This is another regexp that is anchored and does (named) capturing',
+         # it is recommended that your pattern is not anchored for more
+         # reusability, unless necessary. anchored pattern should tag with
+         # 'anchored' to let users/tools know.
          tags => ['capturing', 'anchored'],
          pat => qr/^(?<cap1>\d{3})-(?<cap2>\d{3})/,
          examples => [

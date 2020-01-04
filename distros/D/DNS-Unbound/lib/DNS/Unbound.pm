@@ -66,7 +66,7 @@ use DNS::Unbound::X ();
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.14';
+    $VERSION = '0.15';
     XSLoader::load();
 }
 
@@ -479,6 +479,52 @@ sub count_pending_queries {
     my ($self) = @_;
 
     return $self->{'_queries_lookup'} ? 0 + keys %{ $self->{'_queries_lookup'} } : 0;
+}
+
+#----------------------------------------------------------------------
+
+=head1 METHODS FOR DEALING WITH DNSSEC
+
+The following correspond to their equivalents in libunbound.
+
+=head2 I<OBJ>->add_ta()
+
+Z<>
+
+=cut
+
+sub add_ta {
+    return _ub_ctx_add_ta( $_[0]->{'_ub'}, $_[1] );
+}
+
+=head2 I<OBJ>->add_ta_autr()
+
+Z<>
+
+=cut
+
+sub add_ta_autr {
+    return _ub_ctx_add_ta_autr( $_[0]->{'_ub'}, $_[1] );
+}
+
+=head2 I<OBJ>->add_ta_file()
+
+Z<>
+
+=cut
+
+sub add_ta_file {
+    return _ub_ctx_add_ta_file( $_[0]->{'_ub'}, $_[1] );
+}
+
+=head2 I<OBJ>->trustedkeys()
+
+Z<>
+
+=cut
+
+sub trustedkeys {
+    return _ub_ctx_trustedkeys( $_[0]->{'_ub'}, $_[1] );
 }
 
 #----------------------------------------------------------------------

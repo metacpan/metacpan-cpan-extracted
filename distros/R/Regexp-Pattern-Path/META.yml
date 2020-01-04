@@ -24,7 +24,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Path
   homepage: https://metacpan.org/release/Regexp-Pattern-Path
   repository: git://github.com/perlancar/perl-Regexp-Pattern-Path.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

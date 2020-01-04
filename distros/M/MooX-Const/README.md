@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.4.0
+version v0.4.2
 
 # SYNOPSIS
 
@@ -122,7 +122,7 @@ Kang-min Liu 劉康民 <gugod@gugod.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

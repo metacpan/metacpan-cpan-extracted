@@ -1,0 +1,6 @@
+Revision history for Perl extension DataLocale
+
+1.43 2020-01-04 17:37:30
+    - Fix write postamble into Makefile
+    - Fix any tests
+

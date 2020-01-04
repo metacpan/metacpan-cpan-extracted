@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::js::To_bool::From_str::common_words;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-02'; # DATE
+our $DATE = '2020-01-03'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.043'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,7 +55,7 @@ Data::Sah::Coerce::js::To_bool::From_str::common_words - Coerce from common true
 
 =head1 VERSION
 
-This document describes version 0.043 of Data::Sah::Coerce::js::To_bool::From_str::common_words (from Perl distribution Data-Sah-Coerce), released on 2020-01-02.
+This document describes version 0.046 of Data::Sah::Coerce::js::To_bool::From_str::common_words (from Perl distribution Data-Sah-Coerce), released on 2020-01-03.
 
 =head1 DESCRIPTION
 

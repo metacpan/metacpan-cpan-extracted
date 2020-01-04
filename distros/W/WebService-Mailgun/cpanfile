@@ -17,4 +17,6 @@ on 'test' => sub {
 on 'develop' => sub {
     requires 'Minilla';
     requires 'Pod::Markdown::Github';
+    requires 'Version::Next';
+    requires 'CPAN::Uploader';
 };

@@ -1,7 +1,7 @@
 package Calendar::Dates::FRM;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2020-01-03'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ Calendar::Dates::FRM - FRM exam calendar
 
 =head1 VERSION
 
-This document describes version 0.007 of Calendar::Dates::FRM (from Perl distribution Calendar-Dates-FRM), released on 2019-06-20.
+This document describes version 0.008 of Calendar::Dates::FRM (from Perl distribution Calendar-Dates-FRM), released on 2020-01-03.
 
 =head1 SYNOPSIS
 
@@ -46,162 +46,162 @@ This document describes version 0.007 of Calendar::Dates::FRM (from Perl distrib
  use Calendar::Dates::FRM;
  my $min_year = Calendar::Dates::FRM->get_min_year; # => 2018
  my $max_year = Calendar::Dates::FRM->get_max_year; # => 2020
- my $entries  = Calendar::Dates::FRM->get_entries(2019);
+ my $entries  = Calendar::Dates::FRM->get_entries(2020);
 
 C<$entries> result:
 
  [
    {
-     date    => "2019-01-03",
-     day     => 3,
+     date    => "2020-01-02",
+     day     => 2,
      month   => 1,
      summary => "Exam results sent via email",
-     tags    => ["nov2018exam"],
-     year    => 2019,
+     tags    => ["nov2019exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-01-31",
+     date    => "2020-01-31",
      day     => 31,
      month   => 1,
      summary => "Early registration closed",
-     tags    => ["may2019exam"],
-     year    => 2019,
+     tags    => ["may2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-02-01",
+     date    => "2020-02-01",
      day     => 1,
      month   => 2,
      summary => "Standard registration opened",
-     tags    => ["may2019exam"],
-     year    => 2019,
+     tags    => ["may2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-02-28",
-     day     => 28,
+     date    => "2020-02-29",
+     day     => 29,
      month   => 2,
      summary => "Standard registration closed",
-     tags    => ["may2019exam"],
-     year    => 2019,
+     tags    => ["may2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-03-01",
+     date    => "2020-03-01",
      day     => 1,
      month   => 3,
      summary => "Late registration opened",
-     tags    => ["may2019exam"],
-     year    => 2019,
+     tags    => ["may2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-04-15",
+     date    => "2020-04-15",
      day     => 15,
      month   => 4,
      summary => "Late registration closed",
-     tags    => ["may2019exam"],
-     year    => 2019,
+     tags    => ["may2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-04-15",
+     date    => "2020-04-15",
      day     => 15,
      month   => 4,
      summary => "Defer deadline",
-     tags    => ["may2019exam"],
-     year    => 2019,
+     tags    => ["may2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-05-01",
+     date    => "2020-05-01",
      day     => 1,
      month   => 5,
      summary => "Admission tickets released",
-     tags    => ["may2019exam"],
-     year    => 2019,
+     tags    => ["may2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-05-18",
-     day     => 18,
+     date    => "2020-05-16",
+     day     => 16,
      month   => 5,
      summary => "Exam day",
-     tags    => ["may2019exam"],
-     year    => 2019,
+     tags    => ["may2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-06-28",
-     day     => 28,
-     month   => 6,
+     date    => "2020-07-01",
+     day     => 1,
+     month   => 7,
      summary => "Exam results sent via email",
-     tags    => ["may2019exam"],
-     year    => 2019,
+     tags    => ["may2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-05-01",
+     date    => "2020-05-01",
      day     => 1,
      month   => 5,
      summary => "Early registration opened",
-     tags    => ["nov2019exam"],
-     year    => 2019,
+     tags    => ["nov2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-07-31",
+     date    => "2020-07-31",
      day     => 31,
      month   => 7,
      summary => "Early registration closed",
-     tags    => ["nov2019exam"],
-     year    => 2019,
+     tags    => ["nov2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-08-01",
+     date    => "2020-08-01",
      day     => 1,
      month   => 8,
      summary => "Standard registration opened",
-     tags    => ["nov2019exam"],
-     year    => 2019,
+     tags    => ["nov2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-08-31",
+     date    => "2020-08-31",
      day     => 31,
      month   => 8,
      summary => "Standard registration closed",
-     tags    => ["nov2019exam"],
-     year    => 2019,
+     tags    => ["nov2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-09-01",
+     date    => "2020-09-01",
      day     => 1,
      month   => 9,
      summary => "Late registration opened",
-     tags    => ["nov2019exam"],
-     year    => 2019,
+     tags    => ["nov2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-10-15",
+     date    => "2020-10-15",
      day     => 15,
      month   => 10,
      summary => "Late registration closed",
-     tags    => ["nov2019exam"],
-     year    => 2019,
+     tags    => ["nov2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-10-15",
+     date    => "2020-10-15",
      day     => 15,
      month   => 10,
      summary => "Defer deadline",
-     tags    => ["nov2019exam"],
-     year    => 2019,
+     tags    => ["nov2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-11-01",
+     date    => "2020-11-01",
      day     => 1,
      month   => 11,
      summary => "Admission tickets released",
-     tags    => ["nov2019exam"],
-     year    => 2019,
+     tags    => ["nov2020exam"],
+     year    => 2020,
    },
    {
-     date    => "2019-11-16",
-     day     => 16,
+     date    => "2020-11-21",
+     day     => 21,
      month   => 11,
      summary => "Exam day",
-     tags    => ["nov2019exam"],
-     year    => 2019,
+     tags    => ["nov2020exam"],
+     year    => 2020,
    },
  ]
 
@@ -224,14 +224,6 @@ This module provides FRM exam calendar using the L<Calendar::Dates> interface.
  +---------------+-------+
 
 =head1 DATES SAMPLES
-
-Entries for year 2018:
-
- +------------+-----+-------+---------------------------+-------------+------+
- | date       | day | month | summary                   | tags        | year |
- +------------+-----+-------+---------------------------+-------------+------+
- | 2018-12-01 | 1   | 12    | Early registration opened | may2019exam | 2018 |
- +------------+-----+-------+---------------------------+-------------+------+
 
 Entries for year 2019:
 
@@ -257,15 +249,34 @@ Entries for year 2019:
  | 2019-10-15 | 15  | 10    | Defer deadline               | nov2019exam | 2019 |
  | 2019-11-01 | 1   | 11    | Admission tickets released   | nov2019exam | 2019 |
  | 2019-11-16 | 16  | 11    | Exam day                     | nov2019exam | 2019 |
+ | 2019-12-01 | 1   | 12    | Early registration opened    | may2020exam | 2019 |
  +------------+-----+-------+------------------------------+-------------+------+
 
 Entries for year 2020:
 
- +------------+-----+-------+-----------------------------+-------------+------+
- | date       | day | month | summary                     | tags        | year |
- +------------+-----+-------+-----------------------------+-------------+------+
- | 2020-01-02 | 2   | 1     | Exam results sent via email | nov2019exam | 2020 |
- +------------+-----+-------+-----------------------------+-------------+------+
+ +------------+-----+-------+------------------------------+-------------+------+
+ | date       | day | month | summary                      | tags        | year |
+ +------------+-----+-------+------------------------------+-------------+------+
+ | 2020-01-02 | 2   | 1     | Exam results sent via email  | nov2019exam | 2020 |
+ | 2020-01-31 | 31  | 1     | Early registration closed    | may2020exam | 2020 |
+ | 2020-02-01 | 1   | 2     | Standard registration opened | may2020exam | 2020 |
+ | 2020-02-29 | 29  | 2     | Standard registration closed | may2020exam | 2020 |
+ | 2020-03-01 | 1   | 3     | Late registration opened     | may2020exam | 2020 |
+ | 2020-04-15 | 15  | 4     | Late registration closed     | may2020exam | 2020 |
+ | 2020-04-15 | 15  | 4     | Defer deadline               | may2020exam | 2020 |
+ | 2020-05-01 | 1   | 5     | Admission tickets released   | may2020exam | 2020 |
+ | 2020-05-16 | 16  | 5     | Exam day                     | may2020exam | 2020 |
+ | 2020-07-01 | 1   | 7     | Exam results sent via email  | may2020exam | 2020 |
+ | 2020-05-01 | 1   | 5     | Early registration opened    | nov2020exam | 2020 |
+ | 2020-07-31 | 31  | 7     | Early registration closed    | nov2020exam | 2020 |
+ | 2020-08-01 | 1   | 8     | Standard registration opened | nov2020exam | 2020 |
+ | 2020-08-31 | 31  | 8     | Standard registration closed | nov2020exam | 2020 |
+ | 2020-09-01 | 1   | 9     | Late registration opened     | nov2020exam | 2020 |
+ | 2020-10-15 | 15  | 10    | Late registration closed     | nov2020exam | 2020 |
+ | 2020-10-15 | 15  | 10    | Defer deadline               | nov2020exam | 2020 |
+ | 2020-11-01 | 1   | 11    | Admission tickets released   | nov2020exam | 2020 |
+ | 2020-11-21 | 21  | 11    | Exam day                     | nov2020exam | 2020 |
+ +------------+-----+-------+------------------------------+-------------+------+
 
 =for Pod::Coverage ^(filter_entry)$
 
@@ -319,7 +330,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -353,3 +364,26 @@ __DATA__
 2019-11-01;Admission tickets released;nov2019exam
 2019-11-16;Exam day;nov2019exam
 2020-01-02;Exam results sent via email;nov2019exam
+
+# may2020exam
+2019-12-01;Early registration opened;may2020exam
+2020-01-31;Early registration closed;may2020exam
+2020-02-01;Standard registration opened;may2020exam
+2020-02-29;Standard registration closed;may2020exam
+2020-03-01;Late registration opened;may2020exam
+2020-04-15;Late registration closed;may2020exam
+2020-04-15;Defer deadline;may2020exam
+2020-05-01;Admission tickets released;may2020exam
+2020-05-16;Exam day;may2020exam
+2020-07-01;Exam results sent via email;may2020exam
+
+# nov2020exam
+2020-05-01;Early registration opened;nov2020exam
+2020-07-31;Early registration closed;nov2020exam
+2020-08-01;Standard registration opened;nov2020exam
+2020-08-31;Standard registration closed;nov2020exam
+2020-09-01;Late registration opened;nov2020exam
+2020-10-15;Late registration closed;nov2020exam
+2020-10-15;Defer deadline;nov2020exam
+2020-11-01;Admission tickets released;nov2020exam
+2020-11-21;Exam day;nov2020exam

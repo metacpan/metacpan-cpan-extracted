@@ -1,5 +1,12 @@
 Revision history for Perl extension OLE::Storage_Lite.
 
+0.20 Thu Jan 2 2020
+
+    ! Fixed issue with dates being misinterpreted after 2020.
+      https://rt.cpan.org/Ticket/Display.html?id=124513
+      Reported/fixed by Bernard M Wiedemann and Slaven Rezic.
+
+
 0.19  Tue Nov 24 2009
 
     ! Fixed bug where the OLE header wasn't been written correctly
@@ -118,4 +125,3 @@ Revision history for Perl extension OLE::Storage_Lite.
 
 0.01  Sat Nov  4 16:00:00 2000
     - original version; created by Kawai Takanori
-

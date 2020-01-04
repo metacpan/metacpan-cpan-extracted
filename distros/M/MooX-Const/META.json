@@ -56,6 +56,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "MooX::TypeTiny" : "0",
             "Type::Tiny::XS" : "0",
             "Types::Const" : "v0.3.6"
          },
@@ -78,6 +79,7 @@
             "Moo" : "1.006000",
             "Test::More" : "0",
             "Test::Most" : "0",
+            "if" : "0",
             "lib" : "0"
          }
       }
@@ -85,7 +87,7 @@
    "provides" : {
       "MooX::Const" : {
          "file" : "lib/MooX/Const.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.2"
       }
    },
    "release_status" : "stable",
@@ -100,7 +102,7 @@
          "web" : "https://github.com/robrwo/MooX-Const"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.2",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Kang-min Liu \u5289\u5eb7\u6c11 <gugod@gugod.org>"

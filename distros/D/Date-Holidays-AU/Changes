@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+  0.22 - 3 Jan 2020
+
+      * Fixed test suite.
+
   0.21 - 30 Dec 2019
 
       * Adding VIC Grand Final Eve for 2020, WA Queens Birthday 2021.  Removed caching due to incorrect calculations.  Improved test coverage to 100%.

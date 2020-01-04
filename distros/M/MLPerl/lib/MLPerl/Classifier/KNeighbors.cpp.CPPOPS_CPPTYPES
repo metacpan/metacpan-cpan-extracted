@@ -1,0 +1,268 @@
+// [[[ HEADER ]]]
+using std::cout;  using std::cerr;  using std::endl;
+
+#ifndef __CPP__INCLUDED__MLPerl__Classifier__KNeighbors_cpp
+#define __CPP__INCLUDED__MLPerl__Classifier__KNeighbors_cpp 0.007_000
+
+// [[[ INCLUDES ]]]
+#include "MLPerl/Classifier/KNeighbors.h"
+
+# ifdef __PERL__TYPES
+
+Purposefully_die_from_a_compile-time_error,_due_to____PERL__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# elif defined __CPP__TYPES
+
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+
+// [[[ SUBROUTINES & OO METHODS ]]]
+
+void MLPerl__Classifier__KNeighbors::fit(number_arrayref_arrayref train_data, string_arrayref train_classifications) {
+    this->train_data = train_data;
+    this->train_classifications = train_classifications;
+    return;
+}
+
+string_arrayref MLPerl__Classifier__KNeighbors::predict_repeat(number_arrayref_arrayref test_data, integer timing_repetitions) {
+    integer repetition;
+    string_arrayref tests_classifications;
+    for ( repetition = 0; repetition < timing_repetitions; repetition++ ) {
+        tests_classifications = this->predict(test_data);
+    }
+    return tests_classifications;
+}
+
+string_arrayref MLPerl__Classifier__KNeighbors::predict_repeat_metric_euclidean_weights_uniform(number_arrayref_arrayref test_data, integer timing_repetitions) {
+    integer repetition;
+    string_arrayref tests_classifications;
+    for ( repetition = 0; repetition < timing_repetitions; repetition++ ) {
+        tests_classifications = this->predict_metric_euclidean_weights_uniform(test_data);
+    }
+    return tests_classifications;
+}
+
+string_arrayref MLPerl__Classifier__KNeighbors::predict(number_arrayref_arrayref test_data) {
+    integer i;
+    integer test_data_count = test_data.size();
+    string_arrayref tests_classifications;
+    tests_classifications.resize(test_data_count);
+    for ( i = 0; i < test_data_count; i++ ) {
+        tests_classifications[i] = this->predict_single(test_data[i]);
+    }
+    return tests_classifications;
+}
+
+string_arrayref MLPerl__Classifier__KNeighbors::predict_metric_euclidean_weights_uniform(number_arrayref_arrayref test_data) {
+    integer i;
+    integer test_data_count = test_data.size();
+    string_arrayref tests_classifications;
+    tests_classifications.resize(test_data_count);
+    for ( i = 0; i < test_data_count; i++ ) {
+        tests_classifications[i] = this->predict_single_metric_euclidean_weights_uniform(test_data[i]);
+    }
+    return tests_classifications;
+}
+
+string MLPerl__Classifier__KNeighbors::predict_single(number_arrayref test_data_single) {
+    integer i;
+    integer j;
+    integer train_data_count = this->train_data.size();
+    integer n_neighbors_index_max = this->n_neighbors - 1;
+    MLPerl__Classifier__KNeighbors__Neighbor2D_arrayref neighbors;
+    neighbors.resize(this->n_neighbors);
+    for ( i = 0; i <= n_neighbors_index_max; i++ ) {
+        MLPerl__Classifier__KNeighbors__Neighbor2D_ptr neighbors__i{new MLPerl__Classifier__KNeighbors__Neighbor2D()};  neighbors[i] = std::move(neighbors__i);
+        neighbors[i]->distance = -1;
+    }
+    number_arrayref train_data_single;
+    number distance;
+    number neighbor_largest_distance_value;
+    integer neighbor_largest_distance_index;
+    if ( this->metric == (const string) "manhattan" ) {
+        for ( i = 0; i < train_data_count; i++ ) {
+            train_data_single = this->train_data[i];
+            distance = (abs ((train_data_single[0] - test_data_single[0]))) + (abs ((train_data_single[1] - test_data_single[1])));
+            if ( i <= n_neighbors_index_max ) {
+                neighbors[i]->data = train_data_single;
+                neighbors[i]->classification = this->train_classifications[i];
+                neighbors[i]->distance = distance;
+            }
+            else {
+                neighbor_largest_distance_value = neighbors[0]->distance;
+                neighbor_largest_distance_index = 0;
+                for ( j = 1; j <= n_neighbors_index_max; j++ ) {
+                    if ( neighbors[j]->distance > neighbor_largest_distance_value ) {
+                        neighbor_largest_distance_value = neighbors[j]->distance;
+                        neighbor_largest_distance_index = j;
+                    }
+                }
+                if ( neighbors[neighbor_largest_distance_index]->distance > distance ) {
+                    neighbors[neighbor_largest_distance_index]->data = train_data_single;
+                    neighbors[neighbor_largest_distance_index]->classification = this->train_classifications[i];
+                    neighbors[neighbor_largest_distance_index]->distance = distance;
+                }
+            }
+        }
+    }
+    else if ( this->metric == (const string) "euclidean" ) {
+        for ( i = 0; i < train_data_count; i++ ) {
+            train_data_single = this->train_data[i];
+            distance = sqrt(pow((train_data_single[0] - test_data_single[0]), 2) + pow((train_data_single[1] - test_data_single[1]), 2));
+            if ( i <= n_neighbors_index_max ) {
+                neighbors[i]->data = train_data_single;
+                neighbors[i]->classification = this->train_classifications[i];
+                neighbors[i]->distance = distance;
+            }
+            else {
+                neighbor_largest_distance_value = neighbors[0]->distance;
+                neighbor_largest_distance_index = 0;
+                for ( j = 1; j <= n_neighbors_index_max; j++ ) {
+                    if ( neighbors[j]->distance > neighbor_largest_distance_value ) {
+                        neighbor_largest_distance_value = neighbors[j]->distance;
+                        neighbor_largest_distance_index = j;
+                    }
+                }
+                if ( neighbors[neighbor_largest_distance_index]->distance > distance ) {
+                    neighbors[neighbor_largest_distance_index]->data = train_data_single;
+                    neighbors[neighbor_largest_distance_index]->classification = this->train_classifications[i];
+                    neighbors[neighbor_largest_distance_index]->distance = distance;
+                }
+            }
+        }
+    }
+    else if ( this->metric == (const string) "minkowski" ) {
+        if ( this->p <= 0 ) {
+            Die( "ERROR EMLKNN2D01: Minkowski distance power must be greater than 0, dying" );
+        }
+        for ( i = 0; i < train_data_count; i++ ) {
+            train_data_single = this->train_data[i];
+            distance = pow(((pow((abs ((train_data_single[0] - test_data_single[0]))), this->p)) + (pow((abs ((train_data_single[1] - test_data_single[1]))), this->p))), (1 / this->p));
+            if ( i <= n_neighbors_index_max ) {
+                neighbors[i]->data = train_data_single;
+                neighbors[i]->classification = this->train_classifications[i];
+                neighbors[i]->distance = distance;
+            }
+            else {
+                neighbor_largest_distance_value = neighbors[0]->distance;
+                neighbor_largest_distance_index = 0;
+                for ( j = 1; j <= n_neighbors_index_max; j++ ) {
+                    if ( neighbors[j]->distance > neighbor_largest_distance_value ) {
+                        neighbor_largest_distance_value = neighbors[j]->distance;
+                        neighbor_largest_distance_index = j;
+                    }
+                }
+                if ( neighbors[neighbor_largest_distance_index]->distance > distance ) {
+                    neighbors[neighbor_largest_distance_index]->data = train_data_single;
+                    neighbors[neighbor_largest_distance_index]->classification = this->train_classifications[i];
+                    neighbors[neighbor_largest_distance_index]->distance = distance;
+                }
+            }
+        }
+    }
+    else {
+        Die( "ERROR EMLKNN2D00: Unknown distance metric '" + this->metric + "', must be 'manhattan' or 'euclidean' or 'minkowski', dying" );
+    }
+    integer_hashref k_nearest_classification_counts = {};
+    for ( i = 0; i < this->n_neighbors; i++ ) {
+        string classification = neighbors[i]->classification;
+        if ( not exists(k_nearest_classification_counts, classification) ) {
+            k_nearest_classification_counts[classification] = 0;
+        }
+        if ( this->weights == (const string) "uniform" ) {
+            k_nearest_classification_counts[classification] += 1;
+        }
+        else if ( this->weights == (const string) "distance" ) {
+            k_nearest_classification_counts[classification] += (1 / neighbors[i]->distance);
+        }
+        else {
+            Die( "ERROR EMLKNN2D02: Unknown weight function '" + this->weights + "', must be 'uniform' or 'distance' or callable subroutine, dying" );
+        }
+    }
+    string_arrayref k_nearest_classification_counts_keys = {keys(k_nearest_classification_counts)};
+    number classifications_largest_count_value = k_nearest_classification_counts[k_nearest_classification_counts_keys[0]];
+    string classifications_largest_count_key = k_nearest_classification_counts_keys[0];
+    integer k_nearest_classification_counts_keys_count = k_nearest_classification_counts_keys.size();
+    for ( j = 1; j < k_nearest_classification_counts_keys_count; j++ ) {
+        if ( k_nearest_classification_counts[k_nearest_classification_counts_keys[j]] > classifications_largest_count_value ) {
+            classifications_largest_count_value = k_nearest_classification_counts[k_nearest_classification_counts_keys[j]];
+            classifications_largest_count_key = k_nearest_classification_counts_keys[j];
+        }
+    }
+    return classifications_largest_count_key;
+}
+
+string MLPerl__Classifier__KNeighbors::predict_single_metric_euclidean_weights_uniform(number_arrayref test_data_single) {
+    integer i;
+    integer j;
+    integer train_data_count = this->train_data.size();
+    integer n_neighbors_index_max = this->n_neighbors - 1;
+    MLPerl__Classifier__KNeighbors__Neighbor2D_arrayref neighbors;
+    neighbors.resize(this->n_neighbors);
+    for ( i = 0; i <= n_neighbors_index_max; i++ ) {
+        MLPerl__Classifier__KNeighbors__Neighbor2D_ptr neighbors__i{new MLPerl__Classifier__KNeighbors__Neighbor2D()};  neighbors[i] = std::move(neighbors__i);
+        neighbors[i]->distance = -1;
+    }
+    number_arrayref train_data_single;
+    number distance;
+    number neighbor_largest_distance_value;
+    integer neighbor_largest_distance_index;
+    for ( i = 0; i < train_data_count; i++ ) {
+        train_data_single = this->train_data[i];
+        distance = sqrt(pow((train_data_single[0] - test_data_single[0]), 2) + pow((train_data_single[1] - test_data_single[1]), 2));
+        if ( i <= n_neighbors_index_max ) {
+            neighbors[i]->data = train_data_single;
+            neighbors[i]->classification = this->train_classifications[i];
+            neighbors[i]->distance = distance;
+        }
+        else {
+            neighbor_largest_distance_value = neighbors[0]->distance;
+            neighbor_largest_distance_index = 0;
+            for ( j = 1; j <= n_neighbors_index_max; j++ ) {
+                if ( neighbors[j]->distance > neighbor_largest_distance_value ) {
+                    neighbor_largest_distance_value = neighbors[j]->distance;
+                    neighbor_largest_distance_index = j;
+                }
+            }
+            if ( neighbors[neighbor_largest_distance_index]->distance > distance ) {
+                neighbors[neighbor_largest_distance_index]->data = train_data_single;
+                neighbors[neighbor_largest_distance_index]->classification = this->train_classifications[i];
+                neighbors[neighbor_largest_distance_index]->distance = distance;
+            }
+        }
+    }
+    integer_hashref k_nearest_classification_counts = {};
+    for ( i = 0; i < this->n_neighbors; i++ ) {
+        string classification = neighbors[i]->classification;
+        if ( not exists(k_nearest_classification_counts, classification) ) {
+            k_nearest_classification_counts[classification] = 0;
+        }
+        k_nearest_classification_counts[classification] += 1;
+    }
+    string_arrayref k_nearest_classification_counts_keys = {keys(k_nearest_classification_counts)};
+    number classifications_largest_count_value = k_nearest_classification_counts[k_nearest_classification_counts_keys[0]];
+    string classifications_largest_count_key = k_nearest_classification_counts_keys[0];
+    integer k_nearest_classification_counts_keys_count = k_nearest_classification_counts_keys.size();
+    for ( j = 1; j < k_nearest_classification_counts_keys_count; j++ ) {
+        if ( k_nearest_classification_counts[k_nearest_classification_counts_keys[j]] > classifications_largest_count_value ) {
+            classifications_largest_count_value = k_nearest_classification_counts[k_nearest_classification_counts_keys[j]];
+            classifications_largest_count_key = k_nearest_classification_counts_keys[j];
+        }
+    }
+    return classifications_largest_count_key;
+}
+
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+
+# else
+
+Purposefully_die_from_a_compile-time_error,_due_to_neither___PERL__TYPES_nor___CPP__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# endif
+
+#endif
+
+// end of class

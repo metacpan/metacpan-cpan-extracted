@@ -1,6 +1,6 @@
-# Copyright (c) 2013-2019 Martin Becker.  All rights reserved.
+# Copyright (c) 2013-2020 by Martin Becker, Blaubeuren.
 # This script is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# under the terms of the Artistic License 2.0 (see the LICENSE file).
 
 BEGIN {
     $ENV{'NYTPROF'} = 'start=no';
@@ -37,7 +37,7 @@ sub test_requires ($$) {
 
 requires        'App::CPANTS::Lint'                    => '0.05';
 requires        'Archive::Tar'                         => '2.32';
-requires        'Archive::Zip'                         => '1.64';
+requires        'Archive::Zip'                         => '1.67';
 requires        'Assert::Conditional'                  => '0.009';
 requires        'CPAN'                                 => '2.27';
 requires        'CPAN::Reporter'                       => '1.2018';
@@ -51,50 +51,50 @@ requires        'Devel::NYTProf'                       => '6.06';
 requires        'Devel::StackTrace'                    => '2.04';
 requires        'Digest::SHA'                          => '6.02';
 requires        'Dist::Zilla'                          => '6.012';
-requires        'Encode'                               => '3.01';
+requires        'Encode'                               => '3.02';
 requires        'ExtUtils::CBuilder'                   => '0.280231';
-requires        'ExtUtils::MakeMaker'                  => '7.36';
+requires        'ExtUtils::MakeMaker'                  => '7.42';
 requires        'File::HomeDir'                        => '1.004';
 requires        'File::ShareDir'                       => '1.116';
 requires        'File::Spec'                           => '3.75';
 requires        'File::Temp'                           => '0.2309';
 requires        'File::Which'                          => '1.23';
-requires        'Getopt::Long'                         => '2.5';
-requires        'IO::Compress::Base'                   => '2.086';
+requires        'Getopt::Long'                         => '2.51';
+requires        'IO::Compress::Base'                   => '2.093';
 requires        'IO::Zlib'                             => '1.10';
 requires        'Inline'                               => '0.83';
 requires        'Iterator::Diamond'                    => '1.01';
 requires        'JSON'                                 => '4.02';
 requires        'Kwalify'                              => '1.22';
-requires        'LWP'                                  => '6.39';
+requires        'LWP'                                  => '6.43';
 requires        'List::MoreUtils'                      => '0.428';
 recommends      'List::MoreUtils::XS'                  => '0.428';
 requires        'MIME::Base64'                         => '3.15';
-requires        'MIME::Lite'                           => '3.030';
-requires        'Modern::Perl'                         => '1.20190601';
-requires        'Module::CPANTS::Analyse'              => '1.00';
-requires        'Module::CoreList'                     => '5.20190620';
+requires        'MIME::Lite'                           => '3.031';
+requires        'Modern::Perl'                         => '1.20190727';
+requires        'Module::CPANTS::Analyse'              => '1.01';
+requires        'Module::CoreList'                     => '5.20191220';
 requires        'Module::Install'                      => '1.19';
 requires        'Module::Signature'                    => '0.83';
 requires        'Module::Starter'                      => '1.76';
 requires        'Module::Version'                      => '0.201';
-requires        'Moo'                                  => '2.003004';
-requires        'Moose'                                => '2.2011';
-requires        'Mouse'                                => '2.005006';
+requires        'Moo'                                  => '2.003006';
+requires        'Moose'                                => '2.2012';
+requires        'Mouse'                                => '2.005009';
 requires        'Net::FTP'                             => '3.11';
 requires        'Params::Check'                        => '0.38';
 requires        'Parse::CPAN::Meta'                    => '2.150010';
 requires        'Perl6::Form'                          => '0.090';
 requires        'Perl6::Slurp'                         => '0.051005';
-requires        'Perl::Critic'                         => '1.134';
+requires        'Perl::Critic'                         => '1.136';
 requires        'Readonly'                             => '2.05';
 requires        'Regexp::Common'                       => '2017060201';
 requires        'Role::Basic'                          => '0.13';
-requires        'Scalar::Util'                         => '1.50';
+requires        'Scalar::Util'                         => '1.53';
 requires        'Term::ReadKey'                        => '2.38';
 requires        'Term::ReadLine'                       => '1.14';
 recommends      'Term::ReadLine::Gnu'                  => '1.36';
-requires        'Test2::Suite'                         => '0.000122';
+requires        'Test2::Suite'                         => '0.000127';
 requires        'Test::Class'                          => '0.50';
 requires        'Test::Differences'                    => '0.67';
 requires        'Test::Exception'                      => '0.43';
@@ -102,8 +102,8 @@ requires        'Test::Fatal'                          => '0.014';
 requires        'Test::Harness'                        => '3.42';
 requires        'Test::MinimumVersion'                 => '0.101082';
 recommends      'Test::MinimumVersion::Fast'           => '0.04';
-requires        'Test::MockModule'                     => '0.170.0';
-requires        'Test::More'                           => '1.302164';
+requires        'Test::MockModule'                     => '0.171.0';
+requires        'Test::More'                           => '1.302170';
 requires        'Test::NoWarnings'                     => '1.04';
 requires        'Test::Output'                         => '1.031';
 requires        'Test::Pod'                            => '1.52';
@@ -113,12 +113,12 @@ requires        'Test::Regexp'                         => '2017040101';
 requires        'Test::Reporter::Transport::Metabase'  => '1.999010';
 requires        'Test::Requires'                       => '0.10';
 requires        'Test::Signature'                      => '1.11';
-requires        'Test::Simple'                         => '1.302164';
+requires        'Test::Simple'                         => '1.302170';
 requires        'Test::Strict'                         => '0.52';
 requires        'Test::Warn'                           => '0.36';
 requires        'Text::Glob'                           => '0.11';
 requires        'Try::Tiny'                            => '0.30';
-requires        'Type::Tiny'                           => '1.004004';
+requires        'Type::Tiny'                           => '1.008001';
 requires        'YAML'                                 => '1.29';
 requires        'YAML::Syck'                           => '1.31';
 
@@ -129,7 +129,7 @@ WriteMakefile(
     NAME               => 'Task::Devel::Essentials',
     VERSION_FROM       => $module_filename,
     ABSTRACT_FROM      => $module_filename,
-    LICENSE            => 'perl_5',
+    LICENSE            => 'artistic_2',
     AUTHOR             => 'Martin Becker <mhasch at cpan.org>',
     NO_META            => 0,
     CONFIGURE_REQUIRES => \%conf_requires,

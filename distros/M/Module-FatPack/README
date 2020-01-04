@@ -2,8 +2,8 @@ NAME
     Module::FatPack - Generate source code that contains fatpacked modules
 
 VERSION
-    This document describes version 0.181 of Module::FatPack (from Perl
-    distribution Module-FatPack), released on 2019-02-08.
+    This document describes version 0.182 of Module::FatPack (from Perl
+    distribution Module-FatPack), released on 2020-01-03.
 
 FUNCTIONS
   fatpack_modules
@@ -140,7 +140,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

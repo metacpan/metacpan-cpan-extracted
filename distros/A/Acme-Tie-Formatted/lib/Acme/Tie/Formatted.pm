@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 my $first_char = qr/[_a-zA-Z]/;
 my $next_char  = qr/[_a-zA-Z0-9]/;
@@ -34,7 +34,7 @@ sub TIEHASH {
   my $class = shift;
 
   # Someplace to hang our hat.
-  bless \my($self), $class; 
+  bless \my($self), $class;
 }
 
 sub FETCH {
@@ -61,7 +61,7 @@ sub FETCH {
 # Invalidate all other hash access.
 use subs qw(
  STORE    EXISTS    CLEAR    FIRSTKEY    NEXTKEY  );
-*STORE = *EXISTS = *CLEAR = *FIRSTKEY = *NEXTKEY = 
+*STORE = *EXISTS = *CLEAR = *FIRSTKEY = *NEXTKEY =
   sub {
     croak "You can only use %format by accessing it";
   };
@@ -112,7 +112,7 @@ This makes C<%z> the magic hash instead.
 
   print "This is hex: $z{255, "%04x"}\n";
 
-C<Acme::Tie::Formatted> currently supports only one format in the final 
+C<Acme::Tie::Formatted> currently supports only one format in the final
 argument; this may change if there is demand for it.
 
 =head1 DIAGNOSTICS
@@ -122,8 +122,8 @@ argument; this may change if there is demand for it.
 =item C<< You can only use %format by accessing it >>
 
 You tried to store something in C<%format>, check if an element
-exists in it, delete an element, empty out the hash, or 
-access the key in it. 
+exists in it, delete an element, empty out the hash, or
+access the key in it.
 
 None of these operations do anything; only reading elements
 of the hash works.
@@ -199,10 +199,10 @@ Mark-Jason Dominus, for Interpolate.
 
 =over 4
 
-"We are like dwarfs sitting on the shoulders of giants. We see more 
-than they do, indeed even farther; but not because our sight is 
-better than theirs or because we are taller than they. Our sight 
-is enhanced because they raise us up and increase our stature by 
+"We are like dwarfs sitting on the shoulders of giants. We see more
+than they do, indeed even farther; but not because our sight is
+better than theirs or because we are taller than they. Our sight
+is enhanced because they raise us up and increase our stature by
 their enormous height." - Bernard de Chartes
 
 =back

@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2018-03-21'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-01-03'; # DATE
+our $DIST = 'App-RegexpPatternUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -15,7 +17,7 @@ $SPEC{app} = {
     summary => 'Show declaration from Regexp::Pattern::* module',
     args => {
         name => {
-            schema => ['str*', match=>'\A\w+(::\w+)*\z'], # perl::mod
+            schema => 'perl::modname*',
             pos => 0,
             completion => sub {
                 my %args = @_;
@@ -39,8 +41,8 @@ sub app {
 
     if ($args{list}) {
         my @res;
-        require PERLANCAR::Module::List;
-        my $res = PERLANCAR::Module::List::list_modules(
+        require Module::List::Tiny;
+        my $res = Module::List::Tiny::list_modules(
             'Regexp::Pattern::', {list_modules=>1, recurse=>1});
         for (sort keys %$res) {
             s/\ARegexp::Pattern:://;
@@ -72,9 +74,10 @@ Perinci::CmdLine::Any->new(
     pass_cmdline_object => 1,
     read_config => 0,
     read_env => 0,
+    use_locale => 1,
 )->run;
 
-# ABSTRACT: Get a Regexp::Pattern::* pattern
+# ABSTRACT: Show declaration from Regexp::Pattern::* module
 # PODNAME: show-regexp-pattern-module
 
 __END__
@@ -85,34 +88,17 @@ __END__
 
 =head1 NAME
 
-show-regexp-pattern-module - Get a Regexp::Pattern::* pattern
+show-regexp-pattern-module - Show declaration from Regexp::Pattern::* module
 
 =head1 VERSION
 
-This document describes version 0.003 of show-regexp-pattern-module (from Perl distribution App-RegexpPatternUtils), released on 2018-03-21.
+This document describes version 0.004 of show-regexp-pattern-module (from Perl distribution App-RegexpPatternUtils), released on 2020-01-03.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % show-regexp-pattern-module [options] <name>
-
-Examples:
-
- % show-regexp-pattern-module YouTube/video_id
- ERROR 400: Invalid module name 'YouTube/video_id'
-
-Generate variant A of Example::re3:
-
- % show-regexp-pattern-module Example::re3 --gen-arg 'variant=A'
- ERROR 500: Function died: Can't locate Regexp/Pattern/Example/re3.pm in @INC (you may need to install the Regexp::Pattern::Example::re3 module) (@INC contains: /home/u1/perl5/perlbrew/perls/perl-5.26.1/lib/site_perl/5.26.1/x86_64-linux /home/u1/perl5/perlbrew/perls/perl-5.26.1/lib/site_perl/5.26.1 /home/u1/perl5/perlbrew/perls/perl-5.26.1/lib/5.26.1/x86_64-linux /home/u1/perl5/perlbrew/perls/perl-5.26.1/lib/5.26.1) at /tmp/hcL1JZdoxi line 55.
- 
-
-Generate variant B of Example::re3:
-
- % show-regexp-pattern-module Example::re3 --gen-arg 'variant=B'
- ERROR 500: Function died: Can't locate Regexp/Pattern/Example/re3.pm in @INC (you may need to install the Regexp::Pattern::Example::re3 module) (@INC contains: /home/u1/perl5/perlbrew/perls/perl-5.26.1/lib/site_perl/5.26.1/x86_64-linux /home/u1/perl5/perlbrew/perls/perl-5.26.1/lib/site_perl/5.26.1 /home/u1/perl5/perlbrew/perls/perl-5.26.1/lib/5.26.1/x86_64-linux /home/u1/perl5/perlbrew/perls/perl-5.26.1/lib/5.26.1) at /tmp/hcL1JZdoxi line 55.
- 
+ % show-regexp-pattern-module [options] [name]
 
 =head1 OPTIONS
 
@@ -122,25 +108,9 @@ C<*> marks required options.
 
 =over
 
-=item B<--gen-arg>=I<s>%
+=item B<--list>, B<-l>
 
-Supply generator arguments.
-
-If pattern is a dynamic pattern (generated on-demand) and the generator requires
-some arguments, you can supply them here.
-
-
-Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
-
-=item B<--gen-args-json>=I<s>
-
-Supply generator arguments (JSON-encoded).
-
-See C<--gen-arg>.
-
-=item B<--name>=I<s>*
-
-Name of pattern, with module prefix but without the 'Regexp::Pattern'.
+=item B<--name>=I<s>
 
 =back
 
@@ -257,7 +227,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

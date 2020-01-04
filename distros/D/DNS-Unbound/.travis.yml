@@ -31,7 +31,7 @@ before_install:
 #    - "apt-file update"
 #    - "apt-file show libunbound-dev"
     - "sudo apt-get install libunbound-dev"
-    - cpanm ExtUtils::MakeMaker
+    - cpanm --notest ExtUtils::MakeMaker
 install:
     - cpanm --verbose --installdeps --notest .
 matrix:

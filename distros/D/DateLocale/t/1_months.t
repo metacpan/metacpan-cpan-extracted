@@ -37,7 +37,7 @@ if(DateLocale::change_locale('ru_RU.UTF-8')){
 	is_deeply(DateLocale::format_date_ext(1, 5, \@time, ['long', 'long_tooltip', 'short']), {long => 'вчера в 11:22', long_tooltip => 'вчера в 11:22', short => 'вчера'}, 'date_ext 1 day and 5 sec');
 	is_deeply(DateLocale::format_date_ext($_, 5, \@time, ['long', 'long_tooltip', 'short']), {long => 'вторник', long_tooltip => 'вторник в 11:22',short => '11 марта'}, 'date_ext '.$_.' days and 5 sec') for qw /2 3 4/;
 	is_deeply(DateLocale::format_date_ext(5, 5, \@time2, ['long', 'long_tooltip', 'short']), {long => '11 марта', long_tooltip => '11 марта в 11:22',short => '11 марта'}, 'date_ext 5 days and 5 sec');
-	is_deeply(DateLocale::format_date_ext(200, 5, \@time, ['long', 'long_tooltip', 'short']), {long => '11 мар 14', long_tooltip => '11 марта 2014 в 11:22',short => '11.03.2014'}, 'date_ext 200 days and 5 sec');
+	is_deeply(DateLocale::format_date_ext(200, 5, \@time, ['long', 'long_tooltip', 'short']), {long => POSIX::strftime("%d %b %y", 0, 0, 0, 11, 2, 2014), long_tooltip => '11 марта 2014 в 11:22',short => '11.03.2014'}, 'date_ext 200 days and 5 sec');
 	is_deeply(DateLocale::format_date_ext(0, 5, \@time1, ['short']), {short => ' 7:22'}, 'date_ext 5 sec');
 	is_deeply(DateLocale::format_date_ext(0, 65, \@time1, ['short']), {short => ' 7:22'}, 'date_ext 5 sec');
 	is_deeply(DateLocale::format_date_ext(0, 3605, \@time1, ['short']), {short => ' 7:22'}, 'date_ext 5 sec');
@@ -77,7 +77,7 @@ if(DateLocale::change_locale('uk_UA.UTF-8')){
 	is_deeply(DateLocale::format_date_ext(1, 5, \@time, ['long', 'long_tooltip', 'short']), {long => 'вчора о 11:22', long_tooltip => 'вчора о 11:22', short => 'вчора'}, 'date_ext 1 day and 5 sec');
 	is_deeply(DateLocale::format_date_ext($_, 5, \@time, ['long', 'long_tooltip', 'short']), {long => 'вівторок', long_tooltip => 'вівторок о 11:22', short => '11 березня'}, 'date_ext '.$_.' days and 5 sec') for qw /2 3 4/;
 	is_deeply(DateLocale::format_date_ext(5, 5, \@time2, ['long', 'long_tooltip', 'short']), {long => '11 березня', long_tooltip => '11 березня о 11:22', short => '11 березня'}, 'date_ext 5 days and 5 sec');
-	is_deeply(DateLocale::format_date_ext(200, 5, \@time, ['long', 'long_tooltip', 'short']), {long => '11 бер 14', long_tooltip => '11 березня 2014 о 11:22', short => '11.03.2014'}, 'date_ext 200 days and 5 sec');
+	is_deeply(DateLocale::format_date_ext(200, 5, \@time, ['long', 'long_tooltip', 'short']), {long => POSIX::strftime("%d %b %y", 0, 0, 0, 11, 2, 2014), long_tooltip => '11 березня 2014 о 11:22', short => '11.03.2014'}, 'date_ext 200 days and 5 sec');
 	is_deeply(DateLocale::format_date_ext(0, 5, \@time1, ['short']), {short => ' 7:22'}, 'date_ext 5 sec');
 	is_deeply(DateLocale::format_date_ext(0, 65, \@time1, ['short']), {short => ' 7:22'}, 'date_ext 5 sec');
 	is_deeply(DateLocale::format_date_ext(0, 3605, \@time1, ['short']), {short => ' 7:22'}, 'date_ext 5 sec');
@@ -117,7 +117,7 @@ if(DateLocale::change_locale('kk_KZ.UTF-8')){
 	is_deeply(DateLocale::format_date_ext(1, 5, \@time, ['long', 'long_tooltip', 'short']), {long => 'кеше, 11:22', long_tooltip => 'кеше, 11:22', short => 'кеше'}, 'date_ext 1 day and 5 sec');
 	is_deeply(DateLocale::format_date_ext($_, 5, \@time, ['long', 'long_tooltip', 'short']), {long => 'сейсенбі', long_tooltip => 'сейсенбі, 11:22', short => '11 наурызы'}, 'date_ext '.$_.' days and 5 sec') for qw /2 3 4/;
 	is_deeply(DateLocale::format_date_ext(5, 5, \@time2, ['long', 'long_tooltip', 'short']), {long => '11 наурызы', long_tooltip => '11 наурызы, 11:22', short => '11 наурызы'}, 'date_ext 5 days and 5 sec');
-	is_deeply(DateLocale::format_date_ext(200, 5, \@time, ['long', 'long_tooltip', 'short']), {long => '11 нау 14', long_tooltip => '11 наурызы 2014, 11:22', short => '11.03.2014'}, 'date_ext 200 days and 5 sec');
+	is_deeply(DateLocale::format_date_ext(200, 5, \@time, ['long', 'long_tooltip', 'short']), {long => POSIX::strftime("%d %b %y", 0, 0, 0, 11, 2, 2014), long_tooltip => '11 наурызы 2014, 11:22', short => '11.03.2014'}, 'date_ext 200 days and 5 sec');
 	is_deeply(DateLocale::format_date_ext(0, 5, \@time1, ['short']), {short => ' 7:22'}, 'date_ext 5 sec');
 	is_deeply(DateLocale::format_date_ext(0, 65, \@time1, ['short']), {short => ' 7:22'}, 'date_ext 5 sec');
 	is_deeply(DateLocale::format_date_ext(0, 3605, \@time1, ['short']), {short => ' 7:22'}, 'date_ext 5 sec');

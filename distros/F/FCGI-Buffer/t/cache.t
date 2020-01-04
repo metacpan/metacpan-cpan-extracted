@@ -2,17 +2,19 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 155;
+use Test::Most tests => 159;
 use Storable;
 use Capture::Tiny ':all';
 use CGI::Info;
 use CGI::Lingua;
 use Test::NoWarnings;
-use Test::TempDir::Tiny;
+use Directory::Scratch;
 use autodie qw(:all);
 use HTTP::Response;
 use HTTP::Headers;
 use Cwd;
+use lib 't/lib';
+use MyLogger;
 
 BEGIN {
 	use_ok('FCGI::Buffer');
@@ -26,12 +28,12 @@ CACHED: {
 		eval {
 			require CHI;
 
-			CHI->import;
+			CHI->import();
 		};
 
 		if($@) {
 			diag('CHI required to test caching');
-			skip 'CHI not installed', 153;
+			skip('CHI not installed', 157);
 		} else {
 			diag("Using CHI $CHI::VERSION");
 		}
@@ -166,7 +168,7 @@ CACHED: {
 
 			print "Content-type: text/html; charset=ISO-8859-1\n\n";
 
-			print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\n",
+			print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN>\n",
 				"<HTML><HEAD><TITLE>Hello, world</TITLE></HEAD><BODY><P>The quick brown fox jumped over the lazy dog.</P></BODY></HTML>\n";
 		}
 
@@ -202,7 +204,7 @@ CACHED: {
 
 			print "Content-type: text/html; charset=ISO-8859-1\n\n";
 
-			print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\n",
+			print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN>\n",
 				"<HTML><HEAD><TITLE>Hello, world</TITLE></HEAD><BODY><P>The quick brown fox jumped over the lazy dog.</P></BODY></HTML>\n";
 
 			ok($b->is_cached() == 1);
@@ -218,7 +220,10 @@ CACHED: {
 		ok($headers =~ /^ETag:\s+(.+)/m);
 		ok($1 eq $etag);
 
-		my $tempdir = tempdir();
+		# Among other things, save_to will be to here
+		my $tempdir = Directory::Scratch->new()->mkdir('cache.t');
+		ok(-d $tempdir);
+		ok(-w $tempdir);
 		$ENV{'DOCUMENT_ROOT'} = $tempdir;
 
 		delete $ENV{'LANGUAGE'};
@@ -266,19 +271,22 @@ CACHED: {
 
 			ok($b->can_cache() == 1);
 
-			print "Content-type: text/html; charset=ISO-8859-1\n\n";
-
-			print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\n",
-				"<HTML><HEAD><TITLE>test5</TITLE></HEAD>",
-				"<BODY><P>The quick brown fox jumped over the lazy dog.</P>",
+			print "Content-type: text/html; charset=ISO-8859-1\n\n",
+				"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN>\n",
+				'<HTML><HEAD><TITLE>test5</TITLE></HEAD>',
+				'<BODY><P>The quick brown fox jumped over the lazy dog.</P>',
 				'<A HREF="/cgi-bin/test4.cgi?arg1=a&arg2=b">link</a>',
 				"</BODY></HTML>\n";
 		}
 
 		($stdout, $stderr) = capture { test5() };
+
+		diag($stderr) if($stderr ne '');
 		ok($stderr eq '');
 
 		($headers, $body) = split /\r?\n\r?\n/, $stdout, 2;
+		ok(defined($headers));
+		ok(defined($body));
 
 		like($headers, qr/Content-type: text\/html; charset=ISO-8859-1/mi, 'HTML output');
 		like($headers, qr/^ETag:\s+.+/m, 'ETag header is present');
@@ -299,7 +307,11 @@ CACHED: {
 		ok($headers =~ /^ETag:\s+.+/m);
 		ok($headers =~ /^Expires: /m);
 
-		ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
+		if($^O eq 'MSWin32') {
+			ok($body =~ /\\web\\English\\test4.cgi\\.+\.html"/m);
+		} else {
+			ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
+		}
 
 		$ENV{'SCRIPT_NAME'} = '/cgi-bin/test5.cgi';
 		$ENV{'REQUEST_URI'} = '/cgi-bin/test5.cgi?fred=wilma';
@@ -312,7 +324,11 @@ CACHED: {
 		ok($headers =~ /^ETag:\s+.+/m);
 		ok($headers =~ /^Expires: /m);
 
-		ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
+		if($^O eq 'MSWin32') {
+			ok($body =~ /\\web\\English\\test4.cgi\\.+\.html"/m);
+		} else {
+			ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
+		}
 
 		ok(-f "$tempdir/web/English/test5.cgi/arg1=a_arg2=b.html");
 		open(my $fin, '<', "$tempdir/web/English/test5.cgi/arg1=a_arg2=b.html");
@@ -321,6 +337,7 @@ CACHED: {
 			$html_file .= $_;
 		}
 		close($fin);
+
 		ok($html_file =~ /<A HREF="\/cgi-bin\/test4.cgi\?arg1=a&arg2=b">link<\/a>/mi);
 
 		# no cache argument to init()
@@ -338,9 +355,8 @@ CACHED: {
 
 			ok($b->can_cache() == 1);
 
-			print "Content-type: text/html; charset=ISO-8859-1\n\n";
-
-			print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\n",
+			print "Content-type: text/html; charset=ISO-8859-1\n\n",
+				"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN>\n",
 				"<HTML><HEAD><TITLE>Hello, world</TITLE></HEAD>",
 				"<BODY><P>The quick brown fox jumped over the lazy dog.</P>",
 				'<A HREF="/cgi-bin/test4.cgi?arg1=a&arg2=b">link</a>',
@@ -356,7 +372,11 @@ CACHED: {
 		ok($headers =~ /^ETag:\s+.+/m);
 		ok($headers =~ /^Expires: /m);
 
-		ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
+		if($^O eq 'MSWin32') {
+			ok($body =~ /\\web\\English\\test4.cgi\\.+\.html"/m);
+		} else {
+			ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
+		}
 		ok($body !~ /"\?arg1=a/m);
 
 		ok($headers =~ /^Content-Length:\s+(\d+)/m);
@@ -386,7 +406,7 @@ CACHED: {
 
 			print "Content-type: text/html; charset=ISO-8859-1\n\n";
 
-			print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\n",
+			print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN>\n",
 				"<HTML><HEAD><TITLE>Hello, world</TITLE></HEAD>",
 				"<BODY><P>The quick brown fox jumped over the lazy dog.</P>",
 				'<A HREF="?arg1=a&arg2=b">link</a>',
@@ -404,7 +424,11 @@ CACHED: {
 		ok($headers =~ /^Expires: /m);
 		ok($headers !~ /^Content-Encoding: gzip/m);
 
-		ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
+		if($^O eq 'MSWin32') {
+			ok($body =~ /\\web\\English\\test4.cgi\\.+\.html"/m);
+		} else {
+			ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
+		}
 		ok($body !~ /"\?arg1=a/m);
 
 		ok($headers =~ /^Content-Length:\s+(\d+)/m);
@@ -438,7 +462,11 @@ CACHED: {
 		ok($h->content_encoding() eq 'gzip');
 
 		$body = $r->decoded_content();
-		ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
+		if($^O eq 'MSWin32') {
+			ok($body =~ /\\web\\English\\test4.cgi\\.+\.html"/m);
+		} else {
+			ok($body =~ /"\/web\/English\/test4.cgi\/.+\.html"/m);
+		}
 		ok($body !~ /"\?arg1=a/m);
 
 		$ENV{'REQUEST_METHOD'} = 'HEAD';
@@ -487,7 +515,7 @@ CACHED: {
 
 			print "Content-type: text/html; charset=ISO-8859-1\n\n";
 
-			print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\n",
+			print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN>\n",
 				"<HTML><HEAD><TITLE>test6</TITLE></HEAD>",
 				"<BODY>",
 				'<A HREF="/cgi-bin/test6.cgi?arg2=b">link</a>',
@@ -505,7 +533,11 @@ CACHED: {
 		ok($body =~ /<a href="\?arg2=b">link<\/a>/mi);
 		ok($body =~ /<a href=\"\/\/github.com\/nigelhorne/mi);
 		ok($body =~ /<a href=\"\/cgi-bin\/test4.cgi\?arg3=c">/mi);
-		ok($body =~ /"\/web\/English\/test4.cgi\/arg1=a_arg2=b\.html"/m);
+		if($^O eq 'MSWin32') {
+			ok($body =~ /\\web\\English\\test4.cgi\\arg1=a_arg2=b\.html"/m);
+		} else {
+			ok($body =~ /"\/web\/English\/test4.cgi\/arg1=a_arg2=b\.html"/m);
+		}
 
 		ok(-f "$tempdir/web/English/test6.cgi/arg1=a_arg2=b.html");
 		open($fin, '<', "$tempdir/web/English/test6.cgi/arg1=a_arg2=b.html");
@@ -520,52 +552,7 @@ CACHED: {
 		ok($html_file =~ /<a href=\"\/\/github.com\/nigelhorne/mi);
 		ok($html_file =~ /<a href=\"\/cgi-bin\/test4.cgi\?arg3=c">/mi);
 		ok($html_file =~ /"\/cgi-bin\/test4.cgi\?arg1=a&arg2=b">/mi);
-	}
-}
 
-# On some platforms it's failing - find out why
-package MyLogger;
 
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub info {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub trace {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub AUTOLOAD {
-	our $AUTOLOAD;
-	my $param = $AUTOLOAD;
-
-	unless($param eq 'MyLogger::DESTROY') {
-		::diag("Need to define $param");
 	}
 }

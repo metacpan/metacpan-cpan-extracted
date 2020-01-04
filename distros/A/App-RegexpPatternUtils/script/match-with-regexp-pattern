@@ -1,0 +1,223 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/RegexpPatternUtils/match_with_regexp_pattern
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
+
+our $DATE = '2020-01-03'; # DATE
+our $DIST = 'App-RegexpPatternUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/RegexpPatternUtils/match_with_regexp_pattern",
+    program_name => "match-with-regexp-pattern",
+    read_config => 0,
+    read_env => 0,
+    use_utf8 => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Match a string against a Regexp::Pattern pattern
+# PODNAME: match-with-regexp-pattern
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+match-with-regexp-pattern - Match a string against a Regexp::Pattern pattern
+
+=head1 VERSION
+
+This document describes version 0.004 of match-with-regexp-pattern (from Perl distribution App-RegexpPatternUtils), released on 2020-01-03.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % match-with-regexp-pattern [options] <pattern> <string>
+
+Examples:
+
+A non-match:
+
+ % match-with-regexp-pattern YouTube/video_id foo
+ String DOES NOT match regexp pattern YouTube::video_id
+
+A match:
+
+ % match-with-regexp-pattern YouTube/video_id Yb4EGj4_uS0
+ String matches regexp pattern YouTube::video_id
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--anchor>
+
+Generate an anchored version of the pattern.
+
+=item B<--captures>
+
+Return array of captures instead of just a boolean status.
+
+=item B<--gen-arg>=I<s>%, B<-A>
+
+Supply generator arguments.
+
+If pattern is a dynamic pattern (generated on-demand) and the generator requires
+some arguments, you can supply them here.
+
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--gen-args-json>=I<s>
+
+Supply generator arguments (JSON-encoded).
+
+See C<--gen-arg>.
+
+=item B<--pattern>=I<s>*
+
+Name of pattern, with module prefix but without the 'Regexp::Pattern'.
+
+=item B<--quiet>, B<-q>
+
+=item B<--string>=I<s>*
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C match-with-regexp-pattern match-with-regexp-pattern
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete match-with-regexp-pattern 'p/*/`match-with-regexp-pattern`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-RegexpPatternUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-RegexpPatternUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-RegexpPatternUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<get-regexp-pattern-pattern>.
+
+L<rpgrep>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

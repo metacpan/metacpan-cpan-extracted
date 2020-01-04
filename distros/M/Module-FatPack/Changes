@@ -1,29 +1,35 @@
-0.181   2019-02-08 (PERLANCAR)
+0.182   2020-01-03  Released-By: PERLANCAR; Urgency: low
+
+	- [test] Use a more proper example module name prefixed with
+	  Module::FatPack::Test:: [RT#131338].
+
+
+0.181   2019-02-08  Released-By: PERLANCAR
 
 	- Change default assume_strict to 0.
 
 
-0.180   2018-02-27 (PERLANCAR)
+0.180   2018-02-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [doc] Mention Module::DataPack.
 
 
-0.17    2017-07-14 (PERLANCAR)
+0.17    2017-07-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Fix link to the original implementation App::FatPack*er*.
 
 
-0.16    2016-12-29 (PERLANCAR)
+0.16    2016-12-29  Released-By: PERLANCAR
 
 	- [Bugfix] Fix Rinci metadata to make line prefix defaults to '#'
 	  when --pm is specified.
 
 
-0.15    2016-12-28 (PERLANCAR)
+0.15    2016-12-28  Released-By: PERLANCAR
 
 	- [Bugfix] Avoid perl redefine warning.
 
@@ -32,7 +38,7 @@
 	- Add some tests.
 
 
-0.14    2016-12-28 (PERLANCAR)
+0.14    2016-12-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -40,32 +46,32 @@
 	  x_spec.
 
 
-0.13    2016-12-27 (PERLANCAR)
+0.13    2016-12-27  Released-By: PERLANCAR
 
 	- [Bugfix] Fix operator precedence.
 
 
-0.12    2016-12-27 (PERLANCAR)
+0.12    2016-12-27  Released-By: PERLANCAR
 
 	- Add options: --pm, --line-prefix, --put-hook-at-the-end,
 	  --add-begin-block.
 
 
-0.11    2016-12-11 (PERLANCAR)
+0.11    2016-12-11  Released-By: PERLANCAR
 
 	- Tweak Rinci metadata for nicer CLI.
 
 	- Fix module regex (subpackages are allowed to begin with a digit).
 
 
-0.10    2016-02-09 (PERLANCAR)
+0.10    2016-02-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - Add example.
 
 
-0.09    2015-10-03 (PERLANCAR)
+0.09    2015-10-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -73,7 +79,7 @@
 	  App::depak).
 
 
-0.08    2015-09-03 (PERLANCAR)
+0.08    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -82,13 +88,13 @@
 	  requirement.
 
 
-0.07    2015-07-03 (PERLANCAR)
+0.07    2015-07-03  Released-By: PERLANCAR
 
 	- Accept Foo/Bar.pm or Foo::Bar syntax in module_names &
 	  module_srcs.
 
 
-0.06    2015-06-17 (PERLANCAR)
+0.06    2015-06-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -96,32 +102,32 @@
 	  duplication.
 
 
-0.05    2015-06-17 (PERLANCAR)
+0.05    2015-06-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention fatpack-modules script.
 
 
-0.04    2015-06-12 (PERLANCAR)
+0.04    2015-06-12  Released-By: PERLANCAR
 
 	- Add options 'preamble' and 'postamble'.
 
 
-0.03     2015-06-12 (PERLANCAR)
+0.03     2015-06-12  Released-By: PERLANCAR
 
          - No functional changes.
 
          - Minor fix to Rinci metadata
 
 
-0.02     2015-06-12 (PERLANCAR)
+0.02     2015-06-12  Released-By: PERLANCAR
 
          - Add option 'assume_strict'.
 
          - Tweak Rinci metadata.
 
 
-0.01     2015-06-11 (PERLANCAR)
+0.01     2015-06-11  Released-By: PERLANCAR
 
          - First release.

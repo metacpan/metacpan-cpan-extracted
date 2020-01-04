@@ -57,7 +57,7 @@
    "provides" : {
       "Mojolicious::Plugin::Cron" : {
          "file" : "lib/Mojolicious/Plugin/Cron.pm",
-         "version" : "0.028"
+         "version" : "0.029"
       }
    },
    "release_status" : "stable",
@@ -71,13 +71,13 @@
          "web" : "https://github.com/dmanto/Mojolicious-Plugin-Cron"
       }
    },
-   "version" : "0.028",
+   "version" : "0.029",
    "x_contributors" : [
       "Daniel Mantovani <daniel@MBP-daniel.local>",
       "Daniel Mantovani <daniel@gmail.com>",
+      "Daniel Mantovani <dmanto@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Sébastien Feugère <smonff@users.noreply.github.com>",
-      "dmanto <dmanto@gmail.com>",
       "vagrant <vagrant@vagrant.vm>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.97001",

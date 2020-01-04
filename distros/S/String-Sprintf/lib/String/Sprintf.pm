@@ -3,7 +3,7 @@ use strict;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION     = '0.02';
+$VERSION     = '1.001';
 
 
 sub formatter {  # constructor
@@ -78,19 +78,20 @@ How often has it happened that you wished for a format that (s)printf just doesn
 
 =head1 USAGE
 
-So what is a formatter? Think of it as a "thing" that contains custom settings and behaviour for sprintf. Any formatting style that you don't set ("overload") falls back to the built-in keyword sprintf.
+So what is a formatter? Think of it as a "thing" that contains custom settings and behaviour for C<sprintf>. Any formatting style that you don't set ("overload") falls back to the built-in keyword C<sprintf>.
 
-You can make a minimal formatter that behaves just like sprintf (and that is actually using sprintf internally) with:
+You can make a minimal formatter that behaves just like C<sprintf> (and that is actually using C<sprintf> internally) with:
 
   # nothing custom, all default:
   my $default = String::Sprintf->formatter();
   print $default->sprintf("%%%02X\n", 35);
+
   # which produces the same result as:
   print sprintf("%%%02X\n", 35);   # built-in
 
-Because of the explicit use of these formatters, you can, of course, use several different formatters at the same time, even in the same expression. That is why it's better that it doesn't actually I<really> overload the built-in sprintf. Plus, it was far easier to implement this way.
+Because of the explicit use of these formatters, you can, of course, use several different formatters at the same time, even in the same expression. That is why it's better that it doesn't actually I<really> overload the built-in C<sprintf>. Plus, it was far easier to implement this way.
 
-The syntax used is OO Perl, though I don't really consider this as an object oriented module. For example, I foresee no reason for subclassing, and all formatters behave differently. That's what they're for.
+The syntax used is OO Perl, though I don't really consider this as an object-oriented module. For example, I foresee no reason for subclassing, and all formatters behave differently. That's what they're for.
 
 =head1 METHODS
 
@@ -98,7 +99,11 @@ The syntax used is OO Perl, though I don't really consider this as an object ori
 
 =head3 formatter( 'A' => \&formatter_A, 'B' => \&formatter_B, ... )
 
-A constructor. This returns a formatter object that holds custom formatting definitions, each associated with a letter, for its method C<sprintf>. Its arguments consist of hash-like pairs of each a formatting letter (case sensitive) and a sub ref that is used for callbacks, and that is expected to return the formatted substring.
+This returns a formatter object that holds custom formatting definitions, each associated with a letter, for its method C<sprintf>. Its arguments consist of hash-like pairs of each a formatting letter (case sensitive) and a sub ref that is used for callbacks, and that is expected to return the formatted substring.
+
+A key of C<*> is the default format definition which will be used if
+no other definition matches. If you don't specify a C<*> format, the
+formatter uses Perl's builtin C<sprintf>.
 
 =head2 callback API
 
@@ -139,7 +144,7 @@ The return value in scalar context of this sub is inserted into the final, compo
 
 =head3 sprintf($formatstring, $value1, $value2, ...)
 
-This method inserts the values you pass to it into the formatting string, and returns the constructed string. Just like the built-in sprintf does.
+This method inserts the values you pass to it into the formatting string, and returns the constructed string. Just like the built-in C<sprintf> does.
 
 If you're using formatting letters that are I<not> provided when you built the formatter, then it will fall back to the native formatter: L<perlfunc/sprintf>. So you need only to provide formatters for which you're not happy with the built-ins.
 
@@ -149,7 +154,14 @@ Nothing. What did you expect?
 
 =head1 TODO
 
-Support for overloading strftime is planned for the next release (soon), and proper support for position indexed values, like C<"%2$03X">, is next (also soon).
+=over 4
+
+=item * overload strftime too
+
+=item * proper support for position indexed values, like C<"%2$03X">
+
+=back
+
 
 =head1 SEE ALSO
 
@@ -161,7 +173,7 @@ You tell me...?
 
 =head1 SUPPORT
 
-Currently maintained by brian d foy C<< <bdfoy@cpan.org> > and hosted
+Currently maintained by brian d foy C<< <bdfoy@cpan.org> >> and hosted
 on GitHub (https://github.com/briandfoy/string-sprintf).
 
 =head1 AUTHOR
@@ -173,7 +185,11 @@ on GitHub (https://github.com/briandfoy/string-sprintf).
     L<http://perlmonks.org/?node=bart>
     L<http://users.pandora.be/bartl/>
 
-=head1 COPYRIGHT
+=head1 REPOSITORY
+
+L<https://github.com/briandfoy/string-sprintf>
+
+=head1 LICENSE AND COPYRIGHT
 
 (c) Bart Lateur 2006.
 

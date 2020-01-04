@@ -4,7 +4,7 @@ Revision history for Date::Lectionary::Daily
 
  - Added support for the new ACNA daily lectionary based on the secular calendar
  - Migrated the former ACNA daily lectionary to be the non-default lectionary, but kept it around because I like it
- 
+
  1.20180410 2018-04-10
 
  - Added author tests to ensure better distribution quality
@@ -20,3 +20,6 @@ Revision history for Date::Lectionary::Daily
 
 1.20180423 2018-04-23
  - Force upgrade to Date-Lectionary-Time to 1.20180422.1
+
+ 1.20200102 2020-01-02
+  - Upgrade ACNA Secular lectionary to the final, approved lectionary found in BCP2019.

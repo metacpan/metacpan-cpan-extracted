@@ -27,7 +27,13 @@ is_deeply
 is_deeply
     $c->hashify(sub { $_, $_ * $_ }),
     { map { $_ => { $_ * $_ => $_} } @$c },
-    'multiple keys can be returned'
+    'two keys can be returned'
+    ;
+
+is_deeply
+    $c->hashify(sub { $_, $_ * $_, $_ * $_ * $_ }),
+    { map { $_ => { $_ * $_ => { $_ * $_ * $_ => $_ } } } @$c },
+    'three keys can be returned'
     ;
 
 note 'Test get_value';

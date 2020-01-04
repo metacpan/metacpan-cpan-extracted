@@ -9,7 +9,7 @@ use Scalar::Util 'weaken';
 use Mojo::IOLoop::Stream;
 use Future::Mojo;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 =head1 NAME
 
@@ -133,7 +133,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2019 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

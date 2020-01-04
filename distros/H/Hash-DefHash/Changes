@@ -1,16 +1,23 @@
-0.070   2018-09-10 (PERLANCAR)
+0.071   2020-01-04  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Some formatting, additional comments, and tweaking of examples.
+
+
+0.070   2018-09-10  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Fix dependency to DefHash (rel=x_spec).
 
 
-0.06    2016-07-12 (PERLANCAR)
+0.06    2016-07-12  Released-By: PERLANCAR
 
 	- Update to DefHash 1.0.10.
 
 
-0.05    2015-09-06 (PERLANCAR)
+0.05    2015-09-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -19,7 +26,7 @@
 	  requirement.
 
 
-0.04    2014-12-10 (PERLANCAR)
+0.04    2014-12-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -27,19 +34,19 @@
 	  String::Trim::More.
 
 
-0.03    2012-11-10 (SHARYANTO)
+0.03    2012-11-10  Released-By: SHARYANTO
 
         - Follow DefHash 1.0.3 (getting default value for default_lang from
           LANG).
 
 
-0.02    2012-09-26 (SHARYANTO)
+0.02    2012-09-26  Released-By: SHARYANTO
 
         - Allow defhash() to accept and return Hash::DefHash object, so you can
           use it without fear of "double wrapping".
 
 
-0.01    2012-09-14 (SHARYANTO)
+0.01    2012-09-14  Released-By: SHARYANTO
 
         - First version. Most methods have been implemented except
           get_prop_all_langs() and set_prop_lang().

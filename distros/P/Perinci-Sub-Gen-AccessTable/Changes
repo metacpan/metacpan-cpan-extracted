@@ -1,3 +1,8 @@
+0.582   2020-01-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Generate exclude_fields argument.
+
+
 0.581   2019-09-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option: extra_props.

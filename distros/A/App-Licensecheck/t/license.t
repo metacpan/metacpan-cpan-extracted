@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use lib 't/lib';
-use Test::Licensecheck tests => 38;
+use Test::Licensecheck tests => 36;
 
 license_is( 't/devscripts/academic.h',      'AFL-3.0' );
 license_is( 't/grant/Apache/one_helper.rb', 'Apache-2.0' );
@@ -43,7 +43,6 @@ license_is(
 			t/devscripts/bug-559429
 			t/devscripts/gpl-2-comma.sh
 			t/devscripts/gpl-2-incorrect-address
-			t/devscripts/copr-iso8859.h
 			)
 	],
 	'GPL-2'
@@ -52,7 +51,6 @@ license_is(
 	[   qw(
 			t/devscripts/gpl-2+
 			t/devscripts/gpl-2+.scm
-			t/devscripts/copr-utf8.h
 			)
 	],
 	'GPL-2+'

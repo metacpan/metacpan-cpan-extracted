@@ -1,6 +1,11 @@
 
 ==== history of XML::Compile::SOAP::Mojolicious
 
+version 0.05: Fri  3 Jan 14:26:32 CET 2020
+
+	Improvements:
+	- add mojo_ua option, github#3 [Tobias Oetiker]
+
 version 0.04: Fri  1 Nov 08:38:07 CET 2019
 
 	Improvements:

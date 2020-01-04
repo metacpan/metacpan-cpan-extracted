@@ -2,10 +2,39 @@ Regexp-Pattern-License
 ======================
 
 Created:      2016-11-23
-Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Home page:    <https://metacpan.org/pod/Regexp::Pattern::License>
+Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
+
+v3.1.95	2020-01-03
+
+ [ Bug Fixes ]
+ - declare alternate caption (not name) for object mit
+ - tag object artistic as type:versioned:complex
+
+ [ Other ]
+ - Add object rpsl_1.
+ - Add objects apache_1 apache_1_1 apache_2.
+ - Add objects artistic_1 artistic_1_cl8 artistic_1_clarified
+   artistic_1_perl.
+ - Extend object afl to cover subject patterns grant license (not only
+   name). Add objects afl_1_1 afl_1_2 afl_2 afl_2_1 afl_3.
+ - Extend object wtfpl. Add objects wtfpl_1 wtfpl_2 wtfnmfpl wtfnmfpl_1.
+ - Extend objects cecill cecill_1 cecill_1_1 cecill_2 cecill_2_1 cecill_b
+   cecill_c. Add objects cecill_b_1 cecill_c_1.
+ - Improve object jython: Extend metadata.
+ - add alternate long caption for object bsd
+ - relax internal bullet pattern to match up to 5 digits/chars
+ - relax many patterns to match british spelling of licence
+ - relax slightly trait pattern licensed_under to match strings with
+   capital You
+ - relax trait pattern licensed_under to match "covered by"
+ - relax trait pattern version_prefix and synthesized grant patterns to
+   match more version strings; tighten synthesized grant patterns to avoid
+   matching derived versions
+ - synthesize patterns matching license granting declared as definition,
+   i.e. in the form License: foo
 
 v3.1.94	2019-06-12
 

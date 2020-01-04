@@ -1,22 +1,22 @@
---- #YAML:1.0
-name:               Acme-Tie-Formatted
-version:            0.04
-abstract:           embed sprintf() formatting in regular print()
+---
+abstract: 'embed sprintf() formatting in regular print()'
 author:
-    - Joe McMahon <mcmahon@yahoo-inc.com>
-license:            artistic
-distribution_type:  module
+  - 'Joe McMahon  C<< <mcmahon@cpan.org> >>'
+build_requires: {}
 configure_requires:
-    ExtUtils::MakeMaker:  0
-build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Test::More:  0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.54
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Tie-Formatted
+provides:
+  Acme::Tie::Formatted:
+    file: lib/Acme/Tie/Formatted.pm
+    version: '0.06'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

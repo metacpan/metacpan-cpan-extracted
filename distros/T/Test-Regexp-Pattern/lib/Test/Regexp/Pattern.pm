@@ -2,15 +2,18 @@
 
 package Test::Regexp::Pattern;
 
-our $DATE = '2020-01-02'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-01-04'; # DATE
+our $DIST = 'Test-Regexp-Pattern'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 
-use Regexp::Pattern qw(re);
 use File::Spec;
+use Hash::DefHash; # exports defhash()
+use Regexp::Pattern qw(re);
 use Test::Builder;
 use Test::More ();
 
@@ -144,7 +147,8 @@ sub regexp_patterns_in_module_ok {
                 goto L1;
             }
 
-            for my $name (sort keys %{ "$module\::RE" }) {
+            my $dh = defhash(\%{ "$module\::RE" });
+            for my $name ($dh->props) {
                 my $re = ${"$module\::RE"}{$name};
                 $has_tests++;
                 $Test->subtest(
@@ -265,13 +269,13 @@ Test::Regexp::Pattern - Test Regexp::Pattern patterns
 
 =head1 VERSION
 
-This document describes version 0.005 of Test::Regexp::Pattern (from Perl distribution Test-Regexp-Pattern), released on 2020-01-02.
+This document describes version 0.006 of Test::Regexp::Pattern (from Perl distribution Test-Regexp-Pattern), released on 2020-01-04.
 
 =head1 SYNOPSIS
 
 To check all regexp patterns in a module:
 
- use Test::Regexp::Patterns tests=>1;
+ use Test::Regexp::Pattern;
  regexp_patterns_in_module_ok("Foo::Bar", {opt => ...}, $msg);
 
 Alternatively, you can check all regexp patterns in all modules in a distro:
@@ -289,8 +293,8 @@ This module performs various checks on a module's L<Regexp::Pattern> patterns.
 It is recommended that you include something like C<release-regexp-pattern.t> in
 your distribution if you add regexp patterns to your code. If you use
 L<Dist::Zilla> to build your distribution, there is
-L<[Test::Regexp::Pattern]|Dist::Zilla::Plugin::Test::Regexp::Pattern> to make it
-easy to do so.
+L<[Regexp::Pattern]|Dist::Zilla::Plugin::Regexp::Pattern> which automatically
+adds a release test file for this during build.
 
 =for Pod::Coverage ^(all_modules)$
 
@@ -344,7 +348,7 @@ C<regexp_patterns_in_all_modules_ok()>.
 
 L<Regexp::Pattern>
 
-L<Dist::Zilla::Plugin::Test::Regexp::Pattern>
+L<Dist::Zilla::Plugin::Regexp::Pattern>
 
 =head1 AUTHOR
 

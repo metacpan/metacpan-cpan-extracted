@@ -123,7 +123,7 @@ sub is_licensed_like_scancode ($$;$$)
 	# avoid fc() to support older Perl: SPDX probably use only ASCII
 	my $expected = join ' and/or ',
 		List::MoreUtils::uniq sort { lc($a) cmp lc($b) }
-		map { $licenses->{$_}{spdx_license_key} || $_ }
+		map                        { $licenses->{$_}{spdx_license_key} || $_ }
 		@{ expected( $file, $licenses, $overrides ) };
 
 	my ( $detected, $detected_copyright ) = $app->parse($file);

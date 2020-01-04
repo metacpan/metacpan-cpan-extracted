@@ -31,7 +31,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Spreadsheet-Wright";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-102>, <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-103>, <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-104>, <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-105>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-102>, <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-103>, <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-104>, <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-105>, <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-106>, <http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-107>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-spreadsheet-wright>;
@@ -124,6 +124,42 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Spreadsheet-Wright-0.105.tar.gz>;
 	doap:revision        "0.105"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-106>
+	a                    doap:Version;
+	dc:identifier        "Spreadsheet-Wright-0.106"^^xsd:string;
+	dc:issued            "2020-01-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "addsheet now works for ODS format"@en;
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/merkys>;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/131334>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "fix for ODS XML version attribute"@en;
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/merkys>;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/128919>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Spreadsheet-Wright-0.106.tar.gz>;
+	doap:revision        "0.106"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/v_0-107>
+	a                    doap:Version;
+	dc:identifier        "Spreadsheet-Wright-0.107"^^xsd:string;
+	dc:issued            "2020-01-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Ported XLSX output from Spreadsheet::Write."@en;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/amaltsev>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Spreadsheet-Wright-0.107.tar.gz>;
+	doap:revision        "0.107"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/ANDK>
 	a                    foaf:Agent;
 	foaf:mbox            <mailto:ANDK@cpan.org>.
@@ -134,8 +170,15 @@
 
 <http://purl.org/NET/cpan-uri/person/amaltsev>
 	a                    foaf:Person;
+	foaf:name            "Andrew Maltsev";
 	foaf:nick            "AMALTSEV";
 	foaf:page            <https://metacpan.org/author/AMALTSEV>.
+
+<http://purl.org/NET/cpan-uri/person/merkys>
+	a                    foaf:Person;
+	foaf:name            "Andrius Merkys";
+	foaf:nick            "MERKYS";
+	foaf:page            <https://metacpan.org/author/MERKYS>.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

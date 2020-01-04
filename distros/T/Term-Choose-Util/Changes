@@ -1,6 +1,11 @@
 Revision history for Term::Choose::Util
 
 
+0.111   2020-01-02
+        - Bugfix in 'choose_a_directory'
+        - Bugfix color-width in 'choose_a_number'.
+        - Update year copyright.
+
 0.110   2019-12-08
         - Update 'choose_directories'.
         - Update documentation 'choose_directories'.

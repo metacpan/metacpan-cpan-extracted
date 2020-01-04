@@ -24,6 +24,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
+                                        'MooX::TypeTiny' => '0',
                                         'Type::Tiny::XS' => '0',
                                         'Types::Const' => 'v0.3.6'
                                       },
@@ -46,6 +47,7 @@ do { my $x = {
                                    'Moo' => '1.006000',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
+                                   'if' => '0',
                                    'lib' => '0'
                                  }
                  }

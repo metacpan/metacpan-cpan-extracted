@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.1.94
+    Version v3.1.95
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -23,6 +23,16 @@ PATTERNS
 
     *   afl
 
+    *   afl_1_1
+
+    *   afl_1_2
+
+    *   afl_2
+
+    *   afl_2_1
+
+    *   afl_3
+
     *   agpl
 
     *   aladdin
@@ -33,9 +43,21 @@ PATTERNS
 
     *   apache
 
+    *   apache_1
+
+    *   apache_1_1
+
+    *   apache_2
+
     *   apafml
 
     *   artistic
+
+    *   artistic_1
+
+    *   artistic_1_cl8
+
+    *   artistic_1_perl
 
     *   artistic_2
 
@@ -85,7 +107,11 @@ PATTERNS
 
     *   cecill_b
 
+    *   cecill_b_1
+
     *   cecill_c
+
+    *   cecill_c_1
 
     *   cube
 
@@ -177,6 +203,8 @@ PATTERNS
 
     *   rpsl
 
+    *   rpsl_1
+
     *   sgi_b
 
     *   unicode_strict
@@ -184,6 +212,14 @@ PATTERNS
     *   unicode_tou
 
     *   wtfpl
+
+    *   wtfpl_1
+
+    *   wtfpl_2
+
+    *   wtfnmfpl
+
+    *   wtfnmfpl_1
 
     *   zlib
 
@@ -209,6 +245,8 @@ PATTERNS
     *   fsf_unlimited
 
     *   fsf_unlimited_retention
+
+    *   license_label
 
     *   licensed_under
 

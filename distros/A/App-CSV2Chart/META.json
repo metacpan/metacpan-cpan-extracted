@@ -41,6 +41,7 @@
          "requires" : {
             "App::Cmd::Setup" : "0",
             "Excel::Writer::XLSX" : "0",
+            "Path::Tiny" : "0",
             "Text::CSV" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -59,11 +60,19 @@
    "provides" : {
       "App::CSV2Chart" : {
          "file" : "lib/App/CSV2Chart.pm",
-         "version" : "v0.6.1"
+         "version" : "v0.8.0"
+      },
+      "App::CSV2Chart::API::ToXLSX" : {
+         "file" : "lib/App/CSV2Chart/API/ToXLSX.pm",
+         "version" : "v0.8.0"
+      },
+      "App::CSV2Chart::Command::svg" : {
+         "file" : "lib/App/CSV2Chart/Command/svg.pm",
+         "version" : "v0.8.0"
       },
       "App::CSV2Chart::Command::xlsx" : {
          "file" : "lib/App/CSV2Chart/Command/xlsx.pm",
-         "version" : "v0.6.1"
+         "version" : "v0.8.0"
       }
    },
    "release_status" : "stable",
@@ -78,10 +87,10 @@
          "web" : "https://github.com/shlomif/CSV2Chart"
       }
    },
-   "version" : "0.6.1",
+   "version" : "0.8.0",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028002"
+         "version" : "5.030001"
       },
       "plugins" : [
          {
@@ -206,7 +215,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -419,7 +428,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Support",
                         "name" : "@SHLOMIF/Support",
-                        "version" : "1.010"
+                        "version" : "1.012"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
@@ -536,7 +545,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "x_generated_by_perl" : "v5.30.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18"
 }
 

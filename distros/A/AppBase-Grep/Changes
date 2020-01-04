@@ -1,23 +1,31 @@
-0.005   2018-02-26 (PERLANCAR)
+0.006   2020-01-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Accept (line, label, chomp) from source instead of just (line,
+	  label).
+
+	- [doc] Document more about COLOR_THEME.
+
+
+0.005   2018-02-26  Released-By: PERLANCAR
 
 	- Add color theme support.
 
 	- Grammar/wording.
 
 
-0.004   2018-01-30 (PERLANCAR)
+0.004   2018-01-30  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Add more description.
 
 
-0.003   2018-01-29 (PERLANCAR)
+0.003   2018-01-29  Released-By: PERLANCAR
 
 	- Allow multiple patterns, add option --all (not in GNU grep).
 
 
-0.002   2018-01-29 (PERLANCAR)
+0.002   2018-01-29  Released-By: PERLANCAR
 
 	- [ux] Observe COLOR environment variable (note: this behavior is
 	  not in GNU grep).
@@ -25,6 +33,6 @@
 	- Display label & line number, add option --line-number (-n).
 
 
-0.001   2018-01-26 (PERLANCAR)
+0.001   2018-01-26  Released-By: PERLANCAR
 
         - First release.

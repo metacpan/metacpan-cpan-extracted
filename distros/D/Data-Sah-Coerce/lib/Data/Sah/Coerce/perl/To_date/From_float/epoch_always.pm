@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_date::From_float::epoch_always;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-02'; # DATE
+our $DATE = '2020-01-03'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.043'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,7 +14,7 @@ sub meta {
         v => 4,
         summary => 'Coerce date from number (assumed to be epoch)',
         prio => 50,
-        precludes => ['From_float::Epoch'],
+        precludes => ['From_float::epoch'],
     };
 }
 
@@ -63,7 +63,7 @@ Data::Sah::Coerce::perl::To_date::From_float::epoch_always - Coerce date from nu
 
 =head1 VERSION
 
-This document describes version 0.043 of Data::Sah::Coerce::perl::To_date::From_float::epoch_always (from Perl distribution Data-Sah-Coerce), released on 2020-01-02.
+This document describes version 0.046 of Data::Sah::Coerce::perl::To_date::From_float::epoch_always (from Perl distribution Data-Sah-Coerce), released on 2020-01-03.
 
 =head1 DESCRIPTION
 

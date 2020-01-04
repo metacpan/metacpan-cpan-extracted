@@ -1,7 +1,7 @@
 package AppBase::Grep;
 
-our $DATE = '2018-02-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2020-01-03'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -159,7 +159,7 @@ sub grep {
     $logic = 'and' if $args{all};
 
     my $num_matches = 0;
-    my ($line, $label, $linum);
+    my ($line, $label, $linum, $chomp);
 
     my $code_print = sub {
         if (defined $label && length $label) {
@@ -184,12 +184,15 @@ sub grep {
         } else {
             print $line;
         }
+        print "\n" if $chomp;
     };
 
     my $prevlabel;
     while (1) {
-        ($line, $label) = $source->();
+        ($line, $label, $chomp) = $source->();
         last unless defined $line;
+
+        chomp($line) if $chomp;
 
         $label //= '';
 
@@ -266,7 +269,7 @@ AppBase::Grep - A base for grep-like CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.005 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2018-02-26.
+This document describes version 0.006 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2020-01-03.
 
 =head1 FUNCTIONS
 
@@ -275,7 +278,7 @@ This document describes version 0.005 of AppBase::Grep (from Perl distribution A
 
 Usage:
 
- grep(%args) -> [status, msg, result, meta]
+ grep(%args) -> [status, msg, payload, meta]
 
 A base for grep-like CLI utilities.
 
@@ -340,7 +343,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -356,7 +359,8 @@ C<auto>. This behavior is not in GNU grep.
 
 =head2 COLOR_THEME
 
-String.
+String. Will search color themes in C<AppBase::Grep::ColorTheme::*> as well as
+C<Generic::ColorTheme::*> modules.
 
 =head1 HOMEPAGE
 
@@ -380,7 +384,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

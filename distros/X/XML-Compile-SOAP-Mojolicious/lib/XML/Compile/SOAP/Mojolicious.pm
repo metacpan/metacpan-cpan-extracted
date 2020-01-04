@@ -1,4 +1,4 @@
-# Copyrights 2016-2019 by [Mark Overmeer <markov@overmeer.net>].
+# Copyrights 2016-2020 by [Mark Overmeer <markov@overmeer.net>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -11,7 +11,7 @@ use strict;
 
 package XML::Compile::SOAP::Mojolicious;
 use vars '$VERSION';
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 use Log::Report 'xml-compile-soap-mojolicious';
 

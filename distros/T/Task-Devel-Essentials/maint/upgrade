@@ -1,5 +1,9 @@
 #!/usr/bin/env perl
 
+# Copyright (c) 2013-2020 by Martin Becker, Blaubeuren.
+# This script is free software; you can redistribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see the LICENSE file).
+
 use strict;
 use warnings;
 use version 0.77;

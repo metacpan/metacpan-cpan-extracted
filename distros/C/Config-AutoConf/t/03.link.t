@@ -39,11 +39,11 @@ TODO:
 
     ## OK, we really hope people have -lm around
     ok(!$ac_1->check_lib("m", "foobar"), "foobar() not in -lm");
-    ok($ac_1->check_lib("m", "atan"), "atan() in -lm");
+    ok($ac_1->check_lib("m", "atan"),    "atan() in -lm");
 
     my ($where_atan, $ac_2);
-    ok($ac_2 = Config::AutoConf->new(logfile => "config4.log"), "Instantiating Config::AutoConf for search_libs() tests");
-    ok($where_atan = $ac_2->search_libs("atan", [qw(m)]), "searching lib for atan()");
+    ok($ac_2       = Config::AutoConf->new(logfile => "config4.log"), "Instantiating Config::AutoConf for search_libs() tests");
+    ok($where_atan = $ac_2->search_libs("atan", [qw(m)]),             "searching lib for atan()");
     isnt($where_atan, 0, "library for atan() found (or none required)");
 }
 

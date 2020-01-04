@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "Log::ger" => "0.027",
     "Nodejs::Util" => "0.007",
     "Time::Duration::Parse::AsHash" => 0,
+    "Time::Local" => "1.27",
     "strict" => 0,
     "subroutines" => 0,
     "warnings" => 0
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.043",
+  "VERSION" => "0.046",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,6 +58,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.98",
   "Test::Needs" => 0,
   "Time::Duration::Parse::AsHash" => 0,
+  "Time::Local" => "1.27",
   "strict" => 0,
   "subroutines" => 0,
   "warnings" => 0

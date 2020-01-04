@@ -18,13 +18,14 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-CSV2Chart",
-  "dist_version" => "0.6.1",
+  "dist_version" => "0.8.0",
   "license" => "mit",
   "module_name" => "App::CSV2Chart",
   "recursive_test_files" => 1,
   "requires" => {
     "App::Cmd::Setup" => 0,
     "Excel::Writer::XLSX" => 0,
+    "Path::Tiny" => 0,
     "Text::CSV" => 0,
     "strict" => 0,
     "warnings" => 0

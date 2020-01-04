@@ -41,10 +41,10 @@ WriteMakefile(
         'Moose::Util::TypeConstraints' => '2.2010',
         'MooseX::Aliases'              => '0.11',
         'Date::Lectionary::Time'       => '1.20180422.1',
-        'Date::Advent'                 => '1.20180422',
+        'Date::Advent'                 => '1.20180423',
         'Date::Easter'                 => '1.22',
-        'Date::Lectionary'             => '1.20180422',
-        'Date::Lectionary::Day'        => '1.20180422',
+        'Date::Lectionary'             => '1.20190120',
+        'Date::Lectionary::Day'        => '1.20190120',
         'namespace::autoclean'         => '0.28',
         'File::Share'                  => '0.25',
         'XML::LibXML'                  => '2.0132',
@@ -62,8 +62,8 @@ WriteMakefile(
         },
         provides => {
             'Date::Lectionary::Daily' => {
-                file    => 'lib/Date/Lectionary/Daily.pm', 
-                version => '1.20180423'
+                file    => 'lib/Date/Lectionary/Daily.pm',
+                version => '1.20200102'
             },
         },
         keywords  => [qw/ lectionary rcl acna readings christian liturgical /],

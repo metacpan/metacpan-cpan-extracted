@@ -79,7 +79,7 @@ test_gen(
 );
 
 test_gen(
-    name => 'fields, with_field_names',
+    name => 'fields, exclude_fields, with_field_names',
     table_data => $table_data,
     table_spec => $table_spec,
     status => 200,
@@ -133,6 +133,35 @@ test_gen(
                 or diag explain $fres->[2];
         };
 
+        $fres = $func->(exclude_fields=>"s, s2, s3, i, f", with_field_names=>1);
+        subtest "exclude fields" => sub {
+            is($fres->[0], 200, "status")
+                or diag explain $fres;
+            is_deeply($fres->[2],
+                      [
+                          {a=>[qw//]     , b=>0, d=>'2014-01-02'},
+                          {a=>[qw/t2/]   , b=>0, d=>'2014-02-02'},
+                          {a=>[qw/t1 t2/], b=>1, d=>'2013-01-02'},
+                          {a=>[qw/t1/]   , b=>1, d=>'2013-02-02'},
+                      ],
+                      "result")
+                or diag explain $fres->[2];
+        };
+
+        $fres = $func->(fields => "s, i, a, b, d", exclude_fields=>"s, s2, s3, i, f", with_field_names=>1);
+        subtest "fields + exclude fields" => sub {
+            is($fres->[0], 200, "status")
+                or diag explain $fres;
+            is_deeply($fres->[2],
+                      [
+                          {a=>[qw//]     , b=>0, d=>'2014-01-02'},
+                          {a=>[qw/t2/]   , b=>0, d=>'2014-02-02'},
+                          {a=>[qw/t1 t2/], b=>1, d=>'2013-01-02'},
+                          {a=>[qw/t1/]   , b=>1, d=>'2013-02-02'},
+                      ],
+                      "result")
+                or diag explain $fres->[2];
+        };
     },
 );
 

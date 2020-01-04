@@ -9,7 +9,7 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 # VERSION
 
-Version 0.14
+Version 0.15
 
 # SYNOPSIS
 
@@ -67,9 +67,9 @@ debugging before publishing a code change, set the NO\_CACHE environment variabl
 to any non-zero value.
 If you get errors about Wide characters in print it means that you've
 forgotten to emit pure HTML on non-ascii characters.
-See [HTML::Entities](https://metacpan.org/pod/HTML::Entities).
+See [HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities).
 As a hack work around you could also remove accents and the like by using
-[Text::Unidecode](https://metacpan.org/pod/Text::Unidecode),
+[Text::Unidecode](https://metacpan.org/pod/Text%3A%3AUnidecode),
 which works well but isn't really what you want.
 
 # SUBROUTINES/METHODS
@@ -134,9 +134,9 @@ You can turn it off on a case by case basis thus:
     }
 
 Info is an optional argument to give information about the FCGI environment, e.g.
-a [CGI::Info](https://metacpan.org/pod/CGI::Info) object.
+a [CGI::Info](https://metacpan.org/pod/CGI%3A%3AInfo) object.
 
-Logger will be an object that understands debug() such as an [Log::Log4perl](https://metacpan.org/pod/Log::Log4perl)
+Logger will be an object that understands debug() such as an [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl)
 object.
 
 To generate a last\_modified header, you must give a cache object.
@@ -163,6 +163,7 @@ Synonym for init, kept for historical reasons.
 ## can\_cache
 
 Returns true if the server is allowed to store the results locally.
+This is the value of X-Cache in the returned header.
 
 ## is\_cached
 
@@ -221,7 +222,7 @@ For example:
     print $output;
 
 Can produce buggy JavaScript if you use the &lt;!-- HIDING technique.
-This is a bug in [JavaScript::Packer](https://metacpan.org/pod/JavaScript::Packer), not FCGI::Buffer.
+This is a bug in [JavaScript::Packer](https://metacpan.org/pod/JavaScript%3A%3APacker), not FCGI::Buffer.
 
 Mod\_deflate can confuse this when compressing output.
 Ensure that deflation is off for .pl files:
@@ -238,7 +239,7 @@ FCGI::Buffer has not been tested against FastCGI.
 
 I advise adding FCGI::Buffer as the last use statement so that it is
 cleared up first.  In particular it should be loaded after
-[Log::Log4Perl](https://metacpan.org/pod/Log::Log4Perl), if you're using that, so that any messages it
+[Log::Log4Perl](https://metacpan.org/pod/Log%3A%3ALog4Perl), if you're using that, so that any messages it
 produces are printed after the HTTP headers have been sent by
 FCGI::Buffer;
 
@@ -251,7 +252,7 @@ or through the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
-The lint operation only works on HTML4, because of a restriction in [HTML::Lint](https://metacpan.org/pod/HTML::Lint).
+The lint operation only works on HTML4, because of a restriction in [HTML::Lint](https://metacpan.org/pod/HTML%3A%3ALint).
 
 # SEE ALSO
 
@@ -293,5 +294,5 @@ The licence for cgi\_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2019 Nigel Horne,
+The rest of the program is Copyright 2015-2020 Nigel Horne,
 and is released under the following licence: GPL2

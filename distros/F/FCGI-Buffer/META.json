@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -39,6 +39,7 @@
             "DBI" : "0",
             "Digest::MD5" : "0",
             "Encode" : "0",
+            "File::Path" : "0",
             "File::Spec" : "0",
             "HTML::Lint" : "0",
             "HTML::Packer" : "1",
@@ -58,12 +59,12 @@
             "Capture::Tiny" : "0",
             "DateTime" : "0",
             "DateTime::Format::HTTP" : "0",
+            "Directory::Scratch" : "0",
             "HTTP::Headers" : "0",
             "HTTP::Response" : "0",
             "IPC::System::Simple" : "0",
             "Test::Most" : "0",
             "Test::NoWarnings" : "0",
-            "Test::TempDir::Tiny" : "0.016",
             "autodie" : "0"
          }
       }
@@ -80,6 +81,6 @@
          "web" : "https://github.com/nigelhorne/FCGI-Buffer"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

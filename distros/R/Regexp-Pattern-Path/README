@@ -2,23 +2,139 @@ NAME
     Regexp::Pattern::Path - Regexp patterns related to path
 
 VERSION
-    This document describes version 0.001 of Regexp::Pattern::Path (from
-    Perl distribution Regexp-Pattern-Path), released on 2020-01-02.
+    This document describes version 0.003 of Regexp::Pattern::Path (from
+    Perl distribution Regexp-Pattern-Path), released on 2020-01-03.
 
 SYNOPSIS
      use Regexp::Pattern; # exports re()
-     my $re = re("Path::filename_unix");
+     my $re = re("Path::dirname_unix");
 
 DESCRIPTION
     Regexp::Pattern is a convention for organizing reusable regex patterns.
 
 PATTERNS
+    *   dirname_unix
+
+        Valid directory name on Unix.
+
+        Just like "filename_unix" but allows '.' and '..' (although strictly
+        speaking '.' and '..' are just special directory names instead of
+        regular ones).
+
+        Examples:
+
+         "foo" =~ re("Path::dirname_unix");  # matches
+
+         "foo bar" =~ re("Path::dirname_unix");  # matches
+
+        Too short.
+
+         "" =~ re("Path::dirname_unix");  # doesn't match
+
+        Too long.
+
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" =~ re("Path::dirname_unix");  # doesn't match
+
+        contains slash.
+
+         "foo/bar" =~ re("Path::dirname_unix");  # doesn't match
+
+        begins with slash.
+
+         "/foo" =~ re("Path::dirname_unix");  # doesn't match
+
+        ends with slash.
+
+         "foo/" =~ re("Path::dirname_unix");  # doesn't match
+
+        contains null (\0).
+
+         "foo\0" =~ re("Path::dirname_unix");  # doesn't match
+
+         "." =~ re("Path::dirname_unix");  # matches
+
+         ".." =~ re("Path::dirname_unix");  # matches
+
+         "..." =~ re("Path::dirname_unix");  # matches
+
+    *   filename_dos
+
+        Valid filename on DOS (8.3/short filenames).
+
+        The following rules are used in this pattern:
+
+        1. Contains 1-8 characters, optionally followed by a period and 0-3
+        characters (extension).
+        2. Valid characters include letters A-Z (a-z is also allowed in this
+        regex), numbers 0-9, and the following special characters:
+            _ underscore ^ caret $ dollar sign ~ tilde ! exclamation point #
+            number sign % percent sign & ampersand hyphen (-) {} braces @ at
+            sign ` single quote ' apostrophe () parentheses
+
+        3. The name cannot be one of the following reserved file names:
+        CLOCK$, CON, AUX, COM1, COM2, COM3, COM4, LPT1, LPT2, LPT3, LPT4,
+        NUL, and PRN.
+
+        Examples:
+
+         "FOO" =~ re("Path::filename_dos");  # matches
+
+        Lowercase letters not allowed (convert your string to uppercase
+        first if you want to accept lowercase letters).
+
+         "foo" =~ re("Path::filename_dos");  # matches
+
+         "FOOBARBA.TXT" =~ re("Path::filename_dos");  # matches
+
+        Contains period other than as filename-extension separator.
+
+         ".FOO.TXT" =~ re("Path::filename_dos");  # doesn't match
+
+        Does not contain filename.
+
+         ".TXT" =~ re("Path::filename_dos");  # doesn't match
+
+        Empty.
+
+         "" =~ re("Path::filename_dos");  # doesn't match
+
+        Name too long.
+
+         "FOOBARBAZ" =~ re("Path::filename_dos");  # doesn't match
+
+        Extension too long.
+
+         "FOOBARBA.TEXT" =~ re("Path::filename_dos");  # doesn't match
+
+        reserved name CON.
+
+         "CON" =~ re("Path::filename_dos");  # doesn't match
+
+         "CONAUX" =~ re("Path::filename_dos");  # matches
+
+        Starts with space.
+
+         " FOO.BAR" =~ re("Path::filename_dos");  # doesn't match
+
+        Contains space.
+
+         "FOO .BAR" =~ re("Path::filename_dos");  # doesn't match
+
+         "_\$!%-\@'^.~#&" =~ re("Path::filename_dos");  # matches
+
+         "{}`()." =~ re("Path::filename_dos");  # matches
+
+        Contains invalid character [ and ].
+
+         "FILE[1].TXT" =~ re("Path::filename_dos");  # doesn't match
+
     *   filename_unix
 
-        Valid filename pattern on Unix.
+        Valid filename on Unix.
 
         Length must be 1-255 characters. The only characters not allowed
         include "\0" (null) and "/" (forward slash, for path separator).
+        Also cannot be '.' or '..'.
 
         Examples:
 
@@ -38,9 +154,129 @@ PATTERNS
 
          "foo/bar" =~ re("Path::filename_unix");  # doesn't match
 
+        begins with slash.
+
+         "/foo" =~ re("Path::filename_unix");  # doesn't match
+
+        ends with slash.
+
+         "foo/" =~ re("Path::filename_unix");  # doesn't match
+
         contains null (\0).
 
          "foo\0" =~ re("Path::filename_unix");  # doesn't match
+
+        Cannot be ".".
+
+         "." =~ re("Path::filename_unix");  # doesn't match
+
+        Cannot be "..".
+
+         ".." =~ re("Path::filename_unix");  # doesn't match
+
+         "..." =~ re("Path::filename_unix");  # matches
+
+    *   filename_windows
+
+        Valid filename on Windows (long filenames).
+
+        The following rules are used in this pattern:
+
+        1. Contains 1-260 characters (including extension).
+        2. Does not contain the characters \0, [\x01-\x1f], <, >, :, ", /,
+        \, |, ?, *.
+        3. The name cannot be one of the following reserved file names: CON,
+        PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8, COM9,
+        LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
+        4. Does not end with a period.
+        5. Does not begin with a period.
+        6. Cannot be '.' or '..'.
+
+        References: -
+        <https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+        >
+
+        Examples:
+
+        Empty.
+
+         "" =~ re("Path::filename_windows");  # doesn't match
+
+         "FOO" =~ re("Path::filename_windows");  # matches
+
+         "foo" =~ re("Path::filename_windows");  # matches
+
+         "FOOBARBA.TXT" =~ re("Path::filename_windows");  # matches
+
+        Starts with period.
+
+         ".FOO.TXT" =~ re("Path::filename_windows");  # doesn't match
+
+        Ends with period.
+
+         "bar." =~ re("Path::filename_windows");  # doesn't match
+
+        reserved name CON.
+
+         "CON" =~ re("Path::filename_windows");  # doesn't match
+
+        reserved name LPT3.
+
+         "LPT3" =~ re("Path::filename_windows");  # doesn't match
+
+         "CONAUX" =~ re("Path::filename_windows");  # matches
+
+         "FOO .BAR" =~ re("Path::filename_windows");  # matches
+
+         "foo[1].txt" =~ re("Path::filename_windows");  # matches
+
+         "foo(2).txt" =~ re("Path::filename_windows");  # matches
+
+        Contains invalid character \0.
+
+         "foo\0" =~ re("Path::filename_windows");  # doesn't match
+
+        Contains control character.
+
+         "foo\b" =~ re("Path::filename_windows");  # doesn't match
+
+        Contains invalid character /.
+
+         "foo/bar" =~ re("Path::filename_windows");  # doesn't match
+
+        Contains invalid characters <>.
+
+         "foo<bar>" =~ re("Path::filename_windows");  # doesn't match
+
+        Contains invalid character :.
+
+         "foo:bar" =~ re("Path::filename_windows");  # doesn't match
+
+         "foo's file" =~ re("Path::filename_windows");  # matches
+
+        Contains invalid character ".
+
+         "foo \"bar\"" =~ re("Path::filename_windows");  # doesn't match
+
+        Contains invalid character \.
+
+         "foo\\bar" =~ re("Path::filename_windows");  # doesn't match
+
+        Contains invalid character |.
+
+         "foo|bar" =~ re("Path::filename_windows");  # doesn't match
+
+        Contains invalid character ?.
+
+         "foo?" =~ re("Path::filename_windows");  # doesn't match
+
+        Contains invalid character *.
+
+         "foo*" =~ re("Path::filename_windows");  # doesn't match
+
+        Too long.
+
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" =~ re("Path::filename_windows");  # doesn't match
 
 HOMEPAGE
     Please visit the project's homepage at

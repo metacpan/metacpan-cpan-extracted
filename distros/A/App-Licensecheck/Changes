@@ -2,10 +2,45 @@ App-Licensecheck
 ================
 
 Created:      2000-01-28
-Home page:    <https://metacpan.org/release/App-Licensecheck>
 Home page:    <https://metacpan.org/pod/App::Licensecheck>
+Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
+
+v3.0.38	2020-01-03
+
+ [ REGRESSIONS ]
+ - misdetects some GNU fulltext licenses as also maybe LGPL
+
+ [ Bug Fixes ]
+ - Add missing newline when no arguments
+ - fix: detect creative commons dual-version-licensing (not misdetect as
+   same version twice)
+ - support non-utf8 locale
+
+ [ Test Suite ]
+ - Isolate and extend encoding tests.
+ - adapt author testsuite for improved detection (and few minor
+   regressions) since Regexp::Pattern::License v3.1.95
+ - silence warnings in handling utf8 content
+
+ [ Packaging ]
+ - use more recent Regexp::Pattern::License
+
+ [ Other ]
+ - Add missing newline when no arguments
+ - Improve detection of AFL licenses.
+ - Improve detection of Boost licenses.
+ - Improve detection of Cecill licenses.
+ - Improve detection of WTFPL and WTFNMFPL licenses.
+ - Move encoding loop from executable to library.
+ - Streamline detection of well-formed grants.
+ - Tighten and improve detection of Artistic licenses.
+ - define local regexes in sub licensepatterns (not sub parse_license)
+ - improve detection of apache licenses
+ - pass file and position to function parse_license
+ - support environment variable DEBUG; require modules Log::Any
+   Log::Any::Adapter::Screen MooX::Role::Logger
 
 v3.0.37	2019-06-12
 

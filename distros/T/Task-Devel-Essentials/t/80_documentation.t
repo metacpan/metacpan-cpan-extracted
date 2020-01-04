@@ -1,9 +1,9 @@
-# Copyright (c) 2017-2019 Martin Becker.  All rights reserved.
+# Copyright (c) 2017-2020 by Martin Becker, Blaubeuren.
 # This script is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# under the terms of the Artistic License 2.0 (see the LICENSE file).
 #
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl t/80_documentation.t'
+# Before 'make install' is performed this script should be runnable with
+# 'make test'. After 'make install' it should work as 'perl 80_documentation.t'
 
 use strict;
 use warnings;

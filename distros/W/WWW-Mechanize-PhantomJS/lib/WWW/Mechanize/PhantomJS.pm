@@ -9,10 +9,10 @@ use File::Basename;
 use Carp qw(croak carp);
 use WWW::Mechanize::Link;
 use IO::Socket::INET;
+use Time::HiRes qw(time sleep);
 
-use vars qw($VERSION %link_spec @CARP_NOT);
-$VERSION= '0.22';
-@CARP_NOT=qw(Selenium::Remote::Driver);
+our $VERSION= '0.23';
+our @CARP_NOT=qw(Selenium::Remote::Driver);
 
 =head1 NAME
 
@@ -159,7 +159,7 @@ sub new {
     my ($class, %options) = @_;
 
     my $localhost = '127.0.0.1';
-    unless ( defined $options{ port } ) {
+    unless ( defined $options{ port } and !$options{pid}) {
         my $port = 8910;
         while (1) {
             my $sock = IO::Socket::INET->new(
@@ -172,6 +172,7 @@ sub new {
             if( $sock ) {
                 $port++;
                 $sock->close;
+                sleep 0.1+rand(0.1);
                 next;
             };
             last;
@@ -210,10 +211,10 @@ sub new {
             );
             if( $socket ) {
                 close $socket;
-                sleep 1;
+                sleep 0.1;
                 last;
             };
-            sleep 1 if time - $t < 1;
+            sleep 0.1 if time - $t < 1;
         }
     }
 
@@ -1117,7 +1118,7 @@ or C<< ->selector >> when you want more control.
 
 =cut
 
-%link_spec = (
+our %link_spec = (
     a      => { url => 'href', },
     area   => { url => 'href', },
     frame  => { url => 'src', },
@@ -1168,6 +1169,15 @@ sub make_link {
         ()
     };
 }
+
+sub links {
+    my ($self) = @_;
+    my @links = $self->selector( join ",", sort keys %link_spec);
+    my $base = $self->base;
+    return map {
+        $self->make_link($_,$base)
+    } @links;
+};
 
 =head2 C<< $mech->selector( $css_selector, %options ) >>
 
@@ -1258,8 +1268,7 @@ it also C<croak>s when more than one link is found.
 
 =cut
 
-use vars '%xpath_quote';
-%xpath_quote = (
+our %xpath_quote = (
     '"' => '\"',
     #"'" => "\\'",
     #'[' => '&#91;',
@@ -3176,7 +3185,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2014-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2014-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

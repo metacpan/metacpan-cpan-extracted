@@ -31,20 +31,20 @@ optional_features: {}
 provides:
   Regexp::Pattern::License:
     file: lib/Regexp/Pattern/License.pm
-    version: v3.1.94
+    version: v3.1.95
   Regexp::Pattern::License::Parts:
     file: lib/Regexp/Pattern/License/Parts.pm
-    version: v3.1.94
+    version: v3.1.95
 requires:
   perl: '5'
   strictures: '2'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project
   bugtracker: https://bugs.debian.org/libregexp-pattern-license-perl
-  homepage: https://metacpan.org/release/Regexp-Pattern-License
+  homepage: https://metacpan.org/pod/Regexp::Pattern::License
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://salsa.debian.org/build-common-team/regexp-pattern-license.git
-version: v3.1.94
+version: v3.1.95
 x_help_wanted:
   - documenter
   - tester

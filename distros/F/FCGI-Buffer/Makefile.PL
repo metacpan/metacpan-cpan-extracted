@@ -2,6 +2,33 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
+my %prereq_pm = (
+	'Carp' => 0,
+	'CGI::Info' => 0.51,
+	'CSS::Packer' => 0,
+	'Compress::Zlib' => 0,
+	'File::Path' => 0,
+	'File::Spec' => 0,
+	'Digest::MD5' => 0,
+    	'Encode' => 0,
+	# 'HTML::Clean' => 0.8,
+	'HTML::Packer' => 1.000,
+	'IO::String' => 0,
+	'JavaScript::Packer' => 2.00,
+	'HTTP::Date' => 0,
+	'File::Spec' => 0,
+	'Time::localtime' => 0,
+	'HTML::Lint' => 0,
+	'Storable' => 0,
+	'HTTP::Status' => 0,
+	'DBI' => 0
+);
+
+if($^O ne 'MSWin32') {
+	# Doen't work on Windows
+	$prereq_pm{'IO::Compress::Brotli'} = 0.003;
+}
+
 WriteMakefile(
     NAME                => 'FCGI::Buffer',
     AUTHOR              => q{Nigel Horne <njh@bandsman.co.uk>},
@@ -21,35 +48,15 @@ WriteMakefile(
 	# 'Test::Kwalitee' => 0,
 	'autodie' => 0,
 	'IPC::System::Simple' => 0,
-	'Test::TempDir::Tiny' => 0.016,
+	'Directory::Scratch' => 0,
 	'CGI::Lingua' => 0,
 	'HTTP::Response' => 0,
 	'HTTP::Headers' => 0,
     },
-    PREREQ_PM => {
-	'Carp' => 0,
-	'CGI::Info' => 0.51,
-	'CSS::Packer' => 0,
-	'Compress::Zlib' => 0,
-	'File::Spec' => 0,
-	'IO::Compress::Brotli' => 0.003,
-	'Digest::MD5' => 0,
-    	'Encode' => 0,
-	# 'HTML::Clean' => 0.8,
-	'HTML::Packer' => 1.000,
-	'IO::String' => 0,
-	'JavaScript::Packer' => 2.00,
-	'HTTP::Date' => 0,
-	'File::Spec' => 0,
-	'Time::localtime' => 0,
-	'HTML::Lint' => 0,
-	'Storable' => 0,
-	'HTTP::Status' => 0,
-	'DBI' => 0,
-    },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'FCGI-Buffer-*' },
-    META_MERGE		=> {
+    PREREQ_PM  => \%prereq_pm,
+    dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean      => { FILES => 'FCGI-Buffer-*' },
+    META_MERGE => {
     	'meta-spec' => { version => 2 },
     	resources => {
     		repository => {

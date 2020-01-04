@@ -2,6 +2,7 @@ use lib "lib";
 use Spreadsheet::Wright;
 
 my $excel = Spreadsheet::Wright->new(filename => './example1.xls');
+my $xlsx  = Spreadsheet::Wright->new(filename => './example1.xlsx', styles=>{redcell=>{font_style=>'italic',font_color=>'red'}});
 my $csv   = Spreadsheet::Wright->new(filename => './example1.csv');
 my $ods   = Spreadsheet::Wright->new(filename => './example1.ods');
 my $html  = Spreadsheet::Wright->new(filename => './example1.html', styles=>{redcell=>{font_style=>'italic',font_color=>'red'}});
@@ -21,5 +22,6 @@ $ods->addrows(\@row,"Another",\@row);
 $html->addrows(\@row,"Another",\@row);
 $xhtml->addrows(\@row,"Another",\@row);
 $xml->addrows(\@row,"Another",\@row);
+$xlsx->addrows(\@row,"Another",\@row);
 $json->addrows(\@row,"Another",\@row,"Sheet1",\@row);
 

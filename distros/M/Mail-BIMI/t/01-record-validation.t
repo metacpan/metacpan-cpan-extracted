@@ -1,7 +1,9 @@
-use 5.006;
+#!/perl
+use 5.20.0;
 use strict;
 use warnings FATAL => 'all';
 use lib 't';
+use Mail::BIMI::Pragmas;
 use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Record;

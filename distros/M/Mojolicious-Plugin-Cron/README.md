@@ -54,7 +54,7 @@ time calling all the timers in the interval. This way, you can actually test eve
 far away in the future.
 
 For deployment phase, it will help avoiding the installation steps normally asociated with
-schedulling periodic tasks.
+scheduling periodic tasks.
 
 # BASICS
 

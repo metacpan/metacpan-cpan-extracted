@@ -11,8 +11,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 282;
-use IO::Uncompress::Brotli;
+use Test::Most tests => 281;
 use DateTime;
 use Capture::Tiny ':all';
 use CGI::Info;
@@ -48,7 +47,7 @@ OUTPUT: {
 
 	my ($stdout, $stderr) = capture { test1() };
 
-	ok($stderr eq '');
+	is($stderr, '');
 	ok($stdout !~ /^ETag: "/m);
 	ok($stdout !~ /^Content-Encoding: gzip/m);
 
@@ -121,7 +120,11 @@ OUTPUT: {
 
 	$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
 	delete($ENV{'HTTP_ACCEPT_ENCODING'});
-	$ENV{'HTTP_TE'} = 'br,gzip';
+	if($^O eq 'MSWin32') {
+		$ENV{'HTTP_TE'} = 'gzip';
+	} else {
+		$ENV{'HTTP_TE'} = 'br,gzip';
+	}
 
 	sub test4 {
 		my $b = new_ok('FCGI::Buffer');
@@ -145,15 +148,26 @@ OUTPUT: {
 	ok(defined($length));
 
 	($headers, $body) = split /\r?\n\r?\n/, $stdout, 2;
-	ok($headers =~ /^Content-Encoding: br/m);
 	ok($headers =~ /ETag: "[A-Za-z0-F0-f]{32}"/m);
 
 	ok(defined($body));
 	ok(length($body) eq $length);
-	$body = unbro($body, 1024);
-	ok(defined($body));
-	ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
-	html_ok($body, 'HTML:Lint shows no errors');
+	if($^O eq 'MSWin32') {
+		TODO: {
+			local $TODO = "IO::Compress::Brotli doesn't support Windows";
+			ok($headers =~ /^Content-Encoding: br/m);
+
+			# $body = IO::Compress::Brotli::unbro($body, 1024);
+			ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
+			html_ok($body, 'HTML:Lint shows no errors');
+		}
+	} else {
+		ok($headers =~ /^Content-Encoding: br/m);
+
+		$body = IO::Compress::Brotli::unbro($body, 1024);
+		ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
+		html_ok($body, 'HTML:Lint shows no errors');
+	}
 
 	#..........................................
 	delete $ENV{'SERVER_PROTOCOL'};
@@ -850,7 +864,7 @@ EOF
 
 	($stdout, $stderr) = capture { test21() };
 
-	ok($stderr eq '');
+	is($stderr, '');
 	ok(defined($stdout));
 	ok($stdout !~ /ETag: "([A-Za-z0-F0-f]{32})"/m);
 	ok($stdout !~ /^Status: 304 Not Modified/mi);
@@ -863,7 +877,7 @@ EOF
 
 	ok(length($body) != 0);
 	ok(defined($length));
-	ok(length($body) == $length);
+	is(length($body), $length);
 
 	ok($body =~ /a bit more\s+a third bit/);
 }

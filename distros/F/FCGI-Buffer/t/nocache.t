@@ -9,6 +9,8 @@ use Storable;
 use Capture::Tiny ':all';
 use CGI::Info;
 use autodie qw(:all);
+use lib 't/lib';
+use MyLogger;
 
 eval "use Test::Without::Module qw(CHI)";
 
@@ -66,23 +68,4 @@ NOCACHED: {
 		}
 	}
 	done_testing(7);
-}
-
-# On some platforms it's failing - find out why
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	# Enable this for debugging
-	# ::diag($message);
 }

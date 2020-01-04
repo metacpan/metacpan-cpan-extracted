@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.110';
+our $VERSION = '0.111';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf
@@ -454,7 +454,7 @@ sub __choose_a_path {
     $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
     my @pre;
     my $enchanted_idx;
-    if ( $sub eq 'choose_a_dir' ) {
+    if ( $sub eq 'choose_a_directory' ) {
         @pre = ( undef, $self->{confirm}, $self->{parent_dir} );
         $enchanted_idx = 2;
     }
@@ -657,25 +657,25 @@ sub choose_a_number {
     my $tab_w = print_columns( $tab );
     my $sep_w = print_columns_ext( $self->{thousands_separator}, $self->{color} );
     my $longest = $digits + int( ( $digits - 1 ) / 3 ) * $sep_w;
-    my @choices_range = ();
+    my @ranges = ();
     for my $di ( 0 .. $digits - 1 ) {
         my $begin = 1 . '0' x $di;
         $begin = 0 if $di == 0;
         $begin = insert_sep( $begin, $self->{thousands_separator} );
         ( my $end = $begin ) =~ s/^[01]/9/;
-        unshift @choices_range,  unicode_sprintf( $begin, $longest, { right_justify => 1, color => $self->{color} } )
+        unshift @ranges,  unicode_sprintf( $begin, $longest, { right_justify => 1, color => $self->{color} } )
                                . $tab
                                . unicode_sprintf( $end, $longest, { right_justify => 1, color => $self->{color} } );
     }
     my $back_tmp    = unicode_sprintf( $self->{back},    $longest * 2 + $tab_w + 1, { color => $self->{color} } );
     my $confirm_tmp = unicode_sprintf( $self->{confirm}, $longest * 2 + $tab_w + 1, { color => $self->{color} } );
-    if ( print_columns( "$choices_range[0]" ) > get_term_width() ) {
-        @choices_range = ();
+    if ( print_columns_ext( $ranges[0], $self->{color} ) > get_term_width() ) {
+        @ranges = ();
         for my $di ( 0 .. $digits - 1 ) {
             my $begin = 1 . '0' x $di;
             $begin = 0 if $di == 0;
             $begin = insert_sep( $begin, $self->{thousands_separator} );
-            unshift @choices_range, sprintf "%*s", $longest, $begin;
+            unshift @ranges, unicode_sprintf( $begin, $longest, { color => $self->{color} } );
         }
         $confirm_tmp = $self->{confirm};
         $back_tmp    = $self->{back};
@@ -701,7 +701,7 @@ sub choose_a_number {
         my @pre = ( undef, $confirm_tmp ); # confirm if $result ?
         # Choose
         my $range = choose(
-            $self->{small_first} ? [ @pre, reverse @choices_range ] : [ @pre, @choices_range ],
+            $self->{small_first} ? [ @pre, reverse @ranges ] : [ @pre, @ranges ],
             { info => $self->{info}, prompt => $lines, layout => 3, alignment => 1, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, color => $self->{color},
               tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt}, undef => $back_tmp }
@@ -1049,7 +1049,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.110
+Version 0.111
 
 =cut
 
@@ -1647,7 +1647,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2019 Matthäus Kiem.
+Copyright 2014-2020 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

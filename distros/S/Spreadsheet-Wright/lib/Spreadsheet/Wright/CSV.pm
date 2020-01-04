@@ -6,7 +6,7 @@ use warnings;
 no warnings qw( uninitialized numeric );
 
 BEGIN {
-	$Spreadsheet::Wright::CSV::VERSION   = '0.105';
+	$Spreadsheet::Wright::CSV::VERSION   = '0.107';
 	$Spreadsheet::Wright::CSV::AUTHORITY = 'cpan:TOBYINK';
 }
 
@@ -25,7 +25,7 @@ sub new
 		or croak "Need filename";
 
 	$args{'csv_options'}{'eol'}      //= "\r\n";
-	$args{'csv_options'}{'sep_char'} //= ",";	
+	$args{'csv_options'}{'sep_char'} //= ",";
 	$self->{'_CSV_OPTIONS'} = $args{'csv_options'};
 	
 	return $self;

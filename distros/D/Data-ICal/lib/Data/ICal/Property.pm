@@ -231,7 +231,7 @@ sub _value_as_string {
 
     unless ( $self->vcal10 ) {
         $value =~ s/\\/\\\\/gs;
-        $value =~ s/;/\\;/gs unless lc($key) eq 'rrule';
+        $value =~ s/;/\\;/gs unless lc($key) eq 'rrule' || lc($key) eq 'geo';
         $value =~ s/,/\\,/gs unless lc($key) eq 'rrule';
         $value =~ s/\x0d?\x0a/\\n/gs;
     }
@@ -349,7 +349,7 @@ Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2005 - 2019, Best Practical Solutions, LLC.  All rights reserved.
+Copyright (c) 2005 - 2020, Best Practical Solutions, LLC.  All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

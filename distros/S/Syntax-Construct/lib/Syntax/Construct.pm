@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.014';
+our $VERSION = '1.015';
 
 my %introduces = ( '5.030' => [qw[
                                   unicode12.1 uniprop_wildcards qr'N
@@ -246,7 +246,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.014
+Version 1.015
 
 =head1 SYNOPSIS
 
@@ -771,21 +771,21 @@ Aliases: state-array state-hash
 
 =head3 unicode12.1
 
-L<perldelta/Unicode 12.1 is supported>
+L<perl5300delta/Unicode 12.1 is supported>
 
 =head3 uniprop_wildcards
 
-L<perldelta/Wildcards in Unicode property value specifications are now partially supported>
+L<perl5300delta/Wildcards in Unicode property value specifications are now partially supported>
 
 =head3 qr'N
 
-L<perldelta/qr'\N{name}' is now supported>
+L<perl5300delta/qr'\N{name}' is now supported>
 
 Alias: named-char-in-single-quoted-regex
 
 =head3 turkic-casing
 
-See L<perldelta/Turkic UTF-8 locales are now seamlessly supported>.
+See L<perl5300delta/Turkic UTF-8 locales are now seamlessly supported>.
 B<Beware:> the actual behaviour depends on the operating system's
 locale support. E.g. FreeBSD, DragonFly, and Solaris are known not to
 support it.
@@ -824,7 +824,7 @@ E. Choroba, C<< <choroba at cpan.org> >>
 
 =head2 Contributors
 
-Gabor Szabo, JJ Merelo, tynovsky, Chris White
+Gabor Szabo, JJ Merelo, tynovsky, Chris White, Mohammad S Anwar
 
 =head1 BUGS
 

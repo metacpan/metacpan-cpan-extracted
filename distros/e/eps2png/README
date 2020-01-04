@@ -1,0 +1,99 @@
+eps2png converts files from EPS format (Encapsulated PostScript) to
+PNG (Portable Network Graphics), JPEG or GIF formats.
+
+It uses Ghostscript to produce the images. Since modern GhostScript
+programs do not support GIF due to copyright issues, GIF images are
+produced via an additional converter from the Portable BitMap package.
+
+This program is distributed under the Perl Artistic License and the GPL.
+
+PREREQUISITES
+-------------
+
+Perl 5.10.1 or better. Older perls may work but have not been tested.
+
+Unix (although it is rumoured to work on Windows).
+
+A GhostScript installation that can handle the desired output
+formats (use `gs -h' to get a list of supported formats).
+
+If you want GIF format and your GhostScript cannot produce this,
+the Portable BitMap package (pbmplus or netpbm).
+
+INSTALLATION
+------------
+
+The program is distributed in the form of a gzipped tar (.tar.gz)
+file, eps2png-x.y.tar.gz, where x.y reflect the version number. Unpack
+this file in a scratch directory:
+
+  % gzip -d < eps2png-x.y.tar.gz | tar -xvf -
+
+This will create a sub-directory eps2png-x.y. Change to this
+directory: 
+
+  % cd eps2png-x.y
+
+Execute the following commands. Note that this is the standard
+procedure for Perl extensions and programs:
+
+  % perl Makefile.PL
+  % make all
+  % make test (see note below)
+  % make install
+
+The last command requires superuser (root) privilege.
+
+Note that the program will be installed with the Perl binaries (e.g.
+/opt/perl-5.6.1/bin). If you want a different location, e.g. /usr/bin,
+use:
+
+  % perl Makefile.PL INSTALLSCRIPT=/usr/bin
+  % make ...
+
+The program is installed under the name eps2png. When invoked like
+this, it produces PNG images by default.
+You may install it under alternative names (or create links) for other
+default image formats:
+
+  eps2gif    -- will produce GIF images by default
+  eps2jpg    -- will produce JPEG images by default
+
+Note that, in any case, the desired output format can be selected
+using command line options.
+
+WHEN make test FAILS
+--------------------
+
+The tests work by converting a test EPS to each of the supported
+formats, and comparing the results with reference images. Changes in
+the image drivers of Ghostscript may cause such a test to fail, when
+the generated image is not byte-by-byte indential to the reference
+image. When any of the 'make test' tests fails in test 4 or 5, please
+manually convert some images and decide whether the program is doing
+its job as it should. In this case, it can be safely installed.
+
+AVAILABILITY
+------------
+
+eps2png:
+
+  https://metacpan.org/search?mode=dist&query=eps2png
+  https://johan.vromans.org/software/sw_eps2png.html
+
+Ghostscript:
+
+  https://www.ghostscript.com (GNU Ghostscript)
+  https://git.ghostscript.com (AFPL Ghostscript)
+
+Portable BitMap package:
+
+  These packages (libgr from RedHat, netpbm and pbmplus) seems so
+  abundant that I couldn't find any official web links ;-).
+
+----------------------------------------------------------------------------
+Johan Vromans                                           jvromans@squirrel.nl
+Squirrel Consultancy                                  Exloo, the Netherlands
+https://www.squirrel.nl                            https://johan.vromans.org
+PGP Key 1024D/1298C2B4                 https://johan.vromans.org/pgpkey.html
+----------------------- "Arms are made for hugging" ------------------------

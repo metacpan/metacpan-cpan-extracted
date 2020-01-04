@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2018-03-21'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-01-03'; # DATE
+our $DIST = 'App-RegexpPatternUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -39,19 +41,23 @@ my $res = gen_read_table_func(
                 schema => 'bool*',
                 pos => 4,
             },
-            dynamic_args => {
+            gen_args => {
                 schema => 'str',
                 pos => 5,
+            },
+            tags => {
+                schema => 'str',
+                pos => 6,
             },
         },
         pk => 'name',
     },
     table_data => sub {
-        require PERLANCAR::Module::List;
+        require Module::List::Tiny;
 
         my ($query) = @_;
 
-        my $res = PERLANCAR::Module::List::list_modules(
+        my $res = Module::List::Tiny::list_modules(
             'Regexp::Pattern::', {list_modules=>1, recurse=>1});
 
         #use DD; dd $query;
@@ -71,10 +77,11 @@ my $res = gen_read_table_func(
                     module => $mod,
                     name => $patname,
                     summary => $patspec->{summary},
+                    tags => join(",", @{ $patspec->{tags} // [] }),
                 };
                 if ($patspec->{gen}) {
                     $rec->{is_dynamic} = 1;
-                    $rec->{dynamic_args} =
+                    $rec->{gen_args} =
                         join(",", sort keys %{$patspec->{gen_args} // {}});
                 } else {
                     $rec->{is_dynamic} = 0;
@@ -92,6 +99,7 @@ Perinci::CmdLine::Any->new(
     url => '/main/list_regexp_pattern_patterns',
     read_config => 0,
     read_env => 0,
+    use_locale => 1,
 )->run;
 
 # ABSTRACT: List Regexp::Pattern::* patterns
@@ -109,12 +117,13 @@ list-regexp-pattern-patterns - List Regexp::Pattern::* patterns
 
 =head1 VERSION
 
-This document describes version 0.003 of list-regexp-pattern-patterns (from Perl distribution App-RegexpPatternUtils), released on 2018-03-21.
+This document describes version 0.004 of list-regexp-pattern-patterns (from Perl distribution App-RegexpPatternUtils), released on 2020-01-03.
 
 =head1 SYNOPSIS
 
  % list-regexp-pattern-patterns
  % list-regexp-pattern-patterns -l
+ % list-regexp-pattern-patterns -l --exclude-field pattern
 
 =head1 DESCRIPTION
 
@@ -134,6 +143,18 @@ Return array of full records instead of just ID fields.
 
 By default, only the key (ID) field is returned per result entry.
 
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
 
 =item B<--field>=I<s@>
 
@@ -158,69 +179,69 @@ as list/array (field value, field value, ...).
 
 =back
 
-=head2 Filtering for dynamic_args options
+=head2 Filtering for gen_args options
 
 =over
 
-=item B<--dynamic-args-contains>=I<s>
+=item B<--gen-args-contains>=I<s>
 
-Only return records where the 'dynamic_args' field contains specified text.
+Only return records where the 'gen_args' field contains specified text.
 
-=item B<--dynamic-args-in-json>=I<s>
+=item B<--gen-args-in-json>=I<s>
 
-Only return records where the 'dynamic_args' field is in the specified values (JSON-encoded).
+Only return records where the 'gen_args' field is in the specified values (JSON-encoded).
 
-See C<--dynamic-args-in>.
+See C<--gen-args-in>.
 
-=item B<--dynamic-args-in>=I<s@>
+=item B<--gen-args-in>=I<s@>
 
-Only return records where the 'dynamic_args' field is in the specified values.
-
-Can be specified multiple times.
-
-=item B<--dynamic-args-is>=I<s>
-
-Only return records where the 'dynamic_args' field equals specified value.
-
-=item B<--dynamic-args-isnt>=I<s>
-
-Only return records where the 'dynamic_args' field does not equal specified value.
-
-=item B<--dynamic-args-max>=I<s>
-
-Only return records where the 'dynamic_args' field is less than or equal to specified value.
-
-=item B<--dynamic-args-min>=I<s>
-
-Only return records where the 'dynamic_args' field is greater than or equal to specified value.
-
-=item B<--dynamic-args-not-contains>=I<s>
-
-Only return records where the 'dynamic_args' field does not contain specified text.
-
-=item B<--dynamic-args-not-in-json>=I<s>
-
-Only return records where the 'dynamic_args' field is not in the specified values (JSON-encoded).
-
-See C<--dynamic-args-not-in>.
-
-=item B<--dynamic-args-not-in>=I<s@>
-
-Only return records where the 'dynamic_args' field is not in the specified values.
+Only return records where the 'gen_args' field is in the specified values.
 
 Can be specified multiple times.
 
-=item B<--dynamic-args-xmax>=I<s>
+=item B<--gen-args-is>=I<s>
 
-Only return records where the 'dynamic_args' field is less than specified value.
+Only return records where the 'gen_args' field equals specified value.
 
-=item B<--dynamic-args-xmin>=I<s>
+=item B<--gen-args-isnt>=I<s>
 
-Only return records where the 'dynamic_args' field is greater than specified value.
+Only return records where the 'gen_args' field does not equal specified value.
 
-=item B<--dynamic-args>=I<s>
+=item B<--gen-args-max>=I<s>
 
-Only return records where the 'dynamic_args' field equals specified value.
+Only return records where the 'gen_args' field is less than or equal to specified value.
+
+=item B<--gen-args-min>=I<s>
+
+Only return records where the 'gen_args' field is greater than or equal to specified value.
+
+=item B<--gen-args-not-contains>=I<s>
+
+Only return records where the 'gen_args' field does not contain specified text.
+
+=item B<--gen-args-not-in-json>=I<s>
+
+Only return records where the 'gen_args' field is not in the specified values (JSON-encoded).
+
+See C<--gen-args-not-in>.
+
+=item B<--gen-args-not-in>=I<s@>
+
+Only return records where the 'gen_args' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--gen-args-xmax>=I<s>
+
+Only return records where the 'gen_args' field is less than specified value.
+
+=item B<--gen-args-xmin>=I<s>
+
+Only return records where the 'gen_args' field is greater than specified value.
+
+=item B<--gen-args>=I<s>
+
+Only return records where the 'gen_args' field equals specified value.
 
 =back
 
@@ -506,6 +527,72 @@ Only return records where the 'summary' field equals specified value.
 
 =back
 
+=head2 Filtering for tags options
+
+=over
+
+=item B<--tags-contains>=I<s>
+
+Only return records where the 'tags' field contains specified text.
+
+=item B<--tags-in-json>=I<s>
+
+Only return records where the 'tags' field is in the specified values (JSON-encoded).
+
+See C<--tags-in>.
+
+=item B<--tags-in>=I<s@>
+
+Only return records where the 'tags' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--tags-is>=I<s>
+
+Only return records where the 'tags' field equals specified value.
+
+=item B<--tags-isnt>=I<s>
+
+Only return records where the 'tags' field does not equal specified value.
+
+=item B<--tags-max>=I<s>
+
+Only return records where the 'tags' field is less than or equal to specified value.
+
+=item B<--tags-min>=I<s>
+
+Only return records where the 'tags' field is greater than or equal to specified value.
+
+=item B<--tags-not-contains>=I<s>
+
+Only return records where the 'tags' field does not contain specified text.
+
+=item B<--tags-not-in-json>=I<s>
+
+Only return records where the 'tags' field is not in the specified values (JSON-encoded).
+
+See C<--tags-not-in>.
+
+=item B<--tags-not-in>=I<s@>
+
+Only return records where the 'tags' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--tags-xmax>=I<s>
+
+Only return records where the 'tags' field is less than specified value.
+
+=item B<--tags-xmin>=I<s>
+
+Only return records where the 'tags' field is greater than specified value.
+
+=item B<--tags>=I<s>
+
+Only return records where the 'tags' field equals specified value.
+
+=back
+
 =head2 Filtering options
 
 =over
@@ -669,7 +756,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@ use WWW::Mechanize::Chrome;
 use Object::Import;
 use Carp qw(croak);
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 our @CARP_NOT = (qw[
     WWW::Mechanize::Chrome
@@ -69,7 +69,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2009-2019 by Max Maischein C<corion@cpan.org>.
+Copyright 2009-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

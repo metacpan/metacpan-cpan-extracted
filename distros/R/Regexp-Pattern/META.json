@@ -60,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-Regexp-Pattern"
       }
    },
-   "version" : "0.2.10",
+   "version" : "0.2.11",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

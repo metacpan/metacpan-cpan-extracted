@@ -13,6 +13,8 @@ use Capture::Tiny ':all';
 use DateTime;
 use HTTP::Date;
 # use Test::NoWarnings;	# HTML::Clean has them
+use lib 't/lib';
+use MyLogger;
 
 BEGIN {
 	use_ok('FCGI::Buffer');
@@ -140,53 +142,4 @@ LAST_MODIFIED: {
 		}
 	}
 	done_testing($test_count);
-}
-
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub error {
-	my $self = shift;
-	my $message = shift;
-
-	::diag($message);
-}
-
-sub warn {
-	my $self = shift;
-	my $message = shift;
-
-	::diag($message);
-}
-
-sub info {
-	my $self = shift;
-	my $message = shift;
-
-	::diag($message);
-}
-
-sub trace {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
 }

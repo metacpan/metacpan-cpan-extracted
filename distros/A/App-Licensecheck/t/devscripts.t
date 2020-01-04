@@ -1,6 +1,6 @@
 use strictures 2;
 
-use Test::More tests => 17;
+use Test::More tests => 14;
 use Test::Script 1.09;
 
 sub licensecheck
@@ -36,9 +36,12 @@ TODO: {
 		qr{Public domain GPL \(v3\)	2008 Aaron Plattner, NVIDIA Corporation / 2005 Lars Knoll & Zack Rusin, Trolltech / 2000 Keith Packard, member of The XFree86 Project, Inc.?};
 }
 
-licensecheck 'Duplicated copyright',
-	[qw(-m --copyright)], '../grant/Apache/one_helper.rb',
-	qr{Apache(?: License)? \(v2.0\)	2002-2015,? OpenNebula Project \(OpenNebula.org\), C12G Labs};
+TODO: {
+	local $TODO = 'not yet supported by Regexp::Pattern::License';
+	licensecheck 'Duplicated copyright',
+		[qw(-m --copyright)], '../grant/Apache/one_helper.rb',
+		qr{Apache(?: License)? \(v2.0\)	2002-2015,? OpenNebula Project \(OpenNebula.org\), C12G Labs};
+}
 licensecheck 'Duplicated copyright',
 	[], 'dual.c', 'Public domain GPL (v3)';
 
@@ -72,17 +75,6 @@ licensecheck 'false positives',
 
 licensecheck 'regexp killer',
 	[], 'regexp-killer.c', 'UNKNOWN';
-
-licensecheck 'encoding; ISO 8859-1',
-	[qw(-m --copyright --encoding iso-8859-1)], 'copr-iso8859.h',
-	qr{GPL \(v2\) \(with incorrect FSF address\)	2011 Heinrich Müller <henmull\@src.gnome.org>};
-licensecheck 'encoding; UTF-8',
-	[qw(-m --copyright --encoding utf8)], 'copr-utf8.h',
-	qr{GPL \(v2 or later\)	2004-2015 Oliva 'f00' Oberto / 2001-2010 Paul 'bar' Stevénsön};
-licensecheck 'encoding; ISO 8859-1 parsed as UTF-8',
-	[qw(-m --copyright --encoding utf8)], 'copr-iso8859.h',
-	qr{GPL \(v2\) \(with incorrect FSF address\)	2011 Heinrich M.*ller <henmull\@src.gnome.org>},
-	qr{|utf8 .* does not map to Unicode at};
 
 licensecheck 'info at end',
 	[qw(-m --copyright --lines 0)], 'info-at-eof.h',

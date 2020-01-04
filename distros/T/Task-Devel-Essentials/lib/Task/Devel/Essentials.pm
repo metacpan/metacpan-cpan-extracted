@@ -10,11 +10,11 @@ Task::Devel::Essentials - Bundle of modules useful for developers
 
 =head1 VERSION
 
-Version 0.013
+Version 0.014
 
 =cut
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 =head1 SYNOPSIS
 
@@ -209,13 +209,10 @@ Martin Becker C<< <mhasch at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2019 Martin Becker.
+Copyright (c) 2013-2020 by Martin Becker, Blaubeuren.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.
+This library is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
 
 =cut
 

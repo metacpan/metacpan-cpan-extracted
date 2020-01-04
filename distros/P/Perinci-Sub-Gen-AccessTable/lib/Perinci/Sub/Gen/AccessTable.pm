@@ -1,7 +1,7 @@
 package Perinci::Sub::Gen::AccessTable;
 
-our $DATE = '2019-09-10'; # DATE
-our $VERSION = '0.581'; # VERSION
+our $DATE = '2020-01-03'; # DATE
+our $VERSION = '0.582'; # VERSION
 
 use 5.010001;
 use strict;
@@ -186,6 +186,21 @@ _
         summary     => N__('Select fields to return'),
         extra_props => {
             'x.name.is_plural' => 1,
+        },
+    ) if $opts->{enable_field_selection};
+    _add_arg(
+        func_meta   => $func_meta,
+        langs       => $langs,
+        name        => 'exclude_fields',
+        type        => ['array*' => {of=>['str*', in=>[keys %{$table_spec->{fields}}]]}],
+        default     => $opts->{default_exclude_fields},
+        aliases     => $opts->{exclude_fields_aliases},
+        cat_name    => 'field-selection',
+        cat_text    => N__('field selection'),
+        summary     => N__('Select fields to return'),
+        extra_props => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'exclude_field',
         },
     ) if $opts->{enable_field_selection};
     _add_arg(
@@ -478,19 +493,38 @@ sub __parse_query {
         keys %$fspecs;
 
     my @requested_fields;
-    if ($args->{detail}) {
-        @requested_fields = grep {
-            ($fspecs->{$_}{include_by_default} // 1) ||
-                $args->{"with.$_"}
-            } @fields;
-        $args->{with_field_names} //= 1;
-    } elsif ($args->{fields}) {
-        @requested_fields = @{ $args->{fields} };
-        $args->{with_field_names} //= 0;
-    } else {
-        @requested_fields = ($table_spec->{pk});
-        $args->{with_field_names} //= 0;
-    }
+  SELECT_FIELDS:
+    {
+        if ($args->{detail} || $args->{exclude_fields}) {
+            @requested_fields = grep {
+                ($fspecs->{$_}{include_by_default} // 1) ||
+                    $args->{"with.$_"}
+                } @fields;
+            $args->{with_field_names} //= 1
+                if $args->{detail};
+        }
+
+        if ($args->{fields}) {
+            @requested_fields = @{ $args->{fields} };
+            $args->{with_field_names} //= 0;
+        }
+
+        if ($args->{exclude_fields}) {
+            my @filtered_fields;
+            for my $field (@requested_fields) {
+                next if grep { $field eq $_ } @{ $args->{exclude_fields} };
+                push @filtered_fields, $field;
+            }
+            @requested_fields = @filtered_fields;
+            $args->{with_field_names} //= 0;
+        }
+
+        unless (@requested_fields) {
+            @requested_fields = ($table_spec->{pk});
+            $args->{with_field_names} //= 0;
+        }
+    } # SELECT_FIELDS
+
     for (@requested_fields) {
         return err(400, "Unknown field $_") unless $_ ~~ @fields;
     }
@@ -697,7 +731,7 @@ sub _gen_func {
                 $args{$ak} //= $av->{schema}[1]{default};
             }
             # array-ize "string,with,comma"
-            if ($ak eq 'fields' && defined($args{$ak})) {
+            if ($ak =~ /\A(exclude_fields|fields)\z/ && defined($args{$ak})) {
                 $args{$ak} = [split /\s*[,;]\s*/, $args{$ak}]
                     unless ref($args{$ak}) eq 'ARRAY';
             }
@@ -961,7 +995,7 @@ sub _gen_func {
         goto SKIP_SELECT_FIELDS if $metadata->{fields_selected};
       REC2:
         for my $r (@r) {
-            if (!$args{detail} && !$args{fields}) {
+            if (!$args{detail} && !$args{fields} && !$args{exclude_fields}) {
                 $r = $r->{$pk};
                 next REC2;
             }
@@ -1170,6 +1204,10 @@ _
             schema => 'str',
             summary => "Supply default 'fields' value for function arg spec",
         },
+        default_exclude_fields => {
+            schema => 'str',
+            summary => "Supply default 'exclude_fields' value for function arg spec",
+        },
         default_with_field_names => {
             schema => 'bool',
             summary => "Supply default 'with_field_names' ".
@@ -1351,6 +1389,9 @@ _
         fields_aliases => {
             schema => 'hash*',
         },
+        exclude_fields_aliases => {
+            schema => 'hash*',
+        },
         sort_aliases => {
             schema => 'hash*',
         },
@@ -1496,7 +1537,7 @@ Perinci::Sub::Gen::AccessTable - Generate function (and its metadata) to read ta
 
 =head1 VERSION
 
-This document describes version 0.581 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2019-09-10.
+This document describes version 0.582 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2020-01-03.
 
 =head1 SYNOPSIS
 
@@ -1751,6 +1792,10 @@ Can be used to supply default filters, e.g.
 
 Supply default 'detail' value for function arg spec.
 
+=item * B<default_exclude_fields> => I<str>
+
+Supply default 'exclude_fields' value for function arg spec.
+
 =item * B<default_fields> => I<str>
 
 Supply default 'fields' value for function arg spec.
@@ -1804,6 +1849,8 @@ Ordering must also be enabled (C<enable_ordering>).
 Decide whether generated function will support searching (argument q).
 
 Filtering must also be enabled (C<enable_filtering>).
+
+=item * B<exclude_fields_aliases> => I<hash>
 
 =item * B<extra_args> => I<hash>
 
@@ -2004,7 +2051,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

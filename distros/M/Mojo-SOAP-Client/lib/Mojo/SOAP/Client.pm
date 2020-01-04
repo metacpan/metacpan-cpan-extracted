@@ -1,5 +1,13 @@
 package Mojo::SOAP::Client;
 
+=pod
+
+=begin markdown
+
+![](https://github.com/oposs/mojo-soap-client/workflows/Unit%20Tests/badge.svg?branch=master)
+
+=end markdown
+
 =head1 NAME
 
 Mojo::SOAP::Client - Talk to SOAP Services mojo style
@@ -41,7 +49,7 @@ use Mojo::Util qw(b64_encode dumper);
 use Mojo::Log;
 use Carp;
 
-our $VERSION = '0.1.4';
+our $VERSION = '0.1.5';
 
 =head2 Properties
 
@@ -140,7 +148,7 @@ The key matching the client cert.
 =cut
 
 has 'key';
-
+has 'ua';
 
 has wsdlCompiler => sub ($self) {
     my $wc = XML::Compile::WSDL11->new($self->wsdl);
@@ -153,6 +161,7 @@ has wsdlCompiler => sub ($self) {
 has httpUa => sub ($self) {
     XML::Compile::Transport::SOAPHTTP_MojoUA->new(
         address => $self->endPoint,
+        mojo_ua => $self->ua,
         ua_start_callback => sub ($ua,$tx) {
             $ua->ca($self->ca)
                 if $self->ca;
@@ -281,7 +290,7 @@ package Mojo::SOAP::Exception {
 
 1;
 
-=head1 ACKNOLEDGEMENT
+=head1 ACKNOWLEDGEMENT
 
 This is really just a very thin layer on top of Mark Overmeers great L<XML::Compile::SOAP> module. Thanks Mark!
 
@@ -298,3 +307,5 @@ Copyright OETIKER+PARTNER AG 2019
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10 or,
 at your option, any later version of Perl 5 you may have available.
+
+=cut

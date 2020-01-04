@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ no_index:
     - inc
 recommends:
   ExtUtils::CBuilder: '0.280220'
-  File::Slurp::Tiny: '0'
+  File::Slurper: '0'
   Scalar::Util: '1.18'
 requires:
   Capture::Tiny: '0'
@@ -43,5 +43,5 @@ resources:
   homepage: https://metacpan.org/release/Config-AutoConf
   license: http://dev.perl.org/licenses/
   repository: https://github.com:ambs/Config-AutoConf.git
-version: '0.317'
+version: '0.318'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

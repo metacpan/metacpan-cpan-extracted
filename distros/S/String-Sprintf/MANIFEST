@@ -3,12 +3,13 @@ lib/String/Sprintf.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-META.yml			Module meta-data (added by MakeMaker)
 README
 t/001_load.t
 t/002_constructor.t
 t/003_basic.t
 t/004_synopsis.t
 t/005_results.t
+t/pod.t
 Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

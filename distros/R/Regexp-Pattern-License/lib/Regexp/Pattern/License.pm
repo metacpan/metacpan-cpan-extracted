@@ -12,11 +12,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.1.94
+Version v3.1.95
 
 =cut
 
-our $VERSION = version->declare("v3.1.94");
+our $VERSION = version->declare("v3.1.95");
 
 =head1 DESCRIPTION
 
@@ -30,8 +30,10 @@ L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 # internal patterns compiled into patterns
 #  * must be unique, to not collide at their final use in gen_pat sub
 #  * must be a unit, so that e.g. suffix "?" applies to whole chunk
+my $B  = '[*]';          # bullet
 my $BB = '[*1-9. ]';     # start-of-sentence bullet or count
 my $C  = '[(c)]';        # copyright mark
+my $CQ = '[:"]';         # colon and maybe one or two quotes
 my $D  = '[-]';          # dash
 my $DD = '[ - ]';        # dash with space around
 my $E  = '[ ]';          # end-of-sentence space
@@ -40,12 +42,14 @@ my $F  = '[.]';          # full stop
 my $HT = '[http://]';    # http/https protocol
 my $ND = '[1-9-]';       # number or dash
 my $Q  = '["]';          # quote
+my $QA = "\['\]";        # apostrophe
 my $QB = '["*]';         # quote or bullet
 my $SD = '[ -]';         # space or dash
 
 my @_re = (
-	[ qr/\Q$BB/, '(?:\W{0,3}\S\W{0,3})' ],
+	[ qr/\Q$BB/, '(?:\W{0,5}\S{1,2}\W{0,3})' ],
 	[ qr/\Q$C/,  '(?:©|\(c\))' ],
+	[ qr/\Q$CQ/, '(?::\W{0,2})' ],
 	[ qr/\Q$D/,  '[–-]' ],
 	[ qr/\Q$DD/, '(?: [–—-]{1,2} )' ],
 	[ qr/\Q$E/,  '(?:\s{1,3})' ],
@@ -57,6 +61,7 @@ my @_re = (
 	[ qr/\Q$QB/, '(?:\W{0,2})' ],
 	[ qr/\Q$SD/, '[ –-]' ],
 
+	[ qr/\[à\]/, '(?:[àa]?)' ],
 	[ qr/\[é\]/, '(?:[ée]?)' ],
 	[ qr/\[è\]/, '(?:[èe]?)' ],
 );
@@ -71,7 +76,7 @@ my $the = '(?:[Tt]he )';
 my $cc_by_exercising_you_accept_this
 	= "By exercising the Licensed Rights \\(defined below\\), You accept and agree to be bound by the terms and conditions of this ";
 my $gnu    = '(?:GNU )';
-my $gpl    = '(?:General Public License|GENERAL PUBLIC LICENSE)';
+my $gpl    = '(?:General Public Licen[cs]e|GENERAL PUBLIC LICEN[CS]E)';
 my $fsf    = "(?:$the?Free Software Foundation)";
 my $by_fsf = "(?: (?:as )?published by $fsf)";
 my $niv
@@ -147,12 +152,31 @@ $RE{adobe_glyph} = {
 
 =item * afl
 
+=item * afl_1_1
+
+=item * afl_1_2
+
+=item * afl_2
+
+=item * afl_2_1
+
+=item * afl_3
+
 =cut
+
+my $termination_for_patent_including_counterclaim
+	= "${BB}Termination for Patent Action$F$E"
+	. 'This License shall terminate automatically '
+	. 'and You may no longer exercise any of the rights '
+	. 'granted to You by this License '
+	. 'as of the date You commence an action, '
+	. 'including a cross-claim or counterclaim,';
 
 $RE{afl} = {
 	name                        => 'AFL',
 	'name.alt.org.wikidata'     => 'Q337279',
 	caption                     => 'Academic Free License',
+	'caption.alt.misc.british'  => 'Academic Free Licence',
 	'caption.alt.org.wikipedia' => 'Academic Free License',
 	tags                        => ['type:versioned:decimal'],
 
@@ -161,6 +185,68 @@ $RE{afl} = {
 };
 $RE{afl}{'pat.alt.subject.grant.legal.license'}
 	= 'This ' . $RE{afl}{caption} . ' \(the "License"\) applies to';
+
+$RE{afl_1_1} = {
+	name                => 'AFL-1.1',
+	'name.alt.org.spdx' => 'AFL-1.1',
+	caption             => 'Academic Free License Version v1.1',
+	tags                => ['type:singleversion:afl'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		'The Academic Free License applies to',
+};
+
+$RE{afl_1_2} = {
+	name                => 'AFL-1.2',
+	'name.alt.org.spdx' => 'AFL-1.2',
+	caption             => 'Academic Free License Version v1.2',
+	tags                => ['type:singleversion:afl'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		'This Academic Free License applies to',
+};
+
+$RE{afl_2} = {
+	name                => 'AFL-2.0',
+	'name.alt.org.spdx' => 'AFL-2.0',
+	caption             => 'Academic Free License Version v2.0',
+	tags                => ['type:singleversion:afl'],
+
+	'pat.alt.subject.license.scope.multisection' =>
+		"its terms and conditions$F$EE"
+		. $termination_for_patent_including_counterclaim
+		. " for patent infringement",
+};
+
+$RE{afl_2_1} = {
+	name                => 'AFL-2.1',
+	'name.alt.org.spdx' => 'AFL-2.1',
+	caption             => 'Academic Free License Version v2.1',
+	tags                => ['type:singleversion:afl'],
+
+	'pat.alt.subject.license.scope.multisection' =>
+		"its terms and conditions$F$EE"
+		. $termination_for_patent_including_counterclaim
+		. ' against Licensor or any licensee',
+};
+
+$RE{afl_3} = {
+	name                           => 'AFL-3.0',
+	'name.alt.org.fedora'          => 'AFL',
+	'name.alt.org.fsf'             => 'Academic_Free_License_3.0',
+	'name.alt.org.osi'             => 'AFL-3.0',
+	'name.alt.org.spdx'            => 'AFL-3.0',
+	'name.alt.org.tldr.path.short' => 'afl3',
+	caption                        => 'Academic Free License version 3.0',
+	'caption.alt.org.tldr'         => 'Academic Free License 3.0 (AFL)',
+	'iri.alt.old.osi' => 'https://opensource.org/licenses/academic.php',
+	tags              => ['type:singleversion:afl'],
+
+	'pat.alt.subject.license.scope.multisection' =>
+		"the conditions in Section 1\\(c\\)$F$EE"
+		. $termination_for_patent_including_counterclaim
+		. ' against Licensor or any licensee',
+};
 
 =item * agpl
 
@@ -231,6 +317,12 @@ $RE{aladdin_9} = {
 
 =item * apache
 
+=item * apache_1
+
+=item * apache_1_1
+
+=item * apache_2
+
 =cut
 
 $RE{apache} = {
@@ -238,13 +330,61 @@ $RE{apache} = {
 	'name.alt.org.wikidata'     => 'Q616526',
 	caption                     => 'Apache License',
 	'caption.alt.org.wikipedia' => 'Apache License',
+	'caption.alt.misc.british'  => 'Apache Licence',
 	iri  => 'https://www.apache.org/licenses/LICENSE-2.0',
 	tags => ['type:versioned:decimal'],
 
 	'.default_pat' => 'name',
 
 # FIXME
-	'pat.alt.subject.name' => "$the?Apache(?: Software)? License",
+	'pat.alt.subject.name' => "$the?Apache(?: Software)? Licen[cs]e",
+};
+
+$RE{apache_1} = {
+	name                   => 'Apache-1.0',
+	'name.alt.org.spdx'    => 'Apache-1.0',
+	caption                => 'Apache License 1.0',
+	'caption.alt.org.tldr' => 'Apache License 1.0 (Apache-1.0)',
+	iri                    => 'https://www.apache.org/licenses/LICENSE-1.0',
+	tags                   => ['type:singleversion:apache'],
+
+	'pat.alt.subject.license.scope.sentence' => $P{redist_ack_this},
+};
+
+$RE{apache_1_1} = {
+	name                   => 'Apache-1.1',
+	'name.alt.org.osi'     => 'Apache-1.1',
+	'name.alt.org.spdx'    => 'Apache-1.1',
+	'name.alt.org.tldr'    => 'apache-license-1.1',
+	caption                => 'Apache License 1.1',
+	'caption.alt.org.osi'  => 'Apache Software License, version 1.1',
+	'caption.alt.org.tldr' => 'Apache License 1.1 (Apache-1.1)',
+	iri                    => 'https://www.apache.org/licenses/LICENSE-1.1',
+	'iri.alt.org.wikipedia' =>
+		'https://en.wikipedia.org/wiki/Apache_License#Version_1.1',
+	tags => ['type:singleversion:apache'],
+
+	'pat.alt.subject.license.scope.multisection' =>
+		"without prior written permission of(?: \\S+){1,5}$F$EE"
+		. 'THIS SOFTWARE IS PROVIDED',
+};
+
+$RE{apache_2} = {
+	name                           => 'Apache-2.0',
+	'name.alt.org.osi'             => 'Apache-2.0',
+	'name.alt.org.spdx'            => 'Apache-2.0',
+	'name.alt.org.tldr.path.short' => 'apache2',
+	caption                        => 'Apache License 2.0',
+	'caption.alt.org.osi'          => 'Apache License, Version 2.0',
+	'caption.alt.org.osi.alt.list' => 'Apache License 2.0 (Apache-2.0)',
+	'caption.alt.org.tldr'         => 'Apache License 2.0 (Apache-2.0)',
+	iri => 'https://www.apache.org/licenses/LICENSE-2.0',
+	'iri.alt.org.wikipedia' =>
+		'https://en.wikipedia.org/wiki/Apache_License#Version_2.0',
+	tags => ['type:singleversion:apache'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		'How to apply the Apache License to your work',
 };
 
 =item * apafml
@@ -267,6 +407,12 @@ $RE{apafml} = {
 
 =item * artistic
 
+=item * artistic_1
+
+=item * artistic_1_cl8
+
+=item * artistic_1_perl
+
 =item * artistic_2
 
 =cut
@@ -276,11 +422,69 @@ $RE{artistic} = {
 	'name.alt.org.wikidata'     => 'Q713244',
 	caption                     => 'Artistic License',
 	'caption.alt.org.wikipedia' => 'Artistic License',
-	tags                        => ['type:versioned:decimal'],
+	'caption.alt.misc.british'  => 'Artistic Licence',
+	tags                        => ['type:versioned:complex'],
+};
 
-	'.default_pat' => 'name',
+$RE{artistic_1} = {
+	name                        => 'Artistic-1.0',
+	'name.alt.org.osi'          => 'Artistic-1.0',
+	'name.alt.org.spdx'         => 'Artistic-1.0',
+	caption                     => 'Artistic License, version 1.0',
+	'caption.alt.org.osi'       => 'Artistic License 1.0 (Artistic-1.0)',
+	'caption.alt.org.wikipedia' => 'Artistic License 1.0',
+	'caption.alt.misc.british'  => 'Artistic Licence 1.0',
+	'iri.alt.old.osi' =>
+		'https://opensource.org/licenses/artistic-license-1.0',
+	'iri.alt.org.wikipedia' =>
+		'https://en.wikipedia.org/wiki/Artistic_License#Artistic_License_1.0',
+	tags => ['type:singleversion:artistic'],
 
-	'pat.alt.subject.name' => "$the?Artistic License",
+	'pat.alt.subject.license.scope.multisection' =>
+		"${BB}C or perl subroutines supplied by you and linked into this Package shall not be considered part of this Package$F$EE"
+		. "${BB}The name of the Copyright Holder",
+};
+
+$RE{artistic_1_cl8} = {
+	name                => 'Artistic-1.0-cl8',
+	'name.alt.org.spdx' => 'Artistic-1.0-cl8',
+	summary             => 'Artistic License 1.0 w/clause 8',
+	tags                => ['type:singleversion:artistic'],
+
+	'pat.alt.subject.license.scope.multisection' =>
+		"this Package$F$EE${BB}Aggregation of this Package",
+};
+
+$RE{artistic_1_clarified} = {
+	name                           => 'Artistic-1.0-clarified',
+	'name.alt.org.spdx'            => 'ClArtistic',
+	caption                        => 'Clarified Artistic License',
+	'caption.alt.org.fedora'       => 'Artistic (clarified)',
+	'caption.alt.org.fedora.short' => 'Artistic clarified',
+	'caption.alt.org.fedora.web'   => 'Artistic Clarified',
+	'caption.alt.org.spdx'         => 'Clarified Artistic License',
+	'caption.alt.misc.british'     => 'Clarified Artistic Licence',
+	iri =>
+		'http://gianluca.dellavedova.org/2011/01/03/clarified-artistic-license/',
+	tags => ['type:singleversion:artistic'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		'Aggregation of the Standard Version of the Package',
+};
+
+$RE{artistic_1_perl} = {
+	name                     => 'Artistic-1.0-Perl',
+	'name.alt.org.spdx'      => 'Artistic-1.0-Perl',
+	caption                  => 'Artistic License 1.0 (Perl)',
+	'caption.alt.org.fedora' => 'Artistic 1.0 (original)',
+	'caption.alt.org.spdx'   => 'Artistic License 1.0 (Perl)',
+	iri                      => 'http://dev.perl.org/licenses/artistic.html',
+	'iri.alt.old.perl' =>
+		'http://www.perl.com/pub/a/language/misc/Artistic.html',
+	tags => ['type:singleversion:artistic'],
+
+	'pat.alt.subject.license.scope.multisection' =>
+		"the language$F$EE${BB}Aggregation of this Package",
 };
 
 $RE{artistic_2} = {
@@ -291,6 +495,7 @@ $RE{artistic_2} = {
 	caption                        => 'Artistic License (v2.0)',
 	'caption.alt.org.tldr'         => 'Artistic License 2.0 (Artistic-2.0)',
 	'caption.alt.org.wikipedia'    => 'Artistic License 2.0',
+	'caption.alt.misc.british'     => 'Artistic Licence 2.0',
 	iri => 'http://www.perlfoundation.org/artistic_license_2_0',
 	'iri.alt.org.wikipedia' =>
 		'https://en.wikipedia.org/wiki/Artistic_License#Artistic_License_2.0',
@@ -380,6 +585,11 @@ $RE{bsd_2_clause} = {
 	'caption.alt.org.tldr' => 'BSD 2-Clause License (FreeBSD/Simplified)',
 	'name.alt.org.wikipedia.bsd' =>
 		'2-clause license ("Simplified BSD License" or "FreeBSD License")',
+	'caption.alt.misc.british'  => '2-clause BSD Licence',
+	'caption.alt.misc.british2' => 'FreeBSD Licence',
+	'caption.alt.misc.british3' => 'Simplified BSD Licence',
+	'caption.alt.misc.qemu' =>
+		'BSD Licence (without advertising or endorsement clauses)',
 	tags => [ 'family:bsd', 'type:unversioned' ],
 
 	'pat.alt.subject.license.scope.multisection' =>
@@ -406,7 +616,10 @@ $RE{bsd_3_clause} = {
 	'caption.alt.org.tldr' => 'BSD 3-Clause License (Revised)',
 	'caption.alt.org.wikipedia.bsd' =>
 		'3-clause license ("BSD License 2.0", "Revised BSD License", "New BSD License", or "Modified BSD License")',
-	tags => [ 'family:bsd', 'type:unversioned' ],
+	'caption.alt.misc.british'  => '3-Clause BSD Licence',
+	'caption.alt.misc.british2' => 'Modified BSD Licence',
+	'caption.alt.misc.qemu'     => 'BSD Licence (without advertising clause)',
+	tags                        => [ 'family:bsd', 'type:unversioned' ],
 
 	'pat.alt.subject.license.scope.multisection' =>
 		"$P{repro_copr_cond_discl}$F$EE$BB$P{nopromo_neither}",
@@ -429,7 +642,8 @@ $RE{bsd_4_clause} = {
 	'caption.alt.org.tldr' => '4-Clause BSD',
 	'caption.alt.org.wikipedia.bsd' =>
 		'4-clause license (original "BSD License")',
-	tags => [ 'family:bsd', 'type:unversioned' ],
+	'caption.alt.misc.qemu' => 'BSD Licence (with advertising clause)',
+	tags                    => [ 'family:bsd', 'type:unversioned' ],
 
 	'pat.alt.subject.license.scope.sentence' => $P{ad_mat_ack_this},
 };
@@ -448,7 +662,8 @@ $RE{bsl} = {
 	'caption.alt.org.fedora.web.mit'    => 'Thrift variant',
 	'iri.alt.org.wikipedia' =>
 		'https://en.wikipedia.org/wiki/Boost_Software_License#License',
-	tags => ['type:versioned:decimal'],
+	'caption.alt.misc.british' => 'Boost Software Licence',
+	tags                       => ['type:versioned:decimal'],
 
 # FIXME
 	'_pat.alt.subject.name' => [
@@ -466,6 +681,7 @@ $RE{bsl_1} = {
 	'caption.alt.misc.mixedcase'   => 'boost Software License, Version 1.0',
 	'caption.alt.org.tldr'         => 'Boost Software License 1.0 (BSL-1.0)',
 	'caption.alt.org.facebook'     => 'Thrift Software License',
+	'caption.alt.misc.british'     => 'Boost Software Licence 1.0',
 	iri                            => 'http://www.boost.org/LICENSE_1_0.txt',
 	'iri.alt.org.facebook.archive.20070630190325' =>
 		'http://developers.facebook.com/thrift/',
@@ -565,9 +781,11 @@ $RE{cc_by_sa} = {
 =cut
 
 $RE{cc_cc0} = {
-	name              => 'CC0',
-	'name.alt.org.cc' => 'zero',
-	caption           => 'Creative Commons CC0 Public License',
+	name                        => 'CC0',
+	'name.alt.org.cc'           => 'zero',
+	caption                     => 'Creative Commons CC0 Public License',
+	'caption.alt.misc.american' => 'CC0 License',
+	'caption.alt.misc.british'  => 'CC0 Licence',
 	'iri.alt.org.wikipedia' =>
 		'https://en.wikipedia.org/wiki/Creative_Commons_license#Zero_/_public_domain',
 	tags => [ 'family:cc', 'type:versioned:decimal' ],
@@ -641,6 +859,20 @@ $RE{cecill} = {
 		'(?:la )?licence CeCILL',
 	],
 	'pat.alt.subject.name.misc.short' => 'CeCILL',
+	'pat.alt.subject.grant.scope.line.scope.sentence.version.none(en)' =>
+		'governed by the CeCILL  ?license',
+	'pat.alt.subject.grant.scope.line.scope.sentence.version.none(fr)' =>
+		'Ce logiciel est r[é]gi par la licence CeCILL soumise',
+	'_pat.alt.subject.license.scope.line.scope.sentence(en)' => [
+		'Version 1\.1 of 10/26/2004',
+		"Version 2\\.0 dated 2006${D}09${D}05",
+		"Version 2\\.1 dated 2013${D}06${D}21",
+	],
+	'_pat.alt.subject.license.scope.line.scope.sentence(fr)' => [
+		'Version 1 du 21/06/2004',
+		"Version 2\\.0 du 2006${D}09${D}05",
+		"Version 2\\.1 du 2013${D}06${D}21",
+	],
 };
 
 $RE{cecill_1} = {
@@ -656,6 +888,7 @@ $RE{cecill_1} = {
 		'https://cecill.info/licences/Licence_CeCILL-V1_VF.pdf',
 	tags => ['type:singleversion:cecill'],
 
+	'pat.alt.subject.name' => "CeCILL(?: License)?${SD}2(?:\.0)?",
 	'pat.alt.subject.license.scope.line.scope.sentence(fr)' =>
 		'Version 1 du 21/06/2004',
 };
@@ -672,6 +905,7 @@ $RE{cecill_1_1} = {
 		'https://cecill.info/licences/Licence_CeCILL-V1.1-VA.pdf',
 	tags => ['type:singleversion:cecill'],
 
+	'pat.alt.subject.name' => "CeCILL(?: License)?${SD}1\.1",
 	'pat.alt.subject.license.scope.line.scope.sentence' =>
 		'Version 1\.1 of 10/26/2004',
 };
@@ -694,6 +928,7 @@ $RE{cecill_2} = {
 		'https://cecill.info/licences/Licence_CeCILL_V2-fr.txt',
 	tags => ['type:singleversion:cecill'],
 
+	'pat.alt.subject.name' => "CeCILL(?: License)?${SD}2(?:\.0)?",
 	'pat.alt.subject.license.scope.line.scope.sentence(en)' =>
 		"Version 2\\.0 dated 2006${D}09${D}05",
 	'pat.alt.subject.license.scope.line.scope.sentence(fr)' =>
@@ -716,6 +951,11 @@ $RE{cecill_2_1} = {
 		'https://cecill.info/licences/Licence_CeCILL_V2.1-fr.txt',
 	tags => ['type:singleversion:cecill'],
 
+	'pat.alt.subject.name' => "CeCILL(?: License)?${SD}2\.1",
+	'pat.alt.subject.grant.scope.line.scope.sentence.version.none(en)' =>
+		'governed by the CeCILL  ?license',
+	'pat.alt.subject.grant.scope.line.scope.sentence.version.none(fr)' =>
+		'Ce logiciel est r[é]gi par la licence CeCILL soumise',
 	'pat.alt.subject.license.scope.line.scope.sentence(en)' =>
 		"Version 2\\.1 dated 2013${D}06${D}21",
 	'pat.alt.subject.license.scope.line.scope.sentence(fr)' =>
@@ -723,6 +963,8 @@ $RE{cecill_2_1} = {
 };
 
 =item * cecill_b
+
+=item * cecill_b_1
 
 =cut
 
@@ -741,6 +983,37 @@ $RE{cecill_b} = {
 	tags => ['type:versioned:decimal'],
 
 	'pat.alt.subject.name.misc.short' => "CeCILL${D}B",
+	'pat.alt.subject.grant.scope.line.scope.sentence(en)' =>
+		'governed by the CeCILL-B license',
+	'pat.alt.subject.grant.scope.line.scope.sentence(fr)' =>
+		'Ce logiciel est r[é]gi par la licence CeCILL-B soumise',
+	'pat.alt.subject.license.scope.line.scope.sentence(en)' =>
+		'The exercising of this freedom is conditional upon a strong',
+	'pat.alt.subject.license.scope.line.scope.sentence(fr)' =>
+		'aux utilisateurs une tr[è]s large libert[é] de',
+};
+
+$RE{cecill_b_1} = {
+	name                => 'CECILL-B-1.0',
+	'name.alt.org.spdx' => 'CECILL-B',
+	caption             => 'CeCILL-B License 1.0',
+	'caption.alt.org.inria(en)' =>
+		'CeCILL-B FREE SOFTWARE LICENSE AGREEMENT Version 1.0',
+	'caption.alt.org.inria(fr)' =>
+		'CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL-B Version 1.0',
+	'iri(en)' => 'https://cecill.info/licences/Licence_CeCILL-B_V1-en.html',
+	'iri(fr)' => 'https://cecill.info/licences/Licence_CeCILL-B_V1-en.html',
+	'iri.alt.format.txt(en)' =>
+		'https://cecill.info/licences/Licence_CeCILL-B_V1-en.txt',
+	'iri.alt.format.txt(fr)' =>
+		'https://cecill.info/licences/Licence_CeCILL-B_V1-fr.txt',
+	tags => ['type:singleversion:cecill_b'],
+
+	'pat.alt.subject.name' => "CeCILL${D}B(?: License)?(?:${SD}1(?:\.0)?)?",
+	'pat.alt.subject.grant.scope.line.scope.sentence(en)' =>
+		'governed by the CeCILL-B license',
+	'pat.alt.subject.grant.license.scope.line.scope.sentence(fr)' =>
+		'Ce logiciel est r[é]gi par la licence CeCILL-B soumise',
 	'pat.alt.subject.license.scope.line.scope.sentence(en)' =>
 		'The exercising of this freedom is conditional upon a strong',
 	'pat.alt.subject.license.scope.line.scope.sentence(fr)' =>
@@ -749,8 +1022,11 @@ $RE{cecill_b} = {
 
 =item * cecill_c
 
+=item * cecill_c_1
+
 =cut
 
+# TODO: synthesize patterns (except name) from cecill_c_1: they are all duplicates
 $RE{cecill_c} = {
 	name                        => 'CECILL-C',
 	caption                     => 'CeCILL-C License',
@@ -763,6 +1039,63 @@ $RE{cecill_c} = {
 
 	'pat.alt.subject.name(fr)' =>
 		"CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL${D}C",
+	'pat.alt.subject.name.misc.short'                      => "CeCILL${D}C",
+	'_pat.alt.subject.grant.scope.line.scope.sentence(en)' => [
+		'under the terms of the CeCILL-C license',
+		'governed by the CeCILL-C license',
+	],
+	'pat.alt.subject.grant.scope.line.scope.sentence(fr)' =>
+		'Ce logiciel est r[é]gi par la licence CeCILL-C soumise',
+	'_pat.alt.subject.license.scope.line.scope.sentence(en)' => [
+		'The exercising of this right is conditional upon the obligation',
+		'the Software modified or not;',
+	],
+	'_pat.alt.subject.license.scope.line.scope.sentence(fr)' => [
+		'aux utilisateurs la libert[é] de modifier et',
+		'Logiciel modifi[é] ou non;',
+	],
+	'pat.alt.subject.license(en)' =>
+		"the Software modified or not;$EE${BB}to ensure that use of",
+	'pat.alt.subject.license(fr)' =>
+		"Logiciel modifi[é] ou non;$EE${BB}[à] faire en sorte que",
+};
+
+$RE{cecill_c_1} = {
+	name                => 'CECILL-C-1.0',
+	'name.alt.org.spdx' => 'CECILL-C',
+	caption             => 'CeCILL-C License 1.0',
+	'caption.alt.org.inria(en)' =>
+		'CeCILL-C FREE SOFTWARE LICENSE AGREEMENT Version 1.0',
+	'caption.alt.org.inria(fr)' =>
+		'CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL-C Version 1.0',
+	'iri(en)' => 'https://cecill.info/licences/Licence_CeCILL-C_V1-en.html',
+	'iri(fr)' => 'https://cecill.info/licences/Licence_CeCILL-C_V1-fr.html',
+	'iri.alt.format.txt(en)' =>
+		'https://cecill.info/licences/Licence_CeCILL-C_V1-en.txt',
+	'iri.alt.format.txt(fr)' =>
+		'https://cecill.info/licences/Licence_CeCILL-C_V1-fr.txt',
+	tags => ['type:singleversion:cecill_c'],
+
+	'pat.alt.subject.name.misc.short' =>
+		"CeCILL${D}C(?: License)?(?:${SD}1(?:\.0)?)?",
+	'_pat.alt.subject.grant.scope.line.scope.sentence(en)' => [
+		'under the terms of the CeCILL-C license',
+		'governed by the CeCILL-C license',
+	],
+	'pat.alt.subject.grant.scope.line.scope.sentence(fr)' =>
+		'Ce logiciel est r[é]gi par la licence CeCILL-C soumise',
+	'_pat.alt.subject.license.scope.line.scope.sentence(en)' => [
+		'The exercising of this right is conditional upon the obligation',
+		'the Software modified or not;',
+	],
+	'_pat.alt.subject.license.scope.line.scope.sentence(fr)' => [
+		'aux utilisateurs la libert[é] de modifier et',
+		'Logiciel modifi[é] ou non;',
+	],
+	'pat.alt.subject.license.scope.all(en)' =>
+		"the Software modified or not;$EE${BB}to ensure that use of",
+	'pat.alt.subject.license.scope.all(fr)' =>
+		"Logiciel modifi[é] ou non;$EE${BB}[à] faire en sorte que",
 };
 
 =item * cube
@@ -819,10 +1152,11 @@ $RE{epl} = {
 	'name.alt.org.wikidata'     => 'Q1281977',
 	caption                     => 'Eclipse Public License',
 	'caption.alt.org.wikipedia' => 'Eclipse Public License',
+	'caption.alt.misc.british'  => 'Eclipse Public Licence',
 	tags                        => ['type:versioned:decimal'],
 
 	'_pat.alt.subject.name' => [
-		"$the?Eclipse Public License(?: \\(EPL\\))?",
+		"$the?Eclipse Public Licen[cs]e(?: \\(EPL\\))?",
 		"${the}EPL\\b",
 	],
 };
@@ -913,13 +1247,14 @@ $RE{ftl} = {
 =cut
 
 $RE{gfdl} = {
-	name               => 'GFDL',
-	'name.alt.org.gnu' => 'FDL',
-	caption            => 'GNU Free Documentation License',
-	tags               => ['type:versioned:decimal'],
+	name                       => 'GFDL',
+	'name.alt.org.gnu'         => 'FDL',
+	caption                    => 'GNU Free Documentation License',
+	'caption.alt.misc.british' => 'GNU Free Documentation Licence',
+	tags                       => ['type:versioned:decimal'],
 
 	'_pat.alt.subject.name' => [
-		"$the?$gnu?Free Documentation License(?: \\(GFDL\\))?$by_fsf?",
+		"$the?$gnu?Free Documentation Licen[cs]e(?: \\(GFDL\\))?$by_fsf?",
 		"$the$gnu?GFDL",
 		"${gnu}GFDL",
 	],
@@ -932,12 +1267,14 @@ $RE{gfdl} = {
 $RE{gfdl_niv} = {
 	name    => 'GFDL-NIV',
 	caption => 'GNU Free Documentation License (no invariant sections)',
+	'caption.alt.misc.british' =>
+		'GNU Free Documentation Licence (no invariant sections)',
 	summary =>
 		'GNU Free Documentation License, with no Front-Cover or Back-Cover Texts or Invariant Sections',
 	tags => ['type:versioned:decimal'],
 
 	'_pat.alt.subject.name' => [
-		"$the?$gnu?Free Documentation License(?: \\(GFDL\\))?$by_fsf?[,;]? $niv",
+		"$the?$gnu?Free Documentation Licen[cs]e(?: \\(GFDL\\))?$by_fsf?[,;]? $niv",
 		"$the$gnu?GFDL${D}NIV",
 		"${gnu}GFDL${D}NIV",
 	],
@@ -958,6 +1295,7 @@ $RE{gpl} = {
 	'caption.alt.org.osi'          => 'GNU General Public License',
 	'caption.alt.org.osi.alt.list' => 'GNU General Public License (GPL)',
 	'caption.alt.org.wikipedia'    => 'GNU General Public License',
+	'caption.alt.misc.british'     => 'GNU General Public Licence',
 	tags                           => ['type:versioned:decimal'],
 
 	'.default_pat' => 'name',
@@ -984,6 +1322,7 @@ $RE{isc} = {
 	'caption.alt.misc.openbsd'     => 'OpenBSD License',
 	'caption.alt.org.tldr'         => 'ISC License',
 	'caption.alt.org.wikipedia'    => 'ISC license',
+	'caption.alt.misc.british'     => 'ISC licence',
 	tags                           => [ 'family:mit', 'type:unversioned' ],
 
 	'pat.alt.subject.license.scope.multisection' =>
@@ -1026,7 +1365,9 @@ $RE{json} = {
 
 $RE{jython} = {
 	name                        => 'Jython',
+	'name.alt.org.spdx'         => 'CNRI-Jython',
 	caption                     => 'Jython License',
+	'caption.alt.org.spdx'      => 'CNRI Jython License',
 	'caption.alt.legal.license' => 'The Jython License',
 	iri                         => 'http://www.jython.org/license.txt',
 	tags                        => ['type:unversioned'],
@@ -1066,15 +1407,16 @@ $RE{lgpl} = {
 	'caption.alt.org.osi'       => 'GNU LGPL',
 	'caption.alt.org.osi.alt.list' =>
 		'GNU Lesser General Public License (LGPL)',
-	tags => ['type:versioned:decimal'],
+	'caption.alt.misc.british' => 'GNU Lesser General Public Licence',
+	tags                       => ['type:versioned:decimal'],
 
 	'.default_pat' => 'name',
 
 	'_pat.alt.subject.name' => [
 		"$the?$gnu?Library $gpl(?: \\(LGPL\\))?$by_fsf?",
 		"$the?$gnu?Lesser(?: \\(Library\\))? $gpl(?: \\(LGPL\\))?$by_fsf?",
-		"$the?$gnu?LIBRARY GENERAL PUBLIC LICENSE(?: \\(LGPL\\))?$by_fsf?",
-		"$the?$gnu?LESSER GENERAL PUBLIC LICENSE(?: \\(LGPL\\))?$by_fsf?",
+		"$the?$gnu?LIBRARY GENERAL PUBLIC LICEN[CS]E(?: \\(LGPL\\))?$by_fsf?",
+		"$the?$gnu?LESSER GENERAL PUBLIC LICEN[CS]E(?: \\(LGPL\\))?$by_fsf?",
 		"$the$gnu?LGPL",
 		"${gnu}LGPL",
 	],
@@ -1253,6 +1595,7 @@ $RE{mit_new} = {
 	'caption.alt.org.osi'            => 'The MIT License',
 	'caption.alt.org.osi.alt.list'   => 'MIT license (MIT)',
 	'caption.alt.org.tldr'           => 'MIT License (Expat)',
+	'caption.alt.misc.british'       => 'MIT licence',
 	iri                     => 'http://www.jclark.com/xml/copying.txt',
 	'iri.alt.org.wikipedia' => 'https://en.wikipedia.org/wiki/MIT_License',
 	tags                    => [ 'family:mit', 'type:unversioned' ],
@@ -1350,11 +1693,12 @@ $RE{mpl} = {
 	'name.alt.org.wikidata'  => 'Q308915',
 	caption                  => 'Mozilla Public License',
 	'name.alt.org.wikipedia' => 'Mozilla Public License',
+	'name.alt.misc.british'  => 'Mozilla Public Licence',
 	iri                      => 'https://www.mozilla.org/MPL',
 	tags                     => ['type:versioned:decimal'],
 
 	'_pat.alt.subject.name' => [
-		"$the?Mozilla Public License(?: \\($Q?(?:https?:?//mozilla.org/)?MPL$Q?\\))?(?: (?:as )?published by $the\{0,2}Mozilla Foundation)?",
+		"$the?Mozilla Public Licen[cs]e(?: \\($Q?(?:https?:?//mozilla.org/)?MPL$Q?\\))?(?: (?:as )?published by $the\{0,2}Mozilla Foundation)?",
 		"${the}MPL\\b",
 	],
 };
@@ -1441,14 +1785,15 @@ $RE{ntp_disclaimer} = {
 =cut
 
 $RE{ofl} = {
-	name    => 'OFL',
-	caption => 'SIL Open Font License',
-	iri     => 'http://scripts.sil.org/OFL',
-	tags    => ['type:versioned:decimal'],
+	name                       => 'OFL',
+	caption                    => 'SIL Open Font License',
+	'caption.alt.misc.british' => 'SIL Open Font Licence',
+	iri                        => 'http://scripts.sil.org/OFL',
+	tags                       => ['type:versioned:decimal'],
 
 	'_pat.alt.subject.name' => [
-		"$the?(?:SIL )?OPEN FONT LICENSE(?: \\(OFL\\))?",
-		"$the?(?:SIL )?[Oo]pen [Ff]ont [Ll]icense(?: \\(OFL\\))?",
+		"$the?(?:SIL )?OPEN FONT LICEN[CS]E(?: \\(OFL\\))?",
+		"$the?(?:SIL )?[Oo]pen [Ff]ont [Ll]icen[cs]e(?: \\(OFL\\))?",
 	],
 };
 
@@ -1457,11 +1802,12 @@ $RE{ofl} = {
 =cut
 
 $RE{openssl} = {
-	name                   => 'OpenSSL',
-	'name.alt.org.spdx'    => 'OpenSSL',
-	caption                => 'OpenSSL License',
-	'caption.alt.org.tldr' => 'OpenSSL License (OpenSSL)',
-	tags                   => ['type:unversioned'],
+	name                       => 'OpenSSL',
+	'name.alt.org.spdx'        => 'OpenSSL',
+	caption                    => 'OpenSSL License',
+	'caption.alt.org.tldr'     => 'OpenSSL License (OpenSSL)',
+	'caption.alt.misc.british' => 'OpenSSL Licence',
+	tags                       => ['type:unversioned'],
 
 	'pat.alt.subject.license.scope.multisection' =>
 		"$P{redist_ack_this} the OpenSSL Project for use in the OpenSSL Toolkit \\(${HT}www\\.openssl\\.org/\\)$Q$EE"
@@ -1486,6 +1832,7 @@ $RE{postgresql} = {
 	'caption.alt.org.fedora.web'     => 'PostgreSQL License',
 	'caption.alt.org.fedora.web.mit' => 'PostgreSQL License (MIT Variant)',
 	'caption.alt.org.tldr'           => 'PostgreSQL License (PostgreSQL)',
+	'caption.alt.misc.british'       => 'PostgreSQL Licence',
 	tags                             => [ 'family:mit', 'type:unversioned' ],
 
 	'pat.alt.subject.license.scope.line.scope.sentence' =>
@@ -1577,16 +1924,19 @@ $RE{qpl} = {
 	'name.alt.org.wikidata'     => 'Q1396282',
 	caption                     => 'Q Public License',
 	'caption.alt.org.wikipedia' => 'Q Public License',
+	'caption.alt.misc.british'  => 'Q Public Licence',
 	tags                        => ['type:versioned:decimal'],
 
 	'_pat.alt.subject.name' => [
-		"$the?Q Public License(?: \\(QPL\\))?",
-		"$the?Q PUBLIC LICENSE(?: \\(QPL\\))?",
+		"$the?Q Public Licen[cs]e(?: \\(QPL\\))?",
+		"$the?Q PUBLIC LICEN[CS]E(?: \\(QPL\\))?",
 		"${the}QPL\\b",
 	],
 };
 
 =item * rpsl
+
+=item * rpsl_1
 
 =cut
 
@@ -1598,6 +1948,22 @@ $RE{rpsl} = {
 	tags                        => ['type:versioned:decimal'],
 
 	'pat.alt.subject.name' => "$the?RealNetworks Public Source License",
+};
+
+$RE{rpsl_1} = {
+	name                  => 'RPSL-1.0',
+	'name.alt.org.osi'    => 'RPSL-1.0',
+	'name.alt.org.spdx'   => 'RPSL-1.0',
+	caption               => 'RealNetworks Public Source License 1.0',
+	'caption.alt.org.osi' => 'RealNetworks Public Source License V1.0',
+	'caption.alt.legal.license' =>
+		'RealNetworks Public Source License Version 1.0',
+	'caption.alt.org.tldr' =>
+		'RealNetworks Public Source License v1.0 (RPSL-1.0)',
+	tags => ['type:singleversion:rpsl'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		"General Definitions$F This License applies to any program or other work",
 };
 
 =item * sgi_b
@@ -1648,6 +2014,10 @@ $RE{unicode_tou} = {
 
 =item * wtfpl
 
+=item * wtfpl_1
+
+=item * wtfpl_2
+
 =cut
 
 $RE{wtfpl} = {
@@ -1664,10 +2034,73 @@ $RE{wtfpl} = {
 	tags                       => ['type:versioned:decimal'],
 
 	'_pat.alt.subject.name' => [
-		"$the?[Dd]o What The Fuck [Yy]ou [Ww]ant [Tt]o Public License",
-		"DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE(?: \\(WTFPL\\))?",
+		"$the?[Dd]o What The F(?:u|${B})ck [Yy]ou [Ww]ant(?: [Tt]o)? Public License(?: \\(WTFPL\\))?",
+		"$the?DO WHAT THE F(?:U|${B})CK YOU WANT(?: TO)? PUBLIC LICENSE(?: \\(WTFPL\\))?",
 		"${the}WTFPL\\b",
 	],
+	'pat.alt.subject.license.scope.sentence' =>
+		"[Yy]ou just${EE}DO WHAT THE FUCK YOU WANT TO$F",
+};
+
+$RE{wtfpl_1} = {
+	name    => 'WTFPL-1.0',
+	caption => 'Do What The Fuck You Want To Public License, Version 1',
+	'caption.alt.org.tldr' =>
+		'Do What The F*ck You Want To Public License (WTFPL)',
+	iri  => 'http://cvs.windowmaker.org/co.php/wm/COPYING.WTFPL',
+	tags => ['type:singleversion:wtfpl'],
+
+	'pat.alt.subject.license.scope.sentence' =>
+		"simple and you just${EE}DO WHAT THE FUCK YOU WANT TO$F",
+};
+
+$RE{wtfpl_2} = {
+	name                           => 'WTFPL-2',
+	'name.alt.org.tldr.path.short' => 'wtfpl',
+	caption => 'Do What The Fuck You Want To Public License, Version 2',
+	'caption.alt.legal.license' =>
+		'DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2',
+	'caption.alt.org.tldr' =>
+		'Do What The F*ck You Want To Public License v2 (WTFPL-2.0)',
+	iri                => 'http://www.wtfpl.net/',
+	'iri.alt.misc.old' => 'http://sam.zoy.org/wtfpl/COPYING',
+	tags               => ['type:singleversion:wtfpl'],
+
+	'pat.alt.subject.grant.scope.line.scope.sentence' =>
+		'of the Do What The Fuck You Want To Public License',
+	'pat.alt.subject.license.scope.sentence' =>
+		"${BB}You just${EE}DO WHAT THE FUCK YOU WANT TO$F",
+};
+
+=item * wtfnmfpl
+
+=item * wtfnmfpl_1
+
+=cut
+
+$RE{wtfnmfpl} = {
+	name => 'WTFNMFPL',
+	'caption.alt.org.tldr' =>
+		"Do What The Fuck You Want To But It's Not My Fault Public License v1 (WTFNMFPL-1.0)",
+	tags => ['type:versioned:decimal'],
+};
+
+$RE{wtfnmfpl_1} = {
+	name                  => 'WTFNMFPL-1.0',
+	'name.alt.misc.short' => 'WTFNMFPLv1',
+	caption =>
+		"Do What The Fuck You Want To But It's Not My Fault Public License v1",
+	'caption.alt.legal.license' =>
+		"DO WHAT THE FUCK YOU WANT TO BUT IT'S NOT MY FAULT PUBLIC LICENSE, Version 1",
+	'caption.alt.org.tldr' =>
+		"Do What The Fuck You Want To But It's Not My Fault Public License v1 (WTFNMFPL-1.0)",
+	iri =>
+		'http://www.adversary.org/wp/2013/10/14/do-what-the-fuck-you-want-but-its-not-my-fault/',
+	'iri.alt.web.github' => 'https://github.com/adversary-org/wtfnmf',
+	tags                 => ['type:singleversion:wtfnmfpl'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		'Do not hold the author\(s\), creator\(s\), developer\(s\) or distributor\(s\)',
 };
 
 =item * zlib
@@ -1730,7 +2163,7 @@ $RE{any_of} = {
 	tags    => ['type:trait'],
 
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
-		'(?P<_any_of>(?:any|one or more) of the following(?: licenses(?: at your choice)?)?)[.:]? ?',
+		'(?P<_any_of>(?:any|one or more) of the following(?: licen[cs]es(?: at your choice)?)?)[.:]? ?',
 };
 
 =item * clause_retention
@@ -1808,6 +2241,18 @@ $RE{'fsf_unlimited_retention'} = {
 	'pat.alt.subject.trait.scope.sentence' => $fsf_ullr,
 };
 
+=item * license_label
+
+=cut
+
+$RE{license_label} = {
+	caption => 'license grant "License:" phrase',
+	tags    => ['type:trait'],
+
+	'pat.alt.subject.trait.scope.line.scope.sentence' =>
+		"(?P<_license_label>[Ll]icen[sc]e|[Ii]dentifier)$CQ",
+};
+
 =item * licensed_under
 
 =cut
@@ -1818,9 +2263,10 @@ $RE{licensed_under} = {
 
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
 		'(?P<_licensed_under>(?:[Ll]icen[sc]ed|[Dd]istribut(?:able|ed)|permitted|provided|[Pp]ublished|[Rr]eleased?) under'
-		. '|(?:in form of source code|may be copied|placed their code|to you) under' # sloppy - may need to include granting keyword
-		. '|(?:[Tt]his|[Mm]y) (?:software|file|work) is under'                       # vague descriptor - object included
+		. '|(?:in form of source code|may be copied|placed their code|to [Yy]ou) under' # sloppy - may need to include granting keyword
+		. '|(?:[Tt]his|[Mm]y) (?:software|file|work) is under'                          # vague descriptor - object included
 		. '|Use modification and distribution are subject to'
+		. '|is covered by'
 		. '|(?:(?:according|subject) to|as governed by|[Uu]nder) the (?:conditions|terms) of) ',
 };
 
@@ -1921,25 +2367,25 @@ $RE{'version_prefix'} = {
 	tags    => ['type:trait'],
 
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
-		"(?:$D|[,;]?(?: (?:only |either )?)?|$DD)?\\(?(?:[Vv]ersion |VERSION |[Vv]\\.? ?)?",
+		"(?:$D|[,;]?(?: (?:only |either )?)?|$DD)?\\(?(?:[Vv]ersion [Vv]?|VERSION |[Vv]\\.? ?)?",
 	'pat.alt.subject.trait.scope.paragraph' =>
-		":?$E\\(?(?:Version |VERSION )?",
+		":?$E\\(?(?:Version [Vv]?|VERSION )?",
 	'pat.alt.subject.trait' =>
-		"(?:$D|[,;](?: (?:either )?)?|$DD|:?$E)?\\(?(?:[Vv]ersion |VERSION |[Vv]\\.? ?)?",
+		"(?:$D|[,;](?: (?:either )?)?|$DD|:?$E)?\\(?(?:[Vv]ersion [Vv]?|VERSION |[Vv]\\.? ?)?",
 };
 
 $RE{version_numberstring}{'pat.alt.subject.trait.scope.line.scope.sentence'}
 	= $RE{version_prefix}{'pat.alt.subject.trait.scope.line.scope.sentence'}
 	. $RE{version_number}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	. '(?:(?: of the)? License)?';
+	. '(?:(?: of the)? Licen[cs]e)?';
 $RE{version_numberstring}{'pat.alt.subject.trait.scope.paragraph'}
 	= $RE{version_prefix}{'pat.alt.subject.trait.scope.paragraph'}
 	. $RE{version_number}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	. '(?:(?: of the)? License)?';
+	. '(?:(?: of the)? Licen[cs]e)?';
 $RE{version_numberstring}{'pat.alt.subject.trait'}
 	= $RE{version_prefix}{'pat.alt.subject.trait'}
 	. $RE{version_number}{'pat.alt.subject.trait.scope.line.scope.sentence'}
-	. '(?:(?: of the)? License)?';
+	. '(?:(?: of the)? Licen[cs]e)?';
 
 $RE{version}{'pat.alt.subject.trait.scope.line.scope.sentence'}
 	= '(?P<_version>'
@@ -2006,6 +2452,9 @@ $RE{'bsd'} = {
 	caption                     => 'BSD license',
 	'caption.alt.org.debian'    => 'BSD (unspecified)',
 	'caption.alt.org.wikipedia' => 'BSD licenses',
+	'caption.alt.misc.long'     => 'Berkeley Software Distribution License',
+	'caption.alt.misc.british'  => 'BSD licence',
+	'caption.alt.misc.british2' => 'Berkeley Software Distribution Licence',
 	summary                     => 'a BSD-style license',
 	tags                        => ['type:group'],
 
@@ -2018,11 +2467,12 @@ $RE{'bsd'} = {
 =cut
 
 $RE{'gnu'} = {
-	name                  => 'AGPL/GPL/LGPL',
-	'name.alt.org.debian' => 'GNU~unspecified',
-	caption               => 'GNU license',
-	summary               => 'a GNU license (AGPL or GPL or LGPL)',
-	tags                  => ['type:group'],
+	name                       => 'AGPL/GPL/LGPL',
+	'name.alt.org.debian'      => 'GNU~unspecified',
+	caption                    => 'GNU license',
+	'caption.alt.misc.british' => 'GNU licence',
+	summary                    => 'a GNU license (AGPL or GPL or LGPL)',
+	tags                       => ['type:group'],
 
 	'_pat.alt.subject.name' => [
 		$RE{agpl}{'_pat.alt.subject.name'},
@@ -2036,15 +2486,16 @@ $RE{'gnu'} = {
 =cut
 
 $RE{'mit'} = {
-	name                      => 'MIT',
-	'name.alt.org.debian'     => 'MIT~unspecified',
-	'name.alt.org.fedora.web' => 'MIT',
-	'name.alt.org.wikidata'   => 'Q334661',
-	caption                   => 'MIT license',
-	'name.alt.org.wikipedia'  => 'MIT License',
-	'iri.alt.org.wikipedia'   => 'https://en.wikipedia.org/wiki/MIT_License',
-	summary                   => 'an MIT-style license',
-	tags                      => ['type:group'],
+	name                        => 'MIT',
+	'name.alt.org.debian'       => 'MIT~unspecified',
+	'name.alt.org.fedora.web'   => 'MIT',
+	'name.alt.org.wikidata'     => 'Q334661',
+	caption                     => 'MIT license',
+	'caption.alt.org.wikipedia' => 'MIT License',
+	'caption.alt.misc.british'  => 'MIT Licence',
+	'iri.alt.org.wikipedia' => 'https://en.wikipedia.org/wiki/MIT_License',
+	summary                 => 'an MIT-style license',
+	tags                    => ['type:group'],
 
 	'pat.alt.subject.name' => "${the}MIT\\b",
 };
@@ -2304,7 +2755,7 @@ for my $id (@_OBJECTS) {
 			if ($pat);
 	}
 
-	# synthesize subject pattern name from metadata caption
+	# synthesize subject pattern name from metadata name and caption
 	unless ( $RE{$id}{'_pat.alt.subject.name.synth.caption'}
 		or $_TYPE{$id} eq 'trait' )
 	{
@@ -2318,6 +2769,7 @@ for my $id (@_OBJECTS) {
 			keys %{ $RE{$id} }
 			)
 		{
+			s/([()])/\\$1/g;
 			unless (/ /) {
 				s/^(?:\\b)?/\\b/;
 				s/(?:\\b)?$/\\b/;
@@ -2326,10 +2778,56 @@ for my $id (@_OBJECTS) {
 			s/(?: [Ll]icense)/\(?: \[Ll\]icense\)?/;
 			s/,/,?/g;
 			s/ - /${DD}/g;
+			if (/$RE{version}{'pat.alt.subject.trait.scope.line.scope.sentence'}$/
+				)
+			{
+				my $pos = $-[0];
+				substr( $_, $pos )
+					= $RE{version_prefix}
+					{'pat.alt.subject.trait.scope.line.scope.sentence'} . $2
+					=~ s/\.0$/\(?:\\.0\)?/r . '(?:[^\d.]|\.\D|\.\z|\z)';
+			}
 			push @pat, $_;
 		}
 		push @{ $RE{$id}{'_pat.alt.subject.name.synth.caption'} }, @pat
 			if (@pat);
+	}
+
+# synthesize subject pattern grant from metadata name and subject pattern name
+# TODO: maybe include also subject pattern iri
+# TODO: separately synthesize SPDX-License-Identifier
+	unless ( $RE{$id}{'_pat.alt.subject.grant.synth.name'}
+		or $_TYPE{$id} eq 'trait' )
+	{
+		my %pat;
+		for (
+			grep { !/-\(/ }
+			grep { !/,[_~]/ }
+			map  { $RE{$id}{$_} }
+			grep { !/^name\.alt\.org\.wikidata(?:$_delim|\z)/ }
+			grep {/^name(?:$_delim|\z)/}
+			keys %{ $RE{$id} }
+			)
+		{
+			$_ = quotemeta;
+			s/\\-/$D/g;
+			if (/\d$/) {
+				s/\\\.0$/\(?:\\.0\)?/;
+				$_ .= '(?:[^\d.]|\.\D|\.\z|\z)';
+			}
+			else {
+				$_ .= '(?:[\s]|\z)';
+			}
+			$pat{$_} = 1;
+		}
+		if ( $RE{$id}{'_pat.alt.subject.name.synth.caption'} ) {
+			$pat{$_} = 1
+				for @{ $RE{$id}{'_pat.alt.subject.name.synth.caption'} };
+		}
+		$RE{$id}{'_pat.alt.subject.grant.synth.name'}
+			= $RE{license_label}
+			{'pat.alt.subject.trait.scope.line.scope.sentence'} . ' ?'
+			. _join_pats( keys %pat );
 	}
 
 	# synthesize subject pattern grant from subject pattern name

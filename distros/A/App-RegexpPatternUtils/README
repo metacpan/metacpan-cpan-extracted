@@ -2,8 +2,8 @@ NAME
     App::RegexpPatternUtils - CLI utilities related to Regexp::Pattern
 
 VERSION
-    This document describes version 0.003 of App::RegexpPatternUtils (from
-    Perl distribution App-RegexpPatternUtils), released on 2018-03-21.
+    This document describes version 0.004 of App::RegexpPatternUtils (from
+    Perl distribution App-RegexpPatternUtils), released on 2020-01-03.
 
 SYNOPSIS
 DESCRIPTION
@@ -15,7 +15,150 @@ DESCRIPTION
 
     *   list-regexp-pattern-patterns
 
+    *   match-with-regexp-pattern
+
+    *   rpgrep
+
     *   show-regexp-pattern-module
+
+FUNCTIONS
+  get_regexp_pattern_pattern
+    Usage:
+
+     get_regexp_pattern_pattern(%args) -> [status, msg, payload, meta]
+
+    Get a Regexp::Pattern::* pattern.
+
+    Examples:
+
+    *   Example #1:
+
+         get_regexp_pattern_pattern(pattern => "YouTube/video_id"); # -> "(?^:[A-Za-z0-9_-]{11})"
+
+    *   Generate variant A of Example::re3:
+
+         get_regexp_pattern_pattern( pattern => "Example::re3", gen_args => { variant => "A" }); # -> "(?^:\\d{3}-\\d{3})"
+
+    *   Generate variant B of Example::re3:
+
+         get_regexp_pattern_pattern( pattern => "Example::re3", gen_args => { variant => "B" });
+
+        Result:
+
+         "(?^:\\d{3}-\\d{2}-\\d{5})"
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   gen_args => *hash*
+
+        Supply generator arguments.
+
+        If pattern is a dynamic pattern (generated on-demand) and the
+        generator requires some arguments, you can supply them here.
+
+    *   pattern* => *regexppattern::name*
+
+        Name of pattern, with module prefix but without the
+        'Regexp::Pattern'.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_regexp_pattern_modules
+    Usage:
+
+     list_regexp_pattern_modules() -> [status, msg, payload, meta]
+
+    List all installed Regexp::Pattern::* modules.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  match_with_regexp_pattern
+    Usage:
+
+     match_with_regexp_pattern(%args) -> [status, msg, payload, meta]
+
+    Match a string against a Regexp::Pattern pattern.
+
+    Examples:
+
+    *   A non-match:
+
+         match_with_regexp_pattern(pattern => "YouTube/video_id", string => "foo");
+
+        Result:
+
+         "String DOES NOT match regexp pattern YouTube::video_id"
+
+    *   A match:
+
+         match_with_regexp_pattern(pattern => "YouTube/video_id", string => "Yb4EGj4_uS0");
+
+        Result:
+
+         "String matches regexp pattern YouTube::video_id"
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   anchor => *bool*
+
+        Generate an anchored version of the pattern.
+
+    *   captures => *bool*
+
+        Return array of captures instead of just a boolean status.
+
+    *   gen_args => *hash*
+
+        Supply generator arguments.
+
+        If pattern is a dynamic pattern (generated on-demand) and the
+        generator requires some arguments, you can supply them here.
+
+    *   pattern* => *regexppattern::name*
+
+        Name of pattern, with module prefix but without the
+        'Regexp::Pattern'.
+
+    *   quiet => *bool*
+
+    *   string* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -33,11 +176,16 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
+SEE ALSO
+    get-regexp-pattern-pattern.
+
+    rpgrep.
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

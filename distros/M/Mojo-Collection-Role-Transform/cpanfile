@@ -1,6 +1,6 @@
 requires 'perl', '5.010001';
 
-requires 'Mojolicious';
+requires 'Mojolicious', '7.41';
 requires 'Role::Tiny', '2.000001';
 
 on develop => sub {

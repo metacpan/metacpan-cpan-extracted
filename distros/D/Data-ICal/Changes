@@ -1,5 +1,8 @@
 Revision history for Data-ICal
 
+0.24 2020-01-03
+ - Prevent escaping of semi-colon in GEO field(thanks to Lance Wicks)
+
 0.23 2019-08-14
 
  - Rewrite property folding to be faster (and clearer)(thanks to Calvin Morrison)

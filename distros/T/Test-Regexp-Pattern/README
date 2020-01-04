@@ -2,13 +2,13 @@ NAME
     Test::Regexp::Pattern - Test Regexp::Pattern patterns
 
 VERSION
-    This document describes version 0.005 of Test::Regexp::Pattern (from
-    Perl distribution Test-Regexp-Pattern), released on 2020-01-02.
+    This document describes version 0.006 of Test::Regexp::Pattern (from
+    Perl distribution Test-Regexp-Pattern), released on 2020-01-04.
 
 SYNOPSIS
     To check all regexp patterns in a module:
 
-     use Test::Regexp::Patterns tests=>1;
+     use Test::Regexp::Pattern;
      regexp_patterns_in_module_ok("Foo::Bar", {opt => ...}, $msg);
 
     Alternatively, you can check all regexp patterns in all modules in a
@@ -26,7 +26,8 @@ DESCRIPTION
     patterns. It is recommended that you include something like
     "release-regexp-pattern.t" in your distribution if you add regexp
     patterns to your code. If you use Dist::Zilla to build your
-    distribution, there is [Test::Regexp::Pattern] to make it easy to do so.
+    distribution, there is [Regexp::Pattern] which automatically adds a
+    release test file for this during build.
 
 ACKNOWLEDGEMENTS
     Some code taken from Test::Pod::Coverage by Andy Lester.
@@ -68,7 +69,7 @@ SEE ALSO
 
     Regexp::Pattern
 
-    Dist::Zilla::Plugin::Test::Regexp::Pattern
+    Dist::Zilla::Plugin::Regexp::Pattern
 
 AUTHOR
     perlancar <perlancar@cpan.org>

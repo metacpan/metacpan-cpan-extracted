@@ -2,6 +2,8 @@ package MooTest;
 
 use Moo '1.006000';
 
+use if $ENV{MOOX_CONST_TYPE_TINY}, 'MooX::TypeTiny';
+
 use MooX::Const;
 use Types::Standard -types;
 

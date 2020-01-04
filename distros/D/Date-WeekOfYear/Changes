@@ -1,5 +1,9 @@
 Revision history for Perl extension Date::WeekOfYear.
 
+1.07  2020-01-04
+ - Resolved issue with tests failing. Now pass the full 4 digit year to timelocal() to avoid ambigous date values.
+ - No changes to the actual code
+
 1.06  2014-04-09
  - Allow extended date coverage - past dates handled by localtime - using hash ref argument year, month, day
  - Added mode for ISO 8601 output YYYY-Wxx

@@ -1,0 +1,8 @@
+DONE
+    KNN 2D, Brute Force
+    Python timing
+    MLPerl tests
+    release MLPerl
+
+DOING
+

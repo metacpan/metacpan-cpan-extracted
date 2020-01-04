@@ -65,10 +65,16 @@ for my $option_to_test (@options_to_test) {
     isa_ok $collections, 'Mojo::Collection';
     isa_ok $_, 'Mojo::Collection' for $collections->each;
 
-    $collections = $people_c->collect_by(@options, sub { @{$_}{qw(age favorite_color name)} });
+    my %bob1 = (%$bob, favorite_color => 'turquoise');
+    my %bob2 = (%$bob, favorite_color => 'aqua');
+    my %bob3 = (%$bob, favorit_color  => 'cyan');
+    $collections =
+        c(\%bob1, \%bob2, \%bob3)->with_roles('+Transform')
+                                 ->collect_by(@options, sub { @{$_}{qw(age name favorite_color)} })
+                                 ;
     is_deeply
         $collections,
-        [[$bob], [$alice], [$eve]],
+        [[\%bob1], [\%bob2], [\%bob3]],
         'multiple keys (3) can be returned'
         ;
     isa_ok $collections, 'Mojo::Collection';

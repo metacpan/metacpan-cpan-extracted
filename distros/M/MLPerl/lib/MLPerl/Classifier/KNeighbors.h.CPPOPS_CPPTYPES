@@ -1,0 +1,131 @@
+// [[[ HEADER ]]]
+using std::cout;  using std::cerr;  using std::endl;
+
+#ifndef __CPP__INCLUDED__MLPerl__Classifier__KNeighbors_h
+#define __CPP__INCLUDED__MLPerl__Classifier__KNeighbors_h 0.007_000
+
+// [[[ INCLUDES & OO INHERITANCE INCLUDES ]]]
+#include <RPerl.cpp>  // -> RPerl.h -> (rperltypes_mode.h; rperloperations.h; rperltypes.h; HelperFunctions.cpp)
+#include "MLPerl/Classifier.cpp"
+#include "MLPerl/Classifier/KNeighbors/Neighbor2D.cpp"
+
+# ifdef __PERL__TYPES
+
+Purposefully_die_from_a_compile-time_error,_due_to____PERL__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# elif defined __CPP__TYPES
+
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+
+// [[[ OO INHERITANCE ]]]
+class MLPerl__Classifier__KNeighbors : public MLPerl__Classifier {
+public:
+    // [[[ OO PROPERTIES ]]]
+    string algorithm = "auto";
+    integer leaf_size = 30;
+    string metric = "minkowski";
+    integer n_jobs = 1;
+    integer n_neighbors = 3;
+    integer p = 2;
+    string weights = "uniform";
+    number_arrayref_arrayref train_data;
+    string_arrayref train_classifications;
+
+    // [[[ OO METHODS ]]]
+
+    // <<< OO PROPERTIES, ACCESSORS & MUTATORS >>>
+    string get_algorithm() { return algorithm; }
+    void set_algorithm(string algorithm_new) { algorithm = algorithm_new; }
+
+    integer get_leaf_size() { return leaf_size; }
+    void set_leaf_size(integer leaf_size_new) { leaf_size = leaf_size_new; }
+
+    string get_metric() { return metric; }
+    void set_metric(string metric_new) { metric = metric_new; }
+
+    integer get_n_jobs() { return n_jobs; }
+    void set_n_jobs(integer n_jobs_new) { n_jobs = n_jobs_new; }
+
+    integer get_n_neighbors() { return n_neighbors; }
+    void set_n_neighbors(integer n_neighbors_new) { n_neighbors = n_neighbors_new; }
+
+    integer get_p() { return p; }
+    void set_p(integer p_new) { p = p_new; }
+
+    string get_weights() { return weights; }
+    void set_weights(string weights_new) { weights = weights_new; }
+
+    integer get_train_data_size() { return this->train_data.size(); }  // call from Perl or C++
+    number_arrayref_arrayref get_train_data() { return train_data; }
+    void set_train_data(number_arrayref_arrayref train_data_new) { train_data = train_data_new; }
+    number_arrayref get_train_data_element(integer i) { return train_data[i]; }  // call from C++
+    void set_train_data_element(integer i, number_arrayref value_new) { train_data[i] = value_new; }  // call from C++
+
+    integer get_train_classifications_size() { return this->train_classifications.size(); }  // call from Perl or C++
+    string_arrayref get_train_classifications() { return train_classifications; }
+    void set_train_classifications(string_arrayref train_classifications_new) { train_classifications = train_classifications_new; }
+    string get_train_classifications_element(integer i) { return train_classifications[i]; }  // call from C++
+    void set_train_classifications_element(integer i, string value_new) { train_classifications[i] = value_new; }  // call from C++
+
+
+    // <<< CONSTRUCTOR & DESTRUCTOR >>>
+    MLPerl__Classifier__KNeighbors() {}
+    ~MLPerl__Classifier__KNeighbors() {}
+
+    // <<< CLASS NAME REPORTER >>>
+    virtual string myclassname() { return (const string) "MLPerl::Classifier::KNeighbors"; }
+
+    // <<< USER-DEFINED METHODS >>>
+    void fit(number_arrayref_arrayref train_data, string_arrayref train_classifications);
+    string_arrayref predict_repeat(number_arrayref_arrayref test_data, integer timing_repetitions);
+    string_arrayref predict_repeat_metric_euclidean_weights_uniform(number_arrayref_arrayref test_data, integer timing_repetitions);
+    string_arrayref predict(number_arrayref_arrayref test_data);
+    string_arrayref predict_metric_euclidean_weights_uniform(number_arrayref_arrayref test_data);
+    string predict_single(number_arrayref test_data_single);
+    string predict_single_metric_euclidean_weights_uniform(number_arrayref test_data_single);
+};  // end of class
+
+// [[[ OO SUBCLASSES ]]]
+#define MLPerl__Classifier__KNeighbors_rawptr MLPerl__Classifier__KNeighbors*
+typedef std::unique_ptr<MLPerl__Classifier__KNeighbors> MLPerl__Classifier__KNeighbors_ptr;
+typedef std::vector<MLPerl__Classifier__KNeighbors_ptr> MLPerl__Classifier__KNeighbors_arrayref;
+typedef std::unordered_map<string, MLPerl__Classifier__KNeighbors_ptr> MLPerl__Classifier__KNeighbors_hashref;
+typedef std::unordered_map<string, MLPerl__Classifier__KNeighbors_ptr>::iterator MLPerl__Classifier__KNeighbors_hashref_iterator;
+
+// [[[ OO CONSTRUCTOR WRAPPER CLASS ]]]
+class NEW_MLPerl__Classifier__KNeighbors {
+public:
+    MLPerl__Classifier__KNeighbors_ptr wrapped_object;
+    NEW_MLPerl__Classifier__KNeighbors() : wrapped_object{new MLPerl__Classifier__KNeighbors()} {}
+    MLPerl__Classifier__KNeighbors_ptr&& NEW() { return std::move(wrapped_object); }
+
+    // <<< OO PROPERTIES, INITIALIZERS >>>
+    NEW_MLPerl__Classifier__KNeighbors& algorithm(string algorithm_init) { wrapped_object->algorithm = algorithm_init; return *this; }
+    NEW_MLPerl__Classifier__KNeighbors& leaf_size(integer leaf_size_init) { wrapped_object->leaf_size = leaf_size_init; return *this; }
+    NEW_MLPerl__Classifier__KNeighbors& metric(string metric_init) { wrapped_object->metric = metric_init; return *this; }
+    NEW_MLPerl__Classifier__KNeighbors& n_jobs(integer n_jobs_init) { wrapped_object->n_jobs = n_jobs_init; return *this; }
+    NEW_MLPerl__Classifier__KNeighbors& n_neighbors(integer n_neighbors_init) { wrapped_object->n_neighbors = n_neighbors_init; return *this; }
+    NEW_MLPerl__Classifier__KNeighbors& p(integer p_init) { wrapped_object->p = p_init; return *this; }
+    NEW_MLPerl__Classifier__KNeighbors& weights(string weights_init) { wrapped_object->weights = weights_init; return *this; }
+    NEW_MLPerl__Classifier__KNeighbors& train_data(number_arrayref_arrayref train_data_init) { wrapped_object->train_data = train_data_init; return *this; }
+    NEW_MLPerl__Classifier__KNeighbors& train_classifications(string_arrayref train_classifications_init) { wrapped_object->train_classifications = train_classifications_init; return *this; }
+};
+
+// <<< OPERATIONS & DATA TYPES REPORTER >>>
+integer MLPerl__Classifier__KNeighbors__MODE_ID() { return 2; }  // CPPOPS_CPPTYPES is 2
+
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+
+# else
+
+Purposefully_die_from_a_compile-time_error,_due_to_neither___PERL__TYPES_nor___CPP__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# endif
+
+#endif
+
+// end of class

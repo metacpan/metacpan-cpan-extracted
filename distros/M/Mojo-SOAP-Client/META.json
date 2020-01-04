@@ -41,7 +41,7 @@
             "Mojolicious" : "8.26",
             "XML::Compile::SOAP" : "0",
             "XML::Compile::SOAP12" : "0",
-            "XML::Compile::SOAP::Mojolicious" : "0",
+            "XML::Compile::SOAP::Mojolicious" : "0.05",
             "XML::Compile::WSDL11" : "0",
             "perl" : "5.020001"
          }
@@ -64,6 +64,6 @@
          "url" : "https://github.com/oposs/mojo-soap-client"
       }
    },
-   "version" : "v0.1.4",
+   "version" : "v0.1.5",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

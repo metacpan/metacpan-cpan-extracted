@@ -16,6 +16,12 @@ subtest module_installed => sub {
 
 subtest module_source => sub {
     like(module_source("if"), qr/package if/);
+
+    # list context
+    my ($source, $path) = module_source("if");
+    like($source, qr/package if/);
+    diag "path=$path";
+    ok($path);
 };
 
 done_testing;

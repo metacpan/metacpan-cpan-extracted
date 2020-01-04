@@ -27,6 +27,3 @@ while (<$source>) {
         is($code_version, $1, 'pod version');
     }
 }
-
-my $pod_version;
-

@@ -80,6 +80,7 @@ can_ok($event, qw/add_property add_properties properties/);
 $event->add_properties( 
                         summary => 'Awesome party',
                         description => "at my \\ place,\nOn 5th St.;",
+                        geo => '123.000;-0.001',
                     );
 
 ok($s->add_entry($event));
@@ -97,6 +98,7 @@ URL:http://example.com/todo1
 END:VTODO
 BEGIN:VEVENT
 DESCRIPTION:at my \\\\ place\\,\\nOn 5th St.\\;
+GEO:123.000;-0.001
 SUMMARY:Awesome party
 END:VEVENT
 END:VCALENDAR

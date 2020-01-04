@@ -2,7 +2,7 @@ INSTALLATION
 
 ## Build Prerequisites
 ### macOS
-    brew install coreutils
+    brew install coreutils openssl
     brew reinstall gnu-tar --with-default-names
     brew install openssl
 

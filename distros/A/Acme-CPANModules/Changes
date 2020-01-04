@@ -1,4 +1,22 @@
+0.1.3   2019-11-20  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- Mention Bencher.
+
+	- Show examples for adding Bencher scenario properties.
+
+
+0.1.2   2019-11-20  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- Tweak formatting of code in example.
+
+
 0.1.1   2019-11-20  Released-By: PERLANCAR; Urgency: medium
+
+	- No spec changes.
 
 	- Show examples for entry_features property and entry's features &
 	  bench_* properties.

@@ -2,12 +2,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title></title>
+<title>Date::WeekOfYear - Simple routine to return the ISO 8601 week of the year (as well as the ISO week year)</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:" />
 </head>
 
-<body style="background-color: white">
+<body>
 
 
 
@@ -15,11 +15,37 @@
   <li><a href="#NAME">NAME</a></li>
   <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
   <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
-  <li><a href="#CHANGES">CHANGES</a></li>
-  <li><a href="#ISO-8601">ISO 8601</a></li>
-  <li><a href="#EXPORT">EXPORT</a>
+  <li><a href="#MODES">MODES</a>
+    <ul>
+      <li><a href="#WOY_OLD_MODE">WOY_OLD_MODE</a></li>
+      <li><a href="#WOY_ISO_MODE">WOY_ISO_MODE</a></li>
+    </ul>
+  </li>
+  <li><a href="#DEFAULT-EXPORT">DEFAULT EXPORT</a>
     <ul>
       <li><a href="#WeekOfYear">WeekOfYear</a></li>
+    </ul>
+  </li>
+  <li><a href="#OTHER-FUNCTIONS">OTHER FUNCTIONS</a>
+    <ul>
+      <li><a href="#day_of_year">day_of_year</a></li>
+      <li><a href="#is_leap_year">is_leap_year</a></li>
+      <li><a href="#jan1week_day">jan1week_day</a></li>
+      <li><a href="#week_day">week_day</a></li>
+      <li><a href="#week_number">week_number</a></li>
+    </ul>
+  </li>
+  <li><a href="#CHANGES">CHANGES</a></li>
+  <li><a href="#ISO-8601">ISO 8601</a>
+    <ul>
+      <li><a href="#Calculations">Calculations</a>
+        <ul>
+          <li><a href="#Ordinal-Day">Ordinal Day</a></li>
+          <li><a href="#Week-Number">Week Number</a></li>
+          <li><a href="#Week-Years">53 Week Years</a></li>
+          <li><a href="#Day-of-Week">Day of Week</a></li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li><a href="#KNOWN-ISSUES">KNOWN ISSUES</a></li>
@@ -39,21 +65,29 @@
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
-<pre><code>  <span class="keyword">use</span> <span class="variable">Date::WeekOfYear</span><span class="operator">;</span>
-  
-  <span class="comment"># Get the week number (and year for the end/start of year transitions)</span>
-  <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$wkNo</span><span class="operator">,</span> <span class="variable">$year</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">WeekOfYear</span><span class="operator">();</span>
-  
-  <span class="comment"># Get the week number for the time passed in time_stamp</span>
-  <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$wkNo</span><span class="operator">,</span> <span class="variable">$year</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">WeekOfYear</span><span class="operator">(</span><span class="variable">$time_stamp</span><span class="operator">);</span>
-  
-  <span class="comment"># Use the data for someThing ...</span>
-  <span class="keyword">my</span> <span class="variable">$logFile</span> <span class="operator">=</span> <span class="string">"/someDir/</span><span class="variable">$year</span><span class="string">/someApp_</span><span class="variable">$wkNo</span><span class="string">.log"</span>
-  
-  <span class="comment"># Only want the week number, don't care which year in the week around</span>
-  <span class="comment"># the end/start of the year !</span>
-  <span class="keyword">my</span> <span class="variable">$weekNo</span> <span class="operator">=</span> <span class="variable">WeekOfYear</span><span class="operator">();</span>
-</code></pre>
+<pre><code>  use Date::WeekOfYear;
+
+  # Get the week number (and year for the end/start of year transitions)
+  my ($wkNo, $year) = WeekOfYear();
+
+  # Get the week number for the time passed in time_stamp
+  my ($wkNo, $year) = WeekOfYear($time_stamp);
+
+  # Use the data for someThing ...
+  my $logFile = &quot;/someDir/$year/someApp_$wkNo.log&quot;
+
+  # Only want the week number, don&#39;t care which year in the week around
+  # the end/start of the year !
+  my $weekNo = WeekOfYear();
+
+  # Handle years outside of perls localtime functions - 04/01/2090
+  my ($wkNo, $year) = WeekOfYear({ year =&gt; 2090, month =&gt; 1, day =&gt; 4});
+
+  # or in ISO-8601 format YYYY-Wnn
+  my $iso_8601_wkno = WeekOfYear({ year =&gt; 2090, month =&gt; 1, day =&gt; 4}, WOY_ISO_MODE);
+
+  # Week number as per pre V1.5
+  my ($wkNo, $year) = WeekOfYear($time_stamp, WOY_OLD_MODE);</code></pre>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
@@ -65,16 +99,91 @@
 
 <p><b>NOTE</b> The year returned is not always the same as the Gregorian year for that day for further details see ISO 8601.</p>
 
+<p>To obtain the old functionality, a mode is also passed, WOY_OLD_MODE. Note you need to use the &#39;:mode&#39; or &#39;:all&#39; tags to use to gain access to WOY_OLD_MODE.</p>
+
+<p>If mode WOY_ISO_MODE is used the output will be in the ISO 8601 format YYYY-Wxx where YYYY is the year and xx is the two digit week number and &#39;W&#39; denotes week.</p>
+
+<h1 id="MODES">MODES</h1>
+
+<p>If a second argument, the mode, is provided then either the pre version 1.5 mode is activated or the output is format as per ISO 8601 as YYYY-Wxx</p>
+
+<p>The modes are <b>WOY_OLD_MODE</b> and <b>WOY_ISO_MODE</b></p>
+
+<h2 id="WOY_OLD_MODE">WOY_OLD_MODE</h2>
+
+<p>Used to select the old mode, eg</p>
+
+<pre><code> ($wkNo, $year) = WeekOfYear($time_stamp, WOY_OLD_MODE);</code></pre>
+
+<h2 id="WOY_ISO_MODE">WOY_ISO_MODE</h2>
+
+<p>Use to select the output formatted as YYYY-Wxx, eg</p>
+
+<pre><code> $iso_8601_wkno = WeekOfYear({ year =&gt; 2090, month =&gt; 1, day =&gt; 4}, WOY_ISO_MODE);</code></pre>
+
+<h1 id="DEFAULT-EXPORT">DEFAULT EXPORT</h1>
+
+<h2 id="WeekOfYear">WeekOfYear</h2>
+
+<p>The function, see SYNOPSIS above</p>
+
+<h1 id="OTHER-FUNCTIONS">OTHER FUNCTIONS</h1>
+
+<p>These other functions are available if the use tag &#39;:all&#39; is used, eg:</p>
+
+<pre><code> use Date::WeekOfYear &#39;:all&#39;;</code></pre>
+
+<h2 id="day_of_year">day_of_year</h2>
+
+<p>Returns the day of the year, 1 being the first day. The last day is either 365 or 366, the latter if the year is a leap year. Expected arguments are the year, month and day as numeric values. The year is expected as yyyy, the month as 1 to 12 for Jan to Dec and the day of the month.</p>
+
+<h2 id="is_leap_year">is_leap_year</h2>
+
+<p>Returns true (1) if the year is a leap year, otherwise false (0). The expected argument is the year as a numeric value of format yyyy, eg 2014.</p>
+
+<p>In general terms the algorithm for calculating a leap year is as follows...</p>
+
+<p>A year will be a leap year if it is divisible by 4 but not by 100. If a year is divisible by 4 and by 100, it is not a leap year unless it is also divisible by 400. Thus years such as 1996, 1992, 1988 and so on are leap years because they are divisible by 4 but not by 100. For century years, the 400 rule is important. Thus, century years 1900, 1800 and 1700 while all still divisible by 4 are also exactly divisible by 100. As they are not further divisible by 400, they are not leap years.</p>
+
+<h2 id="jan1week_day">jan1week_day</h2>
+
+<p>Returns the week_day of the 1st of January for the year in question. The week_day is a numeric value indicating the day and differs from that returned by the core function localtime() in that Sunday is 7 rather than 0.</p>
+
+<p>The returned values are:</p>
+
+<pre><code> 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat and 7=Sun</code></pre>
+
+<p>The expected argument is the year in yyyy format, eg 2014.</p>
+
+<h2 id="week_day">week_day</h2>
+
+<p>week_day takes the year (yyyy eg 2014), month (1 to 12) and month_day as arguments and returns the week day.</p>
+
+<p>The week day returned is an integer representing the day of the week where:</p>
+
+<pre><code> 1 = Monday
+ 2 = Tuesday
+ 3 = Wednesday
+ 4 = Thursday
+ 5 = Friday
+ 6 = Saturday
+ 7 = Sunday.</code></pre>
+
+<p><b>Note</b> this is similar to that returned by localtime except that Sunday is 7 rather than 0</p>
+
+<h2 id="week_number">week_number</h2>
+
+<p>week_number takes the year (yyyy eg 2014), month (1 to 12) and month_day as arguments and returns the week number as defined by ISO-8061. That is week 1 starts on a Monday and contains the first Thursday in the year. As a result week 1 can start in the previous year and a year can have either 52 or 53 weeks.</p>
+
 <h1 id="CHANGES">CHANGES</h1>
 
 <p>As of version 1.5 the ISO 8601 week number is calculated. For backwards compatibility a flag can be passed after the time to give the previous functionality.</p>
 
 <p>For example:</p>
 
-<pre><code>  <span class="keyword">my</span> <span class="variable">$weekNo</span> <span class="operator">=</span> <span class="variable">WeekOfYear</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">,</span> <span class="number">1</span><span class="operator">);</span>  <span class="comment"># Week number now in pre ISO 8601 mode</span>
-  <span class="keyword">or</span>
-  <span class="keyword">my</span> <span class="variable">$weekNo</span> <span class="operator">=</span> <span class="variable">WeekOfYear</span><span class="operator">(</span><span class="variable">$the_time</span><span class="operator">,</span> <span class="number">1</span><span class="operator">);</span>  <span class="comment"># Week number for $the_time in pre ISO 8601 mode</span>
-</code></pre>
+<pre><code>  my $weekNo = WeekOfYear(undef, 1);  # Week number now in pre ISO 8601 mode
+  or
+  my $weekNo = WeekOfYear($the_time, 1);  # Week number for $the_time in pre ISO 8601 mode</code></pre>
 
 <h1 id="ISO-8601">ISO 8601</h1>
 
@@ -84,11 +193,54 @@
 
 <p>An ISO week-numbering year (also called ISO year informally) has 52 or 53 full weeks. That is 364 or 371 days instead of the usual 365 or 366 days. The extra week is referred to here as a leap week, although ISO 8601 does not use this term. Weeks start with Monday. The first week of a year is the week that contains the first Thursday (and, hence, 4 January) of the year. ISO week year numbering therefore slightly deviates from the Gregorian for some days close to 1 January.</p>
 
-<h1 id="EXPORT">EXPORT</h1>
+<h2 id="Calculations">Calculations</h2>
 
-<h2 id="WeekOfYear">WeekOfYear</h2>
+<h3 id="Ordinal-Day">Ordinal Day</h3>
 
-<p>WeekOfYear. That&#39;s it, nice and simple</p>
+<p>If the ordinal date is not known, it can be computed by any of several methods. perhaps the most direct is a table such as the following:</p>
+
+<pre><code> To the day of:  Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+ Add:            0   31  59  90  120 151 181 212 243 273 304 334
+ For leap years: 0   31  60  91  121 152 182 213 244 274 305 335</code></pre>
+
+<h3 id="Week-Number">Week Number</h3>
+
+<p>Calculating the week number of a given date</p>
+
+<p>The week number of any date can be calculated, given its ordinal date (i.e. position within the year) and its day of the week.</p>
+
+<p><b>Method:</b> Using ISO weekday numbers (running from 1 for Monday to 7 for Sunday), subtract the weekday from the ordinal date, then add 10. Divide the result by 7. Ignore the remainder; the quotient equals the week number. If the week number thus obtained equals 0, it means that the given date belongs to the preceding (week-based) year. If a week number of 53 is obtained, one must check that the date is not actually in week 1 of the following year.</p>
+
+<pre><code>    week(date) = int((ordinal(date) - weekday(date) + 10)/7)</code></pre>
+
+<p>Example: Friday 26 September 2008</p>
+
+<pre><code>    Ordinal day: 244 + 26 = 270
+    Weekday: Friday = 5
+    270 - 5 + 10 = 275
+    275 / 7 = 39.28
+    Result: Week 39</code></pre>
+
+<h3 id="Week-Years">53 Week Years</h3>
+
+<p>The long years, with 53 weeks in them, can be described by any of the following equivalent definitions:</p>
+
+<pre><code> - any year starting on Thursday and any leap year starting on Wednesday
+ - any year ending on Thursday and any leap year ending on Friday
+ - years in which 1 January and 31 December (in common years) or either (in leap years) are Thursdays</code></pre>
+
+<h3 id="Day-of-Week">Day of Week</h3>
+
+<p>The tabular forerunner to Tondering&#39;s algorithm is embodied in the following ANSI C function. With minor changes, it is adaptable to other high level programming languages such as APL2. (A 6502 assembly language version exists as well.) Devised by Tomohiko Sakamoto in 1993, it is accurate for any Gregorian date:</p>
+
+<pre><code>   int dow(int y, int m, int d)
+   {
+       static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+       y -= m &lt; 3;
+       return (y + y/4 - y/100 + y/400 + t[m-1] + d) % 7;
+   }</code></pre>
+
+<p>The function returns 0 = Sunday, 1 = Monday, etc.</p>
 
 <h1 id="KNOWN-ISSUES">KNOWN ISSUES</h1>
 
@@ -110,6 +262,10 @@
 <p>Thanks to Alexandr Ciornii for the V1.3 updates Thanks to Niel Bowers for [rt.cpan.org #93599] Not clear what type of week number is returned</p>
 
 <h1 id="Log">Log</h1>
+
+<p>Revision 1.7 2020/01/04 Greg - Resolved issue with tests failing. Now pass the full 4 digit year to timelocal() to avoid ambigous date values. - No changes to the actual code</p>
+
+<p>Revision 1.6 2014/04/09 Greg - Allow extended date coverage - past dates handled by localtime - using hash ref argument year, month, day - Added mode for ISO 8601 output YYYY-Wxx</p>
 
 <p>Revision 1.5 2014/03/16 Greg - Updated to conform to ISO 8601 - Added compatability flag to allow backwards usage</p>
 

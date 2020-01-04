@@ -16,7 +16,7 @@ use namespace::autoclean;
 use Moose::Util::TypeConstraints;
 use MooseX::StrictConstructor;
 
-use version; our $VERSION = version->declare("v1.20180423");
+use version; our $VERSION = version->declare("v1.20200102");
 
 =encoding utf8
 =head1 NAME
@@ -25,7 +25,7 @@ Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20180423
+Version 1.20200102
 
 =cut
 
@@ -36,15 +36,15 @@ Version 1.20180423
 
     #Using the old ACNA Liturgical Daily Lectionary
     my $dailyReading = Date::Lectionary::Daily->new(
-        'date' => Time::Piece->strptime("2017-12-24", "%Y-%m-%d"), 
+        'date' => Time::Piece->strptime("2017-12-24", "%Y-%m-%d"),
         'lectionary' => 'acna-xian'
     );
     say $dailyReading->readings->{evening}->{1}; #First lesson for evening prayer, Isaiah 51
 
     #Using the new ACNA Secular/Civil Daily Lectionary
-    my $dailyNewReading = Date::Lectionary::Daily->new( 
-        'date' => Time::Piece->strptime( "2018-03-12", "%Y-%m-%d" ), 
-        'lectionary' => 'acna-sec' 
+    my $dailyNewReading = Date::Lectionary::Daily->new(
+        'date' => Time::Piece->strptime( "2018-03-12", "%Y-%m-%d" ),
+        'lectionary' => 'acna-sec'
     );
     say $dailyNewReading->readings->{morning}->{2}; #Second lesson for morning prayer, Matthew 5
 
@@ -425,7 +425,7 @@ Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and m
 
 =head1 LICENSE
 
-Copyright 2017-2018 MICHAEL WAYNE ARNOLD
+Copyright 2017-2020 MICHAEL WAYNE ARNOLD
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

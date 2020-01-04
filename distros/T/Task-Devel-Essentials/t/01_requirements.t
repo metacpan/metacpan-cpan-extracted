@@ -1,9 +1,9 @@
-# Copyright (c) 2014 Martin Becker.  All rights reserved.
+# Copyright (c) 2014-2020 by Martin Becker, Blaubeuren.
 # This script is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# under the terms of the Artistic License 2.0 (see the LICENSE file).
 #
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl t/01_requirements.t'
+# Before 'make install' is performed this script should be runnable with
+# 'make test'. After 'make install' it should work as 'perl 01_requirements.t'
 
 use strict;
 use warnings;

@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -54,40 +54,43 @@
    "provides" : {
       "Spreadsheet::Wright" : {
          "file" : "lib/Spreadsheet/Wright.pm",
-         "version" : "0.105"
+         "version" : "0.107"
       },
       "Spreadsheet::Wright::CSV" : {
          "file" : "lib/Spreadsheet/Wright/CSV.pm",
-         "version" : "0.105"
+         "version" : "0.107"
       },
       "Spreadsheet::Wright::Excel" : {
          "file" : "lib/Spreadsheet/Wright/Excel.pm",
-         "version" : "0.105"
+         "version" : "0.107"
       },
       "Spreadsheet::Wright::HTML" : {
          "file" : "lib/Spreadsheet/Wright/HTML.pm",
-         "version" : "0.105"
+         "version" : "0.107"
       },
       "Spreadsheet::Wright::JSON" : {
          "file" : "lib/Spreadsheet/Wright/JSON.pm",
-         "version" : "0.105"
+         "version" : "0.107"
+      },
+      "Spreadsheet::Wright::OOXML" : {
+         "file" : "lib/Spreadsheet/Wright/OOXML.pm",
+         "version" : "0.107"
       },
       "Spreadsheet::Wright::OpenDocument" : {
          "file" : "lib/Spreadsheet/Wright/OpenDocument.pm",
-         "version" : "0.105"
+         "version" : "0.107"
       },
       "Spreadsheet::Wright::OpenDocumentXML" : {
          "file" : "lib/Spreadsheet/Wright/OpenDocumentXML.pm",
-         "version" : "0.105"
+         "version" : "0.107"
       },
       "Spreadsheet::Wright::XHTML" : {
          "file" : "lib/Spreadsheet/Wright/XHTML.pm",
-         "version" : "0.105"
+         "version" : "0.107"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/project",
       "bugtracker" : {
          "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Spreadsheet-Wright"
       },
@@ -99,10 +102,14 @@
          "type" : "git",
          "url" : "git://github.com/tobyink/p5-spreadsheet-wright.git",
          "web" : "https://github.com/tobyink/p5-spreadsheet-wright"
-      }
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/project"
    },
-   "version" : "0.105",
+   "version" : "0.107",
    "x_contributors" : [
-      "AMALTSEV <amaltsev@cpan.org>"
-   ]
+      "Andrew Maltsev (AMALTSEV) <amaltsev@cpan.org>",
+      "Andrius Merkys (MERKYS) <merkys@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

@@ -146,8 +146,6 @@ t/devscripts/bug-559429
 t/devscripts/cddl.h
 t/devscripts/comments-detection.h
 t/devscripts/comments-detection.txt
-t/devscripts/copr-iso8859.h
-t/devscripts/copr-utf8.h
 t/devscripts/dual.c
 t/devscripts/epl.h
 t/devscripts/false-positives
@@ -175,6 +173,10 @@ t/devscripts/mpl-2.0.sh
 t/devscripts/multi-line-copyright.c
 t/devscripts/regexp-killer.c
 t/devscripts/texinfo.tex
+t/encoding.t
+t/encoding/README.gs550j
+t/encoding/copr-iso8859.h
+t/encoding/copr-utf8.h
 t/fedora.t
 t/fedora/MIT
 t/fedora/README

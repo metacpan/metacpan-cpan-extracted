@@ -1,42 +1,46 @@
-SYNOPSIS
+NAME
+    Module::Installed::Tiny - Check if a module is installed, with as little
+    code as possible
 
+VERSION
+    This document describes version 0.004 of Module::Installed::Tiny (from
+    Perl distribution Module-Installed-Tiny), released on 2020-01-04.
+
+SYNOPSIS
      use Module::Installed::Tiny qw(module_installed module_source);
-    
+
      # check if a module is available
      if (module_installed "Foo::Bar") {
          # Foo::Bar is available
      } elsif (module_installed "Foo/Baz.pm") {
          # Foo::Baz is available
      }
-    
+
      # get a module's source code, dies on failure
      my $src = module_source("Foo/Baz.pm");
 
 DESCRIPTION
-
     To check if a module is installed (available), generally the simplest
-    way is to try to require() it:
+    way is to try to "require()" it:
 
      if (eval { require Foo::Bar; 1 }) {
          # Foo::Bar is available
      }
 
-    However, this actually loads the module. There are some cases where
-    this is not desirable: 1) we have to check a lot of modules (actually
-    loading the modules will take a lot of CPU time and memory; 2) some of
-    the modules conflict with one another and cannot all be loaded; 3) the
+    However, this actually loads the module. There are some cases where this
+    is not desirable: 1) we have to check a lot of modules (actually loading
+    the modules will take a lot of CPU time and memory; 2) some of the
+    modules conflict with one another and cannot all be loaded; 3) the
     module is OS specific and might not load under another OS; 4) we simply
     do not want to execute the module, for security or other reasons.
 
-    Module::Installed::Tiny provides a routine module_installed() which
-    works like Perl's require but does not actually load the module.
+    "Module::Installed::Tiny" provides a routine "module_installed()" which
+    works like Perl's "require" but does not actually load the module.
 
     This module does not require any other module except Exporter.
 
 FUNCTIONS
-
- module_installed($name) => bool
-
+  module_installed($name) => bool
     Check that module named $name is available to load. This means that:
     either the module file exists on the filesystem and searchable in @INC
     and the contents of the file can be retrieved, or when there is a
@@ -46,17 +50,42 @@ FUNCTIONS
     Note that this does not guarantee that the module can eventually be
     loaded successfully, as there might be syntax or runtime errors in the
     module's source. To check for that, one would need to actually load the
-    module using require.
+    module using "require".
 
- module_source($name) => str
+  module_source($name) => str | (str, source_name)
+    Return module's source code, without actually loading it. Die on failure
+    (e.g. module named $name not found in @INC).
 
-    Return module's source code, without actually loading it. Die on
-    failure.
+    In list context:
+
+     my @res = module_source($name);
+
+    will return the list:
+
+    (str, source_name)
+
+    where "str" is the module source code and "source_name" is source
+    information (file path, or the @INC ref entry when entry is a ref).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Installed-Tiny>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Installed-Tiny>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Installed-Tiny
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
-    Module::Load::Conditional provides check_install which also does what
-    module_installed does, plus can check module version. It also has a
+    Module::Load::Conditional provides "check_install" which also does what
+    "module_installed" does, plus can check module version. It also has a
     couple other knobs to customize its behavior. It's less tiny than
     Module::Installed::Tiny though.
 
@@ -64,4 +93,13 @@ SEE ALSO
     check if a module on the filesystem is available. They do not handle
     require hooks, nor do they actually check that the module file is
     readable.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

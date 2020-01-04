@@ -1,4 +1,3 @@
-CONTRIBUTING
 COPYRIGHT
 CREDITS
 Changes
@@ -18,6 +17,7 @@ lib/Spreadsheet/Wright/CSV.pm
 lib/Spreadsheet/Wright/Excel.pm
 lib/Spreadsheet/Wright/HTML.pm
 lib/Spreadsheet/Wright/JSON.pm
+lib/Spreadsheet/Wright/OOXML.pm
 lib/Spreadsheet/Wright/OpenDocument.pm
 lib/Spreadsheet/Wright/OpenDocumentXML.pm
 lib/Spreadsheet/Wright/XHTML.pm

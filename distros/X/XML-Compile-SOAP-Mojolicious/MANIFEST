@@ -8,6 +8,9 @@ lib/XML/Compile/SOAP/Mojolicious.pod
 lib/XML/Compile/Transport/SOAPHTTP_MojoUA.pm
 lib/XML/Compile/Transport/SOAPHTTP_MojoUA.pod
 t/01use.t
+t/02mojo-ua-option.t
+t/02nameservice.wsdl
+t/02nameservice.xsd
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

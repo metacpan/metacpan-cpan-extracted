@@ -23,14 +23,14 @@ no_index:
     - t
     - xt
 requires:
-  Mojolicious: '0'
+  Mojolicious: '7.41'
   Role::Tiny: '2.000001'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/srchulo/Mojo-Collection-Role-Transform/issues
   homepage: https://github.com/srchulo/Mojo-Collection-Role-Transform
   repository: https://github.com/srchulo/Mojo-Collection-Role-Transform.git
-version: '0.01'
+version: '0.04'
 x_contributors:
   - 'Adam Hopkins <violapiratejunky@gmail.com>'
 x_generated_by_perl: v5.30.0

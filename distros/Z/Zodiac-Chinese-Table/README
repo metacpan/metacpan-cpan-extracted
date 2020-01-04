@@ -1,5 +1,12 @@
-SYNOPSIS
+NAME
+    Zodiac::Chinese::Table - Look up Chinese zodiac for a given Gregorian
+    date
 
+VERSION
+    This document describes version 0.020 of Zodiac::Chinese::Table (from
+    Perl distribution Zodiac-Chinese-Table), released on 2020-01-02.
+
+SYNOPSIS
      use Chinese::Zodiac::Table qw(chinese_zodiac);
      my $res = chinese_zodiac("1980-02-17");
 
@@ -17,20 +24,17 @@ SYNOPSIS
      ]
 
 DESCRIPTION
-
     This module can look up Chinese zodiac for a given Gregorian date.
-    Compared to Zodiac::Chinese, it uses a lookup table (currently
-    available for years 1924-2043) so it is more accurate.
+    Compared to Zodiac::Chinese, it uses a lookup table (currently available
+    for Jan 1900 - Feb 2092) so it is more accurate.
 
     Data source is currently at: https://github.com/perlancar/gudangdata
     (table/chinese_zodiac), which in turn is parsed from Wikipedia article.
 
 FUNCTIONS
-
- chinese_zodiac($date) => arrayref
-
+  chinese_zodiac($date) => arrayref
     Return Chinese zodiac information for a Gregorian date $date. Currently
-    date must be a string in the format of YYYY-MM-DD. Will return an
+    date must be a string in the format of "YYYY-MM-DD". Will return an
     arrayref containing these elements:
 
      # index: 0         1           2           3              4               5               6            7
@@ -38,16 +42,30 @@ FUNCTIONS
 
     Will return undef if date range is unsupported.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Zodiac-Chinese-Table>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Zodiac-Chinese-Table>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Zodiac-Chinese-Table>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Zodiac::Chinese
 
-POD ERRORS
+AUTHOR
+    perlancar <perlancar@cpan.org>
 
-    Hey! The above document had some coding errors, which are explained
-    below:
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
 
-    Around line 13:
-
-      Non-ASCII character seen before =encoding in '"庚",'. Assuming UTF-8
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1,4 +1,4 @@
-# Copyrights 2016-2019 by [Mark Overmeer <markov@overmeer.net>].
+# Copyrights 2016-2020 by [Mark Overmeer <markov@overmeer.net>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package XML::Compile::Transport::SOAPHTTP_MojoUA;
 use vars '$VERSION';
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 use base 'XML::Compile::Transport';
 
@@ -50,6 +50,7 @@ sub init($) {
 		panic "callback not a code" if reftype $cb ne 'CODE';
 	}
 
+    $self->{mojo_ua} = $args->{mojo_ua};
     $self->SUPER::init($args);
     $self;
 }
@@ -188,7 +189,7 @@ sub _prepare_call($) {
     # Needs to be outside the sub so it does not go out of scope
     # when the sub is left (which would cause the termination of
     # the request)
-    my $ua = Mojo::UserAgent->new;
+    my $ua = $self->{mojo_ua} || Mojo::UserAgent->new;
 
     if(my $callback = $self->uaStartCallback) {
        $ua->on(start => $callback);

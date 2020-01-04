@@ -6,7 +6,7 @@ use warnings;
 no warnings qw( uninitialized numeric );
 
 BEGIN {
-	$Spreadsheet::Wright::VERSION   = '0.105';
+	$Spreadsheet::Wright::VERSION   = '0.107';
 	$Spreadsheet::Wright::AUTHORITY = 'cpan:TOBYINK';
 }
 
@@ -38,6 +38,7 @@ sub new
 		xhtml   => 'XHTML',
 		xls     => 'Excel',
 		xml     => 'OpenDocumentXML',
+		xlsx    => 'OOXML',
 		}->{lc $format};
 	
 	my $self = eval
@@ -270,7 +271,7 @@ following are valid:
 
 =item * B<encoding> - encoding of output file (optional, csv format only)
 
-=item * B<format> - format of spreadsheet - 'csv', 'xls', 'html', 'xhtml', 'xml', 'ods', 'json' or 'auto' (default).
+=item * B<format> - format of spreadsheet - 'csv', 'xls',  'xlsx', 'html', 'xhtml', 'xml', 'ods', 'json', or 'auto' (default).
 
 =item * B<sheet> - first sheet name (optional, not supported by some formats)
 
@@ -402,6 +403,8 @@ Toby Inkster <tobyink@cpan.org>.
 
 Excel and CSV output based almost entirely on work by
 Nick Eremeev <nick.eremeev@gmail.com> L<http://ejelta.com/>.
+
+XLSX output based on work by Andrew Maltsev (AMALTSEV).
 
 =head1 COPYRIGHT AND LICENCE
 

@@ -11,7 +11,7 @@ use Time::Local;
 use parent 'Exporter';
 use integer;    # Integer math, so we don't need floor
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 our @ISA = qw(Exporter);
 our %EXPORT_TAGS = (
@@ -464,6 +464,10 @@ Thanks to Alexandr Ciornii for the V1.3 updates
 Thanks to Niel Bowers for [rt.cpan.org #93599] Not clear what type of week number is returned
 
 =head1 Log
+
+Revision 1.7  2020/01/04 Greg
+ - Resolved issue with tests failing. Now pass the full 4 digit year to timelocal() to avoid ambigous date values.
+ - No changes to the actual code
 
 Revision 1.6  2014/04/09 Greg
  - Allow extended date coverage - past dates handled by localtime - using hash ref argument year, month, day

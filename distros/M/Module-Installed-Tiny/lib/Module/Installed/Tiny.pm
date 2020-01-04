@@ -1,7 +1,7 @@
 package Module::Installed::Tiny;
 
-our $DATE = '2016-08-04'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-01-04'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -42,16 +42,16 @@ sub _module_source {
                 open my($fh), "<", $path
                     or die "Can't locate $name_pm: $path: $!";
                 local $/;
-                return scalar <$fh>;
+                return wantarray ? (scalar <$fh>, $path) : scalar <$fh>;
             }
         }
 
         if ($is_hook) {
             next unless @hook_res;
-            my $prepend_ref = shift @hook_res if ref($hook_res[0]) eq 'SCALAR';
-            my $fh          = shift @hook_res if ref($hook_res[0]) eq 'GLOB';
-            my $code        = shift @hook_res if ref($hook_res[0]) eq 'CODE';
-            my $code_state  = shift @hook_res if @hook_res;
+            my $prepend_ref; $prepend_ref = shift @hook_res if ref($hook_res[0]) eq 'SCALAR';
+            my $fh         ; $fh          = shift @hook_res if ref($hook_res[0]) eq 'GLOB';
+            my $code       ; $code        = shift @hook_res if ref($hook_res[0]) eq 'CODE';
+            my $code_state ; $code_state  = shift @hook_res if @hook_res;
             if ($fh) {
                 my $src = "";
                 local $_;
@@ -63,7 +63,7 @@ sub _module_source {
                     $src .= $_;
                 }
                 $src = $$prepend_ref . $src if $prepend_ref;
-                return $src;
+                return wantarray ? ($src, $entry) : $src;
             } elsif ($code) {
                 my $src = "";
                 local $_;
@@ -71,7 +71,7 @@ sub _module_source {
                     $src .= $_;
                 }
                 $src = $$prepend_ref . $src if $prepend_ref;
-                return $src;
+                return wantarray ? ($src, $entry) : $src;
             }
         }
     }
@@ -128,7 +128,7 @@ Module::Installed::Tiny - Check if a module is installed, with as little code as
 
 =head1 VERSION
 
-This document describes version 0.003 of Module::Installed::Tiny (from Perl distribution Module-Installed-Tiny), released on 2016-08-04.
+This document describes version 0.004 of Module::Installed::Tiny (from Perl distribution Module-Installed-Tiny), released on 2020-01-04.
 
 =head1 SYNOPSIS
 
@@ -178,9 +178,21 @@ Note that this does not guarantee that the module can eventually be loaded
 successfully, as there might be syntax or runtime errors in the module's source.
 To check for that, one would need to actually load the module using C<require>.
 
-=head2 module_source($name) => str
+=head2 module_source($name) => str | (str, source_name)
 
-Return module's source code, without actually loading it. Die on failure.
+Return module's source code, without actually loading it. Die on failure (e.g.
+module named C<$name> not found in C<@INC>).
+
+In list context:
+
+ my @res = module_source($name);
+
+will return the list:
+
+(str, source_name)
+
+where C<str> is the module source code and C<source_name> is source information
+(file path, or the @INC ref entry when entry is a ref).
 
 =head1 HOMEPAGE
 
@@ -215,7 +227,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

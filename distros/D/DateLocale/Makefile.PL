@@ -1,13 +1,17 @@
 use strict;
+use lib ".";
 use inc::Module::Install;
+
 name            'DateLocale';
 abstract        'Perl extension for use localized date';
 author          'Nikolay Shulyakovskiy <shulyakovskiy at mail.ru>';
 license         'mit';
 perl_version    '5.008008';
+all_from        'lib/DateLocale.pm';
 no_index        directory => 'share';
 repository      'https://github.com/Nikolo/perl-DateLocale';
 requires        'Locale::Messages';
+requires        'POSIX';
 
 my $MSGFMT = 'msgfmt';
 my $xgettext = 'xgettext';
@@ -34,10 +38,10 @@ print "Portable message objects...";
 my $alltarget = "update-gmo";
 for (<./share/po/*.po>) {
 	my ($po) = /.\/share\/po\/(.*)\.po$/;
-    print " $po";
+	print " $po";
 	push @$pofiles, $po;
 	$uninstall .= "	\$(RM_F) \$(datadir)/locale/$po/LC_TIME/perl-DateLocale.mo\n";
-    $mofiles   .= " $po.gmo";
+	$mofiles   .= " $po.gmo";
 }
 print "\n";
 my $loc = join("|", grep {!/^C$/} @$pofiles);
@@ -46,6 +50,7 @@ unless( @locales ){
 	print "Need to install one of $loc locale";
 	exit(0);
 }
+=rem
 WriteMakefile(
 	'NAME'         => 'DateLocale',
 	'VERSION_FROM' => 'lib/DateLocale.pm',      # finds $VERSION
@@ -59,7 +64,7 @@ WriteMakefile(
 	AUTHOR         => 'Nikolay Shulyakovskiy <shulyakovskiy@mail.ru>',
 	'clean' => { FILES => $mofiles." perl-DateLocale.pot ".join(" ",map {$_.".po"}  @$pofiles)." META.yml" }
 );
-
+=cut
 my $postamble = "generate.po: perl-DateLocale.pot\n";
 	foreach (@$pofiles){
 		$postamble .= "\t".'$(NOECHO) '.$msgmerge.' -w 83 share/po/'.$_.'.po perl-DateLocale.pot >'.$_.'.po~'.$/;
@@ -87,3 +92,4 @@ clean ::
 XXX
 ;
 postamble( $postamble );
+WriteAll();

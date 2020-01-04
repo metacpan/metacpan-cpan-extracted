@@ -6,10 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CSV2Chart.pm',
+    'App/CSV2Chart/API/ToXLSX.pm',
+    'App/CSV2Chart/Command/svg.pm',
     'App/CSV2Chart/Command/xlsx.pm'
 );
 

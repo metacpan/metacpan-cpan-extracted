@@ -7,8 +7,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,4 +19,7 @@ no_index:
     - inc
 requires:
   Test::Simple: '0.44'
-version: '0.02'
+resources:
+  repository: https://github.com/briandfoy/string-sprintf.git
+version: '1.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

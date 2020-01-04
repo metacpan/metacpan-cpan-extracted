@@ -1,7 +1,7 @@
     Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 VERSION
-    Version 1.20180423
+    Version 1.20200102
 
 SYNOPSIS
         use Time::Piece;
@@ -9,15 +9,15 @@ SYNOPSIS
 
         #Using the old ACNA Liturgical Daily Lectionary
         my $dailyReading = Date::Lectionary::Daily->new(
-            'date' => Time::Piece->strptime("2017-12-24", "%Y-%m-%d"), 
+            'date' => Time::Piece->strptime("2017-12-24", "%Y-%m-%d"),
             'lectionary' => 'acna-xian'
         );
         say $dailyReading->readings->{evening}->{1}; #First lesson for evening prayer, Isaiah 51
 
         #Using the new ACNA Secular/Civil Daily Lectionary
-        my $dailyNewReading = Date::Lectionary::Daily->new( 
-            'date' => Time::Piece->strptime( "2018-03-12", "%Y-%m-%d" ), 
-            'lectionary' => 'acna-sec' 
+        my $dailyNewReading = Date::Lectionary::Daily->new(
+            'date' => Time::Piece->strptime( "2018-03-12", "%Y-%m-%d" ),
+            'lectionary' => 'acna-sec'
         );
         say $dailyNewReading->readings->{morning}->{2}; #Second lesson for morning prayer, Matthew 5
 
@@ -125,7 +125,7 @@ ACKNOWLEDGEMENTS
     Rosemary, and my sweet son, Oliver. But, above all, SOLI DEO GLORIA!
 
 LICENSE
-    Copyright 2017-2018 MICHAEL WAYNE ARNOLD
+    Copyright 2017-2020 MICHAEL WAYNE ARNOLD
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are

@@ -72,8 +72,8 @@ DESCRIPTION
 
         *   encoding - encoding of output file (optional, csv format only)
 
-        *   format - format of spreadsheet - 'csv', 'xls', 'html', 'xhtml',
-            'xml', 'ods', 'json' or 'auto' (default).
+        *   format - format of spreadsheet - 'csv', 'xls', 'xlsx', 'html',
+            'xhtml', 'xml', 'ods', 'json', or 'auto' (default).
 
         *   sheet - first sheet name (optional, not supported by some formats)
 
@@ -186,6 +186,8 @@ AUTHORS
 
     Excel and CSV output based almost entirely on work by Nick Eremeev
     <nick.eremeev@gmail.com> <http://ejelta.com/>.
+
+    XLSX output based on work by Andrew Maltsev (AMALTSEV).
 
 COPYRIGHT AND LICENCE
     Copyright 2007 Nick Eremeev.

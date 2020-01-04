@@ -142,6 +142,26 @@ equivalents in libunbound.
 
 Returns the number of outstanding asynchronous queries.
 
+# METHODS FOR DEALING WITH DNSSEC
+
+The following correspond to their equivalents in libunbound.
+
+## _OBJ_->add\_ta()
+
+
+
+## _OBJ_->add\_ta\_autr()
+
+
+
+## _OBJ_->add\_ta\_file()
+
+
+
+## _OBJ_->trustedkeys()
+
+
+
 # CONVENIENCE FUNCTIONS
 
 The following may be called either as object methods or as static

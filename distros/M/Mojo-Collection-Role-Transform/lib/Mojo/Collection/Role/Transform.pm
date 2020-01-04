@@ -2,7 +2,7 @@ package Mojo::Collection::Role::Transform;
 use Mojo::Base -role;
 use Carp ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 requires 'reduce';
 
@@ -76,7 +76,7 @@ sub _create_leading_key_hashes {
 
     my $cur_hash = $hash;
     for my $key (@$keys[0..$#$keys - 1]) {
-        $cur_hash = $hash->{$key} ||= {};
+        $cur_hash = $cur_hash->{$key} ||= {};
     }
 
     return $cur_hash;
@@ -537,15 +537,15 @@ it under the same terms as Perl itself.
 
 =item
 
-* L<Mojo::Collection>
+L<Mojo::Collection>
 
 =item
 
-* L<Mojo::Base/with_roles>
+L<Mojo::Base/with_roles>
 
 =item
 
-* L<Role::Tiny>
+L<Role::Tiny>
 
 =back
 

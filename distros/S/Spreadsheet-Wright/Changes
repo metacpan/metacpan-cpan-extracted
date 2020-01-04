@@ -5,6 +5,19 @@ Home page:    <https://metacpan.org/release/Spreadsheet-Wright>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Spreadsheet-Wright>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.107	2020-01-04
+
+ - Added: Ported XLSX output from Spreadsheet::Write.
+   Andrew Maltsev++
+
+0.106	2020-01-03
+
+ [ Bug Fixes ]
+ - addsheet now works for ODS format
+   Andrius Merkys++
+ - fix for ODS XML version attribute
+   Andrius Merkys++
+
 0.105	2014-06-08
 
  [ Packaging ]

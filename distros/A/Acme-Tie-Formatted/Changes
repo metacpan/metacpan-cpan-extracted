@@ -1,4 +1,10 @@
 Revision history for Tie-Formatted
+0.06  Thu Jan  2 16:07:49 PST 2019
+  - And now we have failures caused by NOT having it.
+    Restore Build.PL
+
+0.05  Sat Jul  2 19:42:30 PDT 2011
+	- Remove Build.PL, as it's causing CPAN Testers failures
 
 0.04  Sun Aug 23 14:35:52 PDT 2009
 	- Fixed doc errors reported by Frank Wiegand (frank.wiegand@gmail.com).

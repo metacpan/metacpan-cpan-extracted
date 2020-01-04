@@ -34,6 +34,7 @@
          "requires" : {
             "File::Spec" : "0",
             "Getopt::Long" : "2.50",
+            "Hash::DefHash" : "0.06",
             "Regexp::Pattern" : "v0.2.7",
             "Test::Builder" : "0",
             "Test::More" : "0",
@@ -63,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-Test-Regexp-Pattern"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

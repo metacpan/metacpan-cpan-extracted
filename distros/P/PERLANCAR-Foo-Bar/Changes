@@ -1,0 +1,11 @@
+0.002   2020-01-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Seems like Foo::Bar is also taken; rename distro to PERLANCAR-Foo-Bar.
+          Make all the "example" modules avoid PAUSE indexing.
+
+	- Add Baz, Qux, Quux, and Foo::Bar::Baz.
+
+
+0.001   2020-01-03  Released-By: PERLANCAR
+
+        - First release.

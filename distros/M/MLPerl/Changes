@@ -1,0 +1,16 @@
+Revision history for Machine Learning Perl AKA MLPerl.
+
+0.101000 2020-01-02
+
+    - Clean Leftover RPerl POD
+    - Remove Large Data Files
+
+0.100000 2020-01-01 Codename Gibbon
+
+    - HOLIDAY EDITION: Happy New Year!
+    - Initial Public Release
+    - K Nearest Neighbors 2D, Brute Force
+
+0.000001 2019-09-18 Unreleased
+
+    - Created MLPerl

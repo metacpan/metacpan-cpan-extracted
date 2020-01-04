@@ -39,9 +39,17 @@ for my $option_to_test (@options_to_test) {
     is_deeply
         $hash,
         { map { $_ => { $_ * $_ => [$_]} } @$c },
-        'multiple keys can be returned'
+        'two keys can be returned'
         ;
     isa_ok $_, 'Mojo::Collection' for map { values %$_ } values %$hash;
+
+    $hash = $c->hashify_collect(@options, sub { $_, $_ * $_, $_ * $_ * $_ });
+    is_deeply
+        $hash,
+        { map { $_ => { $_ * $_ => { $_ * $_ * $_ => [$_] } } } @$c },
+        'three keys can be returned'
+        ;
+    isa_ok $_, 'Mojo::Collection' for map { values %$_ } map { values %$_ } values %$hash;
 
     note 'Test get_value';
     $hash = $c->hashify_collect(@options, sub { $_, $_ * $_ }, sub { $_ * $_ * $_ });

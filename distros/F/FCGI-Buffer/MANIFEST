@@ -14,6 +14,7 @@ t/10-new.t
 t/apoc.t
 t/boiler.t
 t/cache.t
+t/carp.t
 t/changes.t
 t/coverage.t
 t/critic.t
@@ -25,6 +26,7 @@ t/is_cached.t
 t/js.t
 t/kwalitee.t
 t/last_mod.t
+t/lib/MyLogger.pm
 t/links.t
 t/manifest.t
 t/metrics.t

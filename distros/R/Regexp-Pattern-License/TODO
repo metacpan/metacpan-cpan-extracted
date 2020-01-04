@@ -24,6 +24,7 @@ Patterns:
     + Debian (website): https://www.debian.org/legal/licenses/
     + Debian (wiki): https://wiki.debian.org/DFSGLicenses
     + W3C: https://www.w3.org/Consortium/Legal/2002/ipr-notice-20021231
+    + PyPA/PyPI trove classifiers: https://pypi.org/classifiers/
     + http://www.linfo.org/main_index.html
   * Cover traits:
     + Comment styles (most possible):

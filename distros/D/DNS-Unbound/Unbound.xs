@@ -181,6 +181,34 @@ _ub_ctx_get_option( struct ub_ctx *ctx, const char* opt)
     OUTPUT:
         RETVAL
 
+int
+_ub_ctx_add_ta( struct ub_ctx *ctx, char *ta )
+    CODE:
+        RETVAL = ub_ctx_add_ta( ctx, ta );
+    OUTPUT:
+        RETVAL
+
+int
+_ub_ctx_add_ta_autr( struct ub_ctx *ctx, char *fname )
+    CODE:
+        RETVAL = ub_ctx_add_ta_autr( ctx, fname );
+    OUTPUT:
+        RETVAL
+
+int
+_ub_ctx_add_ta_file( struct ub_ctx *ctx, char *fname )
+    CODE:
+        RETVAL = ub_ctx_add_ta_file( ctx, fname );
+    OUTPUT:
+        RETVAL
+
+int
+_ub_ctx_trustedkeys( struct ub_ctx *ctx, char *fname )
+    CODE:
+        RETVAL = ub_ctx_trustedkeys( ctx, fname );
+    OUTPUT:
+        RETVAL
+
 const char *
 _ub_strerror( int err )
     CODE:

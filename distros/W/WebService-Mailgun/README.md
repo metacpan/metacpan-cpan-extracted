@@ -217,13 +217,13 @@ my $res = $mailgun->delete_list_member('ml@example.com' => 'user@example.com');
 
 [https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
 
-## event($option|$uri)
+## event($args)
 
 Get event data.
 
 ```perl
 # get event data
-my ($events, $purl) = $mailgun->event({ event => 'stored' });
+my ($events, $purl) = $mailgun->event({ event => 'stored', limit => 50 });
 ```
 
 [Events](https://documentation.mailgun.com/api-events.html)
@@ -246,7 +246,7 @@ event method return previous url. it can use for fetch event.
 
 ```perl
 # event Pooling
-my ($events, $purl) = $mailgun->event({ event => 'stored' });
+my ($events, $purl) = $mailgun->event({ event => 'stored', begin => localtime->epoch() });
 // do something ...
 $events = $mailgun->event($purl);
 // ...
@@ -268,7 +268,7 @@ this API not implement yet.
 
 # SEE ALSO
 
-[WWW::Mailgun](https://metacpan.org/pod/WWW::Mailgun), [https://documentation.mailgun.com/](https://documentation.mailgun.com/)
+[WWW::Mailgun](https://metacpan.org/pod/WWW%3A%3AMailgun), [https://documentation.mailgun.com/](https://documentation.mailgun.com/)
 
 # LICENSE
 

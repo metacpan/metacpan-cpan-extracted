@@ -1,5 +1,19 @@
 Revision history for MooX-Const:
 
+v0.4.2    2020-01-04 12:59:01+00:00 Europe/London
+  [Tests]
+  - Fix MooX::TypeTiny test to bail out if MooX::TypeTiny missing, #1.
+
+v0.4.1    2020-01-03 18:34:29+00:00 Europe/London
+  [Documentation]
+  - Bump copyright year.
+
+  [Tests]
+  - Add tests with MooX::TypeTiny.
+
+  [Other]
+  - Recommend MooX::TypeTiny as prereq.
+
 v0.4.0    2019-11-15 17:54:30+00:00 Europe/London
   [Enhancements]
   - Added "strict" option to only apply read-only constraints in

@@ -1,6 +1,6 @@
 # VERSION
 
-version 0.6.1
+version 0.8.0
 
 # SYNOPSIS
 
@@ -19,7 +19,7 @@ csv2chart - command line utility to convert CSV data to a graphical chart
 
     But see [https://github.com/watson/chart-csv/issues/4](https://github.com/watson/chart-csv/issues/4) .
 
-- [Text::CSV](https://metacpan.org/pod/Text::CSV)
+- [Text::CSV](https://metacpan.org/pod/Text%3A%3ACSV)
 
 # COPYRIGHT & LICENSE
 
@@ -73,12 +73,6 @@ in addition to those websites please use your favorite search engine to discover
     The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
     [https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSV2Chart](https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSV2Chart)
-
-- AnnoCPAN
-
-    The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-    [http://annocpan.org/dist/App-CSV2Chart](http://annocpan.org/dist/App-CSV2Chart)
 
 - CPAN Ratings
 

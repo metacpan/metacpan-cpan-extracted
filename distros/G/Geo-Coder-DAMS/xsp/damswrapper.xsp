@@ -1,0 +1,89 @@
+#include "dams.h"
+
+%module{Geo::Coder::DAMS};
+%package{Geo::Coder::DAMS};
+
+%{
+void
+dams_init(...)
+    CODE:
+        try {
+            if (items == 0) {
+                damswrapper::init();
+            }
+            else {
+                damswrapper::init( (char *)SvPV_nolen(ST(0)) );
+            }
+        }
+        catch (std::exception& e) {
+            croak("Caught C++ exception of type or derived from 'std::exception': %s", e.what());
+        }
+        catch (...) {
+            croak("Caught C++ exception of unknown type");
+        }
+
+HV*
+dams_retrieve(char* query)
+    CODE:
+        int score;
+        std::string tail;
+        std::vector<damswrapper::Candidate> candidates;
+        damswrapper::retrieve(score, tail, candidates, query);
+
+        RETVAL = newHV();
+        hv_store(RETVAL, "score", 5, newSViv(score),                              0);
+        hv_store(RETVAL, "tail",  4, newSVpvn_utf8(tail.c_str(), tail.size(), 1), 0);
+        AV* cands_val = (AV*)sv_2mortal((SV*)newAV());
+        for (std::vector<damswrapper::Candidate>::iterator it = candidates.begin(); it != candidates.end(); it++) {
+            AV* candi_val = (AV*)sv_2mortal((SV*)newAV());
+            for (damswrapper::Candidate::iterator cit = it->begin(); cit != it->end(); cit++) {
+                HV* elem_val = (HV*)sv_2mortal((SV*)newHV());
+                int len = sizeof(char) * (cit->get_name().size());
+                hv_store(elem_val, "name",  4, newSVpvn_utf8(cit->get_name().c_str(), cit->get_name().size(), 1), 0);
+                hv_store(elem_val, "level", 5, newSViv(cit->get_level()),                                         0);
+                hv_store(elem_val, "x",     1, newSVnv(cit->get_x()),                                             0);
+                hv_store(elem_val, "y",     1, newSVnv(cit->get_y()),                                             0);
+                av_push(candi_val, newRV((SV*)elem_val));
+            }
+            av_push(cands_val, newRV((SV*)candi_val));
+        }
+        hv_store(RETVAL, "candidates", 10, newRV((SV*)cands_val), 0);
+
+        sv_2mortal((SV*)RETVAL);
+    OUTPUT:
+        RETVAL
+
+void
+dams_debugmode(bool flag)
+    CODE:
+        damswrapper::debugmode(flag);
+
+void
+dams_set_check_new_address(bool flag)
+    CODE:
+        damswrapper::set_check_new_address(flag);
+
+void
+dams_set_limit(int limit)
+    CODE:
+        damswrapper::set_limit(limit);
+
+void
+dams_set_exact_match_level(int level)
+    CODE:
+        damswrapper::set_exact_match_level(level);
+
+long
+dams_get_exact_match_level()
+    CODE:
+        RETVAL = damswrapper::get_exact_match_level();
+    OUTPUT:
+        RETVAL
+
+int
+dams_elapsedtime()
+    CODE:
+        RETVAL = damswrapper::elapsedtime();
+    OUTPUT:
+        RETVAL
+%}

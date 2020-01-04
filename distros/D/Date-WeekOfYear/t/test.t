@@ -1,6 +1,7 @@
 # test.t
 #
 # Test old mode and new ISO mode
+# 2020-01-04 GNG Changed all timelocal() to use 4 digit year to resolve errors caused by the ambiguity
 #
 use strict;
 use warnings;
@@ -115,32 +116,32 @@ ok(1, 'Date::WeekOfYear compiled, a good start');
 
 ##### Old Mode tests #####
 #2
-my $time = timelocal(0,0,12,1,0,108);
-is(WeekOfYear($time, WOY_OLD_MODE), 1);
+my $time = timelocal(0,0,12,1,0,2008);
+is(WeekOfYear($time, WOY_OLD_MODE), 1, 'Tue Jan  1 12:00:00 2008');
 
 #3
-$time = timelocal(0,0,12,5,0,108); #Saturday
-is(WeekOfYear($time, WOY_OLD_MODE),1);
+$time = timelocal(0,0,12,5,0,2008);
+is(WeekOfYear($time, WOY_OLD_MODE),1, 'Sat Jan  5 12:00:00 2008');
 
 #4
-$time = timelocal(0,0,12,29,0,108);
-is(WeekOfYear($time, WOY_OLD_MODE),5);
+$time = timelocal(0,0,12,29,0,2008);
+is(WeekOfYear($time, WOY_OLD_MODE),5, 'Tue Jan 29 12:00:00 2008');
 
 #5
-$time = timelocal(0,0,12,1,1,108);
-is(WeekOfYear($time, WOY_OLD_MODE),5);
+$time = timelocal(0,0,12,1,1,2008);
+is(WeekOfYear($time, WOY_OLD_MODE),5, 'Fri Feb  1 12:00:00 2008');
 
 #6
-$time = timelocal(0,0,12,1,0,116);
-is(WeekOfYear($time, WOY_OLD_MODE),1);
+$time = timelocal(0,0,12,1,0,2016);
+is(WeekOfYear($time, WOY_OLD_MODE),1, 'Fri Jan  1 12:00:00 2016');
 
 #7
-$time = timelocal(0,0,12,2,0,116);
-is(WeekOfYear($time, WOY_OLD_MODE),1);
+$time = timelocal(0,0,12,2,0,2016);
+is(WeekOfYear($time, WOY_OLD_MODE),1, 'Sat Jan  2 12:00:00 2016');
 
 #8
-$time = timelocal(0,0,12,6,0,116);
-is(WeekOfYear($time, WOY_OLD_MODE),2);
+$time = timelocal(0,0,12,6,0,2016);
+is(WeekOfYear($time, WOY_OLD_MODE),2, 'Wed Jan  6 12:00:00 2016');
 
 is (WeekOfYear({ year => 2000, month => 1, day => 16}, WOY_ISO_MODE), '2000-W02', 'ISO_MODE hash ref date - 2000-01-16');
 
@@ -156,7 +157,7 @@ foreach my $t (@tests)
 
     # Generate the time value. Use midday so we don't run into any daylight saving time issues
     my ($year, $mon, $mday) = split /-/, $t->[1];
-    my $time = timelocal(0, 0, 12, $mday, $mon - 1, $year - 1900);
+    my $time = timelocal(0, 0, 12, $mday, $mon - 1, $year);
 
     # Get the required answer
     my ($wk_num_year_answer, $wk_num_answer) = split /-/, $t->[2], 2;

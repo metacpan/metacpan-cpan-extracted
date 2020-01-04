@@ -23,7 +23,7 @@ my %LICENSES = (
 	'GFDL-1.2-or-later'    => 'GFDL-1.2+',
 	'GFDL-1.3-or-later'    => 'GFDL-1.3+',
 	'GPL-1.0-only'         => 'GPL-1',
-	'GPL-2.0-only'         => 'GPL-2',
+	'GPL-2.0-only'         => 'GPL-2 and/or LGPL',
 	'GPL-3.0-only'         => 'GPL-3',
 
 #	'LGPL-2.0'                              => 'LGPL-2',
@@ -35,7 +35,7 @@ my %LICENSES = (
 	'MPL-2.0'  => 'MPL-2.0',
 
 #	None                                    => 'UNKNOWN',
-	OpenSSL                                 => 'OpenSSL',
+	OpenSSL                                 => 'Apache-1.0 and/or OpenSSL',
 	'Artistic-1.0-Perl OR GPL-1.0-or-later' => 'Artistic or GPL-1+',
 	PostgreSQL                              => 'PostgreSQL',
 	'QPL-1.0'                               => 'QPL-1.0',
@@ -58,7 +58,7 @@ foreach ( keys %LICENSES ) {
 		);
 	};
 	plan skip_all => "Software::License failed to create license $_" if $@;
-	$workdir->child($_)->spew( $license->notice, $license->license );
+	$workdir->child($_)->spew_utf8( $license->notice, $license->license );
 }
 plan tests => scalar( 1 + keys %LICENSES );
 my $corpus = $workdir;

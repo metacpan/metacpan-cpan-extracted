@@ -2,8 +2,8 @@ NAME
     Data::Sah::Coerce - Coercion rules for Data::Sah
 
 VERSION
-    This document describes version 0.043 of Data::Sah::Coerce (from Perl
-    distribution Data-Sah-Coerce), released on 2020-01-02.
+    This document describes version 0.046 of Data::Sah::Coerce (from Perl
+    distribution Data-Sah-Coerce), released on 2020-01-03.
 
 SYNOPSIS
      use Data::Sah::Coerce qw(gen_coercer);
@@ -29,9 +29,9 @@ DESCRIPTION
     A coercion rule is put in
     "Data::Sah::Coerce::$COMPILER::To_$TARGET_TYPE::From_$SOURCE_TYPE::DESCR
     IPTION" module, for example:
-    Data::Sah::Coerce::perl::To_date::From_float::Epoch for converting date
+    Data::Sah::Coerce::perl::To_date::From_float::epoch for converting date
     from integer (Unix epoch) or
-    Data::Sah::Coerce::perl::To_date::From_str::ISO8601 for converting date
+    Data::Sah::Coerce::perl::To_date::From_str::iso8601 for converting date
     from ISO8601 strings like "2016-05-15".
 
     Basically, a coercion rule will provide an expression ("expr_match")
@@ -129,7 +129,7 @@ DESCRIPTION
 
         Expression in the target language to test whether the data can be
         coerced. For example, in
-        "Data::Sah::Coerce::perl::To_date::From_float::Epoch", only integers
+        "Data::Sah::Coerce::perl::To_date::From_float::epoch", only integers
         ranging from 10^8 to 2^31 are converted into date. Non-integers or
         integers outside this range are not coerced.
 

@@ -1,85 +1,28 @@
 #!perl
 
-our $DATE = '2018-03-21'; # DATE
-our $VERSION = '0.003'; # VERSION
+# Note: This script is a CLI for Riap function /App/RegexpPatternUtils/get_regexp_pattern_pattern
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
+
+our $DATE = '2020-01-03'; # DATE
+our $DIST = 'App-RegexpPatternUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
-use strict 'subs', 'vars';
+use strict;
 use warnings;
+
 use Perinci::CmdLine::Any;
 
-use Regexp::Pattern;
-
-our %SPEC;
-
-$SPEC{app} = {
-    v => 1.1,
-    summary => 'Get a Regexp::Pattern::* pattern',
-    args => {
-        name => {
-            summary => "Name of pattern, with module prefix but without the 'Regexp::Pattern'",
-            schema => ['str*', match=>'\A\w+((::|/|\.)\w+)+\z'],
-            req => 1,
-            pos => 0,
-            completion => sub {
-                my %args = @_;
-                require Complete::Regexp::Pattern;
-                Complete::Regexp::Pattern::complete_regexp_pattern_pattern(
-                    word => $args{word},
-                );
-            },
-        },
-        gen_args => {
-            'x.name.is_plural' => 1,
-            'x.name.singular' => 'gen_arg',
-            summary => 'Supply generator arguments',
-            description => <<'_',
-
-If pattern is a dynamic pattern (generated on-demand) and the generator requires
-some arguments, you can supply them here.
-
-_
-            schema => ['hash*', of=>'str*'],
-        },
-    },
-    examples => [
-        {
-            args => {name=>'YouTube/video_id'},
-        },
-        {
-            summary=>"Generate variant A of Example::re3",
-            argv => ['Example::re3', '--gen-arg', 'variant=A'],
-        },
-        {
-            summary=>"Generate variant B of Example::re3",
-            argv => ['Example::re3', '--gen-arg', 'variant=B'],
-        },
-    ],
-};
-sub app {
-    my %args = @_;
-
-    my $name = $args{name};
-    $name =~ s!(/|\.)!::!g;
-
-    my $re = re($name, $args{gen_args} // {});
-
-    if (-t STDOUT && $args{-cmdline} &&
-            ($args{-cmdline_r}{format} // 'text') =~ /text/) {
-        require Data::Dump::Color;
-        return [200, "OK", Data::Dump::Color::dump($re) . "\n",
-                {'cmdline.skip_format'=>1}];
-    } else {
-        return [200, "OK", "$re"];
-    }
-}
-
-Perinci::CmdLine::Any->new(
-    url => '/main/app',
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/RegexpPatternUtils/get_regexp_pattern_pattern",
+    program_name => "get-regexp-pattern-pattern",
     pass_cmdline_object => 1,
     read_config => 0,
     read_env => 0,
-)->run;
+    use_utf8 => 1,
+);
+
+$cmdline->run;
 
 # ABSTRACT: Get a Regexp::Pattern::* pattern
 # PODNAME: get-regexp-pattern-pattern
@@ -96,13 +39,13 @@ get-regexp-pattern-pattern - Get a Regexp::Pattern::* pattern
 
 =head1 VERSION
 
-This document describes version 0.003 of get-regexp-pattern-pattern (from Perl distribution App-RegexpPatternUtils), released on 2018-03-21.
+This document describes version 0.004 of get-regexp-pattern-pattern (from Perl distribution App-RegexpPatternUtils), released on 2020-01-03.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % get-regexp-pattern-pattern [options] <name>
+ % get-regexp-pattern-pattern [options] <pattern>
 
 Examples:
 
@@ -127,7 +70,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--gen-arg>=I<s>%
+=item B<--gen-arg>=I<s>%, B<-A>
 
 Supply generator arguments.
 
@@ -143,7 +86,7 @@ Supply generator arguments (JSON-encoded).
 
 See C<--gen-arg>.
 
-=item B<--name>=I<s>*
+=item B<--pattern>=I<s>*
 
 Name of pattern, with module prefix but without the 'Regexp::Pattern'.
 
@@ -252,17 +195,13 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head1 SEE ALSO
-
-L<list-regexp-pattern-modules>
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

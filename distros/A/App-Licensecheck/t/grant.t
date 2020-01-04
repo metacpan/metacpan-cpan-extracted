@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use lib 't/lib';
-use Test::Licensecheck tests => 44;
+use Test::Licensecheck tests => 46;
 
 # AFL
 license_is(
@@ -27,9 +27,12 @@ license_is(
 license_is( 't/grant/Apache_and_more/PIE.htc', 'Apache-2.0 or GPL-2' );
 license_is(
 	't/grant/Apache_and_more/rust.lang',
-	'Apache-2.0 or MIT~unspecified'
+	[ 'Apache-2.0 and/or MIT~unspecified', 'Apache-2.0 or MIT~unspecified' ]
 );
-license_is( 't/grant/Apache_and_more/select2.js', 'Apache-2.0 or GPL-2' );
+license_is(
+	't/grant/Apache_and_more/select2.js',
+	[ 'Apache-2.0 and/or Apache-2.0 or GPL-2', 'Apache-2.0 or GPL-2' ]
+);
 license_is(
 	't/grant/Apache_and_more/test_run.py',
 	'Apache-2.0 or BSD-3-clause'
@@ -49,7 +52,7 @@ license_is(
 # EPL
 license_is(
 	't/grant/EPL_and_more/Base64Coder.java',
-	[   'AGPL-3+ and/or Apache-2.0+ and/or EPL-1.0+ and/or LGPL-2.1+ or GPL-3+',
+	[   'AGPL-3+ and/or EPL-1.0+ and/or LGPL-2.1+ or GPL-3+',
 		'AGPL-3+ or Apache-2.0+ or EPL-1.0+ or GPL-3+ or LGPL-2.1+'
 	]
 );

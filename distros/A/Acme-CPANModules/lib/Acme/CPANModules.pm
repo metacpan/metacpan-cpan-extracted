@@ -1,7 +1,7 @@
 package Acme::CPANModules;
 
 our $DATE = '2019-11-20'; # DATE
-our $VERSION = '0.1.1'; # VERSION
+our $VERSION = '0.1.3'; # VERSION
 
 1;
 # ABSTRACT: CPAN modules
@@ -22,7 +22,7 @@ Acme::CPANModules - CPAN modules
 
 =head1 VERSION
 
-This document describes version 0.1.1 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2019-11-20.
+This document describes version 0.1.3 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2019-11-20.
 
 =head1 DESCRIPTION
 
@@ -70,6 +70,8 @@ structure is this:
  This is just a list of my favorite modules.
  _
 
+     ## define features to be used by entries. this can be used to generate a
+     ## feature comparison matrix among the entries.
      # entry_features => { # optional
      #     feature1 => 'Summary of feature1',
      #     feature2 => 'Summary of feature2',
@@ -80,6 +82,11 @@ structure is this:
          {...},
          ...
      ],
+
+     ## specify Bencher scenario properties; "bench_" prefix will be removed
+     ## when creating scenario record. see Bencher for more details.
+     # bench_datasets => [ ... ],
+     # bench_extra_modules => [ ... ],
  }
 
 Each entry is another DefHash:
@@ -99,6 +106,9 @@ Each entry is another DefHash:
 
      # related_modules => ['Data::Dump::Color', 'Data::Dumper'], # if you want to specify related modules that are not listed on the other entries of the same list
 
+     ## specify which features this entry supports/doesn't support. this can be
+     ## used to generate feature comparison matrix. see
+     ## Acme::CPANModulesUtil::FeatureMatrix.
      # features => {
      #     feature1 => 1,
      #     feature2 => 0,
@@ -106,8 +116,8 @@ Each entry is another DefHash:
      #     ...
      # },
 
-     # specify Bencher scenario participant's properties; "bench_" prefix will
-     # be removed when creating participant record.
+     ## specify Bencher scenario participant's properties; "bench_" prefix will
+     ## be removed when creating participant record.
      # bench_code => sub { ... }, # or
      # bench_code_template => 'Data::Dump::dump(<data>)',
      # ...
@@ -157,6 +167,8 @@ feature.
 C<Acme::CPANModules::*> modules
 
 L<cpanmodules> from L<App::cpanmodules>
+
+L<Bencher>
 
 =head1 AUTHOR
 

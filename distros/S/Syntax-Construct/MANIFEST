@@ -2,7 +2,6 @@ Changes
 lib/Syntax/Construct.pm
 Makefile.PL
 MANIFEST			This list of files
-README.pod
 t/00-load.t
 t/01-invalid.t
 t/02-constructs.t

@@ -2,7 +2,7 @@ package Filesys::Notify::Simple;
 
 use strict;
 use 5.008_001;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Carp ();
 use Cwd;
@@ -56,7 +56,7 @@ sub wait_inotify2 {
     my $fs = _full_scan(@path);
     for my $path (keys %$fs) {
         $inotify->watch($path, &IN_MODIFY|&IN_CREATE|&IN_DELETE|&IN_DELETE_SELF|&IN_MOVE_SELF|&IN_MOVE)
-            or Carp::croak("watch failed: $!");
+            or Carp::carp("watch failed for $path: $!");
     }
 
     return sub {

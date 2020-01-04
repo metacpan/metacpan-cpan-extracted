@@ -20,6 +20,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/10-has.t',
     't/20-moo.t',
+    't/21-moox-typetiny.t',
     't/30-strict.t',
     't/31-strict.t',
     't/author-clean-namespaces.t',

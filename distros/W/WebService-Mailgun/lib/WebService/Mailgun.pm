@@ -9,7 +9,7 @@ use URI;
 use Try::Tiny;
 use Carp;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 our $API_BASE = 'api.mailgun.net/v3';
 
 use Class::Accessor::Lite (
@@ -180,13 +180,11 @@ sub delete_list_member {
 }
 
 sub event {
-    my ($self, $args) = @_;
+    my ($self, $query) = @_;
 
-    if (ref($args) && ref($args) eq 'HASH') {
-        return $self->recursive("events", $args);
-    } else {
-        return $self->recursive("events", {}, 'items', URI->new($args));
-    }
+    my $api_url = URI->new($self->domain_api_url("events"));
+    $api_url->query_form($query);
+    return $self->recursive("events", {}, "items", $api_url);
 }
 
 sub get_message_from_event {
@@ -397,12 +395,12 @@ Delete member for mailing list.
 
 L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
 
-=head2 event($option|$uri)
+=head2 event($args)
 
 Get event data.
 
     # get event data
-    my ($events, $purl) = $mailgun->event({ event => 'stored' });
+    my ($events, $purl) = $mailgun->event({ event => 'stored', limit => 50 });
 
 L<Events|https://documentation.mailgun.com/api-events.html>
 
@@ -421,7 +419,7 @@ L<Stored Message|https://documentation.mailgun.com/api-sending.html#retrieving-s
 event method return previous url. it can use for fetch event.
 
     # event Pooling
-    my ($events, $purl) = $mailgun->event({ event => 'stored' });
+    my ($events, $purl) = $mailgun->event({ event => 'stored', begin => localtime->epoch() });
     // do something ...
     $events = $mailgun->event($purl);
     // ...

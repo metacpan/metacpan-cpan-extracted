@@ -1,3 +1,6 @@
+1.20200103 2020-01-03 UTC
+  - Fix tests for perl 5.20
+
 1.20200102 2020-01-02 UTC
   - Refactoring internal code, this is a breaking change!
 

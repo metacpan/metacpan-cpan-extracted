@@ -32,18 +32,21 @@ optional_features: {}
 provides:
   App::Licensecheck:
     file: lib/App/Licensecheck.pm
-    version: v3.0.37
+    version: v3.0.38
 requires:
   Encode: '0'
   Fcntl: '0'
   Getopt::Long::Descriptive: '0'
   List::Util: '1.45'
+  Log::Any: '0'
+  Log::Any::Adapter::Screen: '0'
   Moo: '1.001000'
+  MooX::Role::Logger: '0'
   Path::Iterator::Rule: '0'
   Path::Tiny: '0.062'
   Pod::Constants: '0'
   Regexp::Pattern: '0'
-  Regexp::Pattern::License: v3.1.94
+  Regexp::Pattern::License: v3.1.95
   Sort::Key::Multi: '1.25'
   String::Copyright: '0.003'
   String::Escape: '0'
@@ -56,15 +59,15 @@ requires:
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project
   bugtracker: https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck
-  homepage: https://metacpan.org/release/App-Licensecheck
+  homepage: https://metacpan.org/pod/App::Licensecheck
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://anonscm.debian.org/cgit/build-common/licensecheck.git
-version: v3.0.37
+version: v3.0.38
 x_contributors:
   - 'Paul Wise <pabs@debian.org>'
 x_help_wanted:
-  - documenter
   - tester
+  - documenter
 x_provides_scripts:
   licensecheck:
     file: bin/licensecheck

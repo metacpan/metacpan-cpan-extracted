@@ -11,6 +11,8 @@ README.mkdn
 bin/csv2chart
 dist.ini
 lib/App/CSV2Chart.pm
+lib/App/CSV2Chart/API/ToXLSX.pm
+lib/App/CSV2Chart/Command/svg.pm
 lib/App/CSV2Chart/Command/xlsx.pm
 t/00-compile.t
 weaver.ini

@@ -4,13 +4,35 @@ use FindBin;
 use lib $FindBin::Bin.'/../3rd/lib/perl5';
 use lib $FindBin::Bin.'/../lib';
 use Mojolicious::Lite;
+use Mojo::SOAP::Client;
+use Mojo::File qw(curfile);
 
 plugin 'SOAP::Server' => {
-    wsdl => $FindBin::Bin.'/nameservice.wsdl',
-    xsds => [$FindBin::Bin.'/nameservice.xsd'],
+    wsdl => curfile->sibling('nameservice.wsdl'),
+    xsds => [curfile->sibling('nameservice.xsd')],
     controller => SoapCtrl->new,
     endPoint => '/SOAP'
 };
+
+my $sc = Mojo::SOAP::Client->new(
+    log => app->log,
+    wsdl => curfile->sibling('nameservice.wsdl'),
+    xsds => [
+        curfile->sibling('nameservice.xsd')
+    ],
+    endPoint => '/SOAP'
+);
+
+get '/soapGwTest' => sub {
+    my $c = shift;
+    $sc->call_p('getCountries')->then(sub {
+        $c->render(
+            json => shift
+         );
+    });
+    $c->render_later;
+};
+
 
 app->start;
 

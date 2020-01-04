@@ -29,9 +29,10 @@ my %WriteMakefileArgs = (
     "Moo" => "1.006000",
     "Test::More" => 0,
     "Test::Most" => 0,
+    "if" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.4.0",
+  "VERSION" => "v0.4.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "Test::Most" => 0,
   "Types::Const" => "0.3.3",
   "Types::Standard" => 0,
+  "if" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0
 );

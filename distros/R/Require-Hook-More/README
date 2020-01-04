@@ -1,0 +1,99 @@
+NAME
+    Require::Hook::More - Load module like perl, with more options
+
+VERSION
+    This document describes version 0.001 of Require::Hook::More (from Perl
+    distribution Require-Hook-More), released on 2020-01-04.
+
+SYNOPSIS
+     {
+         local @INC = (Require::Hook::More->new(
+             # skip_scalar    => 1,     # optional, default is 0
+             # skip_scalarref => 1,     # optional, default is 0
+             # skip_globref   => 1,     # optional, default is 0
+             # skip_coderef   => 1,     # optional, default is 0
+             # skip_object    => 1,     # optional, default is 0
+             # prepend_code   => "use re::engine::PCRE2",   # optional, default is none
+             # append_code    => "1;",                      # optional, default is none
+         ), @INC);
+
+         require Foo::Bar;
+         # ...
+     }
+
+DESCRIPTION
+    This require hook behaves like perl when loading modules from (the rest
+    of the) @INC. Read "require" in perlfunc for more details. basically
+    perl supports having scalar (directory names), or scalarref, or globref
+    (filehandle), or coderef, or objects (blessed refs) in @INC.
+
+    Additionally, this require hook provides some more options like skipping
+    some items in @INC, adding code before or after the module's source
+    code. Planned features in the future: plugins (e.g. storage plugin like
+    retrieving source code from database, git repository [e.g. some branch
+    or older revision], or remote storage), code filtering or mangling,
+    signature checking, other kind of code checking, retry/fallback
+    mechanism when code fails to be compiled, etc.
+
+METHODS
+  new
+    Usage:
+
+     $hook = Require::Hook::More->new(%args);
+
+    Constructor. Known arguments:
+
+    *   debug => bool (default: 0)
+
+        If set to 1, will print debugging messages.
+
+    *   skip_scalar => bool (default: 0)
+
+    *   skip_scalarref => bool (default: 0)
+
+    *   skip_globref => bool (default: 0)
+
+    *   skip_coderef => bool (default: 0)
+
+    *   skip_object => bool (default: 0)
+
+    *   append_code => str (default: undef)
+
+        Code to be added at the beginning of module source code. Can be used
+        for example to add pragma since the code will be executed in the
+        same lexical scope as the module source code.
+
+    *   prepend_code => str (default: undef)
+
+        Code to be added at the end of module source code.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Require-Hook-More>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Require-Hook-More>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Require-Hook-More>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Actual implementation of getting module source code from @INC is
+    provided by Module::Installed::Tiny.
+
+    Other "Require::Hook::*".
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -25,28 +25,31 @@ optional_features: {}
 provides:
   Spreadsheet::Wright:
     file: lib/Spreadsheet/Wright.pm
-    version: '0.105'
+    version: '0.107'
   Spreadsheet::Wright::CSV:
     file: lib/Spreadsheet/Wright/CSV.pm
-    version: '0.105'
+    version: '0.107'
   Spreadsheet::Wright::Excel:
     file: lib/Spreadsheet/Wright/Excel.pm
-    version: '0.105'
+    version: '0.107'
   Spreadsheet::Wright::HTML:
     file: lib/Spreadsheet/Wright/HTML.pm
-    version: '0.105'
+    version: '0.107'
   Spreadsheet::Wright::JSON:
     file: lib/Spreadsheet/Wright/JSON.pm
-    version: '0.105'
+    version: '0.107'
+  Spreadsheet::Wright::OOXML:
+    file: lib/Spreadsheet/Wright/OOXML.pm
+    version: '0.107'
   Spreadsheet::Wright::OpenDocument:
     file: lib/Spreadsheet/Wright/OpenDocument.pm
-    version: '0.105'
+    version: '0.107'
   Spreadsheet::Wright::OpenDocumentXML:
     file: lib/Spreadsheet/Wright/OpenDocumentXML.pm
-    version: '0.105'
+    version: '0.107'
   Spreadsheet::Wright::XHTML:
     file: lib/Spreadsheet/Wright/XHTML.pm
-    version: '0.105'
+    version: '0.107'
 recommends:
   Archive::Zip: '0'
   DateTime: '0'
@@ -59,11 +62,14 @@ requires:
   parent: '0'
   perl: '5.010000'
 resources:
-  X_identifier: http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/project
+  Identifier: http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/project
   bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Spreadsheet-Wright
   homepage: https://metacpan.org/release/Spreadsheet-Wright
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-spreadsheet-wright.git
-version: '0.105'
+version: '0.107'
 x_contributors:
-  - 'AMALTSEV <amaltsev@cpan.org>'
+  - 'Andrew Maltsev (AMALTSEV) <amaltsev@cpan.org>'
+  - 'Andrius Merkys (MERKYS) <merkys@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -32,12 +32,12 @@ SOAP client: you can handle many SOAP requests in parallel.
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile-SOAP-Mojolicious distribution version 0.04,
-built on November 01, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile-SOAP-Mojolicious distribution version 0.05,
+built on January 03, 2020. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 
-Copyrights 2016-2019 by [Mark Overmeer <markov@overmeer.net>]. For other contributors see ChangeLog.
+Copyrights 2016-2020 by [Mark Overmeer <markov@overmeer.net>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

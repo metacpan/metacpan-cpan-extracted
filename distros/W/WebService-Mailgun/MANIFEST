@@ -5,6 +5,7 @@ LICENSE
 META.json
 README.md
 cpanfile
+cpanfile.snapshot
 lib/WebService/Mailgun.pm
 minil.toml
 t/00_compile.t

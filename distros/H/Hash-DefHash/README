@@ -2,24 +2,25 @@ NAME
     Hash::DefHash - Manipulate defhash
 
 VERSION
-    This document describes version 0.070 of Hash::DefHash (from Perl
-    distribution Hash-DefHash), released on 2018-09-10.
+    This document describes version 0.071 of Hash::DefHash (from Perl
+    distribution Hash-DefHash), released on 2020-01-04.
 
 SYNOPSIS
      use Hash::DefHash; # imports defhash()
 
      # create a new defhash object, die when hash is invalid defhash
-     $dh = Hash::DefHash->new; # creates an empty hash, or ...
+     $dh = Hash::DefHash->new;                        # creates an empty defhash
+     $dh = Hash::DefHash->new({a=>1});                # use the hashref
+     $dh = Hash::DefHash->new({"contains space"=>1}); # dies!
 
-     # ... manipulate an existing hash, defhash() is a synonym for
-     # Hash::DefHash->new().
+     # defhash() is a synonym for Hash::DefHash->new().
      $dh = defhash({foo=>1});
 
      # return the original hash
      $hash = $dh->hash;
 
      # list properties
-     @prop = $dh->props;
+     @props = $dh->props;
 
      # list property names, values, and attributes, will return ($prop => $attrs,
      # ...). Property values will be put in $attrs with key "". For example:
@@ -98,14 +99,24 @@ FUNCTIONS
     wrapping it again. Exported by default.
 
 METHODS
-  new([ $hash ],[ %opts ]) => OBJ
-    Create a new Hash::DefHash object, which is a thin OO skin over the
-    regular Perl hash. If $hash is not specified, a new anonymous hash is
-    created.
+  new
+    Usage:
 
-    Internally, the object contains a reference to the hash. It does not
-    create a copy of the hash or bless the hash directly. Be careful not to
-    assume that the two are the same!
+     $dh = Hash::DefHash->new([ $hash ],[ %opts ]);
+
+    Constructor. Create a new Hash::DefHash object, which is a thin OO skin
+    over the regular Perl hash. If $hash is not specified, a new anonymous
+    hash is created.
+
+    Internally, the object contains a hash reference which contains
+    reference to the hash ("bless({hash=>$orig_hash, ...},
+    'Hash::DefHash')"). It does not create a copy of the hash or bless the
+    hash directly. Be careful not to assume that the two are the same!
+
+    Will check the keys of hash for invalid properties/attributes and will
+    die if one is found, e.g..
+
+     $dh = Hash::DefHash->new({"contains space" => 1}); # dies!
 
     Known options:
 
@@ -119,35 +130,77 @@ METHODS
         Set defhash's parent. Default language ("default_lang") will follow
         parent's if unset in the current hash.
 
-  $dh->hash
-  $dh->check
-  $dh->contents
-  $dh->default_lang
-  $dh->props
-  $dh->prop
-  $dh->get_prop
-  $dh->prop_exists
-  $dh->add_prop
-  $dh->set_prop
-  $dh->del_prop
-  $dh->del_all_props
-  $dh->attrs
-  $dh->attr
-  $dh->get_attr
-  $dh->attr_exists
-  $dh->add_attr
-  $dh->set_attr
-  $dh->del_attr
-  $dh->del_all_attrs
-  $dh->defhash_v
-  $dh->v
-  $dh->name
-  $dh->summary
-  $dh->description
-  $dh->tags
-  $dh->get_prop_lang
-  $dh->get_prop_all_langs
-  $dh->set_prop_lang
+  hash
+    Usage:
+
+     $hashref = $dh->hash;
+
+    Return the original hashref.
+
+  check
+    Usage:
+
+     $dh->check;
+
+  contents
+    Usage:
+
+     my %contents = $dh->contents;
+
+  default_lang
+    Usage:
+
+     $default_lang = $dh->default_lang;
+
+  props
+    Usage:
+
+     @props = $dh->props;
+
+    Return list of properties. Will ignore properties that begin with
+    underscore, e.g.:
+
+     $dh = defhash({a=>1, _b=>2});
+     $dh->props;
+
+  prop
+    Usage:
+
+     $val = $dh->prop($name);
+
+    Get property value, will die if property does not exist.
+
+  get_prop
+     $val = $dh->get_prop($name);
+
+    Like "prop"(), but will return undef if property does not exist.
+
+  prop_exists
+    Usage:
+
+     $exists = $dh->prop_exists;
+
+  add_prop
+  set_prop
+  del_prop
+  del_all_props
+  attrs
+  attr
+  get_attr
+  attr_exists
+  add_attr
+  set_attr
+  del_attr
+  del_all_attrs
+  defhash_v
+  v
+  name
+  summary
+  description
+  tags
+  get_prop_lang
+  get_prop_all_langs
+  set_prop_lang
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Hash-DefHash>.
@@ -170,7 +223,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2016, 2015, 2014, 2012 by
+    This software is copyright (c) 2020, 2018, 2016, 2015, 2014, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

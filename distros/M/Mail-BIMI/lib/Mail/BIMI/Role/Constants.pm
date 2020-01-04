@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::Constants;
 # ABSTRACT: Class to model a collection of egress pools
-our $VERSION = '1.20200102'; # VERSION
+our $VERSION = '1.20200103'; # VERSION
 use 5.20.0;
 use Moo::Role;
 use Types::Standard qw{Str HashRef ArrayRef};

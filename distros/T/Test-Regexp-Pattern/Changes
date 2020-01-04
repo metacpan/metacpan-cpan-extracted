@@ -1,3 +1,19 @@
+0.006   2020-01-04  Released-By: PERLANCAR; Urgency: medium
+
+	[doc]
+
+        - Update doc (DZP:Test::Regexp::Pattern does not exist, or I
+	  haven't written it; mention DZP:Regexp::Pattern instead which
+	  includes the functionality).
+
+	- Fix example in Synopsis [GH#3].
+
+	[internal]
+
+        - Use Hash::DefHash so we properly ignore ignorable
+          properties/attributes [GH#4].
+
+
 0.005   2020-01-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Generate anchored regex pattern if anchor=>1 in example.

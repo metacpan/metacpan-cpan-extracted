@@ -4,62 +4,67 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "simple spreadsheet worker",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Spreadsheet-Wright",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => {
-                          recommends => {
-                                          "Archive::Zip" => 0,
-                                          "DateTime" => 0,
-                                          "HTML::HTML5::Writer" => 0,
-                                          "JSON" => 0,
-                                          "Spreadsheet::WriteExcel" => 0,
-                                          "XML::LibXML" => 1.62,
-                                        },
-                          requires   => { "parent" => 0, "perl" => "5.010000", "Text::CSV" => 0 },
+  "abstract"         => "simple spreadsheet worker",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
                         },
-                        test => { requires => { "Test::More" => 0.61 } },
-                      },
-  "provides"       => {
-                        "Spreadsheet::Wright"                  => { file => "lib/Spreadsheet/Wright.pm", version => 0.105 },
-                        "Spreadsheet::Wright::CSV"             => { file => "lib/Spreadsheet/Wright/CSV.pm", version => 0.105 },
-                        "Spreadsheet::Wright::Excel"           => { file => "lib/Spreadsheet/Wright/Excel.pm", version => 0.105 },
-                        "Spreadsheet::Wright::HTML"            => { file => "lib/Spreadsheet/Wright/HTML.pm", version => 0.105 },
-                        "Spreadsheet::Wright::JSON"            => { file => "lib/Spreadsheet/Wright/JSON.pm", version => 0.105 },
-                        "Spreadsheet::Wright::OpenDocument"    => { file => "lib/Spreadsheet/Wright/OpenDocument.pm", version => 0.105 },
-                        "Spreadsheet::Wright::OpenDocumentXML" => {
-                                                                    file => "lib/Spreadsheet/Wright/OpenDocumentXML.pm",
-                                                                    version => 0.105,
-                                                                  },
-                        "Spreadsheet::Wright::XHTML"           => { file => "lib/Spreadsheet/Wright/XHTML.pm", version => 0.105 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Spreadsheet-Wright",
-                                        },
-                        homepage     => "https://metacpan.org/release/Spreadsheet-Wright",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-spreadsheet-wright.git",
-                                          web  => "https://github.com/tobyink/p5-spreadsheet-wright",
-                                        },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/project",
-                      },
-  "version"        => 0.105,
-  "x_contributors" => ["AMALTSEV <amaltsev\@cpan.org>"],
+  "name"             => "Spreadsheet-Wright",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            recommends => {
+                                            "Archive::Zip" => 0,
+                                            "DateTime" => 0,
+                                            "HTML::HTML5::Writer" => 0,
+                                            "JSON" => 0,
+                                            "Spreadsheet::WriteExcel" => 0,
+                                            "XML::LibXML" => 1.62,
+                                          },
+                            requires   => { "parent" => 0, "perl" => "5.010000", "Text::CSV" => 0 },
+                          },
+                          test => { requires => { "Test::More" => 0.61 } },
+                        },
+  "provides"         => {
+                          "Spreadsheet::Wright"                  => { file => "lib/Spreadsheet/Wright.pm", version => 0.107 },
+                          "Spreadsheet::Wright::CSV"             => { file => "lib/Spreadsheet/Wright/CSV.pm", version => 0.107 },
+                          "Spreadsheet::Wright::Excel"           => { file => "lib/Spreadsheet/Wright/Excel.pm", version => 0.107 },
+                          "Spreadsheet::Wright::HTML"            => { file => "lib/Spreadsheet/Wright/HTML.pm", version => 0.107 },
+                          "Spreadsheet::Wright::JSON"            => { file => "lib/Spreadsheet/Wright/JSON.pm", version => 0.107 },
+                          "Spreadsheet::Wright::OOXML"           => { file => "lib/Spreadsheet/Wright/OOXML.pm", version => 0.107 },
+                          "Spreadsheet::Wright::OpenDocument"    => { file => "lib/Spreadsheet/Wright/OpenDocument.pm", version => 0.107 },
+                          "Spreadsheet::Wright::OpenDocumentXML" => {
+                                                                      file => "lib/Spreadsheet/Wright/OpenDocumentXML.pm",
+                                                                      version => 0.107,
+                                                                    },
+                          "Spreadsheet::Wright::XHTML"           => { file => "lib/Spreadsheet/Wright/XHTML.pm", version => 0.107 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=Spreadsheet-Wright",
+                                          },
+                          homepage     => "https://metacpan.org/release/Spreadsheet-Wright",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-spreadsheet-wright.git",
+                                            web  => "https://github.com/tobyink/p5-spreadsheet-wright",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Spreadsheet-Wright/project",
+                        },
+  "version"          => 0.107,
+  "x_contributors"   => [
+                          "Andrew Maltsev (AMALTSEV) <amaltsev\@cpan.org>",
+                          "Andrius Merkys (MERKYS) <merkys\@cpan.org>",
+                        ],
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

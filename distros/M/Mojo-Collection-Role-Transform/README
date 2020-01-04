@@ -412,9 +412,9 @@ LICENSE
 
 SEE ALSO
 
-      * * Mojo::Collection
+      * Mojo::Collection
 
-      * * "with_roles" in Mojo::Base
+      * "with_roles" in Mojo::Base
 
-      * * Role::Tiny
+      * Role::Tiny
 

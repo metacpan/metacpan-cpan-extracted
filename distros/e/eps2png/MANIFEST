@@ -1,0 +1,23 @@
+README
+CHANGES
+MANIFEST
+Makefile.PL
+eps2png.spec
+src/eps2png.pl
+script/.placeholder
+t/basic.pl
+t/12_gif.t
+t/11_jpg.t
+t/10_png.t
+t/20_extra.t
+t/x1.eps
+t/x1.gif
+t/x1.jpg
+t/x1.png
+t/x0.eps
+t/x0-120.png
+t/x0-80-120.png
+t/x0-15.png
+t/x0-81.png
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

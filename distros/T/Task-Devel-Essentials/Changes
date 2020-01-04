@@ -1,5 +1,9 @@
 Revision history for Task-Devel-Essentials
 
+0.014   Thu, 02 Jan 2020 12:00:58 +0100
+        upgraded versions
+        switched to Artistic License 2.0
+
 0.013   Thu, 18 Jul 2019 10:32:34 +0200
         upgraded versions
         added more modules

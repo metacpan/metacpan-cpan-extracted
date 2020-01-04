@@ -6,7 +6,7 @@ use warnings;
 
 use lib 't/lib';
 
-use MyTest tests => 84;
+use MyTest tests => 101;
 
 license_covered(
 	'adobe_2006',
@@ -46,6 +46,66 @@ license_covered(
 	license => <<EOF,
 This Academic Free License (the "License") applies to any original work of authorship (the "Original Work") whose owner (the "Licensor") has placed the following licensing notice adjacent to the copyright notice for the Original Work:
 EOF
+);
+
+license_covered(
+	'afl_1_1',
+	name    => 'Academic Free License version 1.1',
+	grant   => 'Licensed under the Academic Free License version 1.1.',
+	license => 'The Academic Free License applies to any original work',
+	TODO    => [qw(grant_grant name_name)]
+);
+
+license_covered(
+	'afl_1_2',
+	name    => 'Academic Free License version 1.2',
+	grant   => 'Licensed under the Academic Free License version 1.2',
+	license => 'This Academic Free License applies to any original work',
+	TODO    => [qw(grant_grant name_name)]
+);
+
+license_covered(
+	'afl_2',
+	name    => 'Academic Free License version 2.0',
+	grant   => 'Licensed under the Academic Free License version 2.0',
+	license => <<EOF,
+9) Acceptance and Termination. If You distribute  copies of the Original Work or a Derivative Work, You must make a reasonable effort under the circumstances to obtain the express assent of recipients to the terms of this License.  Nothing else but this License (or another written agreement between Licensor and You) grants You permission to create Derivative Works based upon the Original Work or to exercise any of the rights granted in Section 1 herein, and any attempt to do so except under the terms of this License (or another written agreement between Licensor and You) is expressly prohibited by U.S. copyright law, the equivalent laws of other countries, and by international treaty.  Therefore, by exercising any of the rights granted to You in Section 1 herein, You indicate Your acceptance of this License and all of its terms and conditions.
+
+10) Termination for Patent Action. This License shall terminate automatically and You may no longer exercise any of the rights granted to You by this License as of the date You commence an action, including a cross-claim or counterclaim, for patent infringement (i) against Licensor with respect to a patent applicable to software or (ii) against any entity with respect to a patent applicable to the Original Work (but excluding combinations of the Original Work with other software or hardware).
+EOF
+	TODO => [qw(grant_grant name_name)]
+);
+
+license_covered(
+	'afl_2_1',
+	name    => 'Academic Free License version 2.1',
+	grant   => 'Licensed under the Academic Free License version 2.1',
+	license => <<EOF,
+9) Acceptance and Termination. If You distribute copies of the Original Work or a Derivative Work, You must make a reasonable effort under the circumstances to obtain the express assent of recipients to the terms of this License. Nothing else but this License (or another written agreement between Licensor and You) grants You permission to create Derivative Works based upon the Original Work or to exercise any of the rights granted in Section 1 herein, and any attempt to do so except under the terms of this License (or another written agreement between Licensor and You) is expressly prohibited by U.S. copyright law, the equivalent laws of other countries, and by international treaty. Therefore, by exercising any of the rights granted to You in Section 1 herein, You indicate Your acceptance of this License and all of its terms and conditions.
+
+10) Termination for Patent Action. This License shall terminate automatically and You may no longer exercise any of the rights granted to You by this License as of the date You commence an action, including a cross-claim or counterclaim, against Licensor or any licensee alleging that the Original Work infringes a patent. This termination provision shall not apply for an action alleging patent infringement by combinations of the Original Work with other software or hardware.
+EOF
+	TODO => [qw(grant_grant name_name)]
+);
+
+license_covered(
+	'afl_3',
+	name    => 'Academic Free License version 3.0',
+	grant   => 'Licensed under the Academic Free License version 3.0',
+	license => <<EOF,
+9) Acceptance and Termination. If, at any time, You expressly assented to this License, that assent indicates your clear and irrevocable acceptance of this License and all of its terms and conditions. If You distribute or communicate copies of the Original Work or a Derivative Work, You must make a reasonable effort under the circumstances to obtain the express assent of recipients to the terms of this License. This License conditions your rights to undertake the activities listed in Section 1, including your right to create Derivative Works based upon the Original Work, and doing so without honoring these terms and conditions is prohibited by copyright law and international treaty. Nothing in this License is intended to affect copyright exceptions and limitations (including “fair use” or “fair dealing”). This License shall terminate immediately and You may no longer exercise any of the rights granted to You by this License upon your failure to honor the conditions in Section 1(c).
+
+10) Termination for Patent Action. This License shall terminate automatically and You may no longer exercise any of the rights granted to You by this License as of the date You commence an action, including a cross-claim or counterclaim, against Licensor or any licensee alleging that the Original Work infringes a patent. This termination provision shall not apply for an action alleging patent infringement by combinations of the Original Work with other software or hardware.
+EOF
+);
+
+license_covered(
+	'agpl',
+	name  => 'GNU Affero General Public License',
+	grant => <<EOF,
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+EOF
+	TODO => [qw(subject_license)]
 );
 
 license_covered(
@@ -92,15 +152,6 @@ EOF
 );
 
 license_covered(
-	'agpl',
-	name  => 'GNU Affero General Public License',
-	grant => <<EOF,
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-EOF
-	TODO => [qw(subject_license)]
-);
-
-license_covered(
 	'apache',
 	name  => 'Apache License',
 	iri   => 'https://www.apache.org/licenses/LICENSE-2.0',
@@ -122,6 +173,70 @@ license_covered(
 	text => <<EOF,
 This file and the 14 PostScript(R) AFM files it accompanies may be used, copied, and distributed for any purpose and without charge, with or without modification, provided that all copyright notices are retained; that the AFM files are not distributed without this file; that all modifications to this file or any of the AFM files are prominently noted in the modified file(s); and that this paragraph is not modified.
 Adobe Systems has no responsibility or obligation to support the use of the AFM files.
+EOF
+);
+
+license_covered(
+	'artistic',
+	name => 'Artistic License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'artistic_1',
+	name => 'Artistic License 1.0',
+	iri  => 'https://opensource.org/licenses/artistic-license-1.0',
+	text => <<EOF,
+7. C or perl subroutines supplied by you and linked into this Package shall not be considered part of this Package.
+
+8. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
+EOF
+);
+
+license_covered(
+	'artistic_1_cl8',
+	name => 'Artistic-1.0-cl8',
+	iri  => 'https://spdx.org/licenses/Artistic-1.0-cl8',
+	text => <<EOF,
+7. C or perl subroutines supplied by you and linked into this Package shall not be considered part of this Package.
+
+8.Aggregation of this Package with a commercial distribution is always permitted provided that the use of this Package is embedded;
+that is, when no overt attempt is made to make this Package's interfaces visible to the end user of the commercial distribution.
+Such use shall not be construed as a distribution of this Package.
+
+9. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
+EOF
+	TODO => [qw(not_iri_name)]
+);
+
+license_covered(
+	'artistic_1_clarified',
+	name => 'Clarified Artistic License',
+	iri =>
+		'http://gianluca.dellavedova.org/2011/01/03/clarified-artistic-license/',
+	text => <<EOF,
+7. C subroutines (or comparably compiled subroutines in other languages) supplied by you and linked into this Package in order to emulate subroutines and variables of the language defined by this Package shall not be considered part of this Package, but are the equivalent of input as in Paragraph 6, provided these subroutines do not change the language in any way that would cause it to fail the regression tests for the language.
+
+8. Aggregation of the Standard Version of the Package with a commercial distribution is always permitted provided that the use of this Package is embedded;
+that is, when no overt attempt is made to make this Package's interfaces visible to the end user of the commercial distribution.
+Such use shall not be construed as a distribution of this Package.
+
+9. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
+EOF
+);
+
+license_covered(
+	'artistic_1_perl',
+	name => 'Artistic License 1.0 (Perl)',
+	iri  => 'http://dev.perl.org/licenses/artistic.html',
+	text => <<EOF,
+7. C subroutines (or comparably compiled subroutines in other languages) supplied by you and linked into this Package in order to emulate subroutines and variables of the language defined by this Package shall not be considered part of this Package, but are the equivalent of input as in Paragraph 6, provided these subroutines do not change the language in any way that would cause it to fail the regression tests for the language.
+
+8. Aggregation of this Package with a commercial distribution is always permitted provided that the use of this Package is embedded;
+that is, when no overt attempt is made to make this Package's interfaces visible to the end user of the commercial distribution.
+Such use shall not be construed as a distribution of this Package.
+
+9. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
 EOF
 );
 
@@ -303,7 +418,6 @@ CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL
 
 Version 2.1 du 2013-06-21
 EOF
-	TODO => [qw(subject_license)]
 );
 
 license_covered(
@@ -313,6 +427,7 @@ license_covered(
 	text => <<EOF,
 Version 1 du 21/06/2004
 EOF
+	TODO => [qw(name_name)]
 );
 
 license_covered(
@@ -332,7 +447,7 @@ license_covered(
 	text => <<EOF,
 Version 2.0 du 2006-09-05.
 EOF
-	TODO => [qw(name_name mot_iri_name)]
+	TODO => [qw(name_name)]
 );
 
 license_covered(
@@ -346,12 +461,26 @@ EOF
 	text => <<EOF,
 Version 2.1 du 2013-06-21
 EOF
-	TODO => [qw(name_name grant_grant)]
+	TODO => [qw(name_name)]
 );
 
 license_covered(
 	'cecill_b',
 	name  => 'CeCILL-B Free Software License Agreement',
+	iri   => 'https://cecill.info/licences/Licence_CeCILL-B_V1-en.html',
+	grant => <<EOF,
+This software is governed by the CeCILL-B license under French law and abiding by the rules of distribution of free software.
+You can  use, modify and/ or redistribute the software under the terms of the CeCILL-B license as circulated by CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+EOF
+	text => <<EOF,
+Ce contrat est une licence de logiciel libre dont l'objectif est de conférer aux utilisateurs une très large liberté de modification et de redistribution du logiciel régi par cette licence.
+EOF
+	TODO => [qw(not_iri_name)]
+);
+
+license_covered(
+	'cecill_b_1',
+	name  => 'CeCILL-B License 1.0',
 	iri   => 'https://cecill.info/licences/Licence_CeCILL-B_V1-en.html',
 	grant => <<EOF,
 This software is governed by the CeCILL-B license under French law and abiding by the rules of distribution of free software.
@@ -384,7 +513,31 @@ Le Licencié s'engage expressément:
 
 Le Licencié s'engage à ne pas porter atteinte, directement ou indirectement, aux droits de propriété intellectuelle du Titulaire et/ou des Contributeurs sur le Logiciel et à prendre, le cas échéant, à l'égard de son personnel toutes les mesures nécessaires pour assurer le respect des dits droits de propriété intellectuelle du Titulaire et/ou des Contributeurs.
 EOF
-	TODO => [qw(subject_license not_iri_name)]
+	TODO => [qw(not_iri_name)]
+);
+
+license_covered(
+	'cecill_c_1',
+	name  => 'CeCILL-C License 1.0',
+	iri   => 'https://cecill.info/licences/Licence_CeCILL-C_V1-fr.html',
+	grant => <<EOF,
+This software is governed by the CeCILL-C license under French law and abiding by the rules of distribution of free software.
+You can  use, modify and/ or redistribute the software under the terms of the CeCILL-C license as circulated by CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+EOF
+	text => <<EOF,
+6.4 MENTIONS DES DROITS
+
+Le Licencié s'engage expressément:
+
+1. à ne pas supprimer ou modifier de quelque manière que ce soit les mentions de propriété intellectuelle apposées sur le Logiciel;
+
+2. à reproduire à l'identique lesdites mentions de propriété intellectuelle sur les copies du Logiciel modifié ou non;
+
+3. à faire en sorte que l'utilisation du Logiciel, ses mentions de propriété intellectuelle et le fait qu'il est régi par le Contrat soient indiqués dans un texte facilement accessible notamment depuis l'interface de tout Logiciel Dérivé.
+
+Le Licencié s'engage à ne pas porter atteinte, directement ou indirectement, aux droits de propriété intellectuelle du Titulaire et/ou des Contributeurs sur le Logiciel et à prendre, le cas échéant, à l'égard de son personnel toutes les mesures nécessaires pour assurer le respect des dits droits de propriété intellectuelle du Titulaire et/ou des Contributeurs.
+EOF
+	TODO => [qw(not_iri_name)]
 );
 
 license_covered(
@@ -791,6 +944,14 @@ license_covered(
 );
 
 license_covered(
+	'rpsl_1',
+	name => 'RealNetworks Public Source License 1.0',
+	text => <<EOF,
+1. General Definitions. This License applies to any program or other work which RealNetworks, Inc., or any other entity that elects to use this license,
+EOF
+);
+
+license_covered(
 	'sgi_b',
 	name => 'SGI Free Software License B',
 	iri  => 'https://www.sgi.com/projects/FreeB/',
@@ -821,7 +982,56 @@ license_covered(
 	'wtfpl',
 	name  => 'Do What The F*ck You Want To Public License',
 	grant => 'This input method table is licensed under the WTFPL.',
-	TODO  => [qw(name_name subject_license)]
+);
+
+license_covered(
+	'wtfpl_1',
+	name => 'Do What The Fuck You Want To Public License, Version 1',
+	iri  => 'http://cvs.windowmaker.org/co.php/wm/COPYING.WTFPL',
+	text => <<EOF,
+Ok, the purpose of this license is simple and you just
+
+DO WHAT THE FUCK YOU WANT TO.
+EOF
+	TODO => [qw(name_name not_iri_name)]
+);
+
+license_covered(
+	'wtfpl_2',
+	name  => 'Do What The Fuck You Want To Public License, Version 2',
+	iri   => 'http://www.wtfpl.net/',
+	grant => <<EOF,
+This work is free.
+You can redistribute it and/or modify it under the terms of the Do What The Fuck You Want To Public License, Version 2, as published by Sam Hocevar.
+See the COPYING file for more details.
+EOF
+	text => <<EOF,
+DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+0. You just DO WHAT THE FUCK YOU WANT TO.
+EOF
+	TODO => [qw(name_name not_iri_name)]
+);
+
+license_covered(
+	'wtfnmfpl',
+	name =>
+		"Do What The Fuck You Want To But It's Not My Fault Public License",
+	TODO => [qw(name_name subject_license)]
+);
+
+license_covered(
+	'wtfnmfpl_1',
+	name =>
+		"Do What The Fuck You Want To But It's Not My Fault Public License v1",
+	iri =>
+		'http://www.adversary.org/wp/2013/10/14/do-what-the-fuck-you-want-but-its-not-my-fault/',
+	text => <<EOF,
+0. You just DO WHAT THE FUCK YOU WANT TO.
+
+1. Do not hold the author(s), creator(s), developer(s) or distributor(s) liable for anything that happens or goes wrong with your use of the work.
+EOF
 );
 
 license_covered(

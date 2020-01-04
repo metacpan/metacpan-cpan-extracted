@@ -381,8 +381,8 @@ $testReading = Date::Lectionary::Daily->new(
     'date' => Time::Piece->strptime( "2019-2-11", "%Y-%m-%d" ), 'lectionary' => 'acna-xian' );
 is(
     $testReading->readings->{morning}->{1},
-    'Tobit 4:5-19',
-	'The first reading for morning prayer on 2019-2-11 should be Tobit 4:5-19'
+    'Jeremiah 17:1-18',
+	'The first reading for morning prayer on 2019-2-11 should be Jeremiah 17:1-18'
 );
 
 #Lectionary Week: Sunday Closest to August 24 -- Day: Wednesday
@@ -408,8 +408,8 @@ $testReading = Date::Lectionary::Daily->new(
     'date' => Time::Piece->strptime( "2019-1-25", "%Y-%m-%d" ), 'lectionary' => 'acna-xian' );
 is(
     $testReading->readings->{evening}->{2},
-    '1 Corinthians 15:1-34',
-	'The second reading for evening prayer on 2019-1-25 should be 1 Corinthians 15:1-34'
+    '1 Corinthians 4:18-5:end',
+	'The second reading for evening prayer on 2019-1-25 should be 1 Corinthians 4:18-5:end'
 );
 
 #Lectionary Week: Sunday Closest to July 20 -- Day: Friday

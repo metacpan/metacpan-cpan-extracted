@@ -1,8 +1,8 @@
-Date/WeekOfYear version 0.01
+Date/WeekOfYear version 1.07
 ============================
 
 Date::WeekOfYear is small and efficient. 
-The only purpose is to return the week of the year. 
+The only purpose is to return the week of the year as per ISO-8601. 
 This can be called in either a scalar or list context.
 
 As from version 1.5 the returned week and year are based

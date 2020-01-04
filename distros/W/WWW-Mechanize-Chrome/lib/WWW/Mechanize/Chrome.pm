@@ -25,7 +25,7 @@ use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -5692,7 +5692,7 @@ Steven Dondley C<s@dondley.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2019 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

@@ -6,7 +6,7 @@ use warnings;
 no warnings qw( uninitialized numeric );
 
 BEGIN {
-	$Spreadsheet::Wright::OpenDocumentXML::VERSION   = '0.105';
+	$Spreadsheet::Wright::OpenDocumentXML::VERSION   = '0.107';
 	$Spreadsheet::Wright::OpenDocumentXML::AUTHORITY = 'cpan:TOBYINK';
 }
 
@@ -59,7 +59,7 @@ sub _prepare
 		$self->{'document'}->documentElement->setNamespace($nsuri, $prefix, $prefix eq 'office' ? 1 : 0);
 	}
 	$self->{'document'}->documentElement->setNodeName('office:document-content');
-	$self->{'document'}->documentElement->setAttribute(OFFICE_NS, 'version', '1.0');
+	$self->{'document'}->documentElement->setAttributeNS(OFFICE_NS, 'version', '1.0');
 	$self->{'body'} = $self->{'document'}->documentElement
 		->addNewChild(OFFICE_NS, 'body')
 		->addNewChild(OFFICE_NS, 'spreadsheet');
@@ -71,6 +71,8 @@ sub _prepare
 sub addsheet
 {
 	my ($self, $caption) = @_;
+
+	$self->_open() or return;
 
 	$self->{'tbody'} = $self->{'body'}->addNewChild(TABLE_NS, 'table');
 

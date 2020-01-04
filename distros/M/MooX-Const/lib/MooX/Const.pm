@@ -15,10 +15,11 @@ use Types::Standard qw( Value Object Ref );
 
 # RECOMMEND PREREQ: Types::Const v0.3.6
 # RECOMMEND PREREQ: Type::Tiny::XS
+# RECOMMEND PREREQ: MooX::TypeTiny
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.2';
 
 
 sub import {
@@ -119,7 +120,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.2
 
 =head1 SYNOPSIS
 
@@ -231,7 +232,7 @@ Kang-min Liu 劉康民 <gugod@gugod.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

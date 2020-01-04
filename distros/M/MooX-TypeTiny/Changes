@@ -1,5 +1,9 @@
 Revision history for MooX::TypeTiny
 
+0.001004 - 2020-01-02
+  - fix tests to account for changes in error location reporting in Type::Tiny
+    1.008001
+
 0.001003 - 2016-02-29
   - fix error reporting for checks nested inside other attributes
 

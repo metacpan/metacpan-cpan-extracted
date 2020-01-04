@@ -3,9 +3,9 @@ NAME
     read table data
 
 VERSION
-    This document describes version 0.581 of Perinci::Sub::Gen::AccessTable
+    This document describes version 0.582 of Perinci::Sub::Gen::AccessTable
     (from Perl distribution Perinci-Sub-Gen-AccessTable), released on
-    2019-09-10.
+    2020-01-03.
 
 SYNOPSIS
     In list_countries.pl:
@@ -257,6 +257,10 @@ FUNCTIONS
 
         Supply default 'detail' value for function arg spec.
 
+    *   default_exclude_fields => *str*
+
+        Supply default 'exclude_fields' value for function arg spec.
+
     *   default_fields => *str*
 
         Supply default 'fields' value for function arg spec.
@@ -318,6 +322,8 @@ FUNCTIONS
         q).
 
         Filtering must also be enabled ("enable_filtering").
+
+    *   exclude_fields_aliases => *hash*
 
     *   extra_args => *hash*
 
@@ -520,8 +526,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013,
-    2012, 2011 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014,
+    2013, 2012, 2011 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

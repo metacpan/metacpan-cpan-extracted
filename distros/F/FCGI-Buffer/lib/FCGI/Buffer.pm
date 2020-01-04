@@ -7,6 +7,7 @@ use warnings;
 # FIXME: save_to treats /cgi-bin/foo.fcgi and /cgi-bin2/foo.fcgi as the same
 
 use Digest::MD5;
+use File::Path;
 use File::Spec;
 use IO::String;
 use CGI::Info;
@@ -20,11 +21,11 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -134,6 +135,9 @@ sub DESTROY {
 	}
 	my $self = shift;
 
+	if($self->{'logger'}) {
+		$self->{'logger'}->info('In DESTROY');
+	}
 	select($self->{old_buf});
 	if((!defined($self->{buf})) || (!defined($self->{buf}->getpos()))) {
 		# Unlikely
@@ -334,7 +338,10 @@ sub DESTROY {
 
 	my $dbh;
 	if(my $save_to = $self->{save_to}) {
-		my $sqlite_file = $save_to->{directory} . '/fcgi.buffer.sql';
+		my $sqlite_file = File::Spec->catfile($save_to->{directory}, 'fcgi.buffer.sql');
+		if($self->{logger}) {
+			$self->{logger}->debug("save_to sqlite file: $sqlite_file");
+		}
 		if(!-r $sqlite_file) {
 			if(!-d $save_to->{directory}) {
 				mkdir $save_to->{directory};
@@ -574,27 +581,26 @@ sub DESTROY {
 					} else {
 						my $dir = $self->{save_to}->{directory};
 						my $browser_type = $self->{info}->browser_type();
-						my $language = $self->{lingua}->language();
-						if($language =~ /([\w\s]+)/i) {
-							$language = $1;	# Untaint
+						my $language;
+						if($self->{'lingua'}) {
+							$language = $self->{lingua}->language();
+							if($language =~ /([\w\s]+)/i) {
+								$language = $1;	# Untaint
+							}
+						} else {
+							$language = 'default';
 						}
 						my $bdir = File::Spec->catfile($dir, $browser_type);
-						if($bdir =~ /^\/(.+)$/) {
-							$bdir = "/$1"; # Untaint
+						if($bdir =~ /^([\/\\])(.+)$/) {
+							$bdir = "$1$2"; # Untaint
 						}
 						my $ldir = File::Spec->catfile($bdir, $language);
 						my $sdir = File::Spec->catfile($ldir, $self->{info}->script_name());
-						if(!-d $bdir) {
-							mkdir $bdir;
-							mkdir $ldir;
-							mkdir $sdir;
-						} elsif(!-d $ldir) {
-							mkdir $ldir;
-							mkdir $sdir;
-						} elsif(!-d $sdir) {
-							mkdir $sdir;
+						if($self->{logger}) {
+							$self->{logger}->debug("Create paths to $sdir");
 						}
-						my $path = "$sdir/" . $self->{info}->as_string() . '.html';
+						File::Path::make_path($sdir);
+						my $path = File::Spec->catfile($sdir, $self->{info}->as_string() . '.html');
 						if($path =~ /^(.+)$/) {
 							$path = $1; # Untaint
 							$path =~ tr/[\|;]/_/;
@@ -628,8 +634,10 @@ sub DESTROY {
 							if($changes && (my $ttl = $self->{save_to}->{ttl})) {
 								push @{$self->{o}}, 'Expires: ' . HTTP::Date::time2str(time + $ttl);
 							}
-						} elsif($self->{logger}) {
-							$self->{logger}->warn("Can't create $path");
+						} else {
+							if($self->{logger}) {
+								$self->{logger}->warn("Can't create $path");
+							}
 						}
 					}
 				}
@@ -1035,8 +1043,18 @@ sub init {
 	if(defined($params{lingua})) {
 		$self->{lingua} = $params{lingua};
 	}
-	# Don't forget to handle where lingua could have been set in a previous init() call
-	if(defined($params{save_to}) && $self->{lingua} && $self->can_cache()) {
+
+	if(defined($params{save_to}) && $self->can_cache()) {
+		if(my $dir = $params{'save_to'}->{'directory'}) {
+			if(! -d $dir) {
+				Carp::carp("$dir isn't a directory");
+				return;
+			}
+			if(! -w $dir) {
+				Carp::carp("$dir isn't writeable");
+				return;
+			}
+		}
 		$self->{save_to} = $params{save_to};
 		if(!exists($params{save_to})) {
 			$self->{save_to} = 600;
@@ -1123,6 +1141,7 @@ sub set_options {
 =head2 can_cache
 
 Returns true if the server is allowed to store the results locally.
+This is the value of X-Cache in the returned header.
 
 =cut
 
@@ -1445,7 +1464,7 @@ sub _save_to {
 						}
 						$link =~ s/\?/\\?/g;
 						my $rootdir = $self->{info}->rootdir();
-						$path =~ s/^$rootdir//;
+						$path = substr($path, length($rootdir));
 						$changes += ($copy =~ s/<a\s+href="$link">/<a href="$path">/gis);
 						# Find the first link that will expire and use that
 						if((!defined($creation)) || ($href->{'creation'} < $creation)) {
@@ -1472,7 +1491,11 @@ sub _save_to {
 		if($self->{logger}) {
 			# $self->{logger}->debug("$changes links now point to static pages");
 			if($changes == 1) {
-				$self->{logger}->info('1 link now points to a static page for ', $expiration - time, 's');
+				if($self->{'save_to'}->{'ttl'}) {
+					$self->{logger}->info('1 link now points to a static page for ', $expiration - time, 's');
+				} else {
+					$self->{logger}->info('1 link now points to a static page');
+				}
 			} else {
 				$self->{logger}->info("$changes links now point to static pages");
 			}
@@ -1629,7 +1652,7 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2019 Nigel Horne,
+The rest of the program is Copyright 2015-2020 Nigel Horne,
 and is released under the following licence: GPL2
 
 =cut

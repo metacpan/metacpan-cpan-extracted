@@ -1,0 +1,49 @@
+NAME
+    Regexp::Pattern::Test::re_engine - Regexp patterns to test loading under
+    re::engine::*
+
+VERSION
+    This document describes version 0.001 of
+    Regexp::Pattern::Test::re_engine (from Perl distribution
+    Regexp-Pattern-Test-re_engine), released on 2020-01-04.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Test::re_engine::contains_code_construct");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+PATTERNS
+    *   contains_code_construct
+
+        Regexp which contains (?{ code }) construct.
+
+        This regex should die when compiled under e.g. re::engine::PCRE2
+        instead of the default Perl regex engine.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Test-re_engine>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Test-re_engine>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Test-r
+    e_engine>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

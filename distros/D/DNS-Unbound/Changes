@@ -1,5 +1,8 @@
 Revision history for Perl module DNS::Unbound
 
+0.15 Thu, 2 Jan 2020
+- Add DNSSEC setup (i.e., trust anchor) methods.
+
 0.14 - Thu, 14 Nov 2019
 - Rewrite AsyncQuery.pm to avoid Promise::ES6 internals.
 

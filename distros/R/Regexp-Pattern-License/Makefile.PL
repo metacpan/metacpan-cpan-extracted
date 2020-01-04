@@ -30,13 +30,13 @@ my $meta = {
                           },
                         },
   "provides"         => {
-                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.1.94" },
-                          "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.1.94" },
+                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.1.95" },
+                          "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.1.95" },
                         },
   "release_status"   => "stable",
   "resources"        => {
                           bugtracker   => { web => "https://bugs.debian.org/libregexp-pattern-license-perl" },
-                          homepage     => "https://metacpan.org/release/Regexp-Pattern-License",
+                          homepage     => "https://metacpan.org/pod/Regexp::Pattern::License",
                           license      => ["http://www.gnu.org/licenses/gpl-3.0.txt"],
                           repository   => {
                                             type => "git",
@@ -44,7 +44,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project",
                         },
-  "version"          => "v3.1.94",
+  "version"          => "v3.1.95",
   "x_help_wanted"    => ["documenter", "tester"],
   "x_static_install" => 1,
 };

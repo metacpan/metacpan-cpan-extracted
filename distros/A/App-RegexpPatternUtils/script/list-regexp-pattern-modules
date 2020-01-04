@@ -1,20 +1,26 @@
 #!perl
 
-our $DATE = '2018-03-21'; # DATE
-our $VERSION = '0.003'; # VERSION
+# Note: This script is a CLI for Riap function /App/RegexpPatternUtils/list_regexp_pattern_modules
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-#use 5.010001;
+our $DATE = '2020-01-03'; # DATE
+our $DIST = 'App-RegexpPatternUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
+
+use 5.010001;
 use strict;
 use warnings;
 
-use PERLANCAR::Module::List;
+use Perinci::CmdLine::Any;
 
-my $res = PERLANCAR::Module::List::list_modules(
-    'Regexp::Pattern::', {list_modules=>1, recurse=>1});
-for (sort keys %$res) {
-    s/\ARegexp::Pattern:://;
-    print "$_\n";
-}
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/RegexpPatternUtils/list_regexp_pattern_modules",
+    program_name => "list-regexp-pattern-modules",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
 
 # ABSTRACT: List all installed Regexp::Pattern::* modules
 # PODNAME: list-regexp-pattern-modules
@@ -31,15 +37,104 @@ list-regexp-pattern-modules - List all installed Regexp::Pattern::* modules
 
 =head1 VERSION
 
-This document describes version 0.003 of list-regexp-pattern-modules (from Perl distribution App-RegexpPatternUtils), released on 2018-03-21.
+This document describes version 0.004 of list-regexp-pattern-modules (from Perl distribution App-RegexpPatternUtils), released on 2020-01-03.
 
 =head1 SYNOPSIS
 
- % list-regexp-pattern-modules
+Usage:
 
-=head1 DESCRIPTION
+ % list-regexp-pattern-modules [options]
 
-This is a simple script to list all installed C<Regexp::Pattern::*> modules.
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-regexp-pattern-modules list-regexp-pattern-modules
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-regexp-pattern-modules 'p/*/`list-regexp-pattern-modules`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
 
 =head1 HOMEPAGE
 
@@ -57,17 +152,13 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head1 SEE ALSO
-
-L<show-regexp-pattern-module>
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

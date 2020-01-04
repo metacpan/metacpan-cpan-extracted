@@ -1,3 +1,19 @@
+0.046   2020-01-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Upgrade dependency Time::Local from TestRecommends to
+	  RuntimeRequires [RT#131332].
+
+
+0.045   2020-01-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in doc and precludes.
+
+
+0.044   2020-01-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Require Time::Local 1.27 for time{gm,local}_modern [RT#131332].
+
+
 0.043   2020-01-02  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
@@ -7,8 +23,9 @@
 
 0.042   2020-01-02  Released-By: PERLANCAR; Urgency: medium
 
-	- [bugfix] Also support dates before epoch 0 (year 1969); switch from
-	  Time::Local::time{gm,local} to time{gm,local}_modern.
+	- [bugfix] To_{date,datenotime,datetime}::From_str::iso8601: Also
+	  support dates before epoch 0 (year 1969) when coerce_to=float(epoch);
+	  switch from Time::Local::time{gm,local} to time{gm,local}_modern.
 
 
 0.041   2020-01-01  Released-By: PERLANCAR; Urgency: medium

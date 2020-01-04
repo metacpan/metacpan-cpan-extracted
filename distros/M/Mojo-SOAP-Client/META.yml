@@ -27,12 +27,12 @@ requires:
   Mojolicious: '8.26'
   XML::Compile::SOAP: '0'
   XML::Compile::SOAP12: '0'
-  XML::Compile::SOAP::Mojolicious: '0'
+  XML::Compile::SOAP::Mojolicious: '0.05'
   XML::Compile::WSDL11: '0'
   perl: '5.020001'
 resources:
   bugtracker: https://github.com/oposs/mojo-soap-client/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/oposs/mojo-soap-client
-version: v0.1.4
+version: v0.1.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

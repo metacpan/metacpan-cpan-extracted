@@ -1,5 +1,10 @@
 Revision history for Config-AutoConf
 
+0.318	2020-01-02
+	- use File::Slurper instead of File::Slurp::Tiny
+	- use cached pkg_config_prog, when available
+	- bump copyright notice
+
 0.317	2018-06-08
 	- fix pkg_config_package_flags a bit more
 	- improve documentation of pkg_config_package_flags (fix

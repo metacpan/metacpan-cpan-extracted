@@ -17,7 +17,7 @@ WriteMakefile(
     'XML::Compile::SOAP' => 0,
     'XML::Compile::SOAP12' => 0,
     'XML::Compile::WSDL11' => 0,
-    'XML::Compile::SOAP::Mojolicious' => 0,
+    'XML::Compile::SOAP::Mojolicious' => 0.05,
     'Mojolicious' => '8.26',
   },
   TEST_REQUIRES => { 

@@ -1,5 +1,9 @@
 Revision history for App-CSV2Chart
 
+0.8.0   2020-01-03
+    - Add the svg subcommand.
+    - Add lib/App/CSV2Chart/API/ToXLSX.pm .
+
 0.6.1   2019-08-16
     - POD fixes
         - https://github.com/shlomif/CSV2Chart/pull/1 .
