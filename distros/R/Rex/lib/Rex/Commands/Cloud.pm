@@ -55,7 +55,7 @@ package Rex::Commands::Cloud;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);

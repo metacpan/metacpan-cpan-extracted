@@ -25,7 +25,6 @@ package Net::FullAuto::ISets::Local::WordPress_is;
 our $VERSION='0.01';
 our $DISPLAY='WordPress Server';
 our $CONNECT='secure';
-our $defaultInstanceType='t2.small';
 
 use 5.005;
 
@@ -39,7 +38,8 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw($select_wordpress_setup);
 
 use Net::FullAuto::Cloud::fa_amazon;
-use Net::FullAuto::FA_Core qw[$localhost cleanup fetch];
+use Net::FullAuto::FA_Core qw[$localhost cleanup fetch clean_handle];
+use Time::Local;
 use File::HomeDir;
 use URI::Escape::XS qw/uri_escape/;
 use JSON::XS;
@@ -487,6 +487,54 @@ if ($do==1) {
    }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://www.python.org/downloads/release');
+   $stdout=~s/^.*list-row-container menu.*?Python (.*?)[<].*$/$1/s;
+   my $version=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      "http://python.org/ftp/python/$version/Python-$version.tar.xz",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar xvf Python-$version.tar.xz",
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd("Python-$version");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './configure --prefix=/usr/local --enable-unicode=ucs4 '.
+      '--enable-shared --enable-optimizations '.
+      'LDFLAGS="-Wl,-rpath /usr/local/lib"',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make altinstall','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'python -m ensurepip --default-pip','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'python -m pip install --upgrade pip setuptools wheel','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'pip install pyasn1','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'pip install pyasn1-modules',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'pip install --upgrade oauth2client','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.'pip install oauth2','__display__');
+   unless ($^O eq 'cygwin') {
+      ($stdout,$stderr)=$handle->cmd('echo /usr/local/lib > '.
+         '~/local.conf','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v 644 ~/local.conf',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mv -v ~/local.conf /etc/ld.so.conf.d','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
+   } else {
+      ($stdout,$stderr)=$handle->cmd('pip install awscli','__display__');
+   }
+}
+$d=0;
+if ($d==1) {
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'python --version','__display__');
    if ($stderr=~/Python /) {
       $stderr=~s/^Python\s+(\d.\d).*$/$1/s;
@@ -581,7 +629,27 @@ print "DOING NGINX\n";
    ($stdout,$stderr)=$handle->cwd($nginx);
    ($stdout,$stderr)=$handle->cmd($sudo."mkdir -vp objs/lib",'__display__');
    ($stdout,$stderr)=$handle->cwd("objs/lib");
-   my $pcre='pcre-8.43';
+   ($stdout,$stderr)=$handle->cmd("wget -qO- https://ftp.pcre.org/pub/pcre/");
+   my %pcre=();
+   my %conv=(
+      Jan => 0, Feb => 1, Mar => 2, Apr => 3, May => 4, Jun => 5, Jul => 6,
+      Aug => 7, Sep => 8, Oct => 9, Nov => 10, Dec => 11
+   );
+   foreach my $line (split /\n/, $stdout) {
+      last unless $line;
+      $line=~/^.*?["](.*?)["].*(\d\d-\w\w\w-\d\d\d\d \d\d:\d\d).*(\d+\w).*$/;
+      my $file=$1;my $date=$2;my $size=$3;
+      next if $file=~/^pcre2|\.sig$|\.tar\.gz$|\.tar\.bz2$/;
+      next if $file!~/\.zip$/;
+      next unless $date;
+      $date=~/^(\d\d)-(\w\w\w)-(\d\d\d\d) (\d\d):(\d\d)$/;
+      my $day=$1;my $month=$2;my $year=$3;my $hour=$4,my $minute=$5;
+      my $timestamp=timelocal(0,$minute,$hour,$day,$conv{$month},--$year);
+      $pcre{$timestamp}=[$file,$size];
+   }
+   my $latest=(reverse sort keys %pcre)[0];
+   my $pcre=$pcre{$latest}->[0];
+   $pcre=~s/\.[^\.]+$//;
    my $checksum='';
    foreach my $cnt (1..3) {
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -944,38 +1012,42 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.'service nginx start',
          '__display__');
       ($stdout,$stderr)=$handle->cwd("$nginx_path/nginx");
-      sleep 3;
-      ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
-      $handle->print($sudo.
-         "certbot --nginx -d $domain_url ".
-         "-d www.$domain_url");
-      $prompt=$handle->prompt();
-      my $output='';
-      while (1) {
-         $output.=fetch($handle);
-         last if $output=~/$prompt/;
-         print $output;
-         if (-1<index $output,'Attempt to reinstall') {
-            $handle->print('1');
-            $output='';
-            next;
-         } elsif (-1<index $output,'No redirect') {
-            $handle->print('2');
-            $output='';
-            next;
-         } elsif (-1<index $output,'Enter email address') {
-            $handle->print('brian.kelly@fullauto.com');
-            $output='';
-            next;
-         } elsif (-1<index $output,'Terms of Service') {
-            $handle->print('A');
-            $output='';
-            next;
-         } elsif (-1<index $output,'Would you be willing') {
-            $handle->print('Y');
-            $output='';
-            next;
+      foreach my $num (1..3) {
+         sleep 3;
+         ($stdout,$stderr)=clean_filehandle($handle);
+         $handle->print($sudo.
+            "certbot --nginx -d $domain_url -d www.$domain_url");
+         $prompt=$handle->prompt();
+         my $output='';
+         while (1) {
+            $output.=fetch($handle);
+            last if $output=~/$prompt/;
+            print $output;
+            if (-1<index $output,'Attempt to reinstall') {
+               $handle->print('1');
+               $output='';
+            } elsif (-1<index $output,'No redirect') {
+               $handle->print('2');
+               $output='';
+            } elsif (-1<index $output,'Enter email address') {
+               $handle->print('brian.kelly@fullauto.com');
+               $output='';
+            } elsif (-1<index $output,'Terms of Service') {
+               $handle->print('A');
+               $output='';
+            } elsif (-1<index $output,'Would you be willing') {
+               $handle->print('Y');
+               $output='';
+            } elsif ((-1<index $output,'existing certificate')
+                  && (-1==index $output,'--duplicate')) {
+               $handle->print('C');
+               $output='';
+            }
          }
+         ($stdout,$stderr)=clean_filehandle($handle);
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'grep Certbot /etc/nginx/nginx.conf');
+         last if $stdout;
       }
       # https://ssldecoder.org
 $do=0;
@@ -2137,7 +2209,7 @@ END
 
 #cleanup;
 
-$do=1;
+$do=0;
 if ($do==1) {
 
    foreach my $plugin ($listt=~/^..([^-n].*?)\s+.*$/mg) {
@@ -2226,7 +2298,7 @@ while (1) {
    $handle->print();
 }
 
-$do=1;
+$do=0;
 if ($do==1) {
 
    $service_and_cert_password=uri_escape($service_and_cert_password);
@@ -2269,7 +2341,7 @@ if ($do==1) {
       }
       $stdout=~s/^.*_wpCustomizeSettings = (.*?)[}][}][}].*$/$1/s;
       last if -1<index $stdout,'"nonce":{';
-      ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+      ($stdout,$stderr)=clean_filehandle($handle);
       ($stdout,$stderr)=$handle->cmd($sudo.
          'curl -v -k --cookie-jar ~/cookies.txt --max-redirs 0 '.
          '--data "log='.$adu.'&pwd='.$service_and_cert_password.
@@ -2342,7 +2414,7 @@ print "WHAT IS HEALING STDOUT=$stdout\n";
 
 ##############################################################
 
-   #($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+   #($stdout,$stderr)=clean_filehandle($handle);
    ($stdout,$stderr)=$handle->cmd($sudo.
       "curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.'/wp-admin/'.
       "customize.php?url=https://www.".$domain_url."%2F' ".
@@ -2427,7 +2499,7 @@ print "STDOUT=$stdout<==CUSTOM LOGO PUBLISH\n";
 
 }
 
-$do=1;
+$do=0;
 if ($do==1) {
    my @wp_plugins=qw(
 
@@ -2460,6 +2532,8 @@ if ($do==1) {
    }
 }
 
+$do=0;
+if ($do==1) {
    # https://www.paidmembershipspro.com/
    # add-a-conditional-log-in-or-log-out-link-to-your-wordpress-menu/
    # https://www.paidmembershipspro.com/best-practices-member-log-log/
@@ -2468,7 +2542,7 @@ if ($do==1) {
       '/var/www/html/wordpress/wp-content/plugins/'.
       'theme-my-login/includes/class-theme-my-login.php');
 
-   ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+   ($stdout,$stderr)=clean_filehandle($handle);
 
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/bin/wp post list --post_type=page,post --allow-root '.
@@ -2857,7 +2931,7 @@ END
       print $output;
    }
 print "GOT OUT OF STRIPE!\n";
-   ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+   ($stdout,$stderr)=clean_filehandle($handle);
 print "DONE WITH CLEANING\n";
    $cmd="curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=wpcf7-integration&service=recaptcha&action=setup' ".
@@ -2884,7 +2958,7 @@ print "OUT OF RECAPTCHA ONE\n";
    $stdout=~s/^.*_wpnonce.*?value=["](.*?)["].*$/$1/s;
    $nonce=$stdout;
 print "NONCE=$nonce<==reCaptcha NONCE\n";
-   ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+   ($stdout,$stderr)=clean_filehandle($handle);
    $cmd="curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=wpcf7-integration&service=recaptcha&action=setup' ".
       "-H 'Host: ".$domain_url."' ".
@@ -3117,7 +3191,7 @@ END
       print $output;
    }
 print "GOT OUT OF PAYMENTPRO!\n";
-   ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
+   ($stdout,$stderr)=clean_filehandle($handle);
 print "GOING FOR NONCE!\n";
    $cmd="curl -k -L -b ~/cookies.txt 'https://www.".$domain_url.
           "/wp-admin/admin.php?page=pmpro-emailsettings' ".
@@ -3217,6 +3291,7 @@ END
       print $output;
    }
 print "GOT OUT OF PAYMENTEMAILPRO!\n";
+}
 
 $do=1;
 if ($do==1) {

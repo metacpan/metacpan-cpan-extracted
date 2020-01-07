@@ -22,27 +22,53 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.55_03",
+            "Math::BigInt" : "1.999816",
+            "Math::BigInt::GMP" : "1.6006"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.55_03"
          }
       },
       "runtime" : {
          "requires" : {
             "Bitcoin::BIP39" : "0.002",
-            "Crypt::RIPEMD160" : "0.06",
             "CryptX" : "0.062",
+            "Digest::SHA" : "6.02",
+            "Math::BigInt" : "1.999816",
+            "Math::BigInt::GMP" : "1.6006",
+            "Math::EllipticCurve::Prime" : "0.003",
             "Modern::Perl" : "1.20181021",
             "Moo" : "2.003004",
             "MooX::Types::MooseLike" : "0.29",
-            "Try::Tiny" : "0.3"
+            "PBKDF2::Tiny" : "0.005",
+            "Throwable" : "0.007",
+            "Try::Tiny" : "0.30",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brtastic/perl-bitcoin-crypto/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Bitcoin-Crypto",
+      "license" : [
+         "https://dev.perl.org/licenses"
+      ],
+      "repository" : {
+         "url" : "https://github.com/brtastic/perl-bitcoin-crypto"
+      }
+   },
+   "version" : "0.99",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

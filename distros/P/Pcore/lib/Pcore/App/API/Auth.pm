@@ -1,7 +1,7 @@
 package Pcore::App::API::Auth;
 
 use Pcore -class, -res;
-use Pcore::App::API qw[:TOKEN_TYPE :PRIVATE_TOKEN :PERMISSIONS];
+use Pcore::App::API qw[:TOKEN_TYPE :PRIVATE_TOKEN :PERMS];
 use Pcore::Util::Scalar qw[is_res is_plain_arrayref];
 
 use overload    #
@@ -73,7 +73,7 @@ sub _check_permissions ( $self, $method_id ) {
         }
     }
     else {
-        return res 200 if $method_permissions eq $PERMISSIONS_ANY_AUTHENTICATED_USER && $self->{is_authenticated};
+        return res 200 if $method_permissions eq $PERMS_ANY_AUTHENTICATED_USER && $self->{is_authenticated};
     }
 
     return res [ 403, qq[Insufficient permissions for method "$method_id"] ];

@@ -7,6 +7,48 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.1.99	2020-01-05
+
+ [ REGRESSIONS ]
+ - give up on auto-loading for now, and support only RE2 (not PCRE2)
+
+ [ Packaging ]
+ - require (not recommend) re::engine::RE2, and stop recommend
+   re::engine::PCRE2
+
+v3.1.98	2020-01-05
+
+ [ Test Suite ]
+ - fix: test for the proper module for each test (arrgh)
+
+v3.1.97	2020-01-05
+
+ [ Test Suite ]
+ - fix: test if re::engine::* is available before testing use of those
+   modules
+
+ [ Packaging ]
+ - test-require module Test::Requires
+
+v3.1.96	2020-01-04
+
+ [ Documentation ]
+ - add examples for object beerware
+
+ [ Test Suite ]
+ - extend testsuite with Test::Regexp::Pattern tests
+
+ [ Packaging ]
+ - recommend modules re::engine::PCRE2 re::engine::RE2
+ - test-require module Test::Regexp::Pattern
+
+ [ Other ]
+ - add option engine
+ - add tags license:is:grant license:contains:grant
+   license:contains:license:* license:contains:name:*
+ - extend object llgpl: Add alternate cliki iri
+ - internalize list of GNU locales
+
 v3.1.95	2020-01-03
 
  [ Bug Fixes ]
@@ -41,11 +83,13 @@ v3.1.94	2019-06-12
  [ Bug Fixes ]
  - Fix DOAP bug-database and repository URLs.
    Slaven Rezić++
- - Fix declare test-requirement on Try::Tiny.
-   Slaven Rezić++
 
  [ Test Suite ]
  - Extend testsuite: Cover objects aladdin_8 aladdin_9.
+
+ [ Packaging ]
+ - Fix declare test-requirement on Try::Tiny.
+   Slaven Rezić++
 
  [ Other ]
  - Extend object bsl_1: Add subject pattern license. Improve metadata.

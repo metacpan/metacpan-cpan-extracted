@@ -42,7 +42,7 @@ Dash::Core::Components::RadioItems
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

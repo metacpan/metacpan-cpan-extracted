@@ -5,7 +5,7 @@ use Mojo::DOM;
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/secure_compare hmac_sha1_sum/;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 # Todo:
 # - Be compliant with https://www.w3.org/TR/websub/
@@ -203,7 +203,7 @@ sub verify {
     # Render challenge
     return $c->render(
       'status' => 200,
-      'format' => 'text',
+      'format' => 'txt',
       'data'   => $challenge
     ) if $ok;
   };
@@ -881,7 +881,7 @@ sub _render_success {
   # Render success with no content
   return $c->render(
     status => 204,
-    format => 'text',
+    format => 'txt',
     data   => ''
   );
 };
@@ -1353,7 +1353,7 @@ This plugin is part of the L<Sojolicious|http://sojolicio.us> project.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2020, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

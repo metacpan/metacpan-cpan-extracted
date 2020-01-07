@@ -7,7 +7,7 @@ use Pcore::Util::UUID qw[uuid_v4_str];
 with qw[Pcore::App::API::Backend::Local];
 
 sub _db_add_schema_patch ( $self, $dbh ) {
-    $dbh->load_schema( $ENV->{share}->get_location('/Pcore/dbh/api/sqlite'), 'api' );
+    $dbh->load_schema( $ENV->{share}->get_location('/Pcore/db/api/sqlite'), 'api' );
 
     return;
 }

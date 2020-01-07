@@ -9,13 +9,13 @@ package Rex::Resource;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use Rex::Constants;
 
 our @CURRENT_RES;
 
-sub is_inside_resource { ref $CURRENT_RES[-1] ? 1 : 0 }
+sub is_inside_resource   { ref $CURRENT_RES[-1] ? 1 : 0 }
 sub get_current_resource { $CURRENT_RES[-1] }
 
 sub new {

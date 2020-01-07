@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -86,13 +86,17 @@ L<pthread_atfork(3)>
 
 L<fork(2)>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Fuji, Goro (gfx)
+
+Shulyakovskiy, Nikolay (nikolas)
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2010 by Fuji, Goro gfx E<lt>gfuji@cpan.orgE<gt>. 
+
+Copyright (C) 2020 by Shulyakovskiy, Nikolay nikolas E<lt>nikolas@cpan.orgE<gt>. 
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself,

@@ -943,10 +943,17 @@ sub sync_rel {
     my @result_files = map { $all_options->{dir} . '/' . basename($_) } @$rel_files;
     unlink @result_files if $all_options->{preclean};
 
+    #- The files must be world-readable, else mgaapplet and urpm* commands run as
+    #- a normal user won't be able to read them. We enforce umask here in the case
+    #- where the msec security level is set to 'secure' (which means umask 077)
+    #- or where we are run from a gdm-x-session (mga#24636)
+    my $old_umask = umask 0022;
+
     (my $cwd) = getcwd() =~ /(.*)/;
     eval { _sync_webfetch_raw($urpm, $medium, $rel_files, \@files, $all_options) };
     my $err = $@;
     chdir $cwd;
+    umask $old_umask;
     if (!$err) {
 	$urpm->{log}(N("retrieved %s", $files_text));
 	\@result_files;

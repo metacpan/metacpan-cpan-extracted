@@ -1,5 +1,12 @@
 Revision history for Ryu
 
+1.011     2020-01-07 11:24:46+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - ->ordered_futures now cancels any pending Futures when the source fails.
+
 1.010     2019-12-25 20:55:38+08:00 Asia/Kuala_Lumpur
     No new features.
 

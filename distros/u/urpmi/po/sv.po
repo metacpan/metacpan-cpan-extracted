@@ -1,6 +1,6 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR Free Software Foundation, Inc.
-# 
+#
 # Translators:
 # Cecilia Johnsson <datb@thegym.net>, 2000
 # Fuad Sabanovic <manijak@telia.com>, 2000
@@ -19,14 +19,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2014-09-13 21:15+0200\n"
+"POT-Creation-Date: 2019-06-26 09:37+0300\n"
 "PO-Revision-Date: 2015-02-13 05:26+0000\n"
 "Last-Translator: Michael Eklund <willard@null.net>\n"
-"Language-Team: Swedish (http://www.transifex.com/projects/p/mageia/language/sv/)\n"
+"Language-Team: Swedish (http://www.transifex.com/projects/p/mageia/language/"
+"sv/)\n"
+"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
-"Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../gurpm/RPMProgressDialog.pm:47
@@ -49,7 +50,7 @@ msgstr "Var god vänta..."
 msgid "Verifying package signatures..."
 msgstr "Verifierar paketsignaturer..."
 
-#: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:107
+#: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:108
 #, c-format
 msgid "Preparing..."
 msgstr "Förbereder..."
@@ -69,46 +70,55 @@ msgstr "Installerar paket \"%s\" (%s/%s)..."
 msgid "Downloading package `%s'..."
 msgstr "Laddar ner paket \"%s\"..."
 
-#: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:126
+#: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:127
 #, c-format
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:453 ../urpm/download.pm:857
-#: ../urpm/get_pkgs.pm:278 ../urpm/media.pm:1126 ../urpm/media.pm:1647
-#: ../urpm/media.pm:1798
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1670
+#: ../urpm/media.pm:1821
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "...hämtning misslyckades: %s"
 
-#: ../gurpmi:49
+#: ../gurpmi:50
 #, c-format
 msgid "RPM installation"
 msgstr "RPM installation"
 
-#: ../gurpmi:63
+#: ../gurpmi:64
 #, c-format
 msgid "Error: unable to find file %s, will cancel operation"
 msgstr "Fel: kan inte hitta filen %s, avbryter operationen"
 
-#: ../gurpmi:64 ../gurpmi2:173 ../gurpmi2:203
+#: ../gurpmi:65 ../gurpmi2:174 ../gurpmi2:203
 #, c-format
 msgid "_Ok"
 msgstr "_OK"
 
-#: ../gurpmi:84
+#: ../gurpmi:85
 #, c-format
 msgid ""
 "You have selected a source package:\n"
 "\n"
 "%s\n"
 "\n"
-"You probably didn't want to install it on your computer (installing it would allow you to make modifications to its sourcecode then compile it).\n"
+"You probably didn't want to install it on your computer (installing it would "
+"allow you to make modifications to its sourcecode then compile it).\n"
 "\n"
 "What would you like to do?"
-msgstr "Du har valt ett källpaket:\n\n%s\n\nDu vill troligen inte installera detta paket (efter installation kan du\nmodifiera källkoden och sedan kompilera koden).\n\nVad vill du göra?"
+msgstr ""
+"Du har valt ett källpaket:\n"
+"\n"
+"%s\n"
+"\n"
+"Du vill troligen inte installera detta paket (efter installation kan du\n"
+"modifiera källkoden och sedan kompilera koden).\n"
+"\n"
+"Vad vill du göra?"
 
-#: ../gurpmi:92 ../gurpmi:103
+#: ../gurpmi:93 ../gurpmi:104
 #, c-format
 msgid ""
 "You are about to install the following software packages on your computer:\n"
@@ -116,9 +126,14 @@ msgid ""
 "%s\n"
 "\n"
 "Proceed?"
-msgstr "Du är på väg att installera följande paket på din dator:\n\n%s\n\nFortsätta?"
+msgstr ""
+"Du är på väg att installera följande paket på din dator:\n"
+"\n"
+"%s\n"
+"\n"
+"Fortsätta?"
 
-#: ../gurpmi:98
+#: ../gurpmi:99
 #, c-format
 msgid ""
 "You are about to install the following software package on your computer:\n"
@@ -126,29 +141,34 @@ msgid ""
 "%s\n"
 "\n"
 "You may prefer to just save it. What is your choice?"
-msgstr "Du är på väg att installera följande paket på din dator:\n\n%s\n\nKanske föredrar du att endast spara detta. Vilket är ditt val?"
+msgstr ""
+"Du är på väg att installera följande paket på din dator:\n"
+"\n"
+"%s\n"
+"\n"
+"Kanske föredrar du att endast spara detta. Vilket är ditt val?"
 
-#: ../gurpmi:116
+#: ../gurpmi:117
 #, c-format
 msgid "_Install"
 msgstr "_Installera"
 
-#: ../gurpmi:117
+#: ../gurpmi:118
 #, c-format
 msgid "_Save"
 msgstr "_Spara"
 
-#: ../gurpmi:118 ../gurpmi2:173
+#: ../gurpmi:119 ../gurpmi2:174
 #, c-format
 msgid "_Cancel"
 msgstr "Av_bryt"
 
-#: ../gurpmi:126
+#: ../gurpmi:127
 #, c-format
 msgid "Choose location to save file"
 msgstr "Välj var filen ska sparas"
 
-#: ../gurpmi:126 ../gurpmi2:119
+#: ../gurpmi:127 ../gurpmi2:120
 #, c-format
 msgid "Ok"
 msgstr "OK"
@@ -159,7 +179,7 @@ msgid "Options:"
 msgstr "Alternativ:"
 
 #: ../gurpmi.pm:57 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
-#: ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
+#: ../urpmi.removemedia:40 ../urpmi.update:33 ../urpmq:41
 #, c-format
 msgid "  --help         - print this help message.\n"
 msgstr "  --help         - visar det här hjälpmeddelandet.\n"
@@ -169,13 +189,15 @@ msgstr "  --help         - visar det här hjälpmeddelandet.\n"
 msgid ""
 "  --auto         - non-interactive mode, assume default answers to "
 "questions.\n"
-msgstr "  --auto         - ej interaktivt läge. väljer standardsvar på alla frågor.\n"
+msgstr ""
+"  --auto         - ej interaktivt läge. väljer standardsvar på alla frågor.\n"
 
 #: ../gurpmi.pm:59 ../urpmi:75 ../urpmq:48
 #, c-format
 msgid ""
 "  --auto-select  - automatically select packages to upgrade the system.\n"
-msgstr "  --auto-select  - välj automatiskt paket för att uppdatera systemet.\n"
+msgstr ""
+"  --auto-select  - välj automatiskt paket för att uppdatera systemet.\n"
 
 #: ../gurpmi.pm:60 ../urpme:46 ../urpmi:100 ../urpmq:64
 #, c-format
@@ -188,7 +210,9 @@ msgstr "  --force        - tvinga användning även om vissa paket inte finns.\n
 msgid ""
 "  --verify-rpm   - verify rpm signature before installation\n"
 "                   (--no-verify-rpm disables it, default is enabled).\n"
-msgstr "  --verify-rpm   - verifiera rpm-signatur före installation (standard)\n                   (--no-verify-rpm inaktiverar det).\n"
+msgstr ""
+"  --verify-rpm   - verifiera rpm-signatur före installation (standard)\n"
+"                   (--no-verify-rpm inaktiverar det).\n"
 
 #: ../gurpmi.pm:63 ../urpmf:36 ../urpmi:68 ../urpmq:43
 #, c-format
@@ -198,7 +222,8 @@ msgstr "  --media        - använd endast givet media, separerat med komma.\n"
 #: ../gurpmi.pm:64 ../urpmi:147
 #, c-format
 msgid "  -p             - allow search in provides to find package.\n"
-msgstr "  -p             - tillåt sökning i \"provides\" för att hitta paket.\n"
+msgstr ""
+"  -p             - tillåt sökning i \"provides\" för att hitta paket.\n"
 
 #: ../gurpmi.pm:65 ../urpmi:148
 #, c-format
@@ -215,65 +240,73 @@ msgstr "  --root         - använd en annan root för rpm installation.\n"
 msgid ""
 "  --test         - only verify if the installation can be achieved "
 "correctly.\n"
-msgstr "  --test         - verifiera endast om installationen kan utföras korrekt.\n"
+msgstr ""
+"  --test         - verifiera endast om installationen kan utföras korrekt.\n"
 
 #: ../gurpmi.pm:68 ../urpmi:71
 #, c-format
 msgid ""
 "  --searchmedia  - use only the given media to search requested packages.\n"
-msgstr "  --searchmedia  - använd endast givet media för att söka efter valda paket.\n"
+msgstr ""
+"  --searchmedia  - använd endast givet media för att söka efter valda "
+"paket.\n"
 
 #: ../gurpmi.pm:115
 #, c-format
 msgid "No packages specified"
 msgstr "Inga paket specifierade"
 
-#: ../gurpmi2:46
+#: ../gurpmi2:47
 #, c-format
 msgid "Must be root"
 msgstr "Måste vara root"
 
-#: ../gurpmi2:76
+#: ../gurpmi2:77
 #, c-format
 msgid "Preparing packages installation..."
 msgstr "Förbereder paketinstallation..."
 
-#: ../gurpmi2:91 ../urpmi:506
+#: ../gurpmi2:92 ../urpmi:506
 #, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
 "%s"
-msgstr "Vissa begärda paket kan inte installeras:\n%s"
+msgstr ""
+"Vissa begärda paket kan inte installeras:\n"
+"%s"
 
-#: ../gurpmi2:99
+#: ../gurpmi2:100
 #, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
 "%s\n"
 "Continue installation anyway?"
-msgstr "Vissa begärda paket kan inte installeras:\n%s\nVill du fortsätta ändå?"
+msgstr ""
+"Vissa begärda paket kan inte installeras:\n"
+"%s\n"
+"Vill du fortsätta ändå?"
 
-#: ../gurpmi2:119
+#: ../gurpmi2:120
 #, c-format
 msgid "Warning"
 msgstr "Varning"
 
-#: ../gurpmi2:169
+#: ../gurpmi2:170
 #, c-format
 msgid " (to upgrade)"
 msgstr " (för att uppdatera)"
 
-#: ../gurpmi2:170
+#: ../gurpmi2:171
 #, c-format
 msgid " (to install)"
 msgstr " (för att installera)"
 
-#: ../gurpmi2:173
+#: ../gurpmi2:174
 #, c-format
 msgid "Package choice"
 msgstr "Val av paket"
 
-#: ../gurpmi2:174
+#: ../gurpmi2:175
 #, c-format
 msgid "One of the following packages is needed:"
 msgstr "Ett av följande paket är nödvändigt:"
@@ -289,48 +322,53 @@ msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s\n"
 "Continue installation anyway?"
-msgstr "Följande paket måste tas bort för att andra ska bli uppdaterade:\n%s\nVill du fortsätta ändå?"
+msgstr ""
+"Följande paket måste tas bort för att andra ska bli uppdaterade:\n"
+"%s\n"
+"Vill du fortsätta ändå?"
 
-#: ../gurpmi2:250 ../urpmi:615
+#: ../gurpmi2:250 ../urpmi:617
 #, c-format
 msgid "%s of additional disk space will be used."
 msgstr "%s mera disk-utrymme kommer att bli använt."
 
-#: ../gurpmi2:251 ../urpmi:616
+#: ../gurpmi2:251 ../urpmi:618
 #, c-format
 msgid "%s of disk space will be freed."
 msgstr "%s disk-utrymme kommer att frigöras."
 
-#: ../gurpmi2:252 ../urpmi:617
+#: ../gurpmi2:252 ../urpmi:619
 #, c-format
 msgid "%s of packages will be retrieved."
 msgstr "%s paket kommer att hämtas."
 
-#: ../gurpmi2:253 ../urpmi:618
+#: ../gurpmi2:253 ../urpmi:620
 #, c-format
 msgid "Proceed with the installation of one package?"
 msgid_plural "Proceed with the installation of the %d packages?"
 msgstr[0] "Fortsätt installationen ett paket?"
 msgstr[1] "Fortsätt installationen av %d paket?"
 
-#: ../gurpmi2:259 ../urpmi:606
+#: ../gurpmi2:259 ../urpmi:608
 #, c-format
 msgid ""
 "To satisfy dependencies, the following package is going to be installed:"
-msgstr "För att tillfredsställa beroenden, kommer följande paket att installeras:"
+msgstr ""
+"För att tillfredsställa beroenden, kommer följande paket att installeras:"
 
-#: ../gurpmi2:260 ../urpmi:607
+#: ../gurpmi2:260 ../urpmi:609
 #, c-format
 msgid ""
 "To satisfy dependencies, the following packages are going to be installed:"
-msgstr "För att tillfredsställa beroenden kommer följande paket att installeras:"
+msgstr ""
+"För att tillfredsställa beroenden kommer följande paket att installeras:"
 
-#: ../gurpmi2:270 ../urpm/main_loop.pm:467
+#: ../gurpmi2:270 ../urpm/main_loop.pm:468
 #, c-format
 msgid "unable to get source packages, aborting"
 msgstr "kunde inte läsa källan, avbryter"
 
-#: ../gurpmi2:287 ../urpmi:634
+#: ../gurpmi2:287 ../urpmi:636
 #, c-format
 msgid "Please insert the medium named \"%s\""
 msgstr "Lägg i media med namnet \"%s\""
@@ -350,14 +388,16 @@ msgstr "_Klar"
 msgid ""
 "Installation failed, some files are missing:\n"
 "%s"
-msgstr "Installationen misslyckades, vissa filer saknas:\n%s"
+msgstr ""
+"Installationen misslyckades, vissa filer saknas:\n"
+"%s"
 
 #: ../gurpmi2:339
 #, c-format
 msgid "You may want to update your urpmi database."
 msgstr "Du behöver nog uppdatera din urpmi-databas."
 
-#: ../gurpmi2:343 ../urpm/main_loop.pm:288 ../urpm/main_loop.pm:580
+#: ../gurpmi2:343 ../urpm/main_loop.pm:289 ../urpm/main_loop.pm:581
 #, c-format
 msgid "Installation failed:"
 msgstr "Installationen misslyckades:"
@@ -372,7 +412,7 @@ msgstr "Allt är redan installerat"
 msgid "Installation finished"
 msgstr "Installation slutförd"
 
-#: ../gurpmi2:363 ../urpmi:692
+#: ../gurpmi2:363 ../urpmi:694
 #, c-format
 msgid "restarting urpmi"
 msgstr "startar om urpmi"
@@ -382,7 +422,9 @@ msgstr "startar om urpmi"
 msgid ""
 "usage: %s [options]\n"
 "where [options] are from\n"
-msgstr "användning: %s [flaggor]\ndär [flaggor] är från\n"
+msgstr ""
+"användning: %s [flaggor]\n"
+"där [flaggor] är från\n"
 
 #: ../rpm-find-leaves:17
 #, c-format
@@ -409,162 +451,171 @@ msgstr "                    standard är %s.\n"
 msgid "   -f             - output rpm full name (NVRA)\n"
 msgstr "  -f             - visa hela rpm namnet (NVRA).\n"
 
-#: ../rurpmi:11 ../urpmi:266
+#: ../rurpmi:12 ../urpmi:266
 #, c-format
 msgid "Only superuser is allowed to install packages"
 msgstr "Endast systemadministratörer får installera paket"
 
-#: ../rurpmi:18
+#: ../rurpmi:19
 #, c-format
 msgid "Running urpmi in restricted mode..."
 msgstr "Kör urpmi i begränsat läge"
 
-#: ../urpm.pm:23
+#: ../urpm.pm:22
 #, c-format
 msgid "While some packages may have been installed, there were failures.\n"
-msgstr "Medans vissa paket kan ha blivit installerade så fanns det misslyckanden.\n"
+msgstr ""
+"Medans vissa paket kan ha blivit installerade så fanns det misslyckanden.\n"
 
-#: ../urpm.pm:194
+#: ../urpm.pm:193
 #, c-format
 msgid "fail to create directory %s"
 msgstr "kan inte skapa katalog %s"
 
-#: ../urpm.pm:195
+#: ../urpm.pm:194
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr "felaktig ägare för katalog %s"
 
-#: ../urpm.pm:238
+#: ../urpm.pm:237
 #, c-format
 msgid "Can not download packages into %s"
 msgstr "Kan inte ladda ner paket till [%s]"
 
-#: ../urpm.pm:254
+#: ../urpm.pm:253
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr "Omgivning sökväg %s existerar inte"
 
-#: ../urpm.pm:255 ../urpmf:244 ../urpmq:163
+#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "använder specifik miljö på %s\n"
 
-#: ../urpm.pm:423
+#: ../urpm.pm:422
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "kunde inte öppna RPM-db"
 
-#: ../urpm.pm:442
+#: ../urpm.pm:441
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "ogiltigt RPM-filnamn [%s]"
 
-#: ../urpm.pm:448
+#: ../urpm.pm:447
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "hämtar RPM-fil [%s]..."
 
-#: ../urpm.pm:450 ../urpm/get_pkgs.pm:276
+#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "...hämtning klar"
 
-#: ../urpm.pm:458
+#: ../urpm.pm:457
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "kan inte läsa rpm-fil [%s]"
 
-#: ../urpm.pm:463
+#: ../urpm.pm:462
 #, c-format
 msgid "unable to parse spec file %s [%s]"
 msgstr "kan inte tyda spec-fil %s [%s]"
 
-#: ../urpm.pm:471
+#: ../urpm.pm:470
 #, c-format
 msgid "unable to register rpm file"
 msgstr "kan inte registrera RPM-fil"
 
-#: ../urpm.pm:473
+#: ../urpm.pm:472
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr "Inkompatibel arkitektur för rpm [%s]"
 
-#: ../urpm.pm:477
+#: ../urpm.pm:476
 #, c-format
 msgid "error registering local packages"
 msgstr "fel vid registrering av lokala paket"
 
-#: ../urpm.pm:589
+#: ../urpm.pm:588
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr "Denna operation är inte tillåten i begränsat läge"
 
-#: ../urpm/args.pm:157 ../urpm/args.pm:166
+#: ../urpm/args.pm:156 ../urpm/args.pm:165
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "felaktig proxydeklaration på kommandorad\n"
 
-#: ../urpm/args.pm:321
+#: ../urpm/args.pm:320
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: kan inte läsa rpm-fil \"%s\"\n"
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:388
 #, c-format
 msgid "unexpected expression %s"
 msgstr "oväntat uttryck %s"
 
-#: ../urpm/args.pm:390
+#: ../urpm/args.pm:389
 #, c-format
 msgid "missing expression before %s"
 msgstr "uttryck saknas före %s"
 
-#: ../urpm/args.pm:396
+#: ../urpm/args.pm:395
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr "oväntat uttryck %s (förslag: använd -a eller -o)"
 
-#: ../urpm/args.pm:400
+#: ../urpm/args.pm:399
 #, c-format
 msgid "no expression to close"
 msgstr "inget uttryck att stänga"
 
-#: ../urpm/args.pm:409
+#: ../urpm/args.pm:408
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
-msgstr "som standard väntar urpmf på en regexp. du borde använda alternativet \"--literal\""
+msgstr ""
+"som standard väntar urpmf på en regexp. du borde använda alternativet \"--"
+"literal\""
 
-#: ../urpm/args.pm:483
+#: ../urpm/args.pm:482
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr "chroot katalog existerar inte"
 
-#: ../urpm/args.pm:506
+#: ../urpm/args.pm:505
 #, c-format
 msgid "Can't use %s without %s"
 msgstr "Kan inte använda %s utan %s"
 
-#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
+#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr "Kan inte använda %s med %s"
 
-#: ../urpm/args.pm:520
+#: ../urpm/args.pm:519
 #, c-format
 msgid "Too many arguments\n"
 msgstr "För många argument\n"
 
-#: ../urpm/args.pm:528
+#: ../urpm/args.pm:527
 #, c-format
 msgid ""
 "%s version %s\n"
 "%s\n"
-"This is free software and may be redistributed under the terms of the GNU GPL.\n"
+"This is free software and may be redistributed under the terms of the GNU "
+"GPL.\n"
 "\n"
 "usage:\n"
-msgstr "%s version %s\n%s\nDet här är fri programvara och får distribueras enligt villkoren i GNU GPL.\n\nanvändning:\n"
+msgstr ""
+"%s version %s\n"
+"%s\n"
+"Det här är fri programvara och får distribueras enligt villkoren i GNU GPL.\n"
+"\n"
+"användning:\n"
 
-#: ../urpm/args.pm:534
+#: ../urpm/args.pm:533
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "Copyright (C) %s, %s"
@@ -574,189 +625,193 @@ msgstr "Copyright (C) %s, %s"
 msgid "Copying failed"
 msgstr "Kopiering misslyckades"
 
-#: ../urpm/cdrom.pm:80
+#: ../urpm/cdrom.pm:79
 #, c-format
 msgid ""
 "You must mount CD-ROM yourself (or install perl-Hal-Cdroms to have it done "
 "automatically)"
-msgstr "Du måste montera CD-ROM själv (eller installera perl-Hal-Cdroms för att få det automatiserat)"
+msgstr ""
+"Du måste montera CD-ROM själv (eller installera perl-Hal-Cdroms för att få "
+"det automatiserat)"
 
-#: ../urpm/cdrom.pm:82
+#: ../urpm/cdrom.pm:81
 #, c-format
 msgid "Udisks daemon (udisks-daemon) is not running or not ready"
 msgstr "Udisks-demonen (udisks-daemon) är inte igång eller ej klar"
 
-#: ../urpm/cdrom.pm:174 ../urpm/cdrom.pm:179
+#: ../urpm/cdrom.pm:173 ../urpm/cdrom.pm:178
 #, c-format
 msgid "medium \"%s\" is not available"
 msgstr "mediat \"%s\" är inte tillgängligt"
 
-#: ../urpm/cdrom.pm:218
+#: ../urpm/cdrom.pm:217
 #, c-format
 msgid "unable to read rpm file [%s] from medium \"%s\""
 msgstr "kunde inte läsa RPM-fil [%s] från media \"%s\""
 
-#: ../urpm/cfg.pm:74
+#: ../urpm/cfg.pm:73
 #, c-format
 msgid "syntax error in config file at line %s"
 msgstr "syntaxfel i inställningsfil på rad %s"
 
-#: ../urpm/cfg.pm:107
+#: ../urpm/cfg.pm:106
 #, c-format
 msgid "unable to read config file [%s]"
 msgstr "kan inte läsa inställningsfil [%s]"
 
-#: ../urpm/cfg.pm:133
+#: ../urpm/cfg.pm:132
 #, c-format
 msgid "medium `%s' is defined twice, aborting"
 msgstr "medium '%s' är definierat två gånger, avbryter"
 
-#: ../urpm/cfg.pm:249 ../urpm/media.pm:556
+#: ../urpm/cfg.pm:248 ../urpm/media.pm:560
 #, c-format
 msgid "unable to write config file [%s]"
 msgstr "kan inte skriva inställningsfil [%s]"
 
-#: ../urpm/download.pm:93
+#: ../urpm/download.pm:95
 #, c-format
 msgid "%s is not available, falling back on %s"
 msgstr "%s är inte tillgänglig, faller tillbaka till %s"
 
-#: ../urpm/download.pm:169
+#: ../urpm/download.pm:171
 #, c-format
 msgid "can not read proxy settings (not enough rights to read %s)"
-msgstr "kan inte läsa proxy-inställningar (inte tillräckliga behörigheter för att läsa %s)"
+msgstr ""
+"kan inte läsa proxy-inställningar (inte tillräckliga behörigheter för att "
+"läsa %s)"
 
-#: ../urpm/download.pm:199
+#: ../urpm/download.pm:201
 #, c-format
 msgid "Please enter your credentials for accessing proxy\n"
 msgstr "Var vänlig ange dina uppgifter för att använda proxy\n"
 
-#: ../urpm/download.pm:200
+#: ../urpm/download.pm:202
 #, c-format
 msgid "User name:"
 msgstr "Användarnamn:"
 
-#: ../urpm/download.pm:200
+#: ../urpm/download.pm:202
 #, c-format
 msgid "Password:"
 msgstr "Lösenord:"
 
-#: ../urpm/download.pm:286
+#: ../urpm/download.pm:288
 #, c-format
 msgid "Unknown webfetch `%s' !!!\n"
 msgstr "Okänd webfetch '%s' !!!\n"
 
-#: ../urpm/download.pm:294
+#: ../urpm/download.pm:296
 #, c-format
 msgid "%s failed: exited with signal %d"
 msgstr "%s misslyckades: avlutades med signal %d"
 
-#: ../urpm/download.pm:295
+#: ../urpm/download.pm:297
 #, c-format
 msgid "%s failed: exited with %d"
 msgstr "%s misslyckades: avlutades med %d"
 
-#: ../urpm/download.pm:329
+#: ../urpm/download.pm:331
 #, c-format
 msgid "copy failed"
 msgstr "kopiering misslyckades"
 
-#: ../urpm/download.pm:335
+#: ../urpm/download.pm:337
 #, c-format
 msgid "wget is missing\n"
 msgstr "wget saknas\n"
 
-#: ../urpm/download.pm:402
+#: ../urpm/download.pm:404
 #, c-format
 msgid "curl is missing\n"
 msgstr "curl saknas\n"
 
-#: ../urpm/download.pm:537
+#: ../urpm/download.pm:539
 #, c-format
 msgid "curl failed: download canceled\n"
 msgstr "curl misslyckades: nerladdningen avbröts\n"
 
-#: ../urpm/download.pm:572
+#: ../urpm/download.pm:574
 #, c-format
 msgid "rsync is missing\n"
 msgstr "rsync saknas\n"
 
-#: ../urpm/download.pm:640
+#: ../urpm/download.pm:642
 #, c-format
 msgid "ssh is missing\n"
 msgstr "ssh saknas\n"
 
-#: ../urpm/download.pm:659
+#: ../urpm/download.pm:661
 #, c-format
 msgid "prozilla is missing\n"
 msgstr "prozilla saknas\n"
 
-#: ../urpm/download.pm:675
+#: ../urpm/download.pm:677
 #, c-format
 msgid "Couldn't execute prozilla\n"
 msgstr "Kunde inte starta prozilla\n"
 
-#: ../urpm/download.pm:685
+#: ../urpm/download.pm:687
 #, c-format
 msgid "aria2 is missing\n"
 msgstr "aria2 saknas\n"
 
-#: ../urpm/download.pm:734
+#: ../urpm/download.pm:736
 #, c-format
 msgid "Failed to download %s"
 msgstr "Misslyckades att hämta %s"
 
-#: ../urpm/download.pm:829
+#: ../urpm/download.pm:854
 #, c-format
 msgid "        %s%% of %s completed, ETA = %s, speed = %s"
 msgstr "        %s%% av %s klar, ETA = %s, hastighet = %s"
 
-#: ../urpm/download.pm:830
+#: ../urpm/download.pm:855
 #, c-format
 msgid "        %s%% completed, speed = %s"
 msgstr "        %s%% klar, hastighet = %s"
 
-#: ../urpm/download.pm:915
+#: ../urpm/download.pm:940
 #, c-format
 msgid "retrieving %s"
 msgstr "hämtar %s"
 
-#: ../urpm/download.pm:926
+#: ../urpm/download.pm:958
 #, c-format
 msgid "retrieved %s"
 msgstr "hämtade %s"
 
-#: ../urpm/download.pm:989
+#: ../urpm/download.pm:1021
 #, c-format
 msgid "unknown protocol defined for %s"
 msgstr "okänt protokoll definierat för %s"
 
-#: ../urpm/download.pm:1003
+#: ../urpm/download.pm:1035
 #, c-format
 msgid "no webfetch found, supported webfetch are: %s\n"
 msgstr "ingen 'webfetch' hittad, supportad webfetch är: %s\n"
 
-#: ../urpm/download.pm:1018
+#: ../urpm/download.pm:1050
 #, c-format
 msgid "unable to handle protocol: %s"
 msgstr "kan inte hantera protokoll: %s"
 
-#: ../urpm/get_pkgs.pm:29
+#: ../urpm/get_pkgs.pm:28
 #, c-format
 msgid "cleaning %s and %s"
 msgstr "rengör %s och %s"
 
-#: ../urpm/get_pkgs.pm:141
+#: ../urpm/get_pkgs.pm:140
 #, c-format
 msgid "package %s is not found."
 msgstr "paketet %s hittas inte."
 
-#: ../urpm/get_pkgs.pm:269
+#: ../urpm/get_pkgs.pm:268
 #, c-format
 msgid "retrieving rpm files from medium \"%s\"..."
 msgstr "hämtar RPM-filer från media \"%s\"..."
 
-#: ../urpm/install.pm:115 ../urpme:164
+#: ../urpm/install.pm:116 ../urpme:164
 #, c-format
 msgid "removing %s"
 msgstr "tar bort %s"
@@ -776,7 +831,7 @@ msgstr "kan inte installera paket %s"
 msgid "removing bad rpm (%s) from %s"
 msgstr "tar bort felaktig rpm (%s) från %s"
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:374
+#: ../urpm/install.pm:246 ../urpm/install.pm:393
 #, c-format
 msgid "removing %s failed: %s"
 msgstr "borttagning av %s misslyckades: %s"
@@ -786,68 +841,70 @@ msgstr "borttagning av %s misslyckades: %s"
 msgid "removing package %s"
 msgstr "tar bort paket %s"
 
-#: ../urpm/install.pm:341
+#: ../urpm/install.pm:359
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
-msgstr "skapade transaktion för installation på %s (ta bort=%d, installera=%d, uppdatera=%d)"
+msgstr ""
+"skapade transaktion för installation på %s (ta bort=%d, installera=%d, "
+"uppdatera=%d)"
 
-#: ../urpm/install.pm:344
+#: ../urpm/install.pm:362
 #, c-format
 msgid "unable to create transaction"
 msgstr "kunde inte skapa transaktion"
 
-#: ../urpm/install.pm:372
+#: ../urpm/install.pm:391
 #, c-format
 msgid "removing installed rpms (%s) from %s"
 msgstr "tar bort installerade rpms (%s) från %s"
 
-#: ../urpm/install.pm:381
+#: ../urpm/install.pm:400
 #, c-format
 msgid "More information on package %s"
 msgstr "Mer information om paket %s"
 
-#: ../urpm/ldap.pm:42
+#: ../urpm/ldap.pm:41
 #, c-format
 msgid "Cannot create ldap cache directory"
 msgstr "Kan inte skapa ldap cache katalog"
 
-#: ../urpm/ldap.pm:48
+#: ../urpm/ldap.pm:47
 #, c-format
 msgid "Cannot write cache file for ldap\n"
 msgstr "Kan inte skriva cache fil för ldap\n"
 
-#: ../urpm/ldap.pm:177
+#: ../urpm/ldap.pm:176
 #, c-format
 msgid "No server defined, missing uri or host"
 msgstr "Ingen server definierad, uri eller host saknas"
 
-#: ../urpm/ldap.pm:178
+#: ../urpm/ldap.pm:177
 #, c-format
 msgid "No base defined"
 msgstr "Ingen bas definierad"
 
-#: ../urpm/ldap.pm:188 ../urpm/ldap.pm:191
+#: ../urpm/ldap.pm:187 ../urpm/ldap.pm:190
 #, c-format
 msgid "Cannot connect to ldap uri:"
 msgstr "Kan inte ansluta till ldap uri:"
 
-#: ../urpm/lock.pm:99
+#: ../urpm/lock.pm:98
 #, c-format
 msgid "%s database is locked, process %d is already using it"
 msgstr "%s databas är låst, processen %d använder den redan"
 
-#: ../urpm/lock.pm:101
+#: ../urpm/lock.pm:100
 #, c-format
 msgid "%s database is locked (another program is already using it)"
 msgstr "%s databas är låst (ett annat program använder den redan)"
 
-#: ../urpm/lock.pm:115
+#: ../urpm/lock.pm:114
 #, c-format
 msgid "%s database is locked. Waiting..."
 msgstr "%s databas låst. Väntar..."
 
-#: ../urpm/lock.pm:116
+#: ../urpm/lock.pm:115
 #, c-format
 msgid "aborting"
 msgstr "avbryter"
@@ -867,14 +924,20 @@ msgstr "Du bör försöka uppdatera urpmi-databasen."
 msgid ""
 "Installation failed, bad rpms:\n"
 "%s"
-msgstr "Installationen misslyckades, felaktiga rpm:\n%s"
+msgstr ""
+"Installationen misslyckades, felaktiga rpm:\n"
+"%s"
 
 #: ../urpm/main_loop.pm:108
 #, c-format
 msgid ""
-"There is not enough space on your filesystem to download all packages (%s needed, %s available).\n"
+"There is not enough space on your filesystem to download all packages (%s "
+"needed, %s available).\n"
 "Are you sure you want to continue?"
-msgstr "Det finns inte tillräckligt med utrymme på ditt filsystem för att ladda ner alla paket (%s behövs, %s tillgängligt).\nÄr du säker du vill fortsätta?"
+msgstr ""
+"Det finns inte tillräckligt med utrymme på ditt filsystem för att ladda ner "
+"alla paket (%s behövs, %s tillgängligt).\n"
+"Är du säker du vill fortsätta?"
 
 #: ../urpm/main_loop.pm:138
 #, c-format
@@ -891,8 +954,8 @@ msgstr "Följande paket har felaktiga signaturer"
 msgid "Do you want to continue installation ?"
 msgstr "Vill du fortsätta installationen?"
 
-#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:290
-#: ../urpm/main_loop.pm:298
+#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:291
+#: ../urpm/main_loop.pm:299
 #, c-format
 msgid "Installation failed"
 msgstr "Installationen misslyckades"
@@ -907,37 +970,37 @@ msgstr "tar bort installerade rpms (%s)"
 msgid "Try to continue anyway?"
 msgstr "Försök fortsätta ändå?"
 
-#: ../urpm/main_loop.pm:236
+#: ../urpm/main_loop.pm:237
 #, c-format
 msgid "installing %s from %s"
 msgstr "installerar %s från %s"
 
-#: ../urpm/main_loop.pm:238
+#: ../urpm/main_loop.pm:239
 #, c-format
 msgid "installing %s"
 msgstr "installerar %s"
 
-#: ../urpm/main_loop.pm:245
+#: ../urpm/main_loop.pm:246
 #, c-format
 msgid "distributing %s"
 msgstr "distribuerar %s"
 
-#: ../urpm/main_loop.pm:291
+#: ../urpm/main_loop.pm:292
 #, c-format
 msgid "Try installation without checking dependencies?"
 msgstr "Prova att installera utan att kontrollera behov av andra filer?"
 
-#: ../urpm/main_loop.pm:299
+#: ../urpm/main_loop.pm:300
 #, c-format
 msgid "Try harder to install (--force)?"
 msgstr "Försök ännu hårdare att installera (--force)?"
 
-#: ../urpm/main_loop.pm:590
+#: ../urpm/main_loop.pm:591
 #, c-format
 msgid "Packages are up to date"
 msgstr "Paket är uppdaterade"
 
-#: ../urpm/main_loop.pm:601 ../urpm/parallel.pm:299
+#: ../urpm/main_loop.pm:602 ../urpm/parallel.pm:340
 #, c-format
 msgid "Installation is possible"
 msgstr "Installation är möjlig"
@@ -947,395 +1010,404 @@ msgstr "Installation är möjlig"
 msgid "warning: md5sum for %s unavailable in MD5SUM file"
 msgstr "varning: md5sum för %s finns ej i MD5SUM filen"
 
-#: ../urpm/media.pm:268
+#: ../urpm/media.pm:267
 #, c-format
 msgid "virtual medium \"%s\" should have a clear url, medium ignored"
 msgstr "virtuellt media \"%s\" bör ha en tydlig URL, media ignorerat"
 
-#: ../urpm/media.pm:270
+#: ../urpm/media.pm:269
 #, c-format
 msgid "unable to access list file of \"%s\", medium ignored"
 msgstr "kunde inte komma åt listfil för \"%s\", media ignorerat"
 
-#: ../urpm/media.pm:273
+#: ../urpm/media.pm:272
 #, c-format
 msgid "unable to access synthesis file of \"%s\", medium ignored"
 msgstr "kunde inte komma åt synthersis-fil för \"%s\", media ignorerat"
 
-#: ../urpm/media.pm:299
+#: ../urpm/media.pm:298
 #, c-format
 msgid "trying to override existing medium \"%s\", skipping"
 msgstr "försöker gå förbi befintligt media \"%s\", hoppar över"
 
-#: ../urpm/media.pm:515
+#: ../urpm/media.pm:514
 #, c-format
 msgid "failed to migrate removable device, ignoring media"
 msgstr "misslyckades att migrera flyttbar enhet, ignorerar medium"
 
-#: ../urpm/media.pm:558
+#: ../urpm/media.pm:563
 #, c-format
 msgid "wrote config file [%s]"
 msgstr "skriv inställningsfil [%s]"
 
-#: ../urpm/media.pm:649
+#: ../urpm/media.pm:654
 #, c-format
 msgid "Can't use parallel mode with use-distrib mode"
 msgstr "Kan ej använda parallellt läge med use-distrib läge"
 
-#: ../urpm/media.pm:657
+#: ../urpm/media.pm:662
 #, c-format
 msgid "using associated media for parallel mode: %s"
 msgstr "använder associerad media för parallelläge: %s"
 
-#: ../urpm/media.pm:673
+#: ../urpm/media.pm:678
 #, c-format
 msgid ""
-"--synthesis cannot be used with --media, --excludemedia, --sortmedia, "
-"--update, --use-distrib or --parallel"
-msgstr "--synthesis kan inte användas med --media, --excludemedia, --sortmedia, -- update, --use-distrib eller --parallel"
+"--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
+"update, --use-distrib or --parallel"
+msgstr ""
+"--synthesis kan inte användas med --media, --excludemedia, --sortmedia, -- "
+"update, --use-distrib eller --parallel"
 
-#: ../urpm/media.pm:786
+#: ../urpm/media.pm:792
 #, c-format
 msgid "ignoring non-free medium `%s'"
 msgstr "ignorerar non-free mediet `%s'"
 
-#: ../urpm/media.pm:795
+#: ../urpm/media.pm:802
 #, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
-msgstr "slutar att ignorera icke-fri media  `%s' b/c icke-fria paket installeras"
+msgstr ""
+"slutar att ignorera icke-fri media  `%s' b/c icke-fria paket installeras"
 
-#: ../urpm/media.pm:799
+#: ../urpm/media.pm:806
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr "slutar att ignorera tainted-media `%s' b/c tainted-paket installeras"
 
-#: ../urpm/media.pm:827
+#: ../urpm/media.pm:816
+#, fuzzy, c-format
+msgid "un-ignoring 32bit medium `%s' b/c system is 32-bit EFI"
+msgstr "slutar att ignorera tainted-media `%s' b/c tainted-paket installeras"
+
+#: ../urpm/media.pm:844
 #, c-format
 msgid "Search start: %s end: %s"
 msgstr "Sök början: %s slut: %s"
 
-#: ../urpm/media.pm:844
+#: ../urpm/media.pm:861
 #, c-format
 msgid "skipping package %s"
 msgstr "hoppar över paket %s"
 
-#: ../urpm/media.pm:860
+#: ../urpm/media.pm:877
 #, c-format
 msgid "would install instead of upgrade package %s"
 msgstr "skulle installera istället för att uppdatera paket %s"
 
-#: ../urpm/media.pm:943
+#: ../urpm/media.pm:960
 #, c-format
 msgid "medium \"%s\" already exists"
 msgstr "media \"%s\" finns redan"
 
-#: ../urpm/media.pm:985
+#: ../urpm/media.pm:1008
 #, c-format
 msgid "(ignored by default)"
 msgstr "(ignorerat som standard)"
 
-#: ../urpm/media.pm:991
+#: ../urpm/media.pm:1014
 #, c-format
 msgid "adding medium \"%s\" before remote medium \"%s\""
 msgstr "lägger till media \"%s\" före fjärrmedia \"%s\""
 
-#: ../urpm/media.pm:997
+#: ../urpm/media.pm:1020
 #, c-format
 msgid "adding medium \"%s\""
 msgstr "lägger till media \"%s\""
 
-#: ../urpm/media.pm:1021
+#: ../urpm/media.pm:1044
 #, c-format
 msgid "failed to copy media.cfg to %s (%d)"
 msgstr "misslyckades kopiera media.cfg till %s (%d)"
 
-#: ../urpm/media.pm:1092
+#: ../urpm/media.pm:1115
 #, c-format
 msgid "directory %s does not exist"
 msgstr "sökväg %s existerar inte"
 
-#: ../urpm/media.pm:1100
+#: ../urpm/media.pm:1123
 #, c-format
 msgid "this location doesn't seem to contain any distribution"
 msgstr "denna sökväg verkar inte innehålla någon distribution"
 
-#: ../urpm/media.pm:1124
+#: ../urpm/media.pm:1147
 #, c-format
 msgid "unable to parse media.cfg"
 msgstr "kan inte tyda media.cfg"
 
-#: ../urpm/media.pm:1127
+#: ../urpm/media.pm:1150
 #, c-format
 msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr "kan inte läsa distributionsmediat (hittade ingen media.cfg fil)"
 
-#: ../urpm/media.pm:1149
+#: ../urpm/media.pm:1172
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr "ignorerar icke-kompatibelt media '%s' (för %s)"
 
-#: ../urpm/media.pm:1207
+#: ../urpm/media.pm:1230
 #, c-format
 msgid "retrieving media.cfg file..."
 msgstr "hämtar media.cfg fil..."
 
-#: ../urpm/media.pm:1250
+#: ../urpm/media.pm:1273
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "försöker välja media som inte finns \"%s\""
 
-#: ../urpm/media.pm:1253
+#: ../urpm/media.pm:1276
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "väljer flera media: %s"
 
-#: ../urpm/media.pm:1312
+#: ../urpm/media.pm:1335
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "tar bort media \"%s\""
 
-#: ../urpm/media.pm:1403
+#: ../urpm/media.pm:1426
 #, c-format
 msgid "reconfiguring urpmi for media \"%s\""
 msgstr "omkonfigurerar urpmi för media \"%s\""
 
-#: ../urpm/media.pm:1437
+#: ../urpm/media.pm:1460
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...omkonfigurering misslyckades"
 
-#: ../urpm/media.pm:1443
+#: ../urpm/media.pm:1466
 #, c-format
 msgid "reconfiguration done"
 msgstr "omkonfigurering utförd"
 
-#: ../urpm/media.pm:1459
+#: ../urpm/media.pm:1482
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr "Fel vid generering av names fil: behövlig %d hittades inte"
 
-#: ../urpm/media.pm:1480
+#: ../urpm/media.pm:1503
 #, c-format
 msgid "medium \"%s\" is up-to-date"
 msgstr "mediat \"%s\" är uppdaterat"
 
-#: ../urpm/media.pm:1491
+#: ../urpm/media.pm:1514
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "undersöker synthesis-fil [%s]"
 
-#: ../urpm/media.pm:1511
+#: ../urpm/media.pm:1534
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "problem med att läsa synthesis-fil för media \"%s\""
 
-#: ../urpm/media.pm:1524 ../urpm/media.pm:1619
+#: ../urpm/media.pm:1547 ../urpm/media.pm:1642
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
 msgstr "kopierar [%s] för media \"%s\"..."
 
-#: ../urpm/media.pm:1526 ../urpm/media.pm:1596 ../urpm/media.pm:1849
+#: ../urpm/media.pm:1549 ../urpm/media.pm:1619 ../urpm/media.pm:1872
 #, c-format
 msgid "...copying failed"
 msgstr "...kopiering misslyckades"
 
-#: ../urpm/media.pm:1592
+#: ../urpm/media.pm:1615
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "kopierar beskrivningsfil för \"%s\"..."
 
-#: ../urpm/media.pm:1594 ../urpm/media.pm:1623
+#: ../urpm/media.pm:1617 ../urpm/media.pm:1646
 #, c-format
 msgid "...copying done"
 msgstr "...kopiering klar"
 
-#: ../urpm/media.pm:1625
+#: ../urpm/media.pm:1648
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "kopiering av [%s] misslyckades (filen är misstänkligt liten)"
 
-#: ../urpm/media.pm:1673
+#: ../urpm/media.pm:1696
 #, c-format
 msgid "computing md5sum of retrieved source synthesis"
 msgstr "beräknar MD5-summa för hämtade syntheses källor"
 
-#: ../urpm/media.pm:1675 ../urpm/media.pm:2158
+#: ../urpm/media.pm:1698 ../urpm/media.pm:2181
 #, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
 msgstr "hämtning av [%s] misslyckades (md5sum stämmer inte)"
 
-#: ../urpm/media.pm:1690
+#: ../urpm/media.pm:1713
 #, c-format
 msgid "genhdlist2 failed on %s"
 msgstr "genhdlist2 misslyckades på %s"
 
-#: ../urpm/media.pm:1700
+#: ../urpm/media.pm:1723
 #, c-format
 msgid "comparing %s and %s"
 msgstr "jämför %s och %s"
 
-#: ../urpm/media.pm:1730
+#: ../urpm/media.pm:1753
 #, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
 msgstr "felaktig hdlist-fil %s för media \"%s\""
 
-#: ../urpm/media.pm:1756
+#: ../urpm/media.pm:1779
 #, c-format
 msgid "copying MD5SUM file of \"%s\"..."
 msgstr "kopierar MD5SUM-fil för \"%s\"..."
 
-#: ../urpm/media.pm:1796
+#: ../urpm/media.pm:1819
 #, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
 msgstr "ogiltig MD5SUM fil (hämtad från %s)"
 
-#: ../urpm/media.pm:1799
+#: ../urpm/media.pm:1822
 #, c-format
 msgid "no metadata found for medium \"%s\""
 msgstr "ingen metadata hittad för media \"%s\""
 
-#: ../urpm/media.pm:1831
+#: ../urpm/media.pm:1854
 #, c-format
 msgid "retrieving source synthesis of \"%s\"..."
 msgstr "hämtar käll-synthesis för \"%s\"..."
 
-#: ../urpm/media.pm:1897
+#: ../urpm/media.pm:1920
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "undersöker \"pubkey\"-fil för \"%s\"..."
 
-#: ../urpm/media.pm:1909
+#: ../urpm/media.pm:1932
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...importerarde nyckel %s från \"pubkey\"-fil av \"%s\""
 
-#: ../urpm/media.pm:1913
+#: ../urpm/media.pm:1936
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "kunde inte importera \"pubkey\"-fil för \"%s\""
 
-#: ../urpm/media.pm:1954
+#: ../urpm/media.pm:1977
 #, c-format
 msgid "no synthesis file found for medium \"%s\""
 msgstr "ingen synthesis-fil hittad för media \"%s\""
 
-#: ../urpm/media.pm:1987
+#: ../urpm/media.pm:2010
 #, c-format
 msgid "updated medium \"%s\""
 msgstr "uppdaterade media %s"
 
-#: ../urpm/media.pm:2152
+#: ../urpm/media.pm:2175
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr "hämtning av [%s] misslyckades"
 
-#: ../urpm/mirrors.pm:34 ../urpm/mirrors.pm:60
+#: ../urpm/mirrors.pm:33 ../urpm/mirrors.pm:59
 #, c-format
 msgid "trying again with mirror %s"
 msgstr "försöker igen med spegelserver %s"
 
-#: ../urpm/mirrors.pm:112
+#: ../urpm/mirrors.pm:111
 #, c-format
 msgid "Could not find a mirror from mirrorlist %s"
 msgstr "Kunde inte hitta någon spegelserver från spegel-lista %s"
 
-#: ../urpm/mirrors.pm:260
+#: ../urpm/mirrors.pm:259
 #, c-format
 msgid "found geolocalisation %s %.2f %.2f from timezone %s"
 msgstr "hittade geolokalisering %s %.2f %.2f från tidszon %s"
 
-#: ../urpm/mirrors.pm:305
+#: ../urpm/mirrors.pm:306
 #, c-format
 msgid "getting mirror list from %s"
 msgstr "hämtar spegel-lista från %s"
 
-#: ../urpm/msg.pm:75 ../urpmi:492 ../urpmi:510 ../urpmi:626
+#: ../urpm/msg.pm:74 ../urpmi:492 ../urpmi:510 ../urpmi:628
 #, c-format
 msgid "Nn"
 msgstr "Nn"
 
 #. -PO: Add here the keys which might be pressed in the "Yes"-case.
-#: ../urpm/msg.pm:76 ../urpme:38 ../urpmi.addmedia:133
+#: ../urpm/msg.pm:75 ../urpme:38 ../urpmi.addmedia:133
 #, c-format
 msgid "Yy"
 msgstr "JjYy"
 
-#: ../urpm/msg.pm:101 ../urpme:158 ../urpmi.addmedia:136
+#: ../urpm/msg.pm:100 ../urpme:158 ../urpmi.addmedia:136
 #, c-format
 msgid " (y/N) "
 msgstr " (j/N) "
 
-#: ../urpm/msg.pm:130
+#: ../urpm/msg.pm:129
 #, c-format
 msgid "Sorry, bad choice, try again\n"
 msgstr "Felaktigt val, försök igen.\n"
 
-#: ../urpm/msg.pm:161
+#: ../urpm/msg.pm:160
 #, c-format
 msgid "Package"
 msgstr "Paket"
 
-#: ../urpm/msg.pm:161
+#: ../urpm/msg.pm:160
 #, c-format
 msgid "Version"
 msgstr "Version"
 
-#: ../urpm/msg.pm:161
+#: ../urpm/msg.pm:160
 #, c-format
 msgid "Release"
 msgstr "Release"
 
-#: ../urpm/msg.pm:161
+#: ../urpm/msg.pm:160
 #, c-format
 msgid "Arch"
 msgstr "Arkitektur"
 
-#: ../urpm/msg.pm:170
+#: ../urpm/msg.pm:169
 #, c-format
 msgid "(recommended)"
 msgstr "(rekommenderas)"
 
-#: ../urpm/msg.pm:185
+#: ../urpm/msg.pm:184
 #, c-format
 msgid "medium \"%s\""
 msgstr "media \"%s\""
 
-#: ../urpm/msg.pm:185
+#: ../urpm/msg.pm:184
 #, c-format
 msgid "command line"
 msgstr "kommandorad"
 
-#: ../urpm/msg.pm:199
+#: ../urpm/msg.pm:198
 #, c-format
 msgid "B"
 msgstr "B"
 
-#: ../urpm/msg.pm:199
+#: ../urpm/msg.pm:198
 #, c-format
 msgid "KB"
 msgstr "KB"
 
-#: ../urpm/msg.pm:199
+#: ../urpm/msg.pm:198
 #, c-format
 msgid "MB"
 msgstr "MB"
 
-#: ../urpm/msg.pm:199
+#: ../urpm/msg.pm:198
 #, c-format
 msgid "GB"
 msgstr "GB"
 
-#: ../urpm/msg.pm:199 ../urpm/msg.pm:208
+#: ../urpm/msg.pm:198 ../urpm/msg.pm:207
 #, c-format
 msgid "TB"
 msgstr "TB"
 
-#: ../urpm/orphans.pm:79
+#: ../urpm/orphans.pm:84
 #, c-format
 msgid "Marking %s as manually installed, it won't be auto-orphaned"
-msgstr "Markerar %s som manuellt installerad, så det inte blir märkt som obehövligt"
+msgstr ""
+"Markerar %s som manuellt installerad, så det inte blir märkt som obehövligt"
 
-#: ../urpm/orphans.pm:527
+#: ../urpm/orphans.pm:613
 #, c-format
 msgid ""
 "The following package:\n"
@@ -1345,55 +1417,69 @@ msgid_plural ""
 "The following packages:\n"
 "%s\n"
 "are now orphaned."
-msgstr[0] "Följande paket:\n%s\nbehövs inte längre."
-msgstr[1] "Följande paket:\n%s\nbehövs inte längre."
+msgstr[0] ""
+"Följande paket:\n"
+"%s\n"
+"behövs inte längre."
+msgstr[1] ""
+"Följande paket:\n"
+"%s\n"
+"behövs inte längre."
 
-#: ../urpm/orphans.pm:530
+#: ../urpm/orphans.pm:616
 #, c-format
 msgid "You may wish to remove it."
 msgid_plural "You may wish to remove them."
 msgstr[0] "Du kanske vill ta bort det."
 msgstr[1] "Du kanske vill ta bort dem."
 
-#: ../urpm/orphans.pm:547
+#: ../urpm/orphans.pm:633
 #, c-format
 msgid ""
 "The following package:\n"
 "%s\n"
-"is now orphaned, if you wish to remove it, you can use \"urpme --auto-orphans\""
+"is now orphaned, if you wish to remove it, you can use \"urpme --auto-orphans"
+"\""
 msgid_plural ""
 "The following packages:\n"
 "%s\n"
-"are now orphaned, if you wish to remove them, you can use \"urpme --auto-orphans\""
-msgstr[0] "Följande paket:\n%s\nbehövs ej mera, använd \"urpme --auto-orphans\" för att ta bort det"
-msgstr[1] "Följande paket:\n%s\nbehövs ej mera, använd \"urpme --auto-orphans\" för att ta bort dem"
+"are now orphaned, if you wish to remove them, you can use \"urpme --auto-"
+"orphans\""
+msgstr[0] ""
+"Följande paket:\n"
+"%s\n"
+"behövs ej mera, använd \"urpme --auto-orphans\" för att ta bort det"
+msgstr[1] ""
+"Följande paket:\n"
+"%s\n"
+"behövs ej mera, använd \"urpme --auto-orphans\" för att ta bort dem"
 
-#: ../urpm/parallel.pm:15
+#: ../urpm/parallel.pm:31
 #, c-format
 msgid "unable to parse \"%s\" in file [%s]"
 msgstr "kan inte tyda \"%s\" i fil [%s]"
 
-#: ../urpm/parallel.pm:24
+#: ../urpm/parallel.pm:40
 #, c-format
 msgid "examining parallel handler in file [%s]"
 msgstr "undersöker parallell hanterare i fil [%s]"
 
-#: ../urpm/parallel.pm:35
+#: ../urpm/parallel.pm:51
 #, c-format
 msgid "found parallel handler for nodes: %s"
 msgstr "hittade parallella hanterare för noder: %s"
 
-#: ../urpm/parallel.pm:39
+#: ../urpm/parallel.pm:55
 #, c-format
 msgid "unable to use parallel option \"%s\""
 msgstr "kan inte använda parallellalternativ \"%s\""
 
-#: ../urpm/parallel.pm:94
+#: ../urpm/parallel.pm:120
 #, c-format
 msgid "on node %s"
 msgstr "på nod %s"
 
-#: ../urpm/parallel.pm:294
+#: ../urpm/parallel.pm:335
 #, c-format
 msgid "Installation failed on node %s"
 msgstr "Installationen misslyckades på nod %s"
@@ -1421,176 +1507,183 @@ msgstr "cp misslyckades på maskin %s (%d)"
 #: ../urpm/parallel_ssh.pm:84
 #, c-format
 msgid ""
-"%s failed on host %s (maybe it does not have a good version of urpmi?) (exit"
-" code: %d)"
-msgstr "%s misslyckades på maskin %s (kanske den inte har en korrekt version av urpmi?) (felkod %d)"
+"%s failed on host %s (maybe it does not have a good version of urpmi?) (exit "
+"code: %d)"
+msgstr ""
+"%s misslyckades på maskin %s (kanske den inte har en korrekt version av "
+"urpmi?) (felkod %d)"
 
-#: ../urpm/removable.pm:46
+#: ../urpm/removable.pm:45
 #, c-format
 msgid "unable to access medium \"%s\"."
 msgstr "kunde inte komma åt media \"%s\"."
 
-#: ../urpm/removable.pm:86 ../urpm/removable.pm:101
+#: ../urpm/removable.pm:85 ../urpm/removable.pm:100
 #, c-format
 msgid "mounting %s"
 msgstr "monterar %s"
 
-#: ../urpm/removable.pm:113
+#: ../urpm/removable.pm:112
 #, c-format
 msgid "unmounting %s"
 msgstr "avmonterar %s"
 
-#: ../urpm/select.pm:45
+#: ../urpm/select.pm:44
 #, c-format
 msgid "urpmi was restarted, and the list of priority packages did not change"
 msgstr "urpmi startades om, och listan av prioriterade paket ändrades inte"
 
-#: ../urpm/select.pm:47
+#: ../urpm/select.pm:46
 #, c-format
 msgid ""
 "urpmi was restarted, and the list of priority packages did change: %s vs %s"
-msgstr "urpmi startades om, och listan av prioriterade paket ändrades: %s mot %s"
+msgstr ""
+"urpmi startades om, och listan av prioriterade paket ändrades: %s mot %s"
 
-#: ../urpm/select.pm:220
+#: ../urpm/select.pm:219
 #, c-format
 msgid "No package named %s"
 msgstr "Inget paket med namn %s"
 
-#: ../urpm/select.pm:222 ../urpme:112
+#: ../urpm/select.pm:221 ../urpme:112
 #, c-format
 msgid "The following packages contain %s: %s"
 msgstr "Följande paket innehåller %s: %s"
 
-#: ../urpm/select.pm:224
+#: ../urpm/select.pm:223
 #, c-format
 msgid "You should use \"-a\" to use all of them"
 msgstr "Du borde använda \"-a\" för att använda alla av dem"
 
-#: ../urpm/select.pm:372
+#: ../urpm/select.pm:371
 #, c-format
 msgid "found package(s) %s in urpmi db, but none are installed"
 msgstr "Hittade paket(en) %s i urpmi db, men inget är installerat"
 
-#: ../urpm/select.pm:607
+#: ../urpm/select.pm:606
 #, c-format
 msgid "Package %s is already installed"
 msgstr "Paket %s är redan installerat"
 
-#: ../urpm/select.pm:608
+#: ../urpm/select.pm:607
 #, c-format
 msgid "Packages %s are already installed"
 msgstr "Paketen %s är redan installerade"
 
-#: ../urpm/select.pm:625 ../urpm/select.pm:712
+#: ../urpm/select.pm:624 ../urpm/select.pm:711
 #, c-format
 msgid "due to conflicts with %s"
 msgstr "på grund av konflikter med %s"
 
-#: ../urpm/select.pm:626 ../urpm/select.pm:706
+#: ../urpm/select.pm:625 ../urpm/select.pm:705
 #, c-format
 msgid "due to unsatisfied %s"
 msgstr "på grund av otillräckliga %s"
 
-#: ../urpm/select.pm:632
+#: ../urpm/select.pm:631
 #, c-format
 msgid "trying to promote %s"
 msgstr "försöker befordra %s"
 
-#: ../urpm/select.pm:633
+#: ../urpm/select.pm:632
 #, c-format
 msgid "in order to keep %s"
 msgstr "för att behålla %s"
 
-#: ../urpm/select.pm:674
+#: ../urpm/select.pm:673
 #, c-format
 msgid ""
 "The following package has to be removed for others to be upgraded:\n"
 "%s"
-msgstr "Följande paket måste tas bort för att andra ska bli uppdaterade:\n%s"
+msgstr ""
+"Följande paket måste tas bort för att andra ska bli uppdaterade:\n"
+"%s"
 
-#: ../urpm/select.pm:675
+#: ../urpm/select.pm:674
 #, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s"
-msgstr "Följande paket måste tas bort för att andra ska bli uppdaterade:\n%s"
+msgstr ""
+"Följande paket måste tas bort för att andra ska bli uppdaterade:\n"
+"%s"
 
-#: ../urpm/select.pm:702
+#: ../urpm/select.pm:701
 #, c-format
 msgid "in order to install %s"
 msgstr "för att installera %s"
 
-#: ../urpm/select.pm:708
+#: ../urpm/select.pm:707
 #, c-format
 msgid "due to missing %s"
 msgstr "för att %s saknas"
 
-#: ../urpm/signature.pm:62
+#: ../urpm/signature.pm:61
 #, c-format
 msgid "Invalid signature (%s)"
 msgstr "Ogiltig signatur (%s)"
 
-#: ../urpm/signature.pm:77
+#: ../urpm/signature.pm:76
 #, c-format
 msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
 msgstr "SÄKERHET: Följande paket är _INTE_ signerat (%s): %s"
 
-#: ../urpm/signature.pm:83
+#: ../urpm/signature.pm:82
 #, c-format
 msgid "SECURITY: NOT checking package \"%s\" (due to configuration)"
 msgstr "SÄKERHET: Kontrollerar INTE paketet \"%s\" (på grund av konfiguration)"
 
-#: ../urpm/signature.pm:102
+#: ../urpm/signature.pm:101
 #, c-format
 msgid "Invalid Key ID (%s)"
 msgstr "Ogiltigt nyckel-id (%s)"
 
-#: ../urpm/signature.pm:104
+#: ../urpm/signature.pm:103
 #, c-format
 msgid "Missing signature (%s)"
 msgstr "Signatur saknas (%s)"
 
-#: ../urpm/signature.pm:107
+#: ../urpm/signature.pm:106
 #, c-format
 msgid "SECURITY: Medium \"%s\" has no key (%s)!"
 msgstr "SÄKERHET: Media \"%s\" har ingen nyckel (%s)!"
 
-#: ../urpm/signature.pm:109
+#: ../urpm/signature.pm:108
 #, c-format
 msgid "Medium without key (%s)"
 msgstr "Media utan nyckel (%s)"
 
-#: ../urpm/sys.pm:199
+#: ../urpm/sys.pm:198
 #, c-format
 msgid "system"
 msgstr "system"
 
-#: ../urpm/sys.pm:236
+#: ../urpm/sys.pm:235
 #, c-format
 msgid "You should restart your computer for %s"
 msgstr "Du borde starta om din dator för %s"
 
-#: ../urpm/sys.pm:238
+#: ../urpm/sys.pm:237
 #, c-format
 msgid "You should restart your session for %s"
 msgstr "Du borde starta om din session för %s"
 
-#: ../urpm/sys.pm:240
+#: ../urpm/sys.pm:239
 #, c-format
 msgid "You should restart %s for %s"
 msgstr "Du borde starta om %s för %s"
 
-#: ../urpm/sys.pm:378
+#: ../urpm/sys.pm:377
 #, c-format
 msgid "Can't write file"
 msgstr "Kan inte skriva fil"
 
-#: ../urpm/sys.pm:378
+#: ../urpm/sys.pm:377
 #, c-format
 msgid "Can't open file"
 msgstr "Kan inte öppna fil"
 
-#: ../urpm/sys.pm:391
+#: ../urpm/sys.pm:390
 #, c-format
 msgid "Can't move file %s to %s"
 msgstr "Kan inte flytta fil %s till %s"
@@ -1621,7 +1714,7 @@ msgid "  --root         - use another root for rpm removal.\n"
 msgstr "  --root         - använd en annan root för att ta bort rpm .\n"
 
 #: ../urpme:49 ../urpmf:35 ../urpmi:108 ../urpmi.addmedia:73
-#: ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
+#: ../urpmi.removemedia:45 ../urpmi.update:49 ../urpmq:68
 #, c-format
 msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
 msgstr "  --urpmi-root   - använd en annan rot för db & rpm installation.\n"
@@ -1641,7 +1734,10 @@ msgstr "  --noscripts    - kör inga skript i paket(en).\n"
 msgid ""
 "  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
 "                   to (un)install a chroot with --root option.\n"
-msgstr "  --use-distrib  - konfigurera urpmi 'on the fly' från ett distributionsträd, användbart\n                   vid (av)installation av chroot med --root option.\n"
+msgstr ""
+"  --use-distrib  - konfigurera urpmi 'on the fly' från ett "
+"distributionsträd, användbart\n"
+"                   vid (av)installation av chroot med --root option.\n"
 
 #: ../urpme:54 ../urpmi:150 ../urpmq:87
 #, c-format
@@ -1690,8 +1786,10 @@ msgstr "Inga obehövliga paket att ta bort"
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
-msgstr[0] "För att tillfredsställa beroenden kommer följande paket att tas bort"
-msgstr[1] "För att tillfredsställa beroenden kommer följande %d paket att tas bort"
+msgstr[0] ""
+"För att tillfredsställa beroenden kommer följande paket att tas bort"
+msgstr[1] ""
+"För att tillfredsställa beroenden kommer följande %d paket att tas bort"
 
 #: ../urpme:151
 #, c-format
@@ -1747,7 +1845,8 @@ msgstr "  --literal, -l  - sök inte mönster, använd argument som söksträng.
 #, c-format
 msgid ""
 "  --sortmedia    - sort media according to substrings separated by comma.\n"
-msgstr "  --sortmedia    - sorterar media enligt kommaseparerade delsträngar.\n"
+msgstr ""
+"  --sortmedia    - sorterar media enligt kommaseparerade delsträngar.\n"
 
 #: ../urpmf:38
 #, c-format
@@ -1777,12 +1876,14 @@ msgstr "  --verbose             - utförligt läge.\n"
 #: ../urpmf:43
 #, c-format
 msgid "  -i             - ignore case distinctions in patterns.\n"
-msgstr "  -i             - versaler och gemener jämförs lika i varje mönster.\n"
+msgstr ""
+"  -i             - versaler och gemener jämförs lika i varje mönster.\n"
 
 #: ../urpmf:44
 #, c-format
 msgid "  -I             - honor case distinctions in patterns (default).\n"
-msgstr "  -I             - versaler och gemener jämförs olika i varje mönster.\n"
+msgstr ""
+"  -I             - versaler och gemener jämförs olika i varje mönster.\n"
 
 #: ../urpmf:45
 #, c-format
@@ -1797,7 +1898,9 @@ msgstr "Mönster-uttryck:\n"
 #: ../urpmf:47
 #, c-format
 msgid "  text           - any text is parsed as a regexp, unless -l is used.\n"
-msgstr "  text           - vilken text som helst används för att söka, om inte -l är använt.\n"
+msgstr ""
+"  text           - vilken text som helst används för att söka, om inte -l är "
+"använt.\n"
 
 #: ../urpmf:48
 #, c-format
@@ -1827,7 +1930,9 @@ msgstr "  ( )            - vänster och höger parentes.\n"
 #: ../urpmf:53
 #, c-format
 msgid "List of tags:\n"
-msgstr "Lista på taggar:\n\n"
+msgstr ""
+"Lista på taggar:\n"
+"\n"
 
 #: ../urpmf:54
 #, c-format
@@ -2019,7 +2124,9 @@ msgstr "  --no-recommends - välj inte automatiskt \"rekommenderade\" paket.\n"
 msgid ""
 "  --no-uninstall - never ask to uninstall a package, abort the "
 "installation.\n"
-msgstr "  --no-uninstall - fråga aldrig om ett paket ska avinstalleras, avbryt installationen.\n"
+msgstr ""
+"  --no-uninstall - fråga aldrig om ett paket ska avinstalleras, avbryt "
+"installationen.\n"
 
 #: ../urpmi:82
 #, c-format
@@ -2031,7 +2138,10 @@ msgstr "  --no-install   - installera inte paket (endast nedladdning)\n"
 msgid ""
 "  --keep         - keep existing packages if possible, reject requested\n"
 "                   packages that lead to removals.\n"
-msgstr "  --keep         - behåll om möjligt existerande paket, ignorera efterfrågade \n                   paket som leder till avinstalleringar.\n"
+msgstr ""
+"  --keep         - behåll om möjligt existerande paket, ignorera "
+"efterfrågade \n"
+"                   paket som leder till avinstalleringar.\n"
 
 #: ../urpmi:85
 #, c-format
@@ -2039,7 +2149,10 @@ msgid ""
 "  --split-level  - split in small transaction if more than given packages\n"
 "                   are going to be installed or upgraded,\n"
 "                   default is %d.\n"
-msgstr "  --split-level  - dela upp i små transaktioner om fler än angivna paket\n                   kommer att installeras eller uppdateras,\n                   standard är %d\n"
+msgstr ""
+"  --split-level  - dela upp i små transaktioner om fler än angivna paket\n"
+"                   kommer att installeras eller uppdateras,\n"
+"                   standard är %d\n"
 
 #: ../urpmi:89
 #, c-format
@@ -2076,27 +2189,34 @@ msgstr "  --noclean      - rensa inte rpms från cache.\n"
 msgid ""
 "  --downgrade    - downgrade a package from the version currently installed\n"
 "                   to the previously highest version\n"
-msgstr "--downgrade - nergradera ett paket från den nuvarande installerade\ntill den tidigare högsta versionen\n"
+msgstr ""
+"--downgrade - nergradera ett paket från den nuvarande installerade\n"
+"till den tidigare högsta versionen\n"
 
 #: ../urpmi:99
 #, c-format
 msgid ""
 "  --replacepkgs  - force installing packages which are already installed.\n"
-msgstr "  --replacepkgs  - tvinga installation av paket som redan är installerade.\n"
+msgstr ""
+"  --replacepkgs  - tvinga installation av paket som redan är installerade.\n"
 
 #: ../urpmi:101
 #, c-format
 msgid ""
 "  --allow-nodeps - allow asking user to install packages without\n"
 "                   dependencies checking.\n"
-msgstr "  --allow-nodeps - tillåter användaren installera paket utan\n                   att kontrollera beroenden.\n"
+msgstr ""
+"  --allow-nodeps - tillåter användaren installera paket utan\n"
+"                   att kontrollera beroenden.\n"
 
 #: ../urpmi:103
 #, c-format
 msgid ""
 "  --allow-force  - allow asking user to install packages without\n"
 "                   dependencies checking and integrity.\n"
-msgstr "  --allow-force  - tillåter användaren att installera paket utan\n                   kontroll av beroenden och integritet.\n"
+msgstr ""
+"  --allow-force  - tillåter användaren att installera paket utan\n"
+"                   kontroll av beroenden och integritet.\n"
 
 #: ../urpmi:105
 #, c-format
@@ -2108,9 +2228,12 @@ msgstr "  --allow-recommends - välja automatiskt \"rekommenderade\" paket.\n"
 msgid ""
 "  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
 "                   to install a chroot with --root option.\n"
-msgstr "  --use-distrib  - konfigurera urpmi 'on the fly' från ett distributionsträd, användbart\n                   vid installation av chroot med --root option.\n"
+msgstr ""
+"  --use-distrib  - konfigurera urpmi 'on the fly' från ett "
+"distributionsträd, användbart\n"
+"                   vid installation av chroot med --root option.\n"
 
-#: ../urpmi:111 ../urpmi.addmedia:60 ../urpmi.update:37
+#: ../urpmi:111 ../urpmi.addmedia:60 ../urpmi.update:38
 #, c-format
 msgid "  --metalink     - generate and use a local metalink.\n"
 msgstr "  --metalink     - generera och använd en lokal metalink.\n"
@@ -2120,14 +2243,18 @@ msgstr "  --metalink     - generera och använd en lokal metalink.\n"
 msgid ""
 "  --download-all - download all needed packages before trying to install "
 "them\n"
-msgstr "  --download-all - ladda ner alla behövliga paket innan de blir installerade\n"
+msgstr ""
+"  --download-all - ladda ner alla behövliga paket innan de blir "
+"installerade\n"
 
 #: ../urpmi:113
 #, c-format
 msgid ""
 "  --downloader   - program to use to retrieve distant files. \n"
 "                   known programs: %s\n"
-msgstr "  --downloader   - program för hämtning av fjärr-filer. \n                   kända program: %s\n"
+msgstr ""
+"  --downloader   - program för hämtning av fjärr-filer. \n"
+"                   kända program: %s\n"
 
 #: ../urpmi:116
 #, c-format
@@ -2154,7 +2281,7 @@ msgstr "  --prozilla-options - tilläggsalternativ för prozilla\n"
 msgid "  --aria2-options - additional options to pass to aria2\n"
 msgstr "  --aria2-options - tilläggsalternativ för aria2\n"
 
-#: ../urpmi:121 ../urpmi.addmedia:61 ../urpmi.update:38
+#: ../urpmi:121 ../urpmi.addmedia:61 ../urpmi.update:39
 #, c-format
 msgid "  --limit-rate   - limit the download speed.\n"
 msgstr "  --limit-rate   - begränsa nedladdningshastigheten.\n"
@@ -2164,28 +2291,38 @@ msgstr "  --limit-rate   - begränsa nedladdningshastigheten.\n"
 msgid ""
 "  --resume       - resume transfer of partially-downloaded files\n"
 "                   (--no-resume disables it, default is disabled).\n"
-msgstr "  --resume       - återuppta nedladdning av delvis nedladdade filer\n                   (--no-resume inaktiverar det, som standard är det inaktiverat).\n"
+msgstr ""
+"  --resume       - återuppta nedladdning av delvis nedladdade filer\n"
+"                   (--no-resume inaktiverar det, som standard är det "
+"inaktiverat).\n"
 
-#: ../urpmi:124 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
+#: ../urpmi:124 ../urpmi.addmedia:62 ../urpmi.update:40 ../urpmq:74
 #, c-format
 msgid ""
 "  --proxy        - use specified HTTP proxy, the port number is assumed\n"
 "                   to be 1080 by default (format is <proxyhost[:port]>).\n"
-msgstr "  --proxy        - använd specificerad HTTP-proxy, portnumret antas\n                   vara 1080 som standard (formatet är <proxydator[:port]>).\n"
+msgstr ""
+"  --proxy        - använd specificerad HTTP-proxy, portnumret antas\n"
+"                   vara 1080 som standard (formatet är <proxydator[:"
+"port]>).\n"
 
-#: ../urpmi:126 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
+#: ../urpmi:126 ../urpmi.addmedia:64 ../urpmi.update:42 ../urpmq:76
 #, c-format
 msgid ""
 "  --proxy-user   - specify user and password to use for proxy\n"
 "                   authentication (format is <user:password>).\n"
-msgstr "  --proxy-user   - ange användare och lösenord för proxy-\n                   autentisering (formatet är <användare:lösenord>).\n"
+msgstr ""
+"  --proxy-user   - ange användare och lösenord för proxy-\n"
+"                   autentisering (formatet är <användare:lösenord>).\n"
 
 #: ../urpmi:128
 #, c-format
 msgid ""
 "  --bug          - output a bug report in directory indicated by\n"
 "                   next arg.\n"
-msgstr "  --bug          - mata ut en felrapport i katalogen som indikeras av\n                   nästa arg.\n"
+msgstr ""
+"  --bug          - mata ut en felrapport i katalogen som indikeras av\n"
+"                   nästa arg.\n"
 
 #: ../urpmi:134
 #, c-format
@@ -2205,7 +2342,8 @@ msgstr "  --ignoresize   - kontrollera inte diskutrymme före installation.\n"
 #: ../urpmi:137
 #, c-format
 msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
-msgstr "  --ignorearch   - tillåt installation av rpm som inte matchar arkitektur.\n"
+msgstr ""
+"  --ignorearch   - tillåt installation av rpm som inte matchar arkitektur.\n"
 
 #: ../urpmi:138
 #, c-format
@@ -2232,7 +2370,9 @@ msgstr "  --prefer       - paket som skall föredras\n"
 msgid ""
 "  --more-choices - when several packages are found, propose more choices\n"
 "                   than the default.\n"
-msgstr "  --more-choices - om flera paket hittas, föreslå fler alternativ\n                   än standard.\n"
+msgstr ""
+"  --more-choices - om flera paket hittas, föreslå fler alternativ\n"
+"                   än standard.\n"
 
 #: ../urpmi:144
 #, c-format
@@ -2274,7 +2414,9 @@ msgstr "Fel: kan inte använda --auto-select samtidigt som en fil-lista.\n"
 msgid ""
 "Error: To generate a bug report, specify the usual command-line arguments\n"
 "along with --bug.\n"
-msgstr "Fel: För att skapa felrapport, använd samma argument som tidigare\noch lägg till --bug.\n"
+msgstr ""
+"Fel: För att skapa felrapport, använd samma argument som tidigare\n"
+"och lägg till --bug.\n"
 
 #: ../urpmi:217
 #, c-format
@@ -2295,14 +2437,18 @@ msgstr "använder --buildrequires"
 #, c-format
 msgid ""
 "please use --buildrequires or --install-src, defaulting to --buildrequires"
-msgstr "vänligen använd --buildrequires eller --install-src, använder --buildrequires som standard"
+msgstr ""
+"vänligen använd --buildrequires eller --install-src, använder --"
+"buildrequires som standard"
 
 #: ../urpmi:250
 #, c-format
 msgid ""
 "Directory [%s] already exists, please use another directory for bug report "
 "or delete it"
-msgstr "Katalogen [%s] finns redan, välj en annan katalog för felrapport eller radera den"
+msgstr ""
+"Katalogen [%s] finns redan, välj en annan katalog för felrapport eller "
+"radera den"
 
 #: ../urpmi:251
 #, c-format
@@ -2314,7 +2460,9 @@ msgstr "Kunde inte skapa katalog [%s] för felrapport"
 msgid ""
 "Error: %s appears to be mounted read-only.\n"
 "Use --allow-force to force operation."
-msgstr "Fel: %s verkar vara monterad som read-only.\nAnvänd --allow-force för att tvinga operationen."
+msgstr ""
+"Fel: %s verkar vara monterad som read-only.\n"
+"Använd --allow-force för att tvinga operationen."
 
 #. -PO: here format is "<package_name>: <summary> (to upgrade)"
 #: ../urpmi:426
@@ -2358,7 +2506,10 @@ msgid ""
 "The following package cannot be installed because it depends on packages\n"
 "that are older than the installed ones:\n"
 "%s"
-msgstr "Följande paket kan inte installeras eftersom det är beroende av paket som\när äldre än de installerade paketen:\n%s"
+msgstr ""
+"Följande paket kan inte installeras eftersom det är beroende av paket som\n"
+"är äldre än de installerade paketen:\n"
+"%s"
 
 #: ../urpmi:487
 #, c-format
@@ -2366,16 +2517,21 @@ msgid ""
 "The following packages can't be installed because they depend on packages\n"
 "that are older than the installed ones:\n"
 "%s"
-msgstr "Följande paket kan inte installeras eftersom de är beroende av paket som\när äldre än de installerade paketen:\n%s"
+msgstr ""
+"Följande paket kan inte installeras eftersom de är beroende av paket som\n"
+"är äldre än de installerade paketen:\n"
+"%s"
 
 #: ../urpmi:493 ../urpmi:511
 #, c-format
 msgid ""
 "\n"
 "Continue installation anyway?"
-msgstr "\nFortsätt installation ändå?"
+msgstr ""
+"\n"
+"Fortsätt installation ändå?"
 
-#: ../urpmi:494 ../urpmi:512 ../urpmi:627 ../urpmi.addmedia:136
+#: ../urpmi:494 ../urpmi:512 ../urpmi:629 ../urpmi.addmedia:136
 #, c-format
 msgid " (Y/n) "
 msgstr " (J/n) "
@@ -2385,7 +2541,9 @@ msgstr " (J/n) "
 msgid ""
 "A requested package cannot be installed:\n"
 "%s"
-msgstr "Ett begärt paket kan inte installeras:\n%s"
+msgstr ""
+"Ett begärt paket kan inte installeras:\n"
+"%s"
 
 #: ../urpmi:526
 #, c-format
@@ -2398,7 +2556,10 @@ msgid ""
 "The installation cannot continue because the following package\n"
 "has to be removed for others to be upgraded:\n"
 "%s\n"
-msgstr "Installationen kan inte fortsätta eftersom följande paket måste\ntas bort så att andra kan uppdateras:\n%s\n"
+msgstr ""
+"Installationen kan inte fortsätta eftersom följande paket måste\n"
+"tas bort så att andra kan uppdateras:\n"
+"%s\n"
 
 #: ../urpmi:536
 #, c-format
@@ -2406,7 +2567,10 @@ msgid ""
 "The installation cannot continue because the following packages\n"
 "have to be removed for others to be upgraded:\n"
 "%s\n"
-msgstr "Installationen kan inte fortsätta eftersom följande paket måste\ntas bort så att andra kan uppdateras:\n%s\n"
+msgstr ""
+"Installationen kan inte fortsätta eftersom följande paket måste\n"
+"tas bort så att andra kan uppdateras:\n"
+"%s\n"
 
 #: ../urpmi:544
 #, c-format
@@ -2416,9 +2580,13 @@ msgstr "(endast test, ingenting kommer att bli borttaget)"
 #: ../urpmi:563
 #, c-format
 msgid ""
-"You must first call urpmi with --buildrequires to install the following dependencies:\n"
+"You must first call urpmi with --buildrequires to install the following "
+"dependencies:\n"
 "%s\n"
-msgstr "Du måste först använda urpmi --buildqequires för att installera följande beroenden:\n%s\n"
+msgstr ""
+"Du måste först använda urpmi --buildqequires för att installera följande "
+"beroenden:\n"
+"%s\n"
 
 #: ../urpmi:573
 #, c-format
@@ -2427,25 +2595,23 @@ msgid_plural "The following orphan packages will be removed."
 msgstr[0] "Följande obehövliga paket kommer att tas bort."
 msgstr[1] "Följande obehövliga paket kommer att tas bort."
 
-#: ../urpmi:597
+#: ../urpmi:599
 #, c-format
 msgid "WARNING: %s option is in use. Some strange problems may happen"
 msgstr "VARNING: %s alternativet används. Vissa underliga problem kan uppstå"
 
-#: ../urpmi:609
+#: ../urpmi:611
 #, c-format
 msgid "(test only, installation will not be actually done)"
 msgstr "(endast test, installation kommer inte att utföras)"
 
-#: ../urpmi:640
+#: ../urpmi:642
 #, c-format
 msgid "Press Enter when mounted..."
 msgstr "Tryck Enter när klart..."
 
-#. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not
-#. be translated!
-#. -PO: neither the ``with''.  Only what is between <brackets> can be
-#. translated.
+#. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
+#. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
 #: ../urpmi.addmedia:36
 #, c-format
 msgid ""
@@ -2468,24 +2634,44 @@ msgid ""
 "\n"
 "\n"
 "and [options] are from\n"
-msgstr "Användning: urpmi.addmedia [flaggor] <namn> <url>\ndär <url> är något av följande\n       [file:/]/<sökväg>\n       ftp://<användarnamn>:<lösenord>@<värdnamn>/<sökväg>\n       ftp://<värdnamn>/<sökväg>\n       http://<värdnamn>/<sökväg>\n       cdrom://<sökväg>\n\nanvändning: urpmi.addmedia [flaggor] --distrib --mirrorlist <url>\nanvändning: urpmi.addmedia [flaggor] --mirrorlist <url> <namn> <relativ-sökväg>\n\nexempel:\n\n  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n  urpmi.addmedia --distrib --zeroconf\n\n\noch [flaggor] är från\n"
+msgstr ""
+"Användning: urpmi.addmedia [flaggor] <namn> <url>\n"
+"där <url> är något av följande\n"
+"       [file:/]/<sökväg>\n"
+"       ftp://<användarnamn>:<lösenord>@<värdnamn>/<sökväg>\n"
+"       ftp://<värdnamn>/<sökväg>\n"
+"       http://<värdnamn>/<sökväg>\n"
+"       cdrom://<sökväg>\n"
+"\n"
+"användning: urpmi.addmedia [flaggor] --distrib --mirrorlist <url>\n"
+"användning: urpmi.addmedia [flaggor] --mirrorlist <url> <namn> <relativ-"
+"sökväg>\n"
+"\n"
+"exempel:\n"
+"\n"
+"  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n"
+"  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n"
+"  urpmi.addmedia --distrib --zeroconf\n"
+"\n"
+"\n"
+"och [flaggor] är från\n"
 
-#: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
+#: ../urpmi.addmedia:56 ../urpmi.update:34 ../urpmq:71
 #, c-format
 msgid "  --wget         - use wget to retrieve distant files.\n"
 msgstr "  --wget         - använd wget för att hämta fjärrfiler.\n"
 
-#: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:72
+#: ../urpmi.addmedia:57 ../urpmi.update:35 ../urpmq:72
 #, c-format
 msgid "  --curl         - use curl to retrieve distant files.\n"
 msgstr "  --curl         - använd curl för att hämta fjärrfiler.\n"
 
-#: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:73
+#: ../urpmi.addmedia:58 ../urpmi.update:36 ../urpmq:73
 #, c-format
 msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
 msgstr "  --prozilla     - använd prozilla för att hämta fjärr-filer.\n"
 
-#: ../urpmi.addmedia:59 ../urpmi.update:36
+#: ../urpmi.addmedia:59 ../urpmi.update:37
 #, c-format
 msgid "  --aria2        - use aria2 to retrieve distant files.\n"
 msgstr "  --curl         - använd aria2 för att hämta fjärrfiler.\n"
@@ -2495,14 +2681,21 @@ msgstr "  --curl         - använd aria2 för att hämta fjärrfiler.\n"
 msgid ""
 "  --update       - create an update medium, \n"
 "                   or discard non-update media (when used with --distrib)\n"
-msgstr "  --update       - skapa ett uppdateringsmedium, \n                   eller ignorera media som inte har uppdateringar (med flaggan --distrib)\n"
+msgstr ""
+"  --update       - skapa ett uppdateringsmedium, \n"
+"                   eller ignorera media som inte har uppdateringar (med "
+"flaggan --distrib)\n"
 
 #: ../urpmi.addmedia:68
 #, c-format
 msgid ""
 "  --xml-info     - use the specific policy for downloading xml info files\n"
-"                   one of: never, on-demand, update-only, always. cf urpmi.cfg(5)\n"
-msgstr "  --xml-info     - använd specifik policy för hämtning av xml info-filer\n                   en av: never, on-demand, update-only, always. se urpmi.cfg(5)\n"
+"                   one of: never, on-demand, update-only, always. cf urpmi."
+"cfg(5)\n"
+msgstr ""
+"  --xml-info     - använd specifik policy för hämtning av xml info-filer\n"
+"                   en av: never, on-demand, update-only, always. se urpmi."
+"cfg(5)\n"
 
 #: ../urpmi.addmedia:70
 #, c-format
@@ -2524,7 +2717,9 @@ msgstr "  --no-probe     - försök ej hitta någon synthesis-fil.\n"
 msgid ""
 "  --distrib      - automatically create all media from an installation\n"
 "                   medium.\n"
-msgstr "  --distrib      - skapa automatiskt all media från ett\n                 installationsmedia.\n"
+msgstr ""
+"  --distrib      - skapa automatiskt all media från ett\n"
+"                 installationsmedia.\n"
 
 #: ../urpmi.addmedia:76
 #, c-format
@@ -2541,7 +2736,7 @@ msgstr "  --all-media    - med --distrib, lägg till alla listade källor\n"
 msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
 msgstr "  --virtual      - skapa virtuellt media som alltid är uppdaterat\n"
 
-#: ../urpmi.addmedia:79 ../urpmi.update:44
+#: ../urpmi.addmedia:79 ../urpmi.update:45
 #, c-format
 msgid "  --no-md5sum    - disable MD5SUM file checking.\n"
 msgstr "  --no-md5sum    - inaktivera md5sum-kontroll av filer.\n"
@@ -2554,14 +2749,15 @@ msgstr "  --nopubkey     - importera inte pubkey för adderat media\n"
 #: ../urpmi.addmedia:81
 #, c-format
 msgid "  --raw          - add the media in config, but don't update it.\n"
-msgstr "  --raw          - lägg till mediat i config, men uppdatera inte det.\n"
+msgstr ""
+"  --raw          - lägg till mediat i config, men uppdatera inte det.\n"
 
-#: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:53
+#: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:54
 #, c-format
 msgid "  -q             - quiet mode.\n"
 msgstr "  -q             - tyst läge.\n"
 
-#: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:54
+#: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:55
 #, c-format
 msgid "  -v             - verbose mode.\n"
 msgstr "  -v             - utförligt läge.\n"
@@ -2606,7 +2802,9 @@ msgstr "behöver inte ange <relativ sökväg till synthesis> med --distrib"
 msgid ""
 "\n"
 "Do you want to add media '%s'?"
-msgstr "\nVill du lägga till källa '%s'"
+msgstr ""
+"\n"
+"Vill du lägga till källa '%s'"
 
 #: ../urpmi.addmedia:156 ../urpmi.addmedia:181
 #, c-format
@@ -2628,7 +2826,9 @@ msgstr "Kan inte använda %s med fjärr-media"
 msgid ""
 "usage: urpmi.removemedia (-a | <name> ...)\n"
 "where <name> is a medium name to remove.\n"
-msgstr "användning: urpmi.removemedia (-a | <namn>...)\ndär <namn> är medianamnet som ska tas bort.\n"
+msgstr ""
+"användning: urpmi.removemedia (-a | <namn>...)\n"
+"där <namn> är medianamnet som ska tas bort.\n"
 
 #: ../urpmi.removemedia:41
 #, c-format
@@ -2655,83 +2855,89 @@ msgstr "inget att ta bort (använd urpmi.addmedia för att lägga till media)\n"
 msgid ""
 "the entry to remove is missing\n"
 "(one of %s)\n"
-msgstr "objektet som ska tas bort saknas\n(en av %s)\n"
+msgstr ""
+"objektet som ska tas bort saknas\n"
+"(en av %s)\n"
 
-#: ../urpmi.update:30
+#: ../urpmi.update:31
 #, c-format
 msgid ""
 "usage: urpmi.update [options] <name> ...\n"
 "where <name> is a medium name to update.\n"
-msgstr "användning: urpmi.update [flaggor] <namn>...\ndär <namn> är medianamnet som ska uppdateras.\n"
+msgstr ""
+"användning: urpmi.update [flaggor] <namn>...\n"
+"där <namn> är medianamnet som ska uppdateras.\n"
 
-#: ../urpmi.update:43
+#: ../urpmi.update:44
 #, c-format
 msgid "  --update       - update only update media.\n"
 msgstr "  --update       - uppdatera endast uppdateringsmedia.\n"
 
-#: ../urpmi.update:45
+#: ../urpmi.update:46
 #, c-format
 msgid "  --force-key    - force update of gpg key.\n"
 msgstr "  --force-key    - tvinga uppdatering av gpg-nyckel.\n"
 
-#: ../urpmi.update:46
+#: ../urpmi.update:47
 #, c-format
 msgid "  --ignore       - don't update, mark the media as ignored.\n"
 msgstr "  --ignore       - uppdatera ej, märk media som ignorerat.\n"
 
-#: ../urpmi.update:47
+#: ../urpmi.update:48
 #, c-format
 msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
 msgstr "  --no-ignore    - uppdatera ej, märk media som aktiverat.\n"
 
-#: ../urpmi.update:49
+#: ../urpmi.update:50
 #, c-format
 msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
 msgstr "  --probe-rpms   - använd inte synthesis, använd rpm filer direkt\n"
 
-#: ../urpmi.update:50
+#: ../urpmi.update:51
 #, c-format
 msgid "  -a             - select all enabled non-removable media.\n"
 msgstr "-a - välj alla aktiverade ej-bortagningsbara media.\n"
 
-#: ../urpmi.update:51
+#: ../urpmi.update:52
 #, c-format
 msgid "  -f             - force updating synthesis\n"
 msgstr "  -f             - tvinga uppdatering av synthesis\n"
 
-#: ../urpmi.update:52
+#: ../urpmi.update:53
 #, c-format
 msgid "  -ff            - really force updating synthesis\n"
 msgstr "  -ff            - hård-tvinga uppdatering av synthesis\n"
 
-#: ../urpmi.update:69
+#: ../urpmi.update:70
 #, c-format
 msgid "Only superuser is allowed to update media"
 msgstr "Endast systemadministratör får uppdatera media"
 
-#: ../urpmi.update:86
+#: ../urpmi.update:87
 #, c-format
 msgid "nothing to update (use urpmi.addmedia to add a media)\n"
 msgstr "inget att uppdatera (använd urpmi.addmedia för att lägga till media)\n"
 
-#: ../urpmi.update:87
+#: ../urpmi.update:88
 #, c-format
 msgid ""
 "the entry to update is missing\n"
 "(one of %s)\n"
-msgstr "objektet som ska uppdateras saknas\n(en av %s)\n"
+msgstr ""
+"objektet som ska uppdateras saknas\n"
+"(en av %s)\n"
 
-#: ../urpmi.update:98
+#: ../urpmi.update:99
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
-#: ../urpmi.update:99
+#: ../urpmi.update:100
 #, c-format
 msgid "ignoring media %s"
 msgstr "ignorerar media %s"
 
-#: ../urpmi.update:99
+#: ../urpmi.update:100
 #, c-format
 msgid "enabling media %s"
 msgstr "aktiverar media %s"
@@ -2739,9 +2945,11 @@ msgstr "aktiverar media %s"
 #: ../urpmq:44
 #, c-format
 msgid ""
-"  --searchmedia  - use only the given media to search requested (or updated)"
-" packages.\n"
-msgstr "  --searchmedia  - använd endast givet media för att söka efter valda (eller uppdaterade) paket.\n"
+"  --searchmedia  - use only the given media to search requested (or updated) "
+"packages.\n"
+msgstr ""
+"  --searchmedia  - använd endast givet media för att söka efter valda (eller "
+"uppdaterade) paket.\n"
 
 #: ../urpmq:49
 #, c-format
@@ -2753,7 +2961,10 @@ msgstr "  --auto-orphans - lista obehövliga paket\n"
 msgid ""
 "  --not-available\n"
 "                 - list installed packages not available on any media.\n"
-msgstr "  --not-available\n                 - lista installerade paket som inte finns tillgängligt på något media.\n"
+msgstr ""
+"  --not-available\n"
+"                 - lista installerade paket som inte finns tillgängligt på "
+"något media.\n"
 
 #: ../urpmq:53
 #, c-format
@@ -2778,7 +2989,8 @@ msgstr "  --list-url     - lista tillgänglig media och dess sökväg.\n"
 #: ../urpmq:59
 #, c-format
 msgid "  --list-nodes   - list available nodes when using --parallel.\n"
-msgstr "  --list-nodes   - visa tillgängliga noder vid användning av --parallel.\n"
+msgstr ""
+"  --list-nodes   - visa tillgängliga noder vid användning av --parallel.\n"
 
 #: ../urpmq:60
 #, c-format
@@ -2787,8 +2999,10 @@ msgstr "  --list-aliases - lista tillgängliga parallellalias.\n"
 
 #: ../urpmq:61
 #, c-format
-msgid "  --dump-config  - dump the config in form of urpmi.addmedia argument.\n"
-msgstr "  --dump-config  - dumpa konfigurationen i form av urpmi.addmedia argument.\n"
+msgid ""
+"  --dump-config  - dump the config in form of urpmi.addmedia argument.\n"
+msgstr ""
+"  --dump-config  - dumpa konfigurationen i form av urpmi.addmedia argument.\n"
 
 #: ../urpmq:62
 #, c-format
@@ -2803,14 +3017,19 @@ msgstr "--sources - skriv käll-URL:er av valda paket\n"
 #: ../urpmq:65
 #, c-format
 msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
-msgstr "  --ignorearch   - tillåt sökande för rpm-paket som inte motsvarar arkitekturen.\n"
+msgstr ""
+"  --ignorearch   - tillåt sökande för rpm-paket som inte motsvarar "
+"arkitekturen.\n"
 
 #: ../urpmq:69
 #, c-format
 msgid ""
 "  --use-distrib  - configure urpmi on the fly from a distrib tree.\n"
 "                   This permit to querying a distro.\n"
-msgstr "  --use-distrib  - konfigurera urpmi 'on the fly' från ett distributionsträd.\n                   Detta tillåter kontroll av distribution.\n"
+msgstr ""
+"  --use-distrib  - konfigurera urpmi 'on the fly' från ett "
+"distributionsträd.\n"
+"                   Detta tillåter kontroll av distribution.\n"
 
 #: ../urpmq:79
 #, c-format
@@ -2857,7 +3076,9 @@ msgstr "  --summary, -S  - skriv ut summering.\n"
 msgid ""
 "  --requires-recursive, -d\n"
 "                   - query package dependencies.\n"
-msgstr "  --requires-recursive, -d\n                   - utöka förfrågning till att omfatta paketberoenden.\n"
+msgstr ""
+"  --requires-recursive, -d\n"
+"                   - utöka förfrågning till att omfatta paketberoenden.\n"
 
 #: ../urpmq:90
 #, c-format
@@ -2869,19 +3090,24 @@ msgstr "  --whatrequires - omvänd sökning för vad som krävs av paket.\n"
 msgid ""
 "  --whatrequires-recursive\n"
 "                   - extended reverse search (includes virtual packages).\n"
-msgstr "  --whatrequires-recursive\n                  - utökad omvänd sökning (inkluderar virtuella paket).\n"
+msgstr ""
+"  --whatrequires-recursive\n"
+"                  - utökad omvänd sökning (inkluderar virtuella paket).\n"
 
 #: ../urpmq:93
 #, c-format
 msgid ""
 "  --whatprovides, -p\n"
 "                   - search in provides to find package.\n"
-msgstr "  --whatprovides, -p\n                 - sök i \"provides\" för att hitta paket.\n"
+msgstr ""
+"  --whatprovides, -p\n"
+"                 - sök i \"provides\" för att hitta paket.\n"
 
 #: ../urpmq:96
 #, c-format
 msgid "  -c             - complete output with package to be removed.\n"
-msgstr "  -c             - fullständig utmatning med paketet som ska tas bort.\n"
+msgstr ""
+"  -c             - fullständig utmatning med paketet som ska tas bort.\n"
 
 #: ../urpmq:98
 #, c-format
@@ -2891,7 +3117,9 @@ msgstr "  -g             - visa grupper med namn.\n"
 #: ../urpmq:99
 #, c-format
 msgid "  -i             - print useful information in human readable form.\n"
-msgstr "  -i             - visa användbar information i en för människan läsbar form.\n"
+msgstr ""
+"  -i             - visa användbar information i en för människan läsbar "
+"form.\n"
 
 #: ../urpmq:100
 #, c-format
@@ -2918,7 +3146,8 @@ msgstr "  -s             - nästa paket är ett källpaket (samma som --src).\n"
 msgid ""
 "  -u             - remove package if a more recent version is already "
 "installed.\n"
-msgstr "  -u             - ta bort paket om en nyare version redan är installerad.\n"
+msgstr ""
+"  -u             - ta bort paket om en nyare version redan är installerad.\n"
 
 #: ../urpmq:105
 #, c-format
@@ -2928,7 +3157,9 @@ msgstr "  -y             - kräv luddig sökning (samma som --fuzzy).\n"
 #: ../urpmq:106
 #, c-format
 msgid "  -Y             - like -y, but forces to match case-insensitively.\n"
-msgstr "  -Y             - som -y, fast tvingar matchning av stora och små bokstäver.\n"
+msgstr ""
+"  -Y             - som -y, fast tvingar matchning av stora och små "
+"bokstäver.\n"
 
 #: ../urpmq:107
 #, c-format
@@ -2953,22 +3184,28 @@ msgstr "använd -l för att lista filer"
 #: ../urpmq:415
 #, c-format
 msgid "no xml info for medium \"%s\", only partial result for package %s"
-msgstr "ingen xml-info för media \"%s\", endast ofullständigt resultat för paketet %s"
+msgstr ""
+"ingen xml-info för media \"%s\", endast ofullständigt resultat för paketet %s"
 
 #: ../urpmq:416
 #, c-format
 msgid "no xml info for medium \"%s\", only partial result for packages %s"
-msgstr "ingen xml-info för media \"%s\", endast ofullständigt resultat för paketen %s"
+msgstr ""
+"ingen xml-info för media \"%s\", endast ofullständigt resultat för paketen %s"
 
 #: ../urpmq:419
 #, c-format
-msgid "no xml info for medium \"%s\", unable to return any result for package %s"
-msgstr "ingen xml-info för media \"%s\", kan inte returnera resultat för paketet %s"
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for package %s"
+msgstr ""
+"ingen xml-info för media \"%s\", kan inte returnera resultat för paketet %s"
 
 #: ../urpmq:420
 #, c-format
-msgid "no xml info for medium \"%s\", unable to return any result for packages %s"
-msgstr "ingen xml-info för media \"%s\", kan inte returnera resultat för paketen %s"
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for packages %s"
+msgstr ""
+"ingen xml-info för media \"%s\", kan inte returnera resultat för paketen %s"
 
 #: ../urpmq:487
 #, c-format

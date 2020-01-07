@@ -3,6 +3,18 @@
 More detailed changelogs can be found at
 <http://github.com/OpenGuides/OpenGuides>
 
+0.83    06 January 2020
+        Remove use of MapQuest tiles, as they're no longer available.
+        Add full CGI URL to popups on map search results, so they can be
+          used in addon scripts.
+        Fix broken version link in ?action=about
+        Make sure index pages don't offer page deletion links.
+        Upgrade Leaflet version to 1.1.0.
+        Make sure HTTPS website links are truncated in same way as HTTP.
+        Stop escaping commas in URLs in places that got missed last time.
+        Attempts to autocreate categories/locales with underscores in the name
+          will now see all underscores changed to spaces.
+
 0.82    05 June 2016
         Add some extra CSS hooks to the templates.  Add new base stylesheet
           rules for a responsive version.  Make a few changes in core templates

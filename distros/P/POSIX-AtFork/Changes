@@ -1,5 +1,15 @@
 Revision history for Perl extension POSIX::AtFork.
 
+0.04 2020-01-06 13:09:15
+    - https://rt.cpan.org/Ticket/Display.html?id=93294
+
+0.03 2020-01-06 01:04:33
+    - Fix work module with Coro
+    - Any fix use Module::Install for perl 5.26 and later
+    - Add META and MANIFEST to repo and dist
+    - Update Module::Install
+    - Add contributors
+
 0.02 2010-11-04 10:27:59
     - First regular release
 

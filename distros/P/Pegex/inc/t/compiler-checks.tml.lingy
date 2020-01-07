@@ -1,0 +1,169 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*grammar","*yaml"],
+      ["==",
+        [".",
+          ["*","grammar"],
+          ["bootstrap-compile"],
+          ["yaml"],
+          ["clean"]],
+        ["*","yaml"],
+        "+ (bootstrap compile)"]],
+    ["%<>",["*grammar","*yaml"],
+      ["==",
+        [".",
+          ["*","grammar"],
+          ["compile"],
+          ["yaml"],
+          ["clean"]],
+        ["*","yaml"],
+        "+ (pegex compile)"]]],
+  "data": [
+    { "label": "Empty Grammar",
+      "point": {
+        "grammar": "",
+        "yaml": "{}\n"}},
+    { "label": "Whitespace Tokens",
+      "point": {
+        "grammar": "a: - b+ + c -\nb: /- 'cat' + 'dog' -/\n",
+        "yaml": "a:\n  .all:\n  - .ref: _\n  - +min: 1\n    .ref: b\n  - .ref: __\n  - .ref: c\n  - .ref: _\nb:\n  .rgx: <_>cat<__>dog<_>\n"}},
+    { "label": "Simple Grammar",
+      "point": {
+        "grammar": "a: ( b c* )+\nb: /x/\nc: x\n",
+        "yaml": "a:\n  +min: 1\n  .all:\n  - .ref: b\n  - +min: 0\n    .ref: c\nb:\n  .rgx: x\nc:\n  .ref: x\n"}},
+    { "label": "Dash in Rule Names",
+      "point": {
+        "grammar": "a-b: c-d\n",
+        "yaml": "a_b:\n  .ref: c_d\n"}},
+    { "label": "Single Rule Reference",
+      "point": {
+        "grammar": "a: x\n",
+        "yaml": "a:\n  .ref: x\n"}},
+    { "label": "Single Rule brackets",
+      "point": {
+        "grammar": "a: <x>\n",
+        "yaml": "a:\n  .ref: x\n"}},
+    { "label": "All Rules",
+      "point": {
+        "grammar": "a: x y z\n",
+        "yaml": "a:\n  .all:\n  - .ref: x\n  - .ref: y\n  - .ref: z\n"}},
+    { "label": "Any Rules",
+      "point": {
+        "grammar": "a: x | y | z\n",
+        "yaml": "a:\n  .any:\n  - .ref: x\n  - .ref: y\n  - .ref: z\n"}},
+    { "label": "Any Rules with Leading Pipe",
+      "point": {
+        "grammar": "a: | x | y | z\n",
+        "yaml": "a:\n  .any:\n  - .ref: x\n  - .ref: y\n  - .ref: z\n"}},
+    { "label": "Separator Syntax",
+      "point": {
+        "grammar": "a: b+ % c | d* %% e\n",
+        "yaml": "a:\n  .any:\n  - .all:\n    - .ref: b\n    - +min: 0\n      -flat: 1\n      .all:\n      - .ref: c\n      - .ref: b\n  - +max: 1\n    .all:\n    - .ref: d\n    - +min: 0\n      -flat: 1\n      .all:\n      - .ref: e\n      - .ref: d\n    - +max: 1\n      .ref: e\n"}},
+    { "label": "Complex All/Any Precedence",
+      "point": {
+        "grammar": "a: b c | ( d | e | f* % g h ) i\n",
+        "yaml": "a:\n  .any:\n  - .all:\n    - .ref: b\n    - .ref: c\n  - .all:\n    - .any:\n      - .ref: d\n      - .ref: e\n      - .all:\n        - +max: 1\n          .all:\n          - .ref: f\n          - +min: 0\n            -flat: 1\n            .all:\n            - .ref: g\n            - .ref: f\n        - .ref: h\n    - .ref: i\n"}},
+    { "label": "Single Rule With Trailing Quantifier",
+      "point": {
+        "grammar": "a: x*\n",
+        "yaml": "a:\n  +min: 0\n  .ref: x\n"}},
+    { "label": "Single Rule With Trailing Quantifier (no angles)",
+      "point": {
+        "grammar": "a: x*\n",
+        "yaml": "a:\n  +min: 0\n  .ref: x\n"}},
+    { "label": "Single Rule With Leading Assertion",
+      "point": {
+        "grammar": "a: =x\n",
+        "yaml": "a:\n  +asr: 1\n  .ref: x\n"}},
+    { "label": "Negative and Positive Assertion",
+      "point": {
+        "grammar": "a: !b =c\n",
+        "yaml": "a:\n  .all:\n  - +asr: -1\n    .ref: b\n  - +asr: 1\n    .ref: c\n"}},
+    { "label": "Single Regex",
+      "point": {
+        "grammar": "a: /x/\n",
+        "yaml": "a:\n  .rgx: x\n"}},
+    { "label": "Quoted Regex",
+      "point": {
+        "grammar": "a: '*** <foo>  + - bar '\n",
+        "yaml": "a:\n  .rgx: '\\*\\*\\*\\ <foo\\>\\ \\ \\+\\ \\-\\ bar\\ '\n"}},
+    { "label": "Quoted String in Regex",
+      "point": {
+        "grammar": "a: /('(foo*)')*/\n",
+        "yaml": "a:\n  .rgx: (\\(foo\\*\\))*\n"}},
+    { "label": "Single Error",
+      "point": {
+        "grammar": "a: `x`\n",
+        "yaml": "a:\n  .err: x\n"}},
+    { "label": "Skip and Wrap Marker",
+      "point": {
+        "grammar": "a: .b +c+ -d?\n",
+        "yaml": "a:\n  .all:\n  - -skip: 1\n    .ref: b\n  - +min: 1\n    -wrap: 1\n    .ref: c\n  - +max: 1\n    -flat: 1\n    .ref: d\n"}},
+    { "label": "Unbracketed All Group",
+      "point": {
+        "grammar": "a: /x/ y\n",
+        "yaml": "a:\n  .all:\n  - .rgx: x\n  - .ref: y\n"}},
+    { "label": "Unbracketed Any Group",
+      "point": {
+        "grammar": "a: /x/ | y | `z`\n",
+        "yaml": "a:\n  .any:\n  - .rgx: x\n  - .ref: y\n  - .err: z\n"}},
+    { "label": "Any Group with Leading Pipe",
+      "point": {
+        "grammar": "a: (\n  | b\n  | c\n)\n",
+        "yaml": "a:\n  .any:\n  - .ref: b\n  - .ref: c\n"}},
+    { "label": "Bracketed All Group",
+      "point": {
+        "grammar": "a: ( x y )\n",
+        "yaml": "a:\n  .all:\n  - .ref: x\n  - .ref: y\n"}},
+    { "label": "Bracketed Group With Trailing Modifier",
+      "point": {
+        "grammar": "a: ( x y )?\n",
+        "yaml": "a:\n  +max: 1\n  .all:\n  - .ref: x\n  - .ref: y\n"}},
+    { "label": "Bracketed Group With Leading Modifier",
+      "point": {
+        "grammar": "a: .( =x y )\n",
+        "yaml": "a:\n  -skip: 1\n  .all:\n  - +asr: 1\n    .ref: x\n  - .ref: y\n"}},
+    { "label": "Multiple Groups",
+      "point": {
+        "grammar": "a: ( x y ) ( z | /zzz/ )\n",
+        "yaml": "a:\n  .all:\n  - .all:\n    - .ref: x\n    - .ref: y\n  - .any:\n    - .ref: z\n    - .rgx: zzz\n"}},
+    { "label": "List Separator",
+      "point": {
+        "grammar": "a: b | c+ %% /d/\n",
+        "yaml": "a:\n  .any:\n  - .ref: b\n  - .all:\n    - .ref: c\n    - +min: 0\n      -flat: 1\n      .all:\n      - .rgx: d\n      - .ref: c\n    - +max: 1\n      .rgx: d\n"}},
+    { "label": "Separators with Quantifiers",
+      "point": {
+        "grammar": "a: <b>2+ % c* d* %% <e>2-3\n",
+        "yaml": "a:\n  .all:\n  - .all:\n    - .ref: b\n    - +min: 1\n      -flat: 1\n      .all:\n      - +min: 0\n        .ref: c\n      - .ref: b\n  - +max: 1\n    .all:\n    - .ref: d\n    - +min: 0\n      -flat: 1\n      .all:\n      - +max: 3\n        +min: 2\n        .ref: e\n      - .ref: d\n    - +max: 1\n      +min: 2\n      .ref: e\n"}},
+    { "label": "All Quantifier Forms",
+      "point": {
+        "grammar": "a: b c? d* e+ <f>55 <g>5+ <h>5-55\n",
+        "yaml": "a:\n  .all:\n  - .ref: b\n  - +max: 1\n    .ref: c\n  - +min: 0\n    .ref: d\n  - +min: 1\n    .ref: e\n  - +max: 55\n    +min: 55\n    .ref: f\n  - +min: 5\n    .ref: g\n  - +max: 55\n    +min: 5\n    .ref: h\n"}},
+    { "label": "Whitespace Tokens",
+      "point": {
+        "grammar": "a: - b+ + c -\nb: /- cat + dog -/\nc: /+/\nd: /+ kitty/\n",
+        "yaml": "a:\n  .all:\n  - .ref: _\n  - +min: 1\n    .ref: b\n  - .ref: __\n  - .ref: c\n  - .ref: _\nb:\n  .rgx: <_><cat><__><dog><_>\nc:\n  .rgx: <__>\nd:\n  .rgx: <__><kitty>\n"}},
+    { "label": "Whitespace in Regex",
+      "point": {
+        "grammar": "a: /<DOT>* (<DASH>{3})\n    <BANG>   <BANG>\n   /\n",
+        "yaml": "a:\n  .rgx: <DOT>*(<DASH>{3})<BANG><BANG>\n"}},
+    { "label": "Dash and Plus as whitespace tokens",
+      "point": {
+        "grammar": "a: / - foo + bar+ -- baz /\n",
+        "yaml": "a:\n  .rgx: <_><foo><__><bar>+<__><baz>\n"}},
+    { "label": "Directives",
+      "point": {
+        "grammar": "%grammar foo\n%version 1.2.3\n",
+        "yaml": "+grammar: foo\n+version: 1.2.3\n"}},
+    { "label": "Multiple Duplicate Directives",
+      "point": {
+        "grammar": "%grammar foo\n%include bar\n%include baz\n",
+        "yaml": "+grammar: foo\n+include:\n- bar\n- baz\n"}},
+    { "label": "Meta Lines",
+      "point": {
+        "grammar": "%grammar        foo\n%version    1.1.1\n%extends bar bar  \n%include   bazzy \na: /b/\n",
+        "yaml": "+extends: bar bar\n+grammar: foo\n+include: bazzy\n+version: 1.1.1\na:\n  .rgx: b\n"}},
+    { "label": "Dash and Plus as whitespace tokens",
+      "point": {
+        "grammar": "a: / - foo + bar+ -- baz /\n",
+        "yaml": "a:\n  .rgx: <_><foo><__><bar>+<__><baz>\n"}}]}

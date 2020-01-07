@@ -72,7 +72,6 @@ foreach (
 25467IRIDIUM 82 [-]
 25527IRIDIUM 2 [-]
 27376IRIDIUM 96 [-]
-27450IRIDIUM 97 [-]
 KELSO
 	["Rod Sladen's Iridium Constellation Status",
 	'http://www.rod.sladen.org.uk/iridium.htm',
@@ -91,13 +90,15 @@ content="text/html; charset=iso-8859-1">
 
 <h1 align="center">Iridium Constellation Status</h1>
 
-<p align="center"><strong>** Updated 12 December 2019 **</strong></p>
+<p align="center"><strong>** Updated 30 December 2019 **</strong></p>
 
 <p align="left"><strong>Latest changes </strong>(see below for
 earlier changes):</p>
 
-<p align="left">(05 December 2019): <strong>The process of
-de-orbiting Iridium 97 (27450, 2002-031A) has started.<br>
+<p align="left">(27 December 2019):<strong> Iridium 97 (27450,
+2002-031A) decayed on 27 December 2019.</strong><br>
+(05 December 2019): <strong>The process of de-orbiting Iridium 97
+(27450, 2002-031A) has started.<br>
 </strong>(mid November 2019): <strong>Iridium 169 (43926,
 2019-002E) has completed its migration from Plane 3 to Plane 4
 and is now the spare in Plane 4, replacing Iridium 97</strong></p>
@@ -116,7 +117,7 @@ announced.</p>
 </strong>A total of 95 satellites were launched; none now remain
 operational.<br>
 - 65 satellites have been de-orbited (retired) following
-replacement by Iridium Next in 2017, 2018 and 2019. 59 out of
+replacement by Iridium Next in 2017, 2018 and 2019. 60 out of
 these have so far re-entered (decayed). It may be many months
 before the rest decay.<br>
 - 25 satellites failed on-orbit and can no longer be controlled.
@@ -159,7 +160,7 @@ color="#FF0000">   </font><a href="iridium33collision.htm"><font
 color="#FF0000">33</font></a>t  57                  45                   27d  30d  31d  32d  59d  <a
 href="iridium33collision.htm">91</a>d  60d  <a
 href="iridium28and95.htm">95</a>d  55d  58d                     (Iridium 30, Iridium 31, Iridium 32, Iridium 91, Iridium 59, Iridium 60, Iridium 95, Iridium 55, Iridium 58 and Iridium 45 deliberately de-orbited.)
-Plane 4:   4   <a href="iridium36and97.htm">36</a>t   7                       51    5   96   97     8d   6d  34d  19d  37d  35d  61d                                    (Iridium  8, Iridium 51, Iridium 5, Iridium 6, Iridium 19, Iridium 34, Iridium 96, Iridium 37, Iridium 35, Iridium 61 and Iridium 97 deliberately de-orbited. Iridium 7, Iridium 51 and Iridium 6 were probably already partial failures.)
+Plane 4:   4   <a href="iridium36and97.htm">36</a>t   7                       51    5   96          8d   6d  34d  19d  37d  35d  61d  97d                               (Iridium  8, Iridium 51, Iridium 5, Iridium 6, Iridium 19, Iridium 34, Iridium 96, Iridium 37, Iridium 35, Iridium 61 and Iridium 97 deliberately de-orbited. Iridium 7, Iridium 51 and Iridium 6 were probably already partial failures.)
 Plane 5:   2t 914t 911t  <a href="iridium16and86.htm">16</a>t                                      85d   <a
 href="iridium9and84.htm">9</a>d  13d  12d  50d  53d  86d  10d  56d  52d  84d  83d  90d  54d (Iridium  9, Iridium 90, Iridium 13, Iridium 12, Iridium 86, Iridium 56, Iridium 50, Iridium 84, Iridium 53, Iridium 10, Iridium 83 and Iridium 52 deliberately de-orbited.) <em>Iridium 2 has drifted far from</em> <em>its original launch plane, and continues to drift</em>
 Plane 6: 920t 921t  44t  <a href="iridium38and82.htm">38</a>t  <a
@@ -175,13 +176,12 @@ Iridium constellation, and the information herein has not been
 confirmed by the new owners, Iridium Satellite LLC, nor by Boeing
 who are maintaining the system for them.</p>
 
-<p>Iridium&nbsp;11 (until recently referred to by OIG as
-Iridium&nbsp;20), Iridium&nbsp;14, Iridium&nbsp;20 (until
-recently referred to by OIG as Iridium&nbsp;11) and
-Iridium&nbsp;21 are the second (i.e. replacement) satellites
-known by those names. They were previously known as
-Iridium&nbsp;20a, Iridium&nbsp;14a, Iridium&nbsp;11a and
-Iridium&nbsp;21a respectively. </p>
+<p>Iridium&nbsp;11 (at one time referred to by OIG as
+Iridium&nbsp;20), Iridium&nbsp;14, Iridium&nbsp;20 (at one time
+referred to by OIG as Iridium&nbsp;11) and Iridium&nbsp;21 are
+the second (i.e. replacement) satellites known by those names.
+They were previously known as Iridium&nbsp;20a, Iridium&nbsp;14a,
+Iridium&nbsp;11a and Iridium&nbsp;21a respectively. </p>
 
 <p>Iridium&nbsp;911, Iridium&nbsp;914, Iridium&nbsp;920,
 Iridium&nbsp;921 are the (failed) satellites originally known as

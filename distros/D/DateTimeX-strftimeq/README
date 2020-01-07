@@ -1,0 +1,65 @@
+NAME
+    DateTimeX::strftimeq - POSIX::strftime() with support for embedded perl
+    code in %(...)q
+
+VERSION
+    This document describes version 0.003 of DateTimeX::strftimeq (from Perl
+    distribution DateTimeX-strftimeq), released on 2019-11-20.
+
+SYNOPSIS
+     use DateTimeX::strftimeq; # by default exports strftimeq()
+
+     my @time = localtime();
+     print strftimeq '<%6Y-%m-%d>', @time; # <002019-11-19>
+     print strftimeq '<%6Y-%m-%d%( $_->day_of_week eq 7 ? "sun" : "" )q>', @time; # <002019-11-19>
+     print strftimeq '<%6Y-%m-%d%( $_->day_of_week eq 2 ? "tue" : "" )q>', @time; # <002019-11-19tue>
+
+    You can also pass DateTime object instead of ($second, $minute, $hour,
+    $day, $month, $year):
+
+     print strftimeq '<%6Y-%m-%d>', $dt; # <002019-11-19>
+
+DESCRIPTION
+    This module provides "strftimeq()" which extends POSIX's "strftime()"
+    with a conversion: "%(...)q". Inside the parenthesis, you can specify
+    Perl code. The Perl code will receive a hash argument (%args) with the
+    following keys: "time" (arrayref, the arguments passed to strftimeq()
+    except for the first), "dt" (DateTime object). For convenience, $_ will
+    also be locally set to the DateTime object.
+
+FUNCTIONS
+  strftimeq
+    Usage:
+
+     $str = strftimeq $fmt, $sec, $min, $hour, $mday, $mon, $year;
+     $str = strftimeq $fmt, $dt;
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DateTimeX-strftimeq>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DateTimeX-strftimeq>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DateTimeX-strftimeq>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    POSIX's "strftime()"
+
+    DateTime
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

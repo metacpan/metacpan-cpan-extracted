@@ -42,9 +42,13 @@
       }
    },
    "provides" : {
+      "App::eps2png" : {
+         "file" : "lib/App/eps2png.pm",
+         "version" : "2.903"
+      },
       "eps2png" : {
-         "file" : "src/eps2png.el",
-         "version" : "2.901"
+         "file" : "script/eps2png",
+         "version" : "2.903"
       }
    },
    "release_status" : "stable",
@@ -55,6 +59,6 @@
          "web" : "https://github.com/sciurius/eps2png"
       }
    },
-   "version" : "2.901",
+   "version" : 2.903,
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -26,6 +26,7 @@ t/hk.t
 t/hp-tablet.t
 t/kwalitee.t
 t/language.t
+t/lib/MyLogger.pm
 t/links.t
 t/locale.t
 t/logger.t

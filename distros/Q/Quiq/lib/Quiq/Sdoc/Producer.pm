@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.168';
+our $VERSION = '1.169';
 
 use Quiq::Unindent;
 
@@ -327,8 +327,18 @@ erzeugt
 
 sub section {
     my ($self,$level,$title) = splice @_,0,3;
+    # @_: $body
 
-    my $str = sprintf "%s %s\n\n",('=' x $level),$title;
+    my $str;
+    if ($level == -1) {
+        $str = sprintf "=- %s\n\n",$title;
+    }
+    elsif ($level == 0) {
+        $str = sprintf "==- %s\n\n",$title;
+    }
+    else {
+        $str = sprintf "%s %s\n\n",('=' x $level),$title;
+    }
     if (@_) {
         my $body = shift;
         $body =~ s/\s+$//;
@@ -452,7 +462,7 @@ sub eof {
 
 =head1 VERSION
 
-1.168
+1.169
 
 =head1 AUTHOR
 

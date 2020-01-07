@@ -4,13 +4,13 @@
       "Russ Allbery <rra@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Term-ANSIColor",
    "no_index" : {
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006"
+            "perl" : "5.008"
          }
       }
    },
@@ -49,6 +49,6 @@
          "web" : "https://github.com/rra/ansicolor"
       }
    },
-   "version" : "4.06",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "5.00",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -9,7 +9,7 @@ package Rex::Fork::Manager;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use Rex::Fork::Task;
 use Time::HiRes qw(sleep);
@@ -86,7 +86,7 @@ sub wait_for {
 
         return 1 unless $all;
       }
-      sleep 0.1;
+      sleep Rex::Config->get_waitpid_blocking_sleep_time;
     }
   } until $self->{'running'} == 0;
 }

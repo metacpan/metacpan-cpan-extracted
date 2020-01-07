@@ -9,7 +9,7 @@ package Rex::Test::Base::has_cron_env;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use Rex -minimal;
 use Rex::Commands::Cron;
@@ -31,7 +31,7 @@ sub new {
 sub run_test {
   my ( $self, $user, $key, $value, $count ) = @_;
 
-  my @envs = cron env => $user => "list";
+  my @envs         = cron env => $user => "list";
   my @matched_envs = grep { $_->{name} eq $key && $_->{value} eq $value } @envs;
 
   if ($count) {
@@ -47,7 +47,7 @@ sub run_test {
 sub run_not_test {
   my ( $self, $user, $key, $value, $count ) = @_;
 
-  my @envs = cron env => $user => "list";
+  my @envs         = cron env => $user => "list";
   my @matched_envs = grep { $_->{name} eq $key && $_->{value} eq $value } @envs;
 
   if ($count) {

@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::FailWarnings;
 
-use DNS::Unbound::AsyncQuery;
+use DNS::Unbound::AsyncQuery::PromiseES6;
 
 {
     my @cancel_args;
@@ -18,7 +18,7 @@ use DNS::Unbound::AsyncQuery;
 
     my $query_resolved;
 
-    my $query = DNS::Unbound::AsyncQuery->new( sub {
+    my $query = DNS::Unbound::AsyncQuery::PromiseES6->new( sub {
         ($res, $rej) = @_;
     } );
 
@@ -38,7 +38,7 @@ use DNS::Unbound::AsyncQuery;
 }
 
 {
-    my $query = DNS::Unbound::AsyncQuery->new( sub {} );
+    my $query = DNS::Unbound::AsyncQuery::PromiseES6->new( sub {} );
     my $faux = { ctx => 'some_ctx', id => 'some_id' };
 
     $query->_set_dns( $faux );

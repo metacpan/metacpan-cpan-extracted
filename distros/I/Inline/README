@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Inline version 0.83.
+    This document describes Inline version 0.85.
 
 SYNOPSIS
 
@@ -478,7 +478,8 @@ USING THE INLINE.PM MODULE
 
         use Inline with => qw(Event Foo Bar);
 
-    Currently, Event is the only module that works with Inline.
+    Currently, modules that works with Inline include Event, PDL, and those
+    that use Alien::Build.
 
     In order to make your module work with Inline in this way, your module
     needs to provide a class method called Inline that takes an Inline

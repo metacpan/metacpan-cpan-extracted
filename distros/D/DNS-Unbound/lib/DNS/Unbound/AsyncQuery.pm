@@ -3,8 +3,6 @@ package DNS::Unbound::AsyncQuery;
 use strict;
 use warnings;
 
-use parent qw( Promise::ES6 );
-
 =encoding utf-8
 
 =head1 NAME
@@ -25,7 +23,8 @@ DNS::Unbound::AsyncQuery
 =head1 DESCRIPTION
 
 This object represents the result of an asynchronous L<DNS::Unbound> query.
-It subclasses L<Promise::ES6> but provides a cancellation mechanism.
+It implements a standard promise interface
+and also provides a cancellation mechanism.
 
 The promise resolves with a L<DNS::Unbound::Result> instance.
 It rejects with a L<DNS::Unbound::X::ResolveError> instance
@@ -46,8 +45,8 @@ our $CANCEL_CR;
 
 =head1 METHODS
 
-In addition to the methods inherited from L<Promise::ES6>, this
-class provides:
+In addition to the C<then()>, C<catch()>, and C<finally()> methods—see
+L<Promise::ES6> if you’re unsure of how to use those—this class provides:
 
 =cut
 
@@ -77,13 +76,27 @@ sub cancel {
 # Leaving undocumented since as far as the caller is concerned
 # this method is identical to the parent class’s.
 sub then {
-    my $self = shift;
 
-    my $new = $self->SUPER::then(@_);
+    # We need to use the promise backend’s then(), but that backend isn’t
+    # a parent class of *this* class, so we can’t call SUPER::then().
+    # Thus, the backend bridge module aliases the backend then() to
+    # _then(), and we call into that.
 
-    $new->_set_dns( $self->_get_dns() );
+    my $new = $_[0]->_then(@_[1, 2]);
+
+    $new->_set_dns( $_[0]->_get_dns() );
 
     return $new;
+}
+
+# Not all promise implementations define these as wrappers around then().
+# So let’s be explicit about it:
+sub catch {
+    return $_[0]->then( undef, $_[1] );
+}
+
+sub finally {
+    return $_[0]->then( $_[1], $_[1] );
 }
 
 # ----------------------------------------------------------------------
@@ -109,7 +122,7 @@ sub DESTROY {
 
     delete $QUERY_OBJ_DNS{$self};
 
-    $self->SUPER::DESTROY() if Promise::ES6->can('DESTROY');
+    $self->SUPER::DESTROY() if $self->can('SUPER::DESTROY');
 
     return;
 }

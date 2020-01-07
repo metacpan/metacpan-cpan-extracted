@@ -24,7 +24,7 @@ if($ENV{RELEASE_TESTING}) {
 	} elsif(eval { require Geo::IP; }) {
 		my $v = Geo::IP->VERSION;
 		if(($^O ne 'MSWin32') && (! -r '/usr/local/share/GeoIP/GeoIP.dat')) {
-			print "Can't find your GeoIP.dat file for Geo::IP\n";
+			print "Warning: Can't find your GeoIP.dat file for Geo::IP, disabling that module\n";
 			$online_tests = are_online();
 		} else {
 			print "You have Geo::IP version $v installed, so CGI::Lingua can work fast\n";
@@ -68,17 +68,21 @@ WriteMakefile(
 	'autodie' => 0,
 	'IPC::System::Simple' => 0,
 	'Test::Compile' => 0,
+	'Test::Without::Module' => 0,
 	'WWW::RT::CPAN' => 0
     },
     PREREQ_PM => {
 	'DBD::SQLite' => 0,	# Locale::Object doesn't declare this prerequisite
-	'Locale::Object::Country' => 0,
+	'Locale::Object::Country' => 0.78,	# Fix for RT#79214
+	'Locale::Object' => 0.80,	# Fix for RT#131347
 	'I18N::AcceptLanguage' => 0,
 	'Locale::Language' => 0,
 	'I18N::LangTags::Detect' => 1.04,
 	'Data::Validate::IP' => 0.25,	# For is_private_ip
+	'Locale::Codes' => 3.59,	# Silence noisy warn messages in perl 5.28
 	'Net::Whois::IANA' => 0,
 	'Net::Whois::IP' => 0,
+	'NetAddr::IP' => 0,
 	'Class::Load' => 0,
 	'CGI::Info' => 0.60, # For AUTOLOAD
 	'Sys::Syslog' => 0,
@@ -109,14 +113,28 @@ sub are_online
 		Timeout => 5
 	);
 	if($s) {
-		print <<EOF;
+		if($ENV{'AUTOMATED_TESTING'}) {
+			close($s);
+			return 1;
+		}
+		if(-r '/usr/local/share/GeoIP/GeoIP.dat') {
+			print <<EOF;
 
 You appear to be directly connected to the Internet.  I have some tests
 that try to query Whois servers.
 These tests will be slow, consider installing IP::Country, Geo::IPfree or
-Geo::IP
+Geo::IP.
 
 EOF
+		} else {
+			print <<EOF;
+
+You appear to be directly connected to the Internet.  I have some tests
+that try to query Whois servers.
+These tests will be slow, consider installing either IP::Country or Geo::IPfree.
+
+EOF
+		}
 		close($s);
 
 		# Timeout inspired by Mail::IMAPClient

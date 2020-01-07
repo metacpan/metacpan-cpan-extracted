@@ -121,9 +121,11 @@ typedef struct s_Package* URPM__Package;
 
 #ifdef RPM4_11_0
 #ifndef RPM4_12_0
+#ifndef PATCHED_RH
 #define RPMTAG_RECOMMENDNAME RPMTAG_SUGGESTSNAME
 #define RPMTAG_RECOMMENDFLAGS RPMTAG_SUGGESTSFLAGS
 #define RPMTAG_RECOMMENDVERSION RPMTAG_SUGGESTSVERSION
+#endif
 #endif
 #endif
 
@@ -993,13 +995,13 @@ open_archive(char *filename, int *empty_archive) {
     } else {
       /* this is an archive, prepare for reading with uncompress defined inside */
       rfd = Fopen(filename, "r.fdio");
-      if (strcmp(buf.uncompress, "gzip"))
+      if (!strncmp(buf.uncompress, "gzip", 4))
            rfd = Fdopen(rfd, "r.gzip");
-      else if (strcmp(buf.uncompress, "bzip"))
+      else if (!strncmp(buf.uncompress, "bzip2", 4))
            rfd = Fdopen(rfd, "r.bzip2");
-      else if (strcmp(buf.uncompress, "xz") || strcmp(buf.uncompress, "lzma"))
+      else if (!strncmp(buf.uncompress, "xz", 2) || !strncmp(buf.uncompress, "lzma", 4))
            rfd = Fdopen(rfd, "r.xz");
-      else if (strcmp(buf.uncompress, "zstd"))
+      else if (!strncmp(buf.uncompress, "zstd", 4))
            rfd = Fdopen(rfd, "r.zstd");
       else {
            free(rfd);

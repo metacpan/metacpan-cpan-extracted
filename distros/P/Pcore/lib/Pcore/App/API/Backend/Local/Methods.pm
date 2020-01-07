@@ -3,7 +3,7 @@ package Pcore::App::API::Backend::Local::Methods;
 use Pcore -role, -res;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 use Package::Stash::XS qw[];
-use Pcore::App::API qw[:PERMISSIONS];
+use Pcore::App::API qw[:PERMS];
 
 has _method => ( init_arg => undef );    # HashRef
 has _obj    => ( init_arg => undef );    # HashRef
@@ -61,10 +61,10 @@ around init => sub ( $orig, $self ) {
         my @bad;
 
         for my $attr (@attrs) {
-            if ( $attr =~ /(Permissions) [(] ([^)]*) [)]/smxx ) {
+            if ( $attr =~ /(Perms) [(] ([^)]*) [)]/smxx ) {
                 my ( $attr, $val ) = ( $1, $2 );
 
-                if ( $attr eq 'Permissions' ) {
+                if ( $attr eq 'Perms' ) {
 
                     # parse args
                     my @val = map {s/\s//smgr} split /,/sm, $val;
@@ -125,7 +125,7 @@ around init => sub ( $orig, $self ) {
                 permissions       => do {
                     my $ref = *{"$class_name\::$method_name"}{CODE};
 
-                    $package_method_permissions->{$ref} // ${"$class_name\::API_NAMESPACE_PERMISSIONS"};
+                    $package_method_permissions->{$ref} // ${"$class_name\::API_NAMESPACE_PERMS"};
                 },
             };
 
@@ -152,8 +152,8 @@ around init => sub ( $orig, $self ) {
                         }
 
                         # any authenticated user
-                        if ( $permission eq $PERMISSIONS_ANY_AUTHENTICATED_USER ) {
-                            $method->{$method_id}->{permissions} = $PERMISSIONS_ANY_AUTHENTICATED_USER;
+                        if ( $permission eq $PERMS_ANY_AUTHENTICATED_USER ) {
+                            $method->{$method_id}->{permissions} = $PERMS_ANY_AUTHENTICATED_USER;
 
                             last;
                         }

@@ -9,43 +9,53 @@ use File::Temp;
 
 use Promise::XS;
 
-my $deferred = Promise::XS::deferred();
+SKIP: {
+    skip 1, 'Windows, XS, fork, and heap allocation don’t get along.' if $^O eq 'MSWin32';
 
-my $ar = [ $deferred ];
-push @$ar, $ar;
+    local $Promise::XS::DETECT_MEMORY_LEAKS = 1;
 
-my $fh = File::Temp::tempfile();
+    my $deferred = Promise::XS::deferred();
 
-my $pid = fork or do {
-    close STDERR;
-    open *STDERR, '>>&=', $fh;
+    my $ar = [ $deferred ];
+    push @$ar, $ar;
 
-    exit;
-};
+    my $fh = File::Temp::tempfile();
 
-waitpid $pid, 0;
+    my $pid = fork or do {
+        close STDERR;
+        open *STDERR, '>>&=', $fh;
 
-is(
-    (stat $fh)[7],
-    0,
-    'no warning on leak from subprocess',
-) or do {
-    sysseek $fh, 0, 0;
+        exit;
+    };
 
-    my $buf = q<>;
-    1 while sysread( $fh, $buf, 512, length $buf );
+    waitpid $pid, 0;
 
-    diag $buf;
-};
+    is(
+        (stat $fh)[7],
+        0,
+        'no warning on leak from subprocess',
+    ) or do {
+        sysseek $fh, 0, 0;
 
-@$ar = ();
+        my $buf = q<>;
+        1 while sysread( $fh, $buf, 512, length $buf );
+
+        diag $buf;
+    };
+
+    @$ar = ();
+}
 
 #----------------------------------------------------------------------
 
 {
-    my @inc_args = map { "-I$_" } @INC;
+    my @inc_args = map { ( '-I', $_ ) } @INC;
 
-    my $got = `$^X @inc_args -Mstrict -Mwarnings -MPromise::XS -e'\$Promise::XS::DETECT_MEMORY_LEAKS = 1; open STDERR, ">>&=", *STDOUT; my \$deferred = Promise::XS::deferred(); my \$ar = [ \$deferred ]; push \@\$ar, \$ar;'`;
+    use File::Spec;
+    my ($dir) = File::Spec->splitdir( __FILE__ );
+    my $script_path = File::Spec->join( $dir, 'assets', 'deferred_leak.pl' );
+
+    my $got = `$^X @inc_args -Mstrict -Mwarnings -MPromise::XS $script_path`;
 
     warn "CHILD_ERROR: $?" if $?;
 
@@ -62,9 +72,13 @@ is(
 #----------------------------------------------------------------------
 
 {
-    my @inc_args = map { "-I$_" } @INC;
+    my @inc_args = map { ( '-I', $_ ) } @INC;
 
-    my $got = `$^X @inc_args -Mstrict -Mwarnings -MPromise::XS -e'\$Promise::XS::DETECT_MEMORY_LEAKS = 1; open STDERR, ">>&=", *STDOUT; my \$deferred = Promise::XS::deferred(); my \$p = \$deferred->promise(); undef \$deferred; my \$ar = [ \$p ]; push \@\$ar, \$ar;'`;
+    use File::Spec;
+    my ($dir) = File::Spec->splitdir( __FILE__ );
+    my $script_path = File::Spec->join( $dir, 'assets', 'promise_leak.pl' );
+
+    my $got = `$^X @inc_args -Mstrict -Mwarnings -MPromise::XS $script_path`;
 
     warn "CHILD_ERROR: $?" if $?;
 

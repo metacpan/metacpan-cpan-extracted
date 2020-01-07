@@ -23,9 +23,11 @@ requires:
   Mojolicious: '8.25'
   Time::HiRes: '0'
   XML::Compile::SOAP: '3.16'
+  XML::Compile::SOAP12: '3.00'
+  XML::Compile::WSDL11: '3.00'
 resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-XML-Compile-SOAP-Mojolicious.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

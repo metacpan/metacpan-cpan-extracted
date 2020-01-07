@@ -122,6 +122,12 @@ mid-flight controls like cancellation.
 - `all()` and `race()` should be implemented in XS,
 as should `resolved()` and `rejected()`.
 
+# KNOWN ISSUES
+
+- Interpreter-based threads may or may not work.
+- This module interacts badly with Perl’s fork() implementation on
+Windows. There may be a workaround possible, but none is implemented for now.
+
 # SEE ALSO
 
 Besides [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises) and [Promises](https://metacpan.org/pod/Promises), you may like [Promise::ES6](https://metacpan.org/pod/Promise::ES6),

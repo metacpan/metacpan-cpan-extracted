@@ -13,7 +13,7 @@ require Exporter;
 use base qw/Exporter/;
 our @EXPORT_OK = qw/__lock __store __retrieve/;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use Fcntl qw(:DEFAULT :flock);
 use Storable;
@@ -29,7 +29,7 @@ our $LOCK_FILE =
 
 sub __lock {
   sysopen( my $dblock, $LOCK_FILE, O_RDONLY | O_CREAT ) or die($!);
-  flock( $dblock, LOCK_EX ) or die($!);
+  flock( $dblock, LOCK_EX )                             or die($!);
 
   my $ret = $_[0]->();
 

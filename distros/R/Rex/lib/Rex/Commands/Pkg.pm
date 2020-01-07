@@ -34,7 +34,7 @@ package Rex::Commands::Pkg;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use Rex::Pkg;
 use Rex::Logger;
@@ -337,7 +337,7 @@ sub install {
     }
     else {
 
-      my $source = Rex::Helper::Path::get_file_path( $source, caller() );
+      my $source  = Rex::Helper::Path::get_file_path( $source, caller() );
       my $content = eval { local ( @ARGV, $/ ) = ($source); <>; };
 
       my $local_md5 = "";

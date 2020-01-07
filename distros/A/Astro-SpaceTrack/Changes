@@ -1,3 +1,10 @@
+0.135		2020-01-06	T. R. Wyant
+    Add Celestrak supplemental Starlink 3 pre-launch TLE catalog.
+
+    Update canned status table for decay of
+
+    - Iridium 97
+
 0.134		2019-12-24	T. R. Wyant
     Document 'TBA' as valid OBJECT_TYPE in modeldef.
 

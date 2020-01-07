@@ -1,3 +1,44 @@
+1.169 2020-01-05
+================
+
+[Quiq::Array]
+* meanValue() - Alias average() hinzugefügt
+
+[Quiq::Epoch]
+* Behandlung von Subsekunden korrigiert
+
+[Quiq::Hash::Db]
+* Doku bearbeitet
+
+[Quiq::Html::Table::Simple]
+* Doku bearbeitet
+
+[Quiq::Html::Widget::Button]
+* Attribut title hinzugefügt
+
+[Quiq::Html::Widget::SelectMenu]
+* Attribut title hinzugefügt
+
+[Quiq::Html::List]
+* Description List (dl) hinzugefügt
+
+[Quiq::Html::Tag]
+* Element details hinzugefügt
+* Element summary hinzugefügt
+
+[Quiq::PlotlyJs::Reference]
+* Klasse hinzugefügt
+
+[Quiq::PlotlyJs::TimeSeries]
+* Attribut color hinzugefügt
+* JavaScript Instanzvariable hinzugefügt
+
+[Quiq::Sdoc::Producer]
+* Sectionsebenen -1 und 0 hinzugefügt
+
+[Quiq::Sql::Script::Reader]
+* Option separator hinzugefügt
+
 1.168 2019-12-22
 ================
 

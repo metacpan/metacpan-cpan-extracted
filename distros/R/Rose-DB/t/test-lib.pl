@@ -121,6 +121,32 @@ BEGIN
   );
 
   #
+  # MariaDB
+  #
+
+  # Main
+  Rose::DB->register_db(
+    domain   => 'test',
+    type     => 'mariadb',
+    driver   => 'mariadb',
+    database => 'test',
+    host     => 'localhost',
+    username => 'test',
+    password => ''
+  );
+
+  # Admin
+  Rose::DB->register_db(
+    domain   => 'test',
+    type     => 'mariadb_admin',
+    driver   => 'mariadb',
+    database => 'test',
+    host     => 'localhost',
+    username => 'test',
+    password => ''
+  );
+
+  #
   # Informix
   #
 
@@ -226,11 +252,12 @@ BEGIN
   }
 
   my @types = qw(oracle oracle_admin pg pg_with_schema pg_admin mysql mysql_admin
+                 mariadb mariadb_admin
                  informix informix_admin sqlite sqlite_admin);
 
   unless($Rose::DB::Object::Test::NoDefaults)
   {
-    foreach my $db_type (qw(ORACLE PG MYSQL INFORMIX))
+    foreach my $db_type (qw(ORACLE PG MYSQL MARIADB INFORMIX))
     {
       if(my $dsn = $ENV{"RDBO_${db_type}_DSN"})
       {
@@ -290,6 +317,9 @@ package My::DB2::MySQL;
 
 sub subclass_special_mysql { 'MYSQL' }
 
+package My::DB2::MariaDB;
+@My::DB2::MariaDB::ISA = qw(Rose::DB::MariaDB);
+
 package My::DB2::Informix;
 @My::DB2::Informix::ISA = qw(Rose::DB::Informix);
 
@@ -298,6 +328,7 @@ sub subclass_special_informix { 'INFORMIX' }
 My::DB2->driver_class(Oracle => 'My::DB2::Oracle');
 My::DB2->driver_class(Pg => 'My::DB2::Pg');
 My::DB2->driver_class(mysql => 'My::DB2::MySQL');
+My::DB2->driver_class(mariadb => 'My::DB2::MariaDB');
 My::DB2->driver_class(Informix => 'My::DB2::Informix');
 
 package My::DB3;

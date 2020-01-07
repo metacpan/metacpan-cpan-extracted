@@ -21,7 +21,7 @@ our @ISA = qw(Rose::Object);
 
 our $Error;
 
-our $VERSION = '0.779';
+our $VERSION = '0.781';
 
 our $Debug = 0;
 
@@ -76,6 +76,7 @@ __PACKAGE__->default_keyword_function_calls(
 __PACKAGE__->driver_classes
 (
   mysql    => 'Rose::DB::MySQL',
+  mariadb  => 'Rose::DB::MariaDB',
   pg       => 'Rose::DB::Pg',
   informix => 'Rose::DB::Informix',
   oracle   => 'Rose::DB::Oracle',
@@ -2899,6 +2900,7 @@ L<Rose::DB> currently supports the following L<DBI> database drivers:
 
     DBD::Pg       (PostgreSQL)
     DBD::mysql    (MySQL)
+    DBD::MariaDB  (MariaDB)
     DBD::SQLite   (SQLite)
     DBD::Informix (Informix)
     DBD::Oracle   (Oracle)
@@ -2909,6 +2911,7 @@ All database-specific behavior is contained and documented in the subclasses of 
 
     DBD::Pg       -> Rose::DB::Pg
     DBD::mysql    -> Rose::DB::MySQL
+    DBD::MariaDB  -> Rose::DB::MariaDB
     DBD::SQLite   -> Rose::DB::SQLite
     DBD::Informix -> Rose::DB::Informix
     DBD::Oracle   -> Rose::DB::Oracle
@@ -3219,6 +3222,7 @@ Get or set the subclass used for DRIVER.  The DRIVER argument is automatically c
 The default mapping of driver names to class names is as follows:
 
     mysql    -> Rose::DB::MySQL
+    mariadb  -> Rose::DB::MariaDB
     pg       -> Rose::DB::Pg
     informix -> Rose::DB::Informix
     sqlite   -> Rose::DB::SQLite
@@ -3435,6 +3439,7 @@ The default driver-to-class mapping is as follows:
 
     pg       -> Rose::DB::Pg
     mysql    -> Rose::DB::MySQL
+    mariadb  -> Rose::DB::MariaDB
     informix -> Rose::DB::Informix
     oracle   -> Rose::DB::Oracle
     sqlite   -> Rose::DB::SQLite
@@ -3708,6 +3713,7 @@ The driver names for the L<currently supported database types|"DATABASE SUPPORT"
 
     pg
     mysql
+    mariadb
     informix
     oracle
     sqlite

@@ -1,4 +1,4 @@
-Bitcoin-Crypto version 0.02
+Bitcoin-Crypto version 0.99
 ================================
 
 This module aims at enabling easy manipulation of Bitcoin
@@ -11,23 +11,18 @@ INSTALLATION
 
 To install this module type the following:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+	perl Makefile.PL
+	make
+	make test
+	make install
 
 DEPENDENCIES
 
-This module requires these other modules and libraries:
-
-  Modern::Perl
-  Moo
-  MooX::Types::MooseLike
-  CryptX
-  Crypt::RIPEMD160
-  Bitcoin::BIP39
-  Try::Tiny
-
+This module requires other modules to function, which are listed in Makefile.PL.
+These modules can be installed by running for example:
+	cpanm --installdeps .
+This module also requires development GMP package installed on your system.
+It must be installed before installing other dependencies.
 
 COPYRIGHT AND LICENCE
 
@@ -36,5 +31,4 @@ Copyright (C) 2018 by Bartosz Jarzyna
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,
 at your option, any later version of Perl 5 you may have available.
-
 

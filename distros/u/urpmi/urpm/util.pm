@@ -30,6 +30,7 @@ our @EXPORT = qw(add2hash_
     reduce_pathname
     remove_internal_name
     same_size_and_mtime
+    uefi_type
     uniq
     uniq_
     unquotespace
@@ -186,7 +187,20 @@ sub uniq_(&@) {
 
 sub output_safe {
     my ($file, $content, $o_backup_ext) = @_;
-    
+
+    #- The file must be world-readable, else mgaapplet and urpm* commands run as
+    #- a normal user won't be able to read it. We enforce umask here in the case
+    #- where the msec security level is set to 'secure' (which means umask 077)
+    #- or where we are run from a gdm-x-session (mga#24636)
+    my $old_umask = umask 0022;
+    my $retval = output_safe_($file, $content, $o_backup_ext);
+    umask $old_umask;
+    $retval;
+}
+
+sub output_safe_ {
+    my ($file, $content, $o_backup_ext) = @_;
+
     open(my $f, '>', "$file.new") or return;
     print $f $content or return;
     close $f or return;
@@ -213,6 +227,16 @@ sub append_to_file {
     open(my $F, '>>', $f) or die "writing to file $f failed: $!\n";
     print $F $_ foreach @_;
     1;
+}
+
+#- return the UEFI machine type short name
+sub uefi_type() {
+    if (-e '/sys/firmware/efi/fw_platform_size') {
+        # No support for ARM yet
+        cat_('/sys/firmware/efi/fw_platform_size') =~ /32/ ? 'ia32' : 'x64';
+    } else {
+        'none';
+    }
 }
 
 1;

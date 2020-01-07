@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.168';
+our $VERSION = '1.169';
 
 use Quiq::Path;
 use Scalar::Util ();
@@ -255,7 +255,7 @@ sub script {
 
 =head1 VERSION
 
-1.168
+1.169
 
 =head1 AUTHOR
 

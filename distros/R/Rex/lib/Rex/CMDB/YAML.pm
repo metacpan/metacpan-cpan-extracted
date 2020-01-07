@@ -9,7 +9,7 @@ package Rex::CMDB::YAML;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use base qw(Rex::CMDB::Base);
 
@@ -113,7 +113,7 @@ sub get {
     if ( -f $file ) {
 
       my $content = eval { local ( @ARGV, $/ ) = ($file); <>; };
-      my $t = Rex::Config->get_template_function();
+      my $t       = Rex::Config->get_template_function();
       $content .= "\n"; # for safety
       $content = $t->( $content, \%template_vars );
 

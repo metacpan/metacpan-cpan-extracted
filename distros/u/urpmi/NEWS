@@ -1,3 +1,26 @@
+Version 8.120 - 21 October 2019
+
+- fix test for whether any 32-bit packages are installed
+
+Version 8.119 - 19 October 2019
+
+- when adding distrib media, enable 32-bit media if needed (mga#24438)
+- translations updates
+
+Version 8.118 - 22 June 2019
+
+- ensure downloaded files are world-readable (mga#24636)
+
+Version 8.117 - 21 June 2019
+
+- ensure urpmi config and cache files are world-readable (mga#24636)
+
+Version 8.116 - 27 May 2019
+
+- don't enable 32-bit media by default on 64-bit systems (mga#24376)
+  o except on systems with 32-bit EFI, where we need the Core 32bit
+    media for the bootloader
+
 Version 8.115 - 1 May 2019
 
 - library:
@@ -4751,4 +4774,3 @@ Version 0.9-34mdk - Jan 04 2000, by Chmouel Boudjnah
 
 * Mon Nov 15 1999 Pixel
 - changed the handling of urpmi, added urpmi.addmedia...
-

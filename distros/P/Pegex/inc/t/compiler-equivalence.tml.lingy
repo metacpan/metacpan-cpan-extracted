@@ -1,0 +1,130 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["=","Plan",50],
+    ["%<>",[],
+      ["=>",[],
+        [["<>",
+            ["*grammar1","*grammar2"],
+            ["==",
+              [".",
+                ["*","grammar1"],
+                ["bootstrap-compile"],
+                ["yaml"]],
+              [".",
+                ["*","grammar2"],
+                ["bootstrap-compile"],
+                ["yaml"]],
+              "+ (bootstrap compile)"]],
+          ["<>",
+            ["*grammar1","*grammar2"],
+            ["==",
+              [".",
+                ["*","grammar1"],
+                ["compile"],
+                ["yaml"]],
+              [".",
+                ["*","grammar2"],
+                ["compile"],
+                ["yaml"]],
+              "+ (pegex compile)"]]]]]],
+  "data": [
+    { "label": "Simple Test Case",
+      "point": {
+        "grammar1": "a: /x/\n",
+        "grammar2": "a:\n    /x/\n"}},
+    { "label": "And over Or Precedence",
+      "point": {
+        "grammar1": "a: b c | d\n",
+        "grammar2": "a: ( b c ) | d\n"}},
+    { "label": "And/Or Precedence with joining",
+      "point": {
+        "grammar1": "a: b % c | d %% e\n",
+        "grammar2": "a: ( b % c ) | ( d %% e )\n"}},
+    { "label": "And/Or Precedence with grouping",
+      "point": {
+        "grammar1": "a:\n     b c\n   | (\n        d\n      | e\n      | f g h i\n   )\n",
+        "grammar2": "a: ( b c ) | ( d | e | ( f g h i ) )\n"}},
+    { "label": "Extra Leading Pipe",
+      "point": {
+        "grammar1": "a: | b | c\n",
+        "grammar2": "a: b | c\n"}},
+    { "label": "Extra Leading Pipe w/ Parens",
+      "point": {
+        "grammar1": "a: (\n  | b\n  | c\n)\n",
+        "grammar2": "a: b | c\n"}},
+    { "label": "In-Line Comments",
+      "point": {
+        "grammar1": "a:  # test\n    b c  # not d\n    /q/  # skipping to q\n    % e  # using e here...\n    ;    # comment -> semicolon test\n",
+        "grammar2": "a: b c /q/ % e\n"}},
+    { "label": "Dashes in names",
+      "point": {
+        "grammar1": "a-a: b-b+ c-c\nb_b: c_c-c /d/\nc-c_c: e\n",
+        "grammar2": "a_a: b_b+ c_c\nb-b: c-c_c /d/\nc_c_c: e\n"}},
+    { "label": "Whitespace Tokens",
+      "point": {
+        "grammar1": "a: - b + c -\nb: /- cat + dog -/\n",
+        "grammar2": "a: _ b __ c _\nb: /<_> cat <__> dog <_>/\n"}},
+    { "label": "Separator Reduction a % b",
+      "point": {
+        "grammar1": "x: a % b\n",
+        "grammar2": "x: a\n"}},
+    { "label": "Separator Reduction a %% b",
+      "point": {
+        "grammar1": "x: a %% b\n",
+        "grammar2": "x: a b?\n"}},
+    { "label": "Separator Reduction a? % b",
+      "point": {
+        "grammar1": "x: a? % b\n",
+        "grammar2": "x: a?\n"}},
+    { "label": "Separator Reduction a? %% b",
+      "point": {
+        "grammar1": "x: a? %% b\n",
+        "grammar2": "x: a? b?\n"}},
+    { "label": "Separator Reduction a* % b",
+      "point": {
+        "grammar1": "x: a* % b\n",
+        "grammar2": "x: (a -(b a)*)?\n"}},
+    { "label": "Separator Reduction a* %% b",
+      "point": {
+        "grammar1": "x: a* %% b\n",
+        "grammar2": "x: (a -(b a)* b?)?\n"}},
+    { "label": "Separator Reduction a+ % b",
+      "point": {
+        "grammar1": "x: a+ % b\n",
+        "grammar2": "x: a -(b a)*\n"}},
+    { "label": "Separator Reduction a+ %% b",
+      "point": {
+        "grammar1": "x: a+ %% b\n",
+        "grammar2": "x: a -(b a)* b?\n"}},
+    { "label": "Separator Reduction <a>3 % b",
+      "point": {
+        "grammar1": "x: <a>3 % b\n",
+        "grammar2": "x: a -(b a)2\n"}},
+    { "label": "Separator Reduction <a>3 %% b",
+      "point": {
+        "grammar1": "x: <a>3 %% b\n",
+        "grammar2": "x: a -(b a)2 b?\n"}},
+    { "label": "Separator Reduction <a>3+ % b",
+      "point": {
+        "grammar1": "x: <a>3+ % b\n",
+        "grammar2": "x: a -(b a)2+\n"}},
+    { "label": "Separator Reduction <a>3+ %% b",
+      "point": {
+        "grammar1": "x: <a>3+ %% b\n",
+        "grammar2": "x: a -(b a)2+ b?\n"}},
+    { "label": "Separator Reduction <a>3-7 % b",
+      "point": {
+        "grammar1": "x: <a>3-7 % b\n",
+        "grammar2": "x: a -(b a)2-6\n"}},
+    { "label": "Separator Reduction <a>3-7 %% b",
+      "point": {
+        "grammar1": "x: <a>3-7 %% b\n",
+        "grammar2": "x: a -(b a)2-6 b?\n"}},
+    { "label": "Leading WS, mulitline regex",
+      "point": {
+        "grammar1": "a: /-\n  'foo'\n/\n",
+        "grammar2": "a: /- 'foo'/\n"}},
+    { "label": "Leading WS, mulitline regex (part2)",
+      "point": {
+        "grammar1": "a: /-\n  'foo'\n/\n",
+        "grammar2": "a: /-foo/\n"}}]}

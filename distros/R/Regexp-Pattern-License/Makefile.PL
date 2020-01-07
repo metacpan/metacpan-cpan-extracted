@@ -18,20 +18,24 @@ my $meta = {
   "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
   "prereqs"          => {
                           configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                          runtime => { requires => { perl => 5, strictures => 2 } },
+                          runtime => {
+                            requires => { "perl" => 5, "re::engine::RE2" => 0, "strictures" => 2 },
+                          },
                           test => {
                             requires => {
                               "Regexp::Pattern"       => 0,
                               "Test::Builder::Module" => 0,
                               "Test::Exception"       => 0,
                               "Test::More"            => 0.98,
+                              "Test::Regexp::Pattern" => 0.003,
+                              "Test::Requires"        => 0,
                               "Try::Tiny"             => 0,
                             },
                           },
                         },
   "provides"         => {
-                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.1.95" },
-                          "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.1.95" },
+                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.1.99" },
+                          "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.1.99" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -44,7 +48,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project",
                         },
-  "version"          => "v3.1.95",
+  "version"          => "v3.1.99",
   "x_help_wanted"    => ["documenter", "tester"],
   "x_static_install" => 1,
 };

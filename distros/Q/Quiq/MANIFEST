@@ -143,6 +143,7 @@ lib/Quiq/Parallel.pm
 lib/Quiq/Parameters.pm
 lib/Quiq/Path.pm
 lib/Quiq/Perl.pm
+lib/Quiq/PlotlyJs/Reference.pm
 lib/Quiq/PlotlyJs/TimeSeries.pm
 lib/Quiq/Pod/Generator.pm
 lib/Quiq/PostgreSql/Catalog.pm
@@ -346,6 +347,7 @@ t/bin/Quiq/Parallel.t
 t/bin/Quiq/Parameters.t
 t/bin/Quiq/Path.t
 t/bin/Quiq/Perl.t
+t/bin/Quiq/PlotlyJs/Reference.t
 t/bin/Quiq/PlotlyJs/TimeSeries.t
 t/bin/Quiq/Pod/Generator.t
 t/bin/Quiq/PostgreSql/Catalog.t

@@ -2,7 +2,7 @@ package <: $module_name ~ "::Index" :>;
 
 use Pcore -class;
 
-with qw[Pcore::App::Controller::Index];
+with qw[Pcore::App::Controller];
 
 sub run ( $self, $req ) {
     return 200, [ 'Content-Type' => 'text/html' ], $self->{app}->{util}->{tmpl}->render('index.html');

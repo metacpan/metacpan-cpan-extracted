@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+  0.23 - 6 Jan 2020
+
+      * Increased required version of Time::Local
+
   0.22 - 3 Jan 2020
 
       * Fixed test suite.

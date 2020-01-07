@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 use Test::Most;
+use lib 't/lib';
+use MyLogger;
 
 unless(-e 't/online.enabled') {
 	plan skip_all => 'On-line tests disabled';
@@ -296,32 +298,4 @@ unless(-e 't/online.enabled') {
 	]);
 	ok($l->language() eq 'German');
 	ok(!defined($l->sublanguage()));
-}
-
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub trace {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
 }

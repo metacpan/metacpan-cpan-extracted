@@ -152,6 +152,40 @@ sub on_event ( $self, $h, $ev ) {
     return;
 }
 
+sub get_nginx_cfg ($self) {
+    my $tmpl = <<'NGINX';
+    # api "<: $location :>"
+: if $location == '/' {
+    location =/ {
+        error_page 418 = @backend;
+        return 418;
+    }
+
+    location / {
+        rewrite ^/favicon.ico$ /cdn/favicon.ico last;
+        rewrite ^/robots.txt$ /cdn/robots.txt last;
+
+        return 404;
+    }
+: } else {
+    location =<: $location :> {
+        return 301 <: $location :>/;
+    }
+
+    location =<: $location :>/ {
+        error_page 418 = @backend;
+        return 418;
+    }
+
+    location <: $location :>/ {
+        return 404;
+    }
+: }
+NGINX
+
+    return P->tmpl->( \$tmpl, { location => $self->{path} } )->$*;
+}
+
 1;
 __END__
 =pod

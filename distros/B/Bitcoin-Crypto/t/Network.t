@@ -1,8 +1,7 @@
-use strict;
-use warnings;
-
-use Test::More tests => 10;
-use Try::Tiny;
+use Modern::Perl "2010";
+use Test::More;
+use Test::Exception;
+use Scalar::Util qw(blessed);
 
 BEGIN { use_ok('Bitcoin::Crypto::Network', qw(:all)) };
 
@@ -14,31 +13,21 @@ is($default_networks[1], "testnet", "testnet available");
 note("no more default networks") if @default_networks == 2;
 
 my $litecoin = {
-    name => "Litecoin Mainnet",
-    p2pkh_byte => 0x30,
+	name => "Litecoin Mainnet",
+	p2pkh_byte => "\x30",
 };
 
 # validate_network - 2 test
 
-try {
-    validate_network($litecoin);
-    fail("invalid network validation successfull");
-} catch {
-    if (m/wif_byte/) {
-        pass("invalid network validation fails");
-    } else {
-        fail("unknown error during validation");
-    }
-};
+throws_ok {
+	validate_network($litecoin);
+} "Bitcoin::Crypto::Exception::NetworkConfig", "invalid network validation fails";
 
-$litecoin->{wif_byte} = 0xb0;
+$litecoin->{wif_byte} = "\xb0";
 
-try {
-    validate_network($litecoin);
-    pass("network validates");
-} catch {
-    fail("unknown error during validation");
-};
+lives_ok {
+	validate_network($litecoin);
+} "network validates";
 
 # add_network - 1 test
 
@@ -53,5 +42,7 @@ is_deeply(get_network(), $litecoin, "get_network() shortcut working");
 
 # find_network - 2 test
 
-is_deeply([find_network(wif_byte => 0xb0)], [qw(litecoin_mainnet)], "network found successfully");
-ok(find_network(name => "unexistent") == 0, "non-existent network not found");
+is_deeply([find_network(wif_byte => "\xb0")], [qw(litecoin_mainnet)], "network found successfully");
+ok(!find_network(name => "unexistent"), "non-existent network not found");
+
+done_testing;

@@ -15,6 +15,7 @@ has app   => ( required => 1 );    # ConsumerOf ['Pcore::App']
 has hosts => ( required => 1 );    # HashRef
 
 has map           => ();           # HashRef, router path -> class name
+has host_re       => ();           # HashRef, router path -> class name
 has host_api_path => ();           # HashRef
 
 has path_ctrl  => ();              # HashRef, router path -> sigleton cache
@@ -103,7 +104,7 @@ sub _get_host_map ( $self, $host, $ns ) {
 
         die qq[Controller path "$route" is not unique] if exists $self->{path_ctrl}->{$host}->{$route};
 
-        $map->{$route} = $class;
+        $map->{ $route eq '/' ? '/' : "$route/" } = $class;
 
         $self->{class_ctrl}->{$class} = $self->{path_ctrl}->{$host}->{$route} = $obj;
 
@@ -114,10 +115,8 @@ sub _get_host_map ( $self, $host, $ns ) {
         }
     }
 
-    # check, that index controller is present
-    die qq[HTTP router path "/" is required but not found for host "$host"] if !exists $map->{'/'};
-
-    die qq[Index controller "$map->{'/'}" must inherit "Pcore::App::Controller::Index" role] if !$self->{class_ctrl}->{ $map->{'/'} }->does('Pcore::App::Controller::Index');
+    my $re = '\A(' . ( join '|', map {quotemeta} reverse sort { length $a <=> length $b } keys $map->%* ) . ')(.*)\z';
+    $self->{host_re}->{$host} = qr/$re/sm;
 
     return $map;
 }
@@ -129,9 +128,9 @@ sub run ( $self, $req ) {
 
     my $env = $req->{env};
 
-    my $map = $self->{map};
-
     my $host = $env->{HTTP_HOST} // '*';
+
+    my $map = $self->{map};
 
     if ( !exists $map->{$host} ) {
 
@@ -146,53 +145,24 @@ sub run ( $self, $req ) {
         }
     }
 
-    $map = $map->{$host};
+    my $path = P->path("/$env->{PATH_INFO}");
 
-    my $path   = P->path("/$env->{PATH_INFO}");
-    my $is_dir = $path ne '/' && !defined $path->{filename};
+    $path .= '/' if $path ne '/' && !defined $path->{filename};
 
-    my ( $req_path, $class );
+    if ( $path =~ $self->{host_re}->{$host} ) {
 
-    if ( exists $map->{$path} ) {
-        $class = $map->{$path};
+        # extend HTTP request
+        $req->{app}  = $self->{app};
+        $req->{host} = $host;
+        $req->{path} = P->path($2) if $2 ne $EMPTY;
 
-        $req_path = P->path() if $is_dir;
+        my $ctrl = $self->{class_ctrl}->{ $map->{$host}->{$1} };
+
+        return $ctrl->run($req);
     }
     else {
-        my @labels = split m[/]sm, $path;
-
-        shift @labels;
-
-        my $prefix;
-
-        while () {
-            pop @labels;
-
-            $prefix = '/' . join '/', @labels;
-
-            $class = $map->{$prefix};
-
-            last if defined $class;
-        }
-
-        if ( $prefix eq '/' ) {
-            $req_path = substr $path, length $prefix;
-        }
-        else {
-            $req_path = substr $path, 1 + length $prefix;
-        }
-
-        $req_path = P->path( $is_dir ? "$req_path/" : $req_path );
+        return 404;
     }
-
-    # extend HTTP request
-    $req->{app}  = $self->{app};
-    $req->{host} = $host;
-    $req->{path} = $req_path;
-
-    my $ctrl = $self->{class_ctrl}->{$class};
-
-    return $ctrl->run($req);
 }
 
 sub get_host_api_path ( $self, $host ) {

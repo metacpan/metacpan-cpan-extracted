@@ -81,6 +81,8 @@ t/data/snippets/man/utf8-nonbreaking
 t/data/snippets/man/utf8-verbatim
 t/data/snippets/man/x-whitespace
 t/data/snippets/man/x-whitespace-entry
+t/data/snippets/overstrike/tag-width
+t/data/snippets/overstrike/wrapping
 t/data/snippets/README
 t/data/snippets/termcap/escape-wrapping
 t/data/snippets/termcap/tag-width
@@ -92,6 +94,7 @@ t/data/snippets/text/alt
 t/data/snippets/text/c-with-spaces
 t/data/snippets/text/code
 t/data/snippets/text/cpp
+t/data/snippets/text/empty
 t/data/snippets/text/error-die
 t/data/snippets/text/error-none
 t/data/snippets/text/error-normal
@@ -99,6 +102,7 @@ t/data/snippets/text/error-pod
 t/data/snippets/text/error-stderr
 t/data/snippets/text/error-stderr-opt
 t/data/snippets/text/for
+t/data/snippets/text/iso-8859-1
 t/data/snippets/text/late-encoding
 t/data/snippets/text/link-rt
 t/data/snippets/text/link-url
@@ -110,6 +114,7 @@ t/data/snippets/text/quotes-opt
 t/data/snippets/text/s-whitespace
 t/data/snippets/text/sentence-spacing
 t/data/snippets/text/utf8
+t/data/snippets/text/utf8-iso
 t/data/snippets/text/verbatim
 t/data/termcap
 t/docs/pod-spelling.t
@@ -137,11 +142,12 @@ t/style/module-version.t
 t/style/obsolete-strings.t
 t/style/strict.t
 t/text/color.t
-t/text/empty.t
+t/text/invalid.t
+t/text/iso-8859-1.t
 t/text/overstrike.t
-t/text/perlio.t
 t/text/snippets.t
 t/text/termcap.t
+t/text/utf8-io.t
 THANKS
 TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)

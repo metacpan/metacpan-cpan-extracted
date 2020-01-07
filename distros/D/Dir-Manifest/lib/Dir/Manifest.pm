@@ -1,5 +1,5 @@
 package Dir::Manifest;
-$Dir::Manifest::VERSION = '0.2.0';
+$Dir::Manifest::VERSION = '0.6.0';
 use strict;
 use warnings;
 
@@ -16,6 +16,27 @@ has 'dir'         => ( is => 'ro', required => 1 );
 
 my $ALLOWED = qr/[a-zA-Z0-9_\-\.=]/;
 my $ALPHAN  = qr/[a-zA-Z0-9_]/;
+
+sub _is_valid_key
+{
+    my ( $self, $key ) = @_;
+    if ( $key !~ /\A(?:$ALLOWED)+\z/ )
+    {
+        die
+"Invalid characters in key \"$key\"! We only allow A-Z, a-z, 0-9, _, dashes and equal signs.";
+    }
+    if ( $key !~ /\A$ALPHAN/ )
+    {
+        die qq#Key does not start with an alphanumeric - "$key"!#;
+    }
+    if ( $key !~ /$ALPHAN\z/ )
+    {
+        die qq#Key does not end with an alphanumeric - "$key"!#;
+    }
+
+    return;
+}
+
 has '_keys' => (
     is      => 'ro',
     lazy    => 1,
@@ -27,19 +48,7 @@ has '_keys' => (
 
         foreach my $l (@lines)
         {
-            if ( $l !~ /\A(?:$ALLOWED)+\z/ )
-            {
-                die
-"Invalid characters in key \"$l\"! We only allow A-Z, a-z, 0-9, _, dashes and equal signs.";
-            }
-            if ( $l !~ /\A$ALPHAN/ )
-            {
-                die qq#Key does not start with an alphanumeric - "$l"!#;
-            }
-            if ( $l !~ /$ALPHAN\z/ )
-            {
-                die qq#Key does not end with an alphanumeric - "$l"!#;
-            }
+            $self->_is_valid_key($l);
             $ret->{$l} = 1;
         }
         return $ret;
@@ -97,6 +106,69 @@ sub texts_dictionary
     return +{ map { $_ => $self->text( $_, $opts ) } @{ $self->get_keys } };
 }
 
+sub _update_disk_manifest
+{
+    my $self = shift;
+
+    path( $self->manifest_fn )->spew_raw( map { "$_\n" } @{ $self->get_keys } );
+
+    return;
+}
+
+sub add_key
+{
+    my ( $self, $args ) = @_;
+
+    my $key      = $args->{key};
+    my $utf8_val = $args->{utf8_val};
+
+    if ( exists $self->_keys->{$key} )
+    {
+        die "Key \"$key\" already exists in the dictionary!";
+    }
+
+    $self->_is_valid_key($key);
+
+    $self->_keys->{$key} = 1;
+
+    $self->_update_disk_manifest;
+    $self->fh($key)->spew_utf8($utf8_val);
+
+    return;
+}
+
+sub remove_key
+{
+    my ( $self, $args ) = @_;
+
+    my $key = $args->{key};
+
+    if ( not exists $self->_keys->{$key} )
+    {
+        die "Key \"$key\" does not exist in the dictionary!";
+    }
+
+    $self->fh($key)->remove;
+    delete $self->_keys->{$key};
+    $self->_update_disk_manifest;
+
+    return;
+}
+
+sub dwim_new
+{
+    my ( $class, $args ) = @_;
+
+    my $base = path( $args->{base} );
+
+    return $class->new(
+        {
+            manifest_fn => $base->child("list.txt"),
+            dir         => $base->child("texts"),
+        }
+    );
+}
+
 1;
 
 __END__
@@ -105,13 +177,9 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-Dir::Manifest
-
 =head1 VERSION
 
-version 0.2.0
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -121,6 +189,13 @@ version 0.2.0
         {
             manifest_fn => "./t/data/texts/list.txt",
             dir         => "./t/data/texts/texts",
+        }
+    );
+
+    # Or alternatively:
+    my $obj = Dir::Manifest->dwim_new(
+        {
+            base => "./t/data/texts",
         }
     );
 
@@ -145,11 +220,18 @@ be done securely and reliably.
 
 Dir::Manifest - treat a directory and a manifest file as a hash/dictionary of keys to texts or blobs
 
-=head1 VERSION
-
-version 0.2.0
-
 =head1 METHODS
+
+=head2 my $obj = Dir::Manifest->new({manifest_fn => "/path/to/base-dir/list.txr", dir => "/path/to/base-dir/texts",});
+
+Constructs a new Dir::Manifest object from separate manifest_fn and a directory holding the texts.
+
+=head2 my $obj = Dir::Manifest->dwim_new({base => "/path/to/base-dir"});
+
+Constructs a new Dir::Manifest with manifest_fn being C<< $base->child("list.txt") >>
+and dir being C<< $base->child("texts") >>. ("Convention over configuration".)
+
+Added in version 0.6.0.
 
 =head2 $self->manifest_fn()
 
@@ -184,6 +266,16 @@ Slurps the key using L<Dir::Manifest::Slurp>
 Returns a hash reference (a dictionary) containing all keys and their slurped contents
 as values. C<'slurp_opts'> is passed to text().
 
+=head2 $obj->add_key( {key => "new_key", utf8_val => $utf8_text, } );
+
+Adds a new key with a file with the new UTF-8 contents encoded as $utf8_text .
+(Added in version 0.4.0).
+
+=head2 $obj->remove_key( {key => "existing_key_id", } );
+
+Removes the key from the dictionary while deleting its associated file.
+(Added in version 0.4.0).
+
 =head1 DEDICATION
 
 This code is dedicated to the memory of L<Jonathan Scott Duff|https://metacpan.org/author/DUFF>
@@ -207,7 +299,7 @@ this code. For more about him, see:
 L<kristian vuljar|https://www.jamendo.com/artist/441226/kristian-vuljar> used to
 have a jamendo track called "Keys" based on L<Shine 4U|https://www.youtube.com/watch?v=B8ehY5tutHs> by Carmen and Camille. You can find it at L<http://www.shlomifish.org/Files/files/dirs/kristian-vuljar--keys/> .
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -241,14 +333,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dir-Manifest>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Dir-Manifest>
 
 =item *
 

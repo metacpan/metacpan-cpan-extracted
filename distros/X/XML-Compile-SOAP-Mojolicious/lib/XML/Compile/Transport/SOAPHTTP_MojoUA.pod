@@ -283,8 +283,8 @@ Inherited, see L<XML::Compile::Transport/"Helpers">
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile-SOAP-Mojolicious distribution version 0.05,
-built on January 03, 2020. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile-SOAP-Mojolicious distribution version 0.06,
+built on January 06, 2020. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 

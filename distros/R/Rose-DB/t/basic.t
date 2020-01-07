@@ -77,8 +77,8 @@ is_deeply(scalar Rose::DB->registry->registered_domains,
           [ qw(atest catalog_test default test) ], 'registered_domains()');
 
 is_deeply(scalar Rose::DB->registry->registered_types('test'), 
-          [ qw(aux default generic informix informix_admin mysql mysql_admin
-               oracle oracle_admin pg pg_admin pg_with_schema),
+          [ qw(aux default generic informix informix_admin  mariadb mariadb_admin 
+              mysql mysql_admin oracle oracle_admin pg pg_admin pg_with_schema),
                ($sqlite_ok ? qw(sqlite sqlite_admin) : ()) ],
           'registered_types()');
 

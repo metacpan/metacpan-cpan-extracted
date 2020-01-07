@@ -17,6 +17,20 @@ WriteMakefile(
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
     LICENSE           => "perl_5",
 
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url => 'git://github.com/FGasper/p5-Promise-XS.git',
+                web => 'https://github.com/FGasper/p5-Promise-XS',
+            },
+            bugtracker => {
+                web => 'https://github.com/FGasper/p5-Promise-XS/issues',
+            },
+        },
+    },
+
     TEST_REQUIRES => {
         'Test::More' => 0,
         'Test::Deep' => 0,

@@ -1,5 +1,7 @@
+0.05 2020-01-06 22:00:00+0000
+  -Support state for callbacks
 0.04 2020-01-01 21:00:00+0000
-  -Suport async resources
+  -Support async resources
 0.03 2020-01-01 20:00:00+0000
   -Add Changes file
   -Add Dash Table component

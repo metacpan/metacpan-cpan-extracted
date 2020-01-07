@@ -100,7 +100,7 @@ methods. Internal methods are usually preceded with a _
 
 
 package Bio::Variation::AAChange;
-$Bio::Variation::AAChange::VERSION = '1.7.4';
+$Bio::Variation::AAChange::VERSION = '1.7.5';
 use vars qw($MATRIX);
 use strict;
 

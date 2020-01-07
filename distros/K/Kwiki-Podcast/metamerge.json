@@ -1,0 +1,11 @@
+{
+    "name": "Kwiki-Podcast",
+    "x_static_install": true,
+    "resources": {
+        "repository": {
+            "web": "https://github.com/gugod/Kwiki-Podcast",
+            "url": "https://github.com/gugod/Kwiki-Podcast.git",
+            "type": "git"
+        }
+    }
+}

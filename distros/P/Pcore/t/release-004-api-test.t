@@ -26,11 +26,11 @@ package App {
 
     with qw[Pcore::App];
 
-    our $PERMISSIONS = [ 'admin', 'user' ];
+    our $PERMS = [ 'admin', 'user' ];
 
     # PERMISSIONS
     sub get_permissions ($self) {
-        return $PERMISSIONS;
+        return $PERMS;
     }
 
     sub run { }

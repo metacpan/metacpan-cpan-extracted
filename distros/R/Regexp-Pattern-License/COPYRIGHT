@@ -9,8 +9,10 @@ Files: Changes
  doap.ttl
  lib/Regexp/Pattern/License.pm
  lib/Regexp/Pattern/License/Parts.pm
+ t/02-regexp-pattern.t
  t/lib/MyTest.pm
  t/normalized.t
+ t/re2.t
 Copyright: Copyright 2020 Jonas Smedegaard.
 License: GPL-3.0
 
@@ -27,13 +29,13 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/01-basic.t
 Copyright: Copyright 2019 Jonas Smedegaard.
 License: GPL-3.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
 Copyright: Copyright 2017 Jonas Smedegaard.

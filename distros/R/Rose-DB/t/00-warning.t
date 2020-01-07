@@ -33,6 +33,12 @@ print STDERR<<"EOF";
 ##     RDBO_MYSQL_USER    (@{[ nvl('RDBO_MYSQL_USER', 'root') ]})
 ##     RDBO_MYSQL_PASS    (@{[ nvl('RDBO_MYSQL_PASS', '<none>') ]})
 ##
+## MariaDB:
+## 
+##     RDBO_MARIADB_DSN     (@{[ nvl('RDBO_MARIADB_DSN', 'dbi:mysql:database=test;host=localhost') ]})
+##     RDBO_MARIADB_USER    (@{[ nvl('RDBO_MARIADB_USER', 'test') ]})
+##     RDBO_MARIADB_PASS    (@{[ nvl('RDBO_MARIADB_PASS', '<none>') ]})
+##
 ## Oracle:
 ##
 ##     RDBO_ORACLE_DSN    (@{[ nvl('RDBO_ORACLE_DSN', 'dbi:Oracle:dbname=test') ]})

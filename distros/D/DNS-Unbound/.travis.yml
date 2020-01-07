@@ -18,19 +18,9 @@ perl:
 #  - "5.6"
 before_install:
     - eval $(curl https://travis-perl.github.io/init) --auto
-# Travis CI’s libunbound-dev package lacks a .pc file.
-# It shouldn’t be needed, but this does an install from source
-# instead of using apt.
-#    - "wget https://nlnetlabs.nl/downloads/unbound/unbound-latest.tar.gz -O /tmp/unbound.tar.gz"
-#    - "pushd /tmp && tar -xvzf unbound.tar.gz && popd"
-#    - "pushd /tmp/unbound-* && ./configure && make && sudo make install && popd"
-#    - "pkg-config --cflags libunbound"
-#    - "pkg-config --libs libunbound"
-#----------------------------------------------------------------------
-#    - "sudo apt-get install apt-file libunbound-dev"
-#    - "apt-file update"
-#    - "apt-file show libunbound-dev"
     - "sudo apt-get install libunbound-dev"
+    - "[ $TRAVIS_PERL_VERSION != '5.14' ] && [ $TRAVIS_PERL_VERSION != '5.12' ] && [ $TRAVIS_PERL_VERSION != '5.10' ] && cpanm --notest --verbose AnyEvent AnyEvent::XSPromises ||:"
+    - cpanm --notest --verbose Promise::XS
     - cpanm --notest ExtUtils::MakeMaker
 install:
     - cpanm --verbose --installdeps --notest .

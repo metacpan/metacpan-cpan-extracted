@@ -6,7 +6,7 @@ use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
 use vars qw($VERSION);
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.59
+Version 0.60
 
 =cut
 
@@ -954,18 +954,17 @@ sub country {
 	if($self->{_country} && ($self->{_country} eq 'eu')) {
 		delete($self->{_country});
 	}
-	unless($self->{_country}) {
+	if((!$self->{_country}) &&
+	   (eval { require LWP::Simple; require JSON::Parse } )) {
 		if($self->{_logger}) {
 			$self->{_logger}->debug("Look up $ip on geoplugin");
 		}
 
-		if(eval { require LWP::Simple; require JSON::Parse } ) {
-			LWP::Simple->import();
-			JSON::Parse->import();
+		LWP::Simple->import();
+		JSON::Parse->import();
 
-			if(my $data = LWP::Simple::get("http://www.geoplugin.net/json.gp?ip=$ip")) {
-				$self->{_country} = JSON::Parse::parse_json($data)->{'geoplugin_countryCode'};
-			}
+		if(my $data = LWP::Simple::get("http://www.geoplugin.net/json.gp?ip=$ip")) {
+			$self->{_country} = JSON::Parse::parse_json($data)->{'geoplugin_countryCode'};
 		}
 	}
 	unless($self->{_country}) {
@@ -990,12 +989,21 @@ sub country {
 			} elsif(defined($whois->{country})) {
 				$self->{_country} = $whois->{country};
 			}
-			if($self->{_country} && ($self->{_country} eq 'eu')) {
-				delete($self->{_country});
+			if($self->{_country}) {
+				if($self->{_country} eq 'EU') {
+					delete($self->{_country});
+				} elsif(($self->{_country} eq 'US') && ($whois->{'StateProv'} eq 'PR')) {
+					# RT#131347: Inspite of what Whois thinks, Puerto Rico isn't in the US
+					$self->{_country} = 'pr';
+				}
 			}
 		}
 
-		unless($self->{_country}) {
+		if($self->{_country}) {
+			if($self->{_logger}) {
+				$self->{_logger}->debug("Found up $ip on Net::WhoisIP as ", $self->{_country});
+			}
+		} else {
 			if($self->{_logger}) {
 				$self->{_logger}->debug("Look up $ip on IANA");
 			}
@@ -1282,7 +1290,7 @@ L<http://search.cpan.org/dist/CGI-Lingua/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2018 Nigel Horne.
+Copyright 2010-2020 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

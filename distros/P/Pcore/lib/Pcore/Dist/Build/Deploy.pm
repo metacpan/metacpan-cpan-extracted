@@ -134,7 +134,7 @@ sub _install ($self) {
         if ( $self->{dist}->is_pcore ) {
 
             # set $ENV{PERL5LIB}
-            P->sys->run_proc(qq[setx.exe /M PERL5LIB "$canon_dist_root/lib;"]) or return;
+            P->sys->run_proc(qq[setx.exe /M PERL5LIB "$canon_dist_root/lib"]) or return;
 
             say qq[%PERL5LIB% updated];
 

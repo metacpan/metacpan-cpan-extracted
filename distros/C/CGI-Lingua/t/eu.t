@@ -7,6 +7,8 @@
 use strict;
 use warnings;
 use Test::Most;
+use lib 't/lib';
+use MyLogger;
 
 # Check comments in Whois records
 
@@ -54,41 +56,4 @@ unless(-e 't/online.enabled') {
 	}
 	ok(!defined($l->sublanguage()));
 	# diag($l->locale());
-}
-
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub warn {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub trace {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
 }

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.168';
+our $VERSION = '1.169';
 
 use Quiq::Sql::Analyzer;
 use Quiq::FileHandle;
@@ -58,8 +58,8 @@ Mehrere SQL-Statements I<auf einer Zeile> beherrscht die Klasse nicht.
 
 =head4 Synopsis
 
-  $rd = $class->new($dbms,$file);
-  $rd = $class->new($dbms,\$str);
+  $rd = $class->new($dbms,$file,@opt);
+  $rd = $class->new($dbms,\$str,@opt);
 
 =head4 Arguments
 
@@ -79,6 +79,18 @@ Das SQL-Skript als Zeichenkette.
 
 =back
 
+=head4 Options
+
+=over 4
+
+=item -separator => $regex (Default: qr/;\s*$/)
+
+Statement-Separator. Per Default ein Semikolon (;) am Zeilenende.
+Andere Variante (geeigneter, wenn Prozeduren vorkommen können),
+Semikolon allein auf Zeile: qr/^;\s*$/.
+
+=back
+
 =head4 Returns
 
 Reader-Objekt
@@ -93,7 +105,13 @@ Zeichenkette $str und liefere eine Referenz auf dieses Objekt zurück.
 # -----------------------------------------------------------------------------
 
 sub new {
-    my ($class,$dbms,$input) = @_;
+    my ($class,$dbms,$input) = splice @_,0,3;
+
+    my $separator = qr/\s*;$/;
+
+    $class->parameters(\@_,
+        -separator => \$separator,
+    );
 
     # SQL-Analyzer instantiieren (mit Namensprüfung)
     my $aly = Quiq::Sql::Analyzer->new($dbms);
@@ -104,6 +122,7 @@ sub new {
     return $class->SUPER::new(
         analyzer => $aly,
         fh => $fh,
+        separator => $separator,
     );
 }
 
@@ -155,7 +174,7 @@ Liefere das nächste SQL-Statement des Skripts. Leere Statements werden
 sub nextStmt {
     my $self = shift;
 
-    my ($fh,$aly) = $self->get('fh','analyzer');
+    my ($fh,$aly,$separator) = $self->get('fh','analyzer','separator');
 
     my $stmt;
     while (<$fh>) {
@@ -164,14 +183,12 @@ sub nextStmt {
             next;
         }
         $stmt .= $_;
-        if (/;\s*$/) {
+        if (/$separator/) {
             if ($stmt =~ /^[\s;]*$/) {
                 # Leere Statements übergehen wir
                 $stmt = undef;
                 next;
             }
-            #if ($sql->isPostgreSQL &&
-            #        $stmt =~ /CREATE\s+(OR\s+REPLACE\s+)?FUNCTION\s+/i) {
 
             if ($aly->isCreateFunction($stmt)) {
 
@@ -229,7 +246,7 @@ sub nextStmt {
 
 =head1 VERSION
 
-1.168
+1.169
 
 =head1 AUTHOR
 

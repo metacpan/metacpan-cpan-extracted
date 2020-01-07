@@ -31,8 +31,8 @@ WriteMakefile(
     requires  => {perl => '5.020001'},
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/oetiker/mojolicious-plugin-soap-server',
-      bugtracker  => 'https://github.com/oetiker/mojolicious-plugin-soap-server/issues'
+      repository  => 'https://github.com/oposs/mojolicious-plugin-soap-server',
+      bugtracker  => 'https://github.com/oposs/mojolicious-plugin-soap-server/issues'
     },
     no_index => {directory => ['t','eg']}
   },

@@ -14,8 +14,6 @@
 
 use Bio::PrimarySeq;
 use Bio::SeqIO;
-use Bio::DB::EMBL;
-use Bio::DB::GenBank;
 use Getopt::Long;
 use strict;
 use warnings;
@@ -25,7 +23,9 @@ use constant VERSION => '3.0';
 my $help = '';
 my $flank = 100;              # flank length on both sides of the region
 my $in_format = 'EMBL';       # format of the file to read in
+# my $db_class = 'Bio::DB::EMBL';  # class of
 my @pos;                      # position(s) in the sequence
+
 
 
 GetOptions ("help" => \$help, "flanklength=i" => \$flank,
@@ -55,21 +55,28 @@ sub get_seq {
     my $IN_FORMAT = 'EMBL';	# format of the local file on disk
 
     if (-e $file ) {		# local file
-	my $in  = Bio::SeqIO->new('-file' => $file,
-				  '-format' => $IN_FORMAT);
-	$seq = $in->next_seq();
+        my $in  = Bio::SeqIO->new('-file' => $file,
+                      '-format' => $IN_FORMAT);
+        $seq = $in->next_seq();
     }
     elsif ($file =~ /\./) {	# sequence version from GenBank
-	eval {
-	    my $gb = new Bio::DB::GenBank;
-	    $seq = $gb->get_Seq_by_version($file);
-	};
+        eval {
+            Bio::SeqIO->_load_module("Bio::DB::GenBank");
+            my $gb = Bio::DB::GenBank->new();
+            $seq = $gb->get_Seq_by_version($file);
+        };
+        if ($@) {
+            die "Encountered an error: $@";
+        }
     } else {			# plain accession mumber from more reliable EMBL
-	eval {
-	    my $gb = new Bio::DB::EMBL;
-	    $seq = $gb->get_Seq_by_acc($file);
-	};
-	
+        eval {
+            Bio::SeqIO->_load_module("Bio::DB::EMBL");
+            my $gb = Bio::DB::EMBL->new();
+            $seq = $gb->get_Seq_by_acc($file);
+        };	
+        if ($@) {
+            die "Encountered an error: $@";
+        }        
     }
     print STDERR "Could not find sequence [$file]" && return unless $seq;
     return $seq;
@@ -159,20 +166,20 @@ sub extract {
 
 	#build BioPerl sequence objects
 	if ($strand == -1) {
-	    my $five_prime_seq = new Bio::PrimarySeq(-alphabet=>'dna',-seq=>$five_prime);
-	    my $snp_seq = new Bio::PrimarySeq(-alphabet=>'dna',-seq=>$snp);
-	    my $three_prime_seq = new Bio::PrimarySeq(-alphabet=>'dna',-seq=>$three_prime);
+	    my $five_prime_seq = Bio::PrimarySeq->new(-alphabet=>'dna',-seq=>$five_prime);
+	    my $snp_seq = Bio::PrimarySeq->new(-alphabet=>'dna',-seq=>$snp);
+	    my $three_prime_seq = Bio::PrimarySeq->new(-alphabet=>'dna',-seq=>$three_prime);
 
 	    my $str = $three_prime_seq->revcom->seq. " ".
 		$snp_seq->revcom->seq. " ". $five_prime_seq->revcom->seq;
 	    $str =~ s/ //g;
-	    $out_seq = new Bio::PrimarySeq (-id => $fastaid,
+	    $out_seq = Bio::PrimarySeq->new(-id => $fastaid,
 					    -alphabet=>'dna',
 					    -seq => $str );
 	} else {
 	    my $str = $five_prime. " ". $snp. " ". $three_prime;
 	    $str =~ s/ //g;
-	    $out_seq = new Bio::PrimarySeq (-id => $fastaid,
+	    $out_seq = Bio::PrimarySeq->new(-id => $fastaid,
 					    -alphabet=>'dna',
 					    -seq => $str );
 	}

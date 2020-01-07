@@ -4,7 +4,6 @@ author:
   - 'Tobias Oetiker <tobi@oetiker.ch>'
 build_requires:
   CPAN::Uploader: '0'
-  Mojolicious::Plugin::SOAP::Server: '0'
   Pod::Markdown::Github: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -34,5 +33,5 @@ resources:
   bugtracker: https://github.com/oposs/mojo-soap-client/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/oposs/mojo-soap-client
-version: v0.1.5
+version: v0.1.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

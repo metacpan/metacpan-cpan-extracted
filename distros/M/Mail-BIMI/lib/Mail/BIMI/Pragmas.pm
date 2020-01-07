@@ -1,6 +1,6 @@
 package Mail::BIMI::Pragmas;
 # ABSTRACT: Setup system wide pragmas
-our $VERSION = '1.20200103'; # VERSION
+our $VERSION = '1.20200107'; # VERSION
 use 5.20.0;
 use strict;
 use warnings;

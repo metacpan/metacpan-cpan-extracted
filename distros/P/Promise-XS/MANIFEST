@@ -15,6 +15,8 @@ t/XSPromises.t
 t/alias.t
 t/anyevent.t
 t/aplus.t
+t/assets/deferred_leak.pl
+t/assets/promise_leak.pl
 t/detect_memory_leaks.t
 t/ioasync.t
 t/mojo.t

@@ -71,7 +71,7 @@
          "web" : "https://github.com/pablrod/perl-Dash"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }

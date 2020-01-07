@@ -69,7 +69,8 @@ to use `resolve_async()` instead.
 Like `resolve()` but starts an asynchronous query rather than a
 synchronous one.
 
-This returns an instance of [DNS::Unbound::AsyncQuery](https://metacpan.org/pod/DNS::Unbound::AsyncQuery).
+This returns an instance of [DNS::Unbound::AsyncQuery](https://metacpan.org/pod/DNS::Unbound::AsyncQuery) (a subclass
+thereof, to be precise).
 
 [See below](#methods-for-dealing-with-asynchronous-queries) for
 the methods you’ll need to use in tandem with this one.
@@ -144,7 +145,8 @@ Returns the number of outstanding asynchronous queries.
 
 # METHODS FOR DEALING WITH DNSSEC
 
-The following correspond to their equivalents in libunbound.
+The following correspond to their equivalents in libunbound
+and will only work if the underlying libunbound version supports them.
 
 ## _OBJ_->add\_ta()
 

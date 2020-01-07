@@ -1,6 +1,6 @@
 package Mail::BIMI::Record;
 # ABSTRACT: Class to model a collection of egress pools
-our $VERSION = '1.20200103'; # VERSION
+our $VERSION = '1.20200107'; # VERSION
 use 5.20.0;
 use Moo;
 use Types::Standard qw{Str HashRef ArrayRef};
@@ -120,13 +120,13 @@ sub _get_dns_rr($self,$type,$domain) {
   };
   for my $rr ( $query->answer ) {
     next if $rr->type ne $type;
-    push @matches, $rr->type eq  'A'   ? $rr->address
-                 : $rr->type eq 'PTR'  ? $rr->ptrdname
-                 : $rr->type eq  'NS'  ? $rr->nsdname
-                 : $rr->type eq  'TXT' ? $rr->txtdata
-                 : $rr->type eq  'SPF' ? $rr->txtdata
-                 : $rr->type eq 'AAAA' ? $rr->address
-                 : $rr->type eq  'MX'  ? $rr->exchange
+    push @matches, $rr->type eq  'A'   ?        $rr->address
+                 : $rr->type eq 'PTR'  ?        $rr->ptrdname
+                 : $rr->type eq  'NS'  ?        $rr->nsdname
+                 : $rr->type eq  'TXT' ? scalar $rr->txtdata
+                 : $rr->type eq  'SPF' ? scalar $rr->txtdata
+                 : $rr->type eq 'AAAA' ?        $rr->address
+                 : $rr->type eq  'MX'  ?        $rr->exchange
                  : $rr->answer;
   }
   return @matches;

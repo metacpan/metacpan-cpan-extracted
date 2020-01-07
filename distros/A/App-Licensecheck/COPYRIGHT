@@ -224,17 +224,17 @@ Files: Changes
 Copyright: Copyright 2020 Jonas Smedegaard.
 License: GPL-3.0
 
-Files: COPYRIGHT
- CREDITS
- SIGNATURE
-Copyright: None
-License: public-domain
-
 Files: t/fedora.t
  t/lib/Test/Licensecheck.pm
  t/lib/Test/Licensecheck/ScanCode.pm
 Copyright: Copyright 2019 Jonas Smedegaard.
 License: GPL-3.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
 
 Files: dist.ini
  t/grant/LGPL/Model.pm

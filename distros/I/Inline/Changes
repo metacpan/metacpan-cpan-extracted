@@ -1,3 +1,10 @@
+0.85 Mon Jan  6 07:33:52 PST 2020
+ - Fix a taint issue @mohawk2++
+
+0.84 Mon Jan  6 07:04:31 PST 2020
+ - https://github.com/ingydotnet/inline-pm/pull/75 Make correct PERL5LIB to
+   pass on including -I flags @mohawk2++
+
 0.83 Sun 28 Apr 2019 11:30:37 AM CEST
  - Reference Inline::Module in docs related to installation (PR#68
    @nrdvana++)

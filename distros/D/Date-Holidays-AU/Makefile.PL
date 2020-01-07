@@ -9,7 +9,7 @@ WriteMakefile(
 				'Test::More' => 0,
 		},
                 'PREREQ_PM'      => {
-				'Time::Local' => 0,
+				'Time::Local' => 1.28,
 				'Date::Easter' => 0,
 				'Carp' => 0,
                                         },

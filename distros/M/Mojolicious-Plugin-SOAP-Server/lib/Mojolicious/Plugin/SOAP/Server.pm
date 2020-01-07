@@ -2,11 +2,11 @@ package Mojolicious::Plugin::SOAP::Server;
 
 =pod
 
-=begin html
+=begin markdown
 
 ![](https://github.com/oposs/mojolicious-plugin-soap-server/workflows/Unit%20Tests/badge.svg?branch=master)
 
-=end html
+=end markdown
 
 =head1 NAME
 
@@ -95,7 +95,7 @@ use XML::Compile::SOAP11;
 use XML::Compile::SOAP12;
 use XML::Compile::SOAP::Daemon::CGI;
 use Mojo::Util qw(dumper);
-our $VERSION = '0.1.3';
+our $VERSION = '0.1.4';
 use Carp qw(carp croak);
 
 has wsdl => sub ($self) {
@@ -169,7 +169,7 @@ sub register ($self,$app,$conf={}) {
     $app->types->type(
         soapxml => 'text/xml; charset="utf-8"'
     );
-    $r->any($conf->{endPoint}.'/*catchall' => { catchall => '' })
+    $r->any($conf->{endPoint})
     ->to(cb => sub ($c) {
         if ( $c->req->method !~ /^(M-)?POST$/ ) {
             return $c->render(

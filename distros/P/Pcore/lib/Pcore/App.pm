@@ -17,9 +17,9 @@ has node   => ( init_arg => undef );    # InstanceOf ['Pcore::Node']
 has cdn    => ( init_arg => undef );    # InstanceOf['Pcore::CDN']
 has ext    => ( init_arg => undef );    # InstanceOf['Pcore::Ext']
 
-const our $PERMISSIONS_ADMIN => 'admin';
-const our $PERMISSIONS_USER  => 'user';
-const our $PERMISSIONS       => [ $PERMISSIONS_ADMIN, $PERMISSIONS_USER ];
+const our $PERMS_ADMIN => 'admin';
+const our $PERMS_USER  => 'user';
+const our $PERMS       => [ $PERMS_ADMIN, $PERMS_USER ];
 
 const our $LOCALES => {
     en => 'English',
@@ -48,7 +48,7 @@ sub BUILD ( $self, $args ) {
 
 # PERMISSIONS
 sub get_permissions ($self) {
-    return $PERMISSIONS;
+    return $PERMS;
 }
 
 # LOCALES

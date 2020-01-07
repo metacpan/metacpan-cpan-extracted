@@ -1,11 +1,11 @@
-# podlators 4.13
+# podlators 4.14
 
 [![Build
 status](https://travis-ci.org/rra/podlators.svg?branch=master)](https://travis-ci.org/rra/podlators)
 [![CPAN
 version](https://img.shields.io/cpan/v/podlators.svg)](https://metacpan.org/release/podlators)
 
-Copyright 1999-2010, 2012-2019 Russ Allbery <rra@cpan.org>.  This software
+Copyright 1999-2010, 2012-2020 Russ Allbery <rra@cpan.org>.  This software
 is distributed under the same terms as Perl itself.  Please see the
 section [License](#license) below for more information.
 
@@ -151,7 +151,7 @@ Perl module issues in the same place.
 The podlators package as a whole is covered by the following copyright
 statement and license:
 
-> Copyright 1999-2010, 2012-2019
+> Copyright 1999-2010, 2012-2020
 >     Russ Allbery <rra@cpan.org>
 >
 > This program is free software; you may redistribute it and/or modify it

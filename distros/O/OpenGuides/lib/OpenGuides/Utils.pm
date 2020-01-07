@@ -2,7 +2,7 @@ package OpenGuides::Utils;
 
 use strict;
 use vars qw( $VERSION );
-$VERSION = '0.20';
+$VERSION = '0.21';
 
 use Carp qw( croak );
 use Wiki::Toolkit;
@@ -286,8 +286,6 @@ sub do_index_list_macro {
                                                  link => "$node|$title" )
                 . "\n";
     }
-    # URI::Escape escapes commas in URLs.  This is annoying.
-    $return =~ s/%2C/,/gs;
     return $return;
 }
 sub do_node_count {

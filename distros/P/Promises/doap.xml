@@ -52,6 +52,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Felipe Gasper</foaf:name>
+      <foaf:mbox rdf:resource="mailto:felipe@felipegasper.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Florian Ragwitz</foaf:name>
       <foaf:mbox rdf:resource="mailto:rafl@debian.org" />
     </foaf:Person>
@@ -60,6 +66,12 @@
     <foaf:Person>
       <foaf:name>hatorikibble</foaf:name>
       <foaf:mbox rdf:resource="mailto:at.peter.mayr@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>hatorikibble</foaf:name>
+      <foaf:mbox rdf:resource="mailto:at.peter.mayr@posteo.de" />
     </foaf:Person>
   </helper>
   <helper>
@@ -78,12 +90,6 @@
     <foaf:Person>
       <foaf:name>Mohammad S Anwar</foaf:name>
       <foaf:mbox rdf:resource="mailto:Mohammad.Anwar@yahoo.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
-      <foaf:name>Mohammad S Anwar</foaf:name>
-      <foaf:mbox rdf:resource="mailto:mohammad.anwar@yahoo.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -260,6 +266,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.01</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-06-15</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.02</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-06-22</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

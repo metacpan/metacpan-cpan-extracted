@@ -28,7 +28,7 @@ use strict;
 use warnings;
 use Rex -base;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 require Exporter;
 use base qw(Exporter);
@@ -115,7 +115,7 @@ sub groups_xml {
   foreach my $server_node ( $xmldoc->findnodes('/configuration/group/server') )
   {
     my ($group) =
-      map  { $_->getValue() }
+      map { $_->getValue() }
       grep { $_->nodeName eq 'name' } $server_node->parentNode->attributes();
     my %atts =
       map { $_->nodeName => $_->getValue() } $server_node->attributes();

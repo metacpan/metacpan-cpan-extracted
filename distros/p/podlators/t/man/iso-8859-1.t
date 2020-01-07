@@ -24,4 +24,4 @@ BEGIN {
 }
 
 # Test the snippet with the proper encoding.
-test_snippet('Pod::Man', 'man/iso-8859-1', { encoding => 'iso-8859-1' });
+test_snippet('Pod::Man', 'man/iso-8859-1');

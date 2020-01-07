@@ -8,7 +8,7 @@
 
 package XML::Compile::Transport::SOAPHTTP_MojoUA;
 use vars '$VERSION';
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 use base 'XML::Compile::Transport';
 

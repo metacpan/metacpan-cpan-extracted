@@ -224,7 +224,7 @@ sub filter_prettier ( $self, %options ) {
     if ( !$res->{status} ) {
         $self->update_log( $res->{reason} );
 
-        return $SRC_ERROR;
+        return res [ $SRC_ERROR, $res->{reason} ];
     }
     else {
         $self->{data} = $res->{result};

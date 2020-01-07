@@ -3,7 +3,7 @@ use Kwiki::Plugin -Base;
 use mixin 'Kwiki::Installer';
 use XML::RSS;
 use URI;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 const class_id => 'podcast';
 const class_title => 'Podcast';
@@ -54,8 +54,6 @@ sub mkrss {
     return $rss->as_string;
 }
 
-__DATA__
-
 =head1 NAME
 
   Kwiki::Podcast - Podcasting in a Kwiki way
@@ -82,7 +80,7 @@ Subscribe can address your podcast RSS URL from Kwiki's toolbar.
 
 =head1 CONFIGURATION
 
-This plugin offer 3 configuratino keywords:
+The following 3 configuration keys are available:
 
 =over 4
 
@@ -100,9 +98,11 @@ General description for this podcast.
 
 =back
 
-=head1 COPYRIGHT
+=head1 AUTHOR
 
-Copyright 2005 by Kang-min Liu <gugod@gugod.org>.
+Kang-min Liu <gugod@gugod.org>
+
+=head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -111,6 +111,7 @@ See <http://www.perl.com/perl/misc/Artistic.html>
 
 =cut
 
+__DATA__
 __config/podcast.yaml__
 podcast_title: Kwiki Podcast
 podcast_publisher: Kwiki Hacker
@@ -121,4 +122,3 @@ __template/tt2/podcast_button.html__
 </a>
 __template/tt2/podcast_button_icon.html__
 Podcast
-

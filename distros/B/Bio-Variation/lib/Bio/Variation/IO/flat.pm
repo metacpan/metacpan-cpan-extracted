@@ -68,7 +68,7 @@ methods. Internal methods are usually preceded with a _
 # Let the code begin...
 
 package Bio::Variation::IO::flat;
-$Bio::Variation::IO::flat::VERSION = '1.7.4';
+$Bio::Variation::IO::flat::VERSION = '1.7.5';
 use strict;
 
 use Text::Wrap;

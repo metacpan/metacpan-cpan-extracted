@@ -9,7 +9,7 @@ package Rex::Interface::Connection::SSH;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 BEGIN {
   use Rex::Require;
@@ -63,7 +63,7 @@ sub connect {
   my $fail_connect = 0;
 
 CON_SSH:
-  $port ||= Rex::Config->get_port( server => $server ) || 22;
+  $port    ||= Rex::Config->get_port( server => $server )    || 22;
   $timeout ||= Rex::Config->get_timeout( server => $server ) || 3;
   $self->{ssh}->timeout( $timeout * 1000 );
 

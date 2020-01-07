@@ -1,3 +1,9 @@
+- fix support for hdlist compressed with !gzip
+- CPAN testers:
+  o display rpm version in flags
+  o workaround CPAN testers that run FreeBSD (RT#131162)
+  o Workaround CPAN testers that run CentOS 7 (RT#131163)
+
 Version 5.23.2 - 30 December 2019
 
 - restore compatibility with rpm build w/o support for zstd

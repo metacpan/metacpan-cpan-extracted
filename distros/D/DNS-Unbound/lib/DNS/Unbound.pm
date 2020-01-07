@@ -66,7 +66,7 @@ use DNS::Unbound::X ();
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.15';
+    $VERSION = '0.16';
     XSLoader::load();
 }
 
@@ -130,6 +130,8 @@ use constant _ctx_err => {
     -9  => 'error reading from file',
     -10 => 'async_id does not exist or result already been delivered',
 };
+
+use constant _DEFAULT_PROMISE_ENGINE => 'Promise::ES6';
 
 #----------------------------------------------------------------------
 
@@ -205,7 +207,8 @@ sub _create_resolve_error {
 Like C<resolve()> but starts an asynchronous query rather than a
 synchronous one.
 
-This returns an instance of L<DNS::Unbound::AsyncQuery>.
+This returns an instance of L<DNS::Unbound::AsyncQuery> (a subclass
+thereof, to be precise).
 
 L<See below|/"METHODS FOR DEALING WITH ASYNCHRONOUS QUERIES"> for
 the methods you’ll need to use in tandem with this one.
@@ -221,13 +224,18 @@ sub resolve_async {
     my $name = $_[1];
     my $class = $_[3] || 1;
 
-    my ($res, $rej);
+    my ($promise, $res, $rej, $deferred);
 
-    _load_asyncquery_if_needed();
+    my $query_class = _load_asyncquery_if_needed();
 
-    my $query = DNS::Unbound::AsyncQuery->new( sub {
-        ($res, $rej) = @_;
-    } );
+    if (my $deferred_cr = $query_class->_DEFERRED_CR()) {
+        $deferred = $deferred_cr->();
+        $promise = $deferred->promise();
+        bless $promise, $query_class;
+    }
+    else {
+        $promise = $query_class->new( sub { ($res, $rej) = @_ } );
+    }
 
     # This hash maintains the query state across all related promise objects.
     # It must NOT contain $self, or else we’ll have a circular reference
@@ -235,6 +243,9 @@ sub resolve_async {
     my %dns = (
         res => $res,
         rej => $rej,
+
+        deferred => $deferred,
+
         ctx => $ctx,
 
         # It’s important that this be the _same_ scalar as what XS gets.
@@ -260,17 +271,24 @@ sub resolve_async {
     # NB: If %dns referenced $query it would be a circular reference.
     @dns{'id', 'queries_lookup'} = ($query_id, $_[0]->{'_queries_lookup'});
 
-    $query->_set_dns(\%dns);
+    $promise->_set_dns(\%dns);
 
-    return $query;
+    return $promise;
 }
 
 my $installed_cancel_cr;
 
 sub _load_asyncquery_if_needed {
-    if (!$INC{'DNS/Unbound/AsyncQuery.pm'}) {
+
+    # Not documented because it’s not yet meant for public consumption.
+    my $engine = $ENV{'DNS_UNBOUND_PROMISE_ENGINE'} || _DEFAULT_PROMISE_ENGINE();
+    $engine =~ tr<:><>d;
+
+    my $ns = "DNS::Unbound::AsyncQuery::$engine";
+
+    if (!$ns->can('cancel')) {
         local ($@, $!);
-        require DNS::Unbound::AsyncQuery;
+        die if !eval "require DNS::Unbound::AsyncQuery::$engine";
     }
 
     $installed_cancel_cr ||= do {
@@ -278,7 +296,7 @@ sub _load_asyncquery_if_needed {
         1;
     };
 
-    return;
+    return $ns;
 }
 
 #----------------------------------------------------------------------
@@ -485,7 +503,8 @@ sub count_pending_queries {
 
 =head1 METHODS FOR DEALING WITH DNSSEC
 
-The following correspond to their equivalents in libunbound.
+The following correspond to their equivalents in libunbound
+and will only work if the underlying libunbound version supports them.
 
 =head2 I<OBJ>->add_ta()
 
@@ -538,22 +557,25 @@ sub _check_promises {
                 delete $asyncs_hr->{ $dns_hr->{'id'} };
                 delete $self->{'_queries_lookup'}{ $dns_hr->{'id'} };
 
-                my $key;
+                my ($succeeded, $settlement);
 
                 if ( ref $dns_hr->{'value'} ) {
-                    $key = 'res';
-                    $dns_hr->{'value'} = DNS::Unbound::Result->new( %{ $dns_hr->{'value'} } );
+                    $succeeded = 1;
+                    $settlement = DNS::Unbound::Result->new( %{ $dns_hr->{'value'} } );
                 }
                 else {
-                    $key = 'rej';
-
-                    $dns_hr->{'value'} = _create_resolve_error($dns_hr->{'value'});
+                    $settlement = _create_resolve_error($dns_hr->{'value'});
                 }
 
-                $dns_hr->{'fulfilled'} ||= do {
-                    eval { $dns_hr->{$key}->($dns_hr->{'value'}) };
-                    1;
-                };
+                if (my $deferred = $dns_hr->{'deferred'}) {
+                    my $fn = $succeeded ? 'resolve' : 'reject';
+                    $deferred->$fn($settlement);
+                }
+
+                # Promise::ES6
+                else {
+                    $dns_hr->{$succeeded ? 'res' : 'rej'}->($settlement);
+                }
             }
         }
     }

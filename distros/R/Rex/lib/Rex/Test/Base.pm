@@ -57,7 +57,7 @@ use warnings;
 
 use base 'Test::Builder::Module';
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 require Rex::Commands;
 use Rex::Commands::Box;

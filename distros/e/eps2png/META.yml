@@ -19,12 +19,15 @@ no_index:
     - t
     - inc
 provides:
+  App::eps2png:
+    file: lib/App/eps2png.pm
+    version: '2.903'
   eps2png:
-    file: src/eps2png.el
-    version: '2.901'
+    file: script/eps2png
+    version: '2.903'
 requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/sciurius/eps2png.git
-version: '2.901'
+version: 2.903
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

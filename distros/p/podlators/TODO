@@ -44,17 +44,7 @@ any of the following are very much welcome.
    testing and then aim for 100% coverage.  That won't guarantee
    everything is tested, but it will be much closer.
 
- * Pod::Text::Termcap can leave underlining turned on across a newline,
-   resulting in weird visual artifacts.  Ideally, underlining should be
-   turned off at the end of each line, if still on, and then turned back
-   on at the start of the subsequent line.
-
  * Update coding style to my current standards.
-
- * Abstract the commonalities between the various test programs into a
-   generic driver for testing POD formatters, and then use it to handle
-   all of the test cases.  (This is mostly done, but the Pod::Text tests
-   still have to be converted.)
 
  * Document all the standard module interfaces from Pod::Simple.
 

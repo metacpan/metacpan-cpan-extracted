@@ -38,6 +38,7 @@
       $('#map_index_no_js').hide();
 
       map_div_id = 'map_index_canvas';
+      full_cgi_url = [% full_cgi_url.json %];
       centre_lat = [% centre_lat %];
       centre_long = [% centre_long %];
       min_lat = [% min_lat %];

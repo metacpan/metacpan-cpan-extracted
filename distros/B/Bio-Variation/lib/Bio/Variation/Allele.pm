@@ -85,7 +85,7 @@ methods. Internal methods are usually preceded with a _
 # Let the code begin...
 
 package Bio::Variation::Allele;
-$Bio::Variation::Allele::VERSION = '1.7.4';
+$Bio::Variation::Allele::VERSION = '1.7.5';
 use strict;
 
 # Object preamble - inheritance

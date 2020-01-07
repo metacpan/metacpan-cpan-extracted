@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.168';
+our $VERSION = '1.169';
 
 # -----------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ L<Quiq::Html::Base>
 =head1 DESCRIPTION
 
 Die Klasse dient der Erzeugung von Aufzählungslisten in HTML.
-Sie kann die beiden Listenarten
+Sie kann die Listenarten
 
 =over 2
 
@@ -33,6 +33,10 @@ Ordered List (<ol>)
 =item *
 
 Unordered List (<ul>)
+
+=item *
+
+Description List (<dl>)
 
 =back
 
@@ -51,10 +55,10 @@ geschützt.
 
 Content der List-Items.
 
-=item type => 'ordered' | 'unordered' (Default: 'unordered')
+=item type => 'ordered' | 'unordered' | 'description' (Default: 'unordered')
 
-Legt fest, ob die Aufzählungsliste eine I<Ordered List> (<ol>) oder
-I<Unordered List> (<ul>) ist.
+Legt fest, ob die Aufzählungsliste eine I<Ordered List> (<ol>), eine
+I<Unordered List> (<ul>) oder eine I<Description List> (<dl>) ist.
 
 =back
 
@@ -169,16 +173,44 @@ sub html {
     my ($class,$id,$itemA,$isText,$type) =
         $self->get(qw/class id items isText type/);
 
-    return $h->tag($type eq 'ordered'? 'ol': 'ul',
+    if ($type eq 'description') {
+        $type = 'dl';
+    }
+    elsif ($type eq 'ordered') {
+        $type = 'ol';
+    }
+    else {
+        $type = 'ul';
+    }
+
+    return $h->tag($type,
         id => $id,
         class => $class,
         do {
             my $html;
-            for my $item (@$itemA) {
-                $html .= $h->tag('li',
-                    -text => $isText,
-                    $item,
-                );
+            if ($type eq 'dl') {
+                for (my $i = 0; $i < @$itemA; $i += 2) {
+                    my $val = $itemA->[$i+1];
+                    if (!defined($val) || $val eq '') {
+                        next;
+                    }
+                    $html .= $h->tag('dt',
+                        -text => $isText,
+                        $itemA->[$i]
+                    );
+                    $html .= $h->tag('dd',
+                        -text => $isText,
+                        $val
+                    );
+                }
+            }
+            else {
+                for my $item (@$itemA) {
+                    $html .= $h->tag('li',
+                        -text => $isText,
+                        $item,
+                    );
+                }
             }
             $html;
         }
@@ -189,7 +221,7 @@ sub html {
 
 =head1 VERSION
 
-1.168
+1.169
 
 =head1 AUTHOR
 
@@ -197,7 +229,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019 Frank Seitz
+Copyright (C) 2020 Frank Seitz
 
 =head1 LICENSE
 

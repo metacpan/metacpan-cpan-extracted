@@ -1,6 +1,6 @@
 package Mail::BIMI;
 # ABSTRACT: Class to model a collection of egress pools
-our $VERSION = '1.20200103'; # VERSION
+our $VERSION = '1.20200107'; # VERSION
 use 5.20.0;
 use Moo;
 use Types::Standard qw{Str HashRef ArrayRef};

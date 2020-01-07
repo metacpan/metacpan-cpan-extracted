@@ -11,69 +11,95 @@ if ( $@ ) {
     plan skip_all => "DBD::SQLite could not be used - no database to test with ($error)";
 }
 
-plan tests => 7;
+plan tests => 14;
 
 OpenGuides::Test::refresh_db();
 
 my $config = OpenGuides::Test->make_basic_config;
 my $guide = OpenGuides->new( config => $config );
 
-$guide->wiki->write_node( "South Croydon Station", "A sleepy main-line station in what is arguably the nicest part of Croydon.", undef, { website => "http://example.com/" } ) or die "Couldn't write node";
-$guide->wiki->write_node( "North Croydon Station", "A busy main-line station in what is arguably the furthest North part of Croydon.", undef, { website => "http://longer.example.com/asdfasdf" } ) or die "Couldn't write node";
-$guide->wiki->write_node( "East Croydon Station",
+# Write nodes with various lengths of websites, both http and https versions.
+my %protocols = ( "http" => "", "https" => " Secure" );
+foreach my $prefix ( keys %protocols ) {
+  my $postfix = $protocols{$prefix};
+
+  $guide->wiki->write_node( "South Croydon Station$postfix",
+  "A sleepy main-line station in what is arguably the nicest part of Croydon.",
+   undef, { website => "$prefix://example.com/" } )
+     or die "Couldn't write node";
+  $guide->wiki->write_node( "North Croydon Station$postfix",
+  "A busy main-line station in what is arguably the furthest North part of "
+  . "Croydon.", undef, { website => "$prefix://longer.example.com/asdfasdf" } )
+    or die "Couldn't write node";
+  $guide->wiki->write_node( "East Croydon Station$postfix",
   "A busy main-line station that actually exists.", undef,
-  { website => "http://www.example.com/foo" } )
+  { website => "$prefix://www.example.com/foo" } )
     or die "Couldn't write node";
-$guide->wiki->write_node( "West Croydon Station",
+  $guide->wiki->write_node( "West Croydon Station$postfix",
   "Another main-line station that actually exists.", undef,
-  { website => "http://www.example.com/bar/" } )
+  { website => "$prefix://www.example.com/bar/" } )
     or die "Couldn't write node";
+}
 
-$config->website_link_max_chars( 20 );
-my %tt_vars = $guide->display_node( id => "South Croydon Station",
-                                    return_tt_vars => 1 );
-is( $tt_vars{formatted_website_text},
-    '<a href="http://example.com/" class="external">example.com</a>',
-    "Website correctly displayed when no need for truncation," );
+my %tt_vars;
 
-%tt_vars = $guide->display_node( id => "East Croydon Station",
-                                    return_tt_vars => 1 );
-is( $tt_vars{formatted_website_text},
-    '<a href="http://www.example.com/foo" class="external">example.com/foo</a>',
-    "Website correctly truncated when there's a leading www" );
+foreach my $prefix ( keys %protocols ) {
+  my $postfix = $protocols{$prefix};
+  diag( "Protocol is $prefix" );
 
-%tt_vars = $guide->display_node( id => "West Croydon Station",
-                                    return_tt_vars => 1 );
-is( $tt_vars{formatted_website_text},
-    '<a href="http://www.example.com/bar/" class="external">example.com/bar/</a>',
-    "Trailing slash not stripped unless it's immediately after domain name" );
+  $config->website_link_max_chars( 20 );
+  %tt_vars = $guide->display_node( id => "South Croydon Station$postfix",
+                                      return_tt_vars => 1 );
+  is( $tt_vars{formatted_website_text}, '<a href="' . $prefix
+      . '://example.com/" class="external">example.com</a>',
+      uc($prefix) . " website correctly displayed when no need for truncation"
+  );
 
-%tt_vars = $guide->display_node( id => "North Croydon Station",
-                                    return_tt_vars => 1 );
-is( $tt_vars{formatted_website_text},
-    '<a href="http://longer.example.com/asdfasdf" class="external">longer.example.co...</a>',
-    "Website correctly truncated when much too long." );
+  %tt_vars = $guide->display_node( id => "East Croydon Station$postfix",
+                                      return_tt_vars => 1 );
+  is( $tt_vars{formatted_website_text}, '<a href="' . $prefix
+      . '://www.example.com/foo" class="external">example.com/foo</a>',
+      uc($prefix) . " website correctly truncated when there's a leading www");
 
-# Make sure website isn't truncated unnecessarily, e.g. that we don't end up
-# just replacing the final three characters with the ellipsis.  Our full URL
-# has 27 characters (not counting the http://).
-$config->website_link_max_chars( 26 );
-%tt_vars = $guide->display_node( id => "North Croydon Station",
-                                 return_tt_vars => 1 );
-is( $tt_vars{formatted_website_text},
- '<a href="http://longer.example.com/asdfasdf" class="external">longer.example.com/asdf...</a>',
-    "Website truncated correctly when 1 character longer than allowed." );
+  %tt_vars = $guide->display_node( id => "West Croydon Station$postfix",
+                                      return_tt_vars => 1 );
+  is( $tt_vars{formatted_website_text}, '<a href="' . $prefix
+      . '://www.example.com/bar/" class="external">example.com/bar/</a>',
+      "Trailing slash not stripped unless it's immediately after domain name");
 
-$config->website_link_max_chars( 27 );
-%tt_vars = $guide->display_node( id => "North Croydon Station",
-                                 return_tt_vars => 1 );
-is( $tt_vars{formatted_website_text},
-'<a href="http://longer.example.com/asdfasdf" class="external">longer.example.com/asdfasdf</a>',
-    "Website not truncated when exact length allowed." );
+  %tt_vars = $guide->display_node( id => "North Croydon Station$postfix",
+                                      return_tt_vars => 1 );
+  is( $tt_vars{formatted_website_text}, '<a href="' . $prefix
+      . '://longer.example.com/asdfasdf" class="external">'
+      . 'longer.example.co...</a>',
+      uc($prefix) . " website correctly truncated when much too long." );
 
-$config->website_link_max_chars( 28 );
-%tt_vars = $guide->display_node( id => "North Croydon Station",
-                                 return_tt_vars => 1 );
-is( $tt_vars{formatted_website_text},
-'<a href="http://longer.example.com/asdfasdf" class="external">longer.example.com/asdfasdf</a>',
-    "Website not truncated when 1 character shorter than allowed." );
+  # Make sure website isn't truncated unnecessarily, e.g. that we don't end up
+  # just replacing the final three characters with the ellipsis.  Our full URL
+  # has 27 characters (not counting the http://).
+  $config->website_link_max_chars( 26 );
+  %tt_vars = $guide->display_node( id => "North Croydon Station$postfix",
+                                   return_tt_vars => 1 );
+  is( $tt_vars{formatted_website_text}, '<a href="' . $prefix
+      . '://longer.example.com/asdfasdf" class="external">'
+      . 'longer.example.com/asdf...</a>',
+      uc($prefix) . " website truncated correctly when 1 character longer "
+      . "than allowed." );
+
+  $config->website_link_max_chars( 27 );
+  %tt_vars = $guide->display_node( id => "North Croydon Station$postfix",
+                                   return_tt_vars => 1 );
+  is( $tt_vars{formatted_website_text}, '<a href="' . $prefix
+      . '://longer.example.com/asdfasdf" class="external">'
+      . 'longer.example.com/asdfasdf</a>',
+      uc($prefix) . " website not truncated when exact length allowed." );
+
+  $config->website_link_max_chars( 28 );
+  %tt_vars = $guide->display_node( id => "North Croydon Station$postfix",
+                                   return_tt_vars => 1 );
+  is( $tt_vars{formatted_website_text}, '<a href="' . $prefix
+      . '://longer.example.com/asdfasdf" class="external">'
+      . 'longer.example.com/asdfasdf</a>',
+      uc($prefix) . " website not truncated when 1 character shorter "
+      . "than allowed." );
+}

@@ -4,7 +4,7 @@
       "David Dick <ddick@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,12 +34,12 @@
          "requires" : {
             "Carp" : "0",
             "Date::Easter" : "0",
-            "Time::Local" : "0",
+            "Time::Local" : "1.28",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.22",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

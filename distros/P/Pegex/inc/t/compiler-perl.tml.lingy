@@ -1,0 +1,29 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*pgx"],
+      ["==",
+        [".",
+          ["*","pgx"],
+          ["compile"],
+          ["ok"]],
+        ["True"],
+        "+: '{*pgx}' compiled"]],
+    ["%<>",["*pgx","*not"],
+      ["!=~",
+        [".",
+          ["*","pgx"],
+          ["compile"],
+          ["perl"]],
+        ["*","not"],
+        "+: No '{*not}'"]]],
+  "data": [
+    { "label": "Test 1",
+      "point": {
+        "pgx": "all: /\\x{FEFF}/\n",
+        "not": ["/","/u$"]}},
+    { "label": "Test 2",
+      "point": {
+        "pgx": "all: 'xxx' /\\x{FEFF}/ 'yyy'\n",
+        "not": ["/","/u$"]}}],
+  "bridge": {
+    "perl5": "use Pegex::Compiler;\nuse TestML::Boolean;\n\nsub compile {\n    my ($self, $pgx) = @_;\n    my $unit = Pegex::Compiler->new->compile($pgx);\n    return $unit;\n}\n\nsub ok {\n    my ($self, $compiled) = @_;\n    return $compiled->tree ? true : false;\n}\n\nsub perl {\n    my ($self, $compiled) = @_;\n    return $compiled->to_perl;\n}\n"}}

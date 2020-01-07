@@ -22,10 +22,11 @@ my %WriteMakefileArgs = (
     "version" => "0.82"
   },
   "TEST_REQUIRES" => {
+    "JSON::PP" => 0,
     "Test::More" => "0.88",
     "Test::Warn" => "0.23"
   },
-  "VERSION" => "0.83",
+  "VERSION" => "0.85",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,6 +36,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Digest::MD5" => 0,
   "File::Spec" => "0.8",
+  "JSON::PP" => 0,
   "Test::More" => "0.88",
   "Test::Warn" => "0.23",
   "version" => "0.82"
@@ -51,3 +53,39 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+use Config;
+use File::Find;
+
+my $file = 'inc/bin/testml-cpan';
+open IN, '<', $file or die "Can't open '$file' for input";
+my @bin = <IN>;
+close IN;
+
+shift @bin;
+unshift @bin, "#!$Config{perlpath}\n";
+open OUT, '>', $file or die "Can't open '$file' for output";
+print OUT @bin;
+close OUT;
+
+chmod 0755, 'inc/bin/testml-cpan';
+
+if ($^O eq 'MSWin32') {
+  my $file = 'inc/bin/testml-cpan.cmd';
+  open OUT, '>', $file or die "Can't open '$file' for output";
+  print OUT 'if exist "%~dpn0" perl %0 %*', "\r\n";
+  close OUT;
+
+  find sub {
+    return unless -f && /\.t$/;
+    my $file = $_;
+    open IN, '<', $file or die "Can't open '$file' for input";
+    return unless <IN> =~ /testml-cpan/;
+    my $text = do {local $/; <IN>};
+    close IN;
+    open OUT, '>', $file or die "Can't open '$file' for output";
+    print OUT '#!inc\\bin\\testml-cpan', "\r\n";
+    print OUT $text;
+    close OUT;
+  }, 't';
+}

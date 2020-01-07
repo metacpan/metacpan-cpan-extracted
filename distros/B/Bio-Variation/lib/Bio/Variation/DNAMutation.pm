@@ -97,7 +97,7 @@ methods. Internal methods are usually preceded with a _
 
 
 package Bio::Variation::DNAMutation;
-$Bio::Variation::DNAMutation::VERSION = '1.7.4';
+$Bio::Variation::DNAMutation::VERSION = '1.7.5';
 use strict;
 
 # Object preamble - inheritance

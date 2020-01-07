@@ -39,7 +39,7 @@ locales.size > 0 %][% FOREACH locale = locales %][% locale.name %][%-
 ", " UNLESS loop.last %][% END %][% END %]" />
   [% END %]
 
-  [% SET leaflet_version='0.7.5' %]
+  [% SET leaflet_version='1.1.0' %]
 
   [% IF stylesheet %]
     <link rel="stylesheet" href="[% stylesheet %]" type="text/css" title="Stylesheet for [% site_name %]" />
@@ -47,7 +47,7 @@ locales.size > 0 %][% FOREACH locale = locales %][% locale.name %][%-
     <link rel="stylesheet" href="[% config.static_url %]openguides-base.css" type="text/css" title="Basic OpenGuides stylesheet" />
   [% END %]
   [% IF config.use_leaflet %]
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-[% leaflet_version %]/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@[% leaflet_version %]/dist/leaflet.css">
   [% END %]
 
   [% IF feed_base %]
@@ -86,7 +86,7 @@ locales.size > 0 %][% FOREACH locale = locales %][% locale.name %][%-
       <script
          src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"
          type="text/javascript"></script>
-      <script src="http://cdn.leafletjs.com/leaflet-[% leaflet_version %]/leaflet.js"
+      <script src="https://unpkg.com/leaflet@[% leaflet_version %]/dist/leaflet.js"
               type="text/javascript"></script>
       <script src="[% config.static_url %]map-leaflet.js"
               type="text/javascript"></script>

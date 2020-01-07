@@ -1,0 +1,16 @@
+kind: pipeline
+name: default
+
+steps:
+  - name: Test with perl 5.28
+    image: gugod/perl-testbox:5.28
+    commands:
+      - cpanm --installdeps .
+      - yath --qvf
+      - mbtiny dist
+
+  - name: Install Distribution
+    image: perl:5.28.0
+    commands:
+      - ls -l
+      - cpanm -q *.tar.gz

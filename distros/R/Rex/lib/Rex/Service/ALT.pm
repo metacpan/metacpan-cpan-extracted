@@ -6,7 +6,7 @@ package Rex::Service::ALT;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use base qw(Rex::Service::Base);
 

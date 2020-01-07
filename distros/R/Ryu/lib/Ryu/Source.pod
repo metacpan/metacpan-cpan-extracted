@@ -331,9 +331,22 @@ Example:
 =head2 ordered_futures
 
 Given a stream of L<Future>s, will emit the results as each L<Future>
-is marked ready. If any fail, the stream will fail.
+is marked ready.
 
-This is a terrible name for a method, expect it to change.
+If any L<Future> in the stream fails, that will mark this source as failed,
+and all remaining L<Future> instances will be cancelled. To avoid this behaviour
+and leave the L<Future> instances active, use:
+
+ $src->map('without_cancel')
+     ->ordered_futures
+
+See L<Future/without_cancel> for more details.
+
+This method is also available as L</resolve>.
+
+=head2 resolve
+
+A synonym for L</ordered_futures>.
 
 =head2 concurrent
 
@@ -593,5 +606,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
 

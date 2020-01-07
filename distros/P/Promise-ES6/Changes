@@ -1,5 +1,9 @@
 Revision history for Perl module Promise::ES6
 
+0.17 Sun 5 Jan 2020
+- Optimization: remove extra call to isa(), and use $self rather than $_[0].
+  (Thank you, bdraco!)
+
 0.16 Tue 31 Dec 2019
 - Optimization: reuse coderefs in all() and race().
 

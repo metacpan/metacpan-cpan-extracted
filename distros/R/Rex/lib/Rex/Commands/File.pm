@@ -62,7 +62,7 @@ use strict;
 use warnings;
 use Fcntl;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;
@@ -416,7 +416,7 @@ sub file {
   Rex::get_current_connection()->{reporter}
     ->report_resource_start( type => "file", name => $file );
 
-  my $need_md5 = ( $option->{"on_change"} && !$is_directory ? 1 : 0 );
+  my $need_md5  = ( $option->{"on_change"} && !$is_directory ? 1 : 0 );
   my $on_change = $option->{"on_change"} || sub { };
 
   my $__ret = { changed => 0 };

@@ -3,38 +3,38 @@
 # Test setting color aliases via the environment.
 #
 # Copyright 2012 Stephen Thirlwall
-# Copyright 2012, 2014 Russ Allbery <rra@cpan.org>
+# Copyright 2012, 2014, 2020 Russ Allbery <rra@cpan.org>
 #
-# This program is free software; you may redistribute it and/or modify it
-# under the same terms as Perl itself.
+# SPDX-License-Identifier: GPL-1.0-or-later OR Artistic-1.0-Perl
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 
 use lib 't/lib';
 
-use Test::More;
 use Test::RRA qw(use_prereq);
+
+use Test::More;
 
 # Load prerequisite modules.
 use_prereq('Test::Warn');
 
 # Print out our plan.
-plan tests => 19;
+plan tests => 22;
 
 # Ensure we don't pick up a setting from the user's environment.
 delete $ENV{ANSI_COLORS_DISABLED};
 
-# Set up some custom color configuration.  The last four will produce warnings
-# on module load.
+# Set up some custom color configuration.  Some will produce warnings on
+# module load.
 my @COLOR_ALIASES = (
     ' custom_black = black',  'custom_red= red',
     'custom_green =green ',   'custom_blue=blue',
-    'custom_unknown=unknown', '=no_new',
-    'no_old=',                'no_equals',
-    'red=green',              'custom_test=red=blue',
-    'custom!test=red',
+    'custom_unknown=unknown', 'custom_multiple=blue on_green',
+    '=no_new',                'no_old=',
+    'no_equals',              'red=green',
+    'custom_test=red=blue',   'custom!test=red',
 );
 local $ENV{ANSI_COLORS_ALIASES} = join(q{,}, @COLOR_ALIASES);
 
@@ -76,6 +76,19 @@ for my $original (qw(black red green blue)) {
     is_deeply([uncolor(color($custom))],
         [$original], "...and uncolor returns $original");
 }
+
+# An alias can map to multiple colors.
+ok(colorvalid('custom_multiple'), 'custom_multiple is valid');
+is(
+    color('custom_multiple'),
+    color('blue', 'on_green'),
+    '...and works with color'
+);
+is(
+    colored('test', 'custom_multiple'),
+    colored('test', 'blue', 'on_green'),
+    '...and works with colored'
+);
 
 # custom_unknown is mapped to an unknown color and should not appear.
 is(colorvalid('custom_unknown'), undef, 'Unknown color mapping fails');

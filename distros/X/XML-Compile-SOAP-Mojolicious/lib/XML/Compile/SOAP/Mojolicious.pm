@@ -11,7 +11,7 @@ use strict;
 
 package XML::Compile::SOAP::Mojolicious;
 use vars '$VERSION';
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 use Log::Report 'xml-compile-soap-mojolicious';
 

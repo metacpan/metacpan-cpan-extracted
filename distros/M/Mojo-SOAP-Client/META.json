@@ -47,9 +47,7 @@
          }
       },
       "test" : {
-         "requires" : {
-            "Mojolicious::Plugin::SOAP::Server" : "0"
-         }
+         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -64,6 +62,6 @@
          "url" : "https://github.com/oposs/mojo-soap-client"
       }
    },
-   "version" : "v0.1.5",
+   "version" : "v0.1.6",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

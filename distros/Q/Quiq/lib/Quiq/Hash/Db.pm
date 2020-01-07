@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.168';
+our $VERSION = '1.169';
 
 use Fcntl ();
 use DB_File ();
@@ -22,6 +22,11 @@ Quiq::Hash::Db - Persistenter Hash
 =head1 BASE CLASS
 
 L<Quiq::Hash>
+
+=head1 DESCRIPTION
+
+Diese Klasse ist eine objektorientierte Überdeckung des Moduls DB_File,
+das eine Schnittstelle zu Berkeley DB 1.x darstellt.
 
 =head1 METHODS
 
@@ -159,7 +164,7 @@ sub close {
 
 =head1 VERSION
 
-1.168
+1.169
 
 =head1 AUTHOR
 

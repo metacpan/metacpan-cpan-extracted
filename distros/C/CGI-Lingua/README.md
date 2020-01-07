@@ -1,16 +1,10 @@
-[![Linux Build Status](https://travis-ci.org/nigelhorne/CGI-Lingua.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Lingua)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/aihulcqwr24so9ix/branch/master?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-lingua/branch/master)
-[![Dependency Status](https://dependencyci.com/github/nigelhorne/CGI-Lingua/badge)](https://dependencyci.com/github/nigelhorne/CGI-Lingua)
-[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/CGI-Lingua/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Lingua?branch=master)
-[![CPAN](https://img.shields.io/cpan/v/CGI-Lingua.svg)](http://search.cpan.org/~nhorne/CGI-Lingua/)
+# NAME
 
-# CGI::Lingua
-
-Create a multilingual web page
+CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.59
+Version 0.60
 
 # SYNOPSIS
 
@@ -72,17 +66,17 @@ This cache object is an object that understands get() and set() messages,
 such as a [CHI](https://metacpan.org/pod/CHI) object.
 
 Takes an optional parameter syslog, to log messages to
-[Sys::Syslog](https://metacpan.org/pod/Sys::Syslog).
+[Sys::Syslog](https://metacpan.org/pod/Sys%3A%3ASyslog).
 It can be a boolean to enable/disable logging to syslog, or a reference
 to a hash to be given to Sys::Syslog::setlogsock.
 
 Takes optional parameter logger, an object which is used for warnings
 and traces.
 This logger object is an object that understands warn() and trace()
-messages, such as a [Log::Log4perl](https://metacpan.org/pod/Log::Log4perl) object.
+messages, such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) object.
 
 Takes optional parameter info, an object which can be used to see if a CGI
-parameter is set, for example an [CGI::Info](https://metacpan.org/pod/CGI::Info) object.
+parameter is set, for example an [CGI::Info](https://metacpan.org/pod/CGI%3A%3AInfo) object.
 
 Since emitting warnings from a CGI class can result in messages being lost (you
 may forget to look in your server's log), or appearing to the client in
@@ -95,7 +89,7 @@ requested languages is supported, CGI::Lingua->language() looks in the IP
 address for the language to use.  This may be not what you want, so use this
 option to disable the feature.
 
-The optional parameter debug is passed on to [I18N::AcceptLanguage](https://metacpan.org/pod/I18N::AcceptLanguage).
+The optional parameter debug is passed on to [I18N::AcceptLanguage](https://metacpan.org/pod/I18N%3A%3AAcceptLanguage).
 
 ## language
 
@@ -164,7 +158,7 @@ or not it is supported.
 
 Returns the two character country code of the remote end in lower case.
 
-If [IP::Country](https://metacpan.org/pod/IP::Country), [Geo::IPfree](https://metacpan.org/pod/Geo::IPfree) or [Geo::IP](https://metacpan.org/pod/Geo::IP) is installed,
+If [IP::Country](https://metacpan.org/pod/IP%3A%3ACountry), [Geo::IPfree](https://metacpan.org/pod/Geo%3A%3AIPfree) or [Geo::IP](https://metacpan.org/pod/Geo%3A%3AIP) is installed,
 CGI::Lingua will make use of that, otherwise it will do a Whois lookup.
 If you do not have any of those installed I recommend you make use of the
 caching capability of CGI::Lingua.
@@ -177,7 +171,7 @@ which would be useful for default currency, date formatting etc.
 This method attempts to detect the information, but it is a best guess
 and is not 100% reliable.  But it's better than nothing ;-)
 
-Returns a [Locale::Object::Country](https://metacpan.org/pod/Locale::Object::Country) object.
+Returns a [Locale::Object::Country](https://metacpan.org/pod/Locale%3A%3AObject%3A%3ACountry) object.
 
 To be clear, if you're in the US and request the language in Spanish,
 and the site supports it, language() will return 'Spanish', and locale() will
@@ -200,8 +194,8 @@ automatically be notified of progress on your bug as I make changes.
 
 # SEE ALSO
 
-[Locale::Country](https://metacpan.org/pod/Locale::Country)
-[HTTP::BrowserDetect](https://metacpan.org/pod/HTTP::BrowserDetect)
+[Locale::Country](https://metacpan.org/pod/Locale%3A%3ACountry)
+[HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 
 # SUPPORT
 
@@ -227,6 +221,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2018 Nigel Horne.
+Copyright 2010-2020 Nigel Horne.
 
 This program is released under the following licence: GPL2

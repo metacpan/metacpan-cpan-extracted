@@ -78,7 +78,7 @@ $config->use_leaflet( 1 );
 $output = $guide->display_node( id => "Red Lion", return_output => 1 );
 unlike( $output, qr/<script.*I like using deprecated code/,
         "...but not when Leaflet switched on." );
-like( $output, qr|http://cdn.leafletjs.com/.*leaflet.js|,
+like( $output, qr|https://unpkg.com/leaflet.*leaflet.js|,
       "Leaflet JavaScript is included when Leaflet switched on." );
 like( $output, qr|http://example.com/static/map-leaflet.js|,
       "...as is our own Leaflet map JavaScript." );

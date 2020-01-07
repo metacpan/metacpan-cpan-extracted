@@ -61,7 +61,7 @@ methods. Internal methods are usually preceded with a _
 # Let the code begin...
 
 package Bio::Variation::SNP;
-$Bio::Variation::SNP::VERSION = '1.7.4';
+$Bio::Variation::SNP::VERSION = '1.7.5';
 use strict;
 use vars qw($AUTOLOAD);
 use Bio::Root::Root;

@@ -220,7 +220,6 @@ is($topics->[0], 'http://sojolicio.us/2/blog',
    'Filtered topics in RSS 3');
 is($dom->find('item')->size, 1, 'Filtered topics in RSS 4');
 
-
 # find topics in atom
 $dom = $dom->parse($atom);
 $topics = Mojolicious::Plugin::PubSubHubbub::_find_topics('atom', $dom);
@@ -360,6 +359,7 @@ $app->hook(
 $t->post_ok('/push' => {'Content-Type' => 'application/rss+xml'} => $rss)
   ->content_type_like(qr{^text/plain})
   ->status_is(204);
+
 
 # Next request
 $request_count++;

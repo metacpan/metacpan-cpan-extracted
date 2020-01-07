@@ -6,6 +6,8 @@ use strict;
 use warnings;
 use Test::Most;
 # use Test::NoWarnings;	# Win32::locale::Lexicon produces warnings
+use lib 't/lib';
+use MyLogger;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -46,33 +48,5 @@ unless(-e 't/online.enabled') {
 		ok(defined $l->language());
 		ok($l->language() eq 'Unknown');
 		ok($l->country() eq 'cn');
-	}
-}
-
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub trace {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
 	}
 }

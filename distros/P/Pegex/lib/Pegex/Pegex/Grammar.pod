@@ -8,7 +8,7 @@ See http://github.com/ingydotnet/swim-pm#readme
 
 =head1 NAME
 
-Pegex::Pegex::Name - Pegex Grammar for the Pegex Grammar Language
+Pegex::Pegex::Grammar - Pegex Grammar for the Pegex Grammar Language
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,7 @@ Ingy döt Net <ingy@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2010-2018. Ingy döt Net.
+Copyright 2010-2020. Ingy döt Net.
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

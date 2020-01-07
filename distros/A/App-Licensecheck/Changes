@@ -7,6 +7,15 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.39	2020-01-04
+
+ - Improve detection of CC licenses.
+ - improve logging; stop require MooX::Role::Logger
+ - optimize bsd detection (apparently case-insensitive match in unneeded)
+ - use hash interface of Regexp::Pattern and RE2 regexes; require
+   re:engine::RE2, and more recent Regexp::Pattern and
+   Regexp::Pattern::License
+
 v3.0.38	2020-01-03
 
  [ REGRESSIONS ]

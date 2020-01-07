@@ -143,6 +143,17 @@ as should C<resolved()> and C<rejected()>.
 
 =back
 
+=head1 KNOWN ISSUES
+
+=over
+
+=item * Interpreter-based threads may or may not work.
+
+=item * This module interacts badly with Perl’s fork() implementation on
+Windows. There may be a workaround possible, but none is implemented for now.
+
+=back
+
 =cut
 
 use Exporter 'import';
@@ -193,20 +204,27 @@ sub all {
     my $then_what= deferred();
     my $pending= 1;
     my $i= 0;
+
+    my $reject_now = sub {
+        if (!$failed++) {
+            $pending= 0;
+            $then_what->reject(@_);
+        }
+    };
+
     for my $p (@_) {
-        my $i= $i++;
-        $p->then(sub {
-            $values[$i]= \@_;
-            if ((--$remaining) == 0) {
-                $pending= 0;
-                $then_what->resolve(@values);
-            }
-        }, sub {
-            if (!$failed++) {
-                $pending= 0;
-                $then_what->reject(@_);
-            }
-        });
+        my $i = $i++;
+
+        $p->then(
+            sub {
+                $values[$i]= \@_;
+                if ((--$remaining) == 0) {
+                    $pending= 0;
+                    $then_what->resolve(@values);
+                }
+            },
+            $reject_now,
+        );
     }
     if (!$remaining && $pending) {
         $then_what->resolve(@values);
@@ -220,35 +238,34 @@ sub all {
 # Lifted from Promise::ES6
 sub race {
 
-    # Perl 5.16 and earlier leak memory when the callbacks are handled
-    # inside the closure here.
     my $deferred = deferred();
 
     my $is_done;
 
+    my $on_resolve_cr = sub {
+        return if $is_done;
+        $is_done = 1;
+
+        $deferred->resolve(@_);
+
+        # Proactively eliminate references:
+        undef $deferred;
+    };
+
+    my $on_reject_cr = sub {
+        return if $is_done;
+        $is_done = 1;
+
+        $deferred->reject(@_);
+
+        # Proactively eliminate references:
+        undef $deferred;
+    };
+
     for my $given_promise (@_) {
         last if $is_done;
 
-        $given_promise->then(
-            sub {
-                return if $is_done;
-                $is_done = 1;
-
-                $deferred->resolve(@_);
-
-                # Proactively eliminate references:
-                undef $deferred;
-            },
-            sub {
-                return if $is_done;
-                $is_done = 1;
-
-                $deferred->reject(@_);
-
-                # Proactively eliminate references:
-                undef $deferred;
-            }
-        );
+        $given_promise->then($on_resolve_cr, $on_reject_cr);
     }
 
     return $deferred->promise();

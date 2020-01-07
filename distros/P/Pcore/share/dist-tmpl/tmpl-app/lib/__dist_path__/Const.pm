@@ -1,11 +1,21 @@
 package <: $module_name ~ "::Const" :>;
 
 use Pcore -const, -export;
+use Pcore::App::API qw[:PERMS];
 
-our $EXPORT = { CONST => [qw[$USER_ACTION_TOKEN_EMAIL $USER_ACTION_TOKEN_PASSWORD]] };
+our $EXPORT = {
+    PERMS  => [qw[$PERMS_ANY_AUTHENTICATED_USER $PERMS_ADMIN $PERMS_USER]],
+    AVATAR => [qw[$DEFAULT_GRAVATAR_IMAGE $DEFAULT_AVATAR]],
+};
 
-const our $USER_ACTION_TOKEN_EMAIL    => 1;
-const our $USER_ACTION_TOKEN_PASSWORD => 2;
+# PERMISSIONS
+const our $PERMS_ADMIN => 'admin';
+const our $PERMS_USER  => 'user';
+const our $PERMS       => [ $PERMS_ADMIN, $PERMS_USER ];
+
+# AVATAR
+const our $DEFAULT_GRAVATAR_IMAGE => 'identicon';                                                                                   # url encoded url or 404, mp, identicon, monsterid, wavatar, retro, robohash, blank, used if email is provided, but has no gravatar associated
+const our $DEFAULT_AVATAR         => "https://s.gravatar.com/avatar/4732e01b487869e3e6d42c2720468036?d=$DEFAULT_GRAVATAR_IMAGE";    # noname@softvisio.net, used if no user email is provided
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -16,7 +26,7 @@ const our $USER_ACTION_TOKEN_PASSWORD => 2;
 ## |======+======================+================================================================================================================|
 ## |    3 | 1                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 12                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 16 does not match the package declaration       |
+## |    1 | 22                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 26 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -20,7 +20,39 @@ sub get_abs_path ( $self, $path ) {
 }
 
 sub get_nginx_cfg ($self) {
-    return;
+    my $tmpl = <<'NGINX';
+    # "<: $location :>"
+: if $location == '/' {
+    location =/ {
+        error_page 418 = @backend;
+        return 418;
+    }
+
+    location / {
+        rewrite ^/favicon.ico$ /cdn/favicon.ico last;
+        rewrite ^/robots.txt$ /cdn/robots.txt last;
+
+        error_page 418 = @backend;
+        return 418;
+    }
+: } else {
+    location =<: $location :> {
+        return 301 <: $location :>/;
+    }
+
+    location =<: $location :>/ {
+        error_page 418 = @backend;
+        return 418;
+    }
+
+    location <: $location :> {
+        error_page 418 = @backend;
+        return 418;
+    }
+: }
+NGINX
+
+    return P->tmpl->( \$tmpl, { location => $self->{path} } )->$*;
 }
 
 1;

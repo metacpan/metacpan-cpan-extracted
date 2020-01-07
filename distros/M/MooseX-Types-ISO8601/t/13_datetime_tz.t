@@ -7,7 +7,7 @@ use MooseX::Types::ISO8601 qw/
     ISO8601StrictDateTimeTZStr
 /;
 
-use Test::More;
+use Test::More 0.88;
 use Test::Deep;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 

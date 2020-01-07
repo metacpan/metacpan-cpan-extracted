@@ -54,7 +54,11 @@ foreach (qw(
 print $FH "\n#endif\n";
 close($FH);
 
-my $ccflags = join(' ', '-Wall -Wextra -fno-strict-aliasing', $cfg{cflags});
+my $workaround;
+if (-e '/etc/redhat-release' && $cfg{modversion} =~ /4.11/) {
+   $workaround = '-DPATCHED_RH';
+}
+my $ccflags = join(' ', '-Wall -Wextra -fno-strict-aliasing', $cfg{cflags}, "-DRPM_VERSON=$cfg{modversion}", $workaround);
 
 print "Found RPM version $cfg{modversion} (compiling with flags: $ccflags)\n";
 
@@ -74,6 +78,9 @@ WriteMakefile(
 	'meta-spec' => { version => 2 },
 	# For proper CPAN indexation:
 	provides => {
+	    'URPM' => {
+		file => 'URPM.pm',
+	    },
 	    'URPM::Resolve' => {
 		file => 'URPM/Resolve.pm',
 	    },

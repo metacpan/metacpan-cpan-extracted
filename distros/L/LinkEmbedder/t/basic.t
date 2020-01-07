@@ -5,8 +5,14 @@ use LinkEmbedder;
 plan skip_all => 'TEST_ONLINE=1'         unless $ENV{TEST_ONLINE};
 plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
 
-my $link;
 my $embedder = LinkEmbedder->new;
+my $link;
+
+$embedder->get_p('https://www.fortunecowsay.com/')->then(sub { $link = shift })->wait;
+is ref($link), 'LinkEmbedder::Link::Basic', 'LinkEmbedder::Link::Basic';
+my $html = Mojo::DOM->new($link->TO_JSON->{html});
+ok $html->at('div.le-paste.le-provider-fortunecowsay.le-rich'), 'fortunecowsay wrapper';
+like $html->at('pre')->text, qr{\|\|-+w\s*\|}, 'the cow has legs';
 
 $embedder->get_p('https://catoverflow.com/cats/r4cIt4z.gif')->then(sub { $link = shift })->wait;
 is ref($link), 'LinkEmbedder::Link::Basic', 'LinkEmbedder::Link::Basic';

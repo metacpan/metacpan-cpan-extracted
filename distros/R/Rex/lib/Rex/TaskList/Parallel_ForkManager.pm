@@ -9,7 +9,7 @@ package Rex::TaskList::Parallel_ForkManager;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use Data::Dumper;
 use Rex::Logger;
@@ -35,6 +35,8 @@ sub run {
   }
 
   my $fm = Parallel::ForkManager->new( $self->get_thread_count($task) );
+  $fm->set_waitpid_blocking_sleep(
+    Rex::Config->get_waitpid_blocking_sleep_time );
   my $all_servers = $task->server;
 
   $fm->run_on_finish(

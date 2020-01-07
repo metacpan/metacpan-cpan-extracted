@@ -1,8 +1,8 @@
-                              podlators 4.13
+                              podlators 4.14
              (format POD source into various output formats)
                 Maintained by Russ Allbery <rra@cpan.org>
 
-  Copyright 1999-2010, 2012-2019 Russ Allbery <rra@cpan.org>.  This
+  Copyright 1999-2010, 2012-2020 Russ Allbery <rra@cpan.org>.  This
   software is distributed under the same terms as Perl itself.  Please see
   the section LICENSE below for more information.
 
@@ -152,7 +152,7 @@ LICENSE
   The podlators package as a whole is covered by the following copyright
   statement and license:
 
-    Copyright 1999-2010, 2012-2019 Russ Allbery <rra@cpan.org>
+    Copyright 1999-2010, 2012-2020 Russ Allbery <rra@cpan.org>
 
     This program is free software; you may redistribute it and/or modify
     it under the same terms as Perl itself.  This means that you may

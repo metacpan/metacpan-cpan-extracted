@@ -10,6 +10,10 @@ use Test::Mojo;
 use Mojo::Util qw(dumper);
 use Mojo::SOAP::Client;
 
+eval "use Mojolicious::Plugin::SOAP::Server";
+
+plan skip_all => "Mojolicious::Plugin::SOAP::Server required for end2end test" if $@;
+
 my $t = Test::Mojo->new(
     curfile->sibling('exsoaple.pl'));
 

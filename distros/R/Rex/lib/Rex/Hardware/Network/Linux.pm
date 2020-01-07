@@ -9,7 +9,7 @@ package Rex::Hardware::Network::Linux;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;
@@ -51,7 +51,7 @@ sub get_bridge_devices {
 sub get_network_devices {
 
   my $command = can_run('ip') ? 'ip addr show' : 'ifconfig -a';
-  my @output = i_run( "$command", fail_ok => 1 );
+  my @output  = i_run( "$command", fail_ok => 1 );
 
   my $devices =
     ( $command eq 'ip addr show' )
@@ -67,7 +67,7 @@ sub get_network_configuration {
   my $device_info = {};
 
   my $command = can_run('ip') ? 'ip addr show' : 'ifconfig -a';
-  my @output = i_run( "$command", fail_ok => 1 );
+  my @output  = i_run( "$command", fail_ok => 1 );
 
   my $br_data = get_bridge_devices();
 

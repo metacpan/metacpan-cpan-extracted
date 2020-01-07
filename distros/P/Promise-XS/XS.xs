@@ -116,6 +116,9 @@ typedef struct {
     xspr_callback_queue_t* queue_tail;
     int in_flush;
     int backend_scheduled;
+#ifdef USE_ITHREADS
+    tTHX owner;
+#endif
     SV* conversion_helper;
     SV* pxs_flush_cr;
     HV* pxs_stash;
@@ -354,7 +357,8 @@ void _call_pv_with_args( pTHX_ const char* subname, SV** args, unsigned argscoun
     PUSHMARK(SP);
     EXTEND(SP, argscount);
 
-    for (unsigned i=0; i<argscount; i++) {
+    unsigned i;
+    for (i=0; i<argscount; i++) {
         PUSHs(args[i]);
     }
 
@@ -734,9 +738,10 @@ MODULE = Promise::XS     PACKAGE = Promise::XS
 
 BOOT:
 {
-    /* XXX: do we need a CLONE? */
-
     MY_CXT_INIT;
+#ifdef USE_ITHREADS
+    MY_CXT.owner = aTHX;
+#endif
     MY_CXT.queue_head = NULL;
     MY_CXT.queue_tail = NULL;
     MY_CXT.in_flush = 0;
@@ -750,6 +755,61 @@ BOOT:
     MY_CXT.deferral_arg = NULL;
     MY_CXT.pxs_flush_cr = NULL;
 }
+
+#ifdef USE_ITHREADS
+
+# ithreads would seem to be a very bad idea in Promise-based code,
+# but anyway ..
+
+void
+CLONE(...)
+    PPCODE:
+
+        SV* conversion_helper = NULL;
+        SV* pxs_flush_cr = NULL;
+        SV* deferral_cr = NULL;
+        SV* deferral_arg = NULL;
+
+        {
+            dMY_CXT;
+
+            CLONE_PARAMS params = {NULL, 0, MY_CXT.owner};
+
+            if ( MY_CXT.conversion_helper ) {
+                conversion_helper = sv_dup_inc( MY_CXT.conversion_helper, &params );
+            }
+
+            if ( MY_CXT.pxs_flush_cr ) {
+                pxs_flush_cr = sv_dup_inc( MY_CXT.pxs_flush_cr, &params );
+            }
+
+            if ( MY_CXT.deferral_cr ) {
+                deferral_cr = sv_dup_inc( MY_CXT.deferral_cr, &params );
+            }
+
+            if ( MY_CXT.deferral_arg ) {
+                deferral_arg = sv_dup_inc( MY_CXT.deferral_arg, &params );
+            }
+        }
+
+        {
+            MY_CXT_CLONE;
+            MY_CXT.owner = aTHX;
+
+            // Clone SVs
+            MY_CXT.conversion_helper = conversion_helper;
+            MY_CXT.pxs_flush_cr = pxs_flush_cr;
+            MY_CXT.deferral_cr = deferral_cr;
+            MY_CXT.deferral_arg = deferral_arg;
+
+            // Clone HVs
+            MY_CXT.pxs_stash = gv_stashpv(PROMISE_CLASS, FALSE);
+            MY_CXT.pxs_deferred_stash = gv_stashpv(DEFERRED_CLASS, FALSE);
+        }
+
+        XSRETURN_UNDEF;
+
+#endif /* USE_ITHREADS */
 
 #SV *
 #resolved(...)
@@ -769,6 +829,8 @@ BOOT:
 #----------------------------------------------------------------------
 
 MODULE = Promise::XS     PACKAGE = Promise::XS::Deferred
+
+PROTOTYPES: DISABLE
 
 SV *
 create()
@@ -930,8 +992,11 @@ DESTROY(SV *self_sv)
         xspr_promise_decref(aTHX_ self->promise);
         Safefree(self);
 
+# ----------------------------------------------------------------------
 
 MODULE = Promise::XS     PACKAGE = Promise::XS::Promise
+
+PROTOTYPES: DISABLE
 
 void
 then(SV* self_sv, ...)
@@ -990,7 +1055,9 @@ DESTROY(SV* self_sv)
 
             SV* warn_args[1 + rejection->count];
             warn_args[0] = self_sv;
-            for (unsigned i=0; i<rejection->count; i++) {
+
+            unsigned i;
+            for (i=0; i<rejection->count; i++) {
                 warn_args[1 + i] = rejection->results[i];
             }
 

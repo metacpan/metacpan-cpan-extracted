@@ -6,7 +6,7 @@ use Pcore::App::API qw[:ROOT_USER];
 with qw[Pcore::App::API::Backend::Local];
 
 sub _db_add_schema_patch ( $self, $dbh ) {
-    $dbh->load_schema( $ENV->{share}->get_location('/Pcore/dbh/api/pgsql'), 'api' );
+    $dbh->load_schema( $ENV->{share}->get_location('/Pcore/db/api/pgsql'), 'api' );
 
     return;
 }

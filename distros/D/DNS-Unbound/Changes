@@ -1,5 +1,9 @@
 Revision history for Perl module DNS::Unbound
 
+0.16 Sun, 5 Jan 2020
+- Fix use with old libunbound versions.
+- (undocumented) experimental support for promise engines besides Promise::ES6
+
 0.15 Thu, 2 Jan 2020
 - Add DNSSEC setup (i.e., trust anchor) methods.
 

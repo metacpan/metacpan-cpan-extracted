@@ -20,8 +20,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Bio::Variation",
   "PREREQ_PM" => {
-    "Bio::DB::EMBL" => 0,
-    "Bio::DB::GenBank" => 0,
     "Bio::DBLinkContainerI" => 0,
     "Bio::PrimarySeq" => 0,
     "Bio::Root::IO" => 0,
@@ -49,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.7.4",
+  "VERSION" => "1.7.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,8 +55,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Bio::DB::EMBL" => 0,
-  "Bio::DB::GenBank" => 0,
   "Bio::DBLinkContainerI" => 0,
   "Bio::PrimarySeq" => 0,
   "Bio::Root::IO" => 0,

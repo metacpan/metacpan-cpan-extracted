@@ -1,3 +1,6 @@
+1.20200107 2020-01-07 UTC
+  - Fix for BIMI records using multiple txt parts
+
 1.20200103 2020-01-03 UTC
   - Fix tests for perl 5.20
 

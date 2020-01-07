@@ -1,0 +1,29 @@
+---
+abstract: 'Perl extension for use localized date'
+author:
+  - 'Nikolay Shulyakovskiy <shulyakovskiy at mail.ru>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateLocale
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Locale::Messages: 0
+  POSIX: 0
+  perl: 5.8.8
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: https://github.com/Nikolo/perl-DateLocale
+version: '1.46'

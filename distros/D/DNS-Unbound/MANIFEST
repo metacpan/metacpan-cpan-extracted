@@ -10,12 +10,17 @@ examples/anyevent.pl
 examples/io_async.pl
 lib/DNS/Unbound.pm
 lib/DNS/Unbound/AsyncQuery.pm
+lib/DNS/Unbound/AsyncQuery/AnyEventXSPromises.pm
+lib/DNS/Unbound/AsyncQuery/PromiseES6.pm
+lib/DNS/Unbound/AsyncQuery/PromiseXS.pm
 lib/DNS/Unbound/Result.pm
 lib/DNS/Unbound/X.pm
 lib/DNS/Unbound/X/BadDebugFD.pm
 lib/DNS/Unbound/X/Base.pm
 lib/DNS/Unbound/X/ResolveError.pm
 t/async.t
+t/async_anyevent_xspromises.t
+t/async_promise_xs.t
 t/asyncquery.t
 t/convenience.t
 t/debuglevel.t

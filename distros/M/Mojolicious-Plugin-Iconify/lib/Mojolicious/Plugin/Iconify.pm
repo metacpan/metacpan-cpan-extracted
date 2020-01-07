@@ -1,10 +1,10 @@
 package Mojolicious::Plugin::Iconify;
 
 use Mojo::Base 'Mojolicious::Plugin';
-use Mojo::DOM::HTML 'tag_to_html';
+use Mojo::DOM::HTML;
 use Mojo::ByteStream;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub register {
 
@@ -79,7 +79,7 @@ sub register {
     );
 }
 
-sub _tag { Mojo::ByteStream->new( tag_to_html(@_) ) }
+sub _tag { Mojo::ByteStream->new( Mojo::DOM::HTML::tag_to_html(@_) ) }
 
 __END__
 

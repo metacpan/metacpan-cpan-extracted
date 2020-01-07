@@ -103,6 +103,17 @@ Why the name?
 
       * 流 was too hard for me to type
 
+METHODS
+
+    Note that you're more likely to find useful methods in the following
+    classes:
+
+      * Ryu::Source
+
+      * Ryu::Sink
+
+      * Ryu::Observable
+
  from
 
     Helper method which returns a Ryu::Source from a list of items.
@@ -169,10 +180,11 @@ SEE ALSO
 
 AUTHOR
 
-    Tom Molesworth <TEAM@cpan.org>
+    Tom Molesworth <TEAM@cpan.org> with contributions from Mohammad S
+    Anwar, Michael Mueller, Zak Elep and Mohanad Zarzour.
 
 LICENSE
 
-    Copyright Tom Molesworth 2011-2019. Licensed under the same terms as
+    Copyright Tom Molesworth 2011-2020. Licensed under the same terms as
     Perl itself.
 

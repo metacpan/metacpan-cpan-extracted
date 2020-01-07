@@ -6,6 +6,7 @@ lib/Rose/DB/Constants.pm
 lib/Rose/DB/Generic.pm
 lib/Rose/DB/Informix.pm
 lib/Rose/DB/MySQL.pm
+lib/Rose/DB/MariaDB.pm
 lib/Rose/DB/Oracle.pm
 lib/Rose/DB/Pg.pm
 lib/Rose/DB/Registry.pm
@@ -25,6 +26,7 @@ t/lib/My/DB.pm
 t/lib/My/FixUp.pm
 t/list-tables.t
 t/make-subclass-tests.pl
+t/mariadb.t
 t/mysql.t
 t/no-registry.t
 t/oracle.t
@@ -39,6 +41,7 @@ t/storable.t
 t/subclass-basic.t
 t/subclass-informix.t
 t/subclass-list-tables.t
+t/subclass-mariadb.t
 t/subclass-mysql.t
 t/subclass-oracle.t
 t/subclass-pg.t

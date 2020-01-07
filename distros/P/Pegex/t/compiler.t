@@ -1,9 +1,9 @@
 #!inc/bin/testml-cpan
 
-Plan = 23
 
 *grammar.compile.yaml == *grammar.bootstrap-compile.yaml
-  :"$BlockLabel - Compiler output matches bootstrap?"
+  :"Compiler output matches bootstrap? - +"
+
 
 === Single Regex
 --- grammar

@@ -1,6 +1,5 @@
 #!inc/bin/testml-cpan
 
-Plan = 2
 
 parse-to-tree(*grammar, *input).yaml.clean == *tree
   :"+ - Pegex::Tree"

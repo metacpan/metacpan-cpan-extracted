@@ -1,77 +1,67 @@
-use strict;
-use warnings;
-
-use Test::More tests => 18;
-use Try::Tiny;
+use Modern::Perl "2010";
+use Test::More;
+use Test::Exception;
 use Bitcoin::Crypto::Config;
 
-BEGIN { use_ok('Bitcoin::Crypto::PrivateKey') };
+BEGIN { use_ok('Bitcoin::Crypto::Key::Private') };
 
 my %cases = qw(
-    641ce7ab9a2ec7697f32d3ade425d9785e8f23bea3501524852cda3ca05fae28
-    04394fde5115357067c1d728210fc43aa1573ed52522b6f6d560fe29f1d0d1967c52ad62fe0b27e5acc0992fc8509e5041a06064ce967200b0b7288a4ab889bf22
-    b7331fd4ff8c53d31fa7d1625df7de451e55dc53337db64bee3efadb7fdd28d9
-    043992aa3f9deda22c02d05ca01a55d8f717d7464bb11ef43b59fc36c32613d0205f34f4ef398da815711d8917b804d429f395af403d52cd4b65b76839c88da442
+	641ce7ab9a2ec7697f32d3ade425d9785e8f23bea3501524852cda3ca05fae28
+	04394fde5115357067c1d728210fc43aa1573ed52522b6f6d560fe29f1d0d1967c52ad62fe0b27e5acc0992fc8509e5041a06064ce967200b0b7288a4ab889bf22
+	b7331fd4ff8c53d31fa7d1625df7de451e55dc53337db64bee3efadb7fdd28d9
+	043992aa3f9deda22c02d05ca01a55d8f717d7464bb11ef43b59fc36c32613d0205f34f4ef398da815711d8917b804d429f395af403d52cd4b65b76839c88da442
 );
 
-my $PrivateKey = "Bitcoin::Crypto::PrivateKey";
+my $PrivateKey = "Bitcoin::Crypto::Key::Private";
+# silence warnings
+local $SIG{__WARN__} = sub {};
 
 # Basic creation of public keys - 4 tests
 for my $key (keys %cases) {
-    my $privkey = $PrivateKey->fromHex($key);
-    is($privkey->toHex(), $key, "imported and exported correctly");
-    is($privkey->getPublicKey()->toHex(), $cases{$key}, "correctly created public key");
+	my $privkey = $PrivateKey->from_hex($key)->set_compressed(0);
+	is($privkey->to_hex(), $key, "imported and exported correctly");
+	is($privkey->get_public_key()->to_hex(), $cases{$key}, "correctly created public key");
 }
 
 my @keylist = keys %cases;
-my $privkey = $PrivateKey->fromHex($keylist[0]);
-my $pubkey = $privkey->getPublicKey();
+my $privkey = $PrivateKey->from_hex($keylist[0])->set_compressed(0);
+my $pubkey = $privkey->get_public_key();
 
 # Message signing - 3 tests
 my $message = "Perl test script";
-my $signature = $privkey->signMessage($message);
+my $signature = $privkey->sign_message($message);
 
-ok($privkey->verifyMessage($message, $signature), "Valid signature");
-ok($pubkey->verifyMessage($message, $signature), "Pubkey recognizes signature");
+# ok($privkey->sign_message($message) eq $signature, "Signatures generation should be deterministic")
+# 	or diag("Signatures generation seems to be nondeterministic, which is a possible private key security threat");
 
-my $privkey2 = $PrivateKey->fromHex($keylist[1]);
-my $pubkey2 = $privkey2->getPublicKey();
+ok($privkey->verify_message($message, $signature), "Valid signature");
+ok($pubkey->verify_message($message, $signature), "Pubkey recognizes signature");
 
-ok(!$pubkey2->verifyMessage($message, $signature), "Different pubkey doesn't recognize signature");
+my $privkey2 = $PrivateKey->from_hex($keylist[1]);
+my $pubkey2 = $privkey2->get_public_key();
+
+ok(!$pubkey2->verify_message($message, $signature), "Different pubkey doesn't recognize signature");
 
 # WIF import / export - 4 tests
 my $wif_raw_key = "972e85e7e3345cb7e6a5f812aa5f5bea82005e3ded7b32d9d56f5ab2504f1648";
 my $wif = "5JxsKGzCoJwaWEjQvfNqD4qPEoUQ696BUEq68Y68WQ2GNR6zrxW";
 my $testnet_wif = "92jVu1okPY1iUJEhZ1Gk5fPLtTq7FJdNpBh3DASdr8mK9SZXqy3";
-
-is($PrivateKey->fromWif($wif)->toHex(), $wif_raw_key, "imported WIF correctly");
-is($PrivateKey->fromHex($wif_raw_key)->toWif(), $wif, "exported WIF correctly");
-is($PrivateKey->fromWif($testnet_wif)->network->{name}, "Bitcoin Testnet", "Recognized non-default network");
-is($PrivateKey->fromWif($testnet_wif)->toHex(), $wif_raw_key, "imported non-default network WIF correctly");
-is($PrivateKey->fromWif($testnet_wif)->getPublicKey()->network->{name}, "Bitcoin Testnet", "Passed network to public key");
-
-# Mnemonic import / export - 2 tests
-my $mnemonic_raw_key = "b792d0a08067d186ffd9d14e8d964843cc55a91d";
-my $mnemonic = "resource notable choice absorb laptop sell youth demand excess hole must maple shed stand item";
-
-is($PrivateKey->fromBip39Mnemonic($mnemonic)->toHex(), $mnemonic_raw_key, "imported mnemonic correctly");
-is($PrivateKey->fromHex($mnemonic_raw_key)->toBip39Mnemonic(), $mnemonic, "exported mnemonic correctly");
+is($PrivateKey->from_wif($wif)->to_hex(), $wif_raw_key, "imported WIF correctly");
+is($PrivateKey->from_hex($wif_raw_key)->set_compressed(0)->to_wif(), $wif, "exported WIF correctly");
+is($PrivateKey->from_wif($testnet_wif)->network->{name}, "Bitcoin Testnet", "Recognized non-default network");
+is($PrivateKey->from_wif($testnet_wif)->to_hex(), $wif_raw_key, "imported non-default network WIF correctly");
+is($PrivateKey->from_wif($testnet_wif)->get_public_key()->network->{name}, "Bitcoin Testnet", "Passed network to public key");
 
 # Key length testing - 3 tests
 my $short_key = "e8d964843cc55a91d";
 my $longer_key = "d0a08067d186ffd9d14e8d964843cc55a91d";
 my $too_long_key = "a3bc641ce7ab9a2ec7697f32d3ade425d9785e8f23bea3501524852cda3ca05fae28";
 
-is(length $PrivateKey->fromHex($short_key)->toBytes(), $config{key_min_length}, "Short key length OK");
-is((length($PrivateKey->fromHex($longer_key)->toBytes()) - $config{key_min_length}) % $config{key_length_step}, 0, "Longer key length OK");
+is(length $PrivateKey->from_hex($short_key)->to_bytes(), $config{key_max_length}, "Short key length OK");
+is(length $PrivateKey->from_hex($longer_key)->to_bytes(), $config{key_max_length}, "Longer key length OK");
 
-try {
-    $PrivateKey->fromHex($too_long_key);
-    fail("Too long key was accepted");
-} catch {
-    if (m/[0-9]+ bytes/) {
-        pass("Too long key got rejected");
-    } else {
-        fail("Too long key failed with unknown reason");
-    }
-};
+throws_ok {
+	$PrivateKey->from_hex($too_long_key);
+} "Bitcoin::Crypto::Exception::KeyCreate", "Too long key got rejected";
+
+done_testing;

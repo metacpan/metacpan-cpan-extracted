@@ -103,7 +103,7 @@ methods. Internal methods are usually preceded with a _
 
 
 package Bio::Variation::VariantI;
-$Bio::Variation::VariantI::VERSION = '1.7.4';
+$Bio::Variation::VariantI::VERSION = '1.7.5';
 use strict;
 # Object preamble - inheritance
 

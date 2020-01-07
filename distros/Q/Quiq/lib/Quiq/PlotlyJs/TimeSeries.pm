@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.168';
+our $VERSION = '1.169';
 
 use Quiq::Json;
 use Quiq::Template;
@@ -117,6 +117,10 @@ Windgeschwindigkeits-Messung)
 
 =over 4
 
+=item color => $color (Default: 'rgb(255,0,0,1)')
+
+Farbe der Kurve.
+
 =item name => $name (Default: 'plot')
 
 Name des Plot. Der Name wird als CSS-Id für den Div-Container
@@ -178,6 +182,7 @@ sub new {
     # @_: @attVal
 
     my $self = $class->SUPER::new(
+        color => 'rgb(255,0,0,1)',
         name => 'plot',
         shape => 'spline',
         title => undef,
@@ -279,8 +284,8 @@ sub js {
 
     # Objektattribute
 
-    my ($name,$shape,$title,$xA,$xTickFormat,$yA,$yMin,$yMax,
-        $yTitle) = $self->get(qw/name shape title x xTickFormat
+    my ($color,$name,$shape,$title,$xA,$xTickFormat,$yA,$yMin,$yMax,
+        $yTitle) = $self->get(qw/color name shape title x xTickFormat
         y yMin yMax yTitle/);
 
     # Erzeuge JSON-Code
@@ -296,7 +301,7 @@ sub js {
         fillcolor => 'rgb(230,230,230,0.1)',
         line => $j->o(
             width => 1,
-            color => 'rgb(255,0,0,1)',
+            color => $color,
             shape => $shape,
         ),
         x => $xA,
@@ -371,7 +376,7 @@ sub js {
             __EXTRA__ => $extra,
         ],
         template => q~
-            Plotly.newPlot('__NAME__',[__TRACES__],__LAYOUT__,__EXTRA__);
+            var __NAME__ = Plotly.newPlot('__NAME__',[__TRACES__],__LAYOUT__,__EXTRA__);
         ~,
     );
 }
@@ -380,7 +385,7 @@ sub js {
 
 =head1 VERSION
 
-1.168
+1.169
 
 =head1 AUTHOR
 

@@ -1,8 +1,8 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # Test Pod::Man UTF-8 handling, with and without PerlIO.
 #
-# Copyright 2002, 2004, 2006, 2008-2010, 2012, 2014-2015, 2018-2019
+# Copyright 2002, 2004, 2006, 2008-2010, 2012, 2014-2015, 2018-2020
 #     Russ Allbery <rra@cpan.org>
 #
 # This program is free software; you may redistribute it and/or modify it

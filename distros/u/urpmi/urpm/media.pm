@@ -4,7 +4,7 @@ package urpm::media;
 use strict;
 use urpm qw(file_from_local_medium is_local_medium);
 use urpm::msg;
-use urpm::util qw(any append_to_file basename cat_ difference2 dirname intersection member output_safe begins_with copy_and_own file_size offset_pathname reduce_pathname);
+use urpm::util qw(any append_to_file basename cat_ difference2 dirname intersection member output_safe begins_with copy_and_own file_size offset_pathname reduce_pathname uefi_type);
 use urpm::removable;
 use urpm::lock;
 use urpm::md5sum;
@@ -551,12 +551,14 @@ sub write_urpmi_cfg {
     };
     remove_passwords_and_write_private_netrc($urpm, $config);
 
-    # urpmi.cfg must be world-readable, else mgaapplet won't be able to read it
-    # as it is executed from the user session. We enforce umask here in the case
-    # where the msec security level is set to 'secure' (which means umask 077).
-    umask 0022;
+    #- urpmi.cfg must be world-readable, else mgaapplet and urpm* commands run as
+    #- a normal user won't be able to read it. We enforce umask here in the case
+    #- where the msec security level is set to 'secure' (which means umask 077)
+    #- or where we are run from a gdm-x-session (mga#24636)
+    my $old_umask = umask 0022;
     urpm::cfg::dump_config($urpm->{config}, $config)
 	or $urpm->{fatal}(6, N("unable to write config file [%s]", $urpm->{config}));
+    umask $old_umask;
 
     $urpm->{log}(N("wrote config file [%s]", $urpm->{config}));
 
@@ -761,45 +763,57 @@ sub _auto_update_media {
 
 =item needed_extra_media($urpm)
 
-Return 2 booleans telling whether nonfree & tainted packages are installed respectively.
+Return 3 booleans telling whether nonfree & tainted & i?86 packages are installed respectively.
 
 =cut
 
 sub needed_extra_media {
     my ($urpm) = @_;
     my $db = urpm::db_open_or_die_($urpm);
-    my ($nonfree, $tainted);
+    my ($nonfree, $tainted, $add32bit);
     $db->traverse(sub {
 	my ($pkg) = @_;
-	return if $nonfree && $tainted;
+	return if $nonfree && $tainted && $add32bit;
 	my $rel = $pkg->release;
 	$nonfree ||= $rel =~ /nonfree$/;
 	$tainted ||= $rel =~ /tainted$/;
+	$add32bit ||= $pkg->arch =~ /i.86/;
     });
-    ($nonfree, $tainted);
+    ($nonfree, $tainted, $add32bit);
 }
 
 sub is_media_to_add_by_default {
-    my ($urpm, $distribconf, $medium, $product_id, $nonfree, $tainted) = @_;
+    my ($urpm, $distribconf, $medium, $product_id, $nonfree, $tainted, $add32bit) = @_;
     my $add_by_default = !$distribconf->getvalue($medium, 'noauto');
     my @media_types = split(':', $distribconf->getvalue($medium, 'media_type'));
     return $add_by_default if !@media_types;
+    my $non_regular_medium = intersection(\@media_types, [ qw(backports debug source testing) ]);
     if ($product_id->{product} eq 'Free') {
 	if (member('non-free', @media_types)) {
 	    $urpm->{log}(N("ignoring non-free medium `%s'", $medium));
 	    $add_by_default = 0;
 	}
     } else {
-	my $non_regular_medium = intersection(\@media_types, [ qw(backports debug source testing) ]);
 	if (!$add_by_default && !$non_regular_medium) {
 	    my $medium_name = $distribconf->getvalue($medium, 'name') || '';
-	    if ($medium_name =~ /Nonfree/ && $nonfree) {
+            # Don't enable 32-bit media by default on 64-bit systems (mga#24376). '32bit' only appears
+            # in the medium name in the 64-bit media info, so we can simply filter on that.
+	    if ($medium_name =~ /Nonfree/ && ($add32bit || $medium_name !~ /32bit/) && $nonfree) {
 		$add_by_default = 1;
 		$urpm->{log}(N("un-ignoring non-free medium `%s' b/c nonfree packages are installed", $medium_name));
 	    }
-	    if ($medium_name =~ /Tainted/ && $tainted) {
+	    if ($medium_name =~ /Tainted/ && ($add32bit || $medium_name !~ /32bit/) && $tainted) {
 		$add_by_default = 1;
 		$urpm->{log}(N("un-ignoring tainted medium `%s' b/c tainted packages are installed", $medium_name));
+	    }
+	}
+    }
+    if ($add32bit) {
+	if (!$add_by_default && !$non_regular_medium) {
+	    my $medium_name = $distribconf->getvalue($medium, 'name') || '';
+	    if ($medium_name =~ /Core/ && $medium_name =~ /32bit/) {
+		$add_by_default = 1;
+		$urpm->{log}(N("un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is 32-bit EFI", $medium_name));
 	    }
 	}
     }
@@ -960,12 +974,18 @@ sub add_medium {
 	$medium->{$_} = $options{$_} if exists $options{$_};
     }
 
+    #- The medium files must be world-readable, else mgaapplet and urpm* commands run
+    #- as a normal user won't be able to read them. We enforce umask here in the case
+    #- where the msec security level is set to 'secure' (which means umask 077) or
+    #- where we are run from a gdm-x-session (mga#24636)
+    my $old_umask = umask 0022;
     #- those files must not be there (cf mdvbz#36267)
     _clean_statedir_medium_files($urpm, $medium);
     if (!($options{virtual} && _local_file($medium))
 	  && !$urpm->{urpmi_root}) { # with --urpmi-root, we do not use statedir_media_info_file to allow compatibility with older urpmi
 	mkdir statedir_media_info_dir($urpm, $medium), 0755;
     }
+    umask $old_umask;
 
     if ($options{virtual}) {
 	$medium->{virtual} = 1;
@@ -1142,7 +1162,19 @@ sub add_distrib_media {
 
     require urpm::mirrors;
     my $product_id = urpm::mirrors::parse_LDAP_namespace_structure(cat_('/etc/product.id'));
-    my ($nonfree, $tainted) = needed_extra_media($urpm);
+    my ($nonfree, $tainted, $add32bit) = needed_extra_media($urpm);
+
+    # On 32-bit UEFI systems, enable 32-bit media to allow 32-bit grub2-efi to be installed/updated.
+    $add32bit ||= $distribconf->getvalue('media_info', 'arch') eq 'x86_64' && uefi_type() eq 'ia32';
+
+    if (!$add32bit) {
+        # If the 'Core 32bit Release' medium is automatically enabled, allow the 32bit nonfree
+        # and tainted media to be enabled as well (mga#24438).
+        foreach my $medium ($distribconf->listmedia) {
+            next if $distribconf->getvalue($medium, 'name') ne 'Core 32bit Release';
+            $add32bit ||= !$distribconf->getvalue($medium, 'noauto');
+        }
+    }
 
     foreach my $media ($distribconf->listmedia) {
         my $media_name = $distribconf->getvalue($media, 'name') || '';
@@ -1160,7 +1192,7 @@ sub add_distrib_media {
 	    $is_update_media or next;
 	}
 
-        my $add_by_default = is_media_to_add_by_default($urpm, $distribconf, $media, $product_id, $nonfree, $tainted);
+        my $add_by_default = is_media_to_add_by_default($urpm, $distribconf, $media, $product_id, $nonfree, $tainted, $add32bit);
 
 	my $ignore;
         if ($options{ask_media}) {

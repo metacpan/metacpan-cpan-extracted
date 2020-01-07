@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.168';
+our $VERSION = '1.169';
 
 use Quiq::Path;
 
@@ -1432,7 +1432,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.168
+1.169
 
 =head1 AUTHOR
 

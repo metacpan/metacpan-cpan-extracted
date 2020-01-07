@@ -7,6 +7,9 @@ License: GPL
 Group: Application/Development
 BuildRoot: %{_tmppath}/%{name}-root
 
+# For CPAN testers that run FreeBSD (RT#131162)
+%global __brp_strip_static_archive %nil
+
 %description
 test rpm
 

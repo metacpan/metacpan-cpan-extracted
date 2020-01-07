@@ -4,13 +4,15 @@ use 5.010;
 
 WriteMakefile
  ( NAME	 	=> 'XML::Compile::SOAP::Mojolicious'
- , VERSION	=> '0.05'
+ , VERSION	=> '0.06'
  , PREREQ_PM    =>
    { XML::Compile::SOAP   => '3.16'
    , Log::Report          => '1.05'
    , Time::HiRes          => 0
    , HTTP::Message        => '6.06'
    , Mojolicious          => '8.25'
+   , XML::Compile::WSDL11 => '3.00',
+   , XML::Compile::SOAP12 => '3.00',
    }
  , AUTHOR       => 'Mark Overmeer <markov@overmeer.net>'
  , ABSTRACT     => 'SOAP with Mojolicious'

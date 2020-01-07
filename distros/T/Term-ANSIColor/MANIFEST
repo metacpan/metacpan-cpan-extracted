@@ -21,8 +21,8 @@ t/data/perltidyrc
 t/docs/pod-coverage.t
 t/docs/pod-spelling.t
 t/docs/pod.t
+t/docs/spdx-license.t
 t/docs/synopsis.t
-t/docs/urls.t
 t/lib/Test/RRA.pm
 t/lib/Test/RRA/Config.pm
 t/module/aliases-env.t
@@ -31,11 +31,14 @@ t/module/basic.t
 t/module/basic256.t
 t/module/eval.t
 t/module/stringify.t
+t/module/true-color.t
 t/style/coverage.t
 t/style/critic.t
 t/style/minimum-version.t
+t/style/obsolete-strings.t
 t/style/strict.t
 t/taint/basic.t
 THANKS
+TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -2,7 +2,7 @@ package OpenGuides::Template;
 
 use strict;
 use vars qw( $VERSION );
-$VERSION = '0.21';
+$VERSION = '0.22';
 
 use Carp qw( croak );
 use CGI; # want to get rid of this and put the burden on the templates
@@ -190,7 +190,8 @@ sub output {
 
     if ($args{node}) {
         $tt_vars->{node_name} = CGI->escapeHTML($args{node});
-        $tt_vars->{node_param} = CGI->escape($args{wiki}->formatter->node_name_to_node_param($args{node}));
+        $tt_vars->{node_param} = OpenGuides::CGI->escape(
+            $args{wiki}->formatter->node_name_to_node_param( $args{node} ) );
     }
 
     # Now set further TT variables if explicitly supplied - do this after the
@@ -328,6 +329,8 @@ sub extract_metadata_vars {
         foreach ( $categories_text, $locales_text ) {
             s/</&lt;/g;
             s/>/&gt;/g;
+            # Underscores aren't allowed in node names - change them to spaces.
+            s/_+/ /g;
         }
 
         # Trim leading and trailing spaces, collapse internal whitespace.
@@ -368,13 +371,13 @@ sub extract_metadata_vars {
     my $website = $args{metadata} ? $metadata{website}[0]
                                   : $q->param("website");
     # Do truncation for website name display.  Max length of field is set in
-    # conf file (website_link_max_chars).  Leading http:// and www. if present
-    # is stripped; trailing / is also stripped if it's the only / in the URL.
+    # conf file (website_link_max_chars).  Leading http(s):// and www. are
+    # stripped; trailing / is also stripped if it's the only / in the URL.
     my $formatted_website_text = "";
     if ( $website && $website ne "http://" && is_web_uri( $website ) ) {
         my $maxlen = $config->website_link_max_chars;
         my $trunc_website = $website;
-        $trunc_website =~ s|http://(www.)?||;
+        $trunc_website =~ s|https?://(www.)?||;
         if ( $trunc_website =~ tr|/|| == 1 ) {
             $trunc_website =~ s|/$||;
         }

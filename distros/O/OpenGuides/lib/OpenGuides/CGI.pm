@@ -1,7 +1,7 @@
 package OpenGuides::CGI;
 use strict;
 use vars qw( $VERSION );
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 use Carp qw( croak );
 use CGI;
@@ -146,6 +146,23 @@ sub extract_node_name {
 
     my $formatter = $args{wiki}->formatter;
     return $formatter->node_param_to_node_name( $param );
+}
+
+=item B<escape>
+
+    my $param = OpenGuides::CGI->escape( "foo?!!??!?!" );
+
+Does exactly the same as L<CGI>->escape (that is, encodes a string so it can
+safely be included in a URL), but doesn't escape commas (because it's not
+necessary, and looks ugly).
+
+=cut
+
+sub escape {
+    my ($class, $string) = @_;
+    my $ret = CGI->escape( $string );
+    $ret =~ s/%2C/,/gs;
+    return $ret;
 }
 
 =item B<check_spaces_redirect>

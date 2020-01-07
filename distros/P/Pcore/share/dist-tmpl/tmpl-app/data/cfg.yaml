@@ -1,58 +1,6 @@
-# api auth db connect uri, if not specified - no authentication will be used
-auth: pgsql://postgres:1@devel?db=test-api
-
 # database connect uri
-db: pgsql://postgres:1@devel?db=test
-
-# node config
-node:
-
-    # node server configuration
-    # if not defined or HashRef - local node server will be started
-    # if string - remote server uri
-    # eg:
-    # //<token>@/<path-to-unix-socket>
-    # //<token>@127.0.0.1:9999
-    # //<token>@ - no host / path specified, local server will be started
-    server:
-
-    # node listen address, if not defined - local listen address will be generated
-    # see node server uri examples above
-    listen:
-
-cdn:
-    native_cdn: 0
-    resources:
-        - Pcore-CDN-Static
-        - <: $dist_name :>
-    locations:
-        static:
-            bucket: s3
-            path: static
-            cache_control: public, max-age=30672000
-        <: $dist_path :>-static:
-            bucket: s3
-            path: <: $dist_path :>/static
-            cache_control: public, max-age=30672000
-        content:
-            bucket: local
-            path: <: $dist_path :>/dynamic
-            cache_control: public, private, must-revalidate, proxy-revalidate
-    buckets:
-        local:
-            type: local
-            locations:
-: my $DATA_DIR_VAR = "<: $DATA_DIR :>"
-                - <: $DATA_DIR_VAR | raw :>/cdn
-                - <: $dist_name :>
-                - Pcore-CDN-Static-Data
-        s3:
-            type: digitalocean
-            bucket:
-            region: nyc3
-            key:
-            secret:
-            edge_links: 0
+db: sqlite:<: "<: $DATA_DIR :>/db.sqlite" | raw :>
+# db: pgsql://postgres:1@devel?db=test
 
 smtp:
     username: no-reply@softvisio.net
@@ -62,10 +10,3 @@ smtp:
     tls: 1
     to:
     cc:
-
-xmpp:
-    username: no-reply@softvisio.net
-    password:
-    host: talk.google.com
-    port: 5222
-    to:

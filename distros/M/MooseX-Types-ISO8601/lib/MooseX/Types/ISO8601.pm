@@ -1,7 +1,7 @@
-package MooseX::Types::ISO8601; # git description: v0.17-8-g110e890
+package MooseX::Types::ISO8601; # git description: v0.18-18-gbfe141b
 # ABSTRACT: ISO8601 date and duration string type constraints and coercions for Moose
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use strict;
 use warnings;
@@ -49,14 +49,21 @@ use MooseX::Types 0.10 -declare => [qw(
     ISO8601DateTimeDurationStr
 )];
 
-my $date_re =       qr/^(\d{4})-(\d{2})-(\d{2})$/;
-my $time_re =                               qr/^(\d{2}):(\d{2}):(\d{2})(?:(?:\.|,)(\d+))?Z?$/;
-my $datetime_re =   qr/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:(?:\.|,)(\d+))?Z?$/;
-my $datetimetz_re = qr/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:(?:\.|,)(\d+))?((?:(?:\+|-)\d\d:\d\d)|Z)$/;
+my $date_re =       qr/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/;
+my $time_re =                               qr/^([0-9]{2}):([0-9]{2}):([0-9]{2})(?:(?:\.|,)([0-9]+))?Z?$/;
+my $datetime_re =   qr/^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})(?:(?:\.|,)([0-9]+))?Z?$/;
+my $datetimetz_re = qr/^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})(?:(?:\.|,)([0-9]+))?((?:(?:\+|-)[0-9][0-9]:[0-9][0-9])|Z)$/;
 
 subtype ISO8601DateStr,
     as Str,
-    where { /$date_re/ };
+    where { /$date_re/ },
+    ( $Moose::VERSION >= 2.0200
+        ? inline_as {
+            $_[0]->parent()->_inline_check( $_[1] ) . ' && '
+                . qq{ $_[1] =~ /$date_re/ };
+        }
+        : ()
+    );
 
 # XXX TODO: this doesn't match all the ISO Time formats in the spec:
 # hhmmss
@@ -65,22 +72,55 @@ subtype ISO8601DateStr,
 # hh:mm
 subtype ISO8601TimeStr,
     as Str,
-    where { /$time_re/ };
+    where { /$time_re/ },
+    ( $Moose::VERSION >= 2.0200
+        ? inline_as {
+            $_[0]->parent()->_inline_check( $_[1] ) . ' && '
+                . qq{ $_[1] =~ /$time_re/ };
+        }
+        : ()
+    );
 
 subtype ISO8601DateTimeStr,
     as Str,
-    where { /$datetime_re/ };
+    where { /$datetime_re/ },
+    ( $Moose::VERSION >= 2.0200
+        ? inline_as {
+            $_[0]->parent()->_inline_check( $_[1] ) . ' && '
+                . qq{ $_[1] =~ /$datetime_re/ };
+        }
+        : ()
+    );
 
 # XXX TODO: this doesn't match these offset indicators:
 # ±hhmm
 # ±hh
 subtype ISO8601DateTimeTZStr,
     as Str,
-    where { /$datetimetz_re/ };
+    where { /$datetimetz_re/ },
+    ( $Moose::VERSION >= 2.0200
+        ? inline_as {
+            $_[0]->parent()->_inline_check( $_[1] ) . ' && '
+                . qq{ $_[1] =~ /$datetimetz_re/ };
+        }
+        : ()
+     );
+
+my $inlined_parse_datetime_format = <<'EOF';
+    (eval {
+        Module::Runtime::use_module('DateTime::Format::ISO8601')->parse_datetime(%s)
+    })->$Safe::Isa::_isa('DateTime')
+EOF
 
 subtype ISO8601StrictDateStr,
     as ISO8601DateStr,
-    where { (try { use_module('DateTime::Format::ISO8601')->parse_datetime($_) })->$_isa('DateTime') };
+    where { (try { use_module('DateTime::Format::ISO8601')->parse_datetime($_) })->$_isa('DateTime') },
+    ( $Moose::VERSION >= 2.0200
+        ? inline_as {
+            $_[0]->parent()->_inline_check( $_[1] ) . ' && ' . sprintf($inlined_parse_datetime_format, $_[1]);
+        }
+        : ()
+    );
 
 subtype ISO8601StrictTimeStr,
     as ISO8601TimeStr,
@@ -88,15 +128,41 @@ subtype ISO8601StrictTimeStr,
         (   try { use_module('DateTime::Format::ISO8601')->parse_datetime($_) }
          || try { DateTime::Format::ISO8601->parse_time($_) }
         )->$_isa('DateTime')
-    };
+    },
+    ( $Moose::VERSION >= 2.0200
+        ? inline_as {
+            $_[0]->parent()->_inline_check( $_[1] ) . ' && ('
+            . sprintf($inlined_parse_datetime_format, $_[1])
+            . <<"EOF"
+                ||
+                (eval {
+                    DateTime::Format::ISO8601->parse_time($_[1]) }
+                )->\$Safe::Isa::_isa('DateTime')
+            )
+EOF
+        }
+        : ()
+    );
 
 subtype ISO8601StrictDateTimeStr,
     as ISO8601DateTimeStr,
-    where { (try { use_module('DateTime::Format::ISO8601')->parse_datetime($_) })->$_isa('DateTime') };
+    where { (try { use_module('DateTime::Format::ISO8601')->parse_datetime($_) })->$_isa('DateTime') },
+    ( $Moose::VERSION >= 2.0200
+        ? inline_as {
+            $_[0]->parent()->_inline_check( $_[1] ) . ' && ' . sprintf($inlined_parse_datetime_format, $_[1]);
+        }
+        : ()
+    );
 
 subtype ISO8601StrictDateTimeTZStr,
     as ISO8601DateTimeTZStr,
-    where { (try { use_module('DateTime::Format::ISO8601')->parse_datetime($_) })->$_isa('DateTime') };
+    where { (try { use_module('DateTime::Format::ISO8601')->parse_datetime($_) })->$_isa('DateTime') },
+    ( $Moose::VERSION >= 2.0200
+        ? inline_as {
+            $_[0]->parent()->_inline_check( $_[1] ) . ' && ' . sprintf($inlined_parse_datetime_format, $_[1]);
+        }
+        : ()
+    );
 
 
 # TODO: According to ISO 8601:2004(E), the lowest order components may be
@@ -104,20 +170,41 @@ subtype ISO8601StrictDateTimeTZStr,
 # a decimal fraction.  We don't support these both together, you may only have
 # a fraction on the seconds component.
 
-my $timeduration_re = qr/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d{0,2})(?:(?:\.|,)(\d+))?S)?$/;
+my $timeduration_re = qr/^PT(?:([0-9]+)H)?(?:([0-9]+)M)?(?:([0-9]{0,2})(?:(?:\.|,)([0-9]+))?S)?$/;
 subtype ISO8601TimeDurationStr,
     as Str,
-    where { grep { looks_like_number($_) } /$timeduration_re/; };
+    where { grep { looks_like_number($_) } /$timeduration_re/; },
+    ( $Moose::VERSION >= 2.0200
+        ? inline_as {
+            $_[0]->parent()->_inline_check( $_[1] ) . ' && ' .
+            "grep { Scalar::Util::looks_like_number(\$_) } $_[1] =~ /$timeduration_re/"
+        }
+        : ()
+    );
 
-my $dateduration_re = qr/^P(?:(\d+)Y)?(?:(\d{1,2})M)?(?:(\d{1,2})D)?$/;
+my $dateduration_re = qr/^P(?:([0-9]+)Y)?(?:([0-9]{1,2})M)?(?:([0-9]{1,2})D)?$/;
 subtype ISO8601DateDurationStr,
     as Str,
-    where { grep { looks_like_number($_) } /$dateduration_re/ };
+    where { grep { looks_like_number($_) } /$dateduration_re/ },
+    ( $Moose::VERSION >= 2.0200
+        ? inline_as {
+            $_[0]->parent()->_inline_check( $_[1] ) . ' && ' .
+            "grep { Scalar::Util::looks_like_number(\$_) } $_[1] =~ /$dateduration_re/"
+        }
+        : ()
+    );
 
-my $datetimeduration_re = qr/^P(?:(\d+)Y)?(?:(\d{1,2})M)?(?:(\d{1,2})D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d{0,2})(?:(?:\.|,)(\d+))?)S)?$/;
+my $datetimeduration_re = qr/^P(?:([0-9]+)Y)?(?:([0-9]{1,2})M)?(?:([0-9]{1,2})D)?(?:T(?:([0-9]+)H)?(?:([0-9]+)M)?(?:([0-9]{0,2})(?:(?:\.|,)([0-9]+))?)S)?$/;
 subtype ISO8601DateTimeDurationStr,
     as Str,
-    where { grep { looks_like_number($_) } /$datetimeduration_re/ };
+    where { grep { looks_like_number($_) } /$datetimeduration_re/ },
+    ( $Moose::VERSION >= 2.0200
+        ? inline_as {
+            $_[0]->parent()->_inline_check( $_[1] ) . ' && ' .
+            "grep { Scalar::Util::looks_like_number(\$_) } $_[1] =~ /$datetimeduration_re/"
+        }
+        : ()
+    );
 
 {
     my %coerce = (
@@ -157,7 +244,7 @@ subtype ISO8601DateTimeDurationStr,
         ISO8601DateStr, sub { $_[0]->ymd('-') },
         ISO8601DateTimeStr, sub { die "cannot coerce non-UTC time" if ($_[0]->offset!=0); $_[0]->ymd('-') . 'T' . $_[0]->hms(':') . 'Z' },
         ISO8601DateTimeTZStr, sub {
-            DateTime::TimeZone->offset_as_string($_[0]->offset) =~ /(.\d\d)(\d\d)/;
+            DateTime::TimeZone->offset_as_string($_[0]->offset) =~ /(.[0-9][0-9])([0-9][0-9])/;
             $_[0]->ymd('-') . 'T' . $_[0]->hms(':') . "$1:$2"
         },
     );
@@ -182,18 +269,18 @@ subtype ISO8601DateTimeDurationStr,
 {
     my %coerce = (
         ISO8601TimeStr, sub {
-            $_ =~ s/^(\d\d) \:? (\d\d) \:? (\d\d([\.\,]\d+)?) (([+-]00\:?(00)?)|Z) $
+            $_ =~ s/^([0-9][0-9]) \:? ([0-9][0-9]) \:? ([0-9][0-9]([\.\,][0-9]+)?) (([+-]00\:?(00)?)|Z) $
                     /${1}:${2}:${3}Z/x;
             return $_;
         },
         ISO8601DateStr, sub {
-            $_ =~ s/^(\d{4}) \-? (\d\d) \-? (\d\d)$
+            $_ =~ s/^([0-9]{4}) \-? ([0-9][0-9]) \-? ([0-9][0-9])$
                     /${1}-${2}-${3}/x;
             return $_;
         },
         ISO8601DateTimeStr, sub {
-            $_ =~ s/^(\d{4}) \-? (\d\d) \-? (\d\d)
-                    T(\d\d) \:? (\d\d) \:? (\d\d([\.\,]\d+)?)
+            $_ =~ s/^([0-9]{4}) \-? ([0-9][0-9]) \-? ([0-9][0-9])
+                    T([0-9][0-9]) \:? ([0-9][0-9]) \:? ([0-9][0-9]([\.\,][0-9]+)?)
                     (([+-]00\:?(00)?)|Z)$
                     /${1}-${2}-${3}T${4}:${5}:${6}Z/x;
             return $_;
@@ -304,7 +391,7 @@ MooseX::Types::ISO8601 - ISO8601 date and duration string type constraints and c
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -463,11 +550,11 @@ accuracy. A full stop character is used as the decimal separator, which is
 allowed, but deprecated in preference to the comma character in
 I<ISO 8601:2004>.
 
-=head1 BUGS
+=head1 LIMITATIONS
 
-Probably full of them, patches are very welcome.
+This module is probably full of bugs; patches are very welcome.
 
-Specifically missing features:
+Specifically, there are missing features:
 
 =over 4
 
@@ -493,21 +580,50 @@ Tests are rubbish.
 
 =over 4
 
+=item *
 
+L<MooseX::Types::DateTime>
+
+=item *
+
+L<DateTime>
+
+=item *
+
+L<DateTime::Duration>
+
+=item *
+
+L<DateTime::Format::ISO8601>
+
+=item *
+
+L<DateTime::Format::Duration>
+
+=item *
+
+L<http://en.wikipedia.org/wiki/ISO_8601>
+
+=item *
+
+L<http://dotat.at/tmp/ISO_8601-2004_E.pdf>
 
 =back
 
-* L<MooseX::Types::DateTime>
-* L<DateTime>
-* L<DateTime::Duration>
-* L<DateTime::Format::ISO8601>
-* L<DateTime::Format::Duration>
-* L<http://en.wikipedia.org/wiki/ISO_8601>
-* L<http://dotat.at/tmp/ISO_8601-2004_E.pdf>
-
 =head1 ACKNOWLEDGEMENTS
 
-The development of this code was sponsored by my employer L<http://www.state51.co.uk>.
+The development of this code was sponsored by my (Tom's) employer L<http://www.state51.co.uk>.
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Types-ISO8601>
+(or L<bug-MooseX-Types-ISO8601@rt.cpan.org|mailto:bug-MooseX-Types-ISO8601@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://lists.perl.org/list/moose.html>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHORS
 
@@ -525,7 +641,7 @@ Dave Lambley <davel@state51.co.uk>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Dave Lambley zebardy Aaron Moses Gregory Oschwald
+=for stopwords Karen Etheridge Dave Lambley zebardy Gregory Oschwald Mark Fowler
 
 =over 4
 
@@ -543,11 +659,11 @@ zebardy <zebardy@gmail.com>
 
 =item *
 
-Aaron Moses <zebardy@gmail.com>
+Gregory Oschwald <goschwald@maxmind.com>
 
 =item *
 
-Gregory Oschwald <goschwald@maxmind.com>
+Mark Fowler <mark@twoshortplanks.com>
 
 =back
 

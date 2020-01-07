@@ -4,7 +4,7 @@
       "Thierry Vignaud"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -54,6 +54,15 @@
          }
       }
    },
+   "provides" : {
+      "urpm" : {
+         "file" : "urpm.pm",
+         "version" : "0"
+      },
+      "urpmi" : {
+         "file" : "urpm.pm"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -62,6 +71,6 @@
          "web" : "http://gitweb.mageia.org/software/rpm/urpmi/"
       }
    },
-   "version" : "v8.115",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v8.120.1",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

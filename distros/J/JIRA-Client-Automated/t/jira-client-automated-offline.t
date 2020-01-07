@@ -269,6 +269,54 @@ subtest 'get_issue' => sub {
         'request ok') or explain $issue;
 };
 
+subtest 'update_issue' => sub {
+    my $request;
+    my $ua = Test::MockModule->new('LWP::UserAgent');
+    $ua->mock(request => dispatch(
+        'issue/createmeta' => sub {
+            return HTTP::Response->new('200', 'OK', [], $json->encode(createmeta()));
+        },
+        'issue/MyProject-123' => sub {
+            my $request = shift;
+            
+            if( $request->method eq 'GET'){
+                my $body = _get_issue();
+                return HTTP::Response->new('200', 'OK', [], $json->encode($body));
+            }
+            else { # It is a PUT request from update call
+                my $content = $json->decode($request->content);
+                
+                # Intercept PUT request and verify fields were updated as expected
+                ok( !exists $content->{fields}->{Group}, "Group field removed from fields");
+                is $content->{fields}->{customfield_11883}->{id}, 13108, "Group converted to customfield correctly";
+                
+                ok( !exists $content->{update}->{COS}, "COS key removed from update");
+                is( $content->{update}->{customfield_11882}->[0]->{set}->{value}, 'Expedite', "COS converted to customfield correctly");
+                
+                ok( exists $content->{update}->{customfield_12685});
+                is $content->{update}->{customfield_12685}->[0]->{set}->{value}, 'AG', "Using customfield id directly still working";
+                
+                # Return a issue body
+                my $body = _get_issue();
+                return HTTP::Response->new('200', 'OK', [], $json->encode($body));
+            }
+            
+        },
+    ));
+
+    # Update issue - tests are completed as part of the mock intercept defined above
+    $jira->update_issue(
+        'MyProject-123', 
+        { 'Group' => 'DBA' },
+        {
+            'COS' => [ { set => { value => 'Expedite' }}],
+            'customfield_12685' => [ { set => { value => 'AG' }}]
+        }  
+    );
+
+    
+};
+
 done_testing();
 
 sub createmeta {

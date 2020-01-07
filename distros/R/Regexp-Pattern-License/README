@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.1.95
+    Version v3.1.99
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -369,6 +369,27 @@ STRUCTURE
     *   family:zlib
 
         Pattern covers a license part of a family of licenses.
+
+    *   license:contains:grant
+
+        License mentions a preferred form for granting the license.
+
+        This implies that license is commonly granted by use of a different
+        (typically far shorter) text.
+
+    *   license:contains:license:*
+
+        License contains another license.
+
+        Wildcard is the key to corresponding license pattern.
+
+    *   license:contains:name:*
+
+        License mentions name of another license.
+
+    *   license:is:grant
+
+        License is commonly granted by stating the whole license.
 
     *   type:combo
 

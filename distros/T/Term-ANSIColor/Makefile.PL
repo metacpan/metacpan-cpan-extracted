@@ -5,13 +5,12 @@
 # backards-compatible Makefile.PL, this way normal releases test the same
 # build system that is used for Perl core.
 #
-# Copyright 1999, 2000, 2001, 2008, 2010, 2012, 2014, 2015, 2016
+# Copyright 1999-2001, 2008, 2010, 2012, 2014-2016, 2020
 #     Russ Allbery <rra@cpan.org>
 #
-# This program is free software; you may redistribute it and/or modify it
-# under the same terms as Perl itself.
+# SPDX-License-Identifier: GPL-1.0-or-later OR Artistic-1.0-Perl
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 
@@ -29,7 +28,7 @@ my %metadata = (
     AUTHOR           => 'Russ Allbery <rra@cpan.org>',
     LICENSE          => 'perl_5',
     VERSION_FROM     => 'lib/Term/ANSIColor.pm',
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.008',
     realclean        => { FILES => 'MANIFEST.bak cover_db' },
 
     # Older versions of ExtUtils::MakeMaker don't pick up nested test

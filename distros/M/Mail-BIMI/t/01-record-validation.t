@@ -8,12 +8,30 @@ use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Record;
 
-plan tests => 9;
+plan tests => 12;
 
 is_deeply(
   test_record( 'v=bimi1; l=https://bimi.example.com/marks/file.svg', 'example.com', 'default' ),
   [ 1, [] ],
   'Valid record'
+);
+
+is_deeply(
+  test_record( 'v=bimi1; l=https://bimi.example.com/marks/file.svg;', 'example.com', 'default' ),
+  [ 1, [] ],
+  'Valid record with terminator'
+);
+
+is_deeply(
+  test_record( 'v=bimi1; l=https://bimi.example.com/marks/file.svg; a=', 'example.com', 'default' ),
+  [ 1, [] ],
+  'Valid record with a'
+);
+
+is_deeply(
+  test_record( 'v=bimi1; l=https://bimi.example.com/marks/file.svg; a=;', 'example.com', 'default' ),
+  [ 1, [] ],
+  'Valid record with a and terminator'
 );
 
 is_deeply(

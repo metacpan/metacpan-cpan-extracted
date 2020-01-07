@@ -9,7 +9,7 @@ package Rex::CMDB::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use Rex::Helper::Path;
 

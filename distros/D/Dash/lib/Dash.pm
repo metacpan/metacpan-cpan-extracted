@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.04';    # VERSION
+our $VERSION = '0.05';    # VERSION
 
 # ABSTRACT: Analytical Web Apps in Perl (Port of Plotly's Dash to Perl)
 
@@ -97,10 +97,16 @@ sub startup {
             my $c            = shift;
             my $dependencies = [];
             for my $callback ( @{ $self->callbacks } ) {
-
-                # TODO Handle state
-                my $rendered_callback = { state => [], clientside_function => JSON::null };
-                my $inputs            = [];
+                my $rendered_callback = { clientside_function => JSON::null };
+                my $states            = [];
+                for my $state ( @{ $callback->{State} } ) {
+                    my $rendered_state = { id       => $state->{component_id},
+                                           property => $state->{component_property}
+                    };
+                    push @$states, $rendered_state;
+                }
+                $rendered_callback->{state} = $states;
+                my $inputs = [];
                 for my $input ( @{ $callback->{Inputs} } ) {
                     my $rendered_input = { id       => $input->{component_id},
                                            property => $input->{component_property}
@@ -132,6 +138,16 @@ sub startup {
                 for my $callback_input ( @{ $callback->{Inputs} } ) {
                     my ( $component_id, $component_property ) = @{$callback_input}{qw(component_id component_property)};
                     for my $change_input ( @{ $request->{inputs} } ) {
+                        my ( $id, $property, $value ) = @{$change_input}{qw(id property value)};
+                        if ( $component_id eq $id && $component_property eq $property ) {
+                            push @callback_arguments, $value;
+                            last;
+                        }
+                    }
+                }
+                for my $callback_input ( @{ $callback->{State} } ) {
+                    my ( $component_id, $component_property ) = @{$callback_input}{qw(component_id component_property)};
+                    for my $change_input ( @{ $request->{state} } ) {
                         my ( $id, $property, $value ) = @{$change_input}{qw(id property value)};
                         if ( $component_id eq $id && $component_property eq $property ) {
                             push @callback_arguments, $value;
@@ -414,7 +430,7 @@ Dash - Analytical Web Apps in Perl (Port of Plotly's Dash to Perl)
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

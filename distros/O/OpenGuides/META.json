@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "perl_5"
    ],
@@ -82,7 +82,7 @@
    "provides" : {
       "OpenGuides" : {
          "file" : "lib/OpenGuides.pm",
-         "version" : "0.82"
+         "version" : "0.83"
       },
       "OpenGuides::Build" : {
          "file" : "lib/OpenGuides/Build.pm",
@@ -90,7 +90,7 @@
       },
       "OpenGuides::CGI" : {
          "file" : "lib/OpenGuides/CGI.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "OpenGuides::Config" : {
          "file" : "lib/OpenGuides/Config.pm",
@@ -118,7 +118,7 @@
       },
       "OpenGuides::Template" : {
          "file" : "lib/OpenGuides/Template.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "OpenGuides::Test" : {
          "file" : "lib/OpenGuides/Test.pm",
@@ -126,7 +126,7 @@
       },
       "OpenGuides::Utils" : {
          "file" : "lib/OpenGuides/Utils.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -144,5 +144,5 @@
       "x_IRC" : "irc://irc.perl.org/#openguides",
       "x_MailingList" : "openguides-dev@lists.openguides.org"
    },
-   "version" : "0.82"
+   "version" : "0.83"
 }

@@ -429,19 +429,19 @@ sub test_minMax : Test(6) {
 
 # -----------------------------------------------------------------------------
 
-sub test_meanValue : Test(3) {
+sub test_average : Test(3) {
     my $self = shift;
 
     my $arr = Quiq::Array->new;
-    my $x = $arr->meanValue;
+    my $x = $arr->average;
     $self->ok(!defined $x);
 
     $arr = Quiq::Array->new([qw/18 21 21 27 27 27 30 31 45/]);
-    $x = $arr->meanValue;
+    $x = $arr->average;
     $x = Quiq::Math->roundTo($x,2);
     $self->is($x,27.44);
 
-    $x = Quiq::Array->meanValue([qw/18 21 21 27 27 27 30 31 45/]);
+    $x = Quiq::Array->average([qw/18 21 21 27 27 27 30 31 45/]);
     $x = Quiq::Math->roundTo($x,2);
     $self->is($x,27.44);
 }

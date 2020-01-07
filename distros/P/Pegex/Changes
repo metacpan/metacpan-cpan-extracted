@@ -1,3 +1,11 @@
+0.72 Sun Jan  5 14:03:42 PST 2020
+ - Apply https://github.com/ingydotnet/pegex-pm/pull/75 (for real) Fix
+   P::P::Grammar title - not "::Name" @mohawk2++
+
+0.71 Sun Jan  5 10:59:17 PST 2020
+ - Apply https://github.com/ingydotnet/pegex-pm/pull/75 Fix P::P::Grammar
+   title - not "::Name" @mohawk2++
+
 0.70 Sun Nov 11 16:47:51 PST 2018
  - Use new Dist-Zilla-Plugin-TestMLIncluder (spaces in windows paths)
 

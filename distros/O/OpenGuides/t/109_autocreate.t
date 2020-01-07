@@ -12,7 +12,7 @@ if ( $@ ) {
         "DBD::SQLite could not be used - no database to test with. ($error)";
 }
 
-plan tests => 13;
+plan tests => 17;
 
 # Clear out the database from any previous runs.
 OpenGuides::Test::refresh_db();
@@ -63,6 +63,24 @@ ok ( $categoriser->in_category( node => "Liaison",
                                 category => "Dim Sum" ),
     "...but it is in the single-spaced one." );
 
+# Underscores:
+OpenGuides::Test->write_data(
+                              guide => $guide,
+                              node  => "Red Lion",
+                              categories => "Real_Ale",
+                              return_output => 1,
+                            );
+
+ok( !$wiki->node_exists( "Category Real_Ale" ),
+    "Categories with underscores in are not auto-created." );
+ok( $wiki->node_exists( "Category Real Ale" ),
+    "...but the corresponding category with spaces is." );
+ok ( !$categoriser->in_category( node => "Red Lion",
+                                 category => "Real_Ale" ),
+    "...and the new node is not in the underscores category." );
+ok ( $categoriser->in_category( node => "Red Lion",
+                                category => "Real Ale" ),
+    "...but it is in the one with spaces." );
 
 # Write a custom template to autofill content in autocreated nodes.
 eval {

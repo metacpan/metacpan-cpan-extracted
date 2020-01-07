@@ -1,0 +1,51 @@
+NAME
+
+      Kwiki::Podcast - Podcasting in a Kwiki way
+
+INSTALLATION
+
+      kwiki -install Kwiki::Podcast
+
+DESCRIPTION
+
+    This plugin offer an Kwiki action to generate podcast rss. User simply
+    put down a mp3 URL in a page, and leave the rest to Kwiki. For example,
+    you only have to write something like:
+
+        My Podcast Try. This is my first podcast song, please
+        take a look at it.
+    
+        http://foobar.org/podcast/first.mp3
+
+    With proper user preference, your podcast will have proper publisher
+    tag too.
+
+    Subscribe can address your podcast RSS URL from Kwiki's toolbar.
+
+CONFIGURATION
+
+    The following 3 configuration keys are available:
+
+    podcast_title
+
+      General title for you Podcasting
+
+    podcast_publisher
+
+      Your name
+
+    podcast_description
+
+      General description for this podcast.
+
+AUTHOR
+
+    Kang-min Liu <gugod@gugod.org>
+
+LICENSE
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

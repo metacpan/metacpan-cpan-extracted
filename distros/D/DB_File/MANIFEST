@@ -27,6 +27,7 @@ patches/5.005_02
 patches/5.005_03
 patches/5.6.0
 ppport.h
+t/000prereq.t
 t/db-btree.t
 t/db-hash.t
 t/db-recno.t

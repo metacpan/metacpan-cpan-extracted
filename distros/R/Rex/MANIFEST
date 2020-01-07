@@ -219,6 +219,7 @@ lib/Rex/Pkg/SunOS.pm
 lib/Rex/Pkg/SunOS/OpenCSW.pm
 lib/Rex/Pkg/SunOS/pkg.pm
 lib/Rex/Pkg/Ubuntu.pm
+lib/Rex/Pkg/VoidLinux.pm
 lib/Rex/PkgConf.pm
 lib/Rex/PkgConf/Base.pm
 lib/Rex/PkgConf/Debian.pm
@@ -258,6 +259,7 @@ lib/Rex/Service/SuSE/systemd.pm
 lib/Rex/Service/SunOS.pm
 lib/Rex/Service/SunOS/svcadm.pm
 lib/Rex/Service/Ubuntu.pm
+lib/Rex/Service/VoidLinux.pm
 lib/Rex/Shared/Var.pm
 lib/Rex/Shared/Var/Array.pm
 lib/Rex/Shared/Var/Common.pm
@@ -464,3 +466,4 @@ xt/author/critic.t
 xt/author/minimum-version.t
 xt/author/perltidy.t
 xt/author/pod-syntax.t
+xt/release/kwalitee.t

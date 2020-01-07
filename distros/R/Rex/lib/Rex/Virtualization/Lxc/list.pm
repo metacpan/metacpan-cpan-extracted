@@ -9,7 +9,7 @@ package Rex::Virtualization::Lxc::list;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;
@@ -35,7 +35,7 @@ sub execute {
     exists $opts->{format}
     ? $opts->{format}
     : 'name,state,autostart,groups,ipv4,ipv6,pid';
-  my $fancy = exists $opts->{fancy} ? '-f' : '';
+  my $fancy  = exists $opts->{fancy}  ? '-f'                   : '';
   my $groups = exists $opts->{groups} ? '-g' . $opts->{groups} : '';
 
   # When using not fancy output, lxc-ls defaults to outputting only name.

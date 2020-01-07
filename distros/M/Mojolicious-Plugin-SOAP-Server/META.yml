@@ -29,8 +29,8 @@ requires:
   XML::Compile::SOAP::Daemon: '3.14'
   perl: '5.020001'
 resources:
-  bugtracker: https://github.com/oetiker/mojolicious-plugin-soap-server/issues
+  bugtracker: https://github.com/oposs/mojolicious-plugin-soap-server/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/oetiker/mojolicious-plugin-soap-server
-version: v0.1.3
+  repository: https://github.com/oposs/mojolicious-plugin-soap-server
+version: v0.1.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

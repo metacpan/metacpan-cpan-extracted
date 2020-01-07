@@ -107,7 +107,7 @@ sub then {
       ],
       ref($self);
 
-    if ( _PENDING_CLASS eq ref $_[0][_VALUE_SR_IDX] ) {
+    if ( _PENDING_CLASS eq ref $self->[_VALUE_SR_IDX] ) {
         push @{ $self->[_CHILDREN_IDX] }, $new;
     }
     else {
@@ -167,6 +167,8 @@ sub _settle {
     # expensive than just always deleting. So, hey.
     delete $_UNHANDLED_REJECTIONS{$final_value_sr};
 
+    my $value_sr_contents_is_package = 1;
+
     if ($callback) {
 
         # This is the block that runs for promises that were created by a
@@ -185,14 +187,17 @@ sub _settle {
             # just run a successful “catch” block, so resolution is correct.
 
             # If $new_value IS a promise, though, then we have to wait.
-
-            bless $self->[_VALUE_SR_IDX], _RESOLUTION_CLASS() if !UNIVERSAL::isa( $new_value, __PACKAGE__ );
+            if ( !UNIVERSAL::isa( $new_value, __PACKAGE__ ) ) {
+                $value_sr_contents_is_package = 0;
+                bless $self->[_VALUE_SR_IDX], _RESOLUTION_CLASS();
+            }
         }
         else {
 
             # The callback errored, which means $self is now rejected.
 
-            $new_value = $@;
+            $new_value                    = $@;
+            $value_sr_contents_is_package = 0;
 
             bless $self->[_VALUE_SR_IDX], _REJECTION_CLASS();
             $_UNHANDLED_REJECTIONS{ $self->[_VALUE_SR_IDX] } = $self->[_VALUE_SR_IDX];
@@ -208,16 +213,18 @@ sub _settle {
 
         bless $self->[_VALUE_SR_IDX], ref($final_value_sr);
         ${ $self->[_VALUE_SR_IDX] } = $$final_value_sr;
+        $value_sr_contents_is_package = UNIVERSAL::isa( $$final_value_sr, __PACKAGE__ );
 
-        if ( $settle_is_rejection ) {
+        if ($settle_is_rejection) {
             $_UNHANDLED_REJECTIONS{ $self->[_VALUE_SR_IDX] } = $self->[_VALUE_SR_IDX];
         }
     }
 
-    if ( UNIVERSAL::isa( ${ $self->[_VALUE_SR_IDX] }, __PACKAGE__ ) ) {
-        _repromise( @{$self}[ _VALUE_SR_IDX, _CHILDREN_IDX, _VALUE_SR_IDX ] );
+    if ($value_sr_contents_is_package) {
+        return _repromise( @{$self}[ _VALUE_SR_IDX, _CHILDREN_IDX, _VALUE_SR_IDX ] );
     }
-    elsif ( @{ $self->[_CHILDREN_IDX] } ) {
+
+    if ( @{ $self->[_CHILDREN_IDX] } ) {
         $_->_settle( $self->[_VALUE_SR_IDX] ) for splice @{ $self->[_CHILDREN_IDX] };
     }
 

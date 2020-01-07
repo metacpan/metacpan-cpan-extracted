@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.168';
+our $VERSION = '1.169';
 
 # -----------------------------------------------------------------------------
 
@@ -30,9 +30,9 @@ Der Wert des Objekt-Attributs C<rows>, das den Inhalt der Tabelle
 definiert, hat den Aufbau:
 
   [[@keyValTr,[@keyValTd,$content],...],...]
-  ^^          ^                   ^    ^
-  ||          |                   |    weitere Zeilen
-  ||          |                   weitere Kolumnen
+  ^^          ^                    ^    ^
+  ||          |                    |    weitere Zeilen
+  ||          |                    weitere Kolumnen
   ||          erste Kolumne
   |erste Zeile mit Attributen @keyValTr
   Array der Zeilen
@@ -68,7 +68,7 @@ C<data-*> Attribute der Tabelle.
 
 =item id => $id (Default: undef)
 
-DOM-Id der Tabelle.
+Id der Tabelle.
 
 =item rows => \@rows (Default: [])
 
@@ -280,7 +280,7 @@ sub html {
 
 =head1 VERSION
 
-1.168
+1.169
 
 =head1 AUTHOR
 
@@ -288,7 +288,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019 Frank Seitz
+Copyright (C) 2020 Frank Seitz
 
 =head1 LICENSE
 

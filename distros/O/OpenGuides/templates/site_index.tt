@@ -38,7 +38,6 @@
      </li>
   [% END %]
 </ol>
-</div>
 
 <div id="site_index_feeds">
   <p>
@@ -49,6 +48,7 @@
     or as an
     <a href="[% feed_base %];format=atom">atom feed</a>.
   </p>
+</div>
 </div>
 
 [% IF config.content_above_navbar_in_html %]

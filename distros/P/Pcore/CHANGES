@@ -1,3 +1,17 @@
+v0.110.1 2020-01-06T15:22:08Z
+ - resources updated
+ - commit
+
+v0.110.0 2020-01-06T15:17:48Z
+ - app router improved
+ - index controller removed
+ - webpack nginx config fixed
+ - app tmpl updated
+ - webpack controller
+ - resources updated
+ - filter rise prettier error
+ - windows deployment fix
+
 v0.109.2 2019-12-27T18:11:53Z
  - resources updated
  - src node utf8

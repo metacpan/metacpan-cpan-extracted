@@ -21,7 +21,7 @@ WriteMakefile(
     'Mojolicious' => '8.26',
   },
   TEST_REQUIRES => { 
-    'Mojolicious::Plugin::SOAP::Server' => 0
+#   'Mojolicious::Plugin::SOAP::Server' => 0
   },
   BUILD_REQUIRES => {
     'CPAN::Uploader' => 0,

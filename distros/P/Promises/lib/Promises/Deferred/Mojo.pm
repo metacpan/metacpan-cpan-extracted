@@ -1,7 +1,7 @@
 package Promises::Deferred::Mojo;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: An implementation of Promises in Perl
-$Promises::Deferred::Mojo::VERSION = '1.02';
+$Promises::Deferred::Mojo::VERSION = '1.03';
 use strict;
 use warnings;
 
@@ -9,9 +9,29 @@ use Mojo::IOLoop;
 
 use parent 'Promises::Deferred';
 
+
+# Before the next_tick-based approach used below, there was a
+# Mojo::IOLoop->timer()-based approach for _notify_backend.
+# The current code is more performant:
+
+# Original code (using the Mojo::Reactor::EV backend):
+# Backend:  Promises::Deferred::Mojo
+# Benchmark: running one, two for at least 10 CPU seconds...
+#        one: 46 wallclock secs @ 758.45/s (n=8032)
+#        two: 44 wallclock secs @ 309.08/s (n=3097)
+
+
+# New approach:
+# Backend:  Promises::Deferred::Mojo
+# Benchmark: running one, two for at least 10 CPU seconds...
+#        one: 29 wallclock secs @ 1714.56/s (n=17197)
+#        two: 24 wallclock secs @ 1184.80/s (n=12156)
+
+
+
 sub _notify_backend {
     my ( $self, $callbacks, $result ) = @_;
-    Mojo::IOLoop->timer(0,sub {
+    Mojo::IOLoop->next_tick(sub {
         foreach my $cb (@$callbacks) {
             $cb->(@$result);
         }
@@ -38,7 +58,7 @@ Promises::Deferred::Mojo - An implementation of Promises in Perl
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 
@@ -75,7 +95,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2014, 2012 by Infinity Interactive, Inc..
+This software is copyright (c) 2020, 2019, 2017, 2014, 2012 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

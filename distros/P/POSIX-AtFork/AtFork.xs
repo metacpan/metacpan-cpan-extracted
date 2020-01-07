@@ -15,6 +15,66 @@ typedef struct {
 } my_cxt_t;
 START_MY_CXT
 
+typedef struct {
+    PERL_SI *curstackinfo;
+    AV *curstack;
+    AV *mainstack;
+    SV **stack_base;
+    SV **stack_sp;
+    SV **stack_max;
+} stack_backup_t;
+
+static void
+paf_save_stacks(pTHX_ stack_backup_t* bk) {
+    bk->curstackinfo = PL_curstackinfo;
+    bk->curstack = PL_curstack;
+    bk->mainstack = PL_mainstack;
+
+    bk->stack_base = PL_stack_base;
+    bk->stack_sp = PL_stack_sp;
+    bk->stack_max = PL_stack_max;
+}
+
+static void
+paf_restore_stacks(pTHX_ stack_backup_t* bk) {
+    PL_curstackinfo = bk->curstackinfo;
+    PL_curstack = bk->curstack;
+    PL_mainstack = bk->mainstack;
+
+    PL_stack_base = bk->stack_base;
+    PL_stack_sp = bk->stack_sp;
+    PL_stack_max = bk->stack_max;
+}
+
+static void
+paf_init_stacks(pTHX) {
+    PL_curstackinfo = new_stackinfo(32, 4);
+    PL_curstackinfo->si_type = PERLSI_MAIN;
+    PL_curstack = PL_curstackinfo->si_stack;
+    PL_mainstack = PL_curstack;
+
+    PL_stack_base = AvARRAY(PL_curstack);
+    PL_stack_sp = PL_stack_base;
+    PL_stack_max = PL_stack_base + AvMAX(PL_curstack);
+}
+
+static void
+paf_destruct_stacks(pTHX) {
+    while (PL_curstackinfo->si_next)
+        PL_curstackinfo = PL_curstackinfo->si_next;
+
+    while (PL_curstackinfo) {
+        PERL_SI *p = PL_curstackinfo->si_prev;
+
+        if (!PL_dirty)
+            SvREFCNT_dec (PL_curstackinfo->si_stack);
+
+        Safefree (PL_curstackinfo->si_cxstack);
+        Safefree (PL_curstackinfo);
+        PL_curstackinfo = p;
+    }
+}
+
 static void
 paf_call_list(pTHX_ AV* const av) {
     const char* const opname = PL_op ? OP_NAME(PL_op) : "(unknown)";
@@ -22,6 +82,9 @@ paf_call_list(pTHX_ AV* const av) {
     I32 const len = av_len(av) + 1;
     I32 i;
 
+    stack_backup_t bk;
+    paf_save_stacks(aTHX_ &bk);
+    paf_init_stacks(aTHX);
     ENTER;
     SAVETMPS;
     opnamesv = sv_2mortal(newSVpv(opname, 0));
@@ -38,6 +101,8 @@ paf_call_list(pTHX_ AV* const av) {
     }
     FREETMPS;
     LEAVE;
+    paf_destruct_stacks(aTHX);
+    paf_restore_stacks(aTHX_ &bk);
 }
 
 static void
@@ -115,7 +180,7 @@ paf_initialize(pTHX_ pMY_CXT_ bool const cloning PERL_UNUSED_DECL) {
     MY_CXT.child_list   = newAV();
 }
 
-MODULE = POSIX::AtFork		PACKAGE = POSIX::AtFork		
+MODULE = POSIX::AtFork		PACKAGE = POSIX::AtFork
 
 PROTOTYPES: DISABLE
 

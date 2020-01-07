@@ -1,3 +1,8 @@
+0.20 2020-01-04
+        - Fixed format to be 'txt' instead of 'text'
+          as this falls back to the default mime type
+          which is no longer text/plain since Mojolicious 8.27.
+
 0.19 2018-11-01
         - Change permissions for files (manwar++).
         - Removed deprecated method Mojo::Transaction::success().

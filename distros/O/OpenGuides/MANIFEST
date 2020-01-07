@@ -149,6 +149,8 @@ t/506_diffs_with_macros.t
 t/507_random_page.t
 t/508_navbar_common_locales_categories.t
 t/509_preferences.t
+t/510_show_index_omits_deletion_link.t
+t/511_url_escaping.t
 t/601_bug_textareas.t
 t/602_bug_trailing_whitespace.t
 t/603_bug_map_link_no_address.t
@@ -191,4 +193,3 @@ t/909_external_class_metadata.t
 t/templates/105_test.tt
 wiki.cgi
 META.json
-SIGNATURE    Added here by Module::Build

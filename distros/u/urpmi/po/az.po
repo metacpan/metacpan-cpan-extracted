@@ -1,37 +1,31 @@
-# translation of urpmi-az.po to Azerbaijani
-# translation of urpmi-az.po to Azerbaijani Turkish
-# urpmi-az.po faylının Azərbaycan dilinə tərcüməsi
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
 #
-# Latest versions of po files are at http://www.mandrivalinux.com/l10n/az.php3
-#
-# Copyright (C) 2003, 2004 Free Software Foundation, Inc.
-# Vasif Ismailoglu <azerb_linux@hotmail.com> , 2000-2001.
-# Mətin Əmirov <metin@karegen.com>, 2003, 2004.
-#
+# Translators:
+# Mətin Əmirov <metin@karegen.com>, 2003-2004
 msgid ""
 msgstr ""
-"Project-Id-Version: urpmi-az\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2004-09-12 20:33+0300\n"
-"Last-Translator: Mətin Əmirov <metin@karegen.com>\n"
-"Language-Team: Azerbaijani <translation-team-az@lists.sourceforge.net>\n"
+"Project-Id-Version: Mageia\n"
+"POT-Creation-Date: 2019-06-26 09:37+0300\n"
+"PO-Revision-Date: 2019-06-26 06:40+0000\n"
+"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+"Language-Team: Azerbaijani (http://www.transifex.com/MageiaLinux/mageia/"
+"language/az/)\n"
 "Language: az\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.3.1\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Content-Transfer-Encoding: 8-bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../gurpm/RPMProgressDialog.pm:47
-#, fuzzy, c-format
+#, c-format
 msgid "Distribution Upgrade"
-msgstr "%s paylanır"
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:47
-#, fuzzy, c-format
+#, c-format
 msgid "Packages installation"
-msgstr "Paket qurulumu..."
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:128
 #, c-format
@@ -43,15 +37,15 @@ msgstr "Xahiş edirik gözləyin..."
 msgid "Verifying package signatures..."
 msgstr "Paketlərin imzaları yoxlanır..."
 
-#: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:107
+#: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:108
 #, c-format
 msgid "Preparing..."
 msgstr "Hazırlanır..."
 
 #: ../gurpm/RPMProgressDialog.pm:313
-#, fuzzy, c-format
+#, c-format
 msgid "Removing package `%s' ..."
-msgstr "%s peketi silinir"
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:316
 #, c-format
@@ -63,35 +57,35 @@ msgstr "`%s' paketi qurulur (%s/%s)..."
 msgid "Downloading package `%s'..."
 msgstr "`%s' paketi endirilir..."
 
-#: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:126
+#: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:127
 #, c-format
 msgid "Cancel"
 msgstr "Ləğv et"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:453 ../urpm/download.pm:857
-#: ../urpm/get_pkgs.pm:278 ../urpm/media.pm:1126 ../urpm/media.pm:1647
-#: ../urpm/media.pm:1798
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1670
+#: ../urpm/media.pm:1821
 #, c-format
 msgid "...retrieving failed: %s"
 msgstr "...alış bacarılmadı: %s"
 
-#: ../gurpmi:49
-#, fuzzy, c-format
+#: ../gurpmi:50
+#, c-format
 msgid "RPM installation"
-msgstr "Sistem qurulumu"
+msgstr ""
 
-#: ../gurpmi:63
+#: ../gurpmi:64
 #, c-format
 msgid "Error: unable to find file %s, will cancel operation"
 msgstr ""
 
-#: ../gurpmi:64 ../gurpmi2:173 ../gurpmi2:203
+#: ../gurpmi:65 ../gurpmi2:174 ../gurpmi2:203
 #, c-format
 msgid "_Ok"
 msgstr "_Oldu"
 
-#: ../gurpmi:84
-#, fuzzy, c-format
+#: ../gurpmi:85
+#, c-format
 msgid ""
 "You have selected a source package:\n"
 "\n"
@@ -102,17 +96,9 @@ msgid ""
 "\n"
 "What would you like to do?"
 msgstr ""
-"Siz bu mənbə paketini seçdiniz:\n"
-"\n"
-"%s\n"
-"\n"
-"Deyəsən bunu qurmaq istəmirdiniz (bunun qurulmsı\n"
-"halında mənbə kodunda dəyişikliklər edilib yenidən dərlənə bilər).\n"
-"\n"
-"İndi nə etmək istəyirsiniz?"
 
-#: ../gurpmi:92 ../gurpmi:103
-#, fuzzy, c-format
+#: ../gurpmi:93 ../gurpmi:104
+#, c-format
 msgid ""
 "You are about to install the following software packages on your computer:\n"
 "\n"
@@ -120,14 +106,8 @@ msgid ""
 "\n"
 "Proceed?"
 msgstr ""
-"Sisteminizə bu paketləri quracaqsınız:\n"
-"\n"
-"%s\n"
-"\n"
-"Bunun yerinə sadəcə olaraq qeyd etməyi də seçə bilərsiniz.\n"
-"Seçiminiz nədir?"
 
-#: ../gurpmi:98
+#: ../gurpmi:99
 #, c-format
 msgid ""
 "You are about to install the following software package on your computer:\n"
@@ -143,27 +123,27 @@ msgstr ""
 "Bunun yerinə sadəcə olaraq qeyd etməyi də seçə bilərsiniz.\n"
 "Seçiminiz nədir?"
 
-#: ../gurpmi:116
+#: ../gurpmi:117
 #, c-format
 msgid "_Install"
 msgstr "_Qur"
 
-#: ../gurpmi:117
+#: ../gurpmi:118
 #, c-format
 msgid "_Save"
 msgstr "_Qeyd Et"
 
-#: ../gurpmi:118 ../gurpmi2:173
+#: ../gurpmi:119 ../gurpmi2:174
 #, c-format
 msgid "_Cancel"
 msgstr "_Ləğv Et"
 
-#: ../gurpmi:126
+#: ../gurpmi:127
 #, c-format
 msgid "Choose location to save file"
 msgstr "Qeyd ediləcək ünvanı seçin"
 
-#: ../gurpmi:126 ../gurpmi2:119
+#: ../gurpmi:127 ../gurpmi2:120
 #, c-format
 msgid "Ok"
 msgstr "Oldu"
@@ -174,7 +154,7 @@ msgid "Options:"
 msgstr ""
 
 #: ../gurpmi.pm:57 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
-#: ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
+#: ../urpmi.removemedia:40 ../urpmi.update:33 ../urpmq:41
 #, c-format
 msgid "  --help         - print this help message.\n"
 msgstr "  --help         - bu kömək ismarışını çap edər.\n"
@@ -199,14 +179,11 @@ msgid ""
 msgstr "  --force        - bəzi paketlər mövcud olmasa belə istəməyə zorla.\n"
 
 #: ../gurpmi.pm:61 ../urpmi:131
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --verify-rpm   - verify rpm signature before installation\n"
 "                   (--no-verify-rpm disables it, default is enabled).\n"
 msgstr ""
-"  --verify-rpm   - qurmadan əvvəl rpm imzasını yoxla\n"
-"                   (--no-verify-rpm bunu qeyri-fəallaşdırır, əsasən "
-"fəaldır).\n"
 
 #: ../gurpmi.pm:63 ../urpmf:36 ../urpmi:68 ../urpmq:43
 #, c-format
@@ -232,35 +209,34 @@ msgid "  --root         - use another root for rpm installation.\n"
 msgstr "  --root         - rpm qurulumu üçün başqa root işlət.\n"
 
 #: ../gurpmi.pm:67 ../urpmi:133
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --test         - only verify if the installation can be achieved "
 "correctly.\n"
-msgstr "  --test         - qurulumun düzgün edilə biləcəyini yoxla.\n"
+msgstr ""
 
 #: ../gurpmi.pm:68 ../urpmi:71
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --searchmedia  - use only the given media to search requested packages.\n"
 msgstr ""
-"  --media       - ancaq vergüllə ayrılmış verilən mediya(lar)nı işlət.\n"
 
 #: ../gurpmi.pm:115
-#, fuzzy, c-format
+#, c-format
 msgid "No packages specified"
-msgstr "Əmr tə'yin edilməyib"
+msgstr ""
 
-#: ../gurpmi2:46
-#, fuzzy, c-format
+#: ../gurpmi2:47
+#, c-format
 msgid "Must be root"
-msgstr "Siçan Qapısı"
+msgstr ""
 
-#: ../gurpmi2:76
+#: ../gurpmi2:77
 #, c-format
 msgid "Preparing packages installation..."
 msgstr "Paketlər qurulum üçün hazırlanır..."
 
-#: ../gurpmi2:91 ../urpmi:506
+#: ../gurpmi2:92 ../urpmi:506
 #, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
@@ -269,37 +245,35 @@ msgstr ""
 "Bəzi istənən paketlər qurula bilmir:\n"
 "%s"
 
-#: ../gurpmi2:99
-#, fuzzy, c-format
+#: ../gurpmi2:100
+#, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"Bəzi istənən paketlər qurula bilmir:\n"
-"%s"
 
-#: ../gurpmi2:119
+#: ../gurpmi2:120
 #, c-format
 msgid "Warning"
 msgstr "Xəbərdarlıq"
 
-#: ../gurpmi2:169
-#, fuzzy, c-format
-msgid " (to upgrade)"
-msgstr "Yeniləmə"
-
 #: ../gurpmi2:170
-#, fuzzy, c-format
-msgid " (to install)"
-msgstr "Qurulumun sonu"
+#, c-format
+msgid " (to upgrade)"
+msgstr ""
 
-#: ../gurpmi2:173
+#: ../gurpmi2:171
+#, c-format
+msgid " (to install)"
+msgstr ""
+
+#: ../gurpmi2:174
 #, c-format
 msgid "Package choice"
 msgstr ""
 
-#: ../gurpmi2:174
+#: ../gurpmi2:175
 #, c-format
 msgid "One of the following packages is needed:"
 msgstr "Aşağıdakı paketlərin bir dənəsinə ehtiyac var:"
@@ -310,89 +284,83 @@ msgid "_Abort"
 msgstr "_Ləğv Et"
 
 #: ../gurpmi2:239
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"Paketlərin yenilənməsi üçün aşağıdakı paketlərin çıxardılması lazımdır:\n"
-"%s"
 
-#: ../gurpmi2:250 ../urpmi:615
+#: ../gurpmi2:250 ../urpmi:617
 #, c-format
 msgid "%s of additional disk space will be used."
 msgstr ""
 
-#: ../gurpmi2:251 ../urpmi:616
+#: ../gurpmi2:251 ../urpmi:618
 #, c-format
 msgid "%s of disk space will be freed."
 msgstr ""
 
-#: ../gurpmi2:252 ../urpmi:617
+#: ../gurpmi2:252 ../urpmi:619
 #, c-format
 msgid "%s of packages will be retrieved."
 msgstr ""
 
-#: ../gurpmi2:253 ../urpmi:618
+#: ../gurpmi2:253 ../urpmi:620
 #, c-format
 msgid "Proceed with the installation of one package?"
 msgid_plural "Proceed with the installation of the %d packages?"
 msgstr[0] ""
+msgstr[1] ""
 
-#: ../gurpmi2:259 ../urpmi:606
-#, fuzzy, c-format
+#: ../gurpmi2:259 ../urpmi:608
+#, c-format
 msgid ""
 "To satisfy dependencies, the following package is going to be installed:"
 msgstr ""
-"Asılıqları ortadan qaldırmaq üçün, aşağıdakılar da qurulmalıdır (%d Mb)"
 
-#: ../gurpmi2:260 ../urpmi:607
-#, fuzzy, c-format
+#: ../gurpmi2:260 ../urpmi:609
+#, c-format
 msgid ""
 "To satisfy dependencies, the following packages are going to be installed:"
 msgstr ""
-"Asılıqları ortadan qaldırmaq üçün, aşağıdakılar da qurulmalıdır (%d Mb)"
 
-#: ../gurpmi2:270 ../urpm/main_loop.pm:467
+#: ../gurpmi2:270 ../urpm/main_loop.pm:468
 #, c-format
 msgid "unable to get source packages, aborting"
 msgstr "qaynaq paketi alına bilmir, çıxılır"
 
-#: ../gurpmi2:287 ../urpmi:634
-#, fuzzy, c-format
+#: ../gurpmi2:287 ../urpmi:636
+#, c-format
 msgid "Please insert the medium named \"%s\""
-msgstr "Lütfən \"%s\" medyasını [%s] avadanlığına yerləşdirin"
+msgstr ""
 
 #: ../gurpmi2:307
 #, c-format
 msgid "An error occurred:"
-msgstr ""
+msgstr "Xəta baş verdi"
 
 #: ../gurpmi2:319
-#, fuzzy, c-format
+#, c-format
 msgid "_Done"
-msgstr "Qurtardı"
+msgstr ""
 
 #: ../gurpmi2:336 ../urpm/main_loop.pm:82
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Installation failed, some files are missing:\n"
 "%s"
-msgstr "Qurulum iflas etdi"
+msgstr ""
 
 #: ../gurpmi2:339
-#, fuzzy, c-format
+#, c-format
 msgid "You may want to update your urpmi database."
 msgstr ""
-"Qurulum bacarılmadı, bəzi fayllar əksikdir:\n"
-"%s\n"
-"Sizə, urpmi databeyzinizi yeniləməyi məsləhət görürük."
 
-#: ../gurpmi2:343 ../urpm/main_loop.pm:288 ../urpm/main_loop.pm:580
-#, fuzzy, c-format
+#: ../gurpmi2:343 ../urpm/main_loop.pm:289 ../urpm/main_loop.pm:581
+#, c-format
 msgid "Installation failed:"
-msgstr "Qurulum iflas etdi"
+msgstr ""
 
 #: ../gurpmi2:348
 #, c-format
@@ -404,7 +372,7 @@ msgstr "hər şey onsuzda quruludur"
 msgid "Installation finished"
 msgstr "Qurulum bitdi"
 
-#: ../gurpmi2:363 ../urpmi:692
+#: ../gurpmi2:363 ../urpmi:694
 #, c-format
 msgid "restarting urpmi"
 msgstr "urpmi yenidən başladılır"
@@ -422,9 +390,9 @@ msgid "   -h|--help      - print this help message.\n"
 msgstr "   -h|--help      - bu kömək ismarışını çap edər.\n"
 
 #: ../rpm-find-leaves:18
-#, fuzzy, c-format
+#, c-format
 msgid "   --root <path>  - use the given root instead of /\n"
-msgstr "  --synthesis    - urpmi db yerinə verilən synthesis'i işlət.\n"
+msgstr ""
 
 #: ../rpm-find-leaves:19
 #, c-format
@@ -437,156 +405,156 @@ msgid "                    defaults to %s.\n"
 msgstr "                    ön qurğulusu %s-dir.\n"
 
 #: ../rpm-find-leaves:21
-#, fuzzy, c-format
+#, c-format
 msgid "   -f             - output rpm full name (NVRA)\n"
-msgstr "  -g             - adla birlikdə qrupları da göstər.\n"
+msgstr ""
 
-#: ../rurpmi:11 ../urpmi:266
+#: ../rurpmi:12 ../urpmi:266
 #, c-format
 msgid "Only superuser is allowed to install packages"
 msgstr "Paketləri qurma icazəsi ancaq ali istifadəçi verilib"
 
-#: ../rurpmi:18
+#: ../rurpmi:19
 #, c-format
 msgid "Running urpmi in restricted mode..."
 msgstr ""
 
-#: ../urpm.pm:23
+#: ../urpm.pm:22
 #, c-format
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr ""
 
-#: ../urpm.pm:194
-#, fuzzy, c-format
+#: ../urpm.pm:193
+#, c-format
 msgid "fail to create directory %s"
-msgstr "Xəta raportu üçün [%s] cərgəsi yaradıla bilmədi"
+msgstr ""
 
-#: ../urpm.pm:195
+#: ../urpm.pm:194
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr ""
 
-#: ../urpm.pm:238
-#, fuzzy, c-format
+#: ../urpm.pm:237
+#, c-format
 msgid "Can not download packages into %s"
-msgstr "`%s' paketi endirilir..."
+msgstr ""
 
-#: ../urpm.pm:254
+#: ../urpm.pm:253
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr ""
 
-#: ../urpm.pm:255 ../urpmf:244 ../urpmq:163
+#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "%s üstündə xüsusi mühit istifadə edilir\n"
 
-#: ../urpm.pm:423
+#: ../urpm.pm:422
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "rpmb açıla bilmir"
 
-#: ../urpm.pm:442
+#: ../urpm.pm:441
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "hökmsüz rpm fayı adı [%s]"
 
-#: ../urpm.pm:448
+#: ../urpm.pm:447
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "[%s] rpm faylı alınır ..."
 
-#: ../urpm.pm:450 ../urpm/get_pkgs.pm:276
+#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "...alınma bitdi"
 
-#: ../urpm.pm:458
+#: ../urpm.pm:457
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "rpm faylı [%s] çatıla bilmir"
 
-#: ../urpm.pm:463
-#, fuzzy, c-format
+#: ../urpm.pm:462
+#, c-format
 msgid "unable to parse spec file %s [%s]"
-msgstr "[%s] faylındakı \"%s\" oxuna bilmədi"
+msgstr ""
 
-#: ../urpm.pm:471
+#: ../urpm.pm:470
 #, c-format
 msgid "unable to register rpm file"
 msgstr "rpm faylı qeydiyyatdan keçirilə bilmədi"
 
-#: ../urpm.pm:473
+#: ../urpm.pm:472
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr ""
 
-#: ../urpm.pm:477
+#: ../urpm.pm:476
 #, c-format
 msgid "error registering local packages"
 msgstr "yerli paket qeydiyyat xətası"
 
-#: ../urpm.pm:589
+#: ../urpm.pm:588
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr ""
 
-#: ../urpm/args.pm:157 ../urpm/args.pm:166
+#: ../urpm/args.pm:156 ../urpm/args.pm:165
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "əmr sətirində hökmsüz vəkil tə'yini\n"
 
-#: ../urpm/args.pm:321
+#: ../urpm/args.pm:320
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: \"%s\" rpm faylı oxuna bilmir\n"
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:388
 #, c-format
 msgid "unexpected expression %s"
 msgstr ""
 
-#: ../urpm/args.pm:390
-#, fuzzy, c-format
+#: ../urpm/args.pm:389
+#, c-format
 msgid "missing expression before %s"
-msgstr "Əksik imza (%s)"
+msgstr ""
 
-#: ../urpm/args.pm:396
+#: ../urpm/args.pm:395
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr ""
 
-#: ../urpm/args.pm:400
+#: ../urpm/args.pm:399
 #, c-format
 msgid "no expression to close"
 msgstr ""
 
-#: ../urpm/args.pm:409
+#: ../urpm/args.pm:408
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 
-#: ../urpm/args.pm:483
+#: ../urpm/args.pm:482
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr ""
 
-#: ../urpm/args.pm:506
+#: ../urpm/args.pm:505
 #, c-format
 msgid "Can't use %s without %s"
 msgstr ""
 
-#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
+#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr ""
 
-#: ../urpm/args.pm:520
+#: ../urpm/args.pm:519
 #, c-format
 msgid "Too many arguments\n"
 msgstr ""
 
-#: ../urpm/args.pm:528
+#: ../urpm/args.pm:527
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -603,7 +571,7 @@ msgstr ""
 "\n"
 "istifadə qaydası:\n"
 
-#: ../urpm/args.pm:534
+#: ../urpm/args.pm:533
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "Müəllif Hüququ (C) %s %s"
@@ -613,197 +581,197 @@ msgstr "Müəllif Hüququ (C) %s %s"
 msgid "Copying failed"
 msgstr "Köçütrmə bacarılmadı"
 
-#: ../urpm/cdrom.pm:80
+#: ../urpm/cdrom.pm:79
 #, c-format
 msgid ""
 "You must mount CD-ROM yourself (or install perl-Hal-Cdroms to have it done "
 "automatically)"
 msgstr ""
 
-#: ../urpm/cdrom.pm:82
+#: ../urpm/cdrom.pm:81
 #, c-format
 msgid "Udisks daemon (udisks-daemon) is not running or not ready"
 msgstr ""
 
-#: ../urpm/cdrom.pm:174 ../urpm/cdrom.pm:179
-#, fuzzy, c-format
+#: ../urpm/cdrom.pm:173 ../urpm/cdrom.pm:178
+#, c-format
 msgid "medium \"%s\" is not available"
-msgstr "\"%s\" medyası seçili deyil"
+msgstr ""
 
-#: ../urpm/cdrom.pm:218
+#: ../urpm/cdrom.pm:217
 #, c-format
 msgid "unable to read rpm file [%s] from medium \"%s\""
 msgstr "\"%s\" medyasından [%s] rpm faylı oxuna bilmir"
 
-#: ../urpm/cfg.pm:74
-#, fuzzy, c-format
+#: ../urpm/cfg.pm:73
+#, c-format
 msgid "syntax error in config file at line %s"
-msgstr "[%s] quraşdırma faylı yazıla bilmir"
+msgstr ""
 
-#: ../urpm/cfg.pm:107
-#, fuzzy, c-format
+#: ../urpm/cfg.pm:106
+#, c-format
 msgid "unable to read config file [%s]"
-msgstr "[%s] quraşdırma faylı yazıla bilmir"
+msgstr ""
 
-#: ../urpm/cfg.pm:133
+#: ../urpm/cfg.pm:132
 #, c-format
 msgid "medium `%s' is defined twice, aborting"
 msgstr ""
 
-#: ../urpm/cfg.pm:249 ../urpm/media.pm:556
+#: ../urpm/cfg.pm:248 ../urpm/media.pm:560
 #, c-format
 msgid "unable to write config file [%s]"
 msgstr "[%s] quraşdırma faylı yazıla bilmir"
 
-#: ../urpm/download.pm:93
+#: ../urpm/download.pm:95
 #, c-format
 msgid "%s is not available, falling back on %s"
 msgstr ""
 
-#: ../urpm/download.pm:169
+#: ../urpm/download.pm:171
 #, c-format
 msgid "can not read proxy settings (not enough rights to read %s)"
 msgstr ""
 
-#: ../urpm/download.pm:199
+#: ../urpm/download.pm:201
 #, c-format
 msgid "Please enter your credentials for accessing proxy\n"
 msgstr ""
 
-#: ../urpm/download.pm:200
+#: ../urpm/download.pm:202
 #, c-format
 msgid "User name:"
 msgstr "İstifadəçi adı:"
 
-#: ../urpm/download.pm:200
+#: ../urpm/download.pm:202
 #, c-format
 msgid "Password:"
 msgstr "Şifrə:"
 
-#: ../urpm/download.pm:286
+#: ../urpm/download.pm:288
 #, c-format
 msgid "Unknown webfetch `%s' !!!\n"
 msgstr ""
 
-#: ../urpm/download.pm:294
+#: ../urpm/download.pm:296
 #, c-format
 msgid "%s failed: exited with signal %d"
 msgstr ""
 
-#: ../urpm/download.pm:295
+#: ../urpm/download.pm:297
 #, c-format
 msgid "%s failed: exited with %d"
 msgstr ""
 
-#: ../urpm/download.pm:329
-#, fuzzy, c-format
+#: ../urpm/download.pm:331
+#, c-format
 msgid "copy failed"
-msgstr "Köçütrmə bacarılmadı"
+msgstr ""
 
-#: ../urpm/download.pm:335
-#, fuzzy, c-format
+#: ../urpm/download.pm:337
+#, c-format
 msgid "wget is missing\n"
-msgstr "%s əksik olduğuna görə"
+msgstr ""
 
-#: ../urpm/download.pm:402
-#, fuzzy, c-format
+#: ../urpm/download.pm:404
+#, c-format
 msgid "curl is missing\n"
-msgstr "%s əksik olduğuna görə"
+msgstr ""
 
-#: ../urpm/download.pm:537
+#: ../urpm/download.pm:539
 #, c-format
 msgid "curl failed: download canceled\n"
 msgstr ""
 
-#: ../urpm/download.pm:572
+#: ../urpm/download.pm:574
 #, c-format
 msgid "rsync is missing\n"
 msgstr ""
 
-#: ../urpm/download.pm:640
+#: ../urpm/download.pm:642
 #, c-format
 msgid "ssh is missing\n"
 msgstr ""
 
-#: ../urpm/download.pm:659
+#: ../urpm/download.pm:661
 #, c-format
 msgid "prozilla is missing\n"
 msgstr ""
 
-#: ../urpm/download.pm:675
+#: ../urpm/download.pm:677
 #, c-format
 msgid "Couldn't execute prozilla\n"
 msgstr ""
 
-#: ../urpm/download.pm:685
-#, fuzzy, c-format
+#: ../urpm/download.pm:687
+#, c-format
 msgid "aria2 is missing\n"
-msgstr "%s əksik olduğuna görə"
+msgstr ""
 
-#: ../urpm/download.pm:734
+#: ../urpm/download.pm:736
 #, c-format
 msgid "Failed to download %s"
 msgstr ""
 
-#: ../urpm/download.pm:829
+#: ../urpm/download.pm:854
 #, c-format
 msgid "        %s%% of %s completed, ETA = %s, speed = %s"
 msgstr ""
 
-#: ../urpm/download.pm:830
+#: ../urpm/download.pm:855
 #, c-format
 msgid "        %s%% completed, speed = %s"
 msgstr ""
 
-#: ../urpm/download.pm:915
-#, fuzzy, c-format
+#: ../urpm/download.pm:940
+#, c-format
 msgid "retrieving %s"
-msgstr "%s silinir"
+msgstr ""
 
-#: ../urpm/download.pm:926
-#, fuzzy, c-format
+#: ../urpm/download.pm:958
+#, c-format
 msgid "retrieved %s"
-msgstr "...alış bacarılmadı: %s"
+msgstr ""
 
-#: ../urpm/download.pm:989
+#: ../urpm/download.pm:1021
 #, c-format
 msgid "unknown protocol defined for %s"
 msgstr "%s üçün müəyyən edilən protokol namə'lumdur"
 
-#: ../urpm/download.pm:1003
+#: ../urpm/download.pm:1035
 #, c-format
 msgid "no webfetch found, supported webfetch are: %s\n"
 msgstr "webfetch tapılmadı, dəstəklənən webfetch-lər: %s\n"
 
-#: ../urpm/download.pm:1018
+#: ../urpm/download.pm:1050
 #, c-format
 msgid "unable to handle protocol: %s"
 msgstr "protokol istifadə edilə bilmir: %s"
 
-#: ../urpm/get_pkgs.pm:29
-#, fuzzy, c-format
+#: ../urpm/get_pkgs.pm:28
+#, c-format
 msgid "cleaning %s and %s"
-msgstr "%s qurulur"
+msgstr ""
 
-#: ../urpm/get_pkgs.pm:141
+#: ../urpm/get_pkgs.pm:140
 #, c-format
 msgid "package %s is not found."
 msgstr "%s paketi tapılmadı."
 
-#: ../urpm/get_pkgs.pm:269
+#: ../urpm/get_pkgs.pm:268
 #, c-format
 msgid "retrieving rpm files from medium \"%s\"..."
 msgstr "\"%s\" mediyumundan rpm faylları alınır..."
 
-#: ../urpm/install.pm:115 ../urpme:164
+#: ../urpm/install.pm:116 ../urpme:164
 #, c-format
 msgid "removing %s"
 msgstr "%s silinir"
 
 #: ../urpm/install.pm:215
-#, fuzzy, c-format
+#, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
-msgstr "%s paketi çıxardıla bilmədi"
+msgstr ""
 
 #: ../urpm/install.pm:242
 #, c-format
@@ -811,85 +779,85 @@ msgid "unable to install package %s"
 msgstr "%s paketi qurula bilmədi"
 
 #: ../urpm/install.pm:245
-#, fuzzy, c-format
+#, c-format
 msgid "removing bad rpm (%s) from %s"
-msgstr "%s qurulur"
+msgstr ""
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:374
-#, fuzzy, c-format
+#: ../urpm/install.pm:246 ../urpm/install.pm:393
+#, c-format
 msgid "removing %s failed: %s"
-msgstr "...alış bacarılmadı: %s"
+msgstr ""
 
 #: ../urpm/install.pm:295
 #, c-format
 msgid "removing package %s"
 msgstr "%s peketi silinir"
 
-#: ../urpm/install.pm:341
+#: ../urpm/install.pm:359
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
 msgstr "%s üstündə qurma üçün keçiş bitdi (sil=%d, qul=%d, yenilə=%d)"
 
-#: ../urpm/install.pm:344
+#: ../urpm/install.pm:362
 #, c-format
 msgid "unable to create transaction"
 msgstr "keçiş yaradıla bilmir"
 
-#: ../urpm/install.pm:372
-#, fuzzy, c-format
+#: ../urpm/install.pm:391
+#, c-format
 msgid "removing installed rpms (%s) from %s"
-msgstr "%s qurulur"
+msgstr ""
 
-#: ../urpm/install.pm:381
+#: ../urpm/install.pm:400
 #, c-format
 msgid "More information on package %s"
 msgstr "%s peketi haqqında daha çox məlumat"
 
-#: ../urpm/ldap.pm:42
+#: ../urpm/ldap.pm:41
 #, c-format
 msgid "Cannot create ldap cache directory"
 msgstr ""
 
-#: ../urpm/ldap.pm:48
+#: ../urpm/ldap.pm:47
 #, c-format
 msgid "Cannot write cache file for ldap\n"
 msgstr ""
 
-#: ../urpm/ldap.pm:177
+#: ../urpm/ldap.pm:176
 #, c-format
 msgid "No server defined, missing uri or host"
 msgstr ""
 
-#: ../urpm/ldap.pm:178
-#, fuzzy, c-format
+#: ../urpm/ldap.pm:177
+#, c-format
 msgid "No base defined"
-msgstr "Əmr tə'yin edilməyib"
+msgstr ""
 
-#: ../urpm/ldap.pm:188 ../urpm/ldap.pm:191
-#, fuzzy, c-format
+#: ../urpm/ldap.pm:187 ../urpm/ldap.pm:190
+#, c-format
 msgid "Cannot connect to ldap uri:"
-msgstr "Vericiyə bağlana bilmir"
+msgstr ""
 
-#: ../urpm/lock.pm:99
-#, fuzzy, c-format
+#: ../urpm/lock.pm:98
+#, c-format
 msgid "%s database is locked, process %d is already using it"
-msgstr "urpmi databeyzi qıfıllıdır"
+msgstr ""
 
-#: ../urpm/lock.pm:101
+#: ../urpm/lock.pm:100
 #, c-format
 msgid "%s database is locked (another program is already using it)"
 msgstr ""
 
-#: ../urpm/lock.pm:115
-#, fuzzy, c-format
+#: ../urpm/lock.pm:114
+#, c-format
 msgid "%s database is locked. Waiting..."
-msgstr "urpmi databeyzi qıfıllıdır"
+msgstr ""
 
-#: ../urpm/lock.pm:116
-#, fuzzy, c-format
+#: ../urpm/lock.pm:115
+#, c-format
 msgid "aborting"
-msgstr "Xəbərdarlıq"
+msgstr ""
 
 #: ../urpm/main_loop.pm:58
 #, c-format
@@ -897,19 +865,16 @@ msgid "Retry?"
 msgstr ""
 
 #: ../urpm/main_loop.pm:85
-#, fuzzy, c-format
+#, c-format
 msgid "You may need to update your urpmi database."
 msgstr ""
-"Qurulum bacarılmadı, bəzi fayllar əksikdir:\n"
-"%s\n"
-"Sizə, urpmi databeyzinizi yeniləməyi məsləhət görürük."
 
 #: ../urpm/main_loop.pm:89
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Installation failed, bad rpms:\n"
 "%s"
-msgstr "Qurulum iflas etdi"
+msgstr ""
 
 #: ../urpm/main_loop.pm:108
 #, c-format
@@ -920,9 +885,9 @@ msgid ""
 msgstr ""
 
 #: ../urpm/main_loop.pm:138
-#, fuzzy, c-format
+#, c-format
 msgid "The following package has bad signature"
-msgstr "Aşağıdakı paketlər hökmsüz imzaya sahibdir"
+msgstr ""
 
 #: ../urpm/main_loop.pm:139
 #, c-format
@@ -934,53 +899,53 @@ msgstr "Aşağıdakı paketlər hökmsüz imzaya sahibdir"
 msgid "Do you want to continue installation ?"
 msgstr "Quruluma davam etmək istəyirsiniz ?"
 
-#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:290
-#: ../urpm/main_loop.pm:298
+#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:291
+#: ../urpm/main_loop.pm:299
 #, c-format
 msgid "Installation failed"
 msgstr "Qurulum iflas etdi"
 
 #: ../urpm/main_loop.pm:159
-#, fuzzy, c-format
+#, c-format
 msgid "removing installed rpms (%s)"
-msgstr "%s qurulur"
+msgstr ""
 
 #: ../urpm/main_loop.pm:185
 #, c-format
 msgid "Try to continue anyway?"
 msgstr ""
 
-#: ../urpm/main_loop.pm:236
-#, fuzzy, c-format
+#: ../urpm/main_loop.pm:237
+#, c-format
 msgid "installing %s from %s"
-msgstr "%s qurulur"
+msgstr ""
 
-#: ../urpm/main_loop.pm:238
+#: ../urpm/main_loop.pm:239
 #, c-format
 msgid "installing %s"
 msgstr "%s qurulur"
 
-#: ../urpm/main_loop.pm:245
+#: ../urpm/main_loop.pm:246
 #, c-format
 msgid "distributing %s"
 msgstr "%s paylanır"
 
-#: ../urpm/main_loop.pm:291
-#, fuzzy, c-format
+#: ../urpm/main_loop.pm:292
+#, c-format
 msgid "Try installation without checking dependencies?"
-msgstr "Paket asılılıqlarına fikir vermədən qurmağı sınayım? (b/X) "
+msgstr ""
 
-#: ../urpm/main_loop.pm:299
-#, fuzzy, c-format
+#: ../urpm/main_loop.pm:300
+#, c-format
 msgid "Try harder to install (--force)?"
-msgstr "Quruluşu zorlayaraq sınayım (--force)? (b/X)"
+msgstr ""
 
-#: ../urpm/main_loop.pm:590
+#: ../urpm/main_loop.pm:591
 #, c-format
 msgid "Packages are up to date"
 msgstr ""
 
-#: ../urpm/main_loop.pm:601 ../urpm/parallel.pm:299
+#: ../urpm/main_loop.pm:602 ../urpm/parallel.pm:340
 #, c-format
 msgid "Installation is possible"
 msgstr "Qurulum mümkündür"
@@ -990,399 +955,401 @@ msgstr "Qurulum mümkündür"
 msgid "warning: md5sum for %s unavailable in MD5SUM file"
 msgstr ""
 
-#: ../urpm/media.pm:268
+#: ../urpm/media.pm:267
 #, c-format
 msgid "virtual medium \"%s\" should have a clear url, medium ignored"
 msgstr "\"%s\" virtual medyumunun düzgün url'si olmalıdır, mediyum rədd edildi"
 
-#: ../urpm/media.pm:270
+#: ../urpm/media.pm:269
 #, c-format
 msgid "unable to access list file of \"%s\", medium ignored"
 msgstr "\"%s\" siyahı faylına çatıla bilmədi, medya rədd edildi"
 
-#: ../urpm/media.pm:273
-#, fuzzy, c-format
+#: ../urpm/media.pm:272
+#, c-format
 msgid "unable to access synthesis file of \"%s\", medium ignored"
-msgstr "\"%s\" medyası hdlist faylına çatıla bilmir, medya rədd edildi"
+msgstr ""
 
-#: ../urpm/media.pm:299
-#, fuzzy, c-format
+#: ../urpm/media.pm:298
+#, c-format
 msgid "trying to override existing medium \"%s\", skipping"
-msgstr "mövcud medya \"%s\" yan keçilməyə çalışıldı, imtina edirəm"
+msgstr ""
 
-#: ../urpm/media.pm:515
+#: ../urpm/media.pm:514
 #, c-format
 msgid "failed to migrate removable device, ignoring media"
 msgstr ""
 
-#: ../urpm/media.pm:558
+#: ../urpm/media.pm:563
 #, c-format
 msgid "wrote config file [%s]"
 msgstr "[%s] quraşdırma faylı yazılır"
 
-#: ../urpm/media.pm:649
+#: ../urpm/media.pm:654
 #, c-format
 msgid "Can't use parallel mode with use-distrib mode"
 msgstr "use-distrib modu ilə bərabər paralel mod işlədilə bilməz"
 
-#: ../urpm/media.pm:657
+#: ../urpm/media.pm:662
 #, c-format
 msgid "using associated media for parallel mode: %s"
 msgstr "paralel mod üçün əlaqələndirilmiş mediya işlədilir: %s"
 
-#: ../urpm/media.pm:673
-#, fuzzy, c-format
+#: ../urpm/media.pm:678
+#, c-format
 msgid ""
 "--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
 "update, --use-distrib or --parallel"
 msgstr ""
-"--synthesis bunlarla bərabər istifadə edilə bilməz: --media, --excludemedia, "
-"--sortmedia, --update ya da --parallel"
 
-#: ../urpm/media.pm:786
-#, fuzzy, c-format
+#: ../urpm/media.pm:792
+#, c-format
 msgid "ignoring non-free medium `%s'"
-msgstr "\"%s\" mediyumu dəyişdirilir:"
+msgstr ""
 
-#: ../urpm/media.pm:795
-#, fuzzy, c-format
+#: ../urpm/media.pm:802
+#, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
-msgstr "\"%s\" mediyumu dəyişdirilir:"
+msgstr ""
 
-#: ../urpm/media.pm:799
+#: ../urpm/media.pm:806
 #, c-format
 msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
 
-#: ../urpm/media.pm:827
-#, fuzzy, c-format
-msgid "Search start: %s end: %s"
-msgstr "Qurulu yazı növlərini axtar"
+#: ../urpm/media.pm:816
+#, c-format
+msgid "un-ignoring 32bit medium `%s' b/c system is 32-bit EFI"
+msgstr ""
 
 #: ../urpm/media.pm:844
+#, c-format
+msgid "Search start: %s end: %s"
+msgstr ""
+
+#: ../urpm/media.pm:861
 #, c-format
 msgid "skipping package %s"
 msgstr "%s paketi keçilir"
 
-#: ../urpm/media.pm:860
+#: ../urpm/media.pm:877
 #, c-format
 msgid "would install instead of upgrade package %s"
 msgstr "%s yeniləmə paketi yerinə qurula bilər"
 
-#: ../urpm/media.pm:943
+#: ../urpm/media.pm:960
 #, c-format
 msgid "medium \"%s\" already exists"
 msgstr "\"%s\" medyası onsuz da vardır"
 
-#: ../urpm/media.pm:985
+#: ../urpm/media.pm:1008
 #, c-format
 msgid "(ignored by default)"
 msgstr ""
 
-#: ../urpm/media.pm:991
-#, fuzzy, c-format
+#: ../urpm/media.pm:1014
+#, c-format
 msgid "adding medium \"%s\" before remote medium \"%s\""
-msgstr "\"%s\" medyasından üst mə'lumatlar oxunur"
+msgstr ""
 
-#: ../urpm/media.pm:997
-#, fuzzy, c-format
+#: ../urpm/media.pm:1020
+#, c-format
 msgid "adding medium \"%s\""
-msgstr "\"%s\" medyumu çıxardılır"
+msgstr ""
 
-#: ../urpm/media.pm:1021
-#, fuzzy, c-format
+#: ../urpm/media.pm:1044
+#, c-format
 msgid "failed to copy media.cfg to %s (%d)"
-msgstr "rpmb açıla bilmir"
+msgstr ""
 
-#: ../urpm/media.pm:1092
+#: ../urpm/media.pm:1115
 #, c-format
 msgid "directory %s does not exist"
 msgstr ""
 
-#: ../urpm/media.pm:1100
+#: ../urpm/media.pm:1123
 #, c-format
 msgid "this location doesn't seem to contain any distribution"
 msgstr ""
 
-#: ../urpm/media.pm:1124
-#, fuzzy, c-format
+#: ../urpm/media.pm:1147
+#, c-format
 msgid "unable to parse media.cfg"
-msgstr "rpmb açıla bilmir"
+msgstr ""
 
-#: ../urpm/media.pm:1127
-#, fuzzy, c-format
+#: ../urpm/media.pm:1150
+#, c-format
 msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr ""
-"birinci qurulum mediyasına yetişə bilmədim (hdlists faylı tapıla bilmədi)"
 
-#: ../urpm/media.pm:1149
+#: ../urpm/media.pm:1172
 #, c-format
 msgid "skipping non compatible media `%s' (for %s)"
 msgstr ""
 
-#: ../urpm/media.pm:1207
-#, fuzzy, c-format
+#: ../urpm/media.pm:1230
+#, c-format
 msgid "retrieving media.cfg file..."
-msgstr "hdlists faylı alınır..."
+msgstr ""
 
-#: ../urpm/media.pm:1250
+#: ../urpm/media.pm:1273
 #, c-format
 msgid "trying to select nonexistent medium \"%s\""
 msgstr "mövcud olmayan \"%s\" medyumu seçilməyə çalışılır"
 
-#: ../urpm/media.pm:1253
+#: ../urpm/media.pm:1276
 #, c-format
 msgid "selecting multiple media: %s"
 msgstr "birdən çox medya seçilir: %s"
 
-#: ../urpm/media.pm:1312
+#: ../urpm/media.pm:1335
 #, c-format
 msgid "removing medium \"%s\""
 msgstr "\"%s\" medyumu çıxardılır"
 
-#: ../urpm/media.pm:1403
-#, fuzzy, c-format
+#: ../urpm/media.pm:1426
+#, c-format
 msgid "reconfiguring urpmi for media \"%s\""
-msgstr "\"%s\" mediyumundan rpm faylları alınır..."
+msgstr ""
 
-#: ../urpm/media.pm:1437
+#: ../urpm/media.pm:1460
 #, c-format
 msgid "...reconfiguration failed"
 msgstr "...yenidən quraşdırma bacarılmadı"
 
-#: ../urpm/media.pm:1443
+#: ../urpm/media.pm:1466
 #, c-format
 msgid "reconfiguration done"
 msgstr "yenidən quraşdırma tamamlandı"
 
-#: ../urpm/media.pm:1459
+#: ../urpm/media.pm:1482
 #, c-format
 msgid "Error generating names file: dependency %d not found"
 msgstr ""
 
-#: ../urpm/media.pm:1480
-#, fuzzy, c-format
+#: ../urpm/media.pm:1503
+#, c-format
 msgid "medium \"%s\" is up-to-date"
-msgstr "\"%s\" medyası seçili deyil"
+msgstr ""
 
-#: ../urpm/media.pm:1491
+#: ../urpm/media.pm:1514
 #, c-format
 msgid "examining synthesis file [%s]"
 msgstr "[%s] synthesis faylı sınanır "
 
-#: ../urpm/media.pm:1511
+#: ../urpm/media.pm:1534
 #, c-format
 msgid "problem reading synthesis file of medium \"%s\""
 msgstr "\"%s\" medyasının synthesis faylı oxuna bilmədi"
 
-#: ../urpm/media.pm:1524 ../urpm/media.pm:1619
-#, fuzzy, c-format
+#: ../urpm/media.pm:1547 ../urpm/media.pm:1642
+#, c-format
 msgid "copying [%s] for medium \"%s\"..."
-msgstr "\"%s\" medyası üçün siyahı faylı yazılır"
+msgstr ""
 
-#: ../urpm/media.pm:1526 ../urpm/media.pm:1596 ../urpm/media.pm:1849
+#: ../urpm/media.pm:1549 ../urpm/media.pm:1619 ../urpm/media.pm:1872
 #, c-format
 msgid "...copying failed"
 msgstr "...köçütrmə bacarılmadı"
 
-#: ../urpm/media.pm:1592
+#: ../urpm/media.pm:1615
 #, c-format
 msgid "copying description file of \"%s\"..."
 msgstr "\"%s\" faylının izahat faylı köçürdülür..."
 
-#: ../urpm/media.pm:1594 ../urpm/media.pm:1623
+#: ../urpm/media.pm:1617 ../urpm/media.pm:1646
 #, c-format
 msgid "...copying done"
 msgstr "...köçürtmə bitdi"
 
-#: ../urpm/media.pm:1625
+#: ../urpm/media.pm:1648
 #, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "[%s] faylının köçürülməsi bacarılmadı (fayl şüphəli dərəcədə kiçikdir)"
 
-#: ../urpm/media.pm:1673
-#, fuzzy, c-format
+#: ../urpm/media.pm:1696
+#, c-format
 msgid "computing md5sum of retrieved source synthesis"
-msgstr "alınan mənbə hdlist (ya da synthesis) faylının md5sum'ları hesablanır"
+msgstr ""
 
-#: ../urpm/media.pm:1675 ../urpm/media.pm:2158
-#, fuzzy, c-format
+#: ../urpm/media.pm:1698 ../urpm/media.pm:2181
+#, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
-msgstr "[%s] köçürülmə əməliyyatı bacarılmadı (md5sum uyğunsuzluğu)"
+msgstr ""
 
-#: ../urpm/media.pm:1690
-#, fuzzy, c-format
+#: ../urpm/media.pm:1713
+#, c-format
 msgid "genhdlist2 failed on %s"
-msgstr "[%s] hdlist faylı yoxlanır"
+msgstr ""
 
-#: ../urpm/media.pm:1700
-#, fuzzy, c-format
+#: ../urpm/media.pm:1723
+#, c-format
 msgid "comparing %s and %s"
-msgstr "%s qurulur"
+msgstr ""
 
-#: ../urpm/media.pm:1730
-#, fuzzy, c-format
+#: ../urpm/media.pm:1753
+#, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
-msgstr "\"%s\" medyası hdlist faylı tapılmadı"
+msgstr ""
 
-#: ../urpm/media.pm:1756
-#, fuzzy, c-format
+#: ../urpm/media.pm:1779
+#, c-format
 msgid "copying MD5SUM file of \"%s\"..."
-msgstr "\"%s\" faylının izahat faylı köçürdülür..."
+msgstr ""
 
-#: ../urpm/media.pm:1796
-#, fuzzy, c-format
+#: ../urpm/media.pm:1819
+#, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
-msgstr "hökmsüz rpm fayı adı [%s]"
+msgstr ""
 
-#: ../urpm/media.pm:1799
-#, fuzzy, c-format
+#: ../urpm/media.pm:1822
+#, c-format
 msgid "no metadata found for medium \"%s\""
-msgstr "\"%s\" medyası hdlist faylı tapılmadı"
+msgstr ""
 
-#: ../urpm/media.pm:1831
-#, fuzzy, c-format
+#: ../urpm/media.pm:1854
+#, c-format
 msgid "retrieving source synthesis of \"%s\"..."
-msgstr "\"%s\"in mənbə hdlist (ya da synthesis) faylı alınır..."
+msgstr ""
 
-#: ../urpm/media.pm:1897
+#: ../urpm/media.pm:1920
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
 msgstr "\"%s\" faylının pubkey'si yoxlanır..."
 
-#: ../urpm/media.pm:1909
+#: ../urpm/media.pm:1932
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
 msgstr "...\"%s\"nın pubkey faylından %s açarı idxal edildi"
 
-#: ../urpm/media.pm:1913
+#: ../urpm/media.pm:1936
 #, c-format
 msgid "unable to import pubkey file of \"%s\""
 msgstr "\"%s\"  faylının pubkey'si idxal edilə bilmədi"
 
-#: ../urpm/media.pm:1954
-#, fuzzy, c-format
+#: ../urpm/media.pm:1977
+#, c-format
 msgid "no synthesis file found for medium \"%s\""
-msgstr "\"%s\" medyası hdlist faylı tapılmadı"
+msgstr ""
 
-#: ../urpm/media.pm:1987
-#, fuzzy, c-format
+#: ../urpm/media.pm:2010
+#, c-format
 msgid "updated medium \"%s\""
-msgstr "%s medyası əlavə edildi"
+msgstr ""
 
-#: ../urpm/media.pm:2152
+#: ../urpm/media.pm:2175
 #, c-format
 msgid "retrieval of [%s] failed"
 msgstr ""
 
-#: ../urpm/mirrors.pm:34 ../urpm/mirrors.pm:60
+#: ../urpm/mirrors.pm:33 ../urpm/mirrors.pm:59
 #, c-format
 msgid "trying again with mirror %s"
 msgstr ""
 
-#: ../urpm/mirrors.pm:112
+#: ../urpm/mirrors.pm:111
 #, c-format
 msgid "Could not find a mirror from mirrorlist %s"
 msgstr ""
 
-#: ../urpm/mirrors.pm:260
+#: ../urpm/mirrors.pm:259
 #, c-format
 msgid "found geolocalisation %s %.2f %.2f from timezone %s"
 msgstr ""
 
-#: ../urpm/mirrors.pm:305
-#, fuzzy, c-format
+#: ../urpm/mirrors.pm:306
+#, c-format
 msgid "getting mirror list from %s"
-msgstr "rpm faylları [%s] üstündən oxunur"
+msgstr ""
 
-#: ../urpm/msg.pm:75 ../urpmi:492 ../urpmi:510 ../urpmi:626
+#: ../urpm/msg.pm:74 ../urpmi:492 ../urpmi:510 ../urpmi:628
 #, c-format
 msgid "Nn"
 msgstr "XxJjNn"
 
 #. -PO: Add here the keys which might be pressed in the "Yes"-case.
-#: ../urpm/msg.pm:76 ../urpme:38 ../urpmi.addmedia:133
+#: ../urpm/msg.pm:75 ../urpme:38 ../urpmi.addmedia:133
 #, c-format
 msgid "Yy"
 msgstr "YyBb"
 
-#: ../urpm/msg.pm:101 ../urpme:158 ../urpmi.addmedia:136
+#: ../urpm/msg.pm:100 ../urpme:158 ../urpmi.addmedia:136
 #, c-format
 msgid " (y/N) "
 msgstr " (b/X) "
 
-#: ../urpm/msg.pm:130
+#: ../urpm/msg.pm:129
 #, c-format
 msgid "Sorry, bad choice, try again\n"
 msgstr "Xətalı seçənək, təkrar sınayın\n"
 
-#: ../urpm/msg.pm:161
+#: ../urpm/msg.pm:160
 #, c-format
 msgid "Package"
 msgstr ""
 
-#: ../urpm/msg.pm:161
+#: ../urpm/msg.pm:160
 #, c-format
 msgid "Version"
 msgstr ""
 
-#: ../urpm/msg.pm:161
+#: ../urpm/msg.pm:160
 #, c-format
 msgid "Release"
 msgstr ""
 
-#: ../urpm/msg.pm:161
-#, fuzzy, c-format
+#: ../urpm/msg.pm:160
+#, c-format
 msgid "Arch"
-msgstr "Axtar"
+msgstr ""
 
-#: ../urpm/msg.pm:170
+#: ../urpm/msg.pm:169
 #, c-format
 msgid "(recommended)"
 msgstr ""
 
-#: ../urpm/msg.pm:185
-#, fuzzy, c-format
+#: ../urpm/msg.pm:184
+#, c-format
 msgid "medium \"%s\""
-msgstr "\"%s\" medyumu çıxardılır"
+msgstr ""
 
-#: ../urpm/msg.pm:185
+#: ../urpm/msg.pm:184
 #, c-format
 msgid "command line"
 msgstr ""
 
-#: ../urpm/msg.pm:199
+#: ../urpm/msg.pm:198
 #, c-format
 msgid "B"
 msgstr ""
 
-#: ../urpm/msg.pm:199
+#: ../urpm/msg.pm:198
 #, c-format
 msgid "KB"
 msgstr "KB"
 
-#: ../urpm/msg.pm:199
+#: ../urpm/msg.pm:198
 #, c-format
 msgid "MB"
 msgstr "MB"
 
-#: ../urpm/msg.pm:199
+#: ../urpm/msg.pm:198
 #, c-format
 msgid "GB"
 msgstr "GB"
 
-#: ../urpm/msg.pm:199 ../urpm/msg.pm:208
+#: ../urpm/msg.pm:198 ../urpm/msg.pm:207
 #, c-format
 msgid "TB"
 msgstr "TB"
 
-#: ../urpm/orphans.pm:79
+#: ../urpm/orphans.pm:84
 #, c-format
 msgid "Marking %s as manually installed, it won't be auto-orphaned"
 msgstr ""
 
-#: ../urpm/orphans.pm:527
-#, fuzzy, c-format
+#: ../urpm/orphans.pm:613
+#, c-format
 msgid ""
 "The following package:\n"
 "%s\n"
@@ -1391,15 +1358,17 @@ msgid_plural ""
 "The following packages:\n"
 "%s\n"
 "are now orphaned."
-msgstr[0] "Aşağıdakı paketlərin bir dənəsinə ehtiyac var:"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpm/orphans.pm:530
-#, fuzzy, c-format
+#: ../urpm/orphans.pm:616
+#, c-format
 msgid "You may wish to remove it."
 msgid_plural "You may wish to remove them."
-msgstr[0] "Silinəcək heç bir şey yoxdur"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpm/orphans.pm:547
+#: ../urpm/orphans.pm:633
 #, c-format
 msgid ""
 "The following package:\n"
@@ -1412,36 +1381,37 @@ msgid_plural ""
 "are now orphaned, if you wish to remove them, you can use \"urpme --auto-"
 "orphans\""
 msgstr[0] ""
+msgstr[1] ""
 
-#: ../urpm/parallel.pm:15
+#: ../urpm/parallel.pm:31
 #, c-format
 msgid "unable to parse \"%s\" in file [%s]"
 msgstr "[%s] faylındakı \"%s\" oxuna bilmədi"
 
-#: ../urpm/parallel.pm:24
+#: ../urpm/parallel.pm:40
 #, c-format
 msgid "examining parallel handler in file [%s]"
 msgstr "[%s] faylındakı paralel tutucu yoxlanır"
 
-#: ../urpm/parallel.pm:35
+#: ../urpm/parallel.pm:51
 #, c-format
 msgid "found parallel handler for nodes: %s"
 msgstr "düyümlər üçün paralel tutucu tapıldı: %s"
 
-#: ../urpm/parallel.pm:39
+#: ../urpm/parallel.pm:55
 #, c-format
 msgid "unable to use parallel option \"%s\""
 msgstr " \"%s\" paralel seçənəyi işlədilə bilmədi"
 
-#: ../urpm/parallel.pm:94
+#: ../urpm/parallel.pm:120
 #, c-format
 msgid "on node %s"
 msgstr ""
 
-#: ../urpm/parallel.pm:294
-#, fuzzy, c-format
+#: ../urpm/parallel.pm:335
+#, c-format
 msgid "Installation failed on node %s"
-msgstr "Qurulum iflas etdi"
+msgstr ""
 
 #: ../urpm/parallel_ka_run.pm:57
 #, c-format
@@ -1470,92 +1440,90 @@ msgid ""
 "code: %d)"
 msgstr ""
 
-#: ../urpm/removable.pm:46
-#, fuzzy, c-format
+#: ../urpm/removable.pm:45
+#, c-format
 msgid "unable to access medium \"%s\"."
-msgstr "\"%s\" medyasına çatıla bilmir"
+msgstr ""
 
-#: ../urpm/removable.pm:86 ../urpm/removable.pm:101
+#: ../urpm/removable.pm:85 ../urpm/removable.pm:100
 #, c-format
 msgid "mounting %s"
 msgstr "%s bağlanır"
 
-#: ../urpm/removable.pm:113
+#: ../urpm/removable.pm:112
 #, c-format
 msgid "unmounting %s"
 msgstr "%s ayrılır"
 
-#: ../urpm/select.pm:45
+#: ../urpm/select.pm:44
 #, c-format
 msgid "urpmi was restarted, and the list of priority packages did not change"
 msgstr ""
 
-#: ../urpm/select.pm:47
+#: ../urpm/select.pm:46
 #, c-format
 msgid ""
 "urpmi was restarted, and the list of priority packages did change: %s vs %s"
 msgstr ""
 
-#: ../urpm/select.pm:220
-#, fuzzy, c-format
+#: ../urpm/select.pm:219
+#, c-format
 msgid "No package named %s"
-msgstr "%s adlı paket yoxdur"
+msgstr ""
 
-#: ../urpm/select.pm:222 ../urpme:112
+#: ../urpm/select.pm:221 ../urpme:112
 #, c-format
 msgid "The following packages contain %s: %s"
 msgstr "Aşağıdakı paketlər %s daxıl edir: %s"
 
-#: ../urpm/select.pm:224
+#: ../urpm/select.pm:223
 #, c-format
 msgid "You should use \"-a\" to use all of them"
 msgstr ""
 
-#: ../urpm/select.pm:372
-#, fuzzy, c-format
+#: ../urpm/select.pm:371
+#, c-format
 msgid "found package(s) %s in urpmi db, but none are installed"
-msgstr "hər şey onsuzda quruludur"
+msgstr ""
+
+#: ../urpm/select.pm:606
+#, c-format
+msgid "Package %s is already installed"
+msgstr ""
 
 #: ../urpm/select.pm:607
-#, fuzzy, c-format
-msgid "Package %s is already installed"
-msgstr "hər şey onsuzda quruludur"
-
-#: ../urpm/select.pm:608
-#, fuzzy, c-format
+#, c-format
 msgid "Packages %s are already installed"
-msgstr "hər şey onsuzda quruludur"
+msgstr ""
 
-#: ../urpm/select.pm:625 ../urpm/select.pm:712
+#: ../urpm/select.pm:624 ../urpm/select.pm:711
 #, c-format
 msgid "due to conflicts with %s"
 msgstr "%s ilə yaranan toqquşma səbəbiylə"
 
-#: ../urpm/select.pm:626 ../urpm/select.pm:706
+#: ../urpm/select.pm:625 ../urpm/select.pm:705
 #, c-format
 msgid "due to unsatisfied %s"
 msgstr "razı qalmayan %s olduğuna görə"
 
-#: ../urpm/select.pm:632
+#: ../urpm/select.pm:631
 #, c-format
 msgid "trying to promote %s"
 msgstr "%s irəliləndirməyə çalışılır"
 
-#: ../urpm/select.pm:633
+#: ../urpm/select.pm:632
 #, c-format
 msgid "in order to keep %s"
 msgstr "%s'ı saxlamaq üçün"
 
-#: ../urpm/select.pm:674
-#, fuzzy, c-format
+#: ../urpm/select.pm:673
+#, c-format
 msgid ""
 "The following package has to be removed for others to be upgraded:\n"
 "%s"
 msgstr ""
-"Paketlərin yenilənməsi üçün aşağıdakı paketlərin çıxardılması lazımdır:\n"
-"%s"
 
-#: ../urpm/select.pm:675
+#: ../urpm/select.pm:674
 #, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
@@ -1564,85 +1532,85 @@ msgstr ""
 "Paketlərin yenilənməsi üçün aşağıdakı paketlərin çıxardılması lazımdır:\n"
 "%s"
 
-#: ../urpm/select.pm:702
+#: ../urpm/select.pm:701
 #, c-format
 msgid "in order to install %s"
 msgstr "%s paket(lər)ini qurmaq üçün"
 
-#: ../urpm/select.pm:708
+#: ../urpm/select.pm:707
 #, c-format
 msgid "due to missing %s"
 msgstr "%s əksik olduğuna görə"
 
-#: ../urpm/signature.pm:62
+#: ../urpm/signature.pm:61
 #, c-format
 msgid "Invalid signature (%s)"
 msgstr "Hökmsüz imza (%s)"
 
-#: ../urpm/signature.pm:77
-#, fuzzy, c-format
+#: ../urpm/signature.pm:76
+#, c-format
 msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
-msgstr "Aşağıdakı paketlər %s daxıl edir: %s"
+msgstr ""
 
-#: ../urpm/signature.pm:83
+#: ../urpm/signature.pm:82
 #, c-format
 msgid "SECURITY: NOT checking package \"%s\" (due to configuration)"
 msgstr ""
 
-#: ../urpm/signature.pm:102
+#: ../urpm/signature.pm:101
 #, c-format
 msgid "Invalid Key ID (%s)"
 msgstr "Hökmsüz Qiymət ID (%s)"
 
-#: ../urpm/signature.pm:104
+#: ../urpm/signature.pm:103
 #, c-format
 msgid "Missing signature (%s)"
 msgstr "Əksik imza (%s)"
 
-#: ../urpm/signature.pm:107
+#: ../urpm/signature.pm:106
 #, c-format
 msgid "SECURITY: Medium \"%s\" has no key (%s)!"
 msgstr ""
 
-#: ../urpm/signature.pm:109
+#: ../urpm/signature.pm:108
 #, c-format
 msgid "Medium without key (%s)"
 msgstr ""
 
-#: ../urpm/sys.pm:199
+#: ../urpm/sys.pm:198
 #, c-format
 msgid "system"
 msgstr ""
 
-#: ../urpm/sys.pm:236
+#: ../urpm/sys.pm:235
 #, c-format
 msgid "You should restart your computer for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:238
+#: ../urpm/sys.pm:237
 #, c-format
 msgid "You should restart your session for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:240
+#: ../urpm/sys.pm:239
 #, c-format
 msgid "You should restart %s for %s"
 msgstr ""
 
-#: ../urpm/sys.pm:378
-#, fuzzy, c-format
+#: ../urpm/sys.pm:377
+#, c-format
 msgid "Can't write file"
-msgstr "[%s] quraşdırma faylı yazıla bilmir"
+msgstr ""
 
-#: ../urpm/sys.pm:378
-#, fuzzy, c-format
+#: ../urpm/sys.pm:377
+#, c-format
 msgid "Can't open file"
-msgstr "Köçütrmə bacarılmadı"
+msgstr ""
 
-#: ../urpm/sys.pm:391
-#, fuzzy, c-format
+#: ../urpm/sys.pm:390
+#, c-format
 msgid "Can't move file %s to %s"
-msgstr "Köçütrmə bacarılmadı"
+msgstr ""
 
 #: ../urpme:43
 #, c-format
@@ -1655,9 +1623,9 @@ msgid "  --auto-orphans - remove orphans\n"
 msgstr ""
 
 #: ../urpme:45
-#, fuzzy, c-format
+#, c-format
 msgid "  --test         - verify if the removal can be achieved correctly.\n"
-msgstr "  --test         - qurulumun düzgün edilə biləcəyini yoxla.\n"
+msgstr ""
 
 #: ../urpme:47 ../urpmi:106 ../urpmq:66
 #, c-format
@@ -1665,37 +1633,37 @@ msgid "  --parallel     - distributed urpmi across machines of alias.\n"
 msgstr "  --parallel     - alias sistemləri arasında paylaşılmış urpmi.\n"
 
 #: ../urpme:48
-#, fuzzy, c-format
+#, c-format
 msgid "  --root         - use another root for rpm removal.\n"
-msgstr "  --root         - rpm qurulumu üçün başqa root işlət.\n"
+msgstr ""
 
 #: ../urpme:49 ../urpmf:35 ../urpmi:108 ../urpmi.addmedia:73
-#: ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
-#, fuzzy, c-format
+#: ../urpmi.removemedia:45 ../urpmi.update:49 ../urpmq:68
+#, c-format
 msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
-msgstr "  --root         - rpm qurulumu üçün başqa root işlət.\n"
+msgstr ""
 
 #: ../urpme:50 ../urpmi:96
-#, fuzzy, c-format
+#, c-format
 msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
-msgstr "  --update       - ancaq yeniləmə medyanı yenilə.\n"
+msgstr ""
 
 #: ../urpme:51
-#, fuzzy, c-format
+#, c-format
 msgid "  --noscripts    - do not execute package scriptlet(s).\n"
-msgstr "  --description   - taq izahatını göstər: izahat.\n"
+msgstr ""
 
 #: ../urpme:52
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
 "                   to (un)install a chroot with --root option.\n"
-msgstr "  --use-distrib  - urpmi-ni birbaşa distrib ağacından quraşdır.\n"
+msgstr ""
 
 #: ../urpme:54 ../urpmi:150 ../urpmq:87
-#, fuzzy, c-format
+#, c-format
 msgid "  --verbose, -v  - verbose mode.\n"
-msgstr "  --verbose      - təfsilatlı mod.\n"
+msgstr ""
 
 #: ../urpme:55
 #, c-format
@@ -1703,9 +1671,9 @@ msgid "  -a             - select all packages matching expression.\n"
 msgstr "  -a             - qaydaya uyğun gələn bütün paketləri seç.\n"
 
 #: ../urpme:70
-#, fuzzy, c-format
+#, c-format
 msgid "Only superuser is allowed to remove packages"
-msgstr "Medianı silmə icazəsi ancaq ali istifadəçiyə verilib"
+msgstr ""
 
 #: ../urpme:103
 #, c-format
@@ -1718,10 +1686,11 @@ msgid "unknown package"
 msgstr "na'məlum paket "
 
 #: ../urpme:118
-#, fuzzy, c-format
+#, c-format
 msgid "Removing the following package will break your system:"
 msgid_plural "Removing the following packages will break your system:"
-msgstr[0] "%s paketini silmək sisteminizi pozacaq"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../urpme:123
 #, c-format
@@ -1729,34 +1698,36 @@ msgid "Nothing to remove"
 msgstr "Silinəcək heç bir şey yoxdur"
 
 #: ../urpme:140
-#, fuzzy, c-format
+#, c-format
 msgid "No orphans to remove"
-msgstr "Silinəcək heç bir şey yoxdur"
+msgstr ""
 
 #: ../urpme:146
-#, fuzzy, c-format
+#, c-format
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
 msgstr[0] ""
-"Asılıqları ortadan qaldırmaq üçün, aşağıdakı paketlər silinəcəkdir (%d MB)"
+msgstr[1] ""
 
 #: ../urpme:151
-#, fuzzy, c-format
+#, c-format
 msgid "(orphan package)"
 msgid_plural "(orphan packages)"
-msgstr[0] "na'məlum paket "
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../urpme:158
-#, fuzzy, c-format
+#, c-format
 msgid "Remove %d package?"
 msgid_plural "Remove %d packages?"
-msgstr[0] "%s peketi silinir"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../urpme:163
-#, fuzzy, c-format
+#, c-format
 msgid "testing removal of %s"
-msgstr "çıxardıla bilən avadanlıq \"%s\" olaraq alınır"
+msgstr ""
 
 #: ../urpme:180
 #, c-format
@@ -1764,9 +1735,9 @@ msgid "Removal failed"
 msgstr "Çıxartma bacarılmadı"
 
 #: ../urpme:182
-#, fuzzy, c-format
+#, c-format
 msgid "Removal is possible"
-msgstr "Çıxartma bacarılmadı"
+msgstr ""
 
 #: ../urpmf:31
 #, c-format
@@ -1797,9 +1768,9 @@ msgstr ""
 "  --sortmedia    - vergüllə ayrılmış alt qatarlara görə mediyanı sırala.\n"
 
 #: ../urpmf:38
-#, fuzzy, c-format
+#, c-format
 msgid "  --use-distrib  - use the given path to access media\n"
-msgstr "  --synthesis    - urpmi db yerinə verilən synthesis'i işlət.\n"
+msgstr ""
 
 #: ../urpmf:39 ../urpmi:73 ../urpmq:47
 #, c-format
@@ -1828,10 +1799,9 @@ msgstr ""
 "  -i             - hər patterndə bötük/kiçik hərf qaydalarını rədd et.\n"
 
 #: ../urpmf:44
-#, fuzzy, c-format
+#, c-format
 msgid "  -I             - honor case distinctions in patterns (default).\n"
 msgstr ""
-"  -i             - hər patterndə bötük/kiçik hərf qaydalarını rədd et.\n"
 
 #: ../urpmf:45
 #, c-format
@@ -1869,36 +1839,34 @@ msgid "  !              - unary NOT.\n"
 msgstr "  !              - NOT operatoru.\n"
 
 #: ../urpmf:52
-#, fuzzy, c-format
+#, c-format
 msgid "  ( )            - left and right parentheses.\n"
-msgstr "  )              - sağ mötərizə qrup ifadəsini bağlamaq üçün.\n"
+msgstr ""
 
 #: ../urpmf:53
-#, fuzzy, c-format
+#, c-format
 msgid "List of tags:\n"
 msgstr ""
-"Geri yüklənəcək mə'lumatların siyahısı:\n"
-"\n"
 
 #: ../urpmf:54
-#, fuzzy, c-format
+#, c-format
 msgid "  --qf           - specify a printf-like output format\n"
-msgstr "  --X            - X ara üzünü işlət.\n"
+msgstr ""
 
 #: ../urpmf:55
-#, fuzzy, c-format
+#, c-format
 msgid "                   example: '%%name:%%files'\n"
-msgstr "                    ön qurğulusu %s-dir.\n"
+msgstr ""
 
 #: ../urpmf:56
-#, fuzzy, c-format
+#, c-format
 msgid "  --arch         - architecture\n"
-msgstr "  --url          - taq url'sini göstər: url.\n"
+msgstr ""
 
 #: ../urpmf:57
-#, fuzzy, c-format
+#, c-format
 msgid "  --buildhost    - build host\n"
-msgstr "  --buildhost    - taq inşa qovşağını göstər: inşa qovşağı.\n"
+msgstr ""
 
 #: ../urpmf:58
 #, c-format
@@ -1906,19 +1874,19 @@ msgid "  --buildtime    - build time\n"
 msgstr ""
 
 #: ../urpmf:59
-#, fuzzy, c-format
+#, c-format
 msgid "  --conffiles    - configuration files\n"
-msgstr "Konsol quraşdırma modulu"
+msgstr ""
 
 #: ../urpmf:60
-#, fuzzy, c-format
+#, c-format
 msgid "  --conflicts    - conflict tags\n"
-msgstr "  --conflicts     - taq toqquşmalarını göstər: bütün toqquşmalar.\n"
+msgstr ""
 
 #: ../urpmf:61
-#, fuzzy, c-format
+#, c-format
 msgid "  --description  - package description\n"
-msgstr "  --description   - taq izahatını göstər: izahat.\n"
+msgstr ""
 
 #: ../urpmf:62
 #, c-format
@@ -1926,89 +1894,89 @@ msgid "  --distribution - distribution\n"
 msgstr ""
 
 #: ../urpmf:63
-#, fuzzy, c-format
+#, c-format
 msgid "  --epoch        - epoch\n"
-msgstr "  --epoch        - taq epoch'unu göstər: epoch.\n"
+msgstr ""
 
 #: ../urpmf:64
-#, fuzzy, c-format
+#, c-format
 msgid "  --filename     - filename of the package\n"
-msgstr "  --name         - sadəcə paket adlarını göstər.\n"
+msgstr ""
 
 #: ../urpmf:65
-#, fuzzy, c-format
+#, c-format
 msgid "  --files        - list of files contained in the package\n"
-msgstr "  -l             - paketdəki faylları göstər.\n"
+msgstr ""
 
 #: ../urpmf:66
-#, fuzzy, c-format
+#, c-format
 msgid "  --group        - group\n"
-msgstr "  --group         - taq qrupunu göstər: qrup.\n"
+msgstr ""
 
 #: ../urpmf:67
-#, fuzzy, c-format
+#, c-format
 msgid "  --license      - license\n"
-msgstr "  --name         - sadəcə paket adlarını göstər.\n"
+msgstr ""
 
 #: ../urpmf:68
-#, fuzzy, c-format
+#, c-format
 msgid "  --name         - package name\n"
-msgstr "  --name         - sadəcə paket adlarını göstər.\n"
+msgstr ""
 
 #: ../urpmf:69
-#, fuzzy, c-format
+#, c-format
 msgid "  --obsoletes    - obsoletes tags\n"
-msgstr "  --obsoletes     - taq mütləqlərini göstər: bütün mütləqlər.\n"
+msgstr ""
 
 #: ../urpmf:70
-#, fuzzy, c-format
+#, c-format
 msgid "  --packager     - packager\n"
-msgstr "  --packager     - taq paketləyicisini göstərr: paketləyici.\n"
+msgstr ""
 
 #: ../urpmf:71
-#, fuzzy, c-format
+#, c-format
 msgid "  --provides     - provides tags\n"
-msgstr "  --provides      - taq gətirənini göstər: bütün gətirənlər.\n"
+msgstr ""
 
 #: ../urpmf:72
-#, fuzzy, c-format
+#, c-format
 msgid "  --requires     - requires tags\n"
-msgstr "  --requires      - taq lazımlılarını göstər: bütün lazımlılar.\n"
+msgstr ""
 
 #: ../urpmf:73
-#, fuzzy, c-format
+#, c-format
 msgid "  --size         - installed size\n"
-msgstr "  --size          - taq böyüklüyünü göstər: böyüklük.\n"
+msgstr ""
 
 #: ../urpmf:74
-#, fuzzy, c-format
+#, c-format
 msgid "  --sourcerpm    - source rpm name\n"
-msgstr "  --sourcerpm    - taq sourcerpm'ini göstər: source rpm.\n"
+msgstr ""
 
 #: ../urpmf:75
-#, fuzzy, c-format
+#, c-format
 msgid "  --recommends   - recommends tags\n"
-msgstr "  --requires      - taq lazımlılarını göstər: bütün lazımlılar.\n"
+msgstr ""
 
 #: ../urpmf:76
-#, fuzzy, c-format
+#, c-format
 msgid "  --summary      - summary\n"
-msgstr "  --summary       - taq icmalını göstər: icmal.\n"
+msgstr ""
 
 #: ../urpmf:77
-#, fuzzy, c-format
+#, c-format
 msgid "  --url          - url\n"
-msgstr "  --url          - taq url'sini göstər: url.\n"
+msgstr ""
 
 #: ../urpmf:78
-#, fuzzy, c-format
+#, c-format
 msgid "  --vendor       - vendor\n"
-msgstr "  --verbose      - təfsilatlı mod.\n"
+msgstr ""
 
 #: ../urpmf:79
-#, fuzzy, c-format
+#, c-format
 msgid "  -m             - the media in which the package was found\n"
-msgstr "  -l             - paketdəki faylları göstər.\n"
+msgstr ""
 
 #: ../urpmf:80 ../urpmq:97
 #, c-format
@@ -2027,34 +1995,34 @@ msgid "Incorrect format: you may use only one multi-valued tag"
 msgstr ""
 
 #: ../urpmf:287
-#, fuzzy, c-format
+#, c-format
 msgid "no hdlist available for medium \"%s\""
-msgstr "\"%s\" medyası hdlist faylı tapılmadı"
+msgstr ""
 
 #: ../urpmf:294
-#, fuzzy, c-format
+#, c-format
 msgid "no synthesis available for medium \"%s\""
-msgstr "\"%s\" medyası hdlist sintezi inşa edilid"
+msgstr ""
 
 #: ../urpmf:303
-#, fuzzy, c-format
+#, c-format
 msgid "no xml-info available for medium \"%s\""
-msgstr "\"%s\" medyası üçün siyahı faylı yazılır"
+msgstr ""
 
 #: ../urpmi:76
-#, fuzzy, c-format
+#, c-format
 msgid "  --auto-update  - update media then upgrade the system.\n"
-msgstr "  --auto-select  - sistemi yeniləmək üçün paketləri avtomatik seç.\n"
+msgstr ""
 
 #: ../urpmi:77
-#, fuzzy, c-format
+#, c-format
 msgid "    --no-md5sum    - disable MD5SUM file checking.\n"
-msgstr "  --no-md5sum    - MD5SUM fayl yoxlamasını qeyri fəallaşdır.\n"
+msgstr ""
 
 #: ../urpmi:78
-#, fuzzy, c-format
+#, c-format
 msgid "    --force-key    - force update of gpg key.\n"
-msgstr "  --force-key    - gpg açarını yeniləməyə məcbur et.\n"
+msgstr ""
 
 #: ../urpmi:79
 #, c-format
@@ -2062,9 +2030,9 @@ msgid "  --auto-orphans - remove orphans without asking\n"
 msgstr ""
 
 #: ../urpmi:80 ../urpmq:52
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-recommends - do not auto select \"recommended\" packages.\n"
-msgstr "  --obsoletes     - taq mütləqlərini göstər: bütün mütləqlər.\n"
+msgstr ""
 
 #: ../urpmi:81
 #, c-format
@@ -2074,9 +2042,9 @@ msgid ""
 msgstr "  --no-uninstall - paket silməyi qətiyyən soruşma, qurulumu bitir.\n"
 
 #: ../urpmi:82
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-install   - don't install packages (only download)\n"
-msgstr "  --install-src  - ancaq mənbə paketini qur (ikililəri yox).\n"
+msgstr ""
 
 #: ../urpmi:83 ../urpmq:54
 #, c-format
@@ -2105,14 +2073,14 @@ msgid "  --split-length - small transaction length, default is %d.\n"
 msgstr "  --split-length - kiçik keçiş uzunluqu, əsasən %d.\n"
 
 #: ../urpmi:91
-#, fuzzy, c-format
+#, c-format
 msgid "  --fuzzy, -y    - impose fuzzy search.\n"
-msgstr "  --fuzzy        - fuzzy axtarmanı qəbul et ( -y ilə eyni).\n"
+msgstr ""
 
 #: ../urpmi:92
-#, fuzzy, c-format
+#, c-format
 msgid "  --buildrequires - install the buildrequires of the packages\n"
-msgstr "  --requires      - taq lazımlılarını göstər: bütün lazımlılar.\n"
+msgstr ""
 
 #: ../urpmi:93
 #, c-format
@@ -2125,9 +2093,9 @@ msgid "  --clean        - remove rpm from cache before anything else.\n"
 msgstr "  --clean        - hərşeydən əvvəl ara yaddaşdan rpm'i sil.\n"
 
 #: ../urpmi:95
-#, fuzzy, c-format
+#, c-format
 msgid "  --noclean      - don't clean rpms from cache.\n"
-msgstr "  --noclean      - rpm'ləri ara yaddaşda işlətmə.\n"
+msgstr ""
 
 #: ../urpmi:97
 #, c-format
@@ -2161,9 +2129,9 @@ msgstr ""
 "                   yoxlanmadan qurma sualı verməyə icazə ver.\n"
 
 #: ../urpmi:105
-#, fuzzy, c-format
+#, c-format
 msgid "  --allow-recommends - auto select \"recommended\" packages.\n"
-msgstr "  --obsoletes     - taq mütləqlərini göstər: bütün mütləqlər.\n"
+msgstr ""
 
 #: ../urpmi:109
 #, c-format
@@ -2172,7 +2140,7 @@ msgid ""
 "                   to install a chroot with --root option.\n"
 msgstr "  --use-distrib  - urpmi-ni birbaşa distrib ağacından quraşdır.\n"
 
-#: ../urpmi:111 ../urpmi.addmedia:60 ../urpmi.update:37
+#: ../urpmi:111 ../urpmi.addmedia:60 ../urpmi.update:38
 #, c-format
 msgid "  --metalink     - generate and use a local metalink.\n"
 msgstr ""
@@ -2216,7 +2184,7 @@ msgstr ""
 msgid "  --aria2-options - additional options to pass to aria2\n"
 msgstr ""
 
-#: ../urpmi:121 ../urpmi.addmedia:61 ../urpmi.update:38
+#: ../urpmi:121 ../urpmi.addmedia:61 ../urpmi.update:39
 #, c-format
 msgid "  --limit-rate   - limit the download speed.\n"
 msgstr "  --limit-rate   - endirmə sür'ətinə sərhəd qoy .\n"
@@ -2231,7 +2199,7 @@ msgstr ""
 "                   (--no-resume bunu qeyri-fəallaşdırır, əsasən qeyri-"
 "fəaldır).\n"
 
-#: ../urpmi:124 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
+#: ../urpmi:124 ../urpmi.addmedia:62 ../urpmi.update:40 ../urpmq:74
 #, c-format
 msgid ""
 "  --proxy        - use specified HTTP proxy, the port number is assumed\n"
@@ -2242,7 +2210,7 @@ msgstr ""
 "                   1080 qəbul edilir (istifadə qaydası: <vəkilqovşaq[:"
 "qapı]>).\n"
 
-#: ../urpmi:126 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
+#: ../urpmi:126 ../urpmi.addmedia:64 ../urpmi.update:42 ../urpmq:76
 #, c-format
 msgid ""
 "  --proxy-user   - specify user and password to use for proxy\n"
@@ -2272,24 +2240,24 @@ msgid "  --excludedocs  - exclude doc files.\n"
 msgstr "  --excludedocs  - sənəd fayllarını ixrac et.\n"
 
 #: ../urpmi:136
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignoresize   - don't verify disk space before installation.\n"
-msgstr "  --no-uninstall - paket silməyi qətiyyən soruşma, qurulumu bitir.\n"
+msgstr ""
 
 #: ../urpmi:137
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
-msgstr "  --url          - taq url'sini göstər: url.\n"
+msgstr ""
 
 #: ../urpmi:138
-#, fuzzy, c-format
+#, c-format
 msgid "  --noscripts    - do not execute package scriptlet(s)\n"
-msgstr "  --description   - taq izahatını göstər: izahat.\n"
+msgstr ""
 
 #: ../urpmi:139
-#, fuzzy, c-format
+#, c-format
 msgid "  --replacefiles - ignore file conflicts\n"
-msgstr "  --conflicts     - taq toqquşmalarını göstər: bütün toqquşmalar.\n"
+msgstr ""
 
 #: ../urpmi:140
 #, c-format
@@ -2297,9 +2265,9 @@ msgid "  --skip         - packages which installation should be skipped\n"
 msgstr "  --skip         - qurulması keçilə bilən paketlər\n"
 
 #: ../urpmi:141
-#, fuzzy, c-format
+#, c-format
 msgid "  --prefer       - packages which should be preferred\n"
-msgstr "  --skip         - qurulması keçilə bilən paketlər\n"
+msgstr ""
 
 #: ../urpmi:142
 #, c-format
@@ -2309,9 +2277,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi:144
-#, fuzzy, c-format
+#, c-format
 msgid "  --nolock       - don't lock rpm db.\n"
-msgstr "  --noclean      - rpm'ləri ara yaddaşda işlətmə.\n"
+msgstr ""
 
 #: ../urpmi:145
 #, c-format
@@ -2324,14 +2292,14 @@ msgid "  -a             - select all matches on command line.\n"
 msgstr "  -a             - əmr sətirindəki bütün uyğun gələnləri seç.\n"
 
 #: ../urpmi:149
-#, fuzzy, c-format
+#, c-format
 msgid "  --quiet, -q    - quiet mode.\n"
-msgstr "  -q             - səssiz mod.\n"
+msgstr ""
 
 #: ../urpmi:151
-#, fuzzy, c-format
+#, c-format
 msgid "  --debug        - very verbose mode.\n"
-msgstr "  --verbose      - təfsilatlı mod.\n"
+msgstr ""
 
 #: ../urpmi:152
 #, c-format
@@ -2351,9 +2319,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi:217
-#, fuzzy, c-format
+#, c-format
 msgid "You can't install binary rpm files when using --install-src"
-msgstr "--install-src istifadə edildiyində rpm faylları ilə nə edilə biləcəyi"
+msgstr ""
 
 #: ../urpmi:218
 #, c-format
@@ -2394,35 +2362,34 @@ msgstr ""
 
 #. -PO: here format is "<package_name>: <summary> (to upgrade)"
 #: ../urpmi:426
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s (to upgrade)"
-msgstr "Yeniləmə"
+msgstr ""
 
 #. -PO: here format is "<package_name> (to upgrade)"
 #: ../urpmi:428
-#, fuzzy, c-format
+#, c-format
 msgid "%s (to upgrade)"
-msgstr "Yeniləmə"
+msgstr ""
 
 #. -PO: here format is "<package_name>: <summary> (to install)"
 #: ../urpmi:432
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s (to install)"
-msgstr "Qurulumun sonu"
+msgstr ""
 
 #. -PO: here format is "<package_name> (to install)"
 #: ../urpmi:434
-#, fuzzy, c-format
+#, c-format
 msgid "%s (to install)"
-msgstr "Qurulumun sonu"
+msgstr ""
 
 #: ../urpmi:440
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "In order to satisfy the '%s' dependency, one of the following packages is "
 "needed:"
 msgstr ""
-"Asılıqları ortadan qaldırmaq üçün, aşağıdakı paketlər silinəcəkdir (%d MB)"
 
 #: ../urpmi:443
 #, c-format
@@ -2446,25 +2413,23 @@ msgid ""
 msgstr ""
 
 #: ../urpmi:493 ../urpmi:511
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Continue installation anyway?"
-msgstr "Davam edilsin?"
+msgstr ""
 
-#: ../urpmi:494 ../urpmi:512 ../urpmi:627 ../urpmi.addmedia:136
+#: ../urpmi:494 ../urpmi:512 ../urpmi:629 ../urpmi.addmedia:136
 #, c-format
 msgid " (Y/n) "
 msgstr " (B/x) "
 
 #: ../urpmi:505
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "A requested package cannot be installed:\n"
 "%s"
 msgstr ""
-"Bəzi istənən paketlər qurula bilmir:\n"
-"%s"
 
 #: ../urpmi:526
 #, c-format
@@ -2472,15 +2437,12 @@ msgid "removing package %s will break your system"
 msgstr "%s paketini silmək sisteminizi pozacaq"
 
 #: ../urpmi:534
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The installation cannot continue because the following package\n"
 "has to be removed for others to be upgraded:\n"
 "%s\n"
 msgstr ""
-"Qurulum davam edə bilmir çünki paketlərin yenilənməsi üçün\n"
-"aşağıdakı paketlərin çıxardılması lazımdır:\n"
-"%s\n"
 
 #: ../urpmi:536
 #, c-format
@@ -2499,41 +2461,39 @@ msgid "(test only, removal will not be actually done)"
 msgstr ""
 
 #: ../urpmi:563
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "You must first call urpmi with --buildrequires to install the following "
 "dependencies:\n"
 "%s\n"
 msgstr ""
-"Aşağıdakı asıllılıqları qurmaq üçün ali istifadəçi olmalısınız:\n"
-"%s\n"
 
 #: ../urpmi:573
-#, fuzzy, c-format
+#, c-format
 msgid "The following orphan package will be removed."
 msgid_plural "The following orphan packages will be removed."
 msgstr[0] ""
-"Asılıqları ortadan qaldırmaq üçün, aşağıdakı paketlər silinəcəkdir (%d MB)"
+msgstr[1] ""
 
-#: ../urpmi:597
+#: ../urpmi:599
 #, c-format
 msgid "WARNING: %s option is in use. Some strange problems may happen"
 msgstr ""
 
-#: ../urpmi:609
+#: ../urpmi:611
 #, c-format
 msgid "(test only, installation will not be actually done)"
 msgstr ""
 
-#: ../urpmi:640
-#, fuzzy, c-format
+#: ../urpmi:642
+#, c-format
 msgid "Press Enter when mounted..."
-msgstr "Hazır olanda Enter düyməsinə basın..."
+msgstr ""
 
 #. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
 #. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
 #: ../urpmi.addmedia:36
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "usage: urpmi.addmedia [options] <name> <url>\n"
 "where <url> is one of\n"
@@ -2555,35 +2515,26 @@ msgid ""
 "\n"
 "and [options] are from\n"
 msgstr ""
-"istifadə qaydası: urpmi.addmedia [seçənəklər] <ad> <url>\n"
-"burada <url> aşağıdakılardan biridir\n"
-"      [file:/]/<cığır>\n"
-"      ftp://<istifadəçi adı>:<şifrə>@<verici>/<cığır>\n"
-"      ftp://<verici>/<cığır>\n"
-"      http://<verici>/<cığır>\n"
-"      removable://<cığır>\n"
-"\n"
-"və [seçənəklər] buradan gəlir\n"
 
-#: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
+#: ../urpmi.addmedia:56 ../urpmi.update:34 ../urpmq:71
 #, c-format
 msgid "  --wget         - use wget to retrieve distant files.\n"
 msgstr "  --wget         - wget'i uzaqdakı faylları almaq üçün işlədin.\n"
 
-#: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:72
+#: ../urpmi.addmedia:57 ../urpmi.update:35 ../urpmq:72
 #, c-format
 msgid "  --curl         - use curl to retrieve distant files.\n"
 msgstr "  --curl         - uzaqdakı faylları almaq üçün curl işlət.\n"
 
-#: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:73
-#, fuzzy, c-format
+#: ../urpmi.addmedia:58 ../urpmi.update:36 ../urpmq:73
+#, c-format
 msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
-msgstr "  --curl         - uzaqdakı faylları almaq üçün curl işlət.\n"
+msgstr ""
 
-#: ../urpmi.addmedia:59 ../urpmi.update:36
-#, fuzzy, c-format
+#: ../urpmi.addmedia:59 ../urpmi.update:37
+#, c-format
 msgid "  --aria2        - use aria2 to retrieve distant files.\n"
-msgstr "  --curl         - uzaqdakı faylları almaq üçün curl işlət.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:66
 #, c-format
@@ -2601,9 +2552,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi.addmedia:70
-#, fuzzy, c-format
+#, c-format
 msgid "  --probe-synthesis - use synthesis file.\n"
-msgstr "  --probe-synthesis - synthesis faylını tapıb işlətməyə çalış.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:71
 #, c-format
@@ -2611,11 +2562,9 @@ msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
 msgstr ""
 
 #: ../urpmi.addmedia:72
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-probe     - do not try to find any synthesis file.\n"
 msgstr ""
-"  --no-probe     - hər hansı bir synthesis ya da hdlist\n"
-"                   faylı tapmaya cəhd göstərmə.\n"
 
 #: ../urpmi.addmedia:74
 #, c-format
@@ -2632,18 +2581,16 @@ msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
 msgstr ""
 
 #: ../urpmi.addmedia:77
-#, fuzzy, c-format
+#, c-format
 msgid "  --all-media    - with --distrib, add every listed media\n"
-msgstr "  --list-media   - mövcud medyanı göstər.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:78
-#, fuzzy, c-format
+#, c-format
 msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
 msgstr ""
-"  --virtual      - həmişə yeni qalan virtual mediya yarat,\n"
-"                   ancaq file:// protokoluna icazə var.\n"
 
-#: ../urpmi.addmedia:79 ../urpmi.update:44
+#: ../urpmi.addmedia:79 ../urpmi.update:45
 #, c-format
 msgid "  --no-md5sum    - disable MD5SUM file checking.\n"
 msgstr "  --no-md5sum    - MD5SUM fayl yoxlamasını qeyri fəallaşdır.\n"
@@ -2658,12 +2605,12 @@ msgstr ""
 msgid "  --raw          - add the media in config, but don't update it.\n"
 msgstr ""
 
-#: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:53
+#: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:54
 #, c-format
 msgid "  -q             - quiet mode.\n"
 msgstr "  -q             - səssiz mod.\n"
 
-#: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:54
+#: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:55
 #, c-format
 msgid "  -v             - verbose mode.\n"
 msgstr "  -v             - təfsilatlı mod.\n"
@@ -2689,19 +2636,19 @@ msgid "Only superuser is allowed to add media"
 msgstr "Media əlavə etmə icazəsi ancaq ali istifadəçiyə verilib"
 
 #: ../urpmi.addmedia:119
-#, fuzzy, c-format
+#, c-format
 msgid "creating config file [%s]"
-msgstr "[%s] quraşdırma faylı yazılır"
+msgstr ""
 
 #: ../urpmi.addmedia:120
-#, fuzzy, c-format
+#, c-format
 msgid "Can't create config file [%s]"
-msgstr "[%s] quraşdırma faylı yazılır"
+msgstr ""
 
 #: ../urpmi.addmedia:128
-#, fuzzy, c-format
+#, c-format
 msgid "no need to give <relative path of synthesis> with --distrib"
-msgstr "<hdlist'in nisbi yolu>nu --distrib ilə verməyə ehtiyac yoxdur"
+msgstr ""
 
 #: ../urpmi.addmedia:136
 #, c-format
@@ -2711,14 +2658,14 @@ msgid ""
 msgstr ""
 
 #: ../urpmi.addmedia:156 ../urpmi.addmedia:181
-#, fuzzy, c-format
+#, c-format
 msgid "unable to add medium"
-msgstr "\"%s\" medyasına çatıla bilmir"
+msgstr ""
 
 #: ../urpmi.addmedia:164
-#, fuzzy, c-format
+#, c-format
 msgid "<relative path of synthesis> missing\n"
-msgstr "<hdlistin nisbi yolu> mövcud deyildir\n"
+msgstr ""
 
 #: ../urpmi.addmedia:167
 #, c-format
@@ -2740,9 +2687,9 @@ msgid "  -a             - select all media.\n"
 msgstr "   -a            - medya seç.\n"
 
 #: ../urpmi.removemedia:42
-#, fuzzy, c-format
+#, c-format
 msgid "  -y             - fuzzy match on media names.\n"
-msgstr "  -a             - əmr sətirindəki bütün uyğun gələnləri seç.\n"
+msgstr ""
 
 #: ../urpmi.removemedia:59
 #, c-format
@@ -2764,7 +2711,7 @@ msgstr ""
 "çıxardılacaq giriş mövcud deyildir\n"
 "(%s dan (dən) biri)\n"
 
-#: ../urpmi.update:30
+#: ../urpmi.update:31
 #, c-format
 msgid ""
 "usage: urpmi.update [options] <name> ...\n"
@@ -2773,60 +2720,58 @@ msgstr ""
 "istifadə qaydası: urpmi.update [seçənəklər] <ad> ...\n"
 "buradakı <ad> yenilənəcək mediyumun adıdır.\n"
 
-#: ../urpmi.update:43
+#: ../urpmi.update:44
 #, c-format
 msgid "  --update       - update only update media.\n"
 msgstr "  --update       - ancaq yeniləmə medyanı yenilə.\n"
 
-#: ../urpmi.update:45
+#: ../urpmi.update:46
 #, c-format
 msgid "  --force-key    - force update of gpg key.\n"
 msgstr "  --force-key    - gpg açarını yeniləməyə məcbur et.\n"
 
-#: ../urpmi.update:46
-#, fuzzy, c-format
-msgid "  --ignore       - don't update, mark the media as ignored.\n"
-msgstr "  --update       - ancaq yeniləmə medyanı yenilə.\n"
-
 #: ../urpmi.update:47
+#, c-format
+msgid "  --ignore       - don't update, mark the media as ignored.\n"
+msgstr ""
+
+#: ../urpmi.update:48
 #, c-format
 msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
 msgstr ""
 
-#: ../urpmi.update:49
-#, fuzzy, c-format
+#: ../urpmi.update:50
+#, c-format
 msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
 msgstr ""
-"  --no-probe     - hər hansı bir synthesis ya da hdlist\n"
-"                   faylı tapmaya cəhd göstərmə.\n"
-
-#: ../urpmi.update:50
-#, fuzzy, c-format
-msgid "  -a             - select all enabled non-removable media.\n"
-msgstr "  -a             - çıxardıla bilməyən medya seç.\n"
 
 #: ../urpmi.update:51
-#, fuzzy, c-format
-msgid "  -f             - force updating synthesis\n"
-msgstr "  -f             - hdlist fayllarının yaradılmasını məcbur et.\n"
+#, c-format
+msgid "  -a             - select all enabled non-removable media.\n"
+msgstr ""
 
 #: ../urpmi.update:52
-#, fuzzy, c-format
-msgid "  -ff            - really force updating synthesis\n"
-msgstr "  -f             - hdlist fayllarının yaradılmasını məcbur et.\n"
+#, c-format
+msgid "  -f             - force updating synthesis\n"
+msgstr ""
 
-#: ../urpmi.update:69
+#: ../urpmi.update:53
+#, c-format
+msgid "  -ff            - really force updating synthesis\n"
+msgstr ""
+
+#: ../urpmi.update:70
 #, c-format
 msgid "Only superuser is allowed to update media"
 msgstr "Medianı yeniləmə icazəsi ancaq ali istifadəçiyə verilib"
 
-#: ../urpmi.update:86
+#: ../urpmi.update:87
 #, c-format
 msgid "nothing to update (use urpmi.addmedia to add a media)\n"
 msgstr ""
 "yenilənəcək bir şey yoxdur (medya əlavə etmək üçün urpmi.addmedia işlədin)\n"
 
-#: ../urpmi.update:87
+#: ../urpmi.update:88
 #, c-format
 msgid ""
 "the entry to update is missing\n"
@@ -2835,28 +2780,27 @@ msgstr ""
 "güncəllənəcək giriş mövcud deyildir\n"
 "(%s dan (dən) biri)\n"
 
-#: ../urpmi.update:98
+#: ../urpmi.update:99
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
-#: ../urpmi.update:99
-#, fuzzy, c-format
+#: ../urpmi.update:100
+#, c-format
 msgid "ignoring media %s"
-msgstr "\"%s\" mediyumu dəyişdirilir:"
+msgstr ""
 
-#: ../urpmi.update:99
-#, fuzzy, c-format
+#: ../urpmi.update:100
+#, c-format
 msgid "enabling media %s"
-msgstr "\"%s\" medyumu çıxardılır"
+msgstr ""
 
 #: ../urpmq:44
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --searchmedia  - use only the given media to search requested (or updated) "
 "packages.\n"
 msgstr ""
-"  --media       - ancaq vergüllə ayrılmış verilən mediya(lar)nı işlət.\n"
 
 #: ../urpmq:49
 #, c-format
@@ -2913,14 +2857,14 @@ msgid "  --src          - next package is a source package (same as -s).\n"
 msgstr "  --src          - növbəti paket mənbə paketidir (-s ilə eyni).\n"
 
 #: ../urpmq:63
-#, fuzzy, c-format
+#, c-format
 msgid "  --sources      - print source URLs of selected packages\n"
-msgstr "  --src          - növbəti paket mənbə paketidir (-s ilə eyni).\n"
+msgstr ""
 
 #: ../urpmq:65
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
-msgstr "  --url          - taq url'sini göstər: url.\n"
+msgstr ""
 
 #: ../urpmq:69
 #, c-format
@@ -2935,46 +2879,46 @@ msgid "  --changelog    - print changelog.\n"
 msgstr "  --changelog    - dəyişmə qeydi faylını göstər.\n"
 
 #: ../urpmq:80
-#, fuzzy, c-format
+#, c-format
 msgid "  --conflicts    - print conflicts.\n"
-msgstr "  --conflicts     - taq toqquşmalarını göstər: bütün toqquşmalar.\n"
+msgstr ""
 
 #: ../urpmq:81
-#, fuzzy, c-format
+#, c-format
 msgid "  --obsoletes    - print obsoletes.\n"
-msgstr "  --obsoletes     - taq mütləqlərini göstər: bütün mütləqlər.\n"
+msgstr ""
 
 #: ../urpmq:82
-#, fuzzy, c-format
+#, c-format
 msgid "  --provides     - print provides.\n"
-msgstr "  --provides      - taq gətirənini göstər: bütün gətirənlər.\n"
+msgstr ""
 
 #: ../urpmq:83
-#, fuzzy, c-format
+#, c-format
 msgid "  --requires     - print requires.\n"
-msgstr "  --requires      - taq lazımlılarını göstər: bütün lazımlılar.\n"
+msgstr ""
 
 #: ../urpmq:84
-#, fuzzy, c-format
+#, c-format
 msgid "  --recommends   - print recommends.\n"
-msgstr "  --requires      - taq lazımlılarını göstər: bütün lazımlılar.\n"
+msgstr ""
 
 #: ../urpmq:85
-#, fuzzy, c-format
+#, c-format
 msgid "  --sourcerpm    - print sourcerpm.\n"
-msgstr "  --sourcerpm    - taq sourcerpm'ini göstər: source rpm.\n"
+msgstr ""
 
 #: ../urpmq:86
-#, fuzzy, c-format
+#, c-format
 msgid "  --summary, -S  - print summary.\n"
-msgstr "  --summary       - taq icmalını göstər: icmal.\n"
+msgstr ""
 
 #: ../urpmq:88
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --requires-recursive, -d\n"
 "                   - query package dependencies.\n"
-msgstr "  -d             - sorğunu paketin asıllılıqlarına qədər uzat.\n"
+msgstr ""
 
 #: ../urpmq:90
 #, c-format
@@ -2982,20 +2926,18 @@ msgid "  --whatrequires - reverse search to what requires package.\n"
 msgstr "  --whatrequires - paketin nəyə ehtiyacı olduğunu tərsdən axtar.\n"
 
 #: ../urpmq:91
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --whatrequires-recursive\n"
 "                   - extended reverse search (includes virtual packages).\n"
-msgstr "  -R             - paketin nəyə ehtiyacı olduğunu tərsdən axtar.\n"
+msgstr ""
 
 #: ../urpmq:93
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --whatprovides, -p\n"
 "                   - search in provides to find package.\n"
 msgstr ""
-"  -p             - paketi tapmaq üçün verilənlər arasında axtarmaya icazə "
-"ver.\n"
 
 #: ../urpmq:96
 #, c-format
@@ -3020,9 +2962,9 @@ msgid "  -l             - list files in package.\n"
 msgstr "  -l             - paketdəki faylları göstər.\n"
 
 #: ../urpmq:101
-#, fuzzy, c-format
+#, c-format
 msgid "  -m             - equivalent to -du\n"
-msgstr "  -q             - səssiz mod.\n"
+msgstr ""
 
 #: ../urpmq:102
 #, c-format
@@ -3047,9 +2989,9 @@ msgid "  -y             - impose fuzzy search (same as --fuzzy).\n"
 msgstr "  -y             - fuzzy axtarmanı qəbul et ( --fuzzy ilə eyni).\n"
 
 #: ../urpmq:106
-#, fuzzy, c-format
+#, c-format
 msgid "  -Y             - like -y, but forces to match case-insensitively.\n"
-msgstr "  -a             - əmr sətirindəki bütün uyğun gələnləri seç.\n"
+msgstr ""
 
 #: ../urpmq:107
 #, c-format
@@ -3067,9 +3009,9 @@ msgid "--list-nodes can only be used with --parallel"
 msgstr "--list-nodes ancaq --parallel ilə bərabər istifadə edilə bilər"
 
 #: ../urpmq:231
-#, fuzzy, c-format
+#, c-format
 msgid "use -l to list files"
-msgstr "\"%s\" fayl siyahısı yazıla bilmi"
+msgstr ""
 
 #: ../urpmq:415
 #, c-format
@@ -3094,14 +3036,13 @@ msgid ""
 msgstr ""
 
 #: ../urpmq:487
-#, fuzzy, c-format
+#, c-format
 msgid "No changelog found\n"
-msgstr "Rəsm tapıla bilmədi"
+msgstr ""
 
 #: ../gurpmi.desktop.in.h:1
-#, fuzzy
 msgid "Software Installer"
-msgstr "Proqram qurucusu"
+msgstr ""
 
 #: ../gurpmi.desktop.in.h:2
 msgid "Graphical front end to install RPM files"
@@ -3114,669 +3055,3 @@ msgstr ""
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:2
 msgid "Authentication is required to run Mageia Package Installer"
 msgstr ""
-
-#, fuzzy
-#~ msgid "  --suggests     - suggests tags\n"
-#~ msgstr "  --obsoletes     - taq mütləqlərini göstər: bütün mütləqlər.\n"
-
-#, fuzzy
-#~ msgid "  --suggests     - print suggests.\n"
-#~ msgstr "  --obsoletes     - taq mütləqlərini göstər: bütün mütləqlər.\n"
-
-#~ msgid "(%d package, %d MB)"
-#~ msgid_plural "(%d packages, %d MB)"
-#~ msgstr[0] "(%d paket, %d MB)"
-
-#, fuzzy
-#~ msgid "  --repackage    - Re-package the files before erasing\n"
-#~ msgstr "  --packager     - taq paketləyicisini göstərr: paketləyici.\n"
-
-#, fuzzy
-#~ msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
-#~ msgstr "  --noclean      - rpm'ləri ara yaddaşda işlətmə.\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "  --list         - list transactions since provided date/duration "
-#~ "argument\n"
-#~ msgstr "  --list-url     - mövcud medyanı və onların URL-lərini göstər.\n"
-
-#, fuzzy
-#~ msgid "  --list-all     - list all transactions in rpmdb (long)\n"
-#~ msgstr "  --list-url     - mövcud medyanı və onların URL-lərini göstər.\n"
-
-#, fuzzy
-#~ msgid "  --list-safe    - list transactions since checkpoint\n"
-#~ msgstr "  --list-url     - mövcud medyanı və onların URL-lərini göstər.\n"
-
-#, fuzzy
-#~ msgid "  --disable      - turn off repackaging\n"
-#~ msgstr "  --name         - sadəcə paket adlarını göstər.\n"
-
-#, fuzzy
-#~ msgid "Repackage directory not defined\n"
-#~ msgstr "%s paketi tapılmadı."
-
-#, fuzzy
-#~ msgid "Can't write to repackage directory [%s]\n"
-#~ msgstr "Xəta raportu üçün [%s] cərgəsi yaradıla bilmədi"
-
-#, fuzzy
-#~ msgid "Cleaning up repackage directory [%s]...\n"
-#~ msgstr "Xəta raportu üçün [%s] cərgəsi yaradıla bilmədi"
-
-#, fuzzy
-#~ msgid "Writing rpm macros file [%s]...\n"
-#~ msgstr "[%s] rpm faylı alınır ..."
-
-#, fuzzy
-#~ msgid "No rollback date found\n"
-#~ msgstr "Heç rəsm tapılmadı"
-
-#, fuzzy
-#~ msgid "Disabling repackaging\n"
-#~ msgstr "  --name         - sadəcə paket adlarını göstər.\n"
-
-#~ msgid ""
-#~ "urpme version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpme buraxılış %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "istifadə qaydası:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmf version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage: urpmf [options] pattern-expression\n"
-#~ msgstr ""
-#~ "urpmf buraxılış %s\n"
-#~ "Müəllif Hüququ (C) 2002-2006 Mandriva.\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "istifadə qaydası:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmi.recover version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmi.recover buraxılış %s\n"
-#~ "Müəllif Hüququ (C) 2006 Mandriva.\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "istifadə qaydası:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmq version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmq buraxılış %s\n"
-#~ "Müəllif Hüququ (C) 2002-2006 Mandriva.\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "istifadə qaydası:\n"
-
-#~ msgid ""
-#~ "Installation failed, some files are missing:\n"
-#~ "%s\n"
-#~ "You may want to update your urpmi database"
-#~ msgstr ""
-#~ "Qurulum bacarılmadı, bəzi fayllar əksikdir:\n"
-#~ "%s\n"
-#~ "Sizə, urpmi databeyzinizi yeniləməyi məsləhət görürük."
-
-#, fuzzy
-#~ msgid "Cannot write DUDF file.\n"
-#~ msgstr "[%s] quraşdırma faylı yazıla bilmir"
-
-#~ msgid ""
-#~ "  --sources      - give all source packages before downloading (root "
-#~ "only).\n"
-#~ msgstr ""
-#~ "  --sources      - endirmədən əvvəl bütün mənbə paketini ver (təkcə ali "
-#~ "istifadəçi).\n"
-
-#, fuzzy
-#~ msgid "due to already installed %s"
-#~ msgstr "hər şey onsuzda quruludur"
-
-#~ msgid ""
-#~ "  --from         - use specified url for list of mirrors, the default is\n"
-#~ "                   %s\n"
-#~ msgstr ""
-#~ "  --from         - əkslərin siyahısı üçün verilən url'ni işlət, əsası\n"
-#~ "                   %s\n"
-
-#, fuzzy
-#~ msgid "examining %s file"
-#~ msgstr "MD5SUM faylı sınanır"
-
-#, fuzzy
-#~ msgid "found probed synthesis as %s"
-#~ msgstr "%s adında sınanmış hdlist (ya da synthesis) tapıldı"
-
-#~ msgid "  --update       - create an update medium.\n"
-#~ msgstr "  --update       - yeniləmə mediyumu yarat.\n"
-
-#, fuzzy
-#~ msgid "malformed URL: [%s]"
-#~ msgstr "xətalı giriş: [%s]"
-
-#~ msgid "%d installation transaction failed"
-#~ msgid_plural "%d installation transactions failed"
-#~ msgstr[0] "%d qurulum daşınmaları bacarılmadı"
-
-#, fuzzy
-#~ msgid "Package %s can not be installed"
-#~ msgstr "hər şey onsuzda quruludur"
-
-#~ msgid "Checking to remove the following packages"
-#~ msgstr "Aşağıdakı paketlər silinmək üçün yoxlanır"
-
-#, fuzzy
-#~ msgid "%s database locked"
-#~ msgstr "urpmi databeyzi qıfıllıdır"
-
-#, fuzzy
-#~ msgid "Unknown option %s"
-#~ msgstr ""
-#~ "\n"
-#~ "naməlum seçənəklər '%s'\n"
-
-#~ msgid "too many mount points for removable medium \"%s\""
-#~ msgstr "\"%s\" çıxardıla bilən mediyası üçün həddindən çox bağlama nöqtəsi"
-
-#~ msgid "using different removable device [%s] for \"%s\""
-#~ msgstr "\"%1$s\" üçün fərqli çıxardıla bilən avadanlıq [%2$s] işlət"
-
-#~ msgid "unable to retrieve pathname for removable medium \"%s\""
-#~ msgstr "\"%s\" çıxardıla bilən mediyumu üçün cığır adı alına bilmədi"
-
-#, fuzzy
-#~ msgid "unable to mount the distribution medium"
-#~ msgstr "Birinci qurulum medyumuna yetişilə bilmir"
-
-#~ msgid ""
-#~ "unable to access medium \"%s\",\n"
-#~ "this could happen if you mounted manually the directory when creating the "
-#~ "medium."
-#~ msgstr ""
-#~ "\"%s\" mediyumuna yetişilə bilmədi,\n"
-#~ "bu, mediyum yaradarkən cərgəni əl ilə bağlayanda baş göstərə bilər."
-
-#~ msgid "inconsistent medium \"%s\" marked removable but not really"
-#~ msgstr "\"%s\" inkeherent medyası söküləbilən deyə bildirilib, amma deyil"
-
-#~ msgid "  -c             - clean headers cache directory.\n"
-#~ msgstr "   -c            - başlıq ara yaddaşı cərgəsini təmizlə.\n"
-
-#, fuzzy
-#~ msgid "virtual medium needs to be local"
-#~ msgstr "\"%s\" vertual medyumu  yerli deyil, medyum rədd edildi"
-
-#, fuzzy
-#~ msgid "unable to parse synthesis file of \"%s\""
-#~ msgstr "\"%s\" hdlist faylı alına bilmir"
-
-#, fuzzy
-#~ msgid "computing md5sum of existing source hdlist (or synthesis) [%s]"
-#~ msgstr ""
-#~ "mövcud mənbə hdlist (ya da synthesis) faylının md5sum'ları hesablanır"
-
-#~ msgid ""
-#~ "virtual medium \"%s\" should not have defined hdlist or list file, medium "
-#~ "ignored"
-#~ msgstr ""
-#~ "\"%s\" medyasının hdlist ya da siyahı faylı tə'yin edilməməlidir, medya "
-#~ "rədd edildi"
-
-#, fuzzy
-#~ msgid "invalid hdlist name"
-#~ msgstr "hökmsüz rpm fayı adı [%s]"
-
-#~ msgid "unable to find list file for \"%s\", medium ignored"
-#~ msgstr "\"%s\" üçün siyahı faylı tapıla bilmir, medya rədd edilir"
-
-#, fuzzy
-#~ msgid "\"synthesis\" should not be set (medium \"%s\")"
-#~ msgstr "mövcud olmayan \"%s\" medyumu seçilməyə çalışılır"
-
-#, fuzzy
-#~ msgid "\"synthesis\" should be set (medium \"%s\")"
-#~ msgstr "\"%s\" medyası hdlist sintezi inşa edilid"
-
-#, fuzzy
-#~ msgid "unable to access list file of \"%s\""
-#~ msgstr "\"%s\" hdlist faylı alına bilmir"
-
-#~ msgid "medium \"%s\" trying to use an already used hdlist, medium ignored"
-#~ msgstr ""
-#~ "\"%s\" medyumu istifadədə olan hdlist'i işlətməyə cəhd etdi, medya rədd "
-#~ "edildi"
-
-#~ msgid "medium \"%s\" trying to use an already used list, medium ignored"
-#~ msgstr ""
-#~ "\"%s\" medyumu onsuz da istifadədə olan siyahını işlətməyə cəhd etdi, "
-#~ "medyum rədd edildi"
-
-#~ msgid "performing second pass to compute dependencies\n"
-#~ msgstr "asıllılıqlar hesablanmaq üçün ikinci dəfə sınanır\n"
-
-#~ msgid "building hdlist [%s]"
-#~ msgstr "[%s] hdlist faylı inşa edilir"
-
-#~ msgid "problem reading hdlist or synthesis file of medium \"%s\""
-#~ msgstr "\"%s\" medyasının hdlist ya da synthesis faylı oxuna bilmədi"
-
-#~ msgid "computing md5sum of copied source hdlist (or synthesis)"
-#~ msgstr ""
-#~ "köçürdülmüş mənbə hdlist (ya da synthesis) faylının md5sum'ları hesablanır"
-
-#~ msgid "...retrieving failed: md5sum mismatch"
-#~ msgstr "...alış bacarılmadı: md5sum uyğunsuzluğu"
-
-#~ msgid "no rpm files found from [%s]"
-#~ msgstr "[%s] üstündə rpm fayı tapıla bilmədi"
-
-#~ msgid "unable to read rpm files from [%s]: %s"
-#~ msgstr "[%s]'dan rpm faylı oxuna bilmir: %s"
-
-#~ msgid "reading headers from medium \"%s\""
-#~ msgstr "\"%s\" medyasından üst mə'lumatlar oxunur"
-
-#, fuzzy
-#~ msgid "    --probe-synthesis - use synthesis file.\n"
-#~ msgstr "  --probe-synthesis - synthesis faylını tapıb işlətməyə çalış.\n"
-
-#, fuzzy
-#~ msgid "    --probe-hdlist - use hdlist file.\n"
-#~ msgstr "  --probe-hdlist - hdlist faylını tapıb işlətməyə çalış.\n"
-
-#, fuzzy
-#~ msgid "  --probe-hdlist - use hdlist file.\n"
-#~ msgstr "  --probe-hdlist - hdlist faylını tapıb işlətməyə çalış.\n"
-
-#~ msgid "unable to update medium \"%s\"\n"
-#~ msgstr " \"%s\" medyası güncəllənə bilmir\n"
-
-#~ msgid "unable to create medium \"%s\"\n"
-#~ msgstr " \"%s\" medyası yaradıla bilmir\n"
-
-#~ msgid "there are multiple packages with the same rpm filename \"%s\""
-#~ msgstr "\"%s\" rpm fayl adlı birdən çox fayl tapıldı"
-
-#~ msgid "unable to correctly parse [%s] on value \"%s\""
-#~ msgstr "\"%s\" qiymətindəki [%s] düzgün oxuna bilmədi"
-
-#~ msgid ""
-#~ "medium \"%s\" uses an invalid list file:\n"
-#~ "  mirror is probably not up-to-date, trying to use alternate method"
-#~ msgstr ""
-#~ "\"%s\" mediyumu hökmsüz siyahı  faylı işlədir:\n"
-#~ "  yəqin ki əks yenilənməyib, alternativ yöntəmi işlətməyə çalışıram"
-
-#~ msgid "medium \"%s\" does not define any location for rpm files"
-#~ msgstr "\"%s\" mediyumu hər hansı bir rpm faylının mövqeyini bildirmir"
-
-#~ msgid "unrequested"
-#~ msgstr "tələb edilməmiş"
-
-#~ msgid " (%d MB)"
-#~ msgstr " (%d MB)"
-
-#~ msgid "adding package %s (id=%d, eid=%d, update=%d, file=%s)"
-#~ msgstr "%s paketi əlavə edilir (id=%d, eid=%d, yeniləmə=%d, fayl=%s)"
-
-#, fuzzy
-#~ msgid ""
-#~ "The following packages have bad signatures:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Do you want to continue installation ?"
-#~ msgstr ""
-#~ "Aşağıdakı paketlər hökmsüz imzalara sahibdir:\n"
-#~ "\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Yenə də qurulumu davam etdirmək istəyirsiniz?"
-
-#, fuzzy
-#~ msgid "You need to be root to use --use-distrib"
-#~ msgstr "Bu əmri işlətmək üçün ali istifadəçi olmalısan ! \n"
-
-#~ msgid "unable to remove package %s"
-#~ msgstr "%s paketi çıxardıla bilmədi"
-
-#, fuzzy
-#~ msgid "No filelist found\n"
-#~ msgstr "Heç rəsm tapılmadı"
-
-#, fuzzy
-#~ msgid ""
-#~ "To satisfy dependencies, the following %d packages will be removed (%d MB)"
-#~ msgstr ""
-#~ "Asılıqları ortadan qaldırmaq üçün, aşağıdakı paketlər silinəcəkdir (%d MB)"
-
-#, fuzzy
-#~ msgid ""
-#~ "  -P             - do not search in provides to find package (default).\n"
-#~ msgstr ""
-#~ "  -P             - paketi tapmaq üçün verilənlər arasında axtarma.\n"
-
-#~ msgid "  -R             - reverse search to what requires package.\n"
-#~ msgstr "  -R             - paketin nəyə ehtiyacı olduğunu tərsdən axtar.\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "To satisfy dependencies, the following %d packages are going to be "
-#~ "installed:\n"
-#~ "%s\n"
-#~ msgstr ""
-#~ "Asılıqları ortadan qaldırmaq üçün, aşağıdakı %d paket də qurulmalıdır (%d "
-#~ "MB)"
-
-#, fuzzy
-#~ msgid "Installing packages on nodes..."
-#~ msgstr "`%s' paketi qurulur (%s/%s)..."
-
-#, fuzzy
-#~ msgid "Propagating synthesis to %s..."
-#~ msgstr "[%s] synthesis faylı sınanır "
-
-#, fuzzy
-#~ msgid "Distributing files to %s..."
-#~ msgstr "%s paylanır"
-
-#, fuzzy
-#~ msgid "Performing install on %s..."
-#~ msgstr "Paket qurulumu..."
-
-#, fuzzy
-#~ msgid "Preparing install on %s..."
-#~ msgstr "Paket qurulumu..."
-
-#~ msgid "  --probe-synthesis - try to find and use synthesis file.\n"
-#~ msgstr "  --probe-synthesis - synthesis faylını tapıb işlətməyə çalış.\n"
-
-#~ msgid "  --probe-hdlist - try to find and use hdlist file.\n"
-#~ msgstr "  --probe-hdlist - hdlist faylını tapıb işlətməyə çalış.\n"
-
-#~ msgid "`with' missing for network media\n"
-#~ msgstr "'with' şəbəkə medyasında əksikdir\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "unknown options '%s'\n"
-#~ msgstr ""
-#~ "\n"
-#~ "naməlum seçənəklər '%s'\n"
-
-#~ msgid "unable to find hdlist file for \"%s\", medium ignored"
-#~ msgstr "\"%s\" üçün hdlist faylı tapıla bilmir, medya rədd edildi"
-
-#~ msgid "inconsistent list file for \"%s\", medium ignored"
-#~ msgstr "\"%s\" üçün inkoherent siyahı faylı, medya rədd edildi"
-
-#~ msgid "unable to inspect list file for \"%s\", medium ignored"
-#~ msgstr "\"%s\" faylları siyahısı yoxlana bilmir, medya rədd edildi"
-
-#~ msgid "virtual medium \"%s\" is not local, medium ignored"
-#~ msgstr "\"%s\" vertual medyumu  yerli deyil, medyum rədd edildi"
-
-#~ msgid ""
-#~ "virtual medium \"%s\" should have valid source hdlist or synthesis, "
-#~ "medium ignored"
-#~ msgstr ""
-#~ "\"%s\" virtual medyumunun hökmlü mənbə hdlist'i ya da synthesis'i "
-#~ "olmalıdır, medya rədd edildi"
-
-#~ msgid "copying source hdlist (or synthesis) of \"%s\"..."
-#~ msgstr "\"%s\"in mənbə hdlist (ya da synthesis) faylı köçürdülür..."
-
-#~ msgid "retrieval of source hdlist (or synthesis) failed"
-#~ msgstr "mənbə hdlist (ya da synthesis) faylının alınması bacarılmadı"
-
-#~ msgid "file [%s] already used in the same medium \"%s\""
-#~ msgstr "[%s] faylı onsuzda eyni \"%s\" mediyumda işlədilib"
-
-#~ msgid "nothing written in list file for \"%s\""
-#~ msgstr "\"%s\" üçün siyahı faylında bir şey yazılmır"
-
-#~ msgid "found %d headers in cache"
-#~ msgstr "ön yaddaşda %d başlıq tapıldı"
-
-#~ msgid "removing %d obsolete headers in cache"
-#~ msgstr "ön yaddaşdakı %d mütləq başlıqlar çıxardılır"
-
-#~ msgid "using process %d for executing transaction"
-#~ msgstr "keçiş icrası üçün %d gedişatı istifadə edilir"
-
-#, fuzzy
-#~ msgid "  --norebuild    - don't try to rebuild hdlist if not readable.\n"
-#~ msgstr "  --buildhost    - taq inşa qovşağını göstər: inşa qovşağı.\n"
-
-#, fuzzy
-#~ msgid "The following package names were assumed: %s"
-#~ msgstr "Aşağıdakı paketlər %s daxıl edir: %s"
-
-#~ msgid "copying hdlists file..."
-#~ msgstr "hdlist faylı köçürdülür..."
-
-#~ msgid "invalid hdlist description \"%s\" in hdlists file"
-#~ msgstr "hdlists faylında hökmsüz \"%s\" hdlist izahatı"
-
-#~ msgid "Is this OK?"
-#~ msgstr "Oldu mu?"
-
-#~ msgid ""
-#~ "  --version      - use specified distribution version, the default is "
-#~ "taken\n"
-#~ "                   from the version of the distribution told by the\n"
-#~ "                   installed mandriva-release package.\n"
-#~ msgstr ""
-#~ "  --version      - müəyyən edilən distribyusiya buraxılışını işlət, "
-#~ "əsası\n"
-#~ "                   qurulu olan mandriva-release paketindən alınan\n"
-#~ "                   distribyusiya buraxılışıdır.\n"
-
-#~ msgid ""
-#~ "  --arch         - use specified architecture, the default is arch of\n"
-#~ "                   mandriva-release package installed.\n"
-#~ msgstr ""
-#~ "  --arch         - verilən memarlığı işlət, əsası qurulmuş\n"
-#~ "                   mandriva-release paketinin memarlığıdır.\n"
-
-#~ msgid ""
-#~ "  --headers      - extract headers for package listed from urpmi db to\n"
-#~ "                   stdout (root only).\n"
-#~ msgstr ""
-#~ "  --headers      - urpmi db üçün sıralanan üst mə'lumatları çıxart\n"
-#~ "                   (ancaq ali istifadəçi).\n"
-
-#~ msgid ""
-#~ "To satisfy dependencies, the following %d packages are going to be "
-#~ "installed (%d MB)"
-#~ msgstr ""
-#~ "Asılıqları ortadan qaldırmaq üçün, aşağıdakı %d paket də qurulmalıdır (%d "
-#~ "MB)"
-
-#~ msgid "installing %s\n"
-#~ msgstr "%s qurulur\n"
-
-#~ msgid ""
-#~ "Automatic installation of packages...\n"
-#~ "You requested installation of package %s\n"
-#~ msgstr ""
-#~ "Paketlərin öz özünə qurulması...\n"
-#~ "%s paketlərininin qurulmasını istədiniz\n"
-
-#~ msgid "%s: command not found\n"
-#~ msgstr "%s: əmr tapılmadı\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "Some package requested cannot be installed:\n"
-#~ "%s\n"
-#~ "Continue?"
-#~ msgstr ""
-#~ "Bəzi istənən paketlər qurula bilmir:\n"
-#~ "%s"
-
-#~ msgid "md5sum mismatch"
-#~ msgstr "md5sum uyğunsuzluğu"
-
-#~ msgid ""
-#~ "urpmf version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmf buraxılış %s\n"
-#~ "Müəllif Hüququ (C) 2002 Mandriva.\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "istifadə qaydası:\n"
-
-#~ msgid "  --synthesis    - use the synthesis given instead of urpmi db.\n"
-#~ msgstr "  --synthesis    - urpmi db yerinə verilən synthesis'i işlət.\n"
-
-#~ msgid ""
-#~ "  --quiet        - do not print tag name (default if no tag given on "
-#~ "command\n"
-#~ "                   line, incompatible with interactive mode).\n"
-#~ msgstr "  --quiet        - taq adlarını göstərmə.\n"
-
-#~ msgid "  --uniq         - do not print identical lines.\n"
-#~ msgstr "  --uniq         - identik sətirləri göstərmə.\n"
-
-#~ msgid "  --all          - print all tags.\n"
-#~ msgstr "  --all           - bütün təqləri göstər.\n"
-
-#~ msgid "  --summary      - print tag summary: summary.\n"
-#~ msgstr "  --summary       - taq icmalını göstər: icmal.\n"
-
-#~ msgid "  --description  - print tag description: description.\n"
-#~ msgstr "  --description   - taq izahatını göstər: izahat.\n"
-
-#~ msgid "  --buildhost    - print tag buildhost: build host.\n"
-#~ msgstr "  --buildhost    - taq inşa qovşağını göstər: inşa qovşağı.\n"
-
-#~ msgid "  --provides     - print tag provides: all provides.\n"
-#~ msgstr "  --provides      - taq gətirənini göstər: bütün gətirənlər.\n"
-
-#~ msgid "  --requires     - print tag requires: all requires.\n"
-#~ msgstr "  --requires      - taq lazımlılarını göstər: bütün lazımlılar.\n"
-
-#~ msgid "  --files        - print tag files: all files.\n"
-#~ msgstr "  --files         - taq fayllarını göstər: bütün fayllar.\n"
-
-#~ msgid "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
-#~ msgstr "  --obsoletes     - taq mütləqlərini göstər: bütün mütləqlər.\n"
-
-#~ msgid ""
-#~ "  --env          - use specific environment (typically a bug\n"
-#~ "                   report).\n"
-#~ msgstr ""
-#~ "  --env          - xüsusi mühit işlət (əsasən bir xəta\n"
-#~ "                   raportu).\n"
-
-#~ msgid "  -i             - ignore case distinctions in every pattern.\n"
-#~ msgstr ""
-#~ "  -i             - hər patterndə bötük/kiçik hərf qaydalarını rədd et.\n"
-
-#~ msgid ""
-#~ "  -a             - binary AND operator, true if both expression are "
-#~ "true.\n"
-#~ msgstr ""
-#~ "  -a             - binary AND operatoru, ifadələrin ikisi də doğru isə "
-#~ "nəticə də doğrudur.\n"
-
-#~ msgid ""
-#~ "  -o             - binary OR operator, true if one expression is true.\n"
-#~ msgstr ""
-#~ "  -o             - OR operatoru, ifadələrdən biri doğrudursa nəticə doğru "
-#~ "olacaq.\n"
-
-#~ msgid "  !              - unary NOT, true if expression is false.\n"
-#~ msgstr ""
-#~ "  !              - NOT operatoru, ifadə səhv isə nəticə doğru olacaq.\n"
-
-#~ msgid "  (              - left parenthesis to open group expression.\n"
-#~ msgstr "  (              - sol mötərizə qrup ifadəsini açmaq üçün.\n"
-
-#~ msgid "  )              - right parenthesis to close group expression.\n"
-#~ msgstr "  )              - sağ mötərizə qrup ifadəsini bağlamaq üçün.\n"
-
-#~ msgid ""
-#~ "callback is:\n"
-#~ "%s\n"
-#~ msgstr ""
-#~ "geri çağırış :\n"
-#~ "%s\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "\n"
-#~ "Continue?"
-#~ msgstr "Davam Et"
-
-#~ msgid ""
-#~ "Some package requested cannot be installed:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Bəzi istənən paketlər qurula bilmir:\n"
-#~ "%s"
-
-#, fuzzy
-#~ msgid ""
-#~ "  --keep         - keep existing packages if possible, reject requested\n"
-#~ "                   packages that leads to remove.\n"
-#~ msgstr ""
-#~ "  --keep         - mümkündürsə, mövcud paketləri saxlamaya çalış, "
-#~ "paketlərin\n"
-#~ "                   silinməsini məcbur qılan paketləri rədd et.\n"
-
-#~ msgid ""
-#~ "  --distrib-XXX  - automatically create a medium for XXX part of a\n"
-#~ "                   distribution, XXX may be main, contrib, updates or\n"
-#~ "                   anything else that has been configured ;-)\n"
-#~ msgstr ""
-#~ "  --distrib-XXX  - distribyusiyanın XXX hissəsi üçün avtomatik olaraq\n"
-#~ "                   mediyum yarat, XXX main, contrib, updates ya da\n"
-#~ "                   quraşdırılmış hər şey ola bilər ;-)\n"
-
-#~ msgid "found version %s and arch %s ..."
-#~ msgstr "%s buraxılışı və arch %s tapıldı..."
-
-#~ msgid "cannot add updates of a cooker distribution\n"
-#~ msgstr "cooker distribyusiyasının yeniləmələri əlavə edilə bilmir\n"
-
-#~ msgid "retrieving mirrors at %s ..."
-#~ msgstr "%s ünvanındakı mirrorlar alınır ..."

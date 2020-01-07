@@ -4,7 +4,7 @@ Promises - An implementation of Promises in Perl
 
 # VERSION
 
-version 1.02
+version 1.03
 
 # SYNOPSIS
 
@@ -351,6 +351,8 @@ cookbook entry below.
 
 - [Promise::ES6](https://metacpan.org/pod/Promise::ES6)
 - [Promise::Tiny](https://metacpan.org/pod/Promise::Tiny)
+- [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises)
+- [Promise::XS](https://metacpan.org/pod/Promise::XS)
 
 # AUTHOR
 
@@ -358,7 +360,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2014, 2012 by Infinity Interactive, Inc..
+This software is copyright (c) 2020, 2019, 2017, 2014, 2012 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

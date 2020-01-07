@@ -1,5 +1,14 @@
 Revision history for Perl extension Promise::XS:
 
+0.03 Mon Jan 6 2020
+    - Optimize all() and race() by reducing number of Perl callbacks.
+    - Fix C99 dependency.
+    - Specify disabled prototypes in XS.
+    - Skip failing test in Win32. (Fix maybe forthcoming … ?)
+    - Attempt to support ithreads. (Thank you, RANDIR!)
+    - Update documentation to include caveats about Windows & threads.
+    - Add GitHub data to Makefile.PL.
+
 0.02 Mon Dec 30 2019
     - Make then(), catch(), and finally() create objects in the same class
       as the context object. Add documentation about subclassing.

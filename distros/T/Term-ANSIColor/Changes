@@ -1,5 +1,36 @@
                    User-Visible Term::ANSIColor Changes
 
+Term::ANSIColor 5.00 (2020-01-05)
+
+    Drop support for Perl 5.6.  The minimum supported version is now Perl
+    5.8.  Perl 5.6 isn't supported by Travis-CI and is only spottily
+    tested, so true support is dubious.
+
+    Add suport for true color (24-bit color) via new rNNNgNNNbNNN and
+    on_rNNNgNNNbNNN attributes.  These are only supported via the function
+    interface, not in the constant interface.  Based on work by Lars
+    Dɪᴇᴄᴋᴏᴡ 迪拉斯.  (#130083)
+
+    Allow color aliases to map to multiple attributes instead of only one
+    attribute.  Based on work by Yanick Champoux.
+
+    Aliases may now be defined in terms of other aliases.
+
+    Document bad interactions between colored output to standard output
+    and standard error when standard output is line-buffered in a couple
+    of places in the manual and suggest setting autoflush() or EACHLINE
+    as a fix.  (#121974)
+
+    Document how to support CLICOLOR <https://bixense.com/clicolors/> in
+    programs using Term::ANSIColor.  (Due to backward compatibility and
+    non-output uses, there's no easy way to support CLICOLOR in the module
+    automatically.)
+
+    Update to rra-c-util 8.1:
+
+    * Update perlcritic configuration.
+    * Add SPDX-License-Identifier headers to all significant files.
+
 Term::ANSIColor 4.06 (2016-10-28)
 
     Add aliases ansi16 through ansi255 and on_ansi16 through on_ansi255

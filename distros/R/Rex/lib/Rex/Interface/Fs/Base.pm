@@ -9,7 +9,7 @@ package Rex::Interface::Fs::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 use Rex::Interface::Exec;
 use Rex::Helper::File::Spec;

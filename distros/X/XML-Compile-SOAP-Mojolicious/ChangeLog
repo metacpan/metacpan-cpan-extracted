@@ -1,6 +1,12 @@
 
 ==== history of XML::Compile::SOAP::Mojolicious
 
+version 0.06: Mon  6 Jan 08:17:10 CET 2020
+
+	Fixes:
+	- add dependencies to XML::Compile::SOAP12 and ::WSDL11 to be
+      able to run the regression tests rt.cpan.org#131349 [Slaven Rezic]
+
 version 0.05: Fri  3 Jan 14:26:32 CET 2020
 
 	Improvements:

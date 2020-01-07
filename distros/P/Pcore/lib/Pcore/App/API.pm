@@ -7,11 +7,10 @@ use Pcore::Util::Data qw[from_b64u];
 use Pcore::Util::Digest qw[sha3_512_bin];
 use Pcore::Util::Text qw[encode_utf8];
 use Pcore::Util::UUID qw[uuid_from_bin];
-use Pcore::App::API::Auth;
 
 our $EXPORT = {
     ROOT_USER       => [qw[$ROOT_USER_NAME $ROOT_USER_ID]],
-    PERMISSIONS     => [qw[$PERMISSIONS_ANY_AUTHENTICATED_USER]],
+    PERMS           => [qw[$PERMS_ANY_AUTHENTICATED_USER]],
     TOKEN_TYPE      => [qw[$TOKEN_TYPE_PASSWORD $TOKEN_TYPE_TOKEN $TOKEN_TYPE_SESSION $TOKEN_TYPE_EMAIL_CONFIRM $TOKEN_TYPE_PASSWORD_RECOVERY]],
     INVALIDATE_TYPE => [qw[$INVALIDATE_USER $INVALIDATE_TOKEN $INVALIDATE_ALL]],
     PRIVATE_TOKEN   => [qw[$PRIVATE_TOKEN_ID $PRIVATE_TOKEN_HASH $PRIVATE_TOKEN_TYPE]],
@@ -29,7 +28,7 @@ has _auth_cache_cleanup_timer => ( init_arg             => undef );    # Instanc
 const our $ROOT_USER_NAME => 'root';
 const our $ROOT_USER_ID   => 1;
 
-const our $PERMISSIONS_ANY_AUTHENTICATED_USER => '*';
+const our $PERMS_ANY_AUTHENTICATED_USER => '*';
 
 const our $TOKEN_TYPE_PASSWORD          => 1;
 const our $TOKEN_TYPE_TOKEN             => 2;
@@ -46,6 +45,8 @@ const our $PRIVATE_TOKEN_HASH => 1;
 const our $PRIVATE_TOKEN_TYPE => 2;
 
 const our $AUTH_CACHE_CLEANUP_TIMEOUT => 60 * 60 * 12;    # remove sessions tokens, that are older than 12 hours
+
+require Pcore::App::API::Auth;
 
 sub new ( $self, $app ) {
     state $scheme_class = {
@@ -325,7 +326,7 @@ sub _auth_cache_cleanup ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 184                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 185                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

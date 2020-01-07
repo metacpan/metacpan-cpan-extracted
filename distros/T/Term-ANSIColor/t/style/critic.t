@@ -7,7 +7,8 @@
 # files, junk, and any files explicitly configured to be ignored.
 #
 # Written by Russ Allbery <eagle@eyrie.org>
-# Copyright 2013, 2014
+# Copyright 2019 Russ Allbery <eagle@eyrie.org>
+# Copyright 2013-2014
 #     The Board of Trustees of the Leland Stanford Junior University
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -27,16 +28,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 
 use lib 't/lib';
 
-use Test::More;
 use Test::RRA qw(skip_unless_author use_prereq);
 use Test::RRA::Config qw(@CRITIC_IGNORE);
+
+use Test::More;
 
 # Skip tests unless we're running author tests since this test is too
 # sensitive to the exact version of Perl::Critic to be generally useful.

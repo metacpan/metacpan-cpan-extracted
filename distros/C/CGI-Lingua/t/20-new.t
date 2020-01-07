@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 use Test::Most tests => 32;
+use lib 't/lib';
+use MyLogger;
 
 BEGIN {
 	use_ok('CGI::Lingua');
@@ -84,33 +86,5 @@ LANGUAGES: {
 		ok(defined $l->requested_language());
 		ok($l->requested_language() =~ /English/);
 		ok($l->country() eq 'gb');
-	}
-}
-
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub trace {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
 	}
 }

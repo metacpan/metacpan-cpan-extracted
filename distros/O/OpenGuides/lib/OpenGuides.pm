@@ -14,7 +14,7 @@ use URI::Escape;
 
 use vars qw( $VERSION );
 
-$VERSION = '0.82';
+$VERSION = '0.83';
 
 =head1 NAME
 
@@ -791,10 +791,8 @@ sub _get_recent_changes {
     }
 
     @rc = map {
-        my $url = $base_url
-                . CGI->escape($formatter->node_name_to_node_param($_->{name}));
-        # CGI->escape escapes commas in URLs.  This is annoying.
-        $url =~ s/%2C/,/gs;
+        my $param = $formatter->node_name_to_node_param( $_->{name} );
+        my $url = $base_url . OpenGuides::CGI->escape( $param );
         {
           name => CGI->escapeHTML($_->{name}),
           last_modified => CGI->escapeHTML($_->{last_modified}),
@@ -898,11 +896,11 @@ sub show_backlinks {
 
     my @backlinks = $wiki->list_backlinks( node => $args{id} );
     my @results = map {
-                          {
-                              url   => CGI->escape($formatter->node_name_to_node_param($_)),
-                              title => CGI->escapeHTML($_)
-                          }
-                      } sort @backlinks;
+      {
+       url => OpenGuides::CGI->escape($formatter->node_name_to_node_param($_)),
+       title => CGI->escapeHTML($_)
+      }
+    } sort @backlinks;
     my %tt_vars = ( results       => \@results,
                     num_results   => scalar @results,
                     not_deletable => 1,
@@ -1199,6 +1197,9 @@ sub show_index {
     } else {
         $template = "site_index.tt";
     }
+
+    $tt_vars{not_editable} = 1;
+    $tt_vars{not_deletable} = 1;
 
     return %tt_vars if $args{return_tt_vars};
 
@@ -1607,7 +1608,7 @@ src="http://openguides.org/img/logo.png" alt="OpenGuides"></a>
 <h1><a href="$script_name">$site_name</a></h1>
 <h2>is powered by <a href="http://openguides.org/">OpenGuides</a> -<br>
 the guides made by you.</h2>
-<h3>version <a href="http://search.cpan.org/~dom/OpenGuides-$VERSION">$VERSION</a></h3>
+<h3>version <a href="https://metacpan.org/release/BOB/OpenGuides-$VERSION">$VERSION</a></h3>
 </div>
 <div id="about">
 <p>

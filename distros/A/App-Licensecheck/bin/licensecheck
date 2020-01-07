@@ -27,11 +27,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.38
+Version v3.0.39
 
 =cut
 
-our $VERSION = version->declare("v3.0.38");
+our $VERSION = version->declare("v3.0.39");
 
 my $progname = path($0)->basename;
 
@@ -224,8 +224,8 @@ HEADER
 
 =head1 DEBUGGING
 
-If either of environment variables DEBUG or TRACE is set to true,
-details about discoveries are emitted to STDERR.
+If either of environment variables INFO, DEBUG or TRACE is set to true,
+varying details about discoveries are emitted to STDERR.
 
 =cut
 

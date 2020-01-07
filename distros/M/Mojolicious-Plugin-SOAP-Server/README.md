@@ -1,6 +1,4 @@
-<div>
-    ![](https://github.com/oposs/mojolicious-plugin-soap-server/workflows/Unit%20Tests/badge.svg?branch=master)
-</div>
+![](https://github.com/oposs/mojolicious-plugin-soap-server/workflows/Unit%20Tests/badge.svg?branch=master)
 
 # NAME
 

@@ -1,6 +1,11 @@
-# Term::ANSIColor 4.06
+# Term::ANSIColor 5.00
 
-Copyright 1996-1998, 2000-2002, 2005-2006, 2008-2016 Russ Allbery
+[![Build
+status](https://travis-ci.org/rra/ansicolor.svg?branch=master)](https://travis-ci.org/rra/ansicolor)
+[![CPAN
+version](https://img.shields.io/cpan/v/Term-ANSIColor.svg)](https://metacpan.org/release/Term-ANSIColor)
+
+Copyright 1996-1998, 2000-2002, 2005-2006, 2008-2020 Russ Allbery
 <rra@cpan.org>.  Copyright 1996 Zenin.  Copyright 2012 Kurt Starsinic
 <kstarsinic@gmail.com>.  This software is distributed under the same terms
 as Perl itself.  Please see the section [License](#license) below for more
@@ -43,22 +48,21 @@ included both approaches.
 
 Term::ANSIColor is written in pure Perl and has no module dependencies
 that aren't found in Perl core.  It should work with any version of Perl
-after 5.6, although it hasn't been tested with old versions in some time.
+after 5.8.
 
-In order to actually see color, you will need to use a terminal window
-that supports the ANSI escape sequences for color.  Any recent version of
-xterm, most xterm derivatives and replacements, and most telnet and ssh
+In order to see color, you will need to use a terminal window that
+supports the ANSI escape sequences for color.  Any recent version of
+xterm, most xterm derivatives and replacements, and most telnet and SSH
 clients for Windows and Macintosh should work, as will the MacOS X
 Terminal application (although Terminal.app reportedly doesn't support 256
 colors).  The console windows for Windows NT and Windows 2000 will not
 work, as they do not even attempt to support ANSI X3.64.
 
-For a complete (to my current knowledge) compatibility list, see the
-Term::ANSIColor module documentation.  If you have any additions to the
-table in the documentation, please send them to me.
+For a terminal emulator compatibility list, see the Term::ANSIColor module
+documentation.  If you have any additions to the table in the
+documentation, please send them to me.
 
-The test suite requires Test::More (part of Perl since 5.6.2).  The
-following additional Perl modules will be used by the test suite if
+The following additional Perl modules will be used by the test suite if
 present:
 
 * Devel::Cover
@@ -74,13 +78,6 @@ present:
 All are available on CPAN.  Those tests will be skipped if the modules are
 not available.
 
-To enable tests that don't detect functionality problems but are used to
-sanity-check the release, set the environment variable `RELEASE_TESTING`
-to a true value.  To enable tests that may be sensitive to the local
-environment or that produce a lot of false positives without uncovering
-many problems, set the environment variable `AUTHOR_TESTING` to a true
-value.
-
 ## Building and Installation
 
 Term::ANSIColor uses ExtUtils::MakeMaker and can be installed using the
@@ -89,12 +86,33 @@ same process as any other ExtUtils::MakeMaker module:
 ```
     perl Makefile.PL
     make
-    make test
     make install
 ```
 
 You'll probably need to do the last as root unless you're installing into
 a local Perl module tree in your home directory.
+
+## Testing
+
+Term::ANSIColor comes with a test suite, which you can run after building
+with:
+
+```
+    make test
+```
+
+If a test vails, you can run a single test with verbose output via:
+
+```
+    prove -vb <path-to-test>
+```
+
+To enable tests that don't detect functionality problems but are used to
+sanity-check the release, set the environment variable `RELEASE_TESTING`
+to a true value.  To enable tests that may be sensitive to the local
+environment or that produce a lot of false positives without uncovering
+many problems, set the environment variable `AUTHOR_TESTING` to a true
+value.
 
 ## Support
 
@@ -106,7 +124,7 @@ pointers to any additional resources.
 For bug tracking, use the [CPAN bug
 tracker](https://rt.cpan.org/Dist/Display.html?Name=Term-ANSIColor).
 However, please be aware that I tend to be extremely busy and work
-projects often take priority.  I'll save your mail and get to it as soon
+projects often take priority.  I'll save your report and get to it as soon
 as I can, but it may take me a couple of months.
 
 ## Source Repository
@@ -131,7 +149,7 @@ Perl module issues in the same place.
 The Term::ANSIColor package as a whole is covered by the following
 copyright statement and license:
 
-> Copyright 1996-1998, 2000-2002, 2005-2006, 2008-2016
+> Copyright 1996-1998, 2000-2002, 2005-2006, 2008-2020
 >     Russ Allbery <rra@cpan.org>
 >
 > Copyright 1996
@@ -153,6 +171,10 @@ licenses, all of which are compatible with the above general package
 license but which may require preservation of additional notices.  All
 required notices, and detailed information about the licensing of each
 file, are recorded in the LICENSE file.
+
+Files covered by a license with an assigned SPDX License Identifier
+include SPDX-License-Identifier tags to enable automated processing of
+license information.  See https://spdx.org/licenses/ for more information.
 
 For any copyright range specified by files in this package as YYYY-ZZZZ,
 the range specifies every single year in that closed interval.

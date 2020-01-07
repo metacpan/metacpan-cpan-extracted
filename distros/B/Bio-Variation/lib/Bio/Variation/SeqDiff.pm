@@ -104,7 +104,7 @@ methods. Internal methods are usually preceded with a _
 # Let the code begin...
 
 package Bio::Variation::SeqDiff;
-$Bio::Variation::SeqDiff::VERSION = '1.7.4';
+$Bio::Variation::SeqDiff::VERSION = '1.7.5';
 use strict;
 use Bio::Tools::CodonTable;
 use Bio::PrimarySeq;

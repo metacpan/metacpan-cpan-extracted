@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.168';
+our $VERSION = '1.169';
 
 # -----------------------------------------------------------------------------
 
@@ -78,6 +78,10 @@ Liste der möglichen Werte und ihrer Anzeigetexte. Beispiel:
 Liste der angezeigten Werte. Wenn nicht angegeben, wird die Liste der
 möglichen Werte (Attribut "options") angezeigt.
 
+=item title => $str (default: undef)
+
+Beschreibungstext.
+
 =item styles => \@styles (Default: [])
 
 Liste der CSS-Definitionen für die einzelnen Optionen. Kann z.B. für
@@ -118,6 +122,7 @@ sub new {
         style => undef,
         styles => [],
         texts => [],
+        title => undef,
         value => undef,
     );
 
@@ -162,9 +167,9 @@ sub html {
     # Attribute
 
     my ($class,$disabled,$id,$javaScript,$name,$onChange,$optionPairs,
-        $options,$style,$styles,$texts,$value) =
+        $options,$style,$styles,$texts,$title,$value) =
         $self->get(qw/class disabled id javaScript name onChange optionPairs
-        options style styles texts value/);
+        options style styles texts title value/);
 
     # Generierung
 
@@ -204,6 +209,7 @@ sub html {
         style => $style,
         disabled => $disabled,
         onchange => $onChange,
+        title => $title,
         '-',
         $str
     );
@@ -220,7 +226,7 @@ sub html {
 
 =head1 VERSION
 
-1.168
+1.169
 
 =head1 AUTHOR
 
@@ -228,7 +234,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019 Frank Seitz
+Copyright (C) 2020 Frank Seitz
 
 =head1 LICENSE
 

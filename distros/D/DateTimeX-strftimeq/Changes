@@ -1,0 +1,16 @@
+0.003   2019-11-20  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix typo in Synopsis.
+
+
+0.002   2019-11-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Accept DateTime object in addition to (sec, min, hour, mday, mon,
+	  year).
+
+
+0.001   2019-11-19  Released-By: PERLANCAR
+
+        - First release.

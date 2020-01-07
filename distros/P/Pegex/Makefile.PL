@@ -24,13 +24,19 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "Pegex",
   "PREREQ_PM" => {
-    "Scalar::Util" => 0
+    "Carp" => 0,
+    "File::ShareDir::Install" => 0,
+    "JSON::XS" => 0,
+    "Scalar::Util" => 0,
+    "XXX" => 0,
+    "YAML::XS" => "0.74"
   },
   "TEST_REQUIRES" => {
     "JSON::PP" => 0,
-    "YAML::XS" => "0.74"
+    "Test::Pod" => 0,
+    "Tie::IxHash" => 0
   },
-  "VERSION" => "0.70",
+  "VERSION" => "0.72",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,8 +44,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
+  "File::ShareDir::Install" => 0,
   "JSON::PP" => 0,
+  "JSON::XS" => 0,
   "Scalar::Util" => 0,
+  "Test::Pod" => 0,
+  "Tie::IxHash" => 0,
+  "XXX" => 0,
   "YAML::XS" => "0.74"
 );
 

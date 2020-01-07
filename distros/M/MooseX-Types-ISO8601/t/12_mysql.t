@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Requires 'MooseX::Types::DateTime::MySQL';
+use Test::More 0.88;
+use Test::Needs 'MooseX::Types::DateTime::MySQL';
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 
 use MooseX::Types::ISO8601 qw/

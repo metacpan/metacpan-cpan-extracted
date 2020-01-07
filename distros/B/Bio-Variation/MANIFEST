@@ -15,7 +15,6 @@ lib/Bio/Variation/DNAMutation.pm
 lib/Bio/Variation/IO.pm
 lib/Bio/Variation/IO/flat.pm
 lib/Bio/Variation/IO/xml.pm
-lib/Bio/Variation/README
 lib/Bio/Variation/RNAChange.pm
 lib/Bio/Variation/SNP.pm
 lib/Bio/Variation/SeqDiff.pm

@@ -2,15 +2,14 @@ package <: $module_name ~ "::Util" :>;
 
 use Pcore -class, -res;
 use Pcore::API::SMTP;
-use Pcore::API::ReCaptcha;
-use <: $module_name ~ "::Const qw[:CONST]" :>;
+use <: $module_name ~ "::Const qw[]" :>;
 
+has app      => ();
 has tmpl     => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Tmpl']
 has dbh      => ( init_arg => undef );    # ConsumerOf ['Pcore::Handle::DBI']
 has settings => ( init_arg => undef );    # HashRef
 
-has _smtp     => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::API::SMTP'] ]
-has recaptcha => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::API::Recaptcha'] ]
+has _smtp => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::API::SMTP'] ]
 
 sub BUILD ( $self, $args ) {
 
@@ -24,7 +23,6 @@ sub BUILD ( $self, $args ) {
             $self->{settings} = $ev->{data};
 
             delete $self->{_smtp};
-            delete $self->{recaptcha};
 
             return;
         }
@@ -44,84 +42,12 @@ sub build_dbh ( $self, $db ) {
     return $self->{dbh};
 }
 
-# TODO
 sub update_schema ( $self, $db ) {
     my $dbh = $self->build_dbh($db);
 
-    $dbh->add_schema_patch(
-        1 => <<'SQL'
-            CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-
-            CREATE TABLE IF NOT EXISTS "settings" (
-                "id" INT2 PRIMARY KEY NOT NULL,
-
-                -- reCaptcha
-                "recaptcha_secret_key" VARCHAR,
-                "recaptcha_site_key" VARCHAR,
-                "recaptcha_enabled" BOOL NOT NULL DEFAULT FALSE,
-
-                -- SMTP
-                "smtp_host" VARCHAR,
-                "smtp_port" INT2,
-                "smtp_username" VARCHAR,
-                "smtp_password" VARCHAR,
-                "smtp_ssl" BOOL NOT NULL DEFAULT FALSE
-            );
-
-            INSERT INTO "settings" ("id", "smtp_host", "smtp_port", "smtp_ssl") VALUES (1, 'smtp.gmail.com', 465, TRUE);
-
-            CREATE TABLE IF NOT EXISTS "user" (
-                "id" UUID PRIMARY KEY NOT NULL,
-                "name" VARCHAR NOT NULL UNIQUE,
-                "enabled" BOOL NOT NULL DEFAULT TRUE,
-                "created" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-                "email" VARCHAR NOT NULL UNIQUE,
-                "email_confirmed" BOOL NOT NULL DEFAULT FALSE
-            );
-
-            CREATE TABLE "user_action_token" (
-                "token" VARCHAR(64) PRIMARY KEY,
-                "user_id" UUID NOT NULL,
-                "token_type" INT2 NOT NULL,
-                "created" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-                "email" VARCHAR NOT NULL
-            );
-
-            CREATE TABLE "log" (
-                "id" UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
-                "created" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-                "channel" TEXT,
-                "level" TEXT,
-                "title" TEXT,
-                "data" TEXT
-            );
-SQL
-    );
+    $dbh->load_schema( $ENV->{share}->get_location('/<: $dist_name :>/db'), 'main' );
 
     return $dbh->upgrade_schema;
-}
-
-# SETTINGS
-sub settings_load ( $self ) {
-    my $settings = $self->{dbh}->selectrow(q[SELECT * FROM "settings" WHERE "id" = 1]);
-
-    P->fire_event( 'app.settings.updated', $settings->{data} ) if $settings;
-
-    return $settings;
-}
-
-sub settings_update ( $self, $settings, $cb ) {
-
-    # check SMTP port
-    if ( exists $settings->{smtp_port} && $settings->{smtp_port} !~ /\A\d+\z/sm ) {
-        return res 400, error => { smtp_port => 'Port is invalid' };
-    }
-
-    my $res = $self->{dbh}->do( [ q[UPDATE "settings"], SET($settings), 'WHERE "id" = 1' ] );
-
-    return $res if !$res;
-
-    return $self->settings_load;
 }
 
 # SMTP
@@ -135,7 +61,7 @@ sub _build__smtp ($self) {
         port     => $cfg->{smtp_port},
         username => $cfg->{smtp_username},
         password => $cfg->{smtp_password},
-        tls      => $cfg->{smtp_ssl},
+        tls      => $cfg->{smtp_tls},
     } );
 }
 
@@ -163,20 +89,6 @@ sub sendmail ( $self, $to, $bcc, $subject, $body ) {
     return $res;
 }
 
-# RECAPTCHA
-sub _build_recaptcha ($self) {
-    my $cfg = $self->{settings};
-
-    return if !$cfg->{recaptcha_enabled};
-
-    return if !$cfg->{recaptcha_secret_key} || !$cfg->{recaptcha_site_key};
-
-    return Pcore::API::ReCaptcha->new( {
-        secret_key => $cfg->{recaptcha_secret_key},
-        site_key   => $cfg->{recaptcha_site_key},
-    } );
-}
-
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -184,11 +96,11 @@ sub _build_recaptcha ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1, 6                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 1, 5                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 161                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 48, 87               | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 182                  | Documentation::RequirePackageMatchesPodName - Pod NAME on line 186 does not match the package declaration      |
+## |    1 | 94                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 98 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

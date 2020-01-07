@@ -1,10 +1,10 @@
                                   DB_File
 
-                               Version 1.852
+                               Version 1.853
 
-                               21 April 2019
+                               5 January 2020
 
-     Copyright (c) 1995-2019 Paul Marquess. All rights reserved. This
+     Copyright (c) 1995-2020 Paul Marquess. All rights reserved. This
       program is free software; you can redistribute it and/or modify
                   it under the same terms as Perl itself.
 
@@ -620,11 +620,11 @@ fixed the problem.
 FEEDBACK
 ========
 
-General feedback/questions/bug reports can be sent to me at pmqs@cpan.org.
+General feedback/questions/bug reports can be sent to 
+https://github.com/pmqs/DB_File/issues (preferred) or
+https://rt.cpan.org/Public/Dist/Display.html?Name=DB_File
 
-Alternatively, if you have Usenet access, you can try the
-comp.databases.berkeley-db or comp.lang.perl.modules groups.
-
+Alternatively, email me at pmqs@cpan.org.
 
 
 How to report a problem with DB_File.

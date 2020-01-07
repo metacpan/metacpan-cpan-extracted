@@ -11,7 +11,7 @@ use warnings;
 
 use Rex::Shared::Var::Common qw/__lock __store __retrieve/;
 
-our $VERSION = '1.7.1'; # VERSION
+our $VERSION = '1.8.0'; # VERSION
 
 sub TIESCALAR {
   my $self = { varname => $_[1], };

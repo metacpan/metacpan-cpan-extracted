@@ -1,12 +1,12 @@
 {
     "name": "Term::ANSIColor",
-    "version": "4.06",
+    "version": "5.00",
     "synopsis": "simple ANSI text attribute control module",
     "maintainer": "Russ Allbery <rra@cpan.org>",
     "copyrights": [
         {
             "holder": "Russ Allbery <rra@cpan.org>",
-            "years": "1996-1998, 2000-2002, 2005-2006, 2008-2016",
+            "years": "1996-1998, 2000-2002, 2005-2006, 2008-2020",
         },
         {
             "holder": "Zenin",
@@ -33,14 +33,16 @@
         "browse": "https://git.eyrie.org/?p=perl/ansicolor.git",
         "github": "rra/ansicolor",
         "openhub": "https://www.openhub.net/p/ansicolor",
+        "travis": "rra/ansicolor",
     },
     "quote": {
         "author": "Dave van Domelen",
     },
     "distribution": {
-        "section": "devel",
+        "section": "perl",
         "tarname": "Term-ANSIColor",
         "version": "term-ansicolor",
+        "cpan": "Term-ANSIColor",
     },
     "docs": {
         "user": [

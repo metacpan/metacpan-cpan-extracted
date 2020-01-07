@@ -4,6 +4,9 @@ use strict;
 use warnings;
 use Test::More tests => 8;
 
+use lib 't/lib';
+use MyLogger;
+
 # See https://rt.cpan.org/Public/Bug/Display.html?id=79214
 
 BEGIN {
@@ -24,15 +27,16 @@ RT79214: {
 	$ENV{'REMOTE_ADDR'} = '24.50.196.23';
 	delete $ENV{'HTTP_ACCEPT_LANGUAGE'};
 	my $l = new_ok('CGI::Lingua' => [
-		supported => [ 'en-gb', 'nl', 'da', 'fr', 'de', 'pl' ]
+		supported => [ 'en-gb', 'nl', 'da', 'fr', 'de', 'pl' ],
+		logger => MyLogger->new()
 	]);
-	ok(defined $l);
+	ok(defined($l));
 	ok($l->isa('CGI::Lingua'));
 	SKIP: {
 		skip 'Test requires Internet access', 4 unless(-e 't/online.enabled');
-		ok($l->country() eq 'pr');
+		is($l->country(), 'pr');	# srezic@cpan.org: RT#131347
 		ok(defined($l->requested_language()));
-		ok($l->language() eq 'Unknown');
+		is($l->language(), 'Unknown');
 
 		TODO: {
 			local $TODO = 'https://rt.cpan.org/Public/Bug/Display.html?id=79214';
