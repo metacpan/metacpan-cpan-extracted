@@ -11,7 +11,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 
@@ -81,9 +81,9 @@ B<module-version.t> [B<--update>]
 
 =head1 REQUIREMENTS
 
-Perl 5.6.0 or later, the Perl6::Slurp module, and the JSON::PP Perl module,
-both of which are available from CPAN.  JSON::PP is also included in Perl core
-in Perl 5.14 and later.
+Perl 5.8 or later, the Perl6::Slurp module, and the JSON::PP Perl module, both
+of which are available from CPAN.  JSON::PP is also included in Perl core in
+Perl 5.14 and later.
 
 =head1 DESCRIPTION
 
@@ -121,7 +121,7 @@ Russ Allbery <eagle@eyrie.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014-2016 Russ Allbery <eagle@eyrie.org>
+Copyright 2014-2016, 2019-2020 Russ Allbery <eagle@eyrie.org>
 
 Copyright 2013-2014 The Board of Trustees of the Leland Stanford Junior
 University

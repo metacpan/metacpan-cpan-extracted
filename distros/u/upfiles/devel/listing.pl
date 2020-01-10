@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016, 2017 Kevin Ryde
+# Copyright 2016, 2017, 2019 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -182,7 +182,7 @@ HERE
                 : '');
     print $out $join,
       " <a ${type}href=\"$Entitize{$filename}\"><code>$Entitize{$filename}</code></a>\n",
-      "    &mdash; ",number_commas($bytes)," bytes, $date\n";
+      "    -- ",number_commas($bytes)," bytes, $date\n";
     $join = '<br>';
     $count++;
   }
@@ -216,11 +216,11 @@ HERE
   if ($old_content eq $new_content) {
     $diff = 'unchanged';
   } else {
-    $diff = 'new';
+    $diff = 'new      ';
     File::Copy::copy($out->filename, $out_filename);
   }
   my $bytes = -s $out_filename;
-  print "$dir $bytes $diff\n";
+  print "$diff $dir  $bytes bytes\n";
 
   system 'weblint',$out_filename;
 }

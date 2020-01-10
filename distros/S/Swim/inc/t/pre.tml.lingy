@@ -1,0 +1,14 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*swim","*pod"],
+      ["==",
+        [".",
+          ["*","swim"],
+          ["parse","Pod"]],
+        ["*","pod"],
+        "Swim to Pod - +"]]],
+  "data": [
+    { "label": "Preformatted with Blank Lines",
+      "point": {
+        "swim": "Code:\n\n  a = b\n\n  b = c\n",
+        "pod": "Code:\n\n    a = b\n\n    b = c\n"}}]}

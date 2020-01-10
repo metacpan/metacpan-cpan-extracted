@@ -34,8 +34,14 @@ sub qtest {
 
   my $q0 = eval { $sub->($qstr0); };
   my $q1 = eval { $sub->($qstr1); };
-  $q0    = $q0->toJson if (UNIVERSAL::can($q0,'toJson'));
-  $q1    = $q1->toJson if (UNIVERSAL::can($q1,'toJson'));
+  if ($q0->can('toHash') && $q1->can('toHash')) {
+    $q0 = $q0->toHash;
+    $q1 = $q1->toHash;
+  }
+  elsif ($q0->can('toJson') && $q1->can('toJson')) {
+    $q0 = $q0->toJson;
+    $q1 = $q1->toJson;
+  }
   is_deeply($q0,$q1,$cmt);
 }
 

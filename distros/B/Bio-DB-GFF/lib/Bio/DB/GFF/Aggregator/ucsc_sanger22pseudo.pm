@@ -25,7 +25,7 @@ L<Bio::DB::GFF::Aggregator::transcript>
 =cut
 
 package Bio::DB::GFF::Aggregator::ucsc_sanger22pseudo;
-$Bio::DB::GFF::Aggregator::ucsc_sanger22pseudo::VERSION = '1.7.3';
+$Bio::DB::GFF::Aggregator::ucsc_sanger22pseudo::VERSION = '1.7.4';
 use strict;
 
 use base qw(Bio::DB::GFF::Aggregator);

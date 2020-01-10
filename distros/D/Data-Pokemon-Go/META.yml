@@ -5,9 +5,8 @@ author:
 build_requires:
   Test::More: '1.302'
   Test::More::UTF8: '0.05'
-  Text::CSV_XS: '1.34'
 configure_requires:
-  Module::Build::Tiny: '0.035'
+  Module::Build::Tiny: '0.039'
 dynamic_config: 0
 generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -28,7 +27,7 @@ no_index:
 provides:
   Data::Pokemon::Go:
     file: lib/Data/Pokemon/Go.pm
-    version: '0.09'
+    version: '0.11'
   Data::Pokemon::Go::IV:
     file: lib/Data/Pokemon/Go/IV.pm
   Data::Pokemon::Go::Pokemon:
@@ -55,7 +54,7 @@ resources:
   bugtracker: https://github.com/worthmine/Data-Pokemon-Go/issues
   homepage: https://github.com/worthmine/Data-Pokemon-Go
   repository: git://github.com/worthmine/Data-Pokemon-Go.git
-version: '0.09'
+version: '0.11'
 x_authority: cpan:WORTHMINE
 x_contributors:
   - 'AnaTofuZ <anatofuz@gmail.com>'

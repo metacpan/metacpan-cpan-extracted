@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.55_03",
-            "Math::BigInt" : "1.999816",
-            "Math::BigInt::GMP" : "1.6006"
+            "ExtUtils::MakeMaker" : "6.55_03"
          }
       },
       "configure" : {
@@ -69,6 +67,6 @@
          "url" : "https://github.com/brtastic/perl-bitcoin-crypto"
       }
    },
-   "version" : "0.99",
+   "version" : "0.991",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

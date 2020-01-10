@@ -1,0 +1,106 @@
+2.905	2020-01-08
+
+   - Final packaging fixes.
+
+2.904	2020-01-07
+
+   - Fix Changes file in MANIFEST.
+
+   - Fix one more unreset variable.
+
+2.903	2020-01-06
+
+   - Miscellaneous changes to turn eps2png (script) into a module
+     App::eps2png.
+
+2.902	2020-01-04
+
+   - Miscellaneous updates for SPEC generation and RPM building.
+
+   - Fix problem with ghoscript >= 9.50.
+
+   - Moved tests involving ghostscript graphics to xt/. It is
+     virtually impossible to create tests that compare graphics output
+     given that this output will differ between architectures and
+     ghostscript versions.
+ 
+   - Skip GIF tests if no NetPBM installed.
+
+2.8  2020-01-02
+
+   - Move development to Github.
+
+   - Updates for modern perl and ghostview.
+
+2.7  2009-03-20
+
+   - Fix problem when converting a series of files, some with illegal
+     bounding boxes.
+
+   - Fix problem with non-integer bounding boxes and --height/--width.
+
+2.6  2006-03-27
+
+   - Better checks for BoundingBox.
+
+   - Better checks for Ghostscript.
+
+   - Prevent width/height from propagating.
+
+   - Configure for PBM fallback at build time.
+
+   - Add .spec file.
+
+2.5 Thu Jul 06, 2006-07-25
+
+   - Updated CHANGES file.
+
+2.4 2006-07-06
+
+   - Add support for transparent PNGs.
+     Thanks to Jean_Baptiste Quenot.
+
+   - Updated reference images.
+
+2.3  2006-06-01
+
+   - Fixed a typo.
+
+2.2, 2001-06-25
+
+   - Add -width and -height options.
+
+   - Add more tests.
+
+2.1  2001-06-22
+
+   - Added support for antialiasing (enabled by default).
+
+   - Enhanced documentation and cleaned up the kit.
+
+   - Added install tests (make test).
+
+1.7  2000-07-13
+
+   - Remove use of temp files. Gives problems on Windows.
+
+1.6  2000-07-10
+
+   - Add POD, MANIFEST. Packaging.
+
+   - Fix a problem where the BoundingBox was not correctly extracted.
+
+1.5  1998-11-11
+
+   - Fix bug in -res option.
+     Thanks to James H. Cloos Jr. <cloos@jhcloos.com>.
+
+1.4  1998-06-07
+
+   - Small changes, mainly for the build/install procedure.
+
+   - Add README.
+
+1.1  1998-06-06
+
+   - Initial version.

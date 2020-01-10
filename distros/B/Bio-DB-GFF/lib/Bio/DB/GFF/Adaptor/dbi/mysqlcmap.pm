@@ -1,5 +1,5 @@
 package Bio::DB::GFF::Adaptor::dbi::mysqlcmap;
-$Bio::DB::GFF::Adaptor::dbi::mysqlcmap::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::dbi::mysqlcmap::VERSION = '1.7.4';
 =head1 NAME
 
 Bio::DB::GFF::Adaptor::dbi::mysqlcmap -- Database adaptor for an integraded

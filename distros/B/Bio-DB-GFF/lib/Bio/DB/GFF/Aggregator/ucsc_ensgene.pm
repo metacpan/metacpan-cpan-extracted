@@ -25,7 +25,7 @@ L<Bio::DB::GFF::Aggregator::transcript>
 =cut
 
 package Bio::DB::GFF::Aggregator::ucsc_ensgene;
-$Bio::DB::GFF::Aggregator::ucsc_ensgene::VERSION = '1.7.3';
+$Bio::DB::GFF::Aggregator::ucsc_ensgene::VERSION = '1.7.4';
 use strict;
 
 use base qw(Bio::DB::GFF::Aggregator);

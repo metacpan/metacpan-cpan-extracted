@@ -1,5 +1,15 @@
 Revision history for Future-AsyncAwait
 
+0.35    2020-01-07
+        [CHANGES]
+         * Support lexical scopes declaring a different class of future
+         * Document the required API for awaitable objects
+         * Provide an API conformance test for implementors of alternative
+           future classes
+
+        [BUGFIXES]
+         * Provide scalar context to controlling expression of `await`
+
 0.34    2019-12-01 01:45:23
         [CHANGES]
          * Various internal changes to neaten up the hax/ directory of C

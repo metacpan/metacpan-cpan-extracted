@@ -15,7 +15,7 @@ for i in /etc/test-%{name} \
          /var/lib/test-%{name}/foo1 /var/lib/test-%{name}/foo2 /var/lib/test-%{name}/foo3 \
 	 /usr/share/locale/fr/LC_MESSAGES/test-%{name}.mo \
          /usr/test-%{name}/foo; do
-	 install -d `dirname $RPM_BUILD_ROOT$i`
+	 mkdir -p `dirname $RPM_BUILD_ROOT$i`
 	 echo foo > $RPM_BUILD_ROOT$i
 done
 

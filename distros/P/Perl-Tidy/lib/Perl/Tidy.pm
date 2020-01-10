@@ -110,7 +110,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20191203';
+    $VERSION = '20200110';
 }
 
 sub streamhandle {
@@ -1177,8 +1177,8 @@ EOM
                     $rpending_logfile_message );
 
                 # stop iterations if errors or converged
-                #my $stop_now = $logger_object->{_warning_count};
                 my $stop_now = $tokenizer->report_tokenization_errors();
+                $stop_now ||= $tokenizer->get_unexpected_error_count();
                 if ($stop_now) {
                     $convergence_log_message = <<EOM;
 Stopping iterations because of severe errors.                       
@@ -1881,6 +1881,7 @@ sub generate_options {
     $add_option->( 'break-before-all-operators',              'bbao',  '!' );
     $add_option->( 'keep-interior-semicolons',                'kis',   '!' );
     $add_option->( 'one-line-block-semicolons',               'olbs',  '=i' );
+    $add_option->( 'one-line-block-nesting',                  'olbn',  '=i' );
 
     ########################################
     $category = 6;    # Controlling list formatting
@@ -2108,6 +2109,7 @@ sub generate_options {
       nowarning-output
       character-encoding=none
       one-line-block-semicolons=1
+      one-line-block-nesting=0
       outdent-labels
       outdent-long-quotes
       outdent-long-comments
@@ -3997,45 +3999,6 @@ sub do_syntax_check {
     Die("Unexpected call for syntax check-shouldn't happen\n");
     return;
 }
-
-=pod
-sub do_syntax_check {
-    my ( $stream, $flags, $error_redirection ) = @_;
-
-    ############################################################
-    # This code is not reachable because syntax check is deactivated,
-    # but it is retained for reference.
-    ############################################################
-
-    # We need a named input file for executing perl
-    my ( $stream_filename, $is_tmpfile ) = get_stream_as_named_file($stream);
-
-    # TODO: Need to add name of file to log somewhere
-    # otherwise Perl output is hard to read
-    if ( !$stream_filename ) { return $stream_filename, "" }
-
-    # We have to quote the filename in case it has unusual characters
-    # or spaces.  Example: this filename #CM11.pm# gives trouble.
-    my $quoted_stream_filename = '"' . $stream_filename . '"';
-
-    # Under VMS something like -T will become -t (and an error) so we
-    # will put quotes around the flags.  Double quotes seem to work on
-    # Unix/Windows/VMS, but this may not work on all systems.  (Single
-    # quotes do not work under Windows).  It could become necessary to
-    # put double quotes around each flag, such as:  -"c"  -"T"
-    # We may eventually need some system-dependent coding here.
-    $flags = '"' . $flags . '"';
-
-    # now wish for luck...
-    my $msg = qx/perl $flags $quoted_stream_filename $error_redirection/; 
-
-    if ($is_tmpfile) {
-        unlink $stream_filename
-          or Perl::Tidy::Die("couldn't unlink stream $stream_filename: $!\n");
-    }
-    return $stream_filename, $msg;
-}
-=cut
 
 1;
 

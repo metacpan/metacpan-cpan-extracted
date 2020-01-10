@@ -25,7 +25,7 @@ replacement for the -name and -class arguments.
 =cut
 
 package Bio::DB::GFF::Featname;
-$Bio::DB::GFF::Featname::VERSION = '1.7.3';
+$Bio::DB::GFF::Featname::VERSION = '1.7.4';
 use strict;
 use base qw(Bio::Root::RootI);
 

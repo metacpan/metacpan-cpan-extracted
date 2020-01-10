@@ -1,22 +1,27 @@
-0.05    2017-01-20 (PERLANCAR)
+0.060   2019-11-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add subcommands: dzil_{bundle,plugin,role}.
+
+
+0.05    2017-01-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Use Pod::Weaver plugin PWP:App::lcpan.
 
 
-0.04    2016-01-18 (PERLANCAR)
+0.04    2016-01-18  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to adjust to lcpan 0.62's modules() (namespace ->
 	  namespaces).
 
 
-0.03    2016-01-18 (PERLANCAR)
+0.03    2016-01-18  Released-By: PERLANCAR
 
 	- Adjust to lcpan 0.64.
 
 
-0.02    2015-12-07 (PERLANCAR)
+0.02    2015-12-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -24,6 +29,6 @@
 	  prerequisite App::lcpan.
 
 
-0.01    2015-12-07 (PERLANCAR)
+0.01    2015-12-07  Released-By: PERLANCAR
 
         - First version.

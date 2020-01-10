@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::dzil;
 
-our $DATE = '2017-01-20'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2019-11-20'; # DATE
+our $VERSION = '0.060'; # VERSION
 
 1;
 # ABSTRACT: lcpan subcommands related to Dist::Zilla
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::dzil - lcpan subcommands related to Dist::Zilla
 
 =head1 VERSION
 
-This document describes version 0.05 of App::lcpan::CmdBundle::dzil (from Perl distribution App-lcpan-CmdBundle-dzil), released on 2017-01-20.
+This document describes version 0.060 of App::lcpan::CmdBundle::dzil (from Perl distribution App-lcpan-CmdBundle-dzil), released on 2019-11-20.
 
 =head1 SYNOPSIS
 
@@ -59,23 +59,29 @@ This bundle provides the following lcpan subcommands:
 
 =over
 
-=item * L<lcpan dzil-authors-by-plugin-count|App::lcpan::Cmd::dzil_authors_by_plugin_count>
-
-=item * L<lcpan dzil-bundles|App::lcpan::Cmd::dzil_bundles>
-
-=item * L<lcpan dzil-authors-by-role-count|App::lcpan::Cmd::dzil_authors_by_role_count>
-
-=item * L<lcpan dzil-plugins-by-rdep-count|App::lcpan::Cmd::dzil_plugins_by_rdep_count>
+=item * L<lcpan dzil-role|App::lcpan::Cmd::dzil_role>
 
 =item * L<lcpan dzil-authors-by-bundle-count|App::lcpan::Cmd::dzil_authors_by_bundle_count>
 
+=item * L<lcpan dzil-plugin|App::lcpan::Cmd::dzil_plugin>
+
+=item * L<lcpan dzil-authors-by-role-count|App::lcpan::Cmd::dzil_authors_by_role_count>
+
+=item * L<lcpan dzil-bundle|App::lcpan::Cmd::dzil_bundle>
+
 =item * L<lcpan dzil-roles-by-rdep-count|App::lcpan::Cmd::dzil_roles_by_rdep_count>
 
-=item * L<lcpan dzil-roles|App::lcpan::Cmd::dzil_roles>
+=item * L<lcpan dzil-bundles|App::lcpan::Cmd::dzil_bundles>
 
 =item * L<lcpan dzil-plugins|App::lcpan::Cmd::dzil_plugins>
 
 =item * L<lcpan dzil-bundles-by-rdep-count|App::lcpan::Cmd::dzil_bundles_by_rdep_count>
+
+=item * L<lcpan dzil-plugins-by-rdep-count|App::lcpan::Cmd::dzil_plugins_by_rdep_count>
+
+=item * L<lcpan dzil-authors-by-plugin-count|App::lcpan::Cmd::dzil_authors_by_plugin_count>
+
+=item * L<lcpan dzil-roles|App::lcpan::Cmd::dzil_roles>
 
 =back
 
@@ -109,7 +115,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

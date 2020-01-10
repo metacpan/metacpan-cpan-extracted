@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.09";
+our $VERSION = "0.11";
 
 use Moose;
 
@@ -18,6 +18,7 @@ Data::Pokemon::Go - Data for every Pokemon in Pokemon Go
 
 =head1 SYNOPSIS
 
+ use utf8;
  use Data::Pokemon::Go::Pokemon;
  my $pg = Data::Pokemon::Go::Pokemon->new( name => 'カイリュー' );
  print $pg->effective();    # こおり ドラゴン いわ フェアリー
@@ -39,11 +40,9 @@ Data::Pokemon::Go is the helper module for who has less knowledge about Pokemons
 
 =over
 
-=item guessing the IVs from each infomations is not available
+=item supporting Multi-language is not completely
 
-=item supporting Multi-language is not available
-
-=item YAMLs for after Sinnoh Region are not available
+=item YAML for after Unova Region are not available
 
 =item Japanese documents are not available L<qiitaで日本語解説を少しだけ|https://qiita.com/worthmine/items/4a51fd74f31b4a97cf3c>
 

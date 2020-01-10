@@ -1,3 +1,9 @@
+0.1.48 Thu Jan  9 13:11:26 PST 2020
+ - Fix a formatting bug from ingydotnet/git-subrepo
+
+0.1.47 Thu Jan  9 08:55:57 PST 2020
+ - Fix for https://github.com/ingydotnet/inline-pm/pull/74
+
 0.1.46 Sun Feb 12 13:45:52 PST 2017
  - Release after pause-cleanup screwed up Swim dists
 

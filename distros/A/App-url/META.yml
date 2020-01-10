@@ -20,11 +20,12 @@ no_index:
     - inc
 requires:
   Mojolicious: '0'
+  Net::PublicSuffixList: '0'
   String::Sprintf: '0'
-  perl: '5.008'
+  perl: '5.026'
 resources:
   bugtracker: https://github.com/briandfoy/app-url/issues
   homepage: https://github.com/briandfoy/app-url
   repository: https://github.com/briandfoy/app-url.git
-version: '1.001'
+version: '1.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -26,6 +26,7 @@ my $meta = {
                                            "Moo" => 1.006,
                                            "namespace::autoclean" => 0,
                                            "perl" => 5.008008,
+                                           "Try::Tiny" => 0,
                                            "Type::Tiny" => "1.004000",
                                          },
                                        },
@@ -35,7 +36,8 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "MooX::Press" => { file => "lib/MooX/Press.pm", version => 0.013 },
+                          "MooX::Press" => { file => "lib/MooX/Press.pm", version => 0.018 },
+                          "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.018 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -49,7 +51,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Press/project",
                         },
-  "version"          => 0.013,
+  "version"          => 0.018,
   "x_static_install" => 1,
 };
 

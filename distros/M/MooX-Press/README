@@ -167,6 +167,12 @@ DESCRIPTION
         Only supported for Moose. Unnecessary for Moo anyway. Defaults to
         false.
 
+    `factory_package_can` *(HashRef[CodeRef])*
+        Hashref of additional subs to install into the factory package.
+
+    `type_library_can` *(HashRef[CodeRef])*
+        Hashref of additional subs to install into the factory package.
+
     At this top level, a shortcut is available for the 'class' and 'role'
     keys. Rather than:
 
@@ -706,15 +712,75 @@ DESCRIPTION
         => "HashRef"` doesn't mean what you think it means. It means an object
         blessed into the "YourApp::HashRef" class.
 
-        Use blessed type constraint objects, such as those from
-        Types::Standard.
+        That is a feature though, not a weakness.
+
+          use MooX::Press (
+            prefix  => 'Nature',
+            class   => [
+              'Leaf'  => {},
+              'Tree'  => {
+                has  => {
+                  'nicest_leaf'  => { isa => 'Leaf' },
+                },
+              },
+            ],
+          );
+
+        The `Nature::Tree` and `Nature::Leaf` classes will be built, and
+        MooX::Press knows that the `nicest_leaf` is supposed to be a blessed
+        `Nature::Leaf` object.
+
+        String type names can be prefixed with `@` or `%` to indicate an
+        arrayref or hashref of a type:
+
+          use MooX::Press (
+            prefix  => 'Nature',
+            class   => [
+              'Leaf'  => {},
+              'Tree'  => {
+                has  => {
+                  'foliage'  => { isa => '@Leaf' },
+                },
+              },
+            ],
+          );
+
+        For more everything else, use blessed type constraint objects, such as
+        those from Types::Standard, or use `type` as documented below.
+
+          use Types::Standard qw( Str );
+          use MooX::Press (
+            prefix  => 'Nature',
+            class   => [
+              'Leaf'  => {},
+              'Tree'  => {
+                has  => {
+                  'foliage'  => { isa => '@Leaf' },
+                  'species'  => { isa => Str },
+                },
+              },
+            ],
+          );
 
     `type` *(Str)*
         `type => "HashRef"` does what you think `isa => "HashRef"` should do.
-        More specifically it searches your type library, along with
+        More specifically it searches (by name) your type library, along with
         Types::Standard, Types::Common::Numeric, and Types::Common::String to
         find the type constraint it thinks you wanted. It's smart enough to
         deal with parameterized types, unions, intersections, and complements.
+
+          use MooX::Press (
+            prefix  => 'Nature',
+            class   => [
+              'Leaf'  => {},
+              'Tree'  => {
+                has  => {
+                  'foliage'  => { isa  => '@Leaf' },
+                  'species'  => { type => 'Str' },
+                },
+              },
+            ],
+          );
 
     `coerce` *(Bool)*
         MooX::Press automatically implies `coerce => 1` when you give a type
@@ -841,7 +907,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2019 by Toby Inkster.
+    This software is copyright (c) 2019-2020 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

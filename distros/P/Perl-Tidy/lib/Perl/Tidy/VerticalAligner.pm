@@ -1,7 +1,7 @@
 package Perl::Tidy::VerticalAligner;
 use strict;
 use warnings;
-our $VERSION = '20191203';
+our $VERSION = '20200110';
 
 use Perl::Tidy::VerticalAligner::Alignment;
 use Perl::Tidy::VerticalAligner::Line;
@@ -1199,8 +1199,6 @@ sub fix_terminal_else {
     my $jmax = @{$rfields} - 1;
     return unless ( $jmax > 0 );
 
-    #my $old_line    = $group_lines[-1];
-
     # check for balanced else block following if/elsif/unless
     my $rfields_old = $old_line->get_rfields();
 
@@ -2055,8 +2053,6 @@ sub my_flush {
         my @new_lines = @group_lines;
         initialize_for_new_group();
 
-        ##my $has_terminal_ternary = $new_lines[-1]->{_is_terminal_ternary};
-
         # remove unmatched tokens in all lines
         delete_unmatched_tokens( \@new_lines );
 
@@ -2101,10 +2097,12 @@ sub my_flush {
             # BEFORE this line unless both it and the previous line have side
             # comments.  This prevents this line from pushing side coments out
             # to the right.
-            ##elsif ( $new_line->get_jmax() == 1 ) {
             elsif ( $new_line->get_jmax() == 1 && !$keep_group_intact ) {
 
-                # There are no matching tokens, so now check side comments:
+                # There are no matching tokens, so now check side comments.
+                # Programming note: accessing arrays with index -1 is
+                # risky in Perl, but we have verified there is at least one
+                # line in the group and that there is at least one field.
                 my $prev_comment = $group_lines[-1]->get_rfields()->[-1];
                 my $side_comment = $new_line->get_rfields()->[-1];
                 my_flush_code() unless ( $side_comment && $prev_comment );
@@ -3202,7 +3200,9 @@ sub valign_output_step_B {
                         my @seqno_last =
                           ( split /:/, $last_nonblank_seqno_string );
                         my @seqno_now = ( split /:/, $seqno_string );
-                        if (   $seqno_now[-1] == $seqno_last[0]
+                        if (   @seqno_now
+                            && @seqno_last
+                            && $seqno_now[-1] == $seqno_last[0]
                             && $seqno_now[0] == $seqno_last[-1] )
                         {
 

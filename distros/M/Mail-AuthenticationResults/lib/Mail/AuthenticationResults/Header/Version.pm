@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::Version;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180923'; # VERSION
+our $VERSION = '1.20200108'; # VERSION
 use Scalar::Util qw{ weaken };
 use Carp;
 
@@ -67,7 +67,7 @@ Mail::AuthenticationResults::Header::Version - Class modelling the AuthServID pa
 
 =head1 VERSION
 
-version 1.20180923
+version 1.20200108
 
 =head1 DESCRIPTION
 

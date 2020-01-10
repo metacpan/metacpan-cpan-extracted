@@ -10,7 +10,7 @@ x
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/usr/share/man
+mkdir -p $RPM_BUILD_ROOT/usr/share/man
 echo h > $RPM_BUILD_ROOT/usr/share/man/foo
 
 %clean

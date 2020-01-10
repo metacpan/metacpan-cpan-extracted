@@ -1,26 +1,23 @@
 ---
-abstract: 'Simple backups based on rsync'
+abstract: 'Simple backups based on rsync.'
 author:
-  - 'John Gravatt <john@gravatt.org>'
+  - 'John Gravatt <gravattj@cpan.org>'
 build_requires:
   File::Path: '0'
+  File::RandomGenerator: '0'
   File::Touch: '0'
   Test::More: '0'
+  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  File::ShareDir: '0'
-  File::ShareDir::Install: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Backup-EZ
-no_index:
-  directory:
-    - t
-    - inc
 requires:
   Carp: '0'
   Config::General: '0'
@@ -28,13 +25,18 @@ requires:
   Data::Printer: '0'
   Data::UUID: '0'
   Devel::Confess: '0'
-  Env: '0'
-  File::RandomGenerator: '0'
+  File::ShareDir: '0'
   File::Slurp: '0'
-  Modern::Perl: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
   Sys::Hostname: '0'
+  Test::Pod: '0'
   Time::localtime: '0'
   Unix::Syslog: '0'
-  perl: '5.006'
-version: '0.40'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  constant: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+version: '0.43'
+x_generated_by_perl: v5.16.3
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -17,7 +17,7 @@ use Path::Tiny;
 use POSIX ":sys_wait_h";
 use App::MultiSsh qw/hosts_from_map is_host multi_run shell_quote/;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -162,7 +162,7 @@ mssh - Multi host ssh executer
 
 =head1 VERSION
 
-This documentation refers to mssh version 0.22.
+This documentation refers to mssh version 0.23.
 
 =head1 SYNOPSIS
 

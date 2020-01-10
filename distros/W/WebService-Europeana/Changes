@@ -1,3 +1,7 @@
+* 0.0.4
+
+added LWP::Protocol::https as an requirement [https://github.com/hatorikibble/webservice-europeana/issues/2]
+
 * 0.0.3
 
 modified for change in the response of the webservice

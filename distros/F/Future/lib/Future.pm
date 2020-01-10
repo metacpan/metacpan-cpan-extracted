@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 package Future;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
@@ -180,6 +180,13 @@ called on it, or it had at least one C<on_ready> or C<on_fail> callback, or
 its failure is propagated to another C<Future> instance (by a sequencing or
 converging method).
 
+=head2 Future::AsyncAwait::Awaitable ROLE
+
+Since version 0.43 this module provides the L<Future::AsyncAwait::Awaitable>
+API. Subclass authors should note that several of the API methods are provided
+by special optimised internal methods, which may require overriding in your
+subclass if your internals are different from that of this module.
+
 =cut
 
 =head1 CONSTRUCTORS
@@ -262,6 +269,8 @@ sub new
          : () ),
    }, ( ref $proto || $proto );
 }
+
+*AWAIT_CLONE = sub { shift->new };  # We need to respect subclassing
 
 my $GLOBAL_END;
 END { $GLOBAL_END = 1; }
@@ -500,6 +509,8 @@ sub is_ready
    return $self->{ready};
 }
 
+*AWAIT_IS_READY = \&is_ready;
+
 =head2 is_done
 
    $done = $future->is_done
@@ -545,6 +556,8 @@ sub is_cancelled
    my $self = shift;
    return $self->{cancelled};
 }
+
+*AWAIT_IS_CANCELLED = \&is_cancelled;
 
 =head2 state
 
@@ -609,6 +622,10 @@ sub done
    return $self;
 }
 
+# TODO: For efficiency we can implement better versions of these as individual
+#  methods know which case is being invoked
+*AWAIT_NEW_DONE = *AWAIT_DONE = \&done;
+
 =head2 fail
 
    $future->fail( $exception, $category, @details )
@@ -662,6 +679,10 @@ sub fail
 
    return $self;
 }
+
+# TODO: For efficiency we can implement better versions of these as individual
+#  methods know which case is being invoked
+*AWAIT_NEW_FAIL = *AWAIT_FAIL = \&fail;
 
 =head2 die
 
@@ -729,6 +750,18 @@ sub on_cancel
    }
 
    return $self;
+}
+
+# An optimised version for Awaitable role
+sub AWAIT_ON_CANCEL
+{
+   my $self = shift;
+   my ( $f2 ) = @_;
+
+   push @{ $self->{on_cancel} }, $f2;
+   push @{ $f2->{revoke_when_ready} }, my $r = [ $self, \$self->{on_cancel}[-1] ];
+   weaken( $r->[0] );
+   weaken( $r->[1] );
 }
 
 sub _revoke_on_cancel
@@ -807,6 +840,14 @@ sub on_ready
    return $self;
 }
 
+# An optimised version for Awaitable role
+sub AWAIT_ON_READY
+{
+   my $self = shift;
+   my ( $code ) = @_;
+   push @{ $self->{callbacks} }, [ CB_ALWAYS|CB_SELF, $self->wrap_cb( on_ready => $code ) ];
+}
+
 =head2 get
 
    @result = $future->get
@@ -844,6 +885,10 @@ sub get
    return $self->{result}->[0] unless wantarray;
    return @{ $self->{result} };
 }
+
+# TODO: For efficiency we can implement a better version of this because it
+#   is only invoked on ready futures
+*AWAIT_GET = \&get;
 
 =head2 block_until_ready
 

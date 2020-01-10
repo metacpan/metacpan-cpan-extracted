@@ -1,4 +1,4 @@
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2020 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -25,7 +25,7 @@ use Net::SFTP::Foreign;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 12;
+our $VERSION = 14;
 
 # Have croaks from Net::SFTP reported against the caller (App::Upfiles)
 # rather than here.

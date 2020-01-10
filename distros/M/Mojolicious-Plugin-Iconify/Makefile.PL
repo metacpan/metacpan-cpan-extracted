@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Mojolicious::Plugin::Iconify',
     VERSION_FROM      => 'lib/Mojolicious/Plugin/Iconify.pm',
-    PREREQ_PM         => {'Mojolicious' => '1.78'},
+    PREREQ_PM         => {'Mojolicious' => '7.93'},
     ABSTRACT_FROM     => 'lib/Mojolicious/Plugin/Iconify.pm',
     AUTHOR            => q{Giuseppe Di Terlizzi <gdt@cpan.org>},
     LICENSE           => 'artistic_2',

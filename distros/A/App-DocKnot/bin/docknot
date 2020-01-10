@@ -51,6 +51,10 @@ Build, test, and generate a distribution tarball of the package in the
 current directory.  The exact commands used is determined by the package
 metadata (see L<App::DocKnot::Generate> for format documentation).
 
+After the distribution is built, it will be checked against the source tree
+and B<docknot> will report an error and exit with a non-zero status if there
+are any expected files missing.
+
 =item generate
 
 Use metadata files and templates to generate human-readable documentation
@@ -87,7 +91,9 @@ Print out usage information and exit.
 
 The directory into which to put the generated distribution tarball.  This is
 also used as a working directory for a temporary copy of the package source.
-Required.
+This should point to a trusted directory, not one where an attacker could have
+written files; see L<App::DocKnot::Dist/make_distribution()> for more
+information.  Required.
 
 =item B<-m> I<metadata>, B<--metadata>=I<metadata>
 
@@ -182,7 +188,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2016, 2018-2019 Russ Allbery <rra@cpan.org>
+Copyright 2016, 2018-2020 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -204,7 +210,7 @@ SOFTWARE.
 
 =head1 SEE ALSO
 
-L<App::DocKnot::Generate>
+L<App::DocKnot::Dist>, L<App::DocKnot::Generate>
 
 This program is part of the DocKnot distribution.  DocKnot is available from
 CPAN as App::DocKnot, or directly from its web site at

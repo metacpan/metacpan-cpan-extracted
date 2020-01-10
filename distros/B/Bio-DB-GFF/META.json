@@ -4,7 +4,7 @@
       "See individual modules"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,6 @@
             "Bio::Das::FeatureTypeI" : "0",
             "Bio::Das::SegmentI" : "0",
             "Bio::DasI" : "0",
-            "Bio::GMOD::CMap::Utils" : "0",
             "Bio::Location::Simple" : "0",
             "Bio::Location::Split" : "0",
             "Bio::LocationI" : "0",
@@ -97,10 +96,10 @@
          "web" : "https://github.com/bioperl/bio-db-gff"
       }
    },
-   "version" : "1.7.3",
+   "version" : "1.7.4",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.022001"
+         "version" : "5.028001"
       },
       "plugins" : [
          {
@@ -208,7 +207,7 @@
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
-                  "bail_out_on_fail" : "0",
+                  "bail_out_on_fail" : 0,
                   "fail_on_warning" : "author",
                   "fake_home" : 0,
                   "filename" : "t/00-compile.t",
@@ -272,7 +271,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -295,7 +294,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -312,12 +311,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "Bio-DB-GFF-v1.7.3",
+                  "tag" : "Bio-DB-GFF-v1.7.4",
                   "tag_format" : "%N-v%v",
                   "tag_message" : "%N-v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -381,12 +380,12 @@
       "zilla" : {
          "class" : "Dist::Zilla::Dist::Builder",
          "config" : {
-            "is_trial" : "0"
+            "is_trial" : 0
          },
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.22.1",
+   "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

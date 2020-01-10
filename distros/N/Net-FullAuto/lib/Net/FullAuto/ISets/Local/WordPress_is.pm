@@ -38,7 +38,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw($select_wordpress_setup);
 
 use Net::FullAuto::Cloud::fa_amazon;
-use Net::FullAuto::FA_Core qw[$localhost cleanup fetch clean_handle];
+use Net::FullAuto::FA_Core qw[$localhost cleanup fetch clean_filehandle];
 use Time::Local;
 use File::HomeDir;
 use URI::Escape::XS qw/uri_escape/;
@@ -47,7 +47,6 @@ use Sys::Hostname;
 
 my $tit='FullAuto.com';
 my $adu='Administrator';
-my $ade='Brian.Kelly@fullauto.com';
 my $avail_port='';
 
 my $hostname=Sys::Hostname::hostname;
@@ -95,10 +94,11 @@ my $configure_wordpress=sub {
    my $domain_url=$_[1]||'';
    $domain_url=~s/^\s*https?:\/\/w?w?w?\.?//;
    my $service_and_cert_password=$_[2]||'';
-   my $stripe_publish_key=$_[3]||'';
-   my $stripe_secret_key=$_[4]||'';
-   my $recaptcha_publish_key=$_[5]||'';
-   my $recpatcha_secret_key=$_[6]||'';
+   my $email_address=$_[3]||'';
+   my $stripe_publish_key=$_[4]||'';
+   my $stripe_secret_key=$_[5]||'';
+   my $recaptcha_publish_key=$_[6]||'';
+   my $recpatcha_secret_key=$_[7]||'';
    my ($stdout,$stderr)=('','');
    my $handle=$localhost;my $connect_error='';
    my $sudo=($^O eq 'cygwin')?'':'sudo ';
@@ -388,20 +388,9 @@ if ($do==1) {
    $public_ip='127.0.0.1' unless $public_ip;
    
    unless ($^O eq 'cygwin') {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'wget --random-wait --progress=dot '.
-         'http://download.fedoraproject.org'.
-         '/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "chown -v $username:$username epel-release-6-8.noarch.rpm",
-         '__display__') if $^O ne 'cygwin';
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'rpm -ivh epel-release-6-8.noarch.rpm',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'rm -rvf epel-release-6-8.noarch.rpm',
-         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'yum install -y '.
+         'https://dl.fedoraproject.org/pub/epel/'.
+         'epel-release-latest-7.noarch.rpm','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'yum -y install uuid-devel '.
          'pkgconfig libtool gcc-c++','__display__');
    }
@@ -485,6 +474,9 @@ if ($do==1) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make install','__display__');
    }
+}
+$do=1;
+if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://www.python.org/downloads/release');
@@ -499,26 +491,38 @@ if ($do==1) {
       '__display__');
    ($stdout,$stderr)=$handle->cwd("Python-$version");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      './configure --prefix=/usr/local --enable-unicode=ucs4 '.
+      './configure --prefix=/usr/local --exec-prefix=/usr/local '.
       '--enable-shared --enable-optimizations '.
       'LDFLAGS="-Wl,-rpath /usr/local/lib"',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'make','__display__');
+      'make','3600','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make altinstall','__display__');
+   $version=~s/^(\d+\.\d+).*$/$1/;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "ln -s /usr/local/bin/python$version /usr/local/bin/python");
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'python -m ensurepip --default-pip','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'python -m pip install --upgrade pip setuptools wheel','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'pip install pyasn1','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'pip install pyasn1-modules',
+      "/usr/local/bin/python$version -m ensurepip --default-pip",
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'pip install --upgrade oauth2client','__display__');
+      "/usr/local/bin/python$version -m pip install ".
+      "--upgrade pip setuptools wheel",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "/usr/local/bin/python$version -m pip install pyasn1",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "/usr/local/bin/python$version -m pip install pyasn1-modules",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "/usr/local/bin/python$version -m pip install --upgrade oauth2client",
+      '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.'pip install oauth2','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "/usr/local/bin/python$version -m pip install oauth2",
+      '__display__');
    unless ($^O eq 'cygwin') {
       ($stdout,$stderr)=$handle->cmd('echo /usr/local/lib > '.
          '~/local.conf','__display__');
@@ -528,78 +532,16 @@ if ($do==1) {
          'mv -v ~/local.conf /etc/ld.so.conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
    } else {
-      ($stdout,$stderr)=$handle->cmd('pip install awscli','__display__');
+      ($stdout,$stderr)=$handle->cmd(
+         "python$version -m pip install awscli",
+         '__display__');
    }
-}
-$d=0;
-if ($d==1) {
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   $sudo='sudo env "PATH=$PATH" ';
    ($stdout,$stderr)=$handle->cmd($sudo.
       'python --version','__display__');
-   if ($stderr=~/Python /) {
-      $stderr=~s/^Python\s+(\d.\d).*$/$1/s;
-      $stderr=~s/[.]//g;
-   }
-   #cleanup;
-   if ($stderr && $stderr<27) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'wget --random-wait --progress=dot '.
-	 'http://python.org/ftp/python/2.7.17/Python-2.7.17.tar.xz',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-	 'tar xvf Python-2.7.17.tar.xz',
-         '__display__');
-      ($stdout,$stderr)=$handle->cwd('Python-2.7.17');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "./configure --prefix=/usr/local --enable-unicode=ucs4 ".
-         "--enable-shared LDFLAGS=\"-Wl,-rpath /usr/local/lib\"",
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "make && make altinstall",'__display__');
-   }
-   ($stdout,$stderr)=$handle->cwd('/opt/source'); 
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'python -m ensurepip --default-pip','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'python -m pip install --upgrade pip setuptools wheel','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'pip install pyasn1','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'pip install pyasn1-modules',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone https://github.com/google/oauth2client.git','__display__');
-   ($stdout,$stderr)=$handle->cwd('oauth2client');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'python setup.py install',
-      '__display__');
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
-   if ($^O ne 'cygwin') {
-      ($stdout,$stderr)=$handle->cmd($sudo.'pip install httplib2',
-         '__display__');
-      my $siteloc='/usr/local/lib/python2.7';
-      $siteloc='/usr/lib/python2.7' if -e '/usr/lib/python2.7';
-      ($stdout,$stderr)=$handle->cmd($sudo.'ls -1 '.
-         "$siteloc/site-packages",'__display__');
-      $stdout=~s/^.*(httplib2.*?egg).*$/$1/s;
-      ($stdout,$stderr)=$handle->cmd($sudo.'chmod o+r -v -R '.
-         "$siteloc/site-packages/$stdout",
-         '__display__');
-   }
-   ($stdout,$stderr)=$handle->cmd($sudo.'pip install oauth2','__display__');
-   unless ($^O eq 'cygwin') {
-      ($stdout,$stderr)=$handle->cmd('echo /usr/local/lib > '.
-         '~/local.conf','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v 644 ~/local.conf',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'mv -v ~/local.conf /etc/ld.so.conf.d','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
-   } else {
-      ($stdout,$stderr)=$handle->cmd('pip install awscli','__display__');
-   }
 }
 $do=1;
-if ($do==1) { # NGINX
-print "DOING NGINX\n";
+if ($do==1) { # INSTALL LATEST VERSION OF NGINX
    # https://nealpoole.com/blog/2011/04/setting-up-php-fastcgi-and-nginx
    #    -dont-trust-the-tutorials-check-your-configuration/
    # https://www.digitalocean.com/community/tutorials/
@@ -1882,7 +1824,11 @@ END
          '/usr/local/php7/bin/pecl channel-update pecl.php.net',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         '/usr/local/php7/bin/pecl install mailparse-3.0.4',
+         'wget -qO- https://pecl.php.net/package/mailparse');
+      $stdout=~s/^.*?get\/(mailparse-.*?).tgz.*$/$1/s;
+      my $version=$stdout;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/php7/bin/pecl install $version",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'bash -c "echo extension=mailparse.so > '.
@@ -1911,10 +1857,12 @@ END
       "--title=$domain_url ".
       "--url=https://www.$domain_url ".
       "--admin_user=$adu ".
-      "--admin_email=$ade ".
+      "--admin_email=$email_address ".
       "--admin_password=$service_and_cert_password ".
       '--allow-root --path=/var/www/html/wordpress',
       '__display__');
+$do=0;
+if ($do==1) {
    my $theme='memberlite';
    $sudo='sudo ';
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2117,94 +2065,130 @@ END
       'wget --random-wait --progress=dot '.
       'https://github.com/strangerstudios/pmpro-advanced-levels-shortcode/'.
       'archive/master.zip','__display__');
+}
 
    # http://www.theblogmaven.com/best-wordpress-plugins/
 
    my $listt=<<'END';
-+-------------------------------------------------+----------+-----------+-----------+
-| name                                            | status   | update    | version   |
-+-------------------------------------------------+----------+-----------+-----------+
-| add-from-server                                 | active   | none      | 3.3.3     |
-| codepress-admin-columns                         | active   | none      | 3.3.1     |
-| akismet                                         | active   | none      | 4.1       |
-| amazon-auto-links                               | active   | available | 3.8.0     |
-| avatar-manager                                  | active   | none      | 1.6.1     |
-| bbp-private-groups                              | active   | none      | 3.6.9     |
-| bbpress                                         | active   | none      | 2.5.14    |
-| bbpress-enable-tinymce-visual-tab               | active   | none      | 1.0.1     |
-| better-recent-comments                          | active   | none      | 1.0.6     |
-| black-studio-tinymce-widget                     | active   | none      | 2.6.4     |
-| blank-slate                                     | active   | none      | 1.1.4     |
-| capability-manager-enhanced                     | active   | none      | 1.5.11    |
-| check-email                                     | active   | none      | 0.5.5     |
-| commentluv                                      | active   | available | 3.0.1     |
-| comment-redirect                                | active   | none      | 1.1.3     |
-| comment-reply-email-notification                | active   | none      | 1.8.0     |
-| contact-form-7                                  | active   | available | 5.1       |
-| convertkit-for-paid-memberships-pro             | active   | none      | 1.0.2     |
-| custom-dashboard-widgets                        | active   | none      | 1.3.1     |
-| display-posts-shortcode                         | active   | none      | 2.9.0     |
-| download-monitor                                | active   | none      | 4.1.1     |
-| duplicate-post                                  | active   | none      | 3.2.2     |
-| easy-google-fonts                               | active   | none      | 1.4.3     |
-| elasticpress                                    | active   | none      | 2.7.0     |
-| elementor                                       | active   | available | 2.3.6     |
-| flamingo                                        | active   | none      | 1.9       |
-| gd-bbpress-attachments                          | active   | none      | 3.0.1     |
-| google-analytics-dashboard-for-wp               | active   | none      | 5.3.7     |
-| insert-php-code-snippet                         | active   | none      | 1.2.6     |
-| jetpack                                         | active   | none      | 6.8.1     |
-| addons-for-elementor                            | inactive | none      | 2.5.2     |
-| memberlite-elements                             | inactive | available | 1.0       |
-| memberlite-shortcodes                           | active   | none      | 1.3.1     |
-| menu-icons                                      | active   | none      | 0.11.4    |
-| menu-icons-icomoon                              | active   | none      | 0.3.0     |
-| multiple-post-thumbnails                        | active   | none      | 1.7       |
-| nav-menu-roles                                  | active   | none      | 1.9.2     |
-| elementor-templater                             | active   | none      | 1.2.9     |
-| paid-memberships-pro                            | active   | none      | 1.9.5.6   |
-| pmpro-bbpress                                   | active   | none      | 1.5.5     |
-| pmpro-woocommerce                               | active   | none      | 1.6.1     |
-| pixelyoursite                                   | active   | none      | 5.3.3     |
-| post-grid                                       | active   | none      | 2.0.29    |
-| post-tags-and-categories-for-pages              | active   | none      | 1.4.1     |
-| post-type-switcher                              | active   | none      | 3.1.0     |
-| printaura-woocommerce-api                       | inactive | none      | 3.4.8     |
-| printify-for-woocommerce                        | active   | none      | 1.1       |
-| quick-pagepost-redirect-plugin                  | active   | none      | 5.1.8     |
-| quotes-collection                               | active   | none      | 2.0.10    |
-| read-more-without-refresh                       | inactive | none      | 3.1       |
-| redux-framework                                 | active   | none      | 3.6.15    |
-| shortcode-in-menus                              | active   | none      | 3.4       |
-| shortcode-redirect                              | active   | none      | 1.0.02    |
-| simple-ajax-chat                                | active   | none      | 20181114  |
-| simple-sitemap                                  | active   | none      | 2.6       |
-| simple-trackback-validation-with-topsy-blocker  | active   | none      | 1.2.7     |
-| text-hover                                      | active   | none      | 3.8       |
-| theme-my-login                                  | active   | none      | 7.0.11    |
-| tidio-live-chat                                 | active   | none      | 3.3.3     |
-| updraftplus                                     | active   | available | 2.15.7.24 |
-| use-clients-time-zone                           | active   | none      | 1.1.4     |
-| user-notes                                      | active   | none      | 1.0.1     |
-| user-switching                                  | active   | none      | 1.4.0     |
-| woocommerce                                     | active   | available | 3.5.2     |
-| woocommerce-bulk-discount                       | active   | none      | 2.4.5     |
-| woocommerce-gateway-paypal-powered-by-braintree | active   | none      | 2.2.0     |
-| woocommerce-services                            | active   | none      | 1.18.0    |
-| woocommerce-gateway-stripe                      | active   | none      | 4.1.13    |
-| wordpress-importer                              | active   | none      | 0.6.4     |
-| wordpress-popular-posts                         | active   | none      | 4.2.2     |
-| wordpress-social-login                          | active   | none      | 2.3.3     |
-| wp-postratings                                  | active   | available | 1.85      |
-| wp-emoji-one                                    | active   | none      | 0.6.0     |
-| wpfront-notification-bar                        | active   | none      | 1.7.1     |
-| wp-hide-post                                    | active   | none      | 2.0.10    |
-| wp-mail-smtp                                    | active   | none      | 1.4.1     |
-| wp-security-audit-log                           | active   | none      | 3.3       |
-| wp-to-twitter                                   | active   | none      | 3.3.9     |
-| yith-donations-for-woocommerce                  | active   | none      | 1.1.1     |
-| wordpress-seo                                   | active   | available | 9.2.1     |
-+-------------------------------------------------+----------+-----------+-----------+
++--------------------------------------------+----------+-----------+----------+
+| name                                       | status   | update    | version  |
++--------------------------------------------+----------+-----------+----------+
+| add-from-server                            | inactive | none      | 3.3.3    |
+| codepress-admin-columns                    | active   | none      | 3.4.8    |
+| akismet                                    | active   | none      | 4.1.3    |
+# amazon-auto-links                          | active   | none      | 3.10.1   |
+| authorizenet-payment-gateway-for-woocommerce | active   | none      | 5.2.2    |
+| avatar-manager                             | active   | none      | 1.6.1    |
+| bbp-private-groups                         | active   | none      | 3.7.9    |
+| bbpress                                    | active   | none      | 2.6.3    |
+| bbpress-enable-tinymce-visual-tab          | active   | none      | 1.0.1    |
+| better-recent-comments                     | active   | none      | 1.1.1    |
+| black-studio-tinymce-widget                | active   | none      | 2.6.9    |
+| blank-slate                                | active   | none      | 1.1.4    |
+| capability-manager-enhanced                | active   | none      | 1.8.1    |
+| check-email                                | active   | none      | 0.5.6    |
+| commentluv                                 | active   | none      | 3.0.4    |
+| comment-redirect                           | active   | none      | 1.1.3    |
+| comment-reply-email-notification           | active   | none      | 1.10.1   |
+| contact-form-7                             | active   | none      | 5.1.6    |
+| custom-dashboard-widgets                   | active   | none      | 1.3.1    |
+| disable-gutenberg                          | active   | none      | 2.0      |
+| display-posts-shortcode                    | active   | none      | 3.0.2    |
+| download-monitor                           | active   | none      | 4.4.2    |
+| duplicate-post                             | inactive | none      | 3.2.4    |
+| dw-question-answer-pro                     | active   | none      | 1.2.1    |
+| yikes-inc-easy-mailchimp-extender          | active   | none      | 6.6.2    |
+| easy-google-fonts                          | active   | none      | 1.4.4    |
+| elasticpress                               | active   | none      | 3.3      |
+| elementor                                  | active   | none      | 2.8.3    |
+| elementor-addon-widgets                    | inactive | none      | 1.3.2    |
+| flamingo                                   | active   | none      | 2.1      |
+| gd-bbpress-attachments                     | active   | none      | 3.2      |
+| google-analytics-dashboard-for-wp          | active   | none      | 5.3.10   |
+| gravityforms                               | active   | none      | 2.4.16   |
+| gravityformsquiz                           | active   | none      | 3.2      |
+| insert-php-code-snippet                    | active   | none      | 1.3.1    |
+| jetpack                                    | inactive | none      | 8.0      |
+| memberlite-elements                        | active   | none      | 1.0.1    |
+| memberlite-shortcodes                      | active   | none      | 1.3.2    |
+| menu-icons                                 | active   | none      | 0.12.2   |
+| menu-icons-icomoon                         | active   | none      | 0.3.0    |
+| multiple-post-thumbnails                   | active   | none      | 1.7      |
+| nav-menu-roles                             | active   | none      | 1.9.5    |
+| newsletter                                 | active   | none      | 6.4.2    |
+| elementor-templater                        | active   | none      | 1.2.9    |
+# paid-memberships-pro                       | active   | none      | 2.2.5    |
+# pmpro-advanced-levels-shortcode-master     | active   | none      | .2.4     |
+# pmpro-bbpress                              | active   | none      | 1.6      |
+# pmpro-cpt                                  | active   | none      | .2.1     |
+# pmpro-toolkit                              | active   | none      | .5.2     |
+# pmpro-donations                            | active   | none      | .5       |
+# pmpro-download-monitor                     | active   | none      | .2.1     |
+# pmpro-email-confirmation                   | active   | none      | .5       |
+# pmpro-mailchimp                            | active   | none      | 2.2.1    |
+# pmpro-member-badges                        | active   | none      | .3.1     |
+# pmpro-member-history                       | active   | none      | .3.1     |
+# pmpro-nav-menus                            | active   | none      | .3.3     |
+# pmpro-proration                            | active   | none      | .3       |
+# pmpro-recurring-emails                     | active   | none      | .5.4     |
+# pmpro-reports-dashboard                    | active   | none      | .3       |
+# pmpro-signup-shortcode                     | active   | none      | .2       |
+# pmpro-subscription-delays                  | active   | none      | .5.3     |
+# pmpro-woocommerce                          | active   | none      | 1.6.1    |
+| pixelyoursite                              | active   | none      | 7.1.4    |
+# pmpro-customizations                       | active   | none      | .1       |
+# pmpro-reason-for-cancelling                | active   | none      | .1.1     |
+# pmpro-roles                                | active   | none      | 1.0      |
+| post-grid                                  | active   | none      | 2.0.43   |
+| post-tags-and-categories-for-pages         | active   | none      | 1.4.1    |
+| post-type-switcher                         | active   | none      | 3.2.0    |
+| quotes-collection                          | active   | none      | 2.5.2    |
+| read-more-without-refresh                  | active   | none      | 3.1      |
+| really-simple-ssl                          | inactive | none      | 3.2.7    |
+| wpcf7-redirect                             | active   | none      | 1.3.5    |
+| redux-framework                            | active   | available | 3.6.16   |
+| seamless-donations                         | inactive | none      | 4.0.23   |
+| shortcode-in-menus                         | active   | none      | 3.5      |
+| shortcode-redirect                         | active   | none      | 1.0.02   |
+| simple-ajax-chat                           | active   | none      | 20191105 |
+| simple-sitemap                             | inactive | none      | 3.4      |
+| simple-trackback-validation-with-topsy-blocker | active   | none      | 1.2.7    |
+| revslider                                  | active   | none      | 6.1.5    |
+| wp-smushit                                 | inactive | none      | 3.3.2    |
+| text-hover                                 | active   | none      | 3.8      |
+| theme-my-login                             | active   | none      | 7.0.15   |
+| Ultimate_VC_Addons                         | active   | none      | 3.19.0   |
+| updraftplus                                | active   | none      | 1.16.21  |
+| use-clients-time-zone                      | active   | none      | 1.1.4    |
+| user-notes                                 | active   | none      | 1.0.1    |
+| user-switching                             | active   | none      | 1.5.3    |
+| woocommerce                                | active   | none      | 3.8.1    |
+| woocommerce-bulk-discount                  | active   | none      | 2.4.5    |
+| woocommerce-gateway-paypal-powered-by-braintree | active   | none      | 2.3.6    |
+| woocommerce-services                       | active   | none      | 1.22.2   |
+| wordfence                                  | active   | none      | 7.4.2    |
+| wp-file-upload                             | active   | none      | 4.12.2   |
+| wordpress-importer                         | active   | none      | 0.6.4    |
+| wordpress-popular-posts                    | active   | none      | 5.0.1    |
+| wordpress-social-login                     | active   | none      | 2.3.3    |
+| wp-postratings                             | active   | none      | 1.87     |
+| wp-all-export                              | active   | none      | 1.2.5    |
+| wp-all-import                              | active   | none      | 3.5.2    |
+| js_composer                                | active   | none      | 6.1      |
+| wp-emoji-one                               | active   | none      | 0.6.0    |
+| wp-file-manager                            | active   | none      | 5.5      |
+| wpfront-notification-bar                   | active   | none      | 1.7.1    |
+| wp-hide-post                               | active   | none      | 2.0.10   |
+| wp-mail-smtp                               | active   | none      | 1.8.1    |
+| wp-noteup                                  | active   | none      | 1.3.0    |
+| wp-post-type-template                      | active   | none      | 1.0.3    |
+| wp-security-audit-log                      | inactive | none      | 3.5.2.1  |
+| wpterm                                     | inactive | none      | 1.1.7    |
+| wp-to-twitter                              | active   | none      | 3.4.4    |
+| yith-donations-for-woocommerce-premium     | active   | none      | 1.1.8    |
+| yith-woocommerce-request-a-quote-premium   | active   | none      | 2.2.7    |
+| wordpress-seo                              | active   | none      | 12.8     |
++--------------------------------------------+----------+-----------+----------+
 END
 
 #cleanup;
@@ -2212,17 +2196,20 @@ END
 $do=0;
 if ($do==1) {
 
-   foreach my $plugin ($listt=~/^..([^-n].*?)\s+.*$/mg) {
-      next if $plugin=~/^#/;
+   foreach my $line (split /\n/, $listt) {
+      next if $line=~/^#/;
+      $line=~/^..([^-n].*?)\s+\|\s+(i?n?active).*$/;
+      my $plugin=$1;my $activate=$2;
+      $activate=($activate eq 'active')?'--activate ':'';
       ($stdout,$stderr)=$handle->cmd($sudo.
          "/usr/local/bin/wp plugin install $plugin --allow-root ".
-         "--activate --path=/var/www/html/wordpress",
+         "${activate}--path=/var/www/html/wordpress",
          '__display__');
    }
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      '/usr/local/bin/wp plugin install pmpro-nav-menus.zip '.
-      '--allow-root --activate --path=/var/www/html/wordpress',
-      '__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   '/usr/local/bin/wp plugin install pmpro-nav-menus.zip '.
+   #   '--allow-root --activate --path=/var/www/html/wordpress',
+   #   '__display__');
    # https://www.paidmembershipspro.com/add-ons/pmpro-advanced-levels-shortcode/
    #($stdout,$stderr)=$handle->cmd($sudo.
    #   '/usr/local/bin/wp plugin install master.zip '.
@@ -3356,14 +3343,15 @@ my $standup_wordpress=sub {
 
    my $catalyst="]T[{select_wordpress_setup}";
    my $password="]I[{'enter_password',1}";
+   my $email_address="]I[{'email_address',1}";
    my $stripe_pub="]I[{'stripe_keys',1}";
    my $stripe_sec="]I[{'stripe_keys',2}";
    my $recaptcha_pub="]I[{'recaptcha_keys',1}";
    my $recaptcha_sec="]I[{'recaptcha_keys',2}";
    my $domain_url="]I[{'domain_url',1}";
    my $cnt=0;
-   $configure_wordpress->($catalyst,$domain_url,$password,$stripe_pub,$stripe_sec,
-                          $recaptcha_pub,$recaptcha_sec);
+   $configure_wordpress->($catalyst,$domain_url,$password,$email_address,$stripe_pub,
+                          $stripe_sec,$recaptcha_pub,$recaptcha_sec);
    return '{choose_demo_setup}<';
 
 };
@@ -3542,6 +3530,45 @@ END
 
 };
 
+our $email_address=sub {
+
+   package email_address;
+   my $email_banner=<<'END';
+
+    ___            _ _     _      _    _
+   | __|_ __  __ _(_) |   /_\  __| |__| |_ _ ___ ______
+   | _|| '  \/ _` | | |  / _ \/ _` / _` | '_/ -_|_-<_-<
+   |___|_|_|_\__,_|_|_| /_/ \_\__,_\__,_|_| \___/__/__/
+
+END
+   $email_banner.=<<END;
+   Type or Paste the necessary Email Address for WordPress here:
+
+   Input box with === border is highlighted (active) input box.
+   Use [TAB] key to switch focus between input boxes.
+
+
+   Email Address
+                   ]I[{1,'brian.kelly\@fullauto.com',45}
+
+   Confirm Address
+                   ]I[{2,'brian.kelly\@fullauto.com',45}
+END
+
+   my $email_address={
+
+      Name => 'email_address',
+      Input => 1,
+      Result => $stripe_keys,
+      #Result =>
+   #$Net::FullAuto::ISets::Local::WordPress_is::select_wordpress_setup,
+      Banner => $email_banner,
+
+   };
+   return $email_address;
+
+};
+
 our $choose_strong_password=sub {
 
    package choose_strong_password;
@@ -3604,7 +3631,7 @@ END
 
       Name => 'enter_password',
       Input => 1,
-      Result => $stripe_keys,
+      Result => $email_address,
       #Result =>
    #$Net::FullAuto::ISets::Local::WordPress_is::select_wordpress_setup,
       Banner => $password_banner,

@@ -54,3 +54,11 @@ foo #:comment\nbar	foo bar
 ##NO #cmt bar foo	foo #cmt 'bar'
  count(x) #cmt bar #by[y]	count(x) #by[y] #cmt 'bar'
  count(x #cmt bar) #by[y]	count(x) #by[y] #cmt 'bar'
+
+##-- subcorpora (v2.2.0)
+ x :foo,bar	x :'foo','bar'
+ x :foo:bar	x :'foo','bar'
+ x :foo/bar,baz	x :'foo/bar','baz'
+ x :*/foo,bar/*	x :'*/foo','bar/*'
+ x :	x
+ x :*	x :'*'

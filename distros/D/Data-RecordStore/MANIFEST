@@ -1,15 +1,7 @@
 bin/record_store_convert
 bin/recordstore_explorer
 Build.PL
-cgi-bin/record-store-endpoint
 CHANGELOG
-Data-RecordStore-6.01.tar.gz
-Data-RecordStore-6.02/Build.PL
-Data-RecordStore-6.02/CHANGELOG
-Data-RecordStore-6.02/Data-RecordStore-6.01.tar.gz
-Data-RecordStore-6.02/Data-RecordStore-6.02/Build.PL
-Data-RecordStore-6.02/Data-RecordStore-6.02/CHANGELOG
-debug.txt
 lib/Data/RecordStore.pm
 lib/Data/RecordStore/Converter.pm
 lib/Data/RecordStore/New.pm
@@ -26,10 +18,6 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
 META.yml
-oob2test.pl
-oobana.txt
-ooblog.txt
-oobtest.txt
 README
 t/lib/api.pm
 t/lib/forker.pm
@@ -124,4 +112,4 @@ t/upgrade_data/5.04/silos/18_RECSTORE/SILO_LOCK
 t/upgrade_data/5.04/VERSION
 TODO.txt
 VERSIONS
-x.pl
+

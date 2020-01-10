@@ -53,7 +53,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc CHANGES README
+%doc Changes README
 %{_bindir}/%{name}
 %{_mandir}/man1/%{name}*
 

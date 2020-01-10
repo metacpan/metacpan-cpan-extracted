@@ -147,27 +147,6 @@ sub bind_subs {
   my $build_lib_dir = $self->{build_dir} . '/lib';
   push @dll_load_paths, $build_lib_dir;
   
-  for my $dll_info (@$dll_infos) {
-    if ($dll_info->{type} eq 'L') {
-      push @dll_load_paths, $dll_info->{name};
-    }
-    elsif ($dll_info->{type} eq 'l') {
-      for my $dll_load_path (reverse @dll_load_paths) {
-        my $name = $dll_info->{name};
-        my $dlext = $Config{dlext};
-        my $dll_file = "$dll_load_path/lib$name.$dlext";
-        if (-f $dll_file) {
-          my $dll_libref = DynaLoader::dl_load_file($dll_file);
-          unless ($dll_libref) {
-            my $dl_error = DynaLoader::dl_error();
-            confess "Can't load pre required dll file \"$dll_file\": $dl_error";
-          }
-          last;
-        }
-      }
-    }
-  }
-  
   for my $sub_name (@$sub_names) {
     my $sub_abs_name = "${package_name}::$sub_name";
 
@@ -258,9 +237,6 @@ sub compile {
   # CBuilder configs
   my $ccflags = $bconf->get_ccflags;
   
-  # Default include path
-  $bconf->add_ccflags("-I$build_dir/include");
-
   # Use all of default %Config not to use %Config directory by ExtUtils::CBuilder
   # and overwrite user configs
   my $config = $bconf->to_hash;
@@ -378,9 +354,6 @@ sub link {
   
   # CBuilder configs
   my $lddlflags = $bconf->get_lddlflags;
-
-  # Default library path
-  $bconf->add_lddlflags("-L$build_dir/lib");
 
   # Use all of default %Config not to use %Config directory by ExtUtils::CBuilder
   # and overwrite user configs

@@ -1,6 +1,5 @@
 Changes
 lib/Business/GoCardless.pm
-lib/Business/GoCardless/Basic.pm
 lib/Business/GoCardless/Bill.pm
 lib/Business/GoCardless/Client.pm
 lib/Business/GoCardless/Customer.pm
@@ -15,7 +14,6 @@ lib/Business/GoCardless/Pro.pm
 lib/Business/GoCardless/RedirectFlow.pm
 lib/Business/GoCardless/Resource.pm
 lib/Business/GoCardless/Subscription.pm
-lib/Business/GoCardless/Upgrading.pod
 lib/Business/GoCardless/User.pm
 lib/Business/GoCardless/Utils.pm
 lib/Business/GoCardless/Webhook.pm
@@ -29,7 +27,6 @@ t/001_compiles_pod.t
 t/003_changes.t
 t/004_end_to_end_pro.t
 t/business/gocardless.t
-t/business/gocardless/basic.t
 t/business/gocardless/bill.t
 t/business/gocardless/client.t
 t/business/gocardless/customer.t

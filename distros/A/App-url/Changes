@@ -1,5 +1,11 @@
 # Changes for App::url
 
+1.002 2020-01-08T04:37:38Z
+	* Require Net::PublicSuffixList
+
+1.001_01 2020-01-03T14:15:51Z
+	* Explore some fixes for Window testing
+
 1.001 2020-01-03T04:09:29Z
 	* First release
 

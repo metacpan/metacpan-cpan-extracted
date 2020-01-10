@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use Test::More;
 
 use_ok 'FASTX::Abi';
-my $chromatogram_dir = "$Bin/../data/";
+my $chromatogram_dir = "$RealBin/../data/";
 
 
 for my $chromatogram (glob "$chromatogram_dir/*.a*") {

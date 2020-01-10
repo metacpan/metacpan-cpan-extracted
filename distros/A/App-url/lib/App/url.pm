@@ -3,6 +3,9 @@ use v5.26;
 
 package App::url;
 
+our $VERSION = '1.002';
+
+use Carp qw(carp);
 use Mojo::Base -strict, -signatures;
 use Mojo::URL;
 use String::Sprintf;
@@ -15,8 +18,11 @@ App::url - format a URL according to a sprintf-like template
 
 =head1 SYNOPSIS
 
-	$ url '%H' http://www.example.com/a/b/c
+	$ url '%h' http://www.example.com/a/b/c
 	www.example.com
+
+	$ url '%H' http://www.example.com/a/b/c
+	www
 
 	$ url '%P' http://www.example.com/a/b/c
 	/a/b/c
@@ -36,9 +42,11 @@ Decompose the URL and reformat it according to
 
 =item * C<%f> - the fragment
 
-=item * C<%h> - the hostname
+=item * C<%h> - the hostname, with domain info
 
-=item * C<%h> - the hostname in punycode
+=item * C<%H> - the hostname without domain info
+
+=item * C<%i> - the hostname in punycode
 
 =item * C<%P> - the password of the userinfo portion
 
@@ -47,6 +55,8 @@ Decompose the URL and reformat it according to
 =item * C<%q> - the query string
 
 =item * C<%s> - the scheme
+
+=item * C<%S> - the public suffix
 
 =item * C<%u> - the complete URL
 
@@ -87,17 +97,30 @@ You can use this code under the terms of the Artistic License 2.
 
 =cut
 
-our $VERSION = '1.001';
+our $VERSION = '1.001_01';
 
 my $formatter = String::Sprintf->formatter(
 	a   => sub ( $w, $v, $V, $l ) { $V->[0]->path      },
 	f   => sub ( $w, $v, $V, $l ) { $V->[0]->fragment  },
 	h   => sub ( $w, $v, $V, $l ) { $V->[0]->host      },
+	H   => sub ( $w, $v, $V, $l ) { ( split /\./, $V->[0]->host )[0] },
 	i   => sub ( $w, $v, $V, $l ) { $V->[0]->ihost     },
 	p   => sub ( $w, $v, $V, $l ) { $V->[0]->port      },
 	P   => sub ( $w, $v, $V, $l ) { $V->[0]->password  },
 	'q' => sub ( $w, $v, $V, $l ) { $V->[0]->query     },
 	's' => sub ( $w, $v, $V, $l ) { $V->[0]->protocol  },
+
+	S   => sub ( $w, $v, $V, $l ) {
+		state $rc = eval { require Net::PublicSuffixList };
+		unless( $rc ) {
+			carp "%${l} requires Net::PublicSuffixList\n";
+			return;
+			}
+		state $psl = Net::PublicSuffixList->new;
+		my $hash = $psl->split_host( $V->[0]->host );
+		$hash->{suffix};
+		},
+
 	U   => sub ( $w, $v, $V, $l ) { $V->[0]->username  },
 	u   => sub ( $w, $v, $V, $l ) { $V->[0]->to_string },
 

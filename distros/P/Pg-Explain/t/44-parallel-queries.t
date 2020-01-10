@@ -25,22 +25,14 @@ is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->ty
 is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->type, 'Parallel Seq Scan',  'Correct type for Parallel Seq Scan' );
 is( $explain->top_node->sub_nodes->[ 0 ]->type,                                                       'Parallel Seq Scan',  'Correct type for Parallel Seq Scan' );
 
-is( $explain->top_node->force_loops,                                                                         undef, 'Force loops for topnode' );
-is( $explain->top_node->initplans->[ 0 ]->force_loops,                                                       undef, 'Correct force loops for Finalize Aggregate' );
-is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->force_loops,                                     undef, 'Correct forced_loops for nested Gather' );
-is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->force_loops,                   1,     'Correct force_loops for Partial Aggregate' );
-is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->force_loops, 1,     'Correct force_loops for Parallel Seq Scan' );
-is( $explain->top_node->sub_nodes->[ 0 ]->force_loops,                                                       1,     'Correct force_loops for top Parallel Seq Scan' );
+is( $explain->top_node->workers,                                                                         1, 'Correct workers for topnode' );
+is( $explain->top_node->initplans->[ 0 ]->workers,                                                       1, 'Correct workers for Finalize Aggregate' );
+is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->workers,                                     1, 'Correct workers for nested Gather' );
+is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->workers,                   3,     'Correct workers for Partial Aggregate' );
+is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->workers, 3,     'Correct workers for Parallel Seq Scan' );
+is( $explain->top_node->sub_nodes->[ 0 ]->workers,                                                       3,     'Correct workers for top Parallel Seq Scan' );
 
 exit;
-
-sub sort_paths {
-    return [
-        map  { $_->[ 1 ] }
-        sort { $a->[ 0 ] cmp $b->[ 0 ] }
-        map  { [ join( ' :: ', @{ $_ } ), $_ ] } @{ $_[ 0 ] }
-    ];
-}
 
 sub load_test_file {
     my $test_no = shift;

@@ -1,4 +1,18 @@
 Revision history for overload::open
+
+0.33.0 Jan 8, 2020
+    - This time we increase refcount at the start and decrease at the end, but
+      also increase them in the ones we push onto the stack.
+
+    - PS. the 0.32 module version is buggier than the 0.31
+
+0.32.0 Jan 8, 2020
+    - Decrement refcount before returning from hook
+
+0.31.1 Dec 18, 2019
+    - Make SYNOPSIS code actually work
+    - Wrap POD to ~80 characters
+
 0.31.0 Dec 18, 2019
     - Fix XS related bugs. Make sure we only get the
     correct number of items from the open call, and not

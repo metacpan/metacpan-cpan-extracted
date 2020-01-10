@@ -1,0 +1,2882 @@
+- # ビクティニ[494] --------------------------------------------------
+    ID: 494
+    Name:
+        ja: ビクティニ
+        en: Victini
+        ch: 比克提尼
+        fr: Victini
+    isNotAvailable: 1
+    Types:
+        - エスパー
+        - ほのお
+    From:
+    To:
+    Stamina: 100
+    Attack: 100
+    Defense: 100
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ツタージャ[495] --------------------------------------------------
+    ID: 495
+    Name:
+        ja: ツタージャ
+        en: Snivy
+        ch: 藤藤蛇
+        fr: Vipélierre
+    isNotAvailable: 1
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 45
+    Attack: 45
+    Defense: 55
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ジャノビー[496] --------------------------------------------------
+    ID: 496
+    Name:
+        ja: ジャノビー
+        en: Servine
+        ch: 青藤蛇
+        fr: Lianaja
+    isNotAvailable: 1
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 60
+    Attack: 60
+    Defense: 75
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ジャローダ[497] --------------------------------------------------
+    ID: 497
+    Name:
+        ja: ジャローダ
+        en: Serperior
+        ch: 君主蛇
+        fr: Majaspic
+    isNotAvailable: 1
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 75
+    Attack: 75
+    Defense: 95
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ポカブ[498] --------------------------------------------------
+    ID: 498
+    Name:
+        ja: ポカブ
+        en: Tepig
+        ch: 暖暖猪
+        fr: Gruikui
+    isNotAvailable: 1
+    Types:
+        - ほのお
+    From:
+    To:
+    Stamina: 65
+    Attack: 63
+    Defense: 45
+    MAXCP:
+        Hatched:
+        Boosted:
+- # チャオブー[499] --------------------------------------------------
+    ID: 499
+    Name:
+        ja: チャオブー
+        en: Pignite
+        ch: 炒炒猪
+        fr: Grotichon
+    isNotAvailable: 1
+    Types:
+        - ほのお
+        - かくとう
+    From:
+    To:
+    Stamina: 90
+    Attack: 93
+    Defense: 55
+    MAXCP:
+        Hatched:
+        Boosted:
+- # エンブオー[500] --------------------------------------------------
+    ID: 500
+    Name:
+        ja: エンブオー
+        en: Emboar
+        ch: 炎武王
+        fr: Roitiflam
+    isNotAvailable: 1
+    Types:
+        - ほのお
+        - かくとう
+    From:
+    To:
+    Stamina: 110
+    Attack: 123
+    Defense: 65
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ミジュマル[501] --------------------------------------------------
+    ID: 501
+    Name:
+        ja: ミジュマル
+        en: Oshawott
+        ch: 水水獭
+        fr: Moustillon
+    isNotAvailable: 1
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 55
+    Attack: 55
+    Defense: 45
+    MAXCP:
+        Hatched:
+        Boosted:
+- # フタチマル[502] --------------------------------------------------
+    ID: 502
+    Name:
+        ja: フタチマル
+        en: Dewott
+        ch: 双刃丸
+        fr: Mateloutre
+    isNotAvailable: 1
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 75
+    Attack: 75
+    Defense: 60
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ダイケンキ[503] --------------------------------------------------
+    ID: 503
+    Name:
+        ja: ダイケンキ
+        en: Samurott
+        ch: 大剑鬼
+        fr: Clamiral
+    isNotAvailable: 1
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 95
+    Attack: 100
+    Defense: 85
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ミネズミ[504] --------------------------------------------------
+    ID: 504
+    Name:
+        ja: ミネズミ
+        en: Patrat
+        ch: 探探鼠
+        fr: Ratentif
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 45
+    Attack: 55
+    Defense: 39
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ミルホッグ[505] --------------------------------------------------
+    ID: 505
+    Name:
+        ja: ミルホッグ
+        en: Watchog
+        ch: 步哨鼠
+        fr: Miradar
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 60
+    Attack: 85
+    Defense: 69
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ヨーテリー[506] --------------------------------------------------
+    ID: 506
+    Name:
+        ja: ヨーテリー
+        en: Lillipup
+        ch: 小约克
+        fr: Ponchiot
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 45
+    Attack: 60
+    Defense: 45
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ハーデリア[507] --------------------------------------------------
+    ID: 507
+    Name:
+        ja: ハーデリア
+        en: Herdier
+        ch: 哈约克
+        fr: Ponchien
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 65
+    Attack: 80
+    Defense: 65
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ムーランド[508] --------------------------------------------------
+    ID: 508
+    Name:
+        ja: ムーランド
+        en: Stoutland
+        ch: 长毛狗
+        fr: Mastouffe
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 85
+    Attack: 110
+    Defense: 90
+    MAXCP:
+        Hatched:
+        Boosted:
+- # チョロネコ[509] --------------------------------------------------
+    ID: 509
+    Name:
+        ja: チョロネコ
+        en: Purrloin
+        ch: 扒手猫
+        fr: Chacripan
+    isNotAvailable: 1
+    Types:
+        - あく
+    From:
+    To:
+    Stamina: 41
+    Attack: 50
+    Defense: 37
+    MAXCP:
+        Hatched:
+        Boosted:
+- # レパルダス[510] --------------------------------------------------
+    ID: 510
+    Name:
+        ja: レパルダス
+        en: Liepard
+        ch: 酷豹
+        fr: Léopardus
+    isNotAvailable: 1
+    Types:
+        - あく
+    From:
+    To:
+    Stamina: 64
+    Attack: 88
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ヤナップ[511] --------------------------------------------------
+    ID: 511
+    Name:
+        ja: ヤナップ
+        en: Pansage
+        ch: 花椰猴
+        fr: Feuillajou
+    isNotAvailable: 1
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 50
+    Attack: 53
+    Defense: 48
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ヤナッキー[512] --------------------------------------------------
+    ID: 512
+    Name:
+        ja: ヤナッキー
+        en: Simisage
+        ch: 花椰猿
+        fr: Feuiloutan
+    isNotAvailable: 1
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 75
+    Attack: 98
+    Defense: 63
+    MAXCP:
+        Hatched:
+        Boosted:
+- # バオップ[513] --------------------------------------------------
+    ID: 513
+    Name:
+        ja: バオップ
+        en: Pansear
+        ch: 爆香猴
+        fr: Flamajou
+    isNotAvailable: 1
+    Types:
+        - ほのお
+    From:
+    To:
+    Stamina: 50
+    Attack: 53
+    Defense: 48
+    MAXCP:
+        Hatched:
+        Boosted:
+- # バオッキー[514] --------------------------------------------------
+    ID: 514
+    Name:
+        ja: バオッキー
+        en: Simisear
+        ch: 爆香猿
+        fr: Flamoutan
+    isNotAvailable: 1
+    Types:
+        - ほのお
+    From:
+    To:
+    Stamina: 75
+    Attack: 98
+    Defense: 63
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ヒヤップ[515] --------------------------------------------------
+    ID: 515
+    Name:
+        ja: ヒヤップ
+        en: Panpour
+        ch: 冷水猴
+        fr: Flotajou
+    isNotAvailable: 1
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 50
+    Attack: 53
+    Defense: 48
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ヒヤッキー[516] --------------------------------------------------
+    ID: 516
+    Name:
+        ja: ヒヤッキー
+        en: Simipour
+        ch: 冷水猿
+        fr: Flotoutan
+    isNotAvailable: 1
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 75
+    Attack: 98
+    Defense: 63
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ムンナ[517] --------------------------------------------------
+    ID: 517
+    Name:
+        ja: ムンナ
+        en: Munna
+        ch: 食梦梦
+        fr: Munna
+    isNotAvailable: 1
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 76
+    Attack: 25
+    Defense: 45
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ムシャーナ[518] --------------------------------------------------
+    ID: 518
+    Name:
+        ja: ムシャーナ
+        en: Musharna
+        ch: 梦梦蚀
+        fr: Mushana
+    isNotAvailable: 1
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 116
+    Attack: 55
+    Defense: 85
+    MAXCP:
+        Hatched:
+        Boosted:
+- # マメパト[519] --------------------------------------------------
+    ID: 519
+    Name:
+        ja: マメパト
+        en: Pidove
+        ch: 豆豆鸽
+        fr: Poichigeon
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+        - ひこう
+    From:
+    To:
+    Stamina: 50
+    Attack: 55
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ハトーボー[520] --------------------------------------------------
+    ID: 520
+    Name:
+        ja: ハトーボー
+        en: Tranquill
+        ch: 咕咕鸽
+        fr: Colombeau
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+        - ひこう
+    From:
+    To:
+    Stamina: 62
+    Attack: 77
+    Defense: 62
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ケンホロウ[521] --------------------------------------------------
+    ID: 521
+    Name:
+        ja: ケンホロウ
+        en: Unfezant
+        ch: 高傲雉鸡
+        fr: Déflaisan
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+        - ひこう
+    From:
+    To:
+    Stamina: 80
+    Attack: 115
+    Defense: 80
+    MAXCP:
+        Hatched:
+        Boosted:
+- # シママ[522] --------------------------------------------------
+    ID: 522
+    Name:
+        ja: シママ
+        en: Blitzle
+        ch: 斑斑马
+        fr: Zébibron
+    isNotAvailable: 1
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 45
+    Attack: 60
+    Defense: 32
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ゼブライカ[523] --------------------------------------------------
+    ID: 523
+    Name:
+        ja: ゼブライカ
+        en: Zebstrika
+        ch: 雷电斑马
+        fr: Zéblitz
+    isNotAvailable: 1
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 75
+    Attack: 100
+    Defense: 63
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ダンゴロ[524] --------------------------------------------------
+    ID: 524
+    Name:
+        ja: ダンゴロ
+        en: Roggenrola
+        ch: 石丸子
+        fr: Nodulithe
+    isNotAvailable: 1
+    Types:
+        - いわ
+    From:
+    To:
+    Stamina: 55
+    Attack: 75
+    Defense: 85
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ガントル[525] --------------------------------------------------
+    ID: 525
+    Name:
+        ja: ガントル
+        en: Boldore
+        ch: 地幔岩
+        fr: Géolithe
+    isNotAvailable: 1
+    Types:
+        - いわ
+    From:
+    To:
+    Stamina: 70
+    Attack: 105
+    Defense: 105
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ギガイアス[526] --------------------------------------------------
+    ID: 526
+    Name:
+        ja: ギガイアス
+        en: Gigalith
+        ch: 庞岩怪
+        fr: Gigalithe
+    isNotAvailable: 1
+    Types:
+        - いわ
+    From:
+    To:
+    Stamina: 85
+    Attack: 135
+    Defense: 130
+    MAXCP:
+        Hatched:
+        Boosted:
+- # コロモリ[527] --------------------------------------------------
+    ID: 527
+    Name:
+        ja: コロモリ
+        en: Woobat
+        ch: 滚滚蝙蝠
+        fr: Chovsourir
+    isNotAvailable: 1
+    Types:
+        - エスパー
+        - ひこう
+    From:
+    To:
+    Stamina: 65
+    Attack: 45
+    Defense: 43
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ココロモリ[528] --------------------------------------------------
+    ID: 528
+    Name:
+        ja: ココロモリ
+        en: Swoobat
+        ch: 心蝙蝠
+        fr: Rhinolove
+    isNotAvailable: 1
+    Types:
+        - エスパー
+        - ひこう
+    From:
+    To:
+    Stamina: 67
+    Attack: 57
+    Defense: 55
+    MAXCP:
+        Hatched:
+        Boosted:
+- # モグリュー[529] --------------------------------------------------
+    ID: 529
+    Name:
+        ja: モグリュー
+        en: Drilbur
+        ch: 螺钉地鼠
+        fr: Rototaupe
+    isNotAvailable: 1
+    Types:
+        - じめん
+    From:
+    To:
+    Stamina: 60
+    Attack: 85
+    Defense: 40
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ドリュウズ[530] --------------------------------------------------
+    ID: 530
+    Name:
+        ja: ドリュウズ
+        en: Excadrill
+        ch: 龙头地鼠
+        fr: Minotaupe
+    isNotAvailable: 1
+    Types:
+        - じめん
+        - はがね
+    From:
+    To:
+    Stamina: 110
+    Attack: 135
+    Defense: 60
+    MAXCP:
+        Hatched:
+        Boosted:
+- # タブンネ[531] --------------------------------------------------
+    ID: 531
+    Name:
+        ja: タブンネ
+        en: Audino
+        ch: 差不多娃娃
+        fr: Nanméouïe
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 103
+    Attack: 60
+    Defense: 86
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ドッコラー[532] --------------------------------------------------
+    ID: 532
+    Name:
+        ja: ドッコラー
+        en: Timburr
+        ch: 搬运小匠
+        fr: Charpenti
+    isNotAvailable: 1
+    Types:
+        - かくとう
+    From:
+    To:
+    Stamina: 75
+    Attack: 80
+    Defense: 55
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ドテッコツ[533] --------------------------------------------------
+    ID: 533
+    Name:
+        ja: ドテッコツ
+        en: Gurdurr
+        ch: 铁骨土人
+        fr: Ouvrifier
+    isNotAvailable: 1
+    Types:
+        - かくとう
+    From:
+    To:
+    Stamina: 85
+    Attack: 105
+    Defense: 85
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ローブシン[534] --------------------------------------------------
+    ID: 534
+    Name:
+        ja: ローブシン
+        en: Conkeldurr
+        ch: 修建老匠
+        fr: Bétochef
+    isNotAvailable: 1
+    Types:
+        - かくとう
+    From:
+    To:
+    Stamina: 105
+    Attack: 140
+    Defense: 95
+    MAXCP:
+        Hatched:
+        Boosted:
+- # オタマロ[535] --------------------------------------------------
+    ID: 535
+    Name:
+        ja: オタマロ
+        en: Tympole
+        ch: 圆蝌蚪
+        fr: Tritonde
+    isNotAvailable: 1
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 50
+    Attack: 50
+    Defense: 40
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ガマガル[536] --------------------------------------------------
+    ID: 536
+    Name:
+        ja: ガマガル
+        en: Palpitoad
+        ch: 蓝蟾蜍
+        fr: Batracné
+    isNotAvailable: 1
+    Types:
+        - みず
+        - じめん
+    From:
+    To:
+    Stamina: 75
+    Attack: 65
+    Defense: 55
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ガマゲロゲ[537] --------------------------------------------------
+    ID: 537
+    Name:
+        ja: ガマゲロゲ
+        en: Seismitoad
+        ch: 蟾蜍王
+        fr: Crapustule
+    isNotAvailable: 1
+    Types:
+        - みず
+        - じめん
+    From:
+    To:
+    Stamina: 105
+    Attack: 95
+    Defense: 75
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ナゲキ[538] --------------------------------------------------
+    ID: 538
+    Name:
+        ja: ナゲキ
+        en: Throh
+        ch: 投摔鬼
+        fr: Judokrak
+    isNotAvailable: 1
+    Types:
+        - かくとう
+    From:
+    To:
+    Stamina: 120
+    Attack: 100
+    Defense: 85
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ダゲキ[539] --------------------------------------------------
+    ID: 539
+    Name:
+        ja: ダゲキ
+        en: Sawk
+        ch: 打击鬼
+        fr: Karaclée
+    isNotAvailable: 1
+    Types:
+        - かくとう
+    From:
+    To:
+    Stamina: 75
+    Attack: 125
+    Defense: 75
+    MAXCP:
+        Hatched:
+        Boosted:
+- # クルミル[540] --------------------------------------------------
+    ID: 540
+    Name:
+        ja: クルミル
+        en: Sewaddle
+        ch: 虫宝包
+        fr: Larveyette
+    isNotAvailable: 1
+    Types:
+        - むし
+        - くさ
+    From:
+    To:
+    Stamina: 45
+    Attack: 53
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # クルマユ[541] --------------------------------------------------
+    ID: 541
+    Name:
+        ja: クルマユ
+        en: Swadloon
+        ch: 宝包茧
+        fr: Couverdure
+    isNotAvailable: 1
+    Types:
+        - むし
+        - くさ
+    From:
+    To:
+    Stamina: 55
+    Attack: 63
+    Defense: 90
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ハハコモリ[542] --------------------------------------------------
+    ID: 542
+    Name:
+        ja: ハハコモリ
+        en: Leavanny
+        ch: 保姆虫
+        fr: Manternel
+    isNotAvailable: 1
+    Types:
+        - むし
+        - くさ
+    From:
+    To:
+    Stamina: 75
+    Attack: 103
+    Defense: 80
+    MAXCP:
+        Hatched:
+        Boosted:
+- # フシデ[543] --------------------------------------------------
+    ID: 543
+    Name:
+        ja: フシデ
+        en: Venipede
+        ch: 百足蜈蚣
+        fr: Venipatte
+    isNotAvailable: 1
+    Types:
+        - むし
+        - どく
+    From:
+    To:
+    Stamina: 30
+    Attack: 45
+    Defense: 59
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ホイーガ[544] --------------------------------------------------
+    ID: 544
+    Name:
+        ja: ホイーガ
+        en: Whirlipede
+        ch: 车轮球
+        fr: Scobolide
+    isNotAvailable: 1
+    Types:
+        - むし
+        - どく
+    From:
+    To:
+    Stamina: 40
+    Attack: 55
+    Defense: 99
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ペンドラー[545] --------------------------------------------------
+    ID: 545
+    Name:
+        ja: ペンドラー
+        en: Scolipede
+        ch: 蜈蚣王
+        fr: Brutapode
+    isNotAvailable: 1
+    Types:
+        - むし
+        - どく
+    From:
+    To:
+    Stamina: 60
+    Attack: 100
+    Defense: 89
+    MAXCP:
+        Hatched:
+        Boosted:
+- # モンメン[546] --------------------------------------------------
+    ID: 546
+    Name:
+        ja: モンメン
+        en: Cottonee
+        ch: 木棉球
+        fr: Doudouvet
+    isNotAvailable: 1
+    Types:
+        - くさ
+        - フェアリー
+    From:
+    To:
+    Stamina: 40
+    Attack: 27
+    Defense: 60
+    MAXCP:
+        Hatched:
+        Boosted:
+- # エルフーン[547] --------------------------------------------------
+    ID: 547
+    Name:
+        ja: エルフーン
+        en: Whimsicott
+        ch: 风妖精
+        fr: Farfaduvet
+    isNotAvailable: 1
+    Types:
+        - くさ
+        - フェアリー
+    From:
+    To:
+    Stamina: 60
+    Attack: 67
+    Defense: 85
+    MAXCP:
+        Hatched:
+        Boosted:
+- # チュリネ[548] --------------------------------------------------
+    ID: 548
+    Name:
+        ja: チュリネ
+        en: Petilil
+        ch: 百合根娃娃
+        fr: Chlorobule
+    isNotAvailable: 1
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 45
+    Attack: 35
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ドレディア[549] --------------------------------------------------
+    ID: 549
+    Name:
+        ja: ドレディア
+        en: Lilligant
+        ch: 裙儿小姐
+        fr: Fragilady
+    isNotAvailable: 1
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 70
+    Attack: 60
+    Defense: 75
+    MAXCP:
+        Hatched:
+        Boosted:
+- # バスラオ[550] --------------------------------------------------
+    ID: 550
+    Name:
+        ja: バスラオ
+        en: Basculin
+        ch: 野蛮鲈鱼
+        fr: Bargantua
+    isNotAvailable: 1
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 70
+    Attack: 92
+    Defense: 65
+    MAXCP:
+        Hatched:
+        Boosted:
+- # メグロコ[551] --------------------------------------------------
+    ID: 551
+    Name:
+        ja: メグロコ
+        en: Sandile
+        ch: 黑眼鳄
+        fr: Mascaïman
+    isNotAvailable: 1
+    Types:
+        - じめん
+        - あく
+    From:
+    To:
+    Stamina: 50
+    Attack: 72
+    Defense: 35
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ワルビル[552] --------------------------------------------------
+    ID: 552
+    Name:
+        ja: ワルビル
+        en: Krokorok
+        ch: 混混鳄
+        fr: Escroco
+    isNotAvailable: 1
+    Types:
+        - じめん
+        - あく
+    From:
+    To:
+    Stamina: 60
+    Attack: 82
+    Defense: 45
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ワルビアル[553] --------------------------------------------------
+    ID: 553
+    Name:
+        ja: ワルビアル
+        en: Krookodile
+        ch: 流氓鳄
+        fr: Crocorible
+    isNotAvailable: 1
+    Types:
+        - じめん
+        - あく
+    From:
+    To:
+    Stamina: 95
+    Attack: 117
+    Defense: 80
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ダルマッカ[554] --------------------------------------------------
+    ID: 554
+    Name:
+        ja: ダルマッカ
+        en: Darumaka
+        ch: 火红不倒翁
+        fr: Darumarond
+    isNotAvailable: 1
+    Types:
+        - ほのお
+    From:
+    To:
+    Stamina: 70
+    Attack: 90
+    Defense: 45
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ヒヒダルマ[555] --------------------------------------------------
+    ID: 555
+    Name:
+        ja: ヒヒダルマ
+        en: Darmanitan
+        ch: 达摩狒狒
+        fr: Darumacho
+    isNotAvailable: 1
+    Types:
+        - ほのお
+    From:
+    To:
+    Stamina: 105
+    Attack: 140
+    Defense: 55
+    MAXCP:
+        Hatched:
+        Boosted:
+- # マラカッチ[556] --------------------------------------------------
+    ID: 556
+    Name:
+        ja: マラカッチ
+        en: Maractus
+        ch: 沙铃仙人掌
+        fr: Maracachi
+    isNotAvailable: 1
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 75
+    Attack: 86
+    Defense: 67
+    MAXCP:
+        Hatched:
+        Boosted:
+- # イシズマイ[557] --------------------------------------------------
+    ID: 557
+    Name:
+        ja: イシズマイ
+        en: Dwebble
+        ch: 石居蟹
+        fr: Crabicoque
+    isNotAvailable: 1
+    Types:
+        - むし
+        - いわ
+    From:
+    To:
+    Stamina: 50
+    Attack: 65
+    Defense: 85
+    MAXCP:
+        Hatched:
+        Boosted:
+- # イワパレス[558] --------------------------------------------------
+    ID: 558
+    Name:
+        ja: イワパレス
+        en: Crustle
+        ch: 岩殿居蟹
+        fr: Crabaraque
+    isNotAvailable: 1
+    Types:
+        - むし
+        - いわ
+    From:
+    To:
+    Stamina: 70
+    Attack: 105
+    Defense: 125
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ズルッグ[559] --------------------------------------------------
+    ID: 559
+    Name:
+        ja: ズルッグ
+        en: Scraggy
+        ch: 滑滑小子
+        fr: Baggiguane
+    isNotAvailable: 1
+    Types:
+        - あく
+        - かくとう
+    From:
+    To:
+    Stamina: 50
+    Attack: 75
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ズルズキン[560] --------------------------------------------------
+    ID: 560
+    Name:
+        ja: ズルズキン
+        en: Scrafty
+        ch: 头巾混混
+        fr: Baggaïd
+    isNotAvailable: 1
+    Types:
+        - あく
+        - かくとう
+    From:
+    To:
+    Stamina: 65
+    Attack: 90
+    Defense: 115
+    MAXCP:
+        Hatched:
+        Boosted:
+- # シンボラー[561] --------------------------------------------------
+    ID: 561
+    Name:
+        ja: シンボラー
+        en: Sigilyph
+        ch: 象征鸟
+        fr: Cryptéro
+    isNotAvailable: 1
+    Types:
+        - エスパー
+        - ひこう
+    From:
+    To:
+    Stamina: 72
+    Attack: 58
+    Defense: 80
+    MAXCP:
+        Hatched:
+        Boosted:
+- # デスマス[562] --------------------------------------------------
+    ID: 562
+    Name:
+        ja: デスマス
+        en: Yamask
+        ch: 哭哭面具
+        fr: Tutafeh
+    isNotAvailable: 1
+    Types:
+        - ゴースト
+    From:
+    To:
+    Stamina: 38
+    Attack: 30
+    Defense: 85
+    MAXCP:
+        Hatched:
+        Boosted:
+- # デスカーン[563] --------------------------------------------------
+    ID: 563
+    Name:
+        ja: デスカーン
+        en: Cofagrigus
+        ch: 死神棺
+        fr: Tutankafer
+    isNotAvailable: 1
+    Types:
+        - ゴースト
+    From:
+    To:
+    Stamina: 58
+    Attack: 50
+    Defense: 145
+    MAXCP:
+        Hatched:
+        Boosted:
+- # プロトーガ[564] --------------------------------------------------
+    ID: 564
+    Name:
+        ja: プロトーガ
+        en: Tirtouga
+        ch: 原盖海龟
+        fr: Carapagos
+    isNotAvailable: 1
+    Types:
+        - みず
+        - いわ
+    From:
+    To:
+    Stamina: 54
+    Attack: 78
+    Defense: 103
+    MAXCP:
+        Hatched:
+        Boosted:
+- # アバゴーラ[565] --------------------------------------------------
+    ID: 565
+    Name:
+        ja: アバゴーラ
+        en: Carracosta
+        ch: 肋骨海龟
+        fr: Mégapagos
+    isNotAvailable: 1
+    Types:
+        - みず
+        - いわ
+    From:
+    To:
+    Stamina: 74
+    Attack: 108
+    Defense: 133
+    MAXCP:
+        Hatched:
+        Boosted:
+- # アーケン[566] --------------------------------------------------
+    ID: 566
+    Name:
+        ja: アーケン
+        en: Archen
+        ch: 始祖小鸟
+        fr: Arkéapti
+    isNotAvailable: 1
+    Types:
+        - いわ
+        - ひこう
+    From:
+    To:
+    Stamina: 55
+    Attack: 112
+    Defense: 45
+    MAXCP:
+        Hatched:
+        Boosted:
+- # アーケオス[567] --------------------------------------------------
+    ID: 567
+    Name:
+        ja: アーケオス
+        en: Archeops
+        ch: 始祖大鸟
+        fr: Aéroptéryx
+    isNotAvailable: 1
+    Types:
+        - いわ
+        - ひこう
+    From:
+    To:
+    Stamina: 75
+    Attack: 140
+    Defense: 65
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ヤブクロン[568] --------------------------------------------------
+    ID: 568
+    Name:
+        ja: ヤブクロン
+        en: Trubbish
+        ch: 破破袋
+        fr: Miamiasme
+    isNotAvailable: 1
+    Types:
+        - どく
+    From:
+    To:
+    Stamina: 50
+    Attack: 50
+    Defense: 62
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ダストダス[569] --------------------------------------------------
+    ID: 569
+    Name:
+        ja: ダストダス
+        en: Garbodor
+        ch: 灰尘山
+        fr: Miasmax
+    isNotAvailable: 1
+    Types:
+        - どく
+    From:
+    To:
+    Stamina: 80
+    Attack: 95
+    Defense: 82
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ゾロア[570] --------------------------------------------------
+    ID: 570
+    Name:
+        ja: ゾロア
+        en: Zorua
+        ch: 索罗亚
+        fr: Zorua
+    isNotAvailable: 1
+    Types:
+        - あく
+    From:
+    To:
+    Stamina: 40
+    Attack: 65
+    Defense: 40
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ゾロアーク[571] --------------------------------------------------
+    ID: 571
+    Name:
+        ja: ゾロアーク
+        en: Zoroark
+        ch: 索罗亚克
+        fr: Zoroark
+    isNotAvailable: 1
+    Types:
+        - あく
+    From:
+    To:
+    Stamina: 60
+    Attack: 105
+    Defense: 60
+    MAXCP:
+        Hatched:
+        Boosted:
+- # チラーミィ[572] --------------------------------------------------
+    ID: 572
+    Name:
+        ja: チラーミィ
+        en: Minccino
+        ch: 泡沫栗鼠
+        fr: Chinchidou
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 55
+    Attack: 50
+    Defense: 40
+    MAXCP:
+        Hatched:
+        Boosted:
+- # チラチーノ[573] --------------------------------------------------
+    ID: 573
+    Name:
+        ja: チラチーノ
+        en: Cinccino
+        ch: 奇诺栗鼠
+        fr: Pashmilla
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 75
+    Attack: 95
+    Defense: 60
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ゴチム[574] --------------------------------------------------
+    ID: 574
+    Name:
+        ja: ゴチム
+        en: Gothita
+        ch: 哥德宝宝
+        fr: Scrutella
+    isNotAvailable: 1
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 45
+    Attack: 30
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ゴチミル[575] --------------------------------------------------
+    ID: 575
+    Name:
+        ja: ゴチミル
+        en: Gothorita
+        ch: 哥德小童
+        fr: Mesmérella
+    isNotAvailable: 1
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 60
+    Attack: 45
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ゴチルゼル[576] --------------------------------------------------
+    ID: 576
+    Name:
+        ja: ゴチルゼル
+        en: Gothitelle
+        ch: 哥德小姐
+        fr: Sidérella
+    isNotAvailable: 1
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 70
+    Attack: 55
+    Defense: 95
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ユニラン[577] --------------------------------------------------
+    ID: 577
+    Name:
+        ja: ユニラン
+        en: Solosis
+        ch: 单卵细胞球
+        fr: Nucléos
+    isNotAvailable: 1
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 45
+    Attack: 30
+    Defense: 40
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ダブラン[578] --------------------------------------------------
+    ID: 578
+    Name:
+        ja: ダブラン
+        en: Duosion
+        ch: 双卵细胞球
+        fr: Méios
+    isNotAvailable: 1
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 65
+    Attack: 40
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ランクルス[579] --------------------------------------------------
+    ID: 579
+    Name:
+        ja: ランクルス
+        en: Reuniclus
+        ch: 人造细胞卵
+        fr: Symbios
+    isNotAvailable: 1
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 110
+    Attack: 65
+    Defense: 75
+    MAXCP:
+        Hatched:
+        Boosted:
+- # コアルヒー[580] --------------------------------------------------
+    ID: 580
+    Name:
+        ja: コアルヒー
+        en: Ducklett
+        ch: 鸭宝宝
+        fr: Couaneton
+    isNotAvailable: 1
+    Types:
+        - みず
+        - ひこう
+    From:
+    To:
+    Stamina: 62
+    Attack: 44
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # スワンナ[581] --------------------------------------------------
+    ID: 581
+    Name:
+        ja: スワンナ
+        en: Swanna
+        ch: 舞天鹅
+        fr: Lakmécygne
+    isNotAvailable: 1
+    Types:
+        - みず
+        - ひこう
+    From:
+    To:
+    Stamina: 75
+    Attack: 87
+    Defense: 63
+    MAXCP:
+        Hatched:
+        Boosted:
+- # バニプッチ[582] --------------------------------------------------
+    ID: 582
+    Name:
+        ja: バニプッチ
+        en: Vanillite
+        ch: 迷你冰
+        fr: Sorbébé
+    isNotAvailable: 1
+    Types:
+        - こおり
+    From:
+    To:
+    Stamina: 36
+    Attack: 50
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # バニリッチ[583] --------------------------------------------------
+    ID: 583
+    Name:
+        ja: バニリッチ
+        en: Vanillish
+        ch: 多多冰
+        fr: Sorboul
+    isNotAvailable: 1
+    Types:
+        - こおり
+    From:
+    To:
+    Stamina: 51
+    Attack: 65
+    Defense: 65
+    MAXCP:
+        Hatched:
+        Boosted:
+- # バイバニラ[584] --------------------------------------------------
+    ID: 584
+    Name:
+        ja: バイバニラ
+        en: Vanilluxe
+        ch: 双倍多多冰
+        fr: Sorbouboul
+    isNotAvailable: 1
+    Types:
+        - こおり
+    From:
+    To:
+    Stamina: 71
+    Attack: 95
+    Defense: 85
+    MAXCP:
+        Hatched:
+        Boosted:
+- # シキジカ[585] --------------------------------------------------
+    ID: 585
+    Name:
+        ja: シキジカ
+        en: Deerling
+        ch: 四季鹿
+        fr: Vivaldaim
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+        - くさ
+    From:
+    To:
+    Stamina: 60
+    Attack: 60
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # メブキジカ[586] --------------------------------------------------
+    ID: 586
+    Name:
+        ja: メブキジカ
+        en: Sawsbuck
+        ch: 萌芽鹿
+        fr: Haydaim
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+        - くさ
+    From:
+    To:
+    Stamina: 80
+    Attack: 100
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # エモンガ[587] --------------------------------------------------
+    ID: 587
+    Name:
+        ja: エモンガ
+        en: Emolga
+        ch: 电飞鼠
+        fr: Emolga
+    isNotAvailable: 1
+    Types:
+        - でんき
+        - ひこう
+    From:
+    To:
+    Stamina: 55
+    Attack: 75
+    Defense: 60
+    MAXCP:
+        Hatched:
+        Boosted:
+- # カブルモ[588] --------------------------------------------------
+    ID: 588
+    Name:
+        ja: カブルモ
+        en: Karrablast
+        ch: 盖盖虫
+        fr: Carabing
+    isNotAvailable: 1
+    Types:
+        - むし
+    From:
+    To:
+    Stamina: 50
+    Attack: 75
+    Defense: 45
+    MAXCP:
+        Hatched:
+        Boosted:
+- # シュバルゴ[589] --------------------------------------------------
+    ID: 589
+    Name:
+        ja: シュバルゴ
+        en: Escavalier
+        ch: 骑士蜗牛
+        fr: Lançargot
+    isNotAvailable: 1
+    Types:
+        - むし
+        - はがね
+    From:
+    To:
+    Stamina: 70
+    Attack: 135
+    Defense: 105
+    MAXCP:
+        Hatched:
+        Boosted:
+- # タマゲタケ[590] --------------------------------------------------
+    ID: 590
+    Name:
+        ja: タマゲタケ
+        en: Foongus
+        ch: 哎呀球菇
+        fr: Trompignon
+    isNotAvailable: 1
+    Types:
+        - くさ
+        - どく
+    From:
+    To:
+    Stamina: 69
+    Attack: 55
+    Defense: 45
+    MAXCP:
+        Hatched:
+        Boosted:
+- # モロバレル[591] --------------------------------------------------
+    ID: 591
+    Name:
+        ja: モロバレル
+        en: Amoonguss
+        ch: 败露球菇
+        fr: Gaulet
+    isNotAvailable: 1
+    Types:
+        - くさ
+        - どく
+    From:
+    To:
+    Stamina: 114
+    Attack: 85
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # プルリル[592] --------------------------------------------------
+    ID: 592
+    Name:
+        ja: プルリル
+        en: Frillish
+        ch: 轻飘飘
+        fr: Viskuse
+    isNotAvailable: 1
+    Types:
+        - みず
+        - ゴースト
+    From:
+    To:
+    Stamina: 55
+    Attack: 40
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ブルンゲル[593] --------------------------------------------------
+    ID: 593
+    Name:
+        ja: ブルンゲル
+        en: Jellicent
+        ch: 胖嘟嘟
+        fr: Moyade
+    isNotAvailable: 1
+    Types:
+        - みず
+        - ゴースト
+    From:
+    To:
+    Stamina: 100
+    Attack: 60
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ママンボウ[594] --------------------------------------------------
+    ID: 594
+    Name:
+        ja: ママンボウ
+        en: Alomomola
+        ch: 保姆曼波
+        fr: Mamanbo
+    isNotAvailable: 1
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 165
+    Attack: 75
+    Defense: 80
+    MAXCP:
+        Hatched:
+        Boosted:
+- # バチュル[595] --------------------------------------------------
+    ID: 595
+    Name:
+        ja: バチュル
+        en: Joltik
+        ch: 电电虫
+        fr: Statitik
+    isNotAvailable: 1
+    Types:
+        - むし
+        - でんき
+    From:
+    To:
+    Stamina: 50
+    Attack: 47
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # デンチュラ[596] --------------------------------------------------
+    ID: 596
+    Name:
+        ja: デンチュラ
+        en: Galvantula
+        ch: 电蜘蛛
+        fr: Mygavolt
+    isNotAvailable: 1
+    Types:
+        - むし
+        - でんき
+    From:
+    To:
+    Stamina: 70
+    Attack: 77
+    Defense: 60
+    MAXCP:
+        Hatched:
+        Boosted:
+- # テッシード[597] --------------------------------------------------
+    ID: 597
+    Name:
+        ja: テッシード
+        en: Ferroseed
+        ch: 种子铁球
+        fr: Grindur
+    isNotAvailable: 1
+    Types:
+        - くさ
+        - はがね
+    From:
+    To:
+    Stamina: 44
+    Attack: 50
+    Defense: 91
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ナットレイ[598] --------------------------------------------------
+    ID: 598
+    Name:
+        ja: ナットレイ
+        en: Ferrothorn
+        ch: 坚果哑铃
+        fr: Noacier
+    isNotAvailable: 1
+    Types:
+        - くさ
+        - はがね
+    From:
+    To:
+    Stamina: 74
+    Attack: 94
+    Defense: 131
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ギアル[599] --------------------------------------------------
+    ID: 599
+    Name:
+        ja: ギアル
+        en: Klink
+        ch: 齿轮儿
+        fr: Tic
+    isNotAvailable: 1
+    Types:
+        - はがね
+    From:
+    To:
+    Stamina: 40
+    Attack: 55
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ギギアル[600] --------------------------------------------------
+    ID: 600
+    Name:
+        ja: ギギアル
+        en: Klang
+        ch: 齿轮组
+        fr: Clic
+    isNotAvailable: 1
+    Types:
+        - はがね
+    From:
+    To:
+    Stamina: 60
+    Attack: 80
+    Defense: 95
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ギギギアル[601] --------------------------------------------------
+    ID: 601
+    Name:
+        ja: ギギギアル
+        en: Klinklang
+        ch: 齿轮怪
+        fr: Cliticlic
+    isNotAvailable: 1
+    Types:
+        - はがね
+    From:
+    To:
+    Stamina: 60
+    Attack: 100
+    Defense: 115
+    MAXCP:
+        Hatched:
+        Boosted:
+- # シビシラス[602] --------------------------------------------------
+    ID: 602
+    Name:
+        ja: シビシラス
+        en: Tynamo
+        ch: 麻麻小鱼
+        fr: Anchwatt
+    isNotAvailable: 1
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 35
+    Attack: 55
+    Defense: 40
+    MAXCP:
+        Hatched:
+        Boosted:
+- # シビビール[603] --------------------------------------------------
+    ID: 603
+    Name:
+        ja: シビビール
+        en: Eelektrik
+        ch: 麻麻鳗
+        fr: Lampéroie
+    isNotAvailable: 1
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 65
+    Attack: 85
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # シビルドン[604] --------------------------------------------------
+    ID: 604
+    Name:
+        ja: シビルドン
+        en: Eelektross
+        ch: 麻麻鳗鱼王
+        fr: Ohmassacre
+    isNotAvailable: 1
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 85
+    Attack: 115
+    Defense: 80
+    MAXCP:
+        Hatched:
+        Boosted:
+- # リグレー[605] --------------------------------------------------
+    ID: 605
+    Name:
+        ja: リグレー
+        en: Elgyem
+        ch: 小灰怪
+        fr: Lewsor
+    isNotAvailable: 1
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 55
+    Attack: 55
+    Defense: 55
+    MAXCP:
+        Hatched:
+        Boosted:
+- # オーベム[606] --------------------------------------------------
+    ID: 606
+    Name:
+        ja: オーベム
+        en: Beheeyem
+        ch: 大宇怪
+        fr: Neitram
+    isNotAvailable: 1
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 75
+    Attack: 75
+    Defense: 75
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ヒトモシ[607] --------------------------------------------------
+    ID: 607
+    Name:
+        ja: ヒトモシ
+        en: Litwick
+        ch: 烛光灵
+        fr: Funécire
+    isNotAvailable: 1
+    Types:
+        - ゴースト
+        - ほのお
+    From:
+    To:
+    Stamina: 50
+    Attack: 30
+    Defense: 55
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ランプラー[608] --------------------------------------------------
+    ID: 608
+    Name:
+        ja: ランプラー
+        en: Lampent
+        ch: 灯火幽灵
+        fr: Mélancolux
+    isNotAvailable: 1
+    Types:
+        - ゴースト
+        - ほのお
+    From:
+    To:
+    Stamina: 60
+    Attack: 40
+    Defense: 60
+    MAXCP:
+        Hatched:
+        Boosted:
+- # シャンデラ[609] --------------------------------------------------
+    ID: 609
+    Name:
+        ja: シャンデラ
+        en: Chandelure
+        ch: 水晶灯火灵
+        fr: Lugulabre
+    isNotAvailable: 1
+    Types:
+        - ゴースト
+        - ほのお
+    From:
+    To:
+    Stamina: 60
+    Attack: 55
+    Defense: 90
+    MAXCP:
+        Hatched:
+        Boosted:
+- # キバゴ[610] --------------------------------------------------
+    ID: 610
+    Name:
+        ja: キバゴ
+        en: Axew
+        ch: 牙牙
+        fr: Coupenotte
+    isNotAvailable: 1
+    Types:
+        - ドラゴン
+    From:
+    To:
+    Stamina: 46
+    Attack: 87
+    Defense: 60
+    MAXCP:
+        Hatched:
+        Boosted:
+- # オノンド[611] --------------------------------------------------
+    ID: 611
+    Name:
+        ja: オノンド
+        en: Fraxure
+        ch: 斧牙龙
+        fr: Incisache
+    isNotAvailable: 1
+    Types:
+        - ドラゴン
+    From:
+    To:
+    Stamina: 66
+    Attack: 117
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # オノノクス[612] --------------------------------------------------
+    ID: 612
+    Name:
+        ja: オノノクス
+        en: Haxorus
+        ch: 双斧战龙
+        fr: Tranchodon
+    isNotAvailable: 1
+    Types:
+        - ドラゴン
+    From:
+    To:
+    Stamina: 76
+    Attack: 147
+    Defense: 90
+    MAXCP:
+        Hatched:
+        Boosted:
+- # クマシュン[613] --------------------------------------------------
+    ID: 613
+    Name:
+        ja: クマシュン
+        en: Cubchoo
+        ch: 喷嚏熊
+        fr: Polarhume
+    isNotAvailable: 1
+    Types:
+        - こおり
+    From:
+    To:
+    Stamina: 55
+    Attack: 70
+    Defense: 40
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ツンベアー[614] --------------------------------------------------
+    ID: 614
+    Name:
+        ja: ツンベアー
+        en: Beartic
+        ch: 冻原熊
+        fr: Polagriffe
+    isNotAvailable: 1
+    Types:
+        - こおり
+    From:
+    To:
+    Stamina: 95
+    Attack: 130
+    Defense: 80
+    MAXCP:
+        Hatched:
+        Boosted:
+- # フリージオ[615] --------------------------------------------------
+    ID: 615
+    Name:
+        ja: フリージオ
+        en: Cryogonal
+        ch: 几何雪花
+        fr: Hexagel
+    isNotAvailable: 1
+    Types:
+        - こおり
+    From:
+    To:
+    Stamina: 80
+    Attack: 50
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # チョボマキ[616] --------------------------------------------------
+    ID: 616
+    Name:
+        ja: チョボマキ
+        en: Shelmet
+        ch: 小嘴蜗
+        fr: Escargaume
+    isNotAvailable: 1
+    Types:
+        - むし
+    From:
+    To:
+    Stamina: 50
+    Attack: 40
+    Defense: 85
+    MAXCP:
+        Hatched:
+        Boosted:
+- # アギルダー[617] --------------------------------------------------
+    ID: 617
+    Name:
+        ja: アギルダー
+        en: Accelgor
+        ch: 敏捷虫
+        fr: Limaspeed
+    isNotAvailable: 1
+    Types:
+        - むし
+    From:
+    To:
+    Stamina: 80
+    Attack: 70
+    Defense: 40
+    MAXCP:
+        Hatched:
+        Boosted:
+- # マッギョ[618] --------------------------------------------------
+    ID: 618
+    Name:
+        ja: マッギョ
+        en: Stunfisk
+        ch: 泥巴鱼
+        fr: Limonde
+    isNotAvailable: 1
+    Types:
+        - じめん
+        - でんき
+    From:
+    To:
+    Stamina: 109
+    Attack: 66
+    Defense: 84
+    MAXCP:
+        Hatched:
+        Boosted:
+- # コジョフー[619] --------------------------------------------------
+    ID: 619
+    Name:
+        ja: コジョフー
+        en: Mienfoo
+        ch: 功夫鼬
+        fr: Kungfouine
+    isNotAvailable: 1
+    Types:
+        - かくとう
+    From:
+    To:
+    Stamina: 45
+    Attack: 85
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # コジョンド[620] --------------------------------------------------
+    ID: 620
+    Name:
+        ja: コジョンド
+        en: Mienshao
+        ch: 师父鼬
+        fr: Shaofouine
+    isNotAvailable: 1
+    Types:
+        - かくとう
+    From:
+    To:
+    Stamina: 65
+    Attack: 125
+    Defense: 60
+    MAXCP:
+        Hatched:
+        Boosted:
+- # クリムガン[621] --------------------------------------------------
+    ID: 621
+    Name:
+        ja: クリムガン
+        en: Druddigon
+        ch: 赤面龙
+        fr: Drakkarmin
+    isNotAvailable: 1
+    Types:
+        - ドラゴン
+    From:
+    To:
+    Stamina: 77
+    Attack: 120
+    Defense: 90
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ゴビット[622] --------------------------------------------------
+    ID: 622
+    Name:
+        ja: ゴビット
+        en: Golett
+        ch: 泥偶小人
+        fr: Gringolem
+    isNotAvailable: 1
+    Types:
+        - じめん
+        - ゴースト
+    From:
+    To:
+    Stamina: 59
+    Attack: 74
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ゴルーグ[623] --------------------------------------------------
+    ID: 623
+    Name:
+        ja: ゴルーグ
+        en: Golurk
+        ch: 泥偶巨人
+        fr: Golemastoc
+    isNotAvailable: 1
+    Types:
+        - じめん
+        - ゴースト
+    From:
+    To:
+    Stamina: 89
+    Attack: 124
+    Defense: 80
+    MAXCP:
+        Hatched:
+        Boosted:
+- # コマタナ[624] --------------------------------------------------
+    ID: 624
+    Name:
+        ja: コマタナ
+        en: Pawniard
+        ch: 驹刀小兵
+        fr: Scalpion
+    isNotAvailable: 1
+    Types:
+        - あく
+        - はがね
+    From:
+    To:
+    Stamina: 45
+    Attack: 85
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # キリキザン[625] --------------------------------------------------
+    ID: 625
+    Name:
+        ja: キリキザン
+        en: Bisharp
+        ch: 劈斩司令
+        fr: Scalproie
+    isNotAvailable: 1
+    Types:
+        - あく
+        - はがね
+    From:
+    To:
+    Stamina: 65
+    Attack: 125
+    Defense: 100
+    MAXCP:
+        Hatched:
+        Boosted:
+- # バッフロン[626] --------------------------------------------------
+    ID: 626
+    Name:
+        ja: バッフロン
+        en: Bouffalant
+        ch: 爆炸头水牛
+        fr: Frison
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 95
+    Attack: 110
+    Defense: 95
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ワシボン[627] --------------------------------------------------
+    ID: 627
+    Name:
+        ja: ワシボン
+        en: Rufflet
+        ch: 毛头小鹰
+        fr: Furaiglon
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+        - ひこう
+    From:
+    To:
+    Stamina: 70
+    Attack: 83
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ウォーグル[628] --------------------------------------------------
+    ID: 628
+    Name:
+        ja: ウォーグル
+        en: Braviary
+        ch: 勇士雄鹰
+        fr: Gueriaigle
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+        - ひこう
+    From:
+    To:
+    Stamina: 100
+    Attack: 123
+    Defense: 75
+    MAXCP:
+        Hatched:
+        Boosted:
+- # バルチャイ[629] --------------------------------------------------
+    ID: 629
+    Name:
+        ja: バルチャイ
+        en: Vullaby
+        ch: 秃鹰丫头
+        fr: Vostourno
+    isNotAvailable: 1
+    Types:
+        - あく
+        - ひこう
+    From:
+    To:
+    Stamina: 70
+    Attack: 55
+    Defense: 75
+    MAXCP:
+        Hatched:
+        Boosted:
+- # バルジーナ[630] --------------------------------------------------
+    ID: 630
+    Name:
+        ja: バルジーナ
+        en: Mandibuzz
+        ch: 秃鹰娜
+        fr: Vaututrice
+    isNotAvailable: 1
+    Types:
+        - あく
+        - ひこう
+    From:
+    To:
+    Stamina: 110
+    Attack: 65
+    Defense: 105
+    MAXCP:
+        Hatched:
+        Boosted:
+- # クイタラン[631] --------------------------------------------------
+    ID: 631
+    Name:
+        ja: クイタラン
+        en: Heatmor
+        ch: 熔蚁兽
+        fr: Aflamanoir
+    isNotAvailable: 1
+    Types:
+        - ほのお
+    From:
+    To:
+    Stamina: 85
+    Attack: 97
+    Defense: 66
+    MAXCP:
+        Hatched:
+        Boosted:
+- # アイアント[632] --------------------------------------------------
+    ID: 632
+    Name:
+        ja: アイアント
+        en: Durant
+        ch: 铁蚁
+        fr: Fermite
+    isNotAvailable: 1
+    Types:
+        - むし
+        - はがね
+    From:
+    To:
+    Stamina: 58
+    Attack: 109
+    Defense: 112
+    MAXCP:
+        Hatched:
+        Boosted:
+- # モノズ[633] --------------------------------------------------
+    ID: 633
+    Name:
+        ja: モノズ
+        en: Deino
+        ch: 单首龙
+        fr: Solochi
+    isNotAvailable: 1
+    Types:
+        - あく
+        - ドラゴン
+    From:
+    To:
+    Stamina: 52
+    Attack: 65
+    Defense: 50
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ジヘッド[634] --------------------------------------------------
+    ID: 634
+    Name:
+        ja: ジヘッド
+        en: Zweilous
+        ch: 双首暴龙
+        fr: Diamat
+    isNotAvailable: 1
+    Types:
+        - あく
+        - ドラゴン
+    From:
+    To:
+    Stamina: 72
+    Attack: 85
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # サザンドラ[635] --------------------------------------------------
+    ID: 635
+    Name:
+        ja: サザンドラ
+        en: Hydreigon
+        ch: 三首恶龙
+        fr: Trioxhydre
+    isNotAvailable: 1
+    Types:
+        - あく
+        - ドラゴン
+    From:
+    To:
+    Stamina: 92
+    Attack: 105
+    Defense: 90
+    MAXCP:
+        Hatched:
+        Boosted:
+- # メラルバ[636] --------------------------------------------------
+    ID: 636
+    Name:
+        ja: メラルバ
+        en: Larvesta
+        ch: 燃烧虫
+        fr: Pyronille
+    isNotAvailable: 1
+    Types:
+        - むし
+        - ほのお
+    From:
+    To:
+    Stamina: 55
+    Attack: 85
+    Defense: 55
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ウルガモス[637] --------------------------------------------------
+    ID: 637
+    Name:
+        ja: ウルガモス
+        en: Volcarona
+        ch: 火神蛾
+        fr: Pyrax
+    isNotAvailable: 1
+    Types:
+        - むし
+        - ほのお
+    From:
+    To:
+    Stamina: 85
+    Attack: 60
+    Defense: 65
+    MAXCP:
+        Hatched:
+        Boosted:
+- # コバルオン[638] --------------------------------------------------
+    ID: 638
+    Name:
+        ja: コバルオン
+        en: Cobalion
+        ch: 勾帕路翁
+        fr: Cobaltium
+    isNotAvailable: 1
+    Types:
+        - はがね
+        - かくとう
+    From:
+    To:
+    Stamina: 91
+    Attack: 90
+    Defense: 129
+    MAXCP:
+        Hatched:
+        Boosted:
+- # テラキオン[639] --------------------------------------------------
+    ID: 639
+    Name:
+        ja: テラキオン
+        en: Terrakion
+        ch: 代拉基翁
+        fr: Terrakium
+    isNotAvailable: 1
+    Types:
+        - いわ
+        - かくとう
+    From:
+    To:
+    Stamina: 91
+    Attack: 129
+    Defense: 90
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ビリジオン[640] --------------------------------------------------
+    ID: 640
+    Name:
+        ja: ビリジオン
+        en: Virizion
+        ch: 毕力吉翁
+        fr: Viridium
+    isNotAvailable: 1
+    Types:
+        - くさ
+        - かくとう
+    From:
+    To:
+    Stamina: 91
+    Attack: 90
+    Defense: 72
+    MAXCP:
+        Hatched:
+        Boosted:
+- # トルネロス[641] --------------------------------------------------
+    ID: 641
+    Name:
+        ja: トルネロス
+        en: Tornadus
+        ch: 龙卷云
+        fr: Boréas
+    isNotAvailable: 1
+    Types:
+        - ひこう
+    From:
+    To:
+    Stamina: 79
+    Attack: 115
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ボルトロス[642] --------------------------------------------------
+    ID: 642
+    Name:
+        ja: ボルトロス
+        en: Thundurus
+        ch: 雷电云
+        fr: Fulguris
+    isNotAvailable: 1
+    Types:
+        - でんき
+        - ひこう
+    From:
+    To:
+    Stamina: 79
+    Attack: 115
+    Defense: 70
+    MAXCP:
+        Hatched:
+        Boosted:
+- # レシラム[643] --------------------------------------------------
+    ID: 643
+    Name:
+        ja: レシラム
+        en: Reshiram
+        ch: 莱希拉姆
+        fr: Reshiram
+    isNotAvailable: 1
+    Types:
+        - ドラゴン
+        - ほのお
+    From:
+    To:
+    Stamina: 100
+    Attack: 120
+    Defense: 100
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ゼクロム[644] --------------------------------------------------
+    ID: 644
+    Name:
+        ja: ゼクロム
+        en: Zekrom
+        ch: 捷克罗姆
+        fr: Zekrom
+    isNotAvailable: 1
+    Types:
+        - ドラゴン
+        - でんき
+    From:
+    To:
+    Stamina: 100
+    Attack: 150
+    Defense: 120
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ランドロス[645] --------------------------------------------------
+    ID: 645
+    Name:
+        ja: ランドロス
+        en: Landorus
+        ch: 土地云
+        fr: Démétéros
+    isNotAvailable: 1
+    Types:
+        - じめん
+        - ひこう
+    From:
+    To:
+    Stamina: 89
+    Attack: 125
+    Defense: 90
+    MAXCP:
+        Hatched:
+        Boosted:
+- # キュレム[646] --------------------------------------------------
+    ID: 646
+    Name:
+        ja: キュレム
+        en: Kyurem
+        ch: 酋雷姆
+        fr: Kyurem
+    isNotAvailable: 1
+    Types:
+        - ドラゴン
+        - こおり
+    From:
+    To:
+    Stamina: 125
+    Attack: 130
+    Defense: 90
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ケルディオ[647] --------------------------------------------------
+    ID: 647
+    Name:
+        ja: ケルディオ
+        en: Keldeo
+        ch: 凯路迪欧
+        fr: Keldeo
+    isNotAvailable: 1
+    Types:
+        - みず
+        - かくとう
+    From:
+    To:
+    Stamina: 91
+    Attack: 72
+    Defense: 90
+    MAXCP:
+        Hatched:
+        Boosted:
+- # メロエッタ[648] --------------------------------------------------
+    ID: 648
+    Name:
+        ja: メロエッタ
+        en: Meloetta
+        ch: 美洛耶塔
+        fr: Meloetta
+    isNotAvailable: 1
+    Types:
+        - ノーマル
+        - エスパー
+    From:
+    To:
+    Stamina: 100
+    Attack: 77
+    Defense: 77
+    MAXCP:
+        Hatched:
+        Boosted:
+- # ゲノセクト[649] --------------------------------------------------
+    ID: 649
+    Name:
+        ja: ゲノセクト
+        en: Genesect
+        ch: 盖诺赛克特
+        fr: Genesect
+    isNotAvailable: 1
+    Types:
+        - むし
+        - はがね
+    From:
+    To:
+    Stamina: 71
+    Attack: 120
+    Defense: 95
+    MAXCP:
+        Hatched:
+        Boosted:

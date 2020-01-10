@@ -41,13 +41,22 @@ else {
   }
   $data->{RequiredModules} = [];
   if (my $r = $data->{requires}) {
-    push @{$data->{RequiredModules}}, keys %$r;
+    while (my ($key, $value) = (each %$r)) {
+      push @{$data->{RequiredModules}},
+        $key . ($value eq '0' ? '' : "~$value");
+    }
   }
   if (my $r = $data->{test}{requires}) {
-    push @{$data->{RequiredModules}}, keys %$r;
+    while (my ($key, $value) = (each %$r)) {
+      push @{$data->{RequiredModules}},
+        $key . ($value eq '0' ? '' : "~$value");
+    }
   }
   if (my $r = $data->{recommends}) {
-    push @{$data->{RequiredModules}}, keys %$r;
+    while (my ($key, $value) = (each %$r)) {
+      push @{$data->{RequiredModules}},
+        $key . ($value eq '0' ? '' : "~$value");
+    }
   }
   ($data->{namepath} = $data->{libname} || $data->{name})
     =~ s/(?:-|::)/\//g;

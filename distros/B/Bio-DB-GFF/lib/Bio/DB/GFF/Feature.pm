@@ -62,7 +62,7 @@ methods implemented by this module.
 =cut
 
 package Bio::DB::GFF::Feature;
-$Bio::DB::GFF::Feature::VERSION = '1.7.3';
+$Bio::DB::GFF::Feature::VERSION = '1.7.4';
 use strict;
 
 use Bio::DB::GFF::Util::Rearrange;

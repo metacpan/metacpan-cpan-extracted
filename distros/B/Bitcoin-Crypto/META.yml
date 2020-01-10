@@ -4,8 +4,6 @@ author:
   - 'Bartosz Jarzyna <brtastic.dev@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: 6.55_03
-  Math::BigInt: '1.999816'
-  Math::BigInt::GMP: '1.6006'
   Test::Exception: '0'
   Test::More: '0.88'
 configure_requires:
@@ -40,5 +38,5 @@ resources:
   homepage: https://metacpan.org/release/Bitcoin-Crypto
   license: https://dev.perl.org/licenses
   repository: https://github.com/brtastic/perl-bitcoin-crypto
-version: '0.99'
+version: '0.991'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

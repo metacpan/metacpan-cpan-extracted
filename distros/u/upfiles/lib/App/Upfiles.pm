@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2020 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -46,7 +46,7 @@ use Regexp::Common 'no_defaults','Emacs';
 use FindBin;
 my $progname = $FindBin::Script;
 
-our $VERSION = 12;
+our $VERSION = 14;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -1073,8 +1073,8 @@ sub timestamp_to_timet {
   my ($year, $month, $day, $hour, $minute, $second)
     = split /[- :+]/, $timestamp;
   require Time::Local;
-  return Time::Local::timegm
-    ($second, $minute, $hour, $day, $month-1, $year-1900);
+  return Time::Local::timegm_modern
+    ($second, $minute, $hour, $day, $month-1, $year);
 }
 
 # $href is a hashref and $re a regexp.  Delete all keys matching $re.
@@ -1129,7 +1129,7 @@ L<http://user42.tuxfamily.org/upfiles/index.html>
 
 =head1 LICENSE
 
-Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2020 Kevin Ryde
 
 Upfiles is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

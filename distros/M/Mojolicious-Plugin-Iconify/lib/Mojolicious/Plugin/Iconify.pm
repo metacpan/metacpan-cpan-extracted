@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::DOM::HTML;
 use Mojo::ByteStream;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub register {
 
@@ -38,6 +38,16 @@ sub register {
                     $iconify_params{'data-inline'} = ( $value == 0 ) ? 'true' : 'false';
                 }
 
+                if ( $param eq 'width' || $param eq 'height' || $param eq 'flip' || $param eq 'align' ) {
+                    $iconify_params{"data-$param"} = $value;
+                }
+
+                $iconify_params{'data-flip'} .= 'horizontal ' if ( $param eq 'flip_horizontal' );
+                $iconify_params{'data-flip'} .= 'vertical '   if ( $param eq 'flip_vertical' );
+                $iconify_params{'data-rotate'} = $value . 'deg' if ( $param eq 'rotate' );
+
+                # Core HTML attributes
+
                 if ( $param eq 'class' ) {
                     $iconify_params{'class'} .= " $value";
                 }
@@ -46,18 +56,10 @@ sub register {
                     $iconify_params{$param} = $value;
                 }
 
-                if ( $param eq 'width' || $param eq 'height' || $param eq 'flip' ) {
-                    $iconify_params{"data-$param"} = $value;
-                }
-
-                $iconify_params{'data-flip'} .= 'horizontal,' if ( $param eq 'flip_horizontal' );
-                $iconify_params{'data-flip'} .= 'vertical,'   if ( $param eq 'flip_vertical' );
-                $iconify_params{'data-rotate'} = $value . 'deg' if ( $param eq 'rotate' );
-
             }
 
             if ( defined $iconify_params{'data-flip'} ) {
-                $iconify_params{'data-flip'} =~ s/,$//;
+                $iconify_params{'data-flip'} =~ s/\s$//;
             }
 
             return _tag( 'span', %iconify_params );
@@ -121,6 +123,7 @@ Generate C<script> tag for include Iconify script file in your template.
   %= icon 'logos:perl', rotate => 90
   %= icon 'logos:perl', flip_horizontal => 1
   %= icon 'logos:perl', flip => 'vertical'
+  %= icon 'logos:perl', align => 'right top crop'
 
 Generate C<span> tag with Iconify atributes.
 
@@ -148,6 +151,45 @@ This is an alias for C<flip =E<gt> "vertical">.
 
 =item C<block>: set the layout to block (no vertical alignment)
 
+=item C<align>: set the vertical / horizontal alignment and cropping
+
+(You can mix those options by separating them with comma or space)
+
+
+Horizontal:
+
+=over
+
+=item C<left>
+
+=item C<center> (default)
+
+=item C<right>
+
+=back
+
+Vertical:
+
+=over
+
+=item C<top>
+
+=item C<middle> (default)
+
+=item C<bottom>
+
+=back
+
+For cropping:
+
+=over
+
+=item C<crop>
+
+=item C<meet> (default)
+
+=back
+
 =back
 
 =head1 METHODS
@@ -163,6 +205,6 @@ Register helpers in L<Mojolicious> application.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>, L<https://iconify.design/docs/>.
 
 =cut

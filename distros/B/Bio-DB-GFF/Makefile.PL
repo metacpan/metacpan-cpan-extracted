@@ -35,7 +35,6 @@ my %WriteMakefileArgs = (
     "Bio::Das::FeatureTypeI" => 0,
     "Bio::Das::SegmentI" => 0,
     "Bio::DasI" => 0,
-    "Bio::GMOD::CMap::Utils" => 0,
     "Bio::Location::Simple" => 0,
     "Bio::Location::Split" => 0,
     "Bio::LocationI" => 0,
@@ -78,7 +77,7 @@ my %WriteMakefileArgs = (
     "Module::Build" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.7.3",
+  "VERSION" => "1.7.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -95,7 +94,6 @@ my %FallbackPrereqs = (
   "Bio::Das::FeatureTypeI" => 0,
   "Bio::Das::SegmentI" => 0,
   "Bio::DasI" => 0,
-  "Bio::GMOD::CMap::Utils" => 0,
   "Bio::Location::Simple" => 0,
   "Bio::Location::Split" => 0,
   "Bio::LocationI" => 0,

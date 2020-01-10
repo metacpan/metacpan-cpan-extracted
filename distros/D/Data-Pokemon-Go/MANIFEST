@@ -22,11 +22,13 @@ share/MeCab.sh
 share/Relations.yaml
 share/Sinnoh.yaml
 share/Skill.yaml
+share/Unova.yaml
 t/00_compile.t
 t/01_relations.t
 t/02_skills.t
-t/03_pokemon.t
-t/04_IV.t
-t/05_mecab.t
+t/03_forms.t
+t/04_pokemon.t
+t/05_IV.t
+t/99_mecab.t
 META.yml
 MANIFEST

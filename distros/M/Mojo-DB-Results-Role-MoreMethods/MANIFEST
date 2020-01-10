@@ -24,16 +24,6 @@ t/get_by_name.t
 t/hash_or_die.t
 t/hashify.t
 t/hashify_collect.t
-t/import_mysql_and_pg_flag.t
-t/import_mysql_flag.t
-t/import_mysql_flag_and_results_class_array.t
-t/import_mysql_flag_and_results_class_string.t
-t/import_pg_flag.t
-t/import_pg_flag_and_results_class_array.t
-t/import_pg_flag_and_results_class_string.t
-t/import_results_class_array.t
-t/import_results_class_string.t
-t/import_validate.t
 t/one.t
 t/one_array.t
 t/one_by_name.t

@@ -1,5 +1,11 @@
 Revision history for Dancer-Plugin-Thumbnail
 
+0.16    2020-01-08
+        * Fixed tests for new libgd versions again and again
+
+0.15    2020-01-07
+        * Fixed tests for new libgd versions again
+
 0.14    2017-04-24
         * Fixed tests for new libgd versions
 

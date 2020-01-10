@@ -10,12 +10,14 @@ README
 README.md
 data/hetero.ab1
 data/mt.ab1
+data/mt.ab1.bak
 dist.ini
 img/chromatogram.png
 lib/FASTX/Abi.pm
 paper/paper.bib
 paper/paper.md
 scripts/ab2fq.pl
+scripts/list_tags.pl
 scripts/strip.pl
 setup.sh
 t/10_basic_test.t

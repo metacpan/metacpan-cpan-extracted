@@ -16,7 +16,7 @@ QUERIES TO IMPLEMENT for the list of methods that must be implemented.
 =cut
 
 package Bio::DB::GFF::Adaptor::dbi;
-$Bio::DB::GFF::Adaptor::dbi::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::dbi::VERSION = '1.7.4';
 # base class for dbi-based implementations
 use strict;
 

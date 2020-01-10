@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "1.78",
+            "Mojolicious" : "7.93",
             "perl" : "5.008"
          }
       }
@@ -45,6 +45,6 @@
          "web" : "https://github.com/giterlizzi/perl-Mojolicious-Plugin-Iconify"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

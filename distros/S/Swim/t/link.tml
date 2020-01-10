@@ -1,5 +1,0 @@
-=== Wiki style link
---- swim
-See [Swim::HTML] for more info.
---- pod
-See L<Swim::HTML> for more info.

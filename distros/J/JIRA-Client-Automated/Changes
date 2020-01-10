@@ -1,3 +1,9 @@
+1.9       2020-01-08 09:37:12-08:00 America/Los_Angeles
+    Changed to higher version because PAUSE doesn't deal with 3-level version numbers.
+
+1.8.1     2020-01-08 09:25:50-08:00 America/Los_Angeles
+    Changed directory case to match package name.
+
 1.8       2020-01-06 08:37:54-08:00 America/Los_Angeles
     Added custom field support to update_issue().
     (Patch provided by Mike Svendsen <msven.dev@gmail.com>.)

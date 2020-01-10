@@ -57,4 +57,32 @@ is( \@expect, $aref );
 
 my @uniq = $list->uniq( \@have );
 
+#####################################
+# diff
+#####################################
+
+my @diff = $list->diff([qw(1 2 3)], [qw(1 2 3)], 0);
+ok(!@diff);
+
+@diff = $list->diff([qw(1 2 3)], [qw(3 2 1)], 1);
+ok(!@diff);
+
+@diff = $list->diff([qw(1 2 3)], [qw(a b c)], 0);
+ok(@diff == 6);
+
+#####################################
+# differ
+#####################################
+
+my $differ = $list->differ([qw(1 2 3)], [qw(1 2 3)], 0);
+ok(!$differ);
+
+$differ = $list->differ([qw(1 2 3)], [qw(3 2 1)], 1);
+ok(!$differ);
+
+$differ = $list->differ([qw(1 2 3)], [qw(a b c)], 0);
+ok($differ);
+
+#####################################
+
 done_testing;

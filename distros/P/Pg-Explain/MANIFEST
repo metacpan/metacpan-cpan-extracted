@@ -204,6 +204,11 @@ t/43-analyzer-initial.d/06.types
 t/43-analyzer-initial.t
 t/44-parallel-queries.d/01.plan
 t/44-parallel-queries.t
+t/45-parallel-queries-correct-times.t
+t/46-parallel-queries-correct-times-nontext.d/json.plan
+t/46-parallel-queries-correct-times-nontext.d/xml.plan
+t/46-parallel-queries-correct-times-nontext.d/yaml.plan
+t/46-parallel-queries-correct-times-nontext.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

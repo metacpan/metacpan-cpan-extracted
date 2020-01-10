@@ -84,9 +84,9 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
 # DESCRIPTION
 
 This class implements the Webmention protocol, as defined by the W3C and
-the IndieWeb community. (See [This article by Chris
-Aldrich](https://metacpan.org/pod/https:#alistapart.com-article-webmentions-enabling-better--communication-on-the-internet) for an excellent high-level summary of
-Webmention and its applications.)
+the IndieWeb community. (See [this article by Chris
+Aldrich](https://alistapart.com/article/webmentions-enabling-better-communication-on-the-internet/)
+for an excellent high-level summary of Webmention and its applications.)
 
 An object of this class represents a single webmention, with target and
 source URLs. It can verify itself, determining whether or not the
@@ -426,10 +426,11 @@ Jason McIntosh (jmac@jmac.org)
 # CONTRIBUTORS
 
 - Mohammad S Anwar (mohammad.anwar@yahoo.com)
+- Tomaž Šolc (tomaz.solc@tablix.org)
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Jason McIntosh.
+This software is Copyright (c) 2018-2020 by Jason McIntosh.
 
 This is free software, licensed under:
 

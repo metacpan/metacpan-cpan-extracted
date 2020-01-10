@@ -1,3 +1,10 @@
+0.007   2020-01-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- Fix description of example in Synopsis (thanks Boris Däppen).
+
+
 0.006   2019-11-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option --pretty and output prettily (color, nice indentation)

@@ -1,5 +1,9 @@
 Revision history for Future
 
+0.43    2020-01-07
+        [CHANGES]
+         * Implement the Future::AsyncAwait::Awaitable API methods directly
+
 0.42    2019-11-12
         [CHANGES]
          * Added Future::Queue

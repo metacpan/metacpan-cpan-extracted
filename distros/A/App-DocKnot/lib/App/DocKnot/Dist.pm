@@ -10,19 +10,22 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Dist 3.01;
+package App::DocKnot::Dist 3.02;
 
 use 5.024;
 use autodie;
 use warnings;
 
 use App::DocKnot::Config;
+use Archive::Tar ();
 use Carp qw(croak);
 use Cwd qw(getcwd);
 use File::Copy qw(move);
+use File::Find qw(find);
 use File::Path qw(remove_tree);
 use IPC::Run qw(run);
 use IPC::System::Simple qw(systemx);
+use List::MoreUtils qw(any lastval);
 
 # Base commands to run for various types of distributions.  Additional
 # variations may be added depending on additional configuration parameters.
@@ -57,9 +60,118 @@ our %COMMANDS = (
 );
 #>>>
 
+# Regexes matching files or directories in the source tree to ignore when
+# comparing it against the generated distribution (in other words, we don't
+# care whether these files or any files in these directories are included in
+# the distribution).  These should match the full file path relative to the
+# top directory.
+#
+# Include all of the build-generated files for docknot itself so that we can
+# use the new version to release the new version.
+## no critic (RegularExpressions::ProhibitFixedStringMatches)
+our @DIST_IGNORE = (
+    qr{ \A [.]git \z }xms,
+    qr{ \A autom4te[.]cache \z }xms,
+    qr{ \A Build \z }xms,
+    qr{ \A MANIFEST[.]bak \z }xms,
+    qr{ \A MYMETA [.] (?:json (?:[.]lock)? | yml) \z }xms,
+    qr{ \A _build \z }xms,
+    qr{ \A blib \z }xms,
+    qr{ \A config[.]h[.]in~ \z }xms,
+    qr{ \A cover_db \z }xms,
+    qr{ \A tests/config \z }xms,
+    qr{ [.]tar[.][gx]z \z }xms,
+);
+## use critic
+
 ##############################################################################
 # Helper methods
 ##############################################################################
+
+# Given the path to the source tree, generate a list of files that we expect
+# to find in the distribution tarball.
+#
+# $self - The App::DocKnot::Dist object
+# $path - The directory path
+#
+# Returns: A list of files (no directories) that the distribution tarball
+#          should contain.
+sub _expected_dist_files {
+    my ($self, $path) = @_;
+    my @files;
+
+    # Find all files in the source directory, stripping its path from the file
+    # name and excluding (and pruning) anything matching @DIST_IGNORE.
+    my $wanted = sub {
+        my $name = $File::Find::name;
+        $name =~ s{ \A \Q$path\E / }{}xms;
+        return if !$name;
+        if (any { $name =~ $_ } @DIST_IGNORE) {
+            $File::Find::prune = 1;
+            return;
+        }
+        return if -d;
+        push(@files, $name);
+    };
+
+    # Generate and return the list of files.
+    find($wanted, $path);
+    return @files;
+}
+
+# Find the tarball compressed with gzip given a directory and a prefix.
+#
+# $self   - The App::DocKnot::Dist object
+# $path   - The directory path
+# $prefix - The tarball file prefix
+#
+# Returns: The full path to the gzip tarball
+#  Throws: Text exception if no gzip tarball was found
+sub _find_gzip_tarball {
+    my ($self, $path, $prefix) = @_;
+    my @files     = $self->_find_matching_tarballs($path, $prefix);
+    my $gzip_file = lastval { m{ [.]tar [.]gz \z }xms } @files;
+    if (!defined($gzip_file)) {
+        die "cannot find gzip tarball for $prefix in $path\n";
+    }
+    return File::Spec->catfile($path, $gzip_file);
+}
+
+# Find matching tarballs given a directory and a prefix.
+#
+# $self   - The App::DocKnot::Dist object
+# $path   - The directory path
+# $prefix - The tarball file prefix
+#
+# Returns: All matching files, without the directory name, as a list
+sub _find_matching_tarballs {
+    my ($self, $path, $prefix) = @_;
+    my $pattern = qr{ \A \Q$prefix\E - \d.* [.]tar [.][xg]z \z }xms;
+    opendir(my $source, $path);
+    my @files = grep { $_ =~ $pattern } readdir($source);
+    closedir($source);
+    return @files;
+}
+
+# Given a directory and a prefix for tarballs in that directory, ensure that
+# all the desired compression formats exist.  Currently this only handles
+# generating the xz version of a gzip tarball.
+#
+# $self   - The App::DocKnot::Dist object
+# $path   - The directory path
+# $prefix - The tarball file prefix
+sub _generate_compression_formats {
+    my ($self, $path, $prefix) = @_;
+    my @files = $self->_find_matching_tarballs($path, $prefix);
+    if (!any { m{ [.]tar [.]xz \z }xms } @files) {
+        my $gzip_file = lastval { m{ [.]tar [.]gz \z }xms } @files;
+        systemx('gzip', '-dk', File::Spec->catfile($path, $gzip_file));
+        my $tar_file = $gzip_file;
+        $tar_file =~ s{ [.]gz \z }{}xms;
+        systemx('xz', File::Spec->catfile($path, $tar_file));
+    }
+    return;
+}
 
 # Given a source directory, a prefix for tarballs and related files (such as
 # signatures), and a destination directory, move all matching files from the
@@ -74,14 +186,7 @@ our %COMMANDS = (
 #         Text exception on failure to move a file
 sub _move_tarballs {
     my ($self, $source_path, $prefix, $dest_path) = @_;
-
-    # Find all matching files.
-    my $pattern = qr{ \A \Q$prefix\E - \d.* [.]tar [.][xg]z \z }xms;
-    opendir(my $source, $source_path);
-    my @files = grep { $_ =~ $pattern } readdir($source);
-    closedir($source);
-
-    # Move the files.
+    my @files = $self->_find_matching_tarballs($source_path, $prefix);
     for my $file (@files) {
         my $source_file = File::Spec->catfile($source_path, $file);
         move($source_file, $dest_path)
@@ -154,6 +259,30 @@ sub new {
     return $self;
 }
 
+# Given a distribution tarball compressed with gzip, ensure that every file
+# from the source directory that is expected to be there is in the
+# distribution tarball.  Assumes that it is run from the root of the source
+# directory.
+#
+# $self    - The App::DocKnot::Dist object
+# $source  - Path to the source directory
+# $tarball - Path to a gzip-compressed distribution tarball
+#
+# Returns: A list of files missing from the distribution (so an empty list
+#          means all expected files were found)
+sub check_dist {
+    my ($self, $source, $tarball) = @_;
+    my @expected = $self->_expected_dist_files(getcwd());
+    my %expected = map { $_ => 1 } @expected;
+    my $archive  = Archive::Tar->new($tarball);
+    for my $file ($archive->list_files()) {
+        $file =~ s{ \A [^/]* / }{}xms;
+        delete $expected{$file};
+    }
+    my @missing = sort(keys(%expected));
+    return @missing;
+}
+
 # Analyze a source directory and return the list of commands to run to
 # generate a distribution tarball.
 #
@@ -162,8 +291,8 @@ sub new {
 # Returns: List of commands, each of which is a list of strings representing
 #          a command and its arguments
 sub commands {
-    my ($self) = @_;
-    my $type = $self->{config}{build}{type};
+    my ($self)   = @_;
+    my $type     = $self->{config}{build}{type};
     my @commands = map { [@$_] } $COMMANDS{$type}->@*;
 
     # Special-case: If a specific path to Perl was configured, use that path
@@ -180,7 +309,6 @@ sub commands {
         #<<<
         my @extra = (
             ['./configure', 'CC=g++'],
-            ['make', 'warnings'],
             ['make', 'check'],
             ['make', 'clean'],
         );
@@ -205,16 +333,27 @@ sub commands {
 # $self - The App::DocKnot::Dist object
 #
 # Throws: Text exception if any of the commands fail
+#         Text exception if the distribution is missing files
 sub make_distribution {
     my ($self) = @_;
 
-    # Export the Git repository into a new directory.
+    # Determine the source directory and the distribution directory name.
     my $source = getcwd() or die "cannot get current directory: $!\n";
     my $prefix = $self->{config}{distribution}{tarname};
-    my @git    = ('git', 'archive', "--remote=$source", "--prefix=${prefix}/",
+
+    # If the distribution directory name already exists, remove it.  Automake
+    # may have made parts of it read-only, so be forceful in the removal.
+    # Note that this does not pass the safe parameter and therefore should not
+    # be called on attacker-controlled directories.
+    chdir($self->{distdir});
+    if (-d $prefix) {
+        remove_tree($prefix);
+    }
+
+    # Export the Git repository into a new directory.
+    my @git = ('git', 'archive', "--remote=$source", "--prefix=${prefix}/",
         'master',);
     my @tar = qw(tar xf -);
-    chdir($self->{distdir});
     run(\@git, q{|}, \@tar) or die "@git | @tar failed with status $?\n";
 
     # Change to that directory and run the configured commands.
@@ -229,6 +368,24 @@ sub make_distribution {
     # Remove the working tree.
     chdir(File::Spec->updir());
     remove_tree($prefix, { safe => 1 });
+
+    # Generate additional compression formats if needed.
+    $self->_generate_compression_formats(getcwd(), $prefix);
+
+    # Check the distribution for any missing files.  If there are any, report
+    # them and then fail with an error.
+    my $tarball = $self->_find_gzip_tarball(getcwd(), $prefix);
+    chdir($source);
+    my @missing = $self->check_dist($source, $tarball);
+    if (@missing) {
+        print "Files found in local tree but not in distribution:\n"
+          or die "cannot print to stdout: $!\n";
+        print q{    } . join(qq{\n    }, @missing) . "\n"
+          or die "cannot print to stdout: $!\n";
+        my $count = scalar(@missing);
+        my $files = ($count == 1) ? '1 file' : "$count files";
+        die "$files missing from distribution\n";
+    }
     return;
 }
 
@@ -241,7 +398,7 @@ __END__
 
 =for stopwords
 Allbery DocKnot MERCHANTABILITY NONINFRINGEMENT sublicense JSON CPAN ARGS
-distdir
+distdir Automake xz
 
 =head1 NAME
 
@@ -285,8 +442,9 @@ following keys:
 
 =item distdir
 
-The path to the directory into which to put the distribution tarball.
-Required.
+The path to the directory into which to put the distribution tarball.  This
+should point to a trusted directory, not one where an attacker could have
+written files (see make_distribution() below).  Required.
 
 =item metadata
 
@@ -307,16 +465,43 @@ PATH.
 
 =over 4
 
+=item check_dist(SOURCE, TARBALL)
+
+Given the path to a source directory and the path to a gzip-compressed
+distribution tarball made from that directory, return the list of files that
+should be in the tarball but aren't.  An empty list means that all files in
+the source tree expected to be in the distribution are present.
+
+This method is provided primarily for testing convenience and is normally just
+an implementation detail of make_distribution().
+
 =item commands()
 
 Return the commands that should be run to generate a distribution tarball as a
 reference to an array of arrays.  Each included array is a single command.
+
 This method is provided primarily for testing convenience and is normally just
 an implementation detail of make_distribution().
 
 =item make_distribution()
 
-Generate a distribution tarball in the C<destdir> directory provided to new().
+Generate distribution tarballs in the C<destdir> directory provided to new().
+
+If C<destdir> already contains a subdirectory whose name matches the
+C<tarname> of the distribution, it will be forcibly removed.  In order to
+successfully remove trees that result from Automake's C<make distcheck>
+failing partway through, App::DocKnot::Dist will change permissions as needed
+to remove an existing directory.  For security reasons, the C<distdir>
+parameter of this module should therefore only be pointed to a trusted
+directory, not one where an attacker could have written files.
+
+If the native distribution tarball generation commands for the package
+generate a gzip-compressed tarball but not an xz-compressed tarball, an
+xz-compressed tarball will be created.
+
+After the distribution is created, check_dist() will be run on it.  If any
+files are missing from the distribution, they will be reported to standard
+output and then an exception will be thrown.
 
 =back
 
@@ -326,7 +511,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019 Russ Allbery <rra@cpan.org>
+Copyright 2019-2020 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

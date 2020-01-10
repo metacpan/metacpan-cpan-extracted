@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::weaver;
 
-our $DATE = '2017-01-20'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2019-11-20'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 1;
 # ABSTRACT: lcpan subcommands related to Pod::Weaver
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::weaver - lcpan subcommands related to Pod::Weaver
 
 =head1 VERSION
 
-This document describes version 0.02 of App::lcpan::CmdBundle::weaver (from Perl distribution App-lcpan-CmdBundle-weaver), released on 2017-01-20.
+This document describes version 0.030 of App::lcpan::CmdBundle::weaver (from Perl distribution App-lcpan-CmdBundle-weaver), released on 2019-11-20.
 
 =head1 SYNOPSIS
 
@@ -68,29 +68,37 @@ This bundle provides the following lcpan subcommands:
 
 =over
 
-=item * L<lcpan weaver-authors-by-plugin-count|App::lcpan::Cmd::weaver_authors_by_plugin_count>
+=item * L<lcpan weaver-roles|App::lcpan::Cmd::weaver_roles>
 
 =item * L<lcpan weaver-bundles-by-rdep-count|App::lcpan::Cmd::weaver_bundles_by_rdep_count>
-
-=item * L<lcpan weaver-bundles|App::lcpan::Cmd::weaver_bundles>
-
-=item * L<lcpan weaver-roles|App::lcpan::Cmd::weaver_roles>
 
 =item * L<lcpan weaver-sections-by-rdep-count|App::lcpan::Cmd::weaver_sections_by_rdep_count>
 
 =item * L<lcpan weaver-authors-by-role-count|App::lcpan::Cmd::weaver_authors_by_role_count>
 
-=item * L<lcpan weaver-sections|App::lcpan::Cmd::weaver_sections>
-
-=item * L<lcpan weaver-roles-by-rdep-count|App::lcpan::Cmd::weaver_roles_by_rdep_count>
-
 =item * L<lcpan weaver-plugins-by-rdep-count|App::lcpan::Cmd::weaver_plugins_by_rdep_count>
 
+=item * L<lcpan weaver-section|App::lcpan::Cmd::weaver_section>
+
+=item * L<lcpan weaver-plugin|App::lcpan::Cmd::weaver_plugin>
+
 =item * L<lcpan weaver-authors-by-bundle-count|App::lcpan::Cmd::weaver_authors_by_bundle_count>
+
+=item * L<lcpan weaver-bundles|App::lcpan::Cmd::weaver_bundles>
+
+=item * L<lcpan weaver-bundle|App::lcpan::Cmd::weaver_bundle>
+
+=item * L<lcpan weaver-authors-by-plugin-count|App::lcpan::Cmd::weaver_authors_by_plugin_count>
+
+=item * L<lcpan weaver-role|App::lcpan::Cmd::weaver_role>
 
 =item * L<lcpan weaver-authors-by-section-count|App::lcpan::Cmd::weaver_authors_by_section_count>
 
 =item * L<lcpan weaver-plugins|App::lcpan::Cmd::weaver_plugins>
+
+=item * L<lcpan weaver-sections|App::lcpan::Cmd::weaver_sections>
+
+=item * L<lcpan weaver-roles-by-rdep-count|App::lcpan::Cmd::weaver_roles_by_rdep_count>
 
 =back
 
@@ -124,7 +132,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,27 +6,28 @@ overload::open - Hooks the native open function
 
   use overload::open;
   my %opened_files;
-  sub my_callback { return if !@_; $opened_files{shift}++ }
+  sub my_callback { return if @_ != 2 && @_ != 3; $opened_files{$_[-1]}++ }
   overload::open->prehook_open(\&my_callback);
   open my $fh, '>', "foo.txt";
 
 =head1 DESCRIPTION
 
-This module hooks the native C<open()> and/or C<sysopen()> functions and passes the
-arguments first to your function and then calls sends it
-to the provided subroutine functions instead.
-It does this using XS and replacing the OP_OPEN/OP_SYSOPEN opcode's with an XS
-function. This function will call your provided sub, then once that returns
-it will run the original OP.
+This module hooks the native C<open()> and/or C<sysopen()> functions and passes
+the arguments first to callback you provide. It then calls the native open/sysopen.
+
+It does this using the XS API and replacing the OP_OPEN/OP_SYSOPEN opcode's
+with an XS function. This function will call your provided sub, then once that
+returns it will run the original OP.
 
 =head1 FEATURES
 
-This function will work fine if you call C<open> or C<sysopen> inside the callback
-due to it detecting recursive calls and not calling the callback for recursive calls.
+This function will work fine if you call C<open> or C<sysopen> inside the
+callback due to it detecting recursive calls and not calling the callback for
+recursive calls.
 
-You are not allowed to pass XS subs as the callback because then this could result
-in a recursive loop. If you need to do this, wrap the XS function in a native Perl
-function.
+You are not allowed to pass XS subs as the callback because then this could
+result in a recursive loop. If you need to do this, wrap the XS function in a
+native Perl function.
 
 =head1 METHODS
 

@@ -1,5 +1,12 @@
 Revision history for App-MultiSsh
 
+0.23   2020-01-08
+        Updating for release of version 0.23
+        Updated date (Ivan Wills)
+        Added note about usage (Ivan Wills)
+        making bin wait (Ivan Wills)
+        Fixing up travis build versions (Ivan Wills)
+
 0.22   2018-07-16
         Updating for release of version 0.22
         Getting nesting working properly (Ivan Wills)

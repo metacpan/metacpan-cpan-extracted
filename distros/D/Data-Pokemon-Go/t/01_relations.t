@@ -7,8 +7,12 @@ use Test::More::UTF8;
 
 use lib './lib';
 
-use_ok 'Data::Pokemon::Go::Relation';                                   # 1
+BEGIN{
+    use_ok( 'Data::Pokemon::Go::Relation', qw( @ALL ) );                                   # 1
+}
+
 my @types = @Data::Pokemon::Go::Role::Types::All;
+
 new_ok 'Data::Pokemon::Go::Relation', [ types => 'ノーマル' ];            # 2
 new_ok 'Data::Pokemon::Go::Relation', [ types => [qw( みず こおり )] ];   # 3
 

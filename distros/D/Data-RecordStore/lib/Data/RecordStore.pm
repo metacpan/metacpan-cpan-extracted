@@ -64,7 +64,7 @@ use Data::RecordStore::Transaction;
 
 use vars qw($VERSION);
 
-$VERSION = '6.02';
+$VERSION = '6.03';
 my $SILO_VERSION = '6.00';
 
 use constant {
@@ -788,12 +788,12 @@ the given directory, if any.
 
 =head1 COPYRIGHT AND LICENSE
 
-       Copyright (c) 2015-2019 Eric Wolf. All rights reserved.
+       Copyright (c) 2015-2020 Eric Wolf. All rights reserved.
        This program is free software; you can redistribute it
        and/or modify it under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 5.04  (Aug, 2019))
+       Version 6.03  (Jan, 2020))
 
 =cut
 

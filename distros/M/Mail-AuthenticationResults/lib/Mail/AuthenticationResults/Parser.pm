@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Parser;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180923'; # VERSION
+our $VERSION = '1.20200108'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Header;
@@ -69,6 +69,8 @@ sub tokenise {
         my $token;
         $header =~ s/^\s+//;
 
+        my $last_non_comment_type = exists( $args->{ 'last_non_comment_type' } ) ? $args->{ 'last_non_comment_type' }->is() : 'none';
+
         if ( length( $header ) == 0 ) {
             last;
         }
@@ -83,8 +85,13 @@ sub tokenise {
             $token = Mail::AuthenticationResults::Token::QuotedString->new( $header, $args );
             $args->{ 'last_non_comment_type' } = $token;
         }
-        elsif ( $header =~ /^\./ ) {
+        elsif ( $last_non_comment_type ne 'assignment' && $header =~ /^\./ ) {
             $token = Mail::AuthenticationResults::Token::Assignment->new( $header, $args );
+            $args->{ 'last_non_comment_type' } = $token;
+        }
+        elsif ( $last_non_comment_type eq 'assignment' && $header =~ /^\./ ) {
+            # a . after an assignment cannot be another assignment, likely an unquoted string.
+            $token = Mail::AuthenticationResults::Token::String->new( $header, $args );
             $args->{ 'last_non_comment_type' } = $token;
         }
         elsif ( $header =~ /^\// ) {
@@ -318,7 +325,7 @@ Mail::AuthenticationResults::Parser - Class for parsing Authentication Results H
 
 =head1 VERSION
 
-version 1.20180923
+version 1.20200108
 
 =head1 DESCRIPTION
 

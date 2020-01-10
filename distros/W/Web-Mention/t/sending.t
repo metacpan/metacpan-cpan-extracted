@@ -18,6 +18,7 @@ my $html_link_target = "$target/c";
 my $no_endpoint_target = "$target/d";
 my $no_webmention_target = "$target/e";
 my $garbage_target = "$target/f";
+my $http_target_no_rel = "$target/g";
 my $evil_target = "http://localhost/muhuhuhahaha";
 
 set_up_test_useragent();
@@ -138,6 +139,29 @@ note("Invalid target - Provides a garbage non-URL as its endpoint");
         source => $source,
         target => $garbage_target,
     );
+    ok ( ! $wm->send );
+}
+
+note("Invalid target - Returns Link header without relation");
+{
+    Web::Mention->ua->map_response(
+        qr{$http_target_no_rel}, HTTP::Response->new(
+            200,
+            'OK',
+            [
+                'Content-Type' => 'application/x-www-form-urlencoded',
+                'Link' => qq{<$good_webmention_endpoint>}
+            ],
+            'Look in the headers for the endpoint, genius.',
+        )
+    );
+
+
+    my $wm = Web::Mention->new(
+        source => $source,
+        target => $http_target_no_rel,
+    );
+
     ok ( ! $wm->send );
 }
 

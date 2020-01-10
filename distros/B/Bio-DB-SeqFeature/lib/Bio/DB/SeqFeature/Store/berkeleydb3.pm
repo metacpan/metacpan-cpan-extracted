@@ -1,5 +1,5 @@
 package Bio::DB::SeqFeature::Store::berkeleydb3;
-$Bio::DB::SeqFeature::Store::berkeleydb3::VERSION = '1.7.3';
+$Bio::DB::SeqFeature::Store::berkeleydb3::VERSION = '1.7.4';
 # $Id: berkeleydb3.pm 15987 2009-08-18 21:08:55Z lstein $
 # faster implementation of berkeleydb
 

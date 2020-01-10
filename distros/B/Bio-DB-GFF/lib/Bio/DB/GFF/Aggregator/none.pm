@@ -23,7 +23,7 @@ aggregate() so that they do exactly nothing.
 =cut
 
 package Bio::DB::GFF::Aggregator::none;
-$Bio::DB::GFF::Aggregator::none::VERSION = '1.7.3';
+$Bio::DB::GFF::Aggregator::none::VERSION = '1.7.4';
 use strict;
 
 use base qw(Bio::DB::GFF::Aggregator);

@@ -1,3 +1,6 @@
+1.000     2020-01-09 18:45:09 EST
+  - Convert to use FFI::Platypus type parser version 1, no functional changes.
+
 0.002     2018-02-17 22:15:28 EST
   - Die with EINVAL error if a nonexistent username is passed to initgroups or getgrouplist
   - Fix tests for unspecified behavior on OS X (thanks plicease)

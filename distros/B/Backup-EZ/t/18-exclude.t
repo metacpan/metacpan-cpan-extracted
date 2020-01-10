@@ -86,8 +86,8 @@ sub get_dest_foo_dir {
 
     my ($backup_dir) = $ez->get_list_of_backups();
     my $foo_dir = sprintf( '%s/%s%s',
-        $ez->get_dest_dir, $backup_dir, get_root_backup_dir($ez), SRC_FOO_DIR() );
-
+        $ez->get_dest_dir, $backup_dir, get_root_backup_dir($ez));
+    
     return $foo_dir;
 }
 

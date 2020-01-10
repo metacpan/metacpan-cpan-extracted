@@ -3,6 +3,6 @@ use Mojo::Base -role;
 
 with 'Mojo::DB::Results::Role::MoreMethods';
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 1;

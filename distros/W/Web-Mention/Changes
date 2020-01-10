@@ -1,5 +1,9 @@
 Revision history for Web::Mention
 
+0.704 2020-01-08T21:13:41Z
+
+    - Improved handling of targets that specify a `Link` HTTP header with a URL but no `rel` value. (Thanks to Tomaž Šolc for the patch.)
+
 0.703 2019-06-23T17:07:03Z
 
     - Adding a 'time_published' read-only attribute.

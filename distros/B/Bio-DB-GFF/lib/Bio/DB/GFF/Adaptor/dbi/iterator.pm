@@ -34,7 +34,7 @@ it under the same terms as Perl itself.
 =cut
 
 package Bio::DB::GFF::Adaptor::dbi::iterator;
-$Bio::DB::GFF::Adaptor::dbi::iterator::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::dbi::iterator::VERSION = '1.7.4';
 use strict;
 use Bio::Root::Version;
 

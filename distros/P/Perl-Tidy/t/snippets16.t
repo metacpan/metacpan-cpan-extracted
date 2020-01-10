@@ -14,6 +14,10 @@
 #11 rt130394.def
 #12 rt131115.def
 #13 rt131115.rt131115
+#14 ndsm1.def
+#15 ndsm1.ndsm
+#16 rt131288.def
+#17 rt130394.rt130394
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -33,6 +37,8 @@ BEGIN {
     $rparams = {
         'def'      => "",
         'git10'    => "-wn -ce -cbl=sort,map,grep",
+        'ndsm'     => "-ndsm",
+        'rt130394' => "-olbn=1",
         'rt131115' => "-bli",
         'spp1'     => "-spp=1",
         'spp2'     => "-spp=2",
@@ -100,8 +106,18 @@ $start   = $end     = $len = $ismut = $number = $allele_ori = $allele_mut =
   $proof = $xxxxreg = $reg = $dist  = '';
 ----------
 
+        'ndsm1' => <<'----------',
+;;;;; # 1 trapped semicolon 
+sub numerically {$a <=> $b};
+;;;;; 
+sub Numerically {$a <=> $b};  # trapped semicolon
+@: = qw;2c72656b636168 
+  2020202020 
+  ;; __;
+----------
+
         'rt130394' => <<'----------',
-# rt130394: keep on one line
+# rt130394: keep on one line with -olbn=1
 $factorial = sub { reduce { $a * $b } 1 .. 11 };
 ----------
 
@@ -113,6 +129,11 @@ sub a {
         $uniq{$par} = 1;
     }
 }
+----------
+
+        'rt131288' => <<'----------',
+sub OptArgs2::STYLE_FULL { 3 }
+$style == OptArgs2::STYLE_FULL ? 'FullUsage' : 'NormalUsage', 'usage: ' . $usage . "\n";
 ----------
 
         'spp' => <<'----------',
@@ -254,8 +275,10 @@ sub head {
             source => "rt130394",
             params => "def",
             expect => <<'#11...........',
-# rt130394: keep on one line
-$factorial = sub { reduce { $a * $b } 1 .. 11 };
+# rt130394: keep on one line with -olbn=1
+$factorial = sub {
+    reduce { $a * $b } 1 .. 11;
+};
 #11...........
         },
 
@@ -287,6 +310,63 @@ sub a
       }
   }
 #13...........
+        },
+
+        'ndsm1.def' => {
+            source => "ndsm1",
+            params => "def",
+            expect => <<'#14...........',
+;    # 1 trapped semicolon
+sub numerically { $a <=> $b }
+
+sub Numerically { $a <=> $b };    # trapped semicolon
+@: = qw;2c72656b636168
+  2020202020
+  ;;
+__;
+#14...........
+        },
+
+        'ndsm1.ndsm' => {
+            source => "ndsm1",
+            params => "ndsm",
+            expect => <<'#15...........',
+;
+;
+;
+;
+;    # 1 trapped semicolon
+sub numerically { $a <=> $b };
+;
+;
+;
+;
+;
+sub Numerically { $a <=> $b };    # trapped semicolon
+@: = qw;2c72656b636168
+  2020202020
+  ;;
+__;
+#15...........
+        },
+
+        'rt131288.def' => {
+            source => "rt131288",
+            params => "def",
+            expect => <<'#16...........',
+sub OptArgs2::STYLE_FULL { 3 }
+$style == OptArgs2::STYLE_FULL ? 'FullUsage' : 'NormalUsage',
+  'usage: ' . $usage . "\n";
+#16...........
+        },
+
+        'rt130394.rt130394' => {
+            source => "rt130394",
+            params => "rt130394",
+            expect => <<'#17...........',
+# rt130394: keep on one line with -olbn=1
+$factorial = sub { reduce { $a * $b } 1 .. 11 };
+#17...........
         },
     };
 

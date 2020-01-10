@@ -1,5 +1,5 @@
 package Bio::DB::GFF::Adaptor::dbi::pg;
-$Bio::DB::GFF::Adaptor::dbi::pg::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::dbi::pg::VERSION = '1.7.4';
 =head1 NAME
 
 Bio::DB::GFF::Adaptor::dbi::pg -- Database adaptor for a specific postgres schema

@@ -12,7 +12,12 @@ need_root_and_prepare();
 test_install_rpm_fail('pre');
 test_install_rpm_fail('pretrans');
 test_install_rpm('post');
-test_install_rpm_but_uninstall_fail('preun');
+require urpm::select;
+if (urpm::select::_rpm_version() lt 4.13.0) { # && -e '/etc/mageia-release') {
+    test_install_rpm('preun');
+} else {
+    test_install_rpm_but_uninstall_fail('preun');
+}
 test_install_rpm('postun');
 test_install_rpm('posttrans');
 

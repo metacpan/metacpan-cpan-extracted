@@ -2,7 +2,7 @@ requires        'Function::Parameters';
 requires        'Import::Into';
 requires        'Role::Tiny';
 requires        'Type::Params';
-requires        'Types::Interface';
+requires        'Types::Interface', '0.002';
 requires        'Types::Standard';
 
 

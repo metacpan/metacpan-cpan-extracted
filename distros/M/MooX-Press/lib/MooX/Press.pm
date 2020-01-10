@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013';
+our $VERSION   = '0.018';
 
 use Types::Standard -is;
 use Exporter::Tiny qw(mkopt);
@@ -25,6 +25,8 @@ my @delete_keys = qw(
 	after
 	type_name
 	can
+	type_library_can
+	factory_package_can
 );
 
 my $_handle_list = sub {
@@ -99,6 +101,17 @@ sub import {
 		);
 	}
 	
+	{
+		my %methods;
+		my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
+		
+		%methods = delete($opts{factory_package_can})->$_handle_list_add_nulls;
+		$builder->$method_installer($opts{'factory_package'}||$opts{'caller'}, \%methods) if keys %methods;
+		
+		%methods = delete($opts{type_library_can})->$_handle_list_add_nulls;
+		$builder->$method_installer($opts{type_library}, \%methods) if keys %methods;
+	}
+	
 	for my $role (@roles) {
 		my ($pkg_name, $pkg_opts) = @$role;
 		$builder->do_coercions_for_role($pkg_name, $pkg_opts->$_handle_list, %opts);
@@ -169,9 +182,14 @@ sub munge_class_options {
 sub qualify_name {
 	shift;
 	my ($name, $prefix, $parent) = @_;
-	return join("::", $parent, $1) if (defined $parent and $name =~ /^\+(.+)/);
-	return $1 if $name =~ /^::(.+)$/;
-	$prefix ? join("::", $prefix, $name) : $name;
+	my $sigil = "";
+	if ($name =~ /^[@%\$]/) {
+		$sigil = substr $name, 0, 1;
+		$name  = substr $name, 1;
+	}
+	return $sigil.join("::", $parent, $1) if (defined $parent and $name =~ /^\+(.+)/);
+	return $sigil.$1 if $name =~ /^::(.+)$/;
+	$prefix ? $sigil.join("::", $prefix, $name) : $sigil.$name;
 }
 
 sub type_name {
@@ -222,6 +240,20 @@ sub prepare_type_library {
 	my $getter = sub {
 		my $me = shift;
 		my ($kind, $target) = @_;
+		if ($target =~ /^([@%])(.+)$/) {
+			my $sigil = $1;
+			$target = $2;
+			if ($sigil eq '@') {
+				require Types::Standard;
+				return Types::Standard::ArrayRef->of($types_hash{$kind}{$target})
+					if $types_hash{$kind}{$target};
+			}
+			elsif ($sigil eq '%') {
+				require Types::Standard;
+				return Types::Standard::HashRef->of($types_hash{$kind}{$target})
+					if $types_hash{$kind}{$target};
+			}
+		}
 		$types_hash{$kind}{$target};
 	};
 	if (defined $opts{'factory_package'} or not exists $opts{'factory_package'}) {
@@ -426,10 +458,13 @@ sub _make_package {
 	
 	my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
 	{
-		my %methods = $opts{can}->$_handle_list_add_nulls;
-		if (keys %methods) {
-			$builder->$method_installer($qname, \%methods);
-		}
+		my %methods;
+		%methods = $opts{can}->$_handle_list_add_nulls;
+		$builder->$method_installer($qname, \%methods) if keys %methods;
+		%methods = $opts{factory_package_can}->$_handle_list_add_nulls;
+		$builder->$method_installer($opts{'factory_package'}||$opts{'caller'}, \%methods) if keys %methods;
+		%methods = $opts{type_library_can}->$_handle_list_add_nulls;
+		$builder->$method_installer($opts{type_library}, \%methods) if keys %methods;
 	}
 	
 	{
@@ -926,6 +961,14 @@ considerably slower than for immutable classes, so this is usually a bad
 idea.
 
 Only supported for Moose. Unnecessary for Moo anyway. Defaults to false.
+
+=item C<< factory_package_can >> I<< (HashRef[CodeRef]) >>
+
+Hashref of additional subs to install into the factory package.
+
+=item C<< type_library_can >> I<< (HashRef[CodeRef]) >>
+
+Hashref of additional subs to install into the factory package.
 
 =back
 
@@ -1512,15 +1555,76 @@ name and your application's namespace prefix is added. So
 C<< isa => "HashRef" >> doesn't mean what you think it means. It means
 an object blessed into the "YourApp::HashRef" class.
 
-Use blessed type constraint objects, such as those from L<Types::Standard>.
+That is a feature though, not a weakness.
+
+  use MooX::Press (
+    prefix  => 'Nature',
+    class   => [
+      'Leaf'  => {},
+      'Tree'  => {
+        has  => {
+          'nicest_leaf'  => { isa => 'Leaf' },
+        },
+      },
+    ],
+  );
+
+The C<< Nature::Tree >> and C<< Nature::Leaf >> classes will be built, and
+MooX::Press knows that the C<nicest_leaf> is supposed to be a blessed
+C<< Nature::Leaf >> object.
+
+String type names can be prefixed with C<< @ >> or C<< % >> to indicate an
+arrayref or hashref of a type:
+
+  use MooX::Press (
+    prefix  => 'Nature',
+    class   => [
+      'Leaf'  => {},
+      'Tree'  => {
+        has  => {
+          'foliage'  => { isa => '@Leaf' },
+        },
+      },
+    ],
+  );
+
+For more everything else, use blessed type constraint objects, such as those
+from L<Types::Standard>, or use C<type> as documented below.
+
+  use Types::Standard qw( Str );
+  use MooX::Press (
+    prefix  => 'Nature',
+    class   => [
+      'Leaf'  => {},
+      'Tree'  => {
+        has  => {
+          'foliage'  => { isa => '@Leaf' },
+          'species'  => { isa => Str },
+        },
+      },
+    ],
+  );
 
 =item C<< type >> I<< (Str) >>
 
 C<< type => "HashRef" >> does what you think  C<< isa => "HashRef" >> should
-do. More specifically it searches your type library, along with
+do. More specifically it searches (by name) your type library, along with
 L<Types::Standard>, L<Types::Common::Numeric>, and L<Types::Common::String>
 to find the type constraint it thinks you wanted. It's smart enough to deal
 with parameterized types, unions, intersections, and complements.
+
+  use MooX::Press (
+    prefix  => 'Nature',
+    class   => [
+      'Leaf'  => {},
+      'Tree'  => {
+        has  => {
+          'foliage'  => { isa  => '@Leaf' },
+          'species'  => { type => 'Str' },
+        },
+      },
+    ],
+  );
 
 =item C<< coerce >> I<< (Bool) >>
 
@@ -1676,7 +1780,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2019 by Toby Inkster.
+This software is copyright (c) 2019-2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

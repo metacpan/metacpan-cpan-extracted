@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,9 +21,10 @@ name: WebService-Europeana
 provides:
   WebService::Europeana:
     file: lib/WebService/Europeana.pm
-    version: v0.0.3
+    version: v0.0.4
 requires:
   JSON: '2.90'
+  LWP::Protocol::https: '6.07'
   LWP::UserAgent: '6.15'
   Log::Any: '1.032'
   Method::Signatures: '20141021'
@@ -36,5 +37,6 @@ resources:
   bugtracker: https://github.com/hatorikibble/webservice-europeana/issues
   homepage: https://github.com/hatorikibble/webservice-europeana
   repository: https://github.com/hatorikibble/webservice-europeana.git
-version: 0.0.3
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: 0.0.4
+x_generated_by_perl: v5.20.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

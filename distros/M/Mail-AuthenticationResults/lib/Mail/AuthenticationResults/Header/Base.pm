@@ -4,8 +4,9 @@ package Mail::AuthenticationResults::Header::Base;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180923'; # VERSION
+our $VERSION = '1.20200108'; # VERSION
 use Scalar::Util qw{ weaken refaddr };
+use JSON;
 use Carp;
 
 use Mail::AuthenticationResults::Header::Group;
@@ -230,6 +231,30 @@ sub as_string_prefix {
     return $indent;
 }
 
+sub _as_hashref {
+    my ( $self ) = @_;
+
+    my $type = lc ref $self;
+    $type =~ s/^(.*::)//;
+    my $hashref = { 'type' => $type };
+
+    $hashref->{'key'} = $self->key() if $self->_HAS_KEY();
+    $hashref->{'value'} = $self->value() if $self->_HAS_VALUE();
+    if ( $self->_HAS_CHILDREN() ) {
+        my @children = map { $_->_as_hashref() } @{ $self->children() };
+        $hashref->{'children'} = \@children;
+    }
+    return $hashref;
+}
+
+
+sub as_json {
+    my ( $self ) = @_;
+    my $J = JSON->new();
+    $J->canonical();
+    return $J->encode( $self->_as_hashref() );
+}
+
 
 sub as_string {
     my ( $self ) = @_;
@@ -389,7 +414,7 @@ Mail::AuthenticationResults::Header::Base - Base class for modelling parts of th
 
 =head1 VERSION
 
-version 1.20180923
+version 1.20200108
 
 =head1 DESCRIPTION
 
@@ -509,6 +534,10 @@ Returns the top Header object and depth of this child
 
 Add the prefix to as_string for this object when calledas a child
 of another objects as_string method call.
+
+=head2 as_json()
+
+Return this instance as a JSON serialised string
 
 =head2 as_string()
 

@@ -18,9 +18,9 @@ no_index:
     - t
     - inc
 requires:
-  Mojolicious: '1.78'
+  Mojolicious: '7.93'
   perl: '5.008'
 resources:
   repository: git://github.com/giterlizzi/perl-Mojolicious-Plugin-Iconify
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

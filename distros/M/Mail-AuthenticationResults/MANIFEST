@@ -29,6 +29,7 @@ t/02-children.t
 t/02-comment.t
 t/02-get.t
 t/02-none.t
+t/02-parser-begin-dot.t
 t/02-parser-quoted.t
 t/02-parser.t
 t/02-safe_set.t
@@ -47,6 +48,7 @@ t/04-mail.ru.t
 t/04-outlook.t
 t/04-yahoo.t
 t/04-yandex.t
+t/05-as-json.t
 t/05-as_string-styles.t
 t/05-as_string-wrap.t
 t/05-eol.t
@@ -54,3 +56,4 @@ t/05-parser-comment-heavy.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+weaver.ini

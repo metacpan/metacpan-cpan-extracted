@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => "2.1",
     "File::Basename" => "2.5"
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }

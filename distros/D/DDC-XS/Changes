@@ -1,5 +1,11 @@
 #-*- Mode: ChangeLog -*-
 
+v0.23 Thu, 09 Jan 2020 14:53:21 +0100 moocow
+	* added quick&dirty thread-safety class-method DDC::XS::Object::CLONE_SKIP a lka https://perldoc.perl.org/perlmod.html#Making-your-module-threadsafe
+
+v0.22 Thu, 21 Nov 2019 16:28:01 +0100 moocow [UNRELEASED]
+	* added tests for DDC v2.2.0 subcorpus paths (bare '/' and '*' in subcorpus labels)
+
 v0.21 Fri, 24 Aug 2018 11:12:01 +0200 moocow
 	* added support for CQueryOptions::m_Comments (requires DDC >= v2.1.16)
 

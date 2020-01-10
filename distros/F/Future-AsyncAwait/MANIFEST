@@ -17,6 +17,8 @@ hax/wrap_keyword_plugin.c.inc
 lib/Future/AsyncAwait.h
 lib/Future/AsyncAwait.pm
 lib/Future/AsyncAwait.xs
+lib/Future/AsyncAwait/Awaitable.pm
+lib/Test/Future/AsyncAwait/Awaitable.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -49,6 +51,9 @@ t/42unresolved.t
 t/43failure.t
 t/44sub-attrs.t
 t/45sub-signatures.t
+t/50future-subclass.t
+t/51awaitable-role.t
+t/52awaitable-future.t
 t/80await+dynamically.t
 t/80await+try.t
 t/81memory-growth.t

@@ -7,6 +7,13 @@ use Carp qw(carp confess);
 use strict;
 
 ##======================================================================
+## Administrivia
+
+## $bool = PACKAGE::CLONE_SKIP()
+##  + thread-safety hack a la https://perldoc.perl.org/perlmod.html#Making-your-module-threadsafe
+sub CLONE_SKIP { 1 }
+
+##======================================================================
 ## Traversal
 
 ##--------------------------------------------------------------

@@ -1,8 +1,12 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.27 2019-07-05T17:21:58
- - Add documentation for usage of promptuser_default option
- - Fix Italian translation
+0.28 2020-01-07T22:52:14
+ - Fix #131391: Mastodon::Client 0.016 sends now '599 Internal Exception'
+   when authentication fails
+
+0.27 2020-01-07T22:50:58Z
+ - Fix #131391: Mastodon::Client 0.016 sends now '599 Internal Exception'
+   when authentication fails
 
 0.26 2019-06-08T15:16:33Z
  - Add dependency to LWP::Protocol::https

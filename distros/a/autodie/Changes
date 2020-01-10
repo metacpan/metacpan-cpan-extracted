@@ -1,5 +1,55 @@
 Revision history for autodie
 
+2.31      2020-01-08 00:37:45-06:00 America/Chicago
+
+        * TEST BUGFIX: Correct diag explain in t/version.t
+          so it'll pass on perl 5.8
+
+        * TEST BUGFIX: Only test t/no-all.t if optional
+          IPC::System::Simple is available
+
+        * BUILD: Switch automated testing to github actions
+
+        * TEST BUGFIX: Turn off t/kill.t for windows. Recent
+          versions of windows seem to choke when doing:
+          `kill 0, $$;`
+
+2.30      2020-01-02 16:51:16-06:00 America/Chicago
+
+        * BUGFIX: Fix a boolean logic precedence error causing
+          a "useless use of numeric" warning when using kill
+          with a signal of 0.  Thanks to Maurice Aubrey for
+          reporting the issue and providing a Pull Request
+          for it.  (GH#76)
+
+        * BUGFIX: Apply patch from Niko Tyni to fix a scoping
+          issue "no autodie" and the "system" sub.  (GH#69)
+
+        * BUGFIX / DOC: Update code and documentation about
+          smartmatch to match current the current support
+          in perl.  Thanks to Zefram; cherry-picked from
+          perl core.  (GH#83)
+
+        * DOC: Fix a POD error and some unnecessary spaces
+          that tripped POD parsers.  Thanks to Aaron Crane
+          and Chase Whitener for reporting the issues plus
+          providing Pull Requests for it.  (GH#51 and GH#79)
+
+        * DOC: Document how to use Import::Into with autodie.
+          (GH#50)
+
+        * BUILD: Clean up of dzil.ini removing some unnecessary
+          test recommends.  Thanks to Karen Etheridge for
+          reporting the issue and providing a Pull Requests
+          for it.  (GH#78)
+
+        * TEST BUGFIX: Set binmode on some file handles to fix
+          issues on Windows.  Thanks to Tony Cook; cherry-picked
+          from perl core.  (GH#83)
+
+        * TEST / INTERNAL / TRAVIS: Also test with Perl 5.22,
+          5.24, 5.26 and 5.28.
+
 2.29      2015-07-09 17:16:38+10:00 Australia/Melbourne
         * BUGFIX: Apply patch from Karen Etheridge to install
           autodie and Fatal into 'perl' rather than 'site'

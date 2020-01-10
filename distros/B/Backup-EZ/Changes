@@ -1,33 +1,179 @@
-Revision history for Backup-EZ
+==================================================
+Changes from 2019-01-09 00:00:00 +0000 to present.
+==================================================
 
-0.40    - Add feature to provide extra_rsync_opts via config file
+-----------------------------------------
+version 0.43 at 2020-01-09 16:36:53 +0000
+-----------------------------------------
 
-0.39    - fixed File::ShareDir accidently removed from Makefile.PL
+  Change: 1d5d70a2f01f219c36f462669eb44e5eb2a32be1
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-09 10:29:21 +0000
 
-0.38    - fixed [rt.cpan.org #127940] Undeclared dependency File::ShareDir::Install
-        - fixed [rt.cpan.org #111469] (found something I missed the first time)
+    finalizing travis updates 
 
-0.37    - fixed [rt.cpan.org #111469] System perl used in tests
-		- cleanup to ensure blib/ isn't getting packaged with the dist
+  Change: d9d31a16ce3ae5c3aa3d9b3cba8bc26aa4dbab2e
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-09 10:08:56 +0000
 
-0.36	- fixed missing Makefile.PL from dist
+    more changes for travis 
 
-0.35    - updated Makefile.PL deps
-        - added MANIFEST.skip
-        - general cleanup
-        
-0.31    - bug fix for previous release
+  Change: 98ec98daf4876c37a00255c8a7388f6edc1b9c4d
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-09 09:57:03 +0000
 
-0.30    - added feature to augment backup dir options
+    additional changes for travis 
 
-0.25    - added use_sudo option to conf file
-        - relaxed requirement that local dir exists
+  Change: 38fdffc58cdb8e90b7bc068b7d5649e07b2cb5e2
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-09 09:49:35 +0000
 
-0.24    - changed facility for log messages to LOG_SYSLOG from LOG_LOCAL7
-        - switched debug messages from Data::Printer to Data::Dumper 
+    fix for TravisCI failure 
 
-0.23    bug fixes
+-----------------------------------------
+version 0.42 at 2020-01-09 15:29:10 +0000
+-----------------------------------------
 
-0.22	improved unit test coverage
+  Change: 1536026adf996641c600f5c9f2d4f8a2f14e9ab5
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-09 09:29:10 +0000
 
-0.21	disabled ssh for unit tests
+    additional modifications for Dist::Zilla 
+
+  Change: 0f30e20cfcd7c025a6d89a40067987ee4c4894e6
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-09 09:23:29 +0000
+
+    convert to Dist::Zilla 
+
+  Change: db8da0d1941cd18df9957eee71e64c2820308cb4
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-09 09:15:50 +0000
+
+    Fixed bug in t/18-exclude.t 
+
+  Change: 97d4d4fc1c4b5de16e54c05093acc496b7400b7d
+  Author: gravattj <john@gravatt.org>
+  Date : 2019-04-25 11:45:04 +0000
+
+    Merge pull request #1 from msven/feature/extra_rsync_opts
+
+    Add feature to provide extra rsync opts via config 
+
+  Change: df5c995f50cfa4ee583f05cab2fa5f5a3de7b42e
+  Author: svendsem <mike.svendsen@act.org>
+  Date : 2019-04-25 16:15:02 +0000
+
+    Add feature to provide extra rsync opts via config 
+
+  Change: ab86cc5886b5a98c1f2162f2e03347393483547c
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2018-12-05 16:28:23 +0000
+
+    fixed missing Makefile.PL from dist 
+
+  Change: 2d24716bef1620f234df7d805631274ba2555825
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2018-12-05 16:19:14 +0000
+
+    updated Makefile.PL deps and added MANIFEST.skip 
+
+  Change: f963e163df3d7c0ba8110243701436553f1b8c3f
+  Author: John Gravatt <john.gravatt@act.org>
+  Date : 2018-08-27 16:29:35 +0000
+
+    updated to better handle spaces in dirnames 
+
+  Change: 7bd16b72f8282c03359450b78229c6a3efc36b89
+  Author: John Gravatt <john.gravatt@act.org>
+  Date : 2018-08-27 11:10:26 +0000
+
+    added chunked function 
+
+  Change: 8185b5494a077a6dd4a217ca16d9a7cbe37ca981
+  Author: gravattj <john@gravatt.org>
+  Date : 2016-01-27 11:49:09 +0000
+
+    added use_sudo feature and relaxed req that local dir must exist 
+
+  Change: ee76ecd7554c846eb7e817bb5bff2a7ae6c8dbfe
+  Author: gravattj <john@gravatt.org>
+  Date : 2016-01-04 12:05:45 +0000
+
+    see Changes file 
+
+  Change: 57bfe38edc364e6f9c9da61d2979ec363b4a719c
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2014-12-07 10:52:42 +0000
+
+    bug fixes 
+
+  Change: d82a2d3ab966b1fa82374eab062dfafe50c8f0c7
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2014-11-16 22:44:06 +0000
+
+    fixed failing unittest 
+
+  Change: 55d96fda5999eda97c1c6f45363ee76153830990
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2014-11-16 22:35:41 +0000
+
+    improved unit test coverage 
+
+  Change: f200f0c8f099436f3d6df220200b70895c7e78c3
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2014-11-16 20:33:30 +0000
+
+    added more detail for test 6 
+
+  Change: 3289b096722632e932a78d12ff0d8031c1d2a664
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2014-11-16 20:29:47 +0000
+
+    fix boilerplate msg 
+
+  Change: d0d710bbda23e5c47cc605f767199706ba9f679c
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2014-11-16 20:10:05 +0000
+
+    fix unit test that uses ssh 
+
+  Change: 2ccd968f9e64cf362c4473fd33b3c1ae1fd02a32
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2014-11-16 20:08:09 +0000
+
+    disable ssh if running unit tests 
+
+  Change: 48dffcf6da2c7a4ffbd29bc7d8f078463839cb2d
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2014-11-16 20:06:48 +0000
+
+    disable ssh if running unit tests 
+
+  Change: 8f31af218b939508f69824ea597ab7248bb3c2b0
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2014-11-16 17:38:11 +0000
+
+    uuid fix 
+
+  Change: 859d47f34b2d328da1ef80c2c36229ea9e17b6b2
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2014-11-16 17:27:49 +0000
+
+    switch to Data::UUID 
+
+  Change: 7e0948982acc7550ae4ce45ef1643433e73e054f
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2014-11-16 17:14:14 +0000
+
+    added travis.yml 
+
+  Change: a8579f78789f9138776a4aab0ede72def7d474ce
+  Author: gravattj <gravattj@wfapp-panext.(none)>
+  Date : 2014-11-16 16:44:42 +0000
+
+    first commit 
+
+================
+End of releases.
+================

@@ -26,7 +26,7 @@ subtest 'Set folding' => sub{
     is( $Parsed->fold_at(), 5, 'Fold at has been set' );
     is( $Parsed->force_fold_at(), undef, 'Force fold at starts undefined' );
     lives_ok( sub{ $Parsed->set_force_fold_at( 800 ); }, 'set_force_fold_at lives' );
-    is( $Parsed->force_fold_at(), 800, 'Force fld at has been set' );
+    is( $Parsed->force_fold_at(), 800, 'Force fold at has been set' );
 };
 
 subtest 'Extra Short folding' => sub{

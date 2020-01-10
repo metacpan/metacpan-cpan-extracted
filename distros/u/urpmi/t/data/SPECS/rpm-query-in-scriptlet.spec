@@ -12,7 +12,9 @@ x
 
 %install
 rm -rf %buildroot
+%ifos linux
 echo %{_libdir}/libnss3.so > list
+%endif
 for i in sh rpm; do
    bin=`which $i`
    echo $bin >> list

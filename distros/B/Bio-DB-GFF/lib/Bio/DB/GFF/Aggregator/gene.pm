@@ -32,7 +32,7 @@ features.  The UTRs may also be named "untranslated_region,"
 =cut
 
 package Bio::DB::GFF::Aggregator::gene;
-$Bio::DB::GFF::Aggregator::gene::VERSION = '1.7.3';
+$Bio::DB::GFF::Aggregator::gene::VERSION = '1.7.4';
 use strict;
 
 use base qw(Bio::DB::GFF::Aggregator);

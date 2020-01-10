@@ -1,0 +1,17 @@
+---
+abstract: 'Decode the redmine cookie _redmine_session'
+author:
+  - 'Tomohiro Hosaka <bokutin@bokut.in>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Authentication-Credential-RedmineCookie
+requires:
+  JSON::MaybeXS: '1'
+version: '0.01'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -6,5 +6,6 @@ The following additional Perl modules are required to use it:
 * IPC::Run
 * IPC::System::Simple
 * JSON
+* List::MoreUtils
 * Perl6::Slurp
 * Template (part of Template Toolkit)

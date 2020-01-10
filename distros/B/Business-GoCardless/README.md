@@ -11,7 +11,7 @@ set of modules
 
 # VERSION
 
-0.33
+0.35
 
 # DESCRIPTION
 
@@ -26,25 +26,9 @@ such lower level interface with the API.
 
 # Do Not Use This Module Directly
 
-Read the below to find out why.
-
-# If You Are New To Business::GoCardless
-
-You should go straight to [Business::GoCardless::Pro](https://metacpan.org/pod/Business::GoCardless::Pro) and start there. Do
-**NOT** use the [Business::GoCardless::Basic](https://metacpan.org/pod/Business::GoCardless::Basic) module for reasons stated below.
-
-# If You Are A Current User Of Business::GoCardless
-
-You should read [Business::GoCardless::Upgrading](https://metacpan.org/pod/Business::GoCardless::Upgrading) as you will be using the
-[Business::GoCardless::Basic](https://metacpan.org/pod/Business::GoCardless::Basic) module (via this module) and the API that
-relates to (v1) will be swtiched off by GoCardless sometime in late 2017.
-
-When GoCardless switch off the v1 API this dist will be updated to make this
-module refer to the Pro module directly.
+You should go straight to [Business::GoCardless::Pro](https://metacpan.org/pod/Business::GoCardless::Pro) and start there.
 
 # SEE ALSO
-
-[Business::GoCardless::Basic](https://metacpan.org/pod/Business::GoCardless::Basic)
 
 [Business::GoCardless::Pro](https://metacpan.org/pod/Business::GoCardless::Pro)
 

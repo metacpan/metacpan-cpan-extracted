@@ -36,7 +36,7 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
     dSP; dTARG;
     SV *hook;
     SV *sv, *sv_array[overload_open_max_args];
-    I32 count, c, ax, my_topmark_after, i, sv_array_pos = 0;
+    I32 count, c, ax, my_topmark_after;
     /* hook is what we are calling instead of `open` */
     hook = get_sv(global, 0);
     int my_debug = 0;
@@ -70,24 +70,31 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
     SV** mysp = sp;
     /* Save the number of items (number of arguments) */
     I32 myitems = items;
+
+    for (c = 0; c < items; c++) {
+        SV *mysv = *(mysp - c);
+        if (my_debug) printf("before enter ref count of *(sp - %i) after: %i\n", c, SvREFCNT(mysv));
+        SvREFCNT_inc(mysv);
+    }
+
     ENTER;
         /* Save the temporaries stack */
         SAVETMPS;
             /* Marking has to do with getting the number of arguments ?
              * maybe. pushmark is start of the arguments
-             *                                                      
+             *
              * The value stack stores individual perl scalar values as temporaries between
              * expressions. Some perl expressions operate on entire lists; for that purpose
              * we need to know where on the stack each list begins. This is the purpose of the
              * mark stack. */
             PUSHMARK(SP); /* SP = Stack Pointer. */
-                EXTEND(SP, myitems);
+                //EXTEND(SP, myitems);
                 for ( c = myitems - 1; 0 <= c; c-- ) {
                     SV* mysv = sv_array[c] = *(mysp - c);
-                    //SvREFCNT_inc(mysv);
-                    SvREFCNT_inc(sv_array[c]);
-                    XPUSHs(sv_2mortal(sv_array[c]));
-                } 
+                    SvREFCNT_inc(mysv);
+                    mXPUSHs(mysv);
+                }
+            /*  PL_stack_sp = sp */
             PUTBACK; /* Closing bracket for XSUB arguments */
             /* count is the number of arguments returned from the call. call_sv()
              * call calls the function `hook` */
@@ -103,18 +110,17 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
              * the memory allocated to the Perl stack has been reallocated during
              * the *call_pv* call
              * SPAGAIN (no relation but makes me think of SPAGAghetti) */
+            /*  sp = PL_stack_sp */
             SPAGAIN;
 
-            /* POPMARK maybe isn't needed? Find out if this is true or not */
-            //POPMARK;
         /* FREETMPS cleans up all stuff on the temporaries stack added since SAVETMPS was called */
         FREETMPS;
     /* Make like a tree and LEAVE */
     LEAVE;
     /* Decrement the refcounts on what we passed to call_sv */
-    for (i = 0; i < sv_array_pos; i++) {
-        //SvREFCNT_dec(sv_array[i]);
-        //printf("ref count of sv %i after: %i\n", i, SvREFCNT(sv_array[i]));
+    for (c = 0; c < myitems; c++) {
+        SvREFCNT_dec(sv_array[c]);
+        if (my_debug) printf("ref count of sv_array[%i] after: %i\n", c, SvREFCNT(sv_array[c]));
     }
     if (my_debug) {
         sv_dump(TOPs);

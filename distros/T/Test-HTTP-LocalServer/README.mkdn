@@ -32,8 +32,15 @@ behaviour in your test suite without talking to the outside world.
     my $server = Test::HTTP::LocalServer->spawn;
 
 This spawns a new HTTP server. The server will stay running until
-  $server->stop
-is called.
+
+    $server->stop
+
+is called. Ideally, you explicitly call `->stop` or use
+
+    undef $server
+
+before the main program ends so that the program exit code reflects the
+real exit code and not the chlid exit code.
 
 Valid arguments are :
 
@@ -78,7 +85,7 @@ The returned object is a copy that you can modify at your leisure.
 
 ## `$server->server_url`
 
-This returns the [URI](https://metacpan.org/pod/URI) object of the server URL. Use ["$server-"](#server)url> instead.
+This returns the [URI](https://metacpan.org/pod/URI) object of the server URL. Use ["$server->url"](#server-url) instead.
 Use this object if you want to modify the hostname or other properties of the
 server object.
 
@@ -188,7 +195,7 @@ None by default.
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
-Copyright (C) 2003-2019 Max Maischein
+Copyright (C) 2003-2020 Max Maischein
 
 # AUTHOR
 

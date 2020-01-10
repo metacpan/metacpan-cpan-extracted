@@ -1522,6 +1522,17 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
  * Some Future class helper functions
  */
 
+#define future_classname()  MY_future_classname(aTHX)
+static SV *MY_future_classname(pTHX)
+{
+  /* cop_hints_fetch_* return a mortal copy so this is fine */
+  SV *class = cop_hints_fetch_pvs(PL_curcop, "Future::AsyncAwait/future", 0);
+  if(class == &PL_sv_placeholder)
+    class = sv_2mortal(newSVpvn("Future", 6));
+
+  return class;
+}
+
 #define future_done_from_stack(f, mark)  MY_future_done_from_stack(aTHX_ f, mark)
 static SV *MY_future_done_from_stack(pTHX_ SV *f, SV **mark)
 {
@@ -1535,20 +1546,26 @@ static SV *MY_future_done_from_stack(pTHX_ SV *f, SV **mark)
 
   PUSHMARK(mark);
   SV **bottom = mark + 1;
+  const char *method;
 
   /* splice the class name 'Future' in to the start of the stack */
 
   for (svp = SP; svp >= bottom; svp--) {
     *(svp+1) = *svp;
   }
-  if(f)
+
+  if(f) {
     *bottom = f;
-  else
-    *bottom = sv_2mortal(newSVpvn("Future", 6));
+    method  = "AWAIT_DONE";
+  }
+  else {
+    *bottom = future_classname();
+    method  = "AWAIT_NEW_DONE";
+  }
   SP++;
   PUTBACK;
 
-  call_method("done", G_SCALAR);
+  call_method(method, G_SCALAR);
 
   SPAGAIN;
 
@@ -1568,15 +1585,21 @@ static SV *MY_future_fail(pTHX_ SV *f, SV *failure)
   ENTER_with_name("future_fail");
   SAVETMPS;
 
+  const char *method;
+
   PUSHMARK(SP);
-  if(f)
+  if(f) {
     PUSHs(f);
-  else
-    mPUSHp("Future", 6);
+    method = "AWAIT_FAIL";
+  }
+  else {
+    PUSHs(future_classname());
+    method = "AWAIT_NEW_FAIL";
+  }
   mPUSHs(newSVsv(failure));
   PUTBACK;
 
-  call_method("fail", G_SCALAR);
+  call_method(method, G_SCALAR);
 
   SPAGAIN;
 
@@ -1600,7 +1623,7 @@ static SV *MY_future_new_from_proto(pTHX_ SV *proto)
   PUSHs(proto);
   PUTBACK;
 
-  call_method("new", G_SCALAR);
+  call_method("AWAIT_CLONE", G_SCALAR);
 
   SPAGAIN;
 
@@ -1617,8 +1640,8 @@ static SV *MY_future_new_from_proto(pTHX_ SV *proto)
   return f;
 }
 
-#define future_is_ready(f)      MY_future_check(aTHX_ f, "is_ready")
-#define future_is_cancelled(f)  MY_future_check(aTHX_ f, "is_cancelled")
+#define future_is_ready(f)      MY_future_check(aTHX_ f, "AWAIT_IS_READY")
+#define future_is_cancelled(f)  MY_future_check(aTHX_ f, "AWAIT_IS_CANCELLED")
 static bool MY_future_check(pTHX_ SV *f, const char *method)
 {
   dSP;
@@ -1659,7 +1682,7 @@ static void MY_future_get_to_stack(pTHX_ SV *f, I32 gimme)
   XPUSHs(f);
   PUTBACK;
 
-  call_method("get", gimme);
+  call_method("AWAIT_GET", gimme);
 
   LEAVE_with_name("future_get_to_stack");
 }
@@ -1677,7 +1700,7 @@ static void MY_future_on_ready(pTHX_ SV *f, CV *code)
   mXPUSHs(newRV_inc((SV *)code));
   PUTBACK;
 
-  call_method("on_ready", G_VOID);
+  call_method("AWAIT_ON_READY", G_VOID);
 
   FREETMPS;
   LEAVE_with_name("future_on_ready");
@@ -1696,7 +1719,7 @@ static void MY_future_chain_on_cancel(pTHX_ SV *f1, SV *f2)
   XPUSHs(f2);
   PUTBACK;
 
-  call_method("on_cancel", G_VOID);
+  call_method("AWAIT_ON_CANCEL", G_VOID);
 
   FREETMPS;
   LEAVE_with_name("future_chain_on_cancel");
@@ -1893,6 +1916,14 @@ static OP *pp_await(pTHX)
 
   CvSTART(curcv) = PL_op; /* resume from here */
   future_on_ready(f, curcv);
+
+  /* If the Future implementation's ->AWAIT_ON_READY failed to capture this CV
+   * then we'll segfault later after SvREFCNT_dec() on it. We can at least
+   * detect that here
+   */
+  if(SvREFCNT(curcv) < 2) {
+    croak("AWAIT_ON_READY failed to capture the CV");
+  }
 
   state->awaiting_future = newSVsv(f);
   sv_rvweaken(state->awaiting_future);
@@ -2175,6 +2206,8 @@ static int await_keyword_plugin(pTHX_ OP **op_ptr)
   }
   else
     expr = parse_termexpr(0);
+
+  op_contextualize(expr, OP_SCALAR);
 
   *op_ptr = newAWAITOP(0, expr);
 

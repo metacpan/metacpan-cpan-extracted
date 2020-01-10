@@ -26,7 +26,7 @@ wanted=$(echo %{_buildrootdir}/buildroot-1-1.%{_arch} | sed 's!//!/!')
 [ "$RPM_BUILD_ROOT" = $wanted ] || { echo "RPM_BUILD_ROOT should be $wanted instead of $RPM_BUILD_ROOT"; exit 1; }
 [ "%macro_using_buildroot" = $wanted ] || { echo "macro_using_buildroot should be $wanted instead of %buildroot"; exit 1; }
 
-install -d $RPM_BUILD_ROOT/etc
+mkdir -p $RPM_BUILD_ROOT/etc
 echo foo > $RPM_BUILD_ROOT/etc/foo
 
 %files

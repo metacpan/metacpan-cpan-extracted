@@ -1,5 +1,24 @@
 Revision history for perlx-bash
 
+0.04      2020-01-09 19:08:54-08:00 America/Los_Angeles
+
+    [New Features]
+    * Can now "pipe" `bash` output through a Perl sub.
+    * Passed in qr// args are quoted just like filenames.
+
+    [Bug Fixes]
+    * Combining capture and `-e` now works as expected.
+    * Now get useful error message if you don't pass `bash` any args.
+    * Ditto if you pass `bash` only capture and/or switch args.
+    * Ditto if you pass `bash` any args which are not defined.
+      (And no extra warning if it's the _first_ arg which is undef.)
+
+    [Doc Fixes]
+    * Now there is some.
+
+    [Distro Fixes]
+    * Fix CPAN Testers failure for older versions of List::Util.
+
 0.03      2018-03-06 02:35:42-08:00 America/Los_Angeles
 
     [New Features]

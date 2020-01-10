@@ -1,6 +1,14 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit b57ea22655c9696f55e3215a4d3d67916f0ddfd2
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Thu Jan 9 17:16:33 2020 -0800
+
+    v1.80 Added /xao/page/default_https configuration
+    
+    Allows to set the default for HTTPS URLs for scripts.
+
 commit 26cc745be6b38599874aedccef25e961f37b7ef8
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Mon Dec 23 18:22:30 2019 -0800
@@ -73,21 +81,4 @@ Date:   Mon Oct 29 18:20:43 2018 -0700
     
     Conputers are becoming too fast, a couple if iterations can
     still result in a zero time spent...
-
-commit 2cc30fd5b807363a490084db5327b358022e3fb0
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Thu Oct 25 12:11:09 2018 -0700
-
-    1.73 pageurl() returns real unmodified URL
-    
-    This was an old problem where for URLs like http://sample.com/foo/
-    a call to pageurl() would return http://sample.com/foo/index.html
-    (appending index.html). This affected all of the derived code, most
-    importantly <%URL...%> template calls.
-    
-    Changed to return the actual URL as was requested, not as it was
-    interpreted in file templates.
-    
-    Also fixed benchmark stats sort stability in testing for
-    https://rt.cpan.org/Public/Bug/Display.html?id=127440
 

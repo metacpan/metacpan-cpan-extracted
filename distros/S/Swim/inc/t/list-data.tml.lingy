@@ -1,0 +1,27 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*swim","*html"],
+      ["==",
+        [".",
+          ["*","swim"],
+          ["parse","HTML"]],
+        ["*","html"],
+        "Swim to HTML - +"]],
+    ["%<>",["*swim","*pod"],
+      ["==",
+        [".",
+          ["*","swim"],
+          ["parse","Pod"]],
+        ["*","pod"],
+        "Swim to Pod - +"]]],
+  "data": [
+    { "label": "Data List",
+      "point": {
+        "swim": "- term one :: Definition 1 is /just/ a line\n- `term 2` :: Definition 2\n  Followed by a paragraph\n\n- Term\n  No definition,\n  just a paragraph\n- Final\n  * No definition\n  * Just\n  * a list\n",
+        "pod": "=over\n\n=item term one\n\nDefinition 1 is I<just> a line\n\n=item C<term 2>\n\nDefinition 2\n\nFollowed by a paragraph\n\n=item Term\n\nNo definition, just a paragraph\n\n=item Final\n\n=over\n\n=item * No definition\n\n=item * Just\n\n=item * a list\n\n=back\n\n=back\n",
+        "html": "<dl>\n<dt>term one</dt>\n<dd>Definition 1 is <em>just</em> a line\n<dd>\n<dt><code>term 2</code></dt>\n<dd>Definition 2\n<p>Followed by a paragraph</p>\n\n<dd>\n<dt>Term</dt>\n<dd><p>No definition, just a paragraph</p>\n\n<dd>\n<dt>Final</dt>\n<dd><ul>\n<li>No definition</li>\n<li>Just</li>\n<li>a list</li>\n</ul>\n\n<dd>\n</dl>\n"}},
+    { "label": "Multi-level item",
+      "point": {
+        "swim": "- this\n    $a = $b\n  See?\n",
+        "pod": "=over\n\n=item this\n\n    $a = $b\n\nSee?\n\n=back\n",
+        "html": "<dl>\n<dt>this</dt>\n<dd><pre><code>$a = $b\n</code></pre>\n<p>See?</p>\n\n<dd>\n</dl>\n"}}]}

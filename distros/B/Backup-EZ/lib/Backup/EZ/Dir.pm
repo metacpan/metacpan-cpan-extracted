@@ -1,4 +1,14 @@
 package Backup::EZ::Dir;
+$Backup::EZ::Dir::VERSION = '0.43';
+=head1 NAME
+
+Backup::EZ::Dir
+
+=head1 VERSION
+
+version 0.43
+
+=cut
 
 use strict;
 use warnings;

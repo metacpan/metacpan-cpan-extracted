@@ -1,7 +1,7 @@
 package Acme::CPANModules;
 
-our $DATE = '2019-11-20'; # DATE
-our $VERSION = '0.1.3'; # VERSION
+our $DATE = '2019-12-24'; # DATE
+our $VERSION = '0.1.5'; # VERSION
 
 1;
 # ABSTRACT: CPAN modules
@@ -18,11 +18,11 @@ Acme::CPANModules - CPAN modules
 
 =head1 SPECIFICATION VERSION
 
-0.1.0
+0.1
 
 =head1 VERSION
 
-This document describes version 0.1.3 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2019-11-20.
+This document describes version 0.1.5 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2019-12-24.
 
 =head1 DESCRIPTION
 
@@ -30,11 +30,12 @@ With the multitude of modules that are available on CPAN, it is sometimes
 difficult for a user to choose an appropriate module for a task or find other
 modules related in some ways to a module. Various projects like L<CPAN
 Ratings|http://cpanratings.perl.org/> (where users rate and review a
-distribution) or L<MetaCPAN|https://metacpan.org/> (which has a C<++> feature
-where logged-in users can press a button to C<++> a module and the website will
-tally the number of C<++>'s a distribution has) help to some extent. There are
-also various blog posts by Perl programmers which review modules, e.g. L<CPAN
-Module Reviews by Neil Bowers|http://neilb.org/reviews/>.
+distribution; now no longer accepting new submission) or
+L<MetaCPAN|https://metacpan.org/> (which has a C<++> feature where logged-in
+users can press a button to C<++> a module and the website will tally the number
+of C<++>'s a distribution has) help to some extent. There are also various blog
+posts by Perl programmers which review modules, e.g. L<CPAN Module Reviews by
+Neil Bowers|http://neilb.org/reviews/>.
 
 For categorizing CPAN authors, there are also the L<Acme::CPANAuthors> project,
 complete with L<its own website|http://acme.cpanauthors.org/>.
@@ -87,6 +88,12 @@ structure is this:
      ## when creating scenario record. see Bencher for more details.
      # bench_datasets => [ ... ],
      # bench_extra_modules => [ ... ],
+
+     ## optional. Instruct cpanmodules script to not show the entries when
+     ## viewing the list. This is sometimes convenient when the description
+     ## already mentions all the entries.
+     #'x.app.cpanmodules.show_entries' => 0,
+
  }
 
 Each entry is another DefHash:
@@ -135,16 +142,20 @@ your module's documentation can immediately read your list.
 
 =head1 USING ACME::CPANMODULES MODULES
 
-As said earlier, a website/online service that collects and indexes all
-Acme::CPANModules modules on CPAN is coming in the future.
+You can install the L<cpanmodules> CLI script (from the L<App::cpanmodules>
+distribution). It can list installed Acme::CPANModules modules and view list
+entries. To install all modules listed on an Acme::CPANModules module, you can
+do something like:
 
-In the meantime, you can install the L<cpanmodules> CLI script (from the
-L<App::cpanmodules> distribution). It can list installed Acme::CPANModules
-modules and view list entries.
+ % cpanmodules ls-entries Org | cpanm -n
 
 Putting similar/related modules together in an Acme::CPANModules can also help
 the L<lcpan> script find related modules (C<lcpan related-mods>). See the lcpan
 documentation or C<lcpan related-mods --help> for more details.
+
+As mentioned earlier, a website/online service that collects and indexes all
+Acme::CPANModules modules on CPAN is coming in the future. Meanwhile, there's
+MetaCPAN.
 
 =head1 HOMEPAGE
 

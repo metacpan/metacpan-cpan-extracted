@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # ABSTRACT: Remove tags by content from ABI traces
 # PODNAME: strip_tags
+
 use 5.018;
 use warnings;
 use Data::Dumper;
@@ -10,7 +11,7 @@ my ($file, $REMOVE_TAG) = @ARGV;
 
 # STRIP TAGS FROM AB1 FILE IF CONTENT MATCHES $REMOVE_TAG
 
-die "Missing argument <AB1File>\n" unless (-e "$file");
+die "Missing argument <AB1File>\n(usage: FileABI TagContentToStrip)\n" if (not defined $file or not -e "$file");
 die "Missing argument TAG (usage: FileABI TagContentToStrip)\n" unless (defined $REMOVE_TAG);
 say "Processing $file";
 
@@ -45,7 +46,7 @@ my $true = 1;
 for my $t (@tag) {
 	my $num = chop($t);
 		say color('bold'),  "[$t] $num" , color('reset');
-	my %DirEntry = $trace->get_directory($t, $num);
+		my %DirEntry = $trace->get_directory($t, $num);
 
 	#
 	# $VAR1 = {

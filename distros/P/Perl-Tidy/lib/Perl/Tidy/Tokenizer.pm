@@ -21,7 +21,7 @@
 package Perl::Tidy::Tokenizer;
 use strict;
 use warnings;
-our $VERSION = '20191203';
+our $VERSION = '20200110';
 
 use Perl::Tidy::LineBuffer;
 
@@ -362,6 +362,11 @@ sub get_saw_brace_error {
     else {
         return 0;
     }
+}
+
+sub get_unexpected_error_count {
+    my ($self) = shift;
+    return $self->{_unexpected_error_count};
 }
 
 # interface to Perl::Tidy::Diagnostics routines
@@ -2055,8 +2060,22 @@ sub prepare_for_a_new_file {
             {
                 $is_pattern = 0;
             }
+
+            # patch for RT#131288, user constant function without prototype
+            # last type is 'U' followed by ?.
+            elsif ( $last_nonblank_type =~ /^[FUY]$/ ) {
+                $is_pattern = 0;
+            }
             elsif ( $expecting == UNKNOWN ) {
 
+                # In older versions of Perl, a bare ? can be a pattern
+                # delimiter.  Sometime after Perl 5.10 this seems to have
+                # been dropped, but we have to support it in order to format
+                # older programs.  For example, the following line worked
+                # at one time:
+                #      ?(.*)? && (print $1,"\n");
+                # In current versions it would have to be written with slashes:
+                #      /(.*)/ && (print $1,"\n");
                 my $msg;
                 ( $is_pattern, $msg ) =
                   guess_if_pattern_or_conditional( $i, $rtokens, $rtoken_map,
@@ -6419,6 +6438,7 @@ sub scan_identifier_do {
                 $statement_type = $tok;
             }
             elsif ($next_nonblank_token) {      # EOF technically ok
+                $subname = "" unless defined($subname);
                 warning(
 "expecting ':' or ';' or '{' after definition or declaration of sub '$subname' but saw '$next_nonblank_token'\n"
                 );

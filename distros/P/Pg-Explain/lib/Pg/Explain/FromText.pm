@@ -8,6 +8,14 @@ use Pg::Explain::Node;
 
 Pg::Explain::FromText - Parser for text based explains
 
+=head1 VERSION
+
+Version 0.91
+
+=cut
+
+our $VERSION = '0.91';
+
 =head1 SYNOPSIS
 
 It's internal class to wrap some work. It should be used by Pg::Explain, and not directly.
@@ -195,6 +203,9 @@ sub parse_source {
             my $previous_element = $element_at_depth{ $maximal_depth };
             next LINE unless $previous_element;
             $previous_element->{ 'node' }->add_extra_info( $info );
+            if ( $info =~ m{ \A Workers \s+ Launched: \s+ ( \d+ ) \z }xmsi ) {
+                $previous_element->{ 'node' }->workers_launched( $1 );
+            }
         }
     }
     return $top_node;

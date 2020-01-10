@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Store::SQL;
-our $VERSION = '1.20191025';
+our $VERSION = '1.20200108';
 use strict;
 use warnings;
 
@@ -136,18 +136,20 @@ sub delete_report {
     print "deleting report $report_id\n" if $self->verbose;
 
     # deletes with FK don't cascade in SQLite? Clean each table manually
-    my $rows = $self->query( $self->grammar->report_record_id,
-        [$report_id] );
-    my $row_ids = join( ',', map { $_->{id} } @$rows ) or return 1;
-    foreach my $table (
-        qw/ report_record_spf report_record_dkim report_record_reason /)
-    {
-        print "deleting $table rows $row_ids\n" if $self->verbose;
-        $self->query(
-            $self->grammar->delete_from_where_record_in($table, $row_ids));
+    my $rows = $self->query( $self->grammar->report_record_id, [$report_id] );
+    my @row_ids = map { $_->{id} } @$rows;
+
+    if (scalar @row_ids) {
+        foreach my $table (qw/ report_record_spf report_record_dkim report_record_reason /) {
+            print "deleting $table rows " . join(',', @row_ids) . "\n" if $self->verbose;
+            eval { $self->query( $self->grammar->delete_from_where_record_in($table, \@row_ids)); };
+            # warn $@ if $@;
+        }
     }
     foreach my $table (qw/ report_policy_published report_record report_error /) {
-        $self->query( $self->grammar->delete_from_where_report($table), [$report_id] );
+        print "deleting $table rows for report $report_id\n" if $self->verbose;
+        eval { $self->query( $self->grammar->delete_from_where_report( $table, [$report_id] )); };
+        # warn $@ if $@;
     }
 
     # In MySQL, where FK constraints DO cascade, this is the only query needed
@@ -597,12 +599,9 @@ sub query {
 
     my $dbix = $self->db_connect() or croak DBIx::Simple->error;
 
-    return $self->query_insert( $query, $err, @params )
-        if $query =~ /^INSERT/ix;
-    return $self->query_replace( $query, $err, @params )
-        if $query =~ /^(?:REPLACE|UPDATE)/ix;
-    return $self->query_delete( $query, $err, @params )
-        if $query =~ /^(?:DELETE|TRUNCATE)/ix;
+    return $self->query_insert( $query, $err, @params )  if $query =~ /^INSERT/ix;
+    return $self->query_replace( $query, $err, @params ) if $query =~ /^(?:REPLACE|UPDATE)/ix;
+    return $self->query_delete( $query, $err, @params )  if $query =~ /^(?:DELETE|TRUNCATE)/ix;
     return $self->query_any( $query, $err, @params );
 }
 
@@ -646,7 +645,6 @@ sub query_delete {
     return $affected;
 }
 
-
 sub get_row_spf {
     my ($self, $rowid) = @_;
     return $self->query( $self->grammar->select_row_spf, [ $rowid ] );
@@ -680,7 +678,7 @@ Mail::DMARC::Report::Store::SQL - store and retrieve reports from a SQL RDBMS
 
 =head1 VERSION
 
-version 1.20191025
+version 1.20200108
 
 =head1 DESCRIPTION
 
@@ -714,7 +712,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Matt Simerson.
+This software is copyright (c) 2020 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

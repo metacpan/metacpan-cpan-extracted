@@ -36,13 +36,13 @@ no_index:
 provides:
   TeX::Encode:
     file: lib/TeX/Encode.pm
-    version: '2.006'
+    version: '2.007'
   TeX::Encode::BibTeX:
     file: lib/TeX/Encode/BibTeX.pm
-    version: '2.006'
+    version: '2.007'
   TeX::Encode::charmap:
     file: lib/TeX/Encode/charmap.pm
-    version: '2.006'
+    version: '2.007'
 requires:
   Carp: '0'
   Encode::Encoding: '0.1'
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://github.com/athreef/TeX-Encode/issues
   homepage: https://github.com/athreef/TeX-Encode
   repository: https://github.com/athreef/TeX-Encode.git
-version: '2.006'
+version: '2.007'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -237,7 +237,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.20.1
           repo_root: .
       name: '@Git/Check'
       version: '2.046'
@@ -254,7 +254,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -267,11 +267,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.006
+          tag: v2.007
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -285,7 +285,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.20.1
           repo_root: .
       name: '@Git/Push'
       version: '2.046'
@@ -301,14 +301,14 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.20.1
           repo_root: .
       name: Git::NextVersion
       version: '2.046'
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: OurPkgVersion
-      version: '0.14'
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -322,8 +322,11 @@ x_Dist_Zilla:
       version: '1.006'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
+      config:
+        Dist::Zilla::Plugin::Test::MinimumVersion:
+          max_target_perl: '5.8'
       name: Test::MinimumVersion
-      version: '2.000008'
+      version: '2.000010'
     -
       class: Dist::Zilla::Plugin::Test::Version
       name: Test::Version

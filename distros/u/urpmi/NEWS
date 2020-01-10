@@ -1,3 +1,6 @@
+- cpan_testers:
+  o skip tests if we have no supported downloader
+
 Version 8.120 - 21 October 2019
 
 - fix test for whether any 32-bit packages are installed

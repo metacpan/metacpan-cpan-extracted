@@ -34,7 +34,7 @@ only needed for backward compatibility.
 =cut
 
 package Bio::DB::GFF::Aggregator::so_transcript;
-$Bio::DB::GFF::Aggregator::so_transcript::VERSION = '1.7.3';
+$Bio::DB::GFF::Aggregator::so_transcript::VERSION = '1.7.4';
 use strict;
 
 use base qw(Bio::DB::GFF::Aggregator);

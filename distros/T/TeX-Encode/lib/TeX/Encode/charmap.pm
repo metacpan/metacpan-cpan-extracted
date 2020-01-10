@@ -1,5 +1,5 @@
 package TeX::Encode::charmap;
-our $VERSION = '2.006'; # VERSION
+our $VERSION = '2.007'; # VERSION
 
 =head1 NAME
 
@@ -78,13 +78,11 @@ chr(0x00a3) => '\\pounds', # £
 chr(0x00a7) => '\\S', # §
 chr(0x00a9) => '\\copyright',
 chr(0x00b6) => '\\P', # ¶
-chr(0x00c5) => '\\AA', # Å
 chr(0x00c6) => '\\AE', # Æ
 chr(0x00d0) => '\\DH', # Ð
 chr(0x00d8) => '\\O', # Ø
 chr(0x00de) => '\\TH', # Þ
 chr(0x00df) => '\\ss', # ß
-chr(0x00e5) => '\\aa', # å
 chr(0x00e6) => '\\ae', # æ
 chr(0x00f0) => '\\dh', # ð
 chr(0x00f8) => '\\o', # ø
@@ -193,7 +191,7 @@ chr(0x01cd) => "\\vA", # Ǎ
 chr(0x0102) => "\\uA", # Ă
 chr(0x0226) => "\\\.A", # Ȧ
 chr(0x0100) => "\\\=A", # Ā
-chr(0x00c5) => "\\rA", # Å
+chr(0x00c5) => "\\AA", # Å
 chr(0x1ea0) => "\\dA", # Ạ
 chr(0x0200) => "\\CA", # Ȁ
 chr(0x0202) => "\\fA", # Ȃ
@@ -471,7 +469,7 @@ chr(0x01ce) => "\\va", # ǎ
 chr(0x0103) => "\\ua", # ă
 chr(0x0227) => "\\\.a", # ȧ
 chr(0x0101) => "\\\=a", # ā
-chr(0x00e5) => "\\ra", # å
+chr(0x00e5) => "\\aa", # å
 chr(0x1ea1) => "\\da", # ạ
 chr(0x0201) => "\\Ca", # ȁ
 chr(0x0203) => "\\fa", # ȃ

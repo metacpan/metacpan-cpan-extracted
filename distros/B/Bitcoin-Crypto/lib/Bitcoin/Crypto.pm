@@ -1,6 +1,6 @@
 package Bitcoin::Crypto;
 
-our $VERSION = "0.99";
+our $VERSION = "0.991";
 
 use Modern::Perl "2010";
 
@@ -98,6 +98,8 @@ Although the module was written with an extra care and appropriate tests are in 
 =item L<Bitcoin::Crypto::Key::Private>
 
 =item L<Bitcoin::BIP39>
+
+=item The examples directory
 
 =back
 

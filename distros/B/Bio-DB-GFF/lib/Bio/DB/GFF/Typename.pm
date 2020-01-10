@@ -24,7 +24,7 @@ same type will share the same Bio::DB::GFF::Typename object.
 =cut
 
 package Bio::DB::GFF::Typename;
-$Bio::DB::GFF::Typename::VERSION = '1.7.3';
+$Bio::DB::GFF::Typename::VERSION = '1.7.4';
 use strict;
 use overload
   '""'     => 'asString',

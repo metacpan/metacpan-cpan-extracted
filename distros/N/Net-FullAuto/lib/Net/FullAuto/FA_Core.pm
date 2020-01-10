@@ -9622,7 +9622,7 @@ my $affero=<<END;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Powerful Network Process Automation Software
-#    Copyright © 2000-2016  Brian M. Kelly
+#    Copyright © 2000-2020  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -11397,7 +11397,7 @@ our $fa_welcome=<<'END';
 
 
 
-   Copyright © 2000-2016  Brian M. Kelly  Brian.Kelly@FullAuto.com
+   Copyright © 2000-2020  Brian M. Kelly  Brian.Kelly@FullAuto.com
 
 
 

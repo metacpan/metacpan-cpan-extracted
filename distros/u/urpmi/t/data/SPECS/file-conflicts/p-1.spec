@@ -10,8 +10,8 @@ x
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/foo
-install -d $RPM_BUILD_ROOT/var/foo
+mkdir -p $RPM_BUILD_ROOT/etc/foo
+mkdir -p $RPM_BUILD_ROOT/var/foo
 echo bar > $RPM_BUILD_ROOT/etc/foo/bar
 echo boo > $RPM_BUILD_ROOT/var/foo/boo
 

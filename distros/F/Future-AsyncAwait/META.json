@@ -40,7 +40,15 @@
    "provides" : {
       "Future::AsyncAwait" : {
          "file" : "lib/Future/AsyncAwait.pm",
-         "version" : "0.34"
+         "version" : "0.35"
+      },
+      "Future::AsyncAwait::Awaitable" : {
+         "file" : "lib/Future/AsyncAwait/Awaitable.pm",
+         "version" : "0.35"
+      },
+      "Test::Future::AsyncAwait::Awaitable" : {
+         "file" : "lib/Test/Future/AsyncAwait/Awaitable.pm",
+         "version" : "0.35"
       }
    },
    "release_status" : "stable",
@@ -50,6 +58,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.34",
+   "version" : "0.35",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

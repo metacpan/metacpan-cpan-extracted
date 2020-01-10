@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/ -I/home/phil/perl/cpan/DataEditXml/lib/
 #-------------------------------------------------------------------------------
 # Test Data::Edit::Xml::Lint
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016

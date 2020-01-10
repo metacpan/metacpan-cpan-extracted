@@ -1,0 +1,22 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*swim","*markdown"],
+      ["==",
+        [".",
+          ["*","swim"],
+          ["parse","Markdown"]],
+        ["*","markdown"],
+        "Swim to Markdown - +"]],
+    ["%<>",["*swim","*pod"],
+      ["==",
+        [".",
+          ["*","swim"],
+          ["parse","Pod"]],
+        ["*","pod"],
+        "Swim to Pod - +"]]],
+  "data": [
+    { "label": "Inline meta section",
+      "point": {
+        "swim": "---\nname: John\nnumber: 42\n...\nDear <$name>,\n\nNow that you are <$number> years old, I regret to inform you...\n",
+        "markdown": "Dear John,\n\nNow that you are 42 years old, I regret to inform you...\n",
+        "pod": "Dear John,\n\nNow that you are 42 years old, I regret to inform you...\n"}}]}

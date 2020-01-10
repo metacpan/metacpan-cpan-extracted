@@ -1,36 +1,45 @@
 package Data::Pokemon::Go::Pokemon;
 use 5.008001;
 use Carp;
+use Exporter 'import';
+our @EXPORT_OK = qw( $All @List @Types );
 
 use Moose;
 use Moose::Util::TypeConstraints;
 use YAML::XS;
 use File::Share 'dist_dir';
-my $dir = dist_dir('Data-Pokemon-Go');
+my $dir = $ENV{'USER'} eq 'yuki.yoshida'? 'share': dist_dir('Data-Pokemon-Go');
 
-use Data::Pokemon::Go;
 use Data::Pokemon::Go::Relation;
+our @Types = @Data::Pokemon::Go::Role::Types::All;
 use Data::Pokemon::Go::Skill;
 
 my $skill = Data::Pokemon::Go::Skill->new();
 
-my $all = {};
-our @All = ();
-foreach my $region (qw|Kanto Johto Hoenn Alola Sinnoh|){
+our $All = {};
+our @List = ();
+foreach my $region (qw|Kanto Johto Hoenn Sinnoh Unova Alola|){
     my $data = YAML::XS::LoadFile("$dir/$region.yaml");
     map{
-        $all->{ $_->{'Name'}{'ja'} } = $_;
-        push @All, $_->{'Name'}{'ja'};
+        my $fullname = _get_fullname( $_, 'ja' );
+        $All->{ $fullname } = $_;
+        push @List, $fullname;
     } @$data;
 }
 
-enum 'PokemonName' => \@All;
+enum 'PokemonName' => \@List;
 has name => ( is => 'rw', isa => 'PokemonName' );
 
 before 'name' => sub {
     my $self = shift;
     my $name = shift;
-    croak "unvalid name" if $name and not $self->exists($name);
+    my $form = shift || '';
+    if ( defined $name and $name =~ /^(\w+)\((\w+)\)$/ ){
+        $name = $1;
+        $form = $2;
+    }
+    
+    croak "unvalid name: $name&$form" if $name and not $self->exists($name) and not $self->exists("$name($form)");
 };
 
 __PACKAGE__->meta->make_immutable;
@@ -39,13 +48,13 @@ no Moose;
 sub exists {
     my $self = shift;
     my $name = shift;
-    return CORE::exists $all->{$name};
+    return CORE::exists $All->{$name};
 }
 
 sub id {
     my $self = shift;
     my $name = $self->name();
-    my $id = $all->{$name}{ID};
+    my $id = $All->{$name}{ID};
     carp "'ID' may be invalid: $id" unless $id =~ /^\d{3}$/;
     return $id;
 }
@@ -53,7 +62,7 @@ sub id {
 sub types {
     my $self = shift;
     my $name = $self->name();
-    my $typesref = $all->{$name}{Types};
+    my $typesref = $All->{$name}{Types};
     carp "'Types' may be invalid: $typesref" unless ref $typesref eq 'ARRAY';
     return $typesref;
 }
@@ -61,7 +70,7 @@ sub types {
 sub skill {
     my $self = shift;
     my $name = $self->name();
-    my $ref = $all->{$name}{Skill};
+    my $ref = $All->{$name}{Skill};
     my @skill;
     foreach my $name (@$ref) {
         $skill->name($name);
@@ -74,7 +83,7 @@ sub skill {
 sub special {
     my $self = shift;
     my $name = $self->name();
-    my $ref = $all->{$name}{Special};
+    my $ref = $All->{$name}{Special};
     my @skill;
     foreach my $name (@$ref) {
         $skill->name($name);
@@ -112,22 +121,22 @@ sub recommended {
 sub stamina {
     my $self = shift;
     my $name = $self->name();
-    croak "'Stamina' is undefined for $name" unless exists $all->{$name}{'Stamina'};
-    return $all->{$name}{Stamina};
+    croak "'Stamina' is undefined for $name" unless exists $All->{$name}{'Stamina'};
+    return $All->{$name}{Stamina};
 }
 
 sub attack {
     my $self = shift;
     my $name = $self->name();
-    croak "'Attack' is undefined for $name" unless exists $all->{$name}{'Attack'};
-    return $all->{$name}{Attack};
+    croak "'Attack' is undefined for $name" unless exists $All->{$name}{'Attack'};
+    return $All->{$name}{Attack};
 }
 
 sub defense {
     my $self = shift;
     my $name = $self->name();
-    croak "'Defense' is undefined for $name" unless exists $all->{$name}{'Defense'};
-    return $all->{$name}{Defense};
+    croak "'Defense' is undefined for $name" unless exists $All->{$name}{'Defense'};
+    return $All->{$name}{Defense};
 }
 
 sub max {
@@ -137,26 +146,48 @@ sub max {
     unless $when =~ /(:?Boosted|Hatched|Grown)/;
 
     my $name = $self->name();
-    croak "'$when' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{$when};
-    return $all->{$name}{'MAXCP'}{$when};
+    croak "'$when' is undefined for $name" unless exists $All->{$name}{'MAXCP'}{$when};
+    return $All->{$name}{'MAXCP'}{$when};
 }
 
 sub isNotWild {
     my $self = shift;
     my $name = $self->name();
-    return $all->{$name}{'isNotWild'};
+    return $All->{$name}{'isNotWild'};
 }
 
 sub isNotAvailable {
     my $self = shift;
     my $name = $self->name();
-    return $all->{$name}{'isNotAvailable'};
+    return $All->{$name}{'isNotAvailable'};
 }
 
 sub isAlola {
     my $self = shift;
     my $name = $self->name();
-    return $all->{$name}{'isAlola'};
+    return $All->{$name}{'isAlola'};
+}
+
+sub hasForms {
+    my $self = shift;
+    my $name = $self->name();
+    return exists $All->{$name}{'Form'}? $All->{$name}{'Form'} : 0;
+}
+
+sub _get_fullname {
+    my $ref = shift;
+    my $lang = shift;
+    my $fullname = __PACKAGE__->get_Pokemon_name( $ref, $lang );
+    $fullname .= "($ref->{'Form'})" if exists $ref->{'Form'};
+    return $fullname;
+}
+
+sub get_Pokemon_name {
+    my $self = shift;
+    my $ref = shift;
+    my $lang = shift || 'jp';
+    croak "No name for $lang" unless exists $ref->{'Name'}{$lang};
+    return $ref->{'Name'}{$lang};
 }
 
 1;

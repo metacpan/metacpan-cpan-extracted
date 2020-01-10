@@ -1,4 +1,5 @@
 requires "DateTime";
+requires "DateTime::Format::ISO8601";
 requires "Encode";
 requires "HTTP::Link";
 requires "LWP";

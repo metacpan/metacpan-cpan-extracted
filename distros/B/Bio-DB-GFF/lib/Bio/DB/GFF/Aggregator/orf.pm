@@ -28,7 +28,7 @@ except that it looks for features of type "ORF" rather than "cds".
 =cut
 
 package Bio::DB::GFF::Aggregator::orf;
-$Bio::DB::GFF::Aggregator::orf::VERSION = '1.7.3';
+$Bio::DB::GFF::Aggregator::orf::VERSION = '1.7.4';
 use strict;
 use Bio::DB::GFF::Aggregator;
 

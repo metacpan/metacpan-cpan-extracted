@@ -3,13 +3,14 @@ package TestUtilFuncs;
 use PerlX::bash;
 
 use Test::More;
+use Test::Command	0.08;
 use Test::Builder;
 use Test::Exception;
 
 use Capture::Tiny qw< capture >;
 
 use base 'Exporter';
-our @EXPORT_OK = qw< throws_error >;
+our @EXPORT_OK = qw< throws_error perl_error_is >;
 
 
 sub throws_error ($$$)
@@ -41,6 +42,36 @@ sub throws_error ($$$)
 		diag "error was: $err";
 	}
 	return $result;
+}
+
+
+
+# These are stolen shamelessly from my personal test suite for "myperl" (Test::myperl).
+# original lives at: https://github.com/barefootcoder/common/blob/master/perl/myperl/t/Test/myperl.pm
+
+sub _perl_command
+{
+	my $cmd = shift;
+	return [ $^X, '-e', $cmd, '--', @_ ];
+}
+
+sub perl_error_is
+{
+	my ($tname, $expected, $cmd, @extra) = @_;
+
+	if ( ref $expected eq 'Regexp' )
+	{
+		stderr_like(_perl_command($cmd, @extra), $expected, $tname);
+	}
+	elsif ( $expected =~ /\n\Z/ )
+	{
+		stderr_is_eq(_perl_command($cmd, @extra), $expected, $tname);
+	}
+	else
+	{
+		my $regex = qr/^\Q$expected\E( at \S+ line \d+\.)?\n/;
+		stderr_like(_perl_command($cmd, @extra), $regex, $tname);
+	}
 }
 
 

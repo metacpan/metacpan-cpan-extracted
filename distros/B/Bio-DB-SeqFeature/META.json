@@ -5,7 +5,7 @@
       "Nathan Weeks <Nathan.Weeks@ars.usda.gov>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -29,6 +29,7 @@
       "runtime" : {
          "requires" : {
             "Bio::DB::Fasta" : "0",
+            "Bio::DB::GFF::Typename" : "0",
             "Bio::DB::GFF::Util::Rearrange" : "0",
             "Bio::Location::Simple" : "0",
             "Bio::PrimarySeq" : "0",
@@ -39,8 +40,6 @@
             "Bio::SeqFeature::Lite" : "0",
             "Carp" : "0",
             "Cwd" : "0",
-            "DBD::Pg" : "0",
-            "DBD::SQLite" : "0",
             "DBI" : "0",
             "DB_File" : "0",
             "Fcntl" : "0",
@@ -90,10 +89,10 @@
          "web" : "https://github.com/bioperl/bio-db-seqfeature"
       }
    },
-   "version" : "1.7.3",
+   "version" : "1.7.4",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.022001"
+         "version" : "5.028001"
       },
       "plugins" : [
          {
@@ -201,7 +200,7 @@
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
-                  "bail_out_on_fail" : "0",
+                  "bail_out_on_fail" : 0,
                   "fail_on_warning" : "author",
                   "fake_home" : 0,
                   "filename" : "t/00-compile.t",
@@ -213,7 +212,10 @@
                   "script_finder" : [
                      ":PerlExecFiles"
                   ],
-                  "skips" : [],
+                  "skips" : [
+                     "Bio::DB::SeqFeature::Store::DBI::Pg",
+                     "Bio::DB::SeqFeature::Store::DBI::SQLite"
+                  ],
                   "switch" : []
                }
             },
@@ -265,7 +267,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -288,7 +290,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -305,12 +307,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "Bio-DB-SeqFeature-v1.7.3",
+                  "tag" : "Bio-DB-SeqFeature-v1.7.4",
                   "tag_format" : "%N-v%v",
                   "tag_message" : "%N-v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -374,12 +376,12 @@
       "zilla" : {
          "class" : "Dist::Zilla::Dist::Builder",
          "config" : {
-            "is_trial" : "0"
+            "is_trial" : 0
          },
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.22.1",
+   "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

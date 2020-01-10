@@ -1,0 +1,56 @@
+=head1 NAME
+
+OpenTracing::Implementation::Interface::Bootstrap - Ensure we do the right thing
+
+
+
+=head1 SYNOPSIS
+
+    package My::OpenTracing::Implementation
+    
+    sub bootstrap {
+        my $class = shift;
+        
+        my @args = @_; # whatever
+        
+        ...
+        
+        my $tracer = ...
+        
+        return $tracer
+    }
+    
+    BEGIN {
+        use Role::Tiny::With;
+        with 'OpenTracing::Implementation::Interface::Bootstrap'
+            if $ENV{OPENTRACING_INTERFACE}
+    } # check at compile time, perl -c will work
+    
+    1;
+
+
+
+=head1 DESCRIPTION
+
+This 'role' describes the interface needed for L<OpenTracing::Implementation>
+bootstraps.
+
+It does so be wrapping typechecks around a required method:
+C<bootstrap>
+
+
+
+=head1 REQUIRED METHODS
+
+The below mentioned methods MUST be implemented by the consuming class:
+
+
+
+=head2 bootstrap
+
+A class method, that accepts further arguments to bootstrap or set-up a specific
+implementation
+
+
+
+=cut

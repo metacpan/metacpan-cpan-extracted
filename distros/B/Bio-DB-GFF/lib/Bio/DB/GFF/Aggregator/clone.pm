@@ -29,7 +29,7 @@ aggregates raw "Clone_left_end", "Clone_right_end", and
 =cut
 
 package Bio::DB::GFF::Aggregator::clone;
-$Bio::DB::GFF::Aggregator::clone::VERSION = '1.7.3';
+$Bio::DB::GFF::Aggregator::clone::VERSION = '1.7.4';
 use strict;
 
 

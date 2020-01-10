@@ -21,7 +21,7 @@ use DateTime::Format::ISO8601;
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.703';
+our $VERSION = '0.704';
 
 Readonly my @VALID_RSVP_TYPES => qw(yes no maybe interested);
 
@@ -489,7 +489,8 @@ sub _build_endpoint {
     if ( $response->header( 'Link' ) ) {
         my @header_links = HTTP::Link->parse( $response->header( 'Link' ) . '' );
         foreach (@header_links ) {
-            if ($_->{relation} eq 'webmention') {
+            my $relation = $_->{relation};
+            if ($relation && $relation eq 'webmention') {
                 $endpoint = $_->{iri};
             }
         }
@@ -616,6 +617,8 @@ sub FROM_JSON {
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Web::Mention - Implementation of the IndieWeb Webmention protocol
@@ -701,10 +704,9 @@ Web::Mention - Implementation of the IndieWeb Webmention protocol
 =head1 DESCRIPTION
 
 This class implements the Webmention protocol, as defined by the W3C and
-the IndieWeb community. (See L<This article by Chris
-Aldrich|https://alistapart.com/article/webmentions-enabling-better-
-communication-on-the-internet> for an excellent high-level summary of
-Webmention and its applications.)
+the IndieWeb community. (See L<this article by Chris
+Aldrich|https://alistapart.com/article/webmentions-enabling-better-communication-on-the-internet/>
+for an excellent high-level summary of Webmention and its applications.)
 
 An object of this class represents a single webmention, with target and
 source URLs. It can verify itself, determining whether or not the
@@ -1085,11 +1087,15 @@ Jason McIntosh (jmac@jmac.org)
 
 Mohammad S Anwar (mohammad.anwar@yahoo.com)
 
+=item *
+
+Tomaž Šolc (tomaz.solc@tablix.org)
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Jason McIntosh.
+This software is Copyright (c) 2018-2020 by Jason McIntosh.
 
 This is free software, licensed under:
 

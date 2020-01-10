@@ -1,0 +1,29 @@
+---
+abstract: 'Configure your app from within systemd service file'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Systemd
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '8.00'
+resources:
+  bugtracker: https://github.com/jhthorsen/mojolicious-plugin-systemd/issues
+  homepage: https://github.com/jhthorsen/mojolicious-plugin-systemd
+  repository: https://github.com/jhthorsen/mojolicious-plugin-systemd.git
+version: '0.01'
+x_contributors:
+  - 'Jan Henning Thorsen'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

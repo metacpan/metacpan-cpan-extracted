@@ -1,6 +1,5 @@
 package Bio::DB::GFF::Adaptor::biofetch;
-$Bio::DB::GFF::Adaptor::biofetch::VERSION = '1.7.3';
-#$Id$
+$Bio::DB::GFF::Adaptor::biofetch::VERSION = '1.7.4';
 =head1 NAME
 
 Bio::DB::GFF::Adaptor::biofetch -- Cache BioFetch objects in a Bio::DB::GFF database

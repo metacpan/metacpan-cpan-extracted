@@ -1,5 +1,5 @@
 package Util::Medley::File;
-$Util::Medley::File::VERSION = '0.020';
+$Util::Medley::File::VERSION = '0.022';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -11,6 +11,7 @@ use File::Path qw(make_path remove_tree);
 use File::Touch;
 use Try::Tiny;
 use Path::Iterator::Rule;
+use File::Slurp;
 
 with 'Util::Medley::Roles::Attributes::Logger';
 with 'Util::Medley::Roles::Attributes::String';
@@ -22,7 +23,7 @@ Util::Medley::File - utility file methods
 
 =head1 VERSION
 
-version 0.020
+version 0.022
 
 =cut
 
@@ -722,6 +723,61 @@ multi method rmdir (Str $dir) {
 		$self->Logger->debug("rmdir $dir");
 		remove_tree($dir);
 	}
+}
+
+=head2 slurp
+
+Just a pass-through to File::Slurp::read_file().
+
+=over
+
+=item usage:
+
+ $util->slurp($file);
+
+ $util->slurp(path => $file);
+
+=item args:
+
+=over
+
+=item path [Str]
+
+File to slurp.
+
+=item trim [Bool]
+
+Trim newlines.  Default 0.
+
+=back
+
+=back
+
+=cut
+
+multi method slurp (Str  :$path,
+					Bool :$trim = 0) {
+
+	if (wantarray) {
+		my @in;
+		foreach my $line (File::Slurp::read_file($path) ){
+			chomp $line if $trim;
+			push @in, $line;	
+		}
+			
+		return @in;
+	}
+	else {
+		my $in = File::Slurp::read_file($path);		
+		chomp $in if $trim;
+		return $in;
+	}
+}
+
+multi method slurp (Str  $path, 
+					Bool $trim = 0) {
+
+	return $self->slurp(path => $path, trim => $trim);
 }
 
 

@@ -18,15 +18,6 @@ extends 'Business::GoCardless::Resource';
 
 =head1 ATTRIBUTES
 
-Note that app_ids, bank_reference, paid_at, and transaction_fees relate to the
-legacy (v1) basic API. These will be removed after the legacy API has been
-switched off
-
-    app_ids
-    bank_reference
-    paid_at
-    transaction_fees
-
     amount
     arrival_date
     created_at
@@ -41,7 +32,8 @@ switched off
 
 =cut
 
-# TODO: remove legacy attributes
+# app_ids, bank_reference, paid_at, and transaction_fees relate to the
+# legacy (v1) basic API
 
 has [ qw/
     app_ids

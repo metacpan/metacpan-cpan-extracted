@@ -44,7 +44,7 @@ my $github    = 'https://github.com/briandfoy/app-url';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => '5.008',
+	'MIN_PERL_VERSION' => '5.026',
 
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
@@ -65,8 +65,9 @@ my %WriteMakefile = (
 		},
 
 	'PREREQ_PM' => {
-		'String::Sprintf' => '0',
-		'Mojolicious'     => '0',
+		'String::Sprintf'       => '0',
+		'Net::PublicSuffixList' => '0',
+		'Mojolicious'           => '0',
 		},
 
 	'EXE_FILES' => [ qw( script/url ) ],

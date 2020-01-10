@@ -117,6 +117,20 @@ async sub makelist
    is( scalar $fret->get, "later", '$fret->get for ANON closure' );
 }
 
+# await EXPR puts EXPR in scalar context
+{
+   my $f1 = Future->new;
+
+   sub yieldcontext { return Future->done( wantarray ); }
+
+   my $func = async sub {
+      return await yieldcontext();
+   };
+   my $fret = $func->();
+
+   is( $fret->get, '', 'await EXPR provides scalar context' );
+}
+
 # await in non-async sub is forbidden
 {
    my $ok = !eval 'sub { await $_[0] }';

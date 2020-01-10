@@ -8,6 +8,14 @@ use Carp;
 
 Pg::Explain::FromJSON - Parser for explains in JSON format
 
+=head1 VERSION
+
+Version 0.91
+
+=cut
+
+our $VERSION = '0.91';
+
 =head1 SYNOPSIS
 
 It's internal class to wrap some work. It should be used by Pg::Explain, and not directly.

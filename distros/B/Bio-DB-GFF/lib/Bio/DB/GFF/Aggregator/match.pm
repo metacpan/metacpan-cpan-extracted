@@ -30,7 +30,7 @@ Also see the "alignment" aggregator.
 =cut
 
 package Bio::DB::GFF::Aggregator::match;
-$Bio::DB::GFF::Aggregator::match::VERSION = '1.7.3';
+$Bio::DB::GFF::Aggregator::match::VERSION = '1.7.4';
 use strict;
 
 use base qw(Bio::DB::GFF::Aggregator);

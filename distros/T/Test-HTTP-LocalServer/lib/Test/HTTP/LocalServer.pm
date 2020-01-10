@@ -11,7 +11,7 @@ use File::Basename;
 use Time::HiRes qw ( time sleep );
 use HTTP::Tiny;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 =head1 NAME
 
@@ -43,8 +43,15 @@ behaviour in your test suite without talking to the outside world.
   my $server = Test::HTTP::LocalServer->spawn;
 
 This spawns a new HTTP server. The server will stay running until
+
   $server->stop
-is called.
+
+is called. Ideally, you explicitly call C<< ->stop >> or use
+
+  undef $server
+
+before the main program ends so that the program exit code reflects the
+real exit code and not the chlid exit code.
 
 Valid arguments are :
 
@@ -103,6 +110,7 @@ sub get {
 }
 
 sub spawn_child_win32 { my ( $self, @cmd ) = @_;
+    local $?;
     system(1, @cmd)
 }
 
@@ -229,7 +237,7 @@ sub url {
 
 =head2 C<< $server->server_url >>
 
-This returns the L<URI> object of the server URL. Use L</$server->url> instead.
+This returns the L<URI> object of the server URL. Use L</$server-E<gt>url> instead.
 Use this object if you want to modify the hostname or other properties of the
 server object.
 
@@ -250,9 +258,11 @@ url.
 =cut
 
 sub stop {
+    local $?; # so we don't override the exit code of a child here
     get( $_[0]->server_url() . "quit_server" );
     undef $_[0]->{_server_url};
-    wait;
+    my $pid = delete $_[0]->{_pid};
+    waitpid $pid, 0;
     #my $retries = 10;
     #while(--$retries and CORE::kill( 0 => $_[0]->{ _pid } )) {
         #warn "Waiting for '$_[0]->{ _pid }'";
@@ -271,11 +281,16 @@ cannot be retrieved then.
 =cut
 
 sub kill {
-  CORE::kill( 'KILL' => $_[0]->{ _pid } )
-      or warn "Couldn't kill pid '$_[0]->{ _pid }': $!";
-  wait;
+  my $pid = delete $_[0]->{_pid};
+  if( $pid and CORE::kill( 0 => $pid )) {
+    local $?; # so we don't override the exit code of a child here
+
+    # The kid is still alive
+    CORE::kill( 'KILL' => $pid )
+        or warn "Couldn't kill pid '$pid': $!";
+    waitpid $pid, 0;
+  };
   undef $_[0]->{_server_url};
-  undef $_[0]->{_pid};
 };
 
 =head2 C<< $server->get_log >>
@@ -435,7 +450,7 @@ None by default.
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
-Copyright (C) 2003-2019 Max Maischein
+Copyright (C) 2003-2020 Max Maischein
 
 =head1 AUTHOR
 

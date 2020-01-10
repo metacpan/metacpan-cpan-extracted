@@ -34,6 +34,7 @@ WriteMakefile
                     'DBI'                   => 0,
                     'DBD::SQLite'           => 0,
                     'File::HomeDir'         => 0,
+                    'File::stat'            => 1.02,
                     'Locale::TextDomain'    => 0,
                     'Math::Round'           => 0,
                     'Module::Load'          => 0,

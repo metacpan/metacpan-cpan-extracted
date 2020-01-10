@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,6 +22,7 @@ meta-spec:
 name: Bio-DB-SeqFeature
 requires:
   Bio::DB::Fasta: '0'
+  Bio::DB::GFF::Typename: '0'
   Bio::DB::GFF::Util::Rearrange: '0'
   Bio::Location::Simple: '0'
   Bio::PrimarySeq: '0'
@@ -32,8 +33,6 @@ requires:
   Bio::SeqFeature::Lite: '0'
   Carp: '0'
   Cwd: '0'
-  DBD::Pg: '0'
-  DBD::SQLite: '0'
   DBI: '0'
   DB_File: '0'
   Fcntl: '0'
@@ -60,10 +59,10 @@ resources:
   bugtracker: https://github.com/bioperl/bio-db-seqfeature/issues
   homepage: https://metacpan.org/release/Bio-DB-SeqFeature
   repository: git://github.com/bioperl/bio-db-seqfeature.git
-version: 1.7.3
+version: 1.7.4
 x_Dist_Zilla:
   perl:
-    version: '5.022001'
+    version: '5.028001'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -159,7 +158,9 @@ x_Dist_Zilla:
           phase: test
           script_finder:
             - ':PerlExecFiles'
-          skips: []
+          skips:
+            - Bio::DB::SeqFeature::Store::DBI::Pg
+            - Bio::DB::SeqFeature::Store::DBI::SQLite
           switch: []
       name: '@BioPerl/Test::Compile'
       version: '2.058'
@@ -199,7 +200,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.20.1
           repo_root: .
       name: '@BioPerl/Git::Check'
       version: '2.045'
@@ -216,7 +217,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -229,11 +230,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: Bio-DB-SeqFeature-v1.7.3
+          tag: Bio-DB-SeqFeature-v1.7.4
           tag_format: '%N-v%v'
           tag_message: '%N-v%v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -284,5 +285,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.22.1
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

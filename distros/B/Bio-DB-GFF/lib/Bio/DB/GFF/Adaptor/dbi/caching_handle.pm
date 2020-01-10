@@ -1,5 +1,5 @@
 package Bio::DB::GFF::Adaptor::dbi::caching_handle;
-$Bio::DB::GFF::Adaptor::dbi::caching_handle::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::dbi::caching_handle::VERSION = '1.7.4';
 use strict;
 use DBI;
 use vars '$AUTOLOAD';
@@ -200,7 +200,7 @@ sub dbi_quote {
 }
 
 package Bio::DB::GFF::Adaptor::dbi::faux_dbh;
-$Bio::DB::GFF::Adaptor::dbi::faux_dbh::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::dbi::faux_dbh::VERSION = '1.7.4';
 use vars '$AUTOLOAD';
 
 sub new {

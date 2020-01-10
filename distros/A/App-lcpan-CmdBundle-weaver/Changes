@@ -1,10 +1,15 @@
-0.02    2017-01-20 (PERLANCAR)
+0.030   2019-11-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add subcommands: weaver-{bundle,plugin,role,section}.
+
+
+0.02    2017-01-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Use Pod::Weaver plugin PWP:App::lcpan.
 
 
-0.01    2016-01-18 (PERLANCAR)
+0.01    2016-01-18  Released-By: PERLANCAR
 
         - First version.

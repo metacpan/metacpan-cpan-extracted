@@ -1,5 +1,5 @@
 package Bio::DB::SeqFeature::Store::berkeleydb;
-$Bio::DB::SeqFeature::Store::berkeleydb::VERSION = '1.7.3';
+$Bio::DB::SeqFeature::Store::berkeleydb::VERSION = '1.7.4';
 use strict;
 use base 'Bio::DB::SeqFeature::Store';
 use Bio::DB::GFF::Util::Rearrange 'rearrange';
@@ -1510,7 +1510,7 @@ sub _featurecount {
 
 
 package Bio::DB::SeqFeature::Store::berkeleydb::Iterator;
-$Bio::DB::SeqFeature::Store::berkeleydb::Iterator::VERSION = '1.7.3';
+$Bio::DB::SeqFeature::Store::berkeleydb::Iterator::VERSION = '1.7.4';
 sub new {
   my $class = shift;
   my $store = shift;
@@ -1529,7 +1529,7 @@ sub next_seq {
 
 
 package Bio::DB::Fasta::Subdir;
-$Bio::DB::Fasta::Subdir::VERSION = '1.7.3';
+$Bio::DB::Fasta::Subdir::VERSION = '1.7.4';
 use base 'Bio::DB::Fasta';
 
 # alter calling arguments so that the index file is placed in a subdirectory

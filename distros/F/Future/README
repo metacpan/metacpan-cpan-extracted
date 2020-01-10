@@ -154,6 +154,14 @@ DESCRIPTION
     its failure is propagated to another Future instance (by a sequencing
     or converging method).
 
+ Future::AsyncAwait::Awaitable ROLE
+
+    Since version 0.43 this module provides the
+    Future::AsyncAwait::Awaitable API. Subclass authors should note that
+    several of the API methods are provided by special optimised internal
+    methods, which may require overriding in your subclass if your
+    internals are different from that of this module.
+
 CONSTRUCTORS
 
  new

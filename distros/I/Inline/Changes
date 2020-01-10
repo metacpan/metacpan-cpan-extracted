@@ -1,3 +1,6 @@
+0.86 Wed Jan  8 21:19:58 PST 2020
+ - Fix various test problems
+
 0.85 Mon Jan  6 07:33:52 PST 2020
  - Fix a taint issue @mohawk2++
 

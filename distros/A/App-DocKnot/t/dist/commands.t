@@ -89,7 +89,6 @@ $docknot
 @expected = (
     ['./bootstrap'],
     ['./configure', 'CC=g++'],
-    ['make', 'warnings'],
     ['make', 'check'],
     ['make', 'clean'],
     ['./configure', 'CC=clang'],

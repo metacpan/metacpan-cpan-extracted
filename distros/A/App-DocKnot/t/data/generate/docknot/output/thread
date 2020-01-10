@@ -104,6 +104,7 @@ The following additional Perl modules are required to use it:
 \bullet(packed)[IPC::Run]
 \bullet(packed)[IPC::System::Simple]
 \bullet(packed)[JSON]
+\bullet(packed)[List::MoreUtils]
 \bullet(packed)[Perl6::Slurp]
 \bullet(packed)[Template (part of Template Toolkit)]
 
@@ -163,7 +164,7 @@ license:
 
 \block[
 
-    Copyright 2013-2019
+    Copyright 2013-2020
         Russ Allbery <rra@cpan.org>
 
     Permission is hereby granted, free of charge, to any person obtaining

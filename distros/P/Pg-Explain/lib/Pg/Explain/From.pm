@@ -7,6 +7,14 @@ use Carp;
 
 Pg::Explain::From - Base class for parsers of non-text explain formats.
 
+=head1 VERSION
+
+Version 0.91
+
+=cut
+
+our $VERSION = '0.91';
+
 =head1 SYNOPSIS
 
 It's internal class to wrap some work. It should be used by Pg::Explain, and not directly.
@@ -138,6 +146,12 @@ sub make_node_from {
                 'subquery_name' => $struct->{ 'Alias' },
             }
         );
+    }
+
+    $new_node->add_extra_info( 'Workers Planned: ' . $struct->{ 'Workers Planned' } ) if $struct->{ 'Workers Planned' };
+    if ( $struct->{ 'Workers Launched' } ) {
+        $new_node->workers_launched( $struct->{ 'Workers Launched' } );
+        $new_node->add_extra_info( 'Workers Launched: ' . $struct->{ 'Workers Launched' } );
     }
 
     $new_node->add_extra_info( 'Index Cond: ' . $struct->{ 'Index Cond' } ) if $struct->{ 'Index Cond' };

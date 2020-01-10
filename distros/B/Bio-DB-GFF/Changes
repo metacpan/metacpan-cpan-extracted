@@ -1,5 +1,9 @@
 Summary of important user-visible changes for Bio-DB-GFF
 --------------------------------------------------------
 
+1.7.4     2020-01-08 14:41:24-06:00 America/Chicago
+  * Explicitly remove Bio::GMOD::CMap::Utils as a requirement, this is 
+    a non-CPAN module that is used in a loader script, so ignore.
+
 1.7.3     2019-02-19 14:12:42-05:00 America/Detroit
   * First release after split from bioperl-live.

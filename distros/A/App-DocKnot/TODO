@@ -44,7 +44,6 @@ DocKnot itself:
 * Incorporate cvs2xhtml into this package
 * Incorporate faq2html into this package (and rewrite as a Perl module)
 * Incorporate release into this package
-* Incorporate check-dist into release and automatically run it
 * Incorporate build-license into this package (and rewrite as a Perl module)
 * Automatically run build-license during the release process
 * Add metadata files and overrides to build-license

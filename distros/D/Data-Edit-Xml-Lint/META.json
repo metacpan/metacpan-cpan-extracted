@@ -4,7 +4,7 @@
       "philiprbrenan@gmail.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -23,19 +23,20 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::Edit::Xml" : "20190721",
-            "Data::Table::Text" : "20190721",
+            "Data::Edit::Xml" : "20191231",
+            "Data::Table::Text" : "20200101",
             "Digest::SHA" : "0",
             "Encode" : "0",
             "Test::More" : "0",
-            "Test::SharedFork" : "0"
+            "Test::SharedFork" : "0",
+            "perl" : "v5.26.1"
          }
       }
    },
    "provides" : {
       "Data::Edit::Xml::Lint" : {
          "file" : "lib/Data/Edit/Xml/Lint.pm",
-         "version" : "20190721"
+         "version" : "20200108"
       },
       "Data::Edit::Xml::Lint::Report" : {
          "file" : "lib/Data/Edit/Xml/Lint.pm"
@@ -47,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20190721",
+   "version" : "20200108",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

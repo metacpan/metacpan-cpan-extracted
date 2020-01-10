@@ -10,6 +10,14 @@ use strict;
 
 Pg::Explain::Node - Class representing single node from query plan
 
+=head1 VERSION
+
+Version 0.91
+
+=cut
+
+our $VERSION = '0.91';
+
 =head1 SYNOPSIS
 
 Quick summary of what the module does.
@@ -68,11 +76,13 @@ Returns estimated full cost of given node.
 
 This cost is measured in units of "single-page seq scan".
 
-=head2 force_loops
+=head2 workers_launched
 
-Stores/returns number of "forced loops". In case of parallel plans, despite having loops=<some_number> in some "parallel node", we should use loops=X from nearest parent Gather node.
+How many worker processes this node launched.
 
-This is for calculation of total_inclusive_time and total_exclusive_time only.
+=head2 workers
+
+How many workers was this node processed on. Always set to at least 1.
 
 =head2 type
 
@@ -161,7 +171,8 @@ sub estimated_row_width    { my $self = shift; $self->{ 'estimated_row_width' } 
 sub estimated_startup_cost { my $self = shift; $self->{ 'estimated_startup_cost' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_startup_cost' }; }
 sub estimated_total_cost   { my $self = shift; $self->{ 'estimated_total_cost' }   = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_total_cost' }; }
 sub extra_info             { my $self = shift; $self->{ 'extra_info' }             = $_[ 0 ] if 0 < scalar @_; return $self->{ 'extra_info' }; }
-sub force_loops            { my $self = shift; $self->{ 'force_loops' }            = $_[ 0 ] if 0 < scalar @_; return $self->{ 'force_loops' }; }
+sub workers_launched       { my $self = shift; $self->{ 'workers_launched' }       = $_[ 0 ] if 0 < scalar @_; return $self->{ 'workers_launched' }; }
+sub workers                { my $self = shift; $self->{ 'workers' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'workers' } || 1; }
 sub initplans              { my $self = shift; $self->{ 'initplans' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'initplans' }; }
 sub never_executed         { my $self = shift; $self->{ 'never_executed' }         = $_[ 0 ] if 0 < scalar @_; return $self->{ 'never_executed' }; }
 sub explain                { my $self = shift; $self->{ 'explain' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'explain' }; }
@@ -486,13 +497,8 @@ Method for getting total node time, summarized with times of all subnodes, subpl
 sub total_inclusive_time {
     my $self = shift;
     return unless defined $self->actual_time_last;
-    if ( defined $self->{ 'force_loops' } ) {
-        return $self->actual_time_last * $self->{ 'force_loops' };
-    }
-    elsif ( $self->actual_loops ) {
-        return $self->actual_loops * $self->actual_time_last;
-    }
-    return;
+    return unless defined $self->actual_loops;
+    return $self->actual_loops * $self->actual_time_last / $self->workers;
 }
 
 =head2 total_exclusive_time

@@ -25,7 +25,7 @@ my $dataroot = File::Spec->catfile('t', 'data', 'generate');
 
 # Load a test configuration and check a few inobvious pieces of it.
 my $metadata_path = File::Spec->catfile($dataroot, 'ansicolor', 'metadata');
-my $config = App::DocKnot::Config->new({ metadata => $metadata_path });
+my $config        = App::DocKnot::Config->new({ metadata => $metadata_path });
 isa_ok($config, 'App::DocKnot::Config');
 my $data_ref = $config->config();
 is($data_ref->{build}{install}, 1, 'build/install defaults to 1');

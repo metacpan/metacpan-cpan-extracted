@@ -1,5 +1,11 @@
 Summary of important user-visible changes for Bio-DB-SeqFeature
 ---------------------------------------------------------------
 
+1.7.4     2020-01-08 22:03:25-06:00 America/Chicago
+  * The prior release required both DBD::Pg and DBD::SQLite; we now 
+    skip these.
+  * We now explicitly require Bio::DB::GFF::Typename; tests depend on 
+    it and the dynamic loading used (which caused issue #1) now doesn't make sense.
+
 1.7.3     2019-02-19 14:26:06-05:00 America/Detroit
   * First release after split from bioperl-live.

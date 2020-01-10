@@ -16,7 +16,7 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Errno' => '0',
                                       'Exporter' => '5.57',
-                                      'FFI::Platypus' => '0.20',
+                                      'FFI::Platypus' => '1.00',
                                       'perl' => '5.008001'
                                     }
                     },

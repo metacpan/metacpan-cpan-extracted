@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/ -I/home/phil/perl/cpan/DataEditXml/lib/
 #-------------------------------------------------------------------------------
 # Lint xml files in parallel using xmllint and report the pass/failure rate.
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2019
@@ -12,13 +12,12 @@
 # Show number of compressed errors on Lint summary line
 # Highlight error counts in bold using boldText() or perhaps enclosed alphanumerics
 # Relint load data in parallel
-# option to print xmllint comamnd
+# option to print xmllint command
 # inputFile=>name unicode seems to be failing
 # Lots more tests needed
 
 package Data::Edit::Xml::Lint;
-our $VERSION = 20190721;
-use v5.20;
+our $VERSION = 20200108;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(cluck confess);
@@ -26,6 +25,9 @@ use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 use Time::HiRes qw(time);
 use Encode;
+
+sub maxLintMsgLength {128}                                                      # Truncate xml lint messages longer then this
+sub maxExampleFiles  {3}                                                        # Maximum number of example files
 
 #D1 Constructor                                                                 # Construct a new linter
 
@@ -97,7 +99,8 @@ sub lint($@)                                                                    
      {my ($o) = @_;
 
       if (my $i = $o->id)                                                       # Id for this node but no labels
-       {$s .= "<!--definition: $i -->\n";                                       # Id definition
+       {$i =~ s(--) (\\-\\-)gs;                                                 # Escape any double hyphens as they are not allowed in XML comments
+        $s .= "<!--definition: $i -->\n";                                       # Id definition
         my $d = $lint->idDefs //= {};                                           # Id definitions for this file
         $d->{$i} = $i;                                                          # Record id definition
        }
@@ -143,7 +146,16 @@ sub lint($@)                                                                    
    }->();
 
   my $errors = qx($c);                                                          # Perform lint
-  my @errors = split /\n/, $errors;                                             # Each error line
+  my @errors = $errors ? split(/\n/, $errors) : ();                             # Each error line
+
+  for my $m(@errors)                                                            # Reverse the expected and got message components as they are more useful that way around
+   {my @m = split /:/, $m;
+    if (@m and $m[-1] =~ m(, got )s)
+     {my $t = pop @m;
+      push @m, join ' ', reverse split /, got /, $t;
+      $m = join ':', @m;
+     }
+   }
 
   if (@errors and $errors !~ m(parser error : Document is empty)s)              # Add errors as comments.
    {my @e;                                                                      # Wrap errors in comments
@@ -167,6 +179,8 @@ sub lint($@)                                                                    
 
   makePath($file);                                                              # Create folder for file
   rename $temp, $file;                                                          # Rename temporary file to obtain a more atomic rename
+
+  $lint
  } # lint
 
 sub squeezeDitaRef($)                                                           #S Squeeze a string so it can be safely stored inside blank separated list inside an xml comment.
@@ -239,8 +253,8 @@ sub formatAttributes(%)                                                         
 
    !defined($v) and m(docType) and confess "No doc type set for the xml to be linted";
     defined($v) or confess "Attribute $_ has no value";
-    $v =~ s/--/__/gs if /title/;                                                # Replace -- with __ as -- will upset the use of xml comments to hold the data in a greppable form - but only for title - for files we need to see an error message
-    $v =~ m/--/s and confess "-- in value of $_=>$v";                           # Confess if -- present in attribute value as this will mess up the xml comments
+    $v =~ s/--/\\-\\-/gs;                                                       # Replace -- with \-\- as -- will upset the use of xml comments to hold the data in a greppable form - but only for title - for files we need to see an error message
+#   $v =~ m/--/s and confess "Found -- in value of $_=>$v";                     # Confess if -- present in attribute value as this will mess up the xml comments
     push @s, "<!--${_}: $v -->";                                                # Place attribute inside a comment
    }
   join "\n", @s
@@ -605,14 +619,16 @@ sub report($;$)                                                                 
    {next if $filter and $in !~ m($filter);                                      # Filter files if a filter has been supplied
     push @x, Data::Edit::Xml::Lint::read($in);                                  # Reload a previously written L<file|/file>
    }
-  confess "No files selected" unless @x;                                        # No files selected
+
+  lll "No files selected" unless @x;                                            # No files selected
+  return undef unless @x;
 
   my %projects;                                                                 # Pass/Fail by project
   my %files;                                                                    # Pass fail by file
   my %filesToProjects;                                                          # Project from file name
   my $totalErrors = 0;                                                          # Total number of errors
   my $totalCompressedErrorsFileByFile = 0;                                      # Total number of errors summed file by file
-  my %CE;                                                                       # Compressed errors over all files
+  my %examples;                                                                 # Compressed errors example files
   my %docTypes;                                                                 # Document types
 
   for my $x(@x)                                                                 # Aggregate the results of individual lints
@@ -631,8 +647,14 @@ sub report($;$)                                                                 
     $totalCompressedErrorsFileByFile += $cErrors;
 
     if ($cet)                                                                   # Compressed errors over all files
-     {for(@$cet)
-       {$CE{$_}++;
+     {for my $message(@$cet)
+       {$message =~ s(\A<!--)  ()gs;                                            # Remove xml comments
+        $message =~ s(-->\Z)   ()gs;
+        $message =~ s(\s*\x29) (\x29)gs;
+        $message = deduplicateSequentialWordsInString($message);                # Remove duplicate sequential words in message
+
+        my $m = firstNChars $message, maxLintMsgLength;                         # Limit the length of messages to make the report more readable and collect similar errors together.
+        $examples{$m}{$file}++                                                  # Files that exhibit this message
        }
      }
     if (my $d = $x->docType)                                                    # Document type summary
@@ -663,52 +685,103 @@ sub report($;$)                                                                 
   my $totalNumberOfFails    = scalar grep {$files{$_}  > 0} keys %files;
   my $totalNumberOfPasses   = scalar grep {$files{$_} == 0} keys %files;
   my $totalPassFailPercent  = p4($totalNumberOfPasses, $totalNumberOfFails);
-  my $ts = dateTimeStamp;
+  my $ts                    = dateTimeStamp;
   my $numberOfProjects      = keys %projects;
   my $numberOfFiles         = $totalNumberOfPasses + $totalNumberOfFails;
-  my $totalCompressedErrors = scalar keys %CE;
+  my $totalCompressedErrors = scalar keys %examples;
+  my $totalPassFailPercentB = boldString($totalPassFailPercent);
 
-  my @report;
+  my $summary = <<END;                                                          # Report summary
+$totalPassFailPercent % success. Projects: $failingProjects+$passingProjects=$numberOfProjects.  Files: $totalNumberOfFails+$totalNumberOfPasses=$numberOfFiles. Errors: $totalCompressedErrors,$totalErrors  On $ts
+END
+
+  push my @report, $summary, "\n";
+
   push @report, sprintf(<<END,                                                  # Report title
-$totalPassFailPercent %% success. Projects: $failingProjects+$passingProjects=$numberOfProjects.  Files: $totalNumberOfFails+$totalNumberOfPasses=$numberOfFiles. Errors: $totalCompressedErrors,$totalErrors  On $ts
-
-CompressedErrorMessagesByCount (at the end of this file): %8d
+CompressedErrorMessagesByCount: %8d
 
 FailingFiles   :  %8d
 PassingFiles   :  %8d
 
 FailingProjects:  %8d
 PassingProjects:  %8d
+END
+  scalar keys %examples,
+  $totalNumberOfFails,
+  $totalNumberOfPasses,
+  scalar(@failingProjects),
+  scalar(@passingProjects));
+
+  if (@failingProjects)                                                         # Failing projects report
+   {push @report, sprintf(<<END,
 
 
 FailingProjects:  %8d
    #  Percent   Pass  Fail  Total  Project
 END
-  scalar keys %CE,
-  $totalNumberOfFails,
-  $totalNumberOfPasses,
-  scalar(@failingProjects),
-  scalar(@passingProjects),
-  scalar(@failingProjects));
+    scalar(@failingProjects));
 
-  for(1..@failingProjects)                                                      # Failing projects
-   {my ($project, $pass, $fail, $total, $percent) = @{$failingProjects[$_-1]};
-    push @report, sprintf("%4d %8.4f   %4d  %4d  %5d  %s\n",
-      $_, $percent, $pass, $fail, $total, $project);
+    for(1..@failingProjects)
+     {my ($project, $pass, $fail, $total, $percent) = @{$failingProjects[$_-1]};
+      push @report, sprintf("%4d %8.4f   %4d  %4d  %5d  %s\n",
+        $_, $percent, $pass, $fail, $total, $project);
+     }
    }
 
-  push @report, sprintf(<<END,                                                  # Passing projects
+  if (@passingProjects)                                                         # Passing projects report
+   {push @report, sprintf(<<END,
 
 
 PassingProjects:  %8d
    #   Files  Project
 END
-  scalar(@passingProjects));
+    scalar(@passingProjects));
 
-  for(1..@passingProjects)
-   {my ($project, $files) = @{$passingProjects[$_-1]};
-    push @report, sprintf("%4d    %4d  %s\n",
-      $_, $files, $project);
+    for(1..@passingProjects)
+     {my ($project, $files) = @{$passingProjects[$_-1]};
+      push @report, sprintf("%4d    %4d  %s\n",
+        $_, $files, $project);
+     }
+   }
+
+  if (my $N = keys %examples)                                                   # Compressed errors report
+   {my @ce = sort {$b->[0] <=> $a->[0]}
+             map  {my @f = keys $examples{$_}->%*; [scalar(@f), $_, \@f]}
+             keys %examples;
+
+    my @e;
+    for my $ce(@ce)
+     {my ($count, $message, $files) = @$ce;
+      $message =~ s(\A<!--)  ()gs;
+      $message =~ s(-->\Z)   ()gs;
+      $message =~ s(\s*\x29) (\x29)gs;
+      $message = trim($message);
+
+      my @f = map {fne($_)} sort {fileSize($a) <=> fileSize($b)} @$files;       # Smallest examples first, shorten file names
+        $#f = maxExampleFiles if scalar(@f) > maxExampleFiles;                  # Limit example files
+
+      push @e, [$count, $message, shift @f];                                    # First line
+      push @e, [q(), q(), $_]     for   @f;                                     # Subsequent lines
+     }
+
+    push @report, <<END,
+
+
+CompressedErrorMessagesByCount: $N
+
+END
+#   formatTableBasic(\@e);
+
+    formatTable(\@e, <<END,                                                     # Report compressed error messages
+Count    Number of times this message appears
+Message  The error message from xmllint - compressed and truncated if necessary
+Examples Files that exhibit this message
+END
+    title     => q(Compressed Error messages by Count),
+    head      => <<END,
+NNNN compressed error messages on DDDD
+END
+     );
    }
 
   my @filesFail = sort                                                          # Failing files: sort by number of errors, project, file name
@@ -723,7 +796,7 @@ END
                   grep {$files{$_} > 0}
                   keys %files;
 
-  if (my $filesFail = @filesFail)
+  if (my $filesFail = @filesFail)                                               # Failing files report
    {my @r;
     for my $n(1..@filesFail)
      {my ($errors, $project, $file) = @{$filesFail[$n-1]};
@@ -740,29 +813,6 @@ File    The file with errors
 END2
    }
 
-  if (my $N = scalar keys %CE)                                                  # Compressed errors
-   {my @ce = sort {$b->[0] <=> $a->[0]}
-             map  {[$CE{$_}, $_]}
-             keys %CE;
-
-    my @e;
-    for(@ce)
-     {my ($count, $message) = @$_;
-      $message =~ s(\A<!--)  ()gs;
-      $message =~ s(-->\Z)   ()gs;
-      $message =~ s(\s*\x29) (\x29)gs;
-      my   @m = split /:/, $message;
-      push @m, reverse(split /, got /, pop @m) if @m and $m[-1] =~ m(, got )s;  # Reverse got to make the table more usable
-      push @e, [$count, @m];
-     }
-    push @report, <<END, formatTableBasic(\@e);
-
-
-CompressedErrorMessagesByCount: $N
-
-END
-   }
-
   if (my $N = scalar keys %docTypes)                                            # Document type summary
    {my $s = formatTable(\%docTypes, [qw(Document Count)]);
     push @report, <<END;
@@ -776,8 +826,14 @@ END
 
   push @report, "\n", (split /\n/, $report[0])[0];                              # Repeat summary line
 
-  return bless {                                                                # Return report
-    compressedErrors                => \%CE,
+  if (my $d = dateTimeStamp)
+   {unshift @report, <<END,                                                     # Time stamp
+Summary of passing and failing projects on: $d
+END
+   }
+
+  return genHash('Data::Edit::Xml::Lint::Report',                               # Return report
+    compressedErrors                => \%examples,
     docTypes                        => \%docTypes,
     failingFiles                    => [@filesFail],
     failingProjects                 => [@failingProjects],
@@ -787,11 +843,12 @@ END
     passingProjects                 => [@passingProjects],
     passRatePercent                 => $totalPassFailPercent,
     print                           => (join '', @report),
+    summary                         => $summary,
     timestamp                       => $ts,
     totalCompressedErrorsFileByFile => $totalCompressedErrorsFileByFile,
-    totalCompressedErrors           => scalar keys %CE,
+    totalCompressedErrors           => scalar keys %examples,
     totalErrors                     => $totalErrors,
-   }, 'Data::Edit::Xml::Lint::Report';
+   );
  } # report
 
 sub fixDitaXrefHrefs($@)                                                        # Fix the dita xref href attributes in the corpus determined by B<foldersAndExtensions>.
@@ -1005,7 +1062,7 @@ L<file|/file> thus fixing the changes
 
 
 
-Version 20190708.
+Version 20190721.
 
 
 The following sections describe the methods in each functional area of this
@@ -1757,7 +1814,7 @@ use Data::Edit::Xml;
 Test::More->builder->output("/dev/null")                                        # Show only errors during testing
   if ((caller(1))[0]//'Data::Edit::Xml::Lint') eq "Data::Edit::Xml::Lint";
 
-if ($^O !~ m(bsd|linux)i)
+if (!-e q(/home/phil/))
  {plan skip_all => 'Not supported';
  }
 
@@ -2167,7 +2224,7 @@ END
 
   my $r = report($outDir);
   my ($e) = values %{$r->compressedErrors};
-  ok $e == $N;
+  ok $N == scalar keys %$e;
 
   clearFolder($outDir, $N+1);
  }

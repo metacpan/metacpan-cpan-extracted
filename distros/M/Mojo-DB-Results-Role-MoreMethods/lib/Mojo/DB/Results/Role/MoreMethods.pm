@@ -5,84 +5,9 @@ use Mojo::Util ();
 
 with 'Mojo::DB::Results::Role::Struct';
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 requires qw(array arrays columns hash hashes);
-
-sub import {
-    my $class = shift;
-
-    my (@mysql_indexes) = grep { ($_[$_] // '') eq '-mysql' } 0..$#_;
-    Carp::croak '-mysql flag provided more than once' if @mysql_indexes > 1;
-
-    my $mysql_flag;
-    if (@mysql_indexes) {
-        splice @_, $mysql_indexes[0], 1;
-        $mysql_flag = 1;
-    }
-
-    my (@pg_indexes) = grep { ($_[$_] // '') eq '-Pg' } 0..$#_;
-    Carp::croak '-Pg flag provided more than once' if @pg_indexes > 1;
-
-    my $pg_flag;
-    if (@pg_indexes) {
-        splice @_, $pg_indexes[0], 1;
-        $pg_flag = 1;
-    }
-
-    my %options = @_;
-    return unless %options or $mysql_flag or $pg_flag;
-
-    my $results_class;
-    if (exists $options{results_class}) {
-        $results_class = delete $options{results_class};
-        Carp::croak 'results_class must be a defined and non-empty value' unless defined $results_class and $results_class ne '';
-
-        my $ref = ref $results_class;
-        Carp::croak 'results_class must be a string or an arrayref' unless $ref eq '' or $ref eq 'ARRAY';
-
-        if ($ref and $ref eq 'ARRAY') {
-            Carp::croak 'results_class array cannot be empty' unless @$results_class;
-            Carp::croak 'results_class array entries must be non-empty strings'
-                unless scalar(grep { defined and not ref $_ and $_ ne '' } @$results_class) == @$results_class
-        } else {
-            $results_class = [$results_class];
-        }
-    }
-
-    Carp::croak 'unknown options provided to import: ' . Mojo::Util::dumper \%options if %options;
-
-    if ($mysql_flag or $pg_flag) {
-        $results_class ||= [];
-        if ($mysql_flag) {
-            if (grep { $_ eq 'Mojo::mysql::Results' } @$results_class) {
-                Carp::croak 'cannot provide -mysql flag and provide Mojo::mysql::Results in result_class';
-            }
-
-            push @$results_class, 'Mojo::mysql::Results';
-        }
-
-        if ($pg_flag) {
-            if (grep { $_ eq 'Mojo::Pg::Results' } @$results_class) {
-                Carp::croak 'cannot provide -Pg flag and provide Mojo::Pg::Results in result_class';
-            }
-
-            push @$results_class, 'Mojo::Pg::Results';
-        }
-    }
-
-    if ($results_class) {
-        require Role::Tiny;
-
-        my %seen;
-        for my $class (@$results_class) {
-            Carp::croak "$class provided more than once to result_class" if $seen{$class}++;
-
-            do { eval "require $class"; 1 } or Carp::croak "Failed to require $class";
-            Role::Tiny->apply_roles_to_package($class, 'Mojo::DB::Results::Role::MoreMethods');
-        }
-    }
-}
 
 sub get {
     my $self = shift;
@@ -434,9 +359,9 @@ Mojo::DB::Results::Role::MoreMethods - More methods for DB Results, like Mojo::P
 
 =head1 SYNOPSIS
 
-  use Mojo::DB::Results::Role::MoreMethods results_class => 'Mojo::Pg::Results';
+  my $db = Mojo::Pg->new(...)
 
-  my $results = $db->select(people => ['name', 'age', 'favorite_food'] => {id => 123});
+  my $results = $db->select(people => ['name', 'age', 'favorite_food'] => {id => 123})->with_roles('+MoreMethods');
   my $name    = $results->get;
   my $name    = $results->get(0);
   my $name    = $results->get(-3);
@@ -456,7 +381,7 @@ Mojo::DB::Results::Role::MoreMethods - More methods for DB Results, like Mojo::P
   }
 
   # get the next row as a Mojo::Collection
-  my $results   = $db->select(people => ['first_name', 'middle_name', 'last_name']);
+  my $results   = $db->select(people => ['first_name', 'middle_name', 'last_name'])->with_roles('+MoreMethods');
   my $full_name = $results->c->join(' ');
 
   # or get collection values by name
@@ -466,19 +391,19 @@ Mojo::DB::Results::Role::MoreMethods - More methods for DB Results, like Mojo::P
   my $full_names = $results->collections->map(sub { $_->join(' ') });
 
   # assert that exactly one row is returned where expected (not 0, not more than one)
-  my $results = $db->select(people => ['name', 'age', 'favorite_food'] => {id => 123});
+  my $results = $db->select(people => ['name', 'age', 'favorite_food'] => {id => 123})->with_roles('+MoreMethods');
   my $name    = $results->one;
   my ($name, $age, $favorite_food) = $results->one;
   my ($name, $favorite_food)       = $results->one_by_name('name', 'favorite_food');
 
   # Flatten results into one Mojo::Collection with names of all people who like Pizza
-  my $results = $db->select(people => ['name'] => {favorite_food => 'Pizza'});
+  my $results = $db->select(people => ['name'] => {favorite_food => 'Pizza'})->with_roles('+MoreMethods');
   my $names   = $results->flatten;
   say 'Pizza lovers:';
   say for $names->each;
 
   # access results by a key
-  my $results = $db->select(people => '*');
+  my $results = $db->select(people => '*')->with_roles('+MoreMethods');
   my $results_by_name = $results->hashify('name');
 
   # $alice_row is a hash
@@ -491,7 +416,7 @@ Mojo::DB::Results::Role::MoreMethods - More methods for DB Results, like Mojo::P
   my $alice_smith_row = $results_by_full_name->{Alice}{Smith};
 
   # collect results by a key in a Mojo::Collection behind a hash
-  my $results = $db->select(people => '*');
+  my $results = $db->select(people => '*')->with_roles('+MoreMethods');
   my $collections_by_name = $results->hashify_collect('name');
 
   # $alice_collection is a Mojo::Collection of all rows with the name 'Alice' as hashes
@@ -505,7 +430,7 @@ Mojo::DB::Results::Role::MoreMethods - More methods for DB Results, like Mojo::P
 
   # create a Mojo::Collection of Mojo::Collection's, where all results that share the same key
   # are grouped in the same inner Mojo::Collection
-  my $results = $db->select(people => '*');
+  my $results = $db->select(people => '*')->with_roles('+MoreMethods');
   my $name_collections = $results->collect_by('name');
 
   for my $name_collection ($name_collections->each) {
@@ -548,41 +473,6 @@ hashes
 =back
 
 =head1 HOW TO APPLY ROLE
-
-=head2 results_class
-
-  use Mojo::DB::Results::Role::MoreMethods results_class => 'Mojo::Pg::Results';
-
-  # or multiple
-
-  use Mojo::DB::Results::Role::MoreMethods results_class => ['Mojo::Pg::Results', 'Mojo::mysql::Results'];
-
-L</results_class> allows you to apply L<Mojo::DB::Results::Role::MoreMethods> to one results class package by providing the results class name,
-or to multiple by providing an arrayref of results class names.
-
-=head2 -mysql
-
-  use Mojo::DB::Results::Role::MoreMethods -mysql;
-
-  # shortcut for
-
-  use Mojo::DB::Results::Role::MoreMethods results_class => 'Mojo::mysql::Results';
-
-L<-mysql> is a shortcut for applying L<Mojo::DB::Results::Role::MoreMethods> to L<Mojo::mysql::Results>.
-
-This can be used with L</-Pg>.
-
-=head2 -Pg
-
-  use Mojo::DB::Results::Role::MoreMethods -Pg;
-
-  # shortcut for
-
-  use Mojo::DB::Results::Role::MoreMethods results_class => 'Mojo::Pg::Results';
-
-L<-Pg> is a shortcut for applying L<Mojo::DB::Results::Role::MoreMethods> to L<Mojo::Pg::Results>.
-
-This can be used with L</-mysql>.
 
 =head2 with_roles
 

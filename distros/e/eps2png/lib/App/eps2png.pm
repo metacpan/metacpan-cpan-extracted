@@ -5,8 +5,8 @@ package App::eps2png;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Jan  6 22:02:17 2020
-# Update Count    : 212
+# Last Modified On: Wed Jan  8 10:14:43 2020
+# Update Count    : 216
 # Status          : Okay
 
 # WARNING: This is a run-only module.
@@ -14,11 +14,12 @@ package App::eps2png;
 ################ Common stuff ################
 
 use strict;
+use warnings;
 use Getopt::Long 2.1;
 
 my $my_package = "Sciurix";
 my $my_name = "eps2png";
-our $VERSION = 2.903;
+our $VERSION = 2.905;
 
 my $use_pbm;			# use PBM fallback
 my $res;			# default resolution
@@ -46,7 +47,7 @@ $res = 82;			# default resolution
 $scale = 1;			# default scaling
 $mono = 0;			# produce BW images if non-zero
 undef $format;			# output format
-$gs_format;			# GS output type
+undef $gs_format;		# GS output type
 undef $output;			# output, defaults to STDOUT
 $antialias = 4;			# antialiasing
 undef $width;			# desired widht

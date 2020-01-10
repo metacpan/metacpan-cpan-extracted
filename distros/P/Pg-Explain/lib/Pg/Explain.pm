@@ -17,11 +17,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 0.90
+Version 0.91
 
 =cut
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 =head1 SYNOPSIS
 
@@ -269,49 +269,26 @@ sub check_for_parallelism {
     return unless $self->top_node->is_analyzed;
 
     # @nodes will contain list of nodes to check if they are Gather
-    my @nodes = ( $self->top_node );
-    while ( my $node = shift @nodes ) {
+    my @nodes = ( [ 1, $self->top_node ] );
 
-        # Sanity check
-        next unless $node;
+    while ( my $node_info = shift @nodes ) {
 
-        # If given node is not Gather, we just add all of its subnodes to @nodes to check, and continue checking
-        if ( $node->type ne 'Gather' ) {
-            push @nodes, $node->all_subnodes;
-            next;
-        }
+        my $workers = $node_info->[ 0 ];
+        my $node    = $node_info->[ 1 ];
 
-        # At the moment, we know that current node is Gather, so:
-        my $force_loops = $node->actual_loops;
+        # Set workers.
+        $node->workers( $workers );
 
-        # Push init/subplans/ctes of current gather to @nodes check
-        push @nodes, @{ $node->initplans }   if $node->initplans;
-        push @nodes, @{ $node->subplans }    if $node->subplans;
-        push @nodes, values %{ $node->ctes } if $node->ctes;
+        # These sub-nodes don't get workers.
+        push @nodes, map { [ $workers, $_ ] } @{ $node->initplans }   if $node->initplans;
+        push @nodes, map { [ $workers, $_ ] } @{ $node->subplans }    if $node->subplans;
+        push @nodes, map { [ $workers, $_ ] } values %{ $node->ctes } if $node->ctes;
 
-        # @set_force_loops is list of nodes that will need to have force_loops set.
-        my @set_force_loops = ();
+        # If there are workers launched, set it as new workers value for recursive set.
+        $workers = 1 + $node->workers_launched if defined $node->workers_launched;
 
-        # Apparently it shouldn't be set for initplans nor subplans, just sub_nodes (of the Gather)
-        push @set_force_loops, @{ $node->sub_nodes } if $node->sub_nodes;
-
-        while ( my $subnode = shift @set_force_loops ) {
-
-            # Sanity check
-            next unless $subnode;
-
-            # Make sure the node has force_loops set
-            $subnode->force_loops( $force_loops );
-
-            # If current node is Gather, add it to @nodes to scan, and don't check it's subnodes for now.
-            if ( $subnode->type eq 'Gather' ) {
-                push @nodes, $subnode;
-                next;
-            }
-
-            # Add all child nodes, regardless of type, to @set_force_loops;
-            push @set_force_loops, $subnode->all_subnodes;
-        }
+        # These things get new workers
+        push @nodes, map { [ $workers, $_ ] } @{ $node->sub_nodes } if $node->sub_nodes;
     }
     return;
 }

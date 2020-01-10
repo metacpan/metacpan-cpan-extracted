@@ -1,5 +1,31 @@
                        User-Visible DocKnot Changes
 
+DocKnot 3.02 (2020-01-08)
+
+    Add support for the No Maintenance Intended badge in the Markdown
+    README file if the package is marked as orphaned.
+
+    If the native distribution generation commands create only a
+    gzip-compressed tarball, generate an xz-compressed tarball from the
+    gzip-compressed tarball during docknot dist.
+
+    docknot dist now checks for files present in the source tree but
+    missing from the distribution, apart from a (currently hard-coded)
+    list of exceptions.
+
+    docknot dist now removes any existing directory when creating a new
+    distribution.  It overrides permissions if possible while doing this
+    so that it can clean up from a failed Automake make distcheck, so the
+    destination directory should be trusted, not one to which an attacker
+    may be able to write files.
+
+    Remove make warnings from the commands when building a distribution
+    that supports C++ with the C++ compiler, since my current Autoconf
+    warning flag discovery code doesn't properly exclude options that are
+    unsupported by C++.
+
+    Properly skip a test on Windows that requires tar.
+
 DocKnot 3.01 (2019-07-14)
 
     docknot dist now also runs make check-cppcheck for Autoconf build

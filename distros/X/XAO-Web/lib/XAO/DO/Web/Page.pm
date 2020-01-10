@@ -1748,14 +1748,23 @@ sub base_url ($;%) {
 
 =item is_secure ()
 
-Returns 1 if the current the current connection is a secure one or 0
-otherwise.
+Returns 1 if the current the current connection is a secure one or
+0 otherwise. If there is a defined cgi() value then the result is
+defined by its https() method; otherwise the default is taken from
+/xao/page/default_https configuration variable. The later is useful for
+scripts that don't have a CGI environment.
 
 =cut
 
 sub is_secure ($) {
     my $self=shift;
-    return $self->cgi && $self->cgi->https() ? 1 : 0;
+    my $cgi=$self->cgi;
+    if($cgi) {
+        return $cgi->https() ? 1 : 0;
+    }
+    else {
+        return $self->siteconfig->get('/xao/page/default_https') ? 1 : 0;
+    }
 }
 
 ###############################################################################

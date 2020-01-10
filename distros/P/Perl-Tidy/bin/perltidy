@@ -3085,7 +3085,6 @@ the result is
 
 This shows that blocks with a single statement become one-line blocks.
 
-
 =item B<-olbs=n>, B<--one-line-block-semicolons=n>
 
 This flag controls the placement of semicolons at the end of one-line blocks.
@@ -3103,6 +3102,31 @@ with the B<-nasc> flag.  Also not that while B<n=2> adds missing semicolons to
 all one-line blocks, regardless of complexity, the B<n=0> option only removes
 ending semicolons which terminate one-line blocks containing just one
 semicolon.  So these two options are not exact inverses.
+
+=item B<-olbn=n>, B<--one-line-block-nesting=n>
+
+Nested one-line blocks are lines with code blocks which themselves contain code
+blocks.  For example, the following line is a nested one-line block.
+
+         foreach (@list) { if ($_ eq $asked_for) { last } ++$found }
+
+The default behavior is to break such lines into multiple lines, but this
+behavior can be controlled with this flag.  The values of n are:
+
+  n=0 break nested one-line blocks into multiple lines [DEFAULT]
+  n=1 stable: keep existing nested-one line blocks intact
+
+For the above example, the default formatting (B<-olbn=0>) is
+
+    foreach (@list) {
+        if ( $_ eq $asked_for ) { last }
+        ++$found;
+    }
+
+If the parameter B<-olbn=1> is given, then the line will be left intact if it
+is a single line in the source, or it will be broken into multiple lines if it 
+is broken in multiple lines in the source.
+
 
 =back
 
@@ -3805,9 +3829,13 @@ detected in any single file will produce this type of exit condition.
 
 perlstyle(1), Perl::Tidy(3)
 
+=head1 INSTALLATION
+
+The perltidy binary uses the Perl::Tidy module and is installed when that module is installed.  The module name is case-sensitive.  For example, the basic command for installing with cpanm is 'cpanm Perl::Tidy'.
+
 =head1 VERSION
 
-This man page documents perltidy version 20191203
+This man page documents perltidy version 20200110
 
 =head1 BUG REPORTS
 
@@ -3819,7 +3847,7 @@ The source code repository is at L<https://github.com/perltidy/perltidy>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000-2018 by Steve Hancock
+Copyright (c) 2000-2020 by Steve Hancock
 
 =head1 LICENSE
 

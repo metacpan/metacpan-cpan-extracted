@@ -31,7 +31,7 @@ named "untranslated_region," "five_prime_untranslated_region,"
 =cut
 
 package Bio::DB::GFF::Aggregator::processed_transcript;
-$Bio::DB::GFF::Aggregator::processed_transcript::VERSION = '1.7.3';
+$Bio::DB::GFF::Aggregator::processed_transcript::VERSION = '1.7.4';
 use strict;
 
 use base qw(Bio::DB::GFF::Aggregator);

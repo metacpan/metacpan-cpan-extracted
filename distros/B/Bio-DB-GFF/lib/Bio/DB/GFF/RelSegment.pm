@@ -105,7 +105,7 @@ We can now set the reference sequence to the first of these contigs like so:
 =cut
 
 package Bio::DB::GFF::RelSegment;
-$Bio::DB::GFF::RelSegment::VERSION = '1.7.3';
+$Bio::DB::GFF::RelSegment::VERSION = '1.7.4';
 use strict;
 
 use Bio::DB::GFF::Feature;

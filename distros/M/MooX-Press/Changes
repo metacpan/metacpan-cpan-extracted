@@ -6,6 +6,35 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.018	2020-01-08
+
+ [ Documentation ]
+ - Fix typo.
+
+0.017	2020-01-08
+
+ - Added: MooX::Press::Keywords
+
+0.016	2020-01-08
+
+ [ Documentation ]
+ - Documentation of @ and % sigils for `isa`.
+ - Other improvements to type constraint related documentation.
+
+ [ Other ]
+ - Added: factory_package_can
+ - Added: type_library_can
+
+0.015	2020-01-07
+
+ [ Bug Fixes ]
+ - Fix interaction of automatic package prefixes and sigils.
+
+0.014	2020-01-07
+
+ - Added: Allow type names given as strings to be prefixed with @ or % to
+   indicate ArrayRef of or HashRef of.
+
 0.013	2019-11-06
 
  - Added: Allow classes to have multiple factories to create them.

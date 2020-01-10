@@ -1,3 +1,7 @@
+version 6.03
+	Oh no, missed versioning for a while? In any case, this update
+	removes 'bin/record_store_convert~' from the build.
+	
 version 3.23
 	Space wasn't being reclaimed during transaction handling.
 	This version fixes that, and also moves the documentation to

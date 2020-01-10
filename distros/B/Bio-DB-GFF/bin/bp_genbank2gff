@@ -69,7 +69,7 @@ disclaimers of warranty.
 =cut
 
 package Bio::DB::GFF::Adaptor::biofetch_to_stdout;
-$Bio::DB::GFF::Adaptor::biofetch_to_stdout::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::biofetch_to_stdout::VERSION = '1.7.4';
 use CGI 'escape';
 use Bio::DB::GFF::Util::Rearrange;
 use Bio::DB::GFF::Adaptor::biofetch;
@@ -129,7 +129,7 @@ sub finish_load { }
 1;
 
 package main;
-$main::VERSION = '1.7.3';
+$main::VERSION = '1.7.4';
 my $USAGE = <<USAGE;
 
 Usage: $0 [options] [<gff file 1> <gff file 2>] ...

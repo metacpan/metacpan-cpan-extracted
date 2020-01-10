@@ -133,6 +133,9 @@ my $blue = Local::Factories->new_collar(animal => 'Mary');
 isa_ok($blue->animal, 'Local::MyApp::Animal');
 is($blue->animal->name, 'Mary', '$blue->owner->name');
 
+my $animal_array_t = Local::MyApp::Types->get_type_for_package(class => '@Local::MyApp::Animal');
+is($animal_array_t->display_name, 'ArrayRef[Creature]');
+
 my $xyz;
 
 {

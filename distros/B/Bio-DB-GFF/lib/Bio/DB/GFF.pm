@@ -593,7 +593,7 @@ The following is the API for Bio::DB::GFF.
 =cut
 
 package Bio::DB::GFF;
-$Bio::DB::GFF::VERSION = '1.7.3';
+$Bio::DB::GFF::VERSION = '1.7.4';
 use strict;
 
 use IO::File;
@@ -3824,7 +3824,7 @@ END
 
 
 package Bio::DB::GFF::ID_Iterator;
-$Bio::DB::GFF::ID_Iterator::VERSION = '1.7.3';
+$Bio::DB::GFF::ID_Iterator::VERSION = '1.7.4';
 use strict;
 
 use base qw(Bio::Root::Root);
@@ -3849,7 +3849,7 @@ sub next_seq {
 }
 
 package Bio::DB::GFF::FeatureIterator;
-$Bio::DB::GFF::FeatureIterator::VERSION = '1.7.3';
+$Bio::DB::GFF::FeatureIterator::VERSION = '1.7.4';
 sub new {
     my $self     = shift;
     my @features = @_;

@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::FoldableHeader;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180923'; # VERSION
+our $VERSION = '1.20200108'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Token::String;
@@ -248,7 +248,7 @@ Mail::AuthenticationResults::FoldableHeader - Class for modelling a foldable hea
 
 =head1 VERSION
 
-version 1.20180923
+version 1.20200108
 
 =head1 DESCRIPTION
 

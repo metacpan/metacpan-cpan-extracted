@@ -1,5 +1,5 @@
 package Bio::DB::GFF::Adaptor::dbi::mysqlopt;
-$Bio::DB::GFF::Adaptor::dbi::mysqlopt::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::dbi::mysqlopt::VERSION = '1.7.4';
 =head1 NAME
 
 Bio::DB::GFF::Adaptor::dbi::mysqlopt -- Deprecated database adaptor

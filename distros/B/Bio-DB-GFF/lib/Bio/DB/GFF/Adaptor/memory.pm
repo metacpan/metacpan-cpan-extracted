@@ -1,5 +1,5 @@
 package Bio::DB::GFF::Adaptor::memory;
-$Bio::DB::GFF::Adaptor::memory::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::memory::VERSION = '1.7.4';
 =head1 NAME
 
 Bio::DB::GFF::Adaptor::memory -- Bio::DB::GFF database adaptor for in-memory databases

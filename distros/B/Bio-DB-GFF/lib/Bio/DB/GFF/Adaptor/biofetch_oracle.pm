@@ -1,5 +1,5 @@
 package Bio::DB::GFF::Adaptor::biofetch_oracle;
-$Bio::DB::GFF::Adaptor::biofetch_oracle::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::biofetch_oracle::VERSION = '1.7.4';
 #$Id$
 
 =head1 NAME

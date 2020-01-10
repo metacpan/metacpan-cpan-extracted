@@ -3,7 +3,7 @@ NAME
     minimum allowed version for prerequisites
 
 VERSION
-    version 0.001
+    version 0.002
 
 SYNOPSIS
         ; in dist.ini
@@ -47,6 +47,9 @@ SUPPORT
 
 AUTHOR
     David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    David Golden <xdg@xdg.me>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2015 by David Golden.

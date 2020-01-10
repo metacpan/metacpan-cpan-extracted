@@ -52,6 +52,7 @@ sub urpmi_force_skip_unknown {
 sub rpm_v3 {
     my @names = qw(libtermcap nls p2c);
 
+    require urpm::select;
     my $noverify_opt = urpm::select::_rpm_version() ge 4.14.2 ? '--noverify' : '';
     system_("rpm $noverify_opt --root $::pwd/root -i --ignorearch --noscripts media/rpm-v3/*.i386.rpm");
     check_installed_names(@names);

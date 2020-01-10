@@ -1,5 +1,5 @@
 package Bio::DB::SeqFeature::Store::memory;
-$Bio::DB::SeqFeature::Store::memory::VERSION = '1.7.3';
+$Bio::DB::SeqFeature::Store::memory::VERSION = '1.7.4';
 =head1 NAME
 
 Bio::DB::SeqFeature::Store::memory -- In-memory implementation of Bio::DB::SeqFeature::Store
@@ -122,6 +122,7 @@ will be lost when the script exits.
 use strict;
 use base 'Bio::DB::SeqFeature::Store';
 use Bio::DB::SeqFeature::Store::GFF3Loader;
+use Bio::DB::GFF::Typename;
 use Bio::DB::GFF::Util::Rearrange 'rearrange';
 use File::Temp 'tempdir';
 use IO::File;
@@ -672,7 +673,6 @@ sub _search_attributes {
 
 sub types {
   my $self = shift;
-  eval "require Bio::DB::GFF::Typename" unless Bio::DB::GFF::Typename->can('new');
   my @types;
   for my $primary_tag ( keys %{$$self{_index}{type}} ) {
     for my $source_tag ( keys %{$$self{_index}{type}{$primary_tag}} ) {
@@ -750,7 +750,7 @@ sub _seq_ids {
 }
 
 package Bio::DB::SeqFeature::Store::memory::Iterator;
-$Bio::DB::SeqFeature::Store::memory::Iterator::VERSION = '1.7.3';
+$Bio::DB::SeqFeature::Store::memory::Iterator::VERSION = '1.7.4';
 sub new {
   my ($class, $store, $ids) = @_;
   return bless {store => $store,

@@ -2,6 +2,16 @@
 
 =encoding utf8
 
+=for HTML <a href="https://travis-ci.org/briandfoy/app-url"><img src="https://travis-ci.org/briandfoy/app-url.svg?branch=master" /></a>
+
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/app-url'><img src='https://ci.appveyor.com/api/projects/status/o3jrgfm3x535e7p4'></a>
+
+=for HTML <a href='https://coveralls.io/github/briandfoy/app-url?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/app-url/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=for HTML <a href="https://github.com/briandfoy/app-file/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/App-url.svg" /></a>
+
+=for HTML <a href="https://metacpan.org/pod/App::url"><img src="https://img.shields.io/cpan/v/App-url.svg" /></A>
+
 =head1 The App::url module
 
 This is the I<README> for the L<App::url> Perl module.

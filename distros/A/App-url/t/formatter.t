@@ -3,7 +3,9 @@ use Mojo::Base -strict, -signatures;
 use open qw(:std :utf8);
 use Test::More 1;
 
-my $program = 'blib/script/url';
+use File::Spec::Functions;
+
+my $program = catfile( qw( blib script url ) );
 
 subtest sanity => sub {
 	my $class = 'App::url';
@@ -87,6 +89,16 @@ subtest host => sub {
 		);
 
 	run_table( '%h', \@tests )
+	};
+
+subtest host_no_domain => sub {
+	my @tests = (
+		[ qw( http://www.example.com/a/b/c         www       ) ],
+		[ qw( http://foo.www.foo.example.net/a/b/c foo       ) ],
+		[ qw( http://briandfoy.github.io/a/b/c     briandfoy ) ],
+		);
+
+	run_table( '%H', \@tests )
 	};
 
 subtest ihost => sub {

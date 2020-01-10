@@ -1,5 +1,17 @@
 #!/usr/bin/env perl
 
+# vim: tabstop=4 expandtab
+
+=head1 NAME
+
+ezbackup - a cli utility for Backup::EZ
+
+=head1 VERSION
+
+version 0.43
+
+=cut
+
 ###### PACKAGES ######
 
 use strict;

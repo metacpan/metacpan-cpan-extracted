@@ -61,4 +61,10 @@ is $str, "this", "no filename without `basename`"
 		or do { diag "command line:"; print STDERR '# '; bash -x => "$^X -e 1", $f };
 
 
+# If an arg is a regex, that should stringify and quote as well.
+my $re = qr/"This" (is) a* 'test'/;
+$str = bash \string => "$^X -e '$proglet'", $re, '2>'.File::Spec->devnull;
+is $str, "$re", "regex quote just like filename";
+
+
 done_testing;

@@ -1,6 +1,6 @@
 #!perl -w
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2020 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use App::Upfiles;
 
-our $VERSION = 12;
+our $VERSION = 14;
 
 my $upf = App::Upfiles->new;
 exit $upf->command_line;
@@ -55,7 +55,7 @@ some conditionals, use C<< $ENV{HOME} >>, etc.  Then to upload run
 
     upfiles
 
-Or to upload just some selected files give the local filenames,
+Or to upload just some selected files,
 
     upfiles /my/directory/foo.txt
     upfiles bar.txt ../something/quux.pl
@@ -69,14 +69,14 @@ Note that FTP transmits username and password in clear text over the
 network.  See L</FTP Security> below for secure connections (or L</SSH File
 Transfer (SFTP)>).
 
-B<upfiles> records what has been sent in an SQLite3 database file
-F<.upfiles.sqdb> in each local toplevel directory, for example
+B<upfiles> records files sent in an SQLite3 database file F<.upfiles.sqdb>
+in each local toplevel directory, for example
 F</my/directory/.upfiles.sqdb>.  Local changes are identified by traversing
-the local tree and comparing file modtimes and sizes against what was last
-sent in the database.  This is faster than asking the remote server what
-it's got.
+the local tree and comparing file modtimes and sizes against what the
+database records was last sent.  This is faster than asking the remote
+server what files etc it's got.
 
-For convenience some local files are always excluded from the upload.
+For convenience, some local files are always excluded from the upload.
 Currently these are
 
     .upfiles.sqdb    which is upfiles itself
@@ -96,8 +96,8 @@ or 5-arg).
 
 Plain RFC959 FTP doesn't have a notion of symlinks or hard links so
 C<upfiles> follows any local links to actual content to upload.  Perhaps in
-the future the C<SITE SYMLINK> extension could be used for links within the
-uploaded tree, if available.  (Or SFTP below has symlinks.)
+the future the C<SITE SYMLINK> extension, if available, could be used for
+links within the uploaded tree.  (Or SFTP below has symlinks.)
 
 Filenames containing CR or LF characters (\r, \n) cannot be sent by FTP
 protocol and Upfiles will refuse to operate on them.
@@ -110,14 +110,14 @@ server.  Recent C<Net::FTP> (version 1.28 circa 2014) and its SSL
 dependencies (L<IO::Socket::SSL>) are required.
 
 C<ftps> is immediate SSL on both command and data channels.  The server
-listens on a different port (990) than plain FTP (port 21).  Give C<ftps> in
+listens on a different port 990 than plain FTP (port 21).  Give C<ftps> in
 the remote URL,
 
     upfiles (local  => '/my/directory',
              remote => 'ftps://fred@example.com/pub/fred');
 
 Or, on the usual FTP connection a C<TLS> command is given to encrypt the
-command channel (and data channels) from that point onwards.  For this give
+command channel (and data channels) from that point onwards.  For this, give
 remote URL with plain C<ftp>, plus C<use_TLS> option,
 
     upfiles (local   => '/my/directory',
@@ -132,7 +132,7 @@ See L</DEBUGGING> below on protocol tracing.
 
 =head2 SSH File Transfer (SFTP)
 
-The C<ssh> "secure shell" program and protocol incorporates an SFTP file
+The C<ssh> "secure shell" program and protocol includes an SFTP file
 transfer.  Upfiles can use this by setting the remote URL to C<sftp>.
 
     upfiles (local  => '/my/directory',
@@ -177,9 +177,9 @@ in F<~/.netrc> by username and machine name.
 
 For an C<ftp> remote, if set to 1 then use the C<TLS> command to give an SSL
 secure protocol with the server.  This is highly recommended when supported
-by the server (or C<ftps> or C<sftp>).
+by the server (or instead C<ftps> or C<sftp> too).
 
-For C<ftps> this option is ignored, as the connection is secured before any
+For C<ftps>, this option is ignored, as the connection is secured before any
 commands at all.
 
 =item C<exclude_regexps> (arrayref of regexps)
@@ -194,7 +194,7 @@ Additional filenames to exclude.  For example to exclude a local F<Makefile>
 
 Whether to copy file modification times to the server.  Usually this is
 desirable.  The default C<"if_possible"> means do so if the server supports
-it.  0 means don't try.  1 means must copy.
+it.  0 means don't try.  1 means must copy times.
 
 For FTP, this uses the C<MFMT> or C<SITE UTIME> commands, which are widely
 available extensions to the basic FTP protocol.  For SFTP, copying times is
@@ -243,35 +243,36 @@ diagnostics include information about certificates checked and encryption
 negotiated.
 
 It can be helpful to check first that a connection to the remote works.  For
-FTP this can be the usual C<ftp> program, or even C<telnet>  (C<quit> to exit).
+FTP this can be the usual C<ftp> program, or even C<telnet> (C<quit> to
+exit).
 
     ftp example.com
     telnet example.com 21
 
 Server support for C<TLS> command can be checked in the usual way by the
 C<FEAT> command (which in an ftp client might have to be sent by C<quot
-feat>) and checking for C<AUTH TLS>.  The initial text banner message often
-says something for human readers too.  The C<use_TLS> option should then
-work, or not, according to server support.
+feat>) and looking for C<AUTH TLS> in its response.  The initial text banner
+message often says something for human readers too.  The C<use_TLS> option
+should then work, or not, according to server support.
 
 For C<ftps> (FTP with SSL on port 990), if no server is listening on that
 port then the host might either immediately give "connection refused", or
-could ignore and C<upfiles> time-out.  If a suitable SSL-enabled C<ftp>
+could ignore so that C<upfiles> times-out.  If a suitable SSL-enabled C<ftp>
 program is not at hand then raw telnet equivalent though SSL can be had with
 either
 
     openssl s_client -connect example.com:990
     gnutls-cli --verbose -p 990 example.com
 
-For SSH SFTP, check C<ssh> works by running it directly (C<-l> for remote
-username).  Its C<-v> can be repeated for ever greater verbosity.
+For SSH SFTP, check C<ssh> works by running it directly (give remote
+username with C<-l>).  Its C<-v> can be repeated for ever greater verbosity.
 
     ssh -v -l fred example.com
 
-On first connection to a new host C<ssh> will usually ask whether to accept
+On first connection to a new host, C<ssh> will usually ask whether to accept
 the host certificate.  This happens when run through C<upfiles> too.
-Preferably you have some external way to validate or get a certificate to
-know to whom you're speaking.  Likewise SSL setups.
+Ideally you should have some separate independent way to validate or get a
+certificate so you know to whom you're speaking.  Likewise SSL setups.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -309,33 +310,33 @@ for F<_netrc>.
 =head1 BUGS
 
 Changing a local file from a file to a directory or vice versa probably
-doesn't work very well.  Remove it and upload, then create the new and
-upload that.
+doesn't work very well.  Remove it locally and upload to remove it at the
+remote, then create the new locally and upload again.
 
 FTP and SFTP make a couple of round trip command/responses to the server for
 every file.  When uploading many small files something streaming or parallel
 would be faster.  The temp file and rename adds a round trip too, but is
-desirable so anyone looking doesn't see a half file.  Perhaps an option
+desirable so anyone looking doesn't see half a file.  Perhaps an option
 could turn this off if not needed (such as upfiles to a remote backup).  For
 reference, C<Net::SFTP::Foreign> has its own atomic option in C<put()>, but
 think it's still just a client side action so recording temporaries in the
-database better ensures cleanup if interrupted.
+database is a better cleanup if interrupted.
 
 The temporary files are named using the local C<$$> PID added to the target
 filename.  This is enough to protect against simultaneous uploads from the
 same source machine, but potentially not if you're networked and are foolish
 enough to C<upfiles> the same tree simultaneously from two different source
-machines.  For FTP, havoc probably ensues.  For SFTP, use of no-overwrite
+machines.  For FTP, havoc probably ensues.  For SFTP, no-overwrite is usedso
 should make an error.  FTP C<STOU> would guarantee uniqueness, but does it
 have a window while the name comes back which if interrupted could leave the
 file created but unknown to upfiles?  C<Net::FTP> C<put_unique()> doesn't
-return the name until after the whole transfer too.
+return the name until the transfer completes too.
 
 For FTP, there's a small chance of a 2-arg C<SITE UTIME> attempt looking
 like 5-arg to a C<pure-ftpd> pre-1.0.33 server (circa 2011), if the filename
 uploaded happens to be dates and "UTC".  Perhaps more care could be taken to
 identify the C<SITE UTIME> style the server expects.  In practice such
-filenames should be unlikely, and there's no problem with recent
+filenames should be unlikely, and there's no problem with new enough
 C<pure-ftpd> which has C<MDTM>.
 
 There's no support for a proxy connection to the remote system.  The squid
@@ -343,7 +344,8 @@ CONNECT style which gives a pass-through socket wouldn't be too hard, and
 C<ssh> can be made to speak through such things too.  The http-only style,
 where http PUT must be given for FTP upload, is irritating and makes the
 proxy a man-in-the-middle which you have to trust.  If a http PUT upload
-method was of interest then it might follow from that easily enough.
+method was of interest then such proxying might follow from that easily
+enough.
 
 File sizes and totals are reported in kbytes (of 1024 bytes).  Probably
 should jump to mbytes or even gbytes at some sensible threshold.
@@ -353,9 +355,17 @@ want to send everything again.  This is good if the remote is genuinely
 somewhere new, or if uploading a local directory to multiple remote places.
 But if it's just a change of hostname or protocol then would want no
 resending.  Hopefully this is rare.  There's a secret undocumented
-maybe-working C<--catchup> for marking everything already sent which could
-help.  Some sort of force option to resend particular files could be useful
-too.
+maybe-working C<--catchup> for marking everything already sent.  Some sort
+of force option to resend particular files could be useful too.
+
+The F<.upfiles.sqdb> database records fake timestamps for directories just
+to indicate whether it has been created on the remote yet.  Currently this
+is time "1 second" in the system epoch (1 Jan 1970 for Unix, whatever 1 Jan
+1904 for MacOS).  Alas this makes the database contents system-dependent.
+Hopefully cross-system operation will be rare and the effect on moving
+systems no worse than some repeated C<MKD>s.  Directory stamps are only
+actually for whether the directory has been created yet or not, so the
+intention is to treat any stamp value as meaning created.
 
 =head1 SEE ALSO
 
@@ -372,7 +382,7 @@ L<http://user42.tuxfamily.org/upfiles/index.html>
 
 =head1 LICENSE
 
-Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2020 Kevin Ryde
 
 Upfiles is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

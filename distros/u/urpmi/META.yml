@@ -39,7 +39,8 @@ requires:
   URPM: v5.16.0
   XML::LibXML: '0'
   XML::LibXML::Reader: '0'
+  perl: '5.010000'
 resources:
   repository: git://git.mageia.org/software/rpm/urpmi/
-version: v8.120.1
+version: v8.120.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

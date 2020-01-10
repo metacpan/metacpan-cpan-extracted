@@ -116,7 +116,7 @@ disclaimers of warranty.
 =cut
 
 package Bio::DB::GFF::Adaptor::faux;
-$Bio::DB::GFF::Adaptor::faux::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::faux::VERSION = '1.7.4';
 use Bio::DB::GFF::Adaptor::dbi::mysqlopt;
 use vars '@ISA';
 @ISA = 'Bio::DB::GFF::Adaptor::dbi::mysqlopt';
@@ -128,7 +128,7 @@ sub insert_sequence {
 }
 
 package main;
-$main::VERSION = '1.7.3';
+$main::VERSION = '1.7.4';
 eval "use Time::HiRes"; undef $@;
 my $timer = defined &Time::HiRes::time;
 

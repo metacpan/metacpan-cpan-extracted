@@ -36,7 +36,7 @@
             "Import::Into" : "0",
             "Role::Tiny" : "0",
             "Type::Params" : "0",
-            "Types::Interface" : "0",
+            "Types::Interface" : "0.002",
             "Types::Standard" : "0"
          }
       },
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

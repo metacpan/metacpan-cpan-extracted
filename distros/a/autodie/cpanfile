@@ -22,7 +22,9 @@ on 'test' => sub {
   requires "FindBin" => "0";
   requires "IO::Handle" => "0";
   requires "Socket" => "0";
+  requires "Test::Kwalitee" => "0";
   requires "Test::More" => "0";
+  requires "Test::Perl::Critic" => "0";
   requires "if" => "0";
   requires "lib" => "0";
 };
@@ -30,9 +32,6 @@ on 'test' => sub {
 on 'test' => sub {
   recommends "BSD::Resource" => "0";
   recommends "Import::Into" => "1.002004";
-  recommends "Pod::Coverage::TrustPod" => "0";
-  recommends "Test::Kwalitee" => "0";
-  recommends "Test::Perl::Critic" => "0";
   recommends "perl" => "5.010";
 };
 
@@ -41,7 +40,13 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "BSD::Resource" => "0";
+  requires "IPC::System::Simple" => "0";
+  requires "Import::Into" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
+  requires "Sub::Identify" => "0";
+  requires "Test::More" => "0";
+  requires "Test::Perl::Critic" => "0";
   requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
 };

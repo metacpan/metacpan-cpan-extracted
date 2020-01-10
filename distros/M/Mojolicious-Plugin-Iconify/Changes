@@ -1,5 +1,10 @@
 Revision history for Perl extension Mojolicious::Plugin::Iconify.
 
+1.02  2010-01-07
+    - Added "align" attribute
+    - Changed minimum Mojolicious version required (>= 7.93) in Makefile.PL
+      Fix RT #131364 bug
+
 1.01  2010-01-05
     - Fix for CPAN Testers
 

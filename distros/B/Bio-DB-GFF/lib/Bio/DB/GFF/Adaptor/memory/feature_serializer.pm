@@ -1,5 +1,5 @@
 package Bio::DB::GFF::Adaptor::memory::feature_serializer;
-$Bio::DB::GFF::Adaptor::memory::feature_serializer::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::memory::feature_serializer::VERSION = '1.7.4';
 
 =head1 NAME
 

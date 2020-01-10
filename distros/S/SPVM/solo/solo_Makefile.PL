@@ -42,17 +42,23 @@ my $ldcmd = "cc ";
 my $makefile = <<"EOS";
 
 all:
-	$cccmd -o solo/main.o solo/main.c
+	$cccmd -o solo/main.o solo/spvm_boot.c
 	$ldcmd -o solo/main -lm -o solo/main solo/main.o @object_files
-
-test:
-	$cccmd -o solo/t/spvm_t_list solo/t/spvm_t_list.c spvm_list.o spvm_util_allocator.o
-	solo/t/spvm_t_list
-	$cccmd -o solo/t/spvm_t_hash solo/t/spvm_t_hash.c spvm_hash.o spvm_util_allocator.o spvm_hash_func.o
-	solo/t/spvm_t_hash
+	mkdir -p solo/SPVM
+	cp lib/SPVM/Byte.spvm solo/SPVM/Byte.spvm
+	cp lib/SPVM/Short.spvm solo/SPVM/Short.spvm
+	cp lib/SPVM/Int.spvm solo/SPVM/Int.spvm
+	cp lib/SPVM/Long.spvm solo/SPVM/Long.spvm
+	cp lib/SPVM/Float.spvm solo/SPVM/Float.spvm
+	cp lib/SPVM/Double.spvm solo/SPVM/Double.spvm
+	cp lib/SPVM/Complex_2f.spvm solo/SPVM/Complex_2f.spvm
+	cp lib/SPVM/Complex_2d.spvm solo/SPVM/Complex_2d.spvm
 
 clean:
 	rm -rf solo/main
+	rm -rf solo/main.o
+	rm -rf solo/Makefile
+	rm -rf solo/SPVM
 EOS
 
 my $makefile_file = 'solo/Makefile';

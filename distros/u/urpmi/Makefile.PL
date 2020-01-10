@@ -206,6 +206,7 @@ WriteMakefile(
 	    release_status => 'stable',
         } ) : ()
     ),
+    MIN_PERL_VERSION => '5.010000',
     EXE_FILES		=> [ @bin_scripts, @sbin_scripts, @libexec_scripts ],
     PMLIBDIRS		=> [ qw(gurpm urpm) ],
     $with_po ? (DIR	=> [ 'po' ]) : (),

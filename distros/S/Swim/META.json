@@ -1,10 +1,10 @@
 {
    "abstract" : "See What I Mean?!",
    "author" : [
-      "Ingy döt Net <ingy@cpan.org>"
+      "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,6 +43,11 @@
             "YAML::XS" : "0",
             "perl" : "v5.8.1"
          }
+      },
+      "test" : {
+         "requires" : {
+            "JSON::PP" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -57,6 +62,8 @@
          "web" : "https://github.com/ingydotnet/swim-pm"
       }
    },
-   "version" : "0.1.46"
+   "version" : "0.1.48",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

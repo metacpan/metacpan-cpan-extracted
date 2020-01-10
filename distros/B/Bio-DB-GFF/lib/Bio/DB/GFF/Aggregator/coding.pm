@@ -29,7 +29,7 @@ if this isn't the case.
 =cut
 
 package Bio::DB::GFF::Aggregator::coding;
-$Bio::DB::GFF::Aggregator::coding::VERSION = '1.7.3';
+$Bio::DB::GFF::Aggregator::coding::VERSION = '1.7.4';
 use strict;
 
 use base qw(Bio::DB::GFF::Aggregator);

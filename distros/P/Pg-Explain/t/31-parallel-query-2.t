@@ -108,7 +108,7 @@ is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 1 ]->ty
 my $gather = $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 1 ];
 is( $gather->sub_nodes->[ 0 ]->type, 'Parallel Seq Scan', 'Properly extracted subnode-4' );
 my $pss = $gather->sub_nodes->[ 0 ];
-is( $pss->total_inclusive_time, $pss->actual_time_last * $gather->actual_loops, "Inclusive time is calculated properly for parallel nodes" );
+ok( abs( 2157047936.846 - $pss->total_inclusive_time ) < 0.001, "Inclusive time is calculated properly for parallel nodes" );
 is( $pss->total_exclusive_time, $pss->total_inclusive_time, "Exclusive time is calculated properly for parallel nodes" );
 
 lives_ok(

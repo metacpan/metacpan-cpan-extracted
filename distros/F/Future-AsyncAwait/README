@@ -88,6 +88,14 @@ DESCRIPTION
     an exception), this value is set as the result of the future it had
     returned earlier.
 
+    await provides scalar context to its controlling expression.
+
+       async sub func {
+          # this function is invoked in scalar context
+       }
+    
+       await func();
+
     Because the await keyword may cause its containing function to suspend
     early, returning a pending future instance, it is only allowed inside
     async-marked subs.
@@ -251,6 +259,41 @@ SUPPORTED USES
       executing if cancelled, but will not propagate the request backwards
       into the future that the async sub is currently waiting on. See
       "TODO".
+
+SUBCLASSING Future
+
+    By default when an async sub returns a result or fails immediately
+    before awaiting, it will return a new completed instance of the Future
+    class. In order to allow code that wishes to use a different class to
+    represent futures the module import method can be passed the name of a
+    class to use instead.
+
+       use Future::AsyncAwait future_class => "Subclass::Of::Future";
+    
+       async sub func { ... }
+
+    This has the usual lexically-scoped effect, applying only to async subs
+    defined within the block; others are unaffected.
+
+       use Future::AsyncAwait;
+    
+       {
+          use Future::AsyncAwait future_class => "Different::Future";
+          async sub x { ... }
+       }
+    
+       async sub y { ... }  # returns a regular Future
+
+    This will only affect immediate results. If the await keyword has to
+    suspend the function and create a new pending future, it will do this
+    by using the prototype constructor on the future it itself is waiting
+    on, and the usual subclass-respecting semantics of "new" in Future will
+    remain in effect there. As such it is not usually necessary to use this
+    feature just for wrapping event system modules or other similar
+    situations.
+
+    Such an alternative subclass should implement the API documented by
+    Future::AsyncAwait::Awaitable.
 
 WITH OTHER MODULES
 

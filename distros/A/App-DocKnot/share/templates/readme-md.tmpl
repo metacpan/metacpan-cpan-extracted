@@ -1,7 +1,8 @@
 # [% name %] [% version %]
-[% IF vcs.travis || distribution.cpan %]
-[% IF vcs.travis %][![Build status](https://travis-ci.org/[% vcs.travis %].svg?branch=master)](https://travis-ci.org/[% vcs.travis %])[% END -%]
-[% IF distribution.cpan %] [![CPAN version](https://img.shields.io/cpan/v/[% distribution.cpan %].svg)](https://metacpan.org/release/[% distribution.cpan %])[% END -%]
+[% IF vcs.travis || distribution.cpan || orphaned %]
+[% IF orphaned %][![No maintenance intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) [% END -%]
+[% IF vcs.travis %][![Build status](https://travis-ci.org/[% vcs.travis %].svg?branch=master)](https://travis-ci.org/[% vcs.travis %]) [% END -%]
+[% IF distribution.cpan %][![CPAN version](https://img.shields.io/cpan/v/[% distribution.cpan %].svg)](https://metacpan.org/release/[% distribution.cpan %])[% END -%]
 
 [% END %]
 [% FOREACH copr IN copyrights %]Copyright [% copr.years %]

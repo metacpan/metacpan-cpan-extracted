@@ -8,6 +8,9 @@ use Cwd 'getcwd';
 
 
 need_root_and_prepare();
+
+need_downloader();
+
 my $url = start_httpd();
 
 my $name = 'various';

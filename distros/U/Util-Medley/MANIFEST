@@ -45,3 +45,4 @@ t/40-file.t
 t/50-xml.t
 t/99-medley.t
 t/author-pod-syntax.t
+t/garbage.txt

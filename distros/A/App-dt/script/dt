@@ -1,8 +1,8 @@
 #!perl
 
-our $DATE = '2019-11-26'; # DATE
+our $DATE = '2020-01-08'; # DATE
 our $DIST = 'App-dt'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -276,7 +276,7 @@ dt - CLI data transformer
 
 =head1 VERSION
 
-This document describes version 0.006 of dt (from Perl distribution App-dt), released on 2019-11-26.
+This document describes version 0.007 of dt (from Perl distribution App-dt), released on 2020-01-08.
 
 =head1 SYNOPSIS
 
@@ -322,7 +322,7 @@ use C<:FORMAT> notation for input, e.g.:
 
 These formats are currently supported: C<json>, C<yaml>, C<perl>.
 
-=item * Convert several YAML files to JSON
+=item * Convert several JSON files to YAML
 
  % dt 1.json 2.json 3.json -o 1.yml -o 2.yml -o 3.yml
 
@@ -435,7 +435,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

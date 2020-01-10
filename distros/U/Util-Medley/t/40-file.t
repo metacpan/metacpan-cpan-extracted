@@ -20,10 +20,22 @@ test_find();
 test_findDirs();
 test_findFiles();
 test_touch();
+test_slurp();
 
 done_testing;
 
 ###################################################
+
+sub test_slurp {
+	
+	my @in = $File->slurp('t/garbage.txt');
+	ok(@in);
+	ok($in[2] eq "three\n");
+	
+	@in = $File->slurp('t/garbage.txt', 1);
+	ok(@in);
+	ok($in[2] eq 'three');
+}
 
 sub test_chdir {
 

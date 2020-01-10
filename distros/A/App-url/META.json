@@ -32,8 +32,9 @@
       "runtime" : {
          "requires" : {
             "Mojolicious" : "0",
+            "Net::PublicSuffixList" : "0",
             "String::Sprintf" : "0",
-            "perl" : "5.008"
+            "perl" : "5.026"
          }
       },
       "test" : {
@@ -54,6 +55,6 @@
          "web" : "https://github.com/briandfoy/app-url"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

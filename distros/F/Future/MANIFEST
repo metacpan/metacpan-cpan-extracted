@@ -41,4 +41,5 @@ t/40mutex.t
 t/41queue.t
 t/50test-future.t
 t/51test-future-deferred.t
+t/52awaitable-future.t
 t/99pod.t

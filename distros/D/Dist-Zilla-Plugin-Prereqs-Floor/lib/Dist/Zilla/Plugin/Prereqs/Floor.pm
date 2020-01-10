@@ -5,7 +5,7 @@ use warnings;
 package Dist::Zilla::Plugin::Prereqs::Floor;
 # ABSTRACT: Dist::Zilla plugin to set a minimum allowed version for prerequisites
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moose;
 
@@ -83,7 +83,7 @@ Dist::Zilla::Plugin::Prereqs::Floor - Dist::Zilla plugin to set a minimum allowe
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -142,6 +142,12 @@ L<https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-Floor>
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords David Golden
+
+David Golden <xdg@xdg.me>
 
 =head1 COPYRIGHT AND LICENSE
 

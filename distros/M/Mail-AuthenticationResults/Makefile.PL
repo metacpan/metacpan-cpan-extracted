@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Mail::AuthenticationResults",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "JSON" => 0,
     "Scalar::Util" => 0,
     "base" => 0,
     "strict" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.20180923",
+  "VERSION" => "1.20200108",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +38,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "JSON" => 0,
   "Scalar::Util" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,

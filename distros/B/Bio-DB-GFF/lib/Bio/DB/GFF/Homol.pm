@@ -21,7 +21,7 @@ Bio::DB::GFF::Feature-E<gt>target() method.
 =cut
 
 package Bio::DB::GFF::Homol;
-$Bio::DB::GFF::Homol::VERSION = '1.7.3';
+$Bio::DB::GFF::Homol::VERSION = '1.7.4';
 use strict;
 
 use base qw(Bio::DB::GFF::Segment);

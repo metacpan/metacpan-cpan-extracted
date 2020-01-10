@@ -18,35 +18,32 @@ extends 'Business::GoCardless::Resource';
 
 =head1 ATTRIBUTES
 
-Note Pro only API attributes marked with (Pro), Basic only API attributes marked
-with (Basic)
-
     amount
     created_at
     currency
-    day_of_month (Pro)
+    day_of_month
     description
     expires_at
-    end_date (Pro)
+    end_date
     id
     interval_length
     interval_unit
-    interval (Pro)
-    links (Pro)
+    interval
+    links
     merchant_id
-    metadata (Pro)
-    month (Pro)
+    metadata
+    month
     name
     next_interval_start
-    payment_reference (Pro)
+    payment_reference
     setup_fee
     start_at
-    start_date (Pro)
+    start_date
     status
     sub_resource_uris
     uri
     user_id
-    upcoming_payments (Pro)
+    upcoming_payments
 
 =cut
 

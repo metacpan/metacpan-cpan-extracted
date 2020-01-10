@@ -10,7 +10,7 @@ x
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/dir
+mkdir -p $RPM_BUILD_ROOT/etc/dir
 echo d > $RPM_BUILD_ROOT/etc/dir/d
 
 %clean

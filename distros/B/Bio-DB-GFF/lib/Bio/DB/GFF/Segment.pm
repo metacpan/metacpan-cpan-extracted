@@ -20,7 +20,7 @@ module.
 =cut
 
 package Bio::DB::GFF::Segment;
-$Bio::DB::GFF::Segment::VERSION = '1.7.3';
+$Bio::DB::GFF::Segment::VERSION = '1.7.4';
 use strict;
 use Bio::Annotation::Collection;
 

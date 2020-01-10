@@ -2,7 +2,7 @@ package helper;
 
 use Test::More;
 use base 'Exporter';
-our @EXPORT = qw(need_root_and_prepare 
+our @EXPORT = qw(need_root_and_prepare need_downloader
 		 start_httpd httpd_port
 		 urpmi_addmedia urpmi_removemedia urpmi_update
 		 urpm_cmd run_urpm_cmd urpmi_cmd urpmi urpmi_partial test_urpmi_fail urpme
@@ -28,6 +28,20 @@ sub need_root_and_prepare() {
     $using_root = 1;
     $ENV{LC_ALL} = 'C';
 }
+
+sub need_downloader() {
+    my @dl_helpers = qw(wget curl prozilla aria2c);
+    my $found;
+    foreach (@dl_helpers) {
+	-e "/bin/$_" and $found = 1;
+    }
+    if (!$found) {
+	warn "SKIPing because we're missing a downloader. We need one of wget/curl/prozilla/aria2c";
+	#plan skip_all => "*BSD fails those";
+	exit 0;
+    }
+}
+
 
 my $server_pid;
 sub httpd_port() { 6969 }

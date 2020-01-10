@@ -19,7 +19,7 @@ Note that this module is currently incomplete and limited to being a back
 compatiblity wrapper to allow migration from the v1 (Basic) API. The complete
 API methods will be added at a later stage (also: patches welcome).
 
-Also note this class also currently inherits from L<Business::GoCardless::Basic>
+Also note this class also currently inherits from L<Business::GoCardless>
 so has all attributes and methods available on that class (some of which may not
 make sense from the context of the Pro API).
 
@@ -112,7 +112,7 @@ use Business::GoCardless::Exception;
 
 =head1 ATTRIBUTES
 
-All attributes are inherited from L<Business::GoCardless::Basic>.
+All attributes are inherited from L<Business::GoCardless>.
 
 =cut
 
@@ -350,7 +350,7 @@ sub _list {
 
 ################################################################
 #
-# BACK COMPATIBILITY SECTION FOLLOWS
+# BACK COMPATIBILITY WITH V1 (BASIC) API SECTION FOLLOWS
 # the Pro version of the API is built on "redirect flows" when
 # using their hosted pages, so we can make it back compatible
 #
@@ -358,8 +358,8 @@ sub _list {
 
 =head1 BACK COMPATIBILITY METHODS
 
-These methods are provided for moving from the v1 (Basic) API with minimal changes
-in your application code. See L<Business::GoCardless::Upgrading> for more info.
+These methods are provided for those who want to move from the v1 (Basic)
+API with minimal changes in your application code.
 
 =head2 new_bill_url
 
@@ -368,8 +368,7 @@ in your application code. See L<Business::GoCardless::Upgrading> for more info.
 =head2 new_subscription_url
 
 Return a URL for redirecting the user to to complete a direct debit mandate that
-will allow you to setup payments. Note the parameters required are slightly different
-to those in the L<Business::GoCardless::Basic> module.
+will allow you to setup payments.
 
 See L<https://developer.gocardless.com/api-reference/#redirect-flows-create-a-redirect-flow>
 for more information.

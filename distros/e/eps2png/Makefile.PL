@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Jun  6 16:08:33 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Jan  6 21:20:01 2020
-# Update Count    : 87
+# Last Modified On: Mon Jan  6 22:45:34 2020
+# Update Count    : 88
 # Status          : Released
 
 # Ease the life of the CPAN testers.
@@ -89,7 +89,7 @@ WriteMakefile(
     NAME                => $name,
     AUTHOR              => 'Johan Vromans <jv@cpan.org>',
     VERSION	        => $version,
-    ABSTRACT_FROM       => $master,
+    ABSTRACT            => 'convert EPS files to PNG, JPG or GIF images',
     LICENSE		=> 'perl',
     PL_FILES            => {},
     EXE_FILES		=> [ map { "script/$_" } @scripts ],

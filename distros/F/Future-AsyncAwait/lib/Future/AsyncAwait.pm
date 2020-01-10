@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Carp;
 
@@ -103,6 +103,14 @@ and resumes execution from the point of the C<await> expression. When the
 now-resumed function eventually finishes (either by returning a value or
 throwing an exception), this value is set as the result of the future it had
 returned earlier.
+
+C<await> provides scalar context to its controlling expression.
+
+   async sub func {
+      # this function is invoked in scalar context
+   }
+
+   await func();
 
 Because the C<await> keyword may cause its containing function to suspend
 early, returning a pending future instance, it is only allowed inside
@@ -272,6 +280,39 @@ the C<async sub> is currently waiting on. See L</TODO>.
 
 =back
 
+=head1 SUBCLASSING Future
+
+By default when an C<async sub> returns a result or fails immediately before
+awaiting, it will return a new completed instance of the L<Future> class. In
+order to allow code that wishes to use a different class to represent futures
+the module import method can be passed the name of a class to use instead.
+
+   use Future::AsyncAwait future_class => "Subclass::Of::Future";
+
+   async sub func { ... }
+
+This has the usual lexically-scoped effect, applying only to C<async sub>s
+defined within the block; others are unaffected.
+
+   use Future::AsyncAwait;
+
+   {
+      use Future::AsyncAwait future_class => "Different::Future";
+      async sub x { ... }
+   }
+
+   async sub y { ... }  # returns a regular Future
+
+This will only affect immediate results. If the C<await> keyword has to
+suspend the function and create a new pending future, it will do this by using
+the prototype constructor on the future it itself is waiting on, and the usual
+subclass-respecting semantics of L<Future/new> will remain in effect there. As
+such it is not usually necessary to use this feature just for wrapping event
+system modules or other similar situations.
+
+Such an alternative subclass should implement the API documented by
+L<Future::AsyncAwait::Awaitable>.
+
 =head1 WITH OTHER MODULES
 
 =head2 Syntax::Keyword::Try
@@ -327,14 +368,33 @@ sub import
 sub import_into
 {
    my $class = shift;
-   my ( $caller, @syms ) = @_;
+   my $caller = shift;
 
-   @syms or @syms = qw( async );
+   $^H{"Future::AsyncAwait/async"}++; # Just always turn this on
 
-   my %syms = map { $_ => 1 } @syms;
-   $^H{"Future::AsyncAwait/async"}++ if delete $syms{async};
+   while( @_ ) {
+      my $sym = shift;
 
-   croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
+      $^H{"Future::AsyncAwait/future"} = shift, next if $sym eq "future_class";
+
+      croak "Unrecognised import symbol $sym";
+   }
+}
+
+if( !defined &Future::AWAIT_CLONE ) {
+   # TODO: These ought to be implemented by Future.pm itself, and it can do
+   # these in a faster, more performant way
+   *Future::AWAIT_CLONE    = sub { shift->new };
+   *Future::AWAIT_NEW_DONE = *Future::AWAIT_DONE = sub { shift->done( @_ ) };
+   *Future::AWAIT_NEW_FAIL = *Future::AWAIT_FAIL = sub { shift->fail( @_ ) };
+
+   *Future::AWAIT_IS_READY     = sub { shift->is_ready };
+   *Future::AWAIT_IS_CANCELLED = sub { shift->is_cancelled };
+
+   *Future::AWAIT_ON_READY  = sub { shift->on_ready( @_ ) };
+   *Future::AWAIT_ON_CANCEL = sub { shift->on_cancel( @_ ) };
+
+   *Future::AWAIT_GET = sub { shift->get };
 }
 
 =head1 SEE ALSO

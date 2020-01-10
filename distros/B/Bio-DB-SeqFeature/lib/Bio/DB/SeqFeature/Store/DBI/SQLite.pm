@@ -1,5 +1,5 @@
 package Bio::DB::SeqFeature::Store::DBI::SQLite;
-$Bio::DB::SeqFeature::Store::DBI::SQLite::VERSION = '1.7.3';
+$Bio::DB::SeqFeature::Store::DBI::SQLite::VERSION = '1.7.4';
 #$Id$
 
 =head1 NAME

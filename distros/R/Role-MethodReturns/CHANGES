@@ -1,0 +1,32 @@
+CHANGE LOG
+==========
+
+2020-01-09 14:50:19 - v0.03
+---------------------------
+
+### Fixed
+
+    - require minimal version for `Types::Interface`
+
+
+2019-12-19 22:34:43 - v0.02
+---------------------------
+
+License Info
+
+### Updated
+
+    - POD
+    - MANIFEST
+    - README
+
+
+2019-12-19 16:32:56 - v0.01
+---------------------------
+
+Initial release
+
+### Added
+
+    - Role::MethodReturns
+    - Prepared for Release

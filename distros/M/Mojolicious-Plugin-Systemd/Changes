@@ -1,0 +1,9 @@
+Revision history for perl distribution Mojolicious-Plugin-Systemd
+
+0.01 2020-01-09T09:01:27+0900
+ - Add config_map()
+ - Can set config() from environment variables
+ - Can read service file
+ - Can read "Environment" from service file
+ - Can read "EnvironmentFile" from service file
+ - Can read "UnsetEnvironment" from service file

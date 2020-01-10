@@ -1,0 +1,14 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*swim","*html"],
+      ["==",
+        [".",
+          ["*","swim"],
+          ["parse","HTML"]],
+        ["*","html"],
+        "Swim to HTML - +"]]],
+  "data": [
+    { "label": "Horizontal Rule",
+      "point": {
+        "swim": "foo\n\n----\n\nbar\n",
+        "html": "<p>foo</p>\n\n<hr/>\n\n<p>bar</p>\n"}}]}

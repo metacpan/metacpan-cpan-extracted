@@ -1,5 +1,10 @@
 Revision history for Pg-Explain
 
+0.91    2020/01/07
+        - Make all times be wall-clock times. That is - take into account
+          number of parallel workers
+        - Re-add version to all libs, to make cpan happy
+
 0.90    2019/11/12
         - Fix display of heap fetches from json (https://gitlab.com/depesz/explain.depesz.com/issues/15)
         - Move global data (planning/execution/total time, trigger info) from top_node to explain object itself

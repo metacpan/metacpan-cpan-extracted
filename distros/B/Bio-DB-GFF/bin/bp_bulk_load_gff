@@ -121,7 +121,7 @@ disclaimers of warranty.
 =cut
 
 package Bio::DB::GFF::Adaptor::fauxmysql;
-$Bio::DB::GFF::Adaptor::fauxmysql::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::fauxmysql::VERSION = '1.7.4';
 use Bio::DB::GFF::Adaptor::dbi::mysqlopt;
 use vars '@ISA';
 @ISA = 'Bio::DB::GFF::Adaptor::dbi::mysqlopt';
@@ -133,7 +133,7 @@ sub insert_sequence {
 };
 
 package Bio::DB::GFF::Adaptor::fauxmysqlcmap;
-$Bio::DB::GFF::Adaptor::fauxmysqlcmap::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::fauxmysqlcmap::VERSION = '1.7.4';
 use Bio::DB::GFF::Adaptor::dbi::mysqlcmap;
 use vars '@ISA';
 @ISA = 'Bio::DB::GFF::Adaptor::dbi::mysqlcmap';
@@ -145,7 +145,7 @@ sub insert_sequence {
 };
 
 package Bio::DB::GFF::Adaptor::fauxpg;
-$Bio::DB::GFF::Adaptor::fauxpg::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::fauxpg::VERSION = '1.7.4';
 use Bio::DB::GFF::Adaptor::dbi::pg;
 use vars '@ISA';
 @ISA = 'Bio::DB::GFF::Adaptor::dbi::pg';
@@ -184,7 +184,7 @@ sub insert_sequence {
 }
 
 package main;
-$main::VERSION = '1.7.3';
+$main::VERSION = '1.7.4';
 eval "use Time::HiRes"; undef $@;
 my $timer = defined &Time::HiRes::time;
 

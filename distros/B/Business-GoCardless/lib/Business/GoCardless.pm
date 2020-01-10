@@ -11,7 +11,7 @@ set of modules
 
 =head1 VERSION
 
-0.34
+0.35
 
 =head1 DESCRIPTION
 
@@ -26,21 +26,7 @@ such lower level interface with the API.
 
 =head1 Do Not Use This Module Directly
 
-Read the below to find out why.
-
-=head1 If You Are New To Business::GoCardless
-
-You should go straight to L<Business::GoCardless::Pro> and start there. Do
-B<NOT> use the L<Business::GoCardless::Basic> module for reasons stated below.
-
-=head1 If You Are A Current User Of Business::GoCardless
-
-You should read L<Business::GoCardless::Upgrading> as you will be using the
-L<Business::GoCardless::Basic> module (via this module) and the API that
-relates to (v1) will be swtiched off by GoCardless sometime in late 2017.
-
-When GoCardless switch off the v1 API this dist will be updated to make this
-module refer to the Pro module directly.
+You should go straight to L<Business::GoCardless::Pro> and start there.
 
 =cut
 
@@ -53,7 +39,7 @@ use Carp qw/ confess /;
 use Business::GoCardless::Client;
 use Business::GoCardless::Webhook;
 
-$Business::GoCardless::VERSION = '0.34';
+$Business::GoCardless::VERSION = '0.35';
 
 has api_version => (
     is       => 'ro',
@@ -213,8 +199,6 @@ sub _generic_find_obj {
 }
 
 =head1 SEE ALSO
-
-L<Business::GoCardless::Basic>
 
 L<Business::GoCardless::Pro>
 

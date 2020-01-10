@@ -1,5 +1,5 @@
 package Bio::DB::GFF::Adaptor::berkeleydb;
-$Bio::DB::GFF::Adaptor::berkeleydb::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::berkeleydb::VERSION = '1.7.4';
 
 =head1 NAME
 
@@ -1003,7 +1003,7 @@ sub get_features_iterator {
 #--------------------------------------------------------------------------#
 
 package FeatureStore;
-$FeatureStore::VERSION = '1.7.3';
+$FeatureStore::VERSION = '1.7.4';
 # This is a very specialized package that stores serialized features onto a file-based
 # array. The array is indexed by the physical offset to the beginning of each serialized
 # feature.

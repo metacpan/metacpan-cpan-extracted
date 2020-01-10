@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use FindBin qw/$Bin/;
 use App::MultiSsh qw/hosts_from_map is_host multi_run shell_quote/;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -86,7 +86,7 @@ mscp - Multi host scp (send files to multiple hosts only)
 
 =head1 VERSION
 
-This documentation refers to mscp version 0.22.
+This documentation refers to mscp version 0.23.
 
 =head1 SYNOPSIS
 
@@ -96,6 +96,7 @@ This documentation refers to mscp version 0.22.
   src           Source file(s)
   dest          Destination file or directory (if more than one source file
                 then dest must be a directory as per usual scp rules)
+                Note: only currently works for copying local files to many hosts
   -r --recurse  Recurse into subdirectories
 
   -v --verbose  Show more detailed option

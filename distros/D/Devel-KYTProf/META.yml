@@ -9,7 +9,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
   perl: 5.008_001
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   Devel::KYTProf:
     file: lib/Devel/KYTProf.pm
-    version: '0.9993'
+    version: '0.9994'
   Devel::KYTProf::Logger::LTSV:
     file: lib/Devel/KYTProf/Logger/LTSV.pm
   Devel::KYTProf::Profiler::Cache::Memcached::Fast:
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://github.com/onishi/perl5-devel-kytprof/issues
   homepage: https://github.com/onishi/perl5-devel-kytprof
   repository: git://github.com/onishi/perl5-devel-kytprof.git
-version: '0.9993'
+version: '0.9994'
 x_authority: cpan:ONISHI
 x_contributors:
   - 'Atsushi Kobayashi <nekokak@gmail.com>'
@@ -60,6 +60,7 @@ x_contributors:
   - 'Masayuki Matsuki <y.songmu@gmail.com>'
   - 'Wakaba <wakabatan@hatena.ne.jp>'
   - 'Yasuhiro Onishi <onishi@hatena.ne.jp>'
+  - 'aereal <aereal@aereal.org>'
   - 'cho45 <cho45@lowreal.net>'
   - 'hitode909 <hitode909@gmail.com>'
   - 'motemen <motemen@gmail.com>'

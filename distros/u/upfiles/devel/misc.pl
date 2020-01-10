@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2012, 2014, 2015, 2017 Kevin Ryde
+# Copyright 2009, 2010, 2012, 2014, 2015, 2017, 2020 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -26,6 +26,24 @@ use Data::Dumper;
 use Smart::Comments;
 
 
+{
+  require App::Upfiles;
+  my $str = '1970-01-01 00:00:01+00:00';
+  my $t = App::Upfiles::timestamp_to_timet($str);
+  ### $t
+
+  my ($year, $month, $day, $hour, $minute, $second)
+    = split /[- :+]/, $str;
+  ### split: "$year, $month, $day, $hour, $minute, $second"
+  require Time::Local;
+  my $tgm = Time::Local::timegm
+    ($second, $minute, $hour, $day, $month-1, $year-1900);
+  ### $tgm
+ $tgm = Time::Local::timegm
+    ($second+0, $minute+0, $hour+0, $day+0, $month-1, $year-1900);
+  ### $tgm
+  exit 0;
+}
 {
   # URI ftps
   # 

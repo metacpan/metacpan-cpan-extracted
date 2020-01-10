@@ -21,8 +21,8 @@ meta-spec:
 name: JIRA-Client-Automated
 provides:
   JIRA::Client::Automated:
-    file: lib/Jira/Client/Automated.pm
-    version: '1.8'
+    file: lib/JIRA/Client/Automated.pm
+    version: '1.9'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -35,6 +35,6 @@ requires:
   perl: '5.010'
   strict: '0'
   warnings: '0'
-version: '1.8'
+version: '1.9'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,0 +1,89 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*swim","*html"],
+      ["==",
+        [".",
+          ["*","swim"],
+          ["parse","HTML"]],
+        ["*","html"],
+        "Swim to HTML - +"]],
+    ["%<>",["*swim","*pod"],
+      ["==",
+        [".",
+          ["*","swim"],
+          ["parse","Pod"]],
+        ["*","pod"],
+        "Swim to Pod - +"]]],
+  "data": [
+    { "label": "Not really a phase func",
+      "point": {
+        "swim": "Ingy dot Net <ingy@ingy.net>\n",
+        "pod": "Ingy dot Net <ingy@ingy.net>\n"}},
+    { "label": "Phrase function: simple",
+      "point": {
+        "swim": "<bold content>\n",
+        "html": "<p><strong>content</strong></p>\n"}},
+    { "label": "Phrase function: simple with single attribute",
+      "point": {
+        "swim": "<bold important:content>\n",
+        "html": "<p><strong class=\"important\">content</strong></p>\n"}},
+    { "label": "Phrase function: simple with multiple attributes",
+      "point": {
+        "swim": "<bold quite important:content>\n",
+        "html": "<p><strong class=\"quite important\">content</strong></p>\n"}},
+    { "label": "Phrase function: key-value attribute",
+      "point": {
+        "swim": "<bold id=item32:content>\n",
+        "html": "<p><strong id=\"item32\">content</strong></p>\n"}},
+    { "label": "Phrase function: key-quoted-value attribute",
+      "point": {
+        "swim": "<bold id=\"item32\":content>\n",
+        "html": "<p><strong id=\"item32\">content</strong></p>\n"}},
+    { "label": "Phrase function: key-value attribute; escaped colon",
+      "point": {
+        "swim": "<bold id=item3\\:2:content>\n",
+        "html": "<p><strong id=\"item3:2\">content</strong></p>\n"}},
+    { "label": "Phrase function: key-quoted-value attribute; with space",
+      "point": {
+        "swim": "<bold title=\"A foo bar\":content>\n",
+        "html": "<p><strong title=\"A foo bar\">content</strong></p>\n"}},
+    { "label": "Phrase function: attribute plus leading space",
+      "point": {
+        "swim": "<bold quite important: content>\n",
+        "html": "<p><strong class=\"quite important\"> content</strong></p>\n"}},
+    { "label": "Phrase function: attribute plus trailing space",
+      "point": {
+        "swim": "<bold quite important:content >\n",
+        "html": "<p><strong class=\"quite important\">content </strong></p>\n"}},
+    { "label": "Phrase function: leading colon",
+      "point": {
+        "swim": "<bold ::leading>\n",
+        "html": "<p><strong>:leading</strong></p>\n"}},
+    { "label": "Phrase function: lots of colons in content",
+      "point": {
+        "swim": "<bold ::colons:everywhere:>\n",
+        "html": "<p><strong>:colons:everywhere:</strong></p>\n"}},
+    { "label": "Phrase function: lots of colons in content; no leading space",
+      "point": {
+        "swim": "<bold::colons:everywhere:>\n",
+        "html": "<p><strong>:colons:everywhere:</strong></p>\n"}},
+    { "label": "Phrase function: attributes and colons in content",
+      "point": {
+        "swim": "<bold important::colons:everywhere:>\n",
+        "html": "<p><strong class=\"important\">:colons:everywhere:</strong></p>\n"}},
+    { "label": "Phrase function: no content",
+      "point": {
+        "swim": "<bold>\n",
+        "html": "<p><strong/></p>\n"}},
+    { "label": "Phrase function: no content: one space",
+      "point": {
+        "swim": "<bold >\n",
+        "html": "<p><strong/></p>\n"}},
+    { "label": "Phrase function: attributes but no content",
+      "point": {
+        "swim": "<bold important:>\n",
+        "html": "<p><strong class=\"important\"/></p>\n"}},
+    { "label": "Phrase function: attribute but no content, no trailing colon",
+      "point": {
+        "swim": "<bold important:>\n",
+        "html": "<p><strong class=\"important\"/></p>\n"}}]}

@@ -1,4 +1,6 @@
- 2.05 - moved locking to Data::RecordStore.
+2.11 - fix test.
+
+2.05 - moved locking to Data::RecordStore.
 
         open_store must now be called by
         Data::ObjectStore->open_store

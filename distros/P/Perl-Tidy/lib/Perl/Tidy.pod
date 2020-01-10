@@ -412,9 +412,13 @@ C<write_debug_entry> in Tidy.pm.
 
   &perltidy
 
+=head1 INSTALLATION
+
+The module 'Perl::Tidy' comes with a binary 'perltidy' which is installed when the module is installed.  The module name is case-sensitive.  For example, the basic command for installing with cpanm is 'cpanm Perl::Tidy'.
+
 =head1 VERSION
 
-This man page documents Perl::Tidy version 20191203
+This man page documents Perl::Tidy version 20200110
 
 =head1 LICENSE
 

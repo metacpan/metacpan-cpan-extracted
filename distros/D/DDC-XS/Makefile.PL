@@ -15,7 +15,7 @@ my %prereq = (
 	     );
 
 ##-- ensure mininum ddc version
-my $min_version = "2.1.16";
+my $min_version = "2.2.0";
 if (Alien::DDC::Concordance->install_type ne 'system') {
   my $alien_vstr = Alien::DDC::Concordance->config('version');
   (my $alien_version = $alien_vstr) =~ s/\-/_/g;

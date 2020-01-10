@@ -153,7 +153,7 @@ methods implemented by this module.
 =cut
 
 package Bio::DB::GFF::Aggregator;
-$Bio::DB::GFF::Aggregator::VERSION = '1.7.3';
+$Bio::DB::GFF::Aggregator::VERSION = '1.7.4';
 use strict;
 use Bio::DB::GFF::Util::Rearrange;  # for rearrange()
 use Bio::DB::GFF::Feature;

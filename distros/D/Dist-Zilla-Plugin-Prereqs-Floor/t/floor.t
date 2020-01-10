@@ -18,7 +18,7 @@ my $dz_version = int( Dist::Zilla->VERSION );
     ok( $tzil, "created test dist" );
 
     $tzil->build_in;
-    my $build_dir = path( $tzil->tempdir->subdir('build') );
+    my $build_dir = path( $tzil->tempdir->child('build') );
 
     my $meta    = CPAN::Meta->load_file( $build_dir->child("META.json") );
     my $prereqs = $meta->effective_prereqs;

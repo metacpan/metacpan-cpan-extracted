@@ -1,0 +1,11 @@
+// this is a comment
+*.com
+net
+co.uk
+au
+
+// comment after blank line
+
+.email
+.badger
+.koala.au

@@ -1,45 +1,102 @@
-SYNOPSIS
+NAME
+    App::lcpan::CmdBundle::dzil - lcpan subcommands related to Dist::Zilla
 
+VERSION
+    This document describes version 0.060 of App::lcpan::CmdBundle::dzil
+    (from Perl distribution App-lcpan-CmdBundle-dzil), released on
+    2019-11-20.
+
+SYNOPSIS
     Install this distribution, then the lcpan subcommands below will be
     available:
 
      # List plugins available on CPAN
      % lcpan dzil-plugins
-    
+
      # List bundles available on CPAN
      % lcpan dzil-bundles
-    
+
      # List roles available on CPAN
      % lcpan dzil-roles
-    
-    
+
+
      # Find plugins most depended by other CPAN distributions
      % lcpan dzil-plugins-by-rdep-count
-    
+
      # Find bundles most depended by other CPAN distributions
      % lcpan dzil-bundles-by-rdep-count
-    
+
      # Find roles most depended by other CPAN distributions
      % lcpan dzil-roles-by-rdep-count
-    
-    
+
+
      # Who release the largest number of plugins
      % lcpan dzil-authors-by-plugin-count
-    
+
      # Who release the largest number of bundles
      % lcpan dzil-authors-by-bundle-count
-    
+
      # Who release the largest number of roles
      % lcpan dzil-authors-by-role-count
 
 DESCRIPTION
+    This bundle provides the following lcpan subcommands:
+
+    *   lcpan dzil-role
+
+    *   lcpan dzil-authors-by-bundle-count
+
+    *   lcpan dzil-plugin
+
+    *   lcpan dzil-authors-by-role-count
+
+    *   lcpan dzil-bundle
+
+    *   lcpan dzil-roles-by-rdep-count
+
+    *   lcpan dzil-bundles
+
+    *   lcpan dzil-plugins
+
+    *   lcpan dzil-bundles-by-rdep-count
+
+    *   lcpan dzil-plugins-by-rdep-count
+
+    *   lcpan dzil-authors-by-plugin-count
+
+    *   lcpan dzil-roles
 
     This distribution packages several lcpan subcommands related to
     Dist::Zilla.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-lcpan-CmdBundle-dzil>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-lcpan-CmdBundle-dzil>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-d
+    zil>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     lcpan
 
     Dist::Zilla
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

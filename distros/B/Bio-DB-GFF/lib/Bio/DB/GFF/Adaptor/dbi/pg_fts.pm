@@ -1,5 +1,5 @@
 package Bio::DB::GFF::Adaptor::dbi::pg_fts;
-$Bio::DB::GFF::Adaptor::dbi::pg_fts::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::dbi::pg_fts::VERSION = '1.7.4';
 
 =head1 NAME
 

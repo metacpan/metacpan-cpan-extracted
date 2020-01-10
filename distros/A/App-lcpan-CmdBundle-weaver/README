@@ -1,54 +1,118 @@
-SYNOPSIS
+NAME
+    App::lcpan::CmdBundle::weaver - lcpan subcommands related to Pod::Weaver
 
+VERSION
+    This document describes version 0.030 of App::lcpan::CmdBundle::weaver
+    (from Perl distribution App-lcpan-CmdBundle-weaver), released on
+    2019-11-20.
+
+SYNOPSIS
     Install this distribution, then the lcpan subcommands below will be
     available:
 
      # List sections available on CPAN
      % lcpan weaver-sections
-    
+
      # List plugins available on CPAN
      % lcpan weaver-plugins
-    
+
      # List bundles available on CPAN
      % lcpan weaver-bundles
-    
+
      # List roles available on CPAN
      % lcpan weaver-roles
-    
-    
+
+
      # Find plugins most depended by other CPAN distributions
      % lcpan weaver-sections-by-rdep-count
-    
+
      # Find plugins most depended by other CPAN distributions
      % lcpan weaver-plugins-by-rdep-count
-    
+
      # Find bundles most depended by other CPAN distributions
      % lcpan weaver-bundles-by-rdep-count
-    
+
      # Find roles most depended by other CPAN distributions
      % lcpan weaver-roles-by-rdep-count
-    
-    
+
+
      # Who release the largest number of sections
      % lcpan weaver-authors-by-section-count
-    
+
      # Who release the largest number of plugins
      % lcpan weaver-authors-by-plugin-count
-    
+
      # Who release the largest number of bundles
      % lcpan weaver-authors-by-bundle-count
-    
+
      # Who release the largest number of roles
      % lcpan weaver-authors-by-role-count
 
 DESCRIPTION
+    This bundle provides the following lcpan subcommands:
+
+    *   lcpan weaver-roles
+
+    *   lcpan weaver-bundles-by-rdep-count
+
+    *   lcpan weaver-sections-by-rdep-count
+
+    *   lcpan weaver-authors-by-role-count
+
+    *   lcpan weaver-plugins-by-rdep-count
+
+    *   lcpan weaver-section
+
+    *   lcpan weaver-plugin
+
+    *   lcpan weaver-authors-by-bundle-count
+
+    *   lcpan weaver-bundles
+
+    *   lcpan weaver-bundle
+
+    *   lcpan weaver-authors-by-plugin-count
+
+    *   lcpan weaver-role
+
+    *   lcpan weaver-authors-by-section-count
+
+    *   lcpan weaver-plugins
+
+    *   lcpan weaver-sections
+
+    *   lcpan weaver-roles-by-rdep-count
 
     This distribution packages several lcpan subcommands related to
     Pod::Weaver.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-lcpan-CmdBundle-weaver>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-lcpan-CmdBundle-weaver>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-w
+    eaver>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     lcpan
 
     Pod::Weaver
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

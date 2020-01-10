@@ -7,7 +7,10 @@ use Test::More::UTF8;
 
 use lib './lib';
 
-use_ok 'Data::Pokemon::Go::Skill';                                      # 1
+BEGIN{
+    use_ok( 'Data::Pokemon::Go::Skill', qw( @ALL ) );                   # 1
+}
+
 my $pg = new_ok 'Data::Pokemon::Go::Skill';                             # 2
 
 subtest 'Kanto' => sub {

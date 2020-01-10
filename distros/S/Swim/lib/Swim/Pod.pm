@@ -48,6 +48,11 @@ sub render_para {
                     s{\ *\n?(L<http.*)\n([^>]*>)([.,!?:]?)(?:\ *\n?)}
                     {\n$1$2$3\n}g
             ) {};
+            while (
+                $out =~
+                    s{([LC]<[^>]*)\n(\S[^>]*)}
+                    {$1$2}g
+            ) {};
         }
         chomp $out;
         return $out;

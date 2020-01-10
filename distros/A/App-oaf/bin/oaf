@@ -33,6 +33,36 @@ sub indent {
 # Should just do Markdown->quote, Markdown->list, etc...
 package Quote;
 
+sub html {
+  my $lines = shift;
+
+  print '<blockquote>',"\n";
+  for (@$lines) {
+    Util::html_escape(\$_);
+    print $_,"\n";
+  }
+  print '</blockquote>',"\n";
+}
+
+sub jira {
+  my ($lines, $multiline) = @_;
+  if ($multiline) {
+    print '{quote}',"\n";
+    printf "%s\n", $_ for @$lines;
+    print '{quote}',"\n";
+  }
+  else {
+    printf "bq. %s\n", join ' ', @$lines
+  }
+}
+
+sub orgmode {
+  my $lines = shift;
+  print "#+BEGIN_QUOTE\n";
+  print $_,"\n" for @$lines;
+  print "#+END_QUOTE\n";
+}
+
 sub markdown {
   my $lines = shift;
   printf "> %s\n", $_ for @$lines;
@@ -41,8 +71,10 @@ sub markdown {
 sub output {
   shift;
 
-  my $format = shift;
+  my ($format, $multiline) = @_;
   my $lines = [];
+
+  die "unsupported quote format: $format\n" unless $Quote::{$format};
 
   while (<STDIN>) {
     chomp;
@@ -50,8 +82,11 @@ sub output {
     push @$lines, $_;
   }
 
-  $Quote::{$format}->($lines);
+  $multiline = @$lines > 1 ? 1 : 0 unless defined($multiline);
+  $Quote::{$format}->($lines, $multiline);
 }
+
+$Quote::{$_} = *markdown for qw(github slack);
 
 package List;
 
@@ -98,7 +133,8 @@ sub orgmode {
 }
 
 sub rst {
-  # same as markdown for ul
+  # Bullet lists are the same as Markdown
+  return markdown(shift) unless pop;
   my $lines = shift;
   printf "#. %s\n", $_ for @$lines;
 }
@@ -117,6 +153,8 @@ sub output {
   my ($format, $numbered) = @_;
   my $lines = [];
 
+  die "unsupported list format: $format\n" unless $List::{$format};
+
   while (<STDIN>) {
     chomp;
     s/^\s*//g;
@@ -126,6 +164,7 @@ sub output {
   $List::{$format}->($lines, $numbered);
 }
 
+$List::{$_} = *markdown for qw(github slack);
 
 package Code;
 
@@ -275,24 +314,24 @@ package main;
 
 use Getopt::Long qw(:config no_ignore_case);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub HELP_MESSAGE {
     my $out = shift;
 
     print $out <<USAGE
-usage: oaf [-mps] [-f format] [-l lang] [--list]
+usage: oaf [-1mpsLQ] [-f format] [-l lang] [--list[1]] [--quote]
 Output stdin according to the given options
-  -f FORMAT Format to output, defaults to markdown
-  --help    Display this message
-  -l LANG   Programming language of stdin, if supported by FORMAT
-  --list    Output a bullet point list using FORMAT, each line is a list item
-  --list1   Output a numbered list using FORMAT, each line is a list item
-  -m        Force multiline output, if supported by FORMAT
-  -p        Print the supported formats and exit
-  --quote   Output as a quote in FORMAT
-  -s        Force single line output, if supported by FORMAT
-  --version Print the version
+  -f FORMAT    Format to output, defaults to markdown
+  -h, --help   Display this message
+  -l LANG      Programming language of stdin, if supported by FORMAT
+  -L, --list   Output a bullet point list using FORMAT, each line is a list item
+  -1, --list1  Output a numbered list using FORMAT, each line is a list item
+  -m           Force multiline output, if supported by FORMAT
+  -p           Print the supported formats and exit
+  -Q, --quote  Output as a quote in FORMAT
+  -s           Force single line output, if supported by FORMAT
+  --version    Print the version
 USAGE
 }
 
@@ -319,11 +358,11 @@ my %formats = (bitbucket => 'github',
 GetOptions('f=s'       => \$options{f},
            'h|help'    => sub { HELP_MESSAGE(*STDOUT) and exit },
            'l=s'       => \$options{l},
-           'list'      => \$options{list},
-           'list1'     => \$options{list1},
+           'list|L'    => \$options{list},
+           'list1|1'   => \$options{list1},
            'm'         => \$options{m},
            'p'         => \$options{p},
-           'quote'     => \$options{quote},
+           'quote|Q'   => \$options{quote},
            's'         => \$options{s},
            'v|version' => sub { VERSION_MESSAGE(*STDOUT) and exit }
           ) or HELP_MESSAGE(*STDERR) and exit 1;
@@ -348,11 +387,11 @@ die "Unknown format: $format\n" unless $formats{$format};
 
 if ($options{list} || $options{list1}) {
   my $numbered = $options{list1} || 0;
-  List->output($format, $numbered);
+  List->output($formats{$format}, $numbered);
 }
 elsif ($options{quote}) {
-  Quote->output($format);
+  Quote->output($formats{$format}, $multiline);
 }
 else {
-  Code->output($format, $lang, $multiline);
+  Code->output($formats{$format}, $lang, $multiline);
 }

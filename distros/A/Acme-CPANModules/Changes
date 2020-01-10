@@ -1,3 +1,22 @@
+0.1.5   2019-12-24  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+	- Denote the specification version as just 0.1 instead of 0.1.0.
+
+	- Update the status of cpanratings.perl.org.
+
+	- Revise the 'Using Acme::CPANModules Modules' section (downplay the
+	  vaporware website).
+
+
+0.1.4   2019-11-26  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- Mention attribute x.app.cpanmodules.show_entries in example.
+
+
 0.1.3   2019-11-20  Released-By: PERLANCAR; Urgency: low
 
 	- No spec changes.

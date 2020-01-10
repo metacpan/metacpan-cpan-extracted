@@ -11,10 +11,10 @@ my $fixed_quality = undef;
 
 if (defined $ARGV[0] and ! -e $ARGV[0]) {
 	$fixed_quality = shift @ARGV;
-	die "Invalid quality: integer > 10 or single char to be supplied ($fixed_quality)\n" if ( (length($fixed_quality) > 1) and $fixed_quality!~/^\d+$/);
-
+	die "Invalid quality: integer >= 10 or single char to be supplied ($fixed_quality)\n"
+		if ( (length($fixed_quality) > 1) and $fixed_quality!~/^\d+$/);
 }
-die "Usage: [FixedQuality] ", basename($0), " FILE1.ab1 FILE2.ab1 .. > reads.fq\n\n" unless defined $ARGV[0];
+die "Usage: ", basename($0), " [FixedQuality] FILE1.ab1 FILE2.ab1 .. > reads.fq\n\n" unless defined $ARGV[0];
 
 foreach my $file (@ARGV) {
 	if (! -e "$file") {

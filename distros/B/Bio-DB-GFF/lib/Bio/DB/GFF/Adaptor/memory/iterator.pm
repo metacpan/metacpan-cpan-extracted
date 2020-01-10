@@ -34,7 +34,7 @@ it under the same terms as Perl itself.
 =cut
 
 package Bio::DB::GFF::Adaptor::memory::iterator;
-$Bio::DB::GFF::Adaptor::memory::iterator::VERSION = '1.7.3';
+$Bio::DB::GFF::Adaptor::memory::iterator::VERSION = '1.7.4';
 use strict;
 # this module needs to be cleaned up and documented
 use Bio::Root::Version;
