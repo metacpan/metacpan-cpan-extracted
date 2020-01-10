@@ -1,0 +1,56 @@
+# This is a manually created sample of test data from various bug
+# reports.  It has no resemblance to any existing real code or readelf
+# output.
+
+Contents of the .debug_info section:
+
+  Compilation Unit @ offset 0x0:
+   Length:        0x10c7 (32-bit)
+   Version:       4
+   Abbrev Offset: 0
+   Pointer Size:  8
+ <0><b>: Abbrev Number: 95 (DW_TAG_compile_unit)
+    <c>   DW_AT_producer    : (indirect string, offset: 0x516): GNU C++ 4.6.3	
+    <10>   DW_AT_language    : 4	(C++)
+    <11>   DW_AT_name        : (indirect string, offset: 0x38b): StructureLayoutTest.cpp	
+    <15>   DW_AT_comp_dir    : (indirect string, offset: 0x15b9): /home/dorner/lib/perl/Parse-Readelf/Examples	
+    <19>   DW_AT_low_pc      : 0x0	
+    <21>   DW_AT_entry_pc    : 0x0	
+    <29>   DW_AT_ranges      : 0x30	
+    <2d>   DW_AT_stmt_list   : 0x0	
+    <31>   DW_AT_macro_info  : 0x0	
+ <1><9c5>: Abbrev Number: 33 (DW_TAG_variable)
+    <9c6>   DW_AT_name        : (indirect string, offset: 0xa77): d_invalid_int_tel_nbr
+    <9ca>   DW_AT_decl_file   : 14
+    <9cb>   DW_AT_decl_line   : 251
+    <9cc>   DW_AT_type        : <0x6f5>
+    <9d0>   DW_AT_const_value : 8 byte block: ff ff ff ff ff ff ff ff 
+ <1><9d9>: Abbrev Number: 34 (DW_TAG_variable)
+    <9da>   DW_AT_name        : (indirect string, offset: 0xb19): d_invalid_ext_tel_nbr
+    <9de>   DW_AT_decl_file   : 14
+    <9df>   DW_AT_decl_line   : 257
+    <9e1>   DW_AT_type        : <0x731>
+    <9e5>   DW_AT_const_value : 32 byte block: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+ <1><2822>: Abbrev Number: 94 (DW_TAG_union_type)
+    <2823>   DW_AT_name        : (indirect string, offset: 0xf58f): TopLevelUnion
+    <2827>   DW_AT_byte_size   : 8
+    <2828>   DW_AT_decl_file   : 1
+    <2829>   DW_AT_decl_line   : 14
+    <282a>   DW_AT_sibling     : <0x2845>
+ <2><282e>: Abbrev Number: 65 (DW_TAG_member)
+    <282f>   DW_AT_name        : (indirect string, offset: 0xac61): m_00_two_shorts
+    <2833>   DW_AT_decl_file   : 1
+    <2834>   DW_AT_decl_line   : 16
+    <2835>   DW_AT_type        : <0x2845>
+ <2><2839>: Abbrev Number: 65 (DW_TAG_member)
+    <283a>   DW_AT_name        : (indirect string, offset: 0x84e4): m_01_long
+    <283e>   DW_AT_decl_file   : 1
+    <283f>   DW_AT_decl_line   : 17
+    <2840>   DW_AT_type        : <0x19de>
+ <1><c180b>: Abbrev Number: 259 (DW_TAG_member)
+    <c180d>   DW_AT_name        : (indirect string, offset: 0x5da5a): context128
+    <c1811>   DW_AT_decl_file   : 352
+    <c1813>   DW_AT_decl_line   : 6
+    <c1814>   DW_AT_type        : <0xab047>
+    <c1818>   DW_AT_data_member_location: 0x10840
+ <1><c181a>: Abbrev Number: 0

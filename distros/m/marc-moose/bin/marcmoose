@@ -3,7 +3,7 @@
 package main;
 # PODNAME: marcmoose
 # ABSTRACT: Read and output MARC record file
-$main::VERSION = '1.0.39';
+$main::VERSION = '1.0.40';
 use Modern::Perl;
 use Pod::Usage;
 use Getopt::Long;
@@ -98,7 +98,7 @@ marcmoose - Read and output MARC record file
 
 =head1 VERSION
 
-version 1.0.39
+version 1.0.40
 
 =head1 DESCRIPTION
 
@@ -149,7 +149,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Frédéric Demians.
+This software is copyright (c) 2020 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

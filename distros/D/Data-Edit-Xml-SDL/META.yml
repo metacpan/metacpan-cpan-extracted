@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.4224'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,20 +15,21 @@ name: Data-Edit-Xml-SDL
 provides:
   Data::Edit::Xml::SDL:
     file: lib/Data/Edit/Xml/SDL.pm
-    version: '20180630'
+    version: '20200109'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Edit::Xml::Lint: '20180629'
-  Data::Table::Text: '20180610'
+  Data::Edit::Xml::Lint: '20190524'
+  Data::Table::Text: '20200101'
   Digest::SHA: '0'
   Encode: '0'
   Storable: '0'
   Test2::API: '0'
   Test::More: '0'
   XML::Parser: '0'
+  perl: v5.26.1
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20180630'
+version: '20200109'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

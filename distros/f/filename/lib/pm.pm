@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-package pm v0.20.009;
+package pm;
 # ABSTRACT: Perl module to load files at compile-time, without BEGIN blocks.
 
 
@@ -52,7 +52,7 @@ feature.
 
 =head1 VERSION
 
-This document describes version v0.20.009 of this module.
+This document describes version v0.20.010 of this module.
 
 =head1 AUTHOR
 

@@ -1,0 +1,30 @@
+---
+abstract: unknown
+author:
+  - 'vrag <vrag867@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SyslogNg
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: '1.18'
+  IO::Socket::INET: '1.31'
+  Sys::HostName: '1.16'
+  perl: v5.14.2
+resources:
+  bugtracker: https://github.com/vrag86/perl-net-syslogng/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/vrag86/perl-net-syslogng
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

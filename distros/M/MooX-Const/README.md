@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.4.2
+version v0.4.3
 
 # SYNOPSIS
 
@@ -82,6 +82,16 @@ it can be used to catch mistakes in code that refer to non-existent
 keys.
 
 Unfortunately, this behaviour is not replicated with array references.
+
+See [Types::Const](https://metacpan.org/pod/Types::Const) for other known issues related to the `Const`
+type.
+
+## Using with Moose and Mouse
+
+This module appears to work with [Moose](https://metacpan.org/pod/Moose), and there is now a small
+test suite.
+
+It does not work with [Mouse](https://metacpan.org/pod/Mouse). Pull requests are welcome.
 
 # SEE ALSO
 

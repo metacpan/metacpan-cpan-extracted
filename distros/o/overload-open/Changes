@@ -1,5 +1,10 @@
 Revision history for overload::open
 
+1.00.0 Jan 10, 2020
+    - Fix a bug with MARK
+    - The bug would cause the filehandle to not be defined but was
+      often hard to trigger.
+
 0.33.0 Jan 8, 2020
     - This time we increase refcount at the start and decrease at the end, but
       also increase them in the ones we push onto the stack.

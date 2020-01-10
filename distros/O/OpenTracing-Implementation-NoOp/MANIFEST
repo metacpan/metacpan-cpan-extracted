@@ -1,0 +1,16 @@
+CHANGES
+cpanfile
+lib/OpenTracing/Implementation/NoOp.pm
+lib/OpenTracing/Implementation/NoOp.pod
+lib/OpenTracing/Implementation/NoOp/Scope.pm
+lib/OpenTracing/Implementation/NoOp/ScopeManager.pm
+lib/OpenTracing/Implementation/NoOp/Span.pm
+lib/OpenTracing/Implementation/NoOp/SpanContext.pm
+lib/OpenTracing/Implementation/NoOp/Tracer.pm
+LICENSE.md
+Makefile.PL
+MANIFEST
+README.md
+t/00_use_ok.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

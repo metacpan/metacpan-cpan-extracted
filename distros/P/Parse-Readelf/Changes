@@ -1,5 +1,12 @@
 Revision history for Perl extension Parse::Readelf.
 
+0.19	(14.12.2019-08.01.2020)
+	fixed missing last item
+	fixed various numbers appearing as hexadecimal values
+	fixed missing non-first members of unions
+	fixed missing members of top-level unions
+	added support for some new TAGs and attributes
+
 0.18	(12.05.2015)
 	fixed regexp in test for Perl 5.22
 

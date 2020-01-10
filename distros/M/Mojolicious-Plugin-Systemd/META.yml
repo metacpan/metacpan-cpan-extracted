@@ -18,12 +18,12 @@ no_index:
     - t
     - inc
 requires:
-  Mojolicious: '8.00'
+  Mojolicious: '8.25'
 resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-systemd/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-systemd
   repository: https://github.com/jhthorsen/mojolicious-plugin-systemd.git
-version: '0.01'
+version: '0.02'
 x_contributors:
   - 'Jan Henning Thorsen'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

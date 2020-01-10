@@ -1,0 +1,76 @@
+=head1 NAME
+
+OpenTracing::Implementation::NoOp - Stops Crashing, doing nothing else
+
+
+
+=head1 SYNOPSIS
+
+    use OpenTracing::Implementation::NoOp;
+    
+    my $tracer = OpenTracing::Implementation::NoOp->bootstrap( );
+
+
+
+=head1 DESCRIPTION
+
+The NoOp Implementation will 'disable' the entire OpenTracing infrastructure by
+making almost every method do nothing, or return a 'NoOp' object.
+
+This way, none of the code will break if there is no OpenTracing active.
+
+This implementation does not rely on L<OpenTracing::Role>, because those already
+add attributes and methods that are totally useless in this context of a 'NoOp'.
+Instead, this only requires the L<OpenTrace::Interface> if the
+C<OPENTRACING_INTERFACE> environment variable has been set (for development
+purposes).
+
+
+
+=head1 CLASS METHODS
+
+
+
+=head2 bootstrap
+
+    my $tracer = OpenTracing::Implementation::NoOp->bootstrap( @extra_args );
+
+Returns a L<OpenTracing::Interface::Tracer> compliant tracer, using the
+L<OpenTracing::Implementation::NoOp::Tracer> implementation.
+
+Any arguments passed in, and dutyfully passed, but are supposedly useless.
+
+
+
+=head1 ENVIRONMENT VARIABLES
+
+
+
+=head2 OPENTRACING_INTERFACE
+
+If set to true, this will wrap all methods inside L<Type::Tiny> typechecks, for
+incomming parameters and return values. Beside that, it will add check for
+required methods according to the L<OpenTracing::Interface> API description.
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing::Implementation::NoOp' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+=cut

@@ -10,7 +10,7 @@
 
 use strict;
 
-use Test::More tests => 141;
+use Test::More tests => 144;
 
 use File::Spec;
 use File::Temp 'tempfile';
@@ -192,6 +192,7 @@ check_stdout('^l_',
 	     (qr'^02') x 4,
 	     qr'^04',
 	     (qr'^08') x 3,
+	     qr'^08\.8',
 	     qr'^12\.8',
 	    );
 
@@ -217,14 +218,16 @@ $filepath = File::Spec->catfile($path, 'data', 'debug_info_0.lst');
 $readelf_data = new Parse::Readelf($filepath);
 is(ref($readelf_data), 'Parse::Readelf', 'created 3rd Parse::Readelf object');
 
-check_stdout('l_object4',
+check_stdout('l_objectAT',
 	     sub { $readelf_data->print_structure_layout('l_objectAT'); },
 	     qr'^O\s+STRUCTURE\s+TYPE \(SIZE\)\s+$',
 	     qr'^0\s+l_objectATE\s+AnonTypedefEnum \(4\)\s+$',
 	     qr'^0\s+AnonTypedefEnum\s+\(4\)\s+$',
 	     qr'^0\s+\(4\)\s+$',
 	     qr'^0\s+l_objectATU\s+AnonTypedefUnion \(8\)\s+$',
-	     qr'^0\s+AnonTypedefUnion\s+\(8\)\s+$'
+	     qr'^0\s+AnonTypedefUnion\s+\(8\)\s+$',
+	     qr'^0\s+m_00_two_shorts\[2\]\s+short int \(4\)\s+$',
+	     qr'^0\s+m_01_long\s+long int \(8\)\s+$',
 	    );
 
 #########################################################################

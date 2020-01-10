@@ -10,7 +10,15 @@ Files: t/01basic.t
  t/10plusattr.t
  t/11plusclass.t
  t/12shortcuts.t
+ t/13signatures.t
 Copyright: This software is copyright (c) 2019 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
@@ -19,13 +27,6 @@ Files: INSTALL
  examples/HTTP-Tiny-Objects/lib/HTTP/Tiny/Objects.pm
 Copyright: Unknown
 License: Unknown
-
-Files: Changes
- META.json
- META.yml
- doap.ttl
-Copyright: Copyright 2020 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
  CREDITS
@@ -38,16 +39,16 @@ Files: README
 Copyright: This software is copyright (c) 2019-2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/MooX/Press/Keywords.pm
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
 Copyright: Copyright 2019 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
+Files: lib/MooX/Press/Keywords.pm
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

@@ -1,3 +1,3 @@
 # You can install this project with curl -L http://cpanmin.us | perl - https://github.com/jhthorsen/mojolicious-plugin-systemd/archive/master.tar.gz
-requires "Mojolicious" => "8.00";
+requires "Mojolicious" => "8.25";
 test_requires "Test::More" => "0.88";

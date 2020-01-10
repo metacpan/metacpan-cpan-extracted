@@ -1,3 +1,7 @@
+0.1.5 2020-01-10 09:45:27 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - require XML::Compile::SOAP < 3.26
+
 0.1.4 2020-01-06 09:39:15 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - update bugtracker link

@@ -2,12 +2,18 @@
 use strict;
 use warnings;
 
-package filename v0.20.009;
+use locale;    # localize $!
+
+package filename;
 # ABSTRACT: Perl module to load files at compile-time, without BEGIN blocks.
 
 
 use Carp 1.50  ();
 use File::Spec ();
+
+
+our $VERSION = 'v0.20.010'; # VERSION
+
 
 
 my ( $do, $error ) = ();    # Private subs
@@ -61,7 +67,7 @@ $error = sub {
     my $filename = @_ ? shift : $_;
     my $fullpath = @_ ? shift : $filename;
 
-    $INC{$filename} &&= undef($!);
+    $INC{$filename} &&= undef($!); # $! is invalid if $INC{$filename} is true.
 
     $@ && Carp::croak( $@, "Compilation failed in require" );
 
@@ -142,7 +148,7 @@ feature.
 
 =head1 VERSION
 
-This document describes version v0.20.009 of this module.
+This document describes version v0.20.010 of this module.
 
 =head1 AUTHOR
 

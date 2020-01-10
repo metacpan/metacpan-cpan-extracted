@@ -10,7 +10,7 @@
 
 use strict;
 
-use Test::More tests => 150;
+use Test::More tests => 167;
 
 use File::Spec;
 
@@ -80,7 +80,7 @@ is($@, '', "import with ':fixed_regexps'");
 test_globals(':fixed_regexps',
 	     {'$command' => undef,
 	      '$re_section_start' => qr(^The section \.debug_info contains:|^Contents of the \.debug_(?:info|types) section:),
-	      '$re_section_stop'  => qr(^The section \.debug_.* contains:|^Contents of the \.debug_.* section:),
+	      '$re_section_stop'  => qr(^The section \.debug_.* contains:|^Contents of the \.debug_.* section:|^(?:Raw dump|Dump) of debug contents of section \.debug_line:),
 	      '$re_dwarf_version' => qr(^\s*Version:\s+(\d+)\s*$)}
 	    );
 reset_globals();
@@ -98,7 +98,7 @@ is($@, '', "import with ':all'");
 test_globals(':all',
 	     {'$command' => 'readelf --debug-dump=info',
 	      '$re_section_start' => qr(^The section \.debug_info contains:|^Contents of the \.debug_(?:info|types) section:),
-	      '$re_section_stop'  => qr(^The section \.debug_.* contains:|^Contents of the \.debug_.* section:),
+	      '$re_section_stop'  => qr(^The section \.debug_.* contains:|^Contents of the \.debug_.* section:|^(?:Raw dump|Dump) of debug contents of section \.debug_line:),
 	      '$re_dwarf_version' => qr(^\s*Version:\s+(\d+)\s*$)}
 	    );
 reset_globals();
@@ -196,7 +196,7 @@ my $debug_info = undef;
 my @ids_matching__l_   = (6,   6,   7,   8,  11,  12, 13);
 my @ids_matching__l_o2 = (2,   2,   2,   2,   4,   4,  4);
 my @ids_matching_l_    = (6,  14,  15,  15,  18,  19, 20);
-my @ids_matching_var   = (7, 122, 128, 119, 124, 122, 16);
+my @ids_matching_var   = (8, 122, 128, 120, 125, 123, 16);
 my @ids_matching_npos  = (0,   3,   3,   3,   3,   3,  0);
 my @ids_matching_S1    = (0,   1,   1,   1,   1,   1,  2);
 
@@ -309,6 +309,53 @@ like($stderr,
      'cloning gives a warning');
 is(ref($debug_info), 'Parse::Readelf::Debug::Info',
    'created new Parse::Readelf::Debug::Info object');
+
+#########################################################################
+# some tests for special bugs:
+$filepath = File::Spec->catfile($path, 'data', 'debug_info_0.lst');
+$debug_info = new Parse::Readelf::Debug::Info($filepath);
+is(scalar($debug_info->item_ids('stdout')), 1, 'last item can be found');
+
+$filepath = File::Spec->catfile($path, 'data', 'debug_info_3.lst');
+$debug_info = new Parse::Readelf::Debug::Info($filepath);
+my @item_ids = $debug_info->item_ids('StructureWithUnion');
+is(scalar(@item_ids), 1, 'StructureWithUnion can be found');
+my $item = $debug_info->{item_map}{$item_ids[0]}{sub_items}[1];
+ok($item, 'StructureWithUnion has 2nd item');
+is($item->{name}, '<anonymous union>', 'StructureWithUnion has union');
+$item = $item->{sub_items}[1];
+ok($item, "StructureWithUnion's union has 2nd item");
+is($item->{member_location}, 0, "StructureWithUnion's union's location is 0");
+
+@item_ids = $debug_info->item_ids('__max');
+is(scalar(@item_ids), 5, 'five __max can be found');
+my $value = $debug_info->{item_map}{$item_ids[0]}{'const_value'};
+is($value, '0x7fffffff', '__max #0 is correct');
+my $value = $debug_info->{item_map}{$item_ids[1]}{'const_value'};
+is($value, undef, '__max #1 is correct');
+my $value = $debug_info->{item_map}{$item_ids[2]}{'const_value'};
+is($value, 127, '__max #2 is correct');
+my $value = $debug_info->{item_map}{$item_ids[3]}{'const_value'};
+is($value, 32767, '__max #3 is correct');
+my $value = $debug_info->{item_map}{$item_ids[4]}{'const_value'};
+is($value, '0xffffffff 0x7fffffff', '__max #4 is correct');
+
+$filepath = File::Spec->catfile($path, 'data', 'debug_info_4.lst');
+$debug_info = new Parse::Readelf::Debug::Info($filepath);
+my @item_ids = $debug_info->item_ids('l_object2_foo');
+is(scalar(@item_ids), 1, 'l_object2_foo can be found');
+
+$filepath = File::Spec->catfile($path, 'data', 'debug_info_snippets.lst');
+$debug_info = new Parse::Readelf::Debug::Info($filepath);
+my @item_ids = $debug_info->item_ids('TopLevelUnion');
+is(scalar(@item_ids), 1, 'TopLevelUnion can be found');
+my $ra_sub_items = $debug_info->{item_map}{$item_ids[0]}{sub_items};
+is(@$ra_sub_items, 2, 'TopLevelUnion has 2 items');
+
+my @item_ids = $debug_info->item_ids('context128');
+is(scalar(@item_ids), 1, 'context128 can be found');
+my $value = $debug_info->{item_map}{$item_ids[0]}{'member_location'};
+is($value, '0x10840', 'location of context128 is correct');
 
 #########################################################################
 # finally some tests with broken data:

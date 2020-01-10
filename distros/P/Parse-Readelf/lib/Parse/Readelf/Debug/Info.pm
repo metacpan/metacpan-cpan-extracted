@@ -36,8 +36,8 @@ AT THE MOMENT ONLY INFORMATION REGARDING THE BINARY ARRANGEMENT OF
 VARIABLES (STRUCTURE LAYOUT) IS SUPPORTED.  Other data is ignored for
 now.
 
-Currently only output for B<Dwarf version 2> is supported.  Please
-contact the author for other versions and provide some example
+Currently only output for B<Dwarf versions 2 and 4> is supported.
+Please contact the author for other versions and provide some example
 C<readelf> outputs.
 
 =cut
@@ -49,7 +49,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Parse::Readelf::Debug::Line;
 
@@ -85,15 +85,19 @@ our %EXPORT_TAGS =
 			   $re_unit_signature
 			   $re_type_offset) ],
      versioned_regexps => [ qw(@re_item_start
+			       @re_abstract_origin
+			       @re_alignment
 			       @re_bit_offset
 			       @re_bit_size
 			       @re_byte_size
 			       @re_comp_dir
+			       @re_const_expt
 			       @re_const_value
 			       @re_containing_type
 			       @re_decl_file
 			       @re_decl_line
 			       @re_declaration
+			       @re_default_value
 			       @re_encoding
 			       @re_external
 			       @re_language
@@ -261,7 +265,7 @@ our $re_section_start =
     qr(^The section \.debug_info contains:|^Contents of the \.debug_(?:info|types) section:);
 
 our $re_section_stop =
-    qr(^The section \.debug_.* contains:|^Contents of the \.debug_.* section:);
+    qr(^The section \.debug_.* contains:|^Contents of the \.debug_.* section:|^(?:Raw dump|Dump) of debug contents of section \.debug_line:);
 
 our $re_unit_offset = qr(^\s*Compilation Unit\s.*\soffset\s+(?:0x)?([0-9a-f]+));
 
@@ -432,6 +436,13 @@ our @re_abstract_origin =
       qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_abstract_origin\s*:\s+<(?:0x)?([0-9A-F]+)>)i
     );
 
+our @re_alignment =
+    ( undef, undef,
+      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_alignment\s*:\s+(\d+))i,
+      undef,
+      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_alignment\s*:\s+(\d+))i
+    );
+
 our @re_bit_offset =
     ( undef, undef,
       qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_bit_offset\s*:\s+(\d+))i,
@@ -448,9 +459,9 @@ our @re_bit_size =
 
 our @re_byte_size =
     ( undef, undef,
-      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_byte_size\s*:\s+(\d+))i,
+      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_byte_size\s*:\s+((?:0x)?[0-9A-F]+))i,
       undef,
-      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_byte_size\s*:\s+(\d+))i
+      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_byte_size\s*:\s+((?:0x)?[0-9A-F]+))i
     );
 
 our @re_comp_dir =
@@ -460,11 +471,18 @@ our @re_comp_dir =
       qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_comp_dir\s*:(?:.+:)?\s+(.+))i
     );
 
+our @re_const_expr =
+    ( undef, undef,
+      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_const_expr\s*:\s+(\d+))i,
+      undef,
+      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_const_expr\s*:\s+(\d+))i
+    );
+
 our @re_const_value =
     ( undef, undef,
-      qr{^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_const_value\s*:\s+([-\d]+|\*|ALL|\(indirect string, .*|\w{1,4})}i,
+      qr{^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_const_value\s*:\s+(0x[0-9a-f]+(?: 0x[0-9a-f]+)?|[1-9]\d* byte block:(?: [0-9a-f]+)+|[-1-9]\d*|\*|ALL|\(indirect string, .*|\w{1,4})\s*$}i,
       undef,
-      qr{^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_const_value\s*:\s+([-\d]+|\*|ALL|\(indirect string, .*|\w{1,4})}i
+      qr{^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_const_value\s*:\s+(0x[0-9a-f]+(?: 0x[0-9a-f]+)?|[1-9]\d* byte block:(?: [0-9a-f]+)+|[-1-9]\d*|\*|ALL|\(indirect string, .*|\w{1,4})\s*$}i
     );
 
 our @re_containing_type =
@@ -493,6 +511,13 @@ our @re_declaration =
       qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_declaration\s*:\s+(\d+))i,
       undef,
       qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_declaration\s*:\s+(\d+))i
+    );
+
+our @re_default_value =
+    ( undef, undef,
+      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_default_value\s*:\s+(\d+))i,
+      undef,
+      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_default_value\s*:\s+(\d+))i
     );
 
 our @re_encoding =
@@ -534,7 +559,7 @@ our @re_member_location =
     ( undef, undef,
       qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_data_member_location:.*DW_OP_(?:(?:plus_uconst|const1u):\s+(\d+))?)i,
       undef,
-      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_data_member_location:\s+(\d+))i
+      qr(^\s*(?:<[0-9A-F ]+>)?\s*DW_AT_data_member_location:\s+(0x[0-9a-f]+|\d+))i
     );
 
 our @re_name_tag =
@@ -623,12 +648,14 @@ our @tag_needs_attributes =
       DW_TAG_pointer_type => [ qw(byte_size) ],
       DW_TAG_ptr_to_member_type => [ qw(containing_type) ],
       DW_TAG_reference_type => [ qw(type byte_size) ],
+      DW_TAG_rvalue_reference_type => [ qw(type byte_size) ],
       DW_TAG_structure_type => [],
       DW_TAG_subrange_type => [ qw(upper_bound) ],
       DW_TAG_template_type_param => [ qw(name byte_size) ],
       DW_TAG_template_value_param => [ qw(name type) ],
       DW_TAG_typedef => [ qw(name type) ],
       DW_TAG_union_type => [ qw(byte_size) ],
+      DW_TAG_unspecified_type => [ qw(name) ],
       DW_TAG_variable => [ qw(name type) ],
       DW_TAG_volatile_type => [ qw(type) ]
      },
@@ -648,12 +675,14 @@ our @tag_needs_attributes =
       DW_TAG_pointer_type => [ qw(byte_size) ],
       DW_TAG_ptr_to_member_type => [ qw(containing_type) ],
       DW_TAG_reference_type => [ qw(type byte_size) ],
+      DW_TAG_rvalue_reference_type => [ qw(type byte_size) ],
       DW_TAG_structure_type => [],
       DW_TAG_subrange_type => [ qw(upper_bound) ],
       DW_TAG_template_type_param => [ qw(name byte_size) ],
       DW_TAG_template_value_param => [ qw(name type) ],
       DW_TAG_typedef => [ qw(name type) ],
       DW_TAG_union_type => [ qw(byte_size) ],
+      DW_TAG_unspecified_type => [ qw(name) ],
       DW_TAG_variable => [ qw(name type) ],
       DW_TAG_volatile_type => [ qw(type) ]
      }
@@ -685,6 +714,7 @@ our @ignored_tags =
       qw(
 	DW_TAG_GNU_call_site
 	DW_TAG_GNU_call_site_parameter
+	DW_TAG_dwarf_procedure
 	DW_TAG_inlined_subroutine
 	DW_TAG_imported_declaration
 	DW_TAG_imported_module
@@ -692,6 +722,7 @@ our @ignored_tags =
 	DW_TAG_label
 	DW_TAG_lexical_block
 	DW_TAG_namespace
+	DW_TAG_restrict_type
 	DW_TAG_subprogram
 	DW_TAG_subroutine_type
 	DW_TAG_type_unit
@@ -799,6 +830,7 @@ sub new($$;$)
     my $tag_needs_attributes = undef;
     my $compilation_unit = -1;
     my %compilation_unit_list = ();
+    my $end_of_section = 0;
     while (<READELF>)
     {
 	if (m/$re_dwarf_version/)
@@ -829,15 +861,15 @@ sub new($$;$)
 	}
 	next unless $version >= 0;
 
-	# stop at end of section:
-	if (m/$re_section_stop/  and  not m/$re_section_start/)
+	# stop at end of section (preparation):
+	if (m/$re_section_stop/  and  not m/$re_section_start/  or  eof READELF)
 	{
 	    my $dummy = grep /nothing/, <READELF>; # avoid SIGPIPE in close
-	    last;
+	    $end_of_section = 1;
 	}
 
 	# handle the beginning (and therefore the change) of an item:
-	if (m/$re_item_start[$version]/i)
+	if ($end_of_section  or  m/$re_item_start[$version]/i)
 	{
 	    # check if item is complete and store it:
 	    if (defined $item)
@@ -866,10 +898,9 @@ sub new($$;$)
 		# special handling of indirect variables of
 		# non-optimised inline functions:
 		if (defined $item->{abstract_origin}  and
-		    (defined $item->{type_tag} eq 'DW_TAG_variable'  ))
+		    defined $item->{type_tag}  and
+		    $item->{type_tag} eq 'DW_TAG_variable')
 		{
-		    # TODO: This needs a test case!
-		    warn "abstract variable";
 		    $item = undef;
 		    next;
 		}
@@ -877,13 +908,46 @@ sub new($$;$)
 		foreach (@$needed_attributes)
 		{
 		    next if defined $item->{$_};
+		    # special handling for missing locations in unions:
+		    if ($item->{type_tag} eq 'DW_TAG_member'  and
+			not defined $item->{member_location}  and
+			$_ eq 'member_location'  and
+			$item->{level} > 1  and
+			$level_stack[$item->{level} - 1]->{type_tag}
+			eq 'DW_TAG_union_type'  and
+			$level_stack[$item->{level} - 1]->{sub_items})
+		    {
+			my $sibling =
+			    $level_stack[$item->{level} - 1]->{sub_items}->[0];
+			# special handling for non-first members of unions:
+			if (defined $sibling)
+			{
+			    while (not defined $sibling->{member_location}  and
+				   $sibling->{sub_items})
+			    {
+				$sibling = $sibling->{sub_items}->[0];
+			    }
+			    if (defined $sibling->{member_location})
+			    {
+				$item->{member_location} =
+				    $sibling->{member_location};
+				next;
+			    }
+			}
+			# special handling for top-level unions:
+			elsif ($item->{level} <= 2)
+			{
+			    $item->{member_location} = 0;
+			    next;
+			}
+		    }
 		    # special handling of items that contain
 		    # additional info needed by other items:
-		    if ($item->{type_tag} eq 'DW_TAG_member' &&
-			defined $item->{member_location} &&
-			defined $item->{type} &&
-			defined $self{item_map}->{$item->{type}} &&
-			! defined
+		    if ($item->{type_tag} eq 'DW_TAG_member'  and
+			defined $item->{member_location}  and
+			defined $item->{type}  and
+			defined $self{item_map}->{$item->{type}}  and
+			not defined
 			$self{item_map}->{$item->{type}}->{member_location})
 		    {
 			$self{item_map}->{$item->{type}}->{member_location} =
@@ -965,6 +1029,8 @@ sub new($$;$)
 			not defined $item->{type});
 		# save a bit of memory (strings):
 	    }
+	    # stop at end of section (finalisation):
+	    last if $end_of_section;
 	    # prepare node for next item (we ignore the type ID in $3
 	    # except for the carp below as the ID uses a new sequence
 	    # for every compilation unit and is therefore pretty much
@@ -993,6 +1059,8 @@ sub new($$;$)
 	{ next }
 	elsif (m/$re_abstract_origin[$version]/)
 	{ $item->{abstract_origin} = $1 }
+	elsif (m/$re_alignment[$version]/)
+	{ $item->{alignment} = $1 }
 	elsif (m/$re_bit_offset[$version]/)
 	{ $item->{bit_offset} = $1 }
 	elsif (m/$re_bit_size[$version]/)
@@ -1001,6 +1069,8 @@ sub new($$;$)
 	{ $item->{byte_size} = $1 }
 	elsif (m/$re_comp_dir[$version]/)
 	{ $item->{comp_dir} = $1 }
+	elsif (m/$re_const_expr[$version]/)
+	{ $item->{const_expr} = $1 }
 	elsif (m/$re_const_value[$version]/)
 	{ $item->{const_value} = $1 }
 	elsif (m/$re_containing_type[$version]/)
@@ -1011,6 +1081,8 @@ sub new($$;$)
 	{ $item->{decl_line} = $1 }
 	elsif (m/$re_declaration[$version]/)
 	{ $item->{declaration} = $1 }
+	elsif (m/$re_default_value[$version]/)
+	{ $item->{default_value} = $1 }
 	elsif (m/$re_encoding[$version]/)
 	{ $item->{encoding} = $1 }
 	elsif (m/$re_external[$version]/)
@@ -1472,8 +1544,7 @@ functions outside of structures always have the size 0.)
 Only Dwarf versions 2 and 4 are currently supported.  Please contact
 the author for other versions and provide some example C<readelf>
 outputs.  Without examples support of other versions will not be
-possible.  Note that the support of Dwarf version 4 is still
-experimental.
+possible.
 
 This has only be tested in a Unix like environment, namely Linux and
 Solaris.
@@ -1489,7 +1560,7 @@ Thomas Dorner, E<lt>dorner (AT) cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007-2013 by Thomas Dorner
+Copyright (C) 2007-2020 by Thomas Dorner
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.1 or,

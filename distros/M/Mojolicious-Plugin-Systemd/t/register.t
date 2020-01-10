@@ -6,6 +6,7 @@ my $unit_file
   = Mojo::File::curfile->sibling(qw(data foo.service))->to_abs->to_string;
 plan skip_all => 'could not find foo.service' unless -r $unit_file;
 
+delete $ENV{XDG_SESSION_ID};    # Smokers are run from systemd
 note 'running outside of systemd';
 use Mojolicious::Lite;
 is eval { plugin 'systemd'; 1983 }, 1983, 'plugin loaded';

@@ -1,5 +1,17 @@
 Revision history for MooX-Const:
 
+v0.4.3    2020-01-10 12:08:40+00:00 Europe/London
+  [Documentation]
+  - Added a note about using with Moose and Mouse.
+
+  - Added link to Types::Const in KNOWN ISSUES.
+
+  [Tests]
+  - Added tests with Moose.
+
+  [Other]
+  - Added MooX::TypeTiny and Moose as recommended test modules.
+
 v0.4.2    2020-01-04 12:59:01+00:00 Europe/London
   [Tests]
   - Fix MooX::TypeTiny test to bail out if MooX::TypeTiny missing, #1.

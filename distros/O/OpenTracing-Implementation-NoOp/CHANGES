@@ -1,0 +1,39 @@
+CHANGE LOG
+==========
+
+
+2020-01-10 - v0.05
+------------------
+
+### Added
+
+    - with OpenTracing Implementation Interface Bootstrap
+
+
+2020-01-10 - v0.04
+------------------
+
+### Added
+
+    - LICENSE and COPYRIGHT info
+
+2019-12-13 - v0.03
+------------------
+
+### Fixed
+
+    - add test to run with $OPENTRACING_INTERFACE = 1
+    - add missing methods required for being OpenTracing-Interface compliant
+
+2019-12-13 - v0.02
+------------------
+
+### Fixed
+
+    - consume role 'OpenTracing::Interface::Tracer'
+
+
+2019-12-06 - v0.01
+------------------
+
+Initial Release

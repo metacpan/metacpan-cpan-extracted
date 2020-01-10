@@ -32,13 +32,13 @@ L</"METHODS"> for details.
 
 This is BETA software, use at your own risk.
 
-at the moment only information regarding the binary arrangement of
+At the moment only information regarding the binary arrangement of
 variables (Structure Layout) is supported (and that is regularly used
 at my company, so the worst bugs should by found by now).  Other data
 is ignored for now.
 
-Currently only output for B<Dwarf version 2> is supported.  Please
-contact the author for other versions and provide some example
+Currently only output for B<Dwarf versions 2 and 4> is supported.
+Please contact the author for other versions and provide some example
 C<readelf> outputs.
 
 =cut
@@ -50,7 +50,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Parse::Readelf::Debug::Line;
 use Parse::Readelf::Debug::Info ':constants';
@@ -265,8 +265,8 @@ __END__
 
 Did I mentioned that this is Beta code?
 
-Only Dwarf version 2 is supported.  Please contact the author for
-other versions and provide some example C<readelf> outputs.
+Only Dwarf versions 2 and 4 are supported.  Please contact the author
+for other versions and provide some example C<readelf> outputs.
 
 This has only be tested in a Unix like environment, namely Linux and
 Solaris.
@@ -282,7 +282,7 @@ Thomas Dorner, E<lt>dorner (AT) cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007-2013 by Thomas Dorner
+Copyright (C) 2007-2020 by Thomas Dorner
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.1 or,

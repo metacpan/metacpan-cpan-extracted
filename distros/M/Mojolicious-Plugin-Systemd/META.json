@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "8.00"
+            "Mojolicious" : "8.25"
          }
       },
       "test" : {
@@ -51,7 +51,7 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-systemd"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "Jan Henning Thorsen"
    ],

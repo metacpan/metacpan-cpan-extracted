@@ -39,7 +39,9 @@ do { my $x = {
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '2.120900'
+                                     'CPAN::Meta' => '2.120900',
+                                     'MooX::TypeTiny' => '0',
+                                     'Moose' => '0'
                                    },
                    'requires' => {
                                    'File::Spec' => '0',

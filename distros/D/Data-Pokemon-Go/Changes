@@ -1,5 +1,8 @@
 Revision history for Perl extension Data-Pokemon-Go
 
+0.12 2020-01-10T12:35:30Z
+    - strat to suport Galar region and Multiformed Pokemons
+
 0.11 2020-01-08T13:35:11Z
     - fixed the bug around method 'exists'
 

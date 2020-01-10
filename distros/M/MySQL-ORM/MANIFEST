@@ -1,6 +1,5 @@
 .includepath
 .project
-.travis.yml
 bin/mysql-orm.pl
 build.sh
 Changes

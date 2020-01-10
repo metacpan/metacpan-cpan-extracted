@@ -38,7 +38,7 @@ name: MooX-Const
 provides:
   MooX::Const:
     file: lib/MooX/Const.pm
-    version: v0.4.2
+    version: v0.4.3
 recommends:
   MooX::TypeTiny: '0'
   Type::Tiny::XS: '0'
@@ -54,7 +54,7 @@ resources:
   bugtracker: https://github.com/robrwo/MooX-Const/issues
   homepage: https://metacpan.org/release/MooX-Const
   repository: git://github.com/robrwo/MooX-Const.git
-version: v0.4.2
+version: v0.4.3
 x_authority: cpan:RRWO
 x_contributors:
   - 'Kang-min Liu 劉康民 <gugod@gugod.org>'

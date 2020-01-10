@@ -9,7 +9,7 @@ use Data::Printer alias => 'pdump';
 use SQL::Abstract::Complete;
 use MySQL::Util::Lite;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -194,7 +194,7 @@ method update (
 
 method upsert (Str     :$table!,
                HashRef :$values!) {
-
+	
 	my $into_cols = join( ', ', keys(%$values) );
 
     my $fq_table = $self->_fq_table($table);

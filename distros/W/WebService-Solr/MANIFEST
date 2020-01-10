@@ -15,13 +15,13 @@ t/live.t
 t/pod.t
 t/pod_coverage.t
 t/query.t
-t/request/add.t
-t/request/commit.t
-t/request/delete.t
-t/request/optimize.t
-t/request/ping.t
-t/request/rollback.t
-t/request/search.t
+t/request-add.t
+t/request-commit.t
+t/request-delete.t
+t/request-optimize.t
+t/request-ping.t
+t/request-rollback.t
+t/request-search.t
 t/response.t
 t/use.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

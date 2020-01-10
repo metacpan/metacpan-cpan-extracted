@@ -22,3 +22,4 @@ t/04mouse.t
 t/10plusattr.t
 t/11plusclass.t
 t/12shortcuts.t
+t/13signatures.t

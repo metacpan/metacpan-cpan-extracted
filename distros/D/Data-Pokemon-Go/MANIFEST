@@ -14,6 +14,7 @@ lib/Data/Pokemon/Go/Role/Types.pm
 lib/Data/Pokemon/Go/Skill.pm
 minil.toml
 share/Alola.yaml
+share/Galar.yaml
 share/Hoenn.yaml
 share/Johto.yaml
 share/Kanto.yaml
@@ -27,8 +28,9 @@ t/00_compile.t
 t/01_relations.t
 t/02_skills.t
 t/03_forms.t
-t/04_pokemon.t
-t/05_IV.t
+t/04_exists.t
+t/05_pokemon.t
+t/06_IV.t
 t/99_mecab.t
 META.yml
 MANIFEST

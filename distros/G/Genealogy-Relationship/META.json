@@ -4,7 +4,7 @@
       "Dave Cross <dave@perlhacks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,7 +41,13 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "v0.0.1",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg/genealogy-relationship.git",
+         "web" : "https://github.com/davorg/genealogy-relationship"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

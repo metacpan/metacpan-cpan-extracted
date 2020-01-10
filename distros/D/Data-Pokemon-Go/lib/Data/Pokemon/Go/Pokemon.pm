@@ -1,11 +1,16 @@
 package Data::Pokemon::Go::Pokemon;
 use 5.008001;
+use utf8;
 use Carp;
 use Exporter 'import';
 our @EXPORT_OK = qw( $All @List @Types );
 
 use Moose;
 use Moose::Util::TypeConstraints;
+
+enum 'Countries' => [qw( en ja ca fr )];
+has lang => ( is => 'ro', isa => 'Countries', required => 1, default => 'ja' );
+
 use YAML::XS;
 use File::Share 'dist_dir';
 my $dir = $ENV{'USER'} eq 'yuki.yoshida'? 'share': dist_dir('Data-Pokemon-Go');
@@ -18,18 +23,17 @@ my $skill = Data::Pokemon::Go::Skill->new();
 
 our $All = {};
 our @List = ();
-foreach my $region (qw|Kanto Johto Hoenn Sinnoh Unova Alola|){
+foreach my $region (qw|Kanto Johto Hoenn Sinnoh Unova Alola Galar|){
     my $data = YAML::XS::LoadFile("$dir/$region.yaml");
     map{
-        my $fullname = _get_fullname( $_, 'ja' );
-        $All->{ $fullname } = $_;
+        my $fullname = get_fullname( bless( { lang => 'ja' }, __PACKAGE__ ), $_ );
         push @List, $fullname;
+        $All->{ $fullname } = $_;
     } @$data;
 }
 
 enum 'PokemonName' => \@List;
 has name => ( is => 'rw', isa => 'PokemonName' );
-
 before 'name' => sub {
     my $self = shift;
     my $name = shift;
@@ -39,7 +43,8 @@ before 'name' => sub {
         $form = $2;
     }
     
-    croak "unvalid name: $name&$form" if $name and not $self->exists($name) and not $self->exists("$name($form)");
+#     croak "unvalid name: $name($form)"
+#    if defined $name and defined $form and not $self->exists($name) and not $self->exists( $name, $form );
 };
 
 __PACKAGE__->meta->make_immutable;
@@ -48,7 +53,16 @@ no Moose;
 sub exists {
     my $self = shift;
     my $name = shift;
-    return CORE::exists $All->{$name};
+    my $form = shift || undef;
+
+    if ( not defined $form and defined $name and $name =~ /^(\w+)\((\w+)\)$/ ){
+        return CORE::exists $All->{"$1($2)"};
+    }
+    my $fullname = $All->{$name}{'Name'}{$self->lang()};
+    return 0 unless defined $fullname;
+    return 1 unless $form;
+    $fullname .= "($form)";
+    return CORE::exists $All->{$fullname};
 }
 
 sub id {
@@ -162,10 +176,10 @@ sub isNotAvailable {
     return $All->{$name}{'isNotAvailable'};
 }
 
-sub isAlola {
+sub hasOtherForm {
     my $self = shift;
     my $name = $self->name();
-    return $All->{$name}{'isAlola'};
+    return $All->{$name}{'hasOtherForm'};
 }
 
 sub hasForms {
@@ -174,18 +188,18 @@ sub hasForms {
     return exists $All->{$name}{'Form'}? $All->{$name}{'Form'} : 0;
 }
 
-sub _get_fullname {
+sub get_fullname {
+    my $self = shift;
     my $ref = shift;
-    my $lang = shift;
-    my $fullname = __PACKAGE__->get_Pokemon_name( $ref, $lang );
-    $fullname .= "($ref->{'Form'})" if exists $ref->{'Form'};
+    my $fullname = $self->get_Pokemon_name($ref);
+    $fullname .= '(' . $ref->{'Form'} . ')' if exists $ref->{'Form'};
     return $fullname;
 }
 
 sub get_Pokemon_name {
     my $self = shift;
     my $ref = shift;
-    my $lang = shift || 'jp';
+    my $lang = $self->lang();
     croak "No name for $lang" unless exists $ref->{'Name'}{$lang};
     return $ref->{'Name'}{$lang};
 }

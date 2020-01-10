@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => "1.50",
     "File::Spec" => 0,
+    "locale" => 0,
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "v0.20.009",
+  "VERSION" => "v0.20.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "FindBin" => 0,
   "Test2::V0" => 0,
+  "locale" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

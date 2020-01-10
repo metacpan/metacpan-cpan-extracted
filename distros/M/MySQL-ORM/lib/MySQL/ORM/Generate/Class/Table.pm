@@ -534,8 +534,11 @@ method _get_method_selectx {
 			if ($order_by) { 
 				my @order;
 				foreach my $col (@$order_by) {
-					my $table = $arg2table{$col};
-					my $alias = $table2alias{$table};
+				    # Support if col provided with an ordering like 'colName DESC'
+				    my ($lookup) = split(/ /, $col);
+				    
+					my $table    = $arg2table{$lookup};
+					my $alias    = $table2alias{$table};
 					push @order, "$alias.$col";
 				}
 				$sql.= "order by " . join(', ', @order);

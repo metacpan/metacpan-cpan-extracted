@@ -37,8 +37,8 @@
          "requires" : {
             "CGI" : "0",
             "Mojolicious" : "8.26",
-            "XML::Compile::SOAP" : "0",
-            "XML::Compile::SOAP12" : "0",
+            "XML::Compile::SOAP" : "3.26",
+            "XML::Compile::SOAP12" : "3.06",
             "XML::Compile::SOAP::Daemon" : "3.14",
             "perl" : "5.020001"
          }
@@ -61,6 +61,6 @@
          "url" : "https://github.com/oposs/mojolicious-plugin-soap-server"
       }
    },
-   "version" : "v0.1.4",
+   "version" : "v0.1.5",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

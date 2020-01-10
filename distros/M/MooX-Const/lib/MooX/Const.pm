@@ -19,7 +19,7 @@ use Types::Standard qw( Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.3';
 
 
 sub import {
@@ -120,7 +120,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.4.2
+version v0.4.3
 
 =head1 SYNOPSIS
 
@@ -190,6 +190,16 @@ it can be used to catch mistakes in code that refer to non-existent
 keys.
 
 Unfortunately, this behaviour is not replicated with array references.
+
+See L<Types::Const> for other known issues related to the C<Const>
+type.
+
+=head2 Using with Moose and Mouse
+
+This module appears to work with L<Moose>, and there is now a small
+test suite.
+
+It does not work with L<Mouse>. Pull requests are welcome.
 
 =head1 SEE ALSO
 

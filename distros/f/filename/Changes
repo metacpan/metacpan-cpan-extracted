@@ -1,5 +1,10 @@
 Revision history for file.
 
+v0.20.010 2020-01-10
+
+ - Use `locale` to fix issues with $!.
+ - Fix $VERSION for older Perls.
+
 v0.20.009 2020-01-09
 
  - Added even more tests.

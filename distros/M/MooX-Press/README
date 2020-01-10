@@ -112,7 +112,7 @@ DESCRIPTION
         A package name to install methods like the `new_cat` and `new_cow`
         methods in "SYNOPSIS".
 
-        This defaults to caller, but may be explicitly set to undef to
+        This defaults to prefix, but may be explicitly set to undef to
         suppress the creation of such methods.
 
         In every class (but not role) that MooX::Press builds, there will be a
@@ -226,6 +226,25 @@ DESCRIPTION
 
         The prefix is automatically added. Include a leading "::" if you don't
         want the prefix to be added.
+
+        Roles may include a trailing "?". When these are seen, the role will
+        be created if it doesn't seem to exist. This is because sometimes it's
+        useful to have roles to classify classes (and check them with the
+        `does` method) even if those roles don't have any other functionality.
+
+          use MooX::Press (
+            prefix => 'Farm',
+            class  => [
+              'Sheep' => { with => ['Bleat?'] },
+            ],
+          );
+  
+          if (Farm::Sheep->new->does('Farm::Bleat')) {
+            ...;
+          }
+
+        Without the "?", trying to compose a role that does not exist is an
+        error.
 
     `has` *(OptList)*
         The list of attributes to add to the class as an optlist.
@@ -782,20 +801,110 @@ DESCRIPTION
             ],
           );
 
+        `type => $blessed_type_object` does still work.
+
+        `type` and `isa` are basically the same as each other, but differ in
+        how they'll interpret a string. `isa` assumes it's a class name as
+        applies the package prefix to it; `type` assumes it's the name of a
+        type constraint which has been defined in some type library somewhere.
+
     `coerce` *(Bool)*
         MooX::Press automatically implies `coerce => 1` when you give a type
         constraint that has a coercion. If you don't want coercion then
         explicitly provide `coerce => 0`.
 
     `does` *(Str)*
-        Similarly, these will be given your namespace prefix.
+        Similarly to `isa`, these will be given your namespace prefix.
+
+          # These mean the same...
+          does => 'SomeRole',
+          type => Types::Standard::ConsumerOf['MyApp::SomeRole'],
 
     `enum` *(ArrayRef[Str])*
         This is a cute shortcut for an enum type constraint.
 
           # These mean the same...
           enum => ['foo', 'bar'],
-          isa  => Types::Standard::Enum['foo', 'bar'],
+          type => Types::Standard::Enum['foo', 'bar'],
+
+   Method Signatures
+    Most places where a coderef is expected, MooX::Press will also accept a
+    hashref of the form:
+
+      {
+        signature  => [ ... ],
+        named      => 1,
+        code       => sub { ... },
+      }
+
+    The `signature` is a specification to be passed to `compile` or
+    `compile_named_oo` from Type::Params (depending on whether `named` is true
+    or false).
+
+    Unlike Type::Params, these signatures allow type constraints to be given
+    as strings, which will be looked up by name.
+
+    This should work for `can`, `factory_can`, `type_library_can`, `factory`,
+    and `builder` methods, but will not work for method modifiers.
+
+    Example with named parameters:
+
+      use MooX::Press (
+        prefix => 'Wedding',
+        class  => [
+          'Person' => { has => [qw( $name $spouse )] },
+          'Officiant' => {
+            can => {
+              'marry' => {
+                signature => [ bride => 'Person', groom => 'Person' ],
+                named     => 1,
+                code      => sub {
+                  my ($self, $args) = @_;
+                  $args->bride->spouse($args->groom);
+                  $args->groom->spouse($args->bride);
+                  printf("%s, you may kiss the bride\n", $args->groom->name);
+                  return $self;
+                },
+              },
+            },
+          },
+        ],
+      );
+  
+      my $alice  = Wedding->new_person(name => 'Alice');
+      my $bob    = Wedding->new_person(name => 'Robert');
+  
+      my $carol  = Wedding->new_officiant(name => 'Carol');
+      $carol->marry(bride => $alice, groom => $bob);
+
+    Example with positional parameters:
+
+      use MooX::Press (
+        prefix => 'Wedding',
+        class  => [
+          'Person' => { has => [qw( $name $spouse )] },
+          'Officiant' => {
+            can => {
+              'marry' => {
+                signature => [ 'Person', 'Person' ],
+                code      => sub {
+                  my ($self, $bride, $groom) = @_;
+                  $bride->spouse($groom);
+                  $groom->spouse($bride);
+                  printf("%s, you may kiss the bride\n", $groom->name);
+                  return $self;
+                },
+              },
+            },
+          },
+        ],
+      );
+  
+      my $alice  = Wedding->new_person(name => 'Alice');
+      my $bob    = Wedding->new_person(name => 'Robert');
+  
+      my $carol  = Wedding->new_officiant(name => 'Carol');
+      $carol->marry($alice, $bob);
 
   Optimization Features
     MooX::Press will automatically load MooX::TypeTiny if it's installed,
@@ -887,6 +996,85 @@ FAQ
     same classes and roles could be used with different prefixes in different
     scripts. You could load two different versions of your API in the same
     script with different prefixes. The possibilities are interesting.
+
+  Why doesn't `$object->isa("Leaf")` work?
+    In the previous question, `$object->isa("Leaf")` won't work to check if an
+    object is a Leaf. This is because the full name of the class is
+    "MyGarden::Leaf".
+
+    You can of course check `$object->isa("MyGarden::Leaf")` but this means
+    you're starting to hard-code class names and prefixes again, which is one
+    of the things MooX::Press aims to reduce.
+
+    The "correct" way to check something is a leaf is:
+
+      use MyGarden::Types qw( is_Leaf );
+  
+      if ( is_Leaf($object) ) {
+        ...;
+      }
+
+    Or if you really want to use `isa`:
+
+      use MyGarden::Types qw( Leaf );
+  
+      if ( $object->isa(Leaf->class) ) {
+        ...;
+      }
+
+    However, the type library is only available *after* you've used
+    MooX::Press. This can make it tricky to refer to types within your
+    methods.
+
+      use constant APP => 'MyGarden';
+      use MooX::Press (
+        prefix => APP,
+        class => [
+          'Leaf',
+          'Tree'  => {
+            can => {
+              'add_leaf' => sub {
+                my ($self, $leaf) = @_;
+            
+                # How to check is_Leaf() here?
+                # It's kind of tricky!
+            
+                my $t = $self->FACTORY->type_library->get_type('Leaf');
+                if ($t->check($leaf)) {
+                  ...;
+                }
+              },
+            },
+          },
+        ],
+      );
+
+    As of version 0.019, MooX::Press has method signatures, so you're less
+    likely to need to check types within your methods; you can just do it in
+    the signature. This won't cover every case you need to check types, but it
+    will cover the common ones.
+
+      use constant APP => 'MyGarden';
+      use MooX::Press (
+        prefix => APP,
+        class => [
+          'Leaf',
+          'Tree'  => {
+            can => {
+              'add_leaf' => {
+                signature => ['Leaf'],
+                code      => sub {
+                  my ($self, $leaf) = @_;
+                  ...;
+                },
+              },
+            },
+          },
+        ],
+      );
+
+    This also makes your code more declarative and less imperative, and that
+    is a Good Thing, design-wise.
 
   The plural of "leaf" is "leaves", right?
     Yeah, but that sounds like something is leaving.

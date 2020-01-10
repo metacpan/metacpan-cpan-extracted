@@ -15,8 +15,8 @@ WriteMakefile(
   LICENSE      => 'artistic_2',
   PREREQ_PM    =>  {
     'XML::Compile::SOAP::Daemon' => '3.14',
-    'XML::Compile::SOAP' => 0,
-    'XML::Compile::SOAP12' => 0,
+    'XML::Compile::SOAP' => '3.26',
+    'XML::Compile::SOAP12' => '3.06',
     'Mojolicious' => '8.26',
     'CGI' => 0,
   },

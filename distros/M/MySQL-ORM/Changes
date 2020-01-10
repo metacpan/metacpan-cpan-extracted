@@ -1,5 +1,7 @@
 Revision history for MySQL-ORM
 
+0.11	- improved selectx to handle order by ASC vs DESC
+
 0.10    - improved MySQL::ORM::Generate::Class::ResultClassX::generate() to better handle null columns in selectx 
 
 0.09    - reverted uniq columns feature added in 0.07

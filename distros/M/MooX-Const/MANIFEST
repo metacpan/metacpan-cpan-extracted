@@ -18,6 +18,7 @@ t/20-moo.t
 t/21-moox-typetiny.t
 t/30-strict.t
 t/31-strict.t
+t/40-moose.t
 t/author-clean-namespaces.t
 t/author-critic.t
 t/author-eof.t
@@ -30,6 +31,7 @@ t/author-pod-syntax.t
 t/author-portability.t
 t/lib/MooTest.pm
 t/lib/MooTest/Strict.pm
+t/lib/MooseTest.pm
 t/release-check-manifest.t
 t/release-fixme.t
 t/release-kwalitee.t

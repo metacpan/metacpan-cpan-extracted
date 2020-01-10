@@ -53,7 +53,7 @@ ok(my $mrca = $rel->most_recent_common_ancestor($son, $cousin),
 is($mrca->name, 'Grandfather',
   'Got the right most recent common ancestor between son and cousin');
 
-ok(my $mrca = $rel->most_recent_common_ancestor($son, $father),
+ok($mrca = $rel->most_recent_common_ancestor($son, $father),
    'Got a most recent common ancestor between son and father');
 is($mrca->name, 'Father',
   'Got the right most recent common ancestor between son and father');

@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojolicious-Plugin-Systemd
 
+0.02 2020-01-10T17:16:10+0900
+ - Fix issue when running unit tests from systemd #1
+ - Fix issue when having too old Mojolicious #2
+
 0.01 2020-01-09T09:01:27+0900
  - Add config_map()
  - Can set config() from environment variables

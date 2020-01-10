@@ -2,7 +2,7 @@ use utf8;
 use strict;
 use warnings;
 
-use Test::More 1.302 tests => 8;
+use Test::More 1.302 tests => 9;
 use Test::More::UTF8;
 
 use YAML::XS;
@@ -20,8 +20,9 @@ subtest 'Kanto'     => sub{ IVs('Kanto') };                             # 3
 subtest 'Johto'     => sub{ IVs('Johto') };                             # 4
 subtest 'Hoenn'     => sub{ IVs('Hoenn') };                             # 5
 subtest 'Sinnoh'    => sub{ IVs('Sinnoh') };                            # 6
-subtest 'Unova'    => sub{ IVs('Unova') };                              # 7
+subtest 'Unova'     => sub{ IVs('Unova') };                             # 7
 subtest 'Alola'     => sub{ IVs('Alola') };                             # 8
+subtest 'galar'     => sub{ IVs('Galar') };                             # 9
 
 done_testing();
 
@@ -30,7 +31,7 @@ exit;
 sub IVs {
     my $region = shift;
     my $data = YAML::XS::LoadFile("$dir/$region.yaml");
-    my @pokemons = map{ Data::Pokemon::Go::Pokemon::_get_fullname( $_, 'ja' ) } @$data;
+    my @pokemons = map{ $pg->get_fullname($_) } @$data;
     plan tests => scalar @pokemons * 2;
     foreach my $name (@pokemons) {
         next unless $pg->exists($name);

@@ -17,13 +17,14 @@ name: filename
 provides:
   filename:
     file: lib/filename.pm
-    version: v0.20.9
+    version: v0.20.10
   pm:
     file: lib/pm.pm
-    version: v0.20.9
+    version: v0.20.10
 requires:
   Carp: '1.50'
   File::Spec: '0'
+  locale: '0'
   parent: '0'
   strict: '0'
   warnings: '0'
@@ -31,6 +32,6 @@ resources:
   bugtracker: https://github.com/rkleemann/filename/issues
   homepage: http://metacpan.org/release/filename/
   repository: git://github.com/rkleemann/filename.git
-version: v0.20.009
+version: v0.20.010
 x_generated_by_perl: v5.18.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

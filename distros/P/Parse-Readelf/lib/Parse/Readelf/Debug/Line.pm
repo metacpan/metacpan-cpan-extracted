@@ -42,8 +42,8 @@ and all relevant information about its debug line section is stored
 inside of the object.  This information can be accessed afterwards
 using a bunch of getter methods, see L</"METHODS"> for details.
 
-Currently only output for B<Dwarf version 2> is supported.  Please
-contact the author for other versions and provide some example
+Currently only output for B<Dwarf versions 2 and 4> is supported.
+Please contact the author for other versions and provide some example
 C<readelf> outputs.
 
 =cut
@@ -55,7 +55,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #########################################################################
 
@@ -683,8 +683,8 @@ __END__
 
 =head1 KNOWN BUGS
 
-Only Dwarf version 2 is supported.  Please contact the author for
-other versions and provide some example C<readelf> outputs.
+Only Dwarf versions 2 and 4 are supported.  Please contact the author
+for other versions and provide some example C<readelf> outputs.
 
 This has only be tested in a Unix like environment and uses Unix path
 syntax in some places.
@@ -699,7 +699,7 @@ Thomas Dorner, E<lt>dorner (AT) cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007-2013 by Thomas Dorner
+Copyright (C) 2007-2020 by Thomas Dorner
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.1 or,

@@ -75,9 +75,9 @@ how to fix it as soon as possible.
 
 =item 2
 
-The table that I use to generate the relationship names only goes back four
-generations - that's to third cousins (people who share great, great
-grandparents with each other).
+The table that I use to generate the relationship names only goes back five
+generations - that's to fourth cousins (people who share great, great,
+great grandparents with each other).
 
 This has, so far, been enough for my purposes, but I realise that more
 coverage would be useful. I should probably move away from a table-based
@@ -103,7 +103,7 @@ use Types::Standard qw[Str HashRef];
 use List::Util qw[first];
 use List::MoreUtils qw[firstidx];
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.3';
 
 has parent_field_name => (
   is => 'ro',
@@ -132,20 +132,22 @@ has relationship_table => (
 sub _build_relationship_table {
   return {
     m => [
-    [ undef, 'Father', 'Grandfather', 'Great grandfather', 'Great, great grandfather' ],
-    ['Son', 'Brother', 'Uncle', 'Great uncle', 'Great, great uncle' ],
-    ['Grandson', 'Nephew', 'First cousin', 'First cousin once removed', 'First cousin twice removed' ],
-    ['Great grandson', 'Great nephew', 'First cousin once removed', 'Second cousin', 'Second cousin once removed'],
-    ['Great, great grandson', 'Great, great nephew', 'First cousin twice removed', 'Second cousin once removed', 'Third cousin',],
+    [ undef, 'Father', 'Grandfather', 'Great grandfather', 'Great, great grandfather', 'Great, great, great grandfather' ],
+    ['Son', 'Brother', 'Uncle', 'Great uncle', 'Great, great uncle', 'Great, great, great uncle' ],
+    ['Grandson', 'Nephew', 'First cousin', 'First cousin once removed', 'First cousin twice removed', 'First cousin three times removed' ],
+    ['Great grandson', 'Great nephew', 'First cousin once removed', 'Second cousin', 'Second cousin once removed', 'Seconc cousin twice removed' ],
+    ['Great, great grandson', 'Great, great nephew', 'First cousin twice removed', 'Second cousin once removed', 'Third cousin', 'Third cousin once removed' ],
+    ['Great, great, great grandson', 'Great, great, great nephew', 'First cousin three times removed', 'Second cousin twice removed', 'Third cousin once removed', 'Fourth cousin' ],
     ],
     f => [
-    [ undef, 'Mother', 'Grandmother', 'Great grandmother', 'Great, great grandmother' ],
-    ['Daughter', 'Sister', 'Aunt', 'Great aunt', 'Great, great aunt' ],
-    ['Granddaughter', 'Niece', 'First cousin', 'First cousin once removed', 'First cousin twice removed'],
-    ['Great granddaughter', 'Great niece', 'First cousin once removed', 'Second cousin', 'Second cousin once removed'],
-    ['Great, great granddaughter', 'Great, great niece', 'First cousin twice removed', 'Second cousin once removed', 'Third cousin',],
+    [ undef, 'Mother', 'Grandmother', 'Great grandmother', 'Great, great grandmother', 'Great, great great grandmother' ],
+    ['Daughter', 'Sister', 'Aunt', 'Great aunt', 'Great, great aunt', 'Great, great, great aunt' ],
+    ['Granddaughter', 'Niece', 'First cousin', 'First cousin once removed', 'First cousin twice removed', 'First cousin three times removed' ],
+    ['Great granddaughter', 'Great niece', 'First cousin once removed', 'Second cousin', 'Second cousin once removed', 'Second cousin twice removed' ],
+    ['Great, great granddaughter', 'Great, great niece', 'First cousin twice removed', 'Second cousin once removed', 'Third cousin', 'Third cousin once removed' ],
+    ['Great, great, great granddaughter', 'Great, great, great niece', 'First cousin three times removed', 'Second cousin twice removed', 'Third cousin once removed', 'Fourth cousin' ],
     ],
-  }
+  };
 }
 
 =head1 Methods

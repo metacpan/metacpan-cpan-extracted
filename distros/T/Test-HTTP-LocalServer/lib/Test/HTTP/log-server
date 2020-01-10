@@ -15,7 +15,8 @@ GetOptions(
     'f=s' => \my $url_filename,
 );
 
-my $d = HTTP::Daemon->new or die;
+# HTTP::Daemon(IO::Socket::IP) sets $@ in case of error
+my $d = HTTP::Daemon->new or die "Couldn't create HTTP::Daemon: $@";
 
 my $url = URI->new( $d->url );
 if( $d->sockdomain == Socket::AF_INET ) {

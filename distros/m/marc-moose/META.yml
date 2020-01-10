@@ -45,4 +45,4 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 1.0.39
+version: 1.0.40

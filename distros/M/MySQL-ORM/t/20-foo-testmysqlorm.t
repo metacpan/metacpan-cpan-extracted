@@ -95,9 +95,9 @@ sub check {
 	ok(@rows == 3);	
 	ok(ref($rows[0]) eq 'Foo::Testmysqlorm::Team::ResultClass');
 		
-	@rows = $team->selectx(order_by => ['team_id']);
+	@rows = $team->selectx(order_by => ['team_id DESC']);
 	ok(@rows == 3);
-	my $row = $rows[0];
+	my $row = $rows[2];
 	ok(ref($row) eq 'Foo::Testmysqlorm::Team::ResultClassX');
 	ok($row->team_name eq 'vikings');
 	ok($row->league_name eq 'nfl');

@@ -64,6 +64,7 @@ my %module = (
                         'CGI' => 0,
                         'HTTP::Request::AsCGI' => 0,
                         'Socket' => 0, # for detecting 127.0.0.1 vs [::1]
+                        'IO::Socket::IP' => 0.25, # for handling IPv6-only localhost
                         'URI'      => 0,
                         'URI::URL' => 0,
                         'Time::HiRes' => 0,

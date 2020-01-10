@@ -1,0 +1,19 @@
+- # マタドガス(ガラルのすがた)[100] ---------------------------------------------------------
+    ID: 100
+    Name:
+        ja: マタドガス
+        en: Weezing
+        ch: 双弹瓦斯
+        fr: Smogogo
+    Form: ガラルのすがた
+    Types:
+        - どく
+        - フェアリー
+    From:
+    To:
+    Stamina: 163
+    Attack: 174
+    Defense: 197
+    MAXCP:
+        Hatched: 1310
+        Boosted: 1637

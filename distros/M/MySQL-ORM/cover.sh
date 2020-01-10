@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cover -delete
-PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine,+ignore,t/.*,prove,.+perltidier,/MySQL/Util prove -lrsv t
+PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine,+ignore,t/.*,prove,perltidier,/MySQL/Util,blib prove -lrsv t
 cover
 
 if [[ "$1" == "ff" ]]; then

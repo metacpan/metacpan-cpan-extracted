@@ -1,3 +1,11 @@
+0.71 2020-01-10
+    * Require IO::Socket::IP explicitly, for better IPv6 support
+      (CPAN testers failure at
+       http://www.cpantesters.org/cpan/report/e9fda1dc-3325-11ea-b88a-584e1f24ea8f )
+    * Output diagnostics when HTTP::Daemon fails to start up
+      (CPAN testers failure at
+       http://www.cpantesters.org/cpan/report/55b7db81-6bfd-1014-acc9-ccd2be2b35a3 )
+
 0.70 2020-01-07
     * Protect the main exit code in $? against child exit code leaking, and
       add some more tests against this. This should fix downstream test

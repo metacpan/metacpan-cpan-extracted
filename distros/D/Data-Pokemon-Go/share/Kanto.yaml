@@ -422,7 +422,7 @@
     Name:
         ja: コラッタ
         en: Rattata
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - ノーマル
     Skill:
@@ -446,7 +446,7 @@
     Name:
         ja: ラッタ
         en: Raticate
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - ノーマル
     Skill:
@@ -588,7 +588,7 @@
     Name:
         ja: ライチュウ
         en: Raichu
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - でんき
     Skill:
@@ -613,7 +613,7 @@
     Name:
         ja: サンド
         en: Sandshrew
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - じめん
     Skill:
@@ -638,7 +638,7 @@
     Name:
         ja: サンドパン
         en: Sandslash
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - じめん
     Skill:
@@ -846,7 +846,7 @@
     Name:
         ja: ロコン
         en: Vulpix
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - ほのお
     Skill:
@@ -870,7 +870,7 @@
     Name:
         ja: キュウコン
         en: Ninetales
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - ほのお
     Skill:
@@ -1164,7 +1164,7 @@
     Name:
         ja: ディグダ
         en: Diglett
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - じめん
     Skill:
@@ -1189,7 +1189,7 @@
     Name:
         ja: ダグトリオ
         en: Dugtrio
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - じめん
     Skill:
@@ -1213,7 +1213,7 @@
     Name:
         ja: ニャース
         en: Meowth
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - ノーマル
     Skill:
@@ -1237,7 +1237,7 @@
     Name:
         ja: ペルシアン
         en: Persian
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - ノーマル
     Skill:
@@ -1737,7 +1737,7 @@
     Name:
         ja: イシツブテ
         en: Geodude
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - いわ
         - じめん
@@ -1762,7 +1762,7 @@
     Name:
         ja: ゴローン
         en: Graveler
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - いわ
         - じめん
@@ -1789,7 +1789,7 @@
     Name:
         ja: ゴローニャ
         en: Golem
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - いわ
         - じめん
@@ -2084,7 +2084,7 @@
     Name:
         ja: ベトベター
         en: Grimer
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - どく
     Skill:
@@ -2109,7 +2109,7 @@
     Name:
         ja: ベトベトン
         en: Muk
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - どく
     Skill:
@@ -2450,7 +2450,7 @@
     Name:
         ja: ナッシー
         en: Exeggutor
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - くさ
         - エスパー
@@ -2499,7 +2499,7 @@
     Name:
         ja: ガラガラ
         en: Marowak
-    hasForm: Alola
+    hasOtherForm: アローラのすがた
     Types:
         - じめん
     Skill:
@@ -2618,6 +2618,7 @@
     Name:
         ja: マタドガス
         en: Weezing
+    hasOtherForm: ガラルのすがた
     Types:
         - どく
     Skill:

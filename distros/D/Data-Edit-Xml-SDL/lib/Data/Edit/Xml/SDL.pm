@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/ -I/home/phil/perl/cpan/DataEditXmlSDL/lib/
 #-------------------------------------------------------------------------------
 # Create SDL file map from a set of linted xml files
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016
@@ -6,24 +6,25 @@
 # podDocumentation
 
 package Data::Edit::Xml::SDL;
-require v5.16.0;
 use warnings FATAL => qw(all);
 use strict;
-use Carp;
+use Carp qw(confess cluck);
+use Data::Dump qw(dump);
 use Data::Edit::Xml::Lint;
 use Data::Table::Text qw(:all);
-our $VERSION = 20180630;
+our $VERSION = 20200109;
 
 #1 Constructor                                                                  # Construct a new SDL file map creator
 
 sub new                                                                         # Create a new SDL file map creator - call this method statically as in Data::Edit::Xml::Lint::new()
- {bless {sdlVersion=>'12.0.0.0', language=>(qq(en-US))}                         # Defaults that can be easily overridden
+ {bless {sdlVersion=>'13.0.0.0', language=>(qq(en-US))}                         # Defaults that can be easily overridden
  }
 
 #2 Attributes                                                                   # Attributes describing a lint
 
 genLValueScalarMethods(qw(filePathFolder));                                     # Prefix this folder (if supplied) to the filepath
 genLValueScalarMethods(qw(fileType));                                           # The fileType of the file to be processed
+genLValueScalarMethods(qw(filesFlattened));                                     # Files have been flattened if true
 genLValueScalarMethods(qw(folderHasMixedContent));                              # folderHasMixedContent field
 genLValueScalarMethods(qw(ishType));                                            # IshType field
 genLValueScalarMethods(qw(imagePath));                                          # Image path relative to sourcebasepath
@@ -32,7 +33,7 @@ genLValueScalarMethods(qw(lint));                                               
 genLValueScalarMethods(qw(sdlVersion));                                         # Version of SDL we are using, defaults to: '12.0.0.0'
 genLValueScalarMethods(qw(section));                                            # Sub folder for file on SDL: maps, topics
 genLValueScalarMethods(qw(sourcebasepath));                                     # Path to source to be uploaded
-genLValueScalarMethods(qw(targetFolder));                                       # The SDL target folder to be used
+genLValueScalarMethods(qw(targetFolder));                                       # Input: The SDL target folder to be used in the filemap - the person doing the upload will give this to you.
 genLValueScalarMethods(qw(version));                                            # Version of the input content
 
 #1 SDL File Map                                                                 # Generate an SDL file map
@@ -50,8 +51,8 @@ sub getFileMap                                                                  
 END
  }
 
-sub getFile($$)                                                                 #P File tag
- {my ($sdl, $images) = @_;                                                      # Sdl file map creator, processing an image file or not
+sub getFile($)                                                                  #P File tag
+ {my ($sdl) = @_;                                                               # Sdl file map creator
   my $targetFolder   = $sdl->targetFolder;
   my $ishType        = $sdl->ishType;
   my $section        = $sdl->section;
@@ -60,24 +61,46 @@ sub getFile($$)                                                                 
   my $project        = $lint->project;
   my $guid           = $lint->guid;
   my $file           = $lint->file;
+  my $title          = $lint->title || 'REQUIRED-CLEANUP-TITLE';
   my $mixed          = ucfirst $sdl->folderHasMixedContent;
      $mixed =~ m/\A(True|False)\Z/s or
        confess "FolderhasMixedContent = (True|False) not $mixed";
+  my $filePrefix = $lint->project;                                              # File name prefix if any
 
-  my $filePrefix = '';                                                          # File name prefix if any
-  if ($images)                                                                  # The image file prefix if we are processing an image
-   {defined($imagePath) or
-      confess "Use SDL->imagePath() to supply a path for images";
-    $filePrefix = filePathDir($imagePath);                                      # The image file prefix if we are processing an image
-    $lint->file =~ s/\.xml\Z//gs;                                               # Remove trailing xml extension on image files
-   }
-
-  my (undef, $fileName, $fileExt) = parseFileName($lint->file);                 # Parse file name
-$fileExt or confess "No file extension for ".$lint->file;
-  my $relFile = filePathExt($filePrefix, $fileName, $fileExt);
-  <<END
-<file fileextension=".$fileExt" filename="$relFile" filepath="$relFile" filetype="$ishType" folderhasmixedcontent="$mixed" id="$guid" targetfolder="$targetFolder\\$project\\$section" title="$fileName">
+  my (undef, $fileName, $fileExt) = parseFileName($file);                       # Parse file name
+  $fileExt or confess "No file extension for ".$file;
+# my $relFile = filePathExt($filePrefix, $fileName, $fileExt);
+  my $relFile = filePathExt($fileName, $fileExt);  ## Fully flattened
+  return <<END unless $sdl->filesFlattened;
+<file fileextension=".$fileExt" filename="$fileName.$fileExt" filepath="$filePrefix\\$fileName.$fileExt" filetype="$ishType" folderhasmixedcontent="$mixed" id="$guid" targetfolder="$targetFolder\\$project\\$section" title="$title">
 END
+
+  return <<END;
+<file fileextension=".$fileExt" filename="$fileName.$fileExt" filepath="$fileName.$fileExt" filetype="$ishType" folderhasmixedcontent="$mixed" id="$guid" targetfolder="$targetFolder\\$project\\$section" title="$title">
+END
+ }
+
+sub getImageFile($)                                                             #P Image file tag
+ {my ($sdl, $file) = @_;                                                        # Sdl file map creator, image file name
+  my $targetFolder = $sdl->targetFolder;
+  my $ishType      = $sdl->ishType;
+  my $section      = $sdl->section;
+  my $imagePath    = $sdl->imagePath;
+  my $project      = "images";
+  my $guid         = guidFromMd5(fn $file);
+  my $mixed        = ucfirst $sdl->folderHasMixedContent;
+     $mixed =~ m/\A(True|False)\Z/s or
+       confess "FolderhasMixedContent = (True|False) not $mixed";
+
+  my $filePrefix = filePathDir($imagePath);                                     # The image file prefix if we are processing an image
+
+  my (undef, $fileName, $fileExt) = parseFileName($file);                       # Parse file name
+# my $relFile = filePathExt($filePrefix, $fileName, $fileExt);
+  my $relFile = filePathExt($fileName, $fileExt); ## Fully flattened
+  my $r = <<END;
+<file fileextension=".$fileExt" filename="$relFile" filepath="$relFile" filetype="$ishType" folderhasmixedcontent="$mixed" id="$guid" targetfolder="$targetFolder\\$section" title="$fileName">
+END
+  $r
  }
 
 sub getIshObject                                                                #P IshObject tag
@@ -85,25 +108,44 @@ sub getIshObject                                                                
   my $ishType = $sdl->ishType;
   my $lint    = $sdl->lint;
   my $guid    = $lint->guid;
+     $guid or confess "No guid supplied";
   <<END
 <ishobject ishref="$guid" ishtype="$ishType">
 END
  }
 
-sub getFTitle                                                                   #P FTITLE tag
- {my ($sdl) = @_;                                                               # Sdl
+sub getImageIshObject($$)                                                       #P IshObject tag for an image
+ {my ($sdl, $file) = @_;                                                        # Sdl, image file
+  my $ishType = $sdl->ishType;
+  my $lint    = $sdl->lint;
+  my $guid    = fn $file;
+  <<END
+<ishobject ishref="$guid" ishtype="$ishType">
+END
+ }
+
+sub getFTitle($;$)                                                              #P FTITLE tag
+ {my ($sdl, $imageFile) = @_;                                                   # Sdl, image file name which might have an image title following the md5 sum
   my $lint  = $sdl->lint;                                                       # Lint
   my $Title = $lint->title;                                                     # Title
+
+  if ($imageFile)                                                               # Image files some times have their titles after the md5 sum
+   {my $i = $imageFile.q(.imageDef);
+    if (-e $i)
+     {$Title = readFile($i);
+     }
+   }
+
 # warn "No title in\n".dump($lint)."\n" unless $Title;
   my $title = $Title || 'REQUIRED-CLEANUP-TITLE';
   <<END
-<ishfield level="logical" name="FTITLE" xml:space="preserve">$title</ishfield>'
+<ishfield level="logical" name="FTITLE" xml:space="preserve">$title</ishfield>
 END
  }
 
 sub getVersion                                                                  #P Version tag
  {my ($sdl) = @_;                                                               # Sdl
-  my $v = $sdl->version;
+  my $v = $sdl->sdlVersion;
   <<END
 <ishfield level="version" name="VERSION" xml:space="preserve">$v</ishfield>
 END
@@ -120,7 +162,12 @@ END
 sub getAuthor                                                                   #P Author tag
  {my ($sdl) = @_;                                                               # Sdl
   my $lint  = $sdl->lint;
-  my $a     = $lint->author;
+  my $a     = sub
+   {my $a = $lint->author;
+    return $a if $a;
+    "bill.gearhart";
+   }->();
+
   <<END
 <ishfield name="FAUTHOR" level="lng" xml:space="preserve">$a</ishfield>
 END
@@ -141,13 +188,21 @@ sub createSDLFileMap($@)                                                        
   my @map = (xmlLineOne, $sdl->getFileMap);                                     # The generated map
 
   for my $file(@files)                                                          # Each file contributing to the map
-   {my $lint = Data::Edit::Xml::Lint::read($file);                              # Linter for the file
+   {next if $file =~ m(\.imageDef\Z)s;                                          # Image definition files
+    my $lint = Data::Edit::Xml::Lint::read($file);                              # Linter for the file
     $sdl->lint = $lint;
 
-    my $ditaType = $lint->ditaType;
+    my $ditaType = sub
+     {return $lint->ditaType if $lint->ditaType;
+      return q(bookmap) if fe($file) =~ m(ditamap)is;
+      return q(image)   if fe($file) =~ m((emf|gif|png|jpg|jpeg|pdf|tiff))is;
+      return q(image)   if fe($file) =~ m(imageDef);                            # File has been guidized the corresponding imageDef file tells us its original name
+      undef;
+     }->();
+
     $ditaType or confess "DitaType required for file:\n$file";
 
-    if ($ditaType =~ m/bookmap/i)
+    if ($ditaType =~ m/map/i)
      {$sdl->ishType = (qq(ISHMasterDoc));
       $sdl->section = (qq(maps));
       $sdl->folderHasMixedContent = (qq(true));
@@ -193,15 +248,15 @@ END
       $sdl->imagePath = qq(images);
       $sdl->folderHasMixedContent = qq(false);
       push @map,
-        $sdl->getFile(1),
-        $sdl->getIshObject, <<END,
+        $sdl->getImageFile($file),
+        $sdl->getImageIshObject($file), <<END,
 <ishfields>
 END
-        $sdl->getFTitle,
+        $sdl->getFTitle($file),
         $sdl->getVersion,
         $sdl->getDocLanguage,
         $sdl->getResolution,
-        $sdl->getAuthor,
+        q(image), #$sdl->getAuthor,
         <<END,
 </ishfields>
 </ishobject>
@@ -488,7 +543,6 @@ test unless caller;
 
 1;
 # podDocumentation
-
 __DATA__
 use warnings FATAL=>qw(all);
 use strict;
@@ -517,11 +571,13 @@ sub writeTest($$$)
 unlink for searchDirectoryTreesForMatchingFiles(@search);                       # Confirm removal
 &writeTest(qw(bookmap ditamap), &testBookMap);
 &writeTest(qw(concept1 dita),   &testConcept);
-&writeTest(qw(image1.jpg xml),  &testImage);
+&writeTest(qw(GUID-11112222-3333-4444-5555-666677778888_image1.jpg imageDef),
+           &testImage);
 
-my $t = $s->createSDLFileMap(@search);
+my $t = $s->createSDLFileMap(@search);                                          # Create file map
+   $t =~ s/\n<!--Created.*?\Z//s;                                               # Remove date
 
-ok $t =~ s/\s//gsr =~ s/<!--Created.+?-->//gsr eq &expectedOutput =~ s/\s//gsr;
+ok $t eq &expectedOutput;
 
 unlink for @filesWritten;                                                       # Remove test files
 ok !scalar(searchDirectoryTreesForMatchingFiles(@search));                      # Confirm removal
@@ -564,51 +620,28 @@ concept1.dita
 END
 
 sub testImage {<<END}
-<?xml version="1.0" encoding="UTF-8"?>
-<image/>
-<!--generated: 2017-Jul-26 -->
-<!--ditaType: image -->
-<!--project: 007-6301-001 -->
-<!--projectNumber: 1 -->
-<!--tags: 313 -->
-<!--file:
-image1.jpg
--->
-<!--guid: GUID-D7147C7F-2017-0001-FRMB-000000000002 -->
-<!--author: bill.gearhart\@hpe.com -->
-<!--title: Test Image -->
+TestImage.png
 END
 
 sub expectedOutput{<<'END'}
 <?xml version="1.0" encoding="utf-8"?>
-<filemap sourcebasepath="C:\hp\frame\batch1\out" version="12.0.0.0">;
-<file fileextension=".ditamap" filename="bm_007-6301-001.ditamap" filepath="bm_007-6301-001.ditamap" filetype="ISHMasterDoc" folderhasmixedcontent="True" id="GUID-D7147C7F-2017-0001-FRMB-000000000001" targetfolder="RyffineImportSGIfm\007-6301-001\maps" title="bm_007-6301-001">
+ <filemap sourcebasepath="C:\hp\frame\batch1\out" version="13.0.0.0">;
+<file fileextension=".ditamap" filename="bookmap.ditamap" filepath="007-6301-001\bookmap.ditamap" filetype="ISHMasterDoc" folderhasmixedcontent="True" id="GUID-D7147C7F-2017-0001-FRMB-000000000001" targetfolder="RyffineImportSGIfm\007-6301-001\maps" title="Title of the bookmap goes here">
 <ishobject ishref="GUID-D7147C7F-2017-0001-FRMB-000000000001" ishtype="ISHMasterDoc">
 <ishfields>
-<ishfield level="logical" name="FTITLE" xml:space="preserve">Title of the bookmap goes here</ishfield>'
-<ishfield level="version" name="VERSION" xml:space="preserve">1</ishfield>
+<ishfield level="logical" name="FTITLE" xml:space="preserve">Title of the bookmap goes here</ishfield>
+<ishfield level="version" name="VERSION" xml:space="preserve">13.0.0.0</ishfield>
 <ishfield level="lng" name="DOC-LANGUAGE" xml:space="preserve">en-US</ishfield>
 <ishfield name="FAUTHOR" level="lng" xml:space="preserve">bill.gearhart@hpe.com</ishfield>
 </ishfields>
 </ishobject>
 </file>
-<file fileextension=".dita" filename="concept1.dita" filepath="concept1.dita" filetype="ISHModule" folderhasmixedcontent="True" id="GUID-D7147C7F-2017-0001-FRMB-000000000002" targetfolder="RyffineImportSGIfm\007-6301-001\topics" title="concept1">
+<file fileextension=".dita" filename="concept1.dita" filepath="007-6301-001\concept1.dita" filetype="ISHModule" folderhasmixedcontent="True" id="GUID-D7147C7F-2017-0001-FRMB-000000000002" targetfolder="RyffineImportSGIfm\007-6301-001\topics" title="Test Concept One">
 <ishobject ishref="GUID-D7147C7F-2017-0001-FRMB-000000000002" ishtype="ISHModule">
 <ishfields>
-<ishfield level="logical" name="FTITLE" xml:space="preserve">Test Concept One</ishfield>'
-<ishfield level="version" name="VERSION" xml:space="preserve">1</ishfield>
+<ishfield level="logical" name="FTITLE" xml:space="preserve">Test Concept One</ishfield>
+<ishfield level="version" name="VERSION" xml:space="preserve">13.0.0.0</ishfield>
 <ishfield level="lng" name="DOC-LANGUAGE" xml:space="preserve">en-US</ishfield>
-<ishfield name="FAUTHOR" level="lng" xml:space="preserve">bill.gearhart@hpe.com</ishfield>
-</ishfields>
-</ishobject>
-</file>
-<file fileextension=".jpg" filename="images/image1.jpg" filepath="images/image1.jpg" filetype="ISHIllustration" folderhasmixedcontent="False" id="GUID-D7147C7F-2017-0001-FRMB-000000000002" targetfolder="RyffineImportSGIfm\007-6301-001\images" title="image1">
-<ishobject ishref="GUID-D7147C7F-2017-0001-FRMB-000000000002" ishtype="ISHIllustration">
-<ishfields>
-<ishfield level="logical" name="FTITLE" xml:space="preserve">Test Image</ishfield>'
-<ishfield level="version" name="VERSION" xml:space="preserve">1</ishfield>
-<ishfield level="lng" name="DOC-LANGUAGE" xml:space="preserve">en-US</ishfield>
-<ishfield level="lng" name="FRESOLUTION" xml:space="preserve">High</ishfield>
 <ishfield name="FAUTHOR" level="lng" xml:space="preserve">bill.gearhart@hpe.com</ishfield>
 </ishfields>
 </ishobject>

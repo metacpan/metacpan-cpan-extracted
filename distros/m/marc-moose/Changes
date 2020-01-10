@@ -1,5 +1,9 @@
 Revision history for Perl module MARC::Moose
 
+1.0.40 2020-01-10
+
+  - UnimarcToMarc21, convert 214 to 260
+
 1.0.39 2019-03-27
 
   - ISO2709 formater on 'modern' Perl environment
