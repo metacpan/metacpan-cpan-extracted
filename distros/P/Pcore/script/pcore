@@ -4,8 +4,8 @@ package main;
 
 use FindBin;
 
-# add pcore lib to @INC, if Pcore is dist
-use if -f qq[$FindBin::RealBin/../share/dist.yaml] && -d qq[$FindBin::RealBin/../lib/], lib => qq[$FindBin::RealBin/../lib/];
+use FindBin;
+use if -f "$FindBin::RealBin/../share/dist.yaml" && -d "$FindBin::RealBin/../lib", lib => "$FindBin::RealBin/../lib";
 use Pcore;
 
 sub CLI ($self) {

@@ -1,0 +1,13 @@
+Build.PL
+CONTRIBUTING.md
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Mojolicious/Plugin/ServerType.pm
+minil.toml
+t/00_compile.t
+t/01_server_type.t
+META.yml
+MANIFEST

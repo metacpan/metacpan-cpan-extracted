@@ -28,6 +28,14 @@ with       = "Pet"
 mew = {{{
 	return "meow";
 }}}
+catch = {
+	named = true,
+	signature = [ "victim", "Animal" ],
+	code = {{{
+		my ($self, $args) = @_;
+		return sprintf("Caught %s", $args->victim->name);
+	}}}
+}
 
 [class:Dog]
 extends   = "Animal"
@@ -41,3 +49,5 @@ with       = ["Livestock", "Milkable"]
 extends    = "Animal"
 with       = ["Livestock"]
 
+[class:Mouse]
+extends    = "Animal"

@@ -17,7 +17,7 @@ use Chart::Plotly::Trace::Treemap::Textfont;
 use Chart::Plotly::Trace::Treemap::Tiling;
 use Chart::Plotly::Trace::Treemap::Transform;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: Visualize hierarchal data from leaves (and/or outer branches) towards root with rectangles. The treemap sectors are determined by the entries in *labels* or *ids* and in *parents*.
 
@@ -307,7 +307,7 @@ Chart::Plotly::Trace::Treemap - Visualize hierarchal data from leaves (and/or ou
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -529,7 +529,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

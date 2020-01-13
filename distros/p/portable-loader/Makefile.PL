@@ -24,7 +24,7 @@ my $meta = {
                                            "FindBin"           => 0,
                                            "JSON::Eval"        => 0,
                                            "Module::Pluggable" => 0,
-                                           "MooX::Press"       => "0.010",
+                                           "MooX::Press"       => 0.019,
                                            "perl"              => 5.008008,
                                            "TOML::Parser"      => 0.08,
                                          },
@@ -32,12 +32,12 @@ my $meta = {
                           test      => { requires => { "Test::Fatal" => 0, "Test::More" => 0.96 } },
                         },
   "provides"         => {
-                          "portable::alias"        => { file => "lib/portable/alias.pm", version => 0.002 },
-                          "portable::lib"          => { file => "lib/portable/lib.pm", version => 0.002 },
-                          "portable::loader"       => { file => "lib/portable/loader.pm", version => 0.002 },
-                          "portable::loader::JSON" => { file => "lib/portable/loader/JSON.pm", version => 0.002 },
-                          "portable::loader::Perl" => { file => "lib/portable/loader/Perl.pm", version => 0.002 },
-                          "portable::loader::TOML" => { file => "lib/portable/loader/TOML.pm", version => 0.002 },
+                          "portable::alias"        => { file => "lib/portable/alias.pm", version => 0.003 },
+                          "portable::lib"          => { file => "lib/portable/lib.pm", version => 0.003 },
+                          "portable::loader"       => { file => "lib/portable/loader.pm", version => 0.003 },
+                          "portable::loader::JSON" => { file => "lib/portable/loader/JSON.pm", version => 0.003 },
+                          "portable::loader::Perl" => { file => "lib/portable/loader/Perl.pm", version => 0.003 },
+                          "portable::loader::TOML" => { file => "lib/portable/loader/TOML.pm", version => 0.003 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -53,7 +53,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/portable-loader/project",
                         },
-  "version"          => 0.002,
+  "version"          => 0.003,
   "x_static_install" => 1,
 };
 

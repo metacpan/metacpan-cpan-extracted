@@ -1,3 +1,28 @@
+0.111		2020-01-11	T. R. Wyant
+    Fix Y2020 bug.
+
+    The problem here was Time::Local's weird handling of years less 100,
+    which is inconsistent with the gmtime() and localtime() built-ins, to
+    wit: years less than 100 are considered to be within 50 years of the
+    current year. As of January 1 2020, 70 became no longer 1970 (the usual
+    epoch year) but 2070.
+
+    As far as I can determine the only impact was in a test that contained
+    an adjustment for systems that might have a non-Unix epoch.
+
+    The solution was to specify a four-digit year in the test, and to use
+    Time::Local's timegm_modern() and timelocal_modern() where available.
+
+    Thanks to Chris Williams (BINGOS), who uncovered this in one of his CPAN
+    tester systems.
+
+    CPAN TESTERS ROCK!
+
+    Suppress 'Ambiguous use of -PIOVER2' under 5.10.1. Thanks to Chris
+    Williams (BINGOS) for finding this.
+
+    Eliminate redirections in POD URL links
+
 0.110		2019-10-04	T. R. Wyant
     Validate horizon and almanac_horizon. This is pretty much the same
     situation as twilight -- they were completely unvalidated, but are

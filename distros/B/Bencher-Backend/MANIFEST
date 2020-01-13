@@ -9,7 +9,7 @@ README
 dist.ini
 lib/Bencher/Backend.pm
 lib/Bencher/Formatter.pm
-lib/Bencher/Formatter/AddVsSlowestField.pm
+lib/Bencher/Formatter/AddComparisonFields.pm
 lib/Bencher/Formatter/CodeStartup.pm
 lib/Bencher/Formatter/DeleteConstantFields.pm
 lib/Bencher/Formatter/DeleteNotesFieldIfEmpty.pm

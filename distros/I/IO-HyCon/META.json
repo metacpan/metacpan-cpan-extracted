@@ -48,11 +48,11 @@
             "File::Basename" : "0",
             "Time::HiRes" : "0",
             "YAML" : "0",
-            "perl" : "5.10"
+            "perl" : "5.010"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.0",
+   "version" : "1.1",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,5 +1,5 @@
 package Devel::Optic::Lens::Perlish::Interpreter;
-$Devel::Optic::Lens::Perlish::Interpreter::VERSION = '0.012';
+$Devel::Optic::Lens::Perlish::Interpreter::VERSION = '0.014';
 # ABSTRACT: Basic recursive interpreter for Perlish lens
 
 use strict;
@@ -244,7 +244,7 @@ sub _sample_or_ref {
     }
 
     if (length $raw > RAW_DATA_SAMPLE_SIZE) {
-        return substr($raw, 0, RAW_DATA_SAMPLE_SIZE) . "...";
+        return sprintf("'%s'", substr($raw, 0, RAW_DATA_SAMPLE_SIZE) . "...");
     }
     return $raw;
 }
@@ -263,7 +263,7 @@ Devel::Optic::Lens::Perlish::Interpreter - Basic recursive interpreter for Perli
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 AUTHOR
 

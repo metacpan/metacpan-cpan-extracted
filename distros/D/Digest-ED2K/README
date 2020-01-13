@@ -1,82 +1,98 @@
 NAME
+
     Digest::ED2K - Calculate ED2K digests
 
 SYNOPSIS
+
             # Functional
             use Digest::ED2K qw(ed2k ed2k_hex ed2k_base64);
-
+    
             my $digest = ed2k $data;
             my $hexdigest = ed2k_hex $data
             my $base64_digest = ed2k_base64 $data;
-
+    
             # Object Oriented
             use Digest::ED2K;
-
+    
             my $ctx = Digest::ED2K->new;
-
+    
             $ctx->add($bytes);
             $ctx->addfile(*FILE);
-
+    
             my $digest = $ctx->digest;
             my $hexdigest = $ctx->hexdigest;
             my $base64_digest = $ctx->b64digest;
 
 DESCRIPTION
+
     Digest::ED2K progressively calculates ED2K digests of data.
 
 FUNCTIONS
+
     Digest::ED2K implements the following functions.
 
-  `ed2k'
+ ed2k
+
             my $digest = ed2k $bytes, ...;
 
     Generate binary ED2K digest for string.
 
-  `ed2k_hex'
+ ed2k_hex
+
             my $hexdigest = ed2k_hex $bytes, ...;
 
     Generate hex ED2K digest for string.
 
-  `ed2k_base64'
+ ed2k_base64
+
             my $base64_digest = ed2k_base64 $bytes, ...;
 
     Generate base64 ED2K digest for string.
 
 METHODS
+
     Digest::ED2K inherits all methods from Digest::base (See Digest for
     documentation) and implements the following new ones.
 
-  `new'
+ new
+
             my $ctx = Digest->new('ED2K');
             my $ctx = Digest::ED2K->new;
 
     Construct a new Digest::ED2K object.
 
-  `add'
+ add
+
             $ctx = $ctx->add($bytes, ...);
 
     Append binary data.
 
-  `clone'
+ clone
+
             my $ctx_clone = $ctx->clone;
 
     Clone this message context.
 
-  `digest'
+ digest
+
             my $digest = $ctx->digest;
 
     Binary ED2K digest for this message context.
 
 REPOSITORY
+
     http://github.com/Kulag/Digest-ED2K
 
 SEE ALSO
+
     Digest, Digest::MD4
 
 AUTHOR
+
     Benjamin Herweyer <benjamin.herweyer@gmail.com>
 
 COPYRIGHT AND LICENSE
+
     Copyright (C) 2011-2012, Benjamin Herweyer.
 
     This program is free software, you can redistribute it and/or modify it

@@ -1,5 +1,5 @@
 use common::sense;
-use Test::More tests => 14;
+use Test::More tests => 15;
 
 use Digest::ED2K qw(ed2k ed2k_hex ed2k_base64);
 BEGIN { *CHUNK_SIZE = *Digest::ED2K::CHUNK_SIZE }
@@ -44,3 +44,10 @@ is $zero_2chunk, '114b21c63a74b6ca922291a11177dd5c', 'The red method is in use f
 # Clone
 my $original = Digest::ED2K->new->add('abc123');
 is $original->clone->hexdigest, $original->hexdigest, 'cloning works';
+
+# Cleared after digest
+{
+	my $ctx = Digest::ED2K->new->add('aaa');
+	$ctx->hexdigest;
+	is $ctx->add('aaa')->hexdigest, HEX->{aaa}, 'md4 contexts reset after digest';
+}

@@ -174,13 +174,17 @@ eval{} block
 
 
 This function is available since XML::LibXML 1.70. It provides easy to use
-interface to the XML parser that parses given file (or URL), string, or input
-stream to a DOM tree. The arguments can be passed in a HASH reference or as
-name => value pairs. The function can be called as a class method or an object
-method. In both cases it internally creates a new parser instance passing the
-specified parser options; if called as an object method, it clones the original
-parser (preserving its settings) and additionally applies the specified options
-to the new parser. See the constructor C<<<<<< new >>>>>> and L<<<<<< Parser Options >>>>>> for more information.
+interface to the XML parser that parses given file (or non-HTTPS URL), string,
+or input stream to a DOM tree. The arguments can be passed in a HASH reference
+or as name => value pairs. The function can be called as a class method or an
+object method. In both cases it internally creates a new parser instance
+passing the specified parser options; if called as an object method, it clones
+the original parser (preserving its settings) and additionally applies the
+specified options to the new parser. See the constructor C<<<<<< new >>>>>> and L<<<<<< Parser Options >>>>>> for more information.
+
+Note that, due to a limitation in the underlying libxml2 library, this call
+does not recognize HTTPS-based URLs. (It will treat an HTTPS URL as a filename,
+likely throwing a "No such file or directory" exception.)
 
 
 =item load_html
@@ -269,8 +273,8 @@ This is an alias to process_xincludes, but through a JAVA like function name.
   $doc = $parser->parse_file( $xmlfilename );
 
 This function parses an XML document from a file or network; $xmlfilename can
-be either a filename or an URL. Note that for parsing files, this function is
-the fastest choice, about 6-8 times faster then parse_fh().
+be either a filename or a (non-HTTPS) URL. Note that for parsing files, this
+function is the fastest choice, about 6-8 times faster then parse_fh().
 
 
 =item parse_fh
@@ -308,7 +312,7 @@ function.
   $doc = $parser->parse_html_file( $htmlfile, \%opts );
 
 Similar to parse_file() but parses HTML (strict) documents; $htmlfile can be
-filename or URL.
+filename or (non-HTTPS) URL.
 
 An optional second argument can be used to pass some options to the HTML parser
 as a HASH reference. See options labeled with HTML in L<<<<<< Parser Options >>>>>>.
@@ -984,7 +988,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0201
+2.0202
 
 =head1 COPYRIGHT
 

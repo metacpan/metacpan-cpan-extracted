@@ -1,0 +1,54 @@
+Template-Plugin-Lingua-EN-Inflexion v0.01
+-----------------------------------------
+
+Released 13th January 2020.
+
+
+DESCRIPTION
+-----------
+
+This plugin may be used with Template Toolkit to provide an interface
+for Lingua::EN::Inflexion in your templates.
+
+
+INSTALLATION
+------------
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+-------------------------
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Template::Plugin::Lingua::EN::Inflexion
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Plugin-Lingua-EN-Inflexion
+	
+	MetaCPAN
+		https://metacpan.org/pod/Template::Plugin::Lingua::EN::Inflexion
+
+
+LICENSE AND COPYRIGHT
+---------------------
+
+Code from Template::Plugin::Lingua::EN::Inflect is copyright
+© 2005-2014 Andrew Ford and
+© 2014-2015 Barbie for Miss Barbell Productions.
+
+Everything else is copyright © 2019-2020 Pete Houston.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License v2.
+
+See https://dev.perl.org/licenses for more information.

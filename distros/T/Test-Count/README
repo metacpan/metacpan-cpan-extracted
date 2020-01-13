@@ -1,9 +1,9 @@
 This archive contains the distribution Test-Count,
-version 0.1001:
+version 0.1101:
 
   Module for keeping track of the number of tests in a test script.
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2006 by Shlomi Fish.
 
 This is free software, licensed under:
 

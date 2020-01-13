@@ -1,14 +1,14 @@
 package <: $module_name ~ "::Node::Worker" :>;
 
 use Pcore -class, -const;
-use <: $module_name ~ "::Const qw[:CONST]" :>;
+use <: $module_name ~ "::Const qw[]" :>;
 
 with qw[<: $module_name ~ "::Node" :>];
 
 const our $NODE_REQUIRES => {
 
     # '*' => 'test',
-    '<: $module_name :>' => ['app.settings.updated'],
+    '<: $module_name :>' => ['app.api.settings.updated'],
 };
 
 sub NODE_ON_EVENT ( $self, $ev ) {
@@ -18,7 +18,7 @@ sub NODE_ON_EVENT ( $self, $ev ) {
 }
 
 sub BUILD ( $self, $args ) {
-    $self->{node}->wait_online;
+    $self->{node}->wait_online if $self->{node};
 
     return;
 }

@@ -17,7 +17,7 @@ use Chart::Plotly::Trace::Isosurface::Spaceframe;
 use Chart::Plotly::Trace::Isosurface::Stream;
 use Chart::Plotly::Trace::Isosurface::Surface;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: Draws isosurfaces between iso-min and iso-max values with coordinates given by four 1-dimensional arrays containing the `value`, `x`, `y` and `z` of every vertex of a uniform or non-uniform 3-D grid. Horizontal or vertical slices, caps as well as spaceframe between iso-min and iso-max values could also be drawn using this trace.
 
@@ -187,6 +187,13 @@ has isomin => ( is            => "rw",
                 documentation => "Sets the minimum boundary for iso-surface plot.",
 );
 
+has legendgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
 has lighting => ( is  => "rw",
                   isa => "Maybe[HashRef]|Chart::Plotly::Trace::Isosurface::Lighting", );
 
@@ -228,6 +235,12 @@ has scene => (
     is => "rw",
     documentation =>
       "Sets a reference between this trace's 3D coordinate system and a 3D scene. If *scene* (the default value), the (x,y,z) coordinates refer to `layout.scene`. If *scene2*, the (x,y,z) coordinates refer to `layout.scene2`, and so on.",
+);
+
+has showlegend => (
+               is            => "rw",
+               isa           => "Bool",
+               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
 );
 
 has showscale => ( is            => "rw",
@@ -334,7 +347,7 @@ Chart::Plotly::Trace::Isosurface - Draws isosurfaces between iso-min and iso-max
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -1288,6 +1301,10 @@ Sets the maximum boundary for iso-surface plot.
 
 Sets the minimum boundary for iso-surface plot.
 
+=item * legendgroup
+
+Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
+
 =item * lighting
 
 =item * lightposition
@@ -1315,6 +1332,10 @@ Reverses the color mapping if true. If true, `cmin` will correspond to the last 
 =item * scene
 
 Sets a reference between this trace's 3D coordinate system and a 3D scene. If *scene* (the default value), the (x,y,z) coordinates refer to `layout.scene`. If *scene2*, the (x,y,z) coordinates refer to `layout.scene2`, and so on.
+
+=item * showlegend
+
+Determines whether or not an item corresponding to this trace is shown in the legend.
 
 =item * showscale
 
@@ -1388,7 +1409,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

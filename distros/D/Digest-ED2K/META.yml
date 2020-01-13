@@ -3,27 +3,28 @@ abstract: 'Calculate ED2K digests'
 author:
   - 'Benjamin Herweyer <benjamin.herweyer@gmail.com>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.40
-  version: 0.77
+  Module::Build: '0.42'
+  version: '0.77'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4002, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Digest-ED2K
 provides:
   Digest::ED2K:
     file: lib/Digest/ED2K.pm
-    version: v1.1.0
+    version: v1.1.1
 requires:
-  Digest::MD4: 0
-  Digest::base: 1.03
-  common::sense: 0
+  Digest::MD4: '1.3'
+  Digest::base: '1.03'
+  common::sense: '0'
   perl: v5.8.0
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
-  repository: https://github.com/Kulag/Digest-ED2K
-version: v1.1.0
+  repository: https://github.com/bherw/Digest-ED2K
+version: v1.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

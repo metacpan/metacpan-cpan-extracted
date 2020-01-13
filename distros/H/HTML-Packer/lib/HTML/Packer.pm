@@ -9,7 +9,7 @@ use Digest::SHA qw(sha256_base64 sha384_base64 sha512_base64);
 
 # -----------------------------------------------------------------------------
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 our @BOOLEAN_ACCESSORS = (
     'remove_comments',
@@ -275,7 +275,7 @@ sub init {
                 if ( $content ) {
                     my $opening_script_re   = '<\s*script' . ( $html5 ? '[^>]*>' : '[^>]*(?:java|ecma)script[^>]*>' );
                     my $opening_style_re    = '<\s*style' . ( $html5 ? '[^>]*>' : '[^>]*text\/css[^>]*>' );
-					my $js_type_re          = q{type=['"]((application|text)/){0,1}(x-){0,1}(java|ecma)script['"]};
+					my $js_type_re          = q{type=['"]((((application|text)/){0,1}(x-){0,1}(java|ecma)script)|module)['"]};
 
                     if (
 						$opening =~ /$opening_script_re/i
@@ -493,7 +493,7 @@ HTML::Packer - Another HTML code cleaner
 
 =head1 VERSION
 
-Version 2.09
+Version 2.10
 
 =head1 DESCRIPTION
 

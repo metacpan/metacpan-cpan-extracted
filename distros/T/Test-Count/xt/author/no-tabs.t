@@ -22,6 +22,7 @@ my @files = (
     't/02-main.t',
     't/03-filter.t',
     't/04-modify-file-in-place.t',
+    't/sample-data/test-scripts/01-parser-good.pl',
     't/sample-data/test-scripts/01-parser.pl',
     't/sample-data/test-scripts/arithmetics.pl',
     't/sample-data/test-scripts/basic.arc',

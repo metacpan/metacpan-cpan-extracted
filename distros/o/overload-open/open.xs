@@ -5,9 +5,10 @@
 
 #define SAVE_AND_REPLACE_PP_IF_UNSET(real_function, op_to_replace, overload_function, OP_replace_mutex) do {\
     MUTEX_LOCK(&OP_replace_mutex);\
-    if (PL_ppaddr[op_to_replace] != overload_function) {\
-        /* Is this a race in threaded perl? */\
+    if (!real_function) {\
         real_function = PL_ppaddr[op_to_replace];\
+    }\
+    if (PL_ppaddr[op_to_replace] != overload_function) {\
         PL_ppaddr[op_to_replace] = overload_function;\
     }\
     else {\
@@ -69,26 +70,37 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
             /* Initialize mark ourselves instead. */
             SV **mark = PL_stack_base + *PL_markstack_ptr;
             /* Save the number of items (number of arguments) */
-            I32 myitems = (I32)(sp - mark);
-            PUSHMARK(sp);
-                EXTEND(sp, myitems);
-                I32 c;
-                for ( c = myitems - 1; 0 <= c; c-- ) {
-                    mPUSHs( newSVsv(*(mysp - c)) );
+            ssize_t myitems = (ssize_t)(sp - PL_stack_base - *PL_markstack_ptr);
+            if (myitems < 0) {
+                SV *suppress_warnings = get_sv("overload::open::SUPPRESS_WARNINGS", 0);
+                if (SvTRUE(suppress_warnings)) {
                 }
-            /*  PL_stack_sp = sp */
-            PUTBACK; /* Closing bracket for XSUB arguments */
-            I32 count = 0;
-            count = call_sv( (SV*)code_hook, G_VOID | G_DISCARD );
-            /* G_VOID and G_DISCARD should cause us to not ask for any return
-             * arguments from the call. */
-            if (count) warn("call_sv was not supposed to get any arguments");
-            /* The purpose of the macro "SPAGAIN" is to refresh the local copy of
-             * the stack pointer. This is necessary because it is possible that
-             * the memory allocated to the Perl stack has been reallocated during
-             * the *call_pv* call */
-            /*  sp = PL_stack_sp */
-            SPAGAIN;
+                else {
+                    warn("overload::open internal error. Unable to save arguments, unexpected behavior could also occur in your program.");
+                }
+            }
+            else {
+                PUSHMARK(sp);
+                    EXTEND(sp, myitems);
+                    ssize_t c;
+                    for ( c = 0; c < myitems; c++) {
+                        /* We are going from last to first */
+                        ssize_t i = myitems - 1 - c;
+                        mPUSHs( newSVsv(*(mysp - i)) );
+                    }
+                /*  PL_stack_sp = sp */
+                PUTBACK; /* Closing bracket for XSUB arguments */
+                I32 count = call_sv( (SV*)code_hook, G_VOID | G_DISCARD );
+                /* G_VOID and G_DISCARD should cause us to not ask for any return
+                * arguments from the call. */
+                if (count) warn("call_sv was not supposed to get any arguments");
+                /* The purpose of the macro "SPAGAIN" is to refresh the local copy of
+                * the stack pointer. This is necessary because it is possible that
+                * the memory allocated to the Perl stack has been reallocated during
+                * the *call_pv* call */
+                /*  sp = PL_stack_sp */
+                SPAGAIN;
+            }
 
         /* FREETMPS cleans up all stuff on the temporaries stack added since SAVETMPS was called */
         FREETMPS;
@@ -98,11 +110,11 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
 }
 
 PP(pp_overload_open) {
-    return overload_allopen("open", "overload::open::GLOBAL", real_pp_open);
+    return overload_allopen("open", "overload::open::GLOBAL_OPEN", real_pp_open);
 }
 
 PP(pp_overload_sysopen) {
-    return overload_allopen("sysopen", "overload::open::GLOBAL_TWO",
+    return overload_allopen("sysopen", "overload::open::GLOBAL_SYSOPEN",
         real_pp_sysopen);
 }
 
@@ -116,13 +128,11 @@ _test_xs_function(...)
         printf("running test xs function\n");
 
 void
-_install_open(what_you_want)
-    char *what_you_want
+_install_open()
     CODE:
         SAVE_AND_REPLACE_PP_IF_UNSET(real_pp_open, OP_OPEN, Perl_pp_overload_open, OP_OPEN_replace_mutex);
 
 void
-_install_sysopen(what_you_want)
-    char *what_you_want
+_install_sysopen()
     CODE:
         SAVE_AND_REPLACE_PP_IF_UNSET(real_pp_sysopen, OP_SYSOPEN, Perl_pp_overload_sysopen, OP_SYSOPEN_replace_mutex);

@@ -5,7 +5,7 @@ use warnings;
 package portable::lib;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.003';
 
 use FindBin qw($Bin);
 push @portable::INC, $Bin;

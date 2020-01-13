@@ -1,7 +1,7 @@
 package Bencher::Role::FieldMunger;
 
-our $DATE = '2019-12-02'; # DATE
-our $VERSION = '1.046'; # VERSION
+our $DATE = '2020-01-12'; # DATE
+our $VERSION = '1.047'; # VERSION
 
 use 5.010;
 use strict;
@@ -14,23 +14,24 @@ sub add_field {
 
     $code->();
 
-    my $ff = $envres->[3]{'table.fields'};
+    my $fs = $envres->[3]{'table.fields'};
     my $fu = $envres->[3]{'table.field_units'};
     my $fa = $envres->[3]{'table.field_aligns'};
+    my $ff = $envres->[3]{'table.field_formats'};
 
     my $pos = 0;
-    for my $i (0..$#{$ff}) {
-        if ($opts->{after} && $ff->[$i] eq $opts->{after}) {
+    for my $i (0..$#{$fs}) {
+        if ($opts->{after} && $fs->[$i] eq $opts->{after}) {
             $pos = $i+1;
             last;
         }
-        if ($opts->{before} && $ff->[$i] eq $opts->{before}) {
+        if ($opts->{before} && $fs->[$i] eq $opts->{before}) {
             $pos = $i;
             last;
         }
     }
 
-    splice @$ff, $pos, 0, $name;
+    splice @$fs, $pos, 0, $name;
     if ($fu) {
         my $unit;
         if ($opts->{unit}) {
@@ -52,6 +53,13 @@ sub add_field {
         }
         splice @$fa, $pos, 0, $align;
     }
+    if ($ff) {
+        my $format;
+        if ($opts->{format}) {
+            $format = $opts->{format};
+        }
+        splice @$ff, $pos, 0, $format;
+    }
 }
 
 sub delete_fields {
@@ -63,15 +71,17 @@ sub delete_fields {
         }
     }
 
-    my $ff = $envres->[3]{'table.fields'};
+    my $fs = $envres->[3]{'table.fields'};
     my $fu = $envres->[3]{'table.field_units'};
     my $fa = $envres->[3]{'table.field_aligns'};
+    my $ff = $envres->[3]{'table.field_formats'};
 
-    for my $i (reverse 0..$#{$ff}) {
-        if (grep {$ff->[$i] eq $_} @names) {
-            splice @$ff, $i, 1;
+    for my $i (reverse 0..$#{$fs}) {
+        if (grep {$fs->[$i] eq $_} @names) {
+            splice @$fs, $i, 1;
             splice @$fu, $i, 1 if $fu && @$fu > $i;
             splice @$fa, $i, 1 if $fa && @$fa > $i;
+            splice @$ff, $i, 1 if $ff && @$ff > $i;
         }
     }
 }
@@ -91,7 +101,7 @@ Bencher::Role::FieldMunger - Field munger role
 
 =head1 VERSION
 
-This document describes version 1.046 of Bencher::Role::FieldMunger (from Perl distribution Bencher-Backend), released on 2019-12-02.
+This document describes version 1.047 of Bencher::Role::FieldMunger (from Perl distribution Bencher-Backend), released on 2020-01-12.
 
 =for Pod::Coverage .*
 
@@ -117,7 +127,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,13 +3,14 @@ NAME
 
 SYNOPSIS
      use Config::Utils qw(conflict hash hash_array);
+
      conflict($self, {'key' => 1}, 'key');
      hash($self, ['one', 'two'], $val);
      hash_array($self, ['one', 'two'], $val);
 
 SUBOUTINES
     "conflict($self, $config_hr, $key)"
-             Check conflits.
+             Check conflicts.
              Affected variables from $self:
              - set_conflicts - Flag, then control conflicts.
              - stack - Reference to array with actual '$key' key position.
@@ -43,11 +44,9 @@ ERRORS
              Conflict in '%s'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Config::Utils qw(conflict);
 
      # Object.
@@ -63,11 +62,9 @@ EXAMPLE1
      # ERROR: Conflict in 'key'.
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Config::Utils qw(hash);
      use Dumpvalue;
 
@@ -97,11 +94,9 @@ EXAMPLE2
      #         empty array
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Config::Utils qw(hash_array);
      use Dumpvalue;
 
@@ -132,11 +127,9 @@ EXAMPLE3
      #         empty array
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Config::Utils qw(hash_array);
      use Dumpvalue;
 
@@ -183,14 +176,14 @@ SEE ALSO
         Module for simple configure file parsing with arrays.
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2011-2015
+     © Michal Josef Špaček 2011-2020
      BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

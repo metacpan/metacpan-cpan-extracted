@@ -1,5 +1,9 @@
 Revision history for Music-Duration-Partition
 
+0.0305 2020-01-11 18:09:17
+    - Improve documentation.
+    - Improve the eg/figured-bass code.
+
 0.0304 2019-11-03 17:32:11
     - Clean up code.
     - Add eg/figured-bass.

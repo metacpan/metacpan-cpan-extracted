@@ -2,7 +2,7 @@ package gurpmi;
 
 #- Copyright (C) 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA
-#- Copyright (C) 2011-2017 Mageia
+#- Copyright (C) 2011-2020 Mageia
 
 #- This is needed because text printed by Gtk3 will always be encoded
 #- in UTF-8; we first check if LC_ALL is defined, because if it is,
@@ -218,7 +218,7 @@ Copyright (C) 2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
 
-Copyright (C) 2011-2017 Mageia
+Copyright (C) 2011-2020 Mageia
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

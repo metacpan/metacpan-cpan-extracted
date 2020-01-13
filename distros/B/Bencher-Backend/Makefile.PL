@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => 0,
     "Chart::Gnuplot" => 0,
     "Complete::Module" => 0,
-    "Complete::Util" => "0.603",
+    "Complete::Util" => "0.606",
     "Data::Clean::ForJSON" => 0,
     "Data::Clone" => 0,
     "Data::Dmp" => "0.21",
@@ -68,7 +68,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.046",
+  "VERSION" => "1.047",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -82,7 +82,7 @@ my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "Chart::Gnuplot" => 0,
   "Complete::Module" => 0,
-  "Complete::Util" => "0.603",
+  "Complete::Util" => "0.606",
   "Data::Clean::ForJSON" => 0,
   "Data::Clone" => 0,
   "Data::Dmp" => "0.21",

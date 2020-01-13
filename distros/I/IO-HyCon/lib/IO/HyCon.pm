@@ -39,6 +39,11 @@
 # 28-OCT-2019   B. Ulmann   Typos in documentation corrected.
 # 14-DEC-2019   B. Ulmann   Adapted to new firmware, added XBAR command, added 
 #                           DPT-query, set_address entfernt
+# 16-DEC-2019   B. Ulmann   set_pt expected a decimal potentiometer value
+#                           while the P command of the HC expects it as hex...
+# 17-DEC-2019   B. Ulmann   Added support for data logging
+# 18-DEC-2019   B. Ulmann   Fixed bug in RO-group handling. The group was 
+#                           reset whenever a digital output was changed...
 #
 
 package IO::HyCon;
@@ -51,7 +56,7 @@ IO::HyCon - Perl interface to the Analog Paradigm hybrid controller.
 
 =head1 VERSION
 
-This document refers to version 0.1 of HyCon
+This document refers to version 1.1 of HyCon
 
 =head1 SYNOPSIS
 
@@ -85,7 +90,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 use YAML qw(LoadFile);
 use Carp qw(confess cluck carp);
@@ -515,6 +520,30 @@ sub read_element_by_address {
     return { value => $value, id => $id};
 }
 
+=head2 get_data()
+
+get_data() reads data from the internal logging facility of the hybrid 
+controller. When a readout group has been defined and a single_run is
+executed, the hybrid controller will gather data from the readout-group
+automatically. There are 1024 memory cells for 16 bit data in the 
+hybrid controller. The sample rate is automatically determined.
+
+=cut
+
+sub get_data {
+    my ($self) = @_;
+    my $data = [];
+    $self->{port}->write('l');
+    while (1) {
+        my $response = get_response($self);
+        last if $response eq 'No data!' or $response =~ /EOD/;
+        my @values = split(/\s+/, $response);
+        push(@$data, @values == 1 ? $values[0] : \@values);
+    }
+
+    return $data;
+}
+
 =head2 read_all_elements()
 
 The routine read_all_elements() reads the current values from all elements 
@@ -620,7 +649,6 @@ sub digital_output {
     confess '$port must be >= 0 and < ' . DIGITAL_OUTPUT_PORTS
         if $port < 0 or $port > DIGITAL_OUTPUT_PORTS;
     $self->{port}->write(($state ? 'D' : 'd') . $port);
-    $self->{'RO-GROUP'} = [];
 }
 
 =head2 set_xbar()
@@ -698,15 +726,15 @@ sub set_pt {
     $value = sprintf('%04d', int($value * (2 ** DPT_RESOLUTION - 1)));
 
     $address = sprintf('%04X', hex($address)); # Make sure we have a four digit hex value
-    $number  = sprintf('%02d', $number);       # Make sure we have a two digital pot number
+    $number  = sprintf('%02X', hex($number));  # Make sure we have a two digital pot number
 
     $self->{port}->write("P$address$number$value");
 
     my $response = get_response($self);      # Get response
     confess 'No response from hybrid controller!' unless $response;
-    my ($raddress, $rnumber, $rvalue) = $response =~ /^P(\d+)\.(\d+)=(\d+)$/;
+    my ($raddress, $rnumber, $rvalue) = $response =~ /^P([^.]+)\.([^=]+)=(\d+)$/;
     confess "set_pt failed! $address vs. $raddress, $rnumber vs. $number, $value vs. $rvalue" 
-        if ($address != $raddress) or ($number != $rnumber) or ($value != $rvalue);
+        if (hex($address) != hex($raddress)) or (hex($number) != hex($rnumber)) or ($value != $rvalue);
 }
 
 =head2 read_dpts()

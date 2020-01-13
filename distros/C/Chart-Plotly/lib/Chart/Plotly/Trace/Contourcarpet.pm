@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Contourcarpet::Contours;
 use Chart::Plotly::Trace::Contourcarpet::Line;
 use Chart::Plotly::Trace::Contourcarpet::Stream;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: Plots contours on either the first carpet axis or the carpet axis with a matching `carpet` attribute. Data `z` is interpreted as matching that of the corresponding carpet axis.
 
@@ -343,7 +343,7 @@ Chart::Plotly::Trace::Contourcarpet - Plots contours on either the first carpet 
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -630,7 +630,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

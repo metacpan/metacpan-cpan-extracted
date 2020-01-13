@@ -68,5 +68,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/shlomif/perl-XML-LibXML.git
-version: '2.0201'
+version: '2.0202'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

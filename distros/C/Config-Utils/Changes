@@ -1,3 +1,12 @@
+0.07 2020-01-12T00:03:27+01:00
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Fix doc.
+ - Improve coverage of Utils::conflict().
+ - Update Module::Install to 1.19 version.
+ - Update copyright years.
+ - Update my github user name.
+ - Update my name.
+
 0.06 2015-10-01T12:34:02+02:00
  - Improve SEE ALSO section in doc.
  - Move author tests to xt/ directory.

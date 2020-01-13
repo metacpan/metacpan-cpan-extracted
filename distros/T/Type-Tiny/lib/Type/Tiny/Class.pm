@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::Class::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Class::VERSION   = '1.008001';
+	$Type::Tiny::Class::VERSION   = '1.008003';
 }
 
 $Type::Tiny::Class::VERSION =~ tr/_//d;
@@ -19,7 +19,7 @@ use Scalar::Util qw< blessed >;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-require Type::Tiny::ConstrainedObject;
+use Type::Tiny::ConstrainedObject ();
 our @ISA = 'Type::Tiny::ConstrainedObject';
 sub _short_name { 'Class' }
 
@@ -357,7 +357,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,12 +1,12 @@
 package Test::Count::FileMutator;
-$Test::Count::FileMutator::VERSION = '0.1001';
+$Test::Count::FileMutator::VERSION = '0.1101';
 use warnings;
 use strict;
 
-use base 'Test::Count::Base';
+use parent 'Test::Count::Base';
 
-use Test::Count;
-use Test::Count::Lib;
+use Test::Count      ();
+use Test::Count::Lib ();
 
 
 sub _counter
@@ -141,20 +141,12 @@ __END__
 
 =head1 VERSION
 
-version 0.1001
+version 0.1101
 
 =head1 SYNOPSIS
 
-    use Test::Count::Parser;
-
-    my $parser = Test::Count::Parser->new();
-
-    $parser->update_assignments($string);
-
-    $parser->update_count($string);
-
-    my $value = $parser->get_count();
-
+    # TODO: fill in
+    #
 =head1 DESCRIPTION
 
 After initiating a parser one can input assignment expressions, and count
@@ -268,7 +260,7 @@ Copyright 2006 Shlomi Fish.
 
 This program is released under the following license: MIT X11.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -302,14 +294,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Count>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Test-Count>
 
 =item *
 
@@ -384,7 +368,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2006 by Shlomi Fish.
 
 This is free software, licensed under:
 

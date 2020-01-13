@@ -34,9 +34,14 @@ use MooX::Press (
 	class => [
 		'SomeClass' => { type_name => 'SomeType' },
 		'OtherClass' => {
+			begin => sub {
+				my $class = shift;
+				my $reg   = Type::Registry->for_class($class);
+				$reg->alias_type('StrLength[1]' => 'Stringo');
+			},
 			can => {
 				'my_method' => {
-					signature => [ 'a' => 'SomeType', 'b' => 'Optional[SomeType]', c => 'Str' ],
+					signature => [ 'a' => 'SomeType', 'b' => 'Optional[SomeType]', c => 'Stringo' ],
 					named     => true,
 					code      => sub { my ($self, $args) = @_; uc($args->c) },
 				},
@@ -65,6 +70,11 @@ $e = exception {
 	is($obj->my_method(a => MyApp->new_someclass, b => MyApp->new_someclass, c => 'Woah'), 'WOAH', 'returned correct value');
 };
 is($e, undef, '... and no exception thrown');
+
+$e = exception {
+	is($obj->my_method(a => MyApp->new_someclass, b => MyApp->new_someclass, c => ''), 'BOOP', 'this should not happen');
+};
+like($e, qr/StrLength.1./);
 
 $e = exception {
 	is($obj->my_method(a => MyApp->new_someclass, b => MyApp->new_otherclass, c => 'Boop'), 'BOOP', 'this should not really happen');

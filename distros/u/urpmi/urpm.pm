@@ -14,7 +14,7 @@ use urpm::md5sum;
 # perl_checker: require urpm::media
 # perl_checker: require urpm::parallel
 
-our $VERSION = 'v8.120.5';
+our $VERSION = 'v8.120.6';
 our @ISA = qw(URPM Exporter);
 our @EXPORT_OK = ('file_from_local_url', 'file_from_local_medium', 'is_local_medium');
 
@@ -615,7 +615,7 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
 
-Copyright (C) 2011-2017 Mageia
+Copyright (C) 2011-2020 Mageia
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

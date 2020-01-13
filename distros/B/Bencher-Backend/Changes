@@ -1,3 +1,13 @@
+1.047   2020-01-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow specifying field format in add_field().
+
+        - [experimental] Replace formatter AddVsSlowest with AddComparisonFields
+	  (which adds pct_faster_vs_slowest, pct_slower_vs_fastest) to make it
+	  easy to say "xx times/percent slower than ..." as well as "xx
+	  times/percent faster than ...".
+
+
 1.046   2019-11-29  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 1.045 & 1.045.1.

@@ -2,7 +2,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2018 by Dominique Dumont.
+# This software is Copyright (c) 2014-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -35,7 +35,7 @@ cme - Check or edit configuration data with Config::Model
 
 =head1 VERSION
 
-version 1.030
+version 1.031
 
 =head1 SYNOPSIS
 
@@ -403,7 +403,7 @@ to learn how to fix a model.
 
 =head1 FOR MORE INFORMATION
 
-For more informations, please check:
+For more information, please check:
 
 =over
 
@@ -439,7 +439,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2018 by Dominique Dumont.
+This software is Copyright (c) 2014-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 

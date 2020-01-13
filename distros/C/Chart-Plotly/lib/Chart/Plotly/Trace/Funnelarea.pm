@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Funnelarea::Textfont;
 use Chart::Plotly::Trace::Funnelarea::Title;
 use Chart::Plotly::Trace::Funnelarea::Transform;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: Visualize stages in a process using area-encoded trapezoids. This trace can be used to show data in a part-to-whole representation similar to a "pie" trace, wherein each item appears in a single stage. See also the "funnel" trace type for a different approach to visualizing funnel data.
 
@@ -295,7 +295,7 @@ Chart::Plotly::Trace::Funnelarea - Visualize stages in a process using area-enco
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -522,7 +522,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

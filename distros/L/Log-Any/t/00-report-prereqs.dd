@@ -19,6 +19,7 @@ do { my $x = {
                                       'File::Basename' => '0',
                                       'FindBin' => '0',
                                       'IO::File' => '0',
+                                      'List::Util' => '0',
                                       'Storable' => '0',
                                       'Sys::Syslog' => '0',
                                       'Test::Builder' => '0',

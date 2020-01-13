@@ -27,7 +27,7 @@ my ($near, $deep) = Astro::Coord::ECI::TLE->parse(<<eod);
 eod
 
 my $time = 61196688000	# 01-Apr-3909 00:00:00 GMT, epoch 1-Jan-1970.
-    + timegm( 0, 0, 0, 1, 0, 70 );	# Adjust for system epoch.
+    + timegm( 0, 0, 0, 1, 0, 1970 );	# Adjust for system epoch.
 
 plan(tests => 14);
 

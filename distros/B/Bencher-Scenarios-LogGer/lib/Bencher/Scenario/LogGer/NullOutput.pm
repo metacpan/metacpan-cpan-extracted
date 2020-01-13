@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::NullOutput;
 
-our $DATE = '2019-09-18'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2020-01-13'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 use 5.010001;
 use strict;
@@ -124,7 +124,7 @@ Bencher::Scenario::LogGer::NullOutput - Benchmark Log::ger logging speed with th
 
 =head1 VERSION
 
-This document describes version 0.015 of Bencher::Scenario::LogGer::NullOutput (from Perl distribution Bencher-Scenarios-LogGer), released on 2019-09-18.
+This document describes version 0.016 of Bencher::Scenario::LogGer::NullOutput (from Perl distribution Bencher-Scenarios-LogGer), released on 2020-01-13.
 
 =head1 SYNOPSIS
 
@@ -142,17 +142,17 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::Any> 1.705
+L<Log::Any> 1.707
 
 L<Log::Contextual> 0.008001
 
 L<Log::Contextual::SimpleLogger> 0.008001
 
-L<Log::Dispatch> 2.67
+L<Log::Dispatch> 2.68
 
-L<Log::Dispatch::Null> 2.67
+L<Log::Dispatch::Null> 2.68
 
-L<Log::Dispatchouli> 2.015
+L<Log::Dispatchouli> 2.019
 
 L<Log::Fast> v2.0.1
 
@@ -320,33 +320,33 @@ Command line:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.04 >>, OS kernel: I<< Linux version 5.0.0-37-generic >>.
 
 Benchmark with default options (C<< bencher -m LogGer::NullOutput >>):
 
  #table1#
- +------------------------------------------+-----------+-------+------------+-----------+---------+
- | participant                              | rate (/s) |  time | vs_slowest |  errors   | samples |
- +------------------------------------------+-----------+-------+------------+-----------+---------+
- | Log::Dispatch::Null-100k_debug           |       0.5 | 2     |        1   |   0.096   |       6 |
- | Log::Contextual+Log4perl-100k_trace      |       2   | 0.6   |        4   |   0.009   |       7 |
- | Log::Contextual+SimpleLogger-100k_trace  |       1.9 | 0.53  |        4.1 |   0.0045  |       6 |
- | Mojo::Log-100k_debug                     |       3.6 | 0.28  |        7.9 |   0.0023  |       6 |
- | Log::Dispatchouli-100k_debug             |       6   | 0.2   |       10   |   0.0024  |       8 |
- | Log::Log4perl::Tiny-100k_trace           |       7   | 0.1   |       20   |   0.0051  |       6 |
- | Log::Any-null_adapter-100k_log_trace     |      14   | 0.07  |       31   |   0.00013 |       6 |
- | Log::Fast-100k_is_debug                  |      14   | 0.069 |       32   |   0.00018 |       6 |
- | Log::Log4perl-easy-100k_trace            |      17   | 0.058 |       38   |   0.0002  |       7 |
- | Log::Any-null_adapter-100k_is_trace      |      20   | 0.05  |       40   |   0.00074 |       7 |
- | Log::Any-no_adapter-100k_is_trace        |      21   | 0.048 |       46   |   0.00028 |       7 |
- | Log::Fast-100k_DEBUG                     |      20   | 0.04  |       50   |   0.00076 |       6 |
- | Log::Any-no_adapter-100k_log_trace       |      38   | 0.026 |       85   |   0.0002  |       6 |
- | Log::ger+LGP:OptAway-100k_log_trace      |      49   | 0.02  |      110   | 5.1e-05   |       6 |
- | Log::ger+LGP:MutilevelLog-100k_log_trace |      50   | 0.02  |      110   | 2.2e-05   |       6 |
- | Log::ger+LGP:MutilevelLog-100k_log_6     |      50   | 0.02  |      110   | 3.2e-05   |       6 |
- | Log::ger-100k_log_is_trace               |      70   | 0.02  |      100   |   0.00055 |       7 |
- | Log::ger-100k_log_trace                  |      67   | 0.015 |      150   |   0.00014 |       6 |
- +------------------------------------------+-----------+-------+------------+-----------+---------+
+ +------------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | participant                              | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +------------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | Log::Dispatch::Null-100k_debug           |      2    |     510   |                 0.00% |              3860.13% |   0.0014  |       6 |
+ | Log::Contextual+Log4perl-100k_trace      |      2.2  |     450   |                12.15% |              3430.94% |   0.0012  |       6 |
+ | Log::Contextual+SimpleLogger-100k_trace  |      2.3  |     440   |                15.55% |              3327.19% |   0.0014  |       6 |
+ | Log::Dispatchouli-100k_debug             |      6.4  |     160   |               225.42% |              1116.91% |   0.00025 |       6 |
+ | Mojo::Log-100k_debug                     |      7.03 |     142   |               257.41% |              1008.01% | 6.3e-05   |       6 |
+ | Log::Log4perl::Tiny-100k_trace           |     10.1  |      98.6 |               415.45% |               668.28% |   7e-05   |       6 |
+ | Log::Fast-100k_is_debug                  |     17    |      60   |               741.35% |               370.69% | 7.7e-05   |       6 |
+ | Log::Any-null_adapter-100k_log_trace     |     16.7  |      59.8 |               750.22% |               365.77% | 2.3e-05   |       8 |
+ | Log::Log4perl-easy-100k_trace            |     19    |      52   |               880.85% |               303.74% |   0.00018 |       6 |
+ | Log::Any-null_adapter-100k_is_trace      |     24.7  |      40.5 |              1154.43% |               215.69% | 3.6e-05   |       6 |
+ | Log::Any-no_adapter-100k_is_trace        |     25    |      40.1 |              1168.66% |               212.15% | 4.5e-06   |       6 |
+ | Log::Fast-100k_DEBUG                     |     27    |      37   |              1281.68% |               186.62% | 5.9e-05   |       6 |
+ | Log::Any-no_adapter-100k_log_trace       |     42    |      24   |              2012.16% |                87.49% | 4.7e-05   |       6 |
+ | Log::ger+LGP:OptAway-100k_log_trace      |     47.2  |      21.2 |              2300.93% |                64.94% | 1.8e-05   |       7 |
+ | Log::ger+LGP:MutilevelLog-100k_log_trace |     52.6  |      19   |              2572.82% |                48.16% | 1.7e-05   |       7 |
+ | Log::ger+LGP:MutilevelLog-100k_log_6     |     52.7  |      19   |              2579.73% |                47.78% | 4.9e-06   |       6 |
+ | Log::ger-100k_log_trace                  |     75.8  |      13.2 |              3752.06% |                 2.81% | 1.1e-05   |       6 |
+ | Log::ger-100k_log_is_trace               |     78    |      13   |              3860.13% |                 0.00% | 2.8e-05   |       6 |
+ +------------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -373,7 +373,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

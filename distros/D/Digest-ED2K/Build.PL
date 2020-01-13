@@ -18,14 +18,14 @@ my %module_build_args = (
 	},
 	meta_merge => {
 		resources => {
-			repository => 'https://github.com/Kulag/Digest-ED2K',
+			repository => 'https://github.com/bherw/Digest-ED2K',
 		},
 	},
 	requires      => {
 		'perl'           => '5.08.0',
 		'common::sense'  => '0',
 		'Digest::base'   => '1.03',
-		'Digest::MD4'    => '0',
+		'Digest::MD4'    => '1.3',
 	},
 );
 

@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2018 by Dominique Dumont.
+# This software is Copyright (c) 2014-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.030';
+$App::Cme::Command::run::VERSION = '1.031';
 use strict;
 use warnings;
 use 5.10.1;
@@ -190,7 +190,8 @@ sub execute {
             unshift @$app_args, @value;
         }
         elsif ($key eq 'var') {
-            my $res = eval ("@value") ;
+            # value comes from system file, not from user data
+            my $res = eval ("@value") ; ## no critic (ProhibitStringyEval)
             die "Error in var specification line $line_nb: $@\n" if $@;
         }
         elsif ($key eq 'default') {
@@ -251,7 +252,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var;
-$App::Cme::Run::Var::VERSION = '1.030';
+$App::Cme::Run::Var::VERSION = '1.031';
 require Tie::Hash;
 
 our @ISA = qw(Tie::ExtraHash);
@@ -278,7 +279,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.030
+version 1.031
 
 =head1 SYNOPSIS
 
@@ -544,7 +545,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2018 by Dominique Dumont.
+This software is Copyright (c) 2014-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 

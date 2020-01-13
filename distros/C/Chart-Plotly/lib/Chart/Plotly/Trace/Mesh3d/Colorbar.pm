@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Mesh3d::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Mesh3d::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Mesh3d::Colorbar::Title;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace mesh3d.
 
@@ -281,7 +281,7 @@ Chart::Plotly::Trace::Mesh3d::Colorbar - This attribute is one of the possible o
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -489,7 +489,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

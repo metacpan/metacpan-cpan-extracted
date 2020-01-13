@@ -1,7 +1,7 @@
 package Bencher::Formatter::ScaleTime;
 
-our $DATE = '2019-12-02'; # DATE
-our $VERSION = '1.046'; # VERSION
+our $DATE = '2020-01-12'; # DATE
+our $VERSION = '1.047'; # VERSION
 
 use 5.010001;
 use strict;
@@ -78,7 +78,7 @@ Bencher::Formatter::ScaleTime - Scale time to make it convenient
 
 =head1 VERSION
 
-This document describes version 1.046 of Bencher::Formatter::ScaleTime (from Perl distribution Bencher-Backend), released on 2019-12-02.
+This document describes version 1.047 of Bencher::Formatter::ScaleTime (from Perl distribution Bencher-Backend), released on 2020-01-12.
 
 =for Pod::Coverage .*
 
@@ -104,7 +104,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

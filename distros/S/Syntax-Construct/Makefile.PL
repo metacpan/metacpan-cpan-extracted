@@ -1,4 +1,4 @@
-use 5.006;
+use 5.006002;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
@@ -19,7 +19,7 @@ WriteMakefile(
     ABSTRACT_FROM    => $lib_file,
     LICENSE          => 'artistic_2',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.006,
+    MIN_PERL_VERSION => 5.006002,
     META_MERGE       => {
                         resources => { repository => 'https://github.com/choroba/syntactic-construct' },
                         provides  => { 'Syntax::Construct' => {

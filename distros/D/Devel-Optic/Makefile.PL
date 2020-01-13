@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000100"
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t t/lens-perlish/*.t"
   }

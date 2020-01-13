@@ -1,5 +1,22 @@
 Revision history for overload::open
 
+1.02.0 Jan 13, 2020
+    - Add an option to suppress warnings. For now this is only
+      applying to an internal error (so as long as you setup overload::open
+      properly you should probably not get a warning
+
+1.01.0 Jan 13, 2020
+    - Use ssize_t instead of I32 when doing pointer math
+    - If number of items is negative, don't attempt to PUSHMARK, just
+      warn and don't try to do the prehook
+
+1.00.2 Jan 11, 2020
+    - Add provides to META and some code cleanup
+
+1.00.1 Jan 11, 2020
+    - Fix a lot of issues with META files and MANIFEST
+    - Don't put files in build directory when running tests
+
 1.00.0 Jan 10, 2020
     - Fix a bug with MARK
     - The bug would cause the filehandle to not be defined but was

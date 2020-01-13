@@ -1,9 +1,59 @@
 ==================================================
-Changes from 2018-06-19 00:00:00 +0000 to present.
+Changes from 2019-01-11 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.012 at 2019-06-19 17:32:22 +0000
+version 0.014 at 2020-01-11 11:33:52 +0000
+------------------------------------------
+
+  Change: 37791ba740055882e00a466e307928b189acd3da
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2020-01-11 12:25:18 +0000
+
+    interpreter: quote scalars in error messages
+
+    Improve readability of the error messages slightly. 
+
+  Change: c8f1251f8ecb5891f816c18e791c1ab6b6e9be0f
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2020-01-11 12:25:18 +0000
+
+    Fix outdated comments and documentation
+
+    These were leftovers from when `fit_to_view` might return a data
+    structure if it was small enough. Since the removal of Devel::Size in
+    f03d4e1d02, `fit_to_view` unconditionally summarizes. 
+
+------------------------------------------
+version 0.013 at 2020-01-11 11:08:24 +0000
+------------------------------------------
+
+  Change: 2335ead0562824c91cd477a4d83428ed1099addb
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2020-01-11 12:08:24 +0000
+
+    v0.013 
+
+  Change: c08db2f997d6b3fdb3586d3907f10121cde30098
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2020-01-11 12:04:22 +0000
+
+    interpreter: quote scalars in error messages
+
+    Improve readability of the error messages slightly. 
+
+  Change: b96c5b1e1a9bc59752c7afb4c1a7cfa34ce3bd55
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2020-01-11 11:52:02 +0000
+
+    Fix outdated comments and documentation
+
+    This were leftovers from when `fit_to_view` might return a data
+    structure if it was small enough. Since the removal of Devel::Size in
+    f03d4e1d02, `fit_to_view` unconditionally summarizes. 
+
+------------------------------------------
+version 0.012 at 2019-06-19 17:27:35 +0000
 ------------------------------------------
 
   Change: f03d4e1d02911665fb8eb4a3cd55de0ac8073370

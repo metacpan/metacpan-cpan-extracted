@@ -1,0 +1,17 @@
+Revision history for Template-Plugin-Lingua-EN-Inflexion
+
+0.01 2020-01-13
+    - Licence correction in README
+
+0.00_03 2020-01-09
+    - Improve synopsis and copy it to examples/
+    - Stringify versions in Makefile.PL
+    - Add CPAN META test
+
+0.00_02 2019-12-20
+    - POD Fixes
+    - Boilerplate test should be release-only.
+
+0.00_01 2019-12-19
+    - First version, released on an unsuspecting world.
+

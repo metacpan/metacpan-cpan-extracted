@@ -6,14 +6,14 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::ConstrainedObject::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::ConstrainedObject::VERSION   = '1.008001';
+	$Type::Tiny::ConstrainedObject::VERSION   = '1.008003';
 }
 
 $Type::Tiny::ConstrainedObject::VERSION =~ tr/_//d;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-require Type::Tiny;
+use Type::Tiny ();
 our @ISA = 'Type::Tiny';
 
 my %errlabel = (
@@ -230,7 +230,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2019 by Toby Inkster.
+This software is copyright (c) 2019-2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

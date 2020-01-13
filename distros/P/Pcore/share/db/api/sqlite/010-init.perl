@@ -1,5 +1,3 @@
-use Arbitrator::Const qw[:ALL];
-
 <<'SQL'
 
 -- PERMISSIONS

@@ -17,7 +17,7 @@ use Chart::Plotly::Trace::Scattergl::Textfont;
 use Chart::Plotly::Trace::Scattergl::Transform;
 use Chart::Plotly::Trace::Scattergl::Unselected;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: The data visualized as scatter point or lines is set in `x` and `y` using the WebGL plotting engine. Bubble charts are achieved by setting `marker.size` and/or `marker.color` to a numerical arrays.
 
@@ -371,7 +371,7 @@ Chart::Plotly::Trace::Scattergl - The data visualized as scatter point or lines 
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -633,7 +633,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

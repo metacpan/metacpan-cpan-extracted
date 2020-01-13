@@ -31,7 +31,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Duration-Partition
   repository: https://github.com/ology/Music-Duration-Partition.git
-version: '0.0304'
+version: '0.0305'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

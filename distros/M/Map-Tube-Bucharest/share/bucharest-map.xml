@@ -71,6 +71,8 @@
     <station id="M4-03" name="Grivița" line="M4:3" link="M4-02,M4-04"/>
     <station id="M4-04" name="1 Mai" line="M4:4" link="M4-03,M4-05"/>
     <station id="M4-05" name="Jiului" line="M4:5" link="M4-04,M4-06"/>
-    <station id="M4-06" name="Parc Bazilescu" line="M4:6" link="M4-05"/>
+    <station id="M4-06" name="Parc Bazilescu" line="M4:6" link="M4-05,M4-07"/>
+    <station id="M4-07" name="Laminorului" line="M4:7" link="M4-06,M4-08"/>
+    <station id="M4-08" name="Străulești" line="M4:8" link="M4-07"/>
   </stations>
 </tube>

@@ -8,13 +8,14 @@ WriteMakefile(
   VERSION_FROM     => 'lib/XML/Invisible.pm',
   ABSTRACT_FROM    => 'lib/XML/Invisible.pm',
   LICENSE          => 'artistic_2',
-  MIN_PERL_VERSION => '5.008001',
+  MIN_PERL_VERSION => '5.008003',
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => '6.64', # TEST_REQUIRES
   },
   TEST_REQUIRES => {
     'Test::More' => '0.88', # done_testing
     'Import::Into' => '0',
+    'Test::Snapshot' => '0.02', # better snapshot filenames
   },
   PREREQ_PM => {
     'Pegex' => '0.64',

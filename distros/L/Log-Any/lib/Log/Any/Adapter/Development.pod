@@ -16,7 +16,7 @@ Log::Any::Adapter::Development - Manual for developing new Log::Any adapters
 
 =head1 VERSION
 
-version 1.707
+version 1.708
 
 =head1 SYNOPSIS
 

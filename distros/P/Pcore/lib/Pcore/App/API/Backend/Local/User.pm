@@ -111,6 +111,8 @@ sub user_create ( $self, $user_name, $password, $enabled, $permissions ) {
 }
 
 sub user_set_password ( $self, $user_id, $password, $dbh = undef ) {
+    return res [ 400, q[Passwort can't be empty] ] if !defined $password || $password eq $EMPTY;
+
     $dbh //= $self->{dbh};
 
     # resolve user

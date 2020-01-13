@@ -3,22 +3,21 @@
 use strict;
 use warnings;
 
-use Test::Count::Filter;
-use Getopt::Long;
+use Test::Count::Filter ();
+use Getopt::Long qw/ GetOptions /;
 
 my $filetype = "perl";
-GetOptions('ft=s' => \$filetype);
+GetOptions( 'ft=s' => \$filetype );
 
-my $filter =
-    Test::Count::Filter->new(
-        {
-            ($filetype eq "arc") ?
-            (
-                assert_prefix_regex => qr{; TEST},
-                plan_prefix_regex => qr{\(plan\s+},
-            ) :
-            ()
-        }
-    );
+my $filter = Test::Count::Filter->new(
+    {
+        ( $filetype eq "arc" )
+        ? (
+            assert_prefix_regex => qr{; TEST},
+            plan_prefix_regex   => qr{\(plan\s+},
+            )
+        : ()
+    }
+);
 
 $filter->process();

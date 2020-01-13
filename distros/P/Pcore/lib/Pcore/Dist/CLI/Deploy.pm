@@ -8,12 +8,13 @@ sub CLI ($self) {
     return {
         abstract => 'deploy distribution',
         opt      => {
-            all        => { desc => 'implies --devel, --recommends and --suggeests', },
-            install    => { desc => 'install "bin" to $PATH and "lib" to $PERL5LIB', },
-            devel      => { desc => 'cpanm --with-develop', },
-            recommends => { desc => 'cpanm --with-recommends', },
-            suggests   => { desc => 'cpanm --with-suggests', },
-            verbose    => { desc => 'cpanm --verbose', },
+            all        => { desc  => 'implies --devel, --recommends and --suggeests', },
+            deps       => { short => undef, desc => 'install dependencies', default => 1 },
+            install    => { desc  => 'install "bin" to $PATH and "lib" to $PERL5LIB', },
+            devel      => { desc  => 'cpanm --with-develop', },
+            recommends => { desc  => 'cpanm --with-recommends', },
+            suggests   => { desc  => 'cpanm --with-suggests', },
+            verbose    => { desc  => 'cpanm --verbose', },
         },
     };
 }
@@ -33,7 +34,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    1 | 12                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 13                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

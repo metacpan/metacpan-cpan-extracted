@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Test-Count",
-  "dist_version" => "0.1001",
+  "dist_version" => "0.1101",
   "license" => "mit",
   "module_name" => "Test::Count",
   "recursive_test_files" => 1,
@@ -27,7 +27,6 @@ my %module_build_args = (
     "File::Basename" => 0,
     "Getopt::Long" => 0,
     "Parse::RecDescent" => 0,
-    "base" => 0,
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0

@@ -1,5 +1,11 @@
 Revision history for Test::Count
 
+0.1101   2020-01-13
+    - Explicitly import symbols and other cleanups.
+
+0.1100   2020-01-13
+    - Add FILTER(MULT($expr)) and ENDFILTER()
+
 0.1001   2019-08-23
     - Move repo to https://github.com/shlomif/perl-test-count
 

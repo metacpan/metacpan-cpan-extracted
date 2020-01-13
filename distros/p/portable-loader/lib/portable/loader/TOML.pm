@@ -5,7 +5,7 @@ use warnings;
 package portable::loader::TOML;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.003';
 
 use portable::lib;
 

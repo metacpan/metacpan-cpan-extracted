@@ -51,7 +51,8 @@
             "Net::Server" : "0",
             "Test::More" : "0",
             "Test::Pod" : "0",
-            "Test::Pod::Coverage" : "0"
+            "Test::Pod::Coverage" : "0",
+            "rpmtools" : "7.11"
          }
       }
    },
@@ -72,6 +73,6 @@
          "web" : "http://gitweb.mageia.org/software/rpm/urpmi/"
       }
    },
-   "version" : "v8.120.5",
+   "version" : "v8.120.6",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -166,7 +166,7 @@ SEE ALSO
         Module for simple configure file parsing with arrays.
 
 REPOSITORY
-    <https://github.com/tupinek/Config-Dot>
+    <https://github.com/michal-josef-spacek/Config-Dot>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -174,9 +174,9 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2018 Michal Josef Špaček
+     © 2011-2020 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

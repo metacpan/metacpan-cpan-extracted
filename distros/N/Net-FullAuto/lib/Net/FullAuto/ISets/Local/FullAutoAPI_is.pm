@@ -39,7 +39,8 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw($select_fullautoapi_setup);
 
 use Net::FullAuto::Cloud::fa_amazon;
-use Net::FullAuto::FA_Core qw[$localhost];
+use Net::FullAuto::FA_Core qw[$localhost cleanup fetch clean_filehandle];
+use Time::Local;
 use File::HomeDir;
 my $home_dir=File::HomeDir->my_home;
 $home_dir||=$ENV{'HOME'}||'';
@@ -48,10 +49,13 @@ my $username=getlogin || getpwuid($<);
 my $do;my $ad;my $prompt;my $public_ip='';
 my $builddir='';my @ls_tmp=();
 
+my $avail_port='';
+
 my $configure_fullautoapi=sub {
 
    my $selection=$_[0]||'';
    my $service_and_cert_password=$_[1]||'';
+   my $domain_url=$_[2]||'';
    my ($stdout,$stderr)=('','');
    my $handle=$localhost;my $connect_error='';
    $handle->cwd('~');
@@ -572,6 +576,77 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd('make','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('~/FullAutoAPI/deps');
+
+$do=1;
+if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://www.python.org/downloads/release');
+   $stdout=~s/^.*list-row-container menu.*?Python (.*?)[<].*$/$1/s;
+   my $version=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "if test -f /usr/local/bin/python$version; then echo Exists; fi");
+   unless ($stdout=~/Exists/) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget --random-wait --progress=dot '.
+         "http://python.org/ftp/python/$version/Python-$version.tar.xz",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "tar xvf Python-$version.tar.xz",
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd("Python-$version");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure --prefix=/usr/local --exec-prefix=/usr/local '.
+         '--enable-shared --enable-optimizations '.
+         'LDFLAGS="-Wl,-rpath /usr/local/lib"',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make','3600','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make altinstall','__display__');
+      $version=~s/^(\d+\.\d+).*$/$1/;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "ln -s /usr/local/bin/python$version /usr/local/bin/python");
+      ($stdout,$stderr)=$handle->cwd('~/FullAutoAPI/deps');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m ensurepip --default-pip",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install ".
+         "--upgrade pip setuptools wheel",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install pyasn1",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install pyasn1-modules",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install --upgrade oauth2client",
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd('~/FullAutoAPI/deps');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install oauth2",
+         '__display__');
+      unless ($^O eq 'cygwin') {
+         ($stdout,$stderr)=$handle->cmd('echo /usr/local/lib > '.
+            '~/local.conf','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v 644 ~/local.conf',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'mv -v ~/local.conf /etc/ld.so.conf.d','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
+      } else {
+         ($stdout,$stderr)=$handle->cmd(
+            "python$version -m pip install awscli",
+            '__display__');
+      }
+      $sudo='sudo env "PATH=$PATH" ';
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'python --version','__display__');
+   }
+}
+$do=0;
+if ($do==1) {
    ($stdout,$stderr)=$handle->cmd($sudo.
       "wget --random-wait --progress=dot ".
       "https://bootstrap.pypa.io/ez_setup.py",'__display__');
@@ -626,18 +701,16 @@ if ($do==1) {
       ($stdout,$stderr)=$handle->cmd('pip install awscli','__display__');
    }
 }
+}
 $do=1;
 if ($do==1) {
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".
-      "https://github.com/zeromq/zeromq4-1/archive/master.zip",
+      'git clone https://github.com/zeromq/zeromq4-x.git',
       '__display__');
+   ($stdout,$stderr)=$handle->cwd('zeromq4-x');
+   my $zmq_branch='v4.0.1';
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "chown -v $username:$username master.zip",'__display__')
-      if $^O ne 'cygwin';
-   ($stdout,$stderr)=$handle->cmd("unzip -o master.zip",'__display__');
-   ($stdout,$stderr)=$handle->cmd("rm -rvf master.zip",'__display__');
-   ($stdout,$stderr)=$handle->cwd('zeromq4-1-master');
+      "git checkout $zmq_branch",'__display__');
    ($stdout,$stderr)=$handle->cmd("./autogen.sh",'__display__');
    $handle->cmd_raw('export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig');
    ($stdout,$stderr)=$handle->cmd('./configure','__display__');
@@ -659,6 +732,463 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cwd('~/FullAutoAPI/deps');
 }
 $do=1;
+if ($do==1) { # INSTALL LATEST VERSION OF NGINX
+   # https://nealpoole.com/blog/2011/04/setting-up-php-fastcgi-and-nginx
+   #    -dont-trust-the-tutorials-check-your-configuration/
+   # https://www.digitalocean.com/community/tutorials/
+   #    understanding-and-implementing-fastcgi-proxying-in-nginx
+   # http://dev.soup.io/post/1622791/I-managed-to-get-nginx-running-on
+   # http://search.cpan.org/dist/Catalyst-Manual-5.9002/lib/Catalyst/
+   #    Manual/Deployment/nginx/FastCGI.pod
+   # https://serverfault.com/questions/171047/why-is-php-request-array-empty
+   # https://codex.wordpress.org/Nginx
+   # https://www.sitepoint.com/setting-up-php-behind-nginx-with-fastcgi/
+   # http://codingsteps.com/install-php-fpm-nginx-mysql-on-ec2-with-amazon-linux-ami/
+   # http://code.tutsplus.com/tutorials/revisiting-open-source-social-networking-installing-gnu-social--cms-22456
+   # https://wiki.loadaverage.org/clipbucket/installation_guides/install_like_loadaverage
+   # https://karp.id.au/social/index.html
+   # http://jeffreifman.com/how-to-install-your-own-private-e-mail-server-in-the-amazon-cloud-aws/
+   # https://www.wpwhitesecurity.com/creating-mysql-wordpress-database/
+   my $nginx_path='/etc';
+   ($stdout,$stderr)=$handle->cwd('~/FullAutoAPI/deps');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'rm -rvf /etc/nginx','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget -qO- https://nginx.org/en/download.html");
+   $stdout=~s/^.*Mainline.*?\/download\/(.*?)\.tar\.gz.*$/$1/s;
+   my $nginx=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo."wget --random-wait --progress=dot ".
+      "http://nginx.org/download/$nginx.tar.gz",300,'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo."tar xvf $nginx.tar.gz",'__display__');
+   ($stdout,$stderr)=$handle->cwd($nginx);
+   ($stdout,$stderr)=$handle->cmd($sudo."mkdir -vp objs/lib",'__display__');
+   ($stdout,$stderr)=$handle->cwd("objs/lib");
+   ($stdout,$stderr)=$handle->cmd("wget -qO- https://ftp.pcre.org/pub/pcre/");
+   my %pcre=();
+   my %conv=(
+      Jan => 0, Feb => 1, Mar => 2, Apr => 3, May => 4, Jun => 5, Jul => 6,
+      Aug => 7, Sep => 8, Oct => 9, Nov => 10, Dec => 11
+   );
+   foreach my $line (split /\n/, $stdout) {
+      last unless $line;
+      $line=~/^.*?["](.*?)["].*(\d\d-\w\w\w-\d\d\d\d \d\d:\d\d).*(\d+\w).*$/;
+      my $file=$1;my $date=$2;my $size=$3;
+      next if $file=~/^pcre2|\.sig$|\.tar\.gz$|\.tar\.bz2$/;
+      next if $file!~/\.zip$/;
+      next unless $date;
+      $date=~/^(\d\d)-(\w\w\w)-(\d\d\d\d) (\d\d):(\d\d)$/;
+      my $day=$1;my $month=$2;my $year=$3;my $hour=$4,my $minute=$5;
+      my $timestamp=timelocal(0,$minute,$hour,$day,$conv{$month},--$year);
+      $pcre{$timestamp}=[$file,$size];
+   }
+   my $latest=(reverse sort keys %pcre)[0];
+   my $pcre=$pcre{$latest}->[0];
+   $pcre=~s/\.[^\.]+$//;
+   my $checksum='';
+   foreach my $cnt (1..3) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "wget --random-wait --progress=dot ".
+         "https://ftp.pcre.org/pub/pcre/$pcre.tar.gz",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "tar xvf $pcre.tar.gz",'__display__');
+      last unless $stderr;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "rm -rfv $pcre.tar.gz",'__display__');
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget -qO- http://zlib.net/index.html");
+   my $zlib_ver=$stdout;
+   my $sha__256=$stdout;
+   $zlib_ver=~s/^.*? source code, version (\d+\.\d+\.\d+).*$/$1/s;
+   $sha__256=~s/^.*?SHA-256 hash [<]tt[>](.*?)[<][\/]tt[>].*$/$1/s;
+   foreach my $count (1..3) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "wget --random-wait --progress=dot ".
+         "http://zlib.net/zlib-$zlib_ver.tar.gz",'__display__');
+      $checksum=$sha__256;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sha256sum -c - <<<\"$checksum zlib-$zlib_ver.tar.gz\"",
+         '__display__');
+      unless ($stderr) {
+         print(qq{ + CHECKSUM Test for zlib-$zlib_ver *PASSED* \n});
+         last
+      } elsif ($count>=3) {
+         print "FATAL ERROR! : CHECKSUM Test for ".
+               "zlib-$zlib_ver.tar.gz *FAILED* ",
+               "after $count attempts\n";
+         cleanup;
+      }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "rm -rvf zlib-$zlib_ver.tar.gz",'__display__');
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo."tar xvf zlib-$zlib_ver.tar.gz",
+      '__display__');
+   my $ossl='openssl-1.1.1c';
+   foreach my $count (1..3) {
+      $checksum='71b830a077276cbeccc994369538617a21bee808';
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "wget --random-wait --progress=dot ".
+         "https://www.openssl.org/source/$ossl.tar.gz",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sha1sum -c - <<<\"$checksum $ossl.tar.gz\"",'__display__');
+      unless ($stderr) {
+         print(qq{ + CHECKSUM Test for $ossl *PASSED* \n});
+         last
+      } elsif ($count>=3) {
+         print "FATAL ERROR! : CHECKSUM Test for $ossl.tar.gz *FAILED* ",
+               "after $count attempts\n";
+         cleanup;
+      }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "rm -rvf $ossl.tar.gz",'__display__');
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo."tar xvf $ossl.tar.gz",'__display__');
+   ($stdout,$stderr)=$handle->cwd('~/FullAutoAPI/deps');
+   # https://www.liberiangeek.net/2015/10/
+   # how-to-install-self-signed-certificates-on-nginx-webserver/
+   # https://www.hrupin.com/2017/07/how-to-automatically-restart-nginx
+   ($stdout,$stderr)=$handle->cwd("~/FullAutoAPI/deps/$nginx");
+   #
+   # echo-ing/streaming files over ssh can be tricky. Use echo -e
+   #          and replace these characters with thier HEX
+   #          equivalents (use an external editor for quick
+   #          search and replace - and paste back results.
+   #          use copy/paste or cat file and copy/paste results.):
+   #
+   #          !  -   \\x21     `  -  \\x60   * - \\x2A
+   #          "  -   \\x22     \  -  \\x5C
+   #          $  -   \\x24     %  -  \\x25
+   #
+   # https://www.lisenet.com/2014/ - bash approach to conversion
+   my $inet_d_script=<<'END';
+#\\x21/bin/sh
+#
+# nginx - this script starts and stops the nginx daemin
+#
+# chkconfig:   - 85 15
+# description:  Nginx is an HTTP(S) server, HTTP(S) reverse \
+#               proxy and IMAP/POP3 proxy server
+# processname: nginx
+# config:      /etc/nginx/nginx.conf
+# pidfile:     /var/run/nginx.pid
+# user:        nginx
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ \\x22\\x24NETWORKING\\x22 = \\x22no\\x22 ] && exit 0
+
+nginx=\\x22/usr/sbin/nginx\\x22
+prog=\\x24(basename \\x24nginx)
+
+NGINX_CONF_FILE=\\x22/etc/nginx/nginx.conf\\x22
+
+lockfile=/var/run/nginx.lock
+
+start() {
+    [ -x \\x24nginx ] || exit 5
+    [ -f \\x24NGINX_CONF_FILE ] || exit 6
+    echo -n \\x24\\x22Starting \\x24prog: \\x22
+    daemon \\x24nginx -c \\x24NGINX_CONF_FILE
+    retval=\\x24?
+    echo
+    [ \\x24retval -eq 0 ] && touch \\x24lockfile
+    return \\x24retval
+}
+
+stop() {
+    echo -n \\x24\\x22Stopping \\x24prog: \\x22
+    killproc \\x24prog -QUIT
+    retval=\\x24?
+    echo
+    [ \\x24retval -eq 0 ] && rm -f \\x24lockfile
+    return \\x24retval
+}
+
+restart() {
+    configtest || return \\x24?
+    stop
+    start
+}
+
+reload() {
+    configtest || return \\x24?
+    echo -n \\x24\\x22Reloading \\x24prog: \\x22
+    killproc \\x24nginx -HUP
+    RETVAL=\\x24?
+    echo
+}
+
+force_reload() {
+    restart
+}
+
+configtest() {
+  \\x24nginx -t -c \\x24NGINX_CONF_FILE
+}
+
+rh_status() {
+    status \\x24prog
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+case \\x22\\x241\\x22 in
+    start)
+        rh_status_q && exit 0
+        \\x241
+        ;;
+    stop)
+        rh_status_q || exit 0
+        \\x241
+        ;;
+    restart|configtest)
+        \\x241
+        ;;
+    reload)
+        rh_status_q || exit 7
+        \\x241
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+            ;;
+    *)
+        echo \\x24\\x22Usage: \\x240 {start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest}\\x22
+        exit 2
+esac
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$inet_d_script\" > ".
+      "~/nginx");
+   ($stdout,$stderr)=$handle->cmd($sudo.'mv -fv ~/nginx /etc/init.d',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v +x /etc/init.d/nginx',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo."chkconfig --add nginx");
+   ($stdout,$stderr)=$handle->cmd($sudo."chkconfig --level 345 nginx on");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'yum -y install certbot-nginx','__display__');
+   # https://www.digitalocean.com/community/tutorials/
+   # how-to-secure-nginx-with-let-s-encrypt-on-centos-7
+   my $make_nginx='./configure --user=www-data '.
+                  '--group=www-data '.
+                  "--prefix=$nginx_path/nginx ".
+                  '--sbin-path=/usr/sbin/nginx '.
+                  "--conf-path=$nginx_path/nginx/nginx.conf ".
+                  '--pid-path=/var/run/nginx.pid '.
+                  '--lock-path=/var/run/nginx.lock '.
+                  '--error-log-path=/var/log/nginx/error.log '.
+                  '--http-log-path=/var/log/nginx/access.log '.
+                  "--with-http_ssl_module --with-pcre=objs/lib/$pcre ".
+                  "--with-zlib=objs/lib/zlib-$zlib_ver ".
+                  '--with-http_gzip_static_module '.
+                  '--with-http_ssl_module '.
+                  '--with-file-aio '.
+                  '--with-http_realip_module '.
+                  '--without-http_scgi_module '.
+                  '--without-http_uwsgi_module '.
+                  '--with-http_v2_module';
+   ($stdout,$stderr)=$handle->cmd($sudo.$make_nginx,'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i 's/-Werror //' ./objs/Makefile");
+   ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+   # https://www.liberiangeek.net/2015/10/
+   # how-to-install-self-signed-certificates-on-nginx-webserver/
+   ($stdout,$stderr)=$handle->cmd($sudo."sed -i 's/1024/64/' ".
+      "$nginx_path/nginx/nginx.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i 's/worker_processes  1;/worker_processes  2;/' ".
+      "$nginx_path/nginx/nginx.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i '0,/root   html/{//d;}' $nginx_path/nginx/nginx.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i '0,/index  index.html/{//d;}' $nginx_path/nginx/nginx.conf");
+   $ad="            root ${home_dir}FullAutoAPI/root;%NL%".
+       '            index  index.php  index.html index.htm;%NL%'.
+       '            try_files $uri $uri/ /index.php?$args;';
+   $ad=<<END;
+sed -i '1,/location/ {/location/a\\\
+$ad
+}' $nginx_path/nginx/nginx.conf
+END
+   $handle->cmd_raw($sudo.$ad);
+   $ad='%NL%        location ~ .php$ {'.
+       "%NL%            root ${home_dir}FullAutoAPI/root;".
+       "%NL%            fastcgi_pass 127.0.0.1:9000;".
+       "%NL%            fastcgi_index index.php;".
+       "%NL%            fastcgi_param SCRIPT_FILENAME ".
+       '$document_root$fastcgi_script_name;'.
+       "%NL%            include fastcgi_params;".
+       '%NL%        }%NL%';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'/404/a$ad\' $nginx_path/nginx/nginx.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
+       "$nginx_path/nginx/nginx.conf");
+   foreach my $port (443,444,445,443) {
+      $avail_port=
+      `true &>/dev/null </dev/tcp/127.0.0.1/$port && echo open || echo closed`;
+      my $status=$avail_port;
+      $avail_port=$port;
+      chomp($status);
+      last if $status eq 'closed';
+   }
+   $ad='client_max_body_size 10M;';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'/octet-stream/i$ad\' $nginx_path/nginx/nginx.conf");
+   my $ngx="$nginx_path/nginx/nginx.conf";
+   $handle->cmd_raw(
+       "sed -i 's/\\(^client_max_body_size 10M;$\\\)/    \\1/' $ngx");
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #    "sed -i \'s/^        listen       80/        listen       ".
+   #    "\*:$avail_port ssl http2 default_server/\' ".
+   #    $nginx_path."/nginx/nginx.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i 's/SCRIPT_NAME/PATH_INFO/' ".
+       $nginx_path."/local/nginx/fastcgi_params");
+   $ad='# Catalyst requires setting PATH_INFO (instead of SCRIPT_NAME)'.
+       ' to \$fastcgi_script_name';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i \'/PATH_INFO/i$ad\' $nginx_path/nginx/fastcgi_params");
+   $ad='fastcgi_param  SCRIPT_NAME        /;';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i \'/PATH_INFO/a$ad\' $nginx_path/nginx/fastcgi_params");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
+      "$nginx_path/nginx/fastcgi_params");
+   #
+   # echo-ing/streaming files over ssh can be tricky. Use echo -e
+   #          and replace these characters with thier HEX
+   #          equivalents (use an external editor for quick
+   #          search and replace - and paste back results.
+   #          use copy/paste or cat file and copy/paste results.):
+   #
+   #          !  -   \\x21     `  -  \\x60   * - \\x2A
+   #          "  -   \\x22     \  -  \\x5C
+   #          $  -   \\x24     %  -  \\x25
+   #
+   # https://www.lisenet.com/2014/ - bash approach to conversion
+   my $script=<<END;
+use Net::FullAuto;
+\\x24Net::FullAuto::FA_Core::debug=1;
+my \\x24handle=connect_shell();
+\\x24handle->print('$nginx_path/nginx/nginx -g \\x22daemon on;\\x22');
+\\x24prompt=\\x24handle->prompt();
+my \\x24output='';my \\x24password_not_submitted=1;
+while (1) {
+   eval {
+      local \\x24SIG{ALRM} = sub { die \\x22alarm\\x5Cn\\x22 };# \\x5Cn required
+      alarm 10;
+      my \\x24output=fetch(\\x24handle);
+      last if \\x24output=~/\\x24prompt/;
+      print \\x24output;
+      if ((-1<index \\x24output,'Enter PEM pass phrase:') &&
+            \\x24password_not_submitted) {
+         \\x24handle->print(\\x24ARGV[0]);
+         \\x24password_not_submitted=0;
+      }
+   };
+   if (\\x24\@) {
+      \\x24handle->print();
+      next;
+   }
+}
+exit 0;
+END
+   if ($^O eq 'cygwin') {
+      ($stdout,$stderr)=$handle->cwd("~/WordPress");
+      my $vimrc=<<END;
+set paste
+set mouse-=a
+END
+      ($stdout,$stderr)=$handle->cmd("echo -e \"$vimrc\" > ~/.vimrc");
+      ($stdout,$stderr)=$handle->cmd("mkdir -vp script",'__display__');
+      ($stdout,$stderr)=$handle->cmd("touch script/start_nginx.pl");
+      ($stdout,$stderr)=$handle->cmd("chmod -v 755 script/start_nginx.pl",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd("chmod o+r $nginx_path/nginx/*",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd("chmod -v 755 $nginx_path/nginx/nginx.exe",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd("echo -e \"$script\" > ".
+         "script/start_nginx.pl");
+      ($stdout,$stderr)=$handle->cmd("cygrunsrv -I nginx_first_time ".
+         "-p /bin/perl -a ".
+         "\'${home_dir}WordPress/script/start_nginx.pl ".
+         "\"$service_and_cert_password\"'");
+      ($stdout,$stderr)=$handle->cmd("cygrunsrv --start nginx_first_time",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd("touch script/first_time_start.flag");
+   } else {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/server_name  localhost/".
+         "server_name $domain_url www.$domain_url/' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/#user  nobody;/user  www-data;/' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/#error_page  404              /404.html;/".
+         "error_page  404              /404.html;/' ".
+         "$nginx_path/nginx/nginx.conf");
+      ($stdout,$stderr)=$handle->cmd($sudo.'service nginx start',
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd("$nginx_path/nginx");
+      foreach my $num (1..3) {
+         sleep 3;
+         ($stdout,$stderr)=clean_filehandle($handle);
+         $handle->print($sudo.
+            "certbot --nginx -d $domain_url -d www.$domain_url");
+         $prompt=$handle->prompt();
+         my $output='';
+         while (1) {
+            $output.=fetch($handle);
+            last if $output=~/$prompt/;
+            print $output;
+            if (-1<index $output,'Attempt to reinstall') {
+               $handle->print('1');
+               $output='';
+            } elsif (-1<index $output,'No redirect') {
+               $handle->print('2');
+               $output='';
+            } elsif (-1<index $output,'Enter email address') {
+               $handle->print('brian.kelly@fullauto.com');
+               $output='';
+            } elsif (-1<index $output,'Terms of Service') {
+               $handle->print('A');
+               $output='';
+            } elsif (-1<index $output,'Would you be willing') {
+               $handle->print('Y');
+               $output='';
+            } elsif ((-1<index $output,'existing certificate')
+                  && (-1==index $output,'--duplicate')) {
+               $handle->print('C');
+               $output='';
+            }
+         }
+         ($stdout,$stderr)=clean_filehandle($handle);
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'grep Certbot /etc/nginx/nginx.conf');
+         last if $stdout;
+      }
+      # https://ssldecoder.org
+      ($stdout,$stderr)=$handle->cmd($sudo."service nginx restart",
+         '__display__');
+   }
+}
+$do=0;
 if ($do==1) { # NGINX
 print "DOING NGINX\n";
    # https://nealpoole.com/blog/2011/04/setting-up-php-fastcgi-and-nginx
@@ -1133,6 +1663,18 @@ END
    my $show=<<END;
 ########################################
 
+   INSTALLING autodie
+
+########################################
+END
+      print $show;
+      $handle->cmd_raw($sudo.
+         'perl -MCPAN -e \'CPAN::Shell->notest('.
+         '"install","autodie")\'',
+         '__display__');
+   $show=<<END;
+########################################
+
    INSTALLING Perl::Critic
 
 ########################################
@@ -1276,8 +1818,9 @@ END
       Math::Random::ISAAC::XS
       HTML::FormHandler
       Crypt::PassGen
-      Test::Aggregate
-      Test::Aggregate::Nested
+      #EXODIST/Test-Simple-1.001014.tar.gz
+      #Test::Aggregate
+      #Test::Aggregate::Nested
       Catalyst::Controller::HTML::FormFu
       HTML::FormHandler::Model::DBIC
       CatalystX::OAuth2
@@ -1294,29 +1837,32 @@ END
 
    # http://cygwin.1069669.n5.nabble.com/where-is-my-quot-usr-dict-
    # words-quot-or-quot-usr-share-dict-words-on-cygwin-1-7-td59328.html
-   my $words1="https://dl.fedoraproject.org/pub/fedora/linux/releases/26/".
-              "Server/x86_64/os/Packages/w/words-3.0-26.fc26.noarch.rpm";
-   #my $words1="ftp://fr2.rpmfind.net/linux/fedora/linux/releases/23/".
-   #      "Everything/i386/os/Packages/w/words-3.0-24.fc23.noarch.rpm";
-   my $words2="http://mirrors.maine.edu/Fedora/releases/23/Server/".
-         "x86_64/os/Packages/w/words-3.0-24.fc23.noarch.rpm";
    ($stdout,$stderr)=$handle->cwd('deps');
+   my $mirror='https://dl.fedoraproject.org/pub/fedora/linux/releases/';
+   # "http://mirrors.maine.edu/Fedora/releases/";
+   ($stdout,$stderr)=$handle->cmd($sudo."wget -qO- $mirror");
+   my @nums=();
+   foreach my $line (split /\n/, $stdout) {
+      next unless $line=~/DIR/;
+      $line=~/^.*DIR.*href=["](\d+)\/["].*$/;
+      my $num=$1;
+      next unless $num;
+      push @num, $num;
+   }
+   my $num=(reverse sort {$a<=>$b} @num)[0];
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".$words1,
+      "wget -qO- $mirror$num/Server/x86_64/os/Packages/w/");
+   $stdout=~s/^.*(words.*?rpm).*$/$1/s;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".
+      "$mirror$num/Server/x86_64/os/Packages/w/$stdout",
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "ls -1",'__display__');
-   unless ($stdout=~/words-/) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "wget --random-wait --progress=dot ".$words2,
-         '__display__');
-   }
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "chown -v $username:$username words-*.noarch.rpm",
+      "chown -v $username:$username words*.rpm",
       '__display__')
       if $^O ne 'cygwin';
    ($stdout,$stderr)=$handle->cmd(
-      "rpm2cpio words-*.noarch.rpm | \(cd /; cpio -idmv\)");
+      "rpm2cpio words*.rpm | \(cd /; cpio -idmv\)");
    ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v 755 /usr/share/dict/',
       '__display__');
    ($stdout,$stderr)=$handle->cwd("~/FullAutoAPI");
@@ -1369,20 +1915,20 @@ END
             "\"install\",\"$module\")\'"
          )
       } else {
-         $handle->{_cmd_handle}->print($sudo."cpan $module 2>&1");
+         $handle->print($sudo."cpan $module 2>&1");
       }
-      my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+      my $prompt=$handle->prompt();
       my $error=0;my $force=0;my $tries=0;my $allout='';
       while (1) {
          my $done=eval {
             local $SIG{ALRM} = sub { die "alarm\n" }; # \n required
             alarm 120;
-            my $output=Net::FullAuto::FA_Core::fetch($handle);
+            my $output=fetch($handle);
             $allout.=$output;
             if ($output=~/$prompt/) {
                if ($error) {
                   $error=0;$force=1;
-                  $handle->{_cmd_handle}->print($sudo.
+                  $handle->print($sudo.
                      'perl -MCPAN -e \'CPAN::Shell->force('.
                      "\"install\",\"$module\")\'"
                   )
@@ -1392,13 +1938,13 @@ END
                   return 'done';
                }
             } elsif ($output=~/build the XS Stash module/) {
-               $handle->{_cmd_handle}->print('y');
+               $handle->print('y');
             } elsif ($output=~/use the XS Stash by default/) {
-               $handle->{_cmd_handle}->print('y');
+               $handle->print('y');
             } elsif ($output=~/it permanently/) {
-               $handle->{_cmd_handle}->print('yes');
+               $handle->print('yes');
             } elsif ($output=~/from CPAN/) {
-               $handle->{_cmd_handle}->print('yes');
+               $handle->print('yes');
             }
             if (!$force &&
                   ((-1<index $allout,'[test_dynamic] Error 255') ||
@@ -1421,10 +1967,10 @@ END
             &Net::FullAuto::FA_Core::cleanup;
          } elsif ($@ && ++$tries<4) {
             alarm(0);$allout='';
-            $handle->{_cmd_handle}->print("\003");
+            $handle->print("\003");
             my $done=eval {
                local $SIG{ALRM} = sub { die "alarm\n" }; # \n required
-               while (my $ln=$handle->{_cmd_handle}->get) {
+               while (my $ln=fetch($handle)) {
                   return 'done' if $ln=~/$prompt/s;
                }
             };
@@ -4001,8 +4547,9 @@ my $standup_fullautoapi=sub {
 
    my $catalyst="]T[{select_fullautoapi_setup}";
    my $password="]I[{'enter_password',1}";
+   my $domain_url="]I[{'domain_url',1}";
    my $cnt=0;
-   $configure_fullautoapi->($catalyst,$password);
+   $configure_fullautoapi->($catalyst,$password,$domain_url);
    return '{choose_demo_setup}<';
 
 };
@@ -4157,6 +4704,61 @@ END
 
 };
 
+our $domain_url=sub {
+
+   package domain_url;
+   use Net::FullAuto;
+   my $handle=connect_shell();
+   my ($stdout,$stderr)=$handle->cmd("wget -qO- http://icanhazip.com");
+   my $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
+   unless ($public_ip) {
+      require Sys::Hostname;
+      import Sys::Hostname;
+      require Socket;
+      import Socket;
+      my($addr)=inet_ntoa((gethostbyname(Sys::Hostname::hostname))[4]);
+      $public_ip=$addr if $addr=~/^\d+\.\d+\.\d+\.\d+\s*/s;
+   }
+   chomp($public_ip);
+   $public_ip='127.0.0.1' unless $public_ip;
+
+   my $domain_url_banner=<<'END';
+
+    ___                 _        _   _ ___ _
+   |   \ ___ _ __  __ _(_)_ _   | | | | _ \ |
+   | |) / _ \ '  \/ _` | | ' \  | |_| |   / |__
+   |___/\___/_|_|_\__,_|_|_||_|  \___/|_|_\____|
+
+
+END
+   $domain_url_banner.=<<END;
+   Type or paste the domain url for the site:
+
+   *** A properly registered domain url is necessary! ***
+
+   Make sure the DNS A/AAAA record(s) for this domain
+   contain(s) this IP address --> $public_ip
+
+
+   Domain URL
+                ]I[{1,'fullautosoftware.net',46}
+
+END
+
+   my $domain_url={
+
+      Name => 'domain_url',
+      Input => 1,
+      Result => $choose_strong_password,
+      #Result =>
+   #$Net::FullAuto::ISets::Local::WordPress_is::select_wordpress_setup,
+      Banner => $domain_url_banner,
+
+   };
+   return $domain_url;
+
+};
+
 our $select_fullautoapi_setup=sub {
 
    my @options=('FullAuto Automation API on This Host');
@@ -4186,7 +4788,7 @@ END
          Text => ']C[',
          Convey => \@options,
          #Result => $standup_fullautoapi,
-         Result => $choose_strong_password,
+         Result => $domain_url,
 
       },
       Scroll => 1,

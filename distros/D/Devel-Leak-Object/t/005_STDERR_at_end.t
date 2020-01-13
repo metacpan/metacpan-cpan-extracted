@@ -7,7 +7,7 @@ use File::Temp qw(tempfile);
 
 (undef, my $temp) = tempfile();
 
-system(qq{ $^X -Mblib -MDevel::Leak::Object=GLOBAL_bless -e '\$foo=bless({},FOO);\$foo->{foo}=\$foo' 2> $temp });
+system(qq{ $^X -Ilib -MDevel::Leak::Object=GLOBAL_bless -e '\$foo=bless({},FOO);\$foo->{foo}=\$foo' 2> $temp });
 
 open(FILE, $temp) || die("Can't read $temp\n");
 my $preamble = <FILE>;

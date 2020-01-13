@@ -16,7 +16,7 @@ use Chart::Plotly::Trace::Sunburst::Stream;
 use Chart::Plotly::Trace::Sunburst::Textfont;
 use Chart::Plotly::Trace::Sunburst::Transform;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: Visualize hierarchal data spanning outward radially from root to leaves. The sunburst sectors are determined by the entries in *labels* or *ids* and in *parents*.
 
@@ -134,6 +134,13 @@ has idssrc => ( is            => "rw",
 
 has insidetextfont => ( is  => "rw",
                         isa => "Maybe[HashRef]|Chart::Plotly::Trace::Sunburst::Insidetextfont", );
+
+has insidetextorientation => (
+    is  => "rw",
+    isa => enum( [ "horizontal", "radial", "tangential", "auto" ] ),
+    documentation =>
+      "Determines the orientation of text inside slices. With *auto* the texts may automatically be rotated to fit with the maximum size inside the slice. Using *horizontal* option forces text to be horizontal. Using *radial* option forces text to be radial. Using *tangential* option forces text to be tangential.",
+);
 
 has labels => ( is            => "rw",
                 isa           => "ArrayRef|PDL",
@@ -287,7 +294,7 @@ Chart::Plotly::Trace::Sunburst - Visualize hierarchal data spanning outward radi
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -411,6 +418,10 @@ Sets the source reference on plot.ly for  ids .
 
 =item * insidetextfont
 
+=item * insidetextorientation
+
+Determines the orientation of text inside slices. With *auto* the texts may automatically be rotated to fit with the maximum size inside the slice. Using *horizontal* option forces text to be horizontal. Using *radial* option forces text to be radial. Using *tangential* option forces text to be tangential.
+
 =item * labels
 
 Sets the labels of each of the sectors.
@@ -511,7 +522,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

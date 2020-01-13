@@ -34,6 +34,14 @@ XML::Invisible - transform "invisible XML" documents into XML using a grammar
       'print ast2xml(make_parser(join "", <>)->("(a+b)"))->toStringC14N(1)' \
       examples/arith-grammar.ixml | xml_pp
 
+    # canonicalise a document
+    use XML::Invisible qw(make_parser make_canonicaliser);
+    my $ixml_grammar = from_file('examples/arith-grammar.ixml');
+    my $transformer = make_parser($ixml_grammar);
+    my $ast = $transformer->(from_file($ixml_input));
+    my $canonicaliser = make_canonicaliser($ixml_grammar);
+    my $canonical = $canonicaliser->($ast);
+
 # DESCRIPTION
 
 An implementation of Steven Pemberton's Invisible XML concept, using
@@ -110,6 +118,33 @@ version 0.05 of this module is only a suggested dependency, not required.
 Arguments:
 
 - an AST from [XML::Invisible::Receiver](https://metacpan.org/pod/XML::Invisible::Receiver)
+
+## make\_canonicaliser
+
+Exportable. Returns a function that when called with an AST as produced
+from a document by a ["make\_parser"](#make_parser), returns a canonical version of
+the original document, or `undef` if it failed.
+
+Arguments:
+
+- an XML::Invisible grammar
+
+It uses a few heuristics:
+
+- literals that are 0-1 (`?`) or any number (`*`) will be omitted
+- literals that are at least one (`+`) will be inserted once
+- if an "any" group is given, the first one that matches will be selected
+
+    This last one means that if you want a canonical representation that is
+    not the bare minimum, provide that as a literal first choice (see the
+    `assign` rule below - while it will accept any or no whitespace, the
+    "canonical" version is given):
+
+        expr: target .assign source
+        target: +name
+        assign: ' = ' | (- EQUAL -)
+        source: -name
+        name: /( ALPHA (: ALPHA | DIGIT )* )/
 
 # DEBUGGING
 

@@ -1,5 +1,5 @@
 package Test::Count::Lib;
-$Test::Count::Lib::VERSION = '0.1001';
+$Test::Count::Lib::VERSION = '0.1101';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ __END__
 
 =head1 VERSION
 
-version 0.1001
+version 0.1101
 
 =head1 NAME
 
@@ -85,7 +85,7 @@ Copyright 2011 Shlomi Fish.
 
 This program is released under the following license: MIT X11.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -119,14 +119,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Count>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Test-Count>
 
 =item *
 
@@ -201,7 +193,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2006 by Shlomi Fish.
 
 This is free software, licensed under:
 

@@ -1,3 +1,19 @@
+v0.110.4 2020-01-13T13:36:20Z
+ - env build updated
+
+v0.110.3 2020-01-11T11:47:05Z
+ - pcore deploy --no-deps option added
+ - scripts updated
+ - arbitrator const removed
+ - app tmpl updated
+ - updated
+
+v0.110.2 2020-01-11T09:26:02Z
+ - resources updated
+ - app tmpl updated
+ - api empty password is forbidden
+ - string quote
+
 v0.110.1 2020-01-06T15:22:08Z
  - resources updated
  - commit

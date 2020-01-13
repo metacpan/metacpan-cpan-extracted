@@ -36,11 +36,11 @@ Config::ENV::Multi - Config::ENV supported Multi ENV
 
 # DESCRIPTION
 
-supported multi environment [Config::ENV](https://metacpan.org/pod/Config::ENV).
+supported multi environment [Config::ENV](https://metacpan.org/pod/Config%3A%3AENV).
 
 # SEE ALSO
 
-[Config::ENV](https://metacpan.org/pod/Config::ENV)
+[Config::ENV](https://metacpan.org/pod/Config%3A%3AENV)
 
 # LICENSE
 

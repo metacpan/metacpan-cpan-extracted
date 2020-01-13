@@ -1,28 +1,32 @@
 Revision history for Perl module Devel-Leak-Object
 
-1.01 Wed 16 Jun 2010
+1.02      2020-01-11 06:49:29Z
+        - converted packaging to Dist::Zilla
+        - fix tests to avoid conflicts with other installed modules (RT#131249)
+
+1.01      2010-06-16
 	- Upgraded to Module::Install::DSL 0.99
 	- warn rather than die for objects that don't conform to our assumptions
 	- list tracked source line only once
 	- list the next caller in the stack if bless is called by the class's new()
 	- add a checkpoint() status which lists new classes created (and not destroyed) since the last call to checkpoint()
 
-1.00 Thu 22 Oct 2009
+1.00      2009-10-22
 	- Upgrading to Module::Install::DSL 0.91
 	- Switching to a prod version (finally)
 	- Optionally track where leaked objects come from
 	- Fix dumping to STDERR at END (previously dumped to STDOUT)
 	- Tests for that
 
-0.92 Tue 11 Dec 2007
+0.92      2007-12-11
 	- Updating to Module::Install 0.68
 	- Updating to newer bundled tests
 
-0.91 Fri 14 Sep 2007
+0.91      2007-09-14
 	- Lexically disable warnings when overwriting DESTROY methods
 	- Fixing a test
 
-0.90 Wed 29 Aug 2007
+0.90      2007-08-29
 	- MAJOR RELEASE: NOW WITH 38% ALL NEW EVIL!!!
 	- Taken over maintenance and rewritten from scratch, using Scalar::Util
 	- Now supports all types of objects, including IO and REF
@@ -30,9 +34,9 @@ Revision history for Perl module Devel-Leak-Object
 	- Support a couple more evil corner cases relating to SUPER::DESTROY
 	- Accelerated and cached the DESTROY-time search for the DESTROY super-method
 
-0.02 Tue Sep 21  2004
+0.02      2004-09-21
 	- Remove call to Hook::LexWrap as this is not what is needed in
 	this module. Do own wrapping.
 
-0.01 Sat Sep 11  2004
+0.01      2004-09-11
 	- Initial version.

@@ -1,11 +1,9 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use utf8;
 use warnings;
 
-# Modules.
 use Map::Tube::Bucharest;
 
 # Object.

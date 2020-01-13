@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Mesh3d::Lighting;
 use Chart::Plotly::Trace::Mesh3d::Lightposition;
 use Chart::Plotly::Trace::Mesh3d::Stream;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: Draws sets of triangles with coordinates given by three 1-dimensional arrays in `x`, `y`, `z` and (1) a sets of `i`, `j`, `k` indices (2) Delaunay triangulation or (3) the Alpha-shape algorithm or (4) the Convex-hull algorithm
 
@@ -206,9 +206,16 @@ has idssrc => ( is            => "rw",
                 documentation => "Sets the source reference on plot.ly for  ids .",
 );
 
-has intensity => ( is            => "rw",
-                   isa           => "ArrayRef|PDL",
-                   documentation => "Sets the vertex intensity values, used for plotting fields on meshes",
+has intensity => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Sets the intensity values for vertices or cells as defined by `intensitymode`. It can be used for plotting fields on meshes.",
+);
+
+has intensitymode => ( is            => "rw",
+                       isa           => enum( [ "vertex", "cell" ] ),
+                       documentation => "Determines the source of `intensity` values.",
 );
 
 has intensitysrc => ( is            => "rw",
@@ -243,6 +250,13 @@ has k => (
 has ksrc => ( is            => "rw",
               isa           => "Str",
               documentation => "Sets the source reference on plot.ly for  k .",
+);
+
+has legendgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
 );
 
 has lighting => ( is  => "rw",
@@ -286,6 +300,12 @@ has scene => (
     is => "rw",
     documentation =>
       "Sets a reference between this trace's 3D coordinate system and a 3D scene. If *scene* (the default value), the (x,y,z) coordinates refer to `layout.scene`. If *scene2*, the (x,y,z) coordinates refer to `layout.scene2`, and so on.",
+);
+
+has showlegend => (
+               is            => "rw",
+               isa           => "Bool",
+               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
 );
 
 has showscale => ( is            => "rw",
@@ -418,7 +438,7 @@ Chart::Plotly::Trace::Mesh3d - Draws sets of triangles with coordinates given by
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -584,7 +604,11 @@ Sets the source reference on plot.ly for  ids .
 
 =item * intensity
 
-Sets the vertex intensity values, used for plotting fields on meshes
+Sets the intensity values for vertices or cells as defined by `intensitymode`. It can be used for plotting fields on meshes.
+
+=item * intensitymode
+
+Determines the source of `intensity` values.
 
 =item * intensitysrc
 
@@ -609,6 +633,10 @@ A vector of vertex indices, i.e. integer values between 0 and the length of the 
 =item * ksrc
 
 Sets the source reference on plot.ly for  k .
+
+=item * legendgroup
+
+Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
 
 =item * lighting
 
@@ -637,6 +665,10 @@ Reverses the color mapping if true. If true, `cmin` will correspond to the last 
 =item * scene
 
 Sets a reference between this trace's 3D coordinate system and a 3D scene. If *scene* (the default value), the (x,y,z) coordinates refer to `layout.scene`. If *scene2*, the (x,y,z) coordinates refer to `layout.scene2`, and so on.
+
+=item * showlegend
+
+Determines whether or not an item corresponding to this trace is shown in the legend.
 
 =item * showscale
 
@@ -716,7 +748,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

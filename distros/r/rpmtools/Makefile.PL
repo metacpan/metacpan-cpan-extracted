@@ -3,7 +3,7 @@
 use strict;
 use ExtUtils::MakeMaker;
 
-my $rpmtools_version = "7.10";
+my $rpmtools_version = "7.11";
 
 # where to find the rpm utility
 
@@ -36,7 +36,6 @@ WriteMakefile(
     CCFLAGS	    => '-Wall',
     INC		    => '',
     LIBS	    => [ '' ],
-    INSTALLDIRS	    => 'vendor',
     PREREQ_PM		=> {
 	'ExtUtils::MakeMaker'	=> '0',
 	'Getopt::Long'		=> '0',

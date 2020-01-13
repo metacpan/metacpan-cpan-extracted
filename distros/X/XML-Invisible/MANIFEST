@@ -9,6 +9,10 @@ README.md
 t/00-report-prereqs.t
 t/language-parser.t
 t/lib/JTTest.pm
+t/reverse.t
+t/snapshots/language-parser_t/arithmetic
+t/snapshots/language-parser_t/flatten
+t/snapshots/language-parser_t/pre-flatten
 xt/manifest.t
 xt/pod-coverage.t
 xt/pod.t

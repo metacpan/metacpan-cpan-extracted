@@ -1,0 +1,58 @@
+{
+   "abstract" : "Interface to Lingua::EN::Inflexion module",
+   "author" : [
+      "Pete Houston <cpan@openstrike.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Plugin-Lingua-EN-Inflexion",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::EN::Inflexion" : "0.001008",
+            "Template" : "2.24",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.41"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Template-Plugin-Lingua-EN-Inflexion"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://gitlab.com/openstrike/template-inflexion.git",
+         "web" : "https://gitlab.com/openstrike/template-inflexion"
+      }
+   },
+   "version" : "0.01"
+}

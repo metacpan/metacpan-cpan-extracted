@@ -1,49 +1,51 @@
+0.036 2020-01-13 10:00:00+0000  
+  - Update to plotly.js v1.52.0
 0.035 2019-12-16 20:00:00+0000  
-  - Update to plotly.js 1.51.3
+  - Update to plotly.js v1.51.3
 0.034 2019-12-05 20:00:00+0000  
   - Fix Devel::IPerl tests when not available on older perls
 0.033 2019-12-01 20:00:00+0000  
   - Integrate Devel::IPerl::Plugin in this package 
 0.032 2019-11-27 20:00:00+0000  
   - Change orca correct check to use long options (the orca docker container doesn't support -h) 
-  - Update to plotly.js 1.51.2
+  - Update to plotly.js v1.51.2
 0.031 2019-11-24 20:00:00+0000  
   - Add information functions about plotly.js use
 0.030 2019-11-08 17:00:00+0000  
-  - Update to plotly.js 1.51.1
+  - Update to plotly.js v1.51.1
   - Add new trace type: image
 0.029 2019-10-09 19:00:00+0000  
-  - Update to plotly.js 1.50.0
+  - Update to plotly.js v1.50.0
   - Add new trace type: treemap
 0.028 2019-10-01 19:00:00+0000  
-  - Update to plotly.js 1.49.4
+  - Update to plotly.js v1.49.4
   - Add new trace type: indicator, choroplethmapbox, densitymapbox
 0.027 2019-06-22 20:30:00+0000
-  - Update to plotly.js 1.48.3
+  - Update to plotly.js v1.48.3
   - Add method Chart::Plotly::Plot->from_json to deserialize from json dumps
   - Now using Plotly.react instead of Plotly.plot
   - Add support for config options
 0.026 2019-06-03 22:00:00+0000 
-  - Update to plotly.js 1.48.1
+  - Update to plotly.js v1.48.1
   - Add new trace types: funnel, funnelarea
   - Add support for 'meta' plotly attribute as 'pmeta' to avoid collision with MOP
 0.025 2019-04-23 23:00:00+0000 
   - Fix probleam with the release process
 0.024 2019-04-23 22:00:00+0000 
-  - Update to plotly.js 1.47.3
+  - Update to plotly.js v1.47.3
   - Add new trace types: isosurface, sunburst, volume, waterfall
   - Fix configure dependencies
   - Fix type constraint issue for attributes of type color
 0.023 2019-01-20 22:00:00+0000
-  - Update to plotly.js 1.43.1
+  - Update to plotly.js v1.43.1
   - Several improvements to Chart::Plotly::Image::Orca
 0.022 2019-01-03 22:35:00+0000
   - Ships a local copy of plotly.js and add support for using that copy
 0.021 2018-12-23 20:00:00+0000
-  - Update to plotly.js 1.43.1
+  - Update to plotly.js v1.43.1
   - Add new trace types: barpolar, streamtube, parcats
 0.019 2018-05-04 20:00:00+0000
-  - Update to plotly.js 1.37.1
+  - Update to plotly.js v1.37.1
 0.016 2018-04-01 19:34:00+0000
   - Add method to know the plotly.js version used 
   - Add screenshots of examples to the documentation
@@ -52,7 +54,7 @@
 0.014 2018-03-31 20:22:00+0000
   -INCOMPATIBLE CHANGE: Chart::Plotly::Trace::Attribute::* classes were moved to the corresponding trace,
     for example: Chart::Plotly::Trace::Attribute::Marker now is a clase per trace: Chart::Plotly::Trace::Scatter::Marker
-  -Update to plotly version 1.35.2
+  -Update to plotly version v1.35.2
   -Add new trace types: violin, area, carpet, contourcarpet, parcoords, sankey, scattercarpet, scatterpolar, scatterpolargl, table
   -Improve tool to generate Moose classes
 0.011 2017-01-15 17:19:00+0000

@@ -64,7 +64,7 @@
          "web" : "https://github.com/ology/Music-Duration-Partition"
       }
    },
-   "version" : "0.0304",
+   "version" : "0.0305",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -462,6 +462,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }
 

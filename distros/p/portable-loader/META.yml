@@ -26,27 +26,27 @@ optional_features: {}
 provides:
   portable::alias:
     file: lib/portable/alias.pm
-    version: '0.002'
+    version: '0.003'
   portable::lib:
     file: lib/portable/lib.pm
-    version: '0.002'
+    version: '0.003'
   portable::loader:
     file: lib/portable/loader.pm
-    version: '0.002'
+    version: '0.003'
   portable::loader::JSON:
     file: lib/portable/loader/JSON.pm
-    version: '0.002'
+    version: '0.003'
   portable::loader::Perl:
     file: lib/portable/loader/Perl.pm
-    version: '0.002'
+    version: '0.003'
   portable::loader::TOML:
     file: lib/portable/loader/TOML.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   FindBin: '0'
   JSON::Eval: '0'
   Module::Pluggable: '0'
-  MooX::Press: '0.010'
+  MooX::Press: '0.019'
   TOML::Parser: '0.08'
   perl: '5.008008'
 resources:
@@ -55,6 +55,6 @@ resources:
   homepage: https://metacpan.org/release/portable-loader
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-portable-loader.git
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

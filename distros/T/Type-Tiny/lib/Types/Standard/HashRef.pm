@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::HashRef::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::HashRef::VERSION   = '1.008001';
+	$Types::Standard::HashRef::VERSION   = '1.008003';
 }
 
 $Types::Standard::HashRef::VERSION =~ tr/_//d;
@@ -199,7 +199,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "FindBin" => 0,
     "IO::File" => 0,
+    "List::Util" => 0,
     "Storable" => 0,
     "Sys::Syslog" => 0,
     "Test::Builder" => 0,
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.707",
+  "VERSION" => "1.708",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,6 +59,7 @@ my %FallbackPrereqs = (
   "IO::File" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => 0,
   "Storable" => 0,
   "Sys::Syslog" => 0,
   "Test::Builder" => 0,

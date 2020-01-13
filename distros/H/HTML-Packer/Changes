@@ -1,5 +1,8 @@
 Revision history for HTML-Packer
 
+2.10       2020-01-13
+    - Merge GH #17: add support for Embedded ECMAScript Modules (thanks to ankitpati)
+
 2.09       2019-07-17
     - Merge GH #16: add support for CSP (thanks to ankitpati)
 

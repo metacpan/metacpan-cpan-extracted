@@ -1,0 +1,22 @@
+{
+  'attributes' => {
+    'close' => ')',
+    'open' => '(',
+    'sign' => '+'
+  },
+  'children' => [
+    {
+      'attributes' => {
+        'name' => 'a'
+      },
+      'nodename' => 'left'
+    },
+    {
+      'children' => [
+        'b'
+      ],
+      'nodename' => 'right'
+    }
+  ],
+  'nodename' => 'expr'
+}

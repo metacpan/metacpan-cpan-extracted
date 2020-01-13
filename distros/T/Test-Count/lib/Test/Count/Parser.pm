@@ -1,19 +1,19 @@
 package Test::Count::Parser;
-$Test::Count::Parser::VERSION = '0.1001';
+$Test::Count::Parser::VERSION = '0.1101';
 use warnings;
 use strict;
 
-use base 'Test::Count::Base';
+use parent 'Test::Count::Base';
 
 use File::Basename (qw(dirname));
 
-use Parse::RecDescent;
+use Parse::RecDescent ();
 
 
 sub _get_grammar
 {
     return <<'EOF';
-update_count: expression            {$thisparser->{count} += $item[1]}
+update_count: expression            {$thisparser->{count} += $item[1] * $thisparser->{filter_mults}->[-1]}
 
 assignments:    statement <commit> ';' assignments
               | statement
@@ -21,6 +21,12 @@ assignments:    statement <commit> ';' assignments
 statement:    assignment
               | expression               {$item [1]}
               | including_file           {$item [1]}
+              | start_filter
+              | end_filter
+
+start_filter: 'FILTER(MULT(' expression '))' {push @{$thisparser->{filter_mults}}, $thisparser->{filter_mults}->[-1] * $item[2] ; }
+
+end_filter: 'ENDFILTER()' {if (@{$thisparser->{filter_mults}} <= 1) { die "Too many ENDFILTER()s"; } pop @{$thisparser->{filter_mults}}; }
 
 including_file: 'source' string          {push @{$thisparser->{includes}}, $item[2];}
 
@@ -63,9 +69,10 @@ sub _calc_parser
 
     my $parser = Parse::RecDescent->new( $self->_get_grammar() );
 
-    $parser->{vars}     = {};
-    $parser->{count}    = 0;
-    $parser->{includes} = [];
+    $parser->{vars}         = {};
+    $parser->{count}        = 0;
+    $parser->{includes}     = [];
+    $parser->{filter_mults} = [1];
 
     return $parser;
 }
@@ -191,11 +198,11 @@ __END__
 
 =head1 VERSION
 
-version 0.1001
+version 0.1101
 
 =head1 SYNOPSIS
 
-    use Test::Count::Parser;
+    use Test::Count::Parser ();
 
     my $parser = Test::Count::Parser->new();
 
@@ -260,10 +267,6 @@ You can also look for information at:
 
 =over 4
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test::Count>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Test::Count>
@@ -291,7 +294,7 @@ Copyright 2006 Shlomi Fish.
 
 This program is released under the following license: MIT X11.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -325,14 +328,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Count>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Test-Count>
 
 =item *
 
@@ -407,7 +402,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2006 by Shlomi Fish.
 
 This is free software, licensed under:
 

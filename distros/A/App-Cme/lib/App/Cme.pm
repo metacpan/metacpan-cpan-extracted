@@ -1,14 +1,14 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2018 by Dominique Dumont.
+# This software is Copyright (c) 2014-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package App::Cme ;
-$App::Cme::VERSION = '1.030';
+$App::Cme::VERSION = '1.031';
 use strict;
 use warnings;
 use 5.10.1;
@@ -19,7 +19,7 @@ use App::Cmd::Setup -app;
 
 1;
 
-# ABSTRACT: Check or edit configuration data with Config::Model
+# ABSTRACT: Configuration data checker or editor based on Config::Model
 
 __END__
 
@@ -29,11 +29,11 @@ __END__
 
 =head1 NAME
 
-App::Cme - Check or edit configuration data with Config::Model
+App::Cme - Configuration data checker or editor based on Config::Model
 
 =head1 VERSION
 
-version 1.030
+version 1.031
 
 =head1 AUTHOR
 
@@ -41,13 +41,13 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2018 by Dominique Dumont.
+This software is Copyright (c) 2014-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 
   The GNU Lesser General Public License, Version 2.1, February 1999
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -65,14 +65,6 @@ Search CPAN
 The default CPAN search engine, useful to view POD in HTML format.
 
 L<http://search.cpan.org/dist/App-Cme>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Cme>
 
 =item *
 

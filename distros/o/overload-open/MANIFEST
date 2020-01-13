@@ -3,12 +3,18 @@ lib/overload/open.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
+open.bs
+open.c
+open.o
 open.xs
 ppport.h
+prepare.sh
 README.pod
 t/00-use.t
 t/01-callback.t
 t/02-record-opened.t
 t/03-disable-xs-functions.t
+t/04-record-opened.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

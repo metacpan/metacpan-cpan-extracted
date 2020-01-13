@@ -5,7 +5,7 @@ use warnings;
 package Log::Any;
 
 # ABSTRACT: Bringing loggers and listeners together
-our $VERSION = '1.707';
+our $VERSION = '1.708';
 
 use Log::Any::Manager;
 use Log::Any::Proxy::Null;
@@ -134,7 +134,7 @@ Log::Any - Bringing loggers and listeners together
 
 =head1 VERSION
 
-version 1.707
+version 1.708
 
 =head1 SYNOPSIS
 
@@ -475,7 +475,7 @@ Stephen Thirlwall <sdt@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords bj5004 cm-perl Karen Etheridge Konstantin S. Uvarin Lucas Kanashiro Maros Kollar Maxim Vuets mephinet Nick Tonkin Paul Durden Philipp Gortan Phill Legault Shlomi Fish
+=for stopwords bj5004 cm-perl Jonathan Karen Etheridge Konstantin S. Uvarin Lucas Kanashiro Maros Kollar Maxim Vuets mephinet Michael Conrad Nick Tonkin Paul Durden Philipp Gortan Phill Legault Shlomi Fish
 
 =over 4
 
@@ -486,6 +486,10 @@ bj5004 <bartosz.jakubski@hurra.com>
 =item *
 
 cm-perl <cm-perl@users.noreply.github.com>
+
+=item *
+
+Jonathan <jjrs.pam+github@gmail.com>
 
 =item *
 
@@ -510,6 +514,10 @@ Maxim Vuets <maxim.vuets@booking.com>
 =item *
 
 mephinet <mephinet@gmx.net>
+
+=item *
+
+Michael Conrad <mconrad@intellitree.com>
 
 =item *
 

@@ -6,6 +6,7 @@ requires "Fcntl" => "0";
 requires "File::Basename" => "0";
 requires "FindBin" => "0";
 requires "IO::File" => "0";
+requires "List::Util" => "0";
 requires "Storable" => "0";
 requires "Sys::Syslog" => "0";
 requires "Test::Builder" => "0";

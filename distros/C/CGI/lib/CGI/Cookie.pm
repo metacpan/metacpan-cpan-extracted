@@ -5,7 +5,7 @@ use warnings;
 
 use if $] >= 5.019, 'deprecate';
 
-our $VERSION='4.44';
+our $VERSION='4.45';
 
 use CGI::Util qw(rearrange unescape escape);
 use overload '""' => \&as_string, 'cmp' => \&compare, 'fallback' => 1;
@@ -230,7 +230,7 @@ sub httponly { # HttpOnly
     return $self->{'httponly'};
 }
 
-my %_legal_samesite = ( Strict => 1, Lax => 1 );
+my %_legal_samesite = ( Strict => 1, Lax => 1, None => 1 );
 sub samesite { # SameSite
     my $self = shift;
     my $samesite = ucfirst lc +shift if @_; # Normalize casing.

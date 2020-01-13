@@ -1,5 +1,3 @@
-use Arbitrator::Const qw[:ALL];
-
 <<'SQL'
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 

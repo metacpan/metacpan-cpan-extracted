@@ -13,11 +13,32 @@ use Cwd;
 use Data::Dump;
 use Scalar::Util;
 
+# TODO update
 # TODO Use enum names
 # TODO Use enums with JSON::false and JSON::true and number
 # TODO Types: color, subplotid, angle, colorscale
 # TODO Add defaults?
 # TODO Add support for items
+
+
+my ($opt, $usage) = describe_options($0 . '%o',
+   ['plotlyjs_version|p=s', 'Plotly.js version to generate from', {required => 1}],
+   ['temp_path|t=s', 'Temporary path to checkout plotly.js and switch to plotlyjs version', {default => 'plotlyjsrepository'}],
+   [],
+   ['help', 'Display help and exit']
+);
+
+print($usage->text), exit if $opt->help;
+
+
+my $plotlyjs_base_path = path($opt->temp_path);
+if (!$plotlyjs_base_path->exists) {
+    system("git clone https://github.com/plotly/plotly.js " . $plotlyjs_base_path);
+} else {
+    system("cd $plotlyjs_base_path && git checkout master && git pull origin");
+}
+# TODO check that this went well
+system("cd $plotlyjs_base_path && git checkout " . $opt->plotlyjs_version);
 
 my $moose_type_for = {
     any        => 'Any',
@@ -33,7 +54,7 @@ my $moose_type_for = {
 };
 my $template = path("template/trace.tmpl")->slurp_utf8();
 my $attribute_template = path("template/attribute.tmpl")->slurp_utf8();
-my $plotly_js_dist_path = path("../plotly.js/dist");
+my $plotly_js_dist_path = $plotlyjs_base_path->child("dist");
 my $current_dir = cwd;
 my $types_without_moose_equivalent = {};
 
@@ -47,6 +68,26 @@ for my $trace_name (sort keys %$traces_schema) {
 }
 
 print "Types without Moose equivalent: \n" . join("\n", sort keys %$types_without_moose_equivalent) . "\n";
+
+$plotly_js_dist_path->child('plotly.min.js')->copy(path($current_dir)->child('share')->child('plotly.js'));
+$plotlyjs_base_path->child('LICENSE')->copy(path($current_dir)->child('share')->child('plotly.js'));
+my $changes_file = path('Changes');
+my @changes = $changes_file->lines;
+if (!grep /\Q$opt->plotlyjs_version\E/, @changes) {
+    unshift @changes, '  - Update to plotly.js ' . $opt->plotlyjs_version . "\n";
+    $changes_file->spew(@changes);
+}
+
+my $plotlypm_file = path('lib')->child('Chart')->child('Plotly.pm');
+$plotlypm_file->edit_lines(sub {
+        if (/\s+return '([0-9.]+)'; # plotlyjs_version_tag$/) {
+            my $version = $opt->plotlyjs_version;
+            $version =~ s/v//;
+            $_ = "    return '$version'; # plotlyjs_version_tag\n";
+        }
+    });
+
+
 
 sub FieldsAST {
     my $fields_schema = shift();

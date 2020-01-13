@@ -29,7 +29,7 @@ use XML::LibXML::XPathContext;
 use IO::Handle; # for FH reads called as methods
 
 BEGIN {
-$VERSION = "2.0201"; # VERSION TEMPLATE: DO NOT CHANGE
+$VERSION = "2.0202"; # VERSION TEMPLATE: DO NOT CHANGE
 $ABI_VERSION = 2;
 require Exporter;
 require DynaLoader;
@@ -261,7 +261,7 @@ use constant {
   HTML_PARSE_NOERROR  => (1<<5),       # suppress error reports
 };
 
-$XML_LIBXML_PARSE_DEFAULTS = ( XML_PARSE_NODICT | XML_PARSE_DTDLOAD | XML_PARSE_NOENT );
+$XML_LIBXML_PARSE_DEFAULTS = ( XML_PARSE_NODICT );
 
 # this hash is made global so that applications can add names for new
 # libxml2 parser flags as temporary workaround
@@ -366,6 +366,7 @@ sub new {
       }
       # parser flags
       $opts{no_blanks} = !$opts{keep_blanks} if exists($opts{keep_blanks}) and !exists($opts{no_blanks});
+      $opts{load_ext_dtd} = $opts{expand_entities} if exists($opts{expand_entities}) and !exists($opts{load_ext_dtd});
 
       for (keys %OUR_FLAGS) {
 	$self->{$OUR_FLAGS{$_}} = delete $opts{$_};
@@ -2078,13 +2079,13 @@ sub new {
 
     my $self = undef;
     if ( defined $args{location} ) {
-        $self = $class->parse_location( $args{location} );
+        $self = $class->parse_location( $args{location}, XML::LibXML->_parser_options(\%args), $args{recover} );
     }
     elsif ( defined $args{string} ) {
-        $self = $class->parse_buffer( $args{string} );
+        $self = $class->parse_buffer( $args{string}, XML::LibXML->_parser_options(\%args), $args{recover} );
     }
     elsif ( defined $args{DOM} ) {
-        $self = $class->parse_document( $args{DOM} );
+        $self = $class->parse_document( $args{DOM}, XML::LibXML->_parser_options(\%args), $args{recover} );
     }
 
     return $self;
@@ -2102,10 +2103,10 @@ sub new {
 
     my $self = undef;
     if ( defined $args{location} ) {
-        $self = $class->parse_location( $args{location} );
+        $self = $class->parse_location( $args{location}, XML::LibXML->_parser_options(\%args), $args{recover} );
     }
     elsif ( defined $args{string} ) {
-        $self = $class->parse_buffer( $args{string} );
+        $self = $class->parse_buffer( $args{string}, XML::LibXML->_parser_options(\%args), $args{recover} );
     }
 
     return $self;

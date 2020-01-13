@@ -12,8 +12,10 @@ lib/Log/.gitignore
 lib/Log/Any.pm
 lib/Log/Any/Adapter.pm
 lib/Log/Any/Adapter/Base.pm
+lib/Log/Any/Adapter/Capture.pm
 lib/Log/Any/Adapter/Development.pod
 lib/Log/Any/Adapter/File.pm
+lib/Log/Any/Adapter/Multiplex.pm
 lib/Log/Any/Adapter/Null.pm
 lib/Log/Any/Adapter/Stderr.pm
 lib/Log/Any/Adapter/Stdout.pm
@@ -31,6 +33,7 @@ t/00-report-prereqs.t
 t/TestAdapters.pm
 t/adapter-import.t
 t/author-pod-syntax.t
+t/capture.t
 t/context.t
 t/default-adapter-env.t
 t/default-adapter-params.t
@@ -43,6 +46,7 @@ t/import.t
 t/inner-adapter.t
 t/log-any-test.t
 t/memory.t
+t/multiplex.t
 t/null-proxy.t
 t/proxy.t
 t/release-backcompat.t

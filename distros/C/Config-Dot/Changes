@@ -1,3 +1,9 @@
+0.09 2020-01-11T23:37:55+01:00
+ - Change my github username.
+ - Improve test cover of 03-new.t.
+ - Improve test of 04-parse.t.
+ - Update copyright years.
+
 0.08 2018-02-10T13:28:34+01:00
  - Add Config::Dot::Array to SEE ALSO section in doc.
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.

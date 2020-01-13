@@ -1,3 +1,12 @@
+1.031 2020-01-12
+
+  Bug fix:
+    * fix warning about deprecated -root parameter
+
+  Misc:
+    * suggest Config::Model::CursesUI instead of recommend
+    * recommend Config::Model::TkUI >= 1.370
+
 1.030 2019-09-11
 
   Improve output of cme:

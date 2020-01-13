@@ -7,24 +7,22 @@ our @EXPORT_OK = qw(ed2k ed2k_hex ed2k_base64);
 use Digest::base 1.03;
 BEGIN { push @Digest::ED2K::ISA, 'Digest::base' }
 
-use version 0.77; our $VERSION = version->declare('v1.1');
+use version 0.077; our $VERSION = version->declare('v1.1.1');
 
 sub CHUNK_SIZE() { 9728000 }
 
 sub new {
 	my $class = shift;
-	bless {
-		chunk_ctx => Digest::MD4->new,
-	}, ref $class || $class;
+	bless { chunk_ctx => Digest::MD4->new }, ref $class || $class;
 }
 
 sub clone {
 	my $self = shift;
 	bless {
 		($self->{ctx} ? (ctx => $self->{ctx}->clone) : ()),
-		chunk_ctx => $self->{chunk_ctx}->clone,
+		chunk_ctx    => $self->{chunk_ctx}->clone,
 		chunk_length => $self->{chunk_length},
-	}, ref($self);
+	}, ref $self;
 }
 
 sub add {
@@ -41,7 +39,7 @@ sub add {
 		return $self;
 	}
 
-	# Buffer crosses chunk border, copy for modification.
+	# Buffer intersects chunk border, copy for modification.
 	my $buffer = shift;
 
 	while ($buffer) {
@@ -55,7 +53,7 @@ sub add {
 		if ($self->{chunk_length} == CHUNK_SIZE) {
 			my $ctx = $self->{ctx} ||= Digest::MD4->new;
 
-			$ctx->add( $self->{chunk_ctx}->digest );
+			$ctx->add($self->{chunk_ctx}->digest);
 			$self->{chunk_length} = 0;
 		}
 
@@ -67,14 +65,13 @@ sub add {
 
 sub digest {
 	my $self = shift;
-	my ($ctx, $chunk_ctx) = delete @$self{qw( ctx chunk_ctx chunk_length )};
-	$self->{chunk_ctx} = Digest::MD4->new;
+	my ($ctx) = delete @$self{qw( ctx chunk_length )};
 
 	# One chunk
-	return $chunk_ctx->digest unless $ctx;
+	return $self->{chunk_ctx}->digest unless $ctx;
 
 	# Multi chunk
-	$ctx->add( $chunk_ctx->digest )->digest;
+	$ctx->add($self->{chunk_ctx}->digest)->digest;
 }
 
 sub ed2k(@) {

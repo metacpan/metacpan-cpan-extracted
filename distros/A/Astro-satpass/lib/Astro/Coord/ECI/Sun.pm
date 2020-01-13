@@ -50,7 +50,7 @@ package Astro::Coord::ECI::Sun;
 use strict;
 use warnings;
 
-our $VERSION = '0.110';
+our $VERSION = '0.111';
 
 use base qw{Astro::Coord::ECI};
 
@@ -308,7 +308,7 @@ If the $theta argument is omitted or undefined, the method returns
 the average magnitude of the Sun, which is taken to be -26.8.
 
 The limb-darkening algorithm and the associated constants come from
-L<http://en.wikipedia.org/wiki/Limb_darkening>.
+L<https://en.wikipedia.org/wiki/Limb_darkening>.
 
 For consistency's sake, an observing station can optionally be passed as
 the first argument (i.e. before C<$theta>). This is currently ignored.
@@ -784,7 +784,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2019 by Thomas R. Wyant, III
+Copyright (C) 2005-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Surface::Lighting;
 use Chart::Plotly::Trace::Surface::Lightposition;
 use Chart::Plotly::Trace::Surface::Stream;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: The data the describes the coordinates of the surface is set in `z`. Data in `z` should be a {2D array}. Coordinates in `x` and `y` can either be 1D {arrays} or {2D arrays} (e.g. to graph parametric surfaces). If not provided in `x` and `y`, the x and y coordinates are assumed to be linear starting at 0 with a unit step. The color scale corresponds to the `z` values by default. For custom color scales, use `surfacecolor` which should be a {2D array}, where its bounds can be controlled using `cmin` and `cmax`.
 
@@ -176,6 +176,13 @@ has idssrc => ( is            => "rw",
                 documentation => "Sets the source reference on plot.ly for  ids .",
 );
 
+has legendgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
 has lighting => ( is  => "rw",
                   isa => "Maybe[HashRef]|Chart::Plotly::Trace::Surface::Lighting", );
 
@@ -217,6 +224,12 @@ has scene => (
     is => "rw",
     documentation =>
       "Sets a reference between this trace's 3D coordinate system and a 3D scene. If *scene* (the default value), the (x,y,z) coordinates refer to `layout.scene`. If *scene2*, the (x,y,z) coordinates refer to `layout.scene2`, and so on.",
+);
+
+has showlegend => (
+               is            => "rw",
+               isa           => "Bool",
+               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
 );
 
 has showscale => ( is            => "rw",
@@ -342,7 +355,7 @@ Chart::Plotly::Trace::Surface - The data the describes the coordinates of the su
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -487,6 +500,10 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 Sets the source reference on plot.ly for  ids .
 
+=item * legendgroup
+
+Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
+
 =item * lighting
 
 =item * lightposition
@@ -514,6 +531,10 @@ Reverses the color mapping if true. If true, `cmin` will correspond to the last 
 =item * scene
 
 Sets a reference between this trace's 3D coordinate system and a 3D scene. If *scene* (the default value), the (x,y,z) coordinates refer to `layout.scene`. If *scene2*, the (x,y,z) coordinates refer to `layout.scene2`, and so on.
+
+=item * showlegend
+
+Determines whether or not an item corresponding to this trace is shown in the legend.
 
 =item * showscale
 
@@ -593,7 +614,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

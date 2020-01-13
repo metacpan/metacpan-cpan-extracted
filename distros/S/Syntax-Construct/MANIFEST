@@ -9,11 +9,13 @@ t/03-hooks.t
 t/04-extra.t
 t/05-functions.t
 t/06-alias.t
-t/changes.t
-t/completness.t
-t/manifest.t
-t/pod-coverage.t
-t/pod.t
-t/version.t
+xt/changes.t
+xt/completness.t
+xt/copyright.t
+xt/manifest.t
+xt/latest-version.t
+xt/pod-coverage.t
+xt/pod.t
+xt/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

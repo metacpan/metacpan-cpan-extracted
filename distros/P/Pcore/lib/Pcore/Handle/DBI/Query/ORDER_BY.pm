@@ -34,7 +34,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
         }
     }
 
-    return @sql ? ( 'ORDER BY ' . join( q[, ], @sql ), undef ) : ( undef, undef );
+    return @sql ? ( 'ORDER BY ' . join( ', ', @sql ), undef ) : ( undef, undef );
 }
 
 1;

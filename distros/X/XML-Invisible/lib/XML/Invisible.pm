@@ -7,8 +7,8 @@ use Pegex::Grammar;
 use Pegex::Parser;
 use XML::Invisible::Receiver;
 
-our $VERSION = '0.06';
-our @EXPORT_OK = qw(make_parser ast2xml);
+our $VERSION = '0.07';
+our @EXPORT_OK = qw(make_parser ast2xml make_canonicaliser);
 
 use constant DEBUG => $ENV{XML_INVISIBLE_DEBUG};
 
@@ -24,6 +24,145 @@ sub make_parser {
     my ($ixml_text) = @_;
     $parser->parse($ixml_text);
   };
+}
+
+sub make_canonicaliser {
+  my ($grammar_text) = @_;
+  require Pegex::Compiler;
+  require Pegex::Grammar::Atoms;
+  my $grammar_tree = Pegex::Compiler->new->parse($grammar_text)->tree;
+  my $toprule = $grammar_tree->{'+toprule'};
+  my $atoms = _atoms2canonical(Pegex::Grammar::Atoms->atoms);
+  sub {
+    my ($ast) = @_;
+    my @results = _extract_canonical($atoms, $ast, $grammar_tree, $toprule);
+    return undef if grep !defined, @results;
+    join '', @results;
+  };
+}
+
+my %ATOM2SPECIAL = (
+  ALL => "",
+  BLANK => " ",
+  BREAK => "\n",
+  BS => "\x08",
+  CONTROL => "\x00",
+  CR => "\r",
+  DOS => "\r\n",
+  EOL => "\n",
+  EOS => "",
+  FF => "\x0C",
+  HICHAR => "\x7f",
+  NL => "\n",
+  TAB => "\t",
+  WORD => "a",
+  WS => " ",
+  _ => "",
+  __ => " ",
+  ws => "",
+  ws1 => "",
+  ws2 => " ",
+);
+sub _atoms2canonical {
+  my ($atoms) = @_;
+  my %lookup;
+  for my $atom (keys %$atoms) {
+    my $c = $atoms->{$atom};
+    if (exists $ATOM2SPECIAL{$atom}) {
+      $c = $ATOM2SPECIAL{$atom};
+    } elsif ($c =~ s/^\\//) {
+      # all good
+    } elsif ($c =~ s/^\[//) {
+      $c = substr $c, 0, 1;
+    }
+    $lookup{$atom} = $c;
+  }
+  \%lookup;
+}
+
+sub _extract_canonical {
+  my ($atoms, $elt, $grammar_tree, $elt_sought, $grammar_frag, $attrs) = @_;
+  $grammar_frag ||= $grammar_tree->{$elt_sought};
+  $attrs ||= {};
+  $attrs = { %$attrs, %{ $elt->{attributes} || {} } } if ref $elt;
+  if (defined($elt)) {
+    return $elt if !ref $elt; # just text node - trust here for good reason
+    return undef if defined($elt_sought) and $elt_sought ne $elt->{nodename};
+  } else {
+    if (defined($elt_sought) and defined(my $value = $attrs->{$elt_sought})) {
+      return $value;
+    }
+  }
+  if (my $rgx = $grammar_frag->{'.rgx'}) {
+    # RE, so parent of text nodes
+    if (defined $elt) {
+      return join('', @{$elt->{children}}) if $elt->{children};
+      return $elt->{nodename};
+    }
+    # or just a bare regex, which is a literal "canonical" representation
+    return undef if $rgx =~ /^\(/; # out of our league
+    $rgx =~ s#\\##g;
+    return $rgx;
+  }
+  if (my $all = $grammar_frag->{'.all'}) {
+    # sequence of productions
+    my ($childcount, @results) = (0);
+    for my $i (0..$#$all) {
+      my $child = $elt->{children}[$childcount];
+      my $all_frag = $all->[$i];
+      my $new_elt_sought = undef;
+      if ($all_frag->{'-skip'}) {
+        $child = undef;
+      } elsif ($all_frag->{'-wrap'}) {
+        $child = undef;
+        $new_elt_sought = $all_frag->{'.ref'};
+      } else {
+        $childcount++;
+      }
+      my @partial = _extract_canonical(
+        $atoms, $child, $grammar_tree, $new_elt_sought, $all_frag, $attrs,
+      );
+      return undef if grep !defined, @partial; # any non-match
+      push @results, @partial;
+    }
+    return @results;
+  } elsif (my $ref = $grammar_frag->{'.ref'}) {
+    return $atoms->{$ref} if exists $atoms->{$ref};
+    return undef if defined($elt) and $elt->{nodename} ne $ref;
+    my $new_frag = $grammar_tree->{$ref};
+    if (my $new_ref = $new_frag->{'.ref'}) {
+      my $child;
+      my $new_attrs = { %$attrs };
+      if (!defined($elt)) {
+        $child = undef;
+      } elsif ($elt->{children}) {
+        return undef if @{$elt->{children}} != 1;
+        $child = $elt->{children}[0];
+      } elsif ($new_frag->{'-wrap'}) {
+        $new_attrs = { %$new_attrs, %{ $elt->{attributes} } };
+      }
+      return _extract_canonical(
+        $atoms, $child, $grammar_tree, $new_ref, $new_frag, $new_attrs,
+      );
+    }
+    # treat ourselves as if we're the ref-ed to thing
+    return _extract_canonical(
+      $atoms, $elt, $grammar_tree, $ref, $new_frag, $attrs,
+    );
+  } elsif (my $any = $grammar_frag->{'.any'}) {
+    # choice, pick first successful
+    for my $i (0..$#$any) {
+      my $any_frag = $any->[$i];
+      my @partial = _extract_canonical(
+        $atoms, $elt, $grammar_tree,
+        (defined($elt) ? $elt->{nodename} : $elt),
+        $any_frag, $attrs,
+      );
+      next if grep !defined, @partial; # any non-match
+      return @partial;
+    }
+    return undef;
+  }
 }
 
 my $xml_loaded = 0;
@@ -93,6 +232,14 @@ XML::Invisible - transform "invisible XML" documents into XML using a grammar
   perl -MXML::Invisible=make_parser,ast2xml -e \
     'print ast2xml(make_parser(join "", <>)->("(a+b)"))->toStringC14N(1)' \
     examples/arith-grammar.ixml | xml_pp
+
+  # canonicalise a document
+  use XML::Invisible qw(make_parser make_canonicaliser);
+  my $ixml_grammar = from_file('examples/arith-grammar.ixml');
+  my $transformer = make_parser($ixml_grammar);
+  my $ast = $transformer->(from_file($ixml_input));
+  my $canonicaliser = make_canonicaliser($ixml_grammar);
+  my $canonical = $canonicaliser->($ast);
 
 =head1 DESCRIPTION
 
@@ -176,6 +323,43 @@ Arguments:
 =over
 
 =item an AST from L<XML::Invisible::Receiver>
+
+=back
+
+=head2 make_canonicaliser
+
+Exportable. Returns a function that when called with an AST as produced
+from a document by a L</make_parser>, returns a canonical version of
+the original document, or C<undef> if it failed.
+
+Arguments:
+
+=over
+
+=item an XML::Invisible grammar
+
+=back
+
+It uses a few heuristics:
+
+=over
+
+=item literals that are 0-1 (C<?>) or any number (C<*>) will be omitted
+
+=item literals that are at least one (C<+>) will be inserted once
+
+=item if an "any" group is given, the first one that matches will be selected
+
+This last one means that if you want a canonical representation that is
+not the bare minimum, provide that as a literal first choice (see the
+C<assign> rule below - while it will accept any or no whitespace, the
+"canonical" version is given):
+
+  expr: target .assign source
+  target: +name
+  assign: ' = ' | (- EQUAL -)
+  source: -name
+  name: /( ALPHA (: ALPHA | DIGIT )* )/
 
 =back
 

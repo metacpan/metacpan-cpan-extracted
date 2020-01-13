@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Scattermapbox::Textfont;
 use Chart::Plotly::Trace::Scattermapbox::Transform;
 use Chart::Plotly::Trace::Scattermapbox::Unselected;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: The data visualized as scatter point, lines or marker symbols on a Mapbox GL geographic map is provided by longitude/latitude pairs in `lon` and `lat`.
 
@@ -314,7 +314,7 @@ Chart::Plotly::Trace::Scattermapbox - The data visualized as scatter point, line
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -564,7 +564,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

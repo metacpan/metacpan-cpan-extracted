@@ -26,7 +26,7 @@ requires:
   Capture::Tiny: '0'
   Chart::Gnuplot: '0'
   Complete::Module: '0'
-  Complete::Util: '0.603'
+  Complete::Util: '0.606'
   Data::Clean::ForJSON: '0'
   Data::Clone: '0'
   Data::Dmp: '0.21'
@@ -68,7 +68,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Backend
   homepage: https://metacpan.org/release/Bencher-Backend
   repository: git://github.com/perlancar/perl-Bencher-Backend.git
-version: '1.046'
+version: '1.047'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -187,7 +187,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Filter/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Filter/IfBuilt'
@@ -327,11 +327,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.04'
+              version: '0.05'
       name: '@Filter/PodWeaver'
       version: '4.008'
     -
@@ -345,7 +345,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Filter/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Filter/Rinci::AddToDb'

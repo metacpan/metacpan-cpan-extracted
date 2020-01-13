@@ -42,7 +42,7 @@
             "Capture::Tiny" : "0",
             "Chart::Gnuplot" : "0",
             "Complete::Module" : "0",
-            "Complete::Util" : "0.603",
+            "Complete::Util" : "0.606",
             "Data::Clean::ForJSON" : "0",
             "Data::Clone" : "0",
             "Data::Dmp" : "0.21",
@@ -104,7 +104,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Backend"
       }
    },
-   "version" : "1.046",
+   "version" : "1.047",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -255,7 +255,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Filter/CopyrightYearFromGit",
-            "version" : "0.003"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -429,12 +429,12 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.06"
+                        "version" : "0.07"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Sah::Schemas",
                         "name" : "-Sah::Schemas",
-                        "version" : "0.04"
+                        "version" : "0.05"
                      }
                   ]
                }
@@ -455,7 +455,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Filter/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",

@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Heatmap::Hoverlabel;
 use Chart::Plotly::Trace::Heatmap::Stream;
 use Chart::Plotly::Trace::Heatmap::Transform;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: The data that describes the heatmap value-to-color mapping is set in `z`. Data in `z` can either be a {2D array} of values (ragged or not) or a 1D array of values. In the case where `z` is a {2D array}, say that `z` has N rows and M columns. Then, by default, the resulting heatmap will have N partitions along the y axis and M partitions along the x axis. In other words, the i-th row/ j-th column cell in `z` is mapped to the i-th partition of the y axis (starting from the bottom of the plot) and the j-th partition of the x-axis (starting from the left of the plot). This behavior can be flipped by using `transpose`. Moreover, `x` (`y`) can be provided with M or M+1 (N or N+1) elements. If M (N), then the coordinates correspond to the center of the heatmap cells and the cells have equal width. If M+1 (N+1), then the coordinates correspond to the edges of the heatmap cells. In the case where `z` is a 1D {array}, the x and y coordinates must be provided in `x` and `y` respectively to form data triplets.
 
@@ -154,6 +154,13 @@ has idssrc => ( is            => "rw",
                 documentation => "Sets the source reference on plot.ly for  ids .",
 );
 
+has legendgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
 has pmeta => (
     is  => "rw",
     isa => "Any|ArrayRef[Any]",
@@ -181,6 +188,12 @@ has reversescale => (
     isa => "Bool",
     documentation =>
       "Reverses the color mapping if true. If true, `zmin` will correspond to the last color in the array and `zmax` will correspond to the first color.",
+);
+
+has showlegend => (
+               is            => "rw",
+               isa           => "Bool",
+               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
 );
 
 has showscale => ( is            => "rw",
@@ -380,7 +393,7 @@ Chart::Plotly::Trace::Heatmap - The data that describes the heatmap value-to-col
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -515,6 +528,10 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 Sets the source reference on plot.ly for  ids .
 
+=item * legendgroup
+
+Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
+
 =item * pmeta
 
 Assigns extra meta information associated with this trace that can be used in various text attributes. Attributes such as trace `name`, graph, axis and colorbar `title.text`, annotation `text` `rangeselector`, `updatemenues` and `sliders` `label` text all support `meta`. To access the trace `meta` values in an attribute in the same trace, simply use `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the `meta` and `n` is the trace index.
@@ -534,6 +551,10 @@ Sets the opacity of the trace.
 =item * reversescale
 
 Reverses the color mapping if true. If true, `zmin` will correspond to the last color in the array and `zmax` will correspond to the first color.
+
+=item * showlegend
+
+Determines whether or not an item corresponding to this trace is shown in the legend.
 
 =item * showscale
 
@@ -663,7 +684,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -1,0 +1,33 @@
+Revision history for Test-SQLite
+
+0.0200 2020-01-13 01:44:20
+    - Remove unused code.
+    - Add user specification of the DBI connection attributes.
+
+0.0106 2020-01-12 23:53:18
+    - Ignore dsn, dbh and _database attributes in the constructor.
+
+0.0105 2020-01-12 19:38:03
+    - Improve documentation again!
+    - Add handy error messages if the schema or database files don't exist.
+    - Add DBD::SQLite to the prereqs to satisfy cpantesters.
+
+0.0104 2020-01-12 19:09:30
+    - Improve documentation.
+    - Add failure and test for no schema or database given.
+
+0.0103 2020-01-12 15:27:52
+    - Improve documentation.
+    - Clean up module and test code a bit.
+
+0.0102 2020-01-12 14:30:09
+    - Remove redundant NAME section.
+
+0.0101 2020-01-12 14:11:57
+    - Improve documentation.
+    - Remove unused code.
+    - Reuse the ->dsn when building the ->dbh.
+
+0.0100 2020-01-12 13:56:21
+    - Tweaked heavily based on suggestions from KP.
+    - Mint by Dist::Zilla.

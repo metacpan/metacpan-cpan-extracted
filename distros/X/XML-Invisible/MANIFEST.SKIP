@@ -9,3 +9,4 @@ MYMETA\..*
 ^Makefile.bak$
 pm_to_blib
 \.swp$
+^cover_db/

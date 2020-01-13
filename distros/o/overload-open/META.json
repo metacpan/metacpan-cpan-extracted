@@ -1,5 +1,5 @@
 {
-   "abstract" : "Hooks the native string open() function",
+   "abstract" : "Hooks the native open function",
    "author" : [
       "Samantha McVey <samantham@posteo.net.com>"
    ],
@@ -25,14 +25,28 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "7.34"
+            "ExtUtils::MakeMaker" : "7.34",
+            "Module::Metadata" : "0"
          }
       },
       "runtime" : {
          "requires" : {}
       }
    },
+   "provides" : {
+      "overload::open" : {
+         "file" : "lib/overload/open.pm",
+         "version" : "v1.2.0"
+      }
+   },
    "release_status" : "stable",
-   "version" : "v1.00.0",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/samcv/perl-overload-open.git",
+         "web" : "https://github.com/samcv/perl-overload-open"
+      }
+   },
+   "version" : "v1.02.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

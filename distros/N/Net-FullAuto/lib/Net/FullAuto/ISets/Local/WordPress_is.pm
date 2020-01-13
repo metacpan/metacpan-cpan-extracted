@@ -171,9 +171,9 @@ my $configure_wordpress=sub {
       ($stdout,$stderr)=$handle->cmd($sudo.'ps -ef');
       if ($stdout=~/nginx: master process/s) {
          ($stdout,$stderr)=$handle->cmd($sudo.
-            "service nginx stop");
+            'service nginx stop');
          if ($stderr) {
-            ($stdout,$stderr)=$handle->cmd("ps -ef",'__display__');
+            ($stdout,$stderr)=$handle->cmd('ps -ef','__display__');
             if ($stdout=~/nginx/) {
                my @psinfo=();
                foreach my $line (split /\n/, $stdout) {
@@ -188,22 +188,22 @@ my $configure_wordpress=sub {
 	 } else { print $stdout."\n" }
          if ($stdout=~/php-fpm: master process/s) {
             ($stdout,$stderr)=$handle->cmd($sudo.
-               "service php-fpm stop",'__display__');
+               'service php-fpm stop','__display__');
          }
          if ($stdout=~/mysqld/s) {
             ($stdout,$stderr)=$handle->cmd($sudo.
-               "service mysqld stop",'__display__');
+               'service mysqld stop','__display__');
          }
       }
       ($stdout,$stderr)=$handle->cmd($sudo.
          "rm -rf /opt/source/* ~/fa\* /var/www/html/wordpress",
          '3600','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "mkdir -vp /var/www/html",'__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo."chmod 755 ~");
-      ($stdout,$stderr)=$handle->cmd($sudo."yum clean all");
-      ($stdout,$stderr)=$handle->cmd($sudo."yum grouplist hidden");
-      ($stdout,$stderr)=$handle->cmd($sudo."yum groups mark convert");
+         'mkdir -vp /var/www/html','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'chmod 755 ~');
+      ($stdout,$stderr)=$handle->cmd($sudo.'yum clean all');
+      ($stdout,$stderr)=$handle->cmd($sudo.'yum grouplist hidden');
+      ($stdout,$stderr)=$handle->cmd($sudo.'yum groups mark convert');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "yum -y groupinstall 'Development tools'",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -483,62 +483,66 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
    $stdout=~s/^.*list-row-container menu.*?Python (.*?)[<].*$/$1/s;
    my $version=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget --random-wait --progress=dot '.
-      "http://python.org/ftp/python/$version/Python-$version.tar.xz",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "tar xvf Python-$version.tar.xz",
-      '__display__');
-   ($stdout,$stderr)=$handle->cwd("Python-$version");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      './configure --prefix=/usr/local --exec-prefix=/usr/local '.
-      '--enable-shared --enable-optimizations '.
-      'LDFLAGS="-Wl,-rpath /usr/local/lib"',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make','3600','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make altinstall','__display__');
-   $version=~s/^(\d+\.\d+).*$/$1/;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "ln -s /usr/local/bin/python$version /usr/local/bin/python");
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "/usr/local/bin/python$version -m ensurepip --default-pip",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "/usr/local/bin/python$version -m pip install ".
-      "--upgrade pip setuptools wheel",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "/usr/local/bin/python$version -m pip install pyasn1",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "/usr/local/bin/python$version -m pip install pyasn1-modules",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "/usr/local/bin/python$version -m pip install --upgrade oauth2client",
-      '__display__');
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "/usr/local/bin/python$version -m pip install oauth2",
-      '__display__');
-   unless ($^O eq 'cygwin') {
-      ($stdout,$stderr)=$handle->cmd('echo /usr/local/lib > '.
-         '~/local.conf','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v 644 ~/local.conf',
+      "if test -f /usr/local/bin/python$version; then echo Exists; fi");
+   unless ($stdout=~/Exists/) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget --random-wait --progress=dot '.
+         "http://python.org/ftp/python/$version/Python-$version.tar.xz",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'mv -v ~/local.conf /etc/ld.so.conf.d','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
-   } else {
-      ($stdout,$stderr)=$handle->cmd(
-         "python$version -m pip install awscli",
+         "tar xvf Python-$version.tar.xz",
          '__display__');
+      ($stdout,$stderr)=$handle->cwd("Python-$version");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure --prefix=/usr/local --exec-prefix=/usr/local '.
+         '--enable-shared --enable-optimizations '.
+         'LDFLAGS="-Wl,-rpath /usr/local/lib"',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make','3600','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make altinstall','__display__');
+      $version=~s/^(\d+\.\d+).*$/$1/;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "ln -s /usr/local/bin/python$version /usr/local/bin/python");
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m ensurepip --default-pip",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install ".
+         "--upgrade pip setuptools wheel",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install pyasn1",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install pyasn1-modules",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install --upgrade oauth2client",
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install oauth2",
+         '__display__');
+      unless ($^O eq 'cygwin') {
+         ($stdout,$stderr)=$handle->cmd('echo /usr/local/lib > '.
+            '~/local.conf','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v 644 ~/local.conf',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'mv -v ~/local.conf /etc/ld.so.conf.d','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
+      } else {
+         ($stdout,$stderr)=$handle->cmd(
+            "python$version -m pip install awscli",
+            '__display__');
+      }
+      $sudo='sudo env "PATH=$PATH" ';
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'python --version','__display__');
    }
-   $sudo='sudo env "PATH=$PATH" ';
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'python --version','__display__');
 }
 $do=1;
 if ($do==1) { # INSTALL LATEST VERSION OF NGINX
@@ -2245,6 +2249,7 @@ $sudo='sudo -u www-data ';
 ($stdout,$stderr)=$handle->cmd($sudo.
    "mkdir -vp /var/www/html/wordpress/wp-content/uploads/$curyear/$mo_",
    '__display__');
+$sudo='sudo '; 
 ($stdout,$stderr)=$handle->cmd($sudo.
    "/usr/local/bin/wp media import $builddir/$ls_tmp[0]/dependencies/gw/* ".
    '--path=/var/www/html/wordpress --allow-root','__display__');
@@ -2253,6 +2258,8 @@ $sudo='sudo -u www-data ';
    "'%angelwing75%'\" --path=/var/www/html/wordpress --allow-root");
 $stdout=~s/^.*(\d+)$/$1/s;
 my $post_id=$stdout;
+($stdout,$stderr)=$handle->cmd($sudo.
+   'chown -R www-data:www-data /var/www');
 $handle->print($sudo.'mysql -u root');
 $prompt=$handle->prompt();
 $cmd_sent=0;

@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::InitTarget;
 
-our $DATE = '2019-09-18'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2020-01-13'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,7 +53,7 @@ Bencher::Scenario::LogGer::InitTarget - Benchmark init_target()
 
 =head1 VERSION
 
-This document describes version 0.015 of Bencher::Scenario::LogGer::InitTarget (from Perl distribution Bencher-Scenarios-LogGer), released on 2019-09-18.
+This document describes version 0.016 of Bencher::Scenario::LogGer::InitTarget (from Perl distribution Bencher-Scenarios-LogGer), released on 2020-01-13.
 
 =head1 SYNOPSIS
 
@@ -95,7 +95,7 @@ Code template:
 
 Code template:
 
- use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("File", path=>'/tmp/S8HoF53EXq'); for(1..1000) { Log::ger::init_target(package => "main") }
+ use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("File", path=>'/tmp/Whjzmfyuq5'); for(1..1000) { Log::ger::init_target(package => "main") }
 
 
 
@@ -119,7 +119,7 @@ Code template:
 
 Code template:
 
- use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("Composite", outputs=>{Screen=>{}, File=>{conf=>{path=>'/tmp/S8HoF53EXq'}}}); for(1..1000) { Log::ger::init_target(package => "main") }
+ use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("Composite", outputs=>{Screen=>{}, File=>{conf=>{path=>'/tmp/Whjzmfyuq5'}}}); for(1..1000) { Log::ger::init_target(package => "main") }
 
 
 
@@ -127,7 +127,7 @@ Code template:
 
 Code template:
 
- use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("Composite", outputs=>{Screen=>{layout=>[Pattern=>{format=>"[%d] %m"}]}, File=>{conf=>{path=>'/tmp/S8HoF53EXq'}, layout=>[Pattern=>{format=>"[%d] [%P] %m"}]}}); for(1..1000) { Log::ger::init_target(package => "main") }
+ use Log::ger (); local %Log::ger::Global_Hooks = %Log::ger::Default_Hooks; use Log::ger::Output; Log::ger::Output->set("Composite", outputs=>{Screen=>{layout=>[Pattern=>{format=>"[%d] %m"}]}, File=>{conf=>{path=>'/tmp/Whjzmfyuq5'}, layout=>[Pattern=>{format=>"[%d] [%P] %m"}]}}); for(1..1000) { Log::ger::init_target(package => "main") }
 
 
 
@@ -135,22 +135,22 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.04 >>, OS kernel: I<< Linux version 5.0.0-37-generic >>.
 
 Benchmark with default options (C<< bencher -m LogGer::InitTarget >>):
 
  #table1#
- +-------------------------------------------------------+-----------+-----------+------------+---------+---------+
- | participant                                           | rate (/s) | time (ms) | vs_slowest |  errors | samples |
- +-------------------------------------------------------+-----------+-----------+------------+---------+---------+
- | 1k with LGO:Composite (0 outputs)                     |      2.5  |       390 |        1   | 0.00056 |       8 |
- | 1k with LGO:Composite (Screen+File & pattern layouts) |      2.8  |       360 |        1.1 | 0.00086 |       7 |
- | 1k default                                            |      2.8  |       360 |        1.1 | 0.00097 |       7 |
- | 1k with LGO:Composite (Screen+File)                   |      3    |       340 |        1.2 | 0.0016  |       7 |
- | 1k with LGO:Composite (Screen)                        |      4    |       250 |        1.6 | 0.00057 |       9 |
- | 1k with LGO:File                                      |      6.08 |       164 |        2.4 | 0.00016 |       7 |
- | 1k with LGO:Screen                                    |      8.3  |       120 |        3.3 | 0.00026 |       7 |
- +-------------------------------------------------------+-----------+-----------+------------+---------+---------+
+ +-------------------------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | participant                                           | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +-------------------------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | 1k with LGO:Composite (Screen+File & pattern layouts) |      3.1  |     320   |                 0.00% |               232.95% |   0.0004  |       7 |
+ | 1k default                                            |      3.16 |     316   |                 1.68% |               227.45% |   0.00022 |       7 |
+ | 1k with LGO:Composite (Screen+File)                   |      3.33 |     301   |                 6.95% |               211.32% |   0.00027 |       7 |
+ | 1k with LGO:Composite (Screen)                        |      4.6  |     220   |                49.11% |               123.30% |   0.00028 |       7 |
+ | 1k with LGO:File                                      |      7.6  |     130   |               144.84% |                35.99% |   0.00018 |       7 |
+ | 1k with LGO:Composite (0 outputs)                     |     10    |      97   |               231.10% |                 0.56% |   0.00017 |       7 |
+ | 1k with LGO:Screen                                    |     10.4  |      96.5 |               232.95% |                 0.00% | 6.7e-05   |       7 |
+ +-------------------------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -177,7 +177,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

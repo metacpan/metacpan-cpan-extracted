@@ -40,7 +40,7 @@ use PSGI::Hector::Response;
 use PSGI::Hector::Session;	#for session management
 use PSGI::Hector::Request;
 use PSGI::Hector::Log;
-our $VERSION = "1.91";
+our $VERSION = "2.0";
 #########################################################
 
 =head2 init(\%options)

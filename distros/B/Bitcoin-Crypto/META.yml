@@ -30,7 +30,7 @@ requires:
   Moo: '2.003004'
   MooX::Types::MooseLike: '0.29'
   PBKDF2::Tiny: '0.005'
-  Throwable: '0.007'
+  Throwable: '0.2'
   Try::Tiny: '0.30'
   perl: '5.010'
 resources:
@@ -38,5 +38,5 @@ resources:
   homepage: https://metacpan.org/release/Bitcoin-Crypto
   license: https://dev.perl.org/licenses
   repository: https://github.com/brtastic/perl-bitcoin-crypto
-version: '0.991'
+version: '0.992'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

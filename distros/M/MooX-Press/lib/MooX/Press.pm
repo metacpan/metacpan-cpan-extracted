@@ -5,9 +5,9 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.019';
+our $VERSION   = '0.020';
 
-use Types::Standard -is, -types;
+use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
 use Exporter::Tiny qw(mkopt);
 use namespace::autoclean;
@@ -95,9 +95,11 @@ sub import {
 			$builder->munge_class_options($pkg_opts, \%opts);
 			$builder->make_type_for_class($pkg_name, $pkg_opts->$_handle_list, %opts);
 		}
-		
+	}
+	
+	if ($opts{factory_package}) {
 		require Type::Registry;
-		my $reg = 'Type::Registry'->for_class($opts{type_library});
+		my $reg = 'Type::Registry'->for_class($opts{factory_package});
 		$reg->add_types($_) for (
 			$opts{type_library},
 			qw( Types::Standard Types::Common::Numeric Types::Common::String Types::TypeTiny ),
@@ -236,7 +238,8 @@ sub prepare_type_library {
 		);
 		$types_hash{$kind}{$target} = $tc_obj;
 		$me->add_type($tc_obj);
-		Type::Registry->for_class($me)->add_type($tc_obj);
+		Type::Registry->for_class($opts{factory_package})->add_type($tc_obj)
+			if defined $opts{factory_package};
 		if ($coercions) {
 			$none ||= ~Any;
 			$tc_obj->coercion->add_type_coercions($none, 'die()');
@@ -443,12 +446,25 @@ sub _make_package {
 		}
 	}
 	
+	my $reg;
+	if ($opts{factory_package}) {
+		require Type::Registry;
+		'Type::Registry'->for_class($qname)->set_parent(
+			'Type::Registry'->for_class($opts{factory_package})
+		);
+		$reg = 'Type::Registry'->for_class($qname);
+	}
+	
 	for my $var (qw/VERSION AUTHORITY/) {
 		if (defined $opts{lc $var}) {
 			no strict 'refs';
 			no warnings 'once';
 			${"$qname\::$var"} = $opts{lc $var};
 		}
+	}
+	
+	if (ref $opts{'begin'}) {
+		$opts{'begin'}->($qname, $opts{is_role} ? 'role' : 'class');
 	}
 	
 	{
@@ -546,7 +562,6 @@ sub _make_package {
 				$spec{isa} = delete $spec{type};
 			}
 			elsif ($spec{type}) {
-				my $reg = 'Type::Registry'->for_class($opts{type_library});
 				$spec{isa} = $reg->lookup(delete $spec{type});
 			}
 			
@@ -766,7 +781,7 @@ sub install_methods {
 				my \$check;
 				sub $name :method {
 					my \@invocants = splice(\@_, 0, $invocant_count);
-					\$check ||= q($builder)->_build_method_signature_check(\$invocants[-1], q($class\::$name), \$signature_style, \$signature, \\\@invocants);
+					\$check ||= q($builder)->_build_method_signature_check(q($class), q($class\::$name), \$signature_style, \$signature, \\\@invocants);
 					\@_ = (\@invocants, \@curry, \&\$check);
 					goto \$coderef;
 				};
@@ -786,7 +801,7 @@ sub install_methods {
 # need to partially parse stuff for Type::Params to look up type names
 sub _build_method_signature_check {
 	my $builder = shift;
-	my ($instance, $method_name, $signature_style, $signature) = @_;
+	my ($method_class, $method_name, $signature_style, $signature) = @_;
 	my $type_library;
 	my @sig = @$signature;
 	
@@ -824,11 +839,8 @@ sub _build_method_signature_check {
 		# All that work, just to do this!!!
 		if (is_Str($type) and not $type =~ /^[01]$/) {
 			$reg ||= do {
-				my ($factory, $typelib) = ref($instance)||$instance;
-				eval { $factory = $instance->FACTORY; 1 };
-				eval { $typelib = $factory->type_library; 1 }
-					or die "No type_library method for $factory";
-				Type::Registry->for_class($typelib);
+				require Type::Registry;
+				'Type::Registry'->for_class($method_class);
 			};
 			
 			if ($type =~ /^\%/) {
@@ -1080,6 +1092,13 @@ are wrapping MooX::Press, you can fake the caller by passing it as an option.
 After creating each class or role, this coderef will be called. It will be
 passed two parameters; the fully-qualified package name of the class or role,
 plus the string "class" or "role" as appropriate.
+
+Optional; defaults to nothing.
+
+=item C<< begin >> I<< (CodeRef) >>
+
+Like C<end>, but called before setting up any attributes, methods, or
+method modifiers. (But after loading Moo/Moose/Mouse.)
 
 Optional; defaults to nothing.
 
@@ -1588,6 +1607,30 @@ See L</Import Options>.
 =item C<< end >> I<< (CodeRef) >>
 
 Override C<end> for this class and any child classes.
+
+See L</Import Options>.
+
+=item C<< begin >> I<< (CodeRef) >>
+
+Override C<begin> for this class and any child classes.
+
+  use MooX::Press::Keywords qw( true false );
+  use MooX::Press (
+    prefix => 'Library',
+    class  => [
+      'Book' => {
+        begin => sub {
+          my $classname = shift;   # "Library::Book"
+          my $registry  = Type::Registry->for_class($classname);
+          $registry->alias_type('ArrayRef[Str]' => 'StrList')
+        },
+        has => {
+          'title'   => { type => 'Str',     required => true },
+          'authors' => { type => 'StrList', required => true },
+        },
+      },
+    ],
+  );
 
 See L</Import Options>.
 

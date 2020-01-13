@@ -1,10 +1,10 @@
 package Syntax::Construct;
 
-use 5.006;
+use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.015';
+our $VERSION = '1.016';
 
 my %introduces = ( '5.030' => [qw[
                                   unicode12.1 uniprop_wildcards qr'N
@@ -139,8 +139,10 @@ my %alias = (
     'unicode-10.0' => 'unicode10.0',
     'state-array' => 'state@=',
     'state-hash' => 'state@=',
+    'list-context-state' => 'state@=',
     # 5.030
     'named-char-in-single-quoted-regex' => "qr'N",
+    'unicode-12.1' => 'unicode12.1',
 );
 
 my %_introduced = map {
@@ -246,7 +248,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.015
+Version 1.016
 
 =head1 SYNOPSIS
 
@@ -765,13 +767,15 @@ Alias: unicode-10.0
 
 See L<perl5280delta/Initialisation-of-aggregate-state-variables>.
 
-Aliases: state-array state-hash
+Aliases: state-array state-hash list-context-state
 
 =head2 5.030
 
 =head3 unicode12.1
 
 L<perl5300delta/Unicode 12.1 is supported>
+
+Alias: unicode-12.1
 
 =head3 uniprop_wildcards
 
@@ -824,7 +828,8 @@ E. Choroba, C<< <choroba at cpan.org> >>
 
 =head2 Contributors
 
-Gabor Szabo, JJ Merelo, tynovsky, Chris White, Mohammad S Anwar
+Gabor Szabo, JJ Merelo, tynovsky, Chris White, Mohammad S Anwar,
+Branislav Zahradnik
 
 =head1 BUGS
 
@@ -878,7 +883,7 @@ L<Perl::MinimumVersion>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 - 2019 E. Choroba.
+Copyright 2013 - 2020 E. Choroba.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

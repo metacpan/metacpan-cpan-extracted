@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Scattergeo::Textfont;
 use Chart::Plotly::Trace::Scattergeo::Transform;
 use Chart::Plotly::Trace::Scattergeo::Unselected;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: The data visualized as scatter point or lines on a geographic map is provided either by longitude/latitude pairs in `lon` and `lat` respectively or by geographic location IDs or names in `locations`.
 
@@ -70,6 +70,13 @@ has customdatasrc => ( is            => "rw",
                        documentation => "Sets the source reference on plot.ly for  customdata .",
 );
 
+has featureidkey => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the key in GeoJSON features which is used as id to match the items included in the `locations` array. Only has an effect when `geojson` is set. Support nested property, for example *properties.name*.",
+);
+
 has fill => (
     is  => "rw",
     isa => enum( [ "none", "toself" ] ),
@@ -88,6 +95,13 @@ has geo => (
     is => "rw",
     documentation =>
       "Sets a reference between this trace's geospatial coordinates and a geographic map. If *geo* (the default value), the geospatial coordinates refer to `layout.geo`. If *geo2*, the geospatial coordinates refer to `layout.geo2`, and so on.",
+);
+
+has geojson => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Sets optional GeoJSON data associated with this trace. If not given, the features on the base map are used when `locations` is set. It can be set as a valid GeoJSON object or as a URL string. Note that we only accept GeoJSONs of type *FeatureCollection* or *Feature* with geometries of type *Polygon* or *MultiPolygon*.",
 );
 
 has hoverinfo => (
@@ -162,9 +176,10 @@ has line => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scattergeo::Line", );
 
 has locationmode => (
-         is            => "rw",
-         isa           => enum( [ "ISO-3", "USA-states", "country names" ] ),
-         documentation => "Determines the set of locations used to match entries in `locations` to regions on the map.",
+    is  => "rw",
+    isa => enum( [ "ISO-3", "USA-states", "country names", "geojson-id" ] ),
+    documentation =>
+      "Determines the set of locations used to match entries in `locations` to regions on the map. Values *ISO-3*, *USA-states*, *country names* correspond to features on the base map and value *geojson-id* corresponds to features from a custom GeoJSON linked to the `geojson` attribute.",
 );
 
 has locations => (
@@ -335,7 +350,7 @@ Chart::Plotly::Trace::Scattergeo - The data visualized as scatter point or lines
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -437,6 +452,10 @@ Assigns extra data each datum. This may be useful when listening to hover, click
 
 Sets the source reference on plot.ly for  customdata .
 
+=item * featureidkey
+
+Sets the key in GeoJSON features which is used as id to match the items included in the `locations` array. Only has an effect when `geojson` is set. Support nested property, for example *properties.name*.
+
 =item * fill
 
 Sets the area to fill with a solid color. Use with `fillcolor` if not *none*. *toself* connects the endpoints of the trace (or each segment of the trace if it has gaps) into a closed shape.
@@ -448,6 +467,10 @@ Sets the fill color. Defaults to a half-transparent variant of the line color, m
 =item * geo
 
 Sets a reference between this trace's geospatial coordinates and a geographic map. If *geo* (the default value), the geospatial coordinates refer to `layout.geo`. If *geo2*, the geospatial coordinates refer to `layout.geo2`, and so on.
+
+=item * geojson
+
+Sets optional GeoJSON data associated with this trace. If not given, the features on the base map are used when `locations` is set. It can be set as a valid GeoJSON object or as a URL string. Note that we only accept GeoJSONs of type *FeatureCollection* or *Feature* with geometries of type *Polygon* or *MultiPolygon*.
 
 =item * hoverinfo
 
@@ -499,7 +522,7 @@ Sets the legend group for this trace. Traces part of the same legend group hide/
 
 =item * locationmode
 
-Determines the set of locations used to match entries in `locations` to regions on the map.
+Determines the set of locations used to match entries in `locations` to regions on the map. Values *ISO-3*, *USA-states*, *country names* correspond to features on the base map and value *geojson-id* corresponds to features from a custom GeoJSON linked to the `geojson` attribute.
 
 =item * locations
 
@@ -601,7 +624,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

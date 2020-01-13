@@ -20,7 +20,7 @@ use warnings;
 
 =pod
 
-#head2 new($options)
+=head2 new($options)
 
 	$log = PSGI::Hector::Log->new({
 		'debug' => 1
@@ -72,7 +72,7 @@ Development questions, bug reports, and patches are welcome to the above address
 
 =head1 Copyright
 
-Copyright (c) 2017 MacGyveR. All rights reserved.
+Copyright (c) 2019 MacGyveR. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

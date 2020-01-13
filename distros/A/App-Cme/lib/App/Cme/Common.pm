@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2018 by Dominique Dumont.
+# This software is Copyright (c) 2014-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.030';
+$App::Cme::Common::VERSION = '1.031';
 use strict;
 use warnings;
 use 5.10.1;
@@ -187,7 +187,7 @@ sub save {
 }
 
 sub run_tk_ui {
-    my ($self, $root, $opt) = @_;
+    my ($self, $instance, $opt) = @_;
 
     require Config::Model::TkUI;
     require Tk;
@@ -201,14 +201,13 @@ sub run_tk_ui {
     # Thanks to Jerome Quelin for the tip
     $mw->optionAdd( '*BorderWidth' => 1 );
 
-    my $cmu = $mw->ConfigModelUI(
-        -root       => $root,
-    );
+    # -root parameter is deprecated
+    my $cmu = $mw->ConfigModelUI( -instance => $instance );
 
-    $root->instance->on_message_cb(sub{$cmu->show_message(@_);});
+    $instance->on_message_cb(sub{$cmu->show_message(@_);});
 
     if ($opt->{open_item}) {
-        my $obj = $root->grab($opt->{open_item});
+        my $obj = $instance->grab($opt->{open_item});
         $cmu->force_element_display($obj);
     }
 
@@ -259,7 +258,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.030
+version 1.031
 
 =head1 SYNOPSIS
 
@@ -275,7 +274,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2018 by Dominique Dumont.
+This software is Copyright (c) 2014-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 

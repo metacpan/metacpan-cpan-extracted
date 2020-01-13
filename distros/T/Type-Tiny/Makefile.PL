@@ -60,47 +60,47 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Devel::TypeTiny::Perl56Compat"            => { file => "lib/Devel/TypeTiny/Perl56Compat.pm", version => 1.008001 },
-                        "Devel::TypeTiny::Perl58Compat"            => { file => "lib/Devel/TypeTiny/Perl58Compat.pm", version => 1.008001 },
-                        "Error::TypeTiny"                          => { file => "lib/Error/TypeTiny.pm", version => 1.008001 },
-                        "Error::TypeTiny::Assertion"               => { file => "lib/Error/TypeTiny/Assertion.pm", version => 1.008001 },
-                        "Error::TypeTiny::Compilation"             => { file => "lib/Error/TypeTiny/Compilation.pm", version => 1.008001 },
+                        "Devel::TypeTiny::Perl56Compat"            => { file => "lib/Devel/TypeTiny/Perl56Compat.pm", version => 1.008003 },
+                        "Devel::TypeTiny::Perl58Compat"            => { file => "lib/Devel/TypeTiny/Perl58Compat.pm", version => 1.008003 },
+                        "Error::TypeTiny"                          => { file => "lib/Error/TypeTiny.pm", version => 1.008003 },
+                        "Error::TypeTiny::Assertion"               => { file => "lib/Error/TypeTiny/Assertion.pm", version => 1.008003 },
+                        "Error::TypeTiny::Compilation"             => { file => "lib/Error/TypeTiny/Compilation.pm", version => 1.008003 },
                         "Error::TypeTiny::WrongNumberOfParameters" => {
                                                                         file => "lib/Error/TypeTiny/WrongNumberOfParameters.pm",
-                                                                        version => 1.008001,
+                                                                        version => 1.008003,
                                                                       },
-                        "Eval::TypeTiny"                           => { file => "lib/Eval/TypeTiny.pm", version => 1.008001 },
-                        "Reply::Plugin::TypeTiny"                  => { file => "lib/Reply/Plugin/TypeTiny.pm", version => 1.008001 },
-                        "Test::TypeTiny"                           => { file => "lib/Test/TypeTiny.pm", version => 1.008001 },
-                        "Type::Coercion"                           => { file => "lib/Type/Coercion.pm", version => 1.008001 },
-                        "Type::Coercion::FromMoose"                => { file => "lib/Type/Coercion/FromMoose.pm", version => 1.008001 },
-                        "Type::Coercion::Union"                    => { file => "lib/Type/Coercion/Union.pm", version => 1.008001 },
-                        "Type::Library"                            => { file => "lib/Type/Library.pm", version => 1.008001 },
-                        "Type::Params"                             => { file => "lib/Type/Params.pm", version => 1.008001 },
-                        "Type::Parser"                             => { file => "lib/Type/Parser.pm", version => 1.008001 },
-                        "Type::Registry"                           => { file => "lib/Type/Registry.pm", version => 1.008001 },
-                        "Type::Tiny"                               => { file => "lib/Type/Tiny.pm", version => 1.008001 },
-                        "Type::Tiny::Class"                        => { file => "lib/Type/Tiny/Class.pm", version => 1.008001 },
-                        "Type::Tiny::ConstrainedObject"            => { file => "lib/Type/Tiny/ConstrainedObject.pm", version => 1.008001 },
-                        "Type::Tiny::Duck"                         => { file => "lib/Type/Tiny/Duck.pm", version => 1.008001 },
-                        "Type::Tiny::Enum"                         => { file => "lib/Type/Tiny/Enum.pm", version => 1.008001 },
-                        "Type::Tiny::Intersection"                 => { file => "lib/Type/Tiny/Intersection.pm", version => 1.008001 },
-                        "Type::Tiny::Role"                         => { file => "lib/Type/Tiny/Role.pm", version => 1.008001 },
-                        "Type::Tiny::Union"                        => { file => "lib/Type/Tiny/Union.pm", version => 1.008001 },
-                        "Type::Utils"                              => { file => "lib/Type/Utils.pm", version => 1.008001 },
-                        "Types::Common::Numeric"                   => { file => "lib/Types/Common/Numeric.pm", version => 1.008001 },
-                        "Types::Common::String"                    => { file => "lib/Types/Common/String.pm", version => 1.008001 },
-                        "Types::Standard"                          => { file => "lib/Types/Standard.pm", version => 1.008001 },
-                        "Types::Standard::ArrayRef"                => { file => "lib/Types/Standard/ArrayRef.pm", version => 1.008001 },
-                        "Types::Standard::CycleTuple"              => { file => "lib/Types/Standard/CycleTuple.pm", version => 1.008001 },
-                        "Types::Standard::Dict"                    => { file => "lib/Types/Standard/Dict.pm", version => 1.008001 },
-                        "Types::Standard::HashRef"                 => { file => "lib/Types/Standard/HashRef.pm", version => 1.008001 },
-                        "Types::Standard::Map"                     => { file => "lib/Types/Standard/Map.pm", version => 1.008001 },
-                        "Types::Standard::ScalarRef"               => { file => "lib/Types/Standard/ScalarRef.pm", version => 1.008001 },
-                        "Types::Standard::StrMatch"                => { file => "lib/Types/Standard/StrMatch.pm", version => 1.008001 },
-                        "Types::Standard::Tied"                    => { file => "lib/Types/Standard/Tied.pm", version => 1.008001 },
-                        "Types::Standard::Tuple"                   => { file => "lib/Types/Standard/Tuple.pm", version => 1.008001 },
-                        "Types::TypeTiny"                          => { file => "lib/Types/TypeTiny.pm", version => 1.008001 },
+                        "Eval::TypeTiny"                           => { file => "lib/Eval/TypeTiny.pm", version => 1.008003 },
+                        "Reply::Plugin::TypeTiny"                  => { file => "lib/Reply/Plugin/TypeTiny.pm", version => 1.008003 },
+                        "Test::TypeTiny"                           => { file => "lib/Test/TypeTiny.pm", version => 1.008003 },
+                        "Type::Coercion"                           => { file => "lib/Type/Coercion.pm", version => 1.008003 },
+                        "Type::Coercion::FromMoose"                => { file => "lib/Type/Coercion/FromMoose.pm", version => 1.008003 },
+                        "Type::Coercion::Union"                    => { file => "lib/Type/Coercion/Union.pm", version => 1.008003 },
+                        "Type::Library"                            => { file => "lib/Type/Library.pm", version => 1.008003 },
+                        "Type::Params"                             => { file => "lib/Type/Params.pm", version => 1.008003 },
+                        "Type::Parser"                             => { file => "lib/Type/Parser.pm", version => 1.008003 },
+                        "Type::Registry"                           => { file => "lib/Type/Registry.pm", version => 1.008003 },
+                        "Type::Tiny"                               => { file => "lib/Type/Tiny.pm", version => 1.008003 },
+                        "Type::Tiny::Class"                        => { file => "lib/Type/Tiny/Class.pm", version => 1.008003 },
+                        "Type::Tiny::ConstrainedObject"            => { file => "lib/Type/Tiny/ConstrainedObject.pm", version => 1.008003 },
+                        "Type::Tiny::Duck"                         => { file => "lib/Type/Tiny/Duck.pm", version => 1.008003 },
+                        "Type::Tiny::Enum"                         => { file => "lib/Type/Tiny/Enum.pm", version => 1.008003 },
+                        "Type::Tiny::Intersection"                 => { file => "lib/Type/Tiny/Intersection.pm", version => 1.008003 },
+                        "Type::Tiny::Role"                         => { file => "lib/Type/Tiny/Role.pm", version => 1.008003 },
+                        "Type::Tiny::Union"                        => { file => "lib/Type/Tiny/Union.pm", version => 1.008003 },
+                        "Type::Utils"                              => { file => "lib/Type/Utils.pm", version => 1.008003 },
+                        "Types::Common::Numeric"                   => { file => "lib/Types/Common/Numeric.pm", version => 1.008003 },
+                        "Types::Common::String"                    => { file => "lib/Types/Common/String.pm", version => 1.008003 },
+                        "Types::Standard"                          => { file => "lib/Types/Standard.pm", version => 1.008003 },
+                        "Types::Standard::ArrayRef"                => { file => "lib/Types/Standard/ArrayRef.pm", version => 1.008003 },
+                        "Types::Standard::CycleTuple"              => { file => "lib/Types/Standard/CycleTuple.pm", version => 1.008003 },
+                        "Types::Standard::Dict"                    => { file => "lib/Types/Standard/Dict.pm", version => 1.008003 },
+                        "Types::Standard::HashRef"                 => { file => "lib/Types/Standard/HashRef.pm", version => 1.008003 },
+                        "Types::Standard::Map"                     => { file => "lib/Types/Standard/Map.pm", version => 1.008003 },
+                        "Types::Standard::ScalarRef"               => { file => "lib/Types/Standard/ScalarRef.pm", version => 1.008003 },
+                        "Types::Standard::StrMatch"                => { file => "lib/Types/Standard/StrMatch.pm", version => 1.008003 },
+                        "Types::Standard::Tied"                    => { file => "lib/Types/Standard/Tied.pm", version => 1.008003 },
+                        "Types::Standard::Tuple"                   => { file => "lib/Types/Standard/Tuple.pm", version => 1.008003 },
+                        "Types::TypeTiny"                          => { file => "lib/Types/TypeTiny.pm", version => 1.008003 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -114,7 +114,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Type-Tiny/project",
                       },
-  "version"        => 1.008001,
+  "version"        => 1.008003,
   "x_breaks"       => { "Kavorka" => "<= 0.013", "Types::ReadOnly" => "<= 0.001" },
   "x_contributors" => [
                         "Diab Jerius (DJERIUS) <djerius\@cpan.org>",
@@ -141,6 +141,7 @@ my $meta = {
                         "Nelo Onyiah",
                         "Jonas B Nielsen (JONASBN) <jonasbn\@cpan.org>",
                         "Benct Philip Jonsson <bpj\@melroch.se>",
+                        "Hauke D (HAUKEX) <haukex\@cpan.org>",
                       ],
 };
 
@@ -151,9 +152,13 @@ $meta->{prereqs}{runtime}{requires}{'Data::Dumper'}   = '1.121' if $] < 5.008001
 $meta->{prereqs}{runtime}{requires}{'Text::Balanced'} = '1.95'  if $] < 5.007003;
 $meta->{prereqs}{runtime}{requires}{'Exporter'}       = '5.57'  if $] < 5.009001;
 
-if ($ENV{EXTENDED_TESTING} and $meta->{version} =~ /_/)
-{
+if ($ENV{EXTENDED_TESTING} and $meta->{version} =~ /_/) {
 	$meta->{prereqs}{test}{requires}{'Moose'} = '2.0600';
+}
+
+if ($ENV{AUTOMATED_TESTING} and "$^V" =~ /c$/) {
+	print "cperl unsupported\n";
+	exit(0);
 }
 
 };

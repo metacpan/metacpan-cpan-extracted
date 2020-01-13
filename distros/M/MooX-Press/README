@@ -158,6 +158,12 @@ DESCRIPTION
 
         Optional; defaults to nothing.
 
+    `begin` *(CodeRef)*
+        Like `end`, but called before setting up any attributes, methods, or
+        method modifiers. (But after loading Moo/Moose/Mouse.)
+
+        Optional; defaults to nothing.
+
     `mutable` *(Bool)*
         Boolean to indicate that classes should be left mutable after creating
         them rather than making them immutable. Constructors for mutable
@@ -633,6 +639,29 @@ DESCRIPTION
 
     `end` *(CodeRef)*
         Override `end` for this class and any child classes.
+
+        See "Import Options".
+
+    `begin` *(CodeRef)*
+        Override `begin` for this class and any child classes.
+
+          use MooX::Press::Keywords qw( true false );
+          use MooX::Press (
+            prefix => 'Library',
+            class  => [
+              'Book' => {
+                begin => sub {
+                  my $classname = shift;   # "Library::Book"
+                  my $registry  = Type::Registry->for_class($classname);
+                  $registry->alias_type('ArrayRef[Str]' => 'StrList')
+                },
+                has => {
+                  'title'   => { type => 'Str',     required => true },
+                  'authors' => { type => 'StrList', required => true },
+                },
+              },
+            ],
+          );
 
         See "Import Options".
 

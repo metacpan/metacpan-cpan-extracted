@@ -9,6 +9,8 @@ README
 dist.ini
 lib/Complete/Util.pm
 t/00-compile.t
+t/answer_has_entries.t
+t/answer_num_entries.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

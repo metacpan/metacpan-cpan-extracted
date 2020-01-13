@@ -49,6 +49,12 @@ will be passed the same arguments as open.
 Runs a hook before C<sysopen> by hooking C<OP_SYSOPEN>. Passes the same arguments
 to the provided sub reference as provided to sysopen.
 
+=item suppress_warnings
+
+  overload::open->suppress_warnings(1)
+
+Suppress runtime warnings
+
 =back
 
 =head1 AUTHOR

@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Densitymapbox::Hoverlabel;
 use Chart::Plotly::Trace::Densitymapbox::Stream;
 use Chart::Plotly::Trace::Densitymapbox::Transform;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: Draws a bivariate kernel density estimation with a Gaussian kernel from `lon` and `lat` coordinates and optional `z` values using a colorscale.
 
@@ -149,6 +149,13 @@ has latsrc => ( is            => "rw",
                 documentation => "Sets the source reference on plot.ly for  lat .",
 );
 
+has legendgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
 has lon => ( is            => "rw",
              isa           => "ArrayRef|PDL",
              documentation => "Sets the longitude coordinates (in degrees East).",
@@ -198,6 +205,12 @@ has reversescale => (
     isa => "Bool",
     documentation =>
       "Reverses the color mapping if true. If true, `zmin` will correspond to the last color in the array and `zmax` will correspond to the first color.",
+);
+
+has showlegend => (
+               is            => "rw",
+               isa           => "Bool",
+               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
 );
 
 has showscale => ( is            => "rw",
@@ -304,7 +317,7 @@ Chart::Plotly::Trace::Densitymapbox - Draws a bivariate kernel density estimatio
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -435,6 +448,10 @@ Sets the latitude coordinates (in degrees North).
 
 Sets the source reference on plot.ly for  lat .
 
+=item * legendgroup
+
+Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
+
 =item * lon
 
 Sets the longitude coordinates (in degrees East).
@@ -470,6 +487,10 @@ Sets the source reference on plot.ly for  radius .
 =item * reversescale
 
 Reverses the color mapping if true. If true, `zmin` will correspond to the last color in the array and `zmax` will correspond to the first color.
+
+=item * showlegend
+
+Determines whether or not an item corresponding to this trace is shown in the legend.
 
 =item * showscale
 
@@ -535,7 +556,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -1,11 +1,9 @@
 package Config::Utils;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use Readonly;
 
@@ -13,7 +11,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(conflict hash hash_array);
 
 # Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Check conflits.
 sub conflict {
@@ -120,6 +118,7 @@ Config::Utils - Common config utilities.
 =head1 SYNOPSIS
 
  use Config::Utils qw(conflict hash hash_array);
+
  conflict($self, {'key' => 1}, 'key');
  hash($self, ['one', 'two'], $val);
  hash_array($self, ['one', 'two'], $val);
@@ -130,7 +129,7 @@ Config::Utils - Common config utilities.
 
 =item C<conflict($self, $config_hr, $key)>
 
- Check conflits.
+ Check conflicts.
  Affected variables from $self:
  - set_conflicts - Flag, then control conflicts.
  - stack - Reference to array with actual '$key' key position.
@@ -170,11 +169,9 @@ Config::Utils - Common config utilities.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Config::Utils qw(conflict);
 
  # Object.
@@ -191,11 +188,9 @@ Config::Utils - Common config utilities.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Config::Utils qw(hash);
  use Dumpvalue;
 
@@ -226,11 +221,9 @@ Config::Utils - Common config utilities.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Config::Utils qw(hash_array);
  use Dumpvalue;
 
@@ -262,11 +255,9 @@ Config::Utils - Common config utilities.
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Config::Utils qw(hash_array);
  use Dumpvalue;
 
@@ -324,17 +315,17 @@ Module for simple configure file parsing with arrays.
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2011-2015
+ © Michal Josef Špaček 2011-2020
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

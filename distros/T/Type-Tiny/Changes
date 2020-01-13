@@ -7,6 +7,36 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.008003	2020-01-13
+
+ [ Documentation ]
+ - Update copyright dates to 2020.
+
+ [ Packaging ]
+ - Makefile.PL will now bail out on cperl if AUTOMATED_TESTING environment
+   variable is set to true.
+
+ [ Other ]
+ - Added: Type::Registry can now have a parent registry.
+
+1.008002	2020-01-11
+
+ [ Bug Fixes ]
+ - Fix bareword errors if certain Type::Tiny subclasses were loaded prior
+   to Type::Tiny.
+   Fixes RT#131401.
+   <https://rt.cpan.org/Ticket/Display.html?id=131401>
+
+ [ Documentation ]
+ - Fix typos.
+   Hauke D++
+
+ [ Other ]
+ - Type::Tiny didn't accept string constraints for parameterizable type
+   constraints; this was not a documented restriction and didn't seem to
+   serve any purpose, so the restriction has been lifted.
+   <https://rt.cpan.org/Ticket/Display.html?id=131238>
+
 1.008001	2019-12-28
 
  - Types::TypeTiny honours $Type::Tiny::AvoidCallbacks.

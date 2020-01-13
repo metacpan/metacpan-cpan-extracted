@@ -4,13 +4,13 @@
       "MacGyveR <dumb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4222",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PSGI-Hector",
    "prereqs" : {
@@ -32,6 +32,7 @@
             "CGI::Simple::Cookie" : "0",
             "CSS::Minifier::XS" : "0",
             "Class::Load" : "0",
+            "Crypt::Simple" : "0",
             "Data::Dumper" : "0",
             "File::Basename" : "0",
             "File::Spec" : "0",
@@ -52,7 +53,7 @@
    "provides" : {
       "PSGI::Hector" : {
          "file" : "lib/PSGI/Hector.pm",
-         "version" : "1.91"
+         "version" : "2.0"
       },
       "PSGI::Hector::Base" : {
          "file" : "lib/PSGI/Hector/Base.pm"
@@ -97,5 +98,6 @@
          "url" : "https://github.com/thedumbterminal/PSGI-Hector"
       }
    },
-   "version" : "1.91"
+   "version" : "2.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

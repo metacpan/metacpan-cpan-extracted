@@ -25,6 +25,8 @@ use constant XML_DECL => "<?xml version=\"1.0\"?>\n";
 
 use Errno qw(ENOENT);
 
+# TEST*533
+
 ##
 # test values
 my @goodWFStrings = (
@@ -720,7 +722,7 @@ my $badXInclude = q{
     my %badstrings = (
                     SIMPLE => '<?xml version="1.0"?>'."\n<A/>\n",
                   );
-    my $parser = XML::LibXML->new;
+    my $parser = XML::LibXML->new(expand_entities => 1);
 
     $parser->validation(1);
     my $doc;
@@ -745,7 +747,7 @@ EOXML
 <bar/>
 EOXML
 
-    my $parser = XML::LibXML->new;
+    my $parser = XML::LibXML->new(expand_entities => 1);
     $parser->validation(1);
 
     eval { $parser->parse_string( $badxml ); };

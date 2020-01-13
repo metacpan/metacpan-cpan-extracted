@@ -11,7 +11,7 @@ plan tests => 25 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 my @module_files = (
     'Bencher/Backend.pm',
     'Bencher/Formatter.pm',
-    'Bencher/Formatter/AddVsSlowestField.pm',
+    'Bencher/Formatter/AddComparisonFields.pm',
     'Bencher/Formatter/CodeStartup.pm',
     'Bencher/Formatter/DeleteConstantFields.pm',
     'Bencher/Formatter/DeleteNotesFieldIfEmpty.pm',

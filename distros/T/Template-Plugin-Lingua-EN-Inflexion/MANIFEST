@@ -1,0 +1,17 @@
+Changes
+examples/synopsis.pl
+lib/Template/Plugin/Lingua/EN/Inflexion.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/inflect-nofilter.t
+t/inflect.t
+t/wordlist.t
+xt/boilerplate.t
+xt/cpan-meta.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

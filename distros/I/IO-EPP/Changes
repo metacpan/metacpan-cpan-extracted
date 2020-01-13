@@ -1,0 +1,10 @@
+0.002   2020-01-01
+        Added Verisign Core server emulation
+        Added more documentation
+
+0.001   2019-09-09
+        Added RIPN.pm, Taeping.pm modules
+        Added Base and CenralNic servers emulation and full test for IO::EPP::Base using virtual server
+
+0.000   2019-01-01
+        Initial release of this package, bot first module writed in 2014-06-01

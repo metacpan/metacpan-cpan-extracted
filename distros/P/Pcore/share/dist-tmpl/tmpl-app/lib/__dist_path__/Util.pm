@@ -18,7 +18,7 @@ sub BUILD ( $self, $args ) {
 
     # set settings listener
     P->bind_events(
-        'app.settings.updated',
+        'app.api.settings.updated',
         sub ($ev) {
             $self->{settings} = $ev->{data};
 

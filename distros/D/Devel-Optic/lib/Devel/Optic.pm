@@ -1,5 +1,5 @@
 package Devel::Optic;
-$Devel::Optic::VERSION = '0.012';
+$Devel::Optic::VERSION = '0.014';
 # ABSTRACT: Production safe data inspector
 
 use strict;
@@ -54,14 +54,16 @@ sub inspect {
     return $self->fit_to_view($full_picture);
 }
 
+# This sub is effectively a very basic serializer. It could probably be made
+# much more information-dense by adopting strategies from real serializers, or
+# by incorporating hints from the user on their desired space<->thoroughness
+# tradeoff.
 sub fit_to_view {
     my ($self, $subject) = @_;
 
     my $ref = ref $subject;
     my $reasonably_summarized_with_substr = !is_ref($subject) || is_regexpref($subject) || is_scalarref($subject);
 
-    # now we're in too-big territory, so we need to come up with a way to get
-    # some useful data to the user without showing the whole structure
     if ($reasonably_summarized_with_substr) {
         if (!defined $subject) {
             return "(undef)";
@@ -174,7 +176,7 @@ Devel::Optic - Production safe data inspector
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -182,11 +184,14 @@ version 0.012
   my $optic = Devel::Optic->new();
   my $foo = { bar => ['baz', 'blorg', { clang => 'pop' }] };
 
+  # 'HASH: {bar => ARRAY} (1 keys)"
+  $optic->inspect('$foo');
+
+  # 'ARRAY: [baz, blorg, HASH] (len 3)'
+  $optic->inspect(q|$foo->{'bar'}|);
+
   # 'pop (len 3)'
   $optic->inspect(q|$foo->{'bar'}->[-1]->{'clang'}|);
-
-  # 'HASH: { bar => ARRAY ...} (1 total keys)"
-  $optic->inspect('$foo');
 
 =head1 DESCRIPTION
 
@@ -202,10 +207,10 @@ of complex data structures from a Perl scope based on the variable name. This
 is intended for use by debuggers or similar introspection/observability tools
 where the consuming audience is a human troubleshooting a system.
 
-If the data structure selected by the query is too big, it will summarize the
-selected data structure into a short, human-readable message. No attempt is
-made to make the summary machine-readable: it should be immediately passed to
-a structured logging pipeline.
+Devel::Optic will summarize the selected data structure into a short,
+human-readable message. No attempt is made to make the summary contents
+machine-readable: it should be immediately passed to a logging pipeline or
+other debugging tool.
 
 =head1 NAME
 
@@ -245,30 +250,25 @@ Number of keys/indices to display when summarizing a hash or arrayref. Default: 
 
   my $stuff = { foo => ['a', 'b', 'c'] };
   my $o = Devel::Optic->new;
-  # 'a'
+  # 'a (len 1)'
   $o->inspect(q|$stuff->{'foo'}->[0]|);
 
-This is the primary method. Given a query, It will either return the requested
-data structure, or, if it is too big, return a summary of the data structure
-found at that path.
+This is the primary method. Given a query, it will return a summary of the data
+structure found at that path.
 
 =head2 fit_to_view
 
     my $some_variable = ['a', 'b', { foo => 'bar' }, [ 'blorg' ] ];
 
-    my $tiny = Devel::Optic->new();
+    my $o = Devel::Optic->new();
     # "ARRAY: [ 'a', 'b', HASH, ARRAY ]"
-    $tiny->fit_to_view($some_variable);
+    $o->fit_to_view($some_variable);
 
-    my $normal = Devel::Optic->new();
-    # ['a', 'b', { foo => 'bar' }, [ 'blorg' ] ]
-    $normal->fit_to_view($some_variable);
-
-This method takes a Perl object/data structure and either returns it unchanged,
-or produces a 'squished' summary of that object/data structure. This summary
-makes no attempt to be comprehensive: its goal is to maximally aid human
-troubleshooting efforts, including efforts to refine a previous invocation of
-Devel::Optic with a more specific query.
+This method takes a Perl object/data structure and produces a 'squished'
+summary of that object/data structure. This summary makes no attempt to be
+comprehensive: its goal is to maximally aid human troubleshooting efforts,
+including efforts to refine a previous invocation of Devel::Optic with a more
+specific query.
 
 =head2 full_picture
 

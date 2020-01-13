@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use constant DELIMITER => '@#%@#';
 
@@ -50,10 +50,10 @@ sub import {
             export   => $opts{export},
         };
     } else {
-        my %opts    = @_;
+        my %opts = @_;
         my $data = _data($class);
         if (my $export = $opts{export} || $data->{export}) {
-           *{"$package\::$export"} = sub () { $class };
+            constant->import("$package\::$export", $class);
         }
     }
 }

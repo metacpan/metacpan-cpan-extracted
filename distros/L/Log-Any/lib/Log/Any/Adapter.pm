@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Adapter;
 
 # ABSTRACT: Tell Log::Any where to send its logs
-our $VERSION = '1.707';
+our $VERSION = '1.708';
 
 use Log::Any;
 our @CARP_NOT = ( 'Log::Any::Manager' );
@@ -25,6 +25,11 @@ sub remove {
     Log::Any->_manager->remove(@_)
 }
 
+sub get {
+    my $pkg = shift;
+    Log::Any->_manager->get_adapter(@_);
+}
+
 1;
 
 __END__
@@ -39,7 +44,7 @@ Log::Any::Adapter - Tell Log::Any where to send its logs
 
 =head1 VERSION
 
-version 1.707
+version 1.708
 
 =head1 SYNOPSIS
 
@@ -220,6 +225,23 @@ created will automatically adjust to the new stack. For example:
         ...
     }
     $log->error("aiggh!");   # this goes nowhere again
+
+=head1 BUILDING ON THE Log::Any BACKEND
+
+=over
+
+=item get
+
+  my $adapter= Log::Any::Adapter->get($category);
+
+The primary intended way to extend the producing-side of Log::Any is with a custom
+L<Log::Any::Proxy> class.  However, for special logging scenarios you might also
+just want access to the adapter for a given category.  The API of an adapter object
+is described in L<Log::Any::Adapter::Development>.  Beware that adapter objects can
+be "rewritten" on the fly, so any conditional behavior you write depending on the
+capabilities of an adapter must be re-checked every time you access the adapter.
+
+=back
 
 =head1 SEE ALSO
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Config-ENV-Multi
 
+0.05 2020-01-11T08:55:36Z
+
+    - Suppress warning
+
 0.04 2017-06-08T15:19:22Z
 
     - Fix dependencies

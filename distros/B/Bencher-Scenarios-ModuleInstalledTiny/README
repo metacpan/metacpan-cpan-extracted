@@ -1,0 +1,42 @@
+NAME
+    Bencher::Scenarios::ModuleInstalledTiny - Scenarios to benchmark
+    Module::Installed::Tiny
+
+VERSION
+    This document describes version 0.003 of
+    Bencher::Scenarios::ModuleInstalledTiny (from Perl distribution
+    Bencher-Scenarios-ModuleInstalledTiny), released on 2020-01-09.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::ModuleInstalledTiny::module_installed
+
+    *   Bencher::Scenario::ModuleInstalledTiny::module_source
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-ModuleInstalledTiny>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-ModuleInstalledTiny>
+    .
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Mod
+    uleInstalledTiny>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -12,7 +12,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -362,7 +362,7 @@ Module for simple configure file parsing with arrays.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Config-Dot>
+L<https://github.com/michal-josef-spacek/Config-Dot>
 
 =head1 AUTHOR
 
@@ -372,11 +372,11 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2018 Michal Josef Špaček
+ © 2011-2020 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

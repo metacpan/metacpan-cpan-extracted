@@ -1,4 +1,5 @@
-package Devel::Leak::Object;
+package Devel::Leak::Object; # git description: ff2d4f9
+# ABSTRACT: Detect leaks of objects
 
 use 5.005;
 # We abuse refs a LOT
@@ -6,25 +7,19 @@ use strict qw{ vars subs };
 use Carp         ();
 use Scalar::Util ();
 
-use vars qw{ $VERSION @ISA @EXPORT_OK };
-use vars qw{ %OBJECT_COUNT %TRACKED %DESTROY_ORIGINAL %DESTROY_STUBBED %DESTROY_NEXT %IGNORE_CLASS %OBJECT_COUNT_CHECKPOINT };
-BEGIN {
-	$VERSION     = '1.01';
+our $VERSION = '1.02';
 
-	# Set up exports
-	require Exporter;
-	@ISA         = qw(Exporter);
-	@EXPORT_OK   = qw(track bless status checkpoint);
+use base 'Exporter';
+our @EXPORT_OK   = qw(track bless status checkpoint);
 
-	# Set up state storage (primary for clarity)
-	%OBJECT_COUNT     = ();
-	%OBJECT_COUNT_CHECKPOINT     = ();
-	%TRACKED          = ();
-	%DESTROY_ORIGINAL = ();
-	%DESTROY_STUBBED  = ();
-	%DESTROY_NEXT     = ();
-	%IGNORE_CLASS     = ();
-}
+# Set up state storage (primary for clarity)
+our %OBJECT_COUNT     = ();
+our %OBJECT_COUNT_CHECKPOINT     = ();
+our %TRACKED          = ();
+our %DESTROY_ORIGINAL = ();
+our %DESTROY_STUBBED  = ();
+our %DESTROY_NEXT     = ();
+our %IGNORE_CLASS     = ();
 
 sub import {
 	my $class  = shift;
@@ -170,7 +165,7 @@ sub make_next {
 		my @queue = ();
 		while ( my $c = shift @stack ) {
 			next if $seen{$c}++;
-		
+
 			# Does the class have it's own DESTROY method
 			my $has_destroy = $DESTROY_STUBBED{$c}
 				? !! exists $DESTROY_ORIGINAL{$c}
@@ -203,10 +198,10 @@ sub checkpoint {
 		next unless $OBJECT_COUNT{$_}; # Don't list class with count zero
 		$OBJECT_COUNT_CHECKPOINT{$_} ||= 0;
 		next unless ($OBJECT_COUNT{$_} > $OBJECT_COUNT_CHECKPOINT{$_});
-		
+
 		print STDERR "checkpoint:\n" unless ($first++);;
 		printf STDERR "\t%-40s %d\n", $_, $OBJECT_COUNT{$_}-$OBJECT_COUNT_CHECKPOINT{$_};
-		
+
 		$OBJECT_COUNT_CHECKPOINT{$_} = $OBJECT_COUNT{$_};
 	}
 }
@@ -246,10 +241,17 @@ END {
 
 __END__
 
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Devel::Leak::Object - Detect leaks of objects 
+Devel::Leak::Object - Detect leaks of objects
+
+=head1 VERSION
+
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -257,7 +259,7 @@ Devel::Leak::Object - Detect leaks of objects
   use Devel::Leak::Object;
   my $obj = Foo::Bar->new;
   Devel::Leak::Object::track($obj);
-  
+
   # Track every object
   use Devel::Leak::Object qw{ GLOBAL_bless };
 
@@ -268,7 +270,7 @@ Devel::Leak::Object - Detect leaks of objects
 =head1 DESCRIPTION
 
 This module provides tracking of objects, for the purpose of detecting memory
-leaks due to circular references or innappropriate caching schemes.
+leaks due to circular references or inappropriate caching schemes.
 
 Object tracking can be enabled on a per object basis. Any objects
 thus tracked are remembered until DESTROYed; details of any objects
@@ -291,33 +293,48 @@ Setting the global variable $Devel::Leak::Object::TRACKSOURCELINES makes the
 report at the end include where (filename and line number) each leaked object
 originates (or where call to the ::new is made).
 
-=head1 BUGS
-
-Please report bugs to http://rt.cpan.org
-
-=head1 AUTHOR
-
-Adam Kennedy <adamk@cpan.org>
-
-With some additional contributions from David Cantrell E<lt>david@cantrell.org.ukE<gt>
-and Sven Dowideit <svendowideit@home.org.au>
-
 =head1 SEE ALSO
 
 L<Devel::Leak>
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Leak-Object>
+(or L<bug-Devel-Leak-Object@rt.cpan.org|mailto:bug-Devel-Leak-Object@rt.cpan.org>).
+
+=head1 AUTHOR
+
+Adam Kennedy, <adamk@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Karen Etheridge Sven Dowideit David Cantrell
+
+=over 4
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Sven Dowideit <sdowideit@cpan.org>
+
+=item *
+
+David Cantrell <david@cantrell.org.uk>
+
+=back
+
 =head1 COPYRIGHT
 
-Copyright 2007 - 2010 Adam Kennedy.
+This software is copyright (c) 2004 by Adam Kennedy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 Rewritten from original copyright 2004 Ivor Williams.
 
 Some documentation also copyright 2004 Ivor Williams.
-
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
 
 =cut

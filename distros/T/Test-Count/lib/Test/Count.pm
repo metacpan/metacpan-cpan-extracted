@@ -1,11 +1,11 @@
 package Test::Count;
-$Test::Count::VERSION = '0.1001';
+$Test::Count::VERSION = '0.1101';
 use warnings;
 use strict;
 
-use base 'Test::Count::Base';
+use parent 'Test::Count::Base';
 
-use Test::Count::Parser;
+use Test::Count::Parser ();
 
 sub _in_fh
 {
@@ -110,6 +110,10 @@ sub process
         }
     }
     $parser->_pop_current_filenames();
+    if ( @{ $parser->_parser->{filter_mults} } != 1 )
+    {
+        die "Unbalanced FILTER() and ENDFILTER().";
+    }
 
     return { 'tests_count' => $parser->get_count(), 'lines' => \@file_lines, };
 }
@@ -125,7 +129,7 @@ __END__
 
 =head1 VERSION
 
-version 0.1001
+version 0.1101
 
 =head1 SYNOPSIS
 
@@ -245,10 +249,10 @@ validate according to the spec, and are processed well using the processor.
     use warnings;
 
     use Test::More tests => 18;
-    use IO::All;
-    use Test::Differences;
+    use IO::All qw/ io /;
+    use Test::Differences qw/ eq_or_diff /;
 
-    use MyFormatProcessor;
+    use MyFormatProcessor ();
 
     # TEST:$num_files=6;
     my @basenames =
@@ -287,6 +291,58 @@ validate according to the spec, and are processed well using the processor.
 As you can see, the number of files is kept in one central place, and each
 assertion inside the loop is multiplied by it. So if we add or remove files,
 we only need to add or remove them from their declarations.
+
+=head2 Loops using FILTER()
+
+Starting from Test::Count version 0.1100 one can also use
+the C<< FILTER(MULT($expr)) >> and C< ENDFILTER() > notations.
+
+    #!/usr/bin/perl
+
+    use strict;
+    use warnings;
+
+    use Test::More tests => 18;
+    use IO::All qw/ io /;
+    use Test::Differences qw/ eq_or_diff /;
+
+    use MyFormatProcessor ();
+
+    # TEST:$num_files=6;
+    my @basenames =
+    (qw(
+        basic
+        with_ampersands
+        with_comments
+        with_bold
+        with_italics
+        with_bold_and_italics
+    ));
+
+    # TEST:FILTER(MULT($num_files))
+    foreach my $basename (@basenames)
+    {
+        my $processor = MyFormatProcessor->new(
+            {
+                filename => "t/data/input/$basename.myformat",
+            }
+        );
+
+        # TEST
+        ok ($processor,
+            "Construction of a processor for '$basename' was successful."
+        );
+
+        # TEST
+        ok (scalar($processor->is_valid()), "'$basename' is valid.");
+
+        # TEST
+        eq_or_diff ($processor->convert_to_xhtml,
+            scalar(io("t/data/want-output/$basename.xhtml")->slurp()),
+            "Converting '$basename' is successful."
+        );
+    }
+    # TEST:ENDFILTER()
 
 =head1 AUTHOR
 
@@ -336,7 +392,7 @@ Copyright 2006 Shlomi Fish.
 
 This program is released under the following license: MIT X11.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -370,14 +426,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Count>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Test-Count>
 
 =item *
 
@@ -452,7 +500,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Shlomi Fish.
+This software is Copyright (c) 2006 by Shlomi Fish.
 
 This is free software, licensed under:
 

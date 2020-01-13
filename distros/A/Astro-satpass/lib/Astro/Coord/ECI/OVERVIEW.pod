@@ -91,7 +91,7 @@ the page.
 =head1 BUGS
 
 Bugs should be reported to queue Astro-satpass at
-L<http://rt.cpan.org/>, or to the author via electronic mail at
+L<https://rt.cpan.org/>, or to the author via electronic mail at
 F<wyant at cpan dot org>.
 
 =head1 UNITS
@@ -219,7 +219,7 @@ from that effective date. Unfortunately, the TLE data do not contain
 either of these.
 
 NASA's Human Space Flight data, available from
-L<http://spaceflight.nasa.gov/realdata/elements/>, specify an effective
+L<https://spaceflight.nasa.gov/realdata/elements/>, specify an effective
 date (see the C<Vector Time> information on that web page), but this is
 not part of the TLE. The L<Astro::SpaceTrack|Astro::SpaceTrack> package
 is capable of returning this data by jamming it onto the first line of a
@@ -492,7 +492,7 @@ L<Astro::SpaceTrack|Astro::SpaceTrack> for the latest.
 =head2 Space Track
 
 The 'most official' source of L<TLE|/TLE> data is
-L<http://www.space-track.org/>, which requires you to register and use a
+L<https://www.space-track.org/>, which requires you to register and use a
 username and password. Other sources may get their data from here, which
 means their data are hours to days older.
 L<Astro::SpaceTrack|Astro::SpaceTrack> will retrieve data from this
@@ -526,7 +526,7 @@ without them.
 =head2 NASA Human Space Flight
 
 NASA makes International Space Station data available at
-L<http://spaceflight.nasa.gov/realdata/elements/>, but the L<TLEs|/TLE>
+L<https://spaceflight.nasa.gov/realdata/elements/>, but the L<TLEs|/TLE>
 have to be dug out of the data.  L<Astro::SpaceTrack|Astro::SpaceTrack>
 will dig out the data for you, and you do not need a username or
 password.  Unlike the other sources, these data include predictions of
@@ -535,13 +535,13 @@ future TLEs.
 =head2 Amateur Radio Satellite Corporation
 
 The Amateur Radio Satellite Corporation (AMSAT) keeps orbital elements
-at L<http://www.amsat.org/amsat-new/tools/keps.php>. They appear to get
-the data from Dr. Kelso. L<Astro::SpaceTrack|Astro::SpaceTrack> will get
-this data for you, and you need no username or password.
+at L<https://www.amsat.org/keplerian-elements-resources/>. They appear
+to get the data from Dr. Kelso. L<Astro::SpaceTrack|Astro::SpaceTrack>
+will get this data for you, and you need no username or password.
 
 =head2 Heavens Above
 
-Heavens Above at L<http://www.heavens-above.com/> does visibility
+Heavens Above at L<https://www.heavens-above.com/> does visibility
 predictions, and will give you L<TLE|/TLE> data if you drill down far
 enough on an individual satellite. I do not know where they get their
 data. I have observed it to be a day or so behind Space Track, but they
@@ -551,7 +551,7 @@ the site. Astro::SpaceTrack does not retrieve data from this site.
 
 =head1 COMPARISON TO HEAVENS ABOVE
 
-Because Heavens Above (L<http://www.heavens-above.com/>) is a good
+Because Heavens Above (L<https://www.heavens-above.com/>) is a good
 source of local satellite visibility predictions, you may wish to try to
 duplicate its predictions as part of your process for qualifying this
 software. Part of the problem with doing this is that Heavens Above's
@@ -623,7 +623,7 @@ little careful with it, because it does not implement the full
 L<DateTime|DateTime> interface.
 
 One of the resources for comparison data is CalSky
-(L<http://calsky.com/>). This does astronomical calculations back to
+(L<https://calsky.com/>). This does astronomical calculations back to
 2999 BC, but there are problems if you go too far back. In particular I
 got no Sunrise time for any location I tried before about 1508 BC, and
 only one phase of the Moon for the entire month of July 2999 BC. Times
@@ -633,7 +633,7 @@ found documentation where they say what they are doing. I also have no
 idea how they extend time zones back before there were time zones, so I
 have asked for times in UTC.
 
-Another resource is Stellarium (L<http://www.stellarium.org/>, which is
+Another resource is Stellarium (L<http://stellarium.org/>, which is
 open source planetarium software. I could not figure out how to get
 things like equinox/solstice and Moon phases out of it, but rise times
 and locations can be obtained just by setting the time appropriately and
@@ -686,7 +686,7 @@ Thomas R. Wyant, III F<wyant@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2019 by Thomas R. Wyant, III
+Copyright (C) 2009-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

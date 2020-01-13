@@ -1,3 +1,8 @@
+0.608   2020-01-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add functions: answer_has_entries, answer_num_entries.
+
+
 0.607   2019-12-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Tweak complete_comma_sep(): don't add space yet when there are

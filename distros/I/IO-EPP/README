@@ -1,0 +1,10 @@
+IO::EPP - Object and procedure client-side interface for work with EPP API of registries and some resellers
+
+To build, test and install this distribution type:
+
+ perl Makefile.PL
+ make test
+ make install
+
+Share and Enjoy!
+Vadiml Likhota <vadiml@cpan.org>

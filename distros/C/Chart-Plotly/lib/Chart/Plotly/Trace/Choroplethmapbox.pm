@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Choroplethmapbox::Stream;
 use Chart::Plotly::Trace::Choroplethmapbox::Transform;
 use Chart::Plotly::Trace::Choroplethmapbox::Unselected;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: GeoJSON features to be filled are set in `geojson` The data that describes the choropleth value-to-color mapping is set in `locations` and `z`.
 
@@ -91,11 +91,18 @@ has customdatasrc => ( is            => "rw",
                        documentation => "Sets the source reference on plot.ly for  customdata .",
 );
 
+has featureidkey => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the key in GeoJSON features which is used as id to match the items included in the `locations` array. Support nested property, for example *properties.name*.",
+);
+
 has geojson => (
     is  => "rw",
     isa => "Any",
     documentation =>
-      "Sets the GeoJSON data associated with this trace. Can be set as a valid GeoJSON object or as URL string Note that we only accept GeoJSON of type *FeatureCollection* and *Feature* with geometries of type *Polygon* and *MultiPolygon*.",
+      "Sets the GeoJSON data associated with this trace. It can be set as a valid GeoJSON object or as a URL string. Note that we only accept GeoJSONs of type *FeatureCollection* or *Feature* with geometries of type *Polygon* or *MultiPolygon*.",
 );
 
 has hoverinfo => (
@@ -147,6 +154,13 @@ has idssrc => ( is            => "rw",
                 documentation => "Sets the source reference on plot.ly for  ids .",
 );
 
+has legendgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
 has locations => ( is            => "rw",
                    isa           => "ArrayRef|PDL",
                    documentation => "Sets which features found in *geojson* to plot using their feature `id` field.",
@@ -192,6 +206,12 @@ has selectedpoints => (
     isa => "Any",
     documentation =>
       "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
+);
+
+has showlegend => (
+               is            => "rw",
+               isa           => "Bool",
+               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
 );
 
 has showscale => ( is            => "rw",
@@ -297,7 +317,7 @@ Chart::Plotly::Trace::Choroplethmapbox - GeoJSON features to be filled are set i
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -386,9 +406,13 @@ Assigns extra data each datum. This may be useful when listening to hover, click
 
 Sets the source reference on plot.ly for  customdata .
 
+=item * featureidkey
+
+Sets the key in GeoJSON features which is used as id to match the items included in the `locations` array. Support nested property, for example *properties.name*.
+
 =item * geojson
 
-Sets the GeoJSON data associated with this trace. Can be set as a valid GeoJSON object or as URL string Note that we only accept GeoJSON of type *FeatureCollection* and *Feature* with geometries of type *Polygon* and *MultiPolygon*.
+Sets the GeoJSON data associated with this trace. It can be set as a valid GeoJSON object or as a URL string. Note that we only accept GeoJSONs of type *FeatureCollection* or *Feature* with geometries of type *Polygon* or *MultiPolygon*.
 
 =item * hoverinfo
 
@@ -424,6 +448,10 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 Sets the source reference on plot.ly for  ids .
 
+=item * legendgroup
+
+Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
+
 =item * locations
 
 Sets which features found in *geojson* to plot using their feature `id` field.
@@ -455,6 +483,10 @@ Reverses the color mapping if true. If true, `zmin` will correspond to the last 
 =item * selectedpoints
 
 Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
+
+=item * showlegend
+
+Determines whether or not an item corresponding to this trace is shown in the legend.
 
 =item * showscale
 
@@ -522,7 +554,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY   = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION     = '1.008001';
+	$Type::Tiny::VERSION     = '1.008003';
 	$Type::Tiny::XS_VERSION  = '0.016';
 }
 
@@ -211,24 +211,6 @@ sub new
 	my $class  = shift;
 	my %params = (@_==1) ? %{$_[0]} : @_;
 	
-	if (exists $params{constraint}
-	and not ref $params{constraint}
-	and not exists $params{constraint_generator}
-	and not exists $params{inline_generator})
-	{
-		require Eval::TypeTiny;
-		my $code = $params{constraint};
-		$params{constraint} = Eval::TypeTiny::eval_closure(
-			source      => sprintf('sub ($) { %s }', $code),
-			description => "anonymous check",
-		);
-		$params{inlined} ||= sub {
-			my ($type) = @_;
-			my $inlined = $_ eq '$_' ? "do { $code }" : "do { local \$_ = $_; $code }";
-			$type->has_parent ? (undef, $inlined) : $inlined;
-		};
-	}
-	
 	if (exists $params{parent}) {
 		$params{parent} = ref($params{parent}) =~ /^Type::Tiny\b/
 			? $params{parent}
@@ -240,6 +222,23 @@ sub new
 		if ($params{parent}->deprecated and not exists $params{deprecated}) {
 			$params{deprecated} = 1;
 		}
+	}
+	
+	if (exists $params{constraint}
+	and defined $params{constraint}
+	and not ref $params{constraint})
+	{
+		require Eval::TypeTiny;
+		my $code = $params{constraint};
+		$params{constraint} = Eval::TypeTiny::eval_closure(
+			source      => sprintf('sub ($) { %s }', $code),
+			description => "anonymous check",
+		);
+		$params{inlined} ||= sub {
+			my ($type) = @_;
+			my $inlined = $_ eq '$_' ? "do { $code }" : "do { local \$_ = $_; $code }";
+			$type->has_parent ? (undef, $inlined) : $inlined;
+		} if (!exists $params{parent} or $params{parent}->can_be_inlined);
 	}
 	
 	# canonicalize to a boolean
@@ -947,10 +946,10 @@ sub is_parameterized
 	my %seen;
 	sub ____make_key {
 		join ',', map {
-			Types::TypeTiny::TypeTiny->check($_) ? sprintf('$Type::Tiny::ALL_TYPES{%d}', $_->{uniq}) :
-			ref() eq 'ARRAY'                     ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('[%s]', ____make_key(@$_)) } :
-			ref() eq 'HASH'                      ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('{%s}', ____make_key(%$_)) } :
-			ref() eq 'SCALAR' || ref() eq 'REF'  ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('do { my $x = %s; \\$x }', ____make_key($$_)) } :
+			Types::TypeTiny::TypeTiny->check($_) ? sprintf('$Type::Tiny::ALL_TYPES{%d}', defined($_->{uniq}) ? $_->{uniq} : '____CANNOT_KEY____') :
+			ref() eq 'ARRAY'                     ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('[%s]',   ____make_key(@$_)) } :
+			ref() eq 'HASH'                      ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('{%s}',   ____make_key(%$_)) } :
+			ref() eq 'SCALAR' || ref() eq 'REF'  ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('\\(%s)', ____make_key($$_)) } :
 			!defined()                           ? 'undef' :
 			!ref()                               ? do { require B; B::perlstring($_) } :
 			'____CANNOT_KEY____';
@@ -2231,7 +2230,7 @@ Thanks to Matt S Trout for advice on L<Moo> integration.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

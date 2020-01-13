@@ -5,6 +5,7 @@ use Config;
 
 has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
 
+has deps       => ();
 has install    => ();
 has devel      => ();
 has recommends => ();
@@ -23,7 +24,7 @@ sub run ($self) {
     my $chdir_guard = P->file->chdir( $self->{dist}->{root} );
 
     # deps
-    exit 3 if !$self->_deps;
+    exit 3 if $self->{deps} && !$self->_deps;
 
     # build
     exit 3 if !$self->_build;
@@ -194,11 +195,11 @@ SH
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 103                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 104                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 122, 139, 144, 165   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 123, 140, 145, 166   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 153                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 154                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

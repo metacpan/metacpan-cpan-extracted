@@ -3,13 +3,12 @@ use strict;
 use warnings;
 use feature qw/ say /;;
 use Test::More;
-use Carp qw/ confess /;
 use Fcntl;
-use File::Temp qw/ tempfile /;
-my $test_file = tempfile;
+use File::Temp;
+my $test_file = File::Temp->new->filename;
 my %opened_files;
-
-open my $fh99, '>', "fake";
+my $test_file2 = File::Temp->new->filename;
+open my $fh99, '>', $test_file2;
 use overload::open;
 
 BEGIN {
@@ -35,9 +34,10 @@ BEGIN {
 }
 sub cleanup {
     unlink $test_file;
+    unlink $test_file2;
 }
 my $global;
-ok(!exists $opened_files{fake}, "did not register we opened the file called 'fake'");
+ok(!exists $opened_files{$test_file2}, "did not register we opened the file called '$test_file2'");
 unlink $test_file;
 my ($open_lives, $print_lives) = (0, 0);
 my $fh;
@@ -53,7 +53,7 @@ eval {
     $print_lives = 1;
     1;
 } or do {
-    confess $@;
+    die $@;
 };
 is $print_lives, 1, "Print does not die";
 is $open_lives, 1, "open does not die";

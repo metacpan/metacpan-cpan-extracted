@@ -1,9 +1,9 @@
 package Complete::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-23'; # DATE
+our $DATE = '2020-01-13'; # DATE
 our $DIST = 'Complete-Util'; # DIST
-our $VERSION = '0.607'; # VERSION
+our $VERSION = '0.608'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,6 +19,8 @@ our @EXPORT_OK = qw(
                        combine_answers
                        modify_answer
                        ununiquify_answer
+                       answer_has_entries
+                       answer_num_entries
                        complete_array_elem
                        complete_hash_key
                        complete_comma_sep
@@ -27,6 +29,15 @@ our @EXPORT_OK = qw(
 our %SPEC;
 
 our $COMPLETE_UTIL_TRACE = $ENV{COMPLETE_UTIL_TRACE} // 0;
+
+our %arg0_answer = (
+    answer => {
+        summary => 'Completion answer structure',
+        schema  => ['any*' => of => ['array*','hash*']],
+        req => 1,
+        pos => 0,
+    },
+);
 
 $SPEC{':package'} = {
     v => 1.1,
@@ -65,12 +76,7 @@ Then will add keys from `meta` to the hash.
 
 _
     args => {
-        arg => {
-            summary => '',
-            schema  => ['any*' => of => ['array*','hash*']],
-            req => 1,
-            pos => 0,
-        },
+        %arg0_answer,
         meta => {
             summary => 'Metadata (extra keys) for the hash',
             schema  => 'hash*',
@@ -107,12 +113,7 @@ receives a hash, will return its `words` key.
 
 _
     args => {
-        arg => {
-            summary => '',
-            schema  => ['any*' => of => ['array*','hash*']],
-            req => 1,
-            pos => 0,
-        },
+        %arg0_answer,
     },
     args_as => 'array',
     result_naked => 1,
@@ -126,6 +127,54 @@ sub arrayify_answer {
         $ans = $ans->{words};
     }
     $ans;
+}
+
+$SPEC{answer_num_entries} = {
+    v => 1.1,
+    summary => 'Get the number of entries in an answer',
+    description => <<'_',
+
+It is equivalent to:
+
+    ref $answer eq 'ARRAY' ? (@$answer // 0) : (@{$answer->{words}} // 0);
+
+_
+    args => {
+        %arg0_answer,
+    },
+    args_as => 'array',
+    result_naked => 1,
+    result => {
+        schema => 'int*',
+    },
+};
+sub answer_num_entries {
+    my $ans = shift;
+    return ref($ans) eq 'HASH' ? (@{$ans->{words} // []} // 0) : (@$ans // 0);
+}
+
+$SPEC{answer_has_entries} = {
+    v => 1.1,
+    summary => 'Check if answer has entries',
+    description => <<'_',
+
+It is equivalent to:
+
+    ref $answer eq 'ARRAY' ? (@$answer ? 1:0) : (@{$answer->{words}} ? 1:0);
+
+_
+    args => {
+        %arg0_answer,
+    },
+    args_as => 'array',
+    result_naked => 1,
+    result => {
+        schema => 'int*',
+    },
+};
+sub answer_has_entries {
+    my $ans = shift;
+    return ref($ans) eq 'HASH' ? (@{$ans->{words} // []} ? 1:0) : (@$ans ? 1:0);
 }
 
 sub __min(@) {
@@ -865,7 +914,7 @@ Complete::Util - General completion routine
 
 =head1 VERSION
 
-This document describes version 0.607 of Complete::Util (from Perl distribution Complete-Util), released on 2019-12-23.
+This document describes version 0.608 of Complete::Util (from Perl distribution Complete-Util), released on 2020-01-13.
 
 =head1 DESCRIPTION
 
@@ -889,11 +938,67 @@ are usually used by the other more specific or higher-level completion modules.
 =head1 FUNCTIONS
 
 
+=head2 answer_has_entries
+
+Usage:
+
+ answer_has_entries($answer) -> int
+
+Check if answer has entries.
+
+It is equivalent to:
+
+ ref $answer eq 'ARRAY' ? (@$answer ? 1:0) : (@{$answer->{words}} ? 1:0);
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$answer>* => I<array|hash>
+
+Completion answer structure.
+
+=back
+
+Return value:  (int)
+
+
+
+=head2 answer_num_entries
+
+Usage:
+
+ answer_num_entries($answer) -> int
+
+Get the number of entries in an answer.
+
+It is equivalent to:
+
+ ref $answer eq 'ARRAY' ? (@$answer // 0) : (@{$answer->{words}} // 0);
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$answer>* => I<array|hash>
+
+Completion answer structure.
+
+=back
+
+Return value:  (int)
+
+
+
 =head2 arrayify_answer
 
 Usage:
 
- arrayify_answer($arg) -> array
+ arrayify_answer($answer) -> array
 
 Make sure we return completion answer in array form.
 
@@ -906,7 +1011,9 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<$arg>* => I<array|hash>
+=item * B<$answer>* => I<array|hash>
+
+Completion answer structure.
 
 =back
 
@@ -1158,7 +1265,7 @@ Return value:  (array)
 
 Usage:
 
- hashify_answer($arg, $meta) -> hash
+ hashify_answer($answer, $meta) -> hash
 
 Make sure we return completion answer in hash form.
 
@@ -1174,7 +1281,9 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<$arg>* => I<array|hash>
+=item * B<$answer>* => I<array|hash>
+
+Completion answer structure.
 
 =item * B<$meta> => I<hash>
 
@@ -1315,7 +1424,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

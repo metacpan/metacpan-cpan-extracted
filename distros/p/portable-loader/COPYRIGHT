@@ -6,14 +6,13 @@ Source: https://metacpan.org/release/portable-loader
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
  lib/portable/alias.pm
  lib/portable/lib.pm
  lib/portable/loader/JSON.pm
  lib/portable/loader/Perl.pm
  lib/portable/loader/TOML.pm
-Copyright: Copyright 2019 Toby Inkster.
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: README
@@ -41,15 +40,19 @@ Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: dist.ini
+Copyright: Copyright 2019 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  

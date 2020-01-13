@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration
 
-our $VERSION = '0.0304';
+our $VERSION = '0.0305';
 
 use Moo;
 use strictures 2;
@@ -131,7 +131,7 @@ Music::Duration::Partition - Partition a musical duration
 
 =head1 VERSION
 
-version 0.0304
+version 0.0305
 
 =head1 SYNOPSIS
 
@@ -249,8 +249,7 @@ application, in a loop until the B<size> is met.
 
 =head1 SEE ALSO
 
-The F<t/01-methods.t>, F<eg/motif> and F<eg/shuffle> code in this
-distribution.
+The F<t/01-methods.t> and F<eg/*> code in this distribution.
 
 L<List::Util>
 

@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Choropleth::Stream;
 use Chart::Plotly::Trace::Choropleth::Transform;
 use Chart::Plotly::Trace::Choropleth::Unselected;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: The data that describes the choropleth value-to-color mapping is set in `z`. The geographic locations corresponding to each value in `z` are set in `locations`.
 
@@ -84,10 +84,24 @@ has customdatasrc => ( is            => "rw",
                        documentation => "Sets the source reference on plot.ly for  customdata .",
 );
 
+has featureidkey => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the key in GeoJSON features which is used as id to match the items included in the `locations` array. Only has an effect when `geojson` is set. Support nested property, for example *properties.name*.",
+);
+
 has geo => (
     is => "rw",
     documentation =>
       "Sets a reference between this trace's geospatial coordinates and a geographic map. If *geo* (the default value), the geospatial coordinates refer to `layout.geo`. If *geo2*, the geospatial coordinates refer to `layout.geo2`, and so on.",
+);
+
+has geojson => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Sets optional GeoJSON data associated with this trace. If not given, the features on the base map are used. It can be set as a valid GeoJSON object or as a URL string. Note that we only accept GeoJSONs of type *FeatureCollection* or *Feature* with geometries of type *Polygon* or *MultiPolygon*.",
 );
 
 has hoverinfo => (
@@ -139,10 +153,18 @@ has idssrc => ( is            => "rw",
                 documentation => "Sets the source reference on plot.ly for  ids .",
 );
 
+has legendgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
 has locationmode => (
-         is            => "rw",
-         isa           => enum( [ "ISO-3", "USA-states", "country names" ] ),
-         documentation => "Determines the set of locations used to match entries in `locations` to regions on the map.",
+    is  => "rw",
+    isa => enum( [ "ISO-3", "USA-states", "country names", "geojson-id" ] ),
+    documentation =>
+      "Determines the set of locations used to match entries in `locations` to regions on the map. Values *ISO-3*, *USA-states*, *country names* correspond to features on the base map and value *geojson-id* corresponds to features from a custom GeoJSON linked to the `geojson` attribute.",
 );
 
 has locations => ( is            => "rw",
@@ -190,6 +212,12 @@ has selectedpoints => (
     isa => "Any",
     documentation =>
       "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
+);
+
+has showlegend => (
+               is            => "rw",
+               isa           => "Bool",
+               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
 );
 
 has showscale => ( is            => "rw",
@@ -289,7 +317,7 @@ Chart::Plotly::Trace::Choropleth - The data that describes the choropleth value-
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -496,9 +524,17 @@ Assigns extra data each datum. This may be useful when listening to hover, click
 
 Sets the source reference on plot.ly for  customdata .
 
+=item * featureidkey
+
+Sets the key in GeoJSON features which is used as id to match the items included in the `locations` array. Only has an effect when `geojson` is set. Support nested property, for example *properties.name*.
+
 =item * geo
 
 Sets a reference between this trace's geospatial coordinates and a geographic map. If *geo* (the default value), the geospatial coordinates refer to `layout.geo`. If *geo2*, the geospatial coordinates refer to `layout.geo2`, and so on.
+
+=item * geojson
+
+Sets optional GeoJSON data associated with this trace. If not given, the features on the base map are used. It can be set as a valid GeoJSON object or as a URL string. Note that we only accept GeoJSONs of type *FeatureCollection* or *Feature* with geometries of type *Polygon* or *MultiPolygon*.
 
 =item * hoverinfo
 
@@ -534,9 +570,13 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 Sets the source reference on plot.ly for  ids .
 
+=item * legendgroup
+
+Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
+
 =item * locationmode
 
-Determines the set of locations used to match entries in `locations` to regions on the map.
+Determines the set of locations used to match entries in `locations` to regions on the map. Values *ISO-3*, *USA-states*, *country names* correspond to features on the base map and value *geojson-id* corresponds to features from a custom GeoJSON linked to the `geojson` attribute.
 
 =item * locations
 
@@ -569,6 +609,10 @@ Reverses the color mapping if true. If true, `zmin` will correspond to the last 
 =item * selectedpoints
 
 Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
+
+=item * showlegend
+
+Determines whether or not an item corresponding to this trace is shown in the legend.
 
 =item * showscale
 
@@ -632,7 +676,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

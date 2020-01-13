@@ -23,7 +23,8 @@ my $build = Module::Build->new(
 		"JavaScript::Minifier::XS" => 0,
 		"IO::Compress::Gzip" => 0,
 		"Plack::Middleware::ReverseProxy" => 0,
-		"Plack::Middleware::ReverseProxyPath" => 0
+		"Plack::Middleware::ReverseProxyPath" => 0,
+		"Crypt::Simple" => 0
 	},
 	build_requires => {
 		"Test::More" => 0,

@@ -1,3 +1,7 @@
+0.07 2020-01-11
+- switch to use Test::Snapshot
+- implement make_canonicaliser
+
 0.06 2020-01-01
 - stop putting element "type" in output
 - make_parser can take a Pegex::Grammar object

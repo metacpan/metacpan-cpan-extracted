@@ -27,7 +27,8 @@ gcc -Wall -static -o a a.c
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -D a $RPM_BUILD_ROOT/bin/a
+mkdir -p $RPM_BUILD_ROOT/bin/
+cp a $RPM_BUILD_ROOT/bin/a
 
 %clean
 rm -rf $RPM_BUILD_ROOT

@@ -16,7 +16,7 @@ use Chart::Plotly::Trace::Violin::Stream;
 use Chart::Plotly::Trace::Violin::Transform;
 use Chart::Plotly::Trace::Violin::Unselected;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: In vertical (horizontal) violin plots, statistics are computed using `y` (`x`) values. By supplying an `x` (`y`) array, one violin per distinct x (y) value is drawn If no `x` (`y`) {array} is provided, a single violin is drawn. That violin position is then positioned with with `name` or with `x0` (`y0`) if provided.
 
@@ -215,7 +215,7 @@ has pointpos => (
 has points => (
     is => "rw",
     documentation =>
-      "If *outliers*, only the sample points lying outside the whiskers are shown If *suspectedoutliers*, the outlier points are shown and points either less than 4*Q1-3*Q3 or greater than 4*Q3-3*Q1 are highlighted (see `outliercolor`) If *all*, all sample points are shown If *false*, only the violins are shown with no sample points",
+      "If *outliers*, only the sample points lying outside the whiskers are shown If *suspectedoutliers*, the outlier points are shown and points either less than 4*Q1-3*Q3 or greater than 4*Q3-3*Q1 are highlighted (see `outliercolor`) If *all*, all sample points are shown If *false*, only the violins are shown with no sample points. Defaults to *suspectedoutliers* when `marker.outliercolor` or `marker.line.outliercolor` is set, otherwise defaults to *outliers*.",
 );
 
 has scalegroup => (
@@ -322,9 +322,11 @@ has x => ( is            => "rw",
            documentation => "Sets the x sample data or coordinates. See overview for more info.",
 );
 
-has x0 => ( is            => "rw",
-            isa           => "Any",
-            documentation => "Sets the x coordinate of the box. See overview for more info.",
+has x0 => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Sets the x coordinate for single-box traces or the starting coordinate for multi-box traces set using q1/median/q3. See overview for more info.",
 );
 
 has xaxis => (
@@ -343,9 +345,11 @@ has y => ( is            => "rw",
            documentation => "Sets the y sample data or coordinates. See overview for more info.",
 );
 
-has y0 => ( is            => "rw",
-            isa           => "Any",
-            documentation => "Sets the y coordinate of the box. See overview for more info.",
+has y0 => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Sets the y coordinate for single-box traces or the starting coordinate for multi-box traces set using q1/median/q3. See overview for more info.",
 );
 
 has yaxis => (
@@ -374,7 +378,7 @@ Chart::Plotly::Trace::Violin - In vertical (horizontal) violin plots, statistics
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -544,7 +548,7 @@ Sets the position of the sample points in relation to the violins. If *0*, the s
 
 =item * points
 
-If *outliers*, only the sample points lying outside the whiskers are shown If *suspectedoutliers*, the outlier points are shown and points either less than 4*Q1-3*Q3 or greater than 4*Q3-3*Q1 are highlighted (see `outliercolor`) If *all*, all sample points are shown If *false*, only the violins are shown with no sample points
+If *outliers*, only the sample points lying outside the whiskers are shown If *suspectedoutliers*, the outlier points are shown and points either less than 4*Q1-3*Q3 or greater than 4*Q3-3*Q1 are highlighted (see `outliercolor`) If *all*, all sample points are shown If *false*, only the violins are shown with no sample points. Defaults to *suspectedoutliers* when `marker.outliercolor` or `marker.line.outliercolor` is set, otherwise defaults to *outliers*.
 
 =item * scalegroup
 
@@ -612,7 +616,7 @@ Sets the x sample data or coordinates. See overview for more info.
 
 =item * x0
 
-Sets the x coordinate of the box. See overview for more info.
+Sets the x coordinate for single-box traces or the starting coordinate for multi-box traces set using q1/median/q3. See overview for more info.
 
 =item * xaxis
 
@@ -628,7 +632,7 @@ Sets the y sample data or coordinates. See overview for more info.
 
 =item * y0
 
-Sets the y coordinate of the box. See overview for more info.
+Sets the y coordinate for single-box traces or the starting coordinate for multi-box traces set using q1/median/q3. See overview for more info.
 
 =item * yaxis
 
@@ -646,7 +650,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

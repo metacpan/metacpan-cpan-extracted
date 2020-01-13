@@ -1,5 +1,10 @@
 Revision history for Syntax-Construct
 
+1.016   2020-01-12
+        - Fix MANIFEST.SKIP and the related test
+        - Two aliases added: unicode-12.1 and list-context-state
+          (thanks Branislav Zahradnik)
+
 1.015   2020-01-04
         - Links fixed after 5.30.1 release (thanks Mohammad S Anwar)
 

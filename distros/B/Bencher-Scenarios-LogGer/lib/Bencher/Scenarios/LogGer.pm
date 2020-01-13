@@ -1,7 +1,7 @@
 package Bencher::Scenarios::LogGer;
 
-our $DATE = '2019-09-18'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2020-01-13'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 1;
 # ABSTRACT: Scenarios for benchmarking Log::ger
@@ -18,7 +18,7 @@ Bencher::Scenarios::LogGer - Scenarios for benchmarking Log::ger
 
 =head1 VERSION
 
-This document describes version 0.015 of Bencher::Scenarios::LogGer (from Perl distribution Bencher-Scenarios-LogGer), released on 2019-09-18.
+This document describes version 0.016 of Bencher::Scenarios::LogGer (from Perl distribution Bencher-Scenarios-LogGer), released on 2020-01-13.
 
 =head1 DESCRIPTION
 
@@ -26,19 +26,19 @@ This distribution contains the following L<Bencher> scenario modules:
 
 =over
 
-=item * L<Bencher::Scenario::LogGer::Overhead>
+=item * L<Bencher::Scenario::LogGer::InitTarget>
 
 =item * L<Bencher::Scenario::LogGer::NullOutput>
+
+=item * L<Bencher::Scenario::LogGer::OutputStartup>
+
+=item * L<Bencher::Scenario::LogGer::NumericLevel>
 
 =item * L<Bencher::Scenario::LogGer::LayoutStartup>
 
 =item * L<Bencher::Scenario::LogGer::StringLevel>
 
-=item * L<Bencher::Scenario::LogGer::NumericLevel>
-
-=item * L<Bencher::Scenario::LogGer::OutputStartup>
-
-=item * L<Bencher::Scenario::LogGer::InitTarget>
+=item * L<Bencher::Scenario::LogGer::Overhead>
 
 =back
 
@@ -64,7 +64,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

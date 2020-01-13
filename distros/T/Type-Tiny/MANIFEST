@@ -152,6 +152,7 @@ t/20-unit/Type-Registry/basic.t
 t/20-unit/Type-Registry/methods.t
 t/20-unit/Type-Registry/moosextypes.t
 t/20-unit/Type-Registry/mousextypes.t
+t/20-unit/Type-Registry/parent.t
 t/20-unit/Type-Tiny-Class/basic.t
 t/20-unit/Type-Tiny-Class/errors.t
 t/20-unit/Type-Tiny-Class/plus-constructors.t
@@ -339,6 +340,7 @@ t/40-regression/rt125132.t
 t/40-regression/rt125765.t
 t/40-regression/rt129729.t
 t/40-regression/rt130823.t
+t/40-regression/rt131401.t
 t/40-regression/rt85911.t
 t/40-regression/rt86004.t
 t/40-regression/rt86233.t

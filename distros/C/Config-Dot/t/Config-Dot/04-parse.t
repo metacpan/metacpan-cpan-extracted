@@ -4,7 +4,7 @@ use warnings;
 use Config::Dot;
 use English qw(-no_match_vars);
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 
 # Test.
@@ -87,4 +87,20 @@ is_deeply(
 		'key2' => '2',
 	},
 	'Parsing with callback.',
+);
+
+# Test.
+$c = Config::Dot->new(
+	config => {
+		'key2' => 'value2',
+	},
+);
+$ret = $c->parse('key1=XXX');
+is_deeply(
+	$ret,
+	{
+		'key1' => 'XXX',
+		'key2' => 'value2',
+	},
+	'Parsing with existing config.',
 );

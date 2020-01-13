@@ -44,7 +44,7 @@ $clipboard_unavailable = $IO::Clipboard::clipboard_unavailable;
 #	Initialization
 #
 
-our $VERSION = '0.110';
+our $VERSION = '0.111';
 
 use constant LINFMT => <<eod;
 %s %s %8.4f %9.4f %7.1f %-4s %s
@@ -309,7 +309,7 @@ satpass $VERSION - Satellite pass predictor
 based on Astro::Coord::ECI @{[Astro::Coord::ECI->VERSION]}
 Perl $Config{version} on $Config{osname}
 
-Copyright 2005-2019 by Thomas R. Wyant, III.
+Copyright 2005-2020 by Thomas R. Wyant, III.
 
 Enter 'help' for help. See the help for terms of use.
 
@@ -6060,7 +6060,7 @@ script testing problem.
 =head1 BUGS
 
 Bugs can be reported to the author by mail, or through
-L<http://rt.cpan.org/>.
+L<https://rt.cpan.org/>.
 
 The VMS- and MSWin32-specific code to find the initialization file and
 do tilde expansion is untested, since I do not currently have access to
@@ -6075,7 +6075,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2019 by Thomas R. Wyant, III
+Copyright (C) 2005-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

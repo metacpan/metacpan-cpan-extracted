@@ -2,8 +2,8 @@ NAME
     Complete::Util - General completion routine
 
 VERSION
-    This document describes version 0.607 of Complete::Util (from Perl
-    distribution Complete-Util), released on 2019-12-23.
+    This document describes version 0.608 of Complete::Util (from Perl
+    distribution Complete-Util), released on 2020-01-13.
 
 DESCRIPTION
     This package provides some generic completion routines that follow the
@@ -24,10 +24,52 @@ DESCRIPTION
     higher-level completion modules.
 
 FUNCTIONS
+  answer_has_entries
+    Usage:
+
+     answer_has_entries($answer) -> int
+
+    Check if answer has entries.
+
+    It is equivalent to:
+
+     ref $answer eq 'ARRAY' ? (@$answer ? 1:0) : (@{$answer->{words}} ? 1:0);
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $answer* => *array|hash*
+
+        Completion answer structure.
+
+    Return value: (int)
+
+  answer_num_entries
+    Usage:
+
+     answer_num_entries($answer) -> int
+
+    Get the number of entries in an answer.
+
+    It is equivalent to:
+
+     ref $answer eq 'ARRAY' ? (@$answer // 0) : (@{$answer->{words}} // 0);
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $answer* => *array|hash*
+
+        Completion answer structure.
+
+    Return value: (int)
+
   arrayify_answer
     Usage:
 
-     arrayify_answer($arg) -> array
+     arrayify_answer($answer) -> array
 
     Make sure we return completion answer in array form.
 
@@ -38,7 +80,9 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   $arg* => *array|hash*
+    *   $answer* => *array|hash*
+
+        Completion answer structure.
 
     Return value: (array)
 
@@ -266,7 +310,7 @@ FUNCTIONS
   hashify_answer
     Usage:
 
-     hashify_answer($arg, $meta) -> hash
+     hashify_answer($answer, $meta) -> hash
 
     Make sure we return completion answer in hash form.
 
@@ -280,7 +324,9 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   $arg* => *array|hash*
+    *   $answer* => *array|hash*
+
+        Completion answer structure.
 
     *   $meta => *hash*
 
@@ -396,8 +442,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

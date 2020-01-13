@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::StringLevel;
 
-our $DATE = '2019-09-18'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2020-01-13'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ Bencher::Scenario::LogGer::StringLevel - Benchmark string_level()
 
 =head1 VERSION
 
-This document describes version 0.015 of Bencher::Scenario::LogGer::StringLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2019-09-18.
+This document describes version 0.016 of Bencher::Scenario::LogGer::StringLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2020-01-13.
 
 =head1 SYNOPSIS
 
@@ -88,28 +88,28 @@ Function call template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.04 >>, OS kernel: I<< Linux version 5.0.0-37-generic >>.
 
 Benchmark with default options (C<< bencher -m LogGer::StringLevel >>):
 
  #table1#
- +---------+-----------+-----------+------------+---------+---------+
- | dataset | rate (/s) | time (ns) | vs_slowest |  errors | samples |
- +---------+-----------+-----------+------------+---------+---------+
- | 10      |    820000 |      1200 |          1 | 2.2e-09 |      20 |
- | warn    |   4900000 |       200 |          6 | 2.2e-10 |      24 |
- +---------+-----------+-----------+------------+---------+---------+
+ +---------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | dataset | rate (/s) | time (ns) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +---------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | 10      |   1100000 |       940 |                 0.00% |               513.31% | 1.1e-09 |      25 |
+ | warn    |   6530000 |       153 |               513.31% |                 0.00% | 5.4e-11 |      20 |
+ +---------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m LogGer::StringLevel --module-startup >>):
 
  #table2#
- +---------------------+-----------+------------------------+------------+---------+---------+
- | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
- +---------------------+-----------+------------------------+------------+---------+---------+
- | Log::ger::Util      |      11   |                    4.8 |        1   | 2.9e-05 |      20 |
- | perl -e1 (baseline) |       6.2 |                    0   |        1.8 |   2e-05 |      20 |
- +---------------------+-----------+------------------------+------------+---------+---------+
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ | Log::ger::Util      |     11.5  |              4.65 |                 0.00% |                67.24% | 9.2e-06 |      20 |
+ | perl -e1 (baseline) |      6.85 |              0    |                67.24% |                 0.00% | 3.7e-06 |      20 |
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -136,7 +136,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

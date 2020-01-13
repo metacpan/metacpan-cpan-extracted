@@ -1,0 +1,77 @@
+NAME
+    DateTime::Format::Strftimeq - Format DateTime object using
+    DateTimeX::strftimeq
+
+VERSION
+    This document describes version 0.001 of DateTime::Format::Strftimeq
+    (from Perl distribution DateTime-Format-Strftimeq), released on
+    2019-11-19.
+
+SYNOPSIS
+     use DateTime::Format::Strftimeq;
+
+     my $format = DateTime::Format::Strftimeq->new(
+         # time_zone => '...',    # optional, default is DateTime object's time zone
+         format => '%Y-%m-%d%( $_->day_of_week == 7 ? "su" : "" )q',
+     );
+
+     my $dt1 = DateTime->new(year=>2019, month=>11, day=>19);
+     my $dt1 = DateTime->new(year=>2019, month=>11, day=>24);
+
+     say $format->format_datetime($dt1); # 2019-11-19
+     say $format->format_datetime($dt1); # 2019-11-24su
+
+DESCRIPTION
+    This module formats DateTime objects using DateTimeX::strftimeq.
+
+ATTRIBUTES
+  format
+    Required. Will be passed to strftimeq.
+
+  time_zone
+    Optional. Used to force the time zone of DateTime objects to be
+    formatted. Either string containing time zone name (e.g. "Asia/Jakarta",
+    "UTC") or DateTime::TimeZone object. Will be converted to
+    DateTime::TimeZone internally.
+
+    The default is to use the DateTime object's time zone.
+
+METHODS
+  new
+    Usage:
+
+     DateTime::Format::ISO8601::Format->new(%attrs) => obj
+
+  format_datetime
+    Usage:
+
+     $format->format_datetime($dt) => str
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DateTime-Format-Strftimeq>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DateTime-Format-Strftimeq>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Strft
+    imeq>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DateTimeX::strftimeq
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

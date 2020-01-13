@@ -1,5 +1,5 @@
 package Devel::Optic::Lens::Perlish::Parser;
-$Devel::Optic::Lens::Perlish::Parser::VERSION = '0.012';
+$Devel::Optic::Lens::Perlish::Parser::VERSION = '0.014';
 # ABSTRACT: Lexer/parser for Perlish lens
 
 use strict;
@@ -256,7 +256,7 @@ Devel::Optic::Lens::Perlish::Parser - Lexer/parser for Perlish lens
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 AUTHOR
 

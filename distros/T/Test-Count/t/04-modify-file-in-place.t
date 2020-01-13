@@ -4,13 +4,13 @@ use strict;
 use warnings;
 
 use Test::More tests => 3;
-use File::Spec;
-use File::Copy;
+use File::Spec ();
+use File::Copy ();
 use File::Temp qw(tempdir);
-use Carp;
+use Carp ();
 
-use Test::Count::FileMutator;
-use IO::Scalar;
+use Test::Count::FileMutator ();
+use IO::Scalar               ();
 
 sub _mycopy
 {

@@ -4,32 +4,31 @@ use warnings;
 use 5.009_004;
 use feature ':5.10';
 use XSLoader;
-
-our $GLOBAL;
-our $GLOBAL_TWO;
+our $VERSION = '1.02.0';
+our $GLOBAL_OPEN;
+our $GLOBAL_SYSOPEN;
+our $SUPPRESS_WARNINGS;
 require overload::open;
-
-sub import {
-    return;
-}
 
 sub prehook_open {
     my ( undef, $callback ) = @_;
-    $GLOBAL = $callback;
+    $GLOBAL_OPEN = $callback;
 }
 
 sub prehook_sysopen {
     my ( undef, $callback ) = @_;
-    $GLOBAL_TWO = $callback;
+    $GLOBAL_SYSOPEN = $callback;
 }
-
-sub _install_open; # Provided by open.xs
+sub suppress_warnings {
+    my ( undef, $value ) = @_;
+    $SUPPRESS_WARNINGS = $value;
+}
+sub _install_open;    # Provided by open.xs
 sub _install_sysopen; # Provided by open.xs
 
-our $VERSION = '1.00.0';
 XSLoader::load( 'overload::open', $VERSION );
-_install_open("OP_OPEN");
-_install_sysopen("OP_SYSOPEN");
+_install_open();
+_install_sysopen();
 
 q[Open sesame seed.];
 
@@ -85,6 +84,12 @@ will be passed the same arguments as open.
 
 Runs a hook before C<sysopen> by hooking C<OP_SYSOPEN>. Passes the same arguments
 to the provided sub reference as provided to sysopen.
+
+=item suppress_warnings
+
+  overload::open->suppress_warnings(1)
+
+Suppress runtime warnings
 
 =back
 

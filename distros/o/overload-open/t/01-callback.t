@@ -2,11 +2,10 @@
 use strict;
 use warnings;
 use Test::More;
-use Carp qw/ confess /;
 sub noop { undef };
-use File::Temp qw/ tempfile /;
+use File::Temp;;
 use Fcntl;
-my $temp_file = tempfile;
+my $temp_file = File::Temp->new->filename;
 use overload::open \&noop;
 my $fh;
 my $global;
@@ -25,7 +24,7 @@ eval {
     $print_lives = 1;
     1;
 } or do {
-    confess $@;
+    die $@;
 };
 is $print_lives, 1, "Print does not die";
 is $open_lives, 1, "open does not die";

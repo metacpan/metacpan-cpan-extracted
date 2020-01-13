@@ -67,5 +67,9 @@ like($e, qr/type constraint/, 'type constraint');
 
 is(Animals->new_cat(name => "Grey")->mew, "meow");
 
+my $tom    = Animals->new_cat(name => 'Tom');
+my $jerry  = Animals->new_mouse(name => 'Jerry');
+is($tom->catch(victim => $jerry), 'Caught Jerry', 'method with signature works');
+
 done_testing;
 

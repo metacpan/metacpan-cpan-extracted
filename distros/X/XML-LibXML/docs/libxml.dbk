@@ -22,7 +22,7 @@
         </authorgroup>
 
 
-        <edition>2.0201</edition>
+        <edition>2.0202</edition>
         <copyright>
             <year>2001-2007</year>
             <holder>AxKit.com Ltd</holder>
@@ -1126,7 +1126,7 @@ $dom = $parser-&gt;load_xml(...);
 			  </funcsynopsisinfo>
 			  </funcsynopsis>
 			  <para>This function is available since XML::LibXML 1.70. It provides easy to use interface to the XML parser that parses
-			  given file (or URL), string, or input stream
+			  given file (or non-HTTPS URL), string, or input stream
 			  to a DOM tree. The arguments
 			  can be passed in a HASH reference
 			  or as name => value pairs.
@@ -1142,6 +1142,11 @@ $dom = $parser-&gt;load_xml(...);
 			  See the constructor <function>new</function>
 			  and <xref linkend="parser-options"/>
 			  for more information.
+			  </para>
+			  <para>Note that, due to a limitation in the underlying libxml2
+			  library, this call does not recognize HTTPS-based URLs. (It
+			  will treat an HTTPS URL as a filename, likely throwing a "No such
+			  file or directory" exception.)
 			  </para>
 			  </listitem>
 		    </varlistentry>
@@ -1269,10 +1274,11 @@ $dom = $parser-&gt;load_html(...);
                             </funcsynopsis>
 
                             <para>This function parses an XML document from a file or network;
-		              $xmlfilename can be either a filename or an URL.
+		              $xmlfilename can be either a filename or a (non-HTTPS) URL.
                               Note that for parsing files, this function is the fastest choice,
 		              about 6-8 times faster then parse_fh().
 	                     </para>
+	                     
                         </listitem>
                     </varlistentry>
 
@@ -1319,7 +1325,7 @@ my $doc = $parser-&gt;parse_string(\$xmlstring, $baseuri);
                             </funcsynopsis>
 
                             <para>Similar to parse_file() but parses HTML (strict) documents;
-		               $htmlfile can be filename or URL.
+		               $htmlfile can be filename or (non-HTTPS) URL.
                             </para>
                             <para>An optional second argument can be
                                used to pass some options to the HTML
@@ -3246,7 +3252,7 @@ my $dtd      = $document-&gt;createInternalSubset( "foo", "-//FOO//DTD FOO 0.1//
                     </funcsynopsis>
 
                     <para>This will unbind the Child Node from its parent <function>$node</function>. The function returns the unbound node. If
-                    <function>oldNode</function> is not a child of the given Node the function will fail.</para>
+                    <function>$childnode</function> is not a child of the given Node the function will fail.</para>
                 </listitem>
             </varlistentry>
 
@@ -5780,16 +5786,19 @@ $doc = XML::LibXML-&gt;new-&gt;parse_file($url);</programlisting>
 
                 <listitem>
                     <funcsynopsis>
-                        <funcsynopsisinfo>$rngschema = XML::LibXML::RelaxNG-&gt;new( location =&gt; $filename_or_url );
-$rngschema = XML::LibXML::RelaxNG-&gt;new( string =&gt; $xmlschemastring );
-$rngschema = XML::LibXML::RelaxNG-&gt;new( DOM =&gt; $doc );</funcsynopsisinfo>
+                        <funcsynopsisinfo>$rngschema = XML::LibXML::RelaxNG-&gt;new( location =&gt; $filename_or_url, no_network =&gt; 1 );
+$rngschema = XML::LibXML::RelaxNG-&gt;new( string =&gt; $xmlschemastring, no_network =&gt; 1 );
+$rngschema = XML::LibXML::RelaxNG-&gt;new( DOM =&gt; $doc, no_network =&gt; 1 );</funcsynopsisinfo>
                     </funcsynopsis>
 
-                    <para>The constructor of XML::LibXML::RelaxNG may get called with either one of three parameters. The parameter tells the class from which
-                    source it should generate a validation schema. It is important, that each schema only have a single source.</para>
+                    <para>The constructor of XML::LibXML::RelaxNG needs to be called with list of parameters. At least location, string or DOM parameter is required to
+                    specify source of schema. Optional parameter no_network set to 1 cause that parser would not access network and optional parameter recover
+                    set 1 cause that parser would not call die() on errors.</para>
+
+                    <para>It is important, that each schema only have a single source.</para>
 
                 <para>The location parameter allows one to parse a schema
-                    from the filesystem or a URL.</para>
+                    from the filesystem or a (non-HTTPS) URL.</para>
 
                     <para>The string parameter will parse the schema from the given XML string.</para>
 
@@ -5845,15 +5854,18 @@ $doc = XML::LibXML-&gt;new-&gt;parse_file($url);</programlisting>
 
                 <listitem>
                     <funcsynopsis>
-                        <funcsynopsisinfo>$xmlschema = XML::LibXML::Schema-&gt;new( location =&gt; $filename_or_url );
-$xmlschema = XML::LibXML::Schema-&gt;new( string =&gt; $xmlschemastring );</funcsynopsisinfo>
+                        <funcsynopsisinfo>$xmlschema = XML::LibXML::Schema-&gt;new( location =&gt; $filename_or_url, no_network =&gt; 1 );
+$xmlschema = XML::LibXML::Schema-&gt;new( string =&gt; $xmlschemastring, no_network =&gt; 1 );</funcsynopsisinfo>
                     </funcsynopsis>
 
-                    <para>The constructor of XML::LibXML::Schema may get called with either one of two parameters. The parameter tells the class from which
-                    source it should generate a validation schema. It is important, that each schema only have a single source.</para>
+                    <para>The constructor of XML::LibXML::Schema needs to be called with list of parameters. At least location or string parameter is required to
+                    specify source of schema. Optional parameter no_network set to 1 cause that parser would not access network and optional parameter recover
+                    set 1 cause that parser would not call die() on errors.</para>
+
+                    <para>It is important, that each schema only have a single source.</para>
 
                 <para>The location parameter allows one to parse a schema
-                    from the filesystem or a URL.</para>
+                    from the filesystem or a (non-HTTPS) URL.</para>
 
                     <para>The string parameter will parse the schema from the given XML string.</para>
 
@@ -6322,7 +6334,7 @@ sub processNode {
           <varlistentry>
             <term>location</term>
             <listitem>
-              <para>Read XML from a local file or URL.</para>
+              <para>Read XML from a local file or (non-HTTPS) URL.</para>
             </listitem>
           </varlistentry>
           <varlistentry>
@@ -6367,7 +6379,7 @@ sub processNode {
             <term>RelaxNG => $rng_schema</term>
             <listitem>
               <para>can be used to pass either a <xref linkend="XML-LibXML-RelaxNG"/>
-		object or a filename or URL of a RelaxNG schema to the
+		object or a filename or (non-HTTPS) URL of a RelaxNG schema to the
 		constructor. The schema is then used to validate the
 		document as it is processed.</para>
             </listitem>
@@ -6376,7 +6388,7 @@ sub processNode {
             <term>Schema => $xsd_schema</term>
             <listitem>
               <para>can be used to pass either a <xref linkend="XML-LibXML-Schema"/>
-		object or a filename or URL of a W3C XSD schema to the
+		object or a filename or (non-HTTPS) URL of a W3C XSD schema to the
 		constructor. The schema is then used to validate the
 		document as it is processed.</para>
             </listitem>

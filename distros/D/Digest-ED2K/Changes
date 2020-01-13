@@ -1,5 +1,9 @@
 Revision history for perl module Digest::ED2K
 
+v1.1.1
+
+	- Increase minimum version of Digest::MD4 to 1.3
+
 v1.1 2012-09-22
 
 	- Improved documentation

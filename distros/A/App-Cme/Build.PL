@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2018 by Dominique Dumont.
+# This software is Copyright (c) 2014-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -22,17 +22,16 @@ my %module_build_args = (
   "configure_requires" => {
     "Module::Build" => "0.34"
   },
-  "dist_abstract" => "Check or edit configuration data with Config::Model",
+  "dist_abstract" => "Configuration data checker or editor based on Config::Model",
   "dist_author" => [
     "Dominique Dumont"
   ],
   "dist_name" => "App-Cme",
-  "dist_version" => "1.030",
+  "dist_version" => "1.031",
   "license" => "lgpl",
   "module_name" => "App::Cme",
   "recommends" => {
-    "Config::Model::CursesUI" => 0,
-    "Tk" => 0
+    "Config::Model::TkUI" => "1.370"
   },
   "recursive_test_files" => 1,
   "requires" => {

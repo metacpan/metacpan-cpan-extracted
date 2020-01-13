@@ -1,5 +1,5 @@
 {
-   "abstract" : "Check or edit configuration data with Config::Model",
+   "abstract" : "Configuration data checker or editor based on Config::Model",
    "author" : [
       "Dominique Dumont"
    ],
@@ -26,8 +26,7 @@
       },
       "runtime" : {
          "recommends" : {
-            "Config::Model::CursesUI" : "0",
-            "Tk" : "0"
+            "Config::Model::TkUI" : "1.370"
          },
          "requires" : {
             "App::Cmd::Setup" : "0",
@@ -50,6 +49,9 @@
             "Tie::Hash" : "0",
             "YAML" : "0",
             "perl" : "5.010"
+         },
+         "suggests" : {
+            "Config::Model::CursesUI" : "0"
          }
       },
       "test" : {
@@ -74,8 +76,8 @@
          "web" : "http://github.com/dod38fr/cme-perl"
       }
    },
-   "version" : "1.030",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "version" : "1.031",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18"
 }
 

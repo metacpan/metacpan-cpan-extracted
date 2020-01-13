@@ -14,9 +14,9 @@ use Chart::Plotly::Trace::Box::Stream;
 use Chart::Plotly::Trace::Box::Transform;
 use Chart::Plotly::Trace::Box::Unselected;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
-# ABSTRACT: In vertical (horizontal) box plots, statistics are computed using `y` (`x`) values. By supplying an `x` (`y`) array, one box per distinct x (y) value is drawn If no `x` (`y`) {array} is provided, a single box is drawn. That box position is then positioned with with `name` or with `x0` (`y0`) if provided. Each box spans from quartile 1 (Q1) to quartile 3 (Q3). The second quartile (Q2) is marked by a line inside the box. By default, the whiskers correspond to the box' edges +/- 1.5 times the interquartile range (IQR: Q3-Q1), see *boxpoints* for other options.
+# ABSTRACT: Each box spans from quartile 1 (Q1) to quartile 3 (Q3). The second quartile (Q2, i.e. the median) is marked by a line inside the box. The fences grow outward from the boxes' edges, by default they span +/- 1.5 times the interquartile range (IQR: Q3-Q1), The sample mean and standard deviation as well as notches and the sample, outlier and suspected outliers points can be optionally added to the box plot. The values and positions corresponding to each boxes can be input using two signatures. The first signature expects users to supply the sample values in the `y` data array for vertical boxes (`x` for horizontal boxes). By supplying an `x` (`y`) array, one box per distinct `x` (`y`) value is drawn If no `x` (`y`) {array} is provided, a single box is drawn. In this case, the box is positioned with the trace `name` or with `x0` (`y0`) if provided. The second signature expects users to supply the boxes corresponding Q1, median and Q3 statistics in the `q1`, `median` and `q3` data arrays respectively. Other box features relying on statistics namely `lowerfence`, `upperfence`, `notchspan` can be set directly by the users. To have plotly compute them or to show sample points besides the boxes, users can set the `y` data array for vertical boxes (`x` for horizontal boxes) to a 2D array with the outer length corresponding to the number of boxes in the traces and the inner length corresponding the sample size.
 
 sub TO_JSON {
     my $self       = shift;
@@ -60,13 +60,13 @@ has alignmentgroup => (
 has boxmean => (
     is => "rw",
     documentation =>
-      "If *true*, the mean of the box(es)' underlying distribution is drawn as a dashed line inside the box(es). If *sd* the standard deviation is also drawn.",
+      "If *true*, the mean of the box(es)' underlying distribution is drawn as a dashed line inside the box(es). If *sd* the standard deviation is also drawn. Defaults to *true* when `mean` is set. Defaults to *sd* when `sd` is set Otherwise defaults to *false*.",
 );
 
 has boxpoints => (
     is => "rw",
     documentation =>
-      "If *outliers*, only the sample points lying outside the whiskers are shown If *suspectedoutliers*, the outlier points are shown and points either less than 4*Q1-3*Q3 or greater than 4*Q3-3*Q1 are highlighted (see `outliercolor`) If *all*, all sample points are shown If *false*, only the box(es) are shown with no sample points",
+      "If *outliers*, only the sample points lying outside the whiskers are shown If *suspectedoutliers*, the outlier points are shown and points either less than 4*Q1-3*Q3 or greater than 4*Q3-3*Q1 are highlighted (see `outliercolor`) If *all*, all sample points are shown If *false*, only the box(es) are shown with no sample points Defaults to *suspectedoutliers* when `marker.outliercolor` or `marker.line.outliercolor` is set. Defaults to *all* under the q1/median/q3 signature. Otherwise defaults to *outliers*.",
 );
 
 has customdata => (
@@ -79,6 +79,16 @@ has customdata => (
 has customdatasrc => ( is            => "rw",
                        isa           => "Str",
                        documentation => "Sets the source reference on plot.ly for  customdata .",
+);
+
+has dx => ( is            => "rw",
+            isa           => "Num",
+            documentation => "Sets the x coordinate step for multi-box traces set using q1/median/q3.",
+);
+
+has dy => ( is            => "rw",
+            isa           => "Num",
+            documentation => "Sets the y coordinate step for multi-box traces set using q1/median/q3.",
 );
 
 has fillcolor => (
@@ -159,8 +169,42 @@ has legendgroup => (
 has line => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Box::Line", );
 
+has lowerfence => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Sets the lower fence values. There should be as many items as the number of boxes desired. This attribute has effect only under the q1/median/q3 signature. If `lowerfence` is not provided but a sample (in `y` or `x`) is set, we compute the lower as the last sample point below 1.5 times the IQR.",
+);
+
+has lowerfencesrc => ( is            => "rw",
+                       isa           => "Str",
+                       documentation => "Sets the source reference on plot.ly for  lowerfence .",
+);
+
 has marker => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Box::Marker", );
+
+has mean => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Sets the mean values. There should be as many items as the number of boxes desired. This attribute has effect only under the q1/median/q3 signature. If `mean` is not provided but a sample (in `y` or `x`) is set, we compute the mean for each box using the sample values.",
+);
+
+has meansrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  mean .",
+);
+
+has median => (is            => "rw",
+               isa           => "ArrayRef|PDL",
+               documentation => "Sets the median values. There should be as many items as the number of boxes desired.",
+);
+
+has mediansrc => ( is            => "rw",
+                   isa           => "Str",
+                   documentation => "Sets the source reference on plot.ly for  median .",
+);
 
 has pmeta => (
     is  => "rw",
@@ -185,7 +229,19 @@ has notched => (
     is  => "rw",
     isa => "Bool",
     documentation =>
-      "Determines whether or not notches are drawn. Notches displays a confidence interval around the median. We compute the confidence interval as median +/- 1.57 / IQR * sqrt(N), where IQR is the interquartile range and N is the sample size. If two boxes' notches do not overlap there is 95% confidence their medians differ. See https://sites.google.com/site/davidsstatistics/home/notched-box-plots for more info.",
+      "Determines whether or not notches are drawn. Notches displays a confidence interval around the median. We compute the confidence interval as median +/- 1.57 * IQR / sqrt(N), where IQR is the interquartile range and N is the sample size. If two boxes' notches do not overlap there is 95% confidence their medians differ. See https://sites.google.com/site/davidsstatistics/home/notched-box-plots for more info. Defaults to *false* unless `notchwidth` or `notchspan` is set.",
+);
+
+has notchspan => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Sets the notch span from the boxes' `median` values. There should be as many items as the number of boxes desired. This attribute has effect only under the q1/median/q3 signature. If `notchspan` is not provided but a sample (in `y` or `x`) is set, we compute it as 1.57 * IQR / sqrt(N), where N is the sample size.",
+);
+
+has notchspansrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  notchspan .",
 );
 
 has notchwidth => (
@@ -219,6 +275,45 @@ has pointpos => (
     isa => "Num",
     documentation =>
       "Sets the position of the sample points in relation to the box(es). If *0*, the sample points are places over the center of the box(es). Positive (negative) values correspond to positions to the right (left) for vertical boxes and above (below) for horizontal boxes",
+);
+
+has q1 => (is            => "rw",
+           isa           => "ArrayRef|PDL",
+           documentation => "Sets the Quartile 1 values. There should be as many items as the number of boxes desired.",
+);
+
+has q1src => ( is            => "rw",
+               isa           => "Str",
+               documentation => "Sets the source reference on plot.ly for  q1 .",
+);
+
+has q3 => (is            => "rw",
+           isa           => "ArrayRef|PDL",
+           documentation => "Sets the Quartile 3 values. There should be as many items as the number of boxes desired.",
+);
+
+has q3src => ( is            => "rw",
+               isa           => "Str",
+               documentation => "Sets the source reference on plot.ly for  q3 .",
+);
+
+has quartilemethod => (
+    is  => "rw",
+    isa => enum( [ "linear", "exclusive", "inclusive" ] ),
+    documentation =>
+      "Sets the method used to compute the sample's Q1 and Q3 quartiles. The *linear* method uses the 25th percentile for Q1 and 75th percentile for Q3 as computed using method #10 (listed on http://www.amstat.org/publications/jse/v14n3/langford.html). The *exclusive* method uses the median to divide the ordered dataset into two halves if the sample is odd, it does not include the median in either half - Q1 is then the median of the lower half and Q3 the median of the upper half. The *inclusive* method also uses the median to divide the ordered dataset into two halves but if the sample is odd, it includes the median in both halves - Q1 is then the median of the lower half and Q3 the median of the upper half.",
+);
+
+has sd => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Sets the standard deviation values. There should be as many items as the number of boxes desired. This attribute has effect only under the q1/median/q3 signature. If `sd` is not provided but a sample (in `y` or `x`) is set, we compute the standard deviation for each box using the sample values.",
+);
+
+has sdsrc => ( is            => "rw",
+               isa           => "Str",
+               documentation => "Sets the source reference on plot.ly for  sd .",
 );
 
 has selected => ( is  => "rw",
@@ -272,6 +367,18 @@ has uirevision => (
 has unselected => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Box::Unselected", );
 
+has upperfence => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Sets the upper fence values. There should be as many items as the number of boxes desired. This attribute has effect only under the q1/median/q3 signature. If `upperfence` is not provided but a sample (in `y` or `x`) is set, we compute the lower as the last sample point above 1.5 times the IQR.",
+);
+
+has upperfencesrc => ( is            => "rw",
+                       isa           => "Str",
+                       documentation => "Sets the source reference on plot.ly for  upperfence .",
+);
+
 has visible => (
     is => "rw",
     documentation =>
@@ -297,9 +404,11 @@ has x => ( is            => "rw",
            documentation => "Sets the x sample data or coordinates. See overview for more info.",
 );
 
-has x0 => ( is            => "rw",
-            isa           => "Any",
-            documentation => "Sets the x coordinate of the box. See overview for more info.",
+has x0 => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Sets the x coordinate for single-box traces or the starting coordinate for multi-box traces set using q1/median/q3. See overview for more info.",
 );
 
 has xaxis => (
@@ -327,9 +436,11 @@ has y => ( is            => "rw",
            documentation => "Sets the y sample data or coordinates. See overview for more info.",
 );
 
-has y0 => ( is            => "rw",
-            isa           => "Any",
-            documentation => "Sets the y coordinate of the box. See overview for more info.",
+has y0 => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Sets the y coordinate for single-box traces or the starting coordinate for multi-box traces set using q1/median/q3. See overview for more info.",
 );
 
 has yaxis => (
@@ -363,11 +474,11 @@ __END__
 
 =head1 NAME
 
-Chart::Plotly::Trace::Box - In vertical (horizontal) box plots, statistics are computed using `y` (`x`) values. By supplying an `x` (`y`) array, one box per distinct x (y) value is drawn If no `x` (`y`) {array} is provided, a single box is drawn. That box position is then positioned with with `name` or with `x0` (`y0`) if provided. Each box spans from quartile 1 (Q1) to quartile 3 (Q3). The second quartile (Q2) is marked by a line inside the box. By default, the whiskers correspond to the box' edges +/- 1.5 times the interquartile range (IQR: Q3-Q1), see *boxpoints* for other options.
+Chart::Plotly::Trace::Box - Each box spans from quartile 1 (Q1) to quartile 3 (Q3). The second quartile (Q2, i.e. the median) is marked by a line inside the box. The fences grow outward from the boxes' edges, by default they span +/- 1.5 times the interquartile range (IQR: Q3-Q1), The sample mean and standard deviation as well as notches and the sample, outlier and suspected outliers points can be optionally added to the box plot. The values and positions corresponding to each boxes can be input using two signatures. The first signature expects users to supply the sample values in the `y` data array for vertical boxes (`x` for horizontal boxes). By supplying an `x` (`y`) array, one box per distinct `x` (`y`) value is drawn If no `x` (`y`) {array} is provided, a single box is drawn. In this case, the box is positioned with the trace `name` or with `x0` (`y0`) if provided. The second signature expects users to supply the boxes corresponding Q1, median and Q3 statistics in the `q1`, `median` and `q3` data arrays respectively. Other box features relying on statistics namely `lowerfence`, `upperfence`, `notchspan` can be set directly by the users. To have plotly compute them or to show sample points besides the boxes, users can set the `y` data array for vertical boxes (`x` for horizontal boxes) to a 2D array with the outer length corresponding to the number of boxes in the traces and the inner length corresponding the sample size.
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -384,7 +495,7 @@ version 0.035
 
 =head1 DESCRIPTION
 
-In vertical (horizontal) box plots, statistics are computed using `y` (`x`) values. By supplying an `x` (`y`) array, one box per distinct x (y) value is drawn If no `x` (`y`) {array} is provided, a single box is drawn. That box position is then positioned with with `name` or with `x0` (`y0`) if provided. Each box spans from quartile 1 (Q1) to quartile 3 (Q3). The second quartile (Q2) is marked by a line inside the box. By default, the whiskers correspond to the box' edges +/- 1.5 times the interquartile range (IQR: Q3-Q1), see *boxpoints* for other options.
+Each box spans from quartile 1 (Q1) to quartile 3 (Q3). The second quartile (Q2, i.e. the median) is marked by a line inside the box. The fences grow outward from the boxes' edges, by default they span +/- 1.5 times the interquartile range (IQR: Q3-Q1), The sample mean and standard deviation as well as notches and the sample, outlier and suspected outliers points can be optionally added to the box plot. The values and positions corresponding to each boxes can be input using two signatures. The first signature expects users to supply the sample values in the `y` data array for vertical boxes (`x` for horizontal boxes). By supplying an `x` (`y`) array, one box per distinct `x` (`y`) value is drawn If no `x` (`y`) {array} is provided, a single box is drawn. In this case, the box is positioned with the trace `name` or with `x0` (`y0`) if provided. The second signature expects users to supply the boxes corresponding Q1, median and Q3 statistics in the `q1`, `median` and `q3` data arrays respectively. Other box features relying on statistics namely `lowerfence`, `upperfence`, `notchspan` can be set directly by the users. To have plotly compute them or to show sample points besides the boxes, users can set the `y` data array for vertical boxes (`x` for horizontal boxes) to a 2D array with the outer length corresponding to the number of boxes in the traces and the inner length corresponding the sample size.
 
 Screenshot of the above example:
 
@@ -430,11 +541,11 @@ Set several traces linked to the same position axis or matching axes to the same
 
 =item * boxmean
 
-If *true*, the mean of the box(es)' underlying distribution is drawn as a dashed line inside the box(es). If *sd* the standard deviation is also drawn.
+If *true*, the mean of the box(es)' underlying distribution is drawn as a dashed line inside the box(es). If *sd* the standard deviation is also drawn. Defaults to *true* when `mean` is set. Defaults to *sd* when `sd` is set Otherwise defaults to *false*.
 
 =item * boxpoints
 
-If *outliers*, only the sample points lying outside the whiskers are shown If *suspectedoutliers*, the outlier points are shown and points either less than 4*Q1-3*Q3 or greater than 4*Q3-3*Q1 are highlighted (see `outliercolor`) If *all*, all sample points are shown If *false*, only the box(es) are shown with no sample points
+If *outliers*, only the sample points lying outside the whiskers are shown If *suspectedoutliers*, the outlier points are shown and points either less than 4*Q1-3*Q3 or greater than 4*Q3-3*Q1 are highlighted (see `outliercolor`) If *all*, all sample points are shown If *false*, only the box(es) are shown with no sample points Defaults to *suspectedoutliers* when `marker.outliercolor` or `marker.line.outliercolor` is set. Defaults to *all* under the q1/median/q3 signature. Otherwise defaults to *outliers*.
 
 =item * customdata
 
@@ -443,6 +554,14 @@ Assigns extra data each datum. This may be useful when listening to hover, click
 =item * customdatasrc
 
 Sets the source reference on plot.ly for  customdata .
+
+=item * dx
+
+Sets the x coordinate step for multi-box traces set using q1/median/q3.
+
+=item * dy
+
+Sets the y coordinate step for multi-box traces set using q1/median/q3.
 
 =item * fillcolor
 
@@ -496,7 +615,31 @@ Sets the legend group for this trace. Traces part of the same legend group hide/
 
 =item * line
 
+=item * lowerfence
+
+Sets the lower fence values. There should be as many items as the number of boxes desired. This attribute has effect only under the q1/median/q3 signature. If `lowerfence` is not provided but a sample (in `y` or `x`) is set, we compute the lower as the last sample point below 1.5 times the IQR.
+
+=item * lowerfencesrc
+
+Sets the source reference on plot.ly for  lowerfence .
+
 =item * marker
+
+=item * mean
+
+Sets the mean values. There should be as many items as the number of boxes desired. This attribute has effect only under the q1/median/q3 signature. If `mean` is not provided but a sample (in `y` or `x`) is set, we compute the mean for each box using the sample values.
+
+=item * meansrc
+
+Sets the source reference on plot.ly for  mean .
+
+=item * median
+
+Sets the median values. There should be as many items as the number of boxes desired.
+
+=item * mediansrc
+
+Sets the source reference on plot.ly for  median .
 
 =item * pmeta
 
@@ -512,7 +655,15 @@ Sets the trace name. The trace name appear as the legend item and on hover. For 
 
 =item * notched
 
-Determines whether or not notches are drawn. Notches displays a confidence interval around the median. We compute the confidence interval as median +/- 1.57 / IQR * sqrt(N), where IQR is the interquartile range and N is the sample size. If two boxes' notches do not overlap there is 95% confidence their medians differ. See https://sites.google.com/site/davidsstatistics/home/notched-box-plots for more info.
+Determines whether or not notches are drawn. Notches displays a confidence interval around the median. We compute the confidence interval as median +/- 1.57 * IQR / sqrt(N), where IQR is the interquartile range and N is the sample size. If two boxes' notches do not overlap there is 95% confidence their medians differ. See https://sites.google.com/site/davidsstatistics/home/notched-box-plots for more info. Defaults to *false* unless `notchwidth` or `notchspan` is set.
+
+=item * notchspan
+
+Sets the notch span from the boxes' `median` values. There should be as many items as the number of boxes desired. This attribute has effect only under the q1/median/q3 signature. If `notchspan` is not provided but a sample (in `y` or `x`) is set, we compute it as 1.57 * IQR / sqrt(N), where N is the sample size.
+
+=item * notchspansrc
+
+Sets the source reference on plot.ly for  notchspan .
 
 =item * notchwidth
 
@@ -533,6 +684,34 @@ Sets the orientation of the box(es). If *v* (*h*), the distribution is visualize
 =item * pointpos
 
 Sets the position of the sample points in relation to the box(es). If *0*, the sample points are places over the center of the box(es). Positive (negative) values correspond to positions to the right (left) for vertical boxes and above (below) for horizontal boxes
+
+=item * q1
+
+Sets the Quartile 1 values. There should be as many items as the number of boxes desired.
+
+=item * q1src
+
+Sets the source reference on plot.ly for  q1 .
+
+=item * q3
+
+Sets the Quartile 3 values. There should be as many items as the number of boxes desired.
+
+=item * q3src
+
+Sets the source reference on plot.ly for  q3 .
+
+=item * quartilemethod
+
+Sets the method used to compute the sample's Q1 and Q3 quartiles. The *linear* method uses the 25th percentile for Q1 and 75th percentile for Q3 as computed using method #10 (listed on http://www.amstat.org/publications/jse/v14n3/langford.html). The *exclusive* method uses the median to divide the ordered dataset into two halves if the sample is odd, it does not include the median in either half - Q1 is then the median of the lower half and Q3 the median of the upper half. The *inclusive* method also uses the median to divide the ordered dataset into two halves but if the sample is odd, it includes the median in both halves - Q1 is then the median of the lower half and Q3 the median of the upper half.
+
+=item * sd
+
+Sets the standard deviation values. There should be as many items as the number of boxes desired. This attribute has effect only under the q1/median/q3 signature. If `sd` is not provided but a sample (in `y` or `x`) is set, we compute the standard deviation for each box using the sample values.
+
+=item * sdsrc
+
+Sets the source reference on plot.ly for  sd .
 
 =item * selected
 
@@ -566,6 +745,14 @@ Controls persistence of some user-driven changes to the trace: `constraintrange`
 
 =item * unselected
 
+=item * upperfence
+
+Sets the upper fence values. There should be as many items as the number of boxes desired. This attribute has effect only under the q1/median/q3 signature. If `upperfence` is not provided but a sample (in `y` or `x`) is set, we compute the lower as the last sample point above 1.5 times the IQR.
+
+=item * upperfencesrc
+
+Sets the source reference on plot.ly for  upperfence .
+
 =item * visible
 
 Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).
@@ -584,7 +771,7 @@ Sets the x sample data or coordinates. See overview for more info.
 
 =item * x0
 
-Sets the x coordinate of the box. See overview for more info.
+Sets the x coordinate for single-box traces or the starting coordinate for multi-box traces set using q1/median/q3. See overview for more info.
 
 =item * xaxis
 
@@ -604,7 +791,7 @@ Sets the y sample data or coordinates. See overview for more info.
 
 =item * y0
 
-Sets the y coordinate of the box. See overview for more info.
+Sets the y coordinate for single-box traces or the starting coordinate for multi-box traces set using q1/median/q3. See overview for more info.
 
 =item * yaxis
 
@@ -626,7 +813,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 8;
 
-use Test::Count::Parser;
+use Test::Count::Parser ();
 
 {
     my $parser = Test::Count::Parser->new();

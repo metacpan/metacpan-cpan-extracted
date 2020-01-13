@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Volume::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Volume::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Volume::Colorbar::Title;
 
-our $VERSION = '0.035';    # VERSION
+our $VERSION = '0.036';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace volume.
 
@@ -281,7 +281,7 @@ Chart::Plotly::Trace::Volume::Colorbar - This attribute is one of the possible o
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -1644,7 +1644,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -9,9 +9,9 @@ XML::LibXML::RelaxNG - RelaxNG Schema Validation
   use XML::LibXML;
   $doc = XML::LibXML->new->parse_file($url);
 
-  $rngschema = XML::LibXML::RelaxNG->new( location => $filename_or_url );
-  $rngschema = XML::LibXML::RelaxNG->new( string => $xmlschemastring );
-  $rngschema = XML::LibXML::RelaxNG->new( DOM => $doc );
+  $rngschema = XML::LibXML::RelaxNG->new( location => $filename_or_url, no_network => 1 );
+  $rngschema = XML::LibXML::RelaxNG->new( string => $xmlschemastring, no_network => 1 );
+  $rngschema = XML::LibXML::RelaxNG->new( DOM => $doc, no_network => 1 );
   eval { $rngschema->validate( $doc ); };
 
 =head1 DESCRIPTION
@@ -27,17 +27,20 @@ validation.
 
 =item new
 
-  $rngschema = XML::LibXML::RelaxNG->new( location => $filename_or_url );
-  $rngschema = XML::LibXML::RelaxNG->new( string => $xmlschemastring );
-  $rngschema = XML::LibXML::RelaxNG->new( DOM => $doc );
+  $rngschema = XML::LibXML::RelaxNG->new( location => $filename_or_url, no_network => 1 );
+  $rngschema = XML::LibXML::RelaxNG->new( string => $xmlschemastring, no_network => 1 );
+  $rngschema = XML::LibXML::RelaxNG->new( DOM => $doc, no_network => 1 );
 
-The constructor of XML::LibXML::RelaxNG may get called with either one of three
-parameters. The parameter tells the class from which source it should generate
-a validation schema. It is important, that each schema only have a single
-source.
+The constructor of XML::LibXML::RelaxNG needs to be called with list of
+parameters. At least location, string or DOM parameter is required to specify
+source of schema. Optional parameter no_network set to 1 cause that parser
+would not access network and optional parameter recover set 1 cause that parser
+would not call die() on errors.
+
+It is important, that each schema only have a single source.
 
 The location parameter allows one to parse a schema from the filesystem or a
-URL.
+(non-HTTPS) URL.
 
 The string parameter will parse the schema from the given XML string.
 
@@ -70,7 +73,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0201
+2.0202
 
 =head1 COPYRIGHT
 

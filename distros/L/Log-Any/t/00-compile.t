@@ -6,13 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Log/Any.pm',
     'Log/Any/Adapter.pm',
     'Log/Any/Adapter/Base.pm',
+    'Log/Any/Adapter/Capture.pm',
     'Log/Any/Adapter/File.pm',
+    'Log/Any/Adapter/Multiplex.pm',
     'Log/Any/Adapter/Null.pm',
     'Log/Any/Adapter/Stderr.pm',
     'Log/Any/Adapter/Stdout.pm',

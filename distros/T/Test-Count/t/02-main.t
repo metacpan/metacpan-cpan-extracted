@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
-use File::Spec;
-use IO::Scalar;
+use Test::More tests => 7;
+use File::Spec ();
+use IO::Scalar ();
 
-use Test::Count;
+use Test::Count ();
 
 {
     open my $in, "<",
@@ -187,6 +187,44 @@ EOF
 
     # TEST
     is( $ret->{'tests_count'}, ( 10 + 10 ) * 30, "Handling *=", );
+
+    close($in);
+}
+
+{
+    my $_T     = 'T' . 'EST';
+    my $buffer = <<"EOF";
+use MyModule;
+
+# ${_T}:\$my_func=30;
+
+# ${_T}:FILTER(MULT(\$my_func))
+
+for my \$idx (1 .. 30)
+{
+    # ${_T}
+    MyModule->my_func("Foo", "Foo \$idx");
+
+    # ${_T}
+    MyModule->my_bar("Bar", "Bar \$idx");
+}
+
+# ${_T}:ENDFILTER()
+
+EOF
+
+    my $in = IO::Scalar->new( \$buffer );
+
+    my $counter = Test::Count->new(
+        {
+            'input_fh' => $in,
+        }
+    );
+
+    my $ret = $counter->process();
+
+    # TEST
+    is( $ret->{'tests_count'}, 2 * 30, "Handling FILTER()" );
 
     close($in);
 }

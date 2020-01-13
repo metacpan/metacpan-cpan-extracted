@@ -7,7 +7,6 @@ wiki/
 
 # node
 dist/
-lib/
 node_modules/
 
 # yarn
